@@ -325,8 +325,12 @@ export function PptxPreviewModal({
                 <SlideLayersInspector
                   slide={slide}
                   onChange={(blocks, label) =>
-                    updateSlideCanvasBlocks(deck.id, slide.id, blocks, { label })
+                    updateSlideCanvasBlocks(deck.id, slide.id, blocks, {
+                      label,
+                      coalesceKey: null,
+                    })
                   }
+
                   onOpenEditor={onClose}
                 />
               </div>

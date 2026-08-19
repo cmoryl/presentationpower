@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { CanvasBlock, DeckSlide } from "@/lib/deck-store";
+import { useDeckStore } from "@/lib/deck-store";
 import {
   clearCanvasEmphasis,
   setCanvasEmphasis,
   useCanvasEmphasis,
 } from "@/lib/canvas-emphasis";
+
 
 /**
  * Read/adjust the slide's canvas layers from the right-hand inspector rail.
@@ -48,6 +50,30 @@ export function SlideLayersInspector({
 
   const [picked, setPicked] = useState<string[]>([]);
   const anchorRef = useRef<string | null>(null);
+
+  // Undo / redo of layer edits rides the deck-wide session history so the
+  // panel, the stage and ⌘Z all agree on the same stack.
+  const undo = useDeckStore((s) => s.undo);
+  const redo = useDeckStore((s) => s.redo);
+  const pastCount = useDeckStore((s) => (s._past ?? []).length);
+  const futureCount = useDeckStore((s) => (s._future ?? []).length);
+  const undoName = useDeckStore((s) => s._past?.[s._past.length - 1]?.label ?? null);
+  const redoName = useDeckStore((s) => s._future?.[s._future.length - 1]?.label ?? null);
+
+  /** ⌘/Ctrl+Z and ⌘/Ctrl+⇧+Z while the panel has focus (works inside modals). */
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "z") return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.shiftKey) redo();
+      else undo();
+      setPicked([]);
+      clearCanvasEmphasis();
+    },
+    [redo, undo],
+  );
+
 
   // Never leave a highlight behind when the panel closes or the slide changes.
   useEffect(() => clearCanvasEmphasis, []);
@@ -193,13 +219,39 @@ export function SlideLayersInspector({
     "rounded-md border border-black/15 bg-white px-2 py-1 text-[11px] font-medium text-black/70 hover:bg-black/[0.05]";
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2" onKeyDown={onKeyDown}>
       <div className="flex items-center justify-between text-[11px] uppercase tracking-widest text-black/45">
         <span>
           {ordered.length} layers
           {picked.length > 0 ? ` · ${picked.length} selected` : ""}
         </span>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              undo();
+              setPicked([]);
+              clearCanvasEmphasis();
+            }}
+            disabled={pastCount === 0}
+            title={undoName ? `Undo ${undoName}` : "Undo (⌘/Ctrl+Z)"}
+            className="hover:text-black/70 disabled:opacity-30"
+          >
+            ↶ Undo
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              redo();
+              setPicked([]);
+              clearCanvasEmphasis();
+            }}
+            disabled={futureCount === 0}
+            title={redoName ? `Redo ${redoName}` : "Redo (⌘/Ctrl+⇧+Z)"}
+            className="hover:text-black/70 disabled:opacity-30"
+          >
+            ↷ Redo
+          </button>
           <button
             type="button"
             onClick={() =>
@@ -215,6 +267,7 @@ export function SlideLayersInspector({
             Edit ⤢
           </button>
         </div>
+
       </div>
 
       {picked.length > 0 && (
