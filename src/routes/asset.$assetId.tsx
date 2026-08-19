@@ -1786,6 +1786,14 @@ function AssetEditor() {
                     </button>
                   </div>
                 </Row>
+                <IconAccentContrastWarning
+                  accent={ctx.iconStyle?.accent}
+                  background={iconPageBackground(editorMode)}
+                  stroke={ctx.iconStyle?.stroke ?? 1}
+                  onApplySuggestion={(hex) =>
+                    patchCtx({ iconStyle: { ...(ctx.iconStyle ?? {}), accent: hex } })
+                  }
+                />
               </Panel>
 
               {baseBrand && (
