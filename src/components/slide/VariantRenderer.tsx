@@ -13656,11 +13656,27 @@ function readHeroStat(
   };
 }
 
+type LocationsInk = {
+  strong: string;
+  body: string;
+  muted: string;
+  faint: string;
+  axis: string;
+  divider: string;
+  hairline: string;
+  hairlineStrong: string;
+  surface: string;
+  surfaceRing: string;
+  ringOnDark: string;
+  onSurface: (hex: string) => string;
+  accentText: string;
+};
+
 function renderLocationsVariant(
   variantId: string,
   brand: { id: string; tokens: { accent: string; primary: string } } & Record<string, unknown>,
   mode: SlideMode,
-  ink: Record<string, string> & { onSurface: (hex: string) => string },
+  ink: LocationsInk,
   c: Record<string, unknown>,
   pageNumber?: number,
 ): React.ReactElement {
