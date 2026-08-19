@@ -25,11 +25,13 @@ function UsersView() {
   const inviteFn = useServerFn(inviteAdminUser);
   const roleFn = useServerFn(setUserRole);
   const delFn = useServerFn(deleteAdminUser);
+  const activateFn = useServerFn(activateAdminUser);
   const qc = useQueryClient();
   const q = useQuery({ queryKey: ["admin", "users"], queryFn: () => listFn(), retry: false });
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("user");
   const [msg, setMsg] = useState<string | null>(null);
+  const [issued, setIssued] = useState<{ email: string; password: string } | null>(null);
 
   const inviteM = useMutation({
     mutationFn: (input: { email: string; role: Role }) => inviteFn({ data: input }),
@@ -48,6 +50,20 @@ function UsersView() {
     mutationFn: (userId: string) => delFn({ data: { userId } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "users"] }),
   });
+  const activateM = useMutation({
+    mutationFn: (input: { userId: string; email: string; password?: string }) =>
+      activateFn({ data: { userId: input.userId, password: input.password } }).then((r) => ({
+        ...r,
+        email: input.email,
+      })),
+    onSuccess: (r) => {
+      setIssued({ email: r.email, password: r.password });
+      setMsg(null);
+      qc.invalidateQueries({ queryKey: ["admin", "users"] });
+    },
+    onError: (e: Error) => setMsg(e.message),
+  });
+
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
 
