@@ -19,6 +19,7 @@ import {
   printKnowledgeStatus,
   syncPrintLibraryKnowledge,
 } from "@/lib/print-knowledge.functions";
+import { backfillOracleMirror } from "@/lib/oracle-mirror.functions";
 import type { PrintAssetKind } from "@/lib/print-assets.types";
 import {
   Sparkle,
