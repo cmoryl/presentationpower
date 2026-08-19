@@ -51,6 +51,7 @@ export function ScaledSlide({
     };
   }, [stageW, stageH]);
 
+  const s = scale ?? 1;
 
   return (
     <div
@@ -64,17 +65,21 @@ export function ScaledSlide({
         /* Thumbnail-scale legibility: below ~0.45 a 32px glyph with a 2.5
            stroke renders under half a pixel and visually disappears in the
            module library cards. CSS keyed off this flag restores presence. */
-        data-thumb={scale < 0.45 ? "1" : undefined}
+        data-thumb={s < 0.45 ? "1" : undefined}
         className="absolute left-0 top-0 origin-top-left text-left"
         style={
           {
             width: stageW,
             height: stageH,
-            transform: `scale(${scale})`,
-            "--slide-scale": scale,
+            transform: `scale(${s})`,
+            // Hidden only for the very first pre-measure frame, so nothing ever
+            // paints at an unscaled size.
+            visibility: scale === null ? "hidden" : undefined,
+            "--slide-scale": s,
           } as CSSProperties
         }
       >
+
 
         {children}
       </div>
