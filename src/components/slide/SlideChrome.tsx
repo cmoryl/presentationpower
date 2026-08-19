@@ -202,11 +202,26 @@ export function makeSlideInk(
   const accentText = accentHex ? readableAccent(accentHex, mode, surfaceHex ?? undefined) : textHex;
   const rgb = hexToRgb(bodyHex) ?? (dark ? { r: 255, g: 255, b: 255 } : { r: 10, g: 15, b: 28 });
   const base = `${rgb.r},${rgb.g},${rgb.b}`;
+  const textBackgrounds = dark
+    ? ["#03002C", "#0A1230"]
+    : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
+  const surfaceRgb = hexToRgb(dark ? "#03002C" : surfaceHex ?? "#FFFFFF") ??
+    (dark ? { r: 3, g: 0, b: 44 } : { r: 255, g: 255, b: 255 });
+  // Secondary and tertiary copy used to be translucent ink. On bright scene
+  // plates that alpha composited to only 1–3:1, which made locked footers,
+  // page numbers and eyebrows fail even though their base token was sound.
+  // Keep the hierarchy by mixing toward the page field, then resolve to an
+  // OPAQUE AA colour against every supported field. Opaque tokens also remain
+  // deterministic in screenshots, PDF and layered PowerPoint export.
+  const mutedStart = rgbToHex(mixRgb(rgb, surfaceRgb, dark ? 0.28 : 0.24));
+  const faintStart = rgbToHex(mixRgb(rgb, surfaceRgb, dark ? 0.46 : 0.42));
+  const mutedHex = readableOn(mutedStart, textBackgrounds, dark ? "lighten" : "darken", 4.5);
+  const faintHex = readableOn(faintStart, textBackgrounds, dark ? "lighten" : "darken", 4.5);
   return {
     text: textHex,
     strong: textHex,
-    muted: `rgba(${base},${dark ? 0.72 : 0.68})`,
-    faint: `rgba(${base},${dark ? 0.52 : 0.52})`,
+    muted: mutedHex,
+    faint: faintHex,
     hairline: `rgba(${base},${dark ? 0.14 : 0.12})`,
     hairlineStrong: `rgba(${base},${dark ? 0.22 : 0.18})`,
     trackFill: `rgba(${base},${dark ? 0.08 : 0.07})`,
@@ -1077,7 +1092,14 @@ export function SlideFrame({
         className="absolute left-24 right-24 flex items-center justify-between uppercase"
         style={{
           bottom: bottomCenterLogo ? 40 : 40,
-          color: enterprise ? enterprisePalette(mode).inkFaint : frameInk.muted,
+          // Style-pack vars include the pack readability guard's corrected
+          // value. The fallback is the opaque AA chrome token above; never use
+          // translucent `inkFaint` for locked footer copy.
+          color: pack
+            ? `var(--pack-ink-muted, ${frameInk.muted})`
+            : enterprise
+              ? frameInk.faint
+              : frameInk.muted,
           fontSize: enterprise ? 15 : 18,
           fontWeight: enterprise ? 600 : undefined,
           letterSpacing: enterprise ? "0.22em" : "0.28em",

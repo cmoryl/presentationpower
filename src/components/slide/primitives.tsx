@@ -254,11 +254,24 @@ export function SupportingText({
 }
 
 // ── Meta row (dates, presenters, "prepared by" line) ──────────────────────
-export function MetaRow({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function MetaRow({
+  children,
+  className = "",
+  color,
+}: {
+  children: ReactNode;
+  className?: string;
+  color?: string;
+}) {
+  const ink = useSlideInk();
   return (
     <div
       className={`flex flex-wrap items-center gap-x-16 gap-y-3 uppercase ${className}`}
-      style={{ fontSize: fillPx(20, "kicker"), letterSpacing: "0.28em", opacity: 0.7 }}
+      style={{
+        color: color ?? ink.faint,
+        fontSize: fillPx(20, "kicker"),
+        letterSpacing: "0.28em",
+      }}
     >
       {children}
     </div>
