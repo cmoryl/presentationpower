@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useBlocker } from "@tanstack/react-router";
 import { useDeckStore } from "@/lib/deck-store";
-import { deckSignature, markDeckSaved, useUnsavedStore } from "@/lib/unsaved-changes";
+import { deckSignature, markDeckSaved, saveDeckNow, useUnsavedStore } from "@/lib/unsaved-changes";
 
 /**
  * Returns true when the in-memory deck differs from the last saved snapshot.
@@ -26,32 +26,39 @@ export function useDeckDirty(deckId: string): boolean {
 }
 
 /**
- * Warns on in-app navigation and on browser tab close/reload while the deck
- * has unsaved changes.
+ * Keeps the deck safe on exit. Leaving with pending edits first tries to save
+ * them silently (the autosave flush); the user is only asked to confirm when
+ * that save actually fails.
  */
 export function useUnsavedDeckGuard(deckId: string) {
   const dirty = useDeckDirty(deckId);
+  const dirtyRef = useRef(dirty);
+  dirtyRef.current = dirty;
 
   useBlocker({
-    shouldBlockFn: () => {
-      if (!dirty) return false;
+    shouldBlockFn: async () => {
+      if (!dirtyRef.current) return false;
+      const saved = await saveDeckNow(deckId);
+      if (saved) return false;
       return !window.confirm(
-        "You have unsaved changes to this deck (including slide order). Leave without saving?",
+        "This deck couldn't be saved to your account (you may be offline or signed out). Leave anyway? Your local copy stays on this device.",
       );
     },
-    enableBeforeUnload: () => dirty,
+    enableBeforeUnload: () => dirtyRef.current,
     withResolver: false,
   });
 
   useEffect(() => {
     if (!dirty) return;
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Fire-and-forget save attempt, then let the browser warn.
+      void saveDeckNow(deckId);
       e.preventDefault();
       e.returnValue = "";
     };
     window.addEventListener("beforeunload", onBeforeUnload);
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
-  }, [dirty]);
+  }, [dirty, deckId]);
 
   return dirty;
 }

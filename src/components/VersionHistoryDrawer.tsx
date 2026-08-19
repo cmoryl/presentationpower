@@ -9,6 +9,8 @@ import {
   snapshotDeckVersion,
 } from "@/lib/deck-versions.functions";
 import { loadCloudDeck } from "@/lib/cloud-decks.functions";
+import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
+
 import { useDeckStore, type Brief, type Deck, type DeckSlide } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -201,22 +203,22 @@ function VersionHistoryDrawer({ deckId, onClose }: { deckId: string; onClose: ()
           id: brief.id,
         };
         const rebuiltSlides: DeckSlide[] = loaded.slides.map((s, i) => {
-          const c = (s.content ?? {}) as Record<string, unknown> & {
-            __localId?: string;
-            __changes?: unknown[];
-          };
-          const { __localId, __changes, ...content } = c;
-          return {
-            id: typeof __localId === "string" ? __localId : s.id,
-            position: s.position ?? i,
-            sectionId: s.section_id,
-            variantId: s.variant_id,
-            layoutId: s.layout_id,
-            content,
-            changes: Array.isArray(__changes) ? (__changes as DeckSlide["changes"]) : [],
-            notes: typeof s.notes === "string" ? s.notes : undefined,
-          };
+          const { content, localId, changes, extras } = splitSlideContent(s.content);
+          return applySlideExtras(
+            {
+              id: localId ?? s.id,
+              position: s.position ?? i,
+              sectionId: s.section_id,
+              variantId: s.variant_id,
+              layoutId: s.layout_id,
+              content,
+              changes: changes as DeckSlide["changes"],
+              notes: typeof s.notes === "string" ? s.notes : undefined,
+            } as DeckSlide,
+            extras,
+          );
         });
+
         const rebuiltDeck: Deck = {
           ...deck,
           title: loaded.deck.title,
