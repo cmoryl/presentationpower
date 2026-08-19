@@ -12,7 +12,11 @@
 import { useEffect, useRef, useState } from "react";
 
 import { PAGE_W } from "@/components/print/print-primitives";
-import { PrintDocModeProvider } from "@/components/print/print-doc-mode";
+import {
+  PrintDocModeProvider,
+  PRINT_ICON_STYLE_DEFAULT,
+  type PrintIconStyle,
+} from "@/components/print/print-doc-mode";
 import { PrintSectionRenderer } from "./PrintSectionRenderer";
 import type { PrintSection } from "@/lib/print-assets.types";
 
@@ -27,6 +31,8 @@ export function PrintSectionPreviewFrame({
   sheet = false,
   /** Render icon chips inside the section. Off = typeset document look. */
   icons = true,
+  /** Glyph scale / stroke / accent override for the iconography. */
+  iconStyle = PRINT_ICON_STYLE_DEFAULT,
 }: {
   section: PrintSection;
   mode?: "light" | "dark";
@@ -35,6 +41,7 @@ export function PrintSectionPreviewFrame({
   maxScale?: number;
   sheet?: boolean;
   icons?: boolean;
+  iconStyle?: PrintIconStyle;
 }) {
   const outerRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -89,7 +96,7 @@ export function PrintSectionPreviewFrame({
             transformOrigin: "top left",
           }}
         >
-          <PrintDocModeProvider icons={icons}>
+          <PrintDocModeProvider icons={icons} iconStyle={iconStyle}>
             <PrintSectionRenderer section={section} mode={mode} accent={accent} />
           </PrintDocModeProvider>
         </div>
