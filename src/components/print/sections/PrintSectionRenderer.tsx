@@ -12,6 +12,8 @@ import {
   HeroQuoteSplit,
   HeroCobrandBand,
   HeroBriefLockup,
+  HeroElementMasthead,
+  HeroElementBand,
 } from "./hero/HeroVariants";
 import { KpiDashboardPortrait } from "./stats/KpiDashboardPortrait";
 import { StatCalloutRowPortrait } from "./stats/StatCalloutRowPortrait";
