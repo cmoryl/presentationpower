@@ -547,7 +547,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           style={{
             position: "relative",
             ...pageGutter(),
-            paddingTop: `calc(${bandH} * 0.78)`,
+            paddingTop: `calc(${bandH} * 0.96)`,
             paddingBottom: cq(6),
             display: "flex",
             flexDirection: "column",
