@@ -272,6 +272,8 @@ export function SpotlightLayout({
 
               {content.quote && (
                 <div
+                  data-section="quote"
+                  data-section-label="Quote"
                   style={{
                     flex: "1 1 0",
                     borderRadius: cq(14),
@@ -588,6 +590,7 @@ export function SpotlightLayout({
             {/* CTA BAND — division-tokenized gradient                        */}
             {/* ============================================================ */}
             {content.cta && (
+              <div data-section="cta" data-section-label="Call to action">
               <PrintCTABand
                 brand={brand}
                 mode={mode}
@@ -599,6 +602,7 @@ export function SpotlightLayout({
                 }
                 cq={cq}
               />
+              </div>
             )}
 
             {/* ============================================================ */}

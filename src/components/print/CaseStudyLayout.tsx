@@ -165,6 +165,8 @@ export function CaseStudyLayout({
               space so the first content module lands at the image fade seam. */}
           <div
             className="relative"
+            data-section="hero"
+            data-section-label="Hero"
             style={{
               padding: `${cq(padTop(density))} ${padCq(padX(density))} ${cq(96)}`,
               overflow: "hidden",
@@ -283,6 +285,8 @@ export function CaseStudyLayout({
           {stats.length > 0 && (
             <div
               className="relative grid"
+              data-section="stats"
+              data-section-label="Stat pills"
               style={{
                 gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
                 gap: cq(14),
@@ -393,6 +397,8 @@ export function CaseStudyLayout({
               <div className="flex" style={{ gap: cq(16), paddingTop: cq(14) }}>
                 {content.quote && (
                   <div
+                    data-section="quote"
+                    data-section-label="Quote"
                     style={{
                       flex: "1.4 1 0",
                       borderRadius: cq(14),
@@ -442,7 +448,11 @@ export function CaseStudyLayout({
                   </div>
                 )}
                 {engagement.bullets.length > 0 && (
-                  <div style={{ flex: "1 1 0", padding: `${cq(6)} 0` }}>
+                  <div
+                    data-section="engagement"
+                    data-section-label="Engagement snapshot"
+                    style={{ flex: "1 1 0", padding: `${cq(6)} 0` }}
+                  >
                     <div style={{ fontWeight: 700, fontSize: cq(12), color: accentInk }}>
                       {engagement.title ?? "Engagement Snapshot"}
                     </div>
@@ -485,14 +495,16 @@ export function CaseStudyLayout({
 
             {/* CTA BAND */}
             {content.cta && (
-              <PrintCTABand
-                brand={brand}
-                mode={mode}
-                label={content.cta.label}
-                subhead={content.cta.subhead}
-                buttonLabel={content.cta.buttonLabel}
-                cq={cq}
-              />
+              <div data-section="cta" data-section-label="Call to action">
+                <PrintCTABand
+                  brand={brand}
+                  mode={mode}
+                  label={content.cta.label}
+                  subhead={content.cta.subhead}
+                  buttonLabel={content.cta.buttonLabel}
+                  cq={cq}
+                />
+              </div>
             )}
 
             {/* FOOTER LOCKUP */}
