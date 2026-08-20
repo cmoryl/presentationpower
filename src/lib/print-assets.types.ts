@@ -546,6 +546,13 @@ export type PrintAssetContext = {
     minPad?: number;
     marginRelief?: boolean;
   };
+  /** Manual sizing pins from the fit audit panel. A pinned knob outranks the
+   *  automatic relief ladder, so an author's chosen scale / margin is never
+   *  overwritten by the measurement loop. */
+  fitOverride?: {
+    scale?: number;
+    pad?: number;
+  };
 
 
   /** The mode the editor canvas renders in. Also the default for the export

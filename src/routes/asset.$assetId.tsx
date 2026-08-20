@@ -217,13 +217,15 @@ export const Route = createFileRoute("/asset/$assetId")({
 // keep the same identity while the stored row content is unchanged — otherwise
 // those three restart on every render and the canvas visibly flickers.
 const RAW_CONTENT_CACHE = new WeakMap<object, Map<string, Record<string, unknown>>>();
+const RAW_CONTENT_EMPTY_ANCHOR: object = {};
 
 function stableRawContent(
   kind: string,
   source: unknown,
   build: () => Record<string, unknown>,
 ): Record<string, unknown> {
-  const anchor = (typeof source === "object" && source !== null ? source : build) as object;
+  const anchor =
+    typeof source === "object" && source !== null ? (source as object) : RAW_CONTENT_EMPTY_ANCHOR;
   let byKind = RAW_CONTENT_CACHE.get(anchor);
   if (!byKind) {
     byKind = new Map();
