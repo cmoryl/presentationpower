@@ -875,13 +875,13 @@ const REGION_COLS: Record<
 > = {
   AMERICAS: {
     headX: 0.56,
-    headY: 9.2,
+    headY: 10.02,
     cols: [0.56, 1.13, 1.72, 2.3, 3.18],
-    colY: 9.46,
+    colY: 10.28,
     colW: 0.62,
   },
-  EMEA: { headX: 4.23, headY: 9.3, cols: [4.23, 4.76, 5.39], colY: 9.54, colW: 0.58 },
-  APAC: { headX: 6.35, headY: 9.33, cols: [6.36, 6.98, 7.52], colY: 9.58, colW: 0.62 },
+  EMEA: { headX: 4.23, headY: 10.12, cols: [4.23, 4.76, 5.39], colY: 10.36, colW: 0.58 },
+  APAC: { headX: 6.35, headY: 10.15, cols: [6.36, 6.98, 7.52], colY: 10.4, colW: 0.62 },
 };
 
 function LocationsPage({ page }: { page: MultiProposalPage }) {
@@ -905,10 +905,10 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
       </T>
 
       <Img
-        x={-1.05}
-        y={2.32}
-        w={10.6}
-        h={5.91}
+        x={-2.64}
+        y={1.43}
+        w={13.78}
+        h={7.68}
         src={PROPOSAL_ART.worldMap}
         alt="World map"
         slot="locations.map"
@@ -919,24 +919,24 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
       {/* Legend */}
       <L
         x={0.56}
-        y={8.36}
+        y={9.24}
         w={0.058}
         h={0.058}
         style={{ background: "#FFFFFF", borderRadius: 999 }}
       />
-      <T x={0.68} y={8.3} w={1.4} size={7.2} weight={700} leading={1.25} upper>
+      <T x={0.68} y={9.18} w={1.4} size={7.2} weight={700} leading={1.25} upper>
         {"Client\nService"}
       </T>
       <L
         x={0.56}
-        y={8.66}
+        y={9.54}
         w={0.058}
         h={0.058}
         style={{ background: PROPOSAL_TEAL, borderRadius: 999 }}
       />
       <T
         x={0.68}
-        y={8.6}
+        y={9.48}
         w={1.6}
         size={7.2}
         weight={700}
