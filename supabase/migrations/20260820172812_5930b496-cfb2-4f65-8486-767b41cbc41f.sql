@@ -1,0 +1,2 @@
+ALTER TABLE public.module_overrides DROP CONSTRAINT module_overrides_scope_check;
+ALTER TABLE public.module_overrides ADD CONSTRAINT module_overrides_scope_check CHECK (scope = ANY (ARRAY['print'::text, 'deck'::text, 'library'::text]));
