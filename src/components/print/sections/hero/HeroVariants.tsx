@@ -791,7 +791,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
               }}
             >
               {q.text}
-            </p>
+            </AutoFitText>
             {q.role && <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>}
             {q.author && (
               <div
@@ -883,17 +883,20 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
           {section.title}
         </AutoFitText>
         {section.summary && (
-          <p
+          <AutoFitText
+            as="p"
+            basePx={heroSummaryFontPx(section, 11.5)}
+            maxLines={4}
             style={{
               margin: `${cq(12)} auto 0`,
               maxWidth: cq(540),
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.86)",
               ...heroSummaryStyle(section),
-              }}
-            >
-              {section.summary}
-            </AutoFitText>
+            }}
+          >
+            {section.summary}
+          </AutoFitText>
         )}
         {stats.length > 0 && (
           <div
