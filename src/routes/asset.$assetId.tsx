@@ -163,6 +163,7 @@ import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
+import { MultiProposalLayout, isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import { ContentInspector } from "@/components/print/ContentInspector";
@@ -821,7 +822,10 @@ function AssetEditor() {
           : exportFormat === "press-x4"
             ? `pressX4-${exportQuality}`
             : `press-${exportQuality}`;
-      await exportPrintAssetAsPdf(canvasRef.current, {
+      const pageNodes = Array.from(
+        canvasRef.current.querySelectorAll<HTMLElement>("[data-print-page]"),
+      );
+      await exportPrintAssetAsPdf(pageNodes.length > 1 ? pageNodes : canvasRef.current, {
         pageSize: exportSize,
         custom: exportSize === "Custom" ? { widthIn: customW, heightIn: customH } : undefined,
         bleedIn,
@@ -846,6 +850,10 @@ function AssetEditor() {
     }
   }
 
+  // Multi-page proposals render every page stacked inside the canvas, so the
+  // canvas cannot be pinned to a single page aspect ratio.
+  const multiDoc =
+    kind === "solution-proposal" && isMultiProposal(rawContent as Partial<SolutionProposalContent>);
   const pageSize: PrintPageSize = ctx.pageSize ?? "A4";
   const marginPreset: PrintMarginPreset = ctx.marginPreset ?? "standard";
   const pagePresetInfo = pagePreset(pageSize);
@@ -1263,7 +1271,7 @@ function AssetEditor() {
             <div
               ref={canvasRef}
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
-              style={{ aspectRatio: canvasAspect }}
+              style={multiDoc ? undefined : { aspectRatio: canvasAspect }}
             >
               <PrintPageProvider size={pageSize} margin={marginPreset} density={density}>
                 <PrintContentFitFrame
@@ -1339,7 +1347,21 @@ function AssetEditor() {
                               seed={`asset-${row.id}`}
                             />
                           )}
-                          {brand && kind === "solution-proposal" && (
+                          {brand &&
+                            kind === "solution-proposal" &&
+                            isMultiProposal(rawContent as Partial<SolutionProposalContent>) && (
+                              <MultiProposalLayout
+                                content={rawContent as unknown as SolutionProposalContent}
+                                brand={brand}
+                                mode={editorMode}
+                                pageSize={pageSize}
+                                density={density}
+                                seed={`asset-${row.id}`}
+                              />
+                            )}
+                          {brand &&
+                            kind === "solution-proposal" &&
+                            !isMultiProposal(rawContent as Partial<SolutionProposalContent>) && (
                             <SolutionProposalLayout
                               content={rawContent as unknown as SolutionProposalContent}
                               brand={brand}
