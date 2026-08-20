@@ -42,7 +42,31 @@ import {
   listModuleOverrides,
   saveModuleOverride,
 } from "@/lib/module-overrides.functions";
-import type { PrintDensity, PrintMode, PrintPageSize } from "@/lib/print-assets.types";
+import type {
+  PrintDensity,
+  PrintHeroMedia,
+  PrintHeroRule,
+  PrintHeroTitleType,
+  PrintMode,
+  PrintPageSize,
+  PrintSection,
+} from "@/lib/print-assets.types";
+import { PrintPageProvider } from "@/components/print/print-page-context";
+import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
+import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
+import {
+  PrintContentFitFrame,
+  type PrintFitOverride,
+} from "@/components/print/PrintContentFitFrame";
+import { PrintFitAuditPanel } from "@/components/print/PrintFitAuditPanel";
+import { MastheadRuleTypeControls } from "@/components/print/sections/hero/HeroRuleTypeControls";
+import {
+  NEUTRAL_FIT,
+  describeFit,
+  resolveContentFit,
+  type PrintFitKnobs,
+} from "@/lib/print-content-fit";
+import type { PrintFitAuditInput, PrintFitFix, PrintFitMeasurement } from "@/lib/print-fit-audit";
 
 export const Route = createFileRoute("/admin/print-library_/$itemId")({
   head: () => ({ meta: [{ title: "Print library master editor · Admin" }] }),
@@ -108,6 +132,8 @@ function MasterItemEditorPage() {
   }, [savedKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [mode, setMode] = useState<PrintMode>("light");
+  const [fitKnobs, setFitKnobs] = useState<PrintFitKnobs>(NEUTRAL_FIT);
+  const [fitMeasure, setFitMeasure] = useState<PrintFitMeasurement | null>(null);
   const [showJson, setShowJson] = useState(false);
   const [jsonText, setJsonText] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
@@ -211,6 +237,25 @@ function MasterItemEditorPage() {
   };
 
   const previewMode = draft.look.mode ?? mode;
+  // Restart fitting whenever content or page geometry moves.
+  const fitDep = {
+    content: draft.content ?? null,
+    pageSize: draft.look.pageSize ?? "Letter",
+    margin: draft.look.marginPreset ?? "standard",
+    density: draft.look.density ?? "standard",
+    mode: previewMode,
+  };
+  const heroMedia = (draft.content as { heroMedia?: PrintHeroMedia } | undefined)?.heroMedia;
+  const fit = resolveContentFit(draft.look.contentFit);
+  const patchFit = (p: Record<string, unknown>) =>
+    patchLook({ contentFit: { ...fit, ...p } as PrintLibraryLook["contentFit"] });
+  const patchFitOverride = (next: PrintFitOverride | null) =>
+    patchLook({ fitOverride: next ?? undefined });
+  const patchContent = (p: Record<string, unknown>) =>
+    setDraft((prev): Draft => {
+      const base: Draft = prev ?? current;
+      return { ...base, content: { ...(base.content ?? {}), ...p } };
+    });
 
   return (
     <div className="pb-24">
@@ -298,14 +343,44 @@ function MasterItemEditorPage() {
 
           <div className="overflow-hidden rounded-2xl border border-black/10 bg-[#f5f5f2] p-4">
             {draft.content ? (
-              <PrintKindPreview
-                kind={saved.kind}
-                content={draft.content}
-                brand={brand}
-                mode={previewMode}
-                pageSize={draft.look.pageSize ?? "Letter"}
+              <PrintPageProvider
+                size={draft.look.pageSize ?? "Letter"}
+                margin={draft.look.marginPreset ?? "standard"}
                 density={draft.look.density ?? "standard"}
-              />
+              >
+                <PrintContentFitFrame
+                  settings={draft.look.contentFit}
+                  dep={fitDep}
+                  override={draft.look.fitOverride}
+                  onChange={(knobs) => setFitKnobs(knobs)}
+                  onMeasure={setFitMeasure}
+                >
+                  <PrintDocModeProvider
+                    icons={draft.look.icons ?? true}
+                    iconStyle={resolvePrintIconStyle({
+                      scale: draft.look.iconScale ?? 1,
+                      ...(draft.look.accentOverride ? { accent: draft.look.accentOverride } : {}),
+                    })}
+                  >
+                    <LiveEditOverlay
+                      enabled
+                      slideId={`library-master-${saved.id}`}
+                      content={draft.content}
+                      editableFields={textPaths}
+                      onChange={(path, value) => patchPath(path, value)}
+                    >
+                      <PrintKindPreview
+                        kind={saved.kind}
+                        content={draft.content}
+                        brand={brand}
+                        mode={previewMode}
+                        pageSize={draft.look.pageSize ?? "Letter"}
+                        density={draft.look.density ?? "standard"}
+                      />
+                    </LiveEditOverlay>
+                  </PrintDocModeProvider>
+                </PrintContentFitFrame>
+              </PrintPageProvider>
             ) : (
               <p className="p-8 text-center text-sm text-black/55">
                 This entry is a blank starting point — it has no stored content. Metadata and look &
@@ -313,7 +388,16 @@ function MasterItemEditorPage() {
               </p>
             )}
           </div>
+          {draft.content ? (
+            <p className="mt-2 text-[11px] text-black/50">
+              Click any text on the page to edit it in place. Fit now: {describeFit(fitKnobs)}
+              {fitMeasure && fitMeasure.overflowPx > 0
+                ? ` · ${fitMeasure.overflowPx}px past the trim`
+                : " · fits the trim"}
+            </p>
+          ) : null}
         </section>
+
 
         {/* ------------------------- Inspector ------------------------- */}
         <aside className="space-y-4">
@@ -465,6 +549,157 @@ function MasterItemEditorPage() {
           </Panel>
 
           {draft.content ? (
+            <>
+              <Panel title="Fit audit & corrections">
+                <PrintFitAuditPanel
+                  measurement={fitMeasure}
+                  input={
+                    {
+                      hasHero: Boolean(heroMedia?.imageUrl),
+                      heroHeightPct: heroMedia?.heightPct ?? 46,
+                      autoFitEnabled: fit.enabled,
+                      minScale: fit.minScale,
+                      minPad: fit.minPad,
+                      pageSize: draft.look.pageSize ?? "Letter",
+                      moduleCount:
+                        ((draft.content as { modules?: PrintSection[] }).modules ?? []).length,
+                    } satisfies PrintFitAuditInput
+                  }
+                  override={draft.look.fitOverride}
+                  onApply={(fix: PrintFitFix) => {
+                    if (fix.advisory) return;
+                    if (fix.enableAutoFit)
+                      patchFit({
+                        enabled: true,
+                        ...(fix.threshold !== undefined ? { threshold: fix.threshold } : {}),
+                      });
+                    if (fix.scale !== undefined || fix.pad !== undefined)
+                      patchFitOverride({
+                        ...(draft.look.fitOverride ?? {}),
+                        ...(fix.scale !== undefined ? { scale: fix.scale } : {}),
+                        ...(fix.pad !== undefined ? { pad: fix.pad } : {}),
+                      });
+                    if (fix.density) patchLook({ density: fix.density });
+                    if (fix.heroHeightPct !== undefined && heroMedia)
+                      patchContent({ heroMedia: { ...heroMedia, heightPct: fix.heroHeightPct } });
+                    toast.success(fix.label);
+                  }}
+                  onOverride={(nextPatch) => {
+                    if (nextPatch === null) {
+                      patchFitOverride(null);
+                      return;
+                    }
+                    const next: PrintFitOverride = { ...(draft.look.fitOverride ?? {}) };
+                    if ("scale" in nextPatch) {
+                      if (nextPatch.scale === undefined) delete next.scale;
+                      else next.scale = nextPatch.scale;
+                    }
+                    if ("pad" in nextPatch) {
+                      if (nextPatch.pad === undefined) delete next.pad;
+                      else next.pad = nextPatch.pad;
+                    }
+                    patchFitOverride(
+                      next.scale === undefined && next.pad === undefined ? null : next,
+                    );
+                  }}
+                />
+              </Panel>
+
+              <Panel title="Content fit">
+                <p className="text-[11px] leading-[1.5] text-black/55">
+                  When the master page runs past the trim by more than the threshold, it pulls the
+                  side margins in first, then shrinks typography and iconography together — down to
+                  the floors below. Saved with the item, so every copy opens fitted.
+                </p>
+                <Row label="Auto-fit overflow">
+                  <input
+                    type="checkbox"
+                    data-testid="master-toggle-content-fit"
+                    checked={fit.enabled}
+                    onChange={(e) => patchFit({ enabled: e.target.checked })}
+                  />
+                </Row>
+                <Row label={`Threshold ${Math.round(fit.threshold * 100)}%`}>
+                  <input
+                    type="range"
+                    aria-label="Content fit threshold"
+                    min={2}
+                    max={40}
+                    step={1}
+                    value={Math.round(fit.threshold * 100)}
+                    onChange={(e) => patchFit({ threshold: Number(e.target.value) / 100 })}
+                  />
+                </Row>
+                <Row label="Margin relief first">
+                  <input
+                    type="checkbox"
+                    checked={fit.marginRelief}
+                    onChange={(e) => patchFit({ marginRelief: e.target.checked })}
+                  />
+                </Row>
+                <Row label={`Min side margin ${Math.round(fit.minPad * 100)}%`}>
+                  <input
+                    type="range"
+                    aria-label="Minimum side margin"
+                    min={40}
+                    max={100}
+                    step={2}
+                    value={Math.round(fit.minPad * 100)}
+                    onChange={(e) => patchFit({ minPad: Number(e.target.value) / 100 })}
+                  />
+                </Row>
+                <Row label={`Min scale ${Math.round(fit.minScale * 100)}%`}>
+                  <input
+                    type="range"
+                    aria-label="Minimum content scale"
+                    min={60}
+                    max={100}
+                    step={1}
+                    value={Math.round(fit.minScale * 100)}
+                    onChange={(e) => patchFit({ minScale: Number(e.target.value) / 100 })}
+                  />
+                </Row>
+                <Row label="Applied now">
+                  <span className="text-[11px] font-medium text-black/60">
+                    {describeFit(fitKnobs)}
+                  </span>
+                </Row>
+              </Panel>
+
+              <Panel title="Page masthead">
+                <MastheadRuleTypeControls
+                  rule={(draft.content as { heroRule?: PrintHeroRule }).heroRule}
+                  titleType={(draft.content as { heroTitleType?: PrintHeroTitleType }).heroTitleType}
+                  onChange={(next) =>
+                    patchContent({
+                      ...("rule" in next ? { heroRule: next.rule } : null),
+                      ...("titleType" in next ? { heroTitleType: next.titleType } : null),
+                    })
+                  }
+                />
+                {heroMedia ? (
+                  <Field label={`Hero height — ${Math.round(heroMedia.heightPct ?? 46)}%`}>
+                    <input
+                      type="range"
+                      aria-label="Hero height"
+                      min={20}
+                      max={70}
+                      step={1}
+                      value={Math.round(heroMedia.heightPct ?? 46)}
+                      onChange={(e) =>
+                        patchContent({
+                          heroMedia: { ...heroMedia, heightPct: Number(e.target.value) },
+                        })
+                      }
+                      className="w-full"
+                    />
+                  </Field>
+                ) : null}
+              </Panel>
+            </>
+          ) : null}
+
+          {draft.content ? (
             <Panel title={`Content — ${textPaths.length} text fields`}>
               <div className="max-h-[480px] space-y-2.5 overflow-y-auto pr-1">
                 {textPaths.map((p) => {
@@ -572,6 +807,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="mb-1 block text-[11px] font-medium text-black/60">{label}</span>
       {children}
     </label>
+  );
+}
+
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="text-[11px] font-medium text-black/60">{label}</span>
+      {children}
+    </div>
   );
 }
 

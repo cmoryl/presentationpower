@@ -6,6 +6,7 @@
  */
 
 import type { PrintDensity, PrintMode, PrintPageSize } from "@/lib/print-assets.types";
+import type { PrintContentFitSettings } from "@/lib/print-content-fit";
 
 export type PrintLibraryLook = {
   mode?: PrintMode;
@@ -18,6 +19,10 @@ export type PrintLibraryLook = {
   primaryOverride?: string;
   /** Iconography scale multiplier (1 = layout default). */
   iconScale?: number;
+  /** Overflow auto-fit settings pinned on the master (same contract as assets). */
+  contentFit?: Partial<PrintContentFitSettings>;
+  /** Manual fit pins from the correction panel. */
+  fitOverride?: { scale?: number; pad?: number };
 };
 
 const MODES: PrintMode[] = ["light", "dark"];
@@ -46,6 +51,10 @@ export function parseLook(raw: unknown): PrintLibraryLook | undefined {
   if (primary) look.primaryOverride = primary;
   const scale = Number(r["iconScale"]);
   if (Number.isFinite(scale) && scale >= 0.5 && scale <= 2) look.iconScale = scale;
+  const fit = parseContentFit(r["contentFit"]);
+  if (fit) look.contentFit = fit;
+  const pins = parseFitOverride(r["fitOverride"]);
+  if (pins) look.fitOverride = pins;
   return Object.keys(look).length ? look : undefined;
 }
 
@@ -61,5 +70,40 @@ export function lookToContext(look?: PrintLibraryLook): Record<string, unknown> 
   if (look.accentOverride) ctx["accentOverride"] = look.accentOverride;
   if (look.primaryOverride) ctx["primaryOverride"] = look.primaryOverride;
   if (look.iconScale) ctx["iconStyle"] = { scale: look.iconScale };
+  if (look.contentFit) ctx["contentFit"] = look.contentFit;
+  if (look.fitOverride) ctx["fitOverride"] = look.fitOverride;
   return ctx;
+}
+
+const num = (v: unknown, lo: number, hi: number): number | undefined => {
+  const n = Number(v);
+  return Number.isFinite(n) && n >= lo && n <= hi ? n : undefined;
+};
+
+/** Validate an untrusted content-fit payload. */
+function parseContentFit(raw: unknown): Partial<PrintContentFitSettings> | undefined {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+  const r = raw as Record<string, unknown>;
+  const out: Partial<PrintContentFitSettings> = {};
+  if (typeof r["enabled"] === "boolean") out.enabled = r["enabled"];
+  if (typeof r["marginRelief"] === "boolean") out.marginRelief = r["marginRelief"];
+  const threshold = num(r["threshold"], 0.02, 0.6);
+  if (threshold !== undefined) out.threshold = threshold;
+  const minScale = num(r["minScale"], 0.6, 1);
+  if (minScale !== undefined) out.minScale = minScale;
+  const minPad = num(r["minPad"], 0.4, 1);
+  if (minPad !== undefined) out.minPad = minPad;
+  return Object.keys(out).length ? out : undefined;
+}
+
+/** Validate manual fit pins. */
+function parseFitOverride(raw: unknown): { scale?: number; pad?: number } | undefined {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+  const r = raw as Record<string, unknown>;
+  const out: { scale?: number; pad?: number } = {};
+  const scale = num(r["scale"], 0.6, 1);
+  if (scale !== undefined) out.scale = scale;
+  const pad = num(r["pad"], 0.4, 1);
+  if (pad !== undefined) out.pad = pad;
+  return Object.keys(out).length ? out : undefined;
 }
