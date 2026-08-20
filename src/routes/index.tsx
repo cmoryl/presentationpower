@@ -474,12 +474,12 @@ function Dashboard() {
         </div>
       )}
 
-      {/* ================= FAST LANES ================= */}
+      {/* ================= ELEMENTS ================= */}
       <section className="mt-10">
         <SectionHeader
-          kicker="Fast lanes"
-          title="Jump into a surface"
-          hint="Every command in the build"
+          kicker="Elements"
+          title="Choose your element"
+          hint="Every surface in the system"
         />
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {MODES.map((m) => {
@@ -490,29 +490,65 @@ function Dashboard() {
                 to={m.actions[0]?.to ?? "/library"}
                 className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
               >
+                {/* ELEMENT accent: brick rail on the left edge, echoing the five-brick E */}
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-30 blur-2xl transition group-hover:opacity-60"
+                  className="pointer-events-none absolute left-0 top-0 flex h-full w-1.5 flex-col"
+                >
+                  {[0.9, 0.5, 0.28, 0.5, 0.9].map((o, i) => (
+                    <span
+                      key={i}
+                      className="flex-1 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{ backgroundColor: m.accent, opacity: o }}
+                    />
+                  ))}
+                </span>
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-20 blur-2xl transition group-hover:opacity-45"
                   style={{ backgroundColor: m.accent }}
                 />
-                <span
-                  className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl"
-                  style={{ backgroundColor: `${m.accent}22`, color: m.accent }}
-                >
-                  <Icon size={16} />
+                {/* Brick-stack mark instead of a plain tinted square */}
+                <span className="relative inline-flex items-center gap-1.5">
+                  <span
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-[10px]"
+                    style={{ backgroundColor: `${m.accent}22`, color: m.accent }}
+                  >
+                    <Icon size={16} />
+                  </span>
+                  <span aria-hidden className="flex flex-col gap-[3px]">
+                    {[1, 0.55, 1].map((o, i) => (
+                      <span
+                        key={i}
+                        className="block h-[5px] w-[5px] rounded-[1.5px]"
+                        style={{ backgroundColor: m.accent, opacity: o }}
+                      />
+                    ))}
+                  </span>
                 </span>
-                <div className="relative mt-3 text-sm font-semibold">{m.label}</div>
+                <div className="relative mt-3 text-sm font-semibold tracking-[-0.01em]">
+                  {m.label}
+                </div>
                 <div className="relative mt-1 text-xs text-black/55 dark:text-white/55">
                   {m.eyebrow}
                 </div>
-                <div className="relative mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
-                  Open <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
-                </div>
+                <span
+                  className="relative mt-4 inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition group-hover:gap-1.5"
+                  style={{
+                    borderColor: `${m.accent}66`,
+                    backgroundColor: `${m.accent}14`,
+                    color: "currentColor",
+                  }}
+                >
+                  Open element
+                  <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+                </span>
               </Link>
             );
           })}
         </div>
       </section>
+
 
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
