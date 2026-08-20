@@ -17,6 +17,8 @@ import {
   Check,
   ImagePlus,
   Images,
+  LayoutTemplate,
+
 
   Maximize2,
   RefreshCw,
@@ -33,12 +35,21 @@ import {
   type EventFacts,
   type CampaignSource,
   type CampaignAsset,
+  type CampaignCopy,
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
+import { SocialModuleFrame } from "@/components/campaigns/SocialModuleFrame";
+import { SocialModulePicker } from "@/components/campaigns/SocialModulePicker";
+import {
+  buildSocialModuleSection,
+  findSocialModuleLayout,
+  printModuleFamilyMeta,
+} from "@/lib/social-module-layouts";
+import { reliefAt } from "@/lib/social-module-fit";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 
 
@@ -146,6 +157,13 @@ export function KitWizard({
   const [libraryOpen, setLibraryOpen] = useState(false);
 
   const [zoomed, setZoomed] = useState<string | null>(null);
+
+  // Optional module layout from the visual section library. When set, every
+  // asset renders through the module frame instead of the default composition.
+  const [moduleLayoutId, setModuleLayoutId] = useState<string | null>(null);
+  const [modulePickerOpen, setModulePickerOpen] = useState(false);
+  const moduleLayout = moduleLayoutId ? findSocialModuleLayout(moduleLayoutId) : undefined;
+
 
 
 
@@ -300,6 +318,24 @@ export function KitWizard({
         : built;
     return withStat.filter((a) => !removed.has(a.id));
   }, [source, formatIds, eventFacts, mode, brandId, regenTick, removed, manualCopy]);
+
+  // Reference frame + copy used by the module picker previews.
+  const pickerFormat = useMemo(
+    () => assets[0]?.format ?? getFormat(formatIds[0] ?? "li-single") ?? SOCIAL_FORMATS_BY_ID["li-single"],
+    [assets, formatIds],
+  );
+  const pickerCopy: CampaignCopy = useMemo(
+    () => ({
+      title: manualCopy.title.trim() || exampleCopyForBrand(brandId).title,
+      summary: manualCopy.summary.trim() || undefined,
+      cta: manualCopy.cta.trim() || undefined,
+      stat:
+        manualCopy.statValue.trim() && manualCopy.statLabel.trim()
+          ? { value: manualCopy.statValue.trim(), label: manualCopy.statLabel.trim() }
+          : undefined,
+    }),
+    [manualCopy, brandId],
+  );
 
   const applyProfile = (id: string) => {
     setProfileId(id);
@@ -547,12 +583,67 @@ export function KitWizard({
                 />
               </div>
             </div>
+            {/* Visual module layout — browse the section library and pick one. */}
+            <div className="mt-4 grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+              <div className="min-w-0">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#003FC7]">
+                  Layout source
+                </div>
+                <div className="mt-1 text-sm font-medium text-[#03002C]">
+                  {moduleLayout
+                    ? moduleLayout.label
+                    : "Default kit composition (auto-designed per format)"}
+                </div>
+                <p className="mt-1 text-xs text-black/55">
+                  {moduleLayout
+                    ? `${printModuleFamilyMeta(moduleLayout.family).label} module · applied to every format in this kit.`
+                    : "Or start from a visual module in the section library — previews are fitted to each format."}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModulePickerOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/[0.06] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+                >
+                  <LayoutTemplate size={12} />
+                  {moduleLayout ? "Change module" : "Browse module library"}
+                </button>
+                {moduleLayout ? (
+                  <button
+                    type="button"
+                    onClick={() => setModuleLayoutId(null)}
+                    className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/60 hover:bg-black/5"
+                  >
+                    Use default
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            {moduleLayout ? (
+              <div className="mt-3 flex justify-start">
+                <SocialModuleFrame
+                  format={pickerFormat}
+                  section={buildSocialModuleSection({
+                    layout: moduleLayout,
+                    copy: pickerCopy,
+                    relief: reliefAt(0),
+                  })}
+                  brandId={brandId}
+                  mode={mode === "light" ? "light" : "dark"}
+                  displayShortEdge={240}
+                />
+              </div>
+            ) : null}
+
             <p className="mt-3 text-xs text-black/55">
-              Prefer starting from an existing module?{" "}
+              Prefer your favorited modules?{" "}
               <Link to="/admin/campaigns/kit" className="text-[#003FC7] hover:underline">
                 Switch to favorited-module flow →
               </Link>
             </p>
+
           </StepCard>
         )}
 
@@ -928,7 +1019,19 @@ export function KitWizard({
                       <div data-kit-asset-id={asset.id} className="min-w-0">
                         <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
                           {(displayShortEdge) =>
-                            nextDesign ? (
+                            moduleLayout && !nextDesign ? (
+                              <SocialModuleFrame
+                                format={asset.format}
+                                section={buildSocialModuleSection({
+                                  layout: moduleLayout,
+                                  copy: asset.copy,
+                                  relief: reliefAt(0),
+                                })}
+                                brandId={asset.brandId}
+                                mode={asset.mode === "light" ? "light" : "dark"}
+                                displayShortEdge={displayShortEdge}
+                              />
+                            ) : nextDesign ? (
                               <NextRenderer
                                 format={asset.format}
                                 trackId={nextTrackId}
@@ -1027,7 +1130,19 @@ export function KitWizard({
                 height={asset.format.height}
               >
                 {(shortEdge) =>
-                  nextDesign ? (
+                  moduleLayout && !nextDesign ? (
+                    <SocialModuleFrame
+                      format={asset.format}
+                      section={buildSocialModuleSection({
+                        layout: moduleLayout,
+                        copy: asset.copy,
+                        relief: reliefAt(0),
+                      })}
+                      brandId={asset.brandId}
+                      mode={asset.mode === "light" ? "light" : "dark"}
+                      displayShortEdge={shortEdge}
+                    />
+                  ) : nextDesign ? (
                     <NextRenderer
                       format={asset.format}
                       trackId={nextTrackId}
@@ -1061,6 +1176,20 @@ export function KitWizard({
             );
           })()
         : null}
+
+      <SocialModulePicker
+        open={modulePickerOpen}
+        onClose={() => setModulePickerOpen(false)}
+        onSelect={(layout) => {
+          setModuleLayoutId(layout.id);
+          setModulePickerOpen(false);
+          toast.success(`${layout.label} applied to every format in this kit`);
+        }}
+        format={pickerFormat}
+        brandId={brandId}
+        mode={mode === "light" ? "light" : "dark"}
+        copy={pickerCopy}
+      />
     </div>
   );
 }
