@@ -137,7 +137,12 @@ test.describe("PrintSectionPreviewFrame — height + type stability under resize
       // loop warning, and the SSR `data-theme` hydration diff from the theme
       // script. Anything else during resize cycling is a real regression.
       consoleErrors.filter(
-        (t) => !/favicon|ResizeObserver loop|hydrat|data-theme|Warning:/i.test(t),
+        (t) =>
+          !/favicon|ResizeObserver loop|hydrat|data-theme|Warning:/i.test(t) &&
+          // Pre-existing, harmless: some icon glyphs pass cqw calc() through
+          // the SVG width/height attributes, which the browser rejects and
+          // falls back to CSS sizing for. Not a resize regression.
+          !/<svg> attribute (width|height)/i.test(t),
       ),
       "console errors during resize cycling",
     ).toEqual([]);
