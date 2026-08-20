@@ -935,18 +935,18 @@ function ItemPreviewOverlay({
   const isTemplate = item.source === "template";
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto bg-black/70 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-start justify-center bg-black/70 p-4 backdrop-blur-sm sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={`${item.title} preview`}
       onClick={onClose}
     >
       <div
-        className={`relative w-full ${isTemplate ? "max-w-[1600px]" : "max-w-[1100px]"} rounded-2xl bg-[#f5f5f2] p-6 shadow-2xl`}
+        className={`relative flex max-h-[calc(100vh-2rem)] w-full flex-col overflow-hidden ${isTemplate ? "max-w-[1600px]" : "max-w-[1100px]"} rounded-2xl bg-[#f5f5f2] shadow-2xl sm:max-h-[calc(100vh-3rem)]`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 z-10 -mx-6 -mt-6 mb-5 flex items-start justify-between gap-6 rounded-t-2xl bg-[#f5f5f2]/95 px-6 pb-4 pt-6 backdrop-blur">
-          <div>
+        <div className="grid shrink-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-4 border-b border-black/10 bg-[#f5f5f2] px-6 pb-4 pt-6">
+          <div className="min-w-0">
             <div className="text-xs uppercase tracking-[0.24em] text-black/50">
               {brand.name} · {printTypeMeta(item.kind).label}
               {item.collection ? ` · ${item.collection}` : ""}
@@ -954,7 +954,7 @@ function ItemPreviewOverlay({
             <h2 className="mt-1 text-2xl font-semibold text-[#03002C]">{item.title}</h2>
             <p className="mt-1 max-w-2xl text-sm text-black/60">{item.blurb}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
             {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
             {isTemplate ? (
               <UseTemplateAction item={item} brand={brand} />
@@ -973,16 +973,18 @@ function ItemPreviewOverlay({
           </div>
         </div>
 
-        {isTemplate ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <PreviewFrame label="Light">{renderPreview(item.kind, brand, "light")}</PreviewFrame>
-            <PreviewFrame label="Dark">{renderPreview(item.kind, brand, "dark")}</PreviewFrame>
-          </div>
-        ) : (
-          <PreviewFrame label="Ready-made">
-            {renderPreview(item.kind, brand, "light", item.content)}
-          </PreviewFrame>
-        )}
+        <div className="min-h-0 flex-1 overflow-y-auto p-6">
+          {isTemplate ? (
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <PreviewFrame label="Light">{renderPreview(item.kind, brand, "light")}</PreviewFrame>
+              <PreviewFrame label="Dark">{renderPreview(item.kind, brand, "dark")}</PreviewFrame>
+            </div>
+          ) : (
+            <PreviewFrame label="Ready-made">
+              {renderPreview(item.kind, brand, "light", item.content)}
+            </PreviewFrame>
+          )}
+        </div>
       </div>
     </div>
   );
