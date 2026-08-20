@@ -57,6 +57,10 @@ export function PrintSectionPreviewFrame({
   const [scale, setScale] = useState(0.6);
   const [height, setHeight] = useState(0);
 
+  const paper = mode === "dark" ? "#03002C" : "#ffffff";
+  const pad = padX ?? pageSideMarginPx(pageSize, "standard", marginPreset);
+  const padTop = sheet ? 28 : 0;
+
   useEffect(() => {
     const outer = outerRef.current;
     const inner = innerRef.current;
@@ -73,9 +77,6 @@ export function PrintSectionPreviewFrame({
     return () => ro.disconnect();
   }, [maxScale, section, pad, pageSize, marginPreset]);
 
-  const paper = mode === "dark" ? "#03002C" : "#ffffff";
-  const pad = padX ?? pageSideMarginPx(pageSize, "standard", marginPreset);
-  const padTop = sheet ? 28 : 0;
 
   return (
     <div
