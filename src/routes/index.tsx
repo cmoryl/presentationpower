@@ -78,6 +78,8 @@ type ModeDef = {
   label: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   accent: string;
+  /** Accent darkened enough to sit on white/light surfaces (WCAG AA text + 3:1 graphics). */
+  ink: string;
   glow: string;
   eyebrow: string;
   headline: string;
@@ -93,6 +95,7 @@ const MODES: ModeDef[] = [
     label: "Presentation",
     icon: Presentation,
     accent: "#003FC7",
+    ink: "#003FC7",
     glow: "#A1FBF9",
     eyebrow: "Modular decks · governed",
     headline: "Snap together a deck the brand already approves.",
@@ -118,6 +121,7 @@ const MODES: ModeDef[] = [
     label: "Print",
     icon: Printer,
     accent: "#EC388A",
+    ink: "#B3186B",
     glow: "#FFEB66",
     eyebrow: "Modular print · PDF/X-4",
     headline: "Modular case studies, eBrochures, spotlights — press-ready.",
@@ -137,6 +141,7 @@ const MODES: ModeDef[] = [
     label: "Event",
     icon: CalendarDays,
     accent: "#A6FA87",
+    ink: "#0F5C1A",
     glow: "#C2A3FF",
     eyebrow: "Modular playbooks · phased",
     headline: "Every event kit, modular and pre-mapped by phase.",
@@ -156,6 +161,7 @@ const MODES: ModeDef[] = [
     label: "Social",
     icon: Share2,
     accent: "#FF9B70",
+    ink: "#A33B12",
     glow: "#EC388A",
     eyebrow: "Modular campaigns · division-scoped",
     headline: "Turn one module into a full social kit.",
@@ -300,7 +306,7 @@ function Dashboard() {
                       className="inline-flex h-5 w-5 items-center justify-center rounded-md transition"
                       style={
                         active
-                          ? { backgroundColor: `${m.accent}22`, color: m.accent }
+                          ? { backgroundColor: `${m.accent}22`, color: m.ink }
                           : { color: "currentColor" }
                       }
                     >
@@ -338,7 +344,7 @@ function Dashboard() {
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">{mode.copy}</p>
               <div className="mt-6 flex flex-wrap items-center gap-2">
                 {mode.actions.map((a) => (
-                  <ModeActionButton key={a.label} action={a} accent={mode.accent} />
+                  <ModeActionButton key={a.label} action={a} ink={mode.ink} />
                 ))}
               </div>
             </div>
@@ -512,7 +518,7 @@ function Dashboard() {
                 <span className="relative inline-flex items-center gap-1.5">
                   <span
                     className="inline-flex h-9 w-9 items-center justify-center rounded-[10px]"
-                    style={{ backgroundColor: `${m.accent}22`, color: m.accent }}
+                    style={{ backgroundColor: `${m.accent}22`, color: m.ink }}
                   >
                     <Icon size={16} />
                   </span>
@@ -854,7 +860,7 @@ function AuroraHero({ mode }: { mode: ModeDef }) {
   );
 }
 
-function ModeActionButton({ action, accent }: { action: ModeAction; accent: string }) {
+function ModeActionButton({ action, ink }: { action: ModeAction; ink: string }) {
   const shared =
     "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition";
   if (action.primary) {
@@ -863,7 +869,7 @@ function ModeActionButton({ action, accent }: { action: ModeAction; accent: stri
         to={action.to}
         className={`${shared} bg-white text-[#03002C] shadow-lg shadow-black/25 hover:shadow-xl hover:-translate-y-0.5`}
       >
-        <Rocket size={14} style={{ color: accent }} />
+        <Rocket size={14} style={{ color: ink }} />
         {action.label}
         {action.hint && (
           <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40">

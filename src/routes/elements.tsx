@@ -39,6 +39,8 @@ type Surface = {
   eyebrow: string;
   copy: string;
   accent: string;
+  /** Accent darkened for foreground use on the white cards (WCAG AA). */
+  ink: string;
   glow: string;
   to: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
@@ -52,6 +54,7 @@ const SURFACES: Surface[] = [
     eyebrow: "Modular decks · governed",
     copy: "Approved slide modules, style packs, and the deck agent — assembled into on-brand presentations and exported as editable PowerPoint.",
     accent: "#003FC7",
+    ink: "#003FC7",
     glow: "#A1FBF9",
     to: "/library",
     icon: Presentation,
@@ -70,6 +73,7 @@ const SURFACES: Surface[] = [
     eyebrow: "Modular print · PDF/X-4",
     copy: "Case studies, spotlights, and e-brochures built from print section modules — page-accurate, editable, and press-ready at 300 DPI.",
     accent: "#EC388A",
+    ink: "#B3186B",
     glow: "#FFEB66",
     to: "/library/print",
     icon: Printer,
@@ -88,6 +92,7 @@ const SURFACES: Surface[] = [
     eyebrow: "Modular playbooks · phased",
     copy: "Launches, flagship conferences, webinars, and executive briefings — each phase mapped to deliverables and rendered live in your palette.",
     accent: "#0F5C1A",
+    ink: "#0F5C1A",
     glow: "#A6FA87",
     to: "/events",
     icon: CalendarDays,
@@ -104,6 +109,7 @@ const SURFACES: Surface[] = [
     eyebrow: "Modular campaigns · division-scoped",
     copy: "Turn a single module into a full social kit — anthems, product teases, milestones, and case spotlights sized for every channel.",
     accent: "#FF9B70",
+    ink: "#A33B12",
     glow: "#EC388A",
     to: "/social",
     icon: Share2,
@@ -211,14 +217,14 @@ function ElementsLanding() {
                     <div className="flex items-center gap-3">
                       <span
                         className="inline-flex h-9 w-9 items-center justify-center rounded-xl"
-                        style={{ background: `${s.accent}16`, color: s.accent }}
+                        style={{ background: `${s.accent}16`, color: s.ink }}
                       >
                         <Icon size={17} />
                       </span>
                       <div className="min-w-0">
                         <div
                           className="text-[10px] font-semibold uppercase tracking-[0.22em]"
-                          style={{ color: s.accent }}
+                          style={{ color: s.ink }}
                         >
                           {s.eyebrow}
                         </div>
@@ -256,7 +262,7 @@ function ElementsLanding() {
                     <Link
                       to={s.to}
                       className="mt-5 inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold text-white transition hover:opacity-90"
-                      style={{ background: s.accent }}
+                      style={{ background: s.ink }}
                     >
                       Open {s.label} <ArrowRight size={13} />
                     </Link>
