@@ -47,6 +47,7 @@ import {
   listModuleOverrides,
   saveModuleOverride,
 } from "@/lib/module-overrides.functions";
+import { blankPrintContent } from "@/lib/print-assets.types";
 import type {
   SolutionProposalContent,
   PrintDensity,
@@ -107,7 +108,11 @@ function draftFrom(item: PrintLibraryItem, hidden: boolean): Draft {
     heroUrl: item.heroUrl ?? "",
     hidden,
     look: { ...(item.look ?? {}) },
-    content: item.content ? (structuredClone(item.content) as Record<string, unknown>) : undefined,
+    // Blank starting points ship without content — seed the kind's empty shape
+    // so blank templates (MSA Partnership included) are previewable + editable.
+    content: item.content
+      ? (structuredClone(item.content) as Record<string, unknown>)
+      : blankPrintContent(item.kind),
   };
 }
 
