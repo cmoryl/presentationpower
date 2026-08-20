@@ -190,7 +190,7 @@ export function MultiProposalLayout({
             const t = makeTokens({ onDark, accent, primary, pad });
             const bandTokens = makeTokens({ onDark: true, accent, primary, pad });
             const pageBg =
-              spec.field === "navy"
+              spec.field === "navy" || spec.field === "art"
                 ? `linear-gradient(125deg, #03002C 0%, ${primary} 46%, ${accent} 108%)`
                 : spec.field === "brand"
                   ? gradient
@@ -215,6 +215,21 @@ export function MultiProposalLayout({
                   flexDirection: "column",
                 }}
               >
+                {spec.field === "art" && (
+                  <img
+                    aria-hidden
+                    alt=""
+                    src={PROPOSAL_ART.field}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      opacity: 0.96,
+                    }}
+                  />
+                )}
                 {spec.field === "band" && (
                   <div
                     aria-hidden
@@ -232,11 +247,12 @@ export function MultiProposalLayout({
                     style={{
                       position: "absolute",
                       inset: "auto 0 0 0",
-                      height: "46%",
-                      background: `linear-gradient(160deg, ${accent}00 0%, ${accent}55 40%, ${accent} 100%)`,
+                      height: cq(6),
+                      background: gradient,
                     }}
                   />
                 )}
+
 
                 <PageHeader
                   brand={brand}
