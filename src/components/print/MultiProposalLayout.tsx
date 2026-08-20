@@ -753,10 +753,11 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
 // ---------------------------------------------------------------------------
 
 const REGION_COLS: Record<string, { headX: number; headY: number; cols: number[]; colY: number; colW: number }> = {
-  AMERICAS: { headX: 0.56, headY: 8.44, cols: [0.56, 1.13, 1.72, 2.3, 3.18], colY: 8.73, colW: 0.62 },
-  EMEA: { headX: 4.23, headY: 8.55, cols: [4.23, 4.76, 5.39], colY: 8.84, colW: 0.58 },
-  APAC: { headX: 6.35, headY: 8.58, cols: [6.36, 6.98, 7.52], colY: 8.88, colW: 0.62 },
+  AMERICAS: { headX: 0.56, headY: 8.92, cols: [0.56, 1.13, 1.72, 2.3, 3.18], colY: 9.18, colW: 0.62 },
+  EMEA: { headX: 4.23, headY: 9.02, cols: [4.23, 4.76, 5.39], colY: 9.26, colW: 0.58 },
+  APAC: { headX: 6.35, headY: 9.05, cols: [6.36, 6.98, 7.52], colY: 9.3, colW: 0.62 },
 };
+
 
 function LocationsPage({ page }: { page: MultiProposalPage }) {
   const title = lines(page.title).length ? lines(page.title) : ["Global", "Locations"];
