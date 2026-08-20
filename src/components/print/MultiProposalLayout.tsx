@@ -1458,28 +1458,60 @@ function PageBody({
   mode: "light" | "dark";
 }) {
   switch (page.kind) {
-    case "cover":
+    case "cover": {
+      const plate = makeTokens({
+        onDark: false,
+        accent: t.accent,
+        primary: brand.tokens.primary,
+        pad: t.pad,
+      });
       return (
-        <div>
-          <div className="flex items-start justify-between" style={{ gap: cq(18) }}>
-            <BrandLockup
-              brand={brand}
-              color={mode === "dark" ? "#FFFFFF" : t.primary}
-              size="sm"
-              orientation="horizontal"
-            />
+        <div className="flex h-full flex-col justify-end">
+          <div
+            className="flex items-center justify-center"
+            style={{
+              borderRadius: cq(20),
+              border: `${cq(1.5)} solid rgba(255,255,255,0.55)`,
+              background: "rgba(255,255,255,0.10)",
+              padding: `${cq(18)} ${cq(20)}`,
+              minHeight: cq(86),
+              marginBottom: cq(20),
+            }}
+          >
             {content.clientLogoUrl ? (
               <img
                 src={content.clientLogoUrl}
                 alt={content.preparedFor?.company ? `${content.preparedFor.company} logo` : ""}
-                style={{ height: cq(32), width: "auto", maxWidth: cq(200), objectFit: "contain" }}
+                style={{ maxHeight: cq(60), maxWidth: "70%", objectFit: "contain" }}
               />
-            ) : null}
+            ) : (
+              <span
+                style={{
+                  fontSize: cq(10),
+                  fontWeight: 700,
+                  letterSpacing: "0.24em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.72)",
+                }}
+              >
+                Client logo
+              </span>
+            )}
           </div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <CoverParties tokens={t} content={content} />
+          <div
+            style={{
+              borderRadius: cq(20),
+              background: mode === "dark" ? "rgba(255,255,255,0.10)" : "#FFFFFF",
+              padding: `${cq(20)} ${cq(20)}`,
+            }}
+          >
+            {page.body && <Body tokens={plate}>{page.body}</Body>}
+            <CoverParties tokens={plate} content={content} />
+          </div>
         </div>
       );
+    }
+
     case "stats":
       return (
         <div>
