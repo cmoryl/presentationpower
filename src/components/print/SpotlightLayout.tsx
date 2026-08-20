@@ -111,7 +111,7 @@ export function SpotlightLayout({
 
   const padX = padXFn(density);
   const padTop = padTopFn(density);
-  const padXcq = cq(padX);
+  const padXcq = padCq(padX);
   const padTopCq = cq(padTop);
 
   return (

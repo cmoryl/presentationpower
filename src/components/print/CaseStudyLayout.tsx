@@ -144,7 +144,7 @@ export function CaseStudyLayout({
           <div
             className="relative"
             style={{
-              padding: `${cq(padTop(density))} ${cq(padX(density))} ${cq(96)}`,
+              padding: `${cq(padTop(density))} ${padCq(padX(density))} ${cq(96)}`,
               overflow: "hidden",
               color: ink,
               display: "flex",
@@ -247,7 +247,7 @@ export function CaseStudyLayout({
               style={{
                 gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
                 gap: cq(14),
-                padding: `0 ${cq(padX(density))}`,
+                padding: `0 ${padCq(padX(density))}`,
                 marginTop: cq(-48),
               }}
             >
@@ -299,7 +299,7 @@ export function CaseStudyLayout({
           {/* CSR ROWS — Challenge / Solution / Result */}
           <div
             className="relative flex flex-col"
-            style={{ padding: `${cq(28)} ${cq(padX(density))} 0`, flex: 1 }}
+            style={{ padding: `${cq(28)} ${padCq(padX(density))} 0`, flex: 1 }}
           >
             {blocks.map((b, i) => (
               <div

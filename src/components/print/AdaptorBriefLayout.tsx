@@ -129,8 +129,8 @@ export function AdaptorBriefLayout({
           <div
             className="relative flex h-full flex-col"
             style={{
-              paddingLeft: cq(padX(density)),
-              paddingRight: cq(padX(density)),
+              paddingLeft: padCq(padX(density)),
+              paddingRight: padCq(padX(density)),
               paddingTop: cq(padTop(density)),
               paddingBottom: cq(28),
             }}
