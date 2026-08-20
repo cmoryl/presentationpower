@@ -201,17 +201,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/faq", label: "FAQ" },
   ] as const;
 
-  // Sleek liquid-glass pills — hairline rings, gradient wash on active, no drop-shadow stacks.
-  const pillIdle =
-    "relative text-black/65 hover:text-black hover:bg-white/40 " +
-    "dark:text-white/70 dark:hover:text-white dark:hover:!bg-white/[0.05]";
-  const pillActive =
-    "relative text-[#03002C] bg-white/60 ring-1 ring-black/[0.04] " +
-    "dark:!text-white dark:!bg-white/[0.06] dark:!ring-white/10 " +
-    // Aqua→violet underline glow instead of a heavy drop shadow
-    "after:pointer-events-none after:absolute after:inset-x-3 after:-bottom-[3px] after:h-px " +
-    "after:bg-gradient-to-r after:from-transparent after:via-[#0057FF]/60 after:to-transparent " +
-    "dark:after:via-[#A1FBF9]/70";
+  // Flat nav links — underline on active, no pill background.
+  const navIdle =
+    "relative text-black/65 hover:text-black transition-colors " +
+    "dark:text-white/70 dark:hover:text-white";
+  const navActive =
+    "relative text-[#03002C] font-medium " +
+    "dark:!text-white " +
+    "after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-0.5 after:h-0.5 " +
+    "after:bg-[#003FC7] after:dark:bg-[#A1FBF9]";
+
 
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
@@ -263,7 +262,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Link>
 
-          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
+          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
             {visibleNav.map((n) => {
               if (n.to === "/elements") {
                 const elementsActive =
@@ -280,8 +279,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <Link
                       to={n.to}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
-                        elementsActive ? pillActive : pillIdle
+                      className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm transition sm:px-4 ${
+                        elementsActive ? navActive : navIdle
                       }`}
                       onClick={() => setPresOpen(false)}
                     >
@@ -358,8 +357,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <Link
                       to={n.to}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
-                        adminActive ? pillActive : pillIdle
+                      className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm transition sm:px-4 ${
+                        adminActive ? navActive : navIdle
                       }`}
                       onClick={() => setAdminOpen(false)}
                     >
@@ -409,7 +408,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${active ? pillActive : pillIdle}`}
+                  className={`rounded-md px-3 py-2 text-sm transition sm:px-4 ${active ? navActive : navIdle}`}
                 >
                   {n.label}
                 </Link>
@@ -446,7 +445,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-full px-4 py-2 text-sm transition ${active ? pillActive : pillIdle}`}
+                  className={`rounded-md px-4 py-2 text-sm transition ${active ? navActive : navIdle}`}
                 >
                   {n.label}
                 </Link>
