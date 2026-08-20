@@ -9,7 +9,7 @@
  * vector for PDF/print output.
  */
 
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   WORLD_MAP_LAND,
   WORLD_MAP_PINS,
@@ -54,7 +54,51 @@ export function ProposalWorldMap({
   // Pin drag: index of the dot being repositioned + whether it actually moved
   // (a click without movement still means "delete this pin").
   const pinDrag = useRef<{ index: number; moved: boolean } | null>(null);
+  const pinDragStart = useRef<WorldMapPin[] | null>(null);
   const [activePin, setActivePin] = useState<number | null>(null);
+
+  // Undo/redo history for pin edits. Each committed edit (add, delete, or a
+  // finished drag) pushes the previous pin array; intermediate drag frames are
+  // deliberately not recorded so one drag = one undo step.
+  const [past, setPast] = useState<WorldMapPin[][]>([]);
+  const [future, setFuture] = useState<WorldMapPin[][]>([]);
+
+  const commit = (next: WorldMapPin[], previous: WorldMapPin[] = list) => {
+    if (!onChange) return;
+    setPast((p) => [...p, previous].slice(-50));
+    setFuture([]);
+    onChange(next);
+  };
+
+  const undo = useCallback(() => {
+    if (!onChange || !past.length) return;
+    const prev = past[past.length - 1]!;
+    setPast((p) => p.slice(0, -1));
+    setFuture((f) => [list, ...f].slice(0, 50));
+    onChange(prev);
+  }, [list, onChange, past]);
+
+  const redo = useCallback(() => {
+    if (!onChange || !future.length) return;
+    const next = future[0]!;
+    setFuture((f) => f.slice(1));
+    setPast((p) => [...p, list].slice(-50));
+    onChange(next);
+  }, [future, list, onChange]);
+
+  useEffect(() => {
+    if (!editable || !onChange) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "z") return;
+      const target = event.target as HTMLElement | null;
+      if (target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName ?? "")) return;
+      event.preventDefault();
+      if (event.shiftKey) redo();
+      else undo();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [editable, onChange, redo, undo]);
 
 
   const w = WORLD_MAP_VIEW.w / zoom;
@@ -99,6 +143,7 @@ export function ProposalWorldMap({
     if (!editable || !onChange) return;
     event.stopPropagation();
     pinDrag.current = { index, moved: false };
+    pinDragStart.current = list;
     setActivePin(index);
     svgRef.current?.setPointerCapture(event.pointerId);
   };
@@ -129,8 +174,14 @@ export function ProposalWorldMap({
 
   const onPointerUp = () => {
     if (pinDrag.current) {
-      dragMoved.current = pinDrag.current.moved;
+      const { moved } = pinDrag.current;
+      dragMoved.current = moved;
+      if (moved && pinDragStart.current) {
+        setPast((p) => [...p, pinDragStart.current!].slice(-50));
+        setFuture([]);
+      }
       pinDrag.current = null;
+      pinDragStart.current = null;
       setActivePin(null);
       return;
     }
@@ -149,7 +200,7 @@ export function ProposalWorldMap({
     if (!rect.width || !rect.height) return;
     const x = view.x + ((event.clientX - rect.left) / rect.width) * view.w;
     const y = view.y + ((event.clientY - rect.top) / rect.height) * view.h;
-    onChange([
+    commit([
       ...list,
       {
         id: `pin-${Date.now().toString(36)}`,
@@ -204,7 +255,7 @@ export function ProposalWorldMap({
                       dragMoved.current = false;
                       return;
                     }
-                    onChange(list.filter((_, index) => index !== i));
+                    commit(list.filter((_, index) => index !== i));
                   }
                 : undefined
             }
