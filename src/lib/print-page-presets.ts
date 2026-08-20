@@ -144,6 +144,17 @@ export function pageSideMarginPx(
   return Math.round((inches / p.widthIn) * CANVAS_W);
 }
 
+/** Side margin in inches — what the format's margin actually prints as. */
+export function pageSideMarginIn(
+  size: PrintPageSize | undefined,
+  density?: PrintDensity,
+  margin?: PrintMarginPreset,
+): number {
+  const p = pagePreset(size);
+  return p.sideMarginIn * densityFactor(density) * PRINT_MARGIN_PRESETS[margin ?? "standard"].factor;
+}
+
+
 /** Top margin in template pixels for a format. `variance` keeps the
  *  per-template personality (Spotlight opens tight, brochures breathe). */
 export function pageTopMarginPx(
