@@ -80,6 +80,13 @@ const KINDS: Array<{
     live: true,
     icon: <Rocket size={16} />,
   },
+  {
+    id: "solution-proposal",
+    label: "Solution Proposal",
+    desc: "Scope, deliverables, timeline, and cost summary.",
+    live: true,
+    icon: <FileText size={16} />,
+  },
 ];
 
 function NewAssetPage() {
