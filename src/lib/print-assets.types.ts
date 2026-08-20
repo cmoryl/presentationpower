@@ -419,6 +419,17 @@ export type PrintAssetContext = {
    *  and an optional accent override. Captured into / restored from page
    *  templates so a reused template keeps its document's icon treatment. */
   iconStyle?: PrintIconStyleSettings;
+  /** Content-fit mode: automatically pull side margins in, then shrink type
+   *  and iconography, once measured overflow passes `threshold` (0..1).
+   *  See src/lib/print-content-fit.ts for the relief ladder + floors. */
+  contentFit?: {
+    enabled?: boolean;
+    threshold?: number;
+    minScale?: number;
+    minPad?: number;
+    marginRelief?: boolean;
+  };
+
 
   /** The mode the editor canvas renders in. Also the default for the export
    *  panel — WYSIWYG unless the user explicitly overrides it before export. */
