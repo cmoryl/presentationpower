@@ -777,17 +777,18 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
         {title.join("\n")}
       </T>
 
-      <Img x={-0.06} y={2.89} w={8.44} h={4.64} src={PROPOSAL_ART.worldMap} alt="World map" slot="locations.map" label="map" />
+      <Img x={-0.2} y={2.72} w={8.9} h={4.96} src={PROPOSAL_ART.worldMap} alt="World map" slot="locations.map" label="map" />
 
       {/* Legend */}
-      <L x={0.56} y={7.56} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
-      <T x={0.68} y={7.5} w={1.4} size={7.2} weight={700} leading={1.25} upper>
+      <L x={0.56} y={7.9} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
+      <T x={0.68} y={7.84} w={1.4} size={7.2} weight={700} leading={1.25} upper>
         {"Client\nService"}
       </T>
-      <L x={0.56} y={7.86} w={0.058} h={0.058} style={{ background: PROPOSAL_TEAL, borderRadius: 999 }} />
-      <T x={0.68} y={7.8} w={1.6} size={7.2} weight={700} color={PROPOSAL_TEAL} leading={1.25} upper>
+      <L x={0.56} y={8.2} w={0.058} h={0.058} style={{ background: PROPOSAL_TEAL, borderRadius: 999 }} />
+      <T x={0.68} y={8.14} w={1.6} size={7.2} weight={700} color={PROPOSAL_TEAL} leading={1.25} upper>
         {"Client Service\n& Production"}
       </T>
+
 
       {PROPOSAL_REGIONS.map((region) => {
         const spec = REGION_COLS[region.region];
