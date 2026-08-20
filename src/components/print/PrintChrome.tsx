@@ -228,13 +228,13 @@ export function PrintFooterLockup({
           <img
             src={productLogoSrc}
             alt={`${productLogoKey ?? "Product"} logo`}
-            style={{ height: cq(18), width: "auto", maxWidth: cq(150), objectFit: "contain" }}
+            style={{ height: cq(24), width: "auto", maxWidth: cq(170), objectFit: "contain" }}
           />
         ) : (
           <BrandLockup
             brand={enterpriseBrand}
             color={enterpriseLogoInk}
-            size="2xs"
+            size="xs"
             orientation="horizontal"
             monochromeOfficialLogo
           />
@@ -242,13 +242,13 @@ export function PrintFooterLockup({
         {!isEnterprise && (
           <>
             <div
-              style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }}
+              style={{ width: 1, height: cq(20), background: dividerCol, flexShrink: 0 }}
               aria-hidden
             />
             <BrandLockup
               brand={brand}
               color={enterpriseLogoInk}
-              size="2xs"
+              size="xs"
               orientation="horizontal"
               monochromeOfficialLogo
             />
@@ -257,7 +257,7 @@ export function PrintFooterLockup({
         {clientLogo?.url && (
           <>
             <div
-              style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }}
+              style={{ width: 1, height: cq(20), background: dividerCol, flexShrink: 0 }}
               aria-hidden
             />
             <img
@@ -265,9 +265,9 @@ export function PrintFooterLockup({
               alt={clientLogo.name ? `${clientLogo.name} logo` : "Client logo"}
               data-testid="print-footer-client-logo"
               style={{
-                height: cq(16),
+                height: cq(22),
                 width: "auto",
-                maxWidth: cq(110),
+                maxWidth: cq(130),
                 objectFit: "contain",
                 flexShrink: 0,
                 filter: mode === "dark" ? "brightness(0) invert(1)" : undefined,

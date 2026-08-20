@@ -151,7 +151,7 @@ export function EBrochureLayout({
               <BrandLockup
                 brand={brand}
                 color={mode === "dark" ? "#FFFFFF" : "#000000"}
-                size="2xs"
+                size="xs"
                 orientation="horizontal"
                 monochromeOfficialLogo
               />
