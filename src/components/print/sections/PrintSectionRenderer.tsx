@@ -1,6 +1,14 @@
 // Dispatch a `PrintSection` block to its portrait-native renderer. Any print
 // layout can render `content.modules?` by mapping through this component.
 import type { PrintSection } from "@/lib/print-assets.types";
+import {
+  HeroPhotoBand,
+  HeroSplitPhoto,
+  HeroTypeStack,
+  HeroAccentBand,
+  HeroStatLockup,
+  HeroClientLockup,
+} from "./hero/HeroVariants";
 import { KpiDashboardPortrait } from "./stats/KpiDashboardPortrait";
 import { StatCalloutRowPortrait } from "./stats/StatCalloutRowPortrait";
 import { StatBentoPortrait } from "./stats/StatBentoPortrait";
@@ -24,6 +32,49 @@ import { TableSpecRows } from "./table/TableSpecRows";
 import { ContactExpertCard } from "./contact/ContactExpertCard";
 import { ContactGlobalPanel } from "./contact/ContactGlobalPanel";
 import { ContactCtaBand } from "./contact/ContactCtaBand";
+
+export const PRINT_HERO_VARIANTS: Array<{
+  id:
+    | "hero-photo-band"
+    | "hero-split-photo"
+    | "hero-type-stack"
+    | "hero-accent-band"
+    | "hero-stat-lockup"
+    | "hero-client-lockup";
+  label: string;
+  description: string;
+}> = [
+  {
+    id: "hero-photo-band",
+    label: "Photo Band",
+    description: "Full-bleed photograph with copy over a bottom scrim.",
+  },
+  {
+    id: "hero-split-photo",
+    label: "Split Photo",
+    description: "Photo panel beside a title + summary column.",
+  },
+  {
+    id: "hero-type-stack",
+    label: "Type Stack",
+    description: "Typographic opener over an accent rule — no photography.",
+  },
+  {
+    id: "hero-accent-band",
+    label: "Accent Band",
+    description: "Solid brand band with reversed type.",
+  },
+  {
+    id: "hero-stat-lockup",
+    label: "Stat Lockup",
+    description: "Glass hero with inline proof numbers along the base.",
+  },
+  {
+    id: "hero-client-lockup",
+    label: "Client Lockup",
+    description: "Case-study opener: client rail beside the engagement title.",
+  },
+];
 
 export const PRINT_STATS_VARIANTS: Array<{
   id: "kpi-dashboard-portrait" | "stat-callout-row-portrait" | "stat-bento-portrait";
@@ -191,6 +242,20 @@ export function PrintSectionRenderer({
   accent: string;
 }) {
   switch (section.kind) {
+    case "hero":
+      if (section.variantId === "hero-photo-band")
+        return <HeroPhotoBand section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-split-photo")
+        return <HeroSplitPhoto section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-type-stack")
+        return <HeroTypeStack section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-accent-band")
+        return <HeroAccentBand section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-stat-lockup")
+        return <HeroStatLockup section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-client-lockup")
+        return <HeroClientLockup section={section} mode={mode} accent={accent} />;
+      return null;
     case "stats":
       if (section.variantId === "kpi-dashboard-portrait")
         return <KpiDashboardPortrait section={section} mode={mode} accent={accent} />;
@@ -284,7 +349,9 @@ export function PrintSectionsStack({
 /** Human label for the canvas selection chip. */
 function sectionLabel(s: PrintSection): string {
   const kindLabel =
-    s.kind === "stats"
+    s.kind === "hero"
+      ? "Hero"
+      : s.kind === "stats"
       ? "Stats"
       : s.kind === "quote"
         ? "Quote"
