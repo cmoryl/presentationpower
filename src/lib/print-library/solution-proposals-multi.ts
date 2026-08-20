@@ -59,13 +59,25 @@ const FOOTPRINT_STATS = [
   { label: "Linguists in network", value: "20", unit: "k+" },
 ];
 
+// Slide 2 — the seven figures in the source template's own order.
 const COMPANY_STATS = [
-  { label: "Annual revenue", value: "$1.3", unit: "B" },
-  { label: "Consecutive profitable years", value: "30", unit: "+" },
-  { label: "Client organizations served", value: "5", unit: "k+" },
-  { label: "ISO-certified processes", value: "6", unit: "" },
-  { label: "Words translated yearly", value: "3.5", unit: "B" },
-  { label: "Employees worldwide", value: "10", unit: "k+" },
+  { label: "IN GLOBAL REVENUE", value: "$1.3B", unit: "" },
+  { label: "CONSECUTIVE\nYEARS OF GROWTH", value: "34", unit: "" },
+  { label: "SERVICE", value: "24/7/365", unit: "" },
+  { label: "CITIES WORLDWIDE", value: "150+", unit: "" },
+  { label: "OF THE FORTUNE 500", value: "90%", unit: "" },
+  { label: "TEAM MEMBERS", value: "10,000+", unit: "" },
+  { label: "LANGUAGES SUPPORTED", value: "200+", unit: "" },
+];
+
+/** Slide 8 — `*runs*` render in the template's accent. */
+const WHY_LINES = [
+  "UNMATCHED *GLOBAL SCALE* & RESOURCES",
+  "GLOBAL *REACH*, LOCAL *FOCUS*",
+  "PROVEN *RECORD OF SUCCESS*",
+  "*TECHNOLOGY* SOLUTIONS",
+  "*FLEXIBLE* AND *SCALABLE*",
+  "INDUSTRY *EXPERTISE*",
 ];
 
 const CLIENT_LOGOS = [
@@ -164,17 +176,28 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       id: "p-cover",
       kind: "cover",
       navLabel: "Cover",
-      eyebrow: content.eyebrow ?? "Solutions proposal",
-      title: content.title || "Solutions proposal",
-      subtitle: content.subtitle,
+      eyebrow: "Transforming Global Performance",
+      title: "SOLUTIONS PROPOSAL",
+      subtitle: "[insert client logo here]",
       body: content.summary,
+      footnote: "MM.DD.YY",
+      cards: [
+        {
+          title: "PREPARED FOR:",
+          body: "Client Contact\nTitle\nCompany Name\nAddress One\nCity, Zip\nClient Email",
+        },
+        {
+          title: "PREPARED BY:",
+          body: "Contact\nTitle\nTransPerfect\nAddress One\nCity, Zip\nYour Email",
+        },
+      ],
     },
     {
       id: "p-stats",
       kind: "stats",
       navLabel: "By the numbers",
       eyebrow: "Who we are",
-      title: "TransPerfect by the numbers",
+      title: "Value.\nIntelligence.\nPerformance.\nIn any language.",
       body: "The largest privately held provider of language and technology solutions — funded by operations, not outside capital, for three decades of consecutive profitability.",
       stats: COMPANY_STATS,
     },
@@ -183,15 +206,33 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       kind: "scope",
       navLabel: "Scope",
       eyebrow: "Scope of work",
-      title: content.includedTitle || "What's included",
+      title: "Project Scope",
+      subtitle: "TIMELINE",
       body: "The services below are in scope for this engagement, with the source files, deliverables, and schedule agreed for this phase.",
+      cards: [
+        {
+          title: content.includedTitle || "What's included",
+          body: (content.included ?? [
+            "Language Pre-Flight",
+            "Localization",
+            "Desktop Publishing",
+            "Project Management",
+          ]).join("\n"),
+        },
+        { title: "Source Files", body: "1 PDF Document" },
+        { title: "Deliverables", body: "1 PDF Document\n1 Certificate" },
+      ],
+      bullets: [
+        "Project timeline is estimated at X business days.",
+        "CLIENT has requested a rush X-day turnaround time.",
+      ],
     },
     {
       id: "p-cost",
       kind: "cost",
       navLabel: "Cost summary",
       eyebrow: "Investment",
-      title: content.costTitle || "Cost summary",
+      title: content.costTitle || "Cost Summary",
       body: "Pricing is itemized per service so scope changes are transparent and easy to approve.",
       costRows: content.costRows,
       costTotal: content.costTotal,
@@ -203,7 +244,7 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       kind: "locations",
       navLabel: "Global footprint",
       eyebrow: "Global footprint",
-      title: "Local teams in every market you sell in",
+      title: "Global\nLocations",
       body: "Production runs follow-the-sun across our own offices — no outsourced coordination layer between you and the linguists doing the work.",
       stats: FOOTPRINT_STATS,
       locations: GLOBAL_LOCATIONS,
@@ -213,7 +254,8 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       kind: "clients",
       navLabel: "Clients",
       eyebrow: "Trusted by",
-      title: "Organizations that rely on us every day",
+      title: "Our\nclients.",
+      subtitle: "We're proud of the company we keep",
       body: "A representative sample of the client organizations we support across regulated, retail, and technology sectors.",
       logos: CLIENT_LOGOS,
     },
@@ -243,7 +285,8 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       kind: "why",
       navLabel: "Why TransPerfect",
       eyebrow: "Why TransPerfect",
-      title: "Why teams consolidate with us",
+      title: "WHY",
+      bullets: WHY_LINES,
       cards: WHY_CARDS,
     },
     {
@@ -251,16 +294,21 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       kind: "advocates",
       navLabel: "Advocates",
       eyebrow: "Your advocates",
-      title: "How we stay accountable to you",
+      title: "Giving Back",
+      subtitle: "We are proud to support these causes",
       body: "Every account is run by named people with published KPIs — governance is part of the deliverable, not an afterthought.",
-      cards: ADVOCATE_CARDS,
+      cards: [
+        { title: "Advocacy", body: "Updates" },
+        { title: "Our Affinity Groups", body: "Are growing" },
+        ...ADVOCATE_CARDS,
+      ],
     },
     {
       id: "p-team-grid",
       kind: "team-grid",
       navLabel: "Meet the team",
       eyebrow: "Meet the team",
-      title: content.teamTitle || "Your team",
+      title: content.teamTitle || "Meet the Team",
       body: "The people assigned to your program, with direct contact details.",
       team: team.length
         ? team

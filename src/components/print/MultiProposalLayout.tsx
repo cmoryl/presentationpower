@@ -1,17 +1,21 @@
-// MULTI-PAGE SOLUTION PROPOSAL
+// MULTI-PAGE SOLUTION PROPOSAL — 1:1 PORT
 // ---------------------------------------------------------------------------
-// PORT — TransPerfect_Solutions_Proposal_Template_1.pptx (15 slides) → a
-// multi-page print asset. Each authored page in `content.pages` renders as its
-// own `[data-print-page]` node so:
-//   * the asset editor renders them stacked and every string stays live-editable
-//     (LiveEditOverlay binds by content path, so no per-page wiring is needed),
-//   * exportPrintAssetAsPdf() receives one node per page and emits a real
-//     multi-page PDF.
+// Rebuilt directly from TransPerfect_Solutions_Proposal_Template.pptx. Every
+// page is composed on the source deck's own coordinate system (8.5in x 11in),
+// so plate geometry, gradients, type sizes and logo placement match the
+// original slide-for-slide instead of being re-interpreted through generic
+// print chrome.
 //
-// Page kinds: cover · stats · scope · cost · locations · clients ·
-// success-stories · why · advocates · team-grid · team-bio · summary.
+// Geometry helpers
+//   u(inches)  → container-relative length (cqw), so a page scales cleanly at
+//                any preview or export DPI.
+//   fs(points) → the same unit, expressed in the source deck's point sizes.
+//
+// Each page renders as its own `[data-print-page]` node so the asset editor can
+// stack them and exportPrintAssetAsPdf() can emit a real multi-page PDF. All
+// visible strings come from `content.pages[i]`, which keeps them live-editable.
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
@@ -21,41 +25,44 @@ import type {
   SolutionProposalContent,
 } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
-import { BrandLockup } from "@/components/BrandLockup";
-import { EditableIcon } from "@/components/print/PrintIconEdit";
-import {
-  cq,
-  padCq,
-  pageAspect,
-  pagePadX as padX,
-  ICON_PATHS,
-  clampLines,
-  type IconName,
-} from "@/components/print/print-primitives";
 import {
   AFFINITY_LOGOS,
   CAUSE_LOGOS,
   CLIENT_LOGOS,
   PROPOSAL_AQUA,
   PROPOSAL_ART,
-  type LogoTile,
 } from "@/lib/print-library/proposal-art";
+import { PROPOSAL_REGIONS, PROPOSAL_TEAL } from "@/lib/print-library/proposal-locations";
 
-const FALLBACK_ICONS: IconName[] = [
-  "check",
-  "language",
-  "grid",
-  "users",
-  "clock",
-  "target",
-  "globe-alt",
-  "star",
-];
+// ---------------------------------------------------------------------------
+// Source-deck constants
+// ---------------------------------------------------------------------------
 
-function iconFor(name: string | undefined, i: number): string {
-  if (name && name in ICON_PATHS) return ICON_PATHS[name as IconName];
-  return ICON_PATHS[FALLBACK_ICONS[i % FALLBACK_ICONS.length]!];
-}
+const PAGE_W_IN = 8.5;
+const PAGE_H_IN = 11;
+
+/** inches → container unit (1 page width === 100cqw). */
+const u = (inches: number) => `${((inches / PAGE_W_IN) * 100).toFixed(4)}cqw`;
+/** points → container unit. */
+const fs = (points: number) => u(points / 72);
+
+const NAVY = "#03002C";
+const BLUE = "#003FC7";
+const LAV = "#A9A3FD";
+const AQUA_FIELD = "#A1F8F9";
+
+/** Slides 3/4/7/10 — blue → lavender → aqua diagonal band. */
+const BRIGHT_FIELD = `linear-gradient(101deg, ${BLUE} 0%, #4B63E8 26%, ${LAV} 58%, #BFE6FA 82%, ${AQUA_FIELD} 100%)`;
+/** Slide 2/5 — deep navy → blue → lavender field. */
+const DEEP_FIELD = `linear-gradient(72deg, ${NAVY} 0%, #061E6E 22%, ${BLUE} 52%, #7FA6F5 74%, ${LAV} 100%)`;
+/** Slide 1 — pale aqua → white → lavender. */
+const COVER_FIELD = `linear-gradient(122deg, ${AQUA_FIELD} 0%, #D8F4FC 18%, #F4FBFF 40%, #F2F0FF 56%, #C6B8FD 82%, ${LAV} 100%)`;
+
+const FONT = "Geist, ui-sans-serif, system-ui, sans-serif";
+
+// ---------------------------------------------------------------------------
+// Public helpers (kept stable — imported by the asset editor + library)
+// ---------------------------------------------------------------------------
 
 /** True when the proposal should render as the multi-page document. */
 export function isMultiProposal(content: Partial<SolutionProposalContent> | undefined): boolean {
@@ -83,81 +90,1093 @@ export function multiPageLabel(page: MultiProposalPage, index: number): string {
   return page.navLabel || page.title || `${MULTI_PAGE_LABELS[page.kind]} ${index + 1}`;
 }
 
-type Tokens = {
-  accent: string;
-  primary: string;
-  ink: string;
-  inkSoft: string;
-  line: string;
-  cardBg: string;
-  rowAlt: string;
-  pad: string;
-  /** True when the page body sits on a dark/brand-gradient field. */
-  onDark: boolean;
+// ---------------------------------------------------------------------------
+// Primitives
+// ---------------------------------------------------------------------------
+
+type BoxProps = {
+  x: number;
+  y: number;
+  w?: number;
+  h?: number;
+  children?: ReactNode;
+  style?: CSSProperties;
 };
 
-/** Page chrome recipes ported from the source template's visual language. */
-type ChromeSpec = {
-  /** Page field behind everything. */
-  field: "white" | "band" | "brand" | "navy" | "wash" | "art";
-  /** Body sits on a floating white plate. */
-  plate: boolean;
-  /** Header treatment. */
-  header: "band" | "hero" | "bubble" | "card" | "cover" | "statement" | "none";
-  /** Body renders on a dark field. */
-  onDark: boolean;
-};
-
-const CHROME: Record<MultiProposalPage["kind"], ChromeSpec> = {
-  cover: { field: "art", plate: false, header: "cover", onDark: true },
-  stats: { field: "art", plate: false, header: "bubble", onDark: true },
-  scope: { field: "band", plate: true, header: "band", onDark: false },
-  cost: { field: "band", plate: true, header: "band", onDark: false },
-  locations: { field: "art", plate: false, header: "card", onDark: true },
-  clients: { field: "white", plate: false, header: "hero", onDark: false },
-  "success-stories": { field: "band", plate: true, header: "band", onDark: false },
-  why: { field: "art", plate: false, header: "statement", onDark: true },
-  advocates: { field: "art", plate: false, header: "statement", onDark: true },
-  "team-grid": { field: "white", plate: false, header: "hero", onDark: false },
-  "team-bio": { field: "band", plate: true, header: "band", onDark: false },
-  summary: { field: "art", plate: false, header: "statement", onDark: true },
-};
-
-
-function brandGradient(primary: string, accent: string): string {
-  return `linear-gradient(115deg, ${primary} 0%, ${primary} 18%, ${accent} 100%)`;
+/** Absolutely-positioned layer in source-deck inches. */
+function L({ x, y, w, h, children, style }: BoxProps) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: u(x),
+        top: u(y),
+        width: w === undefined ? undefined : u(w),
+        height: h === undefined ? undefined : u(h),
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
 }
 
-function makeTokens({
-  onDark,
-  accent,
-  primary,
-  pad,
+/** Text layer — point size + weight straight off the source shape. */
+function T({
+  x,
+  y,
+  w,
+  size,
+  weight = 400,
+  color = "#FFFFFF",
+  align = "left",
+  leading = 1.18,
+  tracking,
+  upper,
+  children,
+  style,
+}: BoxProps & {
+  size: number;
+  weight?: number;
+  color?: string;
+  align?: CSSProperties["textAlign"];
+  leading?: number;
+  tracking?: string;
+  upper?: boolean;
+}) {
+  return (
+    <L x={x} y={y} w={w} style={style}>
+      <div
+        style={{
+          fontFamily: FONT,
+          fontSize: fs(size),
+          fontWeight: weight,
+          lineHeight: leading,
+          color,
+          textAlign: align,
+          letterSpacing: tracking,
+          textTransform: upper ? "uppercase" : undefined,
+          whiteSpace: "pre-wrap",
+        }}
+      >
+        {children}
+      </div>
+    </L>
+  );
+}
+
+/** Hairline rule. */
+function Rule({
+  x,
+  y,
+  w,
+  color = "rgba(255,255,255,0.55)",
+  thickness = 0.008,
 }: {
-  onDark: boolean;
-  accent: string;
-  primary: string;
-  pad: string;
-}): Tokens {
-  return {
-    accent,
-    primary: onDark ? "#FFFFFF" : primary,
-    ink: onDark ? "#FFFFFF" : "#03002C",
-    inkSoft: onDark ? "rgba(255,255,255,0.80)" : "rgba(85,85,85,0.94)",
-    line: onDark ? "rgba(255,255,255,0.22)" : "rgba(3,0,44,0.12)",
-    cardBg: onDark ? "rgba(255,255,255,0.08)" : "#F2F6FF",
-    rowAlt: onDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.035)",
-    pad,
-    onDark,
-  };
+  x: number;
+  y: number;
+  w: number;
+  color?: string;
+  thickness?: number;
+}) {
+  return <L x={x} y={y} w={w} h={thickness} style={{ background: color }} />;
+}
+
+function Img({
+  x,
+  y,
+  w,
+  h,
+  src,
+  alt = "",
+  fit = "contain",
+  radius,
+}: BoxProps & { src: string; alt?: string; fit?: "contain" | "cover"; radius?: number }) {
+  return (
+    <L x={x} y={y} w={w} h={h}>
+      <img
+        alt={alt}
+        src={src}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: fit,
+          objectPosition: "center",
+          borderRadius: radius === undefined ? undefined : u(radius),
+          display: "block",
+        }}
+      />
+    </L>
+  );
+}
+
+function lines(value: string | undefined): string[] {
+  return (value ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
+}
+
+/** `*highlighted*` runs render in the aqua accent, matching the source deck. */
+function AccentRuns({ text, accent }: { text: string; accent: string }) {
+  const parts = text.split(/(\*[^*]+\*)/g).filter(Boolean);
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.startsWith("*") && part.endsWith("*") ? (
+          <span key={i} style={{ color: accent }}>
+            {part.slice(1, -1)}
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Shared page chrome (slides 3 / 4 / 7 / 10 share a header band + white plate)
+// ---------------------------------------------------------------------------
+
+function BandHeader({ title, logo }: { title: string; logo: string }) {
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={2.95} style={{ background: BRIGHT_FIELD }} />
+      <Img x={6.38} y={0.47} w={1.88} h={0.28} src={logo} alt="TransPerfect" />
+      <T x={0.47} y={0.86} w={6} size={39.7} weight={700} leading={1.05} tracking="-0.02em">
+        {title}
+      </T>
+    </>
+  );
+}
+
+function Plate({
+  x,
+  y,
+  w,
+  h,
+  radius = 0.34,
+  bg = "#FFFFFF",
+  border,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  radius?: number;
+  bg?: string;
+  border?: string;
+}) {
+  return (
+    <L
+      x={x}
+      y={y}
+      w={w}
+      h={h}
+      style={{ background: bg, borderRadius: u(radius), border }}
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 1 — Cover
+// ---------------------------------------------------------------------------
+
+function CoverPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string }) {
+  const prepared = page.cards ?? [];
+  const forBlock = prepared[0];
+  const byBlock = prepared[1];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: COVER_FIELD }} />
+      <L
+        x={0}
+        y={0}
+        w={PAGE_W_IN}
+        h={PAGE_H_IN}
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0) 52%, rgba(255,255,255,0.72) 66%, #FFFFFF 76%)",
+        }}
+      />
+
+      <Plate
+        x={0.4}
+        y={0.5}
+        w={7.72}
+        h={3.52}
+        radius={0.36}
+        bg="linear-gradient(118deg, rgba(232,251,253,0.94) 0%, rgba(247,253,255,0.9) 42%, rgba(255,255,255,0.92) 66%, rgba(244,242,255,0.9) 100%)"
+      />
+
+      <T x={0.4} y={0.9} w={7.72} size={17} weight={400} color={BLUE} align="center" leading={1.3}>
+        {page.eyebrow || "Transforming Global Performance"}
+      </T>
+      <Img x={1.84} y={1.34} w={4.9} h={0.62} src={logoDark} alt="TransPerfect" />
+      <T
+        x={0.4}
+        y={2.24}
+        w={7.72}
+        size={19.2}
+        weight={500}
+        color={NAVY}
+        align="center"
+        tracking="0.14em"
+      >
+        {page.title || "SOLUTIONS PROPOSAL"}
+      </T>
+      <T x={2.0} y={2.98} w={4.52} size={18} weight={400} color={NAVY} align="center" leading={1.3}>
+        {page.subtitle || "[insert client logo here]"}
+      </T>
+
+      <L
+        x={2.28}
+        y={4.53}
+        w={4.37}
+        h={0.014}
+        style={{ background: `linear-gradient(90deg, ${BLUE}, ${LAV} 60%, #7FD8F2)` }}
+      />
+
+      <T x={0.4} y={4.9} w={7.72} size={14} weight={400} color={NAVY} align="center">
+        <span style={{ fontWeight: 700 }}>DATE: </span>
+        {page.footnote || "MM.DD.YY"}
+      </T>
+
+      <T x={1.84} y={5.32} w={2.33} size={14} weight={700} color={NAVY} align="right">
+        {forBlock?.title || "PREPARED FOR:"}
+      </T>
+      <T x={4.59} y={5.32} w={2.4} size={14} weight={700} color={NAVY}>
+        {byBlock?.title || "PREPARED BY:"}
+      </T>
+      <T x={1.84} y={5.79} w={2.33} size={14} weight={400} color={NAVY} align="right" leading={1.55}>
+        {forBlock?.body || "Client Contact\nTitle\nCompany Name\nAddress One\nCity, Zip\nClient Email"}
+      </T>
+      <T x={4.59} y={5.79} w={2.4} size={14} weight={400} color={NAVY} leading={1.55}>
+        {byBlock?.body || "Contact\nTitle\nTransPerfect\nAddress One\nCity, Zip\nYour Email"}
+      </T>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 2 — By the numbers
+// ---------------------------------------------------------------------------
+
+const STAT_SLOTS: Array<{
+  vx: number;
+  vy: number;
+  vSize: number;
+  lx: number;
+  ly: number;
+  lw: number;
+  lSize: number;
+  value: string;
+  label: string;
+}> = [
+  { vx: 0.66, vy: 5.6, vSize: 66.2, lx: 0.68, ly: 6.78, lw: 2.8, lSize: 15.5, value: "$1.3B", label: "IN GLOBAL REVENUE" },
+  { vx: 0.66, vy: 7.36, vSize: 44.1, lx: 1.53, ly: 7.42, lw: 2.0, lSize: 13.6, value: "34", label: "CONSECUTIVE\nYEARS OF GROWTH" },
+  { vx: 0.66, vy: 8.55, vSize: 21.7, lx: 2.3, ly: 8.6, lw: 1.4, lSize: 16.5, value: "24/7/365", label: "SERVICE" },
+  { vx: 3.9, vy: 5.5, vSize: 36.6, lx: 5.24, ly: 5.66, lw: 3.1, lSize: 16.5, value: "150+", label: "CITIES WORLDWIDE" },
+  { vx: 3.9, vy: 6.46, vSize: 36.6, lx: 5.14, ly: 6.62, lw: 3.2, lSize: 16.5, value: "90%", label: "OF THE FORTUNE 500" },
+  { vx: 3.9, vy: 7.45, vSize: 36.6, lx: 6.06, ly: 7.61, lw: 2.3, lSize: 16.5, value: "10,000+", label: "TEAM MEMBERS" },
+  { vx: 3.9, vy: 8.43, vSize: 30, lx: 4.95, ly: 8.55, lw: 3.4, lSize: 16.5, value: "200+", label: "LANGUAGES SUPPORTED" },
+];
+
+function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const headline = lines(page.title) .length
+    ? lines(page.title)
+    : ["Value.", "Intelligence.", "Performance.", "In any language."];
+  const stats = page.stats ?? [];
+
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
+
+      {/* Speech bubble — outline only, tail pointing at the revenue figure. */}
+      <svg
+        viewBox={`0 0 ${PAGE_W_IN} ${PAGE_H_IN}`}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        aria-hidden
+      >
+        <path
+          d="M 1.28,0.55 H 5.06 A 1.75,1.75 0 0 1 5.06,4.05 H 2.36 L 1.53,5.58 L 1.47,4.05 H 1.28 A 0.3,0.3 0 0 1 0.98,3.75 V 0.85 A 0.3,0.3 0 0 1 1.28,0.55 Z"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth={0.032}
+          strokeLinejoin="round"
+        />
+      </svg>
+
+      <T x={1.2} y={0.94} w={4.6} size={37} weight={400} leading={1.28} tracking="-0.015em">
+        {headline.map((line, i) => (
+          <div key={i} style={{ fontWeight: i === headline.length - 1 ? 700 : 400 }}>
+            {line}
+          </div>
+        ))}
+      </T>
+
+      {/* Column divider + hairlines */}
+      <L x={3.62} y={5.42} w={0.01} h={3.5} style={{ background: "rgba(255,255,255,0.35)" }} />
+      <Rule x={0.66} y={7.16} w={2.78} color="rgba(255,255,255,0.35)" />
+      <Rule x={0.66} y={8.32} w={2.78} color="rgba(255,255,255,0.35)" />
+      <Rule x={3.9} y={6.32} w={4.05} color="rgba(255,255,255,0.35)" />
+      <Rule x={3.9} y={7.31} w={4.05} color="rgba(255,255,255,0.35)" />
+      <Rule x={3.9} y={8.3} w={4.05} color="rgba(255,255,255,0.35)" />
+      <Rule x={0.66} y={9.2} w={7.3} color="rgba(255,255,255,0.35)" />
+
+      {STAT_SLOTS.map((slot, i) => {
+        const authored = stats[i];
+        const value = authored ? `${authored.value ?? ""}${authored.unit ?? ""}` : slot.value;
+        const label = authored?.label ?? slot.label;
+        return (
+          <div key={i}>
+            <T
+              x={slot.vx}
+              y={slot.vy}
+              w={3}
+              size={slot.vSize}
+              weight={700}
+              color={PROPOSAL_AQUA}
+              leading={1}
+              tracking="-0.03em"
+            >
+              {value}
+            </T>
+            <T
+              x={slot.lx}
+              y={slot.ly}
+              w={slot.lw}
+              size={slot.lSize}
+              weight={700}
+              leading={1.2}
+              upper
+              tracking="0.01em"
+            >
+              {label}
+            </T>
+          </div>
+        );
+      })}
+
+      <Img x={2.52} y={9.86} w={3.48} h={0.44} src={logoWhite} alt="TransPerfect" />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 3 — Project scope
+// ---------------------------------------------------------------------------
+
+function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const rows = page.cards?.length
+    ? page.cards
+    : [
+        { title: "WHAT'S INCLUDED", body: "Language Pre-Flight\nLocalization\nDesktop Publishing\nProject Management" },
+        { title: "SOURCE FILES", body: "1 PDF Document" },
+        { title: "DELIVERABLES", body: "1 PDF Document\n1 Certificate" },
+      ];
+  const heights = [1.78, 1.24, 2.05];
+  const tableX = 1.11;
+  const tableY = 2.93;
+  const colW = [3.18, 3.23];
+  const timeline = page.bullets?.length
+    ? page.bullets
+    : ["Project timeline is estimated at X business days.", "CLIENT has requested a rush X-day turnaround time."];
+
+  let cursor = tableY;
+
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "Project Scope"} logo={logoWhite} />
+
+      <Plate
+        x={0.27}
+        y={2.18}
+        w={7.98}
+        h={6.4}
+        radius={0.4}
+        bg="linear-gradient(160deg, #E9EEFC 0%, #EDF1FD 60%, #E4ECFA 100%)"
+      />
+      <Plate x={0.7} y={2.51} w={7.15} h={5.85} radius={0.06} />
+
+      {rows.slice(0, 3).map((row, i) => {
+        const h = heights[i] ?? 1.4;
+        const y = cursor;
+        cursor += h;
+        return (
+          <div key={i}>
+            <L
+              x={tableX}
+              y={y}
+              w={colW[0]}
+              h={h}
+              style={{ border: `${u(0.008)} solid ${NAVY}`, borderRight: "none" }}
+            />
+            <L
+              x={tableX + colW[0]!}
+              y={y}
+              w={colW[1]}
+              h={h}
+              style={{ border: `${u(0.008)} solid ${NAVY}` }}
+            />
+            <T
+              x={tableX + 0.14}
+              y={y + h / 2 - 0.09}
+              w={colW[0]! - 0.28}
+              size={11}
+              weight={700}
+              color={NAVY}
+              upper
+            >
+              {row.title}
+            </T>
+            <T
+              x={tableX + colW[0]! + 0.14}
+              y={y + h / 2 - (lines(row.body).length * 0.1)}
+              w={colW[1]! - 0.28}
+              size={11}
+              weight={400}
+              color={NAVY}
+              leading={1.42}
+            >
+              {row.body}
+            </T>
+          </div>
+        );
+      })}
+
+      {/* Timeline table */}
+      <L x={0.75} y={8.78} w={7.02} h={0.46} style={{ border: `${u(0.008)} solid ${NAVY}` }} />
+      <T x={0.89} y={8.88} w={4} size={18} weight={700} color={NAVY}>
+        {page.subtitle || "TIMELINE"}
+      </T>
+      <L
+        x={0.75}
+        y={9.24}
+        w={7.02}
+        h={1.0}
+        style={{ border: `${u(0.008)} solid ${NAVY}`, borderTop: "none" }}
+      />
+      {timeline.slice(0, 3).map((line, i) => (
+        <T key={i} x={0.89} y={9.42 + i * 0.34} w={6.7} size={10} weight={400} color={NAVY}>
+          {line}
+        </T>
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 4 — Cost summary
+// ---------------------------------------------------------------------------
+
+function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const rows = page.costRows ?? [];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "Cost Summary"} logo={logoWhite} />
+      <Plate x={0.27} y={2.18} w={7.98} h={8.2} radius={0.4} />
+
+      {rows.length > 0 && (
+        <>
+          <L x={0.75} y={2.72} w={7.02} h={0.46} style={{ background: "#EEF2FD" }} />
+          <T x={0.92} y={2.83} w={3.6} size={11} weight={700} color={NAVY} upper tracking="0.06em">
+            Service
+          </T>
+          <T x={4.6} y={2.83} w={1.4} size={11} weight={700} color={NAVY} upper tracking="0.06em">
+            Volume
+          </T>
+          <T x={6.1} y={2.83} w={1.5} size={11} weight={700} color={NAVY} upper tracking="0.06em" align="right">
+            Investment
+          </T>
+          {rows.map((row, i) => {
+            const y = 3.18 + i * 0.46;
+            return (
+              <div key={i}>
+                <Rule x={0.75} y={y + 0.44} w={7.02} color="rgba(3,0,44,0.14)" />
+                <T x={0.92} y={y + 0.12} w={3.6} size={11} color={NAVY}>
+                  {row.service ?? ""}
+                </T>
+                <T x={4.6} y={y + 0.12} w={1.4} size={11} color="#555555">
+                  {row.volume ?? ""}
+                </T>
+                <T x={5.9} y={y + 0.12} w={1.7} size={11} weight={600} color={NAVY} align="right">
+                  {row.amount ?? ""}
+                </T>
+              </div>
+            );
+          })}
+          <T
+            x={4.0}
+            y={3.34 + rows.length * 0.46}
+            w={2.2}
+            size={12}
+            weight={700}
+            color={NAVY}
+            align="right"
+            upper
+            tracking="0.05em"
+          >
+            {page.costTotalLabel || "Total"}
+          </T>
+          <T
+            x={6.3}
+            y={3.28 + rows.length * 0.46}
+            w={1.3}
+            size={16}
+            weight={700}
+            color={BLUE}
+            align="right"
+          >
+            {page.costTotal || ""}
+          </T>
+          {page.costNote && (
+            <T
+              x={0.92}
+              y={3.98 + rows.length * 0.46}
+              w={6.7}
+              size={9.5}
+              color="#555555"
+              leading={1.45}
+            >
+              {page.costNote}
+            </T>
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 5 — Global locations
+// ---------------------------------------------------------------------------
+
+const REGION_COLS: Record<string, { headX: number; headY: number; cols: number[]; colY: number; colW: number }> = {
+  AMERICAS: { headX: 0.56, headY: 8.44, cols: [0.56, 1.13, 1.72, 2.3, 3.18], colY: 8.73, colW: 0.62 },
+  EMEA: { headX: 4.23, headY: 8.55, cols: [4.23, 4.76, 5.39], colY: 8.84, colW: 0.58 },
+  APAC: { headX: 6.35, headY: 8.58, cols: [6.36, 6.98, 7.52], colY: 8.88, colW: 0.62 },
+};
+
+function LocationsPage({ page }: { page: MultiProposalPage }) {
+  const title = lines(page.title).length ? lines(page.title) : ["Global", "Locations"];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
+
+      <Plate
+        x={0.55}
+        y={0.85}
+        w={7.42}
+        h={2.02}
+        radius={0.16}
+        bg="rgba(255,255,255,0.14)"
+      />
+      <T x={0.55} y={1.24} w={7.42} size={40} weight={700} align="center" leading={1.14} tracking="-0.02em">
+        {title.join("\n")}
+      </T>
+
+      <Img x={-0.06} y={2.89} w={8.44} h={4.64} src={PROPOSAL_ART.worldMap} alt="World map" />
+
+      {/* Legend */}
+      <L x={0.56} y={7.56} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
+      <T x={0.68} y={7.5} w={1.4} size={7.2} weight={700} leading={1.25} upper>
+        {"Client\nService"}
+      </T>
+      <L x={0.56} y={7.86} w={0.058} h={0.058} style={{ background: PROPOSAL_TEAL, borderRadius: 999 }} />
+      <T x={0.68} y={7.8} w={1.6} size={7.2} weight={700} color={PROPOSAL_TEAL} leading={1.25} upper>
+        {"Client Service\n& Production"}
+      </T>
+
+      {PROPOSAL_REGIONS.map((region) => {
+        const spec = REGION_COLS[region.region];
+        if (!spec) return null;
+        return (
+          <div key={region.region}>
+            <T x={spec.headX} y={spec.headY} w={2} size={13.8} weight={700} tracking="-0.01em">
+              {region.region}
+            </T>
+            {region.columns.map((col, ci) => (
+              <T
+                key={ci}
+                x={spec.cols[ci] ?? spec.cols[spec.cols.length - 1]!}
+                y={spec.colY}
+                w={spec.colW}
+                size={4.3}
+                leading={1.5}
+              >
+                {col.map((city, i) => (
+                  <div key={i} style={{ color: city.prod ? PROPOSAL_TEAL : "#FFFFFF" }}>
+                    {city.name}
+                  </div>
+                ))}
+              </T>
+            ))}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 6 — Clients
+// ---------------------------------------------------------------------------
+
+function ClientsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const title = lines(page.title).length ? lines(page.title) : ["Our", "clients."];
+  const tileX = [1.3, 2.84, 4.37, 5.9];
+  const tileY = [4.56, 6.12, 7.67];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: BRIGHT_FIELD }} />
+      <L x={0} y={0} w={PAGE_W_IN} h={5.76} style={{ background: "#FFFFFF" }} />
+      <Plate x={0.43} y={3.5} w={7.59} h={5.87} radius={0.3} />
+
+      <T x={0.68} y={1.28} w={5} size={65.5} weight={700} leading={1.02} tracking="-0.035em">
+        <span style={{ color: NAVY }}>{title[0]}</span>
+        {"\n"}
+        <span style={{ color: BLUE }}>{title[1]}</span>
+      </T>
+      <T x={0.43} y={3.86} w={7.59} size={18} weight={700} color={NAVY} align="center">
+        {page.subtitle || "We're proud of the company we keep"}
+      </T>
+
+      {CLIENT_LOGOS.slice(0, 12).map((logo, i) => {
+        const col = i % 4;
+        const row = Math.floor(i / 4);
+        return (
+          <L key={logo.name} x={tileX[col]!} y={tileY[row]!} w={1.4} h={1.0}>
+            <img
+              alt={logo.name}
+              src={logo.url}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center",
+                display: "block",
+              }}
+            />
+          </L>
+        );
+      })}
+
+      <Img x={2.92} y={10.02} w={2.59} h={0.33} src={logoWhite} alt="TransPerfect" />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 7 — Success stories
+// ---------------------------------------------------------------------------
+
+function Dots({ x, y, color = NAVY }: { x: number; y: number; color?: string }) {
+  return (
+    <>
+      {[0, 1, 2].map((i) => (
+        <L
+          key={i}
+          x={x + i * 0.16}
+          y={y}
+          w={0.062}
+          h={0.062}
+          style={{ background: color, borderRadius: 999 }}
+        />
+      ))}
+    </>
+  );
+}
+
+function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const quotes = page.quotes ?? [];
+  const first = quotes[0];
+  const second = quotes[1];
+  const cardBorder = `${u(0.008)} solid rgba(3,0,44,0.85)`;
+
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "Success Stories"} logo={logoWhite} />
+      <Plate x={0.32} y={1.61} w={7.93} h={9.4} radius={0.4} />
+
+      {/* Card 1 */}
+      <L x={0.64} y={1.89} w={7.38} h={4.36} style={{ border: cardBorder, borderRadius: u(0.34) }} />
+      <Img
+        x={0.27}
+        y={2.42}
+        w={3.25}
+        h={3.13}
+        src={PROPOSAL_ART.photoClouds}
+        alt="Above the clouds"
+        fit="cover"
+        radius={0.3}
+      />
+      <T x={3.72} y={2.5} w={3.6} size={26} weight={700} color={NAVY} tracking="-0.02em">
+        {first?.company || "Lufthansa"}
+      </T>
+      <Dots x={3.72} y={3.05} color={BLUE} />
+      <T x={3.72} y={3.33} w={3.5} size={10} color={NAVY} leading={1.42}>
+        {first?.text ? `"${first.text.replace(/^"|"$/g, "")}"` : ""}
+      </T>
+      <T x={3.72} y={5.02} w={3.5} size={10} color={NAVY}>
+        {first ? `– ${[first.role || first.author, first.company].filter(Boolean).join(", ")}` : ""}
+      </T>
+
+      {/* Card 2 */}
+      <L x={0.64} y={6.8} w={7.38} h={3.62} style={{ border: cardBorder, borderRadius: u(0.34) }} />
+      <Img
+        x={4.89}
+        y={6.57}
+        w={3.29}
+        h={3.44}
+        src={PROPOSAL_ART.photoCoffee}
+        alt="Coffee"
+        fit="cover"
+        radius={0.3}
+      />
+      <T x={1.07} y={6.62} w={3.44} size={26} weight={700} color={NAVY} align="right" tracking="-0.02em">
+        {second?.company || "Lavazza"}
+      </T>
+      <Dots x={3.94} y={7.18} color={BLUE} />
+      <T x={1.07} y={7.5} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
+        {second?.headline || ""}
+      </T>
+      <T x={1.07} y={7.98} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
+        {second?.text ? `"${second.text.replace(/^"|"$/g, "")}"` : ""}
+      </T>
+      <T x={1.07} y={9.16} w={3.44} size={10} color={NAVY} align="right">
+        {second ? `– ${[second.role || second.author, second.company].filter(Boolean).join(", ")}` : ""}
+      </T>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 8 — Why TransPerfect
+// ---------------------------------------------------------------------------
+
+const WHY_LINES = [
+  "UNMATCHED *GLOBAL SCALE* & RESOURCES",
+  "GLOBAL *REACH*, LOCAL *FOCUS*",
+  "PROVEN *RECORD OF SUCCESS*",
+  "*TECHNOLOGY* SOLUTIONS",
+  "*FLEXIBLE* AND *SCALABLE*",
+  "INDUSTRY *EXPERTISE*",
+];
+
+function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string }) {
+  const bullets = page.bullets?.length ? page.bullets : WHY_LINES;
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
+      <Img x={0} y={0} w={8.53} h={3.6} src={PROPOSAL_ART.teamGrid} alt="TransPerfect team" fit="cover" />
+
+      {/* White statement bubble with a downward tail. */}
+      <svg
+        viewBox={`0 0 ${PAGE_W_IN} ${PAGE_H_IN}`}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        aria-hidden
+      >
+        <path
+          d="M 0,3.6 H 6.32 A 0.34,0.34 0 0 1 6.66,3.94 V 5.9 A 0.34,0.34 0 0 1 6.32,6.24 H 5.98 L 5.86,6.72 L 5.42,6.24 H 0 Z"
+          fill="#FFFFFF"
+        />
+      </svg>
+
+      <T x={0.64} y={4.06} w={3} size={44} weight={700} color={BLUE} tracking="-0.03em">
+        {page.title || "WHY"}
+      </T>
+      <Img x={0.64} y={4.9} w={5.33} h={0.67} src={logoDark} alt="TransPerfect" />
+
+      {bullets.slice(0, 6).map((line, i) => (
+        <T
+          key={i}
+          x={1.4}
+          y={6.9 + i * 0.655}
+          w={4.41}
+          size={13}
+          weight={700}
+          align="right"
+          leading={1.2}
+          upper
+          tracking="0.02em"
+        >
+          <AccentRuns text={line} accent="#7CC6F5" />
+        </T>
+      ))}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Page 9 — Advocates
+// ---------------------------------------------------------------------------
+
+const CAUSE_SLOTS = [
+  { x: 3.0, y: 2.55, w: 1.06, h: 0.44 },
+  { x: 4.28, y: 2.48, w: 0.92, h: 0.5 },
+  { x: 5.28, y: 2.5, w: 0.9, h: 0.48 },
+  { x: 6.3, y: 2.5, w: 1.02, h: 0.48 },
+  { x: 7.36, y: 2.5, w: 0.72, h: 0.48 },
+  { x: 3.12, y: 3.28, w: 1.14, h: 0.44 },
+  { x: 4.42, y: 3.22, w: 1.0, h: 0.5 },
+  { x: 5.66, y: 3.2, w: 1.06, h: 0.54 },
+  { x: 6.86, y: 3.24, w: 1.06, h: 0.46 },
+];
+
+const AFFINITY_SLOTS = [
+  { x: 3.0, y: 8.6, w: 1.82, h: 0.52 },
+  { x: 4.86, y: 8.44, w: 1.36, h: 0.6 },
+  { x: 6.86, y: 8.5, w: 1.04, h: 0.72 },
+  { x: 4.3, y: 9.6, w: 2.36, h: 0.56 },
+];
+
+function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string }) {
+  const advocacy = page.cards?.[0];
+  const affinity = page.cards?.[1];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <L
+        x={2.51}
+        y={0}
+        w={PAGE_W_IN - 2.51}
+        h={PAGE_H_IN}
+        style={{
+          background: `linear-gradient(160deg, ${BLUE} 0%, #6E86F0 24%, #9FB7F8 48%, ${LAV} 74%, #C7B6FB 100%)`,
+        }}
+      />
+
+      <T x={3.12} y={0.78} w={4.8} size={39.9} weight={300} leading={1.1} tracking="-0.01em">
+        {page.title || "Giving Back"}
+      </T>
+      <T x={3.13} y={1.5} w={4.9} size={13} weight={400} tracking="0.03em" upper>
+        {page.subtitle || "We are proud to support these causes"}
+      </T>
+      <Rule x={3.12} y={2.06} w={5.08} color="rgba(255,255,255,0.7)" />
+
+      {CAUSE_LOGOS.slice(0, 9).map((logo, i) => {
+        const slot = CAUSE_SLOTS[i]!;
+        return (
+          <L key={logo.name} x={slot.x} y={slot.y} w={slot.w} h={slot.h}>
+            <img
+              alt={logo.name}
+              src={logo.url}
+              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+            />
+          </L>
+        );
+      })}
+
+      <L
+        x={0}
+        y={4.24}
+        w={6.86}
+        h={2.68}
+        style={{
+          background: "#FFFFFF",
+          borderTopRightRadius: u(0.3),
+          borderBottomRightRadius: u(0.3),
+        }}
+      />
+      <Img x={3.99} y={4.78} w={2.59} h={0.33} src={logoDark} alt="TransPerfect" />
+      <T x={2.6} y={5.18} w={3.98} size={48.5} weight={700} color={BLUE} align="right" leading={1.05} tracking="-0.03em">
+        {advocacy?.title || "Advocacy"}
+      </T>
+      <T x={2.6} y={5.9} w={3.98} size={48.5} weight={400} color={NAVY} align="right" leading={1.05} tracking="-0.03em">
+        {advocacy?.body || "Updates"}
+      </T>
+
+      <T x={3.13} y={7.5} w={5} size={35.9} weight={300} leading={1.1} tracking="-0.01em">
+        {affinity?.title || "Our Affinity Groups"}
+      </T>
+      <T x={3.14} y={8.16} w={2} size={13} weight={400} tracking="0.03em" upper>
+        {affinity?.body || "Are growing"}
+      </T>
+      <Rule x={4.63} y={8.29} w={3.17} color="rgba(255,255,255,0.7)" />
+
+      {AFFINITY_LOGOS.slice(0, 4).map((logo, i) => {
+        const slot = AFFINITY_SLOTS[i]!;
+        return (
+          <L key={logo.name} x={slot.x} y={slot.y} w={slot.w} h={slot.h}>
+            <img
+              alt={logo.name}
+              src={logo.url}
+              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+            />
+          </L>
+        );
+      })}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Pages 10–11 — team + closing (source uses a white plate over the band)
+// ---------------------------------------------------------------------------
+
+function TeamPage({
+  page,
+  logoWhite,
+  bios,
+}: {
+  page: MultiProposalPage;
+  logoWhite: string;
+  bios: boolean;
+}) {
+  const team = page.team ?? [];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "Meet the Team"} logo={logoWhite} />
+      <Plate x={0.27} y={2.18} w={7.98} h={8.35} radius={0.4} />
+
+      {page.body && (
+        <T x={0.78} y={2.7} w={6.96} size={11} color="#555555" leading={1.5}>
+          {page.body}
+        </T>
+      )}
+
+      {bios
+        ? team.slice(0, 3).map((member, i) => {
+            const y = 3.4 + i * 2.4;
+            return (
+              <div key={i}>
+                <Rule x={0.78} y={y - 0.24} w={6.96} color="rgba(3,0,44,0.12)" />
+                <T x={0.78} y={y} w={4} size={16} weight={700} color={NAVY}>
+                  {member.name ?? ""}
+                </T>
+                <T x={0.78} y={y + 0.3} w={4} size={11} weight={600} color={BLUE} upper tracking="0.05em">
+                  {member.role ?? ""}
+                </T>
+                <T x={0.78} y={y + 0.62} w={6.96} size={10.5} color="#555555" leading={1.5}>
+                  {member.bio ?? ""}
+                </T>
+                <T x={0.78} y={y + 1.72} w={6.96} size={10} color={NAVY}>
+                  {[member.email, member.phone, member.office].filter(Boolean).join("  ·  ")}
+                </T>
+              </div>
+            );
+          })
+        : team.slice(0, 6).map((member, i) => {
+            const col = i % 2;
+            const row = Math.floor(i / 2);
+            const x = 0.78 + col * 3.6;
+            const y = 3.4 + row * 1.7;
+            return (
+              <div key={i}>
+                <L
+                  x={x}
+                  y={y}
+                  w={3.32}
+                  h={1.36}
+                  style={{ background: "#F3F6FE", borderRadius: u(0.16) }}
+                />
+                <T x={x + 0.24} y={y + 0.22} w={2.84} size={14} weight={700} color={NAVY}>
+                  {member.name ?? ""}
+                </T>
+                <T x={x + 0.24} y={y + 0.5} w={2.84} size={10} weight={600} color={BLUE} upper tracking="0.05em">
+                  {member.role ?? ""}
+                </T>
+                <T x={x + 0.24} y={y + 0.76} w={2.84} size={9.5} color="#555555" leading={1.4}>
+                  {[member.office, member.email].filter(Boolean).join("\n")}
+                </T>
+              </div>
+            );
+          })}
+    </>
+  );
+}
+
+function SummaryPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const bullets = page.bullets ?? [];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: BRIGHT_FIELD }} />
+      <Plate x={0.26} y={-0.36} w={7.98} h={9.81} radius={0.4} />
+
+      <T x={0.78} y={1.1} w={6.6} size={39.7} weight={700} color={NAVY} leading={1.05} tracking="-0.025em">
+        {page.title || "Next steps"}
+      </T>
+      {page.body && (
+        <T x={0.78} y={2.1} w={6.6} size={12} color="#555555" leading={1.55}>
+          {page.body}
+        </T>
+      )}
+      {bullets.map((line, i) => (
+        <div key={i}>
+          <L
+            x={0.78}
+            y={3.06 + i * 0.62}
+            w={0.09}
+            h={0.09}
+            style={{ background: BLUE, borderRadius: 999 }}
+          />
+          <T x={1.06} y={2.98 + i * 0.62} w={6.3} size={12.5} color={NAVY} leading={1.4}>
+            {line}
+          </T>
+        </div>
+      ))}
+      {page.footnote && (
+        <T x={0.78} y={8.6} w={6.6} size={9.5} color="#555555">
+          {page.footnote}
+        </T>
+      )}
+
+      <Img x={5.54} y={9.85} w={2.7} h={0.34} src={logoWhite} alt="TransPerfect" />
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Document
+// ---------------------------------------------------------------------------
+
+function PageBody({
+  page,
+  logoWhite,
+  logoDark,
+}: {
+  page: MultiProposalPage;
+  logoWhite: string;
+  logoDark: string;
+}) {
+  switch (page.kind) {
+    case "cover":
+      return <CoverPage page={page} logoDark={logoDark} />;
+    case "stats":
+      return <StatsPage page={page} logoWhite={logoWhite} />;
+    case "scope":
+      return <ScopePage page={page} logoWhite={logoWhite} />;
+    case "cost":
+      return <CostPage page={page} logoWhite={logoWhite} />;
+    case "locations":
+      return <LocationsPage page={page} />;
+    case "clients":
+      return <ClientsPage page={page} logoWhite={logoWhite} />;
+    case "success-stories":
+      return <StoriesPage page={page} logoWhite={logoWhite} />;
+    case "why":
+      return <WhyPage page={page} logoDark={logoDark} />;
+    case "advocates":
+      return <AdvocatesPage page={page} logoDark={logoDark} />;
+    case "team-grid":
+      return <TeamPage page={page} logoWhite={logoWhite} bios={false} />;
+    case "team-bio":
+      return <TeamPage page={page} logoWhite={logoWhite} bios />;
+    default:
+      return <SummaryPage page={page} logoWhite={logoWhite} />;
+  }
 }
 
 export function MultiProposalLayout({
   content,
   brand,
   mode,
-  pageSize = "Letter",
-  density = "standard",
   style,
   pageIndex,
 }: {
@@ -172,1475 +1191,33 @@ export function MultiProposalLayout({
   pageIndex?: number;
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
-  const primary = brand.tokens.primary;
-  const pad = padCq(padX(density));
-  const gradient = brandGradient(primary, accent);
   const pages = content.pages ?? [];
-  const shown =
-    typeof pageIndex === "number" ? pages.slice(pageIndex, pageIndex + 1) : pages;
-  const offset = typeof pageIndex === "number" ? pageIndex : 0;
+  const shown = typeof pageIndex === "number" ? pages.slice(pageIndex, pageIndex + 1) : pages;
+  const logoWhite = PROPOSAL_ART.logoWhite;
+  const logoDark = PROPOSAL_ART.lockupDark;
 
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", ...style }}>
-          {shown.map((page, i) => {
-            const spec = CHROME[page.kind] ?? CHROME.summary;
-            const onDark = spec.onDark || mode === "dark";
-            const t = makeTokens({ onDark, accent, primary, pad });
-            const bandTokens = makeTokens({ onDark: true, accent, primary, pad });
-            const pageBg =
-              spec.field === "navy" || spec.field === "art"
-                ? `linear-gradient(125deg, #03002C 0%, ${primary} 46%, ${accent} 108%)`
-                : spec.field === "brand"
-                  ? gradient
-                  : spec.field === "wash"
-                    ? `linear-gradient(135deg, #E0E8F5 0%, #EEF6FF 34%, #E4DEFF 72%, ${accent} 132%)`
-                    : mode === "dark"
-                      ? "#111114"
-                      : "#FFFFFF";
-
-            return (
-              <div
-                key={page.id || `${page.kind}-${i}`}
-                data-print-page
-                data-proposal-page={page.kind}
-                className="relative w-full overflow-hidden [container-type:inline-size]"
-                style={{
-                  aspectRatio: pageAspect(pageSize),
-                  background: pageBg,
-                  color: t.ink,
-                  fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                {spec.field === "art" && (
-                  <img
-                    aria-hidden
-                    alt=""
-                    src={PROPOSAL_ART.field}
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      opacity: 0.96,
-                    }}
-                  />
-                )}
-                {spec.field === "band" && (
-                  <div
-                    aria-hidden
-                    style={{
-                      position: "absolute",
-                      inset: `0 0 auto 0`,
-                      height: "24%",
-                      background: gradient,
-                    }}
-                  />
-                )}
-                {spec.field === "white" && (
-                  <div
-                    aria-hidden
-                    style={{
-                      position: "absolute",
-                      inset: "auto 0 0 0",
-                      height: cq(6),
-                      background: gradient,
-                    }}
-                  />
-                )}
-
-
-                <PageHeader
-                  brand={brand}
-                  spec={spec}
-                  page={page}
-                  tokens={spec.header === "band" ? bandTokens : t}
-                  plateTokens={t}
-                />
-
-                <div
-                  style={{
-                    position: "relative",
-                    flex: 1,
-                    minHeight: 0,
-                    marginLeft: t.pad,
-                    marginRight: t.pad,
-                    marginTop: cq(4),
-                    padding: spec.plate ? `${cq(20)} ${cq(20)}` : 0,
-                    borderRadius: spec.plate ? cq(24) : 0,
-                    background: spec.plate
-                      ? mode === "dark"
-                        ? "rgba(255,255,255,0.06)"
-                        : "#FFFFFF"
-                      : "transparent",
-                    boxShadow:
-                      spec.plate && mode !== "dark"
-                        ? `0 ${cq(10)} ${cq(30)} rgba(3,0,44,0.10)`
-                        : "none",
-                    overflow: "hidden",
-                  }}
-                  data-section={`page-${offset + i}`}
-                  data-section-label={multiPageLabel(page, offset + i)}
-                >
-                  <PageBody
-                    page={page}
-                    index={offset + i}
-                    content={content}
-                    tokens={t}
-                    brand={brand}
-                    mode={onDark ? "dark" : "light"}
-                  />
-                </div>
-                <PageFooter
-                  tokens={t}
-                  label={content.footerUrl || "transperfect.com"}
-                  number={offset + i + 1}
-                  total={pages.length}
-                  note={page.footnote}
-                />
-              </div>
-            );
-          })}
+          {shown.map((page, i) => (
+            <div
+              key={page.id || `${page.kind}-${i}`}
+              data-print-page
+              data-proposal-page={page.kind}
+              className="relative w-full overflow-hidden [container-type:inline-size]"
+              style={{
+                aspectRatio: `${PAGE_W_IN} / ${PAGE_H_IN}`,
+                background: "#FFFFFF",
+                color: NAVY,
+                fontFamily: FONT,
+              }}
+            >
+              <PageBody page={page} logoWhite={logoWhite} logoDark={logoDark} />
+            </div>
+          ))}
         </div>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
   );
-}
-
-/* ------------------------------------------------------------------ chrome */
-
-function PageHeader({
-  brand,
-  spec,
-  page,
-  tokens: t,
-  plateTokens,
-}: {
-  brand: BrandMode;
-  spec: ChromeSpec;
-  page: MultiProposalPage;
-  tokens: Tokens;
-  plateTokens: Tokens;
-}) {
-  const lockupColor = t.onDark ? "#FFFFFF" : t.primary;
-
-  /* Cover — full-width white TransPerfect wordmark over the gradient field,
-     with the proposal title set beneath it, exactly as the source template. */
-  if (spec.header === "cover") {
-    return (
-      <div
-        style={{
-          paddingLeft: t.pad,
-          paddingRight: t.pad,
-          paddingTop: cq(64),
-          textAlign: "center",
-        }}
-      >
-        <img
-          src={PROPOSAL_ART.logoWhite}
-          alt="TransPerfect"
-          style={{ width: "62%", height: "auto", margin: "0 auto", display: "block" }}
-        />
-        {page.eyebrow && (
-          <div
-            style={{
-              marginTop: cq(40),
-              fontSize: cq(10),
-              fontWeight: 700,
-              letterSpacing: "0.34em",
-              textTransform: "uppercase",
-              color: PROPOSAL_AQUA,
-            }}
-          >
-            {page.eyebrow}
-          </div>
-        )}
-        <h1
-          style={{
-            margin: `${cq(14)} 0 0`,
-            fontSize: cq(40),
-            lineHeight: 1.02,
-            fontWeight: 800,
-            letterSpacing: "-0.04em",
-            color: "#FFFFFF",
-            ...clampLines(3),
-          }}
-        >
-          {page.title}
-        </h1>
-        {page.subtitle && (
-          <div
-            style={{
-              margin: `${cq(12)} auto 0`,
-              maxWidth: "74%",
-              fontSize: cq(12),
-              lineHeight: 1.5,
-              fontWeight: 500,
-              color: "rgba(255,255,255,0.88)",
-            }}
-          >
-            {page.subtitle}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  /* Statement pages — heavy right-aligned headline mixing white and aqua. */
-  if (spec.header === "statement") {
-    return (
-      <div style={{ paddingLeft: t.pad, paddingRight: t.pad, paddingTop: cq(40) }}>
-        {page.eyebrow && (
-          <div
-            style={{
-              fontSize: cq(9),
-              fontWeight: 700,
-              letterSpacing: "0.3em",
-              textTransform: "uppercase",
-              color: PROPOSAL_AQUA,
-              textAlign: "right",
-            }}
-          >
-            {page.eyebrow}
-          </div>
-        )}
-        <h2
-          style={{
-            margin: `${page.eyebrow ? cq(12) : 0} 0 0`,
-            fontSize: cq(42),
-            lineHeight: 0.98,
-            fontWeight: 800,
-            letterSpacing: "-0.045em",
-            color: "#FFFFFF",
-            textAlign: "right",
-            ...clampLines(3),
-          }}
-        >
-          {page.title}
-        </h2>
-        {page.subtitle && (
-          <div
-            style={{
-              marginTop: cq(12),
-              marginLeft: "auto",
-              maxWidth: "70%",
-              fontSize: cq(12),
-              lineHeight: 1.5,
-              fontWeight: 600,
-              color: PROPOSAL_AQUA,
-              textAlign: "right",
-            }}
-          >
-            {page.subtitle}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-
-  if (spec.header === "bubble") {
-    return (
-      <div
-        style={{
-          position: "relative",
-          paddingLeft: t.pad,
-          paddingRight: t.pad,
-          paddingTop: cq(30),
-        }}
-      >
-        <div
-          style={{
-            position: "relative",
-            border: `${cq(2.5)} solid rgba(255,255,255,0.92)`,
-            borderRadius: cq(30),
-            padding: `${cq(22)} ${cq(24)} ${cq(24)}`,
-            maxWidth: "84%",
-          }}
-        >
-          {page.eyebrow && (
-            <div
-              style={{
-                fontSize: cq(8.5),
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.72)",
-              }}
-            >
-              {page.eyebrow}
-            </div>
-          )}
-          <h2
-            style={{
-              margin: `${page.eyebrow ? cq(8) : 0} 0 0`,
-              fontSize: cq(28),
-              lineHeight: 1.08,
-              fontWeight: 700,
-              letterSpacing: "-0.03em",
-              color: "#FFFFFF",
-              ...clampLines(4),
-            }}
-          >
-            {page.title}
-          </h2>
-          <span
-            aria-hidden
-            style={{
-              position: "absolute",
-              left: cq(34),
-              bottom: cq(-1),
-              width: cq(26),
-              height: cq(26),
-              background: "transparent",
-              borderLeft: `${cq(2.5)} solid rgba(255,255,255,0.92)`,
-              transform: `skewX(-28deg) translateY(${cq(24)})`,
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  /* Big two-line hero headline (clients page). */
-  if (spec.header === "hero") {
-    return (
-      <div style={{ paddingLeft: t.pad, paddingRight: t.pad, paddingTop: cq(34) }}>
-        <h2
-          style={{
-            margin: 0,
-            fontSize: cq(44),
-            lineHeight: 0.98,
-            fontWeight: 800,
-            letterSpacing: "-0.045em",
-            color: plateTokens.primary,
-            maxWidth: "70%",
-            ...clampLines(2),
-          }}
-        >
-          {page.title}
-        </h2>
-        {page.body && (
-          <div
-            style={{
-              marginTop: cq(14),
-              fontSize: cq(12),
-              fontWeight: 700,
-              color: plateTokens.ink,
-              ...clampLines(2),
-            }}
-          >
-            {page.body}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  /* Centered card title (cover, global locations). */
-  if (spec.header === "card") {
-    return (
-      <div style={{ paddingLeft: t.pad, paddingRight: t.pad, paddingTop: cq(28) }}>
-        <div
-          style={{
-            borderRadius: cq(24),
-            background: t.onDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.78)",
-            padding: `${cq(22)} ${cq(24)}`,
-            textAlign: "center",
-          }}
-        >
-          {page.eyebrow && (
-            <div
-              style={{
-                fontSize: cq(9),
-                fontWeight: 700,
-                letterSpacing: "0.28em",
-                textTransform: "uppercase",
-                color: t.onDark ? "rgba(255,255,255,0.82)" : t.primary,
-              }}
-            >
-              {page.eyebrow}
-            </div>
-          )}
-          <h2
-            style={{
-              margin: `${page.eyebrow ? cq(10) : 0} 0 0`,
-              fontSize: cq(30),
-              lineHeight: 1.05,
-              fontWeight: 700,
-              letterSpacing: "-0.035em",
-              color: t.onDark ? "#FFFFFF" : plateTokens.ink,
-              ...clampLines(3),
-            }}
-          >
-            {page.title}
-          </h2>
-          {page.subtitle && (
-            <div
-              style={{
-                marginTop: cq(8),
-                fontSize: cq(11.5),
-                fontWeight: 600,
-                color: t.onDark ? "rgba(255,255,255,0.86)" : t.primary,
-                ...clampLines(2),
-              }}
-            >
-              {page.subtitle}
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (spec.header === "none") return null;
-
-  /* Default: gradient band with the page title reversed out of it. */
-  return (
-    <div
-      style={{
-        position: "relative",
-        paddingLeft: t.pad,
-        paddingRight: t.pad,
-        paddingTop: cq(22),
-        paddingBottom: cq(10),
-      }}
-    >
-      <div className="flex items-start justify-between" style={{ gap: cq(14) }}>
-        <div style={{ minWidth: 0 }}>
-          {page.eyebrow && (
-            <div
-              style={{
-                fontSize: cq(8.5),
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "rgba(255,255,255,0.76)",
-              }}
-            >
-              {page.eyebrow}
-            </div>
-          )}
-          {page.title && (
-            <h2
-              style={{
-                margin: `${page.eyebrow ? cq(8) : 0} 0 0`,
-                fontSize: cq(30),
-                lineHeight: 1.04,
-                fontWeight: 800,
-                letterSpacing: "-0.035em",
-                color: "#FFFFFF",
-                ...clampLines(2),
-              }}
-            >
-              {page.title}
-            </h2>
-          )}
-          {page.subtitle && (
-            <div
-              style={{
-                marginTop: cq(6),
-                fontSize: cq(11),
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.88)",
-                ...clampLines(2),
-              }}
-            >
-              {page.subtitle}
-            </div>
-          )}
-        </div>
-        <BrandLockup brand={brand} color={lockupColor} size="xs" orientation="horizontal" />
-      </div>
-    </div>
-  );
-}
-
-function PageFooter({
-  tokens: t,
-  label,
-  number,
-  total,
-  note,
-}: {
-  tokens: Tokens;
-  label: string;
-  number: number;
-  total: number;
-  note?: string;
-}) {
-  return (
-    <div
-      className="relative flex items-center"
-      style={{
-        gap: cq(12),
-        paddingLeft: t.pad,
-        paddingRight: t.pad,
-        paddingTop: cq(12),
-        paddingBottom: cq(18),
-        marginTop: "auto",
-      }}
-    >
-      <div
-        style={{
-          fontSize: cq(9),
-          fontWeight: 700,
-          letterSpacing: "0.22em",
-          textTransform: "uppercase",
-          color: t.onDark ? "rgba(255,255,255,0.86)" : t.primary,
-          whiteSpace: "nowrap",
-        }}
-      >
-        {label}
-      </div>
-      <div style={{ flex: 1, height: 1, background: t.line }} />
-      {note && (
-        <div style={{ fontSize: cq(7.5), color: t.inkSoft, ...clampLines(1) }}>{note}</div>
-      )}
-      <div style={{ fontSize: cq(8.5), fontWeight: 700, color: t.inkSoft }}>
-        {number} / {total}
-      </div>
-    </div>
-  );
-}
-
-
-/* -------------------------------------------------------------------- body */
-
-function SectionLabel({ tokens: t, children }: { tokens: Tokens; children: string }) {
-  return (
-    <div
-      style={{
-        fontSize: cq(8.5),
-        fontWeight: 700,
-        letterSpacing: "0.16em",
-        textTransform: "uppercase",
-        color: t.primary,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function Body({ tokens: t, children }: { tokens: Tokens; children: string }) {
-  return (
-    <p
-      style={{
-        margin: `${cq(10)} 0 0`,
-        fontSize: cq(11),
-        lineHeight: 1.55,
-        color: t.inkSoft,
-        maxWidth: cq(760),
-      }}
-    >
-      {children}
-    </p>
-  );
-}
-
-function Bullets({ tokens: t, items }: { tokens: Tokens; items: string[] }) {
-  return (
-    <ul
-      style={{
-        margin: `${cq(12)} 0 0`,
-        padding: 0,
-        listStyle: "none",
-        display: "flex",
-        flexDirection: "column",
-        gap: cq(7),
-      }}
-    >
-      {items.map((v, i) => (
-        <li key={i} className="flex" style={{ gap: cq(8) }}>
-          <span
-            style={{
-              marginTop: cq(5),
-              width: cq(6),
-              height: cq(6),
-              borderRadius: 999,
-              background: t.accent,
-              flex: "0 0 auto",
-            }}
-          />
-          <span style={{ fontSize: cq(10), lineHeight: 1.5, color: t.ink }}>{v}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function StatGrid({ tokens: t, stats }: { tokens: Tokens; stats: MultiProposalPage["stats"] }) {
-  const list = (stats ?? []).slice(0, 8);
-  if (list.length === 0) return null;
-  const cols = list.length >= 6 ? 2 : Math.min(list.length, 4) || 1;
-
-  /* On the dark/brand field the template uses big accent figures on hairlines
-     with the label set beside them — not boxed cards. */
-  if (t.onDark) {
-    return (
-      <div
-        className="grid"
-        style={{
-          marginTop: cq(18),
-          gridTemplateColumns: `repeat(${Math.min(cols, 2)}, minmax(0, 1fr))`,
-          columnGap: cq(24),
-          rowGap: cq(2),
-        }}
-      >
-        {list.map((s, i) => (
-          <div
-            key={i}
-            className="flex items-baseline"
-            style={{
-              gap: cq(10),
-              paddingTop: cq(10),
-              paddingBottom: cq(10),
-              borderBottom: `1px solid ${t.line}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: cq(28),
-                fontWeight: 700,
-                lineHeight: 1,
-                letterSpacing: "-0.035em",
-                color: t.accent,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {`${s.value ?? ""}${s.unit ?? ""}`}
-            </div>
-            <div
-              style={{
-                fontSize: cq(9),
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                lineHeight: 1.25,
-                color: "#FFFFFF",
-                ...clampLines(2),
-              }}
-            >
-              {s.label}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="grid"
-      style={{
-        marginTop: cq(14),
-        gridTemplateColumns: `repeat(${list.length >= 6 ? 3 : cols}, minmax(0, 1fr))`,
-        gap: cq(12),
-      }}
-    >
-      {list.map((s, i) => (
-        <div
-          key={i}
-          style={{
-            borderRadius: cq(14),
-            border: `1px solid ${t.line}`,
-            background: t.cardBg,
-            padding: `${cq(14)} ${cq(12)}`,
-          }}
-        >
-          <div
-            style={{
-              fontSize: cq(26),
-              fontWeight: 700,
-              lineHeight: 1.02,
-              letterSpacing: "-0.03em",
-              color: t.primary,
-            }}
-          >
-            {`${s.value ?? ""}${s.unit ?? ""}`}
-          </div>
-          <div
-            style={{
-              marginTop: cq(6),
-              fontSize: cq(9),
-              lineHeight: 1.35,
-              fontWeight: 600,
-              color: t.inkSoft,
-              ...clampLines(3),
-            }}
-          >
-            {s.label}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-
-function CardGrid({
-  tokens: t,
-  cards,
-  withIcons,
-}: {
-  tokens: Tokens;
-  cards: MultiProposalPage["cards"];
-  withIcons?: boolean;
-}) {
-  const list = (cards ?? []).slice(0, 9);
-  if (list.length === 0) return null;
-  const cols = list.length >= 5 ? 3 : Math.min(list.length, 4) || 1;
-  return (
-    <div
-      className="grid"
-      style={{
-        marginTop: cq(14),
-        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-        gap: cq(12),
-      }}
-    >
-      {list.map((c, i) => (
-        <div
-          key={i}
-          style={{
-            borderRadius: cq(14),
-            border: `1px solid ${t.line}`,
-            padding: `${cq(13)} ${cq(12)}`,
-          }}
-        >
-          {withIcons && (
-            <EditableIcon
-              slot={`proposal.cards.${i}`}
-              d={iconFor(c.icon, i)}
-              size={cq(18)}
-              color={t.primary}
-            />
-          )}
-          {c.title && (
-            <div
-              style={{
-                marginTop: withIcons ? cq(8) : 0,
-                fontSize: cq(11),
-                fontWeight: 700,
-                lineHeight: 1.3,
-                color: t.ink,
-                ...clampLines(2),
-              }}
-            >
-              {c.title}
-            </div>
-          )}
-          {c.body && (
-            <div
-              style={{
-                marginTop: cq(5),
-                fontSize: cq(9),
-                lineHeight: 1.45,
-                color: t.inkSoft,
-                ...clampLines(5),
-              }}
-            >
-              {c.body}
-            </div>
-          )}
-          {c.meta && (
-            <div
-              style={{
-                marginTop: cq(6),
-                fontSize: cq(8),
-                fontWeight: 700,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: t.primary,
-              }}
-            >
-              {c.meta}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function Quotes({ tokens: t, quotes }: { tokens: Tokens; quotes: MultiProposalPage["quotes"] }) {
-  const list = (quotes ?? []).slice(0, 3);
-  if (list.length === 0) return null;
-  return (
-    <div
-      style={{
-        marginTop: cq(14),
-        display: "flex",
-        flexDirection: "column",
-        gap: cq(14),
-      }}
-    >
-      {list.map((q, i) => (
-        <div
-          key={i}
-          style={{
-            borderRadius: cq(14),
-            border: `1px solid ${t.line}`,
-            background: i % 2 === 0 ? t.cardBg : "transparent",
-            padding: `${cq(14)} ${cq(14)}`,
-          }}
-        >
-          {q.headline && (
-            <div
-              style={{
-                fontSize: cq(11),
-                fontWeight: 700,
-                color: t.primary,
-                ...clampLines(2),
-              }}
-            >
-              {q.headline}
-            </div>
-          )}
-          {q.text && (
-            <blockquote
-              style={{
-                margin: `${q.headline ? cq(8) : 0} 0 0`,
-                borderLeft: `${cq(3)} solid ${t.accent}`,
-                paddingLeft: cq(12),
-                fontSize: cq(10),
-                lineHeight: 1.5,
-                fontStyle: "italic",
-                color: t.ink,
-                ...clampLines(8),
-              }}
-            >
-              {q.text}
-            </blockquote>
-          )}
-          <div
-            style={{
-              marginTop: cq(8),
-              fontSize: cq(8.5),
-              fontWeight: 700,
-              color: t.primary,
-            }}
-          >
-            {[q.author, q.role, q.company].filter(Boolean).join(" · ")}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function CostTable({
-  tokens: t,
-  page,
-}: {
-  tokens: Tokens;
-  page: MultiProposalPage;
-}) {
-  const rows = (page.costRows ?? []).slice(0, 12);
-  if (rows.length === 0) return null;
-  return (
-    <div style={{ marginTop: cq(14) }}>
-      <div style={{ border: `1px solid ${t.line}`, borderRadius: cq(10), overflow: "hidden" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.6fr 0.4fr 0.6fr",
-            background: t.primary,
-            color: "#FFFFFF",
-            padding: `${cq(8)} ${cq(12)}`,
-            fontSize: cq(8.5),
-            fontWeight: 700,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            gap: cq(8),
-          }}
-        >
-          <div>Service</div>
-          <div style={{ textAlign: "center" }}>Qty</div>
-          <div style={{ textAlign: "right" }}>Price</div>
-        </div>
-        {rows.map((r, i) => (
-          <div
-            key={i}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1.6fr 0.4fr 0.6fr",
-              borderTop: `1px solid ${t.line}`,
-              background: i % 2 === 1 ? t.rowAlt : "transparent",
-              padding: `${cq(8)} ${cq(12)}`,
-              gap: cq(8),
-              alignItems: "baseline",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: cq(10), fontWeight: 700, color: t.ink }}>{r.item}</div>
-              {r.detail && (
-                <div style={{ fontSize: cq(8.5), color: t.inkSoft, ...clampLines(2) }}>
-                  {r.detail}
-                </div>
-              )}
-            </div>
-            <div style={{ fontSize: cq(9.5), color: t.inkSoft, textAlign: "center" }}>
-              {r.qty ?? ""}
-            </div>
-            <div
-              style={{ fontSize: cq(10.5), fontWeight: 700, color: t.ink, textAlign: "right" }}
-            >
-              {r.price ?? ""}
-            </div>
-          </div>
-        ))}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr auto",
-            borderTop: `1px solid ${t.line}`,
-            background: t.cardBg,
-            padding: `${cq(10)} ${cq(12)}`,
-            alignItems: "baseline",
-            gap: cq(10),
-          }}
-        >
-          <div
-            style={{
-              fontSize: cq(9),
-              fontWeight: 700,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              color: t.primary,
-            }}
-          >
-            {page.costTotalLabel || "Total"}
-          </div>
-          <div style={{ fontSize: cq(18), fontWeight: 700, color: t.ink }}>
-            {page.costTotal ?? ""}
-          </div>
-        </div>
-      </div>
-      {page.costNote && (
-        <div
-          style={{
-            marginTop: cq(8),
-            fontSize: cq(8),
-            lineHeight: 1.45,
-            color: t.inkSoft,
-            ...clampLines(4),
-          }}
-        >
-          {page.costNote}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Locations({
-  tokens: t,
-  locations,
-}: {
-  tokens: Tokens;
-  locations: MultiProposalPage["locations"];
-}) {
-  const list = (locations ?? []).slice(0, 6);
-  if (list.length === 0) return null;
-  return (
-    <div
-      className="grid"
-      style={{
-        marginTop: cq(14),
-        gridTemplateColumns: `repeat(${Math.min(list.length, 3)}, minmax(0, 1fr))`,
-        gap: cq(14),
-      }}
-    >
-      {list.map((l, i) => (
-        <div key={i} style={{ borderTop: `${cq(2)} solid ${t.accent}`, paddingTop: cq(8) }}>
-          <div style={{ fontSize: cq(10.5), fontWeight: 700, color: t.ink }}>{l.region}</div>
-          <div
-            style={{
-              marginTop: cq(5),
-              fontSize: cq(9),
-              lineHeight: 1.5,
-              color: t.inkSoft,
-            }}
-          >
-            {(l.offices ?? []).join(" · ")}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function normalizeLogoKey(v: string): string {
-  return v.toLowerCase().replace(/[^a-z0-9]/g, "");
-}
-
-/** Resolve authored logo names against the template's real logo artwork. */
-function resolveLogoTiles(names: string[], pool: LogoTile[]): LogoTile[] {
-  if (names.length === 0) return pool;
-  return names.slice(0, 24).map((name, i) => {
-    const key = normalizeLogoKey(name);
-    const hit = pool.find((p) => {
-      const pk = normalizeLogoKey(p.name);
-      return pk === key || pk.startsWith(key) || key.startsWith(pk);
-    });
-    return hit ?? { name, url: pool[i % Math.max(pool.length, 1)]?.url ?? "" };
-  });
-}
-
-/** Slide 6 client wall — white rounded cards, four across. */
-function LogoWall({ tokens: t, logos }: { tokens: Tokens; logos: string[] }) {
-  const tiles = resolveLogoTiles(logos, CLIENT_LOGOS);
-  if (tiles.length === 0) return null;
-  return (
-    <div
-      className="grid"
-      style={{
-        marginTop: cq(22),
-        gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-        gap: cq(14),
-      }}
-    >
-      {tiles.map((tile, i) => (
-        <div
-          key={`${tile.name}-${i}`}
-          className="flex items-center justify-center"
-          style={{
-            borderRadius: cq(16),
-            background: "#FFFFFF",
-            boxShadow: `0 ${cq(4)} ${cq(16)} rgba(3,0,44,0.10)`,
-            aspectRatio: "1.45",
-            padding: `${cq(12)} ${cq(14)}`,
-          }}
-        >
-          {tile.url ? (
-            <img
-              src={tile.url}
-              alt={tile.name}
-              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
-            />
-          ) : (
-            <span style={{ fontSize: cq(9), fontWeight: 700, color: t.ink }}>{tile.name}</span>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/** Giving-back / affinity marks — reversed-out logos straight on the field. */
-function MarkWall({
-  tiles,
-  cols,
-  marginTop,
-}: {
-  tiles: LogoTile[];
-  cols: number;
-  marginTop: number;
-}) {
-  if (tiles.length === 0) return null;
-  return (
-    <div
-      className="grid"
-      style={{
-        marginTop: cq(marginTop),
-        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-        columnGap: cq(20),
-        rowGap: cq(22),
-        alignItems: "center",
-      }}
-    >
-      {tiles.map((tile, i) => (
-        <div key={`${tile.name}-${i}`} className="flex items-center justify-center">
-          <img
-            src={tile.url}
-            alt={tile.name}
-            style={{ maxWidth: "100%", maxHeight: cq(54), objectFit: "contain" }}
-          />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/** Slide 5 world map plate. */
-function WorldMap() {
-  return (
-    <img
-      src={PROPOSAL_ART.worldMap}
-      alt="TransPerfect global office locations"
-      style={{
-        display: "block",
-        width: "100%",
-        height: "auto",
-        marginTop: cq(18),
-        opacity: 0.95,
-      }}
-    />
-  );
-}
-
-
-function TeamGrid({
-  tokens: t,
-  team,
-  detailed,
-}: {
-  tokens: Tokens;
-  team: MultiProposalPage["team"];
-  detailed?: boolean;
-}) {
-  const list = (team ?? []).slice(0, detailed ? 2 : 6);
-  if (list.length === 0) return null;
-  return (
-    <div
-      className="grid"
-      style={{
-        marginTop: cq(14),
-        gridTemplateColumns: `repeat(${detailed ? 1 : Math.min(list.length, 3)}, minmax(0, 1fr))`,
-        gap: cq(14),
-      }}
-    >
-      {list.map((m, i) => (
-        <div
-          key={i}
-          style={{
-            borderTop: `${cq(2)} solid ${t.accent}`,
-            paddingTop: cq(9),
-            display: detailed ? "grid" : "block",
-            gridTemplateColumns: detailed ? "0.8fr 1.6fr" : undefined,
-            gap: detailed ? cq(16) : undefined,
-          }}
-        >
-          <div>
-            <div style={{ fontSize: cq(11.5), fontWeight: 700, color: t.ink }}>{m.name}</div>
-            {m.role && (
-              <div style={{ fontSize: cq(9.5), color: t.inkSoft, ...clampLines(2) }}>{m.role}</div>
-            )}
-            {m.office && <div style={{ fontSize: cq(9), color: t.inkSoft }}>{m.office}</div>}
-            {m.email && (
-              <div style={{ fontSize: cq(9), color: t.inkSoft, wordBreak: "break-all" }}>
-                {m.email}
-              </div>
-            )}
-            {m.phone && <div style={{ fontSize: cq(9), color: t.inkSoft }}>{m.phone}</div>}
-          </div>
-          {detailed && m.bio && (
-            <div
-              style={{
-                fontSize: cq(9.5),
-                lineHeight: 1.55,
-                color: t.inkSoft,
-                ...clampLines(14),
-              }}
-            >
-              {m.bio}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function CoverParties({
-  tokens: t,
-  content,
-}: {
-  tokens: Tokens;
-  content: SolutionProposalContent;
-}) {
-  const parties = [
-    { key: "for", party: content.preparedFor, fallback: "Prepared for:" },
-    { key: "by", party: content.preparedBy, fallback: "Prepared by:" },
-  ];
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr auto",
-        gap: cq(18),
-        marginTop: cq(10),
-      }}
-    >
-      {parties.map(({ key, party, fallback }) => (
-        <div key={key}>
-          <SectionLabel tokens={t}>{party?.label || fallback}</SectionLabel>
-          <div style={{ marginTop: cq(6), fontSize: cq(11.5), fontWeight: 700, color: t.ink }}>
-            {party?.contact ?? ""}
-          </div>
-          {party?.role && <div style={{ fontSize: cq(9.5), color: t.inkSoft }}>{party.role}</div>}
-          {party?.company && (
-            <div style={{ marginTop: cq(4), fontSize: cq(10), fontWeight: 600, color: t.ink }}>
-              {party.company}
-            </div>
-          )}
-          {party?.address1 && (
-            <div style={{ fontSize: cq(9.5), color: t.inkSoft }}>{party.address1}</div>
-          )}
-          {party?.address2 && (
-            <div style={{ fontSize: cq(9.5), color: t.inkSoft }}>{party.address2}</div>
-          )}
-          {party?.email && (
-            <div style={{ fontSize: cq(9.5), color: t.inkSoft, wordBreak: "break-all" }}>
-              {party.email}
-            </div>
-          )}
-          {party?.phone && <div style={{ fontSize: cq(9.5), color: t.inkSoft }}>{party.phone}</div>}
-        </div>
-      ))}
-      <div style={{ textAlign: "right" }}>
-        <SectionLabel tokens={t}>Date:</SectionLabel>
-        <div style={{ marginTop: cq(6), fontSize: cq(12), fontWeight: 700, color: t.ink }}>
-          {content.dateLabel || ""}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ScopeColumns({
-  tokens: t,
-  content,
-}: {
-  tokens: Tokens;
-  content: SolutionProposalContent;
-}) {
-  const cols: Array<{ title: string; items: string[] }> = [
-    { title: content.sourceFilesTitle || "Source files", items: content.sourceFiles ?? [] },
-    { title: content.deliverablesTitle || "Deliverables", items: content.deliverables ?? [] },
-  ];
-  return (
-    <div
-      className="grid"
-      style={{ marginTop: cq(16), gridTemplateColumns: "1fr 1fr 1.4fr", gap: cq(14) }}
-    >
-      {cols.map((col, i) => (
-        <div key={i} style={{ borderTop: `1px solid ${t.line}`, paddingTop: cq(10) }}>
-          <SectionLabel tokens={t}>{col.title}</SectionLabel>
-          <ul style={{ margin: `${cq(8)} 0 0`, padding: 0, listStyle: "none" }}>
-            {col.items.slice(0, 8).map((v, j) => (
-              <li key={j} style={{ fontSize: cq(9.5), lineHeight: 1.5, color: t.ink }}>
-                {v}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-      <div style={{ borderTop: `1px solid ${t.line}`, paddingTop: cq(10) }}>
-        <SectionLabel tokens={t}>{content.timelineTitle || "Timeline"}</SectionLabel>
-        <p style={{ margin: `${cq(8)} 0 0`, fontSize: cq(9.5), lineHeight: 1.5, color: t.inkSoft }}>
-          {content.timelineNote}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function PageBody({
-  page,
-  index,
-  content,
-  tokens: t,
-  brand,
-  mode,
-}: {
-  page: MultiProposalPage;
-  index: number;
-  content: SolutionProposalContent;
-  tokens: Tokens;
-  brand: BrandMode;
-  mode: "light" | "dark";
-}) {
-  switch (page.kind) {
-    case "cover": {
-      const plate = makeTokens({
-        onDark: false,
-        accent: t.accent,
-        primary: brand.tokens.primary,
-        pad: t.pad,
-      });
-      return (
-        <div className="flex h-full flex-col justify-end">
-          <div
-            className="flex items-center justify-center"
-            style={{
-              borderRadius: cq(20),
-              border: `${cq(1.5)} solid rgba(255,255,255,0.55)`,
-              background: "rgba(255,255,255,0.10)",
-              padding: `${cq(18)} ${cq(20)}`,
-              minHeight: cq(86),
-              marginBottom: cq(20),
-            }}
-          >
-            {content.clientLogoUrl ? (
-              <img
-                src={content.clientLogoUrl}
-                alt={content.preparedFor?.company ? `${content.preparedFor.company} logo` : ""}
-                style={{ maxHeight: cq(60), maxWidth: "70%", objectFit: "contain" }}
-              />
-            ) : (
-              <span
-                style={{
-                  fontSize: cq(10),
-                  fontWeight: 700,
-                  letterSpacing: "0.24em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,255,255,0.72)",
-                }}
-              >
-                Client logo
-              </span>
-            )}
-          </div>
-          <div
-            style={{
-              borderRadius: cq(20),
-              background: mode === "dark" ? "rgba(255,255,255,0.10)" : "#FFFFFF",
-              padding: `${cq(20)} ${cq(20)}`,
-            }}
-          >
-            {page.body && <Body tokens={plate}>{page.body}</Body>}
-            <CoverParties tokens={plate} content={content} />
-          </div>
-        </div>
-      );
-    }
-
-    case "stats":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <StatGrid tokens={t} stats={page.stats ?? content.stats} />
-          {page.bullets?.length ? <Bullets tokens={t} items={page.bullets} /> : null}
-        </div>
-      );
-    case "scope":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <CardGrid
-            tokens={t}
-            withIcons
-            cards={
-              page.cards?.length
-                ? page.cards
-                : (content.included ?? []).map((s) => ({
-                    title: s.label,
-                    body: s.detail,
-                    icon: s.icon,
-                  }))
-            }
-          />
-          <ScopeColumns tokens={t} content={content} />
-        </div>
-      );
-    case "cost":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <CostTable
-            tokens={t}
-            page={{
-              ...page,
-              costRows: page.costRows?.length ? page.costRows : content.costRows,
-              costTotal: page.costTotal ?? content.costTotal,
-              costTotalLabel: page.costTotalLabel ?? content.costTotalLabel,
-              costNote: page.costNote ?? content.costNote,
-            }}
-          />
-        </div>
-      );
-    case "locations":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <WorldMap />
-          <Locations tokens={t} locations={page.locations} />
-          <StatGrid tokens={t} stats={page.stats} />
-        </div>
-      );
-    case "clients":
-      return (
-        <div>
-          <LogoWall tokens={t} logos={page.logos ?? []} />
-          <StatGrid tokens={t} stats={page.stats} />
-        </div>
-      );
-    case "success-stories":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <Quotes tokens={t} quotes={page.quotes ?? (content.quote ? [content.quote] : [])} />
-        </div>
-      );
-    case "why":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <CardGrid tokens={t} withIcons cards={page.cards} />
-          {page.bullets?.length ? <Bullets tokens={t} items={page.bullets} /> : null}
-        </div>
-      );
-    case "advocates":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <MarkWall tiles={CAUSE_LOGOS} cols={3} marginTop={24} />
-          <MarkWall tiles={AFFINITY_LOGOS} cols={4} marginTop={26} />
-          <Quotes tokens={t} quotes={page.quotes} />
-        </div>
-      );
-    case "team-grid":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <img
-            src={PROPOSAL_ART.teamGrid}
-            alt="TransPerfect project team"
-            style={{
-              display: "block",
-              width: "100%",
-              height: "auto",
-              marginTop: cq(18),
-              borderRadius: cq(16),
-            }}
-          />
-          <TeamGrid tokens={t} team={page.team ?? content.team} />
-        </div>
-      );
-
-    case "team-bio":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <TeamGrid tokens={t} team={page.team} detailed />
-        </div>
-      );
-    case "summary":
-      return (
-        <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          {page.bullets?.length ? <Bullets tokens={t} items={page.bullets} /> : null}
-          <CardGrid tokens={t} cards={page.cards} />
-          {content.contacts?.ctaLabel && (
-            <div
-              style={{ marginTop: cq(16), fontSize: cq(11), fontWeight: 700, color: t.primary }}
-            >
-              {content.contacts.ctaLabel}{" "}
-              <span style={{ color: t.ink, fontWeight: 600 }}>
-                {content.contacts.ctaEmail ?? ""}
-              </span>
-            </div>
-          )}
-        </div>
-      );
-    default:
-      return <div data-empty-page={index} />;
-  }
 }
