@@ -92,7 +92,7 @@ function logFitPass(node: Element, t: FitTrace) {
   rec.last = now;
   passLog.set(node, rec);
 
-  const changed = Math.abs(rec.count && t.ratio - t.prevRatio) > 0.0005;
+  const changed = Math.abs(t.ratio - t.prevRatio) > 0.0005;
   const tag = `[autofit] ${t.label}`;
   const detail = {
     authoredPx: t.authoredPx,
