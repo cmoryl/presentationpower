@@ -142,6 +142,16 @@ function MasterItemEditorPage() {
   const [jsonText, setJsonText] = useState("");
   const [jsonError, setJsonError] = useState<string | null>(null);
 
+  // Live page canvas — the hero grip measures against this box and the
+  // overflow hook watches the rendered page for real clipping.
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const overflow = usePrintOverflow(canvasRef, {
+    content: draft?.content ?? null,
+    look: draft?.look ?? null,
+    mode,
+  });
+
+
   const brand = useMemo(
     () =>
       brandModes.find((b) => b.id === (shipped?.divisionId ?? "")) ??
