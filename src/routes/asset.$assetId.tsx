@@ -111,6 +111,15 @@ import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { usePrintOverflow } from "@/hooks/use-print-overflow";
+import { PrintContentFitFrame } from "@/components/print/PrintContentFitFrame";
+import {
+  NEUTRAL_FIT,
+  PRINT_CONTENT_FIT_DEFAULTS,
+  describeFit,
+  isNeutralFit,
+  resolveContentFit,
+  type PrintFitKnobs,
+} from "@/lib/print-content-fit";
 import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import {
@@ -204,6 +213,8 @@ function AssetEditor() {
   // Measured (not predicted) page overflow — fires whenever content is really
   // clipped by the fixed-height page, e.g. after dragging the hero too tall.
   const overflow = usePrintOverflow(canvasRef, row?.content);
+  // Content-fit knobs currently applied by PrintContentFitFrame (1/1 = none).
+  const [fitKnobs, setFitKnobs] = useState<PrintFitKnobs>(NEUTRAL_FIT);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
   // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
@@ -1193,196 +1204,217 @@ function AssetEditor() {
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
               style={{ aspectRatio: canvasAspect }}
             >
-              <PrintDocModeProvider icons={iconTreatment.icons} iconStyle={iconTreatment.iconStyle}>
-                <PrintIconEditContext.Provider
-                  value={{
-                    active: true,
-                    overrides: ((rawContent as { iconOverrides?: Record<string, string> })
-                      .iconOverrides ?? {}) as Record<string, string>,
-                    onPick: (slot, current) => setIconSlot({ slot, current }),
-                  }}
+              <PrintContentFitFrame
+                settings={ctx.contentFit}
+                dep={rawContent}
+                onChange={(knobs) => setFitKnobs(knobs)}
+              >
+                <PrintDocModeProvider
+                  icons={iconTreatment.icons}
+                  iconStyle={iconTreatment.iconStyle}
                 >
-                  <LiveEditOverlay
-                    enabled={true}
-                    slideId={`asset-${row.id}-${kind}`}
-                    content={rawContent}
-                    editableFields={editableFieldPaths}
-                    onChange={(path, value) => patchByPath(path, value)}
-                    inkOverrides={ctx.inkOverrides}
-                    inkScopeOverrides={ctx.inkScopeOverrides}
-                    onSetInkColor={(cp, color) => setInkColor(cp, color)}
-                    onClearInkColor={(cp) => setInkColor(cp, null)}
-                    onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
-                    onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+                  <PrintIconEditContext.Provider
+                    value={{
+                      active: true,
+                      overrides: ((rawContent as { iconOverrides?: Record<string, string> })
+                        .iconOverrides ?? {}) as Record<string, string>,
+                      onPick: (slot, current) => setIconSlot({ slot, current }),
+                    }}
                   >
-                    <PrintClientLogoProvider value={clientLogo}>
-                      {brand && kind === "case-study" && (
-                        <CaseStudyLayout
-                          content={rawContent as unknown as CaseStudyContent}
-                          brand={brand}
-                          mode={editorMode}
-                          pageSize={pageSize}
-                          density={density}
-                          seed={`asset-${row.id}`}
+                    <LiveEditOverlay
+                      enabled={true}
+                      slideId={`asset-${row.id}-${kind}`}
+                      content={rawContent}
+                      editableFields={editableFieldPaths}
+                      onChange={(path, value) => patchByPath(path, value)}
+                      inkOverrides={ctx.inkOverrides}
+                      inkScopeOverrides={ctx.inkScopeOverrides}
+                      onSetInkColor={(cp, color) => setInkColor(cp, color)}
+                      onClearInkColor={(cp) => setInkColor(cp, null)}
+                      onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
+                      onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+                    >
+                      <PrintClientLogoProvider value={clientLogo}>
+                        {brand && kind === "case-study" && (
+                          <CaseStudyLayout
+                            content={rawContent as unknown as CaseStudyContent}
+                            brand={brand}
+                            mode={editorMode}
+                            pageSize={pageSize}
+                            density={density}
+                            seed={`asset-${row.id}`}
+                          />
+                        )}
+                        {brand && kind === "spotlight" && (
+                          <SpotlightLayout
+                            content={rawContent as unknown as SpotlightContent}
+                            brand={brand}
+                            mode={editorMode}
+                            pageSize={pageSize}
+                            density={density}
+                            seed={`asset-${row.id}`}
+                          />
+                        )}
+                        {brand && kind === "ebrochure" && (
+                          <EBrochureLayout
+                            content={rawContent as unknown as EBrochureContent}
+                            brand={brand}
+                            mode={editorMode}
+                            pageSize={pageSize}
+                            density={density}
+                            seed={`asset-${row.id}`}
+                          />
+                        )}
+                        {brand && kind === "msa-partnership" && (
+                          <MsaPartnershipLayout
+                            content={rawContent as unknown as MsaPartnershipContent}
+                            brand={brand}
+                            mode={editorMode}
+                            pageSize={pageSize}
+                            density={density}
+                            seed={`asset-${row.id}`}
+                          />
+                        )}
+                        {brand && kind === "adaptor-brief" && (
+                          <AdaptorBriefLayout
+                            content={rawContent as unknown as AdaptorBriefContent}
+                            brand={brand}
+                            mode={editorMode}
+                            pageSize={pageSize}
+                            density={density}
+                            seed={`asset-${row.id}`}
+                          />
+                        )}
+                      </PrintClientLogoProvider>
+                      {ctx.printSafeArea && (
+                        <div
+                          data-export-ignore="true"
+                          data-canvas-guide="safe-area"
+                          className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
                         />
                       )}
-                      {brand && kind === "spotlight" && (
-                        <SpotlightLayout
-                          content={rawContent as unknown as SpotlightContent}
-                          brand={brand}
-                          mode={editorMode}
-                          pageSize={pageSize}
-                          density={density}
-                          seed={`asset-${row.id}`}
-                        />
-                      )}
-                      {brand && kind === "ebrochure" && (
-                        <EBrochureLayout
-                          content={rawContent as unknown as EBrochureContent}
-                          brand={brand}
-                          mode={editorMode}
-                          pageSize={pageSize}
-                          density={density}
-                          seed={`asset-${row.id}`}
-                        />
-                      )}
-                      {brand && kind === "msa-partnership" && (
-                        <MsaPartnershipLayout
-                          content={rawContent as unknown as MsaPartnershipContent}
-                          brand={brand}
-                          mode={editorMode}
-                          pageSize={pageSize}
-                          density={density}
-                          seed={`asset-${row.id}`}
-                        />
-                      )}
-                      {brand && kind === "adaptor-brief" && (
-                        <AdaptorBriefLayout
-                          content={rawContent as unknown as AdaptorBriefContent}
-                          brand={brand}
-                          mode={editorMode}
-                          pageSize={pageSize}
-                          density={density}
-                          seed={`asset-${row.id}`}
-                        />
-                      )}
-                    </PrintClientLogoProvider>
-                    {ctx.printSafeArea && (
-                      <div
-                        data-export-ignore="true"
-                        data-canvas-guide="safe-area"
-                        className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
+                      <HeroResizeHandle
+                        canvasRef={canvasRef}
+                        media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                        onChange={(next) => patchContent({ heroMedia: next } as never)}
+                        kind={kind as never}
+                        usedModuleUnits={(
+                          (rawContent as { modules?: PrintSection[] }).modules ?? []
+                        ).reduce((n, m) => n + weightForSection(m), 0)}
+                        hasTitle={!!(rawContent as { title?: string }).title}
+                        hasSummary={!!(rawContent as { summary?: string }).summary}
                       />
-                    )}
-                    <HeroResizeHandle
+
+                      {showBleedGuides && (
+                        <>
+                          {/* Bleed edge (outer) — where the printed art bleeds off. */}
+                          <div
+                            className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
+                            style={{
+                              top: `${-bleedFraction * 100}%`,
+                              left: `${-bleedFraction * 100}%`,
+                              right: `${-bleedFraction * 100}%`,
+                              bottom: `${-bleedFraction * 100}%`,
+                            }}
+                            data-export-ignore="true"
+                            data-testid="bleed-guide-outer"
+                          />
+                          {/* Trim edge — the finished cut line. */}
+                          <div
+                            className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                            data-export-ignore="true"
+                            data-testid="bleed-guide-trim"
+                          />
+                        </>
+                      )}
+                    </LiveEditOverlay>
+                    <PrintOverflowOverlay
+                      state={overflow}
+                      onFix={() => {
+                        const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
+                        if (!cur?.imageUrl) {
+                          toast.error(
+                            "Content overflows the page — remove a module or shorten copy.",
+                          );
+                          return;
+                        }
+                        const prev = cur.heightPct ?? 46;
+                        // Give back roughly the clipped height, plus a 2pt safety margin.
+                        const next = Math.max(
+                          22,
+                          Math.round(prev - overflow.overflowFrac * 100 - 2),
+                        );
+                        if (next >= prev) {
+                          toast.error(
+                            "Hero is already at its minimum — remove a module or shorten copy.",
+                          );
+                          return;
+                        }
+                        patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
+                        toast.success(
+                          `Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`,
+                        );
+                      }}
+                    />
+                    <SectionSelectOverlay
                       canvasRef={canvasRef}
-                      media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
-                      onChange={(next) => patchContent({ heroMedia: next } as never)}
-                      kind={kind as never}
-                      usedModuleUnits={(
-                        (rawContent as { modules?: PrintSection[] }).modules ?? []
-                      ).reduce((n, m) => n + weightForSection(m), 0)}
-                      hasTitle={!!(rawContent as { title?: string }).title}
-                      hasSummary={!!(rawContent as { summary?: string }).summary}
+                      scanKey={rawContent}
+                      onDelete={(key) => {
+                        if (key.startsWith("module:")) {
+                          const id = key.slice("module:".length);
+                          const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
+                          const gone = mods.find((m) => m.id === id);
+                          if (!gone) return;
+                          patchContent({ modules: mods.filter((m) => m.id !== id) } as never);
+                          toast.success(`${gone.kind} module removed`, {
+                            action: {
+                              label: "Undo",
+                              onClick: () => patchContent({ modules: mods } as never),
+                            },
+                          });
+                          return;
+                        }
+                        if (key === "features") patchContent({ features: [] } as never);
+                        else if (key === "knowHow") patchContent({ knowHow: [] } as never);
+                        else if (key === "quote") patchContent({ quote: undefined } as never);
+                        else if (key === "cta") patchContent({ cta: undefined } as never);
+                        else if (key === "hero") patchContent({ heroMedia: undefined } as never);
+                        toast.success(`${key} section removed`);
+                      }}
+                      onReplace={(key) => {
+                        if (key.startsWith("module:")) {
+                          setPickerOpen(true);
+                          return;
+                        }
+                        toast.info(`Edit "${key}" in the inspector panel →`);
+                      }}
                     />
 
-                    {showBleedGuides && (
-                      <>
-                        {/* Bleed edge (outer) — where the printed art bleeds off. */}
-                        <div
-                          className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
-                          style={{
-                            top: `${-bleedFraction * 100}%`,
-                            left: `${-bleedFraction * 100}%`,
-                            right: `${-bleedFraction * 100}%`,
-                            bottom: `${-bleedFraction * 100}%`,
-                          }}
-                          data-export-ignore="true"
-                          data-testid="bleed-guide-outer"
-                        />
-                        {/* Trim edge — the finished cut line. */}
-                        <div
-                          className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
-                          data-export-ignore="true"
-                          data-testid="bleed-guide-trim"
-                        />
-                      </>
-                    )}
-                  </LiveEditOverlay>
-                  <PrintOverflowOverlay
-                    state={overflow}
-                    onFix={() => {
-                      const cur = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
-                      if (!cur?.imageUrl) {
-                        toast.error(
-                          "Content overflows the page — remove a module or shorten copy.",
-                        );
-                        return;
-                      }
-                      const prev = cur.heightPct ?? 46;
-                      // Give back roughly the clipped height, plus a 2pt safety margin.
-                      const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
-                      if (next >= prev) {
-                        toast.error(
-                          "Hero is already at its minimum — remove a module or shorten copy.",
-                        );
-                        return;
-                      }
-                      patchContent({ heroMedia: { ...cur, heightPct: next } } as never);
-                      toast.success(
-                        `Hero reduced to ${next}% (was ${Math.round(prev)}%) to stop the page clipping`,
-                      );
-                    }}
-                  />
-                  <SectionSelectOverlay
-                    canvasRef={canvasRef}
-                    scanKey={rawContent}
-                    onDelete={(key) => {
-                      if (key.startsWith("module:")) {
-                        const id = key.slice("module:".length);
-                        const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
-                        const gone = mods.find((m) => m.id === id);
-                        if (!gone) return;
-                        patchContent({ modules: mods.filter((m) => m.id !== id) } as never);
-                        toast.success(`${gone.kind} module removed`, {
-                          action: {
-                            label: "Undo",
-                            onClick: () => patchContent({ modules: mods } as never),
-                          },
-                        });
-                        return;
-                      }
-                      if (key === "features") patchContent({ features: [] } as never);
-                      else if (key === "knowHow") patchContent({ knowHow: [] } as never);
-                      else if (key === "quote") patchContent({ quote: undefined } as never);
-                      else if (key === "cta") patchContent({ cta: undefined } as never);
-                      else if (key === "hero") patchContent({ heroMedia: undefined } as never);
-                      toast.success(`${key} section removed`);
-                    }}
-                    onReplace={(key) => {
-                      if (key.startsWith("module:")) {
-                        setPickerOpen(true);
-                        return;
-                      }
-                      toast.info(`Edit "${key}" in the inspector panel →`);
-                    }}
-                  />
-
-                  {/* Hero affordance — click straight into the hero editor from
+                    {/* Hero affordance — click straight into the hero editor from
                   the canvas instead of hunting for the sidebar panel. */}
-                  <button
-                    type="button"
-                    data-testid="canvas-hero-edit"
-                    data-export-ignore="true"
-                    onClick={() => setHeroModalOpen(true)}
-                    title="Edit hero image"
-                    aria-label="Edit hero image"
-                    className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
-                  >
-                    ✎ Hero
-                  </button>
-                </PrintIconEditContext.Provider>
-              </PrintDocModeProvider>
+                    <button
+                      type="button"
+                      data-testid="canvas-hero-edit"
+                      data-export-ignore="true"
+                      onClick={() => setHeroModalOpen(true)}
+                      title="Edit hero image"
+                      aria-label="Edit hero image"
+                      className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
+                    >
+                      ✎ Hero
+                    </button>
+                  </PrintIconEditContext.Provider>
+                </PrintDocModeProvider>
+              </PrintContentFitFrame>
+              {!isNeutralFit(fitKnobs) && (
+                <div
+                  data-export-ignore="true"
+                  data-testid="print-content-fit-badge"
+                  className="pointer-events-none absolute left-3 top-3 z-30 rounded-full border border-white/40 bg-[#03002C]/80 px-3 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur"
+                >
+                  Content-fit: {describeFit(fitKnobs)}
+                </div>
+              )}
             </div>
 
             {/* DOCUMENT INPUTS — content entry lives under the document */}
@@ -1724,6 +1756,85 @@ function AssetEditor() {
                     onChange={(e) => patchCtx({ showBleedGuides: e.target.checked })}
                   />
                 </Row>
+              </Panel>
+
+              <Panel title="Content fit">
+                {(() => {
+                  const fit = resolveContentFit(ctx.contentFit);
+                  const patchFit = (patch: Record<string, unknown>) =>
+                    patchCtx({ contentFit: { ...fit, ...patch } });
+                  return (
+                    <>
+                      <p className="text-[11px] leading-[1.5] text-black/55 dark:text-white/55">
+                        When content runs past the trim by more than the threshold, the page pulls
+                        its side margins in first, then shrinks typography and iconography together
+                        — down to the floors below.
+                      </p>
+                      <Row label="Auto-fit overflow">
+                        <input
+                          type="checkbox"
+                          data-testid="toggle-content-fit"
+                          checked={fit.enabled}
+                          onChange={(e) => patchFit({ enabled: e.target.checked })}
+                        />
+                      </Row>
+                      <Row label={`Threshold ${Math.round(fit.threshold * 100)}%`}>
+                        <input
+                          type="range"
+                          aria-label="Content fit threshold"
+                          min={2}
+                          max={40}
+                          step={1}
+                          value={Math.round(fit.threshold * 100)}
+                          onChange={(e) => patchFit({ threshold: Number(e.target.value) / 100 })}
+                        />
+                      </Row>
+                      <Row label="Margin relief first">
+                        <input
+                          type="checkbox"
+                          checked={fit.marginRelief}
+                          onChange={(e) => patchFit({ marginRelief: e.target.checked })}
+                        />
+                      </Row>
+                      <Row label={`Min side margin ${Math.round(fit.minPad * 100)}%`}>
+                        <input
+                          type="range"
+                          aria-label="Minimum side margin"
+                          min={40}
+                          max={100}
+                          step={2}
+                          value={Math.round(fit.minPad * 100)}
+                          onChange={(e) => patchFit({ minPad: Number(e.target.value) / 100 })}
+                        />
+                      </Row>
+                      <Row label={`Min scale ${Math.round(fit.minScale * 100)}%`}>
+                        <input
+                          type="range"
+                          aria-label="Minimum content scale"
+                          min={60}
+                          max={100}
+                          step={1}
+                          value={Math.round(fit.minScale * 100)}
+                          onChange={(e) => patchFit({ minScale: Number(e.target.value) / 100 })}
+                        />
+                      </Row>
+                      <Row label="Applied now">
+                        <span className="text-[11px] font-medium text-black/60 dark:text-white/60">
+                          {describeFit(fitKnobs)}
+                        </span>
+                      </Row>
+                      {ctx.contentFit ? (
+                        <button
+                          type="button"
+                          onClick={() => patchCtx({ contentFit: PRINT_CONTENT_FIT_DEFAULTS })}
+                          className="text-[11px] font-medium text-[#003FC7] hover:underline"
+                        >
+                          Reset to defaults
+                        </button>
+                      ) : null}
+                    </>
+                  );
+                })()}
               </Panel>
 
               <Panel title="Iconography">

@@ -28,6 +28,7 @@ export type PrintPageTemplateLayout = Pick<
   | "distribution"
   | "icons"
   | "iconStyle"
+  | "contentFit"
   | "clientLogoUrl"
   | "clientLogoId"
   | "clientLogoName"
@@ -93,6 +94,7 @@ export function captureTemplateLayout(ctx: PrintAssetContext): PrintPageTemplate
     ...(ctx.distribution ? { distribution: ctx.distribution } : {}),
     ...(ctx.icons !== undefined ? { icons: ctx.icons } : {}),
     ...(ctx.iconStyle ? { iconStyle: { ...ctx.iconStyle } } : {}),
+    ...(ctx.contentFit ? { contentFit: { ...ctx.contentFit } } : {}),
     ...(ctx.clientLogoUrl ? { clientLogoUrl: ctx.clientLogoUrl } : {}),
     ...(ctx.clientLogoId ? { clientLogoId: ctx.clientLogoId } : {}),
     ...(ctx.clientLogoName ? { clientLogoName: ctx.clientLogoName } : {}),

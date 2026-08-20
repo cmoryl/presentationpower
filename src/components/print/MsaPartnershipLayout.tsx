@@ -1,10 +1,6 @@
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import type {
-  MsaPartnershipContent,
-  PrintDensity,
-  PrintPageSize,
-} from "@/lib/print-assets.types";
+import type { MsaPartnershipContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
@@ -13,6 +9,7 @@ import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
   cq,
+  padCq,
   pageAspect,
   pagePadX as padX,
   ICON_PATHS,
@@ -135,8 +132,8 @@ export function MsaPartnershipLayout({
               position: "relative",
               background: `linear-gradient(118deg, #03002C 0%, ${primary} 62%, color-mix(in srgb, ${primary} 62%, ${accent}) 100%)`,
               color: bandInk,
-              paddingLeft: cq(padX(density)),
-              paddingRight: cq(padX(density)),
+              paddingLeft: padCq(padX(density)),
+              paddingRight: padCq(padX(density)),
               paddingTop: cq(30),
               paddingBottom: cq(34),
             }}
@@ -273,8 +270,8 @@ export function MsaPartnershipLayout({
             data-section-label="Solutions grid"
             style={{
               position: "relative",
-              paddingLeft: cq(padX(density)),
-              paddingRight: cq(padX(density)),
+              paddingLeft: padCq(padX(density)),
+              paddingRight: padCq(padX(density)),
               paddingTop: cq(30),
               flex: 1,
             }}
@@ -404,8 +401,8 @@ export function MsaPartnershipLayout({
               gridTemplateColumns: contacts ? "1fr auto" : "1fr",
               gap: cq(22),
               alignItems: "start",
-              paddingLeft: cq(padX(density)),
-              paddingRight: cq(padX(density)),
+              paddingLeft: padCq(padX(density)),
+              paddingRight: padCq(padX(density)),
               paddingTop: cq(24),
             }}
           >
@@ -518,7 +515,7 @@ export function MsaPartnershipLayout({
           </div>
 
           {/* SHARED MODULES */}
-          <div style={{ paddingLeft: cq(padX(density)), paddingRight: cq(padX(density)) }}>
+          <div style={{ paddingLeft: padCq(padX(density)), paddingRight: padCq(padX(density)) }}>
             <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
           </div>
 
@@ -529,8 +526,8 @@ export function MsaPartnershipLayout({
             className="flex items-center"
             style={{
               gap: cq(14),
-              paddingLeft: cq(padX(density)),
-              paddingRight: cq(padX(density)),
+              paddingLeft: padCq(padX(density)),
+              paddingRight: padCq(padX(density)),
               paddingTop: cq(18),
               paddingBottom: cq(24),
               marginTop: "auto",

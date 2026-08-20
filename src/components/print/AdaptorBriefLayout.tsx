@@ -11,6 +11,7 @@ import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
   cq,
+  padCq,
   pageAspect,
   pagePadX as padX,
   pagePadTop,
@@ -19,7 +20,6 @@ import {
   IconPath as Icon,
   clampLines,
   PrintEyebrow,
-
 } from "@/components/print/print-primitives";
 
 // -----------------------------------------------------------------------
@@ -129,8 +129,8 @@ export function AdaptorBriefLayout({
           <div
             className="relative flex h-full flex-col"
             style={{
-              paddingLeft: cq(padX(density)),
-              paddingRight: cq(padX(density)),
+              paddingLeft: padCq(padX(density)),
+              paddingRight: padCq(padX(density)),
               paddingTop: cq(padTop(density)),
               paddingBottom: cq(28),
             }}
@@ -241,7 +241,12 @@ export function AdaptorBriefLayout({
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <EditableIcon slot={`ab.item.${i}`} d={glyph!} size={cq(18)} color={accentInk} />
+                          <EditableIcon
+                            slot={`ab.item.${i}`}
+                            d={glyph!}
+                            size={cq(18)}
+                            color={accentInk}
+                          />
                         </div>
                         <div
                           style={{

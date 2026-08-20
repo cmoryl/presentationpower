@@ -106,8 +106,23 @@ export function clampLines(lines: number): CSSProperties {
   };
 }
 
-/** Template-px → container-relative unit (cqw against PAGE_W). */
-export const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
+/**
+ * Template-px → container-relative unit (cqw against PAGE_W).
+ *
+ * Every value is multiplied by `--print-fit-scale` (default 1) so content-fit
+ * mode can shrink typography, iconography and spacing uniformly from a single
+ * variable on an ancestor — see src/lib/print-content-fit.ts.
+ */
+export const cq = (px: number) =>
+  `calc(${((px * 100) / PAGE_W).toFixed(3)}cqw * var(--print-fit-scale, 1))`;
+
+/**
+ * Horizontal page margin unit: fit-scale *and* the independent
+ * `--print-fit-pad` relief knob, so content-fit can win back line width before
+ * it resorts to shrinking type.
+ */
+export const padCq = (px: number) =>
+  `calc(${((px * 100) / PAGE_W).toFixed(3)}cqw * var(--print-fit-scale, 1) * var(--print-fit-pad, 1))`;
 
 export function pageAspect(size: PrintPageSize): string {
   switch (size) {
@@ -224,7 +239,6 @@ export type IconName =
   | "quote"
   | "badge";
 
-
 export const ICON_PATHS: Record<IconName, string> = {
   sparkles:
     "M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z",
@@ -255,8 +269,10 @@ export const ICON_PATHS: Record<IconName, string> = {
   phone:
     "M4.5 4.5h3l1.5 4-2 1.5a11 11 0 0 0 5 5l1.5-2 4 1.5v3a1.5 1.5 0 0 1-1.5 1.5A15 15 0 0 1 3 6a1.5 1.5 0 0 1 1.5-1.5Z",
   link: "M9.5 14.5l5-5M10 6.5l1.5-1.5a4 4 0 0 1 5.5 5.5L15.5 12M14 17.5L12.5 19a4 4 0 0 1-5.5-5.5L8.5 12",
-  "map-pin": "M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
-  document: "M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5L14 3Zm0 0v4.5h4.5M8.5 12h7M8.5 16h5",
+  "map-pin":
+    "M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Zm0-8.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z",
+  document:
+    "M14 3H7a1.5 1.5 0 0 0-1.5 1.5v15A1.5 1.5 0 0 0 7 21h10a1.5 1.5 0 0 0 1.5-1.5V7.5L14 3Zm0 0v4.5h4.5M8.5 12h7M8.5 16h5",
   shield: "M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Zm-2.5 8.5L11.5 14l4-4.5",
   "chart-bar": "M4 20V10M10 20V5M16 20v-7M22 20H2",
   scale: "M12 3v16M6 19h12M12 6l-6 2 3 5 3-5-3-2 6 2-3 5 3-5Z",
@@ -265,7 +281,6 @@ export const ICON_PATHS: Record<IconName, string> = {
   badge:
     "M12 3l2.2 1.6 2.7-.2.9 2.6 2.2 1.6-1 2.5 1 2.5-2.2 1.6-.9 2.6-2.7-.2L12 21l-2.2-1.6-2.7.2-.9-2.6L4 15.4l1-2.5-1-2.5 2.2-1.6.9-2.6 2.7.2L12 3Zm-2 8.5l1.8 1.8 3.4-3.6",
 };
-
 
 export function Icon({
   name,
