@@ -119,7 +119,10 @@ function Atlas() {
         <div className="text-xs uppercase tracking-[0.3em]" style={{ color: `${NAVY}80` }}>
           The Atlas
         </div>
-        <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight" style={{ color: NAVY }}>
+        <h1
+          className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight"
+          style={{ color: NAVY }}
+        >
           Every Element building block, segmented by output.
         </h1>
         <p className="mt-3 max-w-2xl leading-relaxed text-black/60">
@@ -160,7 +163,10 @@ function Atlas() {
       {segment === "events" && <EventsSegment ink={active.ink} />}
       {segment === "style" && <StyleLibrarySegment />}
 
-      <div className="mt-14 rounded-2xl border border-dashed p-6 text-sm text-black/60" style={{ borderColor: "rgba(3,0,44,0.18)" }}>
+      <div
+        className="mt-14 rounded-2xl border border-dashed p-6 text-sm text-black/60"
+        style={{ borderColor: "rgba(3,0,44,0.18)" }}
+      >
         Want to see the pieces in action?{" "}
         <Link to="/brief/new" className="font-medium underline" style={{ color: BLUE }}>
           Start a brief
@@ -353,9 +359,7 @@ function PrintSegment({ ink }: { ink: string }) {
                   </h3>
                   <span className="text-xs text-black/45">{modules.length} modules</span>
                 </div>
-                {meta?.desc && (
-                  <p className="mt-1 max-w-2xl text-sm text-black/55">{meta.desc}</p>
-                )}
+                {meta?.desc && <p className="mt-1 max-w-2xl text-sm text-black/55">{meta.desc}</p>}
                 <div className="mt-3 grid gap-3 md:grid-cols-3">
                   {modules.map((m) => (
                     <div key={m.id} className="rounded-2xl border border-black/10 bg-white p-4">
@@ -456,7 +460,10 @@ function SocialSegment({ ink }: { ink: string }) {
               <p className="mt-1 text-sm text-black/60">{k.description}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {k.formatIds.map((id) => (
-                  <span key={id} className="rounded-full bg-black/5 px-2 py-0.5 font-mono text-[11px]">
+                  <span
+                    key={id}
+                    className="rounded-full bg-black/5 px-2 py-0.5 font-mono text-[11px]"
+                  >
                     {id}
                   </span>
                 ))}
@@ -602,11 +609,15 @@ function StyleLibrarySegment() {
       <Section title="Approved visual languages" count={DESIGN_SKINS.length}>
         <p className="-mt-2 mb-5 max-w-3xl text-sm text-black/60">
           S01–S28 are permanent codes. Every deck, print asset, social frame, and event kit renders
-          through one of these languages — pick the language, then let the industry recipe narrow it.
+          through one of these languages — pick the language, then let the industry recipe narrow
+          it.
         </p>
         <div className="grid gap-4 md:grid-cols-3">
           {DESIGN_SKINS.map((s) => (
-            <div key={s.code} className="overflow-hidden rounded-2xl border border-black/10 bg-white">
+            <div
+              key={s.code}
+              className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+            >
               <div className="flex h-14">
                 {s.palette.map((c) => (
                   <div key={c} className="flex-1" style={{ backgroundColor: c }} aria-hidden />
@@ -690,7 +701,6 @@ function StyleLibrarySegment() {
 const DEMO_BRAND = {
   tokens: { primary: BLUE, accent: "#EC388A" },
 } as const;
-
 
 function IconTile({
   treatment,
