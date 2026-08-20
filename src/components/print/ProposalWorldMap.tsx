@@ -50,6 +50,12 @@ export function ProposalWorldMap({
   });
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const dragMoved = useRef(false);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  // Pin drag: index of the dot being repositioned + whether it actually moved
+  // (a click without movement still means "delete this pin").
+  const pinDrag = useRef<{ index: number; moved: boolean } | null>(null);
+  const [activePin, setActivePin] = useState<number | null>(null);
+
 
   const w = WORLD_MAP_VIEW.w / zoom;
   const h = WORLD_MAP_VIEW.h / zoom;
@@ -80,7 +86,36 @@ export function ProposalWorldMap({
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
+  const toMapPoint = (clientX: number, clientY: number) => {
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect?.width || !rect.height) return null;
+    return {
+      x: Math.round((view.x + ((clientX - rect.left) / rect.width) * view.w) * 10) / 10,
+      y: Math.round((view.y + ((clientY - rect.top) / rect.height) * view.h) * 10) / 10,
+    };
+  };
+
+  const startPinDrag = (index: number) => (event: React.PointerEvent<SVGCircleElement>) => {
+    if (!editable || !onChange) return;
+    event.stopPropagation();
+    pinDrag.current = { index, moved: false };
+    setActivePin(index);
+    svgRef.current?.setPointerCapture(event.pointerId);
+  };
+
   const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    const p = pinDrag.current;
+    if (p && onChange) {
+      const point = toMapPoint(event.clientX, event.clientY);
+      if (!point) return;
+      p.moved = true;
+      onChange(
+        list.map((pin, index) =>
+          index === p.index ? { ...pin, x: point.x, y: point.y } : pin,
+        ),
+      );
+      return;
+    }
     const d = drag.current;
     if (!d) return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -93,6 +128,12 @@ export function ProposalWorldMap({
   };
 
   const onPointerUp = () => {
+    if (pinDrag.current) {
+      dragMoved.current = pinDrag.current.moved;
+      pinDrag.current = null;
+      setActivePin(null);
+      return;
+    }
     dragMoved.current = Boolean(drag.current?.moved);
     drag.current = null;
   };
@@ -103,6 +144,7 @@ export function ProposalWorldMap({
       dragMoved.current = false;
       return;
     }
+
     const rect = event.currentTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     const x = view.x + ((event.clientX - rect.left) / rect.width) * view.w;
@@ -122,6 +164,7 @@ export function ProposalWorldMap({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <svg
+        ref={svgRef}
         viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
         width="100%"
         height="100%"
@@ -136,7 +179,7 @@ export function ProposalWorldMap({
         style={{
           display: "block",
           touchAction: "none",
-          cursor: zoom > 1 ? "grab" : editable ? "crosshair" : "default",
+          cursor: activePin !== null ? "grabbing" : zoom > 1 ? "grab" : editable ? "crosshair" : "default",
         }}
       >
         {WORLD_MAP_LAND.map((path, i) => (
@@ -147,15 +190,20 @@ export function ProposalWorldMap({
             key={pin.id ?? `pin-${i}`}
             cx={pin.x}
             cy={pin.y}
-            r={pin.r ?? 2.3}
+            r={(pin.r ?? 2.3) * (activePin === i ? 1.35 : 1)}
             fill={pinFill(pin.kind)}
             stroke="#FFFFFF"
-            strokeWidth={0.2}
-            style={{ cursor: editable ? "pointer" : "default" }}
+            strokeWidth={activePin === i ? 0.5 : 0.2}
+            style={{ cursor: editable ? (activePin === i ? "grabbing" : "grab") : "default" }}
+            onPointerDown={editable && onChange ? startPinDrag(i) : undefined}
             onClick={
               editable && onChange
                 ? (event) => {
                     event.stopPropagation();
+                    if (dragMoved.current) {
+                      dragMoved.current = false;
+                      return;
+                    }
                     onChange(list.filter((_, index) => index !== i));
                   }
                 : undefined
@@ -163,6 +211,7 @@ export function ProposalWorldMap({
           >
             {pin.name ? <title>{pin.name}</title> : null}
           </circle>
+
         ))}
       </svg>
 
@@ -269,7 +318,7 @@ export function ProposalWorldMap({
               {k === "prod" ? "Service & production" : "Client service"}
             </button>
           ))}
-          <span style={{ opacity: 0.6, fontWeight: 500 }}>· click a dot to delete</span>
+          <span style={{ opacity: 0.6, fontWeight: 500 }}>· drag a dot to move, click to delete</span>
         </div>
       ) : null}
     </div>
