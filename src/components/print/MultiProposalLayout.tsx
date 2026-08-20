@@ -191,7 +191,14 @@ function Img({
   alt = "",
   fit = "contain",
   radius,
-}: BoxProps & { src: string; alt?: string; fit?: "contain" | "cover"; radius?: number }) {
+  align = "center",
+}: BoxProps & {
+  src: string;
+  alt?: string;
+  fit?: "contain" | "cover";
+  radius?: number;
+  align?: "left" | "center" | "right";
+}) {
   return (
     <L x={x} y={y} w={w} h={h}>
       <img
@@ -201,7 +208,7 @@ function Img({
           width: "100%",
           height: "100%",
           objectFit: fit,
-          objectPosition: "center",
+          objectPosition: align === "center" ? "center" : `${align} center`,
           borderRadius: radius === undefined ? undefined : u(radius),
           display: "block",
         }}
@@ -209,6 +216,7 @@ function Img({
     </L>
   );
 }
+
 
 function lines(value: string | undefined): string[] {
   return (value ?? "")
