@@ -105,6 +105,55 @@ export function SkinCatalogPicker({
         />
       </button>
 
+      {/* Chosen style stays visible as a preview card, so the pick is always
+          confirmed visually — even after the catalog is collapsed. */}
+      {selectedEntry && (
+        <div
+          className={`flex items-start gap-3 rounded-lg border p-2 ${
+            dark ? "border-white/10 bg-white/[0.04]" : "border-[#003FC7]/25 bg-[#003FC7]/[0.04]"
+          }`}
+        >
+          <div className="w-32 shrink-0 sm:w-40">
+            {selectedEntry.skin ? (
+              <SkinPreviewTile skin={selectedEntry.skin} seed={`${selectedEntry.code}-cover`} />
+            ) : (
+              <LookPreviewTile
+                pack={selectedEntry.pack}
+                kicker={selectedEntry.reference}
+                seed={`${selectedEntry.code}-cover`}
+              />
+            )}
+          </div>
+          <div className="min-w-0 flex-1 space-y-1">
+            <div className={`text-[10px] font-semibold uppercase tracking-widest ${label}`}>
+              Your style
+            </div>
+            <div className={`truncate text-[12px] font-semibold ${dark ? "text-white" : "text-[#03002C]"}`}>
+              {selectedEntry.name}
+            </div>
+            <div className={`text-[9px] uppercase tracking-wider ${dark ? "text-white/40" : "text-black/40"}`}>
+              {selectedEntry.code} · {selectedEntry.reference}
+            </div>
+            {selectedEntry.description && (
+              <p className={`line-clamp-2 text-[10px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
+                {selectedEntry.description}
+              </p>
+            )}
+            {selected && (
+              <button
+                type="button"
+                onClick={() => setLookbook(selected)}
+                className={`inline-flex items-center gap-1 text-[10px] font-medium ${
+                  dark ? "text-[#A1FBF9] hover:text-white" : "text-[#003FC7] hover:underline"
+                }`}
+              >
+                <Maximize2 size={9} /> See the look
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div
         className="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
