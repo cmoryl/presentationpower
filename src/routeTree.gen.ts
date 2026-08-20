@@ -38,6 +38,7 @@ import { Route as TestPrintHeroRouteImport } from './routes/test.print-hero'
 import { Route as TestPrintDndRouteImport } from './routes/test.print-dnd'
 import { Route as SocialPresetsRouteImport } from './routes/social.presets'
 import { Route as SocialNewRouteImport } from './routes/social.new'
+import { Route as SocialModulesRouteImport } from './routes/social.modules'
 import { Route as SocialBannersRouteImport } from './routes/social.banners'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
@@ -274,6 +275,11 @@ const SocialPresetsRoute = SocialPresetsRouteImport.update({
 const SocialNewRoute = SocialNewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => SocialRoute,
+} as any)
+const SocialModulesRoute = SocialModulesRouteImport.update({
+  id: '/modules',
+  path: '/modules',
   getParentRoute: () => SocialRoute,
 } as any)
 const SocialBannersRoute = SocialBannersRouteImport.update({
@@ -832,6 +838,7 @@ export interface FileRoutesByFullPath {
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
   '/test/print-dnd': typeof TestPrintDndRoute
@@ -951,6 +958,7 @@ export interface FileRoutesByTo {
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
   '/test/print-dnd': typeof TestPrintDndRoute
@@ -1075,6 +1083,7 @@ export interface FileRoutesById {
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
   '/social/banners': typeof SocialBannersRoute
+  '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
   '/social/presets': typeof SocialPresetsRoute
   '/test/print-dnd': typeof TestPrintDndRoute
@@ -1200,6 +1209,7 @@ export interface FileRouteTypes {
     | '/public/styles'
     | '/share/$token'
     | '/social/banners'
+    | '/social/modules'
     | '/social/new'
     | '/social/presets'
     | '/test/print-dnd'
@@ -1319,6 +1329,7 @@ export interface FileRouteTypes {
     | '/public/styles'
     | '/share/$token'
     | '/social/banners'
+    | '/social/modules'
     | '/social/new'
     | '/social/presets'
     | '/test/print-dnd'
@@ -1442,6 +1453,7 @@ export interface FileRouteTypes {
     | '/public/styles'
     | '/share/$token'
     | '/social/banners'
+    | '/social/modules'
     | '/social/new'
     | '/social/presets'
     | '/test/print-dnd'
@@ -1758,6 +1770,13 @@ declare module '@tanstack/react-router' {
       path: '/new'
       fullPath: '/social/new'
       preLoaderRoute: typeof SocialNewRouteImport
+      parentRoute: typeof SocialRoute
+    }
+    '/social/modules': {
+      id: '/social/modules'
+      path: '/modules'
+      fullPath: '/social/modules'
+      preLoaderRoute: typeof SocialModulesRouteImport
       parentRoute: typeof SocialRoute
     }
     '/social/banners': {
@@ -2539,6 +2558,7 @@ const KnowledgeRouteWithChildren = KnowledgeRoute._addFileChildren(
 
 interface SocialRouteChildren {
   SocialBannersRoute: typeof SocialBannersRoute
+  SocialModulesRoute: typeof SocialModulesRoute
   SocialNewRoute: typeof SocialNewRoute
   SocialPresetsRoute: typeof SocialPresetsRoute
   SocialIndexRoute: typeof SocialIndexRoute
@@ -2547,6 +2567,7 @@ interface SocialRouteChildren {
 
 const SocialRouteChildren: SocialRouteChildren = {
   SocialBannersRoute: SocialBannersRoute,
+  SocialModulesRoute: SocialModulesRoute,
   SocialNewRoute: SocialNewRoute,
   SocialPresetsRoute: SocialPresetsRoute,
   SocialIndexRoute: SocialIndexRoute,
