@@ -897,20 +897,20 @@ function DeckMetric({
   accent: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+    <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-black/[0.03] p-5">
       <div
         className="absolute right-0 top-0 h-14 w-14 rounded-bl-full opacity-20"
         style={{ background: accent }}
       />
-      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-white/50">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/40">
         {label}
       </div>
       <div className="mt-2 flex items-baseline gap-2">
-        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-white">
+        <span className="font-[Geist] text-4xl font-semibold tracking-tight text-[#03002C]">
           {value}
         </span>
       </div>
-      <div className="mt-1 text-[11px] text-white/50">{sub}</div>
+      <div className="mt-1 text-[11px] text-black/50">{sub}</div>
     </div>
   );
 }
@@ -931,12 +931,12 @@ function BreakdownBlock({
   const total = rows.reduce((a, r) => a + r.count, 0) || 1;
   const top = rows.slice(0, 6);
   return (
-    <div className={`min-w-0 rounded-2xl border border-white/10 bg-white/5 p-5 ${className}`}>
-      <div className="text-[10px] uppercase tracking-[0.25em] text-white/50">{subtitle}</div>
-      <div className="mt-1 font-[Geist] text-lg font-semibold text-white">{title}</div>
+    <div className={`min-w-0 rounded-2xl border border-black/10 bg-black/[0.03] p-5 ${className}`}>
+      <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">{subtitle}</div>
+      <div className="mt-1 font-[Geist] text-lg font-semibold text-[#03002C]">{title}</div>
       <div className="mt-4 space-y-2.5">
         {top.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-white/20 p-4 text-center text-xs text-white/50">
+          <div className="rounded-lg border border-dashed border-black/20 p-4 text-center text-xs text-black/50">
             No data yet.
           </div>
         ) : (
@@ -945,12 +945,12 @@ function BreakdownBlock({
             return (
               <div key={r.label} className="min-w-0">
                 <div className="flex min-w-0 items-center justify-between gap-2 text-xs">
-                  <span className="min-w-0 truncate text-white/80">{r.label}</span>
-                  <span className="shrink-0 whitespace-nowrap text-white/60">
-                    {r.count} <span className="text-white/40">· {pct.toFixed(0)}%</span>
+                  <span className="min-w-0 truncate text-black/80">{r.label}</span>
+                  <span className="shrink-0 whitespace-nowrap text-black/60">
+                    {r.count} <span className="text-black/40">· {pct.toFixed(0)}%</span>
                   </span>
                 </div>
-                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-black/10">
                   <div
                     className="h-full rounded-full"
                     style={{ width: `${pct}%`, background: accent }}
