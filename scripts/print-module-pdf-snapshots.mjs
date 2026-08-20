@@ -84,8 +84,8 @@ const REPRESENTATIVE = [
   "pm-stats-kpi-dashboard-portrait",
   "pm-quote-pull-quote-hero",
   "pm-logo-grid-logo-grid-portrait",
-  "pm-expertise-icon-strip-portrait",
-  "pm-feature-list-verb-cards-portrait",
+  "pm-expertise-expertise-icon-strip",
+  "pm-feature-list-feature-cards-3col",
   "pm-table-table-spec-rows",
   "pm-contact-contact-expert-card",
 ];
