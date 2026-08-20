@@ -75,6 +75,10 @@ import {
   type GlWebEbrochureSeed,
 } from "@/lib/print-library/glweb-ebrochures";
 import {
+  SOLUTION_PROPOSALS,
+  type SolutionProposalSeed,
+} from "@/lib/print-library/solution-proposals";
+import {
   GAMES_CASE_STUDIES,
   GAMES_DIVISION_ID,
   type GamesCaseStudySeed,
@@ -121,6 +125,13 @@ export const PRINT_TYPES: PrintTypeMeta[] = [
     plural: "MSA Partnerships",
     tagline: "Account relationship · solutions · departments",
     desc: "Co-branded account one-pager — relationship KPIs, the full solution grid, scale rail, and every department supported.",
+  },
+  {
+    id: "solution-proposal",
+    label: "Solution Proposal",
+    plural: "Solution Proposals",
+    tagline: "Scope · deliverables · timeline · investment",
+    desc: "Division-specific master proposal — prepared-for cover block, what's included, deliverables and timeline, a cost summary table, proof, and your account team.",
   },
   {
     id: "adaptor-brief",
@@ -454,6 +465,23 @@ function fromGlWebEbrochure(seed: GlWebEbrochureSeed): PrintLibraryItem {
   };
 }
 
+function fromSolutionProposal(seed: SolutionProposalSeed): PrintLibraryItem {
+  return {
+    id: `proposal-${seed.slug}`,
+    kind: "solution-proposal",
+    title: seed.title,
+    blurb: seed.teaser,
+    divisionId: seed.divisionId,
+    collection: seed.collection,
+    source: "curated",
+    seedSlug: seed.slug,
+    sourceFile: seed.sourceFile,
+    stats: seed.content.stats?.slice(0, 3),
+    tags: seed.tags,
+    content: seed.content as unknown as Record<string, unknown>,
+  };
+}
+
 /** Every catalog entry, templates first. */
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...TEMPLATE_ITEMS,
@@ -471,6 +499,7 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...DATAFORCE_SPOTLIGHTS.map(fromDataForceSpotlight),
   ...GLWEB_SPOTLIGHTS.map(fromGlWebSpotlight),
   ...GLWEB_EBROCHURES.map(fromGlWebEbrochure),
+  ...SOLUTION_PROPOSALS.map(fromSolutionProposal),
 ];
 
 /** Items visible inside a division folder (its own + the shared templates). */
