@@ -43,8 +43,7 @@ export const Route = createFileRoute("/library/print_/heroes")({
       { property: "og:title", content: "Print Hero Modules · Gallery" },
       {
         property: "og:description",
-        content:
-          "Side-by-side gallery of every print hero opener with real collateral examples.",
+        content: "Side-by-side gallery of every print hero opener with real collateral examples.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -91,8 +90,9 @@ function PrintHeroGalleryPage() {
           Hero gallery
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
-          Every opening lockup the curated print collateral uses — including the fade-to-page photo masthead, the spotlight quote split, and the co-brand MSA band. Every preview renders at true
-          Letter proportions with the original hero photography and copy, so you can compare
+          Every opening lockup the curated print collateral uses — including the fade-to-page photo
+          masthead, the spotlight quote split, and the co-brand MSA band. Every preview renders at
+          true Letter proportions with the original hero photography and copy, so you can compare
           openers before inserting one from the editor's <em>Shared modules</em> drawer.
         </p>
       </header>
@@ -156,7 +156,9 @@ function PrintHeroGalleryPage() {
             picked={picked === m.variantId}
             onPick={() => {
               setPicked(m.variantId);
-              toast.success(`${m.label} selected — insert it from the editor's Shared modules drawer`);
+              toast.success(
+                `${m.label} selected — insert it from the editor's Shared modules drawer`,
+              );
             }}
           />
         ))}
@@ -206,7 +208,6 @@ function HeroCard({
   picked,
   onPick,
 }: {
-
   module: PrintSectionModule;
   mode: "light" | "dark";
   useReal: boolean;

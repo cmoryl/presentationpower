@@ -37,12 +37,7 @@ const EYEBROW = (accent: string, size = 9.5) =>
     color: accent,
   }) as const;
 
-function MetaRail({
-  section,
-  mode,
-  accent,
-  onDark,
-}: Props & { onDark?: boolean }) {
+function MetaRail({ section, mode, accent, onDark }: Props & { onDark?: boolean }) {
   const rows = section.meta ?? [];
   if (!rows.length) return null;
   const ink = sectionInk(mode);
@@ -100,9 +95,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
   const bandH = useBandHeight(section.heightPct, 0.62);
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(20) }}>
-      <div
-        style={{ position: "relative", overflow: "hidden", height: bandH, ...bg(section) }}
-      >
+      <div style={{ position: "relative", overflow: "hidden", height: bandH, ...bg(section) }}>
         <div
           style={{
             position: "absolute",
@@ -688,9 +681,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
             >
               {q.text}
             </p>
-            {q.role && (
-              <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>
-            )}
+            {q.role && <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>}
             {q.author && (
               <div
                 style={{ marginTop: cq(2), fontSize: cq(11), fontWeight: 700, color: ink.strong }}
@@ -743,7 +734,10 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
           >
             {section.kicker ?? "TransPerfect"}
           </span>
-          <span aria-hidden style={{ width: 1, alignSelf: "stretch", background: "rgba(255,255,255,0.4)" }} />
+          <span
+            aria-hidden
+            style={{ width: 1, alignSelf: "stretch", background: "rgba(255,255,255,0.4)" }}
+          />
           {section.partnerLogoUrl ? (
             <img
               src={section.partnerLogoUrl}

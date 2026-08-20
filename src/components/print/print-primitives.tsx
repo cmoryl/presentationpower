@@ -164,7 +164,12 @@ export function pagePadTop(
   margin?: PrintMarginPreset,
 ): number {
   if (size || margin) {
-    return pageTopMarginPx(size, d, margin, d === "compact" ? -variance : d === "airy" ? variance : 0);
+    return pageTopMarginPx(
+      size,
+      d,
+      margin,
+      d === "compact" ? -variance : d === "airy" ? variance : 0,
+    );
   }
   return d === "compact" ? base - variance : d === "airy" ? base + variance + 4 : base;
 }

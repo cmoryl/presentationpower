@@ -77,7 +77,6 @@ export function PrintSectionPreviewFrame({
     return () => ro.disconnect();
   }, [maxScale, section, pad, pageSize, marginPreset]);
 
-
   return (
     <div
       ref={outerRef}
