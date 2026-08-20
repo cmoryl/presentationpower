@@ -3558,6 +3558,8 @@ function Slider({
 
 function sectionKindLabel(kind: PrintSection["kind"]): string {
   switch (kind) {
+    case "hero":
+      return "Hero";
     case "stats":
       return "Stats";
     case "quote":
@@ -3587,6 +3589,10 @@ function SectionInlineEditor({
   onPatch: (p: Partial<PrintSection>) => void;
 }) {
   switch (section.kind) {
+    case "hero":
+      return (
+        <HeroInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />
+      );
     case "stats":
       return (
         <StatsInlineEditor section={section} onPatch={(p) => onPatch(p as Partial<PrintSection>)} />
@@ -3723,6 +3729,196 @@ function StatsInlineEditor({
           )}
         />
       </div>
+    </>
+  );
+}
+
+function HeroInlineEditor({
+  section,
+  onPatch,
+}: {
+  section: PrintHeroSection;
+  onPatch: (p: Partial<PrintHeroSection>) => void;
+}) {
+  const meta = section.meta ?? [];
+  const stats = section.stats ?? [];
+  const patchMeta = (i: number, p: Partial<PrintHeroMetaRow>) =>
+    onPatch({ meta: meta.map((r, k) => (k === i ? { ...r, ...p } : r)) });
+  const showPhoto =
+    section.variantId === "hero-photo-band" || section.variantId === "hero-split-photo";
+  return (
+    <>
+      <select
+        aria-label="Variant"
+        className={inspectorInput}
+        value={section.variantId}
+        onChange={(e) => onPatch({ variantId: e.target.value as PrintHeroModuleVariant })}
+      >
+        {PRINT_HERO_VARIANTS.map((v) => (
+          <option key={v.id} value={v.id}>
+            {v.label}
+          </option>
+        ))}
+      </select>
+      <div className="grid grid-cols-2 gap-1">
+        <input
+          className={inspectorInput}
+          placeholder="Eyebrow"
+          value={section.eyebrow ?? ""}
+          onChange={(e) => onPatch({ eyebrow: e.target.value })}
+        />
+        <input
+          className={inspectorInput}
+          placeholder="Kicker (client / product)"
+          value={section.kicker ?? ""}
+          onChange={(e) => onPatch({ kicker: e.target.value })}
+        />
+      </div>
+      <textarea
+        className={inspectorInput}
+        placeholder="Hero title"
+        rows={2}
+        value={section.title}
+        onChange={(e) => onPatch({ title: e.target.value })}
+      />
+      <textarea
+        className={inspectorInput}
+        placeholder="Summary"
+        rows={3}
+        value={section.summary ?? ""}
+        onChange={(e) => onPatch({ summary: e.target.value })}
+      />
+      {showPhoto && (
+        <>
+          <input
+            className={inspectorInput}
+            placeholder="Hero image URL"
+            value={section.imageUrl ?? ""}
+            onChange={(e) => onPatch({ imageUrl: e.target.value })}
+          />
+          <div className="grid grid-cols-2 gap-1">
+            <label className="text-[10px] text-black/55 dark:text-white/55">
+              Focal X
+              <input
+                type="range"
+                aria-label="Hero focal X"
+                min={0}
+                max={100}
+                value={section.focalX ?? 50}
+                onChange={(e) => onPatch({ focalX: Number(e.target.value) })}
+                className="w-full accent-[#003FC7]"
+              />
+            </label>
+            <label className="text-[10px] text-black/55 dark:text-white/55">
+              Focal Y
+              <input
+                type="range"
+                aria-label="Hero focal Y"
+                min={0}
+                max={100}
+                value={section.focalY ?? 50}
+                onChange={(e) => onPatch({ focalY: Number(e.target.value) })}
+                className="w-full accent-[#003FC7]"
+              />
+            </label>
+          </div>
+        </>
+      )}
+      <div className="flex items-center gap-3 text-[10px] text-black/60 dark:text-white/60">
+        <label className="flex items-center gap-1">
+          <input
+            type="checkbox"
+            checked={section.align === "center"}
+            onChange={(e) => onPatch({ align: e.target.checked ? "center" : "left" })}
+          />
+          Centered
+        </label>
+        {section.variantId === "hero-split-photo" && (
+          <label className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              checked={!!section.reverse}
+              onChange={(e) => onPatch({ reverse: e.target.checked })}
+            />
+            Photo right
+          </label>
+        )}
+      </div>
+      {section.variantId === "hero-stat-lockup" ? (
+        <>
+          {stats.map((st, i) => (
+            <div key={i} className="grid grid-cols-[1fr_54px_40px] gap-1">
+              <input
+                className={inspectorInput}
+                placeholder="Stat label"
+                value={st.label}
+                onChange={(e) =>
+                  onPatch({
+                    stats: stats.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)),
+                  })
+                }
+              />
+              <input
+                className={inspectorInput}
+                placeholder="Value"
+                value={st.value}
+                onChange={(e) =>
+                  onPatch({
+                    stats: stats.map((x, k) => (k === i ? { ...x, value: e.target.value } : x)),
+                  })
+                }
+              />
+              <input
+                className={inspectorInput}
+                placeholder="Unit"
+                value={st.unit ?? ""}
+                onChange={(e) =>
+                  onPatch({
+                    stats: stats.map((x, k) => (k === i ? { ...x, unit: e.target.value } : x)),
+                  })
+                }
+              />
+            </div>
+          ))}
+          {stats.length < 4 && (
+            <button
+              type="button"
+              className="text-[11px] font-medium text-[#003FC7] hover:underline"
+              onClick={() => onPatch({ stats: [...stats, { label: "New metric", value: "0" }] })}
+            >
+              + Add stat
+            </button>
+          )}
+        </>
+      ) : (
+        <>
+          {meta.map((r, i) => (
+            <div key={i} className="grid grid-cols-2 gap-1">
+              <input
+                className={inspectorInput}
+                placeholder="Meta label"
+                value={r.label}
+                onChange={(e) => patchMeta(i, { label: e.target.value })}
+              />
+              <input
+                className={inspectorInput}
+                placeholder="Meta value"
+                value={r.value ?? ""}
+                onChange={(e) => patchMeta(i, { value: e.target.value })}
+              />
+            </div>
+          ))}
+          {meta.length < 4 && (
+            <button
+              type="button"
+              className="text-[11px] font-medium text-[#003FC7] hover:underline"
+              onClick={() => onPatch({ meta: [...meta, { label: "Label", value: "Value" }] })}
+            >
+              + Add meta row
+            </button>
+          )}
+        </>
+      )}
     </>
   );
 }
