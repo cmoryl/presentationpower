@@ -1217,7 +1217,16 @@ function StoryLogo({
   return (
     <>
       {hasArt ? null : (
-        <T x={x} y={y + h * 0.12} w={w} size={size} weight={700} color={NAVY} align={align} tracking="-0.02em">
+        <T
+          x={x}
+          y={y + h * 0.12}
+          w={w}
+          size={size}
+          weight={700}
+          color={NAVY}
+          align={align}
+          tracking="-0.02em"
+        >
           {company}
         </T>
       )}
@@ -1266,7 +1275,6 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
       {[0, 1, 2].map((i) => {
         const q = quotes[i];
         const x = startX + i * (cardW + gap);
-        const logo = storyLogo(q?.company);
         return (
           <Fragment key={i}>
             <Plate x={x} y={3.32} w={cardW} h={6.32} radius={0.3} border="rgba(3,0,44,0.14)" />
@@ -1282,32 +1290,15 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
               slot={`stories.grid.photo.${i + 1}`}
               label="photo"
             />
-            {logo ? (
-              <Img
-                x={x + 0.16}
-                y={5.36}
-                w={1.6}
-                h={0.38}
-                src={logo}
-                alt={q?.company || "Client"}
-                fit="contain"
-                align="left"
-                slot={`stories.grid.logo.${i + 1}`}
-                label="logo"
-              />
-            ) : (
-              <T
-                x={x + 0.16}
-                y={5.36}
-                w={cardW - 0.32}
-                size={15}
-                weight={700}
-                color={NAVY}
-                tracking="-0.02em"
-              >
-                {q?.company || "Client"}
-              </T>
-            )}
+            <StoryLogo
+              x={x + 0.16}
+              y={5.3}
+              w={cardW - 0.32}
+              h={0.44}
+              company={q?.company || "Client"}
+              slot={`stories.grid.logo.${i + 1}`}
+              size={15}
+            />
             <Dots x={x + 0.16} y={5.94} color={BLUE} />
             {q?.headline ? (
               <T
@@ -1400,11 +1391,24 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
           label="logo"
         />
       ) : (
-        <T x={0.62} y={5.12} w={6} size={30} weight={700} tracking="-0.03em">
-          {q?.company || "Client"}
-        </T>
+        <>
+          <T x={0.62} y={5.16} w={6} size={30} weight={700} tracking="-0.03em">
+            {q?.company || "Client"}
+          </T>
+          <Img
+            x={0.62}
+            y={5.12}
+            w={2.4}
+            h={0.56}
+            src={TRANSPARENT_PX}
+            alt=""
+            fit="contain"
+            align="left"
+            slot="stories.feature.logo"
+            label="logo"
+          />
+        </>
       )}
-
       <T x={0.62} y={6.0} w={7.3} size={22} weight={600} leading={1.22} tracking="-0.02em">
         {q?.headline || page.title || "Success story"}
       </T>
@@ -1469,7 +1473,6 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
         const q = quotes[i];
         const x = 0.4 + (i % 2) * (cardW + 0.24);
         const y = 3.3 + Math.floor(i / 2) * (cardH + 0.3);
-        const logo = storyLogo(q?.company);
         return (
           <Fragment key={i}>
             <Plate x={x} y={y} w={cardW} h={cardH} radius={0.3} border="rgba(3,0,44,0.14)" />
@@ -1487,24 +1490,15 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
               {storyQuote(q?.text)}
             </T>
             <Rule x={x + 0.28} y={y + 2.5} w={cardW - 0.56} color="rgba(3,0,44,0.14)" />
-            {logo ? (
-              <Img
-                x={x + 0.28}
-                y={y + 2.66}
-                w={1.4}
-                h={0.34}
-                src={logo}
-                alt={q?.company || "Client"}
-                fit="contain"
-                align="left"
-                slot={`stories.quotes.logo.${i + 1}`}
-                label="logo"
-              />
-            ) : (
-              <T x={x + 0.28} y={y + 2.68} w={cardW - 0.56} size={12} weight={700} color={NAVY}>
-                {q?.company || "Client"}
-              </T>
-            )}
+            <StoryLogo
+              x={x + 0.28}
+              y={y + 2.62}
+              w={cardW - 0.56}
+              h={0.38}
+              company={q?.company || "Client"}
+              slot={`stories.quotes.logo.${i + 1}`}
+              size={12}
+            />
             <T x={x + 0.28} y={y + 3.02} w={cardW - 0.56} size={8.5} color="rgba(3,0,44,0.6)">
               {q?.role || q?.author || ""}
             </T>
