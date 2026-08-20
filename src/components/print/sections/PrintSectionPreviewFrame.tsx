@@ -113,6 +113,7 @@ export function PrintSectionPreviewFrame({
   return (
     <div
       ref={outerRef}
+      data-testid="print-section-preview-frame"
       className="w-full overflow-hidden"
       style={
         sheet
@@ -126,9 +127,11 @@ export function PrintSectionPreviewFrame({
           : undefined
       }
     >
-      <div style={{ height: height * scale }}>
+      <div data-testid="print-section-preview-box" style={{ height: height * scale }}>
         <div
           ref={innerRef}
+          data-testid="print-section-preview-page"
+          data-preview-scale={scale}
           className="[container-type:inline-size]"
           style={{
             width: PAGE_W,
