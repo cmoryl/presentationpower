@@ -631,6 +631,7 @@ export function PrintLibraryBrowser({
             brand={brand}
             renderPreview={renderPreview}
             onPreview={() => setOpen(item)}
+            canEditMaster={isAdmin}
           />
         ))}
       </div>
@@ -647,6 +648,7 @@ export function PrintLibraryBrowser({
           brand={brand}
           renderPreview={renderPreview}
           onClose={() => setOpen(null)}
+          canEditMaster={isAdmin}
         />
       ) : null}
     </section>
