@@ -106,8 +106,23 @@ export function clampLines(lines: number): CSSProperties {
   };
 }
 
-/** Template-px → container-relative unit (cqw against PAGE_W). */
-export const cq = (px: number) => `${((px * 100) / PAGE_W).toFixed(3)}cqw`;
+/**
+ * Template-px → container-relative unit (cqw against PAGE_W).
+ *
+ * Every value is multiplied by `--print-fit-scale` (default 1) so content-fit
+ * mode can shrink typography, iconography and spacing uniformly from a single
+ * variable on an ancestor — see src/lib/print-content-fit.ts.
+ */
+export const cq = (px: number) =>
+  `calc(${((px * 100) / PAGE_W).toFixed(3)}cqw * var(--print-fit-scale, 1))`;
+
+/**
+ * Horizontal page margin unit: fit-scale *and* the independent
+ * `--print-fit-pad` relief knob, so content-fit can win back line width before
+ * it resorts to shrinking type.
+ */
+export const padCq = (px: number) =>
+  `calc(${((px * 100) / PAGE_W).toFixed(3)}cqw * var(--print-fit-scale, 1) * var(--print-fit-pad, 1))`;
 
 export function pageAspect(size: PrintPageSize): string {
   switch (size) {
