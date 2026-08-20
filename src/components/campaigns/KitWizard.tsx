@@ -35,6 +35,7 @@ import {
   type EventFacts,
   type CampaignSource,
   type CampaignAsset,
+  type CampaignCopy,
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
