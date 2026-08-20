@@ -21,11 +21,13 @@ import type {
   PrintExpertiseVariant,
   PrintFeatureVariant,
   PrintLogoGridVariant,
+  PrintHeroModuleVariant,
   PrintQuoteVariant,
   PrintSection,
   PrintStatsVariant,
 } from "@/lib/print-assets.types";
 import {
+  makePrintHeroSection,
   makePrintContactSection,
   makePrintNarrativeSection,
   makePrintTableSection,
@@ -37,6 +39,7 @@ import {
 } from "@/components/print/sections/PrintSectionPicker";
 
 export type PrintModuleFamily =
+  | "hero"
   | "narrative"
   | "stats"
   | "quote"
@@ -54,6 +57,12 @@ export type PrintModuleFamilyMeta = {
 };
 
 export const PRINT_MODULE_FAMILIES: PrintModuleFamilyMeta[] = [
+  {
+    id: "hero",
+    label: "Heroes",
+    tagline: "How the page opens",
+    desc: "The six opening lockups the curated collateral uses — full-bleed photo bands, split photo heroes, typographic stacks, accent bands, stat lockups, and the case-study client rail.",
+  },
   {
     id: "narrative",
     label: "Narrative",
@@ -133,6 +142,24 @@ const ALL_KINDS: PrintAssetKind[] = [
   "msa-partnership",
   "adaptor-brief",
 ];
+
+const heroModule = (
+  variantId: PrintHeroModuleVariant,
+  label: string,
+  description: string,
+  density: PrintModuleDensity,
+  tags: string[],
+): PrintSectionModule => ({
+  id: `pm-hero-${variantId}`,
+  family: "hero",
+  variantId,
+  label,
+  description,
+  density,
+  bestFor: ALL_KINDS,
+  tags,
+  make: () => makePrintHeroSection(variantId),
+});
 
 const statsModule = (
   variantId: PrintStatsVariant,
@@ -281,6 +308,48 @@ const contactModule = (
 
 /** Every reusable print section module, in shelf order. */
 export const PRINT_SECTION_MODULES: PrintSectionModule[] = [
+  heroModule(
+    "hero-photo-band",
+    "Hero · Photo Band",
+    "Full-bleed photograph with eyebrow, title, accent rule, and a meta rail set over a bottom scrim — the case-study and spotlight cover.",
+    "tall",
+    ["hero", "cover", "photo", "scrim", "case-study"],
+  ),
+  heroModule(
+    "hero-split-photo",
+    "Hero · Split Photo",
+    "Photo panel beside a title + summary column, flippable left/right — the e-brochure opener.",
+    "standard",
+    ["hero", "split", "photo", "ebrochure"],
+  ),
+  heroModule(
+    "hero-type-stack",
+    "Hero · Type Stack",
+    "Typographic opener: accent rule, oversized title, and a lead paragraph. No photography needed.",
+    "standard",
+    ["hero", "typographic", "no-image", "rule"],
+  ),
+  heroModule(
+    "hero-accent-band",
+    "Hero · Accent Band",
+    "Solid brand-gradient band with reversed type — the loudest opener, and the MSA partnership cover.",
+    "standard",
+    ["hero", "band", "accent", "reversed", "msa"],
+  ),
+  heroModule(
+    "hero-stat-lockup",
+    "Hero · Stat Lockup",
+    "Glass hero with up to four inline proof numbers along the base — leads with outcomes.",
+    "tall",
+    ["hero", "stats", "proof", "outcomes"],
+  ),
+  heroModule(
+    "hero-client-lockup",
+    "Hero · Client Lockup",
+    "Client rail (name + industry/region meta) beside the engagement title — the case-study masthead.",
+    "standard",
+    ["hero", "client", "masthead", "case-study", "meta"],
+  ),
   narrativeModule(
     "narrative-tri-card",
     "Challenge · Approach · Impact",

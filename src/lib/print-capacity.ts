@@ -271,8 +271,19 @@ export const PRINT_CONTACT_VARIANT_LIMITS = {
   "contact-cta-band": { weight: 1.2, maxRows: 0 },
 } as const;
 
+export const PRINT_HERO_VARIANT_WEIGHTS: Record<string, number> = {
+  "hero-photo-band": 3.2,
+  "hero-split-photo": 2.6,
+  "hero-type-stack": 2.2,
+  "hero-accent-band": 2.4,
+  "hero-stat-lockup": 3.0,
+  "hero-client-lockup": 2.4,
+};
+
 export function weightForSection(section: PrintSection): number {
   switch (section.kind) {
+    case "hero":
+      return PRINT_HERO_VARIANT_WEIGHTS[section.variantId] ?? 2.6;
     case "stats":
       return PRINT_STATS_VARIANT_LIMITS[section.variantId]?.weight ?? 2;
     case "quote":
