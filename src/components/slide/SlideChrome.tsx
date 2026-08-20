@@ -36,6 +36,7 @@ import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
+import { ElementBrickRail } from "@/components/brand/ElementBrickMotif";
 
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
