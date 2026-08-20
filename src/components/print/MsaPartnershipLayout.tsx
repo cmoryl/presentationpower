@@ -13,6 +13,7 @@ import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
   cq,
+  padCq,
   pageAspect,
   pagePadX as padX,
   ICON_PATHS,
