@@ -447,13 +447,27 @@ function MasterItemEditorPage() {
           </div>
 
           {draft.content ? (
-            <p className="mt-2 text-[11px] text-black/50">
-              Click any text on the page to edit it in place. Fit now: {describeFit(fitKnobs)}
-              {fitMeasure && fitMeasure.overflowPx > 0
-                ? ` · ${fitMeasure.overflowPx}px past the trim`
-                : " · fits the trim"}
-            </p>
+            <>
+              <p className="mt-2 text-[11px] text-black/50">
+                Click any text on the page to edit it in place. Drag the hero grip vertically to
+                resize the band. Fit now: {describeFit(fitKnobs)}
+                {fitMeasure && fitMeasure.overflowPx > 0
+                  ? ` · ${fitMeasure.overflowPx}px past the trim`
+                  : " · fits the trim"}
+              </p>
+              {overflow.clipped ? (
+                <p
+                  data-testid="master-overflow-note"
+                  className="mt-2 rounded-xl border border-[#E53D2E]/40 bg-[#E53D2E]/8 px-3 py-2 text-[11px] font-medium text-[#E53D2E]"
+                >
+                  Page is clipping: {Math.round(overflow.overflowFrac * 100)}% (
+                  {overflow.overflowPx}px) of content sits past the trim edge and will be cut in
+                  print and PDF.
+                </p>
+              ) : null}
+            </>
           ) : null}
+
         </section>
 
 
