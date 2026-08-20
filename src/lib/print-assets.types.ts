@@ -674,6 +674,8 @@ export type ProposalTeamMember = {
   role?: string;
   office?: string;
   email?: string;
+  /** Optional headshot URL used by the card / lead / wall team layouts. */
+  photo?: string;
 };
 
 export type SolutionProposalContent = {
@@ -726,6 +728,11 @@ export type SolutionProposalContent = {
    */
   docMode?: "single" | "multi";
   pages?: MultiProposalPage[];
+  /**
+   * Slot-keyed picture replacements (logos, maps, photos) applied by the live
+   * editor's drag-and-drop / replace affordances. Keys are layout slot ids.
+   */
+  imageOverrides?: Record<string, string>;
 };
 
 /** One page of a multi-page solution proposal. */
@@ -741,6 +748,9 @@ export type MultiProposalPageKind =
   | "advocates"
   | "team-grid"
   | "team-bio"
+  | "team-cards"
+  | "team-leads"
+  | "team-wall"
   | "summary";
 
 export type MultiProposalPage = {
@@ -769,6 +779,8 @@ export type MultiProposalPage = {
   team?: Array<ProposalTeamMember & { bio?: string; phone?: string }>;
   locations?: Array<{ region?: string; offices?: string[] }>;
   logos?: string[];
+  /** Client wall tiles — logo art plus an editable client name. */
+  clients?: Array<{ name?: string; url?: string }>;
   footnote?: string;
 };
 

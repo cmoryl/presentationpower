@@ -339,6 +339,47 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
         })),
     },
     {
+      id: "p-team-cards",
+      kind: "team-cards",
+      navLabel: "Team cards",
+      eyebrow: "Meet the team",
+      title: content.teamTitle || "Meet the Team",
+      body: "Headshot cards for the core delivery pod — drop in photos in the editor.",
+      team: team.length
+        ? team
+        : [
+            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+          ],
+    },
+    {
+      id: "p-team-leads",
+      kind: "team-leads",
+      navLabel: "Engagement leads",
+      eyebrow: "Meet the team",
+      title: "Your engagement leads",
+      body: "Your two points of escalation, available across your time zones.",
+      team: (team.length ? team : [{ name: "First Last", role: "Title" }])
+        .slice(0, 2)
+        .map((m) => ({ ...m, phone: "+1 000 000 0000", bio: BIO_PLACEHOLDER })),
+    },
+    {
+      id: "p-team-wall",
+      kind: "team-wall",
+      navLabel: "Team wall",
+      eyebrow: "Meet the team",
+      title: "Your global team",
+      subtitle: "Named owners in every region running your program around the clock.",
+      team: team.length
+        ? team
+        : Array.from({ length: 8 }, () => ({
+            name: "First Last",
+            role: "Title",
+            office: "Office",
+          })),
+    },
+    {
       id: "p-summary",
       kind: "summary",
       navLabel: "Summary",

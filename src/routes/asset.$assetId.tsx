@@ -99,6 +99,7 @@ import {
 import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
+import { PrintImageEditContext } from "@/components/print/PrintImageEdit";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
 import { effectiveAssetIconTreatment, usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
@@ -692,6 +693,33 @@ function AssetEditor() {
     setRow({ ...row, content: nextContent as unknown as CaseStudyContent });
     setDirty(true);
     setHistoryTick((t) => t + 1);
+  }
+
+  // --- Replaceable pictures (logos, maps, headshots) ------------------------
+  // Slot ids contain dots, so overrides are written as one flat map instead of
+  // a nested path to keep `writePath` from creating accidental sub-objects.
+  const imageOverrides = ((rawContent as { imageOverrides?: Record<string, string> })
+    .imageOverrides ?? {}) as Record<string, string>;
+  const [imageBusy, setImageBusy] = useState(false);
+
+  function setImageOverride(slot: string, url: string | null) {
+    const next = { ...imageOverrides };
+    if (url) next[slot] = url;
+    else delete next[slot];
+    patchByPath("imageOverrides", next);
+  }
+
+  async function onDropImage(slot: string, file: File) {
+    setImageBusy(true);
+    try {
+      const { signedUrl } = await uploadSlideMedia(file, file.name);
+      setImageOverride(slot, signedUrl);
+    } catch (err) {
+      console.error("Image upload failed", err);
+      toast.error("Could not upload that image");
+    } finally {
+      setImageBusy(false);
+    }
   }
 
   // Collect all non-empty string paths in the content object so LiveEditOverlay
@@ -1293,6 +1321,15 @@ function AssetEditor() {
                         onPick: (slot, current) => setIconSlot({ slot, current }),
                       }}
                     >
+                      <PrintImageEditContext.Provider
+                        value={{
+                          active: true,
+                          overrides: imageOverrides,
+                          onDropFile: onDropImage,
+                          onClear: (slot) => setImageOverride(slot, null),
+                          busy: imageBusy,
+                        }}
+                      >
                       <LiveEditOverlay
                         enabled={true}
                         slideId={`asset-${row.id}-${kind}`}
@@ -1424,6 +1461,7 @@ function AssetEditor() {
                           </>
                         )}
                       </LiveEditOverlay>
+                      </PrintImageEditContext.Provider>
                       <PrintOverflowOverlay
                         state={overflow}
                         onFix={() => {
