@@ -84,7 +84,64 @@ type Tokens = {
   cardBg: string;
   rowAlt: string;
   pad: string;
+  /** True when the page body sits on a dark/brand-gradient field. */
+  onDark: boolean;
 };
+
+/** Page chrome recipes ported from the source template's visual language. */
+type ChromeSpec = {
+  /** Page field behind everything. */
+  field: "white" | "band" | "brand" | "navy" | "wash";
+  /** Body sits on a floating white plate. */
+  plate: boolean;
+  /** Header treatment. */
+  header: "band" | "hero" | "bubble" | "card" | "none";
+  /** Body renders on a dark field. */
+  onDark: boolean;
+};
+
+const CHROME: Record<MultiProposalPage["kind"], ChromeSpec> = {
+  cover: { field: "wash", plate: true, header: "card", onDark: false },
+  stats: { field: "navy", plate: false, header: "bubble", onDark: true },
+  scope: { field: "band", plate: true, header: "band", onDark: false },
+  cost: { field: "band", plate: true, header: "band", onDark: false },
+  locations: { field: "brand", plate: false, header: "card", onDark: true },
+  clients: { field: "white", plate: true, header: "hero", onDark: false },
+  "success-stories": { field: "band", plate: true, header: "band", onDark: false },
+  why: { field: "band", plate: true, header: "band", onDark: false },
+  advocates: { field: "band", plate: true, header: "band", onDark: false },
+  "team-grid": { field: "band", plate: true, header: "band", onDark: false },
+  "team-bio": { field: "band", plate: true, header: "band", onDark: false },
+  summary: { field: "brand", plate: true, header: "band", onDark: false },
+};
+
+function brandGradient(primary: string, accent: string): string {
+  return `linear-gradient(115deg, ${primary} 0%, ${primary} 18%, ${accent} 100%)`;
+}
+
+function makeTokens({
+  onDark,
+  accent,
+  primary,
+  pad,
+}: {
+  onDark: boolean;
+  accent: string;
+  primary: string;
+  pad: string;
+}): Tokens {
+  return {
+    accent,
+    primary: onDark ? "#FFFFFF" : primary,
+    ink: onDark ? "#FFFFFF" : "#03002C",
+    inkSoft: onDark ? "rgba(255,255,255,0.80)" : "rgba(85,85,85,0.94)",
+    line: onDark ? "rgba(255,255,255,0.22)" : "rgba(3,0,44,0.12)",
+    cardBg: onDark ? "rgba(255,255,255,0.08)" : "#F2F6FF",
+    rowAlt: onDark ? "rgba(255,255,255,0.06)" : "rgba(3,0,44,0.035)",
+    pad,
+    onDark,
+  };
+}
 
 export function MultiProposalLayout({
   content,
@@ -107,17 +164,8 @@ export function MultiProposalLayout({
 }) {
   const accent = brand.tokens.accent || brand.tokens.primary;
   const primary = brand.tokens.primary;
-  const t: Tokens = {
-    accent,
-    primary,
-    ink: mode === "dark" ? "#F5F4FF" : "#03002C",
-    inkSoft: mode === "dark" ? "rgba(245,244,255,0.74)" : "rgba(85,85,85,0.94)",
-    line: mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)",
-    cardBg: mode === "dark" ? "rgba(255,255,255,0.05)" : "#F5F8FF",
-    rowAlt: mode === "dark" ? "rgba(255,255,255,0.05)" : "rgba(3,0,44,0.035)",
-    pad: padCq(padX(density)),
-  };
-  const pageBg = mode === "dark" ? "#111114" : "#FFFFFF";
+  const pad = padCq(padX(density));
+  const gradient = brandGradient(primary, accent);
   const pages = content.pages ?? [];
   const shown =
     typeof pageIndex === "number" ? pages.slice(pageIndex, pageIndex + 1) : pages;
@@ -127,58 +175,111 @@ export function MultiProposalLayout({
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
         <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", ...style }}>
-          {shown.map((page, i) => (
-            <div
-              key={page.id || `${page.kind}-${i}`}
-              data-print-page
-              data-proposal-page={page.kind}
-              className="relative w-full overflow-hidden [container-type:inline-size]"
-              style={{
-                aspectRatio: pageAspect(pageSize),
-                backgroundColor: pageBg,
-                color: t.ink,
-                fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <PageChrome
-                brand={brand}
-                mode={mode}
-                tokens={t}
-                page={page}
-                showLockup={page.kind !== "cover"}
-              />
+          {shown.map((page, i) => {
+            const spec = CHROME[page.kind] ?? CHROME.summary;
+            const onDark = spec.onDark || mode === "dark";
+            const t = makeTokens({ onDark, accent, primary, pad });
+            const bandTokens = makeTokens({ onDark: true, accent, primary, pad });
+            const pageBg =
+              spec.field === "navy"
+                ? `linear-gradient(125deg, #03002C 0%, ${primary} 46%, ${accent} 108%)`
+                : spec.field === "brand"
+                  ? gradient
+                  : spec.field === "wash"
+                    ? `linear-gradient(135deg, #E0E8F5 0%, #EEF6FF 34%, #E4DEFF 72%, ${accent} 132%)`
+                    : mode === "dark"
+                      ? "#111114"
+                      : "#FFFFFF";
+
+            return (
               <div
+                key={page.id || `${page.kind}-${i}`}
+                data-print-page
+                data-proposal-page={page.kind}
+                className="relative w-full overflow-hidden [container-type:inline-size]"
                 style={{
-                  flex: 1,
-                  minHeight: 0,
-                  paddingLeft: t.pad,
-                  paddingRight: t.pad,
-                  paddingTop: cq(16),
-                  overflow: "hidden",
+                  aspectRatio: pageAspect(pageSize),
+                  background: pageBg,
+                  color: t.ink,
+                  fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
-                data-section={`page-${offset + i}`}
-                data-section-label={multiPageLabel(page, offset + i)}
               >
-                <PageBody
-                  page={page}
-                  index={offset + i}
-                  content={content}
-                  tokens={t}
+                {spec.field === "band" && (
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: `0 0 auto 0`,
+                      height: "24%",
+                      background: gradient,
+                    }}
+                  />
+                )}
+                {spec.field === "white" && (
+                  <div
+                    aria-hidden
+                    style={{
+                      position: "absolute",
+                      inset: "auto 0 0 0",
+                      height: "46%",
+                      background: `linear-gradient(160deg, ${accent}00 0%, ${accent}55 40%, ${accent} 100%)`,
+                    }}
+                  />
+                )}
+
+                <PageHeader
                   brand={brand}
-                  mode={mode}
+                  spec={spec}
+                  page={page}
+                  tokens={spec.header === "band" ? bandTokens : t}
+                  plateTokens={t}
+                />
+
+                <div
+                  style={{
+                    position: "relative",
+                    flex: 1,
+                    minHeight: 0,
+                    marginLeft: t.pad,
+                    marginRight: t.pad,
+                    marginTop: cq(4),
+                    padding: spec.plate ? `${cq(20)} ${cq(20)}` : 0,
+                    borderRadius: spec.plate ? cq(24) : 0,
+                    background: spec.plate
+                      ? mode === "dark"
+                        ? "rgba(255,255,255,0.06)"
+                        : "#FFFFFF"
+                      : "transparent",
+                    boxShadow:
+                      spec.plate && mode !== "dark"
+                        ? `0 ${cq(10)} ${cq(30)} rgba(3,0,44,0.10)`
+                        : "none",
+                    overflow: "hidden",
+                  }}
+                  data-section={`page-${offset + i}`}
+                  data-section-label={multiPageLabel(page, offset + i)}
+                >
+                  <PageBody
+                    page={page}
+                    index={offset + i}
+                    content={content}
+                    tokens={t}
+                    brand={brand}
+                    mode={onDark ? "dark" : "light"}
+                  />
+                </div>
+                <PageFooter
+                  tokens={t}
+                  label={content.footerUrl || "transperfect.com"}
+                  number={offset + i + 1}
+                  total={pages.length}
+                  note={page.footnote}
                 />
               </div>
-              <PageFooter
-                tokens={t}
-                label={content.footerUrl || "transperfect.com"}
-                number={offset + i + 1}
-                total={pages.length}
-                note={page.footnote}
-              />
-            </div>
-          ))}
+            );
+          })}
         </div>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
@@ -187,92 +288,235 @@ export function MultiProposalLayout({
 
 /* ------------------------------------------------------------------ chrome */
 
-function PageChrome({
+function PageHeader({
   brand,
-  mode,
-  tokens: t,
+  spec,
   page,
-  showLockup,
+  tokens: t,
+  plateTokens,
 }: {
   brand: BrandMode;
-  mode: "light" | "dark";
-  tokens: Tokens;
+  spec: ChromeSpec;
   page: MultiProposalPage;
-  showLockup: boolean;
+  tokens: Tokens;
+  plateTokens: Tokens;
 }) {
-  return (
-    <div
-      style={{
-        paddingLeft: t.pad,
-        paddingRight: t.pad,
-        paddingTop: cq(26),
-        paddingBottom: cq(14),
-        borderBottom: `${cq(3)} solid ${t.accent}`,
-      }}
-    >
-      {showLockup && (
-        <div className="flex items-center justify-between" style={{ gap: cq(14) }}>
-          <BrandLockup
-            brand={brand}
-            color={mode === "dark" ? "#FFFFFF" : t.primary}
-            size="xs"
-            orientation="horizontal"
-          />
-          <div
-            style={{
-              fontSize: cq(8),
-              fontWeight: 700,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: t.inkSoft,
-            }}
-          >
-            {MULTI_PAGE_LABELS[page.kind]}
-          </div>
-        </div>
-      )}
-      {page.eyebrow && (
+  const lockupColor = t.onDark ? "#FFFFFF" : t.primary;
+
+  /* Speech-bubble callout — the template's signature statement device. */
+  if (spec.header === "bubble") {
+    return (
+      <div
+        style={{
+          position: "relative",
+          paddingLeft: t.pad,
+          paddingRight: t.pad,
+          paddingTop: cq(30),
+        }}
+      >
         <div
           style={{
-            marginTop: showLockup ? cq(14) : 0,
-            fontSize: cq(8.5),
-            fontWeight: 700,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            color: t.primary,
+            position: "relative",
+            border: `${cq(2.5)} solid rgba(255,255,255,0.92)`,
+            borderRadius: cq(30),
+            padding: `${cq(22)} ${cq(24)} ${cq(24)}`,
+            maxWidth: "84%",
           }}
         >
-          {page.eyebrow}
+          {page.eyebrow && (
+            <div
+              style={{
+                fontSize: cq(8.5),
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.72)",
+              }}
+            >
+              {page.eyebrow}
+            </div>
+          )}
+          <h2
+            style={{
+              margin: `${page.eyebrow ? cq(8) : 0} 0 0`,
+              fontSize: cq(28),
+              lineHeight: 1.08,
+              fontWeight: 700,
+              letterSpacing: "-0.03em",
+              color: "#FFFFFF",
+              ...clampLines(4),
+            }}
+          >
+            {page.title}
+          </h2>
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: cq(34),
+              bottom: cq(-1),
+              width: cq(26),
+              height: cq(26),
+              background: "transparent",
+              borderLeft: `${cq(2.5)} solid rgba(255,255,255,0.92)`,
+              transform: `skewX(-28deg) translateY(${cq(24)})`,
+            }}
+          />
         </div>
-      )}
-      {page.title && (
+      </div>
+    );
+  }
+
+  /* Big two-line hero headline (clients page). */
+  if (spec.header === "hero") {
+    return (
+      <div style={{ paddingLeft: t.pad, paddingRight: t.pad, paddingTop: cq(34) }}>
         <h2
           style={{
-            margin: `${cq(6)} 0 0`,
-            fontSize: cq(page.kind === "cover" ? 32 : 22),
-            lineHeight: 1.06,
-            fontWeight: 700,
-            letterSpacing: "-0.03em",
-            color: t.ink,
-            ...clampLines(3),
+            margin: 0,
+            fontSize: cq(44),
+            lineHeight: 0.98,
+            fontWeight: 800,
+            letterSpacing: "-0.045em",
+            color: plateTokens.primary,
+            maxWidth: "70%",
+            ...clampLines(2),
           }}
         >
           {page.title}
         </h2>
-      )}
-      {page.subtitle && (
+        {page.body && (
+          <div
+            style={{
+              marginTop: cq(14),
+              fontSize: cq(12),
+              fontWeight: 700,
+              color: plateTokens.ink,
+              ...clampLines(2),
+            }}
+          >
+            {page.body}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* Centered card title (cover, global locations). */
+  if (spec.header === "card") {
+    return (
+      <div style={{ paddingLeft: t.pad, paddingRight: t.pad, paddingTop: cq(28) }}>
         <div
           style={{
-            marginTop: cq(6),
-            fontSize: cq(11),
-            fontWeight: 600,
-            color: t.primary,
-            ...clampLines(2),
+            borderRadius: cq(24),
+            background: t.onDark ? "rgba(255,255,255,0.14)" : "rgba(255,255,255,0.78)",
+            padding: `${cq(22)} ${cq(24)}`,
+            textAlign: "center",
           }}
         >
-          {page.subtitle}
+          {page.eyebrow && (
+            <div
+              style={{
+                fontSize: cq(9),
+                fontWeight: 700,
+                letterSpacing: "0.28em",
+                textTransform: "uppercase",
+                color: t.onDark ? "rgba(255,255,255,0.82)" : t.primary,
+              }}
+            >
+              {page.eyebrow}
+            </div>
+          )}
+          <h2
+            style={{
+              margin: `${page.eyebrow ? cq(10) : 0} 0 0`,
+              fontSize: cq(30),
+              lineHeight: 1.05,
+              fontWeight: 700,
+              letterSpacing: "-0.035em",
+              color: t.onDark ? "#FFFFFF" : plateTokens.ink,
+              ...clampLines(3),
+            }}
+          >
+            {page.title}
+          </h2>
+          {page.subtitle && (
+            <div
+              style={{
+                marginTop: cq(8),
+                fontSize: cq(11.5),
+                fontWeight: 600,
+                color: t.onDark ? "rgba(255,255,255,0.86)" : t.primary,
+                ...clampLines(2),
+              }}
+            >
+              {page.subtitle}
+            </div>
+          )}
         </div>
-      )}
+      </div>
+    );
+  }
+
+  if (spec.header === "none") return null;
+
+  /* Default: gradient band with the page title reversed out of it. */
+  return (
+    <div
+      style={{
+        position: "relative",
+        paddingLeft: t.pad,
+        paddingRight: t.pad,
+        paddingTop: cq(22),
+        paddingBottom: cq(10),
+      }}
+    >
+      <div className="flex items-start justify-between" style={{ gap: cq(14) }}>
+        <div style={{ minWidth: 0 }}>
+          {page.eyebrow && (
+            <div
+              style={{
+                fontSize: cq(8.5),
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.76)",
+              }}
+            >
+              {page.eyebrow}
+            </div>
+          )}
+          {page.title && (
+            <h2
+              style={{
+                margin: `${page.eyebrow ? cq(8) : 0} 0 0`,
+                fontSize: cq(30),
+                lineHeight: 1.04,
+                fontWeight: 800,
+                letterSpacing: "-0.035em",
+                color: "#FFFFFF",
+                ...clampLines(2),
+              }}
+            >
+              {page.title}
+            </h2>
+          )}
+          {page.subtitle && (
+            <div
+              style={{
+                marginTop: cq(6),
+                fontSize: cq(11),
+                fontWeight: 600,
+                color: "rgba(255,255,255,0.88)",
+                ...clampLines(2),
+              }}
+            >
+              {page.subtitle}
+            </div>
+          )}
+        </div>
+        <BrandLockup brand={brand} color={lockupColor} size="xs" orientation="horizontal" />
+      </div>
     </div>
   );
 }
@@ -292,13 +536,13 @@ function PageFooter({
 }) {
   return (
     <div
-      className="flex items-center"
+      className="relative flex items-center"
       style={{
         gap: cq(12),
         paddingLeft: t.pad,
         paddingRight: t.pad,
         paddingTop: cq(12),
-        paddingBottom: cq(20),
+        paddingBottom: cq(18),
         marginTop: "auto",
       }}
     >
@@ -308,7 +552,7 @@ function PageFooter({
           fontWeight: 700,
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: t.primary,
+          color: t.onDark ? "rgba(255,255,255,0.86)" : t.primary,
           whiteSpace: "nowrap",
         }}
       >
@@ -324,6 +568,7 @@ function PageFooter({
     </div>
   );
 }
+
 
 /* -------------------------------------------------------------------- body */
 
@@ -393,13 +638,69 @@ function Bullets({ tokens: t, items }: { tokens: Tokens; items: string[] }) {
 function StatGrid({ tokens: t, stats }: { tokens: Tokens; stats: MultiProposalPage["stats"] }) {
   const list = (stats ?? []).slice(0, 8);
   if (list.length === 0) return null;
-  const cols = list.length >= 6 ? 3 : Math.min(list.length, 4) || 1;
+  const cols = list.length >= 6 ? 2 : Math.min(list.length, 4) || 1;
+
+  /* On the dark/brand field the template uses big accent figures on hairlines
+     with the label set beside them — not boxed cards. */
+  if (t.onDark) {
+    return (
+      <div
+        className="grid"
+        style={{
+          marginTop: cq(18),
+          gridTemplateColumns: `repeat(${Math.min(cols, 2)}, minmax(0, 1fr))`,
+          columnGap: cq(24),
+          rowGap: cq(2),
+        }}
+      >
+        {list.map((s, i) => (
+          <div
+            key={i}
+            className="flex items-baseline"
+            style={{
+              gap: cq(10),
+              paddingTop: cq(10),
+              paddingBottom: cq(10),
+              borderBottom: `1px solid ${t.line}`,
+            }}
+          >
+            <div
+              style={{
+                fontSize: cq(28),
+                fontWeight: 700,
+                lineHeight: 1,
+                letterSpacing: "-0.035em",
+                color: t.accent,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {`${s.value ?? ""}${s.unit ?? ""}`}
+            </div>
+            <div
+              style={{
+                fontSize: cq(9),
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                lineHeight: 1.25,
+                color: "#FFFFFF",
+                ...clampLines(2),
+              }}
+            >
+              {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div
       className="grid"
       style={{
         marginTop: cq(14),
-        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        gridTemplateColumns: `repeat(${list.length >= 6 ? 3 : cols}, minmax(0, 1fr))`,
         gap: cq(12),
       }}
     >
@@ -441,6 +742,7 @@ function StatGrid({ tokens: t, stats }: { tokens: Tokens; stats: MultiProposalPa
     </div>
   );
 }
+
 
 function CardGrid({
   tokens: t,
@@ -1017,10 +1319,10 @@ function PageBody({
     case "clients":
       return (
         <div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
           <LogoWall tokens={t} logos={page.logos ?? []} />
           <StatGrid tokens={t} stats={page.stats} />
         </div>
+
       );
     case "success-stories":
       return (
