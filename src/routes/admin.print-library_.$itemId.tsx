@@ -139,6 +139,7 @@ function MasterItemEditorPage() {
   }, [savedKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [mode, setMode] = useState<PrintMode>("light");
+  const [proposalPage, setProposalPage] = useState(0);
   const [fitKnobs, setFitKnobs] = useState<PrintFitKnobs>(NEUTRAL_FIT);
   const [fitMeasure, setFitMeasure] = useState<PrintFitMeasurement | null>(null);
   const [showJson, setShowJson] = useState(false);
