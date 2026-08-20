@@ -283,6 +283,10 @@ export function PrintSectionRenderer({
         return <HeroCobrandBand section={section} mode={mode} accent={accent} />;
       if (section.variantId === "hero-brief-lockup")
         return <HeroBriefLockup section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-element-masthead")
+        return <HeroElementMasthead section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-element-band")
+        return <HeroElementBand section={section} mode={mode} accent={accent} />;
       return null;
     case "stats":
       if (section.variantId === "kpi-dashboard-portrait")
