@@ -268,7 +268,7 @@ export function ProposalWorldMap({
 
       {editable && onChange ? (
         <div
-          data-export-ignore-chrome
+          data-export-ignore="true"
           style={{
             position: "absolute",
             bottom: 8,
@@ -307,7 +307,7 @@ export function ProposalWorldMap({
 
 
       <div
-        data-export-ignore-chrome
+        data-export-ignore="true"
         style={{
           position: "absolute",
           bottom: 8,
@@ -363,7 +363,7 @@ export function ProposalWorldMap({
 
       {editable && onChange ? (
         <div
-          data-export-ignore-chrome
+          data-export-ignore="true"
           style={{
             position: "absolute",
             top: 6,
