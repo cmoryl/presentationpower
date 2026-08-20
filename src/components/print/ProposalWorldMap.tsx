@@ -32,31 +32,26 @@ export function defaultWorldMapPins(): WorldMapPin[] {
 /**
  * Export-safe pin zone.
  *
- * Two things clip pins in PDF/PPTX output: the map frame itself (a dot dropped
- * at the very edge is cut in half by the layout box) and the translucent
- * "Global Locations" title plate, which overlaps the top of the map box. Both
- * are expressed here in map user units and enforced on every add and drag, so a
- * pin can never land somewhere it won't survive export.
+ * A dot dropped at the very edge of the map box gets cut in half in PDF/PPTX
+ * output, and the page header's hairline rule sits just above the map, so the
+ * top edge needs extra clearance. Both limits live here in map user units and
+ * are enforced on every add and drag.
  */
 const PIN_INSET = 6; // keeps the whole dot (r ~2.6) inside the frame
-const TITLE_BAND = { x0: 133, x1: 613, y1: 156 };
+const TOP_CLEARANCE = 12; // breathing room under the page header rule
 
 export function clampPinPoint(x: number, y: number) {
-  let nx = Math.min(
+  const nx = Math.min(
     WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w - PIN_INSET,
     Math.max(WORLD_MAP_VIEW.x + PIN_INSET, x),
   );
-  let ny = Math.min(
+  const ny = Math.min(
     WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h - PIN_INSET,
-    Math.max(WORLD_MAP_VIEW.y + PIN_INSET, y),
+    Math.max(WORLD_MAP_VIEW.y + TOP_CLEARANCE, y),
   );
-  if (nx >= TITLE_BAND.x0 && nx <= TITLE_BAND.x1 && ny < TITLE_BAND.y1) {
-    ny = TITLE_BAND.y1;
-  }
-  nx = Math.round(nx * 10) / 10;
-  ny = Math.round(ny * 10) / 10;
-  return { x: nx, y: ny };
+  return { x: Math.round(nx * 10) / 10, y: Math.round(ny * 10) / 10 };
 }
+
 
 
 export function ProposalWorldMap({
