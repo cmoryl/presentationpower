@@ -4883,7 +4883,52 @@ function matchesField(pattern: string, field: string): boolean {
   return regex.test(field);
 }
 
+function pathParts(path: string): (string | number)[] {
+  return path.split(".").flatMap((p) => {
+    const m = /^([^[]+)(\[(\d+)\])?$/.exec(p);
+    if (!m) return [p];
+    return m[3] !== undefined ? [m[1] as string | number, Number(m[3])] : [m[1] as string | number];
+  });
+}
+
+function getPath(obj: unknown, path: string): unknown {
+  let cur: unknown = obj;
+  for (const key of pathParts(path)) {
+    if (cur == null || typeof cur !== "object") return undefined;
+    cur = (cur as Record<string | number, unknown>)[key];
+  }
+  return cur;
+}
+
+/**
+ * Adopted canvas blocks bake the module's text at adoption time (see
+ * lib/canvas-adopt.ts) and the renderer hides the original element, so an
+ * inspector edit to `items[1].unit` would otherwise be invisible on the slide.
+ * Re-point every adopted text block that still shows the OLD value at the
+ * edited value. Value matching (not path binding) is what keeps decks adopted
+ * before this fix in sync too.
+ */
+export function syncAdoptedBlockText(
+  blocks: CanvasBlock[] | undefined,
+  prevValue: unknown,
+  nextValue: unknown,
+): CanvasBlock[] | undefined {
+  if (!blocks?.length) return blocks;
+  const prev = typeof prevValue === "string" ? prevValue.trim() : "";
+  const next = typeof nextValue === "string" ? nextValue : "";
+  if (!prev || prev === next.trim()) return blocks;
+  let changed = false;
+  const out = blocks.map((b) => {
+    if (!b.sourceSelector) return b;
+    if ((b.text ?? "").trim() !== prev) return b;
+    changed = true;
+    return { ...b, text: next };
+  });
+  return changed ? out : blocks;
+}
+
 function setPath(
+
   obj: Record<string, unknown>,
   path: string,
   value: unknown,
