@@ -62,6 +62,7 @@ import { Route as DevPrintModulePdfRouteImport } from './routes/dev.print-module
 import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
 import { Route as DevModuleCatalogRouteImport } from './routes/dev.module-catalog'
+import { Route as DevMapExportVerifyRouteImport } from './routes/dev.map-export-verify'
 import { Route as DevLayerDiffRouteImport } from './routes/dev.layer-diff'
 import { Route as DevImageFormatVerifyRouteImport } from './routes/dev.image-format-verify'
 import { Route as DevImageBenchRouteImport } from './routes/dev.image-bench'
@@ -398,6 +399,11 @@ const DevModuleSheetRoute = DevModuleSheetRouteImport.update({
 const DevModuleCatalogRoute = DevModuleCatalogRouteImport.update({
   id: '/dev/module-catalog',
   path: '/dev/module-catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevMapExportVerifyRoute = DevMapExportVerifyRouteImport.update({
+  id: '/dev/map-export-verify',
+  path: '/dev/map-export-verify',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevLayerDiffRoute = DevLayerDiffRouteImport.update({
@@ -829,6 +835,7 @@ export interface FileRoutesByFullPath {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/map-export-verify': typeof DevMapExportVerifyRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
@@ -951,6 +958,7 @@ export interface FileRoutesByTo {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/map-export-verify': typeof DevMapExportVerifyRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
@@ -1078,6 +1086,7 @@ export interface FileRoutesById {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/map-export-verify': typeof DevMapExportVerifyRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
@@ -1206,6 +1215,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/map-export-verify'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
@@ -1328,6 +1338,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/map-export-verify'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
@@ -1454,6 +1465,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/map-export-verify'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
@@ -1555,6 +1567,7 @@ export interface RootRouteChildren {
   DevImageBenchRoute: typeof DevImageBenchRoute
   DevImageFormatVerifyRoute: typeof DevImageFormatVerifyRoute
   DevLayerDiffRoute: typeof DevLayerDiffRoute
+  DevMapExportVerifyRoute: typeof DevMapExportVerifyRoute
   DevModuleCatalogRoute: typeof DevModuleCatalogRoute
   DevModuleSheetRoute: typeof DevModuleSheetRoute
   DevPlacementVerifyRoute: typeof DevPlacementVerifyRoute
@@ -1963,6 +1976,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/module-catalog'
       fullPath: '/dev/module-catalog'
       preLoaderRoute: typeof DevModuleCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/map-export-verify': {
+      id: '/dev/map-export-verify'
+      path: '/dev/map-export-verify'
+      fullPath: '/dev/map-export-verify'
+      preLoaderRoute: typeof DevMapExportVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/layer-diff': {
@@ -2656,6 +2676,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevImageBenchRoute: DevImageBenchRoute,
   DevImageFormatVerifyRoute: DevImageFormatVerifyRoute,
   DevLayerDiffRoute: DevLayerDiffRoute,
+  DevMapExportVerifyRoute: DevMapExportVerifyRoute,
   DevModuleCatalogRoute: DevModuleCatalogRoute,
   DevModuleSheetRoute: DevModuleSheetRoute,
   DevPlacementVerifyRoute: DevPlacementVerifyRoute,
