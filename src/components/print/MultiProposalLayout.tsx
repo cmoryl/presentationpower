@@ -32,6 +32,14 @@ import {
   clampLines,
   type IconName,
 } from "@/components/print/print-primitives";
+import {
+  AFFINITY_LOGOS,
+  CAUSE_LOGOS,
+  CLIENT_LOGOS,
+  PROPOSAL_AQUA,
+  PROPOSAL_ART,
+  type LogoTile,
+} from "@/lib/print-library/proposal-art";
 
 const FALLBACK_ICONS: IconName[] = [
   "check",
@@ -91,29 +99,30 @@ type Tokens = {
 /** Page chrome recipes ported from the source template's visual language. */
 type ChromeSpec = {
   /** Page field behind everything. */
-  field: "white" | "band" | "brand" | "navy" | "wash";
+  field: "white" | "band" | "brand" | "navy" | "wash" | "art";
   /** Body sits on a floating white plate. */
   plate: boolean;
   /** Header treatment. */
-  header: "band" | "hero" | "bubble" | "card" | "none";
+  header: "band" | "hero" | "bubble" | "card" | "cover" | "statement" | "none";
   /** Body renders on a dark field. */
   onDark: boolean;
 };
 
 const CHROME: Record<MultiProposalPage["kind"], ChromeSpec> = {
-  cover: { field: "wash", plate: true, header: "card", onDark: false },
-  stats: { field: "navy", plate: false, header: "bubble", onDark: true },
+  cover: { field: "art", plate: false, header: "cover", onDark: true },
+  stats: { field: "art", plate: false, header: "bubble", onDark: true },
   scope: { field: "band", plate: true, header: "band", onDark: false },
   cost: { field: "band", plate: true, header: "band", onDark: false },
-  locations: { field: "brand", plate: false, header: "card", onDark: true },
-  clients: { field: "white", plate: true, header: "hero", onDark: false },
+  locations: { field: "art", plate: false, header: "card", onDark: true },
+  clients: { field: "white", plate: false, header: "hero", onDark: false },
   "success-stories": { field: "band", plate: true, header: "band", onDark: false },
-  why: { field: "band", plate: true, header: "band", onDark: false },
-  advocates: { field: "band", plate: true, header: "band", onDark: false },
-  "team-grid": { field: "band", plate: true, header: "band", onDark: false },
+  why: { field: "art", plate: false, header: "statement", onDark: true },
+  advocates: { field: "art", plate: false, header: "statement", onDark: true },
+  "team-grid": { field: "white", plate: false, header: "hero", onDark: false },
   "team-bio": { field: "band", plate: true, header: "band", onDark: false },
-  summary: { field: "brand", plate: true, header: "band", onDark: false },
+  summary: { field: "art", plate: false, header: "statement", onDark: true },
 };
+
 
 function brandGradient(primary: string, accent: string): string {
   return `linear-gradient(115deg, ${primary} 0%, ${primary} 18%, ${accent} 100%)`;
@@ -181,7 +190,7 @@ export function MultiProposalLayout({
             const t = makeTokens({ onDark, accent, primary, pad });
             const bandTokens = makeTokens({ onDark: true, accent, primary, pad });
             const pageBg =
-              spec.field === "navy"
+              spec.field === "navy" || spec.field === "art"
                 ? `linear-gradient(125deg, #03002C 0%, ${primary} 46%, ${accent} 108%)`
                 : spec.field === "brand"
                   ? gradient
@@ -206,6 +215,21 @@ export function MultiProposalLayout({
                   flexDirection: "column",
                 }}
               >
+                {spec.field === "art" && (
+                  <img
+                    aria-hidden
+                    alt=""
+                    src={PROPOSAL_ART.field}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      opacity: 0.96,
+                    }}
+                  />
+                )}
                 {spec.field === "band" && (
                   <div
                     aria-hidden
@@ -223,11 +247,12 @@ export function MultiProposalLayout({
                     style={{
                       position: "absolute",
                       inset: "auto 0 0 0",
-                      height: "46%",
-                      background: `linear-gradient(160deg, ${accent}00 0%, ${accent}55 40%, ${accent} 100%)`,
+                      height: cq(6),
+                      background: gradient,
                     }}
                   />
                 )}
+
 
                 <PageHeader
                   brand={brand}
@@ -303,7 +328,121 @@ function PageHeader({
 }) {
   const lockupColor = t.onDark ? "#FFFFFF" : t.primary;
 
-  /* Speech-bubble callout — the template's signature statement device. */
+  /* Cover — full-width white TransPerfect wordmark over the gradient field,
+     with the proposal title set beneath it, exactly as the source template. */
+  if (spec.header === "cover") {
+    return (
+      <div
+        style={{
+          paddingLeft: t.pad,
+          paddingRight: t.pad,
+          paddingTop: cq(64),
+          textAlign: "center",
+        }}
+      >
+        <img
+          src={PROPOSAL_ART.logoWhite}
+          alt="TransPerfect"
+          style={{ width: "62%", height: "auto", margin: "0 auto", display: "block" }}
+        />
+        {page.eyebrow && (
+          <div
+            style={{
+              marginTop: cq(40),
+              fontSize: cq(10),
+              fontWeight: 700,
+              letterSpacing: "0.34em",
+              textTransform: "uppercase",
+              color: PROPOSAL_AQUA,
+            }}
+          >
+            {page.eyebrow}
+          </div>
+        )}
+        <h1
+          style={{
+            margin: `${cq(14)} 0 0`,
+            fontSize: cq(40),
+            lineHeight: 1.02,
+            fontWeight: 800,
+            letterSpacing: "-0.04em",
+            color: "#FFFFFF",
+            ...clampLines(3),
+          }}
+        >
+          {page.title}
+        </h1>
+        {page.subtitle && (
+          <div
+            style={{
+              margin: `${cq(12)} auto 0`,
+              maxWidth: "74%",
+              fontSize: cq(12),
+              lineHeight: 1.5,
+              fontWeight: 500,
+              color: "rgba(255,255,255,0.88)",
+            }}
+          >
+            {page.subtitle}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* Statement pages — heavy right-aligned headline mixing white and aqua. */
+  if (spec.header === "statement") {
+    return (
+      <div style={{ paddingLeft: t.pad, paddingRight: t.pad, paddingTop: cq(40) }}>
+        {page.eyebrow && (
+          <div
+            style={{
+              fontSize: cq(9),
+              fontWeight: 700,
+              letterSpacing: "0.3em",
+              textTransform: "uppercase",
+              color: PROPOSAL_AQUA,
+              textAlign: "right",
+            }}
+          >
+            {page.eyebrow}
+          </div>
+        )}
+        <h2
+          style={{
+            margin: `${page.eyebrow ? cq(12) : 0} 0 0`,
+            fontSize: cq(42),
+            lineHeight: 0.98,
+            fontWeight: 800,
+            letterSpacing: "-0.045em",
+            color: "#FFFFFF",
+            textAlign: "right",
+            ...clampLines(3),
+          }}
+        >
+          {page.title}
+        </h2>
+        {page.subtitle && (
+          <div
+            style={{
+              marginTop: cq(12),
+              marginLeft: "auto",
+              maxWidth: "70%",
+              fontSize: cq(12),
+              lineHeight: 1.5,
+              fontWeight: 600,
+              color: PROPOSAL_AQUA,
+              textAlign: "right",
+            }}
+          >
+            {page.subtitle}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+
   if (spec.header === "bubble") {
     return (
       <div
@@ -1037,38 +1176,115 @@ function Locations({
   );
 }
 
+function normalizeLogoKey(v: string): string {
+  return v.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/** Resolve authored logo names against the template's real logo artwork. */
+function resolveLogoTiles(names: string[], pool: LogoTile[]): LogoTile[] {
+  if (names.length === 0) return pool;
+  return names.slice(0, 24).map((name, i) => {
+    const key = normalizeLogoKey(name);
+    const hit = pool.find((p) => {
+      const pk = normalizeLogoKey(p.name);
+      return pk === key || pk.startsWith(key) || key.startsWith(pk);
+    });
+    return hit ?? { name, url: pool[i % Math.max(pool.length, 1)]?.url ?? "" };
+  });
+}
+
+/** Slide 6 client wall — white rounded cards, four across. */
 function LogoWall({ tokens: t, logos }: { tokens: Tokens; logos: string[] }) {
-  if (logos.length === 0) return null;
+  const tiles = resolveLogoTiles(logos, CLIENT_LOGOS);
+  if (tiles.length === 0) return null;
   return (
     <div
       className="grid"
       style={{
-        marginTop: cq(14),
+        marginTop: cq(22),
         gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-        gap: cq(10),
+        gap: cq(14),
       }}
     >
-      {logos.slice(0, 24).map((name, i) => (
+      {tiles.map((tile, i) => (
         <div
-          key={i}
+          key={`${tile.name}-${i}`}
+          className="flex items-center justify-center"
           style={{
-            borderRadius: cq(10),
-            border: `1px solid ${t.line}`,
-            background: t.cardBg,
-            padding: `${cq(10)} ${cq(8)}`,
-            textAlign: "center",
-            fontSize: cq(9),
-            fontWeight: 700,
-            color: t.ink,
-            ...clampLines(2),
+            borderRadius: cq(16),
+            background: "#FFFFFF",
+            boxShadow: `0 ${cq(4)} ${cq(16)} rgba(3,0,44,0.10)`,
+            aspectRatio: "1.45",
+            padding: `${cq(12)} ${cq(14)}`,
           }}
         >
-          {name}
+          {tile.url ? (
+            <img
+              src={tile.url}
+              alt={tile.name}
+              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+            />
+          ) : (
+            <span style={{ fontSize: cq(9), fontWeight: 700, color: t.ink }}>{tile.name}</span>
+          )}
         </div>
       ))}
     </div>
   );
 }
+
+/** Giving-back / affinity marks — reversed-out logos straight on the field. */
+function MarkWall({
+  tiles,
+  cols,
+  marginTop,
+}: {
+  tiles: LogoTile[];
+  cols: number;
+  marginTop: number;
+}) {
+  if (tiles.length === 0) return null;
+  return (
+    <div
+      className="grid"
+      style={{
+        marginTop: cq(marginTop),
+        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        columnGap: cq(20),
+        rowGap: cq(22),
+        alignItems: "center",
+      }}
+    >
+      {tiles.map((tile, i) => (
+        <div key={`${tile.name}-${i}`} className="flex items-center justify-center">
+          <img
+            src={tile.url}
+            alt={tile.name}
+            style={{ maxWidth: "100%", maxHeight: cq(54), objectFit: "contain" }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Slide 5 world map plate. */
+function WorldMap() {
+  return (
+    <img
+      src={PROPOSAL_ART.worldMap}
+      alt="TransPerfect global office locations"
+      style={{
+        display: "block",
+        width: "100%",
+        height: "auto",
+        marginTop: cq(18),
+        opacity: 0.95,
+      }}
+    />
+  );
+}
+
 
 function TeamGrid({
   tokens: t,
@@ -1242,28 +1458,60 @@ function PageBody({
   mode: "light" | "dark";
 }) {
   switch (page.kind) {
-    case "cover":
+    case "cover": {
+      const plate = makeTokens({
+        onDark: false,
+        accent: t.accent,
+        primary: brand.tokens.primary,
+        pad: t.pad,
+      });
       return (
-        <div>
-          <div className="flex items-start justify-between" style={{ gap: cq(18) }}>
-            <BrandLockup
-              brand={brand}
-              color={mode === "dark" ? "#FFFFFF" : t.primary}
-              size="sm"
-              orientation="horizontal"
-            />
+        <div className="flex h-full flex-col justify-end">
+          <div
+            className="flex items-center justify-center"
+            style={{
+              borderRadius: cq(20),
+              border: `${cq(1.5)} solid rgba(255,255,255,0.55)`,
+              background: "rgba(255,255,255,0.10)",
+              padding: `${cq(18)} ${cq(20)}`,
+              minHeight: cq(86),
+              marginBottom: cq(20),
+            }}
+          >
             {content.clientLogoUrl ? (
               <img
                 src={content.clientLogoUrl}
                 alt={content.preparedFor?.company ? `${content.preparedFor.company} logo` : ""}
-                style={{ height: cq(32), width: "auto", maxWidth: cq(200), objectFit: "contain" }}
+                style={{ maxHeight: cq(60), maxWidth: "70%", objectFit: "contain" }}
               />
-            ) : null}
+            ) : (
+              <span
+                style={{
+                  fontSize: cq(10),
+                  fontWeight: 700,
+                  letterSpacing: "0.24em",
+                  textTransform: "uppercase",
+                  color: "rgba(255,255,255,0.72)",
+                }}
+              >
+                Client logo
+              </span>
+            )}
           </div>
-          {page.body && <Body tokens={t}>{page.body}</Body>}
-          <CoverParties tokens={t} content={content} />
+          <div
+            style={{
+              borderRadius: cq(20),
+              background: mode === "dark" ? "rgba(255,255,255,0.10)" : "#FFFFFF",
+              padding: `${cq(20)} ${cq(20)}`,
+            }}
+          >
+            {page.body && <Body tokens={plate}>{page.body}</Body>}
+            <CoverParties tokens={plate} content={content} />
+          </div>
         </div>
       );
+    }
+
     case "stats":
       return (
         <div>
@@ -1312,8 +1560,9 @@ function PageBody({
       return (
         <div>
           {page.body && <Body tokens={t}>{page.body}</Body>}
-          <StatGrid tokens={t} stats={page.stats} />
+          <WorldMap />
           <Locations tokens={t} locations={page.locations} />
+          <StatGrid tokens={t} stats={page.stats} />
         </div>
       );
     case "clients":
@@ -1322,7 +1571,6 @@ function PageBody({
           <LogoWall tokens={t} logos={page.logos ?? []} />
           <StatGrid tokens={t} stats={page.stats} />
         </div>
-
       );
     case "success-stories":
       return (
@@ -1343,7 +1591,8 @@ function PageBody({
       return (
         <div>
           {page.body && <Body tokens={t}>{page.body}</Body>}
-          <CardGrid tokens={t} cards={page.cards} />
+          <MarkWall tiles={CAUSE_LOGOS} cols={3} marginTop={24} />
+          <MarkWall tiles={AFFINITY_LOGOS} cols={4} marginTop={26} />
           <Quotes tokens={t} quotes={page.quotes} />
         </div>
       );
@@ -1351,9 +1600,21 @@ function PageBody({
       return (
         <div>
           {page.body && <Body tokens={t}>{page.body}</Body>}
+          <img
+            src={PROPOSAL_ART.teamGrid}
+            alt="TransPerfect project team"
+            style={{
+              display: "block",
+              width: "100%",
+              height: "auto",
+              marginTop: cq(18),
+              borderRadius: cq(16),
+            }}
+          />
           <TeamGrid tokens={t} team={page.team ?? content.team} />
         </div>
       );
+
     case "team-bio":
       return (
         <div>
