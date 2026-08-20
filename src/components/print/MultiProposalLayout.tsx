@@ -598,13 +598,13 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
               <div key={i}>
                 <Rule x={0.75} y={y + 0.44} w={7.02} color="rgba(3,0,44,0.14)" />
                 <T x={0.92} y={y + 0.12} w={3.6} size={11} color={NAVY}>
-                  {row.service ?? ""}
+                  {row.item ?? ""}
                 </T>
                 <T x={4.6} y={y + 0.12} w={1.4} size={11} color="#555555">
-                  {row.volume ?? ""}
+                  {row.qty ?? row.detail ?? ""}
                 </T>
                 <T x={5.9} y={y + 0.12} w={1.7} size={11} weight={600} color={NAVY} align="right">
-                  {row.amount ?? ""}
+                  {row.price ?? ""}
                 </T>
               </div>
             );
