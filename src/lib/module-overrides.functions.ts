@@ -9,7 +9,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const scope = z.enum(["print", "deck"]);
+const scope = z.enum(["print", "deck", "library"]);
 
 const patchSchema = z.object({
   label: z.string().nullable().optional(),
@@ -20,6 +20,12 @@ const patchSchema = z.object({
   hidden: z.boolean().optional(),
   content: z.record(z.string(), z.unknown()).nullable().optional(),
   notes: z.string().nullable().optional(),
+  // Library-scope only: master edits to a curated print item's metadata and
+  // look & feel.
+  blurb: z.string().nullable().optional(),
+  collection: z.string().nullable().optional(),
+  heroUrl: z.string().nullable().optional(),
+  look: z.record(z.string(), z.unknown()).nullable().optional(),
 });
 
 export const listModuleOverrides = createServerFn({ method: "GET" })
@@ -53,6 +59,10 @@ export const saveModuleOverride = createServerFn({ method: "POST" })
     if (p.hidden !== undefined) row.hidden = p.hidden;
     if (p.content !== undefined) row.content = p.content;
     if (p.notes !== undefined) row.notes = p.notes;
+    if (p.blurb !== undefined) row.blurb = p.blurb;
+    if (p.collection !== undefined) row.collection = p.collection;
+    if (p.heroUrl !== undefined) row.hero_url = p.heroUrl;
+    if (p.look !== undefined) row.look = p.look;
 
     const { data: saved, error } = await context.supabase
       .from("module_overrides")

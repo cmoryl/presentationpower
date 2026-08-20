@@ -10,9 +10,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { listModuleOverrides } from "@/lib/module-overrides.functions";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 import type { PrintModuleDensity, PrintSectionModule } from "@/lib/print-library/section-modules";
+import type { PrintLibraryItem } from "@/lib/print-library/catalog";
+import { parseLook } from "@/lib/print-library/look";
 import type { ModuleVariant } from "@/lib/taxonomy";
 
-export type ModuleOverrideScope = "print" | "deck";
+export type ModuleOverrideScope = "print" | "deck" | "library";
 
 export type ModuleOverrideRow = {
   id: string;
@@ -27,6 +29,11 @@ export type ModuleOverrideRow = {
   content: unknown;
   notes: string | null;
   updated_at: string;
+  /** Library scope only — master metadata + look & feel patches. */
+  blurb?: string | null;
+  collection?: string | null;
+  hero_url?: string | null;
+  look?: unknown;
 };
 
 export type ModuleOverrideMap = Map<string, ModuleOverrideRow>;
@@ -72,6 +79,40 @@ export function applyPrintOverrides(
   return modules
     .filter((m) => opts.includeHidden || !overrides.get(m.id)?.hidden)
     .map((m) => applyPrintOverride(m, overrides.get(m.id)));
+}
+
+/**
+ * Merge one library-scope override over a curated / template print item.
+ * Any field the admin left blank falls through to the shipped definition.
+ */
+export function applyLibraryOverride(
+  item: PrintLibraryItem,
+  ov?: ModuleOverrideRow,
+): PrintLibraryItem {
+  if (!ov) return item;
+  const next: PrintLibraryItem = { ...item };
+  if (ov.label?.trim()) next.title = ov.label.trim();
+  if (ov.blurb?.trim()) next.blurb = ov.blurb.trim();
+  if (ov.description?.trim() && !ov.blurb?.trim()) next.blurb = ov.description.trim();
+  if (ov.tags && ov.tags.length) next.tags = ov.tags;
+  if (ov.collection?.trim()) next.collection = ov.collection.trim();
+  if (ov.hero_url?.trim()) next.heroUrl = ov.hero_url.trim();
+  const look = parseLook(ov.look);
+  if (look) next.look = look;
+  if (ov.content && typeof ov.content === "object" && !Array.isArray(ov.content))
+    next.content = ov.content as Record<string, unknown>;
+  return next;
+}
+
+/** Apply library overrides across an item list, dropping hidden entries. */
+export function applyLibraryOverrides(
+  items: PrintLibraryItem[],
+  overrides: ModuleOverrideMap,
+  opts: { includeHidden?: boolean } = {},
+): PrintLibraryItem[] {
+  return items
+    .filter((i) => opts.includeHidden || !overrides.get(i.id)?.hidden)
+    .map((i) => applyLibraryOverride(i, overrides.get(i.id)));
 }
 
 /** Merge one override over a presentation module variant. */
