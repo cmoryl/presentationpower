@@ -1986,13 +1986,17 @@ export type Database = {
       module_overrides: {
         Row: {
           best_for: string[] | null
+          blurb: string | null
+          collection: string | null
           content: Json | null
           created_at: string
           density: string | null
           description: string | null
+          hero_url: string | null
           hidden: boolean
           id: string
           label: string | null
+          look: Json | null
           module_id: string
           notes: string | null
           scope: string
@@ -2002,13 +2006,17 @@ export type Database = {
         }
         Insert: {
           best_for?: string[] | null
+          blurb?: string | null
+          collection?: string | null
           content?: Json | null
           created_at?: string
           density?: string | null
           description?: string | null
+          hero_url?: string | null
           hidden?: boolean
           id?: string
           label?: string | null
+          look?: Json | null
           module_id: string
           notes?: string | null
           scope: string
@@ -2018,13 +2026,17 @@ export type Database = {
         }
         Update: {
           best_for?: string[] | null
+          blurb?: string | null
+          collection?: string | null
           content?: Json | null
           created_at?: string
           density?: string | null
           description?: string | null
+          hero_url?: string | null
           hidden?: boolean
           id?: string
           label?: string | null
+          look?: Json | null
           module_id?: string
           notes?: string | null
           scope?: string
