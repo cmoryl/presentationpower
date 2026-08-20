@@ -97,6 +97,7 @@ function bg(section: PrintHeroSection) {
  */
 export function HeroPhotoBand({ section, mode, accent }: Props) {
   const ink = sectionInk(mode);
+  const bandH = useBandHeight(section.heightPct, 0.62);
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(20) }}>
       <div
