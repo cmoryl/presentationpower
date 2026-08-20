@@ -137,7 +137,9 @@ export function EditableImage({
         className="absolute inset-0 flex items-center justify-center rounded-[inherit] text-[9px] font-semibold uppercase tracking-[0.14em] outline-none transition"
         style={{
           background: over ? "rgba(0,63,199,0.22)" : "transparent",
-          border: over ? "2px dashed #003FC7" : "2px dashed transparent",
+          // Slots stay visible while editing so every replaceable logo/photo
+          // reads as a drop target without hunting for it on hover.
+          border: over ? "2px dashed #003FC7" : "1px dashed rgba(0,63,199,0.38)",
           color: "#03002C",
         }}
       >

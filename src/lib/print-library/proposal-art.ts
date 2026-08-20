@@ -9,6 +9,12 @@ import photoClouds from "@/assets/proposal/photo-clouds.jpeg.asset.json";
 import logoLufthansa from "@/assets/proposal/logo-lufthansa.svg.asset.json";
 import logoLavazza from "@/assets/proposal/logo-lavazza.svg.asset.json";
 import photoCoffee from "@/assets/proposal/photo-coffee.jpeg.asset.json";
+import hs1 from "@/assets/proposal/headshots/hs-1.jpg.asset.json";
+import hs2 from "@/assets/proposal/headshots/hs-2.jpg.asset.json";
+import hs3 from "@/assets/proposal/headshots/hs-3.jpg.asset.json";
+import hs4 from "@/assets/proposal/headshots/hs-4.jpg.asset.json";
+import hs5 from "@/assets/proposal/headshots/hs-5.jpg.asset.json";
+import hs6 from "@/assets/proposal/headshots/hs-6.jpg.asset.json";
 
 import samsung from "@/assets/proposal/client-samsung.png.asset.json";
 import amazon from "@/assets/proposal/client-amazon.png.asset.json";
@@ -54,6 +60,25 @@ export const PROPOSAL_ART = {
  * these slots (no real client logos), so the map ships empty: the layout draws
  * the company wordmark and exposes an editable logo slot for a real upload.
  */
+/**
+ * Demo team headshots. Used as the placeholder portrait for any team member
+ * without a photo so the team pages read as finished documents; every slot is
+ * still drag-and-drop replaceable in the editor.
+ */
+export const DEMO_HEADSHOTS: string[] = [
+  hs1.url,
+  hs2.url,
+  hs3.url,
+  hs4.url,
+  hs5.url,
+  hs6.url,
+];
+
+/** Deterministic demo headshot for a given index. */
+export function demoHeadshot(i: number): string {
+  return DEMO_HEADSHOTS[((i % DEMO_HEADSHOTS.length) + DEMO_HEADSHOTS.length) % DEMO_HEADSHOTS.length]!;
+}
+
 export const STORY_LOGOS: Record<string, string> = {};
 
 /** Extracted dot decorations from the source slide (kept for reference). */
