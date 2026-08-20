@@ -125,6 +125,7 @@ import { Route as ApiPublicSkinBackdropRouteImport } from './routes/api/public/s
 import { Route as ApiPublicPdfIndexProxyRouteImport } from './routes/api/public/pdf-index-proxy'
 import { Route as ApiPublicDivisionImageRouteImport } from './routes/api/public/division-image'
 import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/public/brandhub-seed-proxy'
+import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.print-library_.$itemId'
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -719,6 +720,11 @@ const ApiPublicBrandhubSeedProxyRoute =
     path: '/api/public/brandhub-seed-proxy',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminPrintLibraryItemIdRoute = AdminPrintLibraryItemIdRouteImport.update({
+  id: '/print-library_/$itemId',
+  path: '/print-library/$itemId',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCampaignsKitRoute = AdminCampaignsKitRouteImport.update({
   id: '/kit',
   path: '/kit',
@@ -840,6 +846,7 @@ export interface FileRoutesByFullPath {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
+  '/admin/print-library/$itemId': typeof AdminPrintLibraryItemIdRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -958,6 +965,7 @@ export interface FileRoutesByTo {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
+  '/admin/print-library/$itemId': typeof AdminPrintLibraryItemIdRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -1081,6 +1089,7 @@ export interface FileRoutesById {
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/admin/campaigns/kit': typeof AdminCampaignsKitRoute
+  '/admin/print-library_/$itemId': typeof AdminPrintLibraryItemIdRoute
   '/api/public/brandhub-seed-proxy': typeof ApiPublicBrandhubSeedProxyRoute
   '/api/public/division-image': typeof ApiPublicDivisionImageRoute
   '/api/public/pdf-index-proxy': typeof ApiPublicPdfIndexProxyRoute
@@ -1205,6 +1214,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/campaigns/kit'
+    | '/admin/print-library/$itemId'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
@@ -1323,6 +1333,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/campaigns/kit'
+    | '/admin/print-library/$itemId'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
@@ -1445,6 +1456,7 @@ export interface FileRouteTypes {
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/admin/campaigns/kit'
+    | '/admin/print-library_/$itemId'
     | '/api/public/brandhub-seed-proxy'
     | '/api/public/division-image'
     | '/api/public/pdf-index-proxy'
@@ -2357,6 +2369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBrandhubSeedProxyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/print-library_/$itemId': {
+      id: '/admin/print-library_/$itemId'
+      path: '/print-library/$itemId'
+      fullPath: '/admin/print-library/$itemId'
+      preLoaderRoute: typeof AdminPrintLibraryItemIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/campaigns/kit': {
       id: '/admin/campaigns/kit'
       path: '/kit'
@@ -2427,6 +2446,7 @@ interface AdminRouteChildren {
   AdminTranslationRoute: typeof AdminTranslationRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminPrintLibraryItemIdRoute: typeof AdminPrintLibraryItemIdRoute
   AdminModulesPrintModuleIdRoute: typeof AdminModulesPrintModuleIdRoute
 }
 
@@ -2457,6 +2477,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminTranslationRoute: AdminTranslationRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminPrintLibraryItemIdRoute: AdminPrintLibraryItemIdRoute,
   AdminModulesPrintModuleIdRoute: AdminModulesPrintModuleIdRoute,
 }
 
