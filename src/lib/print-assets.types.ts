@@ -382,6 +382,11 @@ export type CaseStudyContent = {
   // in the footer lockup below the CTA band.
   footer?: { links: string[] };
   heroMedia?: PrintHeroMedia;
+  /** Masthead rule styling for the page opener — same contract as the modular
+   *  hero sections, so the inspector controls drive legacy openers too. */
+  heroRule?: PrintHeroRule;
+  /** Title-block typography overrides for the page opener. */
+  heroTitleType?: PrintHeroTitleType;
   /** Reusable shared-module blocks inserted between body content and CTA. */
   modules?: PrintSection[];
 };
@@ -413,6 +418,11 @@ export type SpotlightContent = {
   expert?: { name: string; role?: string; email?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
+  /** Masthead rule styling for the page opener — same contract as the modular
+   *  hero sections, so the inspector controls drive legacy openers too. */
+  heroRule?: PrintHeroRule;
+  /** Title-block typography overrides for the page opener. */
+  heroTitleType?: PrintHeroTitleType;
   modules?: PrintSection[];
 };
 
@@ -439,6 +449,11 @@ export type EBrochureContent = {
   discover?: { body: string; bullets: string[] }; // right-hand "Discover" panel
   cta?: { label: string; url?: string; subhead?: string };
   heroMedia?: PrintHeroMedia;
+  /** Masthead rule styling for the page opener — same contract as the modular
+   *  hero sections, so the inspector controls drive legacy openers too. */
+  heroRule?: PrintHeroRule;
+  /** Title-block typography overrides for the page opener. */
+  heroTitleType?: PrintHeroTitleType;
   modules?: PrintSection[];
 };
 
@@ -462,6 +477,11 @@ export type AdaptorBriefContent = {
   quote?: { text: string; author: string; role?: string; company?: string };
   cta?: { label: string; url?: string };
   heroMedia?: PrintHeroMedia;
+  /** Masthead rule styling for the page opener — same contract as the modular
+   *  hero sections, so the inspector controls drive legacy openers too. */
+  heroRule?: PrintHeroRule;
+  /** Title-block typography overrides for the page opener. */
+  heroTitleType?: PrintHeroTitleType;
   modules?: PrintSection[];
 };
 
@@ -593,6 +613,11 @@ export type MsaPartnershipContent = {
   contacts?: MsaContacts;
   footerUrl?: string; // e.g. "lifesciences.transperfect.com"
   heroMedia?: PrintHeroMedia;
+  /** Masthead rule styling for the page opener — same contract as the modular
+   *  hero sections, so the inspector controls drive legacy openers too. */
+  heroRule?: PrintHeroRule;
+  /** Title-block typography overrides for the page opener. */
+  heroTitleType?: PrintHeroTitleType;
   modules?: PrintSection[];
 };
 
