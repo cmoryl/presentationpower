@@ -1,16 +1,30 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { BrandMode } from "@/lib/taxonomy";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { byId } from "@/lib/taxonomy";
 import { applyDeckOverrides, useModuleOverrides } from "@/lib/module-overrides";
+import { Sparkles } from "lucide-react";
 import {
+  ICON_SIZES,
   ICON_PLACEMENTS_META,
+  ICON_TREATMENTS_META,
+  ICON_EMPHASIS_META,
+  resolveEmphasisColors,
   iconographyForVariant,
   familyIcon,
+  type IconTreatment,
+  type IconEmphasis,
+  type IconSizeToken,
 } from "@/lib/iconography";
-import { LOGO_POSITIONS_META, resolveLogoPlacement } from "@/lib/logo-placement";
+import {
+  LOGO_POSITIONS_META,
+  LOGO_POSITION_BY_LAYOUT,
+  resolveLogoPlacement,
+} from "@/lib/logo-placement";
 import { BrandLockup } from "@/components/BrandLockup";
+
 import { DESIGN_SKINS, INDUSTRY_RECIPES } from "@/lib/design-skins";
 import {
   PRINT_SECTION_MODULES,
