@@ -20,6 +20,7 @@ import { Route as ImageryRouteImport } from './routes/imagery'
 import { Route as FilesRouteImport } from './routes/files'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as EventsRouteImport } from './routes/events'
+import { Route as ElementsRouteImport } from './routes/elements'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
@@ -182,6 +183,11 @@ const FaqRoute = FaqRouteImport.update({
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ElementsRoute = ElementsRouteImport.update({
+  id: '/elements',
+  path: '/elements',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -743,6 +749,7 @@ export interface FileRoutesByFullPath {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/elements': typeof ElementsRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/files': typeof FilesRoute
@@ -863,6 +870,7 @@ export interface FileRoutesByTo {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/elements': typeof ElementsRoute
   '/faq': typeof FaqRoute
   '/files': typeof FilesRoute
   '/imagery': typeof ImageryRoute
@@ -982,6 +990,7 @@ export interface FileRoutesById {
   '/analytics': typeof AnalyticsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
+  '/elements': typeof ElementsRoute
   '/events': typeof EventsRouteWithChildren
   '/faq': typeof FaqRoute
   '/files': typeof FilesRoute
@@ -1105,6 +1114,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/elements'
     | '/events'
     | '/faq'
     | '/files'
@@ -1225,6 +1235,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/elements'
     | '/faq'
     | '/files'
     | '/imagery'
@@ -1343,6 +1354,7 @@ export interface FileRouteTypes {
     | '/analytics'
     | '/atlas'
     | '/auth'
+    | '/elements'
     | '/events'
     | '/faq'
     | '/files'
@@ -1465,6 +1477,7 @@ export interface RootRouteChildren {
   AnalyticsRoute: typeof AnalyticsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
+  ElementsRoute: typeof ElementsRoute
   EventsRoute: typeof EventsRouteWithChildren
   FaqRoute: typeof FaqRoute
   FilesRoute: typeof FilesRoute
@@ -1607,6 +1620,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events'
       preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elements': {
+      id: '/elements'
+      path: '/elements'
+      fullPath: '/elements'
+      preLoaderRoute: typeof ElementsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -2522,6 +2542,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalyticsRoute: AnalyticsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
+  ElementsRoute: ElementsRoute,
   EventsRoute: EventsRouteWithChildren,
   FaqRoute: FaqRoute,
   FilesRoute: FilesRoute,
