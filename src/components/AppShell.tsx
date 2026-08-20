@@ -1,7 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { useTheme, type ThemeMode } from "@/hooks/use-theme";
 import { AdminSidebar } from "@/components/AdminShell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ElementLockup } from "@/components/brand/ElementLogo";
@@ -23,7 +22,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const locSearch = useRouterState({ select: (s) => s.location.searchStr });
 
-  const [theme, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
   const [presOpen, setPresOpen] = useState(false);
   
@@ -45,6 +43,19 @@ export function AppShell({ children }: { children: ReactNode }) {
     document.documentElement.classList.remove("contrast-boost");
   }, []);
 
+  // Dark mode is retired from the main navigation: the app ships light-only for
+  // now, so pin any stored preference (including old "dark" sessions) to light.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("tp:theme-mode", "light");
+    } catch {
+      /* ignore */
+    }
+    document.documentElement.setAttribute("data-theme", "light");
+    document.documentElement.classList.remove("dark");
+  }, []);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (inAdmin) {
@@ -59,10 +70,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname, inAdmin, isAdminLinked]);
 
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
-  const themes: { id: ThemeMode; label: string }[] = [
-    { id: "light", label: "Light" },
-    { id: "dark", label: "Dark" },
-  ];
   const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
@@ -403,31 +410,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
-            <div
-              role="radiogroup"
-              aria-label="Color theme"
-              className="ml-1 inline-flex items-center rounded-full border border-white/40 bg-white/30 p-0.5 text-xs dark:!border-white/10 dark:!bg-white/[0.03]"
-            >
-              {themes.map((t) => {
-                const on = theme === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => setTheme(t.id)}
-                    className={`rounded-full px-2.5 py-1 transition ${
-                      on
-                        ? "bg-white/70 text-[#03002C] ring-1 ring-black/[0.04] dark:!bg-white/[0.08] dark:!text-white dark:!ring-white/10"
-                        : "text-black/60 hover:text-black dark:text-white/65 dark:hover:text-white"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                );
-              })}
-            </div>
           </nav>
         </div>
       </header>
