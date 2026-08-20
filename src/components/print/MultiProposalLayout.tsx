@@ -2255,7 +2255,7 @@ function PageBody({
     case "cost":
       return <CostPage page={page} logoWhite={logoWhite} />;
     case "locations":
-      return <LocationsPage page={page} pageIndex={pageIndex} />;
+      return <LocationsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "clients":
       return <ClientsPage page={page} logoWhite={logoWhite} />;
     case "success-stories":
