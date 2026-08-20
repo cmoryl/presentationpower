@@ -266,6 +266,46 @@ export function ProposalWorldMap({
         ))}
       </svg>
 
+      {editable && onChange ? (
+        <div
+          data-export-ignore-chrome
+          style={{
+            position: "absolute",
+            bottom: 8,
+            right: 8,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.92)",
+            padding: 4,
+            boxShadow: "0 1px 4px rgba(3,0,44,0.25)",
+          }}
+        >
+          <button
+            type="button"
+            aria-label="Undo pin change"
+            title="Undo pin change (⌘Z)"
+            onClick={undo}
+            disabled={!past.length}
+            style={{ ...zoomBtn(!past.length), width: "auto", padding: "0 8px", fontSize: 10 }}
+          >
+            ↶ Undo
+          </button>
+          <button
+            type="button"
+            aria-label="Redo pin change"
+            title="Redo pin change (⇧⌘Z)"
+            onClick={redo}
+            disabled={!future.length}
+            style={{ ...zoomBtn(!future.length), width: "auto", padding: "0 8px", fontSize: 10 }}
+          >
+            Redo ↷
+          </button>
+        </div>
+      ) : null}
+
+
       <div
         data-export-ignore-chrome
         style={{
