@@ -127,6 +127,7 @@ import { Route as ApiPublicBrandhubSeedProxyRouteImport } from './routes/api/pub
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 
 const TemplatesRoute = TemplatesRouteImport.update({
   id: '/templates',
@@ -728,6 +729,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminModulesPrintModuleIdRoute =
+  AdminModulesPrintModuleIdRouteImport.update({
+    id: '/modules_/print/$moduleId',
+    path: '/modules/print/$moduleId',
+    getParentRoute: () => AdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -848,6 +855,7 @@ export interface FileRoutesByFullPath {
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
+  '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -964,6 +972,7 @@ export interface FileRoutesByTo {
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
+  '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1085,6 +1094,7 @@ export interface FileRoutesById {
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
+  '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1207,6 +1217,7 @@ export interface FileRouteTypes {
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
+    | '/admin/modules/print/$moduleId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1323,6 +1334,7 @@ export interface FileRouteTypes {
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
+    | '/admin/modules/print/$moduleId'
   id:
     | '__root__'
     | '/'
@@ -1443,6 +1455,7 @@ export interface FileRouteTypes {
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
+    | '/admin/modules_/print/$moduleId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -2345,6 +2358,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/modules_/print/$moduleId': {
+      id: '/admin/modules_/print/$moduleId'
+      path: '/modules/print/$moduleId'
+      fullPath: '/admin/modules/print/$moduleId'
+      preLoaderRoute: typeof AdminModulesPrintModuleIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -2387,6 +2407,7 @@ interface AdminRouteChildren {
   AdminTranslationRoute: typeof AdminTranslationRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminModulesPrintModuleIdRoute: typeof AdminModulesPrintModuleIdRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -2416,6 +2437,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminTranslationRoute: AdminTranslationRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminModulesPrintModuleIdRoute: AdminModulesPrintModuleIdRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
