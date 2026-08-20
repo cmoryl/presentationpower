@@ -887,7 +887,15 @@ const REGION_COLS: Record<
   APAC: { headX: 6.35, headY: 8.75, cols: [6.36, 6.98, 7.52], colY: 9.0, colW: 0.62 },
 };
 
-function LocationsPage({ page, pageIndex }: { page: MultiProposalPage; pageIndex: number }) {
+function LocationsPage({
+  page,
+  pageIndex,
+  logoWhite,
+}: {
+  page: MultiProposalPage;
+  pageIndex: number;
+  logoWhite: string;
+}) {
   const title = lines(page.title).length ? lines(page.title) : ["Global", "Locations"];
   const listCtx = usePrintLogoList();
   const pinPath = `pages.${pageIndex}.mapPins`;
@@ -896,19 +904,34 @@ function LocationsPage({ page, pageIndex }: { page: MultiProposalPage; pageIndex
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
 
-      <Plate x={0.55} y={0.85} w={7.42} h={2.02} radius={0.16} bg="rgba(255,255,255,0.14)" />
+      {/* Header follows the shared band-header rhythm (eyebrow, left-aligned
+          display title, logo top-right, hairline rule) in a dark-field key. */}
+      <Img
+        x={6.38}
+        y={0.5}
+        w={1.88}
+        h={0.28}
+        src={logoWhite}
+        alt="TransPerfect"
+        slot="band.logo"
+        label="logo"
+      />
+      <T x={0.47} y={0.55} w={4} size={8.4} weight={700} color={AQUA_FIELD} upper tracking="0.16em">
+        Our Footprint
+      </T>
       <T
-        x={0.55}
-        y={1.24}
-        w={7.42}
-        size={40}
+        x={0.47}
+        y={0.86}
+        w={5.6}
+        size={39.7}
         weight={700}
-        align="center"
-        leading={1.14}
+        leading={1.05}
         tracking="-0.02em"
       >
         {title.join("\n")}
       </T>
+      <Rule x={0.47} y={2.34} w={7.79} color="rgba(255,255,255,0.28)" />
+
 
       {/* Vector map: landmass artwork + author-editable office pins. */}
       <L x={-0.61} y={2.62} w={9.72} h={5.3}>
