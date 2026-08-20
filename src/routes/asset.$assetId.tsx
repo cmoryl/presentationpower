@@ -45,6 +45,7 @@ import {
   emptyEBrochure,
   emptyAdaptorBrief,
   emptyMsaPartnership,
+  emptySolutionProposal,
 } from "@/lib/print-assets.types";
 import type {
   PrintSection,
@@ -73,6 +74,7 @@ import type {
   EBrochureContent,
   AdaptorBriefContent,
   MsaPartnershipContent,
+  SolutionProposalContent,
 } from "@/lib/print-assets.types";
 import {
   PRINT_STATS_VARIANTS,
@@ -161,6 +163,7 @@ import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
+import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import { ContentInspector } from "@/components/print/ContentInspector";
 import { schemaFor } from "@/lib/print-content-schema";
@@ -521,7 +524,8 @@ function AssetEditor() {
     | "spotlight"
     | "ebrochure"
     | "adaptor-brief"
-    | "msa-partnership";
+    | "msa-partnership"
+    | "solution-proposal";
   useEffect(() => {
     if (!import.meta.env.DEV) return;
     if (!row) return;
@@ -556,7 +560,8 @@ function AssetEditor() {
     | "spotlight"
     | "ebrochure"
     | "adaptor-brief"
-    | "msa-partnership";
+    | "msa-partnership"
+    | "solution-proposal";
   // Stable identity matters: this object is the `dep` for the content-fit
   // frame, the overflow hook and the section overlay. A fresh object every
   // render restarted all three, which is what made the canvas flicker.
@@ -570,6 +575,8 @@ function AssetEditor() {
       return { ...(emptyAdaptorBrief() as unknown as Record<string, unknown>), ...c };
     if (kind === "msa-partnership")
       return { ...(emptyMsaPartnership() as unknown as Record<string, unknown>), ...c };
+    if (kind === "solution-proposal")
+      return { ...(emptySolutionProposal() as unknown as Record<string, unknown>), ...c };
     return { ...(emptyCaseStudy() as unknown as Record<string, unknown>), ...c };
   });
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
@@ -1325,6 +1332,16 @@ function AssetEditor() {
                           {brand && kind === "msa-partnership" && (
                             <MsaPartnershipLayout
                               content={rawContent as unknown as MsaPartnershipContent}
+                              brand={brand}
+                              mode={editorMode}
+                              pageSize={pageSize}
+                              density={density}
+                              seed={`asset-${row.id}`}
+                            />
+                          )}
+                          {brand && kind === "solution-proposal" && (
+                            <SolutionProposalLayout
+                              content={rawContent as unknown as SolutionProposalContent}
                               brand={brand}
                               mode={editorMode}
                               pageSize={pageSize}
@@ -2269,7 +2286,13 @@ function ModulesPanel({
   hasTitle,
   hasSummary,
 }: {
-  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief" | "msa-partnership";
+  kind:
+    | "case-study"
+    | "spotlight"
+    | "ebrochure"
+    | "adaptor-brief"
+    | "msa-partnership"
+    | "solution-proposal";
   modules: PrintSection[];
   onAdd: () => void;
   onChange: (next: PrintSection[]) => void;
@@ -2803,7 +2826,13 @@ function HeroMediaPanel({
   onChange: (next: PrintHeroMedia | undefined) => void;
   divisionId: string | null;
   brand: BrandMode | undefined;
-  kind: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief" | "msa-partnership";
+  kind:
+    | "case-study"
+    | "spotlight"
+    | "ebrochure"
+    | "adaptor-brief"
+    | "msa-partnership"
+    | "solution-proposal";
   assetId: string | null;
   hasTitle?: boolean;
   hasSummary?: boolean;

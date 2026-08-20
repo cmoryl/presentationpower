@@ -631,12 +631,99 @@ export type MsaPartnershipContent = {
   modules?: PrintSection[];
 };
 
+// ---------------------------------------------------------------------------
+// SOLUTION PROPOSAL — the division-specific master proposal one-pager.
+// Ported from TransPerfect_Solutions_Proposal_Template.pptx: prepared-for /
+// prepared-by cover block, "What's included" service scope, source files +
+// deliverables + timeline grid, a cost summary table, proof (stats + quote),
+// and the account team panel.
+// ---------------------------------------------------------------------------
+
+/** One side of the cover block (client or TransPerfect). */
+export type ProposalParty = {
+  /** Column heading, e.g. "Prepared for:" — defaults per side. */
+  label?: string;
+  contact?: string;
+  role?: string;
+  company?: string;
+  address1?: string;
+  address2?: string;
+  email?: string;
+  phone?: string;
+};
+
+/** A scope line in "What's included". */
+export type ProposalScopeItem = {
+  label: string;
+  /** IconName from print-primitives — falls back to a rotating default set. */
+  icon?: string;
+  detail?: string;
+};
+
+/** A row in the cost summary table. */
+export type ProposalCostRow = {
+  item: string;
+  detail?: string;
+  qty?: string;
+  price?: string;
+};
+
+/** An account-team card. */
+export type ProposalTeamMember = {
+  name: string;
+  role?: string;
+  office?: string;
+  email?: string;
+};
+
+export type SolutionProposalContent = {
+  eyebrow?: string; // e.g. "Solutions proposal"
+  logoColor?: PrintLogoColor;
+  /** Masthead title, e.g. "Solutions proposal". */
+  title: string;
+  subtitle?: string;
+  /** Client logo shown opposite the TransPerfect mark ("insert client logo"). */
+  clientLogoUrl?: string;
+  preparedFor: ProposalParty;
+  preparedBy: ProposalParty;
+  dateLabel?: string; // "MM.DD.YY"
+  summary?: string; // positioning paragraph under the masthead
+  includedTitle?: string; // default "What's included"
+  included: ProposalScopeItem[]; // up to 8
+  sourceFilesTitle?: string; // default "Source files"
+  sourceFiles: string[]; // up to 6
+  deliverablesTitle?: string; // default "Deliverables"
+  deliverables: string[]; // up to 6
+  timelineTitle?: string; // default "Timeline"
+  timelineNote: string;
+  costTitle?: string; // default "Cost summary"
+  costRows: ProposalCostRow[]; // up to 8
+  costTotalLabel?: string; // default "Total"
+  costTotal?: string;
+  costNote?: string;
+  /** Proof metrics beside the cost table. */
+  stats?: CaseStudyStat[]; // up to 4
+  quote?: { text: string; author: string; role?: string; company?: string };
+  teamTitle?: string; // default "Your team"
+  team: ProposalTeamMember[]; // up to 4
+  nextStepsTitle?: string; // default "Next steps"
+  nextSteps?: string[]; // up to 5
+  contacts?: MsaContacts;
+  footerUrl?: string;
+  heroMedia?: PrintHeroMedia;
+  /** Masthead rule styling — same contract as the modular hero sections. */
+  heroRule?: PrintHeroRule;
+  heroTitleType?: PrintHeroTitleType;
+  modules?: PrintSection[];
+};
+
 export type PrintAssetKind =
   | "case-study"
   | "spotlight"
   | "ebrochure"
   | "adaptor-brief"
-  | "msa-partnership";
+  | "msa-partnership"
+  | "solution-proposal";
 
 export type PrintAssetRow = {
   id: string;
@@ -971,6 +1058,94 @@ export function emptyMsaPartnership(seed?: Partial<MsaPartnershipContent>): MsaP
     },
     footerUrl: seed?.footerUrl ?? "transperfect.com",
     heroMedia: seed?.heroMedia,
+    modules: seed?.modules ?? [],
+  };
+}
+
+export function emptySolutionProposal(
+  seed?: Partial<SolutionProposalContent>,
+): SolutionProposalContent {
+  const client = seed?.preparedFor?.company || "Client Company";
+  return {
+    eyebrow: seed?.eyebrow ?? "Solutions proposal",
+    logoColor: seed?.logoColor,
+    title: seed?.title ?? "Solutions proposal",
+    subtitle: seed?.subtitle ?? "Scope, deliverables, timeline, and investment",
+    clientLogoUrl: seed?.clientLogoUrl,
+    preparedFor: seed?.preparedFor ?? {
+      label: "Prepared for:",
+      contact: "Client Contact",
+      role: "Title",
+      company: client,
+      address1: "Address One",
+      address2: "City, Zip",
+      email: "client@example.com",
+    },
+    preparedBy: seed?.preparedBy ?? {
+      label: "Prepared by:",
+      contact: "Contact",
+      role: "Title",
+      company: "TransPerfect",
+      address1: "Address One",
+      address2: "City, Zip",
+      email: "you@transperfect.com",
+    },
+    dateLabel: seed?.dateLabel ?? "MM.DD.YY",
+    summary:
+      seed?.summary ??
+      `This proposal outlines the scope, deliverables, schedule, and investment for the work requested by ${client}, delivered by TransPerfect's dedicated program team.`,
+    includedTitle: seed?.includedTitle ?? "What's included",
+    included: seed?.included ?? [
+      { label: "Language pre-flight", icon: "check" },
+      { label: "Localization", icon: "language" },
+      { label: "Desktop publishing", icon: "grid" },
+      { label: "Project management", icon: "users" },
+    ],
+    sourceFilesTitle: seed?.sourceFilesTitle ?? "Source files",
+    sourceFiles: seed?.sourceFiles ?? ["1 PDF document"],
+    deliverablesTitle: seed?.deliverablesTitle ?? "Deliverables",
+    deliverables: seed?.deliverables ?? ["1 PDF document", "1 certificate of accuracy"],
+    timelineTitle: seed?.timelineTitle ?? "Timeline",
+    timelineNote:
+      seed?.timelineNote ??
+      `Project timeline is estimated at X business days from written approval. ${client} has requested a rush X-day turnaround time.`,
+    costTitle: seed?.costTitle ?? "Cost summary",
+    costRows: seed?.costRows ?? [
+      { item: "Translation", detail: "Per word, 1 target language", qty: "0", price: "$0.00" },
+      { item: "Desktop publishing", detail: "Per page", qty: "0", price: "$0.00" },
+      { item: "Project management", detail: "Program oversight", qty: "1", price: "$0.00" },
+    ],
+    costTotalLabel: seed?.costTotalLabel ?? "Total investment",
+    costTotal: seed?.costTotal ?? "$0.00",
+    costNote:
+      seed?.costNote ??
+      "Pricing is valid for 30 days and assumes final source files. Rush turnaround, additional languages, or scope changes are quoted separately.",
+    stats: seed?.stats ?? [
+      { label: "Languages supported", value: "200", unit: "+" },
+      { label: "Faster time-to-market", value: "3.4", unit: "x" },
+      { label: "On-time delivery", value: "99", unit: "%" },
+    ],
+    quote: seed?.quote ?? {
+      text: "They didn't just translate our content — they rebuilt how we ship it. We're moving at a pace we couldn't have imagined last year.",
+      author: "VP of Global Marketing",
+    },
+    teamTitle: seed?.teamTitle ?? "Your team",
+    team: seed?.team ?? [
+      { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+      { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+      { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+    ],
+    nextStepsTitle: seed?.nextStepsTitle ?? "Next steps",
+    nextSteps: seed?.nextSteps ?? [
+      "Confirm scope and target languages",
+      "Approve pricing and schedule in writing",
+      "Kickoff call with the assigned program team",
+    ],
+    contacts: seed?.contacts,
+    footerUrl: seed?.footerUrl ?? "transperfect.com",
+    heroMedia: seed?.heroMedia,
+    heroRule: seed?.heroRule,
+    heroTitleType: seed?.heroTitleType,
     modules: seed?.modules ?? [],
   };
 }

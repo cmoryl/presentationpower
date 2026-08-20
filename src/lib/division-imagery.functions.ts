@@ -169,7 +169,8 @@ export type PrintTemplateKind =
   | "ebrochure"
   | "case-study"
   | "adaptor-brief"
-  | "msa-partnership";
+  | "msa-partnership"
+  | "solution-proposal";
 
 export type VariantPreset = "thumb" | "square" | "portrait" | "landscape";
 

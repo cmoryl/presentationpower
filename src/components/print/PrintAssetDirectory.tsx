@@ -31,6 +31,7 @@ const KIND_META: Record<string, { label: string; icon: React.ReactNode }> = {
   ebrochure: { label: "E-Brochure", icon: <PenSquare size={12} /> },
   "adaptor-brief": { label: "Adaptor Brief", icon: <Rocket size={12} /> },
   "msa-partnership": { label: "MSA Partnership", icon: <Handshake size={12} /> },
+  "solution-proposal": { label: "Solution Proposal", icon: <FileText size={12} /> },
 };
 
 export function PrintAssetDirectory({

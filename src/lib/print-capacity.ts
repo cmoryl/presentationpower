@@ -19,6 +19,7 @@
 import type {
   AdaptorBriefContent,
   MsaPartnershipContent,
+  SolutionProposalContent,
   CaseStudyContent,
   EBrochureContent,
   PrintHeroMedia,
@@ -33,7 +34,8 @@ export type PrintTemplateKind =
   | "spotlight"
   | "ebrochure"
   | "adaptor-brief"
-  | "msa-partnership";
+  | "msa-partnership"
+  | "solution-proposal";
 
 /** Any print content model the capacity analyzer accepts. */
 export type PrintAnyContent =
@@ -41,7 +43,8 @@ export type PrintAnyContent =
   | SpotlightContent
   | EBrochureContent
   | AdaptorBriefContent
-  | MsaPartnershipContent;
+  | MsaPartnershipContent
+  | SolutionProposalContent;
 
 export type CapacityLevel = "ok" | "warn" | "block";
 
@@ -100,6 +103,8 @@ export const PRINT_TEMPLATE_BUDGETS: Record<
   "adaptor-brief": { moduleBudget: 3.5, label: "Adaptor Brief" },
   // Dense fixed page (band + grid + table) leaves little room for modules.
   "msa-partnership": { moduleBudget: 1.5, label: "MSA Partnership" },
+  // Cover block + scope band + cost table + team panel: effectively full.
+  "solution-proposal": { moduleBudget: 1.0, label: "Solution Proposal" },
 };
 
 /* ------------------------------------------------------------------
@@ -352,6 +357,25 @@ const TEXT_LIMITS = {
     scaleMax: 4,
     departmentsMax: 20,
     departmentLabel: 40,
+  },
+  "solution-proposal": {
+    title: 60,
+    subtitle: 90,
+    summary: 340,
+    includedMax: 8,
+    includedLabel: 40,
+    includedDetail: 120,
+    listMax: 6,
+    listLine: 60,
+    timelineNote: 300,
+    costRowsMax: 8,
+    costItem: 44,
+    costDetail: 60,
+    costNote: 240,
+    statsMax: 4,
+    teamMax: 4,
+    nextStepsMax: 5,
+    nextStepLine: 90,
   },
 } as const;
 
@@ -663,6 +687,78 @@ function analyzeMsaPartnership(c: MsaPartnershipContent): CapacityIssue[] {
   return issues;
 }
 
+function analyzeSolutionProposal(c: SolutionProposalContent): CapacityIssue[] {
+  const t = TEXT_LIMITS["solution-proposal"];
+  const issues: CapacityIssue[] = [];
+  pushLen(issues, "Proposal title", c.title, t.title);
+  pushLen(issues, "Subtitle", c.subtitle, t.subtitle);
+  pushLen(issues, "Positioning paragraph", c.summary, t.summary);
+  pushLen(issues, "Timeline note", c.timelineNote, t.timelineNote);
+  pushLen(issues, "Pricing note", c.costNote, t.costNote);
+
+  (c.included ?? []).forEach((s, i) => {
+    pushLen(issues, `Service ${i + 1}`, s.label, t.includedLabel);
+    pushLen(issues, `Service ${i + 1} detail`, s.detail, t.includedDetail);
+  });
+  if ((c.included?.length ?? 0) > t.includedMax) {
+    issues.push({
+      level: "block",
+      code: "included-overflow",
+      message: `"What's included" fits up to ${t.includedMax} service chips.`,
+    });
+  }
+
+  (c.sourceFiles ?? []).forEach((v, i) =>
+    pushLen(issues, `Source file ${i + 1}`, v, t.listLine),
+  );
+  (c.deliverables ?? []).forEach((v, i) =>
+    pushLen(issues, `Deliverable ${i + 1}`, v, t.listLine),
+  );
+  if ((c.sourceFiles?.length ?? 0) > t.listMax || (c.deliverables?.length ?? 0) > t.listMax) {
+    issues.push({
+      level: "block",
+      code: "scope-list-overflow",
+      message: `Source files and deliverables each fit up to ${t.listMax} lines.`,
+    });
+  }
+
+  (c.costRows ?? []).forEach((r, i) => {
+    pushLen(issues, `Cost row ${i + 1}`, r.item, t.costItem);
+    pushLen(issues, `Cost row ${i + 1} detail`, r.detail, t.costDetail);
+  });
+  if ((c.costRows?.length ?? 0) > t.costRowsMax) {
+    issues.push({
+      level: "block",
+      code: "cost-overflow",
+      message: `The cost summary table fits up to ${t.costRowsMax} line items.`,
+    });
+  }
+
+  if ((c.stats?.length ?? 0) > t.statsMax) {
+    issues.push({
+      level: "warn",
+      code: "stats-overflow",
+      message: `The proof rail fits up to ${t.statsMax} metrics.`,
+    });
+  }
+  if ((c.team?.length ?? 0) > t.teamMax) {
+    issues.push({
+      level: "block",
+      code: "team-overflow",
+      message: `The team panel fits up to ${t.teamMax} people.`,
+    });
+  }
+  (c.nextSteps ?? []).forEach((v, i) => pushLen(issues, `Next step ${i + 1}`, v, t.nextStepLine));
+  if ((c.nextSteps?.length ?? 0) > t.nextStepsMax) {
+    issues.push({
+      level: "warn",
+      code: "next-steps-overflow",
+      message: `Next steps fits up to ${t.nextStepsMax} entries.`,
+    });
+  }
+  return issues;
+}
+
 export function analyzePrintAsset(
   kind: PrintTemplateKind,
   content: PrintAnyContent,
@@ -683,6 +779,8 @@ export function analyzePrintAsset(
   else if (kind === "adaptor-brief") bodyIssues = analyzeAdaptor(content as AdaptorBriefContent);
   else if (kind === "msa-partnership")
     bodyIssues = analyzeMsaPartnership(content as MsaPartnershipContent);
+  else if (kind === "solution-proposal")
+    bodyIssues = analyzeSolutionProposal(content as SolutionProposalContent);
 
   const issues = [...modIssues, ...bodyIssues];
   const level: CapacityLevel = issues.some((i) => i.level === "block")

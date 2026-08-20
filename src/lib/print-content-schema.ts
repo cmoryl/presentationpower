@@ -493,12 +493,149 @@ export const MSA_PARTNERSHIP_SCHEMA: ContentSchema = {
   ],
 };
 
+// Both cover columns share one field list, so "Prepared for" and "Prepared by"
+// stay in lockstep whenever the party shape grows.
+function partyFields(): FieldSpec[] {
+  return [
+    { kind: "string", path: "label", label: "Column label", optional: true },
+    { kind: "string", path: "contact", label: "Contact name", optional: true },
+    { kind: "string", path: "role", label: "Title", optional: true },
+    { kind: "string", path: "company", label: "Company", optional: true },
+    { kind: "string", path: "address1", label: "Address line 1", optional: true },
+    { kind: "string", path: "address2", label: "Address line 2", optional: true },
+    { kind: "string", path: "email", label: "Email", optional: true },
+    { kind: "string", path: "phone", label: "Phone", optional: true },
+  ];
+}
+
+export const SOLUTION_PROPOSAL_SCHEMA: ContentSchema = {
+  kind: "solution-proposal",
+  label: "Solution proposal",
+  fields: [
+    ...headerFields(),
+    { kind: "string", path: "title", label: "Proposal title" },
+    { kind: "string", path: "subtitle", label: "Subtitle", optional: true },
+    { kind: "string", path: "clientLogoUrl", label: "Client logo URL", optional: true },
+    { kind: "string", path: "dateLabel", label: "Date", optional: true },
+    { kind: "string", path: "summary", label: "Positioning paragraph", multiline: true, optional: true },
+    { kind: "object", path: "preparedFor", label: "Prepared for", fields: partyFields() },
+    { kind: "object", path: "preparedBy", label: "Prepared by", fields: partyFields() },
+    { kind: "string", path: "includedTitle", label: "Scope heading", optional: true },
+    {
+      kind: "objectArray",
+      path: "included",
+      label: "What's included",
+      itemLabel: "Service",
+      itemFactory: () => ({ label: "", icon: "", detail: "" }),
+      itemFields: [
+        { kind: "string", path: "label", label: "Label" },
+        { kind: "string", path: "icon", label: "Icon", optional: true },
+        { kind: "string", path: "detail", label: "Detail", optional: true, multiline: true },
+      ],
+      minItems: 0,
+      maxItems: 8,
+    },
+    { kind: "string", path: "sourceFilesTitle", label: "Source files heading", optional: true },
+    {
+      kind: "stringArray",
+      path: "sourceFiles",
+      label: "Source files",
+      itemLabel: "File",
+      minItems: 0,
+      maxItems: 6,
+    },
+    { kind: "string", path: "deliverablesTitle", label: "Deliverables heading", optional: true },
+    {
+      kind: "stringArray",
+      path: "deliverables",
+      label: "Deliverables",
+      itemLabel: "Deliverable",
+      minItems: 0,
+      maxItems: 6,
+    },
+    { kind: "string", path: "timelineTitle", label: "Timeline heading", optional: true },
+    { kind: "string", path: "timelineNote", label: "Timeline note", multiline: true },
+    { kind: "string", path: "costTitle", label: "Cost heading", optional: true },
+    {
+      kind: "objectArray",
+      path: "costRows",
+      label: "Cost rows",
+      itemLabel: "Line item",
+      itemFactory: () => ({ item: "", detail: "", qty: "", price: "" }),
+      itemFields: [
+        { kind: "string", path: "item", label: "Line item" },
+        { kind: "string", path: "detail", label: "Detail", optional: true },
+        { kind: "string", path: "qty", label: "Qty / volume", optional: true },
+        { kind: "string", path: "price", label: "Price", optional: true },
+      ],
+      minItems: 0,
+      maxItems: 8,
+    },
+    { kind: "string", path: "costTotalLabel", label: "Total label", optional: true },
+    { kind: "string", path: "costTotal", label: "Total", optional: true },
+    { kind: "string", path: "costNote", label: "Pricing note", multiline: true, optional: true },
+    {
+      kind: "objectArray",
+      path: "stats",
+      label: "Proof metrics",
+      itemLabel: "Metric",
+      itemFactory: emptyStat,
+      itemFields: statItemFields,
+      minItems: 0,
+      maxItems: 4,
+    },
+    { kind: "object", path: "quote", label: "Pull quote", optional: true, fields: quoteFields },
+    { kind: "string", path: "teamTitle", label: "Team heading", optional: true },
+    {
+      kind: "objectArray",
+      path: "team",
+      label: "Your team",
+      itemLabel: "Team member",
+      itemFactory: () => ({ name: "", role: "", office: "", email: "" }),
+      itemFields: [
+        { kind: "string", path: "name", label: "Name" },
+        { kind: "string", path: "role", label: "Role", optional: true },
+        { kind: "string", path: "office", label: "Office", optional: true },
+        { kind: "string", path: "email", label: "Email", optional: true },
+      ],
+      minItems: 0,
+      maxItems: 4,
+    },
+    { kind: "string", path: "nextStepsTitle", label: "Next steps heading", optional: true },
+    {
+      kind: "stringArray",
+      path: "nextSteps",
+      label: "Next steps",
+      itemLabel: "Step",
+      minItems: 0,
+      maxItems: 5,
+    },
+    {
+      kind: "object",
+      path: "contacts",
+      label: "CTA / contacts",
+      optional: true,
+      fields: [
+        { kind: "string", path: "title", label: "Heading", optional: true },
+        { kind: "string", path: "name", label: "Name", optional: true },
+        { kind: "string", path: "role", label: "Role", optional: true },
+        { kind: "string", path: "phone", label: "Phone", optional: true },
+        { kind: "string", path: "email", label: "Email", optional: true },
+        { kind: "string", path: "ctaLabel", label: "CTA label", optional: true },
+        { kind: "string", path: "ctaEmail", label: "CTA email", optional: true },
+      ],
+    },
+    { kind: "string", path: "footerUrl", label: "Footer URL", optional: true },
+  ],
+};
+
 export const CONTENT_SCHEMAS: Record<PrintAssetKind, ContentSchema> = {
   "case-study": CASE_STUDY_SCHEMA,
   spotlight: SPOTLIGHT_SCHEMA,
   ebrochure: EBROCHURE_SCHEMA,
   "adaptor-brief": ADAPTOR_BRIEF_SCHEMA,
   "msa-partnership": MSA_PARTNERSHIP_SCHEMA,
+  "solution-proposal": SOLUTION_PROPOSAL_SCHEMA,
 };
 
 // ---- Path utilities --------------------------------------------------------
