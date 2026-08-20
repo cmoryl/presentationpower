@@ -9,7 +9,7 @@
  * vector for PDF/print output.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   WORLD_MAP_LAND,
   WORLD_MAP_PINS,
@@ -41,12 +41,72 @@ export function ProposalWorldMap({
   const list = pins?.length ? pins : WORLD_MAP_PINS;
   const [kind, setKind] = useState<WorldMapPinKind>("prod");
 
-  const addPin = (event: React.MouseEvent<SVGSVGElement>) => {
-    if (!editable || !onChange) return;
+  // Zoom/pan is a pure view-box transform: the map element keeps the exact same
+  // box on the page, so page layout and print geometry never change.
+  const [zoom, setZoom] = useState(1);
+  const [center, setCenter] = useState({
+    x: WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w / 2,
+    y: WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h / 2,
+  });
+  const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
+  const dragMoved = useRef(false);
+
+  const w = WORLD_MAP_VIEW.w / zoom;
+  const h = WORLD_MAP_VIEW.h / zoom;
+  const clampCenter = (cx: number, cy: number, vw: number, vh: number) => ({
+    x: Math.min(
+      WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w - vw / 2,
+      Math.max(WORLD_MAP_VIEW.x + vw / 2, cx),
+    ),
+    y: Math.min(
+      WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h - vh / 2,
+      Math.max(WORLD_MAP_VIEW.y + vh / 2, cy),
+    ),
+  });
+  const safeCenter = clampCenter(center.x, center.y, w, h);
+  const view = { x: safeCenter.x - w / 2, y: safeCenter.y - h / 2, w, h };
+
+  const setZoomLevel = (next: number) => {
+    const z = Math.min(6, Math.max(1, Math.round(next * 100) / 100));
+    setZoom(z);
+    setCenter((c) =>
+      clampCenter(c.x, c.y, WORLD_MAP_VIEW.w / z, WORLD_MAP_VIEW.h / z),
+    );
+  };
+
+  const onPointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (zoom <= 1) return;
+    drag.current = { x: event.clientX, y: event.clientY, moved: false };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    const d = drag.current;
+    if (!d) return;
     const rect = event.currentTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const x = WORLD_MAP_VIEW.x + ((event.clientX - rect.left) / rect.width) * WORLD_MAP_VIEW.w;
-    const y = WORLD_MAP_VIEW.y + ((event.clientY - rect.top) / rect.height) * WORLD_MAP_VIEW.h;
+    const dx = ((event.clientX - d.x) / rect.width) * view.w;
+    const dy = ((event.clientY - d.y) / rect.height) * view.h;
+    if (Math.abs(event.clientX - d.x) > 2 || Math.abs(event.clientY - d.y) > 2) d.moved = true;
+    drag.current = { x: event.clientX, y: event.clientY, moved: d.moved };
+    setCenter((c) => clampCenter(c.x - dx, c.y - dy, view.w, view.h));
+  };
+
+  const onPointerUp = () => {
+    dragMoved.current = Boolean(drag.current?.moved);
+    drag.current = null;
+  };
+
+  const addPin = (event: React.MouseEvent<SVGSVGElement>) => {
+    if (!editable || !onChange) return;
+    if (dragMoved.current) {
+      dragMoved.current = false;
+      return;
+    }
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const x = view.x + ((event.clientX - rect.left) / rect.width) * view.w;
+    const y = view.y + ((event.clientY - rect.top) / rect.height) * view.h;
     onChange([
       ...list,
       {
@@ -62,14 +122,22 @@ export function ProposalWorldMap({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <svg
-        viewBox={`${WORLD_MAP_VIEW.x} ${WORLD_MAP_VIEW.y} ${WORLD_MAP_VIEW.w} ${WORLD_MAP_VIEW.h}`}
+        viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
         width="100%"
         height="100%"
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label="World map of TransPerfect office locations"
         onClick={addPin}
-        style={{ display: "block", cursor: editable ? "crosshair" : "default" }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        style={{
+          display: "block",
+          touchAction: "none",
+          cursor: zoom > 1 ? "grab" : editable ? "crosshair" : "default",
+        }}
       >
         {WORLD_MAP_LAND.map((path, i) => (
           <path key={`land-${i}`} d={path.d} fill="#FFFFFF" opacity={path.opacity} />
@@ -97,6 +165,61 @@ export function ProposalWorldMap({
           </circle>
         ))}
       </svg>
+
+      <div
+        data-export-ignore-chrome
+        style={{
+          position: "absolute",
+          bottom: 8,
+          left: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
+          borderRadius: 999,
+          background: "rgba(255,255,255,0.92)",
+          padding: 4,
+          boxShadow: "0 1px 4px rgba(3,0,44,0.25)",
+        }}
+      >
+        <button
+          type="button"
+          aria-label="Zoom out map"
+          onClick={() => setZoomLevel(zoom / 1.4)}
+          disabled={zoom <= 1}
+          style={zoomBtn(zoom <= 1)}
+        >
+          −
+        </button>
+        <span
+          style={{ minWidth: 34, textAlign: "center", fontSize: 10, fontWeight: 700, color: "#03002C" }}
+        >
+          {Math.round(zoom * 100)}%
+        </span>
+        <button
+          type="button"
+          aria-label="Zoom in map"
+          onClick={() => setZoomLevel(zoom * 1.4)}
+          disabled={zoom >= 6}
+          style={zoomBtn(zoom >= 6)}
+        >
+          +
+        </button>
+        <button
+          type="button"
+          aria-label="Reset map zoom"
+          onClick={() => {
+            setZoom(1);
+            setCenter({
+              x: WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w / 2,
+              y: WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h / 2,
+            });
+          }}
+          disabled={zoom === 1}
+          style={{ ...zoomBtn(zoom === 1), width: "auto", padding: "0 8px", fontSize: 10 }}
+        >
+          Reset
+        </button>
+      </div>
 
       {editable && onChange ? (
         <div
@@ -151,4 +274,20 @@ export function ProposalWorldMap({
       ) : null}
     </div>
   );
+}
+
+function zoomBtn(disabled: boolean): React.CSSProperties {
+  return {
+    width: 22,
+    height: 22,
+    borderRadius: 999,
+    border: "1px solid rgba(3,0,44,0.18)",
+    background: disabled ? "rgba(3,0,44,0.04)" : "#FFFFFF",
+    color: "#03002C",
+    fontSize: 14,
+    fontWeight: 700,
+    lineHeight: 1,
+    cursor: disabled ? "default" : "pointer",
+    opacity: disabled ? 0.45 : 1,
+  };
 }
