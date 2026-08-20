@@ -6,6 +6,8 @@ import lockupDark from "@/assets/proposal/tp-lockup-dark.svg.asset.json";
 import worldMap from "@/assets/proposal/world-map.svg.asset.json";
 import teamGrid from "@/assets/proposal/team-grid.png.asset.json";
 import photoClouds from "@/assets/proposal/photo-clouds.jpeg.asset.json";
+import logoLufthansa from "@/assets/proposal/logo-lufthansa.svg.asset.json";
+import logoLavazza from "@/assets/proposal/logo-lavazza.svg.asset.json";
 import photoCoffee from "@/assets/proposal/photo-coffee.jpeg.asset.json";
 
 import samsung from "@/assets/proposal/client-samsung.png.asset.json";
@@ -41,8 +43,15 @@ export const PROPOSAL_ART = {
   lockupDark: lockupDark.url,
   worldMap: worldMap.url,
   teamGrid: teamGrid.url,
-  photoClouds: photoClouds.url,
-  photoCoffee: photoCoffee.url,
+  // The two source photos were exported with swapped filenames; keep the
+  // semantic names pointing at the correct imagery.
+  photoClouds: photoCoffee.url,
+  photoCoffee: photoClouds.url,
+};
+
+export const STORY_LOGOS: Record<string, string> = {
+  lufthansa: logoLufthansa.url,
+  lavazza: logoLavazza.url,
 };
 
 export type LogoTile = { name: string; url: string };

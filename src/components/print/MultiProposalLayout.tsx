@@ -29,6 +29,7 @@ import {
   AFFINITY_LOGOS,
   CAUSE_LOGOS,
   CLIENT_LOGOS,
+  STORY_LOGOS,
   PROPOSAL_AQUA,
   PROPOSAL_ART,
 } from "@/lib/print-library/proposal-art";
@@ -191,7 +192,14 @@ function Img({
   alt = "",
   fit = "contain",
   radius,
-}: BoxProps & { src: string; alt?: string; fit?: "contain" | "cover"; radius?: number }) {
+  align = "center",
+}: BoxProps & {
+  src: string;
+  alt?: string;
+  fit?: "contain" | "cover";
+  radius?: number;
+  align?: "left" | "center" | "right";
+}) {
   return (
     <L x={x} y={y} w={w} h={h}>
       <img
@@ -201,7 +209,7 @@ function Img({
           width: "100%",
           height: "100%",
           objectFit: fit,
-          objectPosition: "center",
+          objectPosition: align === "center" ? "center" : `${align} center`,
           borderRadius: radius === undefined ? undefined : u(radius),
           display: "block",
         }}
@@ -209,6 +217,7 @@ function Img({
     </L>
   );
 }
+
 
 function lines(value: string | undefined): string[] {
   return (value ?? "")
@@ -796,12 +805,30 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
   const first = quotes[0];
   const second = quotes[1];
   const cardBorder = `${u(0.008)} solid rgba(3,0,44,0.85)`;
+  const firstLogo = STORY_LOGOS[(first?.company || "Lufthansa").toLowerCase()];
+  const secondLogo = STORY_LOGOS[(second?.company || "Lavazza").toLowerCase()];
 
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
       <BandHeader title={page.title || "Success Stories"} logo={logoWhite} />
       <Plate x={0.32} y={1.61} w={7.93} h={9.4} radius={0.4} />
+
+      {/* Connector rails (top card in, bottom card out) as in the source deck. */}
+      <svg
+        viewBox={`0 0 ${PAGE_W_IN} ${PAGE_H_IN}`}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+        aria-hidden
+      >
+        <g stroke="rgba(3,0,44,0.85)" strokeWidth={0.012} fill="rgba(3,0,44,0.85)">
+          <path d="M0.44 1.89 L4.05 1.89" />
+          <path d="M4.05 1.83 L4.22 1.89 L4.05 1.95 Z" />
+          <path d="M8.02 6.25 L3.95 6.25" />
+          <path d="M3.95 6.19 L3.78 6.25 L3.95 6.31 Z" />
+          <path d="M0.64 10.42 L4.05 10.42" />
+          <path d="M4.05 10.36 L4.22 10.42 L4.05 10.48 Z" />
+        </g>
+      </svg>
 
       {/* Card 1 */}
       <L x={0.64} y={1.89} w={7.38} h={4.36} style={{ border: cardBorder, borderRadius: u(0.34) }} />
@@ -815,9 +842,22 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         fit="cover"
         radius={0.3}
       />
-      <T x={3.72} y={2.5} w={3.6} size={26} weight={700} color={NAVY} tracking="-0.02em">
-        {first?.company || "Lufthansa"}
-      </T>
+      {firstLogo ? (
+        <Img
+          x={3.72}
+          y={2.42}
+          w={3.35}
+          h={0.5}
+          src={firstLogo}
+          alt={first?.company || "Lufthansa"}
+          fit="contain"
+          align="left"
+        />
+      ) : (
+        <T x={3.72} y={2.5} w={3.6} size={26} weight={700} color={NAVY} tracking="-0.02em">
+          {first?.company || "Lufthansa"}
+        </T>
+      )}
       <Dots x={3.72} y={3.05} color={BLUE} />
       <T x={3.72} y={3.33} w={3.5} size={10} color={NAVY} leading={1.42}>
         {first?.text ? `"${first.text.replace(/^"|"$/g, "")}"` : ""}
@@ -838,22 +878,36 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         fit="cover"
         radius={0.3}
       />
-      <T x={1.07} y={6.62} w={3.44} size={26} weight={700} color={NAVY} align="right" tracking="-0.02em">
-        {second?.company || "Lavazza"}
-      </T>
-      <Dots x={3.94} y={7.18} color={BLUE} />
-      <T x={1.07} y={7.5} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
+      {secondLogo ? (
+        <Img
+          x={1.16}
+          y={6.62}
+          w={3.35}
+          h={0.62}
+          src={secondLogo}
+          alt={second?.company || "Lavazza"}
+          fit="contain"
+          align="right"
+        />
+      ) : (
+        <T x={1.07} y={6.62} w={3.44} size={26} weight={700} color={NAVY} align="right" tracking="-0.02em">
+          {second?.company || "Lavazza"}
+        </T>
+      )}
+      <Dots x={3.94} y={7.4} color={BLUE} />
+      <T x={1.07} y={7.68} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.headline || ""}
       </T>
-      <T x={1.07} y={7.98} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
+      <T x={1.07} y={8.16} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.text ? `"${second.text.replace(/^"|"$/g, "")}"` : ""}
       </T>
-      <T x={1.07} y={9.16} w={3.44} size={10} color={NAVY} align="right">
+      <T x={1.07} y={9.34} w={3.44} size={10} color={NAVY} align="right">
         {second ? `– ${[second.role || second.author, second.company].filter(Boolean).join(", ")}` : ""}
       </T>
     </>
   );
 }
+
 
 // ---------------------------------------------------------------------------
 // Page 8 — Why TransPerfect
@@ -1190,7 +1244,7 @@ export function MultiProposalLayout({
   /** Render one page only (used by thumbnails). Omit to render the document. */
   pageIndex?: number;
 }) {
-  const accent = brand.tokens.accent || brand.tokens.primary;
+  const accent = brand?.tokens?.accent || brand?.tokens?.primary || BLUE;
   const pages = content.pages ?? [];
   const shown = typeof pageIndex === "number" ? pages.slice(pageIndex, pageIndex + 1) : pages;
   const logoWhite = PROPOSAL_ART.logoWhite;
