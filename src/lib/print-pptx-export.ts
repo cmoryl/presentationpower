@@ -60,5 +60,45 @@ export async function exportPrintPagesAsPptx(
     slide.addImage({ data: dataUrl, x: 0, y: 0, w: widthIn, h: heightIn });
   }
 
-  await pptx.writeFile({ fileName: opts.filename ?? "print-asset.pptx" });
+  // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
+  // PresentationML sequence (masters -> notes master -> slides -> sizes). Repair
+  // the order before writing so the file passes strict OOXML validation.
+  const blob = (await pptx.write({ outputType: "blob" })) as Blob;
+  const fileName = opts.filename ?? "print-asset.pptx";
+  const fixed = await reorderPresentationXml(blob);
+  triggerDownload(fixed, fileName);
 }
+
+async function reorderPresentationXml(blob: Blob): Promise<Blob> {
+  try {
+    const JSZip = (await import("jszip")).default;
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
+    const entry = zip.file("ppt/presentation.xml");
+    if (!entry) return blob;
+    const xml = await entry.async("string");
+    const notes = xml.match(/<p:notesMasterIdLst>[\s\S]*?<\/p:notesMasterIdLst>/);
+    if (!notes || xml.indexOf(notes[0]) < xml.indexOf("<p:sldIdLst>")) return blob;
+    const next = xml
+      .replace(notes[0], "")
+      .replace("<p:sldIdLst>", `${notes[0]}<p:sldIdLst>`);
+    zip.file("ppt/presentation.xml", next);
+    return await zip.generateAsync({
+      type: "blob",
+      mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    });
+  } catch {
+    return blob;
+  }
+}
+
+function triggerDownload(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
