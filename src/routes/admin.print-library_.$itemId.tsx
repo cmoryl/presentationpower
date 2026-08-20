@@ -199,8 +199,8 @@ function MasterItemEditorPage() {
     : [];
 
   function patchPath(path: string, value: unknown) {
-    setDraft((prev) => {
-      const base = prev ?? draft;
+    setDraft((prev): Draft => {
+      const base: Draft = prev ?? draft;
       if (!base.content) return base;
       return {
         ...base,
