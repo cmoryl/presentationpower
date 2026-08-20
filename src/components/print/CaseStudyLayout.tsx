@@ -193,7 +193,7 @@ export function CaseStudyLayout({
                       src={content.clientLogoUrl}
                       alt={`${content.client || "Client"} logo`}
                       style={{
-                        height: cq(14),
+                        height: cq(20),
                         width: "auto",
                         objectFit: "contain",
                         filter: mode === "dark" ? "invert(1) brightness(1.6)" : "none",
@@ -204,7 +204,7 @@ export function CaseStudyLayout({
                       style={{
                         display: "inline-block",
                         width: 1,
-                        height: cq(14),
+                        height: cq(20),
                         background: dividerCol,
                       }}
                     />
@@ -213,7 +213,7 @@ export function CaseStudyLayout({
                 <BrandLockup
                   brand={brand}
                   color={mode === "dark" ? "#FFFFFF" : "#000000"}
-                  size="2xs"
+                  size="xs"
                   orientation="horizontal"
                   monochromeOfficialLogo
                 />
