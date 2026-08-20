@@ -111,6 +111,15 @@ import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { usePrintOverflow } from "@/hooks/use-print-overflow";
+import { PrintContentFitFrame } from "@/components/print/PrintContentFitFrame";
+import {
+  NEUTRAL_FIT,
+  PRINT_CONTENT_FIT_DEFAULTS,
+  describeFit,
+  isNeutralFit,
+  resolveContentFit,
+  type PrintFitKnobs,
+} from "@/lib/print-content-fit";
 import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import {
@@ -204,6 +213,8 @@ function AssetEditor() {
   // Measured (not predicted) page overflow — fires whenever content is really
   // clipped by the fixed-height page, e.g. after dragging the hero too tall.
   const overflow = usePrintOverflow(canvasRef, row?.content);
+  // Content-fit knobs currently applied by PrintContentFitFrame (1/1 = none).
+  const [fitKnobs, setFitKnobs] = useState<PrintFitKnobs>(NEUTRAL_FIT);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
   // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
