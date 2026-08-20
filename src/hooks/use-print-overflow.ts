@@ -121,7 +121,7 @@ export function usePrintOverflow(
     mo.observe(host, { subtree: true, childList: true, characterData: true, attributes: true });
     // Fonts settling changes text height after first paint.
     const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
-    fonts?.ready?.then(schedule).catch(() => {});
+    fonts?.ready?.then(() => schedule(0)).catch(() => {});
 
     return () => {
       cancelled = true;
