@@ -39,6 +39,14 @@ import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
+import { SocialModuleFrame } from "@/components/campaigns/SocialModuleFrame";
+import { SocialModulePicker } from "@/components/campaigns/SocialModulePicker";
+import {
+  buildSocialModuleSection,
+  findSocialModuleLayout,
+  printModuleFamilyMeta,
+} from "@/lib/social-module-layouts";
+import { reliefAt } from "@/lib/social-module-fit";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 
 
