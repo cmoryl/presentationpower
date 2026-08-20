@@ -1222,3 +1222,28 @@ export function emptySolutionProposal(
     modules: seed?.modules ?? [],
   };
 }
+
+// ---------------------------------------------------------------------------
+// BLANK CONTENT BY KIND
+// ---------------------------------------------------------------------------
+// The library's "Blank <type>" starting points ship without content, so the
+// master editor had nothing to render or edit for them (notably MSA
+// Partnership). This gives every kind a fully-shaped seed so the master editor
+// can preview and edit blank templates just like curated imports.
+export function blankPrintContent(kind: PrintAssetKind): Record<string, unknown> {
+  switch (kind) {
+    case "spotlight":
+      return emptySpotlight() as unknown as Record<string, unknown>;
+    case "ebrochure":
+      return emptyEBrochure() as unknown as Record<string, unknown>;
+    case "adaptor-brief":
+      return emptyAdaptorBrief() as unknown as Record<string, unknown>;
+    case "msa-partnership":
+      return emptyMsaPartnership() as unknown as Record<string, unknown>;
+    case "solution-proposal":
+      return emptySolutionProposal() as unknown as Record<string, unknown>;
+    case "case-study":
+    default:
+      return emptyCaseStudy() as unknown as Record<string, unknown>;
+  }
+}
