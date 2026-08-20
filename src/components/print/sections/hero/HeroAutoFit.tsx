@@ -78,26 +78,47 @@ export function AutoFitText({
       frame = requestAnimationFrame(() => {
         const node = ref.current;
         if (!node) return;
-        // Walk the ladder synchronously against a probe style so a long
-        // headline settles in one pass instead of one re-render per step.
-        const prevSize = node.style.fontSize;
-        const prevWrap = node.style.overflowWrap;
-        let next = 1;
-        let wrap = false;
+        // Measure UNCLAMPED: with `-webkit-box` line clamping, scrollHeight is
+        // always a couple of px over clientHeight from line-box rounding, which
+        // would make every headline look like it overflows. So drop the clamp,
+        // read the copy's natural height, and compare it with the height the
+        // allowed number of lines actually buys us.
+        const probe = {
+          fontSize: node.style.fontSize,
+          overflowWrap: node.style.overflowWrap,
+          display: node.style.display,
+          overflow: node.style.overflow,
+          clamp: node.style.webkitLineClamp,
+        };
+        node.style.display = "block";
+        node.style.overflow = "visible";
+        node.style.webkitLineClamp = "unset";
+
+        const lineBox = () => {
+          const cs = window.getComputedStyle(node);
+          const lh = parseFloat(cs.lineHeight);
+          return Number.isFinite(lh) ? lh : parseFloat(cs.fontSize) * 1.2;
+        };
         const overflows = () =>
-          node.scrollHeight > node.clientHeight + SLACK ||
+          node.scrollHeight > maxLines * lineBox() + SLACK ||
           node.scrollWidth > node.clientWidth + SLACK;
 
+        let next = 1;
+        let wrap = false;
         while (next > minRatio && overflows()) {
           next = Math.max(minRatio, Number((next - STEP).toFixed(3)));
           node.style.fontSize = cq(basePx * next);
         }
         if (overflows()) {
           node.style.overflowWrap = "anywhere";
-          wrap = true;
+          wrap = overflows();
         }
-        node.style.fontSize = prevSize;
-        node.style.overflowWrap = prevWrap;
+
+        node.style.fontSize = probe.fontSize;
+        node.style.overflowWrap = probe.overflowWrap;
+        node.style.display = probe.display;
+        node.style.overflow = probe.overflow;
+        node.style.webkitLineClamp = probe.clamp;
         setRatio(next);
         setBreakWords(wrap);
       });
@@ -114,7 +135,7 @@ export function AutoFitText({
       cancelAnimationFrame(frame);
       ro.disconnect();
     };
-  }, [contentKey, minRatio]);
+  }, [contentKey, minRatio, maxLines, basePx]);
 
   return (
     <Tag
