@@ -182,7 +182,7 @@ export function PageTemplateCard({
             />
             Reset copy to prompts
           </label>
-          {isAdmin ? (
+          {isAdmin && !template.builtin ? (
             <button
               type="button"
               onClick={() => toggleScope.mutate()}
@@ -191,15 +191,17 @@ export function PageTemplateCard({
               {template.scope === "shared" ? "Unpublish" : "Publish to everyone"}
             </button>
           ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              if (window.confirm(`Delete page template "${template.title}"?`)) remove.mutate();
-            }}
-            className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] font-medium text-black/55 hover:border-red-400 hover:text-red-600"
-          >
-            <Trash2 size={11} /> Delete
-          </button>
+          {template.builtin ? null : (
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(`Delete page template "${template.title}"?`)) remove.mutate();
+              }}
+              className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] font-medium text-black/55 hover:border-red-400 hover:text-red-600"
+            >
+              <Trash2 size={11} /> Delete
+            </button>
+          )}
         </div>
       </div>
 
