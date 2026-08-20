@@ -335,3 +335,101 @@ export function fitSummary(m: PrintFitMeasurement | null): string {
   if (m.overflowPx > 6) return `${Math.round(m.overflowFrac * 100)}% over`;
   return `${Math.round((m.contentH / m.pageH) * 100)}% of page used`;
 }
+
+// ---------------------------------------------------------------------------
+// MODULE-LEVEL AUDIT
+// The same measurement discipline applied to a single section module rendered
+// on its own page, so the library can report which modules are structurally
+// oversized / under-legible before anyone drops them into a live piece.
+
+export type PrintModuleMetrics = {
+  /** Rendered module height at true page width, in px. */
+  heightPx: number;
+  /** Usable page height (trim minus top/bottom margins), in px. */
+  pageContentH: number;
+  /** Height as a fraction of the usable page. */
+  fill: number;
+  minFontPx: number;
+  /** Text blocks sitting outside the module's own measure. */
+  breaches: number;
+};
+
+export type PrintModuleVerdict = {
+  severity: "critical" | "warning" | "ok";
+  headline: string;
+  notes: string[];
+  /** Suggested starting scale so the module fits alongside other sections. */
+  suggestedScale: number;
+};
+
+export function measurePrintModuleBox(
+  el: HTMLElement | null,
+  pageContentH: number,
+): PrintModuleMetrics | null {
+  if (!el || pageContentH <= 0) return null;
+  const rect = el.getBoundingClientRect();
+  const scale = rect.width > 0 ? rect.width / Math.max(1, el.offsetWidth) : 1;
+  const heightPx = Math.round(el.offsetHeight);
+
+  let minFontPx = Number.POSITIVE_INFINITY;
+  let breaches = 0;
+  const own = el.getBoundingClientRect();
+  for (const node of Array.from(el.querySelectorAll<HTMLElement>("*"))) {
+    if (node.dataset["exportIgnore"] === "true") continue;
+    const r = node.getBoundingClientRect();
+    if (r.height < 1) continue;
+    const hasText = Array.from(node.childNodes).some(
+      (n) => n.nodeType === 3 && (n.textContent ?? "").trim().length > 1,
+    );
+    if (!hasText) continue;
+    const fs = parseFloat(getComputedStyle(node).fontSize || "0");
+    if (fs > 0) minFontPx = Math.min(minFontPx, fs);
+    if (r.left < own.left - 1 || r.right > own.right + 1) breaches += 1;
+  }
+
+  return {
+    heightPx,
+    pageContentH,
+    fill: heightPx / pageContentH,
+    minFontPx: Number.isFinite(minFontPx) ? Math.round((minFontPx / (scale || 1)) * 10) / 10 : 0,
+    breaches,
+  };
+}
+
+export function auditPrintModule(m: PrintModuleMetrics): PrintModuleVerdict {
+  const notes: string[] = [];
+  let severity: PrintModuleVerdict["severity"] = "ok";
+  const pct = Math.round(m.fill * 100);
+
+  if (m.fill > 1) {
+    severity = "critical";
+    notes.push(`Taller than one page on its own (${pct}% of the live text area).`);
+  } else if (m.fill > 0.62) {
+    severity = "warning";
+    notes.push(`Fills ${pct}% of the page — will clip if paired with a hero masthead.`);
+  }
+
+  if (m.minFontPx > 0 && m.minFontPx < 8) {
+    severity = severity === "critical" ? "critical" : "warning";
+    notes.push(`Smallest type measures ${m.minFontPx}px (~${(m.minFontPx * 0.75).toFixed(1)}pt).`);
+  }
+
+  if (m.breaches > 0) {
+    severity = severity === "critical" ? "critical" : "warning";
+    notes.push(`${m.breaches} text block${m.breaches > 1 ? "s" : ""} escape the module measure.`);
+  }
+
+  const suggestedScale = m.fill > 0.62 ? clamp(Math.floor((0.6 / m.fill) * 100) / 100, 0.72, 1) : 1;
+
+  return {
+    severity,
+    headline:
+      severity === "ok"
+        ? `Fits cleanly — ${pct}% of the page`
+        : severity === "critical"
+          ? `Needs correction — ${pct}% of the page`
+          : `Watch this one — ${pct}% of the page`,
+    notes,
+    suggestedScale,
+  };
+}
