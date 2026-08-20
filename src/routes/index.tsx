@@ -50,13 +50,13 @@ import { useSessionUser } from "@/hooks/use-session-user";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TransPerfect Element · Command Center" },
+      { title: "Dashboard · TransPerfect Element" },
       {
         name: "description",
         content:
           "Governed brand engine for TransPerfect. Assemble presentations, print, event, and social — from one modular library, powered by the Oracle.",
       },
-      { property: "og:title", content: "TransPerfect Element · Command Center" },
+      { property: "og:title", content: "Dashboard · TransPerfect Element" },
       {
         property: "og:description",
         content:
