@@ -120,6 +120,7 @@ export function AutoFitText({
     <Tag
       ref={ref as React.Ref<HTMLElement>}
       className={className}
+      data-autofit-base={basePx}
       data-autofit={ratio < 1 ? ratio.toFixed(2) : undefined}
       style={{
         fontSize: cq(basePx * ratio),
