@@ -357,44 +357,87 @@ function MasterItemEditorPage() {
 
           <div className="overflow-hidden rounded-2xl border border-black/10 bg-[#f5f5f2] p-4">
             {draft.content ? (
-              <PrintPageProvider
-                size={draft.look.pageSize ?? "Letter"}
-                margin={draft.look.marginPreset ?? "standard"}
-                density={draft.look.density ?? "standard"}
-              >
-                <PrintContentFitFrame
-                  settings={draft.look.contentFit}
-                  dep={fitDep}
-                  override={draft.look.fitOverride}
-                  onChange={(knobs) => setFitKnobs(knobs)}
-                  onMeasure={setFitMeasure}
+              <div ref={canvasRef} className="relative">
+                <PrintPageProvider
+                  size={draft.look.pageSize ?? "Letter"}
+                  margin={draft.look.marginPreset ?? "standard"}
+                  density={draft.look.density ?? "standard"}
                 >
-                  <PrintDocModeProvider
-                    icons={draft.look.icons ?? true}
-                    iconStyle={resolvePrintIconStyle({
-                      scale: draft.look.iconScale ?? 1,
-                      ...(draft.look.accentOverride ? { accent: draft.look.accentOverride } : {}),
-                    })}
+                  <PrintContentFitFrame
+                    settings={draft.look.contentFit}
+                    dep={fitDep}
+                    override={draft.look.fitOverride}
+                    onChange={(knobs) => setFitKnobs(knobs)}
+                    onMeasure={setFitMeasure}
                   >
-                    <LiveEditOverlay
-                      enabled
-                      slideId={`library-master-${saved.id}`}
-                      content={draft.content}
-                      editableFields={textPaths}
-                      onChange={(path, value) => patchPath(path, value)}
+                    <PrintDocModeProvider
+                      icons={draft.look.icons ?? true}
+                      iconStyle={resolvePrintIconStyle({
+                        scale: draft.look.iconScale ?? 1,
+                        ...(draft.look.accentOverride
+                          ? { accent: draft.look.accentOverride }
+                          : {}),
+                      })}
                     >
-                      <PrintKindPreview
-                        kind={saved.kind}
+                      <LiveEditOverlay
+                        enabled
+                        slideId={`library-master-${saved.id}`}
                         content={draft.content}
-                        brand={brand}
-                        mode={previewMode}
-                        pageSize={draft.look.pageSize ?? "Letter"}
-                        density={draft.look.density ?? "standard"}
-                      />
-                    </LiveEditOverlay>
-                  </PrintDocModeProvider>
-                </PrintContentFitFrame>
-              </PrintPageProvider>
+                        editableFields={textPaths}
+                        onChange={(path, value) => patchPath(path, value)}
+                      >
+                        <PrintKindPreview
+                          kind={saved.kind}
+                          content={draft.content}
+                          brand={brand}
+                          mode={previewMode}
+                          pageSize={draft.look.pageSize ?? "Letter"}
+                          density={draft.look.density ?? "standard"}
+                        />
+                      </LiveEditOverlay>
+                    </PrintDocModeProvider>
+                  </PrintContentFitFrame>
+                </PrintPageProvider>
+                {/* Vertical pull-down grip for the hero band — content-aware
+                    ceiling, keyboard nudges, cap warning colours. */}
+                <HeroResizeHandle
+                  canvasRef={canvasRef}
+                  media={heroMedia}
+                  onChange={(next) => patchContent({ heroMedia: next })}
+                  kind={saved.kind as never}
+                  usedModuleUnits={(
+                    (draft.content as { modules?: PrintSection[] }).modules ?? []
+                  ).reduce((n, m) => n + weightForSection(m), 0)}
+                  hasTitle={!!(draft.content as { title?: string }).title}
+                  hasSummary={!!(draft.content as { summary?: string }).summary}
+                  disabledHint="Add hero media to this master to resize the band"
+                />
+                {/* Measured clipping alarm with a one-click hero relief fix. */}
+                <PrintOverflowOverlay
+                  state={overflow}
+                  onFix={() => {
+                    if (!heroMedia?.imageUrl) {
+                      toast.error(
+                        "Content overflows the page — remove a module or shorten copy.",
+                      );
+                      return;
+                    }
+                    const prev = heroMedia.heightPct ?? 46;
+                    const next = Math.max(
+                      22,
+                      Math.round(prev - overflow.overflowFrac * 100 - 2),
+                    );
+                    if (next >= prev) {
+                      toast.error(
+                        "Hero is already at its minimum — remove a module or shorten copy.",
+                      );
+                      return;
+                    }
+                    patchContent({ heroMedia: { ...heroMedia, heightPct: next } });
+                    toast.success(`Hero reduced to ${next}% to stop the page clipping`);
+                  }}
+                />
+              </div>
             ) : (
               <p className="p-8 text-center text-sm text-black/55">
                 This entry is a blank starting point — it has no stored content. Metadata and look &
@@ -402,6 +445,7 @@ function MasterItemEditorPage() {
               </p>
             )}
           </div>
+
           {draft.content ? (
             <p className="mt-2 text-[11px] text-black/50">
               Click any text on the page to edit it in place. Fit now: {describeFit(fitKnobs)}
