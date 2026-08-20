@@ -228,7 +228,7 @@ export function PrintFooterLockup({
           <img
             src={productLogoSrc}
             alt={`${productLogoKey ?? "Product"} logo`}
-            style={{ height: cq(18), width: "auto", maxWidth: cq(150), objectFit: "contain" }}
+            style={{ height: cq(24), width: "auto", maxWidth: cq(170), objectFit: "contain" }}
           />
         ) : (
           <BrandLockup
