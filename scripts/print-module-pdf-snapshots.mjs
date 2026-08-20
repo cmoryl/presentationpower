@@ -27,7 +27,7 @@
  * 2. Assert page geometry with pdfinfo (Letter trim, one page per module).
  * 3. Rasterize each page with pdftoppm at a fixed raster width and pixel-diff
  *    against tests/snapshots/print-modules/<id>.<mode>.png.
- * 4. Fail when the mismatch ratio exceeds the tolerance (default 0.5%).
+ * 4. Fail when the mismatch ratio exceeds the tolerance (default 0.2%; identical re-runs measure 0.000%, a swapped section measures ~3.5%).
  *
  * USAGE
  *   node scripts/print-module-pdf-snapshots.mjs --update     # record baselines
@@ -38,7 +38,7 @@
  *   --url <base>       harness origin (default http://localhost:8080)
  *   --id <moduleId>    restrict to module id(s), repeatable
  *   --modes light,dark modes to sweep (default light)
- *   --tolerance 0.005  allowed mismatched-pixel ratio
+ *   --tolerance 0.002  allowed mismatched-pixel ratio (repeat runs measure 0.000%)
  *   --update           write/refresh baselines instead of comparing
  *   --ci               exit non-zero on any drift or missing baseline
  *   --out <dir>        artifact dir (default artifacts/print-module-pdf)
@@ -66,7 +66,7 @@ const BASE = value("url", "http://localhost:8080");
 const OUT = value("out", "artifacts/print-module-pdf");
 const BASELINE_DIR = "tests/snapshots/print-modules";
 const MANIFEST = path.join(BASELINE_DIR, "manifest.json");
-const TOLERANCE = Number(value("tolerance", "0.005"));
+const TOLERANCE = Number(value("tolerance", "0.002"));
 const UPDATE = flag("update");
 const CI = flag("ci");
 const MODES = value("modes", "light")

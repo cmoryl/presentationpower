@@ -4,7 +4,7 @@
   "exportFormat": "digital + vectorText",
   "pageSize": "Letter",
   "rasterWidth": 816,
-  "tolerance": 0.005,
+  "tolerance": 0.002,
   "modules": [
     "pm-narrative-narrative-tri-card",
     "pm-stats-kpi-dashboard-portrait",
