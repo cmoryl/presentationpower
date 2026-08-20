@@ -49,10 +49,15 @@ export const PROPOSAL_ART = {
   photoCoffee: photoClouds.url,
 };
 
-export const STORY_LOGOS: Record<string, string> = {
-  lufthansa: logoLufthansa.url,
-  lavazza: logoLavazza.url,
-};
+/**
+ * Story-page client marks. The source deck only carried decorative dot art for
+ * these slots (no real client logos), so the map ships empty: the layout draws
+ * the company wordmark and exposes an editable logo slot for a real upload.
+ */
+export const STORY_LOGOS: Record<string, string> = {};
+
+/** Extracted dot decorations from the source slide (kept for reference). */
+export const STORY_DOT_ART = [logoLufthansa.url, logoLavazza.url];
 
 export type LogoTile = { name: string; url: string };
 

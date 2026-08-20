@@ -35,7 +35,7 @@ import {
   PROPOSAL_ART,
 } from "@/lib/print-library/proposal-art";
 import { PROPOSAL_REGIONS, PROPOSAL_TEAL } from "@/lib/print-library/proposal-locations";
-import { EditableImage, usePrintImageEdit } from "./PrintImageEdit";
+import { EditableImage, resolveImageSlot, usePrintImageEdit } from "./PrintImageEdit";
 
 // ---------------------------------------------------------------------------
 // Source-deck constants
@@ -1216,6 +1216,56 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
 // ---------------------------------------------------------------------------
 // Page 7 alternates — additional success-story layouts
 // ---------------------------------------------------------------------------
+
+/**
+ * Client mark for a story card: real logo art when we have it, otherwise the
+ * company wordmark plus an editable slot so a client logo can be dropped in.
+ */
+function StoryLogo({
+  x,
+  y,
+  w,
+  h,
+  company,
+  slot,
+  align = "left",
+  size = 24,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  company: string;
+  slot: string;
+  align?: "left" | "center" | "right";
+  size?: number;
+}) {
+  const ctx = usePrintImageEdit();
+  const art = STORY_LOGOS[company.toLowerCase()];
+  const url = resolveImageSlot(ctx?.overrides, slot, art || TRANSPARENT_PX);
+  const hasArt = url !== TRANSPARENT_PX;
+  return (
+    <>
+      {hasArt ? null : (
+        <T x={x} y={y + h * 0.12} w={w} size={size} weight={700} color={NAVY} align={align} tracking="-0.02em">
+          {company}
+        </T>
+      )}
+      <Img
+        x={x}
+        y={y}
+        w={w}
+        h={h}
+        src={art || TRANSPARENT_PX}
+        alt={hasArt ? company : ""}
+        fit="contain"
+        align={align}
+        slot={slot}
+        label="logo"
+      />
+    </>
+  );
+}
 
 function storyLogo(company: string | undefined): string | undefined {
   return company ? STORY_LOGOS[company.toLowerCase()] : undefined;
