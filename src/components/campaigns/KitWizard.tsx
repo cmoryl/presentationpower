@@ -562,12 +562,67 @@ export function KitWizard({
                 />
               </div>
             </div>
+            {/* Visual module layout — browse the section library and pick one. */}
+            <div className="mt-4 grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+              <div className="min-w-0">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#003FC7]">
+                  Layout source
+                </div>
+                <div className="mt-1 text-sm font-medium text-[#03002C]">
+                  {moduleLayout
+                    ? moduleLayout.label
+                    : "Default kit composition (auto-designed per format)"}
+                </div>
+                <p className="mt-1 text-xs text-black/55">
+                  {moduleLayout
+                    ? `${printModuleFamilyMeta(moduleLayout.family).label} module · applied to every format in this kit.`
+                    : "Or start from a visual module in the section library — previews are fitted to each format."}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModulePickerOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#003FC7]/[0.06] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+                >
+                  <LayoutTemplate size={12} />
+                  {moduleLayout ? "Change module" : "Browse module library"}
+                </button>
+                {moduleLayout ? (
+                  <button
+                    type="button"
+                    onClick={() => setModuleLayoutId(null)}
+                    className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/60 hover:bg-black/5"
+                  >
+                    Use default
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            {moduleLayout ? (
+              <div className="mt-3 flex justify-start">
+                <SocialModuleFrame
+                  format={pickerFormat}
+                  section={buildSocialModuleSection({
+                    layout: moduleLayout,
+                    copy: pickerCopy,
+                    relief: reliefAt(0),
+                  })}
+                  brandId={brandId}
+                  mode={mode === "light" ? "light" : "dark"}
+                  displayShortEdge={240}
+                />
+              </div>
+            ) : null}
+
             <p className="mt-3 text-xs text-black/55">
-              Prefer starting from an existing module?{" "}
+              Prefer your favorited modules?{" "}
               <Link to="/admin/campaigns/kit" className="text-[#003FC7] hover:underline">
                 Switch to favorited-module flow →
               </Link>
             </p>
+
           </StepCard>
         )}
 
