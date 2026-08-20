@@ -541,19 +541,16 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           style={{
             position: "relative",
             ...pageGutter(),
-            paddingTop: cq(30),
-            paddingBottom: cq(18),
+            paddingTop: `calc(${bandH} * 0.78)`,
+            paddingBottom: cq(6),
             display: "flex",
             flexDirection: "column",
-            minHeight: bandH,
-            justifyContent: "flex-end",
           }}
         >
           {section.eyebrow && (
-            <div style={{ ...EYEBROW("#FFFFFF"), opacity: 0.9, marginBottom: cq(10) }}>
-              {section.eyebrow}
-            </div>
+            <div style={{ ...EYEBROW(accent), marginBottom: cq(10) }}>{section.eyebrow}</div>
           )}
+
           <h2
             style={{
               margin: 0,
