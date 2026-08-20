@@ -147,12 +147,14 @@ export function AutoFitText({
   const Tag = (as ?? "div") as ElementType;
   const ref = useRef<HTMLElement | null>(null);
   const [ratio, setRatio] = useState(1);
+  const ratioRef = useRef(1);
   const [breakWords, setBreakWords] = useState(false);
 
   // Re-fit from scratch whenever the copy or the authored size changes,
   // otherwise a shorter headline would inherit the previous shrink.
   const contentKey = `${basePx}|${maxLines}|${String(children)}`;
   useIsoLayoutEffect(() => {
+    ratioRef.current = 1;
     setRatio(1);
     setBreakWords(false);
   }, [contentKey]);
@@ -220,7 +222,7 @@ export function AutoFitText({
           maxLines,
           steps,
           ratio: next,
-          prevRatio: ratio,
+          prevRatio: ratioRef.current,
           breakWords: wrap,
         });
 
@@ -230,6 +232,7 @@ export function AutoFitText({
         node.style.display = probe.display;
         node.style.overflow = probe.overflow;
         node.style.webkitLineClamp = probe.clamp;
+        ratioRef.current = next;
         setRatio((prev) => (Math.abs(prev - next) < 0.0005 ? prev : next));
         setBreakWords((prev) => (prev === wrap ? prev : wrap));
       });
