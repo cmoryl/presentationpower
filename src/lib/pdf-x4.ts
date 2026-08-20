@@ -7,15 +7,21 @@
  *   • Header set to PDF version 1.7
  *   • Each page carries a numerically-correct TrimBox and BleedBox
  *   • Catalog carries an /OutputIntents array with a GTS_PDF_X intent
- *     whose /DestOutputProfile is an embedded ICC profile stream
+ *     whose /DestOutputProfile is an embedded ICC profile stream, with /N
+ *     and /Alternate matching the profile's own colour space
+ *   • Every DeviceRGB raster is retagged ICCBased/sRGB, so page content is
+ *     device-INDEPENDENT rather than untagged device colour
  *   • Catalog carries an XMP /Metadata stream declaring
  *     pdfxid:GTS_PDFXVersion = "PDF/X-4"
  *
- * The current raster export contains **no live text, no live transparency,
- * and no embedded fonts** (every page is a single flat PNG). That means
- * the two hardest X-4 requirements are satisfied by construction — this
- * wrapper only needs to add the identification and page-box metadata a
- * printer's RIP looks for.
+ * WHAT THIS DOES NOT DO: it does not convert content to CMYK. Colour arrives
+ * as ICC-tagged sRGB and the RIP separates it to the OutputIntent space.
+ * PDF/X-4 permits that. Individual printers may not — several shops require
+ * CMYK-native supplied files. Ask yours before treating this as sufficient.
+ *
+ * Live text (the vector-text overlay) and embedded Geist subsets are present
+ * in press output; an older revision of this comment claimed every page was a
+ * single flat PNG, which stopped being true when the overlay shipped.
  *
  * All work is client-side. No native binaries. No server round-trip.
  */
@@ -30,8 +36,10 @@ import {
   PDFRef,
   PDFString,
 } from "pdf-lib";
+import { sRgbIccBytes } from "./icc-srgb";
 import gracolAsset from "@/assets/icc/GRACoL2013_CRPC6.icc.asset.json";
 import swopAsset from "@/assets/icc/SWOP2013_CRPC5.icc.asset.json";
+
 
 export type IccProfileKey = "GRACoL2013_CRPC6" | "SWOP2013_CRPC5";
 
@@ -84,6 +92,12 @@ export interface WrapPdfAsX4Options {
   title?: string;
   /** Optional creator for XMP xmp:CreatorTool. */
   creator?: string;
+  /**
+   * Retag DeviceRGB rasters as ICCBased/sRGB. Default true. Set false only to
+   * reproduce the old untagged output for comparison against a printer's
+   * preflight report.
+   */
+  tagRastersAsSRgb?: boolean;
 }
 
 const IN_TO_PT = 72;
@@ -129,9 +143,27 @@ export async function wrapPdfAsX4(
   // ── ICC profile stream (DestOutputProfile) ────────────────────────────
   // Uncompressed raw stream is safest for printer-side conformance
   // checkers. `context.stream` creates a PDFRawStream with no filter.
+  //
+  // /N and /Alternate MUST match the profile's own colour space, read from
+  // ICC header bytes 16..19. This previously hard-coded N:3 / DeviceRGB while
+  // embedding GRACoL and SWOP, both of which are CMYK ('CMYK' at byte 16) —
+  // a conformance error that some RIPs reject outright and others silently
+  // mis-read.
+  const profileSpace = String.fromCharCode(
+    opts.iccProfileBytes[16]!,
+    opts.iccProfileBytes[17]!,
+    opts.iccProfileBytes[18]!,
+    opts.iccProfileBytes[19]!,
+  ).trim();
+  const componentsForSpace = (space: string): { n: number; alt: string } => {
+    if (space === "CMYK") return { n: 4, alt: "DeviceCMYK" };
+    if (space === "GRAY") return { n: 1, alt: "DeviceGray" };
+    return { n: 3, alt: "DeviceRGB" };
+  };
+  const destSpace = componentsForSpace(profileSpace);
   const iccStream = pdfDoc.context.stream(opts.iccProfileBytes, {
-    N: 3, // RGB output profile — 3 color components
-    Alternate: PDFName.of("DeviceRGB"),
+    N: destSpace.n,
+    Alternate: PDFName.of(destSpace.alt),
   });
   const iccRef = pdfDoc.context.register(iccStream);
 
@@ -147,6 +179,16 @@ export async function wrapPdfAsX4(
   const oiArray = PDFArray.withContext(pdfDoc.context);
   oiArray.push(oiDict);
   pdfDoc.catalog.set(PDFName.of("OutputIntents"), oiArray);
+
+  // ── Tag every raster as ICCBased/sRGB ─────────────────────────────────
+  const tagged = opts.tagRastersAsSRgb === false ? 0 : tagRgbImagesAsSRgb(pdfDoc);
+  console.info(
+    `[pdf-x4] OutputIntent ${opts.iccProfileName} (${profileSpace}, N=${destSpace.n}); ` +
+      `${tagged} raster${tagged === 1 ? "" : "s"} tagged ICCBased/sRGB.`,
+  );
+
+
+
 
   // ── XMP metadata (PDF/X-4 identification) ─────────────────────────────
   const xmp = buildXmpMetadata({
@@ -173,6 +215,59 @@ export async function wrapPdfAsX4(
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// sRGB raster tagging
+// ─────────────────────────────────────────────────────────────────────────
+
+/**
+ * Retag every DeviceRGB image XObject as `[/ICCBased <sRGB stream>]`.
+ *
+ * PDF/X-4 permits device-INDEPENDENT colour, so RGB content is not itself a
+ * violation — what fails preflight is *untagged device* colour, which is
+ * exactly what a `<canvas>` / html2canvas raster is. Tagging each raster with
+ * an sRGB profile makes the colour device-independent and lets the RIP do the
+ * separation to the OutputIntent's CMYK space.
+ *
+ * That is a much smaller job than building a CMYK emission path — but whether
+ * it is ACCEPTABLE is a question for the printer, not for this code. Some shops
+ * require CMYK-native supplied files and will reject RGB-in regardless of
+ * tagging. Confirm before assuming this closes the colour gap.
+ *
+ * Returns the number of image XObjects retagged. Untouched: /DeviceGray (soft
+ * masks), /Indexed, and anything already ICCBased.
+ */
+function tagRgbImagesAsSRgb(pdfDoc: PDFDocument): number {
+  let iccRef: PDFRef | null = null;
+  const ensureSRgbRef = (): PDFRef => {
+    if (iccRef) return iccRef;
+    const bytes = sRgbIccBytes();
+    const stream = pdfDoc.context.stream(bytes, {
+      N: 3,
+      Alternate: PDFName.of("DeviceRGB"),
+    });
+    iccRef = pdfDoc.context.register(stream);
+    return iccRef;
+  };
+
+  let count = 0;
+  for (const [, obj] of pdfDoc.context.enumerateIndirectObjects()) {
+    const dict = obj instanceof PDFRawStream ? obj.dict : null;
+    if (!dict) continue;
+    const subtype = dict.get(PDFName.of("Subtype"));
+    if (!(subtype instanceof PDFName) || subtype.asString() !== "/Image") continue;
+    const cs = dict.get(PDFName.of("ColorSpace"));
+    if (!(cs instanceof PDFName) || cs.asString() !== "/DeviceRGB") continue;
+
+    const arr = PDFArray.withContext(pdfDoc.context);
+    arr.push(PDFName.of("ICCBased"));
+    arr.push(ensureSRgbRef());
+    dict.set(PDFName.of("ColorSpace"), arr);
+    count += 1;
+  }
+  return count;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+
 // XMP construction
 // ─────────────────────────────────────────────────────────────────────────
 

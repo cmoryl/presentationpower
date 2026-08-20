@@ -65,8 +65,10 @@ export type PrintColorBuild = {
 /** Flat 100K — the only permitted separation for body copy. */
 export const TEXT_BLACK: Cmyk = { c: 0, m: 0, y: 0, k: 100 };
 
-/** Rich black for large fills and panels only. Never behind small type. */
-export const RICH_BLACK: Cmyk = { c: 60, m: 40, y: 40, k: 100 };
+// NOTE: there is deliberately no RICH_BLACK constant. A rich-black build is a
+// press decision (support screen depends on stock and TAC limit), not a value
+// this codebase gets to pick. Large dark fills use the brand's approved dark
+// build once one exists; until then they are unresolved like every other slot.
 
 /**
  * Point size at or below which a fill must resolve to 100K. Above it, a rich
@@ -96,38 +98,26 @@ export const TAC_LIMIT_COATED = 320;
 export const TAC_LIMIT_UNCOATED = 280;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Proposed builds (NOT approvals)
+// No proposed builds. By design.
 //
-// Only the shared corporate inks have a proposed build, because those are the
-// ones every brand mode reuses. Division accents are intentionally left blank:
-// several are out-of-gamut on coated (#58ED21, #A1FBF9, #4ADE80) and need a
-// human decision about whether they become a duller process build, a spot, or
-// are simply not used in print.
+// An earlier revision of this file shipped a PROPOSED table with CMYK values
+// and a Pantone suggestion for #003FC7, #03002C and #F2F2F2. Those numbers were
+// authored here, not derived from a press profile, a stock, or a brand owner —
+// which makes them worse than blank, because a table of plausible values gets
+// copied by whoever finds it and looks resolved when it isn't. Deleted.
+//
+// There is no correct automatic conversion from sRGB to CMYK. Every slot stays
+// empty until a human with brand authority fills it against a named stock and
+// profile. The only value in this file that is not a colour decision is
+// TEXT_BLACK (100K), which is a registration rule.
 // ─────────────────────────────────────────────────────────────────────────────
 
-const PROPOSED: Record<string, { cmyk?: Cmyk; spot?: SpotColor; note?: string }> = {
-  // TP Blue 500 — the identity blue. Out of process gamut; a spot is the only
-  // way to hold it on coated offset.
-  "#003FC7": {
-    cmyk: { c: 100, m: 82, y: 0, k: 0 },
-    spot: { name: "PANTONE 2728 C", fallback: { c: 100, m: 82, y: 0, k: 0 } },
-    note: "Proposed only. Process build reads duller and slightly violet on coated. Spot recommended for offset covers.",
-  },
-  // TP Blue 800 — dark navy. Fine as a large fill; never as body text.
-  "#03002C": {
-    cmyk: { c: 95, m: 88, y: 40, k: 60 },
-    note: "Proposed only. Large fills and panels only — body text separates to 100K.",
-  },
-  // Light neutral surfaces reproduce predictably; still needs sign-off because
-  // a 4% tint can break up on uncoated stock.
-  "#F2F2F2": { cmyk: { c: 0, m: 0, y: 0, k: 5 } },
-};
-
-function proposedFor(hex: string): { cmyk?: Cmyk; spot?: SpotColor; note?: string } | undefined {
-  return PROPOSED[hex.toUpperCase()];
+function proposedFor(_hex: string): { cmyk?: Cmyk; spot?: SpotColor; note?: string } | undefined {
+  return undefined;
 }
 
 function slotFor(
+
   role: PrintColorSlot["role"],
   hex: string,
   intent: PrintIntent,
