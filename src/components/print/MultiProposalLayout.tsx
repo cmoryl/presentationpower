@@ -1609,9 +1609,106 @@ const AFFINITY_SLOTS = [
   { x: 4.3, y: 9.6, w: 2.36, h: 0.56 },
 ];
 
-function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string }) {
+type Box = { x: number; y: number; w: number; h: number };
+
+/**
+ * Even wall grid for an arbitrary number of logos inside a region. Used when the
+ * author has added or removed tiles, so the page never overlaps or overflows.
+ */
+function logoGrid(
+  count: number,
+  region: { x: number; y: number; w: number; h: number },
+  maxPerRow: number,
+  tileMaxH: number,
+): Box[] {
+  if (count <= 0) return [];
+  const rows = Math.ceil(count / maxPerRow);
+  const perRow = Math.ceil(count / rows);
+  const pitchY = region.h / rows;
+  const h = Math.min(tileMaxH, Math.max(0.24, pitchY - 0.16));
+  const cellW = region.w / perRow;
+  const w = Math.min(cellW - 0.14, 1.7);
+
+  return Array.from({ length: count }, (_, i) => {
+    const row = Math.floor(i / perRow);
+    const inRow = i % perRow;
+    const rowCount = Math.min(perRow, count - row * perRow);
+    // Centre short trailing rows inside the region.
+    const rowW = rowCount * cellW;
+    const offX = region.x + (region.w - rowW) / 2;
+    return {
+      x: offX + inRow * cellW + (cellW - w) / 2,
+      y: region.y + row * pitchY + (pitchY - h) / 2,
+      w,
+      h,
+    };
+  });
+}
+
+function AdvocatesPage({
+  page,
+  logoDark,
+  pageIndex,
+}: {
+  page: MultiProposalPage;
+  logoDark: string;
+  pageIndex: number;
+}) {
   const advocacy = page.cards?.[0];
   const affinity = page.cards?.[1];
+  const imageCtx = usePrintImageEdit();
+
+  const causes: PrintLogoEntry[] =
+    page.causeLogos && page.causeLogos.length
+      ? page.causeLogos
+      : CAUSE_LOGOS.slice(0, 9).map((l) => ({ name: l.name, url: l.url }));
+  const affinities: PrintLogoEntry[] =
+    page.affinityLogos && page.affinityLogos.length
+      ? page.affinityLogos
+      : AFFINITY_LOGOS.slice(0, 4).map((l) => ({ name: l.name, url: l.url }));
+
+  const causePath = `pages.${pageIndex}.causeLogos`;
+  const affinityPath = `pages.${pageIndex}.affinityLogos`;
+
+  const causeBoxes =
+    causes.length === 9 && !page.causeLogos
+      ? CAUSE_SLOTS
+      : logoGrid(causes.length, { x: 3.0, y: 2.4, w: 5.08, h: 1.68 }, 5, 0.5);
+  const affinityBoxes =
+    affinities.length === 4 && !page.affinityLogos
+      ? AFFINITY_SLOTS
+      : logoGrid(affinities.length, { x: 3.0, y: 8.44, w: 4.9, h: 1.9 }, 3, 0.66);
+
+  const wall = (
+    entries: PrintLogoEntry[],
+    boxes: Box[],
+    path: string,
+    legacyPrefix: string,
+  ) =>
+    entries.map((entry, i) => {
+      const box = boxes[i];
+      if (!box) return null;
+      const id = logoEntryId(entry, i);
+      const src = resolveImageSlot(
+        imageCtx?.overrides,
+        `${legacyPrefix}.${i + 1}`,
+        entry.url || TRANSPARENT_PX,
+      );
+      return (
+        <L key={`${id}-${i}`} x={box.x} y={box.y} w={box.w} h={box.h}>
+          <LogoSlotChrome path={path} list={entries} index={i}>
+            <EditableImage
+              slot={`${legacyPrefix}.${id}`}
+              src={src}
+              alt={entry.name ?? ""}
+              fit="contain"
+              label="logo"
+            />
+          </LogoSlotChrome>
+        </L>
+      );
+    });
+
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
@@ -1625,7 +1722,7 @@ function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: 
         }}
       />
 
-      <T x={3.12} y={0.78} w={4.8} size={39.9} weight={300} leading={1.1} tracking="-0.01em">
+      <T x={3.13} y={0.86} w={5} size={45.6} weight={300} leading={1.06} tracking="-0.02em">
         {page.title || "Giving Back"}
       </T>
       <T x={3.13} y={1.5} w={4.9} size={13} weight={400} tracking="0.03em" upper>
@@ -1633,23 +1730,10 @@ function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: 
       </T>
       <Rule x={3.12} y={2.06} w={5.08} color="rgba(255,255,255,0.7)" />
 
-      {CAUSE_LOGOS.slice(0, 9).map((logo, i) => {
-        const box = CAUSE_SLOTS[i]!;
-        return (
-          <Img
-            key={logo.name}
-            x={box.x}
-            y={box.y}
-            w={box.w}
-            h={box.h}
-            src={logo.url}
-            alt={logo.name}
-            fit="contain"
-            slot={`advocates.cause.${i + 1}`}
-            label="logo"
-          />
-        );
-      })}
+      {wall(causes, causeBoxes, causePath, "advocates.cause")}
+      <L x={3.12} y={4.12} w={5.08}>
+        <AddLogoButton path={causePath} list={causes} label="Add cause logo" max={20} />
+      </L>
 
       <L
         x={0}
@@ -1698,26 +1782,14 @@ function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: 
       </T>
       <Rule x={4.63} y={8.29} w={3.17} color="rgba(255,255,255,0.7)" />
 
-      {AFFINITY_LOGOS.slice(0, 4).map((logo, i) => {
-        const box = AFFINITY_SLOTS[i]!;
-        return (
-          <Img
-            key={logo.name}
-            x={box.x}
-            y={box.y}
-            w={box.w}
-            h={box.h}
-            src={logo.url}
-            alt={logo.name}
-            fit="contain"
-            slot={`advocates.affinity.${i + 1}`}
-            label="logo"
-          />
-        );
-      })}
+      {wall(affinities, affinityBoxes, affinityPath, "advocates.affinity")}
+      <L x={3.12} y={10.4} w={5.08}>
+        <AddLogoButton path={affinityPath} list={affinities} label="Add affinity logo" max={12} />
+      </L>
     </>
   );
 }
+
 
 // ---------------------------------------------------------------------------
 // Pages 10–11 — team + closing (source uses a white plate over the band)
