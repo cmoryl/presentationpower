@@ -136,7 +136,7 @@ export function AutoFitText({
       cancelAnimationFrame(frame);
       ro.disconnect();
     };
-  }, [contentKey, minRatio]);
+  }, [contentKey, minRatio, maxLines, basePx]);
 
   return (
     <Tag
