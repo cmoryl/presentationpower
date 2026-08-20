@@ -84,16 +84,20 @@ export function EBrochureLayout({
 
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
+  // Shared masthead contract (see hero-style): authored sizes pin the ladder.
+  const heroStyle = heroStyleOf(content);
+  const titlePx = heroTitleFontPx(heroStyle, 30);
+  const summaryPx = heroSummaryFontPx(heroStyle, 11.5);
   useTextFit(heroRef, content.title, {
-    min: 24,
-    max: 30,
+    min: Math.min(24, titlePx),
+    max: titlePx,
     base: 50,
     cap: 95,
     containerWidth: PAGE_W,
   });
   useTextFit(introRef, content.summary ?? "", {
-    min: 10,
-    max: 11.5,
+    min: Math.min(10, summaryPx),
+    max: summaryPx,
     base: 160,
     cap: 260,
     containerWidth: PAGE_W,
@@ -173,15 +177,22 @@ export function EBrochureLayout({
                 }}
               >
                 <div
+                  style={{
+                    ...heroRuleTop(heroStyle, accent, 0),
+                    marginBottom: content.heroRule?.weight ? heroRuleGap(heroStyle, 12) : undefined,
+                  }}
+                />
+                <div
                   ref={heroRef}
                   style={{
                     margin: 0,
                     fontWeight: 700,
-                    fontSize: cq(30),
+                    fontSize: cq(titlePx),
                     lineHeight: 1.16,
                     letterSpacing: "-0.015em",
                     color: ink,
                     maxWidth: cq(440),
+                    ...heroTitleStyle(heroStyle),
                   }}
                 >
                   {content.title || "Untitled brochure"}
@@ -191,15 +202,22 @@ export function EBrochureLayout({
                     ref={introRef}
                     style={{
                       margin: `${cq(12)} 0 0`,
-                      fontSize: cq(11.5),
+                      fontSize: cq(summaryPx),
                       lineHeight: 1.65,
                       color: inkSoft,
                       maxWidth: cq(430),
+                      ...heroSummaryStyle(heroStyle),
                     }}
                   >
                     {content.summary}
                   </p>
                 )}
+                <div
+                  style={{
+                    ...heroHairline(heroStyle, { hairline: dividerCol }, false),
+                    marginTop: cq(14),
+                  }}
+                />
               </div>
             </div>
 
