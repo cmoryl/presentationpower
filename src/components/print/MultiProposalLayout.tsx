@@ -1274,6 +1274,7 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
 
       {[0, 1, 2].map((i) => {
         const q = quotes[i];
+        if (!q) return null;
         const x = startX + i * (cardW + gap);
         return (
           <Fragment key={i}>
@@ -1471,6 +1472,7 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
 
       {[0, 1, 2, 3].map((i) => {
         const q = quotes[i];
+        if (!q) return null;
         const x = 0.4 + (i % 2) * (cardW + 0.24);
         const y = 3.3 + Math.floor(i / 2) * (cardH + 0.3);
         return (
