@@ -4914,18 +4914,40 @@ export function syncAdoptedBlockText(
   nextValue: unknown,
 ): CanvasBlock[] | undefined {
   if (!blocks?.length) return blocks;
-  const prev = typeof prevValue === "string" ? prevValue.trim() : "";
-  const next = typeof nextValue === "string" ? nextValue : "";
-  if (!prev || prev === next.trim()) return blocks;
+  // Collect (old → new) string pairs; handles both a single field write and an
+  // array/object write (a whole `items` commit from a row panel).
+  const pairs: [string, string][] = [];
+  const walk = (a: unknown, b: unknown) => {
+    if (typeof a === "string" || typeof b === "string") {
+      const prev = typeof a === "string" ? a.trim() : "";
+      const next = typeof b === "string" ? b : "";
+      if (prev && prev !== next.trim()) pairs.push([prev, next]);
+      return;
+    }
+    if (Array.isArray(a) && Array.isArray(b)) {
+      for (let i = 0; i < Math.min(a.length, b.length); i++) walk(a[i], b[i]);
+      return;
+    }
+    if (a && b && typeof a === "object" && typeof b === "object") {
+      for (const k of Object.keys(a as Record<string, unknown>)) {
+        walk((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]);
+      }
+    }
+  };
+  walk(prevValue, nextValue);
+  if (!pairs.length) return blocks;
+  const map = new Map(pairs);
   let changed = false;
   const out = blocks.map((b) => {
     if (!b.sourceSelector) return b;
-    if ((b.text ?? "").trim() !== prev) return b;
+    const hit = map.get((b.text ?? "").trim());
+    if (hit === undefined) return b;
     changed = true;
-    return { ...b, text: next };
+    return { ...b, text: hit };
   });
   return changed ? out : blocks;
 }
+
 
 function setPath(
 
