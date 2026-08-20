@@ -201,9 +201,12 @@ function HeroCard({
   mode,
   useReal,
   iconStyle,
+  pageSize,
+  marginPreset,
   picked,
   onPick,
 }: {
+
   module: PrintSectionModule;
   mode: "light" | "dark";
   useReal: boolean;
