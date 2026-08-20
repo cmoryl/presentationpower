@@ -274,7 +274,12 @@ export function CaseStudyLayout({
                       flexShrink: 0,
                     }}
                   >
-                    <EditableIcon slot={`cs.stat.${i}`} d={STAT_ICONS[i % STAT_ICONS.length]!} size={cq(17)} color={accentInk} />
+                    <EditableIcon
+                      slot={`cs.stat.${i}`}
+                      d={STAT_ICONS[i % STAT_ICONS.length]!}
+                      size={cq(17)}
+                      color={accentInk}
+                    />
                   </div>
                   <div>
                     <div

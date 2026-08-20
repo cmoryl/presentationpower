@@ -338,7 +338,12 @@ export function SpotlightLayout({
                               ...chipStyle(mode, accent),
                             }}
                           >
-                            <EditableIcon slot={`sp.stat.${i}`} name={pickStatIcon(s.label, i)} size={cq(15)} color={accentInk} />
+                            <EditableIcon
+                              slot={`sp.stat.${i}`}
+                              name={pickStatIcon(s.label, i)}
+                              size={cq(15)}
+                              color={accentInk}
+                            />
                           </div>
                           <div
                             style={{
@@ -391,7 +396,12 @@ export function SpotlightLayout({
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <EditableIcon slot="sp.quote" name="chat" size={cq(15)} color={accentInk} />
+                          <EditableIcon
+                            slot="sp.quote"
+                            name="chat"
+                            size={cq(15)}
+                            color={accentInk}
+                          />
                         </div>
                         <div
                           style={{
@@ -424,7 +434,13 @@ export function SpotlightLayout({
                           className="flex items-center"
                           style={{ gap: cq(6), marginTop: i === 0 ? cq(10) : cq(6) }}
                         >
-                          <EditableIcon slot="sp.check" name="check" size={cq(11)} color={accentInk} strokeWidth={2.5} />
+                          <EditableIcon
+                            slot="sp.check"
+                            name="check"
+                            size={cq(11)}
+                            color={accentInk}
+                            strokeWidth={2.5}
+                          />
                           <div
                             style={{
                               fontSize: cq(9),
@@ -495,7 +511,12 @@ export function SpotlightLayout({
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <EditableIcon slot={`sp.item.${i}`} name={iconName} size={cq(13)} color={accentInk} />
+                          <EditableIcon
+                            slot={`sp.item.${i}`}
+                            name={iconName}
+                            size={cq(13)}
+                            color={accentInk}
+                          />
                         </div>
                         <div
                           style={{

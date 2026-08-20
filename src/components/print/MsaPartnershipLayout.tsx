@@ -1,10 +1,6 @@
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
-import type {
-  MsaPartnershipContent,
-  PrintDensity,
-  PrintPageSize,
-} from "@/lib/print-assets.types";
+import type { MsaPartnershipContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";

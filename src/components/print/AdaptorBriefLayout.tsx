@@ -20,7 +20,6 @@ import {
   IconPath as Icon,
   clampLines,
   PrintEyebrow,
-
 } from "@/components/print/print-primitives";
 
 // -----------------------------------------------------------------------
@@ -242,7 +241,12 @@ export function AdaptorBriefLayout({
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <EditableIcon slot={`ab.item.${i}`} d={glyph!} size={cq(18)} color={accentInk} />
+                          <EditableIcon
+                            slot={`ab.item.${i}`}
+                            d={glyph!}
+                            size={cq(18)}
+                            color={accentInk}
+                          />
                         </div>
                         <div
                           style={{

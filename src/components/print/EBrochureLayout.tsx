@@ -216,7 +216,12 @@ export function EBrochureLayout({
                             ...chipStyle(mode, accent, SECTION_WARM[i]!),
                           }}
                         >
-                          <EditableIcon slot={`eb.section.${i}`} d={SECTION_ICONS[i]!} size={cq(16)} color={accentInk} />
+                          <EditableIcon
+                            slot={`eb.section.${i}`}
+                            d={SECTION_ICONS[i]!}
+                            size={cq(16)}
+                            color={accentInk}
+                          />
                         </div>
                         <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>
                           {s.heading}
@@ -372,7 +377,13 @@ export function EBrochureLayout({
                         className="flex items-center"
                         style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}
                       >
-                        <EditableIcon slot="eb.check" d={ICONS.check} size={cq(11)} color={accentInk} strokeWidth={2.5} />
+                        <EditableIcon
+                          slot="eb.check"
+                          d={ICONS.check}
+                          size={cq(11)}
+                          color={accentInk}
+                          strokeWidth={2.5}
+                        />
                         <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
                           {b}
                         </div>
