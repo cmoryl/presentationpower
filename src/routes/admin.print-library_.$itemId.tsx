@@ -198,16 +198,17 @@ function MasterItemEditorPage() {
       })
     : [];
 
-  function patchPath(path: string, value: unknown) {
+  const current: Draft = draft;
+  const patchPath = (path: string, value: unknown) => {
     setDraft((prev): Draft => {
-      const base: Draft = prev ?? draft;
+      const base: Draft = prev ?? current;
       if (!base.content) return base;
       return {
         ...base,
         content: contentWritePath(base.content, path, value) as Record<string, unknown>,
       };
     });
-  }
+  };
 
   const previewMode = draft.look.mode ?? mode;
 
