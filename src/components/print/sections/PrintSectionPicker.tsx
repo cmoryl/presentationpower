@@ -11,11 +11,13 @@ import type {
   PrintExpertiseVariant,
   PrintFeatureVariant,
   PrintLogoGridVariant,
+  PrintHeroModuleVariant,
   PrintQuoteVariant,
   PrintSection,
   PrintStatsVariant,
 } from "@/lib/print-assets.types";
 import {
+  PRINT_HERO_VARIANTS,
   PRINT_CONTACT_VARIANTS,
   PRINT_NARRATIVE_VARIANTS,
   PRINT_TABLE_VARIANTS,
@@ -33,6 +35,45 @@ export const PRINT_SECTION_DND_MIME = "application/x-print-section";
 const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
 
 // ---- factories -------------------------------------------------------------
+
+const HERO_STOCK =
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=70";
+
+export function makePrintHeroSection(variantId: PrintHeroModuleVariant): PrintSection {
+  const base = {
+    id: rid(),
+    kind: "hero" as const,
+    variantId,
+    eyebrow: "Case study",
+    kicker: "Acme Global",
+    title: "One connected program across every market",
+    summary:
+      "A single localization pipeline replaced twelve regional workflows — content now ships simultaneously in 36 markets.",
+    meta: [
+      { label: "Industry", value: "Life sciences" },
+      { label: "Region", value: "Global" },
+      { label: "Service", value: "GlobalLink Web" },
+    ],
+  };
+  if (variantId === "hero-photo-band" || variantId === "hero-split-photo") {
+    return { ...base, imageUrl: HERO_STOCK, focalX: 50, focalY: 45 };
+  }
+  if (variantId === "hero-stat-lockup") {
+    return {
+      ...base,
+      meta: [],
+      stats: [
+        { label: "Markets live", value: "36" },
+        { label: "Faster time to market", value: "3.4", unit: "x" },
+        { label: "Review cycles removed", value: "62", unit: "%" },
+      ],
+    };
+  }
+  if (variantId === "hero-type-stack" || variantId === "hero-accent-band") {
+    return { ...base, meta: base.meta.slice(0, 2) };
+  }
+  return base;
+}
 
 export function makePrintStatsSection(variantId: PrintStatsVariant): PrintSection {
   const base = {
@@ -353,6 +394,7 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
 // ---- Picker UI ------------------------------------------------------------
 
 type Family =
+  | "hero"
   | "stats"
   | "quote"
   | "logo-grid"
@@ -363,6 +405,7 @@ type Family =
   | "contact";
 
 const FAMILIES: Array<{ id: Family; label: string }> = [
+  { id: "hero", label: "Heroes" },
   { id: "stats", label: "Stats" },
   { id: "quote", label: "Quotes" },
   { id: "logo-grid", label: "Logos" },
@@ -377,6 +420,8 @@ function variantsForFamily(
   family: Family,
 ): Array<{ id: string; label: string; description: string }> {
   switch (family) {
+    case "hero":
+      return PRINT_HERO_VARIANTS;
     case "stats":
       return PRINT_STATS_VARIANTS;
     case "quote":
@@ -398,6 +443,8 @@ function variantsForFamily(
 
 function makeSectionFor(family: Family, id: string): PrintSection {
   switch (family) {
+    case "hero":
+      return makePrintHeroSection(id as PrintHeroModuleVariant);
     case "stats":
       return makePrintStatsSection(id as PrintStatsVariant);
     case "quote":

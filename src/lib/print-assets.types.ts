@@ -93,6 +93,44 @@ export type PrintStatsSection = {
   items: PrintStatItem[];
 };
 
+// ---- Hero family ----------------------------------------------------------
+// Page-opening lockups. These mirror the hero treatments the curated
+// collateral already uses (full-bleed photo band, split photo, typographic
+// stack, accent band, stat lockup, client lockup) but as insertable modules,
+// so a hero can also open a *section* mid-document.
+export type PrintHeroModuleVariant =
+  | "hero-photo-band"
+  | "hero-split-photo"
+  | "hero-type-stack"
+  | "hero-accent-band"
+  | "hero-stat-lockup"
+  | "hero-client-lockup";
+
+export type PrintHeroMetaRow = { label: string; value?: string };
+
+export type PrintHeroSection = {
+  id: string;
+  kind: "hero";
+  variantId: PrintHeroModuleVariant;
+  eyebrow?: string;
+  title: string;
+  summary?: string;
+  /** Small kicker over the title (client name, product, division). */
+  kicker?: string;
+  /** Photography for the photo-bearing variants. */
+  imageUrl?: string;
+  /** Focal point 0..100 for the photo crop. */
+  focalX?: number;
+  focalY?: number;
+  /** Meta chips / rail (Industry, Region, Service line …). */
+  meta?: PrintHeroMetaRow[];
+  /** Inline proof numbers for the stat lockup variant. */
+  stats?: PrintStatItem[];
+  align?: "left" | "center";
+  /** Flip the photo to the right on the split variant. */
+  reverse?: boolean;
+};
+
 // ---- Quote family ---------------------------------------------------------
 export type PrintQuoteVariant =
   | "pull-quote-hero"
@@ -245,6 +283,7 @@ export type PrintContactSection = {
 
 /** Discriminated union — future families add cases here. */
 export type PrintSection =
+  | PrintHeroSection
   | PrintStatsSection
   | PrintQuoteSection
   | PrintLogoGridSection
