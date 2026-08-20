@@ -87,10 +87,21 @@ export function CaseStudyLayout({
     ? `${content.client || "Client"} — ${content.summary}`
     : `${content.client || "Client"} case study`;
   const heroTitle = content.summary?.trim() ? content.summary : title;
-  useTextFit(heroRef, heroTitle, { min: 22, max: 32, base: 60, cap: 110, containerWidth: PAGE_W });
+  // Same masthead contract as the modular hero sections: an authored title /
+  // summary size pins the fit ladder, otherwise it auto-fits as before.
+  const heroStyle = heroStyleOf(content);
+  const titlePx = heroTitleFontPx(heroStyle, 32);
+  const summaryPx = heroSummaryFontPx(heroStyle, 12);
+  useTextFit(heroRef, heroTitle, {
+    min: Math.min(22, titlePx),
+    max: titlePx,
+    base: 60,
+    cap: 110,
+    containerWidth: PAGE_W,
+  });
   useTextFit(introRef, content.industry ?? content.audience ?? "", {
-    min: 10,
-    max: 12,
+    min: Math.min(10, summaryPx),
+    max: summaryPx,
     base: 120,
     cap: 210,
     containerWidth: PAGE_W,
@@ -224,11 +235,12 @@ export function CaseStudyLayout({
                   position: "relative",
                   margin: 0,
                   fontWeight: 700,
-                  fontSize: cq(32),
+                  fontSize: cq(titlePx),
                   lineHeight: 1.15,
                   letterSpacing: "-0.015em",
                   color: ink,
                   maxWidth: cq(460),
+                  ...heroTitleStyle(heroStyle),
                 }}
               >
                 {heroTitle || "Untitled case study"}
@@ -239,10 +251,11 @@ export function CaseStudyLayout({
                   style={{
                     position: "relative",
                     margin: `${cq(12)} 0 0`,
-                    fontSize: cq(12),
+                    fontSize: cq(summaryPx),
                     lineHeight: 1.6,
                     color: inkSoft,
                     maxWidth: cq(420),
+                    ...heroSummaryStyle(heroStyle),
                   }}
                 >
                   {[content.industry, content.audience].filter(Boolean).join(" · ")}
