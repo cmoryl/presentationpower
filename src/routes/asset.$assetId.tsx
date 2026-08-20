@@ -1373,6 +1373,7 @@ function AssetEditor() {
                   <button
                     type="button"
                     data-testid="canvas-hero-edit"
+                    data-export-ignore="true"
                     onClick={() => setHeroModalOpen(true)}
                     title="Edit hero image"
                     aria-label="Edit hero image"
