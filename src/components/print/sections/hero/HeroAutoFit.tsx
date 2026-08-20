@@ -124,7 +124,6 @@ export function AutoFitText({
       });
     };
 
-
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
