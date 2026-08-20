@@ -35,6 +35,7 @@ import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
 import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
+import { MultiProposalLayout, isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
   emptySpotlight,
