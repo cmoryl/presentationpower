@@ -6,6 +6,8 @@ import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { BrandLockup } from "@/components/BrandLockup";
 import { createPrintAssetWithBrief } from "@/lib/print-assets.functions";
+import { curatedMasterFor } from "@/lib/print-library/catalog";
+import { toEditableContent } from "@/lib/print-library/editable";
 import { FileText, Rocket, Layers, PenSquare } from "lucide-react";
 
 // Query-string seeds so all four entry points converge on this one wizard.
@@ -134,6 +136,13 @@ function NewAssetPage() {
       const slideIds = (search.slideIds ?? "")
         .split(",")
         .filter((s: string) => /^[0-9a-f-]{36}$/i.test(s));
+      // Kinds that ship a curated master (Solution Proposal, MSA partnership)
+      // open populated and fully editable instead of an empty document.
+      const master =
+        kind === "solution-proposal" || kind === "msa-partnership"
+          ? curatedMasterFor(kind, brandModeId)
+          : undefined;
+      const seeded = master ? (toEditableContent(master) ?? {}) : {};
       const asset = await create({
         data: {
           kind,
@@ -146,7 +155,8 @@ function NewAssetPage() {
           sourceDeckId: search.sourceDeckId,
           sourceSlideIds: slideIds,
           sourceModuleIds: search.sourceModuleId ? [search.sourceModuleId] : [],
-          content: {},
+          content: { ...seeded, ...(title.trim() ? { title: title.trim() } : {}) },
+
           context: {
             pageSize,
             distribution,
