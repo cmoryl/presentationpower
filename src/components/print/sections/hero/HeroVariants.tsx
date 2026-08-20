@@ -42,11 +42,7 @@ function heroRuleGap(section: PrintHeroSection, def: number): string {
 }
 
 /** Closing hairline under the title block. */
-function heroHairline(
-  section: PrintHeroSection,
-  ink: { hairline: string },
-  shownByDefault = true,
-) {
+function heroHairline(section: PrintHeroSection, ink: { hairline: string }, shownByDefault = true) {
   const shown = section.rule?.hairline ?? shownByDefault;
   if (!shown) return { borderBottom: "none" as const };
   return { borderBottom: `1px solid ${section.rule?.hairlineColor ?? ink.hairline}` };
@@ -263,7 +259,8 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
       {section.eyebrow && (
         <div
           style={{
-            ...EYEBROW(accent), ...heroEyebrowStyle(section),
+            ...EYEBROW(accent),
+            ...heroEyebrowStyle(section),
             paddingBottom: cq(8),
             marginBottom: cq(10),
             borderBottom: `1px solid ${ink.hairline}`,
@@ -353,7 +350,9 @@ export function HeroTypeStack({ section, mode, accent }: Props) {
       }}
     >
       {section.eyebrow && (
-        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
+        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
+          {section.eyebrow}
+        </div>
       )}
       <AutoFitText
         as="h2"
@@ -460,7 +459,9 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
       }}
     >
       {section.eyebrow && (
-        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(8) }}>{section.eyebrow}</div>
+        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(8) }}>
+          {section.eyebrow}
+        </div>
       )}
       <AutoFitText
         as="h2"
@@ -556,7 +557,11 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
     >
       <div style={{ display: "grid", gridTemplateColumns: `${cq(160)} 1fr`, gap: cq(24) }}>
         <div style={{ borderRight: `1px solid ${ink.hairline}`, paddingRight: cq(16) }}>
-          {section.eyebrow && <div style={{ ...EYEBROW(accent, 8.5), ...heroEyebrowStyle(section) }}>{section.eyebrow}</div>}
+          {section.eyebrow && (
+            <div style={{ ...EYEBROW(accent, 8.5), ...heroEyebrowStyle(section) }}>
+              {section.eyebrow}
+            </div>
+          )}
           {section.kicker && (
             <div
               style={{
@@ -662,7 +667,9 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           }}
         >
           {section.eyebrow && (
-            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
+            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
+              {section.eyebrow}
+            </div>
           )}
 
           <AutoFitText
@@ -723,7 +730,9 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: cq(28) }}>
         <div>
           {section.eyebrow && (
-            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
+            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
+              {section.eyebrow}
+            </div>
           )}
           {section.kicker && (
             <div style={{ ...EYEBROW(ink.faint, 8.5), marginBottom: cq(6) }}>{section.kicker}</div>
@@ -794,9 +803,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
             </AutoFitText>
             {q.role && <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>}
             {q.author && (
-              <div
-                style={{ marginTop: cq(2), fontWeight: 700, color: ink.strong }}
-              >
+              <div style={{ marginTop: cq(2), fontWeight: 700, color: ink.strong }}>
                 — {q.author}
                 {q.company ? ` · ${q.company}` : ""}
               </div>
@@ -967,7 +974,9 @@ export function HeroBriefLockup({ section, mode, accent }: Props) {
           borderBottom: `1px solid ${ink.hairline}`,
         }}
       >
-        <span style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section) }}>{section.eyebrow ?? "Brief"}</span>
+        <span style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section) }}>
+          {section.eyebrow ?? "Brief"}
+        </span>
         <span style={{ ...EYEBROW(ink.faint, 8.5) }}>{section.kicker ?? "TransPerfect"}</span>
       </div>
       <AutoFitText
