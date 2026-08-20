@@ -4,8 +4,19 @@
 // variables from measured overflow. Purely presentational: content is never
 // rewritten, so the fit travels into PDF/PNG exports (the vars are inline on a
 // captured ancestor) and reverts the moment copy shrinks again.
+//
+// STABILITY CONTRACT (this is what stops the canvas flickering):
+//   * `dep` is reduced to a string signature — an object identity that changes
+//     every render must never reset the knobs.
+//   * Our own knob writes change layout, which fires the ResizeObserver. Those
+//     echoes are ignored inside a settle window, and a resize only restarts
+//     fitting when the measured page geometry actually moved.
+//   * `onChange` only fires when the knobs or the overflow bucket really
+//     changed, so parents cannot be re-rendered in a loop.
+//   * `override` pins a knob to a manual value and disables the auto ladder for
+//     it, so author-chosen sizing is never fought by the measurement loop.
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import {
   NEUTRAL_FIT,
@@ -15,33 +26,52 @@ import {
   type PrintContentFitSettings,
   type PrintFitKnobs,
 } from "@/lib/print-content-fit";
+import { measurePrintPage, type PrintFitMeasurement } from "@/lib/print-fit-audit";
 
-/** Measure the worst clipped height inside the page root, in rendered px. */
-function measureOverflow(host: HTMLElement): { px: number; height: number } {
-  const page = host.querySelector<HTMLElement>("[data-print-page]");
-  if (!page) return { px: 0, height: 0 };
-  const height = page.clientHeight;
-  let worst = Math.max(0, page.scrollHeight - page.clientHeight);
-  const pageBottom = page.getBoundingClientRect().bottom;
-  for (const el of Array.from(page.querySelectorAll<HTMLElement>("*"))) {
-    const rect = el.getBoundingClientRect();
-    if (rect.height === 0) continue;
-    const past = rect.bottom - pageBottom;
-    if (past > 2) worst = Math.max(worst, past);
+export type PrintFitOverride = { scale?: number; pad?: number };
+
+/** Cheap, stable signature for an arbitrary dep value. */
+function signature(dep: unknown): string {
+  if (dep == null) return "none";
+  if (typeof dep !== "object") return String(dep);
+  try {
+    const json = JSON.stringify(dep);
+    let h = 0;
+    for (let i = 0; i < json.length; i += 1) h = (h * 31 + json.charCodeAt(i)) | 0;
+    return `${json.length}:${h}`;
+  } catch {
+    return "obj";
   }
-  return { px: Math.round(worst), height };
+}
+
+function sameKnobs(a: PrintFitKnobs, b: PrintFitKnobs): boolean {
+  return Math.abs(a.scale - b.scale) < 1e-4 && Math.abs(a.pad - b.pad) < 1e-4;
+}
+
+function applyOverride(k: PrintFitKnobs, o: PrintFitOverride | undefined): PrintFitKnobs {
+  if (!o) return k;
+  return {
+    scale: typeof o.scale === "number" ? o.scale : k.scale,
+    pad: typeof o.pad === "number" ? o.pad : k.pad,
+  };
 }
 
 export function PrintContentFitFrame({
   settings,
   dep,
+  override,
   onChange,
+  onMeasure,
   children,
 }: {
   settings?: Partial<PrintContentFitSettings>;
   /** Any value that should restart fitting (content, page size, density…). */
   dep?: unknown;
+  /** Manual knob pins from the correction panel. */
+  override?: PrintFitOverride;
   onChange?: (knobs: PrintFitKnobs, overflowFrac: number) => void;
+  /** Latest live measurement of the page (quantised, so it is loop-safe). */
+  onMeasure?: (m: PrintFitMeasurement) => void;
   children: ReactNode;
 }) {
   const resolved = resolveContentFit(settings);
@@ -50,63 +80,102 @@ export function PrintContentFitFrame({
   const knobsRef = useRef<PrintFitKnobs>(NEUTRAL_FIT);
   const cbRef = useRef(onChange);
   cbRef.current = onChange;
+  const measureCbRef = useRef(onMeasure);
+  measureCbRef.current = onMeasure;
 
-  const key = `${resolved.enabled}|${resolved.threshold}|${resolved.minScale}|${resolved.minPad}|${resolved.marginRelief}`;
-
-  // Reset knobs whenever content or settings change, then re-converge.
-  useEffect(() => {
-    knobsRef.current = NEUTRAL_FIT;
-    setKnobs(NEUTRAL_FIT);
-  }, [dep, key]);
+  const depKey = useMemo(() => signature(dep), [dep]);
+  const overrideKey = `${override?.scale ?? "a"}|${override?.pad ?? "a"}`;
+  const key = `${resolved.enabled}|${resolved.threshold}|${resolved.minScale}|${resolved.minPad}|${resolved.marginRelief}|${overrideKey}`;
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    if (!resolved.enabled) {
-      knobsRef.current = NEUTRAL_FIT;
-      setKnobs(NEUTRAL_FIT);
-      cbRef.current?.(NEUTRAL_FIT, 0);
-      return;
-    }
+
+    // Start each convergence run from the manual pins (or neutral).
+    const start = applyOverride(NEUTRAL_FIT, override);
+    knobsRef.current = start;
+    setKnobs(start);
 
     let raf = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     let cancelled = false;
     let steps = 0;
+    let settleUntil = 0;
+    let lastGeom = "";
+    let lastReport = "";
+
+    const report = (m: PrintFitMeasurement) => {
+      const sig = `${knobsRef.current.scale.toFixed(3)}|${knobsRef.current.pad.toFixed(3)}|${m.overflowPx}`;
+      if (sig === lastReport) return;
+      lastReport = sig;
+      cbRef.current?.(knobsRef.current, m.overflowFrac);
+      measureCbRef.current?.(m);
+    };
 
     const tick = () => {
       if (cancelled) return;
-      const { px, height } = measureOverflow(host);
-      const frac = height > 0 ? px / height : 0;
-      const next = nextFitStep(knobsRef.current, frac, resolved);
-      if (next && steps < 40) {
+      const m = measurePrintPage(host, knobsRef.current);
+      if (!m) return;
+
+      // Manual pins win: only auto-tune knobs the author has not pinned.
+      const canScale = typeof override?.scale !== "number";
+      const canPad = typeof override?.pad !== "number";
+      const proposed = resolved.enabled
+        ? nextFitStep(knobsRef.current, m.overflowFrac, resolved)
+        : null;
+      const next =
+        proposed &&
+        ((canScale && Math.abs(proposed.scale - knobsRef.current.scale) > 1e-6) ||
+          (canPad && Math.abs(proposed.pad - knobsRef.current.pad) > 1e-6))
+          ? applyOverride(proposed, override)
+          : null;
+
+      if (next && steps < 24 && !sameKnobs(next, knobsRef.current)) {
         steps += 1;
         knobsRef.current = next;
         setKnobs(next);
+        // Our own write is about to resize the page — ignore that echo.
+        settleUntil = Date.now() + 220;
         raf = requestAnimationFrame(tick);
         return;
       }
-      cbRef.current?.(knobsRef.current, frac);
+
+      settleUntil = Date.now() + 160;
+      lastGeom = `${m.pageW}x${m.pageH}`;
+      report(m);
     };
 
-    const schedule = () => {
+    const schedule = (fromObserver: boolean) => {
+      if (fromObserver && Date.now() < settleUntil) return;
+      if (fromObserver) {
+        const page = host.querySelector<HTMLElement>("[data-print-page]");
+        const geom = page ? `${Math.round(page.clientWidth)}x${Math.round(page.clientHeight)}` : "";
+        // Layout echo from our own knob write: same page box, nothing to redo.
+        if (geom && geom === lastGeom) return;
+      }
+      if (timer) clearTimeout(timer);
       cancelAnimationFrame(raf);
-      steps = 0;
-      raf = requestAnimationFrame(tick);
+      timer = setTimeout(() => {
+        steps = 0;
+        raf = requestAnimationFrame(tick);
+      }, fromObserver ? 120 : 0);
     };
 
-    schedule();
-    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    schedule(false);
+    const ro =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(() => schedule(true));
     ro?.observe(host);
     const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
-    fonts?.ready?.then(schedule).catch(() => {});
+    fonts?.ready?.then(() => schedule(false)).catch(() => {});
 
     return () => {
       cancelled = true;
+      if (timer) clearTimeout(timer);
       cancelAnimationFrame(raf);
       ro?.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dep, key]);
+  }, [depKey, key]);
 
   return (
     <div

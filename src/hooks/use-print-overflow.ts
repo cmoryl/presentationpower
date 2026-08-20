@@ -72,7 +72,8 @@ export function usePrintOverflow(
           if (cs.overflowY === "hidden" || cs.overflow === "hidden") worst = Math.max(worst, inner);
         }
       }
-      const overflowPx = Math.round(worst);
+      // Quantised to 4px buckets: sub-pixel reflow noise must not churn state.
+      const overflowPx = Math.round(worst / 4) * 4;
       const overflowFrac = pageHeight > 0 ? overflowPx / pageHeight : 0;
       setState((prev) =>
         prev.overflowPx === overflowPx && prev.pageHeight === pageHeight
@@ -81,17 +82,42 @@ export function usePrintOverflow(
       );
     };
 
-    const schedule = () => {
+    // Instrumentation attributes we write ourselves (content-fit knobs, audit
+    // badges, selection chrome). Re-measuring on those creates a feedback loop:
+    // measure -> state -> render -> attribute write -> measure … which is what
+    // made the canvas flicker. They are filtered out here.
+    const IGNORED_ATTRS = new Set([
+      "style",
+      "class",
+      "data-print-fit",
+      "data-fit-scale",
+      "data-fit-pad",
+      "data-audit-flag",
+      "aria-selected",
+      "data-selected",
+    ]);
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = (delay = 90) => {
+      if (timer) clearTimeout(timer);
       cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(measure);
+      timer = setTimeout(() => {
+        raf = requestAnimationFrame(measure);
+      }, delay);
     };
 
-    schedule();
-    const ro = new ResizeObserver(schedule);
+    schedule(0);
+    const ro = new ResizeObserver(() => schedule());
     ro.observe(host);
     const page = host.querySelector<HTMLElement>("[data-print-page]");
     if (page) ro.observe(page);
-    const mo = new MutationObserver(schedule);
+    const mo = new MutationObserver((records) => {
+      const meaningful = records.some((r) => {
+        if (r.type !== "attributes") return true;
+        return !IGNORED_ATTRS.has(r.attributeName ?? "");
+      });
+      if (meaningful) schedule();
+    });
     mo.observe(host, { subtree: true, childList: true, characterData: true, attributes: true });
     // Fonts settling changes text height after first paint.
     const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
@@ -99,6 +125,7 @@ export function usePrintOverflow(
 
     return () => {
       cancelled = true;
+      if (timer) clearTimeout(timer);
       cancelAnimationFrame(raf);
       ro.disconnect();
       mo.disconnect();

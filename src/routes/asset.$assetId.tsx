@@ -131,7 +131,16 @@ import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
 import { usePrintOverflow } from "@/hooks/use-print-overflow";
-import { PrintContentFitFrame } from "@/components/print/PrintContentFitFrame";
+import {
+  PrintContentFitFrame,
+  type PrintFitOverride,
+} from "@/components/print/PrintContentFitFrame";
+import { PrintFitAuditPanel } from "@/components/print/PrintFitAuditPanel";
+import type {
+  PrintFitAuditInput,
+  PrintFitFix,
+  PrintFitMeasurement,
+} from "@/lib/print-fit-audit";
 import {
   NEUTRAL_FIT,
   PRINT_CONTENT_FIT_DEFAULTS,
@@ -203,6 +212,30 @@ export const Route = createFileRoute("/asset/$assetId")({
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
+// Identity-stable defaults merge. The merged content object is the `dep` for
+// the content-fit frame, the overflow hook and the section overlay, so it must
+// keep the same identity while the stored row content is unchanged — otherwise
+// those three restart on every render and the canvas visibly flickers.
+const RAW_CONTENT_CACHE = new WeakMap<object, Map<string, Record<string, unknown>>>();
+
+function stableRawContent(
+  kind: string,
+  source: unknown,
+  build: () => Record<string, unknown>,
+): Record<string, unknown> {
+  const anchor = (typeof source === "object" && source !== null ? source : build) as object;
+  let byKind = RAW_CONTENT_CACHE.get(anchor);
+  if (!byKind) {
+    byKind = new Map();
+    RAW_CONTENT_CACHE.set(anchor, byKind);
+  }
+  const hit = byKind.get(kind);
+  if (hit) return hit;
+  const made = build();
+  byKind.set(kind, made);
+  return made;
+}
+
 function AssetEditor() {
   const { assetId } = Route.useParams();
   const navigate = useNavigate();
@@ -235,6 +268,8 @@ function AssetEditor() {
   const overflow = usePrintOverflow(canvasRef, row?.content);
   // Content-fit knobs currently applied by PrintContentFitFrame (1/1 = none).
   const [fitKnobs, setFitKnobs] = useState<PrintFitKnobs>(NEUTRAL_FIT);
+  // Latest measurement of the live page — feeds the audit + correction panel.
+  const [fitMeasure, setFitMeasure] = useState<PrintFitMeasurement | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
   // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
@@ -520,7 +555,10 @@ function AssetEditor() {
     | "ebrochure"
     | "adaptor-brief"
     | "msa-partnership";
-  const rawContent: Record<string, unknown> = (() => {
+  // Stable identity matters: this object is the `dep` for the content-fit
+  // frame, the overflow hook and the section overlay. A fresh object every
+  // render restarted all three, which is what made the canvas flicker.
+  const rawContent: Record<string, unknown> = stableRawContent(kind, row.content, () => {
     const c = (row.content as Record<string, unknown>) ?? {};
     if (kind === "spotlight")
       return { ...(emptySpotlight() as unknown as Record<string, unknown>), ...c };
@@ -531,7 +569,7 @@ function AssetEditor() {
     if (kind === "msa-partnership")
       return { ...(emptyMsaPartnership() as unknown as Record<string, unknown>), ...c };
     return { ...(emptyCaseStudy() as unknown as Record<string, unknown>), ...c };
-  })();
+  });
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
   // Icon treatment: the asset's own stored settings when it has them, else the
@@ -1222,7 +1260,9 @@ function AssetEditor() {
                 <PrintContentFitFrame
                   settings={ctx.contentFit}
                   dep={rawContent}
+                  override={ctx.fitOverride}
                   onChange={(knobs) => setFitKnobs(knobs)}
+                  onMeasure={setFitMeasure}
                 >
                   <PrintDocModeProvider
                     icons={iconTreatment.icons}
