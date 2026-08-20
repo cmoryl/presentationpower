@@ -21,6 +21,8 @@ function matchesAdminLinked(pathname: string): boolean {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const locSearch = useRouterState({ select: (s) => s.location.searchStr });
+
   const [theme, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
   const [presOpen, setPresOpen] = useState(false);
@@ -75,17 +77,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   const elementGroups: ReadonlyArray<{
     label: string;
     to: string;
-    items: ReadonlyArray<{ to: string; label: string }>;
+    items: ReadonlyArray<{ to: string; label: string; search?: Record<string, string> }>;
   }> = [
     {
       label: "Presentation",
       to: "/library",
       items: [
-        { to: "/library", label: "Modules" },
-        { to: "/agent", label: "Agent" },
-        { to: "/admin/canvas", label: "Canvas creator" },
-        { to: "/decks", label: "Decks" },
+        { to: "/library", label: "Slide modules" },
+        { to: "/library/my", label: "My decks" },
+        { to: "/decks", label: "All decks" },
         { to: "/library/imported", label: "Imported decks" },
+        { to: "/agent", label: "Deck agent" },
+        { to: "/admin/canvas", label: "Canvas creator" },
       ],
     },
     {
@@ -93,6 +96,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       to: "/library/print",
       items: [
         { to: "/library/print", label: "Print templates" },
+        { to: "/library/print", label: "Case studies", search: { type: "case-study" } },
+        { to: "/library/print", label: "Client spotlights", search: { type: "spotlight" } },
+        { to: "/library/print", label: "E-brochures", search: { type: "ebrochure" } },
         { to: "/library/print/modules", label: "Section modules" },
         { to: "/library/print/heroes", label: "Hero openers" },
       ],
@@ -105,6 +111,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/events/new", label: "New event asset" },
         { to: "/events/presets", label: "Presets" },
         { to: "/events/next", label: "Next-gen builder" },
+        { to: "/events/next/badges", label: "Badges" },
       ],
     },
     {
@@ -118,6 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       ],
     },
   ];
+
 
 
   const adminGroups: ReadonlyArray<{

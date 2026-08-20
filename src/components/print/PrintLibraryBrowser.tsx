@@ -39,22 +39,47 @@ type RenderPreview = (
  * the old flat template grid + per-division shelves with one navigable shelf
  * system and consistent preview cards.
  */
+export type PrintBrowserState = {
+  typeId: PrintTypeId | null;
+  collection: string;
+  query: string;
+  subId: string | null;
+};
+
 export function PrintLibraryBrowser({
   brandModes,
   divisionId,
   onDivisionChange,
   renderPreview,
+  state,
+  onStateChange,
 }: {
   brandModes: BrandMode[];
   divisionId: string;
   onDivisionChange: (id: string) => void;
   renderPreview: RenderPreview;
+  /** Optional URL-driven state so the shelf is deep-linkable. */
+  state?: PrintBrowserState;
+  onStateChange?: (patch: Partial<PrintBrowserState>) => void;
 }) {
-  const [typeId, setTypeId] = useState<PrintTypeId | null>(null);
-  const [collection, setCollection] = useState<string>("All");
-  const [query, setQuery] = useState("");
+  const [local, setLocal] = useState<PrintBrowserState>({
+    typeId: null,
+    collection: "All",
+    query: "",
+    subId: null,
+  });
+  const st = state ?? local;
+  const patch = (p: Partial<PrintBrowserState>) => {
+    if (onStateChange) onStateChange(p);
+    else setLocal((prev) => ({ ...prev, ...p }));
+  };
+  const { typeId, collection, query, subId } = st;
+  const setTypeId = (v: PrintTypeId | null) => patch({ typeId: v });
+  const setCollection = (v: string) => patch({ collection: v });
+  const setQuery = (v: string) => patch({ query: v });
+  const setSubId = (v: string | null) => patch({ subId: v });
   const [open, setOpen] = useState<PrintLibraryItem | null>(null);
-  const [subId, setSubId] = useState<string | null>(null);
+
 
   const divisions = useMemo(
     () => brandModes.filter((b) => !HIDDEN_DIVISION_IDS.has(b.id)),

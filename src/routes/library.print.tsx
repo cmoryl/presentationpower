@@ -24,6 +24,8 @@ import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { PrintAssetDirectory } from "@/components/print/PrintAssetDirectory";
 import { PrintLibraryBrowser } from "@/components/print/PrintLibraryBrowser";
+import type { PrintTypeId } from "@/lib/print-library/catalog";
+
 
 
 
@@ -58,7 +60,28 @@ import { logImageryEvent } from "@/lib/admin.functions";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Download, Copy, Sparkle, Star, Image as ImageIcon, ExternalLink } from "lucide-react";
 
+type PrintSearch = {
+  division?: string;
+  type?: string;
+  collection?: string;
+  sub?: string;
+  q?: string;
+};
+
+const str = (v: unknown): string | undefined => {
+  const s = typeof v === "string" ? v.trim() : "";
+  return s ? s : undefined;
+};
+
 export const Route = createFileRoute("/library/print")({
+  validateSearch: (search: Record<string, unknown>): PrintSearch => ({
+    division: str(search.division),
+    type: str(search.type),
+    collection: str(search.collection),
+    sub: str(search.sub),
+    q: str(search.q),
+  }),
+
   head: () => ({
     meta: [
       { title: "Print templates · Library" },
@@ -325,14 +348,47 @@ const CASE_STUDY_SEED: CaseStudyContent = emptyCaseStudy({
 // ---------------------------------------------------------------------------
 function PrintCenterPage() {
   const { brandModes } = useTaxonomy();
-  const [previewBrandId, setPreviewBrandId] = useState<string>(
-    () =>
-      brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ?? brandModes[0]?.id ?? "bm-enterprise",
-  );
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const fallbackBrandId =
+    brandModes.find((b) => b.id === "bm-tp-lifesci")?.id ?? brandModes[0]?.id ?? "bm-enterprise";
+  const previewBrandId =
+    search.division && brandModes.some((b) => b.id === search.division)
+      ? search.division
+      : fallbackBrandId;
+  const setPreviewBrandId = (id: string) => {
+    void navigate({
+      to: ".",
+      search: (prev) => ({ ...prev, division: id, sub: undefined, collection: undefined }),
+      replace: true,
+    });
+  };
+  const browserState = {
+    typeId: (search.type ?? null) as PrintTypeId | null,
+    collection: search.collection ?? "All",
+    query: search.q ?? "",
+    subId: search.sub ?? null,
+  };
+  const patchBrowserState = (p: Partial<typeof browserState>) => {
+    void navigate({
+      to: ".",
+      search: (prev) => ({
+        ...prev,
+        ...("typeId" in p ? { type: p.typeId ?? undefined } : {}),
+        ...("collection" in p
+          ? { collection: p.collection && p.collection !== "All" ? p.collection : undefined }
+          : {}),
+        ...("query" in p ? { q: p.query || undefined } : {}),
+        ...("subId" in p ? { sub: p.subId ?? undefined } : {}),
+      }),
+      replace: true,
+    });
+  };
   const previewBrand = useMemo(
     () => brandModes.find((b) => b.id === previewBrandId) ?? brandModes[0],
     [brandModes, previewBrandId],
   );
+
 
   const listFn = useServerFn(listMyPrintAssets);
   const delFn = useServerFn(deletePrintAsset);
@@ -392,7 +448,10 @@ function PrintCenterPage() {
         divisionId={previewBrandId}
         onDivisionChange={setPreviewBrandId}
         renderPreview={renderPrintByKind}
+        state={browserState}
+        onStateChange={patchBrowserState}
       />
+
 
       {/* Approved shelf */}
       {isAuthed === true && previewBrand ? <ApprovedShelf brand={previewBrand} /> : null}
