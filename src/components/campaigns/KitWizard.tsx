@@ -17,6 +17,8 @@ import {
   Check,
   ImagePlus,
   Images,
+  LayoutTemplate,
+
 
   Maximize2,
   RefreshCw,
