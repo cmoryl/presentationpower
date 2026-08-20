@@ -31,6 +31,7 @@ import {
   CAUSE_LOGOS,
   CLIENT_LOGOS,
   STORY_LOGOS,
+  demoHeadshot,
   PROPOSAL_AQUA,
   PROPOSAL_ART,
 } from "@/lib/print-library/proposal-art";
