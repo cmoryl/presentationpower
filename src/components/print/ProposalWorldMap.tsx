@@ -318,7 +318,7 @@ export function ProposalWorldMap({
               {k === "prod" ? "Service & production" : "Client service"}
             </button>
           ))}
-          <span style={{ opacity: 0.6, fontWeight: 500 }}>· click a dot to delete</span>
+          <span style={{ opacity: 0.6, fontWeight: 500 }}>· drag a dot to move, click to delete</span>
         </div>
       ) : null}
     </div>
