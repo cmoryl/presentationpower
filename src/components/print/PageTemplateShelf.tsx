@@ -146,11 +146,11 @@ export function PageTemplateCard({
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#003FC7]">
-              Page template
+              {template.builtin ? "Original template" : "Page template"}
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/55">
               {template.scope === "shared" ? <Globe size={10} /> : <Lock size={10} />}
-              {template.scope === "shared" ? "Shared" : "Private"}
+              {template.builtin ? "Curated" : template.scope === "shared" ? "Shared" : "Private"}
             </span>
             <span className="text-[10px] font-medium text-black/45">{typeLabel}</span>
           </div>
