@@ -242,7 +242,7 @@ export function PrintFooterLockup({
         {!isEnterprise && (
           <>
             <div
-              style={{ width: 1, height: cq(16), background: dividerCol, flexShrink: 0 }}
+              style={{ width: 1, height: cq(20), background: dividerCol, flexShrink: 0 }}
               aria-hidden
             />
             <BrandLockup
