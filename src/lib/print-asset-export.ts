@@ -12,6 +12,7 @@
  */
 
 import { jsPDF } from "jspdf";
+import { withExportChrome } from "./export-chrome-suppress";
 import {
   captureSlideAsDataUrl,
   type ExportProgressCallback,
