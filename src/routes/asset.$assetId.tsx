@@ -48,6 +48,9 @@ import type {
   PrintSection,
   PrintStatsSection,
   PrintStatsVariant,
+  PrintHeroSection,
+  PrintHeroMetaRow,
+  PrintHeroModuleVariant,
   PrintQuoteSection,
   PrintQuoteVariant,
   PrintLogoGridSection,
@@ -71,6 +74,7 @@ import type {
 } from "@/lib/print-assets.types";
 import {
   PRINT_STATS_VARIANTS,
+  PRINT_HERO_VARIANTS,
   PRINT_QUOTE_VARIANTS,
   PRINT_LOGO_VARIANTS,
   PRINT_EXPERTISE_VARIANTS,
