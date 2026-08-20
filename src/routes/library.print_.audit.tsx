@@ -79,9 +79,11 @@ function AuditRow({
   useEffect(() => {
     let t: ReturnType<typeof setTimeout> | undefined;
     const run = () => {
-      const host = ref.current?.querySelector<HTMLElement>("[container-type], div");
-      const target = ref.current?.firstElementChild as HTMLElement | null;
-      const m = measurePrintModuleBox(target ?? host ?? ref.current, pageContentH);
+      // Measure the un-transformed page-width container: offsetHeight there is
+      // real print px, while the outer wrapper is already scaled to the card.
+      const target =
+        ref.current?.querySelector<HTMLElement>('[class*="container-type"]') ?? ref.current;
+      const m = measurePrintModuleBox(target, pageContentH);
       if (!m) return;
       const v = auditPrintModule(m);
       setMetrics(m);
