@@ -318,6 +318,24 @@ export function KitWizard({
     return withStat.filter((a) => !removed.has(a.id));
   }, [source, formatIds, eventFacts, mode, brandId, regenTick, removed, manualCopy]);
 
+  // Reference frame + copy used by the module picker previews.
+  const pickerFormat = useMemo(
+    () => assets[0]?.format ?? getFormat(formatIds[0] ?? "li-single") ?? SOCIAL_FORMATS_BY_ID["li-single"],
+    [assets, formatIds],
+  );
+  const pickerCopy: CampaignCopy = useMemo(
+    () => ({
+      title: manualCopy.title.trim() || exampleCopyForBrand(brandId).title,
+      summary: manualCopy.summary.trim() || undefined,
+      cta: manualCopy.cta.trim() || undefined,
+      stat:
+        manualCopy.statValue.trim() && manualCopy.statLabel.trim()
+          ? { value: manualCopy.statValue.trim(), label: manualCopy.statLabel.trim() }
+          : undefined,
+    }),
+    [manualCopy, brandId],
+  );
+
   const applyProfile = (id: string) => {
     setProfileId(id);
     const p = KIT_PROFILES.find((x) => x.id === id);
