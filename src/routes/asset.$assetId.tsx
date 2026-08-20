@@ -34,6 +34,8 @@ import type {
   PrintDensity,
   PrintExportPrefs,
   PrintHeroMedia,
+  PrintHeroRule,
+  PrintHeroTitleType,
   PrintMode,
   PrintPageSize,
 } from "@/lib/print-assets.types";
