@@ -94,6 +94,16 @@ export const PRINT_HERO_VARIANTS: Array<{
     label: "Brief Lockup",
     description: "Adaptor-brief header row over a hairline, then an oversized title block.",
   },
+  {
+    id: "hero-element-masthead",
+    label: "ELEMENT Masthead",
+    description: "Five-brick tick row over a fine rule, then an oversized ELEMENT title block.",
+  },
+  {
+    id: "hero-element-band",
+    label: "ELEMENT Rail Band",
+    description: "Navy→accent band bled to trim with the ELEMENT brick rail on the leading edge.",
+  },
 ];
 
 export const PRINT_STATS_VARIANTS: Array<{
