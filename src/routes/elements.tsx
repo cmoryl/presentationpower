@@ -6,7 +6,6 @@ import {
   Share2,
   ArrowRight,
   Sparkles,
-  Shapes,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ElementBrickRow, ElementBrickRail } from "@/components/brand/ElementBrickMotif";
@@ -177,12 +176,6 @@ function ElementsLanding() {
                 className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#03002C] transition hover:bg-[#E0E8F5]"
               >
                 Start from a brief <ArrowRight size={14} />
-              </Link>
-              <Link
-                to="/library"
-                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-5 py-2.5 text-sm font-medium text-white/85 backdrop-blur transition hover:bg-white/[0.12] hover:text-white"
-              >
-                <Shapes size={14} /> Browse the library
               </Link>
             </div>
           </div>
