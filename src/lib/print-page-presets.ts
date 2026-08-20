@@ -10,8 +10,11 @@
 // (in real inches so a half-sheet doesn't inherit a full-sheet margin), and
 // the masthead band height that reads correctly at that proportion.
 
-import { PAGE_W } from "@/components/print/print-primitives";
 import type { PrintDensity, PrintPageSize } from "./print-assets.types";
+
+/** Authoring canvas width in px — mirrors PAGE_W in print-primitives. Kept
+ *  local so this module stays import-cycle free (primitives imports it). */
+const CANVAS_W = 816;
 
 export type PrintMarginPreset = "tight" | "standard" | "wide";
 
@@ -138,7 +141,7 @@ export function pageSideMarginPx(
   const p = pagePreset(size);
   const inches =
     p.sideMarginIn * densityFactor(density) * PRINT_MARGIN_PRESETS[margin ?? "standard"].factor;
-  return Math.round((inches / p.widthIn) * PAGE_W);
+  return Math.round((inches / p.widthIn) * CANVAS_W);
 }
 
 /** Top margin in template pixels for a format. `variance` keeps the
@@ -152,7 +155,7 @@ export function pageTopMarginPx(
   const p = pagePreset(size);
   const inches =
     p.topMarginIn * densityFactor(density) * PRINT_MARGIN_PRESETS[margin ?? "standard"].factor;
-  return Math.round((inches / p.widthIn) * PAGE_W) + variance;
+  return Math.round((inches / p.widthIn) * CANVAS_W) + variance;
 }
 
 /**
@@ -163,7 +166,7 @@ export function pageTopMarginPx(
  */
 export function pageHeightPx(size: PrintPageSize | undefined): number {
   const p = pagePreset(size);
-  return Math.round((p.heightIn / p.widthIn) * PAGE_W);
+  return Math.round((p.heightIn / p.widthIn) * CANVAS_W);
 }
 
 /** Default masthead band height (% of page height) for a format. */
