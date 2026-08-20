@@ -660,7 +660,7 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
         );
       })}
 
-      <Img x={2.52} y={9.86} w={3.48} h={0.44} src={logoWhite} alt="TransPerfect" />
+      <Img x={3.13} y={10.02} w={2.26} h={0.29} src={logoWhite} alt="TransPerfect" />
     </>
   );
 }
@@ -1062,7 +1062,7 @@ function ClientsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         );
       })}
 
-      <Img x={2.92} y={10.02} w={2.59} h={0.33} src={logoWhite} alt="TransPerfect" />
+      <Img x={3.37} y={10.18} w={1.68} h={0.21} src={logoWhite} alt="TransPerfect" />
     </>
   );
 }
@@ -1345,7 +1345,7 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
         );
       })}
 
-      <Img x={2.92} y={10.02} w={2.59} h={0.33} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
+      <Img x={3.37} y={10.18} w={1.68} h={0.21} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
     </>
   );
 }
@@ -1468,7 +1468,7 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
         </Fragment>
       ))}
 
-      <Img x={2.92} y={10.5} w={2.59} h={0.33} src={PROPOSAL_ART.logoWhite} alt="TransPerfect" />
+      <Img x={3.37} y={10.66} w={1.68} h={0.21} src={PROPOSAL_ART.logoWhite} alt="TransPerfect" />
     </>
   );
 }
@@ -1527,7 +1527,7 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
           {page.footnote}
         </T>
       ) : null}
-      <Img x={2.92} y={10.6} w={2.59} h={0.33} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
+      <Img x={3.37} y={10.76} w={1.68} h={0.21} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
     </>
   );
 }
@@ -2152,7 +2152,7 @@ function TeamWallPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite:
           </div>
         );
       })}
-      <Img x={5.54} y={10.55} w={2.7} h={0.34} src={logoWhite} alt="TransPerfect" />
+      <Img x={6.01} y={10.71} w={1.76} h={0.22} src={logoWhite} alt="TransPerfect" />
     </>
   );
 }
@@ -2201,7 +2201,7 @@ function SummaryPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         </T>
       )}
 
-      <Img x={5.54} y={9.85} w={2.7} h={0.34} src={logoWhite} alt="TransPerfect" />
+      <Img x={6.01} y={10.01} w={1.76} h={0.22} src={logoWhite} alt="TransPerfect" />
     </>
   );
 }
