@@ -35,6 +35,7 @@ import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
 import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
+import { MultiProposalLayout, isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
   emptySpotlight,
@@ -565,16 +566,28 @@ function renderPrintByKind(
         density="standard"
       />
     );
-  if (kind === "solution-proposal")
+  if (kind === "solution-proposal") {
+    const proposal = (content as SolutionProposalContent) ?? PROPOSAL_SEED;
+    if (isMultiProposal(proposal))
+      return (
+        <MultiProposalLayout
+          content={proposal}
+          brand={brand}
+          mode={mode}
+          pageSize="Letter"
+          density="standard"
+        />
+      );
     return (
       <SolutionProposalLayout
-        content={(content as SolutionProposalContent) ?? PROPOSAL_SEED}
+        content={proposal}
         brand={brand}
         mode={mode}
         pageSize="Letter"
         density="standard"
       />
     );
+  }
   if (kind === "adaptor-brief")
     return (
       <AdaptorBriefLayout
