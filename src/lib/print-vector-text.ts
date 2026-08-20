@@ -20,6 +20,7 @@
  */
 
 import {
+import { isAuthoringChrome } from "./export-chrome-suppress";
   PDFDocument,
   rgb,
   setCharacterSpacing,
@@ -304,6 +305,10 @@ export function captureVectorText(root: HTMLElement): VectorTextCapture {
       // Reject text inside hidden ancestors.
       const parent = n.parentElement;
       if (!parent) return NodeFilter.FILTER_REJECT;
+      // Reject authoring-only affordances (hero edit badge, guides, resize
+      // rails). They are hidden from the raster pass, so vector text must
+      // drop them too or they reappear in the PDF overlay.
+      if (isAuthoringChrome(parent)) return NodeFilter.FILTER_REJECT;
       const cs = window.getComputedStyle(parent);
       if (cs.visibility === "hidden" || cs.display === "none" || cs.opacity === "0") {
         return NodeFilter.FILTER_REJECT;
