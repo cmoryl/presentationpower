@@ -13,6 +13,13 @@ import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
 import {
+  PRINT_MARGIN_PRESETS,
+  PRINT_PAGE_SIZE_ORDER,
+  pagePreset,
+  type PrintMarginPreset,
+} from "@/lib/print-page-presets";
+import type { PrintPageSize } from "@/lib/print-assets.types";
+import {
   PRINT_SECTION_MODULES,
   type PrintSectionModule,
 } from "@/lib/print-library/section-modules";
@@ -52,6 +59,10 @@ function PrintHeroGalleryPage() {
   const [useReal, setUseReal] = useState(true);
   const [columns, setColumns] = useState<1 | 2>(2);
   const [picked, setPicked] = useState<string | null>(null);
+  // Mastheads size their band off the page format, so the gallery has to be
+  // able to show the same opener on a half-sheet as on Letter.
+  const [pageSize, setPageSize] = useState<PrintPageSize>("Letter");
+  const [marginPreset, setMarginPreset] = useState<PrintMarginPreset>("standard");
 
   const { prefs: iconPrefs } = usePrintIconPrefs();
   const iconStyle: PrintIconStyle = useMemo(
@@ -100,6 +111,30 @@ function PrintHeroGalleryPage() {
         >
           {mode === "light" ? "Preview on dark" : "Preview on light"}
         </button>
+        <select
+          aria-label="Page format"
+          value={pageSize}
+          onChange={(e) => setPageSize(e.target.value as PrintPageSize)}
+          className="rounded-full border border-black/12 bg-white px-3 py-1.5 text-xs font-semibold text-[#03002C]"
+        >
+          {PRINT_PAGE_SIZE_ORDER.map((key) => (
+            <option key={key} value={key}>
+              {pagePreset(key).label} · {pagePreset(key).dims}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Margin preset"
+          value={marginPreset}
+          onChange={(e) => setMarginPreset(e.target.value as PrintMarginPreset)}
+          className="rounded-full border border-black/12 bg-white px-3 py-1.5 text-xs font-semibold text-[#03002C]"
+        >
+          {(Object.keys(PRINT_MARGIN_PRESETS) as PrintMarginPreset[]).map((key) => (
+            <option key={key} value={key}>
+              {PRINT_MARGIN_PRESETS[key].label} margins
+            </option>
+          ))}
+        </select>
         <p className="ml-auto text-xs text-black/45">{heroes.length} hero modules</p>
       </div>
 
@@ -116,6 +151,8 @@ function PrintHeroGalleryPage() {
             mode={mode}
             useReal={useReal}
             iconStyle={iconStyle}
+            pageSize={pageSize}
+            marginPreset={marginPreset}
             picked={picked === m.variantId}
             onPick={() => {
               setPicked(m.variantId);
@@ -171,6 +208,8 @@ function HeroCard({
   mode: "light" | "dark";
   useReal: boolean;
   iconStyle: PrintIconStyle;
+  pageSize: PrintPageSize;
+  marginPreset: PrintMarginPreset;
   picked: boolean;
   onPick: () => void;
 }) {
@@ -259,6 +298,8 @@ function HeroCard({
           mode={mode}
           accent={ACCENT}
           sheet
+          pageSize={pageSize}
+          marginPreset={marginPreset}
           icons={iconPrefsIcons(iconStyle)}
           iconStyle={iconStyle}
         />
@@ -266,7 +307,8 @@ function HeroCard({
           className="mt-2 text-center text-[10px] uppercase tracking-[0.16em]"
           style={{ color: mode === "dark" ? "rgba(224,232,245,0.45)" : "rgba(3,0,44,0.35)" }}
         >
-          Letter page · 8.5in column
+          {pagePreset(pageSize).label} · {pagePreset(pageSize).dims} ·{" "}
+          {PRINT_MARGIN_PRESETS[marginPreset].label.toLowerCase()} margins
         </p>
       </div>
 
