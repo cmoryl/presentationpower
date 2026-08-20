@@ -868,13 +868,13 @@ const REGION_COLS: Record<
 > = {
   AMERICAS: {
     headX: 0.56,
-    headY: 8.92,
+    headY: 9.2,
     cols: [0.56, 1.13, 1.72, 2.3, 3.18],
-    colY: 9.18,
+    colY: 9.46,
     colW: 0.62,
   },
-  EMEA: { headX: 4.23, headY: 9.02, cols: [4.23, 4.76, 5.39], colY: 9.26, colW: 0.58 },
-  APAC: { headX: 6.35, headY: 9.05, cols: [6.36, 6.98, 7.52], colY: 9.3, colW: 0.62 },
+  EMEA: { headX: 4.23, headY: 9.3, cols: [4.23, 4.76, 5.39], colY: 9.54, colW: 0.58 },
+  APAC: { headX: 6.35, headY: 9.33, cols: [6.36, 6.98, 7.52], colY: 9.58, colW: 0.62 },
 };
 
 function LocationsPage({ page }: { page: MultiProposalPage }) {
@@ -898,10 +898,10 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
       </T>
 
       <Img
-        x={-0.2}
-        y={2.72}
-        w={8.9}
-        h={4.96}
+        x={-0.55}
+        y={2.5}
+        w={9.6}
+        h={5.35}
         src={PROPOSAL_ART.worldMap}
         alt="World map"
         slot="locations.map"
@@ -911,24 +911,24 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
       {/* Legend */}
       <L
         x={0.56}
-        y={7.9}
+        y={8.36}
         w={0.058}
         h={0.058}
         style={{ background: "#FFFFFF", borderRadius: 999 }}
       />
-      <T x={0.68} y={7.84} w={1.4} size={7.2} weight={700} leading={1.25} upper>
+      <T x={0.68} y={8.3} w={1.4} size={7.2} weight={700} leading={1.25} upper>
         {"Client\nService"}
       </T>
       <L
         x={0.56}
-        y={8.2}
+        y={8.66}
         w={0.058}
         h={0.058}
         style={{ background: PROPOSAL_TEAL, borderRadius: 999 }}
       />
       <T
         x={0.68}
-        y={8.14}
+        y={8.6}
         w={1.6}
         size={7.2}
         weight={700}
@@ -1757,7 +1757,7 @@ function TeamPage({
                   y={y}
                   w={1.3}
                   h={1.3}
-                  src={member.photo || TRANSPARENT_PX}
+                  src={member.photo || demoHeadshot(i)}
                   alt={member.name ?? "Team member"}
                   fit="cover"
                   radius={0.12}
@@ -1807,7 +1807,7 @@ function TeamPage({
                   y={y + 0.2}
                   w={0.96}
                   h={0.96}
-                  src={member.photo || TRANSPARENT_PX}
+                  src={member.photo || demoHeadshot(i)}
                   alt={member.name ?? "Team member"}
                   fit="cover"
                   radius={0.48}
@@ -1886,7 +1886,7 @@ function TeamCardsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite
               y={y + 0.16}
               w={1.88}
               h={1.5}
-              src={member.photo || TRANSPARENT_PX}
+              src={member.photo || demoHeadshot(i)}
               alt={member.name ?? "Team member"}
               fit="cover"
               radius={0.12}
@@ -1949,7 +1949,7 @@ function TeamLeadsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite
               y={y}
               w={2.3}
               h={2.6}
-              src={member.photo || TRANSPARENT_PX}
+              src={member.photo || demoHeadshot(i)}
               alt={member.name ?? "Engagement lead"}
               fit="cover"
               radius={0.16}
@@ -2030,7 +2030,7 @@ function TeamWallPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite:
               y={y}
               w={1.5}
               h={1.5}
-              src={member.photo || TRANSPARENT_PX}
+              src={member.photo || demoHeadshot(i)}
               alt={member.name ?? "Team member"}
               fit="cover"
               radius={0.75}
