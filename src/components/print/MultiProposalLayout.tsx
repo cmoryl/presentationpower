@@ -29,6 +29,7 @@ import {
   AFFINITY_LOGOS,
   CAUSE_LOGOS,
   CLIENT_LOGOS,
+  STORY_LOGOS,
   PROPOSAL_AQUA,
   PROPOSAL_ART,
 } from "@/lib/print-library/proposal-art";

@@ -270,7 +270,7 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       kind: "success-stories",
       navLabel: "Success stories",
       eyebrow: "Proof",
-      title: "Success stories",
+      title: "Success Stories",
       quotes: [
         ...SUCCESS_QUOTES,
         ...(content.quote?.text
