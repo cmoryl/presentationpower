@@ -119,7 +119,8 @@ async function launchChromium() {
       for (const dir of dirs) {
         for (const rel of ["chrome-linux/chrome", "chrome-linux/headless_shell"]) {
           const exe = path.join(root, dir, rel);
-          if (existsSync(exe)) return await chromium.launch({ headless: true, executablePath: exe });
+          if (existsSync(exe))
+            return await chromium.launch({ headless: true, executablePath: exe });
         }
       }
     }
@@ -150,7 +151,11 @@ function diff(aBuf, bBuf) {
   const a = PNG.sync.read(aBuf);
   const b = PNG.sync.read(bBuf);
   if (a.width !== b.width || a.height !== b.height) {
-    return { ratio: 1, out: null, sizeMismatch: `${a.width}x${a.height} vs ${b.width}x${b.height}` };
+    return {
+      ratio: 1,
+      out: null,
+      sizeMismatch: `${a.width}x${a.height} vs ${b.width}x${b.height}`,
+    };
   }
   const out = new PNG({ width: a.width, height: a.height });
   const mismatched = pixelmatch(a.data, b.data, out.data, a.width, a.height, {
