@@ -9,6 +9,7 @@ import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { AutoFitText } from "./HeroAutoFit";
+import { ElementBrickRail, ElementBrickRow } from "@/components/brand/ElementBrickMotif";
 import { usePrintPage } from "@/components/print/print-page-context";
 import {
   heroEyebrowStyle,
@@ -983,6 +984,153 @@ export function HeroBriefLockup({ section, mode, accent }: Props) {
       )}
       <MetaRail section={section} mode={mode} accent={accent} />
       <div style={{ marginTop: cq(18), height: cq(3), width: cq(72), background: accent }} />
+    </section>
+  );
+}
+
+/**
+ * 11 — ELEMENT Masthead: the system's own opener. A five-brick tick row sets the
+ * modular measure above the rule, the title runs oversized and tight, and the
+ * meta rail closes the block. No photography — the motif carries the brand.
+ */
+export function HeroElementMasthead({ section, mode, accent }: Props) {
+  const ink = sectionInk(mode);
+  return (
+    <section
+      aria-label="Hero"
+      style={{
+        marginBottom: cq(24),
+        paddingBottom: cq(18),
+        ...heroHairline(section, ink),
+      }}
+    >
+      <ElementBrickRow
+        thickness={cq(6)}
+        unit={cq(7)}
+        gap={cq(4)}
+        tone="spectrum"
+        accent={accent}
+        style={{ marginBottom: cq(14) }}
+      />
+      <div
+        style={{
+          ...heroRuleTop(section, accent, 2),
+          paddingTop: heroRuleGap(section, 18),
+        }}
+      >
+        {section.eyebrow && (
+          <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
+            {section.eyebrow}
+          </div>
+        )}
+        <AutoFitText
+          as="h2"
+          basePx={heroTitleFontPx(section, 46)}
+          maxLines={3}
+          style={{
+            margin: 0,
+            lineHeight: 0.96,
+            letterSpacing: "-0.04em",
+            fontWeight: 700,
+            color: ink.strong,
+            ...heroTitleStyle(section),
+          }}
+        >
+          {section.title}
+        </AutoFitText>
+        {section.summary && (
+          <AutoFitText
+            as="p"
+            basePx={heroSummaryFontPx(section, 12)}
+            maxLines={4}
+            style={{
+              margin: `${cq(16)} 0 0`,
+              maxWidth: cq(520),
+              lineHeight: 1.55,
+              color: ink.soft,
+              ...heroSummaryStyle(section),
+            }}
+          >
+            {section.summary}
+          </AutoFitText>
+        )}
+        <MetaRail section={section} mode={mode} accent={accent} />
+      </div>
+    </section>
+  );
+}
+
+/**
+ * 12 — ELEMENT Rail Band: reversed navy band bled to trim with the brick rail
+ * running down the leading edge, title and summary set against it.
+ */
+export function HeroElementBand({ section, mode, accent }: Props) {
+  return (
+    <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(24) }}>
+      <div
+        style={{
+          background: `linear-gradient(120deg, #03002C 0%, color-mix(in srgb, ${accent} 62%, #03002C) 100%)`,
+          paddingTop: cq(32),
+          paddingBottom: cq(30),
+          ...pageGutter(),
+        }}
+      >
+        <div style={{ display: "flex", gap: cq(20), alignItems: "flex-start" }}>
+          <ElementBrickRail
+            thickness={cq(6)}
+            unit={cq(8)}
+            gap={cq(4)}
+            tone="spectrum"
+            accent={accent}
+            style={{ flex: "0 0 auto", marginTop: cq(4) }}
+          />
+          <div style={{ minWidth: 0, flex: 1 }}>
+            {section.eyebrow && (
+              <div
+                style={{
+                  ...EYEBROW("rgba(255,255,255,0.82)"),
+                  ...heroEyebrowStyle(section),
+                  marginBottom: cq(10),
+                }}
+              >
+                {section.eyebrow}
+              </div>
+            )}
+            <AutoFitText
+              as="h2"
+              basePx={heroTitleFontPx(section, 36)}
+              maxLines={3}
+              style={{
+                margin: 0,
+                lineHeight: 1.02,
+                letterSpacing: "-0.035em",
+                fontWeight: 700,
+                color: "#FFFFFF",
+                ...heroTitleStyle(section),
+              }}
+            >
+              {section.title}
+            </AutoFitText>
+            {section.summary && (
+              <AutoFitText
+                as="p"
+                basePx={heroSummaryFontPx(section, 11.5)}
+                maxLines={4}
+                style={{
+                  margin: `${cq(14)} 0 0`,
+                  maxWidth: cq(520),
+                  lineHeight: 1.55,
+                  color: "rgba(255,255,255,0.88)",
+                  ...heroSummaryStyle(section),
+                }}
+              >
+                {section.summary}
+              </AutoFitText>
+            )}
+            <MetaRail section={section} mode={mode} accent={accent} onDark />
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

@@ -117,6 +117,8 @@ export const PRINT_MODULE_LABELS: Record<string, string> = {
   "hero-quote-split": "Quote Split",
   "hero-cobrand-band": "Co-brand Band",
   "hero-brief-lockup": "Brief Lockup",
+  "hero-element-masthead": "ELEMENT Masthead",
+  "hero-element-band": "ELEMENT Rail Band",
   // Narrative
   "narrative-tri-card": "Challenge · Approach · Impact",
   "narrative-numbered-arc": "Numbered Engagement Arc",

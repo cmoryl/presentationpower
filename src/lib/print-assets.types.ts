@@ -109,7 +109,10 @@ export type PrintHeroModuleVariant =
   | "hero-photo-fade"
   | "hero-quote-split"
   | "hero-cobrand-band"
-  | "hero-brief-lockup";
+  | "hero-brief-lockup"
+  // ELEMENT system openers — five-brick motif carries the brand.
+  | "hero-element-masthead"
+  | "hero-element-band";
 
 export type PrintHeroMetaRow = { label: string; value?: string };
 

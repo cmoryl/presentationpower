@@ -12,6 +12,8 @@ import {
   HeroQuoteSplit,
   HeroCobrandBand,
   HeroBriefLockup,
+  HeroElementMasthead,
+  HeroElementBand,
 } from "./hero/HeroVariants";
 import { KpiDashboardPortrait } from "./stats/KpiDashboardPortrait";
 import { StatCalloutRowPortrait } from "./stats/StatCalloutRowPortrait";
@@ -91,6 +93,16 @@ export const PRINT_HERO_VARIANTS: Array<{
     id: "hero-brief-lockup",
     label: "Brief Lockup",
     description: "Adaptor-brief header row over a hairline, then an oversized title block.",
+  },
+  {
+    id: "hero-element-masthead",
+    label: "ELEMENT Masthead",
+    description: "Five-brick tick row over a fine rule, then an oversized ELEMENT title block.",
+  },
+  {
+    id: "hero-element-band",
+    label: "ELEMENT Rail Band",
+    description: "Navy→accent band bled to trim with the ELEMENT brick rail on the leading edge.",
   },
 ];
 
@@ -281,6 +293,10 @@ export function PrintSectionRenderer({
         return <HeroCobrandBand section={section} mode={mode} accent={accent} />;
       if (section.variantId === "hero-brief-lockup")
         return <HeroBriefLockup section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-element-masthead")
+        return <HeroElementMasthead section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-element-band")
+        return <HeroElementBand section={section} mode={mode} accent={accent} />;
       return null;
     case "stats":
       if (section.variantId === "kpi-dashboard-portrait")
