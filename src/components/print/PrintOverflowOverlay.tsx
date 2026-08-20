@@ -26,6 +26,8 @@ export function PrintOverflowOverlay({
       className="pointer-events-none absolute inset-0 z-40"
       data-testid="print-overflow-overlay"
       data-overflow-px={state.overflowPx}
+      /* Authoring-only affordance: never bake the hatch/alert into exports. */
+      data-export-ignore="true"
     >
       {/* Hatched band showing roughly how much content is lost off the page. */}
       <div
