@@ -55,8 +55,40 @@ export function makePrintHeroSection(variantId: PrintHeroModuleVariant): PrintSe
       { label: "Service", value: "GlobalLink Web" },
     ],
   };
-  if (variantId === "hero-photo-band" || variantId === "hero-split-photo") {
+  if (
+    variantId === "hero-photo-band" ||
+    variantId === "hero-split-photo" ||
+    variantId === "hero-photo-fade"
+  ) {
     return { ...base, imageUrl: HERO_STOCK, focalX: 50, focalY: 45 };
+  }
+  if (variantId === "hero-quote-split") {
+    return {
+      ...base,
+      meta: base.meta.slice(0, 2),
+      quote: {
+        text: "TransPerfect gave us one pipeline and one source of truth — our regional teams stopped rebuilding the same content twice.",
+        author: "Elena Marchetti",
+        role: "Head of global content",
+        company: "Acme Global",
+      },
+    };
+  }
+  if (variantId === "hero-cobrand-band") {
+    return {
+      ...base,
+      kicker: "TransPerfect",
+      partner: "Acme Global",
+      meta: [],
+      stats: [
+        { label: "Markets live", value: "36" },
+        { label: "Languages in scope", value: "24" },
+        { label: "Faster time to market", value: "3.4", unit: "x" },
+      ],
+    };
+  }
+  if (variantId === "hero-brief-lockup") {
+    return { ...base, meta: base.meta.slice(0, 3) };
   }
   if (variantId === "hero-stat-lockup") {
     return {

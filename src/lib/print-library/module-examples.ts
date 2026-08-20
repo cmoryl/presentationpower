@@ -51,8 +51,20 @@ function heroSectionForItem(
   const str = (k: string) => (typeof c[k] === "string" ? (c[k] as string) : undefined);
   const title = str("title") ?? str("productName") ?? item.title;
   if (!title) return null;
-  const needsPhoto = variantId === "hero-photo-band" || variantId === "hero-split-photo";
+  const needsPhoto =
+    variantId === "hero-photo-band" ||
+    variantId === "hero-split-photo" ||
+    variantId === "hero-photo-fade";
   if (needsPhoto && !item.heroUrl) return null;
+  // Quote-split and co-brand openers only make sense with the real testimonial
+  // / partner lockup the source piece actually ships.
+  const rawQuote = (c["quote"] ?? undefined) as
+    | { text?: string; author?: string; role?: string; company?: string }
+    | undefined;
+  if (variantId === "hero-quote-split" && !rawQuote?.text) return null;
+  const partner = str("partner");
+  const partnerLogoUrl = str("partnerLogoUrl");
+  if (variantId === "hero-cobrand-band" && !partner && !partnerLogoUrl) return null;
   const stats = (item.stats ?? []).slice(0, 3).map((st) => ({
     label: st.label,
     value: st.value,
@@ -75,7 +87,23 @@ function heroSectionForItem(
     ...(item.heroUrl ? { imageUrl: item.heroUrl } : {}),
     ...(item.focal ? { focalX: item.focal.x, focalY: item.focal.y } : {}),
     ...(meta.length ? { meta } : {}),
-    ...(variantId === "hero-stat-lockup" ? { stats } : {}),
+    ...(variantId === "hero-stat-lockup" || variantId === "hero-cobrand-band" ? { stats } : {}),
+    ...(variantId === "hero-quote-split" && rawQuote?.text
+      ? {
+          quote: {
+            text: rawQuote.text,
+            ...(rawQuote.author ? { author: rawQuote.author } : {}),
+            ...(rawQuote.role ? { role: rawQuote.role } : {}),
+            ...(rawQuote.company ? { company: rawQuote.company } : {}),
+          },
+        }
+      : {}),
+    ...(variantId === "hero-cobrand-band"
+      ? {
+          ...(partner ? { partner } : {}),
+          ...(partnerLogoUrl ? { partnerLogoUrl } : {}),
+        }
+      : {}),
   };
 }
 
@@ -86,6 +114,10 @@ const HERO_VARIANT_IDS: PrintHeroModuleVariant[] = [
   "hero-accent-band",
   "hero-stat-lockup",
   "hero-client-lockup",
+  "hero-photo-fade",
+  "hero-quote-split",
+  "hero-cobrand-band",
+  "hero-brief-lockup",
 ];
 
 let cache: Map<string, PrintModuleExample[]> | null = null;

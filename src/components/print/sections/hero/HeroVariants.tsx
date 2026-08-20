@@ -501,3 +501,380 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
     </section>
   );
 }
+
+/**
+ * 7 — Photo fade masthead: the treatment the shipped Case Study, E-Brochure,
+ * Spotlight and Adaptor Brief layouts actually use. The photograph bleeds from
+ * the top of the sheet and feathers to nothing into the page stock, so the
+ * title sits in the fade seam rather than on a hard-edged band.
+ */
+export function HeroPhotoFade({ section, mode, accent }: Props) {
+  const ink = sectionInk(mode);
+  const page = mode === "dark" ? "#03002C" : "#FFFFFF";
+  const bandH = cq(Math.round(((section.heightPct ?? 46) / 100) * 1056));
+  return (
+    <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(18) }}>
+      <div style={{ position: "relative" }}>
+        {/* Photo layer, feathered to zero alpha over its bottom third. */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: bandH,
+            ...bg(section),
+            WebkitMaskImage:
+              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 44%, rgba(0,0,0,0.78) 62%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0) 96%)",
+            maskImage:
+              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 44%, rgba(0,0,0,0.78) 62%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0) 96%)",
+          }}
+        />
+        {/* Page-coloured fade so the seam resolves into the paper. */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: bandH,
+            background: `linear-gradient(180deg, rgba(3,0,44,0.16) 0%, transparent 26%, color-mix(in srgb, ${page} 55%, transparent) 58%, ${page} 84%)`,
+          }}
+        />
+        <div
+          style={{
+            position: "relative",
+            ...pageGutter(),
+            paddingTop: `calc(${bandH} * 0.96)`,
+            paddingBottom: cq(6),
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {section.eyebrow && (
+            <div style={{ ...EYEBROW(accent), marginBottom: cq(10) }}>{section.eyebrow}</div>
+          )}
+
+          <h2
+            style={{
+              margin: 0,
+              fontSize: cq(34),
+              lineHeight: 1.12,
+              letterSpacing: "-0.02em",
+              fontWeight: 700,
+              color: ink.strong,
+              maxWidth: cq(470),
+              ...clampLines(3),
+            }}
+          >
+            {section.title}
+          </h2>
+          {section.summary && (
+            <p
+              style={{
+                margin: `${cq(12)} 0 0`,
+                maxWidth: cq(400),
+                fontSize: cq(11.5),
+                lineHeight: 1.6,
+                color: ink.soft,
+                ...clampLines(4),
+              }}
+            >
+              {section.summary}
+            </p>
+          )}
+          <MetaRail section={section} mode={mode} accent={accent} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * 8 — Quote split: the Client Spotlight opener. Title + intro in the left
+ * column, the client pull-quote panelled on the right.
+ */
+export function HeroQuoteSplit({ section, mode, accent }: Props) {
+  const ink = sectionInk(mode);
+  const q = section.quote;
+  return (
+    <section
+      aria-label="Hero"
+      style={{ marginBottom: cq(22), borderTop: `${cq(4)} solid ${accent}`, paddingTop: cq(16) }}
+    >
+      <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: cq(28) }}>
+        <div>
+          {section.eyebrow && (
+            <div style={{ ...EYEBROW(accent), marginBottom: cq(10) }}>{section.eyebrow}</div>
+          )}
+          {section.kicker && (
+            <div style={{ ...EYEBROW(ink.faint, 8.5), marginBottom: cq(6) }}>{section.kicker}</div>
+          )}
+          <h2
+            style={{
+              margin: 0,
+              fontSize: cq(30),
+              lineHeight: 1.12,
+              letterSpacing: "-0.02em",
+              fontWeight: 700,
+              color: ink.strong,
+              ...clampLines(4),
+            }}
+          >
+            {section.title}
+          </h2>
+          {section.summary && (
+            <p
+              style={{
+                margin: `${cq(12)} 0 0`,
+                fontSize: cq(11.5),
+                lineHeight: 1.65,
+                color: ink.soft,
+                ...clampLines(6),
+              }}
+            >
+              {section.summary}
+            </p>
+          )}
+          <MetaRail section={section} mode={mode} accent={accent} />
+        </div>
+        {q?.text && (
+          <div
+            style={{
+              borderLeft: `${cq(3)} solid ${accent}`,
+              paddingLeft: cq(18),
+              paddingTop: cq(2),
+            }}
+          >
+            <div
+              aria-hidden
+              style={{
+                fontFamily: "Georgia, serif",
+                fontSize: cq(40),
+                lineHeight: 0.7,
+                fontWeight: 700,
+                color: accent,
+              }}
+            >
+              &ldquo;
+            </div>
+            <p
+              style={{
+                margin: `${cq(10)} 0 0`,
+                fontSize: cq(12.5),
+                lineHeight: 1.6,
+                color: ink.strong,
+                ...clampLines(7),
+              }}
+            >
+              {q.text}
+            </p>
+            {q.role && (
+              <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>
+            )}
+            {q.author && (
+              <div
+                style={{ marginTop: cq(2), fontSize: cq(11), fontWeight: 700, color: ink.strong }}
+              >
+                — {q.author}
+                {q.company ? ` · ${q.company}` : ""}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * 9 — Co-brand band: the MSA Partnership cover. Navy→accent band bled to the
+ * trim with the two marks locked up centre, a positioning line, and the
+ * headline proof numbers boxed along the base.
+ */
+export function HeroCobrandBand({ section, mode, accent }: Props) {
+  const stats = (section.stats ?? []).slice(0, 4);
+  return (
+    <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(22) }}>
+      <div
+        style={{
+          background: `linear-gradient(118deg, #03002C 0%, ${accent} 62%, color-mix(in srgb, ${accent} 62%, #A1FBF9) 100%)`,
+          ...pageGutter(),
+          paddingTop: cq(30),
+          paddingBottom: cq(30),
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: cq(22),
+            minHeight: cq(44),
+          }}
+        >
+          <span
+            style={{
+              fontSize: cq(20),
+              fontWeight: 700,
+              letterSpacing: "-0.01em",
+              color: "#FFFFFF",
+            }}
+          >
+            {section.kicker ?? "TransPerfect"}
+          </span>
+          <span aria-hidden style={{ width: 1, alignSelf: "stretch", background: "rgba(255,255,255,0.4)" }} />
+          {section.partnerLogoUrl ? (
+            <img
+              src={section.partnerLogoUrl}
+              alt={section.partner ? `${section.partner} logo` : ""}
+              style={{
+                height: cq(30),
+                width: "auto",
+                maxWidth: cq(200),
+                objectFit: "contain",
+                filter: "brightness(0) invert(1)",
+              }}
+            />
+          ) : (
+            <span style={{ fontSize: cq(20), fontWeight: 700, color: "#FFFFFF" }}>
+              {section.partner ?? "Partner"}
+            </span>
+          )}
+        </div>
+        <h2
+          style={{
+            margin: `${cq(18)} auto 0`,
+            maxWidth: cq(560),
+            fontSize: cq(22),
+            lineHeight: 1.25,
+            letterSpacing: "-0.02em",
+            fontWeight: 700,
+            color: "#FFFFFF",
+            ...clampLines(3),
+          }}
+        >
+          {section.title}
+        </h2>
+        {section.summary && (
+          <p
+            style={{
+              margin: `${cq(12)} auto 0`,
+              maxWidth: cq(540),
+              fontSize: cq(11.5),
+              lineHeight: 1.55,
+              color: "rgba(255,255,255,0.86)",
+              ...clampLines(3),
+            }}
+          >
+            {section.summary}
+          </p>
+        )}
+        {stats.length > 0 && (
+          <div
+            style={{
+              marginTop: cq(22),
+              display: "grid",
+              gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
+              gap: cq(10),
+            }}
+          >
+            {stats.map((s, i) => (
+              <div
+                key={i}
+                style={{
+                  border: "1px solid rgba(255,255,255,0.42)",
+                  background: "rgba(255,255,255,0.06)",
+                  padding: `${cq(14)} ${cq(8)}`,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: cq(24),
+                    fontWeight: 700,
+                    lineHeight: 1.05,
+                    letterSpacing: "-0.02em",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  {s.value}
+                  {s.unit && <span style={{ fontSize: cq(14) }}>{s.unit}</span>}
+                </div>
+                <div
+                  style={{
+                    marginTop: cq(6),
+                    fontSize: cq(8.5),
+                    lineHeight: 1.35,
+                    fontWeight: 600,
+                    color: "rgba(255,255,255,0.78)",
+                    ...clampLines(3),
+                  }}
+                >
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * 10 — Brief lockup: the Adaptor Brief / E-Brochure header row — eyebrow left,
+ * brand slot right, hairline under it, then an oversized title block.
+ */
+export function HeroBriefLockup({ section, mode, accent }: Props) {
+  const ink = sectionInk(mode);
+  return (
+    <section aria-label="Hero" style={{ marginBottom: cq(22) }}>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: cq(12),
+          paddingBottom: cq(10),
+          borderBottom: `1px solid ${ink.hairline}`,
+        }}
+      >
+        <span style={EYEBROW(accent)}>{section.eyebrow ?? "Brief"}</span>
+        <span style={{ ...EYEBROW(ink.faint, 8.5) }}>{section.kicker ?? "TransPerfect"}</span>
+      </div>
+      <h2
+        style={{
+          margin: `${cq(20)} 0 0`,
+          fontSize: cq(37),
+          lineHeight: 1.12,
+          letterSpacing: "-0.015em",
+          fontWeight: 700,
+          color: ink.strong,
+          maxWidth: cq(480),
+          ...clampLines(3),
+        }}
+      >
+        {section.title}
+      </h2>
+      {section.summary && (
+        <p
+          style={{
+            margin: `${cq(14)} 0 0`,
+            maxWidth: cq(380),
+            fontSize: cq(12.5),
+            lineHeight: 1.6,
+            color: ink.soft,
+            ...clampLines(4),
+          }}
+        >
+          {section.summary}
+        </p>
+      )}
+      <MetaRail section={section} mode={mode} accent={accent} />
+      <div style={{ marginTop: cq(18), height: cq(3), width: cq(72), background: accent }} />
+    </section>
+  );
+}

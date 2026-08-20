@@ -1,7 +1,7 @@
 // Hero gallery — a dedicated shelf for the print Hero module family.
 //
 // The general module library lists all 40+ families in one column; picking an
-// opener needs a side-by-side view of the six hero lockups with the real
+// opener needs a side-by-side view of every hero lockup with the real
 // curated collateral each one was extracted from.
 
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -31,13 +31,13 @@ export const Route = createFileRoute("/library/print_/heroes")({
       {
         name: "description",
         content:
-          "Preview and pick print hero lockups — Photo Band, Split Photo, Type Stack, Accent Band, Stat Lockup, and Client Lockup — rendered at true page proportions.",
+          "Preview and pick print hero lockups — Photo Band, Photo Fade, Split Photo, Quote Split, Type Stack, Accent Band, Co-brand Band, Stat Lockup, Client Lockup, and Brief Lockup — rendered at true page proportions.",
       },
       { property: "og:title", content: "Print Hero Modules · Gallery" },
       {
         property: "og:description",
         content:
-          "Side-by-side gallery of the six print hero openers with real collateral examples.",
+          "Side-by-side gallery of every print hero opener with real collateral examples.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -80,7 +80,7 @@ function PrintHeroGalleryPage() {
           Hero gallery
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
-          The six opening lockups the curated print collateral uses. Every preview renders at true
+          Every opening lockup the curated print collateral uses — including the fade-to-page photo masthead, the spotlight quote split, and the co-brand MSA band. Every preview renders at true
           Letter proportions with the original hero photography and copy, so you can compare
           openers before inserting one from the editor's <em>Shared modules</em> drawer.
         </p>
