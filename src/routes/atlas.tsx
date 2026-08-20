@@ -353,8 +353,8 @@ function PrintSegment({ ink }: { ink: string }) {
                   </h3>
                   <span className="text-xs text-black/45">{modules.length} modules</span>
                 </div>
-                {meta?.description && (
-                  <p className="mt-1 max-w-2xl text-sm text-black/55">{meta.description}</p>
+                {meta?.desc && (
+                  <p className="mt-1 max-w-2xl text-sm text-black/55">{meta.desc}</p>
                 )}
                 <div className="mt-3 grid gap-3 md:grid-cols-3">
                   {modules.map((m) => (
@@ -536,7 +536,9 @@ function EventsSegment({ ink }: { ink: string }) {
                 <div className="text-xs uppercase tracking-widest text-black/50">Phases</div>
                 <ul className="mt-1 space-y-0.5 text-sm text-black/70">
                   {p.phases.map((ph, i) => (
-                    <li key={i}>{ph.label ?? ph.name}</li>
+                    <li key={i}>
+                      <span className="font-mono text-xs text-black/45">{ph.when}</span> {ph.label}
+                    </li>
                   ))}
                 </ul>
               </div>
