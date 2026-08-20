@@ -50,6 +50,12 @@ export function ProposalWorldMap({
   });
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const dragMoved = useRef(false);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  // Pin drag: index of the dot being repositioned + whether it actually moved
+  // (a click without movement still means "delete this pin").
+  const pinDrag = useRef<{ index: number; moved: boolean } | null>(null);
+  const [activePin, setActivePin] = useState<number | null>(null);
+
 
   const w = WORLD_MAP_VIEW.w / zoom;
   const h = WORLD_MAP_VIEW.h / zoom;
