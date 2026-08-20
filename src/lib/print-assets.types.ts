@@ -98,7 +98,7 @@ export type PrintStatsSection = {
 // collateral already uses (full-bleed photo band, split photo, typographic
 // stack, accent band, stat lockup, client lockup) but as insertable modules,
 // so a hero can also open a *section* mid-document.
-export type PrintHeroVariant =
+export type PrintHeroModuleVariant =
   | "hero-photo-band"
   | "hero-split-photo"
   | "hero-type-stack"
@@ -111,7 +111,7 @@ export type PrintHeroMetaRow = { label: string; value?: string };
 export type PrintHeroSection = {
   id: string;
   kind: "hero";
-  variantId: PrintHeroVariant;
+  variantId: PrintHeroModuleVariant;
   eyebrow?: string;
   title: string;
   summary?: string;
