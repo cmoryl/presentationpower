@@ -17,15 +17,22 @@ import {
   PRINT_ICON_STYLE_DEFAULT,
   type PrintIconStyle,
 } from "@/components/print/print-doc-mode";
+import { PrintPageProvider } from "@/components/print/print-page-context";
+import { pageSideMarginPx, type PrintMarginPreset } from "@/lib/print-page-presets";
 import { PrintSectionRenderer } from "./PrintSectionRenderer";
-import type { PrintSection } from "@/lib/print-assets.types";
+import type { PrintPageSize, PrintSection } from "@/lib/print-assets.types";
 
 export function PrintSectionPreviewFrame({
   section,
   mode = "light",
   accent = "#003FC7",
-  /** Page-relative padding so the block sits inside the print margin. */
-  padX = 56,
+  /** Page format the section is being laid out on. Drives the margin preset
+   *  and the masthead band height. */
+  pageSize = "Letter",
+  /** Margin ladder for that format. */
+  marginPreset = "standard",
+  /** Explicit page padding override (px). Defaults to the format's margin. */
+  padX,
   maxScale = 1,
   /** Draw the page stock (paper, margins, hairline edge, shadow). */
   sheet = false,
@@ -37,6 +44,8 @@ export function PrintSectionPreviewFrame({
   section: PrintSection;
   mode?: "light" | "dark";
   accent?: string;
+  pageSize?: PrintPageSize;
+  marginPreset?: PrintMarginPreset;
   padX?: number;
   maxScale?: number;
   sheet?: boolean;
@@ -62,9 +71,10 @@ export function PrintSectionPreviewFrame({
     ro.observe(outer);
     ro.observe(inner);
     return () => ro.disconnect();
-  }, [maxScale, section]);
+  }, [maxScale, section, pad, pageSize, marginPreset]);
 
   const paper = mode === "dark" ? "#03002C" : "#ffffff";
+  const pad = padX ?? pageSideMarginPx(pageSize, "standard", marginPreset);
   const padTop = sheet ? 28 : 0;
 
   return (
@@ -89,21 +99,23 @@ export function PrintSectionPreviewFrame({
           className="[container-type:inline-size]"
           style={{
             width: PAGE_W,
-            paddingLeft: padX,
-            paddingRight: padX,
+            paddingLeft: pad,
+            paddingRight: pad,
             paddingTop: padTop,
             paddingBottom: sheet ? 28 : 0,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
             // Publish the page margin so hero mastheads can bleed to the trim
             // and restore the margin for their own copy.
-            ["--print-page-pad" as string]: `${padX}px`,
+            ["--print-page-pad" as string]: `${pad}px`,
             ["--print-page-pad-top" as string]: `${padTop}px`,
           }}
         >
-          <PrintDocModeProvider icons={icons} iconStyle={iconStyle}>
-            <PrintSectionRenderer section={section} mode={mode} accent={accent} />
-          </PrintDocModeProvider>
+          <PrintPageProvider size={pageSize} margin={marginPreset}>
+            <PrintDocModeProvider icons={icons} iconStyle={iconStyle}>
+              <PrintSectionRenderer section={section} mode={mode} accent={accent} />
+            </PrintDocModeProvider>
+          </PrintPageProvider>
         </div>
       </div>
     </div>

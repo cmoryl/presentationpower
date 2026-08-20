@@ -433,7 +433,7 @@ export type PrintMode = "light" | "dark";
 /** Persisted export panel state — every field a user can tune in the export
  *  dropdown, so their preset survives reload and can be duplicated. */
 export type PrintExportPrefs = {
-  size?: "A4" | "Letter" | "Square" | "Custom";
+  size?: "A4" | "Letter" | "Square" | "HalfLetter" | "A5" | "Custom";
   customW?: number; // inches, when size=Custom
   customH?: number; // inches, when size=Custom
   bleedIn?: number; // 0 | 0.125 | 0.25

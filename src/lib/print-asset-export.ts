@@ -26,7 +26,7 @@ import {
   type VectorTextCapture,
 } from "./print-vector-text";
 
-export type PrintPageSizeKey = "A4" | "Letter" | "Square" | "Custom";
+export type PrintPageSizeKey = "A4" | "Letter" | "Square" | "HalfLetter" | "A5" | "Custom";
 export type PrintExportQuality = "300dpi" | "600dpi";
 
 /**
@@ -62,6 +62,8 @@ export const PRINT_PAGE_PRESETS: Record<
   A4: { widthIn: 8.2677, heightIn: 11.6929 }, // 210 × 297 mm
   Letter: { widthIn: 8.5, heightIn: 11 },
   Square: { widthIn: 8.5, heightIn: 8.5 },
+  HalfLetter: { widthIn: 5.5, heightIn: 8.5 }, // half-sheet, US
+  A5: { widthIn: 5.8268, heightIn: 8.2677 }, // 148 × 210 mm
 };
 
 /** Numeric DPI for each press quality preset. */
