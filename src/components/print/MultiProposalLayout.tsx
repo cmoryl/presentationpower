@@ -1233,19 +1233,33 @@ function TeamPage({
       {bios
         ? team.slice(0, 3).map((member, i) => {
             const y = 3.4 + i * 2.4;
+            const tx = 2.28;
+            const tw = 5.46;
             return (
               <div key={i}>
                 <Rule x={0.78} y={y - 0.24} w={6.96} color="rgba(3,0,44,0.12)" />
-                <T x={0.78} y={y} w={4} size={16} weight={700} color={NAVY}>
+                <Img
+                  x={0.78}
+                  y={y}
+                  w={1.3}
+                  h={1.3}
+                  src={member.photo || TRANSPARENT_PX}
+                  alt={member.name ?? "Team member"}
+                  fit="cover"
+                  radius={0.12}
+                  slot={`team.bio.photo.${i + 1}`}
+                  label="headshot"
+                />
+                <T x={tx} y={y} w={4} size={16} weight={700} color={NAVY}>
                   {member.name ?? ""}
                 </T>
-                <T x={0.78} y={y + 0.3} w={4} size={11} weight={600} color={BLUE} upper tracking="0.05em">
+                <T x={tx} y={y + 0.3} w={4} size={11} weight={600} color={BLUE} upper tracking="0.05em">
                   {member.role ?? ""}
                 </T>
-                <T x={0.78} y={y + 0.62} w={6.96} size={10.5} color="#555555" leading={1.5}>
+                <T x={tx} y={y + 0.62} w={tw} size={10.5} color="#555555" leading={1.5}>
                   {member.bio ?? ""}
                 </T>
-                <T x={0.78} y={y + 1.72} w={6.96} size={10} color={NAVY}>
+                <T x={tx} y={y + 1.72} w={tw} size={10} color={NAVY}>
                   {[member.email, member.phone, member.office].filter(Boolean).join("  ·  ")}
                 </T>
               </div>
@@ -1265,18 +1279,31 @@ function TeamPage({
                   h={1.36}
                   style={{ background: "#F3F6FE", borderRadius: u(0.16) }}
                 />
-                <T x={x + 0.24} y={y + 0.22} w={2.84} size={14} weight={700} color={NAVY}>
+                <Img
+                  x={x + 0.18}
+                  y={y + 0.2}
+                  w={0.96}
+                  h={0.96}
+                  src={member.photo || TRANSPARENT_PX}
+                  alt={member.name ?? "Team member"}
+                  fit="cover"
+                  radius={0.48}
+                  slot={`team.contact.photo.${i + 1}`}
+                  label="headshot"
+                />
+                <T x={x + 1.28} y={y + 0.2} w={1.86} size={13} weight={700} color={NAVY} leading={1.15}>
                   {member.name ?? ""}
                 </T>
-                <T x={x + 0.24} y={y + 0.5} w={2.84} size={10} weight={600} color={BLUE} upper tracking="0.05em">
+                <T x={x + 1.28} y={y + 0.52} w={1.86} size={9} weight={600} color={BLUE} upper tracking="0.05em" leading={1.25}>
                   {member.role ?? ""}
                 </T>
-                <T x={x + 0.24} y={y + 0.76} w={2.84} size={9.5} color="#555555" leading={1.4}>
+                <T x={x + 1.28} y={y + 0.82} w={1.86} size={8.5} color="#555555" leading={1.35}>
                   {[member.office, member.email].filter(Boolean).join("\n")}
                 </T>
               </div>
             );
           })}
+
     </>
   );
 }
