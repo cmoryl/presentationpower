@@ -32,6 +32,14 @@ import {
   clampLines,
   type IconName,
 } from "@/components/print/print-primitives";
+import {
+  AFFINITY_LOGOS,
+  CAUSE_LOGOS,
+  CLIENT_LOGOS,
+  PROPOSAL_AQUA,
+  PROPOSAL_ART,
+  type LogoTile,
+} from "@/lib/print-library/proposal-art";
 
 const FALLBACK_ICONS: IconName[] = [
   "check",
