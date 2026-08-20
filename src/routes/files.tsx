@@ -322,7 +322,31 @@ function MyFilesPage() {
   );
 }
 
+/** Hero metric with an Element accent underline. */
+function HeroStat({
+  value,
+  label,
+  accent = "#03002C",
+}: {
+  value: number;
+  label: string;
+  accent?: string;
+}) {
+  return (
+    <div>
+      <div className="text-2xl font-semibold tabular-nums tracking-[-0.03em]" style={{ color: accent }}>
+        {value}
+      </div>
+      <div className="mt-1 h-[3px] w-8 rounded-full" style={{ backgroundColor: accent, opacity: 0.5 }} />
+      <div className="mt-1.5 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
+        {label}
+      </div>
+    </div>
+  );
+}
+
 function FileCard({
+
   file,
   onDelete,
   deleting,
