@@ -48,34 +48,50 @@ export const Route = createFileRoute("/files")({
 
 const KIND_META: Record<
   MyFileKind,
-  { label: string; icon: typeof FileText; tint: string; group: string }
+  { label: string; icon: typeof FileText; tint: string; group: string; accent: string; blurb: string }
 > = {
   deck: {
     label: "Presentation",
     icon: Presentation,
     tint: "bg-[#003FC7]/10 text-[#003FC7]",
     group: "Decks",
+    accent: "#003FC7",
+    blurb: "Full presentations",
   },
-  print: { label: "Print", icon: FileText, tint: "bg-[#EC388A]/10 text-[#EC388A]", group: "Print" },
+  print: {
+    label: "Print",
+    icon: FileText,
+    tint: "bg-[#EC388A]/10 text-[#EC388A]",
+    group: "Print",
+    accent: "#EC388A",
+    blurb: "Brochures & case studies",
+  },
   module: {
     label: "Module",
     icon: LayoutGrid,
     tint: "bg-[#A1FBF9]/40 text-[#03002C]",
     group: "Modules",
+    accent: "#12B8B4",
+    blurb: "Reusable sections",
   },
   slide: {
     label: "Slide",
     icon: Presentation,
     tint: "bg-[#C2A3FF]/35 text-[#03002C]",
     group: "Slides",
+    accent: "#8A5CF6",
+    blurb: "Single saved slides",
   },
   surface: {
     label: "Social / Email",
     icon: Share2,
     tint: "bg-[#FFEB66]/40 text-[#03002C]",
     group: "Surfaces",
+    accent: "#E39A00",
+    blurb: "Social & email surfaces",
   },
 };
+
 
 type SortKey = "recent" | "created" | "title";
 
