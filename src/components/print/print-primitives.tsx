@@ -8,6 +8,13 @@
 
 import type { CSSProperties } from "react";
 import type { PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
+import {
+  pageAspectRatio,
+  pageAuroraFrame,
+  pageSideMarginPx,
+  pageTopMarginPx,
+  type PrintMarginPreset,
+} from "@/lib/print-page-presets";
 
 // Template canvas width — everything sizes against this via `cqw` so the
 // layout scales identically at any preview or export DPI.
@@ -125,35 +132,45 @@ export const padCq = (px: number) =>
   `calc(${((px * 100) / PAGE_W).toFixed(3)}cqw * var(--print-fit-scale, 1) * var(--print-fit-pad, 1))`;
 
 export function pageAspect(size: PrintPageSize): string {
-  switch (size) {
-    case "A4":
-      return "8.2677 / 11.6929";
-    case "Letter":
-      return "8.5 / 11";
-    case "Square":
-      return "1 / 1";
-  }
+  return pageAspectRatio(size);
 }
 
 // Aurora is authored 1280×720 landscape; re-project into portrait so orbs
 // bleed from the correct edges instead of being cropped.
 export function auroraAspect(size: PrintPageSize): { w: number; h: number } {
-  switch (size) {
-    case "A4":
-      return { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 };
-    case "Letter":
-      return { w: Math.round((1280 * 8.5) / 11), h: 1280 };
-    case "Square":
-      return { w: 1280, h: 1280 };
-  }
+  return pageAuroraFrame(size);
 }
 
-export function pagePadX(d: PrintDensity): number {
-  return d === "compact" ? 36 : d === "airy" ? 52 : 44;
+/**
+ * Side page margin in template px. Pass the page size (and margin preset) so
+ * the margin is derived from the format's real inch margin — a half-sheet
+ * otherwise inherited a full-sheet margin and swallowed its own text column.
+ */
+export function pagePadX(
+  d: PrintDensity,
+  size?: PrintPageSize,
+  margin?: PrintMarginPreset,
+): number {
+  if (!size && !margin) return d === "compact" ? 36 : d === "airy" ? 52 : 44;
+  return pageSideMarginPx(size, d, margin);
 }
 // Top padding is intentionally per-template — Spotlight opens tight,
 // EBrochure and Adaptor-Brief breathe more. Pass a base + variance.
-export function pagePadTop(d: PrintDensity, base = 34, variance = 6): number {
+export function pagePadTop(
+  d: PrintDensity,
+  base = 34,
+  variance = 6,
+  size?: PrintPageSize,
+  margin?: PrintMarginPreset,
+): number {
+  if (size || margin) {
+    return pageTopMarginPx(
+      size,
+      d,
+      margin,
+      d === "compact" ? -variance : d === "airy" ? variance : 0,
+    );
+  }
   return d === "compact" ? base - variance : d === "airy" ? base + variance + 4 : base;
 }
 

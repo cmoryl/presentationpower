@@ -423,7 +423,9 @@ export type AdaptorBriefContent = {
   modules?: PrintSection[];
 };
 
-export type PrintPageSize = "A4" | "Letter" | "Square";
+/** Page formats the print system can lay out. Geometry, margins and masthead
+ *  band heights for each live in src/lib/print-page-presets.ts. */
+export type PrintPageSize = "A4" | "Letter" | "Square" | "HalfLetter" | "A5";
 export type PrintDensity = "compact" | "standard" | "airy";
 export type PrintDistribution = "sales-enablement" | "web-download" | "print";
 export type PrintMode = "light" | "dark";
@@ -431,7 +433,7 @@ export type PrintMode = "light" | "dark";
 /** Persisted export panel state — every field a user can tune in the export
  *  dropdown, so their preset survives reload and can be duplicated. */
 export type PrintExportPrefs = {
-  size?: "A4" | "Letter" | "Square" | "Custom";
+  size?: "A4" | "Letter" | "Square" | "HalfLetter" | "A5" | "Custom";
   customW?: number; // inches, when size=Custom
   customH?: number; // inches, when size=Custom
   bleedIn?: number; // 0 | 0.125 | 0.25
@@ -460,6 +462,8 @@ export type PrintAssetContext = {
   clientLogoName?: string;
   subCompany?: string;
   pageSize?: PrintPageSize;
+  /** Margin ladder for the chosen format: tight / standard / wide. */
+  marginPreset?: "tight" | "standard" | "wide";
   distribution?: PrintDistribution;
   density?: PrintDensity;
   contactCard?: boolean;

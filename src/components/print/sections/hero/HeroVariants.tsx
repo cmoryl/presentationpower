@@ -8,6 +8,19 @@
 import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
+import { usePrintPage } from "@/components/print/print-page-context";
+
+/**
+ * Masthead band height in template px, resolved against the *current page
+ * format*. `section.heightPct` (when authored) always wins; otherwise the
+ * format's default band is scaled by the variant's own share of it, so a
+ * half-sheet opener doesn't inherit a Letter-deep photo band.
+ */
+function useBandHeight(heightPct: number | undefined, share: number): string {
+  const page = usePrintPage();
+  const pct = heightPct ?? page.heroBandPct * share;
+  return cq(Math.round((pct / 100) * page.heightPx));
+}
 
 type Props = {
   section: PrintHeroSection;
@@ -24,12 +37,7 @@ const EYEBROW = (accent: string, size = 9.5) =>
     color: accent,
   }) as const;
 
-function MetaRail({
-  section,
-  mode,
-  accent,
-  onDark,
-}: Props & { onDark?: boolean }) {
+function MetaRail({ section, mode, accent, onDark }: Props & { onDark?: boolean }) {
   const rows = section.meta ?? [];
   if (!rows.length) return null;
   const ink = sectionInk(mode);
@@ -84,9 +92,10 @@ function bg(section: PrintHeroSection) {
  */
 export function HeroPhotoBand({ section, mode, accent }: Props) {
   const ink = sectionInk(mode);
+  const bandH = useBandHeight(section.heightPct, 0.62);
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(20) }}>
-      <div style={{ position: "relative", overflow: "hidden", height: cq(300), ...bg(section) }}>
+      <div style={{ position: "relative", overflow: "hidden", height: bandH, ...bg(section) }}>
         <div
           style={{
             position: "absolute",
@@ -156,11 +165,12 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
  */
 export function HeroSplitPhoto({ section, mode, accent }: Props) {
   const ink = sectionInk(mode);
+  const bandH = useBandHeight(section.heightPct, 0.56);
   const reverse = Boolean(section.reverse);
   const photo = (
     <div
       style={{
-        minHeight: cq(272),
+        minHeight: bandH,
         ...bg(section),
         marginLeft: reverse ? 0 : `calc(-1 * var(--print-page-pad, 0px))`,
         marginRight: reverse ? `calc(-1 * var(--print-page-pad, 0px))` : 0,
@@ -511,7 +521,7 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
 export function HeroPhotoFade({ section, mode, accent }: Props) {
   const ink = sectionInk(mode);
   const page = mode === "dark" ? "#03002C" : "#FFFFFF";
-  const bandH = cq(Math.round(((section.heightPct ?? 46) / 100) * 1056));
+  const bandH = useBandHeight(section.heightPct, 1);
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(18) }}>
       <div style={{ position: "relative" }}>
@@ -671,9 +681,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
             >
               {q.text}
             </p>
-            {q.role && (
-              <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>
-            )}
+            {q.role && <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>}
             {q.author && (
               <div
                 style={{ marginTop: cq(2), fontSize: cq(11), fontWeight: 700, color: ink.strong }}
@@ -726,7 +734,10 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
           >
             {section.kicker ?? "TransPerfect"}
           </span>
-          <span aria-hidden style={{ width: 1, alignSelf: "stretch", background: "rgba(255,255,255,0.4)" }} />
+          <span
+            aria-hidden
+            style={{ width: 1, alignSelf: "stretch", background: "rgba(255,255,255,0.4)" }}
+          />
           {section.partnerLogoUrl ? (
             <img
               src={section.partnerLogoUrl}
