@@ -85,8 +85,6 @@ export function EditableIcon({
 
   const glyph = (
     <svg
-      width={scaled}
-      height={scaled}
       viewBox="0 0 24 24"
       fill="none"
       stroke={style.accent ?? color}
@@ -95,12 +93,16 @@ export function EditableIcon({
       strokeLinejoin="round"
       focusable="false"
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
-      style={{ display: "block" }}
+      /* Sizing lives in CSS, not SVG attributes: container-query units and
+         calc() are invalid as `width`/`height` attribute values and make the
+         glyph fall back to 100% of its parent. */
+      style={{ display: "block", width: scaled, height: scaled, flex: "0 0 auto" }}
     >
       {label ? <title>{label}</title> : null}
       <path d={resolved.d} />
     </svg>
   );
+
 
   if (!ctx?.active) return glyph;
 

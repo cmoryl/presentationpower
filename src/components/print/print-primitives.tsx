@@ -312,8 +312,6 @@ export function Icon({
 }) {
   return (
     <svg
-      width={size}
-      height={size}
       viewBox="0 0 24 24"
       fill="none"
       stroke={color}
@@ -321,7 +319,7 @@ export function Icon({
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      style={{ display: "block" }}
+      style={{ display: "block", width: size, height: size, flex: "0 0 auto" }}
     >
       <path d={ICON_PATHS[name]} />
     </svg>
@@ -342,8 +340,6 @@ export function IconPath({
 }) {
   return (
     <svg
-      width={size}
-      height={size}
       viewBox="0 0 24 24"
       fill="none"
       stroke={color}
@@ -351,7 +347,7 @@ export function IconPath({
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      style={{ display: "block" }}
+      style={{ display: "block", width: size, height: size, flex: "0 0 auto" }}
     >
       <path d={d} />
     </svg>
