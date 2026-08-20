@@ -2,7 +2,16 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowRight, ChevronRight, Copy, FileText, FolderOpen, Search, X } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  FileText,
+  FolderOpen,
+  Search,
+  X,
+} from "lucide-react";
 
 import { PageTemplateCard } from "@/components/print/PageTemplateShelf";
 import { usePrintPageTemplates } from "@/lib/print-page-templates";
@@ -639,24 +648,39 @@ export function PrintLibraryBrowser({
 
 // ---------------------------------------------------------------------------
 // Page templates captured from real pieces, scoped to the active division.
+// Collapsible accordion — closed by default for every division.
 // ---------------------------------------------------------------------------
 function DivisionPageTemplates({ divisionId }: { divisionId: string }) {
   const { templates } = usePrintPageTemplates();
+  const [open, setOpen] = useState(false);
   const rows = templates.filter((t) => !t.division_id || t.division_id === divisionId);
   if (rows.length === 0) return null;
   return (
     <div className="mt-6 rounded-2xl border border-[#003FC7]/20 bg-[#003FC7]/[0.03] p-4">
-      <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-sm font-semibold text-[#03002C]">Page templates</h3>
-        <span className="text-[11px] text-black/45">
-          {rows.length} captured from real pieces
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 text-left"
+      >
+        <div className="flex items-baseline gap-3">
+          <h3 className="text-sm font-semibold text-[#03002C]">Page templates</h3>
+          <span className="text-[11px] text-black/45">{rows.length} captured from real pieces</span>
+        </div>
+        <span
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/70 text-[#03002C] transition-transform duration-200"
+          style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
+        >
+          <ChevronDown size={14} />
         </span>
-      </div>
-      <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {rows.map((t) => (
-          <PageTemplateCard key={t.id} template={t} />
-        ))}
-      </div>
+      </button>
+      {open ? (
+        <div className="mt-4 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {rows.map((t) => (
+            <PageTemplateCard key={t.id} template={t} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
