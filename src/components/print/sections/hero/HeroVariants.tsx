@@ -8,6 +8,7 @@
 import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
+import { AutoFitText } from "./HeroAutoFit";
 import { usePrintPage } from "@/components/print/print-page-context";
 
 /**
@@ -41,11 +42,7 @@ function heroRuleGap(section: PrintHeroSection, def: number): string {
 }
 
 /** Closing hairline under the title block. */
-function heroHairline(
-  section: PrintHeroSection,
-  ink: { hairline: string },
-  shownByDefault = true,
-) {
+function heroHairline(section: PrintHeroSection, ink: { hairline: string }, shownByDefault = true) {
   const shown = section.rule?.hairline ?? shownByDefault;
   if (!shown) return { borderBottom: "none" as const };
   return { borderBottom: `1px solid ${section.rule?.hairlineColor ?? ink.hairline}` };
@@ -57,7 +54,6 @@ function heroTitleStyle(section: PrintHeroSection) {
   const t = section.titleType;
   if (!t) return {};
   return {
-    ...(t.titlePx ? { fontSize: cq(t.titlePx) } : null),
     ...(t.titleWeight ? { fontWeight: t.titleWeight } : null),
     ...(t.titleTracking !== undefined ? { letterSpacing: emTrack(t.titleTracking) } : null),
     ...(t.titleLeading ? { lineHeight: t.titleLeading / 100 } : null),
@@ -65,11 +61,20 @@ function heroTitleStyle(section: PrintHeroSection) {
   };
 }
 
+/** Authored size for the title block, honouring the inspector override. */
+function heroTitleFontPx(section: PrintHeroSection, def: number): number {
+  return section.titleType?.titlePx ?? def;
+}
+
+/** Authored size for the summary, honouring the inspector override. */
+function heroSummaryFontPx(section: PrintHeroSection, def: number): number {
+  return section.titleType?.summaryPx ?? def;
+}
+
 function heroSummaryStyle(section: PrintHeroSection) {
   const t = section.titleType;
   if (!t) return {};
   return {
-    ...(t.summaryPx ? { fontSize: cq(t.summaryPx) } : null),
     ...(t.summaryLeading ? { lineHeight: t.summaryLeading / 100 } : null),
   };
 }
@@ -180,35 +185,37 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
               {section.eyebrow}
             </div>
           )}
-          <h2
+          <AutoFitText
+            as="h2"
+            basePx={heroTitleFontPx(section, 33)}
+            maxLines={3}
             style={{
               margin: 0,
-              fontSize: cq(33),
               lineHeight: 1.04,
               letterSpacing: "-0.03em",
               fontWeight: 700,
               color: "#FFFFFF",
-              ...clampLines(3),
               ...heroTitleStyle(section),
             }}
           >
             {section.title}
-          </h2>
+          </AutoFitText>
           {section.summary && (
-            <p
+            <AutoFitText
+              as="p"
+              basePx={heroSummaryFontPx(section, 11.5)}
+              maxLines={3}
               style={{
                 margin: `${cq(10)} 0 0`,
                 maxWidth: cq(520),
                 marginInline: section.align === "center" ? "auto" : undefined,
-                fontSize: cq(11.5),
                 lineHeight: 1.5,
                 color: "rgba(255,255,255,0.86)",
-                ...clampLines(3),
                 ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
-            </p>
+            </AutoFitText>
           )}
         </div>
       </div>
@@ -252,7 +259,8 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
       {section.eyebrow && (
         <div
           style={{
-            ...EYEBROW(accent), ...heroEyebrowStyle(section),
+            ...EYEBROW(accent),
+            ...heroEyebrowStyle(section),
             paddingBottom: cq(8),
             marginBottom: cq(10),
             borderBottom: `1px solid ${ink.hairline}`,
@@ -264,33 +272,35 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
       {section.kicker && (
         <div style={{ ...EYEBROW(ink.faint, 8.5), marginBottom: cq(6) }}>{section.kicker}</div>
       )}
-      <h2
+      <AutoFitText
+        as="h2"
+        basePx={heroTitleFontPx(section, 27)}
+        maxLines={4}
         style={{
           margin: 0,
-          fontSize: cq(27),
           lineHeight: 1.06,
           letterSpacing: "-0.03em",
           fontWeight: 700,
           color: ink.strong,
-          ...clampLines(4),
           ...heroTitleStyle(section),
         }}
       >
         {section.title}
-      </h2>
+      </AutoFitText>
       {section.summary && (
-        <p
+        <AutoFitText
+          as="p"
+          basePx={heroSummaryFontPx(section, 11)}
+          maxLines={6}
           style={{
             margin: `${cq(10)} 0 0`,
-            fontSize: cq(11),
             lineHeight: 1.55,
             color: ink.soft,
-            ...clampLines(6),
             ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
-        </p>
+        </AutoFitText>
       )}
       <MetaRail section={section} mode={mode} accent={accent} />
     </div>
@@ -340,36 +350,40 @@ export function HeroTypeStack({ section, mode, accent }: Props) {
       }}
     >
       {section.eyebrow && (
-        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
+        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
+          {section.eyebrow}
+        </div>
       )}
-      <h2
+      <AutoFitText
+        as="h2"
+        basePx={heroTitleFontPx(section, 40)}
+        maxLines={3}
         style={{
           margin: 0,
-          fontSize: cq(40),
           lineHeight: 1,
           letterSpacing: "-0.04em",
           fontWeight: 700,
           color: ink.strong,
-          ...clampLines(3),
           ...heroTitleStyle(section),
         }}
       >
         {section.title}
-      </h2>
+      </AutoFitText>
       {section.summary && (
-        <p
+        <AutoFitText
+          as="p"
+          basePx={heroSummaryFontPx(section, 12)}
+          maxLines={4}
           style={{
             margin: `${cq(14)} ${centered ? "auto" : "0"} 0`,
             maxWidth: cq(540),
-            fontSize: cq(12),
             lineHeight: 1.55,
             color: ink.soft,
-            ...clampLines(4),
             ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
-        </p>
+        </AutoFitText>
       )}
       <MetaRail section={section} mode={mode} accent={accent} />
     </section>
@@ -394,34 +408,36 @@ export function HeroAccentBand({ section, mode, accent }: Props) {
             {section.eyebrow}
           </div>
         )}
-        <h2
+        <AutoFitText
+          as="h2"
+          basePx={heroTitleFontPx(section, 32)}
+          maxLines={3}
           style={{
             margin: 0,
-            fontSize: cq(32),
             lineHeight: 1.05,
             letterSpacing: "-0.03em",
             fontWeight: 700,
             color: "#FFFFFF",
-            ...clampLines(3),
             ...heroTitleStyle(section),
           }}
         >
           {section.title}
-        </h2>
+        </AutoFitText>
         {section.summary && (
-          <p
+          <AutoFitText
+            as="p"
+            basePx={heroSummaryFontPx(section, 11.5)}
+            maxLines={4}
             style={{
               margin: `${cq(12)} ${section.align === "center" ? "auto" : "0"} 0`,
               maxWidth: cq(540),
-              fontSize: cq(11.5),
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.88)",
-              ...clampLines(4),
               ...heroSummaryStyle(section),
             }}
           >
             {section.summary}
-          </p>
+          </AutoFitText>
         )}
         <MetaRail section={section} mode={mode} accent={accent} onDark />
       </div>
@@ -443,36 +459,40 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
       }}
     >
       {section.eyebrow && (
-        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(8) }}>{section.eyebrow}</div>
+        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(8) }}>
+          {section.eyebrow}
+        </div>
       )}
-      <h2
+      <AutoFitText
+        as="h2"
+        basePx={heroTitleFontPx(section, 30)}
+        maxLines={3}
         style={{
           margin: 0,
-          fontSize: cq(30),
           lineHeight: 1.05,
           letterSpacing: "-0.03em",
           fontWeight: 700,
           color: ink.strong,
-          ...clampLines(3),
           ...heroTitleStyle(section),
         }}
       >
         {section.title}
-      </h2>
+      </AutoFitText>
       {section.summary && (
-        <p
+        <AutoFitText
+          as="p"
+          basePx={heroSummaryFontPx(section, 11.5)}
+          maxLines={3}
           style={{
             margin: `${cq(10)} 0 0`,
             maxWidth: cq(560),
-            fontSize: cq(11.5),
             lineHeight: 1.55,
             color: ink.soft,
-            ...clampLines(3),
             ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
-        </p>
+        </AutoFitText>
       )}
       {stats.length > 0 && (
         <div
@@ -537,7 +557,11 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
     >
       <div style={{ display: "grid", gridTemplateColumns: `${cq(160)} 1fr`, gap: cq(24) }}>
         <div style={{ borderRight: `1px solid ${ink.hairline}`, paddingRight: cq(16) }}>
-          {section.eyebrow && <div style={{ ...EYEBROW(accent, 8.5), ...heroEyebrowStyle(section) }}>{section.eyebrow}</div>}
+          {section.eyebrow && (
+            <div style={{ ...EYEBROW(accent, 8.5), ...heroEyebrowStyle(section) }}>
+              {section.eyebrow}
+            </div>
+          )}
           {section.kicker && (
             <div
               style={{
@@ -555,33 +579,35 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
           <MetaRail section={section} mode={mode} accent={accent} />
         </div>
         <div>
-          <h2
+          <AutoFitText
+            as="h2"
+            basePx={heroTitleFontPx(section, 29)}
+            maxLines={4}
             style={{
               margin: 0,
-              fontSize: cq(29),
               lineHeight: 1.06,
               letterSpacing: "-0.03em",
               fontWeight: 700,
               color: ink.strong,
-              ...clampLines(4),
               ...heroTitleStyle(section),
             }}
           >
             {section.title}
-          </h2>
+          </AutoFitText>
           {section.summary && (
-            <p
+            <AutoFitText
+              as="p"
+              basePx={heroSummaryFontPx(section, 11.5)}
+              maxLines={6}
               style={{
                 margin: `${cq(12)} 0 0`,
-                fontSize: cq(11.5),
                 lineHeight: 1.55,
                 color: ink.soft,
-                ...clampLines(6),
                 ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
-            </p>
+            </AutoFitText>
           )}
         </div>
       </div>
@@ -641,38 +667,42 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           }}
         >
           {section.eyebrow && (
-            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
+            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
+              {section.eyebrow}
+            </div>
           )}
 
-          <h2
+          <AutoFitText
+            as="h2"
+            basePx={heroTitleFontPx(section, 34)}
+            maxLines={3}
             style={{
               margin: 0,
-              fontSize: cq(34),
               lineHeight: 1.12,
               letterSpacing: "-0.02em",
               fontWeight: 700,
               color: ink.strong,
               maxWidth: cq(470),
-              ...clampLines(3),
               ...heroTitleStyle(section),
             }}
           >
             {section.title}
-          </h2>
+          </AutoFitText>
           {section.summary && (
-            <p
+            <AutoFitText
+              as="p"
+              basePx={heroSummaryFontPx(section, 11.5)}
+              maxLines={4}
               style={{
                 margin: `${cq(12)} 0 0`,
                 maxWidth: cq(400),
-                fontSize: cq(11.5),
                 lineHeight: 1.6,
                 color: ink.soft,
-                ...clampLines(4),
                 ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
-            </p>
+            </AutoFitText>
           )}
           <MetaRail section={section} mode={mode} accent={accent} />
         </div>
@@ -700,38 +730,42 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: cq(28) }}>
         <div>
           {section.eyebrow && (
-            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
+            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
+              {section.eyebrow}
+            </div>
           )}
           {section.kicker && (
             <div style={{ ...EYEBROW(ink.faint, 8.5), marginBottom: cq(6) }}>{section.kicker}</div>
           )}
-          <h2
+          <AutoFitText
+            as="h2"
+            basePx={heroTitleFontPx(section, 30)}
+            maxLines={4}
             style={{
               margin: 0,
-              fontSize: cq(30),
               lineHeight: 1.12,
               letterSpacing: "-0.02em",
               fontWeight: 700,
               color: ink.strong,
-              ...clampLines(4),
               ...heroTitleStyle(section),
             }}
           >
             {section.title}
-          </h2>
+          </AutoFitText>
           {section.summary && (
-            <p
+            <AutoFitText
+              as="p"
+              basePx={heroSummaryFontPx(section, 11.5)}
+              maxLines={6}
               style={{
                 margin: `${cq(12)} 0 0`,
-                fontSize: cq(11.5),
                 lineHeight: 1.65,
                 color: ink.soft,
-                ...clampLines(6),
                 ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
-            </p>
+            </AutoFitText>
           )}
           <MetaRail section={section} mode={mode} accent={accent} />
         </div>
@@ -755,22 +789,21 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
             >
               &ldquo;
             </div>
-            <p
+            <AutoFitText
+              as="p"
+              basePx={heroSummaryFontPx(section, 12.5)}
+              maxLines={7}
               style={{
                 margin: `${cq(10)} 0 0`,
-                fontSize: cq(12.5),
                 lineHeight: 1.6,
                 color: ink.strong,
-                ...clampLines(7),
               }}
             >
               {q.text}
-            </p>
+            </AutoFitText>
             {q.role && <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>}
             {q.author && (
-              <div
-                style={{ marginTop: cq(2), fontSize: cq(11), fontWeight: 700, color: ink.strong }}
-              >
+              <div style={{ marginTop: cq(2), fontWeight: 700, color: ink.strong }}>
                 — {q.author}
                 {q.company ? ` · ${q.company}` : ""}
               </div>
@@ -811,7 +844,6 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
         >
           <span
             style={{
-              fontSize: cq(20),
               fontWeight: 700,
               letterSpacing: "-0.01em",
               color: "#FFFFFF",
@@ -836,40 +868,42 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
               }}
             />
           ) : (
-            <span style={{ fontSize: cq(20), fontWeight: 700, color: "#FFFFFF" }}>
+            <span style={{ fontWeight: 700, color: "#FFFFFF" }}>
               {section.partner ?? "Partner"}
             </span>
           )}
         </div>
-        <h2
+        <AutoFitText
+          as="h2"
+          basePx={heroTitleFontPx(section, 22)}
+          maxLines={3}
           style={{
             margin: `${cq(18)} auto 0`,
             maxWidth: cq(560),
-            fontSize: cq(22),
             lineHeight: 1.25,
             letterSpacing: "-0.02em",
             fontWeight: 700,
             color: "#FFFFFF",
-            ...clampLines(3),
             ...heroTitleStyle(section),
           }}
         >
           {section.title}
-        </h2>
+        </AutoFitText>
         {section.summary && (
-          <p
+          <AutoFitText
+            as="p"
+            basePx={heroSummaryFontPx(section, 11.5)}
+            maxLines={4}
             style={{
               margin: `${cq(12)} auto 0`,
               maxWidth: cq(540),
-              fontSize: cq(11.5),
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.86)",
-              ...clampLines(3),
               ...heroSummaryStyle(section),
             }}
           >
             {section.summary}
-          </p>
+          </AutoFitText>
         )}
         {stats.length > 0 && (
           <div
@@ -940,38 +974,42 @@ export function HeroBriefLockup({ section, mode, accent }: Props) {
           borderBottom: `1px solid ${ink.hairline}`,
         }}
       >
-        <span style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section) }}>{section.eyebrow ?? "Brief"}</span>
+        <span style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section) }}>
+          {section.eyebrow ?? "Brief"}
+        </span>
         <span style={{ ...EYEBROW(ink.faint, 8.5) }}>{section.kicker ?? "TransPerfect"}</span>
       </div>
-      <h2
+      <AutoFitText
+        as="h2"
+        basePx={heroTitleFontPx(section, 37)}
+        maxLines={3}
         style={{
           margin: `${cq(20)} 0 0`,
-          fontSize: cq(37),
           lineHeight: 1.12,
           letterSpacing: "-0.015em",
           fontWeight: 700,
           color: ink.strong,
           maxWidth: cq(480),
-          ...clampLines(3),
           ...heroTitleStyle(section),
         }}
       >
         {section.title}
-      </h2>
+      </AutoFitText>
       {section.summary && (
-        <p
+        <AutoFitText
+          as="p"
+          basePx={heroSummaryFontPx(section, 12.5)}
+          maxLines={4}
           style={{
             margin: `${cq(14)} 0 0`,
             maxWidth: cq(380),
-            fontSize: cq(12.5),
             lineHeight: 1.6,
             color: ink.soft,
-            ...clampLines(4),
             ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
-        </p>
+        </AutoFitText>
       )}
       <MetaRail section={section} mode={mode} accent={accent} />
       <div style={{ marginTop: cq(18), height: cq(3), width: cq(72), background: accent }} />

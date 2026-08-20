@@ -2,11 +2,7 @@
 // These map 1:1 onto `section.rule` and `section.titleType`, which the hero
 // renderers read — so what the panel shows is what prints and exports.
 
-import type {
-  PrintHeroRule,
-  PrintHeroSection,
-  PrintHeroTitleType,
-} from "@/lib/print-assets.types";
+import type { PrintHeroRule, PrintHeroSection, PrintHeroTitleType } from "@/lib/print-assets.types";
 
 const box =
   "w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white";
@@ -88,8 +84,7 @@ export function HeroRuleTypeControls({
   const rule = section.rule ?? {};
   const type = section.titleType ?? {};
   const patchRule = (p: Partial<PrintHeroRule>) => onPatch({ rule: { ...rule, ...p } });
-  const patchType = (p: Partial<PrintHeroTitleType>) =>
-    onPatch({ titleType: { ...type, ...p } });
+  const patchType = (p: Partial<PrintHeroTitleType>) => onPatch({ titleType: { ...type, ...p } });
 
   return (
     <div className="space-y-2">
