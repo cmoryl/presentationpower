@@ -26,7 +26,8 @@ export type PrintPptxOptions = {
 
 function trimOf(opts: PrintPptxOptions): { widthIn: number; heightIn: number } {
   if (opts.custom?.widthIn && opts.custom?.heightIn) return opts.custom;
-  const preset = PRINT_PAGE_PRESETS[(opts.pageSize ?? "Letter") as string];
+  const presets = PRINT_PAGE_PRESETS as Record<string, { widthIn: number; heightIn: number }>;
+  const preset = presets[String(opts.pageSize ?? "Letter")];
   if (preset) return { widthIn: preset.widthIn, heightIn: preset.heightIn };
   return { widthIn: 8.5, heightIn: 11 };
 }
