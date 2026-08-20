@@ -65,24 +65,60 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
 
-    { to: "/library", label: "Presentations" },
-    { to: "/library/print", label: "Print" },
-    { to: "/events", label: "Event" },
-    { to: "/social", label: "Social" },
+    { to: "/library", label: "Elements" },
 
     { to: "/files", label: "My files" },
     { to: "/admin", label: "Admin" },
   ] as const;
-  const presentationItems: ReadonlyArray<{ to: string; label: string }> = [
-    { to: "/library", label: "Modules" },
-    { to: "/agent", label: "Agent" },
-    { to: "/admin/canvas", label: "Canvas creator" },
-    { to: "/decks", label: "Decks" },
+
+  // Elements mega-menu: the four output channels and their sub-options.
+  const elementGroups: ReadonlyArray<{
+    label: string;
+    to: string;
+    items: ReadonlyArray<{ to: string; label: string }>;
+  }> = [
+    {
+      label: "Presentation",
+      to: "/library",
+      items: [
+        { to: "/library", label: "Modules" },
+        { to: "/agent", label: "Agent" },
+        { to: "/admin/canvas", label: "Canvas creator" },
+        { to: "/decks", label: "Decks" },
+        { to: "/library/imported", label: "Imported decks" },
+      ],
+    },
+    {
+      label: "Print",
+      to: "/library/print",
+      items: [
+        { to: "/library/print", label: "Print templates" },
+        { to: "/library/print/modules", label: "Section modules" },
+        { to: "/library/print/heroes", label: "Hero openers" },
+      ],
+    },
+    {
+      label: "Events",
+      to: "/events",
+      items: [
+        { to: "/events", label: "Event assets" },
+        { to: "/events/new", label: "New event asset" },
+        { to: "/events/presets", label: "Presets" },
+        { to: "/events/next", label: "Next-gen builder" },
+      ],
+    },
+    {
+      label: "Social",
+      to: "/social",
+      items: [
+        { to: "/social", label: "Social assets" },
+        { to: "/social/new", label: "New social asset" },
+        { to: "/social/presets", label: "Presets" },
+        { to: "/social/banners", label: "Banners" },
+      ],
+    },
   ];
-  const printItems: ReadonlyArray<{ to: string; label: string }> = [
-    { to: "/library/print", label: "Print templates" },
-    { to: "/library/print/modules", label: "Modules" },
-  ];
+
 
   const adminGroups: ReadonlyArray<{
     label: string;
