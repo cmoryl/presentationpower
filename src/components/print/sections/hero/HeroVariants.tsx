@@ -335,7 +335,7 @@ export function HeroTypeStack({ section, mode, accent }: Props) {
         textAlign: centered ? "center" : "left",
         ...heroRuleTop(section, accent, 4),
         ...heroHairline(section, ink),
-        paddingTop: cq(16),
+        paddingTop: heroRuleGap(section, 16),
         paddingBottom: cq(18),
       }}
     >
@@ -530,8 +530,8 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
       style={{
         marginBottom: cq(22),
         ...heroRuleTop(section, accent, 4),
-        paddingTop: cq(16),
-        borderBottom: `1px solid ${ink.hairline}`,
+        paddingTop: heroRuleGap(section, 16),
+        ...heroHairline(section, ink),
         paddingBottom: cq(18),
       }}
     >
