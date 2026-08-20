@@ -60,6 +60,8 @@ export type PrintPageTemplate = Omit<PrintPageTemplateRow, "sections" | "layout"
   scope: PrintPageTemplateScope;
   sections: PrintSection[];
   layout: PrintPageTemplateLayout;
+  /** True for curated catalog originals (read-only, not database rows). */
+  builtin?: boolean;
 };
 
 export function normalizePageTemplate(row: PrintPageTemplateRow): PrintPageTemplate {
