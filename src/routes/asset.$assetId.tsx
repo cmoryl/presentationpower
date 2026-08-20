@@ -88,6 +88,7 @@ import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
+import { effectiveAssetIconTreatment, usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
 import { iconPageBackground } from "@/lib/print-icon-contrast";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
@@ -199,6 +200,7 @@ function AssetEditor() {
     Array<{ quote: string; author: string | null; role: string | null }>
   >([]);
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const { prefs: iconPrefs } = usePrintIconPrefs();
   // Measured (not predicted) page overflow — fires whenever content is really
   // clipped by the fixed-height page, e.g. after dragging the hero too tall.
   const overflow = usePrintOverflow(canvasRef, row?.content);
@@ -501,6 +503,10 @@ function AssetEditor() {
   })();
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
+  // Icon treatment: the asset's own stored settings when it has them, else the
+  // shared print iconography preference (tuned in the module library). Both the
+  // on-screen canvas and the PDF export read THIS value, so they cannot drift.
+  const iconTreatment = effectiveAssetIconTreatment(ctx, iconPrefs);
 
   // Cross-links back to the deck (and other artifacts) the same brief produced.
   const siblingDeckId =
@@ -1187,10 +1193,7 @@ function AssetEditor() {
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
               style={{ aspectRatio: canvasAspect }}
             >
-              <PrintDocModeProvider
-                icons={ctx.icons !== false}
-                iconStyle={resolvePrintIconStyle(ctx.iconStyle)}
-              >
+              <PrintDocModeProvider icons={iconTreatment.icons} iconStyle={iconTreatment.iconStyle}>
                 <PrintIconEditContext.Provider
                   value={{
                     active: true,
@@ -1370,6 +1373,7 @@ function AssetEditor() {
                   <button
                     type="button"
                     data-testid="canvas-hero-edit"
+                    data-export-ignore="true"
                     onClick={() => setHeroModalOpen(true)}
                     title="Edit hero image"
                     aria-label="Edit hero image"
@@ -1727,37 +1731,37 @@ function AssetEditor() {
                   <input
                     type="checkbox"
                     data-testid="toggle-print-icons"
-                    checked={ctx.icons !== false}
+                    checked={iconTreatment.icons}
                     onChange={(e) => patchCtx({ icons: e.target.checked })}
                   />
                 </Row>
-                <Row label={`Size ${(ctx.iconStyle?.scale ?? 1).toFixed(2)}x`}>
+                <Row label={`Size ${iconTreatment.iconStyle.scale.toFixed(2)}x`}>
                   <input
                     type="range"
                     aria-label="Icon size"
                     min={0.6}
                     max={1.8}
                     step={0.05}
-                    value={ctx.iconStyle?.scale ?? 1}
+                    value={iconTreatment.iconStyle.scale}
                     onChange={(e) =>
                       patchCtx({
-                        iconStyle: { ...(ctx.iconStyle ?? {}), scale: Number(e.target.value) },
+                        iconStyle: { ...iconTreatment.iconStyle, scale: Number(e.target.value) },
                       })
                     }
                     className="w-full"
                   />
                 </Row>
-                <Row label={`Stroke ${(ctx.iconStyle?.stroke ?? 1).toFixed(2)}x`}>
+                <Row label={`Stroke ${iconTreatment.iconStyle.stroke.toFixed(2)}x`}>
                   <input
                     type="range"
                     aria-label="Icon stroke weight"
                     min={0.6}
                     max={2}
                     step={0.05}
-                    value={ctx.iconStyle?.stroke ?? 1}
+                    value={iconTreatment.iconStyle.stroke}
                     onChange={(e) =>
                       patchCtx({
-                        iconStyle: { ...(ctx.iconStyle ?? {}), stroke: Number(e.target.value) },
+                        iconStyle: { ...iconTreatment.iconStyle, stroke: Number(e.target.value) },
                       })
                     }
                     className="w-full"
@@ -1768,10 +1772,10 @@ function AssetEditor() {
                     <input
                       type="color"
                       aria-label="Icon accent color"
-                      value={ctx.iconStyle?.accent ?? "#003FC7"}
+                      value={iconTreatment.iconStyle.accent ?? "#003FC7"}
                       onChange={(e) =>
                         patchCtx({
-                          iconStyle: { ...(ctx.iconStyle ?? {}), accent: e.target.value },
+                          iconStyle: { ...iconTreatment.iconStyle, accent: e.target.value },
                         })
                       }
                       className="h-7 w-10 cursor-pointer rounded border border-black/10 bg-transparent dark:border-white/15"
@@ -1779,7 +1783,7 @@ function AssetEditor() {
                     <button
                       type="button"
                       onClick={() => {
-                        const { accent: _a, ...rest } = ctx.iconStyle ?? {};
+                        const { accent: _a, ...rest } = iconTreatment.iconStyle;
                         patchCtx({ iconStyle: rest });
                       }}
                       className="rounded-md border border-black/10 px-2 py-1 text-[10px] uppercase tracking-widest text-black/60 transition hover:bg-black/5 dark:border-white/10 dark:text-white/60 dark:hover:bg-white/10"
@@ -1789,11 +1793,11 @@ function AssetEditor() {
                   </div>
                 </Row>
                 <IconAccentContrastWarning
-                  accent={ctx.iconStyle?.accent}
+                  accent={iconTreatment.iconStyle.accent}
                   background={iconPageBackground(editorMode)}
-                  stroke={ctx.iconStyle?.stroke ?? 1}
+                  stroke={iconTreatment.iconStyle.stroke}
                   onApplySuggestion={(hex) =>
-                    patchCtx({ iconStyle: { ...(ctx.iconStyle ?? {}), accent: hex } })
+                    patchCtx({ iconStyle: { ...iconTreatment.iconStyle, accent: hex } })
                   }
                 />
               </Panel>

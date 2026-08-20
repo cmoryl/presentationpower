@@ -24,6 +24,7 @@ import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides"
 import { PageTemplateShelf } from "@/components/print/PageTemplateShelf";
 import { pageTemplateMatches, usePrintPageTemplates } from "@/lib/print-page-templates";
 import type { PrintIconStyle } from "@/components/print/print-doc-mode";
+import { usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
 import { iconPageBackground } from "@/lib/print-icon-contrast";
 import type { PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
@@ -65,11 +66,17 @@ function PrintModuleLibraryPage() {
   const [query, setQuery] = useState("");
   const [useReal, setUseReal] = useState(true);
   const [realOnly, setRealOnly] = useState(true);
-  // Print collateral is typeset, not iconified — document view is the default.
-  const [showIcons, setShowIcons] = useState(true);
-  const [iconScale, setIconScale] = useState(1);
-  const [iconStroke, setIconStroke] = useState(1);
-  const [iconAccent, setIconAccent] = useState<string | undefined>(undefined);
+  // Iconography is a persisted, document-level treatment: whatever is tuned
+  // here becomes the default for new print assets and travels into the PDF.
+  const { prefs: iconPrefs, patch: patchIconPrefs } = usePrintIconPrefs();
+  const showIcons = iconPrefs.icons;
+  const setShowIcons = (v: boolean) => patchIconPrefs({ icons: v });
+  const iconScale = iconPrefs.scale;
+  const setIconScale = (v: number) => patchIconPrefs({ scale: v });
+  const iconStroke = iconPrefs.stroke;
+  const setIconStroke = (v: number) => patchIconPrefs({ stroke: v });
+  const iconAccent = iconPrefs.accent;
+  const setIconAccent = (v: string | undefined) => patchIconPrefs({ accent: v });
   const iconStyle: PrintIconStyle = useMemo(
     () => ({ scale: iconScale, stroke: iconStroke, accent: iconAccent }),
     [iconScale, iconStroke, iconAccent],
