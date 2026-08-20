@@ -33,7 +33,10 @@
     "render:powerpoint": "node scripts/render-via-powerpoint.mjs",
     "verify:charts:style": "node scripts/chart-style-regression.mjs --sample 6",
     "verify:charts:style:calibrate": "node scripts/chart-style-regression.mjs --all --modes light,dark --update",
-    "verify:charts:style:ci": "node scripts/chart-style-regression.mjs --all --modes light,dark --ci --update"
+    "verify:charts:style:ci": "node scripts/chart-style-regression.mjs --all --modes light,dark --ci --update",
+    "verify:print-modules": "node scripts/print-module-pdf-snapshots.mjs",
+    "verify:print-modules:update": "node scripts/print-module-pdf-snapshots.mjs --update",
+    "verify:print-modules:ci": "node scripts/print-module-pdf-snapshots.mjs --ci --modes light,dark"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.30",
