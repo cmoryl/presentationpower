@@ -3889,17 +3889,27 @@ export const useDeckStore = create<DeckState>()(
 
           if (!editable) return;
           const nextContent = setPath({ ...slide.content }, field, value);
+          // Keep adopted canvas blocks (which bake text at adoption time) in
+          // step with the edit, otherwise the change is invisible on the slide.
+          const nextBlocks = syncAdoptedBlockText(
+            slide.canvasBlocks,
+            getPath(slide.content, field),
+            value,
+          );
           set((s) => ({
             decks: {
               ...s.decks,
               [deckId]: {
                 ...deck,
                 slides: deck.slides.map((sl) =>
-                  sl.id === slideId ? { ...sl, content: nextContent } : sl,
+                  sl.id === slideId
+                    ? { ...sl, content: nextContent, canvasBlocks: nextBlocks }
+                    : sl,
                 ),
               },
             },
           }));
+
         },
 
         applySlideBackground: (deckId, slideIds, background) => {
@@ -4883,7 +4893,74 @@ function matchesField(pattern: string, field: string): boolean {
   return regex.test(field);
 }
 
+function pathParts(path: string): (string | number)[] {
+  return path.split(".").flatMap((p) => {
+    const m = /^([^[]+)(\[(\d+)\])?$/.exec(p);
+    if (!m) return [p];
+    return m[3] !== undefined ? [m[1] as string | number, Number(m[3])] : [m[1] as string | number];
+  });
+}
+
+function getPath(obj: unknown, path: string): unknown {
+  let cur: unknown = obj;
+  for (const key of pathParts(path)) {
+    if (cur == null || typeof cur !== "object") return undefined;
+    cur = (cur as Record<string | number, unknown>)[key];
+  }
+  return cur;
+}
+
+/**
+ * Adopted canvas blocks bake the module's text at adoption time (see
+ * lib/canvas-adopt.ts) and the renderer hides the original element, so an
+ * inspector edit to `items[1].unit` would otherwise be invisible on the slide.
+ * Re-point every adopted text block that still shows the OLD value at the
+ * edited value. Value matching (not path binding) is what keeps decks adopted
+ * before this fix in sync too.
+ */
+export function syncAdoptedBlockText(
+  blocks: CanvasBlock[] | undefined,
+  prevValue: unknown,
+  nextValue: unknown,
+): CanvasBlock[] | undefined {
+  if (!blocks?.length) return blocks;
+  // Collect (old → new) string pairs; handles both a single field write and an
+  // array/object write (a whole `items` commit from a row panel).
+  const pairs: [string, string][] = [];
+  const walk = (a: unknown, b: unknown) => {
+    if (typeof a === "string" || typeof b === "string") {
+      const prev = typeof a === "string" ? a.trim() : "";
+      const next = typeof b === "string" ? b : "";
+      if (prev && prev !== next.trim()) pairs.push([prev, next]);
+      return;
+    }
+    if (Array.isArray(a) && Array.isArray(b)) {
+      for (let i = 0; i < Math.min(a.length, b.length); i++) walk(a[i], b[i]);
+      return;
+    }
+    if (a && b && typeof a === "object" && typeof b === "object") {
+      for (const k of Object.keys(a as Record<string, unknown>)) {
+        walk((a as Record<string, unknown>)[k], (b as Record<string, unknown>)[k]);
+      }
+    }
+  };
+  walk(prevValue, nextValue);
+  if (!pairs.length) return blocks;
+  const map = new Map(pairs);
+  let changed = false;
+  const out = blocks.map((b) => {
+    if (!b.sourceSelector) return b;
+    const hit = map.get((b.text ?? "").trim());
+    if (hit === undefined) return b;
+    changed = true;
+    return { ...b, text: hit };
+  });
+  return changed ? out : blocks;
+}
+
 function setPath(
+
+
   obj: Record<string, unknown>,
   path: string,
   value: unknown,
