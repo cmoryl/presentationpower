@@ -212,16 +212,22 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       cards: [
         {
           title: content.includedTitle || "What's included",
-          body: (content.included ?? [
-            "Language Pre-Flight",
-            "Localization",
-            "Desktop Publishing",
-            "Project Management",
-          ]).join("\n"),
+          body: (content.included ?? []).length
+            ? content.included
+                .map((item) => (item.detail ? `${item.label} — ${item.detail}` : item.label))
+                .join("\n")
+            : "Language Pre-Flight\nLocalization\nDesktop Publishing\nProject Management",
         },
-        { title: "Source Files", body: "1 PDF Document" },
-        { title: "Deliverables", body: "1 PDF Document\n1 Certificate" },
+        {
+          title: content.sourceFilesTitle || "Source Files",
+          body: (content.sourceFiles ?? ["1 PDF Document"]).join("\n"),
+        },
+        {
+          title: content.deliverablesTitle || "Deliverables",
+          body: (content.deliverables ?? ["1 PDF Document", "1 Certificate"]).join("\n"),
+        },
       ],
+
       bullets: [
         "Project timeline is estimated at X business days.",
         "CLIENT has requested a rush X-day turnaround time.",

@@ -57,6 +57,7 @@ import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
+import { Route as DevProposalQaRouteImport } from './routes/dev.proposal-qa'
 import { Route as DevPrintModulePdfRouteImport } from './routes/dev.print-module-pdf'
 import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
@@ -372,6 +373,11 @@ const DevUxDebugRoute = DevUxDebugRouteImport.update({
 const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
   id: '/dev/slidestage-demo',
   path: '/dev/slidestage-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevProposalQaRoute = DevProposalQaRouteImport.update({
+  id: '/dev/proposal-qa',
+  path: '/dev/proposal-qa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevPrintModulePdfRoute = DevPrintModulePdfRouteImport.update({
@@ -827,6 +833,7 @@ export interface FileRoutesByFullPath {
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
+  '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
@@ -948,6 +955,7 @@ export interface FileRoutesByTo {
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
+  '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
@@ -1074,6 +1082,7 @@ export interface FileRoutesById {
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
   '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
+  '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
@@ -1201,6 +1210,7 @@ export interface FileRouteTypes {
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/print-module-pdf'
+    | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
     | '/events/new'
@@ -1322,6 +1332,7 @@ export interface FileRouteTypes {
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/print-module-pdf'
+    | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
     | '/events/new'
@@ -1447,6 +1458,7 @@ export interface FileRouteTypes {
     | '/dev/module-sheet'
     | '/dev/placement-verify'
     | '/dev/print-module-pdf'
+    | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
     | '/events/new'
@@ -1547,6 +1559,7 @@ export interface RootRouteChildren {
   DevModuleSheetRoute: typeof DevModuleSheetRoute
   DevPlacementVerifyRoute: typeof DevPlacementVerifyRoute
   DevPrintModulePdfRoute: typeof DevPrintModulePdfRoute
+  DevProposalQaRoute: typeof DevProposalQaRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
@@ -1915,6 +1928,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/slidestage-demo'
       fullPath: '/dev/slidestage-demo'
       preLoaderRoute: typeof DevSlidestageDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/proposal-qa': {
+      id: '/dev/proposal-qa'
+      path: '/dev/proposal-qa'
+      fullPath: '/dev/proposal-qa'
+      preLoaderRoute: typeof DevProposalQaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/print-module-pdf': {
@@ -2640,6 +2660,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevModuleSheetRoute: DevModuleSheetRoute,
   DevPlacementVerifyRoute: DevPlacementVerifyRoute,
   DevPrintModulePdfRoute: DevPrintModulePdfRoute,
+  DevProposalQaRoute: DevProposalQaRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   DevUxDebugRoute: DevUxDebugRoute,
   LibraryImportedRoute: LibraryImportedRoute,
