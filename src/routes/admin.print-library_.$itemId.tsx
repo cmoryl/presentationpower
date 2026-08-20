@@ -343,7 +343,49 @@ function MasterItemEditorPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {draft.content ? (
+            <ExportProposalButton
+              title={draft.title || saved.title}
+              mode={previewMode}
+              pageSize={draft.look.pageSize ?? "Letter"}
+              label={multiPage ? "Export proposal" : "Export"}
+              document={
+                <PrintPageProvider
+                  size={draft.look.pageSize ?? "Letter"}
+                  margin={draft.look.marginPreset ?? "standard"}
+                  density={draft.look.density ?? "standard"}
+                >
+                  <PrintDocModeProvider
+                    icons={draft.look.icons ?? true}
+                    iconStyle={resolvePrintIconStyle({
+                      scale: draft.look.iconScale ?? 1,
+                      ...(draft.look.accentOverride ? { accent: draft.look.accentOverride } : {}),
+                    })}
+                  >
+                    <PrintImageEditContext.Provider
+                      value={{
+                        active: false,
+                        overrides: imageOverrides,
+                        onDropFile: async () => {},
+                        onClear: () => {},
+                      }}
+                    >
+                      <PrintKindPreview
+                        kind={saved.kind}
+                        content={draft.content}
+                        brand={brand}
+                        mode={previewMode}
+                        pageSize={draft.look.pageSize ?? "Letter"}
+                        density={draft.look.density ?? "standard"}
+                      />
+                    </PrintImageEditContext.Provider>
+                  </PrintDocModeProvider>
+                </PrintPageProvider>
+              }
+            />
+          ) : null}
           <button
+
             type="button"
             onClick={() => setDraft(draftFrom(saved, override?.hidden ?? false))}
             disabled={!dirty}
