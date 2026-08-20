@@ -226,8 +226,14 @@ function PrintModuleLibraryPage() {
           Section modules ({PRINT_MODULE_COUNT})
         </span>
         <Link
+          to="/library/print/audit"
+          className="ml-auto rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#E53D2E] hover:text-[#E53D2E]"
+        >
+          Fit audit →
+        </Link>
+        <Link
           to="/library/print/heroes"
-          className="ml-auto rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
+          className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
         >
           Hero gallery →
         </Link>
