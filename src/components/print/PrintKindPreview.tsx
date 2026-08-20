@@ -6,6 +6,7 @@ import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
 import { MsaPartnershipLayout } from "@/components/print/MsaPartnershipLayout";
+import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import type {
   AdaptorBriefContent,
@@ -16,6 +17,7 @@ import type {
   PrintDensity,
   PrintMode,
   PrintPageSize,
+  SolutionProposalContent,
   SpotlightContent,
 } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -43,6 +45,8 @@ export function PrintKindPreview({
     return <EBrochureLayout content={content as EBrochureContent} {...shared} />;
   if (kind === "msa-partnership")
     return <MsaPartnershipLayout content={content as MsaPartnershipContent} {...shared} />;
+  if (kind === "solution-proposal")
+    return <SolutionProposalLayout content={content as SolutionProposalContent} {...shared} />;
   if (kind === "adaptor-brief")
     return <AdaptorBriefLayout content={content as AdaptorBriefContent} {...shared} />;
   if (kind === "case-study")
