@@ -905,15 +905,16 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
       </T>
 
       <Img
-        x={-0.55}
-        y={2.5}
-        w={9.6}
-        h={5.35}
+        x={-1.05}
+        y={2.32}
+        w={10.6}
+        h={5.91}
         src={PROPOSAL_ART.worldMap}
         alt="World map"
         slot="locations.map"
         label="map"
       />
+
 
       {/* Legend */}
       <L
