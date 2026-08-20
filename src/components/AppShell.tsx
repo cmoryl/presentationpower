@@ -1,7 +1,6 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { useTheme } from "@/hooks/use-theme";
 import { AdminSidebar } from "@/components/AdminShell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ElementLockup } from "@/components/brand/ElementLogo";
@@ -23,7 +22,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const locSearch = useRouterState({ select: (s) => s.location.searchStr });
 
-  const [, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
   const [presOpen, setPresOpen] = useState(false);
   
@@ -48,8 +46,15 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Dark mode is retired from the main navigation: the app ships light-only for
   // now, so pin any stored preference (including old "dark" sessions) to light.
   useEffect(() => {
-    setTheme("light");
-  }, [setTheme]);
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem("tp:theme-mode", "light");
+    } catch {
+      /* ignore */
+    }
+    document.documentElement.setAttribute("data-theme", "light");
+    document.documentElement.classList.remove("dark");
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;

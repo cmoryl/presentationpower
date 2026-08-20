@@ -169,9 +169,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-/* Applies the stored ELEMENT theme before first paint so every route — not just
+/* ELEMENT ships light-only for now: dark mode was removed from the nav, so this
+   pins <html> to the light theme before first paint and clears any stored 'dark'
+   preference left over from earlier sessions. (Was: applies the stored theme.)
  * the ones rendering AppShell — lands on the right palette with no flash. */
-const THEME_BOOT = `(function(){try{var m=localStorage.getItem('tp:theme-mode');if(m!=='dark'&&m!=='light')m='light';var r=document.documentElement;r.setAttribute('data-theme',m);r.classList.toggle('dark',m==='dark');var i=document.querySelector('link[rel="icon"][data-theme-icon]');if(i)i.href=m==='dark'?'/favicon-dark.png':'/favicon-light.png';}catch(e){}})();`;
+const THEME_BOOT = `(function(){try{localStorage.setItem('tp:theme-mode','light');}catch(e){}var r=document.documentElement;r.setAttribute('data-theme','light');r.classList.remove('dark');var i=document.querySelector('link[rel="icon"][data-theme-icon]');if(i)i.href='/favicon-light.png';})();`;
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
