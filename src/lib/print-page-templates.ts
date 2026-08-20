@@ -212,7 +212,12 @@ export function instantiateTemplateContent(
 /** Context knobs only — drop the captured content shell. */
 export function instantiateTemplateContext(t: PrintPageTemplate): Record<string, unknown> {
   const { contentShell: _shell, ...rest } = t.layout;
-  return { ...rest, pageTemplateId: t.id } as Record<string, unknown>;
+  const ctx: Record<string, unknown> = { ...rest, pageTemplateId: t.id };
+  if (t.source_library_item_id) {
+    ctx["libraryItemId"] = t.source_library_item_id;
+    if (t.builtin) ctx["sourceLibrary"] = sourceLibraryFor(t.source_library_item_id);
+  }
+  return ctx;
 }
 
 export function pageTemplateKind(t: PrintPageTemplate): PrintAssetKind {
