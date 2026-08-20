@@ -93,6 +93,11 @@ export function AutoFitText({
         node.style.display = "block";
         node.style.overflow = "visible";
         node.style.webkitLineClamp = "unset";
+        // Always measure from the AUTHORED size, never from the currently
+        // applied (already shrunk) size. Measuring the shrunk state reports
+        // "fits", which resets the ratio to 1, which overflows again — the
+        // element then oscillates between sizes and the card visibly jumps.
+        node.style.fontSize = cq(basePx);
 
         const lineBox = () => {
           const cs = window.getComputedStyle(node);
@@ -119,8 +124,8 @@ export function AutoFitText({
         node.style.display = probe.display;
         node.style.overflow = probe.overflow;
         node.style.webkitLineClamp = probe.clamp;
-        setRatio(next);
-        setBreakWords(wrap);
+        setRatio((prev) => (Math.abs(prev - next) < 0.0005 ? prev : next));
+        setBreakWords((prev) => (prev === wrap ? prev : wrap));
       });
     };
 
