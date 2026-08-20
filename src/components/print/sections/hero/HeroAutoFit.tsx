@@ -199,14 +199,31 @@ export function AutoFitText({
 
         let next = 1;
         let wrap = false;
+        let steps = 0;
         while (next > minRatio && overflows()) {
           next = Math.max(minRatio, Number((next - STEP).toFixed(3)));
           node.style.fontSize = cq(basePx * next);
+          steps += 1;
         }
         if (overflows()) {
           node.style.overflowWrap = "anywhere";
           wrap = overflows();
         }
+
+        logFitPass(node, {
+          label: String(children).slice(0, 40) || "(empty)",
+          authoredPx: basePx,
+          measuredPx: node.scrollHeight,
+          allowedPx: maxLines * lineBox() + SLACK,
+          measuredWidth: node.scrollWidth,
+          availableWidth: node.clientWidth,
+          maxLines,
+          steps,
+          ratio: next,
+          prevRatio: ratio,
+          breakWords: wrap,
+        });
+
 
         node.style.fontSize = probe.fontSize;
         node.style.overflowWrap = probe.overflowWrap;
