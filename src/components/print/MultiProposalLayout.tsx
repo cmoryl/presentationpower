@@ -1176,38 +1176,115 @@ function Locations({
   );
 }
 
+function normalizeLogoKey(v: string): string {
+  return v.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/** Resolve authored logo names against the template's real logo artwork. */
+function resolveLogoTiles(names: string[], pool: LogoTile[]): LogoTile[] {
+  if (names.length === 0) return pool;
+  return names.slice(0, 24).map((name, i) => {
+    const key = normalizeLogoKey(name);
+    const hit = pool.find((p) => {
+      const pk = normalizeLogoKey(p.name);
+      return pk === key || pk.startsWith(key) || key.startsWith(pk);
+    });
+    return hit ?? { name, url: pool[i % Math.max(pool.length, 1)]?.url ?? "" };
+  });
+}
+
+/** Slide 6 client wall — white rounded cards, four across. */
 function LogoWall({ tokens: t, logos }: { tokens: Tokens; logos: string[] }) {
-  if (logos.length === 0) return null;
+  const tiles = resolveLogoTiles(logos, CLIENT_LOGOS);
+  if (tiles.length === 0) return null;
   return (
     <div
       className="grid"
       style={{
-        marginTop: cq(14),
+        marginTop: cq(22),
         gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-        gap: cq(10),
+        gap: cq(14),
       }}
     >
-      {logos.slice(0, 24).map((name, i) => (
+      {tiles.map((tile, i) => (
         <div
-          key={i}
+          key={`${tile.name}-${i}`}
+          className="flex items-center justify-center"
           style={{
-            borderRadius: cq(10),
-            border: `1px solid ${t.line}`,
-            background: t.cardBg,
-            padding: `${cq(10)} ${cq(8)}`,
-            textAlign: "center",
-            fontSize: cq(9),
-            fontWeight: 700,
-            color: t.ink,
-            ...clampLines(2),
+            borderRadius: cq(16),
+            background: "#FFFFFF",
+            boxShadow: `0 ${cq(4)} ${cq(16)} rgba(3,0,44,0.10)`,
+            aspectRatio: "1.45",
+            padding: `${cq(12)} ${cq(14)}`,
           }}
         >
-          {name}
+          {tile.url ? (
+            <img
+              src={tile.url}
+              alt={tile.name}
+              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+            />
+          ) : (
+            <span style={{ fontSize: cq(9), fontWeight: 700, color: t.ink }}>{tile.name}</span>
+          )}
         </div>
       ))}
     </div>
   );
 }
+
+/** Giving-back / affinity marks — reversed-out logos straight on the field. */
+function MarkWall({
+  tiles,
+  cols,
+  marginTop,
+}: {
+  tiles: LogoTile[];
+  cols: number;
+  marginTop: number;
+}) {
+  if (tiles.length === 0) return null;
+  return (
+    <div
+      className="grid"
+      style={{
+        marginTop: cq(marginTop),
+        gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+        columnGap: cq(20),
+        rowGap: cq(22),
+        alignItems: "center",
+      }}
+    >
+      {tiles.map((tile, i) => (
+        <div key={`${tile.name}-${i}`} className="flex items-center justify-center">
+          <img
+            src={tile.url}
+            alt={tile.name}
+            style={{ maxWidth: "100%", maxHeight: cq(54), objectFit: "contain" }}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Slide 5 world map plate. */
+function WorldMap() {
+  return (
+    <img
+      src={PROPOSAL_ART.worldMap}
+      alt="TransPerfect global office locations"
+      style={{
+        display: "block",
+        width: "100%",
+        height: "auto",
+        marginTop: cq(18),
+        opacity: 0.95,
+      }}
+    />
+  );
+}
+
 
 function TeamGrid({
   tokens: t,
