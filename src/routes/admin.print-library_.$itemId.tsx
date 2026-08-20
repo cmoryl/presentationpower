@@ -47,6 +47,7 @@ import {
   listModuleOverrides,
   saveModuleOverride,
 } from "@/lib/module-overrides.functions";
+import { blankPrintContent } from "@/lib/print-assets.types";
 import type {
   SolutionProposalContent,
   PrintDensity,
