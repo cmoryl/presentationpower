@@ -2,7 +2,7 @@
 // presentation module variants (MV-*). Edits are stored as overrides so the
 // code registries stay intact and every change is reversible.
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -327,6 +327,19 @@ function ModuleEditorPage() {
                       className={inputCls}
                     />
                   </Field>
+
+                  <div>
+                    <Link
+                      to="/admin/modules/print/$moduleId"
+                      params={{ moduleId: m.id }}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:border-[#003FC7]"
+                    >
+                      Open in studio editor →
+                    </Link>
+                    <span className="ml-2 text-[11px] text-black/50">
+                      Edit the master block: copy, variant, page fit
+                    </span>
+                  </div>
 
                   <RowActions
                     hidden={d.hidden}

@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowLeft, Search, Copy as CopyIcon } from "lucide-react";
+import { ArrowLeft, Search, Copy as CopyIcon, Pencil } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
 import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
 import {
@@ -306,6 +307,7 @@ function ModuleCard({
   iconStyle: PrintIconStyle;
 }) {
   // Real sections extracted from uploaded/curated print pieces for this variant.
+  const isAdmin = useIsAdmin();
   const examples = useMemo(() => examplesForVariant(m.variantId), [m.variantId]);
   const [exIdx, setExIdx] = useState(0);
   const example = useReal && examples.length ? examples[exIdx % examples.length] : undefined;
@@ -335,13 +337,24 @@ function ModuleCard({
           </h2>
           <p className="mt-1 text-xs leading-[1.5] text-black/55">{m.description}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => void copyJson()}
-          className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
-        >
-          <CopyIcon size={12} /> JSON
-        </button>
+        <div className="flex shrink-0 items-center gap-1.5">
+          {isAdmin ? (
+            <Link
+              to="/admin/modules/print/$moduleId"
+              params={{ moduleId: m.id }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/30 bg-[#E0E8F5] px-3 py-1.5 text-xs font-semibold text-[#003FC7] hover:border-[#003FC7]"
+            >
+              <Pencil size={12} aria-hidden /> Edit master
+            </Link>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => void copyJson()}
+            className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-black/40"
+          >
+            <CopyIcon size={12} /> JSON
+          </button>
+        </div>
       </div>
 
       {/* Provenance strip — which real print piece this preview came from */}
