@@ -1033,6 +1033,243 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
   );
 }
 
+// ---------------------------------------------------------------------------
+// Page 7 alternates — additional success-story layouts
+// ---------------------------------------------------------------------------
+
+function storyLogo(company: string | undefined): string | undefined {
+  return company ? STORY_LOGOS[company.toLowerCase()] : undefined;
+}
+
+function storyQuote(text: string | undefined): string {
+  return text ? `"${text.replace(/^"|"$/g, "")}"` : "";
+}
+
+/** 7b — three-up story cards (photo top, logo, trimmed quote). */
+function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const quotes = (page.quotes ?? []).slice(0, 3);
+  const photos = [PROPOSAL_ART.photoClouds, PROPOSAL_ART.photoCoffee, PROPOSAL_ART.teamGrid];
+  const cardW = 2.42;
+  const gap = 0.24;
+  const startX = (PAGE_W_IN - (cardW * 3 + gap * 2)) / 2;
+
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "Success Stories"} logo={logoWhite} />
+      {page.subtitle ? (
+        <T x={0.47} y={2.34} w={6.4} size={12} color="rgba(255,255,255,0.9)" leading={1.35}>
+          {page.subtitle}
+        </T>
+      ) : null}
+
+      {[0, 1, 2].map((i) => {
+        const q = quotes[i];
+        const x = startX + i * (cardW + gap);
+        const logo = storyLogo(q?.company);
+        return (
+          <Fragment key={i}>
+            <Plate x={x} y={3.32} w={cardW} h={6.32} radius={0.3} border="rgba(3,0,44,0.14)" />
+            <Img
+              x={x + 0.16}
+              y={3.48}
+              w={cardW - 0.32}
+              h={1.72}
+              src={photos[i % photos.length]}
+              alt={q?.company || "Client story"}
+              fit="cover"
+              radius={0.22}
+              slot={`stories.grid.photo.${i + 1}`}
+              label="photo"
+            />
+            {logo ? (
+              <Img
+                x={x + 0.16}
+                y={5.36}
+                w={1.6}
+                h={0.38}
+                src={logo}
+                alt={q?.company || "Client"}
+                fit="contain"
+                align="left"
+                slot={`stories.grid.logo.${i + 1}`}
+                label="logo"
+              />
+            ) : (
+              <T x={x + 0.16} y={5.36} w={cardW - 0.32} size={15} weight={700} color={NAVY} tracking="-0.02em">
+                {q?.company || "Client"}
+              </T>
+            )}
+            <Dots x={x + 0.16} y={5.94} color={BLUE} />
+            {q?.headline ? (
+              <T x={x + 0.16} y={6.18} w={cardW - 0.32} size={9.5} weight={600} color={NAVY} leading={1.32}>
+                {q.headline}
+              </T>
+            ) : null}
+            <T x={x + 0.16} y={7.02} w={cardW - 0.32} size={8.5} color="rgba(3,0,44,0.78)" leading={1.42}>
+              {storyQuote(q?.text)}
+            </T>
+            <T x={x + 0.16} y={9.16} w={cardW - 0.32} size={8.5} weight={600} color={NAVY}>
+              {q ? `– ${[q.role || q.author, q.company].filter(Boolean).join(", ")}` : ""}
+            </T>
+          </Fragment>
+        );
+      })}
+
+      <Img x={2.92} y={10.02} w={2.59} h={0.33} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
+    </>
+  );
+}
+
+/** 7c — one hero case study: full-bleed photo, reversed pull quote, KPI band. */
+function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
+  const q = (page.quotes ?? [])[0];
+  const stats = (page.stats ?? []).slice(0, 3);
+  const logo = storyLogo(q?.company);
+
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
+      <Img
+        x={0}
+        y={0}
+        w={PAGE_W_IN}
+        h={4.6}
+        src={PROPOSAL_ART.photoClouds}
+        alt={q?.company || "Client story"}
+        fit="cover"
+        slot="stories.feature.photo"
+        label="photo"
+      />
+      <L
+        x={0}
+        y={3.1}
+        w={PAGE_W_IN}
+        h={1.5}
+        style={{ background: "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.92) 100%)" }}
+      />
+
+      {page.eyebrow ? (
+        <T x={0.62} y={4.78} w={6} size={10} weight={600} color={AQUA} upper tracking="0.16em">
+          {page.eyebrow}
+        </T>
+      ) : null}
+      {logo ? (
+        <Img
+          x={0.62}
+          y={5.12}
+          w={2.4}
+          h={0.56}
+          src={logo}
+          alt={q?.company || "Client"}
+          fit="contain"
+          align="left"
+          slot="stories.feature.logo"
+          label="logo"
+        />
+      ) : (
+        <T x={0.62} y={5.12} w={6} size={30} weight={700} tracking="-0.03em">
+          {q?.company || "Client"}
+        </T>
+      )}
+
+      <T x={0.62} y={6.0} w={7.3} size={22} weight={600} leading={1.22} tracking="-0.02em">
+        {q?.headline || page.title || "Success story"}
+      </T>
+      <Rule x={0.62} y={7.32} w={7.3} color="rgba(161,251,249,0.5)" />
+      <T x={0.62} y={7.56} w={7.3} size={11.5} color="rgba(255,255,255,0.86)" leading={1.5}>
+        {storyQuote(q?.text)}
+      </T>
+      <T x={0.62} y={9.2} w={7.3} size={10} weight={600} color={AQUA}>
+        {q ? `– ${[q.role || q.author, q.company].filter(Boolean).join(", ")}` : ""}
+      </T>
+
+      {stats.map((s, i) => (
+        <Fragment key={i}>
+          <L
+            x={0.62 + i * 2.46}
+            y={9.62}
+            w={2.26}
+            h={0.9}
+            style={{ background: "rgba(255,255,255,0.08)", borderRadius: u(0.18) }}
+          />
+          <T x={0.78 + i * 2.46} y={9.74} w={1.96} size={20} weight={700} color={AQUA} tracking="-0.03em">
+            {s.value}
+          </T>
+          <T x={0.78 + i * 2.46} y={10.14} w={1.96} size={8.5} color="rgba(255,255,255,0.8)" leading={1.3}>
+            {s.label}
+          </T>
+        </Fragment>
+      ))}
+
+      <Img x={2.92} y={10.72} w={2.59} h={0.33} src={PROPOSAL_ART.logoWhite} alt="TransPerfect" />
+    </>
+  );
+}
+
+/** 7d — quote wall: four testimonials, two-up, no photography. */
+function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const quotes = (page.quotes ?? []).slice(0, 4);
+  const cardW = 3.72;
+  const cardH = 3.32;
+
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "In their words"} logo={logoWhite} />
+
+      {[0, 1, 2, 3].map((i) => {
+        const q = quotes[i];
+        const x = 0.4 + (i % 2) * (cardW + 0.24);
+        const y = 3.3 + Math.floor(i / 2) * (cardH + 0.3);
+        const logo = storyLogo(q?.company);
+        return (
+          <Fragment key={i}>
+            <Plate x={x} y={y} w={cardW} h={cardH} radius={0.3} border="rgba(3,0,44,0.14)" />
+            <T x={x + 0.28} y={y + 0.26} w={1.2} size={34} weight={700} color={BLUE} leading={1}>
+              {"\u201C"}
+            </T>
+            <T x={x + 0.28} y={y + 0.86} w={cardW - 0.56} size={9.5} color="rgba(3,0,44,0.82)" leading={1.46}>
+              {storyQuote(q?.text)}
+            </T>
+            <Rule x={x + 0.28} y={y + 2.5} w={cardW - 0.56} color="rgba(3,0,44,0.14)" />
+            {logo ? (
+              <Img
+                x={x + 0.28}
+                y={y + 2.66}
+                w={1.4}
+                h={0.34}
+                src={logo}
+                alt={q?.company || "Client"}
+                fit="contain"
+                align="left"
+                slot={`stories.quotes.logo.${i + 1}`}
+                label="logo"
+              />
+            ) : (
+              <T x={x + 0.28} y={y + 2.68} w={cardW - 0.56} size={12} weight={700} color={NAVY}>
+                {q?.company || "Client"}
+              </T>
+            )}
+            <T x={x + 0.28} y={y + 3.02} w={cardW - 0.56} size={8.5} color="rgba(3,0,44,0.6)">
+              {q?.role || q?.author || ""}
+            </T>
+          </Fragment>
+        );
+      })}
+
+      {page.footnote ? (
+        <T x={0.4} y={10.34} w={7.7} size={8.5} color="rgba(3,0,44,0.55)" align="center">
+          {page.footnote}
+        </T>
+      ) : null}
+      <Img x={2.92} y={10.6} w={2.59} h={0.33} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
+    </>
+  );
+}
+
+
+
 
 // ---------------------------------------------------------------------------
 // Page 8 — Why TransPerfect
