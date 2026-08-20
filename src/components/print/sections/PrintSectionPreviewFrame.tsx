@@ -65,6 +65,7 @@ export function PrintSectionPreviewFrame({
   }, [maxScale, section]);
 
   const paper = mode === "dark" ? "#03002C" : "#ffffff";
+  const padTop = sheet ? 28 : 0;
 
   return (
     <div
