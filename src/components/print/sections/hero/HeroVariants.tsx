@@ -523,9 +523,9 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
             inset: 0,
             ...bg(section),
             WebkitMaskImage:
-              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 58%, rgba(0,0,0,0.82) 74%, rgba(0,0,0,0.45) 88%, rgba(0,0,0,0) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 44%, rgba(0,0,0,0.78) 62%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0) 96%)",
             maskImage:
-              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 58%, rgba(0,0,0,0.82) 74%, rgba(0,0,0,0.45) 88%, rgba(0,0,0,0) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 44%, rgba(0,0,0,0.78) 62%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0) 96%)",
           }}
         />
         {/* Page-coloured fade so the seam resolves into the paper. */}
@@ -534,7 +534,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           style={{
             position: "absolute",
             inset: 0,
-            background: `linear-gradient(180deg, rgba(3,0,44,0.18) 0%, transparent 34%, transparent 52%, ${page} 100%)`,
+            background: `linear-gradient(180deg, rgba(3,0,44,0.16) 0%, transparent 26%, color-mix(in srgb, ${page} 55%, transparent) 58%, ${page} 84%)`,
           }}
         />
         <div
