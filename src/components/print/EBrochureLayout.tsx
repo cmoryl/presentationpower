@@ -295,6 +295,8 @@ export function EBrochureLayout({
             {stats.length > 0 && (
               <div
                 className="grid"
+                data-section="stats"
+                data-section-label="Stat row"
                 style={{
                   gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
                   gap: cq(12),
@@ -343,6 +345,8 @@ export function EBrochureLayout({
               <div className="flex" style={{ gap: cq(16), paddingTop: cq(26), flex: 1 }}>
                 {content.quote && (
                   <div
+                    data-section="quote"
+                    data-section-label="Quote"
                     style={{
                       flex: "1.3 1 0",
                       borderRadius: cq(14),
@@ -427,13 +431,15 @@ export function EBrochureLayout({
 
             {/* CTA BAND */}
             {content.cta && (
-              <PrintCTABand
-                brand={brand}
-                mode={mode}
-                label={content.cta.label}
-                subhead={content.cta.subhead}
-                cq={cq}
-              />
+              <div data-section="cta" data-section-label="Call to action">
+                <PrintCTABand
+                  brand={brand}
+                  mode={mode}
+                  label={content.cta.label}
+                  subhead={content.cta.subhead}
+                  cq={cq}
+                />
+              </div>
             )}
 
             {/* FOOTER */}

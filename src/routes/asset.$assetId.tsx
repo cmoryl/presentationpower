@@ -1513,12 +1513,39 @@ function AssetEditor() {
                             });
                             return;
                           }
-                          if (key === "features") patchContent({ features: [] } as never);
-                          else if (key === "knowHow") patchContent({ knowHow: [] } as never);
-                          else if (key === "quote") patchContent({ quote: undefined } as never);
-                          else if (key === "cta") patchContent({ cta: undefined } as never);
-                          else if (key === "hero") patchContent({ heroMedia: undefined } as never);
-                          toast.success(`${key} section removed`);
+                          // Optional sections map to the content field they own.
+                          // Every removal is undoable: we snapshot the previous
+                          // value and restore it from the toast action.
+                          const clearable: Record<string, string> = {
+                            features: "features",
+                            knowHow: "knowHow",
+                            quote: "quote",
+                            cta: "cta",
+                            hero: "heroMedia",
+                            stats: "stats",
+                            engagement: "engagement",
+                            expert: "expert",
+                            footer: "footer",
+                          };
+                          const field = clearable[key];
+                          if (!field) {
+                            toast.info(
+                              `"${key}" is a core part of this layout — edit it in the inspector instead.`,
+                            );
+                            return;
+                          }
+                          const bag = rawContent as unknown as Record<string, unknown>;
+                          const prevValue = bag[field];
+                          const emptied = Array.isArray(prevValue) ? [] : undefined;
+                          patchContent({ [field]: emptied } as never);
+                          const label =
+                            SECTION_DELETE_LABELS[key] ?? key.replace(/([A-Z])/g, " $1");
+                          toast.success(`${label} removed`, {
+                            action: {
+                              label: "Undo",
+                              onClick: () => patchContent({ [field]: prevValue } as never),
+                            },
+                          });
                         }}
                         onReplace={(key) => {
                           if (key.startsWith("module:")) {
@@ -3821,6 +3848,19 @@ function Slider({
 // ModulesPanel so the drawer + inline editing stay in sync as new variants
 // are added.
 // ---------------------------------------------------------------------------
+
+// Friendly names for canvas click-to-delete toasts.
+const SECTION_DELETE_LABELS: Record<string, string> = {
+  features: "Feature grid",
+  knowHow: "We know how",
+  quote: "Quote",
+  cta: "Call to action",
+  hero: "Hero image",
+  stats: "Stats",
+  engagement: "Engagement snapshot",
+  expert: "Expert contact",
+  footer: "Footer links",
+};
 
 function sectionKindLabel(kind: PrintSection["kind"]): string {
   switch (kind) {
