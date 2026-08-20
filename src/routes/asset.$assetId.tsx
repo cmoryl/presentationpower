@@ -1752,6 +1752,85 @@ function AssetEditor() {
                 </Row>
               </Panel>
 
+              <Panel title="Content fit">
+                {(() => {
+                  const fit = resolveContentFit(ctx.contentFit);
+                  const patchFit = (patch: Record<string, unknown>) =>
+                    patchCtx({ contentFit: { ...fit, ...patch } });
+                  return (
+                    <>
+                      <p className="text-[11px] leading-[1.5] text-black/55 dark:text-white/55">
+                        When content runs past the trim by more than the threshold, the page pulls
+                        its side margins in first, then shrinks typography and iconography together
+                        — down to the floors below.
+                      </p>
+                      <Row label="Auto-fit overflow">
+                        <input
+                          type="checkbox"
+                          data-testid="toggle-content-fit"
+                          checked={fit.enabled}
+                          onChange={(e) => patchFit({ enabled: e.target.checked })}
+                        />
+                      </Row>
+                      <Row label={`Threshold ${Math.round(fit.threshold * 100)}%`}>
+                        <input
+                          type="range"
+                          aria-label="Content fit threshold"
+                          min={2}
+                          max={40}
+                          step={1}
+                          value={Math.round(fit.threshold * 100)}
+                          onChange={(e) => patchFit({ threshold: Number(e.target.value) / 100 })}
+                        />
+                      </Row>
+                      <Row label="Margin relief first">
+                        <input
+                          type="checkbox"
+                          checked={fit.marginRelief}
+                          onChange={(e) => patchFit({ marginRelief: e.target.checked })}
+                        />
+                      </Row>
+                      <Row label={`Min side margin ${Math.round(fit.minPad * 100)}%`}>
+                        <input
+                          type="range"
+                          aria-label="Minimum side margin"
+                          min={40}
+                          max={100}
+                          step={2}
+                          value={Math.round(fit.minPad * 100)}
+                          onChange={(e) => patchFit({ minPad: Number(e.target.value) / 100 })}
+                        />
+                      </Row>
+                      <Row label={`Min scale ${Math.round(fit.minScale * 100)}%`}>
+                        <input
+                          type="range"
+                          aria-label="Minimum content scale"
+                          min={60}
+                          max={100}
+                          step={1}
+                          value={Math.round(fit.minScale * 100)}
+                          onChange={(e) => patchFit({ minScale: Number(e.target.value) / 100 })}
+                        />
+                      </Row>
+                      <Row label="Applied now">
+                        <span className="text-[11px] font-medium text-black/60 dark:text-white/60">
+                          {describeFit(fitKnobs)}
+                        </span>
+                      </Row>
+                      {ctx.contentFit ? (
+                        <button
+                          type="button"
+                          onClick={() => patchCtx({ contentFit: PRINT_CONTENT_FIT_DEFAULTS })}
+                          className="text-[11px] font-medium text-[#003FC7] hover:underline"
+                        >
+                          Reset to defaults
+                        </button>
+                      ) : null}
+                    </>
+                  );
+                })()}
+              </Panel>
+
               <Panel title="Iconography">
                 <Row label="Show icons">
                   <input
