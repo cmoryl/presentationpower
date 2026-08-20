@@ -113,6 +113,44 @@ export type PrintHeroModuleVariant =
 
 export type PrintHeroMetaRow = { label: string; value?: string };
 
+/**
+ * Masthead rule styling. Print systems differ on how heavy the rule over a
+ * document title block is, how much air sits under it, and whether it takes
+ * the accent or a neutral ink — so all three are authorable per section.
+ */
+export type PrintHeroRule = {
+  /** Rule thickness in template px. 0 hides the rule. */
+  weight?: number;
+  /** Space between the rule and the title block, in template px. */
+  gap?: number;
+  /** Rule colour. Defaults to the document accent. */
+  color?: string;
+  /** Show the closing hairline under the title block. */
+  hairline?: boolean;
+  /** Colour for that closing hairline. Defaults to the section's ink hairline. */
+  hairlineColor?: string;
+};
+
+/** Title-block typography overrides, so an opener can match an existing
+ *  print system's type spec instead of the built-in scale. */
+export type PrintHeroTitleType = {
+  /** Title size in template px. */
+  titlePx?: number;
+  /** 500 – 900. */
+  titleWeight?: number;
+  /** Letter-spacing in thousandths of an em (-40 = -0.04em). */
+  titleTracking?: number;
+  /** Line height as a percentage (104 = 1.04). */
+  titleLeading?: number;
+  titleCase?: "none" | "upper";
+  eyebrowPx?: number;
+  /** Eyebrow letter-spacing in thousandths of an em. */
+  eyebrowTracking?: number;
+  summaryPx?: number;
+  /** Summary line height as a percentage. */
+  summaryLeading?: number;
+};
+
 export type PrintHeroSection = {
   id: string;
   kind: "hero";
@@ -141,6 +179,10 @@ export type PrintHeroSection = {
   partnerLogoUrl?: string;
   /** Share of page height the photo band occupies on the fade opener (0..100). */
   heightPct?: number;
+  /** Masthead rule styling (thickness, spacing, colour). */
+  rule?: PrintHeroRule;
+  /** Title-block typography overrides. */
+  titleType?: PrintHeroTitleType;
 };
 
 // ---- Quote family ---------------------------------------------------------

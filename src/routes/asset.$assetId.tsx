@@ -84,6 +84,7 @@ import {
   PRINT_CONTACT_VARIANTS,
 } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
+import { HeroRuleTypeControls } from "@/components/print/sections/hero/HeroRuleTypeControls";
 import {
   PrintSectionPicker,
   PRINT_SECTION_DND_MIME,
@@ -3957,6 +3958,7 @@ function HeroInlineEditor({
           )}
         </>
       )}
+      <HeroRuleTypeControls section={section} onPatch={onPatch} />
     </>
   );
 }
