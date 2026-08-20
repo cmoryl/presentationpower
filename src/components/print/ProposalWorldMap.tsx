@@ -402,6 +402,7 @@ export function ProposalWorldMap({
           Reset
         </button>
       </div>
+      ) : null}
 
       {editable && onChange ? (
         <div
