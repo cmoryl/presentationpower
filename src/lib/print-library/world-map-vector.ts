@@ -238,15 +238,15 @@ export const WORLD_MAP_PINS: WorldMapPin[] = [
     "kind": "prod"
   },
   {
-    "x": 417.1,
-    "y": 408.5,
-    "r": 2.3,
+    "x": 416.8,
+    "y": 408.8,
+    "r": 2.6,
     "kind": "service"
   },
   {
-    "x": 398.2,
-    "y": 422.5,
-    "r": 2.3,
+    "x": 397.9,
+    "y": 422.8,
+    "r": 2.6,
     "kind": "service"
   },
   {
@@ -742,15 +742,15 @@ export const WORLD_MAP_PINS: WorldMapPin[] = [
     "kind": "prod"
   },
   {
-    "x": 407.3,
-    "y": 352.7,
-    "r": 2.3,
+    "x": 406.1,
+    "y": 353.9,
+    "r": 3.5,
     "kind": "service"
   },
   {
-    "x": 476.2,
-    "y": 374.2,
-    "r": 2.3,
+    "x": 475.6,
+    "y": 374.8,
+    "r": 2.9,
     "kind": "service"
   }
 ];
