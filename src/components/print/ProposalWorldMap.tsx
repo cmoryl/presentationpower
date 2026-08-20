@@ -86,7 +86,36 @@ export function ProposalWorldMap({
     event.currentTarget.setPointerCapture(event.pointerId);
   };
 
+  const toMapPoint = (clientX: number, clientY: number) => {
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect?.width || !rect.height) return null;
+    return {
+      x: Math.round((view.x + ((clientX - rect.left) / rect.width) * view.w) * 10) / 10,
+      y: Math.round((view.y + ((clientY - rect.top) / rect.height) * view.h) * 10) / 10,
+    };
+  };
+
+  const startPinDrag = (index: number) => (event: React.PointerEvent<SVGCircleElement>) => {
+    if (!editable || !onChange) return;
+    event.stopPropagation();
+    pinDrag.current = { index, moved: false };
+    setActivePin(index);
+    svgRef.current?.setPointerCapture(event.pointerId);
+  };
+
   const onPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    const p = pinDrag.current;
+    if (p && onChange) {
+      const point = toMapPoint(event.clientX, event.clientY);
+      if (!point) return;
+      p.moved = true;
+      onChange(
+        list.map((pin, index) =>
+          index === p.index ? { ...pin, x: point.x, y: point.y } : pin,
+        ),
+      );
+      return;
+    }
     const d = drag.current;
     if (!d) return;
     const rect = event.currentTarget.getBoundingClientRect();
@@ -99,6 +128,12 @@ export function ProposalWorldMap({
   };
 
   const onPointerUp = () => {
+    if (pinDrag.current) {
+      dragMoved.current = pinDrag.current.moved;
+      pinDrag.current = null;
+      setActivePin(null);
+      return;
+    }
     dragMoved.current = Boolean(drag.current?.moved);
     drag.current = null;
   };
@@ -109,6 +144,7 @@ export function ProposalWorldMap({
       dragMoved.current = false;
       return;
     }
+
     const rect = event.currentTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     const x = view.x + ((event.clientX - rect.left) / rect.width) * view.w;
