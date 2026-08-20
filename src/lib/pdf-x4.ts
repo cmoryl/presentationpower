@@ -129,9 +129,27 @@ export async function wrapPdfAsX4(
   // ── ICC profile stream (DestOutputProfile) ────────────────────────────
   // Uncompressed raw stream is safest for printer-side conformance
   // checkers. `context.stream` creates a PDFRawStream with no filter.
+  //
+  // /N and /Alternate MUST match the profile's own colour space, read from
+  // ICC header bytes 16..19. This previously hard-coded N:3 / DeviceRGB while
+  // embedding GRACoL and SWOP, both of which are CMYK ('CMYK' at byte 16) —
+  // a conformance error that some RIPs reject outright and others silently
+  // mis-read.
+  const profileSpace = String.fromCharCode(
+    opts.iccProfileBytes[16]!,
+    opts.iccProfileBytes[17]!,
+    opts.iccProfileBytes[18]!,
+    opts.iccProfileBytes[19]!,
+  ).trim();
+  const componentsForSpace = (space: string): { n: number; alt: string } => {
+    if (space === "CMYK") return { n: 4, alt: "DeviceCMYK" };
+    if (space === "GRAY") return { n: 1, alt: "DeviceGray" };
+    return { n: 3, alt: "DeviceRGB" };
+  };
+  const destSpace = componentsForSpace(profileSpace);
   const iccStream = pdfDoc.context.stream(opts.iccProfileBytes, {
-    N: 3, // RGB output profile — 3 color components
-    Alternate: PDFName.of("DeviceRGB"),
+    N: destSpace.n,
+    Alternate: PDFName.of(destSpace.alt),
   });
   const iccRef = pdfDoc.context.register(iccStream);
 
@@ -147,6 +165,16 @@ export async function wrapPdfAsX4(
   const oiArray = PDFArray.withContext(pdfDoc.context);
   oiArray.push(oiDict);
   pdfDoc.catalog.set(PDFName.of("OutputIntents"), oiArray);
+
+  // ── Tag every raster as ICCBased/sRGB ─────────────────────────────────
+  const tagged = opts.tagRastersAsSRgb === false ? 0 : tagRgbImagesAsSRgb(pdfDoc);
+  console.info(
+    `[pdf-x4] OutputIntent ${opts.iccProfileName} (${profileSpace}, N=${destSpace.n}); ` +
+      `${tagged} raster${tagged === 1 ? "" : "s"} tagged ICCBased/sRGB.`,
+  );
+
+
+
 
   // ── XMP metadata (PDF/X-4 identification) ─────────────────────────────
   const xmp = buildXmpMetadata({
@@ -173,6 +201,59 @@ export async function wrapPdfAsX4(
 }
 
 // ─────────────────────────────────────────────────────────────────────────
+// sRGB raster tagging
+// ─────────────────────────────────────────────────────────────────────────
+
+/**
+ * Retag every DeviceRGB image XObject as `[/ICCBased <sRGB stream>]`.
+ *
+ * PDF/X-4 permits device-INDEPENDENT colour, so RGB content is not itself a
+ * violation — what fails preflight is *untagged device* colour, which is
+ * exactly what a `<canvas>` / html2canvas raster is. Tagging each raster with
+ * an sRGB profile makes the colour device-independent and lets the RIP do the
+ * separation to the OutputIntent's CMYK space.
+ *
+ * That is a much smaller job than building a CMYK emission path — but whether
+ * it is ACCEPTABLE is a question for the printer, not for this code. Some shops
+ * require CMYK-native supplied files and will reject RGB-in regardless of
+ * tagging. Confirm before assuming this closes the colour gap.
+ *
+ * Returns the number of image XObjects retagged. Untouched: /DeviceGray (soft
+ * masks), /Indexed, and anything already ICCBased.
+ */
+function tagRgbImagesAsSRgb(pdfDoc: PDFDocument): number {
+  let iccRef: PDFRef | null = null;
+  const ensureSRgbRef = (): PDFRef => {
+    if (iccRef) return iccRef;
+    const bytes = sRgbIccBytes();
+    const stream = pdfDoc.context.stream(bytes, {
+      N: 3,
+      Alternate: PDFName.of("DeviceRGB"),
+    });
+    iccRef = pdfDoc.context.register(stream);
+    return iccRef;
+  };
+
+  let count = 0;
+  for (const [, obj] of pdfDoc.context.enumerateIndirectObjects()) {
+    const dict = obj instanceof PDFRawStream ? obj.dict : null;
+    if (!dict) continue;
+    const subtype = dict.get(PDFName.of("Subtype"));
+    if (!(subtype instanceof PDFName) || subtype.asString() !== "/Image") continue;
+    const cs = dict.get(PDFName.of("ColorSpace"));
+    if (!(cs instanceof PDFName) || cs.asString() !== "/DeviceRGB") continue;
+
+    const arr = PDFArray.withContext(pdfDoc.context);
+    arr.push(PDFName.of("ICCBased"));
+    arr.push(ensureSRgbRef());
+    dict.set(PDFName.of("ColorSpace"), arr);
+    count += 1;
+  }
+  return count;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+
 // XMP construction
 // ─────────────────────────────────────────────────────────────────────────
 

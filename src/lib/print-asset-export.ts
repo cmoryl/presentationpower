@@ -19,6 +19,7 @@ import {
   type SlideExportMode,
 } from "./slide-image-export";
 import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
+import { extendRasterForBleed } from "./print-bleed-extend";
 import {
   captureVectorText,
   enableHideTextForCapture,
@@ -257,6 +258,13 @@ export async function exportPrintAssetAsPdf(
     );
     opts.onQualityClamp?.(info);
   }
+  // Trim-space raster geometry. `resolved` is sized for the full page (trim +
+  // bleed) so the effective DPI is honest, but the capture must be trim-sized:
+  // the bleed band is generated, not rendered.
+  const trimWidthPx = Math.max(1, Math.round(resolved.widthPx * (trim.widthIn / pageWidth)));
+  const bleedRasterPx = Math.round(bleed * resolved.dpi);
+  let bleedApproximated = false;
+
 
   const orientation: "landscape" | "portrait" = pageWidth >= pageHeight ? "landscape" : "portrait";
   const pdf = new jsPDF({
@@ -294,29 +302,51 @@ export async function exportPrintAssetAsPdf(
     try {
       // Authoring affordances (hero edit badge, guides, resize rails) live in
       // the same DOM we rasterize — suppress them for the capture only.
+      //
+      // Captured at TRIM pixel width, never page width. The design is authored
+      // at trim proportions, so rasterizing at page width and placing it across
+      // the full page silently scaled every element up by page/trim and pushed
+      // the outer edge past the cut line. See print-bleed-extend.ts.
       const pngDataUrl = await withExportChrome(() =>
         captureSlideAsDataUrl(pageNode, {
           mode: opts.mode ?? "light",
-          targetWidth: resolved.widthPx,
+          targetWidth: trimWidthPx,
           onProgress: opts.onProgress,
         }),
       );
       if (isDigital) {
+        // No bleed on digital by definition — trim IS the page.
         const jpegDataUrl = await pngDataUrlToJpeg(
           pngDataUrl,
           opts.mode ?? "light",
           DIGITAL_JPEG_QUALITY,
         );
         pdf.addImage(jpegDataUrl, "JPEG", 0, 0, pageWidth, pageHeight, undefined, "FAST");
+      } else if (bleed > 0) {
+        // Extend the trim raster into the bleed band by edge clamp, then place
+        // the result 1:1 across the page. Content lands at exactly (bleed,
+        // bleed) at exactly trim size — no scaling, no drift.
+        const extended = await extendRasterForBleed(pngDataUrl, { bleedPx: bleedRasterPx });
+        pdf.addImage(extended.dataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
+        if (extended.bleedIsApproximate) bleedApproximated = true;
       } else {
         pdf.addImage(pngDataUrl, "PNG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
       }
       if (cropMarks && bleed > 0) {
         drawCropMarks(pdf, pageWidth, pageHeight, bleed);
       }
+
     } finally {
       restoreHide?.();
     }
+  }
+
+  if (bleedApproximated) {
+    console.warn(
+      `[print-asset-export] Bleed band (${bleed}in) was filled by edge clamp, not by authored ` +
+        `artwork — the canvas is trim-sized. Exact for continuous backgrounds; check any page ` +
+        `with hard detail running off the trim edge before sending to press.`,
+    );
   }
 
   const filename =

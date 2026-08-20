@@ -15,7 +15,6 @@ import { AlertTriangle, CheckCircle2, CircleDashed, Droplets } from "lucide-reac
 import { AdminPageHeader } from "@/components/admin/AdminPage";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import {
-  RICH_BLACK,
   TEXT_BLACK,
   SMALL_TYPE_PT_CEILING,
   TAC_LIMIT_COATED,
@@ -149,9 +148,11 @@ function PrintColorPage() {
             100K rule; above it a rich or navy build is acceptable.
           </Rule>
           <Rule>
-            Rich black <strong>{cmykString(RICH_BLACK)}</strong> (
-            {totalAreaCoverage(RICH_BLACK)}% TAC) is for large fills and panels only.
+            Rich black for large fills is a <strong>press decision</strong>, not a value this tool
+            supplies — the support screen depends on stock and the printer&rsquo;s TAC limit. Ask for
+            it alongside the brand build.
           </Rule>
+
           <Rule>
             Total area coverage caps at <strong>{TAC_LIMIT_COATED}%</strong> coated /{" "}
             <strong>{TAC_LIMIT_UNCOATED}%</strong> uncoated.

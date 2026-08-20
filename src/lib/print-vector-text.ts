@@ -468,14 +468,20 @@ export async function overlayVectorText(
   for (let i = 0; i < pages.length && i < opts.captures.length; i++) {
     const page = pages[i]!;
     const cap = opts.captures[i]!;
-    const pageWidthPt = opts.pageWidthIn * IN_TO_PT;
     const pageHeightPt = opts.pageHeightIn * IN_TO_PT;
 
-    // Raster placed at (0,0) covering full page (trim stretched over bleed).
-    // Text captures are relative to the CSS canvas whose CSS bounds are
-    // `cap.root.widthCss × cap.root.heightCss`, so we scale by:
-    const scaleX = pageWidthPt / cap.root.widthCss;
-    const scaleY = pageHeightPt / cap.root.heightCss;
+    // The design occupies the TRIM box, inset from the media box by bleed on
+    // all four sides — the bleed band is generated edge-clamp, not layout. Text
+    // captures are relative to the CSS canvas (`cap.root.widthCss ×
+    // heightCss`), which is trim-sized, so scale into trim and offset by bleed.
+    // (Previously this scaled into the full media box, which stretched text ~3%
+    // and shifted it outward in lockstep with the raster's own mis-scale.)
+    const bleedPt = Math.max(0, opts.bleedIn) * IN_TO_PT;
+    const trimWidthPt = opts.pageWidthIn * IN_TO_PT - bleedPt * 2;
+    const trimHeightPt = pageHeightPt - bleedPt * 2;
+    const scaleX = trimWidthPt / cap.root.widthCss;
+    const scaleY = trimHeightPt / cap.root.heightCss;
+
 
     for (const line of cap.lines) {
       const key = pickGeistKey(line.weight, line.italic);
@@ -485,7 +491,9 @@ export async function overlayVectorText(
       const sizePt = line.sizeCss * scaleY;
       const [r, g, b] = line.color;
       const baselineCss = line.bottomCss - line.sizeCss * GEIST_DESCENT_RATIO;
-      const baselineYPt = pageHeightPt - baselineCss * scaleY;
+      // PDF origin is bottom-left of the MEDIA box; trim top sits bleed below
+      // the media top.
+      const baselineYPt = pageHeightPt - bleedPt - baselineCss * scaleY;
 
       // Advance-fit: Geist's PDF metrics differ marginally from the browser's
       // shaped run, which made adjacent inline runs (e.g. a stat value and its
@@ -504,6 +512,7 @@ export async function overlayVectorText(
       drawVectorLine(page, line, font, {
         sizePt,
         scaleX,
+        xOffsetPt: bleedPt,
         baselineYPt,
         color: rgb(r, g, b),
         opacity: line.opacity,
@@ -528,6 +537,8 @@ export async function overlayVectorText(
 interface DrawCtx {
   sizePt: number;
   scaleX: number;
+  /** Media-box → trim-box x offset in points (i.e. the bleed). */
+  xOffsetPt: number;
   baselineYPt: number;
   color: ReturnType<typeof rgb>;
   opacity: number;
@@ -548,7 +559,7 @@ function drawVectorLine(page: PDFPage, line: VectorTextLine, font: PDFFont, ctx:
     page.pushOperators(setCharacterSpacing(ctx.charSpacingPt));
   }
   page.drawText(line.text, {
-    x: line.leftCss * ctx.scaleX,
+    x: ctx.xOffsetPt + line.leftCss * ctx.scaleX,
     y: ctx.baselineYPt,
     size: ctx.sizePt,
     font,
