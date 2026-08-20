@@ -514,13 +514,16 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
   const bandH = cq(Math.round(((section.heightPct ?? 46) / 100) * 1056));
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(18) }}>
-      <div style={{ position: "relative", minHeight: bandH }}>
+      <div style={{ position: "relative" }}>
         {/* Photo layer, feathered to zero alpha over its bottom third. */}
         <div
           aria-hidden
           style={{
             position: "absolute",
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            height: bandH,
             ...bg(section),
             WebkitMaskImage:
               "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 44%, rgba(0,0,0,0.78) 62%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0) 96%)",
@@ -533,7 +536,10 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           aria-hidden
           style={{
             position: "absolute",
-            inset: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            height: bandH,
             background: `linear-gradient(180deg, rgba(3,0,44,0.16) 0%, transparent 26%, color-mix(in srgb, ${page} 55%, transparent) 58%, ${page} 84%)`,
           }}
         />
