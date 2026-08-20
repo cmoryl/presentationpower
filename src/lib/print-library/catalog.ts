@@ -156,6 +156,8 @@ export type PrintLibraryItem = {
   tags?: string[];
   /** Curated-only: the ready-to-copy print content. */
   content?: Record<string, unknown>;
+  /** Master-admin look & feel pinned on this entry (see print-library/look.ts). */
+  look?: PrintLibraryLook;
 };
 
 const TEMPLATE_ITEMS: PrintLibraryItem[] = PRINT_TYPES.map((t) => ({
