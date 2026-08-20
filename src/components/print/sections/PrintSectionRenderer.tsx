@@ -47,7 +47,7 @@ export const PRINT_HERO_VARIANTS: Array<{
   {
     id: "hero-photo-band",
     label: "Photo Band",
-    description: "Full-bleed photograph with copy over a bottom scrim.",
+    description: "Photo masthead bled to the page trim, copy over a bottom scrim.",
   },
   {
     id: "hero-split-photo",
@@ -67,7 +67,7 @@ export const PRINT_HERO_VARIANTS: Array<{
   {
     id: "hero-stat-lockup",
     label: "Stat Lockup",
-    description: "Glass hero with inline proof numbers along the base.",
+    description: "Ruled title block with proof numbers beneath it.",
   },
   {
     id: "hero-client-lockup",

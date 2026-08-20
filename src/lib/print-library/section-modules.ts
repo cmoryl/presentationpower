@@ -311,14 +311,14 @@ export const PRINT_SECTION_MODULES: PrintSectionModule[] = [
   heroModule(
     "hero-photo-band",
     "Hero · Photo Band",
-    "Full-bleed photograph with eyebrow, title, accent rule, and a meta rail set over a bottom scrim — the case-study and spotlight cover.",
+    "Photo masthead bled to the page trim and flush with the top of the sheet, title over a bottom scrim, closed with an accent masthead rule — the case-study and spotlight cover.",
     "tall",
     ["hero", "cover", "photo", "scrim", "case-study"],
   ),
   heroModule(
     "hero-split-photo",
     "Hero · Split Photo",
-    "Photo panel beside a title + summary column, flippable left/right — the e-brochure opener.",
+    "Photo panel bled to one page edge beside a title + summary column in the opposite margin, flippable — the e-brochure opener.",
     "standard",
     ["hero", "split", "photo", "ebrochure"],
   ),
@@ -339,7 +339,7 @@ export const PRINT_SECTION_MODULES: PrintSectionModule[] = [
   heroModule(
     "hero-stat-lockup",
     "Hero · Stat Lockup",
-    "Glass hero with up to four inline proof numbers along the base — leads with outcomes.",
+    "Ruled title block with up to four proof numbers ruled off beneath it — leads with outcomes.",
     "tall",
     ["hero", "stats", "proof", "outcomes"],
   ),
