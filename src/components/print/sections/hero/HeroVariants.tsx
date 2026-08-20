@@ -26,67 +26,8 @@ function useBandHeight(heightPct: number | undefined, share: number): string {
 // ---- Authorable masthead rule + title typography --------------------------
 // `section.rule` and `section.titleType` let a document match an existing print
 // system: rule thickness/air/colour, and the title block's size, weight,
-// tracking, leading and case. Everything falls back to the built-in scale, so
-// untouched sections render exactly as before.
-
-/** Top masthead rule. `def` is the variant's own default thickness in px. */
-function heroRuleTop(section: PrintHeroSection, accent: string, def: number) {
-  const w = section.rule?.weight ?? def;
-  const color = section.rule?.color ?? accent;
-  return w <= 0 ? { borderTop: "none" as const } : { borderTop: `${cq(w)} solid ${color}` };
-}
-
-/** Air under the rule before the title block. */
-function heroRuleGap(section: PrintHeroSection, def: number): string {
-  return cq(section.rule?.gap ?? def);
-}
-
-/** Closing hairline under the title block. */
-function heroHairline(section: PrintHeroSection, ink: { hairline: string }, shownByDefault = true) {
-  const shown = section.rule?.hairline ?? shownByDefault;
-  if (!shown) return { borderBottom: "none" as const };
-  return { borderBottom: `1px solid ${section.rule?.hairlineColor ?? ink.hairline}` };
-}
-
-const emTrack = (thousandths: number) => `${(thousandths / 1000).toFixed(3)}em`;
-
-function heroTitleStyle(section: PrintHeroSection) {
-  const t = section.titleType;
-  if (!t) return {};
-  return {
-    ...(t.titleWeight ? { fontWeight: t.titleWeight } : null),
-    ...(t.titleTracking !== undefined ? { letterSpacing: emTrack(t.titleTracking) } : null),
-    ...(t.titleLeading ? { lineHeight: t.titleLeading / 100 } : null),
-    ...(t.titleCase === "upper" ? { textTransform: "uppercase" as const } : null),
-  };
-}
-
-/** Authored size for the title block, honouring the inspector override. */
-function heroTitleFontPx(section: PrintHeroSection, def: number): number {
-  return section.titleType?.titlePx ?? def;
-}
-
-/** Authored size for the summary, honouring the inspector override. */
-function heroSummaryFontPx(section: PrintHeroSection, def: number): number {
-  return section.titleType?.summaryPx ?? def;
-}
-
-function heroSummaryStyle(section: PrintHeroSection) {
-  const t = section.titleType;
-  if (!t) return {};
-  return {
-    ...(t.summaryLeading ? { lineHeight: t.summaryLeading / 100 } : null),
-  };
-}
-
-function heroEyebrowStyle(section: PrintHeroSection) {
-  const t = section.titleType;
-  if (!t) return {};
-  return {
-    ...(t.eyebrowPx ? { fontSize: cq(t.eyebrowPx) } : null),
-    ...(t.eyebrowTracking !== undefined ? { letterSpacing: emTrack(t.eyebrowTracking) } : null),
-  };
-}
+// tracking, leading and case. The resolvers live in ./hero-style so the legacy
+// full-page openers share the exact same contract.
 
 type Props = {
   section: PrintHeroSection;
