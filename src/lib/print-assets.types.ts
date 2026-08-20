@@ -715,7 +715,63 @@ export type SolutionProposalContent = {
   heroRule?: PrintHeroRule;
   heroTitleType?: PrintHeroTitleType;
   modules?: PrintSection[];
+  /**
+   * MULTI-PAGE PROPOSALS
+   * `docMode: "multi"` (or a non-empty `pages` array) switches the proposal
+   * from the single-page one-pager to the full multi-page deck port
+   * (cover → stats → scope → cost → locations → clients → success stories →
+   * why → advocates → team → summary). Every page is authored from the same
+   * editable content object, so the live editor, the master editor and the
+   * PDF export all read the same nodes.
+   */
+  docMode?: "single" | "multi";
+  pages?: MultiProposalPage[];
 };
+
+/** One page of a multi-page solution proposal. */
+export type MultiProposalPageKind =
+  | "cover"
+  | "stats"
+  | "scope"
+  | "cost"
+  | "locations"
+  | "clients"
+  | "success-stories"
+  | "why"
+  | "advocates"
+  | "team-grid"
+  | "team-bio"
+  | "summary";
+
+export type MultiProposalPage = {
+  id: string;
+  kind: MultiProposalPageKind;
+  /** Shelf / rail label — not printed. */
+  navLabel?: string;
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  body?: string;
+  bullets?: string[];
+  stats?: CaseStudyStat[];
+  cards?: Array<{ title?: string; body?: string; icon?: string; meta?: string }>;
+  quotes?: Array<{
+    headline?: string;
+    text?: string;
+    author?: string;
+    role?: string;
+    company?: string;
+  }>;
+  costRows?: ProposalCostRow[];
+  costTotalLabel?: string;
+  costTotal?: string;
+  costNote?: string;
+  team?: Array<ProposalTeamMember & { bio?: string; phone?: string }>;
+  locations?: Array<{ region?: string; offices?: string[] }>;
+  logos?: string[];
+  footnote?: string;
+};
+
 
 export type PrintAssetKind =
   | "case-study"
