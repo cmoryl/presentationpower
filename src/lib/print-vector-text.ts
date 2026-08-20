@@ -30,6 +30,8 @@ import {
 
 import fontkit from "@pdf-lib/fontkit";
 
+import { isAuthoringChrome } from "./export-chrome-suppress";
+
 // Silence unused import (kept for symbol table sanity).
 void _Standard;
 
