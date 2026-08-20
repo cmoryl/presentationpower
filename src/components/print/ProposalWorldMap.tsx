@@ -164,6 +164,7 @@ export function ProposalWorldMap({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <svg
+        ref={svgRef}
         viewBox={`${view.x} ${view.y} ${view.w} ${view.h}`}
         width="100%"
         height="100%"
@@ -178,7 +179,7 @@ export function ProposalWorldMap({
         style={{
           display: "block",
           touchAction: "none",
-          cursor: zoom > 1 ? "grab" : editable ? "crosshair" : "default",
+          cursor: activePin !== null ? "grabbing" : zoom > 1 ? "grab" : editable ? "crosshair" : "default",
         }}
       >
         {WORLD_MAP_LAND.map((path, i) => (
@@ -189,15 +190,20 @@ export function ProposalWorldMap({
             key={pin.id ?? `pin-${i}`}
             cx={pin.x}
             cy={pin.y}
-            r={pin.r ?? 2.3}
+            r={(pin.r ?? 2.3) * (activePin === i ? 1.35 : 1)}
             fill={pinFill(pin.kind)}
             stroke="#FFFFFF"
-            strokeWidth={0.2}
-            style={{ cursor: editable ? "pointer" : "default" }}
+            strokeWidth={activePin === i ? 0.5 : 0.2}
+            style={{ cursor: editable ? (activePin === i ? "grabbing" : "grab") : "default" }}
+            onPointerDown={editable && onChange ? startPinDrag(i) : undefined}
             onClick={
               editable && onChange
                 ? (event) => {
                     event.stopPropagation();
+                    if (dragMoved.current) {
+                      dragMoved.current = false;
+                      return;
+                    }
                     onChange(list.filter((_, index) => index !== i));
                   }
                 : undefined
@@ -205,6 +211,7 @@ export function ProposalWorldMap({
           >
             {pin.name ? <title>{pin.name}</title> : null}
           </circle>
+
         ))}
       </svg>
 
