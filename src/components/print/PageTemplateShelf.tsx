@@ -146,11 +146,11 @@ export function PageTemplateCard({
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
             <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#003FC7]">
-              Page template
+              {template.builtin ? "Original template" : "Page template"}
             </span>
             <span className="inline-flex items-center gap-1 rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/55">
               {template.scope === "shared" ? <Globe size={10} /> : <Lock size={10} />}
-              {template.scope === "shared" ? "Shared" : "Private"}
+              {template.builtin ? "Curated" : template.scope === "shared" ? "Shared" : "Private"}
             </span>
             <span className="text-[10px] font-medium text-black/45">{typeLabel}</span>
           </div>
@@ -182,7 +182,7 @@ export function PageTemplateCard({
             />
             Reset copy to prompts
           </label>
-          {isAdmin ? (
+          {isAdmin && !template.builtin ? (
             <button
               type="button"
               onClick={() => toggleScope.mutate()}
@@ -191,15 +191,17 @@ export function PageTemplateCard({
               {template.scope === "shared" ? "Unpublish" : "Publish to everyone"}
             </button>
           ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              if (window.confirm(`Delete page template "${template.title}"?`)) remove.mutate();
-            }}
-            className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] font-medium text-black/55 hover:border-red-400 hover:text-red-600"
-          >
-            <Trash2 size={11} /> Delete
-          </button>
+          {template.builtin ? null : (
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm(`Delete page template "${template.title}"?`)) remove.mutate();
+              }}
+              className="inline-flex items-center gap-1 rounded-full border border-black/15 px-2.5 py-1 text-[11px] font-medium text-black/55 hover:border-red-400 hover:text-red-600"
+            >
+              <Trash2 size={11} /> Delete
+            </button>
+          )}
         </div>
       </div>
 

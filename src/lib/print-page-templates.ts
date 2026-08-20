@@ -8,6 +8,8 @@ import {
   canPublishPageTemplates,
   listPrintPageTemplates,
 } from "@/lib/print-page-templates.functions";
+import { sourceLibraryFor } from "@/lib/print-library/editable";
+import { builtinPageTemplates } from "@/lib/print-library/page-templates-builtin";
 import type { PrintAssetContext, PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export type PrintPageTemplateScope = "private" | "shared";
@@ -60,6 +62,8 @@ export type PrintPageTemplate = Omit<PrintPageTemplateRow, "sections" | "layout"
   scope: PrintPageTemplateScope;
   sections: PrintSection[];
   layout: PrintPageTemplateLayout;
+  /** True for curated catalog originals (read-only, not database rows). */
+  builtin?: boolean;
 };
 
 export function normalizePageTemplate(row: PrintPageTemplateRow): PrintPageTemplate {
@@ -209,7 +213,12 @@ export function instantiateTemplateContent(
 /** Context knobs only — drop the captured content shell. */
 export function instantiateTemplateContext(t: PrintPageTemplate): Record<string, unknown> {
   const { contentShell: _shell, ...rest } = t.layout;
-  return { ...rest, pageTemplateId: t.id } as Record<string, unknown>;
+  const ctx: Record<string, unknown> = { ...rest, pageTemplateId: t.id };
+  if (t.source_library_item_id) {
+    ctx["libraryItemId"] = t.source_library_item_id;
+    if (t.builtin) ctx["sourceLibrary"] = sourceLibraryFor(t.source_library_item_id);
+  }
+  return ctx;
 }
 
 export function pageTemplateKind(t: PrintPageTemplate): PrintAssetKind {
@@ -222,7 +231,7 @@ export function pageTemplateMatches(t: PrintPageTemplate, query: string): boolea
   return [t.title, t.description ?? "", ...(t.tags ?? [])].join(" ").toLowerCase().includes(q);
 }
 
-/** Shared read hook: own private templates + every shared one. */
+/** Shared read hook: curated originals + own private templates + shared ones. */
 export function usePrintPageTemplates() {
   const listFn = useServerFn(listPrintPageTemplates);
   const q = useQuery({
@@ -232,7 +241,9 @@ export function usePrintPageTemplates() {
       return rows.map(normalizePageTemplate);
     },
   });
-  return { templates: q.data ?? [], isLoading: q.isLoading, refetch: q.refetch };
+  const builtins = builtinPageTemplates();
+  const templates = [...builtins, ...(q.data ?? [])];
+  return { templates, isLoading: q.isLoading, refetch: q.refetch };
 }
 
 export function usePageTemplateAdmin() {
