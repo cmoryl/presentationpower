@@ -71,7 +71,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const nav = [
-    { to: "/", label: "Dashboard" },
+    { to: "/", label: "Home" },
     { to: "/brief/new", label: "New brief" },
 
     { to: "/elements", label: "Elements" },
@@ -79,6 +79,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/files", label: "My files" },
     { to: "/admin", label: "Admin" },
   ] as const;
+
+  // Hide the Home link when the user is already on the homepage.
+  const visibleNav = nav.filter((n) => !(n.to === "/" && pathname === "/"));
 
   // Elements mega-menu: the four output channels and their sub-options.
   const elementGroups: ReadonlyArray<{
@@ -261,7 +264,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
-            {nav.map((n) => {
+            {visibleNav.map((n) => {
               if (n.to === "/elements") {
                 const elementsActive =
                   pathname === "/elements" ||
