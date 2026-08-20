@@ -4948,8 +4948,8 @@ export function syncAdoptedBlockText(
   return changed ? out : blocks;
 }
 
-
 function setPath(
+
 
   obj: Record<string, unknown>,
   path: string,
