@@ -45,7 +45,7 @@
  */
 import { chromium } from "playwright";
 import { mkdir, writeFile, readFile, rm } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
@@ -97,6 +97,35 @@ const EXPECT_PTS = { w: 612, h: 792 };
 
 const ids = values("id");
 const MODULES = ids.length > 0 ? ids : REPRESENTATIVE;
+
+/**
+ * Chromium resolution mirrors scripts/pixel-diff-exports.mjs: the sandbox/CI
+ * image often ships a different chromium build than the pinned playwright
+ * package expects, so fall back to the newest cached build instead of dying.
+ */
+async function launchChromium() {
+  const envExe = process.env.PW_CHROME || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
+  if (envExe && existsSync(envExe)) {
+    return await chromium.launch({ headless: true, executablePath: envExe });
+  }
+  try {
+    return await chromium.launch({ headless: true });
+  } catch (err) {
+    for (const root of [process.env.PLAYWRIGHT_BROWSERS_PATH, "/opt/ms-playwright"]) {
+      if (!root || !existsSync(root)) continue;
+      const dirs = readdirSync(root)
+        .filter((d) => d.startsWith("chromium"))
+        .sort((a, b) => Number(/(\d+)$/.exec(b)?.[1] ?? 0) - Number(/(\d+)$/.exec(a)?.[1] ?? 0));
+      for (const dir of dirs) {
+        for (const rel of ["chrome-linux/chrome", "chrome-linux/headless_shell"]) {
+          const exe = path.join(root, dir, rel);
+          if (existsSync(exe)) return await chromium.launch({ headless: true, executablePath: exe });
+        }
+      }
+    }
+    throw err;
+  }
+}
 
 async function rasterize(pdfPath, outPrefix) {
   await run("pdftoppm", [
@@ -153,7 +182,7 @@ async function exportModulesPdf(page, mode, moduleIds, pdfPath) {
 async function main() {
   await mkdir(OUT, { recursive: true });
   await mkdir(BASELINE_DIR, { recursive: true });
-  const browser = await chromium.launch({ headless: true });
+  const browser = await launchChromium();
   const context = await browser.newContext({
     viewport: { width: 1280, height: 1800 },
     acceptDownloads: true,
