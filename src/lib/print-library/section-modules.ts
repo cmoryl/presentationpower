@@ -323,6 +323,20 @@ const PRINT_SECTION_MODULES_RAW: PrintSectionModule[] = [
     "standard",
     ["hero", "brief", "header", "rule", "adaptor"],
   ),
+  heroModule(
+    "hero-element-masthead",
+    "Hero · ELEMENT Masthead",
+    "The ELEMENT system opener: a five-brick tick row sets the modular measure over a fine rule, then an oversized tight-tracked title, lead paragraph and meta rail.",
+    "standard",
+    ["hero", "element", "brand", "typographic", "no-image", "rule"],
+  ),
+  heroModule(
+    "hero-element-band",
+    "Hero · ELEMENT Rail Band",
+    "Reversed navy→accent band bled to the trim with the ELEMENT brick rail down the leading edge — the branded cover for any division.",
+    "standard",
+    ["hero", "element", "brand", "band", "reversed", "cover"],
+  ),
   narrativeModule(
     "narrative-tri-card",
     "Challenge · Approach · Impact",
