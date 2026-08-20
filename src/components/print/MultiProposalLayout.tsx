@@ -911,7 +911,7 @@ function LocationsPage({ page, pageIndex }: { page: MultiProposalPage; pageIndex
       </T>
 
       {/* Vector map: landmass artwork + author-editable office pins. */}
-      <L x={-0.87} y={2.34} w={10.24} h={5.58}>
+      <L x={-0.61} y={2.62} w={9.72} h={5.3}>
         <ProposalWorldMap
           pins={pins}
           editable={!!listCtx?.active}
