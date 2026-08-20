@@ -38,84 +38,30 @@ import {
   makePrintStatsSection,
 } from "@/components/print/sections/PrintSectionPicker";
 
-export type PrintModuleFamily =
-  | "hero"
-  | "narrative"
-  | "stats"
-  | "quote"
-  | "logo-grid"
-  | "expertise"
-  | "feature-list"
-  | "table"
-  | "contact";
+import {
+  PRINT_MODULE_FAMILIES,
+  PRINT_MODULE_FAMILY_ORDER,
+  PRINT_MODULE_LABELS,
+  printModuleFamilyMeta,
+  printModuleFamilyRank,
+  printModuleFullLabel,
+  printVariantLabel,
+  type PrintModuleFamily,
+  type PrintModuleFamilyMeta,
+} from "./module-families";
 
-export type PrintModuleFamilyMeta = {
-  id: PrintModuleFamily;
-  label: string;
-  tagline: string;
-  desc: string;
+// Naming + ordering live in `module-families.ts` so the library, the editor
+// picker, and the admin editor all read from one place.
+export {
+  PRINT_MODULE_FAMILIES,
+  PRINT_MODULE_FAMILY_ORDER,
+  printModuleFamilyMeta,
+  printModuleFamilyRank,
+  printModuleFullLabel,
+  printVariantLabel,
 };
+export type { PrintModuleFamily, PrintModuleFamilyMeta };
 
-export const PRINT_MODULE_FAMILIES: PrintModuleFamilyMeta[] = [
-  {
-    id: "hero",
-    label: "Heroes",
-    tagline: "How the page opens",
-    desc: "The six opening lockups the curated collateral uses — full-bleed photo bands, split photo heroes, typographic stacks, accent bands, stat lockups, and the case-study client rail.",
-  },
-  {
-    id: "narrative",
-    label: "Narrative",
-    tagline: "The story spine",
-    desc: "Challenge / Approach / Impact triptychs, numbered engagement arcs, and Discover panels lifted from the curated e-brochures and case studies.",
-  },
-  {
-    id: "stats",
-    label: "Stats",
-    tagline: "Proof in numbers",
-    desc: "KPI rows, callout pills, and bento stacks for measurable outcomes.",
-  },
-  {
-    id: "quote",
-    label: "Quotes",
-    tagline: "Voice of the client",
-    desc: "Pull quotes and attribution lockups for testimonial proof.",
-  },
-  {
-    id: "logo-grid",
-    label: "Client logos",
-    tagline: "Trusted by",
-    desc: "Logo grids, rows, and walls for client rosters and partner sets.",
-  },
-  {
-    id: "expertise",
-    label: "Expertise",
-    tagline: "Capability + credentials",
-    desc: "Icon strips, checklists, and credential pills for what's included.",
-  },
-  {
-    id: "feature-list",
-    label: "Features",
-    tagline: "What we do",
-    desc: "Verb cards and feature lists for service and product capability.",
-  },
-  {
-    id: "table",
-    label: "Tables & rails",
-    tagline: "Coverage and specs",
-    desc: "Departments-supported lists, scale rails, and label→value spec tables from the MSA partnership pages.",
-  },
-  {
-    id: "contact",
-    label: "Contact & CTA",
-    tagline: "How the page closes",
-    desc: "Subject-expert cards, global contact panels, and closing CTA bands — the three endings every curated piece uses.",
-  },
-];
-
-export function printModuleFamilyMeta(id: PrintModuleFamily): PrintModuleFamilyMeta {
-  return PRINT_MODULE_FAMILIES.find((f) => f.id === id) ?? PRINT_MODULE_FAMILIES[0]!;
-}
 
 /** Rough vertical footprint on a portrait page — drives capacity warnings. */
 export type PrintModuleDensity = "compact" | "standard" | "tall";
@@ -153,7 +99,7 @@ const heroModule = (
   id: `pm-hero-${variantId}`,
   family: "hero",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ALL_KINDS,
@@ -171,7 +117,7 @@ const statsModule = (
   id: `pm-stats-${variantId}`,
   family: "stats",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ALL_KINDS,
@@ -189,7 +135,7 @@ const quoteModule = (
   id: `pm-quote-${variantId}`,
   family: "quote",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ALL_KINDS,
@@ -207,7 +153,7 @@ const logoModule = (
   id: `pm-logo-grid-${variantId}`,
   family: "logo-grid",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ["spotlight", "ebrochure", "msa-partnership", "adaptor-brief"],
@@ -225,7 +171,7 @@ const expertiseModule = (
   id: `pm-expertise-${variantId}`,
   family: "expertise",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ALL_KINDS,
@@ -243,7 +189,7 @@ const featureModule = (
   id: `pm-feature-list-${variantId}`,
   family: "feature-list",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ["spotlight", "ebrochure", "adaptor-brief", "msa-partnership"],
@@ -261,7 +207,7 @@ const narrativeModule = (
   id: `pm-narrative-${variantId}`,
   family: "narrative",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ALL_KINDS,
@@ -280,7 +226,7 @@ const tableModule = (
   id: `pm-table-${variantId}`,
   family: "table",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor,
@@ -298,7 +244,7 @@ const contactModule = (
   id: `pm-contact-${variantId}`,
   family: "contact",
   variantId,
-  label,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
   description,
   density,
   bestFor: ALL_KINDS,
@@ -306,8 +252,7 @@ const contactModule = (
   make: () => makePrintContactSection(variantId),
 });
 
-/** Every reusable print section module, in shelf order. */
-export const PRINT_SECTION_MODULES: PrintSectionModule[] = [
+const PRINT_SECTION_MODULES_RAW: PrintSectionModule[] = [
   heroModule(
     "hero-photo-band",
     "Hero · Photo Band",
@@ -548,6 +493,18 @@ export const PRINT_SECTION_MODULES: PrintSectionModule[] = [
   ),
 ];
 
+/**
+ * Every reusable print section module, in canonical shelf order: families in
+ * page-flow order (`PRINT_MODULE_FAMILY_ORDER`), variants in authored order
+ * within each family. Sorting here means every consumer — library, picker,
+ * admin editor — lists modules identically.
+ */
+export const PRINT_SECTION_MODULES: PrintSectionModule[] = PRINT_SECTION_MODULES_RAW.map(
+  (m, i) => ({ m, i }),
+)
+  .sort((a, b) => printModuleFamilyRank(a.m.family) - printModuleFamilyRank(b.m.family) || a.i - b.i)
+  .map((e) => e.m);
+
 export function printModulesForFamily(family: PrintModuleFamily): PrintSectionModule[] {
   return PRINT_SECTION_MODULES.filter((m) => m.family === family);
 }
@@ -560,11 +517,20 @@ export function findPrintModule(id: string): PrintSectionModule | undefined {
   return PRINT_SECTION_MODULES.find((m) => m.id === id);
 }
 
-/** Free-text match across label, description, family, and tags. */
+/** Free-text match across label, family label, description, family, and tags. */
 export function printModuleMatches(m: PrintSectionModule, query: string): boolean {
   const q = query.trim().toLowerCase();
   if (!q) return true;
-  const hay = [m.label, m.description, m.family, m.variantId, ...m.tags].join(" ").toLowerCase();
+  const hay = [
+    m.label,
+    printModuleFullLabel(m.family, m.variantId),
+    m.description,
+    m.family,
+    m.variantId,
+    ...m.tags,
+  ]
+    .join(" ")
+    .toLowerCase();
   return q.split(/\s+/).every((t) => hay.includes(t));
 }
 

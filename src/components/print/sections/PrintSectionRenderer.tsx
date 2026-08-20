@@ -208,7 +208,7 @@ export const PRINT_NARRATIVE_VARIANTS: Array<{
   },
   {
     id: "narrative-numbered-arc",
-    label: "Numbered Arc",
+    label: "Numbered Engagement Arc",
     description: "01/02/03 challenge → solution → result spine.",
   },
   {
@@ -225,13 +225,13 @@ export const PRINT_TABLE_VARIANTS: Array<{
 }> = [
   {
     id: "table-two-col-list",
-    label: "Two-Column List",
+    label: "Departments Supported",
     description: "Departments-supported style hairline list.",
   },
   { id: "table-scale-rail", label: "Scale Rail", description: "Big values over small labels." },
   {
     id: "table-spec-rows",
-    label: "Spec Rows",
+    label: "Program Spec Table",
     description: "Label → value table with header strip.",
   },
 ];
@@ -241,13 +241,13 @@ export const PRINT_CONTACT_VARIANTS: Array<{
   label: string;
   description: string;
 }> = [
-  { id: "contact-expert-card", label: "Expert Card", description: "Named subject expert lockup." },
+  { id: "contact-expert-card", label: "Subject Expert Card", description: "Named subject expert lockup." },
   {
     id: "contact-global-panel",
-    label: "Global Contacts",
+    label: "Global Contacts Panel",
     description: "Navy panel with a region contact rail.",
   },
-  { id: "contact-cta-band", label: "CTA Band", description: "Closing accent band with a button." },
+  { id: "contact-cta-band", label: "Closing CTA Band", description: "Closing accent band with a button." },
 ];
 
 export function PrintSectionRenderer({

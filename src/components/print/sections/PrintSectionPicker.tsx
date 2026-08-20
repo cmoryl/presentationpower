@@ -30,6 +30,12 @@ import {
 } from "./PrintSectionRenderer";
 import { X, GripVertical } from "lucide-react";
 
+import {
+  PRINT_MODULE_FAMILIES,
+  printVariantLabel,
+  type PrintModuleFamily,
+} from "@/lib/print-library/module-families";
+
 export const PRINT_SECTION_DND_MIME = "application/x-print-section";
 
 const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
@@ -425,28 +431,12 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
 
 // ---- Picker UI ------------------------------------------------------------
 
-type Family =
-  | "hero"
-  | "stats"
-  | "quote"
-  | "logo-grid"
-  | "expertise"
-  | "feature-list"
-  | "narrative"
-  | "table"
-  | "contact";
+// Families, their labels, and their order come from the canonical registry
+// naming file so this drawer matches `/library/print/modules` exactly.
+type Family = PrintModuleFamily;
 
-const FAMILIES: Array<{ id: Family; label: string }> = [
-  { id: "hero", label: "Heroes" },
-  { id: "stats", label: "Stats" },
-  { id: "quote", label: "Quotes" },
-  { id: "logo-grid", label: "Logos" },
-  { id: "expertise", label: "Expertise" },
-  { id: "feature-list", label: "Features" },
-  { id: "narrative", label: "Narrative" },
-  { id: "table", label: "Tables" },
-  { id: "contact", label: "Contact & CTA" },
-];
+const FAMILIES = PRINT_MODULE_FAMILIES;
+
 
 function variantsForFamily(
   family: Family,
@@ -509,7 +499,7 @@ export function PrintSectionPicker({
   brand: BrandMode;
   mode: "light" | "dark";
 }) {
-  const [family, setFamily] = useState<Family>("stats");
+  const [family, setFamily] = useState<Family>("hero");
   if (!open) return null;
   const accent = brand.tokens.accent || brand.tokens.primary;
   const variants = variantsForFamily(family);
@@ -592,7 +582,7 @@ export function PrintSectionPicker({
                     aria-hidden
                   />
                   <div>
-                    <div className="text-sm font-semibold text-black">{v.label}</div>
+                    <div className="text-sm font-semibold text-black">{printVariantLabel(v.id)}</div>
                     <div className="mt-0.5 text-[11px] text-black/60">{v.description}</div>
                   </div>
                 </div>

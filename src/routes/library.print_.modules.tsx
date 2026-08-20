@@ -9,6 +9,8 @@ import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSecti
 import {
   PRINT_MODULE_COUNT,
   PRINT_MODULE_FAMILIES,
+  printModuleFamilyMeta,
+  printModuleFamilyRank,
   PRINT_SECTION_MODULES,
   printModuleMatches,
   type PrintModuleFamily,
@@ -103,8 +105,12 @@ function PrintModuleLibraryPage() {
         .filter((m) => kind === "all" || m.bestFor.includes(kind))
         .filter((m) => printModuleMatches(m, query))
         .filter((m) => !realOnly || hasRealExamples(m.variantId))
+        // Canonical family order first (so modules always sit in the same
+        // shelf), then real-collateral examples ahead of demo copy.
         .sort(
-          (a, b) => (hasRealExamples(b.variantId) ? 1 : 0) - (hasRealExamples(a.variantId) ? 1 : 0),
+          (a, b) =>
+            printModuleFamilyRank(a.family) - printModuleFamilyRank(b.family) ||
+            (hasRealExamples(b.variantId) ? 1 : 0) - (hasRealExamples(a.variantId) ? 1 : 0),
         ),
     [family, kind, query, overrides, realOnly],
   );
@@ -344,7 +350,7 @@ function ModuleCard({
       <div className="flex items-start justify-between gap-3 border-b border-black/10 px-5 py-4">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-            {m.family.replace("-", " ")} · {DENSITY_LABEL[m.density]}
+            {printModuleFamilyMeta(m.family).label} · {DENSITY_LABEL[m.density]}
           </p>
           <h2 className="mt-1 text-base font-semibold tracking-[-0.02em] text-[#03002C]">
             {m.label}
