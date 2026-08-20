@@ -1453,7 +1453,7 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
         </Fragment>
       ))}
 
-      <Img x={2.92} y={10.72} w={2.59} h={0.33} src={PROPOSAL_ART.logoWhite} alt="TransPerfect" />
+      <Img x={2.92} y={10.5} w={2.59} h={0.33} src={PROPOSAL_ART.logoWhite} alt="TransPerfect" />
     </>
   );
 }
