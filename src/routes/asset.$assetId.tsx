@@ -1388,6 +1388,16 @@ function AssetEditor() {
                   </button>
                 </PrintIconEditContext.Provider>
               </PrintDocModeProvider>
+              </PrintContentFitFrame>
+              {!isNeutralFit(fitKnobs) && (
+                <div
+                  data-export-ignore="true"
+                  data-testid="print-content-fit-badge"
+                  className="pointer-events-none absolute left-3 top-3 z-30 rounded-full border border-white/40 bg-[#03002C]/80 px-3 py-1 text-[10px] font-semibold tracking-wide text-white backdrop-blur"
+                >
+                  Content-fit: {describeFit(fitKnobs)}
+                </div>
+              )}
             </div>
 
             {/* DOCUMENT INPUTS — content entry lives under the document */}
