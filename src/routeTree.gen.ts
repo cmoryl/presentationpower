@@ -55,6 +55,7 @@ import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
+import { Route as DevPrintModulePdfRouteImport } from './routes/dev.print-module-pdf'
 import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-verify'
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
 import { Route as DevModuleCatalogRouteImport } from './routes/dev.module-catalog'
@@ -354,6 +355,11 @@ const DevUxDebugRoute = DevUxDebugRouteImport.update({
 const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
   id: '/dev/slidestage-demo',
   path: '/dev/slidestage-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevPrintModulePdfRoute = DevPrintModulePdfRouteImport.update({
+  id: '/dev/print-module-pdf',
+  path: '/dev/print-module-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevPlacementVerifyRoute = DevPlacementVerifyRouteImport.update({
@@ -775,6 +781,7 @@ export interface FileRoutesByFullPath {
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
+  '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
@@ -888,6 +895,7 @@ export interface FileRoutesByTo {
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
+  '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
@@ -1006,6 +1014,7 @@ export interface FileRoutesById {
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
   '/dev/placement-verify': typeof DevPlacementVerifyRoute
+  '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events/new': typeof EventsNewRoute
@@ -1125,6 +1134,7 @@ export interface FileRouteTypes {
     | '/dev/module-catalog'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
+    | '/dev/print-module-pdf'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
     | '/events/new'
@@ -1238,6 +1248,7 @@ export interface FileRouteTypes {
     | '/dev/module-catalog'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
+    | '/dev/print-module-pdf'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
     | '/events/new'
@@ -1355,6 +1366,7 @@ export interface FileRouteTypes {
     | '/dev/module-catalog'
     | '/dev/module-sheet'
     | '/dev/placement-verify'
+    | '/dev/print-module-pdf'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
     | '/events/new'
@@ -1448,6 +1460,7 @@ export interface RootRouteChildren {
   DevModuleCatalogRoute: typeof DevModuleCatalogRoute
   DevModuleSheetRoute: typeof DevModuleSheetRoute
   DevPlacementVerifyRoute: typeof DevPlacementVerifyRoute
+  DevPrintModulePdfRoute: typeof DevPrintModulePdfRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
@@ -1800,6 +1813,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/slidestage-demo'
       fullPath: '/dev/slidestage-demo'
       preLoaderRoute: typeof DevSlidestageDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/print-module-pdf': {
+      id: '/dev/print-module-pdf'
+      path: '/dev/print-module-pdf'
+      fullPath: '/dev/print-module-pdf'
+      preLoaderRoute: typeof DevPrintModulePdfRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/placement-verify': {
@@ -2473,6 +2493,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevModuleCatalogRoute: DevModuleCatalogRoute,
   DevModuleSheetRoute: DevModuleSheetRoute,
   DevPlacementVerifyRoute: DevPlacementVerifyRoute,
+  DevPrintModulePdfRoute: DevPrintModulePdfRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   DevUxDebugRoute: DevUxDebugRoute,
   LibraryImportedRoute: LibraryImportedRoute,
