@@ -20,7 +20,6 @@
  */
 
 import {
-import { isAuthoringChrome } from "./export-chrome-suppress";
   PDFDocument,
   rgb,
   setCharacterSpacing,
