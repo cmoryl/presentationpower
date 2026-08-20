@@ -328,7 +328,121 @@ function PageHeader({
 }) {
   const lockupColor = t.onDark ? "#FFFFFF" : t.primary;
 
-  /* Speech-bubble callout — the template's signature statement device. */
+  /* Cover — full-width white TransPerfect wordmark over the gradient field,
+     with the proposal title set beneath it, exactly as the source template. */
+  if (spec.header === "cover") {
+    return (
+      <div
+        style={{
+          paddingLeft: t.pad,
+          paddingRight: t.pad,
+          paddingTop: cq(64),
+          textAlign: "center",
+        }}
+      >
+        <img
+          src={PROPOSAL_ART.logoWhite}
+          alt="TransPerfect"
+          style={{ width: "62%", height: "auto", margin: "0 auto", display: "block" }}
+        />
+        {page.eyebrow && (
+          <div
+            style={{
+              marginTop: cq(40),
+              fontSize: cq(10),
+              fontWeight: 700,
+              letterSpacing: "0.34em",
+              textTransform: "uppercase",
+              color: PROPOSAL_AQUA,
+            }}
+          >
+            {page.eyebrow}
+          </div>
+        )}
+        <h1
+          style={{
+            margin: `${cq(14)} 0 0`,
+            fontSize: cq(40),
+            lineHeight: 1.02,
+            fontWeight: 800,
+            letterSpacing: "-0.04em",
+            color: "#FFFFFF",
+            ...clampLines(3),
+          }}
+        >
+          {page.title}
+        </h1>
+        {page.subtitle && (
+          <div
+            style={{
+              margin: `${cq(12)} auto 0`,
+              maxWidth: "74%",
+              fontSize: cq(12),
+              lineHeight: 1.5,
+              fontWeight: 500,
+              color: "rgba(255,255,255,0.88)",
+            }}
+          >
+            {page.subtitle}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* Statement pages — heavy right-aligned headline mixing white and aqua. */
+  if (spec.header === "statement") {
+    return (
+      <div style={{ paddingLeft: t.pad, paddingRight: t.pad, paddingTop: cq(40) }}>
+        {page.eyebrow && (
+          <div
+            style={{
+              fontSize: cq(9),
+              fontWeight: 700,
+              letterSpacing: "0.3em",
+              textTransform: "uppercase",
+              color: PROPOSAL_AQUA,
+              textAlign: "right",
+            }}
+          >
+            {page.eyebrow}
+          </div>
+        )}
+        <h2
+          style={{
+            margin: `${page.eyebrow ? cq(12) : 0} 0 0`,
+            fontSize: cq(42),
+            lineHeight: 0.98,
+            fontWeight: 800,
+            letterSpacing: "-0.045em",
+            color: "#FFFFFF",
+            textAlign: "right",
+            ...clampLines(3),
+          }}
+        >
+          {page.title}
+        </h2>
+        {page.subtitle && (
+          <div
+            style={{
+              marginTop: cq(12),
+              marginLeft: "auto",
+              maxWidth: "70%",
+              fontSize: cq(12),
+              lineHeight: 1.5,
+              fontWeight: 600,
+              color: PROPOSAL_AQUA,
+              textAlign: "right",
+            }}
+          >
+            {page.subtitle}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+
   if (spec.header === "bubble") {
     return (
       <div
