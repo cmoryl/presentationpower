@@ -3889,17 +3889,27 @@ export const useDeckStore = create<DeckState>()(
 
           if (!editable) return;
           const nextContent = setPath({ ...slide.content }, field, value);
+          // Keep adopted canvas blocks (which bake text at adoption time) in
+          // step with the edit, otherwise the change is invisible on the slide.
+          const nextBlocks = syncAdoptedBlockText(
+            slide.canvasBlocks,
+            getPath(slide.content, field),
+            value,
+          );
           set((s) => ({
             decks: {
               ...s.decks,
               [deckId]: {
                 ...deck,
                 slides: deck.slides.map((sl) =>
-                  sl.id === slideId ? { ...sl, content: nextContent } : sl,
+                  sl.id === slideId
+                    ? { ...sl, content: nextContent, canvasBlocks: nextBlocks }
+                    : sl,
                 ),
               },
             },
           }));
+
         },
 
         applySlideBackground: (deckId, slideIds, background) => {
