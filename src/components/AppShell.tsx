@@ -1,7 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { useTheme, type ThemeMode } from "@/hooks/use-theme";
+import { useTheme } from "@/hooks/use-theme";
 import { AdminSidebar } from "@/components/AdminShell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ElementLockup } from "@/components/brand/ElementLogo";
@@ -23,7 +23,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const locSearch = useRouterState({ select: (s) => s.location.searchStr });
 
-  const [theme, setTheme] = useTheme();
+  const [, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
   const [presOpen, setPresOpen] = useState(false);
   
@@ -45,6 +45,12 @@ export function AppShell({ children }: { children: ReactNode }) {
     document.documentElement.classList.remove("contrast-boost");
   }, []);
 
+  // Dark mode is retired from the main navigation: the app ships light-only for
+  // now, so pin any stored preference (including old "dark" sessions) to light.
+  useEffect(() => {
+    setTheme("light");
+  }, [setTheme]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (inAdmin) {
@@ -59,10 +65,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname, inAdmin, isAdminLinked]);
 
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
-  const themes: { id: ThemeMode; label: string }[] = [
-    { id: "light", label: "Light" },
-    { id: "dark", label: "Dark" },
-  ];
   const nav = [
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
