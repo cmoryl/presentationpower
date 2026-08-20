@@ -13,7 +13,7 @@ import { useState } from "react";
 import {
   WORLD_MAP_LAND,
   WORLD_MAP_PINS,
-  WORLD_MAP_VIEWBOX,
+  WORLD_MAP_VIEW,
   type WorldMapPin,
   type WorldMapPinKind,
 } from "@/lib/print-library/world-map-vector";
@@ -45,8 +45,8 @@ export function ProposalWorldMap({
     if (!editable || !onChange) return;
     const rect = event.currentTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
-    const x = ((event.clientX - rect.left) / rect.width) * WORLD_MAP_VIEWBOX;
-    const y = ((event.clientY - rect.top) / rect.height) * WORLD_MAP_VIEWBOX;
+    const x = WORLD_MAP_VIEW.x + ((event.clientX - rect.left) / rect.width) * WORLD_MAP_VIEW.w;
+    const y = WORLD_MAP_VIEW.y + ((event.clientY - rect.top) / rect.height) * WORLD_MAP_VIEW.h;
     onChange([
       ...list,
       {
@@ -62,7 +62,7 @@ export function ProposalWorldMap({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <svg
-        viewBox={`0 0 ${WORLD_MAP_VIEWBOX} ${WORLD_MAP_VIEWBOX}`}
+        viewBox={`${WORLD_MAP_VIEW.x} ${WORLD_MAP_VIEW.y} ${WORLD_MAP_VIEW.w} ${WORLD_MAP_VIEW.h}`}
         width="100%"
         height="100%"
         preserveAspectRatio="xMidYMid meet"

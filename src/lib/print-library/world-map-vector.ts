@@ -22,7 +22,11 @@ export type WorldMapPin = {
   id?: string;
 };
 
-export const WORLD_MAP_VIEWBOX = 720;
+/**
+ * Tight bounding box of the artwork inside the source 720x720 canvas, so the
+ * map fills its frame on the page instead of floating inside dead margin.
+ */
+export const WORLD_MAP_VIEW = { x: 58, y: 138, w: 629, h: 343 };
 export const WORLD_MAP_PIN_R = 2.3;
 
 export const WORLD_MAP_LAND: Array<{ d: string; opacity: number }> = [
