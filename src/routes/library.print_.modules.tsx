@@ -23,8 +23,6 @@ import {
   hasRealExamples,
 } from "@/lib/print-library/module-examples";
 import { applyPrintOverrides, useModuleOverrides } from "@/lib/module-overrides";
-import { PageTemplateShelf } from "@/components/print/PageTemplateShelf";
-import { pageTemplateMatches, usePrintPageTemplates } from "@/lib/print-page-templates";
 import type { PrintIconStyle } from "@/components/print/print-doc-mode";
 import { usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
