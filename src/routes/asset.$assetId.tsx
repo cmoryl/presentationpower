@@ -784,28 +784,22 @@ function AssetEditor() {
   }
 
   const pageSize: PrintPageSize = ctx.pageSize ?? "A4";
+  const marginPreset: PrintMarginPreset = ctx.marginPreset ?? "standard";
+  const pagePresetInfo = pagePreset(pageSize);
   const density: PrintDensity = ctx.density ?? "standard";
   const editorMode: PrintMode = ctx.editorMode ?? "light";
   const showBleedGuides: boolean = !!ctx.showBleedGuides;
   const bleedFraction = Math.max(
     0,
-    Math.min(0.06, bleedIn / (pageSize === "A4" ? 8.27 : pageSize === "Letter" ? 8.5 : 8.5)),
+    Math.min(0.06, bleedIn / pagePresetInfo.widthIn),
   );
-  const canvasAspect =
-    pageSize === "A4" ? "1 / 1.414" : pageSize === "Letter" ? "8.5 / 11" : "1 / 1";
+  const canvasAspect = pageAspectRatio(pageSize);
   // Aurora orb frame in the shared 1280×720 native space. Portrait / square
   // page sizes re-project the aurora composition onto a taller / square
   // frame so orbs bleed in from the correct edges (issue: with default
   // slice-preserved 16:9 aurora, a portrait page cropped out the horizontal
   // spread and looked flat). Landscape stays at native 1280×720.
-  const auroraAspect: { w: number; h: number } | undefined =
-    pageSize === "A4"
-      ? { w: Math.round((1280 * 8.2677) / 11.6929), h: 1280 }
-      : pageSize === "Letter"
-        ? { w: Math.round((1280 * 8.5) / 11), h: 1280 }
-        : pageSize === "Square"
-          ? { w: 1280, h: 1280 }
-          : undefined;
+  const auroraAspect: { w: number; h: number } | undefined = pageAuroraFrame(pageSize);
 
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
@@ -1001,6 +995,8 @@ function AssetEditor() {
                         <option value="A4">A4 (210 × 297 mm)</option>
                         <option value="Letter">US Letter (8.5 × 11 in)</option>
                         <option value="Square">Square (8.5 × 8.5 in)</option>
+                        <option value="HalfLetter">Half-sheet US (5.5 × 8.5 in)</option>
+                        <option value="A5">Half-sheet A5 (148 × 210 mm)</option>
                         <option value="Custom">Custom…</option>
                       </select>
                     </label>
@@ -1728,11 +1724,41 @@ function AssetEditor() {
                     onChange={(e) => patchCtx({ pageSize: e.target.value as PrintPageSize })}
                     className={inspectorInput}
                   >
-                    <option value="A4">A4</option>
-                    <option value="Letter">US Letter</option>
-                    <option value="Square">Square</option>
+                    {PRINT_PAGE_SIZE_ORDER.map((key) => {
+                      const preset = pagePreset(key);
+                      return (
+                        <option key={key} value={key}>
+                          {preset.label} · {preset.dims}
+                        </option>
+                      );
+                    })}
                   </select>
                 </Row>
+                <Row label="Margins">
+                  <select
+                    aria-label="Margin preset"
+                    value={marginPreset}
+                    onChange={(e) =>
+                      patchCtx({ marginPreset: e.target.value as PrintMarginPreset })
+                    }
+                    className={inspectorInput}
+                    title={PRINT_MARGIN_PRESETS[marginPreset].note}
+                  >
+                    {(
+                      Object.keys(PRINT_MARGIN_PRESETS) as Array<
+                        keyof typeof PRINT_MARGIN_PRESETS
+                      >
+                    ).map((key) => (
+                      <option key={key} value={key}>
+                        {PRINT_MARGIN_PRESETS[key].label}
+                      </option>
+                    ))}
+                  </select>
+                </Row>
+                <div className="px-1 pb-1 text-[10px] leading-snug text-black/45 dark:text-white/45">
+                  {pagePresetInfo.label} · {marginSideIn.toFixed(2)}in side margin ·{" "}
+                  {pagePresetInfo.heroBandPct}% masthead band
+                </div>
                 <Row label="Density">
                   <select
                     aria-label="Density"
