@@ -88,10 +88,30 @@ type QueryResult = { data: unknown; error: { message: string } | null };
 interface QueryBuilder extends PromiseLike<QueryResult> {
   upsert: (row: Record<string, unknown>) => QueryBuilder;
   insert: (rows: unknown) => QueryBuilder;
+  select: (cols: string) => QueryBuilder;
   delete: () => QueryBuilder;
   eq: (col: string, val: unknown) => QueryBuilder;
 }
 type MinimalSb = { from: (t: string) => QueryBuilder };
+
+/**
+ * Resolve a foreign-key reference: returns the id only when a row with that id
+ * actually exists, otherwise null. Locally-authored decks legitimately carry
+ * synthetic ids (agent runs, open-canvas, single-module previews) or an empty
+ * string, and those must not abort the whole save with an FK violation.
+ */
+async function existingRefId(
+  sb: MinimalSb,
+  table: string,
+  id: unknown,
+): Promise<string | null> {
+  const raw = typeof id === "string" ? id.trim() : "";
+  if (!raw) return null;
+  const { data, error } = await sb.from(table).select("id").eq("id", raw);
+  if (error) return null;
+  return Array.isArray(data) && data.length > 0 ? raw : null;
+}
+
 
 /** Upsert a brief + deck + its slides. Owner-scoped through RLS. */
 export async function saveDeckToCloudCore(
@@ -104,6 +124,24 @@ export async function saveDeckToCloudCore(
   const briefUuid = toUuid(`brief:${userId}:${data.brief.id}`);
   const deckUuid = toUuid(`deck:${userId}:${data.deck.id}`);
 
+  // Reference columns are FK-checked in the database; unknown/synthetic ids are
+  // stored as NULL rather than failing the whole save.
+  const briefBrandMode = await existingRefId(
+    sb,
+    "brand_modes",
+    data.brief.brandModeId,
+  );
+  const deckBrandMode = await existingRefId(
+    sb,
+    "brand_modes",
+    data.deck.brandModeId,
+  );
+  const deckArchetype = await existingRefId(
+    sb,
+    "narrative_archetypes",
+    data.deck.archetypeId,
+  );
+
   const { error: briefErr } = await sb.from("briefs").upsert({
     id: briefUuid,
     owner_id: userId,
@@ -112,7 +150,7 @@ export async function saveDeckToCloudCore(
     industry: data.brief.industry,
     meeting_objective: data.brief.meetingObjective,
     audience: data.brief.audience,
-    brand_mode_id: data.brief.brandModeId,
+    brand_mode_id: briefBrandMode,
     sub_company: data.brief.subCompany,
     length_target: data.brief.lengthTarget,
     known_facts: data.brief.clientFacts,
@@ -129,8 +167,9 @@ export async function saveDeckToCloudCore(
     owner_id: userId,
     brief_id: briefUuid,
     title: data.deck.title,
-    archetype_id: data.deck.archetypeId,
-    brand_mode_id: data.deck.brandModeId,
+    archetype_id: deckArchetype,
+    brand_mode_id: deckBrandMode,
+
     status: "draft",
     context: deckContext,
     is_template: data.deck.isTemplate ?? false,

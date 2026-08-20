@@ -132,7 +132,10 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
             serialized: JSON.stringify({ d: deck, b: brief }),
           }
         : null);
-    if (!p) return true;
+    if (!p) {
+      console.warn("[autosave] flush skipped — no deck/brief", { deckId });
+      return true;
+    }
     pending.current = null;
     if (timer.current) clearTimeout(timer.current);
     try {
@@ -141,10 +144,11 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
       markDeckSaved(deckId, deckSignature(p.deck, p.brief));
       markCloudLinked(deckId, true);
       return true;
-    } catch {
-      // best effort — the next edit retries
+    } catch (e) {
+      console.warn("[autosave] save failed", e);
       return false;
     }
+
   };
 
   // Expose the flush so the navigation guard can save on exit instead of
