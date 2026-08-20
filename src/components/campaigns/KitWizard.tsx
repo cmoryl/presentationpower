@@ -147,6 +147,13 @@ export function KitWizard({
 
   const [zoomed, setZoomed] = useState<string | null>(null);
 
+  // Optional module layout from the visual section library. When set, every
+  // asset renders through the module frame instead of the default composition.
+  const [moduleLayoutId, setModuleLayoutId] = useState<string | null>(null);
+  const [modulePickerOpen, setModulePickerOpen] = useState(false);
+  const moduleLayout = moduleLayoutId ? findSocialModuleLayout(moduleLayoutId) : undefined;
+
+
 
 
 
