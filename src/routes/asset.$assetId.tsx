@@ -879,6 +879,32 @@ function AssetEditor() {
     }
   }
 
+  // Same pages, PowerPoint container: one slide per print page at trim size.
+  async function handleExportPptx() {
+    if (!canvasRef.current) return;
+    setExportBusy(true);
+    try {
+      const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
+      const pageNodes = Array.from(
+        canvasRef.current.querySelectorAll<HTMLElement>("[data-print-page]"),
+      );
+      const { exportPrintPagesAsPptx } = await import("@/lib/print-pptx-export");
+      await exportPrintPagesAsPptx(pageNodes.length ? pageNodes : [canvasRef.current], {
+        pageSize: exportSize,
+        custom: exportSize === "Custom" ? { widthIn: customW, heightIn: customH } : undefined,
+        mode: exportMode,
+        title: row?.title ?? "Print asset",
+        filename: `${safeTitle}.pptx`,
+      });
+      setExportOpen(false);
+    } catch (e) {
+      alert(`Export failed: ${(e as Error).message}`);
+    } finally {
+      setExportBusy(false);
+    }
+  }
+
+
   // Multi-page proposals render every page stacked inside the canvas, so the
   // canvas cannot be pinned to a single page aspect ratio.
   const multiDoc =
