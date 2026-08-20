@@ -234,7 +234,7 @@ export function PrintFooterLockup({
           <BrandLockup
             brand={enterpriseBrand}
             color={enterpriseLogoInk}
-            size="2xs"
+            size="xs"
             orientation="horizontal"
             monochromeOfficialLogo
           />
@@ -248,7 +248,7 @@ export function PrintFooterLockup({
             <BrandLockup
               brand={brand}
               color={enterpriseLogoInk}
-              size="2xs"
+              size="xs"
               orientation="horizontal"
               monochromeOfficialLogo
             />
