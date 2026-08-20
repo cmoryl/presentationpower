@@ -100,6 +100,7 @@ import { PrintIconPicker } from "@/components/print/PrintIconPicker";
 import { createPortal } from "react-dom";
 import { PrintIconEditContext } from "@/components/print/PrintIconEdit";
 import { PrintImageEditContext } from "@/components/print/PrintImageEdit";
+import { PrintLogoListContext } from "@/components/print/PrintLogoList";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
 import { effectiveAssetIconTreatment, usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { IconAccentContrastWarning } from "@/components/print/IconAccentContrastWarning";
@@ -1330,6 +1331,9 @@ function AssetEditor() {
                           busy: imageBusy,
                         }}
                       >
+                      <PrintLogoListContext.Provider
+                        value={{ active: true, onChange: (path, next) => patchByPath(path, next) }}
+                      >
                       <LiveEditOverlay
                         enabled={true}
                         slideId={`asset-${row.id}-${kind}`}
@@ -1461,6 +1465,7 @@ function AssetEditor() {
                           </>
                         )}
                       </LiveEditOverlay>
+                      </PrintLogoListContext.Provider>
                       </PrintImageEditContext.Provider>
                       <PrintOverflowOverlay
                         state={overflow}

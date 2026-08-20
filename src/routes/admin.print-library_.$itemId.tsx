@@ -23,6 +23,9 @@ import { ArrowLeft, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { PrintKindPreview } from "@/components/print/PrintKindPreview";
+import { PrintImageEditContext } from "@/components/print/PrintImageEdit";
+import { PrintLogoListContext } from "@/components/print/PrintLogoList";
+import { uploadSlideMedia } from "@/lib/slide-media";
 import { MultiPageThumbRail } from "@/components/print/MultiPageThumbRail";
 import { isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { contentWritePath } from "@/components/print/ContentInspector";
@@ -133,6 +136,7 @@ function MasterItemEditorPage() {
 
   const savedKey = saved ? JSON.stringify({ saved, hidden: override?.hidden ?? false }) : "";
   const [draft, setDraft] = useState<Draft | null>(null);
+  const [imageBusy, setImageBusy] = useState(false);
   useEffect(() => {
     setDraft(saved ? draftFrom(saved, override?.hidden ?? false) : null);
     // savedKey captures every field the draft mirrors.
@@ -281,6 +285,28 @@ function MasterItemEditorPage() {
       return { ...base, content: { ...(base.content ?? {}), ...p } };
     });
 
+  // Replaceable pictures (logo walls, maps, headshots) inside the master preview.
+  const imageOverrides = ((draft.content as { imageOverrides?: Record<string, string> } | undefined)
+    ?.imageOverrides ?? {}) as Record<string, string>;
+  const setImageOverride = (slot: string, url: string | null) => {
+    const next = { ...imageOverrides };
+    if (url) next[slot] = url;
+    else delete next[slot];
+    patchContent({ imageOverrides: next });
+  };
+  const onDropImage = async (slot: string, file: File) => {
+    setImageBusy(true);
+    try {
+      const { signedUrl } = await uploadSlideMedia(file, file.name);
+      setImageOverride(slot, signedUrl);
+    } catch (err) {
+      console.error("Image upload failed", err);
+      toast.error("Could not upload that image");
+    } finally {
+      setImageBusy(false);
+    }
+  };
+
   return (
     <div className="pb-24">
       <header className="flex flex-wrap items-end justify-between gap-3">
@@ -396,15 +422,29 @@ function MasterItemEditorPage() {
                         editableFields={textPaths}
                         onChange={(path, value) => patchPath(path, value)}
                       >
-                        <PrintKindPreview
-                          kind={saved.kind}
-                          content={draft.content}
-                          brand={brand}
-                          mode={previewMode}
-                          pageSize={draft.look.pageSize ?? "Letter"}
-                          density={draft.look.density ?? "standard"}
-                          {...(multiPage ? { pageIndex: activePage } : {})}
-                        />
+                        <PrintImageEditContext.Provider
+                          value={{
+                            active: true,
+                            overrides: imageOverrides,
+                            onDropFile: onDropImage,
+                            onClear: (slot) => setImageOverride(slot, null),
+                            busy: imageBusy,
+                          }}
+                        >
+                          <PrintLogoListContext.Provider
+                            value={{ active: true, onChange: (path, next) => patchPath(path, next) }}
+                          >
+                            <PrintKindPreview
+                              kind={saved.kind}
+                              content={draft.content}
+                              brand={brand}
+                              mode={previewMode}
+                              pageSize={draft.look.pageSize ?? "Letter"}
+                              density={draft.look.density ?? "standard"}
+                              {...(multiPage ? { pageIndex: activePage } : {})}
+                            />
+                          </PrintLogoListContext.Provider>
+                        </PrintImageEditContext.Provider>
                       </LiveEditOverlay>
                     </PrintDocModeProvider>
                   </PrintContentFitFrame>
