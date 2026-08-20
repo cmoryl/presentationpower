@@ -346,6 +346,8 @@ export function ProposalWorldMap({
       ) : null}
 
 
+      {/* Zoom is an authoring aid only — never shown on a read-only page. */}
+      {editable ? (
       <div
         data-export-ignore="true"
         style={{
