@@ -31,6 +31,95 @@ const SLACK = 1.5;
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
+// ---------------------------------------------------------------------------
+// DEBUG INSTRUMENTATION (opt-in, zero cost when off)
+// Enable with `?debugAutofit=1`, `localStorage.debugAutofit = "1"`, or
+// `window.__ELEMENT_DEBUG_AUTOFIT = true`. Logs one line per measurement pass
+// with the authored size, the measured natural box, the allowance and the
+// resulting shrink factor — plus a warning when the same node re-fits many
+// times in a short window, which is the signature of a feedback loop.
+// ---------------------------------------------------------------------------
+
+type AutoFitDebugWindow = Window & { __ELEMENT_DEBUG_AUTOFIT?: boolean };
+
+let debugFlag: boolean | null = null;
+function autofitDebugEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  const w = window as AutoFitDebugWindow;
+  if (w.__ELEMENT_DEBUG_AUTOFIT) return true;
+  if (debugFlag !== null) return debugFlag;
+  let on = false;
+  try {
+    on =
+      new URLSearchParams(window.location.search).get("debugAutofit") === "1" ||
+      window.localStorage.getItem("debugAutofit") === "1";
+  } catch {
+    on = false;
+  }
+  debugFlag = on;
+  return on;
+}
+
+/** Rolling pass counter per node, used to spot re-fit storms. */
+const passLog = new WeakMap<Element, { count: number; since: number; last: number }>();
+/** More than this many passes within the window means something is oscillating. */
+const LOOP_PASS_LIMIT = 12;
+const LOOP_WINDOW_MS = 1000;
+
+type FitTrace = {
+  label: string;
+  authoredPx: number;
+  measuredPx: number;
+  allowedPx: number;
+  measuredWidth: number;
+  availableWidth: number;
+  maxLines: number;
+  steps: number;
+  ratio: number;
+  prevRatio: number;
+  breakWords: boolean;
+};
+
+function logFitPass(node: Element, t: FitTrace) {
+  if (!autofitDebugEnabled()) return;
+  const now = performance.now();
+  const rec = passLog.get(node) ?? { count: 0, since: now, last: now };
+  if (now - rec.since > LOOP_WINDOW_MS) {
+    rec.count = 0;
+    rec.since = now;
+  }
+  rec.count += 1;
+  rec.last = now;
+  passLog.set(node, rec);
+
+  const changed = Math.abs(rec.count && t.ratio - t.prevRatio) > 0.0005;
+  const tag = `[autofit] ${t.label}`;
+  const detail = {
+    authoredPx: t.authoredPx,
+    appliedPx: Number((t.authoredPx * t.ratio).toFixed(2)),
+    shrink: Number(t.ratio.toFixed(3)),
+    prevShrink: Number(t.prevRatio.toFixed(3)),
+    measuredH: Math.round(t.measuredPx),
+    allowedH: Math.round(t.allowedPx),
+    measuredW: Math.round(t.measuredWidth),
+    availableW: Math.round(t.availableWidth),
+    maxLines: t.maxLines,
+    ladderSteps: t.steps,
+    breakWords: t.breakWords,
+    pass: rec.count,
+    changed,
+  };
+
+  if (rec.count > LOOP_PASS_LIMIT) {
+    console.warn(
+      `${tag} possible feedback loop: ${rec.count} measurement passes in ${Math.round(now - rec.since)}ms`,
+      detail,
+    );
+    return;
+  }
+  console.debug(tag, detail);
+}
+
 type Props = {
   /** Rendering element — `h2` for titles, `p` for summaries. */
   as?: ElementType;
