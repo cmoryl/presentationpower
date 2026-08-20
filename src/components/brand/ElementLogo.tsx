@@ -115,6 +115,9 @@ export type ElementLockupLayout = "stacked" | "horizontal" | "wordmark";
  * Full lockup: master ("TRANSPERFECT") over the ELEMENT wordmark with the
  * "MODULAR DESIGN SYSTEM" descriptor. Stacked leads with the mark; horizontal
  * uses a hairline divider; wordmark drops the mark entirely.
+ *
+ * When `image` is true, the official raster lockup is used instead of the
+ * constructed SVG. This is the preferred form for the main navigation.
  */
 export function ElementLockup({
   layout = "horizontal",
@@ -122,13 +125,28 @@ export function ElementLockup({
   className = "",
   markSize = 34,
   showDescriptor = true,
+  image = false,
 }: {
   layout?: ElementLockupLayout;
   tone?: ElementTone;
   className?: string;
   markSize?: number;
   showDescriptor?: boolean;
+  image?: boolean;
 }) {
+  if (image) {
+    const height = layout === "stacked" ? markSize * 1.35 : markSize * 0.85;
+    return (
+      <img
+        src={elementLogoAsset.url}
+        alt="TransPerfect Element"
+        height={height}
+        className={`h-auto w-auto max-w-full object-contain ${className}`}
+        style={{ height }}
+      />
+    );
+  }
+
   const tone = useResolvedElementTone(toneProp);
   const ink = tone === "reversed" ? "text-white" : "";
   const Words = (
@@ -169,3 +187,4 @@ export function ElementLockup({
     </div>
   );
 }
+
