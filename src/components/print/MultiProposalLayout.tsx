@@ -753,10 +753,11 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
 // ---------------------------------------------------------------------------
 
 const REGION_COLS: Record<string, { headX: number; headY: number; cols: number[]; colY: number; colW: number }> = {
-  AMERICAS: { headX: 0.56, headY: 8.44, cols: [0.56, 1.13, 1.72, 2.3, 3.18], colY: 8.73, colW: 0.62 },
-  EMEA: { headX: 4.23, headY: 8.55, cols: [4.23, 4.76, 5.39], colY: 8.84, colW: 0.58 },
-  APAC: { headX: 6.35, headY: 8.58, cols: [6.36, 6.98, 7.52], colY: 8.88, colW: 0.62 },
+  AMERICAS: { headX: 0.56, headY: 8.92, cols: [0.56, 1.13, 1.72, 2.3, 3.18], colY: 9.18, colW: 0.62 },
+  EMEA: { headX: 4.23, headY: 9.02, cols: [4.23, 4.76, 5.39], colY: 9.26, colW: 0.58 },
+  APAC: { headX: 6.35, headY: 9.05, cols: [6.36, 6.98, 7.52], colY: 9.3, colW: 0.62 },
 };
+
 
 function LocationsPage({ page }: { page: MultiProposalPage }) {
   const title = lines(page.title).length ? lines(page.title) : ["Global", "Locations"];
@@ -776,17 +777,18 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
         {title.join("\n")}
       </T>
 
-      <Img x={-0.06} y={2.89} w={8.44} h={4.64} src={PROPOSAL_ART.worldMap} alt="World map" slot="locations.map" label="map" />
+      <Img x={-0.2} y={2.72} w={8.9} h={4.96} src={PROPOSAL_ART.worldMap} alt="World map" slot="locations.map" label="map" />
 
       {/* Legend */}
-      <L x={0.56} y={7.56} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
-      <T x={0.68} y={7.5} w={1.4} size={7.2} weight={700} leading={1.25} upper>
+      <L x={0.56} y={7.9} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
+      <T x={0.68} y={7.84} w={1.4} size={7.2} weight={700} leading={1.25} upper>
         {"Client\nService"}
       </T>
-      <L x={0.56} y={7.86} w={0.058} h={0.058} style={{ background: PROPOSAL_TEAL, borderRadius: 999 }} />
-      <T x={0.68} y={7.8} w={1.6} size={7.2} weight={700} color={PROPOSAL_TEAL} leading={1.25} upper>
+      <L x={0.56} y={8.2} w={0.058} h={0.058} style={{ background: PROPOSAL_TEAL, borderRadius: 999 }} />
+      <T x={0.68} y={8.14} w={1.6} size={7.2} weight={700} color={PROPOSAL_TEAL} leading={1.25} upper>
         {"Client Service\n& Production"}
       </T>
+
 
       {PROPOSAL_REGIONS.map((region) => {
         const spec = REGION_COLS[region.region];
