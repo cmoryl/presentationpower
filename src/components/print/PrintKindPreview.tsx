@@ -45,8 +45,14 @@ export function PrintKindPreview({
     return <EBrochureLayout content={content as EBrochureContent} {...shared} />;
   if (kind === "msa-partnership")
     return <MsaPartnershipLayout content={content as MsaPartnershipContent} {...shared} />;
-  if (kind === "solution-proposal")
-    return <SolutionProposalLayout content={content as SolutionProposalContent} {...shared} />;
+  if (kind === "solution-proposal") {
+    const proposal = content as SolutionProposalContent;
+    // Multi-page masters carry a `pages` array — render the stacked document
+    // instead of collapsing them into the single-page layout.
+    if (isMultiProposal(proposal))
+      return <MultiProposalLayout content={proposal} {...shared} />;
+    return <SolutionProposalLayout content={proposal} {...shared} />;
+  }
   if (kind === "adaptor-brief")
     return <AdaptorBriefLayout content={content as AdaptorBriefContent} {...shared} />;
   if (kind === "case-study")
