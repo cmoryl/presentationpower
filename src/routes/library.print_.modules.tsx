@@ -84,17 +84,6 @@ function PrintModuleLibraryPage() {
   const coverage = useMemo(() => printModuleExampleCoverage(), []);
 
   const { overrides } = useModuleOverrides("print");
-  const { templates } = usePrintPageTemplates();
-  const [shelf, setShelf] = useState<"modules" | "templates">("modules");
-
-  const visibleTemplates = useMemo(
-    () =>
-      templates
-        .filter((t) => !t.hidden)
-        .filter((t) => kind === "all" || t.kind === kind)
-        .filter((t) => pageTemplateMatches(t, query)),
-    [templates, kind, query],
-  );
 
   const modules = useMemo(
     () =>
