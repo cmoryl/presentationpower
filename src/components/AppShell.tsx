@@ -254,7 +254,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <ElementLockup
               layout="horizontal"
               tone="auto"
-              markSize={72}
+              markSize={88}
               image
               className="min-w-0 text-[#03002C] dark:text-white"
             />
