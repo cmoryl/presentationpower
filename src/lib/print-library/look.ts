@@ -21,9 +21,9 @@ export type PrintLibraryLook = {
 };
 
 const MODES: PrintMode[] = ["light", "dark"];
-const SIZES: PrintPageSize[] = ["Letter", "A4", "Square", "HalfLetter", "A5"] as PrintPageSize[];
+const SIZES: PrintPageSize[] = ["Letter", "A4", "Square", "HalfLetter", "A5"];
 const MARGINS = ["tight", "standard", "wide"] as const;
-const DENSITIES = ["compact", "standard", "roomy"] as const;
+const DENSITIES = ["compact", "standard", "airy"] as const;
 
 const hex = (v: unknown): string | undefined =>
   typeof v === "string" && /^#[0-9a-fA-F]{3,8}$/.test(v.trim()) ? v.trim() : undefined;
