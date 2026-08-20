@@ -21,6 +21,8 @@ function matchesAdminLinked(pathname: string): boolean {
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const locSearch = useRouterState({ select: (s) => s.location.searchStr });
+
   const [theme, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
   const [presOpen, setPresOpen] = useState(false);
@@ -75,17 +77,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   const elementGroups: ReadonlyArray<{
     label: string;
     to: string;
-    items: ReadonlyArray<{ to: string; label: string }>;
+    items: ReadonlyArray<{ to: string; label: string; search?: Record<string, string> }>;
   }> = [
     {
       label: "Presentation",
       to: "/library",
       items: [
-        { to: "/library", label: "Modules" },
-        { to: "/agent", label: "Agent" },
-        { to: "/admin/canvas", label: "Canvas creator" },
-        { to: "/decks", label: "Decks" },
+        { to: "/library", label: "Slide modules" },
+        { to: "/library/my", label: "My decks" },
+        { to: "/decks", label: "All decks" },
         { to: "/library/imported", label: "Imported decks" },
+        { to: "/agent", label: "Deck agent" },
+        { to: "/admin/canvas", label: "Canvas creator" },
       ],
     },
     {
@@ -93,6 +96,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       to: "/library/print",
       items: [
         { to: "/library/print", label: "Print templates" },
+        { to: "/library/print", label: "Case studies", search: { type: "case-study" } },
+        { to: "/library/print", label: "Client spotlights", search: { type: "spotlight" } },
+        { to: "/library/print", label: "E-brochures", search: { type: "ebrochure" } },
         { to: "/library/print/modules", label: "Section modules" },
         { to: "/library/print/heroes", label: "Hero openers" },
       ],
@@ -105,6 +111,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/events/new", label: "New event asset" },
         { to: "/events/presets", label: "Presets" },
         { to: "/events/next", label: "Next-gen builder" },
+        { to: "/events/next/badges", label: "Badges" },
       ],
     },
     {
@@ -118,6 +125,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       ],
     },
   ];
+
 
 
   const adminGroups: ReadonlyArray<{
@@ -284,14 +292,27 @@ export function AppShell({ children }: { children: ReactNode }) {
                               </Link>
                               <div className="flex flex-col gap-0.5">
                                 {g.items.map((s) => {
-                                  const active =
-                                    s.to === "/library" || s.to === "/library/print"
-                                      ? pathname === s.to
-                                      : pathname === s.to || pathname.startsWith(s.to + "/");
+                                  const params = new URLSearchParams(locSearch || "");
+                                  const searchMatches = s.search
+                                    ? Object.entries(s.search).every(
+                                        ([k, v]) => params.get(k) === v,
+                                      )
+                                    : ["type", "sub", "collection"].every((k) => !params.get(k));
+                                  const exact =
+                                    s.to === "/library" ||
+                                    s.to === "/library/print" ||
+                                    s.to === "/events" ||
+                                    s.to === "/social" ||
+                                    s.to === "/decks";
+                                  const pathMatches = exact
+                                    ? pathname === s.to
+                                    : pathname === s.to || pathname.startsWith(s.to + "/");
+                                  const active = pathMatches && searchMatches;
                                   return (
                                     <Link
-                                      key={s.to}
+                                      key={`${s.to}:${s.label}`}
                                       to={s.to}
+                                      search={s.search ?? {}}
                                       className={`block rounded-lg px-2.5 py-1.5 text-[13px] leading-tight transition ${
                                         active
                                           ? "bg-white/80 text-[#03002C] dark:!bg-white/10 dark:!text-white"
@@ -302,6 +323,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                                       {s.label}
                                     </Link>
                                   );
+
                                 })}
                               </div>
                             </div>
