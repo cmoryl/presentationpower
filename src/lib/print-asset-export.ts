@@ -289,11 +289,15 @@ export async function exportPrintAssetAsPdf(
       restoreHide = enableHideTextForCapture(pageNode);
     }
     try {
-      const pngDataUrl = await captureSlideAsDataUrl(pageNode, {
-        mode: opts.mode ?? "light",
-        targetWidth: resolved.widthPx,
-        onProgress: opts.onProgress,
-      });
+      // Authoring affordances (hero edit badge, guides, resize rails) live in
+      // the same DOM we rasterize — suppress them for the capture only.
+      const pngDataUrl = await withExportChrome(() =>
+        captureSlideAsDataUrl(pageNode, {
+          mode: opts.mode ?? "light",
+          targetWidth: resolved.widthPx,
+          onProgress: opts.onProgress,
+        }),
+      );
       if (isDigital) {
         const jpegDataUrl = await pngDataUrlToJpeg(
           pngDataUrl,
