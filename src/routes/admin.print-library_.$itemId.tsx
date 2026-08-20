@@ -16,7 +16,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
 
@@ -67,6 +67,10 @@ import {
   type PrintFitKnobs,
 } from "@/lib/print-content-fit";
 import type { PrintFitAuditInput, PrintFitFix, PrintFitMeasurement } from "@/lib/print-fit-audit";
+import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
+import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
+import { usePrintOverflow } from "@/hooks/use-print-overflow";
+import { weightForSection } from "@/lib/print-capacity";
 
 export const Route = createFileRoute("/admin/print-library_/$itemId")({
   head: () => ({ meta: [{ title: "Print library master editor · Admin" }] }),
