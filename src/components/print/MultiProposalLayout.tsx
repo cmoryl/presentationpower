@@ -41,8 +41,11 @@ import {
   AddLogoButton,
   LogoSlotChrome,
   logoEntryId,
+  usePrintLogoList,
   type PrintLogoEntry,
 } from "./PrintLogoList";
+import { ProposalWorldMap, defaultWorldMapPins } from "./ProposalWorldMap";
+import type { WorldMapPin } from "@/lib/print-library/world-map-vector";
 
 // ---------------------------------------------------------------------------
 // Source-deck constants
