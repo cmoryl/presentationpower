@@ -29,6 +29,36 @@ export function defaultWorldMapPins(): WorldMapPin[] {
   return WORLD_MAP_PINS;
 }
 
+/**
+ * Export-safe pin zone.
+ *
+ * Two things clip pins in PDF/PPTX output: the map frame itself (a dot dropped
+ * at the very edge is cut in half by the layout box) and the translucent
+ * "Global Locations" title plate, which overlaps the top of the map box. Both
+ * are expressed here in map user units and enforced on every add and drag, so a
+ * pin can never land somewhere it won't survive export.
+ */
+const PIN_INSET = 6; // keeps the whole dot (r ~2.6) inside the frame
+const TITLE_BAND = { x0: 133, x1: 613, y1: 156 };
+
+export function clampPinPoint(x: number, y: number) {
+  let nx = Math.min(
+    WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w - PIN_INSET,
+    Math.max(WORLD_MAP_VIEW.x + PIN_INSET, x),
+  );
+  let ny = Math.min(
+    WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h - PIN_INSET,
+    Math.max(WORLD_MAP_VIEW.y + PIN_INSET, y),
+  );
+  if (nx >= TITLE_BAND.x0 && nx <= TITLE_BAND.x1 && ny < TITLE_BAND.y1) {
+    ny = TITLE_BAND.y1;
+  }
+  nx = Math.round(nx * 10) / 10;
+  ny = Math.round(ny * 10) / 10;
+  return { x: nx, y: ny };
+}
+
+
 export function ProposalWorldMap({
   pins,
   editable = false,
