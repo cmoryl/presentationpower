@@ -34,6 +34,8 @@ import type {
   PrintDensity,
   PrintExportPrefs,
   PrintHeroMedia,
+  PrintHeroRule,
+  PrintHeroTitleType,
   PrintMode,
   PrintPageSize,
 } from "@/lib/print-assets.types";
@@ -84,7 +86,10 @@ import {
   PRINT_CONTACT_VARIANTS,
 } from "@/components/print/sections/PrintSectionRenderer";
 import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
-import { HeroRuleTypeControls } from "@/components/print/sections/hero/HeroRuleTypeControls";
+import {
+  HeroRuleTypeControls,
+  MastheadRuleTypeControls,
+} from "@/components/print/sections/hero/HeroRuleTypeControls";
 import {
   PrintSectionPicker,
   PRINT_SECTION_DND_MIME,
@@ -1986,6 +1991,21 @@ function AssetEditor() {
                 hasSummary={!!(content as { summary?: string }).summary?.trim()}
                 modules={(content as { modules?: PrintSection[] }).modules}
               />
+
+              {/* Page masthead — the legacy full-page openers read the exact same
+                  rule + title-type contract as the modular hero sections. */}
+              <Panel title="Page masthead">
+                <MastheadRuleTypeControls
+                  rule={(content as { heroRule?: PrintHeroRule }).heroRule}
+                  titleType={(content as { heroTitleType?: PrintHeroTitleType }).heroTitleType}
+                  onChange={(next) =>
+                    patchContent({
+                      ...("rule" in next ? { heroRule: next.rule } : null),
+                      ...("titleType" in next ? { heroTitleType: next.titleType } : null),
+                    } as never)
+                  }
+                />
+              </Panel>
 
               {/* Content input panels live under the document — see below. */}
             </div>

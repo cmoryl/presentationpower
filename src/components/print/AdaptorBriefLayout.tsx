@@ -7,6 +7,16 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import {
+  heroStyleOf,
+  heroHairline,
+  heroRuleGap,
+  heroRuleTop,
+  heroSummaryFontPx,
+  heroSummaryStyle,
+  heroTitleFontPx,
+  heroTitleStyle,
+} from "@/components/print/sections/hero/hero-style";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
@@ -83,16 +93,20 @@ export function AdaptorBriefLayout({
 
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
+  // Shared masthead contract (see hero-style): authored sizes pin the ladder.
+  const heroStyle = heroStyleOf(content);
+  const titlePx = heroTitleFontPx(heroStyle, 37);
+  const summaryPx = heroSummaryFontPx(heroStyle, 12.5);
   useTextFit(heroRef, content.title, {
-    min: 26,
-    max: 37,
+    min: Math.min(26, titlePx),
+    max: titlePx,
     base: 45,
     cap: 90,
     containerWidth: PAGE_W,
   });
   useTextFit(introRef, content.summary ?? "", {
-    min: 10.5,
-    max: 12.5,
+    min: Math.min(10.5, summaryPx),
+    max: summaryPx,
     base: 140,
     cap: 230,
     containerWidth: PAGE_W,
@@ -181,16 +195,23 @@ export function AdaptorBriefLayout({
                 }}
               >
                 <div
+                  style={{
+                    ...heroRuleTop(heroStyle, accent, 0),
+                    marginBottom: content.heroRule?.weight ? heroRuleGap(heroStyle, 12) : undefined,
+                  }}
+                />
+                <div
                   ref={heroRef}
                   style={{
                     position: "relative",
                     margin: 0,
                     fontWeight: 700,
-                    fontSize: cq(37),
+                    fontSize: cq(titlePx),
                     lineHeight: 1.12,
                     letterSpacing: "-0.015em",
                     color: heroInk,
                     maxWidth: cq(480),
+                    ...heroTitleStyle(heroStyle),
                   }}
                 >
                   {content.title || "Untitled adaptor brief"}
@@ -201,15 +222,22 @@ export function AdaptorBriefLayout({
                     style={{
                       position: "relative",
                       margin: `${cq(14)} 0 0`,
-                      fontSize: cq(12.5),
+                      fontSize: cq(summaryPx),
                       lineHeight: 1.6,
                       color: heroSubInk,
                       maxWidth: cq(380),
+                      ...heroSummaryStyle(heroStyle),
                     }}
                   >
                     {content.summary}
                   </p>
                 )}
+                <div
+                  style={{
+                    ...heroHairline(heroStyle, { hairline: dividerCol }, false),
+                    marginTop: cq(14),
+                  }}
+                />
               </div>
             </div>
 

@@ -7,6 +7,16 @@ import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import {
+  heroStyleOf,
+  heroHairline,
+  heroRuleGap,
+  heroRuleTop,
+  heroSummaryFontPx,
+  heroSummaryStyle,
+  heroTitleFontPx,
+  heroTitleStyle,
+} from "@/components/print/sections/hero/hero-style";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
@@ -86,16 +96,20 @@ export function SpotlightLayout({
   // Refs for text-fit — reproduce the template's data-fit ranges exactly.
   const heroRef = useRef<HTMLHeadingElement | null>(null);
   const introRef = useRef<HTMLParagraphElement | null>(null);
+  // Shared masthead contract (see hero-style): authored sizes pin the ladder.
+  const heroStyle = heroStyleOf(content);
+  const titlePx = heroTitleFontPx(heroStyle, 33);
+  const summaryPx = heroSummaryFontPx(heroStyle, 11.5);
   useTextFit(heroRef, content.productName, {
-    min: 25,
-    max: 33,
+    min: Math.min(25, titlePx),
+    max: titlePx,
     base: 50,
     cap: 95,
     containerWidth: PAGE_W,
   });
   useTextFit(introRef, content.tagline ?? content.summary ?? "", {
-    min: 10,
-    max: 11.5,
+    min: Math.min(10, summaryPx),
+    max: summaryPx,
     base: 150,
     cap: 250,
     containerWidth: PAGE_W,
@@ -197,14 +211,23 @@ export function SpotlightLayout({
                   }}
                 >
                   <div
+                    style={{
+                      ...heroRuleTop(heroStyle, accent, 0),
+                      marginBottom: content.heroRule?.weight
+                        ? heroRuleGap(heroStyle, 12)
+                        : undefined,
+                    }}
+                  />
+                  <div
                     ref={heroRef}
                     style={{
                       margin: 0,
                       fontWeight: 700,
-                      fontSize: cq(33),
+                      fontSize: cq(titlePx),
                       lineHeight: 1.14,
                       letterSpacing: "-0.015em",
                       color: ink,
+                      ...heroTitleStyle(heroStyle),
                     }}
                   >
                     {content.productName || "Untitled spotlight"}
@@ -228,15 +251,22 @@ export function SpotlightLayout({
                       ref={introRef}
                       style={{
                         margin: `${cq(12)} 0 0`,
-                        fontSize: cq(11.5),
+                        fontSize: cq(summaryPx),
                         lineHeight: 1.65,
                         color: inkSoft,
                         maxWidth: cq(320),
+                        ...heroSummaryStyle(heroStyle),
                       }}
                     >
                       {content.summary}
                     </p>
                   )}
+                  <div
+                    style={{
+                      ...heroHairline(heroStyle, { hairline: dividerCol }, false),
+                      marginTop: cq(14),
+                    }}
+                  />
                 </div>
               </div>
 

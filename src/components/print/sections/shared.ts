@@ -5,7 +5,11 @@
 import type { CSSProperties } from "react";
 
 export const PRINT_PAGE_W = 816;
-export const cq = (px: number) => `${((px * 100) / PRINT_PAGE_W).toFixed(3)}cqw`;
+/** Same unit the page layouts use (print-primitives.cq): px against the 816pt
+ *  page, multiplied by `--print-fit-scale` so modular sections shrink with the
+ *  rest of the document under content-fit relief instead of overflowing. */
+export const cq = (px: number) =>
+  `calc(${((px * 100) / PRINT_PAGE_W).toFixed(3)}cqw * var(--print-fit-scale, 1))`;
 
 export function sectionInk(mode: "light" | "dark") {
   return {

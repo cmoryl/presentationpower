@@ -10,6 +10,16 @@ import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { AutoFitText } from "./HeroAutoFit";
 import { usePrintPage } from "@/components/print/print-page-context";
+import {
+  heroEyebrowStyle,
+  heroHairline,
+  heroRuleGap,
+  heroRuleTop,
+  heroSummaryFontPx,
+  heroSummaryStyle,
+  heroTitleFontPx,
+  heroTitleStyle,
+} from "./hero-style";
 
 /**
  * Masthead band height in template px, resolved against the *current page
@@ -26,67 +36,8 @@ function useBandHeight(heightPct: number | undefined, share: number): string {
 // ---- Authorable masthead rule + title typography --------------------------
 // `section.rule` and `section.titleType` let a document match an existing print
 // system: rule thickness/air/colour, and the title block's size, weight,
-// tracking, leading and case. Everything falls back to the built-in scale, so
-// untouched sections render exactly as before.
-
-/** Top masthead rule. `def` is the variant's own default thickness in px. */
-function heroRuleTop(section: PrintHeroSection, accent: string, def: number) {
-  const w = section.rule?.weight ?? def;
-  const color = section.rule?.color ?? accent;
-  return w <= 0 ? { borderTop: "none" as const } : { borderTop: `${cq(w)} solid ${color}` };
-}
-
-/** Air under the rule before the title block. */
-function heroRuleGap(section: PrintHeroSection, def: number): string {
-  return cq(section.rule?.gap ?? def);
-}
-
-/** Closing hairline under the title block. */
-function heroHairline(section: PrintHeroSection, ink: { hairline: string }, shownByDefault = true) {
-  const shown = section.rule?.hairline ?? shownByDefault;
-  if (!shown) return { borderBottom: "none" as const };
-  return { borderBottom: `1px solid ${section.rule?.hairlineColor ?? ink.hairline}` };
-}
-
-const emTrack = (thousandths: number) => `${(thousandths / 1000).toFixed(3)}em`;
-
-function heroTitleStyle(section: PrintHeroSection) {
-  const t = section.titleType;
-  if (!t) return {};
-  return {
-    ...(t.titleWeight ? { fontWeight: t.titleWeight } : null),
-    ...(t.titleTracking !== undefined ? { letterSpacing: emTrack(t.titleTracking) } : null),
-    ...(t.titleLeading ? { lineHeight: t.titleLeading / 100 } : null),
-    ...(t.titleCase === "upper" ? { textTransform: "uppercase" as const } : null),
-  };
-}
-
-/** Authored size for the title block, honouring the inspector override. */
-function heroTitleFontPx(section: PrintHeroSection, def: number): number {
-  return section.titleType?.titlePx ?? def;
-}
-
-/** Authored size for the summary, honouring the inspector override. */
-function heroSummaryFontPx(section: PrintHeroSection, def: number): number {
-  return section.titleType?.summaryPx ?? def;
-}
-
-function heroSummaryStyle(section: PrintHeroSection) {
-  const t = section.titleType;
-  if (!t) return {};
-  return {
-    ...(t.summaryLeading ? { lineHeight: t.summaryLeading / 100 } : null),
-  };
-}
-
-function heroEyebrowStyle(section: PrintHeroSection) {
-  const t = section.titleType;
-  if (!t) return {};
-  return {
-    ...(t.eyebrowPx ? { fontSize: cq(t.eyebrowPx) } : null),
-    ...(t.eyebrowTracking !== undefined ? { letterSpacing: emTrack(t.eyebrowTracking) } : null),
-  };
-}
+// tracking, leading and case. The resolvers live in ./hero-style so the legacy
+// full-page openers share the exact same contract.
 
 type Props = {
   section: PrintHeroSection;
@@ -666,6 +617,15 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
             flexDirection: "column",
           }}
         >
+          {/* Masthead rule sits inside the fade seam, over the title block, so
+              the fade opener answers the same rule controls as every other
+              opener. Off by default — the fade itself is the divider. */}
+          <div
+            style={{
+              ...heroRuleTop(section, accent, 0),
+              marginBottom: section.rule?.weight ? heroRuleGap(section, 12) : undefined,
+            }}
+          />
           {section.eyebrow && (
             <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
               {section.eyebrow}
@@ -705,6 +665,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
             </AutoFitText>
           )}
           <MetaRail section={section} mode={mode} accent={accent} />
+          <div style={{ ...heroHairline(section, ink, false), marginTop: cq(14) }} />
         </div>
       </div>
     </section>
@@ -772,7 +733,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
         {q?.text && (
           <div
             style={{
-              borderLeft: `${cq(3)} solid ${accent}`,
+              borderLeft: `${cq(3)} solid ${section.rule?.color ?? accent}`,
               paddingLeft: cq(18),
               paddingTop: cq(2),
             }}
@@ -797,13 +758,21 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
                 margin: `${cq(10)} 0 0`,
                 lineHeight: 1.6,
                 color: ink.strong,
+                ...heroSummaryStyle(section),
               }}
             >
               {q.text}
             </AutoFitText>
             {q.role && <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>}
             {q.author && (
-              <div style={{ marginTop: cq(2), fontWeight: 700, color: ink.strong }}>
+              <div
+                style={{
+                  marginTop: cq(2),
+                  fontSize: cq(heroSummaryFontPx(section, 11)),
+                  fontWeight: 700,
+                  color: ink.strong,
+                }}
+              >
                 — {q.author}
                 {q.company ? ` · ${q.company}` : ""}
               </div>
@@ -811,6 +780,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
           </div>
         )}
       </div>
+      <div style={{ ...heroHairline(section, ink, false), marginTop: cq(18) }} />
     </section>
   );
 }

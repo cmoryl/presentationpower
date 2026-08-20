@@ -613,7 +613,7 @@ export function enumerateLeafPaths(v: unknown, prefix = ""): string[] {
 export function unreachablePaths(
   schema: ContentSchema,
   content: Record<string, unknown>,
-  ignore: string[] = ["heroMedia", "modules"],
+  ignore: string[] = ["heroMedia", "heroRule", "heroTitleType", "modules"],
 ): string[] {
   const match = fieldMatcherFromSchema(schema);
   const leaves = enumerateLeafPaths(content);
