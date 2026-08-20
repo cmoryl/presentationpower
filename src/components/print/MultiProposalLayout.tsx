@@ -99,29 +99,30 @@ type Tokens = {
 /** Page chrome recipes ported from the source template's visual language. */
 type ChromeSpec = {
   /** Page field behind everything. */
-  field: "white" | "band" | "brand" | "navy" | "wash";
+  field: "white" | "band" | "brand" | "navy" | "wash" | "art";
   /** Body sits on a floating white plate. */
   plate: boolean;
   /** Header treatment. */
-  header: "band" | "hero" | "bubble" | "card" | "none";
+  header: "band" | "hero" | "bubble" | "card" | "cover" | "statement" | "none";
   /** Body renders on a dark field. */
   onDark: boolean;
 };
 
 const CHROME: Record<MultiProposalPage["kind"], ChromeSpec> = {
-  cover: { field: "wash", plate: true, header: "card", onDark: false },
-  stats: { field: "navy", plate: false, header: "bubble", onDark: true },
+  cover: { field: "art", plate: false, header: "cover", onDark: true },
+  stats: { field: "art", plate: false, header: "bubble", onDark: true },
   scope: { field: "band", plate: true, header: "band", onDark: false },
   cost: { field: "band", plate: true, header: "band", onDark: false },
-  locations: { field: "brand", plate: false, header: "card", onDark: true },
-  clients: { field: "white", plate: true, header: "hero", onDark: false },
+  locations: { field: "art", plate: false, header: "card", onDark: true },
+  clients: { field: "white", plate: false, header: "hero", onDark: false },
   "success-stories": { field: "band", plate: true, header: "band", onDark: false },
-  why: { field: "band", plate: true, header: "band", onDark: false },
-  advocates: { field: "band", plate: true, header: "band", onDark: false },
-  "team-grid": { field: "band", plate: true, header: "band", onDark: false },
+  why: { field: "art", plate: false, header: "statement", onDark: true },
+  advocates: { field: "art", plate: false, header: "statement", onDark: true },
+  "team-grid": { field: "white", plate: false, header: "hero", onDark: false },
   "team-bio": { field: "band", plate: true, header: "band", onDark: false },
-  summary: { field: "brand", plate: true, header: "band", onDark: false },
+  summary: { field: "art", plate: false, header: "statement", onDark: true },
 };
+
 
 function brandGradient(primary: string, accent: string): string {
   return `linear-gradient(115deg, ${primary} 0%, ${primary} 18%, ${accent} 100%)`;
