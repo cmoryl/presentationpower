@@ -35,10 +35,7 @@ function templateFor(item: PrintLibraryItem): PrintPageTemplate | null {
   if (sections.length === 0) return null;
 
   const ctx = editableContextFor(item);
-  const layout: PrintPageTemplateLayout = {
-    contentShell: shellOf(content),
-    ...(item.divisionId ? {} : {}),
-  };
+  const layout: PrintPageTemplateLayout = { contentShell: shellOf(content) };
 
   let typeLabel = item.kind as string;
   try {
