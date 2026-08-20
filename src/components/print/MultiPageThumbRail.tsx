@@ -5,7 +5,7 @@
 // through the real layout at a tiny width — the layouts are container-query
 // based, so they scale down faithfully with no separate preview code path.
 
-import { MultiProposalLayout, pageNavLabel } from "@/components/print/MultiProposalLayout";
+import { MultiProposalLayout, multiPageLabel } from "@/components/print/MultiProposalLayout";
 import type { SolutionProposalContent } from "@/lib/print-assets.types";
 import type { BrandMode } from "@/lib/taxonomy";
 
@@ -44,7 +44,7 @@ export function MultiPageThumbRail({
                 type="button"
                 onClick={() => onSelect(i)}
                 aria-current={on ? "page" : undefined}
-                title={pageNavLabel(page, i)}
+                title={multiPageLabel(page, i)}
                 className="group block w-full text-left focus:outline-none"
               >
                 <div
@@ -69,7 +69,7 @@ export function MultiPageThumbRail({
                   className="mt-1 block truncate text-[10px] font-medium"
                   style={{ color: on ? "#003FC7" : "rgba(3,0,44,0.6)" }}
                 >
-                  {i + 1}. {pageNavLabel(page, i)}
+                  {i + 1}. {multiPageLabel(page, i)}
                 </span>
               </button>
             </li>

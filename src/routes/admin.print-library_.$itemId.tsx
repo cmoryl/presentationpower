@@ -23,6 +23,8 @@ import { ArrowLeft, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { PrintKindPreview } from "@/components/print/PrintKindPreview";
+import { MultiPageThumbRail } from "@/components/print/MultiPageThumbRail";
+import { isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { contentWritePath } from "@/components/print/ContentInspector";
 import { enumerateLeafPaths } from "@/lib/print-content-schema";
 import { useTaxonomy } from "@/hooks/use-taxonomy";
@@ -43,6 +45,7 @@ import {
   saveModuleOverride,
 } from "@/lib/module-overrides.functions";
 import type {
+  SolutionProposalContent,
   PrintDensity,
   PrintHeroMedia,
   PrintHeroRule,
@@ -251,6 +254,12 @@ function MasterItemEditorPage() {
   };
 
   const previewMode = draft.look.mode ?? mode;
+  // Multi-page documents (solution proposals) edit one page at a time so the
+  // inspector on the right stays visible next to the page you are editing.
+  const multiContent = draft.content as SolutionProposalContent | undefined;
+  const multiPage = !!multiContent && isMultiProposal(multiContent);
+  const pageCount = multiPage ? (multiContent?.pages?.length ?? 0) : 0;
+  const activePage = multiPage ? Math.min(proposalPage, Math.max(0, pageCount - 1)) : 0;
   // Restart fitting whenever content or page geometry moves.
   const fitDep = {
     content: draft.content ?? null,
@@ -393,6 +402,7 @@ function MasterItemEditorPage() {
                           mode={previewMode}
                           pageSize={draft.look.pageSize ?? "Letter"}
                           density={draft.look.density ?? "standard"}
+                          {...(multiPage ? { pageIndex: activePage } : {})}
                         />
                       </LiveEditOverlay>
                     </PrintDocModeProvider>
@@ -468,11 +478,20 @@ function MasterItemEditorPage() {
             </>
           ) : null}
 
+          {multiPage && multiContent ? (
+            <MultiPageThumbRail
+              content={multiContent}
+              brand={brand}
+              mode={previewMode === "dark" ? "dark" : "light"}
+              active={activePage}
+              onSelect={setProposalPage}
+            />
+          ) : null}
         </section>
 
 
         {/* ------------------------- Inspector ------------------------- */}
-        <aside className="space-y-4">
+        <aside className="space-y-4 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:self-start xl:overflow-y-auto xl:pr-1">
           <Panel title="Identity">
             <Field label="Title">
               <input

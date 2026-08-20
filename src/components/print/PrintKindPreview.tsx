@@ -30,6 +30,7 @@ export function PrintKindPreview({
   mode = "light",
   pageSize = "Letter",
   density = "standard",
+  pageIndex,
 }: {
   kind: PrintAssetKind;
   content: unknown;
@@ -37,6 +38,8 @@ export function PrintKindPreview({
   mode?: PrintMode;
   pageSize?: PrintPageSize;
   density?: PrintDensity;
+  /** Multi-page documents: render only this page (page-at-a-time editing). */
+  pageIndex?: number;
 }) {
   const shared = { brand, mode, pageSize, density } as const;
   if (!content) return null;
@@ -51,7 +54,13 @@ export function PrintKindPreview({
     // Multi-page masters carry a `pages` array — render the stacked document
     // instead of collapsing them into the single-page layout.
     if (isMultiProposal(proposal))
-      return <MultiProposalLayout content={proposal} {...shared} />;
+      return (
+        <MultiProposalLayout
+          content={proposal}
+          {...shared}
+          {...(typeof pageIndex === "number" ? { pageIndex } : {})}
+        />
+      );
     return <SolutionProposalLayout content={proposal} {...shared} />;
   }
   if (kind === "adaptor-brief")
