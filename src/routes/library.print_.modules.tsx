@@ -221,13 +221,10 @@ function PrintModuleLibraryPage() {
         />
       ) : null}
 
-      <div className="mt-5 flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Library shelf">
-        <FilterPill active={shelf === "modules"} onClick={() => setShelf("modules")}>
+      <div className="mt-5 flex flex-wrap items-center gap-1.5">
+        <span className="text-xs font-medium text-black/55">
           Section modules ({PRINT_MODULE_COUNT})
-        </FilterPill>
-        <FilterPill active={shelf === "templates"} onClick={() => setShelf("templates")}>
-          Page templates ({visibleTemplates.length})
-        </FilterPill>
+        </span>
         <Link
           to="/library/print/heroes"
           className="ml-auto rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
@@ -236,40 +233,28 @@ function PrintModuleLibraryPage() {
         </Link>
       </div>
 
-      {shelf === "templates" ? (
-        <div className="mb-20 mt-5">
-          <p className="mb-4 max-w-2xl text-xs leading-[1.55] text-black/55">
-            Page templates are whole section stacks captured from real print pieces — layout,
-            typography, and copy structure included. Use one to start a new, fully editable piece.
-          </p>
-          <PageTemplateShelf templates={visibleTemplates} mode={mode} />
-        </div>
-      ) : (
-        <>
-          <p className="mt-3 text-xs text-black/45">
-            {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
-            backed by {coverage.examples} sections extracted from real uploaded print collateral
-          </p>
+      <p className="mt-3 text-xs text-black/45">
+        {modules.length} of {PRINT_MODULE_COUNT} modules shown · {coverage.variants} modules are
+        backed by {coverage.examples} sections extracted from real uploaded print collateral
+      </p>
 
-          <div className="mx-auto mb-20 mt-4 grid max-w-[920px] grid-cols-1 items-start gap-8">
-            {modules.map((m) => (
-              <ModuleCard
-                key={m.id}
-                module={m}
-                mode={mode}
-                useReal={useReal}
-                icons={showIcons}
-                iconStyle={iconStyle}
-              />
-            ))}
-            {modules.length === 0 ? (
-              <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
-                No modules match those filters.
-              </p>
-            ) : null}
-          </div>
-        </>
-      )}
+      <div className="mx-auto mb-20 mt-4 grid max-w-[920px] grid-cols-1 items-start gap-8">
+        {modules.map((m) => (
+          <ModuleCard
+            key={m.id}
+            module={m}
+            mode={mode}
+            useReal={useReal}
+            icons={showIcons}
+            iconStyle={iconStyle}
+          />
+        ))}
+        {modules.length === 0 ? (
+          <p className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-black/55">
+            No modules match those filters.
+          </p>
+        ) : null}
+      </div>
     </AppShell>
   );
 }
