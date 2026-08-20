@@ -228,13 +228,19 @@ function PrintModuleLibraryPage() {
         />
       ) : null}
 
-      <div className="mt-5 flex flex-wrap gap-1.5" role="tablist" aria-label="Library shelf">
+      <div className="mt-5 flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Library shelf">
         <FilterPill active={shelf === "modules"} onClick={() => setShelf("modules")}>
           Section modules ({PRINT_MODULE_COUNT})
         </FilterPill>
         <FilterPill active={shelf === "templates"} onClick={() => setShelf("templates")}>
           Page templates ({visibleTemplates.length})
         </FilterPill>
+        <Link
+          to="/library/print/heroes"
+          className="ml-auto rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs font-medium text-[#03002C] hover:border-[#003FC7] hover:text-[#003FC7]"
+        >
+          Hero gallery →
+        </Link>
       </div>
 
       {shelf === "templates" ? (
