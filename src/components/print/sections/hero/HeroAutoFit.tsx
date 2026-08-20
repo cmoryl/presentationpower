@@ -226,7 +226,6 @@ export function AutoFitText({
           breakWords: wrap,
         });
 
-
         node.style.fontSize = probe.fontSize;
         node.style.overflowWrap = probe.overflowWrap;
         node.style.display = probe.display;
