@@ -29,6 +29,36 @@ export function defaultWorldMapPins(): WorldMapPin[] {
   return WORLD_MAP_PINS;
 }
 
+/**
+ * Export-safe pin zone.
+ *
+ * Two things clip pins in PDF/PPTX output: the map frame itself (a dot dropped
+ * at the very edge is cut in half by the layout box) and the translucent
+ * "Global Locations" title plate, which overlaps the top of the map box. Both
+ * are expressed here in map user units and enforced on every add and drag, so a
+ * pin can never land somewhere it won't survive export.
+ */
+const PIN_INSET = 6; // keeps the whole dot (r ~2.6) inside the frame
+const TITLE_BAND = { x0: 133, x1: 613, y1: 156 };
+
+export function clampPinPoint(x: number, y: number) {
+  let nx = Math.min(
+    WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w - PIN_INSET,
+    Math.max(WORLD_MAP_VIEW.x + PIN_INSET, x),
+  );
+  let ny = Math.min(
+    WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h - PIN_INSET,
+    Math.max(WORLD_MAP_VIEW.y + PIN_INSET, y),
+  );
+  if (nx >= TITLE_BAND.x0 && nx <= TITLE_BAND.x1 && ny < TITLE_BAND.y1) {
+    ny = TITLE_BAND.y1;
+  }
+  nx = Math.round(nx * 10) / 10;
+  ny = Math.round(ny * 10) / 10;
+  return { x: nx, y: ny };
+}
+
+
 export function ProposalWorldMap({
   pins,
   editable = false,
@@ -133,11 +163,12 @@ export function ProposalWorldMap({
   const toMapPoint = (clientX: number, clientY: number) => {
     const rect = svgRef.current?.getBoundingClientRect();
     if (!rect?.width || !rect.height) return null;
-    return {
-      x: Math.round((view.x + ((clientX - rect.left) / rect.width) * view.w) * 10) / 10,
-      y: Math.round((view.y + ((clientY - rect.top) / rect.height) * view.h) * 10) / 10,
-    };
+    return clampPinPoint(
+      view.x + ((clientX - rect.left) / rect.width) * view.w,
+      view.y + ((clientY - rect.top) / rect.height) * view.h,
+    );
   };
+
 
   const startPinDrag = (index: number) => (event: React.PointerEvent<SVGCircleElement>) => {
     if (!editable || !onChange) return;
@@ -196,20 +227,19 @@ export function ProposalWorldMap({
       return;
     }
 
-    const rect = event.currentTarget.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const x = view.x + ((event.clientX - rect.left) / rect.width) * view.w;
-    const y = view.y + ((event.clientY - rect.top) / rect.height) * view.h;
+    const point = toMapPoint(event.clientX, event.clientY);
+    if (!point) return;
     commit([
       ...list,
       {
         id: `pin-${Date.now().toString(36)}`,
-        x: Math.round(x * 10) / 10,
-        y: Math.round(y * 10) / 10,
+        x: point.x,
+        y: point.y,
         r: 2.6,
         kind,
       },
     ]);
+
   };
 
   return (
@@ -236,6 +266,31 @@ export function ProposalWorldMap({
         {WORLD_MAP_LAND.map((path, i) => (
           <path key={`land-${i}`} d={path.d} fill="#FFFFFF" opacity={path.opacity} />
         ))}
+        {/* Authoring-only guide: the export-safe pin zone (frame inset + the
+            area hidden behind the page title plate). Never captured. */}
+        {editable && onChange ? (
+          <g data-export-ignore="true" fill="none" stroke="#A1FBF9" strokeDasharray="3 3">
+            <rect
+              x={WORLD_MAP_VIEW.x + PIN_INSET}
+              y={WORLD_MAP_VIEW.y + PIN_INSET}
+              width={WORLD_MAP_VIEW.w - PIN_INSET * 2}
+              height={WORLD_MAP_VIEW.h - PIN_INSET * 2}
+              strokeWidth={0.6}
+              opacity={activePin !== null ? 0.5 : 0.22}
+            />
+            <rect
+              x={TITLE_BAND.x0}
+              y={WORLD_MAP_VIEW.y}
+              width={TITLE_BAND.x1 - TITLE_BAND.x0}
+              height={TITLE_BAND.y1 - WORLD_MAP_VIEW.y}
+              strokeWidth={0.6}
+              fill="#03002C"
+              fillOpacity={activePin !== null ? 0.28 : 0.14}
+              opacity={activePin !== null ? 0.5 : 0.22}
+            />
+          </g>
+        ) : null}
+
         {list.map((pin, i) => (
           <circle
             key={pin.id ?? `pin-${i}`}
