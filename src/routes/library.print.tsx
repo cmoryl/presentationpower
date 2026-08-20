@@ -565,16 +565,28 @@ function renderPrintByKind(
         density="standard"
       />
     );
-  if (kind === "solution-proposal")
+  if (kind === "solution-proposal") {
+    const proposal = (content as SolutionProposalContent) ?? PROPOSAL_SEED;
+    if (isMultiProposal(proposal))
+      return (
+        <MultiProposalLayout
+          content={proposal}
+          brand={brand}
+          mode={mode}
+          pageSize="Letter"
+          density="standard"
+        />
+      );
     return (
       <SolutionProposalLayout
-        content={(content as SolutionProposalContent) ?? PROPOSAL_SEED}
+        content={proposal}
         brand={brand}
         mode={mode}
         pageSize="Letter"
         density="standard"
       />
     );
+  }
   if (kind === "adaptor-brief")
     return (
       <AdaptorBriefLayout
