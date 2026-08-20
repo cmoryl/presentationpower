@@ -173,10 +173,8 @@ function PrintModulePdfHarness() {
             }}
             className="relative overflow-hidden"
           >
-            <PrintDocModeProvider
-              value={{ doc: true, icons: search.icons === 1, iconStyle }}
-            >
-              <PrintSectionRenderer section={section} />
+            <PrintDocModeProvider icons={search.icons === 1} iconStyle={iconStyle}>
+              <PrintSectionRenderer section={section} mode={search.mode} accent={search.accent} />
             </PrintDocModeProvider>
             <div
               // Authoring label — must never appear in the exported PDF; the
