@@ -617,6 +617,15 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
             flexDirection: "column",
           }}
         >
+          {/* Masthead rule sits inside the fade seam, over the title block, so
+              the fade opener answers the same rule controls as every other
+              opener. Off by default — the fade itself is the divider. */}
+          <div
+            style={{
+              ...heroRuleTop(section, accent, 0),
+              marginBottom: section.rule?.weight ? heroRuleGap(section, 12) : undefined,
+            }}
+          />
           {section.eyebrow && (
             <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>
               {section.eyebrow}
@@ -656,6 +665,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
             </AutoFitText>
           )}
           <MetaRail section={section} mode={mode} accent={accent} />
+          <div style={{ ...heroHairline(section, ink, false), marginTop: cq(14) }} />
         </div>
       </div>
     </section>
@@ -723,7 +733,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
         {q?.text && (
           <div
             style={{
-              borderLeft: `${cq(3)} solid ${accent}`,
+              borderLeft: `${cq(3)} solid ${section.rule?.color ?? accent}`,
               paddingLeft: cq(18),
               paddingTop: cq(2),
             }}
@@ -748,13 +758,21 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
                 margin: `${cq(10)} 0 0`,
                 lineHeight: 1.6,
                 color: ink.strong,
+                ...heroSummaryStyle(section),
               }}
             >
               {q.text}
             </AutoFitText>
             {q.role && <div style={{ ...EYEBROW(accent, 9), marginTop: cq(14) }}>{q.role}</div>}
             {q.author && (
-              <div style={{ marginTop: cq(2), fontWeight: 700, color: ink.strong }}>
+              <div
+                style={{
+                  marginTop: cq(2),
+                  fontSize: cq(heroSummaryFontPx(section, 11)),
+                  fontWeight: 700,
+                  color: ink.strong,
+                }}
+              >
                 — {q.author}
                 {q.company ? ` · ${q.company}` : ""}
               </div>
@@ -762,6 +780,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
           </div>
         )}
       </div>
+      <div style={{ ...heroHairline(section, ink, false), marginTop: cq(18) }} />
     </section>
   );
 }
