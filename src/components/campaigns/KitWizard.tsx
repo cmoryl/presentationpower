@@ -1019,7 +1019,19 @@ export function KitWizard({
                       <div data-kit-asset-id={asset.id} className="min-w-0">
                         <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
                           {(displayShortEdge) =>
-                            nextDesign ? (
+                            moduleLayout && !nextDesign ? (
+                              <SocialModuleFrame
+                                format={asset.format}
+                                section={buildSocialModuleSection({
+                                  layout: moduleLayout,
+                                  copy: asset.copy,
+                                  relief: reliefAt(0),
+                                })}
+                                brandId={asset.brandId}
+                                mode={asset.mode === "light" ? "light" : "dark"}
+                                displayShortEdge={displayShortEdge}
+                              />
+                            ) : nextDesign ? (
                               <NextRenderer
                                 format={asset.format}
                                 trackId={nextTrackId}
