@@ -246,7 +246,6 @@ function Img({
   );
 }
 
-
 function lines(value: string | undefined): string[] {
   return (value ?? "")
     .split("\n")
@@ -280,7 +279,16 @@ function BandHeader({ title, logo }: { title: string; logo: string }) {
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={2.95} style={{ background: BRIGHT_FIELD }} />
-      <Img x={6.38} y={0.47} w={1.88} h={0.28} src={logo} alt="TransPerfect" slot="band.logo" label="logo" />
+      <Img
+        x={6.38}
+        y={0.47}
+        w={1.88}
+        h={0.28}
+        src={logo}
+        alt="TransPerfect"
+        slot="band.logo"
+        label="logo"
+      />
       <T x={0.47} y={0.86} w={6} size={39.7} weight={700} leading={1.05} tracking="-0.02em">
         {title}
       </T>
@@ -305,15 +313,7 @@ function Plate({
   bg?: string;
   border?: string;
 }) {
-  return (
-    <L
-      x={x}
-      y={y}
-      w={w}
-      h={h}
-      style={{ background: bg, borderRadius: u(radius), border }}
-    />
-  );
+  return <L x={x} y={y} w={w} h={h} style={{ background: bg, borderRadius: u(radius), border }} />;
 }
 
 /**
@@ -341,7 +341,9 @@ function ClientLogoSlot({
   const ctx = usePrintImageEdit();
   const url = ctx?.overrides?.[slot];
   if (url) {
-    return <Img x={x} y={y} w={w} h={h} src={url} alt="Client logo" slot={slot} label="client logo" />;
+    return (
+      <Img x={x} y={y} w={w} h={h} src={url} alt="Client logo" slot={slot} label="client logo" />
+    );
   }
   if (!ctx?.active) {
     return (
@@ -408,7 +410,16 @@ function CoverPage({ page, logoDark }: { page: MultiProposalPage; logoDark: stri
       <T x={0.4} y={0.9} w={7.72} size={17} weight={400} color={BLUE} align="center" leading={1.3}>
         {page.eyebrow || "Transforming Global Performance"}
       </T>
-      <Img x={1.84} y={1.34} w={4.9} h={0.62} src={logoDark} alt="TransPerfect" slot="cover.logo" label="logo" />
+      <Img
+        x={1.84}
+        y={1.34}
+        w={4.9}
+        h={0.62}
+        src={logoDark}
+        alt="TransPerfect"
+        slot="cover.logo"
+        label="logo"
+      />
       <T
         x={0.4}
         y={2.24}
@@ -430,7 +441,6 @@ function CoverPage({ page, logoDark }: { page: MultiProposalPage; logoDark: stri
         placeholder={page.subtitle || "[insert client logo here]"}
       />
 
-
       <L
         x={2.28}
         y={4.53}
@@ -450,8 +460,18 @@ function CoverPage({ page, logoDark }: { page: MultiProposalPage; logoDark: stri
       <T x={4.59} y={5.32} w={2.4} size={14} weight={700} color={NAVY}>
         {byBlock?.title || "PREPARED BY:"}
       </T>
-      <T x={1.84} y={5.79} w={2.33} size={14} weight={400} color={NAVY} align="right" leading={1.55}>
-        {forBlock?.body || "Client Contact\nTitle\nCompany Name\nAddress One\nCity, Zip\nClient Email"}
+      <T
+        x={1.84}
+        y={5.79}
+        w={2.33}
+        size={14}
+        weight={400}
+        color={NAVY}
+        align="right"
+        leading={1.55}
+      >
+        {forBlock?.body ||
+          "Client Contact\nTitle\nCompany Name\nAddress One\nCity, Zip\nClient Email"}
       </T>
       <T x={4.59} y={5.79} w={2.4} size={14} weight={400} color={NAVY} leading={1.55}>
         {byBlock?.body || "Contact\nTitle\nTransPerfect\nAddress One\nCity, Zip\nYour Email"}
@@ -475,17 +495,87 @@ const STAT_SLOTS: Array<{
   value: string;
   label: string;
 }> = [
-  { vx: 0.66, vy: 5.6, vSize: 66.2, lx: 0.68, ly: 6.78, lw: 2.8, lSize: 15.5, value: "$1.3B", label: "IN GLOBAL REVENUE" },
-  { vx: 0.66, vy: 7.36, vSize: 44.1, lx: 1.53, ly: 7.42, lw: 2.0, lSize: 13.6, value: "34", label: "CONSECUTIVE\nYEARS OF GROWTH" },
-  { vx: 0.66, vy: 8.55, vSize: 21.7, lx: 2.3, ly: 8.6, lw: 1.4, lSize: 16.5, value: "24/7/365", label: "SERVICE" },
-  { vx: 3.9, vy: 5.5, vSize: 36.6, lx: 5.24, ly: 5.66, lw: 3.1, lSize: 16.5, value: "150+", label: "CITIES WORLDWIDE" },
-  { vx: 3.9, vy: 6.46, vSize: 36.6, lx: 5.14, ly: 6.62, lw: 3.2, lSize: 16.5, value: "90%", label: "OF THE FORTUNE 500" },
-  { vx: 3.9, vy: 7.45, vSize: 36.6, lx: 6.06, ly: 7.61, lw: 2.3, lSize: 16.5, value: "10,000+", label: "TEAM MEMBERS" },
-  { vx: 3.9, vy: 8.43, vSize: 30, lx: 4.95, ly: 8.55, lw: 3.4, lSize: 16.5, value: "200+", label: "LANGUAGES SUPPORTED" },
+  {
+    vx: 0.66,
+    vy: 5.6,
+    vSize: 66.2,
+    lx: 0.68,
+    ly: 6.78,
+    lw: 2.8,
+    lSize: 15.5,
+    value: "$1.3B",
+    label: "IN GLOBAL REVENUE",
+  },
+  {
+    vx: 0.66,
+    vy: 7.36,
+    vSize: 44.1,
+    lx: 1.53,
+    ly: 7.42,
+    lw: 2.0,
+    lSize: 13.6,
+    value: "34",
+    label: "CONSECUTIVE\nYEARS OF GROWTH",
+  },
+  {
+    vx: 0.66,
+    vy: 8.55,
+    vSize: 21.7,
+    lx: 2.3,
+    ly: 8.6,
+    lw: 1.4,
+    lSize: 16.5,
+    value: "24/7/365",
+    label: "SERVICE",
+  },
+  {
+    vx: 3.9,
+    vy: 5.5,
+    vSize: 36.6,
+    lx: 5.24,
+    ly: 5.66,
+    lw: 3.1,
+    lSize: 16.5,
+    value: "150+",
+    label: "CITIES WORLDWIDE",
+  },
+  {
+    vx: 3.9,
+    vy: 6.46,
+    vSize: 36.6,
+    lx: 5.14,
+    ly: 6.62,
+    lw: 3.2,
+    lSize: 16.5,
+    value: "90%",
+    label: "OF THE FORTUNE 500",
+  },
+  {
+    vx: 3.9,
+    vy: 7.45,
+    vSize: 36.6,
+    lx: 6.06,
+    ly: 7.61,
+    lw: 2.3,
+    lSize: 16.5,
+    value: "10,000+",
+    label: "TEAM MEMBERS",
+  },
+  {
+    vx: 3.9,
+    vy: 8.43,
+    vSize: 30,
+    lx: 4.95,
+    ly: 8.55,
+    lw: 3.4,
+    lSize: 16.5,
+    value: "200+",
+    label: "LANGUAGES SUPPORTED",
+  },
 ];
 
 function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
-  const headline = lines(page.title) .length
+  const headline = lines(page.title).length
     ? lines(page.title)
     : ["Value.", "Intelligence.", "Performance.", "In any language."];
   const stats = page.stats ?? [];
@@ -573,7 +663,10 @@ function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
   const rows = page.cards?.length
     ? page.cards
     : [
-        { title: "WHAT'S INCLUDED", body: "Language Pre-Flight\nLocalization\nDesktop Publishing\nProject Management" },
+        {
+          title: "WHAT'S INCLUDED",
+          body: "Language Pre-Flight\nLocalization\nDesktop Publishing\nProject Management",
+        },
         { title: "SOURCE FILES", body: "1 PDF Document" },
         { title: "DELIVERABLES", body: "1 PDF Document\n1 Certificate" },
       ];
@@ -583,7 +676,10 @@ function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
   const colW = [3.18, 3.23];
   const timeline = page.bullets?.length
     ? page.bullets
-    : ["Project timeline is estimated at X business days.", "CLIENT has requested a rush X-day turnaround time."];
+    : [
+        "Project timeline is estimated at X business days.",
+        "CLIENT has requested a rush X-day turnaround time.",
+      ];
 
   let cursor = tableY;
 
@@ -635,7 +731,7 @@ function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
             </T>
             <T
               x={tableX + colW[0]! + 0.14}
-              y={y + h / 2 - (lines(row.body).length * 0.1)}
+              y={y + h / 2 - lines(row.body).length * 0.1}
               w={colW[1]! - 0.28}
               size={11}
               weight={400}
@@ -690,7 +786,17 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
           <T x={4.6} y={2.83} w={1.4} size={11} weight={700} color={NAVY} upper tracking="0.06em">
             Volume
           </T>
-          <T x={6.1} y={2.83} w={1.5} size={11} weight={700} color={NAVY} upper tracking="0.06em" align="right">
+          <T
+            x={6.1}
+            y={2.83}
+            w={1.5}
+            size={11}
+            weight={700}
+            color={NAVY}
+            upper
+            tracking="0.06em"
+            align="right"
+          >
             Investment
           </T>
           {rows.map((row, i) => {
@@ -756,12 +862,20 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
 // Page 5 — Global locations
 // ---------------------------------------------------------------------------
 
-const REGION_COLS: Record<string, { headX: number; headY: number; cols: number[]; colY: number; colW: number }> = {
-  AMERICAS: { headX: 0.56, headY: 8.92, cols: [0.56, 1.13, 1.72, 2.3, 3.18], colY: 9.18, colW: 0.62 },
+const REGION_COLS: Record<
+  string,
+  { headX: number; headY: number; cols: number[]; colY: number; colW: number }
+> = {
+  AMERICAS: {
+    headX: 0.56,
+    headY: 8.92,
+    cols: [0.56, 1.13, 1.72, 2.3, 3.18],
+    colY: 9.18,
+    colW: 0.62,
+  },
   EMEA: { headX: 4.23, headY: 9.02, cols: [4.23, 4.76, 5.39], colY: 9.26, colW: 0.58 },
   APAC: { headX: 6.35, headY: 9.05, cols: [6.36, 6.98, 7.52], colY: 9.3, colW: 0.62 },
 };
-
 
 function LocationsPage({ page }: { page: MultiProposalPage }) {
   const title = lines(page.title).length ? lines(page.title) : ["Global", "Locations"];
@@ -769,30 +883,61 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
 
-      <Plate
+      <Plate x={0.55} y={0.85} w={7.42} h={2.02} radius={0.16} bg="rgba(255,255,255,0.14)" />
+      <T
         x={0.55}
-        y={0.85}
+        y={1.24}
         w={7.42}
-        h={2.02}
-        radius={0.16}
-        bg="rgba(255,255,255,0.14)"
-      />
-      <T x={0.55} y={1.24} w={7.42} size={40} weight={700} align="center" leading={1.14} tracking="-0.02em">
+        size={40}
+        weight={700}
+        align="center"
+        leading={1.14}
+        tracking="-0.02em"
+      >
         {title.join("\n")}
       </T>
 
-      <Img x={-0.2} y={2.72} w={8.9} h={4.96} src={PROPOSAL_ART.worldMap} alt="World map" slot="locations.map" label="map" />
+      <Img
+        x={-0.2}
+        y={2.72}
+        w={8.9}
+        h={4.96}
+        src={PROPOSAL_ART.worldMap}
+        alt="World map"
+        slot="locations.map"
+        label="map"
+      />
 
       {/* Legend */}
-      <L x={0.56} y={7.9} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
+      <L
+        x={0.56}
+        y={7.9}
+        w={0.058}
+        h={0.058}
+        style={{ background: "#FFFFFF", borderRadius: 999 }}
+      />
       <T x={0.68} y={7.84} w={1.4} size={7.2} weight={700} leading={1.25} upper>
         {"Client\nService"}
       </T>
-      <L x={0.56} y={8.2} w={0.058} h={0.058} style={{ background: PROPOSAL_TEAL, borderRadius: 999 }} />
-      <T x={0.68} y={8.14} w={1.6} size={7.2} weight={700} color={PROPOSAL_TEAL} leading={1.25} upper>
+      <L
+        x={0.56}
+        y={8.2}
+        w={0.058}
+        h={0.058}
+        style={{ background: PROPOSAL_TEAL, borderRadius: 999 }}
+      />
+      <T
+        x={0.68}
+        y={8.14}
+        w={1.6}
+        size={7.2}
+        weight={700}
+        color={PROPOSAL_TEAL}
+        leading={1.25}
+        upper
+      >
         {"Client Service\n& Production"}
       </T>
-
 
       {PROPOSAL_REGIONS.map((region) => {
         const spec = REGION_COLS[region.region];
@@ -853,7 +998,16 @@ function ClientsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         {"\n"}
         <span style={{ color: BLUE }}>{title[1]}</span>
       </T>
-      <T x={0.43} y={3.94} w={7.59} size={13.5} weight={700} color={NAVY} align="center" leading={1.3}>
+      <T
+        x={0.43}
+        y={3.94}
+        w={7.59}
+        size={13.5}
+        weight={700}
+        color={NAVY}
+        align="center"
+        leading={1.3}
+      >
         {page.subtitle || "We're proud of the company we keep"}
       </T>
 
@@ -893,7 +1047,6 @@ function ClientsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
           </div>
         );
       })}
-
 
       <Img x={2.92} y={10.02} w={2.59} h={0.33} src={logoWhite} alt="TransPerfect" />
     </>
@@ -938,7 +1091,13 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
       {/* Connector rails (top card in, bottom card out) as in the source deck. */}
       <svg
         viewBox={`0 0 ${PAGE_W_IN} ${PAGE_H_IN}`}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+        }}
         aria-hidden
       >
         <g stroke="rgba(3,0,44,0.85)" strokeWidth={0.012} fill="rgba(3,0,44,0.85)">
@@ -952,7 +1111,13 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
       </svg>
 
       {/* Card 1 */}
-      <L x={0.64} y={1.89} w={7.38} h={4.36} style={{ border: cardBorder, borderRadius: u(0.34) }} />
+      <L
+        x={0.64}
+        y={1.89}
+        w={7.38}
+        h={4.36}
+        style={{ border: cardBorder, borderRadius: u(0.34) }}
+      />
       <Img
         x={0.27}
         y={2.42}
@@ -1019,7 +1184,16 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
           label="logo"
         />
       ) : (
-        <T x={1.07} y={6.62} w={3.44} size={26} weight={700} color={NAVY} align="right" tracking="-0.02em">
+        <T
+          x={1.07}
+          y={6.62}
+          w={3.44}
+          size={26}
+          weight={700}
+          color={NAVY}
+          align="right"
+          tracking="-0.02em"
+        >
           {second?.company || "Lavazza"}
         </T>
       )}
@@ -1031,7 +1205,9 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         {second?.text ? `"${second.text.replace(/^"|"$/g, "")}"` : ""}
       </T>
       <T x={1.07} y={9.34} w={3.44} size={10} color={NAVY} align="right">
-        {second ? `– ${[second.role || second.author, second.company].filter(Boolean).join(", ")}` : ""}
+        {second
+          ? `– ${[second.role || second.author, second.company].filter(Boolean).join(", ")}`
+          : ""}
       </T>
     </>
   );
@@ -1100,17 +1276,40 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
                 label="logo"
               />
             ) : (
-              <T x={x + 0.16} y={5.36} w={cardW - 0.32} size={15} weight={700} color={NAVY} tracking="-0.02em">
+              <T
+                x={x + 0.16}
+                y={5.36}
+                w={cardW - 0.32}
+                size={15}
+                weight={700}
+                color={NAVY}
+                tracking="-0.02em"
+              >
                 {q?.company || "Client"}
               </T>
             )}
             <Dots x={x + 0.16} y={5.94} color={BLUE} />
             {q?.headline ? (
-              <T x={x + 0.16} y={6.18} w={cardW - 0.32} size={9.5} weight={600} color={NAVY} leading={1.32}>
+              <T
+                x={x + 0.16}
+                y={6.18}
+                w={cardW - 0.32}
+                size={9.5}
+                weight={600}
+                color={NAVY}
+                leading={1.32}
+              >
                 {q.headline}
               </T>
             ) : null}
-            <T x={x + 0.16} y={7.02} w={cardW - 0.32} size={8.5} color="rgba(3,0,44,0.78)" leading={1.42}>
+            <T
+              x={x + 0.16}
+              y={7.02}
+              w={cardW - 0.32}
+              size={8.5}
+              color="rgba(3,0,44,0.78)"
+              leading={1.42}
+            >
               {storyQuote(q?.text)}
             </T>
             <T x={x + 0.16} y={9.16} w={cardW - 0.32} size={8.5} weight={600} color={NAVY}>
@@ -1154,7 +1353,16 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
       />
 
       {page.eyebrow ? (
-        <T x={0.62} y={4.78} w={6} size={10} weight={600} color={PROPOSAL_AQUA} upper tracking="0.16em">
+        <T
+          x={0.62}
+          y={4.78}
+          w={6}
+          size={10}
+          weight={600}
+          color={PROPOSAL_AQUA}
+          upper
+          tracking="0.16em"
+        >
           {page.eyebrow}
         </T>
       ) : null}
@@ -1197,10 +1405,25 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
             h={0.9}
             style={{ background: "rgba(255,255,255,0.08)", borderRadius: u(0.18) }}
           />
-          <T x={0.78 + i * 2.46} y={9.74} w={1.96} size={20} weight={700} color={PROPOSAL_AQUA} tracking="-0.03em">
+          <T
+            x={0.78 + i * 2.46}
+            y={9.74}
+            w={1.96}
+            size={20}
+            weight={700}
+            color={PROPOSAL_AQUA}
+            tracking="-0.03em"
+          >
             {s.value}
           </T>
-          <T x={0.78 + i * 2.46} y={10.14} w={1.96} size={8.5} color="rgba(255,255,255,0.8)" leading={1.3}>
+          <T
+            x={0.78 + i * 2.46}
+            y={10.14}
+            w={1.96}
+            size={8.5}
+            color="rgba(255,255,255,0.8)"
+            leading={1.3}
+          >
             {s.label}
           </T>
         </Fragment>
@@ -1233,7 +1456,14 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
             <T x={x + 0.28} y={y + 0.26} w={1.2} size={34} weight={700} color={BLUE} leading={1}>
               {"\u201C"}
             </T>
-            <T x={x + 0.28} y={y + 0.86} w={cardW - 0.56} size={9.5} color="rgba(3,0,44,0.82)" leading={1.46}>
+            <T
+              x={x + 0.28}
+              y={y + 0.86}
+              w={cardW - 0.56}
+              size={9.5}
+              color="rgba(3,0,44,0.82)"
+              leading={1.46}
+            >
               {storyQuote(q?.text)}
             </T>
             <Rule x={x + 0.28} y={y + 2.5} w={cardW - 0.56} color="rgba(3,0,44,0.14)" />
@@ -1272,9 +1502,6 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
   );
 }
 
-
-
-
 // ---------------------------------------------------------------------------
 // Page 8 — Why TransPerfect
 // ---------------------------------------------------------------------------
@@ -1293,7 +1520,17 @@ function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
-      <Img x={0} y={0} w={8.53} h={3.6} src={PROPOSAL_ART.teamGrid} alt="TransPerfect team" fit="cover" slot="why.photo" label="photo" />
+      <Img
+        x={0}
+        y={0}
+        w={8.53}
+        h={3.6}
+        src={PROPOSAL_ART.teamGrid}
+        alt="TransPerfect team"
+        fit="cover"
+        slot="why.photo"
+        label="photo"
+      />
 
       {/* White statement bubble with a downward tail. */}
       <svg
@@ -1409,10 +1646,30 @@ function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: 
         }}
       />
       <Img x={3.99} y={4.78} w={2.59} h={0.33} src={logoDark} alt="TransPerfect" />
-      <T x={2.6} y={5.18} w={3.98} size={48.5} weight={700} color={BLUE} align="right" leading={1.05} tracking="-0.03em">
+      <T
+        x={2.6}
+        y={5.18}
+        w={3.98}
+        size={48.5}
+        weight={700}
+        color={BLUE}
+        align="right"
+        leading={1.05}
+        tracking="-0.03em"
+      >
         {advocacy?.title || "Advocacy"}
       </T>
-      <T x={2.6} y={5.9} w={3.98} size={48.5} weight={400} color={NAVY} align="right" leading={1.05} tracking="-0.03em">
+      <T
+        x={2.6}
+        y={5.9}
+        w={3.98}
+        size={48.5}
+        weight={400}
+        color={NAVY}
+        align="right"
+        leading={1.05}
+        tracking="-0.03em"
+      >
         {advocacy?.body || "Updates"}
       </T>
 
@@ -1494,7 +1751,16 @@ function TeamPage({
                 <T x={tx} y={y} w={4} size={16} weight={700} color={NAVY}>
                   {member.name ?? ""}
                 </T>
-                <T x={tx} y={y + 0.3} w={4} size={11} weight={600} color={BLUE} upper tracking="0.05em">
+                <T
+                  x={tx}
+                  y={y + 0.3}
+                  w={4}
+                  size={11}
+                  weight={600}
+                  color={BLUE}
+                  upper
+                  tracking="0.05em"
+                >
                   {member.role ?? ""}
                 </T>
                 <T x={tx} y={y + 0.62} w={tw} size={10.5} color="#555555" leading={1.5}>
@@ -1532,10 +1798,28 @@ function TeamPage({
                   slot={`team.contact.photo.${i + 1}`}
                   label="headshot"
                 />
-                <T x={x + 1.28} y={y + 0.2} w={1.86} size={13} weight={700} color={NAVY} leading={1.15}>
+                <T
+                  x={x + 1.28}
+                  y={y + 0.2}
+                  w={1.86}
+                  size={13}
+                  weight={700}
+                  color={NAVY}
+                  leading={1.15}
+                >
                   {member.name ?? ""}
                 </T>
-                <T x={x + 1.28} y={y + 0.52} w={1.86} size={9} weight={600} color={BLUE} upper tracking="0.05em" leading={1.25}>
+                <T
+                  x={x + 1.28}
+                  y={y + 0.52}
+                  w={1.86}
+                  size={9}
+                  weight={600}
+                  color={BLUE}
+                  upper
+                  tracking="0.05em"
+                  leading={1.25}
+                >
                   {member.role ?? ""}
                 </T>
                 <T x={x + 1.28} y={y + 0.82} w={1.86} size={8.5} color="#555555" leading={1.35}>
@@ -1544,7 +1828,6 @@ function TeamPage({
               </div>
             );
           })}
-
     </>
   );
 }
@@ -1594,7 +1877,15 @@ function TeamCardsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite
               slot={`team.photo.${i + 1}`}
               label="headshot"
             />
-            <T x={x + 0.18} y={y + 1.8} w={1.86} size={12.5} weight={700} color={NAVY} leading={1.15}>
+            <T
+              x={x + 0.18}
+              y={y + 1.8}
+              w={1.86}
+              size={12.5}
+              weight={700}
+              color={NAVY}
+              leading={1.15}
+            >
               {member.name ?? ""}
             </T>
             <T
@@ -1649,10 +1940,28 @@ function TeamLeadsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite
               slot={`team.lead.photo.${i + 1}`}
               label="portrait"
             />
-            <T x={3.3} y={y} w={4.44} size={20} weight={700} color={NAVY} leading={1.1} tracking="-0.02em">
+            <T
+              x={3.3}
+              y={y}
+              w={4.44}
+              size={20}
+              weight={700}
+              color={NAVY}
+              leading={1.1}
+              tracking="-0.02em"
+            >
               {member.name ?? ""}
             </T>
-            <T x={3.3} y={y + 0.42} w={4.44} size={10} weight={600} color={BLUE} upper tracking="0.07em">
+            <T
+              x={3.3}
+              y={y + 0.42}
+              w={4.44}
+              size={10}
+              weight={600}
+              color={BLUE}
+              upper
+              tracking="0.07em"
+            >
               {member.role ?? ""}
             </T>
             <Rule x={3.3} y={y + 0.68} w={4.44} color="rgba(3,0,44,0.12)" />
@@ -1676,7 +1985,16 @@ function TeamWallPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite:
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: BRIGHT_FIELD }} />
       <Plate x={0.27} y={0.5} w={7.98} h={9.95} radius={0.4} />
-      <T x={0.78} y={1.0} w={6.6} size={39.7} weight={700} color={NAVY} leading={1.04} tracking="-0.025em">
+      <T
+        x={0.78}
+        y={1.0}
+        w={6.6}
+        size={39.7}
+        weight={700}
+        color={NAVY}
+        leading={1.04}
+        tracking="-0.025em"
+      >
         {page.title || "Your global team"}
       </T>
       {page.subtitle && (
@@ -1703,7 +2021,16 @@ function TeamWallPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite:
               slot={`team.wall.photo.${i + 1}`}
               label="headshot"
             />
-            <T x={x - 0.06} y={y + 1.62} w={1.62} size={10} weight={700} color={NAVY} align="center" leading={1.2}>
+            <T
+              x={x - 0.06}
+              y={y + 1.62}
+              w={1.62}
+              size={10}
+              weight={700}
+              color={NAVY}
+              align="center"
+              leading={1.2}
+            >
               {member.name ?? ""}
             </T>
             <T
@@ -1735,7 +2062,16 @@ function SummaryPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: BRIGHT_FIELD }} />
       <Plate x={0.26} y={-0.36} w={7.98} h={9.81} radius={0.4} />
 
-      <T x={0.78} y={1.1} w={6.6} size={39.7} weight={700} color={NAVY} leading={1.05} tracking="-0.025em">
+      <T
+        x={0.78}
+        y={1.1}
+        w={6.6}
+        size={39.7}
+        weight={700}
+        color={NAVY}
+        leading={1.05}
+        tracking="-0.025em"
+      >
         {page.title || "Next steps"}
       </T>
       {page.body && (
