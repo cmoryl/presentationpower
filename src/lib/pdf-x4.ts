@@ -7,15 +7,21 @@
  *   • Header set to PDF version 1.7
  *   • Each page carries a numerically-correct TrimBox and BleedBox
  *   • Catalog carries an /OutputIntents array with a GTS_PDF_X intent
- *     whose /DestOutputProfile is an embedded ICC profile stream
+ *     whose /DestOutputProfile is an embedded ICC profile stream, with /N
+ *     and /Alternate matching the profile's own colour space
+ *   • Every DeviceRGB raster is retagged ICCBased/sRGB, so page content is
+ *     device-INDEPENDENT rather than untagged device colour
  *   • Catalog carries an XMP /Metadata stream declaring
  *     pdfxid:GTS_PDFXVersion = "PDF/X-4"
  *
- * The current raster export contains **no live text, no live transparency,
- * and no embedded fonts** (every page is a single flat PNG). That means
- * the two hardest X-4 requirements are satisfied by construction — this
- * wrapper only needs to add the identification and page-box metadata a
- * printer's RIP looks for.
+ * WHAT THIS DOES NOT DO: it does not convert content to CMYK. Colour arrives
+ * as ICC-tagged sRGB and the RIP separates it to the OutputIntent space.
+ * PDF/X-4 permits that. Individual printers may not — several shops require
+ * CMYK-native supplied files. Ask yours before treating this as sufficient.
+ *
+ * Live text (the vector-text overlay) and embedded Geist subsets are present
+ * in press output; an older revision of this comment claimed every page was a
+ * single flat PNG, which stopped being true when the overlay shipped.
  *
  * All work is client-side. No native binaries. No server round-trip.
  */
@@ -30,8 +36,10 @@ import {
   PDFRef,
   PDFString,
 } from "pdf-lib";
+import { sRgbIccBytes } from "./icc-srgb";
 import gracolAsset from "@/assets/icc/GRACoL2013_CRPC6.icc.asset.json";
 import swopAsset from "@/assets/icc/SWOP2013_CRPC5.icc.asset.json";
+
 
 export type IccProfileKey = "GRACoL2013_CRPC6" | "SWOP2013_CRPC5";
 
