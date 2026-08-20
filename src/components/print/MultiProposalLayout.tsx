@@ -1079,8 +1079,6 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
   const first = quotes[0];
   const second = quotes[1];
   const cardBorder = `${u(0.008)} solid rgba(3,0,44,0.85)`;
-  const firstLogo = STORY_LOGOS[(first?.company || "Lufthansa").toLowerCase()];
-  const secondLogo = STORY_LOGOS[(second?.company || "Lavazza").toLowerCase()];
 
   return (
     <>
@@ -1130,24 +1128,14 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         slot="stories.photo.1"
         label="photo"
       />
-      {firstLogo ? (
-        <Img
-          x={3.72}
-          y={2.42}
-          w={3.35}
-          h={0.5}
-          src={firstLogo}
-          alt={first?.company || "Lufthansa"}
-          fit="contain"
-          align="left"
-          slot="stories.logo.1"
-          label="logo"
-        />
-      ) : (
-        <T x={3.72} y={2.5} w={3.6} size={26} weight={700} color={NAVY} tracking="-0.02em">
-          {first?.company || "Lufthansa"}
-        </T>
-      )}
+      <StoryLogo
+        x={3.72}
+        y={2.42}
+        w={3.35}
+        h={0.5}
+        company={first?.company || "Lufthansa"}
+        slot="stories.logo.1"
+      />
       <Dots x={3.72} y={3.05} color={BLUE} />
       <T x={3.72} y={3.33} w={3.5} size={10} color={NAVY} leading={1.42}>
         {first?.text ? `"${first.text.replace(/^"|"$/g, "")}"` : ""}
@@ -1170,33 +1158,15 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         slot="stories.photo.2"
         label="photo"
       />
-      {secondLogo ? (
-        <Img
-          x={1.16}
-          y={6.62}
-          w={3.35}
-          h={0.62}
-          src={secondLogo}
-          alt={second?.company || "Lavazza"}
-          fit="contain"
-          align="right"
-          slot="stories.logo.2"
-          label="logo"
-        />
-      ) : (
-        <T
-          x={1.07}
-          y={6.62}
-          w={3.44}
-          size={26}
-          weight={700}
-          color={NAVY}
-          align="right"
-          tracking="-0.02em"
-        >
-          {second?.company || "Lavazza"}
-        </T>
-      )}
+      <StoryLogo
+        x={1.07}
+        y={6.62}
+        w={3.44}
+        h={0.62}
+        company={second?.company || "Lavazza"}
+        slot="stories.logo.2"
+        align="right"
+      />
       <Dots x={3.94} y={7.4} color={BLUE} />
       <T x={1.07} y={7.68} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.headline || ""}
