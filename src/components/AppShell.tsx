@@ -403,31 +403,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               );
             })}
-            <div
-              role="radiogroup"
-              aria-label="Color theme"
-              className="ml-1 inline-flex items-center rounded-full border border-white/40 bg-white/30 p-0.5 text-xs dark:!border-white/10 dark:!bg-white/[0.03]"
-            >
-              {themes.map((t) => {
-                const on = theme === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => setTheme(t.id)}
-                    className={`rounded-full px-2.5 py-1 transition ${
-                      on
-                        ? "bg-white/70 text-[#03002C] ring-1 ring-black/[0.04] dark:!bg-white/[0.08] dark:!text-white dark:!ring-white/10"
-                        : "text-black/60 hover:text-black dark:text-white/65 dark:hover:text-white"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                );
-              })}
-            </div>
           </nav>
         </div>
       </header>
