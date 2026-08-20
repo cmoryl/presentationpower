@@ -1560,8 +1560,9 @@ function PageBody({
       return (
         <div>
           {page.body && <Body tokens={t}>{page.body}</Body>}
-          <StatGrid tokens={t} stats={page.stats} />
+          <WorldMap />
           <Locations tokens={t} locations={page.locations} />
+          <StatGrid tokens={t} stats={page.stats} />
         </div>
       );
     case "clients":
@@ -1570,7 +1571,6 @@ function PageBody({
           <LogoWall tokens={t} logos={page.logos ?? []} />
           <StatGrid tokens={t} stats={page.stats} />
         </div>
-
       );
     case "success-stories":
       return (
@@ -1591,7 +1591,8 @@ function PageBody({
       return (
         <div>
           {page.body && <Body tokens={t}>{page.body}</Body>}
-          <CardGrid tokens={t} cards={page.cards} />
+          <MarkWall tiles={CAUSE_LOGOS} cols={3} marginTop={24} />
+          <MarkWall tiles={AFFINITY_LOGOS} cols={4} marginTop={26} />
           <Quotes tokens={t} quotes={page.quotes} />
         </div>
       );
@@ -1599,9 +1600,21 @@ function PageBody({
       return (
         <div>
           {page.body && <Body tokens={t}>{page.body}</Body>}
+          <img
+            src={PROPOSAL_ART.teamGrid}
+            alt="TransPerfect project team"
+            style={{
+              display: "block",
+              width: "100%",
+              height: "auto",
+              marginTop: cq(18),
+              borderRadius: cq(16),
+            }}
+          />
           <TeamGrid tokens={t} team={page.team ?? content.team} />
         </div>
       );
+
     case "team-bio":
       return (
         <div>
