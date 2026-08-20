@@ -1176,6 +1176,20 @@ export function KitWizard({
             );
           })()
         : null}
+
+      <SocialModulePicker
+        open={modulePickerOpen}
+        onClose={() => setModulePickerOpen(false)}
+        onSelect={(layout) => {
+          setModuleLayoutId(layout.id);
+          setModulePickerOpen(false);
+          toast.success(`${layout.label} applied to every format in this kit`);
+        }}
+        format={pickerFormat}
+        brandId={brandId}
+        mode={mode === "light" ? "light" : "dark"}
+        copy={pickerCopy}
+      />
     </div>
   );
 }
