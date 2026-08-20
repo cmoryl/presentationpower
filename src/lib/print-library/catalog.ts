@@ -14,6 +14,7 @@
  */
 
 import type { PrintAssetKind } from "@/lib/print-assets.types";
+import type { PrintLibraryLook } from "@/lib/print-library/look";
 import {
   LEGAL_CASE_STUDIES,
   LEGAL_DIVISION_ID,
@@ -156,6 +157,8 @@ export type PrintLibraryItem = {
   tags?: string[];
   /** Curated-only: the ready-to-copy print content. */
   content?: Record<string, unknown>;
+  /** Master-admin look & feel pinned on this entry (see print-library/look.ts). */
+  look?: PrintLibraryLook;
 };
 
 const TEMPLATE_ITEMS: PrintLibraryItem[] = PRINT_TYPES.map((t) => ({

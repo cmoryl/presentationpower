@@ -18,6 +18,7 @@ import type {
   PrintTableRow,
 } from "@/lib/print-assets.types";
 import type { PrintLibraryItem } from "@/lib/print-library/catalog";
+import { lookToContext } from "@/lib/print-library/look";
 
 const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -440,5 +441,8 @@ export function editableContextFor(item: PrintLibraryItem): Rec {
   if (item.collection) ctx["collection"] = item.collection;
   if (item.divisionId) ctx["divisionId"] = item.divisionId;
   ctx["libraryItemId"] = item.id;
+  // Master-admin look & feel pinned on the library entry becomes the opening
+  // state of the editable copy.
+  Object.assign(ctx, lookToContext(item.look));
   return ctx;
 }

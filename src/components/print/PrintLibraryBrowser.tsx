@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import {
   ArrowRight,
   ChevronDown,
+  Pencil,
   ChevronRight,
   Copy,
   FileText,
@@ -34,6 +35,8 @@ import {
   subsectionsFor,
 } from "@/lib/print-library/subsections";
 import { editableContextFor, toEditableContent } from "@/lib/print-library/editable";
+import { applyLibraryOverrides, useModuleOverrides } from "@/lib/module-overrides";
+import { useIsAdmin } from "@/lib/use-is-admin";
 import type { BrandMode } from "@/lib/taxonomy";
 
 type RenderPreview = (
@@ -88,6 +91,8 @@ export function PrintLibraryBrowser({
   const setQuery = (v: string) => patch({ query: v });
   const setSubId = (v: string | null) => patch({ subId: v });
   const [open, setOpen] = useState<PrintLibraryItem | null>(null);
+  const { isAdmin } = useIsAdmin();
+  const { overrides } = useModuleOverrides("library");
 
 
   const divisions = useMemo(
@@ -130,11 +135,13 @@ export function PrintLibraryBrowser({
         }
       }
     }
-    return base
+    // Master-admin library overrides win over the shipped definitions, and
+    // hidden entries drop out for everyone but admins.
+    return applyLibraryOverrides(base, overrides, { includeHidden: isAdmin })
       .filter((i) => collection === "All" || (i.collection ?? "General") === collection)
       .filter((i) => matchesSubsection(i, activeSub))
       .filter((i) => matchesQuery(i, query));
-  }, [divisionId, typeId, collection, query, activeSub]);
+  }, [divisionId, typeId, collection, query, activeSub, overrides, isAdmin]);
 
   if (!brand) return null;
 
@@ -624,6 +631,7 @@ export function PrintLibraryBrowser({
             brand={brand}
             renderPreview={renderPreview}
             onPreview={() => setOpen(item)}
+            canEditMaster={isAdmin}
           />
         ))}
       </div>
@@ -640,6 +648,7 @@ export function PrintLibraryBrowser({
           brand={brand}
           renderPreview={renderPreview}
           onClose={() => setOpen(null)}
+          canEditMaster={isAdmin}
         />
       ) : null}
     </section>
@@ -693,11 +702,13 @@ function PrintItemCard({
   brand,
   renderPreview,
   onPreview,
+  canEditMaster,
 }: {
   item: PrintLibraryItem;
   brand: BrandMode;
   renderPreview: RenderPreview;
   onPreview: () => void;
+  canEditMaster?: boolean;
 }) {
   const isTemplate = item.source === "template";
   return (
@@ -785,20 +796,36 @@ function PrintItemCard({
           >
             Preview
           </button>
-          {isTemplate ? (
-            <Link
-              to="/asset/new"
-              search={{ kind: item.kind, brandModeId: brand.id }}
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-            >
-              Use template <ArrowRight size={12} />
-            </Link>
-          ) : (
-            <CopyItemButton item={item} />
-          )}
+          <div className="flex items-center gap-2">
+            {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
+            {isTemplate ? (
+              <Link
+                to="/asset/new"
+                search={{ kind: item.kind, brandModeId: brand.id }}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+              >
+                Use template <ArrowRight size={12} />
+              </Link>
+            ) : (
+              <CopyItemButton item={item} />
+            )}
+          </div>
         </div>
       </div>
     </article>
+  );
+}
+
+/** Admin-only jump into the master item editor. */
+function EditMasterLink({ itemId }: { itemId: string }) {
+  return (
+    <Link
+      to="/admin/print-library/$itemId"
+      params={{ itemId }}
+      className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/40 bg-white px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/[0.06]"
+    >
+      <Pencil size={12} /> Edit master
+    </Link>
   );
 }
 
@@ -862,11 +889,13 @@ function ItemPreviewOverlay({
   brand,
   renderPreview,
   onClose,
+  canEditMaster,
 }: {
   item: PrintLibraryItem;
   brand: BrandMode;
   renderPreview: RenderPreview;
   onClose: () => void;
+  canEditMaster?: boolean;
 }) {
   const isTemplate = item.source === "template";
   return (
@@ -891,6 +920,7 @@ function ItemPreviewOverlay({
             <p className="mt-1 max-w-2xl text-sm text-black/60">{item.blurb}</p>
           </div>
           <div className="flex items-center gap-2">
+            {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
             {isTemplate ? (
               <Link
                 to="/asset/new"
