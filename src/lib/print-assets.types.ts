@@ -781,6 +781,10 @@ export type MultiProposalPage = {
   team?: Array<ProposalTeamMember & { bio?: string; phone?: string }>;
   locations?: Array<{ region?: string; offices?: string[] }>;
   logos?: string[];
+  /** Advocates page — "giving back" cause logo wall (editable: add/order/remove). */
+  causeLogos?: Array<{ id?: string; name?: string; url?: string }>;
+  /** Advocates page — affinity group logo wall (editable: add/order/remove). */
+  affinityLogos?: Array<{ id?: string; name?: string; url?: string }>;
   /** Client wall tiles — logo art plus an editable client name. */
   clients?: Array<{ name?: string; url?: string }>;
   footnote?: string;
