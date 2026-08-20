@@ -23,7 +23,7 @@
  */
 import { getFontEmbedCSS, toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
-import { beginExportChrome } from "./export-chrome-suppress";
+import { beginExportChrome, exportNodeFilter } from "./export-chrome-suppress";
 
 /**
  * FONT EMBED CACHE
@@ -458,7 +458,7 @@ export async function captureSlide(
       fontEmbedCSS: await getCachedFontEmbedCSS(node),
       cacheBust: false,
       backgroundColor: opts.backgroundColor,
-      filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
+      filter: exportNodeFilter,
     });
 
     report(onProgress, { stage: "encode", progress: 1, message: "Encoded" });
@@ -511,11 +511,9 @@ export async function captureSlideAsDataUrl(
         cacheBust: opts.cacheBust ?? false,
         backgroundColor: MODE_BG[opts.mode],
         // filter external stylesheets/nodes that break serialization
-        filter: (el) => {
-          if (!(el instanceof HTMLElement)) return true;
-          if (el.dataset?.exportIgnore === "true") return false;
-          return true;
-        },
+        // Drops every authoring affordance (guides, resize rails, overflow
+        // hatch, hero edit badge), not just data-export-ignore.
+        filter: exportNodeFilter,
       });
     } catch (err) {
       // Retry once at a lower ratio — a browser occasionally OOMs on
@@ -535,7 +533,7 @@ export async function captureSlideAsDataUrl(
         fontEmbedCSS,
         cacheBust: false,
         backgroundColor: MODE_BG[opts.mode],
-        filter: (el) => !(el instanceof HTMLElement) || el.dataset?.exportIgnore !== "true",
+        filter: exportNodeFilter,
       });
     }
 
