@@ -42,10 +42,18 @@ export function markDeckSaved(deckId: string, sig: string) {
 /** Best-effort "save right now"; resolves false when nothing could be saved. */
 export async function saveDeckNow(deckId: string): Promise<boolean> {
   const fn = useUnsavedStore.getState().savers[deckId];
-  if (!fn) return false;
+  if (!fn) {
+    console.warn(
+      `[unsaved-changes] no saver registered for "${deckId}" — registered:`,
+      Object.keys(useUnsavedStore.getState().savers),
+    );
+    return false;
+  }
   try {
     return await fn();
-  } catch {
+  } catch (e) {
+    console.warn("[unsaved-changes] saver threw", e);
     return false;
   }
 }
+
