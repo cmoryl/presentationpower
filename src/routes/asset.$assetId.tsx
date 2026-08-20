@@ -104,6 +104,16 @@ import { getDivisionImagery } from "@/assets/backdrops/divisions";
 import { PageColorOverridePanel } from "@/components/print/PageColorOverridePanel";
 import { ClientLogoPanel } from "@/components/print/ClientLogoPanel";
 import { PrintClientLogoProvider } from "@/components/print/PrintChrome";
+import { PrintPageProvider } from "@/components/print/print-page-context";
+import {
+  PRINT_MARGIN_PRESETS,
+  PRINT_PAGE_SIZE_ORDER,
+  pageAspectRatio,
+  pageAuroraFrame,
+  pagePreset,
+  pageSideMarginIn,
+  type PrintMarginPreset,
+} from "@/lib/print-page-presets";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { ClientLogoHubPicker, ClientLogoHubTrigger } from "@/components/print/ClientLogoHubPicker";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
@@ -786,6 +796,7 @@ function AssetEditor() {
   const pageSize: PrintPageSize = ctx.pageSize ?? "A4";
   const marginPreset: PrintMarginPreset = ctx.marginPreset ?? "standard";
   const pagePresetInfo = pagePreset(pageSize);
+  const marginSideIn = pageSideMarginIn(pageSize, ctx.density ?? "standard", marginPreset);
   const density: PrintDensity = ctx.density ?? "standard";
   const editorMode: PrintMode = ctx.editorMode ?? "light";
   const showBleedGuides: boolean = !!ctx.showBleedGuides;
@@ -1204,6 +1215,7 @@ function AssetEditor() {
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
               style={{ aspectRatio: canvasAspect }}
             >
+              <PrintPageProvider size={pageSize} margin={marginPreset} density={density}>
               <PrintContentFitFrame
                 settings={ctx.contentFit}
                 dep={rawContent}
@@ -1406,6 +1418,7 @@ function AssetEditor() {
                   </PrintIconEditContext.Provider>
                 </PrintDocModeProvider>
               </PrintContentFitFrame>
+              </PrintPageProvider>
               {!isNeutralFit(fitKnobs) && (
                 <div
                   data-export-ignore="true"
