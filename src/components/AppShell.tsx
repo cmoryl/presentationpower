@@ -118,7 +118,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/events/new", label: "New event asset" },
         { to: "/events/presets", label: "Presets" },
         { to: "/events/next", label: "Next-gen builder" },
-        { to: "/events/next/badges", label: "Badges" },
       ],
     },
     {
