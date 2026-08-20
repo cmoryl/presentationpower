@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { BrandMode } from "@/lib/taxonomy";
 import { AppShell } from "@/components/AppShell";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
-import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
+import { byId } from "@/lib/taxonomy";
 import { applyDeckOverrides, useModuleOverrides } from "@/lib/module-overrides";
+import { Sparkles } from "lucide-react";
 import {
   ICON_SIZES,
   ICON_PLACEMENTS_META,
@@ -16,8 +18,6 @@ import {
   type IconEmphasis,
   type IconSizeToken,
 } from "@/lib/iconography";
-
-import { Sparkles, Target, Workflow, Layers3, Users, Rocket } from "lucide-react";
 import {
   LOGO_POSITIONS_META,
   LOGO_POSITION_BY_LAYOUT,
@@ -25,14 +25,35 @@ import {
 } from "@/lib/logo-placement";
 import { BrandLockup } from "@/components/BrandLockup";
 
+import { DESIGN_SKINS, INDUSTRY_RECIPES } from "@/lib/design-skins";
+import {
+  PRINT_SECTION_MODULES,
+  PRINT_MODULE_FAMILY_ORDER,
+  printModuleFamilyMeta,
+} from "@/lib/print-library/section-modules";
+import { PRINT_PAGE_PRESETS_FULL, PRINT_PAGE_SIZE_ORDER } from "@/lib/print-page-presets";
+import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
+import { SOCIAL_STYLES } from "@/lib/social-styles";
+import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
+import { EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
+
 export const Route = createFileRoute("/atlas")({
   head: () => ({
     meta: [
       { title: "Atlas · TransPerfect Element" },
       {
         name: "description",
-        content: "Browse the section frameworks, module families, variants, and layout frameworks.",
+        content:
+          "The Element reference: presentation modules, print sections, social formats, event playbooks, and the approved style library.",
       },
+      { property: "og:title", content: "Atlas · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Every building block in Element — segmented by Presentation, Print, Social, Events, plus the S01–S28 style library.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
@@ -43,7 +64,124 @@ export const Route = createFileRoute("/atlas")({
   notFoundComponent: () => <div className="p-10">Not found.</div>,
 });
 
+// Brand palette (v3.0)
+const BLUE = "#003FC7";
+const NAVY = "#03002C";
+
+type SegmentId = "presentation" | "print" | "social" | "events" | "style";
+
+const SEGMENTS: Array<{
+  id: SegmentId;
+  label: string;
+  ink: string;
+  blurb: string;
+}> = [
+  {
+    id: "presentation",
+    label: "Presentation",
+    ink: BLUE,
+    blurb:
+      "Section frameworks, module families, slide variants, and layout geometry for decks and exports.",
+  },
+  {
+    id: "print",
+    label: "Print",
+    ink: "#B3186B",
+    blurb: "Print section modules, page geometry, and the kinds each module reads well on.",
+  },
+  {
+    id: "social",
+    label: "Social",
+    ink: "#A33B12",
+    blurb: "Output geometries, kit profiles, template styles, and campaign playbooks.",
+  },
+  {
+    id: "events",
+    label: "Events",
+    ink: "#0F5C1A",
+    blurb: "Event playbooks with phases, deliverables, and the KPIs each one is judged on.",
+  },
+  {
+    id: "style",
+    label: "Style Library",
+    ink: NAVY,
+    blurb: "The approved visual languages S01–S28 and the industry recipes built from them.",
+  },
+];
+
 function Atlas() {
+  const [segment, setSegment] = useState<SegmentId>("presentation");
+  const active = SEGMENTS.find((s) => s.id === segment)!;
+
+  return (
+    <AppShell>
+      <div>
+        <div className="text-xs uppercase tracking-[0.3em]" style={{ color: `${NAVY}80` }}>
+          The Atlas
+        </div>
+        <h1
+          className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight"
+          style={{ color: NAVY }}
+        >
+          Every Element building block, segmented by output.
+        </h1>
+        <p className="mt-3 max-w-2xl leading-relaxed text-black/60">
+          Presentation, print, social, and events each draw from their own module set — and all of
+          them are skinned by the same approved style library. Pick a segment to see what the
+          assembler can reach for.
+        </p>
+      </div>
+
+      {/* Segment bar */}
+      <nav aria-label="Atlas segments" className="mt-8 flex flex-wrap gap-2">
+        {SEGMENTS.map((s) => {
+          const on = s.id === segment;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSegment(s.id)}
+              aria-pressed={on}
+              className="rounded-full border px-4 py-2 text-sm font-medium transition"
+              style={
+                on
+                  ? { backgroundColor: s.ink, borderColor: s.ink, color: "#FFFFFF" }
+                  : { borderColor: "rgba(3,0,44,0.14)", color: NAVY, backgroundColor: "#FFFFFF" }
+              }
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </nav>
+
+      <p className="mt-4 max-w-2xl text-sm text-black/55">{active.blurb}</p>
+
+      {segment === "presentation" && <PresentationSegment />}
+      {segment === "print" && <PrintSegment ink={active.ink} />}
+      {segment === "social" && <SocialSegment ink={active.ink} />}
+      {segment === "events" && <EventsSegment ink={active.ink} />}
+      {segment === "style" && <StyleLibrarySegment />}
+
+      <div
+        className="mt-14 rounded-2xl border border-dashed p-6 text-sm text-black/60"
+        style={{ borderColor: "rgba(3,0,44,0.18)" }}
+      >
+        Want to see the pieces in action?{" "}
+        <Link to="/brief/new" className="font-medium underline" style={{ color: BLUE }}>
+          Start a brief
+        </Link>{" "}
+        and the assembler will pick from this atlas.
+      </div>
+    </AppShell>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Presentation
+// ---------------------------------------------------------------------------
+
+function PresentationSegment() {
   const {
     layoutFrameworks: LAYOUT_FRAMEWORKS,
     moduleFamilies: MODULE_FAMILIES,
@@ -56,22 +194,9 @@ function Atlas() {
   const deckVariants = applyDeckOverrides(MODULE_VARIANTS, overrides);
 
   return (
-    <AppShell>
-      <div>
-        <div className="text-xs uppercase tracking-[0.3em] text-black/50">The Atlas</div>
-        <h1 className="mt-3 text-4xl font-semibold">
-          Section frameworks, module families, variants, and layouts.
-        </h1>
-        <p className="mt-3 max-w-2xl text-black/60">
-          Every deck is assembled from these pieces. Section frameworks decide where you are in the
-          story; module families decide what job the slide does; variants decide the shape; layouts
-          decide the geometry.
-        </p>
-        <p className="mt-2 text-xs text-black/40">Loaded live from the Cloud taxonomy tables.</p>
-      </div>
-
+    <>
       <Section title="Narrative archetypes" count={NARRATIVE_ARCHETYPES.length}>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
           {NARRATIVE_ARCHETYPES.map((a) => (
             <div key={a.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-medium">{a.name}</div>
@@ -92,7 +217,7 @@ function Atlas() {
       </Section>
 
       <Section title="Section frameworks" count={SECTION_FRAMEWORKS.length}>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid gap-4 md:grid-cols-3">
           {SECTION_FRAMEWORKS.map((sf) => (
             <div key={sf.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-mono text-xs text-black/50">{sf.id}</div>
@@ -102,7 +227,8 @@ function Atlas() {
                 {sf.permittedFamilyIds.map((f) => (
                   <span
                     key={f}
-                    className="rounded-full bg-[#0B2A4A]/10 px-2 py-0.5 font-mono text-xs text-[#0B2A4A]"
+                    className="rounded-full px-2 py-0.5 font-mono text-xs"
+                    style={{ backgroundColor: `${BLUE}14`, color: BLUE }}
                   >
                     {f} {byId(MODULE_FAMILIES, f)?.name}
                   </span>
@@ -114,37 +240,32 @@ function Atlas() {
       </Section>
 
       <Section title="Module families" count={MODULE_FAMILIES.length}>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
           {MODULE_FAMILIES.map((mf) => {
             const variants = deckVariants.filter((mv) => mv.familyId === mf.id);
+            const fi = familyIcon(mf.id);
+            const color =
+              fi.emphasis === "primary"
+                ? BLUE
+                : fi.emphasis === "accent"
+                  ? "#EC388A"
+                  : fi.emphasis === "success"
+                    ? "#0F5C1A"
+                    : fi.emphasis === "warning"
+                      ? "#A33B12"
+                      : "#666666";
             return (
               <div key={mf.id} className="rounded-2xl border border-black/10 bg-white p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    {(() => {
-                      const fi = familyIcon(mf.id);
-                      const color =
-                        fi.emphasis === "primary"
-                          ? "#0B2A4A"
-                          : fi.emphasis === "accent"
-                            ? "#E85D2C"
-                            : fi.emphasis === "success"
-                              ? "#1F7A4C"
-                              : fi.emphasis === "warning"
-                                ? "#B45309"
-                                : "#7A7A7A";
-                      return (
-                        <span
-                          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
-                          style={{ backgroundColor: `${color}18`, color }}
-                          aria-hidden
-                          title={fi.rationale}
-                        >
-                          <fi.Icon size={22} />
-                        </span>
-                      );
-                    })()}
-
+                    <span
+                      className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
+                      style={{ backgroundColor: `${color}18`, color }}
+                      aria-hidden
+                      title={fi.rationale}
+                    >
+                      <fi.Icon size={22} />
+                    </span>
                     <div>
                       <div className="font-mono text-xs text-black/50">{mf.id}</div>
                       <div className="mt-1 font-medium">{mf.name}</div>
@@ -169,10 +290,8 @@ function Atlas() {
                               className="rounded-full px-2 py-0.5 font-mono text-[10px]"
                               style={{
                                 backgroundColor:
-                                  ico.placement === "none"
-                                    ? "rgba(0,0,0,0.04)"
-                                    : "rgba(232,93,44,0.12)",
-                                color: ico.placement === "none" ? "rgba(0,0,0,0.4)" : "#B84512",
+                                  ico.placement === "none" ? "rgba(0,0,0,0.04)" : `${BLUE}14`,
+                                color: ico.placement === "none" ? "rgba(0,0,0,0.4)" : BLUE,
                               }}
                               title={`${ico.placement} · ${ico.size} · ${ico.treatment} · ${ico.emphasis} — ${ico.rationale}`}
                             >
@@ -194,7 +313,7 @@ function Atlas() {
       </Section>
 
       <Section title="Layout frameworks" count={LAYOUT_FRAMEWORKS.length}>
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid gap-4 md:grid-cols-4">
           {LAYOUT_FRAMEWORKS.map((lf) => (
             <div key={lf.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-mono text-xs text-black/50">{lf.id}</div>
@@ -213,25 +332,374 @@ function Atlas() {
       </Section>
 
       <TypographySection />
-
       <IconographySection />
-
       <LogoPlacementSection />
-
-      <div className="mt-14 rounded-2xl border border-dashed border-black/15 bg-white p-6 text-sm text-black/60">
-        Want to see the pieces in action?{" "}
-        <Link to="/brief/new" className="font-medium text-[#0B2A4A] underline">
-          Start a brief
-        </Link>{" "}
-        and the assembler will pick from this atlas.
-      </div>
-    </AppShell>
+    </>
   );
 }
 
-// Shared brand for the swatches — matches the TransPerfect default.
+// ---------------------------------------------------------------------------
+// Print
+// ---------------------------------------------------------------------------
+
+function PrintSegment({ ink }: { ink: string }) {
+  return (
+    <>
+      <Section title="Print section modules" count={PRINT_SECTION_MODULES.length}>
+        <div className="space-y-8">
+          {PRINT_MODULE_FAMILY_ORDER.map((family) => {
+            const modules = PRINT_SECTION_MODULES.filter((m) => m.family === family);
+            if (!modules.length) return null;
+            const meta = printModuleFamilyMeta(family);
+            return (
+              <div key={family}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <h3 className="text-lg font-semibold" style={{ color: NAVY }}>
+                    {meta?.label ?? family}
+                  </h3>
+                  <span className="text-xs text-black/45">{modules.length} modules</span>
+                </div>
+                {meta?.desc && <p className="mt-1 max-w-2xl text-sm text-black/55">{meta.desc}</p>}
+                <div className="mt-3 grid gap-3 md:grid-cols-3">
+                  {modules.map((m) => (
+                    <div key={m.id} className="rounded-2xl border border-black/10 bg-white p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="font-medium leading-snug">{m.label}</div>
+                        <span
+                          className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+                          style={{ backgroundColor: `${ink}14`, color: ink }}
+                        >
+                          {m.density}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-black/60">{m.description}</p>
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {m.bestFor.map((k) => (
+                          <span key={k} className="rounded-full bg-black/5 px-2 py-0.5 text-[11px]">
+                            {k}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="mt-2 font-mono text-[10px] text-black/40">{m.id}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+
+      <Section title="Page geometry" count={PRINT_PAGE_SIZE_ORDER.length}>
+        <div className="grid gap-4 md:grid-cols-4">
+          {PRINT_PAGE_SIZE_ORDER.map((size) => {
+            const p = PRINT_PAGE_PRESETS_FULL[size];
+            return (
+              <div key={size} className="rounded-2xl border border-black/10 bg-white p-5">
+                <div className="font-mono text-xs text-black/50">{size}</div>
+                <div className="mt-1 font-medium">{p.label}</div>
+                <div className="mt-2 text-sm text-black/60">
+                  {p.widthIn}″ × {p.heightIn}″
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Social
+// ---------------------------------------------------------------------------
+
+function SocialSegment({ ink }: { ink: string }) {
+  return (
+    <>
+      <Section title="Output formats" count={SOCIAL_FORMATS.length}>
+        <div className="grid gap-3 md:grid-cols-4">
+          {SOCIAL_FORMATS.map((f) => (
+            <div key={f.id} className="rounded-2xl border border-black/10 bg-white p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-medium leading-snug">{f.label}</div>
+                <span
+                  className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+                  style={{ backgroundColor: `${ink}14`, color: ink }}
+                >
+                  {f.platform}
+                </span>
+              </div>
+              <div className="mt-2 flex items-center gap-3">
+                <div
+                  className="rounded border border-black/10 bg-black/[0.03]"
+                  style={{
+                    width: f.aspect >= 1 ? 44 : 44 * f.aspect,
+                    height: f.aspect >= 1 ? 44 / f.aspect : 44,
+                  }}
+                  aria-hidden
+                />
+                <div className="text-sm text-black/60">
+                  {f.width} × {f.height}
+                  <div className="font-mono text-[10px] text-black/40">
+                    {f.aspect.toFixed(2)} : 1
+                  </div>
+                </div>
+              </div>
+              {f.intent && <p className="mt-2 text-xs text-black/55">{f.intent}</p>}
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Kit profiles" count={KIT_PROFILES.length}>
+        <div className="grid gap-4 md:grid-cols-2">
+          {KIT_PROFILES.map((k) => (
+            <div key={k.id} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="font-medium">{k.label}</div>
+              <p className="mt-1 text-sm text-black/60">{k.description}</p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {k.formatIds.map((id) => (
+                  <span
+                    key={id}
+                    className="rounded-full bg-black/5 px-2 py-0.5 font-mono text-[11px]"
+                  >
+                    {id}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Template styles" count={SOCIAL_STYLES.length}>
+        <div className="grid gap-4 md:grid-cols-3">
+          {SOCIAL_STYLES.map((s) => (
+            <div key={s.id} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-medium">{s.label}</div>
+                <span className="shrink-0 rounded-full bg-black/5 px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                  {s.tag}
+                </span>
+              </div>
+              <p className="mt-1 text-sm text-black/60">{s.blurb}</p>
+              <div className="mt-3 flex flex-wrap gap-1.5 font-mono text-[10px] text-black/50">
+                <span className="rounded bg-black/5 px-2 py-0.5">plate:{s.plate}</span>
+                <span className="rounded bg-black/5 px-2 py-0.5">cta:{s.cta}</span>
+                <span className="rounded bg-black/5 px-2 py-0.5">lockup:{s.lockup}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Campaign playbooks" count={SOCIAL_PLAYBOOKS.length}>
+        <div className="grid gap-4 md:grid-cols-3">
+          {SOCIAL_PLAYBOOKS.map((p) => (
+            <PlaybookCard
+              key={p.id}
+              name={p.name}
+              tagline={p.tagline}
+              chip={p.chip}
+              accent={p.accent}
+              meta={`${p.divisionLabel} · ${p.deliverables.length} deliverables · ${p.phases.length} phases`}
+            />
+          ))}
+        </div>
+      </Section>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+function EventsSegment({ ink }: { ink: string }) {
+  return (
+    <Section title="Event playbooks" count={EVENT_PLAYBOOKS.length}>
+      <div className="grid gap-4 md:grid-cols-2">
+        {EVENT_PLAYBOOKS.map((p) => (
+          <div key={p.id} className="rounded-2xl border border-black/10 bg-white p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="font-mono text-xs text-black/50">{p.kind}</div>
+                <div className="mt-1 text-lg font-semibold" style={{ color: NAVY }}>
+                  {p.name}
+                </div>
+              </div>
+              <span
+                className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+                style={{ backgroundColor: `${ink}14`, color: ink }}
+              >
+                {p.chip}
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-black/60">{p.tagline}</p>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div>
+                <div className="text-xs uppercase tracking-widest text-black/50">Phases</div>
+                <ul className="mt-1 space-y-0.5 text-sm text-black/70">
+                  {p.phases.map((ph, i) => (
+                    <li key={i}>
+                      <span className="font-mono text-xs text-black/45">{ph.when}</span> {ph.label}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <div className="text-xs uppercase tracking-widest text-black/50">KPIs</div>
+                <ul className="mt-1 space-y-0.5 text-sm text-black/70">
+                  {p.kpis.map((k, i) => (
+                    <li key={i}>{k.label}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-3 text-xs text-black/50">
+              {p.deliverables.length} deliverables · kit {p.kitProfileId}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+function PlaybookCard({
+  name,
+  tagline,
+  chip,
+  accent,
+  meta,
+}: {
+  name: string;
+  tagline: string;
+  chip: string;
+  accent: string;
+  meta: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-white p-5">
+      <div className="flex items-start justify-between gap-2">
+        <div className="font-medium leading-snug">{name}</div>
+        <span
+          className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider"
+          style={{ backgroundColor: `${accent}1F`, color: NAVY }}
+        >
+          {chip}
+        </span>
+      </div>
+      <p className="mt-1 text-sm text-black/60">{tagline}</p>
+      <div className="mt-3 text-xs text-black/50">{meta}</div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Style library
+// ---------------------------------------------------------------------------
+
+function StyleLibrarySegment() {
+  return (
+    <>
+      <Section title="Approved visual languages" count={DESIGN_SKINS.length}>
+        <p className="-mt-2 mb-5 max-w-3xl text-sm text-black/60">
+          S01–S28 are permanent codes. Every deck, print asset, social frame, and event kit renders
+          through one of these languages — pick the language, then let the industry recipe narrow
+          it.
+        </p>
+        <div className="grid gap-4 md:grid-cols-3">
+          {DESIGN_SKINS.map((s) => (
+            <div
+              key={s.code}
+              className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+            >
+              <div className="flex h-14">
+                {s.palette.map((c) => (
+                  <div key={c} className="flex-1" style={{ backgroundColor: c }} aria-hidden />
+                ))}
+              </div>
+              <div className="p-5">
+                <div className="flex items-baseline justify-between gap-2">
+                  <div className="font-mono text-xs text-black/50">{s.code}</div>
+                  <span className="rounded-full bg-black/5 px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                    {s.mode}
+                  </span>
+                </div>
+                <div className="mt-1 font-medium" style={{ color: NAVY }}>
+                  {s.name}
+                </div>
+                <div className="mt-0.5 text-[11px] uppercase tracking-wider text-black/40">
+                  {s.reference}
+                </div>
+                <p className="mt-2 text-sm text-black/60">{s.description}</p>
+                <dl className="mt-3 space-y-1 text-xs text-black/55">
+                  <div>
+                    <dt className="inline font-medium text-black/70">Best fit: </dt>
+                    <dd className="inline">{s.bestFit}</dd>
+                  </div>
+                  <div>
+                    <dt className="inline font-medium text-black/70">Type: </dt>
+                    <dd className="inline">{s.typography}</dd>
+                  </div>
+                  <div>
+                    <dt className="inline font-medium text-black/70">Density: </dt>
+                    <dd className="inline">{s.density}</dd>
+                  </div>
+                </dl>
+                <div className="mt-3 font-mono text-[10px] text-black/40">{s.spec}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Industry recipes" count={INDUSTRY_RECIPES.length}>
+        <div className="grid gap-4 md:grid-cols-3">
+          {INDUSTRY_RECIPES.map((r) => (
+            <div key={r.id} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="font-mono text-xs text-black/50">{r.id}</div>
+              <div className="mt-1 font-medium" style={{ color: NAVY }}>
+                {r.name}
+              </div>
+              <p className="mt-1 text-sm text-black/60">{r.summary}</p>
+              <div className="mt-3 flex gap-1">
+                {r.palette.map((c) => (
+                  <span
+                    key={c}
+                    className="h-5 w-5 rounded-full border border-black/10"
+                    style={{ backgroundColor: c }}
+                    aria-hidden
+                  />
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {r.dna.map((d) => (
+                  <span
+                    key={d}
+                    className="rounded-full px-2 py-0.5 text-[11px]"
+                    style={{ backgroundColor: `${BLUE}12`, color: BLUE }}
+                  >
+                    {d}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-2 text-xs text-black/50">Tone: {r.tone}</div>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </>
+  );
+}
+
+// Shared brand for the swatches — TransPerfect v3.0 palette.
 const DEMO_BRAND = {
-  tokens: { primary: "#0B2A4A", accent: "#E85D2C" },
+  tokens: { primary: BLUE, accent: "#EC388A" },
 } as const;
 
 function IconTile({
