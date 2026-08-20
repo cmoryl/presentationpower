@@ -262,7 +262,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Link>
 
-          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
+          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
             {visibleNav.map((n) => {
               if (n.to === "/elements") {
                 const elementsActive =
@@ -279,8 +279,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <Link
                       to={n.to}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
-                        elementsActive ? pillActive : pillIdle
+                      className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm transition sm:px-4 ${
+                        elementsActive ? navActive : navIdle
                       }`}
                       onClick={() => setPresOpen(false)}
                     >
@@ -357,8 +357,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                   >
                     <Link
                       to={n.to}
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
-                        adminActive ? pillActive : pillIdle
+                      className={`inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm transition sm:px-4 ${
+                        adminActive ? navActive : navIdle
                       }`}
                       onClick={() => setAdminOpen(false)}
                     >
@@ -408,7 +408,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${active ? pillActive : pillIdle}`}
+                  className={`rounded-md px-3 py-2 text-sm transition sm:px-4 ${active ? navActive : navIdle}`}
                 >
                   {n.label}
                 </Link>
@@ -445,7 +445,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={n.to}
                   to={n.to}
-                  className={`rounded-full px-4 py-2 text-sm transition ${active ? pillActive : pillIdle}`}
+                  className={`rounded-md px-4 py-2 text-sm transition ${active ? navActive : navIdle}`}
                 >
                   {n.label}
                 </Link>
