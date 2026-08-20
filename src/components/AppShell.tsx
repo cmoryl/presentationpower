@@ -201,17 +201,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/faq", label: "FAQ" },
   ] as const;
 
-  // Sleek liquid-glass pills — hairline rings, gradient wash on active, no drop-shadow stacks.
-  const pillIdle =
-    "relative text-black/65 hover:text-black hover:bg-white/40 " +
-    "dark:text-white/70 dark:hover:text-white dark:hover:!bg-white/[0.05]";
-  const pillActive =
-    "relative text-[#03002C] bg-white/60 ring-1 ring-black/[0.04] " +
-    "dark:!text-white dark:!bg-white/[0.06] dark:!ring-white/10 " +
-    // Aqua→violet underline glow instead of a heavy drop shadow
-    "after:pointer-events-none after:absolute after:inset-x-3 after:-bottom-[3px] after:h-px " +
-    "after:bg-gradient-to-r after:from-transparent after:via-[#0057FF]/60 after:to-transparent " +
-    "dark:after:via-[#A1FBF9]/70";
+  // Flat nav links — underline on active, no pill background.
+  const navIdle =
+    "relative text-black/65 hover:text-black transition-colors " +
+    "dark:text-white/70 dark:hover:text-white";
+  const navActive =
+    "relative text-[#03002C] font-medium " +
+    "dark:!text-white " +
+    "after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-0.5 after:h-0.5 " +
+    "after:bg-[#003FC7] after:dark:bg-[#A1FBF9]";
+
 
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
