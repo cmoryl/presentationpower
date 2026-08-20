@@ -266,6 +266,31 @@ export function ProposalWorldMap({
         {WORLD_MAP_LAND.map((path, i) => (
           <path key={`land-${i}`} d={path.d} fill="#FFFFFF" opacity={path.opacity} />
         ))}
+        {/* Authoring-only guide: the export-safe pin zone (frame inset + the
+            area hidden behind the page title plate). Never captured. */}
+        {editable && onChange ? (
+          <g data-export-ignore="true" fill="none" stroke="#A1FBF9" strokeDasharray="3 3">
+            <rect
+              x={WORLD_MAP_VIEW.x + PIN_INSET}
+              y={WORLD_MAP_VIEW.y + PIN_INSET}
+              width={WORLD_MAP_VIEW.w - PIN_INSET * 2}
+              height={WORLD_MAP_VIEW.h - PIN_INSET * 2}
+              strokeWidth={0.6}
+              opacity={activePin !== null ? 0.5 : 0.22}
+            />
+            <rect
+              x={TITLE_BAND.x0}
+              y={WORLD_MAP_VIEW.y}
+              width={TITLE_BAND.x1 - TITLE_BAND.x0}
+              height={TITLE_BAND.y1 - WORLD_MAP_VIEW.y}
+              strokeWidth={0.6}
+              fill="#03002C"
+              fillOpacity={activePin !== null ? 0.28 : 0.14}
+              opacity={activePin !== null ? 0.5 : 0.22}
+            />
+          </g>
+        ) : null}
+
         {list.map((pin, i) => (
           <circle
             key={pin.id ?? `pin-${i}`}
