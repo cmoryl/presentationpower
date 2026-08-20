@@ -148,59 +148,115 @@ function MyFilesPage() {
   return (
     <AppShell>
       <div>
-        <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
-          My Files
-        </div>
-        <h1 className="mt-3 text-4xl font-semibold tracking-[-0.02em]">Everything you’ve made.</h1>
-        <p className="mt-3 max-w-2xl text-black/60 dark:text-white/60">
-          Decks, individual saved slides, print assets, saved modules, and social surfaces — saved
-          automatically as you work.
-          Search, reopen, or clear out what you no longer need.
-        </p>
+        {/* ============ HERO ============ */}
+        <section className="relative overflow-hidden rounded-3xl border border-black/10 bg-white px-7 py-9 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:px-10 sm:py-12">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full opacity-25 blur-3xl"
+            style={{ backgroundColor: "#003FC7" }}
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full opacity-20 blur-3xl"
+            style={{ backgroundColor: "#C2A3FF" }}
+          />
+          {/* Element brick rail */}
+          <span aria-hidden className="pointer-events-none absolute left-0 top-0 flex h-full w-2 flex-col">
+            {["#003FC7", "#A1FBF9", "#03002C", "#FF9B70", "#C2A3FF"].map((c) => (
+              <span key={c} className="flex-1" style={{ backgroundColor: c }} />
+            ))}
+          </span>
 
-        <div className="mt-8 flex flex-wrap items-center gap-2">
+          <div className="relative">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#003FC7]">
+              My files
+            </div>
+            <h1 className="mt-4 text-4xl font-semibold tracking-[-0.03em] sm:text-5xl">
+              Everything you’ve made.
+            </h1>
+            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-black/60 dark:text-white/60">
+              Decks, individual saved slides, print assets, saved modules, and social surfaces —
+              saved automatically as you work. Search, reopen, or clear out what you no longer need.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-6">
+              <HeroStat value={rows.length} label="Saved items" />
+              <HeroStat value={counts.deck ?? 0} label="Presentations" accent="#003FC7" />
+              <HeroStat value={counts.print ?? 0} label="Print assets" accent="#EC388A" />
+              <HeroStat value={counts.slide ?? 0} label="Slides" accent="#8A5CF6" />
+            </div>
+          </div>
+        </section>
+
+        {/* ============ ELEMENT SELECTOR ============ */}
+        <div className="mt-8 text-[10px] font-semibold uppercase tracking-[0.28em] text-black/45 dark:text-white/45">
+          Browse by element
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
           {(["all", "deck", "slide", "print", "module", "surface"] as const).map((k) => {
             const active = kind === k;
-            const label = k === "all" ? "All files" : KIND_META[k].group;
+            const meta = k === "all" ? null : KIND_META[k];
+            const accent = meta?.accent ?? "#03002C";
+            const Icon = meta?.icon ?? FolderOpen;
             return (
               <button
                 key={k}
                 type="button"
                 onClick={() => setKind(k)}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                aria-pressed={active}
+                className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md ${
                   active
-                    ? "border-[#003FC7] bg-[#003FC7] text-white"
-                    : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/50 dark:border-white/15 dark:bg-white/[0.04] dark:text-white/70"
+                    ? "border-transparent shadow-md"
+                    : "border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.04]"
                 }`}
+                style={active ? { backgroundColor: `${accent}12`, borderColor: `${accent}80` } : undefined}
               >
-                {label}
-                <span className={`ml-2 ${active ? "text-white/70" : "text-black/40"}`}>
-                  {counts[k] ?? 0}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute left-0 top-0 h-full w-1"
+                  style={{ backgroundColor: accent, opacity: active ? 1 : 0.35 }}
+                />
+                <span
+                  className="inline-flex size-9 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: `${accent}1f`, color: accent }}
+                >
+                  <Icon size={16} />
                 </span>
+                <div className="mt-3 text-sm font-semibold tracking-[-0.01em]">
+                  {k === "all" ? "All files" : meta!.group}
+                </div>
+                <div className="mt-0.5 text-[11px] text-black/50 dark:text-white/50">
+                  {k === "all" ? "Everything saved" : meta!.blurb}
+                </div>
+                <div
+                  className="mt-3 text-2xl font-semibold tabular-nums tracking-[-0.03em]"
+                  style={{ color: accent }}
+                >
+                  {counts[k] ?? 0}
+                </div>
               </button>
             );
           })}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
           <div className="relative w-72">
             <Search
               size={14}
-              className="pointer-events-none absolute left-3 top-2.5 text-foreground/40"
+              className="pointer-events-none absolute left-3 top-3 text-foreground/40"
             />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search your files…"
               aria-label="Search your files"
-              className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 pl-8 text-sm shadow-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20 dark:border-white/15 dark:bg-white/[0.04]"
+              className="w-full rounded-xl border border-black/15 bg-white px-3 py-2.5 pl-8 text-sm shadow-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20 dark:border-white/15 dark:bg-white/[0.04]"
             />
           </div>
           <select
             aria-label="Sort files"
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="rounded-lg border border-black/15 bg-white px-3 py-2 text-sm dark:border-white/15 dark:bg-white/[0.04]"
+            className="rounded-xl border border-black/15 bg-white px-3 py-2.5 text-sm dark:border-white/15 dark:bg-white/[0.04]"
           >
             <option value="recent">Recently edited</option>
             <option value="created">Recently created</option>
@@ -210,6 +266,7 @@ function MyFilesPage() {
             {filtered.length} of {rows.length}
           </span>
         </div>
+
 
         <div className="mt-6">
           {isLoading && (
