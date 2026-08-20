@@ -87,8 +87,8 @@ const SURFACES: Surface[] = [
     label: "Events",
     eyebrow: "Modular playbooks · phased",
     copy: "Launches, flagship conferences, webinars, and executive briefings — each phase mapped to deliverables and rendered live in your palette.",
-    accent: "#A6FA87",
-    glow: "#C2A3FF",
+    accent: "#0F5C1A",
+    glow: "#A6FA87",
     to: "/events",
     icon: CalendarDays,
     items: [
