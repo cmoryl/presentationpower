@@ -1,5 +1,5 @@
 {
-  "recordedAt": "2026-08-20T00:44:23.511Z",
+  "recordedAt": "2026-08-20T00:48:31.809Z",
   "harness": "/dev/print-module-pdf",
   "exportFormat": "digital + vectorText",
   "pageSize": "Letter",
@@ -16,7 +16,8 @@
     "pm-contact-contact-expert-card"
   ],
   "modes": [
-    "light"
+    "light",
+    "dark"
   ],
   "pages": [
     {
@@ -71,6 +72,62 @@
     {
       "id": "pm-contact-contact-expert-card",
       "mode": "light",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-narrative-narrative-tri-card",
+      "mode": "dark",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-stats-kpi-dashboard-portrait",
+      "mode": "dark",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-quote-pull-quote-hero",
+      "mode": "dark",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-logo-grid-logo-grid-portrait",
+      "mode": "dark",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-expertise-expertise-icon-strip",
+      "mode": "dark",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-feature-list-feature-cards-3col",
+      "mode": "dark",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-table-table-spec-rows",
+      "mode": "dark",
+      "w": 816,
+      "h": 1056,
+      "ratio": 0
+    },
+    {
+      "id": "pm-contact-contact-expert-card",
+      "mode": "dark",
       "w": 816,
       "h": 1056,
       "ratio": 0
