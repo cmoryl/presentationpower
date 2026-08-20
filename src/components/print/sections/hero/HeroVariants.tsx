@@ -22,6 +22,67 @@ function useBandHeight(heightPct: number | undefined, share: number): string {
   return cq(Math.round((pct / 100) * page.heightPx));
 }
 
+// ---- Authorable masthead rule + title typography --------------------------
+// `section.rule` and `section.titleType` let a document match an existing print
+// system: rule thickness/air/colour, and the title block's size, weight,
+// tracking, leading and case. Everything falls back to the built-in scale, so
+// untouched sections render exactly as before.
+
+/** Top masthead rule. `def` is the variant's own default thickness in px. */
+function heroRuleTop(section: PrintHeroSection, accent: string, def: number) {
+  const w = section.rule?.weight ?? def;
+  const color = section.rule?.color ?? accent;
+  return w <= 0 ? { borderTop: "none" as const } : { borderTop: `${cq(w)} solid ${color}` };
+}
+
+/** Air under the rule before the title block. */
+function heroRuleGap(section: PrintHeroSection, def: number): string {
+  return cq(section.rule?.gap ?? def);
+}
+
+/** Closing hairline under the title block. */
+function heroHairline(
+  section: PrintHeroSection,
+  ink: { hairline: string },
+  shownByDefault = true,
+) {
+  const shown = section.rule?.hairline ?? shownByDefault;
+  if (!shown) return { borderBottom: "none" as const };
+  return { borderBottom: `1px solid ${section.rule?.hairlineColor ?? ink.hairline}` };
+}
+
+const emTrack = (thousandths: number) => `${(thousandths / 1000).toFixed(3)}em`;
+
+function heroTitleStyle(section: PrintHeroSection) {
+  const t = section.titleType;
+  if (!t) return {};
+  return {
+    ...(t.titlePx ? { fontSize: cq(t.titlePx) } : null),
+    ...(t.titleWeight ? { fontWeight: t.titleWeight } : null),
+    ...(t.titleTracking !== undefined ? { letterSpacing: emTrack(t.titleTracking) } : null),
+    ...(t.titleLeading ? { lineHeight: t.titleLeading / 100 } : null),
+    ...(t.titleCase === "upper" ? { textTransform: "uppercase" as const } : null),
+  };
+}
+
+function heroSummaryStyle(section: PrintHeroSection) {
+  const t = section.titleType;
+  if (!t) return {};
+  return {
+    ...(t.summaryPx ? { fontSize: cq(t.summaryPx) } : null),
+    ...(t.summaryLeading ? { lineHeight: t.summaryLeading / 100 } : null),
+  };
+}
+
+function heroEyebrowStyle(section: PrintHeroSection) {
+  const t = section.titleType;
+  if (!t) return {};
+  return {
+    ...(t.eyebrowPx ? { fontSize: cq(t.eyebrowPx) } : null),
+    ...(t.eyebrowTracking !== undefined ? { letterSpacing: emTrack(t.eyebrowTracking) } : null),
+  };
+}
+
 type Props = {
   section: PrintHeroSection;
   mode: "light" | "dark";
@@ -128,6 +189,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
               fontWeight: 700,
               color: "#FFFFFF",
               ...clampLines(3),
+              ...heroTitleStyle(section),
             }}
           >
             {section.title}
@@ -142,6 +204,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
                 lineHeight: 1.5,
                 color: "rgba(255,255,255,0.86)",
                 ...clampLines(3),
+                ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
@@ -152,7 +215,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
       {/* Masthead rule: where the band ends and the document body begins. */}
       <div style={{ ...pageGutter() }}>
         <div style={{ height: cq(3), background: accent }} />
-        <div style={{ borderBottom: `1px solid ${ink.hairline}`, paddingBottom: cq(2) }} />
+        <div style={{ ...heroHairline(section, ink), paddingBottom: cq(2) }} />
         <MetaRail section={section} mode={mode} accent={accent} />
       </div>
     </section>
@@ -189,7 +252,7 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
       {section.eyebrow && (
         <div
           style={{
-            ...EYEBROW(accent),
+            ...EYEBROW(accent), ...heroEyebrowStyle(section),
             paddingBottom: cq(8),
             marginBottom: cq(10),
             borderBottom: `1px solid ${ink.hairline}`,
@@ -210,6 +273,7 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
           fontWeight: 700,
           color: ink.strong,
           ...clampLines(4),
+          ...heroTitleStyle(section),
         }}
       >
         {section.title}
@@ -222,6 +286,7 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
             lineHeight: 1.55,
             color: ink.soft,
             ...clampLines(6),
+            ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
@@ -253,7 +318,7 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
           </>
         )}
       </div>
-      <div style={{ borderTop: `${cq(2)} solid ${accent}` }} />
+      <div style={heroRuleTop(section, accent, 2)} />
     </section>
   );
 }
@@ -268,14 +333,14 @@ export function HeroTypeStack({ section, mode, accent }: Props) {
       style={{
         marginBottom: cq(22),
         textAlign: centered ? "center" : "left",
-        borderTop: `${cq(4)} solid ${accent}`,
-        borderBottom: `1px solid ${ink.hairline}`,
+        ...heroRuleTop(section, accent, 4),
+        ...heroHairline(section, ink),
         paddingTop: cq(16),
         paddingBottom: cq(18),
       }}
     >
       {section.eyebrow && (
-        <div style={{ ...EYEBROW(accent), marginBottom: cq(10) }}>{section.eyebrow}</div>
+        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
       )}
       <h2
         style={{
@@ -286,6 +351,7 @@ export function HeroTypeStack({ section, mode, accent }: Props) {
           fontWeight: 700,
           color: ink.strong,
           ...clampLines(3),
+          ...heroTitleStyle(section),
         }}
       >
         {section.title}
@@ -299,6 +365,7 @@ export function HeroTypeStack({ section, mode, accent }: Props) {
             lineHeight: 1.55,
             color: ink.soft,
             ...clampLines(4),
+            ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
@@ -336,6 +403,7 @@ export function HeroAccentBand({ section, mode, accent }: Props) {
             fontWeight: 700,
             color: "#FFFFFF",
             ...clampLines(3),
+            ...heroTitleStyle(section),
           }}
         >
           {section.title}
@@ -349,6 +417,7 @@ export function HeroAccentBand({ section, mode, accent }: Props) {
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.88)",
               ...clampLines(4),
+              ...heroSummaryStyle(section),
             }}
           >
             {section.summary}
@@ -367,10 +436,14 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
   return (
     <section
       aria-label="Hero"
-      style={{ marginBottom: cq(22), borderTop: `${cq(4)} solid ${accent}`, paddingTop: cq(16) }}
+      style={{
+        marginBottom: cq(22),
+        ...heroRuleTop(section, accent, 4),
+        paddingTop: heroRuleGap(section, 16),
+      }}
     >
       {section.eyebrow && (
-        <div style={{ ...EYEBROW(accent), marginBottom: cq(8) }}>{section.eyebrow}</div>
+        <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(8) }}>{section.eyebrow}</div>
       )}
       <h2
         style={{
@@ -381,6 +454,7 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
           fontWeight: 700,
           color: ink.strong,
           ...clampLines(3),
+          ...heroTitleStyle(section),
         }}
       >
         {section.title}
@@ -394,6 +468,7 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
             lineHeight: 1.55,
             color: ink.soft,
             ...clampLines(3),
+            ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
@@ -454,7 +529,7 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
       aria-label="Hero"
       style={{
         marginBottom: cq(22),
-        borderTop: `${cq(4)} solid ${accent}`,
+        ...heroRuleTop(section, accent, 4),
         paddingTop: cq(16),
         borderBottom: `1px solid ${ink.hairline}`,
         paddingBottom: cq(18),
@@ -462,7 +537,7 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
     >
       <div style={{ display: "grid", gridTemplateColumns: `${cq(160)} 1fr`, gap: cq(24) }}>
         <div style={{ borderRight: `1px solid ${ink.hairline}`, paddingRight: cq(16) }}>
-          {section.eyebrow && <div style={EYEBROW(accent, 8.5)}>{section.eyebrow}</div>}
+          {section.eyebrow && <div style={{ ...EYEBROW(accent, 8.5), ...heroEyebrowStyle(section) }}>{section.eyebrow}</div>}
           {section.kicker && (
             <div
               style={{
@@ -489,6 +564,7 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
               fontWeight: 700,
               color: ink.strong,
               ...clampLines(4),
+              ...heroTitleStyle(section),
             }}
           >
             {section.title}
@@ -501,6 +577,7 @@ export function HeroClientLockup({ section, mode, accent }: Props) {
                 lineHeight: 1.55,
                 color: ink.soft,
                 ...clampLines(6),
+                ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
@@ -564,7 +641,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           }}
         >
           {section.eyebrow && (
-            <div style={{ ...EYEBROW(accent), marginBottom: cq(10) }}>{section.eyebrow}</div>
+            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
           )}
 
           <h2
@@ -577,6 +654,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
               color: ink.strong,
               maxWidth: cq(470),
               ...clampLines(3),
+              ...heroTitleStyle(section),
             }}
           >
             {section.title}
@@ -590,6 +668,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
                 lineHeight: 1.6,
                 color: ink.soft,
                 ...clampLines(4),
+                ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
@@ -612,12 +691,16 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
   return (
     <section
       aria-label="Hero"
-      style={{ marginBottom: cq(22), borderTop: `${cq(4)} solid ${accent}`, paddingTop: cq(16) }}
+      style={{
+        marginBottom: cq(22),
+        ...heroRuleTop(section, accent, 4),
+        paddingTop: heroRuleGap(section, 16),
+      }}
     >
       <div style={{ display: "grid", gridTemplateColumns: "1.15fr 1fr", gap: cq(28) }}>
         <div>
           {section.eyebrow && (
-            <div style={{ ...EYEBROW(accent), marginBottom: cq(10) }}>{section.eyebrow}</div>
+            <div style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section), marginBottom: cq(10) }}>{section.eyebrow}</div>
           )}
           {section.kicker && (
             <div style={{ ...EYEBROW(ink.faint, 8.5), marginBottom: cq(6) }}>{section.kicker}</div>
@@ -631,6 +714,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
               fontWeight: 700,
               color: ink.strong,
               ...clampLines(4),
+              ...heroTitleStyle(section),
             }}
           >
             {section.title}
@@ -643,6 +727,7 @@ export function HeroQuoteSplit({ section, mode, accent }: Props) {
                 lineHeight: 1.65,
                 color: ink.soft,
                 ...clampLines(6),
+                ...heroSummaryStyle(section),
               }}
             >
               {section.summary}
@@ -766,6 +851,7 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
             fontWeight: 700,
             color: "#FFFFFF",
             ...clampLines(3),
+            ...heroTitleStyle(section),
           }}
         >
           {section.title}
@@ -779,6 +865,7 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
               lineHeight: 1.55,
               color: "rgba(255,255,255,0.86)",
               ...clampLines(3),
+              ...heroSummaryStyle(section),
             }}
           >
             {section.summary}
@@ -853,7 +940,7 @@ export function HeroBriefLockup({ section, mode, accent }: Props) {
           borderBottom: `1px solid ${ink.hairline}`,
         }}
       >
-        <span style={EYEBROW(accent)}>{section.eyebrow ?? "Brief"}</span>
+        <span style={{ ...EYEBROW(accent), ...heroEyebrowStyle(section) }}>{section.eyebrow ?? "Brief"}</span>
         <span style={{ ...EYEBROW(ink.faint, 8.5) }}>{section.kicker ?? "TransPerfect"}</span>
       </div>
       <h2
@@ -866,6 +953,7 @@ export function HeroBriefLockup({ section, mode, accent }: Props) {
           color: ink.strong,
           maxWidth: cq(480),
           ...clampLines(3),
+          ...heroTitleStyle(section),
         }}
       >
         {section.title}
@@ -879,6 +967,7 @@ export function HeroBriefLockup({ section, mode, accent }: Props) {
             lineHeight: 1.6,
             color: ink.soft,
             ...clampLines(4),
+            ...heroSummaryStyle(section),
           }}
         >
           {section.summary}
