@@ -219,6 +219,15 @@ export function CaseStudyLayout({
                 />
               </div>
             </div>
+            {/* Masthead rule — off unless authored, same control surface as the
+                modular hero sections. */}
+            <div
+              style={{
+                ...heroRuleTop(heroStyle, accent, 0),
+                marginTop: content.heroRule?.weight ? cq(14) : undefined,
+                marginBottom: content.heroRule?.weight ? heroRuleGap(heroStyle, 12) : undefined,
+              }}
+            />
             <div
               style={{
                 flex: 1,
@@ -261,6 +270,12 @@ export function CaseStudyLayout({
                   {[content.industry, content.audience].filter(Boolean).join(" · ")}
                 </p>
               )}
+              <div
+                style={{
+                  ...heroHairline(heroStyle, { hairline: dividerCol }, false),
+                  marginTop: cq(14),
+                }}
+              />
             </div>
           </div>
 
