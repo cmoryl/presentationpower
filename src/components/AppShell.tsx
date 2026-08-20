@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
 
-    { to: "/library", label: "Elements" },
+    { to: "/elements", label: "Elements" },
 
     { to: "/files", label: "My files" },
     { to: "/admin", label: "Admin" },
@@ -262,7 +262,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
           <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
             {nav.map((n) => {
-              if (n.to === "/library" && n.label === "Elements") {
+              if (n.to === "/elements") {
                 const elementsActive = elementGroups.some((g) =>
                   g.items.some((s) => pathname === s.to || pathname.startsWith(s.to + "/")),
                 );

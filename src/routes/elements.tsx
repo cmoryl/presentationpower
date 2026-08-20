@@ -203,7 +203,7 @@ function ElementsLanding() {
                     thickness="7px"
                     unit="6px"
                     gap="4px"
-                    tone="mono"
+                    tone="accent"
                     accent={s.accent}
                     style={{ marginTop: 4 }}
                   />
