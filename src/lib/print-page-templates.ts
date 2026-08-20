@@ -8,6 +8,7 @@ import {
   canPublishPageTemplates,
   listPrintPageTemplates,
 } from "@/lib/print-page-templates.functions";
+import { builtinPageTemplates } from "@/lib/print-library/page-templates-builtin";
 import type { PrintAssetContext, PrintAssetKind, PrintSection } from "@/lib/print-assets.types";
 
 export type PrintPageTemplateScope = "private" | "shared";
