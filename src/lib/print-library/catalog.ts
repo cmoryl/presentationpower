@@ -14,6 +14,7 @@
  */
 
 import type { PrintAssetKind } from "@/lib/print-assets.types";
+import type { PrintLibraryLook } from "@/lib/print-library/look";
 import {
   LEGAL_CASE_STUDIES,
   LEGAL_DIVISION_ID,
