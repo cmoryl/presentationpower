@@ -264,7 +264,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-full border border-white/40 bg-white/25 p-1 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
-            {nav.map((n) => {
+            {visibleNav.map((n) => {
               if (n.to === "/elements") {
                 const elementsActive =
                   pathname === "/elements" ||
