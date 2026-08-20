@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useTheme();
   const [adminOpen, setAdminOpen] = useState(false);
   const [presOpen, setPresOpen] = useState(false);
-  const [printOpen, setPrintOpen] = useState(false);
+  
   const inAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
   const isAdminLinked = matchesAdminLinked(pathname);
   const [adminCtx, setAdminCtx] = useState(false);
