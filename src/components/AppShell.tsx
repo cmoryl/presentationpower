@@ -256,6 +256,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               layout="horizontal"
               tone="auto"
               markSize={30}
+              image
               className="min-w-0 text-[#03002C] dark:text-white"
             />
           </Link>
