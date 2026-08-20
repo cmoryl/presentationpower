@@ -106,6 +106,7 @@ import { Route as KnowledgeBrandGuidesIndexRouteImport } from './routes/knowledg
 import { Route as DecksDeckIdIndexRouteImport } from './routes/decks.$deckId.index'
 import { Route as SocialDemoPlaybookIdRouteImport } from './routes/social.demo.$playbookId'
 import { Route as LibraryPrintModulesRouteImport } from './routes/library.print_.modules'
+import { Route as LibraryPrintHeroesRouteImport } from './routes/library.print_.heroes'
 import { Route as LibraryImportedMastersRouteImport } from './routes/library.imported_.masters'
 import { Route as LibraryImportedAuditRouteImport } from './routes/library.imported_.audit'
 import { Route as KnowledgeBrandGuidesNext2026BuildRouteImport } from './routes/knowledge.brand-guides.next-2026-build'
@@ -615,6 +616,11 @@ const LibraryPrintModulesRoute = LibraryPrintModulesRouteImport.update({
   path: '/library/print/modules',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryPrintHeroesRoute = LibraryPrintHeroesRouteImport.update({
+  id: '/library/print_/heroes',
+  path: '/library/print/heroes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryImportedMastersRoute = LibraryImportedMastersRouteImport.update({
   id: '/library/imported_/masters',
   path: '/library/imported/masters',
@@ -830,6 +836,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/library/imported/audit': typeof LibraryImportedAuditRoute
   '/library/imported/masters': typeof LibraryImportedMastersRoute
+  '/library/print/heroes': typeof LibraryPrintHeroesRoute
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
@@ -944,6 +951,7 @@ export interface FileRoutesByTo {
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/library/imported/audit': typeof LibraryImportedAuditRoute
   '/library/imported/masters': typeof LibraryImportedMastersRoute
+  '/library/print/heroes': typeof LibraryPrintHeroesRoute
   '/library/print/modules': typeof LibraryPrintModulesRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
@@ -1063,6 +1071,7 @@ export interface FileRoutesById {
   '/knowledge/brand-guides/next-2026-build': typeof KnowledgeBrandGuidesNext2026BuildRoute
   '/library/imported_/audit': typeof LibraryImportedAuditRoute
   '/library/imported_/masters': typeof LibraryImportedMastersRoute
+  '/library/print_/heroes': typeof LibraryPrintHeroesRoute
   '/library/print_/modules': typeof LibraryPrintModulesRoute
   '/social/demo/$playbookId': typeof SocialDemoPlaybookIdRoute
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
@@ -1183,6 +1192,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/next-2026-build'
     | '/library/imported/audit'
     | '/library/imported/masters'
+    | '/library/print/heroes'
     | '/library/print/modules'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
@@ -1297,6 +1307,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/next-2026-build'
     | '/library/imported/audit'
     | '/library/imported/masters'
+    | '/library/print/heroes'
     | '/library/print/modules'
     | '/social/demo/$playbookId'
     | '/decks/$deckId'
@@ -1415,6 +1426,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/next-2026-build'
     | '/library/imported_/audit'
     | '/library/imported_/masters'
+    | '/library/print_/heroes'
     | '/library/print_/modules'
     | '/social/demo/$playbookId'
     | '/decks/$deckId/'
@@ -1487,6 +1499,7 @@ export interface RootRouteChildren {
   DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
   LibraryImportedAuditRoute: typeof LibraryImportedAuditRoute
   LibraryImportedMastersRoute: typeof LibraryImportedMastersRoute
+  LibraryPrintHeroesRoute: typeof LibraryPrintHeroesRoute
   LibraryPrintModulesRoute: typeof LibraryPrintModulesRoute
   DecksDeckIdIndexRoute: typeof DecksDeckIdIndexRoute
 }
@@ -2172,6 +2185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LibraryPrintModulesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library/print_/heroes': {
+      id: '/library/print_/heroes'
+      path: '/library/print/heroes'
+      fullPath: '/library/print/heroes'
+      preLoaderRoute: typeof LibraryPrintHeroesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library/imported_/masters': {
       id: '/library/imported_/masters'
       path: '/library/imported/masters'
@@ -2520,6 +2540,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
   LibraryImportedAuditRoute: LibraryImportedAuditRoute,
   LibraryImportedMastersRoute: LibraryImportedMastersRoute,
+  LibraryPrintHeroesRoute: LibraryPrintHeroesRoute,
   LibraryPrintModulesRoute: LibraryPrintModulesRoute,
   DecksDeckIdIndexRoute: DecksDeckIdIndexRoute,
 }
