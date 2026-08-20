@@ -292,14 +292,27 @@ export function AppShell({ children }: { children: ReactNode }) {
                               </Link>
                               <div className="flex flex-col gap-0.5">
                                 {g.items.map((s) => {
-                                  const active =
-                                    s.to === "/library" || s.to === "/library/print"
-                                      ? pathname === s.to
-                                      : pathname === s.to || pathname.startsWith(s.to + "/");
+                                  const params = new URLSearchParams(locSearch || "");
+                                  const searchMatches = s.search
+                                    ? Object.entries(s.search).every(
+                                        ([k, v]) => params.get(k) === v,
+                                      )
+                                    : ["type", "sub", "collection"].every((k) => !params.get(k));
+                                  const exact =
+                                    s.to === "/library" ||
+                                    s.to === "/library/print" ||
+                                    s.to === "/events" ||
+                                    s.to === "/social" ||
+                                    s.to === "/decks";
+                                  const pathMatches = exact
+                                    ? pathname === s.to
+                                    : pathname === s.to || pathname.startsWith(s.to + "/");
+                                  const active = pathMatches && searchMatches;
                                   return (
                                     <Link
-                                      key={s.to}
+                                      key={`${s.to}:${s.label}`}
                                       to={s.to}
+                                      search={s.search ?? {}}
                                       className={`block rounded-lg px-2.5 py-1.5 text-[13px] leading-tight transition ${
                                         active
                                           ? "bg-white/80 text-[#03002C] dark:!bg-white/10 dark:!text-white"
@@ -310,6 +323,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                                       {s.label}
                                     </Link>
                                   );
+
                                 })}
                               </div>
                             </div>
