@@ -163,11 +163,12 @@ export function ProposalWorldMap({
   const toMapPoint = (clientX: number, clientY: number) => {
     const rect = svgRef.current?.getBoundingClientRect();
     if (!rect?.width || !rect.height) return null;
-    return {
-      x: Math.round((view.x + ((clientX - rect.left) / rect.width) * view.w) * 10) / 10,
-      y: Math.round((view.y + ((clientY - rect.top) / rect.height) * view.h) * 10) / 10,
-    };
+    return clampPinPoint(
+      view.x + ((clientX - rect.left) / rect.width) * view.w,
+      view.y + ((clientY - rect.top) / rect.height) * view.h,
+    );
   };
+
 
   const startPinDrag = (index: number) => (event: React.PointerEvent<SVGCircleElement>) => {
     if (!editable || !onChange) return;
