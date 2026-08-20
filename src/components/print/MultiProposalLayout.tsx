@@ -34,6 +34,7 @@ import {
   PROPOSAL_ART,
 } from "@/lib/print-library/proposal-art";
 import { PROPOSAL_REGIONS, PROPOSAL_TEAL } from "@/lib/print-library/proposal-locations";
+import { EditableImage, usePrintImageEdit } from "./PrintImageEdit";
 
 // ---------------------------------------------------------------------------
 // Source-deck constants
@@ -58,6 +59,9 @@ const BRIGHT_FIELD = `linear-gradient(101deg, ${BLUE} 0%, #4B63E8 26%, ${LAV} 58
 const DEEP_FIELD = `linear-gradient(72deg, ${NAVY} 0%, #061E6E 22%, ${BLUE} 52%, #7FA6F5 74%, ${LAV} 100%)`;
 /** Slide 1 — pale aqua → white → lavender. */
 const COVER_FIELD = `linear-gradient(122deg, ${AQUA_FIELD} 0%, #D8F4FC 18%, #F4FBFF 40%, #F2F0FF 56%, #C6B8FD 82%, ${LAV} 100%)`;
+
+const TRANSPARENT_PX =
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 const FONT = "Geist, ui-sans-serif, system-ui, sans-serif";
 
@@ -84,6 +88,9 @@ export const MULTI_PAGE_LABELS: Record<MultiProposalPage["kind"], string> = {
   advocates: "Advocates",
   "team-grid": "Meet the team",
   "team-bio": "Team bios",
+  "team-cards": "Team cards",
+  "team-leads": "Engagement leads",
+  "team-wall": "Team wall",
   summary: "Summary",
 };
 
@@ -193,27 +200,44 @@ function Img({
   fit = "contain",
   radius,
   align = "center",
+  slot,
+  label,
 }: BoxProps & {
   src: string;
   alt?: string;
   fit?: "contain" | "cover";
   radius?: number;
   align?: "left" | "center" | "right";
+  /** When set (and the editor context is present) the picture is replaceable. */
+  slot?: string;
+  label?: string;
 }) {
   return (
     <L x={x} y={y} w={w} h={h}>
-      <img
-        alt={alt}
-        src={src}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: fit,
-          objectPosition: align === "center" ? "center" : `${align} center`,
-          borderRadius: radius === undefined ? undefined : u(radius),
-          display: "block",
-        }}
-      />
+      {slot ? (
+        <EditableImage
+          slot={slot}
+          src={src}
+          alt={alt}
+          fit={fit}
+          align={align}
+          radius={radius === undefined ? undefined : u(radius)}
+          label={label}
+        />
+      ) : (
+        <img
+          alt={alt}
+          src={src}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: fit,
+            objectPosition: align === "center" ? "center" : `${align} center`,
+            borderRadius: radius === undefined ? undefined : u(radius),
+            display: "block",
+          }}
+        />
+      )}
     </L>
   );
 }
@@ -252,7 +276,7 @@ function BandHeader({ title, logo }: { title: string; logo: string }) {
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={2.95} style={{ background: BRIGHT_FIELD }} />
-      <Img x={6.38} y={0.47} w={1.88} h={0.28} src={logo} alt="TransPerfect" />
+      <Img x={6.38} y={0.47} w={1.88} h={0.28} src={logo} alt="TransPerfect" slot="band.logo" label="logo" />
       <T x={0.47} y={0.86} w={6} size={39.7} weight={700} leading={1.05} tracking="-0.02em">
         {title}
       </T>
@@ -285,6 +309,64 @@ function Plate({
       h={h}
       style={{ background: bg, borderRadius: u(radius), border }}
     />
+  );
+}
+
+/**
+ * Client-logo drop slot. Prints the uploaded mark once one exists; until then
+ * it shows the template's "[insert client logo here]" prompt, and in the editor
+ * that prompt doubles as a drag-and-drop / click-to-replace target.
+ */
+function ClientLogoSlot({
+  x,
+  y,
+  w,
+  h,
+  slot,
+  placeholder,
+  color = NAVY,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  slot: string;
+  placeholder: string;
+  color?: string;
+}) {
+  const ctx = usePrintImageEdit();
+  const url = ctx?.overrides?.[slot];
+  if (url) {
+    return <Img x={x} y={y} w={w} h={h} src={url} alt="Client logo" slot={slot} label="client logo" />;
+  }
+  if (!ctx?.active) {
+    return (
+      <T x={x} y={y + 0.12} w={w} size={18} weight={400} color={color} align="center" leading={1.3}>
+        {placeholder}
+      </T>
+    );
+  }
+  return (
+    <L x={x} y={y} w={w} h={h}>
+      <EditableImage slot={slot} src={TRANSPARENT_PX} alt="Client logo" label="client logo" />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          border: `${u(0.012)} dashed rgba(3,0,44,0.35)`,
+          borderRadius: u(0.12),
+          color,
+          fontSize: u(0.19),
+          pointerEvents: "none",
+        }}
+      >
+        {placeholder}
+      </div>
+    </L>
   );
 }
 
@@ -322,7 +404,7 @@ function CoverPage({ page, logoDark }: { page: MultiProposalPage; logoDark: stri
       <T x={0.4} y={0.9} w={7.72} size={17} weight={400} color={BLUE} align="center" leading={1.3}>
         {page.eyebrow || "Transforming Global Performance"}
       </T>
-      <Img x={1.84} y={1.34} w={4.9} h={0.62} src={logoDark} alt="TransPerfect" />
+      <Img x={1.84} y={1.34} w={4.9} h={0.62} src={logoDark} alt="TransPerfect" slot="cover.logo" label="logo" />
       <T
         x={0.4}
         y={2.24}
@@ -335,9 +417,15 @@ function CoverPage({ page, logoDark }: { page: MultiProposalPage; logoDark: stri
       >
         {page.title || "SOLUTIONS PROPOSAL"}
       </T>
-      <T x={2.0} y={2.98} w={4.52} size={18} weight={400} color={NAVY} align="center" leading={1.3}>
-        {page.subtitle || "[insert client logo here]"}
-      </T>
+      <ClientLogoSlot
+        x={2.0}
+        y={2.86}
+        w={4.52}
+        h={0.72}
+        slot="cover.clientLogo"
+        placeholder={page.subtitle || "[insert client logo here]"}
+      />
+
 
       <L
         x={2.28}
@@ -688,7 +776,7 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
         {title.join("\n")}
       </T>
 
-      <Img x={-0.06} y={2.89} w={8.44} h={4.64} src={PROPOSAL_ART.worldMap} alt="World map" />
+      <Img x={-0.06} y={2.89} w={8.44} h={4.64} src={PROPOSAL_ART.worldMap} alt="World map" slot="locations.map" label="map" />
 
       {/* Legend */}
       <L x={0.56} y={7.56} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
@@ -737,42 +825,69 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
 
 function ClientsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
   const title = lines(page.title).length ? lines(page.title) : ["Our", "clients."];
+  const editing = !!usePrintImageEdit()?.active;
+  // Column centres and row baselines lifted straight off the source slide.
   const tileX = [1.3, 2.84, 4.37, 5.9];
-  const tileY = [4.56, 6.12, 7.67];
+  const tileY = [4.98, 6.55, 8.06];
+  const tiles = Array.from({ length: 12 }, (_, i) => ({
+    // Names are opt-in captions — the source slide shows logos only.
+    name: page.clients?.[i]?.name ?? "",
+    alt: page.clients?.[i]?.name || CLIENT_LOGOS[i]?.name || "Client logo",
+    url: page.clients?.[i]?.url || CLIENT_LOGOS[i]?.url || TRANSPARENT_PX,
+  }));
+
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: BRIGHT_FIELD }} />
-      <L x={0} y={0} w={PAGE_W_IN} h={5.76} style={{ background: "#FFFFFF" }} />
+      <L x={0} y={0} w={PAGE_W_IN} h={5.78} style={{ background: "#FFFFFF" }} />
       <Plate x={0.43} y={3.5} w={7.59} h={5.87} radius={0.3} />
 
-      <T x={0.68} y={1.28} w={5} size={65.5} weight={700} leading={1.02} tracking="-0.035em">
+      <T x={0.68} y={1.3} w={5} size={65.5} weight={700} leading={1.02} tracking="-0.035em">
         <span style={{ color: NAVY }}>{title[0]}</span>
         {"\n"}
         <span style={{ color: BLUE }}>{title[1]}</span>
       </T>
-      <T x={0.43} y={3.86} w={7.59} size={18} weight={700} color={NAVY} align="center">
+      <T x={0.43} y={3.94} w={7.59} size={13.5} weight={700} color={NAVY} align="center" leading={1.3}>
         {page.subtitle || "We're proud of the company we keep"}
       </T>
 
-      {CLIENT_LOGOS.slice(0, 12).map((logo, i) => {
+      {tiles.map((tile, i) => {
         const col = i % 4;
         const row = Math.floor(i / 4);
+        const x = tileX[col]!;
+        const y = tileY[row]!;
         return (
-          <L key={logo.name} x={tileX[col]!} y={tileY[row]!} w={1.4} h={1.0}>
-            <img
-              alt={logo.name}
-              src={logo.url}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                objectPosition: "center",
-                display: "block",
-              }}
+          <div key={i}>
+            <Img
+              x={x}
+              y={y}
+              w={1.4}
+              h={0.62}
+              src={tile.url}
+              alt={tile.alt}
+              fit="contain"
+              slot={`clients.logo.${i + 1}`}
+              label="client logo"
             />
-          </L>
+            {(tile.name || editing) && (
+              <T
+                x={x}
+                y={y + 0.68}
+                w={1.4}
+                size={7.5}
+                weight={600}
+                color={editing && !tile.name ? "rgba(3,0,44,0.35)" : "#555555"}
+                align="center"
+                tracking="0.06em"
+                upper
+              >
+                {tile.name || "Client name"}
+              </T>
+            )}
+          </div>
         );
       })}
+
 
       <Img x={2.92} y={10.02} w={2.59} h={0.33} src={logoWhite} alt="TransPerfect" />
     </>
@@ -841,6 +956,8 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         alt="Above the clouds"
         fit="cover"
         radius={0.3}
+        slot="stories.photo.1"
+        label="photo"
       />
       {firstLogo ? (
         <Img
@@ -852,6 +969,8 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
           alt={first?.company || "Lufthansa"}
           fit="contain"
           align="left"
+          slot="stories.logo.1"
+          label="logo"
         />
       ) : (
         <T x={3.72} y={2.5} w={3.6} size={26} weight={700} color={NAVY} tracking="-0.02em">
@@ -877,6 +996,8 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         alt="Coffee"
         fit="cover"
         radius={0.3}
+        slot="stories.photo.2"
+        label="photo"
       />
       {secondLogo ? (
         <Img
@@ -888,6 +1009,8 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
           alt={second?.company || "Lavazza"}
           fit="contain"
           align="right"
+          slot="stories.logo.2"
+          label="logo"
         />
       ) : (
         <T x={1.07} y={6.62} w={3.44} size={26} weight={700} color={NAVY} align="right" tracking="-0.02em">
@@ -927,7 +1050,7 @@ function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
-      <Img x={0} y={0} w={8.53} h={3.6} src={PROPOSAL_ART.teamGrid} alt="TransPerfect team" fit="cover" />
+      <Img x={0} y={0} w={8.53} h={3.6} src={PROPOSAL_ART.teamGrid} alt="TransPerfect team" fit="cover" slot="why.photo" label="photo" />
 
       {/* White statement bubble with a downward tail. */}
       <svg
@@ -1014,15 +1137,20 @@ function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: 
       <Rule x={3.12} y={2.06} w={5.08} color="rgba(255,255,255,0.7)" />
 
       {CAUSE_LOGOS.slice(0, 9).map((logo, i) => {
-        const slot = CAUSE_SLOTS[i]!;
+        const box = CAUSE_SLOTS[i]!;
         return (
-          <L key={logo.name} x={slot.x} y={slot.y} w={slot.w} h={slot.h}>
-            <img
-              alt={logo.name}
-              src={logo.url}
-              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-            />
-          </L>
+          <Img
+            key={logo.name}
+            x={box.x}
+            y={box.y}
+            w={box.w}
+            h={box.h}
+            src={logo.url}
+            alt={logo.name}
+            fit="contain"
+            slot={`advocates.cause.${i + 1}`}
+            label="logo"
+          />
         );
       })}
 
@@ -1054,15 +1182,20 @@ function AdvocatesPage({ page, logoDark }: { page: MultiProposalPage; logoDark: 
       <Rule x={4.63} y={8.29} w={3.17} color="rgba(255,255,255,0.7)" />
 
       {AFFINITY_LOGOS.slice(0, 4).map((logo, i) => {
-        const slot = AFFINITY_SLOTS[i]!;
+        const box = AFFINITY_SLOTS[i]!;
         return (
-          <L key={logo.name} x={slot.x} y={slot.y} w={slot.w} h={slot.h}>
-            <img
-              alt={logo.name}
-              src={logo.url}
-              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-            />
-          </L>
+          <Img
+            key={logo.name}
+            x={box.x}
+            y={box.y}
+            w={box.w}
+            h={box.h}
+            src={logo.url}
+            alt={logo.name}
+            fit="contain"
+            slot={`advocates.affinity.${i + 1}`}
+            label="logo"
+          />
         );
       })}
     </>
@@ -1146,6 +1279,185 @@ function TeamPage({
   );
 }
 
+// --- Additional team page designs -----------------------------------------
+
+/** Photo card grid — 3 columns × 2 rows of headshot cards. */
+function TeamCardsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const team = page.team ?? [];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "Meet the Team"} logo={logoWhite} />
+      <Plate x={0.27} y={2.18} w={7.98} h={8.35} radius={0.4} />
+      {page.body && (
+        <T x={0.78} y={2.62} w={6.96} size={11} color="#555555" leading={1.5}>
+          {page.body}
+        </T>
+      )}
+      {team.slice(0, 6).map((member, i) => {
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+        const x = 0.7 + col * 2.44;
+        const y = 3.42 + row * 3.18;
+        return (
+          <div key={i}>
+            <L
+              x={x}
+              y={y}
+              w={2.2}
+              h={2.86}
+              style={{
+                background: "#F3F6FE",
+                borderRadius: u(0.18),
+                border: `${u(0.008)} solid rgba(3,0,44,0.08)`,
+              }}
+            />
+            <Img
+              x={x + 0.16}
+              y={y + 0.16}
+              w={1.88}
+              h={1.5}
+              src={member.photo || TRANSPARENT_PX}
+              alt={member.name ?? "Team member"}
+              fit="cover"
+              radius={0.12}
+              slot={`team.photo.${i + 1}`}
+              label="headshot"
+            />
+            <T x={x + 0.18} y={y + 1.8} w={1.86} size={12.5} weight={700} color={NAVY} leading={1.15}>
+              {member.name ?? ""}
+            </T>
+            <T
+              x={x + 0.18}
+              y={y + 2.14}
+              w={1.86}
+              size={8.5}
+              weight={600}
+              color={BLUE}
+              upper
+              tracking="0.06em"
+              leading={1.25}
+            >
+              {member.role ?? ""}
+            </T>
+            <T x={x + 0.18} y={y + 2.46} w={1.86} size={8.5} color="#555555" leading={1.35}>
+              {[member.office, member.email].filter(Boolean).join("\n")}
+            </T>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+/** Two engagement leads, large portraits with a full bio column. */
+function TeamLeadsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const team = page.team ?? [];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      <BandHeader title={page.title || "Your engagement leads"} logo={logoWhite} />
+      <Plate x={0.27} y={2.18} w={7.98} h={8.35} radius={0.4} />
+      {page.body && (
+        <T x={0.78} y={2.62} w={6.96} size={11} color="#555555" leading={1.5}>
+          {page.body}
+        </T>
+      )}
+      {team.slice(0, 2).map((member, i) => {
+        const y = 3.5 + i * 3.5;
+        return (
+          <div key={i}>
+            <Img
+              x={0.78}
+              y={y}
+              w={2.3}
+              h={2.6}
+              src={member.photo || TRANSPARENT_PX}
+              alt={member.name ?? "Engagement lead"}
+              fit="cover"
+              radius={0.16}
+              slot={`team.lead.photo.${i + 1}`}
+              label="portrait"
+            />
+            <T x={3.3} y={y} w={4.44} size={20} weight={700} color={NAVY} leading={1.1} tracking="-0.02em">
+              {member.name ?? ""}
+            </T>
+            <T x={3.3} y={y + 0.42} w={4.44} size={10} weight={600} color={BLUE} upper tracking="0.07em">
+              {member.role ?? ""}
+            </T>
+            <Rule x={3.3} y={y + 0.68} w={4.44} color="rgba(3,0,44,0.12)" />
+            <T x={3.3} y={y + 0.84} w={4.44} size={10.5} color="#555555" leading={1.5}>
+              {member.bio ?? ""}
+            </T>
+            <T x={3.3} y={y + 2.28} w={4.44} size={9.5} color={NAVY} leading={1.4}>
+              {[member.email, member.phone, member.office].filter(Boolean).join("  ·  ")}
+            </T>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+/** Dense headshot wall — up to 12 people on a single page. */
+function TeamWallPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const team = page.team ?? [];
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: BRIGHT_FIELD }} />
+      <Plate x={0.27} y={0.5} w={7.98} h={9.95} radius={0.4} />
+      <T x={0.78} y={1.0} w={6.6} size={39.7} weight={700} color={NAVY} leading={1.04} tracking="-0.025em">
+        {page.title || "Your global team"}
+      </T>
+      {page.subtitle && (
+        <T x={0.78} y={1.86} w={6.6} size={13} weight={600} color={BLUE} leading={1.35}>
+          {page.subtitle}
+        </T>
+      )}
+      {team.slice(0, 12).map((member, i) => {
+        const col = i % 4;
+        const row = Math.floor(i / 4);
+        const x = 0.78 + col * 1.72;
+        const y = 2.6 + row * 2.5;
+        return (
+          <div key={i}>
+            <Img
+              x={x}
+              y={y}
+              w={1.5}
+              h={1.5}
+              src={member.photo || TRANSPARENT_PX}
+              alt={member.name ?? "Team member"}
+              fit="cover"
+              radius={0.75}
+              slot={`team.wall.photo.${i + 1}`}
+              label="headshot"
+            />
+            <T x={x - 0.06} y={y + 1.62} w={1.62} size={10} weight={700} color={NAVY} align="center" leading={1.2}>
+              {member.name ?? ""}
+            </T>
+            <T
+              x={x - 0.06}
+              y={y + 1.94}
+              w={1.62}
+              size={7.5}
+              weight={600}
+              color={BLUE}
+              align="center"
+              upper
+              tracking="0.06em"
+              leading={1.25}
+            >
+              {member.role ?? ""}
+            </T>
+          </div>
+        );
+      })}
+      <Img x={5.54} y={10.55} w={2.7} h={0.34} src={logoWhite} alt="TransPerfect" />
+    </>
+  );
+}
+
 function SummaryPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
   const bullets = page.bullets ?? [];
   return (
@@ -1222,6 +1534,12 @@ function PageBody({
       return <TeamPage page={page} logoWhite={logoWhite} bios={false} />;
     case "team-bio":
       return <TeamPage page={page} logoWhite={logoWhite} bios />;
+    case "team-cards":
+      return <TeamCardsPage page={page} logoWhite={logoWhite} />;
+    case "team-leads":
+      return <TeamLeadsPage page={page} logoWhite={logoWhite} />;
+    case "team-wall":
+      return <TeamWallPage page={page} logoWhite={logoWhite} />;
     default:
       return <SummaryPage page={page} logoWhite={logoWhite} />;
   }
