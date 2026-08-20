@@ -80,7 +80,7 @@ function PrintHeroGalleryPage() {
           Hero gallery
         </h1>
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
-          The six opening lockups the curated print collateral uses. Every preview renders at true
+          Every opening lockup the curated print collateral uses — including the fade-to-page photo masthead, the spotlight quote split, and the co-brand MSA band. Every preview renders at true
           Letter proportions with the original hero photography and copy, so you can compare
           openers before inserting one from the editor's <em>Shared modules</em> drawer.
         </p>
