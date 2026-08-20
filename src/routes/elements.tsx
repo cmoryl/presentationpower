@@ -6,7 +6,6 @@ import {
   Share2,
   ArrowRight,
   Sparkles,
-  Shapes,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ElementBrickRow, ElementBrickRail } from "@/components/brand/ElementBrickMotif";
