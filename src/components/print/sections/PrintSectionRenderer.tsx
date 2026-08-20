@@ -1,6 +1,6 @@
 // Dispatch a `PrintSection` block to its portrait-native renderer. Any print
 // layout can render `content.modules?` by mapping through this component.
-import type { PrintSection } from "@/lib/print-assets.types";
+import type { PrintHeroModuleVariant, PrintSection } from "@/lib/print-assets.types";
 import {
   HeroPhotoBand,
   HeroSplitPhoto,
@@ -8,6 +8,10 @@ import {
   HeroAccentBand,
   HeroStatLockup,
   HeroClientLockup,
+  HeroPhotoFade,
+  HeroQuoteSplit,
+  HeroCobrandBand,
+  HeroBriefLockup,
 } from "./hero/HeroVariants";
 import { KpiDashboardPortrait } from "./stats/KpiDashboardPortrait";
 import { StatCalloutRowPortrait } from "./stats/StatCalloutRowPortrait";
@@ -34,13 +38,7 @@ import { ContactGlobalPanel } from "./contact/ContactGlobalPanel";
 import { ContactCtaBand } from "./contact/ContactCtaBand";
 
 export const PRINT_HERO_VARIANTS: Array<{
-  id:
-    | "hero-photo-band"
-    | "hero-split-photo"
-    | "hero-type-stack"
-    | "hero-accent-band"
-    | "hero-stat-lockup"
-    | "hero-client-lockup";
+  id: PrintHeroModuleVariant;
   label: string;
   description: string;
 }> = [
@@ -73,6 +71,26 @@ export const PRINT_HERO_VARIANTS: Array<{
     id: "hero-client-lockup",
     label: "Client Lockup",
     description: "Case-study opener: client rail beside the engagement title.",
+  },
+  {
+    id: "hero-photo-fade",
+    label: "Photo Fade",
+    description: "Photo bleeds from the top and feathers into the page; title sits in the seam.",
+  },
+  {
+    id: "hero-quote-split",
+    label: "Quote Split",
+    description: "Spotlight opener: title + intro left, client pull-quote right.",
+  },
+  {
+    id: "hero-cobrand-band",
+    label: "Co-brand Band",
+    description: "MSA cover: two marks locked up on a navy→accent band with proof numbers.",
+  },
+  {
+    id: "hero-brief-lockup",
+    label: "Brief Lockup",
+    description: "Adaptor-brief header row over a hairline, then an oversized title block.",
   },
 ];
 
@@ -255,6 +273,14 @@ export function PrintSectionRenderer({
         return <HeroStatLockup section={section} mode={mode} accent={accent} />;
       if (section.variantId === "hero-client-lockup")
         return <HeroClientLockup section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-photo-fade")
+        return <HeroPhotoFade section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-quote-split")
+        return <HeroQuoteSplit section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-cobrand-band")
+        return <HeroCobrandBand section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "hero-brief-lockup")
+        return <HeroBriefLockup section={section} mode={mode} accent={accent} />;
       return null;
     case "stats":
       if (section.variantId === "kpi-dashboard-portrait")
