@@ -1193,6 +1193,11 @@ function AssetEditor() {
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
               style={{ aspectRatio: canvasAspect }}
             >
+              <PrintContentFitFrame
+                settings={ctx.contentFit}
+                dep={rawContent}
+                onChange={(knobs) => setFitKnobs(knobs)}
+              >
               <PrintDocModeProvider icons={iconTreatment.icons} iconStyle={iconTreatment.iconStyle}>
                 <PrintIconEditContext.Provider
                   value={{
