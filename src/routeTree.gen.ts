@@ -83,6 +83,7 @@ import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
 import { Route as AdminTeamRouteImport } from './routes/admin.team'
 import { Route as AdminStyleLearningRouteImport } from './routes/admin.style-learning'
 import { Route as AdminPrintLibraryRouteImport } from './routes/admin.print-library'
+import { Route as AdminPrintColorRouteImport } from './routes/admin.print-color'
 import { Route as AdminPdfIngestRouteImport } from './routes/admin.pdf-ingest'
 import { Route as AdminOracleRouteImport } from './routes/admin.oracle'
 import { Route as AdminModulesRouteImport } from './routes/admin.modules'
@@ -503,6 +504,11 @@ const AdminPrintLibraryRoute = AdminPrintLibraryRouteImport.update({
   path: '/print-library',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPrintColorRoute = AdminPrintColorRouteImport.update({
+  id: '/print-color',
+  path: '/print-color',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPdfIngestRoute = AdminPdfIngestRouteImport.update({
   id: '/pdf-ingest',
   path: '/pdf-ingest',
@@ -794,6 +800,7 @@ export interface FileRoutesByFullPath {
   '/admin/modules': typeof AdminModulesRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/print-color': typeof AdminPrintColorRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/team': typeof AdminTeamRoute
@@ -914,6 +921,7 @@ export interface FileRoutesByTo {
   '/admin/modules': typeof AdminModulesRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/print-color': typeof AdminPrintColorRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/team': typeof AdminTeamRoute
@@ -1039,6 +1047,7 @@ export interface FileRoutesById {
   '/admin/modules': typeof AdminModulesRoute
   '/admin/oracle': typeof AdminOracleRoute
   '/admin/pdf-ingest': typeof AdminPdfIngestRoute
+  '/admin/print-color': typeof AdminPrintColorRoute
   '/admin/print-library': typeof AdminPrintLibraryRoute
   '/admin/style-learning': typeof AdminStyleLearningRoute
   '/admin/team': typeof AdminTeamRoute
@@ -1165,6 +1174,7 @@ export interface FileRouteTypes {
     | '/admin/modules'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/print-color'
     | '/admin/print-library'
     | '/admin/style-learning'
     | '/admin/team'
@@ -1285,6 +1295,7 @@ export interface FileRouteTypes {
     | '/admin/modules'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/print-color'
     | '/admin/print-library'
     | '/admin/style-learning'
     | '/admin/team'
@@ -1409,6 +1420,7 @@ export interface FileRouteTypes {
     | '/admin/modules'
     | '/admin/oracle'
     | '/admin/pdf-ingest'
+    | '/admin/print-color'
     | '/admin/print-library'
     | '/admin/style-learning'
     | '/admin/team'
@@ -2087,6 +2099,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPrintLibraryRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/print-color': {
+      id: '/admin/print-color'
+      path: '/print-color'
+      fullPath: '/admin/print-color'
+      preLoaderRoute: typeof AdminPrintColorRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pdf-ingest': {
       id: '/admin/pdf-ingest'
       path: '/pdf-ingest'
@@ -2458,6 +2477,7 @@ interface AdminRouteChildren {
   AdminModulesRoute: typeof AdminModulesRoute
   AdminOracleRoute: typeof AdminOracleRoute
   AdminPdfIngestRoute: typeof AdminPdfIngestRoute
+  AdminPrintColorRoute: typeof AdminPrintColorRoute
   AdminPrintLibraryRoute: typeof AdminPrintLibraryRoute
   AdminStyleLearningRoute: typeof AdminStyleLearningRoute
   AdminTeamRoute: typeof AdminTeamRoute
@@ -2489,6 +2509,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminModulesRoute: AdminModulesRoute,
   AdminOracleRoute: AdminOracleRoute,
   AdminPdfIngestRoute: AdminPdfIngestRoute,
+  AdminPrintColorRoute: AdminPrintColorRoute,
   AdminPrintLibraryRoute: AdminPrintLibraryRoute,
   AdminStyleLearningRoute: AdminStyleLearningRoute,
   AdminTeamRoute: AdminTeamRoute,
