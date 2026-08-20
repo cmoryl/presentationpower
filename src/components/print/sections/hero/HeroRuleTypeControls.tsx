@@ -74,6 +74,7 @@ function Slider({
   );
 }
 
+/** Section-scoped wrapper: drives `section.rule` / `section.titleType`. */
 export function HeroRuleTypeControls({
   section,
   onPatch,
@@ -81,8 +82,33 @@ export function HeroRuleTypeControls({
   section: PrintHeroSection;
   onPatch: (p: Partial<PrintHeroSection>) => void;
 }) {
-  const rule = section.rule ?? {};
-  const type = section.titleType ?? {};
+  return (
+    <MastheadRuleTypeControls
+      rule={section.rule}
+      titleType={section.titleType}
+      onChange={(next) => onPatch(next)}
+    />
+  );
+}
+
+/**
+ * Generic masthead controls. Used by the modular hero sections and by the
+ * legacy full-page openers (case study / spotlight / e-brochure / brief),
+ * which store the same contract as `content.heroRule` / `content.heroTitleType`.
+ */
+export function MastheadRuleTypeControls({
+  rule: ruleProp,
+  titleType,
+  onChange,
+}: {
+  rule: PrintHeroRule | undefined;
+  titleType: PrintHeroTitleType | undefined;
+  onChange: (next: { rule?: PrintHeroRule; titleType?: PrintHeroTitleType }) => void;
+}) {
+  const section = { rule: ruleProp, titleType } as Pick<PrintHeroSection, "rule" | "titleType">;
+  const rule = ruleProp ?? {};
+  const type = titleType ?? {};
+  const onPatch = onChange;
   const patchRule = (p: Partial<PrintHeroRule>) => onPatch({ rule: { ...rule, ...p } });
   const patchType = (p: Partial<PrintHeroTitleType>) => onPatch({ titleType: { ...type, ...p } });
 
