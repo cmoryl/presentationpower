@@ -1202,12 +1202,21 @@ function AssetEditor() {
                     </button>
                     <button
                       type="button"
+                      onClick={handleExportPptx}
+                      disabled={exportBusy}
+                      className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] font-semibold text-[#03002C] disabled:opacity-40 dark:border-white/20 dark:bg-white/[0.06] dark:text-white"
+                    >
+                      {exportBusy ? "Rendering…" : "Download PPTX"}
+                    </button>
+                    <button
+                      type="button"
                       onClick={handleExportPdf}
                       disabled={exportBusy}
                       className="rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
                     >
                       {exportBusy ? "Rendering…" : "Download PDF"}
                     </button>
+
                   </div>
                 </div>
               )}
