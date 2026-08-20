@@ -10,6 +10,16 @@ import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { AutoFitText } from "./HeroAutoFit";
 import { usePrintPage } from "@/components/print/print-page-context";
+import {
+  heroEyebrowStyle,
+  heroHairline,
+  heroRuleGap,
+  heroRuleTop,
+  heroSummaryFontPx,
+  heroSummaryStyle,
+  heroTitleFontPx,
+  heroTitleStyle,
+} from "./hero-style";
 
 /**
  * Masthead band height in template px, resolved against the *current page
