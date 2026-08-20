@@ -530,6 +530,27 @@ export function collectionsFor(divisionId: string, kind: PrintTypeId): string[] 
   return seen;
 }
 
+/**
+ * The curated master to seed from when someone starts a blank template of a
+ * given kind. Prefers the master authored for that division, then any curated
+ * master of the same kind, so "Use template" never opens an empty page when a
+ * master exists (Solution Proposals, MSA partnerships, …).
+ */
+export function curatedMasterFor(
+  kind: PrintTypeId,
+  divisionId?: string | null,
+): PrintLibraryItem | undefined {
+  const curated = PRINT_LIBRARY_ITEMS.filter(
+    (i) => i.source === "curated" && i.kind === kind && i.content,
+  );
+  if (divisionId) {
+    const own = curated.find((i) => i.divisionId === divisionId);
+    if (own) return own;
+  }
+  return curated[0];
+}
+
+
 export function matchesQuery(item: PrintLibraryItem, q: string): boolean {
   if (!q.trim()) return true;
   const needle = q.trim().toLowerCase();

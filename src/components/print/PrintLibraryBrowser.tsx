@@ -21,6 +21,8 @@ import {
   PRINT_TYPES,
   collectionsFor,
   curatedCount,
+  curatedMasterFor,
+
   itemsForDivision,
   itemsForDivisionType,
   matchesQuery,
@@ -799,16 +801,11 @@ function PrintItemCard({
           <div className="flex items-center gap-2">
             {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
             {isTemplate ? (
-              <Link
-                to="/asset/new"
-                search={{ kind: item.kind, brandModeId: brand.id }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-              >
-                Use template <ArrowRight size={12} />
-              </Link>
+              <UseTemplateAction item={item} brand={brand} />
             ) : (
               <CopyItemButton item={item} />
             )}
+
           </div>
         </div>
       </div>
@@ -829,7 +826,45 @@ function EditMasterLink({ itemId }: { itemId: string }) {
   );
 }
 
-function CopyItemButton({ item }: { item: PrintLibraryItem }) {
+/**
+ * Blank-template action. Kinds that ship a curated master (Solution Proposals,
+ * MSA partnerships) start from that master's content so "Use template" always
+ * opens a fully populated, editable document instead of an empty page. Other
+ * kinds keep the brief wizard, which drafts their copy from division knowledge.
+ */
+const SEED_FROM_MASTER_KINDS = new Set<PrintLibraryItem["kind"]>([
+  "solution-proposal",
+  "msa-partnership",
+]);
+
+function UseTemplateAction({ item, brand }: { item: PrintLibraryItem; brand: BrandMode }) {
+  const master = useMemo(
+    () =>
+      SEED_FROM_MASTER_KINDS.has(item.kind) ? curatedMasterFor(item.kind, brand.id) : undefined,
+    [item.kind, brand.id],
+  );
+
+  if (master) {
+    const seed: PrintLibraryItem =
+      master.divisionId === brand.id
+        ? master
+        : { ...master, id: `${master.id}--${brand.id}`, divisionId: brand.id };
+    return <CopyItemButton item={seed} label="Use template" />;
+  }
+
+  return (
+    <Link
+      to="/asset/new"
+      search={{ kind: item.kind, brandModeId: brand.id }}
+      className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
+    >
+      Use template <ArrowRight size={12} />
+    </Link>
+  );
+}
+
+
+function CopyItemButton({ item, label }: { item: PrintLibraryItem; label?: string }) {
   const createFn = useServerFn(createPrintAsset);
   const findFn = useServerFn(findMyPrintAssetForLibraryItem);
   const navigate = useNavigate();
@@ -876,7 +911,7 @@ function CopyItemButton({ item }: { item: PrintLibraryItem }) {
       onClick={() => void makeCopy()}
       className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85 disabled:opacity-60"
     >
-      <Copy size={12} /> {busy ? "Opening…" : "Use this template"}
+      <Copy size={12} /> {busy ? "Opening…" : (label ?? "Use this template")}
     </button>
   );
 }
@@ -922,16 +957,11 @@ function ItemPreviewOverlay({
           <div className="flex items-center gap-2">
             {canEditMaster ? <EditMasterLink itemId={item.id} /> : null}
             {isTemplate ? (
-              <Link
-                to="/asset/new"
-                search={{ kind: item.kind, brandModeId: brand.id }}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-              >
-                Use this template <ArrowRight size={12} />
-              </Link>
+              <UseTemplateAction item={item} brand={brand} />
             ) : (
               <CopyItemButton item={item} />
             )}
+
             <button
               type="button"
               onClick={onClose}
