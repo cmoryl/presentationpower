@@ -104,7 +104,12 @@ export type PrintHeroModuleVariant =
   | "hero-type-stack"
   | "hero-accent-band"
   | "hero-stat-lockup"
-  | "hero-client-lockup";
+  | "hero-client-lockup"
+  // Openers lifted 1:1 from the shipped print layouts.
+  | "hero-photo-fade"
+  | "hero-quote-split"
+  | "hero-cobrand-band"
+  | "hero-brief-lockup";
 
 export type PrintHeroMetaRow = { label: string; value?: string };
 
@@ -129,6 +134,13 @@ export type PrintHeroSection = {
   align?: "left" | "center";
   /** Flip the photo to the right on the split variant. */
   reverse?: boolean;
+  /** Pull-quote card for the spotlight-style quote-split opener. */
+  quote?: { text: string; author?: string; role?: string; company?: string };
+  /** Co-brand partner name / logo for the MSA partnership band opener. */
+  partner?: string;
+  partnerLogoUrl?: string;
+  /** Share of page height the photo band occupies on the fade opener (0..100). */
+  heightPct?: number;
 };
 
 // ---- Quote family ---------------------------------------------------------
