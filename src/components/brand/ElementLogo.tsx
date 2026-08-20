@@ -11,6 +11,7 @@
  */
 
 import { useTheme } from "@/hooks/use-theme";
+import elementLogoAsset from "@/assets/element-logo.png.asset.json";
 
 export type ElementMarkTone = "mono" | "color" | "reversed";
 /** `auto` follows the app theme: mono in light, reversed (white) in dark. */
@@ -22,6 +23,7 @@ export function useResolvedElementTone(tone: ElementTone): ElementMarkTone {
   if (tone !== "auto") return tone;
   return mode === "dark" ? "reversed" : "mono";
 }
+
 
 const BRICKS = [
   { x: 0, y: 0, w: 100, h: 20, k: "cap" },
