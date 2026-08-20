@@ -65,6 +65,7 @@ export function PrintSectionPreviewFrame({
   }, [maxScale, section]);
 
   const paper = mode === "dark" ? "#03002C" : "#ffffff";
+  const padTop = sheet ? 28 : 0;
 
   return (
     <div
@@ -90,10 +91,14 @@ export function PrintSectionPreviewFrame({
             width: PAGE_W,
             paddingLeft: padX,
             paddingRight: padX,
-            paddingTop: sheet ? 28 : 0,
+            paddingTop: padTop,
             paddingBottom: sheet ? 28 : 0,
             transform: `scale(${scale})`,
             transformOrigin: "top left",
+            // Publish the page margin so hero mastheads can bleed to the trim
+            // and restore the margin for their own copy.
+            ["--print-page-pad" as string]: `${padX}px`,
+            ["--print-page-pad-top" as string]: `${padTop}px`,
           }}
         >
           <PrintDocModeProvider icons={icons} iconStyle={iconStyle}>

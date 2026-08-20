@@ -31,3 +31,32 @@ export function sectionGlass(mode: "light" | "dark", accent: string): CSSPropert
     boxShadow: `0 ${cq(6)} ${cq(18)} rgba(3,0,44,0.10)`,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Page bleed
+// ---------------------------------------------------------------------------
+// Hero modules are the TOP SECTION of a printed page, not a web hero card:
+// photo/accent mastheads run to the trimmed page edge and sit flush with the
+// top of the sheet, while the copy inside them keeps the page's own side
+// margin. Containers that know their page padding publish it as
+// `--print-page-pad` / `--print-page-pad-top`; everywhere else the fallback of
+// 0px means the block simply stays inside its column.
+export const PAGE_PAD_VAR = "var(--print-page-pad, 0px)";
+export const PAGE_PAD_TOP_VAR = "var(--print-page-pad-top, 0px)";
+
+/** Pull a masthead out to the page trim on both sides (and optionally the top). */
+export function pageBleed(top = true): CSSProperties {
+  return {
+    marginLeft: `calc(-1 * ${PAGE_PAD_VAR})`,
+    marginRight: `calc(-1 * ${PAGE_PAD_VAR})`,
+    ...(top ? { marginTop: `calc(-1 * ${PAGE_PAD_TOP_VAR})` } : {}),
+  };
+}
+
+/** Inside a bled masthead, restore the page's own side margin for copy. */
+export function pageGutter(extra = 0): CSSProperties {
+  return {
+    paddingLeft: `calc(${PAGE_PAD_VAR} + ${cq(extra)})`,
+    paddingRight: `calc(${PAGE_PAD_VAR} + ${cq(extra)})`,
+  };
+}
