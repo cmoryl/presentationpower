@@ -19,6 +19,9 @@ import type { SocialFormat } from "@/lib/social-formats";
 import {
   computeSocialFit,
   nextRelief,
+  nextGrowthStep,
+  SOCIAL_GROWTH_MAX,
+  SOCIAL_GROWTH_STEPS,
   reliefAt,
   socialSafeRect,
   type SocialFitRelief,
