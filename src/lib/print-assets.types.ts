@@ -557,7 +557,6 @@ export type PrintAssetContext = {
     pad?: number;
   };
 
-
   /** The mode the editor canvas renders in. Also the default for the export
    *  panel — WYSIWYG unless the user explicitly overrides it before export. */
   editorMode?: PrintMode;
@@ -744,6 +743,9 @@ export type MultiProposalPageKind =
   | "locations"
   | "clients"
   | "success-stories"
+  | "stories-grid"
+  | "story-feature"
+  | "stories-quotes"
   | "why"
   | "advocates"
   | "team-grid"
@@ -783,7 +785,6 @@ export type MultiProposalPage = {
   clients?: Array<{ name?: string; url?: string }>;
   footnote?: string;
 };
-
 
 export type PrintAssetKind =
   | "case-study"

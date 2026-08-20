@@ -10,11 +10,11 @@
 // where every page string is editable in the live asset editor exactly like
 // the case studies and spotlights.
 
-import type {
-  MultiProposalPage,
-  SolutionProposalContent,
-} from "@/lib/print-assets.types";
-import { SOLUTION_PROPOSALS, type SolutionProposalSeed } from "@/lib/print-library/solution-proposals";
+import type { MultiProposalPage, SolutionProposalContent } from "@/lib/print-assets.types";
+import {
+  SOLUTION_PROPOSALS,
+  type SolutionProposalSeed,
+} from "@/lib/print-library/solution-proposals";
 
 const SOURCE_FILE = "TransPerfect_Solutions_Proposal_Template_1.pptx";
 const COLLECTION = "Solution proposals — multi-page";
@@ -287,6 +287,57 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       ].slice(0, 3),
     },
     {
+      id: "p-stories-grid",
+      kind: "stories-grid",
+      navLabel: "Story cards",
+      eyebrow: "Proof",
+      title: "Client\nstories.",
+      subtitle: "Three programs, three integration paths, one delivery model.",
+      quotes: [
+        ...SUCCESS_QUOTES,
+        ...(content.quote?.text
+          ? [
+              {
+                headline: "From this program",
+                text: content.quote.text,
+                author: content.quote.author,
+                role: content.quote.role,
+                company: content.quote.company,
+              },
+            ]
+          : []),
+      ].slice(0, 3),
+    },
+    {
+      id: "p-story-feature",
+      kind: "story-feature",
+      navLabel: "Featured story",
+      eyebrow: "Featured engagement",
+      title: "Featured story",
+      quotes: SUCCESS_QUOTES.slice(0, 1),
+      stats: (content.stats ?? []).slice(0, 3),
+    },
+    {
+      id: "p-stories-quotes",
+      kind: "stories-quotes",
+      navLabel: "Quote wall",
+      title: "In their\nwords.",
+      quotes: [
+        ...SUCCESS_QUOTES,
+        ...(content.quote?.text
+          ? [
+              {
+                text: content.quote.text,
+                author: content.quote.author,
+                role: content.quote.role,
+                company: content.quote.company,
+              },
+            ]
+          : []),
+      ].slice(0, 4),
+      footnote: "Reference calls available on request.",
+    },
+    {
       id: "p-why",
       kind: "why",
       navLabel: "Why TransPerfect",
@@ -319,9 +370,24 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       team: team.length
         ? team
         : [
-            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
-            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
-            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+            {
+              name: "First Last",
+              role: "Title",
+              office: "Office",
+              email: "email@transperfect.com",
+            },
+            {
+              name: "First Last",
+              role: "Title",
+              office: "Office",
+              email: "email@transperfect.com",
+            },
+            {
+              name: "First Last",
+              role: "Title",
+              office: "Office",
+              email: "email@transperfect.com",
+            },
           ],
     },
     {
@@ -330,13 +396,11 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       navLabel: "Team bios",
       eyebrow: "Meet the team",
       title: "Biographies",
-      team: (team.length ? team : [{ name: "First Last", role: "Title" }])
-        .slice(0, 2)
-        .map((m) => ({
-          ...m,
-          phone: "+1 000 000 0000",
-          bio: BIO_PLACEHOLDER,
-        })),
+      team: (team.length ? team : [{ name: "First Last", role: "Title" }]).slice(0, 2).map((m) => ({
+        ...m,
+        phone: "+1 000 000 0000",
+        bio: BIO_PLACEHOLDER,
+      })),
     },
     {
       id: "p-team-cards",
@@ -348,9 +412,24 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
       team: team.length
         ? team
         : [
-            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
-            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
-            { name: "First Last", role: "Title", office: "Office", email: "email@transperfect.com" },
+            {
+              name: "First Last",
+              role: "Title",
+              office: "Office",
+              email: "email@transperfect.com",
+            },
+            {
+              name: "First Last",
+              role: "Title",
+              office: "Office",
+              email: "email@transperfect.com",
+            },
+            {
+              name: "First Last",
+              role: "Title",
+              office: "Office",
+              email: "email@transperfect.com",
+            },
           ],
     },
     {
