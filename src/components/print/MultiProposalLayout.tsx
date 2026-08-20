@@ -37,6 +37,12 @@ import {
 } from "@/lib/print-library/proposal-art";
 import { PROPOSAL_REGIONS, PROPOSAL_TEAL } from "@/lib/print-library/proposal-locations";
 import { EditableImage, resolveImageSlot, usePrintImageEdit } from "./PrintImageEdit";
+import {
+  AddLogoButton,
+  LogoSlotChrome,
+  logoEntryId,
+  type PrintLogoEntry,
+} from "./PrintLogoList";
 
 // ---------------------------------------------------------------------------
 // Source-deck constants
@@ -2201,10 +2207,13 @@ function PageBody({
   page,
   logoWhite,
   logoDark,
+  pageIndex,
 }: {
   page: MultiProposalPage;
   logoWhite: string;
   logoDark: string;
+  /** Absolute index in `content.pages` — used by list editors to patch paths. */
+  pageIndex: number;
 }) {
   switch (page.kind) {
     case "cover":
@@ -2230,7 +2239,7 @@ function PageBody({
     case "why":
       return <WhyPage page={page} logoDark={logoDark} />;
     case "advocates":
-      return <AdvocatesPage page={page} logoDark={logoDark} />;
+      return <AdvocatesPage page={page} logoDark={logoDark} pageIndex={pageIndex} />;
     case "team-grid":
       return <TeamPage page={page} logoWhite={logoWhite} bios={false} />;
     case "team-bio":
@@ -2286,7 +2295,12 @@ export function MultiProposalLayout({
                 fontFamily: FONT,
               }}
             >
-              <PageBody page={page} logoWhite={logoWhite} logoDark={logoDark} />
+              <PageBody
+                page={page}
+                logoWhite={logoWhite}
+                logoDark={logoDark}
+                pageIndex={(pageIndex ?? 0) + i}
+              />
             </div>
           ))}
         </div>
