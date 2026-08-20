@@ -65,17 +65,50 @@ export function PrintSectionPreviewFrame({
     const outer = outerRef.current;
     const inner = innerRef.current;
     if (!outer || !inner) return;
+
+    // The measure loop can feed back on itself: the frame's height depends on
+    // the scale, the scale depends on the outer width, and the outer width can
+    // change when the page gains or loses a scrollbar. Without damping that
+    // round trip the card visibly jitters ("jumping" previews). So we
+    // rAF-coalesce measurements, quantise the scale, and ignore sub-pixel
+    // height deltas — the loop settles after one pass.
+    let raf = 0;
+    let lastScale = -1;
+    let lastHeight = -1;
+
     const measure = () => {
+      raf = 0;
       const w = outer.clientWidth;
-      if (w > 0) setScale(Math.min(maxScale, w / PAGE_W));
-      setHeight(inner.offsetHeight);
+      const h = inner.offsetHeight;
+      if (w > 0) {
+        // 3-decimal quantisation kills the endless 0.0001 oscillation.
+        const next = Math.round(Math.min(maxScale, w / PAGE_W) * 1000) / 1000;
+        if (Math.abs(next - lastScale) > 0.0005) {
+          lastScale = next;
+          setScale(next);
+        }
+      }
+      if (Math.abs(h - lastHeight) > 0.75) {
+        lastHeight = h;
+        setHeight(h);
+      }
     };
+
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(measure);
+    };
+
     measure();
-    const ro = new ResizeObserver(measure);
+    const ro = new ResizeObserver(schedule);
     ro.observe(outer);
     ro.observe(inner);
-    return () => ro.disconnect();
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
   }, [maxScale, section, pad, pageSize, marginPreset]);
+
 
   return (
     <div
