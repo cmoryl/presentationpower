@@ -1844,6 +1844,77 @@ function AssetEditor() {
                 </Row>
               </Panel>
 
+              <Panel title="Fit audit & corrections">
+                {(() => {
+                  const fit = resolveContentFit(ctx.contentFit);
+                  const hero = (rawContent as { heroMedia?: PrintHeroMedia }).heroMedia;
+                  const auditInput: PrintFitAuditInput = {
+                    hasHero: Boolean(hero?.imageUrl),
+                    heroHeightPct: hero?.heightPct ?? 46,
+                    autoFitEnabled: fit.enabled,
+                    minScale: fit.minScale,
+                    minPad: fit.minPad,
+                    pageSize,
+                    moduleCount: ((rawContent as { modules?: PrintSection[] }).modules ?? []).length,
+                  };
+                  const applyFix = (fix: PrintFitFix) => {
+                    if (fix.advisory) return;
+                    const ctxPatch: Record<string, unknown> = {};
+                    if (fix.enableAutoFit) {
+                      ctxPatch["contentFit"] = {
+                        ...fit,
+                        enabled: true,
+                        ...(fix.threshold !== undefined ? { threshold: fix.threshold } : {}),
+                      };
+                    }
+                    if (fix.scale !== undefined || fix.pad !== undefined) {
+                      ctxPatch["fitOverride"] = {
+                        ...(ctx.fitOverride ?? {}),
+                        ...(fix.scale !== undefined ? { scale: fix.scale } : {}),
+                        ...(fix.pad !== undefined ? { pad: fix.pad } : {}),
+                      };
+                    }
+                    if (fix.density) ctxPatch["density"] = fix.density;
+                    if (Object.keys(ctxPatch).length) patchCtx(ctxPatch as Partial<typeof ctx>);
+                    if (fix.heroHeightPct !== undefined && hero) {
+                      patchContent({
+                        heroMedia: { ...hero, heightPct: fix.heroHeightPct },
+                      } as never);
+                    }
+                    toast.success(fix.label);
+                  };
+                  return (
+                    <PrintFitAuditPanel
+                      measurement={fitMeasure}
+                      input={auditInput}
+                      override={ctx.fitOverride}
+                      onApply={applyFix}
+                      onOverride={(patch) => {
+                        if (patch === null) {
+                          patchCtx({ fitOverride: undefined });
+                          return;
+                        }
+                        const next: { scale?: number; pad?: number } = {
+                          ...(ctx.fitOverride ?? {}),
+                        };
+                        if ("scale" in patch) {
+                          if (patch.scale === undefined) delete next.scale;
+                          else next.scale = patch.scale;
+                        }
+                        if ("pad" in patch) {
+                          if (patch.pad === undefined) delete next.pad;
+                          else next.pad = patch.pad;
+                        }
+                        patchCtx({
+                          fitOverride:
+                            next.scale === undefined && next.pad === undefined ? undefined : next,
+                        });
+                      }}
+                    />
+                  );
+                })()}
+              </Panel>
+
               <Panel title="Content fit">
                 {(() => {
                   const fit = resolveContentFit(ctx.contentFit);
