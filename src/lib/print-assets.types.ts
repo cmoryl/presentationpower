@@ -779,6 +779,8 @@ export type MultiProposalPage = {
   costTotal?: string;
   costNote?: string;
   team?: Array<ProposalTeamMember & { bio?: string; phone?: string }>;
+  /** Global locations page — editable vector map pins (add/delete dots). */
+  mapPins?: Array<{ x: number; y: number; r?: number; kind: "service" | "prod"; name?: string; id?: string }>;
   locations?: Array<{ region?: string; offices?: string[] }>;
   logos?: string[];
   /** Advocates page — "giving back" cause logo wall (editable: add/order/remove). */

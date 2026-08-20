@@ -41,8 +41,11 @@ import {
   AddLogoButton,
   LogoSlotChrome,
   logoEntryId,
+  usePrintLogoList,
   type PrintLogoEntry,
 } from "./PrintLogoList";
+import { ProposalWorldMap, defaultWorldMapPins } from "./ProposalWorldMap";
+import type { WorldMapPin } from "@/lib/print-library/world-map-vector";
 
 // ---------------------------------------------------------------------------
 // Source-deck constants
@@ -875,17 +878,20 @@ const REGION_COLS: Record<
 > = {
   AMERICAS: {
     headX: 0.56,
-    headY: 10.02,
+    headY: 8.62,
     cols: [0.56, 1.13, 1.72, 2.3, 3.18],
-    colY: 10.28,
+    colY: 8.88,
     colW: 0.62,
   },
-  EMEA: { headX: 4.23, headY: 10.12, cols: [4.23, 4.76, 5.39], colY: 10.36, colW: 0.58 },
-  APAC: { headX: 6.35, headY: 10.15, cols: [6.36, 6.98, 7.52], colY: 10.4, colW: 0.62 },
+  EMEA: { headX: 4.23, headY: 8.72, cols: [4.23, 4.76, 5.39], colY: 8.96, colW: 0.58 },
+  APAC: { headX: 6.35, headY: 8.75, cols: [6.36, 6.98, 7.52], colY: 9.0, colW: 0.62 },
 };
 
-function LocationsPage({ page }: { page: MultiProposalPage }) {
+function LocationsPage({ page, pageIndex }: { page: MultiProposalPage; pageIndex: number }) {
   const title = lines(page.title).length ? lines(page.title) : ["Global", "Locations"];
+  const listCtx = usePrintLogoList();
+  const pinPath = `pages.${pageIndex}.mapPins`;
+  const pins = page.mapPins?.length ? page.mapPins : defaultWorldMapPins();
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
@@ -904,39 +910,38 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
         {title.join("\n")}
       </T>
 
-      <Img
-        x={-2.64}
-        y={1.43}
-        w={13.78}
-        h={7.68}
-        src={PROPOSAL_ART.worldMap}
-        alt="World map"
-        slot="locations.map"
-        label="map"
-      />
-
+      {/* Vector map: landmass artwork + author-editable office pins. */}
+      <L x={-0.61} y={2.62} w={9.72} h={5.3}>
+        <ProposalWorldMap
+          pins={pins}
+          editable={!!listCtx?.active}
+          {...(listCtx?.active
+            ? { onChange: (next: WorldMapPin[]) => listCtx.onChange(pinPath, next) }
+            : {})}
+        />
+      </L>
 
       {/* Legend */}
       <L
         x={0.56}
-        y={9.24}
+        y={8.02}
         w={0.058}
         h={0.058}
         style={{ background: "#FFFFFF", borderRadius: 999 }}
       />
-      <T x={0.68} y={9.18} w={1.4} size={7.2} weight={700} leading={1.25} upper>
+      <T x={0.68} y={7.96} w={1.4} size={7.2} weight={700} leading={1.25} upper>
         {"Client\nService"}
       </T>
       <L
         x={0.56}
-        y={9.54}
+        y={8.28}
         w={0.058}
         h={0.058}
         style={{ background: PROPOSAL_TEAL, borderRadius: 999 }}
       />
       <T
         x={0.68}
-        y={9.48}
+        y={8.22}
         w={1.6}
         size={7.2}
         weight={700}
@@ -977,6 +982,7 @@ function LocationsPage({ page }: { page: MultiProposalPage }) {
     </>
   );
 }
+
 
 // ---------------------------------------------------------------------------
 // Page 6 — Clients
@@ -2226,7 +2232,7 @@ function PageBody({
     case "cost":
       return <CostPage page={page} logoWhite={logoWhite} />;
     case "locations":
-      return <LocationsPage page={page} />;
+      return <LocationsPage page={page} pageIndex={pageIndex} />;
     case "clients":
       return <ClientsPage page={page} logoWhite={logoWhite} />;
     case "success-stories":
