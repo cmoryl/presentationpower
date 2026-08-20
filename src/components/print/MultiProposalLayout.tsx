@@ -15,6 +15,7 @@
 // stack them and exportPrintAssetAsPdf() can emit a real multi-page PDF. All
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
+import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 import type { BrandMode } from "@/lib/taxonomy";
@@ -84,6 +85,9 @@ export const MULTI_PAGE_LABELS: Record<MultiProposalPage["kind"], string> = {
   locations: "Global footprint",
   clients: "Clients",
   "success-stories": "Success stories",
+  "stories-grid": "Story cards",
+  "story-feature": "Featured story",
+  "stories-quotes": "Quote wall",
   why: "Why TransPerfect",
   advocates: "Advocates",
   "team-grid": "Meet the team",
@@ -1150,7 +1154,7 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
       />
 
       {page.eyebrow ? (
-        <T x={0.62} y={4.78} w={6} size={10} weight={600} color={AQUA} upper tracking="0.16em">
+        <T x={0.62} y={4.78} w={6} size={10} weight={600} color={PROPOSAL_AQUA} upper tracking="0.16em">
           {page.eyebrow}
         </T>
       ) : null}
@@ -1176,11 +1180,11 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
       <T x={0.62} y={6.0} w={7.3} size={22} weight={600} leading={1.22} tracking="-0.02em">
         {q?.headline || page.title || "Success story"}
       </T>
-      <Rule x={0.62} y={7.32} w={7.3} color="rgba(161,251,249,0.5)" />
+      <Rule x={0.62} y={7.32} w={7.3} color="rgba(161,248,249,0.5)" />
       <T x={0.62} y={7.56} w={7.3} size={11.5} color="rgba(255,255,255,0.86)" leading={1.5}>
         {storyQuote(q?.text)}
       </T>
-      <T x={0.62} y={9.2} w={7.3} size={10} weight={600} color={AQUA}>
+      <T x={0.62} y={9.2} w={7.3} size={10} weight={600} color={PROPOSAL_AQUA}>
         {q ? `– ${[q.role || q.author, q.company].filter(Boolean).join(", ")}` : ""}
       </T>
 
@@ -1193,7 +1197,7 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
             h={0.9}
             style={{ background: "rgba(255,255,255,0.08)", borderRadius: u(0.18) }}
           />
-          <T x={0.78 + i * 2.46} y={9.74} w={1.96} size={20} weight={700} color={AQUA} tracking="-0.03em">
+          <T x={0.78 + i * 2.46} y={9.74} w={1.96} size={20} weight={700} color={PROPOSAL_AQUA} tracking="-0.03em">
             {s.value}
           </T>
           <T x={0.78 + i * 2.46} y={10.14} w={1.96} size={8.5} color="rgba(255,255,255,0.8)" leading={1.3}>
@@ -1792,6 +1796,12 @@ function PageBody({
       return <ClientsPage page={page} logoWhite={logoWhite} />;
     case "success-stories":
       return <StoriesPage page={page} logoWhite={logoWhite} />;
+    case "stories-grid":
+      return <StoriesGridPage page={page} logoWhite={logoWhite} />;
+    case "story-feature":
+      return <StoryFeaturePage page={page} />;
+    case "stories-quotes":
+      return <StoriesQuotesPage page={page} logoWhite={logoWhite} />;
     case "why":
       return <WhyPage page={page} logoDark={logoDark} />;
     case "advocates":
