@@ -982,6 +982,28 @@ export function SlideFrame({
           );
         })()}
 
+      {/* ELEMENT motif — the five-brick rail marks the deck's dramatic moments
+          (cover / divider / close) on the leading edge, echoing the print
+          mastheads. Purely decorative, never over content, and it exports with
+          the slide because it is a real painted layer. */}
+      {(variant === "cover" || variant === "divider" || variant === "close") && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute"
+          style={{ left: 0, top: 128, zIndex: 40 }}
+        >
+          <ElementBrickRail
+            thickness="10px"
+            unit="14px"
+            gap="7px"
+            tone={slideDark ? "reversed" : "spectrum"}
+            accent={brand.tokens.accent}
+          />
+        </div>
+      )}
+
+
+
       {/* Content — 96px side margin. Vertical reserves grow when a logo
           hugs the top or bottom so text never runs under the lockup or the
           locked footer band. Baseline: pt=128, pb=96.
