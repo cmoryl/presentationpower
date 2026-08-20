@@ -84,6 +84,12 @@ export interface WrapPdfAsX4Options {
   title?: string;
   /** Optional creator for XMP xmp:CreatorTool. */
   creator?: string;
+  /**
+   * Retag DeviceRGB rasters as ICCBased/sRGB. Default true. Set false only to
+   * reproduce the old untagged output for comparison against a printer's
+   * preflight report.
+   */
+  tagRastersAsSRgb?: boolean;
 }
 
 const IN_TO_PT = 72;
