@@ -224,7 +224,7 @@ export function pageTemplateMatches(t: PrintPageTemplate, query: string): boolea
   return [t.title, t.description ?? "", ...(t.tags ?? [])].join(" ").toLowerCase().includes(q);
 }
 
-/** Shared read hook: own private templates + every shared one. */
+/** Shared read hook: curated originals + own private templates + shared ones. */
 export function usePrintPageTemplates() {
   const listFn = useServerFn(listPrintPageTemplates);
   const q = useQuery({
@@ -234,7 +234,9 @@ export function usePrintPageTemplates() {
       return rows.map(normalizePageTemplate);
     },
   });
-  return { templates: q.data ?? [], isLoading: q.isLoading, refetch: q.refetch };
+  const builtins = builtinPageTemplates();
+  const templates = [...builtins, ...(q.data ?? [])];
+  return { templates, isLoading: q.isLoading, refetch: q.refetch };
 }
 
 export function usePageTemplateAdmin() {
