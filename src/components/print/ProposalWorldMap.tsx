@@ -227,20 +227,19 @@ export function ProposalWorldMap({
       return;
     }
 
-    const rect = event.currentTarget.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const x = view.x + ((event.clientX - rect.left) / rect.width) * view.w;
-    const y = view.y + ((event.clientY - rect.top) / rect.height) * view.h;
+    const point = toMapPoint(event.clientX, event.clientY);
+    if (!point) return;
     commit([
       ...list,
       {
         id: `pin-${Date.now().toString(36)}`,
-        x: Math.round(x * 10) / 10,
-        y: Math.round(y * 10) / 10,
+        x: point.x,
+        y: point.y,
         r: 2.6,
         kind,
       },
     ]);
+
   };
 
   return (
