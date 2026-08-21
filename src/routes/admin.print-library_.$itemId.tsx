@@ -616,14 +616,16 @@ function MasterItemEditorPage() {
                 onChange={(e) => patch({ tags: e.target.value })}
               />
             </Field>
-            <Field label="Hero image URL">
-              <input
-                className={fieldCls}
-                value={draft.heroUrl}
-                onChange={(e) => patch({ heroUrl: e.target.value })}
-                placeholder="https://…"
-              />
-            </Field>
+            {!multiPage ? (
+              <Field label="Hero image URL">
+                <input
+                  className={fieldCls}
+                  value={draft.heroUrl}
+                  onChange={(e) => patch({ heroUrl: e.target.value })}
+                  placeholder="https://…"
+                />
+              </Field>
+            ) : null}
             <button
               type="button"
               onClick={() => patch({ hidden: !draft.hidden })}
