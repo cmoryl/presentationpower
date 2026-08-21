@@ -2712,6 +2712,40 @@ function AdvocatesPage({
         );
       })}
 
+      {/* Rail foot stats keep the lower column active instead of idle space. */}
+      <Rule x={0.44} y={8.34} w={1.74} color="rgba(255,255,255,0.16)" />
+      <T x={0.44} y={8.56} w={1.74} size={30} weight={600} color={AQUA_FIELD} leading={1} tracking="-0.03em">
+        {String(causes.length)}
+      </T>
+      <T
+        x={0.44}
+        y={9.02}
+        w={1.74}
+        size={8.4}
+        weight={500}
+        color="rgba(255,255,255,0.62)"
+        tracking="0.14em"
+        upper
+      >
+        Cause partners supported
+      </T>
+      <T x={0.44} y={9.42} w={1.74} size={30} weight={600} color={LAV} leading={1} tracking="-0.03em">
+        {String(affinities.length)}
+      </T>
+      <T
+        x={0.44}
+        y={9.88}
+        w={1.74}
+        size={8.4}
+        weight={500}
+        color="rgba(255,255,255,0.62)"
+        tracking="0.14em"
+        upper
+      >
+        Employee affinity groups
+      </T>
+
+
       <Img x={0.44} y={10.22} w={1.5} h={0.19} src={logoWhite} alt="TransPerfect" align="left" />
       <T
         x={0.44}
