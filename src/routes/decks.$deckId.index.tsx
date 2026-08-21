@@ -1258,7 +1258,7 @@ function DeckEditor() {
                     ? "Drag an image from your computer onto the slide to use it."
                     : "This module has no image slot — switch to an image-forward layout to drop imagery."}
                 </span>
-                <span className="inline-flex items-center gap-3">
+                <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1.5">
                   <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} />
                   <label className="inline-flex items-center gap-1.5">
                     <input

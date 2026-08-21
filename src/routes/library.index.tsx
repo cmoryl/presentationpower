@@ -1976,7 +1976,7 @@ const VariantCard = memo(function VariantCard({
           aria-label={pinned ? "Unpin variant" : "Pin variant"}
           title={pinned ? "Pinned — click to unpin" : "Pin to Favorites"}
           data-variant-pin=""
-          className={`absolute right-2 top-2 z-10 inline-flex h-6 w-6 items-center justify-center rounded-md backdrop-blur transition ${
+          className={`absolute right-2 top-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-md backdrop-blur transition sm:h-6 sm:w-6 ${
             pinned
               ? "bg-amber-400 text-[#03002C] shadow ring-1 ring-amber-500/40"
               : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
@@ -1998,7 +1998,7 @@ const VariantCard = memo(function VariantCard({
             e.stopPropagation();
             void downloadThisSlide();
           }}
-          className={`absolute right-2 bottom-2 z-10 inline-flex items-center gap-1 rounded-md px-1.5 py-[2px] text-[7px] font-semibold uppercase tracking-[0.1em] backdrop-blur transition ${
+          className={`absolute right-2 bottom-2 z-10 inline-flex min-h-9 items-center gap-1 rounded-md px-2.5 py-[2px] text-[7px] sm:min-h-0 sm:px-1.5 font-semibold uppercase tracking-[0.1em] backdrop-blur transition ${
             isDark
               ? "bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25"
               : "bg-black/60 text-white hover:bg-black/75"

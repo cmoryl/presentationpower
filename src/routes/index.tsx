@@ -1378,7 +1378,7 @@ function RecentActivity({
         />
         <Link
           to="/decks"
-          className="text-sm text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+          className="inline-flex min-h-11 items-center text-sm text-black/60 hover:text-black sm:min-h-0 dark:text-white/60 dark:hover:text-white"
         >
           View all decks →
         </Link>

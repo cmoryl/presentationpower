@@ -95,7 +95,7 @@ function AuditView() {
 
       {q.isLoading && <AdminLoading />}
 
-      <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
+      <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
         <table className="w-full text-xs">
           <thead className="bg-black/5 text-left uppercase tracking-widest text-black/50">
             <tr>

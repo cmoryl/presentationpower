@@ -4,7 +4,7 @@
 // Both the Deck Editor and the Open Canvas Studio render through this shell so
 // navigation, widths and collapse behaviour stay identical between them.
 
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 
 export type EditorRailTab = {
   id: string;
@@ -41,7 +41,7 @@ export function EditorSideRail({
   const activeTab = tabs.find((t) => t.id === open) ?? null;
 
   return (
-    <div className={`flex h-full shrink-0 ${className}`}>
+    <div className={`flex h-full max-w-full shrink-0 ${className}`}>
       <div
         className="relative overflow-hidden transition-[width] duration-300 ease-out"
         style={{ width: activeTab ? width : 0 }}
@@ -151,7 +151,7 @@ export function UnifiedEditorShell({
       {left ? (
         <div
           className="w-full min-w-0 shrink-0 lg:w-[var(--editor-left-w)]"
-          style={{ "--editor-left-w": `${leftWidth}px` } as React.CSSProperties}
+          style={{ "--editor-left-w": `${leftWidth}px` } as CSSProperties}
         >
           {left}
         </div>

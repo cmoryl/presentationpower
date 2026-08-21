@@ -99,7 +99,7 @@ export function AuthoringNav({
   return (
     <nav
       aria-label="Deck views"
-      className={`inline-flex items-center gap-0.5 rounded-full border border-black/[0.07] bg-white/80 p-1 shadow-[0_1px_0_rgba(0,0,0,0.02)] backdrop-blur ${className ?? ""}`}
+      className={`inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-black/[0.07] bg-white/80 p-1 shadow-[0_1px_0_rgba(0,0,0,0.02)] backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]{display:none} ${className ?? ""}`}
     >
       {SURFACES.map((s) => {
         const isActive = s.id === active;
@@ -110,7 +110,7 @@ export function AuthoringNav({
             params={{ deckId }}
             title={s.hint}
             aria-current={isActive ? "page" : undefined}
-            className={`rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition ${
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition ${
               isActive
                 ? "bg-[#03002C] text-white shadow-sm"
                 : "text-black/50 hover:bg-black/[0.04] hover:text-primary"

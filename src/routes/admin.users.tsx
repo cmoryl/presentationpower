@@ -242,7 +242,7 @@ function UsersView() {
           <span className="text-sm text-black/50">{q.data?.length ?? 0}</span>
         </div>
         {q.isLoading && <AdminLoading />}
-        <div className="overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
+        <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white/70 backdrop-blur">
           <table className="w-full text-sm">
             <thead className="bg-black/5 text-left text-xs uppercase tracking-widest text-black/50">
               <tr>
