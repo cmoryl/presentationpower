@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { assertCanManageRecord } from "@/lib/owner-or-admin";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   extractStrings,
@@ -327,7 +328,7 @@ export const translateDeckInPlace = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { deck, slides } = await loadDeckBundle(supabase, data.deckId);
-    if (deck.owner_id !== context.userId) throw new Error("Forbidden");
+    await assertCanManageRecord(supabase, context.userId, deck.owner_id);
 
     // Auto-snapshot for undo
     try {
@@ -433,7 +434,7 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { deck, slides } = await loadDeckBundle(supabase, data.deckId);
-    if (deck.owner_id !== context.userId) throw new Error("Forbidden");
+    await assertCanManageRecord(supabase, context.userId, deck.owner_id);
 
     const divisionId = deck.brand_mode_id as string | null;
     const glossary = await loadRelevantGlossary(supabase, divisionId, deck.id);
@@ -562,7 +563,7 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
       try {
         const { supabase } = context as { supabase: AnySupabase };
         const { deck, slides } = await loadDeckBundle(supabase, data.deckId);
-        if (deck.owner_id !== context.userId) throw new Error("Forbidden");
+        await assertCanManageRecord(supabase, context.userId, deck.owner_id);
         const divisionId = deck.brand_mode_id as string | null;
         const glossary = await loadRelevantGlossary(supabase, divisionId, deck.id);
         const engine = data.engine ?? "globallink";
@@ -671,7 +672,7 @@ export const cacheDeckTranslation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { deck, slides } = await loadDeckBundle(supabase, data.deckId);
-    if (deck.owner_id !== context.userId) throw new Error("Forbidden");
+    await assertCanManageRecord(supabase, context.userId, deck.owner_id);
 
     const divisionId = deck.brand_mode_id as string | null;
     const glossary = await loadRelevantGlossary(supabase, divisionId, deck.id);
@@ -1033,7 +1034,8 @@ export const retryDeckTranslation = createServerFn({ method: "POST" })
       .select("owner_id, brand_mode_id")
       .eq("id", job.source_deck_id)
       .maybeSingle();
-    if (!deck || deck.owner_id !== context.userId) throw new Error("Forbidden");
+    if (!deck) throw new Error("Forbidden");
+    await assertCanManageRecord(supabase, context.userId, deck.owner_id);
 
     const { data: slides } = await supabase
       .from("deck_slides")
