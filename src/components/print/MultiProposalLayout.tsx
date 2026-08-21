@@ -1216,18 +1216,37 @@ function RegionLocationsPage({
 // Page 6 — Clients
 // ---------------------------------------------------------------------------
 
-function ClientsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+function ClientsPage({
+  page,
+  logoWhite,
+  pageIndex,
+}: {
+  page: MultiProposalPage;
+  logoWhite: string;
+  pageIndex: number;
+}) {
   const title = lines(page.title).length ? lines(page.title) : ["Our", "clients."];
   const editing = !!usePrintImageEdit()?.active;
-  // Column centres and row baselines lifted straight off the source slide.
-  const tileX = [1.3, 2.84, 4.37, 5.9];
-  const tileY = [4.98, 6.55, 8.06];
-  const tiles = Array.from({ length: 12 }, (_, i) => ({
-    // Names are opt-in captions — the source slide shows logos only.
-    name: page.clients?.[i]?.name ?? "",
-    alt: page.clients?.[i]?.name || CLIENT_LOGOS[i]?.name || "Client logo",
-    url: page.clients?.[i]?.url || CLIENT_LOGOS[i]?.url || TRANSPARENT_PX,
-  }));
+
+  // Author data wins; otherwise fall back to the 12 logos from the source slide.
+  const entries: PrintLogoEntry[] =
+    page.clients && page.clients.length
+      ? (page.clients as PrintLogoEntry[])
+      : CLIENT_LOGOS.slice(0, 12).map((l) => ({ name: "", url: l.url, id: l.name }));
+  const clientsPath = `pages.${pageIndex}.clients`;
+
+  const showCaptions = editing || entries.some((e) => (e.name ?? "").trim().length > 0);
+  const captionH = showCaptions ? 0.28 : 0;
+  // Wall region sits inside the plate with an even safe margin on all sides.
+  const boxes = autoLogoWall(entries.length, { x: 1.0, y: 4.74, w: 6.45, h: 5.0 }, {
+    maxCols: 4,
+    gutterX: 0.3,
+    gutterY: 0.34,
+    captionH,
+    maxTileW: 1.4,
+    maxTileH: 0.66,
+    safe: 0.14,
+  });
 
   return (
     <>
@@ -1253,42 +1272,46 @@ function ClientsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         {page.subtitle || "We're proud of the company we keep"}
       </T>
 
-      {tiles.map((tile, i) => {
-        const col = i % 4;
-        const row = Math.floor(i / 4);
-        const x = tileX[col]!;
-        const y = tileY[row]!;
+      {entries.map((entry, i) => {
+        const box = boxes[i];
+        if (!box) return null;
+        const id = logoEntryId(entry, i);
+        const name = (entry.name ?? "").trim();
         return (
-          <div key={i}>
-            <Img
-              x={x}
-              y={y}
-              w={1.4}
-              h={0.62}
-              src={tile.url}
-              alt={tile.alt}
-              fit="contain"
-              slot={`clients.logo.${i + 1}`}
-              label="client logo"
-            />
-            {(tile.name || editing) && (
+          <div key={`${id}-${i}`}>
+            <L x={box.x} y={box.y} w={box.w} h={box.h}>
+              <LogoSlotChrome path={clientsPath} list={entries} index={i}>
+                <EditableImage
+                  slot={`clients.logo.${id}`}
+                  src={entry.url || TRANSPARENT_PX}
+                  alt={name || CLIENT_LOGOS[i]?.name || "Client logo"}
+                  fit="contain"
+                  label="client logo"
+                />
+              </LogoSlotChrome>
+            </L>
+            {showCaptions && (
               <T
-                x={x}
-                y={y + 0.68}
-                w={1.4}
+                x={box.x}
+                y={box.captionY}
+                w={box.w}
                 size={7.5}
                 weight={600}
-                color={editing && !tile.name ? "rgba(3,0,44,0.35)" : "#555555"}
+                color={editing && !name ? "rgba(3,0,44,0.35)" : "#555555"}
                 align="center"
                 tracking="0.06em"
                 upper
               >
-                {tile.name || "Client name"}
+                {name || "Client name"}
               </T>
             )}
           </div>
         );
       })}
+
+      <L x={1.0} y={9.82} w={6.45}>
+        <AddLogoButton path={clientsPath} list={entries} label="Add client logo" max={24} />
+      </L>
 
       <Img x={3.37} y={10.18} w={1.68} h={0.21} src={logoWhite} alt="TransPerfect" />
     </>
