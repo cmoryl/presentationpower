@@ -14,7 +14,7 @@ import {
 } from "./taxonomy";
 import { BRAND_PROFILES, getSubCompanyProfile } from "./brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
-import { getApprovedLogoItems } from "./approved-logos";
+import { clientPlaceholderItems } from "./logohub-fillers";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import type { SlideSkin } from "./slide-skin";
@@ -1458,33 +1458,32 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-PROOF-LOGOS":
       return {
         title: "Trusted by",
-        items: getApprovedLogoItems("light", 8),
+        items: clientPlaceholderItems(8),
       };
     case "MV-PROOF-LOGOS-STRIP":
       return {
         kicker: "Trusted by",
         title: "Programs that ship with us",
-        items: getApprovedLogoItems("light", 6),
+        items: clientPlaceholderItems(6),
       };
     case "MV-PROOF-LOGOS-MARQUEE":
       return {
         title: "A global bench of programs",
-        subtitle: "Ten teams across TransPerfect running against the same operating model.",
-        items: getApprovedLogoItems("light", 10),
+        subtitle: "Ten client programs running against the same operating model.",
+        items: clientPlaceholderItems(10),
       };
     case "MV-PROOF-LOGOS-FEATURED": {
-      const [featured, ...rest] = getApprovedLogoItems("light", 5);
+      const [featured, ...rest] = clientPlaceholderItems(5);
       return {
         title: "Anchor partner + supporting proof",
         featuredName: featured.name,
-        featuredLogoUrl: featured.logoUrl,
-        featuredLogoUrlDark: featured.logoUrlDark,
+
         featuredNote: "Anchor engagement running against the shared program KPIs.",
         items: rest,
       };
     }
     case "MV-PROOF-LOGOS-CATEGORIZED": {
-      const half = getApprovedLogoItems("light", 8);
+      const half = clientPlaceholderItems(8);
       return {
         title: "Programs by capability",
         items: [
@@ -1497,7 +1496,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         kicker: "Trusted by",
         title: "A cross-section of the portfolio",
-        items: getApprovedLogoItems("light", 7),
+        items: clientPlaceholderItems(7),
       };
     case "MV-PROOF-TESTIMONIAL": {
       const cs = pickCaseStudy(brief.brandModeId, brief.industry);
