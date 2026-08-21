@@ -82,9 +82,9 @@ export function ElementMark({
   const flat = tone === "reversed" ? "#FFFFFF" : "currentColor";
   return (
     <svg
-      viewBox="0 0 100 72"
+      viewBox={`0 0 100 ${MARK_H}`}
       width={size}
-      height={(size * 72) / 100}
+      height={(size * MARK_H) / 100}
       className={className}
       role="img"
       aria-label={title}
@@ -104,7 +104,7 @@ export function ElementMark({
   );
 }
 
-/** Compact monogram / favicon form — cap, short brick, base pair only. */
+/** Compact monogram / favicon form — the master mark at reduced fidelity. */
 export function ElementMonogram({
   size = 24,
   className = "",
@@ -114,24 +114,7 @@ export function ElementMonogram({
   className?: string;
   tone?: ElementTone;
 }) {
-  const tone = useResolvedElementTone(toneProp);
-  const fill = tone === "reversed" ? "#FFFFFF" : tone === "color" ? "#2563EB" : "currentColor";
-  return (
-    <svg
-      viewBox="0 0 76 72"
-      width={size}
-      height={(size * 72) / 76}
-      className={className}
-      role="img"
-      aria-label="Element"
-      shapeRendering="crispEdges"
-    >
-      <rect x={0} y={0} width={76} height={20} fill={fill} />
-      <rect x={0} y={26} width={52} height={20} fill={fill} />
-      <rect x={0} y={52} width={30} height={20} fill={fill} />
-      <rect x={36} y={52} width={16} height={20} fill={fill} />
-    </svg>
-  );
+  return <ElementMark tone={toneProp} size={size} className={className} title="Element" />;
 }
 
 export type ElementLockupLayout = "stacked" | "horizontal" | "wordmark";
