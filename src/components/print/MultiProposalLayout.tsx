@@ -2055,14 +2055,17 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
       <T x={1.07} y={7.68} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.headline || ""}
       </T>
-      <T x={1.07} y={8.16} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
-        {second?.text ? `"${second.text.replace(/^"|"$/g, "")}"` : ""}
-      </T>
-      <T x={1.07} y={9.34} w={3.44} size={10} color={NAVY} align="right">
-        {second
-          ? `– ${[second.role || second.author, second.company].filter(Boolean).join(", ")}`
-          : ""}
-      </T>
+      <QuoteBody
+        x={1.07}
+        y={8.16}
+        w={3.44}
+        maxH={1.1}
+        size={10}
+        quote={second}
+        align="right"
+      />
+      <QuoteAttribution x={1.07} y={9.34} w={3.44} size={10} quote={second} align="right" />
+
     </>
   );
 }
