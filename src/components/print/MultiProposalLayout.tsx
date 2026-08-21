@@ -1054,7 +1054,13 @@ function StatsPage({
       {/* Speech bubble — outline only, tail pointing at the revenue figure. */}
       <svg
         viewBox={`0 0 ${PAGE_W_IN} ${PAGE_H_IN}`}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+        }}
         aria-hidden
       >
         <path
