@@ -1469,7 +1469,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-PROOF-LOGOS-MARQUEE":
       return {
         title: "A global bench of programs",
-        subtitle: "Ten teams across TransPerfect running against the same operating model.",
+        subtitle: "Ten client programs running against the same operating model.",
         items: clientPlaceholderItems(10),
       };
     case "MV-PROOF-LOGOS-FEATURED": {
