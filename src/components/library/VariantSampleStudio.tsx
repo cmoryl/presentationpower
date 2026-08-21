@@ -173,6 +173,13 @@ export function VariantSampleStudio({
   const [newKind, setNewKind] = useState<string>("body");
   /** Cell selected by clicking its photo / icon on the rendered slide. */
   const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
+  /**
+   * Step-chain focus: which numbered step is being edited. Clicking a tile on
+   * the slide (or a chip in the copy tab) narrows the field list to that step's
+   * own fields so long chains stay editable one step at a time.
+   */
+  const [stepFocus, setStepFocus] = useState<number | null>(null);
+
   const [uploading, setUploading] = useState<number | null>(null);
   /** Index of the imagery cell whose picker modal is open. */
   const [pickerFor, setPickerFor] = useState<number | null>(null);
