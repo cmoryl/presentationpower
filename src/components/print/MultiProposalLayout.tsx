@@ -2476,24 +2476,9 @@ function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string
 // Page 9 — Advocates
 // ---------------------------------------------------------------------------
 
-const CAUSE_SLOTS = [
-  { x: 3.0, y: 2.55, w: 1.06, h: 0.44 },
-  { x: 4.28, y: 2.48, w: 0.92, h: 0.5 },
-  { x: 5.28, y: 2.5, w: 0.9, h: 0.48 },
-  { x: 6.3, y: 2.5, w: 1.02, h: 0.48 },
-  { x: 7.36, y: 2.5, w: 0.72, h: 0.48 },
-  { x: 3.12, y: 3.28, w: 1.14, h: 0.44 },
-  { x: 4.42, y: 3.22, w: 1.0, h: 0.5 },
-  { x: 5.66, y: 3.2, w: 1.06, h: 0.54 },
-  { x: 6.86, y: 3.24, w: 1.06, h: 0.46 },
-];
+/** Left editorial rail geometry for the advocates page. */
+const ADV_RAIL_W = 2.62;
 
-const AFFINITY_SLOTS = [
-  { x: 3.0, y: 8.6, w: 1.82, h: 0.52 },
-  { x: 4.86, y: 8.44, w: 1.36, h: 0.6 },
-  { x: 6.86, y: 8.5, w: 1.04, h: 0.72 },
-  { x: 4.3, y: 9.6, w: 2.36, h: 0.56 },
-];
 
 type Box = { x: number; y: number; w: number; h: number };
 
