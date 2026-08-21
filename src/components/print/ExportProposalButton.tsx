@@ -12,9 +12,10 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-import { CheckSquare, FileDown, FileText, Presentation, Square } from "lucide-react";
+import { CheckSquare, Eye, FileDown, FileText, Presentation, Square } from "lucide-react";
 import { toast } from "sonner";
 import type { PrintMode, PrintPageSize } from "@/lib/print-assets.types";
+import { PptxLayoutPreview } from "./PptxLayoutPreview";
 
 type Fmt = "pdf" | "pptx";
 type PageInfo = { index: number; label: string };
