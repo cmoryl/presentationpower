@@ -2024,12 +2024,9 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         slot="stories.logo.1"
       />
       <Dots x={3.72} y={3.05} color={BLUE} />
-      <T x={3.72} y={3.33} w={3.5} size={10} color={NAVY} leading={1.42}>
-        {first?.text ? `"${first.text.replace(/^"|"$/g, "")}"` : ""}
-      </T>
-      <T x={3.72} y={5.02} w={3.5} size={10} color={NAVY}>
-        {first ? `– ${[first.role || first.author, first.company].filter(Boolean).join(", ")}` : ""}
-      </T>
+      <QuoteBody x={3.72} y={3.33} w={3.5} maxH={1.6} size={10} quote={first} />
+      <QuoteAttribution x={3.72} y={5.02} w={3.5} size={10} quote={first} />
+
 
       {/* Card 2 */}
       <L x={0.64} y={6.8} w={7.38} h={3.62} style={{ border: cardBorder, borderRadius: u(0.34) }} />
@@ -2058,14 +2055,17 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
       <T x={1.07} y={7.68} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.headline || ""}
       </T>
-      <T x={1.07} y={8.16} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
-        {second?.text ? `"${second.text.replace(/^"|"$/g, "")}"` : ""}
-      </T>
-      <T x={1.07} y={9.34} w={3.44} size={10} color={NAVY} align="right">
-        {second
-          ? `– ${[second.role || second.author, second.company].filter(Boolean).join(", ")}`
-          : ""}
-      </T>
+      <QuoteBody
+        x={1.07}
+        y={8.16}
+        w={3.44}
+        maxH={1.1}
+        size={10}
+        quote={second}
+        align="right"
+      />
+      <QuoteAttribution x={1.07} y={9.34} w={3.44} size={10} quote={second} align="right" />
+
     </>
   );
 }
@@ -2137,9 +2137,109 @@ function storyLogo(company: string | undefined): string | undefined {
   return company ? STORY_LOGOS[company.toLowerCase()] : undefined;
 }
 
-function storyQuote(text: string | undefined): string {
-  return text ? `"${text.replace(/^"|"$/g, "")}"` : "";
+type ProposalQuote = NonNullable<MultiProposalPage["quotes"]>[number];
+
+/**
+ * QUOTE BODY — live-editable and self-fitting.
+ *
+ * Two rules make a testimonial behave here:
+ *
+ * 1. *Editable in place.* LiveEditOverlay tags an element only when its text is
+ *    exactly the stored string. The old renderer wrapped the copy in quote marks
+ *    (`"…"`), so nothing on the page matched `pages[n].quotes[m].text` and the
+ *    quote was the one field you could not click. The marks now live in their
+ *    own spans and the stored value renders untouched in a span of its own — and
+ *    when the author already typed their own quote marks, none are added.
+ * 2. *Fits its card.* Every quote is a different length, so a fixed point size
+ *    either clips the long ones or leaves the short ones swimming. `sizePt` sets
+ *    the per-quote ceiling and the fitter shrinks from there until the copy fits
+ *    the card box, which is the same measurement PDF and PPTX export use.
+ */
+function QuoteBody({
+  x,
+  y,
+  w,
+  maxH,
+  size,
+  quote,
+  color = NAVY,
+  leading = 1.42,
+  align = "left",
+  weight = 400,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  maxH: number;
+  /** Layout's authored size — the ceiling when the quote has no own `sizePt`. */
+  size: number;
+  quote: ProposalQuote | undefined;
+  color?: string;
+  leading?: number;
+  align?: CSSProperties["textAlign"];
+  weight?: number;
+}) {
+  const stored = quote?.text ?? "";
+  if (!stored.trim()) return null;
+  // Authored marks win: adding a second pair would both look wrong and break the
+  // exact-text match the edit overlay needs.
+  const quoted = /^["“”].*["“”]$/s.test(stored.trim());
+  // A bumped per-quote size may exceed the layout default; the fitter still
+  // guarantees it lands inside the card.
+  const pt = Math.max(5, Math.min(quote?.sizePt || size, size * 2.2));
+  return (
+    <FitT
+      x={x}
+      y={y}
+      w={w}
+      maxH={maxH}
+      size={pt}
+      minSize={Math.max(5.5, Math.min(pt, size) * 0.62)}
+      color={color}
+      leading={leading}
+      align={align}
+      weight={weight}
+    >
+      {quoted ? null : <span>{"\u0022"}</span>}
+      <span>{stored}</span>
+      {quoted ? null : <span>{"\u0022"}</span>}
+    </FitT>
+  );
 }
+
+/** `– Role, Company`, with each stored field in its own clickable span. */
+function QuoteAttribution({
+  x,
+  y,
+  w,
+  size,
+  quote,
+  color = NAVY,
+  align = "left",
+  weight = 400,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  size: number;
+  quote: ProposalQuote | undefined;
+  color?: string;
+  align?: CSSProperties["textAlign"];
+  weight?: number;
+}) {
+  const who = quote?.role || quote?.author || "";
+  const company = quote?.company || "";
+  if (!who && !company) return null;
+  return (
+    <T x={x} y={y} w={w} size={size} color={color} align={align} weight={weight}>
+      <span>{"\u2013 "}</span>
+      {who ? <span>{who}</span> : null}
+      {who && company ? <span>{", "}</span> : null}
+      {company ? <span>{company}</span> : null}
+    </T>
+  );
+}
+
 
 /** 7b — three-up story cards (photo top, logo, trimmed quote). */
 function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
@@ -2201,19 +2301,24 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
                 {q.headline}
               </T>
             ) : null}
-            <T
+            <QuoteBody
               x={x + 0.16}
               y={7.02}
               w={cardW - 0.32}
+              maxH={2.02}
               size={8.5}
+              quote={q}
               color="rgba(3,0,44,0.78)"
-              leading={1.42}
-            >
-              {storyQuote(q?.text)}
-            </T>
-            <T x={x + 0.16} y={9.16} w={cardW - 0.32} size={8.5} weight={600} color={NAVY}>
-              {q ? `– ${[q.role || q.author, q.company].filter(Boolean).join(", ")}` : ""}
-            </T>
+            />
+            <QuoteAttribution
+              x={x + 0.16}
+              y={9.16}
+              w={cardW - 0.32}
+              size={8.5}
+              weight={600}
+              quote={q}
+            />
+
           </Fragment>
         );
       })}
@@ -2301,12 +2406,26 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
         {q?.headline || page.title || "Success story"}
       </T>
       <Rule x={0.62} y={7.32} w={7.3} color="rgba(161,248,249,0.5)" />
-      <T x={0.62} y={7.56} w={7.3} size={11.5} color="rgba(255,255,255,0.86)" leading={1.5}>
-        {storyQuote(q?.text)}
-      </T>
-      <T x={0.62} y={9.2} w={7.3} size={10} weight={600} color={PROPOSAL_AQUA}>
-        {q ? `– ${[q.role || q.author, q.company].filter(Boolean).join(", ")}` : ""}
-      </T>
+      <QuoteBody
+        x={0.62}
+        y={7.56}
+        w={7.3}
+        maxH={1.54}
+        size={11.5}
+        quote={q}
+        color="rgba(255,255,255,0.86)"
+        leading={1.5}
+      />
+      <QuoteAttribution
+        x={0.62}
+        y={9.2}
+        w={7.3}
+        size={10}
+        weight={600}
+        color={PROPOSAL_AQUA}
+        quote={q}
+      />
+
 
       {stats.map((s, i) => (
         <Fragment key={i}>
@@ -2368,16 +2487,17 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
             <T x={x + 0.28} y={y + 0.26} w={1.2} size={34} weight={700} color={BLUE} leading={1}>
               {"\u201C"}
             </T>
-            <T
+            <QuoteBody
               x={x + 0.28}
               y={y + 0.86}
               w={cardW - 0.56}
+              maxH={1.56}
               size={9.5}
+              quote={q}
               color="rgba(3,0,44,0.82)"
               leading={1.46}
-            >
-              {storyQuote(q?.text)}
-            </T>
+            />
+
             <Rule x={x + 0.28} y={y + 2.5} w={cardW - 0.56} color="rgba(3,0,44,0.14)" />
             <StoryLogo
               x={x + 0.28}
