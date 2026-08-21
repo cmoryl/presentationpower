@@ -658,7 +658,20 @@ function VariantRendererInner(props: Props) {
   // per-slide Appearance → Dark toggle look broken on Enterprise decks.
   const mode: SlideMode = activePack ? activePack.mode : modeProp;
 
-  const c = slide.content as Record<string, unknown>;
+  // CLIENT-facing logo modules (logo walls, client matrices, case logo grids)
+  // must show real client marks. Any seeded/legacy content that still points at
+  // a TransPerfect brand asset (/brand-logos/*) — or has no mark at all — is
+  // re-filled from the LogoHub roster. Author-picked client logos are kept.
+  const logoPool = useClientLogoPool();
+  const rawContent = slide.content as Record<string, unknown>;
+  const c = useMemo(() => {
+    if (!logoPool.length) return rawContent;
+    const json = JSON.stringify(rawContent ?? {});
+    const needsClientMarks = /\/brand-logos\//.test(json) || !/logoUrl/.test(json);
+    if (!needsClientMarks) return rawContent;
+    return overlayLogoHubFillers(rawContent, variant.id, logoPool);
+  }, [rawContent, logoPool, variant.id]);
+
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
   // Optional per-slide accent override (`content.accentOverride`, a hex string).
