@@ -12,7 +12,7 @@ import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
-import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { resolveSlideTransition, type DeckSlide } from "@/lib/deck-store";
 import { Play, X, ChevronLeft, ChevronRight, Languages, Check, Loader2 } from "lucide-react";
