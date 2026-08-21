@@ -256,7 +256,7 @@ function PresentationSegment() {
                       : "#666666";
             return (
               <div key={mf.id} className="rounded-2xl border border-black/10 bg-white p-5">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <span
                       className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
@@ -283,9 +283,9 @@ function PresentationSegment() {
                     {variants.map((v) => {
                       const ico = iconographyForVariant(v);
                       return (
-                        <li key={v.id} className="flex items-center justify-between gap-2">
+                        <li key={v.id} className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
                           <span className="truncate">{v.name}</span>
-                          <span className="flex shrink-0 items-center gap-2">
+                          <span className="flex min-w-0 flex-wrap items-center gap-2">
                             <span
                               className="rounded-full px-2 py-0.5 font-mono text-[10px]"
                               style={{
@@ -522,7 +522,7 @@ function EventsSegment({ ink }: { ink: string }) {
       <div className="grid gap-4 md:grid-cols-2">
         {EVENT_PLAYBOOKS.map((p) => (
           <div key={p.id} className="rounded-2xl border border-black/10 bg-white p-5">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="font-mono text-xs text-black/50">{p.kind}</div>
                 <div className="mt-1 text-lg font-semibold" style={{ color: NAVY }}>

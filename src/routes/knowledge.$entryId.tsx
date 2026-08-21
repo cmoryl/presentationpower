@@ -103,7 +103,7 @@ function EntryView() {
         >
           ← Back to knowledge
         </Link>
-        <div className="mt-3 flex items-baseline justify-between gap-6">
+        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-3 sm:gap-6">
           <div>
             <div className="text-xs uppercase tracking-[0.3em] text-black/50">
               {KNOWLEDGE_KIND_META[kind].label} · {ownerName}

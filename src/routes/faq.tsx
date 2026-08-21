@@ -490,7 +490,7 @@ function FAQPage() {
     <AppShell>
       <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#C2A3FF22] py-9 lg:py-12">
         <div className="mx-auto max-w-[1400px]">
-          <div className="flex items-baseline justify-between gap-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-3 sm:gap-6">
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-black/50">Support</div>
               <h1 className="mt-3 text-4xl font-semibold sm:text-5xl">

@@ -103,7 +103,7 @@ function OracleView() {
 
   return (
     <AppShell>
-      <div className="flex items-baseline justify-between gap-6">
+      <div className="flex flex-wrap items-baseline justify-between gap-3 sm:gap-6">
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">
             Oracle intelligence

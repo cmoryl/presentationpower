@@ -345,7 +345,7 @@ function AboutPage() {
     <AppShell>
       <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-9 lg:py-12">
         <div className="mx-auto max-w-6xl">
-          <div className="flex items-baseline justify-between gap-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-3 sm:gap-6">
             <div>
               <div className="text-xs uppercase tracking-[0.3em] text-black/50">About</div>
               <h1 className="mt-3 text-5xl font-semibold leading-[1.05] tracking-[-0.02em] sm:text-6xl">
