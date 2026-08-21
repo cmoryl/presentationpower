@@ -42,6 +42,56 @@ type Pillar = {
 
 const CHANGELOG: Array<{ date: string; title: string; body: string }> = [
   {
+    date: "2026-08",
+    title: "Element identity + Element System style packs (S29 · S30)",
+    body: "The platform is TransPerfect Element. A dedicated Element product skin ships in light (S29) and dark (S30) with the five-brick Element logo, vibrant Element palette, and authored Element background plates — never the TransPerfect wordmark.",
+  },
+  {
+    date: "2026-08",
+    title: "Mobile pass across app, admin, and editors",
+    body: "Hamburger navigation with the full Elements/Admin tree, responsive page headers, single-column library and atlas grids, horizontally scrollable admin tables, stacked editor and studio panes, and 44px tap targets.",
+  },
+  {
+    date: "2026-08",
+    title: "Slide transitions + section cues",
+    body: "Per-slide and deck-default transitions run compositor-only, honour reduced-motion, and export as native PowerPoint transitions. Section cues mark chapter changes during playback.",
+  },
+  {
+    date: "2026-08",
+    title: "Solution proposal template + interactive world map",
+    body: "A division-specific master proposal with page-at-a-time editing, thumbnail rail, editable logo wall, live cost math, a vector world map with drag-and-drop pins, and layered editable PPTX/PDF export.",
+  },
+  {
+    date: "2026-08",
+    title: "Print section module library + print CMYK contract",
+    body: "A browsable library of governed print sections with a copy normalizer so imported briefs are fully editable, plus approved CMYK/spot builds, 100K body text, bleed/crop/safe geometry, and a PDF/X-4 preflight gate.",
+  },
+  {
+    date: "2026-08",
+    title: "Presentation agent (/agent)",
+    body: "Chat-driven deck authoring: outline proposal, style-pack and section-template selection, populated charts and stats, importable design DNA, and per-thread palette/layout/backdrop overrides.",
+  },
+  {
+    date: "2026-08",
+    title: "Style pack catalog S01–S30 + intent recommender",
+    body: "Thirty permanent approved packs with per-skin motifs, geometry, composition rules and background presets, ranked against a structured brief by a deterministic recommender with reasons.",
+  },
+  {
+    date: "2026-08",
+    title: "Certified PowerPoint view + layered exports",
+    body: "A 1:1 certified canvas renders through the export pipeline with a layers inspector, and decks, canvases, and print assets export as real editable PowerPoint objects with font mapping and radius parity.",
+  },
+  {
+    date: "2026-08",
+    title: "Open Canvas Studio, Module Studio & Social Module Studio",
+    body: "Free-placement canvas editing with snapping, layers and AI Refit; module authoring with schema mapping; and any library module re-fitted into any social format by the social fit engine.",
+  },
+  {
+    date: "2026-08",
+    title: "Editor geometry lock + regression suite",
+    body: "Stage scaling unified across every editor mode so geometry, typography, and position stay identical between edit, preview, and export — guarded by an automated resize-stability suite.",
+  },
+  {
     date: "2026-07",
     title: "Build-wide breadcrumbs",
     body: "A shared breadcrumb trail resolves dynamic segments — deck titles, playbook names, admin sections — with friendly labels and fallback shortened IDs across every route.",
@@ -299,6 +349,64 @@ function AboutPage() {
       to: "/admin",
       toLabel: "Open admin →",
     },
+    {
+      kicker: "14 · Style packs",
+      title: "Thirty approved looks, permanently numbered.",
+      body: "S01–S30 each define palette, type scale, card geometry, composition rules, and background motif. S-codes never change, so a deck keeps its look forever. Element System · Light (S29) and Dark (S30) carry the Element product identity and the five-brick Element logo.",
+      bullets: [
+        "Style pack and industry recipe stay independent",
+        "Intent recommender ranks packs from the brief",
+        "High-contrast render mode + live pack switching",
+      ],
+      to: "/looks",
+      toLabel: "Open Template Studio →",
+    },
+    {
+      kicker: "15 · Agent",
+      title: "Chat a whole deck into existence.",
+      body: "Describe the audience, objective, and length. The agent proposes an outline, selects a style pack and section templates, writes the slides with charts and stats populated, and hands back an editable deck.",
+      bullets: [
+        "Importable design DNA per thread",
+        "Per-thread palette / layout / backdrop overrides",
+        "Deck visual audit before hand-off",
+      ],
+      to: "/agent",
+      toLabel: "Open the agent →",
+    },
+    {
+      kicker: "16 · Studios",
+      title: "Canvas control when a module isn't enough.",
+      body: "Open Canvas Studio gives free placement with snapping, guides, layers, and AI Refit. Module Studio turns a one-off layout into a governed module. Social Module Studio re-fits any library module into any social format.",
+      bullets: [
+        "Canvas blocks export as editable PPTX shapes",
+        "Schema mapping keeps new modules editable",
+        "Social fit engine + AI Refit for tight frames",
+      ],
+      to: "/admin/canvas",
+      toLabel: "Open Canvas Studio →",
+    },
+    {
+      kicker: "17 · Proposals & print modules",
+      title: "Client-ready proposals, section by section.",
+      body: "Solution proposal is a division-specific master template: page-at-a-time editing, thumbnail rail, editable logo wall, live cost math, and a vector world map with drag-and-drop location pins. Print sections come from a governed module library.",
+      bullets: [
+        "Layered editable PPTX + print-ready PDF",
+        "Approved CMYK/spot builds, 100K body text",
+        "PDF/X-4 preflight for bleed, crop, safe area",
+      ],
+      to: "/library/print/modules",
+      toLabel: "Browse print modules →",
+    },
+    {
+      kicker: "18 · Fidelity",
+      title: "What you see is what PowerPoint gets.",
+      body: "A certified canvas renders through the export pipeline at true 1:1 scale with a layers inspector, and stage scaling is unified across every editor mode so geometry and typography never shift between edit, preview, and export.",
+      bullets: [
+        "Layered PPTX with font mapping + radius parity",
+        "Native slide transitions on export",
+        "Automated resize-stability regression suite",
+      ],
+    },
   ];
 
   const surfaces: Array<{ to: string; label: string; blurb: string }> = [
@@ -337,6 +445,24 @@ function AboutPage() {
       to: "/admin/globallink",
       label: "GlobalLink",
       blurb: "Translation connector config & status.",
+    },
+    { to: "/agent", label: "Agent", blurb: "Chat-driven deck authoring end to end." },
+    { to: "/looks", label: "Template Studio", blurb: "Compare all 30 style packs on real slides." },
+    {
+      to: "/library/print/modules",
+      label: "Print modules",
+      blurb: "Governed print section library.",
+    },
+    { to: "/social/modules", label: "Social studio", blurb: "Re-fit any module to any format." },
+    {
+      to: "/admin/canvas",
+      label: "Canvas Studio",
+      blurb: "Free-placement canvas with layers & AI Refit.",
+    },
+    {
+      to: "/admin/module-studio",
+      label: "Module Studio",
+      blurb: "Author new governed modules.",
     },
     { to: "/faq", label: "FAQ", blurb: "Step-by-step basics and common questions." },
   ];

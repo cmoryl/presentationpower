@@ -206,6 +206,108 @@ const GUIDES: Array<{ title: string; blurb: string; steps: string[] }> = [
       "Drill into any module to see per-slide events (view, edit, export).",
     ],
   },
+  {
+    title: "Build a solution proposal (print)",
+    blurb: "A division-specific master proposal you can edit page by page.",
+    steps: [
+      "Open Print → New print asset and pick Solution proposal, or seed one from a master brief.",
+      "The editor opens one page at a time; use the thumbnail rail to jump between pages.",
+      "Edit headlines, scope tables, and logos in place — the logo list lets you add, remove, and reorder client marks.",
+      "On the locations page, drag pins on the vector world map to add or move offices.",
+      "Enter rates and quantities on the cost page — totals recalculate automatically.",
+      "Use Export proposal for a layered, editable PPTX or a print-ready PDF.",
+    ],
+  },
+  {
+    title: "Reuse a print section module",
+    blurb: "Drop a governed print section into any asset instead of rebuilding it.",
+    steps: [
+      "Open Print → Modules to browse the print section module library.",
+      "Preview a module at real page scale and check which fields it exposes.",
+      "Insert it into the asset you're editing — copy is normalized so every field stays editable.",
+      "Adjust the hero band and section order; the auto-fit engine rescales type to keep the page clean.",
+    ],
+  },
+  {
+    title: "Choose a style pack (including the Element skin)",
+    blurb: "30 approved packs, S01–S30, plus per-industry recipes.",
+    steps: [
+      "Open Template Studio (Looks) to compare packs side by side on real slides.",
+      "In a deck, use Look & feel in the toolbar to switch packs live — geometry and type stay locked to the pack.",
+      "Pick Element System · Light (S29) or Element System · Dark (S30) for Element product marketing — these use the Element five-brick logo, never the TransPerfect wordmark.",
+      "Style packs and industry recipes are independent: changing the pack does not change the industry background family.",
+    ],
+  },
+  {
+    title: "Build a deck with the presentation agent",
+    blurb: "Chat your way to a finished, on-brand deck.",
+    steps: [
+      "Open Agent from the Elements menu and describe the deck, audience, and length.",
+      "Review the proposed outline — approve, trim, or reorder sections in the chat.",
+      "The agent picks a style pack and section templates, then writes the slides with charts and stats populated.",
+      "Open the generated deck in the editor to fine-tune, or ask the agent to revise specific slides.",
+    ],
+  },
+  {
+    title: "Design freely in Open Canvas Studio (admin)",
+    blurb: "Full canvas control when a module isn't enough.",
+    steps: [
+      "Go to Admin → Brand assets → Open Canvas Studio.",
+      "Drag blocks from the palette onto the canvas; snapping, guides, and z-order controls keep placement exact.",
+      "Use the Layers and Inspect panels in the right rail for stacking and precise geometry.",
+      "Run AI Refit to rebalance a crowded canvas, then export — canvas blocks export as editable PPTX shapes.",
+    ],
+  },
+  {
+    title: "Author a reusable module in Module Studio (admin)",
+    blurb: "Turn a one-off layout into a governed library module.",
+    steps: [
+      "Go to Admin → Brand assets → Module Studio.",
+      "Compose the layout, then map each element to a schema field so the module stays editable everywhere.",
+      "Preview across light/dark and multiple style packs to confirm it holds up.",
+      "Save it into the library — it becomes selectable in decks, print, and social.",
+    ],
+  },
+  {
+    title: "Render a library module into a social post",
+    blurb: "Any module, resized correctly for any social format.",
+    steps: [
+      "Open Social → Modules to open the Social Module Studio.",
+      "Pick the target format (LinkedIn, Instagram square, story, banner).",
+      "Choose a library module — the fit engine re-lays it out for the new aspect ratio.",
+      "If the copy is too long for the frame, run AI Refit; then edit anything directly on the canvas.",
+    ],
+  },
+  {
+    title: "Check the certified PowerPoint view before export",
+    blurb: "See exactly what PowerPoint will render, layer by layer.",
+    steps: [
+      "Open a deck and switch to the certified preview from the editor toolbar.",
+      "The slide renders at true 1:1 export scale using the export pipeline, not the web preview.",
+      "Open the Layers inspector to confirm every text frame, image, and surface is present and editable.",
+      "Fix anything flagged, then export — decks and solution proposals both export as layered, editable PPTX.",
+    ],
+  },
+  {
+    title: "Add slide transitions and section cues",
+    blurb: "Premium playback without hurting performance.",
+    steps: [
+      "In the editor, open Motion on the slide toolbar and pick a transition type and speed.",
+      "Set a deck default so new slides inherit it, and override individual slides where needed.",
+      "Transitions are compositor-only and automatically disabled when the viewer prefers reduced motion.",
+      "Present or share the deck — section cues appear briefly at chapter changes and export as native PowerPoint transitions.",
+    ],
+  },
+  {
+    title: "Work on a phone or tablet",
+    blurb: "What's practical on small screens.",
+    steps: [
+      "Use the hamburger menu for the Elements and Admin sections — every top-level surface is in the sheet.",
+      "Browsing, reviewing, presenting, and sharing all work at phone width.",
+      "Editor and studio surfaces stack vertically on phones, but canvas editing is still best on a desktop.",
+      "Admin tables scroll horizontally so dense data stays readable.",
+    ],
+  },
 ];
 
 const FAQS: Array<{ section: string; items: QA[] }> = [
@@ -221,8 +323,8 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
         a: "Anyone with a TransPerfect email can sign up. Admin privileges are granted automatically for @transperfect.com addresses on first confirmed sign-in.",
       },
       {
-        q: "What are the four surfaces in the top nav?",
-        a: "Presentation (decks + module library + Atlas), Print (long-form print studio), Event (event playbooks and kits), and Social (division-scoped social playbooks). All four share the same brief, brand modes, and knowledge base.",
+        q: "How is the navigation organised?",
+        a: "An Elements menu in the header holds the four production surfaces — Presentation, Print, Event, and Social — each with its own sub-options. Brief, Knowledge, Agent, and Admin sit alongside it. All surfaces share the same brief, brand modes, style packs, and knowledge base. On phones the same tree lives in the hamburger sheet.",
       },
       {
         q: "What's a master brief?",
@@ -269,6 +371,18 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       {
         q: "How do I resize the hero band?",
         a: "Drag the hero handle up or down on the canvas — the hero can be anywhere from 20% to 80% of the page. Sizing is persisted per asset.",
+      },
+      {
+        q: "Can I build a client proposal?",
+        a: "Yes. Solution proposal is a first-class print template with division-specific content, a page thumbnail rail, an editable logo wall, a vector world map with drag-and-drop location pins, and a cost summary that recalculates totals from your inputs.",
+      },
+      {
+        q: "Is there a library of print sections?",
+        a: "Yes — Print → Modules. Every section module can be inserted into any asset with its copy normalized so all fields stay editable, and the hero auto-fit engine keeps pages balanced.",
+      },
+      {
+        q: "How is print colour handled?",
+        a: "Print targets offset and digital/POD. Brand RGB is never auto-converted — each brand has approved CMYK/spot builds, body text is always 100K, and a PDF/X-4 preflight gate checks bleed, crop, and safe geometry before output.",
       },
       {
         q: "How do I export print?",
@@ -387,6 +501,57 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
     ],
   },
   {
+    section: "Style packs & the Element skin",
+    items: [
+      {
+        q: "What is a style pack?",
+        a: "An approved visual system — palette, type scale, card geometry, and background motif — applied across a whole deck or print asset. There are 30 packs, S01–S30, and their S-codes never change, so a deck built on a pack keeps the same look forever.",
+      },
+      {
+        q: "What is the Element System skin?",
+        a: "S29 (light) and S30 (dark) are the Element product skins: vibrant Element colors, the five-brick Element logo, and authored Element background plates. Use them for Element platform marketing — they never show the TransPerfect wordmark.",
+      },
+      {
+        q: "Do style packs and industry backgrounds interact?",
+        a: "No. The style pack and the industry design recipe are independent, so you can switch the pack without losing the industry background family, and vice versa.",
+      },
+      {
+        q: "How do I pick the right pack?",
+        a: "Open Template Studio to compare packs on real slides, or let the intent recommender rank them from your brief — it returns three recommendations plus three alternates with the reason for each.",
+      },
+    ],
+  },
+  {
+    section: "Agent chat",
+    items: [
+      {
+        q: "What can the presentation agent do?",
+        a: "Open Agent from the Elements menu and describe what you need. It proposes an outline, picks a style pack and section templates, writes the slides, and populates charts and stats — then hands you an editable deck.",
+      },
+      {
+        q: "Can I control the agent's design choices?",
+        a: "Yes. You can import a visual knowledge map as the design authority for a thread, or set per-thread overrides for palette, box layout, backdrop, and light/dark mode. Overrides outrank both the imported map and the skin catalog.",
+      },
+    ],
+  },
+  {
+    section: "Studios & canvas editing",
+    items: [
+      {
+        q: "When should I use Open Canvas Studio instead of a module?",
+        a: "Use modules for anything repeatable. Use Open Canvas Studio (Admin → Brand assets) when a layout is genuinely one-off: free placement with snapping, guides, z-order, and AI Refit, exporting as editable PPTX shapes.",
+      },
+      {
+        q: "What is Module Studio for?",
+        a: "Authoring new governed modules. Compose a layout, map each element to a schema field, verify it across light/dark and multiple style packs, then publish it to the library for decks, print, and social.",
+      },
+      {
+        q: "Does editing ever resize the rest of my slide?",
+        a: "No. Stage scaling is unified across every editor mode and covered by an automated regression suite, so geometry, typography, and position stay identical between edit, preview, and export.",
+      },
+    ],
+  },
+  {
     section: "Analytics",
     items: [
       {
@@ -411,6 +576,18 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
         a: "JPEG, PNG, WebP, GIF (passthrough), AVIF (rasterized), and SVG (vector-preserving passthrough — rasterized on-the-fly during PPTX export). Video (MP4/WebM) is supported build-wide.",
       },
       {
+        q: "Are exported PowerPoints editable?",
+        a: "Yes. Decks and solution proposals export layered and editable — text frames, images, surfaces, icons, and backgrounds arrive as real PowerPoint objects with fonts mapped and corner radii preserved, not flattened pictures.",
+      },
+      {
+        q: "How do I know the export will match the preview?",
+        a: "Use the certified PowerPoint view in the editor: it renders through the export pipeline at true 1:1 scale, and the Layers inspector lists every object the file will contain.",
+      },
+      {
+        q: "Do slide transitions survive export?",
+        a: "Yes. Transitions set in the editor are written as native PowerPoint transitions, and on-screen playback respects reduced-motion settings.",
+      },
+      {
         q: "Is there a presenter view?",
         a: "Yes. Presenter view runs the deck fullscreen with speaker notes and keyboard navigation. Present mode is also available for a clean fullscreen show.",
       },
@@ -433,7 +610,7 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       },
       {
         q: "What's in the Admin sidebar?",
-        a: "Overview (command center, Atlas, Templates, Print Studio, Audit log), Analytics (Master analytics, deck engagement, AI usage, A/B), Knowledge (hub, entries, Oracle, KB manager, approvals), Brand assets (assets, guides, LogoHub, Icon Studio, PDF ingestion), Translation, and Governance.",
+        a: "Overview (command center, Template Studio, team templates, print library, campaigns, audit log), Analytics (master analytics, deck engagement, AI usage & cost, imagery analytics, style-learning governance), Knowledge (hub, entries, Ask Oracle, Oracle KB, KB manager, approvals), Brand assets (assets, brand guides, LogoHub, Icon Studio, Open Canvas Studio, Module Studio, module editor, PDF ingestion, imagery), Translation (GlobalLink translate & share), and Governance (users & roles, team workspace).",
       },
       {
         q: "How do breadcrumbs work?",
