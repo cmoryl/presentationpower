@@ -223,13 +223,16 @@ function checkCharCaps(slide: DeckSlide, variant: ModuleVariant, issues: QaIssue
 
 export function expandPath(pattern: string, content: Record<string, unknown>): string[] {
   if (!pattern.includes("[]")) return [pattern];
-  const [head, ...rest] = pattern.split("[]");
-  const arrKey = head.replace(/\.$/, "");
+  const idx = pattern.indexOf("[]");
+  const arrKey = pattern.slice(0, idx).replace(/\.$/, "");
+  const tail = pattern.slice(idx + 2);
   const arrVal = readPath(content, arrKey);
   if (!Array.isArray(arrVal)) return [];
-  const tail = rest.join("[]");
-  return arrVal.map((_, i) => `${arrKey}[${i}]${tail}`);
+  // Recurse so nested wildcards (e.g. "items[].values[]") expand fully instead
+  // of leaving a literal "[]" segment that never resolves.
+  return arrVal.flatMap((_, i) => expandPath(`${arrKey}[${i}]${tail}`, content));
 }
+
 
 export function readPath(obj: unknown, path: string): unknown {
   const parts = path.split(".").flatMap((p) => {
