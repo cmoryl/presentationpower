@@ -44,6 +44,9 @@ const VIDEO_VARIANT_IDS = new Set<string>([
   "MV-IMG-CAPTION",
   "MV-IMG-PORTRAIT",
   "MV-IMG-QUOTE-BG",
+  // Screen recordings play inside the device screen
+  "MV-SHOW-LAPTOP",
+  "MV-SHOW-MONITOR",
 ]);
 
 /** True when the variant renders a slide-level photograph from
