@@ -27,6 +27,8 @@ import React, {
   useState,
   type ReactNode,
 } from "react";
+import { AnchoredPortal, useAnchoredPosition } from "@/components/ui/anchored-panel";
+
 
 // -----------------------------------------------------------------------------
 // Page header
