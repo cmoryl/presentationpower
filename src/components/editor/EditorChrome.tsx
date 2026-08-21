@@ -203,8 +203,14 @@ export function EditorMenu({
   const [anchor, setAnchor] = useState<"left" | "right">("left");
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const [triggerEl, setTriggerEl] = useState<HTMLButtonElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const panelId = useId();
+  const pos = useAnchoredPosition(triggerEl, open, {
+    align: anchor === "right" ? "end" : "start",
+    width: 340,
+  });
+
 
   const getFocusable = useCallback((): HTMLElement[] => {
     const panel = panelRef.current;
