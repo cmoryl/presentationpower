@@ -96,66 +96,37 @@ export function BrandLockup({
     orientation === "stacked" ? "stacked" : "horizontal";
 
   // ELEMENT PRODUCT BRAND. Element markets itself, so its chrome must never
-  // borrow the TransPerfect corporate wordmark: the five-brick E mark plus the
-  // ELEMENT wordmark is the whole lockup. Sizes are px (not rem) because slide
-  // chrome renders at 1920-stage scale, where rem type would collapse.
+  // borrow the TransPerfect corporate wordmark. We render the APPROVED MASTER
+  // LOCKUP artwork (colour bricks + wordmark), switching to the reversed master
+  // file on dark chrome. Mark-only chrome renders the colour brick mark.
   if (ELEMENT_BRANDS.has(logo.wordmark)) {
+    const onDark = /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white";
     const markPx = Math.round(dims.markPx * (isMarkOnly ? 1.25 : 1));
-    const eyebrowPx = Math.max(6, Math.round(dims.wordmarkPx * 0.42));
-    const wordPx = Math.round(dims.wordmarkPx * 0.92);
-    const descriptorPx = Math.max(5, Math.round(dims.wordmarkPx * 0.34));
+    if (isMarkOnly) {
+      return (
+        <div className="inline-flex" style={{ color }}>
+          <ElementMark tone="color" size={markPx} title="TransPerfect Element" />
+        </div>
+      );
+    }
+    const lockupPx = Math.round(markPx * 1.55);
     return (
       <div
-        className={
-          innerOrientation === "stacked"
-            ? "inline-flex flex-col items-start"
-            : "inline-flex items-center"
-        }
-        style={{ gap: dims.gapPx, color }}
+        className="inline-flex items-center"
+        style={{ color }}
         role="img"
         aria-label="TransPerfect Element lockup"
       >
-        <ElementMark tone="mono" size={markPx} title="TransPerfect Element" />
-        {!isMarkOnly && (
-          <div className="min-w-0 leading-none">
-            <div
-              style={{
-                fontSize: eyebrowPx,
-                letterSpacing: "0.42em",
-                fontWeight: 500,
-                opacity: 0.75,
-              }}
-            >
-              TRANSPERFECT
-            </div>
-            <div
-              style={{
-                marginTop: Math.round(wordPx * 0.24),
-                fontSize: wordPx,
-                letterSpacing: "0.3em",
-                fontWeight: 600,
-              }}
-            >
-              ELEMENT
-            </div>
-            {/* Descriptor drops out at small sizes, per the logo rules. */}
-            {dims.wordmarkPx >= 17 && (
-              <div
-                style={{
-                  marginTop: Math.round(descriptorPx * 0.6),
-                  fontSize: descriptorPx,
-                  letterSpacing: "0.32em",
-                  opacity: 0.65,
-                }}
-              >
-                MODULAR DESIGN SYSTEM
-              </div>
-            )}
-          </div>
-        )}
+        <img
+          src={onDark ? ELEMENT_LOCKUP_URLS.reversed : ELEMENT_LOCKUP_URLS.color}
+          alt="TransPerfect Element"
+          className="w-auto max-w-full object-contain"
+          style={{ height: lockupPx, display: "block" }}
+        />
       </div>
     );
   }
+
 
 
 
