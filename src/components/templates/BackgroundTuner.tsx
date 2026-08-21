@@ -507,27 +507,58 @@ export function BackgroundTuner({
               </span>
             )}
           </div>
+          <p className="mb-2 text-[11px] opacity-60">
+            Each section can keep the look's own artwork or use a picture you upload — drop a file on
+            a tile, or use “Replace”.
+          </p>
+          <input
+            ref={tileFileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void replaceSceneArt(tileTarget.current, f);
+              e.target.value = "";
+            }}
+          />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {SKIN_SCENES.map((s) => {
               const o = mine.find((x) => x.scene === s);
               const live = s === scene ? previewLayers : layersFor(o ?? defaultOverride(code, s), s);
               const on = s === scene;
+              const custom = s === scene ? !!edit.imageUrl : !!o?.imageUrl;
+              const uploading = uploadingScene === s;
               return (
-                <button
+                <div
                   key={s}
-                  type="button"
-                  onClick={() => setScene(s as SkinScene)}
-                  aria-pressed={on}
-                  className={`group flex min-w-0 flex-col gap-1.5 rounded-xl border p-2 text-left transition ${
+                  onDragOver={(e) => {
+                    if (e.dataTransfer.types.includes("Files")) e.preventDefault();
+                  }}
+                  onDrop={(e) => {
+                    const f = e.dataTransfer.files?.[0];
+                    if (f) {
+                      e.preventDefault();
+                      void replaceSceneArt(s as SkinScene, f);
+                    }
+                  }}
+                  className={`group relative flex min-w-0 flex-col gap-1.5 rounded-xl border p-2 text-left transition ${
                     on
                       ? "border-[#003FC7] bg-[#003FC7]/5 ring-2 ring-[#003FC7]/25"
                       : "border-black/10 hover:border-[#003FC7]/50 dark:border-white/15"
                   }`}
                 >
-                  <span
-                    className="block aspect-[16/9] w-full rounded-lg border border-black/10 dark:border-white/15"
-                    style={{ background: live.join(", ") }}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setScene(s as SkinScene)}
+                    aria-pressed={on}
+                    className="block w-full text-left"
+                  >
+                    <span
+                      className="block aspect-[16/9] w-full rounded-lg border border-black/10 dark:border-white/15"
+                      style={{ background: live.join(", ") }}
+                    />
+                  </button>
                   <span className="flex min-w-0 items-center justify-between gap-1.5">
                     <span
                       className={`text-xs font-semibold leading-tight ${on ? "text-[#003FC7]" : ""}`}
@@ -540,9 +571,37 @@ export function BackgroundTuner({
                       </span>
                     )}
                   </span>
-                </button>
+                  <span className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      disabled={uploading}
+                      onClick={() => {
+                        tileTarget.current = s as SkinScene;
+                        tileFileRef.current?.click();
+                      }}
+                      className="rounded-full border border-black/12 px-2 py-0.5 text-[10px] font-semibold transition hover:border-[#003FC7]/60 hover:text-[#003FC7] disabled:opacity-40 dark:border-white/15"
+                    >
+                      {uploading ? "Uploading…" : custom ? "Replace" : "↑ Upload"}
+                    </button>
+                    {custom && !uploading && (
+                      <button
+                        type="button"
+                        onClick={() => void clearSceneArt(s as SkinScene)}
+                        className="rounded-full border border-black/12 px-2 py-0.5 text-[10px] transition hover:border-red-400 hover:text-red-600 dark:border-white/15"
+                      >
+                        Remove
+                      </button>
+                    )}
+                    {custom && (
+                      <span className="ml-auto text-[9px] font-semibold uppercase tracking-wide text-[#003FC7]">
+                        yours
+                      </span>
+                    )}
+                  </span>
+                </div>
               );
             })}
+
           </div>
 
         </div>
