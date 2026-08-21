@@ -15,6 +15,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { ToastAssertiveLiveRegion, installToastA11y } from "@/lib/toast-a11y";
 import { UxDebugDock } from "@/components/debug/UxDebugDock";
+import { supabase } from "@/integrations/supabase/client";
+import { LOGIN_PATH, loginUrl } from "@/lib/sign-out";
 
 function NotFoundComponent() {
   return (
@@ -184,6 +186,25 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // Single global auth listener: keeps router/cache in sync and makes any
+  // sign-out (including one triggered in another tab) land on the login page.
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      if (event === "SIGNED_OUT") {
+        queryClient.clear();
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith(LOGIN_PATH)) {
+          window.location.replace(loginUrl({ expired: true }));
+        }
+        return;
+      }
+      router.invalidate();
+      queryClient.invalidateQueries();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [queryClient, router]);
 
   useEffect(() => {
     installToastA11y();
