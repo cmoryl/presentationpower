@@ -1,5 +1,6 @@
 // Portrait-native "big number pill" row — three hero stats side-by-side in
 // glass surfaces. Great for the tail of a case study or eBrochure.
+import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";

@@ -5,6 +5,7 @@
 // band, split photo, typographic stack, accent band, stat lockup, and the
 // case-study client lockup.
 
+import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";

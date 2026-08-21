@@ -1,6 +1,7 @@
 // Portrait-native asymmetric bento — one hero stat on the left, small stacked
 // stats on the right. Perfect for portrait where landscape KPI grids feel too
 // wide.
+import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass } from "../shared";
 

@@ -1,5 +1,6 @@
 // Portrait-native port of MV-KPI-DASHBOARD. Two-column grid with divider
 // hairlines, big value + label + optional delta. Sized for an 816px canvas.
+import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
