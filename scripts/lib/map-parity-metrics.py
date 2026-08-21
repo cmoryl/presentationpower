@@ -99,7 +99,8 @@ def find_pins(img, band):
                 }
 
             )
-    pins.sort(key=lambda p: (round(p["y"], 3), round(p["x"], 3)))
+    # Row-bucketed sort: rasteriser jitter must not reorder a row.
+    pins.sort(key=lambda p: (round(p["y"], 2), p["x"]))
     return pins
 
 

@@ -43,8 +43,13 @@ function metricsFor(image: string): Metrics {
   return JSON.parse(out) as Metrics;
 }
 
+/**
+ * Row-bucketed ordering. Sub-pixel jitter between the screen, the PDF render
+ * and the PPTX raster must never reshuffle pins within a row.
+ */
 function sortPins<T extends { x: number; y: number }>(pins: T[]) {
-  return [...pins].sort((a, b) => a.y - b.y || a.x - b.x);
+  const row = (v: number) => Math.round(v * 100) / 100;
+  return [...pins].sort((a, b) => row(a.y) - row(b.y) || a.x - b.x);
 }
 
 /** Pin centres from the live SVG, normalised to the print page box. */
