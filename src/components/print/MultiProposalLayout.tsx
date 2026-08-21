@@ -283,6 +283,85 @@ function lines(value: string | undefined): string[] {
     .filter(Boolean);
 }
 
+/**
+ * Explicit-break aware split: keeps authored hard returns *and* single blank
+ * lines so the rendered block is line-for-line what the author typed in the
+ * live-edit overlay. Runs of 3+ returns collapse to one blank line; leading and
+ * trailing blanks are dropped.
+ */
+function paragraphLines(value: string | undefined): string[] {
+  const out = (value ?? "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .split("\n")
+    .map((l) => l.trim());
+  while (out.length && !out[0]) out.shift();
+  while (out.length && !out[out.length - 1]) out.pop();
+  return out;
+}
+
+/**
+ * Text layer that auto-shrinks until the (wrapped) copy fits `maxH` inches, so
+ * long headlines and extra hard returns stay inside their plate instead of
+ * spilling — the on-screen box then matches the exported layout exactly.
+ */
+function FitT({
+  maxH,
+  size,
+  minSize,
+  children,
+  ...rest
+}: Omit<Parameters<typeof T>[0], "children"> & {
+  maxH: number;
+  minSize?: number;
+  children?: ReactNode;
+}) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [factor, setFactor] = useState(1);
+  const floor = (minSize ?? size * 0.6) / size;
+
+  const measure = useCallback(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const inner = host.firstElementChild as HTMLElement | null;
+    if (!inner) return;
+    const limit = host.clientHeight;
+    if (!limit) return;
+    const h = inner.scrollHeight;
+    setFactor((prev) => {
+      if (h <= limit + 0.5) {
+        // Grow back toward 1 when the copy got shorter.
+        if (prev >= 1) return prev;
+        const next = Math.min(1, prev * (limit / Math.max(h, 1)));
+        return next - prev > 0.005 ? next : prev;
+      }
+      const next = Math.max(floor, prev * (limit / h));
+      return prev - next > 0.005 ? next : prev;
+    });
+  }, [floor]);
+
+  useLayoutEffect(() => {
+    measure();
+    const host = hostRef.current;
+    if (!host || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(host);
+    const inner = host.firstElementChild;
+    if (inner) ro.observe(inner);
+    return () => ro.disconnect();
+  }, [measure, children, factor]);
+
+  return (
+    <div ref={hostRef} style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+      <div style={{ position: "absolute", left: 0, top: 0, width: "100%", height: u(maxH) }}>
+        <T {...rest} size={size * factor} w={rest.w} style={{ pointerEvents: "auto", ...rest.style }}>
+          {children}
+        </T>
+      </div>
+    </div>
+  );
+}
+
 /** `*highlighted*` runs render in the aqua accent, matching the source deck. */
 function AccentRuns({ text, accent }: { text: string; accent: string }) {
   const parts = text.split(/(\*[^*]+\*)/g).filter(Boolean);
