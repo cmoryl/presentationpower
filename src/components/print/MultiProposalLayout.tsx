@@ -1985,14 +1985,17 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         }}
         aria-hidden
       >
+        {/* Rails start/stop inside the card corner radius (0.34in) so they never
+            run past the rounded corners or off the trim edge. */}
         <g stroke="rgba(3,0,44,0.85)" strokeWidth={0.012} fill="rgba(3,0,44,0.85)">
-          <path d="M0.44 1.89 L4.05 1.89" />
+          <path d="M0.98 1.89 L4.05 1.89" />
           <path d="M4.05 1.83 L4.22 1.89 L4.05 1.95 Z" />
-          <path d="M8.02 6.25 L3.95 6.25" />
+          <path d="M7.68 6.25 L3.95 6.25" />
           <path d="M3.95 6.19 L3.78 6.25 L3.95 6.31 Z" />
-          <path d="M0.64 10.42 L4.05 10.42" />
+          <path d="M0.98 10.42 L4.05 10.42" />
           <path d="M4.05 10.36 L4.22 10.42 L4.05 10.48 Z" />
         </g>
+
       </svg>
 
       {/* Card 1 */}
