@@ -289,7 +289,11 @@ export function EditorMenu({
   return (
     <div ref={rootRef} className="relative" data-open={open ? "true" : "false"}>
       <button
-        ref={triggerRef}
+        ref={(el) => {
+          triggerRef.current = el;
+          setTriggerEl(el);
+        }}
+
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
