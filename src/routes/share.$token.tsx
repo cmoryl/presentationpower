@@ -9,6 +9,7 @@ import {
 } from "@/lib/translation.functions";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
+import { SectionCue } from "@/components/slide/SectionCue";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
@@ -493,6 +494,10 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                   if (!v) return null;
                   return (
                     <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-white shadow-2xl">
+                      <SectionCue
+                        sectionId={s.sectionId}
+                        label={byId(SECTION_FRAMEWORKS, s.sectionId ?? "")?.name ?? undefined}
+                      />
                       <SlideStage
                         slideKey={s.id}
                         direction={presentDirection}

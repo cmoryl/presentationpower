@@ -5,12 +5,13 @@ import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrate
 
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
+import { SectionCue } from "@/components/slide/SectionCue";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
-import { MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 
@@ -148,7 +149,13 @@ function PresenterView() {
     <SlideMediaRefreshProvider slides={visibleSlides}>
       <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
         <div className="w-full max-w-[95vw]">
-          <div className="mx-auto aspect-[16/9] w-full">
+          <div className="relative mx-auto aspect-[16/9] w-full">
+            <SectionCue
+              sectionId={slide?.sectionId}
+              label={
+                slide ? (byId(SECTION_FRAMEWORKS, slide.sectionId)?.name ?? undefined) : undefined
+              }
+            />
             {slide && variant && (
               <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
                 <DeckPackScope pack={pack}>
