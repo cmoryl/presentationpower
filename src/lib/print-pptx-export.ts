@@ -93,6 +93,7 @@ export async function exportPrintPagesAsPptx(
   if (opts.title) pptx.title = opts.title;
 
   const slideRatio = widthIn / heightIn;
+  const editable = (opts.fidelity ?? "editable") === "editable";
 
   for (const node of pages) {
     // Capture at the page's own aspect ratio, then letterbox it into the slide.
@@ -100,17 +101,6 @@ export async function exportPrintPagesAsPptx(
     const rect = node.getBoundingClientRect();
     const nodeRatio = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : slideRatio;
     const resolved = resolvePrintPixelWidth(widthIn, heightIn, dpi);
-    const png = await withExportChrome(() =>
-      captureSlideAsDataUrl(node, {
-        mode: opts.mode ?? "light",
-        targetWidth: resolved.widthPx,
-      }),
-    );
-    // Page rasters are photographic (gradients, imagery, maps): PNG runs 2-4MB
-    // each and a 20-page proposal produced a ~50MB file PowerPoint struggles to
-    // open and re-render. Re-encode to high-quality JPEG on an opaque white
-    // canvas — same pixels, ~10x smaller, no transparency to lose.
-    const dataUrl = await toJpeg(png, 0.92);
 
     let w = widthIn;
     let h = widthIn / nodeRatio;
@@ -123,8 +113,58 @@ export async function exportPrintPagesAsPptx(
 
     const slide = pptx.addSlide();
     slide.background = { color: "FFFFFF" };
-    slide.addImage({ data: dataUrl, x, y, w, h });
+
+    // ---- layered editable ---------------------------------------------------
+    if (editable) {
+      const space = spaceForTrim(w, h);
+      const layers = await capturePrintPageLayers(node, {
+        space,
+        offsetPx: { x: x * 144, y: y * 144 },
+        mode: opts.mode ?? "light",
+        targetWidth: resolved.widthPx,
+      });
+      if (layers) {
+        slide.addImage({
+          data: await toJpeg(layers.plate, 0.92),
+          x,
+          y,
+          w,
+          h,
+          objectName: "TP Design plate",
+        });
+        // Slide bounds move with the trim so off-slide guards and width clamps
+        // in the shared placers measure against THIS page, not a 16:9 slide.
+        await withExportSlideBounds(widthIn, heightIn, async () => {
+          if (layers.shapes.length > 0) {
+            const { placeDomShapes } = await import("./export-dom-place");
+            placeDomShapes(slide, layers.shapes, { maxObjects: 600 });
+          }
+          const { placeTextRuns } = await import("./export-text-place");
+          placeTextRuns(
+            slide as unknown as { addText: (t: unknown, o: Record<string, unknown>) => unknown },
+            layers.runs,
+          );
+        });
+        continue;
+      }
+      // Decomposition failed for this page — fall through to the flat raster so
+      // the page still ships exactly as designed.
+    }
+
+    // ---- flat raster fallback ----------------------------------------------
+    const png = await withExportChrome(() =>
+      captureSlideAsDataUrl(node, {
+        mode: opts.mode ?? "light",
+        targetWidth: resolved.widthPx,
+      }),
+    );
+    // Page rasters are photographic (gradients, imagery, maps): PNG runs 2-4MB
+    // each and a 20-page proposal produced a ~50MB file PowerPoint struggles to
+    // open and re-render. Re-encode to high-quality JPEG on an opaque white
+    // canvas — same pixels, ~10x smaller, no transparency to lose.
+    slide.addImage({ data: await toJpeg(png, 0.92), x, y, w, h });
   }
+
 
 
 
