@@ -151,6 +151,15 @@ export function ExportProposalButton({
     });
   }
 
+  function openPreview() {
+    if (pages.length > 0 && selected.size === 0) {
+      toast.error("Pick at least one page to preview");
+      return;
+    }
+    setOpen(false);
+    setPreviewOpen(true);
+  }
+
   function start(fmt: Fmt) {
     if (pages.length > 0 && selected.size === 0) {
       toast.error("Pick at least one page to export");
