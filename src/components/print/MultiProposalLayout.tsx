@@ -358,6 +358,7 @@ function FitT({
     }
     if (stepsRef.current > 14) return;
     const h = inner.scrollHeight;
+    if (typeof window !== "undefined") console.log("[FIT]", h, limit, stepsRef.current);
     setFactor((prev) => {
       let next = prev;
       if (h <= limit + 0.5) {
