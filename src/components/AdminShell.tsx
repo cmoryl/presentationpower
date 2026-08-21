@@ -2,6 +2,8 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
+import { signOutAndRedirect, loginUrl } from "@/lib/sign-out";
+import { useQueryClient } from "@tanstack/react-query";
 
 type SessionInfo = {
   email: string | null;
@@ -46,8 +48,7 @@ function SessionRoleBanner() {
   }, []);
 
   async function handleSignOut() {
-    await supabase.auth.signOut();
-    window.location.replace("/auth");
+    await signOutAndRedirect({ queryClient, reason: "user" });
   }
 
   const signedIn = !!info?.userId;
@@ -90,7 +91,7 @@ function SessionRoleBanner() {
       )}
       {!signedIn && !loading && (
         <a
-          href="/auth"
+          href={loginUrl()}
           className="ml-auto rounded-lg bg-[#003FC7] px-3 py-1 text-xs font-semibold text-white hover:bg-[#0033a3]"
         >
           Sign in

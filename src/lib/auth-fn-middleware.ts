@@ -15,6 +15,7 @@
 
 import { createMiddleware } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { SESSION_EXPIRED_MESSAGE, handleExpiredSession } from "@/lib/sign-out";
 
 const SKEW_SECONDS = 60;
 
@@ -60,7 +61,10 @@ export const attachAuthWithRefresh = createMiddleware({ type: "function" }).clie
       if (fresh) {
         return await next({ headers: { Authorization: `Bearer ${fresh}` } });
       }
-      throw new Error("Your session expired. Please sign in again to continue.");
+      // No refreshable session left: run the canonical sign-out flow (message
+      // + cache teardown + redirect to the login page).
+      handleExpiredSession();
+      throw new Error(SESSION_EXPIRED_MESSAGE);
     }
   },
 );
