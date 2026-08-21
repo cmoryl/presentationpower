@@ -143,15 +143,21 @@ export function UnifiedEditorShell({
   rail: ReactNode;
   className?: string;
 }) {
+  // Below `lg` the three zones stack: a 260px palette plus a 320px tool rail
+  // cannot coexist with the stage at phone widths, so the rails become
+  // full-width sections above/below the canvas instead of shoving it offscreen.
   return (
-    <div className={`flex gap-4 ${className}`}>
+    <div className={`flex flex-col gap-4 lg:flex-row ${className}`}>
       {left ? (
-        <div className="shrink-0" style={{ width: leftWidth }}>
+        <div
+          className="w-full min-w-0 shrink-0 lg:w-[var(--editor-left-w)]"
+          style={{ "--editor-left-w": `${leftWidth}px` } as React.CSSProperties}
+        >
           {left}
         </div>
       ) : null}
       <div className="flex min-w-0 flex-1 flex-col">{center}</div>
-      {rail}
+      <div className="min-w-0 max-w-full">{rail}</div>
     </div>
   );
 }
