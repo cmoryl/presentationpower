@@ -43,7 +43,14 @@ export type IntroRecipe = {
   durationMs: number;
   /** Delay before the first item moves. */
   leadMs: number;
+  /** Override the shared cascade budget (ms) — for two-act builds (figure, then list). */
+  budgetMs?: number;
+  /** Ring/arc sweep overrides: delay before the first arc, sweep length, per-arc trail. */
+  arcLeadMs?: number;
+  arcDrawMs?: number;
+  arcStepMs?: number;
 };
+
 
 const RECIPES: Record<string, IntroRecipe> = {
   bento: {
@@ -111,6 +118,24 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 560,
     leadMs: 260,
   },
+  // Donut / pie breakdowns are a two-act build: ACT 1 the ring draws itself
+  // segment by segment (clockwise from 12 o'clock) and the centre figure lands,
+  // ACT 2 the legend lists in from the left, one row per segment, in the same
+  // order the arcs were drawn — so the eye pairs each row with its slice.
+  donut: {
+    id: "donut",
+    label: "Ring draw + legend list",
+    keyframe: "tp-in-left",
+    order: "top-down",
+    stepMs: 150,
+    durationMs: 480,
+    leadMs: 820,
+    budgetMs: 2200,
+    arcLeadMs: 120,
+    arcDrawMs: 760,
+    arcStepMs: 170,
+  },
+
   // Hub & satellite layouts (centre disc + orbiting nodes + flanking copy):
   // the connector ring draws itself on, then the satellites radiate outward
   // along their own radius clockwise from 12 o'clock while the copy blocks
@@ -228,7 +253,8 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/^MV-(PROC|HORIZON|MATURITY-CURVE)/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
   // Cyclical devices spin up; charts plot in; figure walls tally.
-  [/(ORBIT|DONUT|GAUGE|PIE|RADIAL|RING|DIAL)/, RECIPES.orbit],
+  [/(DONUT|PIE|BREAKDOWN-RING)/, RECIPES.donut],
+  [/(ORBIT|GAUGE|RADIAL|RING|DIAL)/, RECIPES.orbit],
   [/(FLYWHEEL|CYCLE|LOOP)/, RECIPES.cycle],
   [/(BAR-COMPARE|PERCENT-COMPARE|STACKED-BAR|CATEGORY-BARS|GAUGE-ROW|RANKING|LEADERBOARD)/, RECIPES.plotX],
   [
@@ -322,7 +348,8 @@ export const INTRO_BUDGET_MS = 1250;
  * several elements share one).
  */
 export function introBeatDelay(recipe: IntroRecipe, beat: number, beats: number): number {
-  const spare = Math.max(0, INTRO_BUDGET_MS - recipe.leadMs - recipe.durationMs);
+  const budget = recipe.budgetMs ?? INTRO_BUDGET_MS;
+  const spare = Math.max(0, budget - recipe.leadMs - recipe.durationMs);
   const lastBeat = Math.max(1, beats - 1);
   const step = Math.min(recipe.stepMs, spare / lastBeat);
   return Math.round(recipe.leadMs + beat * step);
@@ -354,7 +381,7 @@ export const ARC_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
  */
 
 /** Recipes whose slides are figure-led, and therefore get the hero-stat beat. */
-export const HERO_STAT_RECIPES = new Set(["figures", "data", "orbit", "plot", "plot-x"]);
+export const HERO_STAT_RECIPES = new Set(["figures", "data", "orbit", "donut", "plot", "plot-x"]);
 /** Below this rendered size (slide-space px) a number is a caption, not a hero. */
 export const HERO_STAT_MIN_PX = 56;
 /** How much bigger the hero must be than the runner-up to stand alone. */

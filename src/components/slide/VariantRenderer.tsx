@@ -6763,25 +6763,48 @@ function renderVariantBody({
           0,
         ) || 1;
       const palette = [brand.tokens.primary, brand.tokens.accent, "#4A90A4", "#8E44AD", "#22C1C3"];
+      // Ring geometry: stroked SVG arcs (not a conic gradient) so the intro can
+      // draw each slice on clockwise from 12 o'clock. The resting ring is pixel
+      // identical to the previous gradient, so export/raster fidelity is unchanged.
+      const RING_BOX = 560;
+      const RING_R = 229.5;
+      const RING_SW = 101;
+      const RING_C = 2 * Math.PI * RING_R;
       let cum = 0;
-      const segments = items
-        .map((it, i) => {
-          const v = typeof it.value === "number" ? it.value : Number(it.value) || 0;
-          const start = (cum / total) * 360;
-          cum += v;
-          const end = (cum / total) * 360;
-          return `${palette[i % palette.length]} ${start}deg ${end}deg`;
-        })
-        .join(", ");
+      const arcs = items.map((it, i) => {
+        const v = typeof it.value === "number" ? it.value : Number(it.value) || 0;
+        const start = (cum / total) * RING_C;
+        cum += v;
+        const len = Math.max(0, (v / total) * RING_C);
+        return { len, start, color: palette[i % palette.length]! };
+      });
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Where the effort goes")} />
           <div className="mt-10 grid grid-cols-[560px_1fr] items-center gap-16">
             <div className="relative aspect-square w-[560px]">
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{ background: `conic-gradient(${segments})` }}
-              />
+              <svg
+                className="absolute inset-0 h-full w-full"
+                viewBox={`0 0 ${RING_BOX} ${RING_BOX}`}
+                aria-hidden="true"
+              >
+                <g transform={`rotate(-90 ${RING_BOX / 2} ${RING_BOX / 2})`}>
+                  {arcs.map((a, i) => (
+                    <circle
+                      key={i}
+                      data-intro-arc="on"
+                      cx={RING_BOX / 2}
+                      cy={RING_BOX / 2}
+                      r={RING_R}
+                      fill="none"
+                      stroke={a.color}
+                      strokeWidth={RING_SW}
+                      strokeDasharray={`${a.len.toFixed(2)} ${(RING_C - a.len).toFixed(2)}`}
+                      strokeDashoffset={(-a.start).toFixed(2)}
+                    />
+                  ))}
+                </g>
+              </svg>
               {/* House circle centre: glass disc + seam sitting in the donut hole. */}
               <div className="absolute inset-0 grid place-items-center">
                 <OrbitDisc
@@ -6804,7 +6827,12 @@ function renderVariantBody({
             </div>
             <div className="space-y-5">
               {items.map((it, i) => (
-                <div key={i} className="flex items-start gap-5">
+                <div
+                  key={i}
+                  data-intro-item=""
+                  data-intro-step={i}
+                  className="flex items-start gap-5"
+                >
                   <div
                     className="mt-3 h-5 w-5 shrink-0 rounded"
                     style={{ backgroundColor: palette[i % palette.length] }}
@@ -6826,6 +6854,7 @@ function renderVariantBody({
                 </div>
               ))}
             </div>
+
           </div>
         </SlideFrame>
       );

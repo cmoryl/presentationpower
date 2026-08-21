@@ -107,8 +107,8 @@ function applyArcDraw(root: HTMLElement, recipe: IntroRecipe) {
   arcs.forEach(({ el, from, to }, i) => {
     el.style.setProperty("--tp-arc-from", from);
     el.style.setProperty("--tp-arc-to", to);
-    el.style.animation = `tp-arc-draw ${ARC_DRAW_MS}ms ${ARC_EASE} ${
-      recipe.leadMs + i * ARC_STEP_MS
+    el.style.animation = `tp-arc-draw ${recipe.arcDrawMs ?? ARC_DRAW_MS}ms ${ARC_EASE} ${
+      (recipe.arcLeadMs ?? recipe.leadMs) + i * (recipe.arcStepMs ?? ARC_STEP_MS)
     }ms both`;
     // Hand the property back to the element's own attribute once settled, so
     // the resting ring is the static design — not an animation fill state.
