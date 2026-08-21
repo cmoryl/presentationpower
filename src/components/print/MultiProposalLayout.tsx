@@ -293,23 +293,123 @@ function AccentRuns({ text, accent }: { text: string; accent: string }) {
 // Shared page chrome (slides 3 / 4 / 7 / 10 share a header band + white plate)
 // ---------------------------------------------------------------------------
 
-function BandHeader({ title, logo }: { title: string; logo: string }) {
+/**
+ * Header rhythm tokens.
+ *
+ * Everything the signature header draws — eyebrow, display title, top-right
+ * logo, hairline rule — is derived from ONE left/right margin and ONE baseline
+ * step, so the header aligns identically on any trim size or aspect ratio:
+ *   • horizontal: left text edge and rule start at `HDR.marginX`; the logo's
+ *     right edge and the rule's end both land on the mirrored right margin,
+ *     so the header optically brackets the page instead of hanging 0.23in off
+ *     to one side (the old hardcoded 7.79in rule did).
+ *   • vertical: the rule sits a fixed pad below the *measured* last title
+ *     line, so one-line and two-line titles keep the same title→rule gap.
+ * Sizes are in points/inches on the 8.5in basis and rendered through `u()`/`fs()`
+ * (container units), so they rescale proportionally with the page width.
+ */
+const HDR = {
+  marginX: 0.47,
+  logoW: 1.88,
+  logoH: 0.28,
+  logoY: 0.5,
+  eyebrowY: 0.55,
+  eyebrowSize: 8.4,
+  /** Title baseline sits one eyebrow-step below the eyebrow. */
+  titleY: 0.86,
+  titleSize: 39.7,
+  titleLeading: 1.05,
+  /** Gap between the last title line and the hairline rule. */
+  rulePad: 0.32,
+} as const;
+
+/** Content width between the mirrored margins. */
+const HDR_CONTENT_W = PAGE_W_IN - HDR.marginX * 2;
+/** Logo x so its right edge lands exactly on the right margin. */
+const HDR_LOGO_X = PAGE_W_IN - HDR.marginX - HDR.logoW;
+/** Title column stops clear of the logo so long titles never collide with it. */
+const HDR_TITLE_W = HDR_CONTENT_W - HDR.logoW - 0.2;
+/** Rendered height of one title line, in inches. */
+const HDR_TITLE_LINE_H = (HDR.titleSize / 72) * HDR.titleLeading;
+
+/** Rule baseline for a title of `lines` rendered lines. */
+const headerRuleY = (lines: number) =>
+  HDR.titleY + Math.max(1, lines) * HDR_TITLE_LINE_H + HDR.rulePad;
+
+/**
+ * Signature header used by every multi-page proposal page: optional eyebrow,
+ * left-aligned display title, logo top-right, optional hairline rule.
+ */
+function SignatureHeader({
+  title,
+  logo,
+  eyebrow,
+  rule,
+  eyebrowColor = AQUA_FIELD,
+  ruleColor = "rgba(255,255,255,0.28)",
+}: {
+  title: string;
+  logo: string;
+  eyebrow?: string;
+  rule?: boolean;
+  eyebrowColor?: string;
+  ruleColor?: string;
+}) {
+  const titleLines = title.split("\n").length;
   return (
     <>
-      <L x={0} y={0} w={PAGE_W_IN} h={2.95} style={{ background: BRIGHT_FIELD }} />
       <Img
-        x={6.38}
-        y={0.47}
-        w={1.88}
-        h={0.28}
+        x={HDR_LOGO_X}
+        y={HDR.logoY}
+        w={HDR.logoW}
+        h={HDR.logoH}
         src={logo}
         alt="TransPerfect"
         slot="band.logo"
         label="logo"
       />
-      <T x={0.47} y={0.86} w={6} size={39.7} weight={700} leading={1.05} tracking="-0.02em">
+      {eyebrow ? (
+        <T
+          x={HDR.marginX}
+          y={HDR.eyebrowY}
+          w={HDR_TITLE_W}
+          size={HDR.eyebrowSize}
+          weight={700}
+          color={eyebrowColor}
+          upper
+          tracking="0.16em"
+        >
+          {eyebrow}
+        </T>
+      ) : null}
+      <T
+        x={HDR.marginX}
+        y={HDR.titleY}
+        w={HDR_TITLE_W}
+        size={HDR.titleSize}
+        weight={700}
+        leading={HDR.titleLeading}
+        tracking="-0.02em"
+      >
         {title}
       </T>
+      {rule ? (
+        <Rule
+          x={HDR.marginX}
+          y={headerRuleY(titleLines)}
+          w={HDR_CONTENT_W}
+          color={ruleColor}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function BandHeader({ title, logo }: { title: string; logo: string }) {
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={2.95} style={{ background: BRIGHT_FIELD }} />
+      <SignatureHeader title={title} logo={logo} />
     </>
   );
 }
@@ -912,33 +1012,15 @@ function LocationsPage({
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
 
-      {/* Header follows the shared band-header rhythm (eyebrow, left-aligned
-          display title, logo top-right, hairline rule) in a dark-field key. */}
-      <Img
-        x={6.38}
-        y={0.5}
-        w={1.88}
-        h={0.28}
-        src={logoWhite}
-        alt="TransPerfect"
-        slot="band.logo"
-        label="logo"
+      {/* Shared signature header rhythm (eyebrow, left-aligned display title,
+          logo top-right, hairline rule) in a dark-field key. */}
+      <SignatureHeader
+        title={title.join("\n")}
+        logo={logoWhite}
+        eyebrow="Our Footprint"
+        rule
       />
-      <T x={0.47} y={0.55} w={4} size={8.4} weight={700} color={AQUA_FIELD} upper tracking="0.16em">
-        Our Footprint
-      </T>
-      <T
-        x={0.47}
-        y={0.86}
-        w={5.6}
-        size={39.7}
-        weight={700}
-        leading={1.05}
-        tracking="-0.02em"
-      >
-        {title.join("\n")}
-      </T>
-      <Rule x={0.47} y={2.34} w={7.79} color="rgba(255,255,255,0.28)" />
+
 
 
       {/* Vector map: landmass artwork + author-editable office pins. */}
@@ -1039,43 +1121,39 @@ function RegionLocationsPage({
   const region = PROPOSAL_REGIONS.find((r) => r.region === regionKey);
   const cities = (region?.columns ?? []).flat();
   const cols = chunkCities(cities, cities.length > 40 ? 5 : cities.length > 18 ? 4 : 3);
-  const colW = 7.79 / Math.max(cols.length, 1);
+  const colW = HDR_CONTENT_W / Math.max(cols.length, 1);
   const title = lines(page.title).length ? lines(page.title) : [regionKey, "Locations"];
   const listCtx = usePrintLogoList();
   const pinPath = `pages.${pageIndex}.mapPins`;
   const pins = page.mapPins?.length ? page.mapPins : defaultWorldMapPins();
   const crop = WORLD_MAP_REGION_VIEWS[regionKey] ?? { x: 58, y: 138, w: 629, h: 343 };
   const mapBox = (() => {
-    const maxW = 7.9;
+    const maxW = HDR_CONTENT_W;
     const maxH = 4.3;
     const aspect = crop.w / crop.h;
     const w = Math.min(maxW, maxH * aspect);
     const h = w / aspect;
-    return { x: 0.47 + (maxW - w) / 2, w, h };
+    return { x: HDR.marginX + (maxW - w) / 2, w, h };
   })();
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
-      <Img
-        x={6.38}
-        y={0.5}
-        w={1.88}
-        h={0.28}
-        src={logoWhite}
-        alt="TransPerfect"
-        slot="band.logo"
-        label="logo"
+      <SignatureHeader
+        title={title.join("\n")}
+        logo={logoWhite}
+        eyebrow={page.eyebrow || "Regional footprint"}
+        rule
       />
-      <T x={0.47} y={0.55} w={4} size={8.4} weight={700} color={AQUA_FIELD} upper tracking="0.16em">
-        {page.eyebrow || "Regional footprint"}
-      </T>
-      <T x={0.47} y={0.86} w={5.6} size={39.7} weight={700} leading={1.05} tracking="-0.02em">
-        {title.join("\n")}
-      </T>
-      <Rule x={0.47} y={2.34} w={7.79} color="rgba(255,255,255,0.28)" />
 
       {page.body ? (
-        <T x={0.47} y={2.52} w={5.4} size={9.2} leading={1.4} color="rgba(255,255,255,0.82)">
+        <T
+          x={HDR.marginX}
+          y={headerRuleY(title.length) + 0.18}
+          w={HDR_CONTENT_W * 0.72}
+          size={9.2}
+          leading={1.4}
+          color="rgba(255,255,255,0.82)"
+        >
           {page.body}
         </T>
       ) : null}
@@ -1110,7 +1188,7 @@ function RegionLocationsPage({
         Client Service &amp; Production
       </T>
 
-      <Rule x={0.47} y={7.9} w={7.79} color="rgba(255,255,255,0.18)" />
+      <Rule x={HDR.marginX} y={7.9} w={HDR_CONTENT_W} color="rgba(255,255,255,0.18)" />
       <T x={0.47} y={8.04} w={3} size={13.8} weight={700} tracking="-0.01em">
         {regionKey}
       </T>
