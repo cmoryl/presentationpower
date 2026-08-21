@@ -849,36 +849,40 @@ function MasterItemEditorPage() {
                 </Row>
               </Panel>
 
-              <Panel title="Page masthead">
-                <MastheadRuleTypeControls
-                  rule={(draft.content as { heroRule?: PrintHeroRule }).heroRule}
-                  titleType={(draft.content as { heroTitleType?: PrintHeroTitleType }).heroTitleType}
-                  onChange={(next) =>
-                    patchContent({
-                      ...("rule" in next ? { heroRule: next.rule } : null),
-                      ...("titleType" in next ? { heroTitleType: next.titleType } : null),
-                    })
-                  }
-                />
-                {heroMedia ? (
-                  <Field label={`Hero height — ${Math.round(heroMedia.heightPct ?? 46)}%`}>
-                    <input
-                      type="range"
-                      aria-label="Hero height"
-                      min={20}
-                      max={70}
-                      step={1}
-                      value={Math.round(heroMedia.heightPct ?? 46)}
-                      onChange={(e) =>
-                        patchContent({
-                          heroMedia: { ...heroMedia, heightPct: Number(e.target.value) },
-                        })
-                      }
-                      className="w-full"
-                    />
-                  </Field>
-                ) : null}
-              </Panel>
+              {!multiPage ? (
+                <Panel title="Page masthead">
+                  <MastheadRuleTypeControls
+                    rule={(draft.content as { heroRule?: PrintHeroRule }).heroRule}
+                    titleType={
+                      (draft.content as { heroTitleType?: PrintHeroTitleType }).heroTitleType
+                    }
+                    onChange={(next) =>
+                      patchContent({
+                        ...("rule" in next ? { heroRule: next.rule } : null),
+                        ...("titleType" in next ? { heroTitleType: next.titleType } : null),
+                      })
+                    }
+                  />
+                  {heroMedia ? (
+                    <Field label={`Hero height — ${Math.round(heroMedia.heightPct ?? 46)}%`}>
+                      <input
+                        type="range"
+                        aria-label="Hero height"
+                        min={20}
+                        max={70}
+                        step={1}
+                        value={Math.round(heroMedia.heightPct ?? 46)}
+                        onChange={(e) =>
+                          patchContent({
+                            heroMedia: { ...heroMedia, heightPct: Number(e.target.value) },
+                          })
+                        }
+                        className="w-full"
+                      />
+                    </Field>
+                  ) : null}
+                </Panel>
+              ) : null}
             </>
           ) : null}
 
