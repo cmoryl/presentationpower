@@ -161,10 +161,9 @@ test.describe("Global Locations map — export parity", () => {
     await pageEl.screenshot({ path: screenShot });
     const screen = metricsFor(screenShot);
     expect(screen.pins.length, "detector disagreed with the DOM on screen").toBe(dom.length);
-    for (const [i, p] of sortPins(screen.pins).entries()) {
-      expect(Math.abs(p.x - dom[i]!.x), `screen pin ${i} x`).toBeLessThan(POS_TOL);
-      expect(Math.abs(p.y - dom[i]!.y), `screen pin ${i} y`).toBeLessThan(POS_TOL);
-    }
+    const screenPair = pairPins(dom, sortPins(screen.pins), POS_TOL);
+    expect(screenPair.matched, "detector could not pair on-screen pins").toBe(dom.length);
+
 
     // ---- PDF -------------------------------------------------------------
     const pdf = await exportAs(page, "PDF", dir, "parity.pdf");
