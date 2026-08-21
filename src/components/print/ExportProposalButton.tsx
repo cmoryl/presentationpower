@@ -12,9 +12,10 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-import { CheckSquare, FileDown, FileText, Presentation, Square } from "lucide-react";
+import { CheckSquare, Eye, FileDown, FileText, Presentation, Square } from "lucide-react";
 import { toast } from "sonner";
 import type { PrintMode, PrintPageSize } from "@/lib/print-assets.types";
+import { PptxLayoutPreview } from "./PptxLayoutPreview";
 
 type Fmt = "pdf" | "pptx";
 type PageInfo = { index: number; label: string };
@@ -46,12 +47,15 @@ export function ExportProposalButton({
   const [scanning, setScanning] = useState(false);
   const [pages, setPages] = useState<PageInfo[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewNodes, setPreviewNodes] = useState<HTMLElement[]>([]);
   const hostRef = useRef<HTMLDivElement>(null);
   const runRef = useRef<Fmt | null>(null);
 
   const safe = (title || "proposal").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
-  // The host must be mounted for either job: enumerating pages or exporting.
-  const hostMounted = scanning || !!pending;
+  // The host must be mounted for either job: enumerating pages, previewing, or
+  // exporting.
+  const hostMounted = scanning || !!pending || previewOpen;
 
   const settle = useCallback(
     () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
@@ -130,6 +134,25 @@ export function ExportProposalButton({
     };
   }, [pending, mode, pageSize, safe, title, selected, settle]);
 
+  // Collect the live page nodes for the preview once the offscreen host mounts.
+  useEffect(() => {
+    if (!previewOpen) {
+      setPreviewNodes([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      await settle();
+      if (cancelled) return;
+      const host = hostRef.current;
+      const all = host ? Array.from(host.querySelectorAll<HTMLElement>("[data-print-page]")) : [];
+      setPreviewNodes(selected.size ? all.filter((_, i) => selected.has(i)) : all);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [previewOpen, selected, settle]);
+
   function toggleMenu() {
     setOpen((v) => {
       const next = !v;
@@ -145,6 +168,15 @@ export function ExportProposalButton({
       else next.add(index);
       return next;
     });
+  }
+
+  function openPreview() {
+    if (pages.length > 0 && selected.size === 0) {
+      toast.error("Pick at least one page to preview");
+      return;
+    }
+    setOpen(false);
+    setPreviewOpen(true);
   }
 
   function start(fmt: Fmt) {
@@ -223,6 +255,13 @@ export function ExportProposalButton({
             </p>
             <button
               type="button"
+              onClick={openPreview}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+            >
+              <Eye size={13} aria-hidden /> Preview PowerPoint layout
+            </button>
+            <button
+              type="button"
               onClick={() => start("pdf")}
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[#03002C] hover:bg-[#E0E8F5]"
             >
@@ -262,6 +301,21 @@ export function ExportProposalButton({
           window.document.body,
         )}
 
+      {previewOpen &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <PptxLayoutPreview
+            nodes={previewNodes}
+            labels={
+              selected.size
+                ? pages.filter((p) => selected.has(p.index)).map((p) => p.label)
+                : pages.map((p) => p.label)
+            }
+            pageSize={String(pageSize)}
+            onClose={() => setPreviewOpen(false)}
+          />,
+          window.document.body,
+        )}
     </div>
   );
 }
