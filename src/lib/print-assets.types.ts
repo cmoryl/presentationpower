@@ -766,6 +766,8 @@ export type MultiProposalPage = {
   navLabel?: string;
   eyebrow?: string;
   title?: string;
+  /** Stats page — authored headline point size (auto-fit still applies). */
+  titleSizePt?: number;
   subtitle?: string;
   body?: string;
   bullets?: string[];

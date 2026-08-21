@@ -3166,7 +3166,7 @@ function PageBody({
     case "cover":
       return <CoverPage page={page} logoDark={logoDark} />;
     case "stats":
-      return <StatsPage page={page} logoWhite={logoWhite} />;
+      return <StatsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "scope":
       return <ScopePage page={page} logoWhite={logoWhite} />;
     case "cost":
