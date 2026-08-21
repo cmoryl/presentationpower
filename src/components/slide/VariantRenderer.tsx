@@ -149,6 +149,9 @@ import { accentInk, hexA } from "@/lib/accent-tokens";
 import { itemTone, itemToneEnd, toneWashGradient, tonePlateGradient } from "@/lib/item-tone";
 
 import { APPROVED_LOGOS } from "@/lib/approved-logos";
+import { useClientLogoMark, useClientLogoPool } from "@/lib/client-logo-pool";
+import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
+
 import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
 
