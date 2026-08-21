@@ -366,14 +366,6 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
         </div>
         <div className="glass rounded-[20px] p-7">
           <h1 className="text-2xl font-semibold tracking-tight">Team access</h1>
-          {expired === "1" && mode === "signin" && (
-            <div
-              role="status"
-              className="mt-3 rounded-lg border border-[#E85A2C]/30 bg-[#E85A2C]/10 px-3 py-2 text-sm text-[#03002C]"
-            >
-              Your session expired. Please sign in again to continue.
-            </div>
-          )}
           <p className="mt-1 text-sm text-black/60">
             Enter the shared team password to open the full build — decks, briefs, print assets and
             the admin console.
