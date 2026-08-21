@@ -48,7 +48,7 @@ export function EditorPageHeader({
   status?: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-8">
+    <div className="flex flex-col items-start gap-4 sm:flex-row sm:justify-between sm:gap-8">
       <div className="min-w-0">
         <Link
           to={backTo}
@@ -56,14 +56,18 @@ export function EditorPageHeader({
         >
           {backLabel}
         </Link>
-        <h1 className="mt-3 truncate text-[34px] font-semibold leading-tight tracking-tight text-[#03002C]">
+        <h1 className="mt-3 text-[22px] font-semibold leading-tight tracking-tight text-[#03002C] sm:truncate sm:text-[34px]">
           {title}
         </h1>
         {meta ? (
           <div className="mt-2 flex flex-wrap items-center gap-3 text-[13px] text-black/55">{meta}</div>
         ) : null}
       </div>
-      {status ? <div className="flex shrink-0 flex-col items-end gap-2">{status}</div> : null}
+      {status ? (
+        <div className="flex w-full shrink-0 flex-row flex-wrap items-center gap-2 sm:w-auto sm:flex-col sm:items-end">
+          {status}
+        </div>
+      ) : null}
     </div>
   );
 }
