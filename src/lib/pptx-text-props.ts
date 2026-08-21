@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 import { STAGE_H, STAGE_W } from "./export-quality";
+import { exportSlideBounds } from "./export-space";
 import type { TextRun } from "./export-text-layer";
 
 export const PPTX_SLIDE_W_IN = 13.333;

@@ -530,12 +530,15 @@ function effectShapeFor(
   root: DOMRect,
   sx: number,
   sy: number,
+  spaceW: number = STAGE_W,
+  spaceH: number = STAGE_H,
 ): DomShape | null {
   const r = el.getBoundingClientRect();
   const w = r.width * sx;
   const h = r.height * sy;
   if (w < MIN_SIDE_PX || h < MIN_SIDE_PX) return null;
-  if (w > STAGE_W * 1.5 || h > STAGE_H * 1.5) return null;
+  if (w > spaceW * 1.5 || h > spaceH * 1.5) return null;
+
 
   const { fill, gradient } = paintOf(cs);
   const radiusPx = radiusOf(cs, w, h);
@@ -580,7 +583,8 @@ function effectShapeFor(
 
   const x = (r.left - root.left) * sx - payload.padPx;
   const y = (r.top - root.top) * sy - payload.padPx;
-  if (x > STAGE_W || y > STAGE_H || x + payload.frameW < 0 || y + payload.frameH < 0) return null;
+  if (x > spaceW || y > spaceH || x + payload.frameW < 0 || y + payload.frameH < 0) return null;
+
 
   return {
     kind: "image",
@@ -605,22 +609,43 @@ function effectShapeFor(
 
 
 
+export interface DecomposeOptions {
+  /**
+   * Measurement space in stage px. Defaults to the 1920x1080 deck stage; print
+   * pages pass `trim inches * 144` so px -> inch conversion stays one constant.
+   */
+  space?: { w: number; h: number };
+  /**
+   * Content planes to walk. Defaults to the deck's plane selectors; pass
+   * `"self"` to measure the whole subtree of `stage` (print pages, which have no
+   * slide planes).
+   */
+  planes?: "self" | string[];
+}
+
 /**
- * Measure every painted content object on a settled ExactSlideStage.
+ * Measure every painted content object on a settled stage (deck slide or print
+ * page).
  *
  * Returned in DOM paint order (parents before children), which is the order the
  * placer emits them in, so PowerPoint z-order matches the browser's.
  */
-export function decomposeStage(stage: HTMLElement): DomShape[] {
+export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}): DomShape[] {
+  const spaceW = opts.space?.w ?? STAGE_W;
+  const spaceH = opts.space?.h ?? STAGE_H;
   const root = stage.getBoundingClientRect();
   if (root.width < 1 || root.height < 1) return [];
-  const sx = STAGE_W / root.width;
-  const sy = STAGE_H / root.height;
+  const sx = spaceW / root.width;
+  const sy = spaceH / root.height;
   const shapes: DomShape[] = [];
 
-  const planes = CONTENT_PLANES.flatMap((sel) =>
-    Array.from(stage.querySelectorAll<HTMLElement>(sel)),
-  );
+  const planes =
+    opts.planes === "self"
+      ? [stage]
+      : (opts.planes ?? CONTENT_PLANES).flatMap((sel) =>
+          Array.from(stage.querySelectorAll<HTMLElement>(sel)),
+        );
+
   if (planes.length === 0) return [];
 
   const seen = new Set<Element>();
@@ -667,7 +692,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
         // Pure decorative effect (blur bloom, drop-shadow halo, gradient
         // feather) → ship the effect itself as a transparent picture layer so it
         // stays selectable and renders identically on light and dark slides.
-        const fx = effectShapeFor(el, cs, root, sx, sy);
+        const fx = effectShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
         if (fx) {
           shapes.push(fx);
           effectRoots.push(el);
@@ -682,7 +707,7 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       // how DESCENDANTS paint, so the element ships as its own effect artwork
       // and its children keep exporting as editable native layers.
       if (hasUnexpressibleShadow(cs)) {
-        const fx = effectShapeFor(el, cs, root, sx, sy);
+        const fx = effectShapeFor(el, cs, root, sx, sy, spaceW, spaceH);
         if (fx) {
           shapes.push(fx);
           continue;
@@ -708,10 +733,10 @@ export function decomposeStage(stage: HTMLElement): DomShape[] {
       const w = r.width * sx;
       const h = r.height * sy;
       if (w < MIN_SIDE_PX && h < MIN_SIDE_PX) continue;
-      if (w > STAGE_W * 1.5 || h > STAGE_H * 1.5) continue;
+      if (w > spaceW * 1.5 || h > spaceH * 1.5) continue;
       const x = (r.left - root.left) * sx;
       const y = (r.top - root.top) * sy;
-      if (x > STAGE_W || y > STAGE_H || x + w < 0 || y + h < 0) continue;
+      if (x > spaceW || y > spaceH || x + w < 0 || y + h < 0) continue;
 
       const rotationDeg = rotationOf(cs.transform);
       const alphaMul = Number.isFinite(opacity) ? opacity : 1;
