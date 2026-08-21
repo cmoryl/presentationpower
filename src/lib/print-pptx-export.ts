@@ -253,24 +253,27 @@ export async function exportPrintPagesAsPptx(
 async function reorderPresentationXml(blob: Blob): Promise<Blob> {
   try {
     const JSZip = (await import("jszip")).default;
+    const { repackPptx } = await import("./pptx-repack");
     const zip = await JSZip.loadAsync(await blob.arrayBuffer());
     const entry = zip.file("ppt/presentation.xml");
-    if (!entry) return blob;
-    const xml = await entry.async("string");
-    const notes = xml.match(/<p:notesMasterIdLst>[\s\S]*?<\/p:notesMasterIdLst>/);
-    if (!notes || xml.indexOf(notes[0]) < xml.indexOf("<p:sldIdLst>")) return blob;
-    const next = xml
-      .replace(notes[0], "")
-      .replace("<p:sldIdLst>", `${notes[0]}<p:sldIdLst>`);
-    zip.file("ppt/presentation.xml", next);
-    return await zip.generateAsync({
-      type: "blob",
-      mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    });
+    if (entry) {
+      const xml = await entry.async("string");
+      const notes = xml.match(/<p:notesMasterIdLst>[\s\S]*?<\/p:notesMasterIdLst>/);
+      if (notes && xml.indexOf(notes[0]) > xml.indexOf("<p:sldIdLst>")) {
+        zip.file(
+          "ppt/presentation.xml",
+          xml.replace(notes[0], "").replace("<p:sldIdLst>", `${notes[0]}<p:sldIdLst>`),
+        );
+      }
+    }
+    // Always repack: PowerPoint requires [Content_Types].xml first and no
+    // directory entries, which JSZip's default output does not guarantee.
+    return await repackPptx(zip);
   } catch {
     return blob;
   }
 }
+
 
 function triggerDownload(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
