@@ -2543,22 +2543,38 @@ const WHY_LINES = [
   "INDUSTRY *EXPERTISE*",
 ];
 
+const WHY_GRID_COLS = 8;
+const WHY_GRID_ROWS = 4;
+
 function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string }) {
   const bullets = page.bullets?.length ? page.bullets : WHY_LINES;
+  const team = page.team ?? [];
+  const tileW = 8.53 / WHY_GRID_COLS;
+  const tileH = 3.6 / WHY_GRID_ROWS;
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
-      <Img
-        x={0}
-        y={0}
-        w={8.53}
-        h={3.6}
-        src={PROPOSAL_ART.teamGrid}
-        alt="TransPerfect team"
-        fit="cover"
-        slot="why.photo"
-        label="photo"
-      />
+      {/* Editable headshot mosaic — each tile can be swapped independently. */}
+      <L x={0} y={0} w={8.53} h={3.6} style={{ background: "#FFFFFF" }} />
+      {Array.from({ length: WHY_GRID_COLS * WHY_GRID_ROWS }).map((_, i) => {
+        const col = i % WHY_GRID_COLS;
+        const row = Math.floor(i / WHY_GRID_COLS);
+        return (
+          <Img
+            key={i}
+            x={col * tileW}
+            y={row * tileH}
+            w={tileW}
+            h={tileH}
+            src={team[i]?.photo || demoHeadshot(i)}
+            alt={team[i]?.name ?? "TransPerfect team member"}
+            fit="cover"
+            slot={`why.headshot.${i + 1}`}
+            label="headshot"
+          />
+        );
+      })}
+
 
       {/* White statement bubble with a downward tail. */}
       <svg
