@@ -196,7 +196,7 @@ function PresentationSegment() {
   return (
     <>
       <Section title="Narrative archetypes" count={NARRATIVE_ARCHETYPES.length}>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {NARRATIVE_ARCHETYPES.map((a) => (
             <div key={a.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-medium">{a.name}</div>
@@ -217,7 +217,7 @@ function PresentationSegment() {
       </Section>
 
       <Section title="Section frameworks" count={SECTION_FRAMEWORKS.length}>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {SECTION_FRAMEWORKS.map((sf) => (
             <div key={sf.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-mono text-xs text-black/50">{sf.id}</div>
@@ -240,7 +240,7 @@ function PresentationSegment() {
       </Section>
 
       <Section title="Module families" count={MODULE_FAMILIES.length}>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {MODULE_FAMILIES.map((mf) => {
             const variants = deckVariants.filter((mv) => mv.familyId === mf.id);
             const fi = familyIcon(mf.id);
@@ -256,7 +256,7 @@ function PresentationSegment() {
                       : "#666666";
             return (
               <div key={mf.id} className="rounded-2xl border border-black/10 bg-white p-5">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
                     <span
                       className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
@@ -283,9 +283,9 @@ function PresentationSegment() {
                     {variants.map((v) => {
                       const ico = iconographyForVariant(v);
                       return (
-                        <li key={v.id} className="flex items-center justify-between gap-2">
+                        <li key={v.id} className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
                           <span className="truncate">{v.name}</span>
-                          <span className="flex shrink-0 items-center gap-2">
+                          <span className="flex min-w-0 flex-wrap items-center gap-2">
                             <span
                               className="rounded-full px-2 py-0.5 font-mono text-[10px]"
                               style={{
@@ -313,7 +313,7 @@ function PresentationSegment() {
       </Section>
 
       <Section title="Layout frameworks" count={LAYOUT_FRAMEWORKS.length}>
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           {LAYOUT_FRAMEWORKS.map((lf) => (
             <div key={lf.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-mono text-xs text-black/50">{lf.id}</div>
@@ -360,7 +360,7 @@ function PrintSegment({ ink }: { ink: string }) {
                   <span className="text-xs text-black/45">{modules.length} modules</span>
                 </div>
                 {meta?.desc && <p className="mt-1 max-w-2xl text-sm text-black/55">{meta.desc}</p>}
-                <div className="mt-3 grid gap-3 md:grid-cols-3">
+                <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
                   {modules.map((m) => (
                     <div key={m.id} className="rounded-2xl border border-black/10 bg-white p-4">
                       <div className="flex items-start justify-between gap-2">
@@ -391,7 +391,7 @@ function PrintSegment({ ink }: { ink: string }) {
       </Section>
 
       <Section title="Page geometry" count={PRINT_PAGE_SIZE_ORDER.length}>
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
           {PRINT_PAGE_SIZE_ORDER.map((size) => {
             const p = PRINT_PAGE_PRESETS_FULL[size];
             return (
@@ -418,7 +418,7 @@ function SocialSegment({ ink }: { ink: string }) {
   return (
     <>
       <Section title="Output formats" count={SOCIAL_FORMATS.length}>
-        <div className="grid gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
           {SOCIAL_FORMATS.map((f) => (
             <div key={f.id} className="rounded-2xl border border-black/10 bg-white p-4">
               <div className="flex items-start justify-between gap-2">
@@ -453,7 +453,7 @@ function SocialSegment({ ink }: { ink: string }) {
       </Section>
 
       <Section title="Kit profiles" count={KIT_PROFILES.length}>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {KIT_PROFILES.map((k) => (
             <div key={k.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-medium">{k.label}</div>
@@ -474,7 +474,7 @@ function SocialSegment({ ink }: { ink: string }) {
       </Section>
 
       <Section title="Template styles" count={SOCIAL_STYLES.length}>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {SOCIAL_STYLES.map((s) => (
             <div key={s.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="flex items-start justify-between gap-2">
@@ -495,7 +495,7 @@ function SocialSegment({ ink }: { ink: string }) {
       </Section>
 
       <Section title="Campaign playbooks" count={SOCIAL_PLAYBOOKS.length}>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {SOCIAL_PLAYBOOKS.map((p) => (
             <PlaybookCard
               key={p.id}
@@ -519,10 +519,10 @@ function SocialSegment({ ink }: { ink: string }) {
 function EventsSegment({ ink }: { ink: string }) {
   return (
     <Section title="Event playbooks" count={EVENT_PLAYBOOKS.length}>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {EVENT_PLAYBOOKS.map((p) => (
           <div key={p.id} className="rounded-2xl border border-black/10 bg-white p-5">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="font-mono text-xs text-black/50">{p.kind}</div>
                 <div className="mt-1 text-lg font-semibold" style={{ color: NAVY }}>
@@ -612,7 +612,7 @@ function StyleLibrarySegment() {
           through one of these languages — pick the language, then let the industry recipe narrow
           it.
         </p>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {DESIGN_SKINS.map((s) => (
             <div
               key={s.code}
@@ -659,7 +659,7 @@ function StyleLibrarySegment() {
       </Section>
 
       <Section title="Industry recipes" count={INDUSTRY_RECIPES.length}>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {INDUSTRY_RECIPES.map((r) => (
             <div key={r.id} className="rounded-2xl border border-black/10 bg-white p-5">
               <div className="font-mono text-xs text-black/50">{r.id}</div>
@@ -1031,7 +1031,7 @@ function LogoPlacementSection() {
           Layout-framework overrides
         </div>
         <div className="rounded-2xl border border-black/10 bg-white p-5">
-          <ul className="grid gap-2 md:grid-cols-2">
+          <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
             {Object.entries(LOGO_POSITION_BY_LAYOUT).map(([lfId, pos]) => (
               <li key={lfId} className="flex items-center justify-between text-sm">
                 <span>
@@ -1221,7 +1221,7 @@ function TypographySection() {
       </div>
 
       {/* Rules */}
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-black/10 bg-white p-5">
           <div className="mb-2 font-medium">Usage rules</div>
           <ul className="list-inside list-disc space-y-1 text-sm text-black/70">
