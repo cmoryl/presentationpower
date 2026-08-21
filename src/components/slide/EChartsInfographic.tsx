@@ -84,7 +84,29 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
   const hostRef = React.useRef<HTMLDivElement | null>(null);
   const instRef = React.useRef<echarts.ECharts | null>(null);
 
+  // A card can mount while its box is still 0×0 (lazily revealed grid cell,
+  // closed accordion, off-screen tab). ECharts sizes itself once at init, so
+  // initialising then would draw an invisible chart and the card reads broken.
+  // We wait for the first non-zero layout box before initialising.
+  const [ready, setReady] = React.useState(false);
   React.useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    const check = () => {
+      if (host.offsetWidth > 0 && host.offsetHeight > 0) setReady(true);
+    };
+    check();
+    if (typeof ResizeObserver === "undefined") {
+      setReady(true);
+      return;
+    }
+    const ro = new ResizeObserver(check);
+    ro.observe(host);
+    return () => ro.disconnect();
+  }, []);
+
+  React.useEffect(() => {
+    if (!ready) return;
     if (!hostRef.current) return;
     // Use SVG renderer whenever we're capturing (exporting) — vector output
     // survives PPTX/PDF. Canvas is fine for interactive presentation.
@@ -116,7 +138,7 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
       instRef.current = null;
     };
     // Full re-init on spec change — cheap for our sizes and avoids stale option shape.
-  }, [spec, ctx.exporting, ctx.width, ctx.height, ctx.fill]);
+  }, [ready, spec, ctx.exporting, ctx.width, ctx.height, ctx.fill]);
 
   return (
     <div
