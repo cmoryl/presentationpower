@@ -132,6 +132,8 @@ const SKIN_TRAITS: Record<string, SkinTraits> = {
   S26: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 600, displayTracking: "-0.031em", displayTransform: "none", displayScale: 1, kickerWeight: 500, kickerTracking: "0.29em", radius: 18, surfaceStyle: "glass", topBar: false, grain: 0.05 },
   S27: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 300, displayTracking: "-0.018em", displayTransform: "none", displayScale: 1.09, kickerWeight: 600, kickerTracking: "0.23em", radius: 30, surfaceStyle: "glass", topBar: false, grain: 0.05 },
   S28: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 500, displayTracking: "-0.026em", displayTransform: "none", displayScale: 0.99, kickerWeight: 500, kickerTracking: "0.17em", radius: 16, surfaceStyle: "slab", topBar: true, grain: 0.03 },
+  // Element's product skin: brick-square corners, systematic uppercase kickers.
+  S29: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 620, displayTracking: "-0.033em", displayTransform: "none", displayScale: 1.03, kickerWeight: 650, kickerTracking: "0.3em", radius: 10, surfaceStyle: "flat", topBar: true, grain: 0.025 },
 };
 
 

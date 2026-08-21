@@ -454,7 +454,28 @@ export const DESIGN_SKINS: DesignSkin[] = [
     density: "High",
     spec: "GRADIENT G01 / G02  \u00b7  OPACITY O16\u201372  \u00b7  TYPE T02  \u00b7  LAYOUT L04 / L10  \u00b7  ICON I02",
   },
+  {
+    // PRODUCT SKIN — Element's own brand, not TransPerfect corporate. Used for
+    // marketing the build itself: Element Ink field, Element Blue lead, and the
+    // three signal accents from the five-brick logo. The corporate wordmark is
+    // never used here; the chrome renders the Element lockup instead.
+    code: "S29",
+    name: "Element System",
+    reference: "TRANSPERFECT ELEMENT \u00b7 FIVE-BRICK SYSTEM",
+    description: "Element's own product language: ink field, modular brick geometry and signal accents drawn straight from the five-brick E logo.",
+    bestFit: "Element product marketing \u00b7 platform launches \u00b7 enablement \u00b7 internal rollout",
+    mode: "dark",
+    palette: ["#0D1117", "#F5F7FA", "#2563EB", "#14B8A6", "#FF6B57"],
+    typography: "Modular display \u00b7 systematic labels",
+    surfaceNote: "Ink planes \u00b7 brick-aligned cards",
+    imagery: "Modular bricks \u00b7 system diagrams \u00b7 product UI crops",
+    density: "Medium",
+    spec: "GRADIENT G03 / G07  \u00b7  OPACITY O16\u201372  \u00b7  TYPE T03  \u00b7  LAYOUT L09 / L10  \u00b7  ICON I03",
+    industries: ["Technology", "SaaS", "Internal enablement", "Marketing"],
+    hc: { surface: "#000000", ink: "#FFFFFF", accent: "#5B8DFF" },
+  },
 ];
+
 
 export const INDUSTRY_RECIPES: IndustryRecipe[] = [
   {
