@@ -169,7 +169,7 @@ export const SKIN_MOTIF: Record<string, MotifFamily> = {
   S26: "prism", //    dark glass, explainable layered planes
   S27: "aurora", //   soft atmospheric volumes, outline-free
   S28: "terrazzo", // overlapping transparent mosaic planes
-  S29: "blueprint", // Element five-brick modular lattice
+  S29: "terrazzo", // Element five-brick colour choreography on a light field
 
   /* Industry packs (R01–R30) — motif chosen for the sector, not derived. */
   R01: "mesh",
