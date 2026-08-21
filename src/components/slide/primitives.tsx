@@ -738,7 +738,7 @@ export function StatFigure({
           }}
         >
           <StatIcon
-            size={Math.round(spec.valuePx * 1.25 * iconK)}
+            size={Math.round(spec.valuePx * 1.6 * iconK)}
             strokeWidth={1.25}
             absoluteStrokeWidth
           />
@@ -750,18 +750,18 @@ export function StatFigure({
           data-decorative
           className={`relative block ${centeredShape ? "mx-auto" : ""}`}
           style={{
-            width: Math.round(spec.valuePx * 0.62),
+            width: Math.round(spec.valuePx * 0.92),
             marginBottom: Math.round(spec.valuePx * 0.07),
             color: aInk,
             zIndex: 1,
           }}
         >
-          <StatIcon size={Math.round(spec.valuePx * 0.62 * iconK)} strokeWidth={1.4} absoluteStrokeWidth />
+          <StatIcon size={Math.round(spec.valuePx * 0.92 * iconK)} strokeWidth={1.4} absoluteStrokeWidth />
         </span>
       )}
       <div
         className={isIconRow ? "relative flex items-center" : "relative"}
-        style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.16) : undefined }}
+        style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.2) : undefined }}
       >
         {isIconRow && StatIcon && (
           resolvedShape === "icon-tile" ? (
@@ -770,17 +770,17 @@ export function StatFigure({
               data-decorative
               className="relative flex shrink-0 items-center justify-center"
               style={{
-                width: Math.round(spec.valuePx * 0.78),
-                height: Math.round(spec.valuePx * 0.78),
-                borderRadius: Math.round(spec.valuePx * 0.18),
+                width: Math.round(spec.valuePx * 1.18),
+                height: Math.round(spec.valuePx * 1.18),
+                borderRadius: Math.round(spec.valuePx * 0.26),
                 background: `linear-gradient(160deg, ${hexA(aFig, mode === "dark" ? 0.28 : 0.16)} 0%, ${hexA(aFig, mode === "dark" ? 0.1 : 0.05)} 100%)`,
                 border: `1px solid ${hexA(aFig, mode === "dark" ? 0.4 : 0.24)}`,
                 color: aInk,
               }}
             >
               <StatIcon
-                size={Math.round(spec.valuePx * 0.44 * iconK)}
-                strokeWidth={1.6}
+                size={Math.round(spec.valuePx * 0.7 * iconK)}
+                strokeWidth={1.5}
                 absoluteStrokeWidth
               />
             </span>
@@ -791,13 +791,13 @@ export function StatFigure({
               className="relative flex shrink-0 items-center"
               style={{
                 color: aInk,
-                paddingRight: Math.round(spec.valuePx * 0.14),
+                paddingRight: Math.round(spec.valuePx * 0.18),
                 borderRight: `1px solid ${hexA(aFig, mode === "dark" ? 0.32 : 0.2)}`,
               }}
             >
               <StatIcon
-                size={Math.round(spec.valuePx * 0.86 * iconK)}
-                strokeWidth={1.3}
+                size={Math.round(spec.valuePx * 1.24 * iconK)}
+                strokeWidth={1.25}
                 absoluteStrokeWidth
               />
             </span>
