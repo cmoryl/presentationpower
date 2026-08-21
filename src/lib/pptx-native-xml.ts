@@ -555,12 +555,9 @@ export async function applyNativePptxFeatures(
     }
 
     if (touched === 0) return blob;
-    return (await zip.generateAsync({
-      type: "blob",
-      compression: "DEFLATE",
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    })) as Blob;
+    const { repackPptx } = await import("./pptx-repack");
+    return await repackPptx(zip);
+
   } catch (err) {
     console.warn("[pptx-native-xml] post-processing skipped", err);
     return blob;
