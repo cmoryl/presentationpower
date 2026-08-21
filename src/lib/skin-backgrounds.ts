@@ -260,7 +260,7 @@ export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
   S26: { rake: 12, weight: 1.05, texture: 0.4, anchor: "70% 40%", ratio: 1.14 },
   S27: { rake: -16, weight: 1.2, texture: 0.15, anchor: "44% 58%", ratio: 1.32 },
   S28: { rake: 16, weight: 1, texture: 0.55, anchor: "82% 44%", ratio: 1.08 },
-  S29: { rake: 0, weight: 1.15, texture: 0.3, anchor: "88% 22%", ratio: 1 },
+  S29: { rake: 12, weight: 1.32, texture: 0.5, anchor: "74% 24%", ratio: 1.14 },
 
   /**
    * INDUSTRY BACKGROUND SIGNATURES — R01–R30.
