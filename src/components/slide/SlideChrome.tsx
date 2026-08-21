@@ -16,6 +16,7 @@ import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, enterprisePalette, isEnterpriseWhite } from "@/lib/slide-skin";
 import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
 import { useStylePack } from "@/components/slide/StylePackContext";
+import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useFillCssVars, useOverflowGuard } from "@/components/slide/OpenSpaceFill";
 import {
   GRAIN_PLATE,
@@ -273,6 +274,8 @@ export type SlideBackdrop = {
 
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
+const ELEMENT_BRAND_MODE = resolveBrandMode("bm-element");
+
 // A slide frame that owns the locked chrome — brand bar, footer, logo, page
 // number. Locked fields live here so variant renderers cannot override them.
 // The brand lockup is placed in an approved zone per chrome variant / layout;
@@ -337,7 +340,7 @@ function HeroPlate({
 }
 
 export function SlideFrame({
-  brand,
+  brand: brandProp,
   pageNumber,
   children,
   variant = "content",
@@ -364,6 +367,11 @@ export function SlideFrame({
   // Alternate style pack (public taste-testing directory). When active it owns
   // the page ground, ink and accent; it never applies on production surfaces.
   const pack = useStylePack();
+  // ELEMENT PRODUCT SKIN (S29). Element markets itself with its own identity, so
+  // whenever the Element style pack is active the chrome lockup swaps to the
+  // five-brick Element mark — the TransPerfect corporate wordmark never renders
+  // on Element product decks.
+  const brand = pack?.id === "skin-s29" ? ELEMENT_BRAND_MODE : brandProp;
   // Enterprise White master template — white page, navy ink, soft pastel
   // corner wash, hairline footer. Suppresses the flagship aurora grounds.
   const enterprise = isEnterpriseWhite(skin);
