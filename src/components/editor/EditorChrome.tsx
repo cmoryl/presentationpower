@@ -99,7 +99,7 @@ export function AuthoringNav({
   return (
     <nav
       aria-label="Deck views"
-      className={`inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-black/[0.07] bg-white/80 p-1 shadow-[0_1px_0_rgba(0,0,0,0.02)] backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]{display:none} ${className ?? ""}`}
+      className={`inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-black/[0.07] bg-white/80 p-1 shadow-[0_1px_0_rgba(0,0,0,0.02)] backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className ?? ""}`}
     >
       {SURFACES.map((s) => {
         const isActive = s.id === active;
