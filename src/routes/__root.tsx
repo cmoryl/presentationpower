@@ -217,9 +217,14 @@ function RootComponent() {
           (editor, present, share, agent). Absent entries fall back to the
           CSS-composed scene, so this never blocks rendering. */}
       <SkinBackdropLibrary>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
+        {/* LogoHub roster — every CLIENT logo slot resolves through this pool
+            so a TransPerfect division mark can never stand in for a client. */}
+        <ClientLogoPoolProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+        </ClientLogoPoolProvider>
       </SkinBackdropLibrary>
+
       <Toaster />
       <ToastAssertiveLiveRegion />
       {/* Debugging Workflow recorder — renders nothing unless explicitly enabled. */}
