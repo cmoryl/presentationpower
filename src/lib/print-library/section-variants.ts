@@ -4,6 +4,7 @@
 
 import {
   PRINT_CONTACT_VARIANTS,
+  PRINT_DEVICE_VARIANTS,
   PRINT_EXPERTISE_VARIANTS,
   PRINT_FEATURE_VARIANTS,
   PRINT_HERO_VARIANTS,
@@ -37,6 +38,8 @@ export function sectionVariantsFor(kind: PrintSection["kind"]): SectionVariantOp
       return PRINT_TABLE_VARIANTS;
     case "contact":
       return PRINT_CONTACT_VARIANTS;
+    case "device":
+      return PRINT_DEVICE_VARIANTS;
     default:
       return [];
   }

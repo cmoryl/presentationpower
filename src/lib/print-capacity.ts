@@ -276,6 +276,12 @@ export const PRINT_CONTACT_VARIANT_LIMITS = {
   "contact-cta-band": { weight: 1.2, maxRows: 0 },
 } as const;
 
+export const PRINT_DEVICE_VARIANT_LIMITS = {
+  "device-laptop-showcase": { weight: 2.6, maxItems: 4 },
+  "device-monitor-showcase": { weight: 2.8, maxItems: 3 },
+  "device-duo-showcase": { weight: 3.0, maxItems: 4 },
+} as const;
+
 export const PRINT_HERO_VARIANT_WEIGHTS: Record<string, number> = {
   "hero-photo-band": 3.2,
   "hero-split-photo": 2.6,
@@ -305,6 +311,8 @@ export function weightForSection(section: PrintSection): number {
       return PRINT_TABLE_VARIANT_LIMITS[section.variantId]?.weight ?? 2;
     case "contact":
       return PRINT_CONTACT_VARIANT_LIMITS[section.variantId]?.weight ?? 1.2;
+    case "device":
+      return PRINT_DEVICE_VARIANT_LIMITS[section.variantId]?.weight ?? 2.6;
     default:
       return 2;
   }
