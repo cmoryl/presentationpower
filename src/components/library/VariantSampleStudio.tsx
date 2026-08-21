@@ -316,6 +316,23 @@ export function VariantSampleStudio({
       const t = e.target as HTMLElement | null;
       if (!t) return;
       if (t.closest("[data-crop-overlay]")) return;
+      // Step chain: clicking a tile picks that step for editing. Text inside a
+      // tile still belongs to live edit, and Alt-click keeps the icon gallery.
+      if (isStepChain && !e.altKey && !t.closest('[contenteditable="true"]')) {
+        const stepTile = t.closest("[data-step-tile]");
+        if (stepTile) {
+          const order = Array.from(root.querySelectorAll("[data-step-tile]"));
+          const index = order.indexOf(stepTile);
+          if (index >= 0) {
+            e.preventDefault();
+            e.stopPropagation();
+            setStepFocus(index);
+            setTab("copy");
+            return;
+          }
+        }
+      }
+
       const logo = t.closest("[data-logo-tile]");
       const tile = logo ? null : t.closest("[data-media-tile]");
       const well = logo || tile ? null : t.closest("[data-icon-well]");
