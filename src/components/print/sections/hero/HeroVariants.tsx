@@ -486,6 +486,7 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
                   ...clampLines(2),
                 }}
               >
+                {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
                 {s.label}
               </div>
             </div>
@@ -922,6 +923,7 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
                     ...clampLines(3),
                   }}
                 >
+                  {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
                   {s.label}
                 </div>
               </div>
