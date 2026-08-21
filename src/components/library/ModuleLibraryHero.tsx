@@ -41,7 +41,10 @@ function ParallaxWatermark({ text }: { text: string }) {
       className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
       style={{
         fontSize: "clamp(80px, 18vw, 280px)",
-        background: "linear-gradient(180deg, #ffffff00 0%, #ffffff16 35%, #ffffff05 75%, transparent 100%)",
+        // Longhand only: mixing the `background` shorthand with `backgroundClip`
+        // in the same re-rendering style object makes React drop the clip.
+        backgroundImage:
+          "linear-gradient(180deg, #ffffff00 0%, #ffffff16 35%, #ffffff05 75%, transparent 100%)",
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
