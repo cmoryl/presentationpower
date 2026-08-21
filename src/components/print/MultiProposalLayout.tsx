@@ -1012,33 +1012,15 @@ function LocationsPage({
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
 
-      {/* Header follows the shared band-header rhythm (eyebrow, left-aligned
-          display title, logo top-right, hairline rule) in a dark-field key. */}
-      <Img
-        x={6.38}
-        y={0.5}
-        w={1.88}
-        h={0.28}
-        src={logoWhite}
-        alt="TransPerfect"
-        slot="band.logo"
-        label="logo"
+      {/* Shared signature header rhythm (eyebrow, left-aligned display title,
+          logo top-right, hairline rule) in a dark-field key. */}
+      <SignatureHeader
+        title={title.join("\n")}
+        logo={logoWhite}
+        eyebrow="Our Footprint"
+        rule
       />
-      <T x={0.47} y={0.55} w={4} size={8.4} weight={700} color={AQUA_FIELD} upper tracking="0.16em">
-        Our Footprint
-      </T>
-      <T
-        x={0.47}
-        y={0.86}
-        w={5.6}
-        size={39.7}
-        weight={700}
-        leading={1.05}
-        tracking="-0.02em"
-      >
-        {title.join("\n")}
-      </T>
-      <Rule x={0.47} y={2.34} w={7.79} color="rgba(255,255,255,0.28)" />
+
 
 
       {/* Vector map: landmass artwork + author-editable office pins. */}
