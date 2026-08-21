@@ -1322,7 +1322,7 @@ function DeckEditor() {
                     type="button"
                     onClick={() => setZoomedTracked(true)}
                     title="Edit this slide full size"
-                    className="absolute bottom-3 right-3 z-30 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
+                    className="absolute bottom-3 right-3 z-50 rounded-full bg-black/75 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow hover:bg-black"
                   >
                     ⤢ Enlarge to edit
                   </button>
