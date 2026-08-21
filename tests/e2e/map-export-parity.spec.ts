@@ -89,11 +89,14 @@ async function domPins(page: Page) {
     const pageBox = host.getBoundingClientRect();
     return Array.from(host.querySelectorAll<SVGCircleElement>("svg circle")).map((c) => {
       const b = c.getBoundingClientRect();
+      const fill = (c.getAttribute("fill") ?? "").toLowerCase();
       return {
         x: (b.x + b.width / 2 - pageBox.x) / pageBox.width,
         y: (b.y + b.height / 2 - pageBox.y) / pageBox.height,
+        kind: fill.includes("139dd8") ? "service" : "prod",
       };
     });
+
   });
 }
 
