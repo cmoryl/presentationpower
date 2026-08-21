@@ -9,7 +9,7 @@ function Page() {
   const seed = MULTI_SOLUTION_PROPOSALS[0]!;
   const content = seed.content as SolutionProposalContent;
   const idx = (content.pages ?? []).findIndex((p) => p.kind === "locations");
-  const idxRegion = (content.pages ?? []).findIndex((p) => p.kind === "locations-region");
+  const idxRegion = (content.pages ?? []).findIndex((p) => p.kind === "scope");
   return (
     <div style={{ width: 900 }}>
       <MultiProposalLayout content={content} brand="transperfect" mode="dark" pageIndex={idx} />
