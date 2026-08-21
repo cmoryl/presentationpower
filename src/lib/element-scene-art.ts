@@ -92,8 +92,16 @@ export function elementSceneArtSet(mode: ElementArtMode): Record<SkinScene, stri
  * only muddy it. Admin uploads for a scene take precedence and short-circuit.
  */
 export function withElementSceneArt(pack: StylePack, code: string): StylePack {
-  if (!hasElementSceneArt(code)) return pack;
+  const mode = code ? ELEMENT_ART_MODE[code.toUpperCase()] : undefined;
+  if (!mode) return pack;
   const base = pack.ground;
+  // The plates carry large saturated fields. A tonal veil sits between the art
+  // and the slide content so headlines, stats and cards stay legible while the
+  // composition still reads through.
+  const veil =
+    mode === "dark"
+      ? "linear-gradient(0deg, rgba(13,19,29,0.62), rgba(13,19,29,0.62))"
+      : "linear-gradient(0deg, rgba(255,255,255,0.68), rgba(255,255,255,0.68))";
   return {
     ...pack,
     ground: (seed: string) => {
@@ -102,7 +110,8 @@ export function withElementSceneArt(pack: StylePack, code: string): StylePack {
       if (custom?.imageUrl) return base(seed);
       const url = elementSceneArtUrl(code, scene);
       if (!url) return base(seed);
-      return [`url("${url}") center center / cover no-repeat`];
+      return [veil, `url("${url}") center center / cover no-repeat`];
     },
   };
 }
+
