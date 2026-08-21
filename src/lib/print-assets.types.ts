@@ -664,8 +664,11 @@ export type ProposalCostRow = {
   item: string;
   detail?: string;
   qty?: string;
+  /** Unit rate — when set with `qty`, the line investment is computed. */
+  rate?: string;
   price?: string;
 };
+
 
 /** An account-team card. */
 export type ProposalTeamMember = {
