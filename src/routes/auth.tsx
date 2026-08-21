@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { teamSignIn } from "@/lib/team-access.functions";
 
-
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (s: { next?: string; expired?: string }): { next?: string; expired?: string } => ({
+  validateSearch: (s: {
+    next?: string;
+    expired?: string;
+  }): { next?: string; expired?: string } => ({
     next: typeof s.next === "string" ? s.next : undefined,
     expired: s.expired === "1" ? "1" : undefined,
   }),
@@ -131,7 +133,6 @@ function AuthPage() {
   }
 
   return (
-
     <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] flex items-center justify-center px-6">
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex items-center gap-3">
@@ -418,4 +419,3 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
     </div>
   );
 }
-
