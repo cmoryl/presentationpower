@@ -133,16 +133,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       {
         rel: "icon",
-        href: "/favicon-light.png",
-        type: "image/png",
-        media: "(prefers-color-scheme: light)",
-        "data-theme-icon": "",
-      },
-      {
-        rel: "icon",
-        href: "/favicon-dark.png",
-        type: "image/png",
-        media: "(prefers-color-scheme: dark)",
+        href: "/favicon.svg",
+        type: "image/svg+xml",
       },
       { rel: "apple-touch-icon", href: "/icon-1024.png", sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
