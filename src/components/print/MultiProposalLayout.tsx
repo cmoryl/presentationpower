@@ -15,7 +15,7 @@
 // stack them and exportPrintAssetAsPdf() can emit a real multi-page PDF. All
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
-import { Fragment } from "react";
+import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 import type { BrandMode } from "@/lib/taxonomy";
@@ -281,6 +281,119 @@ function lines(value: string | undefined): string[] {
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
+}
+
+/**
+ * Explicit-break aware split: keeps authored hard returns *and* single blank
+ * lines so the rendered block is line-for-line what the author typed in the
+ * live-edit overlay. Runs of 3+ returns collapse to one blank line; leading and
+ * trailing blanks are dropped.
+ */
+function paragraphLines(value: string | undefined): string[] {
+  const out = (value ?? "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .split("\n")
+    .map((l) => l.trim());
+  while (out.length && !out[0]) out.shift();
+  while (out.length && !out[out.length - 1]) out.pop();
+  return out;
+}
+
+/**
+ * Text layer that auto-shrinks until the (wrapped) copy fits `maxH` inches, so
+ * long headlines and extra hard returns stay inside their plate instead of
+ * spilling — the on-screen box then matches the exported layout exactly.
+ */
+function FitT({
+  x,
+  y,
+  w,
+  maxH,
+  size,
+  minSize,
+  weight = 400,
+  color = "#FFFFFF",
+  align = "left",
+  leading = 1.18,
+  tracking,
+  children,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  maxH: number;
+  size: number;
+  minSize?: number;
+  weight?: number;
+  color?: string;
+  align?: CSSProperties["textAlign"];
+  leading?: number;
+  tracking?: string;
+  children?: ReactNode;
+}) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [factor, setFactor] = useState(1);
+  const floor = Math.min(1, (minSize ?? size * 0.6) / size);
+
+  const measure = useCallback(() => {
+    const host = hostRef.current;
+    const inner = host?.firstElementChild as HTMLElement | null;
+    if (!host || !inner) return;
+    const limit = host.clientHeight;
+    if (!limit) return;
+    const h = inner.scrollHeight;
+    setFactor((prev) => {
+      if (h <= limit + 0.5) {
+        if (prev >= 1) return prev;
+        const next = Math.min(1, prev * (limit / Math.max(h, 1)));
+        return next - prev > 0.004 ? next : prev;
+      }
+      const next = Math.max(floor, prev * (limit / h));
+      return prev - next > 0.004 ? next : prev;
+    });
+  }, [floor]);
+
+  useLayoutEffect(() => {
+    measure();
+    const host = hostRef.current;
+    if (!host || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(host);
+    const inner = host.firstElementChild;
+    if (inner) ro.observe(inner);
+    return () => ro.disconnect();
+  }, [measure, children, factor]);
+
+  return (
+    <div
+      ref={hostRef}
+      style={{
+        position: "absolute",
+        left: u(x),
+        top: u(y),
+        width: u(w),
+        height: u(maxH),
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: FONT,
+          fontSize: fs(size * factor),
+          fontWeight: weight,
+          lineHeight: leading,
+          color,
+          textAlign: align,
+          letterSpacing: tracking,
+          whiteSpace: "pre-wrap",
+          overflowWrap: "break-word",
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
 }
 
 /** `*highlighted*` runs render in the aqua accent, matching the source deck. */
@@ -705,9 +818,15 @@ const STAT_SLOTS: Array<{
 ];
 
 function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
-  const headline = lines(page.title).length
-    ? lines(page.title)
+  const authoredHeadline = paragraphLines(page.title);
+  const headline = authoredHeadline.length
+    ? authoredHeadline
     : ["Value.", "Intelligence.", "Performance.", "In any language."];
+  // Last line with copy on it carries the bold emphasis of the source deck.
+  const emphasisIndex = (() => {
+    for (let i = headline.length - 1; i >= 0; i -= 1) if (headline[i]) return i;
+    return -1;
+  })();
   const stats = page.stats ?? [];
 
   return (
@@ -731,15 +850,29 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
 
       {/* One text box (spans, not block divs) so the live-edit overlay can match
           the whole authored `title` string — block children concatenate without
-          whitespace in textContent and never match the stored value. */}
-      <T x={1.2} y={0.94} w={4.6} size={37} weight={400} leading={1.28} tracking="-0.015em">
+          whitespace in textContent and never match the stored value. Hard
+          returns are preserved verbatim (pre-wrap) and long lines auto-wrap,
+          with FitT shrinking type until the block fits inside the bubble so the
+          editable box always mirrors the final rendered layout. */}
+      <FitT
+        x={1.2}
+        y={0.94}
+        w={4.6}
+        maxH={2.92}
+        size={37}
+        minSize={20}
+        weight={400}
+        leading={1.28}
+        tracking="-0.015em"
+      >
         {headline.map((line, i) => (
-          <span key={i} style={{ fontWeight: i === headline.length - 1 ? 700 : 400 }}>
+          <span key={i} style={{ fontWeight: i === emphasisIndex ? 700 : 400 }}>
             {line}
             {i < headline.length - 1 ? "\n" : ""}
           </span>
         ))}
-      </T>
+      </FitT>
+
 
 
       {/* Column divider + hairlines */}
