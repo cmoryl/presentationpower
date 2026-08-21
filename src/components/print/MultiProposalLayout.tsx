@@ -2045,29 +2045,31 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         slot="stories.photo.2"
         label="photo"
       />
+      {/* Card 2 copy stack sits fully BELOW the card's top rule (y = 6.8in). */}
       <StoryLogo
         x={1.07}
-        y={6.62}
+        y={6.98}
         w={3.44}
-        h={0.62}
+        h={0.56}
         company={second?.company || "Lavazza"}
         slot="stories.logo.2"
         align="right"
       />
-      <Dots x={3.94} y={7.4} color={BLUE} />
-      <T x={1.07} y={7.68} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
+      <Dots x={3.94} y={7.66} color={BLUE} />
+      <T x={1.07} y={7.9} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.headline || ""}
       </T>
       <QuoteBody
         x={1.07}
-        y={8.16}
+        y={8.36}
         w={3.44}
-        maxH={1.1}
+        maxH={1.02}
         size={10}
         quote={second}
         align="right"
       />
-      <QuoteAttribution x={1.07} y={9.34} w={3.44} size={10} quote={second} align="right" />
+      <QuoteAttribution x={1.07} y={9.52} w={3.44} size={10} quote={second} align="right" />
+
 
     </>
   );
