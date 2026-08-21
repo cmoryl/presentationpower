@@ -750,7 +750,7 @@ export function StatFigure({
           data-decorative
           className={`relative block ${centeredShape ? "mx-auto" : ""}`}
           style={{
-            width: Math.round(spec.valuePx * 0.62),
+            width: Math.round(spec.valuePx * 0.92),
             marginBottom: Math.round(spec.valuePx * 0.07),
             color: aInk,
             zIndex: 1,
