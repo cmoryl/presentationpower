@@ -208,11 +208,9 @@ export async function embedFontsInPptx(
 
 
 
-    return await zip.generateAsync({
-      type: "blob",
-      mimeType:
-        blob.type || "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    });
+    const { repackPptx } = await import("./pptx-repack");
+    return await repackPptx(zip);
+
   } catch (e) {
     console.warn("[pptx-font-embed] failed, returning original blob", e);
     return blob;
