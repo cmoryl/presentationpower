@@ -726,10 +726,12 @@ function PrintItemCard({
   canEditMaster?: boolean;
 }) {
   const isTemplate = item.source === "template";
-  // Multi-page masters (Solution Proposals) have no hero photo — render the
-  // live cover page as the card art so every card previews the real document.
+  // Masters with no hero photo (multi-page Solution Proposals in particular)
+  // render their live cover page as card art, so every card previews the real
+  // document instead of an empty navy plate.
   const multiPage = !isTemplate && isMultiPageItem(item);
-  const liveArt = isTemplate || multiPage;
+  const docArt = !isTemplate && (multiPage || !item.heroUrl);
+  const liveArt = isTemplate || docArt;
   const pageCount = pageCountOf(item);
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md">
@@ -737,7 +739,7 @@ function PrintItemCard({
         type="button"
         onClick={onPreview}
         aria-label={`Preview ${item.title}`}
-        className={`relative block w-full overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${multiPage ? "bg-white" : "bg-[#0b0a2a]"}`}
+        className={`relative block w-full overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${docArt ? "bg-white" : "bg-[#0b0a2a]"}`}
         style={{ height: 0, paddingBottom: "62.5%" }}
       >
         {isTemplate ? (
@@ -747,7 +749,7 @@ function PrintItemCard({
               {renderPreview(item.kind, brand, item.kind === "adaptor-brief" ? "dark" : "light")}
             </div>
           </div>
-        ) : multiPage ? (
+        ) : docArt ? (
           <div className="pointer-events-none absolute inset-x-0 top-0 origin-top">
             <div className="w-full" style={{ aspectRatio: "8.5 / 11" }}>
               {renderPreview(item.kind, brand, "light", item.content, 0)}
