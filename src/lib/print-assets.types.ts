@@ -338,6 +338,35 @@ export type PrintContactSection = {
   rows?: PrintTableRow[];
 };
 
+
+// ---------------------------------------------------------------------------
+// DEVICE SHOWCASE — laptop screen / desktop monitor mockups
+// ---------------------------------------------------------------------------
+// Product-screen modules: a laptop or monitor chassis whose screen image is a
+// replaceable image slot (click or drop a screenshot onto it in the editor).
+export type PrintDeviceVariant =
+  | "device-laptop-showcase"
+  | "device-monitor-showcase"
+  | "device-duo-showcase";
+
+export type PrintDeviceSection = {
+  id: string;
+  kind: "device";
+  variantId: PrintDeviceVariant;
+  eyebrow?: string;
+  title?: string;
+  body?: string;
+  caption?: string;
+  /** Primary screen image (laptop / monitor). Replaceable in the editor. */
+  imageUrl?: string;
+  /** Second screen for the duo variant. */
+  secondaryImageUrl?: string;
+  /** Chassis finish. */
+  deviceTone?: "graphite" | "silver" | "ink";
+  /** Optional supporting bullets beside / below the device. */
+  items?: Array<{ label: string; body?: string }>;
+};
+
 /** Discriminated union — future families add cases here. */
 export type PrintSection =
   | PrintHeroSection
@@ -348,7 +377,8 @@ export type PrintSection =
   | PrintFeatureListSection
   | PrintNarrativeSection
   | PrintTableSection
-  | PrintContactSection;
+  | PrintContactSection
+  | PrintDeviceSection;
 
 export type CaseStudyStat = {
   label: string;
