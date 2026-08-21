@@ -1847,6 +1847,26 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         credit: "Product · v3.4",
         mediaSeed: `${clientName}-workbench`,
       };
+    case "MV-SHOW-LAPTOP":
+      return {
+        eyebrow: "Product tour",
+        title: "The workbench your team already knows",
+        body: "Brief, translation memory, and reviewer rules sit in one screen — so nobody leaves the tool to find context.",
+        caption: "Element · reviewer workbench",
+        mediaSeed: `${clientName}-laptop-screen`,
+        deviceKind: "laptop",
+        deviceTone: "graphite",
+      };
+    case "MV-SHOW-MONITOR":
+      return {
+        eyebrow: "In the platform",
+        title: "One dashboard for every market",
+        body: "Live status across markets, owners, and deadlines.",
+        caption: "Element · program dashboard",
+        mediaSeed: `${clientName}-monitor-screen`,
+        deviceKind: "monitor",
+        deviceTone: "ink",
+      };
     case "MV-IMG-GRID-3":
       return {
         title: "In practice",
