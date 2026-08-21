@@ -144,11 +144,14 @@ export function ElementLockup({
 
   if (image && layout !== "wordmark") {
     // Master artwork is 1983 x 793; scale from the requested mark height so the
-    // lockup stays optically matched to constructed marks beside it.
+    // lockup stays optically matched to constructed marks beside it. External
+    // SVGs can't inherit currentColor, so `auto`/`mono` on light surfaces uses
+    // the full-colour master file (the approved primary form).
     const height = markSize * (layout === "stacked" ? 1.9 : 1.55);
+    const imageTone: ElementMarkTone = tone === "reversed" ? "reversed" : "color";
     return (
       <img
-        src={ELEMENT_LOCKUP_URLS[tone]}
+        src={ELEMENT_LOCKUP_URLS[imageTone]}
         alt="TransPerfect Element"
         className={`w-auto max-w-full object-contain ${className}`}
         style={{ height }}
