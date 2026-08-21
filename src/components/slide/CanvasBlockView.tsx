@@ -46,6 +46,9 @@ export function canvasTextFromEditable(root: HTMLElement): string {
       out.push("\n");
       return;
     }
+    if ((tag === "div" || tag === "p") && out.length > 0 && !out[out.length - 1]?.endsWith("\n")) {
+      out.push("\n");
+    }
     node.childNodes.forEach(walk);
     if (tag === "div" || tag === "p") out.push("\n");
   };

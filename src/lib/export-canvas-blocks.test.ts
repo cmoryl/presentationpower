@@ -79,7 +79,7 @@ describe("canvas block export geometry", () => {
   it("preserves explicit lines from object text editing", () => {
     const root = document.createElement("div");
     root.innerHTML = "First line<div>Second line<br>Third line</div>";
-    expect(canvasTextFromEditable(root)).toBe("First lineSecond line\nThird line");
+    expect(canvasTextFromEditable(root)).toBe("First line\nSecond line\nThird line");
   });
 
   it("parses rgba fills", () => {
