@@ -5,11 +5,13 @@ import type { BrandMode } from "@/lib/taxonomy";
 import {
   boundsOf,
   buildSnapTargets,
+  clientPointToStage,
   clampToStage,
   rectsIntersect,
   GRID,
   snapMove,
   snapResize,
+  stageScaleFromRect,
   STAGE_H,
   STAGE_W,
   type Box,
