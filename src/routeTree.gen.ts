@@ -28,6 +28,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
+import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
@@ -230,6 +231,11 @@ const SocialIndexRoute = SocialIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SocialRoute,
+} as any)
+const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
+  id: '/print-agent/',
+  path: '/print-agent/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
@@ -877,6 +883,7 @@ export interface FileRoutesByFullPath {
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/print-agent/': typeof PrintAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1001,6 +1008,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
+  '/print-agent': typeof PrintAgentIndexRoute
   '/social': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1130,6 +1138,7 @@ export interface FileRoutesById {
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/print-agent/': typeof PrintAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1260,6 +1269,7 @@ export interface FileRouteTypes {
     | '/events/'
     | '/knowledge/'
     | '/library/'
+    | '/print-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1384,6 +1394,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/knowledge'
     | '/library'
+    | '/print-agent'
     | '/social'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1512,6 +1523,7 @@ export interface FileRouteTypes {
     | '/events/'
     | '/knowledge/'
     | '/library/'
+    | '/print-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1600,6 +1612,7 @@ export interface RootRouteChildren {
   AgentIndexRoute: typeof AgentIndexRoute
   DecksIndexRoute: typeof DecksIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
+  PrintAgentIndexRoute: typeof PrintAgentIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
@@ -1752,6 +1765,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/social/'
       preLoaderRoute: typeof SocialIndexRouteImport
       parentRoute: typeof SocialRoute
+    }
+    '/print-agent/': {
+      id: '/print-agent/'
+      path: '/print-agent'
+      fullPath: '/print-agent/'
+      preLoaderRoute: typeof PrintAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/library/': {
       id: '/library/'
@@ -2717,6 +2737,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentIndexRoute: AgentIndexRoute,
   DecksIndexRoute: DecksIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
+  PrintAgentIndexRoute: PrintAgentIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
