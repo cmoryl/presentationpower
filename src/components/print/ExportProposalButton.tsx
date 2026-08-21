@@ -61,6 +61,8 @@ export function ExportProposalButton({
   // Aspect-ratio preflight for the pages currently in the host. Measured against
   // the PDF's stretch fit — the worst case of the two formats.
   const [aspect, setAspect] = useState<AspectCheckReport | null>(null);
+  // Live export progress so the user watches real work instead of guessing.
+  const [progress, setProgress] = useState<{ pct: number; message: string } | null>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const runRef = useRef<Fmt | null>(null);
 
@@ -128,6 +130,14 @@ export function ExportProposalButton({
       const all = host ? Array.from(host.querySelectorAll<HTMLElement>("[data-print-page]")) : [];
       // No selection recorded yet (menu never scanned) means "everything".
       const nodes = selected.size ? all.filter((_, i) => selected.has(i)) : all;
+      const onProgress = (p: { stage: string; progress?: number; message?: string }) => {
+        const pct = Math.max(0, Math.min(1, typeof p.progress === "number" ? p.progress : 0));
+        setProgress({
+          pct: p.stage === "done" ? 1 : pct,
+          message: p.message || (p.stage === "done" ? "Saved" : "Working…"),
+        });
+      };
+      setProgress({ pct: 0.02, message: "Preparing pages…" });
       try {
         if (nodes.length === 0) throw new Error("No pages selected");
         if (fmt === "pdf") {
@@ -138,6 +148,7 @@ export function ExportProposalButton({
             format: "digital",
             filename: `${safe}.pdf`,
             onAspectReport: setAspect,
+            onProgress,
           });
         } else {
           const { exportPrintPagesAsPptx } = await import("@/lib/print-pptx-export");
@@ -147,6 +158,7 @@ export function ExportProposalButton({
             title,
             filename: `${safe}.pptx`,
             onAspectReport: setAspect,
+            onProgress,
           });
         }
         toast.success(
@@ -172,6 +184,7 @@ export function ExportProposalButton({
         if (!cancelled) {
           runRef.current = null;
           setPending(null);
+          setProgress(null);
         }
       }
     })();
@@ -245,8 +258,42 @@ export function ExportProposalButton({
         className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3.5 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-40"
       >
         <FileDown size={13} aria-hidden />
-        {pending ? `Exporting ${pending.toUpperCase()}…` : label}
+        {pending
+          ? `Exporting ${pending.toUpperCase()}… ${Math.round((progress?.pct ?? 0) * 100)}%`
+          : label}
       </button>
+
+      {pending && (
+        <div
+          className="absolute right-0 z-40 mt-1.5 w-72 rounded-xl border border-black/10 bg-white p-3 shadow-xl"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] font-semibold text-[#03002C]">
+              Exporting {pending.toUpperCase()}
+            </span>
+            <span className="text-[11px] font-medium text-[#003FC7] tabular-nums">
+              {Math.round((progress?.pct ?? 0) * 100)}%
+            </span>
+          </div>
+          <div
+            className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E0E8F5]"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round((progress?.pct ?? 0) * 100)}
+          >
+            <div
+              className="h-full rounded-full bg-[#003FC7] transition-[width] duration-300 ease-out"
+              style={{ width: `${Math.max(3, Math.round((progress?.pct ?? 0) * 100))}%` }}
+            />
+          </div>
+          <p className="mt-2 text-[11px] leading-snug text-[#666]">
+            {progress?.message ?? "Preparing pages…"}
+          </p>
+        </div>
+      )}
 
       {open && (
         <div className="absolute right-0 z-30 mt-1.5 w-72 overflow-hidden rounded-xl border border-black/10 bg-white p-1 shadow-xl">
