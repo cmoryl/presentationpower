@@ -200,6 +200,7 @@ function AuthPage() {
                         setError(null);
                         setInfo(null);
                       }}
+                      data-allow-small-tap
                       className="text-xs text-[#03002C] underline underline-offset-2 hover:opacity-80"
                     >
                       Forgot password?
@@ -225,7 +226,7 @@ function AuthPage() {
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="h-4 w-4 rounded border-black/25 accent-[#03002C]"
+                  className="h-6 w-6 rounded border-black/25 accent-[#03002C] sm:h-4 sm:w-4"
                 />
                 Remember me on this device
               </label>
@@ -268,6 +269,7 @@ function AuthPage() {
                     setError(null);
                     setInfo(null);
                   }}
+                  data-allow-small-tap
                   className="font-medium text-[#03002C] underline underline-offset-2"
                 >
                   Create one
@@ -284,6 +286,7 @@ function AuthPage() {
                     setError(null);
                     setInfo(null);
                   }}
+                  data-allow-small-tap
                   className="font-medium text-[#03002C] underline underline-offset-2"
                 >
                   Sign in
@@ -298,7 +301,8 @@ function AuthPage() {
                   setError(null);
                   setInfo(null);
                 }}
-                className="font-medium text-[#03002C] underline underline-offset-2"
+                data-allow-small-tap
+                  className="font-medium text-[#03002C] underline underline-offset-2"
               >
                 Back to sign in
               </button>
@@ -406,7 +410,8 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
             <button
               type="button"
               onClick={onBack}
-              className="font-medium text-[#03002C] underline underline-offset-2"
+              data-allow-small-tap
+                  className="font-medium text-[#03002C] underline underline-offset-2"
             >
               Back to sign in
             </button>
