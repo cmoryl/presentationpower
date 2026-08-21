@@ -368,7 +368,7 @@ export function VariantSampleStudio({
     };
     root.addEventListener("click", onClick, true);
     return () => root.removeEventListener("click", onClick, true);
-  }, [items, logoCells]);
+  }, [items, logoCells, isStepChain]);
 
   // ── Double-click any photo on the slide → open the image picker ────────
   // Single click already selects + opens, but double-click is the muscle
