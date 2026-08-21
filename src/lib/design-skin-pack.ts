@@ -20,6 +20,7 @@ import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
 import { industrySceneLayers, coreSceneLayers } from "./industry-scene-art";
 import { GEOMETRY_SHEET } from "./pack-geometry";
 import { INDUSTRY_SKINS } from "./industry-skins";
+import { withElementSceneArt } from "./element-scene-art";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
@@ -458,7 +459,7 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
   const dense = tr ? tr.topBar : /high/i.test(skin.density);
   const card = { ...cardFor(skin, r), shape: geo?.shape };
 
-  return {
+  const pack: StylePack = {
     id: skinPackId(skin.code) as StylePack["id"],
     label: `${skin.name}`,
     tagline: skin.description,
@@ -494,7 +495,14 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
     ground: (seed) => groundFor(skin, r, hc ? `${seed} hc` : seed),
     swatch: [r.surface, r.ink, r.accent, r.accentAlt],
   };
+
+  // Element system skins (S29/S30) paint from the authored KO Power plates, so
+  // every surface built straight from a skin — catalog tiles, the lookbook, the
+  // backdrop prompt — shows the same ground the deck renderer uses. High
+  // contrast keeps the generated CSS ground for legibility.
+  return hc ? pack : withElementSceneArt(pack, (skin.code ?? "").toUpperCase());
 }
+
 
 /** High-contrast rendering of one catalog skin, for the a11y preview mode. */
 export function highContrastPackFromSkin(skin: DesignSkin): StylePack {
