@@ -196,3 +196,98 @@ export function normalizeTypefacesInXml(xml: string): string {
     return `typeface="${mapped}"`;
   });
 }
+
+// ---------------------------------------------------------------------------
+// Fallback hardening — keeps layout stable when the brand face is missing
+// ---------------------------------------------------------------------------
+
+/**
+ * Average advance-width ratio of each canonical family's *best substitute*
+ * relative to the canonical face itself, measured over a mixed-case Latin
+ * sample. > 1 means the substitute sets wider, so a text box sized for the
+ * canonical face can overflow (and rewrap) on a machine without it.
+ */
+export const FALLBACK_WIDTH_RATIO: Record<CanonicalFont, number> = {
+  Geist: 1.035, // Arial/Helvetica are marginally wider than Geist
+  "Geist Mono": 1.0, // monospaced substitutes match by definition
+  Georgia: 1.02, // Cambria/Times are close, Times slightly narrower
+};
+
+/**
+ * `fontScale` (in OOXML per-mille-of-percent units) to apply to auto-fit bodies
+ * so a wider substitute still fits the box it was measured for instead of
+ * reflowing into extra lines. Returns null when no compensation is needed.
+ */
+export function fallbackFontScale(font: string = CANONICAL_FONTS.sans): number | null {
+  const canonical = (Object.values(CANONICAL_FONTS) as string[]).includes(font)
+    ? (font as CanonicalFont)
+    : mapFontFamily(font);
+  const ratio = FALLBACK_WIDTH_RATIO[canonical] ?? 1;
+  if (ratio <= 1.001) return null;
+  // Round down to the nearest 0.5% so the value stays stable across builds.
+  const pct = Math.floor((100 / ratio) * 2) / 2;
+  return Math.round(pct * 1000);
+}
+
+/** Panose/pitch/charset metadata for one canonical family, as XML attributes. */
+function panoseAttrs(font: CanonicalFont): string {
+  const meta = FONT_PANOSE[font];
+  return ` panose="${meta.panose}" pitchFamily="${meta.pitchFamily}" charset="0"`;
+}
+
+/**
+ * Give every font reference in a slide part the metadata PowerPoint needs to
+ * pick *our* metric-similar substitute, and (when the real font files are not
+ * embedded) let auto-fit absorb the residual width difference.
+ *
+ * Two transforms, both idempotent:
+ *  1. `<a:latin|a:ea|a:cs|a:font|a:buFont typeface="Geist"/>` gains
+ *     `panose`/`pitchFamily`/`charset`. Without panose data PowerPoint falls
+ *     back to its generic substitution table (Calibri-ish), which rewraps text;
+ *     with it, the substitute is metrically close and line breaks hold.
+ *  2. When `embedded` is false, every `<a:bodyPr>` that has no explicit autofit
+ *     child gets `<a:normAutofit fontScale="…"/>`, so a slightly wider
+ *     substitute shrinks inside the measured box rather than overflowing it.
+ *     Bodies that already declare `spAutoFit`/`noAutofit`/`normAutofit` are
+ *     left untouched — the exporter set those deliberately.
+ */
+export function hardenFontFallbacksInXml(
+  xml: string,
+  opts?: { embedded?: boolean; font?: CanonicalFont },
+): string {
+  let out = xml.replace(
+    /<a:(latin|ea|cs|font|buFont)\b([^>]*?)typeface="([^"]+)"([^>]*?)(\/?)>/g,
+    (whole, tag: string, pre: string, name: string, post: string, selfClose: string) => {
+      if (/^\+m[jn]-/.test(name)) return whole; // theme reference
+      if (/panose=/.test(pre) || /panose=/.test(post)) return whole; // already hardened
+      const canonical = (Object.values(CANONICAL_FONTS) as string[]).includes(name)
+        ? (name as CanonicalFont)
+        : mapFontFamily(name);
+      return `<a:${tag}${pre}typeface="${name}"${post}${panoseAttrs(canonical)}${selfClose}>`;
+    },
+  );
+
+  if (opts?.embedded === false) {
+    const scale = fallbackFontScale(opts?.font ?? CANONICAL_FONTS.sans);
+    if (scale) {
+      const autofit = `<a:normAutofit fontScale="${scale}"/>`;
+      // Self-closing bodies: <a:bodyPr .../> → open a body carrying autofit.
+      out = out.replace(/<a:bodyPr\b([^>]*?)\/>/g, (_w, attrs: string) => {
+        return `<a:bodyPr${attrs}>${autofit}</a:bodyPr>`;
+      });
+      // Bodies with children but no autofit declaration.
+      out = out.replace(
+        /<a:bodyPr\b([^>]*)>([\s\S]*?)<\/a:bodyPr>/g,
+        (whole, attrs: string, inner: string) => {
+          if (/<a:(normAutofit|spAutoFit|noAutofit)\b/.test(inner)) return whole;
+          // Autofit must precede a:scene3d/a:sp3d etc.; prepending is safe here
+          // because those only appear after the autofit slot in CT_TextBodyProperties.
+          return `<a:bodyPr${attrs}>${autofit}${inner}</a:bodyPr>`;
+        },
+      );
+    }
+  }
+
+  return out;
+}
+
