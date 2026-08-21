@@ -70,7 +70,7 @@ export function LogoSlotChrome({
     <div className="group relative h-full w-full">
       {children}
       <div
-        data-export-ignore-chrome
+        data-export-ignore="true"
         className="pointer-events-none absolute -top-5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100"
       >
         <button
@@ -123,7 +123,7 @@ export function AddLogoButton({
   return (
     <button
       type="button"
-      data-export-ignore-chrome
+      data-export-ignore="true"
       disabled={full}
       className="pointer-events-auto inline-flex items-center gap-1 rounded-full border border-dashed border-[#03002C]/40 bg-white/85 px-2 py-1 text-[10px] font-semibold text-[#03002C] shadow-sm hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-40"
       onClick={() =>
