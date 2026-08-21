@@ -818,9 +818,15 @@ const STAT_SLOTS: Array<{
 ];
 
 function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
-  const headline = lines(page.title).length
-    ? lines(page.title)
+  const authoredHeadline = paragraphLines(page.title);
+  const headline = authoredHeadline.length
+    ? authoredHeadline
     : ["Value.", "Intelligence.", "Performance.", "In any language."];
+  // Last line with copy on it carries the bold emphasis of the source deck.
+  const emphasisIndex = (() => {
+    for (let i = headline.length - 1; i >= 0; i -= 1) if (headline[i]) return i;
+    return -1;
+  })();
   const stats = page.stats ?? [];
 
   return (
