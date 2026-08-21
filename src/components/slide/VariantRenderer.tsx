@@ -4511,19 +4511,22 @@ function renderVariantBody({
                   </div>
                 </OrbitDisc>
 
-                <HouseArrow
+                {/* Echo chevrons: contained in the hub column's own gutter so
+                    they read as motion radiating out of the disc without ever
+                    crossing over the state panels beside them. */}
+                <EchoArrow
                   tone={cool}
                   direction="left"
-                  length={70}
+                  size={34}
                   className="absolute"
-                  style={{ left: -40, zIndex: 3 }}
+                  style={{ left: 8, zIndex: 3 }}
                 />
-                <HouseArrow
+                <EchoArrow
                   tone={accent}
                   direction="right"
-                  length={70}
+                  size={34}
                   className="absolute"
-                  style={{ right: -40, zIndex: 3 }}
+                  style={{ right: 8, zIndex: 3 }}
                 />
               </div>
               <Column
