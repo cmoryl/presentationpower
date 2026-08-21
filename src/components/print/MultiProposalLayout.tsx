@@ -933,7 +933,7 @@ function HeadlineFitBadge({
       : `Fits at ${fit.fittedPt}pt`;
 
   return (
-    <L x={1.2} y={4.24} w={4.6} data-export-ignore="true">
+    <L x={5.98} y={0.94} w={2.02} data-export-ignore="true">
       <div
         style={{
           fontFamily: FONT,
