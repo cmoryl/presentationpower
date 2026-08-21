@@ -770,9 +770,9 @@ export function StatFigure({
               data-decorative
               className="relative flex shrink-0 items-center justify-center"
               style={{
-                width: Math.round(spec.valuePx * 0.78),
-                height: Math.round(spec.valuePx * 0.78),
-                borderRadius: Math.round(spec.valuePx * 0.18),
+                width: Math.round(spec.valuePx * 1.18),
+                height: Math.round(spec.valuePx * 1.18),
+                borderRadius: Math.round(spec.valuePx * 0.26),
                 background: `linear-gradient(160deg, ${hexA(aFig, mode === "dark" ? 0.28 : 0.16)} 0%, ${hexA(aFig, mode === "dark" ? 0.1 : 0.05)} 100%)`,
                 border: `1px solid ${hexA(aFig, mode === "dark" ? 0.4 : 0.24)}`,
                 color: aInk,
