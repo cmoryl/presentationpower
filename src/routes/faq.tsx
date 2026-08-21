@@ -323,8 +323,8 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
         a: "Anyone with a TransPerfect email can sign up. Admin privileges are granted automatically for @transperfect.com addresses on first confirmed sign-in.",
       },
       {
-        q: "What are the four surfaces in the top nav?",
-        a: "Presentation (decks + module library + Atlas), Print (long-form print studio), Event (event playbooks and kits), and Social (division-scoped social playbooks). All four share the same brief, brand modes, and knowledge base.",
+        q: "How is the navigation organised?",
+        a: "An Elements menu in the header holds the four production surfaces — Presentation, Print, Event, and Social — each with its own sub-options. Brief, Knowledge, Agent, and Admin sit alongside it. All surfaces share the same brief, brand modes, style packs, and knowledge base. On phones the same tree lives in the hamburger sheet.",
       },
       {
         q: "What's a master brief?",
@@ -610,7 +610,7 @@ const FAQS: Array<{ section: string; items: QA[] }> = [
       },
       {
         q: "What's in the Admin sidebar?",
-        a: "Overview (command center, Atlas, Templates, Print Studio, Audit log), Analytics (Master analytics, deck engagement, AI usage, A/B), Knowledge (hub, entries, Oracle, KB manager, approvals), Brand assets (assets, guides, LogoHub, Icon Studio, PDF ingestion), Translation, and Governance.",
+        a: "Overview (command center, Template Studio, team templates, print library, campaigns, audit log), Analytics (master analytics, deck engagement, AI usage & cost, imagery analytics, style-learning governance), Knowledge (hub, entries, Ask Oracle, Oracle KB, KB manager, approvals), Brand assets (assets, brand guides, LogoHub, Icon Studio, Open Canvas Studio, Module Studio, module editor, PDF ingestion, imagery), Translation (GlobalLink translate & share), and Governance (users & roles, team workspace).",
       },
       {
         q: "How do breadcrumbs work?",
