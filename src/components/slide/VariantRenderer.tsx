@@ -7373,49 +7373,67 @@ function renderVariantBody({
       );
 
     case "MV-IMG-MATRIX-4":
+      // Boxed media matrix: each pair is a card, not loose art + copy. Media is
+      // a full-height plate inside the card, copy sits in the panel beside it.
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "In practice")} />
           <div
-            className="slide-fill-stretch slide-fill-rows mt-10 grid grid-cols-2 gap-x-10 gap-y-10"
+            className="slide-fill-stretch slide-fill-rows mt-10 grid grid-cols-2 gap-x-8 gap-y-8"
             style={{ gridTemplateRows: "repeat(2, minmax(0, 1fr))" }}
           >
             {arr(c.items)
               .slice(0, 4)
               .map((it, i) => (
-                <div key={i} className="grid grid-cols-[240px_1fr] items-center gap-8">
-                  <MediaTile
-                    brand={brand}
-                    seed={s(it.seed, `mx-${i}`)}
-                    className="aspect-[4/3] w-full"
-                  />
-                  <div className="pt-2">
-                    <div
-                      className="tabular-nums uppercase"
-                      style={{
-                        fontSize: fillPx(18, "body"),
-                        letterSpacing: "0.28em",
-                        color: "var(--slide-accent-text)",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
+                <div key={i} data-intro-item="" data-intro-step={i} className="min-w-0">
+                  <GlassTile radius={26} padding="p-6" className="flex h-full min-w-0 gap-7">
+                    <MediaTile
+                      brand={brand}
+                      seed={s(it.seed, `mx-${i}`)}
+                      className="h-full w-[236px] shrink-0 rounded-[18px]"
+                    />
+                    <div className="flex min-w-0 flex-1 flex-col justify-center pr-1">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="grid place-items-center tabular-nums"
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 12,
+                            background: "color-mix(in oklab, var(--slide-accent-text) 14%, transparent)",
+                            color: "var(--slide-accent-text)",
+                            fontSize: fillPx(18, "body"),
+                            fontWeight: 700,
+                          }}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </div>
+                        <div
+                          aria-hidden
+                          style={{
+                            height: 2,
+                            flex: 1,
+                            background:
+                              "linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 34%, transparent), transparent)",
+                          }}
+                        />
+                      </div>
+                      <div
+                        className="mt-4"
+                        style={{
+                          fontSize: fillPx(30, "figure"),
+                          fontWeight: 600,
+                          letterSpacing: "-0.015em",
+                          color: ink.strong,
+                        }}
+                      >
+                        {s(it.label)}
+                      </div>
+                      <SupportingText size="md" opacity={0.75} className="mt-3">
+                        {s(it.body)}
+                      </SupportingText>
                     </div>
-                    <div
-                      className="mt-4"
-                      style={{
-                        fontSize: fillPx(30, "figure"),
-                        fontWeight: 600,
-                        letterSpacing: "-0.015em",
-                        color: ink.strong,
-                      }}
-                    >
-                      {s(it.label)}
-                    </div>
-                    <SupportingText size="md" opacity={0.75} className="mt-3">
-                      {s(it.body)}
-                    </SupportingText>
-                  </div>
+                  </GlassTile>
                 </div>
               ))}
           </div>
@@ -7423,41 +7441,59 @@ function renderVariantBody({
       );
 
     case "MV-IMG-MATRIX-6":
-      // Six tiles + captions in two rows: the tile height is fixed rather than
-      // aspect-derived, because a 16/9 tile at this column width makes the
-      // second row's caption run into the footer.
+      // Six boxed cards in two rows: media plate on top, copy in the panel
+      // below. Tile height stays fixed so the second row clears the footer.
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Program surface area")} />
-          <div className="mt-6 grid grid-cols-3 gap-x-8 gap-y-5">
+          <div className="mt-6 grid grid-cols-3 gap-x-7 gap-y-6">
             {arr(c.items)
               .slice(0, 6)
               .map((it, i) => (
-                <div key={i} className="min-w-0">
-                  <MediaTile
-                    brand={brand}
-                    seed={s(it.seed, `mx6-${i}`)}
-                    className="h-[226px] w-full"
-                  />
-                  <div
-                    className="mt-3 line-clamp-1"
-                    style={{
-                      fontSize: fillPx(24, "body"),
-                      fontWeight: 600,
-                      letterSpacing: "-0.01em",
-                      color: ink.strong,
-                    }}
-                  >
-                    {s(it.label)}
-                  </div>
-                  <SupportingText size="sm" opacity={0.72} className="mt-2 line-clamp-2">
-                    {s(it.body)}
-                  </SupportingText>
+                <div key={i} data-intro-item="" data-intro-step={i} className="min-w-0">
+                  <GlassTile radius={24} padding="p-5" className="flex h-full min-w-0 flex-col">
+                    <div className="relative">
+                      <MediaTile
+                        brand={brand}
+                        seed={s(it.seed, `mx6-${i}`)}
+                        className="h-[196px] w-full rounded-[16px]"
+                      />
+                      <div
+                        className="absolute left-3 top-3 grid place-items-center tabular-nums backdrop-blur"
+                        style={{
+                          width: 34,
+                          height: 34,
+                          borderRadius: 10,
+                          background: "color-mix(in oklab, var(--slide-accent-text) 82%, transparent)",
+                          color: "#ffffff",
+                          fontSize: fillPx(15, "body"),
+                          fontWeight: 700,
+                        }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </div>
+                    </div>
+                    <div
+                      className="mt-4 line-clamp-1"
+                      style={{
+                        fontSize: fillPx(24, "body"),
+                        fontWeight: 600,
+                        letterSpacing: "-0.01em",
+                        color: ink.strong,
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
+                    <SupportingText size="sm" opacity={0.72} className="mt-2 line-clamp-2">
+                      {s(it.body)}
+                    </SupportingText>
+                  </GlassTile>
                 </div>
               ))}
           </div>
         </SlideFrame>
       );
+
 
 
     case "MV-CLIENT-COMPARE":
