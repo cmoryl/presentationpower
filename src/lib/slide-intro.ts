@@ -118,6 +118,24 @@ const RECIPES: Record<string, IntroRecipe> = {
     durationMs: 560,
     leadMs: 260,
   },
+  // Donut / pie breakdowns are a two-act build: ACT 1 the ring draws itself
+  // segment by segment (clockwise from 12 o'clock) and the centre figure lands,
+  // ACT 2 the legend lists in from the left, one row per segment, in the same
+  // order the arcs were drawn — so the eye pairs each row with its slice.
+  donut: {
+    id: "donut",
+    label: "Ring draw + legend list",
+    keyframe: "tp-in-left",
+    order: "top-down",
+    stepMs: 150,
+    durationMs: 480,
+    leadMs: 820,
+    budgetMs: 2200,
+    arcLeadMs: 120,
+    arcDrawMs: 760,
+    arcStepMs: 170,
+  },
+
   // Hub & satellite layouts (centre disc + orbiting nodes + flanking copy):
   // the connector ring draws itself on, then the satellites radiate outward
   // along their own radius clockwise from 12 o'clock while the copy blocks
