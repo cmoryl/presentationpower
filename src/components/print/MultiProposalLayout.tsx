@@ -1121,19 +1121,19 @@ function RegionLocationsPage({
   const region = PROPOSAL_REGIONS.find((r) => r.region === regionKey);
   const cities = (region?.columns ?? []).flat();
   const cols = chunkCities(cities, cities.length > 40 ? 5 : cities.length > 18 ? 4 : 3);
-  const colW = 7.79 / Math.max(cols.length, 1);
+  const colW = HDR_CONTENT_W / Math.max(cols.length, 1);
   const title = lines(page.title).length ? lines(page.title) : [regionKey, "Locations"];
   const listCtx = usePrintLogoList();
   const pinPath = `pages.${pageIndex}.mapPins`;
   const pins = page.mapPins?.length ? page.mapPins : defaultWorldMapPins();
   const crop = WORLD_MAP_REGION_VIEWS[regionKey] ?? { x: 58, y: 138, w: 629, h: 343 };
   const mapBox = (() => {
-    const maxW = 7.9;
+    const maxW = HDR_CONTENT_W;
     const maxH = 4.3;
     const aspect = crop.w / crop.h;
     const w = Math.min(maxW, maxH * aspect);
     const h = w / aspect;
-    return { x: 0.47 + (maxW - w) / 2, w, h };
+    return { x: HDR.marginX + (maxW - w) / 2, w, h };
   })();
   return (
     <>
