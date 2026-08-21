@@ -6159,6 +6159,97 @@ function renderVariantBody({
         </SlideFrame>
       );
 
+    case "MV-SHOW-LAPTOP":
+    case "MV-SHOW-MONITOR": {
+      const kind = deviceKindFrom(
+        c.deviceKind,
+        variantId === "MV-SHOW-MONITOR" ? "monitor" : "laptop",
+      );
+      const tone = (["graphite", "silver", "ink"] as const).includes(
+        s(c.deviceTone) as "graphite",
+      )
+        ? (s(c.deviceTone) as "graphite" | "silver" | "ink")
+        : kind === "monitor"
+          ? "ink"
+          : "graphite";
+      const hasMedia = Boolean(s(c.mediaUrl) || s(c.mediaPath) || s(c.videoUrl) || s(c.videoPath));
+      const screen = hasMedia ? (
+        <MediaTile
+          brand={brand}
+          seed={s(c.mediaSeed, s(c.title, "device"))}
+          overrideUrl={s(c.mediaUrl)}
+          fit={s(c.mediaFit) || "cover"}
+          focus={s(c.mediaFocus) || undefined}
+          zoom={Number(c.mediaZoom) || undefined}
+          mediaPath={s(c.mediaPath)}
+          videoUrl={s(c.videoUrl)}
+          videoPosterUrl={s(c.videoPosterUrl)}
+          videoPath={s(c.videoPath)}
+          videoPosterPath={s(c.videoPosterPath)}
+          videoAutoplay={c.videoAutoplay as boolean | undefined}
+          videoLoop={c.videoLoop as boolean | undefined}
+          videoMuted={c.videoMuted as boolean | undefined}
+          videoControls={c.videoControls as boolean | undefined}
+          className="h-full w-full"
+        />
+      ) : (
+        <DeviceScreenPlaceholder accent="var(--slide-accent-text)" />
+      );
+
+      if (kind === "monitor") {
+        return (
+          <SlideFrame brand={brand} pageNumber={pageNumber}>
+            <div className="flex h-full flex-col items-center justify-center">
+              {s(c.eyebrow) && <Kicker brand={brand}>{s(c.eyebrow)}</Kicker>}
+              <SlideTitle brand={brand} title={s(c.title)} className="mt-4 text-center" />
+              <div className="mt-10 w-[64%]">
+                <DeviceFrame kind="monitor" tone={tone} accent="var(--slide-accent-text)">
+                  {screen}
+                </DeviceFrame>
+              </div>
+              {s(c.body) && (
+                <SupportingText
+                  size="lg"
+                  opacity={0.85}
+                  className="mt-10 text-center"
+                  maxWidthPx={1000}
+                >
+                  {s(c.body)}
+                </SupportingText>
+              )}
+              {s(c.caption) && (
+                <MetaRow className="mt-6">
+                  <span>{s(c.caption)}</span>
+                </MetaRow>
+              )}
+            </div>
+          </SlideFrame>
+        );
+      }
+
+      return (
+        <SlideFrame brand={brand} pageNumber={pageNumber}>
+          <div className="grid h-full grid-cols-[1.15fr_1fr] items-center gap-16">
+            <DeviceFrame kind="laptop" tone={tone} accent="var(--slide-accent-text)">
+              {screen}
+            </DeviceFrame>
+            <div className="flex flex-col justify-center">
+              {s(c.eyebrow) && <Kicker brand={brand}>{s(c.eyebrow)}</Kicker>}
+              <SlideTitle brand={brand} title={s(c.title)} className="mt-4" />
+              <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>
+                {s(c.body)}
+              </SupportingText>
+              {s(c.caption) && (
+                <MetaRow className="mt-12">
+                  <span>{s(c.caption)}</span>
+                </MetaRow>
+              )}
+            </div>
+          </div>
+        </SlideFrame>
+      );
+    }
+
     case "MV-IMG-GRID-3":
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
