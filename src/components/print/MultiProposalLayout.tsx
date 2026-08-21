@@ -1138,26 +1138,22 @@ function RegionLocationsPage({
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
-      <Img
-        x={6.38}
-        y={0.5}
-        w={1.88}
-        h={0.28}
-        src={logoWhite}
-        alt="TransPerfect"
-        slot="band.logo"
-        label="logo"
+      <SignatureHeader
+        title={title.join("\n")}
+        logo={logoWhite}
+        eyebrow={page.eyebrow || "Regional footprint"}
+        rule
       />
-      <T x={0.47} y={0.55} w={4} size={8.4} weight={700} color={AQUA_FIELD} upper tracking="0.16em">
-        {page.eyebrow || "Regional footprint"}
-      </T>
-      <T x={0.47} y={0.86} w={5.6} size={39.7} weight={700} leading={1.05} tracking="-0.02em">
-        {title.join("\n")}
-      </T>
-      <Rule x={0.47} y={2.34} w={7.79} color="rgba(255,255,255,0.28)" />
 
       {page.body ? (
-        <T x={0.47} y={2.52} w={5.4} size={9.2} leading={1.4} color="rgba(255,255,255,0.82)">
+        <T
+          x={HDR.marginX}
+          y={headerRuleY(title.length) + 0.18}
+          w={HDR_CONTENT_W * 0.72}
+          size={9.2}
+          leading={1.4}
+          color="rgba(255,255,255,0.82)"
+        >
           {page.body}
         </T>
       ) : null}
