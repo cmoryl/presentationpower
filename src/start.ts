@@ -1,7 +1,10 @@
 import { createStart, createMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
+// Local replacement for the generated `attachSupabaseAuth`: refreshes expired
+// sessions and retries once on 401 so users never see a raw
+// "No authorization header provided" error.
+import { attachAuthWithRefresh } from "@/lib/auth-fn-middleware";
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -19,6 +22,6 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
 });
 
 export const startInstance = createStart(() => ({
-  functionMiddleware: [attachSupabaseAuth],
+  functionMiddleware: [attachAuthWithRefresh],
   requestMiddleware: [errorMiddleware],
 }));
