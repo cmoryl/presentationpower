@@ -210,14 +210,21 @@ export function AdminSidebar() {
   );
 }
 
+function useAdminEditMode(): boolean {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Deep editors need the full width; the list/listing pages keep the sidebar.
+  return pathname.startsWith("/admin/print-library_/");
+}
+
 export function AdminShell() {
+  const editMode = useAdminEditMode();
   return (
     <AppShell>
       <div className="mb-4">
         <SessionRoleBanner />
       </div>
       <div className="flex flex-col gap-6 md:flex-row">
-        <AdminSidebar />
+        {!editMode && <AdminSidebar />}
         <div className="min-w-0 flex-1">
           <Outlet />
         </div>
