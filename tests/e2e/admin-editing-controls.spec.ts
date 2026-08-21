@@ -55,9 +55,11 @@ test.describe("Admin editing controls", () => {
     }
 
     // Glossary table renders its editable columns.
-    const text = await bodyText(page);
     for (const col of ["Term", "Scope", "Scope ID", "DNT"]) {
-      expect(text, `missing glossary column ${col}`).toContain(col);
+      await expect(
+        page.getByRole("columnheader", { name: col, exact: true }).first(),
+        `missing glossary column ${col}`,
+      ).toBeVisible();
     }
 
     // Typing into the term field must be accepted (field is not read-only).
@@ -68,7 +70,9 @@ test.describe("Admin editing controls", () => {
     await scope.selectOption("division");
     await expect(page.getByPlaceholder(/Division id/i)).toBeEnabled();
 
-    expect(text).not.toMatch(/access required|not authorized|Something went wrong/i);
+    expect(await bodyText(page)).not.toMatch(
+      /access required|not authorized|Something went wrong/i,
+    );
   });
 
   test("/admin/globallink-share exposes delivery settings controls", async ({ page, context }) => {
@@ -79,8 +83,10 @@ test.describe("Admin editing controls", () => {
     // configured (by design), so enablement is asserted conditionally.
     const testBtn = page.getByRole("button", { name: /Test connection/i }).first();
     await expect(testBtn).toBeVisible();
-    const connected = /Connected/i.test(await bodyText(page));
-    if (connected) await expect(testBtn).toBeEnabled();
+    // The button self-documents its gate via title; only assert enablement
+    // when credentials are actually configured in this environment.
+    const gated = /Configure credentials first/i.test((await testBtn.getAttribute("title")) ?? "");
+    if (!gated) await expect(testBtn).toBeEnabled();
     await expect(page.getByRole("button", { name: /Save defaults/i }).first()).toBeEnabled();
 
     // Editable default fields.
@@ -124,7 +130,12 @@ test.describe("Admin editing controls", () => {
     await expect(page.getByLabel("Variant Filter")).toBeEnabled();
 
     // Queue tabs are always interactive.
-    for (const tab of [/^Pending/i, /^Changes requested/i, /^Approved/i]) {
+    for (const tab of [
+      /^Pending/i,
+      /^Changes requested/i,
+      /^Expiring soon/i,
+      /^Recently reviewed/i,
+    ]) {
       await expect(page.getByRole("button", { name: tab }).first()).toBeEnabled();
     }
 
