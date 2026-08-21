@@ -1449,3 +1449,40 @@ body.export-mode [data-print-surface] {
   flex-direction: column;
   justify-content: center;
 }
+
+/* ── Phone tap-target floor (WCAG 2.5.8) ─────────────────────────────────
+   On phone-class widths every standalone control gets a 44px minimum edge
+   so touch accuracy doesn't depend on a designer remembering `min-h-11`.
+   Inline text controls that flow inside prose are exempt (per 2.5.8) and
+   opt out with `data-allow-small-tap`; dense desk-only surfaces opt out by
+   marking an ancestor with the same attribute. The regression suite
+   `tests/e2e/mobile-responsive-regression.spec.ts` enforces this. */
+@media (max-width: 480px) {
+  button:not([data-allow-small-tap]),
+  [role="button"]:not([data-allow-small-tap]),
+  [role="tab"]:not([data-allow-small-tap]),
+  [role="menuitem"]:not([data-allow-small-tap]),
+  summary:not([data-allow-small-tap]),
+  select:not([data-allow-small-tap]),
+  a[aria-label]:not([data-allow-small-tap]) {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 24px !important;
+    min-width: 24px !important;
+  }
+  [data-allow-small-tap] button,
+  [data-allow-small-tap] [role="button"],
+  [data-allow-small-tap] [role="tab"],
+  [data-allow-small-tap] summary,
+  [data-allow-small-tap] select {
+    min-height: 0 !important;
+    min-width: 0 !important;
+  }
+  label:has(> input[type="checkbox"]),
+  label:has(> input[type="radio"]) {
+    min-height: 44px;
+  }
+}
