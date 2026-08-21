@@ -551,8 +551,9 @@ function MasterItemEditorPage() {
           {draft.content ? (
             <>
               <p className="mt-2 text-[11px] text-black/50">
-                Click any text on the page to edit it in place. Drag the hero grip vertically to
-                resize the band. Fit now: {describeFit(fitKnobs)}
+                Click any text on the page to edit it in place.
+                {multiPage ? " " : " Drag the hero grip vertically to resize the band. "}
+                Fit now: {describeFit(fitKnobs)}
                 {fitMeasure && fitMeasure.overflowPx > 0
                   ? ` · ${fitMeasure.overflowPx}px past the trim`
                   : " · fits the trim"}
