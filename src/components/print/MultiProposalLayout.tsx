@@ -2579,7 +2579,14 @@ function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string
       {/* White statement bubble with a downward tail. */}
       <svg
         viewBox={`0 0 ${PAGE_W_IN} ${PAGE_H_IN}`}
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          // Decorative overlay: must never swallow clicks on the headshot tiles.
+          pointerEvents: "none",
+        }}
         aria-hidden
       >
         <path
