@@ -23,7 +23,8 @@ import {
 import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import type { StylePack } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
-import { BackdropSourcePicker } from "./BackdropSourcePicker";
+import { BackdropSourcePicker, divisionImageUrl } from "./BackdropSourcePicker";
+import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { SceneSlideStage } from "./SceneSlideStage";
 
 import type { BackdropShot } from "./BackdropLightbox";
@@ -231,6 +232,82 @@ export function BackgroundTuner({
     v: TemplateBackgroundOverride[K],
   ) => setEdit((e) => ({ ...e, [k]: v }));
 
+  // ── per-section replacement art: upload straight onto one section tile ──
+  const uploadFn = useServerFn(uploadDivisionImagery);
+  const [uploadingScene, setUploadingScene] = useState<string | null>(null);
+  const tileFileRef = useRef<HTMLInputElement>(null);
+  const tileTarget = useRef<SkinScene>("cover");
+
+  const replaceSceneArt = useCallback(
+    async (target: SkinScene, file: File) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Pick an image file.");
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        toast.error("Image exceeds 20MB.");
+        return;
+      }
+      setUploadingScene(target);
+      try {
+        const b64 = await new Promise<string>((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result as string);
+          r.onerror = () => reject(r.error);
+          r.readAsDataURL(file);
+        });
+        const row = (await uploadFn({
+          data: {
+            divisionId: "transperfect",
+            filename: file.name,
+            contentType: file.type || "image/png",
+            data: b64,
+            kind: "abstract",
+            tags: ["backdrop", "template", code.toLowerCase(), target],
+            note: `Replacement background for ${code} · ${SCENE_LABEL[target] ?? target}`,
+          },
+        })) as { storage_path?: string };
+        if (!row?.storage_path) throw new Error("Upload returned no path.");
+        const url = divisionImageUrl(row.storage_path);
+        const base = mine.find((o) => o.scene === target) ?? defaultOverride(code, target);
+        await persist(target, { ...base, imageUrl: url });
+        await loadTemplateRegistry(true);
+        onChanged();
+        if (target === scene) {
+          skipNextSave.current = true;
+          setEdit((e) => ({ ...e, imageUrl: url }));
+        }
+        toast.success(`${SCENE_LABEL[target] ?? target} background replaced.`);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Upload failed.");
+      } finally {
+        setUploadingScene(null);
+      }
+    },
+    [uploadFn, code, mine, persist, onChanged, scene],
+  );
+
+  const clearSceneArt = useCallback(
+    async (target: SkinScene) => {
+      const base = mine.find((o) => o.scene === target) ?? defaultOverride(code, target);
+      try {
+        await persist(target, { ...base, imageUrl: null });
+        await loadTemplateRegistry(true);
+        onChanged();
+        if (target === scene) {
+          skipNextSave.current = true;
+          setEdit((e) => ({ ...e, imageUrl: null }));
+        }
+        toast.success("Back to the look's own artwork.");
+      } catch (e) {
+        toast.error((e as Error).message);
+      }
+    },
+    [mine, code, persist, onChanged, scene],
+  );
+
+
+
   const swatches = [
     pack.tokens.accent,
     pack.tokens.accentAlt,
@@ -430,27 +507,58 @@ export function BackgroundTuner({
               </span>
             )}
           </div>
+          <p className="mb-2 text-[11px] opacity-60">
+            Each section can keep the look's own artwork or use a picture you upload — drop a file on
+            a tile, or use “Replace”.
+          </p>
+          <input
+            ref={tileFileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void replaceSceneArt(tileTarget.current, f);
+              e.target.value = "";
+            }}
+          />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {SKIN_SCENES.map((s) => {
               const o = mine.find((x) => x.scene === s);
               const live = s === scene ? previewLayers : layersFor(o ?? defaultOverride(code, s), s);
               const on = s === scene;
+              const custom = s === scene ? !!edit.imageUrl : !!o?.imageUrl;
+              const uploading = uploadingScene === s;
               return (
-                <button
+                <div
                   key={s}
-                  type="button"
-                  onClick={() => setScene(s as SkinScene)}
-                  aria-pressed={on}
-                  className={`group flex min-w-0 flex-col gap-1.5 rounded-xl border p-2 text-left transition ${
+                  onDragOver={(e) => {
+                    if (e.dataTransfer.types.includes("Files")) e.preventDefault();
+                  }}
+                  onDrop={(e) => {
+                    const f = e.dataTransfer.files?.[0];
+                    if (f) {
+                      e.preventDefault();
+                      void replaceSceneArt(s as SkinScene, f);
+                    }
+                  }}
+                  className={`group relative flex min-w-0 flex-col gap-1.5 rounded-xl border p-2 text-left transition ${
                     on
                       ? "border-[#003FC7] bg-[#003FC7]/5 ring-2 ring-[#003FC7]/25"
                       : "border-black/10 hover:border-[#003FC7]/50 dark:border-white/15"
                   }`}
                 >
-                  <span
-                    className="block aspect-[16/9] w-full rounded-lg border border-black/10 dark:border-white/15"
-                    style={{ background: live.join(", ") }}
-                  />
+                  <button
+                    type="button"
+                    onClick={() => setScene(s as SkinScene)}
+                    aria-pressed={on}
+                    className="block w-full text-left"
+                  >
+                    <span
+                      className="block aspect-[16/9] w-full rounded-lg border border-black/10 dark:border-white/15"
+                      style={{ background: live.join(", ") }}
+                    />
+                  </button>
                   <span className="flex min-w-0 items-center justify-between gap-1.5">
                     <span
                       className={`text-xs font-semibold leading-tight ${on ? "text-[#003FC7]" : ""}`}
@@ -463,9 +571,37 @@ export function BackgroundTuner({
                       </span>
                     )}
                   </span>
-                </button>
+                  <span className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      disabled={uploading}
+                      onClick={() => {
+                        tileTarget.current = s as SkinScene;
+                        tileFileRef.current?.click();
+                      }}
+                      className="rounded-full border border-black/12 px-2 py-0.5 text-[10px] font-semibold transition hover:border-[#003FC7]/60 hover:text-[#003FC7] disabled:opacity-40 dark:border-white/15"
+                    >
+                      {uploading ? "Uploading…" : custom ? "Replace" : "↑ Upload"}
+                    </button>
+                    {custom && !uploading && (
+                      <button
+                        type="button"
+                        onClick={() => void clearSceneArt(s as SkinScene)}
+                        className="rounded-full border border-black/12 px-2 py-0.5 text-[10px] transition hover:border-red-400 hover:text-red-600 dark:border-white/15"
+                      >
+                        Remove
+                      </button>
+                    )}
+                    {custom && (
+                      <span className="ml-auto text-[9px] font-semibold uppercase tracking-wide text-[#003FC7]">
+                        yours
+                      </span>
+                    )}
+                  </span>
+                </div>
               );
             })}
+
           </div>
 
         </div>
