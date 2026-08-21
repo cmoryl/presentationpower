@@ -61,6 +61,8 @@ import { composeEffectivePack } from "@/lib/effective-pack";
 
 import { stylePackById } from "@/lib/style-packs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
+import { useTemplateRegistryVersion } from "@/hooks/use-template-registry";
+
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { LazyMount } from "@/components/LazyMount";
