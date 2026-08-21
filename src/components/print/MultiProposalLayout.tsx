@@ -717,13 +717,18 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
         />
       </svg>
 
+      {/* One text box (spans, not block divs) so the live-edit overlay can match
+          the whole authored `title` string — block children concatenate without
+          whitespace in textContent and never match the stored value. */}
       <T x={1.2} y={0.94} w={4.6} size={37} weight={400} leading={1.28} tracking="-0.015em">
         {headline.map((line, i) => (
-          <div key={i} style={{ fontWeight: i === headline.length - 1 ? 700 : 400 }}>
+          <span key={i} style={{ fontWeight: i === headline.length - 1 ? 700 : 400 }}>
             {line}
-          </div>
+            {i < headline.length - 1 ? "\n" : ""}
+          </span>
         ))}
       </T>
+
 
       {/* Column divider + hairlines */}
       <L x={3.62} y={5.42} w={0.01} h={3.5} style={{ background: "rgba(255,255,255,0.35)" }} />
