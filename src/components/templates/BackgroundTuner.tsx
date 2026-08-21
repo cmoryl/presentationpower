@@ -232,6 +232,82 @@ export function BackgroundTuner({
     v: TemplateBackgroundOverride[K],
   ) => setEdit((e) => ({ ...e, [k]: v }));
 
+  // ── per-section replacement art: upload straight onto one section tile ──
+  const uploadFn = useServerFn(uploadDivisionImagery);
+  const [uploadingScene, setUploadingScene] = useState<string | null>(null);
+  const tileFileRef = useRef<HTMLInputElement>(null);
+  const tileTarget = useRef<SkinScene>("cover");
+
+  const replaceSceneArt = useCallback(
+    async (target: SkinScene, file: File) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Pick an image file.");
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        toast.error("Image exceeds 20MB.");
+        return;
+      }
+      setUploadingScene(target);
+      try {
+        const b64 = await new Promise<string>((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result as string);
+          r.onerror = () => reject(r.error);
+          r.readAsDataURL(file);
+        });
+        const row = (await uploadFn({
+          data: {
+            divisionId: "transperfect",
+            filename: file.name,
+            contentType: file.type || "image/png",
+            data: b64,
+            kind: "abstract",
+            tags: ["backdrop", "template", code.toLowerCase(), target],
+            note: `Replacement background for ${code} · ${SCENE_LABEL[target] ?? target}`,
+          },
+        })) as { storage_path?: string };
+        if (!row?.storage_path) throw new Error("Upload returned no path.");
+        const url = divisionImageUrl(row.storage_path);
+        const base = mine.find((o) => o.scene === target) ?? defaultOverride(code, target);
+        await persist(target, { ...base, imageUrl: url });
+        await loadTemplateRegistry(true);
+        onChanged();
+        if (target === scene) {
+          skipNextSave.current = true;
+          setEdit((e) => ({ ...e, imageUrl: url }));
+        }
+        toast.success(`${SCENE_LABEL[target] ?? target} background replaced.`);
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : "Upload failed.");
+      } finally {
+        setUploadingScene(null);
+      }
+    },
+    [uploadFn, code, mine, persist, onChanged, scene],
+  );
+
+  const clearSceneArt = useCallback(
+    async (target: SkinScene) => {
+      const base = mine.find((o) => o.scene === target) ?? defaultOverride(code, target);
+      try {
+        await persist(target, { ...base, imageUrl: null });
+        await loadTemplateRegistry(true);
+        onChanged();
+        if (target === scene) {
+          skipNextSave.current = true;
+          setEdit((e) => ({ ...e, imageUrl: null }));
+        }
+        toast.success("Back to the look's own artwork.");
+      } catch (e) {
+        toast.error((e as Error).message);
+      }
+    },
+    [mine, code, persist, onChanged, scene],
+  );
+
+
+
   const swatches = [
     pack.tokens.accent,
     pack.tokens.accentAlt,
