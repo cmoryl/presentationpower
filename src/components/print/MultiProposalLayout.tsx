@@ -1188,7 +1188,7 @@ function RegionLocationsPage({
         Client Service &amp; Production
       </T>
 
-      <Rule x={0.47} y={7.9} w={7.79} color="rgba(255,255,255,0.18)" />
+      <Rule x={HDR.marginX} y={7.9} w={HDR_CONTENT_W} color="rgba(255,255,255,0.18)" />
       <T x={0.47} y={8.04} w={3} size={13.8} weight={700} tracking="-0.01em">
         {regionKey}
       </T>
