@@ -408,8 +408,11 @@ function FitT({
       return;
     }
     const b = boundsRef.current;
-    if (b.done) return;
     const fits = inner.scrollHeight <= limit + 0.5;
+    if (b.done) {
+      report(fits, factor <= floor + 0.001);
+      return;
+    }
 
     setFactor((prev) => {
       if (fits) b.lo = Math.max(b.lo, prev);
@@ -428,7 +431,8 @@ function FitT({
       const next = Math.max(floor, (Math.max(b.lo, floor) + b.hi) / 2);
       return Math.abs(next - prev) > 0.001 ? next : prev;
     });
-  }, [floor, size, w, maxH]);
+  }, [floor, size, w, maxH, factor, report]);
+
 
 
   useLayoutEffect(() => {
