@@ -1985,14 +1985,17 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         }}
         aria-hidden
       >
+        {/* Rails start/stop inside the card corner radius (0.34in) so they never
+            run past the rounded corners or off the trim edge. */}
         <g stroke="rgba(3,0,44,0.85)" strokeWidth={0.012} fill="rgba(3,0,44,0.85)">
-          <path d="M0.44 1.89 L4.05 1.89" />
+          <path d="M0.98 1.89 L4.05 1.89" />
           <path d="M4.05 1.83 L4.22 1.89 L4.05 1.95 Z" />
-          <path d="M8.02 6.25 L3.95 6.25" />
+          <path d="M7.68 6.25 L3.95 6.25" />
           <path d="M3.95 6.19 L3.78 6.25 L3.95 6.31 Z" />
-          <path d="M0.64 10.42 L4.05 10.42" />
+          <path d="M0.98 10.42 L4.05 10.42" />
           <path d="M4.05 10.36 L4.22 10.42 L4.05 10.48 Z" />
         </g>
+
       </svg>
 
       {/* Card 1 */}
@@ -2042,29 +2045,31 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         slot="stories.photo.2"
         label="photo"
       />
+      {/* Card 2 copy stack sits fully BELOW the card's top rule (y = 6.8in). */}
       <StoryLogo
         x={1.07}
-        y={6.62}
+        y={6.98}
         w={3.44}
-        h={0.62}
+        h={0.56}
         company={second?.company || "Lavazza"}
         slot="stories.logo.2"
         align="right"
       />
-      <Dots x={3.94} y={7.4} color={BLUE} />
-      <T x={1.07} y={7.68} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
+      <Dots x={3.94} y={7.66} color={BLUE} />
+      <T x={1.07} y={7.9} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.headline || ""}
       </T>
       <QuoteBody
         x={1.07}
-        y={8.16}
+        y={8.36}
         w={3.44}
-        maxH={1.1}
+        maxH={1.02}
         size={10}
         quote={second}
         align="right"
       />
-      <QuoteAttribution x={1.07} y={9.34} w={3.44} size={10} quote={second} align="right" />
+      <QuoteAttribution x={1.07} y={9.52} w={3.44} size={10} quote={second} align="right" />
+
 
     </>
   );
