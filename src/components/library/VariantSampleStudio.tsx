@@ -390,6 +390,29 @@ export function VariantSampleStudio({
     return () => root.removeEventListener("click", onClick, true);
   }, [items, logoCells, isStepChain]);
 
+  // ── Ring the focused step tile on the slide ───────────────────────────
+  // Purely a preview affordance: a soft aqua ring drawn on the DOM node so it
+  // never enters the exported/saved content.
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root || !isStepChain) return;
+    const tiles = Array.from(root.querySelectorAll<HTMLElement>("[data-step-tile]"));
+    tiles.forEach((node, i) => {
+      const on = activeStep === i;
+      node.style.outline = on ? "2px solid #A1FBF9" : "";
+      node.style.outlineOffset = on ? "6px" : "";
+      node.style.borderRadius = on ? "16px" : "";
+    });
+    return () => {
+      tiles.forEach((node) => {
+        node.style.outline = "";
+        node.style.outlineOffset = "";
+        node.style.borderRadius = "";
+      });
+    };
+  }, [isStepChain, activeStep, copy, mode]);
+
+
   // ── Double-click any photo on the slide → open the image picker ────────
   // Single click already selects + opens, but double-click is the muscle
   // memory people bring from design tools, and it also catches photos that
