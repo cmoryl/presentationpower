@@ -779,7 +779,14 @@ export type MultiProposalPage = {
     author?: string;
     role?: string;
     company?: string;
+    /**
+     * Per-quote authored point size for the body copy. Auto-fit still shrinks
+     * from here when a long quote runs past its card, so a bumped size never
+     * clips — it just sets the ceiling for THIS quote.
+     */
+    sizePt?: number;
   }>;
+
   costRows?: ProposalCostRow[];
   costTotalLabel?: string;
   costTotal?: string;
