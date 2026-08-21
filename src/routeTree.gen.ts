@@ -44,6 +44,7 @@ import { Route as SocialBannersRouteImport } from './routes/social.banners'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
+import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
 import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library.industry-backgrounds'
@@ -310,6 +311,11 @@ const PublicStylesRoute = PublicStylesRouteImport.update({
 const PublicModulesRoute = PublicModulesRouteImport.update({
   id: '/public/modules',
   path: '/public/modules',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrintAgentThreadIdRoute = PrintAgentThreadIdRouteImport.update({
+  id: '/print-agent/$threadId',
+  path: '/print-agent/$threadId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryPrintRoute = LibraryPrintRouteImport.update({
@@ -868,6 +874,7 @@ export interface FileRoutesByFullPath {
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -993,6 +1000,7 @@ export interface FileRoutesByTo {
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1123,6 +1131,7 @@ export interface FileRoutesById {
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1254,6 +1263,7 @@ export interface FileRouteTypes {
     | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
+    | '/print-agent/$threadId'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1379,6 +1389,7 @@ export interface FileRouteTypes {
     | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
+    | '/print-agent/$threadId'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1508,6 +1519,7 @@ export interface FileRouteTypes {
     | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
+    | '/print-agent/$threadId'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1604,6 +1616,7 @@ export interface RootRouteChildren {
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
+  PrintAgentThreadIdRoute: typeof PrintAgentThreadIdRoute
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -1876,6 +1889,13 @@ declare module '@tanstack/react-router' {
       path: '/public/modules'
       fullPath: '/public/modules'
       preLoaderRoute: typeof PublicModulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print-agent/$threadId': {
+      id: '/print-agent/$threadId'
+      path: '/print-agent/$threadId'
+      fullPath: '/print-agent/$threadId'
+      preLoaderRoute: typeof PrintAgentThreadIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/print': {
@@ -2729,6 +2749,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
+  PrintAgentThreadIdRoute: PrintAgentThreadIdRoute,
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,
