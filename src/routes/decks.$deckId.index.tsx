@@ -596,11 +596,16 @@ function DeckEditor() {
                   <EditorMenu
                     label="Look & feel"
                     hint={
-                      (deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === "enterprise-white"
+                      // Show the deck's recorded style pack when it has one —
+                      // the base skin alone read as "Flagship 2026" even after
+                      // an approved look (e.g. Element System) was applied.
+                      pack?.label ??
+                      ((deck.context?.skin ?? DEFAULT_SLIDE_SKIN) === "enterprise-white"
                         ? "Enterprise White"
-                        : "Flagship 2026"
+                        : "Flagship 2026")
                     }
                   >
+
                     <EditorMenuRow
                       label="Base skin"
                       hint="Brand chrome for every slide"
