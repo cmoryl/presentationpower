@@ -134,6 +134,25 @@ export function ExportProposalButton({
     };
   }, [pending, mode, pageSize, safe, title, selected, settle]);
 
+  // Collect the live page nodes for the preview once the offscreen host mounts.
+  useEffect(() => {
+    if (!previewOpen) {
+      setPreviewNodes([]);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      await settle();
+      if (cancelled) return;
+      const host = hostRef.current;
+      const all = host ? Array.from(host.querySelectorAll<HTMLElement>("[data-print-page]")) : [];
+      setPreviewNodes(selected.size ? all.filter((_, i) => selected.has(i)) : all);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [previewOpen, selected, settle]);
+
   function toggleMenu() {
     setOpen((v) => {
       const next = !v;
