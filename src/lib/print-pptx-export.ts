@@ -24,6 +24,11 @@ import { withExportChrome } from "./export-chrome-suppress";
 import { PRINT_PAGE_PRESETS, resolvePrintPixelWidth } from "./print-asset-export";
 import { spaceForTrim, withExportSlideBounds } from "./export-space";
 import { capturePrintPageLayers } from "./print-pptx-layered";
+import {
+  checkExportAspect,
+  logAspectReport,
+  type AspectCheckReport,
+} from "./export-aspect-check";
 import type { PrintMode, PrintPageSize } from "./print-assets.types";
 
 export type PrintPptxOptions = {
@@ -40,6 +45,12 @@ export type PrintPptxOptions = {
    * "flat" ships one raster per page.
    */
   fidelity?: "editable" | "flat";
+  /**
+   * Fires with the aspect-ratio preflight before any page is captured. Slides are
+   * letterboxed rather than stretched, so a mismatch costs empty bands, not
+   * distortion — but the user still wants to know.
+   */
+  onAspectReport?: (report: AspectCheckReport) => void;
 };
 
 /** Re-encode a PNG data URL as opaque JPEG so PowerPoint files stay openable. */
@@ -79,7 +90,7 @@ function trimOf(opts: PrintPptxOptions): { widthIn: number; heightIn: number } {
 export async function exportPrintPagesAsPptx(
   nodes: HTMLElement | HTMLElement[],
   opts: PrintPptxOptions = {},
-): Promise<void> {
+): Promise<AspectCheckReport> {
   const pages = (Array.isArray(nodes) ? nodes : [nodes]).filter(Boolean);
   if (pages.length === 0) throw new Error("exportPrintPagesAsPptx: no pages provided.");
 
@@ -91,6 +102,26 @@ export async function exportPrintPagesAsPptx(
   pptx.defineLayout({ name: "PRINT_PAGE", width: widthIn, height: heightIn });
   pptx.layout = "PRINT_PAGE";
   if (opts.title) pptx.title = opts.title;
+
+  // --- aspect preflight (letterbox fit) ------------------------------------
+  const aspectReport = logAspectReport(
+    "print-pptx-export",
+    checkExportAspect(pages, {
+      widthIn,
+      heightIn,
+      fit: "letterbox",
+      labels: pages.map(
+        (n, i) =>
+          `Page ${i + 1}` +
+          (n.getAttribute("data-proposal-page") || n.getAttribute("data-page-kind")
+            ? ` (${(n.getAttribute("data-proposal-page") || n.getAttribute("data-page-kind"))!
+                .replace(/[-_]+/g, " ")
+                .replace(/\b\w/g, (c) => c.toUpperCase())})`
+            : ""),
+      ),
+    }),
+  );
+  opts.onAspectReport?.(aspectReport);
 
   const slideRatio = widthIn / heightIn;
   const editable = (opts.fidelity ?? "editable") === "editable";
@@ -181,6 +212,7 @@ export async function exportPrintPagesAsPptx(
   const fixed = await reorderPresentationXml(native);
   triggerDownload(fixed, fileName);
 
+  return aspectReport;
 }
 
 async function reorderPresentationXml(blob: Blob): Promise<Blob> {

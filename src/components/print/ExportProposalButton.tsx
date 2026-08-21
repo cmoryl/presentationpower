@@ -12,8 +12,17 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-import { CheckSquare, Eye, FileDown, FileText, Presentation, Square } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckSquare,
+  Eye,
+  FileDown,
+  FileText,
+  Presentation,
+  Square,
+} from "lucide-react";
 import { toast } from "sonner";
+import type { AspectCheckReport } from "@/lib/export-aspect-check";
 import type { PrintMode, PrintPageSize } from "@/lib/print-assets.types";
 import { PptxLayoutPreview } from "./PptxLayoutPreview";
 
@@ -49,6 +58,9 @@ export function ExportProposalButton({
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewNodes, setPreviewNodes] = useState<HTMLElement[]>([]);
+  // Aspect-ratio preflight for the pages currently in the host. Measured against
+  // the PDF's stretch fit — the worst case of the two formats.
+  const [aspect, setAspect] = useState<AspectCheckReport | null>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const runRef = useRef<Fmt | null>(null);
 
@@ -75,12 +87,33 @@ export function ExportProposalButton({
       const found = nodes.map((n, i) => ({ index: i, label: labelFor(n, i) }));
       setPages(found);
       setSelected(new Set(found.map((p) => p.index)));
+      if (nodes.length > 0) {
+        const [{ checkExportAspect }, { PRINT_PAGE_PRESETS }] = await Promise.all([
+          import("@/lib/export-aspect-check"),
+          import("@/lib/print-asset-export"),
+        ]);
+        const trim = (
+          PRINT_PAGE_PRESETS as Record<string, { widthIn: number; heightIn: number }>
+        )[String(pageSize)] ?? { widthIn: 8.5, heightIn: 11 };
+        if (!cancelled) {
+          setAspect(
+            checkExportAspect(nodes, {
+              widthIn: trim.widthIn,
+              heightIn: trim.heightIn,
+              fit: "stretch",
+              labels: found.map((p) => p.label),
+            }),
+          );
+        }
+      } else if (!cancelled) {
+        setAspect(null);
+      }
       setScanning(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, [scanning, settle]);
+  }, [scanning, settle, pageSize]);
 
   // Once the offscreen document has mounted, capture and write the file.
   useEffect(() => {
@@ -104,6 +137,7 @@ export function ExportProposalButton({
             mode,
             format: "digital",
             filename: `${safe}.pdf`,
+            onAspectReport: setAspect,
           });
         } else {
           const { exportPrintPagesAsPptx } = await import("@/lib/print-pptx-export");
@@ -112,11 +146,23 @@ export function ExportProposalButton({
             mode,
             title,
             filename: `${safe}.pptx`,
+            onAspectReport: setAspect,
           });
         }
         toast.success(
           `Exported ${nodes.length} page${nodes.length === 1 ? "" : "s"} as ${fmt.toUpperCase()}`,
         );
+        // Aspect warnings are reported by the exporters through onAspectReport;
+        // re-check the freshest state so the user hears about a distorted page.
+        const { formatAspectWarning } = await import("@/lib/export-aspect-check");
+        setAspect((current) => {
+          const warning = current ? formatAspectWarning(current) : null;
+          if (warning) {
+            if (current!.severity === "error") toast.error(warning, { duration: 10000 });
+            else toast.warning(warning, { duration: 8000 });
+          }
+          return current;
+        });
       } catch (err) {
         console.error("Proposal export failed", err);
         const { describeCaptureFailure } = await import("@/lib/slide-image-export");
@@ -246,6 +292,23 @@ export function ExportProposalButton({
               );
             })}
           </div>
+
+          {aspect && aspect.severity !== "ok" && (
+            <div
+              className={`mx-1 mb-1 flex gap-1.5 rounded-lg px-2 py-1.5 text-[10px] leading-snug ${
+                aspect.severity === "error"
+                  ? "bg-[#E53D2E]/10 text-[#8f1f14]"
+                  : "bg-[#FFEB66]/40 text-[#5a4b00]"
+              }`}
+              role="status"
+            >
+              <AlertTriangle size={12} className="mt-px shrink-0" aria-hidden />
+              <span>
+                <strong className="font-semibold">Aspect check:</strong> {aspect.summary} PDF
+                stretches these pages to the trim; PowerPoint letterboxes them.
+              </span>
+            </div>
+          )}
 
           <div className="mt-1 border-t border-black/10 pt-1">
             <p className="px-2.5 pb-1 text-[10px] text-[#666]">

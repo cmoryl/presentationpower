@@ -21,6 +21,11 @@ import {
 import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
 import { extendRasterForBleed } from "./print-bleed-extend";
 import {
+  checkExportAspect,
+  logAspectReport,
+  type AspectCheckReport,
+} from "./export-aspect-check";
+import {
   captureVectorText,
   enableHideTextForCapture,
   overlayVectorText,
@@ -127,6 +132,13 @@ export interface PrintExportOptions {
   vectorText?: boolean;
   /** Fires once the vector-text overlay has been drawn (diagnostics). */
   onVectorTextReport?: (report: VectorTextReport) => void;
+  /**
+   * Fires with the aspect-ratio preflight result before any page is rasterized.
+   * PDF placement stretches each page raster across the full page box, so a page
+   * whose rendered ratio drifts from the trim distorts — this is how the UI hears
+   * about it.
+   */
+  onAspectReport?: (report: AspectCheckReport) => void;
 }
 
 export interface VectorTextReport {
@@ -137,6 +149,14 @@ export interface VectorTextReport {
   rasterBytes: number;
   finalBytes: number;
   skippedClamped: number;
+}
+
+/** Readable page name for the aspect report: page kind, else ordinal. */
+function labelForPage(node: HTMLElement, index: number): string {
+  const kind =
+    node.getAttribute?.("data-proposal-page") || node.getAttribute?.("data-page-kind") || "";
+  const pretty = kind.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return `Page ${index + 1}${pretty ? ` (${pretty})` : ""}`;
 }
 
 function resolveTrim(opts: PrintExportOptions): PrintPageDimensions {
@@ -265,6 +285,20 @@ export async function exportPrintAssetAsPdf(
   const bleedRasterPx = Math.round(bleed * resolved.dpi);
   let bleedApproximated = false;
 
+
+  // --- aspect preflight -----------------------------------------------------
+  // Measured against the TRIM box: that is the geometry the capture is placed
+  // into (the bleed band is generated, not rendered).
+  const aspectReport = logAspectReport(
+    "print-asset-export",
+    checkExportAspect(pages, {
+      widthIn: trim.widthIn,
+      heightIn: trim.heightIn,
+      fit: "stretch",
+      labels: pages.map((n, i) => labelForPage(n, i)),
+    }),
+  );
+  opts.onAspectReport?.(aspectReport);
 
   const orientation: "landscape" | "portrait" = pageWidth >= pageHeight ? "landscape" : "portrait";
   const pdf = new jsPDF({
