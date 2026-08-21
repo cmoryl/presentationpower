@@ -173,6 +173,13 @@ export function VariantSampleStudio({
   const [newKind, setNewKind] = useState<string>("body");
   /** Cell selected by clicking its photo / icon on the rendered slide. */
   const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
+  /**
+   * Step-chain focus: which numbered step is being edited. Clicking a tile on
+   * the slide (or a chip in the copy tab) narrows the field list to that step's
+   * own fields so long chains stay editable one step at a time.
+   */
+  const [stepFocus, setStepFocus] = useState<number | null>(null);
+
   const [uploading, setUploading] = useState<number | null>(null);
   /** Index of the imagery cell whose picker modal is open. */
   const [pickerFor, setPickerFor] = useState<number | null>(null);
@@ -217,6 +224,30 @@ export function VariantSampleStudio({
   const fields = useMemo(() => collectStringPaths(copy), [copy]);
   const items = Array.isArray(copy.items) ? (copy.items as Record<string, unknown>[]) : null;
   const isLogoModule = /LOGO/i.test(variant.id);
+  const isStepChain = variant.id === "MV-PROC-STEP-CHAIN";
+  /** Steps actually rendered by the chain (the renderer caps at nine). */
+  const stepCount = isStepChain ? Math.min(items?.length ?? 0, 9) : 0;
+  /** Focused step, clamped to what is on the slide right now. */
+  const activeStep =
+    isStepChain && stepFocus !== null && stepFocus < stepCount ? stepFocus : null;
+  /**
+   * Copy-tab field list. With a step picked, show only that step's own text
+   * fields — including ones that are still empty (highlight / note), so a step
+   * can be annotated without leaving the studio.
+   */
+  const visibleFields = useMemo(() => {
+    if (activeStep === null) return fields;
+    const prefix = `items[${activeStep}].`;
+    const textKeys = Object.entries(variant.capacity?.items?.fields ?? {})
+      .filter(([, def]) => (def as { kind?: string })?.kind !== "icon")
+      .map(([key]) => key);
+    const keys = textKeys.length ? textKeys : ["label", "body"];
+    const own = keys.map((k) => `${prefix}${k}`);
+    const extra = fields.filter((p) => p.startsWith(prefix) && !own.includes(p));
+    return [...own, ...extra];
+  }, [fields, activeStep, variant]);
+
+
   const logoCells = useMemo(() => collectLogoCells(copy, isLogoModule), [copy, isLogoModule]);
   const capacity = variant.capacity?.items;
   const busy = save.isPending || reset.isPending;
@@ -309,6 +340,23 @@ export function VariantSampleStudio({
       const t = e.target as HTMLElement | null;
       if (!t) return;
       if (t.closest("[data-crop-overlay]")) return;
+      // Step chain: clicking a tile picks that step for editing. Text inside a
+      // tile still belongs to live edit, and Alt-click keeps the icon gallery.
+      if (isStepChain && !e.altKey && !t.closest('[contenteditable="true"]')) {
+        const stepTile = t.closest("[data-step-tile]");
+        if (stepTile) {
+          const order = Array.from(root.querySelectorAll("[data-step-tile]"));
+          const index = order.indexOf(stepTile);
+          if (index >= 0) {
+            e.preventDefault();
+            e.stopPropagation();
+            setStepFocus(index);
+            setTab("copy");
+            return;
+          }
+        }
+      }
+
       const logo = t.closest("[data-logo-tile]");
       const tile = logo ? null : t.closest("[data-media-tile]");
       const well = logo || tile ? null : t.closest("[data-icon-well]");
@@ -340,7 +388,30 @@ export function VariantSampleStudio({
     };
     root.addEventListener("click", onClick, true);
     return () => root.removeEventListener("click", onClick, true);
-  }, [items, logoCells]);
+  }, [items, logoCells, isStepChain]);
+
+  // ── Ring the focused step tile on the slide ───────────────────────────
+  // Purely a preview affordance: a soft aqua ring drawn on the DOM node so it
+  // never enters the exported/saved content.
+  useEffect(() => {
+    const root = stageRef.current;
+    if (!root || !isStepChain) return;
+    const tiles = Array.from(root.querySelectorAll<HTMLElement>("[data-step-tile]"));
+    tiles.forEach((node, i) => {
+      const on = activeStep === i;
+      node.style.outline = on ? "2px solid #A1FBF9" : "";
+      node.style.outlineOffset = on ? "6px" : "";
+      node.style.borderRadius = on ? "16px" : "";
+    });
+    return () => {
+      tiles.forEach((node) => {
+        node.style.outline = "";
+        node.style.outlineOffset = "";
+        node.style.borderRadius = "";
+      });
+    };
+  }, [isStepChain, activeStep, copy, mode]);
+
 
   // ── Double-click any photo on the slide → open the image picker ────────
   // Single click already selects + opens, but double-click is the muscle
@@ -1088,18 +1159,65 @@ export function VariantSampleStudio({
           ) : tab === "copy" ? (
             <>
               <p className="mt-3 text-[11px] text-white/50">
-                {liveEdit
-                  ? "Click any text on the slide to edit in place, or type here."
-                  : "Live edit is off — type here to change copy."}
+                {isStepChain
+                  ? "Click a step on the slide to edit just that step, or pick one below."
+                  : liveEdit
+                    ? "Click any text on the slide to edit in place, or type here."
+                    : "Live edit is off — type here to change copy."}
               </p>
+              {isStepChain && stepCount > 0 && (
+                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                  <div className="text-[10px] uppercase tracking-widest text-white/40">
+                    Edit step
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setStepFocus(null)}
+                      className={`min-h-[28px] rounded-full border px-2.5 text-[11px] transition ${
+                        activeStep === null
+                          ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                          : "border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                      }`}
+                    >
+                      All copy
+                    </button>
+                    {Array.from({ length: stepCount }, (_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setStepFocus(i)}
+                        title={String((items?.[i] as { label?: unknown })?.label ?? `Step ${i + 1}`)}
+                        className={`min-h-[28px] min-w-[28px] rounded-full border px-2 text-[11px] transition ${
+                          activeStep === i
+                            ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                            : "border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                  {activeStep !== null && (
+                    <p className="mt-2 text-[11px] text-white/45">
+                      Step {activeStep + 1}
+                      {String((items?.[activeStep] as { label?: unknown })?.label ?? "")
+                        ? ` · ${String((items?.[activeStep] as { label?: unknown })?.label)}`
+                        : ""}{" "}
+                      — Alt-click the tile on the slide to swap its icon.
+                    </p>
+                  )}
+                </div>
+              )}
               <div className="mt-3 space-y-2">
-                {fields.length === 0 && (
+                {visibleFields.length === 0 && (
                   <p className="text-[11px] text-white/45">
                     This module has no editable text fields.
                   </p>
                 )}
-                {fields.map((path) => {
+                {visibleFields.map((path) => {
                   const value = String(readPath(copy, path) ?? "");
+
                   const seedValue = String(readPath(seeded, path) ?? "");
                   const changed = value !== seedValue;
                   const isModeOverride = layer?.copy && path in layer.copy;
