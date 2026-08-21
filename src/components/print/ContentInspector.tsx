@@ -380,7 +380,7 @@ function CollapsibleSection({
   count?: number;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   return (
     <div className="rounded-lg border border-black/10 bg-white/50 p-2 dark:border-white/10 dark:bg-white/[0.02]">
       <button
