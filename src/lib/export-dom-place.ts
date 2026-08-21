@@ -16,7 +16,7 @@ import type PptxGenJS from "pptxgenjs";
 import type { DomColor, DomShape } from "./export-dom-decompose";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
-import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
+import { gradientTag, pxToPt } from "./export-surface";
 import { coverCropTag, roundPicTag } from "./pptx-shape-normalize";
 import { exportSlideBounds } from "./export-space";
 
