@@ -306,37 +306,51 @@ function paragraphLines(value: string | undefined): string[] {
  * spilling — the on-screen box then matches the exported layout exactly.
  */
 function FitT({
+  x,
+  y,
+  w,
   maxH,
   size,
   minSize,
+  weight = 400,
+  color = "#FFFFFF",
+  align = "left",
+  leading = 1.18,
+  tracking,
   children,
-  ...rest
-}: Omit<Parameters<typeof T>[0], "children"> & {
+}: {
+  x: number;
+  y: number;
+  w: number;
   maxH: number;
+  size: number;
   minSize?: number;
+  weight?: number;
+  color?: string;
+  align?: CSSProperties["textAlign"];
+  leading?: number;
+  tracking?: string;
   children?: ReactNode;
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [factor, setFactor] = useState(1);
-  const floor = (minSize ?? size * 0.6) / size;
+  const floor = Math.min(1, (minSize ?? size * 0.6) / size);
 
   const measure = useCallback(() => {
     const host = hostRef.current;
-    if (!host) return;
-    const inner = host.firstElementChild as HTMLElement | null;
-    if (!inner) return;
+    const inner = host?.firstElementChild as HTMLElement | null;
+    if (!host || !inner) return;
     const limit = host.clientHeight;
     if (!limit) return;
     const h = inner.scrollHeight;
     setFactor((prev) => {
       if (h <= limit + 0.5) {
-        // Grow back toward 1 when the copy got shorter.
         if (prev >= 1) return prev;
         const next = Math.min(1, prev * (limit / Math.max(h, 1)));
-        return next - prev > 0.005 ? next : prev;
+        return next - prev > 0.004 ? next : prev;
       }
       const next = Math.max(floor, prev * (limit / h));
-      return prev - next > 0.005 ? next : prev;
+      return prev - next > 0.004 ? next : prev;
     });
   }, [floor]);
 
@@ -352,11 +366,31 @@ function FitT({
   }, [measure, children, factor]);
 
   return (
-    <div ref={hostRef} style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
-      <div style={{ position: "absolute", left: 0, top: 0, width: "100%", height: u(maxH) }}>
-        <T {...rest} size={size * factor} w={rest.w} style={{ pointerEvents: "auto", ...rest.style }}>
-          {children}
-        </T>
+    <div
+      ref={hostRef}
+      style={{
+        position: "absolute",
+        left: u(x),
+        top: u(y),
+        width: u(w),
+        height: u(maxH),
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          fontFamily: FONT,
+          fontSize: fs(size * factor),
+          fontWeight: weight,
+          lineHeight: leading,
+          color,
+          textAlign: align,
+          letterSpacing: tracking,
+          whiteSpace: "pre-wrap",
+          overflowWrap: "break-word",
+        }}
+      >
+        {children}
       </div>
     </div>
   );
