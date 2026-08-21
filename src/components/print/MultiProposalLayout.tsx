@@ -3288,7 +3288,15 @@ function PageBody({
     case "why":
       return <WhyPage page={page} logoDark={logoDark} />;
     case "advocates":
-      return <AdvocatesPage page={page} logoDark={logoDark} pageIndex={pageIndex} />;
+      return (
+        <AdvocatesPage
+          page={page}
+          logoDark={logoDark}
+          logoWhite={logoWhite}
+          pageIndex={pageIndex}
+        />
+      );
+
     case "team-grid":
       return <TeamPage page={page} logoWhite={logoWhite} bios={false} />;
     case "team-bio":
