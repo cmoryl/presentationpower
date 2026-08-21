@@ -582,7 +582,7 @@ export function FreeCanvasEditor({
    * module template is untouched; "Restore removed" brings it back.
    */
   const removeSectionAt = (clientX: number, clientY: number) => {
-    const root = wrapRef.current;
+    const root = stageSurface();
     if (!root) return;
     const target = adoptTargetAt(root, clientX, clientY);
     if (!target) return;
@@ -992,7 +992,7 @@ export function FreeCanvasEditor({
       let fontPx: number | undefined;
       if (block && isTextKind(block.kind)) {
         // Text scales with its frame so resizing feels like PowerPoint.
-        fontPx = Math.max(12, Math.round((block.size ?? fontFor(block.kind)) * ((sx + sy) / 2)));
+        fontPx = Math.max(12, Math.round(blockFontSize(block) * ((sx + sy) / 2)));
         drag.liveSizes.set(id, fontPx);
       }
       paintBox(id, next, fontPx);
@@ -1206,7 +1206,7 @@ export function FreeCanvasEditor({
       onPointerMove={(e) => {
         if (textTool) return;
         if (pickMode !== "off" && !dragRef.current) {
-          const root = wrapRef.current;
+          const root = stageSurface();
           paintPick(
             root
               ? pickMode === "card"
@@ -1225,7 +1225,7 @@ export function FreeCanvasEditor({
       // mode first: whole box when there is one, otherwise the single element.
       onDoubleClick={(e) => {
         if (textTool || pickMode !== "off") return;
-        const root = wrapRef.current;
+        const root = stageSurface();
         if (!root) return;
         const onBlock = (e.target as HTMLElement | null)?.closest("[data-canvas-block]");
         if (onBlock) return;
