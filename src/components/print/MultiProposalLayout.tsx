@@ -343,6 +343,7 @@ function FitT({
   const textRef = useRef<string | null>(null);
 
   const measure = useCallback(() => {
+    if (typeof window !== "undefined") console.log("[FIT-CALL]", !!hostRef.current);
     const host = hostRef.current;
     const inner = host?.firstElementChild as HTMLElement | null;
     if (!host || !inner) return;
