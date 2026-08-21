@@ -2744,21 +2744,22 @@ function AdvocatesPage({
       </T>
       <Rule x={3.06} y={2.02} w={4.98} color="rgba(255,255,255,0.6)" />
 
-      {/* Cause partners sit on a white plate so full-colour marks stay legible. */}
+      {/* Cause marks are reversed art, so they keep a translucent dark plate. */}
       <L
         x={2.86}
         y={2.24}
         w={5.38}
         h={2.38}
         style={{
-          background: "#FFFFFF",
+          background: "rgba(3,0,44,0.3)",
           borderRadius: u(0.24),
-          boxShadow: "0 0.6cqw 1.6cqw rgba(3,0,44,0.18)",
+          border: `${u(0.008)} solid rgba(255,255,255,0.28)`,
         }}
       />
-      <T x={3.06} y={2.4} w={4.98} size={8.4} weight={600} color={BLUE} tracking="0.18em" upper>
+      <T x={3.06} y={2.4} w={4.98} size={8.4} weight={600} color={AQUA_FIELD} tracking="0.18em" upper>
         Cause partners
       </T>
+
       {wall(
         causes,
         causeBoxes.map((b) => ({ ...b, y: b.y + 0.24 })),
