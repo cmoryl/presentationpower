@@ -173,10 +173,9 @@ export async function annotateDebugPptx(zip: JSZip, manifest: DebugManifest): Pr
     }
   }
 
-  return (await zip.generateAsync({
-    type: "blob",
-    mimeType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-  })) as Blob;
+  const { repackPptx } = await import("./pptx-repack");
+  return await repackPptx(zip);
+
 }
 
 /** Trigger a browser download for the sidecar manifest. */
