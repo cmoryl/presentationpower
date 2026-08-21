@@ -439,7 +439,70 @@ export function AppShell({ children }: { children: ReactNode }) {
               );
             })}
           </nav>
+
+          {mobileNavOpen && (
+            <nav
+              id="mobile-nav-sheet"
+              className="col-span-2 max-h-[70vh] overflow-y-auto rounded-2xl border border-black/[0.06] bg-white/85 p-3 [backdrop-filter:blur(24px)_saturate(160%)] lg:hidden"
+              aria-label="Main"
+            >
+              <div className="flex flex-col gap-1">
+                {visibleNav.map((n) => {
+                  const active =
+                    pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
+                  return (
+                    <Link
+                      key={`m:${n.to}`}
+                      to={n.to}
+                      className={`flex min-h-11 items-center rounded-xl px-3 text-sm transition ${
+                        active
+                          ? "bg-[#003FC7] text-white"
+                          : "text-black/75 hover:bg-black/[0.04] hover:text-black"
+                      }`}
+                    >
+                      {n.label}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {[
+                ...(visibleNav.some((n) => n.to === "/elements")
+                  ? [{ title: "Elements", groups: elementGroups }]
+                  : []),
+                ...(visibleNav.some((n) => n.to === "/admin")
+                  ? [{ title: "Admin", groups: adminGroups }]
+                  : []),
+              ].map((block) => (
+                <div key={block.title} className="mt-3 border-t border-black/[0.06] pt-3">
+                  <div className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45">
+                    {block.title}
+                  </div>
+                  {block.groups.map((g) => (
+                    <div key={`${block.title}:${g.label}`} className="mt-1 min-w-0">
+                      <div className="px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-black/35">
+                        {g.label}
+                      </div>
+                      <div className="flex flex-col">
+                        {g.items.map((s) => (
+                          <Link
+                            key={`m:${block.title}:${s.to}:${s.label}`}
+                            to={s.to}
+                            search={"search" in s && s.search ? s.search : {}}
+                            className="flex min-h-11 min-w-0 items-center rounded-xl px-3 text-[13px] text-black/70 transition hover:bg-black/[0.04] hover:text-black"
+                          >
+                            <span className="truncate">{s.label}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </nav>
+          )}
         </div>
+
       </header>
       {/* --shell-pad-top is the contract full-bleed heroes cancel with `hero-flush`. */}
       <main
