@@ -535,6 +535,8 @@ function renderPrintByKind(
   brand: BrandMode,
   mode: "light" | "dark",
   content?: unknown,
+  /** Multi-page documents: render only this page (card art renders page 1). */
+  pageIndex?: number,
 ): React.ReactElement | null {
   if (kind === "spotlight")
     return (
