@@ -95,6 +95,7 @@ import {
 } from "@/lib/orbit-label-layout";
 
 import { HouseArrow } from "./HouseArrow";
+import { EchoArrow } from "./EchoArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
 
 import { OrbitDisc } from "./OrbitDisc";
