@@ -43,7 +43,14 @@ export type IntroRecipe = {
   durationMs: number;
   /** Delay before the first item moves. */
   leadMs: number;
+  /** Override the shared cascade budget (ms) — for two-act builds (figure, then list). */
+  budgetMs?: number;
+  /** Ring/arc sweep overrides: delay before the first arc, sweep length, per-arc trail. */
+  arcLeadMs?: number;
+  arcDrawMs?: number;
+  arcStepMs?: number;
 };
+
 
 const RECIPES: Record<string, IntroRecipe> = {
   bento: {
