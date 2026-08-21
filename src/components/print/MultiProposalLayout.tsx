@@ -520,9 +520,9 @@ function AccentRuns({ text, accent }: { text: string; accent: string }) {
  */
 const HDR = {
   marginX: 0.47,
-  logoW: 1.88,
-  logoH: 0.28,
-  logoY: 0.5,
+  logoW: 2.8,
+  logoH: 0.42,
+  logoY: 0.43,
   eyebrowY: 0.55,
   eyebrowSize: 8.4,
   /** Title baseline sits one eyebrow-step below the eyebrow. */
