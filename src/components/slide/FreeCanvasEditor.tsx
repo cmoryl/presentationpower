@@ -5,11 +5,13 @@ import type { BrandMode } from "@/lib/taxonomy";
 import {
   boundsOf,
   buildSnapTargets,
+  clientPointToStage,
   clampToStage,
   rectsIntersect,
   GRID,
   snapMove,
   snapResize,
+  stageScaleFromRect,
   STAGE_H,
   STAGE_W,
   type Box,
@@ -38,6 +40,7 @@ import {
   blockFontSize,
   CanvasBlockContent,
   canvasBlockFrameStyle,
+  canvasTextFromEditable,
   canvasBlockTextStyle,
   sortBlocksForEdit,
 } from "./CanvasBlockView";
@@ -245,18 +248,14 @@ export function FreeCanvasEditor({
 
   /** The visible 16:9 surface is the coordinate authority, never editor chrome. */
   const stageSurface = useCallback(
-    () => wrapRef.current?.querySelector<HTMLElement>("[data-print-surface]") ?? wrapRef.current,
+    () => wrapRef.current?.querySelector<HTMLElement>("[data-print-surface]") ?? null,
     [],
   );
 
   const stageFromClient = useCallback((clientX: number, clientY: number) => {
     const el = stageSurface();
     if (!el) return { x: 0, y: 0 };
-    const r = el.getBoundingClientRect();
-    return {
-      x: ((clientX - r.left) / r.width) * STAGE_W,
-      y: ((clientY - r.top) / r.height) * STAGE_H,
-    };
+    return clientPointToStage(clientX, clientY, el.getBoundingClientRect());
   }, [stageSurface]);
 
   /**
@@ -269,9 +268,7 @@ export function FreeCanvasEditor({
     const apply = () => {
       const surface = stageSurface();
       const rect = surface?.getBoundingClientRect();
-      const scale = rect && rect.width > 0 && rect.height > 0
-        ? Math.min(rect.width / STAGE_W, rect.height / STAGE_H)
-        : 1;
+      const scale = rect ? stageScaleFromRect(rect) : 1;
       el.style.setProperty("--cb-scale", String(scale));
     };
     apply();
@@ -1308,7 +1305,7 @@ export function FreeCanvasEditor({
                     commit(
                       list.map((x) =>
                         x.id === b.id
-                          ? { ...x, text: (e.currentTarget.textContent ?? "").trim() }
+                          ? { ...x, text: canvasTextFromEditable(e.currentTarget) }
                           : x,
                       ),
                       "Edit object text",

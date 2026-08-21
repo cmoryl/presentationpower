@@ -23,7 +23,13 @@
 import type PptxGenJS from "pptxgenjs";
 
 import type { CanvasBlock } from "./deck-store";
-import { blockFontSize, sortBlocks } from "@/components/slide/CanvasBlockView";
+import {
+  blockFontSize,
+  blockFontWeight,
+  blockLetterSpacingEm,
+  blockLineHeight,
+  sortBlocks,
+} from "@/components/slide/CanvasBlockView";
 import { STAGE_H, STAGE_W } from "./canvas-snap";
 import { repairBlocks } from "./canvas-adopt";
 import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
@@ -37,16 +43,6 @@ import { groupTag } from "./pptx-group-xml";
 
 const IN_PER_UNIT_X = SLIDE_W_IN / STAGE_W;
 const IN_PER_UNIT_Y = SLIDE_H_IN / STAGE_H;
-
-/** Editor CSS: heading leading 1.02, everything else 1.28 (CanvasBlockView). */
-function lineHeightFor(b: CanvasBlock): number {
-  return b.kind === "heading" ? 1.02 : 1.28;
-}
-
-/** Editor CSS: heading tracking -0.03em, everything else -0.005em. */
-function trackingEmFor(b: CanvasBlock): number {
-  return b.kind === "heading" ? -0.03 : -0.005;
-}
 
 export interface ParsedColor {
   /** 6-digit uppercase hex, no `#`. */
@@ -123,7 +119,7 @@ export function describeCanvasBlockText(
   const px = blockFontSize(b);
   const fontSize = Math.round(pxToPt(px) * 10) / 10;
   const parsed = parseCssColorToPptx(b.color) ?? parseCssColorToPptx(inkHex) ?? { hex: "0B0B12", alpha: 1 };
-  const weight = b.weight ?? (b.kind === "heading" ? 700 : 500);
+  const weight = blockFontWeight(b);
   return {
     text: b.text,
     fontSize,
@@ -132,8 +128,8 @@ export function describeCanvasBlockText(
     color: parsed.hex,
     transparency: parsed.alpha < 1 ? Math.round((1 - parsed.alpha) * 100) : undefined,
     align: b.align ?? "left",
-    charSpacing: Math.round(trackingEmFor(b) * fontSize * 100) / 100,
-    lineSpacing: Math.round(fontSize * lineHeightFor(b) * 10) / 10,
+    charSpacing: Math.round(blockLetterSpacingEm(b) * fontSize * 100) / 100,
+    lineSpacing: Math.round(fontSize * blockLineHeight(b) * 10) / 10,
   };
 }
 

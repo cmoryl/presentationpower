@@ -15,6 +15,35 @@ export const GRID = 20;
 export const SNAP_TOLERANCE = 10;
 
 export type Box = { x: number; y: number; w: number; h: number };
+
+/**
+ * Canonical viewport ↔ authored-stage transform. Every editor surface uses
+ * this instead of deriving its own width-only or chrome-relative scale.
+ */
+export type StageViewportRect = Pick<DOMRect, "left" | "top" | "width" | "height">;
+
+export function stageScaleFromRect(
+  rect: Pick<StageViewportRect, "width" | "height">,
+  stageW = STAGE_W,
+  stageH = STAGE_H,
+): number {
+  if (rect.width <= 0 || rect.height <= 0 || stageW <= 0 || stageH <= 0) return 1;
+  return Math.min(rect.width / stageW, rect.height / stageH);
+}
+
+export function clientPointToStage(
+  clientX: number,
+  clientY: number,
+  rect: StageViewportRect,
+  stageW = STAGE_W,
+  stageH = STAGE_H,
+): { x: number; y: number } {
+  if (rect.width <= 0 || rect.height <= 0) return { x: 0, y: 0 };
+  return {
+    x: ((clientX - rect.left) / rect.width) * stageW,
+    y: ((clientY - rect.top) / rect.height) * stageH,
+  };
+}
 export type Guide = {
   axis: "x" | "y";
   at: number;
