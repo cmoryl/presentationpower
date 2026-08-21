@@ -153,11 +153,12 @@ import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
 
 
-// Example client-logo chip for case study previews. Uses the deck's real
-// clientLogoUrl when set (via SlideFrameCtx); otherwise deterministically
-// picks an approved filler mark (excluding TransPerfect) so library
-// previews always render with a real logo lockup rather than an empty
-// "Client" chip. Mode-aware — white variant on dark, color on light.
+// CLIENT logo chip for case-study modules. Resolution order:
+//   1. the deck's real clientLogoUrl (explicitly picked in the editor)
+//   2. a matching / deterministic mark from the LogoHub client roster
+//   3. a neutral wordmark of the client name
+// A TransPerfect brand or division lockup is NEVER used here — the mark on a
+// case study must always represent the client being highlighted.
 function ClientLogoChip({
   mode,
   clientName,
@@ -175,13 +176,13 @@ function ClientLogoChip({
   accent: string;
   faint: string;
 }) {
-  const pool = APPROVED_LOGOS.filter((l) => l.id !== "tp");
-  const key = (clientName || "acme").toLowerCase();
-  let hash = 0;
-  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
-  const pick = pool[hash % pool.length];
-  const filler = mode === "dark" ? pick.white || pick.color : pick.color;
-  const src = clientLogoUrl || filler;
+  const hubMark = useClientLogoMark({
+    clientName,
+    seed: clientName || "client",
+    mode: mode === "dark" ? "dark" : "light",
+  });
+  const src = clientLogoUrl || hubMark?.url || null;
+  const displayName = clientName || hubMark?.name || "Client";
   return (
     <div className="inline-flex items-center gap-3">
       <span
@@ -195,14 +196,29 @@ function ClientLogoChip({
         {label}
       </span>
       <span aria-hidden className="inline-block h-3 w-px" style={{ background: faint }} />
-      <img
-        src={src}
-        alt={clientName ? `${clientName} logo` : `${pick.name} logo (example)`}
-        style={{ height: size, width: "auto", maxWidth: size * 4, objectFit: "contain" }}
-      />
+      {src ? (
+        <img
+          src={src}
+          alt={`${displayName} logo`}
+          style={{ height: size, width: "auto", maxWidth: size * 4, objectFit: "contain" }}
+        />
+      ) : (
+        <span
+          className="uppercase"
+          style={{
+            fontSize: fillPx(15, "body"),
+            fontWeight: 700,
+            letterSpacing: "0.16em",
+            color: mode === "dark" ? "rgba(255,255,255,0.92)" : "rgba(3,0,44,0.9)",
+          }}
+        >
+          {displayName}
+        </span>
+      )}
     </div>
   );
 }
+
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
 // etc.) automatically pick up the current slide's clientName + layoutId when
