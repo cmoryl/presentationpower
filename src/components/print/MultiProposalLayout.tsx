@@ -1238,7 +1238,7 @@ function ClientsPage({
   const showCaptions = editing || entries.some((e) => (e.name ?? "").trim().length > 0);
   const captionH = showCaptions ? 0.28 : 0;
   // Wall region sits inside the plate with an even safe margin on all sides.
-  const boxes = autoLogoWall(entries.length, { x: 1.0, y: 4.74, w: 6.45, h: 5.0 }, {
+  const boxes = autoLogoWall(entries.length, { x: 1.0, y: 4.74, w: 6.45, h: 4.3 }, {
     maxCols: 4,
     gutterX: 0.3,
     gutterY: 0.34,
@@ -1309,7 +1309,7 @@ function ClientsPage({
         );
       })}
 
-      <L x={1.0} y={9.82} w={6.45}>
+      <L x={1.0} y={9.06} w={6.45}>
         <AddLogoButton path={clientsPath} list={entries} label="Add client logo" max={24} />
       </L>
 
