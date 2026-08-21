@@ -131,12 +131,15 @@ type BoxProps = {
   h?: number;
   children?: ReactNode;
   style?: CSSProperties;
+  /** Marks authoring chrome so PDF/PPTX capture strips it. */
+  "data-export-ignore"?: string;
 };
 
 /** Absolutely-positioned layer in source-deck inches. */
-function L({ x, y, w, h, children, style }: BoxProps) {
+function L({ x, y, w, h, children, style, ...rest }: BoxProps) {
   return (
     <div
+      {...rest}
       style={{
         position: "absolute",
         left: u(x),
@@ -150,6 +153,7 @@ function L({ x, y, w, h, children, style }: BoxProps) {
     </div>
   );
 }
+
 
 /** Text layer — point size + weight straight off the source shape. */
 function T({
