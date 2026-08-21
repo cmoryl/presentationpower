@@ -1044,6 +1044,15 @@ function RegionLocationsPage({
   const listCtx = usePrintLogoList();
   const pinPath = `pages.${pageIndex}.mapPins`;
   const pins = page.mapPins?.length ? page.mapPins : defaultWorldMapPins();
+  const crop = WORLD_MAP_REGION_VIEWS[regionKey] ?? { x: 58, y: 138, w: 629, h: 343 };
+  const mapBox = (() => {
+    const maxW = 7.9;
+    const maxH = 4.3;
+    const aspect = crop.w / crop.h;
+    const w = Math.min(maxW, maxH * aspect);
+    const h = w / aspect;
+    return { x: 0.47 + (maxW - w) / 2, w, h };
+  })();
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
@@ -1071,11 +1080,13 @@ function RegionLocationsPage({
         </T>
       ) : null}
 
-      {/* Region crop of the shared vector map — pins stay editable. */}
-      <L x={0.3} y={3.12} w={7.9} h={4.3}>
+      {/* Region crop of the shared vector map — pins stay editable. The box is
+          sized to the crop's aspect ratio and centered, so the SVG never
+          letterboxes in neighboring continents. */}
+      <L x={mapBox.x} y={3.12} w={mapBox.w} h={mapBox.h}>
         <ProposalWorldMap
           pins={pins}
-          frame={WORLD_MAP_REGION_VIEWS[regionKey]}
+          frame={crop}
           editable={!!listCtx?.active}
           {...(listCtx?.active
             ? { onChange: (next: WorldMapPin[]) => listCtx.onChange(pinPath, next) }
