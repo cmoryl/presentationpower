@@ -49,7 +49,10 @@ import {
   type PrintLogoEntry,
 } from "./PrintLogoList";
 import { ProposalWorldMap, defaultWorldMapPins } from "./ProposalWorldMap";
-import type { WorldMapPin } from "@/lib/print-library/world-map-vector";
+import {
+  WORLD_MAP_REGION_VIEWS,
+  type WorldMapPin,
+} from "@/lib/print-library/world-map-vector";
 
 // ---------------------------------------------------------------------------
 // Source-deck constants
