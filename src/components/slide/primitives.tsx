@@ -756,7 +756,7 @@ export function StatFigure({
             zIndex: 1,
           }}
         >
-          <StatIcon size={Math.round(spec.valuePx * 0.62 * iconK)} strokeWidth={1.4} absoluteStrokeWidth />
+          <StatIcon size={Math.round(spec.valuePx * 0.92 * iconK)} strokeWidth={1.4} absoluteStrokeWidth />
         </span>
       )}
       <div
