@@ -1,3 +1,5 @@
+import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
+import heroPrintVideo from "@/assets/hero-print.mp4.asset.json";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -432,7 +434,8 @@ function PrintCenterPage() {
   return (
     <AppShell>
       <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#EC388A14] via-white/70 to-[#FFEB6626] py-9 lg:py-12">
-        <div className="mx-auto max-w-[1400px]">
+        <HeroVideoLayer src={heroPrintVideo.url} opacity={0.55} tint="#FFFFFF" />
+        <div className="relative z-10 mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Print</div>
           <div className="mt-3">
             <LibrarySubnav active="/library/print" />

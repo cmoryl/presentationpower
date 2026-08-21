@@ -15,11 +15,14 @@ export function HeroVideoLayer({
   opacity = 0.5,
   /** Accent used for the wash that keeps text legible over the footage. */
   tint = "#FFFFFF",
+  /** Wash colour used under `.dark` so light text keeps its contrast. */
+  darkTint = "#05041A",
   className = "",
 }: {
   src: string;
   opacity?: number;
   tint?: string;
+  darkTint?: string;
   className?: string;
 }) {
   const ref = useRef<HTMLVideoElement | null>(null);
@@ -57,9 +60,15 @@ export function HeroVideoLayer({
       )}
       {/* Legibility wash: solid at the text edge, clearing toward the far side. */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 dark:hidden"
         style={{
           background: `linear-gradient(100deg, ${tint} 0%, ${tint}F2 34%, ${tint}B8 62%, ${tint}66 100%)`,
+        }}
+      />
+      <div
+        className="absolute inset-0 hidden dark:block"
+        style={{
+          background: `linear-gradient(100deg, ${darkTint} 0%, ${darkTint}F2 34%, ${darkTint}C4 62%, ${darkTint}7A 100%)`,
         }}
       />
     </div>

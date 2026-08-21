@@ -4,6 +4,8 @@
 // favorites-to-kit entry point and kit-profile presets. Every playbook
 // opens /social/demo/$id for a fully-rendered live preview.
 
+import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
+import heroSocialVideo from "@/assets/hero-social.mp4.asset.json";
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
@@ -94,7 +96,8 @@ function SocialView() {
     <>
       {/* Hero */}
       <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#FF9B7024] via-white/70 to-[#EC388A22] py-9 lg:py-12">
-        <div className="mx-auto max-w-7xl">
+        <HeroVideoLayer src={heroSocialVideo.url} opacity={0.55} tint="#FFFFFF" />
+        <div className="relative z-10 mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
               <Share2 size={12} /> Social command center

@@ -6,6 +6,8 @@
 // a real kit end-to-end. Also surfaces the format catalog by surface, a
 // phased-rollout explainer, and the favorites-to-kit entry point.
 
+import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
+import heroEventsVideo from "@/assets/hero-events.mp4.asset.json";
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
@@ -107,7 +109,8 @@ function EventsView() {
     <>
       {/* Hero */}
       <header className="full-bleed relative hero-flush overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#A6FA8724] via-white/70 to-[#C2A3FF26] py-9 lg:py-12">
-        <div className="mx-auto max-w-7xl">
+        <HeroVideoLayer src={heroEventsVideo.url} opacity={0.55} tint="#FFFFFF" />
+        <div className="relative z-10 mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
               <CalendarDays size={12} /> Events command center
