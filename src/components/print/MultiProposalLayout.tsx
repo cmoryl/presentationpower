@@ -1852,6 +1852,75 @@ const AFFINITY_SLOTS = [
 
 type Box = { x: number; y: number; w: number; h: number };
 
+/** Column count that keeps a wall visually balanced for any logo count. */
+export function wallColumns(count: number, maxCols = 4): number {
+  if (count <= 0) return 1;
+  if (count <= 3) return Math.min(count, maxCols);
+  if (count === 4) return Math.min(2, maxCols) === 2 && maxCols < 4 ? 2 : Math.min(4, maxCols);
+  if (count <= 6) return Math.min(3, maxCols);
+  if (count <= 12) return Math.min(4, maxCols);
+  if (count <= 20) return Math.min(5, maxCols);
+  return Math.min(6, maxCols);
+}
+
+/**
+ * Auto-configuring logo wall: given a count and a region, returns evenly
+ * spaced tile boxes with consistent gutters, a per-tile safe zone (logos never
+ * touch the tile edge) and optional caption reserve. Trailing short rows are
+ * centred so the wall always reads as a deliberate composition.
+ */
+export function autoLogoWall(
+  count: number,
+  region: Box,
+  opts: {
+    maxCols?: number;
+    gutterX?: number;
+    gutterY?: number;
+    captionH?: number;
+    maxTileW?: number;
+    maxTileH?: number;
+    /** Fraction of the cell kept clear around each logo (safe zone). */
+    safe?: number;
+  } = {},
+): Array<Box & { captionY: number }> {
+  if (count <= 0) return [];
+  const {
+    maxCols = 4,
+    gutterX = 0.26,
+    gutterY = 0.3,
+    captionH = 0,
+    maxTileW = 1.7,
+    maxTileH = 0.8,
+    safe = 0.12,
+  } = opts;
+
+  const cols = Math.max(1, Math.min(wallColumns(count, maxCols), count));
+  const rows = Math.ceil(count / cols);
+  const cellW = (region.w - gutterX * (cols - 1)) / cols;
+  const cellH = (region.h - gutterY * (rows - 1)) / rows;
+  const artH = Math.max(0.2, cellH - captionH);
+
+  const w = Math.min(maxTileW, cellW * (1 - safe));
+  const h = Math.min(maxTileH, artH * (1 - safe));
+
+  return Array.from({ length: count }, (_, i) => {
+    const row = Math.floor(i / cols);
+    const inRow = i % cols;
+    const rowCount = Math.min(cols, count - row * cols);
+    const rowW = rowCount * cellW + gutterX * (rowCount - 1);
+    const offX = region.x + (region.w - rowW) / 2;
+    const cellX = offX + inRow * (cellW + gutterX);
+    const cellY = region.y + row * (cellH + gutterY);
+    return {
+      x: cellX + (cellW - w) / 2,
+      y: cellY + (artH - h) / 2,
+      w,
+      h,
+      captionY: cellY + artH + 0.04,
+    };
+  });
+}
+
 /**
  * Even wall grid for an arbitrary number of logos inside a region. Used when the
  * author has added or removed tiles, so the page never overlaps or overflows.
