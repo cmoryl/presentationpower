@@ -40,14 +40,14 @@ export function defaultWorldMapPins(): WorldMapPin[] {
 const PIN_INSET = 6; // keeps the whole dot (r ~2.6) inside the frame
 const TOP_CLEARANCE = 12; // breathing room under the page header rule
 
-export function clampPinPoint(x: number, y: number) {
+export function clampPinPoint(x: number, y: number, frame = WORLD_MAP_VIEW) {
   const nx = Math.min(
-    WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w - PIN_INSET,
-    Math.max(WORLD_MAP_VIEW.x + PIN_INSET, x),
+    frame.x + frame.w - PIN_INSET,
+    Math.max(frame.x + PIN_INSET, x),
   );
   const ny = Math.min(
-    WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h - PIN_INSET,
-    Math.max(WORLD_MAP_VIEW.y + TOP_CLEARANCE, y),
+    frame.y + frame.h - PIN_INSET,
+    Math.max(frame.y + TOP_CLEARANCE, y),
   );
   return { x: Math.round(nx * 10) / 10, y: Math.round(ny * 10) / 10 };
 }
@@ -58,11 +58,15 @@ export function ProposalWorldMap({
   pins,
   editable = false,
   onChange,
+  /** Optional cropped frame (region views) — defaults to the whole world. */
+  frame,
 }: {
   pins?: WorldMapPin[];
   editable?: boolean;
   onChange?: (next: WorldMapPin[]) => void;
+  frame?: { x: number; y: number; w: number; h: number };
 }) {
+  const BASE = frame ?? WORLD_MAP_VIEW;
   const list = pins?.length ? pins : WORLD_MAP_PINS;
   const [kind, setKind] = useState<WorldMapPinKind>("prod");
 
@@ -70,8 +74,8 @@ export function ProposalWorldMap({
   // box on the page, so page layout and print geometry never change.
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState({
-    x: WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w / 2,
-    y: WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h / 2,
+    x: BASE.x + BASE.w / 2,
+    y: BASE.y + BASE.h / 2,
   });
   const drag = useRef<{ x: number; y: number; moved: boolean } | null>(null);
   const dragMoved = useRef(false);
@@ -126,16 +130,16 @@ export function ProposalWorldMap({
   }, [editable, onChange, redo, undo]);
 
 
-  const w = WORLD_MAP_VIEW.w / zoom;
-  const h = WORLD_MAP_VIEW.h / zoom;
+  const w = BASE.w / zoom;
+  const h = BASE.h / zoom;
   const clampCenter = (cx: number, cy: number, vw: number, vh: number) => ({
     x: Math.min(
-      WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w - vw / 2,
-      Math.max(WORLD_MAP_VIEW.x + vw / 2, cx),
+      BASE.x + BASE.w - vw / 2,
+      Math.max(BASE.x + vw / 2, cx),
     ),
     y: Math.min(
-      WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h - vh / 2,
-      Math.max(WORLD_MAP_VIEW.y + vh / 2, cy),
+      BASE.y + BASE.h - vh / 2,
+      Math.max(BASE.y + vh / 2, cy),
     ),
   });
   const safeCenter = clampCenter(center.x, center.y, w, h);
@@ -145,7 +149,7 @@ export function ProposalWorldMap({
     const z = Math.min(6, Math.max(1, Math.round(next * 100) / 100));
     setZoom(z);
     setCenter((c) =>
-      clampCenter(c.x, c.y, WORLD_MAP_VIEW.w / z, WORLD_MAP_VIEW.h / z),
+      clampCenter(c.x, c.y, BASE.w / z, BASE.h / z),
     );
   };
 
@@ -161,6 +165,7 @@ export function ProposalWorldMap({
     return clampPinPoint(
       view.x + ((clientX - rect.left) / rect.width) * view.w,
       view.y + ((clientY - rect.top) / rect.height) * view.h,
+      BASE,
     );
   };
 
@@ -265,10 +270,10 @@ export function ProposalWorldMap({
         {editable && onChange ? (
           <g data-export-ignore="true" fill="none" stroke="#A1FBF9" strokeDasharray="3 3">
             <rect
-              x={WORLD_MAP_VIEW.x + PIN_INSET}
-              y={WORLD_MAP_VIEW.y + TOP_CLEARANCE}
-              width={WORLD_MAP_VIEW.w - PIN_INSET * 2}
-              height={WORLD_MAP_VIEW.h - TOP_CLEARANCE - PIN_INSET}
+              x={BASE.x + PIN_INSET}
+              y={BASE.y + TOP_CLEARANCE}
+              width={BASE.w - PIN_INSET * 2}
+              height={BASE.h - TOP_CLEARANCE - PIN_INSET}
               strokeWidth={0.6}
               opacity={activePin !== null ? 0.5 : 0.22}
             />
@@ -392,8 +397,8 @@ export function ProposalWorldMap({
           onClick={() => {
             setZoom(1);
             setCenter({
-              x: WORLD_MAP_VIEW.x + WORLD_MAP_VIEW.w / 2,
-              y: WORLD_MAP_VIEW.y + WORLD_MAP_VIEW.h / 2,
+              x: BASE.x + BASE.w / 2,
+              y: BASE.y + BASE.h / 2,
             });
           }}
           disabled={zoom === 1}
