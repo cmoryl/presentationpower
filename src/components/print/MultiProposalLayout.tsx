@@ -2824,7 +2824,7 @@ function AdvocatesPage({
         w={5.38}
         h={1.9}
         style={{
-          background: "rgba(255,255,255,0.14)",
+          background: "rgba(3,0,44,0.3)",
           borderRadius: u(0.24),
           border: `${u(0.008)} solid rgba(255,255,255,0.3)`,
         }}
