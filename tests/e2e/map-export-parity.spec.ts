@@ -192,12 +192,20 @@ test.describe("Global Locations map — export parity", () => {
     ] as const) {
       expect(m.pins.length, `${label}: pin count drifted`).toBe(dom.length);
 
-      const got = sortPins(m.pins);
-      for (const [i, p] of got.entries()) {
-        expect(Math.abs(p.x - dom[i]!.x), `${label}: pin ${i} x drifted`).toBeLessThan(POS_TOL);
-        expect(Math.abs(p.y - dom[i]!.y), `${label}: pin ${i} y drifted`).toBeLessThan(POS_TOL);
-        expect(p.kind, `${label}: pin ${i} kind colour drifted`).toBe(got[i]!.kind);
-      }
+      const pair = pairPins(dom, sortPins(m.pins), POS_TOL);
+      const drifted = pair.worst.filter((wp) => wp.d > POS_TOL);
+      expect(
+        drifted.map((wp) => `#${wp.i} Δ${wp.d.toFixed(4)}`),
+        `${label}: pin positions drifted`,
+      ).toEqual([]);
+      expect(pair.matched, `${label}: unmatched pins`).toBe(dom.length);
+      expect(pair.leftover, `${label}: extra blobs captured (chrome leaked?)`).toBe(0);
+      const wrongKind = pair.worst.filter((wp) => wp.kind && wp.kind !== dom[wp.i]!.kind);
+      expect(
+        wrongKind.map((wp) => `#${wp.i} ${wp.kind} != ${dom[wp.i]!.kind}`),
+        `${label}: pin kind colours drifted`,
+      ).toEqual([]);
+
 
       // Header band signature must match the on-screen header.
       const delta =
