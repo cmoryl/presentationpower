@@ -10,6 +10,8 @@
 // the user can tick exactly which ones ship. Selection is by document order.
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+
 import { CheckSquare, FileDown, FileText, Presentation, Square } from "lucide-react";
 import { toast } from "sonner";
 import type { PrintMode, PrintPageSize } from "@/lib/print-assets.types";
@@ -113,8 +115,10 @@ export function ExportProposalButton({
         );
       } catch (err) {
         console.error("Proposal export failed", err);
-        toast.error(`Export failed: ${(err as Error).message}`);
+        const { describeCaptureFailure } = await import("@/lib/slide-image-export");
+        toast.error(`Export failed: ${describeCaptureFailure(err)}`);
       } finally {
+
         if (!cancelled) {
           runRef.current = null;
           setPending(null);
@@ -235,22 +239,29 @@ export function ExportProposalButton({
         </div>
       )}
 
-      {/* Offscreen host — full document at print width, never visible. */}
-      {hostMounted && (
-        <div
-          aria-hidden
-          style={{
-            position: "fixed",
-            left: "-10000px",
-            top: 0,
-            width: "1100px",
-            pointerEvents: "none",
-            opacity: 1,
-          }}
-        >
-          <div ref={hostRef}>{docNode}</div>
-        </div>
-      )}
+      {/* Offscreen host — full document at print width, never visible.
+          It MUST live outside this button's `data-export-ignore` wrapper:
+          export-chrome suppression hides that subtree during capture, which
+          collapsed the host to 0×0 and produced a blank/failed raster. */}
+      {hostMounted &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <div
+            aria-hidden
+            style={{
+              position: "fixed",
+              left: "-10000px",
+              top: 0,
+              width: "1100px",
+              pointerEvents: "none",
+              opacity: 1,
+            }}
+          >
+            <div ref={hostRef}>{docNode}</div>
+          </div>,
+          window.document.body,
+        )}
+
     </div>
   );
 }
