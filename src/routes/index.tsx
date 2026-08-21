@@ -196,7 +196,7 @@ function Dashboard() {
   const mode = MODES.find((m) => m.id === modeId) ?? MODES[0];
   const reducedMotion = useReducedMotion();
 
-  // Auto-rotate through modes every 5s until the user picks one or hovers the picker.
+  // Auto-rotate through modes every 9s until the user picks one or hovers the picker.
   // Skipped entirely under prefers-reduced-motion — no timer is scheduled.
   useEffect(() => {
     if (!autoRotate || reducedMotion) return;
@@ -205,7 +205,7 @@ function Dashboard() {
         const idx = MODES.findIndex((m) => m.id === cur);
         return MODES[(idx + 1) % MODES.length].id;
       });
-    }, 5000);
+    }, 9000);
     return () => window.clearInterval(id);
   }, [autoRotate, reducedMotion]);
 
