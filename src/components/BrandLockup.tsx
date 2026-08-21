@@ -1,7 +1,7 @@
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CSSProperties } from "react";
 import { getDivisionLogos } from "@/lib/division-logos";
-import { ElementMark } from "@/components/brand/ElementLogo";
+import { ElementMark, ELEMENT_LOCKUP_URLS } from "@/components/brand/ElementLogo";
 
 // Inline SVG of the approved TransPerfect horizontal wordmark. Paths inherit
 // `currentColor` so a single component tints for both dark and light chrome.
