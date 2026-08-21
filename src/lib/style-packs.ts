@@ -37,6 +37,8 @@ import {
   customTemplatePacks,
 } from "./template-registry";
 import { withBackgroundOverrides } from "./template-background";
+import { withElementSceneArt } from "./element-scene-art";
+
 import { templateCodeFromPackId } from "./custom-templates";
 
 
@@ -1850,13 +1852,18 @@ export function stylePackById(id: string | null | undefined): StylePack | null {
   return skin ? withOverrides(skin, skinCodeFromPackId(skin.id)) : null;
 }
 
-/** Apply admin background overrides, when any exist for this code. */
+/**
+ * Apply the authored Element scene plates (S29/S30) and then any admin
+ * background overrides — tuning always composes on top of the artwork.
+ */
 function withOverrides(pack: StylePack, code: string): StylePack {
+  const art = withElementSceneArt(pack, code);
   if (!backgroundOverrides().some((o) => o.skinCode.toUpperCase() === code.toUpperCase())) {
-    return pack;
+    return art;
   }
-  return withBackgroundOverrides(pack, code);
+  return withBackgroundOverrides(art, code);
 }
+
 
 /**
  * The admin tuning code behind a pack id ("skin-s29" → "S29", "tpl-x" → "X").
