@@ -305,6 +305,22 @@ function paragraphLines(value: string | undefined): string[] {
  * long headlines and extra hard returns stay inside their plate instead of
  * spilling — the on-screen box then matches the exported layout exactly.
  */
+/** What the fitter last measured — surfaced to editor-only fit warnings. */
+export type FitReport = {
+  /** Point size actually rendered after auto-shrink. */
+  fittedPt: number;
+  /** Authored point size before auto-shrink. */
+  authoredPt: number;
+  /** Visual lines the export will contain. */
+  lines: number;
+  /** True when the copy is auto-shrunk below the authored size. */
+  shrunk: boolean;
+  /** True when even the minimum size overflows — the export WILL clip. */
+  clipped: boolean;
+  /** Largest point size (≤ authored) that fits, for a one-click fix. */
+  suggestedPt: number;
+};
+
 function FitT({
   x,
   y,
@@ -317,6 +333,7 @@ function FitT({
   align = "left",
   leading = 1.18,
   tracking,
+  onFit,
   children,
 }: {
   x: number;
@@ -330,6 +347,7 @@ function FitT({
   align?: CSSProperties["textAlign"];
   leading?: number;
   tracking?: string;
+  onFit?: (report: FitReport) => void;
   children?: ReactNode;
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
@@ -343,6 +361,36 @@ function FitT({
   // factor already proven too big.
   const boundsRef = useRef({ lo: 0, hi: 1, done: false });
   const textRef = useRef<string | null>(null);
+  const reportRef = useRef<string>("");
+
+  // Report the settled measurement to the caller (editor-only warning UI).
+  const report = useCallback(
+    (fits: boolean, atFloor: boolean) => {
+      const host = hostRef.current;
+      const inner = host?.firstElementChild as HTMLElement | null;
+      if (!host || !inner || !onFit) return;
+      const px = parseFloat(getComputedStyle(inner).fontSize) || 1;
+      const lines = Math.max(1, Math.round(inner.scrollHeight / (px * leading)));
+      const fittedPt = size * factor;
+      const next: FitReport = {
+        fittedPt: Math.round(fittedPt * 10) / 10,
+        authoredPt: size,
+        lines,
+        shrunk: factor < 0.995,
+        clipped: !fits && atFloor,
+        suggestedPt: Math.max(
+          minSize ?? size * 0.6,
+          Math.round(size * (fits ? factor : floor) * 10) / 10,
+        ),
+      };
+      const key = JSON.stringify(next);
+      if (key === reportRef.current) return;
+      reportRef.current = key;
+      onFit(next);
+    },
+    [factor, floor, leading, minSize, onFit, size],
+  );
+
 
   const measure = useCallback(() => {
     const host = hostRef.current;
@@ -360,8 +408,13 @@ function FitT({
       return;
     }
     const b = boundsRef.current;
-    if (b.done) return;
     const fits = inner.scrollHeight <= limit + 0.5;
+    // Report every measurement (deduped inside `report`), so the editor badge
+    // still learns the outcome when the very first pass already fits and the
+    // search never runs another probe.
+    report(fits, factor <= floor + 0.001);
+    if (b.done) return;
+
 
     setFactor((prev) => {
       if (fits) b.lo = Math.max(b.lo, prev);
@@ -380,7 +433,8 @@ function FitT({
       const next = Math.max(floor, (Math.max(b.lo, floor) + b.hi) / 2);
       return Math.abs(next - prev) > 0.001 ? next : prev;
     });
-  }, [floor, size, w, maxH]);
+  }, [floor, size, w, maxH, factor, report]);
+
 
 
   useLayoutEffect(() => {
@@ -848,7 +902,131 @@ const STAT_SLOTS: Array<{
   },
 ];
 
-function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+const HEADLINE_PT = 37;
+const HEADLINE_MIN_PT = 20;
+
+const clampHeadlinePt = (pt: number) =>
+  Math.max(HEADLINE_MIN_PT, Math.min(HEADLINE_PT + 8, Math.round(pt * 10) / 10));
+
+/**
+ * Editor-only fit indicator for the speech-bubble headline: says how many lines
+ * the export will contain, warns when the copy had to be auto-shrunk (or still
+ * cannot fit), and offers one-click ways to reduce the type size. Chrome-tagged,
+ * so PDF and PPTX exports never see it.
+ */
+function HeadlineFitBadge({
+  fit,
+  authoredPt,
+  onSet,
+  onReset,
+}: {
+  fit: FitReport;
+  authoredPt: number;
+  onSet: (pt: number) => void;
+  onReset: () => void;
+}) {
+  const tone = fit.clipped ? "#FF9B70" : fit.shrunk ? "#FFEB66" : "#A1FBF9";
+  const label = fit.clipped
+    ? "Headline is too long for the bubble — it will clip on export"
+    : fit.shrunk
+      ? `Auto-shrunk to fit: ${fit.fittedPt}pt (authored ${authoredPt}pt)`
+      : `Fits at ${fit.fittedPt}pt`;
+
+  return (
+    <L x={5.9} y={4.32} w={2.1} data-export-ignore="true">
+      <div
+        style={{
+          fontFamily: FONT,
+          fontSize: fs(9),
+          lineHeight: 1.35,
+          color: "#FFFFFF",
+          background: "rgba(3,0,44,0.72)",
+          border: `1px solid ${tone}`,
+          borderRadius: u(0.08),
+          padding: `${u(0.07)} ${u(0.1)}`,
+          display: "grid",
+          gap: u(0.06),
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: u(0.07) }}>
+          <span
+            aria-hidden
+            style={{
+              width: u(0.07),
+              height: u(0.07),
+              borderRadius: "50%",
+              background: tone,
+              flex: "0 0 auto",
+            }}
+          />
+          <strong style={{ fontWeight: 600 }}>{label}</strong>
+        </div>
+        <div style={{ opacity: 0.85 }}>
+          {fit.lines} {fit.lines === 1 ? "line" : "lines"} will export
+          {fit.clipped ? " — reduce the size or cut copy" : ""}
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: u(0.05) }}>
+          {fit.shrunk || fit.clipped ? (
+            <FitBtn onClick={() => onSet(fit.suggestedPt)}>
+              Set {fit.suggestedPt}pt (fit)
+            </FitBtn>
+          ) : null}
+          <FitBtn onClick={() => onSet(authoredPt - 1)} disabled={authoredPt <= HEADLINE_MIN_PT}>
+            −1pt
+          </FitBtn>
+          <FitBtn onClick={() => onSet(authoredPt + 1)}>+1pt</FitBtn>
+          <FitBtn onClick={() => onSet(Math.round(authoredPt * 0.9 * 10) / 10)}>−10%</FitBtn>
+          <FitBtn onClick={onReset} disabled={authoredPt === HEADLINE_PT}>
+            Reset
+          </FitBtn>
+        </div>
+      </div>
+    </L>
+  );
+}
+
+function FitBtn({
+  onClick,
+  disabled,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        fontFamily: FONT,
+        fontSize: fs(8.5),
+        fontWeight: 600,
+        color: "#03002C",
+        background: disabled ? "rgba(255,255,255,0.35)" : "#FFFFFF",
+        opacity: disabled ? 0.5 : 1,
+        border: "none",
+        borderRadius: u(0.06),
+        padding: `${u(0.035)} ${u(0.08)}`,
+        cursor: disabled ? "default" : "pointer",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+
+function StatsPage({
+  page,
+  pageIndex,
+  logoWhite,
+}: {
+  page: MultiProposalPage;
+  pageIndex: number;
+  logoWhite: string;
+}) {
   const authoredHeadline = paragraphLines(page.title);
   const headline = authoredHeadline.length
     ? authoredHeadline
@@ -859,6 +1037,15 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
     return -1;
   })();
   const stats = page.stats ?? [];
+  const editCtx = usePrintLogoList();
+  const editing = !!editCtx?.active;
+  const [fit, setFit] = useState<FitReport | null>(null);
+  const authoredPt = clampHeadlinePt(page.titleSizePt ?? HEADLINE_PT);
+  const setHeadlinePt = (pt: number | null) =>
+    editCtx?.onChange(
+      `pages.${pageIndex}.titleSizePt`,
+      pt == null ? undefined : clampHeadlinePt(pt),
+    );
 
   return (
     <>
@@ -890,11 +1077,12 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
         y={0.94}
         w={4.6}
         maxH={2.92}
-        size={37}
-        minSize={20}
+        size={authoredPt}
+        minSize={HEADLINE_MIN_PT}
         weight={400}
         leading={1.28}
         tracking="-0.015em"
+        {...(editing ? { onFit: setFit } : {})}
       >
         {headline.map((line, i) => (
           <span key={i} style={{ fontWeight: i === emphasisIndex ? 700 : 400 }}>
@@ -903,6 +1091,16 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
           </span>
         ))}
       </FitT>
+
+      {editing && fit ? (
+        <HeadlineFitBadge
+          fit={fit}
+          authoredPt={authoredPt}
+          onSet={setHeadlinePt}
+          onReset={() => setHeadlinePt(null)}
+        />
+      ) : null}
+
 
 
 
@@ -2970,7 +3168,7 @@ function PageBody({
     case "cover":
       return <CoverPage page={page} logoDark={logoDark} />;
     case "stats":
-      return <StatsPage page={page} logoWhite={logoWhite} />;
+      return <StatsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "scope":
       return <ScopePage page={page} logoWhite={logoWhite} />;
     case "cost":

@@ -20,8 +20,11 @@ export type PrintLogoEntry = { id?: string; name?: string; url?: string };
 
 type LogoListCtx = {
   active: boolean;
-  /** Write an array back to a content path, e.g. `pages.11.causeLogos`. */
-  onChange: (path: string, next: unknown[]) => void;
+  /**
+   * Write a value back to a content path, e.g. `pages.11.causeLogos` (array) or
+   * `pages.1.titleSizePt` (scalar; `undefined` clears it).
+   */
+  onChange: (path: string, next: unknown) => void;
 };
 
 export const PrintLogoListContext = createContext<LogoListCtx | null>(null);
