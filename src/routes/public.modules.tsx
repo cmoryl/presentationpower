@@ -260,7 +260,9 @@ function PublicModuleLibrary() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const pack = stylePackById(packId);
+  // Registry-aware so an admin background retune lands here too.
+  const pack = useResolvedStylePack(packId);
+
 
   // Deep-linkable: /public/modules?style=neo-brutal opens on that look, and
   // switching packs rewrites the URL so reviewers can share exactly what they
