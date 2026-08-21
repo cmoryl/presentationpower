@@ -2406,12 +2406,26 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
         {q?.headline || page.title || "Success story"}
       </T>
       <Rule x={0.62} y={7.32} w={7.3} color="rgba(161,248,249,0.5)" />
-      <T x={0.62} y={7.56} w={7.3} size={11.5} color="rgba(255,255,255,0.86)" leading={1.5}>
-        {storyQuote(q?.text)}
-      </T>
-      <T x={0.62} y={9.2} w={7.3} size={10} weight={600} color={PROPOSAL_AQUA}>
-        {q ? `– ${[q.role || q.author, q.company].filter(Boolean).join(", ")}` : ""}
-      </T>
+      <QuoteBody
+        x={0.62}
+        y={7.56}
+        w={7.3}
+        maxH={1.54}
+        size={11.5}
+        quote={q}
+        color="rgba(255,255,255,0.86)"
+        leading={1.5}
+      />
+      <QuoteAttribution
+        x={0.62}
+        y={9.2}
+        w={7.3}
+        size={10}
+        weight={600}
+        color={PROPOSAL_AQUA}
+        quote={q}
+      />
+
 
       {stats.map((s, i) => (
         <Fragment key={i}>
