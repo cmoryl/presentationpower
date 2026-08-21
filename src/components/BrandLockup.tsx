@@ -101,7 +101,10 @@ export function BrandLockup({
   // file on dark chrome. Mark-only chrome renders the colour brick mark.
   if (ELEMENT_BRANDS.has(logo.wordmark)) {
     const onDark = /^#?fff(fff)?$/i.test(color) || color.toLowerCase() === "white";
-    const markPx = Math.round(dims.markPx * (isMarkOnly ? 1.25 : 1));
+    // Element templates are the platform's own marketing; the lockup should
+    // read with authority. Scale both the mark and lockup ~50% above the
+    // baseline corporate sizing so the five-brick artwork carries the page.
+    const markPx = Math.round(dims.markPx * (isMarkOnly ? 1.25 * 1.5 : 1.5));
     if (isMarkOnly) {
       return (
         <div className="inline-flex" style={{ color }}>
@@ -109,7 +112,7 @@ export function BrandLockup({
         </div>
       );
     }
-    const lockupPx = Math.round(markPx * 1.55);
+    const lockupPx = Math.round(markPx * 1.55 * 1.5);
     return (
       <div
         className="inline-flex items-center"
