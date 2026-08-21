@@ -12,6 +12,7 @@ type SessionInfo = {
 };
 
 function SessionRoleBanner() {
+  const queryClient = useQueryClient();
   const [info, setInfo] = useState<SessionInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
