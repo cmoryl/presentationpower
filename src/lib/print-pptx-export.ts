@@ -23,6 +23,31 @@ export type PrintPptxOptions = {
   filename?: string;
   title?: string;
 };
+/** Re-encode a PNG data URL as opaque JPEG so PowerPoint files stay openable. */
+async function toJpeg(pngDataUrl: string, quality: number): Promise<string> {
+  try {
+    const img = new Image();
+    img.decoding = "sync";
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("raster decode failed"));
+      img.src = pngDataUrl;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return pngDataUrl;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    const jpeg = canvas.toDataURL("image/jpeg", quality);
+    return jpeg.startsWith("data:image/jpeg") ? jpeg : pngDataUrl;
+  } catch {
+    return pngDataUrl;
+  }
+}
+
 
 function trimOf(opts: PrintPptxOptions): { widthIn: number; heightIn: number } {
   if (opts.custom?.widthIn && opts.custom?.heightIn) return opts.custom;
@@ -56,12 +81,17 @@ export async function exportPrintPagesAsPptx(
     const rect = node.getBoundingClientRect();
     const nodeRatio = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : slideRatio;
     const resolved = resolvePrintPixelWidth(widthIn, heightIn, dpi);
-    const dataUrl = await withExportChrome(() =>
+    const png = await withExportChrome(() =>
       captureSlideAsDataUrl(node, {
         mode: opts.mode ?? "light",
         targetWidth: resolved.widthPx,
       }),
     );
+    // Page rasters are photographic (gradients, imagery, maps): PNG runs 2-4MB
+    // each and a 20-page proposal produced a ~50MB file PowerPoint struggles to
+    // open and re-render. Re-encode to high-quality JPEG on an opaque white
+    // canvas — same pixels, ~10x smaller, no transparency to lose.
+    const dataUrl = await toJpeg(png, 0.92);
 
     let w = widthIn;
     let h = widthIn / nodeRatio;
@@ -76,6 +106,7 @@ export async function exportPrintPagesAsPptx(
     slide.background = { color: "FFFFFF" };
     slide.addImage({ data: dataUrl, x, y, w, h });
   }
+
 
 
   // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
