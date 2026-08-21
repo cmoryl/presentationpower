@@ -1136,18 +1136,65 @@ export function VariantSampleStudio({
           ) : tab === "copy" ? (
             <>
               <p className="mt-3 text-[11px] text-white/50">
-                {liveEdit
-                  ? "Click any text on the slide to edit in place, or type here."
-                  : "Live edit is off — type here to change copy."}
+                {isStepChain
+                  ? "Click a step on the slide to edit just that step, or pick one below."
+                  : liveEdit
+                    ? "Click any text on the slide to edit in place, or type here."
+                    : "Live edit is off — type here to change copy."}
               </p>
+              {isStepChain && stepCount > 0 && (
+                <div className="mt-3 rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
+                  <div className="text-[10px] uppercase tracking-widest text-white/40">
+                    Edit step
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setStepFocus(null)}
+                      className={`min-h-[28px] rounded-full border px-2.5 text-[11px] transition ${
+                        activeStep === null
+                          ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                          : "border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                      }`}
+                    >
+                      All copy
+                    </button>
+                    {Array.from({ length: stepCount }, (_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setStepFocus(i)}
+                        title={String((items?.[i] as { label?: unknown })?.label ?? `Step ${i + 1}`)}
+                        className={`min-h-[28px] min-w-[28px] rounded-full border px-2 text-[11px] transition ${
+                          activeStep === i
+                            ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                            : "border-white/20 text-white/60 hover:border-white/50 hover:text-white"
+                        }`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                  {activeStep !== null && (
+                    <p className="mt-2 text-[11px] text-white/45">
+                      Step {activeStep + 1}
+                      {String((items?.[activeStep] as { label?: unknown })?.label ?? "")
+                        ? ` · ${String((items?.[activeStep] as { label?: unknown })?.label)}`
+                        : ""}{" "}
+                      — Alt-click the tile on the slide to swap its icon.
+                    </p>
+                  )}
+                </div>
+              )}
               <div className="mt-3 space-y-2">
-                {fields.length === 0 && (
+                {visibleFields.length === 0 && (
                   <p className="text-[11px] text-white/45">
                     This module has no editable text fields.
                   </p>
                 )}
-                {fields.map((path) => {
+                {visibleFields.map((path) => {
                   const value = String(readPath(copy, path) ?? "");
+
                   const seedValue = String(readPath(seeded, path) ?? "");
                   const changed = value !== seedValue;
                   const isModeOverride = layer?.copy && path in layer.copy;
