@@ -578,6 +578,7 @@ function renderPrintByKind(
           mode={mode}
           pageSize="Letter"
           density="standard"
+          {...(typeof pageIndex === "number" ? { pageIndex } : {})}
         />
       );
     return (
