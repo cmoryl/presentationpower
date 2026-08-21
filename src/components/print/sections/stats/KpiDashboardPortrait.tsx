@@ -1,5 +1,6 @@
 // Portrait-native port of MV-KPI-DASHBOARD. Two-column grid with divider
 // hairlines, big value + label + optional delta. Sized for an 816px canvas.
+import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
@@ -91,11 +92,12 @@ export function KpiDashboardPortrait({
                     letterSpacing: "-0.035em",
                     color: ink.strong,
                     fontVariantNumeric: "tabular-nums",
+                    ...STAT_VALUE_NOWRAP,
                   }}
                 >
                   {it.value || "—"}
                 </span>
-                {it.unit && (
+                {statUnitParts(it.unit).inline && (
                   <span
                     style={{
                       fontSize: cq(16),
@@ -104,7 +106,7 @@ export function KpiDashboardPortrait({
                       letterSpacing: "-0.015em",
                     }}
                   >
-                    {it.unit}
+                    {statUnitParts(it.unit).inline}
                   </span>
                 )}
               </div>
@@ -117,6 +119,7 @@ export function KpiDashboardPortrait({
                   maxWidth: cq(220),
                 }}
               >
+                {statUnitParts(it.unit).word ? `${statUnitParts(it.unit).word} · ` : ""}
                 {it.label}
               </div>
               {it.delta && (

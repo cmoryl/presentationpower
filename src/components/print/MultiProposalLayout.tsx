@@ -15,6 +15,7 @@
 // stack them and exportPrintAssetAsPdf() can emit a real multi-page PDF. All
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
+import { statUnitParts } from "@/lib/print-stat-unit";
 import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -1121,8 +1122,10 @@ function StatsPage({
 
       {STAT_SLOTS.map((slot, i) => {
         const authored = stats[i];
-        const value = authored ? `${authored.value ?? ""}${authored.unit ?? ""}` : slot.value;
-        const label = authored?.label ?? slot.label;
+        const parts = statUnitParts(authored?.unit);
+        const value = authored ? `${authored.value ?? ""}${parts.inline ?? ""}` : slot.value;
+        const baseLabel = authored?.label ?? slot.label;
+        const label = parts.word ? `${parts.word} · ${baseLabel}` : baseLabel;
         return (
           <div key={i}>
             <T

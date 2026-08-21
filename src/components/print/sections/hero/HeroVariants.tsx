@@ -5,6 +5,7 @@
 // band, split photo, typographic stack, accent band, stat lockup, and the
 // case-study client lockup.
 
+import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
@@ -468,10 +469,13 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
                   letterSpacing: "-0.03em",
                   color: accent,
                   lineHeight: 1,
+                  ...STAT_VALUE_NOWRAP,
                 }}
               >
                 {s.value}
-                {s.unit && <span style={{ fontSize: cq(14) }}>{s.unit}</span>}
+                {statUnitParts(s.unit).inline && (
+                  <span style={{ fontSize: cq(14) }}>{statUnitParts(s.unit).inline}</span>
+                )}
               </div>
               <div
                 style={{
@@ -482,6 +486,7 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
                   ...clampLines(2),
                 }}
               >
+                {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
                 {s.label}
               </div>
             </div>
@@ -904,7 +909,9 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
                   }}
                 >
                   {s.value}
-                  {s.unit && <span style={{ fontSize: cq(14) }}>{s.unit}</span>}
+                  {statUnitParts(s.unit).inline && (
+                    <span style={{ fontSize: cq(14) }}>{statUnitParts(s.unit).inline}</span>
+                  )}
                 </div>
                 <div
                   style={{
@@ -916,6 +923,7 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
                     ...clampLines(3),
                   }}
                 >
+                  {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
                   {s.label}
                 </div>
               </div>

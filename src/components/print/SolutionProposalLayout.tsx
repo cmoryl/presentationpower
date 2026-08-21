@@ -1,3 +1,4 @@
+import { statUnitParts } from "@/lib/print-stat-unit";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
@@ -55,7 +56,13 @@ function iconFor(name: string | undefined, i: number): string {
 }
 
 function statValue(s: { value: string; unit?: string }): string {
-  return `${s.value ?? ""}${s.unit ?? ""}`;
+  // Word units drop to the label line; only symbol units stay on the numeral.
+  return `${s.value ?? ""}${statUnitParts(s.unit).inline ?? ""}`;
+}
+
+function statLabel(s: { label?: string; unit?: string }): string {
+  const word = statUnitParts(s.unit).word;
+  return word ? `${word} · ${s.label ?? ""}`.trim() : (s.label ?? "");
 }
 
 export function SolutionProposalLayout({
@@ -584,7 +591,7 @@ export function SolutionProposalLayout({
                             ...clampLines(2),
                           }}
                         >
-                          {s.label}
+                          {statLabel(s)}
                         </div>
                       </div>
                     ))}
