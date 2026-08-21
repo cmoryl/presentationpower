@@ -900,7 +900,18 @@ const STAT_SLOTS: Array<{
   },
 ];
 
-function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+const HEADLINE_PT = 37;
+const HEADLINE_MIN_PT = 20;
+
+function StatsPage({
+  page,
+  pageIndex,
+  logoWhite,
+}: {
+  page: MultiProposalPage;
+  pageIndex: number;
+  logoWhite: string;
+}) {
   const authoredHeadline = paragraphLines(page.title);
   const headline = authoredHeadline.length
     ? authoredHeadline
@@ -911,6 +922,15 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
     return -1;
   })();
   const stats = page.stats ?? [];
+  const editCtx = usePrintLogoList();
+  const editing = !!editCtx?.active;
+  const [fit, setFit] = useState<FitReport | null>(null);
+  const authoredPt = clampHeadlinePt(page.titleSizePt ?? HEADLINE_PT);
+  const setHeadlinePt = (pt: number | null) =>
+    editCtx?.onChange(
+      `pages.${pageIndex}.titleSizePt`,
+      pt == null ? undefined : clampHeadlinePt(pt),
+    );
 
   return (
     <>
@@ -942,11 +962,12 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
         y={0.94}
         w={4.6}
         maxH={2.92}
-        size={37}
-        minSize={20}
+        size={authoredPt}
+        minSize={HEADLINE_MIN_PT}
         weight={400}
         leading={1.28}
         tracking="-0.015em"
+        {...(editing ? { onFit: setFit } : {})}
       >
         {headline.map((line, i) => (
           <span key={i} style={{ fontWeight: i === emphasisIndex ? 700 : 400 }}>
@@ -955,6 +976,16 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
           </span>
         ))}
       </FitT>
+
+      {editing && fit ? (
+        <HeadlineFitBadge
+          fit={fit}
+          authoredPt={authoredPt}
+          onSet={setHeadlinePt}
+          onReset={() => setHeadlinePt(null)}
+        />
+      ) : null}
+
 
 
 
