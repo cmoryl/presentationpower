@@ -586,7 +586,9 @@ export function ShareMenu({ deckId }: { deckId: string }) {
             )}
           </div>
         </div>
+        </AnchoredPortal>
       )}
+
       <ExportPreflightModal
         open={preflightIssues !== null && preflightIssues.length > 0}
         issues={preflightIssues ?? []}
