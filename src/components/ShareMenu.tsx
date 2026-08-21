@@ -387,6 +387,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   return (
     <div ref={ref} className="relative">
       <button
+        ref={setTriggerEl}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
@@ -398,7 +399,21 @@ export function ShareMenu({ deckId }: { deckId: string }) {
         <Share2 size={14} />
       </button>
       {open && (
-        <div className="absolute right-0 z-30 mt-2 w-80 overflow-hidden rounded-2xl border border-black/10 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-white/10 dark:bg-[#07061F]/95">
+        <AnchoredPortal>
+        <div
+          ref={panelRef}
+          role="menu"
+          aria-label="Share and export"
+          style={{
+            position: "fixed",
+            top: pos.top,
+            left: pos.left,
+            width: pos.width,
+            maxHeight: pos.maxHeight,
+          }}
+          className="z-[140] overflow-y-auto overscroll-contain rounded-2xl border border-black/10 bg-white shadow-[0_24px_60px_-20px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-[#07061F]"
+        >
+
           <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
             <div className="text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
               Share &amp; export
