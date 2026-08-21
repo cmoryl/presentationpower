@@ -8,6 +8,7 @@
 // -----------------------------------------------------------------------------
 
 import { STAGE_H, STAGE_W } from "./export-quality";
+import { exportSlideBounds } from "./export-space";
 import type { TextRun } from "./export-text-layer";
 
 export const PPTX_SLIDE_W_IN = 13.333;
@@ -121,8 +122,11 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
 
   const wRaw =
     run.singleLine && align === "left"
-      ? Math.max(0.1, Math.min(PPTX_SLIDE_W_IN - Math.max(0, inX(run.x)), inX(contentPx) + slack + 1))
-      : Math.min(PPTX_SLIDE_W_IN, inX(contentPx) + slack);
+      ? Math.max(
+          0.1,
+          Math.min(exportSlideBounds().wIn - Math.max(0, inX(run.x)), inX(contentPx) + slack + 1),
+        )
+      : Math.min(exportSlideBounds().wIn, inX(contentPx) + slack);
   // Extra width lands on the right edge, so centred / right-aligned copy shifts
   // left by the same amount to stay optically anchored where it sits on screen.
   const grow = Math.max(0, wRaw - inX(run.w));
@@ -140,7 +144,7 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     // clips it vertically instead.
     h: r3(
       Math.min(
-        PPTX_SLIDE_H_IN,
+        exportSlideBounds().hIn,
         run.singleLine && run.letterSpacingPx > 0
           ? Math.max(inY(run.h) + 0.02, (size * 1.45) / 72)
           : inY(run.h) + 0.02,

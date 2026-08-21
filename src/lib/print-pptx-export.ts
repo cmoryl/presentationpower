@@ -2,15 +2,28 @@
 // Print pages -> PowerPoint
 //
 // A print piece (proposal, brochure, case study) is authored at a fixed page
-// geometry, so the honest PPTX is one slide per page sized to the trim, with the
-// rendered page placed edge to edge. Uses the same capture engine as the PDF
-// exporter, so authoring chrome (guides, resize rails, edit outlines) is
-// suppressed and cross-origin imagery is inlined before rasterization.
+// geometry, so the honest PPTX is one slide per page sized to the trim.
+//
+// LAYERED-EDITABLE (default, matching deck exports): each page is decomposed
+// into native PowerPoint objects — boxes with their own fills/strokes/radii,
+// pictures, rules and editable text boxes at the build's own geometry and type
+// metrics — over a design plate that carries only the paint OOXML cannot
+// describe (frosted glass, radial washes, filtered art). Nothing is flattened
+// that could be an object.
+//
+// FLAT: one raster per page (the old behaviour), kept as an automatic fallback
+// when a page cannot be decomposed.
+//
+// Both paths use the same capture engine as the PDF exporter, so authoring
+// chrome (guides, resize rails, edit outlines) is suppressed and cross-origin
+// imagery is inlined before rasterization.
 // -----------------------------------------------------------------------------
 
 import { captureSlideAsDataUrl } from "./slide-image-export";
 import { withExportChrome } from "./export-chrome-suppress";
 import { PRINT_PAGE_PRESETS, resolvePrintPixelWidth } from "./print-asset-export";
+import { spaceForTrim, withExportSlideBounds } from "./export-space";
+import { capturePrintPageLayers } from "./print-pptx-layered";
 import type { PrintMode, PrintPageSize } from "./print-assets.types";
 
 export type PrintPptxOptions = {
@@ -22,7 +35,13 @@ export type PrintPptxOptions = {
   dpi?: number;
   filename?: string;
   title?: string;
+  /**
+   * "editable" (default) ships layered native objects + a design plate;
+   * "flat" ships one raster per page.
+   */
+  fidelity?: "editable" | "flat";
 };
+
 /** Re-encode a PNG data URL as opaque JPEG so PowerPoint files stay openable. */
 async function toJpeg(pngDataUrl: string, quality: number): Promise<string> {
   try {
@@ -74,6 +93,7 @@ export async function exportPrintPagesAsPptx(
   if (opts.title) pptx.title = opts.title;
 
   const slideRatio = widthIn / heightIn;
+  const editable = (opts.fidelity ?? "editable") === "editable";
 
   for (const node of pages) {
     // Capture at the page's own aspect ratio, then letterbox it into the slide.
@@ -81,17 +101,6 @@ export async function exportPrintPagesAsPptx(
     const rect = node.getBoundingClientRect();
     const nodeRatio = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : slideRatio;
     const resolved = resolvePrintPixelWidth(widthIn, heightIn, dpi);
-    const png = await withExportChrome(() =>
-      captureSlideAsDataUrl(node, {
-        mode: opts.mode ?? "light",
-        targetWidth: resolved.widthPx,
-      }),
-    );
-    // Page rasters are photographic (gradients, imagery, maps): PNG runs 2-4MB
-    // each and a 20-page proposal produced a ~50MB file PowerPoint struggles to
-    // open and re-render. Re-encode to high-quality JPEG on an opaque white
-    // canvas — same pixels, ~10x smaller, no transparency to lose.
-    const dataUrl = await toJpeg(png, 0.92);
 
     let w = widthIn;
     let h = widthIn / nodeRatio;
@@ -104,8 +113,58 @@ export async function exportPrintPagesAsPptx(
 
     const slide = pptx.addSlide();
     slide.background = { color: "FFFFFF" };
-    slide.addImage({ data: dataUrl, x, y, w, h });
+
+    // ---- layered editable ---------------------------------------------------
+    if (editable) {
+      const space = spaceForTrim(w, h);
+      const layers = await capturePrintPageLayers(node, {
+        space,
+        offsetPx: { x: x * 144, y: y * 144 },
+        mode: opts.mode ?? "light",
+        targetWidth: resolved.widthPx,
+      });
+      if (layers) {
+        slide.addImage({
+          data: await toJpeg(layers.plate, 0.92),
+          x,
+          y,
+          w,
+          h,
+          objectName: "TP Design plate",
+        });
+        // Slide bounds move with the trim so off-slide guards and width clamps
+        // in the shared placers measure against THIS page, not a 16:9 slide.
+        await withExportSlideBounds(widthIn, heightIn, async () => {
+          if (layers.shapes.length > 0) {
+            const { placeDomShapes } = await import("./export-dom-place");
+            placeDomShapes(slide, layers.shapes, { maxObjects: 600 });
+          }
+          const { placeTextRuns } = await import("./export-text-place");
+          placeTextRuns(
+            slide as unknown as { addText: (t: unknown, o: Record<string, unknown>) => unknown },
+            layers.runs,
+          );
+        });
+        continue;
+      }
+      // Decomposition failed for this page — fall through to the flat raster so
+      // the page still ships exactly as designed.
+    }
+
+    // ---- flat raster fallback ----------------------------------------------
+    const png = await withExportChrome(() =>
+      captureSlideAsDataUrl(node, {
+        mode: opts.mode ?? "light",
+        targetWidth: resolved.widthPx,
+      }),
+    );
+    // Page rasters are photographic (gradients, imagery, maps): PNG runs 2-4MB
+    // each and a 20-page proposal produced a ~50MB file PowerPoint struggles to
+    // open and re-render. Re-encode to high-quality JPEG on an opaque white
+    // canvas — same pixels, ~10x smaller, no transparency to lose.
+    slide.addImage({ data: await toJpeg(png, 0.92), x, y, w, h });
   }
+
 
 
 
@@ -114,8 +173,14 @@ export async function exportPrintPagesAsPptx(
   // the order before writing so the file passes strict OOXML validation.
   const blob = (await pptx.write({ outputType: "blob" })) as Blob;
   const fileName = opts.filename ?? "print-asset.pptx";
-  const fixed = await reorderPresentationXml(blob);
+  // Same native-feature pass the deck exporter runs: editable gradient stops
+  // (per-stop alpha), explicit "No line", zero text insets for baked lines, alt
+  // text from object names, content-type repair.
+  const { applyNativePptxFeatures } = await import("./pptx-native-xml");
+  const native = await applyNativePptxFeatures(blob, { altText: true });
+  const fixed = await reorderPresentationXml(native);
   triggerDownload(fixed, fileName);
+
 }
 
 async function reorderPresentationXml(blob: Blob): Promise<Blob> {

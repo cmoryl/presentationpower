@@ -225,12 +225,21 @@ function directText(el: Element): string {
  * Measure every visible text run inside a settled export stage.
  * Runs are returned in DOM order (paint order), in stage pixel space.
  */
-export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: HTMLElement[] } {
+export function extractTextRuns(
+  stage: HTMLElement,
+  /**
+   * Measurement space in stage px. Defaults to the 1920×1080 deck stage; print
+   * pages pass `trim inches × 144` so px→inch/pt conversion stays one constant.
+   */
+  space?: { w: number; h: number },
+): { runs: TextRun[]; nodes: HTMLElement[] } {
   const stageRect = stage.getBoundingClientRect();
+  const spaceW = space?.w ?? STAGE_W;
+  const spaceH = space?.h ?? STAGE_H;
   // The stage may be rendered at a scale ≠ 1 in some hosts; normalise to the
-  // canonical 1920×1080 space so px→inch conversion is one constant.
-  const sx = stageRect.width ? STAGE_W / stageRect.width : 1;
-  const sy = stageRect.height ? STAGE_H / stageRect.height : 1;
+  // measurement space so px→inch conversion is one constant.
+  const sx = stageRect.width ? spaceW / stageRect.width : 1;
+  const sy = stageRect.height ? spaceH / stageRect.height : 1;
 
   const runs: TextRun[] = [];
   const nodes: HTMLElement[] = [];
@@ -273,7 +282,7 @@ export function extractTextRuns(stage: HTMLElement): { runs: TextRun[]; nodes: H
     const y = (rect.top - stageRect.top + padT) * sy;
     const w = Math.max(4, (rect.width - padL - padR) * sx);
     const h = Math.max(4, (rect.height - padT - padB) * sy);
-    if (x > STAGE_W || y > STAGE_H) continue;
+    if (x > spaceW || y > spaceH) continue;
 
     const fontSizePx = (parseFloat(cs.fontSize) || 16) * sy;
     const lhRaw = parseFloat(cs.lineHeight);

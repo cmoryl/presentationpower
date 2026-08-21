@@ -16,8 +16,9 @@ import type PptxGenJS from "pptxgenjs";
 import type { DomColor, DomShape } from "./export-dom-decompose";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
-import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
+import { gradientTag, pxToPt } from "./export-surface";
 import { coverCropTag, roundPicTag } from "./pptx-shape-normalize";
+import { exportSlideBounds } from "./export-space";
 
 /** Stage px → inches. */
 function inOf(px: number): number {
@@ -62,7 +63,8 @@ export function placeDomShapes(
     const w = inOf(s.w);
     const h = inOf(s.h);
     if (w < minSide || h < minSide) continue;
-    if (x >= SLIDE_W_IN || y >= SLIDE_H_IN) continue;
+    const bounds = exportSlideBounds();
+    if (x >= bounds.wIn || y >= bounds.hIn) continue;
 
     const radiusIn = pxToRadiusIn(s.radiusPx);
     const shadow = s.shadow && s.shadow.color.alpha >= 0.04
