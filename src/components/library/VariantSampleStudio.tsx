@@ -224,6 +224,10 @@ export function VariantSampleStudio({
   const fields = useMemo(() => collectStringPaths(copy), [copy]);
   const items = Array.isArray(copy.items) ? (copy.items as Record<string, unknown>[]) : null;
   const isLogoModule = /LOGO/i.test(variant.id);
+  const isStepChain = variant.id === "MV-PROC-STEP-CHAIN";
+  /** Steps actually rendered by the chain (the renderer caps at nine). */
+  const stepCount = isStepChain ? Math.min(items?.length ?? 0, 9) : 0;
+
   const logoCells = useMemo(() => collectLogoCells(copy, isLogoModule), [copy, isLogoModule]);
   const capacity = variant.capacity?.items;
   const busy = save.isPending || reset.isPending;
