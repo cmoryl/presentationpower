@@ -23,6 +23,31 @@ export type PrintPptxOptions = {
   filename?: string;
   title?: string;
 };
+/** Re-encode a PNG data URL as opaque JPEG so PowerPoint files stay openable. */
+async function toJpeg(pngDataUrl: string, quality: number): Promise<string> {
+  try {
+    const img = new Image();
+    img.decoding = "sync";
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("raster decode failed"));
+      img.src = pngDataUrl;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return pngDataUrl;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
+    const jpeg = canvas.toDataURL("image/jpeg", quality);
+    return jpeg.startsWith("data:image/jpeg") ? jpeg : pngDataUrl;
+  } catch {
+    return pngDataUrl;
+  }
+}
+
 
 function trimOf(opts: PrintPptxOptions): { widthIn: number; heightIn: number } {
   if (opts.custom?.widthIn && opts.custom?.heightIn) return opts.custom;
