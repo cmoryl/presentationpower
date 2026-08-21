@@ -46,7 +46,20 @@ type RenderPreview = (
   brand: BrandMode,
   mode: "light" | "dark",
   content?: unknown,
+  /** Multi-page documents: render only this page (used for card art). */
+  pageIndex?: number,
 ) => React.ReactElement | null;
+
+/** Multi-page master (Solution Proposal etc.) — card art renders page 1 live. */
+function isMultiPageItem(item: PrintLibraryItem): boolean {
+  const pages = (item.content as { pages?: unknown[] } | undefined)?.pages;
+  return Array.isArray(pages) && pages.length > 1;
+}
+
+function pageCountOf(item: PrintLibraryItem): number {
+  const pages = (item.content as { pages?: unknown[] } | undefined)?.pages;
+  return Array.isArray(pages) ? pages.length : 0;
+}
 
 /**
  * Division → print type → collection browser for the print library. Replaces
