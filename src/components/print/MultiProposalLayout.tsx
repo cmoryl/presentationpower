@@ -2556,7 +2556,7 @@ function PageBody({
     case "locations-region":
       return <RegionLocationsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "clients":
-      return <ClientsPage page={page} logoWhite={logoWhite} />;
+      return <ClientsPage page={page} logoWhite={logoWhite} pageIndex={pageIndex} />;
     case "success-stories":
       return <StoriesPage page={page} logoWhite={logoWhite} />;
     case "stories-grid":

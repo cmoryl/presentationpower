@@ -791,7 +791,7 @@ export type MultiProposalPage = {
   /** Advocates page — affinity group logo wall (editable: add/order/remove). */
   affinityLogos?: Array<{ id?: string; name?: string; url?: string }>;
   /** Client wall tiles — logo art plus an editable client name. */
-  clients?: Array<{ name?: string; url?: string }>;
+  clients?: Array<{ id?: string; name?: string; url?: string }>;
   footnote?: string;
 };
 
