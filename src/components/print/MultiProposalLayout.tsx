@@ -2024,12 +2024,9 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
         slot="stories.logo.1"
       />
       <Dots x={3.72} y={3.05} color={BLUE} />
-      <T x={3.72} y={3.33} w={3.5} size={10} color={NAVY} leading={1.42}>
-        {first?.text ? `"${first.text.replace(/^"|"$/g, "")}"` : ""}
-      </T>
-      <T x={3.72} y={5.02} w={3.5} size={10} color={NAVY}>
-        {first ? `– ${[first.role || first.author, first.company].filter(Boolean).join(", ")}` : ""}
-      </T>
+      <QuoteBody x={3.72} y={3.33} w={3.5} maxH={1.6} size={10} quote={first} />
+      <QuoteAttribution x={3.72} y={5.02} w={3.5} size={10} quote={first} />
+
 
       {/* Card 2 */}
       <L x={0.64} y={6.8} w={7.38} h={3.62} style={{ border: cardBorder, borderRadius: u(0.34) }} />
