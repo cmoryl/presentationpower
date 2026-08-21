@@ -14,7 +14,6 @@ export const enableDeckSharing = createServerFn({ method: "POST" })
     return { token };
   });
 
-
 export const setDeckShareExpiry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw) =>
