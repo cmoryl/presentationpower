@@ -11,7 +11,9 @@
  */
 
 import { useTheme } from "@/hooks/use-theme";
-import elementLogoAsset from "@/assets/element-logo.png.asset.json";
+import elementLogoAsset from "@/assets/element-logo.svg.asset.json";
+import elementLogoReversedAsset from "@/assets/element-logo-reversed.svg.asset.json";
+import elementLogoMonoAsset from "@/assets/element-logo-mono.svg.asset.json";
 
 export type ElementMarkTone = "mono" | "color" | "reversed";
 /** `auto` follows the app theme: mono in light, reversed (white) in dark. */
@@ -24,22 +26,45 @@ export function useResolvedElementTone(tone: ElementTone): ElementMarkTone {
   return mode === "dark" ? "reversed" : "mono";
 }
 
-
+/**
+ * Master-file brick geometry, normalised from the approved artwork
+ * (viewBox 156.5 191 356.5 363) to a 100 x 101.8 grid. Do not redraw.
+ */
 const BRICKS = [
-  { x: 0, y: 0, w: 100, h: 20, k: "cap" },
-  { x: 0, y: 26, w: 26, h: 20, k: "midShort" },
-  { x: 32, y: 26, w: 68, h: 20, k: "midLong" },
-  { x: 0, y: 52, w: 68, h: 20, k: "baseLong" },
-  { x: 74, y: 52, w: 26, h: 20, k: "baseShort" },
+  { x: 0, y: 0, w: 100, h: 28.89, k: "cap" },
+  { x: 0, y: 35.19, w: 35.48, h: 30.16, k: "midShort" },
+  { x: 41.52, y: 35.19, w: 58.48, h: 30.16, k: "midLong" },
+  { x: 0, y: 72.09, w: 58.77, h: 29.73, k: "baseLong" },
+  { x: 64.66, y: 72.09, w: 35.34, h: 29.73, k: "baseShort" },
 ] as const;
 
-/** Brand spectrum assignment for the color mark (fixed — do not re-map). */
-const COLOR_FILLS: Record<string, string> = {
-  cap: "#2563EB",
-  midShort: "#14B8A6",
-  midLong: "#0D2A6B",
-  baseLong: "#FF6B57",
-  baseShort: "#8B5CF6",
+const MARK_H = 101.82;
+
+/** Master-file colour assignment for the colour mark (fixed — do not re-map). */
+export const ELEMENT_BRICK_COLORS = {
+  cap: "#135CFB",
+  midShort: "#08BFC1",
+  midLong: "#073091",
+  baseLong: "#FC5950",
+  baseShort: "#7C4EF4",
+} as const;
+
+const COLOR_FILLS: Record<string, string> = ELEMENT_BRICK_COLORS;
+
+/** Ordered brick spectrum for motifs, rails and accent rows. */
+export const ELEMENT_SPECTRUM = [
+  ELEMENT_BRICK_COLORS.cap,
+  ELEMENT_BRICK_COLORS.midShort,
+  ELEMENT_BRICK_COLORS.midLong,
+  ELEMENT_BRICK_COLORS.baseLong,
+  ELEMENT_BRICK_COLORS.baseShort,
+] as const;
+
+/** Master lockup artwork per tone (approved SVG files, never redrawn). */
+export const ELEMENT_LOCKUP_URLS: Record<ElementMarkTone, string> = {
+  color: elementLogoAsset.url,
+  reversed: elementLogoReversedAsset.url,
+  mono: elementLogoMonoAsset.url,
 };
 
 export function ElementMark({
