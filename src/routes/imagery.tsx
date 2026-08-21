@@ -121,8 +121,8 @@ function ImageryPage() {
 
   return (
     <AppShell>
-      <div className="flex flex-wrap items-baseline justify-between gap-3 sm:gap-6">
-        <div>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 sm:flex sm:flex-wrap sm:justify-between sm:gap-6">
+        <div className="min-w-0">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Master Imagery</div>
           <h1 className="mt-3 text-4xl font-semibold text-[#03002C]">Brand imagery repository</h1>
           <p className="mt-3 max-w-2xl text-black/60">

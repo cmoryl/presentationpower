@@ -831,7 +831,7 @@ function ProgressPanel({
 
   return (
     <div className="mt-10 rounded-2xl border border-black/10 bg-white p-8">
-      <div className="flex flex-wrap items-baseline justify-between gap-3 sm:gap-6">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 sm:flex sm:flex-wrap sm:justify-between sm:gap-6">
         <div className="min-w-0">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">
             {stage === "done" ? "Ready" : "In progress"}

@@ -103,8 +103,8 @@ function EntryView() {
         >
           ← Back to knowledge
         </Link>
-        <div className="mt-3 flex flex-wrap items-baseline justify-between gap-3 sm:gap-6">
-          <div>
+        <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 sm:flex sm:flex-wrap sm:justify-between sm:gap-6">
+          <div className="min-w-0">
             <div className="text-xs uppercase tracking-[0.3em] text-black/50">
               {KNOWLEDGE_KIND_META[kind].label} · {ownerName}
             </div>
