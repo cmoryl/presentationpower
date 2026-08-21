@@ -60,8 +60,14 @@ export function AppShell({ children }: { children: ReactNode }) {
     document.documentElement.classList.remove("dark");
   }, []);
 
+  // Navigating always dismisses the mobile sheet.
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname, locSearch]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
+
     if (inAdmin) {
       sessionStorage.setItem("tpm.adminCtx", "1");
       setAdminCtx(true);
