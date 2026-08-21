@@ -808,19 +808,32 @@ function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
   const labelW = 2.42;
   const bodyW = tableW - labelW;
 
+  /* Wrap-aware line count: long bullets wrap inside the body column, so the
+     row must be measured on rendered lines, not newlines. */
+  const cpl = Math.max(16, Math.floor(((bodyW - PAD_X * 2) * 72) / (BODY_PT * 0.5)));
+  const wrapped = (body: string | undefined) =>
+    lines(body).reduce((n, l) => n + Math.max(1, Math.ceil(l.length / cpl)), 0);
+
   const visible = rows.slice(0, 5);
-  const rowH = visible.map((r) =>
-    Math.max(0.72, Math.max(1, lines(r.body).length) * bodyLineH + PAD_Y * 2),
-  );
   const tableTop = 2.86;
-  const tableH = rowH.reduce((a, b) => a + b, 0);
-  const rowY = rowH.map((_, i) => tableTop + rowH.slice(0, i).reduce((a, b) => a + b, 0));
+  const baseH = visible.map((r) => Math.max(0.74, wrapped(r.body) * bodyLineH + PAD_Y * 2));
 
   // Timeline block sits a fixed rhythm step below the scope table.
   const tlHeadH = 0.5;
   const tlLineH = (BODY_PT / 72) * 1.5;
-  const tlTop = tableTop + tableH + 0.62;
-  const tlBodyH = Math.max(0.62, timeline.length * tlLineH + PAD_Y * 2);
+  const tlBodyH = Math.max(0.62, wrapped(timeline.join("\n")) * tlLineH + PAD_Y * 2);
+  const tlGap = 0.62;
+
+  /* Fill the plate: any slack left above the page's bottom margin is shared
+     evenly across the scope rows so the table never floats in dead space. */
+  const bottom = 9.28;
+  const baseTotal = baseH.reduce((a, b) => a + b, 0);
+  const room = bottom - tableTop - (tlGap + tlHeadH + tlBodyH);
+  const grow = baseTotal > 0 ? Math.min(1.5, Math.max(1, room / baseTotal)) : 1;
+  const rowH = baseH.map((h) => h * grow);
+  const tableH = rowH.reduce((a, b) => a + b, 0);
+  const rowY = rowH.map((_, i) => tableTop + rowH.slice(0, i).reduce((a, b) => a + b, 0));
+  const tlTop = tableTop + tableH + tlGap;
 
   const plateTop = tableTop - 0.42;
   const plateH = tlTop + tlHeadH + tlBodyH + 0.42 - plateTop;
