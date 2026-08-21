@@ -2487,16 +2487,17 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
             <T x={x + 0.28} y={y + 0.26} w={1.2} size={34} weight={700} color={BLUE} leading={1}>
               {"\u201C"}
             </T>
-            <T
+            <QuoteBody
               x={x + 0.28}
               y={y + 0.86}
               w={cardW - 0.56}
+              maxH={1.56}
               size={9.5}
+              quote={q}
               color="rgba(3,0,44,0.82)"
               leading={1.46}
-            >
-              {storyQuote(q?.text)}
-            </T>
+            />
+
             <Rule x={x + 0.28} y={y + 2.5} w={cardW - 0.56} color="rgba(3,0,44,0.14)" />
             <StoryLogo
               x={x + 0.28}
