@@ -19,7 +19,7 @@
 // imagery is inlined before rasterization.
 // -----------------------------------------------------------------------------
 
-import { captureSlideAsDataUrl } from "./slide-image-export";
+import { captureSlideAsDataUrl, type ExportProgressCallback } from "./slide-image-export";
 import { withExportChrome } from "./export-chrome-suppress";
 import { PRINT_PAGE_PRESETS, resolvePrintPixelWidth } from "./print-asset-export";
 import { spaceForTrim, withExportSlideBounds } from "./export-space";
@@ -51,6 +51,11 @@ export type PrintPptxOptions = {
    * distortion — but the user still wants to know.
    */
   onAspectReport?: (report: AspectCheckReport) => void;
+  /**
+   * Page-by-page progress so the UI can show a real bar instead of a spinner.
+   * `progress` is 0..1 across the whole document, including the final assembly.
+   */
+  onProgress?: ExportProgressCallback;
 };
 
 /** Re-encode a PNG data URL as opaque JPEG so PowerPoint files stay openable. */
@@ -125,8 +130,21 @@ export async function exportPrintPagesAsPptx(
 
   const slideRatio = widthIn / heightIn;
   const editable = (opts.fidelity ?? "editable") === "editable";
+  const total = pages.length;
+  // Capture accounts for ~85% of the wall clock; assembly/repair the rest.
+  const CAPTURE_SHARE = 0.85;
+  opts.onProgress?.({
+    stage: "prepare",
+    progress: 0,
+    message: `Preparing ${total} page${total === 1 ? "" : "s"}…`,
+  });
 
-  for (const node of pages) {
+  for (const [pageIndex, node] of pages.entries()) {
+    opts.onProgress?.({
+      stage: "render",
+      progress: (pageIndex / total) * CAPTURE_SHARE,
+      message: `Rendering page ${pageIndex + 1} of ${total}…`,
+    });
     // Capture at the page's own aspect ratio, then letterbox it into the slide.
     // Stretching the raster to the trim box was what skewed type and artwork.
     const rect = node.getBoundingClientRect();
@@ -176,6 +194,11 @@ export async function exportPrintPagesAsPptx(
             layers.runs,
           );
         });
+        opts.onProgress?.({
+          stage: "render",
+          progress: ((pageIndex + 1) / total) * CAPTURE_SHARE,
+          message: `Page ${pageIndex + 1} of ${total} ready`,
+        });
         continue;
       }
       // Decomposition failed for this page — fall through to the flat raster so
@@ -194,6 +217,11 @@ export async function exportPrintPagesAsPptx(
     // open and re-render. Re-encode to high-quality JPEG on an opaque white
     // canvas — same pixels, ~10x smaller, no transparency to lose.
     slide.addImage({ data: await toJpeg(png, 0.92), x, y, w, h });
+    opts.onProgress?.({
+      stage: "render",
+      progress: ((pageIndex + 1) / total) * CAPTURE_SHARE,
+      message: `Page ${pageIndex + 1} of ${total} ready`,
+    });
   }
 
 
@@ -202,6 +230,11 @@ export async function exportPrintPagesAsPptx(
   // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
   // PresentationML sequence (masters -> notes master -> slides -> sizes). Repair
   // the order before writing so the file passes strict OOXML validation.
+  opts.onProgress?.({
+    stage: "encode",
+    progress: 0.88,
+    message: "Assembling PowerPoint file…",
+  });
   const blob = (await pptx.write({ outputType: "blob" })) as Blob;
   const fileName = opts.filename ?? "print-asset.pptx";
   // Same native-feature pass the deck exporter runs: editable gradient stops
@@ -209,8 +242,10 @@ export async function exportPrintPagesAsPptx(
   // text from object names, content-type repair.
   const { applyNativePptxFeatures } = await import("./pptx-native-xml");
   const native = await applyNativePptxFeatures(blob, { altText: true });
+  opts.onProgress?.({ stage: "encode", progress: 0.96, message: "Finalizing slides…" });
   const fixed = await reorderPresentationXml(native);
   triggerDownload(fixed, fileName);
+  opts.onProgress?.({ stage: "done", progress: 1, message: "Saved" });
 
   return aspectReport;
 }
