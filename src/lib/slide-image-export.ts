@@ -129,6 +129,28 @@ function resolvePixelRatio(
 
 const DEFAULT_READY_TIMEOUT = 6000;
 
+/**
+ * Ceiling for inlined @font-face payloads. html-to-image puts the whole font
+ * CSS inside an SVG data URI; past a few MB the browser refuses to decode the
+ * image and rejects with an opaque `Event`. Beyond this size we capture with
+ * system fonts instead of failing the export outright.
+ */
+const MAX_FONT_EMBED_CHARS = 3_000_000;
+
+/**
+ * html-to-image rejects with a DOM `Event` (image load failure), which prints
+ * as "Event" and tells the user nothing. Turn any rejection into a sentence.
+ */
+export function describeCaptureFailure(err: unknown): string {
+  if (err instanceof Error && err.message) return err.message;
+  if (typeof err === "string" && err) return err;
+  if (typeof Event !== "undefined" && err instanceof Event) {
+    return "the browser could not rasterize this page (image or font asset failed to load)";
+  }
+  return "the browser could not rasterize this page";
+}
+
+
 function report(cb: ExportProgressCallback | undefined, p: ExportProgress): void {
   if (cb) {
     try {
@@ -498,47 +520,58 @@ export async function captureSlideAsDataUrl(
 
   try {
     report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
-    let dataUrl: string;
     const effectiveRatio = resolvePixelRatio(node, opts);
     // Collected once per page and reused for every slide in a batch export.
     const fontEmbedCSS = await getCachedFontEmbedCSS(node);
-    try {
-      dataUrl = await toPng(node, {
-        pixelRatio: effectiveRatio,
-        fontEmbedCSS,
-        // cacheBust appends a unique query per asset, which defeats the HTTP
-        // cache and re-downloads every image on every slide in a batch run.
-        cacheBust: opts.cacheBust ?? false,
-        backgroundColor: MODE_BG[opts.mode],
-        // filter external stylesheets/nodes that break serialization
-        // Drops every authoring affordance (guides, resize rails, overflow
-        // hatch, hero edit badge), not just data-export-ignore.
-        filter: exportNodeFilter,
-      });
-    } catch (err) {
-      // Retry once at a lower ratio — a browser occasionally OOMs on
-      // complex slides above ~3× density.
-      const fallbackRatio = Math.max(1, Math.min(2, effectiveRatio / 2));
+    const safeFontCss = fontEmbedCSS.length > MAX_FONT_EMBED_CHARS ? "" : fontEmbedCSS;
+    if (!safeFontCss && fontEmbedCSS) {
       console.warn(
-        `[slide-image-export] first pass failed at pixelRatio=${effectiveRatio.toFixed(2)}, retrying at ${fallbackRatio.toFixed(2)}`,
-        err,
+        `[slide-image-export] embedded font CSS is ${(fontEmbedCSS.length / 1e6).toFixed(1)}MB — too large to inline, capturing with system fonts`,
       );
-      report(onProgress, {
-        stage: "render",
-        progress: 0.5,
-        message: "Retrying at lower resolution…",
-      });
-      dataUrl = await toPng(node, {
-        pixelRatio: fallbackRatio,
-        fontEmbedCSS,
-        cacheBust: false,
-        backgroundColor: MODE_BG[opts.mode],
-        filter: exportNodeFilter,
-      });
     }
+    const fallbackRatio = Math.max(1, Math.min(2, effectiveRatio / 2));
+    // Tiered attempts: full density → half density → no embedded fonts. The
+    // last tier matters because the SVG <foreignObject> data URI carries every
+    // inlined woff2; on font-heavy pages that payload can exceed what the
+    // browser will decode, and the image load fails with a bare `Event`.
+    const attempts: Array<{ ratio: number; css: string; label: string }> = [
+      { ratio: effectiveRatio, css: safeFontCss, label: `pixelRatio=${effectiveRatio.toFixed(2)}` },
+      { ratio: fallbackRatio, css: safeFontCss, label: `pixelRatio=${fallbackRatio.toFixed(2)}` },
+      { ratio: fallbackRatio, css: "", label: "no embedded fonts" },
+    ];
 
-    report(onProgress, { stage: "encode", progress: 1, message: "Encoding…" });
-    return dataUrl;
+    let lastErr: unknown = null;
+    for (let i = 0; i < attempts.length; i += 1) {
+      const attempt = attempts[i]!;
+      if (i > 0) {
+        report(onProgress, {
+          stage: "render",
+          progress: 0.5,
+          message: `Retrying capture (${attempt.label})…`,
+        });
+      }
+      try {
+        const dataUrl = await toPng(node, {
+          pixelRatio: attempt.ratio,
+          fontEmbedCSS: attempt.css,
+          // cacheBust appends a unique query per asset, which defeats the HTTP
+          // cache and re-downloads every image on every slide in a batch run.
+          cacheBust: i === 0 ? (opts.cacheBust ?? false) : false,
+          backgroundColor: MODE_BG[opts.mode],
+          // Drops every authoring affordance (guides, resize rails, overflow
+          // hatch, hero edit badge), not just data-export-ignore.
+          filter: exportNodeFilter,
+        });
+        if (!dataUrl || dataUrl.length < 512) throw new Error("empty raster");
+        report(onProgress, { stage: "encode", progress: 1, message: "Encoding…" });
+        return dataUrl;
+      } catch (err) {
+        lastErr = err;
+        console.warn(`[slide-image-export] capture failed (${attempt.label})`, err);
+      }
+    }
+    throw new Error(describeCaptureFailure(lastErr));
+
   } finally {
     releaseChrome();
     restoreBackdrop();
