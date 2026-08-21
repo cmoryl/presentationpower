@@ -253,7 +253,8 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/^MV-(PROC|HORIZON|MATURITY-CURVE)/, RECIPES.steps],
   [/^MV-BENTO/, RECIPES.bento],
   // Cyclical devices spin up; charts plot in; figure walls tally.
-  [/(ORBIT|DONUT|GAUGE|PIE|RADIAL|RING|DIAL)/, RECIPES.orbit],
+  [/(DONUT|PIE|BREAKDOWN-RING)/, RECIPES.donut],
+  [/(ORBIT|GAUGE|RADIAL|RING|DIAL)/, RECIPES.orbit],
   [/(FLYWHEEL|CYCLE|LOOP)/, RECIPES.cycle],
   [/(BAR-COMPARE|PERCENT-COMPARE|STACKED-BAR|CATEGORY-BARS|GAUGE-ROW|RANKING|LEADERBOARD)/, RECIPES.plotX],
   [
@@ -347,7 +348,8 @@ export const INTRO_BUDGET_MS = 1250;
  * several elements share one).
  */
 export function introBeatDelay(recipe: IntroRecipe, beat: number, beats: number): number {
-  const spare = Math.max(0, INTRO_BUDGET_MS - recipe.leadMs - recipe.durationMs);
+  const budget = recipe.budgetMs ?? INTRO_BUDGET_MS;
+  const spare = Math.max(0, budget - recipe.leadMs - recipe.durationMs);
   const lastBeat = Math.max(1, beats - 1);
   const step = Math.min(recipe.stepMs, spare / lastBeat);
   return Math.round(recipe.leadMs + beat * step);
@@ -379,7 +381,7 @@ export const ARC_EASE = "cubic-bezier(0.22, 0.61, 0.36, 1)";
  */
 
 /** Recipes whose slides are figure-led, and therefore get the hero-stat beat. */
-export const HERO_STAT_RECIPES = new Set(["figures", "data", "orbit", "plot", "plot-x"]);
+export const HERO_STAT_RECIPES = new Set(["figures", "data", "orbit", "donut", "plot", "plot-x"]);
 /** Below this rendered size (slide-space px) a number is a caption, not a hero. */
 export const HERO_STAT_MIN_PX = 56;
 /** How much bigger the hero must be than the runner-up to stand alone. */
