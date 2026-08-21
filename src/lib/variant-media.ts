@@ -22,6 +22,9 @@ const IMAGE_VARIANT_IDS = new Set<string>([
   "MV-IMG-PORTRAIT",
   "MV-IMG-QUOTE-BG",
   "MV-IMG-STAT-CALLOUT",
+  // Device showcases — the screenshot inside the laptop / monitor
+  "MV-SHOW-LAPTOP",
+  "MV-SHOW-MONITOR",
   // Portrait quote uses a subject photo
   "MV-QUOTE-PORTRAIT",
   // CTA close card renders a supporting photo
@@ -41,6 +44,9 @@ const VIDEO_VARIANT_IDS = new Set<string>([
   "MV-IMG-CAPTION",
   "MV-IMG-PORTRAIT",
   "MV-IMG-QUOTE-BG",
+  // Screen recordings play inside the device screen
+  "MV-SHOW-LAPTOP",
+  "MV-SHOW-MONITOR",
 ]);
 
 /** True when the variant renders a slide-level photograph from
