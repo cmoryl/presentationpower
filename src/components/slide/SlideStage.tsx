@@ -153,14 +153,20 @@ export function SlideStage({ slideKey, direction, transition, children }: Props)
     ? { ...exitPose(activeType, activeDirection), transition: transitionCss }
     : { ...currentPose(), transition: transitionCss };
 
+  // Only hint the compositor while a transition is actually in flight — a
+  // permanent will-change keeps an extra layer alive for every idle slide.
+  const layerHint: CSSProperties = previous
+    ? { willChange: "transform, opacity", backfaceVisibility: "hidden" }
+    : { willChange: "auto" };
+
   return (
     <div className="relative h-full w-full overflow-hidden" data-slide-stage-root="">
       {previous && (
         <div
           key={`prev-${previous.key}`}
           data-slidestage-layer="previous"
-          className="absolute inset-0 will-change-transform"
-          style={previousStyle}
+          className="absolute inset-0"
+          style={{ ...previousStyle, ...layerHint }}
           aria-hidden="true"
         >
           <ScaledSlide>{previous.node}</ScaledSlide>
@@ -169,8 +175,8 @@ export function SlideStage({ slideKey, direction, transition, children }: Props)
       <div
         key={`cur-${current?.key ?? "empty"}`}
         data-slidestage-layer="current"
-        className="absolute inset-0 will-change-transform"
-        style={currentStyle}
+        className="absolute inset-0"
+        style={{ ...currentStyle, ...layerHint }}
       >
         {current && <ScaledSlide>{current.node}</ScaledSlide>}
       </div>
