@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "test:e2e:video-autoplay": "playwright test tests/e2e/library-video-autoplay.spec.ts --project=chromium --project=firefox --project=webkit",
     "test:e2e:smoke": "playwright test tests/e2e/smoke-routes.spec.ts --project=chromium",
+    "test:e2e:resize-stability": "playwright test tests/e2e/deck-editor-resize-stability.spec.ts --project=chromium",
     "bench:images": "bun scripts/bench-image-reencode.mjs",
     "verify:exports": "node scripts/verify-exports.mjs",
     "verify:exports:full": "node scripts/verify-exports.mjs --full",
