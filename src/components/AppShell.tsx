@@ -115,7 +115,9 @@ export function AppShell({ children }: { children: ReactNode }) {
       label: "Print",
       to: "/library/print",
       items: [
+        { to: "/print-agent", label: "Print agent" },
         { to: "/library/print", label: "Print templates" },
+
         { to: "/library/print", label: "Case studies", search: { type: "case-study" } },
         { to: "/library/print", label: "Client spotlights", search: { type: "spotlight" } },
         { to: "/library/print", label: "E-brochures", search: { type: "ebrochure" } },
