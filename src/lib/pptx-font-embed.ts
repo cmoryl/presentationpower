@@ -23,6 +23,7 @@ import JSZip from "jszip";
 import {
   CANONICAL_FONTS,
   FONT_PANOSE,
+  hardenFontFallbacksInXml,
   normalizeTypefacesInXml,
   patchThemeFontScheme,
 } from "./pptx-font-map";
@@ -84,7 +85,9 @@ export async function embedFontsInPptx(
           fetchFont("boldItalic"),
         ])
       : [null, null, null, null];
-    if (embedFontData && !regular) return blob;
+    // A failed font fetch is not fatal: continue with zero embedded parts so the
+    // fallback hardening below still runs (that is exactly the case it exists
+    // for — the opening machine will have to substitute).
 
     // Read the bytes first: JSZip only accepts a Blob where the runtime has
     // Blob-reading support (browser). On the server (headless MCP export) a
@@ -145,12 +148,22 @@ export async function embedFontsInPptx(
     for (const path of Object.keys(zip.files)) {
       if (/^ppt\/theme\/theme\d+\.xml$/.test(path)) {
         const xml = await zip.file(path)!.async("string");
-        zip.file(path, normalizeTypefacesInXml(patchThemeFontScheme(xml)));
+        zip.file(
+          path,
+          hardenFontFallbacksInXml(normalizeTypefacesInXml(patchThemeFontScheme(xml)), {
+            embedded: parts.length > 0,
+          }),
+        );
       } else if (
         /^ppt\/(slides|slideLayouts|slideMasters|notesSlides|notesMasters)\/[^/]+\.xml$/.test(path)
       ) {
         const xml = await zip.file(path)!.async("string");
-        zip.file(path, normalizeTypefacesInXml(xml));
+        zip.file(
+          path,
+          hardenFontFallbacksInXml(normalizeTypefacesInXml(xml), {
+            embedded: parts.length > 0,
+          }),
+        );
       }
     }
 
