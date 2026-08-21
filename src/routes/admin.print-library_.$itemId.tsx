@@ -898,6 +898,64 @@ function MasterItemEditorPage() {
             </>
           ) : null}
 
+          {multiPage && (multiContent?.pages?.[activePage]?.quotes?.length ?? 0) > 0 ? (
+            <Panel title="Quote sizes">
+              <p className="mb-2 text-[11px] leading-[1.5] text-muted-foreground">
+                Click any quote on the page to edit its words. Size sets the ceiling — a long
+                quote still shrinks to stay inside its card.
+              </p>
+              <div className="space-y-2">
+                {(multiContent?.pages?.[activePage]?.quotes ?? []).map((q, i) => {
+                  const path = `pages.${activePage}.quotes.${i}.sizePt`;
+                  const size = typeof q.sizePt === "number" ? q.sizePt : undefined;
+                  const label = q.company || q.author || q.role || `Quote ${i + 1}`;
+                  const bump = (delta: number) =>
+                    patchPath(path, Math.round(((size ?? 10) + delta) * 10) / 10);
+                  return (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="min-w-0 flex-1 truncate text-[11px] text-foreground/80">
+                        {label}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-6 w-6 p-0 text-[11px]"
+                          aria-label={`Decrease size of ${label}`}
+                          onClick={() => bump(-0.5)}
+                        >
+                          A-
+                        </Button>
+                        <span className="w-10 text-center text-[11px] tabular-nums text-muted-foreground">
+                          {size ? `${size}pt` : "auto"}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-6 w-6 p-0 text-[11px]"
+                          aria-label={`Increase size of ${label}`}
+                          onClick={() => bump(0.5)}
+                        >
+                          A+
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 px-1.5 text-[10px]"
+                          aria-label={`Reset size of ${label}`}
+                          onClick={() => patchPath(path, undefined)}
+                        >
+                          Reset
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Panel>
+          ) : null}
+
+
           {draft.content ? (
             <Panel title={`Content — ${textPaths.length} text fields`}>
               <div className="max-h-[480px] space-y-2.5 overflow-y-auto pr-1">
