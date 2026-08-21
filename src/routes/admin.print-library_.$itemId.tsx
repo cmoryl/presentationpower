@@ -264,13 +264,15 @@ function MasterItemEditorPage() {
     });
   };
 
-  const previewMode = draft.look.mode ?? mode;
   // Multi-page documents (solution proposals) edit one page at a time so the
   // inspector on the right stays visible next to the page you are editing.
   const multiContent = draft.content as SolutionProposalContent | undefined;
   const multiPage = !!multiContent && isMultiProposal(multiContent);
+  // Proposals are print stock: always light, no dark preview.
+  const previewMode: PrintMode = multiPage ? "light" : (draft.look.mode ?? mode);
   const pageCount = multiPage ? (multiContent?.pages?.length ?? 0) : 0;
   const activePage = multiPage ? Math.min(proposalPage, Math.max(0, pageCount - 1)) : 0;
+
   // Restart fitting whenever content or page geometry moves.
   const fitDep = {
     content: draft.content ?? null,
@@ -427,17 +429,20 @@ function MasterItemEditorPage() {
         {/* ------------------------- Live page ------------------------- */}
         <section className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <ControlGroup label="Preview mode">
-              {(["light", "dark"] as PrintMode[]).map((m) => (
-                <Chip key={m} on={previewMode === m} onClick={() => setMode(m)}>
-                  {m}
-                </Chip>
-              ))}
-            </ControlGroup>
+            {!multiPage && (
+              <ControlGroup label="Preview mode">
+                {(["light", "dark"] as PrintMode[]).map((m) => (
+                  <Chip key={m} on={previewMode === m} onClick={() => setMode(m)}>
+                    {m}
+                  </Chip>
+                ))}
+              </ControlGroup>
+            )}
             <span className="text-[11px] text-black/45">
               {brand.name} · {draft.look.pageSize ?? "Letter"}
             </span>
           </div>
+
 
           <div className="overflow-hidden rounded-2xl border border-black/10 bg-[#f5f5f2] p-4">
             {draft.content ? (
@@ -637,16 +642,20 @@ function MasterItemEditorPage() {
           </Panel>
 
           <Panel title="Look & feel">
-            <ControlGroup label="Mode">
-              <Chip on={!draft.look.mode} onClick={() => patchLook({ mode: undefined })}>
-                Default
-              </Chip>
-              {(["light", "dark"] as PrintMode[]).map((m) => (
-                <Chip key={m} on={draft.look.mode === m} onClick={() => patchLook({ mode: m })}>
-                  {m}
+            {/* Solution proposals are print-only, always light stock — no mode switch. */}
+            {!multiPage && (
+              <ControlGroup label="Mode">
+                <Chip on={!draft.look.mode} onClick={() => patchLook({ mode: undefined })}>
+                  Default
                 </Chip>
-              ))}
-            </ControlGroup>
+                {(["light", "dark"] as PrintMode[]).map((m) => (
+                  <Chip key={m} on={draft.look.mode === m} onClick={() => patchLook({ mode: m })}>
+                    {m}
+                  </Chip>
+                ))}
+              </ControlGroup>
+            )}
+
             <ControlGroup label="Page">
               {PAGE_SIZES.map((s) => (
                 <Chip

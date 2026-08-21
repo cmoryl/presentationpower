@@ -41,7 +41,6 @@ export async function exportPrintPagesAsPptx(
 
   const { widthIn, heightIn } = trimOf(opts);
   const dpi = opts.dpi ?? 200;
-  const resolved = resolvePrintPixelWidth(widthIn, heightIn, dpi);
 
   const PptxGenJS = (await import("pptxgenjs")).default;
   const pptx = new PptxGenJS();
@@ -49,16 +48,35 @@ export async function exportPrintPagesAsPptx(
   pptx.layout = "PRINT_PAGE";
   if (opts.title) pptx.title = opts.title;
 
+  const slideRatio = widthIn / heightIn;
+
   for (const node of pages) {
+    // Capture at the page's own aspect ratio, then letterbox it into the slide.
+    // Stretching the raster to the trim box was what skewed type and artwork.
+    const rect = node.getBoundingClientRect();
+    const nodeRatio = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : slideRatio;
+    const resolved = resolvePrintPixelWidth(widthIn, heightIn, dpi);
     const dataUrl = await withExportChrome(() =>
       captureSlideAsDataUrl(node, {
         mode: opts.mode ?? "light",
         targetWidth: resolved.widthPx,
       }),
     );
+
+    let w = widthIn;
+    let h = widthIn / nodeRatio;
+    if (h > heightIn) {
+      h = heightIn;
+      w = heightIn * nodeRatio;
+    }
+    const x = (widthIn - w) / 2;
+    const y = (heightIn - h) / 2;
+
     const slide = pptx.addSlide();
-    slide.addImage({ data: dataUrl, x: 0, y: 0, w: widthIn, h: heightIn });
+    slide.background = { color: "FFFFFF" };
+    slide.addImage({ data: dataUrl, x, y, w, h });
   }
+
 
   // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
   // PresentationML sequence (masters -> notes master -> slides -> sizes). Repair
