@@ -17,7 +17,20 @@
 // cheap enough to run whenever the export menu opens.
 // -----------------------------------------------------------------------------
 
-import { PRINT_PAGE_PRESETS } from "./print-asset-export";
+/**
+ * Trim ratios used for the "a different page size would fit" hint. Kept local
+ * (rather than importing PRINT_PAGE_PRESETS) so the PDF exporter can import this
+ * module without a circular dependency.
+ */
+const TRIM_RATIOS: Record<string, number> = {
+  A4: 8.2677 / 11.6929,
+  Letter: 8.5 / 11,
+  Square: 1,
+  HalfLetter: 5.5 / 8.5,
+  A5: 5.8268 / 8.2677,
+  "Letter landscape": 11 / 8.5,
+  "16:9 slide": 16 / 9,
+};
 
 /** How the exporter fits a page into its target box. */
 export type AspectFit = "stretch" | "letterbox";
@@ -79,12 +92,8 @@ function fmtPct(n: number): string {
 
 /** Nearest trim preset (by ratio) for a measured page ratio. */
 function nearestPreset(ratio: number): { name: string; ratio: number; deltaPct: number } | null {
-  const entries = Object.entries(
-    PRINT_PAGE_PRESETS as Record<string, { widthIn: number; heightIn: number }>,
-  );
   let best: { name: string; ratio: number; deltaPct: number } | null = null;
-  for (const [name, dim] of entries) {
-    const r = dim.widthIn / dim.heightIn;
+  for (const [name, r] of Object.entries(TRIM_RATIOS)) {
     const delta = (Math.abs(r - ratio) / r) * 100;
     if (!best || delta < best.deltaPct) best = { name, ratio: r, deltaPct: delta };
   }

@@ -21,6 +21,11 @@ import {
 import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
 import { extendRasterForBleed } from "./print-bleed-extend";
 import {
+  checkExportAspect,
+  logAspectReport,
+  type AspectCheckReport,
+} from "./export-aspect-check";
+import {
   captureVectorText,
   enableHideTextForCapture,
   overlayVectorText,
@@ -144,6 +149,14 @@ export interface VectorTextReport {
   rasterBytes: number;
   finalBytes: number;
   skippedClamped: number;
+}
+
+/** Readable page name for the aspect report: page kind, else ordinal. */
+function labelForPage(node: HTMLElement, index: number): string {
+  const kind =
+    node.getAttribute?.("data-proposal-page") || node.getAttribute?.("data-page-kind") || "";
+  const pretty = kind.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  return `Page ${index + 1}${pretty ? ` (${pretty})` : ""}`;
 }
 
 function resolveTrim(opts: PrintExportOptions): PrintPageDimensions {
