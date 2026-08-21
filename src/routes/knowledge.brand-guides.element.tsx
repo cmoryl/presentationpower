@@ -25,11 +25,11 @@ export const Route = createFileRoute("/knowledge/brand-guides/element")({
 });
 
 const PALETTE = [
-  { hex: "#0D1117", label: "Element Ink" },
-  { hex: "#2563EB", label: "Element Blue" },
-  { hex: "#14B8A6", label: "Signal Teal" },
-  { hex: "#FF6B57", label: "Signal Coral" },
-  { hex: "#8B5CF6", label: "Signal Violet" },
+  { hex: "#0D131D", label: "Element Ink" },
+  { hex: "#135CFB", label: "Element Blue" },
+  { hex: "#08BFC1", label: "Signal Teal" },
+  { hex: "#FC5950", label: "Signal Coral" },
+  { hex: "#7C4EF4", label: "Signal Violet" },
   { hex: "#D1D5DB", label: "System Gray" },
 ];
 
@@ -54,7 +54,7 @@ function Panel({
     <div
       className={`rounded-2xl border p-6 ${
         dark
-          ? "border-white/10 bg-[#0D1117] text-white"
+          ? "border-white/10 bg-[#0D131D] text-white"
           : "border-black/10 bg-white dark:border-white/10 dark:bg-white/5"
       }`}
     >
@@ -94,22 +94,22 @@ function ElementIdentityPage() {
 
       <section className="mt-8 grid gap-5 md:grid-cols-3">
         <Panel label="1 · Primary lockup — light">
-          <ElementLockup layout="stacked" markSize={54} className="text-[#0D1117]" />
+          <ElementLockup layout="stacked" markSize={54} className="text-[#0D131D]" />
         </Panel>
         <Panel label="1a · Primary lockup — color">
-          <ElementLockup layout="stacked" tone="color" markSize={54} className="text-[#0D1117]" />
+          <ElementLockup layout="stacked" tone="color" markSize={54} className="text-[#0D131D]" />
         </Panel>
         <Panel label="8 · Reversed — white on dark" dark>
           <ElementLockup layout="stacked" tone="reversed" markSize={54} />
         </Panel>
         <Panel label="3 · Horizontal lockup">
-          <ElementLockup layout="horizontal" markSize={40} className="text-[#0D1117]" />
+          <ElementLockup layout="horizontal" markSize={40} className="text-[#0D131D]" />
         </Panel>
         <Panel label="6 · Wordmark only">
-          <ElementLockup layout="wordmark" className="text-[#0D1117]" />
+          <ElementLockup layout="wordmark" className="text-[#0D131D]" />
         </Panel>
         <Panel label="4 / 5 · Icon + monogram">
-          <div className="flex items-end gap-8 text-[#0D1117]">
+          <div className="flex items-end gap-8 text-[#0D131D]">
             <ElementMark size={54} />
             <ElementMonogram size={40} />
             <ElementMark tone="color" size={30} />
@@ -143,7 +143,7 @@ function ElementIdentityPage() {
                 key={r}
                 className="flex gap-3 text-sm leading-relaxed text-black/75 dark:text-white/75"
               >
-                <span className="mt-1.5 h-2 w-4 shrink-0 bg-[#2563EB]" aria-hidden />
+                <span className="mt-1.5 h-2 w-4 shrink-0 bg-[#135CFB]" aria-hidden />
                 {r}
               </li>
             ))}

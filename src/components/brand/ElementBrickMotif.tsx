@@ -16,11 +16,11 @@ export const ELEMENT_BRICK_UNITS = [5, 1.3, 3.4, 3.4, 1.3] as const;
 
 /** Brand spectrum, in brick order. Never re-map. */
 export const ELEMENT_BRICK_COLORS = [
-  "#2563EB",
-  "#14B8A6",
-  "#0D2A6B",
-  "#FF6B57",
-  "#8B5CF6",
+  "#135CFB",
+  "#08BFC1",
+  "#073091",
+  "#FC5950",
+  "#7C4EF4",
 ] as const;
 
 export type ElementBrickTone = "spectrum" | "accent" | "ink" | "reversed";
@@ -30,7 +30,7 @@ function fills(tone: ElementBrickTone, accent: string): string[] {
   if (tone === "reversed")
     return ["#FFFFFF", "rgba(255,255,255,0.78)", "rgba(255,255,255,0.55)", "rgba(255,255,255,0.78)", "#FFFFFF"];
   if (tone === "ink")
-    return ["#03002C", "rgba(3,0,44,0.7)", "rgba(3,0,44,0.45)", "rgba(3,0,44,0.7)", "#03002C"];
+    return ["#0D131D", "rgba(13,19,29,0.7)", "rgba(13,19,29,0.45)", "rgba(13,19,29,0.7)", "#0D131D"];
   return [
     accent,
     `color-mix(in srgb, ${accent} 70%, #FFFFFF)`,

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="156.5 191 356.5 363" role="img" aria-labelledby="t4">
+  <title id="t4">Element mark</title>
+  <g id="mark">
+    <rect id="brick-bar" x="156.5" y="191" width="356.5" height="103" fill="#135CFB"/>
+    <rect id="brick-teal" x="156.5" y="316.5" width="126.5" height="107.5" fill="#08BFC1"/>
+    <rect id="brick-navy" x="304.5" y="316.5" width="208.5" height="107.5" fill="#073091"/>
+    <rect id="brick-coral" x="156.5" y="448" width="209.5" height="106" fill="#FC5950"/>
+    <rect id="brick-violet" x="387" y="448" width="126" height="106" fill="#7C4EF4"/>
+  </g>
+</svg>

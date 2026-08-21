@@ -11,7 +11,9 @@
  */
 
 import { useTheme } from "@/hooks/use-theme";
-import elementLogoAsset from "@/assets/element-logo.png.asset.json";
+import elementLogoAsset from "@/assets/element-logo.svg.asset.json";
+import elementLogoReversedAsset from "@/assets/element-logo-reversed.svg.asset.json";
+import elementLogoMonoAsset from "@/assets/element-logo-mono.svg.asset.json";
 
 export type ElementMarkTone = "mono" | "color" | "reversed";
 /** `auto` follows the app theme: mono in light, reversed (white) in dark. */
@@ -24,22 +26,45 @@ export function useResolvedElementTone(tone: ElementTone): ElementMarkTone {
   return mode === "dark" ? "reversed" : "mono";
 }
 
-
+/**
+ * Master-file brick geometry, normalised from the approved artwork
+ * (viewBox 156.5 191 356.5 363) to a 100 x 101.8 grid. Do not redraw.
+ */
 const BRICKS = [
-  { x: 0, y: 0, w: 100, h: 20, k: "cap" },
-  { x: 0, y: 26, w: 26, h: 20, k: "midShort" },
-  { x: 32, y: 26, w: 68, h: 20, k: "midLong" },
-  { x: 0, y: 52, w: 68, h: 20, k: "baseLong" },
-  { x: 74, y: 52, w: 26, h: 20, k: "baseShort" },
+  { x: 0, y: 0, w: 100, h: 28.89, k: "cap" },
+  { x: 0, y: 35.19, w: 35.48, h: 30.16, k: "midShort" },
+  { x: 41.52, y: 35.19, w: 58.48, h: 30.16, k: "midLong" },
+  { x: 0, y: 72.09, w: 58.77, h: 29.73, k: "baseLong" },
+  { x: 64.66, y: 72.09, w: 35.34, h: 29.73, k: "baseShort" },
 ] as const;
 
-/** Brand spectrum assignment for the color mark (fixed — do not re-map). */
-const COLOR_FILLS: Record<string, string> = {
-  cap: "#2563EB",
-  midShort: "#14B8A6",
-  midLong: "#0D2A6B",
-  baseLong: "#FF6B57",
-  baseShort: "#8B5CF6",
+const MARK_H = 101.82;
+
+/** Master-file colour assignment for the colour mark (fixed — do not re-map). */
+export const ELEMENT_BRICK_COLORS = {
+  cap: "#135CFB",
+  midShort: "#08BFC1",
+  midLong: "#073091",
+  baseLong: "#FC5950",
+  baseShort: "#7C4EF4",
+} as const;
+
+const COLOR_FILLS: Record<string, string> = ELEMENT_BRICK_COLORS;
+
+/** Ordered brick spectrum for motifs, rails and accent rows. */
+export const ELEMENT_SPECTRUM = [
+  ELEMENT_BRICK_COLORS.cap,
+  ELEMENT_BRICK_COLORS.midShort,
+  ELEMENT_BRICK_COLORS.midLong,
+  ELEMENT_BRICK_COLORS.baseLong,
+  ELEMENT_BRICK_COLORS.baseShort,
+] as const;
+
+/** Master lockup artwork per tone (approved SVG files, never redrawn). */
+export const ELEMENT_LOCKUP_URLS: Record<ElementMarkTone, string> = {
+  color: elementLogoAsset.url,
+  reversed: elementLogoReversedAsset.url,
+  mono: elementLogoMonoAsset.url,
 };
 
 export function ElementMark({
@@ -57,9 +82,9 @@ export function ElementMark({
   const flat = tone === "reversed" ? "#FFFFFF" : "currentColor";
   return (
     <svg
-      viewBox="0 0 100 72"
+      viewBox={`0 0 100 ${MARK_H}`}
       width={size}
-      height={(size * 72) / 100}
+      height={(size * MARK_H) / 100}
       className={className}
       role="img"
       aria-label={title}
@@ -79,7 +104,7 @@ export function ElementMark({
   );
 }
 
-/** Compact monogram / favicon form — cap, short brick, base pair only. */
+/** Compact monogram / favicon form — the master mark at reduced fidelity. */
 export function ElementMonogram({
   size = 24,
   className = "",
@@ -89,35 +114,16 @@ export function ElementMonogram({
   className?: string;
   tone?: ElementTone;
 }) {
-  const tone = useResolvedElementTone(toneProp);
-  const fill = tone === "reversed" ? "#FFFFFF" : tone === "color" ? "#2563EB" : "currentColor";
-  return (
-    <svg
-      viewBox="0 0 76 72"
-      width={size}
-      height={(size * 72) / 76}
-      className={className}
-      role="img"
-      aria-label="Element"
-      shapeRendering="crispEdges"
-    >
-      <rect x={0} y={0} width={76} height={20} fill={fill} />
-      <rect x={0} y={26} width={52} height={20} fill={fill} />
-      <rect x={0} y={52} width={30} height={20} fill={fill} />
-      <rect x={36} y={52} width={16} height={20} fill={fill} />
-    </svg>
-  );
+  return <ElementMark tone={toneProp} size={size} className={className} title="Element" />;
 }
 
 export type ElementLockupLayout = "stacked" | "horizontal" | "wordmark";
 
 /**
- * Full lockup: master ("TRANSPERFECT") over the ELEMENT wordmark with the
- * "MODULAR DESIGN SYSTEM" descriptor. Stacked leads with the mark; horizontal
- * uses a hairline divider; wordmark drops the mark entirely.
- *
- * When `image` is true, the official raster lockup is used instead of the
- * constructed SVG. This is the preferred form for the main navigation.
+ * Full lockup. By default this renders the APPROVED MASTER ARTWORK (SVG) for
+ * the resolved tone — colour, reversed (white wordmark) or mono. Pass
+ * `image={false}` for the constructed mark + type fallback used where the
+ * lockup must inherit `currentColor` at tiny chrome sizes.
  */
 export function ElementLockup({
   layout = "horizontal",
@@ -125,7 +131,7 @@ export function ElementLockup({
   className = "",
   markSize = 34,
   showDescriptor = true,
-  image = false,
+  image = true,
 }: {
   layout?: ElementLockupLayout;
   tone?: ElementTone;
@@ -134,20 +140,25 @@ export function ElementLockup({
   showDescriptor?: boolean;
   image?: boolean;
 }) {
-  if (image) {
-    const height = layout === "stacked" ? markSize * 1.35 : markSize * 0.85;
+  const tone = useResolvedElementTone(toneProp);
+
+  if (image && layout !== "wordmark") {
+    // Master artwork is 1983 x 793; scale from the requested mark height so the
+    // lockup stays optically matched to constructed marks beside it. External
+    // SVGs can't inherit currentColor, so `auto`/`mono` on light surfaces uses
+    // the full-colour master file (the approved primary form).
+    const height = markSize * (layout === "stacked" ? 1.9 : 1.55);
+    const imageTone: ElementMarkTone = tone === "reversed" ? "reversed" : "color";
     return (
       <img
-        src={elementLogoAsset.url}
+        src={ELEMENT_LOCKUP_URLS[imageTone]}
         alt="TransPerfect Element"
-        height={height}
-        className={`h-auto w-auto max-w-full object-contain ${className}`}
+        className={`w-auto max-w-full object-contain ${className}`}
         style={{ height }}
       />
     );
   }
 
-  const tone = useResolvedElementTone(toneProp);
   const ink = tone === "reversed" ? "text-white" : "";
   const Words = (
     <div className={`min-w-0 leading-none ${ink}`}>

@@ -142,7 +142,7 @@ export const BRAND_MODES: BrandMode[] = [
     description: "TransPerfect Element product brand — the platform's own marketing identity",
     // Element's own palette (never TP corporate): Element Ink field, Element
     // Blue lead, Signal Teal accent. Pairs with the S29 "Element System" skin.
-    tokens: { primary: "#2563EB", accent: "#14B8A6", surface: "#0D1117", ink: "#F5F7FA" },
+    tokens: { primary: "#135CFB", accent: "#08BFC1", surface: "#FFFFFF", ink: "#0D131D" },
   },
   {
     id: "bm-product",
