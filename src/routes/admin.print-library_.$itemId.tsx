@@ -498,19 +498,22 @@ function MasterItemEditorPage() {
                   </PrintContentFitFrame>
                 </PrintPageProvider>
                 {/* Vertical pull-down grip for the hero band — content-aware
-                    ceiling, keyboard nudges, cap warning colours. */}
-                <HeroResizeHandle
-                  canvasRef={canvasRef}
-                  media={heroMedia}
-                  onChange={(next) => patchContent({ heroMedia: next })}
-                  kind={saved.kind as never}
-                  usedModuleUnits={(
-                    (draft.content as { modules?: PrintSection[] }).modules ?? []
-                  ).reduce((n, m) => n + weightForSection(m), 0)}
-                  hasTitle={!!(draft.content as { title?: string }).title}
-                  hasSummary={!!(draft.content as { summary?: string }).summary}
-                  disabledHint="Add hero media to this master to resize the band"
-                />
+                    ceiling, keyboard nudges, cap warning colours. Multi-page
+                    proposal masters have authored page art, no hero band. */}
+                {!multiPage ? (
+                  <HeroResizeHandle
+                    canvasRef={canvasRef}
+                    media={heroMedia}
+                    onChange={(next) => patchContent({ heroMedia: next })}
+                    kind={saved.kind as never}
+                    usedModuleUnits={(
+                      (draft.content as { modules?: PrintSection[] }).modules ?? []
+                    ).reduce((n, m) => n + weightForSection(m), 0)}
+                    hasTitle={!!(draft.content as { title?: string }).title}
+                    hasSummary={!!(draft.content as { summary?: string }).summary}
+                    disabledHint="Add hero media to this master to resize the band"
+                  />
+                ) : null}
                 {/* Measured clipping alarm with a one-click hero relief fix. */}
                 <PrintOverflowOverlay
                   state={overflow}
