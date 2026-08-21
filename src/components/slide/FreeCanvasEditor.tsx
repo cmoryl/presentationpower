@@ -40,6 +40,7 @@ import {
   blockFontSize,
   CanvasBlockContent,
   canvasBlockFrameStyle,
+  canvasTextFromEditable,
   canvasBlockTextStyle,
   sortBlocksForEdit,
 } from "./CanvasBlockView";
@@ -247,7 +248,7 @@ export function FreeCanvasEditor({
 
   /** The visible 16:9 surface is the coordinate authority, never editor chrome. */
   const stageSurface = useCallback(
-    () => wrapRef.current?.querySelector<HTMLElement>("[data-print-surface]") ?? wrapRef.current,
+    () => wrapRef.current?.querySelector<HTMLElement>("[data-print-surface]") ?? null,
     [],
   );
 
@@ -1304,7 +1305,7 @@ export function FreeCanvasEditor({
                     commit(
                       list.map((x) =>
                         x.id === b.id
-                          ? { ...x, text: (e.currentTarget.textContent ?? "").trim() }
+                          ? { ...x, text: canvasTextFromEditable(e.currentTarget) }
                           : x,
                       ),
                       "Edit object text",

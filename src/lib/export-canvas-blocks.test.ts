@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import type { CanvasBlock } from "./deck-store";
-import { canvasBlockFrameStyle, canvasBlockTextStyle } from "@/components/slide/CanvasBlockView";
+import {
+  canvasBlockFrameStyle,
+  canvasBlockTextStyle,
+  canvasTextFromEditable,
+} from "@/components/slide/CanvasBlockView";
 import { clientPointToStage, stageScaleFromRect } from "./canvas-snap";
 import {
   canvasBlockRectIn,
@@ -70,6 +74,12 @@ describe("canvas block export geometry", () => {
     expect(pptx.y / 7.5).toBeCloseTo(0.2, 5);
     expect(pptx.w / 13.333).toBeCloseTo(0.5, 5);
     expect(pptx.h / 7.5).toBeCloseTo(0.4, 5);
+  });
+
+  it("preserves explicit lines from object text editing", () => {
+    const root = document.createElement("div");
+    root.innerHTML = "First line<div>Second line<br>Third line</div>";
+    expect(canvasTextFromEditable(root)).toBe("First lineSecond line\nThird line");
   });
 
   it("parses rgba fills", () => {

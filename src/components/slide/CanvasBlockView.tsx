@@ -32,6 +32,27 @@ export function blockFontWeight(b: CanvasBlock): number {
   return b.weight ?? (b.kind === "heading" ? 700 : 500);
 }
 
+/** Preserve the exact visible line structure produced by contentEditable. */
+export function canvasTextFromEditable(root: HTMLElement): string {
+  const out: string[] = [];
+  const walk = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      out.push(node.nodeValue ?? "");
+      return;
+    }
+    if (!(node instanceof HTMLElement)) return;
+    const tag = node.tagName.toLowerCase();
+    if (tag === "br") {
+      out.push("\n");
+      return;
+    }
+    node.childNodes.forEach(walk);
+    if (tag === "div" || tag === "p") out.push("\n");
+  };
+  root.childNodes.forEach(walk);
+  return out.join("").replace(/\n+$/, "");
+}
+
 /**
  * Paint order for the interactive editor: suppressed blocks removed (they only
  * exist to keep a deleted module section hidden), hidden blocks KEPT so the
