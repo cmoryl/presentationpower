@@ -1,3 +1,4 @@
+import { canManageRecord } from "@/lib/owner-or-admin";
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
@@ -235,7 +236,7 @@ export const getShareAnalytics = createServerFn({ method: "POST" })
       .select("id, owner_id")
       .eq("id", data.deckId)
       .maybeSingle();
-    if (!deck || deck.owner_id !== userId) {
+    if (!deck || !(await canManageRecord(supabase, userId, deck.owner_id))) {
       return {
         totalViews: 0,
         uniqueSessions: 0,

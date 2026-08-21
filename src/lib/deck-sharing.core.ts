@@ -2,6 +2,7 @@
 // and the `create_share_link` MCP tool so token minting, owner checks and
 // column writes exist exactly once.
 
+import { assertCanManageRecord } from "@/lib/owner-or-admin";
 import { z } from "zod";
 
 export const shareEnableInput = z.object({
@@ -59,7 +60,7 @@ export async function enableDeckSharingCore(
     share_token: string | null;
     share_expires_at: string | null;
   };
-  if (existing.owner_id !== userId) throw new Error("Forbidden");
+  await assertCanManageRecord(supabase, userId, existing.owner_id);
 
   let token = existing.share_token as string | null;
   const needsNew = !token || data.regenerate === true;
