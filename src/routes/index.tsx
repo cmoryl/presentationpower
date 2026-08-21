@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ShowcaseGallery } from "@/components/home/ShowcaseGallery";
+import { HomeHeroVideo } from "@/components/home/HomeHeroVideo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -258,8 +259,12 @@ function Dashboard() {
     <AppShell>
       {/* ================= HERO ================= */}
       <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-8 text-white sm:py-9 lg:py-12">
+        {/* photoreal motion plate per mode (dark/light authored versions) */}
+        <HomeHeroVideo mode={mode.id} />
+
         {/* animated aurora blobs — reactive to selected mode + scroll parallax */}
         <AuroraHero mode={mode} />
+
 
         {/* Oversized ELEMENT watermark — brand signature behind the hero */}
         <ParallaxWatermark accent={mode.accent} />
