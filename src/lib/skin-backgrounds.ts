@@ -169,7 +169,8 @@ export const SKIN_MOTIF: Record<string, MotifFamily> = {
   S26: "prism", //    dark glass, explainable layered planes
   S27: "aurora", //   soft atmospheric volumes, outline-free
   S28: "terrazzo", // overlapping transparent mosaic planes
-  S29: "terrazzo", // Element five-brick colour choreography on a light field
+  S29: "aurora", //   Element: soft-focus natural-element volumes, light field
+  S30: "aurora", //   Element dark twin: same volumes, glowing on mineral ink
 
   /* Industry packs (R01–R30) — motif chosen for the sector, not derived. */
   R01: "mesh",
@@ -260,7 +261,8 @@ export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
   S26: { rake: 12, weight: 1.05, texture: 0.4, anchor: "70% 40%", ratio: 1.14 },
   S27: { rake: -16, weight: 1.2, texture: 0.15, anchor: "44% 58%", ratio: 1.32 },
   S28: { rake: 16, weight: 1, texture: 0.55, anchor: "82% 44%", ratio: 1.08 },
-  S29: { rake: 12, weight: 1.32, texture: 0.5, anchor: "74% 24%", ratio: 1.14 },
+  S29: { rake: -10, weight: 1.05, texture: 0.12, anchor: "72% 26%", ratio: 1.28 },
+  S30: { rake: 14, weight: 1.18, texture: 0.1, anchor: "30% 62%", ratio: 1.3 },
 
   /**
    * INDUSTRY BACKGROUND SIGNATURES — R01–R30.

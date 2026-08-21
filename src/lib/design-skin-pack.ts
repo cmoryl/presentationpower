@@ -133,7 +133,8 @@ const SKIN_TRAITS: Record<string, SkinTraits> = {
   S27: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 300, displayTracking: "-0.018em", displayTransform: "none", displayScale: 1.09, kickerWeight: 600, kickerTracking: "0.23em", radius: 30, surfaceStyle: "glass", topBar: false, grain: 0.05 },
   S28: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 500, displayTracking: "-0.026em", displayTransform: "none", displayScale: 0.99, kickerWeight: 500, kickerTracking: "0.17em", radius: 16, surfaceStyle: "slab", topBar: true, grain: 0.03 },
   // Element's product skin: lifted brick cards, confident display, systematic kickers.
-  S29: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 700, displayTracking: "-0.036em", displayTransform: "none", displayScale: 1.06, kickerWeight: 700, kickerTracking: "0.28em", radius: 14, surfaceStyle: "raised", topBar: true, grain: 0.03 },
+  S29: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 600, displayTracking: "-0.034em", displayTransform: "none", displayScale: 1.08, kickerWeight: 700, kickerTracking: "0.28em", radius: 20, surfaceStyle: "glass", topBar: true, grain: 0.02 },
+  S30: { display: GEIST, body: GEIST, kicker: GEIST, mono: GEIST_MONO, displayWeight: 600, displayTracking: "-0.034em", displayTransform: "none", displayScale: 1.08, kickerWeight: 700, kickerTracking: "0.28em", radius: 20, surfaceStyle: "glass", topBar: true, grain: 0.02 },
 
 };
 
