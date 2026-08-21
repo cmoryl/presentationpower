@@ -35,7 +35,11 @@ import {
   PROPOSAL_AQUA,
   PROPOSAL_ART,
 } from "@/lib/print-library/proposal-art";
-import { PROPOSAL_REGIONS, PROPOSAL_TEAL } from "@/lib/print-library/proposal-locations";
+import {
+  PROPOSAL_REGIONS,
+  PROPOSAL_TEAL,
+  type ProposalCity,
+} from "@/lib/print-library/proposal-locations";
 import { EditableImage, resolveImageSlot, usePrintImageEdit } from "./PrintImageEdit";
 import {
   AddLogoButton,
@@ -1006,6 +1010,114 @@ function LocationsPage({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Region locations page — same footprint story, cropped to one region so the
+// office list can breathe at a readable size.
+// ---------------------------------------------------------------------------
+
+function chunkCities(cities: ProposalCity[], columns: number): ProposalCity[][] {
+  const per = Math.ceil(cities.length / columns);
+  return Array.from({ length: columns }, (_, i) => cities.slice(i * per, (i + 1) * per)).filter(
+    (col) => col.length > 0,
+  );
+}
+
+function RegionLocationsPage({
+  page,
+  pageIndex,
+  logoWhite,
+}: {
+  page: MultiProposalPage;
+  pageIndex: number;
+  logoWhite: string;
+}) {
+  const regionKey = page.mapRegion ?? "AMERICAS";
+  const region = PROPOSAL_REGIONS.find((r) => r.region === regionKey);
+  const cities = (region?.columns ?? []).flat();
+  const cols = chunkCities(cities, cities.length > 40 ? 5 : cities.length > 18 ? 4 : 3);
+  const colW = 7.79 / Math.max(cols.length, 1);
+  const title = lines(page.title).length ? lines(page.title) : [regionKey, "Locations"];
+  const listCtx = usePrintLogoList();
+  const pinPath = `pages.${pageIndex}.mapPins`;
+  const pins = page.mapPins?.length ? page.mapPins : defaultWorldMapPins();
+  return (
+    <>
+      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: DEEP_FIELD }} />
+      <Img
+        x={6.38}
+        y={0.5}
+        w={1.88}
+        h={0.28}
+        src={logoWhite}
+        alt="TransPerfect"
+        slot="band.logo"
+        label="logo"
+      />
+      <T x={0.47} y={0.55} w={4} size={8.4} weight={700} color={AQUA_FIELD} upper tracking="0.16em">
+        {page.eyebrow || "Regional footprint"}
+      </T>
+      <T x={0.47} y={0.86} w={5.6} size={39.7} weight={700} leading={1.05} tracking="-0.02em">
+        {title.join("\n")}
+      </T>
+      <Rule x={0.47} y={2.34} w={7.79} color="rgba(255,255,255,0.28)" />
+
+      {page.body ? (
+        <T x={0.47} y={2.52} w={5.4} size={9.2} leading={1.4} color="rgba(255,255,255,0.82)">
+          {page.body}
+        </T>
+      ) : null}
+
+      {/* Region crop of the shared vector map — pins stay editable. */}
+      <L x={0.3} y={3.12} w={7.9} h={4.3}>
+        <ProposalWorldMap
+          pins={pins}
+          frame={WORLD_MAP_REGION_VIEWS[regionKey]}
+          editable={!!listCtx?.active}
+          {...(listCtx?.active
+            ? { onChange: (next: WorldMapPin[]) => listCtx.onChange(pinPath, next) }
+            : {})}
+        />
+      </L>
+
+      {/* Legend */}
+      <L x={0.47} y={7.6} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
+      <T x={0.59} y={7.55} w={1.5} size={7.2} weight={700} upper>
+        Client Service
+      </T>
+      <L
+        x={2.2}
+        y={7.6}
+        w={0.058}
+        h={0.058}
+        style={{ background: PROPOSAL_TEAL, borderRadius: 999 }}
+      />
+      <T x={2.32} y={7.55} w={2.4} size={7.2} weight={700} color={PROPOSAL_TEAL} upper>
+        Client Service &amp; Production
+      </T>
+
+      <Rule x={0.47} y={7.9} w={7.79} color="rgba(255,255,255,0.18)" />
+      <T x={0.47} y={8.04} w={3} size={13.8} weight={700} tracking="-0.01em">
+        {regionKey}
+      </T>
+      {cols.map((col, ci) => (
+        <T
+          key={ci}
+          x={0.47 + ci * colW}
+          y={8.42}
+          w={colW - 0.12}
+          size={6.6}
+          leading={1.55}
+        >
+          {col.map((city, i) => (
+            <div key={i} style={{ color: city.prod ? PROPOSAL_TEAL : "#FFFFFF" }}>
+              {city.name}
+            </div>
+          ))}
+        </T>
+      ))}
+    </>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Page 6 — Clients
@@ -2256,6 +2368,8 @@ function PageBody({
       return <CostPage page={page} logoWhite={logoWhite} />;
     case "locations":
       return <LocationsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
+    case "locations-region":
+      return <RegionLocationsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "clients":
       return <ClientsPage page={page} logoWhite={logoWhite} />;
     case "success-stories":
