@@ -255,6 +255,13 @@ export function ExportProposalButton({
             </p>
             <button
               type="button"
+              onClick={openPreview}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+            >
+              <Eye size={13} aria-hidden /> Preview PowerPoint layout
+            </button>
+            <button
+              type="button"
               onClick={() => start("pdf")}
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs font-medium text-[#03002C] hover:bg-[#E0E8F5]"
             >
