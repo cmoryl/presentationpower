@@ -38,6 +38,7 @@ import {
   blockFontSize,
   CanvasBlockContent,
   canvasBlockFrameStyle,
+  canvasBlockTextStyle,
   sortBlocksForEdit,
 } from "./CanvasBlockView";
 
@@ -242,35 +243,56 @@ export function FreeCanvasEditor({
   );
   const selectionBounds = selectedBlocks.length ? boundsOf(selectedBlocks) : null;
 
+  /** The visible 16:9 surface is the coordinate authority, never editor chrome. */
+  const stageSurface = useCallback(
+    () => wrapRef.current?.querySelector<HTMLElement>("[data-print-surface]") ?? wrapRef.current,
+    [],
+  );
+
   const stageFromClient = useCallback((clientX: number, clientY: number) => {
-    const el = wrapRef.current;
+    const el = stageSurface();
     if (!el) return { x: 0, y: 0 };
     const r = el.getBoundingClientRect();
     return {
       x: ((clientX - r.left) / r.width) * STAGE_W,
       y: ((clientY - r.top) / r.height) * STAGE_H,
     };
-  }, []);
+  }, [stageSurface]);
 
   /**
-   * The editor mounts the block layer at the container's own width while the
-   * module underneath scales itself, so block type (authored in 1920-wide stage
-   * units) has to be divided down by the same ratio. Published as `--cb-scale`
-   * and kept live with a ResizeObserver so panels opening / closing retype the
-   * canvas instead of blowing headlines up over their neighbours.
+   * Mirror the exact aspect-fit scale of the visible slide surface so opening a
+   * rail or entering text editing cannot scale objects independently.
    */
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
     const apply = () => {
-      const w = el.getBoundingClientRect().width;
-      el.style.setProperty("--cb-scale", w > 0 ? String(w / STAGE_W) : "1");
+      const surface = stageSurface();
+      const rect = surface?.getBoundingClientRect();
+      const scale = rect && rect.width > 0 && rect.height > 0
+        ? Math.min(rect.width / STAGE_W, rect.height / STAGE_H)
+        : 1;
+      el.style.setProperty("--cb-scale", String(scale));
     };
     apply();
     const ro = new ResizeObserver(apply);
     ro.observe(el);
+    const surface = stageSurface();
+    if (surface && surface !== el) ro.observe(surface);
     return () => ro.disconnect();
-  }, []);
+  }, [stageSurface]);
+
+  /** Remove stale auto-adopted mirrors while preserving every real user edit. */
+  const legacyMirrorCleanupRef = useRef(false);
+  useEffect(() => {
+    if (legacyMirrorCleanupRef.current) return;
+    legacyMirrorCleanupRef.current = true;
+    const current = blocks ?? [];
+    const kept = current.filter((b) => !b.sourceSelector || b.touched || b.suppressed);
+    if (kept.length !== current.length) {
+      onChange(kept, { label: "Restore canonical slide layout", coalesceKey: null });
+    }
+  }, [blocks, onChange]);
 
   /**
    * Every mutation flows through here, and every caller names itself, so the
@@ -433,7 +455,7 @@ export function FreeCanvasEditor({
   /** Paint the pick-mode hover outline straight to the DOM (no re-render). */
   const paintPick = useCallback((el: Element | null) => {
     const node = pickRef.current;
-    const root = wrapRef.current;
+    const root = stageSurface();
     if (!node || !root) return;
     if (!el) {
       node.style.display = "none";
@@ -446,7 +468,7 @@ export function FreeCanvasEditor({
     node.style.top = `${((r.top - rr.top) / rr.height) * 100}%`;
     node.style.width = `${(r.width / rr.width) * 100}%`;
     node.style.height = `${(r.height / rr.height) * 100}%`;
-  }, []);
+  }, [stageSurface]);
 
   /**
    * Convert the module element under the pointer into a canvas block. The block
@@ -454,7 +476,7 @@ export function FreeCanvasEditor({
    * unchanged until the user moves it.
    */
   const adoptAt = (clientX: number, clientY: number) => {
-    const root = wrapRef.current;
+    const root = stageSurface();
     if (!root) return;
     const target = adoptTargetAt(root, clientX, clientY);
     if (!target) return;
@@ -484,7 +506,7 @@ export function FreeCanvasEditor({
    * Returns true when a card was found, so callers can fall back to leaf pick.
    */
   const adoptCardAt = (clientX: number, clientY: number): boolean => {
-    const root = wrapRef.current;
+    const root = stageSurface();
     if (!root) return false;
     const card = cardTargetAt(root, clientX, clientY);
     if (!card) return false;
@@ -514,7 +536,7 @@ export function FreeCanvasEditor({
    * what makes an existing slide feel opened rather than empty.
    */
   const adoptAllSections = useCallback((): number => {
-    const root = wrapRef.current;
+    const root = stageSurface();
     if (!root) return 0;
     const current = blocks ?? [];
     const made = adoptAllFromModule(
@@ -527,33 +549,7 @@ export function FreeCanvasEditor({
       label: "Load module layers",
     });
     return made.length;
-  }, [blocks, onChange]);
-
-  /**
-   * First time the objects tool is opened on a slide with no objects yet, adopt
-   * what is already there so the Layers pane lists the real slide instead of
-   * "no objects yet". Runs once per mount, after the render has settled.
-   */
-  const autoLoadedRef = useRef(false);
-  useEffect(() => {
-    if (textTool || autoLoadedRef.current) return;
-    if ((blocks ?? []).length > 0) {
-      autoLoadedRef.current = true;
-      return;
-    }
-    let cancelled = false;
-    const t = window.setTimeout(() => {
-      if (cancelled || autoLoadedRef.current) return;
-      const root = wrapRef.current;
-      if (!root || root.getBoundingClientRect().height < 40) return;
-      autoLoadedRef.current = true;
-      adoptAllSections();
-    }, 260);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(t);
-    };
-  }, [textTool, blocks, adoptAllSections]);
+  }, [blocks, onChange, stageSurface]);
 
   /**
    * Insert a complete card — plate, icon badge, index, title, body — grouped,
@@ -586,7 +582,7 @@ export function FreeCanvasEditor({
    * module template is untouched; "Restore removed" brings it back.
    */
   const removeSectionAt = (clientX: number, clientY: number) => {
-    const root = wrapRef.current;
+    const root = stageSurface();
     if (!root) return;
     const target = adoptTargetAt(root, clientX, clientY);
     if (!target) return;
@@ -815,14 +811,14 @@ export function FreeCanvasEditor({
    * expensive) and reused for every pointer-move.
    */
   const moduleBoxes = useCallback((): Box[] => {
-    const root = wrapRef.current;
+    const root = stageSurface();
     if (!root) return [];
     try {
       return moduleSnapBoxes(root);
     } catch {
       return [];
     }
-  }, []);
+  }, [stageSurface]);
 
   const paintBox = useCallback((id: string, box: Box, fontPx?: number) => {
     const el = blockRefs.current.get(id);
@@ -996,7 +992,7 @@ export function FreeCanvasEditor({
       let fontPx: number | undefined;
       if (block && isTextKind(block.kind)) {
         // Text scales with its frame so resizing feels like PowerPoint.
-        fontPx = Math.max(12, Math.round((block.size ?? fontFor(block.kind)) * ((sx + sy) / 2)));
+        fontPx = Math.max(12, Math.round(blockFontSize(block) * ((sx + sy) / 2)));
         drag.liveSizes.set(id, fontPx);
       }
       paintBox(id, next, fontPx);
@@ -1210,7 +1206,7 @@ export function FreeCanvasEditor({
       onPointerMove={(e) => {
         if (textTool) return;
         if (pickMode !== "off" && !dragRef.current) {
-          const root = wrapRef.current;
+          const root = stageSurface();
           paintPick(
             root
               ? pickMode === "card"
@@ -1229,7 +1225,7 @@ export function FreeCanvasEditor({
       // mode first: whole box when there is one, otherwise the single element.
       onDoubleClick={(e) => {
         if (textTool || pickMode !== "off") return;
-        const root = wrapRef.current;
+        const root = stageSurface();
         if (!root) return;
         const onBlock = (e.target as HTMLElement | null)?.closest("[data-canvas-block]");
         if (onBlock) return;
@@ -1306,13 +1302,7 @@ export function FreeCanvasEditor({
                     width: "100%",
                     height: "100%",
                     outline: "none",
-                    color: b.color ?? ink,
-                    // Match the painted block exactly (stage units × canvas scale)
-                    // so typing never jumps to a different size.
-                    fontSize: `calc(${b.size ?? fontFor(b.kind)}px * var(--cb-scale, 1))`,
-                    fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),
-                    textAlign: b.align ?? "left",
-                    whiteSpace: "pre-wrap",
+                    ...canvasBlockTextStyle(b, ink),
                   }}
                   onBlur={(e) => {
                     commit(
@@ -1856,10 +1846,6 @@ export function FreeCanvasEditor({
       )}
     </div>
   );
-}
-
-function fontFor(kind: CanvasBlockKind): number {
-  return kind === "heading" ? 96 : kind === "body" ? 40 : 26;
 }
 
 function handleOffset(h: ResizeHandle): React.CSSProperties {

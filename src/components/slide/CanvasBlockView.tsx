@@ -1,7 +1,6 @@
 import { memo } from "react";
 import type { CanvasBlock } from "@/lib/deck-store";
 import { canvasFillCss } from "@/lib/canvas-fill";
-import { repairBlocks } from "@/lib/canvas-adopt";
 
 import { STAGE_H, STAGE_W } from "@/lib/canvas-snap";
 
@@ -27,9 +26,9 @@ export function blockFontSize(b: CanvasBlock): number {
  * layers panel can still list and un-hide them.
  */
 export function sortBlocksForEdit(blocks: readonly CanvasBlock[]): CanvasBlock[] {
-  // repairBlocks heals blocks whose geometry was measured on an unscaled stage
-  // (they'd otherwise paint at multiples of their real size, off the slide).
-  return [...repairBlocks(blocks)]
+  // Geometry is authoritative while editing. Legacy repair is a one-time store
+  // migration; running a heuristic here made valid objects jump after edits.
+  return [...blocks]
     .filter((b) => !b.suppressed)
     .map((b, i) => ({ b, i }))
     .sort((a, z) => (a.b.z ?? a.i) - (z.b.z ?? z.i) || a.i - z.i)
@@ -62,10 +61,9 @@ export function canvasBlockFrameStyle(b: CanvasBlock): React.CSSProperties {
 export function canvasBlockTextStyle(b: CanvasBlock, ink: string): React.CSSProperties {
   return {
     color: b.color ?? ink,
-    // Type is authored in 1920x1080 stage units. Surfaces that scale the stage
-    // with a CSS transform leave `--cb-scale` at 1; surfaces that mount the
-    // block layer at the container's own width (the canvas editor) publish the
-    // width ratio there so headlines don't render at full 1920 size.
+    // Type is authored in 1920x1080 stage units. The interactive editor mounts
+    // its overlay outside the transformed stage and publishes the exact stage
+    // aspect-fit ratio; transformed read-only surfaces leave this at 1.
     fontSize: `calc(var(--cb-fs, ${blockFontSize(b)}px) * var(--cb-scale, 1))`,
     lineHeight: b.kind === "heading" ? 1.02 : 1.28,
     letterSpacing: b.kind === "heading" ? "-0.03em" : "-0.005em",
