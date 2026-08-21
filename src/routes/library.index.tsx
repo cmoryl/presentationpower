@@ -1,3 +1,5 @@
+import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
+import heroPresentationVideo from "@/assets/hero-presentation.mp4.asset.json";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BackToTop } from "@/components/BackToTop";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -776,7 +778,8 @@ function Library() {
     <AppShell>
       <BackToTop />
       <header className="full-bleed relative hero-flush mb-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
-        <div className="mx-auto max-w-[1400px]">
+        <HeroVideoLayer src={heroPresentationVideo.url} opacity={0.55} tint="#FFFFFF" />
+        <div className="relative z-10 mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
             Library
           </div>
