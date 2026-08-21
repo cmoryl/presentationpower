@@ -798,7 +798,7 @@ function PrintItemCard({
         <div className="text-[11px] uppercase tracking-[0.18em] text-black/45">
           {printTypeMeta(item.kind).label}
         </div>
-        {isTemplate ? (
+        {liveArt ? (
           <h3 className="mt-1 text-base font-semibold text-[#03002C]">{item.title}</h3>
         ) : null}
         <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-black/60">{item.blurb}</p>
