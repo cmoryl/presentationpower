@@ -21,6 +21,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
   MultiProposalPage,
+  ProposalCostRow,
   PrintDensity,
   PrintPageSize,
   SolutionProposalContent,
@@ -48,6 +49,13 @@ import {
   usePrintLogoList,
   type PrintLogoEntry,
 } from "./PrintLogoList";
+import {
+  blankCostRow,
+  computeCostLines,
+  computeCostTotal,
+  currencyOf,
+  parseAmount,
+} from "@/lib/print-library/cost-math";
 import { ProposalWorldMap, defaultWorldMapPins } from "./ProposalWorldMap";
 import {
   WORLD_MAP_REGION_VIEWS,
@@ -2803,7 +2811,7 @@ function PageBody({
     case "scope":
       return <ScopePage page={page} logoWhite={logoWhite} />;
     case "cost":
-      return <CostPage page={page} logoWhite={logoWhite} />;
+      return <CostPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "locations":
       return <LocationsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "locations-region":
