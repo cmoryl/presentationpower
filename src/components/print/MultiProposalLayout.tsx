@@ -100,6 +100,7 @@ export const MULTI_PAGE_LABELS: Record<MultiProposalPage["kind"], string> = {
   scope: "Scope",
   cost: "Cost summary",
   locations: "Global footprint",
+  "locations-region": "Region footprint",
   clients: "Clients",
   "success-stories": "Success stories",
   "stories-grid": "Story cards",
