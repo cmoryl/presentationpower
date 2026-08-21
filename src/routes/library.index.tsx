@@ -61,6 +61,8 @@ import { composeEffectivePack } from "@/lib/effective-pack";
 
 import { stylePackById } from "@/lib/style-packs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
+import { useTemplateRegistryVersion } from "@/hooks/use-template-registry";
+
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { LazyMount } from "@/components/LazyMount";
@@ -658,14 +660,19 @@ function Library() {
 
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
   const selectablePacks = useSelectablePacks();
+  // Registry version keys the memo so an admin background retune repaints the
+  // library previews immediately; `stylePackById` first, because that entry
+  // point is what applies the admin background overrides.
+  const registryVersion = useTemplateRegistryVersion();
   const activePack = useMemo(
     () =>
       composeEffectivePack(
-        selectablePacks.find((p) => p.id === packId) ?? stylePackById(packId),
+        stylePackById(packId) ?? selectablePacks.find((p) => p.id === packId) ?? null,
         recipeId,
       ),
-    [packId, recipeId, selectablePacks],
+    [packId, recipeId, selectablePacks, registryVersion],
   );
+
 
   // Video example zoom (uses the same LightboxPortal as before, so the
   // ▶ badge inside the enlarged stage still plays the clip in-place).

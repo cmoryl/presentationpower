@@ -1858,6 +1858,27 @@ function withOverrides(pack: StylePack, code: string): StylePack {
   return withBackgroundOverrides(pack, code);
 }
 
+/**
+ * The admin tuning code behind a pack id ("skin-s29" → "S29", "tpl-x" → "X").
+ * Exported so composition layers (e.g. the industry ground) can re-apply the
+ * admin background overrides after they replace `ground()`.
+ */
+export function backgroundCodeForPackId(id: string | null | undefined): string | null {
+  if (!id) return null;
+  if (STYLE_PACKS.some((p) => p.id === id)) return id;
+  const custom = customPackById(id);
+  if (custom) return templateCodeFromPackId(custom.id);
+  const skin = skinPackById(id);
+  return skin ? skinCodeFromPackId(skin.id) : null;
+}
+
+/** Re-apply admin background overrides on a pack whose ground was recomposed. */
+export function reapplyBackgroundOverrides(pack: StylePack, packId: string): StylePack {
+  const code = backgroundCodeForPackId(packId);
+  return code ? withOverrides(pack, code) : pack;
+}
+
+
 /** Every selectable look including admin-authored templates. */
 export function allSelectablePacks(): StylePack[] {
   return [...ALL_STYLE_PACKS, ...customTemplatePacks()];

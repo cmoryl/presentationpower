@@ -16,7 +16,7 @@
  * and export can never disagree.
  */
 
-import { stylePackById, type StylePack } from "./style-packs";
+import { stylePackById, reapplyBackgroundOverrides, type StylePack } from "./style-packs";
 import { withIndustryGround, industryBackgroundSet } from "./industry-backgrounds";
 
 export interface LookSelection {
@@ -29,6 +29,10 @@ export interface LookSelection {
  *
  * With no base pack we deliberately return null (approved brand default) rather
  * than promoting the R recipe into the primary visual language.
+ *
+ * The industry ground REPLACES `ground()`, so admin background overrides are
+ * re-applied on top: a tuned/uploaded background must win on every surface,
+ * industry recipe or not.
  */
 export function composeEffectivePack(
   base: StylePack | null | undefined,
@@ -36,8 +40,9 @@ export function composeEffectivePack(
 ): StylePack | null {
   if (!base) return null;
   if (!designRecipeId) return base;
-  return withIndustryGround(base, designRecipeId);
+  return reapplyBackgroundOverrides(withIndustryGround(base, designRecipeId), base.id);
 }
+
 
 /** Resolve both ids into the one effective pack. Null = brand default. */
 export function effectivePack(sel: LookSelection | null | undefined): StylePack | null {

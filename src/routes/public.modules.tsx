@@ -50,6 +50,7 @@ import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackTh
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
 
 import { APPROVED_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 
 
 
@@ -260,7 +261,9 @@ function PublicModuleLibrary() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const pack = stylePackById(packId);
+  // Registry-aware so an admin background retune lands here too.
+  const pack = useResolvedStylePack(packId);
+
 
   // Deep-linkable: /public/modules?style=neo-brutal opens on that look, and
   // switching packs rewrites the URL so reviewers can share exactly what they
