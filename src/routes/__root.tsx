@@ -15,6 +15,8 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { ToastAssertiveLiveRegion, installToastA11y } from "@/lib/toast-a11y";
 import { UxDebugDock } from "@/components/debug/UxDebugDock";
+import { supabase } from "@/integrations/supabase/client";
+import { LOGIN_PATH, loginUrl } from "@/lib/sign-out";
 
 function NotFoundComponent() {
   return (
@@ -152,7 +154,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@400;600;700&family=Space+Grotesk:wght@400;500;700&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600&family=Manrope:wght@400;600&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:wght@400;500;600&family=Karla:wght@400;700&family=Jura:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&family=Bebas+Neue&family=Barlow:wght@400;600;700&family=Lora:wght@400;500;600&family=Nunito+Sans:wght@400;700&family=Outfit:wght@200;300;400;600&family=Figtree:wght@400;600&family=Syne:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700&family=Libre+Baskerville:wght@400;700&family=Tektur:wght@500;600;700&family=Rubik:wght@400;500;700&family=Hind:wght@400;500;600;700&family=Poiret+One&family=Anton&family=Oswald:wght@300;400;500;600&family=Great+Vibes&family=Fraunces:ital,wght@0,400;0,600;1,400&display=swap",
       },
-
     ],
   }),
   shellComponent: RootShell,
@@ -184,13 +185,31 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  // Single global auth listener: keeps router/cache in sync and makes any
+  // sign-out (including one triggered in another tab) land on the login page.
+  useEffect(() => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      if (event === "SIGNED_OUT") {
+        queryClient.clear();
+        if (typeof window !== "undefined" && !window.location.pathname.startsWith(LOGIN_PATH)) {
+          window.location.replace(loginUrl({ expired: true }));
+        }
+        return;
+      }
+      router.invalidate();
+      queryClient.invalidateQueries();
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [queryClient, router]);
 
   useEffect(() => {
     installToastA11y();
     // Admin-authored templates + background overrides join the pack catalog.
     void import("@/lib/template-loader").then((m) => m.loadTemplateRegistry());
   }, []);
-
 
   return (
     <QueryClientProvider client={queryClient}>

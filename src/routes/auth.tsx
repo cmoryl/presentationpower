@@ -3,11 +3,14 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { teamSignIn } from "@/lib/team-access.functions";
 
-
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  validateSearch: (s: { next?: string }): { next?: string } => ({
+  validateSearch: (s: {
+    next?: string;
+    expired?: string;
+  }): { next?: string; expired?: string } => ({
     next: typeof s.next === "string" ? s.next : undefined,
+    expired: s.expired === "1" ? "1" : undefined,
   }),
   head: () => ({ meta: [{ title: "Sign in · TransPerfect Element" }] }),
   component: AuthPage,
@@ -24,7 +27,7 @@ type Mode = "signin" | "signup" | "forgot" | "team";
 
 function AuthPage() {
   const navigate = useNavigate();
-  const { next } = Route.useSearch();
+  const { next, expired } = Route.useSearch();
   const returnTo = safeNext(next);
   const goAfterAuth = () => {
     if (returnTo) window.location.href = returnTo;
@@ -130,7 +133,6 @@ function AuthPage() {
   }
 
   return (
-
     <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] flex items-center justify-center px-6">
       <div className="w-full max-w-[420px]">
         <div className="mb-6 flex items-center gap-3">
@@ -145,6 +147,14 @@ function AuthPage() {
                 ? "Create account"
                 : "Reset password"}
           </h1>
+          {expired === "1" && mode === "signin" && (
+            <div
+              role="status"
+              className="mt-3 rounded-lg border border-[#E85A2C]/30 bg-[#E85A2C]/10 px-3 py-2 text-sm text-[#03002C]"
+            >
+              Your session expired. Please sign in again to continue.
+            </div>
+          )}
           <p className="mt-1 text-sm text-black/60">
             {mode === "signin"
               ? "Access the modular deck system and admin console."
@@ -409,4 +419,3 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
     </div>
   );
 }
-
