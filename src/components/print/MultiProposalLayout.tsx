@@ -335,46 +335,53 @@ function FitT({
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [factor, setFactor] = useState(1);
   const floor = Math.min(1, (minSize ?? size * 0.6) / size);
-  // Convergence budget: a shrink changes the wrap, which re-fires the observer,
-  // which can shrink again. Cap the number of adjustments per content change so
-  // a headline that never quite settles cannot loop forever ("Maximum update
-  // depth exceeded") — after the budget the last fitted factor is final.
-  const stepsRef = useRef(0);
+  // Wrapped text does not scale proportionally — shrinking one step can drop a
+  // whole line, so a ratio-based guess overshoots and then oscillates forever
+  // ("Maximum update depth exceeded"). Converge with a monotone bisection
+  // instead: remember the largest factor known to FIT and the smallest known to
+  // OVERFLOW, and always probe between them. Bounded, and never grows past a
+  // factor already proven too big.
+  const boundsRef = useRef({ lo: 0, hi: 1, done: false });
   const textRef = useRef<string | null>(null);
 
   const measure = useCallback(() => {
-    if (typeof window !== "undefined") console.log("[FIT-CALL]", !!hostRef.current);
     const host = hostRef.current;
     const inner = host?.firstElementChild as HTMLElement | null;
     if (!host || !inner) return;
     const limit = host.clientHeight;
     if (!limit) return;
-    // New copy (or a new geometry) earns a fresh convergence budget. Keyed off
-    // the rendered string rather than the `children` React node, whose identity
-    // changes on every parent render and would otherwise reset forever.
-    const key = `${inner.textContent ?? ""}|${size}|${w}|${maxH}`;
+    // New copy (or new geometry) restarts the search. Keyed off the rendered
+    // string, not the `children` React node whose identity changes every render.
+    const key = `${inner.textContent ?? ""}|${size}|${w}|${maxH}|${limit}`;
     if (textRef.current !== key) {
       textRef.current = key;
-      stepsRef.current = 0;
+      boundsRef.current = { lo: 0, hi: 1, done: false };
+      setFactor(1);
+      return;
     }
-    if (stepsRef.current > 14) return;
-    const h = inner.scrollHeight;
-    if (typeof window !== "undefined") console.log("[FIT]", h, limit, stepsRef.current);
+    const b = boundsRef.current;
+    if (b.done) return;
+    const fits = inner.scrollHeight <= limit + 0.5;
+
     setFactor((prev) => {
-      let next = prev;
-      if (h <= limit + 0.5) {
-        // Only grow back when there is real slack, and never overshoot.
-        if (prev >= 1 || h > limit * 0.94) return prev;
-        next = Math.min(1, prev * (limit / Math.max(h, 1)) * 0.98);
-        if (next - prev <= 0.01) return prev;
-      } else {
-        next = Math.max(floor, prev * (limit / h));
-        if (prev - next <= 0.01) return prev;
+      if (fits) b.lo = Math.max(b.lo, prev);
+      else b.hi = Math.min(b.hi, prev);
+      // Fits at full size: nothing to do.
+      if (fits && prev >= 1) {
+        b.done = true;
+        return prev;
       }
-      stepsRef.current += 1;
-      return next;
+      if (b.hi - Math.max(b.lo, floor) <= 0.02) {
+        b.done = true;
+        // Land on the largest proven-fitting factor (floor when nothing fits).
+        const settled = Math.max(floor, b.lo || floor);
+        return Math.abs(settled - prev) > 0.001 ? settled : prev;
+      }
+      const next = Math.max(floor, (Math.max(b.lo, floor) + b.hi) / 2);
+      return Math.abs(next - prev) > 0.001 ? next : prev;
     });
   }, [floor, size, w, maxH]);
+
 
   useLayoutEffect(() => {
     measure();
