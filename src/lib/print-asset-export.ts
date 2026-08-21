@@ -127,6 +127,13 @@ export interface PrintExportOptions {
   vectorText?: boolean;
   /** Fires once the vector-text overlay has been drawn (diagnostics). */
   onVectorTextReport?: (report: VectorTextReport) => void;
+  /**
+   * Fires with the aspect-ratio preflight result before any page is rasterized.
+   * PDF placement stretches each page raster across the full page box, so a page
+   * whose rendered ratio drifts from the trim distorts — this is how the UI hears
+   * about it.
+   */
+  onAspectReport?: (report: AspectCheckReport) => void;
 }
 
 export interface VectorTextReport {
@@ -265,6 +272,20 @@ export async function exportPrintAssetAsPdf(
   const bleedRasterPx = Math.round(bleed * resolved.dpi);
   let bleedApproximated = false;
 
+
+  // --- aspect preflight -----------------------------------------------------
+  // Measured against the TRIM box: that is the geometry the capture is placed
+  // into (the bleed band is generated, not rendered).
+  const aspectReport = logAspectReport(
+    "print-asset-export",
+    checkExportAspect(pages, {
+      widthIn: trim.widthIn,
+      heightIn: trim.heightIn,
+      fit: "stretch",
+      labels: pages.map((n, i) => labelForPage(n, i)),
+    }),
+  );
+  opts.onAspectReport?.(aspectReport);
 
   const orientation: "landscape" | "portrait" = pageWidth >= pageHeight ? "landscape" : "portrait";
   const pdf = new jsPDF({
