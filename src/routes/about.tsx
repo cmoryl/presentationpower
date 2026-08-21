@@ -404,7 +404,7 @@ function AboutPage() {
                 {p.to && p.toLabel && (
                   <Link
                     to={p.to}
-                    className="mt-4 inline-block text-sm font-medium text-[#003FC7] hover:underline"
+                    className="mt-2 inline-flex min-h-11 items-center text-sm font-medium text-[#003FC7] hover:underline sm:mt-4 sm:min-h-0"
                   >
                     {p.toLabel}
                   </Link>

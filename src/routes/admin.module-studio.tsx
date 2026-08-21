@@ -767,7 +767,8 @@ function ModuleStudioPage() {
 
       <div className="h-3" />
 
-      <div className="flex h-[70vh] min-h-[540px] gap-3">
+      {/* Phones stack palette / canvas / rail; only lg+ has room for 3 columns. */}
+      <div className="flex flex-col gap-3 lg:h-[70vh] lg:min-h-[540px] lg:flex-row">
         <StudioPalette
           brand={brand}
           mode={comp.mode}

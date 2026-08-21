@@ -48,7 +48,7 @@ export function EditorPageHeader({
   status?: ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-8">
+    <div className="flex flex-col items-start gap-4 sm:flex-row sm:justify-between sm:gap-8">
       <div className="min-w-0">
         <Link
           to={backTo}
@@ -56,14 +56,18 @@ export function EditorPageHeader({
         >
           {backLabel}
         </Link>
-        <h1 className="mt-3 truncate text-[34px] font-semibold leading-tight tracking-tight text-[#03002C]">
+        <h1 className="mt-3 text-[22px] font-semibold leading-tight tracking-tight text-[#03002C] sm:truncate sm:text-[34px]">
           {title}
         </h1>
         {meta ? (
           <div className="mt-2 flex flex-wrap items-center gap-3 text-[13px] text-black/55">{meta}</div>
         ) : null}
       </div>
-      {status ? <div className="flex shrink-0 flex-col items-end gap-2">{status}</div> : null}
+      {status ? (
+        <div className="flex w-full shrink-0 flex-row flex-wrap items-center gap-2 sm:w-auto sm:flex-col sm:items-end">
+          {status}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -99,7 +103,7 @@ export function AuthoringNav({
   return (
     <nav
       aria-label="Deck views"
-      className={`inline-flex items-center gap-0.5 rounded-full border border-black/[0.07] bg-white/80 p-1 shadow-[0_1px_0_rgba(0,0,0,0.02)] backdrop-blur ${className ?? ""}`}
+      className={`inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-black/[0.07] bg-white/80 p-1 shadow-[0_1px_0_rgba(0,0,0,0.02)] backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${className ?? ""}`}
     >
       {SURFACES.map((s) => {
         const isActive = s.id === active;
@@ -110,7 +114,7 @@ export function AuthoringNav({
             params={{ deckId }}
             title={s.hint}
             aria-current={isActive ? "page" : undefined}
-            className={`rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition ${
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] transition ${
               isActive
                 ? "bg-[#03002C] text-white shadow-sm"
                 : "text-black/50 hover:bg-black/[0.04] hover:text-primary"

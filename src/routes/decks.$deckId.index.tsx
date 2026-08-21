@@ -830,7 +830,8 @@ function DeckEditor() {
             />
           </header>
 
-          <div className="mt-8 flex items-start gap-4">
+          {/* Phones stack: slide list, stage, then tool rail. lg+ keeps the row. */}
+          <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-start">
             {/* Slide list — collapses to a slim tab so the stage can grow. */}
             <div className="flex shrink-0 flex-col gap-1 self-start rounded-2xl border border-black/10 bg-white/80 p-1 shadow-sm backdrop-blur">
               <button
@@ -1258,7 +1259,7 @@ function DeckEditor() {
                     ? "Drag an image from your computer onto the slide to use it."
                     : "This module has no image slot — switch to an image-forward layout to drop imagery."}
                 </span>
-                <span className="inline-flex items-center gap-3">
+                <span className="inline-flex flex-wrap items-center gap-x-3 gap-y-1.5">
                   <SafeAreaGuidesToggle on={guides.on} onToggle={guides.toggle} />
                   <label className="inline-flex items-center gap-1.5">
                     <input
