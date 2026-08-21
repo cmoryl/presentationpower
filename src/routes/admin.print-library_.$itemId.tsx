@@ -22,6 +22,8 @@ import { ArrowLeft, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
 
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminLoading } from "@/components/admin/AdminPage";
+import { Button } from "@/components/ui/button";
+
 import { PrintKindPreview } from "@/components/print/PrintKindPreview";
 import { PrintImageEditContext } from "@/components/print/PrintImageEdit";
 import { PrintLogoListContext } from "@/components/print/PrintLogoList";
