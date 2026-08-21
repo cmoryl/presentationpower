@@ -21,6 +21,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
   MultiProposalPage,
+  ProposalCostRow,
   PrintDensity,
   PrintPageSize,
   SolutionProposalContent,
@@ -48,6 +49,13 @@ import {
   usePrintLogoList,
   type PrintLogoEntry,
 } from "./PrintLogoList";
+import {
+  blankCostRow,
+  computeCostLines,
+  computeCostTotal,
+  currencyOf,
+  parseAmount,
+} from "@/lib/print-library/cost-math";
 import { ProposalWorldMap, defaultWorldMapPins } from "./ProposalWorldMap";
 import {
   WORLD_MAP_REGION_VIEWS,
@@ -131,12 +139,15 @@ type BoxProps = {
   h?: number;
   children?: ReactNode;
   style?: CSSProperties;
+  /** Marks authoring chrome so PDF/PPTX capture strips it. */
+  "data-export-ignore"?: string;
 };
 
 /** Absolutely-positioned layer in source-deck inches. */
-function L({ x, y, w, h, children, style }: BoxProps) {
+function L({ x, y, w, h, children, style, ...rest }: BoxProps) {
   return (
     <div
+      {...rest}
       style={{
         position: "absolute",
         left: u(x),
@@ -150,6 +161,7 @@ function L({ x, y, w, h, children, style }: BoxProps) {
     </div>
   );
 }
+
 
 /** Text layer — point size + weight straight off the source shape. */
 function T({
@@ -940,8 +952,78 @@ function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
 // Page 4 — Cost summary
 // ---------------------------------------------------------------------------
 
-function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+const COST_COLS = {
+  service: { x: 0.92, w: 2.72 },
+  volume: { x: 3.78, w: 0.86 },
+  rate: { x: 4.72, w: 1.0 },
+  amount: { x: 5.9, w: 1.7 },
+};
+
+/** Editor-only numeric cell. Chrome-tagged so exports never capture inputs. */
+function CostInput({
+  x,
+  y,
+  w,
+  value,
+  align = "left",
+  placeholder,
+  onCommit,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  value: string;
+  align?: "left" | "right";
+  placeholder?: string;
+  onCommit: (next: string) => void;
+}) {
+  return (
+    <L x={x} y={y} w={w} data-export-ignore="true">
+      <input
+        defaultValue={value}
+        placeholder={placeholder}
+        onChange={(e) => onCommit(e.currentTarget.value)}
+        style={{
+          width: "100%",
+          fontFamily: FONT,
+          fontSize: fs(11),
+          color: NAVY,
+          textAlign: align,
+          background: "rgba(0,63,199,0.05)",
+          border: "1px solid rgba(0,63,199,0.28)",
+          borderRadius: u(0.04),
+          padding: `${u(0.03)} ${u(0.05)}`,
+          outline: "none",
+        }}
+      />
+    </L>
+  );
+}
+
+function CostPage({
+  page,
+  pageIndex,
+  logoWhite,
+}: {
+  page: MultiProposalPage;
+  pageIndex: number;
+  logoWhite: string;
+}) {
   const rows = page.costRows ?? [];
+  const editCtx = usePrintLogoList();
+  const editing = !!editCtx?.active;
+  const rowsPath = `pages.${pageIndex}.costRows`;
+  const symbol = currencyOf(rows);
+  const linesOut = computeCostLines(rows, symbol);
+  const totals = computeCostTotal(linesOut, symbol);
+  const totalDisplay = totals.hasNumbers ? totals.display : page.costTotal || "";
+
+  const patchRow = (i: number, patch: Partial<ProposalCostRow>) =>
+    editCtx?.onChange(
+      rowsPath,
+      rows.map((r, ri) => (ri === i ? { ...r, ...patch } : r)),
+    );
+
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
@@ -951,16 +1033,47 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
       {rows.length > 0 && (
         <>
           <L x={0.75} y={2.72} w={7.02} h={0.46} style={{ background: "#EEF2FD" }} />
-          <T x={0.92} y={2.83} w={3.6} size={11} weight={700} color={NAVY} upper tracking="0.06em">
+          <T
+            x={COST_COLS.service.x}
+            y={2.83}
+            w={COST_COLS.service.w}
+            size={11}
+            weight={700}
+            color={NAVY}
+            upper
+            tracking="0.06em"
+          >
             Service
           </T>
-          <T x={4.6} y={2.83} w={1.4} size={11} weight={700} color={NAVY} upper tracking="0.06em">
+          <T
+            x={COST_COLS.volume.x}
+            y={2.83}
+            w={COST_COLS.volume.w}
+            size={11}
+            weight={700}
+            color={NAVY}
+            upper
+            tracking="0.06em"
+          >
             Volume
           </T>
           <T
-            x={6.1}
+            x={COST_COLS.rate.x}
             y={2.83}
-            w={1.5}
+            w={COST_COLS.rate.w}
+            size={11}
+            weight={700}
+            color={NAVY}
+            upper
+            tracking="0.06em"
+            align="right"
+          >
+            Rate
+          </T>
+          <T
+            x={COST_COLS.amount.x - 0.1}
+            y={2.83}
+            w={COST_COLS.amount.w}
             size={11}
             weight={700}
             color={NAVY}
@@ -970,27 +1083,109 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
           >
             Investment
           </T>
-          {rows.map((row, i) => {
+          {linesOut.map((line, i) => {
             const y = 3.18 + i * 0.46;
+            const row = line.row;
             return (
               <div key={i}>
                 <Rule x={0.75} y={y + 0.44} w={7.02} color="rgba(3,0,44,0.14)" />
-                <T x={0.92} y={y + 0.12} w={3.6} size={11} color={NAVY}>
-                  {row.item ?? ""}
+                {editing ? (
+                  <CostInput
+                    x={COST_COLS.service.x}
+                    y={y + 0.08}
+                    w={COST_COLS.service.w}
+                    value={row.item ?? ""}
+                    placeholder="Service"
+                    onCommit={(item) => patchRow(i, { item })}
+                  />
+                ) : (
+                  <T
+                    x={COST_COLS.service.x}
+                    y={y + 0.12}
+                    w={COST_COLS.service.w}
+                    size={11}
+                    color={NAVY}
+                  >
+                    {row.item ?? ""}
+                  </T>
+                )}
+                {editing ? (
+                  <CostInput
+                    x={COST_COLS.volume.x}
+                    y={y + 0.08}
+                    w={COST_COLS.volume.w}
+                    value={row.qty ?? ""}
+                    placeholder="0"
+                    onCommit={(qty) => patchRow(i, { qty })}
+                  />
+                ) : (
+                  <T
+                    x={COST_COLS.volume.x}
+                    y={y + 0.12}
+                    w={COST_COLS.volume.w}
+                    size={11}
+                    color="#555555"
+                  >
+                    {row.qty ?? row.detail ?? ""}
+                  </T>
+                )}
+                {editing ? (
+                  <CostInput
+                    x={COST_COLS.rate.x}
+                    y={y + 0.08}
+                    w={COST_COLS.rate.w}
+                    value={row.rate ?? ""}
+                    align="right"
+                    placeholder="rate"
+                    onCommit={(rate) => patchRow(i, { rate })}
+                  />
+                ) : (
+                  <T
+                    x={COST_COLS.rate.x}
+                    y={y + 0.12}
+                    w={COST_COLS.rate.w}
+                    size={11}
+                    color="#555555"
+                    align="right"
+                  >
+                    {row.rate ? `${symbol}${parseAmount(row.rate)?.toFixed(2) ?? row.rate}` : ""}
+                  </T>
+                )}
+                <T
+                  x={COST_COLS.amount.x}
+                  y={y + 0.12}
+                  w={COST_COLS.amount.w}
+                  size={11}
+                  weight={600}
+                  color={NAVY}
+                  align="right"
+                >
+                  {line.display}
                 </T>
-                <T x={4.6} y={y + 0.12} w={1.4} size={11} color="#555555">
-                  {row.qty ?? row.detail ?? ""}
-                </T>
-                <T x={5.9} y={y + 0.12} w={1.7} size={11} weight={600} color={NAVY} align="right">
-                  {row.price ?? ""}
-                </T>
+                {editing ? (
+                  <L x={7.72} y={y + 0.12} w={0.28} data-export-ignore="true">
+                    <button
+                      type="button"
+                      title="Remove line"
+                      onClick={() =>
+                        editCtx?.onChange(
+                          rowsPath,
+                          rows.filter((_, ri) => ri !== i),
+                        )
+                      }
+                      className="pointer-events-auto grid h-4 w-4 place-items-center rounded-full bg-[#03002C] text-[10px] leading-none text-white hover:bg-[#E53D2E]"
+                    >
+                      ×
+                    </button>
+                  </L>
+                ) : null}
               </div>
             );
           })}
           <T
-            x={4.0}
+            x={3.4}
             y={3.34 + rows.length * 0.46}
-            w={2.2}
+            w={2.4}
             size={12}
             weight={700}
             color={NAVY}
@@ -1001,20 +1196,31 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
             {page.costTotalLabel || "Total"}
           </T>
           <T
-            x={6.3}
+            x={COST_COLS.amount.x}
             y={3.28 + rows.length * 0.46}
-            w={1.3}
+            w={COST_COLS.amount.w}
             size={16}
             weight={700}
             color={BLUE}
             align="right"
           >
-            {page.costTotal || ""}
+            {totalDisplay}
           </T>
+          {editing ? (
+            <L x={0.92} y={3.86 + rows.length * 0.46} w={3} data-export-ignore="true">
+              <button
+                type="button"
+                onClick={() => editCtx?.onChange(rowsPath, [...rows, blankCostRow()])}
+                className="pointer-events-auto rounded-full border border-[#003FC7]/30 bg-[#003FC7]/5 px-2 py-[2px] text-[9px] font-semibold uppercase tracking-[0.14em] text-[#003FC7] hover:bg-[#003FC7]/10"
+              >
+                + Add line
+              </button>
+            </L>
+          ) : null}
           {page.costNote && (
             <T
               x={0.92}
-              y={3.98 + rows.length * 0.46}
+              y={(editing ? 4.24 : 3.98) + rows.length * 0.46}
               w={6.7}
               size={9.5}
               color="#555555"
@@ -1028,6 +1234,7 @@ function CostPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: str
     </>
   );
 }
+
 
 // ---------------------------------------------------------------------------
 // Page 5 — Global locations
@@ -2603,7 +2810,7 @@ function PageBody({
     case "scope":
       return <ScopePage page={page} logoWhite={logoWhite} />;
     case "cost":
-      return <CostPage page={page} logoWhite={logoWhite} />;
+      return <CostPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "locations":
       return <LocationsPage page={page} pageIndex={pageIndex} logoWhite={logoWhite} />;
     case "locations-region":
