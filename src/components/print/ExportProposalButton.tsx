@@ -47,12 +47,15 @@ export function ExportProposalButton({
   const [scanning, setScanning] = useState(false);
   const [pages, setPages] = useState<PageInfo[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewNodes, setPreviewNodes] = useState<HTMLElement[]>([]);
   const hostRef = useRef<HTMLDivElement>(null);
   const runRef = useRef<Fmt | null>(null);
 
   const safe = (title || "proposal").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
-  // The host must be mounted for either job: enumerating pages or exporting.
-  const hostMounted = scanning || !!pending;
+  // The host must be mounted for either job: enumerating pages, previewing, or
+  // exporting.
+  const hostMounted = scanning || !!pending || previewOpen;
 
   const settle = useCallback(
     () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))),
