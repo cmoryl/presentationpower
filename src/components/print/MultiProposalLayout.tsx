@@ -850,15 +850,29 @@ function StatsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
 
       {/* One text box (spans, not block divs) so the live-edit overlay can match
           the whole authored `title` string — block children concatenate without
-          whitespace in textContent and never match the stored value. */}
-      <T x={1.2} y={0.94} w={4.6} size={37} weight={400} leading={1.28} tracking="-0.015em">
+          whitespace in textContent and never match the stored value. Hard
+          returns are preserved verbatim (pre-wrap) and long lines auto-wrap,
+          with FitT shrinking type until the block fits inside the bubble so the
+          editable box always mirrors the final rendered layout. */}
+      <FitT
+        x={1.2}
+        y={0.94}
+        w={4.6}
+        maxH={2.92}
+        size={37}
+        minSize={20}
+        weight={400}
+        leading={1.28}
+        tracking="-0.015em"
+      >
         {headline.map((line, i) => (
-          <span key={i} style={{ fontWeight: i === headline.length - 1 ? 700 : 400 }}>
+          <span key={i} style={{ fontWeight: i === emphasisIndex ? 700 : 400 }}>
             {line}
             {i < headline.length - 1 ? "\n" : ""}
           </span>
         ))}
-      </T>
+      </FitT>
+
 
 
       {/* Column divider + hairlines */}
