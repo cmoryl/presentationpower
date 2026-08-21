@@ -62,7 +62,11 @@ export function canvasBlockFrameStyle(b: CanvasBlock): React.CSSProperties {
 export function canvasBlockTextStyle(b: CanvasBlock, ink: string): React.CSSProperties {
   return {
     color: b.color ?? ink,
-    fontSize: `var(--cb-fs, ${blockFontSize(b)}px)`,
+    // Type is authored in 1920x1080 stage units. Surfaces that scale the stage
+    // with a CSS transform leave `--cb-scale` at 1; surfaces that mount the
+    // block layer at the container's own width (the canvas editor) publish the
+    // width ratio there so headlines don't render at full 1920 size.
+    fontSize: `calc(var(--cb-fs, ${blockFontSize(b)}px) * var(--cb-scale, 1))`,
     lineHeight: b.kind === "heading" ? 1.02 : 1.28,
     letterSpacing: b.kind === "heading" ? "-0.03em" : "-0.005em",
     fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),

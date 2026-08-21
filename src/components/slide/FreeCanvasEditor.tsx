@@ -253,6 +253,26 @@ export function FreeCanvasEditor({
   }, []);
 
   /**
+   * The editor mounts the block layer at the container's own width while the
+   * module underneath scales itself, so block type (authored in 1920-wide stage
+   * units) has to be divided down by the same ratio. Published as `--cb-scale`
+   * and kept live with a ResizeObserver so panels opening / closing retype the
+   * canvas instead of blowing headlines up over their neighbours.
+   */
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const apply = () => {
+      const w = el.getBoundingClientRect().width;
+      el.style.setProperty("--cb-scale", w > 0 ? String(w / STAGE_W) : "1");
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  /**
    * Every mutation flows through here, and every caller names itself, so the
    * deck history reads as a list of real actions ("Pick from module", "Resize
    * objects") instead of an anonymous run of "Canvas edit" steps. Discrete by
@@ -1287,7 +1307,9 @@ export function FreeCanvasEditor({
                     height: "100%",
                     outline: "none",
                     color: b.color ?? ink,
-                    fontSize: b.size ?? fontFor(b.kind),
+                    // Match the painted block exactly (stage units × canvas scale)
+                    // so typing never jumps to a different size.
+                    fontSize: `calc(${b.size ?? fontFor(b.kind)}px * var(--cb-scale, 1))`,
                     fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),
                     textAlign: b.align ?? "left",
                     whiteSpace: "pre-wrap",

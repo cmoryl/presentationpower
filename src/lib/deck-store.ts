@@ -179,7 +179,60 @@ export type CanvasBlock = {
    * never touched — this is a per-deck override that "Restore removed" undoes.
    */
   suppressed?: boolean;
+  /**
+   * Set the first time the user actually changes an ADOPTED block (move, resize,
+   * retype, restyle, hide, delete-section). Untouched adopted blocks are just a
+   * mirror of what the module painted, so a look-and-feel / appearance change
+   * drops them and lets the module repaint in the new style; touched ones are
+   * real authoring work and always survive.
+   */
+  touched?: boolean;
 };
+
+/**
+ * Drop adopted-but-untouched canvas mirrors so the module repaints itself.
+ * Used by every action that changes how a slide LOOKS (deck skin, per-slide
+ * skin, light/dark appearance, style pack / recipe), because a frozen mirror of
+ * the old look would otherwise sit on top of the new one.
+ */
+export function releaseUntouchedAdopted<T extends { canvasBlocks?: CanvasBlock[] }>(slide: T): T {
+  const blocks = slide.canvasBlocks;
+  if (!blocks?.length) return slide;
+  const kept = blocks.filter((b) => !b.sourceSelector || b.touched || b.suppressed);
+  if (kept.length === blocks.length) return slide;
+  return { ...slide, canvasBlocks: kept.length ? kept : undefined };
+}
+
+/** Mark adopted blocks the user genuinely changed, comparing against the previous list. */
+export function markTouchedAdopted(
+  prev: readonly CanvasBlock[] | undefined,
+  next: readonly CanvasBlock[],
+): CanvasBlock[] {
+  const before = new Map((prev ?? []).map((b) => [b.id, b]));
+  return next.map((b) => {
+    if (!b.sourceSelector || b.touched) return b;
+    const was = before.get(b.id);
+    // A brand-new adopted block is a mirror, not an edit.
+    if (!was) return b;
+    const same =
+      was.x === b.x &&
+      was.y === b.y &&
+      was.w === b.w &&
+      was.h === b.h &&
+      was.text === b.text &&
+      was.size === b.size &&
+      was.color === b.color &&
+      was.weight === b.weight &&
+      was.align === b.align &&
+      was.fill === b.fill &&
+      was.src === b.src &&
+      was.radius === b.radius &&
+      was.opacity === b.opacity &&
+      was.hidden === b.hidden &&
+      was.z === b.z;
+    return same ? b : { ...b, touched: true };
+  });
+}
 
 // ---- Presentation transitions (Pass 1 — on-screen only) --------------
 // Restricted to the SAFE native-mappable set so Pass 3 (PPTX post-processing
@@ -3785,7 +3838,12 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: {
                 ...deck,
                 slides: deck.slides.map((sl) =>
-                  sl.id === slideId ? { ...sl, canvasBlocks: blocks } : sl,
+                  sl.id === slideId
+                    ? {
+                        ...sl,
+                        canvasBlocks: markTouchedAdopted(sl.canvasBlocks, blocks),
+                      }
+                    : sl,
                 ),
               },
             },
@@ -3957,7 +4015,11 @@ export const useDeckStore = create<DeckState>()(
               ...s.decks,
               [deckId]: {
                 ...deck,
-                slides: deck.slides.map((sl) => (sl.id === slideId ? { ...sl, mode } : sl)),
+                slides: deck.slides.map((sl) =>
+                  // Appearance is a LOOK change: release adopted mirrors of the
+                  // old look so the module repaints light/dark for real.
+                  sl.id === slideId ? releaseUntouchedAdopted({ ...sl, mode }) : sl,
+                ),
               },
             },
           }));
@@ -4010,7 +4072,7 @@ export const useDeckStore = create<DeckState>()(
                 // Switching the deck skin stamps every slide so the deck reads
                 // as one template on every surface (editor, present, share,
                 // print, export) without per-surface wiring.
-                slides: deck.slides.map((sl) => ({ ...sl, skin })),
+                slides: deck.slides.map((sl) => releaseUntouchedAdopted({ ...sl, skin })),
                 context: { ...(deck.context ?? {}), skin },
               },
             },
@@ -4027,7 +4089,9 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: {
                 ...deck,
                 slides: deck.slides.map((sl) =>
-                  sl.id === slideId ? { ...sl, skin: skin ?? undefined } : sl,
+                  sl.id === slideId
+                    ? releaseUntouchedAdopted({ ...sl, skin: skin ?? undefined })
+                    : sl,
                 ),
               },
             },
@@ -4645,7 +4709,19 @@ export const useDeckStore = create<DeckState>()(
           const deck = get().decks[deckId];
           if (!deck) return;
           const next: DeckContext = { ...(deck.context ?? {}), ...patch };
-          set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, context: next } } }));
+          // A visual-language switch (style pack, industry recipe, base skin)
+          // must reach the slides: adopted mirrors of the previous look are
+          // released so every module renders in the newly selected style.
+          const looksChanged =
+            ("stylePackId" in patch && patch.stylePackId !== deck.context?.stylePackId) ||
+            ("designRecipeId" in patch && patch.designRecipeId !== deck.context?.designRecipeId) ||
+            ("skin" in patch && patch.skin !== deck.context?.skin);
+          const slides = looksChanged
+            ? deck.slides.map((sl) => releaseUntouchedAdopted(sl))
+            : deck.slides;
+          set((s) => ({
+            decks: { ...s.decks, [deckId]: { ...deck, context: next, slides } },
+          }));
         },
 
         setDeckTemplateFlag: (deckId, isTemplate) => {
