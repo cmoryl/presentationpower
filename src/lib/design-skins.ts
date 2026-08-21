@@ -462,18 +462,19 @@ export const DESIGN_SKINS: DesignSkin[] = [
     code: "S29",
     name: "Element System",
     reference: "TRANSPERFECT ELEMENT \u00b7 FIVE-BRICK SYSTEM",
-    description: "Element's own product language on white: paper-bright field, modular brick geometry and the master logo spectrum used as structural signal, never decoration.",
+    description: "Element's own product language: paper-white light field energised by the full five-brick spectrum \u2014 blue, teal, violet and coral bricks used as structural signal and bold colour choreography.",
     bestFit: "Element product marketing \u00b7 platform launches \u00b7 enablement \u00b7 internal rollout",
     mode: "light",
-    palette: ["#FFFFFF", "#0D131D", "#135CFB", "#08BFC1", "#FC5950"],
-    typography: "Modular display \u00b7 systematic labels",
-    surfaceNote: "Paper-white planes \u00b7 brick-aligned cards \u00b7 hairline rules",
+    palette: ["#FFFFFF", "#0D131D", "#135CFB", "#08BFC1", "#7C4EF4"],
+    typography: "Modular display \u00b7 confident systematic labels",
+    surfaceNote: "Light paper field \u00b7 lifted brick cards \u00b7 saturated colour blocks",
     imagery: "Modular bricks \u00b7 system diagrams \u00b7 product UI crops",
     density: "Medium",
-    spec: "GRADIENT G01 / G03  \u00b7  OPACITY O08\u201364  \u00b7  TYPE T03  \u00b7  LAYOUT L09 / L10  \u00b7  ICON I03",
+    spec: "GRADIENT G02 / G05  \u00b7  OPACITY O16\u201382  \u00b7  TYPE T03  \u00b7  LAYOUT L09 / L10  \u00b7  ICON I03",
     industries: ["Technology", "SaaS", "Internal enablement", "Marketing"],
     hc: { surface: "#FFFFFF", ink: "#000000", accent: "#073091" },
   },
+
 ];
 
 
