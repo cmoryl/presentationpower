@@ -75,6 +75,7 @@ import { Route as BriefDeckIdRouteImport } from './routes/brief.$deckId'
 import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
+import { Route as ApiPrintAgentChatRouteImport } from './routes/api/print-agent-chat'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
 import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
@@ -466,6 +467,11 @@ const AssetAssetIdRoute = AssetAssetIdRouteImport.update({
   path: '/asset/$assetId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPrintAgentChatRoute = ApiPrintAgentChatRouteImport.update({
+  id: '/api/print-agent-chat',
+  path: '/api/print-agent-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -823,6 +829,7 @@ export interface FileRoutesByFullPath {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
@@ -946,6 +953,7 @@ export interface FileRoutesByTo {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
@@ -1074,6 +1082,7 @@ export interface FileRoutesById {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
@@ -1203,6 +1212,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
@@ -1326,6 +1336,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
@@ -1453,6 +1464,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
@@ -1555,6 +1567,7 @@ export interface RootRouteChildren {
   AgentThreadIdRoute: typeof AgentThreadIdRoute
   ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiPrintAgentChatRoute: typeof ApiPrintAgentChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
   AssetSpotlightPreviewRoute: typeof AssetSpotlightPreviewRoute
@@ -2067,6 +2080,13 @@ declare module '@tanstack/react-router' {
       path: '/asset/$assetId'
       fullPath: '/asset/$assetId'
       preLoaderRoute: typeof AssetAssetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/print-agent-chat': {
+      id: '/api/print-agent-chat'
+      path: '/api/print-agent-chat'
+      fullPath: '/api/print-agent-chat'
+      preLoaderRoute: typeof ApiPrintAgentChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -2664,6 +2684,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentThreadIdRoute: AgentThreadIdRoute,
   ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiPrintAgentChatRoute: ApiPrintAgentChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
   AssetSpotlightPreviewRoute: AssetSpotlightPreviewRoute,
