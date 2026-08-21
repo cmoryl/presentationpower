@@ -903,6 +903,119 @@ const STAT_SLOTS: Array<{
 const HEADLINE_PT = 37;
 const HEADLINE_MIN_PT = 20;
 
+const clampHeadlinePt = (pt: number) =>
+  Math.max(HEADLINE_MIN_PT, Math.min(HEADLINE_PT + 8, Math.round(pt * 10) / 10));
+
+/**
+ * Editor-only fit indicator for the speech-bubble headline: says how many lines
+ * the export will contain, warns when the copy had to be auto-shrunk (or still
+ * cannot fit), and offers one-click ways to reduce the type size. Chrome-tagged,
+ * so PDF and PPTX exports never see it.
+ */
+function HeadlineFitBadge({
+  fit,
+  authoredPt,
+  onSet,
+  onReset,
+}: {
+  fit: FitReport;
+  authoredPt: number;
+  onSet: (pt: number) => void;
+  onReset: () => void;
+}) {
+  const tone = fit.clipped ? "#FF9B70" : fit.shrunk ? "#FFEB66" : "#A1FBF9";
+  const label = fit.clipped
+    ? "Headline is too long for the bubble — it will clip on export"
+    : fit.shrunk
+      ? `Auto-shrunk to fit: ${fit.fittedPt}pt (authored ${authoredPt}pt)`
+      : `Fits at ${fit.fittedPt}pt`;
+
+  return (
+    <L x={1.2} y={4.24} w={4.6} data-export-ignore="true">
+      <div
+        style={{
+          fontFamily: FONT,
+          fontSize: fs(9),
+          lineHeight: 1.35,
+          color: "#FFFFFF",
+          background: "rgba(3,0,44,0.72)",
+          border: `1px solid ${tone}`,
+          borderRadius: u(0.08),
+          padding: `${u(0.07)} ${u(0.1)}`,
+          display: "grid",
+          gap: u(0.06),
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: u(0.07) }}>
+          <span
+            aria-hidden
+            style={{
+              width: u(0.07),
+              height: u(0.07),
+              borderRadius: "50%",
+              background: tone,
+              flex: "0 0 auto",
+            }}
+          />
+          <strong style={{ fontWeight: 600 }}>{label}</strong>
+        </div>
+        <div style={{ opacity: 0.85 }}>
+          {fit.lines} {fit.lines === 1 ? "line" : "lines"} will export
+          {fit.clipped ? " — reduce the size or cut copy" : ""}
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: u(0.05) }}>
+          {fit.shrunk || fit.clipped ? (
+            <FitBtn onClick={() => onSet(fit.suggestedPt)}>
+              Set {fit.suggestedPt}pt (fit)
+            </FitBtn>
+          ) : null}
+          <FitBtn onClick={() => onSet(authoredPt - 1)} disabled={authoredPt <= HEADLINE_MIN_PT}>
+            −1pt
+          </FitBtn>
+          <FitBtn onClick={() => onSet(authoredPt + 1)}>+1pt</FitBtn>
+          <FitBtn onClick={() => onSet(Math.round(authoredPt * 0.9 * 10) / 10)}>−10%</FitBtn>
+          <FitBtn onClick={onReset} disabled={authoredPt === HEADLINE_PT}>
+            Reset
+          </FitBtn>
+        </div>
+      </div>
+    </L>
+  );
+}
+
+function FitBtn({
+  onClick,
+  disabled,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      style={{
+        fontFamily: FONT,
+        fontSize: fs(8.5),
+        fontWeight: 600,
+        color: "#03002C",
+        background: disabled ? "rgba(255,255,255,0.35)" : "#FFFFFF",
+        opacity: disabled ? 0.5 : 1,
+        border: "none",
+        borderRadius: u(0.06),
+        padding: `${u(0.035)} ${u(0.08)}`,
+        cursor: disabled ? "default" : "pointer",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+
 function StatsPage({
   page,
   pageIndex,
