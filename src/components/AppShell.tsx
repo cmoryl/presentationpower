@@ -419,8 +419,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       {/* --shell-pad-top is the contract full-bleed heroes cancel with `hero-flush`. */}
       <main
-        className="relative z-10 mx-auto max-w-[1400px] px-3 pb-10 pt-3 sm:px-8 sm:pb-14 sm:pt-4"
-        style={{ "--shell-pad-top": "0.75rem" } as React.CSSProperties}
+        className="relative z-10 mx-auto max-w-[1400px] px-3 pb-10 pt-3 sm:px-8 sm:pb-14"
+        style={{ "--shell-pad-top": "0.75rem" } as Record<string, string>}
       >
         {showAdminChrome ? (
           <div className="flex flex-col gap-6 md:flex-row">
