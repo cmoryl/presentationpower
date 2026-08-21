@@ -20,6 +20,7 @@ import { skinBackgroundLayers, sceneFromSeed } from "./skin-backgrounds";
 import { industrySceneLayers, coreSceneLayers } from "./industry-scene-art";
 import { GEOMETRY_SHEET } from "./pack-geometry";
 import { INDUSTRY_SKINS } from "./industry-skins";
+import { withElementSceneArt } from "./element-scene-art";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
