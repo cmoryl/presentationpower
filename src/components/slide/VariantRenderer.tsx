@@ -664,7 +664,7 @@ function VariantRendererInner(props: Props) {
   // re-filled from the LogoHub roster. Author-picked client logos are kept.
   const logoPool = useClientLogoPool();
   const rawContent = slide.content as Record<string, unknown>;
-  const c = useMemo(() => {
+  const c = React.useMemo(() => {
     if (!logoPool.length) return rawContent;
     const json = JSON.stringify(rawContent ?? {});
     const needsClientMarks = /\/brand-logos\//.test(json) || !/logoUrl/.test(json);
