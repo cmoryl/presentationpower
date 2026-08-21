@@ -65,6 +65,8 @@ import { ReviewStatusControl } from "@/components/ReviewStatusControl";
 import {
   ChevronDown,
   Layers,
+  LayoutList,
+
   MessageSquare,
   RectangleHorizontal,
   Rows2,
@@ -377,6 +379,8 @@ function DeckEditor() {
    * Controlled here so turning live editing on can reveal the Tools tab.
    */
   const [railTab, setRailTab] = useState<string | null>("inspect");
+  /** Left slide list collapses so the live stage can take the extra width. */
+  const [slidesRailOpen, setSlidesRailOpen] = useState(true);
   const stageDrop = useImageDrop({
     divisionId: deck?.brandModeId,
     onApply: ({ url, path }) => {
@@ -822,9 +826,30 @@ function DeckEditor() {
           </header>
 
           <div className="mt-8 flex items-start gap-4">
-            {/* Overview grid */}
+            {/* Slide list — collapses to a slim tab so the stage can grow. */}
+            <div className="flex shrink-0 flex-col gap-1 self-start rounded-2xl border border-black/10 bg-white/80 p-1 shadow-sm backdrop-blur">
+              <button
+                type="button"
+                onClick={() => setSlidesRailOpen((v) => !v)}
+                aria-expanded={slidesRailOpen}
+                title={slidesRailOpen ? "Collapse the slide list" : "Show the slide list"}
+                className={`flex w-9 flex-col items-center gap-1.5 rounded-lg py-3 transition ${
+                  slidesRailOpen
+                    ? "bg-[#003FC7] text-white"
+                    : "text-black/60 hover:bg-black/5"
+                }`}
+              >
+                <LayoutList className="h-4 w-4" />
+                <span
+                  className="text-[10px] font-semibold uppercase tracking-[0.14em]"
+                  style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+                >
+                  Slides
+                </span>
+              </button>
+            </div>
             <div
-              className="w-[260px] shrink-0 space-y-3"
+              className={`shrink-0 space-y-3 ${slidesRailOpen ? "w-[260px]" : "hidden"}`}
               role="group"
               aria-label="Slide list and selection"
               aria-describedby="slide-rail-help"
