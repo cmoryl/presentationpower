@@ -335,6 +335,12 @@ function FitT({
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [factor, setFactor] = useState(1);
   const floor = Math.min(1, (minSize ?? size * 0.6) / size);
+  // Convergence budget: a shrink changes the wrap, which re-fires the observer,
+  // which can shrink again. Cap the number of adjustments per content change so
+  // a headline that never quite settles cannot loop forever ("Maximum update
+  // depth exceeded") — after the budget the last fitted factor is final.
+  const stepsRef = useRef(0);
+  const textRef = useRef<string | null>(null);
 
   const measure = useCallback(() => {
     const host = hostRef.current;
@@ -342,17 +348,31 @@ function FitT({
     if (!host || !inner) return;
     const limit = host.clientHeight;
     if (!limit) return;
+    // New copy (or a new geometry) earns a fresh convergence budget. Keyed off
+    // the rendered string rather than the `children` React node, whose identity
+    // changes on every parent render and would otherwise reset forever.
+    const key = `${inner.textContent ?? ""}|${size}|${w}|${maxH}`;
+    if (textRef.current !== key) {
+      textRef.current = key;
+      stepsRef.current = 0;
+    }
+    if (stepsRef.current > 14) return;
     const h = inner.scrollHeight;
     setFactor((prev) => {
+      let next = prev;
       if (h <= limit + 0.5) {
-        if (prev >= 1) return prev;
-        const next = Math.min(1, prev * (limit / Math.max(h, 1)));
-        return next - prev > 0.004 ? next : prev;
+        // Only grow back when there is real slack, and never overshoot.
+        if (prev >= 1 || h > limit * 0.94) return prev;
+        next = Math.min(1, prev * (limit / Math.max(h, 1)) * 0.98);
+        if (next - prev <= 0.01) return prev;
+      } else {
+        next = Math.max(floor, prev * (limit / h));
+        if (prev - next <= 0.01) return prev;
       }
-      const next = Math.max(floor, prev * (limit / h));
-      return prev - next > 0.004 ? next : prev;
+      stepsRef.current += 1;
+      return next;
     });
-  }, [floor]);
+  }, [floor, size, w, maxH]);
 
   useLayoutEffect(() => {
     measure();
@@ -364,6 +384,8 @@ function FitT({
     if (inner) ro.observe(inner);
     return () => ro.disconnect();
   }, [measure, children, factor]);
+
+
 
   return (
     <div

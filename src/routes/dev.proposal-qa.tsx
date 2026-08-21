@@ -2,6 +2,7 @@
 // Renders the first multi-page master at a fixed width so a headless browser
 // can screenshot each page against the source deck references.
 
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { MultiProposalLayout } from "@/components/print/MultiProposalLayout";
@@ -21,11 +22,15 @@ export const Route = createFileRoute("/dev/proposal-qa")({
 
 function ProposalQa() {
   const seed = MULTI_SOLUTION_PROPOSALS[0];
+  const [override, setOverride] = useState<string | null>(null);
+  useEffect(() => {
+    setOverride(new URLSearchParams(window.location.search).get("title"));
+  }, []);
   if (!seed) return <div>No multi-page proposal masters found.</div>;
   return (
     <main style={{ background: "#DADDE5", padding: 24 }}>
       <div style={{ width: 816, margin: "0 auto", display: "grid", gap: 24 }}>
-        <MultiProposalLayout content={seed.content} brand={BRAND_MODES[0]!} mode="light" pageSize="Letter" />
+        <MultiProposalLayout content={override ? { ...seed.content, pages: seed.content.pages.map((pg, i) => (i === 1 ? { ...pg, title: override } : pg)) } : seed.content} brand={BRAND_MODES[0]!} mode="light" pageSize="Letter" />
       </div>
     </main>
   );
