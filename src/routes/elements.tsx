@@ -9,6 +9,9 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ElementBrickRow, ElementBrickRail } from "@/components/brand/ElementBrickMotif";
+import { ThemedHeroVideo } from "@/components/hero/ThemedHeroVideo";
+import heroElementsDark from "@/assets/hero-elements-dark.mp4.asset.json";
+import heroElementsLight from "@/assets/hero-elements-light.mp4.asset.json";
 
 export const Route = createFileRoute("/elements")({
   head: () => ({
@@ -126,7 +129,9 @@ function ElementsLanding() {
     <AppShell>
       {/* ================= HERO ================= */}
       <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:py-10 lg:py-12">
+        <ThemedHeroVideo dark={heroElementsDark.url} light={heroElementsLight.url} />
         <div aria-hidden className="pointer-events-none absolute inset-0">
+
           <div
             className="absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full blur-[110px]"
             style={{ background: "#003FC7", opacity: 0.55 }}
