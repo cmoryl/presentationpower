@@ -498,19 +498,22 @@ function MasterItemEditorPage() {
                   </PrintContentFitFrame>
                 </PrintPageProvider>
                 {/* Vertical pull-down grip for the hero band — content-aware
-                    ceiling, keyboard nudges, cap warning colours. */}
-                <HeroResizeHandle
-                  canvasRef={canvasRef}
-                  media={heroMedia}
-                  onChange={(next) => patchContent({ heroMedia: next })}
-                  kind={saved.kind as never}
-                  usedModuleUnits={(
-                    (draft.content as { modules?: PrintSection[] }).modules ?? []
-                  ).reduce((n, m) => n + weightForSection(m), 0)}
-                  hasTitle={!!(draft.content as { title?: string }).title}
-                  hasSummary={!!(draft.content as { summary?: string }).summary}
-                  disabledHint="Add hero media to this master to resize the band"
-                />
+                    ceiling, keyboard nudges, cap warning colours. Multi-page
+                    proposal masters have authored page art, no hero band. */}
+                {!multiPage ? (
+                  <HeroResizeHandle
+                    canvasRef={canvasRef}
+                    media={heroMedia}
+                    onChange={(next) => patchContent({ heroMedia: next })}
+                    kind={saved.kind as never}
+                    usedModuleUnits={(
+                      (draft.content as { modules?: PrintSection[] }).modules ?? []
+                    ).reduce((n, m) => n + weightForSection(m), 0)}
+                    hasTitle={!!(draft.content as { title?: string }).title}
+                    hasSummary={!!(draft.content as { summary?: string }).summary}
+                    disabledHint="Add hero media to this master to resize the band"
+                  />
+                ) : null}
                 {/* Measured clipping alarm with a one-click hero relief fix. */}
                 <PrintOverflowOverlay
                   state={overflow}
@@ -548,8 +551,9 @@ function MasterItemEditorPage() {
           {draft.content ? (
             <>
               <p className="mt-2 text-[11px] text-black/50">
-                Click any text on the page to edit it in place. Drag the hero grip vertically to
-                resize the band. Fit now: {describeFit(fitKnobs)}
+                Click any text on the page to edit it in place.
+                {multiPage ? " " : " Drag the hero grip vertically to resize the band. "}
+                Fit now: {describeFit(fitKnobs)}
                 {fitMeasure && fitMeasure.overflowPx > 0
                   ? ` · ${fitMeasure.overflowPx}px past the trim`
                   : " · fits the trim"}
@@ -612,14 +616,16 @@ function MasterItemEditorPage() {
                 onChange={(e) => patch({ tags: e.target.value })}
               />
             </Field>
-            <Field label="Hero image URL">
-              <input
-                className={fieldCls}
-                value={draft.heroUrl}
-                onChange={(e) => patch({ heroUrl: e.target.value })}
-                placeholder="https://…"
-              />
-            </Field>
+            {!multiPage ? (
+              <Field label="Hero image URL">
+                <input
+                  className={fieldCls}
+                  value={draft.heroUrl}
+                  onChange={(e) => patch({ heroUrl: e.target.value })}
+                  placeholder="https://…"
+                />
+              </Field>
+            ) : null}
             <button
               type="button"
               onClick={() => patch({ hidden: !draft.hidden })}
@@ -846,36 +852,40 @@ function MasterItemEditorPage() {
                 </Row>
               </Panel>
 
-              <Panel title="Page masthead">
-                <MastheadRuleTypeControls
-                  rule={(draft.content as { heroRule?: PrintHeroRule }).heroRule}
-                  titleType={(draft.content as { heroTitleType?: PrintHeroTitleType }).heroTitleType}
-                  onChange={(next) =>
-                    patchContent({
-                      ...("rule" in next ? { heroRule: next.rule } : null),
-                      ...("titleType" in next ? { heroTitleType: next.titleType } : null),
-                    })
-                  }
-                />
-                {heroMedia ? (
-                  <Field label={`Hero height — ${Math.round(heroMedia.heightPct ?? 46)}%`}>
-                    <input
-                      type="range"
-                      aria-label="Hero height"
-                      min={20}
-                      max={70}
-                      step={1}
-                      value={Math.round(heroMedia.heightPct ?? 46)}
-                      onChange={(e) =>
-                        patchContent({
-                          heroMedia: { ...heroMedia, heightPct: Number(e.target.value) },
-                        })
-                      }
-                      className="w-full"
-                    />
-                  </Field>
-                ) : null}
-              </Panel>
+              {!multiPage ? (
+                <Panel title="Page masthead">
+                  <MastheadRuleTypeControls
+                    rule={(draft.content as { heroRule?: PrintHeroRule }).heroRule}
+                    titleType={
+                      (draft.content as { heroTitleType?: PrintHeroTitleType }).heroTitleType
+                    }
+                    onChange={(next) =>
+                      patchContent({
+                        ...("rule" in next ? { heroRule: next.rule } : null),
+                        ...("titleType" in next ? { heroTitleType: next.titleType } : null),
+                      })
+                    }
+                  />
+                  {heroMedia ? (
+                    <Field label={`Hero height — ${Math.round(heroMedia.heightPct ?? 46)}%`}>
+                      <input
+                        type="range"
+                        aria-label="Hero height"
+                        min={20}
+                        max={70}
+                        step={1}
+                        value={Math.round(heroMedia.heightPct ?? 46)}
+                        onChange={(e) =>
+                          patchContent({
+                            heroMedia: { ...heroMedia, heightPct: Number(e.target.value) },
+                          })
+                        }
+                        className="w-full"
+                      />
+                    </Field>
+                  ) : null}
+                </Panel>
+              ) : null}
             </>
           ) : null}
 
