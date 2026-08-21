@@ -23,7 +23,8 @@ import {
 import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import type { StylePack } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
-import { BackdropSourcePicker } from "./BackdropSourcePicker";
+import { BackdropSourcePicker, divisionImageUrl } from "./BackdropSourcePicker";
+import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { SceneSlideStage } from "./SceneSlideStage";
 
 import type { BackdropShot } from "./BackdropLightbox";
