@@ -38,6 +38,11 @@ import { TableSpecRows } from "./table/TableSpecRows";
 import { ContactExpertCard } from "./contact/ContactExpertCard";
 import { ContactGlobalPanel } from "./contact/ContactGlobalPanel";
 import { ContactCtaBand } from "./contact/ContactCtaBand";
+import {
+  DeviceLaptopShowcase,
+  DeviceMonitorShowcase,
+  DeviceDuoShowcase,
+} from "./device/DeviceVariants";
 
 export const PRINT_HERO_VARIANTS: Array<{
   id: PrintHeroModuleVariant;
@@ -262,6 +267,29 @@ export const PRINT_CONTACT_VARIANTS: Array<{
   { id: "contact-cta-band", label: "Closing CTA Band", description: "Closing accent band with a button." },
 ];
 
+export const PRINT_DEVICE_VARIANTS: Array<{
+  id: "device-laptop-showcase" | "device-monitor-showcase" | "device-duo-showcase";
+  label: string;
+  description: string;
+}> = [
+  {
+    id: "device-laptop-showcase",
+    label: "Laptop Screen",
+    description: "Laptop mockup beside supporting copy — screen image is replaceable.",
+  },
+  {
+    id: "device-monitor-showcase",
+    label: "Desktop Monitor",
+    description: "Centered desktop monitor with headline above and caption below.",
+  },
+  {
+    id: "device-duo-showcase",
+    label: "Laptop + Monitor Duo",
+    description: "Monitor and laptop pair for a hero screen plus a companion view.",
+  },
+];
+
+
 export function PrintSectionRenderer({
   section,
   mode,
@@ -361,6 +389,14 @@ export function PrintSectionRenderer({
         return <ContactGlobalPanel section={section} mode={mode} accent={accent} />;
       if (section.variantId === "contact-cta-band")
         return <ContactCtaBand section={section} mode={mode} accent={accent} />;
+      return null;
+    case "device":
+      if (section.variantId === "device-laptop-showcase")
+        return <DeviceLaptopShowcase section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "device-monitor-showcase")
+        return <DeviceMonitorShowcase section={section} mode={mode} accent={accent} />;
+      if (section.variantId === "device-duo-showcase")
+        return <DeviceDuoShowcase section={section} mode={mode} accent={accent} />;
       return null;
     default:
       return null;

@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
   PrintContactVariant,
+  PrintDeviceVariant,
   PrintNarrativeVariant,
   PrintTableVariant,
   PrintExpertiseVariant,
@@ -19,6 +20,7 @@ import type {
 import {
   PRINT_HERO_VARIANTS,
   PRINT_CONTACT_VARIANTS,
+  PRINT_DEVICE_VARIANTS,
   PRINT_NARRATIVE_VARIANTS,
   PRINT_TABLE_VARIANTS,
   PRINT_EXPERTISE_VARIANTS,
@@ -429,6 +431,30 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
   };
 }
 
+export function makePrintDeviceSection(variantId: PrintDeviceVariant): PrintSection {
+  const base = {
+    id: rid(),
+    kind: "device" as const,
+    variantId,
+    eyebrow: "In the platform",
+    title: "See the workflow on screen",
+    body: "Brief, translation memory, and reviewer rules in one view — replace the screen image with your own product capture.",
+    caption: "Element · reviewer workbench",
+    items: [
+      { label: "One intake", body: "Every request enters the same queue." },
+      { label: "Live status", body: "Owners and deadlines per market." },
+      { label: "Approved output", body: "Only signed-off content ships." },
+    ],
+  };
+  if (variantId === "device-monitor-showcase") {
+    return { ...base, deviceTone: "ink" as const, items: base.items.slice(0, 3) };
+  }
+  if (variantId === "device-duo-showcase") {
+    return { ...base, deviceTone: "ink" as const, title: "Desktop and laptop, one program view" };
+  }
+  return { ...base, deviceTone: "graphite" as const };
+}
+
 // ---- Picker UI ------------------------------------------------------------
 
 // Families, their labels, and their order come from the canonical registry
@@ -460,6 +486,8 @@ function variantsForFamily(
       return PRINT_TABLE_VARIANTS;
     case "contact":
       return PRINT_CONTACT_VARIANTS;
+    case "device":
+      return PRINT_DEVICE_VARIANTS;
   }
 }
 
@@ -483,6 +511,8 @@ function makeSectionFor(family: Family, id: string): PrintSection {
       return makePrintTableSection(id as PrintTableVariant);
     case "contact":
       return makePrintContactSection(id as PrintContactVariant);
+    case "device":
+      return makePrintDeviceSection(id as PrintDeviceVariant);
   }
 }
 

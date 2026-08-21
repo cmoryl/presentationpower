@@ -19,7 +19,8 @@ export type PrintModuleFamily =
   | "expertise"
   | "feature-list"
   | "table"
-  | "contact";
+  | "contact"
+  | "device";
 
 export type PrintModuleFamilyMeta = {
   id: PrintModuleFamily;
@@ -83,6 +84,12 @@ export const PRINT_MODULE_FAMILIES: PrintModuleFamilyMeta[] = [
     label: "Contact & CTA",
     tagline: "How the page closes",
     desc: "Subject-expert cards, global contact panels, and closing CTA bands — the three endings every curated piece uses.",
+  },
+  {
+    id: "device",
+    label: "Device screens",
+    tagline: "Show the product",
+    desc: "Laptop and desktop-monitor mockups with a replaceable screen image — drop in a product screenshot to show the platform in context.",
   },
 ];
 
@@ -151,6 +158,10 @@ export const PRINT_MODULE_LABELS: Record<string, string> = {
   "contact-expert-card": "Subject Expert Card",
   "contact-global-panel": "Global Contacts Panel",
   "contact-cta-band": "Closing CTA Band",
+  // Device screens
+  "device-laptop-showcase": "Laptop Screen",
+  "device-monitor-showcase": "Desktop Monitor",
+  "device-duo-showcase": "Laptop + Monitor Duo",
 };
 
 /** Canonical label for a variant id, falling back to a title-cased id. */
@@ -158,7 +169,7 @@ export function printVariantLabel(variantId: string): string {
   return (
     PRINT_MODULE_LABELS[variantId] ??
     variantId
-      .replace(/^(hero|stat|quote|logo|expertise|feature|narrative|table|contact)-/, "")
+      .replace(/^(hero|stat|quote|logo|expertise|feature|narrative|table|contact|device)-/, "")
       .replace(/-portrait$/, "")
       .split("-")
       .map((w) => w.charAt(0).toUpperCase() + w.slice(1))

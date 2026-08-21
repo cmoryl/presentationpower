@@ -16,6 +16,7 @@
 import type {
   PrintAssetKind,
   PrintContactVariant,
+  PrintDeviceVariant,
   PrintNarrativeVariant,
   PrintTableVariant,
   PrintExpertiseVariant,
@@ -29,6 +30,7 @@ import type {
 import {
   makePrintHeroSection,
   makePrintContactSection,
+  makePrintDeviceSection,
   makePrintNarrativeSection,
   makePrintTableSection,
   makePrintExpertiseSection,
@@ -250,6 +252,24 @@ const contactModule = (
   bestFor: ALL_KINDS,
   tags,
   make: () => makePrintContactSection(variantId),
+});
+
+const deviceModule = (
+  variantId: PrintDeviceVariant,
+  label: string,
+  description: string,
+  density: PrintModuleDensity,
+  tags: string[],
+): PrintSectionModule => ({
+  id: `pm-device-${variantId}`,
+  family: "device",
+  variantId,
+  label: PRINT_MODULE_LABELS[variantId] ?? label,
+  description,
+  density,
+  bestFor: ALL_KINDS,
+  tags,
+  make: () => makePrintDeviceSection(variantId),
 });
 
 const PRINT_SECTION_MODULES_RAW: PrintSectionModule[] = [
@@ -504,6 +524,27 @@ const PRINT_SECTION_MODULES_RAW: PrintSectionModule[] = [
     "Accent band with headline, supporting line, and a pill button — the standard page-closing call to action.",
     "compact",
     ["cta", "close", "band", "next step"],
+  ),
+  deviceModule(
+    "device-laptop-showcase",
+    "Laptop Screen",
+    "Laptop chassis beside supporting copy — click or drop a screenshot onto the screen to show the product in context.",
+    "standard",
+    ["device", "laptop", "screenshot", "product", "software"],
+  ),
+  deviceModule(
+    "device-monitor-showcase",
+    "Desktop Monitor",
+    "Centered desktop monitor with the headline above and a caption below — the widest way to show a dashboard.",
+    "tall",
+    ["device", "monitor", "desktop", "dashboard", "screenshot"],
+  ),
+  deviceModule(
+    "device-duo-showcase",
+    "Laptop + Monitor Duo",
+    "Monitor and laptop paired on one baseline for a hero screen plus a companion view.",
+    "tall",
+    ["device", "duo", "monitor", "laptop", "screens"],
   ),
 ];
 

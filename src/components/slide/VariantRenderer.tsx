@@ -8,6 +8,7 @@ import {
   type ResolvedFunnelStyle,
 } from "@/lib/funnel-style";
 import { FunnelFigure, type FunnelStage } from "./FunnelFigure";
+import { DeviceFrame, DeviceScreenPlaceholder, deviceKindFrom } from "@/components/device/DeviceFrame";
 import { AccentRule, FlowArrow, ProcessRail } from "./Connectors";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import {
@@ -6163,7 +6164,7 @@ function renderVariantBody({
     case "MV-SHOW-MONITOR": {
       const kind = deviceKindFrom(
         c.deviceKind,
-        variantId === "MV-SHOW-MONITOR" ? "monitor" : "laptop",
+        variant.id === "MV-SHOW-MONITOR" ? "monitor" : "laptop",
       );
       const tone = (["graphite", "silver", "ink"] as const).includes(
         s(c.deviceTone) as "graphite",
@@ -6201,7 +6202,7 @@ function renderVariantBody({
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <div className="flex h-full flex-col items-center justify-center">
               {s(c.eyebrow) && <Kicker brand={brand}>{s(c.eyebrow)}</Kicker>}
-              <SlideTitle brand={brand} title={s(c.title)} className="mt-4 text-center" />
+              <div className="mt-4 text-center"><SlideTitle brand={brand} title={s(c.title)} /></div>
               <div className="mt-10 w-[64%]">
                 <DeviceFrame kind="monitor" tone={tone} accent="var(--slide-accent-text)">
                   {screen}
@@ -6235,7 +6236,7 @@ function renderVariantBody({
             </DeviceFrame>
             <div className="flex flex-col justify-center">
               {s(c.eyebrow) && <Kicker brand={brand}>{s(c.eyebrow)}</Kicker>}
-              <SlideTitle brand={brand} title={s(c.title)} className="mt-4" />
+              <div className="mt-4"><SlideTitle brand={brand} title={s(c.title)} /></div>
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>
                 {s(c.body)}
               </SupportingText>
