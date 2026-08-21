@@ -15,7 +15,7 @@
 // stack them and exportPrintAssetAsPdf() can emit a real multi-page PDF. All
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
-import { Fragment } from "react";
+import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
 import type { BrandMode } from "@/lib/taxonomy";
