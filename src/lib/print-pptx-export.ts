@@ -56,12 +56,17 @@ export async function exportPrintPagesAsPptx(
     const rect = node.getBoundingClientRect();
     const nodeRatio = rect.width > 0 && rect.height > 0 ? rect.width / rect.height : slideRatio;
     const resolved = resolvePrintPixelWidth(widthIn, heightIn, dpi);
-    const dataUrl = await withExportChrome(() =>
+    const png = await withExportChrome(() =>
       captureSlideAsDataUrl(node, {
         mode: opts.mode ?? "light",
         targetWidth: resolved.widthPx,
       }),
     );
+    // Page rasters are photographic (gradients, imagery, maps): PNG runs 2-4MB
+    // each and a 20-page proposal produced a ~50MB file PowerPoint struggles to
+    // open and re-render. Re-encode to high-quality JPEG on an opaque white
+    // canvas — same pixels, ~10x smaller, no transparency to lose.
+    const dataUrl = await toJpeg(png, 0.92);
 
     let w = widthIn;
     let h = widthIn / nodeRatio;
@@ -76,6 +81,7 @@ export async function exportPrintPagesAsPptx(
     slide.background = { color: "FFFFFF" };
     slide.addImage({ data: dataUrl, x, y, w, h });
   }
+
 
 
   // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
