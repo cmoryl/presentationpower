@@ -726,13 +726,18 @@ function PrintItemCard({
   canEditMaster?: boolean;
 }) {
   const isTemplate = item.source === "template";
+  // Multi-page masters (Solution Proposals) have no hero photo — render the
+  // live cover page as the card art so every card previews the real document.
+  const multiPage = !isTemplate && isMultiPageItem(item);
+  const liveArt = isTemplate || multiPage;
+  const pageCount = pageCountOf(item);
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/50 hover:shadow-md">
       <button
         type="button"
         onClick={onPreview}
         aria-label={`Preview ${item.title}`}
-        className="relative block w-full overflow-hidden bg-[#0b0a2a] text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]"
+        className={`relative block w-full overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] ${multiPage ? "bg-white" : "bg-[#0b0a2a]"}`}
         style={{ height: 0, paddingBottom: "62.5%" }}
       >
         {isTemplate ? (
@@ -740,6 +745,12 @@ function PrintItemCard({
             {/* Full page render, scaled so the top third of the sheet reads as the card art. */}
             <div className="w-full" style={{ aspectRatio: "8.5 / 11" }}>
               {renderPreview(item.kind, brand, item.kind === "adaptor-brief" ? "dark" : "light")}
+            </div>
+          </div>
+        ) : multiPage ? (
+          <div className="pointer-events-none absolute inset-x-0 top-0 origin-top">
+            <div className="w-full" style={{ aspectRatio: "8.5 / 11" }}>
+              {renderPreview(item.kind, brand, "light", item.content, 0)}
             </div>
           </div>
         ) : item.heroUrl ? (
@@ -751,13 +762,13 @@ function PrintItemCard({
             style={{ objectPosition: `${item.focal?.x ?? 50}% ${item.focal?.y ?? 50}%` }}
           />
         ) : null}
-        {/* Accent strip only (like modules) — no gradient wash over template art. */}
+        {/* Accent strip only (like modules) — no gradient wash over live page art. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1.5"
           style={{ background: brand.tokens.primary }}
         />
-        {!isTemplate ? (
+        {!liveArt ? (
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
@@ -767,15 +778,21 @@ function PrintItemCard({
           />
         ) : null}
 
-        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
+        <span className="absolute left-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#03002C]">
           {isTemplate ? "Blank template" : (item.collection ?? "Ready-made")}
         </span>
-        {!isTemplate ? (
+        {multiPage ? (
+          <span className="absolute right-3 top-3 z-20 inline-flex items-center gap-1 rounded-full bg-[#03002C]/90 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white">
+            {pageCount} pages
+          </span>
+        ) : null}
+        {!liveArt ? (
           <h3 className="absolute inset-x-3 bottom-3 line-clamp-2 text-sm font-semibold leading-tight text-white">
             {item.title}
           </h3>
         ) : null}
       </button>
+
 
       <div className="flex flex-1 flex-col p-4">
         <div className="text-[11px] uppercase tracking-[0.18em] text-black/45">
