@@ -1477,8 +1477,21 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
   if (/bento|mosaic|grid-cards|modular/.test(s)) return "bento";
   if (/chart|graph|plot|table|data/.test(s)) return "chart";
   if (/quote|testimonial|voice/.test(s)) return "quote";
-  if (/timeline|phase|milestone|process|cycle/.test(s)) return "timeline";
+  if (/timeline|phase|milestone|process|cycle|step|roadmap|journey|flow/.test(s))
+    return "timeline";
+  // Second pass: the module vocabulary below has no scene word in it, but the
+  // layouts are unmistakable. Without these, most of the catalogue collapsed
+  // onto the "section" plate and a whole deck wore a single background.
+  if (/card|tile|grid|mosaic|matrix|feature|pillar|icon|logo|list/.test(s))
+    return "bento";
+  if (/team|portrait|people|headshot|profile|showcase|device|laptop|monitor/.test(s))
+    return "split";
+  if (/table|pricing|compare|scorecard|budget|cost|breakdown/.test(s)) return "chart";
+  if (/why|value|benefit|approach|solution|capabilit|service|offer/.test(s))
+    return "agenda";
+  if (/divider|section|chapter|break|title-only/.test(s)) return "section";
   return "section";
+
 }
 
 /** Human-readable description of a skin's background library, for the UI. */
