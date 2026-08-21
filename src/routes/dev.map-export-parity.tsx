@@ -14,6 +14,7 @@ import { MultiProposalLayout } from "@/components/print/MultiProposalLayout";
 import { ExportProposalButton } from "@/components/print/ExportProposalButton";
 import { MULTI_SOLUTION_PROPOSALS } from "@/lib/print-library/solution-proposals-multi";
 import type { SolutionProposalContent } from "@/lib/print-assets.types";
+import { BRAND_MODES } from "@/lib/taxonomy";
 import { WORLD_MAP_VIEW, type WorldMapPin } from "@/lib/print-library/world-map-vector";
 
 export const Route = createFileRoute("/dev/map-export-parity")({
@@ -60,7 +61,7 @@ function MapExportParityHarness() {
     pages: [{ ...locations, mapPins: probePins() }],
   };
   const document = (
-    <MultiProposalLayout content={content} brand="transperfect" mode="dark" />
+    <MultiProposalLayout content={content} brand={BRAND_MODES[0]!} mode="dark" />
   );
 
   return (
