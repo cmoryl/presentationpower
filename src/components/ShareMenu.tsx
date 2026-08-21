@@ -100,8 +100,12 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      if (ref.current?.contains(t)) return;
+      if (panelRef.current?.contains(t)) return;
+      setOpen(false);
     };
+
     const onKey = (e: KeyboardEvent) => {
       // Popover menu — Escape closes and returns focus to the trigger button.
       if (e.key === "Escape") {
