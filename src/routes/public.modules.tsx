@@ -50,6 +50,7 @@ import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackTh
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
 
 import { APPROVED_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import { useResolvedStylePack } from "@/hooks/use-template-registry";
 
 
 
