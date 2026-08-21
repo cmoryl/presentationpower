@@ -1898,7 +1898,7 @@ const VariantCard = memo(function VariantCard({
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
               <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">
                     Family
                   </span>
                   <span className="truncate text-xs font-medium text-[#03002C]">
@@ -1907,7 +1907,7 @@ const VariantCard = memo(function VariantCard({
                 </div>
                 <div className="h-6 w-px bg-slate-100" />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">
+                  <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">
                     {videoExample ? "Variant" : "Layouts"}
                   </span>
                   <span className="text-xs font-medium text-[#03002C]">
@@ -1920,7 +1920,7 @@ const VariantCard = memo(function VariantCard({
                   <>
                     <div className="h-6 w-px bg-slate-100" />
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold uppercase tracking-tighter text-slate-400">
+                      <span className="text-[10px] font-bold uppercase tracking-tight text-slate-400">
                         Items
                       </span>
                       <span className="text-xs font-medium text-[#03002C]">
