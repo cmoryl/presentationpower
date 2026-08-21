@@ -768,7 +768,7 @@ function Library() {
     <LibraryPackProvider packId={packId} recipeId={recipeId}>
     <AppShell>
       <BackToTop />
-      <header className="full-bleed relative -mt-6 mb-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-10 sm:-mt-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+      <header className="full-bleed relative hero-flush mb-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
         <div className="mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
             Library

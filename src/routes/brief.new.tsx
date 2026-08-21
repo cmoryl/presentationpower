@@ -1037,7 +1037,7 @@ function BriefCommandCenter() {
   return (
     <AppShell>
       {/* Command bar — slim, dark, always-on context */}
-      <section className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] text-white sm:-mt-10">
+      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] text-white">
         <div
           aria-hidden
           className="pointer-events-none absolute -left-32 -top-40 h-[380px] w-[380px] rounded-full opacity-40 blur-[130px]"

@@ -431,7 +431,7 @@ function PrintCenterPage() {
 
   return (
     <AppShell>
-      <header className="full-bleed relative -mt-6 mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#EC388A14] via-white/70 to-[#FFEB6626] py-14 sm:-mt-10 lg:py-20">
+      <header className="full-bleed relative hero-flush mb-10 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#EC388A14] via-white/70 to-[#FFEB6626] py-9 lg:py-12">
         <div className="mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50">Library · Print</div>
           <div className="mt-3">
