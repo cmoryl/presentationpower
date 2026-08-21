@@ -741,6 +741,7 @@ export type MultiProposalPageKind =
   | "scope"
   | "cost"
   | "locations"
+  | "locations-region"
   | "clients"
   | "success-stories"
   | "stories-grid"
@@ -782,6 +783,8 @@ export type MultiProposalPage = {
   /** Global locations page — editable vector map pins (add/delete dots). */
   mapPins?: Array<{ x: number; y: number; r?: number; kind: "service" | "prod"; name?: string; id?: string }>;
   locations?: Array<{ region?: string; offices?: string[] }>;
+  /** Per-region locations page — which region crop/office list to render. */
+  mapRegion?: "AMERICAS" | "EMEA" | "APAC";
   logos?: string[];
   /** Advocates page — "giving back" cause logo wall (editable: add/order/remove). */
   causeLogos?: Array<{ id?: string; name?: string; url?: string }>;

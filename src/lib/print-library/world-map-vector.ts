@@ -29,6 +29,17 @@ export type WorldMapPin = {
 export const WORLD_MAP_VIEW = { x: 58, y: 138, w: 629, h: 343 };
 export const WORLD_MAP_PIN_R = 2.3;
 
+/**
+ * Region crops used by the per-region locations pages. Each rect is the office
+ * pin cluster for that region plus breathing room, clamped inside
+ * `WORLD_MAP_VIEW`; the SVG letterboxes to fit so nothing distorts.
+ */
+export const WORLD_MAP_REGION_VIEWS: Record<string, { x: number; y: number; w: number; h: number }> = {
+  AMERICAS: { x: 76, y: 212, w: 234, h: 238 },
+  EMEA: { x: 324, y: 177, w: 163, h: 271 },
+  APAC: { x: 451, y: 233, w: 236, h: 217 },
+};
+
 export const WORLD_MAP_LAND: Array<{ d: string; opacity: number }> = [
   {
     "d": "M103 303.3L103.2 303.5 103.4 303.3 103.2 303.2 103 303.3z",
