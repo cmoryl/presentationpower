@@ -334,18 +334,28 @@ export function EditorMenu({
         </svg>
       </button>
       {open && (
-        <div
-          id={panelId}
-          ref={panelRef}
-          role="group"
-          aria-label={label}
-          tabIndex={-1}
-          onKeyDown={onPanelKeyDown}
-          className={`absolute top-[calc(100%+6px)] z-[60] flex w-max min-w-[min(220px,calc(100vw_-_4.5rem))] max-w-[min(340px,calc(100vw_-_4.5rem))] max-h-[min(70vh,560px)] flex-col gap-0.5 overflow-y-auto overflow-x-hidden overscroll-contain rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_12px_30px_-12px_rgba(3,0,44,0.25)] outline-none ${anchor === "right" ? "right-0 left-auto" : "left-0 right-auto"}`}
-        >
-          {children}
-        </div>
+        <AnchoredPortal>
+          <div
+            id={panelId}
+            ref={panelRef}
+            role="group"
+            aria-label={label}
+            tabIndex={-1}
+            onKeyDown={onPanelKeyDown}
+            style={{
+              position: "fixed",
+              top: pos.top,
+              left: pos.left,
+              width: pos.width,
+              maxHeight: pos.maxHeight,
+            }}
+            className="z-[120] flex flex-col gap-0.5 overflow-y-auto overflow-x-hidden overscroll-contain rounded-xl border border-black/[0.08] bg-white p-1.5 shadow-[0_18px_44px_-16px_rgba(3,0,44,0.35)] outline-none"
+          >
+            {children}
+          </div>
+        </AnchoredPortal>
       )}
+
     </div>
   );
 }
