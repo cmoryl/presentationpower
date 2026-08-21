@@ -2301,19 +2301,24 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
                 {q.headline}
               </T>
             ) : null}
-            <T
+            <QuoteBody
               x={x + 0.16}
               y={7.02}
               w={cardW - 0.32}
+              maxH={2.02}
               size={8.5}
+              quote={q}
               color="rgba(3,0,44,0.78)"
-              leading={1.42}
-            >
-              {storyQuote(q?.text)}
-            </T>
-            <T x={x + 0.16} y={9.16} w={cardW - 0.32} size={8.5} weight={600} color={NAVY}>
-              {q ? `– ${[q.role || q.author, q.company].filter(Boolean).join(", ")}` : ""}
-            </T>
+            />
+            <QuoteAttribution
+              x={x + 0.16}
+              y={9.16}
+              w={cardW - 0.32}
+              size={8.5}
+              weight={600}
+              quote={q}
+            />
+
           </Fragment>
         );
       })}
