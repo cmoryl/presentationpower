@@ -227,6 +227,26 @@ export function VariantSampleStudio({
   const isStepChain = variant.id === "MV-PROC-STEP-CHAIN";
   /** Steps actually rendered by the chain (the renderer caps at nine). */
   const stepCount = isStepChain ? Math.min(items?.length ?? 0, 9) : 0;
+  /** Focused step, clamped to what is on the slide right now. */
+  const activeStep =
+    isStepChain && stepFocus !== null && stepFocus < stepCount ? stepFocus : null;
+  /**
+   * Copy-tab field list. With a step picked, show only that step's own text
+   * fields — including ones that are still empty (highlight / note), so a step
+   * can be annotated without leaving the studio.
+   */
+  const visibleFields = useMemo(() => {
+    if (activeStep === null) return fields;
+    const prefix = `items[${activeStep}].`;
+    const textKeys = Object.entries(variant.capacity?.items?.fields ?? {})
+      .filter(([, def]) => (def as { kind?: string })?.kind !== "icon")
+      .map(([key]) => key);
+    const keys = textKeys.length ? textKeys : ["label", "body"];
+    const own = keys.map((k) => `${prefix}${k}`);
+    const extra = fields.filter((p) => p.startsWith(prefix) && !own.includes(p));
+    return [...own, ...extra];
+  }, [fields, activeStep, variant]);
+
 
   const logoCells = useMemo(() => collectLogoCells(copy, isLogoModule), [copy, isLogoModule]);
   const capacity = variant.capacity?.items;
