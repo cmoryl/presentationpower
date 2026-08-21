@@ -257,7 +257,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               "linear-gradient(90deg, transparent 0%, rgba(161,251,249,0.4) 20%, rgba(122,92,255,0.5) 50%, rgba(0,63,199,0.4) 80%, transparent 100%)",
           }}
         />
-        <div className="relative mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-3 px-4 py-3 lg:flex-row lg:px-8 lg:py-3.5">
+        <div className="relative mx-auto grid max-w-[1400px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 lg:flex lg:justify-between lg:px-8 lg:py-3.5">
           <Link
             to="/"
             className="flex min-w-0 items-center gap-3"
@@ -272,7 +272,21 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Link>
 
-          <nav className="flex max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] dark:!border-white/10 dark:!bg-white/[0.03]">
+          <button
+            type="button"
+            aria-expanded={mobileNavOpen}
+            aria-controls="mobile-nav-sheet"
+            aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileNavOpen((v) => !v)}
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/[0.06] bg-white/60 text-[#03002C] transition hover:bg-white lg:hidden"
+          >
+            <span aria-hidden className="text-base leading-none">
+              {mobileNavOpen ? "✕" : "☰"}
+            </span>
+          </button>
+
+          <nav className="hidden max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] lg:flex dark:!border-white/10 dark:!bg-white/[0.03]">
+
             {visibleNav.map((n) => {
               if (n.to === "/elements") {
                 const elementsActive =
