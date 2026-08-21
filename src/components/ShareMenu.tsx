@@ -47,6 +47,10 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [triggerEl, setTriggerEl] = useState<HTMLButtonElement | null>(null);
+  const pos = useAnchoredPosition(triggerEl, open, { align: "end", width: 340 });
+
 
   const save = useServerFn(saveDeckToCloud);
   const signShareLogo = useServerFn(signClientLogoForShare);
