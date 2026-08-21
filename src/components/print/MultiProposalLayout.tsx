@@ -305,6 +305,22 @@ function paragraphLines(value: string | undefined): string[] {
  * long headlines and extra hard returns stay inside their plate instead of
  * spilling — the on-screen box then matches the exported layout exactly.
  */
+/** What the fitter last measured — surfaced to editor-only fit warnings. */
+export type FitReport = {
+  /** Point size actually rendered after auto-shrink. */
+  fittedPt: number;
+  /** Authored point size before auto-shrink. */
+  authoredPt: number;
+  /** Visual lines the export will contain. */
+  lines: number;
+  /** True when the copy is auto-shrunk below the authored size. */
+  shrunk: boolean;
+  /** True when even the minimum size overflows — the export WILL clip. */
+  clipped: boolean;
+  /** Largest point size (≤ authored) that fits, for a one-click fix. */
+  suggestedPt: number;
+};
+
 function FitT({
   x,
   y,
@@ -317,6 +333,7 @@ function FitT({
   align = "left",
   leading = 1.18,
   tracking,
+  onFit,
   children,
 }: {
   x: number;
@@ -330,6 +347,7 @@ function FitT({
   align?: CSSProperties["textAlign"];
   leading?: number;
   tracking?: string;
+  onFit?: (report: FitReport) => void;
   children?: ReactNode;
 }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
@@ -343,6 +361,36 @@ function FitT({
   // factor already proven too big.
   const boundsRef = useRef({ lo: 0, hi: 1, done: false });
   const textRef = useRef<string | null>(null);
+  const reportRef = useRef<string>("");
+
+  // Report the settled measurement to the caller (editor-only warning UI).
+  const report = useCallback(
+    (fits: boolean, atFloor: boolean) => {
+      const host = hostRef.current;
+      const inner = host?.firstElementChild as HTMLElement | null;
+      if (!host || !inner || !onFit) return;
+      const px = parseFloat(getComputedStyle(inner).fontSize) || 1;
+      const lines = Math.max(1, Math.round(inner.scrollHeight / (px * leading)));
+      const fittedPt = size * factor;
+      const next: FitReport = {
+        fittedPt: Math.round(fittedPt * 10) / 10,
+        authoredPt: size,
+        lines,
+        shrunk: factor < 0.995,
+        clipped: !fits && atFloor,
+        suggestedPt: Math.max(
+          minSize ?? size * 0.6,
+          Math.round(size * (fits ? factor : floor) * 10) / 10,
+        ),
+      };
+      const key = JSON.stringify(next);
+      if (key === reportRef.current) return;
+      reportRef.current = key;
+      onFit(next);
+    },
+    [factor, floor, leading, minSize, onFit, size],
+  );
+
 
   const measure = useCallback(() => {
     const host = hostRef.current;
