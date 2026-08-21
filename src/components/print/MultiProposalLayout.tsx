@@ -409,10 +409,12 @@ function FitT({
     }
     const b = boundsRef.current;
     const fits = inner.scrollHeight <= limit + 0.5;
-    if (b.done) {
-      report(fits, factor <= floor + 0.001);
-      return;
-    }
+    // Report every measurement (deduped inside `report`), so the editor badge
+    // still learns the outcome when the very first pass already fits and the
+    // search never runs another probe.
+    report(fits, factor <= floor + 0.001);
+    if (b.done) return;
+
 
     setFactor((prev) => {
       if (fits) b.lo = Math.max(b.lo, prev);
