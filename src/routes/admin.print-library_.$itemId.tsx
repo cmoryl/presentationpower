@@ -482,6 +482,7 @@ function MasterItemEditorPage() {
                             active: true,
                             overrides: imageOverrides,
                             onDropFile: onDropImage,
+                            onSetUrl: (slot, url) => setImageOverride(slot, url),
                             onClear: (slot) => setImageOverride(slot, null),
                             busy: imageBusy,
                           }}

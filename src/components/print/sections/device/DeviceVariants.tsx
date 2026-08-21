@@ -13,6 +13,7 @@
  */
 
 import { DeviceFrame, DeviceScreenPlaceholder } from "@/components/device/DeviceFrame";
+import { DeviceScreenPicker } from "@/components/device/DeviceScreenPicker";
 import { EditableImage, resolveImageSlot, usePrintImageEdit } from "@/components/print/PrintImageEdit";
 import type { PrintDeviceSection } from "@/lib/print-assets.types";
 import { cq, sectionInk } from "../shared";
@@ -63,6 +64,7 @@ function Screen({
             fit="cover"
             label="screen image"
           />
+          <DeviceScreenPicker slot={slot} label={label} />
         </div>
       )}
     </div>

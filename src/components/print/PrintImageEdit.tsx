@@ -22,6 +22,8 @@ type ImageEditCtx = {
   overrides: PrintImageOverrides;
   /** Upload/accept a dropped or picked file and persist it to the slot. */
   onDropFile: (slot: string, file: File) => void | Promise<void>;
+  /** Apply an already-hosted image URL to the slot (paste / pick a URL). */
+  onSetUrl?: (slot: string, url: string) => void;
   /** Clear an override, restoring the layout default. */
   onClear?: (slot: string) => void;
   /** True while an upload is in flight (any slot). */

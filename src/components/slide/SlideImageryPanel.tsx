@@ -31,11 +31,15 @@ export function SlideImageryPanel({
   mediaUrl,
   mediaSeed,
   divisionId,
+  title,
   onChange,
 }: {
   mediaUrl?: string;
   mediaSeed?: string;
   divisionId?: string;
+  /** Panel heading. Device showcase modules relabel this to "Device screen
+   *  image" so it's obvious the upload lands inside the laptop / monitor. */
+  title?: string;
   /** Second arg is the storage path (private slide-media bucket) when the
    *  URL came from an upload; the editor persists it so the refresh
    *  provider can re-sign after the 30-day TTL. `null` clears the
@@ -111,7 +115,9 @@ export function SlideImageryPanel({
   return (
     <div className="mt-6 rounded-2xl border border-black/10 bg-white p-6">
       <div className="flex items-center justify-between gap-2">
-        <div className="text-xs uppercase tracking-widest text-black/50">Slide imagery</div>
+        <div className="text-xs uppercase tracking-widest text-black/50">
+          {title ?? "Slide imagery"}
+        </div>
         {hasCustom && (
           <button
             type="button"
