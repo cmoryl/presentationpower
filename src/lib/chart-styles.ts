@@ -146,6 +146,7 @@ export const SKIN_CHART_STYLES: Record<string, ChartStyle> = {
   S26: def({ bar: "ghost", grid: "frame", axis: "spine", line: "step", area: "flat", marker: "diamond", ringThickness: 0.46, gaugeSweep: 180, barRatio: 0.72, plate: "inset", labelTrack: 0.2 }),
   S27: def({ bar: "notch", grid: "ticks", axis: "boxed", line: "smooth", area: "hatch", marker: "hollow", ringThickness: 0.22, ringGap: 5, gaugeSweep: 215, barRatio: 0.6 }),
   S28: def({ bar: "tick", grid: "none", axis: "baseline", line: "dashed", area: "gradient", marker: "tick", ringThickness: 0.15, gaugeSweep: 270, barRatio: 0.2, labelCase: "none", labelTrack: 0.02, valueLabel: "end" }),
+  S29: def({ bar: "block", grid: "ticks", axis: "baseline", line: "step", area: "flat", marker: "square", ringThickness: 0.32, gaugeSweep: 220, barRatio: 0.55, labelTrack: 0.14, valueLabel: "end" }),
 };
 
 /**

@@ -55,6 +55,24 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       ],
     },
   },
+  "bm-element": {
+    // Product brand for the build itself. The lockup resolves to the five-brick
+    // Element mark + ELEMENT wordmark — the TransPerfect wordmark is never used.
+    role: "product",
+    parentId: "bm-enterprise",
+    logo: { mark: "EL", wordmark: "Element", divisionLine: "MODULAR DESIGN SYSTEM" },
+    contentScope: {
+      industries: ["Technology", "Marketing", "Internal enablement"],
+      serviceLines: [
+        "Brand asset production",
+        "Presentation automation",
+        "Print & social production",
+        "Design system governance",
+      ],
+      caseStudyTags: ["speed-to-market", "cost-savings", "brand-governance"],
+      preferredArchetypes: ["arch-value-story", "arch-decision-drive"],
+    },
+  },
   "bm-subcompany": {
     // Neutral fallback for free-typed subcompany names not in the fixed list.
     // Concrete divisions live in their own `bm-tp-*` entries below.

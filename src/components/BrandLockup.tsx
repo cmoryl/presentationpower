@@ -1,6 +1,7 @@
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CSSProperties } from "react";
 import { getDivisionLogos } from "@/lib/division-logos";
+import { ElementMark } from "@/components/brand/ElementLogo";
 
 // Inline SVG of the approved TransPerfect horizontal wordmark. Paths inherit
 // `currentColor` so a single component tints for both dark and light chrome.
@@ -37,6 +38,8 @@ function TransPerfectWordmark({ height }: { height: number }) {
 // single SVG serves both dark and light surfaces.
 const TP_WORDMARK_ASPECT = 432 / 44.4; // width / height from the source SVG viewBox
 const TP_BRANDS = new Set(["TransPerfect"]);
+/** Brands that render the Element product lockup instead of the TP wordmark. */
+const ELEMENT_BRANDS = new Set(["Element", "TransPerfect Element"]);
 
 export function BrandLockup({
   brand,
@@ -91,6 +94,70 @@ export function BrandLockup({
   const isMarkOnly = orientation === "mark-only";
   const innerOrientation: "horizontal" | "stacked" =
     orientation === "stacked" ? "stacked" : "horizontal";
+
+  // ELEMENT PRODUCT BRAND. Element markets itself, so its chrome must never
+  // borrow the TransPerfect corporate wordmark: the five-brick E mark plus the
+  // ELEMENT wordmark is the whole lockup. Sizes are px (not rem) because slide
+  // chrome renders at 1920-stage scale, where rem type would collapse.
+  if (ELEMENT_BRANDS.has(logo.wordmark)) {
+    const markPx = Math.round(dims.markPx * (isMarkOnly ? 1.25 : 1));
+    const eyebrowPx = Math.max(6, Math.round(dims.wordmarkPx * 0.42));
+    const wordPx = Math.round(dims.wordmarkPx * 0.92);
+    const descriptorPx = Math.max(5, Math.round(dims.wordmarkPx * 0.34));
+    return (
+      <div
+        className={
+          innerOrientation === "stacked"
+            ? "inline-flex flex-col items-start"
+            : "inline-flex items-center"
+        }
+        style={{ gap: dims.gapPx, color }}
+        role="img"
+        aria-label="TransPerfect Element lockup"
+      >
+        <ElementMark tone="mono" size={markPx} title="TransPerfect Element" />
+        {!isMarkOnly && (
+          <div className="min-w-0 leading-none">
+            <div
+              style={{
+                fontSize: eyebrowPx,
+                letterSpacing: "0.42em",
+                fontWeight: 500,
+                opacity: 0.75,
+              }}
+            >
+              TRANSPERFECT
+            </div>
+            <div
+              style={{
+                marginTop: Math.round(wordPx * 0.24),
+                fontSize: wordPx,
+                letterSpacing: "0.3em",
+                fontWeight: 600,
+              }}
+            >
+              ELEMENT
+            </div>
+            {/* Descriptor drops out at small sizes, per the logo rules. */}
+            {dims.wordmarkPx >= 17 && (
+              <div
+                style={{
+                  marginTop: Math.round(descriptorPx * 0.6),
+                  fontSize: descriptorPx,
+                  letterSpacing: "0.32em",
+                  opacity: 0.65,
+                }}
+              >
+                MODULAR DESIGN SYSTEM
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+
 
   // Mark-only mode: render just the letter tile. When a brand ships an
   // official image, we still fall back to the letter tile because the shipped
