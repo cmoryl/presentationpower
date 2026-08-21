@@ -24,6 +24,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   const [adminOpen, setAdminOpen] = useState(false);
   const [presOpen, setPresOpen] = useState(false);
+  // Phone/tablet nav: the desktop link bar wrapped into 2–3 rows below `lg`,
+  // so it collapses into a single sheet toggled from the header.
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   
   const inAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
   const isAdminLinked = matchesAdminLinked(pathname);
