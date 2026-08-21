@@ -6164,7 +6164,7 @@ function renderVariantBody({
     case "MV-SHOW-MONITOR": {
       const kind = deviceKindFrom(
         c.deviceKind,
-        variantId === "MV-SHOW-MONITOR" ? "monitor" : "laptop",
+        variant.id === "MV-SHOW-MONITOR" ? "monitor" : "laptop",
       );
       const tone = (["graphite", "silver", "ink"] as const).includes(
         s(c.deviceTone) as "graphite",
