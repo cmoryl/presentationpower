@@ -982,7 +982,6 @@ function CostInput({
       <input
         defaultValue={value}
         placeholder={placeholder}
-        key={value}
         onChange={(e) => onCommit(e.currentTarget.value)}
         style={{
           width: "100%",
