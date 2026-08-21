@@ -830,7 +830,8 @@ function DeckEditor() {
             />
           </header>
 
-          <div className="mt-8 flex items-start gap-4">
+          {/* Phones stack: slide list, stage, then tool rail. lg+ keeps the row. */}
+          <div className="mt-8 flex flex-col gap-4 lg:flex-row lg:items-start">
             {/* Slide list — collapses to a slim tab so the stage can grow. */}
             <div className="flex shrink-0 flex-col gap-1 self-start rounded-2xl border border-black/10 bg-white/80 p-1 shadow-sm backdrop-blur">
               <button
