@@ -107,7 +107,7 @@ def header_signature(img, band):
     w, h = img.size
     crop = img.convert("L").crop((0, int(band[0] * h), w, int(band[1] * h)))
     small = crop.resize((64, 16), Image.BILINEAR)
-    return list(small.getdata())
+    return list(small.getdata())  # noqa
 
 
 def main():
