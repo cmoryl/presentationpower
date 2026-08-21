@@ -1538,6 +1538,12 @@ function DeckEditor() {
                           available: true,
                           render: () => (
                             <SlideImageryPanel
+                              title={
+                                active.variantId === "MV-SHOW-LAPTOP" ||
+                                active.variantId === "MV-SHOW-MONITOR"
+                                  ? "Device screen image"
+                                  : undefined
+                              }
                               mediaUrl={
                                 (active.content as Record<string, unknown>).mediaUrl as
                                   | string
