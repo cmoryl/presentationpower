@@ -2,15 +2,28 @@
 // Print pages -> PowerPoint
 //
 // A print piece (proposal, brochure, case study) is authored at a fixed page
-// geometry, so the honest PPTX is one slide per page sized to the trim, with the
-// rendered page placed edge to edge. Uses the same capture engine as the PDF
-// exporter, so authoring chrome (guides, resize rails, edit outlines) is
-// suppressed and cross-origin imagery is inlined before rasterization.
+// geometry, so the honest PPTX is one slide per page sized to the trim.
+//
+// LAYERED-EDITABLE (default, matching deck exports): each page is decomposed
+// into native PowerPoint objects — boxes with their own fills/strokes/radii,
+// pictures, rules and editable text boxes at the build's own geometry and type
+// metrics — over a design plate that carries only the paint OOXML cannot
+// describe (frosted glass, radial washes, filtered art). Nothing is flattened
+// that could be an object.
+//
+// FLAT: one raster per page (the old behaviour), kept as an automatic fallback
+// when a page cannot be decomposed.
+//
+// Both paths use the same capture engine as the PDF exporter, so authoring
+// chrome (guides, resize rails, edit outlines) is suppressed and cross-origin
+// imagery is inlined before rasterization.
 // -----------------------------------------------------------------------------
 
 import { captureSlideAsDataUrl } from "./slide-image-export";
 import { withExportChrome } from "./export-chrome-suppress";
 import { PRINT_PAGE_PRESETS, resolvePrintPixelWidth } from "./print-asset-export";
+import { spaceForTrim, withExportSlideBounds } from "./export-space";
+import { capturePrintPageLayers } from "./print-pptx-layered";
 import type { PrintMode, PrintPageSize } from "./print-assets.types";
 
 export type PrintPptxOptions = {
@@ -22,7 +35,13 @@ export type PrintPptxOptions = {
   dpi?: number;
   filename?: string;
   title?: string;
+  /**
+   * "editable" (default) ships layered native objects + a design plate;
+   * "flat" ships one raster per page.
+   */
+  fidelity?: "editable" | "flat";
 };
+
 /** Re-encode a PNG data URL as opaque JPEG so PowerPoint files stay openable. */
 async function toJpeg(pngDataUrl: string, quality: number): Promise<string> {
   try {
