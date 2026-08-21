@@ -51,8 +51,20 @@ export function EditorSideRail({
           className="flex h-full flex-col overflow-hidden rounded-l-2xl border border-r-0 border-black/10 bg-white/90 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.06]"
           style={{ width }}
         >
+          {/* EVERY tab stays mounted. Panels host portal targets (the studio
+              toolbar, the layers list), so unmounting a closed tab would send
+              those controls back to their overlay fallback on top of the slide.
+              Inactive panels are hidden, never destroyed. */}
           <div className="flex-1 overflow-y-auto p-2">
-            {activeTab && <div className="h-full">{activeTab.content}</div>}
+            {tabs.map((tab) => (
+              <div
+                key={tab.id}
+                className={tab.id === open ? "h-full" : "hidden"}
+                aria-hidden={tab.id !== open}
+              >
+                {tab.content}
+              </div>
+            ))}
           </div>
         </div>
       </div>
