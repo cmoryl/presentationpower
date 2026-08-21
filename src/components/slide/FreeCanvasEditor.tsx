@@ -1307,7 +1307,9 @@ export function FreeCanvasEditor({
                     height: "100%",
                     outline: "none",
                     color: b.color ?? ink,
-                    fontSize: b.size ?? fontFor(b.kind),
+                    // Match the painted block exactly (stage units × canvas scale)
+                    // so typing never jumps to a different size.
+                    fontSize: `calc(${b.size ?? fontFor(b.kind)}px * var(--cb-scale, 1))`,
                     fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),
                     textAlign: b.align ?? "left",
                     whiteSpace: "pre-wrap",
