@@ -2137,9 +2137,109 @@ function storyLogo(company: string | undefined): string | undefined {
   return company ? STORY_LOGOS[company.toLowerCase()] : undefined;
 }
 
-function storyQuote(text: string | undefined): string {
-  return text ? `"${text.replace(/^"|"$/g, "")}"` : "";
+type ProposalQuote = NonNullable<MultiProposalPage["quotes"]>[number];
+
+/**
+ * QUOTE BODY — live-editable and self-fitting.
+ *
+ * Two rules make a testimonial behave here:
+ *
+ * 1. *Editable in place.* LiveEditOverlay tags an element only when its text is
+ *    exactly the stored string. The old renderer wrapped the copy in quote marks
+ *    (`"…"`), so nothing on the page matched `pages[n].quotes[m].text` and the
+ *    quote was the one field you could not click. The marks now live in their
+ *    own spans and the stored value renders untouched in a span of its own — and
+ *    when the author already typed their own quote marks, none are added.
+ * 2. *Fits its card.* Every quote is a different length, so a fixed point size
+ *    either clips the long ones or leaves the short ones swimming. `sizePt` sets
+ *    the per-quote ceiling and the fitter shrinks from there until the copy fits
+ *    the card box, which is the same measurement PDF and PPTX export use.
+ */
+function QuoteBody({
+  x,
+  y,
+  w,
+  maxH,
+  size,
+  quote,
+  color = NAVY,
+  leading = 1.42,
+  align = "left",
+  weight = 400,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  maxH: number;
+  /** Layout's authored size — the ceiling when the quote has no own `sizePt`. */
+  size: number;
+  quote: ProposalQuote | undefined;
+  color?: string;
+  leading?: number;
+  align?: CSSProperties["textAlign"];
+  weight?: number;
+}) {
+  const stored = quote?.text ?? "";
+  if (!stored.trim()) return null;
+  // Authored marks win: adding a second pair would both look wrong and break the
+  // exact-text match the edit overlay needs.
+  const quoted = /^["“”].*["“”]$/s.test(stored.trim());
+  // A bumped per-quote size may exceed the layout default; the fitter still
+  // guarantees it lands inside the card.
+  const pt = Math.max(5, Math.min(quote?.sizePt || size, size * 2.2));
+  return (
+    <FitT
+      x={x}
+      y={y}
+      w={w}
+      maxH={maxH}
+      size={pt}
+      minSize={Math.max(5.5, Math.min(pt, size) * 0.62)}
+      color={color}
+      leading={leading}
+      align={align}
+      weight={weight}
+    >
+      {quoted ? null : <span>{"\u0022"}</span>}
+      <span>{stored}</span>
+      {quoted ? null : <span>{"\u0022"}</span>}
+    </FitT>
+  );
 }
+
+/** `– Role, Company`, with each stored field in its own clickable span. */
+function QuoteAttribution({
+  x,
+  y,
+  w,
+  size,
+  quote,
+  color = NAVY,
+  align = "left",
+  weight = 400,
+}: {
+  x: number;
+  y: number;
+  w: number;
+  size: number;
+  quote: ProposalQuote | undefined;
+  color?: string;
+  align?: CSSProperties["textAlign"];
+  weight?: number;
+}) {
+  const who = quote?.role || quote?.author || "";
+  const company = quote?.company || "";
+  if (!who && !company) return null;
+  return (
+    <T x={x} y={y} w={w} size={size} color={color} align={align} weight={weight}>
+      <span>{"\u2013 "}</span>
+      {who ? <span>{who}</span> : null}
+      {who && company ? <span>{", "}</span> : null}
+      {company ? <span>{company}</span> : null}
+    </T>
+  );
+}
+
 
 /** 7b — three-up story cards (photo top, logo, trimmed quote). */
 function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
