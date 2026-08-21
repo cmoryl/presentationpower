@@ -246,7 +246,7 @@ export function MsaPartnershipLayout({
                         ...clampLines(3),
                       }}
                     >
-                      {s.label}
+                      {statLabel(s)}
                     </div>
                   </div>
                 ))}
@@ -350,7 +350,7 @@ export function MsaPartnershipLayout({
                         ...clampLines(3),
                       }}
                     >
-                      {s.label}
+                      {statLabel(s)}
                     </div>
                   </div>
                 ))}
@@ -392,7 +392,7 @@ export function MsaPartnershipLayout({
                           ...clampLines(2),
                         }}
                       >
-                        {s.label}
+                        {statLabel(s)}
                       </div>
                     </div>
                   ))}

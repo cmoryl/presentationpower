@@ -591,7 +591,7 @@ export function SolutionProposalLayout({
                             ...clampLines(2),
                           }}
                         >
-                          {s.label}
+                          {statLabel(s)}
                         </div>
                       </div>
                     ))}
