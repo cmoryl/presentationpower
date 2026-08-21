@@ -22,59 +22,41 @@ import { sceneFromSeed, type SkinScene } from "./skin-backgrounds";
 import { overrideFor } from "./template-registry";
 import type { StylePack } from "./style-packs";
 
-import lightAgenda from "@/assets/element-bg/light-agenda.png.asset.json";
-import lightBento from "@/assets/element-bg/light-bento.png.asset.json";
-import lightChart from "@/assets/element-bg/light-chart.png.asset.json";
-import lightClosing from "@/assets/element-bg/light-closing.png.asset.json";
-import lightCover from "@/assets/element-bg/light-cover.png.asset.json";
-import lightQuote from "@/assets/element-bg/light-quote.png.asset.json";
-import lightSection from "@/assets/element-bg/light-section.png.asset.json";
-import lightSplit from "@/assets/element-bg/light-split.png.asset.json";
-import lightStatement from "@/assets/element-bg/light-statement.png.asset.json";
-import lightStats from "@/assets/element-bg/light-stats.png.asset.json";
-import lightTimeline from "@/assets/element-bg/light-timeline.png.asset.json";
-
-import darkAgenda from "@/assets/element-bg/dark-agenda.png.asset.json";
-import darkBento from "@/assets/element-bg/dark-bento.png.asset.json";
-import darkChart from "@/assets/element-bg/dark-chart.png.asset.json";
-import darkClosing from "@/assets/element-bg/dark-closing.png.asset.json";
-import darkCover from "@/assets/element-bg/dark-cover.png.asset.json";
-import darkQuote from "@/assets/element-bg/dark-quote.png.asset.json";
-import darkSection from "@/assets/element-bg/dark-section.png.asset.json";
-import darkSplit from "@/assets/element-bg/dark-split.png.asset.json";
-import darkStatement from "@/assets/element-bg/dark-statement.png.asset.json";
-import darkStats from "@/assets/element-bg/dark-stats.png.asset.json";
-import darkTimeline from "@/assets/element-bg/dark-timeline.png.asset.json";
-
 export type ElementArtMode = "light" | "dark";
 
+// CDN pointers written by lovable-assets (src/assets/element-bg/*.asset.json).
+// Inlined as plain strings: this module is reachable from config-time code, and
+// JSON imports through the `@/` alias don't resolve in that graph.
+const CDN = "/__l5e/assets-v1";
+
 const LIGHT: Record<SkinScene, string> = {
-  cover: lightCover.url,
-  agenda: lightAgenda.url,
-  statement: lightStatement.url,
-  stats: lightStats.url,
-  split: lightSplit.url,
-  bento: lightBento.url,
-  chart: lightChart.url,
-  quote: lightQuote.url,
-  timeline: lightTimeline.url,
-  closing: lightClosing.url,
-  section: lightSection.url,
+  cover: `${CDN}/7fba8abb-dde7-4bfb-92ea-d5115d83c569/element-light-cover.png`,
+  agenda: `${CDN}/eb878d0c-3207-4ce9-a2fd-875592d9acd8/element-light-agenda.png`,
+  statement: `${CDN}/36a414e1-172e-4a46-92e4-3edbef364d65/element-light-statement.png`,
+  stats: `${CDN}/0348142d-8ea9-479a-9799-5876f89c5faa/element-light-stats.png`,
+  split: `${CDN}/9496f1fa-6a16-4c01-a299-57d09f999d86/element-light-split.png`,
+  bento: `${CDN}/1943235c-81ff-4952-865e-7e69535406cd/element-light-bento.png`,
+  chart: `${CDN}/becc3e0d-0026-4ae0-9515-322c5a817ac4/element-light-chart.png`,
+  quote: `${CDN}/36a90f16-4dda-4df1-aaf9-03a74b82408e/element-light-quote.png`,
+  timeline: `${CDN}/c29b2237-2272-41ca-9597-5ace8b0f9591/element-light-timeline.png`,
+  closing: `${CDN}/bad80823-9d64-48cf-bdaf-cf44af0418ef/element-light-closing.png`,
+  section: `${CDN}/337caacf-97b1-487d-80b2-17fcce4e8df2/element-light-section.png`,
 };
 
 const DARK: Record<SkinScene, string> = {
-  cover: darkCover.url,
-  agenda: darkAgenda.url,
-  statement: darkStatement.url,
-  stats: darkStats.url,
-  split: darkSplit.url,
-  bento: darkBento.url,
-  chart: darkChart.url,
-  quote: darkQuote.url,
-  timeline: darkTimeline.url,
-  closing: darkClosing.url,
-  section: darkSection.url,
+  cover: `${CDN}/9e77308a-f723-4d55-b65a-084ee04b2c6f/element-dark-cover.png`,
+  agenda: `${CDN}/1441013b-cd39-437f-ad98-cf4202ea4882/element-dark-agenda.png`,
+  statement: `${CDN}/0f6ae797-9a86-4716-b7f0-332c177d032a/element-dark-statement.png`,
+  stats: `${CDN}/a5bbee19-d48b-4467-95e6-015828cc3e4c/element-dark-stats.png`,
+  split: `${CDN}/ddd5cd16-f7b6-41d1-80da-9ce091a7bde5/element-dark-split.png`,
+  bento: `${CDN}/f59b9df1-0f50-4283-ae9e-030bec579df6/element-dark-bento.png`,
+  chart: `${CDN}/37b54a91-651b-449e-9b31-369e59af36e2/element-dark-chart.png`,
+  quote: `${CDN}/7e07438d-40be-479b-98e1-3ac027ca84dd/element-dark-quote.png`,
+  timeline: `${CDN}/a9e42c02-eb07-4ca9-9738-877064e09144/element-dark-timeline.png`,
+  closing: `${CDN}/a569cc15-711d-43ec-956b-7025c9f05e3b/element-dark-closing.png`,
+  section: `${CDN}/33920940-19e3-4d32-831f-e0afc22d110a/element-dark-section.png`,
 };
+
 
 /** Which Element skins carry authored plates, and in which tonality. */
 export const ELEMENT_ART_MODE: Record<string, ElementArtMode> = {
