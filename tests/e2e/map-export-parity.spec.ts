@@ -52,6 +52,35 @@ function sortPins<T extends { x: number; y: number }>(pins: T[]) {
   return [...pins].sort((a, b) => row(a.y) - row(b.y) || a.x - b.x);
 }
 
+type Pt = { x: number; y: number; kind?: string };
+
+/**
+ * Greedy nearest-neighbour pairing of expected (on-screen) pins to captured
+ * ones. Index-based pairing is fragile at row boundaries, so parity is measured
+ * as: every expected pin has its own captured pin within `tol`, and no captured
+ * pin is left over.
+ */
+function pairPins(expected: Pt[], got: Pt[], tol: number) {
+  const used = new Set<number>();
+  const worst: Array<{ i: number; d: number; kind?: string }> = [];
+  expected.forEach((e, i) => {
+    let best = -1;
+    let bestD = Infinity;
+    got.forEach((g, j) => {
+      if (used.has(j)) return;
+      const d = Math.hypot(g.x - e.x, g.y - e.y);
+      if (d < bestD) {
+        bestD = d;
+        best = j;
+      }
+    });
+    if (best >= 0 && bestD <= tol) used.add(best);
+    worst.push({ i, d: bestD, kind: best >= 0 ? got[best]!.kind : undefined });
+  });
+  return { matched: used.size, leftover: got.length - used.size, worst };
+}
+
+
 /** Pin centres from the live SVG, normalised to the print page box. */
 async function domPins(page: Page) {
   return page.evaluate(() => {
