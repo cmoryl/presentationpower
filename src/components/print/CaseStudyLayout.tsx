@@ -331,12 +331,14 @@ export function CaseStudyLayout({
                         fontSize: cq(13),
                         color: accentInk,
                         letterSpacing: "-0.01em",
+                        ...STAT_VALUE_NOWRAP,
                       }}
                     >
                       {s.value}
-                      {s.unit ?? ""}
+                      {statUnitParts(s.unit).inline ?? ""}
                     </div>
                     <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(2) }}>
+                      {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
                       {s.label}
                     </div>
                   </div>

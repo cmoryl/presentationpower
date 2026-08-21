@@ -85,15 +85,19 @@ export function StatCalloutRowPortrait({
                   letterSpacing: "-0.035em",
                   color: ink.strong,
                   fontVariantNumeric: "tabular-nums",
+                  ...STAT_VALUE_NOWRAP,
                 }}
               >
                 {it.value || "—"}
               </span>
-              {it.unit && (
-                <span style={{ fontSize: cq(14), fontWeight: 600, color: accent }}>{it.unit}</span>
+              {statUnitParts(it.unit).inline && (
+                <span style={{ fontSize: cq(14), fontWeight: 600, color: accent }}>
+                  {statUnitParts(it.unit).inline}
+                </span>
               )}
             </div>
             <div style={{ marginTop: cq(6), fontSize: cq(10), lineHeight: 1.35, color: ink.soft }}>
+              {statUnitParts(it.unit).word ? `${statUnitParts(it.unit).word} · ` : ""}
               {it.label}
             </div>
             {it.caption && (

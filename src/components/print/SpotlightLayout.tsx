@@ -386,13 +386,28 @@ export function SpotlightLayout({
                               marginTop: cq(8),
                               lineHeight: 1,
                               letterSpacing: "-0.02em",
+                              ...STAT_VALUE_NOWRAP,
                             }}
                           >
                             {s.value}
-                            {s.unit && (
-                              <span style={{ fontSize: cq(14), marginLeft: cq(1) }}>{s.unit}</span>
+                            {statUnitParts(s.unit).inline && (
+                              <span style={{ fontSize: cq(14), marginLeft: cq(1) }}>
+                                {statUnitParts(s.unit).inline}
+                              </span>
                             )}
                           </div>
+                          {statUnitParts(s.unit).word && (
+                            <div
+                              style={{
+                                fontSize: cq(10),
+                                fontWeight: 600,
+                                color: accentInk,
+                                marginTop: cq(2),
+                              }}
+                            >
+                              {statUnitParts(s.unit).word}
+                            </div>
+                          )}
                           <div
                             style={{
                               fontSize: cq(9),

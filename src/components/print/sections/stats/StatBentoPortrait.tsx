@@ -84,13 +84,14 @@ export function StatBentoPortrait({
                   letterSpacing: "-0.04em",
                   color: ink.strong,
                   fontVariantNumeric: "tabular-nums",
+                  ...STAT_VALUE_NOWRAP,
                 }}
               >
                 {hero?.value || "—"}
               </span>
-              {hero?.unit && (
+              {statUnitParts(hero?.unit).inline && (
                 <span style={{ fontSize: cq(22), fontWeight: 600, color: accent }}>
-                  {hero.unit}
+                  {statUnitParts(hero?.unit).inline}
                 </span>
               )}
             </div>
@@ -103,6 +104,7 @@ export function StatBentoPortrait({
                 maxWidth: cq(340),
               }}
             >
+              {statUnitParts(hero?.unit).word ? `${statUnitParts(hero?.unit).word} · ` : ""}
               {hero?.label}
             </div>
           </div>
@@ -135,19 +137,21 @@ export function StatBentoPortrait({
                     letterSpacing: "-0.03em",
                     color: ink.strong,
                     fontVariantNumeric: "tabular-nums",
+                    ...STAT_VALUE_NOWRAP,
                   }}
                 >
                   {it.value || "—"}
                 </span>
-                {it.unit && (
+                {statUnitParts(it.unit).inline && (
                   <span style={{ fontSize: cq(12), fontWeight: 600, color: accent }}>
-                    {it.unit}
+                    {statUnitParts(it.unit).inline}
                   </span>
                 )}
               </div>
               <div
                 style={{ marginTop: cq(4), fontSize: cq(9.5), lineHeight: 1.35, color: ink.soft }}
               >
+                {statUnitParts(it.unit).word ? `${statUnitParts(it.unit).word} · ` : ""}
                 {it.label}
               </div>
             </div>

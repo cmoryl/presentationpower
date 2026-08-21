@@ -327,13 +327,15 @@ export function EBrochureLayout({
                           fontSize: cq(19),
                           color: accentInk,
                           letterSpacing: "-0.02em",
+                          ...STAT_VALUE_NOWRAP,
                         }}
                       >
                         {s.value}
-                        {s.unit ?? ""}
+                        {statUnitParts(s.unit).inline ?? ""}
                       </span>
                     </div>
                     <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(4) }}>
+                      {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
                       {s.label}
                     </div>
                   </div>

@@ -469,10 +469,13 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
                   letterSpacing: "-0.03em",
                   color: accent,
                   lineHeight: 1,
+                  ...STAT_VALUE_NOWRAP,
                 }}
               >
                 {s.value}
-                {s.unit && <span style={{ fontSize: cq(14) }}>{s.unit}</span>}
+                {statUnitParts(s.unit).inline && (
+                  <span style={{ fontSize: cq(14) }}>{statUnitParts(s.unit).inline}</span>
+                )}
               </div>
               <div
                 style={{
@@ -905,7 +908,9 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
                   }}
                 >
                   {s.value}
-                  {s.unit && <span style={{ fontSize: cq(14) }}>{s.unit}</span>}
+                  {statUnitParts(s.unit).inline && (
+                    <span style={{ fontSize: cq(14) }}>{statUnitParts(s.unit).inline}</span>
+                  )}
                 </div>
                 <div
                   style={{
