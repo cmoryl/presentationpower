@@ -1,5 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SkinBackdropLibrary } from "@/components/slide/SkinBackdropContext";
+import { ClientLogoPoolProvider } from "@/lib/client-logo-pool";
+
 import {
   Outlet,
   Link,
