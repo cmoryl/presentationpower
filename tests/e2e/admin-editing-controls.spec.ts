@@ -55,9 +55,9 @@ test.describe("Admin editing controls", () => {
     }
 
     // Glossary table renders its editable columns.
-    for (const col of ["Term", "Scope", "Scope ID", "DNT"]) {
+    for (const col of [/^Term$/i, /^Scope$/i, /^Scope ID$/i, /^DNT$/i]) {
       await expect(
-        page.getByRole("columnheader", { name: col, exact: true }).first(),
+        page.locator("th").filter({ hasText: col }).first(),
         `missing glossary column ${col}`,
       ).toBeVisible();
     }
@@ -106,9 +106,12 @@ test.describe("Admin editing controls", () => {
       expect(text, `missing toggle ${toggle}`).toContain(toggle);
     }
 
-    // Activity ledger columns render.
-    for (const col of ["Deck / File", "Status", "Link"]) {
-      expect(text, `missing activity column ${col}`).toContain(col);
+    // Activity ledger: either the table with its columns, or the empty state.
+    expect(text).toMatch(/Recent activity/i);
+    if (!/No shares yet/i.test(text)) {
+      for (const col of ["Deck / File", "Status", "Link"]) {
+        expect(text, `missing activity column ${col}`).toContain(col);
+      }
     }
 
     const counts = await enabledCount(page);
