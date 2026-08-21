@@ -252,11 +252,7 @@ export function FreeCanvasEditor({
   const stageFromClient = useCallback((clientX: number, clientY: number) => {
     const el = stageSurface();
     if (!el) return { x: 0, y: 0 };
-    const r = el.getBoundingClientRect();
-    return {
-      x: ((clientX - r.left) / r.width) * STAGE_W,
-      y: ((clientY - r.top) / r.height) * STAGE_H,
-    };
+    return clientPointToStage(clientX, clientY, el.getBoundingClientRect());
   }, [stageSurface]);
 
   /**
@@ -269,9 +265,7 @@ export function FreeCanvasEditor({
     const apply = () => {
       const surface = stageSurface();
       const rect = surface?.getBoundingClientRect();
-      const scale = rect && rect.width > 0 && rect.height > 0
-        ? Math.min(rect.width / STAGE_W, rect.height / STAGE_H)
-        : 1;
+      const scale = rect ? stageScaleFromRect(rect) : 1;
       el.style.setProperty("--cb-scale", String(scale));
     };
     apply();

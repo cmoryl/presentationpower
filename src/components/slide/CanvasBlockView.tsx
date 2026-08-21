@@ -20,6 +20,18 @@ export function blockFontSize(b: CanvasBlock): number {
   return b.size ?? BLOCK_FONT_SIZE[b.kind] ?? 40;
 }
 
+export function blockLineHeight(b: CanvasBlock): number {
+  return b.kind === "heading" ? 1.02 : 1.28;
+}
+
+export function blockLetterSpacingEm(b: CanvasBlock): number {
+  return b.kind === "heading" ? -0.03 : -0.005;
+}
+
+export function blockFontWeight(b: CanvasBlock): number {
+  return b.weight ?? (b.kind === "heading" ? 700 : 500);
+}
+
 /**
  * Paint order for the interactive editor: suppressed blocks removed (they only
  * exist to keep a deleted module section hidden), hidden blocks KEPT so the
@@ -65,9 +77,9 @@ export function canvasBlockTextStyle(b: CanvasBlock, ink: string): React.CSSProp
     // its overlay outside the transformed stage and publishes the exact stage
     // aspect-fit ratio; transformed read-only surfaces leave this at 1.
     fontSize: `calc(var(--cb-fs, ${blockFontSize(b)}px) * var(--cb-scale, 1))`,
-    lineHeight: b.kind === "heading" ? 1.02 : 1.28,
-    letterSpacing: b.kind === "heading" ? "-0.03em" : "-0.005em",
-    fontWeight: b.weight ?? (b.kind === "heading" ? 700 : 500),
+    lineHeight: blockLineHeight(b),
+    letterSpacing: `${blockLetterSpacingEm(b)}em`,
+    fontWeight: blockFontWeight(b),
     textAlign: b.align ?? "left",
     whiteSpace: "pre-wrap",
     width: "100%",
