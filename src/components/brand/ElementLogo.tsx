@@ -120,12 +120,10 @@ export function ElementMonogram({
 export type ElementLockupLayout = "stacked" | "horizontal" | "wordmark";
 
 /**
- * Full lockup: master ("TRANSPERFECT") over the ELEMENT wordmark with the
- * "MODULAR DESIGN SYSTEM" descriptor. Stacked leads with the mark; horizontal
- * uses a hairline divider; wordmark drops the mark entirely.
- *
- * When `image` is true, the official raster lockup is used instead of the
- * constructed SVG. This is the preferred form for the main navigation.
+ * Full lockup. By default this renders the APPROVED MASTER ARTWORK (SVG) for
+ * the resolved tone — colour, reversed (white wordmark) or mono. Pass
+ * `image={false}` for the constructed mark + type fallback used where the
+ * lockup must inherit `currentColor` at tiny chrome sizes.
  */
 export function ElementLockup({
   layout = "horizontal",
@@ -133,7 +131,7 @@ export function ElementLockup({
   className = "",
   markSize = 34,
   showDescriptor = true,
-  image = false,
+  image = true,
 }: {
   layout?: ElementLockupLayout;
   tone?: ElementTone;
@@ -142,20 +140,22 @@ export function ElementLockup({
   showDescriptor?: boolean;
   image?: boolean;
 }) {
-  if (image) {
-    const height = layout === "stacked" ? markSize * 1.35 : markSize * 0.85;
+  const tone = useResolvedElementTone(toneProp);
+
+  if (image && layout !== "wordmark") {
+    // Master artwork is 1983 x 793; scale from the requested mark height so the
+    // lockup stays optically matched to constructed marks beside it.
+    const height = markSize * (layout === "stacked" ? 1.9 : 1.55);
     return (
       <img
-        src={elementLogoAsset.url}
+        src={ELEMENT_LOCKUP_URLS[tone]}
         alt="TransPerfect Element"
-        height={height}
-        className={`h-auto w-auto max-w-full object-contain ${className}`}
+        className={`w-auto max-w-full object-contain ${className}`}
         style={{ height }}
       />
     );
   }
 
-  const tone = useResolvedElementTone(toneProp);
   const ink = tone === "reversed" ? "text-white" : "";
   const Words = (
     <div className={`min-w-0 leading-none ${ink}`}>
