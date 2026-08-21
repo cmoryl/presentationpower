@@ -171,7 +171,7 @@ export function Breadcrumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="mb-5 flex items-center gap-1.5 overflow-x-auto text-[12px] font-medium text-black/55 dark:text-white/55"
+      className="mb-2.5 flex items-center gap-1.5 overflow-x-auto text-[12px] font-medium text-black/55 dark:text-white/55"
     >
       <Link
         to="/"

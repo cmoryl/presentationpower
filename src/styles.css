@@ -245,6 +245,13 @@
   padding-right: max(clamp(1rem, 4vw, 3.5rem), calc((100vw - 1400px) / 2));
 }
 
+/* Page heroes sit flush under the breadcrumb trail: cancel exactly the shell's
+   own top padding (set by AppShell as --shell-pad-top) instead of guessing a
+   fixed -mt value per page, which drifted as the shell padding changed. */
+@utility hero-flush {
+  margin-top: calc(-1 * var(--shell-pad-top, 1rem));
+}
+
 @utility hero-band {
   width: 100vw;
   margin-left: calc(50% - 50vw);

@@ -125,7 +125,7 @@ function ElementsLanding() {
   return (
     <AppShell>
       {/* ================= HERO ================= */}
-      <section className="full-bleed relative -mt-6 overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:-mt-10 sm:py-16 lg:py-20">
+      <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:py-10 lg:py-12">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div
             className="absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full blur-[110px]"

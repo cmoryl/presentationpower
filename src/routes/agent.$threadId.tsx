@@ -239,7 +239,7 @@ function AgentHero({
   return (
     <section
       className={`full-bleed relative overflow-hidden border-b border-black/5 bg-white py-8 sm:py-10 lg:py-12 ${
-        flush ? "-mt-6 sm:-mt-10" : ""
+        flush ? "hero-flush" : ""
       }`}
     >
       <AgentAuroraHero />

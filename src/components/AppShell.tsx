@@ -247,7 +247,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               "linear-gradient(90deg, transparent 0%, rgba(161,251,249,0.4) 20%, rgba(122,92,255,0.5) 50%, rgba(0,63,199,0.4) 80%, transparent 100%)",
           }}
         />
-        <div className="relative mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-4 py-4 lg:flex-row lg:px-8 lg:py-5">
+        <div className="relative mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-3 px-4 py-3 lg:flex-row lg:px-8 lg:py-3.5">
           <Link
             to="/"
             className="flex min-w-0 items-center gap-3"
@@ -417,7 +417,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="relative z-10 mx-auto max-w-[1400px] px-3 py-6 sm:px-8 sm:py-10">
+      {/* --shell-pad-top is the contract full-bleed heroes cancel with `hero-flush`. */}
+      <main
+        className="relative z-10 mx-auto max-w-[1400px] px-3 pb-10 pt-3 sm:px-8 sm:pb-14"
+        style={{ "--shell-pad-top": "0.75rem" } as Record<string, string>}
+      >
         {showAdminChrome ? (
           <div className="flex flex-col gap-6 md:flex-row">
             <AdminSidebar />
