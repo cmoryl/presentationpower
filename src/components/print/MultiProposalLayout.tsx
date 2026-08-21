@@ -2476,24 +2476,9 @@ function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string
 // Page 9 — Advocates
 // ---------------------------------------------------------------------------
 
-const CAUSE_SLOTS = [
-  { x: 3.0, y: 2.55, w: 1.06, h: 0.44 },
-  { x: 4.28, y: 2.48, w: 0.92, h: 0.5 },
-  { x: 5.28, y: 2.5, w: 0.9, h: 0.48 },
-  { x: 6.3, y: 2.5, w: 1.02, h: 0.48 },
-  { x: 7.36, y: 2.5, w: 0.72, h: 0.48 },
-  { x: 3.12, y: 3.28, w: 1.14, h: 0.44 },
-  { x: 4.42, y: 3.22, w: 1.0, h: 0.5 },
-  { x: 5.66, y: 3.2, w: 1.06, h: 0.54 },
-  { x: 6.86, y: 3.24, w: 1.06, h: 0.46 },
-];
+/** Left editorial rail geometry for the advocates page. */
+const ADV_RAIL_W = 2.62;
 
-const AFFINITY_SLOTS = [
-  { x: 3.0, y: 8.6, w: 1.82, h: 0.52 },
-  { x: 4.86, y: 8.44, w: 1.36, h: 0.6 },
-  { x: 6.86, y: 8.5, w: 1.04, h: 0.72 },
-  { x: 4.3, y: 9.6, w: 2.36, h: 0.56 },
-];
 
 type Box = { x: number; y: number; w: number; h: number };
 
@@ -2566,51 +2551,20 @@ export function autoLogoWall(
   });
 }
 
-/**
- * Even wall grid for an arbitrary number of logos inside a region. Used when the
- * author has added or removed tiles, so the page never overlaps or overflows.
- */
-function logoGrid(
-  count: number,
-  region: { x: number; y: number; w: number; h: number },
-  maxPerRow: number,
-  tileMaxH: number,
-): Box[] {
-  if (count <= 0) return [];
-  const rows = Math.ceil(count / maxPerRow);
-  const perRow = Math.ceil(count / rows);
-  const pitchY = region.h / rows;
-  const h = Math.min(tileMaxH, Math.max(0.24, pitchY - 0.16));
-  const cellW = region.w / perRow;
-  const w = Math.min(cellW - 0.14, 1.7);
-
-  return Array.from({ length: count }, (_, i) => {
-    const row = Math.floor(i / perRow);
-    const inRow = i % perRow;
-    const rowCount = Math.min(perRow, count - row * perRow);
-    // Centre short trailing rows inside the region.
-    const rowW = rowCount * cellW;
-    const offX = region.x + (region.w - rowW) / 2;
-    return {
-      x: offX + inRow * cellW + (cellW - w) / 2,
-      y: region.y + row * pitchY + (pitchY - h) / 2,
-      w,
-      h,
-    };
-  });
-}
-
 function AdvocatesPage({
   page,
   logoDark,
+  logoWhite,
   pageIndex,
 }: {
   page: MultiProposalPage;
   logoDark: string;
+  logoWhite: string;
   pageIndex: number;
 }) {
   const advocacy = page.cards?.[0];
   const affinity = page.cards?.[1];
+  const rail = (page.cards ?? []).slice(2, 5);
   const imageCtx = usePrintImageEdit();
 
   const causes: PrintLogoEntry[] =
@@ -2625,14 +2579,18 @@ function AdvocatesPage({
   const causePath = `pages.${pageIndex}.causeLogos`;
   const affinityPath = `pages.${pageIndex}.affinityLogos`;
 
-  const causeBoxes =
-    causes.length === 9 && !page.causeLogos
-      ? CAUSE_SLOTS
-      : logoGrid(causes.length, { x: 3.0, y: 2.4, w: 5.08, h: 1.68 }, 5, 0.5);
-  const affinityBoxes =
-    affinities.length === 4 && !page.affinityLogos
-      ? AFFINITY_SLOTS
-      : logoGrid(affinities.length, { x: 3.0, y: 8.44, w: 4.9, h: 1.9 }, 3, 0.66);
+  // Both walls auto-configure: adding or removing a logo re-flows the grid and
+  // keeps every tile inside its plate with a consistent safe zone.
+  const causeBoxes = autoLogoWall(
+    causes.length,
+    { x: 3.06, y: 2.42, w: 4.98, h: 2.02 },
+    { maxCols: causes.length > 8 ? 4 : 3, gutterX: 0.2, gutterY: 0.22, maxTileW: 1.2, maxTileH: 0.6 },
+  );
+  const affinityBoxes = autoLogoWall(
+    affinities.length,
+    { x: 3.06, y: 8.6, w: 4.98, h: 1.5 },
+    { maxCols: affinities.length > 4 ? 4 : 2, gutterX: 0.24, gutterY: 0.2, maxTileW: 1.9, maxTileH: 0.62 },
+  );
 
   const wall = (
     entries: PrintLogoEntry[],
@@ -2666,84 +2624,259 @@ function AdvocatesPage({
 
   return (
     <>
-      <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
+      {/* Full-bleed field: the page is graphic edge to edge, no idle white margin. */}
       <L
-        x={2.51}
+        x={0}
         y={0}
-        w={PAGE_W_IN - 2.51}
+        w={PAGE_W_IN}
         h={PAGE_H_IN}
         style={{
-          background: `linear-gradient(160deg, ${BLUE} 0%, #6E86F0 24%, #9FB7F8 48%, ${LAV} 74%, #C7B6FB 100%)`,
+          background: `linear-gradient(158deg, ${BLUE} 0%, #2C5AE0 26%, #7E95F4 52%, ${LAV} 78%, #CFC1FC 100%)`,
         }}
       />
 
-      <T x={3.13} y={0.86} w={5} size={45.6} weight={300} leading={1.06} tracking="-0.02em">
+      {/* Left editorial rail — navy column carrying the governance proof points. */}
+      <L
+        x={0}
+        y={0}
+        w={ADV_RAIL_W}
+        h={PAGE_H_IN}
+        style={{
+          background: `linear-gradient(180deg, ${NAVY} 0%, #06003E 62%, ${NAVY} 100%)`,
+        }}
+      />
+      {/* Element brick motif */}
+      {[AQUA_FIELD, LAV, "#FFFFFF", "rgba(255,255,255,0.32)"].map((c, i) => (
+        <L
+          key={`brick-${i}`}
+          x={0.44 + i * 0.2}
+          y={0.6}
+          w={0.14}
+          h={0.14}
+          style={{ background: c }}
+        />
+      ))}
+      <T
+        x={0.44}
+        y={0.98}
+        w={1.9}
+        size={9.5}
+        weight={600}
+        color={AQUA_FIELD}
+        tracking="0.2em"
+        upper
+      >
+        {page.eyebrow || "Your advocates"}
+      </T>
+      <T x={0.44} y={1.34} w={1.86} size={19} weight={500} leading={1.12} tracking="-0.02em">
+        {advocacy?.title || "Advocacy"}
+        {"\n"}
+        <span style={{ color: "rgba(255,255,255,0.62)" }}>{advocacy?.body || "Updates"}</span>
+      </T>
+      <Rule x={0.44} y={2.28} w={1.74} color="rgba(255,255,255,0.22)" />
+
+      {rail.map((card, i) => {
+        const y = 2.56 + i * 1.86;
+        return (
+          <Fragment key={`rail-${i}`}>
+            <T
+              x={0.44}
+              y={y}
+              w={1.74}
+              size={8.5}
+              weight={600}
+              color={AQUA_FIELD}
+              tracking="0.16em"
+              upper
+            >
+              {card.meta || ""}
+            </T>
+            <T x={0.44} y={y + 0.26} w={1.74} size={12.5} weight={600} leading={1.16}>
+              {card.title || ""}
+            </T>
+            <T
+              x={0.44}
+              y={y + 0.78}
+              w={1.74}
+              size={9.2}
+              weight={400}
+              color="rgba(255,255,255,0.66)"
+              leading={1.42}
+            >
+              {card.body || ""}
+            </T>
+            {i < rail.length - 1 ? (
+              <Rule x={0.44} y={y + 1.6} w={1.74} color="rgba(255,255,255,0.16)" />
+            ) : null}
+          </Fragment>
+        );
+      })}
+
+      {/* Rail foot stats keep the lower column active instead of idle space. */}
+      <Rule x={0.44} y={8.34} w={1.74} color="rgba(255,255,255,0.16)" />
+      <T x={0.44} y={8.56} w={1.74} size={30} weight={600} color={AQUA_FIELD} leading={1} tracking="-0.03em">
+        {String(causes.length)}
+      </T>
+      <T
+        x={0.44}
+        y={9.02}
+        w={1.74}
+        size={8.4}
+        weight={500}
+        color="rgba(255,255,255,0.62)"
+        tracking="0.14em"
+        upper
+      >
+        Cause partners supported
+      </T>
+      <T x={0.44} y={9.42} w={1.74} size={30} weight={600} color={LAV} leading={1} tracking="-0.03em">
+        {String(affinities.length)}
+      </T>
+      <T
+        x={0.44}
+        y={9.88}
+        w={1.74}
+        size={8.4}
+        weight={500}
+        color="rgba(255,255,255,0.62)"
+        tracking="0.14em"
+        upper
+      >
+        Employee affinity groups
+      </T>
+
+
+      <Img x={0.44} y={10.22} w={1.5} h={0.19} src={logoWhite} alt="TransPerfect" align="left" />
+      <T
+        x={0.44}
+        y={10.5}
+        w={1.74}
+        size={7.6}
+        weight={400}
+        color="rgba(255,255,255,0.46)"
+        tracking="0.12em"
+        upper
+      >
+        Community &amp; inclusion
+      </T>
+
+      {/* Right field — headline, then two plated logo walls. */}
+      <T x={3.06} y={0.78} w={4.98} size={44} weight={300} leading={1.04} tracking="-0.025em">
         {page.title || "Giving Back"}
       </T>
-      <T x={3.13} y={1.5} w={4.9} size={13} weight={400} tracking="0.03em" upper>
+      <T
+        x={3.06}
+        y={1.62}
+        w={4.7}
+        size={11.5}
+        weight={500}
+        color="rgba(255,255,255,0.86)"
+        tracking="0.14em"
+        upper
+      >
         {page.subtitle || "We are proud to support these causes"}
       </T>
-      <Rule x={3.12} y={2.06} w={5.08} color="rgba(255,255,255,0.7)" />
+      <Rule x={3.06} y={2.02} w={4.98} color="rgba(255,255,255,0.6)" />
 
-      {wall(causes, causeBoxes, causePath, "advocates.cause")}
-      <L x={3.12} y={4.12} w={5.08}>
+      {/* Cause marks are reversed art, so they keep a translucent dark plate. */}
+      <L
+        x={2.86}
+        y={2.24}
+        w={5.38}
+        h={2.38}
+        style={{
+          background: "rgba(3,0,44,0.3)",
+          borderRadius: u(0.24),
+          border: `${u(0.008)} solid rgba(255,255,255,0.28)`,
+        }}
+      />
+      <T x={3.06} y={2.4} w={4.98} size={8.4} weight={600} color={AQUA_FIELD} tracking="0.18em" upper>
+        Cause partners
+      </T>
+
+      {wall(
+        causes,
+        causeBoxes.map((b) => ({ ...b, y: b.y + 0.24 })),
+        causePath,
+        "advocates.cause",
+      )}
+      <L x={3.06} y={4.7} w={4.98}>
         <AddLogoButton path={causePath} list={causes} label="Add cause logo" max={20} />
       </L>
 
+      {/* Statement band bridging the two walls. */}
       <L
-        x={0}
-        y={4.24}
-        w={6.86}
-        h={2.68}
+        x={2.86}
+        y={5.16}
+        w={5.38}
+        h={1.86}
         style={{
-          background: "#FFFFFF",
-          borderTopRightRadius: u(0.3),
-          borderBottomRightRadius: u(0.3),
+          background: "rgba(3,0,44,0.34)",
+          borderRadius: u(0.24),
+          border: `${u(0.008)} solid rgba(255,255,255,0.28)`,
         }}
       />
-      <Img x={3.99} y={4.78} w={2.59} h={0.33} src={logoDark} alt="TransPerfect" />
+      <L x={2.86} y={5.16} w={0.06} h={1.86} style={{ background: AQUA_FIELD }} />
       <T
-        x={2.6}
-        y={5.18}
-        w={3.98}
-        size={48.5}
-        weight={700}
-        color={BLUE}
-        align="right"
-        leading={1.05}
-        tracking="-0.03em"
+        x={3.16}
+        y={5.4}
+        w={4.78}
+        size={8.4}
+        weight={600}
+        color={AQUA_FIELD}
+        tracking="0.18em"
+        upper
       >
-        {advocacy?.title || "Advocacy"}
+        Governance is a deliverable
       </T>
-      <T
-        x={2.6}
-        y={5.9}
-        w={3.98}
-        size={48.5}
-        weight={400}
-        color={NAVY}
-        align="right"
-        leading={1.05}
-        tracking="-0.03em"
-      >
-        {advocacy?.body || "Updates"}
+      <T x={3.16} y={5.7} w={4.78} size={14.5} weight={400} leading={1.34}>
+        {page.body ||
+          "Every account is run by named people with published KPIs — governance is part of the deliverable, not an afterthought."}
       </T>
 
-      <T x={3.13} y={7.5} w={5} size={35.9} weight={300} leading={1.1} tracking="-0.01em">
+      <T x={3.06} y={7.32} w={4.98} size={29} weight={300} leading={1.08} tracking="-0.02em">
         {affinity?.title || "Our Affinity Groups"}
       </T>
-      <T x={3.14} y={8.16} w={2} size={13} weight={400} tracking="0.03em" upper>
+      <T
+        x={3.06}
+        y={7.86}
+        w={4.7}
+        size={10.5}
+        weight={500}
+        color="rgba(255,255,255,0.84)"
+        tracking="0.16em"
+        upper
+      >
         {affinity?.body || "Are growing"}
       </T>
-      <Rule x={4.63} y={8.29} w={3.17} color="rgba(255,255,255,0.7)" />
+      <Rule x={3.06} y={8.2} w={4.98} color="rgba(255,255,255,0.5)" />
 
-      {wall(affinities, affinityBoxes, affinityPath, "advocates.affinity")}
-      <L x={3.12} y={10.4} w={5.08}>
+      {/* Affinity marks are reversed art, so they keep a translucent dark plate. */}
+      <L
+        x={2.86}
+        y={8.42}
+        w={5.38}
+        h={1.9}
+        style={{
+          background: "rgba(3,0,44,0.3)",
+          borderRadius: u(0.24),
+          border: `${u(0.008)} solid rgba(255,255,255,0.3)`,
+        }}
+      />
+      {wall(
+        affinities,
+        affinityBoxes.map((b) => ({ ...b, y: b.y + 0.1 })),
+        affinityPath,
+        "advocates.affinity",
+      )}
+      <L x={3.06} y={10.42} w={4.98}>
         <AddLogoButton path={affinityPath} list={affinities} label="Add affinity logo" max={12} />
       </L>
+      <Img x={6.74} y={10.6} w={1.3} h={0.17} src={logoDark} alt="TransPerfect" align="right" />
     </>
   );
 }
+
 
 
 // ---------------------------------------------------------------------------
@@ -3190,7 +3323,15 @@ function PageBody({
     case "why":
       return <WhyPage page={page} logoDark={logoDark} />;
     case "advocates":
-      return <AdvocatesPage page={page} logoDark={logoDark} pageIndex={pageIndex} />;
+      return (
+        <AdvocatesPage
+          page={page}
+          logoDark={logoDark}
+          logoWhite={logoWhite}
+          pageIndex={pageIndex}
+        />
+      );
+
     case "team-grid":
       return <TeamPage page={page} logoWhite={logoWhite} bios={false} />;
     case "team-bio":
