@@ -74,7 +74,7 @@ export function StudioPalette({
   }, [q, sectionId]);
 
   return (
-    <div className="flex h-full min-h-0 w-[320px] shrink-0 flex-col rounded-2xl border border-black/10 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
+    <div className="flex h-72 min-h-0 w-full shrink-0 flex-col lg:h-full lg:w-[320px] rounded-2xl border border-black/10 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
       <div className="flex gap-1 border-b border-black/10 p-2 dark:border-white/10">
         {(["blocks", "modules"] as const).map((t) => (
           <button
