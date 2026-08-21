@@ -1,6 +1,7 @@
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CSSProperties } from "react";
 import { getDivisionLogos } from "@/lib/division-logos";
+import { ElementMark } from "@/components/brand/ElementLogo";
 
 // Inline SVG of the approved TransPerfect horizontal wordmark. Paths inherit
 // `currentColor` so a single component tints for both dark and light chrome.
@@ -37,6 +38,8 @@ function TransPerfectWordmark({ height }: { height: number }) {
 // single SVG serves both dark and light surfaces.
 const TP_WORDMARK_ASPECT = 432 / 44.4; // width / height from the source SVG viewBox
 const TP_BRANDS = new Set(["TransPerfect"]);
+/** Brands that render the Element product lockup instead of the TP wordmark. */
+const ELEMENT_BRANDS = new Set(["Element", "TransPerfect Element"]);
 
 export function BrandLockup({
   brand,
