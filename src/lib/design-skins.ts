@@ -456,26 +456,47 @@ export const DESIGN_SKINS: DesignSkin[] = [
   },
   {
     // PRODUCT SKIN — Element's own brand, not TransPerfect corporate. Used for
-    // marketing the build itself: Element Ink field, Element Blue lead, and the
-    // three signal accents from the five-brick logo. The corporate wordmark is
-    // never used here; the chrome renders the Element lockup instead.
+    // marketing the build itself. The corporate wordmark is never used here;
+    // the chrome renders the Element five-brick lockup instead.
+    //
+    // Look: "natural elements" — soft-focus atmospheric fields (air, water,
+    // mineral, light) in the five-brick spectrum, held by crisp modular type.
     code: "S29",
-    name: "Element System",
+    name: "Element System \u00b7 Light",
     reference: "TRANSPERFECT ELEMENT \u00b7 FIVE-BRICK SYSTEM",
-    description: "Element's own product language: paper-white light field energised by the full five-brick spectrum \u2014 blue, teal, violet and coral bricks used as structural signal and bold colour choreography.",
+    description: "Element's own product language, light: a soft-focus paper field where the five brick colours drift as diffused atmospheric volumes \u2014 air, water and mineral \u2014 under crisp modular type and lifted glass cards.",
     bestFit: "Element product marketing \u00b7 platform launches \u00b7 enablement \u00b7 internal rollout",
     mode: "light",
-    palette: ["#FFFFFF", "#0D131D", "#135CFB", "#08BFC1", "#7C4EF4"],
+    palette: ["#F7F9FD", "#0D131D", "#135CFB", "#08BFC1", "#7C4EF4"],
     typography: "Modular display \u00b7 confident systematic labels",
-    surfaceNote: "Light paper field \u00b7 lifted brick cards \u00b7 saturated colour blocks",
-    imagery: "Modular bricks \u00b7 system diagrams \u00b7 product UI crops",
+    surfaceNote: "Soft-focus paper field \u00b7 diffused colour volumes \u00b7 lifted glass cards",
+    imagery: "Natural elements \u00b7 modular bricks \u00b7 product UI crops",
     density: "Medium",
     spec: "GRADIENT G02 / G05  \u00b7  OPACITY O16\u201382  \u00b7  TYPE T03  \u00b7  LAYOUT L09 / L10  \u00b7  ICON I03",
     industries: ["Technology", "SaaS", "Internal enablement", "Marketing"],
     hc: { surface: "#FFFFFF", ink: "#000000", accent: "#073091" },
   },
+  {
+    // Dark twin of S29 — same Element product brand, same five-brick spectrum,
+    // same soft-focus natural-elements language on a deep mineral field.
+    code: "S30",
+    name: "Element System \u00b7 Dark",
+    reference: "TRANSPERFECT ELEMENT \u00b7 FIVE-BRICK SYSTEM",
+    description: "Element's own product language, dark: deep mineral ink with the five brick colours glowing as soft-focus aurora volumes \u2014 luminous, calm and unmistakably the system's own.",
+    bestFit: "Element launch keynotes \u00b7 product films \u00b7 exec previews \u00b7 event screens",
+    mode: "dark",
+    palette: ["#080C16", "#F2F6FF", "#3D7CFF", "#08BFC1", "#7C4EF4"],
+    typography: "Modular display \u00b7 luminous systematic labels",
+    surfaceNote: "Deep mineral field \u00b7 glowing diffused volumes \u00b7 translucent brick cards",
+    imagery: "Natural elements at night \u00b7 backlit bricks \u00b7 dark UI crops",
+    density: "Medium",
+    spec: "GRADIENT G02 / G05  \u00b7  OPACITY O24\u201388  \u00b7  TYPE T03  \u00b7  LAYOUT L09 / L10  \u00b7  ICON I03",
+    industries: ["Technology", "SaaS", "Internal enablement", "Marketing"],
+    hc: { surface: "#000000", ink: "#FFFFFF", accent: "#8FB6FF" },
+  },
 
 ];
+
 
 
 export const INDUSTRY_RECIPES: IndustryRecipe[] = [

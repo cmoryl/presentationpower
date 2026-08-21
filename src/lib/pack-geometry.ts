@@ -214,6 +214,7 @@ export const SKIN_GEOMETRY: Record<string, PackGeometry> = {
   S27: { shape: "wedge", scaffold: "split", device: "chevron", fill: 0.6, layout: { cover: "split", stats: "rail", grid: "mosaic", rule: "bar" } },
   S28: { shape: "diptych", scaffold: "margin", device: "grid", fill: 0.35, layout: { cover: "banded", stats: "cards4", grid: "columns", rule: "dots" } },
   S29: { shape: "notch", scaffold: "margin", device: "grid", fill: 0.62, layout: { cover: "split", stats: "cards4", grid: "bento", rule: "bar" } },
+  S30: { shape: "notch", scaffold: "margin", device: "grid", fill: 0.6, layout: { cover: "split", stats: "cards4", grid: "bento", rule: "bar" } },
 };
 
 /**
