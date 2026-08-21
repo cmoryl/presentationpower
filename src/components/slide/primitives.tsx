@@ -738,7 +738,7 @@ export function StatFigure({
           }}
         >
           <StatIcon
-            size={Math.round(spec.valuePx * 1.25 * iconK)}
+            size={Math.round(spec.valuePx * 1.6 * iconK)}
             strokeWidth={1.25}
             absoluteStrokeWidth
           />
@@ -761,7 +761,7 @@ export function StatFigure({
       )}
       <div
         className={isIconRow ? "relative flex items-center" : "relative"}
-        style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.16) : undefined }}
+        style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.2) : undefined }}
       >
         {isIconRow && StatIcon && (
           resolvedShape === "icon-tile" ? (
@@ -791,7 +791,7 @@ export function StatFigure({
               className="relative flex shrink-0 items-center"
               style={{
                 color: aInk,
-                paddingRight: Math.round(spec.valuePx * 0.14),
+                paddingRight: Math.round(spec.valuePx * 0.18),
                 borderRight: `1px solid ${hexA(aFig, mode === "dark" ? 0.32 : 0.2)}`,
               }}
             >
