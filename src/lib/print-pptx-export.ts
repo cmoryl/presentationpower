@@ -173,8 +173,14 @@ export async function exportPrintPagesAsPptx(
   // the order before writing so the file passes strict OOXML validation.
   const blob = (await pptx.write({ outputType: "blob" })) as Blob;
   const fileName = opts.filename ?? "print-asset.pptx";
-  const fixed = await reorderPresentationXml(blob);
+  // Same native-feature pass the deck exporter runs: editable gradient stops
+  // (per-stop alpha), explicit "No line", zero text insets for baked lines, alt
+  // text from object names, content-type repair.
+  const { applyNativePptxFeatures } = await import("./pptx-native-xml");
+  const native = await applyNativePptxFeatures(blob, { altText: true });
+  const fixed = await reorderPresentationXml(native);
   triggerDownload(fixed, fileName);
+
 }
 
 async function reorderPresentationXml(blob: Blob): Promise<Blob> {
