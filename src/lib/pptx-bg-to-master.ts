@@ -378,13 +378,9 @@ export async function backgroundsToMaster(blob: Blob): Promise<Blob> {
     zip.file("[Content_Types].xml", ctXml);
     console.info("[pptx-bg-to-master]", report);
 
-    return (await zip.generateAsync({
-      type: "blob",
-      mimeType:
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      compression: "DEFLATE",
-      compressionOptions: { level: 6 },
-    })) as Blob;
+    const { repackPptx } = await import("./pptx-repack");
+    return await repackPptx(zip);
+
   } catch (err) {
     console.warn("[pptx-bg-to-master] skipped", err);
     return blob;
