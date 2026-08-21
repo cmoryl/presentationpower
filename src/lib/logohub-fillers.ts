@@ -155,3 +155,29 @@ export function overlayLogoHubFillers(
   }
 
 }
+
+// Neutral CLIENT placeholders for logo-wall seeds. Seeded decks must never
+// ship a TransPerfect brand/division mark in a "client" slot: these carry a
+// name only, so the renderer draws a wordmark/initials plate until LogoHub
+// supplies a real client mark (see overlayLogoHubFillers).
+const CLIENT_PLACEHOLDER_NAMES = [
+  "Global Bank",
+  "Life Sciences Leader",
+  "Consumer Tech",
+  "Global Retailer",
+  "Insurance Group",
+  "Automotive OEM",
+  "Streaming Platform",
+  "Medical Devices",
+  "Payments Network",
+  "Industrial Manufacturer",
+];
+
+export function clientPlaceholderItems(count = 8): Array<{ client: string; name: string }> {
+  const out: Array<{ client: string; name: string }> = [];
+  for (let i = 0; i < count; i++) {
+    const n = CLIENT_PLACEHOLDER_NAMES[i % CLIENT_PLACEHOLDER_NAMES.length];
+    out.push({ client: n, name: n });
+  }
+  return out;
+}
