@@ -301,6 +301,21 @@ export function ExportProposalButton({
           window.document.body,
         )}
 
+      {previewOpen &&
+        typeof window !== "undefined" &&
+        createPortal(
+          <PptxLayoutPreview
+            nodes={previewNodes}
+            labels={
+              selected.size
+                ? pages.filter((p) => selected.has(p.index)).map((p) => p.label)
+                : pages.map((p) => p.label)
+            }
+            pageSize={String(pageSize)}
+            onClose={() => setPreviewOpen(false)}
+          />,
+          window.document.body,
+        )}
     </div>
   );
 }
