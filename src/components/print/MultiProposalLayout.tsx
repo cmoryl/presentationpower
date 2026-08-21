@@ -788,10 +788,6 @@ function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
         { title: "SOURCE FILES", body: "1 PDF Document" },
         { title: "DELIVERABLES", body: "1 PDF Document\n1 Certificate" },
       ];
-  const heights = [1.78, 1.24, 2.05];
-  const tableX = 1.11;
-  const tableY = 2.93;
-  const colW = [3.18, 3.23];
   const timeline = page.bullets?.length
     ? page.bullets
     : [
@@ -799,86 +795,125 @@ function ScopePage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: st
         "CLIENT has requested a rush X-day turnaround time.",
       ];
 
-  let cursor = tableY;
+  /* Table geometry — one margin, one hairline, one cell pad. Row heights are
+     derived from the copy so cells never clip and rules always meet. */
+  const HAIR = 0.008;
+  const PAD_X = 0.2;
+  const PAD_Y = 0.17;
+  const BODY_PT = 10.5;
+  const BODY_LEAD = 1.42;
+  const bodyLineH = (BODY_PT / 72) * BODY_LEAD;
+  const tableX = HDR.marginX + 0.16;
+  const tableW = HDR_CONTENT_W - 0.32;
+  const labelW = 2.42;
+  const bodyW = tableW - labelW;
+
+  const visible = rows.slice(0, 5);
+  const rowH = visible.map((r) =>
+    Math.max(0.72, Math.max(1, lines(r.body).length) * bodyLineH + PAD_Y * 2),
+  );
+  const tableTop = 2.86;
+  const tableH = rowH.reduce((a, b) => a + b, 0);
+  const rowY = rowH.map((_, i) => tableTop + rowH.slice(0, i).reduce((a, b) => a + b, 0));
+
+  // Timeline block sits a fixed rhythm step below the scope table.
+  const tlHeadH = 0.5;
+  const tlLineH = (BODY_PT / 72) * 1.5;
+  const tlTop = tableTop + tableH + 0.62;
+  const tlBodyH = Math.max(0.62, timeline.length * tlLineH + PAD_Y * 2);
+
+  const plateTop = tableTop - 0.42;
+  const plateH = tlTop + tlHeadH + tlBodyH + 0.42 - plateTop;
 
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={PAGE_H_IN} style={{ background: "#FFFFFF" }} />
       <BandHeader title={page.title || "Project Scope"} logo={logoWhite} />
 
+      {/* Tinted field + white card, both bracketed by the header margins. */}
       <Plate
-        x={0.27}
-        y={2.18}
-        w={7.98}
-        h={6.4}
-        radius={0.4}
+        x={HDR.marginX - 0.2}
+        y={plateTop - 0.2}
+        w={HDR_CONTENT_W + 0.4}
+        h={plateH + 0.4}
+        radius={0.34}
         bg="linear-gradient(160deg, #E9EEFC 0%, #EDF1FD 60%, #E4ECFA 100%)"
       />
-      <Plate x={0.7} y={2.51} w={7.15} h={5.85} radius={0.06} />
+      <Plate x={HDR.marginX} y={plateTop} w={HDR_CONTENT_W} h={plateH} radius={0.06} />
 
-      {rows.slice(0, 3).map((row, i) => {
-        const h = heights[i] ?? 1.4;
-        const y = cursor;
-        cursor += h;
-        return (
-          <div key={i}>
-            <L
-              x={tableX}
-              y={y}
-              w={colW[0]}
-              h={h}
-              style={{ border: `${u(0.008)} solid ${NAVY}`, borderRight: "none" }}
-            />
-            <L
-              x={tableX + colW[0]!}
-              y={y}
-              w={colW[1]}
-              h={h}
-              style={{ border: `${u(0.008)} solid ${NAVY}` }}
-            />
-            <T
-              x={tableX + 0.14}
-              y={y + h / 2 - 0.09}
-              w={colW[0]! - 0.28}
-              size={11}
-              weight={700}
-              color={NAVY}
-              upper
-            >
-              {row.title}
-            </T>
-            <T
-              x={tableX + colW[0]! + 0.14}
-              y={y + h / 2 - lines(row.body).length * 0.1}
-              w={colW[1]! - 0.28}
-              size={11}
-              weight={400}
-              color={NAVY}
-              leading={1.42}
-            >
-              {row.body}
-            </T>
-          </div>
-        );
-      })}
-
-      {/* Timeline table */}
-      <L x={0.75} y={8.78} w={7.02} h={0.46} style={{ border: `${u(0.008)} solid ${NAVY}` }} />
-      <T x={0.89} y={8.88} w={4} size={18} weight={700} color={NAVY}>
-        {page.subtitle || "TIMELINE"}
-      </T>
+      {/* Scope table: outer frame, one vertical divider, one rule per row seam. */}
       <L
-        x={0.75}
-        y={9.24}
-        w={7.02}
-        h={1.0}
-        style={{ border: `${u(0.008)} solid ${NAVY}`, borderTop: "none" }}
+        x={tableX}
+        y={tableTop}
+        w={tableW}
+        h={tableH}
+        style={{ border: `${u(HAIR)} solid ${NAVY}` }}
       />
-      {timeline.slice(0, 3).map((line, i) => (
-        <T key={i} x={0.89} y={9.42 + i * 0.34} w={6.7} size={10} weight={400} color={NAVY}>
-          {line}
-        </T>
+      <L x={tableX + labelW} y={tableTop} w={HAIR} h={tableH} style={{ background: NAVY }} />
+      {visible.map((row, i) => (
+        <div key={`scope-${i}`}>
+          {i > 0 ? <Rule x={tableX} y={rowY[i]!} w={tableW} color={NAVY} thickness={HAIR} /> : null}
+          <T
+            x={tableX + PAD_X}
+            y={rowY[i]! + PAD_Y}
+            w={labelW - PAD_X * 2}
+            size={10.5}
+            weight={700}
+            color={NAVY}
+            leading={1.3}
+            tracking="0.02em"
+            upper
+          >
+            {row.title}
+          </T>
+          <T
+            x={tableX + labelW + PAD_X}
+            y={rowY[i]! + PAD_Y}
+            w={bodyW - PAD_X * 2}
+            size={BODY_PT}
+            weight={400}
+            color={NAVY}
+            leading={BODY_LEAD}
+          >
+            {lines(row.body).join("\n")}
+          </T>
+        </div>
       ))}
+
+      {/* Timeline table — header band + body, same frame language. */}
+      <L
+        x={tableX}
+        y={tlTop}
+        w={tableW}
+        h={tlHeadH + tlBodyH}
+        style={{ border: `${u(HAIR)} solid ${NAVY}` }}
+      />
+      <L x={tableX} y={tlTop} w={tableW} h={tlHeadH} style={{ background: "#EEF2FD" }} />
+      <Rule x={tableX} y={tlTop + tlHeadH} w={tableW} color={NAVY} thickness={HAIR} />
+      <T
+        x={tableX + PAD_X}
+        y={tlTop + tlHeadH / 2 - 0.115}
+        w={tableW - PAD_X * 2}
+        size={14}
+        weight={700}
+        color={NAVY}
+        leading={1.1}
+        tracking="0.01em"
+        upper
+      >
+        {page.subtitle || "Timeline"}
+      </T>
+      <T
+        x={tableX + PAD_X}
+        y={tlTop + tlHeadH + PAD_Y}
+        w={tableW - PAD_X * 2}
+        size={BODY_PT}
+        weight={400}
+        color={NAVY}
+        leading={1.5}
+      >
+        {timeline.slice(0, 6).join("\n")}
+      </T>
     </>
   );
 }
