@@ -721,9 +721,17 @@ export function SlideFrame({
           // The author's per-slide background section wins over the seed-derived
           // scene, and picking one locks the ground to the pack's signature
           // accent so the colour stays consistent slide to slide.
+          //
+          // Otherwise the scene comes from the MODULE variant, not the layout
+          // id: layout ids ("lp-…") carry no scene vocabulary, so seeding from
+          // them collapsed every slide onto the "section" plate and the whole
+          // deck wore one background. The layout id still rides along so
+          // generated grounds keep their per-layout jitter.
+          const variantScene = sceneFromSeed(variant);
           const groundSeed = templateScene
             ? `scene:${templateScene} accentlock ${seed}`
-            : seed;
+            : `scene:${variantScene} ${seed}`;
+
           // Curated skin packs paint an art-directed industry scene: it keeps
           // its authored layers, its strength, and the full sheet (the scene is
           // already composed off the reading core).
