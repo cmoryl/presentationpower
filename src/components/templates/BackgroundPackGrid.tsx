@@ -92,6 +92,8 @@ export function BackgroundPackGrid({
     tint: "#003FC7",
     tintStrength: 0.18,
     imageUrl: null as string | null,
+    imagePriority: "front" as "front" | "behind",
+
     sceneSwap: "" as string,
     note: "",
   });
