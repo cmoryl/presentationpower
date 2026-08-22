@@ -17,6 +17,7 @@ import type { BrandMode } from "@/lib/taxonomy";
 import { getDivisionLogos } from "@/lib/division-logos";
 import { ELEMENT_LOCKUP_URLS } from "@/components/brand/ElementLogo";
 import { PROPOSAL_ART } from "@/lib/print-library/proposal-art";
+import { useDivisionSeed, type DivisionSeed } from "@/lib/division-seeds";
 
 /** TransPerfect master defaults — also the fallback for unmapped brands. */
 const TP_NAVY = "#03002C";
