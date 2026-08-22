@@ -503,8 +503,26 @@ function fromMultiSolutionProposal(seed: MultiSolutionProposalSeed): PrintLibrar
   };
 }
 
+/**
+ * Trial Interactive is a product brand with its own lockup. Curated seeds that
+ * are authored on the Life Sciences shelves but are Trial Interactive assets
+ * get retargeted to `bm-trial-interactive` so the TI logo — never the
+ * TransPerfect / Life Sciences mark — renders on the page.
+ */
+const TI_DIVISION_ID = "bm-trial-interactive";
+
+function retargetTrialInteractive(item: PrintLibraryItem): PrintLibraryItem {
+  if (item.divisionId === TI_DIVISION_ID) return item;
+  const haystack = `${item.seedSlug ?? ""} ${item.title} ${(item.tags ?? []).join(" ")}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ");
+  if (!haystack.includes("trial interactive")) return item;
+  return { ...item, divisionId: TI_DIVISION_ID };
+}
+
 /** Every catalog entry, templates first. */
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
+
   ...TEMPLATE_ITEMS,
   ...LEGAL_CASE_STUDIES.map(fromLegal),
   ...LEGAL_EBROCHURES.map(fromLegalEbrochure),
