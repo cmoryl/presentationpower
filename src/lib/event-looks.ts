@@ -235,6 +235,87 @@ export function eventLookForPlaybook(playbookId: string | null | undefined): Eve
 }
 
 // ---------------------------------------------------------------------------
+// Cohesion across channels
+// ---------------------------------------------------------------------------
+
+/**
+ * Division (brand mode) → authored look. Social kits are scoped by division,
+ * events by archetype, so a social demo used to derive a random field from its
+ * own id and the two channels never matched. Mapping the division onto the SAME
+ * authored look family means a division's social posts, event collateral and
+ * print comps all read as one campaign end to end.
+ */
+export const BRAND_LOOK_ID: Record<string, string> = {
+  "bm-tp-master": "next-city",
+  "bm-enterprise": "counsel-authority",
+  "bm-tp-legal": "counsel-authority",
+  "bm-tp-lifesci": "clinical-calm",
+  "bm-trial-interactive": "clinical-calm",
+  "bm-tp-games": "gala-spotlight",
+  "bm-tp-media": "studio-aura",
+  "bm-tp-digital": "launch-signal",
+  "bm-cobrand": "field-warmth",
+  "bm-element": "launch-signal",
+};
+
+/**
+ * Campaign intent → look, for divisions that run several social kits. The
+ * division still owns the palette; the intent only shifts the field graphic so
+ * two kits from one division are distinguishable without breaking cohesion.
+ */
+const INTENT_LOOK_ID: Record<string, string> = {
+  "brand-anthem": "next-city",
+  announcement: "launch-signal",
+  "product-tease": "launch-signal",
+  milestone: "gala-spotlight",
+  "case-spotlight": "counsel-authority",
+  "thought-leadership": "studio-aura",
+  recruitment: "field-warmth",
+  partnership: "field-warmth",
+  webinar: "studio-aura",
+};
+
+/**
+ * The look a social/print demo set should wear. The division mapping is the
+ * authority (cohesion with that division's event collateral); the campaign
+ * intent supplies the motif variant; the kit's own accent re-inks the plate.
+ */
+export function channelLook(args: {
+  /** Demo set id — used only as the deterministic fallback key. */
+  key: string;
+  /** Brand mode / division id, e.g. "bm-tp-legal". */
+  brandId?: string | null;
+  /** Campaign intent id, e.g. "case-spotlight". */
+  intentId?: string | null;
+  accent?: string;
+  label?: string;
+}): EventLook {
+  const brandLook = args.brandId ? BRAND_LOOK_ID[args.brandId] : undefined;
+  const intentLook = args.intentId ? INTENT_LOOK_ID[args.intentId] : undefined;
+  const baseId = brandLook ?? intentLook;
+  if (!baseId) {
+    return derivedLook(args.key, { accent: args.accent, label: args.label });
+  }
+  const base = EVENT_LOOKS_BY_ID[baseId]!;
+  // The division owns palette + type; the intent contributes motif geometry so
+  // sibling kits differ in field graphic while staying in the same family.
+  const variant = intentLook ? EVENT_LOOKS_BY_ID[intentLook]! : base;
+  const accent = args.accent ?? base.accent;
+  return {
+    ...base,
+    id: base.id,
+    label: args.label ?? base.label,
+    accent,
+    accentAlt: mix(accent, base.accentAlt, 0.55),
+    deep: mix(base.deep, accent, 0.12),
+    motif: variant.motif,
+    motifOpacity: base.motifOpacity,
+    styleId: variant.styleId,
+  };
+}
+
+
+// ---------------------------------------------------------------------------
 // Per-demo derived looks
 // ---------------------------------------------------------------------------
 
