@@ -17,7 +17,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { ToastAssertiveLiveRegion, installToastA11y } from "@/lib/toast-a11y";
 import { UxDebugDock } from "@/components/debug/UxDebugDock";
-import { BackToTop } from "@/components/BackToTop";
+import { BackToTop, BackToTopSentinel } from "@/components/BackToTop";
 import { supabase } from "@/integrations/supabase/client";
 import { LOGIN_PATH, loginUrl } from "@/lib/sign-out";
 
