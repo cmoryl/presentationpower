@@ -121,11 +121,6 @@ function region(layer: string, pos: string, w: string, h: string): string {
   return `${layer} ${pos} / ${w} ${h} no-repeat`;
 }
 
-/** Concentric hairline rings — a target/orbit register around a focal point. */
-function rings(at: string, hex: string, alpha: number, gap = 86): string {
-  return `repeating-radial-gradient(circle at ${at}, rgba(255,255,255,0) 0px, rgba(255,255,255,0) ${gap - 1}px, ${rgba(hex, alpha)} ${gap - 1}px, ${rgba(hex, alpha)} ${gap}px)`;
-}
-
 
 /** A single measured hairline at a fractional position (0–1) on an axis. */
 function line(pos: number, hex: string, alpha: number, axis: "x" | "y" = "x"): string {
@@ -258,12 +253,11 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
   "center-stage": {
     id: "center-stage",
     label: "Centre stage",
-    description: "Concentric hairline rings and a ring vignette centre a hero number.",
+    description: "A soft centred vignette frames a hero number — no ring vector.",
     contentZone: "center",
     build: (a) => [
       ...cropMarks(INK, 0.14),
       veil("50% 48%", 52, 48, 0.96),
-      rings("50% 50%", INK, 0.055, 92),
       dots(INK, 0.04, 30),
       `radial-gradient(72% 66% at 50% 50%, rgba(255,255,255,0) 46%, ${rgba(a, 0.16)} 78%, ${rgba(P, 0.18)} 100%)`,
       bloom("50% 4%", 56, 30, LAV, 0.26),
