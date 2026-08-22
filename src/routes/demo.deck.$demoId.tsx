@@ -1,11 +1,17 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
 import { ArrowRight, Presentation, Sparkles } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { showcaseArt } from "@/lib/showcase-art";
+import {
+  DEMO_DIVISIONS,
+  retargetPayload,
+  type DemoDivision,
+} from "@/lib/showcase-division";
 
 export const Route = createFileRoute("/demo/deck/$demoId")({
   loader: ({ params }) => {
