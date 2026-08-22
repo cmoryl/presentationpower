@@ -41,27 +41,37 @@ export type ProposalBrand = {
   deepField: string;
 };
 
-export function resolveProposalBrand(brand?: BrandMode | null): ProposalBrand {
-  const accent = brand?.tokens?.accent || brand?.tokens?.primary || TP_BLUE;
-  const deep = brand?.tokens?.primary || TP_NAVY;
+export function resolveProposalBrand(
+  brand?: BrandMode | null,
+  /** Admin-authored override from the `division_seeds` table (sparse). */
+  seed?: DivisionSeed | null,
+): ProposalBrand {
+  const accent = seed?.accent || brand?.tokens?.accent || brand?.tokens?.primary || TP_BLUE;
+  const deep = seed?.deep || brand?.tokens?.primary || TP_NAVY;
   const isElement = brand?.id === "bm-element";
   const logos = brand?.id ? getDivisionLogos(brand.id) : undefined;
 
-  const logoDark = isElement
-    ? ELEMENT_LOCKUP_URLS.color
-    : (logos?.color ?? PROPOSAL_ART.lockupDark);
-  const logoWhite = isElement
-    ? ELEMENT_LOCKUP_URLS.reversed
-    : (logos?.white ?? logos?.color ?? PROPOSAL_ART.logoWhite);
+  const logoDark =
+    seed?.logoDark ||
+    (isElement ? ELEMENT_LOCKUP_URLS.color : (logos?.color ?? PROPOSAL_ART.lockupDark));
+  const logoWhite =
+    seed?.logoWhite ||
+    (isElement
+      ? ELEMENT_LOCKUP_URLS.reversed
+      : (logos?.white ?? logos?.color ?? PROPOSAL_ART.logoWhite));
 
   return {
-    name: brand?.name ?? "TransPerfect",
+    name: seed?.displayName || brand?.name || "TransPerfect",
     accent,
     deep,
     logoDark,
     logoWhite,
-    brightField: `linear-gradient(101deg, ${accent} 0%, ${accent}CC 26%, ${TP_LAV} 58%, #BFE6FA 82%, ${TP_AQUA} 100%)`,
-    deepField: `linear-gradient(72deg, ${deep} 0%, ${deep}E6 22%, ${accent} 52%, #7FA6F5 74%, ${TP_LAV} 100%)`,
+    brightField:
+      seed?.brightField ||
+      `linear-gradient(101deg, ${accent} 0%, ${accent}CC 26%, ${TP_LAV} 58%, #BFE6FA 82%, ${TP_AQUA} 100%)`,
+    deepField:
+      seed?.deepField ||
+      `linear-gradient(72deg, ${deep} 0%, ${deep}E6 22%, ${accent} 52%, #7FA6F5 74%, ${TP_LAV} 100%)`,
   };
 }
 
@@ -76,7 +86,9 @@ export function ProposalBrandProvider({
   brand?: BrandMode | null;
   children: ReactNode;
 }) {
-  const value = useMemo(() => resolveProposalBrand(brand), [brand]);
+  // Admin overrides win over the code-authored division defaults.
+  const seed = useDivisionSeed(brand?.id);
+  const value = useMemo(() => resolveProposalBrand(brand, seed), [brand, seed]);
   return <ProposalBrandContext.Provider value={value}>{children}</ProposalBrandContext.Provider>;
 }
 
