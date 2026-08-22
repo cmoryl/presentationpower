@@ -122,16 +122,20 @@ function PlaybookDemoView() {
           year: "numeric",
         })
       : "Dates TBC";
+    const logos = getDivisionLogos(playbook.subBrand);
+    const wide = logos?.white ?? logos?.color ?? "/brand-logos/tp-white.png";
+    const stacked = logos?.stackedWhite ?? logos?.stackedColor ?? wide;
     return {
       eventName: playbook.facts.name || playbook.name,
-      city: playbook.facts.city || nextSuite.trackName,
+      city: playbook.facts.city || nextSuite?.trackName || playbook.chip,
       venue: playbook.facts.venue || "Venue TBC",
       dateLine: d,
       hashtag: playbook.facts.hashtag || "#TransPerfectNEXT",
       url: playbook.facts.registrationUrl || "transperfect.com/next",
       accent: playbook.accent,
-      logoWide: nextSuite.wide,
-      logoStacked: nextSuite.stacked,
+      logoWide: nextSuite?.wide ?? { url: wide, ratio: 4.6 },
+      logoStacked: nextSuite?.stacked ?? { url: stacked, ratio: 2.1 },
+      logoNeedsKnockout: nextSuite ? undefined : !logos?.white,
     };
   }, [nextSuite, playbook]);
 
