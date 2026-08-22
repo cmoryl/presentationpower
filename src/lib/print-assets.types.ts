@@ -553,6 +553,14 @@ export type PrintAssetContext = {
   /** Stamped on copies generated from an approved showcase demo — suppresses
    *  layout-health, overflow and preflight warnings for a final piece. */
   demoApproved?: boolean;
+  /** Set when an admin opened a print demo for *live* editing: publishing from
+   *  this asset replaces what every visitor sees on the demo page. */
+  liveDemo?: {
+    kind: "deck" | "print";
+    demoId: string;
+    divisionKey: string;
+    label?: string;
+  } | null;
   clientLogoUrl?: string;
   /** Repository id of the picked client logo (shared client-logo layer). */
   clientLogoId?: string;
