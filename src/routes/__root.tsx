@@ -230,6 +230,8 @@ function RootComponent() {
 
       <Toaster />
       <ToastAssertiveLiveRegion />
+      {/* Back-to-top appears on every scrollable page once the user scrolls past the fold. */}
+      <BackToTop />
       {/* Debugging Workflow recorder — renders nothing unless explicitly enabled. */}
       <UxDebugDock />
     </QueryClientProvider>
