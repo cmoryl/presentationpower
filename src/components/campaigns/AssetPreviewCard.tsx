@@ -58,7 +58,14 @@ export function AssetPreviewCard({
   // division-accent aura so each division stays visually distinct.
   const isLight = rendererProps.mode === "light";
   return (
-    <div className="flex min-w-0 flex-col gap-1.5">
+    <div
+      className="flex min-w-0 flex-col gap-1.5"
+      data-testid="asset-preview-card"
+      data-asset-mode={rendererProps.mode}
+      data-asset-format={formatLabel}
+      data-asset-w={formatWidth}
+      data-asset-h={formatHeight}
+    >
       <button
         type="button"
         onClick={() => setOpen(true)}
