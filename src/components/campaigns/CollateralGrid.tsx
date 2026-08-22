@@ -196,7 +196,7 @@ export function CollateralGrid({
                 ) : null}
                 <div className="flex items-center justify-between gap-2">
                   <SurfacePill surface={d.surface} />
-                  <StatusRibbon status={d.status} />
+                  <StatusRibbon status={allRendered ? "live" : d.status} />
                 </div>
                 <div className="mt-1">
                   <div
