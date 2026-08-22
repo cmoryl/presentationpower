@@ -14,6 +14,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 
 type DemoSlide = {
