@@ -157,21 +157,22 @@ function ElementsLanding() {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.06] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/75 backdrop-blur">
-                <Sparkles size={12} className="text-[#A1FBF9]" /> Element · Surfaces
+                <Sparkles size={12} className="text-[#A1FBF9]" /> Element · Overview
               </span>
               <span className="hidden text-[11px] text-white/50 sm:inline">
-                One modular design system · four output channels
+                One system · four ways to show up
               </span>
             </div>
 
             <h1 className="mt-6 max-w-3xl text-[42px] font-semibold leading-[1.04] tracking-tight sm:text-[56px]">
-              Choose your element.
+              Pick where it needs to land.
             </h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/70">
-              Every TransPerfect Element surface starts from the same governed library — approved
-              modules, style packs, and brand rules. Pick the channel and the system does the
-              layout, typography, and export for you.
+              Presentations, print, events, social — all built in Element from the same approved
+              designs and brand rules. You bring the story; Element handles the look, the layout, and
+              a finished file you can hand off.
             </p>
+
 
             <ElementBrickRow thickness="6px" unit="7px" gap="5px" style={{ marginTop: 26 }} />
 
