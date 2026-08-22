@@ -90,6 +90,10 @@ const SIZES: Record<ArtKind, { w: number; h: number }> = {
   stickers: { w: 850, h: 1100 },
   video: { w: 1400, h: 788 },
   "video-vertical": { w: 620, h: 1100 },
+  "social-square": { w: 1080, h: 1080 },
+  "social-story": { w: 1080, h: 1920 },
+  "social-wide": { w: 1280, h: 720 },
+  "signature-strip": { w: 1200, h: 300 },
 };
 
 export function artKindFor(label: string, surface: string): ArtKind {
