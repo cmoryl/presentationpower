@@ -25,6 +25,7 @@ import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { SHOWCASE_DECKS } from "@/lib/showcase-decks";
 import { showcaseArt } from "@/lib/showcase-art";
+import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
 import { PRINT_DEMOS } from "@/lib/showcase-print";
 
 
@@ -108,7 +109,8 @@ export function ShowcaseGallery() {
             one and edit it as your own.
           </p>
         </div>
-        <div className="flex flex-wrap gap-4 text-sm">
+        <div className="flex flex-wrap items-center gap-4 text-sm">
+          <RegenerateApprovedCopiesButton />
           <Link
             to="/library/print"
             className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"

@@ -3,6 +3,7 @@ import { ArrowRight, Presentation, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
 import { useDeckStore } from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
@@ -136,6 +137,10 @@ function ShowcaseDeckDemoPage() {
                 Regenerate fresh copy
               </button>
             ) : null}
+            <RegenerateApprovedCopiesButton
+              label="Regenerate all approved copies"
+              className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/50 px-5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
+            />
             <Link
               to="/library"
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/50 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
