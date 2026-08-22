@@ -24,6 +24,10 @@ type DemoSlide = {
   content: Record<string, unknown>;
   mode?: "light" | "dark";
   canvasBlocks?: unknown;
+  // The showcase completeness pass names an explicit backdrop scene per slide.
+  // It MUST ride through to the renderer or every comp falls back to the flat
+  // seed ground and the demo reads as background-less.
+  templateOverride?: unknown;
 };
 
 type DemoPayload = {
