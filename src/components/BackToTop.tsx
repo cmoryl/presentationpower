@@ -1,36 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronUp } from "lucide-react";
 
-const TOP_SENTINEL_ID = "back-to-top-sentinel";
 const SCROLL_THRESHOLD = 320;
 
 function useScrolledPast(threshold: number) {
   const [visible, setVisible] = useState(false);
-  const lastRef = useRef(false);
 
   useEffect(() => {
-    let mounted = true;
-    let timer: number | null = null;
-
     const check = () => {
-      if (!mounted) return;
-      const y = typeof window !== "undefined" ? window.scrollY ?? window.pageYOffset ?? 0 : 0;
-      if (typeof window !== "undefined") {
-        (window as any).__backToTopDebug = { y, threshold, nowVisible: y > threshold, last: lastRef.current };
-      }
-      const nowVisible = y > threshold;
-      if (nowVisible !== lastRef.current) {
-        lastRef.current = nowVisible;
-        setVisible(nowVisible);
-      }
+      const y = window.scrollY ?? window.pageYOffset ?? 0;
+      setVisible(y > threshold);
     };
 
     check();
-    timer = window.setInterval(check, 100);
-    return () => {
-      mounted = false;
-      if (timer !== null) window.clearInterval(timer);
-    };
+    window.addEventListener("scroll", check, { passive: true });
+    return () => window.removeEventListener("scroll", check);
   }, [threshold]);
 
   return visible;
@@ -63,8 +47,4 @@ export function BackToTop() {
       <ChevronUp className="h-6 w-6" aria-hidden="true" />
     </button>
   );
-}
-
-export function BackToTopSentinel() {
-  return <div id={TOP_SENTINEL_ID} className="relative h-1 w-1" aria-hidden="true" />;
 }
