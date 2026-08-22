@@ -72,6 +72,9 @@ function PlaybookDemoView() {
     [playbook.subBrand],
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
+  // Per-asset edits (text blocks, caption, photo panel) for both light and
+  // dark variants — same model the social demos and kit builder use.
+  const assetEdits = useSocialAssetEdits();
   // Hand-authored playbook copy wins over the seeded module story so the
   // socials speak to the event itself (booth number, "come visit us").
   const source = useMemo(
