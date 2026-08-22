@@ -198,6 +198,7 @@ export function PrintLibraryBrowser({
               onDivisionChange(e.target.value);
               setCollection("All");
               setSubId(null);
+              setDivisionPickerOpen(false);
             }}
             className="max-w-[13rem] cursor-pointer truncate bg-transparent pr-1 text-xs font-medium text-[#03002C] outline-none"
           >
