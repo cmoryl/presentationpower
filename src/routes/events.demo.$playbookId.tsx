@@ -133,12 +133,13 @@ function PlaybookDemoView() {
       dateLine: d,
       hashtag: playbook.facts.hashtag || "#TransPerfectNEXT",
       url: playbook.facts.registrationUrl || "transperfect.com/next",
-      accent: playbook.accent,
+      accent: look.accent,
       logoWide: nextSuite?.wide ?? { url: wide, ratio: 4.6 },
       logoStacked: nextSuite?.stacked ?? { url: stacked, ratio: 2.1 },
       logoNeedsKnockout: nextSuite ? undefined : !logos?.white,
+      lookId: look.id,
     };
-  }, [nextSuite, playbook]);
+  }, [nextSuite, playbook, look]);
 
   const startDate = playbook.facts.startDate
     ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
