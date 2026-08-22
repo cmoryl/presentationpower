@@ -88,7 +88,18 @@ function PrintDemoPage() {
     });
   }, [item]);
 
+  // Rendered comp inputs: division-seeded content through the real layout, with
+  // the master's pinned look & feel so the demo matches the editable copy.
+  const previewContent = useMemo(() => {
+    if (!item) return null;
+    const base = toEditableContent(item);
+    return base ? applyDivisionSeedToContent(base, seed) : null;
+  }, [item, seed]);
+
   if (!def || !item) return null;
+  const previewLook = parseLook(item.look) ?? {};
+  const previewBrand =
+    BRAND_MODES.find((b) => b.id === (item.divisionId ?? "bm-enterprise")) ?? BRAND_MODES[0];
   const accent = def.accent;
   const art = showcaseArt(demoId);
   const kindLabel = printTypeMeta(item.kind).label;
