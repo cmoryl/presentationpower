@@ -1,20 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronUp } from "lucide-react";
 
-const SCROLL_THRESHOLD = 320;
+const TOP_SENTINEL_ID = "back-to-top-sentinel";
 
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY ?? window.pageYOffset ?? 0;
-      setVisible(y > SCROLL_THRESHOLD);
-    };
+    const sentinel = document.getElementById(TOP_SENTINEL_ID);
+    if (!sentinel) return;
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setVisible(!entry.isIntersecting);
+      },
+      { threshold: 0, rootMargin: "0px 0px -100% 0px" },
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
   }, []);
 
   const handleClick = () => {
@@ -41,4 +45,8 @@ export function BackToTop() {
       <ChevronUp className="h-6 w-6" aria-hidden="true" />
     </button>
   );
+}
+
+export function BackToTopSentinel() {
+  return <div id={TOP_SENTINEL_ID} className="absolute left-0 top-0 h-1 w-1" aria-hidden="true" />;
 }
