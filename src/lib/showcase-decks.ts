@@ -11,6 +11,7 @@
 import type { TemplatePayload } from "./deck-store";
 import { EXTRA_SHOWCASE_DECKS } from "./showcase-decks-extra";
 import type { ShowcaseDeckDef } from "./showcase-decks-types";
+import { enrichShowcasePayload } from "./showcase-enrich";
 
 export type { ShowcaseDeckDef };
 
@@ -426,7 +427,7 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Style pack + industry ground already selected",
       "Opens editable: swap the client, keep the narrative",
     ],
-    build: buildGlobalLinkPitch,
+    build: () => enrichShowcasePayload(buildGlobalLinkPitch(), "globallink"),
   },
   {
     id: "lifesci-regulated-program",
@@ -443,7 +444,7 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Zero-findings evidence with anonymized reference quote",
       "Opens editable: retarget to any filing calendar",
     ],
-    build: buildLifeSciencesProgram,
+    build: () => enrichShowcasePayload(buildLifeSciencesProgram(), "lifesci"),
   },
   ...EXTRA_SHOWCASE_DECKS,
 ];

@@ -9,6 +9,7 @@
 
 import type { TemplatePayload } from "./deck-store";
 import type { ShowcaseDeckDef } from "./showcase-decks-types";
+import { enrichShowcasePayload } from "./showcase-enrich";
 
 /* ------------------------------------------------------------------ */
 /* Legal · multilingual eDiscovery review program                      */
@@ -621,7 +622,7 @@ export const EXTRA_SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Recall and QC numbers opposing counsel can test",
       "Opens editable: swap the matter, keep the argument",
     ],
-    build: buildLegalEdiscovery,
+    build: () => enrichShowcasePayload(buildLegalEdiscovery(), "legal"),
   },
   {
     id: "gaming-sim-ship-launch",
@@ -638,7 +639,7 @@ export const EXTRA_SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Voice, text and LQA scoped on one slide",
       "Opens editable: retarget to any title or platform mix",
     ],
-    build: buildGamingLaunch,
+    build: () => enrichShowcasePayload(buildGamingLaunch(), "gaming"),
   },
   {
     id: "digital-growth-localization",
@@ -655,6 +656,6 @@ export const EXTRA_SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Conversion, CAC and organic lift on one proof slide",
       "Opens editable: drop in your own funnel baseline",
     ],
-    build: buildDigitalGrowth,
+    build: () => enrichShowcasePayload(buildDigitalGrowth(), "digital"),
   },
 ];
