@@ -23,6 +23,10 @@ import { aspectClass } from "@/lib/social-formats";
 import type { CampaignCopy, EventFacts } from "@/lib/campaigns";
 import { resolveSocialStyle, type SocialStyleId } from "@/lib/social-styles";
 import { statGradient } from "@/lib/stat-contrast";
+import {
+  applySocialCopyEdit,
+  type SocialAssetEdit,
+} from "@/lib/social-asset-edit";
 
 type Preset = {
   padPct: number;
@@ -405,6 +409,9 @@ export type SocialRendererProps = {
   /** Optional event lockup (e.g. TransPerfect NEXT · City Series). When set it
    *  replaces the division wordmark so the event brand leads the asset. */
   eventLogo?: { url: string; ratio: number; urlDark?: string };
+  /** Per-asset edit patch from the asset editor — copy overrides, caption,
+   *  photo-panel geometry, and copy type scale. Undefined = untouched asset. */
+  edit?: SocialAssetEdit;
   /** Display size in CSS pixels — the frame renders at format.width×.height
    *  and this prop just scales the wrapper. Defaults to 320px on the short
    *  edge for grid previews. */
@@ -415,7 +422,7 @@ export function SocialRenderer({
   format,
   brandId,
   mode,
-  copy,
+  copy: copyProp,
   facts,
   imageUrl,
   imageScrimPct = 55,
@@ -423,13 +430,15 @@ export function SocialRenderer({
 
   styleId,
   eventLogo,
+  edit,
   displayShortEdge = 320,
 }: SocialRendererProps) {
+  const copy = applySocialCopyEdit(copyProp, edit);
   const brand = findBrand(brandId);
   const preset = presetFor(format);
   const tune = format.tune ?? {};
   // The caller wins; otherwise the platform preset decides bleed vs panel.
-  const imageLayout = imageLayoutProp ?? tune.imageLayout ?? "bleed";
+  const imageLayout = edit?.imageLayout ?? imageLayoutProp ?? tune.imageLayout ?? "bleed";
   const style = resolveSocialStyle(styleId);
 
   const short = Math.min(format.width, format.height);
@@ -462,7 +471,7 @@ export function SocialRenderer({
 
   // The style decides where copy anchors; the photo subject and scrim flip
   // to sit in the opposite half of the frame.
-  const copyAlign = style.copyAlign;
+  const copyAlign = edit?.copyAlign ?? style.copyAlign;
   const scrim = Math.min(100, imageScrimPct * style.scrimMultiplier);
 
   // ---- Rule of thirds ------------------------------------------------------
@@ -487,7 +496,9 @@ export function SocialRenderer({
           : 74
         : focalY;
 
-  const objectPosition = `center ${focalYAdjusted}%`;
+  const focalX = edit?.focalXPct ?? 50;
+  const focalYFinal = edit?.focalYPct ?? focalYAdjusted;
+  const objectPosition = `${focalX}% ${focalYFinal}%`;
 
   // ---- Panel composition ---------------------------------------------------
   // "panel" keeps the artwork and the copy in separate zones. The panel rect is
@@ -497,16 +508,19 @@ export function SocialRenderer({
   // stretched, and the copy region shrinks by exactly the panel size.
   const panelMode = Boolean(imageUrl) && imageLayout === "panel";
   const panelSide: "right" | "top" =
-    cls === "landscape-wide" || cls === "landscape" ? "right" : "top";
+    edit?.panelSide ?? (cls === "landscape-wide" || cls === "landscape" ? "right" : "top");
   const panelGap = (short * 3.2) / 100;
+  const panelFrac =
+    edit?.panelSizePct != null ? Math.min(70, Math.max(24, edit.panelSizePct)) / 100 : null;
   const panelW =
     panelSide === "right"
-      ? (format.width - safeInset.left - safeInset.right) * (cls === "landscape-wide" ? 0.4 : 0.44)
+      ? (format.width - safeInset.left - safeInset.right) *
+        (panelFrac ?? (cls === "landscape-wide" ? 0.4 : 0.44))
       : 0;
   const panelH =
     panelSide === "top"
       ? (format.height - safeInset.top - safeInset.bottom) *
-        (cls === "portrait-tall" ? 0.46 : cls === "portrait" ? 0.42 : 0.4)
+        (panelFrac ?? (cls === "portrait-tall" ? 0.46 : cls === "portrait" ? 0.42 : 0.4))
       : 0;
   const panelRect: CSSProperties =
     panelSide === "right"
@@ -568,6 +582,7 @@ export function SocialRenderer({
           : 0.86
         : 1) *
     (tune.copyScaleMul ?? 1) *
+    Math.min(1.35, Math.max(0.7, edit?.typeScale ?? 1)) *
     safeFit;
   const titleLines =
     tune.titleLines ??
@@ -799,7 +814,14 @@ export function SocialRenderer({
               alt=""
               crossOrigin="anonymous"
               className="absolute inset-0 size-full object-cover"
-              style={{ objectPosition: panelSide === "right" ? "center 42%" : objectPosition }}
+              style={{
+                objectPosition:
+                  edit?.focalXPct != null || edit?.focalYPct != null
+                    ? objectPosition
+                    : panelSide === "right"
+                      ? "center 42%"
+                      : objectPosition,
+              }}
             />
             {/* Accent edge tying the crop back to the division palette. */}
             <div
@@ -921,6 +943,20 @@ export function SocialRenderer({
                 mode={mode}
               />
             )}
+
+            {edit?.caption?.trim() ? (
+              <div
+                style={{
+                  fontSize: (short * preset.summaryPct * 0.82 * copyScale) / 100,
+                  lineHeight: 1.3,
+                  color: dimColor,
+                  maxWidth: copyMaxWidth,
+                  letterSpacing: "0.01em",
+                }}
+              >
+                {edit.caption}
+              </div>
+            ) : null}
 
             <div
               className="flex flex-wrap items-center gap-3"
