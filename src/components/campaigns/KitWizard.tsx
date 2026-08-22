@@ -319,6 +319,16 @@ export function KitWizard({
     return { ...event, subBrand: brandId };
   }, [attachEvent, event, brandId]);
 
+  // Layout/geometry contract for the rendered assets: the kit's locked look
+  // wins, then the division's stored campaign direction, then the authored
+  // default. This is what keeps agent-built kits visually cohesive with the
+  // social, event and digital assets of the same campaign.
+  const activeStyleId = useMemo(
+    () =>
+      campaignArtDirection({ brandId, lookId: kitLook.lookId, styleId: kitLook.styleId }).styleId,
+    [brandId, kitLook.lookId, kitLook.styleId],
+  );
+
   const assets: CampaignAsset[] = useMemo(() => {
     if (!source) return [];
     const activeFormats = formatIds.filter((id) => !!SOCIAL_FORMATS_BY_ID[id]);
