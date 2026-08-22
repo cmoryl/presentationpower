@@ -42,8 +42,9 @@ export interface GamesPlate {
   texture: "flat" | "textured";
   composition: string;
   variant: string;
-  energyRegion: GamesRegion;
-  quiet: GamesRegion[];
+  /** Free-form in the kit vocabulary ("bottom-left", "lower centre band", …). */
+  energyRegion: string;
+  quiet: string[];
   activity: GamesActivity;
 }
 
@@ -196,7 +197,7 @@ export function hasGamesSceneArt(code: string | null | undefined): boolean {
 export function gamesPlatesForScene(scene: SkinScene, mode: GamesArtMode): GamesPlate[] {
   const brief = SCENE_BRIEF[scene] ?? SCENE_BRIEF.statement;
   const scored = GAMES_PLATES.filter((p) => p.mode === mode).map((p) => {
-    const covered = brief.copy.filter((rg) => p.quiet.includes(rg)).length;
+    const covered = brief.copy.filter((rg) => p.quiet.some((q) => q === rg || q === "any" || q.includes(rg))).length;
     const want = brief.loud ? 3 : 1;
     const activityGap = Math.abs(ACTIVITY_RANK[p.activity] - want);
     return { p, score: covered * 10 - activityGap };
