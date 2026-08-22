@@ -2265,6 +2265,7 @@ function QuoteAttribution({
 
 /** 7b — three-up story cards (photo top, logo, trimmed quote). */
 function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const pb = useProposalBrand();
   const { accent: BLUE } = useProposalBrand();
   const quotes = (page.quotes ?? []).slice(0, 3);
   const photos = [PROPOSAL_ART.photoClouds, PROPOSAL_ART.photoCoffee, PROPOSAL_ART.teamGrid];
@@ -2346,13 +2347,14 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
         );
       })}
 
-      <Img x={3.37} y={10.18} w={1.68} h={0.21} src={useProposalBrandLogoDark()} alt="TransPerfect" />
+      <Img x={3.37} y={10.18} w={1.68} h={0.21} src={pb.logoDark} alt="TransPerfect" />
     </>
   );
 }
 
 /** 7c — one hero case study: full-bleed photo, reversed pull quote, KPI band. */
 function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
+  const pb = useProposalBrand();
   const { deepField: DEEP_FIELD } = useProposalBrand();
   const q = (page.quotes ?? [])[0];
   const stats = (page.stats ?? []).slice(0, 3);
@@ -2484,13 +2486,14 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
         </Fragment>
       ))}
 
-      <Img x={3.37} y={10.66} w={1.68} h={0.21} src={PROPOSAL_ART.logoWhite} alt="TransPerfect" />
+      <Img x={3.37} y={10.66} w={1.68} h={0.21} src={pb.logoWhite} alt="TransPerfect" />
     </>
   );
 }
 
 /** 7d — quote wall: four testimonials, two-up, no photography. */
 function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const pb = useProposalBrand();
   const { accent: BLUE } = useProposalBrand();
   const quotes = (page.quotes ?? []).slice(0, 4);
   const cardW = 3.72;
@@ -2545,7 +2548,7 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
           {page.footnote}
         </T>
       ) : null}
-      <Img x={3.37} y={10.76} w={1.68} h={0.21} src={useProposalBrandLogoDark()} alt="TransPerfect" />
+      <Img x={3.37} y={10.76} w={1.68} h={0.21} src={pb.logoDark} alt="TransPerfect" />
     </>
   );
 }
@@ -3542,6 +3545,7 @@ export function MultiProposalLayout({
   // Division branding: lockups and accent come from the proposal's own brand
   // mode, so a Legal master prints the Legal lockup, Element prints Element, and
   // so on — never the master TransPerfect artwork by default.
+  const pb = useProposalBrand();
   const pb = resolveProposalBrand(brand);
   const accent = pb.accent;
   const pages = content.pages ?? [];
