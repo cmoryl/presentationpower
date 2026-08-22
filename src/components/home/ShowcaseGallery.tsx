@@ -24,11 +24,7 @@ import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { SHOWCASE_DECKS } from "@/lib/showcase-decks";
-
-import demoPresentationImg from "@/assets/showcase/demo-presentation.jpg";
-import demoPrintImg from "@/assets/showcase/demo-print.jpg";
-import demoEventImg from "@/assets/showcase/demo-event.jpg";
-import demoSocialImg from "@/assets/showcase/demo-social.jpg";
+import { showcaseArt } from "@/lib/showcase-art";
 
 type ShowcaseEntry = {
   id: string;
