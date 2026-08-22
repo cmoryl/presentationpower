@@ -458,22 +458,76 @@ export function SocialRenderer({
     cls === "portrait-tall" ? (copyAlign === "end" ? 26 : 74) : focalY;
   const objectPosition = `center ${focalYAdjusted}%`;
 
+  // ---- Panel composition ---------------------------------------------------
+  // "panel" keeps the artwork and the copy in separate zones. The panel rect is
+  // derived from the frame's own aspect class, so a 1200×400 header gets a tall
+  // right-hand column while a 1080×1350 portrait gets a deep top band — the
+  // photo is always cropped (object-cover) to the panel's own aspect, never
+  // stretched, and the copy region shrinks by exactly the panel size.
+  const panelMode = Boolean(imageUrl) && imageLayout === "panel";
+  const panelSide: "right" | "top" =
+    cls === "landscape-wide" || cls === "landscape" ? "right" : "top";
+  const panelGap = (short * 3.2) / 100;
+  const panelW =
+    panelSide === "right"
+      ? (format.width - safeInset.left - safeInset.right) * (cls === "landscape-wide" ? 0.4 : 0.44)
+      : 0;
+  const panelH =
+    panelSide === "top"
+      ? (format.height - safeInset.top - safeInset.bottom) *
+        (cls === "portrait-tall" ? 0.46 : cls === "portrait" ? 0.42 : 0.4)
+      : 0;
+  const panelRect: CSSProperties =
+    panelSide === "right"
+      ? {
+          top: safeInset.top,
+          bottom: safeInset.bottom,
+          right: safeInset.right,
+          width: panelW,
+        }
+      : {
+          top: safeInset.top,
+          left: safeInset.left,
+          right: safeInset.right,
+          height: panelH,
+        };
+  const contentInset = {
+    top: safeInset.top + (panelMode && panelSide === "top" ? panelH + panelGap : 0),
+    bottom: safeInset.bottom,
+    left: safeInset.left,
+    right: safeInset.right + (panelMode && panelSide === "right" ? panelW + panelGap : 0),
+  };
+
+  // A full-bleed photo is the only case that needs a copy plate + scrim.
+  const bleedImage = Boolean(imageUrl) && !panelMode;
+
   // Copy band: how much of the frame the copy stack may occupy, opposite the
   // subject. Enforced through the line clamps below rather than a hard crop —
   // a cap that slices through a line of text reads worse than a deeper band.
 
   // Wide frames also thirds horizontally — copy occupies two thirds, the
   // subject's third stays clear.
-  const copyMaxWidth =
-    imageUrl && (cls === "landscape-wide" || cls === "landscape")
+  const copyMaxWidth = panelMode
+    ? format.width - contentInset.left - contentInset.right
+    : bleedImage && (cls === "landscape-wide" || cls === "landscape")
       ? format.width * 0.66
       : format.width * 0.92;
 
   // Photography competes with type, so tighten the stack when an image is on.
   // Wide frames give the copy the least room, so they shrink hardest — a
   // clipped half-sentence reads worse than slightly smaller type.
-  const copyScale = imageUrl ? (cls === "landscape-wide" ? 0.8 : 0.9) : 1;
-  const titleLines = cls === "landscape-wide" ? (imageUrl ? 3 : 2) : imageUrl ? 3 : 4;
+  const copyScale = bleedImage
+    ? cls === "landscape-wide"
+      ? 0.8
+      : 0.9
+    : panelMode
+      ? cls === "landscape-wide"
+        ? 0.74
+        : 0.86
+      : 1;
+  const titleLines =
+    cls === "landscape-wide" ? (imageUrl ? 3 : 2) : panelMode ? 4 : imageUrl ? 3 : 4;
+
 
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
