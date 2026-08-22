@@ -207,16 +207,46 @@ function ElementsLanding() {
         <div className="grid gap-5 lg:grid-cols-2">
           {SURFACES.map((s) => {
             const Icon = s.icon;
+            const art = showcaseArt(s.artId);
             return (
               <article
                 key={s.id}
-                className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white p-6 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_18px_50px_-30px_rgba(3,0,44,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-28px_rgba(3,0,44,0.4)]"
+                className="group relative overflow-hidden rounded-3xl border border-black/10 bg-white pb-6 shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_18px_50px_-30px_rgba(3,0,44,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-28px_rgba(3,0,44,0.4)]"
               >
+                {/* cinematic art band — real demo photography per surface */}
+                <div className="relative h-[168px] overflow-hidden sm:h-[196px]">
+                  <img
+                    src={art.src}
+                    alt={art.alt}
+                    loading="lazy"
+                    width={1536}
+                    height={1024}
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
+                  />
+                  <span
+                    aria-hidden
+                    className="absolute inset-0"
+                    style={{
+                      background: `linear-gradient(180deg, ${s.accent}26 0%, transparent 42%, rgba(255,255,255,0.92) 100%)`,
+                    }}
+                  />
+                  <div className="absolute inset-x-0 bottom-0 flex flex-wrap gap-1.5 px-6 pb-3">
+                    {s.proof.map((p) => (
+                      <span
+                        key={p}
+                        className="rounded-full border border-black/10 bg-white/85 px-2.5 py-0.5 text-[11px] font-semibold text-[#03002C] backdrop-blur"
+                      >
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                </div>
                 <div
                   aria-hidden
                   className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full blur-[80px] opacity-25 transition group-hover:opacity-40"
                   style={{ background: s.glow }}
                 />
+
                 <div className="relative flex items-start gap-5">
                   <ElementBrickRail
                     thickness="7px"
