@@ -617,6 +617,7 @@ function SignatureHeader({
 }
 
 function BandHeader({ title, logo }: { title: string; logo: string }) {
+  const { brightField: BRIGHT_FIELD } = useProposalBrand();
   return (
     <>
       <L x={0} y={0} w={PAGE_W_IN} h={2.95} style={{ background: BRIGHT_FIELD }} />
@@ -710,6 +711,7 @@ function ClientLogoSlot({
 // ---------------------------------------------------------------------------
 
 function CoverPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string }) {
+  const { accent: BLUE } = useProposalBrand();
   const prepared = page.cards ?? [];
   const forBlock = prepared[0];
   const byBlock = prepared[1];
@@ -1028,6 +1030,7 @@ function StatsPage({
   pageIndex: number;
   logoWhite: string;
 }) {
+  const { deepField: DEEP_FIELD } = useProposalBrand();
   const authoredHeadline = paragraphLines(page.title);
   const headline = authoredHeadline.length
     ? authoredHeadline
@@ -1380,6 +1383,7 @@ function CostPage({
   pageIndex: number;
   logoWhite: string;
 }) {
+  const { accent: BLUE } = useProposalBrand();
   const rows = page.costRows ?? [];
   const editCtx = usePrintLogoList();
   const editing = !!editCtx?.active;
@@ -1635,6 +1639,7 @@ function LocationsPage({
   pageIndex: number;
   logoWhite: string;
 }) {
+  const { deepField: DEEP_FIELD } = useProposalBrand();
   const title = lines(page.title).length ? lines(page.title) : ["Global", "Locations"];
   const listCtx = usePrintLogoList();
   const pinPath = `pages.${pageIndex}.mapPins`;
@@ -1748,6 +1753,7 @@ function RegionLocationsPage({
   pageIndex: number;
   logoWhite: string;
 }) {
+  const { deepField: DEEP_FIELD } = useProposalBrand();
   const regionKey = page.mapRegion ?? "AMERICAS";
   const region = PROPOSAL_REGIONS.find((r) => r.region === regionKey);
   const cities = (region?.columns ?? []).flat();
@@ -1856,6 +1862,7 @@ function ClientsPage({
   logoWhite: string;
   pageIndex: number;
 }) {
+  const { accent: BLUE, brightField: BRIGHT_FIELD } = useProposalBrand();
   const title = lines(page.title).length ? lines(page.title) : ["Our", "clients."];
   const editing = !!usePrintImageEdit()?.active;
 
@@ -1971,6 +1978,7 @@ function Dots({ x, y, color = NAVY }: { x: number; y: number; color?: string }) 
 }
 
 function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const { accent: BLUE } = useProposalBrand();
   const quotes = page.quotes ?? [];
   const first = quotes[0];
   const second = quotes[1];
@@ -2257,6 +2265,7 @@ function QuoteAttribution({
 
 /** 7b — three-up story cards (photo top, logo, trimmed quote). */
 function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const { accent: BLUE } = useProposalBrand();
   const quotes = (page.quotes ?? []).slice(0, 3);
   const photos = [PROPOSAL_ART.photoClouds, PROPOSAL_ART.photoCoffee, PROPOSAL_ART.teamGrid];
   const cardW = 2.42;
@@ -2344,6 +2353,7 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
 
 /** 7c — one hero case study: full-bleed photo, reversed pull quote, KPI band. */
 function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
+  const { deepField: DEEP_FIELD } = useProposalBrand();
   const q = (page.quotes ?? [])[0];
   const stats = (page.stats ?? []).slice(0, 3);
   const logo = storyLogo(q?.company);
@@ -2481,6 +2491,7 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
 
 /** 7d — quote wall: four testimonials, two-up, no photography. */
 function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const { accent: BLUE } = useProposalBrand();
   const quotes = (page.quotes ?? []).slice(0, 4);
   const cardW = 3.72;
   const cardH = 3.32;
@@ -2556,6 +2567,7 @@ const WHY_GRID_COLS = 8;
 const WHY_GRID_ROWS = 4;
 
 function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string }) {
+  const { accent: BLUE, deepField: DEEP_FIELD } = useProposalBrand();
   const bullets = page.bullets?.length ? page.bullets : WHY_LINES;
   const team = page.team ?? [];
   const tileW = 8.53 / WHY_GRID_COLS;
@@ -2719,6 +2731,7 @@ function AdvocatesPage({
   logoWhite: string;
   pageIndex: number;
 }) {
+  const { accent: BLUE } = useProposalBrand();
   const advocacy = page.cards?.[0];
   const affinity = page.cards?.[1];
   const rail = (page.cards ?? []).slice(2, 5);
@@ -3049,6 +3062,7 @@ function TeamPage({
   logoWhite: string;
   bios: boolean;
 }) {
+  const { accent: BLUE } = useProposalBrand();
   const team = page.team ?? [];
   return (
     <>
@@ -3170,6 +3184,7 @@ function TeamPage({
 
 /** Photo card grid — 3 columns × 2 rows of headshot cards. */
 function TeamCardsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const { accent: BLUE } = useProposalBrand();
   const team = page.team ?? [];
   return (
     <>
@@ -3247,6 +3262,7 @@ function TeamCardsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite
 
 /** Two engagement leads, large portraits with a full bio column. */
 function TeamLeadsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const { accent: BLUE } = useProposalBrand();
   const team = page.team ?? [];
   return (
     <>
@@ -3314,6 +3330,7 @@ function TeamLeadsPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite
 
 /** Dense headshot wall — up to 12 people on a single page. */
 function TeamWallPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const { accent: BLUE, brightField: BRIGHT_FIELD } = useProposalBrand();
   const team = page.team ?? [];
   return (
     <>
@@ -3390,6 +3407,7 @@ function TeamWallPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite:
 }
 
 function SummaryPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
+  const { accent: BLUE, brightField: BRIGHT_FIELD } = useProposalBrand();
   const bullets = page.bullets ?? [];
   return (
     <>
@@ -3521,6 +3539,7 @@ export function MultiProposalLayout({
   /** Render one page only (used by thumbnails). Omit to render the document. */
   pageIndex?: number;
 }) {
+  const { accent: BLUE } = useProposalBrand();
   const accent = brand?.tokens?.accent || brand?.tokens?.primary || BLUE;
   const pages = content.pages ?? [];
   const shown = typeof pageIndex === "number" ? pages.slice(pageIndex, pageIndex + 1) : pages;
