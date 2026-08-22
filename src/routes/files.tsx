@@ -178,12 +178,6 @@ function MyFilesPage() {
               Decks, individual saved slides, print assets, saved modules, and social surfaces —
               saved automatically as you work. Search, reopen, or clear out what you no longer need.
             </p>
-            <div className="mt-6 flex flex-wrap items-center gap-6">
-              <HeroStat value={rows.length} label="Saved items" />
-              <HeroStat value={counts.deck ?? 0} label="Presentations" accent="#003FC7" />
-              <HeroStat value={counts.print ?? 0} label="Print assets" accent="#EC388A" />
-              <HeroStat value={counts.slide ?? 0} label="Slides" accent="#8A5CF6" />
-            </div>
           </div>
         </section>
 
