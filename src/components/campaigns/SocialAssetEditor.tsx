@@ -8,6 +8,7 @@ import { X, RotateCcw, Pencil } from "lucide-react";
 import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns/SocialRenderer";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import type { SocialAssetEdit } from "@/lib/social-asset-edit";
+import { photoForFormat } from "@/lib/social-photography";
 
 type RendererProps = Omit<SocialRendererProps, "displayShortEdge" | "edit">;
 
@@ -97,7 +98,14 @@ function SocialAssetEditorModal({
   const patch = (p: Partial<SocialAssetEdit>) => onChange({ ...edit, ...p });
 
   const baseCopy = rendererProps.copy;
-  const hasImage = Boolean(rendererProps.imageUrl);
+  // Photography can be attached by the edit itself, so assets the pipeline
+  // produced without imagery (common on dark variants for divisions with no
+  // photo pool) still get the full panel toolkit.
+  const fallbackPhoto =
+    photoForFormat(rendererProps.brandId, format) ?? photoForFormat("bm-tp-master", format);
+  const effectiveImage =
+    edit.imageUrl !== undefined ? edit.imageUrl || undefined : rendererProps.imageUrl;
+  const hasImage = Boolean(effectiveImage);
   const panelActive = hasImage && (edit.imageLayout ?? rendererProps.imageLayout) === "panel";
 
   const preview = useMemo(
@@ -226,12 +234,35 @@ function SocialAssetEditorModal({
             </Group>
 
             <Group title="Photography">
+              <div className="flex flex-wrap items-center gap-2">
+                {!hasImage ? (
+                  <button
+                    type="button"
+                    disabled={!fallbackPhoto}
+                    onClick={() =>
+                      patch({ imageUrl: fallbackPhoto, imageLayout: edit.imageLayout ?? "panel" })
+                    }
+                    className="inline-flex min-h-[32px] items-center rounded-full border border-black/15 px-3 text-[11px] font-medium text-black/70 transition hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-40"
+                  >
+                    {fallbackPhoto ? "Attach division photo" : "No photography available"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => patch({ imageUrl: "" })}
+                    className="inline-flex min-h-[32px] items-center rounded-full border border-black/15 px-3 text-[11px] font-medium text-black/70 transition hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                  >
+                    Remove photo
+                  </button>
+                )}
+              </div>
               {!hasImage ? (
                 <p className="text-xs text-black/55">
-                  This asset has no photo attached — panel controls unlock once imagery is set.
+                  This asset renders copy-only — attach photography to unlock the panel controls.
                 </p>
               ) : (
                 <>
+
                   <Segmented
                     label="Layout"
                     value={edit.imageLayout ?? rendererProps.imageLayout ?? "bleed"}

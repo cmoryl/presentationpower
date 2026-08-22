@@ -36,6 +36,7 @@ import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 import { PlaybookGallery } from "@/components/events/PlaybookGallery";
 import type { CollateralContext } from "@/components/events/CollateralArtwork";
 import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
+import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
   loader: ({ params }) => {
@@ -71,6 +72,9 @@ function PlaybookDemoView() {
     [playbook.subBrand],
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
+  // Per-asset edits (text blocks, caption, photo panel) for both light and
+  // dark variants — same model the social demos and kit builder use.
+  const assetEdits = useSocialAssetEdits();
   // Hand-authored playbook copy wins over the seeded module story so the
   // socials speak to the event itself (booth number, "come visit us").
   const source = useMemo(
@@ -302,9 +306,13 @@ function PlaybookDemoView() {
             // panel sized to the frame's aspect; dark variants run full bleed.
             const imageUrl = photoForFormat(a.brandId, a.format);
             const panel = a.mode === "light";
+            const editKey = socialEditKey(`events-demo:${playbook.id}`, a.id);
             return (
               <AssetPreviewCard
                 key={a.id}
+                edit={assetEdits.get(editKey)}
+                onEditChange={(next) => assetEdits.set(editKey, next)}
+                onEditReset={() => assetEdits.reset(editKey)}
                 rendererProps={{
                   format: a.format,
                   brandId: a.brandId,
