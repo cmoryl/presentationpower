@@ -66,7 +66,7 @@ export function ElementShowreel() {
           </h2>
           <p className="mt-4 max-w-md text-[15px] leading-relaxed text-white/70">
             The same approved modules, palette and brand rules render a deck, a press-ready print
-            piece, an event kit and a full social run — no redesign between them, no版 drift, nothing
+            piece, an event kit and a full social run — no redesign between them, no drift, nothing
             to rebuild.
           </p>
           <ElementBrickRow thickness="6px" unit="7px" gap="5px" style={{ marginTop: 24 }} />
