@@ -19,6 +19,9 @@ import { toEditableContent, editableContextFor } from "@/lib/print-library/edita
 import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-apply";
 import { useDivisionSeed } from "@/lib/division-seeds";
 import { printTypeMeta } from "@/lib/print-library/catalog";
+import { parseLook } from "@/lib/print-library/look";
+import { BRAND_MODES } from "@/lib/taxonomy";
+import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 
 export const Route = createFileRoute("/demo/print/$demoId")({
   loader: ({ params }) => {
