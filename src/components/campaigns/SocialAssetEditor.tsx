@@ -12,7 +12,7 @@ import { useIsAdmin } from "@/hooks/use-is-admin";
 import type { SocialAssetEdit } from "@/lib/social-asset-edit";
 import { clearSocialAssetDefault, saveSocialAssetDefault } from "@/lib/social-asset-edit";
 import { photoForFormat, SOCIAL_PHOTO_SETS } from "@/lib/social-photography";
-import { aspectClass } from "@/lib/social-formats";
+import { aspectClass, type SocialFormat } from "@/lib/social-formats";
 import { listSlideMedia, uploadSlideMedia, type SlideMediaItem } from "@/lib/slide-media";
 
 type RendererProps = Omit<SocialRendererProps, "displayShortEdge" | "edit">;
@@ -523,12 +523,12 @@ function PhotoPicker({
   onClose,
 }: {
   brandId: string;
-  format: { width: number; height: number };
+  format: SocialFormat;
   library: SlideMediaItem[];
   onPick: (url: string) => void;
   onClose: () => void;
 }) {
-  const cls = aspectClass(format as never);
+  const cls = aspectClass(format);
   const key = cls === "portrait-tall" || cls === "portrait" ? "tall" : cls.startsWith("landscape") ? "wide" : "square";
   const sets = Object.entries(SOCIAL_PHOTO_SETS);
   const ordered = [
