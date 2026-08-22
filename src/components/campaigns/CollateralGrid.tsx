@@ -150,8 +150,15 @@ export function CollateralGrid({
   artworkCtx?: CollateralContext;
 }) {
   const [open, setOpen] = useState<PlaybookDeliverable | null>(null);
-  const liveItems = items.filter((d) => (d.status ?? "live") === "live");
-  const soonItems = items.filter((d) => (d.status ?? "live") === "coming-soon");
+  // Demos are fully rendered: when an artwork context is supplied every piece
+  // gets a finished comp, so there is no roadmap bucket to split off.
+  const allRendered = Boolean(artworkCtx);
+  const liveItems = allRendered
+    ? items
+    : items.filter((d) => (d.status ?? "live") === "live");
+  const soonItems = allRendered
+    ? []
+    : items.filter((d) => (d.status ?? "live") === "coming-soon");
 
   const renderGroups = (rows: PlaybookDeliverable[], soon: boolean) => {
     const byCat = new Map<string, PlaybookDeliverable[]>();
@@ -189,7 +196,7 @@ export function CollateralGrid({
                 ) : null}
                 <div className="flex items-center justify-between gap-2">
                   <SurfacePill surface={d.surface} />
-                  <StatusRibbon status={d.status} />
+                  <StatusRibbon status={allRendered ? "live" : d.status} />
                 </div>
                 <div className="mt-1">
                   <div
@@ -219,11 +226,13 @@ export function CollateralGrid({
       ) : null}
       <div className="flex flex-wrap items-center gap-3 text-[11px] text-black/55">
         <span className="inline-flex items-center gap-1 rounded-full border border-[#A6FA87]/40 bg-[#A6FA8722] px-2 py-0.5 font-semibold uppercase tracking-widest text-[#2F6D1B]">
-          <CircleCheck size={12} /> {liveItems.length} live
+          <CircleCheck size={12} /> {liveItems.length} rendered
         </span>
-        <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/85 px-2 py-0.5 font-semibold uppercase tracking-widest text-black/55">
-          <Clock size={12} /> {soonItems.length} coming soon
-        </span>
+        {soonItems.length > 0 ? (
+          <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white/85 px-2 py-0.5 font-semibold uppercase tracking-widest text-black/55">
+            <Clock size={12} /> {soonItems.length} coming soon
+          </span>
+        ) : null}
         <span className="text-black/40">
           · {items.length} total collateral pieces in the full kit scope
         </span>
@@ -233,7 +242,8 @@ export function CollateralGrid({
         <div className="space-y-8">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1 rounded-full border border-[#A6FA87]/40 bg-[#A6FA8722] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#2F6D1B]">
-              <CircleCheck size={12} /> Rendering live now
+              <CircleCheck size={12} />{" "}
+              {allRendered ? "Every piece rendered" : "Rendering live now"}
             </span>
             <div className="h-px flex-1 bg-black/10" />
           </div>

@@ -19,6 +19,9 @@ import { toEditableContent, editableContextFor } from "@/lib/print-library/edita
 import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-apply";
 import { useDivisionSeed } from "@/lib/division-seeds";
 import { printTypeMeta } from "@/lib/print-library/catalog";
+import { parseLook } from "@/lib/print-library/look";
+import { BRAND_MODES } from "@/lib/taxonomy";
+import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 
 export const Route = createFileRoute("/demo/print/$demoId")({
   loader: ({ params }) => {
@@ -88,7 +91,18 @@ function PrintDemoPage() {
     });
   }, [item]);
 
+  // Rendered comp inputs: division-seeded content through the real layout, with
+  // the master's pinned look & feel so the demo matches the editable copy.
+  const previewContent = useMemo(() => {
+    if (!item) return null;
+    const base = toEditableContent(item);
+    return base ? applyDivisionSeedToContent(base, seed) : null;
+  }, [item, seed]);
+
   if (!def || !item) return null;
+  const previewLook = parseLook(item.look) ?? {};
+  const previewBrand =
+    BRAND_MODES.find((b) => b.id === (item.divisionId ?? "bm-enterprise")) ?? BRAND_MODES[0];
   const accent = def.accent;
   const art = showcaseArt(demoId);
   const kindLabel = printTypeMeta(item.kind).label;
@@ -173,7 +187,28 @@ function PrintDemoPage() {
         </div>
       </div>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+      {/* Rendered comps — the real print layout for every page of the piece. */}
+      <section className="mt-10">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold tracking-tight">Rendered preview</h2>
+          <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
+            Click any page to enlarge
+          </span>
+        </div>
+        <div className="mt-4">
+          <ShowcasePrintGallery
+            kind={item.kind}
+            content={previewContent}
+            brand={previewBrand}
+            mode={previewLook.mode}
+            pageSize={previewLook.pageSize}
+            density={previewLook.density}
+            accent={accent}
+          />
+        </div>
+      </section>
+
+      <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">
             {pages.length ? "Every page, already written" : "Every block, already written"}

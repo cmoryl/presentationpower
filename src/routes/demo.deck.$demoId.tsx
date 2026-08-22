@@ -7,6 +7,7 @@ import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateAppr
 import { useDeckStore } from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
+import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
 import { showcaseArt } from "@/lib/showcase-art";
 import {
   DEMO_DIVISIONS,
@@ -210,7 +211,22 @@ function ShowcaseDeckDemoPage() {
       </div>
 
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.15fr_minmax(0,0.85fr)]">
+      {/* Rendered comps — every slide of the demo, live from the renderer. */}
+      <section className="mt-10">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold tracking-tight">
+            Rendered preview · all {payload.slides.length} slides
+          </h2>
+          <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
+            Click any slide to enlarge
+          </span>
+        </div>
+        <div className="mt-4">
+          <ShowcaseSlideGallery payload={payload} accent={accent} />
+        </div>
+      </section>
+
+      <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_minmax(0,0.85fr)]">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight">
             Every slide, already written
