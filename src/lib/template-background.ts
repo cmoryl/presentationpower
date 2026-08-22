@@ -8,7 +8,7 @@
  *   • intensity   — 0 flattens toward the page field, 1 is as authored, 2 double
  *                   strikes the ground for a punchier read
  *   • tint        — a colour veil over the ground (brand pass, warm/cool shift)
- *   • imageUrl    — a custom or AI backdrop painted behind the CSS layers
+ *   • imageUrl    — a custom or AI backdrop painted in front of the CSS layers
  *
  * Wrapping keeps every downstream surface — previews, present/share, PPTX
  * decomposition — on the exact same layer contract.
