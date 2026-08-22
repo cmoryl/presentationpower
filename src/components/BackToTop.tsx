@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronUp } from "lucide-react";
 
 const TOP_SENTINEL_ID = "back-to-top-sentinel";
