@@ -42,7 +42,7 @@ export const Route = createFileRoute("/admin/division-seeds")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: DivisionSeedsPage;
+  component: DivisionSeedsPage,
 });
 
 type Draft = {
