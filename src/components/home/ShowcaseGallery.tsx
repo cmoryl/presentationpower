@@ -154,17 +154,18 @@ export function ShowcaseGallery() {
         {PRINT_DEMOS.map((p) => (
           <MediaCard
             key={p.id}
-            to={{ to: "/library/print", search: p.search }}
+            to={{ to: "/demo/print/$demoId", params: { demoId: p.id } }}
             art={showcaseArt(p.id).src}
             artAlt={showcaseArt(p.id).alt}
             accent={p.accent}
             icon={<Printer size={12} />}
-            label={p.label}
-            title={p.title}
+            label={`Print · ${p.eyebrow}`}
+            title={p.name}
             blurb={p.blurb}
             pills={[...p.pills]}
           />
         ))}
+
 
         {SHOWCASE.map((entry) => (
           <ShowcaseCard key={entry.id} entry={entry} />
