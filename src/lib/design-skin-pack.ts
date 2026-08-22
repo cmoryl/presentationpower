@@ -21,6 +21,7 @@ import { industrySceneLayers, coreSceneLayers } from "./industry-scene-art";
 import { GEOMETRY_SHEET } from "./pack-geometry";
 import { INDUSTRY_SKINS } from "./industry-skins";
 import { withElementSceneArt } from "./element-scene-art";
+import { withGamesSceneArt } from "./games-scene-art";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
@@ -500,7 +501,10 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
   // every surface built straight from a skin — catalog tiles, the lookbook, the
   // backdrop prompt — shows the same ground the deck renderer uses. High
   // contrast keeps the generated CSS ground for legibility.
-  return hc ? pack : withElementSceneArt(pack, (skin.code ?? "").toUpperCase());
+  const code = (skin.code ?? "").toUpperCase();
+  if (hc) return pack;
+  // Games (R22) paints from the authored bm-tp-games plate kit.
+  return withGamesSceneArt(withElementSceneArt(pack, code), code);
 }
 
 
