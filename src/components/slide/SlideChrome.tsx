@@ -412,9 +412,9 @@ export function SlideFrame({
   // outright: brand mesh/aurora backdrops are suppressed while one is active.
   // Without this, every dark pack rendered the corporate navy backdrop and the
   // packs read as recolours of one sheet instead of distinct designs.
-  // A style pack owns the page ground UNLESS the author picked a background for
-  // this slide in the editor — an explicit pick always wins, live.
-  const packOwnsGround = !!pack && !backdrop?.authored;
+  // …UNLESS the author picked a background for this slide in the editor — an
+  // explicit pick always wins, live.
+  const packOwnsGround = stylePackOwnsGround(pack, backdrop);
   const hasBackdrop = !!backdrop && !packOwnsGround;
   const hasBackdropImage = !!backdrop?.url && !packOwnsGround;
   const hasBackdropAurora = !!backdrop?.aurora && !packOwnsGround;
