@@ -100,16 +100,17 @@ function SocialView() {
         <div className="relative z-10 mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
-              <Share2 size={12} /> Social command center
+              <Share2 size={12} /> Element · Social
             </div>
             <h1 className="text-4xl font-semibold tracking-tight text-[#03002C] sm:text-5xl">
-              Every division. Every angle. One social system.
+              Social that looks like one studio made it.
             </h1>
             <p className="max-w-2xl text-base text-black/65">
-              Pre-built social playbooks for every TransPerfect division — brand anthems, product
-              teases, milestones, thought leadership, and case spotlights — each seeded from a real
-              module so previews render live in your palette.
+              Ready-to-post sets for every division — brand moments, product teases, milestones,
+              thought leadership, and client wins — designed in Element and rendering live in your
+              palette, sized right for every channel.
             </p>
+
             <div className="flex flex-wrap gap-3 pt-2">
               <a
                 href="#playbooks"
