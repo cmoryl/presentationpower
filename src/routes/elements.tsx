@@ -45,9 +45,14 @@ type Surface = {
   ink: string;
   glow: string;
   to: string;
+  /** Showcase demo whose photography fronts this card. */
+  artId: string;
+  /** Short proof chips shown over the art. */
+  proof: readonly string[];
   icon: React.ComponentType<{ size?: number; className?: string }>;
   items: ReadonlyArray<{ label: string; to: string; search?: Record<string, string> }>;
 };
+
 
 const SURFACES: Surface[] = [
   {
