@@ -2870,6 +2870,33 @@ export type Database = {
           },
         ]
       }
+      social_asset_edits: {
+        Row: {
+          created_at: string
+          edit_key: string
+          id: string
+          patch: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          edit_key: string
+          id?: string
+          patch?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          edit_key?: string
+          id?: string
+          patch?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       style_expansion_candidates: {
         Row: {
           audience: string | null
