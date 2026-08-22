@@ -173,7 +173,28 @@ function PrintDemoPage() {
         </div>
       </div>
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+      {/* Rendered comps — the real print layout for every page of the piece. */}
+      <section className="mt-10">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold tracking-tight">Rendered preview</h2>
+          <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
+            Click any page to enlarge
+          </span>
+        </div>
+        <div className="mt-4">
+          <ShowcasePrintGallery
+            kind={item.kind}
+            content={previewContent}
+            brand={previewBrand}
+            mode={previewLook.mode}
+            pageSize={previewLook.pageSize}
+            density={previewLook.density}
+            accent={accent}
+          />
+        </div>
+      </section>
+
+      <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">
             {pages.length ? "Every page, already written" : "Every block, already written"}
