@@ -41,8 +41,12 @@ export function useDemoOverrides(kind: DemoKind, demoId: string) {
 /** The override for one demo + division, or undefined when none is published. */
 export function useDemoOverride(kind: DemoKind, demoId: string, divisionKey: string) {
   const q = useDemoOverrides(kind, demoId);
-  const row = (q.data ?? []).find((r) => r.divisionKey === divisionKey);
-  return { ...q, override: row };
+  const rows: DemoOverrideRow[] = (q.data as DemoOverrideRow[] | undefined) ?? [];
+  const row = rows.find((r) => r.divisionKey === divisionKey);
+  const override = row
+    ? { ...row, payload: JSON.parse(row.payloadJson) as Record<string, unknown> }
+    : undefined;
+  return { ...q, override };
 }
 
 export function usePublishDemoOverride() {

@@ -16,7 +16,8 @@ export type DemoOverrideRow = {
   demoKind: DemoKind;
   demoId: string;
   divisionKey: string;
-  payload: Record<string, unknown>;
+  /** JSON text — server functions only carry plainly serializable values. */
+  payloadJson: string;
   label: string | null;
   updatedAt: string;
 };
@@ -64,7 +65,7 @@ export const listDemoOverrides = createServerFn({ method: "GET" })
         demoKind: row["demo_kind"] as DemoKind,
         demoId: row["demo_id"] as string,
         divisionKey: (row["division_key"] as string) ?? "",
-        payload: (row["payload"] as Record<string, unknown>) ?? {},
+        payloadJson: JSON.stringify(row["payload"] ?? {}),
         label: (row["label"] as string | null) ?? null,
         updatedAt: (row["updated_at"] as string) ?? "",
       };
@@ -97,7 +98,7 @@ export const saveDemoOverride = createServerFn({ method: "POST" })
     label?: string;
   }) =>
     Key.extend({
-      payload: z.record(z.unknown()),
+      payload: z.record(z.string(), z.unknown()),
       label: z.string().max(200).optional(),
     }).parse(input),
   )
