@@ -988,17 +988,20 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
           <div style={{ position: "relative", height: 250, ...darkField() }}>
             <ChevronField opacity={0.14} />
             <div style={{ position: "relative", padding: 34, display: "flex", flexDirection: "column", gap: 14 }}>
-              <Logo ctx={ctx} width={280} />
-              <div style={{ color: "#fff", fontSize: 28, fontWeight: 700 }}>Save the date · {ctx.city}</div>
-              <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 20 }}>{ctx.dateLine}</div>
+              <div style={lockupRow}>
+                <Logo ctx={ctx} width={280} />
+              </div>
+              <Eyebrow size={16}>{ctx.dateLine}</Eyebrow>
+              <div style={{ color: "#fff", ...titleStyle(sstyle, 28) }}>
+                Save the date · {ctx.city}
+              </div>
             </div>
           </div>
           <div style={{ padding: 34, display: "flex", flexDirection: "column", gap: 18, color: INK }}>
-            <div style={{ fontSize: 26, fontWeight: 800 }}>You're invited</div>
+            <div style={titleStyle(sstyle, 26)}>You&rsquo;re invited</div>
+            <StyleRule w={104} h={6} />
             <Lines n={6} />
-            <div style={{ alignSelf: "flex-start", background: BLUE, color: "#fff", padding: "14px 28px", borderRadius: 99, fontSize: 20, fontWeight: 700 }}>
-              Reserve your seat
-            </div>
+            <Cta size={18}>Reserve your seat</Cta>
             <Lines n={3} />
           </div>
         </div>
@@ -1007,11 +1010,28 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "linkedin-header":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 44, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexDirection: sstyle.lockup === "top-left" ? "row" : "row-reverse",
+            }}
+          >
             <Logo ctx={ctx} width={520} />
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 30, fontWeight: 700 }}>{ctx.city}</div>
-              <div style={{ fontSize: 22, color: "#7FD0FF" }}>{ctx.dateLine}</div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                alignItems: sstyle.lockup === "top-left" ? "flex-end" : "flex-start",
+              }}
+            >
+              <div style={titleStyle(sstyle, 30)}>{ctx.city}</div>
+              <Eyebrow size={18}>{ctx.dateLine}</Eyebrow>
             </div>
           </div>
         </Field>
@@ -1020,27 +1040,48 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "web-hero":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 64, display: "flex", flexDirection: "column", justifyContent: "center", gap: 22 }}>
-            <Logo ctx={ctx} width={460} />
-            <div style={{ fontSize: 54, fontWeight: 800, letterSpacing: "-0.035em", maxWidth: "62%" }}>
-              The City Series lands in {ctx.city.split("·")[0].trim()}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 64,
+              display: "flex",
+              flexDirection: "column",
+              gap: 22,
+              ...stackAlign,
+            }}
+          >
+            <div style={lockupRow}>
+              <Logo ctx={ctx} width={460} />
             </div>
-            <div style={{ display: "flex", gap: 14, marginTop: 6 }}>
-              {["06", "14", "22", "09"].map((n, i) => (
-                <div key={i} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 14, padding: "14px 20px", textAlign: "center" }}>
-                  <div style={{ fontSize: 34, fontWeight: 800 }}>{n}</div>
-                  <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", letterSpacing: "0.14em" }}>
-                    {["DAYS", "HRS", "MIN", "SEC"][i]}
+            <CopyPlate shortEdge={640} pad={40}>
+              <StyleRule w={120} h={7} />
+              <div style={titleStyle(sstyle, 54, "62%")}>{ctx.eventName}</div>
+              <div style={{ display: "flex", gap: 14, marginTop: 6 }}>
+                {["06", "14", "22", "09"].map((n, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: "rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      borderRadius: sstyle.plateFullBleed ? 4 : 14,
+                      padding: "14px 20px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: 34, fontWeight: 800 }}>{n}</div>
+                    <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", letterSpacing: "0.14em" }}>
+                      {["DAYS", "HRS", "MIN", "SEC"][i]}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ alignSelf: "flex-start", background: BLUE, borderRadius: 99, padding: "14px 30px", fontWeight: 700, fontSize: 20 }}>
-              Register free
-            </div>
+                ))}
+              </div>
+              <Cta size={20}>Register free</Cta>
+            </CopyPlate>
           </div>
         </Field>
       );
+
 
     case "tshirt":
       return (
