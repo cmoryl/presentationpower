@@ -63,23 +63,26 @@ function SlideFrame({
     <SlideBackdropContext.Provider value={null}>
       <ScaledSlide>
         <DeckPackScope pack={pack}>
-          <VariantRenderer
-            slide={{
-              id: slide.id ?? `demo-${index}`,
-              position: index,
-              sectionId: slide.sectionId,
-              variantId: slide.variantId,
-              layoutId: slide.layoutId ?? variant.permittedLayoutIds[0],
-              content: slide.content,
-              changes: [],
-              canvasBlocks: slide.canvasBlocks as never,
-            }}
-            variant={variant}
-            brand={brand}
-            pageNumber={index + 1}
-            subCompany={payload.subCompany ?? undefined}
-            mode={slide.mode ?? "light"}
-          />
+          <SlideTemplateIndustryProvider industryId={payload.context?.designRecipeId ?? null}>
+            <VariantRenderer
+              slide={{
+                id: slide.id ?? `demo-${index}`,
+                position: index,
+                sectionId: slide.sectionId,
+                variantId: slide.variantId,
+                layoutId: slide.layoutId ?? variant.permittedLayoutIds[0],
+                content: slide.content,
+                changes: [],
+                canvasBlocks: slide.canvasBlocks as never,
+                templateOverride: slide.templateOverride as never,
+              }}
+              variant={variant}
+              brand={brand}
+              pageNumber={index + 1}
+              subCompany={payload.subCompany ?? undefined}
+              mode={slide.mode ?? "light"}
+            />
+          </SlideTemplateIndustryProvider>
         </DeckPackScope>
       </ScaledSlide>
     </SlideBackdropContext.Provider>
