@@ -11,6 +11,14 @@ import {
   SOCIAL_FORMATS,
   SOCIAL_FORMATS_BY_ID,
 } from "@/lib/social-formats";
+import {
+  BRAND_LOOK_ID,
+  DEFAULT_EVENT_LOOK_ID,
+  EVENT_LOOKS,
+  EVENT_LOOKS_BY_ID,
+} from "@/lib/event-looks";
+import { DEFAULT_SOCIAL_STYLE_ID, SOCIAL_STYLES } from "@/lib/social-styles";
+import { BriefSchema, briefGaps, mergeBrief, readBrief, writeBrief } from "./brief";
 import type { KitSurface } from "./threads";
 
 export const KIT_PROPOSAL_TOOL_NAME = "propose_kit";
@@ -72,10 +80,13 @@ export function buildKitAgentToolSet({
   supabase,
   userId,
   surface,
+  threadId,
 }: {
   supabase: SupabaseClient;
   userId: string;
   surface: KitSurface;
+  /** Conversation the tools belong to — the brief is stored on this row. */
+  threadId: string;
 }): ToolSet {
   async function loadKit(kitId: string) {
     const { data, error } = await supabase
@@ -351,6 +362,214 @@ export function buildKitAgentToolSet({
           kit_id: input.kitId,
           updated: Object.keys(patch).filter((k) => k !== "updated_at"),
           editorPath: editorPathFor(surface, input.kitId),
+        };
+      },
+    }),
+
+    // ---------------------------------------------------------------------
+    // CONVERSATION MEMORY — the brief. Read at the start of every turn,
+    // written whenever the user gives a new fact, so a long conversation
+    // keeps building ONE campaign instead of restarting each turn.
+    // ---------------------------------------------------------------------
+    read_brief: tool({
+      description:
+        "Read the saved campaign brief for THIS conversation (facts, audience, message, art direction, kits already built). Call this first on every turn before asking the user anything.",
+      inputSchema: z.object({}),
+      execute: async () => {
+        const brief = await readBrief(supabase, threadId);
+        return {
+          brief,
+          missing: briefGaps(brief, surface),
+          hasBrief: Object.keys(brief).length > 0,
+        };
+      },
+    }),
+
+    save_brief: tool({
+      description:
+        "Merge new facts into the saved campaign brief for this conversation. Call it immediately after the user gives or confirms anything (name, audience, message, dates, look, CTA, deliverables, constraints). Empty values never erase stored facts.",
+      inputSchema: BriefSchema,
+      execute: async (patch) => {
+        const current = await readBrief(supabase, threadId);
+        const next = mergeBrief(current, patch);
+        await writeBrief(supabase, threadId, next);
+        return { ok: true, brief: next, missing: briefGaps(next, surface) };
+      },
+    }),
+
+    // ---------------------------------------------------------------------
+    // ART DIRECTION — one look per campaign, shared across every channel.
+    // ---------------------------------------------------------------------
+    list_looks: tool({
+      description:
+        "List the approved art directions (looks) and social template styles. A look sets palette, motif, type case and corner character; the style sets the layout/geometry contract. Every asset in one campaign must use the SAME look + style.",
+      inputSchema: z.object({ divisionId: z.string().optional() }),
+      execute: async ({ divisionId }) => {
+        const suggestedLookId = divisionId
+          ? (BRAND_LOOK_ID[divisionId] ?? DEFAULT_EVENT_LOOK_ID)
+          : DEFAULT_EVENT_LOOK_ID;
+        return {
+          suggestedLookId,
+          looks: EVENT_LOOKS.map((l) => ({
+            id: l.id,
+            label: l.label,
+            tag: l.tag,
+            blurb: l.blurb,
+            palette: { deep: l.deep, accent: l.accent, accentAlt: l.accentAlt },
+            motif: l.motif,
+            uppercase: l.uppercase,
+            styleId: l.styleId,
+          })),
+          styles: SOCIAL_STYLES.map((s) => ({ id: s.id, label: s.label, blurb: s.blurb })),
+          defaultStyleId: DEFAULT_SOCIAL_STYLE_ID,
+        };
+      },
+    }),
+
+    set_kit_look: tool({
+      description:
+        "Lock the art direction on a kit so every rendered asset — and every asset generated later on other channels for this division — uses the same palette, motif and layout style.",
+      inputSchema: z.object({
+        kitId: z.string().uuid(),
+        lookId: z.string().min(1),
+        styleId: z.string().optional(),
+      }),
+      execute: async ({ kitId, lookId, styleId }) => {
+        if (!EVENT_LOOKS_BY_ID[lookId])
+          return { error: `Unknown look "${lookId}". Call list_looks first.` };
+        const resolvedStyle = styleId ?? EVENT_LOOKS_BY_ID[lookId]!.styleId;
+        if (!SOCIAL_STYLES.some((s) => s.id === resolvedStyle))
+          return { error: `Unknown style "${resolvedStyle}". Call list_looks first.` };
+        const kit = await loadKit(kitId);
+        const facts = { ...((kit["event_facts"] as Rec) ?? {}) };
+        facts["look"] = { lookId, styleId: resolvedStyle };
+        const { error } = await supabase
+          .from("campaign_kits")
+          .update({
+            event_facts: facts as never,
+            updated_at: new Date().toISOString(),
+          } as never)
+          .eq("id", kitId);
+        if (error) return { error: error.message };
+        const brief = await readBrief(supabase, threadId);
+        await writeBrief(supabase, threadId, mergeBrief(brief, { lookId, styleId: resolvedStyle }));
+        return {
+          ok: true,
+          kit_id: kitId,
+          lookId,
+          styleId: resolvedStyle,
+          editorPath: editorPathFor(surface, kitId),
+        };
+      },
+    }),
+
+    // ---------------------------------------------------------------------
+    // COVERAGE — never close a build turn on a half-filled kit.
+    // ---------------------------------------------------------------------
+    audit_kit: tool({
+      description:
+        "Check a kit for cohesion and completeness: missing copy slots, missing event facts, unset art direction, and channel coverage gaps. Call this before you tell the user a kit is done, and fix what it reports with update_kit / set_kit_look.",
+      inputSchema: z.object({ kitId: z.string().uuid() }),
+      execute: async ({ kitId }) => {
+        const kit = await loadKit(kitId);
+        const copy = (kit["copy"] as Rec) ?? {};
+        const facts = (kit["event_facts"] as Rec) ?? {};
+        const formatIds = Array.isArray(kit["format_ids"]) ? (kit["format_ids"] as string[]) : [];
+        const kitSurface = String(kit["surface"] ?? surface) as KitSurface;
+
+        const issues: string[] = [];
+        const need = (key: string, label: string) => {
+          const value = copy[key];
+          if (typeof value !== "string" || value.trim() === "") issues.push(`copy.${key} (${label})`);
+        };
+        need("title", "headline every format shows");
+        need("summary", "support line");
+        need("cta", "call to action");
+        if (!copy["statValue"] || !copy["statLabel"])
+          issues.push("copy.statValue + copy.statLabel (proof point — number on one line, label on another)");
+
+        if (kitSurface === "event") {
+          for (const [key, label] of [
+            ["name", "event name"],
+            ["city", "city"],
+            ["startDate", "start date"],
+            ["hashtag", "hashtag"],
+            ["registrationUrl", "registration URL"],
+          ] as const) {
+            const value = facts[key];
+            if (typeof value !== "string" || value.trim() === "")
+              issues.push(`eventFacts.${key} (${label})`);
+          }
+        }
+
+        const look = facts["look"] as { lookId?: string; styleId?: string } | undefined;
+        if (!look?.lookId)
+          issues.push("art direction not locked — call set_kit_look so every asset matches");
+
+        const categories = new Set(
+          formatIds.map((id) => SOCIAL_FORMATS_BY_ID[id]?.category).filter(Boolean) as string[],
+        );
+        const coverage =
+          kitSurface === "event"
+            ? (["signage", "screen", "social", "email"] as const)
+            : (["social", "email"] as const);
+        const missingCoverage = coverage.filter((c) => !categories.has(c));
+
+        return {
+          kit_id: kitId,
+          name: kit["name"],
+          formats: formatIds.length,
+          lookId: look?.lookId ?? null,
+          styleId: look?.styleId ?? null,
+          issues,
+          missingCoverage,
+          ready: issues.length === 0,
+          editorPath: editorPathFor(kitSurface, kitId),
+        };
+      },
+    }),
+
+    create_companion_kit: tool({
+      description:
+        "Spin the campaign onto the other channel while keeping it cohesive: copies this kit's division, mode, copy, event facts and art direction into a kit on the other surface (event -> social, social -> event) with a format profile sized for that channel.",
+      inputSchema: z.object({
+        kitId: z.string().uuid(),
+        name: z.string().min(1).max(120).optional(),
+        profileId: z.string().optional(),
+      }),
+      execute: async ({ kitId, name, profileId }) => {
+        const kit = await loadKit(kitId);
+        const from = String(kit["surface"] ?? surface) as KitSurface;
+        const to: KitSurface = from === "event" ? "social" : "event";
+        const fallbackProfile = to === "event" ? "event-kit" : KIT_PROFILES[0]?.id;
+        const profile =
+          KIT_PROFILES.find((p) => p.id === (profileId ?? fallbackProfile)) ?? KIT_PROFILES[0];
+        if (!profile) return { error: "No kit profiles available." };
+        const { data, error } = await supabase
+          .from("campaign_kits")
+          .insert({
+            user_id: userId,
+            name: name ?? `${String(kit["name"] ?? "Campaign")} — ${to === "event" ? "event" : "social"}`,
+            surface: to,
+            brand_id: kit["brand_id"],
+            mode: kit["mode"],
+            profile_id: profile.id,
+            format_ids: profile.formatIds,
+            copy: (kit["copy"] ?? {}) as never,
+            event_facts: (kit["event_facts"] ?? {}) as never,
+            attach_event: to === "event",
+          } as never)
+          .select("id, name")
+          .single();
+        if (error) return { error: error.message };
+        const row = data as { id: string; name: string };
+        return {
+          ok: true,
+          kit_id: row.id,
+          name: row.name,
+          surface: to,
+          formats: profile.formatIds.map(slimFormat),
+          editorPath: editorPathFor(to, row.id),
         };
       },
     }),
