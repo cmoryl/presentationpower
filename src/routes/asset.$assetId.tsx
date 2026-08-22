@@ -134,6 +134,7 @@ import { HeroDiffTile } from "@/components/print/HeroDiffTile";
 import type { BrandMode } from "@/lib/taxonomy";
 
 import { LayoutHealthBanner } from "@/components/print/LayoutHealthBanner";
+import { isApprovedDemo } from "@/lib/demo-approved";
 import { usePrintOverflow } from "@/hooks/use-print-overflow";
 import {
   PrintContentFitFrame,
@@ -584,6 +585,9 @@ function AssetEditor() {
   });
   const content: CaseStudyContent = rawContent as unknown as CaseStudyContent;
   const ctx: PrintAssetContext = (row.context as PrintAssetContext) ?? {};
+  // Approved showcase demos are final, reviewed pieces — suppress layout-health
+  // and overflow warnings so a generated copy opens clean.
+  const approvedDemo = isApprovedDemo(ctx);
   // Icon treatment: the asset's own stored settings when it has them, else the
   // shared print iconography preference (tuned in the module library). Both the
   // on-screen canvas and the PDF export read THIS value, so they cannot drift.
@@ -1690,7 +1694,7 @@ function AssetEditor() {
               </Panel>
 
               <Panel title="Shared modules" defaultOpen={false}>
-                {overflow.clipped && (
+                {overflow.clipped && !approvedDemo && (
                   <div
                     data-testid="overflow-inspector-note"
                     className="mb-2 rounded-xl border border-red-400/60 bg-red-50 px-3 py-2 text-[11px] font-semibold leading-snug text-red-700 dark:bg-red-500/10 dark:text-red-300"
@@ -1702,7 +1706,7 @@ function AssetEditor() {
                   </div>
                 )}
                 <LayoutHealthBanner
-                  report={analyzePrintAsset(kind, content)}
+                  report={approvedDemo ? null : analyzePrintAsset(kind, content)}
                   onApplySuggestion={(s) => {
                     if (s.kind === "reduce-hero") {
                       const cur =
