@@ -213,6 +213,19 @@ export function KitWizard({
         setAttachEvent(row.attachEvent);
         setNextDesign(!!row.nextDesign);
         setNextTrackId(row.nextTrackId || "city-series");
+        {
+          const stored = (row.eventFacts as { look?: { lookId?: string; styleId?: string } } | null)
+            ?.look;
+          if (stored?.lookId || stored?.styleId) {
+            setKitLook({ lookId: stored.lookId, styleId: stored.styleId });
+            // Publish it as the division's campaign direction so social,
+            // event and digital assets generated later inherit the same look.
+            saveCampaignLook(row.brandId, {
+              ...(stored.lookId ? { lookId: stored.lookId } : {}),
+              ...(stored.styleId ? { styleId: stored.styleId } : {}),
+            });
+          }
+        }
         setStep(4); // jump to review
       })
       .catch((err) => {
