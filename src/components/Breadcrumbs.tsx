@@ -58,6 +58,10 @@ const STATIC_LABELS: Record<string, string> = {
   faq: "FAQ",
   about: "About",
   auth: "Sign in",
+  agent: "Deck agent",
+  "print-agent": "Print agent",
+  "events-agent": "Events agent",
+  "social-agent": "Social agent",
 };
 
 // Segments that should be hidden from the trail entirely (they're internal
