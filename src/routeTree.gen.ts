@@ -58,6 +58,7 @@ import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryI
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
 import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DevProposalQaRouteImport } from './routes/dev.proposal-qa'
@@ -388,6 +389,11 @@ const EventsNewRoute = EventsNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => EventsRoute,
+} as any)
+const EventsAgentThreadIdRoute = EventsAgentThreadIdRouteImport.update({
+  id: '/events-agent/$threadId',
+  path: '/events-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DevUxDebugRoute = DevUxDebugRouteImport.update({
   id: '/dev/ux-debug',
@@ -894,6 +900,7 @@ export interface FileRoutesByFullPath {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
+  '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -1025,6 +1032,7 @@ export interface FileRoutesByTo {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
+  '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -1161,6 +1169,7 @@ export interface FileRoutesById {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
+  '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -1298,6 +1307,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
+    | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1429,6 +1439,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
+    | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1564,6 +1575,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
+    | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1673,6 +1685,7 @@ export interface RootRouteChildren {
   DevProposalQaRoute: typeof DevProposalQaRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
+  EventsAgentThreadIdRoute: typeof EventsAgentThreadIdRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -2052,6 +2065,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
       parentRoute: typeof EventsRoute
+    }
+    '/events-agent/$threadId': {
+      id: '/events-agent/$threadId'
+      path: '/events-agent/$threadId'
+      fullPath: '/events-agent/$threadId'
+      preLoaderRoute: typeof EventsAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dev/ux-debug': {
       id: '/dev/ux-debug'
@@ -2847,6 +2867,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevProposalQaRoute: DevProposalQaRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   DevUxDebugRoute: DevUxDebugRoute,
+  EventsAgentThreadIdRoute: EventsAgentThreadIdRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
