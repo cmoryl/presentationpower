@@ -40,24 +40,43 @@ export const Route = createFileRoute("/demo/deck/$demoId")({
   component: ShowcaseDeckDemoPage,
 });
 
+function nativeDivision(divisionLabel: string): DemoDivision {
+  const match = DEMO_DIVISIONS.find(
+    (d) => divisionLabel.includes(d.name) || divisionLabel.includes(d.label),
+  );
+  return match ?? DEMO_DIVISIONS[0];
+}
+
 function ShowcaseDeckDemoPage() {
   const { demoId } = Route.useParams();
   const def = getShowcaseDeck(demoId);
   const navigate = useNavigate();
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+
+  const home = def ? nativeDivision(def.divisionLabel) : DEMO_DIVISIONS[0];
+  const [divisionId, setDivisionId] = useState(home.id);
+  const division =
+    DEMO_DIVISIONS.find((d) => d.id === divisionId) ?? home;
+
+  const payload = useMemo(() => {
+    if (!def) return null;
+    const base = def.build();
+    return division.id === home.id ? base : retargetPayload(base, division);
+  }, [def, division, home.id]);
+
   const existingId = useDeckStore((s) =>
-    def ? Object.values(s.decks).find((d) => d.title === def.deckTitle)?.id : undefined,
+    payload ? Object.values(s.decks).find((d) => d.title === payload.title)?.id : undefined,
   );
 
-  if (!def) return null;
-  const payload = def.build();
+  if (!def || !payload) return null;
+  const accent = division.accent;
 
   function open() {
     if (existingId) {
       void navigate({ to: "/decks/$deckId", params: { deckId: existingId } });
       return;
     }
-    const { deckId } = createDeckFromTemplate(def!.build());
+    const { deckId } = createDeckFromTemplate(payload!);
     void navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 
@@ -75,12 +94,12 @@ function ShowcaseDeckDemoPage() {
           aria-hidden
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(90deg, ${def.accent}F2 0%, ${def.accent}B0 42%, transparent 88%)`,
+            background: `linear-gradient(90deg, ${accent}F2 0%, ${accent}B0 42%, transparent 88%)`,
           }}
         />
         <div className="absolute inset-0 flex flex-col justify-end gap-3 p-6 sm:p-9">
           <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/80">
-            Element · Presentation demo
+            Element · Presentation demo · {division.label}
           </div>
           <h1 className="max-w-2xl text-3xl font-semibold tracking-[-0.03em] text-white sm:text-4xl">
             {def.name}
@@ -93,7 +112,9 @@ function ShowcaseDeckDemoPage() {
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#03002C] transition hover:bg-white/90"
             >
               <Sparkles size={15} />
-              {existingId ? "Open my copy" : "Open editable demo deck"}
+              {existingId
+                ? `Open my ${division.label} copy`
+                : `Generate for ${division.label}`}
               <ArrowRight size={15} />
             </button>
             <Link
@@ -105,6 +126,59 @@ function ShowcaseDeckDemoPage() {
           </div>
         </div>
       </div>
+
+      <div className="mt-5 rounded-2xl border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+              Division
+            </div>
+            <p className="mt-1 text-[12px] text-black/55 dark:text-white/55">
+              Same narrative, re-branded: brand mode, style pack, copy and generated
+              imagery all follow the division you pick.
+            </p>
+          </div>
+          <div className="text-[11px] text-black/45 dark:text-white/45">
+            {division.name} · {division.stylePackId.toUpperCase().replace("SKIN-", "")}
+          </div>
+        </div>
+        <div
+          role="group"
+          aria-label="Choose division"
+          className="mt-3 flex flex-wrap gap-2"
+        >
+          {DEMO_DIVISIONS.map((d) => {
+            const on = d.id === division.id;
+            return (
+              <button
+                key={d.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => setDivisionId(d.id)}
+                className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-medium transition ${
+                  on
+                    ? "border-transparent text-white"
+                    : "border-black/12 text-black/70 hover:border-black/35 dark:border-white/15 dark:text-white/75 dark:hover:border-white/35"
+                }`}
+                style={on ? { background: d.accent, color: "#0B1020" } : undefined}
+              >
+                <span
+                  aria-hidden
+                  className="h-2.5 w-2.5 rounded-[3px]"
+                  style={{ background: on ? "#0B1020" : d.accent }}
+                />
+                {d.label}
+                {d.id === home.id ? (
+                  <span className="text-[10px] uppercase tracking-[0.14em] opacity-70">
+                    native
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
 
       <section className="mt-8 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
