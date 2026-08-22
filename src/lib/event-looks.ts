@@ -280,7 +280,24 @@ const INTENT_LOOK_ID: Record<string, string> = {
  * authority (cohesion with that division's event collateral); the campaign
  * intent supplies the motif variant; the kit's own accent re-inks the plate.
  */
+/**
+ * Re-ink an authored look with a division's own accent. Used when a demo set is
+ * retargeted to a different art direction: the field graphic, type and radius
+ * change, the brand colour does not.
+ */
+export function reinkLook(look: EventLook, accent: string | null | undefined): EventLook {
+  if (!accent) return look;
+  return {
+    ...look,
+    accent,
+    accentAlt: mix(accent, look.accentAlt, 0.55),
+    deep: mix(look.deep, accent, 0.12),
+    lightFrom: mix(look.lightFrom, accent, 0.06),
+  };
+}
+
 export function channelLook(args: {
+
   /** Demo set id — used only as the deterministic fallback key. */
   key: string;
   /** Brand mode / division id, e.g. "bm-tp-legal". */
