@@ -508,10 +508,12 @@ export function SocialRenderer({
   // Wide frames also thirds horizontally — copy occupies two thirds, the
   // subject's third stays clear.
   const copyMaxWidth = panelMode
-    ? format.width - contentInset.left - contentInset.right
+    ? (format.width - contentInset.left - contentInset.right) *
+      (panelSide === "top" ? 0.82 : 1)
     : bleedImage && (cls === "landscape-wide" || cls === "landscape")
       ? format.width * 0.66
       : format.width * 0.92;
+
 
   // Photography competes with type, so tighten the stack when an image is on.
   // Wide frames give the copy the least room, so they shrink hardest — a
