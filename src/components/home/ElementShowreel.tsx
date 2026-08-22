@@ -132,11 +132,12 @@ export function ElementShowreel() {
 
       {/* Capability marquee */}
       <div className="relative mt-12 overflow-hidden">
-        <div className="el-marquee-track gap-2.5" aria-hidden>
+        {/* Minimal capability line: no pills — hairline-separated small caps. */}
+        <div className="el-marquee-track items-center gap-0" aria-hidden>
           {[...MARQUEE, ...MARQUEE].map((m, i) => (
             <span
               key={`${m}-${i}`}
-              className="shrink-0 rounded-full border border-white/12 bg-white/[0.05] px-4 py-1.5 text-[12px] font-medium text-white/75 backdrop-blur"
+              className="shrink-0 border-l border-white/10 px-6 text-[11px] font-medium uppercase tracking-[0.16em] text-white/55 first:border-l-0"
             >
               {m}
             </span>
