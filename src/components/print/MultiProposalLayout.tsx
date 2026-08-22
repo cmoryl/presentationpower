@@ -3539,40 +3539,46 @@ export function MultiProposalLayout({
   /** Render one page only (used by thumbnails). Omit to render the document. */
   pageIndex?: number;
 }) {
-  const { accent: BLUE } = useProposalBrand();
-  const accent = brand?.tokens?.accent || brand?.tokens?.primary || BLUE;
+  // Division branding: lockups and accent come from the proposal's own brand
+  // mode, so a Legal master prints the Legal lockup, Element prints Element, and
+  // so on — never the master TransPerfect artwork by default.
+  const pb = resolveProposalBrand(brand);
+  const accent = pb.accent;
   const pages = content.pages ?? [];
   const shown = typeof pageIndex === "number" ? pages.slice(pageIndex, pageIndex + 1) : pages;
-  const logoWhite = PROPOSAL_ART.logoWhite;
-  const logoDark = PROPOSAL_ART.lockupDark;
+  const logoWhite = pb.logoWhite;
+  const logoDark = pb.logoDark;
 
   return (
-    <SlideModeContext.Provider value={mode}>
-      <SlideAccentContext.Provider value={accent}>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", ...style }}>
-          {shown.map((page, i) => (
-            <div
-              key={page.id || `${page.kind}-${i}`}
-              data-print-page
-              data-proposal-page={page.kind}
-              className="relative w-full overflow-hidden [container-type:inline-size]"
-              style={{
-                aspectRatio: `${PAGE_W_IN} / ${PAGE_H_IN}`,
-                background: "#FFFFFF",
-                color: NAVY,
-                fontFamily: FONT,
-              }}
-            >
-              <PageBody
-                page={page}
-                logoWhite={logoWhite}
-                logoDark={logoDark}
-                pageIndex={(pageIndex ?? 0) + i}
-              />
-            </div>
-          ))}
-        </div>
-      </SlideAccentContext.Provider>
-    </SlideModeContext.Provider>
+    <ProposalBrandProvider brand={brand}>
+      <SlideModeContext.Provider value={mode}>
+        <SlideAccentContext.Provider value={accent}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", ...style }}>
+            {shown.map((page, i) => (
+              <div
+                key={page.id || `${page.kind}-${i}`}
+                data-print-page
+                data-proposal-page={page.kind}
+                className="relative w-full overflow-hidden [container-type:inline-size]"
+                style={{
+                  aspectRatio: `${PAGE_W_IN} / ${PAGE_H_IN}`,
+                  background: "#FFFFFF",
+                  color: NAVY,
+                  fontFamily: FONT,
+                }}
+              >
+                <PageBody
+                  page={page}
+                  logoWhite={logoWhite}
+                  logoDark={logoDark}
+                  pageIndex={(pageIndex ?? 0) + i}
+                />
+              </div>
+            ))}
+          </div>
+        </SlideAccentContext.Provider>
+      </SlideModeContext.Provider>
+    </ProposalBrandProvider>
   );
+
 }
