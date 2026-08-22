@@ -152,8 +152,8 @@ export function ShowcaseGallery() {
           <MediaCard
             key={p.id}
             to={{ to: "/library/print", search: p.search }}
-            art={demoPrintImg}
-            artAlt="Printed brochures and a case-study booklet fanned on a studio surface"
+            art={showcaseArt(p.id).src}
+            artAlt={showcaseArt(p.id).alt}
             accent={p.accent}
             icon={<Printer size={12} />}
             label={p.label}
