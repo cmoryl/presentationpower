@@ -28,6 +28,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
+import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
@@ -43,6 +44,7 @@ import { Route as SocialBannersRouteImport } from './routes/social.banners'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
+import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
 import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library.industry-backgrounds'
@@ -75,6 +77,7 @@ import { Route as BriefDeckIdRouteImport } from './routes/brief.$deckId'
 import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotlight-preview'
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
+import { Route as ApiPrintAgentChatRouteImport } from './routes/api/print-agent-chat'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
 import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
@@ -230,6 +233,11 @@ const SocialIndexRoute = SocialIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SocialRoute,
 } as any)
+const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
+  id: '/print-agent/',
+  path: '/print-agent/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryIndexRoute = LibraryIndexRouteImport.update({
   id: '/library/',
   path: '/library/',
@@ -303,6 +311,11 @@ const PublicStylesRoute = PublicStylesRouteImport.update({
 const PublicModulesRoute = PublicModulesRouteImport.update({
   id: '/public/modules',
   path: '/public/modules',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrintAgentThreadIdRoute = PrintAgentThreadIdRouteImport.update({
+  id: '/print-agent/$threadId',
+  path: '/print-agent/$threadId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryPrintRoute = LibraryPrintRouteImport.update({
@@ -464,6 +477,11 @@ const AssetNewRoute = AssetNewRouteImport.update({
 const AssetAssetIdRoute = AssetAssetIdRouteImport.update({
   id: '/asset/$assetId',
   path: '/asset/$assetId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPrintAgentChatRoute = ApiPrintAgentChatRouteImport.update({
+  id: '/api/print-agent-chat',
+  path: '/api/print-agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -823,6 +841,7 @@ export interface FileRoutesByFullPath {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
@@ -855,6 +874,7 @@ export interface FileRoutesByFullPath {
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -870,6 +890,7 @@ export interface FileRoutesByFullPath {
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/print-agent/': typeof PrintAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -946,6 +967,7 @@ export interface FileRoutesByTo {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
@@ -978,6 +1000,7 @@ export interface FileRoutesByTo {
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -993,6 +1016,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
+  '/print-agent': typeof PrintAgentIndexRoute
   '/social': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1074,6 +1098,7 @@ export interface FileRoutesById {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
   '/asset/spotlight-preview': typeof AssetSpotlightPreviewRoute
@@ -1106,6 +1131,7 @@ export interface FileRoutesById {
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
+  '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1121,6 +1147,7 @@ export interface FileRoutesById {
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
+  '/print-agent/': typeof PrintAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1203,6 +1230,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
@@ -1235,6 +1263,7 @@ export interface FileRouteTypes {
     | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
+    | '/print-agent/$threadId'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1250,6 +1279,7 @@ export interface FileRouteTypes {
     | '/events/'
     | '/knowledge/'
     | '/library/'
+    | '/print-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1326,6 +1356,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
@@ -1358,6 +1389,7 @@ export interface FileRouteTypes {
     | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
+    | '/print-agent/$threadId'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1373,6 +1405,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/knowledge'
     | '/library'
+    | '/print-agent'
     | '/social'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1453,6 +1486,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
     | '/asset/spotlight-preview'
@@ -1485,6 +1519,7 @@ export interface FileRouteTypes {
     | '/library/industry-backgrounds'
     | '/library/my'
     | '/library/print'
+    | '/print-agent/$threadId'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1500,6 +1535,7 @@ export interface FileRouteTypes {
     | '/events/'
     | '/knowledge/'
     | '/library/'
+    | '/print-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1555,6 +1591,7 @@ export interface RootRouteChildren {
   AgentThreadIdRoute: typeof AgentThreadIdRoute
   ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiPrintAgentChatRoute: typeof ApiPrintAgentChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
   AssetSpotlightPreviewRoute: typeof AssetSpotlightPreviewRoute
@@ -1579,6 +1616,7 @@ export interface RootRouteChildren {
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
+  PrintAgentThreadIdRoute: typeof PrintAgentThreadIdRoute
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -1587,6 +1625,7 @@ export interface RootRouteChildren {
   AgentIndexRoute: typeof AgentIndexRoute
   DecksIndexRoute: typeof DecksIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
+  PrintAgentIndexRoute: typeof PrintAgentIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
@@ -1740,6 +1779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialIndexRouteImport
       parentRoute: typeof SocialRoute
     }
+    '/print-agent/': {
+      id: '/print-agent/'
+      path: '/print-agent'
+      fullPath: '/print-agent/'
+      preLoaderRoute: typeof PrintAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library/': {
       id: '/library/'
       path: '/library'
@@ -1843,6 +1889,13 @@ declare module '@tanstack/react-router' {
       path: '/public/modules'
       fullPath: '/public/modules'
       preLoaderRoute: typeof PublicModulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/print-agent/$threadId': {
+      id: '/print-agent/$threadId'
+      path: '/print-agent/$threadId'
+      fullPath: '/print-agent/$threadId'
+      preLoaderRoute: typeof PrintAgentThreadIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/print': {
@@ -2067,6 +2120,13 @@ declare module '@tanstack/react-router' {
       path: '/asset/$assetId'
       fullPath: '/asset/$assetId'
       preLoaderRoute: typeof AssetAssetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/print-agent-chat': {
+      id: '/api/print-agent-chat'
+      path: '/api/print-agent-chat'
+      fullPath: '/api/print-agent-chat'
+      preLoaderRoute: typeof ApiPrintAgentChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -2664,6 +2724,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentThreadIdRoute: AgentThreadIdRoute,
   ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiPrintAgentChatRoute: ApiPrintAgentChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
   AssetSpotlightPreviewRoute: AssetSpotlightPreviewRoute,
@@ -2688,6 +2749,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
+  PrintAgentThreadIdRoute: PrintAgentThreadIdRoute,
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,
@@ -2696,6 +2758,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentIndexRoute: AgentIndexRoute,
   DecksIndexRoute: DecksIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
+  PrintAgentIndexRoute: PrintAgentIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,

@@ -266,7 +266,9 @@ export type Database = {
           created_at: string
           deck_id: string | null
           id: string
+          kind: string
           owner_id: string
+          print_asset_id: string | null
           title: string
           updated_at: string
         }
@@ -274,7 +276,9 @@ export type Database = {
           created_at?: string
           deck_id?: string | null
           id?: string
+          kind?: string
           owner_id: string
+          print_asset_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -282,7 +286,9 @@ export type Database = {
           created_at?: string
           deck_id?: string | null
           id?: string
+          kind?: string
           owner_id?: string
+          print_asset_id?: string | null
           title?: string
           updated_at?: string
         }
@@ -292,6 +298,13 @@ export type Database = {
             columns: ["deck_id"]
             isOneToOne: false
             referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_threads_print_asset_id_fkey"
+            columns: ["print_asset_id"]
+            isOneToOne: false
+            referencedRelation: "print_assets"
             referencedColumns: ["id"]
           },
         ]
