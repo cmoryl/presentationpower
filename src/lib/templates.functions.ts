@@ -45,6 +45,8 @@ const OverrideInput = z.object({
   tintStrength: z.number().min(0).max(1).default(0),
   sceneSwap: z.string().trim().max(24).optional().nullable(),
   imageUrl: z.string().trim().max(2000).optional().nullable(),
+  imagePriority: z.enum(["front", "behind"]).default("front"),
+
   note: z.string().trim().max(400).default(""),
 });
 
