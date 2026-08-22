@@ -441,6 +441,17 @@ function Lines({
 
 function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; label: string }) {
   const pad = 44;
+  // Shadow the fallback tokens with the active look so every piece in the
+  // switch below re-inks to this demo set's art direction.
+  const look = useLook();
+  const NAVY = look.deep;
+  const BLUE = look.accent;
+  const INK = look.ink;
+  const darkField = (radial = true) => darkFieldFor(look, radial);
+  const ChevronField = ({ opacity, color }: { opacity?: number; color?: string }) => (
+    <MotifField opacity={opacity} color={color ?? look.accentAlt} />
+  );
+
 
   switch (kind) {
     case "badge": {
