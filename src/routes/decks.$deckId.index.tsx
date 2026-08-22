@@ -129,6 +129,7 @@ import {
 import { AddSlideGallery } from "@/components/slide/AddSlideGallery";
 import { resolveDivisionBrief } from "@/lib/library-preview";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
+import { gateQaIssues } from "@/lib/demo-approved";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 
 import {
@@ -477,7 +478,11 @@ function DeckEditor() {
     supportsImagery: variantSupportsImagery(active?.variantId),
   };
 
-  const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
+  // Approved showcase demos ship without QA chips or warnings.
+  const qa = useMemo(
+    () => gateQaIssues(runQa(deck.slides, deck.brandModeId), deck.context),
+    [deck.slides, deck.brandModeId, deck.context],
+  );
   const clientLogoUrl = resolvedClientLogo.url;
   const logoOrientation = deck.context?.logoOrientation ?? "horizontal";
 

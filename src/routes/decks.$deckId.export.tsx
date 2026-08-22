@@ -13,6 +13,7 @@ import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 
 import { runQa, blockingIssues, warningIssues } from "@/lib/qa";
+import { gateQaIssues, isApprovedDemo } from "@/lib/demo-approved";
 import type { GeometryRepairReport } from "@/lib/canvas-repair-report";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
@@ -108,7 +109,12 @@ function ExportView() {
   const pack = deckPack(deck);
   const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
 
-  const qa = useMemo(() => runQa(deck.slides, deck.brandModeId), [deck.slides, deck.brandModeId]);
+  // Approved showcase demos are final pieces: no QA list, no blocking gate.
+  const approvedDemo = isApprovedDemo(deck.context);
+  const qa = useMemo(
+    () => gateQaIssues(runQa(deck.slides, deck.brandModeId), deck.context),
+    [deck.slides, deck.brandModeId, deck.context],
+  );
   const blocks = blockingIssues(qa);
   const warns = warningIssues(qa);
   const blocked = blocks.length > 0 && !override;
@@ -288,7 +294,7 @@ function ExportView() {
     if (blocked || exporting || preflightBusy) return;
     setPreflightBusy(true);
     try {
-      const issues = await runExportPreflight(deck);
+      const issues = approvedDemo ? [] : await runExportPreflight(deck);
       if (issues.length === 0) {
         await runPptxExport();
       } else {

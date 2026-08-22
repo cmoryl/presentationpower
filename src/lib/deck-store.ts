@@ -379,6 +379,9 @@ export type DeckContext = {
     matched: string[];
     createdAt: string;
   } | null;
+  /** Stamped on copies generated from an approved showcase demo. Approved
+   *  demos are final, reviewed pieces, so every QA gate / warning is skipped. */
+  demoApproved?: boolean;
   /** Style/tone guidance extracted from user-uploaded reference assets. */
   referenceGuidance?: {
     guidance: string;
