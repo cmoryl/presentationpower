@@ -18,7 +18,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Rocket,
-  Cloud,
   Clock,
   Presentation,
   Printer,
@@ -947,29 +946,6 @@ function SectionHeader({
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
         {hint && <span className="text-xs text-black/45 dark:text-white/45">{hint}</span>}
       </div>
-    </div>
-  );
-}
-
-function HeroStat({
-  label,
-  value,
-  sub,
-  icon,
-}: {
-  label: string;
-  value: number | string;
-  sub?: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-4 backdrop-blur">
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/60">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
-      {sub && <div className="mt-1 text-[11px] text-white/50">{sub}</div>}
     </div>
   );
 }

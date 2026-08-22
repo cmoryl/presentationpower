@@ -328,7 +328,6 @@ function MyFilesPage() {
   );
 }
 
-/** Hero metric with an Element accent underline. */
 function HeroStat({
   value,
   label,
