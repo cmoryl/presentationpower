@@ -15,7 +15,7 @@ export const KEY_TO_SLUG: Record<string, string> = {
   "bm-tp-games": "games",
   "bm-tp-digital": "digital",
   "bm-tp-lifesci": "lifesci",
-  "bm-trial-interactive": "tp",
+  "bm-trial-interactive": "trialinteractive",
   "bm-product": "dataforce",
   "bm-cobrand": "tp",
 
@@ -30,9 +30,11 @@ export const KEY_TO_SLUG: Record<string, string> = {
   "transperfect-digital": "digital",
   "transperfect-cobrand": "tp",
   dataforce: "dataforce",
-  "trial-interactive": "tp",
+  "trial-interactive": "trialinteractive",
 
   // Convenience aliases
+  trialinteractive: "trialinteractive",
+  ti: "trialinteractive",
   legal: "legal",
   lifesci: "lifesci",
   "life-sciences": "lifesci",

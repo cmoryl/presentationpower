@@ -60,6 +60,11 @@ const NEXT: Record<string, DivisionLogoSet> = {
     color: `${B}/digital-color.png`,
     stackedColor: `${B}/digital-stacked-color.png`,
   },
+  trialinteractive: {
+    // Official Trial Interactive marks are SVG classics; the single-colour
+    // dark-blue lockup doubles as the "black" mark for bright surfaces.
+    black: `${B}/trialinteractive-classic-black.svg`,
+  },
   dataforce: {
     color: `${B}/dataforce-color.png`,
     white: `${B}/dataforce-white.png`,
@@ -97,6 +102,9 @@ const CLASSIC_MANIFEST: Record<string, ClassicPresence> = {
   dataforce: { color: "png", white: "png", stackedColor: "png", stackedWhite: "png" },
   // GlobalLink classic (BrandHub-supplied G-mark wordmark, horizontal only).
   globallink: { color: "svg", white: "svg" },
+  // Trial Interactive (portfolio product under Life Sciences) — official
+  // SVG lockups, horizontal + stacked.
+  trialinteractive: { color: "svg", white: "svg", stackedColor: "svg", stackedWhite: "svg" },
 };
 
 function classicSetFor(slug: string): DivisionLogoSet | undefined {
