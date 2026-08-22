@@ -134,6 +134,8 @@ export function BackgroundPackGrid({
         tintStrength: from.tintStrength,
         sceneSwap: from.sceneSwap ?? null,
         imageUrl: from.imageUrl ?? null,
+        imagePriority: from.imagePriority ?? "front",
+
         note: from.note ?? "",
       },
     });
