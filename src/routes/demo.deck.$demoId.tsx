@@ -4,7 +4,13 @@ import { useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
-import { useDeckStore } from "@/lib/deck-store";
+import { useIsAdmin } from "@/hooks/use-is-admin";
+import { useDemoOverride } from "@/lib/demo-overrides";
+import {
+  useDeckStore,
+  type DeckSnapshot,
+  type TemplatePayload,
+} from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
