@@ -1069,9 +1069,10 @@ export function SlideFrame({
 
       {/* ELEMENT motif — the five-brick rail marks the deck's dramatic moments
           (cover / divider / close) on the leading edge, echoing the print
-          mastheads. Purely decorative, never over content, and it exports with
-          the slide because it is a real painted layer. */}
-      {(variant === "cover" || variant === "divider" || variant === "close") && (
+          mastheads. It is ELEMENT-BRAND ONLY: the brick device belongs to the
+          Element product identity (skins S29 / S30) and must never ride on
+          TransPerfect corporate, division or industry templates. */}
+      {isElementSkin && (variant === "cover" || variant === "divider" || variant === "close") && (
         <div
           aria-hidden
           className="pointer-events-none absolute"
@@ -1086,6 +1087,7 @@ export function SlideFrame({
           />
         </div>
       )}
+
 
 
 
