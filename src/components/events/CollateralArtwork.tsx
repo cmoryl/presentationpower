@@ -666,6 +666,12 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
   const ChevronField = ({ opacity, color }: { opacity?: number; color?: string }) => (
     <MotifField opacity={opacity} color={color ?? look.accentAlt} />
   );
+  // Active social template style. The digital/web/social trims below compose
+  // from it so they render in the same visual language as the generated social
+  // assets for this campaign.
+  const sstyle = useSocialStyle();
+  const lockupRow = lockupRowStyle(sstyle);
+  const stackAlign = copyAlignStyle(sstyle);
 
 
   switch (kind) {
