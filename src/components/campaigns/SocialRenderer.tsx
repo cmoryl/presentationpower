@@ -373,6 +373,14 @@ export type SocialRendererProps = {
   imageUrl?: string;
   /** 0–100 — how strongly the brand scrim darkens the photo. */
   imageScrimPct?: number;
+  /** How the photo is composed into the frame.
+   *  · "bleed" (default) — full-frame photo with copy over a plate.
+   *  · "panel" — the photo is cropped into a dedicated panel (right column on
+   *    wide frames, top band on square/portrait) and the copy owns the rest of
+   *    the frame. Designed light layouts use this so the artwork never sits
+   *    under the ink and every aspect gets a purpose-built crop. */
+  imageLayout?: "bleed" | "panel";
+
   /** Template style skin — see src/lib/social-styles.ts. */
   styleId?: SocialStyleId;
   /** Optional event lockup (e.g. TransPerfect NEXT · City Series). When set it
