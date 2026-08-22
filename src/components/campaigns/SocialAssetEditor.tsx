@@ -233,12 +233,35 @@ function SocialAssetEditorModal({
             </Group>
 
             <Group title="Photography">
+              <div className="flex flex-wrap items-center gap-2">
+                {!hasImage ? (
+                  <button
+                    type="button"
+                    disabled={!fallbackPhoto}
+                    onClick={() =>
+                      patch({ imageUrl: fallbackPhoto, imageLayout: edit.imageLayout ?? "panel" })
+                    }
+                    className="inline-flex min-h-[32px] items-center rounded-full border border-black/15 px-3 text-[11px] font-medium text-black/70 transition hover:border-[#003FC7]/50 hover:text-[#003FC7] disabled:opacity-40"
+                  >
+                    {fallbackPhoto ? "Attach division photo" : "No photography available"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => patch({ imageUrl: "" })}
+                    className="inline-flex min-h-[32px] items-center rounded-full border border-black/15 px-3 text-[11px] font-medium text-black/70 transition hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                  >
+                    Remove photo
+                  </button>
+                )}
+              </div>
               {!hasImage ? (
                 <p className="text-xs text-black/55">
-                  This asset has no photo attached — panel controls unlock once imagery is set.
+                  This asset renders copy-only — attach photography to unlock the panel controls.
                 </p>
               ) : (
                 <>
+
                   <Segmented
                     label="Layout"
                     value={edit.imageLayout ?? rendererProps.imageLayout ?? "bleed"}
