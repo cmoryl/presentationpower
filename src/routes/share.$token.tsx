@@ -548,5 +548,6 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
         </div>
       )}
     </div>
+    </SlideTemplateIndustryProvider>
   );
 }
