@@ -124,6 +124,7 @@ import { Route as KnowledgeBrandGuidesElementRouteImport } from './routes/knowle
 import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge.brand-guides.$slug'
 import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
 import { Route as EventsDemoPlaybookIdRouteImport } from './routes/events.demo.$playbookId'
+import { Route as DemoDeckDemoIdRouteImport } from './routes/demo.deck.$demoId'
 import { Route as DecksDeckIdPrintRouteImport } from './routes/decks.$deckId.print'
 import { Route as DecksDeckIdPresentRouteImport } from './routes/decks.$deckId.present'
 import { Route as DecksDeckIdExportRouteImport } from './routes/decks.$deckId.export'
@@ -721,6 +722,11 @@ const EventsDemoPlaybookIdRoute = EventsDemoPlaybookIdRouteImport.update({
   path: '/demo/$playbookId',
   getParentRoute: () => EventsRoute,
 } as any)
+const DemoDeckDemoIdRoute = DemoDeckDemoIdRouteImport.update({
+  id: '/demo/deck/$demoId',
+  path: '/demo/deck/$demoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DecksDeckIdPrintRoute = DecksDeckIdPrintRouteImport.update({
   id: '/decks/$deckId/print',
   path: '/decks/$deckId/print',
@@ -904,6 +910,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
+  '/demo/deck/$demoId': typeof DemoDeckDemoIdRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
@@ -1030,6 +1037,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
+  '/demo/deck/$demoId': typeof DemoDeckDemoIdRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
@@ -1161,6 +1169,7 @@ export interface FileRoutesById {
   '/decks/$deckId/export': typeof DecksDeckIdExportRoute
   '/decks/$deckId/present': typeof DecksDeckIdPresentRoute
   '/decks/$deckId/print': typeof DecksDeckIdPrintRoute
+  '/demo/deck/$demoId': typeof DemoDeckDemoIdRoute
   '/events/demo/$playbookId': typeof EventsDemoPlaybookIdRoute
   '/events/next_/badges': typeof EventsNextBadgesRoute
   '/knowledge/brand-guides/$slug': typeof KnowledgeBrandGuidesSlugRoute
@@ -1293,6 +1302,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
+    | '/demo/deck/$demoId'
     | '/events/demo/$playbookId'
     | '/events/next/badges'
     | '/knowledge/brand-guides/$slug'
@@ -1419,6 +1429,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
+    | '/demo/deck/$demoId'
     | '/events/demo/$playbookId'
     | '/events/next/badges'
     | '/knowledge/brand-guides/$slug'
@@ -1549,6 +1560,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/export'
     | '/decks/$deckId/present'
     | '/decks/$deckId/print'
+    | '/demo/deck/$demoId'
     | '/events/demo/$playbookId'
     | '/events/next_/badges'
     | '/knowledge/brand-guides/$slug'
@@ -1636,6 +1648,7 @@ export interface RootRouteChildren {
   DecksDeckIdExportRoute: typeof DecksDeckIdExportRoute
   DecksDeckIdPresentRoute: typeof DecksDeckIdPresentRoute
   DecksDeckIdPrintRoute: typeof DecksDeckIdPrintRoute
+  DemoDeckDemoIdRoute: typeof DemoDeckDemoIdRoute
   LibraryImportedAuditRoute: typeof LibraryImportedAuditRoute
   LibraryImportedMastersRoute: typeof LibraryImportedMastersRoute
   LibraryPrintAuditRoute: typeof LibraryPrintAuditRoute
@@ -2451,6 +2464,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsDemoPlaybookIdRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/demo/deck/$demoId': {
+      id: '/demo/deck/$demoId'
+      path: '/demo/deck/$demoId'
+      fullPath: '/demo/deck/$demoId'
+      preLoaderRoute: typeof DemoDeckDemoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/decks/$deckId/print': {
       id: '/decks/$deckId/print'
       path: '/decks/$deckId/print'
@@ -2769,6 +2789,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksDeckIdExportRoute: DecksDeckIdExportRoute,
   DecksDeckIdPresentRoute: DecksDeckIdPresentRoute,
   DecksDeckIdPrintRoute: DecksDeckIdPrintRoute,
+  DemoDeckDemoIdRoute: DemoDeckDemoIdRoute,
   LibraryImportedAuditRoute: LibraryImportedAuditRoute,
   LibraryImportedMastersRoute: LibraryImportedMastersRoute,
   LibraryPrintAuditRoute: LibraryPrintAuditRoute,
