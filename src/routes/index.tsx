@@ -99,8 +99,8 @@ const MODES: ModeDef[] = [
     ink: "#003FC7",
     glow: "#A1FBF9",
     eyebrow: "Element · Presentation",
-    headline: "Build a deck that already looks approved.",
-    copy: "Tell Element what the deck is for. It lays out the story with designs your brand already signed off on — you review, make it yours, and send it.",
+    headline: "Built to own the room.",
+    copy: "From brief to board-ready in minutes. Element assembles the right story, layout, and approved visuals — you just refine and present.",
     actions: [
       { label: "New deck from brief", to: "/brief/new", primary: true, hint: "≈ 60s" },
       { label: "Open library", to: "/library" },
@@ -125,8 +125,8 @@ const MODES: ModeDef[] = [
     ink: "#B3186B",
     glow: "#FFEB66",
     eyebrow: "Element · Print",
-    headline: "Case studies, brochures, proposals — press-ready.",
-    copy: "The same Element look, fitted to the page and exported print-ready — so what you approve on screen is exactly what comes off the press.",
+    headline: "Print with presence.",
+    copy: "Brochures, proposals, and case studies that feel as premium in the hand as they do on screen. Press-ready, every time.",
     actions: [
       { label: "Open Print Studio", to: "/library/print", primary: true },
       { label: "Generate a print asset", to: "/asset/new" },
@@ -145,8 +145,8 @@ const MODES: ModeDef[] = [
     ink: "#0F5C1A",
     glow: "#C2A3FF",
     eyebrow: "Element · Events",
-    headline: "Every event kit, ready before you start.",
-    copy: "Launches, conferences, webinars, exec briefings — each arrives with the signage, invites, social, and email already designed and timed to your run-up.",
+    headline: "Every event asset, already in motion.",
+    copy: "Launches, conferences, webinars, and exec briefings — signage, invites, email, and social, all timed to your run-of-show.",
     actions: [
       { label: "Open Events hub", to: "/events", primary: true },
       { label: "Product launch demo", to: "/events/demo/$playbookId", hint: "live" },
@@ -165,8 +165,8 @@ const MODES: ModeDef[] = [
     ink: "#A33B12",
     glow: "#EC388A",
     eyebrow: "Element · Social",
-    headline: "One idea, a full social set.",
-    copy: "Brand moments, product teases, milestones, and client wins — designed per division, sized for every channel, and rendering live in your palette.",
+    headline: "One idea, a full feed.",
+    copy: "Turn a single brand moment into a complete social set, sized for every channel and ready to post — on brand, instantly.",
     actions: [
       { label: "Open Social hub", to: "/social", primary: true },
       { label: "Brand anthem demo", to: "/social/demo/$playbookId", hint: "live" },
