@@ -121,7 +121,9 @@ function PlaybookDemoView() {
         : window.localStorage.getItem(`element:events-demo-look:${playbook.id}`);
     setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : eventLookForPlaybook(playbook.id).id);
   }, [playbook.id]);
-  const look = eventLookById(lookId);
+  const look = lookId.includes("--")
+    ? eventLookForPlaybook(playbook.id)
+    : eventLookById(lookId);
   const pickLook = (id: string) => {
     setLookId(id);
     if (typeof window !== "undefined") {
@@ -163,6 +165,7 @@ function PlaybookDemoView() {
       logoStacked: nextSuite?.stacked ?? { url: stacked, ratio: 2.1 },
       logoNeedsKnockout: nextSuite ? undefined : !logos?.white,
       lookId: look.id,
+      look,
     };
   }, [nextSuite, playbook, look]);
 
