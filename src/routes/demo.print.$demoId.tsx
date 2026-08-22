@@ -114,7 +114,8 @@ function PrintDemoPage() {
           title: item!.title,
           brandModeId: item!.divisionId ?? undefined,
           content,
-          context: editableContextFor(item!),
+          // Approved demo: the editable copy opens without QA gates.
+          context: { ...editableContextFor(item!), demoApproved: true },
         },
       });
       toast.success("Editable copy created");

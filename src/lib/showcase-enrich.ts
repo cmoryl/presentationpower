@@ -72,5 +72,11 @@ export function enrichShowcasePayload(payload: TemplatePayload, key: string): Te
     return { ...slide, content, templateOverride } as TemplatePayload["slides"][number];
   });
 
-  return { ...payload, slides };
+  // Demos are final, reviewed pieces — the generated editable copy opens with
+  // every QA gate and warning suppressed.
+  return {
+    ...payload,
+    slides,
+    context: { ...(payload.context ?? {}), demoApproved: true },
+  };
 }
