@@ -29,7 +29,7 @@ type DemoSlide = {
 type DemoPayload = {
   title?: string;
   brandModeId?: string;
-  subCompany?: string;
+  subCompany?: string | null;
   context?: { stylePackId?: string | null; designRecipeId?: string | null } | null;
   slides: DemoSlide[];
 };
@@ -73,7 +73,7 @@ function SlideFrame({
             variant={variant}
             brand={brand}
             pageNumber={index + 1}
-            subCompany={payload.subCompany}
+            subCompany={payload.subCompany ?? undefined}
             mode={slide.mode ?? "light"}
           />
         </DeckPackScope>
