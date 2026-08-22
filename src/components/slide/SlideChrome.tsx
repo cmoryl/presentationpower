@@ -816,7 +816,7 @@ export function SlideFrame({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background: packGroundPaint(pack, groundSeed).join(", "),
-                  opacity: packGroundDamp(pack, groundSeed),
+                  opacity: authoredPlateGround ? 1 : packGroundDamp(pack, groundSeed),
                   maskImage: groundMask,
                   WebkitMaskImage: groundMask,
                 }}
@@ -839,6 +839,7 @@ export function SlideFrame({
         (() => {
           // Tiled signature motifs are wallpaper; the minimal direction keeps
           // only non-repeating gestures.
+          if (authoredPlateGround) return null;
           const sig = packSignature(pack);
           if (!sig) return null;
           const tiled =
