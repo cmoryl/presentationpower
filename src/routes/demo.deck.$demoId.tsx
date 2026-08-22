@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { useDeckStore } from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
-import demoPresentationImg from "@/assets/showcase/demo-presentation.jpg";
+import { showcaseArt } from "@/lib/showcase-art";
 
 export const Route = createFileRoute("/demo/deck/$demoId")({
   loader: ({ params }) => {
