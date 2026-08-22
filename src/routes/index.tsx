@@ -75,7 +75,11 @@ export const Route = createFileRoute("/")({
 
 type ModeId = "presentation" | "print" | "event" | "social";
 type ModeAction = { label: string; to: string; hint?: string; primary?: boolean };
-type ModeSubnavItem = { label: string; to: string; icon: React.ComponentType<{ size?: number; className?: string }> };
+type ModeSubnavItem = {
+  label: string;
+  to: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+};
 type ModeDef = {
   id: ModeId;
   label: string;
@@ -266,7 +270,6 @@ function Dashboard() {
 
         {/* animated aurora blobs — reactive to selected mode + scroll parallax */}
         <AuroraHero mode={mode} />
-
 
         {/* Oversized ELEMENT watermark — brand signature behind the hero */}
         <ParallaxWatermark accent={mode.accent} />
@@ -562,13 +565,11 @@ function Dashboard() {
         </div>
       </section>
 
-
       {/* ================= SHOWREEL ================= */}
       <ElementShowreel />
 
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
-
 
       {/* ================= RECENT ACTIVITY ================= */}
       <RecentActivity
@@ -576,59 +577,6 @@ function Dashboard() {
         allDeckCount={cloudCount ?? Object.keys(decksMap).length}
         briefs={briefs}
       />
-
-      {/* ================= AI SUITE ================= */}
-      <section className="mt-12">
-        <SectionHeader
-          kicker="Intelligence"
-          title="AI suite"
-          hint="Six agents, one command surface"
-        />
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <AiCard
-            to="/brief/new"
-            icon={<Brain size={16} />}
-            title="Narrative Strategist"
-            desc="Plans deck architecture from your brief before assembly."
-            tint="#A1FBF9"
-          />
-          <AiCard
-            to="/knowledge/ask"
-            icon={<BookOpen size={16} />}
-            title="Deep RAG Synthesis"
-            desc="Claude reasoning over the full brand knowledge base."
-            tint="#C2A3FF"
-          />
-          <AiCard
-            to="/atlas"
-            icon={<MessageSquare size={16} />}
-            title="Deck Copilot"
-            desc="Natural-language edits from inside the deck editor."
-            tint="#A6FA87"
-          />
-          <AiCard
-            to="/atlas"
-            icon={<ShieldCheck size={16} />}
-            title="Brand Reviewer"
-            desc="Scores every deck against its division's guide."
-            tint="#FFEB66"
-          />
-          <AiCard
-            to="/atlas"
-            icon={<ImageIcon size={16} />}
-            title="Asset Suggest"
-            desc="Semantic icon and logo recommendations per slide."
-            tint="#FF9B70"
-          />
-          <AiCard
-            to="/knowledge/ask"
-            icon={<Compass size={16} />}
-            title="Ask Oracle"
-            desc="Conversational hybrid retrieval over Oracle + KB."
-            tint="#EC388A"
-          />
-        </div>
-      </section>
 
       {/* ================= KNOWLEDGE & BRAND ================= */}
       <section className="mt-12">
