@@ -138,6 +138,10 @@ export function KitWizard({
   );
   const [attachEvent, setAttachEvent] = useState(surface === "event");
   const [event, setEvent] = useState<EventFacts>(EMPTY_EVENT);
+  // Art direction locked on the kit (by the events/social agent or another
+  // channel). It travels in event_facts.look so every renderer — and every
+  // asset generated later for this division — reads the same direction.
+  const [kitLook, setKitLook] = useState<{ lookId?: string; styleId?: string }>({});
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
 
