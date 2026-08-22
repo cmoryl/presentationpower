@@ -765,7 +765,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
       return (
         <div style={{ position: "absolute", inset: 0, background: "#F4F6FB", display: "flex", flexDirection: "column" }}>
           <div style={{ position: "relative", height: 250, ...darkField() }}>
-            <ChevronField opacity={0.14} color="#7FD0FF" />
+            <ChevronField opacity={0.14} />
             <div style={{ position: "relative", padding: 34, display: "flex", flexDirection: "column", gap: 14 }}>
               <Logo ctx={ctx} width={280} />
               <div style={{ color: "#fff", fontSize: 28, fontWeight: 700 }}>Save the date · {ctx.city}</div>
@@ -996,7 +996,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
         <Field light chevron={0.05}>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
             <div style={{ position: "relative", height: 330, ...darkField() }}>
-              <ChevronField opacity={0.16} color="#7FD0FF" />
+              <ChevronField opacity={0.16} />
               <div style={{ position: "relative", padding: 44, display: "flex", flexDirection: "column", gap: 16 }}>
                 <Logo ctx={ctx} width={340} />
                 <div style={{ color: "#fff", fontSize: 40, fontWeight: 800, letterSpacing: "-0.03em" }}>
