@@ -7022,11 +7022,20 @@ function renderVariantBody({
     case "MV-INFO-CIRCULAR-FLOW": {
       const items = arr(c.items).slice(0, 6);
       const n = Math.max(items.length, 1);
-      const R = 300;
+      // Stage geometry: the hub disc is 300px wide, so nodes ride an orbit well
+      // clear of it and every label block is anchored *outward* from the ring so
+      // copy can never overlap the hub or its rings.
+      const STAGE_W = 1180;
+      const STAGE_H = 820;
+      const RX = 430;
+      const RY = 300;
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
-          <div className="relative mx-auto mt-8 h-[780px] w-[780px]">
+          <div
+            className="relative mx-auto mt-6"
+            style={{ height: STAGE_H, width: STAGE_W, maxWidth: "100%" }}
+          >
             {/* Hub uses the house circle so the cycle reads like the rest of the system. */}
             <div className="absolute inset-0 grid place-items-center">
               <OrbitDisc
@@ -7045,33 +7054,34 @@ function renderVariantBody({
             </div>
             {items.map((it, i) => {
               const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
-              const x = 50 + (R / 780) * 100 * Math.cos(angle);
-              const y = 50 + (R / 780) * 100 * Math.sin(angle);
-              return (
-                <div
-                  key={i}
-                  className="absolute w-[240px] -translate-x-1/2 -translate-y-1/2 p-2 text-center"
-                  style={{ left: `${x}%`, top: `${y}%` }}
+              const cos = Math.cos(angle);
+              const sin = Math.sin(angle);
+              const x = STAGE_W / 2 + RX * cos;
+              const y = STAGE_H / 2 + RY * sin;
+              // Anchor the block on the side of the point facing away from the hub.
+              const side = Math.abs(cos) > 0.6 ? (cos > 0 ? "right" : "left") : sin < 0 ? "top" : "bottom";
+              const tx = side === "right" ? "0%" : side === "left" ? "-100%" : "-50%";
+              const ty = side === "top" ? "-100%" : side === "bottom" ? "0%" : "-50%";
+              const iconFirst = side !== "top";
+              const Ic = pickIcon(s(it.label), i, s(it.icon));
+              const icon = (
+                <OrbitDisc
+                  size={76}
+                  accent={brand.tokens.accent}
+                  cool={brand.tokens.primary}
+                  isDark={isDark}
+                  rings={false}
+                  seam={false}
+                  className="mx-auto"
+                  contentClassName="flex items-center justify-center"
+                  style={{ color: "var(--slide-accent-text)" }}
                 >
-                  <OrbitDisc
-                    size={76}
-                    accent={brand.tokens.accent}
-                    cool={brand.tokens.primary}
-                    isDark={isDark}
-                    rings={false}
-                    seam={false}
-                    className="mx-auto"
-                    contentClassName="flex items-center justify-center"
-                    style={{ color: "var(--slide-accent-text)" }}
-                  >
-                    {(() => {
-                      const Ic = pickIcon(s(it.label), i, s(it.icon));
-                      return <Ic size={30} />;
-                    })()}
-                  </OrbitDisc>
-
+                  <Ic size={30} />
+                </OrbitDisc>
+              );
+              const copy = (
+                <>
                   <div
-                    className="mt-4"
                     style={{
                       fontSize: fillPx(24, "body"),
                       fontWeight: 600,
@@ -7084,6 +7094,29 @@ function renderVariantBody({
                   <SupportingText size="sm" opacity={0.72} className="mt-2">
                     {s(it.body)}
                   </SupportingText>
+                </>
+              );
+              return (
+                <div
+                  key={i}
+                  className="absolute w-[250px] text-center"
+                  style={{
+                    left: x,
+                    top: y,
+                    transform: `translate(${tx}, ${ty})`,
+                  }}
+                >
+                  {iconFirst ? (
+                    <>
+                      {icon}
+                      <div className="mt-4">{copy}</div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="mb-4">{copy}</div>
+                      {icon}
+                    </>
+                  )}
                 </div>
               );
             })}
@@ -7091,6 +7124,7 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
+
 
     case "MV-INFO-PYRAMID": {
       const items = arr(c.items);
