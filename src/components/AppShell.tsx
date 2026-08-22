@@ -129,6 +129,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       label: "Events",
       to: "/events",
       items: [
+        { to: "/events-agent", label: "Events agent" },
         { to: "/events", label: "Event assets" },
         { to: "/events/new", label: "New event asset" },
         { to: "/events/presets", label: "Presets" },
@@ -139,6 +140,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       label: "Social",
       to: "/social",
       items: [
+        { to: "/social-agent", label: "Social agent" },
         { to: "/social", label: "Social assets" },
         { to: "/social/new", label: "New social asset" },
         { to: "/social/presets", label: "Presets" },
