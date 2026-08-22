@@ -209,6 +209,13 @@ export function gamesPlatesForScene(scene: SkinScene, mode: GamesArtMode): Games
   return scored.map((s) => s.p);
 }
 
+/** Stable small hash so each scene starts at a different point in the pool. */
+function sceneOffset(scene: string): number {
+  let h = 0;
+  for (let i = 0; i < scene.length; i += 1) h = (h * 31 + scene.charCodeAt(i)) % 9973;
+  return h;
+}
+
 /** The plate for one scene, rotating variants by `take`. */
 export function gamesScenePlate(
   scene: SkinScene,
@@ -217,7 +224,12 @@ export function gamesScenePlate(
 ): GamesPlate | null {
   const pool = gamesPlatesForScene(scene, mode);
   if (!pool.length) return null;
-  return pool[Math.abs(take) % Math.min(pool.length, 6)] ?? pool[0]!;
+  // Scene ranking often produces the same top plate for several scenes, which
+  // made a whole deck wear two or three images. Offsetting the index by the
+  // scene name spreads the deck across the kit while staying deterministic.
+  const window = Math.min(pool.length, 10);
+  const idx = (Math.abs(take) + sceneOffset(scene)) % window;
+  return pool[idx] ?? pool[0]!;
 }
 
 export function gamesSceneArtUrl(
@@ -235,14 +247,16 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
   const mode = code ? GAMES_ART_MODE[code.toUpperCase()] : undefined;
   if (!mode) return pack;
   const base = pack.ground;
+  // The plates are finished compositions, so the veil only needs to hold copy
+  // contrast — heavier values flattened the art back into a flat navy field.
   const veil =
     mode === "dark"
-      ? "linear-gradient(0deg, rgba(3,0,44,0.42), rgba(3,0,44,0.42))"
-      : "linear-gradient(0deg, rgba(255,255,255,0.48), rgba(255,255,255,0.48))";
+      ? "linear-gradient(0deg, rgba(3,0,44,0.20), rgba(3,0,44,0.20))"
+      : "linear-gradient(0deg, rgba(255,255,255,0.26), rgba(255,255,255,0.26))";
   const scrim =
     mode === "dark"
-      ? "linear-gradient(100deg, rgba(3,0,44,0.52) 0%, rgba(3,0,44,0.14) 58%, rgba(3,0,44,0) 100%)"
-      : "linear-gradient(100deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.14) 58%, rgba(255,255,255,0) 100%)";
+      ? "linear-gradient(100deg, rgba(3,0,44,0.46) 0%, rgba(3,0,44,0.10) 56%, rgba(3,0,44,0) 100%)"
+      : "linear-gradient(100deg, rgba(255,255,255,0.56) 0%, rgba(255,255,255,0.12) 56%, rgba(255,255,255,0) 100%)";
   return {
     ...pack,
     ground: (seed: string) => {
@@ -257,3 +271,4 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
     },
   };
 }
+

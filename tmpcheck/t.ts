@@ -1,0 +1,11 @@
+import { stylePackById, ALL_STYLE_PACKS } from "../src/lib/style-packs";
+console.log(ALL_STYLE_PACKS.filter(p=>/r2[0-4]/i.test(p.id)).map(p=>p.id));
+const p = stylePackById("skin-r22");
+console.log(!!p, p?.id);
+for (const s of ["cover","stats","chart","closing","timeline"]) console.log(s, JSON.stringify(p?.ground(`scene:${s} lp-x`)).slice(0,320));
+import { withIndustryGround } from "../src/lib/industry-backgrounds";
+const base = stylePackById("skin-s02")!;
+const g = withIndustryGround(base, "R22");
+console.log("R22 ground on s02:", JSON.stringify(g.ground("scene:cover lp-x")).slice(0,300));
+const d = withIndustryGround(stylePackById("skin-s16")!, "R22");
+console.log("dark host:", JSON.stringify(d.ground("scene:cover lp-x")).slice(0,300));

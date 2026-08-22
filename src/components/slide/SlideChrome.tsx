@@ -428,6 +428,14 @@ export function SlideFrame({
   // …UNLESS the author picked a background for this slide in the editor — an
   // explicit pick always wins, live.
   const packOwnsGround = stylePackOwnsGround(pack, backdrop);
+  // Authored plate kits (Games R22, Element S29/S30) paint a finished image as
+  // the pack ground. Those planes must survive at full strength and must not be
+  // over-painted by the pack's procedural signature motif.
+  const authoredPlateGround =
+    !!pack &&
+    packGroundPaint(pack, `scene:${templateScene ?? sceneFromSeed(variant)} ${layoutId ?? variant}`)
+      .some((l) => /url\(["']?https?:/i.test(l));
+
   const hasBackdrop = !!backdrop && !packOwnsGround;
   const hasBackdropImage = !!backdrop?.url && !packOwnsGround;
   const hasBackdropAurora = !!backdrop?.aurora && !packOwnsGround;
@@ -808,7 +816,7 @@ export function SlideFrame({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background: packGroundPaint(pack, groundSeed).join(", "),
-                  opacity: packGroundDamp(pack, groundSeed),
+                  opacity: authoredPlateGround ? 1 : packGroundDamp(pack, groundSeed),
                   maskImage: groundMask,
                   WebkitMaskImage: groundMask,
                 }}
@@ -831,6 +839,7 @@ export function SlideFrame({
         (() => {
           // Tiled signature motifs are wallpaper; the minimal direction keeps
           // only non-repeating gestures.
+          if (authoredPlateGround) return null;
           const sig = packSignature(pack);
           if (!sig) return null;
           const tiled =
