@@ -1174,6 +1174,7 @@ export function KitWizard({
                       imageUrl={imageUrl}
                       imageScrimPct={imageScrimPct}
                       displayShortEdge={shortEdge}
+                      styleId={activeStyleId}
                     />
                   )
                 }
