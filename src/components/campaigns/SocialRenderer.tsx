@@ -698,10 +698,25 @@ export function SocialRenderer({
           />
         </SlideModeContext.Provider>
 
+        {/* Designed ground — light frames without a full-bleed photo used to
+            render as near-white voids. A deterministic composition of brand
+            geometry (accent wash, brick rail, hairline grid) gives them a
+            designed base at every aspect. */}
+        {!bleedImage ? (
+          <DesignGround
+            format={format}
+            accent={brand.tokens.accent}
+            mode={mode}
+            short={short}
+            copyAlign={copyAlign}
+            panelSide={panelMode ? panelSide : null}
+          />
+        ) : null}
+
         {/* Optional imagery layer — sits above the aurora, below the copy.
             The photo's focal point is pushed into the negative space opposite
             the copy block so the subject is never buried behind the text. */}
-        {imageUrl ? (
+        {bleedImage ? (
           <>
             <img
               src={imageUrl}
@@ -727,8 +742,38 @@ export function SocialRenderer({
           </>
         ) : null}
 
-
-
+        {/* Photo panel — cropped to the panel's own aspect with object-cover so
+            imagery is never distorted, whatever the ad size. */}
+        {panelMode && imageUrl ? (
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              ...panelRect,
+              borderRadius: (short * 3.4) / 100,
+              boxShadow:
+                mode === "dark"
+                  ? "0 18px 46px rgba(0,0,0,0.42)"
+                  : "0 18px 40px rgba(3,0,44,0.16)",
+            }}
+          >
+            <img
+              src={imageUrl}
+              alt=""
+              crossOrigin="anonymous"
+              className="absolute inset-0 size-full object-cover"
+              style={{ objectPosition: panelSide === "right" ? "center 42%" : objectPosition }}
+            />
+            {/* Accent edge tying the crop back to the division palette. */}
+            <div
+              aria-hidden
+              className="absolute inset-x-0 bottom-0"
+              style={{
+                height: Math.max(3, (short * 0.8) / 100),
+                background: accentGradient(brand.tokens.accent, "90deg", mode),
+              }}
+            />
+          </div>
+        ) : null}
 
         {/* Content stack — anchored per copyAlign, inside the safe area and
             capped to the rule-of-thirds copy band so it can never grow into
@@ -736,10 +781,10 @@ export function SocialRenderer({
         <div
           className="absolute flex flex-col"
           style={{
-            top: safeInset.top,
-            bottom: safeInset.bottom,
-            left: safeInset.left,
-            right: safeInset.right,
+            top: contentInset.top,
+            bottom: contentInset.bottom,
+            left: contentInset.left,
+            right: contentInset.right,
             justifyContent: copyAlign === "end" ? "flex-end" : "flex-start",
             color: inkColor,
           }}
@@ -755,10 +800,12 @@ export function SocialRenderer({
             // bounding, so copy never gets sliced through a line of text.
             minHeight: 0,
 
-            ...(imageUrl ? plateStyle : null),
+            ...(bleedImage ? plateStyle : null),
           }}
         >
-          {imageUrl ? <div aria-hidden style={plateFillStyle} /> : null}
+          {bleedImage ? <div aria-hidden style={plateFillStyle} /> : null}
+
+
 
 
 
