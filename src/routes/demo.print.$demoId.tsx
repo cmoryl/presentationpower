@@ -102,6 +102,16 @@ function PrintDemoPage() {
     return base ? applyDivisionSeedToContent(base, seed) : null;
   }, [item, seed]);
 
+  // Live draft: every copy edit re-renders the real print layout below and is
+  // what gets written into the editable copy when the user opens it.
+  const [draft, setDraft] = useState<unknown>(previewContent);
+  useEffect(() => setDraft(previewContent), [previewContent]);
+  const dirty = useMemo(
+    () => JSON.stringify(draft) !== JSON.stringify(previewContent),
+    [draft, previewContent],
+  );
+  const renderKey = dirty ? "edited" : "base";
+
   if (!def || !item) return null;
   const previewLook = parseLook(item.look) ?? {};
   const previewBrand =
@@ -116,7 +126,10 @@ function PrintDemoPage() {
       toast.error("This example has no editable content yet.");
       return;
     }
-    const content = applyDivisionSeedToContent(base, seed);
+    // Carry the on-page edits into the real asset.
+    const content =
+      (draft as Record<string, unknown> | null) ?? applyDivisionSeedToContent(base, seed);
+
     setBusy(true);
     try {
       const existing = await findFn({ data: { libraryItemId: item!.id } });
