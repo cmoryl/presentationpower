@@ -14,7 +14,7 @@ export function BackToTop() {
       ([entry]) => {
         setVisible(!entry.isIntersecting);
       },
-      { threshold: 0, rootMargin: "0px 0px -100% 0px" },
+      { threshold: 0 },
     );
 
     observer.observe(sentinel);
