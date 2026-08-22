@@ -2,7 +2,6 @@ import { RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useDeckStore } from "@/lib/deck-store";
 import { regenerateApprovedDemoCopies } from "@/lib/showcase-regenerate";
 
 /**
@@ -16,10 +15,7 @@ export function RegenerateApprovedCopiesButton({
   className?: string;
   label?: string;
 }) {
-  const deckCount = useDeckStore((s) => Object.keys(s.decks).length);
   const [busy, setBusy] = useState(false);
-
-  if (deckCount === 0) return null;
 
   function run() {
     setBusy(true);
