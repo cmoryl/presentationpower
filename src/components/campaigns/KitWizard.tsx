@@ -325,8 +325,13 @@ export function KitWizard({
   // social, event and digital assets of the same campaign.
   const activeStyleId = useMemo(
     () =>
-      campaignArtDirection({ brandId, lookId: kitLook.lookId, styleId: kitLook.styleId }).styleId,
-    [brandId, kitLook.lookId, kitLook.styleId],
+      campaignArtDirection({
+        key: `kit:${surface}:${savedKitId ?? "draft"}`,
+        brandId,
+        lookId: kitLook.lookId,
+        styleId: kitLook.styleId,
+      }).styleId,
+    [surface, savedKitId, brandId, kitLook.lookId, kitLook.styleId],
   );
 
   const assets: CampaignAsset[] = useMemo(() => {
