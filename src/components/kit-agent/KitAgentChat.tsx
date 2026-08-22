@@ -26,6 +26,12 @@ const TOOL_LABELS: Record<string, string> = {
   read_kit: "Reading the kit",
   create_kit: "Creating the kit",
   update_kit: "Updating the kit",
+  read_brief: "Recalling the brief",
+  save_brief: "Saving the brief",
+  list_looks: "Reviewing art directions",
+  set_kit_look: "Locking the art direction",
+  audit_kit: "Checking the kit for gaps",
+  create_companion_kit: "Building the companion kit",
 };
 
 function toolNameOf(type: string) {
