@@ -1517,6 +1517,57 @@ export type Database = {
         }
         Relationships: []
       }
+      division_seeds: {
+        Row: {
+          accent: string | null
+          bright_field: string | null
+          deep: string | null
+          deep_field: string | null
+          display_name: string | null
+          division_id: string
+          logo_dark: string | null
+          logo_white: string | null
+          updated_at: string
+          updated_by: string | null
+          why_cards: Json | null
+          why_eyebrow: string | null
+          why_lines: string[] | null
+          why_title: string | null
+        }
+        Insert: {
+          accent?: string | null
+          bright_field?: string | null
+          deep?: string | null
+          deep_field?: string | null
+          display_name?: string | null
+          division_id: string
+          logo_dark?: string | null
+          logo_white?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          why_cards?: Json | null
+          why_eyebrow?: string | null
+          why_lines?: string[] | null
+          why_title?: string | null
+        }
+        Update: {
+          accent?: string | null
+          bright_field?: string | null
+          deep?: string | null
+          deep_field?: string | null
+          display_name?: string | null
+          division_id?: string
+          logo_dark?: string | null
+          logo_white?: string | null
+          updated_at?: string
+          updated_by?: string | null
+          why_cards?: Json | null
+          why_eyebrow?: string | null
+          why_lines?: string[] | null
+          why_title?: string | null
+        }
+        Relationships: []
+      }
       division_stats: {
         Row: {
           caption: string | null
