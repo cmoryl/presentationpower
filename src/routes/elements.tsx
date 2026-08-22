@@ -10,6 +10,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { ElementBrickRow, ElementBrickRail } from "@/components/brand/ElementBrickMotif";
 import { ThemedHeroVideo } from "@/components/hero/ThemedHeroVideo";
+import { showcaseArt } from "@/lib/showcase-art";
 import heroElementsDark from "@/assets/hero-elements-dark.mp4.asset.json";
 import heroElementsLight from "@/assets/hero-elements-light.mp4.asset.json";
 
@@ -64,6 +65,8 @@ const SURFACES: Surface[] = [
     ink: "#003FC7",
     glow: "#A1FBF9",
     to: "/library",
+    artId: "globallink-enterprise-pitch",
+    proof: ["Editable PPTX", "189 modules", "Style packs"],
     icon: Presentation,
     items: [
       { label: "Slide modules", to: "/library" },
@@ -83,6 +86,8 @@ const SURFACES: Surface[] = [
     ink: "#B3186B",
     glow: "#FFEB66",
     to: "/library/print",
+    artId: "pd-legal-proposal",
+    proof: ["PDF/X-4", "300 DPI", "Layered PPTX"],
     icon: Printer,
     items: [
       { label: "Print templates", to: "/library/print" },
@@ -102,6 +107,8 @@ const SURFACES: Surface[] = [
     ink: "#0F5C1A",
     glow: "#A6FA87",
     to: "/events",
+    artId: "sc-conference",
+    proof: ["Phased kits", "Signage + badges", "Live palette"],
     icon: CalendarDays,
     items: [
       { label: "Event assets", to: "/events" },
@@ -119,6 +126,8 @@ const SURFACES: Surface[] = [
     ink: "#A33B12",
     glow: "#EC388A",
     to: "/social",
+    artId: "sc-gaming",
+    proof: ["Every channel size", "Division-scoped", "One-click kit"],
     icon: Share2,
     items: [
       { label: "Social assets", to: "/social" },
