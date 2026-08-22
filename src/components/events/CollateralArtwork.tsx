@@ -401,8 +401,11 @@ function Meta({
   );
 }
 
-function Rule({ color = BLUE, h = 6, w = "38%" }: { color?: string; h?: number; w?: number | string }) {
-  return <div style={{ width: w, height: h, borderRadius: 99, background: color }} />;
+function Rule({ color, h = 6, w = "38%" }: { color?: string; h?: number; w?: number | string }) {
+  const look = useLook();
+  return (
+    <div style={{ width: w, height: h, borderRadius: 99, background: color ?? look.accent }} />
+  );
 }
 
 function Lines({
