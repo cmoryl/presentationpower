@@ -38,6 +38,7 @@ import {
   type CampaignCopy,
 } from "@/lib/campaigns";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
+import { campaignArtDirection, saveCampaignLook } from "@/lib/campaign-look";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { NextRenderer, NEXT_RENDER_TRACKS } from "@/components/campaigns/NextRenderer";
 import { NEXT_NAVY_SPEC } from "@/lib/next-brand-guide";
@@ -138,6 +139,10 @@ export function KitWizard({
   );
   const [attachEvent, setAttachEvent] = useState(surface === "event");
   const [event, setEvent] = useState<EventFacts>(EMPTY_EVENT);
+  // Art direction locked on the kit (by the events/social agent or another
+  // channel). It travels in event_facts.look so every renderer — and every
+  // asset generated later for this division — reads the same direction.
+  const [kitLook, setKitLook] = useState<{ lookId?: string; styleId?: string }>({});
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
 
@@ -209,6 +214,19 @@ export function KitWizard({
         setAttachEvent(row.attachEvent);
         setNextDesign(!!row.nextDesign);
         setNextTrackId(row.nextTrackId || "city-series");
+        {
+          const stored = (row.eventFacts as { look?: { lookId?: string; styleId?: string } } | null)
+            ?.look;
+          if (stored?.lookId || stored?.styleId) {
+            setKitLook({ lookId: stored.lookId, styleId: stored.styleId });
+            // Publish it as the division's campaign direction so social,
+            // event and digital assets generated later inherit the same look.
+            saveCampaignLook(row.brandId, {
+              ...(stored.lookId ? { lookId: stored.lookId } : {}),
+              ...(stored.styleId ? { styleId: stored.styleId } : {}),
+            });
+          }
+        }
         setStep(4); // jump to review
       })
       .catch((err) => {
@@ -256,7 +274,12 @@ export function KitWizard({
             statValue: manualCopy.statValue.trim() || undefined,
             statLabel: manualCopy.statLabel.trim() || undefined,
           },
-          eventFacts: attachEvent ? (event as unknown as Record<string, unknown>) : {},
+          eventFacts: {
+            ...(attachEvent ? (event as unknown as Record<string, unknown>) : {}),
+            // Keep the locked art direction on the row even when event facts
+            // are off, so reopening the kit renders in the same look.
+            ...(kitLook.lookId || kitLook.styleId ? { look: kitLook } : {}),
+          },
           attachEvent,
           nextDesign,
           nextTrackId,
@@ -296,6 +319,21 @@ export function KitWizard({
     if (!attachEvent) return { ...EMPTY_EVENT, subBrand: brandId };
     return { ...event, subBrand: brandId };
   }, [attachEvent, event, brandId]);
+
+  // Layout/geometry contract for the rendered assets: the kit's locked look
+  // wins, then the division's stored campaign direction, then the authored
+  // default. This is what keeps agent-built kits visually cohesive with the
+  // social, event and digital assets of the same campaign.
+  const activeStyleId = useMemo(
+    () =>
+      campaignArtDirection({
+        key: `kit:${surface}:${savedKitId ?? "draft"}`,
+        brandId,
+        lookId: kitLook.lookId,
+        styleId: kitLook.styleId,
+      }).styleId,
+    [surface, savedKitId, brandId, kitLook.lookId, kitLook.styleId],
+  );
 
   const assets: CampaignAsset[] = useMemo(() => {
     if (!source) return [];
@@ -1058,6 +1096,7 @@ export function KitWizard({
                                 imageUrl={imageUrl}
                                 imageScrimPct={imageScrimPct}
                                 displayShortEdge={displayShortEdge}
+                                styleId={activeStyleId}
                               />
                             )
                           }
@@ -1169,6 +1208,7 @@ export function KitWizard({
                       imageUrl={imageUrl}
                       imageScrimPct={imageScrimPct}
                       displayShortEdge={shortEdge}
+                      styleId={activeStyleId}
                     />
                   )
                 }

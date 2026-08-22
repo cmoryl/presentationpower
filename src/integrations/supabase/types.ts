@@ -263,6 +263,7 @@ export type Database = {
       }
       agent_threads: {
         Row: {
+          brief: Json
           created_at: string
           deck_id: string | null
           id: string
@@ -274,6 +275,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          brief?: Json
           created_at?: string
           deck_id?: string | null
           id?: string
@@ -285,6 +287,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          brief?: Json
           created_at?: string
           deck_id?: string | null
           id?: string

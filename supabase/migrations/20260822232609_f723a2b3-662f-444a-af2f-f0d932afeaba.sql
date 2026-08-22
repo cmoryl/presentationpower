@@ -1,0 +1,1 @@
+ALTER TABLE public.agent_threads ADD COLUMN IF NOT EXISTS brief jsonb NOT NULL DEFAULT '{}'::jsonb;
