@@ -7,7 +7,8 @@
  * carries meaning and never autoplays for users who ask for reduced motion.
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { SeamlessVideo } from "@/components/hero/SeamlessVideo";
 
 export function HeroVideoLayer({
   src,
@@ -25,7 +26,6 @@ export function HeroVideoLayer({
   darkTint?: string;
   className?: string;
 }) {
-  const ref = useRef<HTMLVideoElement | null>(null);
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
@@ -36,27 +36,12 @@ export function HeroVideoLayer({
     return () => mq.removeEventListener("change", apply);
   }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (allowed) void el.play().catch(() => undefined);
-    else el.pause();
-  }, [allowed]);
-
   return (
     <div aria-hidden className={`pointer-events-none absolute inset-0 -z-0 ${className}`}>
       {allowed && (
-        <video
-          ref={ref}
-          src={src}
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="metadata"
-          className="h-full w-full object-cover"
-          style={{ opacity }}
-        />
+        <div className="absolute inset-0" style={{ opacity }}>
+          <SeamlessVideo src={src} />
+        </div>
       )}
       {/* Legibility wash: solid at the text edge, clearing toward the far side. */}
       <div
