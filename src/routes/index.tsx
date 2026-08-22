@@ -561,8 +561,12 @@ function Dashboard() {
       </section>
 
 
+      {/* ================= SHOWREEL ================= */}
+      <ElementShowreel />
+
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
+
 
       {/* ================= RECENT ACTIVITY ================= */}
       <RecentActivity
