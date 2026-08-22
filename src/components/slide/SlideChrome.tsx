@@ -477,12 +477,9 @@ export function SlideFrame({
   // https: silently let the motif ride on top of every authored plate.
   const authoredPlateGround =
     !!pack &&
-    packGroundPaint(
-      pack,
-      templateScene
-        ? `scene:${templateScene} accentlock ${layoutId ?? variant}`
-        : `scene:${sceneFromSeed(variant)} ${layoutId ?? variant}`,
-    ).some((l) => /url\(\s*["']?(?:https?:)?\/\//i.test(l) || /url\(\s*["']?\//i.test(l));
+    packGroundPaint(pack, groundSeed).some(
+      (l) => /url\(\s*["']?(?:https?:)?\/\//i.test(l) || /url\(\s*["']?\//i.test(l),
+    );
 
 
   const hasBackdrop = !!backdrop && !packOwnsGround;
