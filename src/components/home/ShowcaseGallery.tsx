@@ -132,8 +132,8 @@ export function ShowcaseGallery() {
           <MediaCard
             key={d.id}
             to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
-            art={demoPresentationImg}
-            artAlt="Executive team reviewing a finished Element deck on a boardroom display"
+            art={showcaseArt(d.id).src}
+            artAlt={showcaseArt(d.id).alt}
             accent={d.accent}
             icon={<Presentation size={12} />}
             label={`Deck · ${d.eyebrow}`}
