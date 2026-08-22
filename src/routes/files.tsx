@@ -48,7 +48,14 @@ export const Route = createFileRoute("/files")({
 
 const KIND_META: Record<
   MyFileKind,
-  { label: string; icon: typeof FileText; tint: string; group: string; accent: string; blurb: string }
+  {
+    label: string;
+    icon: typeof FileText;
+    tint: string;
+    group: string;
+    accent: string;
+    blurb: string;
+  }
 > = {
   deck: {
     label: "Presentation",
@@ -91,7 +98,6 @@ const KIND_META: Record<
     blurb: "Social & email surfaces",
   },
 };
-
 
 type SortKey = "recent" | "created" | "title";
 
@@ -161,7 +167,10 @@ function MyFilesPage() {
             style={{ backgroundColor: "#C2A3FF" }}
           />
           {/* Element brick rail */}
-          <span aria-hidden className="pointer-events-none absolute left-0 top-0 flex h-full w-2 flex-col">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-0 top-0 flex h-full w-2 flex-col"
+          >
             {["#003FC7", "#A1FBF9", "#03002C", "#FF9B70", "#C2A3FF"].map((c) => (
               <span key={c} className="flex-1" style={{ backgroundColor: c }} />
             ))}
@@ -178,12 +187,6 @@ function MyFilesPage() {
               Decks, individual saved slides, print assets, saved modules, and social surfaces —
               saved automatically as you work. Search, reopen, or clear out what you no longer need.
             </p>
-            <div className="mt-6 flex flex-wrap items-center gap-6">
-              <HeroStat value={rows.length} label="Saved items" />
-              <HeroStat value={counts.deck ?? 0} label="Presentations" accent="#003FC7" />
-              <HeroStat value={counts.print ?? 0} label="Print assets" accent="#EC388A" />
-              <HeroStat value={counts.slide ?? 0} label="Slides" accent="#8A5CF6" />
-            </div>
           </div>
         </section>
 
@@ -208,7 +211,11 @@ function MyFilesPage() {
                     ? "border-transparent shadow-md"
                     : "border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.04]"
                 }`}
-                style={active ? { backgroundColor: `${accent}12`, borderColor: `${accent}80` } : undefined}
+                style={
+                  active
+                    ? { backgroundColor: `${accent}12`, borderColor: `${accent}80` }
+                    : undefined
+                }
               >
                 <span
                   aria-hidden
@@ -267,7 +274,6 @@ function MyFilesPage() {
           </span>
         </div>
 
-
         <div className="mt-6">
           {isLoading && (
             <div className="flex items-center gap-2 text-sm text-black/60">
@@ -322,31 +328,7 @@ function MyFilesPage() {
   );
 }
 
-/** Hero metric with an Element accent underline. */
-function HeroStat({
-  value,
-  label,
-  accent = "#03002C",
-}: {
-  value: number;
-  label: string;
-  accent?: string;
-}) {
-  return (
-    <div>
-      <div className="text-2xl font-semibold tabular-nums tracking-[-0.03em]" style={{ color: accent }}>
-        {value}
-      </div>
-      <div className="mt-1 h-[3px] w-8 rounded-full" style={{ backgroundColor: accent, opacity: 0.5 }} />
-      <div className="mt-1.5 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
-        {label}
-      </div>
-    </div>
-  );
-}
-
 function FileCard({
-
   file,
   onDelete,
   deleting,
@@ -373,7 +355,9 @@ function FileCard({
         <div className="mt-0.5 truncate text-[11px] text-black/55 dark:text-white/55">
           {meta.label}
           {file.subtitle ? ` · ${file.subtitle}` : ""}
-          {file.fileName ? ` · .pptx${file.fileSize ? ` (${formatBytes(file.fileSize)})` : ""}` : ""}
+          {file.fileName
+            ? ` · .pptx${file.fileSize ? ` (${formatBytes(file.fileSize)})` : ""}`
+            : ""}
         </div>
         <div className="mt-2 flex items-center gap-2 text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
           <span>Edited {formatWhen(file.updatedAt)}</span>

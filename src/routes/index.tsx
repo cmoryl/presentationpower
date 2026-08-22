@@ -18,7 +18,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Rocket,
-  Cloud,
   Clock,
   Presentation,
   Printer,
@@ -238,16 +237,6 @@ function Dashboard() {
   );
 
   const totalSlides = allDecks.reduce((n, d) => n + d.slides.length, 0);
-  const lastExport = useMemo(() => {
-    let latest: { at: string; kind?: string; title: string } | null = null;
-    for (const d of allDecks) {
-      const at = d.context?.lastExportedAt;
-      if (!at) continue;
-      if (!latest || at > latest.at)
-        latest = { at, kind: d.context?.lastExportKind, title: d.title };
-    }
-    return latest;
-  }, [allDecks]);
 
   /* Agent bar handoff */
   const sendToOracle = (prompt: string) => {
@@ -414,21 +403,6 @@ function Dashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-3 gap-3">
-                  <HeroStat label="Decks" value={allDecks.length} sub={`${totalSlides} slides`} />
-                  <HeroStat
-                    label="Cloud saved"
-                    value={signedIn ? (cloudCount ?? "—") : "—"}
-                    sub={signedIn ? "in your account" : "sign in to sync"}
-                    icon={<Cloud size={12} />}
-                  />
-                  <HeroStat
-                    label="Last export"
-                    value={lastExport ? (lastExport.kind ?? "export").toUpperCase() : "—"}
-                    sub={lastExport ? relative(lastExport.at) : "—"}
-                    icon={<Clock size={12} />}
-                  />
-                </div>
                 <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur">
                   <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
                     Try
@@ -962,29 +936,6 @@ function SectionHeader({
         <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
         {hint && <span className="text-xs text-black/45 dark:text-white/45">{hint}</span>}
       </div>
-    </div>
-  );
-}
-
-function HeroStat({
-  label,
-  value,
-  sub,
-  icon,
-}: {
-  label: string;
-  value: number | string;
-  sub?: string;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-4 backdrop-blur">
-      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/60">
-        {icon}
-        <span>{label}</span>
-      </div>
-      <div className="mt-2 text-2xl font-semibold tabular-nums">{value}</div>
-      {sub && <div className="mt-1 text-[11px] text-white/50">{sub}</div>}
     </div>
   );
 }
