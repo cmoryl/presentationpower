@@ -37,9 +37,28 @@ type Preset = {
 };
 
 // Percentages are fractions of the frame's shorter edge (min(w, h)) so a
-// story and a square use compatible units.
+// story and a square use compatible units. The aspect class sets the base and
+// the format's own `tune` (per-platform preset) is merged on top, so two 9:16
+// frames with different chrome budgets still size type and imagery correctly.
 function presetFor(format: SocialFormat): Preset {
+  const base = basePresetFor(format);
+  const t = format.tune;
+  if (!t) return base;
+  return {
+    padPct: t.padPct ?? base.padPct,
+    eyebrowPct: t.eyebrowPct ?? base.eyebrowPct,
+    titlePct: t.titlePct ?? base.titlePct,
+    summaryPct: t.summaryPct ?? base.summaryPct,
+    ctaPct: t.ctaPct ?? base.ctaPct,
+    align: t.align ?? base.align,
+    showSummary: t.showSummary ?? base.showSummary,
+    lockupSize: t.lockupSize ?? base.lockupSize,
+  };
+}
+
+function basePresetFor(format: SocialFormat): Preset {
   switch (aspectClass(format)) {
+
     case "landscape-wide":
       return {
         padPct: 5,
@@ -400,7 +419,7 @@ export function SocialRenderer({
   facts,
   imageUrl,
   imageScrimPct = 55,
-  imageLayout = "bleed",
+  imageLayout: imageLayoutProp,
 
   styleId,
   eventLogo,
@@ -409,7 +428,11 @@ export function SocialRenderer({
 
   const brand = findBrand(brandId);
   const preset = presetFor(format);
+  const tune = format.tune ?? {};
+  // The caller wins; otherwise the platform preset decides bleed vs panel.
+  const imageLayout = imageLayoutProp ?? tune.imageLayout ?? "bleed";
   const style = resolveSocialStyle(styleId);
+
   const short = Math.min(format.width, format.height);
   const scale = displayShortEdge / short;
   const wrapperStyle: CSSProperties = {
@@ -455,7 +478,16 @@ export function SocialRenderer({
   // Nudge the crop away from the copy band on tall frames, where object-cover
   // has the most vertical slack to give.
   const focalYAdjusted =
-    cls === "portrait-tall" ? (copyAlign === "end" ? 26 : 74) : focalY;
+    tune.focalYPct != null
+      ? copyAlign === "end"
+        ? tune.focalYPct
+        : 100 - tune.focalYPct
+      : cls === "portrait-tall"
+        ? copyAlign === "end"
+          ? 26
+          : 74
+        : focalY;
+
   const objectPosition = `center ${focalYAdjusted}%`;
 
   // ---- Panel composition ---------------------------------------------------
@@ -518,17 +550,32 @@ export function SocialRenderer({
   // Photography competes with type, so tighten the stack when an image is on.
   // Wide frames give the copy the least room, so they shrink hardest — a
   // clipped half-sentence reads worse than slightly smaller type.
-  const copyScale = bleedImage
-    ? cls === "landscape-wide"
-      ? 0.8
-      : 0.9
-    : panelMode
+  // Safe-area fit: when platform chrome eats a big slice of the frame (TikTok
+// rails, YouTube channel-art centre band, LinkedIn banners) the usable box is
+  // much smaller than the frame, so the whole stack scales with it instead of
+  // spilling out of the safe rect.
+  const usableW = format.width - safeInset.left - safeInset.right;
+  const usableH = format.height - safeInset.top - safeInset.bottom;
+  const safeFit = Math.min(
+    1,
+    Math.max(0.62, Math.min(usableW / format.width, usableH / format.height) / 0.8),
+  );
+  const copyScale =
+    (bleedImage
       ? cls === "landscape-wide"
-        ? 0.74
-        : 0.86
-      : 1;
+        ? 0.8
+        : 0.9
+      : panelMode
+        ? cls === "landscape-wide"
+          ? 0.74
+          : 0.86
+        : 1) *
+    (tune.copyScaleMul ?? 1) *
+    safeFit;
   const titleLines =
-    cls === "landscape-wide" ? (imageUrl ? 3 : 2) : panelMode ? 4 : imageUrl ? 3 : 4;
+    tune.titleLines ??
+    (cls === "landscape-wide" ? (imageUrl ? 3 : 2) : panelMode ? 4 : imageUrl ? 3 : 4);
+
 
 
 

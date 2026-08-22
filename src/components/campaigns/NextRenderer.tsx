@@ -53,7 +53,23 @@ type Preset = {
 };
 
 function presetFor(format: SocialFormat): Preset {
+  const base = basePresetFor(format);
+  const t = format.tune;
+  if (!t) return base;
+  return {
+    ...base,
+    padPct: t.padPct ?? base.padPct,
+    eyebrowPct: t.eyebrowPct ?? base.eyebrowPct,
+    titlePct: t.titlePct ?? base.titlePct,
+    summaryPct: t.summaryPct ?? base.summaryPct,
+    ctaPct: t.ctaPct ?? base.ctaPct,
+    showSummary: t.showSummary ?? base.showSummary,
+  };
+}
+
+function basePresetFor(format: SocialFormat): Preset {
   switch (aspectClass(format)) {
+
     case "landscape-wide":
       return {
         padPct: 5,
