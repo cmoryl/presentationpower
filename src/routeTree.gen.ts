@@ -41,6 +41,7 @@ import { Route as SocialPresetsRouteImport } from './routes/social.presets'
 import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as SocialModulesRouteImport } from './routes/social.modules'
 import { Route as SocialBannersRouteImport } from './routes/social.banners'
+import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
@@ -301,6 +302,11 @@ const SocialBannersRoute = SocialBannersRouteImport.update({
   id: '/banners',
   path: '/banners',
   getParentRoute: () => SocialRoute,
+} as any)
+const SocialAgentThreadIdRoute = SocialAgentThreadIdRouteImport.update({
+  id: '/social-agent/$threadId',
+  path: '/social-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
@@ -904,6 +910,7 @@ export interface FileRoutesByFullPath {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1034,6 +1041,7 @@ export interface FileRoutesByTo {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1169,6 +1177,7 @@ export interface FileRoutesById {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1305,6 +1314,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
     | '/social/new'
@@ -1435,6 +1445,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
     | '/social/new'
@@ -1569,6 +1580,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
     | '/social/new'
@@ -1669,6 +1681,7 @@ export interface RootRouteChildren {
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  SocialAgentThreadIdRoute: typeof SocialAgentThreadIdRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   AgentIndexRoute: typeof AgentIndexRoute
@@ -1920,6 +1933,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/social/banners'
       preLoaderRoute: typeof SocialBannersRouteImport
       parentRoute: typeof SocialRoute
+    }
+    '/social-agent/$threadId': {
+      id: '/social-agent/$threadId'
+      path: '/social-agent/$threadId'
+      fullPath: '/social-agent/$threadId'
+      preLoaderRoute: typeof SocialAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/share/$token': {
       id: '/share/$token'
@@ -2835,6 +2855,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,
+  SocialAgentThreadIdRoute: SocialAgentThreadIdRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
   AgentIndexRoute: AgentIndexRoute,
