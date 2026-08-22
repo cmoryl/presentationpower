@@ -33,6 +33,26 @@ export function buildEchartsOption(spec: InfographicSpec): Record<string, unknow
       return treemapOption(spec);
     case "calendar-heatmap":
       return calendarHeatmapOption(spec);
+    case "waterfall":
+      return waterfallOption(spec);
+    case "radar":
+      return radarOption(spec);
+    case "stacked-area":
+      return stackedAreaOption(spec);
+    case "dumbbell":
+      return dumbbellOption(spec);
+    case "radial-bar":
+      return radialBarOption(spec);
+    case "sunburst":
+      return sunburstOption(spec);
+    case "gantt":
+      return ganttOption(spec);
+    case "slope":
+      return slopeOption(spec);
+    case "gauge-grid":
+      return gaugeGridOption(spec);
+    case "boxplot":
+      return boxplotOption(spec);
     default:
       return {};
   }
@@ -324,4 +344,422 @@ function calendarHeatmapOption(spec: InfographicSpec) {
     },
     series: [{ type: "heatmap", coordinateSystem: "calendar", data }],
   };
+}
+
+
+// ── Second-wave builders ──────────────────────────────────────────────────
+// Every builder below is pure: rows in, ECharts option out. Colours come from
+// the slide's own brand tokens so a chart re-inks with the look, and axis /
+// label ink uses the shared muted-hairline scale rather than hard-coded grey.
+
+/** Shared cartesian frame so the wave-two charts sit on one visual baseline. */
+function grid(bottom = 40) {
+  return { top: 28, left: 56, right: 32, bottom, containLabel: true };
+}
+function catAxis(ink: ReturnType<typeof echartsInk>, data: string[]) {
+  return {
+    type: "category",
+    data,
+    axisLine: { lineStyle: { color: ink.hairline } },
+    axisTick: { show: false },
+    axisLabel: { color: ink.muted, fontSize: 12 },
+  };
+}
+function valAxis(ink: ReturnType<typeof echartsInk>, name?: string) {
+  return {
+    type: "value",
+    name,
+    nameTextStyle: { color: ink.muted, fontSize: 11 },
+    axisLine: { show: false },
+    axisTick: { show: false },
+    axisLabel: { color: ink.muted, fontSize: 11 },
+    splitLine: { lineStyle: { color: ink.hairline } },
+  };
+}
+
+/** Waterfall — running total with rise/fall bars over an invisible base. */
+function waterfallOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const labelKey = spec.encoding.x ?? spec.encoding.label ?? "label";
+  const valueKey = spec.encoding.value ?? spec.encoding.y ?? "value";
+  const labels: string[] = [];
+  const base: number[] = [];
+  const rise: Array<number | string> = [];
+  const fall: Array<number | string> = [];
+  let running = 0;
+  spec.data.rows.forEach((r, i) => {
+    const v = n(r[valueKey]);
+    const isTotal = String(r.type ?? "").toLowerCase() === "total" || i === spec.data.rows.length - 1 && String(r.type ?? "").toLowerCase() === "total";
+    labels.push(str(r[labelKey], `#${i + 1}`));
+    if (isTotal) {
+      base.push(0);
+      rise.push(v);
+      fall.push("-");
+      running = v;
+      return;
+    }
+    if (v >= 0) {
+      base.push(running);
+      rise.push(v);
+      fall.push("-");
+    } else {
+      base.push(running + v);
+      rise.push("-");
+      fall.push(-v);
+    }
+    running += v;
+  });
+  return {
+    grid: grid(),
+    xAxis: catAxis(ink, labels),
+    yAxis: valAxis(ink, spec.data.columns?.[valueKey]),
+    series: [
+      { type: "bar", stack: "wf", itemStyle: { color: "transparent" }, emphasis: { itemStyle: { color: "transparent" } }, data: base, silent: true },
+      { name: "Increase", type: "bar", stack: "wf", data: rise, itemStyle: { color: palette[0], borderRadius: [4, 4, 0, 0] }, label: { show: true, position: "top", color: ink.muted, fontSize: 11 } },
+      { name: "Decrease", type: "bar", stack: "wf", data: fall, itemStyle: { color: palette[4] ?? palette[1], borderRadius: [0, 0, 4, 4] }, label: { show: true, position: "bottom", color: ink.muted, fontSize: 11 } },
+    ],
+  };
+}
+
+/** Radar — multi-axis capability profile, one polygon per series. */
+function radarOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const axisKey = spec.encoding.x ?? spec.encoding.label ?? "axis";
+  const seriesKey = spec.encoding.series ?? "series";
+  const valueKey = spec.encoding.value ?? spec.encoding.y ?? "value";
+  const axes: string[] = [];
+  const bySeries = new Map<string, Map<string, number>>();
+  for (const r of spec.data.rows) {
+    const axis = str(r[axisKey]);
+    const name = str(r[seriesKey], "Series");
+    if (!axis) continue;
+    if (!axes.includes(axis)) axes.push(axis);
+    const m = bySeries.get(name) ?? new Map<string, number>();
+    m.set(axis, n(r[valueKey]));
+    bySeries.set(name, m);
+  }
+  const max = Math.max(1, ...[...bySeries.values()].flatMap((m) => [...m.values()]));
+  return {
+    legend: { bottom: 0, textStyle: { color: ink.muted, fontSize: 12 }, icon: "circle" },
+    radar: {
+      indicator: axes.map((name) => ({ name, max: Math.ceil(max * 1.1) })),
+      radius: "64%",
+      center: ["50%", "48%"],
+      axisName: { color: ink.muted, fontSize: 12 },
+      splitLine: { lineStyle: { color: ink.hairline } },
+      splitArea: { areaStyle: { color: ["transparent"] } },
+      axisLine: { lineStyle: { color: ink.hairline } },
+    },
+    series: [
+      {
+        type: "radar",
+        symbolSize: 6,
+        data: [...bySeries.entries()].map(([name, m], i) => ({
+          name,
+          value: axes.map((a) => m.get(a) ?? 0),
+          lineStyle: { width: 2, color: palette[i % palette.length] },
+          itemStyle: { color: palette[i % palette.length] },
+          areaStyle: { color: palette[i % palette.length], opacity: 0.16 },
+        })),
+      },
+    ],
+  };
+}
+
+/** Stacked area — composition over time. */
+function stackedAreaOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const xKey = spec.encoding.x ?? "period";
+  const seriesKey = spec.encoding.series ?? "series";
+  const valueKey = spec.encoding.value ?? spec.encoding.y ?? "value";
+  const periods: string[] = [];
+  const bySeries = new Map<string, Map<string, number>>();
+  for (const r of spec.data.rows) {
+    const x = str(r[xKey]);
+    const name = str(r[seriesKey], "Series");
+    if (!x) continue;
+    if (!periods.includes(x)) periods.push(x);
+    const m = bySeries.get(name) ?? new Map<string, number>();
+    m.set(x, n(r[valueKey]));
+    bySeries.set(name, m);
+  }
+  return {
+    legend: { bottom: 0, textStyle: { color: ink.muted, fontSize: 12 }, icon: "roundRect" },
+    grid: grid(52),
+    xAxis: { ...catAxis(ink, periods), boundaryGap: false },
+    yAxis: valAxis(ink, spec.data.columns?.[valueKey]),
+    series: [...bySeries.entries()].map(([name, m], i) => ({
+      name,
+      type: "line",
+      stack: "total",
+      smooth: 0.35,
+      showSymbol: false,
+      lineStyle: { width: 2, color: palette[i % palette.length] },
+      areaStyle: { color: palette[i % palette.length], opacity: 0.5 },
+      data: periods.map((p) => m.get(p) ?? 0),
+    })),
+  };
+}
+
+/** Dumbbell — before/after gap per category. */
+function dumbbellOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const labelKey = spec.encoding.label ?? spec.encoding.x ?? "label";
+  const aKey = spec.encoding.value ?? "before";
+  const bKey = spec.encoding.y2 ?? spec.encoding.y ?? "after";
+  const labels = spec.data.rows.map((r, i) => str(r[labelKey], `#${i + 1}`));
+  const a = spec.data.rows.map((r) => n(r[aKey]));
+  const b = spec.data.rows.map((r) => n(r[bKey]));
+  return {
+    legend: { bottom: 0, textStyle: { color: ink.muted, fontSize: 12 }, icon: "circle" },
+    grid: grid(52),
+    xAxis: valAxis(ink, spec.data.columns?.[bKey]),
+    yAxis: { ...catAxis(ink, labels), inverse: true },
+    series: [
+      {
+        name: "Gap",
+        type: "bar",
+        barWidth: 3,
+        stack: "gap",
+        itemStyle: { color: "transparent" },
+        silent: true,
+        data: a.map((v, i) => Math.min(v, b[i] ?? v)),
+      },
+      {
+        name: "Change",
+        type: "bar",
+        barWidth: 3,
+        stack: "gap",
+        itemStyle: { color: ink.faint, borderRadius: 2 },
+        data: a.map((v, i) => Math.abs((b[i] ?? v) - v)),
+      },
+      {
+        name: spec.data.columns?.[aKey] ?? "Before",
+        type: "scatter",
+        symbolSize: 14,
+        itemStyle: { color: palette[1] ?? palette[0] },
+        data: a.map((v, i) => [v, i]),
+      },
+      {
+        name: spec.data.columns?.[bKey] ?? "After",
+        type: "scatter",
+        symbolSize: 14,
+        itemStyle: { color: palette[0] },
+        label: { show: true, position: "right", color: ink.muted, fontSize: 11, formatter: "{@[0]}" },
+        data: b.map((v, i) => [v, i]),
+      },
+    ],
+  };
+}
+
+/** Radial bar — progress rings, one arc per item. */
+function radialBarOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const labelKey = spec.encoding.label ?? spec.encoding.x ?? "label";
+  const valueKey = spec.encoding.value ?? spec.encoding.y ?? "value";
+  const rows = spec.data.rows.slice(0, 6);
+  const labels = rows.map((r, i) => str(r[labelKey], `#${i + 1}`));
+  const max = Math.max(100, ...rows.map((r) => n(r[valueKey])));
+  return {
+    angleAxis: { max, startAngle: 90, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { show: false }, splitLine: { show: false } },
+    radiusAxis: { type: "category", data: labels, z: 10, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: ink.muted, fontSize: 12 } },
+    polar: { center: ["50%", "52%"], radius: ["26%", "88%"] },
+    series: [
+      {
+        type: "bar",
+        coordinateSystem: "polar",
+        roundCap: true,
+        barWidth: 14,
+        showBackground: true,
+        backgroundStyle: { color: ink.hairline },
+        data: rows.map((r, i) => ({ value: n(r[valueKey]), itemStyle: { color: palette[i % palette.length] } })),
+        label: { show: true, position: "middle", formatter: "{c}", color: ink.strong, fontSize: 11, fontWeight: 600 },
+      },
+    ],
+  };
+}
+
+/** Sunburst — two-level hierarchy of share. */
+function sunburstOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const labelKey = spec.encoding.label ?? "label";
+  const valueKey = spec.encoding.value ?? "value";
+  const catKey = spec.encoding.category;
+  type Node = { name: string; value?: number; children?: Node[]; itemStyle?: { color: string } };
+  let data: Node[] = [];
+  if (catKey) {
+    const groups = new Map<string, Node[]>();
+    for (const r of spec.data.rows) {
+      const cat = str(r[catKey], "Other");
+      const arr = groups.get(cat) ?? [];
+      arr.push({ name: str(r[labelKey]), value: n(r[valueKey]) });
+      groups.set(cat, arr);
+    }
+    data = [...groups.entries()].map(([name, children], i) => ({
+      name,
+      children,
+      itemStyle: { color: palette[i % palette.length] },
+    }));
+  } else {
+    data = spec.data.rows.map((r, i) => ({
+      name: str(r[labelKey]),
+      value: n(r[valueKey]),
+      itemStyle: { color: palette[i % palette.length] },
+    }));
+  }
+  return {
+    series: [
+      {
+        type: "sunburst",
+        radius: ["18%", "92%"],
+        center: ["50%", "50%"],
+        data,
+        sort: undefined,
+        emphasis: { focus: "ancestor" },
+        itemStyle: { borderColor: spec.theme.surface, borderWidth: 2 },
+        label: { color: "#fff", fontSize: 12, minAngle: 12 },
+        levels: [{}, { r0: "18%", r: "52%", label: { rotate: "tangential", fontWeight: 600 } }, { r0: "52%", r: "92%", label: { align: "right" } }],
+        tooltip: { textStyle: { color: ink.strong } },
+      },
+    ],
+  };
+}
+
+/** Gantt — schedule bars per workstream on a numeric timeline. */
+function ganttOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const labelKey = spec.encoding.label ?? "task";
+  const startKey = spec.encoding.value ?? "start";
+  const endKey = spec.encoding.y2 ?? "end";
+  const catKey = spec.encoding.category;
+  const rows = spec.data.rows;
+  const labels = rows.map((r, i) => str(r[labelKey], `#${i + 1}`));
+  const cats = [...new Set(rows.map((r) => (catKey ? str(r[catKey], "Track") : "Track")))];
+  return {
+    grid: grid(),
+    xAxis: valAxis(ink, spec.data.columns?.[startKey] ?? "Weeks"),
+    yAxis: { ...catAxis(ink, labels), inverse: true },
+    series: [
+      { type: "bar", stack: "gantt", itemStyle: { color: "transparent" }, silent: true, data: rows.map((r) => n(r[startKey])) },
+      {
+        type: "bar",
+        stack: "gantt",
+        barWidth: 16,
+        data: rows.map((r, i) => ({
+          value: Math.max(0.25, n(r[endKey]) - n(r[startKey])),
+          itemStyle: {
+            color: palette[(catKey ? cats.indexOf(str(r[catKey], "Track")) : i) % palette.length],
+            borderRadius: 8,
+          },
+        })),
+        label: {
+          show: true,
+          position: "insideLeft",
+          color: "#fff",
+          fontSize: 11,
+          fontWeight: 600,
+          formatter: (p: { dataIndex: number }) => (catKey ? str(rows[p.dataIndex]?.[catKey], "") : ""),
+        },
+      },
+    ],
+  };
+}
+
+/** Slope — two-point comparison lines (start vs end state). */
+function slopeOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const seriesKey = spec.encoding.series ?? spec.encoding.label ?? "series";
+  const aKey = spec.encoding.value ?? "before";
+  const bKey = spec.encoding.y2 ?? spec.encoding.y ?? "after";
+  const left = spec.data.columns?.[aKey] ?? "Before";
+  const right = spec.data.columns?.[bKey] ?? "After";
+  return {
+    grid: { top: 32, left: 96, right: 96, bottom: 40 },
+    xAxis: { ...catAxis(ink, [left, right]), boundaryGap: false },
+    yAxis: { ...valAxis(ink), splitLine: { show: false } },
+    series: spec.data.rows.map((r, i) => ({
+      name: str(r[seriesKey], `#${i + 1}`),
+      type: "line",
+      symbolSize: 10,
+      lineStyle: { width: 2.5, color: palette[i % palette.length] },
+      itemStyle: { color: palette[i % palette.length] },
+      data: [n(r[aKey]), n(r[bKey])],
+      endLabel: { show: true, color: ink.strong, fontSize: 12, fontWeight: 600, formatter: "{a} · {c}" },
+      labelLayout: { moveOverlap: "shiftY" },
+    })),
+  };
+}
+
+/** Gauge grid — up to four scoreboard dials. */
+function gaugeGridOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const labelKey = spec.encoding.label ?? "label";
+  const valueKey = spec.encoding.value ?? spec.encoding.y ?? "value";
+  const rows = spec.data.rows.slice(0, 4);
+  const span = 100 / Math.max(1, rows.length);
+  return {
+    series: rows.map((r, i) => ({
+      type: "gauge",
+      center: [`${span * i + span / 2}%`, "56%"],
+      radius: rows.length > 2 ? "40%" : "64%",
+      startAngle: 210,
+      endAngle: -30,
+      min: 0,
+      max: Math.max(100, n(r.max)),
+      progress: { show: true, width: 12, roundCap: true, itemStyle: { color: palette[i % palette.length] } },
+      axisLine: { lineStyle: { width: 12, color: [[1, ink.hairline]] } },
+      pointer: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: { show: false },
+      title: { show: true, offsetCenter: [0, "78%"], color: ink.muted, fontSize: 12, width: 140, overflow: "break" },
+      detail: {
+        valueAnimation: true,
+        offsetCenter: [0, "6%"],
+        color: ink.strong,
+        fontSize: 26,
+        fontWeight: 700,
+        formatter: (v: number) => `${Math.round(v)}${str(r.unit, "")}`,
+      },
+      data: [{ value: n(r[valueKey]), name: str(r[labelKey], `#${i + 1}`) }],
+    })),
+  };
+}
+
+/** Boxplot — spread per category from min/q1/median/q3/max columns. */
+function boxplotOption(spec: InfographicSpec) {
+  const palette = paletteFromTheme(spec.theme);
+  const ink = echartsInk(spec.theme);
+  const labelKey = spec.encoding.x ?? spec.encoding.label ?? "label";
+  const labels = spec.data.rows.map((r, i) => str(r[labelKey], `#${i + 1}`));
+  const boxes = spec.data.rows.map((r) => [n(r.min), n(r.q1), n(r.median), n(r.q3), n(r.max)]);
+  return {
+    grid: grid(),
+    xAxis: catAxis(ink, labels),
+    yAxis: valAxis(ink, spec.data.columns?.median),
+    series: [
+      {
+        type: "boxplot",
+        data: boxes,
+        itemStyle: { color: hexish(palette[0]), borderColor: palette[1] ?? palette[0], borderWidth: 2 },
+        boxWidth: [18, 44],
+      },
+    ],
+  };
+}
+
+/** Boxes read better as a tinted fill than a solid brand block. */
+function hexish(hex: string): string {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return hex;
+  return `rgba(${parseInt(h.slice(0, 2), 16)},${parseInt(h.slice(2, 4), 16)},${parseInt(h.slice(4, 6), 16)},0.28)`;
 }
