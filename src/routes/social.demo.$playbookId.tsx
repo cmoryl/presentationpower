@@ -119,6 +119,9 @@ function SocialDemoView() {
       }),
     [source, facts, kit, playbook.subBrand],
   );
+  const assetEdits = useSocialAssetEdits();
+
+
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
