@@ -8,6 +8,7 @@ import { X, RotateCcw, Pencil } from "lucide-react";
 import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns/SocialRenderer";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import type { SocialAssetEdit } from "@/lib/social-asset-edit";
+import { photoForFormat } from "@/lib/social-photography";
 
 type RendererProps = Omit<SocialRendererProps, "displayShortEdge" | "edit">;
 
