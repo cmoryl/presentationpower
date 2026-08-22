@@ -231,5 +231,63 @@ export function eventLookById(id: string | null | undefined): EventLook {
 
 /** The authored look for a playbook, or the NEXT field when unmapped. */
 export function eventLookForPlaybook(playbookId: string | null | undefined): EventLook {
-  return eventLookById(PLAYBOOK_LOOK_ID[playbookId ?? ""] ?? DEFAULT_EVENT_LOOK_ID);
+  return derivedLook(playbookId ?? DEFAULT_EVENT_LOOK_ID);
+}
+
+// ---------------------------------------------------------------------------
+// Per-demo derived looks
+// ---------------------------------------------------------------------------
+
+function hashKey(key: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < key.length; i += 1) {
+    h ^= key.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
+}
+
+function mix(hex: string, target: string, amount: number): string {
+  const parse = (v: string) => {
+    const s = v.replace("#", "");
+    const f = s.length === 3 ? s.split("").map((c) => c + c).join("") : s;
+    return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16));
+  };
+  const [r1, g1, b1] = parse(hex);
+  const [r2, g2, b2] = parse(target);
+  const t = Math.max(0, Math.min(1, amount));
+  const to = (a: number, b: number) => Math.round(a + (b - a) * t).toString(16).padStart(2, "0");
+  return `#${to(r1!, r2!)}${to(g1!, g2!)}${to(b1!, b2!)}`;
+}
+
+/** A look that is unique to one demo set. The motif geometry, radius, casing
+ *  and social style spread deterministically across the authored looks by key,
+ *  then the demo's own accent re-inks the plate — so no two demo sets share the
+ *  NEXT City field by accident. Authored mappings still win when present. */
+export function derivedLook(
+  key: string,
+  overrides?: { accent?: string; accentAlt?: string; ink?: string; label?: string },
+): EventLook {
+  const mapped = PLAYBOOK_LOOK_ID[key];
+  const pool = EVENT_LOOKS;
+  const base = mapped
+    ? EVENT_LOOKS_BY_ID[mapped]!
+    : pool[hashKey(key) % pool.length]!;
+  const accent = overrides?.accent ?? base.accent;
+  const accentAlt = overrides?.accentAlt ?? mix(accent, base.accentAlt, 0.55);
+  const h = hashKey(`${key}:tune`);
+  return {
+    ...base,
+    id: mapped ? base.id : `${base.id}--${key}`,
+    label: overrides?.label ?? base.label,
+    accent,
+    accentAlt,
+    deep: mapped ? base.deep : mix(base.deep, accent, 0.16),
+    lightFrom: mix(base.lightFrom, accent, 0.06),
+    lightTo: base.lightTo,
+    ink: overrides?.ink ?? base.ink,
+    motif: mapped ? base.motif : (["grid", "arcs", "rays", "dots", "waves", "terrazzo", "bars", "chevron"] as const)[h % 8]!,
+    motifOpacity: mapped ? base.motifOpacity : 0.1 + ((h >> 3) % 5) * 0.03,
+    radius: mapped ? base.radius : [4, 8, 12, 18, 24][(h >> 6) % 5]!,
+  };
 }

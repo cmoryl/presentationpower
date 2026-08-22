@@ -27,6 +27,9 @@ export type CollateralContext = {
   /** Art direction for this demo set — palette, motif, type case. When absent
    *  the NEXT City field is used so existing callers are unchanged. */
   lookId?: string;
+  /** Fully-resolved art direction — outranks `lookId`. Demo pages pass a
+   *  per-demo derived look so each set reads as its own campaign. */
+  look?: EventLook;
 };
 
 export type ArtKind =
@@ -1039,7 +1042,7 @@ export function CollateralArtwork(props: {
   displayWidth: number;
 }) {
   return (
-    <LookContext.Provider value={eventLookById(props.ctx.lookId)}>
+    <LookContext.Provider value={props.ctx.look ?? eventLookById(props.ctx.lookId)}>
       <CollateralArtworkFramed {...props} />
     </LookContext.Provider>
   );

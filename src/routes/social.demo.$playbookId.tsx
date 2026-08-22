@@ -25,6 +25,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
+import { derivedLook } from "@/lib/event-looks";
 
 import {
   getSocialPlaybook,
@@ -80,7 +81,16 @@ function SocialDemoView() {
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
   const photoSet = getPhotoSet(playbook.subBrand);
-  const [styleId, setStyleId] = useState<SocialStyleId>(DEFAULT_SOCIAL_STYLE_ID);
+  // Every social demo set gets its own art direction (motif, plate, radius,
+  // casing) derived from the playbook id and re-inked with its own accent, so
+  // no two demo kits render the same field graphic.
+  const look = useMemo(
+    () => derivedLook(`social:${playbook.id}`, { accent: playbook.accent }),
+    [playbook.id, playbook.accent],
+  );
+  const [styleId, setStyleId] = useState<SocialStyleId>(
+    () => (look.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID,
+  );
   const activeStyle = resolveSocialStyle(styleId);
 
 
@@ -108,8 +118,10 @@ function SocialDemoView() {
       logoWide: { url: wide, ratio: 4.6 },
       logoStacked: { url: stacked, ratio: 2.1 },
       logoNeedsKnockout: needsKnockout,
+      lookId: look.id,
+      look,
     };
-  }, [playbook]);
+  }, [playbook, look]);
   const assets = useMemo(
     () =>
       buildCampaignAssets(source, facts, {
