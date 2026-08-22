@@ -83,6 +83,26 @@ function SocialDemoView() {
 
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
   const facts = useMemo(() => factsFromSocialPlaybook(playbook), [playbook]);
+
+  // Collateral artwork context — the collateral grid renders a finished demo
+  // asset for every piece in the kit, skinned with this division's lockup,
+  // accent and campaign copy.
+  const artworkCtx = useMemo<CollateralContext>(() => {
+    const logos = getDivisionLogos(playbook.subBrand);
+    const wide = logos?.white ?? logos?.color ?? "/brand-logos/tp-white.png";
+    const stacked = logos?.stackedWhite ?? logos?.stackedColor ?? wide;
+    return {
+      eventName: playbook.copy.title,
+      city: playbook.divisionLabel,
+      venue: playbook.tagline,
+      dateLine: playbook.chip,
+      hashtag: `#${playbook.divisionLabel.replace(/[^A-Za-z0-9]/g, "")}`,
+      url: "transperfect.com",
+      accent: playbook.accent,
+      logoWide: { url: wide, ratio: 4.6 },
+      logoStacked: { url: stacked, ratio: 2.1 },
+    };
+  }, [playbook]);
   const assets = useMemo(
     () =>
       buildCampaignAssets(source, facts, {
