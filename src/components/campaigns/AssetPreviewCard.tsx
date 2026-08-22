@@ -34,6 +34,8 @@ type Props = {
    *  editor (text blocks, caption, photo-panel geometry). */
   edit?: SocialAssetEdit;
   onEditChange?: (next: SocialAssetEdit) => void;
+  /** Stable asset key — lets admins publish the edit as the approved version. */
+  editKey?: string;
   onEditReset?: () => void;
 };
 
@@ -47,6 +49,7 @@ export function AssetPreviewCard({
   badge,
   edit,
   onEditChange,
+  editKey,
   onEditReset,
 }: Props) {
 
@@ -138,6 +141,7 @@ export function AssetPreviewCard({
               rendererProps={rendererProps}
               formatLabel={formatLabel}
               edit={edit ?? {}}
+              editKey={editKey}
               onChange={(next) => onEditChange?.(next)}
               onReset={() => onEditReset?.()}
             />

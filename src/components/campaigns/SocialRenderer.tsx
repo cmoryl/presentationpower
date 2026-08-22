@@ -502,6 +502,10 @@ export function SocialRenderer({
   const focalX = edit?.focalXPct ?? 50;
   const focalYFinal = edit?.focalYPct ?? focalYAdjusted;
   const objectPosition = `${focalX}% ${focalYFinal}%`;
+  // Zoom crops further into the photo around the focal point, so repositioning
+  // stays meaningful on tight formats. 1 = plain cover fit.
+  const photoZoom = Math.min(2.5, Math.max(1, edit?.photoZoom ?? 1));
+  const photoTransform = photoZoom > 1 ? `scale(${photoZoom})` : undefined;
 
   // ---- Panel composition ---------------------------------------------------
   // "panel" keeps the artwork and the copy in separate zones. The panel rect is
@@ -782,7 +786,7 @@ export function SocialRenderer({
               alt=""
               crossOrigin="anonymous"
               className="absolute inset-0 size-full object-cover"
-              style={{ objectPosition }}
+              style={{ objectPosition, transform: photoTransform, transformOrigin: objectPosition }}
             />
             <div
               className="absolute inset-0"
@@ -824,6 +828,8 @@ export function SocialRenderer({
                     : panelSide === "right"
                       ? "center 42%"
                       : objectPosition,
+                transform: photoTransform,
+                transformOrigin: objectPosition,
               }}
             />
             {/* Accent edge tying the crop back to the division palette. */}

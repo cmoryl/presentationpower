@@ -2880,6 +2880,33 @@ export type Database = {
           },
         ]
       }
+      social_asset_defaults: {
+        Row: {
+          created_at: string
+          edit_key: string
+          id: string
+          patch: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          edit_key: string
+          id?: string
+          patch?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          edit_key?: string
+          id?: string
+          patch?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       social_asset_edits: {
         Row: {
           created_at: string
