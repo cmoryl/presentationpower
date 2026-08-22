@@ -322,7 +322,7 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
     >
       <div className="relative flex h-[230px] items-center justify-center overflow-hidden p-4">
         <img
-          src={meta.art}
+          src={showcaseArt(entry.id).src}
           alt=""
           aria-hidden
           loading="lazy"
