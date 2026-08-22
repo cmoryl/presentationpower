@@ -221,7 +221,7 @@ function buildGlobalLinkPitch(): TemplatePayload {
     title: "GlobalLink · Enterprise localization pitch (demo)",
     brandModeId: "bm-globallink",
     archetypeId: "arch-problem-solution",
-    context: { stylePackId: "skin-s06", designRecipeId: "R04", defaultTransition: { type: "fade", speed: "normal" } },
+    context: { stylePackId: "skin-s06", designRecipeId: "R04", defaultTransition: { type: "fade", durationMs: 420 } },
     slides,
     brief: {
       prospect: "Northwind Retail Group",
@@ -380,7 +380,7 @@ function buildLifeSciencesProgram(): TemplatePayload {
     title: "Life Sciences · Regulated content program (demo)",
     brandModeId: "bm-tp-lifesci",
     archetypeId: "arch-problem-solution",
-    context: { stylePackId: "skin-s14", designRecipeId: "R08", defaultTransition: { type: "fade", speed: "slow" } },
+    context: { stylePackId: "skin-s14", designRecipeId: "R08", defaultTransition: { type: "fade", durationMs: 560 } },
     slides,
     brief: {
       prospect: "Meridian Therapeutics",
