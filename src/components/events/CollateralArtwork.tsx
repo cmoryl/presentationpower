@@ -1056,6 +1056,7 @@ function CollateralArtworkFramed({
   label: string;
   displayWidth: number;
 }) {
+  const look = useLook();
   const { w, h } = SIZES[kind];
   const scale = displayWidth / w;
 
@@ -1223,7 +1224,7 @@ function CollateralArtworkFramed({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  color: NAVY,
+                  color: look.deep,
                   fontSize: 20,
                 }}
               >
