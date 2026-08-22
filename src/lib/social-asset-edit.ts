@@ -66,8 +66,9 @@ export function applySocialCopyEdit(copy: CampaignCopy, edit?: SocialAssetEdit):
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Persistence — edits live in localStorage keyed by a stable asset key so a
-// user's tuning survives navigation and regeneration of the same kit.
+// Persistence — edits are stored per user in the backend
+// (public.social_asset_edits) so tuning syncs across devices, with
+// localStorage kept as an offline cache / signed-out fallback.
 // ────────────────────────────────────────────────────────────────────────────
 const STORE_KEY = "element.social.asset.edits.v1";
 
@@ -97,12 +98,49 @@ export function socialEditKey(scope: string, assetId: string): string {
   return `${scope}::${assetId}`;
 }
 
-/** Reactive access to the edit map. Hydration-safe: reads in an effect. */
+/** Reactive access to the edit map. Hydration-safe: reads in an effect.
+ *  Signed-in users read/write the backend copy (synced across devices);
+ *  signed-out users fall back to the local cache only. */
 export function useSocialAssetEdits() {
   const [map, setMap] = useState<EditMap>({});
+  const userId = useRef<string | null>(null);
 
+  // Hydrate: local cache first (instant), then the backend copy for the
+  // signed-in user. Any local-only keys are pushed up so a device's existing
+  // edits are adopted into the account on first sync.
   useEffect(() => {
-    setMap(readStore());
+    let alive = true;
+    const local = readStore();
+    setMap(local);
+    (async () => {
+      const { data } = await supabase.auth.getUser();
+      const uid = data.user?.id ?? null;
+      if (!alive) return;
+      userId.current = uid;
+      if (!uid) return;
+      const { data: rows, error } = await supabase
+        .from("social_asset_edits")
+        .select("edit_key, patch")
+        .eq("user_id", uid);
+      if (!alive || error || !rows) return;
+      const remote: EditMap = {};
+      for (const r of rows) remote[r.edit_key] = (r.patch ?? {}) as SocialAssetEdit;
+      const merged = { ...local, ...remote };
+      setMap(merged);
+      writeStore(merged);
+      const localOnly = Object.keys(local).filter((k) => !(k in remote) && hasSocialEdit(local[k]));
+      if (localOnly.length) {
+        await supabase.from("social_asset_edits").upsert(
+          localOnly.map((k) => ({ user_id: uid, edit_key: k, patch: local[k] as never })),
+          { onConflict: "user_id,edit_key" },
+        );
+      }
+    })().catch(() => {
+      /* offline / signed out — local cache stays authoritative */
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const get = useCallback((key: string): SocialAssetEdit => map[key] ?? EMPTY_SOCIAL_EDIT, [map]);
@@ -110,8 +148,22 @@ export function useSocialAssetEdits() {
   const set = useCallback((key: string, edit: SocialAssetEdit) => {
     setMap((prev) => {
       const next = { ...prev, [key]: edit };
-      if (!hasSocialEdit(edit)) delete next[key];
+      const keep = hasSocialEdit(edit);
+      if (!keep) delete next[key];
       writeStore(next);
+      const uid = userId.current;
+      if (uid) {
+        const op = keep
+          ? supabase
+              .from("social_asset_edits")
+              .upsert({ user_id: uid, edit_key: key, patch: edit as never }, {
+                onConflict: "user_id,edit_key",
+              })
+          : supabase.from("social_asset_edits").delete().eq("user_id", uid).eq("edit_key", key);
+        void Promise.resolve(op).catch(() => {
+          /* keep the local copy; next sync reconciles */
+        });
+      }
       return next;
     });
   }, []);
@@ -121,6 +173,17 @@ export function useSocialAssetEdits() {
       const next = { ...prev };
       delete next[key];
       writeStore(next);
+      const uid = userId.current;
+      if (uid) {
+        void supabase
+          .from("social_asset_edits")
+          .delete()
+          .eq("user_id", uid)
+          .eq("edit_key", key)
+          .then(undefined, () => {
+            /* ignore — local cache already reflects the reset */
+          });
+      }
       return next;
     });
   }, []);
