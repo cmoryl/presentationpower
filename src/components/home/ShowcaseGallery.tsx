@@ -25,6 +25,8 @@ import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { SHOWCASE_DECKS } from "@/lib/showcase-decks";
 import { showcaseArt } from "@/lib/showcase-art";
+import { PRINT_DEMOS } from "@/lib/showcase-print";
+
 
 type ShowcaseEntry = {
   id: string;
