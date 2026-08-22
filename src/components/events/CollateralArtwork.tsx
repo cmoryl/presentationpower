@@ -24,6 +24,9 @@ export type CollateralContext = {
   /** Set when the supplied lockups are dark/colour files that must be
    *  knocked out to white on the dark artwork fields. */
   logoNeedsKnockout?: boolean;
+  /** Art direction for this demo set — palette, motif, type case. When absent
+   *  the NEXT City field is used so existing callers are unchanged. */
+  lookId?: string;
 };
 
 export type ArtKind =
