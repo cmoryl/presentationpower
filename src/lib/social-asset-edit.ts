@@ -6,7 +6,8 @@
 // paint time, so nothing about the generation pipeline has to change and an
 // asset with no edits renders byte-identically to before.
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import type { CampaignCopy } from "./campaigns";
 
 export type SocialAssetEdit = {
