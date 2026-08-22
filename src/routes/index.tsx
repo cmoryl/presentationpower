@@ -237,16 +237,6 @@ function Dashboard() {
   );
 
   const totalSlides = allDecks.reduce((n, d) => n + d.slides.length, 0);
-  const lastExport = useMemo(() => {
-    let latest: { at: string; kind?: string; title: string } | null = null;
-    for (const d of allDecks) {
-      const at = d.context?.lastExportedAt;
-      if (!at) continue;
-      if (!latest || at > latest.at)
-        latest = { at, kind: d.context?.lastExportKind, title: d.title };
-    }
-    return latest;
-  }, [allDecks]);
 
   /* Agent bar handoff */
   const sendToOracle = (prompt: string) => {
