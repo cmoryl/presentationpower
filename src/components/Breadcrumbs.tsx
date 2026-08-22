@@ -168,11 +168,13 @@ export function Breadcrumbs() {
         label = titleCase(seg);
       }
 
+      const routable = isRoutablePath(routePatterns, acc);
       items.push({
         label,
         to: acc,
         last: i === parts.length - 1,
-        routable: isRoutablePath(routePatterns, acc),
+        // Namespace crumbs still navigate — up to their closest real route.
+        href: routable ? acc : nearestRoutableAncestor(routePatterns, acc),
       });
     }
     return items;
