@@ -42,7 +42,13 @@ export const Route = createFileRoute("/demo/deck/$demoId")({
 });
 
 function nativeDivision(divisionLabel: string): DemoDivision {
-  const match = DEMO_DIVISIONS.find(
+  // Longest name/label first: "TransPerfect Life Sciences" must beat the bare
+  // "TransPerfect" (Enterprise) prefix, or every division deck looks Enterprise
+  // and retargeting translates from the wrong vocabulary.
+  const ranked = [...DEMO_DIVISIONS].sort(
+    (a, b) => Math.max(b.name.length, b.label.length) - Math.max(a.name.length, a.label.length),
+  );
+  const match = ranked.find(
     (d) => divisionLabel.includes(d.name) || divisionLabel.includes(d.label),
   );
   return match ?? DEMO_DIVISIONS[0];

@@ -13,6 +13,7 @@
 // ---------------------------------------------------------------------------
 
 import type { TemplatePayload } from "./deck-store";
+import { applyLexicon, lexiconRules, type LexiconRule } from "./division-lexicon";
 
 export type DemoDivision = {
   /** Canonical bm-* brand mode id. */
@@ -125,9 +126,13 @@ const DIVISION_ALIASES: string[] = [
   "GlobalLink",
 ];
 
-function rewriteText(text: string, target: DemoDivision): string {
-  let out = text;
-  // Longest-first so "TransPerfect Life Sciences" wins over "TransPerfect".
+function rewriteText(text: string, target: DemoDivision, rules: LexiconRule[] = []): string {
+  // 1. Domain vocabulary: rewrite the source division's world into the target's
+  //    (annexes → exhibit sets, clinician review → attorney review, …). Runs
+  //    first so division names inserted in step 2 are never re-matched.
+  let out = applyLexicon(text, rules);
+  // 2. Division naming. Longest-first so "TransPerfect Life Sciences" wins
+  //    over "TransPerfect".
   const aliases = Array.from(new Set(DIVISION_ALIASES)).sort((a, b) => b.length - a.length);
   for (const alias of aliases) {
     if (alias === target.name) continue;
@@ -136,24 +141,40 @@ function rewriteText(text: string, target: DemoDivision): string {
   return out;
 }
 
-function rewriteValue(value: unknown, target: DemoDivision, seedSuffix: string, key?: string): unknown {
+function rewriteValue(
+  value: unknown,
+  target: DemoDivision,
+  seedSuffix: string,
+  rules: LexiconRule[],
+  key?: string,
+): unknown {
   if (typeof value === "string") {
     if (key === "mediaSeed" || key === "seed" || key === "imageSeed") {
       return `${value}-${seedSuffix}`;
     }
-    return rewriteText(value, target);
+    return rewriteText(value, target, rules);
   }
   if (Array.isArray(value)) {
-    return value.map((v) => rewriteValue(v, target, seedSuffix));
+    return value.map((v) => rewriteValue(v, target, seedSuffix, rules));
   }
   if (value && typeof value === "object") {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      out[k] = rewriteValue(v, target, seedSuffix, k);
+      out[k] = rewriteValue(v, target, seedSuffix, rules, k);
     }
     return out;
   }
   return value;
+}
+
+/** Which division authored a payload, so we know which vocabulary to translate from. */
+function sourceDivision(payload: TemplatePayload): DemoDivision | undefined {
+  const byMode = payload.brandModeId
+    ? DEMO_DIVISIONS.find((d) => d.id === payload.brandModeId)
+    : undefined;
+  if (byMode) return byMode;
+  const industry = payload.brief?.industry ?? "";
+  return DEMO_DIVISIONS.find((d) => d.industry === industry);
 }
 
 /** Deck title for a retargeted demo — stable, so copies are reused not duplicated. */
@@ -164,10 +185,12 @@ export function retargetedTitle(baseTitle: string, target: DemoDivision): string
 
 export function retargetPayload(payload: TemplatePayload, target: DemoDivision): TemplatePayload {
   const seedSuffix = target.slug;
+  const from = sourceDivision(payload);
+  const rules = from ? lexiconRules(from.slug, target.slug) : [];
   const slides = payload.slides.map((s) => ({
     ...s,
-    content: rewriteValue(s.content, target, seedSuffix) as typeof s.content,
-    notes: s.notes ? rewriteText(s.notes, target) : s.notes,
+    content: rewriteValue(s.content, target, seedSuffix, rules) as typeof s.content,
+    notes: s.notes ? rewriteText(s.notes, target, rules) : s.notes,
   }));
 
   return {
@@ -180,8 +203,8 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
       ? {
           ...payload.brief,
           industry: target.industry,
-          audience: rewriteText(payload.brief.audience ?? "", target),
-          meetingObjective: rewriteText(payload.brief.meetingObjective ?? "", target),
+          audience: rewriteText(payload.brief.audience ?? "", target, rules),
+          meetingObjective: rewriteText(payload.brief.meetingObjective ?? "", target, rules),
         }
       : payload.brief,
   };
