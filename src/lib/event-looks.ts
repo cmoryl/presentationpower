@@ -327,7 +327,9 @@ export function channelLook(args: {
     deep: mix(base.deep, accent, 0.12),
     motif: variant.motif,
     motifOpacity: base.motifOpacity,
-    styleId: variant.styleId,
+    // The template style stays the DIVISION's, not the intent's: a division's
+    // posts and its event collateral must render in the same social template.
+    styleId: base.styleId,
   };
 }
 
