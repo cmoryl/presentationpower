@@ -6,27 +6,27 @@ const SCROLL_THRESHOLD = 320;
 
 function useScrolledPast(threshold: number) {
   const [visible, setVisible] = useState(false);
-  const rafRef = useRef<number | null>(null);
   const lastRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
+    let timer: number | null = null;
 
     const check = () => {
       if (!mounted) return;
-      const y = window.scrollY ?? window.pageYOffset ?? 0;
+      const y = typeof window !== "undefined" ? window.scrollY ?? window.pageYOffset ?? 0 : 0;
       const nowVisible = y > threshold;
       if (nowVisible !== lastRef.current) {
         lastRef.current = nowVisible;
         setVisible(nowVisible);
       }
-      rafRef.current = requestAnimationFrame(check);
     };
 
-    rafRef.current = requestAnimationFrame(check);
+    check();
+    timer = window.setInterval(check, 100);
     return () => {
       mounted = false;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (timer !== null) window.clearInterval(timer);
     };
   }, [threshold]);
 
