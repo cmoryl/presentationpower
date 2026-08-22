@@ -28,6 +28,7 @@ import {
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
+import { photoForFormat } from "@/lib/social-photography";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
