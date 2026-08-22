@@ -132,12 +132,14 @@ function PrintDemoPage() {
 
     setBusy(true);
     try {
-      const existing = await findFn({ data: { libraryItemId: item!.id } });
+      // Edited on this page? Always create a fresh copy so the edits survive.
+      const existing = dirty ? null : await findFn({ data: { libraryItemId: item!.id } });
       if (existing?.id) {
         toast.success("Opening your existing copy");
         void navigate({ to: "/asset/$assetId", params: { assetId: existing.id } });
         return;
       }
+
       const row = await createFn({
         data: {
           kind: item!.kind,
