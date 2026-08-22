@@ -33,6 +33,7 @@ import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
+import { Route as EventsAgentIndexRouteImport } from './routes/events-agent.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AgentIndexRouteImport } from './routes/agent.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -264,6 +265,11 @@ const EventsIndexRoute = EventsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => EventsRoute,
+} as any)
+const EventsAgentIndexRoute = EventsAgentIndexRouteImport.update({
+  id: '/events-agent/',
+  path: '/events-agent/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksIndexRoute = DecksIndexRouteImport.update({
   id: '/decks/',
@@ -933,6 +939,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
+  '/events-agent/': typeof EventsAgentIndexRoute
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
@@ -1066,6 +1073,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/agent': typeof AgentIndexRoute
   '/decks': typeof DecksIndexRoute
+  '/events-agent': typeof EventsAgentIndexRoute
   '/events': typeof EventsIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
@@ -1204,6 +1212,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
+  '/events-agent/': typeof EventsAgentIndexRoute
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
@@ -1343,6 +1352,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/agent/'
     | '/decks/'
+    | '/events-agent/'
     | '/events/'
     | '/knowledge/'
     | '/library/'
@@ -1476,6 +1486,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/agent'
     | '/decks'
+    | '/events-agent'
     | '/events'
     | '/knowledge'
     | '/library'
@@ -1613,6 +1624,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/agent/'
     | '/decks/'
+    | '/events-agent/'
     | '/events/'
     | '/knowledge/'
     | '/library/'
@@ -1711,6 +1723,7 @@ export interface RootRouteChildren {
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   AgentIndexRoute: typeof AgentIndexRoute
   DecksIndexRoute: typeof DecksIndexRoute
+  EventsAgentIndexRoute: typeof EventsAgentIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   PrintAgentIndexRoute: typeof PrintAgentIndexRoute
   SocialAgentIndexRoute: typeof SocialAgentIndexRoute
@@ -1903,6 +1916,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/'
       preLoaderRoute: typeof EventsIndexRouteImport
       parentRoute: typeof EventsRoute
+    }
+    '/events-agent/': {
+      id: '/events-agent/'
+      path: '/events-agent'
+      fullPath: '/events-agent/'
+      preLoaderRoute: typeof EventsAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/decks/': {
       id: '/decks/'
@@ -2901,6 +2921,7 @@ const rootRouteChildren: RootRouteChildren = {
   TestPrintHeroRoute: TestPrintHeroRoute,
   AgentIndexRoute: AgentIndexRoute,
   DecksIndexRoute: DecksIndexRoute,
+  EventsAgentIndexRoute: EventsAgentIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   PrintAgentIndexRoute: PrintAgentIndexRoute,
   SocialAgentIndexRoute: SocialAgentIndexRoute,
