@@ -3,12 +3,17 @@
 // geometry. Works for light and dark assets; light assets are the ones that
 // need it most because the photo panel and copy share the frame.
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { X, RotateCcw, Pencil } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { X, RotateCcw, Pencil, Upload, Images, Move, ShieldCheck, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns/SocialRenderer";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import type { SocialAssetEdit } from "@/lib/social-asset-edit";
-import { photoForFormat } from "@/lib/social-photography";
+import { clearSocialAssetDefault, saveSocialAssetDefault } from "@/lib/social-asset-edit";
+import { photoForFormat, SOCIAL_PHOTO_SETS } from "@/lib/social-photography";
+import { aspectClass } from "@/lib/social-formats";
+import { listSlideMedia, uploadSlideMedia, type SlideMediaItem } from "@/lib/slide-media";
 
 type RendererProps = Omit<SocialRendererProps, "displayShortEdge" | "edit">;
 
@@ -20,12 +25,15 @@ export function SocialAssetEditorButton({
   onReset,
   className,
   label = "Edit",
+  editKey,
 }: {
   rendererProps: RendererProps;
   formatLabel: string;
   edit: SocialAssetEdit;
   onChange: (next: SocialAssetEdit) => void;
   onReset: () => void;
+  /** Stable asset key — enables the admin "save as the approved default" action. */
+  editKey?: string;
   className?: string;
   label?: string;
 }) {
@@ -48,6 +56,7 @@ export function SocialAssetEditorButton({
           rendererProps={rendererProps}
           formatLabel={formatLabel}
           edit={edit}
+          editKey={editKey}
           onChange={onChange}
           onReset={onReset}
           onClose={() => setOpen(false)}
@@ -61,6 +70,7 @@ function SocialAssetEditorModal({
   rendererProps,
   formatLabel,
   edit,
+  editKey,
   onChange,
   onReset,
   onClose,
@@ -68,6 +78,7 @@ function SocialAssetEditorModal({
   rendererProps: RendererProps;
   formatLabel: string;
   edit: SocialAssetEdit;
+  editKey?: string;
   onChange: (next: SocialAssetEdit) => void;
   onReset: () => void;
   onClose: () => void;
