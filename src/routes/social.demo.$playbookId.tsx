@@ -5,7 +5,7 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SOCIAL_STYLES,
   DEFAULT_SOCIAL_STYLE_ID,
@@ -28,6 +28,7 @@ import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
 import {
   channelLook,
   eventLookById,
+  reinkLook,
   EVENT_LOOKS,
   EVENT_LOOKS_BY_ID,
 } from "@/lib/event-looks";
