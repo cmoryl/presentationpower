@@ -75,7 +75,11 @@ export const Route = createFileRoute("/")({
 
 type ModeId = "presentation" | "print" | "event" | "social";
 type ModeAction = { label: string; to: string; hint?: string; primary?: boolean };
-type ModeSubnavItem = { label: string; to: string; icon: React.ComponentType<{ size?: number; className?: string }> };
+type ModeSubnavItem = {
+  label: string;
+  to: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+};
 type ModeDef = {
   id: ModeId;
   label: string;
@@ -266,7 +270,6 @@ function Dashboard() {
 
         {/* animated aurora blobs — reactive to selected mode + scroll parallax */}
         <AuroraHero mode={mode} />
-
 
         {/* Oversized ELEMENT watermark — brand signature behind the hero */}
         <ParallaxWatermark accent={mode.accent} />
@@ -562,13 +565,11 @@ function Dashboard() {
         </div>
       </section>
 
-
       {/* ================= SHOWREEL ================= */}
       <ElementShowreel />
 
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
-
 
       {/* ================= RECENT ACTIVITY ================= */}
       <RecentActivity
@@ -576,7 +577,6 @@ function Dashboard() {
         allDeckCount={cloudCount ?? Object.keys(decksMap).length}
         briefs={briefs}
       />
-
 
       {/* ================= KNOWLEDGE & BRAND ================= */}
       <section className="mt-12">
