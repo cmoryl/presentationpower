@@ -758,7 +758,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
       return (
         <Field chevron={0.1} style={{ background: `linear-gradient(150deg, ${NAVY} 0%, #0B1226 62%, ${ctx.accent}44 100%)` }}>
           <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26 }}>
-            <Logo ctx={ctx} width={360} colorway="white" />
+            <Logo ctx={ctx} width={360} />
             <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 22 }}>
               <div style={{ height: 8, width: 132, background: ctx.accent, borderRadius: 99 }} />
               <div style={{ fontSize: 74, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.02 }}>
@@ -780,7 +780,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
       return (
         <Field chevron={0.09} style={{ background: `linear-gradient(190deg, ${NAVY} 0%, #0A1023 58%, ${ctx.accent}3d 100%)` }}>
           <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30 }}>
-            <Logo ctx={ctx} width={340} colorway="white" />
+            <Logo ctx={ctx} width={340} />
             <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 26 }}>
               <div style={{ fontSize: 26, letterSpacing: "0.24em", color: ctx.accent, fontWeight: 700 }}>
                 {ctx.dateLine.toUpperCase()}
@@ -813,7 +813,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
         <Field chevron={0.11} style={{ background: `linear-gradient(115deg, ${NAVY} 0%, #0B1226 55%, ${ctx.accent}3a 100%)` }}>
           <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22 }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-              <Logo ctx={ctx} width={330} colorway="white" />
+              <Logo ctx={ctx} width={330} />
               <span style={{ fontSize: 22, letterSpacing: "0.18em", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
                 {ctx.city.toUpperCase()}
               </span>
@@ -846,7 +846,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               gap: 40,
             }}
           >
-            <Logo ctx={ctx} width={280} colorway="white" />
+            <Logo ctx={ctx} width={280} />
             <div style={{ width: 2, height: 120, background: `${ctx.accent}88` }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
               <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em" }}>{ctx.eventName}</span>
