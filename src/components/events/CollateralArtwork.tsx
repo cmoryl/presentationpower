@@ -21,6 +21,9 @@ export type CollateralContext = {
   /** Event lockups by orientation. */
   logoWide: { url: string; ratio: number };
   logoStacked: { url: string; ratio: number };
+  /** Set when the supplied lockups are dark/colour files that must be
+   *  knocked out to white on the dark artwork fields. */
+  logoNeedsKnockout?: boolean;
 };
 
 export type ArtKind =
@@ -52,7 +55,13 @@ export type ArtKind =
   | "bottle"
   | "stickers"
   | "video"
-  | "video-vertical";
+  | "video-vertical"
+  // Social / digital-native trims. These are used by the social playbook
+  // demos, where every card must render an asset rather than a blank tile.
+  | "social-square"
+  | "social-story"
+  | "social-wide"
+  | "signature-strip";
 
 const SIZES: Record<ArtKind, { w: number; h: number }> = {
   badge: { w: 700, h: 900 },
@@ -84,6 +93,10 @@ const SIZES: Record<ArtKind, { w: number; h: number }> = {
   stickers: { w: 850, h: 1100 },
   video: { w: 1400, h: 788 },
   "video-vertical": { w: 620, h: 1100 },
+  "social-square": { w: 1080, h: 1080 },
+  "social-story": { w: 1080, h: 1920 },
+  "social-wide": { w: 1280, h: 720 },
+  "signature-strip": { w: 1200, h: 300 },
 };
 
 export function artKindFor(label: string, surface: string): ArtKind {
@@ -111,7 +124,35 @@ export function artKindFor(label: string, surface: string): ArtKind {
   if (l.includes("bottle")) return "bottle";
   if (l.includes("sticker")) return "stickers";
   if (l.includes("zoom") || l.includes("teams")) return "zoom";
+  // Social / digital-native mappings — checked before the generic hero/email
+  // fallbacks so a social kit never lands on the document layout.
+  if (l.includes("signature")) return "signature-strip";
+  if (
+    l.includes("story") ||
+    l.includes("reel") ||
+    l.includes("tiktok") ||
+    l.includes("bumper") ||
+    l.includes("screenshot") ||
+    l.includes("vertical")
+  )
+    return "social-story";
+  if (l.includes("podcast") || l.includes("square") || l.includes("carousel") || l.includes("post"))
+    return "social-square";
+  if (l.includes("linkedin newsletter")) return "social-wide";
   if (l.includes("linkedin")) return "linkedin-header";
+  if (
+    l.includes("thumbnail") ||
+    l.includes("og ") ||
+    l.includes("og/") ||
+    l.includes("social-share") ||
+    l.includes("cover") ||
+    l.includes("banner") ||
+    l.includes("paid-ad") ||
+    l.includes("advocacy") ||
+    l.includes("blog header") ||
+    l.includes("press-release")
+  )
+    return "social-wide";
   if (l.includes("website") || l.includes("hero")) return "web-hero";
   if (l.includes("countdown") && surface === "video") return "video-vertical";
   if (surface === "video") return "video";
@@ -215,7 +256,10 @@ function Logo({
         height: width / entry.ratio,
         objectFit: "contain",
         display: "block",
-        filter: colorway === "white" ? "brightness(0) invert(1)" : undefined,
+        filter:
+          colorway === "white" || (colorway !== "color" && ctx.logoNeedsKnockout)
+            ? "brightness(0) invert(1)"
+            : undefined,
         ...style,
       }}
     />
@@ -708,6 +752,114 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
                 <Logo ctx={ctx} stacked width={190} colorway={i % 3 === 2 ? "color" : "white"} />
               </div>
             ))}
+          </div>
+        </Field>
+      );
+
+    // ---- Social / digital-native trims ---------------------------------
+    // These read the same ctx as the event pieces (name, division line,
+    // hashtag, url, accent) so a social playbook card renders a finished
+    // composition instead of an empty tile.
+    case "social-square":
+      return (
+        <Field chevron={0.1} style={{ background: `linear-gradient(150deg, ${NAVY} 0%, #0B1226 62%, ${ctx.accent}44 100%)` }}>
+          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26 }}>
+            <Logo ctx={ctx} width={360} />
+            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 22 }}>
+              <div style={{ height: 8, width: 132, background: ctx.accent, borderRadius: 99 }} />
+              <div style={{ fontSize: 74, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.02 }}>
+                {ctx.eventName}
+              </div>
+              <div style={{ fontSize: 30, color: "rgba(255,255,255,0.72)", lineHeight: 1.3 }}>
+                {ctx.city} · {ctx.venue}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 26 }}>
+                <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
+                <span style={{ color: "rgba(255,255,255,0.55)" }}>{ctx.url}</span>
+              </div>
+            </div>
+          </div>
+        </Field>
+      );
+
+    case "social-story":
+      return (
+        <Field chevron={0.09} style={{ background: `linear-gradient(190deg, ${NAVY} 0%, #0A1023 58%, ${ctx.accent}3d 100%)` }}>
+          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30 }}>
+            <Logo ctx={ctx} width={340} />
+            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 26 }}>
+              <div style={{ fontSize: 26, letterSpacing: "0.24em", color: ctx.accent, fontWeight: 700 }}>
+                {ctx.dateLine.toUpperCase()}
+              </div>
+              <div style={{ fontSize: 96, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1 }}>
+                {ctx.eventName}
+              </div>
+              <div style={{ fontSize: 34, color: "rgba(255,255,255,0.7)", lineHeight: 1.32 }}>{ctx.venue}</div>
+              <div
+                style={{
+                  alignSelf: "flex-start",
+                  marginTop: 18,
+                  padding: "20px 40px",
+                  borderRadius: 999,
+                  background: ctx.accent,
+                  color: NAVY,
+                  fontSize: 30,
+                  fontWeight: 800,
+                }}
+              >
+                {ctx.hashtag}
+              </div>
+            </div>
+          </div>
+        </Field>
+      );
+
+    case "social-wide":
+      return (
+        <Field chevron={0.11} style={{ background: `linear-gradient(115deg, ${NAVY} 0%, #0B1226 55%, ${ctx.accent}3a 100%)` }}>
+          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+              <Logo ctx={ctx} width={330} />
+              <span style={{ fontSize: 22, letterSpacing: "0.18em", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
+                {ctx.city.toUpperCase()}
+              </span>
+            </div>
+            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 18 }}>
+              <div style={{ height: 7, width: 120, background: ctx.accent, borderRadius: 99 }} />
+              <div style={{ fontSize: 62, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.04, maxWidth: "82%" }}>
+                {ctx.eventName}
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 24 }}>
+                <span style={{ color: "rgba(255,255,255,0.7)" }}>{ctx.venue}</span>
+                <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
+              </div>
+            </div>
+          </div>
+        </Field>
+      );
+
+    case "signature-strip":
+      return (
+        <Field chevron={0.07} style={{ background: `linear-gradient(100deg, ${NAVY} 0%, #0B1226 70%, ${ctx.accent}33 100%)` }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: "0 56px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 40,
+            }}
+          >
+            <Logo ctx={ctx} width={280} />
+            <div style={{ width: 2, height: 120, background: `${ctx.accent}88` }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+              <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em" }}>{ctx.eventName}</span>
+              <span style={{ fontSize: 24, color: "rgba(255,255,255,0.65)" }}>
+                {ctx.city} · {ctx.url}
+              </span>
+            </div>
           </div>
         </Field>
       );

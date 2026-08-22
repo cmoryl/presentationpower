@@ -35,6 +35,8 @@ import {
   type SocialPlaybook,
 } from "@/lib/social-playbooks";
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
+import type { CollateralContext } from "@/components/events/CollateralArtwork";
+import { getDivisionLogos } from "@/lib/division-logos";
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets } from "@/lib/campaigns";
@@ -83,6 +85,30 @@ function SocialDemoView() {
 
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
   const facts = useMemo(() => factsFromSocialPlaybook(playbook), [playbook]);
+
+  // Collateral artwork context — the collateral grid renders a finished demo
+  // asset for every piece in the kit, skinned with this division's lockup,
+  // accent and campaign copy.
+  const artworkCtx = useMemo<CollateralContext>(() => {
+    const logos = getDivisionLogos(playbook.subBrand);
+    const wide = logos?.white ?? logos?.color ?? "/brand-logos/tp-white.png";
+    const stacked = logos?.stackedWhite ?? logos?.stackedColor ?? wide;
+    // Divisions without a white lockup on disk fall back to the colour file,
+    // which needs knocking out so it reads on the dark artwork fields.
+    const needsKnockout = !logos?.white;
+    return {
+      eventName: playbook.copy.title,
+      city: playbook.divisionLabel,
+      venue: playbook.tagline,
+      dateLine: playbook.chip,
+      hashtag: `#${playbook.divisionLabel.replace(/[^A-Za-z0-9]/g, "")}`,
+      url: "transperfect.com",
+      accent: playbook.accent,
+      logoWide: { url: wide, ratio: 4.6 },
+      logoStacked: { url: stacked, ratio: 2.1 },
+      logoNeedsKnockout: needsKnockout,
+    };
+  }, [playbook]);
   const assets = useMemo(
     () =>
       buildCampaignAssets(source, facts, {
@@ -283,7 +309,7 @@ function SocialDemoView() {
           desc="The full production scope for this campaign — feed, story, reels, ad variants, PR headers, newsletter, employee advocacy and more. Pieces flagged live render right now; the rest are on the roadmap."
         />
         <div className="mt-6">
-          <CollateralGrid items={getExpandedSocialCollateral(playbook)} />
+          <CollateralGrid items={getExpandedSocialCollateral(playbook)} artworkCtx={artworkCtx} />
         </div>
       </section>
 
