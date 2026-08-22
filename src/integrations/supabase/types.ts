@@ -3211,6 +3211,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          image_priority: string
           image_url: string | null
           intensity: number
           note: string
@@ -3225,6 +3226,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          image_priority?: string
           image_url?: string | null
           intensity?: number
           note?: string
@@ -3239,6 +3241,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          image_priority?: string
           image_url?: string | null
           intensity?: number
           note?: string

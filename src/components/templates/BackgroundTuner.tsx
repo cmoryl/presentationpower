@@ -198,6 +198,8 @@ export function BackgroundTuner({
           tintStrength: from.tintStrength,
           sceneSwap: from.sceneSwap ?? null,
           imageUrl: from.imageUrl ?? null,
+          imagePriority: from.imagePriority ?? "front",
+
           note: from.note ?? "",
         },
       });
@@ -775,7 +777,7 @@ export function BackgroundTuner({
         {/* backdrop image */}
         <details className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
           <summary className="cursor-pointer text-[11px] font-semibold">
-            Add a photo or texture behind it
+            Replace the picture on this section
             {edit.imageUrl && (
               <span className="ml-2 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] text-[#003FC7]">
                 on
@@ -785,6 +787,40 @@ export function BackgroundTuner({
           <div className="mt-3">
             <BackdropSourcePicker value={edit.imageUrl} onPick={(url) => upd("imageUrl", url)} />
             {edit.imageUrl && (
+              <div className="mt-3 rounded-xl border border-black/10 p-3 dark:border-white/15">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] opacity-60">
+                  Layer priority
+                </div>
+                <div className="mt-2 flex gap-2">
+                  {(
+                    [
+                      ["front", "Image in front", "Your picture is the background."],
+                      ["behind", "Artwork in front", "Template art paints over the picture."],
+                    ] as const
+                  ).map(([val, label, hint]) => {
+                    const active = (edit.imagePriority ?? "front") === val;
+                    return (
+                      <button
+                        key={val}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => upd("imagePriority", val)}
+                        className={`flex-1 rounded-lg border px-3 py-2 text-left text-[10px] transition ${
+                          active
+                            ? "border-[#003FC7] bg-[#003FC7]/8 text-[#003FC7]"
+                            : "border-black/12 opacity-70 hover:opacity-100 dark:border-white/15"
+                        }`}
+                      >
+                        <span className="block font-semibold">{label}</span>
+                        <span className="mt-0.5 block opacity-70">{hint}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            {edit.imageUrl && (
+
               <div className="mt-3 flex items-center gap-2">
                 <button
                   type="button"

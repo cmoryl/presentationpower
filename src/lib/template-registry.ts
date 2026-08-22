@@ -23,8 +23,17 @@ export interface TemplateBackgroundOverride {
   tintStrength: number;
   /** Paint another scene's composition instead of this one's. */
   sceneSwap?: string | null;
-  /** Custom/AI backdrop image painted behind the CSS layers. */
+  /** Custom/AI backdrop image composited with the CSS layers. */
   imageUrl?: string | null;
+  /**
+   * Where the replacement image sits in the layer stack:
+   *   "front"  — the picture IS the ground (default); authored geometry stays
+   *              behind it only as a load/404 fallback.
+   *   "behind" — the authored geometry paints on top of the picture, so the
+   *              image reads as a photographic base under the artwork.
+   */
+  imagePriority?: "front" | "behind";
+
   note?: string;
 }
 

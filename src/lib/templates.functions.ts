@@ -45,6 +45,8 @@ const OverrideInput = z.object({
   tintStrength: z.number().min(0).max(1).default(0),
   sceneSwap: z.string().trim().max(24).optional().nullable(),
   imageUrl: z.string().trim().max(2000).optional().nullable(),
+  imagePriority: z.enum(["front", "behind"]).default("front"),
+
   note: z.string().trim().max(400).default(""),
 });
 
@@ -81,6 +83,8 @@ function toOverride(r: Row): TemplateBackgroundOverride {
     tintStrength: Number(r.tint_strength ?? 0),
     sceneSwap: (r.scene_swap as string | null) ?? null,
     imageUrl: (r.image_url as string | null) ?? null,
+    imagePriority: r.image_priority === "behind" ? "behind" : "front",
+
     note: String(r.note ?? ""),
   };
 }
@@ -187,6 +191,8 @@ export const saveBackgroundOverride = createServerFn({ method: "POST" })
           tint_strength: data.tintStrength,
           scene_swap: data.sceneSwap || null,
           image_url: data.imageUrl || null,
+          image_priority: data.imagePriority,
+
           note: data.note,
           created_by: context.userId,
         },
