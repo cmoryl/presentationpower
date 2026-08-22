@@ -977,3 +977,111 @@ export function SocialRenderer({
     </div>
   );
 }
+
+// ---- Designed ground ------------------------------------------------------
+// Light social frames used to render as near-empty white cards: the aurora is
+// almost invisible at light intensity and, without a photo, nothing else laid
+// down structure. DesignGround composes brand geometry that scales off the
+// frame's short edge — so a 1200×400 header, a 1080×1080 square and a
+// 1080×1920 story each get a proportionate composition rather than one layout
+// squashed into three aspects.
+function DesignGround({
+  format,
+  accent,
+  mode,
+  short,
+  copyAlign,
+  panelSide,
+}: {
+  format: SocialFormat;
+  accent: string;
+  mode: "light" | "dark";
+  short: number;
+  copyAlign: "start" | "end";
+  panelSide: "right" | "top" | null;
+}) {
+  const cls = aspectClass(format);
+  const wide = cls === "landscape-wide" || cls === "landscape";
+  const unit = (short * 3.6) / 100;
+  // Bloom sits opposite the copy so it lifts the empty half of the frame.
+  const bloomX = panelSide === "right" ? "18%" : wide ? "78%" : "76%";
+  const bloomY = copyAlign === "end" ? "12%" : "88%";
+  const base =
+    mode === "dark"
+      ? `linear-gradient(150deg, ${tintRgba(accent, 0.22)} 0%, rgba(3,0,44,0.92) 58%, rgba(3,0,44,0.98) 100%)`
+      : `linear-gradient(150deg, ${tintRgba(accent, 0.13)} 0%, rgba(255,255,255,0.86) 46%, ${tintRgba(accent, 0.07)} 100%)`;
+  const rule = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(3,0,44,0.07)";
+  const bricks = wide ? 5 : 6;
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0" style={{ background: base }} />
+
+      {/* Soft accent bloom in the negative half. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(${wide ? "58% 120%" : "72% 52%"} at ${bloomX} ${bloomY}, ${tintRgba(
+            accent,
+            mode === "dark" ? 0.34 : 0.26,
+          )} 0%, ${tintRgba(accent, mode === "dark" ? 0.12 : 0.09)} 46%, rgba(255,255,255,0) 78%)`,
+        }}
+      />
+
+      {/* Hairline field — systematic, quiet, keeps the surface from reading
+          blank without competing with type. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `linear-gradient(to right, ${rule} 0 1px, transparent 1px 100%), linear-gradient(to bottom, ${rule} 0 1px, transparent 1px 100%)`,
+          backgroundSize: `${unit * 2}px ${unit * 2}px`,
+          maskImage: `radial-gradient(120% 100% at ${panelSide === "right" ? "20%" : "50%"} ${
+            copyAlign === "end" ? "0%" : "100%"
+          }, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0) 88%)`,
+          WebkitMaskImage: `radial-gradient(120% 100% at ${panelSide === "right" ? "20%" : "50%"} ${
+            copyAlign === "end" ? "0%" : "100%"
+          }, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0) 88%)`,
+        }}
+      />
+
+      {/* Element brick rail — the shared motif, anchored to the copy edge. */}
+      <div
+        className="absolute flex"
+        style={{
+          gap: unit * 0.42,
+          left: unit * 1.4,
+          [copyAlign === "end" ? "top" : "bottom"]: unit * 1.4,
+        } as CSSProperties}
+      >
+        {Array.from({ length: bricks }).map((_, i) => (
+          <span
+            key={i}
+            style={{
+              display: "block",
+              width: unit * (i === 0 ? 1.5 : 0.72),
+              height: unit * 0.72,
+              borderRadius: unit * 0.16,
+              background:
+                i === 0
+                  ? accent
+                  : tintRgba(accent, mode === "dark" ? 0.5 - i * 0.07 : 0.42 - i * 0.06),
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Corner rule — a single confident line closing the composition. */}
+      <div
+        className="absolute"
+        style={{
+          right: 0,
+          [copyAlign === "end" ? "top" : "bottom"]: 0,
+          width: wide ? short * 0.5 : short * 0.34,
+          height: Math.max(2, (short * 0.5) / 100),
+          background: `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${accent} 100%)`,
+          opacity: mode === "dark" ? 0.85 : 0.7,
+        } as CSSProperties}
+      />
+    </div>
+  );
+}
