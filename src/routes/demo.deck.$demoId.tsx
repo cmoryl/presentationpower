@@ -210,7 +210,22 @@ function ShowcaseDeckDemoPage() {
       </div>
 
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.15fr_minmax(0,0.85fr)]">
+      {/* Rendered comps — every slide of the demo, live from the renderer. */}
+      <section className="mt-10">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-semibold tracking-tight">
+            Rendered preview · all {payload.slides.length} slides
+          </h2>
+          <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
+            Click any slide to enlarge
+          </span>
+        </div>
+        <div className="mt-4">
+          <ShowcaseSlideGallery payload={payload} accent={accent} />
+        </div>
+      </section>
+
+      <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_minmax(0,0.85fr)]">
         <div className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight">
             Every slide, already written
