@@ -189,7 +189,7 @@ function PlaybookDemoView() {
       <header
         className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 p-8 backdrop-blur"
         style={{
-          background: `linear-gradient(120deg, ${playbook.accent}18 0%, rgba(255,255,255,0.65) 55%, ${playbook.accent}08 100%)`,
+          background: `linear-gradient(120deg, ${look.accent}22 0%, rgba(255,255,255,0.66) 52%, ${look.accentAlt}18 100%)`,
         }}
       >
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
@@ -252,7 +252,7 @@ function PlaybookDemoView() {
         <div className="mt-6">
           <PlaybookGallery
             playbookId={playbook.id}
-            accent={playbook.accent}
+            accent={look.accent}
             name={playbook.name}
           />
         </div>
