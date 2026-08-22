@@ -117,6 +117,16 @@ function ShowcaseDeckDemoPage() {
                 : `Generate for ${division.label}`}
               <ArrowRight size={15} />
             </button>
+            {existingId ? (
+              <button
+                type="button"
+                onClick={regenerate}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/50 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
+                title="Replace your saved copy with the current demo build (imagery, backdrops and all)"
+              >
+                Regenerate fresh copy
+              </button>
+            ) : null}
             <Link
               to="/library"
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/50 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
