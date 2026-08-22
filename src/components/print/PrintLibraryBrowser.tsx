@@ -323,81 +323,106 @@ export function PrintLibraryBrowser({
       >
         {/* Division nav — aligned card grid, no ragged tab wrapping */}
         <div
-          className="px-4 pb-4 pt-4 sm:px-6"
+          className="px-4 pt-4 sm:px-6"
           style={{
-            borderBottom: `1px solid color-mix(in oklab, ${brand.tokens.accent} 26%, transparent)`,
+            borderBottom: divisionPickerOpen
+              ? `1px solid color-mix(in oklab, ${brand.tokens.accent} 26%, transparent)`
+              : undefined,
           }}
         >
-          <div className="mb-2.5 flex items-baseline justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setDivisionPickerOpen((v) => !v)}
+            className="mb-2.5 flex w-full items-baseline justify-between gap-3 text-left"
+            aria-expanded={divisionPickerOpen}
+            aria-controls="division-picker-grid"
+          >
             <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-black/45">
               Choose a division
             </span>
-            <span className="text-[11px] text-black/40">{divisions.length} divisions</span>
-          </div>
+            <span className="inline-flex items-center gap-1.5 text-[11px] text-black/40">
+              {divisions.length} divisions
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-300 ${divisionPickerOpen ? "rotate-180" : ""}`}
+                aria-hidden
+              />
+            </span>
+          </button>
           <div
-            className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-            role="tablist"
-            aria-label="Divisions"
+            id="division-picker-grid"
+            className={`grid transition-all duration-300 ease-out ${
+              divisionPickerOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            }`}
           >
-            {divisions.map((b) => {
-              const active = b.id === divisionId;
-              const n = curatedCount(b.id);
-              return (
-                <button
-                  key={b.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => {
-                    onDivisionChange(b.id);
-                    setCollection("All");
-                    setSubId(null);
-                  }}
-                  className={
-                    "group relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition " +
-                    (active
-                      ? "border-transparent bg-white shadow-md"
-                      : "border-black/10 bg-white/70 hover:border-black/25 hover:bg-white")
-                  }
-                  style={
-                    active
-                      ? {
-                          boxShadow: `0 1px 0 rgba(0,0,0,0.04), 0 0 0 2px color-mix(in oklab, ${b.tokens.accent} 62%, transparent)`,
-                        }
-                      : undefined
-                  }
-                >
-                  <span
-                    aria-hidden
-                    className="absolute inset-y-0 left-0 w-1"
-                    style={{
-                      background: b.tokens.accent,
-                      opacity: active ? 1 : 0.35,
-                    }}
-                  />
-                  <span
-                    aria-hidden
-                    className="ml-1 inline-block h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/10"
-                    style={{ background: b.tokens.accent }}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span
+            <div className="overflow-hidden">
+              <div
+                className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                role="tablist"
+                aria-label="Divisions"
+              >
+                {divisions.map((b) => {
+                  const active = b.id === divisionId;
+                  const n = curatedCount(b.id);
+                  return (
+                    <button
+                      key={b.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => {
+                        onDivisionChange(b.id);
+                        setCollection("All");
+                        setSubId(null);
+                        setDivisionPickerOpen(false);
+                      }}
                       className={
-                        "block truncate text-xs font-semibold " +
-                        (active ? "text-[#03002C]" : "text-[#03002C]/75")
+                        "group relative flex min-w-0 items-center gap-2.5 overflow-hidden rounded-xl border px-3 py-2.5 text-left transition " +
+                        (active
+                          ? "border-transparent bg-white shadow-md"
+                          : "border-black/10 bg-white/70 hover:border-black/25 hover:bg-white")
+                      }
+                      style={
+                        active
+                          ? {
+                              boxShadow: `0 1px 0 rgba(0,0,0,0.04), 0 0 0 2px color-mix(in oklab, ${b.tokens.accent} 62%, transparent)`,
+                            }
+                          : undefined
                       }
                     >
-                      {b.name}
-                    </span>
-                    <span className="block text-[10px] text-black/45">
-                      {n > 0
-                        ? `${n} ready-made · ${PRINT_TYPES.length} blank`
-                        : `${PRINT_TYPES.length} blank templates`}
-                    </span>
-                  </span>
-                </button>
-              );
-            })}
+                      <span
+                        aria-hidden
+                        className="absolute inset-y-0 left-0 w-1"
+                        style={{
+                          background: b.tokens.accent,
+                          opacity: active ? 1 : 0.35,
+                        }}
+                      />
+                      <span
+                        aria-hidden
+                        className="ml-1 inline-block h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/10"
+                        style={{ background: b.tokens.accent }}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span
+                          className={
+                            "block truncate text-xs font-semibold " +
+                            (active ? "text-[#03002C]" : "text-[#03002C]/75")
+                          }
+                        >
+                          {b.name}
+                        </span>
+                        <span className="block text-[10px] text-black/45">
+                          {n > 0
+                            ? `${n} ready-made · ${PRINT_TYPES.length} blank`
+                            : `${PRINT_TYPES.length} blank templates`}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
