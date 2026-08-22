@@ -47,6 +47,18 @@ const SHOWCASE: ShowcaseEntry[] = [
     blurb: "Media & Entertainment spotlight with division photography on every dark variant.",
   },
   {
+    id: "sc-legal",
+    surface: "social",
+    playbookId: "legal-ediscovery-insight",
+    blurb: "Legal insight drop: authority-led statements, dark variants, quote card and carousel.",
+  },
+  {
+    id: "sc-gaming",
+    surface: "social",
+    playbookId: "gaming-scale-drop",
+    blurb: "Gaming scale drop with neon accents, vertical story cuts and launch-day countdown.",
+  },
+  {
     id: "sc-launch",
     surface: "event",
     playbookId: "product-launch",
@@ -58,31 +70,20 @@ const SHOWCASE: ShowcaseEntry[] = [
     playbookId: "flagship-conference",
     blurb: "Flagship conference run-of-show with speaker cards and sponsor lockups.",
   },
+  {
+    id: "sc-legaltech",
+    surface: "event",
+    playbookId: "legaltech-day",
+    blurb: "Legal-tech day: roundtable signage, agenda boards and panel speaker cards.",
+  },
+  {
+    id: "sc-gaming-party",
+    surface: "event",
+    playbookId: "gaming-launch-party",
+    blurb: "Launch party kit: LED stage plates, invite set and social cut-downs.",
+  },
 ];
 
-/** Curated print pieces that already exist in the library, deep-linked. */
-const PRINT_DEMOS = [
-  {
-    id: "pd-legal-genai",
-    title: "Generative AI eDiscovery e-brochure",
-    label: "Print · Legal",
-    blurb:
-      "Eight-page production e-brochure: hero spread, capability grid, two-line statistics and export-safe icons — print and digital ready.",
-    accent: "#003FC7",
-    search: { division: "bm-tp-legal", type: "ebrochure", q: "Generative AI" },
-    pills: ["Offset + POD", "CMYK preflight", "Editable"],
-  },
-  {
-    id: "pd-lifesci-veeva",
-    title: "Veeva Vault RIM integration brief",
-    label: "Print · Life Sciences",
-    blurb:
-      "Regulated-content brief with locked source callouts, integration diagram and a compliance-safe stat band.",
-    accent: "#EC388A",
-    search: { division: "bm-tp-lifesci", type: "ebrochure", q: "Veeva" },
-    pills: ["PDF/X-4", "100K body text", "Editable"],
-  },
-] as const;
 
 const SURFACE_META = {
   social: { label: "Social kit", icon: Share2, accent: "#FF9B70" },
