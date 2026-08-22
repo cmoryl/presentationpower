@@ -283,7 +283,7 @@ function SocialDemoView() {
           desc="The full production scope for this campaign — feed, story, reels, ad variants, PR headers, newsletter, employee advocacy and more. Pieces flagged live render right now; the rest are on the roadmap."
         />
         <div className="mt-6">
-          <CollateralGrid items={getExpandedSocialCollateral(playbook)} />
+          <CollateralGrid items={getExpandedSocialCollateral(playbook)} artworkCtx={artworkCtx} />
         </div>
       </section>
 
