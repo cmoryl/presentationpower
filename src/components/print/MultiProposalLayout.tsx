@@ -44,6 +44,11 @@ import {
 } from "@/lib/print-library/proposal-locations";
 import { EditableImage, resolveImageSlot, usePrintImageEdit } from "./PrintImageEdit";
 import {
+  ProposalBrandProvider,
+  resolveProposalBrand,
+  useProposalBrand,
+} from "@/lib/print-library/proposal-brand";
+import {
   AddLogoButton,
   LogoSlotChrome,
   logoEntryId,
@@ -3545,7 +3550,6 @@ export function MultiProposalLayout({
   // Division branding: lockups and accent come from the proposal's own brand
   // mode, so a Legal master prints the Legal lockup, Element prints Element, and
   // so on — never the master TransPerfect artwork by default.
-  const pb = useProposalBrand();
   const pb = resolveProposalBrand(brand);
   const accent = pb.accent;
   const pages = content.pages ?? [];
