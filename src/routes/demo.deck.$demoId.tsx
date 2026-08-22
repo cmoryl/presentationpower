@@ -52,6 +52,7 @@ function ShowcaseDeckDemoPage() {
   const def = getShowcaseDeck(demoId);
   const navigate = useNavigate();
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const deleteDeck = useDeckStore((s) => s.deleteDeck);
 
   const home = def ? nativeDivision(def.divisionLabel) : DEMO_DIVISIONS[0];
   const [divisionId, setDivisionId] = useState(home.id);
@@ -76,6 +77,14 @@ function ShowcaseDeckDemoPage() {
       void navigate({ to: "/decks/$deckId", params: { deckId: existingId } });
       return;
     }
+    const { deckId } = createDeckFromTemplate(payload!);
+    void navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
+  /** Replace an older saved copy with the current demo build so decks
+   *  generated before an authoring update pick up imagery and backdrops. */
+  function regenerate() {
+    if (existingId) deleteDeck(existingId);
     const { deckId } = createDeckFromTemplate(payload!);
     void navigate({ to: "/decks/$deckId", params: { deckId } });
   }
@@ -117,6 +126,16 @@ function ShowcaseDeckDemoPage() {
                 : `Generate for ${division.label}`}
               <ArrowRight size={15} />
             </button>
+            {existingId ? (
+              <button
+                type="button"
+                onClick={regenerate}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/50 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
+                title="Replace your saved copy with the current demo build (imagery, backdrops and all)"
+              >
+                Regenerate fresh copy
+              </button>
+            ) : null}
             <Link
               to="/library"
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/50 px-5 text-sm font-semibold text-white transition hover:bg-white/10"

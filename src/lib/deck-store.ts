@@ -413,6 +413,8 @@ export type TemplatePayload = {
     layoutId: string;
     content: SlideContent;
     notes?: string | null;
+    /** Optional per-slide template override (backdrop scene, type register…). */
+    templateOverride?: DeckSlide["templateOverride"];
   }>;
   brief?: {
     prospect?: string;
@@ -4852,6 +4854,9 @@ export const useDeckStore = create<DeckState>()(
                 content: structuredClone(s.content),
                 changes: [],
                 notes: s.notes ?? undefined,
+                templateOverride: s.templateOverride
+                  ? structuredClone(s.templateOverride)
+                  : undefined,
               };
             }),
           };

@@ -9,6 +9,7 @@
 
 import type { TemplatePayload } from "./deck-store";
 import type { ShowcaseDeckDef } from "./showcase-decks-types";
+import { enrichShowcasePayload } from "./showcase-enrich";
 
 /* ------------------------------------------------------------------ */
 /* Legal · multilingual eDiscovery review program                      */
@@ -113,6 +114,18 @@ function buildLegalEdiscovery(): TemplatePayload {
         ],
       },
       notes: "Four nouns that survive a Rule 26 conference.",
+    },
+    {
+      sectionId: "SF-07",
+      variantId: "MV-IMG-SPLIT",
+      layoutId: "LF-03",
+      content: {
+        title: "Review at defensible speed",
+        body: "Multilingual reviewers work in one platform with the same tags, the same privilege calls and a full audit trail behind every decision.",
+        caption: "Managed review, multilingual team",
+        mediaSeed: "legal-review-floor",
+      },
+      notes: "Image-forward beat — gives the eye a rest between the model and the numbers.",
     },
     {
       sectionId: "SF-08",
@@ -296,6 +309,18 @@ function buildGamingLaunch(): TemplatePayload {
       notes: "Four pillars, all mapped to a milestone the producer already tracks.",
     },
     {
+      sectionId: "SF-07",
+      variantId: "MV-IMG-SPLIT",
+      layoutId: "LF-03",
+      content: {
+        title: "Localized on the nightly build",
+        body: "Voice, text and LQA run against the same build the dev team ships, so a broken string is caught the morning it appears — not at cert.",
+        caption: "Sim-ship LQA floor",
+        mediaSeed: "gaming-nightly-lqa",
+      },
+      notes: "Image-forward beat — gives the eye a rest between the model and the numbers.",
+    },
+    {
       sectionId: "SF-08",
       variantId: "MV-PROOF-STATS-4",
       layoutId: "LF-10",
@@ -459,6 +484,18 @@ function buildDigitalGrowth(): TemplatePayload {
       notes: "Four pillars — each one maps to a metric on the next slide.",
     },
     {
+      sectionId: "SF-07",
+      variantId: "MV-IMG-SPLIT",
+      layoutId: "LF-03",
+      content: {
+        title: "Copy that lands in-market",
+        body: "Local growth writers work from the same brief as the source campaign, so headlines convert instead of translating. Every variant ships with its own search terms already checked.",
+        caption: "Digital campaign studio",
+        mediaSeed: "digital-inmarket-copy",
+      },
+      notes: "Image-forward beat — gives the eye a rest between the model and the numbers.",
+    },
+    {
       sectionId: "SF-08",
       variantId: "MV-PROOF-STATS-4",
       layoutId: "LF-10",
@@ -585,7 +622,7 @@ export const EXTRA_SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Recall and QC numbers opposing counsel can test",
       "Opens editable: swap the matter, keep the argument",
     ],
-    build: buildLegalEdiscovery,
+    build: () => enrichShowcasePayload(buildLegalEdiscovery(), "legal"),
   },
   {
     id: "gaming-sim-ship-launch",
@@ -602,7 +639,7 @@ export const EXTRA_SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Voice, text and LQA scoped on one slide",
       "Opens editable: retarget to any title or platform mix",
     ],
-    build: buildGamingLaunch,
+    build: () => enrichShowcasePayload(buildGamingLaunch(), "gaming"),
   },
   {
     id: "digital-growth-localization",
@@ -619,6 +656,6 @@ export const EXTRA_SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Conversion, CAC and organic lift on one proof slide",
       "Opens editable: drop in your own funnel baseline",
     ],
-    build: buildDigitalGrowth,
+    build: () => enrichShowcasePayload(buildDigitalGrowth(), "digital"),
   },
 ];

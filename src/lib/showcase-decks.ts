@@ -11,6 +11,7 @@
 import type { TemplatePayload } from "./deck-store";
 import { EXTRA_SHOWCASE_DECKS } from "./showcase-decks-extra";
 import type { ShowcaseDeckDef } from "./showcase-decks-types";
+import { enrichShowcasePayload } from "./showcase-enrich";
 
 export type { ShowcaseDeckDef };
 
@@ -117,6 +118,18 @@ function buildGlobalLinkPitch(): TemplatePayload {
         ],
       },
       notes: "Architecture without the diagram — four nouns your CFO can repeat.",
+    },
+    {
+      sectionId: "SF-07",
+      variantId: "MV-IMG-SPLIT",
+      layoutId: "LF-03",
+      content: {
+        title: "One lane, every market",
+        body: "Connectors publish into a single translation lane the moment merchandising hits save. Nobody chases a file, and no market waits on another market to finish.",
+        caption: "GlobalLink program operations",
+        mediaSeed: "globallink-one-lane",
+      },
+      notes: "Image-forward beat — gives the eye a rest between the model and the numbers.",
     },
     {
       sectionId: "SF-08",
@@ -296,6 +309,18 @@ function buildLifeSciencesProgram(): TemplatePayload {
       notes: "Four pillars map one-to-one to the SOP annex.",
     },
     {
+      sectionId: "SF-07",
+      variantId: "MV-IMG-SPLIT",
+      layoutId: "LF-03",
+      content: {
+        title: "What the review lane looks like",
+        body: "One queue, one memory, one approver per market. Reviewers open the live page in their own language, comment in place, and the change lands back in the master without a single email.",
+        caption: "In-context review, EMEA hub",
+        mediaSeed: "globallink-review-lane",
+      },
+      notes: "Image-forward beat — gives the eye a rest between the model and the numbers.",
+    },
+    {
       sectionId: "SF-10",
       variantId: "MV-PROC-TIMELINE",
       layoutId: "LF-14",
@@ -402,7 +427,7 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Style pack + industry ground already selected",
       "Opens editable: swap the client, keep the narrative",
     ],
-    build: buildGlobalLinkPitch,
+    build: () => enrichShowcasePayload(buildGlobalLinkPitch(), "globallink"),
   },
   {
     id: "lifesci-regulated-program",
@@ -419,7 +444,7 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
       "Zero-findings evidence with anonymized reference quote",
       "Opens editable: retarget to any filing calendar",
     ],
-    build: buildLifeSciencesProgram,
+    build: () => enrichShowcasePayload(buildLifeSciencesProgram(), "lifesci"),
   },
   ...EXTRA_SHOWCASE_DECKS,
 ];
