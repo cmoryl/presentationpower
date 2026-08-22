@@ -112,19 +112,14 @@ function SocialDemoView() {
   }, [playbook.id, baseLook.id]);
   // The division's own accent always re-inks whichever look is active, so a
   // retarget changes the field graphic and type — never the brand colour.
-  const look = useMemo(() => {
-    if (lookId === baseLook.id) return baseLook;
-    const picked = eventLookById(lookId);
-    return channelLook({
-      key: `social:${playbook.id}`,
-      brandId: null,
-      intentId: null,
-      accent: playbook.accent,
-      label: picked.label,
-    }).id === picked.id
-      ? picked
-      : { ...picked, accent: playbook.accent };
-  }, [lookId, baseLook, playbook.id, playbook.accent]);
+  const look = useMemo(
+    () =>
+      lookId === baseLook.id
+        ? baseLook
+        : reinkLook(eventLookById(lookId), playbook.accent),
+    [lookId, baseLook, playbook.accent],
+  );
+
   const pickLook = (id: string) => {
     setLookId(id);
     if (typeof window !== "undefined") {
