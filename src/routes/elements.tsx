@@ -72,7 +72,6 @@ const SURFACES: Surface[] = [
       { label: "Slide modules", to: "/library" },
       { label: "My decks", to: "/library/my" },
       { label: "All decks", to: "/decks" },
-      { label: "Imported decks", to: "/library/imported" },
       { label: "Deck agent", to: "/agent" },
       { label: "Canvas creator", to: "/admin/canvas" },
     ],
@@ -95,7 +94,6 @@ const SURFACES: Surface[] = [
       { label: "Client spotlights", to: "/library/print", search: { type: "spotlight" } },
       { label: "E-brochures", to: "/library/print", search: { type: "ebrochure" } },
       { label: "Section modules", to: "/library/print/modules" },
-      { label: "Hero openers", to: "/library/print/heroes" },
     ],
   },
   {
@@ -114,7 +112,6 @@ const SURFACES: Surface[] = [
       { label: "Event assets", to: "/events" },
       { label: "New event asset", to: "/events/new" },
       { label: "Presets", to: "/events/presets" },
-      { label: "Next-gen builder", to: "/events/next" },
     ],
   },
   {
@@ -133,7 +130,6 @@ const SURFACES: Surface[] = [
       { label: "Social assets", to: "/social" },
       { label: "New social asset", to: "/social/new" },
       { label: "Presets", to: "/social/presets" },
-      { label: "Banners", to: "/social/banners" },
     ],
   },
 ];
