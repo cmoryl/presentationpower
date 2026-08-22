@@ -296,27 +296,38 @@ function PlaybookDemoView() {
           desc="Rendered right now from the deterministic pipeline. Configure to swap copy, brand, and cadence."
         />
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {assets.map((a) => (
-            <AssetPreviewCard
-              key={a.id}
-              rendererProps={{
-                format: a.format,
-                brandId: a.brandId,
-                mode: a.mode,
-                copy: a.copy,
-                facts: {
-                  hashtag: playbook.facts.hashtag,
-                  registrationUrl: playbook.facts.registrationUrl,
-                },
-                eventLogo,
-              }}
-              formatLabel={a.format.label}
-              formatWidth={a.format.width}
-              formatHeight={a.format.height}
-              mode={a.mode}
-            />
-          ))}
+          {assets.map((a) => {
+            // Light variants crop the division photography into a designed
+            // panel sized to the frame's aspect; dark variants run full bleed.
+            const imageUrl = photoForFormat(a.brandId, a.format);
+            const panel = a.mode === "light";
+            return (
+              <AssetPreviewCard
+                key={a.id}
+                rendererProps={{
+                  format: a.format,
+                  brandId: a.brandId,
+                  mode: a.mode,
+                  copy: a.copy,
+                  facts: {
+                    hashtag: playbook.facts.hashtag,
+                    registrationUrl: playbook.facts.registrationUrl,
+                  },
+                  eventLogo,
+                  imageUrl,
+                  imageLayout: panel ? "panel" : "bleed",
+                  imageScrimPct: 60,
+                }}
+                badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
+                formatLabel={a.format.label}
+                formatWidth={a.format.width}
+                formatHeight={a.format.height}
+                mode={a.mode}
+              />
+            );
+          })}
         </div>
+
       </section>
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
