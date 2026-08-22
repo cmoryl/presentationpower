@@ -21,6 +21,9 @@ export type CollateralContext = {
   /** Event lockups by orientation. */
   logoWide: { url: string; ratio: number };
   logoStacked: { url: string; ratio: number };
+  /** Set when the supplied lockups are dark/colour files that must be
+   *  knocked out to white on the dark artwork fields. */
+  logoNeedsKnockout?: boolean;
 };
 
 export type ArtKind =
@@ -253,7 +256,10 @@ function Logo({
         height: width / entry.ratio,
         objectFit: "contain",
         display: "block",
-        filter: colorway === "white" ? "brightness(0) invert(1)" : undefined,
+        filter:
+          colorway === "white" || (colorway !== "color" && ctx.logoNeedsKnockout)
+            ? "brightness(0) invert(1)"
+            : undefined,
         ...style,
       }}
     />
