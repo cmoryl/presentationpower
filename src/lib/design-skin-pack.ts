@@ -22,6 +22,7 @@ import { GEOMETRY_SHEET } from "./pack-geometry";
 import { INDUSTRY_SKINS } from "./industry-skins";
 import { withElementSceneArt } from "./element-scene-art";
 import { withGamesSceneArt } from "./games-scene-art";
+import { withIndustryPhotoArt } from "./industry-photo-art";
 
 const SANS = `'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif`;
 const SERIF = `'Instrument Serif', Georgia, 'Times New Roman', serif`;
@@ -504,7 +505,7 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
   const code = (skin.code ?? "").toUpperCase();
   if (hc) return pack;
   // Games (R22) paints from the authored bm-tp-games plate kit.
-  return withGamesSceneArt(withElementSceneArt(pack, code), code);
+  return withGamesSceneArt(withIndustryPhotoArt(withElementSceneArt(pack, code), code), code);
 }
 
 

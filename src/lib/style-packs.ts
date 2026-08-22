@@ -39,6 +39,7 @@ import {
 import { withBackgroundOverrides } from "./template-background";
 import { withElementSceneArt } from "./element-scene-art";
 import { withGamesSceneArt } from "./games-scene-art";
+import { withIndustryPhotoArt } from "./industry-photo-art";
 
 import { templateCodeFromPackId } from "./custom-templates";
 
@@ -1858,7 +1859,7 @@ export function stylePackById(id: string | null | undefined): StylePack | null {
  * background overrides — tuning always composes on top of the artwork.
  */
 function withOverrides(pack: StylePack, code: string): StylePack {
-  const art = withGamesSceneArt(withElementSceneArt(pack, code), code);
+  const art = withGamesSceneArt(withIndustryPhotoArt(withElementSceneArt(pack, code), code), code);
   if (!backgroundOverrides().some((o) => o.skinCode.toUpperCase() === code.toUpperCase())) {
     return art;
   }
