@@ -413,6 +413,8 @@ export type TemplatePayload = {
     layoutId: string;
     content: SlideContent;
     notes?: string | null;
+    /** Optional per-slide template override (backdrop scene, type register…). */
+    templateOverride?: DeckSlide["templateOverride"];
   }>;
   brief?: {
     prospect?: string;
