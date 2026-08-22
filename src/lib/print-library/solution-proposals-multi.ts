@@ -11,6 +11,7 @@
 // the case studies and spotlights.
 
 import type { MultiProposalPage, SolutionProposalContent } from "@/lib/print-assets.types";
+import { BRAND_MODES } from "@/lib/taxonomy";
 import {
   SOLUTION_PROPOSALS,
   type SolutionProposalSeed,
@@ -169,7 +170,11 @@ const BIO_PLACEHOLDER =
  * Content that already exists on the one-pager (scope, cost rows, stats,
  * quote, team) is reused so both masters stay in lockstep per division.
  */
-export function multiPagesFor(content: SolutionProposalContent): MultiProposalPage[] {
+export function multiPagesFor(
+  content: SolutionProposalContent,
+  /** Division signing entity, e.g. "TransPerfect Legal". */
+  divisionName = "TransPerfect",
+): MultiProposalPage[] {
   const team = content.team ?? [];
   return [
     {
@@ -188,7 +193,7 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
         },
         {
           title: "PREPARED BY:",
-          body: "Contact\nTitle\nTransPerfect\nAddress One\nCity, Zip\nYour Email",
+          body: `Contact\nTitle\n${divisionName}\nAddress One\nCity, Zip\nYour Email`,
         },
       ],
     },
@@ -367,8 +372,8 @@ export function multiPagesFor(content: SolutionProposalContent): MultiProposalPa
     {
       id: "p-why",
       kind: "why",
-      navLabel: "Why TransPerfect",
-      eyebrow: "Why TransPerfect",
+      navLabel: `Why ${divisionName}`,
+      eyebrow: `Why ${divisionName}`,
       title: "WHY",
       bullets: WHY_LINES,
       cards: WHY_CARDS,
@@ -513,16 +518,21 @@ export type MultiSolutionProposalSeed = {
   content: SolutionProposalContent;
 };
 
+/** Display name for a division id, used in the signing + "Why" copy. */
+function divisionName(divisionId: string): string {
+  return BRAND_MODES.find((b) => b.id === divisionId)?.name ?? "TransPerfect";
+}
+
 function toMultiSeed(seed: SolutionProposalSeed): MultiSolutionProposalSeed {
   const content: SolutionProposalContent = {
     ...seed.content,
     docMode: "multi",
-    pages: multiPagesFor(seed.content),
+    pages: multiPagesFor(seed.content, divisionName(seed.divisionId)),
   };
   return {
     slug: `${seed.slug}-multipage`,
     title: seed.title.replace(/—\s*Master$/, "").trim() + " — Multi-page Master",
-    teaser: `Full multi-page proposal — cover, by-the-numbers, scope, cost, footprint, clients, success stories, why TransPerfect, advocates, and team bios. ${seed.teaser}`,
+    teaser: `Full multi-page proposal — cover, by-the-numbers, scope, cost, footprint, clients, success stories, why ${divisionName(seed.divisionId)}, advocates, and team bios. ${seed.teaser}`,
     tags: [...seed.tags, "multi-page"],
     collection: COLLECTION,
     sourceFile: SOURCE_FILE,
