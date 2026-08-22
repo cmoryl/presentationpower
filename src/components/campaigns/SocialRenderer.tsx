@@ -1044,15 +1044,17 @@ function DesignGround({
         }}
       />
 
-      {/* Element brick rail — the shared motif, anchored to the copy edge. */}
+      {/* Element brick rail — the shared motif, floated in the open band
+          between the wordmark and the copy stack so it never sits under type. */}
       <div
         className="absolute flex"
         style={{
           gap: unit * 0.42,
           left: unit * 1.4,
-          [copyAlign === "end" ? "top" : "bottom"]: unit * 1.4,
+          [copyAlign === "end" ? "top" : "bottom"]: wide ? "34%" : "30%",
         } as CSSProperties}
       >
+
         {Array.from({ length: bricks }).map((_, i) => (
           <span
             key={i}
