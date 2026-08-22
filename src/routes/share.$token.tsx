@@ -363,6 +363,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   };
 
   return (
+    <SlideTemplateIndustryProvider industryId={deck.design_recipe_id ?? null}>
     <div className="min-h-screen bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
       {/* Minimal header */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
