@@ -400,6 +400,8 @@ export function SocialRenderer({
   facts,
   imageUrl,
   imageScrimPct = 55,
+  imageLayout = "bleed",
+
   styleId,
   eventLogo,
   displayShortEdge = 320,
