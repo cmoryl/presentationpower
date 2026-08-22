@@ -247,7 +247,7 @@ function ElementsLanding() {
                   style={{ background: s.glow }}
                 />
 
-                <div className="relative flex items-start gap-5">
+                <div className="relative flex items-start gap-5 px-6 pt-5">
                   <ElementBrickRail
                     thickness="7px"
                     unit="6px"
