@@ -48,5 +48,11 @@ export function BackToTop() {
 }
 
 export function BackToTopSentinel() {
-  return <div id={TOP_SENTINEL_ID} className="absolute left-0 top-0 h-1 w-1" aria-hidden="true" />;
+  return (
+    <div
+      id={TOP_SENTINEL_ID}
+      className="relative top-[320px] h-1 w-1"
+      aria-hidden="true"
+    />
+  );
 }
