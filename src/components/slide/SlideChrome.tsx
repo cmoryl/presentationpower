@@ -281,6 +281,25 @@ export type SlideBackdrop = {
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
 /**
+ * Module identity for background selection.
+ *
+ * `SlideFrame`'s own `variant` prop is the CHROME variant — only
+ * "cover" | "content" | "divider" | "close". Seeding the style pack's ground
+ * from it collapsed the entire catalogue onto three plates (cover / section /
+ * closing), so switching a look on the library page repainted every content
+ * module with the same background instead of the plate its composition wants.
+ *
+ * VariantRenderer publishes the real module vocabulary here (module variant id
+ * + name + family), which `sceneFromSeed` maps to stats / chart / bento /
+ * timeline / split / quote plates.
+ */
+export const SlideSceneSeedContext = createContext<string | null>(null);
+
+export function useSlideSceneSeed(): string | null {
+  return useContext(SlideSceneSeedContext);
+}
+
+/**
  * Ground ownership rule. A style pack is a complete master design, so it paints
  * the page ground — except when the author explicitly picked a background for
  * this slide in the editor (`content.background`), which always wins so the
