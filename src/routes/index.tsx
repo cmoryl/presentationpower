@@ -414,21 +414,7 @@ function Dashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                <div className="grid grid-cols-3 gap-3">
-                  <HeroStat label="Decks" value={allDecks.length} sub={`${totalSlides} slides`} />
-                  <HeroStat
-                    label="Cloud saved"
-                    value={signedIn ? (cloudCount ?? "—") : "—"}
-                    sub={signedIn ? "in your account" : "sign in to sync"}
-                    icon={<Cloud size={12} />}
-                  />
-                  <HeroStat
-                    label="Last export"
-                    value={lastExport ? (lastExport.kind ?? "export").toUpperCase() : "—"}
-                    sub={lastExport ? relative(lastExport.at) : "—"}
-                    icon={<Clock size={12} />}
-                  />
-                </div>
+
                 <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur">
                   <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
                     Try
