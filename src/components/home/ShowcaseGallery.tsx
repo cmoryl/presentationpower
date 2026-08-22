@@ -1,13 +1,15 @@
 // Homepage "Finished examples" gallery.
 //
-// Renders fully-built demo variations (real assets, real brand tokens, real
-// copy) so a first-time visitor can see a complete setup end to end instead of
-// an empty workspace. Social + event cards render live SocialRenderer previews
-// from the same playbook data the /social/demo and /events/demo routes use.
+// Renders fully-built demo setups across all four Elements — Presentation,
+// Print, Event, Social. Nothing here is a mock: presentation cards expand into
+// real editable decks (authored copy, style pack, transitions), print cards
+// deep-link to curated production layouts, and event/social cards render live
+// SocialRenderer previews from the same playbook data /events/demo and
+// /social/demo use. Hyper-real photography backs every card.
 
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarDays, Printer, Share2 } from "lucide-react";
+import { ArrowRight, CalendarDays, Presentation, Printer, Share2 } from "lucide-react";
 
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
@@ -21,6 +23,12 @@ import { getPlaybook } from "@/lib/event-playbooks";
 import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
+import { SHOWCASE_DECKS } from "@/lib/showcase-decks";
+
+import demoPresentationImg from "@/assets/showcase/demo-presentation.jpg";
+import demoPrintImg from "@/assets/showcase/demo-print.jpg";
+import demoEventImg from "@/assets/showcase/demo-event.jpg";
+import demoSocialImg from "@/assets/showcase/demo-social.jpg";
 
 type ShowcaseEntry = {
   id: string;
@@ -43,12 +51,6 @@ const SHOWCASE: ShowcaseEntry[] = [
     blurb: "Media & Entertainment spotlight with division photography on every dark variant.",
   },
   {
-    id: "sc-legal",
-    surface: "social",
-    playbookId: "legal-ediscovery-insight",
-    blurb: "Legal thought-leadership drumbeat — insight card, stat callout, story.",
-  },
-  {
     id: "sc-launch",
     surface: "event",
     playbookId: "product-launch",
@@ -60,17 +62,35 @@ const SHOWCASE: ShowcaseEntry[] = [
     playbookId: "flagship-conference",
     blurb: "Flagship conference run-of-show with speaker cards and sponsor lockups.",
   },
-  {
-    id: "sc-lifesci",
-    surface: "event",
-    playbookId: "life-sciences-summit",
-    blurb: "Life Sciences summit kit tuned for regulated-copy review.",
-  },
 ];
 
+/** Curated print pieces that already exist in the library, deep-linked. */
+const PRINT_DEMOS = [
+  {
+    id: "pd-legal-genai",
+    title: "Generative AI eDiscovery e-brochure",
+    label: "Print · Legal",
+    blurb:
+      "Eight-page production e-brochure: hero spread, capability grid, two-line statistics and export-safe icons — print and digital ready.",
+    accent: "#003FC7",
+    search: { division: "bm-tp-legal", type: "ebrochure", q: "Generative AI" },
+    pills: ["Offset + POD", "CMYK preflight", "Editable"],
+  },
+  {
+    id: "pd-lifesci-veeva",
+    title: "Veeva Vault RIM integration brief",
+    label: "Print · Life Sciences",
+    blurb:
+      "Regulated-content brief with locked source callouts, integration diagram and a compliance-safe stat band.",
+    accent: "#EC388A",
+    search: { division: "bm-tp-lifesci", type: "ebrochure", q: "Veeva" },
+    pills: ["PDF/X-4", "100K body text", "Editable"],
+  },
+] as const;
+
 const SURFACE_META = {
-  social: { label: "Social kit", icon: Share2, accent: "#FF9B70" },
-  event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87" },
+  social: { label: "Social kit", icon: Share2, accent: "#FF9B70", art: demoSocialImg },
+  event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87", art: demoEventImg },
 } as const;
 
 export function ShowcaseGallery() {
@@ -82,13 +102,20 @@ export function ShowcaseGallery() {
             Finished examples
           </div>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight text-[#03002C] dark:text-white">
-            Fully built demo setups
+            Complete, ready-to-ship demos
           </h2>
           <p className="mt-1 text-sm text-black/55 dark:text-white/55">
-            Complete, brand-checked kits — open one to see every asset, phase, and KPI.
+            End to end across every element — real copy, real photography, real export paths. Open
+            one and edit it as your own.
           </p>
         </div>
-        <div className="flex gap-4 text-sm">
+        <div className="flex flex-wrap gap-4 text-sm">
+          <Link
+            to="/library/print"
+            className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+          >
+            All print →
+          </Link>
           <Link
             to="/social"
             className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
@@ -105,21 +132,136 @@ export function ShowcaseGallery() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        {SHOWCASE_DECKS.map((d) => (
+          <MediaCard
+            key={d.id}
+            to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
+            art={demoPresentationImg}
+            artAlt="Executive team reviewing a finished Element deck on a boardroom display"
+            accent={d.accent}
+            icon={<Presentation size={12} />}
+            label={`Deck · ${d.eyebrow}`}
+            title={d.name}
+            blurb={d.blurb}
+            pills={[
+              `${d.build().slides.length} slides`,
+              "Authored copy",
+              "Style pack set",
+              "PPTX + PDF",
+            ]}
+          />
+        ))}
+
+        {PRINT_DEMOS.map((p) => (
+          <MediaCard
+            key={p.id}
+            to={{ to: "/library/print", search: p.search }}
+            art={demoPrintImg}
+            artAlt="Printed brochures and a case-study booklet fanned on a studio surface"
+            accent={p.accent}
+            icon={<Printer size={12} />}
+            label={p.label}
+            title={p.title}
+            blurb={p.blurb}
+            pills={[...p.pills]}
+          />
+        ))}
+
         {SHOWCASE.map((entry) => (
           <ShowcaseCard key={entry.id} entry={entry} />
         ))}
-        <StructureCard
-          to="/library/print"
-          icon={<Printer size={16} />}
-          accent="#EC388A"
-          label="Print library"
-          title="Case study & e-brochure set"
-          blurb="Production-ready print layouts with hero media, stats, and export-safe icons."
-        />
       </div>
     </section>
   );
 }
+
+/* ---------------- generic photo-backed card ---------------- */
+
+type CardLink =
+  | { to: "/demo/deck/$demoId"; params: { demoId: string } }
+  | { to: "/library/print"; search: { division: string; type: string; q: string } };
+
+function MediaCard({
+  to,
+  art,
+  artAlt,
+  accent,
+  icon,
+  label,
+  title,
+  blurb,
+  pills,
+}: {
+  to: CardLink;
+  art: string;
+  artAlt: string;
+  accent: string;
+  icon: React.ReactNode;
+  label: string;
+  title: string;
+  blurb: string;
+  pills: string[];
+}) {
+  const linkProps = to as unknown as React.ComponentProps<typeof Link>;
+  return (
+    <Link
+      {...linkProps}
+      className="group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
+    >
+      <div className="relative h-[230px] overflow-hidden">
+        <img
+          src={art}
+          alt={artAlt}
+          loading="lazy"
+          width={1536}
+          height={1024}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(180deg, ${accent}00 34%, ${accent}CC 100%)`,
+          }}
+        />
+        <span
+          aria-hidden
+          className="absolute bottom-0 left-0 flex h-1.5 w-full"
+        >
+          {[0.9, 0.5, 0.28, 0.5, 0.9].map((o, i) => (
+            <span key={i} className="flex-1" style={{ background: accent, opacity: o }} />
+          ))}
+        </span>
+      </div>
+
+      <div className="flex flex-1 flex-col gap-2 p-5">
+        <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
+          <span
+            className="grid h-6 w-6 place-items-center rounded-lg text-white"
+            style={{ background: accent }}
+            aria-hidden
+          >
+            {icon}
+          </span>
+          {label}
+        </div>
+        <div className="text-base font-semibold text-[#03002C] dark:text-white">{title}</div>
+        <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">{blurb}</p>
+        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3 text-[11px] text-black/55 dark:text-white/55">
+          {pills.map((p) => (
+            <Pill key={p}>{p}</Pill>
+          ))}
+        </div>
+        <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
+          Open full example{" "}
+          <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+/* ---------------- live-rendered social / event cards ---------------- */
 
 function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
   const meta = SURFACE_META[entry.surface];
@@ -139,7 +281,6 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
         name: pb.name,
         accent: pb.accent,
         chip: pb.chip,
-        division: pb.divisionLabel,
         brandId: pb.subBrand,
         assets,
         deliverables: pb.deliverables.length,
@@ -160,7 +301,6 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
       name: pb.name,
       accent: pb.accent,
       chip: pb.chip,
-      division: pb.facts.city ?? brand.name ?? "TransPerfect",
       brandId: brand.id,
       assets,
       deliverables: pb.deliverables.length,
@@ -184,28 +324,43 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
       {...href}
       className="group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
     >
-      <div
-        className="flex h-[230px] items-center justify-center overflow-hidden p-4"
-        style={{ background: `linear-gradient(140deg, ${built.accent}22, ${built.accent}06)` }}
-      >
-        <AssetPreviewFrame
-          width={hero.format.width}
-          height={hero.format.height}
-          maxShortEdge={210}
-          maxHeight={198}
-        >
-          {(displayShortEdge) => (
-            <SocialRenderer
-              format={hero.format}
-              brandId={hero.brandId}
-              mode={hero.mode}
-              copy={hero.copy}
-              imageUrl={imageUrl}
-              imageScrimPct={62}
-              displayShortEdge={displayShortEdge}
-            />
-          )}
-        </AssetPreviewFrame>
+      <div className="relative flex h-[230px] items-center justify-center overflow-hidden p-4">
+        <img
+          src={meta.art}
+          alt=""
+          aria-hidden
+          loading="lazy"
+          width={1536}
+          height={1024}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 backdrop-blur-[2px]"
+          style={{
+            background: `linear-gradient(150deg, ${built.accent}D9, ${built.accent}66 55%, #03002CCC)`,
+          }}
+        />
+        <div className="relative">
+          <AssetPreviewFrame
+            width={hero.format.width}
+            height={hero.format.height}
+            maxShortEdge={210}
+            maxHeight={198}
+          >
+            {(displayShortEdge) => (
+              <SocialRenderer
+                format={hero.format}
+                brandId={hero.brandId}
+                mode={hero.mode}
+                copy={hero.copy}
+                imageUrl={imageUrl}
+                imageScrimPct={62}
+                displayShortEdge={displayShortEdge}
+              />
+            )}
+          </AssetPreviewFrame>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-5">
@@ -241,51 +396,5 @@ function Pill({ children }: { children: React.ReactNode }) {
     <span className="rounded-full border border-black/10 px-2 py-0.5 dark:border-white/10">
       {children}
     </span>
-  );
-}
-
-function StructureCard({
-  to,
-  icon,
-  accent,
-  label,
-  title,
-  blurb,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  accent: string;
-  label: string;
-  title: string;
-  blurb: string;
-}) {
-  return (
-    <Link
-      to={to}
-      className="group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
-    >
-      <div
-        className="flex h-[230px] items-center justify-center"
-        style={{ background: `linear-gradient(140deg, ${accent}22, ${accent}06)` }}
-      >
-        <span
-          className="grid h-16 w-16 place-items-center rounded-2xl text-white"
-          style={{ background: accent }}
-          aria-hidden
-        >
-          {icon}
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col gap-2 p-5">
-        <div className="text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
-          {label}
-        </div>
-        <div className="text-base font-semibold text-[#03002C] dark:text-white">{title}</div>
-        <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">{blurb}</p>
-        <div className="mt-auto inline-flex items-center gap-1 pt-3 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
-          Open <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
-        </div>
-      </div>
-    </Link>
   );
 }
