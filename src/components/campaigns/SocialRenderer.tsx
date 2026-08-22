@@ -665,12 +665,18 @@ export function SocialRenderer({
     pointerEvents: "none",
   };
 
-  const lockupPos: CSSProperties =
-    style.lockup === "top-left"
+  // Panel layouts own their corners: the wordmark moves into the copy zone so
+  // it never lands on the photo panel or on the headline.
+  const lockupPos: CSSProperties = panelMode
+    ? panelSide === "right"
+      ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
+      : { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
+    : style.lockup === "top-left"
       ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
       : style.lockup === "bottom-right"
         ? { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
         : { top: safeInset.top, right: safeInset.right, transformOrigin: "top right" };
+
 
 
   return (
