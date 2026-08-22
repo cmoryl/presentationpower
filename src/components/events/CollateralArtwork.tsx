@@ -509,6 +509,7 @@ function CopyPlate({
     padding: style.plate === "none" ? 0 : pad,
     borderRadius: radius,
     marginInline: style.plateFullBleed && style.plate !== "none" ? -pad : 0,
+    marginTop: style.copyAlign === "end" ? "auto" : undefined,
   };
   if (style.plate === "glass") {
     return (
@@ -671,7 +672,6 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
   // assets for this campaign.
   const sstyle = useSocialStyle();
   const lockupRow = lockupRowStyle(sstyle);
-  const stackAlign = copyAlignStyle(sstyle);
 
 
   switch (kind) {
@@ -1151,7 +1151,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-square":
       return (
         <Field chevron={0.1} style={{ background: `linear-gradient(150deg, ${NAVY} 0%, #0B1226 62%, ${ctx.accent}44 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26, ...stackAlign }}>
+          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26}}>
             <div style={lockupRow}>
               <Logo ctx={ctx} width={360} />
             </div>
@@ -1173,7 +1173,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-story":
       return (
         <Field chevron={0.09} style={{ background: `linear-gradient(190deg, ${NAVY} 0%, #0A1023 58%, ${ctx.accent}3d 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30, ...stackAlign }}>
+          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30}}>
             <div style={lockupRow}>
               <Logo ctx={ctx} width={340} />
             </div>
@@ -1190,7 +1190,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-wide":
       return (
         <Field chevron={0.11} style={{ background: `linear-gradient(115deg, ${NAVY} 0%, #0B1226 55%, ${ctx.accent}3a 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22, ...stackAlign }}>
+          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22}}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", ...lockupRow }}>
               <Logo ctx={ctx} width={330} />
               <span style={{ fontSize: 22, letterSpacing: "0.18em", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
