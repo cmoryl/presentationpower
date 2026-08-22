@@ -7,6 +7,7 @@ import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateAppr
 import { useDeckStore } from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
+import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
 import { showcaseArt } from "@/lib/showcase-art";
 import {
   DEMO_DIVISIONS,
