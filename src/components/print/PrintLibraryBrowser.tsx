@@ -108,6 +108,7 @@ export function PrintLibraryBrowser({
   const setQuery = (v: string) => patch({ query: v });
   const setSubId = (v: string | null) => patch({ subId: v });
   const [open, setOpen] = useState<PrintLibraryItem | null>(null);
+  const [divisionPickerOpen, setDivisionPickerOpen] = useState(true);
   const { isAdmin } = useIsAdmin();
   const { overrides } = useModuleOverrides("library");
 
