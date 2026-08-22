@@ -202,7 +202,7 @@ function ShowcaseDeckDemoPage() {
                 >
                   <span
                     className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-lg text-[11px] font-semibold text-white"
-                    style={{ background: def.accent }}
+                    style={{ background: accent }}
                   >
                     {i + 1}
                   </span>
@@ -231,7 +231,7 @@ function ShowcaseDeckDemoPage() {
                   <span
                     aria-hidden
                     className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-[2px]"
-                    style={{ background: def.accent }}
+                    style={{ background: accent }}
                   />
                   {h}
                 </li>
@@ -240,7 +240,7 @@ function ShowcaseDeckDemoPage() {
           </div>
           <div className="rounded-2xl border border-black/10 bg-white p-5 text-sm dark:border-white/10 dark:bg-white/[0.04]">
             <div className="flex items-center gap-2 font-medium text-[#03002C] dark:text-white">
-              <Presentation size={15} /> {def.divisionLabel}
+              <Presentation size={15} /> {division.name}
             </div>
             <dl className="mt-3 space-y-1.5 text-[12px] text-black/60 dark:text-white/60">
               <div className="flex justify-between gap-3">
