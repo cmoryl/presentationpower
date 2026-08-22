@@ -195,6 +195,7 @@ function MediaCard({
   title,
   blurb,
   pills,
+  feature = false,
 }: {
   to: CardLink;
   art: string;
@@ -205,21 +206,27 @@ function MediaCard({
   title: string;
   blurb: string;
   pills: string[];
+  /** Feature cards span two columns with a taller, cinematic art plate. */
+  feature?: boolean;
 }) {
   const linkProps = to as unknown as React.ComponentProps<typeof Link>;
   return (
     <Link
       {...linkProps}
-      className="group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
+      className={`group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25 ${
+        feature ? "sm:col-span-2" : ""
+      }`}
     >
-      <div className="relative h-[230px] overflow-hidden">
+      <div className={`relative overflow-hidden ${feature ? "h-[300px] sm:h-[360px]" : "h-[230px]"}`}>
         <img
           src={art}
           alt={artAlt}
           loading="lazy"
           width={1536}
           height={1024}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+          className={`h-full w-full object-cover transition duration-500 group-hover:scale-[1.03] ${
+            feature ? "tp-kenburns" : ""
+          }`}
         />
         <span
           aria-hidden
@@ -248,8 +255,22 @@ function MediaCard({
             {icon}
           </span>
           {label}
+          {feature ? (
+            <span
+              className="ml-auto rounded-full px-2 py-0.5 text-[10px] tracking-[0.18em] text-white"
+              style={{ background: accent }}
+            >
+              Featured
+            </span>
+          ) : null}
         </div>
-        <div className="text-base font-semibold text-[#03002C] dark:text-white">{title}</div>
+        <div
+          className={`font-semibold text-[#03002C] dark:text-white ${
+            feature ? "text-[22px] tracking-[-0.02em] sm:text-[26px]" : "text-base"
+          }`}
+        >
+          {title}
+        </div>
         <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">{blurb}</p>
         <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3 text-[11px] text-black/55 dark:text-white/55">
           {pills.map((p) => (
