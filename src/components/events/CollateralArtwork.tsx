@@ -121,7 +121,35 @@ export function artKindFor(label: string, surface: string): ArtKind {
   if (l.includes("bottle")) return "bottle";
   if (l.includes("sticker")) return "stickers";
   if (l.includes("zoom") || l.includes("teams")) return "zoom";
+  // Social / digital-native mappings — checked before the generic hero/email
+  // fallbacks so a social kit never lands on the document layout.
+  if (l.includes("signature")) return "signature-strip";
+  if (
+    l.includes("story") ||
+    l.includes("reel") ||
+    l.includes("tiktok") ||
+    l.includes("bumper") ||
+    l.includes("screenshot") ||
+    l.includes("vertical")
+  )
+    return "social-story";
+  if (l.includes("podcast") || l.includes("square") || l.includes("carousel") || l.includes("post"))
+    return "social-square";
+  if (l.includes("linkedin newsletter")) return "social-wide";
   if (l.includes("linkedin")) return "linkedin-header";
+  if (
+    l.includes("thumbnail") ||
+    l.includes("og ") ||
+    l.includes("og/") ||
+    l.includes("social-share") ||
+    l.includes("cover") ||
+    l.includes("banner") ||
+    l.includes("paid-ad") ||
+    l.includes("advocacy") ||
+    l.includes("blog header") ||
+    l.includes("press-release")
+  )
+    return "social-wide";
   if (l.includes("website") || l.includes("hero")) return "web-hero";
   if (l.includes("countdown") && surface === "video") return "video-vertical";
   if (surface === "video") return "video";
