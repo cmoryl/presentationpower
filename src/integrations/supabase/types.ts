@@ -267,6 +267,7 @@ export type Database = {
           deck_id: string | null
           id: string
           kind: string
+          kit_id: string | null
           owner_id: string
           print_asset_id: string | null
           title: string
@@ -277,6 +278,7 @@ export type Database = {
           deck_id?: string | null
           id?: string
           kind?: string
+          kit_id?: string | null
           owner_id: string
           print_asset_id?: string | null
           title?: string
@@ -287,6 +289,7 @@ export type Database = {
           deck_id?: string | null
           id?: string
           kind?: string
+          kit_id?: string | null
           owner_id?: string
           print_asset_id?: string | null
           title?: string
@@ -298,6 +301,13 @@ export type Database = {
             columns: ["deck_id"]
             isOneToOne: false
             referencedRelation: "decks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_threads_kit_id_fkey"
+            columns: ["kit_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_kits"
             referencedColumns: ["id"]
           },
           {
