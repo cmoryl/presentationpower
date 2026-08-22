@@ -23,6 +23,8 @@ import { printTypeMeta } from "@/lib/print-library/catalog";
 import { parseLook } from "@/lib/print-library/look";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
+import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";
+
 
 export const Route = createFileRoute("/demo/print/$demoId")({
   loader: ({ params }) => {
