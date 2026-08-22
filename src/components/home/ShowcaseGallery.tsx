@@ -202,9 +202,10 @@ function MediaCard({
   blurb: string;
   pills: string[];
 }) {
+  const linkProps = to as unknown as React.ComponentProps<typeof Link>;
   return (
     <Link
-      {...(to as unknown as Record<string, unknown>)}
+      {...linkProps}
       className="group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
     >
       <div className="relative h-[230px] overflow-hidden">
