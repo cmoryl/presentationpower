@@ -382,6 +382,14 @@ export type DeckContext = {
   /** Stamped on copies generated from an approved showcase demo. Approved
    *  demos are final, reviewed pieces, so every QA gate / warning is skipped. */
   demoApproved?: boolean;
+  /** Set when an admin opened a demo for *live* editing: publishing from this
+   *  deck replaces what every visitor sees on the demo page. */
+  liveDemo?: {
+    kind: "deck" | "print";
+    demoId: string;
+    divisionKey: string;
+    label?: string;
+  } | null;
   /** Style/tone guidance extracted from user-uploaded reference assets. */
   referenceGuidance?: {
     guidance: string;
@@ -427,6 +435,18 @@ export type TemplatePayload = {
     lengthTarget?: number;
     clientFacts?: string;
   } | null;
+};
+
+/** Loss-free deck snapshot: every authored slide field is preserved. */
+export type DeckSnapshot = {
+  title: string;
+  brandModeId: string;
+  archetypeId: string;
+  subCompany?: string | null;
+  context?: Record<string, unknown> | null;
+  clientLogo?: DeckClientLogo | null;
+  slides: Array<Partial<DeckSlide> & { sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  brief?: TemplatePayload["brief"];
 };
 
 type HistoryEntry = {
@@ -600,6 +620,10 @@ type DeckState = {
   rebrandDeck: (deckId: string, brandModeId: string, subCompany?: string | null) => void;
   duplicateDeck: (deckId: string) => string | null;
   createDeckFromTemplate: (payload: TemplatePayload) => { briefId: string; deckId: string };
+  /** Full-fidelity clone from a stored deck snapshot (canvas blocks, ink
+   *  overrides, per-slide modes and transitions all survive). Used by live
+   *  demo editing, where the saved override *is* the demo. */
+  createDeckFromSnapshot: (snapshot: DeckSnapshot) => { briefId: string; deckId: string };
   deleteDeck: (deckId: string) => void;
 
   // Undo / redo — session-scoped, bounded to 50 entries.
