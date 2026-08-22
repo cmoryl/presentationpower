@@ -483,7 +483,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
                 </span>
               </div>
             </div>
-            <div style={{ height: 66, background: track.color, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 30px", fontSize: 20, fontWeight: 700, color: NEXT_CITY_TOKENS.ink }}>
+            <div style={{ height: 66, background: track.color, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 30px", fontSize: 20, fontWeight: 700, color: INK }}>
               <span>{ctx.dateLine}</span>
               <span>{ctx.hashtag}</span>
             </div>
@@ -772,7 +772,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 20 }}>{ctx.dateLine}</div>
             </div>
           </div>
-          <div style={{ padding: 34, display: "flex", flexDirection: "column", gap: 18, color: NEXT_CITY_TOKENS.ink }}>
+          <div style={{ padding: 34, display: "flex", flexDirection: "column", gap: 18, color: INK }}>
             <div style={{ fontSize: 26, fontWeight: 800 }}>You're invited</div>
             <Lines n={6} />
             <div style={{ alignSelf: "flex-start", background: BLUE, color: "#fff", padding: "14px 28px", borderRadius: 99, fontSize: 20, fontWeight: 700 }}>
