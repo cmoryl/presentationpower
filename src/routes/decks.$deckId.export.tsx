@@ -34,6 +34,8 @@ import {
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
+import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
+
 import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
 
 
@@ -587,6 +589,10 @@ function ExportView() {
           </div>
         )}
 
+        <div className="mx-auto mb-6 max-w-[1400px] px-6 print:hidden">
+          <ArrowOverlapCheck />
+        </div>
+
         <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-6 print:max-w-none print:gap-0 print:p-0">
           {deck.slides.map((slide, i) => {
             const variant = byId(MODULE_VARIANTS, slide.variantId);
@@ -596,7 +602,12 @@ function ExportView() {
                 key={slide.id}
                 className="print-page w-full overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none"
               >
-                <div className="aspect-[16/9] w-full">
+                <div
+                  className="aspect-[16/9] w-full"
+                  data-arrow-check-slide={slide.id}
+                  data-arrow-check-index={i + 1}
+                >
+
                   <ScaledSlide>
                     <DeckPackScope pack={pack}>
                       <VariantRenderer
