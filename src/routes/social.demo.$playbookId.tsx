@@ -41,6 +41,7 @@ import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets } from "@/lib/campaigns";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
+import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
 
@@ -274,9 +275,13 @@ function SocialDemoView() {
             // the frame's own aspect, with the copy owning the rest.
             const imageUrl = photoForFormat(playbook.subBrand, a.format);
             const panel = a.mode === "light";
+            const editKey = socialEditKey(`social-demo:${playbook.id}:${styleId}`, a.id);
             return (
               <AssetPreviewCard
                 key={`${styleId}-${a.id}`}
+                edit={assetEdits.get(editKey)}
+                onEditChange={(next) => assetEdits.set(editKey, next)}
+                onEditReset={() => assetEdits.reset(editKey)}
                 rendererProps={{
                   format: a.format,
                   brandId: a.brandId,
