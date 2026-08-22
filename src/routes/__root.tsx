@@ -220,6 +220,8 @@ function RootComponent() {
           (editor, present, share, agent). Absent entries fall back to the
           CSS-composed scene, so this never blocks rendering. */}
       <SkinBackdropLibrary>
+        {/* Sentinel: the back-to-top button watches when this leaves the viewport. */}
+        <BackToTopSentinel />
         {/* LogoHub roster — every CLIENT logo slot resolves through this pool
             so a TransPerfect division mark can never stand in for a client. */}
         <ClientLogoPoolProvider>
