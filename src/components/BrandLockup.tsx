@@ -64,18 +64,21 @@ export function BrandLockup({
   orientation?: "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only";
   monochromeOfficialLogo?: boolean;
 }) {
+  // Lockup scale — every step runs 20% larger than the original chrome scale so
+  // the mark reads at presentation distance on module templates.
   const dims =
     size === "2xs"
-      ? { markPx: 14, wordmarkPx: 8, wordPx: 8, dividerPx: 6, radiusPx: 4, gapPx: 4 }
+      ? { markPx: 17, wordmarkPx: 10, wordPx: 10, dividerPx: 7, radiusPx: 5, gapPx: 5 }
       : size === "xs"
-        ? { markPx: 18, wordmarkPx: 11, wordPx: 11, dividerPx: 8, radiusPx: 5, gapPx: 6 }
+        ? { markPx: 22, wordmarkPx: 13, wordPx: 13, dividerPx: 10, radiusPx: 6, gapPx: 7 }
         : size === "sm"
-          ? { markPx: 24, wordmarkPx: 14, wordPx: 14, dividerPx: 10, radiusPx: 6, gapPx: 8 }
+          ? { markPx: 29, wordmarkPx: 17, wordPx: 17, dividerPx: 12, radiusPx: 7, gapPx: 10 }
           : size === "lg"
-            ? { markPx: 64, wordmarkPx: 40, wordPx: 32, dividerPx: 18, radiusPx: 12, gapPx: 16 }
+            ? { markPx: 77, wordmarkPx: 48, wordPx: 38, dividerPx: 22, radiusPx: 14, gapPx: 19 }
             : size === "xl"
-              ? { markPx: 96, wordmarkPx: 64, wordPx: 48, dividerPx: 24, radiusPx: 16, gapPx: 22 }
-              : { markPx: 32, wordmarkPx: 18, wordPx: 17, dividerPx: 11, radiusPx: 8, gapPx: 10 };
+              ? { markPx: 115, wordmarkPx: 77, wordPx: 58, dividerPx: 29, radiusPx: 19, gapPx: 26 }
+              : { markPx: 38, wordmarkPx: 22, wordPx: 20, dividerPx: 13, radiusPx: 10, gapPx: 12 };
+
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = (subCompany ?? logo.divisionLine)?.replace(
     "{client}",
