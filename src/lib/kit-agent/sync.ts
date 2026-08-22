@@ -50,6 +50,9 @@ function onRealtimeRows(
   filter: string | undefined,
   run: () => void,
 ): () => void {
+  // Topics must be unique per subscriber: two components watching the same
+  // thread would otherwise collide on one channel and tear each other down.
+  const topic = `${channelName}:${Math.random().toString(36).slice(2, 8)}`;
   let timer: number | undefined;
   const fire = () => {
     if (timer) window.clearTimeout(timer);
@@ -57,7 +60,7 @@ function onRealtimeRows(
   };
 
   const channel = supabase
-    .channel(channelName)
+    .channel(topic)
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table, ...(filter ? { filter } : {}) },
