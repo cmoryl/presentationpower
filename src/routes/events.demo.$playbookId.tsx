@@ -35,6 +35,7 @@ import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaig
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 import { PlaybookGallery } from "@/components/events/PlaybookGallery";
 import type { CollateralContext } from "@/components/events/CollateralArtwork";
+import { getDivisionLogos } from "@/lib/division-logos";
 import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
 import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
 
