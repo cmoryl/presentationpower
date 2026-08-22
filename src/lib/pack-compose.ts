@@ -194,9 +194,10 @@ export function composePlateCss(
       return { style: { borderLeft: `4px solid ${t.accent}` }, pad: { x: 36, y: 8 } };
     case "frame":
       return {
-        style: { border: `1px solid ${line}`, outline: `1px solid ${veil}`, outlineOffset: "10px" },
+        style: { border: `1px solid ${line}` },
         pad: { x: 40, y: 34 },
       };
+
     case "shadowbox":
       return {
         style: {

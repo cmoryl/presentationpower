@@ -1064,11 +1064,15 @@ export function SlideFrame({
           genuinely different layout from look to look. */}
       {(() => {
         const compose = pack ? packCompose(pack) : null;
-        const plate = pack && compose ? composePlateCss(compose.plate, pack) : null;
         // Horizontal bias also only shapes the hero chrome. On a content module
         // `flex-end` / `center` collapses the child to its intrinsic width,
         // which is what left half-empty sheets behind — content stretches.
         const heroChrome = variant === "cover" || variant === "divider" || variant === "close";
+        // Content modules already box their own cards, so the compose plate's
+        // outline/frame around the whole sheet read as a stray double border.
+        // Plates now only dress the text-led hero chrome.
+        const plate = pack && compose && heroChrome ? composePlateCss(compose.plate, pack) : null;
+
         const align = !heroChrome
           ? "stretch"
           : compose?.bias === "right"
