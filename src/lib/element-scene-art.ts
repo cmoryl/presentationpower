@@ -100,8 +100,14 @@ export function withElementSceneArt(pack: StylePack, code: string): StylePack {
   // composition still reads through.
   const veil =
     mode === "dark"
-      ? "linear-gradient(0deg, rgba(13,19,29,0.62), rgba(13,19,29,0.62))"
-      : "linear-gradient(0deg, rgba(255,255,255,0.68), rgba(255,255,255,0.68))";
+      ? "linear-gradient(0deg, rgba(13,19,29,0.46), rgba(13,19,29,0.46))"
+      : "linear-gradient(0deg, rgba(255,255,255,0.5), rgba(255,255,255,0.5))";
+  // A soft reading scrim over the copy side only, so the plate's composition
+  // stays vivid at the outer edges instead of being flattened everywhere.
+  const scrim =
+    mode === "dark"
+      ? "linear-gradient(100deg, rgba(13,19,29,0.5) 0%, rgba(13,19,29,0.12) 58%, rgba(13,19,29,0) 100%)"
+      : "linear-gradient(100deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.14) 58%, rgba(255,255,255,0) 100%)";
   return {
     ...pack,
     ground: (seed: string) => {
@@ -110,8 +116,9 @@ export function withElementSceneArt(pack: StylePack, code: string): StylePack {
       if (custom?.imageUrl) return base(seed);
       const url = elementSceneArtUrl(code, scene);
       if (!url) return base(seed);
-      return [veil, `url("${url}") center center / cover no-repeat`];
+      return [scrim, veil, `url("${url}") center center / cover no-repeat`];
     },
   };
 }
+
 
