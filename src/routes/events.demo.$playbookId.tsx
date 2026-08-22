@@ -6,6 +6,7 @@
 // reproducible and reviewable. A "Configure this kit" CTA hands off to the
 // existing /admin/campaigns/kit builder pre-seeded with the same profile.
 
+import { resolveSocialStyle, type SocialStyleId } from "@/lib/social-styles";
 import { readCampaignLookId, readCampaignStyleId, saveCampaignLook } from "@/lib/campaign-look";
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
