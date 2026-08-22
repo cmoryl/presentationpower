@@ -52,6 +52,7 @@ function ShowcaseDeckDemoPage() {
   const def = getShowcaseDeck(demoId);
   const navigate = useNavigate();
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const deleteDeck = useDeckStore((s) => s.deleteDeck);
 
   const home = def ? nativeDivision(def.divisionLabel) : DEMO_DIVISIONS[0];
   const [divisionId, setDivisionId] = useState(home.id);
