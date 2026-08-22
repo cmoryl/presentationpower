@@ -104,6 +104,25 @@ function PlaybookDemoView() {
     return trackId ? nextLockupSuite(trackId) : undefined;
   }, [playbook.id, playbook.name]);
 
+  // Art direction for this demo set. Each playbook maps to its own authored
+  // look; the switcher below lets a user retarget the whole set live and the
+  // choice sticks per playbook.
+  const [lookId, setLookId] = useState<string>(() => eventLookForPlaybook(playbook.id).id);
+  useEffect(() => {
+    const stored =
+      typeof window === "undefined"
+        ? null
+        : window.localStorage.getItem(`element:events-demo-look:${playbook.id}`);
+    setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : eventLookForPlaybook(playbook.id).id);
+  }, [playbook.id]);
+  const look = eventLookById(lookId);
+  const pickLook = (id: string) => {
+    setLookId(id);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(`element:events-demo-look:${playbook.id}`, id);
+    }
+  };
+
   const eventLogo = useMemo(
     () =>
       nextSuite
