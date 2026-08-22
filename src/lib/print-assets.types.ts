@@ -550,6 +550,9 @@ export type PrintIconStyleSettings = {
 };
 
 export type PrintAssetContext = {
+  /** Stamped on copies generated from an approved showcase demo — suppresses
+   *  layout-health, overflow and preflight warnings for a final piece. */
+  demoApproved?: boolean;
   clientLogoUrl?: string;
   /** Repository id of the picked client logo (shared client-logo layer). */
   clientLogoId?: string;
