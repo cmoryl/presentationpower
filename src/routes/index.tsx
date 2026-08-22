@@ -414,7 +414,6 @@ function Dashboard() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-
                 <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur">
                   <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">
                     Try
