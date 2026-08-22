@@ -4894,6 +4894,48 @@ export const useDeckStore = create<DeckState>()(
           return { briefId, deckId };
         },
 
+        createDeckFromSnapshot: (snapshot) => {
+          const briefId = nanoid(8);
+          const brief: Brief = {
+            id: briefId,
+            createdAt: new Date().toISOString(),
+            prospect: snapshot.brief?.prospect ?? "",
+            industry: snapshot.brief?.industry ?? "",
+            meetingObjective: snapshot.brief?.meetingObjective ?? "",
+            audience: snapshot.brief?.audience ?? "",
+            brandModeId: snapshot.brandModeId,
+            subCompany: snapshot.subCompany ?? undefined,
+            archetypeId: snapshot.archetypeId,
+            lengthTarget: snapshot.brief?.lengthTarget ?? snapshot.slides.length,
+            clientFacts: snapshot.brief?.clientFacts ?? "",
+          };
+          const deckId = nanoid(10);
+          const deck: Deck = {
+            id: deckId,
+            createdAt: new Date().toISOString(),
+            title: snapshot.title,
+            briefId,
+            brandModeId: snapshot.brandModeId,
+            subCompany: snapshot.subCompany ?? undefined,
+            archetypeId: snapshot.archetypeId,
+            isTemplate: false,
+            clientLogo: snapshot.clientLogo ?? undefined,
+            context: (snapshot.context as DeckContext) ?? undefined,
+            slides: snapshot.slides.map((s, i) => ({
+              ...(structuredClone(s) as DeckSlide),
+              id: nanoid(8),
+              position: i,
+              changes: [],
+            })),
+          };
+          set((s) => ({
+            briefs: { ...s.briefs, [briefId]: brief },
+            decks: { ...s.decks, [deckId]: healDeckCanvasGeometry(deck) },
+          }));
+          return { briefId, deckId };
+        },
+
+
         deleteDeck: (deckId) => {
           set((s) => {
             const next = { ...s.decks };
