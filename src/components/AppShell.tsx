@@ -106,7 +106,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/library", label: "Slide modules" },
         { to: "/library/my", label: "My decks" },
         { to: "/decks", label: "All decks" },
-        { to: "/library/imported", label: "Imported decks" },
         { to: "/agent", label: "Deck agent" },
         { to: "/admin/canvas", label: "Canvas creator" },
       ],
@@ -122,7 +121,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/library/print", label: "Client spotlights", search: { type: "spotlight" } },
         { to: "/library/print", label: "E-brochures", search: { type: "ebrochure" } },
         { to: "/library/print/modules", label: "Section modules" },
-        { to: "/library/print/heroes", label: "Hero openers" },
       ],
     },
     {
@@ -133,7 +131,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/events", label: "Event assets" },
         { to: "/events/new", label: "New event asset" },
         { to: "/events/presets", label: "Presets" },
-        { to: "/events/next", label: "Next-gen builder" },
       ],
     },
     {
@@ -144,7 +141,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/social", label: "Social assets" },
         { to: "/social/new", label: "New social asset" },
         { to: "/social/presets", label: "Presets" },
-        { to: "/social/banners", label: "Banners" },
       ],
     },
   ];
