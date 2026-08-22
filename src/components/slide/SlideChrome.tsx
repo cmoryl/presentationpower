@@ -428,6 +428,14 @@ export function SlideFrame({
   // …UNLESS the author picked a background for this slide in the editor — an
   // explicit pick always wins, live.
   const packOwnsGround = stylePackOwnsGround(pack, backdrop);
+  // Authored plate kits (Games R22, Element S29/S30) paint a finished image as
+  // the pack ground. Those planes must survive at full strength and must not be
+  // over-painted by the pack's procedural signature motif.
+  const authoredPlateGround =
+    !!pack &&
+    packGroundPaint(pack, `scene:${templateScene ?? sceneFromSeed(variant)} ${layoutId ?? variant}`)
+      .some((l) => /url\(["']?https?:/i.test(l));
+
   const hasBackdrop = !!backdrop && !packOwnsGround;
   const hasBackdropImage = !!backdrop?.url && !packOwnsGround;
   const hasBackdropAurora = !!backdrop?.aurora && !packOwnsGround;
