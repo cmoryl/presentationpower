@@ -15,6 +15,9 @@ function useScrolledPast(threshold: number) {
     const check = () => {
       if (!mounted) return;
       const y = typeof window !== "undefined" ? window.scrollY ?? window.pageYOffset ?? 0 : 0;
+      if (typeof window !== "undefined") {
+        (window as any).__backToTopDebug = { y, threshold, nowVisible: y > threshold, last: lastRef.current };
+      }
       const nowVisible = y > threshold;
       if (nowVisible !== lastRef.current) {
         lastRef.current = nowVisible;
