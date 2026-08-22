@@ -36,6 +36,7 @@ import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 import { PlaybookGallery } from "@/components/events/PlaybookGallery";
 import type { CollateralContext } from "@/components/events/CollateralArtwork";
 import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
+import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
   loader: ({ params }) => {
