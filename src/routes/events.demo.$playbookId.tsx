@@ -6,6 +6,8 @@
 // reproducible and reviewable. A "Configure this kit" CTA hands off to the
 // existing /admin/campaigns/kit builder pre-seeded with the same profile.
 
+import { resolveSocialStyle, type SocialStyleId } from "@/lib/social-styles";
+import { readCampaignLookId, readCampaignStyleId, saveCampaignLook } from "@/lib/campaign-look";
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
@@ -114,22 +116,27 @@ function PlaybookDemoView() {
   // look; the switcher below lets a user retarget the whole set live and the
   // choice sticks per playbook.
   const [lookId, setLookId] = useState<string>(() => eventLookForPlaybook(playbook.id).id);
+  // Look memory is scoped to the DIVISION so an event kit opens in whatever
+  // campaign direction the social or digital demos for this brand are already
+  // wearing — one campaign look across every channel.
   useEffect(() => {
-    const stored =
-      typeof window === "undefined"
-        ? null
-        : window.localStorage.getItem(`element:events-demo-look:${playbook.id}`);
+    const stored = readCampaignLookId(playbook.subBrand);
     setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : eventLookForPlaybook(playbook.id).id);
-  }, [playbook.id]);
+  }, [playbook.id, playbook.subBrand]);
   const look = lookId.includes("--")
     ? eventLookForPlaybook(playbook.id)
     : eventLookById(lookId);
   const pickLook = (id: string) => {
     setLookId(id);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(`element:events-demo-look:${playbook.id}`, id);
-    }
+    saveCampaignLook(playbook.subBrand, { lookId: id });
   };
+  // The social template style rides along, so the kit's digital/web trims match
+  // the generated social posts for the same campaign.
+  const [campaignStyleId, setCampaignStyleId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    setCampaignStyleId(readCampaignStyleId(playbook.subBrand) ?? undefined);
+  }, [playbook.subBrand]);
+  const styleId = campaignStyleId ?? look.styleId;
 
   const eventLogo = useMemo(
     () =>
@@ -166,8 +173,9 @@ function PlaybookDemoView() {
       logoNeedsKnockout: nextSuite ? undefined : !logos?.white,
       lookId: look.id,
       look,
+      styleId,
     };
-  }, [nextSuite, playbook, look]);
+  }, [nextSuite, playbook, look, styleId]);
 
   const startDate = playbook.facts.startDate
     ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
@@ -395,7 +403,7 @@ function PlaybookDemoView() {
                   imageUrl,
                   imageLayout: panel ? "panel" : "bleed",
                   imageScrimPct: 60,
-                  styleId: look.styleId,
+                  styleId: resolveSocialStyle(styleId).id as SocialStyleId,
                 }}
                 badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
                 formatLabel={a.format.label}

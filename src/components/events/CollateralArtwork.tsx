@@ -9,6 +9,7 @@
 
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import { eventLookById, type EventLook } from "@/lib/event-looks";
+import { resolveSocialStyle, type SocialStyle } from "@/lib/social-styles";
 
 export type CollateralContext = {
   eventName: string;
@@ -30,6 +31,14 @@ export type CollateralContext = {
   /** Fully-resolved art direction — outranks `lookId`. Demo pages pass a
    *  per-demo derived look so each set reads as its own campaign. */
   look?: EventLook;
+  /**
+   * Social template style id (see `social-styles.ts`). The digital and web
+   * trims — hero, email, LinkedIn header, signature strip and every social
+   * post — compose from this style, so a demo kit's digital/web pieces carry
+   * the exact plate treatment, radius, type case and CTA shape as the
+   * generated social assets for the same campaign. Omit for the default.
+   */
+  styleId?: string;
 };
 
 export type ArtKind =
@@ -183,6 +192,14 @@ const LookContext = createContext<EventLook>(eventLookById(undefined));
 
 function useLook(): EventLook {
   return useContext(LookContext);
+}
+
+/** Active social template style — the shared geometry/type contract between
+ *  generated social assets and the digital/web trims in a demo kit. */
+const StyleContext = createContext<SocialStyle>(resolveSocialStyle(undefined));
+
+function useSocialStyle(): SocialStyle {
+  return useContext(StyleContext);
 }
 
 
@@ -439,6 +456,195 @@ function Lines({
 }
 
 // ---------------------------------------------------------------------------
+// Social-style primitives (digital + web cohesion)
+// ---------------------------------------------------------------------------
+//
+// The generated social assets compose from a SocialStyle: where the copy sits,
+// what plate sits behind it, the plate radius, the headline case/weight, the
+// eyebrow and the CTA shape. The digital and web trims below used to hardcode
+// their own version of all of that, so a kit's web hero and email header never
+// matched the posts they shipped alongside. These primitives read the active
+// style so both channels compose from one contract.
+
+/** Headline type tuned by the active style. */
+function titleStyle(style: SocialStyle, basePx: number, maxWidth?: string): CSSProperties {
+  return {
+    fontSize: Math.round(basePx * style.titleScale),
+    fontWeight: style.titleWeight,
+    letterSpacing: style.titleTracking,
+    textTransform: style.titleUppercase ? "uppercase" : undefined,
+    lineHeight: 1.03,
+    maxWidth,
+  };
+}
+
+/** Plate behind the copy — glass / solid / band / aura / none, per style. */
+function CopyPlate({
+  children,
+  shortEdge,
+  pad = 44,
+  dark = true,
+}: {
+  children: ReactNode;
+  /** Short edge of the trim, used to scale the plate radius. */
+  shortEdge: number;
+  pad?: number;
+  dark?: boolean;
+}) {
+  const style = useSocialStyle();
+  const look = useLook();
+  const radius = style.plateFullBleed ? 0 : Math.round(shortEdge * style.plateRadiusPct);
+  const base: CSSProperties = {
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    gap: Math.round(pad * 0.45),
+    padding: style.plate === "none" ? 0 : pad,
+    borderRadius: radius,
+    marginInline: style.plateFullBleed && style.plate !== "none" ? -pad : 0,
+    marginTop: style.copyAlign === "end" ? "auto" : undefined,
+  };
+  if (style.plate === "glass") {
+    return (
+      <div
+        style={{
+          ...base,
+          background: dark ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.62)",
+          backdropFilter: "blur(18px)",
+          border: `1px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(3,0,44,0.10)"}`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+  if (style.plate === "solid") {
+    return (
+      <div style={{ ...base, background: dark ? `${look.deep}E6` : "#FFFFFF" }}>{children}</div>
+    );
+  }
+  if (style.plate === "band") {
+    return (
+      <div
+        style={{
+          ...base,
+          background: dark
+            ? `linear-gradient(90deg, ${look.deep}F2 0%, ${look.deep}A6 78%, transparent 100%)`
+            : `linear-gradient(90deg, #FFFFFFF2 0%, #FFFFFFB8 78%, transparent 100%)`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+  if (style.plate === "aura") {
+    return (
+      <div
+        style={{
+          ...base,
+          background: `radial-gradient(120% 160% at 12% 100%, ${look.accent}3d 0%, transparent 70%)`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+  return <div style={base}>{children}</div>;
+}
+
+/** Accent rule / eyebrow bar — drawn only when the style calls for one. */
+function StyleRule({ w = 132, h = 8 }: { w?: number; h?: number }) {
+  const style = useSocialStyle();
+  const look = useLook();
+  if (!style.accentRule) return null;
+  return <div style={{ width: w, height: h, borderRadius: 99, background: look.accent }} />;
+}
+
+function Eyebrow({ children, size = 24 }: { children: ReactNode; size?: number }) {
+  const style = useSocialStyle();
+  const look = useLook();
+  if (style.eyebrow === "hidden") return null;
+  if (style.eyebrow === "pill") {
+    return (
+      <span
+        style={{
+          alignSelf: "flex-start",
+          padding: `${Math.round(size * 0.4)}px ${size}px`,
+          borderRadius: 999,
+          background: `${look.accent}2e`,
+          border: `1px solid ${look.accent}66`,
+          color: look.accent,
+          fontSize: size,
+          fontWeight: 700,
+        }}
+      >
+        {children}
+      </span>
+    );
+  }
+  return (
+    <span
+      style={{
+        fontSize: size,
+        letterSpacing: "0.22em",
+        textTransform: "uppercase",
+        fontWeight: 700,
+        color: look.accent,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function Cta({ children, size = 22 }: { children: ReactNode; size?: number }) {
+  const style = useSocialStyle();
+  const look = useLook();
+  const padY = Math.round(size * 0.7);
+  const padX = Math.round(size * 1.5);
+  if (style.cta === "underline") {
+    return (
+      <span
+        style={{
+          alignSelf: "flex-start",
+          fontSize: size,
+          fontWeight: 700,
+          color: look.accent,
+          borderBottom: `3px solid ${look.accent}`,
+          paddingBottom: 6,
+        }}
+      >
+        {children}
+      </span>
+    );
+  }
+  return (
+    <span
+      style={{
+        alignSelf: "flex-start",
+        padding: `${padY}px ${padX}px`,
+        borderRadius: style.cta === "pill" ? 999 : 6,
+        background: look.accent,
+        color: look.deep,
+        fontSize: size,
+        fontWeight: 800,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+/** Lockup corner for the active style. */
+function lockupRowStyle(style: SocialStyle): CSSProperties {
+  return {
+    display: "flex",
+    justifyContent: style.lockup === "top-left" ? "flex-start" : "flex-end",
+    order: style.lockup === "bottom-right" ? 2 : 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Per-kind artwork
 // ---------------------------------------------------------------------------
 
@@ -454,6 +660,11 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
   const ChevronField = ({ opacity, color }: { opacity?: number; color?: string }) => (
     <MotifField opacity={opacity} color={color ?? look.accentAlt} />
   );
+  // Active social template style. The digital/web/social trims below compose
+  // from it so they render in the same visual language as the generated social
+  // assets for this campaign.
+  const sstyle = useSocialStyle();
+  const lockupRow = lockupRowStyle(sstyle);
 
 
   switch (kind) {
@@ -770,17 +981,20 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
           <div style={{ position: "relative", height: 250, ...darkField() }}>
             <ChevronField opacity={0.14} />
             <div style={{ position: "relative", padding: 34, display: "flex", flexDirection: "column", gap: 14 }}>
-              <Logo ctx={ctx} width={280} />
-              <div style={{ color: "#fff", fontSize: 28, fontWeight: 700 }}>Save the date · {ctx.city}</div>
-              <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 20 }}>{ctx.dateLine}</div>
+              <div style={lockupRow}>
+                <Logo ctx={ctx} width={280} />
+              </div>
+              <Eyebrow size={16}>{ctx.dateLine}</Eyebrow>
+              <div style={{ color: "#fff", ...titleStyle(sstyle, 28) }}>
+                Save the date · {ctx.city}
+              </div>
             </div>
           </div>
           <div style={{ padding: 34, display: "flex", flexDirection: "column", gap: 18, color: INK }}>
-            <div style={{ fontSize: 26, fontWeight: 800 }}>You're invited</div>
+            <div style={titleStyle(sstyle, 26)}>You&rsquo;re invited</div>
+            <StyleRule w={104} h={6} />
             <Lines n={6} />
-            <div style={{ alignSelf: "flex-start", background: BLUE, color: "#fff", padding: "14px 28px", borderRadius: 99, fontSize: 20, fontWeight: 700 }}>
-              Reserve your seat
-            </div>
+            <Cta size={18}>Reserve your seat</Cta>
             <Lines n={3} />
           </div>
         </div>
@@ -789,11 +1003,28 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "linkedin-header":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 44, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexDirection: sstyle.lockup === "top-left" ? "row" : "row-reverse",
+            }}
+          >
             <Logo ctx={ctx} width={520} />
-            <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 30, fontWeight: 700 }}>{ctx.city}</div>
-              <div style={{ fontSize: 22, color: "#7FD0FF" }}>{ctx.dateLine}</div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                alignItems: sstyle.lockup === "top-left" ? "flex-end" : "flex-start",
+              }}
+            >
+              <div style={titleStyle(sstyle, 30)}>{ctx.city}</div>
+              <Eyebrow size={18}>{ctx.dateLine}</Eyebrow>
             </div>
           </div>
         </Field>
@@ -802,27 +1033,47 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "web-hero":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 64, display: "flex", flexDirection: "column", justifyContent: "center", gap: 22 }}>
-            <Logo ctx={ctx} width={460} />
-            <div style={{ fontSize: 54, fontWeight: 800, letterSpacing: "-0.035em", maxWidth: "62%" }}>
-              The City Series lands in {ctx.city.split("·")[0].trim()}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 64,
+              display: "flex",
+              flexDirection: "column",
+              gap: 22,
+            }}
+          >
+            <div style={lockupRow}>
+              <Logo ctx={ctx} width={460} />
             </div>
-            <div style={{ display: "flex", gap: 14, marginTop: 6 }}>
-              {["06", "14", "22", "09"].map((n, i) => (
-                <div key={i} style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 14, padding: "14px 20px", textAlign: "center" }}>
-                  <div style={{ fontSize: 34, fontWeight: 800 }}>{n}</div>
-                  <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", letterSpacing: "0.14em" }}>
-                    {["DAYS", "HRS", "MIN", "SEC"][i]}
+            <CopyPlate shortEdge={640} pad={40}>
+              <StyleRule w={120} h={7} />
+              <div style={titleStyle(sstyle, 54, "62%")}>{ctx.eventName}</div>
+              <div style={{ display: "flex", gap: 14, marginTop: 6 }}>
+                {["06", "14", "22", "09"].map((n, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: "rgba(255,255,255,0.1)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      borderRadius: sstyle.plateFullBleed ? 4 : 14,
+                      padding: "14px 20px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <div style={{ fontSize: 34, fontWeight: 800 }}>{n}</div>
+                    <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", letterSpacing: "0.14em" }}>
+                      {["DAYS", "HRS", "MIN", "SEC"][i]}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ alignSelf: "flex-start", background: BLUE, borderRadius: 99, padding: "14px 30px", fontWeight: 700, fontSize: 20 }}>
-              Register free
-            </div>
+                ))}
+              </div>
+              <Cta size={20}>Register free</Cta>
+            </CopyPlate>
           </div>
         </Field>
       );
+
 
     case "tshirt":
       return (
@@ -892,13 +1143,13 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-square":
       return (
         <Field chevron={0.1} style={{ background: `linear-gradient(150deg, ${NAVY} 0%, #0B1226 62%, ${ctx.accent}44 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26 }}>
-            <Logo ctx={ctx} width={360} />
-            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 22 }}>
-              <div style={{ height: 8, width: 132, background: ctx.accent, borderRadius: 99 }} />
-              <div style={{ fontSize: 74, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.02 }}>
-                {ctx.eventName}
-              </div>
+          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26}}>
+            <div style={lockupRow}>
+              <Logo ctx={ctx} width={360} />
+            </div>
+            <CopyPlate shortEdge={1080} pad={56}>
+              <StyleRule />
+              <div style={titleStyle(sstyle, 74)}>{ctx.eventName}</div>
               <div style={{ fontSize: 30, color: "rgba(255,255,255,0.72)", lineHeight: 1.3 }}>
                 {ctx.city} · {ctx.venue}
               </div>
@@ -906,7 +1157,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
                 <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
                 <span style={{ color: "rgba(255,255,255,0.55)" }}>{ctx.url}</span>
               </div>
-            </div>
+            </CopyPlate>
           </div>
         </Field>
       );
@@ -914,31 +1165,16 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-story":
       return (
         <Field chevron={0.09} style={{ background: `linear-gradient(190deg, ${NAVY} 0%, #0A1023 58%, ${ctx.accent}3d 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30 }}>
-            <Logo ctx={ctx} width={340} />
-            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 26 }}>
-              <div style={{ fontSize: 26, letterSpacing: "0.24em", color: ctx.accent, fontWeight: 700 }}>
-                {ctx.dateLine.toUpperCase()}
-              </div>
-              <div style={{ fontSize: 96, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1 }}>
-                {ctx.eventName}
-              </div>
-              <div style={{ fontSize: 34, color: "rgba(255,255,255,0.7)", lineHeight: 1.32 }}>{ctx.venue}</div>
-              <div
-                style={{
-                  alignSelf: "flex-start",
-                  marginTop: 18,
-                  padding: "20px 40px",
-                  borderRadius: 999,
-                  background: ctx.accent,
-                  color: NAVY,
-                  fontSize: 30,
-                  fontWeight: 800,
-                }}
-              >
-                {ctx.hashtag}
-              </div>
+          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30}}>
+            <div style={lockupRow}>
+              <Logo ctx={ctx} width={340} />
             </div>
+            <CopyPlate shortEdge={1080} pad={60}>
+              <Eyebrow size={26}>{ctx.dateLine.toUpperCase()}</Eyebrow>
+              <div style={titleStyle(sstyle, 96)}>{ctx.eventName}</div>
+              <div style={{ fontSize: 34, color: "rgba(255,255,255,0.7)", lineHeight: 1.32 }}>{ctx.venue}</div>
+              <Cta size={30}>{ctx.hashtag}</Cta>
+            </CopyPlate>
           </div>
         </Field>
       );
@@ -946,23 +1182,21 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-wide":
       return (
         <Field chevron={0.11} style={{ background: `linear-gradient(115deg, ${NAVY} 0%, #0B1226 55%, ${ctx.accent}3a 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22 }}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22}}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", ...lockupRow }}>
               <Logo ctx={ctx} width={330} />
               <span style={{ fontSize: 22, letterSpacing: "0.18em", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
                 {ctx.city.toUpperCase()}
               </span>
             </div>
-            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 18 }}>
-              <div style={{ height: 7, width: 120, background: ctx.accent, borderRadius: 99 }} />
-              <div style={{ fontSize: 62, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.04, maxWidth: "82%" }}>
-                {ctx.eventName}
-              </div>
+            <CopyPlate shortEdge={628} pad={44}>
+              <StyleRule w={120} h={7} />
+              <div style={titleStyle(sstyle, 62, "82%")}>{ctx.eventName}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 24 }}>
                 <span style={{ color: "rgba(255,255,255,0.7)" }}>{ctx.venue}</span>
                 <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
               </div>
-            </div>
+            </CopyPlate>
           </div>
         </Field>
       );
@@ -979,12 +1213,13 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               alignItems: "center",
               justifyContent: "space-between",
               gap: 40,
+              flexDirection: sstyle.lockup === "top-left" ? "row" : "row-reverse",
             }}
           >
             <Logo ctx={ctx} width={280} />
             <div style={{ width: 2, height: 120, background: `${ctx.accent}88` }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
-              <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em" }}>{ctx.eventName}</span>
+              <span style={titleStyle(sstyle, 34)}>{ctx.eventName}</span>
               <span style={{ fontSize: 24, color: "rgba(255,255,255,0.65)" }}>
                 {ctx.city} · {ctx.url}
               </span>
@@ -992,6 +1227,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
           </div>
         </Field>
       );
+
 
     case "doc":
     default:
@@ -1043,9 +1279,12 @@ export function CollateralArtwork(props: {
 }) {
   return (
     <LookContext.Provider value={props.ctx.look ?? eventLookById(props.ctx.lookId)}>
-      <CollateralArtworkFramed {...props} />
+      <StyleContext.Provider value={resolveSocialStyle(props.ctx.styleId)}>
+        <CollateralArtworkFramed {...props} />
+      </StyleContext.Provider>
     </LookContext.Provider>
   );
+
 }
 
 function CollateralArtworkFramed({
