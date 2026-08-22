@@ -3454,6 +3454,162 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       };
     }
 
+    // Wave two: every new MV-VIZ module seeds real, on-topic rows so a fresh
+    // insert renders a finished chart instead of an empty frame.
+    case "MV-VIZ-WATERFALL":
+      return {
+        title: "How the cost per 1k words comes down",
+        kicker: "Cost bridge",
+        subtitle: "Legacy run-rate to Element run-rate",
+        rows: [
+          { label: "Legacy cost", value: 220, type: "total" },
+          { label: "TM leverage", value: -34 },
+          { label: "MT + review", value: -46 },
+          { label: "Vendor consolidation", value: -18 },
+          { label: "New locales", value: 12 },
+          { label: "Element run-rate", value: 134, type: "total" },
+        ],
+        encoding: { x: "label", value: "value" },
+        source: "Programme economics, FY26",
+      };
+    case "MV-VIZ-RADAR":
+      return {
+        title: "Programme maturity, today vs. target",
+        kicker: "Capability profile",
+        subtitle: "Six dimensions scored 0–100",
+        rows: ["Automation", "Quality", "Speed", "Coverage", "Governance", "Cost control"].flatMap(
+          (axis, i) => [
+            { axis, series: "Today", value: 44 + ((i * 9) % 22) },
+            { axis, series: "With Element", value: 74 + ((i * 5) % 20) },
+          ],
+        ),
+        encoding: { x: "axis", series: "series", value: "value" },
+        source: "Maturity assessment, 2026",
+      };
+    case "MV-VIZ-STACKED-AREA":
+      return {
+        title: "Volume mix by channel",
+        kicker: "Composition over time",
+        subtitle: "Millions of words per quarter",
+        rows: ["Q1", "Q2", "Q3", "Q4", "Q5", "Q6"].flatMap((period, q) =>
+          ["Product", "Support", "Marketing", "Legal"].map((channel, c) => ({
+            period,
+            channel,
+            value: Math.round((6 + c * 3 + q * (c === 0 ? 3 : 1.4)) * 10) / 10,
+          })),
+        ),
+        encoding: { x: "period", series: "channel", value: "value" },
+        source: "Volume ledger, FY26",
+      };
+    case "MV-VIZ-DUMBBELL":
+      return {
+        title: "Cycle time, before and after",
+        kicker: "Before vs. after",
+        subtitle: "Median turnaround in hours",
+        rows: [
+          { label: "Product UI", before: 21, after: 6 },
+          { label: "Support centre", before: 14, after: 4 },
+          { label: "Campaigns", before: 32, after: 11 },
+          { label: "Regulated docs", before: 45, after: 22 },
+          { label: "Video + subtitles", before: 38, after: 13 },
+        ],
+        encoding: { label: "label", value: "before", y2: "after" },
+        columns: { before: "Before", after: "With Element" },
+        source: "Cycle-time audit, rolling 90d",
+      };
+    case "MV-VIZ-RADIAL-BAR":
+      return {
+        title: "Rollout progress by workstream",
+        kicker: "Where we stand",
+        subtitle: "Percent complete",
+        rows: [
+          { label: "Locale onboarding", value: 92 },
+          { label: "TM migration", value: 78 },
+          { label: "MT tuning", value: 64 },
+          { label: "Reviewer network", value: 51 },
+          { label: "Governance", value: 38 },
+        ],
+        encoding: { label: "label", value: "value" },
+        source: "Programme tracker, this week",
+      };
+    case "MV-VIZ-SUNBURST":
+      return {
+        title: "Content inventory, unit to type",
+        kicker: "Nested share",
+        subtitle: "Share of annual words",
+        rows: [
+          { category: "Product", label: "UI strings", value: 32 },
+          { category: "Product", label: "Help centre", value: 18 },
+          { category: "Growth", label: "Campaigns", value: 22 },
+          { category: "Growth", label: "Website", value: 16 },
+          { category: "Regulated", label: "Labelling", value: 14 },
+          { category: "Regulated", label: "Contracts", value: 9 },
+        ],
+        encoding: { label: "label", value: "value", category: "category" },
+        source: "Content inventory, 2026",
+      };
+    case "MV-VIZ-GANTT":
+      return {
+        title: "Eighteen weeks to full rollout",
+        kicker: "Implementation plan",
+        subtitle: "Weeks from kick-off",
+        rows: [
+          { task: "Discovery + audit", track: "Setup", start: 0, end: 3 },
+          { task: "TM + glossary migration", track: "Setup", start: 2, end: 6 },
+          { task: "Connector build", track: "Build", start: 4, end: 9 },
+          { task: "MT tuning", track: "Build", start: 6, end: 11 },
+          { task: "Pilot locales", track: "Launch", start: 9, end: 13 },
+          { task: "Full rollout", track: "Launch", start: 12, end: 18 },
+        ],
+        encoding: { label: "task", value: "start", y2: "end", category: "track" },
+        columns: { start: "Weeks" },
+        source: "Delivery plan, FY26",
+      };
+    case "MV-VIZ-SLOPE":
+      return {
+        title: "Every scorecard metric moved",
+        kicker: "Two-point change",
+        subtitle: "FY25 baseline to FY26 actuals",
+        rows: [
+          { label: "On-time delivery", before: 78, after: 96 },
+          { label: "First-pass quality", before: 84, after: 95 },
+          { label: "Reuse rate", before: 41, after: 68 },
+          { label: "Cost index", before: 92, after: 56 },
+        ],
+        encoding: { series: "label", value: "before", y2: "after" },
+        columns: { before: "FY25", after: "FY26" },
+        source: "Programme scorecard, FY26",
+      };
+    case "MV-VIZ-GAUGE-GRID":
+      return {
+        title: "Programme health at a glance",
+        kicker: "Scorecard",
+        subtitle: "Rolling 30-day averages",
+        rows: [
+          { label: "On-time delivery", value: 96, unit: "%" },
+          { label: "Quality (LQA)", value: 94, unit: "%" },
+          { label: "Automation coverage", value: 81, unit: "%" },
+          { label: "Reviewer satisfaction", value: 88, unit: "%" },
+        ],
+        encoding: { label: "label", value: "value" },
+        source: "Operations dashboard, rolling 30d",
+      };
+    case "MV-VIZ-BOXPLOT":
+      return {
+        title: "Turnaround spread by workstream",
+        kicker: "Variance, not just averages",
+        subtitle: "Hours · min / quartiles / max",
+        rows: [
+          { label: "Product UI", min: 3, q1: 5, median: 7, q3: 10, max: 16 },
+          { label: "Support", min: 2, q1: 3, median: 5, q3: 7, max: 12 },
+          { label: "Marketing", min: 6, q1: 11, median: 16, q3: 22, max: 34 },
+          { label: "Regulated", min: 12, q1: 18, median: 24, q3: 33, max: 48 },
+        ],
+        encoding: { x: "label" },
+        columns: { median: "Turnaround (hrs)" },
+        source: "SLA telemetry, rolling 90d",
+      };
+
     // ── Typographic statistics family ───────────────────────────────────
     case "MV-STAT-HERO-NUMBER":
       return {

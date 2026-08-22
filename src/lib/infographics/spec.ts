@@ -24,6 +24,15 @@ export type InfographicKind =
   | "waterfall"
   | "funnel"
   | "calendar-heatmap"
+  | "radar"
+  | "stacked-area"
+  | "dumbbell"
+  | "radial-bar"
+  | "sunburst"
+  | "gantt"
+  | "slope"
+  | "gauge-grid"
+  | "boxplot"
   | "custom";
 
 export type InfographicMode = "light" | "dark";

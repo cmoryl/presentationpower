@@ -14,6 +14,16 @@ export const VIZ_KIND_BY_VARIANT: Record<string, InfographicKind> = {
   "MV-VIZ-MARKET-MAP": "market-map",
   "MV-VIZ-TREEMAP": "treemap",
   "MV-VIZ-CALENDAR-HEATMAP": "calendar-heatmap",
+  "MV-VIZ-WATERFALL": "waterfall",
+  "MV-VIZ-RADAR": "radar",
+  "MV-VIZ-STACKED-AREA": "stacked-area",
+  "MV-VIZ-DUMBBELL": "dumbbell",
+  "MV-VIZ-RADIAL-BAR": "radial-bar",
+  "MV-VIZ-SUNBURST": "sunburst",
+  "MV-VIZ-GANTT": "gantt",
+  "MV-VIZ-SLOPE": "slope",
+  "MV-VIZ-GAUGE-GRID": "gauge-grid",
+  "MV-VIZ-BOXPLOT": "boxplot",
 };
 
 /** Kinds buildEchartsOption() implements — anything else renders empty. */
@@ -25,6 +35,16 @@ export const SUPPORTED_VIZ_KINDS: InfographicKind[] = [
   "market-map",
   "treemap",
   "calendar-heatmap",
+  "waterfall",
+  "radar",
+  "stacked-area",
+  "dumbbell",
+  "radial-bar",
+  "sunburst",
+  "gantt",
+  "slope",
+  "gauge-grid",
+  "boxplot",
 ];
 
 /**

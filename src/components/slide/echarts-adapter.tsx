@@ -18,6 +18,16 @@ const SUPPORTED: InfographicKind[] = [
   "treemap",
   "calendar-heatmap",
   "heatmap",
+  "waterfall",
+  "radar",
+  "stacked-area",
+  "dumbbell",
+  "radial-bar",
+  "sunburst",
+  "gantt",
+  "slope",
+  "gauge-grid",
+  "boxplot",
 ];
 
 /**

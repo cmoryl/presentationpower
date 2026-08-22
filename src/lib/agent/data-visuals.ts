@@ -52,19 +52,19 @@ export type ProcessShape = (typeof PROCESS_SHAPES)[number];
 /** Preferred module ids per shape, best first. Unknown ids are filtered out. */
 const DATA_PREFERENCE: Record<DataShape, string[]> = {
   "single-metric": ["MV-DASH-SUMMARY", "MV-KPI-DASHBOARD", "MV-DASH-REPORT-CARDS"],
-  "metric-set": ["MV-KPI-DASHBOARD", "MV-DASH-REPORT-CARDS", "MV-DASH-GAUGE-ROW"],
-  "share-of-total": ["MV-DASH-DONUT-TRIO", "MV-VIZ-TREEMAP", "MV-DASH-BREAKDOWN"],
-  ranking: ["MV-DASH-PERFORMANCE", "MV-DASH-GROWTH-COLUMNS", "MV-VIZ-TREEMAP"],
+  "metric-set": ["MV-KPI-DASHBOARD", "MV-VIZ-GAUGE-GRID", "MV-DASH-REPORT-CARDS", "MV-DASH-GAUGE-ROW"],
+  "share-of-total": ["MV-DASH-DONUT-TRIO", "MV-VIZ-TREEMAP", "MV-VIZ-SUNBURST", "MV-DASH-BREAKDOWN"],
+  ranking: ["MV-DASH-PERFORMANCE", "MV-DASH-GROWTH-COLUMNS", "MV-VIZ-RADIAL-BAR", "MV-VIZ-TREEMAP"],
   "trend-over-time": ["MV-DASH-SALES-CHART", "MV-DASH-GROWTH-COLUMNS", "MV-DASH-PERFORMANCE"],
-  "multi-series-trend": ["MV-DASH-PERFORMANCE", "MV-DASH-SALES-CHART"],
-  distribution: ["MV-VIZ-BEESWARM", "MV-DASH-PERFORMANCE"],
+  "multi-series-trend": ["MV-VIZ-STACKED-AREA", "MV-DASH-PERFORMANCE", "MV-DASH-SALES-CHART"],
+  distribution: ["MV-VIZ-BEESWARM", "MV-VIZ-BOXPLOT", "MV-DASH-PERFORMANCE"],
   "two-axis-scatter": ["MV-VIZ-MARKET-MAP"],
   "flow-between-nodes": ["MV-VIZ-SANKEY"],
   relationships: ["MV-VIZ-CHORD", "MV-VIZ-SANKEY"],
   "rank-over-time": ["MV-VIZ-BUMP"],
   matrix: ["MV-VIZ-CALENDAR-HEATMAP", "MV-VIZ-MARKET-MAP"],
   "calendar-activity": ["MV-VIZ-CALENDAR-HEATMAP"],
-  "before-after": ["MV-PROC-BEFORE-AFTER", "MV-PROC-BEFORE-AFTER-SPLIT"],
+  "before-after": ["MV-VIZ-DUMBBELL", "MV-VIZ-SLOPE", "MV-PROC-BEFORE-AFTER", "MV-PROC-BEFORE-AFTER-SPLIT"],
 };
 
 const PROCESS_PREFERENCE: Record<ProcessShape, string[]> = {
