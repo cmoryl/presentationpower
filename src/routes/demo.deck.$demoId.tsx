@@ -80,6 +80,14 @@ function ShowcaseDeckDemoPage() {
     void navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 
+  /** Replace an older saved copy with the current demo build so decks
+   *  generated before an authoring update pick up imagery and backdrops. */
+  function regenerate() {
+    if (existingId) deleteDeck(existingId);
+    const { deckId } = createDeckFromTemplate(payload!);
+    void navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
   return (
     <AppShell>
       <div className="relative overflow-hidden rounded-3xl border border-black/10 dark:border-white/10">
