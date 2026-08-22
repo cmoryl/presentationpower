@@ -1031,8 +1031,21 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
 // ---------------------------------------------------------------------------
 
 /** Renders the trim artwork at natural size, scaled into `displayWidth`, and
- *  wraps it in the physical treatment for that kind. */
-export function CollateralArtwork({
+ *  wraps it in the physical treatment for that kind. Themed by `ctx.lookId`. */
+export function CollateralArtwork(props: {
+  kind: ArtKind;
+  ctx: CollateralContext;
+  label: string;
+  displayWidth: number;
+}) {
+  return (
+    <LookContext.Provider value={eventLookById(props.ctx.lookId)}>
+      <CollateralArtworkFramed {...props} />
+    </LookContext.Provider>
+  );
+}
+
+function CollateralArtworkFramed({
   kind,
   ctx,
   label,
