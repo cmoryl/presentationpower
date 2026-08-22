@@ -409,7 +409,8 @@ export function SlideFrame({
   // whenever the Element style pack is active the chrome lockup swaps to the
   // five-brick Element mark — the TransPerfect corporate wordmark never renders
   // on Element product decks.
-  const brand = ["S29", "S30"].includes(skinCodeFromPackId(String(pack?.id ?? ""))) ? ELEMENT_BRAND_MODE : brandProp;
+  const isElementSkin = ["S29", "S30"].includes(skinCodeFromPackId(String(pack?.id ?? "")));
+  const brand = isElementSkin ? ELEMENT_BRAND_MODE : brandProp;
   // Enterprise White master template — white page, navy ink, soft pastel
   // corner wash, hairline footer. Suppresses the flagship aurora grounds.
   const enterprise = isEnterpriseWhite(skin);
