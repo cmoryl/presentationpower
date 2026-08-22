@@ -5,7 +5,7 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SOCIAL_STYLES,
   DEFAULT_SOCIAL_STYLE_ID,
@@ -25,7 +25,14 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
-import { derivedLook } from "@/lib/event-looks";
+import {
+  channelLook,
+  eventLookById,
+  reinkLook,
+  EVENT_LOOKS,
+  EVENT_LOOKS_BY_ID,
+} from "@/lib/event-looks";
+
 
 import {
   getSocialPlaybook,
@@ -81,17 +88,55 @@ function SocialDemoView() {
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
   const photoSet = getPhotoSet(playbook.subBrand);
-  // Every social demo set gets its own art direction (motif, plate, radius,
-  // casing) derived from the playbook id and re-inked with its own accent, so
-  // no two demo kits render the same field graphic.
+  // Art direction. A social kit wears the SAME authored look family as its
+  // division's event collateral (`channelLook`), so posts, event artwork and
+  // print comps for one division read as one campaign end to end. The switcher
+  // below retargets the whole set live and the choice sticks per playbook,
+  // exactly like the events demo.
+  const baseLook = useMemo(
+    () =>
+      channelLook({
+        key: `social:${playbook.id}`,
+        brandId: playbook.subBrand,
+        intentId: playbook.angle,
+        accent: playbook.accent,
+      }),
+    [playbook.id, playbook.subBrand, playbook.angle, playbook.accent],
+  );
+  const [lookId, setLookId] = useState<string>(() => baseLook.id);
+  useEffect(() => {
+    const stored =
+      typeof window === "undefined"
+        ? null
+        : window.localStorage.getItem(`element:social-demo-look:${playbook.id}`);
+    setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : baseLook.id);
+  }, [playbook.id, baseLook.id]);
+  // The division's own accent always re-inks whichever look is active, so a
+  // retarget changes the field graphic and type — never the brand colour.
   const look = useMemo(
-    () => derivedLook(`social:${playbook.id}`, { accent: playbook.accent }),
-    [playbook.id, playbook.accent],
+    () =>
+      lookId === baseLook.id
+        ? baseLook
+        : reinkLook(eventLookById(lookId), playbook.accent),
+    [lookId, baseLook, playbook.accent],
   );
+
+  const pickLook = (id: string) => {
+    setLookId(id);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(`element:social-demo-look:${playbook.id}`, id);
+    }
+  };
   const [styleId, setStyleId] = useState<SocialStyleId>(
-    () => (look.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID,
+    () => (baseLook.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID,
   );
+  // The look owns the template style: retargeting the art direction restyles
+  // every rendered asset, and the style chips still allow a manual override.
+  useEffect(() => {
+    setStyleId((look.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID);
+  }, [look.styleId]);
   const activeStyle = resolveSocialStyle(styleId);
+
 
 
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
@@ -246,7 +291,39 @@ function SocialDemoView() {
               : "Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
           }
         />
+        {/* Art direction — the same look family this division's event
+            collateral wears, so every channel stays cohesive. */}
         <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Demo look &amp; feel
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {EVENT_LOOKS.map((l) => {
+              const active = l.id === look.id;
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => pickLook(l.id)}
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    active
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
+                  }`}
+                >
+                  {l.label}
+                  <span className={active ? "ml-2 text-white/70" : "ml-2 text-black/40"}>
+                    {l.tag}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 max-w-3xl text-xs text-black/60">{look.blurb}</p>
+        </div>
+        <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
             Template style
           </div>
