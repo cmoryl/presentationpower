@@ -15,6 +15,7 @@ import {
   SlideFrame as BaseSlideFrame,
   SlideModeContext,
   SlideBackdropContext,
+  SlideSceneSeedContext,
   SlideAccentContext,
   SlideInkContext,
   makeSlideInk,
@@ -736,6 +737,14 @@ function VariantRendererInner(props: Props) {
       <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
         <SlideInkContext.Provider value={semanticInk}>
           <SlideBackdropContext.Provider value={backdrop}>
+            {/* Module vocabulary for background selection. The chrome only
+                knows "cover | content | divider | close", which is far too
+                coarse to pick a plate — publish the real module identity so the
+                active style pack grounds each module with the scene its
+                composition wants (stats, chart, bento, timeline, split, quote). */}
+            <SlideSceneSeedContext.Provider
+              value={`${variant.id} ${variant.name} ${variant.familyId}`}
+            >
             <SlideFrameCtx.Provider
               value={{
                 clientName: resolvedClient,
@@ -770,6 +779,7 @@ function VariantRendererInner(props: Props) {
                 </StatLayoutProvider>
               </div>
             </SlideFrameCtx.Provider>
+            </SlideSceneSeedContext.Provider>
           </SlideBackdropContext.Provider>
         </SlideInkContext.Provider>
       </SlideAccentContext.Provider>

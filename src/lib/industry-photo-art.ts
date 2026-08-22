@@ -151,10 +151,16 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       const scene = sceneFromSeed(seed);
       const custom = overrideFor(code, scene);
       if (custom?.imageUrl) return base(seed);
+      // FIT BEFORE VARIETY. Each scene names its plate families in preference
+      // order, and the FIRST one is the fitted plate for that content type
+      // (hero for covers, data for stats/charts, flow for process/timeline,
+      // content for agenda/bento/split). Rotating that choice with a per-pack
+      // hash — as this used to — collapsed eleven scenes onto whichever pair
+      // member the hash landed on, so a stats module could be grounded with a
+      // process plate. Only an explicit `take:` (the backdrop studio asking for
+      // an alternate) rotates within the pair.
       const takeMatch = /take:(\d+)/i.exec(seed);
-      // Core skins borrow a shared kit, so the pack code joins the take seed:
-      // two core skins on the same kit still choose different plates per scene.
-      const take = (takeMatch ? parseInt(takeMatch[1]!, 10) : 0) + hash(code);
+      const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
       const url = industryPhotoUrl(plateCode, scene, take);
 
       if (!url) return base(seed);
