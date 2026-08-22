@@ -54,6 +54,7 @@ export function defaultOverride(skinCode: string, scene: string): TemplateBackgr
     tintStrength: 0,
     sceneSwap: null,
     imageUrl: null,
+    imagePriority: "front",
     note: "",
   };
 }
@@ -68,6 +69,11 @@ export function isNeutralOverride(o: TemplateBackgroundOverride): boolean {
   );
 }
 
+/** Replacement images default to painting in FRONT of the authored artwork. */
+export function imagePriorityOf(o: TemplateBackgroundOverride): "front" | "behind" {
+  return o.imagePriority === "behind" ? "behind" : "front";
+}
+
 /**
  * Compose the final CSS background layer list for one override.
  * CSS paints the first layer in front, so the order here is front → back.
@@ -79,6 +85,8 @@ export function composeOverrideLayers(
 ): string[] {
   const intensity = Math.max(0, Math.min(2, Number(o.intensity ?? 1)));
   const out: string[] = [];
+  const priority = imagePriorityOf(o);
+  const image = o.imageUrl ? `url("${o.imageUrl}") center center / cover no-repeat` : null;
 
   if (o.tint && o.tintStrength > 0) {
     out.push(flat(withAlpha(o.tint, Math.min(0.85, o.tintStrength))));
@@ -87,19 +95,25 @@ export function composeOverrideLayers(
     // Veil of the page field damps the ground without touching its geometry.
     out.push(flat(withAlpha(surface, 1 - intensity)));
   }
-  if (o.imageUrl) {
+  if (image && priority === "front") {
     // A replacement picture IS the ground: it paints in front of the authored
     // geometry (CSS draws the first layer on top), which stays behind it only
     // as a fallback while the image loads or if it 404s.
-    out.push(`url("${o.imageUrl}") center center / cover no-repeat`);
+    out.push(image);
   }
   out.push(...layers);
-  if (intensity > 1 && !o.imageUrl) {
+  if (intensity > 1 && !(image && priority === "front")) {
     // Second strike of the same geometry deepens it (alpha stacks).
     out.push(...layers);
   }
+  if (image && priority === "behind") {
+    // Opt-in: authored artwork keeps the top of the stack and the picture is a
+    // photographic base underneath it.
+    out.push(image);
+  }
   return out;
 }
+
 
 
 /** Wrap a pack so its ground honours the admin overrides for `code`. */
