@@ -14,6 +14,7 @@ import { findKitIdInMessages, type KitSurface } from "@/lib/kit-agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { KIT_PROPOSAL_TOOL_NAME } from "@/lib/kit-agent/tools";
 import { KitProposalCard, kitProposalFromTool } from "./KitProposalCard";
+import { messagesFingerprint, useKitThreadMessageSync } from "@/lib/kit-agent/sync";
 
 const TOOL_LABELS: Record<string, string> = {
   list_divisions: "Checking divisions",
@@ -62,7 +63,7 @@ export function KitAgentChat({
     [threadId, surface],
   );
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, setMessages, status, error } = useChat({
     id: threadId,
     messages: initialMessages,
     transport,
@@ -74,6 +75,26 @@ export function KitAgentChat({
   const scrollRef = useRef<HTMLDivElement>(null);
   const seenKit = useRef<string | null>(null);
   const busy = status === "submitted" || status === "streaming";
+
+  // The stored history is the source of truth, so a conversation continued on
+  // another device (or tab) catches up here on focus / idle poll. Never while a
+  // local turn is streaming — that reply is not in the database yet.
+  const localPrint = messagesFingerprint(messages);
+  const printRef = useRef(localPrint);
+  printRef.current = localPrint;
+  useKitThreadMessageSync({
+    threadId,
+    enabled: true,
+    paused: busy,
+    onRemoteMessages: (remote) => {
+      const next = messagesFingerprint(remote);
+      if (next === printRef.current) return;
+      // Only adopt the remote snapshot when it is at least as complete, so a
+      // slow read can never roll the visible conversation backwards.
+      if (remote.length === 0) return;
+      setMessages(remote);
+    },
+  });
 
   useEffect(() => {
     if (!busy) inputRef.current?.focus();

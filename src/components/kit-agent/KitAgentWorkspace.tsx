@@ -19,6 +19,7 @@ import {
   type KitAgentThread,
   type KitSurface,
 } from "@/lib/kit-agent/threads";
+import { useKitThreadListSync } from "@/lib/kit-agent/sync";
 
 const COPY: Record<
   KitSurface,
@@ -100,6 +101,9 @@ export function KitAgentWorkspace({
       );
     refreshThreads();
   }, [threadId, userId, refreshThreads]);
+
+  // Threads started or renamed on another device show up in the rail here.
+  useKitThreadListSync({ surface, enabled: Boolean(userId), onThreads: setThreads });
 
   const onKitDetected = useCallback(
     (id: string) => {

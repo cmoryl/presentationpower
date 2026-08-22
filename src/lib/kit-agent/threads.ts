@@ -84,22 +84,37 @@ export async function loadKitThread(
 
   const { data: rows, error: msgErr } = await supabase
     .from("agent_messages")
-    .select("id, role, parts")
+    .select("id, role, parts, client_message_id")
     .eq("thread_id", id)
     .order("created_at", { ascending: true })
     .limit(400);
   if (msgErr) throw new Error(msgErr.message);
 
+  // Prefer the client message id so a row keeps the same identity as the turn
+  // that produced it — that makes local streamed messages and the stored
+  // history line up instead of duplicating when another device syncs in.
+  const seen = new Set<string>();
   const messages = repairDanglingToolParts(
-    (rows ?? []).map((row) => {
-      const r = row as { id: string; role: string; parts: unknown };
-      return {
-        id: r.id,
-        role: r.role === "assistant" ? "assistant" : "user",
-        parts: Array.isArray(r.parts) ? r.parts : [],
-      } as UIMessage;
+    (rows ?? []).flatMap((row) => {
+      const r = row as {
+        id: string;
+        role: string;
+        parts: unknown;
+        client_message_id: string | null;
+      };
+      const key = r.client_message_id ?? r.id;
+      if (seen.has(key)) return [];
+      seen.add(key);
+      return [
+        {
+          id: key,
+          role: r.role === "assistant" ? "assistant" : "user",
+          parts: Array.isArray(r.parts) ? r.parts : [],
+        } as UIMessage,
+      ];
     }),
   );
+
   return { thread: thread as unknown as KitAgentThread, messages };
 }
 
