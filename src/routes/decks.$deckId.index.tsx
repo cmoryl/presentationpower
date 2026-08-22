@@ -529,6 +529,8 @@ function DeckEditor() {
               />
             </div>
 
+            <LiveDemoDeckBar deckId={deckId} />
+
             <EditorToolbar
               slideLabel={active ? `Slide ${String(clamped + 1).padStart(2, "0")}` : undefined}
               deckRow={
