@@ -24,11 +24,7 @@ import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { SHOWCASE_DECKS } from "@/lib/showcase-decks";
-
-import demoPresentationImg from "@/assets/showcase/demo-presentation.jpg";
-import demoPrintImg from "@/assets/showcase/demo-print.jpg";
-import demoEventImg from "@/assets/showcase/demo-event.jpg";
-import demoSocialImg from "@/assets/showcase/demo-social.jpg";
+import { showcaseArt } from "@/lib/showcase-art";
 
 type ShowcaseEntry = {
   id: string;
@@ -89,8 +85,8 @@ const PRINT_DEMOS = [
 ] as const;
 
 const SURFACE_META = {
-  social: { label: "Social kit", icon: Share2, accent: "#FF9B70", art: demoSocialImg },
-  event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87", art: demoEventImg },
+  social: { label: "Social kit", icon: Share2, accent: "#FF9B70" },
+  event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87" },
 } as const;
 
 export function ShowcaseGallery() {
@@ -136,8 +132,8 @@ export function ShowcaseGallery() {
           <MediaCard
             key={d.id}
             to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
-            art={demoPresentationImg}
-            artAlt="Executive team reviewing a finished Element deck on a boardroom display"
+            art={showcaseArt(d.id).src}
+            artAlt={showcaseArt(d.id).alt}
             accent={d.accent}
             icon={<Presentation size={12} />}
             label={`Deck · ${d.eyebrow}`}
@@ -156,8 +152,8 @@ export function ShowcaseGallery() {
           <MediaCard
             key={p.id}
             to={{ to: "/library/print", search: p.search }}
-            art={demoPrintImg}
-            artAlt="Printed brochures and a case-study booklet fanned on a studio surface"
+            art={showcaseArt(p.id).src}
+            artAlt={showcaseArt(p.id).alt}
             accent={p.accent}
             icon={<Printer size={12} />}
             label={p.label}
@@ -326,7 +322,7 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
     >
       <div className="relative flex h-[230px] items-center justify-center overflow-hidden p-4">
         <img
-          src={meta.art}
+          src={showcaseArt(entry.id).src}
           alt=""
           aria-hidden
           loading="lazy"
