@@ -280,6 +280,19 @@ export type SlideBackdrop = {
 
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
+/**
+ * Ground ownership rule. A style pack is a complete master design, so it paints
+ * the page ground — except when the author explicitly picked a background for
+ * this slide in the editor (`content.background`), which always wins so the
+ * swap is visible live.
+ */
+export function stylePackOwnsGround(
+  pack: { id?: string } | null | undefined,
+  backdrop: SlideBackdrop | null | undefined,
+): boolean {
+  return !!pack && !backdrop?.authored;
+}
+
 const ELEMENT_BRAND_MODE = resolveBrandMode("bm-element");
 
 // A slide frame that owns the locked chrome — brand bar, footer, logo, page
