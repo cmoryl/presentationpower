@@ -35,6 +35,8 @@ import {
   type SocialPlaybook,
 } from "@/lib/social-playbooks";
 import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
+import type { CollateralContext } from "@/components/events/CollateralArtwork";
+import { getDivisionLogos } from "@/lib/division-logos";
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets } from "@/lib/campaigns";
