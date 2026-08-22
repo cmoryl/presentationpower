@@ -863,7 +863,7 @@ export function SlideFrame({
                 data-decorative="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
-                  background: minimalPackLayers(packLayoutLayers(pack, comp, seed)).join(", "),
+                  background: minimalPackLayers(packLayoutLayers(pack, comp, groundSeed)).join(", "),
                 }}
               />
             </>
