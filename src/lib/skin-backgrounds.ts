@@ -1489,8 +1489,40 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
   if (/table|pricing|compare|scorecard|budget|cost|breakdown/.test(s)) return "chart";
   if (/why|value|benefit|approach|solution|capabilit|service|offer/.test(s))
     return "agenda";
-  if (/divider|section|chapter|break|title-only/.test(s)) return "section";
-  return "section";
+  // Third pass: the module *families* (MV-VIZ-…, MV-DASH-…, MV-INFO-…) name
+  // their geometry, not a deck section, so they used to fall straight through
+  // to "section". Route each family to the plate its composition wants.
+  if (/\b(viz|dash)\b|donut|funnel|pyramid|venn|sankey|chord|beeswarm|bump|treemap|heatmap|curve|gauge|performance|columns|market-map/.test(s))
+    return "chart";
+  if (/hub|satellit|orbit|flywheel|layer-stack|platform-loop|architecture|countdown|horizon|before-after|maturity|stack/.test(s))
+    return "timeline";
+  if (/\bimg\b|\bloc\b|world|region|spoke|map|pins|bleed|strip|caption|spread/.test(s))
+    return "split";
+  if (/\bctx\b|\bins\b|trend|callout|so-what|definition|principle|iceberg|opportunity/.test(s))
+    return "statement";
+  if (/case|client|\bgov\b|raci|risk|mitigation|\bcomm\b|investment|\brec\b|next/.test(s))
+    return "bento";
+  if (/divider|section|chapter|break|title-only|blank|kicker|poster/.test(s))
+    return "section";
+  // Deterministic spread instead of a "section" magnet: anything still
+  // unmatched hashes across the content plates so a deck never wears one
+  // background just because its modules use novel names.
+  const SPREAD: SkinScene[] = [
+    "agenda",
+    "bento",
+    "chart",
+    "split",
+    "statement",
+    "stats",
+    "timeline",
+  ];
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return SPREAD[Math.abs(h) % SPREAD.length]!;
+
 
 }
 
