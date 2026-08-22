@@ -424,7 +424,7 @@ export function SocialRenderer({
   mode,
   copy: copyProp,
   facts,
-  imageUrl,
+  imageUrl: imageUrlProp,
   imageScrimPct = 55,
   imageLayout: imageLayoutProp,
 
@@ -439,6 +439,9 @@ export function SocialRenderer({
   const tune = format.tune ?? {};
   // The caller wins; otherwise the platform preset decides bleed vs panel.
   const imageLayout = edit?.imageLayout ?? imageLayoutProp ?? tune.imageLayout ?? "bleed";
+  // An edit may attach photography to an asset the pipeline produced without
+  // any, or clear it (empty string) — both modes honour the override.
+  const imageUrl = edit?.imageUrl !== undefined ? edit.imageUrl || undefined : imageUrlProp;
   const style = resolveSocialStyle(styleId);
 
   const short = Math.min(format.width, format.height);

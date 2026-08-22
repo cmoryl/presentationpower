@@ -20,6 +20,9 @@ export type SocialAssetEdit = {
   caption?: string;
 
   /** Photo composition. */
+  /** Photo source override — lets an asset with no generated photography
+   *  attach one (or an existing one be swapped/cleared with ""). */
+  imageUrl?: string;
   imageLayout?: "bleed" | "panel";
   panelSide?: "right" | "top";
   /** Panel size as a % of the usable frame on its axis (24–70). */
