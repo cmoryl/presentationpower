@@ -83,6 +83,8 @@ function toOverride(r: Row): TemplateBackgroundOverride {
     tintStrength: Number(r.tint_strength ?? 0),
     sceneSwap: (r.scene_swap as string | null) ?? null,
     imageUrl: (r.image_url as string | null) ?? null,
+    imagePriority: r.image_priority === "behind" ? "behind" : "front",
+
     note: String(r.note ?? ""),
   };
 }
