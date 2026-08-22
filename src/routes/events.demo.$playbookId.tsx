@@ -402,7 +402,7 @@ function PlaybookDemoView() {
                   imageUrl,
                   imageLayout: panel ? "panel" : "bleed",
                   imageScrimPct: 60,
-                  styleId,
+                  styleId: resolveSocialStyle(styleId).id as SocialStyleId,
                 }}
                 badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
                 formatLabel={a.format.label}
