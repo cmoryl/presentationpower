@@ -7,7 +7,7 @@
  * scrim sits on top so white hero copy keeps its contrast.
  */
 
-import { useEffect, useRef } from "react";
+import { SeamlessVideo } from "@/components/hero/SeamlessVideo";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -23,28 +23,13 @@ export function ThemedHeroVideo({
 }) {
   const reduced = useReducedMotion();
   const [theme] = useTheme();
-  const ref = useRef<HTMLVideoElement | null>(null);
   const src = theme === "dark" ? dark : light;
-
-  useEffect(() => {
-    const el = ref.current;
-    if (el) void el.play().catch(() => undefined);
-  }, [src]);
 
   if (reduced) return null;
 
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <video
-        ref={ref}
-        src={src}
-        muted
-        loop
-        playsInline
-        autoPlay
-        preload="metadata"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      <SeamlessVideo src={src} />
       <div
         className="absolute inset-0"
         style={{

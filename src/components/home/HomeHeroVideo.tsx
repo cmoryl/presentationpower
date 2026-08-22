@@ -12,7 +12,7 @@
  * fallback.
  */
 
-import { useEffect, useRef } from "react";
+import { SeamlessVideo } from "@/components/hero/SeamlessVideo";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useTheme } from "@/hooks/use-theme";
 
@@ -37,26 +37,13 @@ const PLATES: Record<HomeHeroModeId, { dark: string; light: string }> = {
 const ORDER: HomeHeroModeId[] = ["presentation", "print", "event", "social"];
 
 function Plate({ src, active }: { src: string; active: boolean }) {
-  const ref = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (active) void el.play().catch(() => undefined);
-    else el.pause();
-  }, [active, src]);
-
   return (
-    <video
-      ref={ref}
-      src={src}
-      muted
-      loop
-      playsInline
-      preload={active ? "auto" : "none"}
-      className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-out will-change-[opacity]"
+    <div
+      className="absolute inset-0 transition-opacity duration-[1200ms] ease-out will-change-[opacity]"
       style={{ opacity: active ? 1 : 0 }}
-    />
+    >
+      <SeamlessVideo src={src} paused={!active} preload={active ? "auto" : "none"} />
+    </div>
   );
 }
 
