@@ -281,6 +281,25 @@ export type SlideBackdrop = {
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
 
 /**
+ * Module identity for background selection.
+ *
+ * `SlideFrame`'s own `variant` prop is the CHROME variant — only
+ * "cover" | "content" | "divider" | "close". Seeding the style pack's ground
+ * from it collapsed the entire catalogue onto three plates (cover / section /
+ * closing), so switching a look on the library page repainted every content
+ * module with the same background instead of the plate its composition wants.
+ *
+ * VariantRenderer publishes the real module vocabulary here (module variant id
+ * + name + family), which `sceneFromSeed` maps to stats / chart / bento /
+ * timeline / split / quote plates.
+ */
+export const SlideSceneSeedContext = createContext<string | null>(null);
+
+export function useSlideSceneSeed(): string | null {
+  return useContext(SlideSceneSeedContext);
+}
+
+/**
  * Ground ownership rule. A style pack is a complete master design, so it paints
  * the page ground — except when the author explicitly picked a background for
  * this slide in the editor (`content.background`), which always wins so the
@@ -402,7 +421,26 @@ export function SlideFrame({
   // A per-slide template override can name the backdrop scene explicitly;
   // otherwise the scene stays deterministic from the module seed.
   const templateScene = useSlideTemplateScene();
-  const packScene = templateScene ?? sceneFromSeed(layoutId ?? variant);
+  // Module vocabulary (published by VariantRenderer) is the primary scene
+  // authority; the chrome variant is only a fallback for cover / divider /
+  // close plates, and the layout id contributes jitter, never the scene.
+  const moduleSeed = useSlideSceneSeed();
+  const moduleScene = moduleSeed ? sceneFromSeed(moduleSeed) : null;
+  const chromeScene = sceneFromSeed(variant);
+  const seededScene =
+    moduleScene && moduleScene !== "section"
+      ? moduleScene
+      : chromeScene !== "section"
+        ? chromeScene
+        : sceneFromSeed(layoutId ?? variant);
+  const packScene = templateScene ?? seededScene;
+  // The ground plane, the authored-plate probe and the AI backdrop must all
+  // paint from ONE seed — they used to disagree (layout id vs chrome variant),
+  // so the motif suppression test looked at a different plate than the one
+  // actually rendered.
+  const groundSeed = templateScene
+    ? `scene:${templateScene} accentlock ${moduleSeed ?? ""} ${layoutId ?? variant}`
+    : `scene:${packScene} ${moduleSeed ?? ""} ${layoutId ?? variant}`;
   const aiBackdrop = useSkinBackdropImage(pack?.id ?? null, packScene);
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
