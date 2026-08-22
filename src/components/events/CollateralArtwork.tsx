@@ -9,6 +9,7 @@
 
 import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import { eventLookById, type EventLook } from "@/lib/event-looks";
+import { resolveSocialStyle, type SocialStyle } from "@/lib/social-styles";
 
 export type CollateralContext = {
   eventName: string;
@@ -30,6 +31,14 @@ export type CollateralContext = {
   /** Fully-resolved art direction — outranks `lookId`. Demo pages pass a
    *  per-demo derived look so each set reads as its own campaign. */
   look?: EventLook;
+  /**
+   * Social template style id (see `social-styles.ts`). The digital and web
+   * trims — hero, email, LinkedIn header, signature strip and every social
+   * post — compose from this style, so a demo kit's digital/web pieces carry
+   * the exact plate treatment, radius, type case and CTA shape as the
+   * generated social assets for the same campaign. Omit for the default.
+   */
+  styleId?: string;
 };
 
 export type ArtKind =
@@ -183,6 +192,14 @@ const LookContext = createContext<EventLook>(eventLookById(undefined));
 
 function useLook(): EventLook {
   return useContext(LookContext);
+}
+
+/** Active social template style — the shared geometry/type contract between
+ *  generated social assets and the digital/web trims in a demo kit. */
+const StyleContext = createContext<SocialStyle>(resolveSocialStyle(undefined));
+
+function useSocialStyle(): SocialStyle {
+  return useContext(StyleContext);
 }
 
 
@@ -436,6 +453,201 @@ function Lines({
       ))}
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Social-style primitives (digital + web cohesion)
+// ---------------------------------------------------------------------------
+//
+// The generated social assets compose from a SocialStyle: where the copy sits,
+// what plate sits behind it, the plate radius, the headline case/weight, the
+// eyebrow and the CTA shape. The digital and web trims below used to hardcode
+// their own version of all of that, so a kit's web hero and email header never
+// matched the posts they shipped alongside. These primitives read the active
+// style so both channels compose from one contract.
+
+/** Copy-stack alignment for the active style. */
+function copyAlignStyle(style: SocialStyle): CSSProperties {
+  return {
+    justifyContent: style.copyAlign === "start" ? "flex-start" : "flex-end",
+  };
+}
+
+/** Headline type tuned by the active style. */
+function titleStyle(style: SocialStyle, basePx: number, maxWidth?: string): CSSProperties {
+  return {
+    fontSize: Math.round(basePx * style.titleScale),
+    fontWeight: style.titleWeight,
+    letterSpacing: style.titleTracking,
+    textTransform: style.titleUppercase ? "uppercase" : undefined,
+    lineHeight: 1.03,
+    maxWidth,
+  };
+}
+
+/** Plate behind the copy — glass / solid / band / aura / none, per style. */
+function CopyPlate({
+  children,
+  shortEdge,
+  pad = 44,
+  dark = true,
+}: {
+  children: ReactNode;
+  /** Short edge of the trim, used to scale the plate radius. */
+  shortEdge: number;
+  pad?: number;
+  dark?: boolean;
+}) {
+  const style = useSocialStyle();
+  const look = useLook();
+  const radius = style.plateFullBleed ? 0 : Math.round(shortEdge * style.plateRadiusPct);
+  const base: CSSProperties = {
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    gap: Math.round(pad * 0.45),
+    padding: style.plate === "none" ? 0 : pad,
+    borderRadius: radius,
+    marginInline: style.plateFullBleed && style.plate !== "none" ? -pad : 0,
+  };
+  if (style.plate === "glass") {
+    return (
+      <div
+        style={{
+          ...base,
+          background: dark ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.62)",
+          backdropFilter: "blur(18px)",
+          border: `1px solid ${dark ? "rgba(255,255,255,0.22)" : "rgba(3,0,44,0.10)"}`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+  if (style.plate === "solid") {
+    return (
+      <div style={{ ...base, background: dark ? `${look.deep}E6` : "#FFFFFF" }}>{children}</div>
+    );
+  }
+  if (style.plate === "band") {
+    return (
+      <div
+        style={{
+          ...base,
+          background: dark
+            ? `linear-gradient(90deg, ${look.deep}F2 0%, ${look.deep}A6 78%, transparent 100%)`
+            : `linear-gradient(90deg, #FFFFFFF2 0%, #FFFFFFB8 78%, transparent 100%)`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+  if (style.plate === "aura") {
+    return (
+      <div
+        style={{
+          ...base,
+          background: `radial-gradient(120% 160% at 12% 100%, ${look.accent}3d 0%, transparent 70%)`,
+        }}
+      >
+        {children}
+      </div>
+    );
+  }
+  return <div style={base}>{children}</div>;
+}
+
+/** Accent rule / eyebrow bar — drawn only when the style calls for one. */
+function StyleRule({ w = 132, h = 8 }: { w?: number; h?: number }) {
+  const style = useSocialStyle();
+  const look = useLook();
+  if (!style.accentRule) return null;
+  return <div style={{ width: w, height: h, borderRadius: 99, background: look.accent }} />;
+}
+
+function Eyebrow({ children, size = 24 }: { children: ReactNode; size?: number }) {
+  const style = useSocialStyle();
+  const look = useLook();
+  if (style.eyebrow === "hidden") return null;
+  if (style.eyebrow === "pill") {
+    return (
+      <span
+        style={{
+          alignSelf: "flex-start",
+          padding: `${Math.round(size * 0.4)}px ${size}px`,
+          borderRadius: 999,
+          background: `${look.accent}2e`,
+          border: `1px solid ${look.accent}66`,
+          color: look.accent,
+          fontSize: size,
+          fontWeight: 700,
+        }}
+      >
+        {children}
+      </span>
+    );
+  }
+  return (
+    <span
+      style={{
+        fontSize: size,
+        letterSpacing: "0.22em",
+        textTransform: "uppercase",
+        fontWeight: 700,
+        color: look.accent,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function Cta({ children, size = 22 }: { children: ReactNode; size?: number }) {
+  const style = useSocialStyle();
+  const look = useLook();
+  const padY = Math.round(size * 0.7);
+  const padX = Math.round(size * 1.5);
+  if (style.cta === "underline") {
+    return (
+      <span
+        style={{
+          alignSelf: "flex-start",
+          fontSize: size,
+          fontWeight: 700,
+          color: look.accent,
+          borderBottom: `3px solid ${look.accent}`,
+          paddingBottom: 6,
+        }}
+      >
+        {children}
+      </span>
+    );
+  }
+  return (
+    <span
+      style={{
+        alignSelf: "flex-start",
+        padding: `${padY}px ${padX}px`,
+        borderRadius: style.cta === "pill" ? 999 : 6,
+        background: look.accent,
+        color: look.deep,
+        fontSize: size,
+        fontWeight: 800,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+/** Lockup corner for the active style. */
+function lockupRowStyle(style: SocialStyle): CSSProperties {
+  return {
+    display: "flex",
+    justifyContent: style.lockup === "top-left" ? "flex-start" : "flex-end",
+    order: style.lockup === "bottom-right" ? 2 : 0,
+  };
 }
 
 // ---------------------------------------------------------------------------
