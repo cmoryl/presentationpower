@@ -6,10 +6,11 @@
 // functions the print library uses.
 
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, Printer, Sparkles, FileText } from "lucide-react";
+
 
 import { AppShell } from "@/components/AppShell";
 import { showcaseArt } from "@/lib/showcase-art";
@@ -22,6 +23,8 @@ import { printTypeMeta } from "@/lib/print-library/catalog";
 import { parseLook } from "@/lib/print-library/look";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
+import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";
+
 
 export const Route = createFileRoute("/demo/print/$demoId")({
   loader: ({ params }) => {
@@ -99,6 +102,16 @@ function PrintDemoPage() {
     return base ? applyDivisionSeedToContent(base, seed) : null;
   }, [item, seed]);
 
+  // Live draft: every copy edit re-renders the real print layout below and is
+  // what gets written into the editable copy when the user opens it.
+  const [draft, setDraft] = useState<unknown>(previewContent);
+  useEffect(() => setDraft(previewContent), [previewContent]);
+  const dirty = useMemo(
+    () => JSON.stringify(draft) !== JSON.stringify(previewContent),
+    [draft, previewContent],
+  );
+  const renderKey = dirty ? "edited" : "base";
+
   if (!def || !item) return null;
   const previewLook = parseLook(item.look) ?? {};
   const previewBrand =
@@ -113,15 +126,20 @@ function PrintDemoPage() {
       toast.error("This example has no editable content yet.");
       return;
     }
-    const content = applyDivisionSeedToContent(base, seed);
+    // Carry the on-page edits into the real asset.
+    const content =
+      (draft as Record<string, unknown> | null) ?? applyDivisionSeedToContent(base, seed);
+
     setBusy(true);
     try {
-      const existing = await findFn({ data: { libraryItemId: item!.id } });
+      // Edited on this page? Always create a fresh copy so the edits survive.
+      const existing = dirty ? null : await findFn({ data: { libraryItemId: item!.id } });
       if (existing?.id) {
         toast.success("Opening your existing copy");
         void navigate({ to: "/asset/$assetId", params: { assetId: existing.id } });
         return;
       }
+
       const row = await createFn({
         data: {
           kind: item!.kind,
@@ -187,26 +205,47 @@ function PrintDemoPage() {
         </div>
       </div>
 
-      {/* Rendered comps — the real print layout for every page of the piece. */}
-      <section className="mt-10">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-semibold tracking-tight">Rendered preview</h2>
-          <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
-            Click any page to enlarge
-          </span>
-        </div>
-        <div className="mt-4">
-          <ShowcasePrintGallery
-            kind={item.kind}
-            content={previewContent}
-            brand={previewBrand}
-            mode={previewLook.mode}
-            pageSize={previewLook.pageSize}
-            density={previewLook.density}
-            accent={accent}
-          />
+      {/* Rendered comps — the real print layout, live from the edited content,
+          shown in both light and dark so both finishes are verifiable here. */}
+      <section className="mt-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+        <PrintDemoContentEditor
+          content={draft}
+          onChange={setDraft}
+          onReset={() => setDraft(previewContent)}
+          dirty={dirty}
+          accent={accent}
+        />
+        <div>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3">
+            <h2 className="min-w-0 truncate text-lg font-semibold tracking-tight">
+              Rendered preview {dirty ? "· updated" : ""}
+            </h2>
+            <span className="shrink-0 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
+              Click any page to enlarge
+            </span>
+          </div>
+          <div className="mt-4 space-y-6">
+            {(["light", "dark"] as const).map((mode) => (
+              <div key={mode}>
+                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+                  {mode} version
+                </div>
+                <ShowcasePrintGallery
+                  key={`${mode}-${renderKey}`}
+                  kind={item.kind}
+                  content={draft}
+                  brand={previewBrand}
+                  mode={mode}
+                  pageSize={previewLook.pageSize}
+                  density={previewLook.density}
+                  accent={accent}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
+
 
       <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
