@@ -47,6 +47,8 @@ type DivisionProposal = {
   quote: { text: string; author: string; role?: string; company?: string };
   nextSteps: string[];
   footerUrl: string;
+  /** Signing entity on the "Prepared by" block. Defaults to "TransPerfect". */
+  companyName?: string;
 };
 
 const DIVISION_PROPOSALS: DivisionProposal[] = [
@@ -452,6 +454,213 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     ],
     footerUrl: "transperfect.com",
   },
+  {
+    slug: "enterprise-solutions-proposal",
+    divisionId: "bm-enterprise",
+    title: "Enterprise Solutions Proposal — Master",
+    teaser:
+      "Master enterprise proposal — multi-division program scope, governance model, global delivery footprint, and a consolidated investment summary.",
+    tags: ["proposal", "enterprise", "program", "governance", "master"],
+    eyebrow: "Enterprise solutions proposal",
+    proposalTitle: "Enterprise solutions proposal",
+    subtitle: "Program scope, governance, global delivery, and investment",
+    clientName: "Enterprise Client",
+    summary:
+      "This proposal outlines the scope, governance model, delivery footprint, and investment for a consolidated multilingual program across your business units. One contract, one governance structure, and one reporting line covering every language, channel, and division involved.",
+    included: [
+      { label: "Program governance", icon: "users", detail: "Single accountable program lead with quarterly business reviews." },
+      { label: "Consolidated language services", icon: "globe-alt", detail: "Translation, transcreation, and interpreting across all units." },
+      { label: "Technology and integration", icon: "grid", detail: "Connector-based automation into your content and product stack." },
+      { label: "Enterprise reporting", icon: "trending", detail: "Spend, quality, and turnaround reporting by business unit." },
+    ],
+    sourceFiles: ["Current vendor and spend baseline", "System and connector inventory"],
+    deliverables: [
+      "Program governance and RACI model",
+      "Consolidated service catalog and SLAs",
+      "Integration and rollout plan by business unit",
+    ],
+    timelineNote:
+      "Program mobilization is estimated at X weeks from written approval, with business units onboarded in agreed waves. Priority units can be accelerated to a rush X-week wave.",
+    costRows: [
+      { item: "Language services", detail: "Blended rate, per word", qty: "0", price: "$0.00" },
+      { item: "Technology and integration", detail: "Per connector, one-time", qty: "0", price: "$0.00" },
+      { item: "Program governance", detail: "Monthly, dedicated team", qty: "12", price: "$0.00" },
+      { item: "Enterprise reporting", detail: "Annual platform access", qty: "1", price: "$0.00" },
+    ],
+    costNote:
+      "Pricing is valid for 30 days and assumes the volumes stated in the baseline. Added business units, new languages, or custom integrations are quoted separately.",
+    stats: [
+      { label: "Languages supported", value: "200", unit: "+" },
+      { label: "Offices worldwide", value: "140", unit: "+" },
+      { label: "Consolidated spend savings", value: "30", unit: "%" },
+    ],
+    quote: {
+      text: "We replaced nine vendors with one program and finally have a single number for global content.",
+      author: "VP, Global Operations",
+    },
+    nextSteps: [
+      "Confirm business units, languages, and volumes",
+      "Approve governance model and pricing in writing",
+      "Mobilization workshop with your program team",
+    ],
+    footerUrl: "transperfect.com",
+  },
+  {
+    slug: "globallink-solutions-proposal",
+    divisionId: "bm-division",
+    title: "GlobalLink Solutions Proposal — Master",
+    teaser:
+      "Master proposal for GlobalLink technology programs — connector-based automation, translation management, and platform scope with a licensing cost summary.",
+    tags: ["proposal", "globallink", "technology", "connectors", "master"],
+    eyebrow: "GlobalLink solutions proposal",
+    proposalTitle: "GlobalLink solutions proposal",
+    subtitle: "Platform scope, connectors, rollout, and investment",
+    clientName: "Client Company",
+    summary:
+      "This proposal outlines the platform scope, connector footprint, rollout plan, and investment for automating your multilingual content operations on GlobalLink. Content moves from your systems into translation and back without manual handoffs.",
+    included: [
+      { label: "Translation management", icon: "grid", detail: "Centralized workflow, TM, and terminology across all content." },
+      { label: "System connectors", icon: "globe-alt", detail: "Pre-built integrations for CMS, PIM, commerce, and repositories." },
+      { label: "Workflow automation", icon: "clock", detail: "Automated routing, review steps, and publishing triggers." },
+      { label: "Analytics and reporting", icon: "trending", detail: "Live visibility into volume, cost, and turnaround." },
+    ],
+    sourceFiles: ["System inventory and API access", "Existing TM and glossary assets"],
+    deliverables: [
+      "Configured GlobalLink environment",
+      "Connector configuration and test report",
+      "Workflow documentation and admin training",
+    ],
+    timelineNote:
+      "Standard implementation is estimated at X weeks from written approval and API access. A single-connector pilot can be accelerated to a rush X-week deployment.",
+    costRows: [
+      { item: "Platform licensing", detail: "Annual, per environment", qty: "1", price: "$0.00" },
+      { item: "Connector configuration", detail: "One-time, per system", qty: "0", price: "$0.00" },
+      { item: "Workflow automation", detail: "One-time setup", qty: "1", price: "$0.00" },
+      { item: "Support and success", detail: "Annual, tiered", qty: "1", price: "$0.00" },
+    ],
+    costNote:
+      "Pricing is valid for 30 days and assumes standard connector scope. Custom integrations, added environments, or bespoke workflows are quoted separately.",
+    stats: [
+      { label: "Pre-built connectors", value: "60", unit: "+" },
+      { label: "Manual handling removed", value: "80", unit: "%" },
+      { label: "Faster time to market", value: "50", unit: "%" },
+    ],
+    quote: {
+      text: "Content leaves our CMS and comes back translated. Nobody emails a file anymore.",
+      author: "Director of Digital Platforms",
+    },
+    nextSteps: [
+      "Confirm systems, locales, and content types",
+      "Approve licensing and implementation scope in writing",
+      "Technical kickoff with your solutions architect",
+    ],
+    footerUrl: "globallink.com",
+    companyName: "GlobalLink",
+  },
+  {
+    slug: "trial-interactive-solutions-proposal",
+    divisionId: "bm-trial-interactive",
+    title: "Trial Interactive Solutions Proposal — Master",
+    teaser:
+      "Master proposal for eClinical programs — eTMF, study start-up, and inspection-readiness scope with a study-level cost summary.",
+    tags: ["proposal", "trial interactive", "etmf", "clinical", "master"],
+    eyebrow: "Trial Interactive solutions proposal",
+    proposalTitle: "Trial Interactive solutions proposal",
+    subtitle: "Study scope, eTMF configuration, timelines, and investment",
+    clientName: "Sponsor Company",
+    summary:
+      "This proposal outlines the scope, eTMF configuration, timelines, and investment for your clinical program on Trial Interactive. Every artifact is filed against a validated structure so the trial master file stays inspection-ready from first-patient-in.",
+    included: [
+      { label: "eTMF implementation", icon: "check", detail: "Validated environment configured to your TMF reference model." },
+      { label: "Study start-up", icon: "clock", detail: "Site activation tracking, document collection, and workflows." },
+      { label: "Inspection readiness", icon: "star", detail: "Completeness metrics, QC review, and audit-ready exports." },
+      { label: "Training and support", icon: "users", detail: "Role-based training for sponsor, CRO, and site users." },
+    ],
+    sourceFiles: ["TMF reference model and study documents", "Site and country list"],
+    deliverables: [
+      "Configured and validated eTMF environment",
+      "Study start-up tracking and site document set",
+      "Inspection-readiness metrics and export package",
+    ],
+    timelineNote:
+      "Standard study setup is estimated at X weeks from written approval and protocol receipt. First-site-activation timelines can be accelerated to a rush X-week setup.",
+    costRows: [
+      { item: "eTMF licensing", detail: "Per study, annual", qty: "1", price: "$0.00" },
+      { item: "Study configuration", detail: "One-time setup", qty: "1", price: "$0.00" },
+      { item: "Study start-up services", detail: "Per site", qty: "0", price: "$0.00" },
+      { item: "Training and support", detail: "Annual, per study", qty: "1", price: "$0.00" },
+    ],
+    costNote:
+      "Pricing is valid for 30 days and assumes the site and country counts stated above. Added sites, countries, or scope changes are quoted separately.",
+    stats: [
+      { label: "Studies supported", value: "3,000", unit: "+" },
+      { label: "TMF completeness at inspection", value: "99", unit: "%" },
+      { label: "Faster study start-up", value: "40", unit: "%" },
+    ],
+    quote: {
+      text: "The TMF was inspection-ready without a scramble. That has never happened before.",
+      author: "Head of Clinical Operations",
+    },
+    nextSteps: [
+      "Confirm protocol, countries, and site counts",
+      "Approve licensing and configuration scope in writing",
+      "Study setup kickoff with your implementation lead",
+    ],
+    footerUrl: "trialinteractive.com",
+    companyName: "Trial Interactive",
+  },
+  {
+    slug: "element-solutions-proposal",
+    divisionId: "bm-element",
+    title: "Element Solutions Proposal — Master",
+    teaser:
+      "Master proposal for Element rollouts — brand system scope, module library, team enablement, and a platform investment summary.",
+    tags: ["proposal", "element", "brand system", "enablement", "master"],
+    eyebrow: "Element solutions proposal",
+    proposalTitle: "Element solutions proposal",
+    subtitle: "System scope, module library, enablement, and investment",
+    clientName: "Client Company",
+    summary:
+      "This proposal outlines the scope, module library, enablement plan, and investment for standing up Element as your on-brand production system. Presentations, print, events, and social all come out of one approved library instead of being rebuilt each time.",
+    included: [
+      { label: "Brand system setup", icon: "star", detail: "Palette, type, logo rules, and style packs encoded as tokens." },
+      { label: "Module library", icon: "grid", detail: "Approved slide, print, event, and social modules per division." },
+      { label: "Team enablement", icon: "users", detail: "Role-based onboarding for design, marketing, and sales teams." },
+      { label: "Governance and updates", icon: "check", detail: "Change control so every asset stays on the current brand." },
+    ],
+    sourceFiles: ["Current brand guidelines and asset library", "Team and division list"],
+    deliverables: [
+      "Configured Element workspace with brand tokens",
+      "Division module library and style packs",
+      "Enablement sessions and admin documentation",
+    ],
+    timelineNote:
+      "Standard rollout is estimated at X weeks from written approval and brand asset receipt. A single-division pilot can be accelerated to a rush X-week launch.",
+    costRows: [
+      { item: "Platform access", detail: "Annual, per workspace", qty: "1", price: "$0.00" },
+      { item: "Brand system setup", detail: "One-time configuration", qty: "1", price: "$0.00" },
+      { item: "Module library build", detail: "Per division", qty: "0", price: "$0.00" },
+      { item: "Enablement and support", detail: "Annual, tiered", qty: "1", price: "$0.00" },
+    ],
+    costNote:
+      "Pricing is valid for 30 days and assumes the division count stated above. Added divisions, custom modules, or bespoke integrations are quoted separately.",
+    stats: [
+      { label: "Faster asset turnaround", value: "70", unit: "%" },
+      { label: "Brand compliance on first pass", value: "98", unit: "%" },
+      { label: "Approved modules available", value: "189", unit: "+" },
+    ],
+    quote: {
+      text: "Sales builds its own decks now and design never has to fix them.",
+      author: "Global Brand Director",
+    },
+    nextSteps: [
+      "Confirm divisions, channels, and team sizes",
+      "Approve platform and setup scope in writing",
+      "Rollout kickoff with your enablement lead",
+    ],
+    footerUrl: "transperfect.com",
+    companyName: "TransPerfect Element",
+  },
 ];
 
 function seedFor(d: DivisionProposal): SolutionProposalSeed {
@@ -481,7 +690,7 @@ function seedFor(d: DivisionProposal): SolutionProposalSeed {
         label: "Prepared by:",
         contact: "Account Director",
         role: "Title",
-        company: "TransPerfect",
+        company: d.companyName ?? "TransPerfect",
         address1: "1250 Broadway, 32nd Floor",
         address2: "New York, NY 10001",
         email: "proposals@transperfect.com",
