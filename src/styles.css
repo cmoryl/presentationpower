@@ -1486,3 +1486,45 @@ body.export-mode [data-print-surface] {
     min-height: 44px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Marketing showreel — continuous horizontal drift for the capability marquee
+   and a soft accent-bloom pulse behind the collage. Both are compositor-only
+   (transform / opacity) and disabled under prefers-reduced-motion.
+--------------------------------------------------------------------------- */
+@keyframes el-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.el-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: el-marquee 38s linear infinite;
+}
+.el-marquee-track:hover {
+  animation-play-state: paused;
+}
+@keyframes el-bloom {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.12);
+  }
+}
+.el-bloom {
+  animation: el-bloom 9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .el-marquee-track,
+  .el-bloom {
+    animation: none;
+  }
+}

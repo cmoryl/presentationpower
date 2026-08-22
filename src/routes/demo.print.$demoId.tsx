@@ -134,7 +134,7 @@ function PrintDemoPage() {
           alt={art.alt}
           width={1536}
           height={1024}
-          className="h-[300px] w-full object-cover sm:h-[380px]"
+          className="tp-kenburns h-[300px] w-full object-cover sm:h-[440px]"
         />
         <div
           aria-hidden

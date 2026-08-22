@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ShowcaseGallery } from "@/components/home/ShowcaseGallery";
+import { ElementShowreel } from "@/components/home/ElementShowreel";
+
 import { HomeHeroVideo } from "@/components/home/HomeHeroVideo";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -561,8 +563,12 @@ function Dashboard() {
       </section>
 
 
+      {/* ================= SHOWREEL ================= */}
+      <ElementShowreel />
+
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
+
 
       {/* ================= RECENT ACTIVITY ================= */}
       <RecentActivity
