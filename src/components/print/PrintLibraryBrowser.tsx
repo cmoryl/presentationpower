@@ -37,6 +37,8 @@ import {
   subsectionsFor,
 } from "@/lib/print-library/subsections";
 import { editableContextFor, toEditableContent } from "@/lib/print-library/editable";
+import { useDivisionSeed } from "@/lib/division-seeds";
+import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-apply";
 import { applyLibraryOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import { useIsAdmin } from "@/lib/use-is-admin";
 import type { BrandMode } from "@/lib/taxonomy";
