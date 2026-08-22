@@ -781,19 +781,21 @@ function Library() {
         <HeroVideoLayer src={heroPresentationVideo.url} opacity={0.55} tint="#FFFFFF" />
         <div className="relative z-10 mx-auto max-w-[1400px]">
           <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
-            Library
+            Element · Presentation
           </div>
           <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Approved module variants.
+            Slides that are already on brand.
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-            Search and preview the modules the assembler pulls from. Scope by brand to hide
-            off-limits families.{" "}
+            Browse the ready-made slide designs Element builds your decks from — every one approved,
+            every one live in your brand's colors and type. Choose a division to see only what you're
+            cleared to use, or open{" "}
             <Link to="/library/imported" className="underline hover:text-[#003FC7]">
-              Imported slides
+              imported slides
             </Link>{" "}
-            holds freshly staged PPTX.
+            to pick up a deck you brought in.
           </p>
+
           <div className="mt-5">
             <LibrarySubnav active="/library" />
           </div>
