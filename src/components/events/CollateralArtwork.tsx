@@ -52,7 +52,13 @@ export type ArtKind =
   | "bottle"
   | "stickers"
   | "video"
-  | "video-vertical";
+  | "video-vertical"
+  // Social / digital-native trims. These are used by the social playbook
+  // demos, where every card must render an asset rather than a blank tile.
+  | "social-square"
+  | "social-story"
+  | "social-wide"
+  | "signature-strip";
 
 const SIZES: Record<ArtKind, { w: number; h: number }> = {
   badge: { w: 700, h: 900 },
