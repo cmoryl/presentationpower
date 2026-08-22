@@ -12,6 +12,8 @@ import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
+import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { resolveSlideTransition, type DeckSlide } from "@/lib/deck-store";
