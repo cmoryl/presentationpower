@@ -93,11 +93,49 @@ export function industryPhotoUrl(
   return set[fam];
 }
 
+/**
+ * OnDeck core / approved language packs (S01–S28) carry no industry of their
+ * own, so they used to fall back to generated CSS grounds while the industry
+ * recipes ran photoreal plates — two visibly different production standards in
+ * one library. Each core skin now borrows a plate set deterministically from
+ * the photoreal kit, filtered to plates that match the pack's own light/dark
+ * mode so ink contrast is preserved. Element skins (S29/S30) keep their own
+ * authored KO Power plates and are never remapped here.
+ */
+const CORE_SKIN = /^S(?:0[1-9]|1\d|2[0-8])$/;
+
+function hash(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i += 1) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
+}
+
+/** The plate-kit code a pack should paint from ("S07" → a mode-matched R code). */
+export function photoCodeForPack(
+  code: string | null | undefined,
+  mode: PhotoMode,
+): string | null {
+  const up = (code ?? "").toUpperCase();
+  if (!up) return null;
+  if (INDUSTRY_PHOTO[up]) return up;
+  if (!CORE_SKIN.test(up)) return null;
+  const pool = Object.keys(INDUSTRY_PHOTO)
+    .filter((k) => INDUSTRY_PHOTO[k]!.mode === mode)
+    .sort();
+  if (!pool.length) return null;
+  return pool[hash(up) % pool.length]!;
+}
+
 /** Wrap a pack so its industry photo plate paints as the ground. */
 export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
-  const set = code ? INDUSTRY_PHOTO[code.toUpperCase()] : undefined;
-  if (!set) return pack;
+  const plateCode = photoCodeForPack(code, pack.mode === "dark" ? "dark" : "light");
+  const set = plateCode ? INDUSTRY_PHOTO[plateCode] : undefined;
+  if (!set || !plateCode) return pack;
   const base = pack.ground;
+
   // Finished photographs: the veil only carries copy contrast, never hides art.
   const veil =
     set.mode === "dark"
