@@ -242,7 +242,8 @@ export function CollateralGrid({
         <div className="space-y-8">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1 rounded-full border border-[#A6FA87]/40 bg-[#A6FA8722] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-widest text-[#2F6D1B]">
-              <CircleCheck size={12} /> Rendering live now
+              <CircleCheck size={12} />{" "}
+              {allRendered ? "Every piece rendered" : "Rendering live now"}
             </span>
             <div className="h-px flex-1 bg-black/10" />
           </div>
