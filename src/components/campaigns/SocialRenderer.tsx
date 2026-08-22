@@ -24,7 +24,6 @@ import type { CampaignCopy, EventFacts } from "@/lib/campaigns";
 import { resolveSocialStyle, type SocialStyleId } from "@/lib/social-styles";
 import { statGradient } from "@/lib/stat-contrast";
 
-
 type Preset = {
   padPct: number;
   eyebrowPct: number;
@@ -37,8 +36,26 @@ type Preset = {
 };
 
 // Percentages are fractions of the frame's shorter edge (min(w, h)) so a
-// story and a square use compatible units.
+// story and a square use compatible units. The aspect class sets the base and
+// the format's own `tune` (per-platform preset) is merged on top, so two 9:16
+// frames with different chrome budgets still size type and imagery correctly.
 function presetFor(format: SocialFormat): Preset {
+  const base = basePresetFor(format);
+  const t = format.tune;
+  if (!t) return base;
+  return {
+    padPct: t.padPct ?? base.padPct,
+    eyebrowPct: t.eyebrowPct ?? base.eyebrowPct,
+    titlePct: t.titlePct ?? base.titlePct,
+    summaryPct: t.summaryPct ?? base.summaryPct,
+    ctaPct: t.ctaPct ?? base.ctaPct,
+    align: t.align ?? base.align,
+    showSummary: t.showSummary ?? base.showSummary,
+    lockupSize: t.lockupSize ?? base.lockupSize,
+  };
+}
+
+function basePresetFor(format: SocialFormat): Preset {
   switch (aspectClass(format)) {
     case "landscape-wide":
       return {
@@ -172,7 +189,6 @@ function StatFigure({
         border: "none",
       }}
     >
-
       {pct !== null ? (
         <div className="relative shrink-0" style={{ width: ring, height: ring }}>
           <svg width={ring} height={ring} viewBox={`0 0 ${ring} ${ring}`} aria-hidden="true">
@@ -205,7 +221,6 @@ function StatFigure({
               letterSpacing: "-0.03em",
               ...figureFill(accent, mode),
             }}
-
           >
             {Math.round(pct)}%
           </span>
@@ -232,7 +247,6 @@ function StatFigure({
               letterSpacing: "-0.045em",
               ...figureFill(accent, mode),
             }}
-
           >
             {display}
           </span>
@@ -284,7 +298,13 @@ function tintRgba(color: string, alpha: number): string {
   const hex = color.trim();
   if (hex.startsWith("#")) {
     const h = hex.slice(1);
-    const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+    const full =
+      h.length === 3
+        ? h
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : h;
     const n = parseInt(full.slice(0, 6), 16);
     if (!Number.isNaN(n)) {
       return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
@@ -302,7 +322,11 @@ function tintRgba(color: string, alpha: number): string {
  *  Stops are contrast-checked against the backdrop by `statGradient`, so a
  *  low-contrast division accent is automatically lifted (dark mode) or
  *  deepened (light mode) instead of rendering unreadable. */
-function accentGradient(accent: string, angle = "100deg", mode: "light" | "dark" = "light"): string {
+function accentGradient(
+  accent: string,
+  angle = "100deg",
+  mode: "light" | "dark" = "light",
+): string {
   return statGradient(accent, mode, angle).backgroundImage;
 }
 
@@ -320,8 +344,7 @@ function figureFill(accent: string, mode: "light" | "dark", angle = "100deg") {
 }
 
 /** Matches figures inside running copy: 40%, 3.5x, $2M, 1,200+, 24/7, 10× … */
-const FIGURE_RE =
-  /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
+const FIGURE_RE = /((?:[$€£¥]\s?)?\d[\d.,]*(?:\s?(?:%|percent|x|×|k|K|M|B|bn|\+|\/\d+))?)/g;
 
 /** Renders text with every statistic / percentage lifted in the division
  *  accent as a gradient fill ON the characters. No gradient background,
@@ -350,7 +373,6 @@ function AccentFigures({
               letterSpacing: "-0.02em",
               ...figureFill(accent, mode),
             }}
-
           >
             {part}
           </span>
@@ -359,9 +381,6 @@ function AccentFigures({
     </>
   );
 }
-
-
-
 
 export type SocialRendererProps = {
   format: SocialFormat;
@@ -400,16 +419,19 @@ export function SocialRenderer({
   facts,
   imageUrl,
   imageScrimPct = 55,
-  imageLayout = "bleed",
+  imageLayout: imageLayoutProp,
 
   styleId,
   eventLogo,
   displayShortEdge = 320,
 }: SocialRendererProps) {
-
   const brand = findBrand(brandId);
   const preset = presetFor(format);
+  const tune = format.tune ?? {};
+  // The caller wins; otherwise the platform preset decides bleed vs panel.
+  const imageLayout = imageLayoutProp ?? tune.imageLayout ?? "bleed";
   const style = resolveSocialStyle(styleId);
+
   const short = Math.min(format.width, format.height);
   const scale = displayShortEdge / short;
   const wrapperStyle: CSSProperties = {
@@ -455,7 +477,16 @@ export function SocialRenderer({
   // Nudge the crop away from the copy band on tall frames, where object-cover
   // has the most vertical slack to give.
   const focalYAdjusted =
-    cls === "portrait-tall" ? (copyAlign === "end" ? 26 : 74) : focalY;
+    tune.focalYPct != null
+      ? copyAlign === "end"
+        ? tune.focalYPct
+        : 100 - tune.focalYPct
+      : cls === "portrait-tall"
+        ? copyAlign === "end"
+          ? 26
+          : 74
+        : focalY;
+
   const objectPosition = `center ${focalYAdjusted}%`;
 
   // ---- Panel composition ---------------------------------------------------
@@ -508,34 +539,43 @@ export function SocialRenderer({
   // Wide frames also thirds horizontally — copy occupies two thirds, the
   // subject's third stays clear.
   const copyMaxWidth = panelMode
-    ? (format.width - contentInset.left - contentInset.right) *
-      (panelSide === "top" ? 0.82 : 1)
+    ? (format.width - contentInset.left - contentInset.right) * (panelSide === "top" ? 0.82 : 1)
     : bleedImage && (cls === "landscape-wide" || cls === "landscape")
       ? format.width * 0.66
       : format.width * 0.92;
 
-
   // Photography competes with type, so tighten the stack when an image is on.
   // Wide frames give the copy the least room, so they shrink hardest — a
   // clipped half-sentence reads worse than slightly smaller type.
-  const copyScale = bleedImage
-    ? cls === "landscape-wide"
-      ? 0.8
-      : 0.9
-    : panelMode
+  // Safe-area fit: when platform chrome eats a big slice of the frame (TikTok
+  // rails, YouTube channel-art centre band, LinkedIn banners) the usable box is
+  // much smaller than the frame, so the whole stack scales with it instead of
+  // spilling out of the safe rect.
+  const usableW = format.width - safeInset.left - safeInset.right;
+  const usableH = format.height - safeInset.top - safeInset.bottom;
+  const safeFit = Math.min(
+    1,
+    Math.max(0.62, Math.min(usableW / format.width, usableH / format.height) / 0.8),
+  );
+  const copyScale =
+    (bleedImage
       ? cls === "landscape-wide"
-        ? 0.74
-        : 0.86
-      : 1;
+        ? 0.8
+        : 0.9
+      : panelMode
+        ? cls === "landscape-wide"
+          ? 0.74
+          : 0.86
+        : 1) *
+    (tune.copyScaleMul ?? 1) *
+    safeFit;
   const titleLines =
-    cls === "landscape-wide" ? (imageUrl ? 3 : 2) : panelMode ? 4 : imageUrl ? 3 : 4;
-
-
+    tune.titleLines ??
+    (cls === "landscape-wide" ? (imageUrl ? 3 : 2) : panelMode ? 4 : imageUrl ? 3 : 4);
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
   const showEyebrow = aspectClass(format) !== "landscape-wide" && style.eyebrow !== "hidden";
   const showCta = copy.cta && aspectClass(format) !== "landscape-wide";
-
 
   // ---- Copy plate, per template style -------------------------------------
   const hairline =
@@ -612,29 +652,29 @@ export function SocialRenderer({
             paddingBottom: (short * 5) / 100 + bleedBottom,
           }
         : style.plate === "solid"
-        ? {
-            background: mode === "dark" ? "rgba(3,0,44,0.88)" : "rgba(255,255,255,0.92)",
-            boxShadow: "0 10px 30px rgba(3,0,44,0.18)",
-          }
-        : style.plate === "band"
           ? {
-              background: mode === "dark" ? "rgba(3,0,44,0.42)" : "rgba(255,255,255,0.48)",
-              backdropFilter: "blur(18px) saturate(140%)",
+              background: mode === "dark" ? "rgba(3,0,44,0.88)" : "rgba(255,255,255,0.92)",
+              boxShadow: "0 10px 30px rgba(3,0,44,0.18)",
             }
-          : style.plateFullBleed
+          : style.plate === "band"
             ? {
-                // Plate-less: a soft brand gradient rising behind the copy does
-                // the offsetting instead of a panel, so the photo stays whole.
-                background:
-                  mode === "dark"
-                    ? copyAlign === "end"
-                      ? "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
-                      : "linear-gradient(0deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
-                    : copyAlign === "end"
-                      ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)"
-                      : "linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)",
+                background: mode === "dark" ? "rgba(3,0,44,0.42)" : "rgba(255,255,255,0.48)",
+                backdropFilter: "blur(18px) saturate(140%)",
               }
-            : { background: "transparent" };
+            : style.plateFullBleed
+              ? {
+                  // Plate-less: a soft brand gradient rising behind the copy does
+                  // the offsetting instead of a panel, so the photo stays whole.
+                  background:
+                    mode === "dark"
+                      ? copyAlign === "end"
+                        ? "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
+                        : "linear-gradient(0deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.34) 45%, rgba(3,0,44,0.62) 100%)"
+                      : copyAlign === "end"
+                        ? "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)"
+                        : "linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.48) 45%, rgba(255,255,255,0.78) 100%)",
+                }
+              : { background: "transparent" };
   const accent: CSSProperties = style.accentRule
     ? style.plateFullBleed
       ? { borderTop: `${accentRuleWidth}px solid ${brand.tokens.accent}` }
@@ -648,8 +688,11 @@ export function SocialRenderer({
   // element that holds the text fades and softens the text itself. So split
   // the plate into layout (stays on the copy container) and fill (rendered as
   // a z-index:-1 layer inside an isolated stacking context).
-  const { paddingTop: fillPadTop, paddingBottom: fillPadBottom, ...plateFillPaint } =
-    plateFill as CSSProperties & { paddingTop?: number; paddingBottom?: number };
+  const {
+    paddingTop: fillPadTop,
+    paddingBottom: fillPadBottom,
+    ...plateFillPaint
+  } = plateFill as CSSProperties & { paddingTop?: number; paddingBottom?: number };
   const plateStyle: CSSProperties = {
     ...plateBase,
     ...(fillPadTop !== undefined ? { paddingTop: fillPadTop } : null),
@@ -678,8 +721,6 @@ export function SocialRenderer({
       : style.lockup === "bottom-right"
         ? { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
         : { top: safeInset.top, right: safeInset.right, transformOrigin: "top right" };
-
-
 
   return (
     <div
@@ -738,7 +779,6 @@ export function SocialRenderer({
                       : `linear-gradient(0deg, rgba(255,255,255,${(scrim / 100) * 0.12}) 0%, rgba(255,255,255,${(scrim / 100) * 0.22}) 40%, rgba(255,255,255,${Math.min(1, (scrim / 100) * 0.55 + 0.08)}) 100%)`,
               }}
             />
-
           </>
         ) : null}
 
@@ -751,9 +791,7 @@ export function SocialRenderer({
               ...panelRect,
               borderRadius: (short * 3.4) / 100,
               boxShadow:
-                mode === "dark"
-                  ? "0 18px 46px rgba(0,0,0,0.42)"
-                  : "0 18px 40px rgba(3,0,44,0.16)",
+                mode === "dark" ? "0 18px 46px rgba(0,0,0,0.42)" : "0 18px 40px rgba(3,0,44,0.16)",
             }}
           >
             <img
@@ -789,163 +827,152 @@ export function SocialRenderer({
             color: inkColor,
           }}
         >
-        <div
-          className="flex flex-col"
-          style={{
-            gap: (short * 2.4 * copyScale) / 100,
-            // NOTE: width is constrained on the text itself, not here — the
-            // plate still needs to bleed full width on full-bleed styles.
-
-            // Soft guide, not a clip: the per-element line clamps do the
-            // bounding, so copy never gets sliced through a line of text.
-            minHeight: 0,
-
-            ...(bleedImage ? plateStyle : null),
-          }}
-        >
-          {bleedImage ? <div aria-hidden style={plateFillStyle} /> : null}
-
-
-
-
-
-          {showEyebrow && copy.eyebrow && (
-            <div
-              style={
-                style.eyebrow === "pill"
-                  ? {
-                      alignSelf: "flex-start",
-                      fontSize: (short * preset.eyebrowPct * 0.95) / 100,
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      fontWeight: 700,
-                      color: inkColor,
-                      background: chipBg,
-                      border: chipBorder,
-                      borderRadius: 9999,
-                      padding: `${(short * 0.9) / 100}px ${(short * 1.8) / 100}px`,
-                    }
-                  : {
-                      fontSize: (short * preset.eyebrowPct) / 100,
-                      letterSpacing: "0.18em",
-                      textTransform: "uppercase",
-                      fontWeight: 600,
-                      color: dimColor,
-                    }
-              }
-            >
-              <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} mode={mode} />
-            </div>
-          )}
-
           <div
+            className="flex flex-col"
             style={{
-              fontSize: (short * preset.titlePct * style.titleScale * copyScale) / 100,
-              lineHeight: style.titleUppercase ? 1.06 : 1.04,
-              letterSpacing: style.titleTracking,
-              fontWeight: style.titleWeight,
-              textTransform: style.titleUppercase ? "uppercase" : "none",
-              maxWidth: copyMaxWidth,
-              display: "-webkit-box",
-              WebkitLineClamp: titleLines,
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
+              gap: (short * 2.4 * copyScale) / 100,
+              // NOTE: width is constrained on the text itself, not here — the
+              // plate still needs to bleed full width on full-bleed styles.
+
+              // Soft guide, not a clip: the per-element line clamps do the
+              // bounding, so copy never gets sliced through a line of text.
+              minHeight: 0,
+
+              ...(bleedImage ? plateStyle : null),
             }}
           >
-            <AccentFigures text={copy.title} accent={brand.tokens.accent} mode={mode} />
-          </div>
+            {bleedImage ? <div aria-hidden style={plateFillStyle} /> : null}
 
+            {showEyebrow && copy.eyebrow && (
+              <div
+                style={
+                  style.eyebrow === "pill"
+                    ? {
+                        alignSelf: "flex-start",
+                        fontSize: (short * preset.eyebrowPct * 0.95) / 100,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        fontWeight: 700,
+                        color: inkColor,
+                        background: chipBg,
+                        border: chipBorder,
+                        borderRadius: 9999,
+                        padding: `${(short * 0.9) / 100}px ${(short * 1.8) / 100}px`,
+                      }
+                    : {
+                        fontSize: (short * preset.eyebrowPct) / 100,
+                        letterSpacing: "0.18em",
+                        textTransform: "uppercase",
+                        fontWeight: 600,
+                        color: dimColor,
+                      }
+                }
+              >
+                <AccentFigures text={copy.eyebrow} accent={brand.tokens.accent} mode={mode} />
+              </div>
+            )}
 
-          {preset.showSummary && copy.summary && (
             <div
               style={{
-                fontSize: (short * preset.summaryPct * copyScale) / 100,
-                lineHeight: 1.28,
-                color: dimColor,
+                fontSize: (short * preset.titlePct * style.titleScale * copyScale) / 100,
+                lineHeight: style.titleUppercase ? 1.06 : 1.04,
+                letterSpacing: style.titleTracking,
+                fontWeight: style.titleWeight,
+                textTransform: style.titleUppercase ? "uppercase" : "none",
                 maxWidth: copyMaxWidth,
                 display: "-webkit-box",
-                WebkitLineClamp: imageUrl ? 2 : 3,
+                WebkitLineClamp: titleLines,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
               }}
             >
-              <AccentFigures text={copy.summary} accent={brand.tokens.accent} mode={mode} />
+              <AccentFigures text={copy.title} accent={brand.tokens.accent} mode={mode} />
             </div>
-          )}
 
-          {copy.stat && (
-            <StatFigure
-              value={copy.stat.value}
-              label={copy.stat.label}
-              short={short}
-              accent={brand.tokens.accent}
-              inkColor={inkColor}
-              dimColor={dimColor}
-              chipBg={chipBg}
-              chipBorder={chipBorder}
-              valuePx={(short * preset.titlePct * 0.78 * copyScale) / 100}
-              labelPx={(short * preset.summaryPct * 0.92 * copyScale) / 100}
-              mode={mode}
-            />
-
-          )}
-
-          <div
-            className="flex flex-wrap items-center gap-3"
-            style={{ marginTop: (short * 1.6) / 100 }}
-          >
-            {showCta && (
-              <span
-                style={
-                  style.cta === "underline"
-                    ? {
-                        fontSize: (short * preset.ctaPct) / 100,
-                        paddingBottom: (short * 0.5) / 100,
-                        borderBottom: `${Math.max(1.5, (short * 0.35) / 100)}px solid ${brand.tokens.accent}`,
-                        color: inkColor,
-                        fontWeight: 600,
-                        letterSpacing: "0.02em",
-                      }
-                    : {
-                        fontSize: (short * preset.ctaPct) / 100,
-                        padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
-                        borderRadius: style.cta === "block" ? (short * 0.6) / 100 : 9999,
-                        background: brand.tokens.accent,
-                        color: "#03002C",
-                        fontWeight: style.cta === "block" ? 700 : 600,
-                        letterSpacing: "0.02em",
-                      }
-                }
-              >
-                {copy.cta}
-              </span>
-            )}
-            {facts?.hashtag && (
-              <span
+            {preset.showSummary && copy.summary && (
+              <div
                 style={{
-                  fontSize: (short * preset.ctaPct * 0.95) / 100,
-                  padding: `${(short * 1) / 100}px ${(short * 1.8) / 100}px`,
-                  borderRadius: 9999,
-                  background: chipBg,
-                  border: chipBorder,
-                  color: inkColor,
+                  fontSize: (short * preset.summaryPct * copyScale) / 100,
+                  lineHeight: 1.28,
+                  color: dimColor,
+                  maxWidth: copyMaxWidth,
+                  display: "-webkit-box",
+                  WebkitLineClamp: imageUrl ? 2 : 3,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
                 }}
               >
-                {facts.hashtag}
-              </span>
+                <AccentFigures text={copy.summary} accent={brand.tokens.accent} mode={mode} />
+              </div>
             )}
+
+            {copy.stat && (
+              <StatFigure
+                value={copy.stat.value}
+                label={copy.stat.label}
+                short={short}
+                accent={brand.tokens.accent}
+                inkColor={inkColor}
+                dimColor={dimColor}
+                chipBg={chipBg}
+                chipBorder={chipBorder}
+                valuePx={(short * preset.titlePct * 0.78 * copyScale) / 100}
+                labelPx={(short * preset.summaryPct * 0.92 * copyScale) / 100}
+                mode={mode}
+              />
+            )}
+
+            <div
+              className="flex flex-wrap items-center gap-3"
+              style={{ marginTop: (short * 1.6) / 100 }}
+            >
+              {showCta && (
+                <span
+                  style={
+                    style.cta === "underline"
+                      ? {
+                          fontSize: (short * preset.ctaPct) / 100,
+                          paddingBottom: (short * 0.5) / 100,
+                          borderBottom: `${Math.max(1.5, (short * 0.35) / 100)}px solid ${brand.tokens.accent}`,
+                          color: inkColor,
+                          fontWeight: 600,
+                          letterSpacing: "0.02em",
+                        }
+                      : {
+                          fontSize: (short * preset.ctaPct) / 100,
+                          padding: `${(short * 1.2) / 100}px ${(short * 2.2) / 100}px`,
+                          borderRadius: style.cta === "block" ? (short * 0.6) / 100 : 9999,
+                          background: brand.tokens.accent,
+                          color: "#03002C",
+                          fontWeight: style.cta === "block" ? 700 : 600,
+                          letterSpacing: "0.02em",
+                        }
+                  }
+                >
+                  {copy.cta}
+                </span>
+              )}
+              {facts?.hashtag && (
+                <span
+                  style={{
+                    fontSize: (short * preset.ctaPct * 0.95) / 100,
+                    padding: `${(short * 1) / 100}px ${(short * 1.8) / 100}px`,
+                    borderRadius: 9999,
+                    background: chipBg,
+                    border: chipBorder,
+                    color: inkColor,
+                  }}
+                >
+                  {facts.hashtag}
+                </span>
+              )}
+            </div>
           </div>
         </div>
-        </div>
-
 
         {/* Lockup — corner set by the template style, inside the safe area,
             ~15% larger for stronger brand presence across all formats. */}
-        <div
-          className="absolute"
-          style={{ ...lockupPos, transform: "scale(1.15)" }}
-        >
-
+        <div className="absolute" style={{ ...lockupPos, transform: "scale(1.15)" }}>
           {eventLogo ? (
             <img
               src={mode === "dark" ? (eventLogo.urlDark ?? eventLogo.url) : eventLogo.url}
@@ -1048,13 +1075,14 @@ function DesignGround({
           between the wordmark and the copy stack so it never sits under type. */}
       <div
         className="absolute flex"
-        style={{
-          gap: unit * 0.42,
-          left: unit * 1.4,
-          [copyAlign === "end" ? "top" : "bottom"]: wide ? "34%" : "30%",
-        } as CSSProperties}
+        style={
+          {
+            gap: unit * 0.42,
+            left: unit * 1.4,
+            [copyAlign === "end" ? "top" : "bottom"]: wide ? "34%" : "30%",
+          } as CSSProperties
+        }
       >
-
         {Array.from({ length: bricks }).map((_, i) => (
           <span
             key={i}
@@ -1075,14 +1103,16 @@ function DesignGround({
       {/* Corner rule — a single confident line closing the composition. */}
       <div
         className="absolute"
-        style={{
-          right: 0,
-          [copyAlign === "end" ? "top" : "bottom"]: 0,
-          width: wide ? short * 0.5 : short * 0.34,
-          height: Math.max(2, (short * 0.5) / 100),
-          background: `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${accent} 100%)`,
-          opacity: mode === "dark" ? 0.85 : 0.7,
-        } as CSSProperties}
+        style={
+          {
+            right: 0,
+            [copyAlign === "end" ? "top" : "bottom"]: 0,
+            width: wide ? short * 0.5 : short * 0.34,
+            height: Math.max(2, (short * 0.5) / 100),
+            background: `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${accent} 100%)`,
+            opacity: mode === "dark" ? 0.85 : 0.7,
+          } as CSSProperties
+        }
       />
     </div>
   );

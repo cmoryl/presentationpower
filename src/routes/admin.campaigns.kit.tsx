@@ -17,6 +17,7 @@ import { useFavorites } from "@/lib/favorites";
 import { byId, MODULE_VARIANTS, BRAND_MODES } from "@/lib/taxonomy";
 import {
   SOCIAL_FORMATS_BY_ID,
+  PLATFORM_LABELS,
   KIT_PROFILES,
   aspectClass,
   type SocialFormat,
@@ -304,27 +305,43 @@ function KitBuilderInner() {
           <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-black/50">
             Formats in this kit ({formatIds.length})
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {Object.values(SOCIAL_FORMATS_BY_ID).map((f) => {
-              const on = formatIds.includes(f.id);
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => toggleFormat(f.id)}
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] transition ${
-                    on
-                      ? "border-[#03002C] bg-[#03002C] text-white"
-                      : "border-black/15 bg-white text-black/60 hover:border-black/40"
-                  }`}
-                >
-                  <span>{f.label}</span>
-                  <span className="text-[10px] opacity-70">
-                    {f.width}×{f.height}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="space-y-3">
+            {Object.entries(
+              Object.values(SOCIAL_FORMATS_BY_ID).reduce<
+                Record<string, (typeof SOCIAL_FORMATS_BY_ID)[string][]>
+              >((acc, f) => {
+                (acc[f.platform] ??= []).push(f);
+                return acc;
+              }, {}),
+            ).map(([platform, list]) => (
+              <div key={platform} className="min-w-0">
+                <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
+                  {PLATFORM_LABELS[platform as keyof typeof PLATFORM_LABELS] ?? platform}
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {list.map((f) => {
+                    const on = formatIds.includes(f.id);
+                    return (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => toggleFormat(f.id)}
+                        className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] transition ${
+                          on
+                            ? "border-[#03002C] bg-[#03002C] text-white"
+                            : "border-black/15 bg-white text-black/60 hover:border-black/40"
+                        }`}
+                      >
+                        <span>{f.label}</span>
+                        <span className="text-[10px] opacity-70">
+                          {f.width}×{f.height}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </AdminSection>
@@ -758,7 +775,6 @@ function WizardFlow(p: WizardProps) {
               }
             />
             <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
-
               <div className="sm:col-span-2">
                 <TextField
                   label="Headline (required)"

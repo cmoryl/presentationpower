@@ -53,6 +53,21 @@ type Preset = {
 };
 
 function presetFor(format: SocialFormat): Preset {
+  const base = basePresetFor(format);
+  const t = format.tune;
+  if (!t) return base;
+  return {
+    ...base,
+    padPct: t.padPct ?? base.padPct,
+    eyebrowPct: t.eyebrowPct ?? base.eyebrowPct,
+    titlePct: t.titlePct ?? base.titlePct,
+    summaryPct: t.summaryPct ?? base.summaryPct,
+    ctaPct: t.ctaPct ?? base.ctaPct,
+    showSummary: t.showSummary ?? base.showSummary,
+  };
+}
+
+function basePresetFor(format: SocialFormat): Preset {
   switch (aspectClass(format)) {
     case "landscape-wide":
       return {
@@ -134,7 +149,6 @@ export function NextRenderer({
   imageScrimPct = 62,
   displayShortEdge = 320,
 }: NextRendererProps) {
-
   const track = getNextDivision(trackId) ?? NEXT_DIVISIONS[0];
   const accent = track.accentArtwork || track.accent;
   const ground = groundFor(track.id);
@@ -193,7 +207,6 @@ export function NextRenderer({
             />
           </>
         ) : null}
-
 
         {/* Accent glow — NEXT ground is flat navy with one soft track-colour bloom */}
         <div
