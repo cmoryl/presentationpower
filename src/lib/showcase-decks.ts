@@ -119,6 +119,18 @@ function buildGlobalLinkPitch(): TemplatePayload {
       notes: "Architecture without the diagram — four nouns your CFO can repeat.",
     },
     {
+      sectionId: "SF-07",
+      variantId: "MV-IMG-SPLIT",
+      layoutId: "LF-03",
+      content: {
+        title: "One lane, every market",
+        body: "Connectors publish into a single translation lane the moment merchandising hits save. Nobody chases a file, and no market waits on another market to finish.",
+        caption: "GlobalLink program operations",
+        mediaSeed: "globallink-one-lane",
+      },
+      notes: "Image-forward beat — gives the eye a rest between the model and the numbers.",
+    },
+    {
       sectionId: "SF-08",
       variantId: "MV-PROOF-STATS-4",
       layoutId: "LF-10",
@@ -294,6 +306,18 @@ function buildLifeSciencesProgram(): TemplatePayload {
         ],
       },
       notes: "Four pillars map one-to-one to the SOP annex.",
+    },
+    {
+      sectionId: "SF-07",
+      variantId: "MV-IMG-SPLIT",
+      layoutId: "LF-03",
+      content: {
+        title: "What the review lane looks like",
+        body: "One queue, one memory, one approver per market. Reviewers open the live page in their own language, comment in place, and the change lands back in the master without a single email.",
+        caption: "In-context review, EMEA hub",
+        mediaSeed: "globallink-review-lane",
+      },
+      notes: "Image-forward beat — gives the eye a rest between the model and the numbers.",
     },
     {
       sectionId: "SF-10",
