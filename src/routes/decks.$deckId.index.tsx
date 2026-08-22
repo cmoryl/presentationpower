@@ -41,6 +41,7 @@ import {
 } from "@/components/editor/EditorChrome";
 import { EditorSideRail } from "@/components/editor/UnifiedEditorShell";
 
+import { LiveDemoDeckBar } from "@/components/demo/LiveDemoDeckBar";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
