@@ -28,10 +28,12 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
+import { Route as SocialAgentIndexRouteImport } from './routes/social-agent.index'
 import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
 import { Route as EventsIndexRouteImport } from './routes/events.index'
+import { Route as EventsAgentIndexRouteImport } from './routes/events-agent.index'
 import { Route as DecksIndexRouteImport } from './routes/decks.index'
 import { Route as AgentIndexRouteImport } from './routes/agent.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -41,6 +43,7 @@ import { Route as SocialPresetsRouteImport } from './routes/social.presets'
 import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as SocialModulesRouteImport } from './routes/social.modules'
 import { Route as SocialBannersRouteImport } from './routes/social.banners'
+import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
@@ -57,6 +60,7 @@ import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryI
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
+import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
 import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DevProposalQaRouteImport } from './routes/dev.proposal-qa'
@@ -78,6 +82,7 @@ import { Route as AssetSpotlightPreviewRouteImport } from './routes/asset.spotli
 import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiPrintAgentChatRouteImport } from './routes/api/print-agent-chat'
+import { Route as ApiKitAgentChatRouteImport } from './routes/api/kit-agent-chat'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
 import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
@@ -236,6 +241,11 @@ const SocialIndexRoute = SocialIndexRouteImport.update({
   path: '/',
   getParentRoute: () => SocialRoute,
 } as any)
+const SocialAgentIndexRoute = SocialAgentIndexRouteImport.update({
+  id: '/social-agent/',
+  path: '/social-agent/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
   id: '/print-agent/',
   path: '/print-agent/',
@@ -255,6 +265,11 @@ const EventsIndexRoute = EventsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => EventsRoute,
+} as any)
+const EventsAgentIndexRoute = EventsAgentIndexRouteImport.update({
+  id: '/events-agent/',
+  path: '/events-agent/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DecksIndexRoute = DecksIndexRouteImport.update({
   id: '/decks/',
@@ -300,6 +315,11 @@ const SocialBannersRoute = SocialBannersRouteImport.update({
   id: '/banners',
   path: '/banners',
   getParentRoute: () => SocialRoute,
+} as any)
+const SocialAgentThreadIdRoute = SocialAgentThreadIdRouteImport.update({
+  id: '/social-agent/$threadId',
+  path: '/social-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
@@ -381,6 +401,11 @@ const EventsNewRoute = EventsNewRouteImport.update({
   id: '/new',
   path: '/new',
   getParentRoute: () => EventsRoute,
+} as any)
+const EventsAgentThreadIdRoute = EventsAgentThreadIdRouteImport.update({
+  id: '/events-agent/$threadId',
+  path: '/events-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DevUxDebugRoute = DevUxDebugRouteImport.update({
   id: '/dev/ux-debug',
@@ -485,6 +510,11 @@ const AssetAssetIdRoute = AssetAssetIdRouteImport.update({
 const ApiPrintAgentChatRoute = ApiPrintAgentChatRouteImport.update({
   id: '/api/print-agent-chat',
   path: '/api/print-agent-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiKitAgentChatRoute = ApiKitAgentChatRouteImport.update({
+  id: '/api/kit-agent-chat',
+  path: '/api/kit-agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiChatRoute = ApiChatRouteImport.update({
@@ -860,6 +890,7 @@ export interface FileRoutesByFullPath {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -881,6 +912,7 @@ export interface FileRoutesByFullPath {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
+  '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -897,6 +929,7 @@ export interface FileRoutesByFullPath {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -906,10 +939,12 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
+  '/events-agent/': typeof EventsAgentIndexRoute
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -989,6 +1024,7 @@ export interface FileRoutesByTo {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -1010,6 +1046,7 @@ export interface FileRoutesByTo {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
+  '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -1026,6 +1063,7 @@ export interface FileRoutesByTo {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1035,10 +1073,12 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/agent': typeof AgentIndexRoute
   '/decks': typeof DecksIndexRoute
+  '/events-agent': typeof EventsAgentIndexRoute
   '/events': typeof EventsIndexRoute
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
   '/print-agent': typeof PrintAgentIndexRoute
+  '/social-agent': typeof SocialAgentIndexRoute
   '/social': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1123,6 +1163,7 @@ export interface FileRoutesById {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
   '/asset/new': typeof AssetNewRoute
@@ -1144,6 +1185,7 @@ export interface FileRoutesById {
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
+  '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
@@ -1160,6 +1202,7 @@ export interface FileRoutesById {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
   '/social/new': typeof SocialNewRoute
@@ -1169,10 +1212,12 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/agent/': typeof AgentIndexRoute
   '/decks/': typeof DecksIndexRoute
+  '/events-agent/': typeof EventsAgentIndexRoute
   '/events/': typeof EventsIndexRoute
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1258,6 +1303,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1279,6 +1325,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
+    | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1295,6 +1342,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
     | '/social/new'
@@ -1304,10 +1352,12 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/agent/'
     | '/decks/'
+    | '/events-agent/'
     | '/events/'
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1387,6 +1437,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1408,6 +1459,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
+    | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1424,6 +1476,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
     | '/social/new'
@@ -1433,10 +1486,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/agent'
     | '/decks'
+    | '/events-agent'
     | '/events'
     | '/knowledge'
     | '/library'
     | '/print-agent'
+    | '/social-agent'
     | '/social'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1520,6 +1575,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
     | '/asset/new'
@@ -1541,6 +1597,7 @@ export interface FileRouteTypes {
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
     | '/dev/ux-debug'
+    | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
     | '/events/presets'
@@ -1557,6 +1614,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
     | '/social/new'
@@ -1566,10 +1624,12 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/agent/'
     | '/decks/'
+    | '/events-agent/'
     | '/events/'
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1627,6 +1687,7 @@ export interface RootRouteChildren {
   AgentThreadIdRoute: typeof AgentThreadIdRoute
   ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiKitAgentChatRoute: typeof ApiKitAgentChatRoute
   ApiPrintAgentChatRoute: typeof ApiPrintAgentChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
   AssetNewRoute: typeof AssetNewRoute
@@ -1648,6 +1709,7 @@ export interface RootRouteChildren {
   DevProposalQaRoute: typeof DevProposalQaRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
+  EventsAgentThreadIdRoute: typeof EventsAgentThreadIdRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -1656,12 +1718,15 @@ export interface RootRouteChildren {
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  SocialAgentThreadIdRoute: typeof SocialAgentThreadIdRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
   AgentIndexRoute: typeof AgentIndexRoute
   DecksIndexRoute: typeof DecksIndexRoute
+  EventsAgentIndexRoute: typeof EventsAgentIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   PrintAgentIndexRoute: typeof PrintAgentIndexRoute
+  SocialAgentIndexRoute: typeof SocialAgentIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
@@ -1817,6 +1882,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialIndexRouteImport
       parentRoute: typeof SocialRoute
     }
+    '/social-agent/': {
+      id: '/social-agent/'
+      path: '/social-agent'
+      fullPath: '/social-agent/'
+      preLoaderRoute: typeof SocialAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/print-agent/': {
       id: '/print-agent/'
       path: '/print-agent'
@@ -1844,6 +1916,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/'
       preLoaderRoute: typeof EventsIndexRouteImport
       parentRoute: typeof EventsRoute
+    }
+    '/events-agent/': {
+      id: '/events-agent/'
+      path: '/events-agent'
+      fullPath: '/events-agent/'
+      preLoaderRoute: typeof EventsAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/decks/': {
       id: '/decks/'
@@ -1907,6 +1986,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/social/banners'
       preLoaderRoute: typeof SocialBannersRouteImport
       parentRoute: typeof SocialRoute
+    }
+    '/social-agent/$threadId': {
+      id: '/social-agent/$threadId'
+      path: '/social-agent/$threadId'
+      fullPath: '/social-agent/$threadId'
+      preLoaderRoute: typeof SocialAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/share/$token': {
       id: '/share/$token'
@@ -2019,6 +2105,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/new'
       preLoaderRoute: typeof EventsNewRouteImport
       parentRoute: typeof EventsRoute
+    }
+    '/events-agent/$threadId': {
+      id: '/events-agent/$threadId'
+      path: '/events-agent/$threadId'
+      fullPath: '/events-agent/$threadId'
+      preLoaderRoute: typeof EventsAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/dev/ux-debug': {
       id: '/dev/ux-debug'
@@ -2165,6 +2258,13 @@ declare module '@tanstack/react-router' {
       path: '/api/print-agent-chat'
       fullPath: '/api/print-agent-chat'
       preLoaderRoute: typeof ApiPrintAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/kit-agent-chat': {
+      id: '/api/kit-agent-chat'
+      path: '/api/kit-agent-chat'
+      fullPath: '/api/kit-agent-chat'
+      preLoaderRoute: typeof ApiKitAgentChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -2785,6 +2885,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentThreadIdRoute: AgentThreadIdRoute,
   ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiKitAgentChatRoute: ApiKitAgentChatRoute,
   ApiPrintAgentChatRoute: ApiPrintAgentChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
   AssetNewRoute: AssetNewRoute,
@@ -2806,6 +2907,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevProposalQaRoute: DevProposalQaRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
   DevUxDebugRoute: DevUxDebugRoute,
+  EventsAgentThreadIdRoute: EventsAgentThreadIdRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
@@ -2814,12 +2916,15 @@ const rootRouteChildren: RootRouteChildren = {
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,
+  SocialAgentThreadIdRoute: SocialAgentThreadIdRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
   AgentIndexRoute: AgentIndexRoute,
   DecksIndexRoute: DecksIndexRoute,
+  EventsAgentIndexRoute: EventsAgentIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   PrintAgentIndexRoute: PrintAgentIndexRoute,
+  SocialAgentIndexRoute: SocialAgentIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
