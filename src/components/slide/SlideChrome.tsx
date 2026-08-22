@@ -807,11 +807,20 @@ export function SlideFrame({
           const curated = isCuratedGroundPack(pack);
           const groundMask = curated ? undefined : packGroundMask(comp);
           // Depth-of-field for authored photoreal plates under dense modules.
+          const calmBias =
+            comp === "editorial" || comp === "data"
+              ? "left"
+              : comp === "media"
+                ? "right"
+                : comp === "grid"
+                  ? "wide"
+                  : "center";
           const calm = plateCalmFor(
             variant,
             layoutId,
             pack.mode === "dark" ? "dark" : "light",
-            comp.bias,
+            calmBias,
+
           );
 
           return (
