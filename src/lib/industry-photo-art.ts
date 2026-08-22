@@ -159,6 +159,7 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       // member the hash landed on, so a stats module could be grounded with a
       // process plate. Only an explicit `take:` (the backdrop studio asking for
       // an alternate) rotates within the pair.
+      const takeMatch = /take:(\d+)/i.exec(seed);
       const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
       const url = industryPhotoUrl(plateCode, scene, take);
 
