@@ -4854,6 +4854,9 @@ export const useDeckStore = create<DeckState>()(
                 content: structuredClone(s.content),
                 changes: [],
                 notes: s.notes ?? undefined,
+                templateOverride: s.templateOverride
+                  ? structuredClone(s.templateOverride)
+                  : undefined,
               };
             }),
           };
