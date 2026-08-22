@@ -69,7 +69,6 @@ function presetFor(format: SocialFormat): Preset {
 
 function basePresetFor(format: SocialFormat): Preset {
   switch (aspectClass(format)) {
-
     case "landscape-wide":
       return {
         padPct: 5,
@@ -150,7 +149,6 @@ export function NextRenderer({
   imageScrimPct = 62,
   displayShortEdge = 320,
 }: NextRendererProps) {
-
   const track = getNextDivision(trackId) ?? NEXT_DIVISIONS[0];
   const accent = track.accentArtwork || track.accent;
   const ground = groundFor(track.id);
@@ -209,7 +207,6 @@ export function NextRenderer({
             />
           </>
         ) : null}
-
 
         {/* Accent glow — NEXT ground is flat navy with one soft track-colour bloom */}
         <div

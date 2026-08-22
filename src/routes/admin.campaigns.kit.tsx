@@ -18,7 +18,6 @@ import { byId, MODULE_VARIANTS, BRAND_MODES } from "@/lib/taxonomy";
 import {
   SOCIAL_FORMATS_BY_ID,
   PLATFORM_LABELS,
-
   KIT_PROFILES,
   aspectClass,
   type SocialFormat,
@@ -308,13 +307,12 @@ function KitBuilderInner() {
           </div>
           <div className="space-y-3">
             {Object.entries(
-              Object.values(SOCIAL_FORMATS_BY_ID).reduce<Record<string, typeof SOCIAL_FORMATS_BY_ID[string][]>>(
-                (acc, f) => {
-                  (acc[f.platform] ??= []).push(f);
-                  return acc;
-                },
-                {},
-              ),
+              Object.values(SOCIAL_FORMATS_BY_ID).reduce<
+                Record<string, (typeof SOCIAL_FORMATS_BY_ID)[string][]>
+              >((acc, f) => {
+                (acc[f.platform] ??= []).push(f);
+                return acc;
+              }, {}),
             ).map(([platform, list]) => (
               <div key={platform} className="min-w-0">
                 <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-black/40">
@@ -345,7 +343,6 @@ function KitBuilderInner() {
               </div>
             ))}
           </div>
-
         </div>
       </AdminSection>
 
@@ -778,7 +775,6 @@ function WizardFlow(p: WizardProps) {
               }
             />
             <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
-
               <div className="sm:col-span-2">
                 <TextField
                   label="Headline (required)"

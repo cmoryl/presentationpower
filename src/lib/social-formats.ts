@@ -28,7 +28,6 @@ export type FormatPlatform =
   | "whatsapp"
   | "signage";
 
-
 export type SafeArea = {
   /** Fraction of width (0..1) reserved on the left. */
   left?: number;
@@ -79,7 +78,6 @@ export type FormatTune = {
   imageLayout?: "bleed" | "panel";
   /** Vertical crop focus for full-bleed photography, 0..100. */
   focalYPct?: number;
-
 };
 
 function fmt(f: Omit<SocialFormat, "aspect">): SocialFormat {
@@ -422,7 +420,6 @@ export const SOCIAL_FORMATS: SocialFormat[] = [
   }),
 ];
 
-
 export const SOCIAL_FORMATS_BY_ID: Record<string, SocialFormat> = Object.fromEntries(
   SOCIAL_FORMATS.map((f) => [f.id, f]),
 );
@@ -560,4 +557,3 @@ export const PLATFORM_LABELS: Record<FormatPlatform, string> = {
 export function formatsForPlatform(platform: FormatPlatform): SocialFormat[] {
   return SOCIAL_FORMATS.filter((f) => f.platform === platform);
 }
-
