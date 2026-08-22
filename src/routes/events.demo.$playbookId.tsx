@@ -8,7 +8,7 @@
 
 import { AppShell } from "@/components/AppShell";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
   CalendarDays,
@@ -38,6 +38,12 @@ import type { CollateralContext } from "@/components/events/CollateralArtwork";
 import { getDivisionLogos } from "@/lib/division-logos";
 import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
 import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
+import {
+  EVENT_LOOKS,
+  EVENT_LOOKS_BY_ID,
+  eventLookById,
+  eventLookForPlaybook,
+} from "@/lib/event-looks";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
   loader: ({ params }) => {
@@ -104,6 +110,25 @@ function PlaybookDemoView() {
     return trackId ? nextLockupSuite(trackId) : undefined;
   }, [playbook.id, playbook.name]);
 
+  // Art direction for this demo set. Each playbook maps to its own authored
+  // look; the switcher below lets a user retarget the whole set live and the
+  // choice sticks per playbook.
+  const [lookId, setLookId] = useState<string>(() => eventLookForPlaybook(playbook.id).id);
+  useEffect(() => {
+    const stored =
+      typeof window === "undefined"
+        ? null
+        : window.localStorage.getItem(`element:events-demo-look:${playbook.id}`);
+    setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : eventLookForPlaybook(playbook.id).id);
+  }, [playbook.id]);
+  const look = eventLookById(lookId);
+  const pickLook = (id: string) => {
+    setLookId(id);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(`element:events-demo-look:${playbook.id}`, id);
+    }
+  };
+
   const eventLogo = useMemo(
     () =>
       nextSuite
@@ -133,12 +158,13 @@ function PlaybookDemoView() {
       dateLine: d,
       hashtag: playbook.facts.hashtag || "#TransPerfectNEXT",
       url: playbook.facts.registrationUrl || "transperfect.com/next",
-      accent: playbook.accent,
+      accent: look.accent,
       logoWide: nextSuite?.wide ?? { url: wide, ratio: 4.6 },
       logoStacked: nextSuite?.stacked ?? { url: stacked, ratio: 2.1 },
       logoNeedsKnockout: nextSuite ? undefined : !logos?.white,
+      lookId: look.id,
     };
-  }, [nextSuite, playbook]);
+  }, [nextSuite, playbook, look]);
 
   const startDate = playbook.facts.startDate
     ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
@@ -163,7 +189,7 @@ function PlaybookDemoView() {
       <header
         className="relative overflow-hidden rounded-3xl border border-black/10 bg-white/70 p-8 backdrop-blur"
         style={{
-          background: `linear-gradient(120deg, ${playbook.accent}18 0%, rgba(255,255,255,0.65) 55%, ${playbook.accent}08 100%)`,
+          background: `linear-gradient(120deg, ${look.accent}22 0%, rgba(255,255,255,0.66) 52%, ${look.accentAlt}18 100%)`,
         }}
       >
         <div className="grid gap-8 lg:grid-cols-[1.4fr_1fr]">
@@ -226,7 +252,7 @@ function PlaybookDemoView() {
         <div className="mt-6">
           <PlaybookGallery
             playbookId={playbook.id}
-            accent={playbook.accent}
+            accent={look.accent}
             name={playbook.name}
           />
         </div>
@@ -305,18 +331,50 @@ function PlaybookDemoView() {
         <SectionHead
           eyebrow="Live preview"
           title={`${assets.length} rendered assets · light + dark`}
-          desc="Rendered right now from the deterministic pipeline. Configure to swap copy, brand, and cadence."
+          desc="Rendered right now from the deterministic pipeline on this demo set's own art direction. Switch the look to retarget every asset and collateral comp below."
         />
+        <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Demo look &amp; feel
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {EVENT_LOOKS.map((l) => {
+              const active = l.id === look.id;
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => pickLook(l.id)}
+                  aria-pressed={active}
+                  className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    active
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
+                  }`}
+                >
+                  <span
+                    aria-hidden
+                    className="h-3 w-3 rounded-full border border-black/10"
+                    style={{ background: `linear-gradient(135deg,${l.accent},${l.deep})` }}
+                  />
+                  {l.label}
+                  <span className={active ? "text-white/70" : "text-black/40"}>{l.tag}</span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 max-w-3xl text-xs text-black/60">{look.blurb}</p>
+        </div>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {assets.map((a) => {
             // Light variants crop the division photography into a designed
             // panel sized to the frame's aspect; dark variants run full bleed.
             const imageUrl = photoForFormat(a.brandId, a.format);
             const panel = a.mode === "light";
-            const editKey = socialEditKey(`events-demo:${playbook.id}`, a.id);
+            const editKey = socialEditKey(`events-demo:${playbook.id}:${look.id}`, a.id);
             return (
               <AssetPreviewCard
-                key={a.id}
+                key={`${look.id}-${a.id}`}
                 edit={assetEdits.get(editKey)}
                 onEditChange={(next) => assetEdits.set(editKey, next)}
                 onEditReset={() => assetEdits.reset(editKey)}
@@ -334,6 +392,7 @@ function PlaybookDemoView() {
                   imageUrl,
                   imageLayout: panel ? "panel" : "bleed",
                   imageScrimPct: 60,
+                  styleId: look.styleId,
                 }}
                 badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
                 formatLabel={a.format.label}
