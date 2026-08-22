@@ -306,9 +306,13 @@ function PlaybookDemoView() {
             // panel sized to the frame's aspect; dark variants run full bleed.
             const imageUrl = photoForFormat(a.brandId, a.format);
             const panel = a.mode === "light";
+            const editKey = socialEditKey(`events-demo:${playbook.id}`, a.id);
             return (
               <AssetPreviewCard
                 key={a.id}
+                edit={assetEdits.get(editKey)}
+                onEditChange={(next) => assetEdits.set(editKey, next)}
+                onEditReset={() => assetEdits.reset(editKey)}
                 rendererProps={{
                   format: a.format,
                   brandId: a.brandId,
