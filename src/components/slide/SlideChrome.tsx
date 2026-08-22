@@ -421,7 +421,26 @@ export function SlideFrame({
   // A per-slide template override can name the backdrop scene explicitly;
   // otherwise the scene stays deterministic from the module seed.
   const templateScene = useSlideTemplateScene();
-  const packScene = templateScene ?? sceneFromSeed(layoutId ?? variant);
+  // Module vocabulary (published by VariantRenderer) is the primary scene
+  // authority; the chrome variant is only a fallback for cover / divider /
+  // close plates, and the layout id contributes jitter, never the scene.
+  const moduleSeed = useSlideSceneSeed();
+  const moduleScene = moduleSeed ? sceneFromSeed(moduleSeed) : null;
+  const chromeScene = sceneFromSeed(variant);
+  const seededScene =
+    moduleScene && moduleScene !== "section"
+      ? moduleScene
+      : chromeScene !== "section"
+        ? chromeScene
+        : sceneFromSeed(layoutId ?? variant);
+  const packScene = templateScene ?? seededScene;
+  // The ground plane, the authored-plate probe and the AI backdrop must all
+  // paint from ONE seed — they used to disagree (layout id vs chrome variant),
+  // so the motif suppression test looked at a different plate than the one
+  // actually rendered.
+  const groundSeed = templateScene
+    ? `scene:${templateScene} accentlock ${moduleSeed ?? ""} ${layoutId ?? variant}`
+    : `scene:${packScene} ${moduleSeed ?? ""} ${layoutId ?? variant}`;
   const aiBackdrop = useSkinBackdropImage(pack?.id ?? null, packScene);
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
