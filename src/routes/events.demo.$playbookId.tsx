@@ -320,6 +320,7 @@ function PlaybookDemoView() {
                 edit={assetEdits.get(editKey)}
                 onEditChange={(next) => assetEdits.set(editKey, next)}
                 onEditReset={() => assetEdits.reset(editKey)}
+                editKey={editKey}
                 rendererProps={{
                   format: a.format,
                   brandId: a.brandId,
