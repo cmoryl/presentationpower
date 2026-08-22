@@ -7,8 +7,8 @@
 // Everything is vector/CSS so it stays crisp at any preview size and can be
 // re-skinned per event by swapping the logo + tokens passed in.
 
-import type { CSSProperties, ReactNode } from "react";
-import { NEXT_CITY_TOKENS } from "@/lib/next-city-logos";
+import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
+import { eventLookById, type EventLook } from "@/lib/event-looks";
 
 export type CollateralContext = {
   eventName: string;
