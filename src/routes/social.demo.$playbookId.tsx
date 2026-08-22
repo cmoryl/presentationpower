@@ -25,7 +25,13 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
-import { derivedLook } from "@/lib/event-looks";
+import {
+  channelLook,
+  eventLookById,
+  EVENT_LOOKS,
+  EVENT_LOOKS_BY_ID,
+} from "@/lib/event-looks";
+
 
 import {
   getSocialPlaybook,
