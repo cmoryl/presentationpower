@@ -428,13 +428,24 @@ export function SlideFrame({
   // …UNLESS the author picked a background for this slide in the editor — an
   // explicit pick always wins, live.
   const packOwnsGround = stylePackOwnsGround(pack, backdrop);
-  // Authored plate kits (Games R22, Element S29/S30) paint a finished image as
-  // the pack ground. Those planes must survive at full strength and must not be
-  // over-painted by the pack's procedural signature motif.
+  // Authored plate kits (Games R22, Element S29/S30, the photoreal industry
+  // kit R01–R30) paint a finished image as the pack ground. Those planes must
+  // survive at full strength and must not be over-painted by the pack's
+  // procedural signature motif.
+  //
+  // Detection matches the seed the ground plane actually paints with (below),
+  // and any real image url — absolute (https:) OR root-relative asset paths
+  // ("/__l5e/…"), which is how the authored kits are served. Matching only
+  // https: silently let the motif ride on top of every authored plate.
   const authoredPlateGround =
     !!pack &&
-    packGroundPaint(pack, `scene:${templateScene ?? sceneFromSeed(variant)} ${layoutId ?? variant}`)
-      .some((l) => /url\(["']?https?:/i.test(l));
+    packGroundPaint(
+      pack,
+      templateScene
+        ? `scene:${templateScene} accentlock ${layoutId ?? variant}`
+        : `scene:${sceneFromSeed(variant)} ${layoutId ?? variant}`,
+    ).some((l) => /url\(\s*["']?(?:https?:)?\/\//i.test(l) || /url\(\s*["']?\//i.test(l));
+
 
   const hasBackdrop = !!backdrop && !packOwnsGround;
   const hasBackdropImage = !!backdrop?.url && !packOwnsGround;
