@@ -152,7 +152,10 @@ export function BackgroundPackGrid({
           ...base,
           ...(fields.intensity ? { intensity: form.intensity } : {}),
           ...(fields.tint ? { tint: form.tint, tintStrength: form.tintStrength } : {}),
-          ...(fields.backdrop ? { imageUrl: form.imageUrl } : {}),
+          ...(fields.backdrop
+            ? { imageUrl: form.imageUrl, imagePriority: form.imagePriority }
+            : {}),
+
           ...(fields.swap
             ? { sceneSwap: form.sceneSwap && form.sceneSwap !== scene ? form.sceneSwap : null }
             : {}),
