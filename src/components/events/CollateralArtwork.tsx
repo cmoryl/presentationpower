@@ -182,9 +182,6 @@ function useLook(): EventLook {
   return useContext(LookContext);
 }
 
-/** Fallbacks for the (few) places that read tokens outside a look provider. */
-const NAVY = eventLookById(undefined).deep;
-const BLUE = eventLookById(undefined).accent;
 
 /** Field graphic drawn behind the artwork — one geometry per look. */
 function MotifField({ opacity, color }: { opacity?: number; color?: string }) {
