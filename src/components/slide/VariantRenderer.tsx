@@ -723,6 +723,9 @@ function VariantRendererInner(props: Props) {
         zoom: resolvedBg.zoom,
         offsetX: resolvedBg.offsetX,
         offsetY: resolvedBg.offsetY,
+        // Author picked this background in the editor — it outranks the style
+        // pack's generated ground so the swap shows up live.
+        authored: true,
       }
     : fallbackBackdrop;
 

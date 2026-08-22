@@ -271,9 +271,27 @@ export type SlideBackdrop = {
   zoom?: number; // 1..3 — CSS scale on the image
   offsetX?: number; // -100..100 (percent). 0 = center.
   offsetY?: number; // -100..100 (percent). 0 = center.
+  /** True when an author explicitly picked this background in the editor
+   *  (`content.background`). Authored backgrounds outrank the style pack's own
+   *  ground planes — otherwise swapping a background in the deck editor looked
+   *  like nothing happened, because a pack is always active on a skinned deck. */
+  authored?: boolean;
 };
 
 export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
+
+/**
+ * Ground ownership rule. A style pack is a complete master design, so it paints
+ * the page ground — except when the author explicitly picked a background for
+ * this slide in the editor (`content.background`), which always wins so the
+ * swap is visible live.
+ */
+export function stylePackOwnsGround(
+  pack: { id?: string } | null | undefined,
+  backdrop: SlideBackdrop | null | undefined,
+): boolean {
+  return !!pack && !backdrop?.authored;
+}
 
 const ELEMENT_BRAND_MODE = resolveBrandMode("bm-element");
 
@@ -407,11 +425,15 @@ export function SlideFrame({
   // outright: brand mesh/aurora backdrops are suppressed while one is active.
   // Without this, every dark pack rendered the corporate navy backdrop and the
   // packs read as recolours of one sheet instead of distinct designs.
-  const hasBackdrop = !!backdrop && !pack;
-  const hasBackdropImage = !!backdrop?.url && !pack;
-  const hasBackdropAurora = !!backdrop?.aurora && !pack;
+  // …UNLESS the author picked a background for this slide in the editor — an
+  // explicit pick always wins, live.
+  const packOwnsGround = stylePackOwnsGround(pack, backdrop);
+  const hasBackdrop = !!backdrop && !packOwnsGround;
+  const hasBackdropImage = !!backdrop?.url && !packOwnsGround;
+  const hasBackdropAurora = !!backdrop?.aurora && !packOwnsGround;
 
-  const hasBackdropCss = !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora) && !pack;
+  const hasBackdropCss =
+    !!(backdrop?.css && !backdrop?.url && !backdrop?.aurora) && !packOwnsGround;
   // A backdrop is "dark" when the caller flagged darkChrome, or when it's a
   // photo/aurora backdrop on a non-light slide (legacy behavior).
   const backdropIsDark =
@@ -652,7 +674,7 @@ export function SlideFrame({
           Content variants stay quiet and recessive so data reads clean.
           ───────────────────────────────────────────────────────────────── */}
       {!hasBackdrop &&
-        !pack &&
+        !packOwnsGround &&
         slideDark &&
 
         (() => {
@@ -714,7 +736,7 @@ export function SlideFrame({
       {/* Style pack sheet — four discrete planes (see the layering contract in
           style-packs.ts): flat field, damped + centre-cleared ground, crisp
           layout scaffold, then one zoned signature motif. */}
-      {pack &&
+      {packOwnsGround && pack &&
         (() => {
           const comp = packCompositionFor(variant, layoutId);
           const seed = layoutId ?? variant;
@@ -805,7 +827,7 @@ export function SlideFrame({
         })()}
       {/* 4 — signature motif: the pack's one piece of art, confined to its
           reserve zone and dissolved into the field. Decorative, never content. */}
-      {pack &&
+      {packOwnsGround && pack &&
         (() => {
           // Tiled signature motifs are wallpaper; the minimal direction keeps
           // only non-repeating gestures.
@@ -832,7 +854,7 @@ export function SlideFrame({
           );
         })()}
 
-      {pack && pack.grain > 0 && (
+      {packOwnsGround && pack && pack.grain > 0 && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -849,7 +871,7 @@ export function SlideFrame({
           decorative planes produce (see pack-readability.ts). A veil of the
           page field collapses the texture back toward the surface colour so
           copy never blends into grain, rails or blooms. */}
-      {pack &&
+      {packOwnsGround && pack &&
         (() => {
           const { scrimAlpha } = packReadability(pack);
           if (scrimAlpha <= 0) return null;
@@ -870,7 +892,7 @@ export function SlideFrame({
           sheets on the library, editor, present, share and print surfaces.
           Light pages now always draw a designed ground, keyed to the module's
           layout so colour lands away from the copy. */}
-      {!hasBackdrop && !pack && (enterprise || !slideDark) && !enterpriseDark && (
+      {!hasBackdrop && !packOwnsGround && (enterprise || !slideDark) && !enterpriseDark && (
         <>
           <div
             aria-hidden
@@ -897,7 +919,7 @@ export function SlideFrame({
       {/* Enterprise DARK ground — same quiet master grammar as the white page,
           rendered on the brand navy floor with two soft accent washes placed in
           the corners so copy zones stay clean. */}
-      {enterpriseDark && !hasBackdrop && !pack && (
+      {enterpriseDark && !hasBackdrop && !packOwnsGround && (
         <div
           aria-hidden
           data-decorative="true"
@@ -927,7 +949,7 @@ export function SlideFrame({
           />
         ) : null
       ) : null}
-      {!enterprise && !pack && (
+      {!enterprise && !packOwnsGround && (
 
         <div
           className="absolute left-0 top-0 h-[2px] w-full"
