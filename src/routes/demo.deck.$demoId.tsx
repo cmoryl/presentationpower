@@ -3,6 +3,7 @@ import { ArrowRight, Presentation, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
 import { useDeckStore } from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
