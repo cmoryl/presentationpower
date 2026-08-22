@@ -95,7 +95,7 @@ import {
 } from "@/lib/orbit-label-layout";
 
 import { HouseArrow } from "./HouseArrow";
-import { EchoArrow } from "./EchoArrow";
+import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
 
 import { OrbitDisc } from "./OrbitDisc";
@@ -4359,6 +4359,11 @@ function renderVariantBody({
       const after = obj(c.after);
       const hub = obj(c.hub);
       const summary = obj(c.summary);
+      // Cosmetic-only arrow treatment ("echo" | "thin" | "bold" | "dashed").
+      // Accepted on the module or nested under hub so themed decks can match
+      // stroke weight without any layout shift.
+      const arrowVariant = coerceEchoArrowVariant(c.arrowStyle ?? hub.arrowStyle);
+
       // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
       // is too deep to read as text or as a hairline, so lift it onto the
       // shared accentInk ramp. Light mode is unchanged.
@@ -4551,6 +4556,7 @@ function renderVariantBody({
                   tone={cool}
                   direction="left"
                   size={34}
+                  variant={arrowVariant}
                   className="absolute"
                   style={{ left: 8, zIndex: 3 }}
                 />
@@ -4558,9 +4564,11 @@ function renderVariantBody({
                   tone={accent}
                   direction="right"
                   size={34}
+                  variant={arrowVariant}
                   className="absolute"
                   style={{ right: 8, zIndex: 3 }}
                 />
+
               </div>
               <Column
                 side="after"
