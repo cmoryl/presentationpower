@@ -16,8 +16,6 @@ async function loadPlaybookNames(kind: "events" | "social") {
   for (const p of entries) playbookNames.set(`${kind}:${p.id}`, p.name);
 }
 
-
-
 // Static label overrides for known path segments. Anything not listed falls
 // back to a title-cased version of the URL segment (e.g. `brand-assets` →
 // "Brand Assets").
@@ -76,15 +74,31 @@ function shortenId(id: string): string {
 }
 
 // True when `path` corresponds to a real route. Intermediate URL segments like
-// `/social/demo` are namespaces with no route file, so linking them lands the
-// user on the not-found page — those crumbs render as plain text instead.
+// `/social/demo` are namespaces with no route file, so linking them directly
+// lands the user on the not-found page.
 function isRoutablePath(routePatterns: string[], path: string): boolean {
   const parts = path.split("/").filter(Boolean);
   return routePatterns.some((pattern) => {
-    const pat = pattern.split("/").filter(Boolean).filter((p) => !p.startsWith("_"));
+    const pat = pattern
+      .split("/")
+      .filter(Boolean)
+      .filter((p) => !p.startsWith("_"));
     if (pat.length !== parts.length) return false;
     return pat.every((p, i) => p.startsWith("$") || p === parts[i]);
   });
+}
+
+// Every crumb should be a working "back" target. When a segment is a bare
+// namespace (`/social/demo`, `/demo/deck`), walk up until we find the closest
+// ancestor that does resolve to a route so the crumb still navigates somewhere
+// sensible instead of rendering as dead text.
+function nearestRoutableAncestor(routePatterns: string[], path: string): string {
+  const parts = path.split("/").filter(Boolean);
+  for (let n = parts.length - 1; n > 0; n -= 1) {
+    const candidate = `/${parts.slice(0, n).join("/")}`;
+    if (isRoutablePath(routePatterns, candidate)) return candidate;
+  }
+  return "/";
 }
 
 export function Breadcrumbs() {
@@ -92,10 +106,7 @@ export function Breadcrumbs() {
   const router = useRouter();
   const decks = useDeckStore((s) => s.decks);
 
-  const routePatterns = useMemo(
-    () => Object.keys(router.routesByPath ?? {}),
-    [router],
-  );
+  const routePatterns = useMemo(() => Object.keys(router.routesByPath ?? {}), [router]);
 
   // Only demo routes need a playbook name; load that catalog lazily and
   // re-label once it resolves.
@@ -116,19 +127,16 @@ export function Breadcrumbs() {
     };
   }, [demoKind]);
 
-
-
-
   const crumbs = useMemo(() => {
     // Root has no breadcrumbs — home page speaks for itself.
     if (pathname === "/" || pathname === "")
-      return [] as Array<{ label: string; to: string; last: boolean; routable: boolean }>;
+      return [] as Array<{ label: string; to: string; last: boolean; href: string }>;
 
     const parts = pathname
       .split("/")
       .filter(Boolean)
       .filter((p) => !HIDDEN_SEGMENTS.has(p));
-    const items: Array<{ label: string; to: string; last: boolean; routable: boolean }> = [];
+    const items: Array<{ label: string; to: string; last: boolean; href: string }> = [];
     let acc = "";
     for (let i = 0; i < parts.length; i += 1) {
       const seg = parts[i];
@@ -145,7 +153,6 @@ export function Breadcrumbs() {
       } else if (prev === "demo" && (parts[i - 2] === "events" || parts[i - 2] === "social")) {
         const kind = parts[i - 2] as "events" | "social";
         label = playbookNames.get(`${kind}:${seg}`) ?? shortenId(seg);
-
       } else if (STATIC_LABELS[seg]) {
         label = STATIC_LABELS[seg];
       } else if (/^[0-9a-f-]{20,}$/i.test(seg) || /^[a-z]+-[a-z0-9-]{10,}/i.test(seg)) {
@@ -155,16 +162,17 @@ export function Breadcrumbs() {
         label = titleCase(seg);
       }
 
+      const routable = isRoutablePath(routePatterns, acc);
       items.push({
         label,
         to: acc,
         last: i === parts.length - 1,
-        routable: isRoutablePath(routePatterns, acc),
+        // Namespace crumbs still navigate — up to their closest real route.
+        href: routable ? acc : nearestRoutableAncestor(routePatterns, acc),
       });
     }
     return items;
   }, [pathname, decks, routePatterns, catalogVersion]);
-
 
   if (crumbs.length === 0) return null;
 
@@ -191,23 +199,18 @@ export function Breadcrumbs() {
             >
               {c.label}
             </span>
-          ) : c.routable ? (
+          ) : (
             // TanStack Router requires typed path params for statically-typed
             // routes. Since breadcrumbs walk arbitrary URLs, cast the string
-            // through the loose overload — this is safe because every entry
-            // comes from the current matched location.
+            // through the loose overload — this is safe because every href is
+            // resolved to a real route above.
             <Link
-              to={c.to as string}
+              to={c.href as string}
               className="rounded-full px-2 py-1 transition hover:bg-white/50 hover:text-black dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               {c.label}
             </Link>
-          ) : (
-            // Namespace segment with no route of its own (e.g. /social/demo) —
-            // showing it as a link would dead-end on the not-found page.
-            <span className="px-2 py-1 text-black/40 dark:text-white/40">{c.label}</span>
           )}
-
         </span>
       ))}
     </nav>
