@@ -466,13 +466,6 @@ function Lines({
 // matched the posts they shipped alongside. These primitives read the active
 // style so both channels compose from one contract.
 
-/** Copy-stack alignment for the active style. */
-function copyAlignStyle(style: SocialStyle): CSSProperties {
-  return {
-    justifyContent: style.copyAlign === "start" ? "flex-start" : "flex-end",
-  };
-}
-
 /** Headline type tuned by the active style. */
 function titleStyle(style: SocialStyle, basePx: number, maxWidth?: string): CSSProperties {
   return {
@@ -1048,7 +1041,6 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               display: "flex",
               flexDirection: "column",
               gap: 22,
-              ...stackAlign,
             }}
           >
             <div style={lockupRow}>
