@@ -21,6 +21,7 @@ import getTaxonomy from "./tools/get-taxonomy";
 import listVariants from "./tools/list-variants";
 import createDeck from "./tools/create-deck";
 import auditDeckVisuals from "./tools/audit-deck-visuals";
+import auditDeckCompleteness from "./tools/audit-deck-completeness";
 import exportDeck from "./tools/export-deck";
 
 
@@ -38,7 +39,7 @@ export default defineMcp({
     "Discover: get_taxonomy returns brand modes (divisions), module families, section frameworks, layout frameworks and narrative archetypes; list_variants is the filtered module catalogue.",
     "Author: create_brief starts a new deck brief and generate_deck turns a brief (or inline brief fields) into a saved deck with a planned narrative; insert_slide, delete_slide, reorder_slides, update_slide_content, set_slide_icon, change_slide_variant and update_slide_notes edit an existing deck slide by its 0-based position (get_deck first to see positions).",
     "Rules that mirror the in-app copilot: prefer the smallest edit; update_slide_content deep-merges, so send only changed fields; numeric stats, dates and currency stay locked unless the user explicitly asks for numeric edits (allow_numeric_edits); a variant must be permitted for the slide's section — call list_section_variants first; ground every factual claim with search_knowledge before writing it into a slide.",
-    "Verify: audit_deck_visuals lists every chart, KPI board or process diagram in a deck whose plotted data is missing, with the exact keys to fill — run it after any build or batch of content writes and fix what it lists before reporting the deck as done.",
+    "Verify: audit_deck_completeness is the finishing gate — it lists every slide with empty content fields, grids holding fewer cards than the layout is built for, copy far under the space a block reserves, unplotted visuals or missing speaker notes, with the exact writable paths and their character budgets. audit_deck_visuals lists every chart, KPI board or process diagram in a deck whose plotted data is missing, with the exact keys to fill — run it after any build or batch of content writes and fix what it lists before reporting the deck as done.",
     "Deliver: export_deck builds a layered, editable .pptx from a saved deck and returns a private download link valid for one hour; it also lists any slides whose artwork needs the in-app export for pixel-exact plates.",
     "Share: create_share_link enables a read-only link for a deck.",
   ].join("\n"),
@@ -70,6 +71,7 @@ export default defineMcp({
     updateSlideNotes,
     createShareLink,
     auditDeckVisuals,
+    auditDeckCompleteness,
     exportDeck,
 
   ],
