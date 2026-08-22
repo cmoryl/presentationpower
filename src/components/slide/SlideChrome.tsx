@@ -30,6 +30,8 @@ import {
   packGroundPaint,
   isCuratedGroundPack,
 } from "@/lib/style-packs";
+import { plateCalmFor } from "@/lib/plate-calm";
+
 import { packSignature } from "@/lib/style-pack-motifs";
 import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
@@ -804,6 +806,23 @@ export function SlideFrame({
           // already composed off the reading core).
           const curated = isCuratedGroundPack(pack);
           const groundMask = curated ? undefined : packGroundMask(comp);
+          // Depth-of-field for authored photoreal plates under dense modules.
+          const calmBias =
+            comp === "editorial" || comp === "data"
+              ? "left"
+              : comp === "media"
+                ? "right"
+                : comp === "grid"
+                  ? "wide"
+                  : "center";
+          const calm = plateCalmFor(
+            variant,
+            layoutId,
+            pack.mode === "dark" ? "dark" : "light",
+            calmBias,
+
+          );
+
           return (
             <>
               {/* 1 — field */}
@@ -846,18 +865,48 @@ export function SlideFrame({
                 </>
               )}
               {/* 2 — ground: the pack's own washes and tiles, pulled back and
-                  feathered away from the reading core. */}
+                  feathered away from the reading core. Authored photoreal
+                  plates additionally get depth-of-field treatment under module
+                  layouts (see lib/plate-calm.ts) so their detail stops
+                  competing with stats, charts and cards. */}
               <div
                 aria-hidden
                 data-decorative="true"
+                data-plate-calm={authoredPlateGround && calm.filter ? "true" : undefined}
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background: packGroundPaint(pack, groundSeed).join(", "),
                   opacity: authoredPlateGround ? 1 : packGroundDamp(pack, groundSeed),
                   maskImage: groundMask,
                   WebkitMaskImage: groundMask,
+                  ...(authoredPlateGround && calm.filter
+                    ? {
+                        filter: calm.filter,
+                        // Scale past the frame so the blur doesn't feather in
+                        // transparent edges.
+                        transform: "scale(1.08)",
+                        transformOrigin: "center center",
+                      }
+                    : null),
                 }}
               />
+              {/* 2b — calm veil: field-coloured wash concentrated over the
+                  reading zone; the outer frame keeps the plate's texture. */}
+              {authoredPlateGround && calm.veilAlpha > 0 && (
+                <div
+                  aria-hidden
+                  data-decorative="true"
+                  data-plate-calm-veil="true"
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    backgroundColor: packField(pack),
+                    opacity: calm.veilAlpha,
+                    maskImage: calm.veilMask,
+                    WebkitMaskImage: calm.veilMask,
+                  }}
+                />
+              )}
+
               {/* 3 — scaffold: page structure for this composition. */}
               <div
                 aria-hidden
