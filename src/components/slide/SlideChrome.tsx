@@ -804,6 +804,14 @@ export function SlideFrame({
           // already composed off the reading core).
           const curated = isCuratedGroundPack(pack);
           const groundMask = curated ? undefined : packGroundMask(comp);
+          // Depth-of-field for authored photoreal plates under dense modules.
+          const calm = plateCalmFor(
+            variant,
+            layoutId,
+            pack.mode === "dark" ? "dark" : "light",
+            comp.bias,
+          );
+
           return (
             <>
               {/* 1 — field */}
