@@ -191,6 +191,8 @@ export const saveBackgroundOverride = createServerFn({ method: "POST" })
           tint_strength: data.tintStrength,
           scene_swap: data.sceneSwap || null,
           image_url: data.imageUrl || null,
+          image_priority: data.imagePriority,
+
           note: data.note,
           created_by: context.userId,
         },
