@@ -76,8 +76,8 @@ function shortenId(id: string): string {
 }
 
 // True when `path` corresponds to a real route. Intermediate URL segments like
-// `/social/demo` are namespaces with no route file, so linking them lands the
-// user on the not-found page — those crumbs render as plain text instead.
+// `/social/demo` are namespaces with no route file, so linking them directly
+// lands the user on the not-found page.
 function isRoutablePath(routePatterns: string[], path: string): boolean {
   const parts = path.split("/").filter(Boolean);
   return routePatterns.some((pattern) => {
@@ -85,6 +85,19 @@ function isRoutablePath(routePatterns: string[], path: string): boolean {
     if (pat.length !== parts.length) return false;
     return pat.every((p, i) => p.startsWith("$") || p === parts[i]);
   });
+}
+
+// Every crumb should be a working "back" target. When a segment is a bare
+// namespace (`/social/demo`, `/demo/deck`), walk up until we find the closest
+// ancestor that does resolve to a route so the crumb still navigates somewhere
+// sensible instead of rendering as dead text.
+function nearestRoutableAncestor(routePatterns: string[], path: string): string {
+  const parts = path.split("/").filter(Boolean);
+  for (let n = parts.length - 1; n > 0; n -= 1) {
+    const candidate = `/${parts.slice(0, n).join("/")}`;
+    if (isRoutablePath(routePatterns, candidate)) return candidate;
+  }
+  return "/";
 }
 
 export function Breadcrumbs() {
