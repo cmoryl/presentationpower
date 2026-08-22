@@ -6,10 +6,11 @@
 // functions the print library uses.
 
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, Printer, Sparkles, FileText } from "lucide-react";
+
 
 import { AppShell } from "@/components/AppShell";
 import { showcaseArt } from "@/lib/showcase-art";
