@@ -144,6 +144,7 @@ const navGroups: NavGroup[] = [
       { to: "/admin/brand-assets", label: "Brand assets" },
       { to: "/knowledge/brand-guides", label: "Brand guides" },
       { to: "/admin/logohub", label: "LogoHub" },
+      { to: "/admin/division-seeds", label: "Division seeds" },
       { to: "/admin/icon-studio", label: "Icon Studio" },
       { to: "/admin/canvas", label: "Open Canvas Studio" },
       { to: "/admin/module-studio", label: "Module Studio" },

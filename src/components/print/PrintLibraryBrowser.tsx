@@ -37,6 +37,8 @@ import {
   subsectionsFor,
 } from "@/lib/print-library/subsections";
 import { editableContextFor, toEditableContent } from "@/lib/print-library/editable";
+import { useDivisionSeed } from "@/lib/division-seeds";
+import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-apply";
 import { applyLibraryOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import { useIsAdmin } from "@/lib/use-is-admin";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -901,9 +903,13 @@ function CopyItemButton({ item, label }: { item: PrintLibraryItem; label?: strin
   const findFn = useServerFn(findMyPrintAssetForLibraryItem);
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
+  // Admin-authored division copy (e.g. the "Why <division>" page) is stamped
+  // into the new copy so the user edits the current wording, not last year's.
+  const seed = useDivisionSeed(item.divisionId);
 
   const makeCopy = async () => {
-    const content = toEditableContent(item);
+    const base = toEditableContent(item);
+    const content = base ? applyDivisionSeedToContent(base, seed) : base;
     if (!content) {
       toast.error("This item has no editable content yet.");
       return;

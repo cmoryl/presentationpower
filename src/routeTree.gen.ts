@@ -102,6 +102,7 @@ import { Route as AdminImageryRouteImport } from './routes/admin.imagery'
 import { Route as AdminIconStudioRouteImport } from './routes/admin.icon-studio'
 import { Route as AdminGloballinkShareRouteImport } from './routes/admin.globallink-share'
 import { Route as AdminGloballinkRouteImport } from './routes/admin.globallink'
+import { Route as AdminDivisionSeedsRouteImport } from './routes/admin.division-seeds'
 import { Route as AdminCampaignsRouteImport } from './routes/admin.campaigns'
 import { Route as AdminBrandAssetsRouteImport } from './routes/admin.brand-assets'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -605,6 +606,11 @@ const AdminGloballinkRoute = AdminGloballinkRouteImport.update({
   path: '/globallink',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDivisionSeedsRoute = AdminDivisionSeedsRouteImport.update({
+  id: '/division-seeds',
+  path: '/division-seeds',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCampaignsRoute = AdminCampaignsRouteImport.update({
   id: '/campaigns',
   path: '/campaigns',
@@ -823,6 +829,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
+  '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -950,6 +957,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
+  '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -1082,6 +1090,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/brand-assets': typeof AdminBrandAssetsRoute
   '/admin/campaigns': typeof AdminCampaignsRouteWithChildren
+  '/admin/division-seeds': typeof AdminDivisionSeedsRoute
   '/admin/globallink': typeof AdminGloballinkRoute
   '/admin/globallink-share': typeof AdminGloballinkShareRoute
   '/admin/icon-studio': typeof AdminIconStudioRoute
@@ -1215,6 +1224,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
+    | '/admin/division-seeds'
     | '/admin/globallink'
     | '/admin/globallink-share'
     | '/admin/icon-studio'
@@ -1342,6 +1352,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
+    | '/admin/division-seeds'
     | '/admin/globallink'
     | '/admin/globallink-share'
     | '/admin/icon-studio'
@@ -1473,6 +1484,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/brand-assets'
     | '/admin/campaigns'
+    | '/admin/division-seeds'
     | '/admin/globallink'
     | '/admin/globallink-share'
     | '/admin/icon-studio'
@@ -2310,6 +2322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGloballinkRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/division-seeds': {
+      id: '/admin/division-seeds'
+      path: '/division-seeds'
+      fullPath: '/admin/division-seeds'
+      preLoaderRoute: typeof AdminDivisionSeedsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/campaigns': {
       id: '/admin/campaigns'
       path: '/campaigns'
@@ -2584,6 +2603,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBrandAssetsRoute: typeof AdminBrandAssetsRoute
   AdminCampaignsRoute: typeof AdminCampaignsRouteWithChildren
+  AdminDivisionSeedsRoute: typeof AdminDivisionSeedsRoute
   AdminGloballinkRoute: typeof AdminGloballinkRoute
   AdminGloballinkShareRoute: typeof AdminGloballinkShareRoute
   AdminIconStudioRoute: typeof AdminIconStudioRoute
@@ -2616,6 +2636,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBrandAssetsRoute: AdminBrandAssetsRoute,
   AdminCampaignsRoute: AdminCampaignsRouteWithChildren,
+  AdminDivisionSeedsRoute: AdminDivisionSeedsRoute,
   AdminGloballinkRoute: AdminGloballinkRoute,
   AdminGloballinkShareRoute: AdminGloballinkShareRoute,
   AdminIconStudioRoute: AdminIconStudioRoute,
