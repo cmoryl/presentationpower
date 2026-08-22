@@ -291,7 +291,39 @@ function SocialDemoView() {
               : "Rendered right now from the deterministic pipeline. Configure to swap copy and cadence."
           }
         />
+        {/* Art direction — the same look family this division's event
+            collateral wears, so every channel stays cohesive. */}
         <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
+            Demo look &amp; feel
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {EVENT_LOOKS.map((l) => {
+              const active = l.id === look.id;
+              return (
+                <button
+                  key={l.id}
+                  type="button"
+                  onClick={() => pickLook(l.id)}
+                  aria-pressed={active}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    active
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-black/15 bg-white text-[#03002C] hover:border-[#003FC7]/50"
+                  }`}
+                >
+                  {l.label}
+                  <span className={active ? "ml-2 text-white/70" : "ml-2 text-black/40"}>
+                    {l.tag}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 max-w-3xl text-xs text-black/60">{look.blurb}</p>
+        </div>
+        <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
+
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
             Template style
           </div>
