@@ -28,6 +28,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
+import { Route as SocialAgentIndexRouteImport } from './routes/social-agent.index'
 import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
@@ -238,6 +239,11 @@ const SocialIndexRoute = SocialIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => SocialRoute,
+} as any)
+const SocialAgentIndexRoute = SocialAgentIndexRouteImport.update({
+  id: '/social-agent/',
+  path: '/social-agent/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
   id: '/print-agent/',
@@ -931,6 +937,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1063,6 +1070,7 @@ export interface FileRoutesByTo {
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
   '/print-agent': typeof PrintAgentIndexRoute
+  '/social-agent': typeof SocialAgentIndexRoute
   '/social': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1200,6 +1208,7 @@ export interface FileRoutesById {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1338,6 +1347,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1470,6 +1480,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/library'
     | '/print-agent'
+    | '/social-agent'
     | '/social'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1606,6 +1617,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1701,6 +1713,7 @@ export interface RootRouteChildren {
   DecksIndexRoute: typeof DecksIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   PrintAgentIndexRoute: typeof PrintAgentIndexRoute
+  SocialAgentIndexRoute: typeof SocialAgentIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBrandhubSeedProxyRoute: typeof ApiPublicBrandhubSeedProxyRoute
@@ -1855,6 +1868,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/social/'
       preLoaderRoute: typeof SocialIndexRouteImport
       parentRoute: typeof SocialRoute
+    }
+    '/social-agent/': {
+      id: '/social-agent/'
+      path: '/social-agent'
+      fullPath: '/social-agent/'
+      preLoaderRoute: typeof SocialAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/print-agent/': {
       id: '/print-agent/'
@@ -2883,6 +2903,7 @@ const rootRouteChildren: RootRouteChildren = {
   DecksIndexRoute: DecksIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   PrintAgentIndexRoute: PrintAgentIndexRoute,
+  SocialAgentIndexRoute: SocialAgentIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBrandhubSeedProxyRoute: ApiPublicBrandhubSeedProxyRoute,
