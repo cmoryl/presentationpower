@@ -113,16 +113,17 @@ function EventsView() {
         <div className="relative z-10 mx-auto max-w-7xl">
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/60">
-              <CalendarDays size={12} /> Events command center
+              <CalendarDays size={12} /> Element · Events
             </div>
             <h1 className="text-4xl font-semibold tracking-tight text-[#03002C] sm:text-5xl">
-              Every event, one visual system.
+              Every event, on brand from day one.
             </h1>
             <p className="max-w-2xl text-base text-black/65">
-              Industry-standard playbooks for launches, summits, webinars, briefings, roadshows, and
-              awards — each ships a full kit of signage, invites, social, and email. Preview any
-              playbook live, then configure it for your event in under a minute.
+              Launches, summits, webinars, briefings, roadshows, and awards — each one arrives as a
+              complete Element kit: signage, invites, social, and email already designed and in your
+              colors. Preview a full event live, then make it yours in about a minute.
             </p>
+
             <div className="flex flex-wrap gap-3 pt-2">
               <a
                 href="#playbooks"
