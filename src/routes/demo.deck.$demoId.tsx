@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { ArrowRight, Presentation, Sparkles } from "lucide-react";
+import { ArrowRight, PencilLine, Presentation, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
