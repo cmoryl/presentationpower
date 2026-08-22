@@ -75,7 +75,7 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
           model: gateway(MODEL),
           system: kitAgentSystemPrompt(surface),
           messages: await convertToModelMessages(messages),
-          tools: buildKitAgentToolSet({ supabase, userId, surface }),
+          tools: buildKitAgentToolSet({ supabase, userId, surface, threadId }),
           stopWhen: stepCountIs(40),
           abortSignal: request.signal,
           onError: ({ error }) => console.error("kit agent stream error:", error),
