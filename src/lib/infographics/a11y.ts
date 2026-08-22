@@ -22,6 +22,15 @@ const KIND_LABEL: Record<InfographicKind, string> = {
   waterfall: "waterfall chart",
   funnel: "funnel chart",
   "calendar-heatmap": "calendar heatmap",
+  radar: "radar capability profile",
+  "stacked-area": "stacked area chart",
+  dumbbell: "before-and-after dumbbell chart",
+  "radial-bar": "radial progress bars",
+  sunburst: "sunburst hierarchy chart",
+  gantt: "gantt timeline",
+  slope: "slope comparison chart",
+  "gauge-grid": "grid of gauge dials",
+  boxplot: "box plot",
   custom: "custom infographic",
 };
 
