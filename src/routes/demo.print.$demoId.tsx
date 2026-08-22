@@ -187,26 +187,47 @@ function PrintDemoPage() {
         </div>
       </div>
 
-      {/* Rendered comps — the real print layout for every page of the piece. */}
-      <section className="mt-10">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-semibold tracking-tight">Rendered preview</h2>
-          <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
-            Click any page to enlarge
-          </span>
-        </div>
-        <div className="mt-4">
-          <ShowcasePrintGallery
-            kind={item.kind}
-            content={previewContent}
-            brand={previewBrand}
-            mode={previewLook.mode}
-            pageSize={previewLook.pageSize}
-            density={previewLook.density}
-            accent={accent}
-          />
+      {/* Rendered comps — the real print layout, live from the edited content,
+          shown in both light and dark so both finishes are verifiable here. */}
+      <section className="mt-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+        <PrintDemoContentEditor
+          content={draft}
+          onChange={setDraft}
+          onReset={() => setDraft(previewContent)}
+          dirty={dirty}
+          accent={accent}
+        />
+        <div>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3">
+            <h2 className="min-w-0 truncate text-lg font-semibold tracking-tight">
+              Rendered preview {dirty ? "· updated" : ""}
+            </h2>
+            <span className="shrink-0 text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
+              Click any page to enlarge
+            </span>
+          </div>
+          <div className="mt-4 space-y-6">
+            {(["light", "dark"] as const).map((mode) => (
+              <div key={mode}>
+                <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+                  {mode} version
+                </div>
+                <ShowcasePrintGallery
+                  key={`${mode}-${renderKey}`}
+                  kind={item.kind}
+                  content={draft}
+                  brand={previewBrand}
+                  mode={mode}
+                  pageSize={previewLook.pageSize}
+                  density={previewLook.density}
+                  accent={accent}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
+
 
       <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
