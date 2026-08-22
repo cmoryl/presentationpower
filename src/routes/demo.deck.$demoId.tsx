@@ -187,6 +187,17 @@ function ShowcaseDeckDemoPage() {
                 Regenerate fresh copy
               </button>
             ) : null}
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={editLive}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/70 bg-white/15 px-5 text-sm font-semibold text-white transition hover:bg-white/25"
+                title="Open this demo in the studio editor and publish your changes back to the live demo"
+              >
+                <PencilLine size={15} />
+                Edit live demo
+              </button>
+            ) : null}
             <RegenerateApprovedCopiesButton
               label="Regenerate all approved copies"
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/50 px-5 text-sm font-semibold text-white transition hover:bg-white/10 disabled:opacity-60"
