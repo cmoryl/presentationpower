@@ -273,7 +273,12 @@ export function KitWizard({
             statValue: manualCopy.statValue.trim() || undefined,
             statLabel: manualCopy.statLabel.trim() || undefined,
           },
-          eventFacts: attachEvent ? (event as unknown as Record<string, unknown>) : {},
+          eventFacts: {
+            ...(attachEvent ? (event as unknown as Record<string, unknown>) : {}),
+            // Keep the locked art direction on the row even when event facts
+            // are off, so reopening the kit renders in the same look.
+            ...(kitLook.lookId || kitLook.styleId ? { look: kitLook } : {}),
+          },
           attachEvent,
           nextDesign,
           nextTrackId,
