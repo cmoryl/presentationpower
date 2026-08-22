@@ -32,6 +32,12 @@ import {
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AdminPageHeader, AdminSection, AdminEmpty } from "@/components/admin/AdminPage";
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
+import { SocialAssetEditorButton } from "@/components/campaigns/SocialAssetEditor";
+import {
+  useSocialAssetEdits,
+  socialEditKey,
+  type SocialAssetEdit,
+} from "@/lib/social-asset-edit";
 
 const searchSchema = z.object({
   source: z.string().optional(),
@@ -101,6 +107,7 @@ function KitBuilderInner() {
     () => KIT_PROFILES.find((p) => p.id === "social-essentials")?.formatIds ?? [],
   );
   const [regenTick, setRegenTick] = useState(0);
+  const assetEdits = useSocialAssetEdits();
 
   // Wizard mode — triggered by ?blank=1 from /social and /events blank-kit CTAs.
   const isWizard = !!search.blank;
@@ -473,6 +480,9 @@ function KitBuilderInner() {
                 onRegenerate={() => setRegenTick((t) => t + 1)}
                 hashtag={eventFacts.hashtag}
                 registrationUrl={eventFacts.registrationUrl}
+                edit={assetEdits.get(socialEditKey("admin-kit", asset.id))}
+                onEditChange={(next) => assetEdits.set(socialEditKey("admin-kit", asset.id), next)}
+                onEditReset={() => assetEdits.reset(socialEditKey("admin-kit", asset.id))}
               />
             ))}
           </div>
@@ -499,14 +509,27 @@ function AssetCard({
   onRegenerate,
   hashtag,
   registrationUrl,
+  edit,
+  onEditChange,
+  onEditReset,
 }: {
   asset: CampaignAsset;
   onRemove: () => void;
   onRegenerate: () => void;
   hashtag?: string;
   registrationUrl?: string;
+  edit?: SocialAssetEdit;
+  onEditChange?: (next: SocialAssetEdit) => void;
+  onEditReset?: () => void;
 }) {
   const format: SocialFormat = asset.format;
+  const rendererProps = {
+    format,
+    brandId: asset.brandId,
+    mode: asset.mode,
+    copy: asset.copy,
+    facts: { hashtag, registrationUrl },
+  } as const;
   return (
     <div className="group space-y-2">
       <div className="flex items-start justify-between gap-2">
@@ -518,7 +541,16 @@ function AssetCard({
             {format.width}×{format.height} · {aspectClass(format)} · {asset.mode}
           </div>
         </div>
-        <div className="flex shrink-0 gap-1 opacity-0 transition group-hover:opacity-100">
+        <div className="flex shrink-0 items-center gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+          {onEditChange ? (
+            <SocialAssetEditorButton
+              rendererProps={rendererProps}
+              formatLabel={format.label}
+              edit={edit ?? {}}
+              onChange={onEditChange}
+              onReset={() => onEditReset?.()}
+            />
+          ) : null}
           <button
             type="button"
             onClick={onRegenerate}
@@ -537,14 +569,7 @@ function AssetCard({
           </button>
         </div>
       </div>
-      <SocialRenderer
-        format={format}
-        brandId={asset.brandId}
-        mode={asset.mode}
-        copy={asset.copy}
-        facts={{ hashtag, registrationUrl }}
-        displayShortEdge={280}
-      />
+      <SocialRenderer {...rendererProps} edit={edit} displayShortEdge={280} />
     </div>
   );
 }
