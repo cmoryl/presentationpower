@@ -25,6 +25,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
+import { readCampaignLookId, readCampaignStyleId, saveCampaignLook } from "@/lib/campaign-look";
 import {
   channelLook,
   eventLookById,
@@ -104,13 +105,13 @@ function SocialDemoView() {
     [playbook.id, playbook.subBrand, playbook.angle, playbook.accent],
   );
   const [lookId, setLookId] = useState<string>(() => baseLook.id);
+  // Look memory is scoped to the DIVISION, not this route: if the user already
+  // picked an art direction on the events or digital demo for this brand, the
+  // social kit opens in that same campaign look, and vice versa.
   useEffect(() => {
-    const stored =
-      typeof window === "undefined"
-        ? null
-        : window.localStorage.getItem(`element:social-demo-look:${playbook.id}`);
+    const stored = readCampaignLookId(playbook.subBrand);
     setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : baseLook.id);
-  }, [playbook.id, baseLook.id]);
+  }, [playbook.subBrand, baseLook.id]);
   // The division's own accent always re-inks whichever look is active, so a
   // retarget changes the field graphic and type — never the brand colour.
   const look = useMemo(
@@ -123,9 +124,7 @@ function SocialDemoView() {
 
   const pickLook = (id: string) => {
     setLookId(id);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(`element:social-demo-look:${playbook.id}`, id);
-    }
+    saveCampaignLook(playbook.subBrand, { lookId: id });
   };
   const [styleId, setStyleId] = useState<SocialStyleId>(
     () => (baseLook.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID,
@@ -133,8 +132,13 @@ function SocialDemoView() {
   // The look owns the template style: retargeting the art direction restyles
   // every rendered asset, and the style chips still allow a manual override.
   useEffect(() => {
-    setStyleId((look.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID);
-  }, [look.styleId]);
+    const stored = readCampaignStyleId(playbook.subBrand);
+    setStyleId(stored ?? (look.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID);
+  }, [look.styleId, playbook.subBrand]);
+  const pickStyle = (id: SocialStyleId) => {
+    setStyleId(id);
+    saveCampaignLook(playbook.subBrand, { styleId: id });
+  };
   const activeStyle = resolveSocialStyle(styleId);
 
 
@@ -165,8 +169,9 @@ function SocialDemoView() {
       logoNeedsKnockout: needsKnockout,
       lookId: look.id,
       look,
+      styleId,
     };
-  }, [playbook, look]);
+  }, [playbook, look, styleId]);
   const assets = useMemo(
     () =>
       buildCampaignAssets(source, facts, {
@@ -334,7 +339,7 @@ function SocialDemoView() {
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => setStyleId(s.id)}
+                  onClick={() => pickStyle(s.id)}
                   aria-pressed={active}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                     active
