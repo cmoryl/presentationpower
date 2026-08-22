@@ -152,8 +152,11 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       const custom = overrideFor(code, scene);
       if (custom?.imageUrl) return base(seed);
       const takeMatch = /take:(\d+)/i.exec(seed);
-      const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
-      const url = industryPhotoUrl(code, scene, take);
+      // Core skins borrow a shared kit, so the pack code joins the take seed:
+      // two core skins on the same kit still choose different plates per scene.
+      const take = (takeMatch ? parseInt(takeMatch[1]!, 10) : 0) + hash(code);
+      const url = industryPhotoUrl(plateCode, scene, take);
+
       if (!url) return base(seed);
       return [scrim, veil, `url("${url}") center center / cover no-repeat`];
     },
