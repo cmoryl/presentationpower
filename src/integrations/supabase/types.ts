@@ -1419,6 +1419,42 @@ export type Database = {
           },
         ]
       }
+      demo_overrides: {
+        Row: {
+          created_at: string
+          demo_id: string
+          demo_kind: string
+          division_key: string
+          id: string
+          label: string | null
+          payload: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          demo_id: string
+          demo_kind: string
+          division_key?: string
+          id?: string
+          label?: string | null
+          payload: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          demo_id?: string
+          demo_kind?: string
+          division_key?: string
+          id?: string
+          label?: string | null
+          payload?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       division_imagery: {
         Row: {
           approved: boolean

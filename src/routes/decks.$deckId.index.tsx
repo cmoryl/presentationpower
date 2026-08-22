@@ -41,6 +41,7 @@ import {
 } from "@/components/editor/EditorChrome";
 import { EditorSideRail } from "@/components/editor/UnifiedEditorShell";
 
+import { LiveDemoDeckBar } from "@/components/demo/LiveDemoDeckBar";
 import { BriefOutputsBar } from "@/components/BriefOutputsBar";
 import { CopilotPanel } from "@/components/CopilotPanel";
 import { IconPicker } from "@/components/IconPicker";
@@ -528,6 +529,8 @@ function DeckEditor() {
                 active={{ kind: "deck" }}
               />
             </div>
+
+            <LiveDemoDeckBar deckId={deckId} />
 
             <EditorToolbar
               slideLabel={active ? `Slide ${String(clamped + 1).padStart(2, "0")}` : undefined}

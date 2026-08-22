@@ -382,6 +382,14 @@ export type DeckContext = {
   /** Stamped on copies generated from an approved showcase demo. Approved
    *  demos are final, reviewed pieces, so every QA gate / warning is skipped. */
   demoApproved?: boolean;
+  /** Set when an admin opened a demo for *live* editing: publishing from this
+   *  deck replaces what every visitor sees on the demo page. */
+  liveDemo?: {
+    kind: "deck" | "print";
+    demoId: string;
+    divisionKey: string;
+    label?: string;
+  } | null;
   /** Style/tone guidance extracted from user-uploaded reference assets. */
   referenceGuidance?: {
     guidance: string;
@@ -427,6 +435,18 @@ export type TemplatePayload = {
     lengthTarget?: number;
     clientFacts?: string;
   } | null;
+};
+
+/** Loss-free deck snapshot: every authored slide field is preserved. */
+export type DeckSnapshot = {
+  title: string;
+  brandModeId: string;
+  archetypeId: string;
+  subCompany?: string | null;
+  context?: Record<string, unknown> | null;
+  clientLogo?: DeckClientLogo | null;
+  slides: Array<Partial<DeckSlide> & { sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  brief?: TemplatePayload["brief"];
 };
 
 type HistoryEntry = {
@@ -600,6 +620,10 @@ type DeckState = {
   rebrandDeck: (deckId: string, brandModeId: string, subCompany?: string | null) => void;
   duplicateDeck: (deckId: string) => string | null;
   createDeckFromTemplate: (payload: TemplatePayload) => { briefId: string; deckId: string };
+  /** Full-fidelity clone from a stored deck snapshot (canvas blocks, ink
+   *  overrides, per-slide modes and transitions all survive). Used by live
+   *  demo editing, where the saved override *is* the demo. */
+  createDeckFromSnapshot: (snapshot: DeckSnapshot) => { briefId: string; deckId: string };
   deleteDeck: (deckId: string) => void;
 
   // Undo / redo — session-scoped, bounded to 50 entries.
@@ -4869,6 +4893,48 @@ export const useDeckStore = create<DeckState>()(
           }));
           return { briefId, deckId };
         },
+
+        createDeckFromSnapshot: (snapshot) => {
+          const briefId = nanoid(8);
+          const brief: Brief = {
+            id: briefId,
+            createdAt: new Date().toISOString(),
+            prospect: snapshot.brief?.prospect ?? "",
+            industry: snapshot.brief?.industry ?? "",
+            meetingObjective: snapshot.brief?.meetingObjective ?? "",
+            audience: snapshot.brief?.audience ?? "",
+            brandModeId: snapshot.brandModeId,
+            subCompany: snapshot.subCompany ?? undefined,
+            archetypeId: snapshot.archetypeId,
+            lengthTarget: snapshot.brief?.lengthTarget ?? snapshot.slides.length,
+            clientFacts: snapshot.brief?.clientFacts ?? "",
+          };
+          const deckId = nanoid(10);
+          const deck: Deck = {
+            id: deckId,
+            createdAt: new Date().toISOString(),
+            title: snapshot.title,
+            briefId,
+            brandModeId: snapshot.brandModeId,
+            subCompany: snapshot.subCompany ?? undefined,
+            archetypeId: snapshot.archetypeId,
+            isTemplate: false,
+            clientLogo: snapshot.clientLogo ?? undefined,
+            context: (snapshot.context as DeckContext) ?? undefined,
+            slides: snapshot.slides.map((s, i) => ({
+              ...(structuredClone(s) as DeckSlide),
+              id: nanoid(8),
+              position: i,
+              changes: [],
+            })),
+          };
+          set((s) => ({
+            briefs: { ...s.briefs, [briefId]: brief },
+            decks: { ...s.decks, [deckId]: healDeckCanvasGeometry(deck) },
+          }));
+          return { briefId, deckId };
+        },
+
 
         deleteDeck: (deckId) => {
           set((s) => {

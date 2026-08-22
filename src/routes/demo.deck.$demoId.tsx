@@ -1,10 +1,16 @@
 import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
-import { ArrowRight, Presentation, Sparkles } from "lucide-react";
+import { ArrowRight, PencilLine, Presentation, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
-import { useDeckStore } from "@/lib/deck-store";
+import { useIsAdmin } from "@/hooks/use-is-admin";
+import { useDemoOverride } from "@/lib/demo-overrides";
+import {
+  useDeckStore,
+  type DeckSnapshot,
+  type TemplatePayload,
+} from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
@@ -59,7 +65,9 @@ function ShowcaseDeckDemoPage() {
   const { demoId } = Route.useParams();
   const def = getShowcaseDeck(demoId);
   const navigate = useNavigate();
+  const isAdmin = useIsAdmin();
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const createDeckFromSnapshot = useDeckStore((s) => s.createDeckFromSnapshot);
   const deleteDeck = useDeckStore((s) => s.deleteDeck);
 
   const home = def ? nativeDivision(def.divisionLabel) : DEMO_DIVISIONS[0];
@@ -67,11 +75,15 @@ function ShowcaseDeckDemoPage() {
   const division =
     DEMO_DIVISIONS.find((d) => d.id === divisionId) ?? home;
 
-  const payload = useMemo(() => {
+  const authored = useMemo(() => {
     if (!def) return null;
     const base = def.build();
     return division.id === home.id ? base : retargetPayload(base, division);
   }, [def, division, home.id]);
+
+  // A published admin edit *is* the demo; the authored build is the fallback.
+  const { override } = useDemoOverride("deck", demoId, division.id);
+  const payload = (override?.payload as unknown as TemplatePayload | undefined) ?? authored;
 
   const existingId = useDeckStore((s) =>
     payload ? Object.values(s.decks).find((d) => d.title === payload.title)?.id : undefined,
@@ -80,12 +92,27 @@ function ShowcaseDeckDemoPage() {
   if (!def || !payload) return null;
   const accent = division.accent;
 
+  /** Create (or reopen) the visitor's own editable copy of the demo. */
+  function newCopy(context?: Record<string, unknown>) {
+    if (override) {
+      const snap = override.payload as unknown as DeckSnapshot;
+      return createDeckFromSnapshot({
+        ...snap,
+        context: { ...(snap.context ?? {}), ...(context ?? {}) },
+      });
+    }
+    return createDeckFromTemplate({
+      ...payload!,
+      context: { ...(payload!.context ?? {}), ...(context ?? {}) },
+    });
+  }
+
   function open() {
     if (existingId) {
       void navigate({ to: "/decks/$deckId", params: { deckId: existingId } });
       return;
     }
-    const { deckId } = createDeckFromTemplate(payload!);
+    const { deckId } = newCopy();
     void navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 
@@ -93,9 +120,25 @@ function ShowcaseDeckDemoPage() {
    *  generated before an authoring update pick up imagery and backdrops. */
   function regenerate() {
     if (existingId) deleteDeck(existingId);
-    const { deckId } = createDeckFromTemplate(payload!);
+    const { deckId } = newCopy();
     void navigate({ to: "/decks/$deckId", params: { deckId } });
   }
+
+  /** Admin: open the demo itself in the studio editor. Publishing from that
+   *  deck updates what every visitor sees on this page. */
+  function editLive() {
+    const { deckId } = newCopy({
+      demoApproved: true,
+      liveDemo: {
+        kind: "deck",
+        demoId,
+        divisionKey: division.id,
+        label: `${def!.name} · ${division.label}`,
+      },
+    });
+    void navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
 
   return (
     <AppShell>
@@ -142,6 +185,17 @@ function ShowcaseDeckDemoPage() {
                 title="Replace your saved copy with the current demo build (imagery, backdrops and all)"
               >
                 Regenerate fresh copy
+              </button>
+            ) : null}
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={editLive}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-white/70 bg-white/15 px-5 text-sm font-semibold text-white transition hover:bg-white/25"
+                title="Open this demo in the studio editor and publish your changes back to the live demo"
+              >
+                <PencilLine size={15} />
+                Edit live demo
               </button>
             ) : null}
             <RegenerateApprovedCopiesButton
