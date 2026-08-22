@@ -373,6 +373,14 @@ export type SocialRendererProps = {
   imageUrl?: string;
   /** 0–100 — how strongly the brand scrim darkens the photo. */
   imageScrimPct?: number;
+  /** How the photo is composed into the frame.
+   *  · "bleed" (default) — full-frame photo with copy over a plate.
+   *  · "panel" — the photo is cropped into a dedicated panel (right column on
+   *    wide frames, top band on square/portrait) and the copy owns the rest of
+   *    the frame. Designed light layouts use this so the artwork never sits
+   *    under the ink and every aspect gets a purpose-built crop. */
+  imageLayout?: "bleed" | "panel";
+
   /** Template style skin — see src/lib/social-styles.ts. */
   styleId?: SocialStyleId;
   /** Optional event lockup (e.g. TransPerfect NEXT · City Series). When set it
@@ -392,6 +400,8 @@ export function SocialRenderer({
   facts,
   imageUrl,
   imageScrimPct = 55,
+  imageLayout = "bleed",
+
   styleId,
   eventLogo,
   displayShortEdge = 320,
@@ -448,22 +458,78 @@ export function SocialRenderer({
     cls === "portrait-tall" ? (copyAlign === "end" ? 26 : 74) : focalY;
   const objectPosition = `center ${focalYAdjusted}%`;
 
+  // ---- Panel composition ---------------------------------------------------
+  // "panel" keeps the artwork and the copy in separate zones. The panel rect is
+  // derived from the frame's own aspect class, so a 1200×400 header gets a tall
+  // right-hand column while a 1080×1350 portrait gets a deep top band — the
+  // photo is always cropped (object-cover) to the panel's own aspect, never
+  // stretched, and the copy region shrinks by exactly the panel size.
+  const panelMode = Boolean(imageUrl) && imageLayout === "panel";
+  const panelSide: "right" | "top" =
+    cls === "landscape-wide" || cls === "landscape" ? "right" : "top";
+  const panelGap = (short * 3.2) / 100;
+  const panelW =
+    panelSide === "right"
+      ? (format.width - safeInset.left - safeInset.right) * (cls === "landscape-wide" ? 0.4 : 0.44)
+      : 0;
+  const panelH =
+    panelSide === "top"
+      ? (format.height - safeInset.top - safeInset.bottom) *
+        (cls === "portrait-tall" ? 0.46 : cls === "portrait" ? 0.42 : 0.4)
+      : 0;
+  const panelRect: CSSProperties =
+    panelSide === "right"
+      ? {
+          top: safeInset.top,
+          bottom: safeInset.bottom,
+          right: safeInset.right,
+          width: panelW,
+        }
+      : {
+          top: safeInset.top,
+          left: safeInset.left,
+          right: safeInset.right,
+          height: panelH,
+        };
+  const contentInset = {
+    top: safeInset.top + (panelMode && panelSide === "top" ? panelH + panelGap : 0),
+    bottom: safeInset.bottom,
+    left: safeInset.left,
+    right: safeInset.right + (panelMode && panelSide === "right" ? panelW + panelGap : 0),
+  };
+
+  // A full-bleed photo is the only case that needs a copy plate + scrim.
+  const bleedImage = Boolean(imageUrl) && !panelMode;
+
   // Copy band: how much of the frame the copy stack may occupy, opposite the
   // subject. Enforced through the line clamps below rather than a hard crop —
   // a cap that slices through a line of text reads worse than a deeper band.
 
   // Wide frames also thirds horizontally — copy occupies two thirds, the
   // subject's third stays clear.
-  const copyMaxWidth =
-    imageUrl && (cls === "landscape-wide" || cls === "landscape")
+  const copyMaxWidth = panelMode
+    ? (format.width - contentInset.left - contentInset.right) *
+      (panelSide === "top" ? 0.82 : 1)
+    : bleedImage && (cls === "landscape-wide" || cls === "landscape")
       ? format.width * 0.66
       : format.width * 0.92;
+
 
   // Photography competes with type, so tighten the stack when an image is on.
   // Wide frames give the copy the least room, so they shrink hardest — a
   // clipped half-sentence reads worse than slightly smaller type.
-  const copyScale = imageUrl ? (cls === "landscape-wide" ? 0.8 : 0.9) : 1;
-  const titleLines = cls === "landscape-wide" ? (imageUrl ? 3 : 2) : imageUrl ? 3 : 4;
+  const copyScale = bleedImage
+    ? cls === "landscape-wide"
+      ? 0.8
+      : 0.9
+    : panelMode
+      ? cls === "landscape-wide"
+        ? 0.74
+        : 0.86
+      : 1;
+  const titleLines =
+    cls === "landscape-wide" ? (imageUrl ? 3 : 2) : panelMode ? 4 : imageUrl ? 3 : 4;
+
 
 
   // Extreme landscape hides eyebrow to protect single-clause headline.
@@ -601,12 +667,18 @@ export function SocialRenderer({
     pointerEvents: "none",
   };
 
-  const lockupPos: CSSProperties =
-    style.lockup === "top-left"
+  // Panel layouts own their corners: the wordmark moves into the copy zone so
+  // it never lands on the photo panel or on the headline.
+  const lockupPos: CSSProperties = panelMode
+    ? panelSide === "right"
+      ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
+      : { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
+    : style.lockup === "top-left"
       ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
       : style.lockup === "bottom-right"
         ? { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
         : { top: safeInset.top, right: safeInset.right, transformOrigin: "top right" };
+
 
 
   return (
@@ -626,10 +698,25 @@ export function SocialRenderer({
           />
         </SlideModeContext.Provider>
 
+        {/* Designed ground — light frames without a full-bleed photo used to
+            render as near-white voids. A deterministic composition of brand
+            geometry (accent wash, brick rail, hairline grid) gives them a
+            designed base at every aspect. */}
+        {!bleedImage ? (
+          <DesignGround
+            format={format}
+            accent={brand.tokens.accent}
+            mode={mode}
+            short={short}
+            copyAlign={copyAlign}
+            panelSide={panelMode ? panelSide : null}
+          />
+        ) : null}
+
         {/* Optional imagery layer — sits above the aurora, below the copy.
             The photo's focal point is pushed into the negative space opposite
             the copy block so the subject is never buried behind the text. */}
-        {imageUrl ? (
+        {bleedImage ? (
           <>
             <img
               src={imageUrl}
@@ -655,8 +742,38 @@ export function SocialRenderer({
           </>
         ) : null}
 
-
-
+        {/* Photo panel — cropped to the panel's own aspect with object-cover so
+            imagery is never distorted, whatever the ad size. */}
+        {panelMode && imageUrl ? (
+          <div
+            className="absolute overflow-hidden"
+            style={{
+              ...panelRect,
+              borderRadius: (short * 3.4) / 100,
+              boxShadow:
+                mode === "dark"
+                  ? "0 18px 46px rgba(0,0,0,0.42)"
+                  : "0 18px 40px rgba(3,0,44,0.16)",
+            }}
+          >
+            <img
+              src={imageUrl}
+              alt=""
+              crossOrigin="anonymous"
+              className="absolute inset-0 size-full object-cover"
+              style={{ objectPosition: panelSide === "right" ? "center 42%" : objectPosition }}
+            />
+            {/* Accent edge tying the crop back to the division palette. */}
+            <div
+              aria-hidden
+              className="absolute inset-x-0 bottom-0"
+              style={{
+                height: Math.max(3, (short * 0.8) / 100),
+                background: accentGradient(brand.tokens.accent, "90deg", mode),
+              }}
+            />
+          </div>
+        ) : null}
 
         {/* Content stack — anchored per copyAlign, inside the safe area and
             capped to the rule-of-thirds copy band so it can never grow into
@@ -664,10 +781,10 @@ export function SocialRenderer({
         <div
           className="absolute flex flex-col"
           style={{
-            top: safeInset.top,
-            bottom: safeInset.bottom,
-            left: safeInset.left,
-            right: safeInset.right,
+            top: contentInset.top,
+            bottom: contentInset.bottom,
+            left: contentInset.left,
+            right: contentInset.right,
             justifyContent: copyAlign === "end" ? "flex-end" : "flex-start",
             color: inkColor,
           }}
@@ -683,10 +800,12 @@ export function SocialRenderer({
             // bounding, so copy never gets sliced through a line of text.
             minHeight: 0,
 
-            ...(imageUrl ? plateStyle : null),
+            ...(bleedImage ? plateStyle : null),
           }}
         >
-          {imageUrl ? <div aria-hidden style={plateFillStyle} /> : null}
+          {bleedImage ? <div aria-hidden style={plateFillStyle} /> : null}
+
+
 
 
 
@@ -855,6 +974,116 @@ export function SocialRenderer({
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ---- Designed ground ------------------------------------------------------
+// Light social frames used to render as near-empty white cards: the aurora is
+// almost invisible at light intensity and, without a photo, nothing else laid
+// down structure. DesignGround composes brand geometry that scales off the
+// frame's short edge — so a 1200×400 header, a 1080×1080 square and a
+// 1080×1920 story each get a proportionate composition rather than one layout
+// squashed into three aspects.
+function DesignGround({
+  format,
+  accent,
+  mode,
+  short,
+  copyAlign,
+  panelSide,
+}: {
+  format: SocialFormat;
+  accent: string;
+  mode: "light" | "dark";
+  short: number;
+  copyAlign: "start" | "end";
+  panelSide: "right" | "top" | null;
+}) {
+  const cls = aspectClass(format);
+  const wide = cls === "landscape-wide" || cls === "landscape";
+  const unit = (short * 3.6) / 100;
+  // Bloom sits opposite the copy so it lifts the empty half of the frame.
+  const bloomX = panelSide === "right" ? "18%" : wide ? "78%" : "76%";
+  const bloomY = copyAlign === "end" ? "12%" : "88%";
+  const base =
+    mode === "dark"
+      ? `linear-gradient(150deg, ${tintRgba(accent, 0.22)} 0%, rgba(3,0,44,0.92) 58%, rgba(3,0,44,0.98) 100%)`
+      : `linear-gradient(150deg, ${tintRgba(accent, 0.13)} 0%, rgba(255,255,255,0.86) 46%, ${tintRgba(accent, 0.07)} 100%)`;
+  const rule = mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(3,0,44,0.07)";
+  const bricks = wide ? 5 : 6;
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0" style={{ background: base }} />
+
+      {/* Soft accent bloom in the negative half. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(${wide ? "58% 120%" : "72% 52%"} at ${bloomX} ${bloomY}, ${tintRgba(
+            accent,
+            mode === "dark" ? 0.34 : 0.26,
+          )} 0%, ${tintRgba(accent, mode === "dark" ? 0.12 : 0.09)} 46%, rgba(255,255,255,0) 78%)`,
+        }}
+      />
+
+      {/* Hairline field — systematic, quiet, keeps the surface from reading
+          blank without competing with type. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `linear-gradient(to right, ${rule} 0 1px, transparent 1px 100%), linear-gradient(to bottom, ${rule} 0 1px, transparent 1px 100%)`,
+          backgroundSize: `${unit * 2}px ${unit * 2}px`,
+          maskImage: `radial-gradient(120% 100% at ${panelSide === "right" ? "20%" : "50%"} ${
+            copyAlign === "end" ? "0%" : "100%"
+          }, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0) 88%)`,
+          WebkitMaskImage: `radial-gradient(120% 100% at ${panelSide === "right" ? "20%" : "50%"} ${
+            copyAlign === "end" ? "0%" : "100%"
+          }, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0) 88%)`,
+        }}
+      />
+
+      {/* Element brick rail — the shared motif, floated in the open band
+          between the wordmark and the copy stack so it never sits under type. */}
+      <div
+        className="absolute flex"
+        style={{
+          gap: unit * 0.42,
+          left: unit * 1.4,
+          [copyAlign === "end" ? "top" : "bottom"]: wide ? "34%" : "30%",
+        } as CSSProperties}
+      >
+
+        {Array.from({ length: bricks }).map((_, i) => (
+          <span
+            key={i}
+            style={{
+              display: "block",
+              width: unit * (i === 0 ? 1.5 : 0.72),
+              height: unit * 0.72,
+              borderRadius: unit * 0.16,
+              background:
+                i === 0
+                  ? accent
+                  : tintRgba(accent, mode === "dark" ? 0.5 - i * 0.07 : 0.42 - i * 0.06),
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Corner rule — a single confident line closing the composition. */}
+      <div
+        className="absolute"
+        style={{
+          right: 0,
+          [copyAlign === "end" ? "top" : "bottom"]: 0,
+          width: wide ? short * 0.5 : short * 0.34,
+          height: Math.max(2, (short * 0.5) / 100),
+          background: `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${accent} 100%)`,
+          opacity: mode === "dark" ? 0.85 : 0.7,
+        } as CSSProperties}
+      />
     </div>
   );
 }

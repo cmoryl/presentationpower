@@ -243,10 +243,11 @@ function SocialDemoView() {
         ) : null}
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {assets.map((a) => {
-            // Photography on the dark variants only, so each size shows both a
-            // photographic and an aurora-only treatment side by side.
-            const imageUrl =
-              a.mode === "dark" ? photoForFormat(playbook.subBrand, a.format) : undefined;
+            // Both modes carry photography now. Dark variants run the photo
+            // full bleed; light variants crop it into a designed panel sized to
+            // the frame's own aspect, with the copy owning the rest.
+            const imageUrl = photoForFormat(playbook.subBrand, a.format);
+            const panel = a.mode === "light";
             return (
               <AssetPreviewCard
                 key={`${styleId}-${a.id}`}
@@ -256,11 +257,12 @@ function SocialDemoView() {
                   mode: a.mode,
                   copy: a.copy,
                   imageUrl,
+                  imageLayout: panel ? "panel" : "bleed",
                   imageScrimPct: 62,
                   styleId,
                 }}
 
-                badge={imageUrl ? "Photo" : undefined}
+                badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
                 formatLabel={a.format.label}
                 formatWidth={a.format.width}
                 formatHeight={a.format.height}
@@ -269,6 +271,7 @@ function SocialDemoView() {
             );
           })}
         </div>
+
       </section>
 
 
