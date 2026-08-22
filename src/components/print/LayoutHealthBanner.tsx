@@ -10,11 +10,13 @@ import type { CapacityReport, CapacitySuggestion } from "@/lib/print-capacity";
 import { AlertTriangle, CheckCircle2, XOctagon, Wand2 } from "lucide-react";
 
 type Props = {
-  report: CapacityReport;
+  /** Null hides the banner entirely (approved demos carry no QA gates). */
+  report: CapacityReport | null;
   onApplySuggestion?: (s: CapacitySuggestion) => void;
 };
 
 export function LayoutHealthBanner({ report, onApplySuggestion }: Props) {
+  if (!report) return null;
   const pct = Math.min(100, Math.round(report.fill * 100));
   const tone =
     report.level === "block"
