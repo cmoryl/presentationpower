@@ -421,7 +421,9 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
     ],
     build: buildLifeSciencesProgram,
   },
+  ...EXTRA_SHOWCASE_DECKS,
 ];
+
 
 export function getShowcaseDeck(id: string): ShowcaseDeckDef | undefined {
   return SHOWCASE_DECKS.find((d) => d.id === id);
