@@ -9,20 +9,11 @@
 // ---------------------------------------------------------------------------
 
 import type { TemplatePayload } from "./deck-store";
+import { EXTRA_SHOWCASE_DECKS } from "./showcase-decks-extra";
+import type { ShowcaseDeckDef } from "./showcase-decks-types";
 
-export type ShowcaseDeckDef = {
-  id: string;
-  /** Card + page title. */
-  name: string;
-  eyebrow: string;
-  blurb: string;
-  accent: string;
-  divisionLabel: string;
-  /** Stable deck title used to reuse an already-generated copy. */
-  deckTitle: string;
-  highlights: string[];
-  build: () => TemplatePayload;
-};
+export type { ShowcaseDeckDef };
+
 
 /* ------------------------------------------------------------------ */
 /* 1. GlobalLink enterprise localization — executive pitch            */
@@ -430,7 +421,9 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
     ],
     build: buildLifeSciencesProgram,
   },
+  ...EXTRA_SHOWCASE_DECKS,
 ];
+
 
 export function getShowcaseDeck(id: string): ShowcaseDeckDef | undefined {
   return SHOWCASE_DECKS.find((d) => d.id === id);
