@@ -179,7 +179,9 @@ export function ShowcaseGallery() {
 
 type CardLink =
   | { to: "/demo/deck/$demoId"; params: { demoId: string } }
+  | { to: "/demo/print/$demoId"; params: { demoId: string } }
   | { to: "/library/print"; search: { division: string; type: string; q: string } };
+
 
 function MediaCard({
   to,
