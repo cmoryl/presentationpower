@@ -12,6 +12,8 @@ import { SocialRenderer, type SocialRendererProps } from "@/components/campaigns
 import { AssetPreviewFrame } from "@/components/campaigns/AssetPreviewFrame";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { BRAND_MODES } from "@/lib/taxonomy";
+import { SocialAssetEditorButton } from "@/components/campaigns/SocialAssetEditor";
+import type { SocialAssetEdit } from "@/lib/social-asset-edit";
 
 /** Division accent for the card aura — falls back to TransPerfect blue. */
 function divisionAccent(brandId: string): string {
@@ -28,6 +30,11 @@ type Props = {
   thumbShortEdge?: number;
   /** Optional small tag shown next to the format label (e.g. "Photo"). */
   badge?: string;
+  /** When provided, the card exposes an "Edit" action that opens the asset
+   *  editor (text blocks, caption, photo-panel geometry). */
+  edit?: SocialAssetEdit;
+  onEditChange?: (next: SocialAssetEdit) => void;
+  onEditReset?: () => void;
 };
 
 export function AssetPreviewCard({
@@ -38,15 +45,20 @@ export function AssetPreviewCard({
   mode,
   thumbShortEdge = 220,
   badge,
+  edit,
+  onEditChange,
+  onEditReset,
 }: Props) {
 
   const [open, setOpen] = useState(false);
   const accent = divisionAccent(rendererProps.brandId);
+  const editable = Boolean(onEditChange);
+  const liveProps = { ...rendererProps, edit };
   // Light-mode assets sit on white surfaces and read flat — give them a soft
   // division-accent aura so each division stays visually distinct.
   const isLight = rendererProps.mode === "light";
   return (
-    <>
+    <div className="flex min-w-0 flex-col gap-1.5">
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -90,7 +102,7 @@ export function AssetPreviewCard({
                     style={{ background: `radial-gradient(60% 60% at 50% 50%, ${accent}40, transparent 70%)` }}
                   />
                 ) : null}
-                <SocialRenderer {...rendererProps} displayShortEdge={displayShortEdge} />
+                <SocialRenderer {...liveProps} displayShortEdge={displayShortEdge} />
               </div>
             )}
           </AssetPreviewFrame>
@@ -99,32 +111,43 @@ export function AssetPreviewCard({
             View full
           </span>
         </div>
-        <div className="flex min-w-0 items-center justify-between gap-2 px-1 text-[11px]">
-          <span className="flex min-w-0 items-center gap-1.5">
-            <span className="truncate font-semibold text-[#03002C]">{formatLabel}</span>
-            {badge ? (
-              <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7]">
-                {badge}
-              </span>
-            ) : null}
-          </span>
-          <span className="shrink-0 text-black/50">
+      </button>
+
+      <div className="flex min-w-0 items-center justify-between gap-2 px-1 text-[11px]">
+        <span className="flex min-w-0 items-center gap-1.5">
+          <span className="truncate font-semibold text-[#03002C]">{formatLabel}</span>
+          {badge ? (
+            <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-[#003FC7]">
+              {badge}
+            </span>
+          ) : null}
+        </span>
+        <span className="flex shrink-0 items-center gap-2 text-black/50">
+          <span>
             {formatWidth}×{formatHeight} · {mode}
           </span>
-        </div>
-
-      </button>
+          {editable ? (
+            <SocialAssetEditorButton
+              rendererProps={rendererProps}
+              formatLabel={formatLabel}
+              edit={edit ?? {}}
+              onChange={(next) => onEditChange?.(next)}
+              onReset={() => onEditReset?.()}
+            />
+          ) : null}
+        </span>
+      </div>
       {open ? (
         <AssetPreviewModal
           onClose={() => setOpen(false)}
-          rendererProps={rendererProps}
+          rendererProps={liveProps}
           formatLabel={formatLabel}
           formatWidth={formatWidth}
           formatHeight={formatHeight}
           mode={mode}
         />
       ) : null}
-    </>
+    </div>
   );
 }
 
