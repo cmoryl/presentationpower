@@ -131,9 +131,10 @@ export function ShowcaseGallery() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {SHOWCASE_DECKS.map((d) => (
+        {SHOWCASE_DECKS.map((d, i) => (
           <MediaCard
             key={d.id}
+            feature={i === 0}
             to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
             art={showcaseArt(d.id).src}
             artAlt={showcaseArt(d.id).alt}
@@ -150,6 +151,7 @@ export function ShowcaseGallery() {
             ]}
           />
         ))}
+
 
         {PRINT_DEMOS.map((p) => (
           <MediaCard
