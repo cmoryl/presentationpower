@@ -59,8 +59,8 @@ function ShowcaseDeckDemoPage() {
     <AppShell>
       <div className="relative overflow-hidden rounded-3xl border border-black/10 dark:border-white/10">
         <img
-          src={demoPresentationImg}
-          alt="An executive team reviewing a finished Element deck on a boardroom display"
+          src={showcaseArt(demoId).src}
+          alt={showcaseArt(demoId).alt}
           width={1536}
           height={1024}
           className="h-[300px] w-full object-cover sm:h-[380px]"
