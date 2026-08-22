@@ -87,17 +87,60 @@ function SocialDemoView() {
   );
   const kit = KIT_PROFILES_BY_ID[playbook.kitProfileId];
   const photoSet = getPhotoSet(playbook.subBrand);
-  // Every social demo set gets its own art direction (motif, plate, radius,
-  // casing) derived from the playbook id and re-inked with its own accent, so
-  // no two demo kits render the same field graphic.
-  const look = useMemo(
-    () => derivedLook(`social:${playbook.id}`, { accent: playbook.accent }),
-    [playbook.id, playbook.accent],
+  // Art direction. A social kit wears the SAME authored look family as its
+  // division's event collateral (`channelLook`), so posts, event artwork and
+  // print comps for one division read as one campaign end to end. The switcher
+  // below retargets the whole set live and the choice sticks per playbook,
+  // exactly like the events demo.
+  const baseLook = useMemo(
+    () =>
+      channelLook({
+        key: `social:${playbook.id}`,
+        brandId: playbook.subBrand,
+        intentId: playbook.angle,
+        accent: playbook.accent,
+      }),
+    [playbook.id, playbook.subBrand, playbook.angle, playbook.accent],
   );
+  const [lookId, setLookId] = useState<string>(() => baseLook.id);
+  useEffect(() => {
+    const stored =
+      typeof window === "undefined"
+        ? null
+        : window.localStorage.getItem(`element:social-demo-look:${playbook.id}`);
+    setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : baseLook.id);
+  }, [playbook.id, baseLook.id]);
+  // The division's own accent always re-inks whichever look is active, so a
+  // retarget changes the field graphic and type — never the brand colour.
+  const look = useMemo(() => {
+    if (lookId === baseLook.id) return baseLook;
+    const picked = eventLookById(lookId);
+    return channelLook({
+      key: `social:${playbook.id}`,
+      brandId: null,
+      intentId: null,
+      accent: playbook.accent,
+      label: picked.label,
+    }).id === picked.id
+      ? picked
+      : { ...picked, accent: playbook.accent };
+  }, [lookId, baseLook, playbook.id, playbook.accent]);
+  const pickLook = (id: string) => {
+    setLookId(id);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(`element:social-demo-look:${playbook.id}`, id);
+    }
+  };
   const [styleId, setStyleId] = useState<SocialStyleId>(
-    () => (look.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID,
+    () => (baseLook.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID,
   );
+  // The look owns the template style: retargeting the art direction restyles
+  // every rendered asset, and the style chips still allow a manual override.
+  useEffect(() => {
+    setStyleId((look.styleId as SocialStyleId) ?? DEFAULT_SOCIAL_STYLE_ID);
+  }, [look.styleId]);
   const activeStyle = resolveSocialStyle(styleId);
+
 
 
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
