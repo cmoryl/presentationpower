@@ -4551,6 +4551,7 @@ function renderVariantBody({
                   tone={cool}
                   direction="left"
                   size={34}
+                  variant={arrowVariant}
                   className="absolute"
                   style={{ left: 8, zIndex: 3 }}
                 />
@@ -4558,9 +4559,11 @@ function renderVariantBody({
                   tone={accent}
                   direction="right"
                   size={34}
+                  variant={arrowVariant}
                   className="absolute"
                   style={{ right: 8, zIndex: 3 }}
                 />
+
               </div>
               <Column
                 side="after"
