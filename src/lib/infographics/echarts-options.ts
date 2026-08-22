@@ -390,7 +390,7 @@ function waterfallOption(spec: InfographicSpec) {
   let running = 0;
   spec.data.rows.forEach((r, i) => {
     const v = n(r[valueKey]);
-    const isTotal = String(r.type ?? "").toLowerCase() === "total" || i === spec.data.rows.length - 1 && String(r.type ?? "").toLowerCase() === "total";
+    const isTotal = String(r.type ?? "").toLowerCase() === "total";
     labels.push(str(r[labelKey], `#${i + 1}`));
     if (isTotal) {
       base.push(0);
