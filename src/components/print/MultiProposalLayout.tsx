@@ -2346,7 +2346,7 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
         );
       })}
 
-      <Img x={3.37} y={10.18} w={1.68} h={0.21} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
+      <Img x={3.37} y={10.18} w={1.68} h={0.21} src={useProposalBrandLogoDark()} alt="TransPerfect" />
     </>
   );
 }
@@ -2545,7 +2545,7 @@ function StoriesQuotesPage({ page, logoWhite }: { page: MultiProposalPage; logoW
           {page.footnote}
         </T>
       ) : null}
-      <Img x={3.37} y={10.76} w={1.68} h={0.21} src={PROPOSAL_ART.lockupDark} alt="TransPerfect" />
+      <Img x={3.37} y={10.76} w={1.68} h={0.21} src={useProposalBrandLogoDark()} alt="TransPerfect" />
     </>
   );
 }
