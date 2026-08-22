@@ -173,63 +173,175 @@ export function artSize(kind: ArtKind) {
 // Shared artwork primitives
 // ---------------------------------------------------------------------------
 
-const NAVY = NEXT_CITY_TOKENS.deep;
-const BLUE = NEXT_CITY_TOKENS.blue;
+/** Active art direction. Provided by CollateralArtwork from ctx.lookId so the
+ *  primitives below theme themselves without threading props through the
+ *  per-kind artwork switch. */
+const LookContext = createContext<EventLook>(eventLookById(undefined));
 
-/** NEXT chevron motif — the double ">>" from the logo, repeated as a
- *  large translucent field graphic. */
-function ChevronField({ opacity = 0.14, color = BLUE }: { opacity?: number; color?: string }) {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 200 100"
-      preserveAspectRatio="xMidYMid slice"
-      style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity }}
-    >
-      {[0, 34, 68, 102, 136, 170].map((x) => (
-        <path
-          key={x}
-          d={`M${x} 10 L${x + 22} 50 L${x} 90 L${x + 12} 90 L${x + 34} 50 L${x + 12} 10 Z`}
-          fill={color}
-        />
-      ))}
-    </svg>
-  );
+function useLook(): EventLook {
+  return useContext(LookContext);
 }
 
-function darkField(radial = true): CSSProperties {
+/** Fallbacks for the (few) places that read tokens outside a look provider. */
+const NAVY = eventLookById(undefined).deep;
+const BLUE = eventLookById(undefined).accent;
+
+/** Field graphic drawn behind the artwork — one geometry per look. */
+function MotifField({ opacity, color }: { opacity?: number; color?: string }) {
+  const look = useLook();
+  const o = opacity ?? look.motifOpacity;
+  const c = color ?? look.accent;
+  if (o <= 0) return null;
+  const common: CSSProperties = {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    opacity: o,
+  };
+  switch (look.motif) {
+    case "grid":
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="none" style={common}>
+          {Array.from({ length: 21 }).map((_, i) => (
+            <line key={`v${i}`} x1={i * 10} y1={0} x2={i * 10} y2={100} stroke={c} strokeWidth={0.5} />
+          ))}
+          {Array.from({ length: 11 }).map((_, i) => (
+            <line key={`h${i}`} x1={0} y1={i * 10} x2={200} y2={i * 10} stroke={c} strokeWidth={0.5} />
+          ))}
+        </svg>
+      );
+    case "arcs":
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style={common}>
+          {[30, 55, 80, 105, 130].map((r) => (
+            <circle key={r} cx={186} cy={12} r={r} fill="none" stroke={c} strokeWidth={2.2} />
+          ))}
+        </svg>
+      );
+    case "rays":
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style={common}>
+          {Array.from({ length: 14 }).map((_, i) => (
+            <path
+              key={i}
+              d={`M200 6 L${200 - 210} ${6 + i * 13} L${200 - 210} ${11 + i * 13} Z`}
+              fill={c}
+              opacity={1 - i * 0.05}
+            />
+          ))}
+        </svg>
+      );
+    case "dots":
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style={common}>
+          {Array.from({ length: 11 }).map((_, r) =>
+            Array.from({ length: 21 }).map((_, cIdx) => (
+              <circle key={`${r}-${cIdx}`} cx={cIdx * 10} cy={r * 10} r={1.6} fill={c} />
+            )),
+          )}
+        </svg>
+      );
+    case "waves":
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="none" style={common}>
+          {[0, 18, 36, 54, 72, 90].map((y) => (
+            <path
+              key={y}
+              d={`M0 ${y} C 40 ${y - 14}, 60 ${y + 14}, 100 ${y} S 160 ${y - 14}, 200 ${y}`}
+              fill="none"
+              stroke={c}
+              strokeWidth={3}
+            />
+          ))}
+        </svg>
+      );
+    case "terrazzo":
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style={common}>
+          {Array.from({ length: 26 }).map((_, i) => {
+            const x = (i * 37) % 200;
+            const y = (i * 53) % 100;
+            const s = 3 + ((i * 7) % 9);
+            return i % 3 === 0 ? (
+              <circle key={i} cx={x} cy={y} r={s / 1.6} fill={c} />
+            ) : (
+              <rect
+                key={i}
+                x={x}
+                y={y}
+                width={s}
+                height={s / 1.5}
+                fill={i % 3 === 1 ? c : look.accentAlt}
+                transform={`rotate(${(i * 23) % 90} ${x} ${y})`}
+              />
+            );
+          })}
+        </svg>
+      );
+    case "bars":
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="none" style={common}>
+          {Array.from({ length: 24 }).map((_, i) => (
+            <rect key={i} x={i * 8.4} y={0} width={1.4} height={100} fill={c} />
+          ))}
+        </svg>
+      );
+    case "chevron":
+    default:
+      return (
+        <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style={common}>
+          {[0, 34, 68, 102, 136, 170].map((x) => (
+            <path
+              key={x}
+              d={`M${x} 10 L${x + 22} 50 L${x} 90 L${x + 12} 90 L${x + 34} 50 L${x + 12} 10 Z`}
+              fill={c}
+            />
+          ))}
+        </svg>
+      );
+  }
+}
+
+function darkFieldFor(look: EventLook, radial = true): CSSProperties {
   return {
     background: radial
-      ? `radial-gradient(120% 120% at 82% 12%, ${BLUE}55 0%, ${NAVY} 58%, #070B1E 100%)`
-      : `linear-gradient(135deg, ${NAVY} 0%, #0B1226 100%)`,
+      ? `radial-gradient(120% 120% at 82% 12%, ${look.accent}55 0%, ${look.deep} 58%, #05060F 100%)`
+      : `linear-gradient(135deg, ${look.deep} 0%, #0B1226 100%)`,
   };
 }
 
 function Field({
   children,
   style,
-  chevron = 0.13,
+  chevron,
   light = false,
 }: {
   children?: ReactNode;
   style?: CSSProperties;
+  /** Motif strength override; defaults to the look's own value. */
   chevron?: number;
   light?: boolean;
 }) {
+  const look = useLook();
+  const motif = chevron ?? look.motifOpacity;
   return (
     <div
       style={{
         position: "absolute",
         inset: 0,
         overflow: "hidden",
-        color: light ? NEXT_CITY_TOKENS.ink : "#FFFFFF",
+        color: light ? look.ink : "#FFFFFF",
         ...(light
-          ? { background: "linear-gradient(160deg,#FFFFFF 0%,#EEF3FF 100%)" }
-          : darkField()),
+          ? { background: `linear-gradient(160deg,${look.lightFrom} 0%,${look.lightTo} 100%)` }
+          : darkFieldFor(look)),
         ...style,
       }}
     >
-      {chevron > 0 ? <ChevronField opacity={chevron} color={light ? BLUE : "#7FD0FF"} /> : null}
+      <MotifField
+        opacity={light ? motif * 0.55 : motif}
+        color={light ? look.accent : look.accentAlt}
+      />
       <div style={{ position: "relative", width: "100%", height: "100%" }}>{children}</div>
     </div>
   );
