@@ -540,7 +540,7 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
   ...GLWEB_EBROCHURES.map(fromGlWebEbrochure),
   ...SOLUTION_PROPOSALS.map(fromSolutionProposal),
   ...MULTI_SOLUTION_PROPOSALS.map(fromMultiSolutionProposal),
-];
+].map(retargetTrialInteractive);
 
 /** Items visible inside a division folder (its own + the shared templates). */
 export function itemsForDivision(divisionId: string): PrintLibraryItem[] {
