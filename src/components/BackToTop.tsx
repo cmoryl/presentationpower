@@ -1,43 +1,50 @@
 import { useEffect, useState } from "react";
-import { ArrowUp } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 
-/**
- * Floating "back to top" control. Appears once the page has scrolled past a
- * threshold; respects reduced-motion by falling back to an instant jump.
- */
-export function BackToTop({ threshold = 480 }: { threshold?: number }) {
+const SCROLL_THRESHOLD = 320;
+
+function useScrolledPast(threshold: number) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > threshold);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const check = () => {
+      const y = window.scrollY ?? window.pageYOffset ?? 0;
+      setVisible(y > threshold);
+    };
+
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    return () => window.removeEventListener("scroll", check);
   }, [threshold]);
 
-  const toTop = () => {
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+  return visible;
+}
+
+export function BackToTop() {
+  const visible = useScrolledPast(SCROLL_THRESHOLD);
+
+  const handleClick = () => {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" });
   };
 
   return (
     <button
       type="button"
-      onClick={toTop}
+      onClick={handleClick}
       aria-label="Back to top"
-      title="Back to top"
-      aria-hidden={!visible}
-      tabIndex={visible ? 0 : -1}
-      className={`fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-background/85 px-4 py-3 text-xs font-medium text-foreground shadow-lg backdrop-blur transition-all duration-200 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
-      }`}
+      className={`
+        fixed bottom-5 right-5 z-[100]
+        flex h-12 w-12 items-center justify-center rounded-full
+        bg-primary text-primary-foreground shadow-lg
+        transition-all duration-300 ease-out
+        hover:scale-110 hover:bg-primary/90 hover:shadow-xl
+        focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+        active:scale-95
+        ${visible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0 pointer-events-none"}
+      `}
     >
-      <ArrowUp size={14} strokeWidth={1.75} />
-      <span className="hidden sm:inline">Top</span>
+      <ChevronUp className="h-6 w-6" aria-hidden="true" />
     </button>
   );
 }
-
-export default BackToTop;
