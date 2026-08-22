@@ -1468,7 +1468,9 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
   // "agenda" as a closing slide (it contains "end").
   if ((SKIN_SCENES as string[]).includes(s)) return s as SkinScene;
   if (/cover|title|hero|opening/.test(s)) return "cover";
-  if (/closing|thanks|\bend\b|cta|contact/.test(s)) return "closing";
+  if (/closing|thanks|\bend\b|cta|contact|\bclose\b|\bqna\b|next-steps/.test(s))
+    return "closing";
+
 
   if (/agenda|contents|index|roadmap-list/.test(s)) return "agenda";
   if (/statement|manifesto|big|impact/.test(s)) return "statement";
