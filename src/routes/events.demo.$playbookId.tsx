@@ -111,8 +111,10 @@ function PlaybookDemoView() {
     [nextSuite],
   );
 
-  const artworkCtx = useMemo<CollateralContext | undefined>(() => {
-    if (!nextSuite) return undefined;
+  // Every demo renders a finished comp for every collateral piece. Playbooks
+  // outside the NEXT lockup suites (flagship conference, field events …) fall
+  // back to the division lockup so no tile is ever left blank.
+  const artworkCtx = useMemo<CollateralContext>(() => {
     const d = playbook.facts.startDate
       ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
           month: "short",
