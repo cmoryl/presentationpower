@@ -85,8 +85,8 @@ const PRINT_DEMOS = [
 ] as const;
 
 const SURFACE_META = {
-  social: { label: "Social kit", icon: Share2, accent: "#FF9B70", art: demoSocialImg },
-  event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87", art: demoEventImg },
+  social: { label: "Social kit", icon: Share2, accent: "#FF9B70" },
+  event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87" },
 } as const;
 
 export function ShowcaseGallery() {
