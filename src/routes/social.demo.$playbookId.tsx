@@ -93,6 +93,9 @@ function SocialDemoView() {
     const logos = getDivisionLogos(playbook.subBrand);
     const wide = logos?.white ?? logos?.color ?? "/brand-logos/tp-white.png";
     const stacked = logos?.stackedWhite ?? logos?.stackedColor ?? wide;
+    // Divisions without a white lockup on disk fall back to the colour file,
+    // which needs knocking out so it reads on the dark artwork fields.
+    const needsKnockout = !logos?.white;
     return {
       eventName: playbook.copy.title,
       city: playbook.divisionLabel,
@@ -103,6 +106,7 @@ function SocialDemoView() {
       accent: playbook.accent,
       logoWide: { url: wide, ratio: 4.6 },
       logoStacked: { url: stacked, ratio: 2.1 },
+      logoNeedsKnockout: needsKnockout,
     };
   }, [playbook]);
   const assets = useMemo(
