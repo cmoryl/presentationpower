@@ -455,6 +455,32 @@ export function BackgroundPackGrid({
                     </button>
                   )}
                 </div>
+                <div className="mt-2 flex gap-2">
+                  {(
+                    [
+                      ["front", "Image in front"],
+                      ["behind", "Artwork in front"],
+                    ] as const
+                  ).map(([val, label]) => {
+                    const active = form.imagePriority === val;
+                    return (
+                      <button
+                        key={val}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => setForm((f) => ({ ...f, imagePriority: val }))}
+                        className={`flex-1 rounded-lg border px-2 py-1 text-[10px] font-semibold transition ${
+                          active
+                            ? "border-[#003FC7] bg-[#003FC7]/8 text-[#003FC7]"
+                            : "border-black/12 opacity-70 hover:opacity-100 dark:border-white/15"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+
               </div>
             )}
 
