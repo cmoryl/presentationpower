@@ -199,8 +199,8 @@ function ShowcaseDeckDemoPage() {
       </div>
 
 
-      <section className="mt-8 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <div>
+      <section className="mt-8 grid gap-6 lg:grid-cols-[1.15fr_minmax(0,0.85fr)]">
+        <div className="min-w-0">
           <h2 className="text-lg font-semibold tracking-tight">
             Every slide, already written
           </h2>
@@ -239,7 +239,7 @@ function ShowcaseDeckDemoPage() {
           </ol>
         </div>
 
-        <aside className="space-y-4">
+        <aside className="min-w-0 space-y-4">
           <div className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.04]">
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
               Ready to ship
@@ -267,12 +267,14 @@ function ShowcaseDeckDemoPage() {
                 <dd>{payload.slides.length}</dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt>Audience</dt>
-                <dd className="text-right">{payload.brief?.audience}</dd>
+                <dt className="shrink-0">Audience</dt>
+                <dd className="min-w-0 break-words text-right">{payload.brief?.audience}</dd>
               </div>
               <div className="flex justify-between gap-3">
-                <dt>Objective</dt>
-                <dd className="text-right">{payload.brief?.meetingObjective}</dd>
+                <dt className="shrink-0">Objective</dt>
+                <dd className="min-w-0 break-words text-right">
+                  {payload.brief?.meetingObjective}
+                </dd>
               </div>
             </dl>
           </div>
@@ -286,9 +288,9 @@ function ShowcaseDeckDemoPage() {
                   key={d.id}
                   to="/demo/deck/$demoId"
                   params={{ demoId: d.id }}
-                  className="flex min-h-[44px] items-center justify-between gap-3 rounded-xl border border-black/10 px-3 text-sm transition hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
+                  className="flex min-h-[44px] items-center justify-between gap-3 rounded-xl border border-black/10 px-3 py-2 text-sm transition hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
                 >
-                  <span>{d.eyebrow} · {d.name}</span>
+                  <span className="min-w-0 break-words">{d.eyebrow} · {d.name}</span>
                   <ArrowRight size={14} />
                 </Link>
               ))}
