@@ -1151,13 +1151,13 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-square":
       return (
         <Field chevron={0.1} style={{ background: `linear-gradient(150deg, ${NAVY} 0%, #0B1226 62%, ${ctx.accent}44 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26 }}>
-            <Logo ctx={ctx} width={360} />
-            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 22 }}>
-              <div style={{ height: 8, width: 132, background: ctx.accent, borderRadius: 99 }} />
-              <div style={{ fontSize: 74, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.02 }}>
-                {ctx.eventName}
-              </div>
+          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26, ...stackAlign }}>
+            <div style={lockupRow}>
+              <Logo ctx={ctx} width={360} />
+            </div>
+            <CopyPlate shortEdge={1080} pad={56}>
+              <StyleRule />
+              <div style={titleStyle(sstyle, 74)}>{ctx.eventName}</div>
               <div style={{ fontSize: 30, color: "rgba(255,255,255,0.72)", lineHeight: 1.3 }}>
                 {ctx.city} · {ctx.venue}
               </div>
@@ -1165,7 +1165,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
                 <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
                 <span style={{ color: "rgba(255,255,255,0.55)" }}>{ctx.url}</span>
               </div>
-            </div>
+            </CopyPlate>
           </div>
         </Field>
       );
@@ -1173,31 +1173,16 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-story":
       return (
         <Field chevron={0.09} style={{ background: `linear-gradient(190deg, ${NAVY} 0%, #0A1023 58%, ${ctx.accent}3d 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30 }}>
-            <Logo ctx={ctx} width={340} />
-            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 26 }}>
-              <div style={{ fontSize: 26, letterSpacing: "0.24em", color: ctx.accent, fontWeight: 700 }}>
-                {ctx.dateLine.toUpperCase()}
-              </div>
-              <div style={{ fontSize: 96, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1 }}>
-                {ctx.eventName}
-              </div>
-              <div style={{ fontSize: 34, color: "rgba(255,255,255,0.7)", lineHeight: 1.32 }}>{ctx.venue}</div>
-              <div
-                style={{
-                  alignSelf: "flex-start",
-                  marginTop: 18,
-                  padding: "20px 40px",
-                  borderRadius: 999,
-                  background: ctx.accent,
-                  color: NAVY,
-                  fontSize: 30,
-                  fontWeight: 800,
-                }}
-              >
-                {ctx.hashtag}
-              </div>
+          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30, ...stackAlign }}>
+            <div style={lockupRow}>
+              <Logo ctx={ctx} width={340} />
             </div>
+            <CopyPlate shortEdge={1080} pad={60}>
+              <Eyebrow size={26}>{ctx.dateLine.toUpperCase()}</Eyebrow>
+              <div style={titleStyle(sstyle, 96)}>{ctx.eventName}</div>
+              <div style={{ fontSize: 34, color: "rgba(255,255,255,0.7)", lineHeight: 1.32 }}>{ctx.venue}</div>
+              <Cta size={30}>{ctx.hashtag}</Cta>
+            </CopyPlate>
           </div>
         </Field>
       );
@@ -1205,23 +1190,21 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "social-wide":
       return (
         <Field chevron={0.11} style={{ background: `linear-gradient(115deg, ${NAVY} 0%, #0B1226 55%, ${ctx.accent}3a 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22 }}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22, ...stackAlign }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", ...lockupRow }}>
               <Logo ctx={ctx} width={330} />
               <span style={{ fontSize: 22, letterSpacing: "0.18em", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
                 {ctx.city.toUpperCase()}
               </span>
             </div>
-            <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 18 }}>
-              <div style={{ height: 7, width: 120, background: ctx.accent, borderRadius: 99 }} />
-              <div style={{ fontSize: 62, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.04, maxWidth: "82%" }}>
-                {ctx.eventName}
-              </div>
+            <CopyPlate shortEdge={628} pad={44}>
+              <StyleRule w={120} h={7} />
+              <div style={titleStyle(sstyle, 62, "82%")}>{ctx.eventName}</div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 24 }}>
                 <span style={{ color: "rgba(255,255,255,0.7)" }}>{ctx.venue}</span>
                 <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
               </div>
-            </div>
+            </CopyPlate>
           </div>
         </Field>
       );
@@ -1238,12 +1221,13 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               alignItems: "center",
               justifyContent: "space-between",
               gap: 40,
+              flexDirection: sstyle.lockup === "top-left" ? "row" : "row-reverse",
             }}
           >
             <Logo ctx={ctx} width={280} />
             <div style={{ width: 2, height: 120, background: `${ctx.accent}88` }} />
             <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
-              <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em" }}>{ctx.eventName}</span>
+              <span style={titleStyle(sstyle, 34)}>{ctx.eventName}</span>
               <span style={{ fontSize: 24, color: "rgba(255,255,255,0.65)" }}>
                 {ctx.city} · {ctx.url}
               </span>
@@ -1251,6 +1235,7 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
           </div>
         </Field>
       );
+
 
     case "doc":
     default:
