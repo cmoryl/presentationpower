@@ -8,7 +8,7 @@
  *   • intensity   — 0 flattens toward the page field, 1 is as authored, 2 double
  *                   strikes the ground for a punchier read
  *   • tint        — a colour veil over the ground (brand pass, warm/cool shift)
- *   • imageUrl    — a custom or AI backdrop painted behind the CSS layers
+ *   • imageUrl    — a custom or AI backdrop painted in front of the CSS layers
  *
  * Wrapping keeps every downstream surface — previews, present/share, PPTX
  * decomposition — on the exact same layer contract.
@@ -87,16 +87,20 @@ export function composeOverrideLayers(
     // Veil of the page field damps the ground without touching its geometry.
     out.push(flat(withAlpha(surface, 1 - intensity)));
   }
+  if (o.imageUrl) {
+    // A replacement picture IS the ground: it paints in front of the authored
+    // geometry (CSS draws the first layer on top), which stays behind it only
+    // as a fallback while the image loads or if it 404s.
+    out.push(`url("${o.imageUrl}") center center / cover no-repeat`);
+  }
   out.push(...layers);
-  if (intensity > 1) {
+  if (intensity > 1 && !o.imageUrl) {
     // Second strike of the same geometry deepens it (alpha stacks).
     out.push(...layers);
   }
-  if (o.imageUrl) {
-    out.push(`url("${o.imageUrl}") center center / cover no-repeat`);
-  }
   return out;
 }
+
 
 /** Wrap a pack so its ground honours the admin overrides for `code`. */
 export function withBackgroundOverrides(pack: StylePack, code: string): StylePack {
