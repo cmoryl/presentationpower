@@ -12,6 +12,8 @@ import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
+import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { resolveSlideTransition, type DeckSlide } from "@/lib/deck-store";
@@ -141,15 +143,27 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   const brand = packBrand(resolveBrandMode(deck.brand_mode_id ?? "", deck.sub_company), pack);
   const slides: DeckSlide[] = useMemo(
     () =>
-      (deck.slides ?? []).map((s, i) => ({
-        id: `share-${i}`,
-        position: s.position ?? i,
-        sectionId: s.section_id,
-        variantId: s.variant_id,
-        layoutId: s.layout_id,
-        content: (s.content ?? {}) as Record<string, unknown>,
-        changes: [],
-      })),
+      (deck.slides ?? []).map((s, i) => {
+        // Authoring extras (appearance mode, canvas blocks, transition and the
+        // per-slide background/template override) live inside the persisted
+        // content blob. Restoring them here is what keeps a shared link on the
+        // same designed grounds as the editor.
+        const { content, extras } = splitSlideContent(
+          (s.content ?? {}) as Record<string, unknown>,
+        );
+        return applySlideExtras(
+          {
+            id: `share-${i}`,
+            position: s.position ?? i,
+            sectionId: s.section_id,
+            variantId: s.variant_id,
+            layoutId: s.layout_id,
+            content,
+            changes: [],
+          },
+          extras,
+        ) as DeckSlide;
+      }),
     [deck.slides],
   );
   const clientName = deck.brief?.prospect ?? undefined;
@@ -349,6 +363,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   };
 
   return (
+    <SlideTemplateIndustryProvider industryId={deck.design_recipe_id ?? null}>
     <div className="min-h-screen bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
       {/* Minimal header */}
       <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
@@ -533,5 +548,6 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
         </div>
       )}
     </div>
+    </SlideTemplateIndustryProvider>
   );
 }

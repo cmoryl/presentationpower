@@ -1130,3 +1130,39 @@ export function sceneKindFor(code: string | null | undefined): SceneKind | null 
   const c = code.toUpperCase();
   return INDUSTRY_ART[c]?.kind ?? CORE_SCENE_KIND[c] ?? null;
 }
+
+
+/**
+ * APPEARANCE-TONED industry art: the sector's authored scene KIND rendered in a
+ * host pack's own palette. Needed when a light style pack picks a dark sector
+ * recipe (or the reverse) — painting the recipe's own dark plate under light
+ * modules produced the muddy grey "no background" read.
+ */
+export function tonedIndustrySceneLayers(
+  code: string | null | undefined,
+  scene: SkinScene,
+  palette: CoreArtPalette,
+  take = 0,
+): string[] {
+  if (!code) return [];
+  const c = code.toUpperCase();
+  const base = INDUSTRY_ART[c];
+  if (!base) return [];
+  const key = `v${SCENE_ART_VERSION}|toned|${c}|${scene}|${take}|${palette.surface}|${palette.ink}|${palette.accent}|${palette.accentAlt}|${palette.dark ? 1 : 0}`;
+  const hit = memoGet(coreCache, key);
+  if (hit) return hit;
+  const spec: ArtSpec = {
+    ...base,
+    surface: palette.surface,
+    deep: palette.dark ? palette.surface : palette.ink,
+    ink: palette.ink,
+    a1: palette.accent,
+    a2: palette.accentAlt,
+    signal: palette.accent,
+    dark: palette.dark,
+  };
+  const svg = svgFrom(spec, key, scene, take, 0.86);
+  return memoSet(coreCache, key, [
+    `url("data:image/svg+xml,${encodeURIComponent(svg)}") center center / cover no-repeat`,
+  ]);
+}

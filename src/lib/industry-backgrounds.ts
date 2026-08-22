@@ -28,6 +28,7 @@ import {
 } from "./design-skins";
 import { INDUSTRY_SKINS, industrySkinByCode } from "./industry-skins";
 import { skinPackById, skinPackId, stylePackFromSkin } from "./design-skin-pack";
+import { tonedIndustrySceneLayers } from "./industry-scene-art";
 import type { StylePack } from "./style-packs";
 import {
   MOTIF_LABEL,
@@ -35,6 +36,7 @@ import {
   SKIN_SCENES,
   TAKE_LABEL,
   motifFamilyFor,
+  sceneFromSeed,
   skinSignature,
   type MotifFamily,
   type SceneTier,
@@ -212,6 +214,21 @@ export const INDUSTRY_BG_COMBOS = SKIN_SCENES.length * SKIN_BG_TAKES;
  * layout, and take only `ground()` from the industry background system. Module
  * renderers are untouched — this is a pack-level composition, nothing forked.
  */
+/** Rough luminance test for a pack's page field. */
+function isDarkSurface(hex: string): boolean {
+  const h = (hex ?? "").replace("#", "");
+  if (h.length < 6) return false;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.5;
+}
+
+function takeFromSeed(seed: string): number {
+  const m = /take:(\d+)/i.exec(seed);
+  return m ? parseInt(m[1]!, 10) : 0;
+}
+
 export function withIndustryGround(
   basePack: StylePack,
   recipeId: string | null | undefined,
@@ -220,10 +237,32 @@ export function withIndustryGround(
   if (!set) return basePack;
   const skin = industrySkinByCode(set.recipeId);
   if (!skin) return basePack;
+  // APPEARANCE MATCH: a dark sector plate under a light style pack (or the
+  // reverse) reads as a muddy grey field — the "demo has no background" bug.
+  // When the two disagree we keep the sector's authored scene GEOMETRY but
+  // render it in the host pack's own palette, over the pack's own ground.
+  const hostDark = isDarkSurface(basePack.tokens.surface);
+  const clash = hostDark !== (skin.mode === "dark");
   return {
     ...basePack,
     reference: `${basePack.reference} · ${set.recipeId} GROUND`,
-    ground: (seed) => set.pack.ground(seed),
+    ground: clash
+      ? (seed) => [
+          ...tonedIndustrySceneLayers(
+            set.recipeId,
+            sceneFromSeed(seed),
+            {
+              surface: basePack.tokens.surface,
+              ink: basePack.tokens.ink,
+              accent: basePack.tokens.accent,
+              accentAlt: basePack.tokens.accentAlt,
+              dark: hostDark,
+            },
+            takeFromSeed(seed),
+          ),
+          ...basePack.ground(seed),
+        ]
+      : (seed) => set.pack.ground(seed),
     swatch: basePack.swatch,
   };
 }
