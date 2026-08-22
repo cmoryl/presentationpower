@@ -97,7 +97,14 @@ function SocialAssetEditorModal({
   const patch = (p: Partial<SocialAssetEdit>) => onChange({ ...edit, ...p });
 
   const baseCopy = rendererProps.copy;
-  const hasImage = Boolean(rendererProps.imageUrl);
+  // Photography can be attached by the edit itself, so assets the pipeline
+  // produced without imagery (common on dark variants for divisions with no
+  // photo pool) still get the full panel toolkit.
+  const fallbackPhoto =
+    photoForFormat(rendererProps.brandId, format) ?? photoForFormat("bm-tp-master", format);
+  const effectiveImage =
+    edit.imageUrl !== undefined ? edit.imageUrl || undefined : rendererProps.imageUrl;
+  const hasImage = Boolean(effectiveImage);
   const panelActive = hasImage && (edit.imageLayout ?? rendererProps.imageLayout) === "panel";
 
   const preview = useMemo(
