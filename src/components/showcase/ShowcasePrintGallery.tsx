@@ -11,6 +11,7 @@ import { Maximize2, X } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
 import { PrintKindPreview } from "@/components/print/PrintKindPreview";
 import { PrintPageProvider } from "@/components/print/print-page-context";
+import { PrintContentFitFrame } from "@/components/print/PrintContentFitFrame";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
 import { isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { multiPageLabel } from "@/components/print/MultiProposalLayout";
@@ -31,6 +32,8 @@ type Props = {
   pageSize?: PrintPageSize;
   density?: PrintDensity;
   accent?: string;
+  /** Auto-fit content to the trim (margin relief, then uniform scale). */
+  fit?: boolean;
 };
 
 function Page({
@@ -41,21 +44,34 @@ function Page({
   pageSize = "Letter",
   density = "standard",
   pageIndex,
+  fit = false,
 }: Props & { pageIndex?: number }) {
+  const page = (
+    <div className="pointer-events-none">
+      <PrintKindPreview
+        kind={kind}
+        content={content}
+        brand={brand}
+        mode={mode}
+        pageSize={pageSize}
+        density={density}
+        {...(typeof pageIndex === "number" ? { pageIndex } : {})}
+      />
+    </div>
+  );
   return (
     <PrintPageProvider size={pageSize} margin="standard" density={density}>
       <PrintDocModeProvider icons iconStyle={resolvePrintIconStyle({ scale: 1 })}>
-        <div className="pointer-events-none">
-          <PrintKindPreview
-            kind={kind}
-            content={content}
-            brand={brand}
-            mode={mode}
-            pageSize={pageSize}
-            density={density}
-            {...(typeof pageIndex === "number" ? { pageIndex } : {})}
-          />
-        </div>
+        {fit ? (
+          <PrintContentFitFrame
+            settings={{ enabled: true }}
+            dep={{ content, pageSize, density, pageIndex }}
+          >
+            {page}
+          </PrintContentFitFrame>
+        ) : (
+          page
+        )}
       </PrintDocModeProvider>
     </PrintPageProvider>
   );
