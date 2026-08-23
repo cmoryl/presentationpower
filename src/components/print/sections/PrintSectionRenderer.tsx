@@ -1,6 +1,7 @@
 // Dispatch a `PrintSection` block to its portrait-native renderer. Any print
 // layout can render `content.modules?` by mapping through this component.
 import type { PrintHeroModuleVariant, PrintSection } from "@/lib/print-assets.types";
+import { cq, MODULE } from "./shared";
 import {
   HeroPhotoBand,
   HeroSplitPhoto,
