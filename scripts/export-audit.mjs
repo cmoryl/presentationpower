@@ -11,6 +11,7 @@
 
 import { writeFileSync } from "node:fs";
 import { chromium } from "playwright";
+import { ensureChromiumLaunchOptions } from "./lib/ensure-chromium.mjs";
 
 const args = process.argv.slice(2);
 const flag = (name, fallback) => {
@@ -21,8 +22,17 @@ const flag = (name, fallback) => {
 const BASE = flag("url", "http://localhost:8080").replace(/\/$/, "");
 const JSON_OUT = flag("json", null);
 
-const browser = await chromium.launch();
+let launchOptions;
+try {
+  launchOptions = await ensureChromiumLaunchOptions();
+} catch (err) {
+  console.error(`\n✗ cannot start the headless export gate.\n\n${err?.message ?? err}\n`);
+  process.exit(1);
+}
+
+const browser = await chromium.launch(launchOptions);
 const context = await browser.newContext({ viewport: { width: 1280, height: 1800 } });
+
 const page = await context.newPage();
 const consoleErrors = [];
 page.on("console", (msg) => {
