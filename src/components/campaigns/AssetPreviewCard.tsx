@@ -21,7 +21,6 @@ function divisionAccent(brandId: string): string {
   return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? "#003FC7";
 }
 
-
 type Props = {
   rendererProps: Omit<SocialRendererProps, "displayShortEdge">;
   formatLabel: string;
@@ -53,7 +52,6 @@ export function AssetPreviewCard({
   editKey,
   onEditReset,
 }: Props) {
-
   const [open, setOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const accent = divisionAccent(rendererProps.brandId);
@@ -112,7 +110,9 @@ export function AssetPreviewCard({
                   <span
                     aria-hidden
                     className="pointer-events-none absolute -inset-4 -z-10 blur-2xl"
-                    style={{ background: `radial-gradient(60% 60% at 50% 50%, ${accent}40, transparent 70%)` }}
+                    style={{
+                      background: `radial-gradient(60% 60% at 50% 50%, ${accent}40, transparent 70%)`,
+                    }}
                   />
                 ) : null}
                 <SocialRenderer {...liveProps} displayShortEdge={displayShortEdge} />
@@ -149,7 +149,9 @@ export function AssetPreviewCard({
               // export captures that inner frame so output is platform-exact.
               const node =
                 cardRef.current?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
-              return node ? [{ node, width: formatWidth, height: formatHeight, label: formatLabel }] : [];
+              return node
+                ? [{ node, width: formatWidth, height: formatHeight, label: formatLabel }]
+                : [];
             }}
           />
           {editable ? (

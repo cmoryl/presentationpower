@@ -96,7 +96,10 @@ export function AssetExportMenu({
         name = `${base}-${Math.round(t.width * job.scale)}x${Math.round(t.height * job.scale)}.${job.format}`;
         kind = job.format;
         if (job.format === "png") {
-          expect = { width: Math.round(t.width * job.scale), height: Math.round(t.height * job.scale) };
+          expect = {
+            width: Math.round(t.width * job.scale),
+            height: Math.round(t.height * job.scale),
+          };
         }
       } else if (job.kind === "pdf") {
         blob = await exportAssetsPdf(targets);

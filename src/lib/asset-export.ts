@@ -123,7 +123,8 @@ function canvasToBlob(
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error(`canvas.toBlob returned null (${format})`))),
+      (blob) =>
+        blob ? resolve(blob) : reject(new Error(`canvas.toBlob returned null (${format})`)),
       ASSET_IMAGE_MIME[format],
       format === "png" ? undefined : quality,
     );
@@ -205,12 +206,22 @@ export async function exportAssetsZip(
     const blob = await exportAssetImage(t, opts);
     const name = `${String(i + 1).padStart(2, "0")}-${assetFileSlug(t.label, "asset")}-${t.width}x${t.height}.${format}`;
     folder.file(name, blob);
-    manifest.push({ file: name, label: t.label ?? null, width: t.width, height: t.height, bytes: blob.size });
+    manifest.push({
+      file: name,
+      label: t.label ?? null,
+      width: t.width,
+      height: t.height,
+      bytes: blob.size,
+    });
     opts.onProgress?.(i + 1, targets.length);
   }
   folder.file(
     "manifest.json",
-    JSON.stringify({ bundle, exportedAt: new Date().toISOString(), format, assets: manifest }, null, 2),
+    JSON.stringify(
+      { bundle, exportedAt: new Date().toISOString(), format, assets: manifest },
+      null,
+      2,
+    ),
   );
   return zip.generateAsync({ type: "blob" });
 }

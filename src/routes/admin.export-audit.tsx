@@ -95,7 +95,12 @@ const CHECK_META: Array<{ id: string; label: string; area: string; kind: ExportK
   { id: "social.png", label: "Social asset → PNG 1080×1080", area: "Social", kind: "png" },
   { id: "social.zip", label: "Social kit → ZIP", area: "Social", kind: "zip" },
   { id: "print.pdf.digital", label: "Print page → digital PDF", area: "Print", kind: "pdf" },
-  { id: "print.pdf.press", label: "Print page → press PDF (bleed + vector text)", area: "Print", kind: "pdf" },
+  {
+    id: "print.pdf.press",
+    label: "Print page → press PDF (bleed + vector text)",
+    area: "Print",
+    kind: "pdf",
+  },
   { id: "print.pptx", label: "Print page → layered PPTX", area: "Print", kind: "pptx" },
   { id: "print.html", label: "Print page → standalone HTML", area: "Print", kind: "html" },
   { id: "deck.pptx", label: "Deck slide → layered PPTX", area: "Presentation", kind: "pptx" },
@@ -138,8 +143,7 @@ function genericTargets(fx: Fixtures): AssetCaptureTarget[] {
 }
 
 async function deckFixturePptx(): Promise<Blob> {
-  const variant =
-    MODULE_VARIANTS.find((v) => v.id.startsWith("MV-TXT")) ?? MODULE_VARIANTS[0];
+  const variant = MODULE_VARIANTS.find((v) => v.id.startsWith("MV-TXT")) ?? MODULE_VARIANTS[0];
   const brand = BRAND_MODES[0];
   const brief = resolveDivisionBrief(brand);
   const content = seedDivisionContent(variant.id, brief, "Export audit", brand) as Record<
@@ -234,7 +238,9 @@ async function iconBlobs(): Promise<{ svg: Blob; png: Blob }> {
   };
 }
 
-type Runner = (fx: Fixtures) => Promise<{ blob: Blob; expect?: Parameters<typeof verifyExportBlob>[2] }>;
+type Runner = (
+  fx: Fixtures,
+) => Promise<{ blob: Blob; expect?: Parameters<typeof verifyExportBlob>[2] }>;
 
 const RUNNERS: Record<string, Runner> = {
   "asset.png": async (fx) => ({
@@ -534,7 +540,14 @@ function ExportAuditPage() {
             fontFamily: "Geist, system-ui, sans-serif",
           }}
         >
-          <p style={{ fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "#003FC7" }}>
+          <p
+            style={{
+              fontSize: 11,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "#003FC7",
+            }}
+          >
             Export audit
           </p>
           <h1 style={{ fontSize: 44, lineHeight: 1.05, letterSpacing: "-0.03em", marginTop: 12 }}>
@@ -547,7 +560,10 @@ function ExportAuditPage() {
           <div style={{ marginTop: 32, height: 240, background: "#E0E8F5", borderRadius: 14 }} />
           <div style={{ display: "flex", gap: 16, marginTop: 24 }}>
             {["98%", "3×", "24h"].map((v) => (
-              <div key={v} style={{ flex: 1, background: "#F2F2F2", borderRadius: 14, padding: 20 }}>
+              <div
+                key={v}
+                style={{ flex: 1, background: "#F2F2F2", borderRadius: 14, padding: 20 }}
+              >
                 <div style={{ fontSize: 34, letterSpacing: "-0.03em" }}>{v}</div>
                 <div style={{ fontSize: 12, color: "#666", marginTop: 6 }}>Verified metric</div>
               </div>

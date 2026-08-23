@@ -19,8 +19,6 @@ import {
   ImagePlus,
   Images,
   LayoutTemplate,
-
-
   Maximize2,
   RefreshCw,
   Save,
@@ -53,8 +51,6 @@ import {
 } from "@/lib/social-module-layouts";
 import { reliefAt } from "@/lib/social-module-fit";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
-
-
 
 import { getKit, saveKit, type SavedKit } from "@/lib/kits.functions";
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
@@ -147,10 +143,6 @@ export function KitWizard({
   const [regenTick, setRegenTick] = useState(0);
   const [removed, setRemoved] = useState<Set<string>>(new Set());
 
-
-
-
-
   // ─── NEXT 2026 design mode ─────────────────────────────────────────────
   // When on, every asset re-renders in the NEXT design language (navy ground,
   // track accent, official NEXT lockup) instead of the division aurora look.
@@ -169,10 +161,6 @@ export function KitWizard({
   const [moduleLayoutId, setModuleLayoutId] = useState<string | null>(null);
   const [modulePickerOpen, setModulePickerOpen] = useState(false);
   const moduleLayout = moduleLayoutId ? findSocialModuleLayout(moduleLayoutId) : undefined;
-
-
-
-
 
   // ─── Save state ────────────────────────────────────────────────────────
   const [savedKitId, setSavedKitId] = useState<string | undefined>(kitId);
@@ -360,7 +348,10 @@ export function KitWizard({
 
   // Reference frame + copy used by the module picker previews.
   const pickerFormat = useMemo(
-    () => assets[0]?.format ?? getFormat(formatIds[0] ?? "li-single") ?? SOCIAL_FORMATS_BY_ID["li-single"],
+    () =>
+      assets[0]?.format ??
+      getFormat(formatIds[0] ?? "li-single") ??
+      SOCIAL_FORMATS_BY_ID["li-single"],
     [assets, formatIds],
   );
   const pickerCopy: CampaignCopy = useMemo(
@@ -582,9 +573,7 @@ export function KitWizard({
               }
             />
 
-
             <div className="grid gap-3 rounded-2xl border border-black/10 bg-white/60 p-4 sm:grid-cols-2">
-
               <div className="sm:col-span-2">
                 <TextField
                   label="Headline (required)"
@@ -682,7 +671,6 @@ export function KitWizard({
                 Switch to favorited-module flow →
               </Link>
             </p>
-
           </StepCard>
         )}
 
@@ -905,7 +893,6 @@ export function KitWizard({
                     className="size-4"
                     style={{ accentColor: NEXT_NAVY_SPEC }}
                   />
-
                   Regenerate in NEXT 2026 designs
                 </label>
                 <label className="inline-flex items-center gap-2 text-xs text-black/60">
@@ -1018,11 +1005,9 @@ export function KitWizard({
                   Drops a full-bleed photo behind every asset with a brand scrim so the copy stays
                   legible. Uploaded files are embedded, so they export with the PNGs. Or pull an
                   approved shot from this division&rsquo;s imagery library.
-
                 </p>
               )}
             </div>
-
 
             {source == null ? (
               <EmptyState
@@ -1139,12 +1124,9 @@ export function KitWizard({
                         </span>
                       </button>
                     </div>
-
                   </div>
                 ))}
               </div>
-
-
             )}
           </StepCard>
         )}
@@ -1333,7 +1315,6 @@ function KitAssetZoom({
     </div>
   );
 }
-
 
 function StepCard({
   eyebrow,
