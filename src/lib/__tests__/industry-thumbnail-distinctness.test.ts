@@ -41,12 +41,18 @@ function expandLayers(layers: string[]): string {
     .join("\n");
 }
 
-/** Stable structural tokens: colors, gradient kinds, angles, stops, shapes. */
+/** Stable structural tokens: plates, colors, gradient kinds, angles, stops, shapes. */
 function tokenize(art: string): Set<string> {
   const tokens = new Set<string>();
   const push = (re: RegExp, prefix: string) => {
     for (const m of art.matchAll(re)) tokens.add(`${prefix}:${m[0].toLowerCase()}`);
   };
+  // Authored PHOTOREAL plates carry the recipe identity in the asset itself, so
+  // the plate file is a first-class structural token (the kits share scrims).
+  for (const m of art.matchAll(/url\("([^"]+)"\)/g)) {
+    const file = (m[1] ?? "").split("/").pop() ?? "";
+    if (!file.startsWith("data:")) tokens.add(`plate:${file.toLowerCase()}`);
+  }
   push(/#[0-9a-f]{3,8}\b/gi, "hex");
   push(/(?:linear|radial|conic)-gradient/gi, "grad");
   push(/-?\d+(?:\.\d+)?deg/g, "angle");
@@ -55,6 +61,12 @@ function tokenize(art: string): Set<string> {
   push(/\b(?:rgba?|hsla?)\([^)]*\)/gi, "color");
   return tokens;
 }
+
+/** Authored plate files referenced by a thumbnail's layer stack. */
+function plates(tokens: Set<string>): string[] {
+  return [...tokens].filter((t) => t.startsWith("plate:"));
+}
+
 
 function distance(a: Set<string>, b: Set<string>): number {
   let shared = 0;
