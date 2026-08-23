@@ -258,7 +258,7 @@ function CanvasStudioPage() {
           comp.items.length === 1 ? "" : "s"
         }`,
         content: { composition: comp } as Record<string, unknown>,
-        brandMode: comp.mode,
+        brandMode: (stageComp ?? comp).mode,
         subCompany: comp.brandId,
         tags: ["open-canvas"],
       };
@@ -325,7 +325,7 @@ function CanvasStudioPage() {
     mutationFn: async () => {
       if (!comp) throw new Error("Nothing to export");
       const { exportCompositionToPptx } = await import("@/lib/canvas-studio-export");
-      return exportCompositionToPptx(comp, brand);
+      return exportCompositionToPptx(stageComp ?? comp, brand);
     },
     onSuccess: (res) =>
       toast.success("PowerPoint exported", {
@@ -354,7 +354,10 @@ function CanvasStudioPage() {
             <MetaDot />
             <span>{brand.name}</span>
             <MetaDot />
-            <span>{comp.mode === "dark" ? "Dark" : "Light"} mode</span>
+            <span>
+              {(stageComp ?? comp).mode === "dark" ? "Dark" : "Light"} mode
+              {pack ? ` · ${pack.label}` : ""}
+            </span>
           </>
         }
         status={
