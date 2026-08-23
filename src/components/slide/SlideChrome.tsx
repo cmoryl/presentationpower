@@ -1081,13 +1081,15 @@ export function SlideFrame({
             placement.position === "bottom-right";
 
           const baseSize = variant === "content" ? "sm" : variant === "cover" ? "xl" : "md";
+          // Corner / centered placements step down one notch, but never below
+          // `xs` — division lockups must stay legible at presentation distance.
           const shrink: Record<string, "2xs" | "xs" | "sm" | "md" | "lg" | "xl"> = {
-            xl: "sm",
-            lg: "xs",
-            md: "xs",
-            sm: "2xs",
-            xs: "2xs",
-            "2xs": "2xs",
+            xl: "md",
+            lg: "sm",
+            md: "sm",
+            sm: "xs",
+            xs: "xs",
+            "2xs": "xs",
           };
           const sizeAfterHalf = halfSize ? shrink[baseSize] : (baseSize as "sm" | "md" | "xl");
           const effectiveSize = isMarkOnly

@@ -32,7 +32,7 @@ export type DemoDivision = {
    * Divisions with an authored plate kit (Gaming = R22) must name it here or
    * the deck falls back to whatever recipe the source narrative carried.
    */
-  designRecipeId?: string;
+  designRecipeId?: string | null;
   /** Industry stamped into the brief. */
   industry: string;
 };
@@ -89,8 +89,11 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Gaming",
     slug: "gaming",
     accent: "#4ADE80",
-    stylePackId: "skin-r22",
-    designRecipeId: "R22",
+    // Gaming reads as a *designed* language (mesh gradients, neon geometry)
+    // rather than photoreal industry plates: S03 Gradient Infrastructure, with
+    // the industry background family explicitly cleared (null, not undefined).
+    stylePackId: "skin-s03",
+    designRecipeId: null,
     industry: "Gaming",
   },
   {
@@ -208,8 +211,12 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
       ...(payload.context ?? {}),
       stylePackId: target.stylePackId,
       // Keep the source recipe only when the target division has no authored
-      // background family of its own.
-      designRecipeId: target.designRecipeId ?? payload.context?.designRecipeId ?? null,
+      // background family of its own. An explicit `null` clears it, so
+      // design-led divisions never inherit the source industry plates.
+      designRecipeId:
+        target.designRecipeId === null
+          ? null
+          : (target.designRecipeId ?? payload.context?.designRecipeId ?? null),
     },
     slides,
     brief: payload.brief

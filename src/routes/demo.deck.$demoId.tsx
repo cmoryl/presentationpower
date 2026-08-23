@@ -14,6 +14,7 @@ import {
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
+import { DemoStyleAdmin } from "@/components/showcase/DemoStyleAdmin";
 import { showcaseArt } from "@/lib/showcase-art";
 import {
   DEMO_DIVISIONS,
@@ -264,6 +265,17 @@ function ShowcaseDeckDemoPage() {
         </div>
       </div>
 
+
+      {isAdmin ? (
+        <DemoStyleAdmin
+          demoKind="deck"
+          demoId={demoId}
+          divisionKey={division.id}
+          divisionLabel={division.label}
+          payload={payload}
+          hasOverride={Boolean(override)}
+        />
+      ) : null}
 
       {/* Rendered comps — every slide of the demo, live from the renderer. */}
       <section className="mt-10">

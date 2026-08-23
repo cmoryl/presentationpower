@@ -64,20 +64,22 @@ export function BrandLockup({
   orientation?: "horizontal" | "stacked" | "vertical-left" | "vertical-right" | "mark-only";
   monochromeOfficialLogo?: boolean;
 }) {
-  // Lockup scale — every step runs 20% larger than the original chrome scale so
-  // the mark reads at presentation distance on module templates.
+  // Lockup scale. Division / corporate marks were reading far too small on
+  // slides, so the small end of the ramp (the sizes chrome actually uses for
+  // content and corner placements) is lifted ~1.6x; the hero end grows more
+  // gently since it was already close to right.
   const dims =
     size === "2xs"
-      ? { markPx: 17, wordmarkPx: 10, wordPx: 10, dividerPx: 7, radiusPx: 5, gapPx: 5 }
+      ? { markPx: 29, wordmarkPx: 17, wordPx: 16, dividerPx: 11, radiusPx: 8, gapPx: 8 }
       : size === "xs"
-        ? { markPx: 22, wordmarkPx: 13, wordPx: 13, dividerPx: 10, radiusPx: 6, gapPx: 7 }
+        ? { markPx: 36, wordmarkPx: 22, wordPx: 20, dividerPx: 15, radiusPx: 9, gapPx: 10 }
         : size === "sm"
-          ? { markPx: 29, wordmarkPx: 17, wordPx: 17, dividerPx: 12, radiusPx: 7, gapPx: 10 }
+          ? { markPx: 47, wordmarkPx: 28, wordPx: 26, dividerPx: 18, radiusPx: 11, gapPx: 14 }
           : size === "lg"
-            ? { markPx: 77, wordmarkPx: 48, wordPx: 38, dividerPx: 22, radiusPx: 14, gapPx: 19 }
+            ? { markPx: 96, wordmarkPx: 60, wordPx: 46, dividerPx: 26, radiusPx: 16, gapPx: 22 }
             : size === "xl"
-              ? { markPx: 115, wordmarkPx: 77, wordPx: 58, dividerPx: 29, radiusPx: 19, gapPx: 26 }
-              : { markPx: 38, wordmarkPx: 22, wordPx: 20, dividerPx: 13, radiusPx: 10, gapPx: 12 };
+              ? { markPx: 138, wordmarkPx: 92, wordPx: 68, dividerPx: 33, radiusPx: 21, gapPx: 30 }
+              : { markPx: 60, wordmarkPx: 36, wordPx: 30, dividerPx: 19, radiusPx: 13, gapPx: 17 };
 
   const logo = brand.logo ?? { mark: brand.name.slice(0, 2).toUpperCase(), wordmark: brand.name };
   const divisionLine = (subCompany ?? logo.divisionLine)?.replace(
