@@ -116,6 +116,12 @@ function PrintModuleStudioPage() {
       toast.error(e instanceof Error ? e.message : "Could not reset this module"),
   });
 
+  // Computed before the early returns so the unsaved-work guard keeps a stable
+  // hook order.
+  const dirty = draft ? JSON.stringify(draft) !== savedKey : false;
+  // Warn before a reload / tab close throws unsaved master edits away.
+  useDirtyExitGuard(dirty);
+
   if (rowsQ.isLoading) return <AdminLoading label="Loading module…" />;
   if (isForbidden(rowsQ.error)) return <AdminForbidden />;
 
@@ -134,9 +140,6 @@ function PrintModuleStudioPage() {
   }
 
   const merged = applyPrintOverride(shipped, override);
-  const dirty = JSON.stringify(draft) !== savedKey;
-  // Warn before a reload / tab close throws unsaved master edits away.
-  useDirtyExitGuard(dirty);
   const variants = sectionVariantsFor(draft.kind);
   const textPaths = enumerateLeafPaths(draft as unknown as Record<string, unknown>).filter((p) => {
     const v = readLeaf(draft as unknown as Record<string, unknown>, p);
