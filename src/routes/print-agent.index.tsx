@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { createPrintThread, listPrintThreads } from "@/lib/print-agent/threads";
+import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 export const Route = createFileRoute("/print-agent/")({
   ssr: false,
@@ -48,10 +49,17 @@ function PrintAgentIndex() {
     })();
   }, [userId, navigate]);
 
+  if (userId === null)
+    return (
+      <AppShell>
+        <AgentSignInGate label="print agent" />
+      </AppShell>
+    );
+
   return (
     <AppShell>
       <div className="flex min-h-[60vh] items-center justify-center p-10 text-sm text-foreground/55">
-        {userId === null ? "Sign in to use the print agent." : (error ?? "Opening your print agent…")}
+        {error ?? "Opening your print agent…"}
       </div>
     </AppShell>
   );

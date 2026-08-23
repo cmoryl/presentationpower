@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { createAgentThread, listAgentThreads } from "@/lib/agent/threads";
+import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 export const Route = createFileRoute("/agent/")({
   ssr: false,
@@ -48,12 +49,17 @@ function AgentIndex() {
     })();
   }, [userId, navigate]);
 
+  if (userId === null)
+    return (
+      <AppShell>
+        <AgentSignInGate label="presentation agent" />
+      </AppShell>
+    );
+
   return (
     <AppShell>
       <div className="flex min-h-[60vh] items-center justify-center p-10 text-sm text-foreground/55">
-        {userId === null
-          ? "Sign in to use the presentation agent."
-          : (error ?? "Opening your presentation agent…")}
+        {error ?? "Opening your presentation agent…"}
       </div>
     </AppShell>
   );

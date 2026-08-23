@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { createKitThread, listKitThreads } from "@/lib/kit-agent/threads";
+import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 export const Route = createFileRoute("/social-agent/")({
   ssr: false,
@@ -52,12 +53,17 @@ function SocialAgentIndex() {
     })();
   }, [userId, navigate]);
 
+  if (userId === null)
+    return (
+      <AppShell>
+        <AgentSignInGate label="social agent" />
+      </AppShell>
+    );
+
   return (
     <AppShell>
       <div className="flex min-h-[60vh] items-center justify-center p-10 text-sm text-foreground/55">
-        {userId === null
-          ? "Sign in to use the social agent."
-          : (error ?? "Opening your social agent…")}
+        {error ?? "Opening your social agent…"}
       </div>
     </AppShell>
   );
