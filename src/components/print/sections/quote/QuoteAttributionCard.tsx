@@ -1,6 +1,6 @@
 // Glass card with quote body left, author lockup right.
 import type { PrintQuoteSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -25,14 +25,14 @@ export function QuoteAttributionCard({
       .join("")
       .toUpperCase() || "★";
   return (
-    <section aria-label="Quote" style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label="Quote" style={{ margin: 0 }}>
       <div
         className="grid"
         style={{
           gridTemplateColumns: "1.6fr 1fr",
-          gap: cq(16),
-          borderRadius: cq(16),
-          padding: cq(22),
+          gap: cq(MODULE.gridGap),
+          borderRadius: cq(MODULE.radius),
+          padding: `${cq(MODULE.padY * 1.25)} ${cq(MODULE.padX * 1.2)}`,
           ...sectionGlass(mode, accent),
         }}
       >

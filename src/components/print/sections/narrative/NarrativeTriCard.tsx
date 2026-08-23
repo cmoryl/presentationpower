@@ -1,7 +1,7 @@
 // Challenge / Approach / Impact triptych — the spine of every curated
 // e-brochure in the print library. Three glass cards, optional bullet rails.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 import { clampLines, type IconName } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -22,9 +22,9 @@ export function NarrativeTriCard({
   const items = section.items.slice(0, 3);
   const cols = Math.max(1, items.length);
   return (
-    <section aria-label={section.title ?? "Narrative"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Narrative"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(12) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
@@ -42,7 +42,7 @@ export function NarrativeTriCard({
             <h3
               style={{
                 margin: `${cq(4)} 0 0`,
-                fontSize: cq(16),
+                fontSize: cq(MODULE.title),
                 fontWeight: 700,
                 color: ink.strong,
                 letterSpacing: "-0.015em",
@@ -55,15 +55,13 @@ export function NarrativeTriCard({
       )}
       <div
         className="grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(12) }}
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(MODULE.gridGap) }}
       >
         {items.map((it, i) => (
           <div
             key={i}
             style={{
-              borderRadius: cq(14),
-              padding: `${cq(14)} ${cq(14)} ${cq(16)}`,
-              ...sectionGlass(mode, accent),
+              ...moduleCard(mode, accent),
             }}
           >
             {icons ? (
@@ -99,7 +97,7 @@ export function NarrativeTriCard({
             )}
             <div
               style={{
-                fontSize: cq(12.5),
+                fontSize: cq(MODULE.cardTitle),
                 fontWeight: 700,
                 color: ink.strong,
                 letterSpacing: "-0.01em",
@@ -111,8 +109,8 @@ export function NarrativeTriCard({
               <div
                 style={{
                   marginTop: cq(6),
-                  fontSize: cq(9.8),
-                  lineHeight: 1.5,
+                  fontSize: cq(MODULE.body),
+                  lineHeight: MODULE.bodyLead,
                   color: ink.soft,
                   ...clampLines(6),
                 }}

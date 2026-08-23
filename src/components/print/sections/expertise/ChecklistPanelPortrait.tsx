@@ -1,6 +1,6 @@
 // Glass checklist panel — up to 6 rows with accent check chips.
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 import { Icon, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -18,20 +18,18 @@ export function ChecklistPanelPortrait({
   const icons = usePrintIcons();
   const items = section.items.slice(0, 6);
   return (
-    <section aria-label={section.title ?? "Capabilities"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Capabilities"} style={{ margin: 0 }}>
       <div
         style={{
-          borderRadius: cq(14),
-          padding: `${cq(18)} ${cq(20)}`,
-          ...sectionGlass(mode, accent),
+          ...modulePanel(mode, accent),
         }}
       >
         {(section.eyebrow || section.title) && (
-          <div style={{ marginBottom: cq(10) }}>
+          <div style={{ marginBottom: cq(MODULE.headerGap) }}>
             {section.eyebrow && (
               <div
                 style={{
-                  fontSize: cq(9),
+                  fontSize: cq(MODULE.eyebrow),
                   fontWeight: 700,
                   letterSpacing: "0.18em",
                   color: accent,
@@ -43,7 +41,7 @@ export function ChecklistPanelPortrait({
             )}
             {section.title && (
               <div
-                style={{ marginTop: cq(3), fontSize: cq(14), fontWeight: 700, color: ink.strong }}
+                style={{ marginTop: cq(MODULE.eyebrowGap), fontSize: cq(MODULE.panelTitle), fontWeight: 700, letterSpacing: MODULE.titleTrack, color: ink.strong }}
               >
                 {section.title}
               </div>
@@ -54,8 +52,8 @@ export function ChecklistPanelPortrait({
           className="grid"
           style={{
             gridTemplateColumns: items.length > 3 ? "1fr 1fr" : "1fr",
-            columnGap: cq(18),
-            rowGap: cq(10),
+            columnGap: cq(MODULE.gridGap * 1.25),
+            rowGap: cq(11),
           }}
         >
           {items.map((it, i) => (
@@ -93,7 +91,7 @@ export function ChecklistPanelPortrait({
                 />
               )}
               <div
-                style={{ fontSize: cq(10.5), lineHeight: 1.45, color: ink.soft, ...clampLines(2) }}
+                style={{ fontSize: cq(MODULE.body), lineHeight: 1.45, color: ink.soft, ...clampLines(2) }}
               >
                 {it.label}
               </div>

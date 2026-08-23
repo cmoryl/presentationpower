@@ -3,7 +3,7 @@
 // wide.
 import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 
 export function StatBentoPortrait({
   section,
@@ -20,9 +20,9 @@ export function StatBentoPortrait({
   const [hero, ...rest] = items;
 
   return (
-    <section aria-label={section.title ?? "Stat bento"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Stat bento"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(12) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
@@ -51,11 +51,11 @@ export function StatBentoPortrait({
           )}
         </header>
       )}
-      <div className="grid" style={{ gridTemplateColumns: "1.35fr 1fr", gap: cq(12) }}>
+      <div className="grid" style={{ gridTemplateColumns: "1.35fr 1fr", gap: cq(MODULE.gridGap) }}>
         <div
           style={{
-            borderRadius: cq(16),
-            padding: cq(20),
+            borderRadius: cq(MODULE.radius),
+            padding: cq(MODULE.padX),
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
@@ -113,15 +113,15 @@ export function StatBentoPortrait({
           style={{
             display: "grid",
             gridTemplateRows: `repeat(${Math.max(rest.length, 1)}, minmax(0, 1fr))`,
-            gap: cq(12),
+            gap: cq(MODULE.gridGap),
           }}
         >
           {rest.map((it, i) => (
             <div
               key={i}
               style={{
-                borderRadius: cq(14),
-                padding: `${cq(14)} ${cq(16)}`,
+                borderRadius: cq(MODULE.radius),
+                padding: cq(MODULE.cardPad),
                 ...sectionGlass(mode, accent),
                 display: "flex",
                 flexDirection: "column",

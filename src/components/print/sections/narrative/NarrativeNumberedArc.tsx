@@ -16,7 +16,7 @@ export function NarrativeNumberedArc({
   const ink = sectionInk(mode);
   const items = section.items.slice(0, 4);
   return (
-    <section aria-label={section.title ?? "Narrative arc"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Narrative arc"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
         <header style={{ marginBottom: cq(10) }}>
           {section.eyebrow && (

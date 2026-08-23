@@ -1,6 +1,6 @@
 // Single-column feature list — verb + body rows with hairline dividers.
 import type { PrintFeatureListSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -20,9 +20,9 @@ export function FeatureList1Col({
   const icons = usePrintIcons();
   const items = section.items.slice(0, 5);
   return (
-    <section aria-label={section.title ?? "Features"} style={{ margin: `${cq(16)} 0` }}>
+    <section aria-label={section.title ?? "Features"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(10) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
@@ -40,7 +40,7 @@ export function FeatureList1Col({
             <h3
               style={{
                 margin: `${cq(4)} 0 0`,
-                fontSize: cq(16),
+                fontSize: cq(MODULE.title),
                 fontWeight: 700,
                 color: ink.strong,
                 letterSpacing: "-0.015em",
@@ -62,8 +62,8 @@ export function FeatureList1Col({
               key={i}
               className="flex items-start"
               style={{
-                gap: cq(14),
-                padding: `${cq(12)} 0`,
+                gap: cq(MODULE.gridGap),
+                padding: `${cq(MODULE.rowPadY * 1.4)} 0`,
                 borderTop: i === 0 ? "none" : `1px solid ${ink.hairline}`,
               }}
             >

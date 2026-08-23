@@ -16,7 +16,7 @@ import { DeviceFrame, DeviceScreenPlaceholder } from "@/components/device/Device
 import { DeviceScreenPicker } from "@/components/device/DeviceScreenPicker";
 import { EditableImage, resolveImageSlot, usePrintImageEdit } from "@/components/print/PrintImageEdit";
 import type { PrintDeviceSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 
 const TRANSPARENT_PX =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
@@ -97,8 +97,8 @@ function Copy({
         <div
           style={{
             marginTop: cq(5),
-            fontSize: cq(18),
-            lineHeight: 1.1,
+            fontSize: cq(MODULE.title),
+            lineHeight: 1.15,
             fontWeight: 700,
             letterSpacing: "-0.025em",
             color: ink.strong,
@@ -111,8 +111,8 @@ function Copy({
         <div
           style={{
             marginTop: cq(7),
-            fontSize: cq(10),
-            lineHeight: 1.55,
+            fontSize: cq(MODULE.body),
+            lineHeight: MODULE.bodyLead,
             color: ink.soft,
           }}
         >
@@ -173,12 +173,12 @@ function Caption({ section, mode }: Props) {
 export function DeviceLaptopShowcase(props: Props) {
   const { section, accent } = props;
   return (
-    <section aria-label={section.title ?? "Product screen"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Product screen"} style={{ margin: 0 }}>
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "1.1fr 0.9fr",
-          gap: cq(20),
+          gap: cq(MODULE.gridGap * 1.4),
           alignItems: "center",
         }}
       >
@@ -209,9 +209,9 @@ export function DeviceLaptopShowcase(props: Props) {
 export function DeviceMonitorShowcase(props: Props) {
   const { section, accent } = props;
   return (
-    <section aria-label={section.title ?? "Product screen"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Product screen"} style={{ margin: 0 }}>
       <Copy {...props} align="center" />
-      <div style={{ margin: `${cq(14)} auto 0`, width: "82%" }}>
+      <div style={{ margin: `${cq(MODULE.gridGap)} auto 0`, width: "82%" }}>
         <DeviceFrame
           kind="monitor"
           tone={section.deviceTone ?? "ink"}
@@ -238,14 +238,14 @@ export function DeviceMonitorShowcase(props: Props) {
 export function DeviceDuoShowcase(props: Props) {
   const { section, accent } = props;
   return (
-    <section aria-label={section.title ?? "Product screens"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Product screens"} style={{ margin: 0 }}>
       <Copy {...props} />
       <div
         style={{
-          marginTop: cq(14),
+          marginTop: cq(MODULE.gridGap),
           display: "grid",
           gridTemplateColumns: "1.35fr 1fr",
-          gap: cq(16),
+          gap: cq(MODULE.gridGap),
           alignItems: "end",
         }}
       >

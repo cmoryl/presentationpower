@@ -1,6 +1,6 @@
 // Single-row logo strip — 4-6 logos with dividers, no card.
 import type { PrintLogoGridSection, PrintLogoItem } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 
 function Cell({ item, mode }: { item: PrintLogoItem; mode: "light" | "dark" }) {
@@ -42,9 +42,9 @@ export function LogoRowPortrait({
   const items = section.items.slice(0, 6);
   if (items.length === 0) return null;
   return (
-    <section aria-label={section.title ?? "Client logos"} style={{ margin: `${cq(16)} 0` }}>
+    <section aria-label={section.title ?? "Client logos"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <div className="flex items-center" style={{ gap: cq(14), marginBottom: cq(10) }}>
+        <div className="flex items-center" style={{ gap: cq(MODULE.gridGap), marginBottom: cq(MODULE.headerGap) }}>
           <div style={{ flex: 1, height: 1, background: ink.hairline }} />
           <div
             style={{

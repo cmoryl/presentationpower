@@ -1,6 +1,6 @@
 // Client logo grid — 3-col portrait grid with glass tiles.
 import type { PrintLogoGridSection, PrintLogoItem } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 import { useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 
 function LogoTile({
@@ -21,8 +21,8 @@ function LogoTile({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        borderRadius: cq(10),
-        padding: cq(10),
+        borderRadius: cq(MODULE.radiusInner),
+        padding: cq(12),
         ...sectionGlass(mode, accent),
       }}
     >
@@ -59,9 +59,9 @@ export function LogoGridPortrait({
   const ink = sectionInk(mode);
   const items = section.items.slice(0, cols * 3);
   return (
-    <section aria-label={section.title ?? "Client logos"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Client logos"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(12) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
@@ -92,7 +92,7 @@ export function LogoGridPortrait({
       )}
       <div
         className="grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(10) }}
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(12) }}
       >
         {items.map((it, i) => (
           <LogoTile key={i} item={it} mode={mode} accent={accent} />

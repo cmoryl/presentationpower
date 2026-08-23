@@ -1,7 +1,7 @@
 // "Discover" panel — short body paragraph on the left, bullet rail on the
 // right. Ported from the e-brochure / engagement-snapshot pattern.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -20,22 +20,20 @@ export function NarrativeDiscoverPanel({
   const lead = section.items[0];
   const bullets = (lead?.bullets ?? []).slice(0, 6);
   return (
-    <section aria-label={section.title ?? "Discover"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Discover"} style={{ margin: 0 }}>
       <div
         className="grid"
         style={{
           gridTemplateColumns: "1.05fr 0.95fr",
-          gap: cq(14),
-          borderRadius: cq(14),
-          padding: `${cq(16)} ${cq(18)}`,
-          ...sectionGlass(mode, accent),
+          gap: cq(MODULE.gridGap),
+          ...modulePanel(mode, accent),
         }}
       >
         <div>
           {section.eyebrow && (
             <div
               style={{
-                fontSize: cq(9),
+                fontSize: cq(MODULE.eyebrow),
                 fontWeight: 700,
                 letterSpacing: "0.18em",
                 color: accent,
@@ -47,8 +45,8 @@ export function NarrativeDiscoverPanel({
           )}
           <div
             style={{
-              marginTop: cq(4),
-              fontSize: cq(15),
+              marginTop: cq(MODULE.eyebrowGap),
+              fontSize: cq(MODULE.panelTitle),
               fontWeight: 700,
               color: ink.strong,
               letterSpacing: "-0.015em",
@@ -60,8 +58,8 @@ export function NarrativeDiscoverPanel({
             <div
               style={{
                 marginTop: cq(7),
-                fontSize: cq(10),
-                lineHeight: 1.55,
+                fontSize: cq(MODULE.body),
+                lineHeight: MODULE.bodyLead,
                 color: ink.soft,
                 ...clampLines(8),
               }}
@@ -73,7 +71,7 @@ export function NarrativeDiscoverPanel({
         <div
           style={{
             borderLeft: `1px solid ${ink.hairline}`,
-            paddingLeft: cq(14),
+            paddingLeft: cq(MODULE.gridGap),
           }}
         >
           {bullets.map((b, i) => (

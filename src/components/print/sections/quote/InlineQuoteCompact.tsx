@@ -16,7 +16,7 @@ export function InlineQuoteCompact({
   return (
     <section
       aria-label="Inline quote"
-      style={{ margin: `${cq(14)} 0`, display: "flex", gap: cq(14), alignItems: "flex-start" }}
+      style={{ margin: 0, display: "flex", gap: cq(14), alignItems: "flex-start" }}
     >
       <div
         aria-hidden

@@ -2,7 +2,7 @@
 // hairlines, big value + label + optional delta. Sized for an 816px canvas.
 import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -21,9 +21,9 @@ export function KpiDashboardPortrait({
   const cols = items.length <= 2 ? items.length : items.length === 3 ? 3 : 2;
 
   return (
-    <section aria-label={section.title ?? "KPI dashboard"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "KPI dashboard"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(14) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
@@ -56,8 +56,8 @@ export function KpiDashboardPortrait({
         className="grid"
         style={{
           gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-          columnGap: cq(24),
-          rowGap: cq(20),
+          columnGap: cq(MODULE.gridGap * 1.5),
+          rowGap: cq(MODULE.gridGap * 1.25),
         }}
       >
         {items.map((it, i) => {

@@ -1,7 +1,7 @@
 // Spec rows — label → value table with a shaded header strip. Used for scope,
 // SLA, language coverage and deliverable specs across curated collateral.
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -18,10 +18,10 @@ export function TableSpecRows({
   const icons = usePrintIcons();
   const rows = section.rows.slice(0, 10);
   return (
-    <section aria-label={section.title ?? "Specification"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Specification"} style={{ margin: 0 }}>
       <div
         style={{
-          borderRadius: cq(12),
+          borderRadius: cq(MODULE.radius),
           overflow: "hidden",
           border: `1px solid ${ink.hairline}`,
         }}
@@ -29,8 +29,8 @@ export function TableSpecRows({
         <div
           className="flex items-baseline justify-between"
           style={{
-            gap: cq(10),
-            padding: `${cq(9)} ${cq(14)}`,
+            gap: cq(12),
+            padding: `${cq(MODULE.rowPadY * 1.15)} ${cq(MODULE.padX)}`,
             background: `color-mix(in srgb, ${accent} ${mode === "dark" ? 22 : 12}%, transparent)`,
           }}
         >
@@ -74,12 +74,12 @@ export function TableSpecRows({
             key={i}
             className="flex items-baseline justify-between"
             style={{
-              gap: cq(14),
-              padding: `${cq(8)} ${cq(14)}`,
+              gap: cq(MODULE.gridGap),
+              padding: `${cq(MODULE.rowPadY)} ${cq(MODULE.padX)}`,
               borderTop: `1px solid ${ink.hairline}`,
             }}
           >
-            <span style={{ fontSize: cq(9.8), color: ink.soft }}>{r.label}</span>
+            <span style={{ fontSize: cq(MODULE.meta), color: ink.soft }}>{r.label}</span>
             <span
               style={{
                 fontSize: cq(10),

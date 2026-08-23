@@ -1,7 +1,7 @@
 // Feature verb cards — port of AdaptorBrief 6-card pattern. Supports 2- or
 // 3-column layouts via the `cols` prop.
 import type { PrintFeatureListSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE, modulePanel } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -23,9 +23,9 @@ export function VerbCardsPortrait({
   const icons = usePrintIcons();
   const items = section.items.slice(0, cols === 3 ? 6 : 4);
   return (
-    <section aria-label={section.title ?? "Features"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Features"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(12) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
@@ -54,10 +54,10 @@ export function VerbCardsPortrait({
           )}
         </header>
       )}
-      <div style={{ borderRadius: cq(16), padding: cq(16), ...sectionGlass(mode, accent) }}>
+      <div style={modulePanel(mode, accent)}>
         <div
           className="grid"
-          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(14) }}
+          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(MODULE.gridGap) }}
         >
           {items.map((f, i) => {
             const name =
