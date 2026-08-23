@@ -32,7 +32,7 @@ export type DemoDivision = {
    * Divisions with an authored plate kit (Gaming = R22) must name it here or
    * the deck falls back to whatever recipe the source narrative carried.
    */
-  designRecipeId?: string;
+  designRecipeId?: string | null;
   /** Industry stamped into the brief. */
   industry: string;
 };
