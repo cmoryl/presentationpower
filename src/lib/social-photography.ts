@@ -85,7 +85,36 @@ export const SOCIAL_PHOTO_SETS: Record<string, PhotoSet> = {
     square: lifesciSquare,
     tall: lifesciTall,
   },
+  "bm-tp-digital": {
+    label: "Digital — campaign operations",
+    credit: "Generated example set · digital marketing",
+    wide: digitalWide,
+    square: digitalSquare,
+    tall: digitalTall,
+  },
+  "bm-enterprise": {
+    label: "Enterprise — leadership & scale",
+    credit: "Generated example set · enterprise solutions",
+    wide: enterpriseWide,
+    square: enterpriseSquare,
+    tall: enterpriseTall,
+  },
+  "bm-trial-interactive": {
+    label: "Trial Interactive — clinical sites & eTMF",
+    credit: "Generated example set · Trial Interactive",
+    wide: trialWide,
+    square: trialSquare,
+    tall: trialTall,
+  },
+  "bm-cobrand": {
+    label: "Partner co-brand — shared teams",
+    credit: "Generated example set · co-branded partnerships",
+    wide: cobrandWide,
+    square: cobrandSquare,
+    tall: cobrandTall,
+  },
 };
+
 
 export function getPhotoSet(brandId: string): PhotoSet | undefined {
   return SOCIAL_PHOTO_SETS[brandId];
