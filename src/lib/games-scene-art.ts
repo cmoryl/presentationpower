@@ -272,3 +272,27 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
   };
 }
 
+
+/**
+ * MEDIA POOL — the plates a slide-level MediaTile (covers, split/full-bleed
+ * imagery) draws from for the Games brand mode. Slide media used to fall back
+ * to the generic TP dark gradient set, which made Gaming title slides read as
+ * plain navy instead of wearing the authored kit. Loud textured compositions
+ * come first (a cover wants energy), calmer flats after.
+ */
+export function gamesMediaPool(mode: GamesArtMode = "dark"): string[] {
+  const inMode = GAMES_PLATES.filter((p) => p.mode === mode);
+  const textured = inMode.filter((p) => p.texture === "textured");
+  const loud = textured.filter((p) => ACTIVITY_RANK[p.activity] >= ACTIVITY_RANK.medium);
+  // Flat plates are near-plain grounds: correct behind dense copy, but as a
+  // slide-level photograph they read as a blank navy field, which is exactly
+  // what made the Gaming title slides look empty. Media uses the textured
+  // compositions only.
+  // Highest-energy compositions first: a cover or full-bleed wants the loudest
+  // plate in the kit, not the quietest textured one.
+  const ranked = [...(loud.length ? loud : textured.length ? textured : inMode)].sort(
+    (a, b) => ACTIVITY_RANK[b.activity] - ACTIVITY_RANK[a.activity],
+  );
+  const ordered = ranked;
+  return ordered.map((p) => p.url);
+}
