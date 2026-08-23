@@ -18,7 +18,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, RotateCcw, Undo2 } from "lucide-react";
 
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { SaveActionButton } from "@/components/editor/SaveActionButton";
@@ -246,6 +246,8 @@ function MasterItemEditorPage() {
     });
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(draftFrom(saved, override?.hidden ?? false));
+  // Warn before a reload / tab close throws unsaved master edits away.
+  useDirtyExitGuard(dirty);
 
   const textPaths = draft.content
     ? enumerateLeafPaths(draft.content).filter((p) => {

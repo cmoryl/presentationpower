@@ -16,7 +16,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, RotateCcw, Save, Undo2 } from "lucide-react";
+import { ArrowLeft, RotateCcw, Undo2 } from "lucide-react";
 
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { SaveActionButton } from "@/components/editor/SaveActionButton";
@@ -135,6 +135,8 @@ function PrintModuleStudioPage() {
 
   const merged = applyPrintOverride(shipped, override);
   const dirty = JSON.stringify(draft) !== savedKey;
+  // Warn before a reload / tab close throws unsaved master edits away.
+  useDirtyExitGuard(dirty);
   const variants = sectionVariantsFor(draft.kind);
   const textPaths = enumerateLeafPaths(draft as unknown as Record<string, unknown>).filter((p) => {
     const v = readLeaf(draft as unknown as Record<string, unknown>, p);
