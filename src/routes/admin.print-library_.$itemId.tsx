@@ -169,7 +169,6 @@ function MasterItemEditorPage() {
     mode,
   });
 
-
   const brand = useMemo(
     () =>
       brandModes.find((b) => b.id === (shipped?.divisionId ?? "")) ??
@@ -245,7 +244,8 @@ function MasterItemEditorPage() {
       return { ...base, look };
     });
 
-  const dirty = JSON.stringify(draft) !== JSON.stringify(draftFrom(saved, override?.hidden ?? false));
+  const dirty =
+    JSON.stringify(draft) !== JSON.stringify(draftFrom(saved, override?.hidden ?? false));
   // Warn before a reload / tab close throws unsaved master edits away.
   useDirtyExitGuard(dirty);
 
@@ -394,7 +394,6 @@ function MasterItemEditorPage() {
             />
           ) : null}
           <button
-
             type="button"
             onClick={() => setDraft(draftFrom(saved, override?.hidden ?? false))}
             disabled={!dirty}
@@ -449,7 +448,6 @@ function MasterItemEditorPage() {
             </span>
           </div>
 
-
           <div className="overflow-hidden rounded-2xl border border-black/10 bg-[#f5f5f2] p-4">
             {draft.content ? (
               <div ref={canvasRef} className="relative">
@@ -469,9 +467,7 @@ function MasterItemEditorPage() {
                       icons={draft.look.icons ?? true}
                       iconStyle={resolvePrintIconStyle({
                         scale: draft.look.iconScale ?? 1,
-                        ...(draft.look.accentOverride
-                          ? { accent: draft.look.accentOverride }
-                          : {}),
+                        ...(draft.look.accentOverride ? { accent: draft.look.accentOverride } : {}),
                       })}
                     >
                       <LiveEditOverlay
@@ -492,7 +488,10 @@ function MasterItemEditorPage() {
                           }}
                         >
                           <PrintLogoListContext.Provider
-                            value={{ active: true, onChange: (path, next) => patchPath(path, next) }}
+                            value={{
+                              active: true,
+                              onChange: (path, next) => patchPath(path, next),
+                            }}
                           >
                             <PrintKindPreview
                               kind={saved.kind}
@@ -531,16 +530,11 @@ function MasterItemEditorPage() {
                   state={overflow}
                   onFix={() => {
                     if (!heroMedia?.imageUrl) {
-                      toast.error(
-                        "Content overflows the page — remove a module or shorten copy.",
-                      );
+                      toast.error("Content overflows the page — remove a module or shorten copy.");
                       return;
                     }
                     const prev = heroMedia.heightPct ?? 46;
-                    const next = Math.max(
-                      22,
-                      Math.round(prev - overflow.overflowFrac * 100 - 2),
-                    );
+                    const next = Math.max(22, Math.round(prev - overflow.overflowFrac * 100 - 2));
                     if (next >= prev) {
                       toast.error(
                         "Hero is already at its minimum — remove a module or shorten copy.",
@@ -593,7 +587,6 @@ function MasterItemEditorPage() {
             />
           ) : null}
         </section>
-
 
         {/* ------------------------- Inspector ------------------------- */}
         <aside className="space-y-4 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:self-start xl:overflow-y-auto xl:pr-1">
@@ -763,8 +756,8 @@ function MasterItemEditorPage() {
                       minScale: fit.minScale,
                       minPad: fit.minPad,
                       pageSize: draft.look.pageSize ?? "Letter",
-                      moduleCount:
-                        ((draft.content as { modules?: PrintSection[] }).modules ?? []).length,
+                      moduleCount: ((draft.content as { modules?: PrintSection[] }).modules ?? [])
+                        .length,
                     } satisfies PrintFitAuditInput
                   }
                   override={draft.look.fitOverride}
@@ -908,8 +901,8 @@ function MasterItemEditorPage() {
           {multiPage && (multiContent?.pages?.[activePage]?.quotes?.length ?? 0) > 0 ? (
             <Panel title="Quote sizes">
               <p className="mb-2 text-[11px] leading-[1.5] text-muted-foreground">
-                Click any quote on the page to edit its words. Size sets the ceiling — a long
-                quote still shrinks to stay inside its card.
+                Click any quote on the page to edit its words. Size sets the ceiling — a long quote
+                still shrinks to stay inside its card.
               </p>
               <div className="space-y-2">
                 {(multiContent?.pages?.[activePage]?.quotes ?? []).map((q, i) => {
@@ -961,7 +954,6 @@ function MasterItemEditorPage() {
               </div>
             </Panel>
           ) : null}
-
 
           {draft.content ? (
             <Panel title={`Content — ${textPaths.length} text fields`}>

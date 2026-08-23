@@ -44,13 +44,7 @@ import {
   updateCustomModule,
 } from "@/lib/custom-modules.functions";
 import { compositionToModuleParts, moduleToItems } from "@/lib/module-studio-bridge";
-import {
-  STAGE_H,
-  STAGE_W,
-  makeItem,
-  useCanvasStudio,
-  type CanvasItem,
-} from "@/lib/canvas-studio";
+import { STAGE_H, STAGE_W, makeItem, useCanvasStudio, type CanvasItem } from "@/lib/canvas-studio";
 
 export const Route = createFileRoute("/admin/module-studio")({
   head: () => ({
@@ -267,10 +261,7 @@ function ModuleStudioPage() {
 
   // ---- module record: validation, publish, export -------------------------
 
-  const parts = useMemo(
-    () => (comp ? compositionToModuleParts(comp, brand) : null),
-    [comp, brand],
-  );
+  const parts = useMemo(() => (comp ? compositionToModuleParts(comp, brand) : null), [comp, brand]);
 
   const issues = useMemo(
     () =>
@@ -378,7 +369,11 @@ function ModuleStudioPage() {
     const mode = (row.brand_mode?.includes("dark") ? "dark" : "light") as "light" | "dark";
     const id = createComposition(asCopy ? `${row.name} copy` : row.name, row.brand_mode ?? brandId);
     patchComposition(id, { brandId: row.brand_mode ?? brandId, mode });
-    for (const item of moduleToItems(row.base_variant_id, normalizeCanvasBlocks(row.canvas_blocks), mode)) {
+    for (const item of moduleToItems(
+      row.base_variant_id,
+      normalizeCanvasBlocks(row.canvas_blocks),
+      mode,
+    )) {
       addItem(id, item);
     }
     setMeta({
@@ -426,9 +421,7 @@ function ModuleStudioPage() {
               aria-checked={comp.mode === "dark"}
               aria-label="Toggle dark mode"
               title={comp.mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              onClick={() =>
-                switchAppearance(comp.mode === "dark" ? "light" : "dark")
-              }
+              onClick={() => switchAppearance(comp.mode === "dark" ? "light" : "dark")}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 comp.mode === "dark"
                   ? "bg-[#03002C] text-white"

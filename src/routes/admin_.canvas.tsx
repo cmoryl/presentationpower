@@ -35,13 +35,7 @@ import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackCo
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
 import { useEffectiveStylePack } from "@/hooks/use-template-registry";
 import { packToneBrand } from "@/lib/style-packs";
-import {
-  STAGE_H,
-  STAGE_W,
-  makeItem,
-  useCanvasStudio,
-  type CanvasItem,
-} from "@/lib/canvas-studio";
+import { STAGE_H, STAGE_W, makeItem, useCanvasStudio, type CanvasItem } from "@/lib/canvas-studio";
 
 export const Route = createFileRoute("/admin_/canvas")({
   head: () => ({
@@ -131,7 +125,6 @@ function CanvasStudioPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [undo, redo]);
 
-
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === (comp?.brandId ?? brandId)) ?? BRAND_MODES[0]!,
     [comp?.brandId, brandId],
@@ -200,7 +193,6 @@ function CanvasStudioPage() {
     }
   };
 
-
   const imageDrop = useImageDrop({
     onApply: ({ url }, index) => {
       if (!comp) return;
@@ -226,14 +218,18 @@ function CanvasStudioPage() {
     const el = document.querySelector<HTMLElement>(`[data-studio-item="${itemId}"]`);
     const stage = el?.closest<HTMLElement>('[role="application"]');
     if (!el || !stage) {
-      toast.error("Could not read the module", { description: "Scroll it into view and try again." });
+      toast.error("Could not read the module", {
+        description: "Scroll it into view and try again.",
+      });
       return;
     }
     const { explodeModuleRender } = await import("@/lib/canvas-studio-explode");
     const startZ = comp.items.reduce((m, i) => Math.max(m, i.z), 0) + 1;
     const { items, counts, truncated } = explodeModuleRender(el, stage, startZ);
     if (!items.length) {
-      toast.error("Nothing to convert", { description: "This module rendered no editable pieces." });
+      toast.error("Nothing to convert", {
+        description: "This module rendered no editable pieces.",
+      });
       return;
     }
     removeItem(comp.id, itemId);
@@ -342,7 +338,6 @@ function CanvasStudioPage() {
       }),
   });
 
-
   if (!comp) return null;
 
   return (
@@ -353,7 +348,9 @@ function CanvasStudioPage() {
         title="Open Canvas Studio"
         meta={
           <>
-            <span>{comp.items.length} layer{comp.items.length === 1 ? "" : "s"}</span>
+            <span>
+              {comp.items.length} layer{comp.items.length === 1 ? "" : "s"}
+            </span>
             <MetaDot />
             <span>{brand.name}</span>
             <MetaDot />
@@ -389,9 +386,7 @@ function CanvasStudioPage() {
               {effMode === "dark" ? "Dark" : "Light"}
             </button>
             <SaveActionButton
-              state={
-                saveToFiles.isPending ? "saving" : comp.savedFileId ? "saved" : "dirty"
-              }
+              state={saveToFiles.isPending ? "saving" : comp.savedFileId ? "saved" : "dirty"}
               onSave={() => saveToFiles.mutate()}
               label="Save to My Files"
               savedLabel="Saved to My Files"
@@ -399,7 +394,6 @@ function CanvasStudioPage() {
             {imageDrop.busy ? <span>Uploading imagery…</span> : null}
           </div>
         }
-
       />
 
       <div className="mt-4">
@@ -539,11 +533,7 @@ function CanvasStudioPage() {
                 </div>
               </EditorMenu>
 
-              <EditorMenu
-                label="Template"
-                hint={pack ? pack.label : "Brand system"}
-                wide
-              >
+              <EditorMenu label="Template" hint={pack ? pack.label : "Brand system"} wide>
                 <div className="w-full">
                   <p className="mb-2 text-[11px] leading-relaxed text-black/55">
                     Pick an approved template look. The canvas ground, type and every module you
@@ -558,9 +548,7 @@ function CanvasStudioPage() {
                   {(comp.packId || comp.recipeId) && (
                     <button
                       type="button"
-                      onClick={() =>
-                        patchComposition(comp.id, { packId: null, recipeId: null })
-                      }
+                      onClick={() => patchComposition(comp.id, { packId: null, recipeId: null })}
                       className="mt-2 rounded-full border border-black/[0.08] bg-white px-3 py-1.5 text-[11px] font-semibold text-black/60 transition hover:border-primary/40 hover:text-primary"
                     >
                       Reset to brand system
@@ -628,85 +616,81 @@ function CanvasStudioPage() {
               {selectedIds.length > 0 ? ` · ${selectedIds.length} selected` : ""}
             </span>
           }
-
         />
       </div>
 
       <div className="h-3" />
 
       <LibraryPackProvider packId={comp.packId ?? null} recipeId={comp.recipeId ?? null}>
-      <StylePackProvider pack={pack}>
-      <StylePackVars pack={pack} className="contents">
-      {/* Stack palette / stage / inspector on narrow screens — matches Module
+        <StylePackProvider pack={pack}>
+          <StylePackVars pack={pack} className="contents">
+            {/* Stack palette / stage / inspector on narrow screens — matches Module
           Studio, which never had the fixed-height desktop-only row. */}
-      <div className="flex flex-col gap-3 lg:h-[70vh] lg:min-h-[540px] lg:flex-row">
-        <StudioPalette
-          brand={stageBrand}
-          mode={stageComp?.mode ?? comp.mode}
-          onAdd={(payload) => place(payload, { x: STAGE_W / 2, y: STAGE_H / 2 })}
-        />
-        <div className="flex min-w-0 flex-1 flex-col justify-center">
-          <CanvasStage
-            comp={stageComp ?? comp}
-            brand={stageBrand}
-            selectedIds={selectedIds}
-            snapOn={snapOn}
-            showGrid={showGrid}
-            onSelect={setSelected}
-            onPatch={(id, patch) => patchItem(comp.id, id, patch)}
-            onPatchMany={(patches) => patchItems(comp.id, patches)}
-            onDropPayload={place}
-            onDropFiles={(files) => void imageDrop.ingest(files)}
-            onDelete={(id) => removeItem(comp.id, id)}
-            onExplode={(id) => void makeEditable(id)}
-            onBeginBatch={beginBatch}
-            onEndBatch={endBatch}
-            onUndo={undo}
-            onRedo={redo}
-          />
-          {imageDrop.error && (
-            <p className="mt-2 text-xs text-rose-600">{imageDrop.error}</p>
-          )}
-          <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
-            Drag to move · corner handle to resize · drag across empty canvas to lasso-select ·
-            shift-click to add · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z steps
-            through history. Double-click a placed module to make it fully editable. Compositions
-            save automatically in this browser.
-          </p>
-
-        </div>
-        <StudioSideAccordion
-          layers={
-            <StudioLayers
-              className="h-full w-full border-0 bg-transparent"
-              items={comp.items}
-              selectedIds={selectedIds}
-              onSelect={setSelected}
-              onPatch={(id, patch) => patchItem(comp.id, id, patch)}
-              onRemove={(id) => removeItem(comp.id, id)}
-              onDuplicate={(id) => duplicateItem(comp.id, id)}
-              onOrder={(id, dir) => reorderItem(comp.id, id, dir)}
-            />
-          }
-          inspector={
-            <StudioInspector
-              className="h-full w-full border-0 bg-transparent"
-              item={(selectedItem as CanvasItem | null) ?? null}
-              onPatch={(patch) => selectedItem && patchItem(comp.id, selectedItem.id, patch)}
-              onRemove={() => selectedItem && removeItem(comp.id, selectedItem.id)}
-              onDuplicate={() => selectedItem && duplicateItem(comp.id, selectedItem.id)}
-              onOrder={(dir) => selectedItem && reorderItem(comp.id, selectedItem.id, dir)}
-              onExplode={
-                selectedItem?.type === "module"
-                  ? () => void makeEditable(selectedItem.id)
-                  : undefined
-              }
-            />
-          }
-        />
-      </div>
-      </StylePackVars>
-      </StylePackProvider>
+            <div className="flex flex-col gap-3 lg:h-[70vh] lg:min-h-[540px] lg:flex-row">
+              <StudioPalette
+                brand={stageBrand}
+                mode={stageComp?.mode ?? comp.mode}
+                onAdd={(payload) => place(payload, { x: STAGE_W / 2, y: STAGE_H / 2 })}
+              />
+              <div className="flex min-w-0 flex-1 flex-col justify-center">
+                <CanvasStage
+                  comp={stageComp ?? comp}
+                  brand={stageBrand}
+                  selectedIds={selectedIds}
+                  snapOn={snapOn}
+                  showGrid={showGrid}
+                  onSelect={setSelected}
+                  onPatch={(id, patch) => patchItem(comp.id, id, patch)}
+                  onPatchMany={(patches) => patchItems(comp.id, patches)}
+                  onDropPayload={place}
+                  onDropFiles={(files) => void imageDrop.ingest(files)}
+                  onDelete={(id) => removeItem(comp.id, id)}
+                  onExplode={(id) => void makeEditable(id)}
+                  onBeginBatch={beginBatch}
+                  onEndBatch={endBatch}
+                  onUndo={undo}
+                  onRedo={redo}
+                />
+                {imageDrop.error && <p className="mt-2 text-xs text-rose-600">{imageDrop.error}</p>}
+                <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
+                  Drag to move · corner handle to resize · drag across empty canvas to lasso-select
+                  · shift-click to add · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z
+                  steps through history. Double-click a placed module to make it fully editable.
+                  Compositions save automatically in this browser.
+                </p>
+              </div>
+              <StudioSideAccordion
+                layers={
+                  <StudioLayers
+                    className="h-full w-full border-0 bg-transparent"
+                    items={comp.items}
+                    selectedIds={selectedIds}
+                    onSelect={setSelected}
+                    onPatch={(id, patch) => patchItem(comp.id, id, patch)}
+                    onRemove={(id) => removeItem(comp.id, id)}
+                    onDuplicate={(id) => duplicateItem(comp.id, id)}
+                    onOrder={(id, dir) => reorderItem(comp.id, id, dir)}
+                  />
+                }
+                inspector={
+                  <StudioInspector
+                    className="h-full w-full border-0 bg-transparent"
+                    item={(selectedItem as CanvasItem | null) ?? null}
+                    onPatch={(patch) => selectedItem && patchItem(comp.id, selectedItem.id, patch)}
+                    onRemove={() => selectedItem && removeItem(comp.id, selectedItem.id)}
+                    onDuplicate={() => selectedItem && duplicateItem(comp.id, selectedItem.id)}
+                    onOrder={(dir) => selectedItem && reorderItem(comp.id, selectedItem.id, dir)}
+                    onExplode={
+                      selectedItem?.type === "module"
+                        ? () => void makeEditable(selectedItem.id)
+                        : undefined
+                    }
+                  />
+                }
+              />
+            </div>
+          </StylePackVars>
+        </StylePackProvider>
       </LibraryPackProvider>
     </AppShell>
   );

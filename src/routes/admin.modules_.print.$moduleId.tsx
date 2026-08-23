@@ -241,10 +241,10 @@ function PrintModuleStudioPage() {
       </header>
 
       <p className="mt-3 max-w-3xl text-sm leading-[1.5] text-black/60">
-        Click any line on the page to edit it in place, swap the variant, and check the block against
-        each page format. Saving updates the master block: the library preview, the insert drawer and
-        every newly created asset stamp this content from now on. Assets already built keep their own
-        copy.
+        Click any line on the page to edit it in place, swap the variant, and check the block
+        against each page format. Saving updates the master block: the library preview, the insert
+        drawer and every newly created asset stamp this content from now on. Assets already built
+        keep their own copy.
       </p>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
@@ -341,7 +341,9 @@ function PrintModuleStudioPage() {
           <StudioPanel title={`Copy (${textPaths.length} fields)`}>
             <div className="space-y-2.5">
               {textPaths.map((p) => {
-                const value = String(readLeaf(draft as unknown as Record<string, unknown>, p) ?? "");
+                const value = String(
+                  readLeaf(draft as unknown as Record<string, unknown>, p) ?? "",
+                );
                 const long = value.length > 60;
                 return (
                   <label key={p} className="block">
