@@ -20,7 +20,12 @@
  *   node scripts/visual-regression-social-corners.mjs            # verify
  *   node scripts/visual-regression-social-corners.mjs --update   # re-record
  *
- * Flags: --styles a,b  --formats a,b  --modes light,dark  --url  --out
+ * Coverage (styles, formats, modes, brands, caps, tolerances) is derived from
+ * src/lib/social-corner-sweep.ts and published by the harness, so newly added
+ * social formats or template styles are swept automatically — nothing here is
+ * hard-coded or counted by hand.
+ *
+ * Flags: --styles a,b  --formats a,b  --modes light,dark  --brands a,b  --url  --out
  *        --baseline  --tolerance <pct>  --radius-tolerance <px>  --update
  */
 import { chromium } from "playwright";
@@ -42,19 +47,10 @@ const BASE = args.url ?? "http://localhost:8080";
 const OUT = path.resolve(args.out ?? "tests/snapshots/social-corners");
 const BASELINE = path.resolve(args.baseline ?? "tests/snapshots/social-corners.baseline.json");
 const UPDATE = args.update === "true";
-const MODES = (args.modes ?? "light,dark").split(",").map((s) => s.trim()).filter(Boolean);
-/** Max share of differing pixels in a corner crop before it's a regression. */
-const TOLERANCE_PCT = Number(args.tolerance ?? 0.35);
-/** Max drift in the measured radius, in CSS px. */
-const RADIUS_TOL_PX = Number(args["radius-tolerance"] ?? 0.75);
-/** Corner crop size, px — big enough to contain any legal radius (6% of 360). */
-const CROP = 40;
 /** Corner crops are always written; only --pixel makes a crop diff FAIL the run
  *  (plate interiors carry live aurora/type antialiasing, so the always-on gate
  *  is the deterministic corner-geometry golden below). */
 const PIXEL_GATE = args.pixel === "true";
-/** Hard cap the renderer promises: radius <= 6% of the frame's short edge. */
-const MAX_RADIUS_PCT = 6;
 
 const STYLE_FILTER = args.styles ? new Set(args.styles.split(",").map((s) => s.trim())) : null;
 const FORMAT_FILTER = args.formats ? new Set(args.formats.split(",").map((s) => s.trim())) : null;
@@ -107,14 +103,49 @@ const context = await browser.newContext({
 });
 const page = await context.newPage();
 
-// Style ids come from the app itself so a new style is swept automatically.
+/**
+ * COVERAGE COMES FROM THE APP, NOT FROM THIS FILE.
+ *
+ * src/lib/social-corner-sweep.ts derives the whole matrix (styles × formats ×
+ * modes × brands) plus every tolerance/cap from the live registries, and the
+ * harness publishes it on `window.__SOCIAL_CORNER_SWEEP__`. Add a format or a
+ * style anywhere in the app and it is swept on the next run — no counts here.
+ */
 await page.goto(`${BASE}/dev/social-corners`, { waitUntil: "domcontentloaded" });
-const STYLES = (
-  await page.evaluate(async () => {
-    const mod = await import("/src/lib/social-styles.ts");
-    return mod.SOCIAL_STYLES.map((s) => s.id);
-  })
-).filter((id) => !STYLE_FILTER || STYLE_FILTER.has(id));
+const PLAN = await page.waitForFunction(
+  () => window.__SOCIAL_CORNER_SWEEP__ ?? null,
+  undefined,
+  { timeout: 60_000 },
+).then((h) => h.jsonValue());
+
+const CFG = PLAN.config;
+/** Max share of differing pixels in a corner crop before it's a regression. */
+const TOLERANCE_PCT = Number(args.tolerance ?? CFG.pixelTolerancePct);
+/** Max drift in the measured radius, in CSS px. */
+const RADIUS_TOL_PX = Number(args["radius-tolerance"] ?? CFG.radiusTolerancePx);
+/** Corner crop size, px — big enough to contain any legal radius. */
+const CROP = Number(args.crop ?? CFG.cropPx);
+/** Hard cap the renderer promises, as a share of the frame's short edge. */
+const MAX_RADIUS_PCT = Number(CFG.maxRadiusPct);
+
+const MODES = (args.modes ? args.modes.split(",") : CFG.modes)
+  .map((s) => String(s).trim())
+  .filter(Boolean);
+const BRANDS = (args.brands ? args.brands.split(",") : CFG.brands)
+  .map((s) => String(s).trim())
+  .filter(Boolean);
+const STYLES = PLAN.styles.filter((id) => !STYLE_FILTER || STYLE_FILTER.has(id));
+const EXPECTED_KEYS = new Set(
+  PLAN.cases
+    .filter(
+      (c) =>
+        MODES.includes(c.mode) &&
+        BRANDS.includes(c.brandId) &&
+        (!STYLE_FILTER || STYLE_FILTER.has(c.styleId)) &&
+        (!FORMAT_FILTER || FORMAT_FILTER.has(c.formatId)),
+    )
+    .map((c) => c.key),
+);
 
 /** One retry: a live dev server can invalidate the execution context. */
 async function screenshotWithRetry(locator) {
@@ -130,8 +161,9 @@ const results = [];
 const nextBaseline = { ...baseline, cases: { ...(baseline.cases ?? {}) } };
 
 for (const mode of MODES) {
+ for (const brand of BRANDS) {
   for (const style of STYLES) {
-    await page.goto(`${BASE}/dev/social-corners?style=${style}&mode=${mode}`, {
+    await page.goto(`${BASE}/dev/social-corners?style=${style}&mode=${mode}&brand=${brand}`, {
       waitUntil: "domcontentloaded",
     });
     await page.waitForFunction(
@@ -264,6 +296,7 @@ for (const mode of MODES) {
 
       results.push({
         case: caseKey,
+        brand,
         ok: problems.length === 0,
         ...fingerprint,
         worstMismatchPct: Number(worstMismatch.toFixed(3)),
@@ -271,21 +304,47 @@ for (const mode of MODES) {
       });
     }
   }
+ }
 }
 
 await browser.close();
 
-if (UPDATE) await writeFile(BASELINE, `${JSON.stringify(nextBaseline, null, 2)}\n`);
 await writeFile(
   path.join(OUT, "report.json"),
-  `${JSON.stringify({ generatedFrom: BASE, modes: MODES, results }, null, 2)}\n`,
+  `${JSON.stringify({ generatedFrom: BASE, modes: MODES, brands: BRANDS, coverage: PLAN.counts, fingerprint: PLAN.fingerprint, results }, null, 2)}\n`,
 );
 
 const failures = results.filter((r) => !r.ok);
 const swept = results.filter((r) => !r.skipped).length;
+const seen = new Set(results.map((r) => r.case));
+/** Coverage gate: every combination the config derives must actually render. */
+const missing = [...EXPECTED_KEYS].filter((k) => !seen.has(k));
+const newCases = results
+  .filter((r) => !r.skipped && !(baseline.cases ?? {})[r.case])
+  .map((r) => r.case);
+const fingerprintDrift = baseline.fingerprint && baseline.fingerprint !== PLAN.fingerprint;
+nextBaseline.fingerprint = PLAN.fingerprint;
+nextBaseline.coverage = { ...PLAN.counts, styles: PLAN.styles, formats: PLAN.formats };
+if (UPDATE) await writeFile(BASELINE, `${JSON.stringify(nextBaseline, null, 2)}\n`);
+
 console.log(
-  `Social corner sweep: ${swept} plate cases across ${STYLES.length} styles × ${MODES.length} modes`,
+  `Social corner sweep: ${swept} plate cases · ${STYLES.length} styles × ${PLAN.counts.formats} formats × ` +
+    `${MODES.length} modes × ${BRANDS.length} brands · coverage fp ${PLAN.fingerprint}`,
 );
+if (fingerprintDrift)
+  console.log(
+    `  coverage changed since the last recording (${baseline.fingerprint} → ${PLAN.fingerprint})`,
+  );
+if (newCases.length)
+  console.log(
+    `  ${newCases.length} new case(s) picked up automatically: ${newCases.slice(0, 8).join(", ")}${newCases.length > 8 ? ", …" : ""}`,
+  );
+if (missing.length) {
+  console.error(
+    `\n${missing.length} expected case(s) never rendered — the harness is not covering the config:`,
+  );
+  for (const k of missing.slice(0, 20)) console.error(`    ${k}`);
+}
 for (const f of failures) {
   console.error(`✗ ${f.case}`);
   for (const p of f.problems) console.error(`    ${p}`);
@@ -293,6 +352,10 @@ for (const f of failures) {
 if (UPDATE) {
   console.log(`Baseline recorded → ${path.relative(process.cwd(), BASELINE)}`);
   process.exit(0);
+}
+if (missing.length && !UPDATE) {
+  console.error("\nCoverage gap — fix the harness or the config, then re-run.");
+  process.exit(1);
 }
 if (failures.length) {
   console.error(`\n${failures.length} corner-rounding regression(s). Crops in ${OUT}`);

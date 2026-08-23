@@ -2031,5 +2031,51 @@
       "radiusPct": 0,
       "shortEdge": 360
     }
+  },
+  "fingerprint": "03b541ab",
+  "coverage": {
+    "styles": [
+      "editorial-glass",
+      "bold-block",
+      "split-band",
+      "minimal-rule",
+      "poster-stack",
+      "photo-gradient",
+      "aura-soft"
+    ],
+    "formats": [
+      "square-1080",
+      "portrait-1080x1350",
+      "story-1080x1920",
+      "linkedin-link-1200x627",
+      "linkedin-post-1200x1200",
+      "callout-1200x628",
+      "x-1600x900",
+      "youtube-1280x720",
+      "pinterest-1000x1500",
+      "email-header-1200x400",
+      "instagram-reel-1080x1920",
+      "instagram-carousel-1080x1350",
+      "tiktok-1080x1920",
+      "tiktok-cover-1080x1440",
+      "youtube-short-1080x1920",
+      "youtube-banner-2560x1440",
+      "linkedin-portrait-1080x1350",
+      "linkedin-banner-1584x396",
+      "linkedin-company-1128x191",
+      "facebook-post-1200x1500",
+      "facebook-story-1080x1920",
+      "facebook-cover-1640x624",
+      "x-post-1080x1350",
+      "x-header-1500x500",
+      "threads-1080x1350",
+      "bluesky-1200x675",
+      "pinterest-square-1000x1000",
+      "snapchat-1080x1920",
+      "whatsapp-status-1080x1920"
+    ],
+    "modes": 2,
+    "brands": 1,
+    "cases": 406
   }
 }

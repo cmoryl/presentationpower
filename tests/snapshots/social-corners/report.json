@@ -4,9 +4,21 @@
     "light",
     "dark"
   ],
+  "brands": [
+    "bm-enterprise"
+  ],
+  "coverage": {
+    "styles": 7,
+    "formats": 29,
+    "modes": 2,
+    "brands": 1,
+    "cases": 406
+  },
+  "fingerprint": "03b541ab",
   "results": [
     {
       "case": "light/editorial-glass__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -16,6 +28,7 @@
     },
     {
       "case": "light/editorial-glass__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -25,6 +38,7 @@
     },
     {
       "case": "light/editorial-glass__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -34,6 +48,7 @@
     },
     {
       "case": "light/editorial-glass__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -43,6 +58,7 @@
     },
     {
       "case": "light/editorial-glass__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -52,6 +68,7 @@
     },
     {
       "case": "light/editorial-glass__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -61,6 +78,7 @@
     },
     {
       "case": "light/editorial-glass__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -70,6 +88,7 @@
     },
     {
       "case": "light/editorial-glass__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -79,6 +98,7 @@
     },
     {
       "case": "light/editorial-glass__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -88,15 +108,17 @@
     },
     {
       "case": "light/editorial-glass__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 42.75,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/editorial-glass__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -106,6 +128,7 @@
     },
     {
       "case": "light/editorial-glass__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -115,6 +138,7 @@
     },
     {
       "case": "light/editorial-glass__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -124,6 +148,7 @@
     },
     {
       "case": "light/editorial-glass__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -133,6 +158,7 @@
     },
     {
       "case": "light/editorial-glass__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -142,15 +168,17 @@
     },
     {
       "case": "light/editorial-glass__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 0,
+      "worstMismatchPct": 43.938,
       "problems": []
     },
     {
       "case": "light/editorial-glass__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -160,6 +188,7 @@
     },
     {
       "case": "light/editorial-glass__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -169,6 +198,7 @@
     },
     {
       "case": "light/editorial-glass__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -178,6 +208,7 @@
     },
     {
       "case": "light/editorial-glass__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -187,6 +218,7 @@
     },
     {
       "case": "light/editorial-glass__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -196,6 +228,7 @@
     },
     {
       "case": "light/editorial-glass__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -205,6 +238,7 @@
     },
     {
       "case": "light/editorial-glass__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -214,6 +248,7 @@
     },
     {
       "case": "light/editorial-glass__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -223,6 +258,7 @@
     },
     {
       "case": "light/editorial-glass__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -232,6 +268,7 @@
     },
     {
       "case": "light/editorial-glass__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -241,6 +278,7 @@
     },
     {
       "case": "light/editorial-glass__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -250,6 +288,7 @@
     },
     {
       "case": "light/editorial-glass__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -259,6 +298,7 @@
     },
     {
       "case": "light/editorial-glass__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -268,6 +308,7 @@
     },
     {
       "case": "light/bold-block__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -277,6 +318,7 @@
     },
     {
       "case": "light/bold-block__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -286,6 +328,7 @@
     },
     {
       "case": "light/bold-block__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -295,6 +338,7 @@
     },
     {
       "case": "light/bold-block__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -304,6 +348,7 @@
     },
     {
       "case": "light/bold-block__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -313,6 +358,7 @@
     },
     {
       "case": "light/bold-block__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -322,6 +368,7 @@
     },
     {
       "case": "light/bold-block__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -331,24 +378,27 @@
     },
     {
       "case": "light/bold-block__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.999,
       "radiusPct": 2.5,
       "shortEdge": 360,
-      "worstMismatchPct": 55.75,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/bold-block__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
       "shortEdge": 360,
-      "worstMismatchPct": 65.438,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/bold-block__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -358,6 +408,7 @@
     },
     {
       "case": "light/bold-block__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.995,
       "radiusPct": 2.499,
@@ -367,6 +418,7 @@
     },
     {
       "case": "light/bold-block__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -376,6 +428,7 @@
     },
     {
       "case": "light/bold-block__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.002,
       "radiusPct": 2.501,
@@ -385,6 +438,7 @@
     },
     {
       "case": "light/bold-block__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -394,6 +448,7 @@
     },
     {
       "case": "light/bold-block__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.005,
       "radiusPct": 2.501,
@@ -403,6 +458,7 @@
     },
     {
       "case": "light/bold-block__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.999,
       "radiusPct": 2.5,
@@ -412,6 +468,7 @@
     },
     {
       "case": "light/bold-block__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -421,6 +478,7 @@
     },
     {
       "case": "light/bold-block__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.997,
       "radiusPct": 2.499,
@@ -430,6 +488,7 @@
     },
     {
       "case": "light/bold-block__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.003,
       "radiusPct": 2.501,
@@ -439,6 +498,7 @@
     },
     {
       "case": "light/bold-block__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -448,6 +508,7 @@
     },
     {
       "case": "light/bold-block__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -457,6 +518,7 @@
     },
     {
       "case": "light/bold-block__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.001,
       "radiusPct": 2.5,
@@ -466,6 +528,7 @@
     },
     {
       "case": "light/bold-block__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -475,6 +538,7 @@
     },
     {
       "case": "light/bold-block__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -484,6 +548,7 @@
     },
     {
       "case": "light/bold-block__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -493,6 +558,7 @@
     },
     {
       "case": "light/bold-block__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -502,6 +568,7 @@
     },
     {
       "case": "light/bold-block__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -511,6 +578,7 @@
     },
     {
       "case": "light/bold-block__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -520,6 +588,7 @@
     },
     {
       "case": "light/bold-block__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -529,6 +598,7 @@
     },
     {
       "case": "light/split-band__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -538,6 +608,7 @@
     },
     {
       "case": "light/split-band__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -547,6 +618,7 @@
     },
     {
       "case": "light/split-band__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -556,6 +628,7 @@
     },
     {
       "case": "light/split-band__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -565,6 +638,7 @@
     },
     {
       "case": "light/split-band__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -574,6 +648,7 @@
     },
     {
       "case": "light/split-band__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -583,6 +658,7 @@
     },
     {
       "case": "light/split-band__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -592,6 +668,7 @@
     },
     {
       "case": "light/split-band__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -601,6 +678,7 @@
     },
     {
       "case": "light/split-band__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -610,6 +688,7 @@
     },
     {
       "case": "light/split-band__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -619,6 +698,7 @@
     },
     {
       "case": "light/split-band__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -628,6 +708,7 @@
     },
     {
       "case": "light/split-band__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -637,6 +718,7 @@
     },
     {
       "case": "light/split-band__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -646,6 +728,7 @@
     },
     {
       "case": "light/split-band__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -655,6 +738,7 @@
     },
     {
       "case": "light/split-band__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -664,6 +748,7 @@
     },
     {
       "case": "light/split-band__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -673,6 +758,7 @@
     },
     {
       "case": "light/split-band__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -682,6 +768,7 @@
     },
     {
       "case": "light/split-band__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -691,6 +778,7 @@
     },
     {
       "case": "light/split-band__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -700,6 +788,7 @@
     },
     {
       "case": "light/split-band__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -709,6 +798,7 @@
     },
     {
       "case": "light/split-band__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -718,6 +808,7 @@
     },
     {
       "case": "light/split-band__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -727,6 +818,7 @@
     },
     {
       "case": "light/split-band__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -736,6 +828,7 @@
     },
     {
       "case": "light/split-band__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -745,6 +838,7 @@
     },
     {
       "case": "light/split-band__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -754,6 +848,7 @@
     },
     {
       "case": "light/split-band__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -763,6 +858,7 @@
     },
     {
       "case": "light/split-band__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -772,6 +868,7 @@
     },
     {
       "case": "light/split-band__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -781,6 +878,7 @@
     },
     {
       "case": "light/split-band__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -790,6 +888,7 @@
     },
     {
       "case": "light/minimal-rule__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -799,6 +898,7 @@
     },
     {
       "case": "light/minimal-rule__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -808,6 +908,7 @@
     },
     {
       "case": "light/minimal-rule__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -817,6 +918,7 @@
     },
     {
       "case": "light/minimal-rule__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -826,6 +928,7 @@
     },
     {
       "case": "light/minimal-rule__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -835,6 +938,7 @@
     },
     {
       "case": "light/minimal-rule__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -844,6 +948,7 @@
     },
     {
       "case": "light/minimal-rule__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -853,6 +958,7 @@
     },
     {
       "case": "light/minimal-rule__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -862,6 +968,7 @@
     },
     {
       "case": "light/minimal-rule__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -871,6 +978,7 @@
     },
     {
       "case": "light/minimal-rule__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -880,6 +988,7 @@
     },
     {
       "case": "light/minimal-rule__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -889,6 +998,7 @@
     },
     {
       "case": "light/minimal-rule__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -898,6 +1008,7 @@
     },
     {
       "case": "light/minimal-rule__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -907,6 +1018,7 @@
     },
     {
       "case": "light/minimal-rule__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -916,6 +1028,7 @@
     },
     {
       "case": "light/minimal-rule__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -925,6 +1038,7 @@
     },
     {
       "case": "light/minimal-rule__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -934,6 +1048,7 @@
     },
     {
       "case": "light/minimal-rule__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -943,6 +1058,7 @@
     },
     {
       "case": "light/minimal-rule__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -952,6 +1068,7 @@
     },
     {
       "case": "light/minimal-rule__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -961,6 +1078,7 @@
     },
     {
       "case": "light/minimal-rule__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -970,6 +1088,7 @@
     },
     {
       "case": "light/minimal-rule__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -979,6 +1098,7 @@
     },
     {
       "case": "light/minimal-rule__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -988,6 +1108,7 @@
     },
     {
       "case": "light/minimal-rule__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -997,6 +1118,7 @@
     },
     {
       "case": "light/minimal-rule__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1006,6 +1128,7 @@
     },
     {
       "case": "light/minimal-rule__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1015,6 +1138,7 @@
     },
     {
       "case": "light/minimal-rule__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1024,6 +1148,7 @@
     },
     {
       "case": "light/minimal-rule__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1033,6 +1158,7 @@
     },
     {
       "case": "light/minimal-rule__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1042,6 +1168,7 @@
     },
     {
       "case": "light/minimal-rule__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1051,6 +1178,7 @@
     },
     {
       "case": "light/poster-stack__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1060,6 +1188,7 @@
     },
     {
       "case": "light/poster-stack__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1069,6 +1198,7 @@
     },
     {
       "case": "light/poster-stack__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
@@ -1078,6 +1208,7 @@
     },
     {
       "case": "light/poster-stack__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1087,6 +1218,7 @@
     },
     {
       "case": "light/poster-stack__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1096,6 +1228,7 @@
     },
     {
       "case": "light/poster-stack__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.599,
       "radiusPct": 3.5,
@@ -1105,6 +1238,7 @@
     },
     {
       "case": "light/poster-stack__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1114,6 +1248,7 @@
     },
     {
       "case": "light/poster-stack__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.598,
       "radiusPct": 3.499,
@@ -1123,6 +1258,7 @@
     },
     {
       "case": "light/poster-stack__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1132,6 +1268,7 @@
     },
     {
       "case": "light/poster-stack__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1141,6 +1278,7 @@
     },
     {
       "case": "light/poster-stack__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.594,
       "radiusPct": 3.498,
@@ -1150,6 +1288,7 @@
     },
     {
       "case": "light/poster-stack__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1159,6 +1298,7 @@
     },
     {
       "case": "light/poster-stack__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.603,
       "radiusPct": 3.501,
@@ -1168,6 +1308,7 @@
     },
     {
       "case": "light/poster-stack__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1177,6 +1318,7 @@
     },
     {
       "case": "light/poster-stack__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.606,
       "radiusPct": 3.502,
@@ -1186,6 +1328,7 @@
     },
     {
       "case": "light/poster-stack__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.599,
       "radiusPct": 3.5,
@@ -1195,6 +1338,7 @@
     },
     {
       "case": "light/poster-stack__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1204,6 +1348,7 @@
     },
     {
       "case": "light/poster-stack__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.596,
       "radiusPct": 3.499,
@@ -1213,6 +1358,7 @@
     },
     {
       "case": "light/poster-stack__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1222,6 +1368,7 @@
     },
     {
       "case": "light/poster-stack__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1231,6 +1378,7 @@
     },
     {
       "case": "light/poster-stack__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
@@ -1240,6 +1388,7 @@
     },
     {
       "case": "light/poster-stack__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.602,
       "radiusPct": 3.501,
@@ -1249,6 +1398,7 @@
     },
     {
       "case": "light/poster-stack__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1258,6 +1408,7 @@
     },
     {
       "case": "light/poster-stack__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1267,6 +1418,7 @@
     },
     {
       "case": "light/poster-stack__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -1276,6 +1428,7 @@
     },
     {
       "case": "light/poster-stack__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
@@ -1285,6 +1438,7 @@
     },
     {
       "case": "light/poster-stack__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -1294,6 +1448,7 @@
     },
     {
       "case": "light/poster-stack__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
@@ -1303,6 +1458,7 @@
     },
     {
       "case": "light/poster-stack__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
@@ -1312,6 +1468,7 @@
     },
     {
       "case": "light/photo-gradient__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1321,6 +1478,7 @@
     },
     {
       "case": "light/photo-gradient__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1330,6 +1488,7 @@
     },
     {
       "case": "light/photo-gradient__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1339,6 +1498,7 @@
     },
     {
       "case": "light/photo-gradient__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1348,6 +1508,7 @@
     },
     {
       "case": "light/photo-gradient__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1357,6 +1518,7 @@
     },
     {
       "case": "light/photo-gradient__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1366,6 +1528,7 @@
     },
     {
       "case": "light/photo-gradient__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1375,6 +1538,7 @@
     },
     {
       "case": "light/photo-gradient__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1384,6 +1548,7 @@
     },
     {
       "case": "light/photo-gradient__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1393,6 +1558,7 @@
     },
     {
       "case": "light/photo-gradient__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1402,6 +1568,7 @@
     },
     {
       "case": "light/photo-gradient__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1411,6 +1578,7 @@
     },
     {
       "case": "light/photo-gradient__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1420,6 +1588,7 @@
     },
     {
       "case": "light/photo-gradient__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1429,6 +1598,7 @@
     },
     {
       "case": "light/photo-gradient__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1438,6 +1608,7 @@
     },
     {
       "case": "light/photo-gradient__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1447,6 +1618,7 @@
     },
     {
       "case": "light/photo-gradient__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1456,6 +1628,7 @@
     },
     {
       "case": "light/photo-gradient__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1465,6 +1638,7 @@
     },
     {
       "case": "light/photo-gradient__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1474,6 +1648,7 @@
     },
     {
       "case": "light/photo-gradient__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1483,6 +1658,7 @@
     },
     {
       "case": "light/photo-gradient__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1492,6 +1668,7 @@
     },
     {
       "case": "light/photo-gradient__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1501,6 +1678,7 @@
     },
     {
       "case": "light/photo-gradient__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1510,6 +1688,7 @@
     },
     {
       "case": "light/photo-gradient__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1519,6 +1698,7 @@
     },
     {
       "case": "light/photo-gradient__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1528,6 +1708,7 @@
     },
     {
       "case": "light/photo-gradient__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1537,6 +1718,7 @@
     },
     {
       "case": "light/photo-gradient__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1546,6 +1728,7 @@
     },
     {
       "case": "light/photo-gradient__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1555,6 +1738,7 @@
     },
     {
       "case": "light/photo-gradient__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1564,6 +1748,7 @@
     },
     {
       "case": "light/photo-gradient__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1573,6 +1758,7 @@
     },
     {
       "case": "light/aura-soft__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1582,6 +1768,7 @@
     },
     {
       "case": "light/aura-soft__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1591,6 +1778,7 @@
     },
     {
       "case": "light/aura-soft__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1600,6 +1788,7 @@
     },
     {
       "case": "light/aura-soft__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1609,6 +1798,7 @@
     },
     {
       "case": "light/aura-soft__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1618,6 +1808,7 @@
     },
     {
       "case": "light/aura-soft__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1627,6 +1818,7 @@
     },
     {
       "case": "light/aura-soft__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1636,6 +1828,7 @@
     },
     {
       "case": "light/aura-soft__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1645,6 +1838,7 @@
     },
     {
       "case": "light/aura-soft__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1654,6 +1848,7 @@
     },
     {
       "case": "light/aura-soft__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1663,6 +1858,7 @@
     },
     {
       "case": "light/aura-soft__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1672,6 +1868,7 @@
     },
     {
       "case": "light/aura-soft__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1681,6 +1878,7 @@
     },
     {
       "case": "light/aura-soft__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1690,6 +1888,7 @@
     },
     {
       "case": "light/aura-soft__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1699,6 +1898,7 @@
     },
     {
       "case": "light/aura-soft__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1708,6 +1908,7 @@
     },
     {
       "case": "light/aura-soft__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1717,6 +1918,7 @@
     },
     {
       "case": "light/aura-soft__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1726,6 +1928,7 @@
     },
     {
       "case": "light/aura-soft__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1735,6 +1938,7 @@
     },
     {
       "case": "light/aura-soft__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1744,6 +1948,7 @@
     },
     {
       "case": "light/aura-soft__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1753,15 +1958,17 @@
     },
     {
       "case": "light/aura-soft__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 94.563,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/aura-soft__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1771,15 +1978,17 @@
     },
     {
       "case": "light/aura-soft__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 37.313,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/aura-soft__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1789,24 +1998,27 @@
     },
     {
       "case": "light/aura-soft__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 100,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/aura-soft__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 98.313,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/aura-soft__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1816,24 +2028,27 @@
     },
     {
       "case": "light/aura-soft__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 37.438,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "light/aura-soft__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 50.187,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/editorial-glass__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1843,6 +2058,7 @@
     },
     {
       "case": "dark/editorial-glass__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1852,6 +2068,7 @@
     },
     {
       "case": "dark/editorial-glass__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1861,6 +2078,7 @@
     },
     {
       "case": "dark/editorial-glass__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1870,6 +2088,7 @@
     },
     {
       "case": "dark/editorial-glass__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1879,6 +2098,7 @@
     },
     {
       "case": "dark/editorial-glass__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1888,6 +2108,7 @@
     },
     {
       "case": "dark/editorial-glass__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1897,6 +2118,7 @@
     },
     {
       "case": "dark/editorial-glass__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1906,6 +2128,7 @@
     },
     {
       "case": "dark/editorial-glass__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1915,6 +2138,7 @@
     },
     {
       "case": "dark/editorial-glass__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1924,6 +2148,7 @@
     },
     {
       "case": "dark/editorial-glass__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1933,6 +2158,7 @@
     },
     {
       "case": "dark/editorial-glass__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1942,6 +2168,7 @@
     },
     {
       "case": "dark/editorial-glass__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1951,6 +2178,7 @@
     },
     {
       "case": "dark/editorial-glass__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1960,6 +2188,7 @@
     },
     {
       "case": "dark/editorial-glass__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1969,6 +2198,7 @@
     },
     {
       "case": "dark/editorial-glass__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1978,6 +2208,7 @@
     },
     {
       "case": "dark/editorial-glass__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1987,6 +2218,7 @@
     },
     {
       "case": "dark/editorial-glass__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -1996,15 +2228,17 @@
     },
     {
       "case": "dark/editorial-glass__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 0,
+      "worstMismatchPct": 48.875,
       "problems": []
     },
     {
       "case": "dark/editorial-glass__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2014,6 +2248,7 @@
     },
     {
       "case": "dark/editorial-glass__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2023,6 +2258,7 @@
     },
     {
       "case": "dark/editorial-glass__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2032,6 +2268,7 @@
     },
     {
       "case": "dark/editorial-glass__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2041,6 +2278,7 @@
     },
     {
       "case": "dark/editorial-glass__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2050,6 +2288,7 @@
     },
     {
       "case": "dark/editorial-glass__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2059,6 +2298,7 @@
     },
     {
       "case": "dark/editorial-glass__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2068,6 +2308,7 @@
     },
     {
       "case": "dark/editorial-glass__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2077,6 +2318,7 @@
     },
     {
       "case": "dark/editorial-glass__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2086,6 +2328,7 @@
     },
     {
       "case": "dark/editorial-glass__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2095,6 +2338,7 @@
     },
     {
       "case": "dark/bold-block__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -2104,6 +2348,7 @@
     },
     {
       "case": "dark/bold-block__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -2113,6 +2358,7 @@
     },
     {
       "case": "dark/bold-block__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -2122,6 +2368,7 @@
     },
     {
       "case": "dark/bold-block__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2131,6 +2378,7 @@
     },
     {
       "case": "dark/bold-block__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2140,6 +2388,7 @@
     },
     {
       "case": "dark/bold-block__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2149,6 +2398,7 @@
     },
     {
       "case": "dark/bold-block__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2158,24 +2408,27 @@
     },
     {
       "case": "dark/bold-block__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.999,
       "radiusPct": 2.5,
       "shortEdge": 360,
-      "worstMismatchPct": 0,
+      "worstMismatchPct": 79.125,
       "problems": []
     },
     {
       "case": "dark/bold-block__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
       "shortEdge": 360,
-      "worstMismatchPct": 80.313,
+      "worstMismatchPct": 82.188,
       "problems": []
     },
     {
       "case": "dark/bold-block__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2185,6 +2438,7 @@
     },
     {
       "case": "dark/bold-block__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.995,
       "radiusPct": 2.499,
@@ -2194,6 +2448,7 @@
     },
     {
       "case": "dark/bold-block__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -2203,6 +2458,7 @@
     },
     {
       "case": "dark/bold-block__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.002,
       "radiusPct": 2.501,
@@ -2212,6 +2468,7 @@
     },
     {
       "case": "dark/bold-block__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -2221,6 +2478,7 @@
     },
     {
       "case": "dark/bold-block__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.005,
       "radiusPct": 2.501,
@@ -2230,6 +2488,7 @@
     },
     {
       "case": "dark/bold-block__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.999,
       "radiusPct": 2.5,
@@ -2239,6 +2498,7 @@
     },
     {
       "case": "dark/bold-block__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -2248,6 +2508,7 @@
     },
     {
       "case": "dark/bold-block__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.997,
       "radiusPct": 2.499,
@@ -2257,6 +2518,7 @@
     },
     {
       "case": "dark/bold-block__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.003,
       "radiusPct": 2.501,
@@ -2266,6 +2528,7 @@
     },
     {
       "case": "dark/bold-block__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2275,6 +2538,7 @@
     },
     {
       "case": "dark/bold-block__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -2284,6 +2548,7 @@
     },
     {
       "case": "dark/bold-block__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.001,
       "radiusPct": 2.5,
@@ -2293,6 +2558,7 @@
     },
     {
       "case": "dark/bold-block__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -2302,6 +2568,7 @@
     },
     {
       "case": "dark/bold-block__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2311,6 +2578,7 @@
     },
     {
       "case": "dark/bold-block__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9.004,
       "radiusPct": 2.501,
@@ -2320,6 +2588,7 @@
     },
     {
       "case": "dark/bold-block__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -2329,6 +2598,7 @@
     },
     {
       "case": "dark/bold-block__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 9,
       "radiusPct": 2.5,
@@ -2338,6 +2608,7 @@
     },
     {
       "case": "dark/bold-block__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -2347,6 +2618,7 @@
     },
     {
       "case": "dark/bold-block__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 8.998,
       "radiusPct": 2.499,
@@ -2356,6 +2628,7 @@
     },
     {
       "case": "dark/split-band__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2365,6 +2638,7 @@
     },
     {
       "case": "dark/split-band__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2374,6 +2648,7 @@
     },
     {
       "case": "dark/split-band__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2383,6 +2658,7 @@
     },
     {
       "case": "dark/split-band__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2392,6 +2668,7 @@
     },
     {
       "case": "dark/split-band__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2401,6 +2678,7 @@
     },
     {
       "case": "dark/split-band__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2410,6 +2688,7 @@
     },
     {
       "case": "dark/split-band__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2419,24 +2698,27 @@
     },
     {
       "case": "dark/split-band__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 53,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/split-band__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
       "shortEdge": 360,
-      "worstMismatchPct": 49.438,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/split-band__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2446,6 +2728,7 @@
     },
     {
       "case": "dark/split-band__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2455,6 +2738,7 @@
     },
     {
       "case": "dark/split-band__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2464,6 +2748,7 @@
     },
     {
       "case": "dark/split-band__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2473,6 +2758,7 @@
     },
     {
       "case": "dark/split-band__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2482,6 +2768,7 @@
     },
     {
       "case": "dark/split-band__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2491,6 +2778,7 @@
     },
     {
       "case": "dark/split-band__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2500,6 +2788,7 @@
     },
     {
       "case": "dark/split-band__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2509,6 +2798,7 @@
     },
     {
       "case": "dark/split-band__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2518,6 +2808,7 @@
     },
     {
       "case": "dark/split-band__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2527,6 +2818,7 @@
     },
     {
       "case": "dark/split-band__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2536,6 +2828,7 @@
     },
     {
       "case": "dark/split-band__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2545,6 +2838,7 @@
     },
     {
       "case": "dark/split-band__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2554,6 +2848,7 @@
     },
     {
       "case": "dark/split-band__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2563,6 +2858,7 @@
     },
     {
       "case": "dark/split-band__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2572,6 +2868,7 @@
     },
     {
       "case": "dark/split-band__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2581,6 +2878,7 @@
     },
     {
       "case": "dark/split-band__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2590,6 +2888,7 @@
     },
     {
       "case": "dark/split-band__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2599,6 +2898,7 @@
     },
     {
       "case": "dark/split-band__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2608,6 +2908,7 @@
     },
     {
       "case": "dark/split-band__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2617,6 +2918,7 @@
     },
     {
       "case": "dark/minimal-rule__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2626,6 +2928,7 @@
     },
     {
       "case": "dark/minimal-rule__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2635,6 +2938,7 @@
     },
     {
       "case": "dark/minimal-rule__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2644,6 +2948,7 @@
     },
     {
       "case": "dark/minimal-rule__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2653,6 +2958,7 @@
     },
     {
       "case": "dark/minimal-rule__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2662,6 +2968,7 @@
     },
     {
       "case": "dark/minimal-rule__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2671,6 +2978,7 @@
     },
     {
       "case": "dark/minimal-rule__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2680,6 +2988,7 @@
     },
     {
       "case": "dark/minimal-rule__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2689,6 +2998,7 @@
     },
     {
       "case": "dark/minimal-rule__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2698,6 +3008,7 @@
     },
     {
       "case": "dark/minimal-rule__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2707,6 +3018,7 @@
     },
     {
       "case": "dark/minimal-rule__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2716,6 +3028,7 @@
     },
     {
       "case": "dark/minimal-rule__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2725,6 +3038,7 @@
     },
     {
       "case": "dark/minimal-rule__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2734,6 +3048,7 @@
     },
     {
       "case": "dark/minimal-rule__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2743,6 +3058,7 @@
     },
     {
       "case": "dark/minimal-rule__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2752,6 +3068,7 @@
     },
     {
       "case": "dark/minimal-rule__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2761,6 +3078,7 @@
     },
     {
       "case": "dark/minimal-rule__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2770,6 +3088,7 @@
     },
     {
       "case": "dark/minimal-rule__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2779,6 +3098,7 @@
     },
     {
       "case": "dark/minimal-rule__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2788,6 +3108,7 @@
     },
     {
       "case": "dark/minimal-rule__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2797,6 +3118,7 @@
     },
     {
       "case": "dark/minimal-rule__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2806,6 +3128,7 @@
     },
     {
       "case": "dark/minimal-rule__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2815,6 +3138,7 @@
     },
     {
       "case": "dark/minimal-rule__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2824,6 +3148,7 @@
     },
     {
       "case": "dark/minimal-rule__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2833,6 +3158,7 @@
     },
     {
       "case": "dark/minimal-rule__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2842,6 +3168,7 @@
     },
     {
       "case": "dark/minimal-rule__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2851,6 +3178,7 @@
     },
     {
       "case": "dark/minimal-rule__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2860,6 +3188,7 @@
     },
     {
       "case": "dark/minimal-rule__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2869,6 +3198,7 @@
     },
     {
       "case": "dark/minimal-rule__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -2878,6 +3208,7 @@
     },
     {
       "case": "dark/poster-stack__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -2887,6 +3218,7 @@
     },
     {
       "case": "dark/poster-stack__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -2896,6 +3228,7 @@
     },
     {
       "case": "dark/poster-stack__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
@@ -2905,6 +3238,7 @@
     },
     {
       "case": "dark/poster-stack__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -2914,6 +3248,7 @@
     },
     {
       "case": "dark/poster-stack__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -2923,6 +3258,7 @@
     },
     {
       "case": "dark/poster-stack__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.599,
       "radiusPct": 3.5,
@@ -2932,6 +3268,7 @@
     },
     {
       "case": "dark/poster-stack__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -2941,6 +3278,7 @@
     },
     {
       "case": "dark/poster-stack__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.598,
       "radiusPct": 3.499,
@@ -2950,6 +3288,7 @@
     },
     {
       "case": "dark/poster-stack__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -2959,6 +3298,7 @@
     },
     {
       "case": "dark/poster-stack__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -2968,6 +3308,7 @@
     },
     {
       "case": "dark/poster-stack__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.594,
       "radiusPct": 3.498,
@@ -2977,6 +3318,7 @@
     },
     {
       "case": "dark/poster-stack__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -2986,6 +3328,7 @@
     },
     {
       "case": "dark/poster-stack__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.603,
       "radiusPct": 3.501,
@@ -2995,6 +3338,7 @@
     },
     {
       "case": "dark/poster-stack__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -3004,6 +3348,7 @@
     },
     {
       "case": "dark/poster-stack__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.606,
       "radiusPct": 3.502,
@@ -3013,6 +3358,7 @@
     },
     {
       "case": "dark/poster-stack__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.599,
       "radiusPct": 3.5,
@@ -3022,6 +3368,7 @@
     },
     {
       "case": "dark/poster-stack__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -3031,6 +3378,7 @@
     },
     {
       "case": "dark/poster-stack__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.596,
       "radiusPct": 3.499,
@@ -3040,15 +3388,17 @@
     },
     {
       "case": "dark/poster-stack__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
       "shortEdge": 360,
-      "worstMismatchPct": 6.688,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/poster-stack__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -3058,6 +3408,7 @@
     },
     {
       "case": "dark/poster-stack__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
@@ -3067,6 +3418,7 @@
     },
     {
       "case": "dark/poster-stack__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.602,
       "radiusPct": 3.501,
@@ -3076,6 +3428,7 @@
     },
     {
       "case": "dark/poster-stack__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
@@ -3085,6 +3438,7 @@
     },
     {
       "case": "dark/poster-stack__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -3094,24 +3448,27 @@
     },
     {
       "case": "dark/poster-stack__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.605,
       "radiusPct": 3.501,
       "shortEdge": 360,
-      "worstMismatchPct": 93.25,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/poster-stack__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
       "shortEdge": 360,
-      "worstMismatchPct": 70.75,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/poster-stack__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.6,
       "radiusPct": 3.5,
@@ -3121,24 +3478,27 @@
     },
     {
       "case": "dark/poster-stack__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
       "shortEdge": 360,
-      "worstMismatchPct": 28.063,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/poster-stack__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 12.597,
       "radiusPct": 3.499,
       "shortEdge": 360,
-      "worstMismatchPct": 48.688,
+      "worstMismatchPct": 0,
       "problems": []
     },
     {
       "case": "dark/photo-gradient__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3148,6 +3508,7 @@
     },
     {
       "case": "dark/photo-gradient__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3157,6 +3518,7 @@
     },
     {
       "case": "dark/photo-gradient__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3166,6 +3528,7 @@
     },
     {
       "case": "dark/photo-gradient__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3175,6 +3538,7 @@
     },
     {
       "case": "dark/photo-gradient__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3184,6 +3548,7 @@
     },
     {
       "case": "dark/photo-gradient__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3193,6 +3558,7 @@
     },
     {
       "case": "dark/photo-gradient__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3202,6 +3568,7 @@
     },
     {
       "case": "dark/photo-gradient__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3211,6 +3578,7 @@
     },
     {
       "case": "dark/photo-gradient__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3220,6 +3588,7 @@
     },
     {
       "case": "dark/photo-gradient__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3229,6 +3598,7 @@
     },
     {
       "case": "dark/photo-gradient__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3238,6 +3608,7 @@
     },
     {
       "case": "dark/photo-gradient__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3247,6 +3618,7 @@
     },
     {
       "case": "dark/photo-gradient__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3256,6 +3628,7 @@
     },
     {
       "case": "dark/photo-gradient__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3265,6 +3638,7 @@
     },
     {
       "case": "dark/photo-gradient__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3274,6 +3648,7 @@
     },
     {
       "case": "dark/photo-gradient__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3283,6 +3658,7 @@
     },
     {
       "case": "dark/photo-gradient__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3292,6 +3668,7 @@
     },
     {
       "case": "dark/photo-gradient__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3301,6 +3678,7 @@
     },
     {
       "case": "dark/photo-gradient__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3310,6 +3688,7 @@
     },
     {
       "case": "dark/photo-gradient__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3319,6 +3698,7 @@
     },
     {
       "case": "dark/photo-gradient__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3328,6 +3708,7 @@
     },
     {
       "case": "dark/photo-gradient__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3337,6 +3718,7 @@
     },
     {
       "case": "dark/photo-gradient__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3346,6 +3728,7 @@
     },
     {
       "case": "dark/photo-gradient__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3355,6 +3738,7 @@
     },
     {
       "case": "dark/photo-gradient__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3364,6 +3748,7 @@
     },
     {
       "case": "dark/photo-gradient__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3373,6 +3758,7 @@
     },
     {
       "case": "dark/photo-gradient__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3382,6 +3768,7 @@
     },
     {
       "case": "dark/photo-gradient__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3391,6 +3778,7 @@
     },
     {
       "case": "dark/photo-gradient__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3400,6 +3788,7 @@
     },
     {
       "case": "dark/aura-soft__square-1080",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3409,6 +3798,7 @@
     },
     {
       "case": "dark/aura-soft__portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3418,6 +3808,7 @@
     },
     {
       "case": "dark/aura-soft__story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3427,6 +3818,7 @@
     },
     {
       "case": "dark/aura-soft__linkedin-link-1200x627",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3436,6 +3828,7 @@
     },
     {
       "case": "dark/aura-soft__linkedin-post-1200x1200",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3445,6 +3838,7 @@
     },
     {
       "case": "dark/aura-soft__callout-1200x628",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3454,6 +3848,7 @@
     },
     {
       "case": "dark/aura-soft__x-1600x900",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3463,6 +3858,7 @@
     },
     {
       "case": "dark/aura-soft__youtube-1280x720",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3472,6 +3868,7 @@
     },
     {
       "case": "dark/aura-soft__pinterest-1000x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3481,6 +3878,7 @@
     },
     {
       "case": "dark/aura-soft__email-header-1200x400",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3490,6 +3888,7 @@
     },
     {
       "case": "dark/aura-soft__instagram-reel-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3499,6 +3898,7 @@
     },
     {
       "case": "dark/aura-soft__instagram-carousel-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3508,6 +3908,7 @@
     },
     {
       "case": "dark/aura-soft__tiktok-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3517,6 +3918,7 @@
     },
     {
       "case": "dark/aura-soft__tiktok-cover-1080x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3526,6 +3928,7 @@
     },
     {
       "case": "dark/aura-soft__youtube-short-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3535,6 +3938,7 @@
     },
     {
       "case": "dark/aura-soft__youtube-banner-2560x1440",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3544,6 +3948,7 @@
     },
     {
       "case": "dark/aura-soft__linkedin-portrait-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3553,6 +3958,7 @@
     },
     {
       "case": "dark/aura-soft__linkedin-banner-1584x396",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3562,6 +3968,7 @@
     },
     {
       "case": "dark/aura-soft__linkedin-company-1128x191",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3571,6 +3978,7 @@
     },
     {
       "case": "dark/aura-soft__facebook-post-1200x1500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3580,6 +3988,7 @@
     },
     {
       "case": "dark/aura-soft__facebook-story-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3589,6 +3998,7 @@
     },
     {
       "case": "dark/aura-soft__facebook-cover-1640x624",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3598,6 +4008,7 @@
     },
     {
       "case": "dark/aura-soft__x-post-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3607,6 +4018,7 @@
     },
     {
       "case": "dark/aura-soft__x-header-1500x500",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3616,6 +4028,7 @@
     },
     {
       "case": "dark/aura-soft__threads-1080x1350",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3625,6 +4038,7 @@
     },
     {
       "case": "dark/aura-soft__bluesky-1200x675",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3634,6 +4048,7 @@
     },
     {
       "case": "dark/aura-soft__pinterest-square-1000x1000",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3643,6 +4058,7 @@
     },
     {
       "case": "dark/aura-soft__snapchat-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
@@ -3652,6 +4068,7 @@
     },
     {
       "case": "dark/aura-soft__whatsapp-status-1080x1920",
+      "brand": "bm-enterprise",
       "ok": true,
       "radiusPx": 0,
       "radiusPct": 0,
