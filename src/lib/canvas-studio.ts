@@ -89,6 +89,14 @@ export type CanvasComposition = {
   /** saved_modules row id once the composition has been saved to My Files. */
   savedFileId?: string | null;
   savedAt?: string | null;
+  /**
+   * TEMPLATE LOOK — an approved style pack id (S01–S28, S29/S30 Element) whose
+   * typography, surfaces and ground the whole canvas wears. `null` keeps the
+   * approved TransPerfect brand system. Independent from `recipeId`.
+   */
+  packId?: string | null;
+  /** Industry recipe id (R01–R30) contributing only the background system. */
+  recipeId?: string | null;
 };
 
 export const STAGE_W = 1920;

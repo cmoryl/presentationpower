@@ -29,6 +29,11 @@ import { saveModule, updateSavedModule } from "@/lib/saved-modules.functions";
 import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { attachSlideFile } from "@/lib/slide-files.functions";
 import { blobToBase64 } from "@/lib/blob-base64";
+import { LibraryPackProvider } from "@/components/slide/PackShell";
+import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
+import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
+import { useEffectiveStylePack } from "@/hooks/use-template-registry";
+import { packToneBrand } from "@/lib/style-packs";
 import {
   STAGE_H,
   STAGE_W,
@@ -129,6 +134,20 @@ function CanvasStudioPage() {
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === (comp?.brandId ?? brandId)) ?? BRAND_MODES[0]!,
     [comp?.brandId, brandId],
+  );
+
+  // TEMPLATE LOOK — the composition can wear any approved style pack (plus an
+  // optional industry ground). The pack owns mode, palette and typography, so
+  // the stage, the module palette previews and every placed module all render
+  // through it; with no pack selected nothing changes.
+  const pack = useEffectiveStylePack(comp?.packId ?? null, comp?.recipeId ?? null);
+  const stageBrand = useMemo(() => (pack ? packToneBrand(brand, pack) : brand), [brand, pack]);
+  const stageComp = useMemo(
+    () =>
+      comp && pack
+        ? { ...comp, mode: pack.mode, background: comp.background ?? pack.tokens.surface }
+        : comp,
+    [comp, pack],
   );
 
   const selectedItem = comp?.items.find((i) => i.id === selectedIds[0]) ?? null;
@@ -239,7 +258,7 @@ function CanvasStudioPage() {
           comp.items.length === 1 ? "" : "s"
         }`,
         content: { composition: comp } as Record<string, unknown>,
-        brandMode: comp.mode,
+        brandMode: (stageComp ?? comp).mode,
         subCompany: comp.brandId,
         tags: ["open-canvas"],
       };
@@ -302,11 +321,13 @@ function CanvasStudioPage() {
     });
   };
 
+  const effMode = (stageComp ?? comp)?.mode ?? "light";
+
   const exportPptx = useMutation({
     mutationFn: async () => {
       if (!comp) throw new Error("Nothing to export");
       const { exportCompositionToPptx } = await import("@/lib/canvas-studio-export");
-      return exportCompositionToPptx(comp, brand);
+      return exportCompositionToPptx(stageComp ?? comp, brand);
     },
     onSuccess: (res) =>
       toast.success("PowerPoint exported", {
@@ -335,7 +356,10 @@ function CanvasStudioPage() {
             <MetaDot />
             <span>{brand.name}</span>
             <MetaDot />
-            <span>{comp.mode === "dark" ? "Dark" : "Light"} mode</span>
+            <span>
+              {effMode === "dark" ? "Dark" : "Light"} mode
+              {pack ? ` · ${pack.label}` : ""}
+            </span>
           </>
         }
         status={
@@ -343,20 +367,25 @@ function CanvasStudioPage() {
             <button
               type="button"
               role="switch"
-              aria-checked={comp.mode === "dark"}
+              aria-checked={effMode === "dark"}
               aria-label="Toggle dark mode"
-              title={comp.mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              onClick={() =>
-                switchAppearance(comp.mode === "dark" ? "light" : "dark")
+              disabled={Boolean(pack)}
+              title={
+                pack
+                  ? `${pack.label} sets the appearance`
+                  : effMode === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
               }
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition ${
-                comp.mode === "dark"
+              onClick={() => switchAppearance(effMode === "dark" ? "light" : "dark")}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                effMode === "dark"
                   ? "bg-[#03002C] text-white"
                   : "bg-black/[0.04] text-[#03002C] hover:bg-black/[0.07]"
               }`}
             >
-              <span aria-hidden>{comp.mode === "dark" ? "☾" : "☀"}</span>
-              {comp.mode === "dark" ? "Dark" : "Light"}
+              <span aria-hidden>{effMode === "dark" ? "☾" : "☀"}</span>
+              {effMode === "dark" ? "Dark" : "Light"}
             </button>
             <SaveActionButton
               state={
@@ -467,7 +496,22 @@ function CanvasStudioPage() {
           }
           slideRow={
             <>
-              <EditorMenu label="Appearance" hint={comp.mode === "dark" ? "Dark" : "Light"}>
+              <EditorMenu
+                label="Appearance"
+                hint={
+                  pack
+                    ? `${pack.mode === "dark" ? "Dark" : "Light"} · template`
+                    : comp.mode === "dark"
+                      ? "Dark"
+                      : "Light"
+                }
+              >
+                {pack && (
+                  <p className="mb-1.5 px-1 text-[11px] leading-relaxed text-black/55">
+                    {pack.label} is a {pack.mode} template, so it sets the canvas appearance. Reset
+                    to the brand system to choose light or dark yourself.
+                  </p>
+                )}
                 <div
                   role="group"
                   aria-label="Canvas appearance mode"
@@ -477,10 +521,11 @@ function CanvasStudioPage() {
                     <button
                       key={m}
                       type="button"
-                      aria-pressed={comp.mode === m}
+                      aria-pressed={(pack ? pack.mode : comp.mode) === m}
+                      disabled={Boolean(pack)}
                       onClick={() => switchAppearance(m)}
-                      className={`rounded-full px-3 py-1 transition ${
-                        comp.mode === m
+                      className={`rounded-full px-3 py-1 transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                        (pack ? pack.mode : comp.mode) === m
                           ? m === "dark"
                             ? "bg-[#03002C] text-white shadow-sm"
                             : "bg-white text-[#03002C] shadow-sm"
@@ -490,6 +535,36 @@ function CanvasStudioPage() {
                       {m === "dark" ? "☾ Dark" : "☀ Light"}
                     </button>
                   ))}
+                </div>
+              </EditorMenu>
+
+              <EditorMenu
+                label="Template"
+                hint={pack ? pack.label : "Brand system"}
+                wide
+              >
+                <div className="w-full">
+                  <p className="mb-2 text-[11px] leading-relaxed text-black/55">
+                    Pick an approved template look. The canvas ground, type and every module you
+                    drop in adopt it — modules stay fully editable.
+                  </p>
+                  <StyleLookPicker
+                    value={comp.packId ?? null}
+                    onChange={(id) => patchComposition(comp.id, { packId: id })}
+                    recipeId={comp.recipeId ?? null}
+                    onRecipeChange={(id) => patchComposition(comp.id, { recipeId: id })}
+                  />
+                  {(comp.packId || comp.recipeId) && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        patchComposition(comp.id, { packId: null, recipeId: null })
+                      }
+                      className="mt-2 rounded-full border border-black/[0.08] bg-white px-3 py-1.5 text-[11px] font-semibold text-black/60 transition hover:border-primary/40 hover:text-primary"
+                    >
+                      Reset to brand system
+                    </button>
+                  )}
                 </div>
               </EditorMenu>
 
@@ -570,16 +645,19 @@ function CanvasStudioPage() {
 
       <div className="h-3" />
 
+      <LibraryPackProvider packId={comp.packId ?? null} recipeId={comp.recipeId ?? null}>
+      <StylePackProvider pack={pack}>
+      <StylePackVars pack={pack} className="contents">
       <div className="flex h-[70vh] min-h-[540px] gap-3">
         <StudioPalette
-          brand={brand}
-          mode={comp.mode}
+          brand={stageBrand}
+          mode={stageComp?.mode ?? comp.mode}
           onAdd={(payload) => place(payload, { x: STAGE_W / 2, y: STAGE_H / 2 })}
         />
         <div className="flex min-w-0 flex-1 flex-col justify-center">
           <CanvasStage
-            comp={comp}
-            brand={brand}
+            comp={stageComp ?? comp}
+            brand={stageBrand}
             selectedIds={selectedIds}
             snapOn={snapOn}
             showGrid={showGrid}
@@ -636,6 +714,9 @@ function CanvasStudioPage() {
           }
         />
       </div>
+      </StylePackVars>
+      </StylePackProvider>
+      </LibraryPackProvider>
     </AppShell>
   );
 }

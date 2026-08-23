@@ -198,11 +198,14 @@ export function EditorMenu({
   label,
   hint,
   badge,
+  wide,
   children,
 }: {
   label: string;
   hint?: string;
   badge?: string;
+  /** Panel wide enough for a gallery-style picker instead of a control stack. */
+  wide?: boolean;
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -214,7 +217,7 @@ export function EditorMenu({
   const panelId = useId();
   const pos = useAnchoredPosition(triggerEl, open, {
     align: anchor === "right" ? "end" : "start",
-    width: 340,
+    width: wide ? 900 : 340,
   });
 
 
