@@ -5,7 +5,13 @@ import { ElementMark, ELEMENT_LOCKUP_URLS } from "@/components/brand/ElementLogo
 
 // Inline SVG of the approved TransPerfect horizontal wordmark. Paths inherit
 // `currentColor` so a single component tints for both dark and light chrome.
-function TransPerfectWordmark({ height }: { height: number | string }) {
+function TransPerfectWordmark({
+  height,
+  maxWidth,
+}: {
+  height: number | string;
+  maxWidth?: string | undefined;
+}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -13,7 +19,13 @@ function TransPerfectWordmark({ height }: { height: number | string }) {
       fill="currentColor"
       preserveAspectRatio="xMinYMid meet"
       aria-hidden
-      style={{ display: "block", maxWidth: "100%", height, width: "auto", aspectRatio: "432 / 44.4" }}
+      style={{
+        display: "block",
+        maxWidth: maxWidth ?? "100%",
+        height,
+        width: "auto",
+        aspectRatio: "432 / 44.4",
+      }}
     >
       <path d="M359.9,21.9c0-12.7,9.2-21.9,22-21.9s11.2,1.9,16,6.2l-3.8,5c-3.1-2.8-6.8-4.6-12-4.6-8.7,0-14.7,6.4-14.7,15.3s5.8,15.4,14.4,15.4,9.5-2.3,12.3-6l4.6,4.7c-4.1,5.1-9.9,7.9-17.1,7.9-13,0-21.7-9.7-21.7-22" />
       <polygon points="258 37 258 43.5 230.7 43.5 230.7 1 257.4 1 257.4 7.5 238.1 7.5 238.1 18.8 255 18.8 255 25.1 238.1 25.1 238.1 37 258 37" />
@@ -69,9 +81,31 @@ export function BrandLockup({
    * instead of staying at absolute pixel size.
    */
   unit?: (px: number) => string;
+  /**
+   * Legibility-safe ceiling for container-scaled surfaces (card previews,
+   * thumbnails, contact-sheet grids). Expressed as a percentage of the
+   * container's inline size, so the lockup can never grow past a share of the
+   * page/card no matter which `size` step or artwork aspect it resolves to.
+   * Defaults are generous — they only clip runaway artwork, never the tuned
+   * live-editor sizing. Pass `false` to opt out.
+   */
+  cap?: { widthPct?: number; heightPct?: number } | false;
 }) {
   // `u()` formats a template px value in the caller's unit system.
   const u = (px: number): string | number => (unit ? unit(px) : px);
+  // ---- RESPONSIVE LOGO CLAMPS -------------------------------------------
+  // Only container-scaled callers (those passing `unit`) sit inside a
+  // [container-type:inline-size] page/card, so cqw is meaningful there.
+  const bigSize = size === "lg" || size === "xl";
+  const capOn = unit != null && cap !== false;
+  const capW = capOn ? (cap?.widthPct ?? (bigSize ? 64 : 52)) : undefined;
+  const capH = capOn ? (cap?.heightPct ?? (bigSize ? 18 : 13)) : undefined;
+  const asLen = (v: string | number): string => (typeof v === "number" ? `${v}px` : v);
+  /** Height in the caller's unit, ceilinged at `capH`% of the container. */
+  const uh = (px: number): string | number =>
+    capH == null ? u(px) : `min(${asLen(u(px))}, ${capH}cqw)`;
+  /** Width ceiling shared by every lockup media element. */
+  const capWidth: string | undefined = capW == null ? undefined : `min(100%, ${capW}cqw)`;
   // Lockup scale. Division / corporate marks were reading far too small on
   // slides, so the small end of the ramp (the sizes chrome actually uses for
   // content and corner placements) is lifted ~1.6x; the hero end grows more
@@ -122,7 +156,7 @@ export function BrandLockup({
       return (
         <div className="inline-flex" style={{ color }}>
           {unit ? (
-            <div style={{ height: u(markPx), display: "flex" }}>
+            <div style={{ height: uh(markPx), display: "flex", maxWidth: capWidth }}>
               <ElementMark
                 tone="color"
                 size={markPx}
@@ -148,7 +182,7 @@ export function BrandLockup({
           src={onDark ? ELEMENT_LOCKUP_URLS.reversed : ELEMENT_LOCKUP_URLS.color}
           alt="TransPerfect Element"
           className="w-auto max-w-full object-contain"
-          style={{ height: u(lockupPx), display: "block" }}
+          style={{ height: uh(lockupPx), display: "block", maxWidth: capWidth }}
         />
       </div>
     );
@@ -172,8 +206,8 @@ export function BrandLockup({
         <div
           className="flex items-center justify-center font-semibold tracking-tight"
           style={{
-            width: u(tilePx),
-            height: u(tilePx),
+            width: uh(tilePx),
+            height: uh(tilePx),
             border: `1.75px solid ${color}`,
             borderRadius: u(dims.radiusPx),
             fontSize: u(tilePx * 0.44),
@@ -259,9 +293,9 @@ export function BrandLockup({
               src={officialLogoUrl}
               alt={`${logo.wordmark} logo`}
               style={{
-                height: u(officialImageHeight),
+                height: uh(officialImageHeight),
                 width: "auto",
-                maxWidth: "100%",
+                maxWidth: capWidth ?? "100%",
                 objectFit: "contain",
                 display: "block",
                 filter: flattenOfficialLogo
@@ -272,11 +306,14 @@ export function BrandLockup({
               }}
             />
           ) : useOfficialWordmark ? (
-            <TransPerfectWordmark height={u(wordmarkHeight)} />
+            <TransPerfectWordmark height={uh(wordmarkHeight)} maxWidth={capWidth} />
           ) : (
             <div
               className="min-w-0 max-w-full break-words font-semibold tracking-wide"
-              style={{ fontSize: u(dims.wordPx), letterSpacing: "0.02em" }}
+              style={{
+                fontSize: capH == null ? u(dims.wordPx) : `min(${asLen(u(dims.wordPx))}, ${capH}cqw)`,
+                letterSpacing: "0.02em",
+              }}
             >
               {logo.wordmark.toUpperCase()}
             </div>
@@ -310,9 +347,11 @@ export function BrandLockup({
               src={clientLogoUrl}
               alt={clientName ? `${clientName} logo` : "Client logo"}
               style={{
-                height: u(dims.wordmarkPx * 1.6),
+                height: uh(dims.wordmarkPx * 1.6),
                 width: "auto",
-                maxWidth: u(dims.wordmarkPx * 6),
+                maxWidth: capWidth
+                  ? `min(${asLen(u(dims.wordmarkPx * 6))}, ${capWidth})`
+                  : u(dims.wordmarkPx * 6),
                 objectFit: "contain",
                 display: "block",
               }}
