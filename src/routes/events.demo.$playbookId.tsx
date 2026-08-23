@@ -174,8 +174,12 @@ function PlaybookDemoView() {
       lookId: look.id,
       look,
       styleId,
+      // Same division photography as the social demos, so an event kit's
+      // digital extensions match the campaign's social posts.
+      photo: getPhotoSet(playbook.subBrand),
     };
   }, [nextSuite, playbook, look, styleId]);
+
 
   const startDate = playbook.facts.startDate
     ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
