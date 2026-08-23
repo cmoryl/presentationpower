@@ -59,7 +59,7 @@ describe("verifyExportBytes", () => {
     const plain = new JSZip();
     plain.file("a.txt", "hello");
     const zipBytes = await plain.generateAsync({ type: "uint8array" });
-    expect(verifyExportBytes(zipBytes, "zip").ok).toBe(true);
+    expect(verifyExportBytes(zipBytes, "zip", { minBytes: 64 }).ok).toBe(true);
     // A zip missing OOXML parts must fail the pptx check.
     expect(verifyExportBytes(zipBytes, "pptx", { minBytes: 64 }).ok).toBe(false);
 
