@@ -121,7 +121,18 @@ export function BrandLockup({
     if (isMarkOnly) {
       return (
         <div className="inline-flex" style={{ color }}>
-          <ElementMark tone="color" size={markPx} title="TransPerfect Element" />
+          {unit ? (
+            <div style={{ height: u(markPx), display: "flex" }}>
+              <ElementMark
+                tone="color"
+                size={markPx}
+                className="h-full w-auto"
+                title="TransPerfect Element"
+              />
+            </div>
+          ) : (
+            <ElementMark tone="color" size={markPx} title="TransPerfect Element" />
+          )}
         </div>
       );
     }
@@ -137,7 +148,7 @@ export function BrandLockup({
           src={onDark ? ELEMENT_LOCKUP_URLS.reversed : ELEMENT_LOCKUP_URLS.color}
           alt="TransPerfect Element"
           className="w-auto max-w-full object-contain"
-          style={{ height: lockupPx, display: "block" }}
+          style={{ height: u(lockupPx), display: "block" }}
         />
       </div>
     );
@@ -161,11 +172,11 @@ export function BrandLockup({
         <div
           className="flex items-center justify-center font-semibold tracking-tight"
           style={{
-            width: tilePx,
-            height: tilePx,
+            width: u(tilePx),
+            height: u(tilePx),
             border: `1.75px solid ${color}`,
-            borderRadius: dims.radiusPx,
-            fontSize: tilePx * 0.44,
+            borderRadius: u(dims.radiusPx),
+            fontSize: u(tilePx * 0.44),
             letterSpacing: "-0.02em",
           }}
           aria-hidden
@@ -222,7 +233,7 @@ export function BrandLockup({
           "flex min-w-0 max-w-full " +
           (innerOrientation === "stacked" ? "flex-col items-start" : "items-center")
         }
-        style={{ gap: dims.gapPx, color }}
+        style={{ gap: u(dims.gapPx), color }}
         role="img"
         aria-label={`${logo.wordmark}${divisionLine ? " — " + divisionLine : ""}${clientLogoUrl ? " × client" : ""} lockup`}
       >
@@ -230,11 +241,11 @@ export function BrandLockup({
           <div
             className="flex items-center justify-center font-semibold tracking-tight"
             style={{
-              width: dims.markPx,
-              height: dims.markPx,
+              width: u(dims.markPx),
+              height: u(dims.markPx),
               border: `1.5px solid ${color}`,
-              borderRadius: dims.radiusPx,
-              fontSize: dims.markPx * 0.42,
+              borderRadius: u(dims.radiusPx),
+              fontSize: u(dims.markPx * 0.42),
               letterSpacing: "-0.02em",
             }}
             aria-hidden
@@ -248,7 +259,7 @@ export function BrandLockup({
               src={officialLogoUrl}
               alt={`${logo.wordmark} logo`}
               style={{
-                height: officialImageHeight,
+                height: u(officialImageHeight),
                 width: "auto",
                 maxWidth: "100%",
                 objectFit: "contain",
@@ -261,11 +272,11 @@ export function BrandLockup({
               }}
             />
           ) : useOfficialWordmark ? (
-            <TransPerfectWordmark height={wordmarkHeight} />
+            <TransPerfectWordmark height={u(wordmarkHeight)} />
           ) : (
             <div
               className="min-w-0 max-w-full break-words font-semibold tracking-wide"
-              style={{ fontSize: dims.wordPx, letterSpacing: "0.02em" }}
+              style={{ fontSize: u(dims.wordPx), letterSpacing: "0.02em" }}
             >
               {logo.wordmark.toUpperCase()}
             </div>
@@ -273,7 +284,10 @@ export function BrandLockup({
           {showDivision && divisionLine && !useOfficialImage && (
             <div
               className="max-w-full uppercase leading-tight tracking-[0.14em] opacity-70 [overflow-wrap:anywhere]"
-              style={{ fontSize: dims.dividerPx, marginTop: useOfficialWordmark ? 6 : 4 }}
+              style={{
+                fontSize: u(dims.dividerPx),
+                marginTop: u(useOfficialWordmark ? 6 : 4),
+              }}
             >
               {divisionLine}
             </div>
@@ -285,20 +299,20 @@ export function BrandLockup({
               aria-hidden
               style={{
                 width: 1,
-                height: dims.wordmarkPx * 1.6,
+                height: u(dims.wordmarkPx * 1.6),
                 backgroundColor: "currentColor",
                 opacity: 0.35,
-                marginLeft: dims.gapPx / 2,
-                marginRight: dims.gapPx / 2,
+                marginLeft: u(dims.gapPx / 2),
+                marginRight: u(dims.gapPx / 2),
               }}
             />
             <img
               src={clientLogoUrl}
               alt={clientName ? `${clientName} logo` : "Client logo"}
               style={{
-                height: dims.wordmarkPx * 1.6,
+                height: u(dims.wordmarkPx * 1.6),
                 width: "auto",
-                maxWidth: dims.wordmarkPx * 6,
+                maxWidth: u(dims.wordmarkPx * 6),
                 objectFit: "contain",
                 display: "block",
               }}
