@@ -203,20 +203,32 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
     notes: s.notes ? rewriteText(s.notes, target, rules) : s.notes,
   }));
 
+  // Keep the source recipe only when the target division has no authored
+  // background family of its own. An explicit `null` clears it, so design-led
+  // divisions never inherit the source industry plates. The pairing is then
+  // validated so a division can never end up wearing another sector's ground.
+  const wantedRecipe =
+    target.designRecipeId === null
+      ? null
+      : (target.designRecipeId ?? payload.context?.designRecipeId ?? null);
+  const look = normalizeLook({
+    stylePackId: target.stylePackId,
+    designRecipeId: wantedRecipe,
+    industry: target.industry,
+  });
+  const mismatched = look.issues.some((i) => i.code === "industry-mismatch");
+
   return {
     ...payload,
     title: retargetedTitle(payload.title, target),
     brandModeId: target.id,
     context: {
       ...(payload.context ?? {}),
-      stylePackId: target.stylePackId,
-      // Keep the source recipe only when the target division has no authored
-      // background family of its own. An explicit `null` clears it, so
-      // design-led divisions never inherit the source industry plates.
+      stylePackId: look.stylePackId ?? undefined,
+      // An inherited recipe from another sector is dropped rather than shipped;
+      // a recipe the division names itself always wins.
       designRecipeId:
-        target.designRecipeId === null
-          ? null
-          : (target.designRecipeId ?? payload.context?.designRecipeId ?? null),
+        mismatched && !target.designRecipeId ? null : look.designRecipeId,
     },
     slides,
     brief: payload.brief
