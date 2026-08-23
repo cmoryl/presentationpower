@@ -517,7 +517,7 @@ function CanvasStudioPage() {
                 hint={pack ? pack.name : "Brand system"}
                 wide
               >
-                <div className="w-[min(78vw,880px)] max-w-[880px]">
+                <div className="w-full">
                   <p className="mb-2 text-[11px] leading-relaxed text-black/55">
                     Pick an approved template look. The canvas ground, type and every module you
                     drop in adopt it — modules stay fully editable.
