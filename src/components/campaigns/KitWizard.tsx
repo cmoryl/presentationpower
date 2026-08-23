@@ -1049,9 +1049,34 @@ export function KitWizard({
                     <div className="text-[11px] uppercase tracking-widest text-black/60">
                       {asset.format.label}
                     </div>
-                    <div className="text-[10px] text-black/40">
-                      {asset.format.width}×{asset.format.height} ·{" "}
-                      {nextDesign ? "NEXT 2026" : asset.mode}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-[10px] text-black/40">
+                        {asset.format.width}×{asset.format.height} ·{" "}
+                        {nextDesign ? "NEXT 2026" : asset.mode}
+                      </div>
+                      <AssetExportMenu
+                        label="Export"
+                        allowZip={false}
+                        filename={`${asset.format.label}-${asset.format.width}x${asset.format.height}`}
+                        bundleName={asset.format.label}
+                        resolveTargets={() => {
+                          const root = document.querySelector<HTMLElement>(
+                            `[data-kit-asset-id="${asset.id}"]`,
+                          );
+                          const node =
+                            root?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
+                          return node
+                            ? [
+                                {
+                                  node,
+                                  width: asset.format.width,
+                                  height: asset.format.height,
+                                  label: asset.format.label,
+                                },
+                              ]
+                            : [];
+                        }}
+                      />
                     </div>
                     <div className="relative min-w-0">
                       <div data-kit-asset-id={asset.id} className="min-w-0">
