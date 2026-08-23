@@ -637,7 +637,9 @@ function CanvasStudioPage() {
       <LibraryPackProvider packId={comp.packId ?? null} recipeId={comp.recipeId ?? null}>
       <StylePackProvider pack={pack}>
       <StylePackVars pack={pack} className="contents">
-      <div className="flex h-[70vh] min-h-[540px] gap-3">
+      {/* Stack palette / stage / inspector on narrow screens — matches Module
+          Studio, which never had the fixed-height desktop-only row. */}
+      <div className="flex flex-col gap-3 lg:h-[70vh] lg:min-h-[540px] lg:flex-row">
         <StudioPalette
           brand={stageBrand}
           mode={stageComp?.mode ?? comp.mode}
