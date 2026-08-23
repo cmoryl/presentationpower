@@ -67,6 +67,7 @@ import {
   useTemplateIndustry,
 } from "./SlideTemplateContext";
 import { resolveSlideTemplate } from "@/lib/section-templates";
+import { gamesMediaPool } from "@/lib/games-scene-art";
 
 import { StatLayoutProvider } from "./StatLayoutContext";
 import { resolveStatLayout } from "@/lib/stat-layouts";
