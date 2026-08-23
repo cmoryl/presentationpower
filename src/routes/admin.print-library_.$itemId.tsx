@@ -215,6 +215,15 @@ function MasterItemEditorPage() {
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Could not reset"),
   });
 
+  // Computed before the early returns so the unsaved-work guard keeps a stable
+  // hook order.
+  const dirty =
+    !!draft &&
+    !!saved &&
+    JSON.stringify(draft) !== JSON.stringify(draftFrom(saved, override?.hidden ?? false));
+  // Warn before a reload / tab close throws unsaved master edits away.
+  useDirtyExitGuard(dirty);
+
   if (rowsQ.isLoading) return <AdminLoading label="Loading library item…" />;
   if (isForbidden(rowsQ.error)) return <AdminForbidden />;
 
@@ -243,11 +252,6 @@ function MasterItemEditorPage() {
         if (v === undefined || v === "") delete (look as Record<string, unknown>)[k];
       return { ...base, look };
     });
-
-  const dirty =
-    JSON.stringify(draft) !== JSON.stringify(draftFrom(saved, override?.hidden ?? false));
-  // Warn before a reload / tab close throws unsaved master edits away.
-  useDirtyExitGuard(dirty);
 
   const textPaths = draft.content
     ? enumerateLeafPaths(draft.content).filter((p) => {
