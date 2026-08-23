@@ -4912,7 +4912,19 @@ export const useDeckStore = create<DeckState>()(
         setDeckContext: (deckId, patch) => {
           const deck = get().decks[deckId];
           if (!deck) return;
-          const next: DeckContext = { ...(deck.context ?? {}), ...patch };
+          const merged: DeckContext = { ...(deck.context ?? {}), ...patch };
+          // Structurally invalid look pairings (R without S, industry ground on
+          // an industry/product language, unknown ids) can never be persisted.
+          const repaired = normalizeLook({
+            stylePackId: merged.stylePackId ?? null,
+            designRecipeId: merged.designRecipeId ?? null,
+          });
+          const next: DeckContext = {
+            ...merged,
+            stylePackId: repaired.stylePackId ?? undefined,
+            designRecipeId: repaired.designRecipeId,
+          };
+
           // A visual-language switch (style pack, industry recipe, base skin)
           // must reach the slides: adopted mirrors of the previous look are
           // released so every module renders in the newly selected style.
