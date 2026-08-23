@@ -27,7 +27,7 @@ export type SocialStyle = {
   copyAlign: "start" | "end";
   /** Treatment behind the copy when a photo is present. */
   plate: "glass" | "solid" | "band" | "none" | "aura";
-  /** Plate corner radius as a fraction of the short edge (0 = full bleed band). */
+  /** Plate corner radius as a PERCENT of the short edge (0 = full bleed band). */
   plateRadiusPct: number;
   /** Plate runs edge-to-edge horizontally. */
   plateFullBleed: boolean;
