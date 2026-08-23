@@ -398,7 +398,7 @@ function buildGamingLaunch(): TemplatePayload {
     archetypeId: "arch-problem-solution",
     context: {
       stylePackId: "skin-s11",
-      designRecipeId: "R13",
+      designRecipeId: "R22",
       defaultTransition: { type: "push", durationMs: 420 },
     },
     slides,
