@@ -14,6 +14,7 @@ import {
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
+import { DemoStyleAdmin } from "@/components/showcase/DemoStyleAdmin";
 import { showcaseArt } from "@/lib/showcase-art";
 import {
   DEMO_DIVISIONS,
