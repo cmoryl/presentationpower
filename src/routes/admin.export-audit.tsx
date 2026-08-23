@@ -222,9 +222,10 @@ async function printHtml(node: HTMLElement): Promise<Blob> {
 
 async function iconBlobs(): Promise<{ svg: Blob; png: Blob }> {
   const { iconSvgString, iconPngBlob } = await import("@/lib/icon-export");
-  const { BRAND_ICON_SETS } = await import("@/lib/brand-icons");
-  const first = BRAND_ICON_SETS.flatMap((s) => s.subAreas.flatMap((a) => a.icons))[0];
-  const name = typeof first === "string" ? first : (first as { name: string })?.name;
+  const { BRAND_ICON_SETS } = await import("@/lib/brand-icon-sets");
+  const first = BRAND_ICON_SETS.flatMap((set) => set.subAreas.flatMap((a) => a.icons))[0];
+  const name = first?.name;
+  if (!name) throw new Error("no approved icons registered");
   const svg = iconSvgString(name, { color: "#003FC7", strokeWidth: 1.5 });
   if (!svg) throw new Error(`icon "${name}" did not render`);
   return {

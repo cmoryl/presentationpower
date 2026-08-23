@@ -80,6 +80,14 @@ async function rewriteCssUrls(css: string): Promise<string> {
   });
 }
 
+/**
+ * Public wrapper so other export paths (and the export audit) can serialize
+ * the app's resolved CSS with the exact same logic the HTML export uses.
+ */
+export function collectStylesheetText(): Promise<string> {
+  return collectStylesheets();
+}
+
 async function collectStylesheets(onProgress?: ProgressFn): Promise<string> {
   const parts: string[] = [];
   const sheets = Array.from(document.styleSheets);
