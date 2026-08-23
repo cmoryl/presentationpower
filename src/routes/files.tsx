@@ -286,28 +286,90 @@ function MyFilesPage() {
             </div>
           )}
           {!isLoading && !error && filtered.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-black/15 bg-white/60 px-6 py-16 text-center dark:border-white/15 dark:bg-white/[0.03]">
-              <FolderOpen size={24} className="mx-auto text-foreground/30" />
-              <div className="mt-3 text-sm font-medium text-black/70 dark:text-white/70">
-                {rows.length === 0 ? "Nothing saved yet." : "No files match your filters."}
-              </div>
-              <div className="mt-1 text-xs text-black/50 dark:text-white/50">
-                Start a{" "}
-                <Link to="/brief/new" className="underline">
-                  new brief
-                </Link>
-                , build a deck in the{" "}
-                <Link to="/library" className="underline">
-                  Presentation library
-                </Link>
-                , or create a{" "}
-                <Link to="/library/print" className="underline">
-                  print asset
-                </Link>
-                .
-              </div>
-            </div>
+            <>
+              {rows.length === 0 && signedIn === false ? (
+                <div className="rounded-2xl border border-dashed border-black/15 bg-white/60 px-6 py-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
+                  <FolderOpen size={24} className="mx-auto text-foreground/30" />
+                  <div className="mt-3 text-sm font-semibold text-black/75 dark:text-white/75">
+                    Sign in to see your files
+                  </div>
+                  <p className="mx-auto mt-1 max-w-sm text-xs leading-relaxed text-black/55 dark:text-white/55">
+                    Decks, print assets, saved modules and social surfaces are stored against your
+                    account so they follow you between devices.
+                  </p>
+                  <Link
+                    to="/auth"
+                    className="mt-4 inline-flex items-center rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#0033a8]"
+                  >
+                    Sign in
+                  </Link>
+                </div>
+              ) : rows.length === 0 ? (
+                <div className="rounded-3xl border border-dashed border-black/15 bg-white/60 p-8 dark:border-white/15 dark:bg-white/[0.03]">
+                  <div className="mx-auto max-w-md text-center">
+                    <FolderOpen size={24} className="mx-auto text-foreground/30" />
+                    <div className="mt-3 text-base font-semibold text-black/80 dark:text-white/80">
+                      Nothing saved yet
+                    </div>
+                    <p className="mt-1 text-xs leading-relaxed text-black/55 dark:text-white/55">
+                      Anything you create in Element lands here automatically. Pick a starting
+                      point:
+                    </p>
+                  </div>
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    {STARTERS.map((s) => {
+                      const Icon = s.icon;
+                      return (
+                        <Link
+                          key={s.to}
+                          to={s.to}
+                          className="group rounded-2xl border border-black/10 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#003FC7]/40 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]"
+                        >
+                          <span
+                            className="inline-flex size-9 items-center justify-center rounded-xl"
+                            style={{ backgroundColor: `${s.accent}1f`, color: s.accent }}
+                          >
+                            <Icon size={16} />
+                          </span>
+                          <div className="mt-3 text-sm font-semibold tracking-[-0.01em]">
+                            {s.title}
+                          </div>
+                          <p className="mt-1 text-[11px] leading-relaxed text-black/55 dark:text-white/55">
+                            {s.body}
+                          </p>
+                          <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7]">
+                            {s.cta} <ArrowUpRight size={12} />
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-black/15 bg-white/60 px-6 py-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
+                  <Search size={22} className="mx-auto text-foreground/30" />
+                  <div className="mt-3 text-sm font-medium text-black/70 dark:text-white/70">
+                    No files match your filters.
+                  </div>
+                  <div className="mt-1 text-xs text-black/50 dark:text-white/50">
+                    {rows.length} saved {rows.length === 1 ? "item" : "items"} are hidden by the
+                    current search or element filter.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQ("");
+                      setKind("all");
+                    }}
+                    className="mt-4 rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+                  >
+                    Clear filters
+                  </button>
+                </div>
+              )}
+            </>
           )}
+
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map((f) => (
