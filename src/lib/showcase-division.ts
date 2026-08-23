@@ -89,8 +89,11 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Gaming",
     slug: "gaming",
     accent: "#4ADE80",
-    stylePackId: "skin-r22",
-    designRecipeId: "R22",
+    // Gaming reads as a *designed* language (mesh gradients, neon geometry)
+    // rather than photoreal industry plates: S03 Gradient Infrastructure, with
+    // the industry background family explicitly cleared (null, not undefined).
+    stylePackId: "skin-s03",
+    designRecipeId: null,
     industry: "Gaming",
   },
   {
