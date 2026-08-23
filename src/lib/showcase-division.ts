@@ -211,7 +211,8 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
   const wantedRecipe =
     target.designRecipeId === null
       ? null
-      : (target.designRecipeId ?? payload.context?.designRecipeId ?? null);
+      : (target.designRecipeId ??
+        ((payload.context?.designRecipeId as string | null | undefined) ?? null));
   const look = normalizeLook({
     stylePackId: target.stylePackId,
     designRecipeId: wantedRecipe,
