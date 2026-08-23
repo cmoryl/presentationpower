@@ -7057,7 +7057,7 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
           <div
-            className="relative mx-auto mt-6"
+            className="relative mx-auto mt-10"
             style={{ height: STAGE_H, width: STAGE_W, maxWidth: "100%" }}
           >
             {/* Hub uses the house circle so the cycle reads like the rest of the system. */}
