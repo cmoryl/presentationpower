@@ -86,3 +86,32 @@ bun run verify:print-modules:ci         # light + dark, exit 1 on drift
 Flags: `--id <moduleId>` (repeatable), `--modes light,dark`, `--tolerance`,
 `--url`, `--out`. Failures write `actual.*.png` and `diff.*.png` into
 `artifacts/print-module-pdf/`.
+
+---
+
+# Social corner rounding sweep
+
+`scripts/visual-regression-social-corners.mjs` loads `/dev/social-corners`
+once per template style × light/dark and, for **every social format**
+(1:1, 4:5, 9:16, 16:9, 1200×627, 2:3, signage, banners, …):
+
+1. measures the copy plate's painted corner radius (computed `borderRadius`,
+   plate rect, frame short edge),
+2. writes 40×40 crops of the plate's four corners to
+   `tests/snapshots/social-corners/<mode>/<style>/<formatId>.<corner>.png`,
+3. diffs the golden geometry fingerprint in `social-corners.baseline.json`,
+4. fails when a plate rounds past the 6%-of-short-edge cap, reaches half the
+   plate's short side (pill/ellipse), or has unequal corners.
+
+That last check is the regression this guards: `plateRadiusPct` is a *percent*
+of the short edge, and multiplying by the raw pixel edge produced radii in the
+thousands of px that browsers clamp to 50% — the plate rendered as an ellipse.
+
+```bash
+bun run verify:social-corners           # 406 plate cases, gate on geometry
+bun run verify:social-corners:update    # re-record after an intended change
+node scripts/visual-regression-social-corners.mjs --pixel   # also gate crops
+```
+
+Flags: `--styles`, `--formats`, `--modes`, `--tolerance`, `--radius-tolerance`,
+`--url`, `--out`, `--baseline`, `--pixel`, `--update`.
