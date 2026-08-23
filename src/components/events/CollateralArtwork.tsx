@@ -380,6 +380,7 @@ function Field({
   light?: boolean;
 }) {
   const look = useLook();
+  const photo = useContext(PhotoContext);
   const motif = chevron ?? look.motifOpacity;
   return (
     <div
@@ -394,14 +395,40 @@ function Field({
         ...style,
       }}
     >
+      {photo ? (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage: `url(${photo})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: light ? "saturate(0.95)" : "saturate(1.05) contrast(1.02)",
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: light
+                ? `linear-gradient(160deg, ${look.lightFrom}F2 0%, ${look.lightTo}D9 62%, ${look.lightTo}F2 100%)`
+                : `linear-gradient(105deg, ${look.deep}F0 0%, ${look.deep}C4 46%, ${look.deep}5C 78%, ${look.accent}33 100%)`,
+            }}
+          />
+        </>
+      ) : null}
       <MotifField
-        opacity={light ? motif * 0.55 : motif}
+        opacity={(light ? motif * 0.55 : motif) * (photo ? 0.5 : 1)}
         color={light ? look.accent : look.accentAlt}
       />
       <div style={{ position: "relative", width: "100%", height: "100%" }}>{children}</div>
     </div>
   );
 }
+
 
 function Logo({
   ctx,
