@@ -20,6 +20,7 @@ import {
   type KitSurface,
 } from "@/lib/kit-agent/threads";
 import { useKitThreadListSync } from "@/lib/kit-agent/sync";
+import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 const COPY: Record<
   KitSurface,
@@ -144,9 +145,7 @@ export function KitAgentWorkspace({
   if (userId === null)
     return (
       <AppShell>
-        <div className="flex min-h-[60vh] items-center justify-center p-10 text-sm text-foreground/55">
-          Sign in to use the {surface === "social" ? "social" : "events"} agent.
-        </div>
+        <AgentSignInGate label={surface === "social" ? "social agent" : "events agent"} />
       </AppShell>
     );
 

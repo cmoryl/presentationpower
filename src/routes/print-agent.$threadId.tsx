@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { PrintAgentChat } from "@/components/print-agent/PrintAgentChat";
 import {
+import { AgentSignInGate } from "@/components/AgentSignInGate";
   createPrintThread,
   deletePrintThread,
   listPrintThreads,
@@ -117,9 +118,7 @@ function PrintAgentThreadPage() {
   if (userId === null)
     return (
       <AppShell>
-        <div className="flex min-h-[60vh] items-center justify-center p-10 text-sm text-foreground/55">
-          Sign in to use the print agent.
-        </div>
+        <AgentSignInGate label="print agent" />
       </AppShell>
     );
 

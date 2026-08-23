@@ -73,7 +73,13 @@ export const Route = createFileRoute("/")({
 /* ---------- mode registry (drives the animated hero) ---------- */
 
 type ModeId = "presentation" | "print" | "event" | "social";
-type ModeAction = { label: string; to: string; hint?: string; primary?: boolean };
+type ModeAction = {
+  label: string;
+  to: string;
+  params?: Record<string, string>;
+  hint?: string;
+  primary?: boolean;
+};
 type ModeSubnavItem = {
   label: string;
   to: string;
@@ -154,7 +160,12 @@ const MODES: ModeDef[] = [
     copy: "Launches, conferences, webinars, and exec briefings — signage, invites, email, and social, all timed to your run-of-show.",
     actions: [
       { label: "Open Events hub", to: "/events", primary: true },
-      { label: "Product launch demo", to: "/events/demo/$playbookId", hint: "live" },
+      {
+        label: "Product launch demo",
+        to: "/events/demo/$playbookId",
+        params: { playbookId: "product-launch" },
+        hint: "live",
+      },
     ],
     suggest: [
       "Product launch — GlobalLink AI",
@@ -174,7 +185,12 @@ const MODES: ModeDef[] = [
     copy: "Turn a single brand moment into a complete social set, sized for every channel and ready to post — on brand, instantly.",
     actions: [
       { label: "Open Social hub", to: "/social", primary: true },
-      { label: "Brand anthem demo", to: "/social/demo/$playbookId", hint: "live" },
+      {
+        label: "Brand anthem demo",
+        to: "/social/demo/$playbookId",
+        params: { playbookId: "master-brand-anthem" },
+        hint: "live",
+      },
     ],
     suggest: [
       "Media localization spotlight",
@@ -800,6 +816,7 @@ function ModeActionButton({ action, ink }: { action: ModeAction; ink: string }) 
     return (
       <Link
         to={action.to}
+        {...(action.params ? { params: action.params as never } : {})}
         className={`${shared} bg-white text-[#03002C] shadow-lg shadow-black/25 hover:shadow-xl hover:-translate-y-0.5`}
       >
         <Rocket size={14} style={{ color: ink }} />
@@ -815,6 +832,7 @@ function ModeActionButton({ action, ink }: { action: ModeAction; ink: string }) 
   return (
     <Link
       to={action.to}
+      {...(action.params ? { params: action.params as never } : {})}
       className={`${shared} border border-white/20 bg-white/[0.05] text-white/85 backdrop-blur hover:border-white/40 hover:bg-white/[0.1]`}
     >
       {action.label}
