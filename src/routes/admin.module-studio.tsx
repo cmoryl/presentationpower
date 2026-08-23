@@ -20,6 +20,7 @@ import {
   MetaDot,
   ToolbarSep,
 } from "@/components/editor/EditorChrome";
+import { EditorHistoryControls } from "@/components/editor/EditorHistoryControls";
 import { BRAND_MODES, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";

@@ -16,6 +16,7 @@ import {
   MetaDot,
   ToolbarSep,
 } from "@/components/editor/EditorChrome";
+import { EditorHistoryControls } from "@/components/editor/EditorHistoryControls";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { retintItemsForMode } from "@/lib/canvas-mode-ink";
 import { useImageDrop } from "@/hooks/use-image-drop";
