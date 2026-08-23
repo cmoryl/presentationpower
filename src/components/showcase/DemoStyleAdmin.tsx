@@ -56,6 +56,18 @@ export function DemoStyleAdmin({
     [],
   );
 
+  // Guard against mismatched pairings (R-only looks, an industry ground on an
+  // industry/product language, another sector's plates) before publishing.
+  const validation = useMemo(
+    () =>
+      validateLook({
+        stylePackId: packId || null,
+        designRecipeId: recipeId || null,
+        industry: (payload.brief?.industry as string | undefined) ?? divisionLabel,
+      }),
+    [packId, recipeId, payload.brief?.industry, divisionLabel],
+  );
+
   const dirty =
     packId !== currentPack || (recipeId || "") !== (currentRecipe || "") || clearSlideBackgrounds;
 
