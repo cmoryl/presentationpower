@@ -299,7 +299,7 @@ function DecksIndex() {
 
       {/* Grid */}
       {enriched.length === 0 ? (
-        <EmptyNew />
+        <EmptyNew signedIn={signedIn} />
       ) : filtered.length === 0 ? (
         <EmptyNoMatches onClear={clearAll} />
       ) : (
@@ -317,7 +317,12 @@ function DecksIndex() {
           ))}
         </div>
       )}
+
+      {/* Real decks saved to the account — this browser's local store can be
+          empty (new device, cleared storage) while the workspace is not. */}
+      <MyCloudDecks />
     </AppShell>
+
   );
 }
 
