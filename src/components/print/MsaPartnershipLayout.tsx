@@ -151,6 +151,7 @@ export function MsaPartnershipLayout({
               style={{ gap: cq(22), minHeight: cq(46) }}
             >
               <BrandLockup
+                unit={cq}
                 brand={brand}
                 color="#FFFFFF"
                 size="sm"

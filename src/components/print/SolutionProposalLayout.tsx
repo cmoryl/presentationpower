@@ -151,6 +151,7 @@ export function SolutionProposalLayout({
           >
             <div className="flex items-center justify-between" style={{ gap: cq(18) }}>
               <BrandLockup
+                unit={cq}
                 brand={brand}
                 color={mode === "dark" ? "#FFFFFF" : primary}
                 size="sm"

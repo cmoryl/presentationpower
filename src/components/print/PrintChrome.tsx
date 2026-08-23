@@ -93,7 +93,14 @@ export function PrintCTABand({
             }}
             aria-hidden
           >
-            <BrandLockup brand={brand} color="#FFFFFF" size="2xs" orientation="mark-only" />
+            <BrandLockup
+              unit={cq}
+              brand={brand}
+              color="#FFFFFF"
+              size="2xs"
+              orientation="mark-only"
+              unit={cq}
+            />
           </div>
         )}
         <div style={{ minWidth: 0 }}>
@@ -232,6 +239,7 @@ export function PrintFooterLockup({
           />
         ) : (
           <BrandLockup
+            unit={cq}
             brand={enterpriseBrand}
             color={enterpriseLogoInk}
             size="xs"
@@ -246,6 +254,7 @@ export function PrintFooterLockup({
               aria-hidden
             />
             <BrandLockup
+              unit={cq}
               brand={brand}
               color={enterpriseLogoInk}
               size="xs"
