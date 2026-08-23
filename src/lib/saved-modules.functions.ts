@@ -51,7 +51,6 @@ function withSidecars(
   return next;
 }
 
-
 export const saveModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => savedModuleInput.parse(data))

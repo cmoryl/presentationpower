@@ -82,8 +82,6 @@ export const LOGO_POSITION_BY_VARIANT: Record<string, LogoPosition> = {
   "MV-ED-HERO-BLEED": "top-right",
 };
 
-
-
 export type LogoPlacementSpec = {
   position: LogoPosition;
   source: "layout-override" | "chrome-default" | "hidden";

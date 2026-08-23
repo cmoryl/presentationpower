@@ -55,7 +55,10 @@ export interface LookValidation {
 const PRODUCT_LANGUAGE_CODES = new Set(["S29", "S30"]);
 
 function norm(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 /** Best-guess R recipe for a free-text industry / division sector. */

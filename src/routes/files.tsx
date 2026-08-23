@@ -24,7 +24,6 @@ import { useSignedIn } from "@/components/CloudDeckControls";
 import { listMyFiles, deleteMyFile, type MyFile, type MyFileKind } from "@/lib/my-files.functions";
 import { getSlideFileUrl } from "@/lib/slide-files.functions";
 
-
 export const Route = createFileRoute("/files")({
   head: () => ({
     meta: [
@@ -410,7 +409,6 @@ function MyFilesPage() {
               )}
             </>
           )}
-
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
             {filtered.map((f) => (

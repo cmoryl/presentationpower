@@ -151,7 +151,6 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
       ),
     ),
 
-
     fontSize: r1(size),
     fontFace: run.fontFamily,
     bold: run.bold,

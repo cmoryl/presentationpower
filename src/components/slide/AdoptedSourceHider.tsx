@@ -29,7 +29,9 @@ export function useHideAdoptedSources(
   // Signature key: re-runs the effect when the adopted set, its text or its
   // geometry changes, since the fallback matcher keys off exactly those.
   const selectors = adopted
-    .map((b) => `${b.sourceSelector}~${b.kind}~${(b.text ?? "").trim()}~${b.x},${b.y},${b.w},${b.h}`)
+    .map(
+      (b) => `${b.sourceSelector}~${b.kind}~${(b.text ?? "").trim()}~${b.x},${b.y},${b.w},${b.h}`,
+    )
     .join("|");
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export function useHideAdoptedSources(
       mo?.disconnect();
       for (const h of touched) h.style.visibility = "";
     };
-  // `adopted` is fully described by the signature key above.
+    // `adopted` is fully described by the signature key above.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rootRef, selectors, fromParent]);
 }

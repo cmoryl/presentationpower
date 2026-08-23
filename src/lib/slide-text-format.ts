@@ -177,9 +177,7 @@ export function isPresetActive(
   return (Object.keys(preset.formats) as SlideTextScope[]).every((scope) => {
     const want = preset.formats[scope] ?? {};
     const got = current?.[scope] ?? {};
-    const keys = new Set([...Object.keys(want), ...Object.keys(got)]) as Set<
-      keyof SlideTextFormat
-    >;
+    const keys = new Set([...Object.keys(want), ...Object.keys(got)]) as Set<keyof SlideTextFormat>;
     return [...keys].every((k) => want[k] === got[k]);
   });
 }

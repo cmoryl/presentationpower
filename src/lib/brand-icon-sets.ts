@@ -490,23 +490,21 @@ const SETS: BrandIconSet[] = [
     title: "TransPerfect + Client",
     headline: "Co-brand approved icon set",
     body: "A deliberately narrow set: partnership and program language only. Client brand colour leads, so icons stay in Blue 800 or Dark Gray.",
-    subAreas: withCore(
-      {
-        id: "partnership",
-        name: "Partnership",
-        note: "Joint-program glyphs. Never mix client icon styles into this set.",
-        icons: [
-          { name: "Handshake", label: "Partnership" },
-          { name: "Users", label: "Joint team" },
-          { name: "Workflow", label: "Managed service" },
-          { name: "Building2", label: "Named account" },
-          { name: "Calendar", label: "Program governance", keywords: ["cadence", "qbr"] },
-          { name: "LineChart", label: "Shared outcomes" },
-          { name: "ShieldCheck", label: "Contract & SLA" },
-          { name: "Globe2", label: "Global rollout" },
-        ],
-      },
-    ),
+    subAreas: withCore({
+      id: "partnership",
+      name: "Partnership",
+      note: "Joint-program glyphs. Never mix client icon styles into this set.",
+      icons: [
+        { name: "Handshake", label: "Partnership" },
+        { name: "Users", label: "Joint team" },
+        { name: "Workflow", label: "Managed service" },
+        { name: "Building2", label: "Named account" },
+        { name: "Calendar", label: "Program governance", keywords: ["cadence", "qbr"] },
+        { name: "LineChart", label: "Shared outcomes" },
+        { name: "ShieldCheck", label: "Contract & SLA" },
+        { name: "Globe2", label: "Global rollout" },
+      ],
+    }),
   },
   {
     slug: "trial-interactive",
@@ -561,7 +559,6 @@ export const SUB_AREA_MIN_SIZE = 50;
  */
 export const APPROVED_SET_SIZE = 100;
 
-
 /**
  * Group order each guide draws its extended vocabulary from, so the padded tail
  * of a set still reads as that division's world rather than a generic dump.
@@ -569,7 +566,15 @@ export const APPROVED_SET_SIZE = 100;
 const GROUP_BIAS: Record<string, Array<string>> = {
   "transperfect-master": ["Industry", "Process", "Data", "People", "Comms", "Object", "Core"],
   globallink: ["Data", "Process", "Object", "Comms", "Industry", "People", "Core"],
-  "transperfect-life-sciences": ["Industry", "People", "Process", "Data", "Comms", "Object", "Core"],
+  "transperfect-life-sciences": [
+    "Industry",
+    "People",
+    "Process",
+    "Data",
+    "Comms",
+    "Object",
+    "Core",
+  ],
   "transperfect-legal": ["Process", "Industry", "Data", "People", "Comms", "Object", "Core"],
   "transperfect-media": ["Comms", "Object", "Process", "Data", "Industry", "People", "Core"],
   "transperfect-gaming": ["Comms", "Data", "Object", "Process", "People", "Industry", "Core"],
@@ -616,13 +621,16 @@ const AREA_BIAS: Record<string, Array<string>> = {
 function padArea(slug: string, area: IconSubArea, used: Set<string>): IconSubArea {
   const need = SUB_AREA_MIN_SIZE - area.icons.length;
   if (need <= 0) return area;
-  const bias =
-    AREA_BIAS[area.id] ?? GROUP_BIAS[slug] ?? GROUP_BIAS["transperfect-master"]!;
+  const bias = AREA_BIAS[area.id] ?? GROUP_BIAS[slug] ?? GROUP_BIAS["transperfect-master"]!;
   const seed = `${slug}:${area.id}`;
   const extra = ICON_LIBRARY.filter((e) => !used.has(e.name))
     .map((e) => {
       const rank = bias.indexOf(e.group);
-      return { entry: e, bucket: rank === -1 ? bias.length : rank, jitter: seededRank(seed, e.name) };
+      return {
+        entry: e,
+        bucket: rank === -1 ? bias.length : rank,
+        jitter: seededRank(seed, e.name),
+      };
     })
     .sort((a, b) => a.bucket - b.bucket || a.jitter - b.jitter)
     .slice(0, need)
@@ -646,11 +654,19 @@ function extendedArea(slug: string, used: Set<string>, need: number): IconSubAre
   const pool = ICON_LIBRARY.filter((e) => !used.has(e.name))
     .map((e) => {
       const rank = bias.indexOf(e.group);
-      return { entry: e, bucket: rank === -1 ? bias.length : rank, jitter: seededRank(slug, e.name) };
+      return {
+        entry: e,
+        bucket: rank === -1 ? bias.length : rank,
+        jitter: seededRank(slug, e.name),
+      };
     })
     .sort((a, b) => a.bucket - b.bucket || a.jitter - b.jitter)
     .slice(0, need)
-    .map(({ entry }) => ({ name: entry.name, label: entry.label, keywords: [entry.group.toLowerCase()] }));
+    .map(({ entry }) => ({
+      name: entry.name,
+      label: entry.label,
+      keywords: [entry.group.toLowerCase()],
+    }));
   if (!pool.length) return null;
   return {
     id: "extended",
@@ -676,7 +692,6 @@ const SANITIZED: BrandIconSet[] = SETS.map((set) => {
   const tail = extendedArea(set.slug, used, SUB_AREA_MIN_SIZE);
   return { ...set, subAreas: tail ? [...subAreas, tail] : subAreas };
 });
-
 
 export const BRAND_ICON_SETS: BrandIconSet[] = SANITIZED;
 

@@ -35,7 +35,8 @@ export const Route = createFileRoute("/api/public/division-image")({
         const file = await supabaseAdmin.storage.from("division-imagery").download(path);
         if (file.error || !file.data) return new Response("Not found", { status: 404 });
 
-        const type = row.content_type && ALLOWED.has(row.content_type) ? row.content_type : "image/png";
+        const type =
+          row.content_type && ALLOWED.has(row.content_type) ? row.content_type : "image/png";
 
         return new Response(await file.data.arrayBuffer(), {
           headers: {

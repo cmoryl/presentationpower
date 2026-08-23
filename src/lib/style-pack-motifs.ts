@@ -60,7 +60,6 @@ export interface SignatureLayer {
   mask?: string;
 }
 
-
 /* ── encoding ────────────────────────────────────────────────────────────── */
 
 function svg(body: string, w: number, h: number): string {
@@ -206,7 +205,6 @@ function starfield(c: string, glow: string): string {
   return out;
 }
 
-
 /** Sunburst rays from a low centre — retro print. */
 function sunburst(c: string): string {
   let out = "";
@@ -238,8 +236,6 @@ function circuit(c: string): string {
   out += `<path d='M 1288 155 V 197 M 1267 176 H 1309' stroke='${c}' stroke-width='0.8' opacity='0.4'/>`;
   return out;
 }
-
-
 
 /** Column arcade — architectural verticals with capital arches. */
 function arcade(c: string): string {
@@ -299,7 +295,6 @@ function perspectiveGrid(c: string): string {
  */
 /* ── pattern-first motifs (flat ink, hard edges, no washes) ─────────────── */
 
-
 /** Glazed tile medallion — one large radial-symmetry ornament, drawn in line. */
 function tileMedallion(c: string, alt: string): string {
   let out = `<g fill='none' stroke='${c}' stroke-width='3'>`;
@@ -325,7 +320,6 @@ function speedLines(c: string, cx: number, cy: number): string {
   }
   return out;
 }
-
 
 /** Pressed botanical silhouettes — specimen sheet. */
 function pressedBotanical(c: string): string {
@@ -362,7 +356,6 @@ function decoArches(c: string, alt: string): string {
   }
   return out;
 }
-
 
 /* ── refreshed masters ───────────────────────────────────────────────────
  * Replacements for the retired pattern packs. Each is ONE drawn gesture at
@@ -531,7 +524,6 @@ function coilSpiral(c: string): string {
 }
 
 function rawSignature(pack: StylePack): SignatureLayer | null {
-
   const { accent, accentAlt, ink } = pack.tokens;
   const id: StylePackId = pack.id;
 

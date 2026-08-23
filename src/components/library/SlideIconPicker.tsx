@@ -5,12 +5,7 @@
 // swapping it in. Complements the compact dropdown IconPicker used inline.
 
 import { useEffect, useMemo, useState } from "react";
-import {
-  ICON_GROUPS,
-  ICON_LIBRARY,
-  iconByName,
-  parseIconRef,
-} from "@/lib/icon-library";
+import { ICON_GROUPS, ICON_LIBRARY, iconByName, parseIconRef } from "@/lib/icon-library";
 import { IconRenderer } from "@/components/IconRenderer";
 
 const SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
@@ -41,7 +36,6 @@ function pushRecent(name: string): string[] {
   return next;
 }
 
-
 export function SlideIconPicker({
   title = "Choose icon",
   value,
@@ -69,7 +63,6 @@ export function SlideIconPicker({
     onPick(name);
     onClose();
   };
-
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -171,9 +164,7 @@ export function SlideIconPicker({
           </div>
           {onSize && (
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
-                Size
-              </span>
+              <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">Size</span>
               {SIZE_CHOICES.map((s) => (
                 <button
                   key={s}
@@ -196,9 +187,7 @@ export function SlideIconPicker({
         {recents.length > 0 && (
           <div className="border-b border-white/10 px-4 py-3">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-widest text-white/40">
-                Recent
-              </span>
+              <span className="text-[10px] uppercase tracking-widest text-white/40">Recent</span>
               <button
                 type="button"
                 onClick={() => {
@@ -246,9 +235,7 @@ export function SlideIconPicker({
 
         <div className="max-h-[52vh] overflow-y-auto p-4">
           {entries.length === 0 ? (
-            <p className="py-6 text-center text-xs text-white/50">
-              No icons match “{q}”.
-            </p>
+            <p className="py-6 text-center text-xs text-white/50">No icons match “{q}”.</p>
           ) : (
             <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
               {entries.map((e) => {
@@ -259,7 +246,6 @@ export function SlideIconPicker({
                     key={e.name}
                     type="button"
                     onClick={() => choose(e.name)}
-
                     title={`${e.label} · ${e.group}`}
                     className={`flex flex-col items-center gap-1.5 rounded-xl border px-2 py-3 transition ${
                       active

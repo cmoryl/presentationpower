@@ -1351,7 +1351,13 @@ const CONTINENT_PATHS = CONTINENTS.map(polygonPath).join(" ");
 // reads as an infographic (data-viz halftone) rather than a flat silhouette.
 // Computed once per spacing and cached at module scope — ~10k point-in-poly
 // tests, cheap enough to do lazily on first render.
-type ProjectedRing = { pts: { x: number; y: number }[]; minX: number; maxX: number; minY: number; maxY: number };
+type ProjectedRing = {
+  pts: { x: number; y: number }[];
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
 
 const PROJECTED_RINGS: ProjectedRing[] = CONTINENTS.map((ring) => {
   const pts = ring.map(([lon, lat]) => projectLatLon(lat, lon));
@@ -1426,17 +1432,11 @@ export function landDots(spacing = 7.5): LandDot[] {
 }
 
 /** Curved great-circle-ish arc between two projected points. */
-function arcPath(
-  a: { x: number; y: number },
-  b: { x: number; y: number },
-  lift = 0.2,
-): string {
+function arcPath(a: { x: number; y: number }, b: { x: number; y: number }, lift = 0.2): string {
   const mx = (a.x + b.x) / 2;
   const my = (a.y + b.y) / 2 - Math.hypot(b.x - a.x, b.y - a.y) * lift;
   return `M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
 }
-
-
 
 // ── Region viewports ──────────────────────────────────────────────────────
 export type RegionKey = "world" | "AMER" | "EMEA" | "APAC" | "LATAM" | "MEA";
@@ -1535,7 +1535,6 @@ export function WorldMap({
   const labelHalo = isDark ? "rgba(3,0,44,0.6)" : "rgba(255,255,255,0.85)";
   const uid = React.useId().replace(/[^a-zA-Z0-9]/g, "");
 
-
   const vb = regionViewBox(region);
 
   // Longitude/latitude graticule lines (subtle)
@@ -1583,7 +1582,10 @@ export function WorldMap({
       const pa = projectLatLon(a.lat, a.lon);
       const peers = nodes
         .filter((b) => b.id !== a.id)
-        .map((b) => ({ b, d: Math.hypot(projectLatLon(b.lat, b.lon).x - pa.x, projectLatLon(b.lat, b.lon).y - pa.y) }))
+        .map((b) => ({
+          b,
+          d: Math.hypot(projectLatLon(b.lat, b.lon).x - pa.x, projectLatLon(b.lat, b.lon).y - pa.y),
+        }))
         .sort((m, n) => m.d - n.d)
         .slice(0, 2);
       for (const { b, d } of peers) {
@@ -1600,7 +1602,6 @@ export function WorldMap({
   const dots = React.useMemo(() => (texture === "dots" ? landDots(7.5) : []), [texture]);
 
   const glow = `url(#tp-pin-glow-${uid})`;
-
 
   // ── Metric scale ────────────────────────────────────────────────────────
   const activeMetricId = metricId ?? metric?.id;
@@ -1808,7 +1809,6 @@ export function WorldMap({
             })}
         </g>
       )}
-
 
       {/* Pin glows — scale radius by metric when active */}
       <g>

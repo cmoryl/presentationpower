@@ -24,11 +24,7 @@ import { withExportChrome } from "./export-chrome-suppress";
 import { PRINT_PAGE_PRESETS, resolvePrintPixelWidth } from "./print-asset-export";
 import { spaceForTrim, withExportSlideBounds } from "./export-space";
 import { capturePrintPageLayers } from "./print-pptx-layered";
-import {
-  checkExportAspect,
-  logAspectReport,
-  type AspectCheckReport,
-} from "./export-aspect-check";
+import { checkExportAspect, logAspectReport, type AspectCheckReport } from "./export-aspect-check";
 import type { PrintMode, PrintPageSize } from "./print-assets.types";
 
 export type PrintPptxOptions = {
@@ -90,7 +86,6 @@ async function toJpeg(pngDataUrl: string, quality: number): Promise<string> {
     return pngDataUrl;
   }
 }
-
 
 function trimOf(opts: PrintPptxOptions): { widthIn: number; heightIn: number } {
   if (opts.custom?.widthIn && opts.custom?.heightIn) return opts.custom;
@@ -232,9 +227,6 @@ export async function exportPrintPagesAsPptx(
     });
   }
 
-
-
-
   // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
   // PresentationML sequence (masters -> notes master -> slides -> sizes). Repair
   // the order before writing so the file passes strict OOXML validation.
@@ -283,7 +275,6 @@ async function reorderPresentationXml(blob: Blob): Promise<Blob> {
   }
 }
 
-
 function triggerDownload(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -294,4 +285,3 @@ function triggerDownload(blob: Blob, fileName: string) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
-

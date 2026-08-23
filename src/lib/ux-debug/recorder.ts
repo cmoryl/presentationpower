@@ -69,7 +69,8 @@ function signature(el: Element): string {
   return parts.join("");
 }
 
-const INTERACTIVE = "button,a,input,select,textarea,summary,[role=button],[role=tab],[role=switch],[role=menuitem],[role=option],[contenteditable=true],label";
+const INTERACTIVE =
+  "button,a,input,select,textarea,summary,[role=button],[role=tab],[role=switch],[role=menuitem],[role=option],[contenteditable=true],label";
 
 function interactiveAncestor(node: EventTarget | null): Element | null {
   let el = node instanceof Element ? node : null;
@@ -83,7 +84,8 @@ function interactiveAncestor(node: EventTarget | null): Element | null {
 function toggleKind(el: Element): UxStepKind | null {
   const role = el.getAttribute("role");
   if (role === "switch" || role === "tab" || role === "checkbox") return "toggle";
-  if (el instanceof HTMLInputElement && (el.type === "checkbox" || el.type === "radio")) return "toggle";
+  if (el instanceof HTMLInputElement && (el.type === "checkbox" || el.type === "radio"))
+    return "toggle";
   if (el.hasAttribute("aria-pressed") || el.hasAttribute("aria-checked")) return "toggle";
   if (el.hasAttribute("aria-expanded")) return "toggle";
   return null;
@@ -385,8 +387,7 @@ class UxRecorder {
     const originalFetch = window.fetch.bind(window);
     const patchedFetch: typeof window.fetch = async (input, init) => {
       const started = Date.now();
-      const url =
-        typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
       try {
         const res = await originalFetch(input, init);
         const ms = Date.now() - started;

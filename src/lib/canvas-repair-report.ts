@@ -65,10 +65,7 @@ export function auditDeckGeometry(
         slideTitle: slide?.title || slide?.variantId || `Slide ${slideIndex + 1}`,
         blockId: block.id,
         label:
-          (block.text ? String(block.text).slice(0, 40) : "") ||
-          block.kind ||
-          block.id ||
-          "block",
+          (block.text ? String(block.text).slice(0, 40) : "") || block.kind || block.id || "block",
         from: { x: block.x, y: block.y, w: block.w, h: block.h },
         to: { x: healed.x, y: healed.y, w: healed.w, h: healed.h },
         scale: block.w > 0 ? round2(healed.w / block.w) : 1,

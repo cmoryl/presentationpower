@@ -90,7 +90,13 @@ export function CropFrameOverlay({
     e.preventDefault();
     e.stopPropagation();
     const f = parseFocus(focus);
-    start.current = { x: e.clientX, y: e.clientY, fx: f.x, fy: f.y, zoom: zoom && zoom > 0 ? zoom : 1 };
+    start.current = {
+      x: e.clientX,
+      y: e.clientY,
+      fx: f.x,
+      fy: f.y,
+      zoom: zoom && zoom > 0 ? zoom : 1,
+    };
     setMode(next);
   };
 

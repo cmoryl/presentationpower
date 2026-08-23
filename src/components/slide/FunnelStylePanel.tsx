@@ -96,7 +96,6 @@ export function FunnelStylePanel({
         />
       </div>
 
-
       <label className="block text-xs" htmlFor={`${id}-fade`}>
         <span className="mb-1 flex items-center justify-between font-medium text-black/70">
           <span>Depth fade</span>
@@ -234,7 +233,6 @@ function ColorField({
           {disabled ? `${fallback} · from theme` : value ? `${value} · clear` : hint}
         </button>
       </span>
-
     </label>
   );
 }

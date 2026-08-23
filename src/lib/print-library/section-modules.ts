@@ -64,7 +64,6 @@ export {
 };
 export type { PrintModuleFamily, PrintModuleFamilyMeta };
 
-
 /** Rough vertical footprint on a portrait page — drives capacity warnings. */
 export type PrintModuleDensity = "compact" | "standard" | "tall";
 
@@ -557,7 +556,9 @@ const PRINT_SECTION_MODULES_RAW: PrintSectionModule[] = [
 export const PRINT_SECTION_MODULES: PrintSectionModule[] = PRINT_SECTION_MODULES_RAW.map(
   (m, i) => ({ m, i }),
 )
-  .sort((a, b) => printModuleFamilyRank(a.m.family) - printModuleFamilyRank(b.m.family) || a.i - b.i)
+  .sort(
+    (a, b) => printModuleFamilyRank(a.m.family) - printModuleFamilyRank(b.m.family) || a.i - b.i,
+  )
   .map((e) => e.m);
 
 export function printModulesForFamily(family: PrintModuleFamily): PrintSectionModule[] {

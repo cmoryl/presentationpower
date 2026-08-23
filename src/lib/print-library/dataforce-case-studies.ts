@@ -71,11 +71,30 @@ export const DATAFORCE_CASE_STUDIES: DataForceCaseStudySeed[] = [
         body: "Six aisle-segment photos and 350 individual bottle photos produced 356 photos, 2,800 attributes, and 700 segmentations, plus an additional 468 segmentations and 1,404 attributes from two wide-angle images. Sampling of 80% on collection and 84% on annotation returned pass rates of 98% and 97% respectively, for a 99.8% customer pass rate — all delivered in under one month. Aapya's dataset now models 300+ liquor products at 90–95% detection accuracy, positioning the platform to scale locally, regionally, and nationally.",
       },
       stats: [
-        { label: "Customer pass rate", value: "99.8", unit: "%", caption: "Across collection and annotation" },
-        { label: "Detection accuracy", value: "90–95", unit: "%", caption: "On 300+ liquor products" },
-        { label: "Segmentations delivered", value: "1,168", caption: "Polygons and bounding boxes" },
+        {
+          label: "Customer pass rate",
+          value: "99.8",
+          unit: "%",
+          caption: "Across collection and annotation",
+        },
+        {
+          label: "Detection accuracy",
+          value: "90–95",
+          unit: "%",
+          caption: "On 300+ liquor products",
+        },
+        {
+          label: "Segmentations delivered",
+          value: "1,168",
+          caption: "Polygons and bounding boxes",
+        },
         { label: "Attributes captured", value: "4,204", caption: "Up to eight per bottle" },
-        { label: "Time to delivery", value: "<1", unit: "mo", caption: "Full collection to delivery" },
+        {
+          label: "Time to delivery",
+          value: "<1",
+          unit: "mo",
+          caption: "Full collection to delivery",
+        },
       ],
       quote: {
         text: "DataForce is a great company to work with! The team has been highly organized, responsive, and accommodating to changing requests and requirements. This has helped us model our dataset of 300+ liquor products to 90%–95% accuracy for detection.",
@@ -131,7 +150,12 @@ export const DATAFORCE_CASE_STUDIES: DataForceCaseStudySeed[] = [
         body: "DataForce oversaw the annotation of more than 25,000 frames of jet engines, delivering on both timeline and quality. Just as importantly, the collaborative model — feedback exchanged in-platform, over email, and on calls — gave zeroG a higher level of control over an externally supplied project, and the partnership is now expanding into new use cases.",
       },
       stats: [
-        { label: "Frames annotated", value: "25,000", unit: "+", caption: "Jet engine inspection imagery" },
+        {
+          label: "Frames annotated",
+          value: "25,000",
+          unit: "+",
+          caption: "Jet engine inspection imagery",
+        },
         { label: "Defect categories", value: "11", caption: "Assigned via bounding boxes" },
         { label: "Delivery", value: "On time", caption: "Timeline and quality targets met" },
         { label: "QA layers", value: "2", caption: "DataForce pass plus client control" },

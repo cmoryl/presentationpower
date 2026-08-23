@@ -40,7 +40,6 @@ export function proportionalStrokeWidth(boxIn: number): number {
   return Number(((24 * targetPt) / boxPt).toFixed(3));
 }
 
-
 /**
  * Icon-pack glyphs, resolved SYNCHRONOUSLY off the in-memory pack cache.
  *
@@ -85,7 +84,8 @@ export async function warmIconPacks(refs: Iterable<string | null | undefined>): 
 }
 
 /** Elements that can only be SVG content — never HTML placeholder markup. */
-const SVG_FRAGMENT = /^<(path|g|circle|rect|ellipse|line|polyline|polygon|defs|use|mask|clipPath|linearGradient|radialGradient|symbol|text|tspan)[\s>/]/i;
+const SVG_FRAGMENT =
+  /^<(path|g|circle|rect|ellipse|line|polyline|polygon|defs|use|mask|clipPath|linearGradient|radialGradient|symbol|text|tspan)[\s>/]/i;
 
 /**
  * Turn rendered markup into an SVG data URL.

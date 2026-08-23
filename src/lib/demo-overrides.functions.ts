@@ -49,7 +49,9 @@ function publicClient() {
 /** Public read: every saved override for one demo (all divisions). */
 export const listDemoOverrides = createServerFn({ method: "GET" })
   .inputValidator((input: { demoKind: DemoKind; demoId: string }) =>
-    z.object({ demoKind: z.enum(["deck", "print"]), demoId: z.string().min(1).max(200) }).parse(input),
+    z
+      .object({ demoKind: z.enum(["deck", "print"]), demoId: z.string().min(1).max(200) })
+      .parse(input),
   )
   .handler(async ({ data }): Promise<DemoOverrideRow[]> => {
     const sb = publicClient();
@@ -90,17 +92,18 @@ async function assertAdmin(context: { supabase: unknown; userId: string }) {
 /** Admin write: publish the current editor state as the live demo. */
 export const saveDemoOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: {
-    demoKind: DemoKind;
-    demoId: string;
-    divisionKey?: string;
-    payload: Record<string, unknown>;
-    label?: string;
-  }) =>
-    Key.extend({
-      payload: z.record(z.string(), z.unknown()),
-      label: z.string().max(200).optional(),
-    }).parse(input),
+  .inputValidator(
+    (input: {
+      demoKind: DemoKind;
+      demoId: string;
+      divisionKey?: string;
+      payload: Record<string, unknown>;
+      label?: string;
+    }) =>
+      Key.extend({
+        payload: z.record(z.string(), z.unknown()),
+        label: z.string().max(200).optional(),
+      }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context as unknown as { supabase: unknown; userId: string });
@@ -139,8 +142,14 @@ export const clearDemoOverride = createServerFn({ method: "POST" })
     const sb = context.supabase as unknown as {
       from: (t: string) => {
         delete: () => {
-          eq: (c: string, v: unknown) => {
-            eq: (c: string, v: unknown) => {
+          eq: (
+            c: string,
+            v: unknown,
+          ) => {
+            eq: (
+              c: string,
+              v: unknown,
+            ) => {
               eq: (c: string, v: unknown) => PromiseLike<{ error: { message?: string } | null }>;
             };
           };

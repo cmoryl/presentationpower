@@ -99,7 +99,6 @@ export function getDeckAuditActor() {
   return auditActor;
 }
 
-
 export type SlideLogoPosition =
   | "auto"
   | "top-left"
@@ -446,7 +445,14 @@ export type DeckSnapshot = {
   subCompany?: string | null;
   context?: Record<string, unknown> | null;
   clientLogo?: DeckClientLogo | null;
-  slides: Array<Partial<DeckSlide> & { sectionId: string; variantId: string; layoutId: string; content: SlideContent }>;
+  slides: Array<
+    Partial<DeckSlide> & {
+      sectionId: string;
+      variantId: string;
+      layoutId: string;
+      content: SlideContent;
+    }
+  >;
   brief?: TemplatePayload["brief"];
 };
 
@@ -561,11 +567,7 @@ type DeckState = {
   ) => void;
   clearSlideTextFormats: (deckId: string, slideId: string) => void;
   /** Replace the whole typography override set (used by the presets row). */
-  setSlideTextFormats: (
-    deckId: string,
-    slideId: string,
-    formats: SlideTextFormats | null,
-  ) => void;
+  setSlideTextFormats: (deckId: string, slideId: string, formats: SlideTextFormats | null) => void;
 
   swapVariant: (
     deckId: string,
@@ -999,9 +1001,21 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         subtitle: "Step 1",
         stepNumber: "1",
         items: [
-          { label: "Timeline construction", icon: "Calendar", body: "Milestones mapped to launch dates." },
-          { label: "Translation memory analysis", icon: "Search", body: "Leverage measured before a word is touched." },
-          { label: "Glossary & style guide creation", icon: "FileText", body: "Approved terminology locked at the source." },
+          {
+            label: "Timeline construction",
+            icon: "Calendar",
+            body: "Milestones mapped to launch dates.",
+          },
+          {
+            label: "Translation memory analysis",
+            icon: "Search",
+            body: "Leverage measured before a word is touched.",
+          },
+          {
+            label: "Glossary & style guide creation",
+            icon: "FileText",
+            body: "Approved terminology locked at the source.",
+          },
         ],
       };
     case "MV-PROC-STAGE-ORBITS":
@@ -1107,12 +1121,36 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: "One platform, every capability",
         hub: { title: "GlobalLink", subtitle: "Connected delivery" },
         items: [
-          { label: "Central intake", body: "Every request enters one governed queue with its brief attached.", icon: "ClipboardList" },
-          { label: "Translation memory", body: "Approved language is reused across markets automatically.", icon: "Database" },
-          { label: "Brand review", body: "In-context review keeps tone and terminology on brand.", icon: "FileCheck2" },
-          { label: "Market rollout", body: "Local teams publish from the same source of truth.", icon: "Globe2" },
-          { label: "Live analytics", body: "Programme leaders see throughput, cost, and quality in one view.", icon: "BarChart3" },
-          { label: "Security & audit", body: "Enterprise controls with a full trail on every asset.", icon: "ShieldCheck" },
+          {
+            label: "Central intake",
+            body: "Every request enters one governed queue with its brief attached.",
+            icon: "ClipboardList",
+          },
+          {
+            label: "Translation memory",
+            body: "Approved language is reused across markets automatically.",
+            icon: "Database",
+          },
+          {
+            label: "Brand review",
+            body: "In-context review keeps tone and terminology on brand.",
+            icon: "FileCheck2",
+          },
+          {
+            label: "Market rollout",
+            body: "Local teams publish from the same source of truth.",
+            icon: "Globe2",
+          },
+          {
+            label: "Live analytics",
+            body: "Programme leaders see throughput, cost, and quality in one view.",
+            icon: "BarChart3",
+          },
+          {
+            label: "Security & audit",
+            body: "Enterprise controls with a full trail on every asset.",
+            icon: "ShieldCheck",
+          },
         ],
         summary: {
           lead: "Six capabilities, one operating model —",
@@ -1145,10 +1183,26 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: "How the engagement runs",
         items: [
-          { label: "Discover", body: "Two-week intake across priority content types, markets, and systems.", icon: "Search" },
-          { label: "Design", body: "Workflow, terminology, and review gates agreed with the owning teams.", icon: "PenTool" },
-          { label: "Pilot", body: "One market, one content type — measurable results inside a quarter.", icon: "Rocket" },
-          { label: "Scale", body: "Expand to the full portfolio with governance and analytics in place.", icon: "TrendingUp" },
+          {
+            label: "Discover",
+            body: "Two-week intake across priority content types, markets, and systems.",
+            icon: "Search",
+          },
+          {
+            label: "Design",
+            body: "Workflow, terminology, and review gates agreed with the owning teams.",
+            icon: "PenTool",
+          },
+          {
+            label: "Pilot",
+            body: "One market, one content type — measurable results inside a quarter.",
+            icon: "Rocket",
+          },
+          {
+            label: "Scale",
+            body: "Expand to the full portfolio with governance and analytics in place.",
+            icon: "TrendingUp",
+          },
         ],
         summary: {
           lead: "Each stage hands off with its context intact —",
@@ -1160,12 +1214,42 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: "The first 12 months",
         subtitle: "From intake to a governed, measurable program",
         items: [
-          { meta: "Weeks 1-2", label: "Intake", body: "Content types, markets and systems mapped with the owning teams.", icon: "Search" },
-          { meta: "Weeks 3-6", label: "Workflow design", body: "Terminology, review gates and SLAs agreed and documented.", icon: "PenTool" },
-          { meta: "Quarter 1", label: "Pilot market", body: "One market, one content type, measured against baseline.", icon: "Rocket" },
-          { meta: "Quarter 2", label: "Integration", body: "Connectors live in the CMS and product repositories.", icon: "Cpu" },
-          { meta: "Quarter 3", label: "Portfolio scale", body: "Full content set onboarded with governance in place.", icon: "TrendingUp" },
-          { meta: "Quarter 4", label: "Optimize", body: "Quarterly reviews tune throughput, quality and spend.", icon: "BarChart3" },
+          {
+            meta: "Weeks 1-2",
+            label: "Intake",
+            body: "Content types, markets and systems mapped with the owning teams.",
+            icon: "Search",
+          },
+          {
+            meta: "Weeks 3-6",
+            label: "Workflow design",
+            body: "Terminology, review gates and SLAs agreed and documented.",
+            icon: "PenTool",
+          },
+          {
+            meta: "Quarter 1",
+            label: "Pilot market",
+            body: "One market, one content type, measured against baseline.",
+            icon: "Rocket",
+          },
+          {
+            meta: "Quarter 2",
+            label: "Integration",
+            body: "Connectors live in the CMS and product repositories.",
+            icon: "Cpu",
+          },
+          {
+            meta: "Quarter 3",
+            label: "Portfolio scale",
+            body: "Full content set onboarded with governance in place.",
+            icon: "TrendingUp",
+          },
+          {
+            meta: "Quarter 4",
+            label: "Optimize",
+            body: "Quarterly reviews tune throughput, quality and spend.",
+            icon: "BarChart3",
+          },
         ],
         summary: {
           lead: "One timeline, one owner —",
@@ -1368,7 +1452,6 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       };
 
     case "MV-PROC-BEFORE-AFTER-SPLIT":
-
       return {
         title: "The shift",
         before: {
@@ -1430,8 +1513,6 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           emphasis: "It transforms the entire program experience.",
         },
       };
-
-
 
     case "MV-PROOF-STATS-2":
       return {
@@ -2464,8 +2545,6 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
           ctaBody: `Schedule the ${clientName} EnrollmentOS executive briefing today.`,
         },
       };
-
-
 
     case "MV-KPI-DASHBOARD":
       return {
@@ -3615,7 +3694,11 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
     case "MV-STAT-HERO-NUMBER":
       return {
         kicker: "The number that matters",
-        stat: { value: "68", unit: "%", label: "Of global revenue now originates outside HQ markets" },
+        stat: {
+          value: "68",
+          unit: "%",
+          label: "Of global revenue now originates outside HQ markets",
+        },
         narrative:
           "Localisation stopped being a cost line the moment the majority of growth moved offshore. The programme is now the growth engine.",
         items: [
@@ -3760,8 +3843,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
       return {
         title: "Scale, measured on the floor",
         kicker: "Operating evidence",
-        narrative:
-          "Numbers taken from live programme reporting across the last four quarters.",
+        narrative: "Numbers taken from live programme reporting across the last four quarters.",
         items: [
           { value: "38", unit: "", label: "Markets live" },
           { value: "41", unit: "%", label: "Faster launch" },
@@ -3786,10 +3868,8 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         mediaSeed: "portrait-proof",
       };
 
-
     default:
       return { title: sectionName };
-
   }
 }
 
@@ -4172,7 +4252,6 @@ export const useDeckStore = create<DeckState>()(
               },
             },
           }));
-
         },
 
         applySlideBackground: (deckId, slideIds, background) => {
@@ -4600,7 +4679,6 @@ export const useDeckStore = create<DeckState>()(
           }));
         },
 
-
         moveSlide: (deckId, slideId, direction) => {
           const deck = get().decks[deckId];
           if (!deck) return;
@@ -4730,8 +4808,6 @@ export const useDeckStore = create<DeckState>()(
           set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
         },
 
-
-
         moveSlidesToIndex: (deckId, slideIds, beforeIndex) => {
           const deck = get().decks[deckId];
           if (!deck || slideIds.length === 0) return;
@@ -4742,9 +4818,7 @@ export const useDeckStore = create<DeckState>()(
           // Translate the drop target (an index in the original list) into an
           // insertion point inside the list with the dragged block removed.
           const target = Math.max(0, Math.min(beforeIndex, deck.slides.length));
-          const removedBefore = deck.slides
-            .slice(0, target)
-            .filter((sl) => ids.has(sl.id)).length;
+          const removedBefore = deck.slides.slice(0, target).filter((sl) => ids.has(sl.id)).length;
           const insertAt = Math.max(0, Math.min(target - removedBefore, rest.length));
           const next = [...rest.slice(0, insertAt), ...picked, ...rest.slice(insertAt)];
           const unchanged = next.every((sl, i) => sl.id === deck.slides[i]?.id);
@@ -5104,7 +5178,6 @@ export const useDeckStore = create<DeckState>()(
           return { briefId, deckId };
         },
 
-
         deleteDeck: (deckId) => {
           set((s) => {
             const next = { ...s.decks };
@@ -5297,8 +5370,6 @@ export function syncAdoptedBlockText(
 }
 
 function setPath(
-
-
   obj: Record<string, unknown>,
   path: string,
   value: unknown,

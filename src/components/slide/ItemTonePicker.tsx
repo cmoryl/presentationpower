@@ -17,7 +17,9 @@ export function ItemToneRow({
   dark?: boolean;
 }) {
   const muted = dark ? "text-white/55" : "text-black/40";
-  const ring = dark ? "border-white/20 hover:border-white/60" : "border-black/15 hover:border-black/40";
+  const ring = dark
+    ? "border-white/20 hover:border-white/60"
+    : "border-black/15 hover:border-black/40";
   const chip = dark
     ? "border-white/20 text-white/70 hover:border-white/50"
     : "border-black/10 text-black/55 hover:border-black/30";
@@ -66,7 +68,6 @@ export function ItemToneRow({
           Auto
         </button>
       )}
-
     </div>
   );
 }
@@ -107,7 +108,9 @@ export function ItemTonePanel({
         {rows.some((r) => itemTone(r) || itemToneEnd(r)) && (
           <button
             type="button"
-            onClick={() => onChange(rows.map(({ tone: _tone, toneEnd: _toneEnd, ...rest }) => rest))}
+            onClick={() =>
+              onChange(rows.map(({ tone: _tone, toneEnd: _toneEnd, ...rest }) => rest))
+            }
             className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/55 hover:border-black/30"
           >
             Reset all
@@ -116,8 +119,8 @@ export function ItemTonePanel({
       </div>
       <p className="mt-1 text-[11px] leading-relaxed text-black/45">
         Each row's wash gradient runs from the start colour at the top to the end colour as it
-        fades; the rail and hairline follow the start colour. Contrast is auto-corrected
-        for light and dark appearance, and the choice carries into PowerPoint and PDF exports.
+        fades; the rail and hairline follow the start colour. Contrast is auto-corrected for light
+        and dark appearance, and the choice carries into PowerPoint and PDF exports.
       </p>
       <div className="mt-3 space-y-2">
         {rows.map((row, i) => {
@@ -135,10 +138,7 @@ export function ItemTonePanel({
                   className="ml-auto h-5 w-16 shrink-0 rounded-md border border-black/10"
                   style={{
                     backgroundColor: "#fff",
-                    backgroundImage: toneWashGradient(
-                      itemTone(row) ?? "#003FC7",
-                      itemToneEnd(row),
-                    ),
+                    backgroundImage: toneWashGradient(itemTone(row) ?? "#003FC7", itemToneEnd(row)),
                   }}
                 />
               </div>

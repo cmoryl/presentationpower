@@ -12,7 +12,6 @@ import {
   resendAdminInvite,
 } from "@/lib/admin.functions";
 
-
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
@@ -20,6 +19,24 @@ const ROLES = ["admin", "editor", "brand_lead", "viewer", "user"] as const;
 type Role = (typeof ROLES)[number];
 
 export const Route = createFileRoute("/admin/users")({
+  head: () => ({
+    meta: [
+      { title: "Users & roles · Admin · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Grant Element admin, designer and marketing roles and review team access requests.",
+      },
+      { property: "og:title", content: "Users & roles · Admin · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Grant Element admin, designer and marketing roles and review team access requests.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: UsersView,
 });
 
@@ -44,7 +61,6 @@ function UsersView() {
   const [revealed, setRevealed] = useState(false);
   const [copied, setCopied] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
-
 
   const inviteM = useMutation({
     mutationFn: (input: { email: string; role: Role }) => inviteFn({ data: input }),
@@ -114,8 +130,6 @@ function UsersView() {
     onError: (e: Error) => setMsg(e.message),
     onSettled: () => setBusyId(null),
   });
-
-
 
   if (q.error && isForbidden(q.error)) return <AdminForbidden />;
 
@@ -235,7 +249,6 @@ function UsersView() {
         )}
       </section>
 
-
       <section>
         <div className="mb-3 flex items-baseline justify-between">
           <h2 className="text-lg font-semibold">All users</h2>
@@ -335,8 +348,6 @@ function UsersView() {
                       </button>
                     </div>
                   </td>
-
-
                 </tr>
               ))}
             </tbody>

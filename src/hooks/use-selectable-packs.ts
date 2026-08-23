@@ -11,11 +11,7 @@ import { subscribeTemplateRegistry, templateRegistryVersion } from "@/lib/templa
 const emptySubscribe = () => () => {};
 
 export function useSelectablePacks(): StylePack[] {
-  useSyncExternalStore(
-    subscribeTemplateRegistry,
-    templateRegistryVersion,
-    () => 0,
-  );
+  useSyncExternalStore(subscribeTemplateRegistry, templateRegistryVersion, () => 0);
   // Admin-published templates only exist client-side, so the first client render
   // must match the server's built-in-only list to avoid a hydration mismatch.
   const hydrated = useSyncExternalStore(
@@ -25,4 +21,3 @@ export function useSelectablePacks(): StylePack[] {
   );
   return hydrated ? allSelectablePacks() : ALL_STYLE_PACKS;
 }
-

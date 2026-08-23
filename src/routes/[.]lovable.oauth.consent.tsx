@@ -15,9 +15,7 @@ type OAuthApi = {
   approveAuthorization: (
     id: string,
   ) => Promise<{ data: OAuthAuthorizationData; error: Error | null }>;
-  denyAuthorization: (
-    id: string,
-  ) => Promise<{ data: OAuthAuthorizationData; error: Error | null }>;
+  denyAuthorization: (id: string) => Promise<{ data: OAuthAuthorizationData; error: Error | null }>;
 };
 
 function oauthApi(): OAuthApi {

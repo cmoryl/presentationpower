@@ -133,7 +133,6 @@ export function SlideImageryPanel({
       <div className="mt-3 flex items-stretch gap-3">
         <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-xl border border-black/10 bg-black/5">
           {mediaUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={mediaUrl}
               alt="Current slide imagery"
@@ -309,7 +308,6 @@ export function SlideImageryPanel({
                             : "border-black/10 hover:border-black/40"
                         }`}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={b.url}
                           alt={b.label}
@@ -398,7 +396,6 @@ export function SlideImageryPanel({
                           }`}
                         >
                           {r.signedUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                               src={r.signedUrl}
                               alt={r.filename}

@@ -83,24 +83,13 @@ async function cropStage(
   if (!ctx) return null;
   ctx.imageSmoothingQuality = "high";
   const inset = BLEED * pixelRatio;
-  ctx.drawImage(
-    img,
-    inset,
-    inset,
-    W * pixelRatio,
-    H * pixelRatio,
-    0,
-    0,
-    plate.width,
-    plate.height,
-  );
+  ctx.drawImage(img, inset, inset, W * pixelRatio, H * pixelRatio, 0, 0, plate.width, plate.height);
   try {
     return canvas.toDataURL("image/png");
   } catch {
     return null;
   }
 }
-
 
 /**
  * Renders the pack sheet for one module (variant + layout) to a PNG data URL.
@@ -113,7 +102,6 @@ export async function rasterizePackBackground(
   layoutId: string,
   quality?: ExportQualityId | null,
 ): Promise<{ data: string | null; surface: string }> {
-
   const surface = packField(pack);
   if (typeof document === "undefined") return { data: null, surface };
 
@@ -154,7 +142,6 @@ export async function rasterizePackBackground(
   // Clip to the stage so the plate matches what SlideChrome paints on screen —
   // the bleed exists only to keep the capture viewport off the slide edge.
   host.style.overflow = "hidden";
-
 
   // 1 — field
   host.appendChild(plane({ backgroundColor: surface }));
@@ -238,4 +225,3 @@ export async function rasterizePackBackground(
     shell.remove();
   }
 }
-

@@ -195,9 +195,7 @@ export function DeviceScreenPicker({
             </button>
           </div>
 
-          {error && (
-            <div style={{ marginTop: 6, fontSize: 10, color: "#E53D2E" }}>{error}</div>
-          )}
+          {error && <div style={{ marginTop: 6, fontSize: 10, color: "#E53D2E" }}>{error}</div>}
 
           <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between", gap: 8 }}>
             {current && ctx.onClear ? (

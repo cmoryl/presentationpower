@@ -138,9 +138,7 @@ export function collectTextFields(content: unknown): TextField[] {
       }
       if (typeof v === "number" || typeof v === "boolean" || v == null) continue;
       const nextGroup =
-        Array.isArray(v) || typeof v === "object"
-          ? `${group}${group ? " · " : ""}${k}`
-          : group;
+        Array.isArray(v) || typeof v === "object" ? `${group}${group ? " · " : ""}${k}` : group;
       walk(v, [...path, k], nextGroup);
     }
   };

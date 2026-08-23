@@ -50,7 +50,9 @@ export function buildSectionTemplateToolSet(): ToolSet {
       inputSchema: z.object({
         industry_id: z.string().describe("Industry recipe id, e.g. 'R05'"),
         section_id: z.string().describe("Section framework id, e.g. 'SF-08'"),
-        level: LevelEnum.optional().describe("Reading level; omitted uses the section's primary level"),
+        level: LevelEnum.optional().describe(
+          "Reading level; omitted uses the section's primary level",
+        ),
         slide_job: z
           .string()
           .optional()
@@ -59,7 +61,11 @@ export function buildSectionTemplateToolSet(): ToolSet {
       execute: async ({ industry_id, section_id, level, slide_job }) => {
         const inferred: TemplateLevel | undefined =
           level ?? (slide_job ? inferLevel(slide_job, section_id) : undefined);
-        const treatment = sectionTemplate({ industryId: industry_id, sectionId: section_id, level: inferred });
+        const treatment = sectionTemplate({
+          industryId: industry_id,
+          sectionId: section_id,
+          level: inferred,
+        });
         if (!treatment)
           return {
             error: `No treatment for industry "${industry_id}" + section "${section_id}". Valid industries: ${INDUSTRY_RECIPES.map((r) => r.id).join(", ")}. Valid sections: ${SECTION_FRAMEWORKS.map((s) => s.id).join(", ")}.`,

@@ -267,7 +267,8 @@ export function validatePackageEntries(entries: ArchiveEntry[]): PackageValidati
       risks.push({
         code: "absolute-path",
         severity: "blocker",
-        message: "Archive contains an absolute path, which is never valid inside a PowerPoint package.",
+        message:
+          "Archive contains an absolute path, which is never valid inside a PowerPoint package.",
         path: e.path,
       });
     } else if (e.path.split(/[\\/]/).includes("..")) {

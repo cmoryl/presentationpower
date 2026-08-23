@@ -24,7 +24,10 @@ export default defineTool({
     const slides = existing.slides;
     if (slides.length === 0) return errorResult("Deck has no slides");
 
-    const expected = slides.map((s) => s.position).sort((a, b) => a - b).join(",");
+    const expected = slides
+      .map((s) => s.position)
+      .sort((a, b) => a - b)
+      .join(",");
     const got = [...order].sort((a, b) => a - b).join(",");
     if (expected !== got) {
       return errorResult(

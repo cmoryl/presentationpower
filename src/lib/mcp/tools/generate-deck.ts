@@ -9,7 +9,10 @@ export default defineTool({
     "Run the full authoring pipeline for the signed-in user: narrative strategist section planning, grounded knowledge synthesis, variant selection and copy personalization, then save the deck. Pass brief_id from create_brief, or the brief fields inline. Returns the deck id, an ordered slide summary and the editor URL.",
   inputSchema: {
     brief_id: z.string().describe("Existing brief UUID from create_brief.").optional(),
-    prospect: z.string().describe("Prospect or client name (required without brief_id).").optional(),
+    prospect: z
+      .string()
+      .describe("Prospect or client name (required without brief_id).")
+      .optional(),
     industry: z.string().describe("Industry vertical.").optional(),
     audience: z.string().describe("Who is in the room.").optional(),
     meeting_objective: z.string().describe("What the meeting should achieve.").optional(),
@@ -18,7 +21,9 @@ export default defineTool({
       .string()
       .describe("Brand mode id, e.g. 'bm-enterprise'. Call get_taxonomy for the list.")
       .optional(),
-    sub_company: z.string().describe("Sub-company name when brand_mode_id is 'bm-subcompany'.")
+    sub_company: z
+      .string()
+      .describe("Sub-company name when brand_mode_id is 'bm-subcompany'.")
       .optional(),
     archetype_id: z
       .string()

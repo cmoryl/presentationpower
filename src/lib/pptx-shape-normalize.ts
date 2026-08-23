@@ -26,11 +26,7 @@ import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radi
 import type { BackdropSampler } from "@/lib/export-glass-crop";
 import { chartTheme } from "@/lib/export-chart-theme";
 
-import {
-  GLASS_CROP_MAX_PER_SLIDE,
-  GLASS_CROP_MIN_IN,
-  glassBlurPx,
-} from "@/lib/export-glass-crop";
+import { GLASS_CROP_MAX_PER_SLIDE, GLASS_CROP_MIN_IN, glassBlurPx } from "@/lib/export-glass-crop";
 import {
   SURFACE_HAIRLINE_IN,
   ambientTag,
@@ -41,7 +37,6 @@ import {
   isGlassFill,
   surfaceEligible,
 } from "@/lib/export-surface";
-
 
 /** PPTX widescreen stage, inches. */
 const SLIDE_W_IN = 13.333;
@@ -86,7 +81,6 @@ export type ShapeExtras = {
 
 export type ImageExtras = { rounded?: boolean };
 
-
 /** `[r:<adj>]` — consumed by {@link withRoundedPictures} in the zip pass. */
 export const ROUND_PIC_TAG_RE = /\[r:(\d+)\]\s*/;
 
@@ -127,11 +121,7 @@ export function stripCropPicTag(name: string): string {
  * is STRETCHED to the box instead of cropped. Every export path measures the
  * ratio itself and crops natively instead.
  */
-export function coverCropTag(
-  ratio: number | undefined,
-  w: number,
-  h: number,
-): string {
+export function coverCropTag(ratio: number | undefined, w: number, h: number): string {
   if (!ratio || !Number.isFinite(ratio) || ratio <= 0 || w <= 0 || h <= 0) return "";
   const boxRatio = w / h;
   if (Math.abs(ratio - boxRatio) / boxRatio <= 0.002) return "";
@@ -170,7 +160,6 @@ export function withCroppedPictures(xml: string): string {
   });
 }
 
-
 /**
  * The design radius (inches) for a box of this size, or null when the box must
  * stay square. Mirrors the on-screen token ladder: photo plates and cards use
@@ -185,7 +174,11 @@ export function designRadiusIn(w: number, h: number): number | null {
   if (w >= SLIDE_W_IN - 0.02 && h >= SLIDE_H_IN - 0.02) return null;
   if (min < HAIRLINE_IN) return null;
   const token =
-    min >= 1.5 ? EXPORT_RADIUS_IN.media : min >= 0.55 ? EXPORT_RADIUS_IN.band : EXPORT_RADIUS_IN.chip;
+    min >= 1.5
+      ? EXPORT_RADIUS_IN.media
+      : min >= 0.55
+        ? EXPORT_RADIUS_IN.band
+        : EXPORT_RADIUS_IN.chip;
   return Math.min(token, pillRadiusIn(min));
 }
 
@@ -219,7 +212,10 @@ function applySurface(
   const h = num(o.h);
   if (!surfaceEligible(w, h)) return false;
 
-  const fill = o.fill as { color?: string; transparency?: number; type?: string } | string | undefined;
+  const fill = o.fill as
+    | { color?: string; transparency?: number; type?: string }
+    | string
+    | undefined;
   const fillColor = typeof fill === "string" ? fill : fill?.color;
   // No fill at all (an outline-only frame) or a caller-supplied gradient: leave it.
   if (!fillColor || (typeof fill === "object" && fill?.type === "gradient")) return false;
@@ -258,7 +254,6 @@ function applySurface(
   if (!strokeIsDeliberate) {
     o.line = { ...SURFACE_NO_LINE };
   }
-
 
   // Gradient stops and the second (ambient) shadow have no pptxgenjs API, so
   // they ride along in the object name and are consumed by the zip pass.
@@ -372,7 +367,6 @@ export function withDesignSurfaces(
         };
       }
 
-
       if (key === "addImage") {
         return (opts?: Record<string, unknown>) => {
           const o = (opts ?? {}) as Record<string, unknown> & Rect & ImageExtras;
@@ -429,6 +423,9 @@ export function withRoundedPictures(xml: string): string {
         `<a:prstGeom prst="roundRect"><a:avLst><a:gd name="adj" fmla="val ${adj}"/></a:avLst></a:prstGeom>`,
       );
     }
-    return out.replace(/name="([^"]*)"/, (_all, name: string) => `name="${stripRoundPicTag(name)}"`);
+    return out.replace(
+      /name="([^"]*)"/,
+      (_all, name: string) => `name="${stripRoundPicTag(name)}"`,
+    );
   });
 }

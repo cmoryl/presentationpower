@@ -136,7 +136,10 @@ describe("bento swap PPTX export regression", () => {
         const xml = await exportedXml(swapped.variantId, swapped.content, mode);
         if (xml !== reference) drift.push(id);
       }
-      expect(drift, `swapped sources whose export drifted from the authored bento: ${drift.join(", ")}`).toEqual([]);
+      expect(
+        drift,
+        `swapped sources whose export drifted from the authored bento: ${drift.join(", ")}`,
+      ).toEqual([]);
     }, 120_000);
   }
 

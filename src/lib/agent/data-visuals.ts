@@ -52,8 +52,18 @@ export type ProcessShape = (typeof PROCESS_SHAPES)[number];
 /** Preferred module ids per shape, best first. Unknown ids are filtered out. */
 const DATA_PREFERENCE: Record<DataShape, string[]> = {
   "single-metric": ["MV-DASH-SUMMARY", "MV-KPI-DASHBOARD", "MV-DASH-REPORT-CARDS"],
-  "metric-set": ["MV-KPI-DASHBOARD", "MV-VIZ-GAUGE-GRID", "MV-DASH-REPORT-CARDS", "MV-DASH-GAUGE-ROW"],
-  "share-of-total": ["MV-DASH-DONUT-TRIO", "MV-VIZ-TREEMAP", "MV-VIZ-SUNBURST", "MV-DASH-BREAKDOWN"],
+  "metric-set": [
+    "MV-KPI-DASHBOARD",
+    "MV-VIZ-GAUGE-GRID",
+    "MV-DASH-REPORT-CARDS",
+    "MV-DASH-GAUGE-ROW",
+  ],
+  "share-of-total": [
+    "MV-DASH-DONUT-TRIO",
+    "MV-VIZ-TREEMAP",
+    "MV-VIZ-SUNBURST",
+    "MV-DASH-BREAKDOWN",
+  ],
   ranking: ["MV-DASH-PERFORMANCE", "MV-DASH-GROWTH-COLUMNS", "MV-VIZ-RADIAL-BAR", "MV-VIZ-TREEMAP"],
   "trend-over-time": ["MV-DASH-SALES-CHART", "MV-DASH-GROWTH-COLUMNS", "MV-DASH-PERFORMANCE"],
   "multi-series-trend": ["MV-VIZ-STACKED-AREA", "MV-DASH-PERFORMANCE", "MV-DASH-SALES-CHART"],
@@ -64,7 +74,12 @@ const DATA_PREFERENCE: Record<DataShape, string[]> = {
   "rank-over-time": ["MV-VIZ-BUMP"],
   matrix: ["MV-VIZ-CALENDAR-HEATMAP", "MV-VIZ-MARKET-MAP"],
   "calendar-activity": ["MV-VIZ-CALENDAR-HEATMAP"],
-  "before-after": ["MV-VIZ-DUMBBELL", "MV-VIZ-SLOPE", "MV-PROC-BEFORE-AFTER", "MV-PROC-BEFORE-AFTER-SPLIT"],
+  "before-after": [
+    "MV-VIZ-DUMBBELL",
+    "MV-VIZ-SLOPE",
+    "MV-PROC-BEFORE-AFTER",
+    "MV-PROC-BEFORE-AFTER-SPLIT",
+  ],
 };
 
 const PROCESS_PREFERENCE: Record<ProcessShape, string[]> = {
@@ -105,7 +120,8 @@ function exampleContent(variantId: string): Record<string, unknown> {
     // Long generated arrays (beeswarm/calendar) would flood the context.
     const trimmed: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(content)) {
-      trimmed[k] = Array.isArray(v) && v.length > 6 ? [...v.slice(0, 4), `…${v.length} rows total`] : v;
+      trimmed[k] =
+        Array.isArray(v) && v.length > 6 ? [...v.slice(0, 4), `…${v.length} rows total`] : v;
     }
     return trimmed;
   } catch {
@@ -212,7 +228,11 @@ export function recommendVisual(input: {
         .filter(
           (m) =>
             !prefs.includes(m.module_id) &&
-            q.split(/\s+/).some((w) => w.length > 3 && `${m.name} ${m.what_it_shows}`.toLowerCase().includes(w)),
+            q
+              .split(/\s+/)
+              .some(
+                (w) => w.length > 3 && `${m.name} ${m.what_it_shows}`.toLowerCase().includes(w),
+              ),
         )
         .slice(0, 5)
         .map((m) => `${m.module_id} · ${m.name}`)
@@ -235,7 +255,8 @@ export function validateVisualContent(
   content: Record<string, unknown>,
 ): { ok: boolean; problems: string[]; notes: string[] } {
   const d = digestFor(moduleId);
-  if (!d) return { ok: false, problems: [`${moduleId} is not a data or process module.`], notes: [] };
+  if (!d)
+    return { ok: false, problems: [`${moduleId} is not a data or process module.`], notes: [] };
 
   const problems: string[] = [];
   const notes: string[] = [];
@@ -244,10 +265,13 @@ export function validateVisualContent(
   const rowsKey = d.items_path?.split(".")[0];
   if (rowsKey) {
     const rows = content[rowsKey];
-    if (!Array.isArray(rows)) problems.push(`Missing "${rowsKey}" array — this module plots its data from it.`);
+    if (!Array.isArray(rows))
+      problems.push(`Missing "${rowsKey}" array — this module plots its data from it.`);
     else {
       if (d.items_min != null && rows.length < d.items_min)
-        problems.push(`"${rowsKey}" has ${rows.length} entries; at least ${d.items_min} are needed.`);
+        problems.push(
+          `"${rowsKey}" has ${rows.length} entries; at least ${d.items_min} are needed.`,
+        );
       if (d.items_max != null && rows.length > d.items_max)
         problems.push(`"${rowsKey}" has ${rows.length} entries; the layout holds ${d.items_max}.`);
       const first = rows[0];
@@ -256,13 +280,18 @@ export function validateVisualContent(
         const want = Object.keys(exFirst as object);
         const got = Object.keys(first as object);
         const missing = want.filter((k) => !got.includes(k));
-        if (missing.length) notes.push(`Row keys usually include: ${want.join(", ")} (missing: ${missing.join(", ")}).`);
+        if (missing.length)
+          notes.push(
+            `Row keys usually include: ${want.join(", ")} (missing: ${missing.join(", ")}).`,
+          );
       }
     }
   }
 
   if (d.module_id.startsWith("MV-VIZ-") && !content.encoding)
-    problems.push('Spec-driven charts need an "encoding" object mapping row keys to channels, e.g. { source, target, value }.');
+    problems.push(
+      'Spec-driven charts need an "encoding" object mapping row keys to channels, e.g. { source, target, value }.',
+    );
   if (!content.title) notes.push("Add a title that states the takeaway, not the metric name.");
   if (d.family === "data" && !content.source)
     notes.push('Add a "source" string so the figure is defensible in the room.');
@@ -338,14 +367,21 @@ export function buildDataVisualOptions(input: {
   headline: string;
   shape?: string | null;
   style_pack_id?: string | null;
-  options: Array<{ module_id: string; content: Record<string, unknown>; label?: string | null; why?: string | null }>;
+  options: Array<{
+    module_id: string;
+    content: Record<string, unknown>;
+    label?: string | null;
+    why?: string | null;
+  }>;
 }): DataVisualOptionSet | { error: string } {
   const items: DataVisualOption[] = [];
   const errors: string[] = [];
   for (const o of input.options) {
     const d = digestFor(o.module_id);
     if (!d) {
-      errors.push(`${o.module_id} is not a data or process module — pick ids from plan_data_visual.`);
+      errors.push(
+        `${o.module_id} is not a data or process module — pick ids from plan_data_visual.`,
+      );
       continue;
     }
     items.push({
@@ -360,7 +396,10 @@ export function buildDataVisualOptions(input: {
     });
   }
   if (!items.length)
-    return { error: "No valid visual options. Call plan_data_visual first and reuse the module ids it returns." };
+    return {
+      error:
+        "No valid visual options. Call plan_data_visual first and reuse the module ids it returns.",
+    };
 
   return {
     options: true,
@@ -382,9 +421,14 @@ export function buildDataVisualToolSet(): ToolSet {
         "Render a live on-screen preview of a data or process visual for the user BEFORE it is saved to the deck. Pass the module id and the exact content JSON you intend to write. The user sees the real rendered slide in the chat and can approve it or ask for changes. Call this for every chart or process visual, then only write it with insert_slide / update_slide_content once the user is happy (or immediately after, if they asked you to just build it).",
       inputSchema: z.object({
         module_id: z.string().describe("Module id from plan_data_visual, e.g. MV-VIZ-SANKEY"),
-        content: z.record(z.string(), z.unknown()).describe("The full content object for the slide"),
+        content: z
+          .record(z.string(), z.unknown())
+          .describe("The full content object for the slide"),
         why: z.string().nullable().describe("One line on why this visual fits the data"),
-        style_pack_id: z.string().nullable().describe("Design language to preview it in, if one is chosen"),
+        style_pack_id: z
+          .string()
+          .nullable()
+          .describe("Design language to preview it in, if one is chosen"),
       }),
       execute: async ({ module_id, content, why, style_pack_id }) =>
         buildDataVisualPreview({ module_id, content, why, style_pack_id }),
@@ -396,14 +440,22 @@ export function buildDataVisualToolSet(): ToolSet {
       inputSchema: z.object({
         headline: z.string().describe("Plain-language description of what the slide must show"),
         shape: z.string().nullable().describe("The data/process shape you identified, if any"),
-        style_pack_id: z.string().nullable().describe("Design language to render the options in, if chosen"),
+        style_pack_id: z
+          .string()
+          .nullable()
+          .describe("Design language to render the options in, if chosen"),
         options: z
           .array(
             z.object({
               module_id: z.string().describe("Module id from plan_data_visual"),
-              label: z.string().nullable().describe("Short plain-language name for this option, e.g. 'Trend line'"),
+              label: z
+                .string()
+                .nullable()
+                .describe("Short plain-language name for this option, e.g. 'Trend line'"),
               why: z.string().nullable().describe("One line on what this option emphasises"),
-              content: z.record(z.string(), z.unknown()).describe("Full content object for this option"),
+              content: z
+                .record(z.string(), z.unknown())
+                .describe("Full content object for this option"),
             }),
           )
           .min(2)
@@ -418,13 +470,19 @@ export function buildDataVisualToolSet(): ToolSet {
       description:
         "List the deck's data-visualisation modules (charts, KPI boards, flow/relationship diagrams) and process-visual modules (steps, timelines, cycles, swimlanes, layer stacks) with what each shows, its editable fields, its data-point limits and a real example of the content JSON it expects.",
       inputSchema: z.object({
-        family: z.enum(["data", "process", "all"]).nullable().describe("Which family to list; null = all"),
+        family: z
+          .enum(["data", "process", "all"])
+          .nullable()
+          .describe("Which family to list; null = all"),
         query: z.string().nullable().describe("Optional keyword filter over name and description"),
       }),
       execute: async ({ family, query }) => {
         let mods = visualModules(family ?? "all");
         const q = (query ?? "").toLowerCase().trim();
-        if (q) mods = mods.filter((m) => `${m.module_id} ${m.name} ${m.what_it_shows}`.toLowerCase().includes(q));
+        if (q)
+          mods = mods.filter((m) =>
+            `${m.module_id} ${m.name} ${m.what_it_shows}`.toLowerCase().includes(q),
+          );
         return { count: mods.length, modules: mods.slice(0, 40) };
       },
     }),
@@ -433,15 +491,25 @@ export function buildDataVisualToolSet(): ToolSet {
       description:
         "Choose how to visualise a dataset or a process. Describe the shape of what you have (a trend, a share of total, a flow between nodes, linear steps, a cycle…) and get back the best modules, their exact content shape, and warnings about data-point limits. Call this before inserting any chart or process slide.",
       inputSchema: z.object({
-        family: z.enum(["data", "process"]).describe("'data' for numbers, 'process' for how something works"),
+        family: z
+          .enum(["data", "process"])
+          .describe("'data' for numbers, 'process' for how something works"),
         shape: z
           .string()
           .describe(
             `Shape of the story. Data: ${DATA_SHAPES.join(" | ")}. Process: ${PROCESS_SHAPES.join(" | ")}`,
           ),
         intent: z.string().nullable().describe("One line on the point the slide must make"),
-        series_count: z.number().int().nullable().describe("How many series/lines/categories, if known"),
-        points_per_series: z.number().int().nullable().describe("How many data points or steps, if known"),
+        series_count: z
+          .number()
+          .int()
+          .nullable()
+          .describe("How many series/lines/categories, if known"),
+        points_per_series: z
+          .number()
+          .int()
+          .nullable()
+          .describe("How many data points or steps, if known"),
       }),
       execute: async ({ family, shape, intent, series_count, points_per_series }) =>
         recommendVisual({ family, shape, series_count, points_per_series, query: intent }),
@@ -452,7 +520,9 @@ export function buildDataVisualToolSet(): ToolSet {
         "Check the content JSON you are about to write into a chart or process slide against that module's expected shape and data-point limits. Fix any reported problems before calling update_slide_content.",
       inputSchema: z.object({
         module_id: z.string().describe("The module id of the slide"),
-        content: z.record(z.string(), z.unknown()).describe("The content object you intend to write"),
+        content: z
+          .record(z.string(), z.unknown())
+          .describe("The content object you intend to write"),
       }),
       execute: async ({ module_id, content }) => validateVisualContent(module_id, content),
     }),

@@ -67,7 +67,11 @@ export class ExportIntegrity {
     return fresh;
   }
 
-  noteBackground(slideIndex: number, kind: NonNullable<SlideIntegrity["background"]>, variantId = "") {
+  noteBackground(
+    slideIndex: number,
+    kind: NonNullable<SlideIntegrity["background"]>,
+    variantId = "",
+  ) {
     this.track(slideIndex, variantId).background = kind;
   }
 
@@ -145,7 +149,10 @@ export class ExportIntegrity {
       iconsRequested: entries.reduce((n, s) => n + s.iconsRequested, 0),
       // A dropped glyph leaves an empty icon well in PowerPoint. Surfaced in the
       // summary (not just the warning prose) so CI can gate on it.
-      iconsMissing: entries.reduce((n, s) => n + Math.max(0, s.iconsRequested - s.iconsEmbedded), 0),
+      iconsMissing: entries.reduce(
+        (n, s) => n + Math.max(0, s.iconsRequested - s.iconsEmbedded),
+        0,
+      ),
     };
   }
 }

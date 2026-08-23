@@ -279,7 +279,6 @@ export async function retrieveGrounding({
             }
           }
 
-
           if (rows.length) {
             const { data: assets } = await s
               .from("brand_assets")

@@ -38,9 +38,16 @@ function groupMatchesAssetType(group: string, filter: AssetTypeFilter) {
   const isLogos = normalized === LOGO_GROUP.toLowerCase();
   if (filter === "logos") return isLogos;
   if (filter === "funnel") return normalized.includes("funnel");
-  if (filter === "timeline") return normalized.startsWith("time ·") || normalized.includes("journey");
+  if (filter === "timeline")
+    return normalized.startsWith("time ·") || normalized.includes("journey");
   if (filter === "stat-wall") return normalized.startsWith("numbers ·");
-  return !isLogos && !normalized.includes("funnel") && !normalized.startsWith("time ·") && !normalized.includes("journey") && !normalized.startsWith("numbers ·");
+  return (
+    !isLogos &&
+    !normalized.includes("funnel") &&
+    !normalized.startsWith("time ·") &&
+    !normalized.includes("journey") &&
+    !normalized.startsWith("numbers ·")
+  );
 }
 
 /** Extra words reviewers type that should match a layout's real name. */
@@ -52,7 +59,9 @@ const SEARCH_ALIASES: { test: (entry: DesignCatalogEntry) => boolean; words: str
 ];
 
 function searchHaystack(d: DesignCatalogEntry) {
-  const extra = SEARCH_ALIASES.filter((a) => a.test(d)).map((a) => a.words).join(" ");
+  const extra = SEARCH_ALIASES.filter((a) => a.test(d))
+    .map((a) => a.words)
+    .join(" ");
   return `${d.name} ${d.variantId} ${d.group} ${d.description} ${extra}`.toLowerCase();
 }
 
@@ -78,17 +87,13 @@ export function DesignPicker({
 
   const groups = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    return DESIGN_GROUPS
-      .filter((g) => groupMatchesAssetType(g.group, assetType))
+    return DESIGN_GROUPS.filter((g) => groupMatchesAssetType(g.group, assetType))
       .map((g) => ({
         group: g.group,
-        entries: needle
-          ? g.entries.filter((d) => searchHaystack(d).includes(needle))
-          : g.entries,
+        entries: needle ? g.entries.filter((d) => searchHaystack(d).includes(needle)) : g.entries,
       }))
       .filter((g) => g.entries.length > 0);
   }, [assetType, q]);
-
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -125,7 +130,10 @@ export function DesignPicker({
             className="w-full bg-transparent text-xs outline-none placeholder:text-black/35"
           />
         </div>
-        <div className="flex items-center gap-1 overflow-x-auto border-b border-black/10 px-3 py-2" aria-label="Filter layouts by asset type">
+        <div
+          className="flex items-center gap-1 overflow-x-auto border-b border-black/10 px-3 py-2"
+          aria-label="Filter layouts by asset type"
+        >
           <Filter size={12} className="mr-1 shrink-0 text-black/35" aria-hidden="true" />
           {ASSET_TYPE_FILTERS.map((filter) => {
             const active = assetType === filter.value;
@@ -175,7 +183,11 @@ export function DesignPicker({
                           : "border-black/10 bg-white hover:border-[#003FC7]/60"
                       }`}
                     >
-                      <LayoutThumb variantId={d.variantId} accent={accent} className="h-auto w-full" />
+                      <LayoutThumb
+                        variantId={d.variantId}
+                        accent={accent}
+                        className="h-auto w-full"
+                      />
                       <div className="mt-1 flex items-start gap-1">
                         <span className="min-w-0 flex-1 truncate text-[11px] font-medium text-[#03002C]">
                           {d.isPrimary ? "★ " : ""}
@@ -217,7 +229,11 @@ export function DesignPicker({
                             : "border-black/10 bg-white/85 text-black/35 opacity-0 hover:text-[#003FC7] group-hover:opacity-100"
                         }`}
                       >
-                        {presets[d.group] === d.variantId ? <Pin size={10} /> : <PinOff size={10} />}
+                        {presets[d.group] === d.variantId ? (
+                          <Pin size={10} />
+                        ) : (
+                          <PinOff size={10} />
+                        )}
                       </span>
                     </button>
                   );

@@ -65,10 +65,7 @@ export function measureMediaFrames(stage: HTMLElement): MediaTileMeasurement[] {
       h: r.height * sy,
     };
     if (frame.w < MIN_IN || frame.h < MIN_IN) continue;
-    if (
-      r.width >= host.width * FULL_BLEED_RATIO &&
-      r.height >= host.height * FULL_BLEED_RATIO
-    ) {
+    if (r.width >= host.width * FULL_BLEED_RATIO && r.height >= host.height * FULL_BLEED_RATIO) {
       continue;
     }
     // Clamp into the slide so a tile bled past the edge cannot push a picture

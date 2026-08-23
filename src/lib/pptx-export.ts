@@ -56,23 +56,22 @@ import {
   addGaugeMeter,
   addPhotoScrim,
   percentGaugeFraction,
-
   statRuns,
 } from "./export-card-furniture";
 
 import { getGlassTreatment, gradientTag } from "./export-surface";
 import { canonicalizeInk, resolveForeground } from "./export-foreground";
-import {
-  auditContrast,
-  auditTextOverlap,
-  type AuditFill,
-  type AuditText,
-} from "./export-audit";
+import { auditContrast, auditTextOverlap, type AuditFill, type AuditText } from "./export-audit";
 import { auroraSvgDataUrl } from "./aurora-svg";
 import { flattenBackdrops, type BackdropFlattenReport } from "./pptx-backdrop-flatten";
 import { embedFontsInPptx } from "./pptx-font-embed";
 import { applyNativePptxFeatures } from "./pptx-native-xml";
-import { cropPicTag, designRadiusIn, roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
+import {
+  cropPicTag,
+  designRadiusIn,
+  roundPicTag,
+  withDesignSurfaces,
+} from "./pptx-shape-normalize";
 import { getImageAspect, measureImageAspect } from "./export-image-aspect";
 import { placeCanvasBlocks } from "./export-canvas-blocks";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
@@ -83,7 +82,6 @@ import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
 import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
-
 
 // Cursor for the slide currently being emitted. The exporter draws through many
 // module-level helpers (glyphs, logo lockups, imagery) that have no access to
@@ -107,7 +105,6 @@ import {
   geometryRepairWarnings,
   type GeometryRepairReport,
 } from "./canvas-repair-report";
-
 
 // Rasterize an SVG data URL to a PNG data URL via <canvas> so PowerPoint
 // renders our aurora backdrops reliably (some viewers ignore embedded SVG
@@ -225,7 +222,6 @@ async function rasterizeSvgToPngDataUrl(svgDataUrl: string): Promise<string | nu
 // fetchAsDataUrlOnce and pptx-background.ts' backdrop route) shares one
 // implementation — a second copy is how dark-mode WebP kept slipping through.
 
-
 async function fetchAsDataUrl(url: string, label?: string): Promise<string | null> {
   // Backgrounds, logos and imagery are load-bearing for the export, so a single
   // transient failure (signed URL racing its refresh, proxy hiccup) must not
@@ -302,7 +298,6 @@ async function fetchAsDataUrlOnce(
       url,
       label: label ?? "image",
     });
-
   } catch (e) {
     console.warn(`[pptx-export] ${label ?? "image"} fetch failed (likely CORS): ${url}`, e);
     return null;
@@ -329,7 +324,6 @@ const aspectCache = {
 async function measureAspect(dataUrl: string | null | undefined): Promise<void> {
   await measureImageAspect(dataUrl);
 }
-
 
 /**
  * Centered contain-fit rectangle for an embedded image inside a box.
@@ -376,7 +370,6 @@ function coverFrame(
   if (ratio > boxRatio) fw = h * ratio;
   else fh = w / ratio;
   return { x: x + (w - fw) / 2, y: y + (h - fh) / 2, w: fw, h: fh };
-
 }
 
 /**
@@ -418,7 +411,6 @@ function addInsetPhoto(
 }
 
 async function tintImageDataUrl(dataUrl: string | null, color: string): Promise<string | null> {
-
   if (!dataUrl || typeof document === "undefined") return dataUrl;
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -498,10 +490,7 @@ function relLuminanceHex(hex: string): number {
  *      and text run is also recorded for the export-time contrast and overlap
  *      assertions in `export-audit.ts`.
  */
-function installForegroundGuard(
-  s: PptxGenJS.Slide,
-  opts: { ink: string; light: boolean },
-) {
+function installForegroundGuard(s: PptxGenJS.Slide, opts: { ink: string; light: boolean }) {
   const ink = canonicalizeInk(opts.ink) || "03002C";
   const target = s as unknown as {
     addText: (...args: unknown[]) => unknown;
@@ -717,7 +706,6 @@ function slideTextDigest(slide: { variantId?: string; content?: unknown }): stri
   return body ? `${slide.variantId ?? "Slide"}\n\n${body}` : "";
 }
 
-
 export async function exportDeckToPptx(
   deck: Deck,
   brand: BrandMode,
@@ -780,11 +768,7 @@ export async function exportDeckToPptx(
      * master section) and scrub full-bleed decor off the slide. Default true.
      */
     backgroundInMaster?: boolean;
-
   },
-
-
-
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
 
@@ -828,9 +812,6 @@ export async function exportDeckToPptx(
   } catch (e) {
     console.warn("[pptx-export] icon pack warm-up skipped", e);
   }
-
-
-
 
   const pptx = new PptxGenJS();
   pptx.layout = "LAYOUT_WIDE";
@@ -879,7 +860,7 @@ export async function exportDeckToPptx(
   const logos = getDivisionLogos(deck.brandModeId) ?? getDivisionLogos("tp");
   const [rawLogoColor, rawLogoWhite, rawLogoStackedColor, rawLogoStackedWhite] = await Promise.all([
     // Light slides use the approved black lockup, matching the app.
-    logos?.black ?? logos?.color
+    (logos?.black ?? logos?.color)
       ? fetchAsDataUrl((logos?.black ?? logos?.color)!)
       : Promise.resolve(null),
     logos?.white
@@ -1153,15 +1134,12 @@ export async function exportDeckToPptx(
           flatBackdrops.add(i);
           integrity.noteBackground(i, "plate", deck.slides[i].variantId);
         }
-
       }
     } catch (err) {
       console.error("[pptx-export] ground capture failed", err);
     }
     endGround();
   }
-
-
 
   // ---------------------------------------------------------------------------
   // Layered pass (default fidelity) — design-exact DECOR plate + native objects
@@ -1204,9 +1182,7 @@ export async function exportDeckToPptx(
   if (wantsPlatePass && typeof document !== "undefined") {
     const endPlates = telemetry.phase("plates");
     try {
-      const { rasterizeDecorPlates, rasterizeObjectPlates } = await import(
-        "./slide-exact-raster"
-      );
+      const { rasterizeDecorPlates, rasterizeObjectPlates } = await import("./slide-exact-raster");
       // Fully-layered capture: paint we can express in OOXML leaves the plate
       // and ships as native objects, so plated modules are editable too.
       const rasterizeTextEditablePlates = rasterizeObjectPlates;
@@ -1277,7 +1253,8 @@ export async function exportDeckToPptx(
             layeredText[i] = {
               plate: res.plate,
               runs: res.runs ?? [],
-              shapes: (res as { shapes?: import("./export-dom-decompose").DomShape[] }).shapes ?? [],
+              shapes:
+                (res as { shapes?: import("./export-dom-decompose").DomShape[] }).shapes ?? [],
             };
             telemetry.noteTextRuns?.(i, res.runs?.length ?? 0);
           } else missed.push({ sl, i });
@@ -1302,8 +1279,8 @@ export async function exportDeckToPptx(
             layeredText[i] = {
               plate: retried.plate,
               runs: (retried.runs ?? []) as import("./export-text-layer").TextRun[],
-              shapes:
-                ((retried as { shapes?: unknown }).shapes ?? []) as import("./export-dom-decompose").DomShape[],
+              shapes: ((retried as { shapes?: unknown }).shapes ??
+                []) as import("./export-dom-decompose").DomShape[],
             };
             telemetry.notePlate(i, Date.now() - retryStart, sl.variantId);
             continue;
@@ -1326,8 +1303,6 @@ export async function exportDeckToPptx(
       endPlates();
     }
   }
-
-
 
   // Prefetch per-item client logos for the six client-listing variants so the
   // export renderers can embed real wordmarks (falling back to the initials
@@ -1442,8 +1417,6 @@ export async function exportDeckToPptx(
         .map((b) => measureAspect(b.src as string)),
     ),
   );
-
-
 
   // Pre-render MV-VIZ-* infographic specs to vector SVG (browser-only,
   // via ECharts). Ships as an image on the slide — pptxgenjs accepts SVG
@@ -1581,17 +1554,14 @@ export async function exportDeckToPptx(
     else if (plan?.kind === "image") integrity.noteBackground(i, "photo", sl.variantId);
     else if (plan?.kind === "solid") integrity.noteBackground(i, "solid", sl.variantId);
     else integrity.noteBackground(i, "gradient", sl.variantId);
-
   });
 
   // `resolveSlideDark` is declared above (before the client-logo prefetch) so
   // the prefetched wordmark colour variant and the chrome palette agree.
 
-
   const failedSlides: string[] = [];
   /** Contrast / overlap offences found in what the renderers emitted. */
   const auditWarnings: string[] = [];
-
 
   const endOoxml = telemetry.phase("ooxml");
   for (let i = 0; i < deck.slides.length; i++) {
@@ -1605,7 +1575,6 @@ export async function exportDeckToPptx(
     activeIntegrity = integrity;
     activeSlideIndex = i;
     activeVariantId = slide.variantId;
-
 
     // Design-exact (explicitly flat) path: the plate contains every layer
     // (background planes, tiles, figures, icons, imagery, logo, footer), so it
@@ -1622,7 +1591,14 @@ export async function exportDeckToPptx(
               ? "FFFFFF"
               : palette.primary;
       s.background = { color: fallback };
-      s.addImage({ data: exactPlate, x: 0, y: 0, w: SLIDE_W, h: SLIDE_H, objectName: "TP Design plate" });
+      s.addImage({
+        data: exactPlate,
+        x: 0,
+        y: 0,
+        w: SLIDE_W,
+        h: SLIDE_H,
+        objectName: "TP Design plate",
+      });
       // Canvas edits are NOT part of the rasterized plate (ExactSlideStage renders
       // the variant only), so they ship as native editable objects on top — same
       // geometry, z-order, glass surfaces and type metrics as the editor.
@@ -1665,7 +1641,10 @@ export async function exportDeckToPptx(
         placeDomShapes(s, layered.shapes);
       }
       const { placeTextRuns } = await import("./export-text-place");
-      placeTextRuns(s as unknown as { addText: (t: unknown, o: Record<string, unknown>) => unknown }, layered.runs);
+      placeTextRuns(
+        s as unknown as { addText: (t: unknown, o: Record<string, unknown>) => unknown },
+        layered.runs,
+      );
       placeCanvasBlocks(s, slide.canvasBlocks, {
         dark: resolveSlideDark(i),
         accent: palette.accent,
@@ -1677,12 +1656,7 @@ export async function exportDeckToPptx(
       continue;
     }
 
-
-
-
-
     try {
-
       const kind = classifyVariant(slide.variantId, i);
       const advancedDark = slide.variantId === "MV-COUNTDOWN";
       const plan = backgroundPlans[i];
@@ -1758,7 +1732,6 @@ export async function exportDeckToPptx(
                 : "TP Photo",
         });
 
-
         for (const rect of scrimRectSpec(plan, SLIDE_W, SLIDE_H)) {
           s.addShape("rect", {
             x: rect.x,
@@ -1800,7 +1773,11 @@ export async function exportDeckToPptx(
         imgData &&
         variantSupportsImagery(slide.variantId)
       ) {
-        s.addImage({ data: imgData, ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H), objectName: "TP Photo" });
+        s.addImage({
+          data: imgData,
+          ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H),
+          objectName: "TP Photo",
+        });
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
         // through while remaining legible under the renderer's text.
@@ -1814,7 +1791,6 @@ export async function exportDeckToPptx(
           line: { color: palette.primary, transparency: 100 },
         });
       }
-
 
       // Light slides: remap hardcoded white copy to brand ink so no text can
       // vanish against a light decor plate or light-mode surface. Skipped when a
@@ -1831,13 +1807,12 @@ export async function exportDeckToPptx(
         plan.kind === "image" && !flatBackdrops.has(i) && layeredPlates[i] !== plan.data;
       const overDarkPhoto = Boolean(
         photoGround ||
-          (imgData &&
-            variantSupportsImagery(slide.variantId) &&
-            !bgIsImage &&
-            !insetFrames &&
-            measuredTiles.length === 0),
+        (imgData &&
+          variantSupportsImagery(slide.variantId) &&
+          !bgIsImage &&
+          !insetFrames &&
+          measuredTiles.length === 0),
       );
-
 
       // Installed on EVERY slide: the light-ink remap is gated on the slide
       // being light, but surface→foreground pairing and the audit recorders
@@ -1942,11 +1917,7 @@ export async function exportDeckToPptx(
       const variantPos = slide.variantId
         ? LOGO_POSITION_BY_VARIANT[slide.variantId.toUpperCase()]
         : undefined;
-      const placement = resolveLogoPlacement(
-        chrome,
-        slide.layoutId,
-        perSlidePos ?? variantPos,
-      );
+      const placement = resolveLogoPlacement(chrome, slide.layoutId, perSlidePos ?? variantPos);
 
       const perSlideOrient =
         slide.logoOrientation && slide.logoOrientation !== "auto"
@@ -1979,7 +1950,6 @@ export async function exportDeckToPptx(
           ? (logoWhite ?? logoStackedWhite ?? logoColor ?? logoStackedColor)
           : (logoColor ?? logoStackedColor ?? logoWhite ?? logoStackedWhite));
       noteExportLogo(Boolean(logoData));
-
 
       if (placement.position !== "hidden") {
         const isHalf =
@@ -2113,9 +2083,7 @@ export async function exportDeckToPptx(
 
       // Colour pairing and text-layout assertions over everything this slide
       // emitted (see export-audit.ts).
-      auditWarnings.push(
-        ...auditSlideEmissions(s, `slide ${i + 1} (${slide.variantId})`),
-      );
+      auditWarnings.push(...auditSlideEmissions(s, `slide ${i + 1} (${slide.variantId})`));
     } catch (err) {
       // Per-slide resilience: one bad variant renderer must not fail the
       // whole export. Log server-side, record the slide id, and drop a
@@ -2242,9 +2210,8 @@ export async function exportDeckToPptx(
   let deliverName = fileName;
   if (opts?.debugObjectTree) {
     try {
-      const { buildDebugManifest, annotateDebugPptx, downloadManifest } = await import(
-        "./export-debug"
-      );
+      const { buildDebugManifest, annotateDebugPptx, downloadManifest } =
+        await import("./export-debug");
       const built = await buildDebugManifest(flatBlob, {
         deckTitle: deck.title,
         fidelity,
@@ -2536,13 +2503,7 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       },
     );
     if (frac !== null) {
-      addGaugeMeter(
-        s as never,
-        { x, y: y + 1.5, w: colW },
-        p.accent,
-        frac,
-        `Stat gauge ${k + 1}`,
-      );
+      addGaugeMeter(s as never, { x, y: y + 1.5, w: colW }, p.accent, frac, `Stat gauge ${k + 1}`);
     }
 
     s.addText(str(it.label ?? it.narrative ?? ""), {
@@ -2556,7 +2517,6 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       valign: "top",
     });
   });
-
 }
 
 function renderQuote(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
@@ -3048,7 +3008,6 @@ function renderContent(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   }
 }
 
-
 function sanitize(name: string) {
   return name.replace(/[^a-z0-9-_]+/gi, "_").slice(0, 60) || "deck";
 }
@@ -3493,7 +3452,13 @@ function renderVizSpec(
 // The area matrices mirror the on-screen renderer exactly, so an exported deck
 // keeps the same reading order and cell weighting as the preview.
 const BENTO_AREAS: Record<number, { units: number[]; rows: string[][] }> = {
-  5: { units: [1.5, 1, 1], rows: [["a", "b", "c"], ["a", "d", "e"]] },
+  5: {
+    units: [1.5, 1, 1],
+    rows: [
+      ["a", "b", "c"],
+      ["a", "d", "e"],
+    ],
+  },
   6: {
     units: [1, 1, 1, 1, 1],
     rows: [
@@ -3590,12 +3555,7 @@ function bentoCells(count: number, y0: number) {
   return Array.from({ length: count }, (_, i) => out[String.fromCharCode(97 + i)]!);
 }
 
-function renderBento5(
-  s: PptxGenJS.Slide,
-  c: Record<string, unknown>,
-  p: Palette,
-  count = 5,
-) {
+function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette, count = 5) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items);
   const cells = bentoCells(count, y0);
@@ -3607,7 +3567,6 @@ function renderBento5(
   // furniture module so every module exports the identical treatment.
   const seam = (g: PptxGenJS.Slide, cell: { x: number; y: number; w: number }) =>
     addCardSeam(g as never, cell, p.accent, EXPORT_RADIUS_IN.media);
-
 
   const k7 = count >= 8 ? 0.84 : count === 7 ? 0.89 : count === 6 ? 0.94 : 1;
   const px = (n: number) => PT(Math.round(n * k7));
@@ -3650,7 +3609,6 @@ function renderBento5(
           `Bento caption scrim ${i + 1}`,
         );
       }
-
 
       capTarget.addShape("rect", {
         x: cell.x + pad,
@@ -3736,7 +3694,6 @@ function renderBento5(
       });
     }
 
-
     if (kind === "stat") {
       const unit = str(it.unit);
       // A meter asserts proportion toward a target, so it is only drawn for a
@@ -3768,7 +3725,6 @@ function renderBento5(
         );
       }
 
-
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
         y: cell.y + cell.h - pad - 0.34,
@@ -3782,7 +3738,6 @@ function renderBento5(
 
       return;
     }
-
 
     // Body cell: accent gradient rule, title, supporting copy — bottom-aligned
     // like the screen's `mt-auto` block.
@@ -3864,11 +3819,7 @@ const PT = (px: number) => px * 0.5;
  * cannot clip. Runs from the slide's addText wrapper, so it covers every
  * per-variant renderer at once.
  */
-function applyTrackedWidthFloor(
-  flat: string,
-  text: unknown,
-  o: Record<string, unknown>,
-): void {
+function applyTrackedWidthFloor(flat: string, text: unknown, o: Record<string, unknown>): void {
   if (!flat.trim() || flat.includes("\n")) return;
   const n = (v: unknown) => (typeof v === "number" ? v : Number.parseFloat(String(v ?? "")));
   const x = n(o.x);
@@ -3967,7 +3918,6 @@ function addIconGlyph(
   s.addImage({ data, x: opts.x, y: opts.y, w: opts.size, h: opts.size, objectName: "TP Icon" });
   noteExportAsset("icon", true);
   return true;
-
 }
 
 /**
@@ -4014,14 +3964,7 @@ function addIconBadge(
 }
 
 /** House "open-bottom" band: accent wash, no outline, centred accent top seam. */
-function drawHouseBand(
-  s: PptxGenJS.Slide,
-  p: Palette,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-) {
+function drawHouseBand(s: PptxGenJS.Slide, p: Palette, x: number, y: number, w: number, h: number) {
   s.addShape("roundRect", {
     x,
     y,
@@ -4032,7 +3975,6 @@ function drawHouseBand(
     line: { type: "none" },
   });
   addCardSeam(s as never, { x, y, w }, p.accent, EXPORT_RADIUS_IN.band);
-
 }
 
 function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -4069,7 +4011,9 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     s.addText(
       [
         promiseLead ? { text: promiseLead, options: { color: p.ink } } : null,
-        promiseEmph ? { text: `${promiseLead ? " " : ""}${promiseEmph}`, options: { color: p.accent } } : null,
+        promiseEmph
+          ? { text: `${promiseLead ? " " : ""}${promiseEmph}`, options: { color: p.accent } }
+          : null,
       ].filter(Boolean) as PptxGenJS.TextProps[],
       {
         x: x0 + 0.3,
@@ -4206,7 +4150,6 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
     });
   });
 
-
   const closeY = y + gridH + 0.28;
   const closeLead = str(close.lead);
   const closeEmph = str(close.emphasis);
@@ -4243,7 +4186,12 @@ function renderBentoValueClose(s: PptxGenJS.Slide, c: Record<string, unknown>, p
         str(close.ctaTitle)
           ? {
               text: str(close.ctaTitle),
-              options: { color: p.ink, bold: true, fontSize: PT(24), breakLine: !!str(close.ctaBody) },
+              options: {
+                color: p.ink,
+                bold: true,
+                fontSize: PT(24),
+                breakLine: !!str(close.ctaBody),
+              },
             }
           : null,
         str(close.ctaBody)
@@ -4331,7 +4279,6 @@ function renderKpiDashboard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
         `KPI gauge ${k + 1}`,
       );
     }
-
 
     const trend = str(it.trend);
     const arrow = trend === "down" ? "▼" : trend === "up" ? "▲" : "•";
@@ -5372,9 +5319,7 @@ function renderCompareVsLists(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   const right = (c.right ?? {}) as Record<string, unknown>;
   const rows = (o: Record<string, unknown>) =>
     (Array.isArray(o.items) ? (o.items as unknown[]) : [])
-      .map((it) =>
-        str(typeof it === "string" ? it : ((it ?? {}) as Record<string, unknown>).label),
-      )
+      .map((it) => str(typeof it === "string" ? it : ((it ?? {}) as Record<string, unknown>).label))
       .filter(Boolean)
       .slice(0, 8);
   const colW = (SLIDE_W - 1.2 - 1.1) / 2;
@@ -5617,7 +5562,6 @@ function renderLayerStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       fill: { color: tone },
       line: { color: tone },
     });
-
 
     const chip = Math.min(0.46, laneH * 0.42);
     const chipY = y + (laneH - chip) / 2;
@@ -5881,7 +5825,6 @@ function renderPlatformLoop(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   drawCloseBand(s, c, p, 6.15);
 }
 
-
 // 15c. MV-INFO-HUB-PILL-ORBIT
 //
 // Rebuilt straight off the on-screen renderer (VariantRenderer case
@@ -5916,9 +5859,7 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
   }
   const hub = (c.hub ?? {}) as Record<string, unknown>;
   const items = (Array.isArray(c.items) ? (c.items as unknown[]) : [])
-    .map((it) =>
-      typeof it === "string" ? { label: it } : ((it ?? {}) as Record<string, unknown>),
-    )
+    .map((it) => (typeof it === "string" ? { label: it } : ((it ?? {}) as Record<string, unknown>)))
     .filter((it) => str(it.label))
     .slice(0, 12);
   const count = Math.max(items.length, 1);
@@ -6104,8 +6045,7 @@ function renderHubPillOrbit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
           : { fill: { color: "FFFFFF" }, line: { type: "none" }, glass: true }),
       } as unknown as PptxGenJS.ShapeProps);
       // Icon well sits at the pill's inner end (row-reverse on the left stack).
-      const wellX =
-        side === "left" ? x + pillW - padX - wellD : x + padX;
+      const wellX = side === "left" ? x + pillW - padX - wellD : x + padX;
       const wellY = y + (pillH - wellD) / 2;
       s.addShape("ellipse", {
         x: wellX,
@@ -6682,7 +6622,6 @@ function bodyC(p: Palette): string {
   return isDarkPalette(p) ? p.ink : DARK_GRAY;
 }
 
-
 // ── MV-DASH-SUMMARY ──
 function renderDashSummary(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
@@ -6978,7 +6917,6 @@ function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   });
 }
 
-
 // ── MV-DASH-SALES-CHART ──
 function renderDashSalesChart(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
@@ -7114,7 +7052,6 @@ function renderDashGaugeRow(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
       align: "center",
     });
   });
-
 }
 
 // ── MV-DASH-PERFORMANCE ──
@@ -7851,7 +7788,6 @@ function renderGraphRings(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
         line: { color, width: 0, transparency },
       } as unknown as PptxGenJS.ShapeProps);
     }
-
   });
 
   // Legend right side
@@ -8814,7 +8750,6 @@ function renderGraphCombo(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
       // border color is undefined — which threw at write time
       // ("(colorStr || '').replace is not a function") and lost the slide.
       {
-
         x: 0.6,
         y: y0 + 0.1,
         w: SLIDE_W - 1.2,
@@ -8851,7 +8786,6 @@ function renderGraphCombo(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
           { catAxisHidden: true },
         ],
       } as unknown as Parameters<PptxGenJS.Slide["addChart"]>[1],
-
     );
   } catch {
     /* no-op */
@@ -9088,7 +9022,6 @@ function renderInfoPyramid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
       });
   });
 }
-
 
 // ── MV-INFO-VENN ── 3 overlapping circles + intersection callout
 function renderInfoVenn(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -9505,7 +9438,6 @@ function renderImgStrip(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palet
       color: "FFFFFF",
       fontFace: "Geist",
     });
-
   });
   // arrow row below
   const arrowY = stripY + stripH + 0.35;
@@ -11545,7 +11477,6 @@ function renderCoverMedia(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pal
     });
 }
 
-
 // MV-OP-COVER-MINIMAL — tiny mark + big title only
 function renderCoverMinimal(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const title = str(c.title) || "Untitled";
@@ -11856,7 +11787,9 @@ function renderAgendaVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
 function renderDividerNumbered(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const title = str(c.title || c.headline) || "Section";
   // The numeral slot renders at 320pt; a prose kicker there is not a numeral.
-  const numCandidate = [c.number, c.kicker, c.eyebrow].map((v) => str(v)).find((v) => v.trim().length > 0 && v.trim().length <= 4);
+  const numCandidate = [c.number, c.kicker, c.eyebrow]
+    .map((v) => str(v))
+    .find((v) => v.trim().length > 0 && v.trim().length <= 4);
   const num = numCandidate?.trim() || "01";
   const body = str(c.body || c.narrative);
   s.addText(num, {

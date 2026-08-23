@@ -53,7 +53,8 @@ function toSwatches(value: unknown): DesignDnaSwatch[] {
       else if (entry && typeof entry === "object") {
         const o = entry as Record<string, unknown>;
         const v = str(pick(o, "value", "hex", "color"));
-        if (v) out.push({ name: str(pick(o, "name", "role", "label")) ?? `color ${i + 1}`, value: v });
+        if (v)
+          out.push({ name: str(pick(o, "name", "role", "label")) ?? `color ${i + 1}`, value: v });
       }
     });
   } else if (value && typeof value === "object") {
@@ -66,7 +67,11 @@ function toSwatches(value: unknown): DesignDnaSwatch[] {
 }
 
 function toRules(value: unknown): string[] {
-  if (Array.isArray(value)) return value.map((v) => str(v) ?? "").filter(Boolean).slice(0, 40);
+  if (Array.isArray(value))
+    return value
+      .map((v) => str(v) ?? "")
+      .filter(Boolean)
+      .slice(0, 40);
   const s = str(value);
   if (!s) return [];
   return s
@@ -83,7 +88,8 @@ function toScenes(value: unknown): { scene: string; note: string }[] {
       if (!entry || typeof entry !== "object") continue;
       const o = entry as Record<string, unknown>;
       const scene = str(pick(o, "scene", "section", "slide", "name"));
-      if (scene) out.push({ scene, note: str(pick(o, "note", "description", "layout", "backdrop")) ?? "" });
+      if (scene)
+        out.push({ scene, note: str(pick(o, "note", "description", "layout", "backdrop")) ?? "" });
     }
   } else if (value && typeof value === "object") {
     for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
@@ -108,7 +114,9 @@ function fromJson(json: unknown, fileName?: string): DesignDna | null {
     fonts: {
       heading: str(pick(typography, "heading", "headings", "display", "title")),
       body: str(pick(typography, "body", "text", "paragraph")),
-      notes: str(pick(typography, "notes", "note", "character", "scale")) ?? str(pick(o, "typographynote")),
+      notes:
+        str(pick(typography, "notes", "note", "character", "scale")) ??
+        str(pick(o, "typographynote")),
     },
     geometry: {
       card_shape: str(pick(geometry, "cardshape", "shape", "cards")),
@@ -128,7 +136,10 @@ function fromJson(json: unknown, fileName?: string): DesignDna | null {
 
 /** Fall back to notes/markdown: pull hexes, font mentions and bullet rules. */
 function fromText(text: string, fileName?: string): DesignDna {
-  const hexes = Array.from(new Set((text.match(HEX) ?? []).map((h) => h.toLowerCase()))).slice(0, 18);
+  const hexes = Array.from(new Set((text.match(HEX) ?? []).map((h) => h.toLowerCase()))).slice(
+    0,
+    18,
+  );
   const lines = text
     .split(/\r?\n/)
     .map((l) => l.trim())
@@ -150,7 +161,10 @@ function fromText(text: string, fileName?: string): DesignDna {
       ...(fontLine && !headingFont && !bodyFont ? { notes: fontLine } : {}),
     },
     scenes: [],
-    rules: lines.filter((l) => /^[-•*]/.test(l)).map((l) => l.replace(/^[-•*]\s*/, "")).slice(0, 40),
+    rules: lines
+      .filter((l) => /^[-•*]/.test(l))
+      .map((l) => l.replace(/^[-•*]\s*/, ""))
+      .slice(0, 40),
     raw: text.slice(0, MAX_RAW),
     source: "text",
     ...(fileName ? { fileName } : {}),
@@ -160,7 +174,11 @@ function fromText(text: string, fileName?: string): DesignDna {
 /** Parse pasted/uploaded content of unknown shape into a design DNA record. */
 export function parseDesignDna(input: string, fileName?: string): DesignDna | { error: string } {
   const text = (input ?? "").trim();
-  if (text.length < 8) return { error: "That file or text looks empty — paste a knowledge map or upload a JSON/markdown file." };
+  if (text.length < 8)
+    return {
+      error:
+        "That file or text looks empty — paste a knowledge map or upload a JSON/markdown file.",
+    };
   try {
     const parsed = JSON.parse(text);
     const dna = fromJson(parsed, fileName);
@@ -178,9 +196,19 @@ export const DesignDnaSchema = z
     summary: z.string().optional(),
     mode: z.enum(["light", "dark"]).optional(),
     palette: z.array(z.object({ name: z.string(), value: z.string() })).optional(),
-    fonts: z.object({ heading: z.string().optional(), body: z.string().optional(), notes: z.string().optional() }).optional(),
+    fonts: z
+      .object({
+        heading: z.string().optional(),
+        body: z.string().optional(),
+        notes: z.string().optional(),
+      })
+      .optional(),
     geometry: z
-      .object({ card_shape: z.string().optional(), corner_radius: z.string().optional(), notes: z.string().optional() })
+      .object({
+        card_shape: z.string().optional(),
+        corner_radius: z.string().optional(),
+        notes: z.string().optional(),
+      })
       .optional(),
     scenes: z.array(z.object({ scene: z.string(), note: z.string().optional() })).optional(),
     rules: z.array(z.string()).optional(),
@@ -213,7 +241,8 @@ export function coerceDesignDna(value: unknown): DesignDna | null {
 export function designDnaSummary(dna: DesignDna): string {
   const bits = [dna.name];
   if (dna.palette.length) bits.push(`${dna.palette.length} colors`);
-  if (dna.fonts.heading || dna.fonts.body) bits.push([dna.fonts.heading, dna.fonts.body].filter(Boolean).join(" / "));
+  if (dna.fonts.heading || dna.fonts.body)
+    bits.push([dna.fonts.heading, dna.fonts.body].filter(Boolean).join(" / "));
   if (dna.rules.length) bits.push(`${dna.rules.length} rules`);
   return bits.join(" · ");
 }
@@ -228,14 +257,22 @@ export function designDnaPromptBlock(dna: DesignDna): string {
   if (dna.summary) lines.push(`Summary: ${dna.summary}`);
   if (dna.palette.length)
     lines.push(`Palette: ${dna.palette.map((p) => `${p.name} ${p.value}`).join(", ")}`);
-  const fonts = [dna.fonts.heading && `headings ${dna.fonts.heading}`, dna.fonts.body && `body ${dna.fonts.body}`, dna.fonts.notes]
+  const fonts = [
+    dna.fonts.heading && `headings ${dna.fonts.heading}`,
+    dna.fonts.body && `body ${dna.fonts.body}`,
+    dna.fonts.notes,
+  ]
     .filter(Boolean)
     .join("; ");
   if (fonts) lines.push(`Typography: ${fonts}`);
-  const geo = [dna.geometry?.card_shape, dna.geometry?.corner_radius, dna.geometry?.notes].filter(Boolean).join("; ");
+  const geo = [dna.geometry?.card_shape, dna.geometry?.corner_radius, dna.geometry?.notes]
+    .filter(Boolean)
+    .join("; ");
   if (geo) lines.push(`Geometry: ${geo}`);
   if (dna.scenes.length)
-    lines.push(`Section intent: ${dna.scenes.map((s) => `${s.scene}${s.note ? ` — ${s.note}` : ""}`).join(" | ")}`);
+    lines.push(
+      `Section intent: ${dna.scenes.map((s) => `${s.scene}${s.note ? ` — ${s.note}` : ""}`).join(" | ")}`,
+    );
   if (dna.rules.length) lines.push("Rules:", ...dna.rules.map((r) => `- ${r}`));
   lines.push(
     "Use this map when you call plan_visual_design: choose the built-in design language that sits closest to it, and say in the rationale how you matched palette, typography, geometry and section intent. Never contradict an explicit rule above. Call read_design_dna if you need the full source.",

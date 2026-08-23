@@ -99,10 +99,7 @@ export function ArrowOverlapCheck({ className = "" }: { className?: string }) {
                 <span className="font-mono text-amber-900/60">Slide {s.index}</span>{" "}
                 {s.hits
                   .slice(0, 3)
-                  .map(
-                    (h) =>
-                      `${h.arrowKind} over “${h.content}” (${Math.round(h.ratio * 100)}%)`,
-                  )
+                  .map((h) => `${h.arrowKind} over “${h.content}” (${Math.round(h.ratio * 100)}%)`)
                   .join(" · ")}
                 {s.hits.length > 3 ? ` · +${s.hits.length - 3} more` : ""}
               </li>

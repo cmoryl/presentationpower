@@ -144,7 +144,6 @@ function EventsView() {
                 All presets <ArrowRight size={14} />
               </Link>
             </div>
-
           </div>
         </div>
       </header>
@@ -165,8 +164,7 @@ function EventsView() {
               to="/events/next"
               className="group relative flex flex-col overflow-hidden rounded-2xl border border-[#003FC7]/30 p-5 transition hover:border-[#003FC7] hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.35)]"
               style={{
-                background:
-                  "linear-gradient(160deg, #03002C 0%, #003FC7 65%, #003FC7 100%)",
+                background: "linear-gradient(160deg, #03002C 0%, #003FC7 65%, #003FC7 100%)",
               }}
             >
               <div className="flex items-center justify-between">
@@ -214,7 +212,6 @@ function EventsView() {
                     </div>
                   ) : null}
                   <div className="flex items-center justify-between">
-
                     <span
                       className="inline-flex h-8 w-8 items-center justify-center rounded-full"
                       style={{ backgroundColor: `${p.accent}22`, color: p.accent }}

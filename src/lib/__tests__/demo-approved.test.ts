@@ -9,7 +9,9 @@ describe("approved demos carry no QA gates", () => {
         title: "Demo",
         brandModeId: "bm-globallink",
         archetypeId: "NA-01",
-        slides: [{ sectionId: "SF-04", variantId: "MV-SOL-PILLARS-4", layoutId: "LF-02", content: {} }],
+        slides: [
+          { sectionId: "SF-04", variantId: "MV-SOL-PILLARS-4", layoutId: "LF-02", content: {} },
+        ],
       },
       "demo-key",
     );

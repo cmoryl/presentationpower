@@ -18,7 +18,8 @@ type LooseToolPart = {
   errorText?: string;
 };
 
-const DANGLING_MESSAGE = "Tool result is missing — the previous run ended before this tool finished. Retry it if it is still needed.";
+const DANGLING_MESSAGE =
+  "Tool result is missing — the previous run ended before this tool finished. Retry it if it is still needed.";
 
 function isToolPart(part: unknown): part is LooseToolPart {
   if (!part || typeof part !== "object") return false;

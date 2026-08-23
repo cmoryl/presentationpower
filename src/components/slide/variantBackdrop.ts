@@ -192,7 +192,6 @@ function _computeBackdrop(
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
-
   // Default aurora wash — extends the per-division accent signature to every
   // slide when the brand+mode has no curated PNG set. Applies to:
   //   • All divisions in light mode (except curated ones, currently none)

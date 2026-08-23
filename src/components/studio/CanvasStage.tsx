@@ -56,7 +56,6 @@ export function CanvasStage({
   onUndo,
   onRedo,
 }: Props) {
-
   const wrapRef = useRef<HTMLDivElement>(null);
   const [isOver, setIsOver] = useState(false);
   const drag = useRef<
@@ -72,11 +71,14 @@ export function CanvasStage({
     | null
   >(null);
   /** Live marquee rectangle in stage units while lasso-selecting. */
-  const [marquee, setMarquee] = useState<
-    { x0: number; y0: number; x1: number; y1: number; additive: boolean } | null
-  >(null);
+  const [marquee, setMarquee] = useState<{
+    x0: number;
+    y0: number;
+    x1: number;
+    y1: number;
+    additive: boolean;
+  } | null>(null);
   const marqueeBase = useRef<readonly string[]>([]);
-
 
   const stageFrom = useCallback((clientX: number, clientY: number) => {
     const el = wrapRef.current;
@@ -98,16 +100,18 @@ export function CanvasStage({
     return () => ro.disconnect();
   }, []);
 
-  const items = [...comp.items]
-    .filter((i) => !i.hidden)
-    .sort((a, b) => a.z - b.z);
+  const items = [...comp.items].filter((i) => !i.hidden).sort((a, b) => a.z - b.z);
   const bg =
     comp.background ?? (comp.mode === "dark" ? "#03002C" : (brand.tokens.surface ?? "#FFFFFF"));
 
   return (
     <div
       className="relative w-full overflow-hidden rounded-2xl border border-black/10 shadow-sm"
-      style={{ aspectRatio: "16 / 9", background: bg, outline: isOver ? "3px solid #003FC7" : "none" }}
+      style={{
+        aspectRatio: "16 / 9",
+        background: bg,
+        outline: isOver ? "3px solid #003FC7" : "none",
+      }}
       ref={wrapRef}
       tabIndex={0}
       role="application"
@@ -139,8 +143,7 @@ export function CanvasStage({
         // select every item the rectangle touches. Shift keeps the existing
         // selection and adds to it.
         const onEmpty =
-          e.target === wrapRef.current ||
-          (e.target as HTMLElement)?.dataset?.stagePlane === "true";
+          e.target === wrapRef.current || (e.target as HTMLElement)?.dataset?.stagePlane === "true";
         if (!onEmpty || e.button !== 0) return;
         wrapRef.current?.focus();
         const s = stageFrom(e.clientX, e.clientY);
@@ -206,7 +209,6 @@ export function CanvasStage({
           selectedIds.forEach(onDelete);
         }
       }}
-
     >
       {showGrid && (
         <div
@@ -224,131 +226,130 @@ export function CanvasStage({
         className="absolute left-0 top-0 origin-top-left"
         style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${scale})` }}
       >
-      {items.map((it) => {
-        const selected = selectedIds.includes(it.id);
-        return (
-          <div
-            key={it.id}
-            data-studio-item={it.id}
-            title={it.type === "module" ? "Double-click to make this module editable" : undefined}
-            onDoubleClick={(e) => {
-              if (it.type !== "module" || !onExplode) return;
-              e.stopPropagation();
-              onExplode(it.id);
-            }}
-            className="absolute"
-
-            style={{
-              left: it.x,
-              top: it.y,
-              width: it.w,
-              height: it.h,
-              zIndex: it.z,
-              outline: selected
-                ? `${2 / scale}px solid #003FC7`
-                : `${1 / scale}px dashed rgba(3,0,44,0.18)`,
-              outlineOffset: 1,
-              cursor: it.locked ? "default" : "move",
-            }}
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              wrapRef.current?.focus();
-              if (e.shiftKey) {
-                onSelect(
-                  selectedIds.includes(it.id)
-                    ? selectedIds.filter((x) => x !== it.id)
-                    : [...selectedIds, it.id],
-                );
-                return;
-              }
-              // Pressing an already-selected item keeps the multi-selection so
-              // the whole lasso group drags together.
-              const groupIds = selectedIds.includes(it.id) ? [...selectedIds] : [it.id];
-              if (!selectedIds.includes(it.id)) onSelect([it.id]);
-              if (it.locked) return;
-              (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-              const s = stageFrom(e.clientX, e.clientY);
-              onBeginBatch?.();
-              drag.current = {
-                mode: "move",
-                id: it.id,
-                dx: s.x - it.x,
-                dy: s.y - it.y,
-                group: comp.items
-                  .filter((i) => groupIds.includes(i.id) && !i.locked)
-                  .map((i) => ({ id: i.id, x: i.x, y: i.y })),
-              };
-            }}
-            onPointerMove={(e) => {
-              const d = drag.current;
-              if (!d || d.id !== it.id) return;
-              const s = stageFrom(e.clientX, e.clientY);
-              if (d.mode === "move") {
-                const nx = Math.max(0, Math.min(STAGE_W - it.w, snap(s.x - d.dx, snapOn)));
-                const ny = Math.max(0, Math.min(STAGE_H - it.h, snap(s.y - d.dy, snapOn)));
-                const shiftX = nx - it.x;
-                const shiftY = ny - it.y;
-                if (d.group.length > 1 && onPatchMany) {
-                  const patches: Record<string, Partial<CanvasItem>> = {};
-                  for (const g of d.group) {
-                    const src = comp.items.find((i) => i.id === g.id);
-                    if (!src) continue;
-                    patches[g.id] = {
-                      x: Math.max(0, Math.min(STAGE_W - src.w, src.x + shiftX)),
-                      y: Math.max(0, Math.min(STAGE_H - src.h, src.y + shiftY)),
-                    };
-                  }
-                  onPatchMany(patches);
-                } else {
-                  onPatch(it.id, { x: nx, y: ny });
+        {items.map((it) => {
+          const selected = selectedIds.includes(it.id);
+          return (
+            <div
+              key={it.id}
+              data-studio-item={it.id}
+              title={it.type === "module" ? "Double-click to make this module editable" : undefined}
+              onDoubleClick={(e) => {
+                if (it.type !== "module" || !onExplode) return;
+                e.stopPropagation();
+                onExplode(it.id);
+              }}
+              className="absolute"
+              style={{
+                left: it.x,
+                top: it.y,
+                width: it.w,
+                height: it.h,
+                zIndex: it.z,
+                outline: selected
+                  ? `${2 / scale}px solid #003FC7`
+                  : `${1 / scale}px dashed rgba(3,0,44,0.18)`,
+                outlineOffset: 1,
+                cursor: it.locked ? "default" : "move",
+              }}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                wrapRef.current?.focus();
+                if (e.shiftKey) {
+                  onSelect(
+                    selectedIds.includes(it.id)
+                      ? selectedIds.filter((x) => x !== it.id)
+                      : [...selectedIds, it.id],
+                  );
+                  return;
                 }
-              } else {
-                onPatch(it.id, {
-                  w: Math.max(60, Math.min(STAGE_W - it.x, snap(d.w + (s.x - d.startX), snapOn))),
-                  h: Math.max(40, Math.min(STAGE_H - it.y, snap(d.h + (s.y - d.startY), snapOn))),
-                });
-              }
-            }}
-            onPointerUp={() => {
-              if (drag.current) onEndBatch?.();
-              drag.current = null;
-            }}
-          >
-
-            <div className="pointer-events-none h-full w-full">
-              <CanvasItemView item={it} brand={brand} mode={comp.mode} />
+                // Pressing an already-selected item keeps the multi-selection so
+                // the whole lasso group drags together.
+                const groupIds = selectedIds.includes(it.id) ? [...selectedIds] : [it.id];
+                if (!selectedIds.includes(it.id)) onSelect([it.id]);
+                if (it.locked) return;
+                (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+                const s = stageFrom(e.clientX, e.clientY);
+                onBeginBatch?.();
+                drag.current = {
+                  mode: "move",
+                  id: it.id,
+                  dx: s.x - it.x,
+                  dy: s.y - it.y,
+                  group: comp.items
+                    .filter((i) => groupIds.includes(i.id) && !i.locked)
+                    .map((i) => ({ id: i.id, x: i.x, y: i.y })),
+                };
+              }}
+              onPointerMove={(e) => {
+                const d = drag.current;
+                if (!d || d.id !== it.id) return;
+                const s = stageFrom(e.clientX, e.clientY);
+                if (d.mode === "move") {
+                  const nx = Math.max(0, Math.min(STAGE_W - it.w, snap(s.x - d.dx, snapOn)));
+                  const ny = Math.max(0, Math.min(STAGE_H - it.h, snap(s.y - d.dy, snapOn)));
+                  const shiftX = nx - it.x;
+                  const shiftY = ny - it.y;
+                  if (d.group.length > 1 && onPatchMany) {
+                    const patches: Record<string, Partial<CanvasItem>> = {};
+                    for (const g of d.group) {
+                      const src = comp.items.find((i) => i.id === g.id);
+                      if (!src) continue;
+                      patches[g.id] = {
+                        x: Math.max(0, Math.min(STAGE_W - src.w, src.x + shiftX)),
+                        y: Math.max(0, Math.min(STAGE_H - src.h, src.y + shiftY)),
+                      };
+                    }
+                    onPatchMany(patches);
+                  } else {
+                    onPatch(it.id, { x: nx, y: ny });
+                  }
+                } else {
+                  onPatch(it.id, {
+                    w: Math.max(60, Math.min(STAGE_W - it.x, snap(d.w + (s.x - d.startX), snapOn))),
+                    h: Math.max(40, Math.min(STAGE_H - it.y, snap(d.h + (s.y - d.startY), snapOn))),
+                  });
+                }
+              }}
+              onPointerUp={() => {
+                if (drag.current) onEndBatch?.();
+                drag.current = null;
+              }}
+            >
+              <div className="pointer-events-none h-full w-full">
+                <CanvasItemView item={it} brand={brand} mode={comp.mode} />
+              </div>
+              {selected && !it.locked && (
+                <div
+                  role="presentation"
+                  className="absolute cursor-nwse-resize rounded-full border-2 border-white bg-[#003FC7] shadow"
+                  style={{
+                    width: 20 / scale,
+                    height: 20 / scale,
+                    right: -10 / scale,
+                    bottom: -10 / scale,
+                    borderWidth: 2 / scale,
+                  }}
+                  onPointerDown={(e) => {
+                    e.stopPropagation();
+                    (e.currentTarget.parentElement as HTMLElement)?.setPointerCapture?.(
+                      e.pointerId,
+                    );
+                    const s = stageFrom(e.clientX, e.clientY);
+                    onBeginBatch?.();
+                    drag.current = {
+                      mode: "resize",
+                      id: it.id,
+                      startX: s.x,
+                      startY: s.y,
+                      w: it.w,
+                      h: it.h,
+                    };
+                  }}
+                />
+              )}
             </div>
-            {selected && !it.locked && (
-              <div
-                role="presentation"
-                className="absolute cursor-nwse-resize rounded-full border-2 border-white bg-[#003FC7] shadow"
-                style={{
-                  width: 20 / scale,
-                  height: 20 / scale,
-                  right: -10 / scale,
-                  bottom: -10 / scale,
-                  borderWidth: 2 / scale,
-                }}
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  (e.currentTarget.parentElement as HTMLElement)?.setPointerCapture?.(e.pointerId);
-                  const s = stageFrom(e.clientX, e.clientY);
-                  onBeginBatch?.();
-                  drag.current = {
-                    mode: "resize",
-                    id: it.id,
-                    startX: s.x,
-                    startY: s.y,
-                    w: it.w,
-                    h: it.h,
-                  };
-                }}
-              />
-            )}
-          </div>
-        );
-      })}
-
+          );
+        })}
       </div>
 
       {marquee && (
@@ -398,10 +399,6 @@ function idsInRect(
   const top = Math.min(r.y0, r.y1);
   const bottom = Math.max(r.y0, r.y1);
   return items
-    .filter(
-      (i) =>
-        !i.locked && i.x < right && i.x + i.w > left && i.y < bottom && i.y + i.h > top,
-    )
+    .filter((i) => !i.locked && i.x < right && i.x + i.w > left && i.y < bottom && i.y + i.h > top)
     .map((i) => i.id);
 }
-

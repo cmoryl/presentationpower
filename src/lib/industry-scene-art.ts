@@ -80,36 +80,336 @@ interface ArtSpec {
  * scene family are the two things that make a sector instantly readable.
  */
 export const INDUSTRY_ART: Record<string, ArtSpec> = {
-  R01: { kind: "architecture", surface: "#F3F6FB", deep: "#0A2342", ink: "#0A2342", a1: "#0150EF", a2: "#5CE1E6", signal: "#FFB347", dark: false, density: 1 },
-  R02: { kind: "techSystem", surface: "#07101F", deep: "#040A14", ink: "#8FB2FF", a1: "#4F7CFF", a2: "#7C5CFF", signal: "#5CE1E6", dark: true, density: 1.2 },
-  R03: { kind: "dataField", surface: "#080D1E", deep: "#04060F", ink: "#B9CBFF", a1: "#49A8FF", a2: "#A78BFA", signal: "#E7F0FF", dark: true, density: 1.3 },
-  R04: { kind: "rails", surface: "#0B1030", deep: "#050723", ink: "#C6D4FF", a1: "#3B5BFF", a2: "#28D9D0", signal: "#FF7A5C", dark: true, density: 1.1 },
-  R05: { kind: "ledger", surface: "#0E1420", deep: "#070B12", ink: "#E8DFC8", a1: "#C8A75A", a2: "#8FA6C4", signal: "#F2E3B6", dark: true, density: 0.9 },
-  R06: { kind: "clinical", surface: "#EEF3F7", deep: "#0E2A47", ink: "#123A5C", a1: "#1D63A8", a2: "#2E9E7B", signal: "#0E2A47", dark: false, density: 0.9 },
-  R07: { kind: "techSystem", surface: "#050A0C", deep: "#020506", ink: "#7FE3C6", a1: "#25E6C0", a2: "#3AA0FF", signal: "#FF5C4D", dark: true, density: 1.3 },
-  R08: { kind: "clinical", surface: "#F2F9FA", deep: "#0B3B4A", ink: "#0E4657", a1: "#159FBF", a2: "#4FC9A6", signal: "#0B3B4A", dark: false, density: 0.8 },
-  R09: { kind: "molecular", surface: "#F6F8FC", deep: "#141B3C", ink: "#26305C", a1: "#3ABEC7", a2: "#9B8CFA", signal: "#26305C", dark: false, density: 1.2 },
-  R10: { kind: "civic", surface: "#F6F2EA", deep: "#1B1D22", ink: "#26282E", a1: "#6B1F2E", a2: "#1F3757", signal: "#A88451", dark: false, density: 0.95 },
-  R11: { kind: "architecture", surface: "#FBFCFE", deep: "#0B1B33", ink: "#12233D", a1: "#0B4CE0", a2: "#5A7BB5", signal: "#0B4CE0", dark: false, density: 1.05 },
-  R12: { kind: "isometric", surface: "#EDF1F5", deep: "#16283C", ink: "#1D3category", a1: "#20415F", a2: "#6E8AA6", signal: "#F2A31C", dark: false, density: 1.25 },
-  R13: { kind: "contour", surface: "#08222A", deep: "#04141A", ink: "#9FD9CF", a1: "#12A88C", a2: "#2F7FB8", signal: "#B6F26B", dark: true, density: 1.15 },
-  R14: { kind: "aero", surface: "#0A0C10", deep: "#04050A", ink: "#C3CBD8", a1: "#8B98AC", a2: "#3C7BFF", signal: "#E5372B", dark: true, density: 1 },
-  R15: { kind: "orbital", surface: "#071528", deep: "#030A16", ink: "#BBD3EA", a1: "#3EA6D9", a2: "#7F94AC", signal: "#E9F4FF", dark: true, density: 1.05 },
-  R16: { kind: "techSystem", surface: "#08122E", deep: "#040919", ink: "#BCD0FF", a1: "#2F6BFF", a2: "#38D2E6", signal: "#9B6BFF", dark: true, density: 1.35 },
-  R17: { kind: "rails", surface: "#101823", deep: "#080D14", ink: "#C4CFDC", a1: "#3B6E9E", a2: "#8B9BAD", signal: "#F0A32A", dark: true, density: 1.2 },
-  R18: { kind: "commerce", surface: "#FAF7F2", deep: "#12251E", ink: "#1B3229", a1: "#0F7A57", a2: "#C29B6B", signal: "#E0653F", dark: false, density: 1.1 },
-  R19: { kind: "organic", surface: "#FBF5E9", deep: "#2B3520", ink: "#3A3323", a1: "#6B8F3E", a2: "#E08A2C", signal: "#C2571F", dark: false, density: 1.05 },
-  R20: { kind: "architecture", surface: "#F7F2EC", deep: "#221C18", ink: "#2C241E", a1: "#B08A5C", a2: "#DFC7BA", signal: "#8A6A3E", dark: false, density: 0.75 },
-  R21: { kind: "cinematic", surface: "#08070B", deep: "#030204", ink: "#EDE7F5", a1: "#E1263C", a2: "#8B4CE6", signal: "#FFFFFF", dark: true, density: 1.05 },
-  R22: { kind: "neonGrid", surface: "#0A0721", deep: "#050313", ink: "#CDBBFF", a1: "#25E5F0", a2: "#F0359B", signal: "#8A5CFF", dark: true, density: 1.3 },
-  R23: { kind: "aero", surface: "#0C0C0E", deep: "#050506", ink: "#EDEDED", a1: "#E1252B", a2: "#22C9E6", signal: "#FFFFFF", dark: true, density: 1.25 },
-  R24: { kind: "contour", surface: "#EEF6F5", deep: "#0C3B41", ink: "#12474C", a1: "#2A9A96", a2: "#D9C29A", signal: "#0C3B41", dark: false, density: 0.95 },
-  R25: { kind: "architecture", surface: "#F4F1EC", deep: "#2A2E33", ink: "#33383E", a1: "#7A6A57", a2: "#4E6377", signal: "#B08A5C", dark: false, density: 1.1 },
-  R26: { kind: "molecular", surface: "#F8F4EC", deep: "#152743", ink: "#1E3050", a1: "#0F4FC4", a2: "#8B6BE0", signal: "#E8A020", dark: false, density: 1.05 },
-  R27: { kind: "civic", surface: "#F4F7FB", deep: "#0E2647", ink: "#153458", a1: "#1552A8", a2: "#7C93B4", signal: "#C0A053", dark: false, density: 1 },
-  R28: { kind: "organic", surface: "#F5F1E6", deep: "#1E3327", ink: "#2B3B2E", a1: "#2F6B4A", a2: "#3FA9A0", signal: "#C4643A", dark: false, density: 1.1 },
-  R29: { kind: "rails", surface: "#FBF6F1", deep: "#1B2A44", ink: "#25344C", a1: "#2A63C4", a2: "#9B7FE0", signal: "#EE7A5F", dark: false, density: 1 },
-  R30: { kind: "cinematic", surface: "#08072A", deep: "#03021A", ink: "#DCE4FF", a1: "#3A5CFF", a2: "#25D8E6", signal: "#B98BFF", dark: true, density: 1.2 },
+  R01: {
+    kind: "architecture",
+    surface: "#F3F6FB",
+    deep: "#0A2342",
+    ink: "#0A2342",
+    a1: "#0150EF",
+    a2: "#5CE1E6",
+    signal: "#FFB347",
+    dark: false,
+    density: 1,
+  },
+  R02: {
+    kind: "techSystem",
+    surface: "#07101F",
+    deep: "#040A14",
+    ink: "#8FB2FF",
+    a1: "#4F7CFF",
+    a2: "#7C5CFF",
+    signal: "#5CE1E6",
+    dark: true,
+    density: 1.2,
+  },
+  R03: {
+    kind: "dataField",
+    surface: "#080D1E",
+    deep: "#04060F",
+    ink: "#B9CBFF",
+    a1: "#49A8FF",
+    a2: "#A78BFA",
+    signal: "#E7F0FF",
+    dark: true,
+    density: 1.3,
+  },
+  R04: {
+    kind: "rails",
+    surface: "#0B1030",
+    deep: "#050723",
+    ink: "#C6D4FF",
+    a1: "#3B5BFF",
+    a2: "#28D9D0",
+    signal: "#FF7A5C",
+    dark: true,
+    density: 1.1,
+  },
+  R05: {
+    kind: "ledger",
+    surface: "#0E1420",
+    deep: "#070B12",
+    ink: "#E8DFC8",
+    a1: "#C8A75A",
+    a2: "#8FA6C4",
+    signal: "#F2E3B6",
+    dark: true,
+    density: 0.9,
+  },
+  R06: {
+    kind: "clinical",
+    surface: "#EEF3F7",
+    deep: "#0E2A47",
+    ink: "#123A5C",
+    a1: "#1D63A8",
+    a2: "#2E9E7B",
+    signal: "#0E2A47",
+    dark: false,
+    density: 0.9,
+  },
+  R07: {
+    kind: "techSystem",
+    surface: "#050A0C",
+    deep: "#020506",
+    ink: "#7FE3C6",
+    a1: "#25E6C0",
+    a2: "#3AA0FF",
+    signal: "#FF5C4D",
+    dark: true,
+    density: 1.3,
+  },
+  R08: {
+    kind: "clinical",
+    surface: "#F2F9FA",
+    deep: "#0B3B4A",
+    ink: "#0E4657",
+    a1: "#159FBF",
+    a2: "#4FC9A6",
+    signal: "#0B3B4A",
+    dark: false,
+    density: 0.8,
+  },
+  R09: {
+    kind: "molecular",
+    surface: "#F6F8FC",
+    deep: "#141B3C",
+    ink: "#26305C",
+    a1: "#3ABEC7",
+    a2: "#9B8CFA",
+    signal: "#26305C",
+    dark: false,
+    density: 1.2,
+  },
+  R10: {
+    kind: "civic",
+    surface: "#F6F2EA",
+    deep: "#1B1D22",
+    ink: "#26282E",
+    a1: "#6B1F2E",
+    a2: "#1F3757",
+    signal: "#A88451",
+    dark: false,
+    density: 0.95,
+  },
+  R11: {
+    kind: "architecture",
+    surface: "#FBFCFE",
+    deep: "#0B1B33",
+    ink: "#12233D",
+    a1: "#0B4CE0",
+    a2: "#5A7BB5",
+    signal: "#0B4CE0",
+    dark: false,
+    density: 1.05,
+  },
+  R12: {
+    kind: "isometric",
+    surface: "#EDF1F5",
+    deep: "#16283C",
+    ink: "#1D3category",
+    a1: "#20415F",
+    a2: "#6E8AA6",
+    signal: "#F2A31C",
+    dark: false,
+    density: 1.25,
+  },
+  R13: {
+    kind: "contour",
+    surface: "#08222A",
+    deep: "#04141A",
+    ink: "#9FD9CF",
+    a1: "#12A88C",
+    a2: "#2F7FB8",
+    signal: "#B6F26B",
+    dark: true,
+    density: 1.15,
+  },
+  R14: {
+    kind: "aero",
+    surface: "#0A0C10",
+    deep: "#04050A",
+    ink: "#C3CBD8",
+    a1: "#8B98AC",
+    a2: "#3C7BFF",
+    signal: "#E5372B",
+    dark: true,
+    density: 1,
+  },
+  R15: {
+    kind: "orbital",
+    surface: "#071528",
+    deep: "#030A16",
+    ink: "#BBD3EA",
+    a1: "#3EA6D9",
+    a2: "#7F94AC",
+    signal: "#E9F4FF",
+    dark: true,
+    density: 1.05,
+  },
+  R16: {
+    kind: "techSystem",
+    surface: "#08122E",
+    deep: "#040919",
+    ink: "#BCD0FF",
+    a1: "#2F6BFF",
+    a2: "#38D2E6",
+    signal: "#9B6BFF",
+    dark: true,
+    density: 1.35,
+  },
+  R17: {
+    kind: "rails",
+    surface: "#101823",
+    deep: "#080D14",
+    ink: "#C4CFDC",
+    a1: "#3B6E9E",
+    a2: "#8B9BAD",
+    signal: "#F0A32A",
+    dark: true,
+    density: 1.2,
+  },
+  R18: {
+    kind: "commerce",
+    surface: "#FAF7F2",
+    deep: "#12251E",
+    ink: "#1B3229",
+    a1: "#0F7A57",
+    a2: "#C29B6B",
+    signal: "#E0653F",
+    dark: false,
+    density: 1.1,
+  },
+  R19: {
+    kind: "organic",
+    surface: "#FBF5E9",
+    deep: "#2B3520",
+    ink: "#3A3323",
+    a1: "#6B8F3E",
+    a2: "#E08A2C",
+    signal: "#C2571F",
+    dark: false,
+    density: 1.05,
+  },
+  R20: {
+    kind: "architecture",
+    surface: "#F7F2EC",
+    deep: "#221C18",
+    ink: "#2C241E",
+    a1: "#B08A5C",
+    a2: "#DFC7BA",
+    signal: "#8A6A3E",
+    dark: false,
+    density: 0.75,
+  },
+  R21: {
+    kind: "cinematic",
+    surface: "#08070B",
+    deep: "#030204",
+    ink: "#EDE7F5",
+    a1: "#E1263C",
+    a2: "#8B4CE6",
+    signal: "#FFFFFF",
+    dark: true,
+    density: 1.05,
+  },
+  R22: {
+    kind: "neonGrid",
+    surface: "#0A0721",
+    deep: "#050313",
+    ink: "#CDBBFF",
+    a1: "#25E5F0",
+    a2: "#F0359B",
+    signal: "#8A5CFF",
+    dark: true,
+    density: 1.3,
+  },
+  R23: {
+    kind: "aero",
+    surface: "#0C0C0E",
+    deep: "#050506",
+    ink: "#EDEDED",
+    a1: "#E1252B",
+    a2: "#22C9E6",
+    signal: "#FFFFFF",
+    dark: true,
+    density: 1.25,
+  },
+  R24: {
+    kind: "contour",
+    surface: "#EEF6F5",
+    deep: "#0C3B41",
+    ink: "#12474C",
+    a1: "#2A9A96",
+    a2: "#D9C29A",
+    signal: "#0C3B41",
+    dark: false,
+    density: 0.95,
+  },
+  R25: {
+    kind: "architecture",
+    surface: "#F4F1EC",
+    deep: "#2A2E33",
+    ink: "#33383E",
+    a1: "#7A6A57",
+    a2: "#4E6377",
+    signal: "#B08A5C",
+    dark: false,
+    density: 1.1,
+  },
+  R26: {
+    kind: "molecular",
+    surface: "#F8F4EC",
+    deep: "#152743",
+    ink: "#1E3050",
+    a1: "#0F4FC4",
+    a2: "#8B6BE0",
+    signal: "#E8A020",
+    dark: false,
+    density: 1.05,
+  },
+  R27: {
+    kind: "civic",
+    surface: "#F4F7FB",
+    deep: "#0E2647",
+    ink: "#153458",
+    a1: "#1552A8",
+    a2: "#7C93B4",
+    signal: "#C0A053",
+    dark: false,
+    density: 1,
+  },
+  R28: {
+    kind: "organic",
+    surface: "#F5F1E6",
+    deep: "#1E3327",
+    ink: "#2B3B2E",
+    a1: "#2F6B4A",
+    a2: "#3FA9A0",
+    signal: "#C4643A",
+    dark: false,
+    density: 1.1,
+  },
+  R29: {
+    kind: "rails",
+    surface: "#FBF6F1",
+    deep: "#1B2A44",
+    ink: "#25344C",
+    a1: "#2A63C4",
+    a2: "#9B7FE0",
+    signal: "#EE7A5F",
+    dark: false,
+    density: 1,
+  },
+  R30: {
+    kind: "cinematic",
+    surface: "#08072A",
+    deep: "#03021A",
+    ink: "#DCE4FF",
+    a1: "#3A5CFF",
+    a2: "#25D8E6",
+    signal: "#B98BFF",
+    dark: true,
+    density: 1.2,
+  },
 };
 
 // Guard against a typo'd hex ever reaching the renderer.
@@ -135,7 +435,13 @@ function rng(seedStr: string): () => number {
 
 function a(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
-  const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const f =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const r = parseInt(f.slice(0, 2), 16);
   const g = parseInt(f.slice(2, 4), 16);
   const b = parseInt(f.slice(4, 6), 16);
@@ -189,7 +495,9 @@ function architecture(c: Ctx): string {
   for (let i = 1; i <= 6; i += 1) {
     const t = i / 7;
     const y = vpy + (H - vpy) * Math.pow(t, 2.1);
-    body.push(`<path d="M0 ${y.toFixed(1)} H${W}" stroke="${a(s.ink, 0.09 * k)}" stroke-width="1"/>`);
+    body.push(
+      `<path d="M0 ${y.toFixed(1)} H${W}" stroke="${a(s.ink, 0.09 * k)}" stroke-width="1"/>`,
+    );
   }
   // Glass planes: tall mullioned slabs stepping into depth.
   const planes = Math.round(4 * d);
@@ -275,7 +583,8 @@ function dataField(c: Ctx): string {
     const amp = 44 + Math.sin(t * 3 + c.take) * 26;
     const pts: string[] = [];
     for (let x = 0; x <= W; x += 32) {
-      const y = base + Math.sin((x / W) * Math.PI * (2 + c.take * 0.4) + t * 2.4) * amp * (1 - t * 0.4);
+      const y =
+        base + Math.sin((x / W) * Math.PI * (2 + c.take * 0.4) + t * 2.4) * amp * (1 - t * 0.4);
       pts.push(`${x},${y.toFixed(1)}`);
     }
     body.push(
@@ -555,7 +864,9 @@ function orbital(c: Ctx): string {
   // Schematic tick frame + crosshair markers.
   for (let i = 0; i < Math.round(26 * d); i += 1) {
     const x = 60 + (i / 26) * (W - 120);
-    body.push(`<path d="M${x.toFixed(0)} 80 v${i % 4 === 0 ? 16 : 8}" stroke="${a(s.ink, 0.28 * k)}" stroke-width="1"/>`);
+    body.push(
+      `<path d="M${x.toFixed(0)} 80 v${i % 4 === 0 ? 16 : 8}" stroke="${a(s.ink, 0.28 * k)}" stroke-width="1"/>`,
+    );
   }
   const marks = Math.round(4 * d);
   for (let i = 0; i < marks; i += 1) {
@@ -596,7 +907,9 @@ function commerce(c: Ctx): string {
   // Shelf datum lines.
   for (let y = 1; y < rows; y += 1) {
     const yy = 130 + y * ((H - 220) / rows) - 9;
-    body.push(`<path d="M40 ${yy.toFixed(0)} H${W - 40}" stroke="${a(s.ink, 0.16 * k)}" stroke-width="1"/>`);
+    body.push(
+      `<path d="M40 ${yy.toFixed(0)} H${W - 40}" stroke="${a(s.ink, 0.16 * k)}" stroke-width="1"/>`,
+    );
   }
   return body.join("");
 }
@@ -648,7 +961,9 @@ function neonGrid(c: Ctx): string {
   }
   for (let i = 1; i <= 9; i += 1) {
     const y = hy + (H + 60 - hy) * Math.pow(i / 9, 2.4);
-    body.push(`<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(s.a2, 0.22 * k)}" stroke-width="1"/>`);
+    body.push(
+      `<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(s.a2, 0.22 * k)}" stroke-width="1"/>`,
+    );
   }
   body.push(
     `<path d="M0 ${hy} H${W}" stroke="${a(s.a1, 0.75 * k)}" stroke-width="2.4"/>`,
@@ -680,7 +995,9 @@ function organic(c: Ctx): string {
     for (let ang = 0; ang <= 360; ang += 12) {
       const rad = (ang * Math.PI) / 180;
       const wob = 1 + Math.sin(rad * 3 + i * 0.8 + c.take) * 0.09 + Math.sin(rad * 5) * 0.05;
-      pts.push(`${(cx + Math.cos(rad) * rr * wob).toFixed(1)},${(370 + Math.sin(rad) * rr * 0.72 * wob).toFixed(1)}`);
+      pts.push(
+        `${(cx + Math.cos(rad) * rr * wob).toFixed(1)},${(370 + Math.sin(rad) * rr * 0.72 * wob).toFixed(1)}`,
+      );
     }
     body.push(
       `<polygon points="${pts.join(" ")}" fill="${i === 0 ? a(s.a1, 0.18 * k) : "none"}" stroke="${a(i % 3 === 0 ? s.a2 : s.a1, (0.34 - t * 0.16) * k)}" stroke-width="${i % 3 === 0 ? 1.8 : 1}"/>`,
@@ -809,9 +1126,7 @@ function signalOverlay(c: Ctx): string {
   const { s } = c;
   const body: string[] = [];
   const baseY = H - 92;
-  body.push(
-    `<path d="M72 ${baseY} H${W - 72}" stroke="${a(s.ink, 0.14)}" stroke-width="1"/>`,
-  );
+  body.push(`<path d="M72 ${baseY} H${W - 72}" stroke="${a(s.ink, 0.14)}" stroke-width="1"/>`);
   const mx = c.dir > 0 ? 72 : W - 72;
   for (let i = 0; i < 4; i += 1) {
     const y = baseY - 74 - i * 74;
@@ -865,7 +1180,6 @@ function heroClear(c: Ctx): string {
     height: 0.62,
   });
 }
-
 
 /* ───────────────────────────────────────────────────────────────── assembly */
 
@@ -1003,8 +1317,7 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
   // colour anchored in the metadata's safe band, never an opaque rectangle.
   const anchorY =
     layout.focalBand === "upper" ? H * 0.6 : layout.focalBand === "lower" ? H * 0.34 : H * 0.44;
-  const strength =
-    tier === "hero" ? 0.4 : tier === "content" ? 0.72 : tier === "data" ? 0.8 : 0.5;
+  const strength = tier === "hero" ? 0.4 : tier === "content" ? 0.72 : tier === "data" ? 0.8 : 0.5;
   const field = safeField(c as never, `sf${t}${tier}`, {
     strength,
     coverage: layout.safeCoverage,
@@ -1025,8 +1338,6 @@ function svgFor(code: string, scene: SkinScene, take: number): string | null {
     `</svg>`
   );
 }
-
-
 
 /**
  * ART VERSION — bump whenever a generator, tier alpha or overlay changes.
@@ -1079,7 +1390,6 @@ export function industrySceneLayers(
   return memoSet(cache, key, [layer]);
 }
 
-
 /** True when this code has authored industry scene art. */
 export function hasIndustrySceneArt(code: string | null | undefined): boolean {
   return Boolean(code && INDUSTRY_ART[code.toUpperCase()]);
@@ -1116,7 +1426,6 @@ export function coreSceneLayers(
   ]);
 }
 
-
 /** True when this code has authored scene art (industry recipe or core language). */
 export function hasSceneArt(code: string | null | undefined): boolean {
   if (!code) return false;
@@ -1130,7 +1439,6 @@ export function sceneKindFor(code: string | null | undefined): SceneKind | null 
   const c = code.toUpperCase();
   return INDUSTRY_ART[c]?.kind ?? CORE_SCENE_KIND[c] ?? null;
 }
-
 
 /**
  * APPEARANCE-TONED industry art: the sector's authored scene KIND rendered in a

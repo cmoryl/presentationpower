@@ -40,16 +40,9 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
-import {
-  openBottomMaskStyle,
-  SEAM_HEIGHT_PX,
-} from "@/lib/surface-tokens";
+import { openBottomMaskStyle, SEAM_HEIGHT_PX } from "@/lib/surface-tokens";
 
-import {
-  accentTokens,
-  accentInk,
-  hexA as accentHexA,
-} from "@/lib/accent-tokens";
+import { accentTokens, accentInk, hexA as accentHexA } from "@/lib/accent-tokens";
 
 export const EDITORIAL_SERIF =
   '"Geist Variable","Geist","Inter","SF Pro Display",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif';
@@ -785,7 +778,6 @@ export function GlassTile({
     clipPath: "var(--pack-card-clip, none)" as const,
   });
 
-
   // Enterprise dark pages fall through to the dark card treatment below — the
   // light gradient panel is invisible on the navy floor.
   if (enterprise && mode !== "dark") {
@@ -805,7 +797,6 @@ export function GlassTile({
             background: accentTokens(ea, "light").seam,
           }}
         />
-
 
         {children}
       </div>
@@ -842,7 +833,9 @@ export function GlassTile({
   const fillAlpha = Math.min(0.7, 0.22 * intensity);
   const ringAlpha = Math.min(0.4, 0.16 * intensity);
   const bg = `rgba(10, 8, 48, ${fillAlpha})`;
-  const ring = a ? accentTokens(a, "dark", { emphasis: 1.07 }).ring : `rgba(255, 255, 255, ${ringAlpha})`;
+  const ring = a
+    ? accentTokens(a, "dark", { emphasis: 1.07 }).ring
+    : `rgba(255, 255, 255, ${ringAlpha})`;
   const highlight = "inset 0 1px 0 0 rgba(255,255,255,0.08)";
   const accentGlow = a ? `, ${accentTokens(a, "dark").glow}` : "";
   return (
@@ -872,8 +865,6 @@ export function GlassTile({
       {children}
     </div>
   );
-
-
 }
 
 // ── moduleCardTint / AccentTick ───────────────────────────────────────────
@@ -893,7 +884,6 @@ export function moduleCardTint(
   // card surface — one look for every module card.
   return moduleCardSurface(accentHex, mode, opts);
 }
-
 
 /**
  * Canonical module-card surface — the same look GlassTile produces, exposed as
@@ -938,8 +928,6 @@ export function moduleCardSurface(
     overflow: "hidden",
   };
 }
-
-
 
 /** Full-width accent seam along the top edge of a module card. */
 export function AccentTick({

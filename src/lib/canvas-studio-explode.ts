@@ -36,7 +36,10 @@ function hexFrom(color: string): string | undefined {
   const parts = m[1].split(",").map((v) => Number.parseFloat(v.trim()));
   const [r, g, b, a] = parts;
   if (a !== undefined && a < 0.04) return undefined;
-  const hex = (n: number) => Math.max(0, Math.min(255, Math.round(n || 0))).toString(16).padStart(2, "0");
+  const hex = (n: number) =>
+    Math.max(0, Math.min(255, Math.round(n || 0)))
+      .toString(16)
+      .padStart(2, "0");
   return `#${hex(r)}${hex(g)}${hex(b)}`;
 }
 
@@ -211,7 +214,8 @@ export function explodeModuleRender(
       const raw = (el.textContent ?? "").trim();
       if (!raw) continue;
       const upper = cs.textTransform === "uppercase";
-      const align = cs.textAlign === "center" ? "center" : cs.textAlign === "right" ? "right" : "left";
+      const align =
+        cs.textAlign === "center" ? "center" : cs.textAlign === "right" ? "right" : "left";
       // The DOM box hugs the glyphs exactly. PowerPoint measures the same string
       // with its own font metrics plus text-box inset, so a pixel-tight box wraps
       // the last word onto a new line. Give single-line runs a little slack.
@@ -260,7 +264,10 @@ export function explodeModuleRender(
         ? Number(
             Math.max(
               0.02,
-              Math.min(1, paint.opacity * (Number.isFinite(Number(cs.opacity)) ? Number(cs.opacity) : 1)),
+              Math.min(
+                1,
+                paint.opacity * (Number.isFinite(Number(cs.opacity)) ? Number(cs.opacity) : 1),
+              ),
             ).toFixed(2),
           )
         : 0,

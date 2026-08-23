@@ -65,7 +65,8 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
   {
     slug: "candivore-match-masters-player-support",
     title: "Scaling Player Support for Match Masters",
-    teaser: "Multilingual support in 10+ languages, millions of tickets, and a 90%+ quality threshold.",
+    teaser:
+      "Multilingual support in 10+ languages, millions of tickets, and a 90%+ quality threshold.",
     collection: C_SUPPORT,
     tags: ["player support", "multilingual", "QA", "mobile"],
     sourceFile: "TPGames_CaseStudy_MatchMasters.pdf",
@@ -90,7 +91,12 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
       },
       stats: [
         { label: "Support languages", value: "10+", caption: "Delivered by native speakers" },
-        { label: "Quality control threshold", value: "90", unit: "%+", caption: "Sustained across tickets" },
+        {
+          label: "Quality control threshold",
+          value: "90",
+          unit: "%+",
+          caption: "Sustained across tickets",
+        },
         { label: "Player tickets handled", value: "Millions", caption: "Across the player base" },
         { label: "Staffing model", value: "Flexible", caption: "Rapid scale up and down" },
       ],
@@ -136,7 +142,12 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
       },
       stats: [
         { label: "Custom 2D assets", value: "20", caption: "Across two in-game scenes" },
-        { label: "Production cycle", value: "20", unit: " days", caption: "Artist plus art director" },
+        {
+          label: "Production cycle",
+          value: "20",
+          unit: " days",
+          caption: "Artist plus art director",
+        },
         { label: "Delivered on budget", value: "100", unit: "%", caption: "Within client budget" },
       ],
       engagement: {
@@ -180,9 +191,19 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
         body: "Ongoing data reviews and analysis continually improved the client's social strategy, expanding content formats and diversifying community activities. Followers, impressions, and sign-ups all climbed sharply month over month.",
       },
       stats: [
-        { label: "Increase in Facebook followers", value: "450", unit: "%", caption: "Every month" },
+        {
+          label: "Increase in Facebook followers",
+          value: "450",
+          unit: "%",
+          caption: "Every month",
+        },
         { label: "More sign-ups for the game", value: "3x", caption: "Within two months" },
-        { label: "Increase in Facebook impressions", value: "275", unit: "%", caption: "Every month" },
+        {
+          label: "Increase in Facebook impressions",
+          value: "275",
+          unit: "%",
+          caption: "Every month",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -201,7 +222,8 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
   {
     slug: "inxile-wasteland-3-localization",
     title: "Expanding the Wasteland Universe",
-    teaser: "Simultaneous multilingual worldwide release for Wasteland 3 — and Frostpoint VR three days later.",
+    teaser:
+      "Simultaneous multilingual worldwide release for Wasteland 3 — and Frostpoint VR three days later.",
     collection: C_LOC,
     tags: ["localization", "RPG", "LQA", "simship"],
     sourceFile: "TPGames_CaseStudy_InXileEntertainment.pdf",
@@ -278,7 +300,12 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
       stats: [
         { label: "Markets evaluated", value: "2", caption: "Korea and Japan" },
         { label: "Professional experts", value: "6", caption: "Three per market" },
-        { label: "Gameplay per build", value: "30", unit: " min", caption: "Both localized versions" },
+        {
+          label: "Gameplay per build",
+          value: "30",
+          unit: " min",
+          caption: "Both localized versions",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -297,7 +324,8 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
   {
     slug: "nanobit-player-support-social",
     title: "24/7 Player Support for Nanobit",
-    teaser: "A multilingual support and social media task force stood up in weeks for Tabou Stories.",
+    teaser:
+      "A multilingual support and social media task force stood up in weeks for Tabou Stories.",
     collection: C_SUPPORT,
     tags: ["player support", "community management", "social", "mobile"],
     sourceFile: "TPGames_CaseStudy_Nanobit.pdf",
@@ -380,7 +408,11 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
       stats: [
         { label: "Languages delivered", value: "6", caption: "FR, DE, ES, IT, RU, PT-BR" },
         { label: "Partnership since", value: "2015", caption: "Growing year over year" },
-        { label: "Flagship titles supported", value: "6+", caption: "Including Marvel Future Fight" },
+        {
+          label: "Flagship titles supported",
+          value: "6+",
+          caption: "Including Marvel Future Fight",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -429,7 +461,11 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
         company: "Nimble Giant Entertainment",
       },
       stats: [
-        { label: "Community platform built", value: "Discord", caption: "Self-sustaining to this day" },
+        {
+          label: "Community platform built",
+          value: "Discord",
+          caption: "Self-sustaining to this day",
+        },
         { label: "Setup time", value: "Rapid", caption: "Live ahead of launch" },
         { label: "Partnership start", value: "2020", caption: "Quantum League launch" },
       ],
@@ -496,7 +532,8 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
   {
     slug: "outright-games-discord-community",
     title: "A Secure Community Hub for Outright Games",
-    teaser: "A custom Discord platform for 28 studio games across 25 countries — 150% follower growth.",
+    teaser:
+      "A custom Discord platform for 28 studio games across 25 countries — 150% follower growth.",
     collection: C_SUPPORT,
     tags: ["community management", "Discord", "family games", "ambassadors"],
     sourceFile: "TPGames_CaseStudy_OutrightGames.pdf",
@@ -541,7 +578,8 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
   {
     slug: "paid-social-two-game-launch",
     title: "Using Paid Social to Promote Two New Games",
-    teaser: "Localized paid campaigns across seven key markets on Facebook, Instagram, and Twitter.",
+    teaser:
+      "Localized paid campaigns across seven key markets on Facebook, Instagram, and Twitter.",
     collection: C_MARKETING,
     tags: ["paid social", "campaign management", "creative", "multi-market"],
     sourceFile: "TPGames_CaseStudy_PaidSocial.pdf",
@@ -565,9 +603,19 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
         body: "Alongside paid delivery, we provided community management — responding quickly to the audience, increasing engagement, and encouraging conversation. Follower growth, sign-ups, and impressions all rose sharply.",
       },
       stats: [
-        { label: "Increase in Facebook followers", value: "450", unit: "%", caption: "Every month" },
+        {
+          label: "Increase in Facebook followers",
+          value: "450",
+          unit: "%",
+          caption: "Every month",
+        },
         { label: "More sign-ups for the game", value: "3x", caption: "Within two months" },
-        { label: "Increase in Facebook impressions", value: "275", unit: "%", caption: "Every month" },
+        {
+          label: "Increase in Facebook impressions",
+          value: "275",
+          unit: "%",
+          caption: "Every month",
+        },
         { label: "Key markets", value: "7", caption: "US, UK, DE, FR, ES, IT, BR" },
       ],
       engagement: {
@@ -587,7 +635,8 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
   {
     slug: "player-insights-localized-research",
     title: "Driving Launch Decisions Through Localized Player Insights",
-    teaser: "Twenty players across Korea and Japan, recorded gameplay, and native-language interviews.",
+    teaser:
+      "Twenty players across Korea and Japan, recorded gameplay, and native-language interviews.",
     collection: C_RESEARCH,
     tags: ["user research", "FTUE", "Korea", "Japan", "playtesting"],
     sourceFile: "TPGames_CaseStudy_PlayerInsights.pdf",
@@ -613,7 +662,12 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
       stats: [
         { label: "Participants", value: "20", caption: "Ten per market" },
         { label: "Markets", value: "2", caption: "Korea and Japan" },
-        { label: "Recorded gameplay per player", value: "30", unit: " min", caption: "Screen capture" },
+        {
+          label: "Recorded gameplay per player",
+          value: "30",
+          unit: " min",
+          caption: "Screen capture",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -748,7 +802,11 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
         body: "The client received three social listening reports identifying over 5,000 pieces of critical differences, data insights, and key recommendations covering localization, bugs, game assets, new features, NPCs, and more. The reports surfaced more than 10 key opportunities, enabling ongoing support such as reputation management and social media strategy to improve brand perception.",
       },
       stats: [
-        { label: "Pieces of qualified data collected", value: "5,000", caption: "Manually reviewed" },
+        {
+          label: "Pieces of qualified data collected",
+          value: "5,000",
+          caption: "Manually reviewed",
+        },
         { label: "Social listening reports generated", value: "3", caption: "EN, DE, ZH" },
         { label: "Key opportunities identified", value: "10+", caption: "Product + content" },
       ],
@@ -969,7 +1027,8 @@ export const GAMES_CASE_STUDIES: GamesCaseStudySeed[] = [
   {
     slug: "xbox-power-on-accessibility",
     title: "Accessible Global Storytelling for Xbox",
-    teaser: "Captioning, subtitling, and audio description in 30+ languages for Power On: The Story of Xbox.",
+    teaser:
+      "Captioning, subtitling, and audio description in 30+ languages for Power On: The Story of Xbox.",
     collection: C_PORTING,
     tags: ["accessibility", "subtitling", "audio description", "docuseries"],
     sourceFile: "TPGames_CaseStudy_Xbox.pdf",

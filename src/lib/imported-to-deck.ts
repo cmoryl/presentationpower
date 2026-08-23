@@ -20,8 +20,6 @@ import { extractImportedBackdrop } from "./imported-backdrop";
 import { rehydrateStoredGraphics, type StoredSlideAssets } from "./imported-graphics";
 import type { ParsedSlide } from "./pptx-import";
 
-
-
 export type StoredImportedSlide = {
   index: number;
   title: string;
@@ -174,8 +172,6 @@ export function mapStoredImportedDeck(
   const designed = !opts.reinterpret || opts.noDesign ? mapped : designReinterpretedDeck(mapped);
   return applyVisualOverrides(designed, opts.visualOverrides);
 }
-
-
 
 /** Approved AI visual conversions win over anything the mapper chose. */
 export function applyVisualOverrides(

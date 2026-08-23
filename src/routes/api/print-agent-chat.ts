@@ -24,7 +24,8 @@ export const Route = createFileRoute("/api/print-agent-chat")({
         const publishableKey =
           process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
         const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!supabaseUrl || !publishableKey) return new Response("Backend not configured", { status: 500 });
+        if (!supabaseUrl || !publishableKey)
+          return new Response("Backend not configured", { status: 500 });
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
         const supabase = createClient(supabaseUrl, publishableKey, {
@@ -96,7 +97,8 @@ export const Route = createFileRoute("/api/print-agent-chat")({
               role: "assistant",
               parts: responseMessage.parts as never,
             } as never);
-            if (error) console.error("print agent_messages insert (assistant) failed:", error.message);
+            if (error)
+              console.error("print agent_messages insert (assistant) failed:", error.message);
             await supabase
               .from("agent_threads")
               .update({ updated_at: new Date().toISOString() } as never)

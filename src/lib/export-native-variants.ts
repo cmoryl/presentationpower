@@ -182,7 +182,6 @@ export function hasNativeVariantEmitter(variantId: string | undefined | null): b
   return NATIVE_SET.has(variantId);
 }
 
-
 /**
  * True when the variant can only look right as a design-exact graphic plate
  * (plate + native measured text + decomposed native shapes).

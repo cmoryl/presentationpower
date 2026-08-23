@@ -18,7 +18,16 @@ const searchSchema = z.object({
   prospect: z.string().optional(),
   industry: z.string().optional(),
   brandModeId: z.string().optional(),
-  kind: z.enum(["case-study", "spotlight", "ebrochure", "adaptor-brief", "msa-partnership", "solution-proposal"]).optional(),
+  kind: z
+    .enum([
+      "case-study",
+      "spotlight",
+      "ebrochure",
+      "adaptor-brief",
+      "msa-partnership",
+      "solution-proposal",
+    ])
+    .optional(),
 });
 
 export const Route = createFileRoute("/asset/new")({
@@ -48,7 +57,13 @@ export const Route = createFileRoute("/asset/new")({
 });
 
 const KINDS: Array<{
-  id: "case-study" | "spotlight" | "ebrochure" | "adaptor-brief" | "msa-partnership" | "solution-proposal";
+  id:
+    | "case-study"
+    | "spotlight"
+    | "ebrochure"
+    | "adaptor-brief"
+    | "msa-partnership"
+    | "solution-proposal";
   label: string;
   desc: string;
   live: boolean;
@@ -97,9 +112,14 @@ function NewAssetPage() {
   const { brandModes } = useTaxonomy();
   const create = useServerFn(createPrintAssetWithBrief);
 
-  const [kind, setKind] = useState<"case-study" | "spotlight" | "ebrochure" | "adaptor-brief" | "msa-partnership" | "solution-proposal">(
-    search.kind ?? "case-study",
-  );
+  const [kind, setKind] = useState<
+    | "case-study"
+    | "spotlight"
+    | "ebrochure"
+    | "adaptor-brief"
+    | "msa-partnership"
+    | "solution-proposal"
+  >(search.kind ?? "case-study");
   const [title, setTitle] = useState(search.prospect ? `${search.prospect} — Case Study` : "");
   const [brandModeId, setBrandModeId] = useState(
     search.brandModeId ??

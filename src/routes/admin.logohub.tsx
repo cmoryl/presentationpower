@@ -15,6 +15,24 @@ import {
 } from "@/lib/client-logos.functions";
 
 export const Route = createFileRoute("/admin/logohub")({
+  head: () => ({
+    meta: [
+      { title: "LogoHub admin · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Upload, tag and version every TransPerfect division and client logo used across Element assets.",
+      },
+      { property: "og:title", content: "LogoHub admin · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Upload, tag and version every TransPerfect division and client logo used across Element assets.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: LogoHubAdmin,
 });
 

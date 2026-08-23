@@ -30,16 +30,11 @@ export type DataForceEbrochureSeed = {
 
 const CTA = {
   label: "Talk to DataForce",
-  subhead:
-    "All data is unique — dataforce@transperfect.com",
+  subhead: "All data is unique — dataforce@transperfect.com",
   url: "https://dataforce.ai",
 };
 
-const hero = (
-  url: string,
-  heightPct = 42,
-  focalY = 50,
-): EBrochureContent["heroMedia"] => ({
+const hero = (url: string, heightPct = 42, focalY = 50): EBrochureContent["heroMedia"] => ({
   imageUrl: url,
   aspect: "fill",
   heightPct,
@@ -92,7 +87,12 @@ export const DATAFORCE_EBROCHURES: DataForceEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Collaborator network", value: "1M", unit: "+", caption: "Global contributor community" },
+        {
+          label: "Collaborator network",
+          value: "1M",
+          unit: "+",
+          caption: "Global contributor community",
+        },
         { label: "Languages covered", value: "250", caption: "Across every service line" },
         { label: "Cities worldwide", value: "140", unit: "+", caption: "In 46 countries" },
         { label: "Enterprise trust", value: "Fortune 100", caption: "Trusted by top companies" },
@@ -160,7 +160,12 @@ export const DATAFORCE_EBROCHURES: DataForceEbrochureSeed[] = [
       stats: [
         { label: "Contributor community", value: "1.3M", caption: "Global, vetted collaborators" },
         { label: "Cities with offices", value: "120", unit: "+", caption: "Across 46 countries" },
-        { label: "Languages covered", value: "250", unit: "+", caption: "Collection and annotation" },
+        {
+          label: "Languages covered",
+          value: "250",
+          unit: "+",
+          caption: "Collection and annotation",
+        },
         { label: "Study formats", value: "6", caption: "Moderated to fully remote" },
       ],
       discover: {
@@ -223,7 +228,12 @@ export const DATAFORCE_EBROCHURES: DataForceEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Human labeling time removed", value: "80", unit: "%", caption: "Via automation and post-processing" },
+        {
+          label: "Human labeling time removed",
+          value: "80",
+          unit: "%",
+          caption: "Via automation and post-processing",
+        },
         { label: "Collection community", value: "1.3M", caption: "Managed global contributors" },
         { label: "Annotation modalities", value: "3D", caption: "Point cloud, image, and video" },
         { label: "Verification layers", value: "3", caption: "Analysis, geo-location, IP" },

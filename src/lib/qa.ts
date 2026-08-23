@@ -7,7 +7,6 @@ import { MODULE_VARIANTS, byId, type ModuleVariant } from "./taxonomy";
 import { BRAND_PROFILES, resolveBrandMode } from "./brand-profiles";
 import { hexContrast, resolveSlideAccent, slideBackgroundForMode } from "./slide-accent";
 
-
 export type QaSeverity = "block" | "warn";
 export type QaIssue = {
   slideId: string;
@@ -232,7 +231,6 @@ export function expandPath(pattern: string, content: Record<string, unknown>): s
   // of leaving a literal "[]" segment that never resolves.
   return arrVal.flatMap((_, i) => expandPath(`${arrKey}[${i}]${tail}`, content));
 }
-
 
 export function readPath(obj: unknown, path: string): unknown {
   const parts = path.split(".").flatMap((p) => {

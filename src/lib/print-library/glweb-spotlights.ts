@@ -32,7 +32,10 @@ export type GlWebSpotlightSeed = {
   content: SpotlightContent;
 };
 
-const CTA = { label: "Talk to GlobalLink Web", url: "https://globallink.transperfect.com/products/globallink-web" };
+const CTA = {
+  label: "Talk to GlobalLink Web",
+  url: "https://globallink.transperfect.com/products/globallink-web",
+};
 
 const EXPERT = {
   name: "GlobalLink Web",
@@ -74,8 +77,17 @@ export const GLWEB_SPOTLIGHTS: GlWebSpotlightSeed[] = [
         },
       ],
       stats: [
-        { label: "Sales from global markets", value: "30", unit: "%+", caption: "Since multilingual launch" },
-        { label: "In-house resources needed", value: "0", caption: "Fully managed by GlobalLink Web" },
+        {
+          label: "Sales from global markets",
+          value: "30",
+          unit: "%+",
+          caption: "Since multilingual launch",
+        },
+        {
+          label: "In-house resources needed",
+          value: "0",
+          caption: "Fully managed by GlobalLink Web",
+        },
         { label: "Customer engagement", value: "Remarkable growth", caption: "Post-localization" },
       ],
       quote: {
@@ -237,7 +249,13 @@ export const GLWEB_SPOTLIGHTS: GlWebSpotlightSeed[] = [
     teaser:
       "Five new market sites integrated with Adobe Experience Manager — and a 300% increase in user traffic from those markets.",
     collection: GLWEB_COLLECTION,
-    tags: ["globallink web", "website localization", "travel", "aviation", "adobe experience manager"],
+    tags: [
+      "globallink web",
+      "website localization",
+      "travel",
+      "aviation",
+      "adobe experience manager",
+    ],
     sourceFile: "TPT_Travel_Spotlight_Heathrow.pdf",
     content: {
       eyebrow: "Client spotlight",
@@ -264,10 +282,19 @@ export const GLWEB_SPOTLIGHTS: GlWebSpotlightSeed[] = [
         },
       ],
       stats: [
-        { label: "Increase in user traffic", value: "300", unit: "%", caption: "From the new markets" },
+        {
+          label: "Increase in user traffic",
+          value: "300",
+          unit: "%",
+          caption: "From the new markets",
+        },
         { label: "Markets launched", value: "5", caption: "ES, DE, IT, SV, ZH-Hans" },
         { label: "Bounce & exit rates", value: "Down", caption: "Significant reduction" },
-        { label: "Upfront investment", value: "Lower", caption: "Budget optimized by workflow tiering" },
+        {
+          label: "Upfront investment",
+          value: "Lower",
+          caption: "Budget optimized by workflow tiering",
+        },
       ],
       quote: {
         text: "TransPerfect's analytical approach was able to align our budget and goals while delivering the most languages to support our growing international audience. Their partnership with Adobe and collaboration with Sapient, our system integration agency, meant the project was a huge success.",

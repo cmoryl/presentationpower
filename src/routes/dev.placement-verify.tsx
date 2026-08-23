@@ -177,43 +177,41 @@ async function verifySlide(
         )
       : null;
 
-    const out = await withExactStage(
-      { slide, variant, brand, mode, pack },
-      async (stage) => {
-        const before = capturePlacement(stage, {
-          designWidth: STAGE_W,
-          designHeight: STAGE_H,
-        });
+    const out = await withExactStage({ slide, variant, brand, mode, pack }, async (stage) => {
+      const before = capturePlacement(stage, {
+        designWidth: STAGE_W,
+        designHeight: STAGE_H,
+      });
 
-        // Play the real cascade over the real tree.
-        const { applyIntroForVerification } = await import("@/components/slide/SlideIntro");
-        const cleanup = applyIntroForVerification(stage, variant.id);
-        await wait(SETTLE_MS);
-        await frames(2);
-        const settled = capturePlacement(stage, {
-          designWidth: STAGE_W,
-          designHeight: STAGE_H,
-        });
-        cleanup();
-        await frames(2);
-        const restored = capturePlacement(stage, {
-          designWidth: STAGE_W,
-          designHeight: STAGE_H,
-        });
-        // Rasterise last: this mutates the tree, so nothing may be measured after.
-        const rasterAfter = withRaster ? await rasterDigestOf(stage, mode) : null;
-        return { before, settled, restored, rasterBefore, rasterAfter };
-      },
-    );
+      // Play the real cascade over the real tree.
+      const { applyIntroForVerification } = await import("@/components/slide/SlideIntro");
+      const cleanup = applyIntroForVerification(stage, variant.id);
+      await wait(SETTLE_MS);
+      await frames(2);
+      const settled = capturePlacement(stage, {
+        designWidth: STAGE_W,
+        designHeight: STAGE_H,
+      });
+      cleanup();
+      await frames(2);
+      const restored = capturePlacement(stage, {
+        designWidth: STAGE_W,
+        designHeight: STAGE_H,
+      });
+      // Rasterise last: this mutates the tree, so nothing may be measured after.
+      const rasterAfter = withRaster ? await rasterDigestOf(stage, mode) : null;
+      return { before, settled, restored, rasterBefore, rasterAfter };
+    });
     if (!out) return { ...base, problems: ["stage failed to mount"] };
-
 
     const problems: string[] = [];
     if (out.before.entries.length === 0) problems.push("nothing measurable on stage");
     const settleDrift = diffPlacement(out.before.entries, out.settled.entries);
     const restoreDrift = diffPlacement(out.before.entries, out.restored.entries);
-    if (settleDrift.length) problems.push(`${settleDrift.length} elements moved after the intro settled`);
-    if (restoreDrift.length) problems.push(`${restoreDrift.length} elements moved after intro cleanup`);
+    if (settleDrift.length)
+      problems.push(`${settleDrift.length} elements moved after the intro settled`);
+    if (restoreDrift.length)
+      problems.push(`${restoreDrift.length} elements moved after intro cleanup`);
     // Raster bytes are advisory only: PNG encoding of gradients/photos varies by
     // decode timing, so pixel inequality is reported but placement (measured at
     // zero tolerance above) is what gates the build.
@@ -221,7 +219,6 @@ async function verifySlide(
       withRaster && out.rasterBefore && out.rasterAfter && out.rasterBefore !== out.rasterAfter
         ? ["raster bytes differ across the intro (advisory; placement is identical)"]
         : [];
-
 
     return {
       ...base,
@@ -322,7 +319,6 @@ async function renderPrintPage(
       await frames(3);
     }
     return stable;
-
   } catch {
     return null;
   } finally {
@@ -424,10 +420,10 @@ function PlacementVerifyHarness() {
     <main className="mx-auto max-w-2xl p-10 font-sans">
       <h1 className="text-2xl font-semibold tracking-tight">Placement verification harness</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        {ready ? "Ready" : "Loading"} · {MODULE_VARIANTS.length} modules ·{" "}
-        {PRINT_KINDS.length} print layouts. Fingerprints geometry before, after and
-        post-cleanup of the intro cascade, then compares rasters byte-for-byte.
-        Driven headlessly via <code>window.__tpPlacementVerify.run()</code>.
+        {ready ? "Ready" : "Loading"} · {MODULE_VARIANTS.length} modules · {PRINT_KINDS.length}{" "}
+        print layouts. Fingerprints geometry before, after and post-cleanup of the intro cascade,
+        then compares rasters byte-for-byte. Driven headlessly via{" "}
+        <code>window.__tpPlacementVerify.run()</code>.
       </p>
     </main>
   );

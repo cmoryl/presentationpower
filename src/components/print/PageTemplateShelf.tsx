@@ -115,7 +115,7 @@ export function PageTemplateCard({
       toast.error(e instanceof Error ? e.message : "Could not change visibility"),
   });
 
-  async function useTemplate() {
+  async function applyTemplate() {
     if (busy) return;
     setBusy(true);
     try {
@@ -168,7 +168,7 @@ export function PageTemplateCard({
         <div className="flex shrink-0 flex-col items-end gap-1.5">
           <button
             type="button"
-            onClick={() => void useTemplate()}
+            onClick={() => void applyTemplate()}
             disabled={busy}
             className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#003FC7]/85 disabled:opacity-60"
           >

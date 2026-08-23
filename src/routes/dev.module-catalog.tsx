@@ -181,9 +181,10 @@ function buildDeck(mode: Mode, ids: string[] | null) {
     if (!rows.length) continue;
     for (let i = 0; i < rows.length; i += INDEX_PER_SLIDE) {
       const chunk = rows.slice(i, i + INDEX_PER_SLIDE);
-      const part = rows.length > INDEX_PER_SLIDE
-        ? ` (${Math.floor(i / INDEX_PER_SLIDE) + 1}/${Math.ceil(rows.length / INDEX_PER_SLIDE)})`
-        : "";
+      const part =
+        rows.length > INDEX_PER_SLIDE
+          ? ` (${Math.floor(i / INDEX_PER_SLIDE) + 1}/${Math.ceil(rows.length / INDEX_PER_SLIDE)})`
+          : "";
       push(
         "MV-OP-AGENDA-VERTICAL",
         "LF-13",
@@ -199,7 +200,8 @@ function buildDeck(mode: Mode, ids: string[] | null) {
           `INDEX — ${family.name.toUpperCase()}${part}`,
           "",
           ...chunk.map(
-            (r) => `${String(r.n).padStart(3, "0")} · ${r.v.name} (${r.v.id}) — ${r.v.description}.`,
+            (r) =>
+              `${String(r.n).padStart(3, "0")} · ${r.v.name} (${r.v.id}) — ${r.v.description}.`,
           ),
           "",
           "Module numbers here match the slide order later in this deck, so an index entry can be found by counting from the first module slide.",

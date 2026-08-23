@@ -123,7 +123,8 @@ export const DEFAULT_AVAILABLE_FONTS = [
   "+mj-lt",
 ];
 
-const SAFE_MEDIA_MIME = /^(video\/mp4|audio\/mpeg|audio\/mp4|audio\/wav|audio\/x-wav|video\/quicktime)$/i;
+const SAFE_MEDIA_MIME =
+  /^(video\/mp4|audio\/mpeg|audio\/mp4|audio\/wav|audio\/x-wav|video\/quicktime)$/i;
 const STANDARD_SIZE = { w: 13.333, h: 7.5 };
 
 export type DiagnoseOptions = {
@@ -155,8 +156,7 @@ function estimateTextHeightIn(shape: Extract<LayoutShape, { kind: "text" }>): nu
     // ~0.5em average advance width is a close enough proxy for wrap counting.
     const charsPerLine = Math.max(4, Math.floor(usableW / ((sizePt * 0.5) / 72)));
     const lines = Math.max(1, Math.ceil(text.length / charsPerLine));
-    const mult =
-      para.lineSpacing && "mult" in para.lineSpacing ? para.lineSpacing.mult : 1.2;
+    const mult = para.lineSpacing && "mult" in para.lineSpacing ? para.lineSpacing.mult : 1.2;
     total += lines * lineHeightIn(sizePt, mult);
     total += (para.spcBeforePt ?? 0) / 72 + (para.spcAfterPt ?? 0) / 72;
   }
@@ -182,7 +182,10 @@ function collectFonts(slide: ParsedSlide): string[] {
  * Pure and synchronous so it runs on the server during ingest and again in the
  * browser when a slide is re-analysed after repairs.
  */
-export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions = {}): CompatReport {
+export function diagnoseImportedDeck(
+  deck: ParsedDeck,
+  options: DiagnoseOptions = {},
+): CompatReport {
   const available = new Set(
     (options.availableFonts ?? DEFAULT_AVAILABLE_FONTS).map((f) => f.toLowerCase()),
   );
@@ -202,8 +205,10 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
   for (const risk of options.packageValidation?.risks ?? []) {
     push({
       code: `package-${risk.code}`,
-      severity: risk.severity === "blocker" ? "blocker" : risk.severity === "warning" ? "medium" : "info",
-      category: risk.code === "macros-present" || risk.code === "ole-embed-present" ? "media" : "integrity",
+      severity:
+        risk.severity === "blocker" ? "blocker" : risk.severity === "warning" ? "medium" : "info",
+      category:
+        risk.code === "macros-present" || risk.code === "ole-embed-present" ? "media" : "integrity",
       title:
         risk.code === "macros-present"
           ? "Macros present (not executed)"
@@ -219,7 +224,10 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
 
   // ---- Deck level ---------------------------------------------------------
   const firstSize = deck.slides[0]?.layout?.size;
-  if (firstSize && (Math.abs(firstSize.w - target.w) > 0.05 || Math.abs(firstSize.h - target.h) > 0.05)) {
+  if (
+    firstSize &&
+    (Math.abs(firstSize.w - target.w) > 0.05 || Math.abs(firstSize.h - target.h) > 0.05)
+  ) {
     push({
       code: "slide-size-mismatch",
       severity: "high",
@@ -238,7 +246,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
       severity: "high",
       category: "masters",
       title: "No slide master recovered",
-      detail: "The package declares no readable slide master, so inherited backgrounds and placeholder geometry are unavailable.",
+      detail:
+        "The package declares no readable slide master, so inherited backgrounds and placeholder geometry are unavailable.",
       slideIndex: null,
       fix: "manual",
     });
@@ -292,7 +301,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
       severity: "high",
       category: "imagery",
       title: "Some images exceeded the import budget",
-      detail: "The original file keeps every asset untouched, but some large images were not inlined for editing. Re-import a slimmer file, or relink those images.",
+      detail:
+        "The original file keeps every asset untouched, but some large images were not inlined for editing. Re-import a slimmer file, or relink those images.",
       slideIndex: null,
       fix: "manual",
     });
@@ -339,7 +349,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
         severity: "low",
         category: "media",
         title: "Animations are not carried over",
-        detail: "This slide declares an animation timeline. Build order and effects are not reconstructed; the end state is what you see.",
+        detail:
+          "This slide declares an animation timeline. Build order and effects are not reconstructed; the end state is what you see.",
         slideIndex,
         fix: "manual",
       });
@@ -377,7 +388,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
           severity: "medium",
           category: "media",
           title: "Embedded object kept as a visual fallback",
-          detail: "OLE embeds cannot be edited here. The appearance and the original data are both preserved, and you can rebuild it as editable objects.",
+          detail:
+            "OLE embeds cannot be edited here. The appearance and the original data are both preserved, and you can rebuild it as editable objects.",
           slideIndex,
           elementRef: media.path,
           fix: "manual",
@@ -411,7 +423,11 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
           fix: "safe",
           fixLabel: "Remove the empty hyperlink",
         });
-      } else if (link.external && !isExternalRelationshipTarget(link.target) && !/^mailto:/i.test(link.target)) {
+      } else if (
+        link.external &&
+        !isExternalRelationshipTarget(link.target) &&
+        !/^mailto:/i.test(link.target)
+      ) {
         push({
           code: "broken-link",
           severity: "medium",
@@ -449,7 +465,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
     shapes.forEach((shape, shapeIndex) => {
       const name = shapeName(layers, shapeIndex, shape);
       const ref = { slideIndex, elementRef: name, shapeIndex };
-      const editable = shape.kind !== "diagram" || !("fallbackReason" in shape && shape.fallbackReason);
+      const editable =
+        shape.kind !== "diagram" || !("fallbackReason" in shape && shape.fallbackReason);
       if (editable) editableObjects += 1;
       else fallbackObjects += 1;
 
@@ -541,8 +558,7 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
               code: "low-contrast",
               severity: ratio < 3 ? "high" : "medium",
               category: "accessibility",
-              title: `Text contrast ${ratio.toFixed(2)}:1`
-                ,
+              title: `Text contrast ${ratio.toFixed(2)}:1`,
               detail: `"${name}" falls below the 4.5:1 minimum for body text against its background.`,
               fix: "review",
               fixLabel: "Apply a readable brand colour pair",
@@ -641,7 +657,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
         severity: "high",
         category: "imagery",
         title: "Slide is a flattened image",
-        detail: "The whole slide arrived as one picture with no live text, so nothing on it is editable yet. Convert to an OnDeck module to rebuild it as real objects.",
+        detail:
+          "The whole slide arrived as one picture with no live text, so nothing on it is editable yet. Convert to an OnDeck module to rebuild it as real objects.",
         slideIndex,
         fix: "manual",
       });
@@ -649,7 +666,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
 
     // Accessibility: alt text + reading order.
     (layers ?? []).forEach((layer: ImportLayerDescriptor, i: number) => {
-      const needsAlt = layer.node === "pic" || layer.role === "Chart / SmartArt" || layer.role === "Table";
+      const needsAlt =
+        layer.node === "pic" || layer.role === "Chart / SmartArt" || layer.role === "Table";
       if (needsAlt && !layer.altText) {
         push({
           code: "missing-alt-text",
@@ -665,7 +683,9 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
         });
       }
     });
-    const titleFirst = (layers ?? []).findIndex((l: ImportLayerDescriptor) => l.placeholder === "title" || l.placeholder === "ctrTitle");
+    const titleFirst = (layers ?? []).findIndex(
+      (l: ImportLayerDescriptor) => l.placeholder === "title" || l.placeholder === "ctrTitle",
+    );
     if (titleFirst > 0) {
       push({
         code: "reading-order",
@@ -702,7 +722,8 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
         severity: "info",
         category: "fonts",
         title: `"${font}" is embedded in the source`,
-        detail: "The typeface travels inside the original file, so exporting with font embedding keeps the source appearance.",
+        detail:
+          "The typeface travels inside the original file, so exporting with font embedding keeps the source appearance.",
         slideIndex: null,
         fix: "safe",
         fixLabel: "Embed the source font on export",
@@ -711,7 +732,13 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
   }
 
   // ---- Totals + scores ---------------------------------------------------
-  const bySeverity: Record<IssueSeverity, number> = { blocker: 0, high: 0, medium: 0, low: 0, info: 0 };
+  const bySeverity: Record<IssueSeverity, number> = {
+    blocker: 0,
+    high: 0,
+    medium: 0,
+    low: 0,
+    info: 0,
+  };
   const byCategory: Record<IssueCategory, number> = {
     fonts: 0,
     text: 0,
@@ -745,7 +772,10 @@ export function diagnoseImportedDeck(deck: ParsedDeck, options: DiagnoseOptions 
     bySeverity.blocker * 10 + bySeverity.high * 3 + bySeverity.medium * 1 + fallbackObjects * 0.5;
   const visualFidelity = Math.max(
     0,
-    Math.min(100, Math.round(recoveryRatio * 100 - fidelityPenalty / Math.max(1, deck.slides.length))),
+    Math.min(
+      100,
+      Math.round(recoveryRatio * 100 - fidelityPenalty / Math.max(1, deck.slides.length)),
+    ),
   );
 
   return {

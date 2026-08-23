@@ -103,7 +103,6 @@ function BannerPreview({
   );
 }
 
-
 export function LinkedInBannerStudio() {
   const [copy, setCopy] = useState<Copy>({
     line1: "Transforming",
@@ -148,10 +147,7 @@ export function LinkedInBannerStudio() {
     try {
       for (const s of BANNER_SURFACES) {
         const blob = await exportBannerPng(rec, copy, 1, s);
-        downloadBlob(
-          blob,
-          `transperfect-${s.platform}-${s.width}x${s.height}-${rec.id}.png`,
-        );
+        downloadBlob(blob, `transperfect-${s.platform}-${s.width}x${s.height}-${rec.id}.png`);
       }
     } finally {
       setBusy(false);
@@ -226,7 +222,6 @@ export function LinkedInBannerStudio() {
           surface={surface}
           className="shadow-[0_18px_50px_-24px_rgba(3,0,44,0.45)]"
         />
-
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="space-y-1">

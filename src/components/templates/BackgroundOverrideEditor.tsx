@@ -54,7 +54,6 @@ export function BackgroundOverrideEditor({
             ["all", "See all sections", "Compare and batch-update the whole look"],
           ] as const
         ).map(([id, label, hint]) => (
-
           <button
             key={id}
             type="button"

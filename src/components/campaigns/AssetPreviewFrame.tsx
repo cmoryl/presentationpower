@@ -44,11 +44,7 @@ export function AssetPreviewFrame({
   // Tall formats (portrait / story) also need a height cap or they blow the
   // grid row open and paint over the row below.
   const heightLimited = maxHeight ? (maxHeight * short) / height : Number.POSITIVE_INFINITY;
-  const displayShortEdge = Math.max(
-    100,
-    Math.min(maxShortEdge, widthLimited, heightLimited),
-  );
-
+  const displayShortEdge = Math.max(100, Math.min(maxShortEdge, widthLimited, heightLimited));
 
   return (
     <div ref={ref} className="w-full min-w-0">

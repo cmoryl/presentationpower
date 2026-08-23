@@ -308,7 +308,6 @@ export type NextFormatGroupId =
   | "pillar-signage"
   | "attendee-credentials";
 
-
 export type NextFormatGroup = {
   id: NextFormatGroupId;
   label: string;
@@ -328,8 +327,7 @@ export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
     id: "asset-subsection",
     label: "Social & digital",
     badge: "Digital",
-    detail:
-      "Social ads · content banners · email banners · advocacy · speaker cards.",
+    detail: "Social ads · content banners · email banners · advocacy · speaker cards.",
   },
 
   {
@@ -358,7 +356,6 @@ export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
       "B-series badge artwork — 4.33×6.3 in dual-slot plastic badge with BLE Klik cutout, front and back.",
   },
 ];
-
 
 // ── Registry row ───────────────────────────────────────────────────────────
 /** Compact shape stored in next-registry.json. */
@@ -423,7 +420,7 @@ export function nextBadgeRows(): NextRegistryRow[] {
       group: "attendee-credentials" as const,
       code,
       format: label,
-      size: '4.33×6.3 in · bleed 4.58×6.55 in',
+      size: "4.33×6.3 in · bleed 4.58×6.55 in",
       category: "Attendee credentials",
       internalUrl: `/events/next/badges?division=${d.id}`,
       badgeSide: side,
@@ -437,7 +434,6 @@ export async function loadNextRegistry(): Promise<NextRegistryRow[]> {
   const raw = (mod.default ?? mod) as unknown as NextRegistryRowRaw[];
   return [...raw.map(normalizeNextRow), ...nextBadgeRows()];
 }
-
 
 // ── City Series ────────────────────────────────────────────────────────────
 // The City Series is the multi-location roadshow that runs alongside the
@@ -560,4 +556,3 @@ export function deckPagesFor(row: {
   if (isPowerpointDeck(row)) return powerpointDeckPages(row.divisionId);
   return null;
 }
-

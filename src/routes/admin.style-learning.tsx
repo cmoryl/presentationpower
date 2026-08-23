@@ -32,7 +32,8 @@ export const Route = createFileRoute("/admin/style-learning")({
       { property: "og:title", content: "Style learning governance" },
       {
         property: "og:description",
-        content: "Approve, defer or reject learned style-expansion candidates. Catalog changes stay human-approved.",
+        content:
+          "Approve, defer or reject learned style-expansion candidates. Catalog changes stay human-approved.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -74,8 +75,11 @@ function StyleLearningView() {
   });
 
   const reviewM = useMutation({
-    mutationFn: (input: { id: string; status: "approved" | "rejected" | "deferred"; note: string }) =>
-      reviewFn({ data: input }),
+    mutationFn: (input: {
+      id: string;
+      status: "approved" | "rejected" | "deferred";
+      note: string;
+    }) => reviewFn({ data: input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["admin", "style-learning"] }),
   });
 
@@ -92,10 +96,10 @@ function StyleLearningView() {
           Style learning governance
         </h1>
         <p className="max-w-2xl text-sm text-[#03002C]/60 dark:text-white/60">
-          Recommendations learn from usage — selections, exports, reuse and overrides — but the learned
-          nudge is capped at {LEARNING_LIMITS.totalCap} points, far below the industry-DNA prior of 100.
-          The approved 28 visual languages, their palettes and the recipe DNA change only here, by
-          explicit approval.
+          Recommendations learn from usage — selections, exports, reuse and overrides — but the
+          learned nudge is capped at {LEARNING_LIMITS.totalCap} points, far below the industry-DNA
+          prior of 100. The approved 28 visual languages, their palettes and the recipe DNA change
+          only here, by explicit approval.
         </p>
       </header>
 
@@ -191,7 +195,11 @@ function StyleLearningView() {
                     disabled={reviewM.isPending}
                     className="rounded-lg border border-black/10 px-2.5 py-1.5 text-xs font-medium text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-50 dark:border-white/15 dark:text-white"
                   >
-                    {s === "approved" ? "Approve for versioning" : s === "deferred" ? "Defer" : "Reject"}
+                    {s === "approved"
+                      ? "Approve for versioning"
+                      : s === "deferred"
+                        ? "Defer"
+                        : "Reject"}
                   </button>
                 ))}
               </div>

@@ -55,7 +55,11 @@ const SEV_BADGE: Record<PrintModuleVerdict["severity"], string> = {
   ok: "bg-[#A6FA87] text-[#03002C]",
 };
 
-type Result = { module: PrintSectionModule; metrics: PrintModuleMetrics; verdict: PrintModuleVerdict };
+type Result = {
+  module: PrintSectionModule;
+  metrics: PrintModuleMetrics;
+  verdict: PrintModuleVerdict;
+};
 
 function AuditRow({
   module,
@@ -225,8 +229,8 @@ function PrintModuleAuditPage() {
         <p className="mt-2 max-w-2xl text-sm leading-[1.5] text-black/60">
           Every module is rendered at true page width and measured live: how much of the usable page
           it consumes, its smallest rendered type size, and whether any text escapes the measure.
-          Corrections are made once in the module editor, so every asset built from a module inherits
-          the fix.
+          Corrections are made once in the module editor, so every asset built from a module
+          inherits the fix.
         </p>
       </header>
 
@@ -285,7 +289,9 @@ function PrintModuleAuditPage() {
             pageSize={pageSize}
             pageContentH={pageContentH}
             runKey={runKey}
-            onResult={(r) => setResults((prev) => (prev[r.module.id] ? prev : { ...prev, [r.module.id]: r }))}
+            onResult={(r) =>
+              setResults((prev) => (prev[r.module.id] ? prev : { ...prev, [r.module.id]: r }))
+            }
           />
         ))}
       </div>

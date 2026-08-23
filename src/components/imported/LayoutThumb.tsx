@@ -139,7 +139,13 @@ function body(k: ThumbKind, accent: string, mid: string, soft: string) {
       return (
         <>
           {title}
-          <path d="M8 13 C 26 13, 34 18, 56 18" stroke={accent} strokeWidth="4" fill="none" opacity="0.8" />
+          <path
+            d="M8 13 C 26 13, 34 18, 56 18"
+            stroke={accent}
+            strokeWidth="4"
+            fill="none"
+            opacity="0.8"
+          />
           <path d="M8 20 C 26 20, 34 25, 56 25" stroke={mid} strokeWidth="3" fill="none" />
           <path d="M8 26 C 26 26, 34 30, 56 30" stroke={soft} strokeWidth="2.5" fill="none" />
         </>
@@ -174,8 +180,17 @@ function body(k: ThumbKind, accent: string, mid: string, soft: string) {
       return (
         <>
           {title}
-          <path d="M8 30 C 20 30, 22 16, 34 16 S 48 12, 56 11" stroke={accent} strokeWidth="1.8" fill="none" />
-          {[[8, 30], [34, 16], [56, 11]].map(([x, y]) => (
+          <path
+            d="M8 30 C 20 30, 22 16, 34 16 S 48 12, 56 11"
+            stroke={accent}
+            strokeWidth="1.8"
+            fill="none"
+          />
+          {[
+            [8, 30],
+            [34, 16],
+            [56, 11],
+          ].map(([x, y]) => (
             <circle key={x} cx={x} cy={y} r="2" fill={mid} />
           ))}
         </>
@@ -227,7 +242,13 @@ function body(k: ThumbKind, accent: string, mid: string, soft: string) {
       return (
         <>
           {title}
-          {[[12, 14], [22, 9], [32, 18], [42, 6], [52, 12]].map(([x, h], i) => (
+          {[
+            [12, 14],
+            [22, 9],
+            [32, 18],
+            [42, 6],
+            [52, 12],
+          ].map(([x, h], i) => (
             <rect
               key={x}
               x={x - 3}
@@ -292,7 +313,12 @@ function body(k: ThumbKind, accent: string, mid: string, soft: string) {
           {title}
           <rect x="6" y="11" width="24" height="20" rx="2" fill="#fff" stroke="#00000014" />
           {bar(8.5, 13.5, 9, 3, accent)}
-          {[[32, 11], [46, 11], [32, 22], [46, 22]].map(([x, y]) => (
+          {[
+            [32, 11],
+            [46, 11],
+            [32, 22],
+            [46, 22],
+          ].map(([x, y]) => (
             <g key={`${x}-${y}`}>
               <rect x={x} y={y} width="12" height="9" rx="1.5" fill="#fff" stroke="#00000014" />
               {bar(x + 2, y + 2, 5, 2, mid)}

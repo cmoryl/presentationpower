@@ -28,10 +28,7 @@ import {
 function isFullStage(item: ModuleItem): boolean {
   const tol = 24;
   return (
-    item.x <= tol &&
-    item.y <= tol &&
-    item.w >= STAGE_W - tol * 2 &&
-    item.h >= STAGE_H - tol * 2
+    item.x <= tol && item.y <= tol && item.w >= STAGE_W - tol * 2 && item.h >= STAGE_H - tol * 2
   );
 }
 
@@ -295,7 +292,8 @@ async function rasterizeModuleLayers(
     const variant = MODULE_VARIANTS.find((v) => v.id === item.variantId);
     if (!variant) continue;
     const sectionId =
-      SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId))?.id ?? "SF-01";
+      SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId))?.id ??
+      "SF-01";
     const slide = {
       id: `raster:${item.id}`,
       position: 0,
@@ -328,7 +326,6 @@ export interface CanvasExportResult {
   warnings: string[];
   blocks: number;
 }
-
 
 /**
  * One-click export: rasterize any non-full-bleed module layers, build the

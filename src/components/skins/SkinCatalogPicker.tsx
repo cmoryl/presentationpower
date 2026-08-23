@@ -19,7 +19,6 @@ import { lookCatalog, type LookEntry } from "@/lib/look-catalog";
 import { SkinPreviewTile, LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { SkinLookbook } from "@/components/skins/SkinLookbook";
 
-
 export function SkinCatalogPicker({
   /** Selected pack id ("skin-s01") or "" for "let the agent choose". */
   value,
@@ -71,14 +70,12 @@ export function SkinCatalogPicker({
   }, [recipeId, intent, catalog]);
   const list: LookEntry[] = showAll ? catalog : recommended;
 
-
   const label = dark ? "text-white/45" : "text-[#03002C]/45";
   const selectCls = `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
     dark
       ? "border-white/10 bg-[#03002C]/50 text-white/90 focus:border-[#A1FBF9]"
       : "border-black/10 bg-white text-[#03002C] focus:border-[#003FC7]"
   }`;
-
 
   return (
     <div className="space-y-2.5">
@@ -96,7 +93,9 @@ export function SkinCatalogPicker({
         <span className={`text-[11px] font-semibold ${dark ? "text-white" : "text-[#03002C]"}`}>
           Visual style
         </span>
-        <span className={`min-w-0 flex-1 truncate text-[11px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
+        <span
+          className={`min-w-0 flex-1 truncate text-[11px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}
+        >
           {selectedEntry ? `${selectedEntry.name} · ${selectedEntry.code}` : "Let the agent choose"}
         </span>
         <ChevronDown
@@ -128,14 +127,20 @@ export function SkinCatalogPicker({
             <div className={`text-[10px] font-semibold uppercase tracking-widest ${label}`}>
               Your style
             </div>
-            <div className={`truncate text-[12px] font-semibold ${dark ? "text-white" : "text-[#03002C]"}`}>
+            <div
+              className={`truncate text-[12px] font-semibold ${dark ? "text-white" : "text-[#03002C]"}`}
+            >
               {selectedEntry.name}
             </div>
-            <div className={`text-[9px] uppercase tracking-wider ${dark ? "text-white/40" : "text-black/40"}`}>
+            <div
+              className={`text-[9px] uppercase tracking-wider ${dark ? "text-white/40" : "text-black/40"}`}
+            >
               {selectedEntry.code} · {selectedEntry.reference}
             </div>
             {selectedEntry.description && (
-              <p className={`line-clamp-2 text-[10px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
+              <p
+                className={`line-clamp-2 text-[10px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}
+              >
                 {selectedEntry.description}
               </p>
             )}
@@ -159,122 +164,124 @@ export function SkinCatalogPicker({
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
       >
         <div className={`min-h-0 space-y-2.5 overflow-hidden ${open ? "" : "invisible"}`}>
-      <div className="flex flex-wrap items-center gap-2">
-
-        <span className={`text-[10px] font-semibold uppercase tracking-widest ${label}`}>
-          Industry recipe
-        </span>
-        <select
-          value={recipeId}
-          onChange={(e) => onRecipeChange(e.target.value)}
-          aria-label="Industry recipe"
-          className={selectCls}
-        >
-          <option value="">No recipe — recommend from my brief</option>
-          {INDUSTRY_RECIPES.map((r) => (
-            <option key={r.id} value={r.id}>
-              {r.name}
-            </option>
-          ))}
-        </select>
-        {value && (
-          <button
-            type="button"
-            onClick={() => onChange("")}
-            className={`text-[11px] underline-offset-2 hover:underline ${
-              dark ? "text-white/50 hover:text-white" : "text-[#03002C]/50 hover:text-[#03002C]"
-            }`}
-          >
-            Clear skin
-          </button>
-        )}
-      </div>
-
-      {recipe && (
-        <p className={`text-[11px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
-          {recipe.summary} · Tone {recipe.tone.toLowerCase()} ·{" "}
-          <span className="font-medium">{recipe.presets.map((p) => p.name).join(" / ")}</span>
-        </p>
-      )}
-
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {list.map((entry) => {
-          const active = value === entry.pack.id;
-          return (
-            <button
-              key={entry.pack.id}
-              type="button"
-              onClick={() => {
-                pick(entry.pack.id);
-                // Only catalog skins have a full lookbook page.
-                if (entry.skin) setLookbook(entry.skin);
-              }}
-              title={`${entry.name} — ${entry.description} · click to see the full look and feel`}
-              aria-pressed={active}
-              aria-haspopup={entry.skin ? "dialog" : undefined}
-              className={`group relative rounded-lg border p-1.5 text-left transition ${
-                active
-                  ? dark
-                    ? "border-[#A1FBF9] bg-white/10"
-                    : "border-[#003FC7] bg-[#003FC7]/[0.05]"
-                  : dark
-                    ? "border-white/10 bg-white/[0.03] hover:border-white/35"
-                    : "border-black/10 bg-white hover:border-[#003FC7]/60"
-              }`}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`text-[10px] font-semibold uppercase tracking-widest ${label}`}>
+              Industry recipe
+            </span>
+            <select
+              value={recipeId}
+              onChange={(e) => onRecipeChange(e.target.value)}
+              aria-label="Industry recipe"
+              className={selectCls}
             >
-              {entry.skin ? (
-                <SkinPreviewTile skin={entry.skin} seed={`${entry.code}-cover`} />
-              ) : (
-                <LookPreviewTile pack={entry.pack} kicker={entry.reference} seed={`${entry.code}-cover`} />
-              )}
-              {entry.skin && (
-                <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
-                  <Maximize2 size={9} /> See the look
-                </span>
-              )}
-              <div className="mt-1.5 flex items-start gap-1">
-                <span
-                  className={`min-w-0 flex-1 truncate text-[11px] font-semibold ${
-                    dark ? "text-white" : "text-[#03002C]"
-                  }`}
-                >
-                  {entry.name}
-                </span>
-                {active && (
-                  <Check size={11} className={dark ? "text-[#A1FBF9]" : "text-[#003FC7]"} />
-                )}
-              </div>
-              <div
-                className={`truncate text-[9px] uppercase tracking-wider ${
-                  dark ? "text-white/40" : "text-black/40"
+              <option value="">No recipe — recommend from my brief</option>
+              {INDUSTRY_RECIPES.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+            {value && (
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className={`text-[11px] underline-offset-2 hover:underline ${
+                  dark ? "text-white/50 hover:text-white" : "text-[#03002C]/50 hover:text-[#03002C]"
                 }`}
               >
-                {entry.code} · {entry.reference}
-              </div>
+                Clear skin
+              </button>
+            )}
+          </div>
+
+          {recipe && (
+            <p className={`text-[11px] ${dark ? "text-white/55" : "text-[#03002C]/55"}`}>
+              {recipe.summary} · Tone {recipe.tone.toLowerCase()} ·{" "}
+              <span className="font-medium">{recipe.presets.map((p) => p.name).join(" / ")}</span>
+            </p>
+          )}
+
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {list.map((entry) => {
+              const active = value === entry.pack.id;
+              return (
+                <button
+                  key={entry.pack.id}
+                  type="button"
+                  onClick={() => {
+                    pick(entry.pack.id);
+                    // Only catalog skins have a full lookbook page.
+                    if (entry.skin) setLookbook(entry.skin);
+                  }}
+                  title={`${entry.name} — ${entry.description} · click to see the full look and feel`}
+                  aria-pressed={active}
+                  aria-haspopup={entry.skin ? "dialog" : undefined}
+                  className={`group relative rounded-lg border p-1.5 text-left transition ${
+                    active
+                      ? dark
+                        ? "border-[#A1FBF9] bg-white/10"
+                        : "border-[#003FC7] bg-[#003FC7]/[0.05]"
+                      : dark
+                        ? "border-white/10 bg-white/[0.03] hover:border-white/35"
+                        : "border-black/10 bg-white hover:border-[#003FC7]/60"
+                  }`}
+                >
+                  {entry.skin ? (
+                    <SkinPreviewTile skin={entry.skin} seed={`${entry.code}-cover`} />
+                  ) : (
+                    <LookPreviewTile
+                      pack={entry.pack}
+                      kicker={entry.reference}
+                      seed={`${entry.code}-cover`}
+                    />
+                  )}
+                  {entry.skin && (
+                    <span className="pointer-events-none absolute left-1/2 top-[38%] inline-flex -translate-x-1/2 items-center gap-1 rounded-full bg-white/90 px-2 py-1 text-[9px] font-semibold uppercase tracking-widest text-[#03002C] opacity-0 shadow transition group-hover:opacity-100">
+                      <Maximize2 size={9} /> See the look
+                    </span>
+                  )}
+                  <div className="mt-1.5 flex items-start gap-1">
+                    <span
+                      className={`min-w-0 flex-1 truncate text-[11px] font-semibold ${
+                        dark ? "text-white" : "text-[#03002C]"
+                      }`}
+                    >
+                      {entry.name}
+                    </span>
+                    {active && (
+                      <Check size={11} className={dark ? "text-[#A1FBF9]" : "text-[#003FC7]"} />
+                    )}
+                  </div>
+                  <div
+                    className={`truncate text-[9px] uppercase tracking-wider ${
+                      dark ? "text-white/40" : "text-black/40"
+                    }`}
+                  >
+                    {entry.code} · {entry.reference}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${
+                dark ? "text-white/70 hover:text-white" : "text-[#003FC7] hover:underline"
+              }`}
+            >
+              <Layers size={12} />
+              {showAll ? "Show recommended six" : `View all ${catalog.length} looks`}
+              <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
             </button>
-          );
-        })}
-
-      </div>
-
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => setShowAll((v) => !v)}
-          className={`inline-flex items-center gap-1.5 text-[11px] font-medium ${
-            dark ? "text-white/70 hover:text-white" : "text-[#003FC7] hover:underline"
-          }`}
-        >
-          <Layers size={12} />
-          {showAll ? "Show recommended six" : `View all ${catalog.length} looks`}
-          <ChevronDown size={12} className={showAll ? "rotate-180 transition" : "transition"} />
-        </button>
-        {selected && (
-          <span className={`text-[10px] ${dark ? "text-white/45" : "text-[#03002C]/45"}`}>
-            {selected.mode} mode · {selected.density} density · {selected.spec}
-          </span>
-        )}
-      </div>
+            {selected && (
+              <span className={`text-[10px] ${dark ? "text-white/45" : "text-[#03002C]/45"}`}>
+                {selected.mode} mode · {selected.density} density · {selected.spec}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

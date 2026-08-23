@@ -42,7 +42,11 @@ function PrintAgentIndex() {
       try {
         const threads = await listPrintThreads();
         const target = threads[0] ?? (await createPrintThread());
-        void navigate({ to: "/print-agent/$threadId", params: { threadId: target.id }, replace: true });
+        void navigate({
+          to: "/print-agent/$threadId",
+          params: { threadId: target.id },
+          replace: true,
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not open the print agent.");
       }

@@ -40,7 +40,8 @@ export function backdropCssText(b: ImportedBackdrop | null): string {
     return `background: linear-gradient(${b.angle ?? 135}deg, ${b.color}, ${b.colorB});`;
   }
   if (b.kind === "color" && b.color) return `background: ${b.color};`;
-  if (b.url) return `background: url("${b.url}") center / ${b.fit === "contain" ? "contain" : "cover"} no-repeat;`;
+  if (b.url)
+    return `background: url("${b.url}") center / ${b.fit === "contain" ? "contain" : "cover"} no-repeat;`;
   return "";
 }
 
@@ -109,6 +110,10 @@ export function downloadDataUrl(dataUrl: string, filename: string) {
 }
 
 export function backdropFilename(b: ImportedBackdrop | null, slideIndex: number): string {
-  const base = b?.path ? backdropBasename(b.path).replace(/\.[a-z0-9]+$/i, "") : (b?.kind ?? "backdrop");
-  return `backdrop-slide-${slideIndex + 1}-${base}`.replace(/[^\w.\-]+/g, "-").slice(0, 120) + ".png";
+  const base = b?.path
+    ? backdropBasename(b.path).replace(/\.[a-z0-9]+$/i, "")
+    : (b?.kind ?? "backdrop");
+  return (
+    `backdrop-slide-${slideIndex + 1}-${base}`.replace(/[^\w.\-]+/g, "-").slice(0, 120) + ".png"
+  );
 }

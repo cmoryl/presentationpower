@@ -34,7 +34,6 @@ function SkinScope({ pack, children }: { pack: StylePack | null; children: React
   );
 }
 
-
 type Row = {
   id: string;
   position: number;
@@ -142,7 +141,6 @@ export function AgentDeckPreview({
     [baseBrand, pack],
   );
   const frame = pack ? pack.tokens.surface : "#03002C";
-
 
   const slides: DeckSlide[] = useMemo(
     () =>
@@ -267,7 +265,6 @@ export function AgentDeckPreview({
               </span>
             </span>
           </button>
-
         ) : (
           <p className="text-xs text-foreground/45">The agent has not added slides yet.</p>
         )}
@@ -306,7 +303,12 @@ export function AgentDeckPreview({
                       <SlideThumbnailContext.Provider value={true}>
                         <ScaledSlide>
                           <SkinScope pack={pack}>
-                            <VariantRenderer slide={s} variant={v} brand={brand} pageNumber={i + 1} />
+                            <VariantRenderer
+                              slide={s}
+                              variant={v}
+                              brand={brand}
+                              pageNumber={i + 1}
+                            />
                           </SkinScope>
                         </ScaledSlide>
                       </SlideThumbnailContext.Provider>
@@ -383,7 +385,6 @@ function EnlargedSlideModal({
   onPrev: () => void;
   onNext: () => void;
 }) {
-
   const ref = useRef<HTMLDivElement>(null);
   useModalA11y({ open: true, onClose, containerRef: ref });
 
@@ -463,11 +464,15 @@ function EnlargedSlideModal({
         >
           <ScaledSlide>
             <SkinScope pack={pack}>
-              <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={index + 1} />
+              <VariantRenderer
+                slide={slide}
+                variant={variant}
+                brand={brand}
+                pageNumber={index + 1}
+              />
             </SkinScope>
           </ScaledSlide>
         </div>
-
 
         {slide.notes && (
           <p className="rounded-lg bg-white/10 p-3 text-xs leading-relaxed text-white/80">

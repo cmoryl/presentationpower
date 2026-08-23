@@ -79,7 +79,12 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
       },
       stats: [
         { label: "Generated in cost savings", value: "$2.4M", caption: "Against expected spend" },
-        { label: "Reduction in time to launch", value: "70", unit: "%", caption: "Three months total" },
+        {
+          label: "Reduction in time to launch",
+          value: "70",
+          unit: "%",
+          caption: "Three months total",
+        },
         { label: "Languages launched", value: "9", caption: "Simultaneous release" },
         { label: "Words translated", value: "2M+", caption: "Plus localized imagery" },
       ],
@@ -129,7 +134,12 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
           value: "$250K",
           caption: "TM optimization + validation",
         },
-        { label: "Reduction in time to market", value: "88", unit: "%", caption: "Vs. manual approach" },
+        {
+          label: "Reduction in time to market",
+          value: "88",
+          unit: "%",
+          caption: "Vs. manual approach",
+        },
         { label: "Languages live", value: "15", caption: "In under three months" },
         { label: "Words, URLs, images", value: "1.6M", caption: "91 URLs, 92 images" },
       ],
@@ -150,7 +160,8 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
   {
     slug: "pharma-regulatory-translation-automation",
     title: "Saving $1 Million with Regulatory Translation Automation",
-    teaser: "Veeva RIM + GlobalLink centralization, AI workflows, and 50% average monthly TM savings.",
+    teaser:
+      "Veeva RIM + GlobalLink centralization, AI workflows, and 50% average monthly TM savings.",
     collection: C_REG,
     tags: ["regulatory affairs", "Veeva RIM", "GlobalLink", "AI workflows", "automation"],
     sourceFile: "LifeSci_LeadingPharmaAutomating_Spotlight.pdf",
@@ -177,7 +188,12 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
         { label: "Total savings", value: "$1M", caption: "Across 20M words translated" },
         { label: "Price per word reduction", value: "53", unit: "%", caption: "First six months" },
         { label: "Average monthly TM savings", value: "50", unit: "%", caption: "18 months in" },
-        { label: "Cycle time reduction on large NDAs", value: "70", unit: "%", caption: "AI-powered workflows" },
+        {
+          label: "Cycle time reduction on large NDAs",
+          value: "70",
+          unit: "%",
+          caption: "AI-powered workflows",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -225,9 +241,17 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
         role: "Language quality stakeholder",
       },
       stats: [
-        { label: "Languages under quality control", value: "45", caption: "IFU, labels, safety signs" },
+        {
+          label: "Languages under quality control",
+          value: "45",
+          caption: "IFU, labels, safety signs",
+        },
         { label: "Multilingual quality", value: "Improved", caption: "Risk mitigated" },
-        { label: "Client visibility on global language quality", value: "Increased", caption: "Error lists + score cards" },
+        {
+          label: "Client visibility on global language quality",
+          value: "Increased",
+          caption: "Error lists + score cards",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -246,7 +270,8 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
   {
     slug: "vivacy-readability-validation",
     title: "Validating the Readability of Key Patient Materials",
-    teaser: "Patient and HCP user testing that validated SSCP IFP, PIL, and IFU against MDR requirements.",
+    teaser:
+      "Patient and HCP user testing that validated SSCP IFP, PIL, and IFU against MDR requirements.",
     collection: C_CLINICAL,
     tags: ["MDR", "readability testing", "SSCP", "patient materials", "HCP research"],
     sourceFile: "LifeSci_Vivacy_Spotlight.pdf",
@@ -277,7 +302,11 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
       stats: [
         { label: "Document types tested", value: "3", caption: "SSCP IFP, PIL, IFU" },
         { label: "MDR patient review", value: "Validated", caption: "Verification reports issued" },
-        { label: "Readability certificates", value: "Per document", caption: "Delivered with reports" },
+        {
+          label: "Readability certificates",
+          value: "Per document",
+          caption: "Delivered with reports",
+        },
         { label: "Follow-on projects", value: "Expanded", caption: "Patients and HCPs" },
       ],
       engagement: {
@@ -297,7 +326,8 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
   {
     slug: "in-study-interviews-patient-voice",
     title: "In-Study Interviews Amplify the Patient's Voice",
-    teaser: "Real-time patient data across five new EU markets, with translation planned around FPI dates.",
+    teaser:
+      "Real-time patient data across five new EU markets, with translation planned around FPI dates.",
     collection: C_CLINICAL,
     tags: ["COA", "in-study interviews", "clinical research", "interpreting", "EU markets"],
     sourceFile: "LifeSci_InStudyInterview_Spotlight.pdf",
@@ -322,9 +352,21 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
       },
       stats: [
         { label: "New EU markets", value: "5", caption: "ISIs conducted" },
-        { label: "Submission approval timelines", value: "Augmented", caption: "Real-world patient data" },
-        { label: "Rush translation risk", value: "Mitigated", caption: "Planned against FPI dates" },
-        { label: "Interview modes", value: "In-person + remote", caption: "Interpreter scheduling included" },
+        {
+          label: "Submission approval timelines",
+          value: "Augmented",
+          caption: "Real-world patient data",
+        },
+        {
+          label: "Rush translation risk",
+          value: "Mitigated",
+          caption: "Planned against FPI dates",
+        },
+        {
+          label: "Interview modes",
+          value: "In-person + remote",
+          caption: "Interpreter scheduling included",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -343,7 +385,8 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
   {
     slug: "pharma-multilingual-employee-training-apac-emea",
     title: "Multilingual Multichannel Employee Training in APAC and EMEA",
-    teaser: "40,000 words in under two weeks, subtitled videos, and four interpreted live sessions.",
+    teaser:
+      "40,000 words in under two weeks, subtitled videos, and four interpreted live sessions.",
     collection: C_TRAINING,
     tags: ["employee training", "subtitling", "live interpreting", "SAP", "APAC", "EMEA"],
     sourceFile: "LifeSci_BlindedAZ_Spotlight.pdf",
@@ -367,7 +410,11 @@ export const LIFESCI_CASE_STUDIES: LifeSciCaseStudySeed[] = [
         body: "A total of 40,000 words were translated in under two weeks, culminating in four successful live training sessions with accompanying documentation and training videos. The full process and multistakeholder review were completed within an aggressive launch timeline despite multiple reviewers and feedback loops — and the training program was subsequently expanded to additional EMEA regions.",
       },
       stats: [
-        { label: "Words translated in under two weeks", value: "40,000", caption: "Documents + video" },
+        {
+          label: "Words translated in under two weeks",
+          value: "40,000",
+          caption: "Documents + video",
+        },
         { label: "Interpreted live sessions", value: "4", caption: "In-person Q&A" },
         { label: "Subtitled languages", value: "2", caption: "Japanese and Korean" },
         { label: "Program expansion", value: "EMEA", caption: "After APAC success" },

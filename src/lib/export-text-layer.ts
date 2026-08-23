@@ -87,7 +87,10 @@ let probeCtx: CanvasRenderingContext2D | null | undefined;
 function resolveColor(color: string): { hex: string; alpha: number } | null {
   const m = color.match(/rgba?\(([^)]+)\)/i);
   if (m) {
-    const parts = m[1].split(/[\s,\/]+/).filter(Boolean).map((p) => parseFloat(p));
+    const parts = m[1]
+      .split(/[\s,\/]+/)
+      .filter(Boolean)
+      .map((p) => parseFloat(p));
     const [r, g, b] = parts;
     const a = parts.length > 3 ? parts[3] : 1;
     if (Number.isFinite(r)) return { hex: hex3(r, g, b), alpha: a };
@@ -117,7 +120,10 @@ function resolveColor(color: string): { hex: string; alpha: number } | null {
 
 function hex3(r: number, g: number, b: number): string {
   const hx = (n: number) =>
-    Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0").toUpperCase();
+    Math.max(0, Math.min(255, Math.round(n)))
+      .toString(16)
+      .padStart(2, "0")
+      .toUpperCase();
   return `${hx(r)}${hx(g)}${hx(b)}`;
 }
 
@@ -139,10 +145,7 @@ function blendOverBackdrop(
 ): { hex: string; transparency: number } {
   if (paint.alpha >= 0.995) return { hex: paint.hex, transparency: 0 };
   const num = (h: string, i: number) => parseInt(h.slice(i, i + 2), 16);
-  const over = (
-    fg: { hex: string; alpha: number },
-    bg: string,
-  ): string => {
+  const over = (fg: { hex: string; alpha: number }, bg: string): string => {
     const mix = (i: number) => num(fg.hex, i) * fg.alpha + num(bg, i) * (1 - fg.alpha);
     return hex3(mix(0), mix(2), mix(4));
   };
@@ -189,8 +192,7 @@ function firstFamily(stack: string): string {
 function applyTransform(text: string, transform: string): string {
   if (transform === "uppercase") return text.toUpperCase();
   if (transform === "lowercase") return text.toLowerCase();
-  if (transform === "capitalize")
-    return text.replace(/\b\p{L}/gu, (c) => c.toUpperCase());
+  if (transform === "capitalize") return text.replace(/\b\p{L}/gu, (c) => c.toUpperCase());
   return text;
 }
 

@@ -15,7 +15,6 @@ import {
   Minus,
   PlugZap,
   X,
-
 } from "lucide-react";
 import { lookupProspectContext, type ProspectRelevance } from "@/lib/prospect-context.functions";
 
@@ -125,7 +124,6 @@ export function ProspectPanel({
   const strengthLabel =
     doneCount <= 2 ? "Generic" : doneCount <= 4 ? "Tailored" : "Highly specific";
 
-
   return (
     <div className="rounded-2xl border border-black/10 bg-white p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -200,11 +198,12 @@ export function ProspectPanel({
                   })}
                 </div>
               )}
-              {industry && !industryOptions.some((i) => i.toLowerCase() === industry.toLowerCase()) && (
-                <div className="mt-1.5 text-[11px] text-black/45">
-                  Using a custom industry — not part of the selected brand mode&rsquo;s scope.
-                </div>
-              )}
+              {industry &&
+                !industryOptions.some((i) => i.toLowerCase() === industry.toLowerCase()) && (
+                  <div className="mt-1.5 text-[11px] text-black/45">
+                    Using a custom industry — not part of the selected brand mode&rsquo;s scope.
+                  </div>
+                )}
             </div>
           </div>
 
@@ -428,7 +427,6 @@ export function ProspectPanel({
             )}
           </div>
 
-
           {/* 3 — Named hits, only when there are any */}
           {relevance && hitCount > 0 && (
             <>
@@ -511,7 +509,11 @@ function EmptyState({
   return (
     <div className="mt-3 rounded-lg border border-dashed border-black/15 bg-white/70 p-3">
       <div className="flex items-start gap-2">
-        <PlugZap className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black/35" strokeWidth={1.75} aria-hidden />
+        <PlugZap
+          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-black/35"
+          strokeWidth={1.75}
+          aria-hidden
+        />
         <div className="min-w-0">
           <p className="text-[11px] font-semibold text-[#03002C]">{title}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-black/55">{body}</p>
@@ -535,7 +537,6 @@ function EmptyState({
 }
 
 type ReuseState = "always" | "found" | "searching" | "none" | "waiting" | "signin";
-
 
 /** One compact row in the "What we'll reuse" list with an honest status. */
 function ReuseRow({
@@ -567,7 +568,9 @@ function ReuseRow({
         className={`h-3.5 w-3.5 shrink-0 ${on ? "text-[#003FC7]" : "text-black/25"}`}
         strokeWidth={1.75}
       />
-      <span className={`min-w-0 flex-1 truncate text-[11px] ${on ? "text-black/75" : "text-black/45"}`}>
+      <span
+        className={`min-w-0 flex-1 truncate text-[11px] ${on ? "text-black/75" : "text-black/45"}`}
+      >
         {label}
       </span>
       <span

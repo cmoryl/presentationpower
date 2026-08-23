@@ -66,14 +66,15 @@ export function BrandIconLibrary({ slug, hero }: Props) {
         <p className="mt-3 text-xs uppercase tracking-[0.25em]" style={{ color: hero }}>
           {total} approved glyphs · {set.subAreas.length} sub-areas · 50+ per sub-area · SVG + PNG
         </p>
-
       </div>
 
       {/* Controls */}
       <div className="rounded-2xl border border-border bg-card p-4">
         <div className="flex flex-wrap items-end gap-4">
           <label className="flex flex-col gap-1">
-            <span className="text-[11px] uppercase tracking-[0.2em] text-foreground/60">Format</span>
+            <span className="text-[11px] uppercase tracking-[0.2em] text-foreground/60">
+              Format
+            </span>
             <div className="flex overflow-hidden rounded-full border border-border">
               {(["svg", "png"] as const).map((f) => (
                 <button
@@ -144,7 +145,9 @@ export function BrandIconLibrary({ slug, hero }: Props) {
           </div>
 
           <label className="ml-auto flex flex-col gap-1">
-            <span className="text-[11px] uppercase tracking-[0.2em] text-foreground/60">Search</span>
+            <span className="text-[11px] uppercase tracking-[0.2em] text-foreground/60">
+              Search
+            </span>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -158,9 +161,7 @@ export function BrandIconLibrary({ slug, hero }: Props) {
           <button
             type="button"
             disabled={busy !== null}
-            onClick={() =>
-              run("set", () => downloadFullSet(set, { ...opts }))
-            }
+            onClick={() => run("set", () => downloadFullSet(set, { ...opts }))}
             className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] text-white disabled:opacity-60"
             style={{ background: hero }}
           >

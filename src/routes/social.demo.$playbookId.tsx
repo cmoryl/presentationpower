@@ -34,7 +34,6 @@ import {
   EVENT_LOOKS_BY_ID,
 } from "@/lib/event-looks";
 
-
 import {
   getSocialPlaybook,
   SOCIAL_PLAYBOOKS,
@@ -115,10 +114,7 @@ function SocialDemoView() {
   // The division's own accent always re-inks whichever look is active, so a
   // retarget changes the field graphic and type — never the brand colour.
   const look = useMemo(
-    () =>
-      lookId === baseLook.id
-        ? baseLook
-        : reinkLook(eventLookById(lookId), playbook.accent),
+    () => (lookId === baseLook.id ? baseLook : reinkLook(eventLookById(lookId), playbook.accent)),
     [lookId, baseLook, playbook.accent],
   );
 
@@ -140,8 +136,6 @@ function SocialDemoView() {
     saveCampaignLook(playbook.subBrand, { styleId: id });
   };
   const activeStyle = resolveSocialStyle(styleId);
-
-
 
   const source = useMemo(() => sourceFromSocialPlaybook(playbook), [playbook]);
   const facts = useMemo(() => factsFromSocialPlaybook(playbook), [playbook]);
@@ -186,8 +180,6 @@ function SocialDemoView() {
     [source, facts, kit, playbook.subBrand],
   );
   const assetEdits = useSocialAssetEdits();
-
-
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
@@ -332,7 +324,6 @@ function SocialDemoView() {
           <p className="mt-2 max-w-3xl text-xs text-black/60">{look.blurb}</p>
         </div>
         <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
-
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/50">
             Template style
           </div>
@@ -394,7 +385,6 @@ function SocialDemoView() {
                   imageScrimPct: 62,
                   styleId,
                 }}
-
                 badge={imageUrl ? (panel ? "Panel" : "Photo") : undefined}
                 formatLabel={a.format.label}
                 formatWidth={a.format.width}
@@ -404,9 +394,7 @@ function SocialDemoView() {
             );
           })}
         </div>
-
       </section>
-
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}
       <section>

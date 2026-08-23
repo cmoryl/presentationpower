@@ -21,7 +21,6 @@ import {
 } from "@/components/imported/BackdropInspector";
 import { uploadDivisionImagery, approveDivisionImagery } from "@/lib/division-imagery.functions";
 
-
 export const Route = createFileRoute("/library/imported_/masters")({
   head: () => ({
     meta: [
@@ -45,7 +44,6 @@ export const Route = createFileRoute("/library/imported_/masters")({
 });
 
 const basename = backdropBasename;
-
 
 function MasterAudit() {
   const [brandModeId, setBrandModeId] = useState<string>("bm-enterprise");
@@ -103,7 +101,12 @@ function MasterAudit() {
     }
     let best: string | undefined;
     let n = 0;
-    for (const [k, v] of counts) if (v > n) ((best = k), (n = v));
+    for (const [k, v] of counts) {
+      if (v > n) {
+        best = k;
+        n = v;
+      }
+    }
     return best;
   }, [rows]);
 
@@ -120,8 +123,7 @@ function MasterAudit() {
   const uploadFn = useServerFn(uploadDivisionImagery);
   const approveFn = useServerFn(approveDivisionImagery);
 
-  const deckName =
-    decks.find((d) => d.id === activeDeckId)?.original_filename ?? "Imported deck";
+  const deckName = decks.find((d) => d.id === activeDeckId)?.original_filename ?? "Imported deck";
   const inspected = rows.find((r) => r.index === openRow) ?? null;
   const selectable = rows.filter((r) => !!r.backdrop);
 
@@ -160,7 +162,6 @@ function MasterAudit() {
       );
     if (failed) toast.error(`${failed} backdrop${failed === 1 ? "" : "s"} could not be saved.`);
   };
-
 
   return (
     <AppShell>
@@ -395,7 +396,6 @@ function MasterAudit() {
             onClose={() => setOpenRow(null)}
           />
         )}
-
       </div>
     </AppShell>
   );

@@ -1,12 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Presentation,
-  Printer,
-  CalendarDays,
-  Share2,
-  ArrowRight,
-  Sparkles,
-} from "lucide-react";
+import { Presentation, Printer, CalendarDays, Share2, ArrowRight, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ElementBrickRow, ElementBrickRail } from "@/components/brand/ElementBrickMotif";
 import { ThemedHeroVideo } from "@/components/hero/ThemedHeroVideo";
@@ -53,7 +46,6 @@ type Surface = {
   icon: React.ComponentType<{ size?: number; className?: string }>;
   items: ReadonlyArray<{ label: string; to: string; search?: Record<string, string> }>;
 };
-
 
 const SURFACES: Surface[] = [
   {
@@ -141,7 +133,6 @@ function ElementsLanding() {
       <section className="full-bleed relative hero-flush overflow-hidden border-b border-white/10 bg-[#03002C] py-10 text-white sm:py-10 lg:py-12">
         <ThemedHeroVideo dark={heroElementsDark.url} light={heroElementsLight.url} />
         <div aria-hidden className="pointer-events-none absolute inset-0">
-
           <div
             className="absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full blur-[110px]"
             style={{ background: "#003FC7", opacity: 0.55 }}
@@ -179,10 +170,9 @@ function ElementsLanding() {
             </h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-white/70">
               Presentations, print, events, social — all built in Element from the same approved
-              designs and brand rules. You bring the story; Element handles the look, the layout, and
-              a finished file you can hand off.
+              designs and brand rules. You bring the story; Element handles the look, the layout,
+              and a finished file you can hand off.
             </p>
-
 
             <ElementBrickRow thickness="6px" unit="7px" gap="5px" style={{ marginTop: 26 }} />
 

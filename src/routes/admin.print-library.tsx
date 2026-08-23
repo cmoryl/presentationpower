@@ -15,10 +15,7 @@ import {
   reviewPrintVariantSuggestion,
 } from "@/lib/approved-print-variants.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
-import {
-  printKnowledgeStatus,
-  syncPrintLibraryKnowledge,
-} from "@/lib/print-knowledge.functions";
+import { printKnowledgeStatus, syncPrintLibraryKnowledge } from "@/lib/print-knowledge.functions";
 import { backfillOracleMirror } from "@/lib/oracle-mirror.functions";
 import type { PrintAssetKind } from "@/lib/print-assets.types";
 import {
@@ -150,8 +147,6 @@ function PrintLibraryCurator() {
       </header>
 
       <PrintKnowledgeSyncCard />
-
-
 
       {/* Publish new snapshot */}
       <section className="rounded-2xl border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-white/[0.03]">

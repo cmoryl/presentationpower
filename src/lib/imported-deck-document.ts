@@ -29,16 +29,17 @@ export type ImportedSlideLite = {
 
 export type DeckSectionLite = { name: string; slideIndexes: number[] };
 
-const clean = (v: unknown) => String(v ?? "").replace(/\s+/g, " ").trim();
+const clean = (v: unknown) =>
+  String(v ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
 const uniq = (xs: string[]) => Array.from(new Set(xs.filter(Boolean)));
 
 /** Flatten a captured LayoutTextBody into a single line of prose. */
 function textBodyToLine(body: any): string {
   const paras = body?.paras ?? [];
   return clean(
-    paras
-      .map((p: any) => (p?.runs ?? []).map((r: any) => r?.text ?? "").join(""))
-      .join(" "),
+    paras.map((p: any) => (p?.runs ?? []).map((r: any) => r?.text ?? "").join("")).join(" "),
   );
 }
 
@@ -92,9 +93,11 @@ export function buildSlideBlock(s: ImportedSlideLite): string {
   const chartSeen = new Set<string>();
   charts.forEach((c: any) => {
     const title2 = clean(c?.title);
-    const series = uniq(((c?.seriesLabels ?? c?.series ?? []) as any[]).map((x) =>
-      clean(typeof x === "string" ? x : x?.label),
-    ));
+    const series = uniq(
+      ((c?.seriesLabels ?? c?.series ?? []) as any[]).map((x) =>
+        clean(typeof x === "string" ? x : x?.label),
+      ),
+    );
     const cats = uniq(((c?.categories ?? []) as any[]).map(clean));
     const key = `${title2}|${series.join(",")}|${cats.join(",")}`;
     if (chartSeen.has(key)) return;
@@ -130,7 +133,10 @@ export function buildDeckDocument(slides: ImportedSlideLite[]): string {
  * (1200/200, prefers paragraph boundaries, drops sub-40-char fragments).
  */
 export function chunkText(text: string, size = 1200, overlap = 200): string[] {
-  const src = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  const src = text
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
   if (src.length <= size) return src.length > 40 ? [src] : [];
   const chunks: string[] = [];
   let i = 0;

@@ -25,13 +25,7 @@ function when(iso: string) {
 }
 
 /** Append-only audit trail of module layout/variant swaps for one slide. */
-export function SlideSwapLogPanel({
-  slide,
-  onClear,
-}: {
-  slide: DeckSlide;
-  onClear?: () => void;
-}) {
+export function SlideSwapLogPanel({ slide, onClear }: { slide: DeckSlide; onClear?: () => void }) {
   const log: SlideSwapLogEntry[] = slide.swapLog ?? [];
   const entries = [...log].reverse();
 

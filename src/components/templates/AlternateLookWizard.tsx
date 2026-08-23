@@ -16,16 +16,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import {
-  Check,
-  ChevronRight,
-  Loader2,
-  Plus,
-  RotateCcw,
-  Trash2,
-  Upload,
-  X,
-} from "lucide-react";
+import { Check, ChevronRight, Loader2, Plus, RotateCcw, Trash2, Upload, X } from "lucide-react";
 
 import {
   approveIntakeStage,
@@ -498,7 +489,10 @@ function IntakePanel({
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {derived.template.palette.map((hex, i) => (
-              <span key={i} className="flex items-center gap-2 rounded-lg border border-black/10 px-2 py-1 text-[11px] dark:border-white/15">
+              <span
+                key={i}
+                className="flex items-center gap-2 rounded-lg border border-black/10 px-2 py-1 text-[11px] dark:border-white/15"
+              >
                 <span
                   className="h-4 w-4 rounded"
                   style={{ background: hex, outline: "1px solid rgba(0,0,0,0.12)" }}

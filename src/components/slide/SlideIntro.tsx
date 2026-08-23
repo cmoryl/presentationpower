@@ -61,7 +61,7 @@ function collectBlocks(root: HTMLElement): Block[] {
       queue.push(...(Array.from(el.children) as HTMLElement[]));
       continue;
     }
-    const share = ((r.width * scale) * (r.height * scale)) / SLIDE_AREA;
+    const share = (r.width * scale * (r.height * scale)) / SLIDE_AREA;
     // Skip decorative full-bleed grounds and absolutely-positioned washes.
     const decorative = el.dataset.slideGround != null || el.getAttribute("aria-hidden") === "true";
     if (share >= MIN_SHARE && share <= MAX_SHARE && !decorative) {
@@ -90,7 +90,10 @@ function collectArcs(root: HTMLElement): Array<{ el: ArcTarget; from: string; to
     if (flag === "off") continue;
     const raw = el.getAttribute("stroke-dasharray");
     if (!raw) continue;
-    const parts = raw.trim().split(/[\s,]+/).map(Number);
+    const parts = raw
+      .trim()
+      .split(/[\s,]+/)
+      .map(Number);
     if (parts.length !== 2 || parts.some((n) => !Number.isFinite(n))) continue;
     if (flag !== "on" && parts[0]! < ARC_MIN_DASH_PX) continue;
     // Grow the visible segment from nothing to its authored length, holding the
@@ -142,15 +145,15 @@ function collectHeroStats(root: HTMLElement): HTMLElement[] {
 
   let pool = Array.from(root.querySelectorAll<HTMLElement>('[data-stat-value="figure"]'));
   if (!pool.length) {
-    pool = Array.from(root.querySelectorAll<HTMLElement>("div, span, p, strong, h1, h2, h3")).filter(
-      (el) => {
-        if (el.dataset.heroStat === "off" || el.dataset.decorative != null) return false;
-        if (el.getAttribute("aria-hidden") === "true") return false;
-        if (el.querySelector("*")) return false; // leaf text runs only
-        const text = (el.textContent || "").trim();
-        return text.length > 0 && text.length <= 14 && /\d/.test(text);
-      },
-    );
+    pool = Array.from(
+      root.querySelectorAll<HTMLElement>("div, span, p, strong, h1, h2, h3"),
+    ).filter((el) => {
+      if (el.dataset.heroStat === "off" || el.dataset.decorative != null) return false;
+      if (el.getAttribute("aria-hidden") === "true") return false;
+      if (el.querySelector("*")) return false; // leaf text runs only
+      const text = (el.textContent || "").trim();
+      return text.length > 0 && text.length <= 14 && /\d/.test(text);
+    });
   }
   const sized = pool
     .filter((el) => el.dataset.heroStat !== "off")
@@ -177,7 +180,8 @@ function applyHeroStats(root: HTMLElement, recipe: IntroRecipe) {
     const host = el.closest<HTMLElement>("[data-intro-delay]");
     const base = Number(host?.dataset.introDelay ?? recipe.leadMs) || recipe.leadMs;
     const align = getComputedStyle(el).textAlign;
-    el.style.transformOrigin = align === "center" ? "50% 50%" : align === "right" ? "100% 50%" : "0% 50%";
+    el.style.transformOrigin =
+      align === "center" ? "50% 50%" : align === "right" ? "100% 50%" : "0% 50%";
     el.style.willChange = "transform, opacity, filter";
     el.style.backfaceVisibility = "hidden";
     el.style.animation = `tp-stat-hero ${HERO_STAT_MS}ms ${HERO_STAT_EASE} ${
@@ -196,7 +200,6 @@ function applyHeroStats(root: HTMLElement, recipe: IntroRecipe) {
   });
   return stats;
 }
-
 
 function applyIntro(root: HTMLElement, recipe: IntroRecipe) {
   const blocks = orderIntroItems(collectBlocks(root), recipe.order);

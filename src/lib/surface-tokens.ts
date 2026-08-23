@@ -138,10 +138,7 @@ export function summaryBandStyle(accent: string, scale = 1): CSSProperties {
  * ring border is drawn on, so every dot is centred on the hairline instead of
  * being eyeballed with hand-written percentages.
  */
-export function orbitNodePositions(
-  count: number,
-  startDeg = 24,
-): { top: string; left: string }[] {
+export function orbitNodePositions(count: number, startDeg = 24): { top: string; left: string }[] {
   const n = Math.max(count, 1);
   return Array.from({ length: n }, (_, i) => {
     const a = ((startDeg + (360 / n) * i) * Math.PI) / 180;

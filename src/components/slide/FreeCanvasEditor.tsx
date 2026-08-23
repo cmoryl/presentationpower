@@ -252,11 +252,14 @@ export function FreeCanvasEditor({
     [],
   );
 
-  const stageFromClient = useCallback((clientX: number, clientY: number) => {
-    const el = stageSurface();
-    if (!el) return { x: 0, y: 0 };
-    return clientPointToStage(clientX, clientY, el.getBoundingClientRect());
-  }, [stageSurface]);
+  const stageFromClient = useCallback(
+    (clientX: number, clientY: number) => {
+      const el = stageSurface();
+      if (!el) return { x: 0, y: 0 };
+      return clientPointToStage(clientX, clientY, el.getBoundingClientRect());
+    },
+    [stageSurface],
+  );
 
   /**
    * Mirror the exact aspect-fit scale of the visible slide surface so opening a
@@ -450,22 +453,25 @@ export function FreeCanvasEditor({
   // ---- adopt an existing module section ----------------------------------
 
   /** Paint the pick-mode hover outline straight to the DOM (no re-render). */
-  const paintPick = useCallback((el: Element | null) => {
-    const node = pickRef.current;
-    const root = stageSurface();
-    if (!node || !root) return;
-    if (!el) {
-      node.style.display = "none";
-      return;
-    }
-    const r = el.getBoundingClientRect();
-    const rr = root.getBoundingClientRect();
-    node.style.display = "";
-    node.style.left = `${((r.left - rr.left) / rr.width) * 100}%`;
-    node.style.top = `${((r.top - rr.top) / rr.height) * 100}%`;
-    node.style.width = `${(r.width / rr.width) * 100}%`;
-    node.style.height = `${(r.height / rr.height) * 100}%`;
-  }, [stageSurface]);
+  const paintPick = useCallback(
+    (el: Element | null) => {
+      const node = pickRef.current;
+      const root = stageSurface();
+      if (!node || !root) return;
+      if (!el) {
+        node.style.display = "none";
+        return;
+      }
+      const r = el.getBoundingClientRect();
+      const rr = root.getBoundingClientRect();
+      node.style.display = "";
+      node.style.left = `${((r.left - rr.left) / rr.width) * 100}%`;
+      node.style.top = `${((r.top - rr.top) / rr.height) * 100}%`;
+      node.style.width = `${(r.width / rr.width) * 100}%`;
+      node.style.height = `${(r.height / rr.height) * 100}%`;
+    },
+    [stageSurface],
+  );
 
   /**
    * Convert the module element under the pointer into a canvas block. The block
@@ -1304,9 +1310,7 @@ export function FreeCanvasEditor({
                   onBlur={(e) => {
                     commit(
                       list.map((x) =>
-                        x.id === b.id
-                          ? { ...x, text: canvasTextFromEditable(e.currentTarget) }
-                          : x,
+                        x.id === b.id ? { ...x, text: canvasTextFromEditable(e.currentTarget) } : x,
                       ),
                       "Edit object text",
                       `text:${b.id}`,
@@ -1456,7 +1460,10 @@ export function FreeCanvasEditor({
                   if (!additive) return add;
                   const set = new Set(prev);
                   const allIn = add.every((id) => set.has(id));
-                  for (const id of add) allIn ? set.delete(id) : set.add(id);
+                  for (const id of add) {
+                    if (allIn) set.delete(id);
+                    else set.add(id);
+                  }
                   return [...set];
                 })
               }

@@ -401,9 +401,6 @@ export type ImportLayerDescriptor = {
   hidden?: boolean;
 };
 
-
-
-
 export type ParsedMedia = {
   /** video | audio | ole | other — coarse bucket for downstream renderers. */
   kind: "video" | "audio" | "ole" | "other";
@@ -513,7 +510,6 @@ export type DeckSection = {
   slideIndexes: number[];
 };
 
-
 export type ParsedTheme = {
   /** accent1..accent6 in slot order — used to resolve c:schemeClr references. */
   accents: string[];
@@ -621,7 +617,6 @@ export type DeckScreening = {
   compat: CompatReport;
 };
 
-
 const MAX_PER_IMAGE_BYTES = 15_000_000;
 const MAX_TOTAL_IMAGE_BYTES = 180_000_000;
 const MAX_IMAGES_PER_SLIDE = 160;
@@ -644,9 +639,8 @@ export async function parsePptxBuffer(
     throw new Error("Not a PowerPoint file (missing zip signature).");
   }
   const zip = await JSZip.loadAsync(buf);
-  const { sniffPresentationPackage, validatePackageEntries } = await import(
-    "./pptx-package-validate"
-  );
+  const { sniffPresentationPackage, validatePackageEntries } =
+    await import("./pptx-package-validate");
 
   // Authoritative kind check: trust [Content_Types].xml over the file extension
   // so a renamed Word/Excel package (or a legacy binary .ppt) is refused here.
@@ -1024,14 +1018,7 @@ export async function parsePptxBuffer(
     // ── Faithful layout (positions / z-order / styling) ─────────────────
     let layout: SlideLayout | undefined;
     try {
-      layout = extractSlideLayout(
-        xml,
-        slideSize,
-        imageEmbedIds,
-        parents,
-        theme,
-        diagramDrawingXml,
-      );
+      layout = extractSlideLayout(xml, slideSize, imageEmbedIds, parents, theme, diagramDrawingXml);
       // Attach parsed chart data to chart shapes by rel id
       if (layout) {
         for (const sh of layout.shapes) {
@@ -2090,7 +2077,9 @@ async function resolveThemePath(zip: JSZip, parser: XMLParser): Promise<string |
         .filter((r: unknown) =>
           type.test(String((r as Record<string, unknown> | undefined)?.["@_Type"] ?? "")),
         )
-        .map((r: unknown) => String((r as Record<string, unknown> | undefined)?.["@_Target"] ?? ""));
+        .map((r: unknown) =>
+          String((r as Record<string, unknown> | undefined)?.["@_Target"] ?? ""),
+        );
     } catch {
       return [];
     }
@@ -2558,7 +2547,6 @@ function readColorMods(colorNode: PNode | undefined): ColorMods | undefined {
   const any = Object.values(mods).some((v) => v !== undefined);
   return any ? mods : undefined;
 }
-
 
 function encodeSchemeMods(mods: ColorMods): string {
   const parts: string[] = [];
@@ -3311,7 +3299,6 @@ function walkSpTree(
    */
   diagramDrawings?: Record<string, PNode>,
 ) {
-
   for (const node of nodes) {
     const t = pTag(node);
     if (!t) continue;
@@ -3381,7 +3368,7 @@ function walkSpTree(
       const style = pFind(node, "p:style");
       const prstGeom = spPr ? pFind(spPr, "a:prstGeom") : undefined;
       let prst = prstGeom ? pAttrs(prstGeom)["@_prst"] : undefined;
-      let adj = readPrstAdj(prstGeom);
+      const adj = readPrstAdj(prstGeom);
       let fill =
         remapFillScheme(readFill(spPr, imageEmbedIds, embedIdMap), clrMap) ??
         readMappedFillRef(style, theme, clrMap);
@@ -3709,7 +3696,6 @@ function walkSpTree(
           out.push({ kind: "diagram", z: zRef.z++, frame, fallbackReason: "unknown-payload" });
         }
       }
-
     }
   }
 }
@@ -3802,7 +3788,6 @@ function describeSpTree(nodes: PNode[], group?: string): ImportLayerDescriptor[]
   return out;
 }
 
-
 function extractSlideLayout(
   xml: string,
   size: { w: number; h: number },
@@ -3854,7 +3839,6 @@ function extractSlideLayout(
     background = parents.master.background;
     backgroundFrom = "master";
   }
-
 
   // Prepend master → layout decor so it renders beneath slide-level shapes.
   // These carry brand furniture (logos, footer bars, dividers, page numbers)
@@ -3952,11 +3936,8 @@ function extractSlideLayout(
       sourceLayers: spTree ? describeSpTree(pChildren(spTree)) : [],
       masterLayers: parents?.master?.decorLayers ?? [],
       layoutLayers: parents?.layout?.decorLayers ?? [],
-
     },
   };
-
-
 }
 
 // ─── Slide master / layout inheritance ─────────────────────────────────
@@ -4023,7 +4004,6 @@ type ResolvedParents = {
   masterPath?: string;
 };
 
-
 async function resolveParents(
   zip: JSZip,
   parser: XMLParser,
@@ -4064,7 +4044,6 @@ async function resolveParents(
   }
   return { layout: layoutData, master: masterData, layoutPath, masterPath: masterPathOut };
 }
-
 
 async function loadParent(
   zip: JSZip,
@@ -4218,15 +4197,14 @@ async function loadParent(
   }
   // Named object list for the import audit (decor only — placeholders are
   // inherited through PhProto and reported on the slide itself).
-  const decorLayers = spTree
-    ? describeSpTree(pChildren(spTree)).filter((l) => !l.placeholder)
-    : [];
+  const decorLayers = spTree ? describeSpTree(pChildren(spTree)).filter((l) => !l.placeholder) : [];
 
   const data: ParentSlideData = {
     kind: isMaster ? "master" : "layout",
     path,
     name: cSld ? (pAttrs(cSld)["@_name"] as string | undefined) || undefined : undefined,
-    layoutType: !isMaster && rootNode ? (pAttrs(rootNode)["@_type"] as string | undefined) : undefined,
+    layoutType:
+      !isMaster && rootNode ? (pAttrs(rootNode)["@_type"] as string | undefined) : undefined,
     background,
     placeholders,
     decor,

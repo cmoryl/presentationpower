@@ -118,8 +118,7 @@ export function forceContrast(ink: string, field: string, target = 4.5): string 
   if (contrast(ink, field) >= target) return ink;
   // Head for whichever extreme the field can actually reach: a mid-tone field
   // never clears 4.5:1 against white, so a luminance threshold alone strands it.
-  const toward =
-    contrast("#000000", field) >= contrast("#ffffff", field) ? "#000000" : "#ffffff";
+  const toward = contrast("#000000", field) >= contrast("#ffffff", field) ? "#000000" : "#ffffff";
   let best = ink;
   for (let t = 0.05; t <= 1.0001; t += 0.05) {
     best = mix(ink, toward, t);
@@ -277,7 +276,7 @@ export interface IntakeAsset {
   /** Hex swatches sampled from this asset in the browser, most-used first. */
   swatches?: string[];
   width?: number | null;
-  height?: number | null
+  height?: number | null;
   uploadedAt?: string;
   uploadedBy?: string;
 }
@@ -409,7 +408,7 @@ export function evaluateChecklist(intake: TemplateIntake): ChecklistRow[] {
     if (slot.id === "cover-image" && asset.width && asset.width < 1200) {
       problems.push(`Cover imagery is only ${asset.width}px wide — 1920px or more reads cleanly.`);
     }
-    if (slot.sampled && slot.id === "palette-source" && !(asset.swatches?.length)) {
+    if (slot.sampled && slot.id === "palette-source" && !asset.swatches?.length) {
       problems.push("No colours could be read from this file — upload a swatch sheet or hex list.");
     }
     return { slot, asset, ok: problems.length === 0, problems };
@@ -479,10 +478,7 @@ const DARK_FALLBACK = ["#0b1020", "#f4f6fb", "#a1fbf9", "#c2a3ff", "#1b2440"];
  * extreme, ink is the opposite extreme, and the accents are the two most
  * colourful swatches that survive a contrast check against the field.
  */
-export function derivePalette(
-  intake: TemplateIntake,
-  swatchesIn?: string[],
-): DerivedPalette {
+export function derivePalette(intake: TemplateIntake, swatchesIn?: string[]): DerivedPalette {
   const swatches = (swatchesIn ?? collectSwatches(intake))
     .map((s) => normalizeHex(s))
     .filter((s): s is string => Boolean(s));
@@ -510,9 +506,7 @@ export function derivePalette(
   const byLum = [...swatches].sort((a, b) => luminance(a) - luminance(b));
 
   // Field: the neutral extreme on the correct side of the light/dark split.
-  const fieldPool = neutrals.filter((s) =>
-    wantDark ? luminance(s) < 0.3 : luminance(s) > 0.6,
-  );
+  const fieldPool = neutrals.filter((s) => (wantDark ? luminance(s) < 0.3 : luminance(s) > 0.6));
   const field = fieldPool[0] ?? (wantDark ? byLum[0]! : byLum[byLum.length - 1]!);
 
   // Ink: the far luminance extreme, contrast-forced to stay legible.
@@ -524,11 +518,7 @@ export function derivePalette(
     .filter((s) => s !== field && s !== inkRaw)
     .sort((a, b) => saturation(b) - saturation(a));
   const accent = forceContrast(chroma[0] ?? fallback[2]!, field, 3);
-  const accentAlt = forceContrast(
-    chroma.find((s) => s !== chroma[0]) ?? fallback[3]!,
-    field,
-    2.2,
-  );
+  const accentAlt = forceContrast(chroma.find((s) => s !== chroma[0]) ?? fallback[3]!, field, 2.2);
 
   // Support: a quiet plane between field and ink for cards and rules.
   const support = mix(field, ink, wantDark ? 0.18 : 0.1);
@@ -597,9 +587,7 @@ export function deriveTemplateFromIntake(
     bestFit: intake.brief.slice(0, 200),
     mode: palette.mode,
     palette: palette.palette,
-    typography: typeSpec
-      ? "Brand typography per supplied spec"
-      : "Large scale · restrained weight",
+    typography: typeSpec ? "Brand typography per supplied spec" : "Large scale · restrained weight",
     surfaceNote: plate
       ? "Supplied plate ground · one lifted plane"
       : "Flat canvas · one lifted plane",
@@ -724,10 +712,7 @@ export function approveStage(
 }
 
 /** Send an intake back a stage, e.g. a reviewer rejects the generated look. */
-export function requestChanges(
-  intake: TemplateIntake,
-  reason: string,
-): TemplateIntake {
+export function requestChanges(intake: TemplateIntake, reason: string): TemplateIntake {
   const idx = stageIndex(intake.stage);
   const back = STAGE_ORDER[Math.max(0, idx - 1)]!;
   return {

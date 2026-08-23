@@ -638,7 +638,9 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
               .select("id")
               .single();
             if (insErr || !inserted)
-              throw new Error(String((insErr as { message?: string } | null)?.message ?? "asset insert failed"));
+              throw new Error(
+                String((insErr as { message?: string } | null)?.message ?? "asset insert failed"),
+              );
             assetId = (inserted as { id: string }).id;
           } else {
             // Re-embed: refresh the mirrored text and re-apply the division

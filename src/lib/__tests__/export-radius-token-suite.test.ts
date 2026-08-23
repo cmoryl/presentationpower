@@ -148,7 +148,9 @@ describe("exported radius tokens match the stage layout", () => {
       if (!w || !h) continue;
       if (w !== h) offenders.push(`w: ${w} / h: ${h}`);
     }
-    expect(offenders, `non-circular ellipses in the exporter:\n${offenders.join("\n")}`).toEqual([]);
+    expect(offenders, `non-circular ellipses in the exporter:\n${offenders.join("\n")}`).toEqual(
+      [],
+    );
   });
 
   it("keeps raster plate corners aligned with their vector shape at every DPI", () => {
@@ -170,7 +172,9 @@ describe("exported radius tokens match the stage layout", () => {
   it("blocks reintroducing a literal rectRadius in the exporter", () => {
     const literals = [...EXPORTER.matchAll(/rectRadius:\s*([^,\n]+)/g)]
       .map((m) => m[1].trim())
-      .filter((v) => !/^EXPORT_RADIUS_IN\.|^pillRadiusIn\(|^laneCornerRadiusIn\(|\.rectRadius$/.test(v));
+      .filter(
+        (v) => !/^EXPORT_RADIUS_IN\.|^pillRadiusIn\(|^laneCornerRadiusIn\(|\.rectRadius$/.test(v),
+      );
     expect(literals, `untokenised rectRadius values: ${literals.join(", ")}`).toEqual([]);
   });
 

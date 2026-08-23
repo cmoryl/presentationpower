@@ -60,7 +60,13 @@ function blockToItem(block: CanvasBlock, z: number, pool: CanvasItem[]): CanvasI
     return makeItem(
       "image",
       at,
-      { ...shared, url: block.src, fit: block.fit ?? "cover", radius: block.radius ?? 0, alt: block.alt },
+      {
+        ...shared,
+        url: block.src,
+        fit: block.fit ?? "cover",
+        radius: block.radius ?? 0,
+        alt: block.alt,
+      },
       pool,
     );
   }

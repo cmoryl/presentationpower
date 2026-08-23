@@ -67,7 +67,6 @@ function BadgesPage() {
     requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
   };
 
-
   const person: BadgeAttendee = { ...attendee, roleId };
   const sides: ("front" | "back")[] = side === "both" ? ["front", "back"] : [side];
 
@@ -104,9 +103,9 @@ function BadgesPage() {
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-black/60">
             Built on the supplied print template — {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ plastic
-            badge, dual top slots, BLE Klik cutout. Bleed {BADGE_SPEC.bleedW}″ × {BADGE_SPEC.bleedH}″,
-            safe area {BADGE_SPEC.safeW}″ × {BADGE_SPEC.safeH}″. Artwork is CMYK, 300 ppi minimum, and
-            exports as {BADGE_SPEC.exportPreset}.
+            badge, dual top slots, BLE Klik cutout. Bleed {BADGE_SPEC.bleedW}″ × {BADGE_SPEC.bleedH}
+            ″, safe area {BADGE_SPEC.safeW}″ × {BADGE_SPEC.safeH}″. Artwork is CMYK, 300 ppi
+            minimum, and exports as {BADGE_SPEC.exportPreset}.
           </p>
 
           <div className="mt-6 grid gap-4 rounded-2xl border border-black/10 bg-white p-5 md:grid-cols-[repeat(4,minmax(0,1fr))]">
@@ -144,7 +143,11 @@ function BadgesPage() {
             </label>
             <label className="text-xs font-medium text-black/60">
               Role band
-              <select className={`mt-1 ${field}`} value={roleId} onChange={(e) => setRoleId(e.target.value)}>
+              <select
+                className={`mt-1 ${field}`}
+                value={roleId}
+                onChange={(e) => setRoleId(e.target.value)}
+              >
                 {BADGE_ROLES.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.label}
@@ -212,7 +215,9 @@ function BadgesPage() {
           </div>
         </div>
 
-        <div className={`badge-sheet mt-8 flex flex-wrap gap-8 ${pdfExport ? "is-pdf-export" : ""}`}>
+        <div
+          className={`badge-sheet mt-8 flex flex-wrap gap-8 ${pdfExport ? "is-pdf-export" : ""}`}
+        >
           {divisions.map((div) =>
             sides.map((s) => (
               <figure
@@ -221,7 +226,6 @@ function BadgesPage() {
                   div.id === pdfTargetId ? "is-pdf-target" : ""
                 }`}
               >
-
                 <NextBadge
                   division={div}
                   attendee={person}

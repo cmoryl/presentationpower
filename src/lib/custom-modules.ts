@@ -60,7 +60,8 @@ export function normalizeCanvasBlocks(raw: unknown): CanvasBlock[] {
   for (const item of raw) {
     if (!item || typeof item !== "object") continue;
     const b = item as Record<string, unknown>;
-    const num = (v: unknown, fallback: number) => (Number.isFinite(Number(v)) ? Number(v) : fallback);
+    const num = (v: unknown, fallback: number) =>
+      Number.isFinite(Number(v)) ? Number(v) : fallback;
     const kind = String(b.kind ?? "body");
     if (!["heading", "body", "caption", "image", "shape"].includes(kind)) continue;
     out.push({
@@ -80,7 +81,9 @@ export function normalizeCanvasBlocks(raw: unknown): CanvasBlock[] {
 }
 
 /** The variant a custom module renders through. */
-export function baseVariantFor(row: Pick<CustomModuleRow, "base_variant_id">): ModuleVariant | undefined {
+export function baseVariantFor(
+  row: Pick<CustomModuleRow, "base_variant_id">,
+): ModuleVariant | undefined {
   return byId(MODULE_VARIANTS, row.base_variant_id);
 }
 
@@ -128,7 +131,10 @@ export function validateCustomModule(input: {
     issues.push({ level: "error", message: "Give the module a name of at least 3 characters." });
   }
   if (!byId(MODULE_VARIANTS, input.baseVariantId)) {
-    issues.push({ level: "error", message: `Base module “${input.baseVariantId}” no longer exists.` });
+    issues.push({
+      level: "error",
+      message: `Base module “${input.baseVariantId}” no longer exists.`,
+    });
   }
   const visible = input.blocks.filter((b) => !b.hidden);
   const isBlankBase = input.baseVariantId === BLANK_VARIANT_ID;
@@ -154,7 +160,10 @@ export function validateCustomModule(input: {
     }
   }
   if (visible.some((b) => b.kind === "image" && !b.src)) {
-    issues.push({ level: "error", message: "An image object has no artwork — upload or remove it." });
+    issues.push({
+      level: "error",
+      message: "An image object has no artwork — upload or remove it.",
+    });
   }
   return issues;
 }

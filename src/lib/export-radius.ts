@@ -56,7 +56,7 @@ export function rectRadiusAdj(radiusIn: number, wIn: number, hIn: number): numbe
  */
 export function renderedRadiusPx(radiusIn: number, wIn: number, hIn: number): number {
   const adj = Math.min(rectRadiusAdj(radiusIn, wIn, hIn), 50000);
-  return ((adj / 100000) * Math.min(wIn, hIn)) * PX_PER_IN;
+  return (adj / 100000) * Math.min(wIn, hIn) * PX_PER_IN;
 }
 
 /** Absolute px drift between the intended token radius and what PPT paints. */

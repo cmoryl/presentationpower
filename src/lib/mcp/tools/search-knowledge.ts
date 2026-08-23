@@ -15,7 +15,13 @@ export default defineTool({
         "Brand mode id from get_taxonomy (e.g. 'bm-enterprise', 'bm-tp-legal'). Defaults to the master brand 'bm-enterprise'.",
       )
       .optional(),
-    limit: z.number().int().min(1).max(12).describe("Max snippets to return (default 6).").optional(),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(12)
+      .describe("Max snippets to return (default 6).")
+      .optional(),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ query, division_id, limit }, ctx) => {

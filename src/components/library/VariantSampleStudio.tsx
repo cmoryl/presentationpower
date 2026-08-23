@@ -68,12 +68,12 @@ const CELL_KINDS = ["feature", "body", "stat", "media"] as const;
  *  used by modules that render imagery without an `items[]` cell. */
 const SLIDE_MEDIA = -1;
 
-
 /** Icon container sizes a curator can pick per cell (iconography tokens). */
 const ICON_SIZE_CHOICES = ["xs", "sm", "md", "lg", "xl", "display"] as const;
 
 function blankItem(kind: string): Record<string, unknown> {
-  if (kind === "media") return { kind: "media", title: "New imagery", mediaSeed: `media-${Date.now()}`, mediaUrl: "" };
+  if (kind === "media")
+    return { kind: "media", title: "New imagery", mediaSeed: `media-${Date.now()}`, mediaUrl: "" };
   if (kind === "stat") return { kind: "stat", value: "0", unit: "%", label: "New metric" };
   return { kind, icon: "Layers3", title: "New cell", body: "Supporting detail for this cell." };
 }
@@ -85,7 +85,14 @@ function blankItem(kind: string): Record<string, unknown> {
  * swap any mark — and so a click on a rendered mark maps back to its cell.
  * ---------------------------------------------------------------------- */
 
-const LOGO_URL_KEYS = ["logoUrl", "logo", "primaryUrl", "logoUrlDark", "logoWhite", "logoPath"] as const;
+const LOGO_URL_KEYS = [
+  "logoUrl",
+  "logo",
+  "primaryUrl",
+  "logoUrlDark",
+  "logoWhite",
+  "logoPath",
+] as const;
 
 export type LogoCell = {
   /** Dotted/bracketed path into the copy object, e.g. `items[2]`. */
@@ -110,7 +117,9 @@ function collectLogoCells(copy: Record<string, unknown>, logoModule: boolean): L
         walk(it.logos, `${path}.logos`);
         return;
       }
-      const hasLogoKey = LOGO_URL_KEYS.some((k) => typeof it[k] === "string" && String(it[k]).trim());
+      const hasLogoKey = LOGO_URL_KEYS.some(
+        (k) => typeof it[k] === "string" && String(it[k]).trim(),
+      );
       if (!hasLogoKey && !logoModule) return;
       const url = String(it.logoUrl ?? it.logo ?? it.primaryUrl ?? "").trim();
       const darkUrl = String(it.logoUrlDark ?? it.logoWhite ?? "").trim();
@@ -129,8 +138,6 @@ function collectLogoCells(copy: Record<string, unknown>, logoModule: boolean): L
   walk(copy.logos, "logos");
   return out;
 }
-
-
 
 export function VariantSampleStudio({
   variant,
@@ -210,13 +217,7 @@ export function VariantSampleStudio({
   // Linear undo/redo over draft snapshots (every edit funnels through commit).
   const history = useUndoHistory<Record<string, unknown>>({ limit: 60 });
 
-
-
-
-  const { copy: baseCopy, ink: baseInk, modes } = useMemo(
-    () => splitSampleContent(draft),
-    [draft],
-  );
+  const { copy: baseCopy, ink: baseInk, modes } = useMemo(() => splitSampleContent(draft), [draft]);
   const layer: SampleModeLayer | undefined = modes[mode];
   /** What the slide actually shows in the mode being previewed. */
   const copy = useMemo(() => applyModeCopy(baseCopy, layer), [baseCopy, layer]);
@@ -228,8 +229,7 @@ export function VariantSampleStudio({
   /** Steps actually rendered by the chain (the renderer caps at nine). */
   const stepCount = isStepChain ? Math.min(items?.length ?? 0, 9) : 0;
   /** Focused step, clamped to what is on the slide right now. */
-  const activeStep =
-    isStepChain && stepFocus !== null && stepFocus < stepCount ? stepFocus : null;
+  const activeStep = isStepChain && stepFocus !== null && stepFocus < stepCount ? stepFocus : null;
   /**
    * Copy-tab field list. With a step picked, show only that step's own text
    * fields — including ones that are still empty (highlight / note), so a step
@@ -246,7 +246,6 @@ export function VariantSampleStudio({
     const extra = fields.filter((p) => p.startsWith(prefix) && !own.includes(p));
     return [...own, ...extra];
   }, [fields, activeStep, variant]);
-
 
   const logoCells = useMemo(() => collectLogoCells(copy, isLogoModule), [copy, isLogoModule]);
   const capacity = variant.capacity?.items;
@@ -274,8 +273,6 @@ export function VariantSampleStudio({
     return () => window.clearTimeout(t);
   }, [justSaved]);
 
-
-
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
@@ -294,7 +291,6 @@ export function VariantSampleStudio({
     return () => window.removeEventListener("keydown", onKey);
   });
 
-
   // ⌘S / Ctrl+S publishes the draft.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -307,7 +303,6 @@ export function VariantSampleStudio({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
-
 
   // ⌘Z / Ctrl+Z undo, ⇧⌘Z or Ctrl+Y redo — works while live editing too.
   useEffect(() => {
@@ -412,7 +407,6 @@ export function VariantSampleStudio({
     };
   }, [isStepChain, activeStep, copy, mode]);
 
-
   // ── Double-click any photo on the slide → open the image picker ────────
   // Single click already selects + opens, but double-click is the muscle
   // memory people bring from design tools, and it also catches photos that
@@ -464,8 +458,7 @@ export function VariantSampleStudio({
     const mediaIdx = (items ?? []).flatMap((it, i) => (String(it.kind) === "media" ? [i] : []));
     const measure = () => {
       const tiles = Array.from(root.querySelectorAll("[data-media-tile]"));
-      const tile =
-        sel.index === SLIDE_MEDIA ? tiles[0] : tiles[mediaIdx.indexOf(sel.index)];
+      const tile = sel.index === SLIDE_MEDIA ? tiles[0] : tiles[mediaIdx.indexOf(sel.index)];
       if (!tile) {
         setCropRect(null);
         return;
@@ -500,8 +493,6 @@ export function VariantSampleStudio({
           : null
       : null;
 
-
-
   // Bring the selected cell's editor into view after a stage click.
 
   useEffect(() => {
@@ -509,19 +500,17 @@ export function VariantSampleStudio({
     cardRefs.current[sel.index]?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [sel]);
 
-
   /** Every draft mutation funnels through here, so undo covers all of them. */
-  const commit = (
-    next: Record<string, unknown>,
-    label = "Edit",
-    coalesceKey?: string,
-  ) => {
+  const commit = (next: Record<string, unknown>, label = "Edit", coalesceKey?: string) => {
     history.push(structuredClone(draft ?? {}), label, coalesceKey);
     onDraftChange(next);
     setDirty(true);
   };
 
-  const applyHistory = (entry: { value: Record<string, unknown>; label: string } | null, verb: string) => {
+  const applyHistory = (
+    entry: { value: Record<string, unknown>; label: string } | null,
+    verb: string,
+  ) => {
     if (!entry) return;
     onDraftChange(structuredClone(entry.value));
     setDirty(true);
@@ -593,11 +582,8 @@ export function VariantSampleStudio({
 
   /** Structure edits always write the shared item list — a mode may restyle
    *  copy, but both modes render the same set of cells. */
-  const writeItems = (
-    next: Record<string, unknown>[],
-    label = "Sections",
-    coalesceKey?: string,
-  ) => commit({ ...draft, ...setPath(baseCopy, "items", next) }, label, coalesceKey);
+  const writeItems = (next: Record<string, unknown>[], label = "Sections", coalesceKey?: string) =>
+    commit({ ...draft, ...setPath(baseCopy, "items", next) }, label, coalesceKey);
 
   /** The shared (mode-agnostic) cell list. `items` is the mode-resolved view
    *  used for rendering; writes must go through this one so a light-only or
@@ -608,7 +594,6 @@ export function VariantSampleStudio({
   /** Cells to write against — falls back to the rendered list if shapes drift. */
   const writableItems = () =>
     baseItems && items && baseItems.length === items.length ? baseItems : items;
-
 
   const addItem = (kind: string) => {
     if (!items) return;
@@ -627,7 +612,10 @@ export function VariantSampleStudio({
         description: "Removing more may leave gaps in the layout.",
       });
     }
-    writeItems((writableItems() ?? []).filter((_, i) => i !== index), "Remove cell");
+    writeItems(
+      (writableItems() ?? []).filter((_, i) => i !== index),
+      "Remove cell",
+    );
   };
 
   const moveItem = (index: number, delta: number) => {
@@ -651,11 +639,7 @@ export function VariantSampleStudio({
   };
 
   /** `coalesceKey` collapses rapid patches (crop dragging) into one undo step. */
-  const patchItem = (
-    index: number,
-    patch: Record<string, unknown>,
-    coalesceKey?: string,
-  ) => {
+  const patchItem = (index: number, patch: Record<string, unknown>, coalesceKey?: string) => {
     // SLIDE_MEDIA addresses the slide's own hero photo, which lives on the
     // top-level copy object instead of an `items[]` cell.
     if (index === SLIDE_MEDIA) {
@@ -680,7 +664,6 @@ export function VariantSampleStudio({
     commit({ ...draft, ...setPath(baseCopy, path, { ...current, ...patch }) }, label);
   };
 
-
   /** Replace a cell's photo with an uploaded file. Stores both the signed URL
    *  and the storage path so the image is re-signed after the URL's TTL. */
   async function replaceImage(index: number, file: File) {
@@ -697,7 +680,6 @@ export function VariantSampleStudio({
       setUploading(null);
     }
   }
-
 
   const previewSlide: DeckSlide = {
     id: `${variant.id}:studio`,
@@ -791,7 +773,6 @@ export function VariantSampleStudio({
     if (ok) void handleSaveAndClose();
   }
 
-
   async function handleReset() {
     try {
       await reset.mutateAsync({
@@ -868,9 +849,7 @@ export function VariantSampleStudio({
                     : "All changes published"}
             </span>
           </div>
-
         </div>
-
 
         <div className="flex overflow-hidden rounded-full border border-white/25">
           <button
@@ -969,7 +948,6 @@ export function VariantSampleStudio({
           className="rounded-full border border-white/25 px-3 py-1.5 text-xs text-white/75 hover:border-white/60 hover:text-white"
         >
           ✕ Close
-
         </button>
       </div>
 
@@ -1012,7 +990,6 @@ export function VariantSampleStudio({
       )}
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5 lg:flex-row">
-
         {/* Stage */}
         <div className="flex min-h-0 flex-1 items-center justify-center">
           <div
@@ -1020,7 +997,6 @@ export function VariantSampleStudio({
             className={`relative w-full max-w-[1400px] overflow-hidden rounded-xl border shadow-2xl ${
               mode === "dark" ? "border-white/15 bg-[#03002C]" : "border-black/10 bg-white"
             }`}
-          
             style={pack ? { background: pack.tokens.surface } : undefined}
           >
             {/* Hover affordance: photos and icons are click-to-edit targets. */}
@@ -1084,7 +1060,9 @@ export function VariantSampleStudio({
                 onClick={() => setTab(t)}
                 aria-pressed={tab === t}
                 className={`flex-1 rounded-full px-3 py-1 capitalize transition ${
-                  tab === t ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"
+                  tab === t
+                    ? "bg-white font-semibold text-[#03002C]"
+                    : "text-white/65 hover:text-white"
                 }`}
               >
                 {t === "copy"
@@ -1097,7 +1075,6 @@ export function VariantSampleStudio({
               </button>
             ))}
           </div>
-
 
           <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60">
             <div className="font-semibold uppercase tracking-widest text-white/45">Save scope</div>
@@ -1115,8 +1092,8 @@ export function VariantSampleStudio({
                 checked={modeOnly}
                 onChange={(e) => setModeOnly(e.target.checked)}
               />
-              New copy / colour edits apply to <span className="font-semibold text-white">{mode}</span>{" "}
-              mode only
+              New copy / colour edits apply to{" "}
+              <span className="font-semibold text-white">{mode}</span> mode only
             </label>
             {modeLayerCount > 0 && (
               <div className="mt-2 flex items-center gap-2">
@@ -1187,7 +1164,9 @@ export function VariantSampleStudio({
                         key={i}
                         type="button"
                         onClick={() => setStepFocus(i)}
-                        title={String((items?.[i] as { label?: unknown })?.label ?? `Step ${i + 1}`)}
+                        title={String(
+                          (items?.[i] as { label?: unknown })?.label ?? `Step ${i + 1}`,
+                        )}
                         className={`min-h-[28px] min-w-[28px] rounded-full border px-2 text-[11px] transition ${
                           activeStep === i
                             ? "border-[#A1FBF9] bg-[#A1FBF9]/15 text-[#A1FBF9]"
@@ -1289,7 +1268,8 @@ export function VariantSampleStudio({
                   </p>
                   <ul className="mt-2 grid grid-cols-3 gap-1.5">
                     {logoCells.map((cell) => {
-                      const preview = mode === "dark" ? cell.darkUrl || cell.url : cell.url || cell.darkUrl;
+                      const preview =
+                        mode === "dark" ? cell.darkUrl || cell.url : cell.url || cell.darkUrl;
                       return (
                         <li key={cell.path}>
                           <button
@@ -1330,8 +1310,11 @@ export function VariantSampleStudio({
               ) : (
                 <>
                   <p className="mt-3 text-[11px] text-white/50">
-                    Click a photo, an icon or a logo on the slide to jump to its cell, then
-                    replace, swap or resize it. {capacity?.max ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.` : ""}
+                    Click a photo, an icon or a logo on the slide to jump to its cell, then replace,
+                    swap or resize it.{" "}
+                    {capacity?.max
+                      ? `${variant.name} renders ${capacity.min ?? 1}–${capacity.max} cells.`
+                      : ""}
                   </p>
 
                   {/* Global type scale — one setting per role so numerals, titles
@@ -1383,13 +1366,11 @@ export function VariantSampleStudio({
                         );
                       })}
                       <p className="mt-2 text-[10px] leading-snug text-white/40">
-                        Applies to every step, so 3-step and 9-step chains read at the same
-                        size. Text still shrinks on narrow canvases to avoid overlap.
+                        Applies to every step, so 3-step and 9-step chains read at the same size.
+                        Text still shrinks on narrow canvases to avoid overlap.
                       </p>
                     </div>
                   )}
-
-
 
                   <div className="mt-3 flex items-center gap-2">
                     <select
@@ -1430,7 +1411,6 @@ export function VariantSampleStudio({
                               : "border-white/12"
                           }`}
                         >
-
                           <div className="flex items-center gap-1.5">
                             <span className="font-mono text-[10px] text-white/40">
                               {String(i + 1).padStart(2, "0")}
@@ -1498,7 +1478,6 @@ export function VariantSampleStudio({
                               onChange={(hex) => setItemField(i, "toneEnd", hex ?? undefined)}
                             />
                           </div>
-
 
                           {isMedia ? (
                             <>
@@ -1571,7 +1550,11 @@ export function VariantSampleStudio({
                                 <button
                                   type="button"
                                   onClick={() =>
-                                    setItemField(i, "mediaSeed", `media-${Math.random().toString(36).slice(2, 8)}`)
+                                    setItemField(
+                                      i,
+                                      "mediaSeed",
+                                      `media-${Math.random().toString(36).slice(2, 8)}`,
+                                    )
                                   }
                                   title="Shuffle the curated photo for this cell"
                                   className="rounded border border-white/20 px-2 py-1 text-[10px] text-white/70 hover:text-white"
@@ -1595,7 +1578,9 @@ export function VariantSampleStudio({
                                     step={0.05}
                                     value={Number(it.mediaZoom) || 1}
                                     aria-label={`Cell ${i + 1} image size`}
-                                    onChange={(e) => setItemField(i, "mediaZoom", Number(e.target.value))}
+                                    onChange={(e) =>
+                                      setItemField(i, "mediaZoom", Number(e.target.value))
+                                    }
                                     className="flex-1 accent-[#A1FBF9]"
                                   />
                                   <button
@@ -1620,7 +1605,8 @@ export function VariantSampleStudio({
                                       ["contain", "Show whole image"],
                                     ] as const
                                   ).map(([value, label]) => {
-                                    const active = (String(it.mediaFit ?? "cover") || "cover") === value;
+                                    const active =
+                                      (String(it.mediaFit ?? "cover") || "cover") === value;
                                     return (
                                       <button
                                         key={value}
@@ -1629,7 +1615,9 @@ export function VariantSampleStudio({
                                         aria-pressed={active}
                                         onClick={() => setItemField(i, "mediaFit", value)}
                                         className={`flex-1 px-2 py-1 text-[10px] ${
-                                          active ? "bg-white text-[#03002C]" : "text-white/65 hover:text-white"
+                                          active
+                                            ? "bg-white text-[#03002C]"
+                                            : "text-white/65 hover:text-white"
                                         }`}
                                       >
                                         {value === "cover" ? "▣ Cover" : "▢ Contain"}
@@ -1645,7 +1633,13 @@ export function VariantSampleStudio({
                                   <span>Crop focus</span>
                                   <button
                                     type="button"
-                                    onClick={() => patchItem(i, { mediaFocus: "", mediaZoom: 1, mediaFit: "cover" })}
+                                    onClick={() =>
+                                      patchItem(i, {
+                                        mediaFocus: "",
+                                        mediaZoom: 1,
+                                        mediaFit: "cover",
+                                      })
+                                    }
                                     className="rounded border border-white/20 px-1.5 py-0.5 text-[9px] normal-case tracking-normal text-white/60 hover:text-white"
                                   >
                                     reset crop
@@ -1689,9 +1683,7 @@ export function VariantSampleStudio({
                                   })}
                                 </div>
                               </div>
-
                             </>
-
                           ) : kind === "stat" ? (
                             <div className="mt-1.5 flex gap-1.5">
                               <input
@@ -1811,7 +1803,6 @@ export function VariantSampleStudio({
                                   {Number(it.iconOffsetPct ?? 0) || 0}%
                                 </span>
                               </label>
-
                             </div>
                           )}
                         </div>
@@ -1827,11 +1818,7 @@ export function VariantSampleStudio({
 
       {pickerFor !== null && (pickerFor === SLIDE_MEDIA || items?.[pickerFor]) && (
         <SlideMediaPicker
-          title={
-            pickerFor === SLIDE_MEDIA
-              ? "Slide image"
-              : `Image for cell ${pickerFor + 1}`
-          }
+          title={pickerFor === SLIDE_MEDIA ? "Slide image" : `Image for cell ${pickerFor + 1}`}
           currentUrl={
             String(
               (pickerFor === SLIDE_MEDIA ? copy.mediaUrl : items?.[pickerFor]?.mediaUrl) ?? "",
@@ -1855,37 +1842,42 @@ export function VariantSampleStudio({
         />
       )}
 
-      {logoPickerFor !== null && (() => {
-        const cell = logoCells.find((c) => c.path === logoPickerFor);
-        const preview = cell ? (mode === "dark" ? cell.darkUrl || cell.url : cell.url || cell.darkUrl) : "";
-        return (
-          <SlideLogoPicker
-            title={cell?.name ? `Logo · ${cell.name}` : "Choose logo"}
-            currentName={cell?.name}
-            currentUrl={preview || undefined}
-            onClose={() => setLogoPickerFor(null)}
-            onPick={(picked) =>
-              patchLogoCell(
-                logoPickerFor,
-                {
-                  logoUrl: picked.logoUrl,
-                  logoUrlDark: picked.logoUrlDark,
-                  logoPath: picked.logoPath,
-                  ...(picked.name ? { name: picked.name } : {}),
-                },
-                `Logo · ${picked.name || "swap"}`,
-              )
-            }
-            onClear={() =>
-              patchLogoCell(
-                logoPickerFor,
-                { logoUrl: "", logoUrlDark: "", logoPath: "" },
-                "Logo · clear",
-              )
-            }
-          />
-        );
-      })()}
+      {logoPickerFor !== null &&
+        (() => {
+          const cell = logoCells.find((c) => c.path === logoPickerFor);
+          const preview = cell
+            ? mode === "dark"
+              ? cell.darkUrl || cell.url
+              : cell.url || cell.darkUrl
+            : "";
+          return (
+            <SlideLogoPicker
+              title={cell?.name ? `Logo · ${cell.name}` : "Choose logo"}
+              currentName={cell?.name}
+              currentUrl={preview || undefined}
+              onClose={() => setLogoPickerFor(null)}
+              onPick={(picked) =>
+                patchLogoCell(
+                  logoPickerFor,
+                  {
+                    logoUrl: picked.logoUrl,
+                    logoUrlDark: picked.logoUrlDark,
+                    logoPath: picked.logoPath,
+                    ...(picked.name ? { name: picked.name } : {}),
+                  },
+                  `Logo · ${picked.name || "swap"}`,
+                )
+              }
+              onClear={() =>
+                patchLogoCell(
+                  logoPickerFor,
+                  { logoUrl: "", logoUrlDark: "", logoPath: "" },
+                  "Logo · clear",
+                )
+              }
+            />
+          );
+        })()}
 
       <SaveModuleDialog
         open={saveToFiles}
@@ -1902,7 +1894,6 @@ export function VariantSampleStudio({
   if (typeof document === "undefined") return studio;
   return createPortal(studio, document.body);
 }
-
 
 /* ── Version history ──────────────────────────────────────────────────────
  * Every successful save writes a restore point. This panel lists them
@@ -1957,9 +1948,7 @@ function SampleHistoryPanel({
           return (
             <div key={v.id} className="rounded-lg border border-white/12 bg-[#03002C]/45 p-2.5">
               <div className="flex items-center gap-2">
-                <span className="font-mono text-[10px] text-white/40">
-                  v{versions.length - i}
-                </span>
+                <span className="font-mono text-[10px] text-white/40">v{versions.length - i}</span>
                 <span className="text-[11px] text-white/80">{fmt(v.createdAt)}</span>
                 {i === 0 && (
                   <span className="rounded-full bg-[#A6FA87]/15 px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-[#A6FA87]">
@@ -1967,7 +1956,9 @@ function SampleHistoryPanel({
                   </span>
                 )}
                 <span className="ml-auto text-[10px] text-white/45">
-                  {rows.length === 0 ? "same as draft" : `${rows.length} diff${rows.length === 1 ? "" : "s"}`}
+                  {rows.length === 0
+                    ? "same as draft"
+                    : `${rows.length} diff${rows.length === 1 ? "" : "s"}`}
                 </span>
               </div>
               {v.label && <div className="mt-1 text-[11px] text-white/55">{v.label}</div>}

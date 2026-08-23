@@ -114,7 +114,8 @@ export function campaignArtDirection(args: {
   const styleId =
     (args.styleId as SocialStyleId | null | undefined) ??
     readCampaignStyleId(args.brandId) ??
-    ((look.styleId as SocialStyleId | undefined) ?? DEFAULT_SOCIAL_STYLE_ID);
+    (look.styleId as SocialStyleId | undefined) ??
+    DEFAULT_SOCIAL_STYLE_ID;
   return {
     look,
     styleId: resolveSocialStyle(styleId).id as SocialStyleId,

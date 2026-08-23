@@ -131,7 +131,8 @@ export function OpenSpaceFillProvider({
     [scaleOverride],
   );
   const signature = React.useMemo(
-    () => `${variantId ?? ""}:${JSON.stringify(content ?? {}).length}:${density ?? ""}:${overrideKey}`,
+    () =>
+      `${variantId ?? ""}:${JSON.stringify(content ?? {}).length}:${density ?? ""}:${overrideKey}`,
     [variantId, content, density, overrideKey],
   );
   // A new slide (or edited content) starts again at full growth.
@@ -179,9 +180,7 @@ export function OpenSpaceFillProvider({
     };
   }, [base, enabled, stepIndex, overrideKey, scaleOverride, typography]);
 
-  return (
-    <OpenSpaceFillContext.Provider value={value}>{children}</OpenSpaceFillContext.Provider>
-  );
+  return <OpenSpaceFillContext.Provider value={value}>{children}</OpenSpaceFillContext.Provider>;
 }
 
 /**

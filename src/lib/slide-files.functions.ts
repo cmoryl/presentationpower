@@ -13,7 +13,10 @@ const BUCKET = "slide-files";
 const SIGNED_TTL = 60 * 10;
 
 function sanitizeName(name: string): string {
-  const base = name.replace(/[^\w.\-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+  const base = name
+    .replace(/[^\w.\-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
   const safe = base || "slide.pptx";
   return safe.toLowerCase().endsWith(".pptx") ? safe : `${safe}.pptx`;
 }
@@ -47,8 +50,7 @@ export const attachSlideFile = createServerFn({ method: "POST" })
     const path = `${userId}/${data.moduleId}/${fileName}`;
 
     const up = await supabase.storage.from(BUCKET).upload(path, bytes, {
-      contentType:
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
       upsert: true,
     });
     if (up.error) throw up.error;

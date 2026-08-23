@@ -8,7 +8,11 @@ import {
   type ResolvedFunnelStyle,
 } from "@/lib/funnel-style";
 import { FunnelFigure, type FunnelStage } from "./FunnelFigure";
-import { DeviceFrame, DeviceScreenPlaceholder, deviceKindFrom } from "@/components/device/DeviceFrame";
+import {
+  DeviceFrame,
+  DeviceScreenPlaceholder,
+  deviceKindFrom,
+} from "@/components/device/DeviceFrame";
 import { AccentRule, FlowArrow, ProcessRail } from "./Connectors";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import {
@@ -21,7 +25,6 @@ import {
   makeSlideInk,
   useSlideInk,
   useSlideMode,
-
   type SlideMode,
   type SlideBackdrop,
 } from "./SlideChrome";
@@ -43,7 +46,12 @@ import { backdropForVariant } from "./variantBackdrop";
 import { useSlideSkin, SlideSkinProvider } from "./SlideSkinContext";
 import { useStylePack } from "./StylePackContext";
 import { dashLook, type DashChart, type DashLook } from "@/lib/dash-look";
-import { OpenSpaceFillProvider, useChartLabelCap, useChartLabelStride, useOpenSpaceFill } from "./OpenSpaceFill";
+import {
+  OpenSpaceFillProvider,
+  useChartLabelCap,
+  useChartLabelStride,
+  useOpenSpaceFill,
+} from "./OpenSpaceFill";
 import { chartLabelSize, fillPx, statPx, STAT_FIT_STYLE, clampLines } from "@/lib/open-space-fill";
 import { useChartStyle } from "./ChartStyleContext";
 import {
@@ -77,11 +85,9 @@ import {
   cardWashGradient,
   openBottomFrame,
   orbitNodePositions,
-
   SEAM_HEIGHT_PX,
   SEAM_TICK_INSET_PCT,
   SUMMARY_BAND,
-
 } from "@/lib/surface-tokens";
 import { laneCornerRadiusPx, laneLadderPx, railBoxPx } from "@/lib/layer-stack-geometry";
 import {
@@ -101,9 +107,6 @@ import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
 
 import { OrbitDisc } from "./OrbitDisc";
-
-
-
 
 import {
   createContext,
@@ -143,7 +146,6 @@ import {
   AuroraSidePanel,
   moduleCardTint,
   moduleCardSurface,
-
   AccentTick,
   EDITORIAL_SERIF,
 } from "./flagship";
@@ -156,7 +158,6 @@ import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 
 import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
-
 
 // CLIENT logo chip for case-study modules. Resolution order:
 //   1. the deck's real clientLogoUrl (explicitly picked in the editor)
@@ -223,7 +224,6 @@ function ClientLogoChip({
     </div>
   );
 }
-
 
 // Module-scoped context so helper components (CardGrid, StatGrid, NumberedList,
 // etc.) automatically pick up the current slide's clientName + layoutId when
@@ -321,8 +321,6 @@ import {
   Check,
   ChevronsDown,
   ChevronsRight,
-
-
 } from "lucide-react";
 
 type IconType = typeof Sparkles;
@@ -467,7 +465,7 @@ function IconBadge({
         : (tone as IconEmphasis);
   const spec = withDefaults({
     placement,
-    size: (sizeToken && ICON_SIZES[sizeToken as IconSizeToken] ? (sizeToken as IconSizeToken) : size),
+    size: sizeToken && ICON_SIZES[sizeToken as IconSizeToken] ? (sizeToken as IconSizeToken) : size,
     treatment: treatment ?? (legacyOnDark ? "on-dark" : "soft-tile"),
     emphasis,
     a11yRole: ariaLabel ? "semantic" : "decorative",
@@ -485,7 +483,6 @@ function IconBadge({
     <div
       data-icon-well=""
       className={`flex shrink-0 items-center justify-center ${isCircle ? "rounded-full" : ""}`}
-
       style={{
         width: dims.containerPx,
         height: dims.containerPx,
@@ -503,8 +500,6 @@ function IconBadge({
         className="icon-strong"
         aria-hidden={spec.a11yRole === "decorative"}
       />
-
-
     </div>
   );
 }
@@ -610,20 +605,20 @@ export function VariantRenderer(props: Props) {
     : packForFill?.geometry?.fill;
   return (
     <SlideTemplateProvider template={template}>
-    <OpenSpaceFillProvider
-      content={props.slide?.content}
-      variantId={props.variant?.id}
-      density={fillDensity}
-      scaleOverride={templateScale}
-      industryId={industryId}
-    >
-    <SlideTextFormatLayer
-      formats={formats}
-      signature={`${props.variant.id}:${JSON.stringify(props.slide?.content ?? {}).length}`}
-    >
-      <VariantRendererInner {...props} />
-    </SlideTextFormatLayer>
-    </OpenSpaceFillProvider>
+      <OpenSpaceFillProvider
+        content={props.slide?.content}
+        variantId={props.variant?.id}
+        density={fillDensity}
+        scaleOverride={templateScale}
+        industryId={industryId}
+      >
+        <SlideTextFormatLayer
+          formats={formats}
+          signature={`${props.variant.id}:${JSON.stringify(props.slide?.content ?? {}).length}`}
+        >
+          <VariantRendererInner {...props} />
+        </SlideTextFormatLayer>
+      </OpenSpaceFillProvider>
     </SlideTemplateProvider>
   );
 }
@@ -731,60 +726,59 @@ function VariantRendererInner(props: Props) {
       }
     : fallbackBackdrop;
 
-
   return (
     <SlideSkinProvider skin={skin}>
-    <SlideModeContext.Provider value={mode}>
-      <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
-        <SlideInkContext.Provider value={semanticInk}>
-          <SlideBackdropContext.Provider value={backdrop}>
-            {/* Module vocabulary for background selection. The chrome only
+      <SlideModeContext.Provider value={mode}>
+        <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
+          <SlideInkContext.Provider value={semanticInk}>
+            <SlideBackdropContext.Provider value={backdrop}>
+              {/* Module vocabulary for background selection. The chrome only
                 knows "cover | content | divider | close", which is far too
                 coarse to pick a plate — publish the real module identity so the
                 active style pack grounds each module with the scene its
                 composition wants (stats, chart, bento, timeline, split, quote). */}
-            <SlideSceneSeedContext.Provider
-              value={`${variant.id} ${variant.name} ${variant.familyId}`}
-            >
-            <SlideFrameCtx.Provider
-              value={{
-                clientName: resolvedClient,
-                layoutId: slide.layoutId,
-                clientLogoUrl: clientLogoUrl ?? null,
-                subCompany,
-                logoOrientation:
-                  slide.logoOrientation && slide.logoOrientation !== "auto"
-                    ? slide.logoOrientation
-                    : logoOrientation,
-                logoPosition:
-                  slide.logoPosition && slide.logoPosition !== "auto"
-                    ? slide.logoPosition
-                    : undefined,
-              }}
-            >
-              {/* display:contents keeps layout untouched while exposing the
+              <SlideSceneSeedContext.Provider
+                value={`${variant.id} ${variant.name} ${variant.familyId}`}
+              >
+                <SlideFrameCtx.Provider
+                  value={{
+                    clientName: resolvedClient,
+                    layoutId: slide.layoutId,
+                    clientLogoUrl: clientLogoUrl ?? null,
+                    subCompany,
+                    logoOrientation:
+                      slide.logoOrientation && slide.logoOrientation !== "auto"
+                        ? slide.logoOrientation
+                        : logoOrientation,
+                    logoPosition:
+                      slide.logoPosition && slide.logoPosition !== "auto"
+                        ? slide.logoPosition
+                        : undefined,
+                  }}
+                >
+                  {/* display:contents keeps layout untouched while exposing the
                   slide mode to CSS (light mode kills text/content shadows). */}
-              <div data-slide-mode={mode} style={{ display: "contents" }}>
-                <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
-                {renderVariantBody({
-                  slide,
-                  variant,
-                  brand: themedBrand,
-                  pageNumber,
-                  c,
-                  mode,
-                  clientName: resolvedClient,
-                  clientLogoUrl: clientLogoUrl ?? null,
-                  dash,
-                })}
-                </StatLayoutProvider>
-              </div>
-            </SlideFrameCtx.Provider>
-            </SlideSceneSeedContext.Provider>
-          </SlideBackdropContext.Provider>
-        </SlideInkContext.Provider>
-      </SlideAccentContext.Provider>
-    </SlideModeContext.Provider>
+                  <div data-slide-mode={mode} style={{ display: "contents" }}>
+                    <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
+                      {renderVariantBody({
+                        slide,
+                        variant,
+                        brand: themedBrand,
+                        pageNumber,
+                        c,
+                        mode,
+                        clientName: resolvedClient,
+                        clientLogoUrl: clientLogoUrl ?? null,
+                        dash,
+                      })}
+                    </StatLayoutProvider>
+                  </div>
+                </SlideFrameCtx.Provider>
+              </SlideSceneSeedContext.Provider>
+            </SlideBackdropContext.Provider>
+          </SlideInkContext.Provider>
+        </SlideAccentContext.Provider>
+      </SlideModeContext.Provider>
     </SlideSkinProvider>
   );
 }
@@ -867,7 +861,9 @@ function renderVariantBody({
   // them to a native module (which clears `importedDeckId`).
   const importedRef = readImportedRef(c);
   if (importedRef) {
-    return <ImportedFaithfulSlide deckId={importedRef.deckId} slideIndex={importedRef.slideIndex} />;
+    return (
+      <ImportedFaithfulSlide deckId={importedRef.deckId} slideIndex={importedRef.slideIndex} />
+    );
   }
 
   // Spec-driven MV-VIZ-* family renders through the InfographicSpec pipeline.
@@ -982,7 +978,6 @@ function renderVariantBody({
       const platedCover = brand.id === "bm-tp-games" && !s(c.mediaUrl) && !s(c.mediaPath);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
-
           <MediaTile
             brand={brand}
             seed={s(c.mediaSeed, s(c.clientName, "cover-media"))}
@@ -1016,7 +1011,10 @@ function renderVariantBody({
             <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
           )}
 
-          <div data-on-media className="absolute inset-x-24 top-32 bottom-40 flex flex-col justify-end overflow-hidden text-white">
+          <div
+            data-on-media
+            className="absolute inset-x-24 top-32 bottom-40 flex flex-col justify-end overflow-hidden text-white"
+          >
             <div className="flex items-center gap-4 tp-rise">
               <span
                 className="inline-block h-2 w-2 rounded-full"
@@ -1169,7 +1167,9 @@ function renderVariantBody({
             <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
             <div
               className="slide-fill-stretch slide-fill-rows mt-16 grid grid-cols-2 gap-x-24"
-              style={{ gridTemplateRows: `repeat(${Math.max(1, Math.ceil(items.length / 2))}, minmax(0, 1fr))` }}
+              style={{
+                gridTemplateRows: `repeat(${Math.max(1, Math.ceil(items.length / 2))}, minmax(0, 1fr))`,
+              }}
             >
               {items.map((it, i) => (
                 <div
@@ -1210,10 +1210,7 @@ function renderVariantBody({
           <SlideTitle brand={brand} title={s(c.title, "Agenda")} kicker="Contents" />
           <div className="mt-12">
             {arr(c.items).map((it, i) => (
-              <div
-                key={i}
-                className="relative flex items-baseline gap-10 py-7"
-              >
+              <div key={i} className="relative flex items-baseline gap-10 py-7">
                 <AccentRule
                   accent={brand.tokens.accent}
                   cap
@@ -1234,7 +1231,10 @@ function renderVariantBody({
                     {s(it.label)}
                   </div>
                   {s(it.body) && (
-                    <div className="mt-2" style={{ fontSize: fillPx(24, "body"), opacity: 0.66, lineHeight: 1.35 }}>
+                    <div
+                      className="mt-2"
+                      style={{ fontSize: fillPx(24, "body"), opacity: 0.66, lineHeight: 1.35 }}
+                    >
                       {s(it.body)}
                     </div>
                   )}
@@ -1420,7 +1420,9 @@ function renderVariantBody({
                 unit={s(c.unit)}
                 label={s(c.label)}
                 size="xl"
-              icon={s(c.icon)} iconSize={s(c.iconSize)} />
+                icon={s(c.icon)}
+                iconSize={s(c.iconSize)}
+              />
             </div>
             <SupportingText size="xl" opacity={0.85} maxWidthPx={720}>
               {s(c.narrative)}
@@ -1761,7 +1763,11 @@ function renderVariantBody({
           <AuroraOrb x={90} y={28} size={860} />
           <div className="relative flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title)} />
-            <GlassTile radius={26} padding="px-12 py-12" className="slide-fill-stretch mt-12 flex flex-col">
+            <GlassTile
+              radius={26}
+              padding="px-12 py-12"
+              className="slide-fill-stretch mt-12 flex flex-col"
+            >
               <div
                 className="slide-fill-stretch slide-fill-rows grid grid-cols-2 items-center gap-x-16 gap-y-8"
                 style={{
@@ -1775,7 +1781,8 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="md"
-                      override={s(it.icon)} sizeToken={s(it.iconSize)}
+                      override={s(it.icon)}
+                      sizeToken={s(it.iconSize)}
                     />
                     <div className="flex-1">
                       <div className="text-3xl font-semibold" style={{ color: ink.strong }}>
@@ -1917,16 +1924,17 @@ function renderVariantBody({
                 columnGap: gap,
               }}
             >
-
               {steps.map((it, i) => {
                 const flagged = truthy(it.highlight);
                 const StepIcon = it.icon ? iconByName(s(it.icon)) : null;
                 // Per-step glyph size token, matching the Studio icon stepper.
                 const stepIconK =
-                  ({ xs: 0.6, sm: 0.8, md: 1, lg: 1.25, xl: 1.6, display: 2.2 } as Record<
-                    string,
-                    number
-                  >)[String(it.iconSize ?? "md")] ?? 1;
+                  (
+                    { xs: 0.6, sm: 0.8, md: 1, lg: 1.25, xl: 1.6, display: 2.2 } as Record<
+                      string,
+                      number
+                    >
+                  )[String(it.iconSize ?? "md")] ?? 1;
                 // Flagged steps break out of the division accent into the brand
                 // pink pop so the risk point reads instantly.
                 // Mode-aware tone: raw pink/blue is unreadable as ink or hairline on
@@ -2022,7 +2030,6 @@ function renderVariantBody({
                           )}%)`,
                         }}
                       >
-
                         {StepIcon ? (
                           <StepIcon
                             size={Math.round(NUMERAL_BASE * numeralK * 0.86 * stepIconK)}
@@ -2049,9 +2056,7 @@ function renderVariantBody({
                           </span>
                         )}
                       </div>
-
                     </div>
-
 
                     {/* Reserved title band keeps sub-text baselines aligned even
                         when one step's label wraps to two lines. */}
@@ -2080,11 +2085,9 @@ function renderVariantBody({
                           color: "color-mix(in oklab, currentColor 66%, transparent)",
                         }}
                       >
-
                         {s(it.body)}
                       </div>
                     )}
-
 
                     {flagged && s(it.note) && (
                       <div className="mt-5 flex flex-col items-center">
@@ -2136,7 +2139,6 @@ function renderVariantBody({
                 />
               );
             })()}
-
           </div>
         </SlideFrame>
       );
@@ -2166,9 +2168,17 @@ function renderVariantBody({
 
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <div className="grid h-full items-center" style={{ gridTemplateColumns: "0.92fr 1.08fr", columnGap: 96 }}>
+          <div
+            className="grid h-full items-center"
+            style={{ gridTemplateColumns: "0.92fr 1.08fr", columnGap: 96 }}
+          >
             {/* ── Numbered medallion ───────────────────────────────────── */}
-            <div data-intro-item="" data-intro-step={0} className="relative mx-auto aspect-square w-full" style={{ maxWidth: 620 }}>
+            <div
+              data-intro-item=""
+              data-intro-step={0}
+              className="relative mx-auto aspect-square w-full"
+              style={{ maxWidth: 620 }}
+            >
               {/* Outer orbit ring — one continuous hairline, no masked breaks
                   (the old conic mask read as several stacked arcs). */}
               <div
@@ -2283,7 +2293,9 @@ function renderVariantBody({
                             {RowIcon ? (
                               <RowIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
                             ) : (
-                              <span style={{ fontSize: fillPx(30, "figure"), fontWeight: 700 }}>{i + 1}</span>
+                              <span style={{ fontSize: fillPx(30, "figure"), fontWeight: 700 }}>
+                                {i + 1}
+                              </span>
                             )}
                           </span>
                         </div>
@@ -2302,7 +2314,11 @@ function renderVariantBody({
                           {s(it.body) && (
                             <div
                               className="mt-1.5"
-                              style={{ fontSize: fillPx(22, "body"), lineHeight: 1.35, color: ink.body }}
+                              style={{
+                                fontSize: fillPx(22, "body"),
+                                lineHeight: 1.35,
+                                color: ink.body,
+                              }}
                             >
                               {s(it.body)}
                             </div>
@@ -2326,7 +2342,9 @@ function renderVariantBody({
       // eye between stages. House treatment: accentInk tones, hairline rings
       // with faded tails, cardWashGradient + openBottomFrame task tiles.
       const accent = accentInk(brand.tokens.accent, mode, 4.5);
-      const stages = arr(c.stages).slice(0, 4).map((raw) => obj(raw));
+      const stages = arr(c.stages)
+        .slice(0, 4)
+        .map((raw) => obj(raw));
       const stageCount = Math.max(stages.length, 1);
       const wide = stageCount <= 3;
       const iconBox = wide ? 78 : 64;
@@ -2344,7 +2362,9 @@ function renderVariantBody({
             )}
             <div className="mt-10 flex items-start justify-center" style={{ gap: wide ? 28 : 18 }}>
               {stages.map((st, si) => {
-                const tasks = arr(st.items).slice(0, 4).map((t) => obj(t));
+                const tasks = arr(st.items)
+                  .slice(0, 4)
+                  .map((t) => obj(t));
                 return (
                   <React.Fragment key={si}>
                     {si > 0 && (
@@ -2370,7 +2390,9 @@ function renderVariantBody({
                           aria-hidden
                           data-decorative
                           className="absolute inset-0 rounded-full"
-                          style={{ border: `2px solid color-mix(in oklab, ${accent} 38%, transparent)` }}
+                          style={{
+                            border: `2px solid color-mix(in oklab, ${accent} 38%, transparent)`,
+                          }}
                         />
                         {/* Inner containment ring. */}
                         <div
@@ -2384,7 +2406,6 @@ function renderVariantBody({
                         />
                         {/* Orbit nodes centred exactly on the outer ring. */}
                         {orbitNodePositions(4, 26).map((pos, i) => (
-
                           <div
                             key={i}
                             aria-hidden
@@ -2400,7 +2421,10 @@ function renderVariantBody({
                           />
                         ))}
                         {/* Photo medallion with duotone wash so type clears. */}
-                        <div className="absolute overflow-hidden rounded-full" style={{ inset: "11%" }}>
+                        <div
+                          className="absolute overflow-hidden rounded-full"
+                          style={{ inset: "11%" }}
+                        >
                           <MediaTile
                             brand={brand}
                             seed={s(st.mediaSeed, s(st.label, `stage-${si + 1}`))}
@@ -2488,7 +2512,10 @@ function renderVariantBody({
                                     aria-hidden
                                     data-decorative
                                     className="absolute inset-0"
-                                    style={{ borderRadius: 18, backgroundImage: cardWashGradient(accent) }}
+                                    style={{
+                                      borderRadius: 18,
+                                      backgroundImage: cardWashGradient(accent),
+                                    }}
                                   />
                                   <div
                                     aria-hidden
@@ -2498,9 +2525,16 @@ function renderVariantBody({
                                   />
                                   <span className="relative" style={{ color: accent }}>
                                     {TaskIcon ? (
-                                      <TaskIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
+                                      <TaskIcon
+                                        size={Math.round(iconBox * 0.46)}
+                                        strokeWidth={1.7}
+                                      />
                                     ) : (
-                                      <span style={{ fontSize: fillPx(24, "body"), fontWeight: 700 }}>{ti + 1}</span>
+                                      <span
+                                        style={{ fontSize: fillPx(24, "body"), fontWeight: 700 }}
+                                      >
+                                        {ti + 1}
+                                      </span>
                                     )}
                                   </span>
                                 </div>
@@ -2531,10 +2565,7 @@ function renderVariantBody({
       );
     }
 
-
-
     case "MV-PROC-BEFORE-AFTER": {
-
       const before = obj(c.before);
       const after = obj(c.after);
       return (
@@ -2672,7 +2703,12 @@ function renderVariantBody({
             }}
           >
             {NodeIcon ? (
-              <NodeIcon size={Math.round(node * 0.42)} strokeWidth={1.8} color={accent} aria-hidden />
+              <NodeIcon
+                size={Math.round(node * 0.42)}
+                strokeWidth={1.8}
+                color={accent}
+                aria-hidden
+              />
             ) : (
               <span
                 style={{
@@ -2853,7 +2889,12 @@ function renderVariantBody({
                 ))}
               </div>
             </div>
-            <SummaryBand {...readSummary(c.summary)} accent={accent} leadTone={ink.strong} scale={0.8} />
+            <SummaryBand
+              {...readSummary(c.summary)}
+              accent={accent}
+              leadTone={ink.strong}
+              scale={0.8}
+            />
           </div>
         </SlideFrame>
       );
@@ -2884,14 +2925,10 @@ function renderVariantBody({
       const pillH = perSide >= 6 ? 52 : perSide >= 5 ? 58 : 64;
       const pillW = perSide >= 6 ? 322 : 344;
       const labelSize = perSide >= 6 ? 20 : perSide >= 5 ? 22 : 23;
-      const step =
-        perSide > 1
-          ? Math.min(pillH + 26, (STAGE_H - pillH - 8) / (perSide - 1))
-          : 0;
+      const step = perSide > 1 ? Math.min(pillH + 26, (STAGE_H - pillH - 8) / (perSide - 1)) : 0;
       const LEAD = 30; // breathing room between chip edge and the hub arc
 
-      const rowOffset = (i: number, total: number) =>
-        (i - (total - 1) / 2) * step;
+      const rowOffset = (i: number, total: number) => (i - (total - 1) / 2) * step;
 
       /** Horizontal distance from the hub centre to a chip's inner edge, tracing
        *  the hub arc so middle rows step outward and end rows tuck inward. */
@@ -2966,7 +3003,12 @@ function renderVariantBody({
                 }}
               >
                 {PillIcon ? (
-                  <PillIcon size={Math.round(pillH * 0.3)} strokeWidth={1.8} color={accent} aria-hidden />
+                  <PillIcon
+                    size={Math.round(pillH * 0.3)}
+                    strokeWidth={1.8}
+                    color={accent}
+                    aria-hidden
+                  />
                 ) : (
                   <span
                     style={{
@@ -3015,7 +3057,6 @@ function renderVariantBody({
             </div>
           )}
           <div className="relative mt-8">
-
             <div className="relative" style={{ height: STAGE_H }}>
               {/* Clearance halo: ties the two stacks to one orbit. */}
               <div
@@ -3030,7 +3071,10 @@ function renderVariantBody({
                   border: `1px solid color-mix(in oklab, ${accent} 14%, transparent)`,
                 }}
               />
-              <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 2 }}>
+              <div
+                className="absolute inset-0 flex items-center justify-center"
+                style={{ zIndex: 2 }}
+              >
                 <OrbitDisc size={discSize} accent={accent} cool={cool} isDark={isDark}>
                   <div
                     style={{
@@ -3066,7 +3110,12 @@ function renderVariantBody({
                 <Pill key={`r${i}`} it={it} i={i} total={rightChips.length} side="right" />
               ))}
             </div>
-            <SummaryBand {...readSummary(c.summary)} accent={accent} leadTone={ink.strong} scale={0.8} />
+            <SummaryBand
+              {...readSummary(c.summary)}
+              accent={accent}
+              leadTone={ink.strong}
+              scale={0.8}
+            />
           </div>
         </SlideFrame>
       );
@@ -3139,7 +3188,10 @@ function renderVariantBody({
           const tm = (t0 + t1) / 2;
           const edge = Math.min(tm, 1 - tm) / 0.22;
           const o = 0.1 + 0.34 * Math.min(1, edge);
-          out.push({ d: `M ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`, o });
+          out.push({
+            d: `M ${p0.x.toFixed(2)} ${p0.y.toFixed(2)} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)}`,
+            o,
+          });
         }
         return out;
       };
@@ -3313,7 +3365,6 @@ function renderVariantBody({
             leadTone={ink.strong}
             scale={0.8}
           />
-
         </SlideFrame>
       );
     }
@@ -3383,11 +3434,21 @@ function renderVariantBody({
                     }}
                   >
                     {StopIcon ? (
-                      <StopIcon size={Math.round(nodeD * 0.42)} strokeWidth={1.7} color={line} aria-hidden />
+                      <StopIcon
+                        size={Math.round(nodeD * 0.42)}
+                        strokeWidth={1.7}
+                        color={line}
+                        aria-hidden
+                      />
                     ) : (
                       <span
                         className="tabular-nums"
-                        style={{ fontSize: Math.round(nodeD * 0.38), fontWeight: 800, color: line, letterSpacing: "-0.04em" }}
+                        style={{
+                          fontSize: Math.round(nodeD * 0.38),
+                          fontWeight: 800,
+                          color: line,
+                          letterSpacing: "-0.04em",
+                        }}
                       >
                         {i + 1}
                       </span>
@@ -3424,9 +3485,21 @@ function renderVariantBody({
                       zIndex: 2,
                     }}
                   >
-                    <div className="relative px-5 pb-7 pt-5" style={{ borderRadius: 20, backgroundImage: cardWashGradient(line), maxHeight: cardHalf, overflow: "hidden" }}>
-
-                      <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "20px")} />
+                    <div
+                      className="relative px-5 pb-7 pt-5"
+                      style={{
+                        borderRadius: 20,
+                        backgroundImage: cardWashGradient(line),
+                        maxHeight: cardHalf,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute inset-0"
+                        style={openBottomFrame(line, "20px")}
+                      />
                       <div
                         aria-hidden
                         data-decorative
@@ -3480,7 +3553,6 @@ function renderVariantBody({
                           {s(it.body)}
                         </div>
                       )}
-
                     </div>
                   </div>
                 </React.Fragment>
@@ -3556,11 +3628,21 @@ function renderVariantBody({
                       }}
                     >
                       {StageIcon ? (
-                        <StageIcon size={Math.round(nodeD * 0.42)} strokeWidth={1.7} color={line} aria-hidden />
+                        <StageIcon
+                          size={Math.round(nodeD * 0.42)}
+                          strokeWidth={1.7}
+                          color={line}
+                          aria-hidden
+                        />
                       ) : (
                         <span
                           className="tabular-nums"
-                          style={{ fontSize: Math.round(nodeD * 0.38), fontWeight: 800, color: line, letterSpacing: "-0.04em" }}
+                          style={{
+                            fontSize: Math.round(nodeD * 0.38),
+                            fontWeight: 800,
+                            color: line,
+                            letterSpacing: "-0.04em",
+                          }}
                         >
                           {i + 1}
                         </span>
@@ -3570,7 +3652,12 @@ function renderVariantBody({
                       className="relative min-w-0 flex-1 px-7 pb-8 pt-6"
                       style={{ borderRadius: 22, backgroundImage: cardWashGradient(line) }}
                     >
-                      <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "22px")} />
+                      <div
+                        aria-hidden
+                        data-decorative
+                        className="absolute inset-0"
+                        style={openBottomFrame(line, "22px")}
+                      />
                       <div
                         aria-hidden
                         data-decorative
@@ -3674,7 +3761,10 @@ function renderVariantBody({
               data-intro-item=""
               data-intro-step={1}
               className="grid items-end"
-              style={{ gridTemplateColumns: `${railW}px repeat(${pCount}, minmax(0, 1fr))`, columnGap: 18 }}
+              style={{
+                gridTemplateColumns: `${railW}px repeat(${pCount}, minmax(0, 1fr))`,
+                columnGap: 18,
+              }}
             >
               <div />
               {phases.map((p, i) => (
@@ -3688,11 +3778,17 @@ function renderVariantBody({
                       color: accent,
                     }}
                   >
-                    {s(typeof p === "string" ? p : (p as { meta?: unknown }).meta) || `Phase ${i + 1}`}
+                    {s(typeof p === "string" ? p : (p as { meta?: unknown }).meta) ||
+                      `Phase ${i + 1}`}
                   </div>
                   <div
                     className="mt-1"
-                    style={{ fontSize: fillPx(23, "body"), fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}
+                    style={{
+                      fontSize: fillPx(23, "body"),
+                      fontWeight: 700,
+                      letterSpacing: "-0.02em",
+                      color: ink.strong,
+                    }}
                   >
                     {s(typeof p === "string" ? p : (p as { label?: unknown }).label)}
                   </div>
@@ -3728,9 +3824,18 @@ function renderVariantBody({
                   }}
                 >
                   <div className="flex items-center" style={{ gap: 14 }}>
-                    {LaneIcon && <LaneIcon size={30} strokeWidth={1.7} color={accent} aria-hidden />}
+                    {LaneIcon && (
+                      <LaneIcon size={30} strokeWidth={1.7} color={accent} aria-hidden />
+                    )}
                     <div>
-                      <div style={{ fontSize: fillPx(22, "body"), fontWeight: 700, letterSpacing: "-0.02em", color: ink.strong }}>
+                      <div
+                        style={{
+                          fontSize: fillPx(22, "body"),
+                          fontWeight: 700,
+                          letterSpacing: "-0.02em",
+                          color: ink.strong,
+                        }}
+                      >
                         {s(lane.label)}
                       </div>
                       {s(lane.meta) && (
@@ -3775,9 +3880,19 @@ function renderVariantBody({
                       <div
                         key={ci}
                         className="relative flex items-start px-5 pb-6 pt-4"
-                        style={{ minHeight: 108, gap: 12, borderRadius: 18, backgroundImage: cardWashGradient(line) }}
+                        style={{
+                          minHeight: 108,
+                          gap: 12,
+                          borderRadius: 18,
+                          backgroundImage: cardWashGradient(line),
+                        }}
                       >
-                        <div aria-hidden data-decorative className="absolute inset-0" style={openBottomFrame(line, "18px")} />
+                        <div
+                          aria-hidden
+                          data-decorative
+                          className="absolute inset-0"
+                          style={openBottomFrame(line, "18px")}
+                        />
                         <div
                           aria-hidden
                           data-decorative
@@ -3793,7 +3908,13 @@ function renderVariantBody({
                           }}
                         />
                         {CellIcon && (
-                          <CellIcon size={24} strokeWidth={1.7} color={line} aria-hidden className="mt-0.5 shrink-0" />
+                          <CellIcon
+                            size={24}
+                            strokeWidth={1.7}
+                            color={line}
+                            aria-hidden
+                            className="mt-0.5 shrink-0"
+                          />
                         )}
                         <div
                           className="min-w-0"
@@ -3859,10 +3980,6 @@ function renderVariantBody({
       const laneRadiusPx = laneCornerRadiusPx(laneH);
       const laneRail = railBoxPx(laneH);
 
-
-
-
-
       const headW = 356;
 
       return (
@@ -3911,7 +4028,10 @@ function renderVariantBody({
                     aria-hidden
                     data-decorative
                     className="absolute inset-0"
-                    style={{ borderRadius: laneRadiusPx, backgroundImage: toneWashGradient(tone, toneEnd) }}
+                    style={{
+                      borderRadius: laneRadiusPx,
+                      backgroundImage: toneWashGradient(tone, toneEnd),
+                    }}
                   />
                   <div
                     aria-hidden
@@ -4274,7 +4394,8 @@ function renderVariantBody({
                     top: "50%",
                     height: 1,
                     backgroundImage: `repeating-linear-gradient(90deg, color-mix(in oklab, ${cool} 55%, transparent) 0 6px, transparent 6px 14px)`,
-                    maskImage: "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
+                    maskImage:
+                      "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
                     WebkitMaskImage:
                       "linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)",
                   }}
@@ -4375,7 +4496,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-PROC-BEFORE-AFTER-SPLIT": {
       // Two-state split with a centre hub: the "without" column reads in muted
@@ -4595,7 +4715,6 @@ function renderVariantBody({
                   className="absolute"
                   style={{ right: 8, zIndex: 3 }}
                 />
-
               </div>
               <Column
                 side="after"
@@ -4611,13 +4730,10 @@ function renderVariantBody({
               leadTone={ink.strong}
               scale={0.8}
             />
-
           </div>
         </SlideFrame>
       );
     }
-
-
 
     // ── Proof & Data ──────────────────────────────────────────────────
     case "MV-PROOF-LOGOS":
@@ -4666,7 +4782,13 @@ function renderVariantBody({
                         style={{ filter: isDark ? "brightness(1.05)" : undefined }}
                       />
                     ) : (
-                      <div style={{ fontSize: fillPx(24, "body"), fontWeight: 600, letterSpacing: "-0.01em" }}>
+                      <div
+                        style={{
+                          fontSize: fillPx(24, "body"),
+                          fontWeight: 600,
+                          letterSpacing: "-0.01em",
+                        }}
+                      >
                         {name}
                       </div>
                     )}
@@ -4741,10 +4863,7 @@ function renderVariantBody({
       const row1 = items.slice(0, 5);
       const row2 = items.slice(5, 10);
       const renderRow = (row: Item[], offset: boolean, key: string) => (
-        <div
-          key={key}
-          className={`grid grid-cols-5 items-center gap-10 ${offset ? "px-16" : ""}`}
-        >
+        <div key={key} className={`grid grid-cols-5 items-center gap-10 ${offset ? "px-16" : ""}`}>
           {row.map((it, i) => {
             const url = pickLogoForMode(it, mode);
             const path = s(it.logoPath);
@@ -4785,11 +4904,10 @@ function renderVariantBody({
     }
 
     case "MV-PROOF-LOGOS-FEATURED": {
-      const featuredUrl =
-        pickLogoForMode(
-          { logoUrl: c.featuredLogoUrl, logoUrlDark: c.featuredLogoUrlDark },
-          mode,
-        );
+      const featuredUrl = pickLogoForMode(
+        { logoUrl: c.featuredLogoUrl, logoUrlDark: c.featuredLogoUrlDark },
+        mode,
+      );
       const featuredName = s(c.featuredName, "Anchor partner");
       const featuredNote = s(c.featuredNote);
       const supports = arr(c.items).slice(0, 4);
@@ -5001,7 +5119,13 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>Measurable outcome</Kicker>
               <div className="mt-8">
-                <StatFigure brand={brand} value={s(c.metric)} size="lg" icon={s(c.icon)} iconSize={s(c.iconSize)} />
+                <StatFigure
+                  brand={brand}
+                  value={s(c.metric)}
+                  size="lg"
+                  icon={s(c.icon)}
+                  iconSize={s(c.iconSize)}
+                />
               </div>
             </div>
           </div>
@@ -5040,7 +5164,11 @@ function renderVariantBody({
           <AuroraOrb x={92} y={28} size={860} />
           <div className="relative flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title)} />
-            <GlassTile radius={26} padding="px-12 py-10" className="slide-fill-stretch mt-12 flex flex-col">
+            <GlassTile
+              radius={26}
+              padding="px-12 py-10"
+              className="slide-fill-stretch mt-12 flex flex-col"
+            >
               <div
                 className="slide-fill-stretch slide-fill-rows grid items-center gap-x-8"
                 style={{ gridTemplateColumns: `2fr ${columns.map(() => "1fr").join(" ")}` }}
@@ -5210,7 +5338,10 @@ function renderVariantBody({
                     {strs(tier.features).map((f, k) => (
                       <div key={k}>
                         {k > 0 && <SoftDivider />}
-                        <div className="flex gap-4 py-3" style={{ fontSize: fillPx(22, "body"), lineHeight: 1.35 }}>
+                        <div
+                          className="flex gap-4 py-3"
+                          style={{ fontSize: fillPx(22, "body"), lineHeight: 1.35 }}
+                        >
                           <span style={{ color: "var(--slide-accent-text)", fontWeight: 600 }}>
                             —
                           </span>
@@ -5238,7 +5369,14 @@ function renderVariantBody({
                 thicknessPx={2}
                 className="mt-6 mb-10"
               />
-              <StatFigure brand={brand} value={s(c.amount)} unit={s(c.unit)} size="xl" icon={s(c.icon)} iconSize={s(c.iconSize)} />
+              <StatFigure
+                brand={brand}
+                value={s(c.amount)}
+                unit={s(c.unit)}
+                size="xl"
+                icon={s(c.icon)}
+                iconSize={s(c.iconSize)}
+              />
             </div>
             <div className="min-w-0">
               <Hairline
@@ -5359,7 +5497,9 @@ function renderVariantBody({
               >
                 <div className="flex items-center gap-4">
                   <IconWell accent={brand.tokens.accent}>
-                    <span style={{ fontSize: fillPx(20, "body"), color: "var(--slide-accent-text)" }}>
+                    <span
+                      style={{ fontSize: fillPx(20, "body"), color: "var(--slide-accent-text)" }}
+                    >
                       {r.icon}
                     </span>
                   </IconWell>
@@ -5390,7 +5530,14 @@ function renderVariantBody({
           </div>
           {s(c.metric) && (
             <div className="mt-10">
-              <StatFigure brand={brand} value={s(c.metric)} label="Outcome" size="md" icon={s(c.icon)} iconSize={s(c.iconSize)} />
+              <StatFigure
+                brand={brand}
+                value={s(c.metric)}
+                label="Outcome"
+                size="md"
+                icon={s(c.icon)}
+                iconSize={s(c.iconSize)}
+              />
             </div>
           )}
         </SlideFrame>
@@ -5436,7 +5583,9 @@ function renderVariantBody({
                   unit={s(it.unit)}
                   label={s(it.label)}
                   size="lg"
-                icon={s(it.icon)} iconSize={s(it.iconSize)} />
+                  icon={s(it.icon)}
+                  iconSize={s(it.iconSize)}
+                />
               </div>
             ))}
           </div>
@@ -5470,7 +5619,12 @@ function renderVariantBody({
               </div>
               <div
                 className="mt-8"
-                style={{ fontSize: fillPx(42, "figure"), fontWeight: 600, lineHeight: 1.1, letterSpacing: "-0.02em" }}
+                style={{
+                  fontSize: fillPx(42, "figure"),
+                  fontWeight: 600,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                }}
               >
                 {s(c.headline)}
               </div>
@@ -5557,7 +5711,9 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title="Our recommendation" />
           <div className="slide-fill-stretch slide-fill-center mt-10">
-            <div className="max-w-6xl text-5xl font-medium leading-tight">{s(c.recommendation)}</div>
+            <div className="max-w-6xl text-5xl font-medium leading-tight">
+              {s(c.recommendation)}
+            </div>
             <div className="mt-8 max-w-5xl text-3xl opacity-75">{s(c.rationale)}</div>
           </div>
         </SlideFrame>
@@ -5737,7 +5893,10 @@ function renderVariantBody({
                       >
                         {s(p.role)}
                       </div>
-                      <div className="mt-4 space-y-1" style={{ fontSize: fillPx(20, "body"), color: ink.muted }}>
+                      <div
+                        className="mt-4 space-y-1"
+                        style={{ fontSize: fillPx(20, "body"), color: ink.muted }}
+                      >
                         <div>{s(p.email)}</div>
                         {s(p.phone) && <div style={{ opacity: 0.7 }}>{s(p.phone)}</div>}
                       </div>
@@ -5819,7 +5978,9 @@ function renderVariantBody({
                 }}
               />
               <div className="relative">
-                <Kicker brand={brand} color={panelInk}>Prepared for {s(c.clientName)}</Kicker>
+                <Kicker brand={brand} color={panelInk}>
+                  Prepared for {s(c.clientName)}
+                </Kicker>
                 <Hairline
                   color={"var(--slide-accent-text)"}
                   widthPx={72}
@@ -5868,12 +6029,7 @@ function renderVariantBody({
     case "MV-OP-COVER-GRID": {
       const items = arr(c.items);
       return (
-        <SlideFrame
-          brand={brand}
-          pageNumber={pageNumber}
-          variant="cover"
-          logoPosition="top-left"
-        >
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-left">
           <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-2 p-2">
             {(items.length ? items : [{}, {}, {}, {}]).slice(0, 4).map((it, i) => (
               <MediaTile
@@ -5952,9 +6108,7 @@ function renderVariantBody({
                 Prepared for {s(c.clientName)}
               </SupportingText>
             </div>
-            <div
-              className="relative grid grid-cols-3 gap-16 pt-8"
-            >
+            <div className="relative grid grid-cols-3 gap-16 pt-8">
               <AccentRule
                 accent={brand.tokens.accent}
                 cap
@@ -5971,7 +6125,10 @@ function renderVariantBody({
                   <Kicker brand={brand} size={14} tracking="0.32em">
                     {label}
                   </Kicker>
-                  <div className="mt-3" style={{ fontSize: fillPx(22, "body"), letterSpacing: "-0.01em" }}>
+                  <div
+                    className="mt-3"
+                    style={{ fontSize: fillPx(22, "body"), letterSpacing: "-0.01em" }}
+                  >
                     {value}
                   </div>
                 </div>
@@ -5992,7 +6149,10 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div data-on-media className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white">
+          <div
+            data-on-media
+            className="absolute inset-x-24 top-32 bottom-24 flex flex-col justify-end overflow-hidden text-white"
+          >
             <Kicker brand={brand} tracking="0.32em">
               Prepared for {s(c.clientName)}
             </Kicker>
@@ -6129,7 +6289,10 @@ function renderVariantBody({
           <HeroScrim brand={brand} anchor="bottom" />
           {/* Bottom offset clears the locked chrome band (wordmark lockup +
               confidentiality footer) so full-bleed copy never collides with it. */}
-          <div data-on-media className="absolute inset-x-24 top-32 bottom-[208px] flex flex-col justify-end overflow-hidden text-white">
+          <div
+            data-on-media
+            className="absolute inset-x-24 top-32 bottom-[208px] flex flex-col justify-end overflow-hidden text-white"
+          >
             <Kicker brand={brand}>{s(c.kicker, "In focus")}</Kicker>
             <Hairline
               color={"var(--slide-accent-text)"}
@@ -6237,9 +6400,7 @@ function renderVariantBody({
         c.deviceKind,
         variant.id === "MV-SHOW-MONITOR" ? "monitor" : "laptop",
       );
-      const tone = (["graphite", "silver", "ink"] as const).includes(
-        s(c.deviceTone) as "graphite",
-      )
+      const tone = (["graphite", "silver", "ink"] as const).includes(s(c.deviceTone) as "graphite")
         ? (s(c.deviceTone) as "graphite" | "silver" | "ink")
         : kind === "monitor"
           ? "ink"
@@ -6273,7 +6434,9 @@ function renderVariantBody({
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <div className="flex h-full flex-col items-center justify-center">
               {s(c.eyebrow) && <Kicker brand={brand}>{s(c.eyebrow)}</Kicker>}
-              <div className="mt-4 text-center"><SlideTitle brand={brand} title={s(c.title)} /></div>
+              <div className="mt-4 text-center">
+                <SlideTitle brand={brand} title={s(c.title)} />
+              </div>
               <div className="mt-10 w-[64%]">
                 <DeviceFrame kind="monitor" tone={tone} accent="var(--slide-accent-text)">
                   {screen}
@@ -6307,7 +6470,9 @@ function renderVariantBody({
             </DeviceFrame>
             <div className="flex flex-col justify-center">
               {s(c.eyebrow) && <Kicker brand={brand}>{s(c.eyebrow)}</Kicker>}
-              <div className="mt-4"><SlideTitle brand={brand} title={s(c.title)} /></div>
+              <div className="mt-4">
+                <SlideTitle brand={brand} title={s(c.title)} />
+              </div>
               <SupportingText size="lg" opacity={0.82} className="mt-8" maxWidthPx={720}>
                 {s(c.body)}
               </SupportingText>
@@ -6577,7 +6742,9 @@ function renderVariantBody({
                 unit={s(c.unit)}
                 label={s(c.label)}
                 size="xl"
-              icon={s(c.icon)} iconSize={s(c.iconSize)} />
+                icon={s(c.icon)}
+                iconSize={s(c.iconSize)}
+              />
               <SupportingText size="lg" opacity={0.8} maxWidthPx={560} className="mt-10">
                 {s(c.narrative)}
               </SupportingText>
@@ -6785,7 +6952,14 @@ function renderVariantBody({
               />
               <Kicker brand={brand}>{s(c.metricLabel, "Outcome")}</Kicker>
               <div className="mt-8">
-                <StatFigure brand={brand} value={s(c.metric)} unit={s(c.unit)} size="xl" icon={s(c.icon)} iconSize={s(c.iconSize)} />
+                <StatFigure
+                  brand={brand}
+                  value={s(c.metric)}
+                  unit={s(c.unit)}
+                  size="xl"
+                  icon={s(c.icon)}
+                  iconSize={s(c.iconSize)}
+                />
               </div>
             </div>
           </div>
@@ -6881,7 +7055,10 @@ function renderVariantBody({
                   isDark={isDark}
                   rings={false}
                 >
-                  <div className="text-8xl font-semibold leading-none" style={{ color: ink.strong }}>
+                  <div
+                    className="text-8xl font-semibold leading-none"
+                    style={{ color: ink.strong }}
+                  >
                     {s(c.centerValue)}
                     <span className="text-4xl" style={{ color: "var(--slide-accent-text)" }}>
                       {s(c.centerUnit)}
@@ -6890,7 +7067,6 @@ function renderVariantBody({
                   <div className="mt-4 max-w-[80%] text-xl opacity-80">{s(c.centerLabel)}</div>
                 </OrbitDisc>
               </div>
-
             </div>
             <div className="space-y-5">
               {items.map((it, i) => (
@@ -6921,7 +7097,6 @@ function renderVariantBody({
                 </div>
               ))}
             </div>
-
           </div>
         </SlideFrame>
       );
@@ -6940,7 +7115,8 @@ function renderVariantBody({
               return (
                 <div key={i} className="flex flex-1 items-center gap-8">
                   <div
-                    data-on-fill className="flex h-full min-h-24 items-center justify-between rounded-xl px-10 text-white"
+                    data-on-fill
+                    className="flex h-full min-h-24 items-center justify-between rounded-xl px-10 text-white"
                     style={{
                       width: `${widthPct}%`,
                       backgroundColor: brand.tokens.primary,
@@ -7029,7 +7205,10 @@ function renderVariantBody({
                         }}
                       >
                         {s(it.value)}
-                        <span className="ml-1" style={{ fontSize: fillPx(18, "body"), color: ink.faint }}>
+                        <span
+                          className="ml-1"
+                          style={{ fontSize: fillPx(18, "body"), color: ink.faint }}
+                        >
                           {s(c.unit)}
                         </span>
                       </div>
@@ -7083,7 +7262,8 @@ function renderVariantBody({
               const x = STAGE_W / 2 + RX * cos;
               const y = STAGE_H / 2 + RY * sin;
               // Anchor the block on the side of the point facing away from the hub.
-              const side = Math.abs(cos) > 0.6 ? (cos > 0 ? "right" : "left") : sin < 0 ? "top" : "bottom";
+              const side =
+                Math.abs(cos) > 0.6 ? (cos > 0 ? "right" : "left") : sin < 0 ? "top" : "bottom";
               const tx = side === "right" ? "0%" : side === "left" ? "-100%" : "-50%";
               const ty = side === "top" ? "-100%" : side === "bottom" ? "0%" : "-50%";
               const iconFirst = side !== "top";
@@ -7148,7 +7328,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-INFO-PYRAMID": {
       const items = arr(c.items);
@@ -7266,9 +7445,7 @@ function renderVariantBody({
       // Two-row layouts have to fit the same 1080px stage as a single row, so
       // the card rhythm compresses instead of overflowing off the slide.
       const dense = rows.length > 3;
-      const nums = rows.map(
-        (it) => Number(String(s(it.metric)).replace(/[^0-9.]/g, "")) || 0,
-      );
+      const nums = rows.map((it) => Number(String(s(it.metric)).replace(/[^0-9.]/g, "")) || 0);
       const peak = Math.max(1, ...nums);
       // Contrast-guarded: stops are auto-corrected against the slide backdrop
       // and the glow is dropped when the accent has no headroom.
@@ -7382,10 +7559,10 @@ function renderVariantBody({
                       size="sm"
                       shape="column"
                       progress={pct}
-                    icon={s(it.icon)} iconSize={s(it.iconSize)} />
-
+                      icon={s(it.icon)}
+                      iconSize={s(it.iconSize)}
+                    />
                   </div>
-
                 </div>
               );
             })}
@@ -7393,7 +7570,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-CLIENT-DETAIL-3":
       return (
@@ -7501,7 +7677,8 @@ function renderVariantBody({
                             width: 40,
                             height: 40,
                             borderRadius: 12,
-                            background: "color-mix(in oklab, var(--slide-accent-text) 14%, transparent)",
+                            background:
+                              "color-mix(in oklab, var(--slide-accent-text) 14%, transparent)",
                             color: "var(--slide-accent-text)",
                             fontSize: fillPx(18, "body"),
                             fontWeight: 700,
@@ -7565,7 +7742,8 @@ function renderVariantBody({
                           width: 34,
                           height: 34,
                           borderRadius: 10,
-                          background: "color-mix(in oklab, var(--slide-accent-text) 82%, transparent)",
+                          background:
+                            "color-mix(in oklab, var(--slide-accent-text) 82%, transparent)",
                           color: "#ffffff",
                           fontSize: fillPx(15, "body"),
                           fontWeight: 700,
@@ -7594,8 +7772,6 @@ function renderVariantBody({
           </div>
         </SlideFrame>
       );
-
-
 
     case "MV-CLIENT-COMPARE":
       return (
@@ -7651,7 +7827,13 @@ function renderVariantBody({
                         </SupportingText>
                       </div>
                       <div className="mt-10">
-                        <StatFigure brand={brand} value={s(it.metric)} size="md" icon={s(it.icon)} iconSize={s(it.iconSize)} />
+                        <StatFigure
+                          brand={brand}
+                          value={s(it.metric)}
+                          size="md"
+                          icon={s(it.icon)}
+                          iconSize={s(it.iconSize)}
+                        />
                       </div>
                     </GlassTile>
                   );
@@ -7760,7 +7942,12 @@ function renderVariantBody({
             <GlassTile radius={28} padding="px-12 py-12">
               <div
                 className="uppercase"
-                style={{ fontSize: fillPx(18, "body"), letterSpacing: "0.28em", fontWeight: 600, color: ink.faint }}
+                style={{
+                  fontSize: fillPx(18, "body"),
+                  letterSpacing: "0.28em",
+                  fontWeight: 600,
+                  color: ink.faint,
+                }}
               >
                 Decision by
               </div>
@@ -8079,7 +8266,9 @@ function renderVariantBody({
               unit={s(c.unit)}
               size="monumental"
               valueColor={ink.strong}
-            icon={s(c.icon)} iconSize={s(c.iconSize)} />
+              icon={s(c.icon)}
+              iconSize={s(c.iconSize)}
+            />
             <div className="mt-14 max-w-[1500px]">
               <DisplayTitle size="section" color={ink.strong}>
                 {s(c.promise)}
@@ -8174,7 +8363,7 @@ function renderVariantBody({
             }}
           >
             <div className={cellClass} style={{ ...cellStyle, gridArea: "a" }}>
-                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+              <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
               <div
                 className="pointer-events-none absolute"
                 style={{
@@ -8189,13 +8378,18 @@ function renderVariantBody({
                   label={s(anchor.title)}
                   index={0}
                   size="md"
-                  override={s(anchor.icon)} sizeToken={s(anchor.iconSize)}
+                  override={s(anchor.icon)}
+                  sizeToken={s(anchor.iconSize)}
                   treatment="soft-tile"
                 />
                 <Kicker brand={brand}>Anchor</Kicker>
                 <span
                   className="ml-auto tabular-nums"
-                  style={{ fontSize: fillPx(16, "body"), letterSpacing: "0.24em", color: ink.faint }}
+                  style={{
+                    fontSize: fillPx(16, "body"),
+                    letterSpacing: "0.24em",
+                    color: ink.faint,
+                  }}
                 >
                   01
                 </span>
@@ -8240,7 +8434,7 @@ function renderVariantBody({
               if (kind === "media") {
                 return (
                   <div key={i} style={{ ...cellStyle, gridArea: area }}>
-                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                    <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
                     <MediaTile
                       brand={brand}
                       seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
@@ -8291,14 +8485,22 @@ function renderVariantBody({
                       brand={brand}
                       label={s(kind === "stat" ? it.label : it.title)}
                       index={i + 1}
-                      size={(ICON_SIZES as Record<string, unknown>)[s(it.iconSize)] ? (s(it.iconSize) as IconSizeToken) : "sm"}
-
-                      override={s(it.icon)} sizeToken={s(it.iconSize)}
+                      size={
+                        (ICON_SIZES as Record<string, unknown>)[s(it.iconSize)]
+                          ? (s(it.iconSize) as IconSizeToken)
+                          : "sm"
+                      }
+                      override={s(it.icon)}
+                      sizeToken={s(it.iconSize)}
                       treatment="soft-tile"
                     />
                     <span
                       className="ml-auto tabular-nums"
-                      style={{ fontSize: fillPx(15, "kicker"), letterSpacing: "0.24em", color: ink.faint }}
+                      style={{
+                        fontSize: fillPx(15, "kicker"),
+                        letterSpacing: "0.24em",
+                        color: ink.faint,
+                      }}
                     >
                       {idx}
                     </span>
@@ -8312,7 +8514,9 @@ function renderVariantBody({
                         size="sm"
                         shape="column"
                         progress={0.72}
-                      icon={s(it.icon)} iconSize={s(it.iconSize)} />
+                        icon={s(it.icon)}
+                        iconSize={s(it.iconSize)}
+                      />
 
                       <div
                         className="mt-4 uppercase"
@@ -8417,7 +8621,6 @@ function renderVariantBody({
               <div
                 data-title-subline
                 className="mt-4 flex-none"
-
                 style={{
                   fontSize: fillPx(34, "figure"),
                   fontWeight: 600,
@@ -8468,75 +8671,74 @@ function renderVariantBody({
                 containerType: "inline-size",
               }}
             >
-            {items.map((it, i) => {
-              const tone = toneFor(i);
-              return (
-                <div
-                  key={i}
-                  className="flex min-w-0 flex-col items-center justify-center overflow-hidden text-center"
-                  style={{
-                    ...cellStyle,
-                    // cqw is cell-relative inside the size container below.
-                    paddingInline: "min(24px, 5cqw)",
-                    paddingTop: cellGap(20, 12),
-                    paddingBottom: cellGap(24, 14),
-                    // Cell owns a size container so the steps below can fall back
-                    // to a share of the height it actually received.
-                    containerType: "size",
-                  }}
-                >
-                  <AccentTick accent={accent} height={3} radius={20} />
-                  <IconBadge
-                    brand={brand}
-                    label={s(it.title)}
-                    index={i}
-                    size="sm"
-                    override={s(it.icon)}
-                    sizeToken={s(it.iconSize)}
-                    treatment="soft-circle"
-                  />
+              {items.map((it, i) => {
+                const tone = toneFor(i);
+                return (
                   <div
-                    className="min-w-0 flex-none"
+                    key={i}
+                    className="flex min-w-0 flex-col items-center justify-center overflow-hidden text-center"
                     style={{
-                      marginTop: cellGap(14, 8),
-                      fontSize: cellText(23, 0.048, 15),
-                      fontWeight: 700,
-                      letterSpacing: "-0.018em",
-                      lineHeight: 1.14,
-                      color: tone === ink.strong ? ink.strong : accentInk(tone, mode, 4.5),
-                      ...clamp(2),
+                      ...cellStyle,
+                      // cqw is cell-relative inside the size container below.
+                      paddingInline: "min(24px, 5cqw)",
+                      paddingTop: cellGap(20, 12),
+                      paddingBottom: cellGap(24, 14),
+                      // Cell owns a size container so the steps below can fall back
+                      // to a share of the height it actually received.
+                      containerType: "size",
                     }}
                   >
-                    {s(it.title)}
+                    <AccentTick accent={accent} height={3} radius={20} />
+                    <IconBadge
+                      brand={brand}
+                      label={s(it.title)}
+                      index={i}
+                      size="sm"
+                      override={s(it.icon)}
+                      sizeToken={s(it.iconSize)}
+                      treatment="soft-circle"
+                    />
+                    <div
+                      className="min-w-0 flex-none"
+                      style={{
+                        marginTop: cellGap(14, 8),
+                        fontSize: cellText(23, 0.048, 15),
+                        fontWeight: 700,
+                        letterSpacing: "-0.018em",
+                        lineHeight: 1.14,
+                        color: tone === ink.strong ? ink.strong : accentInk(tone, mode, 4.5),
+                        ...clamp(2),
+                      }}
+                    >
+                      {s(it.title)}
+                    </div>
+                    <div
+                      aria-hidden
+                      data-decorative
+                      className="flex-none"
+                      style={{
+                        marginTop: cellGap(12, 7),
+                        height: SEAM_HEIGHT_PX,
+                        width: `min(56px, ${(0.12 * 100).toFixed(2)}cqw)`,
+                        borderRadius: SEAM_HEIGHT_PX,
+                        backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
+                      }}
+                    />
+                    <div
+                      className="min-w-0 flex-none"
+                      style={{
+                        marginTop: cellGap(12, 7),
+                        fontSize: cellText(17, 0.036, 11),
+                        lineHeight: 1.38,
+                        color: ink.muted,
+                        ...clamp(bodyLines),
+                      }}
+                    >
+                      {s(it.body)}
+                    </div>
                   </div>
-                  <div
-                    aria-hidden
-                    data-decorative
-                    className="flex-none"
-                    style={{
-                      marginTop: cellGap(12, 7),
-                      height: SEAM_HEIGHT_PX,
-                      width: `min(56px, ${(0.12 * 100).toFixed(2)}cqw)`,
-                      borderRadius: SEAM_HEIGHT_PX,
-                      backgroundImage: `linear-gradient(90deg, transparent, ${tone}, transparent)`,
-                    }}
-                  />
-                  <div
-                    className="min-w-0 flex-none"
-                    style={{
-                      marginTop: cellGap(12, 7),
-                      fontSize: cellText(17, 0.036, 11),
-                      lineHeight: 1.38,
-                      color: ink.muted,
-                      ...clamp(bodyLines),
-                    }}
-                  >
-                    {s(it.body)}
-                  </div>
-                </div>
-
-              );
-            })}
+                );
+              })}
             </div>
             {hasClose && (
               // Pinned to the bottom of the content box with a guaranteed gap
@@ -8630,11 +8832,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
-
-
-
-
 
     case "MV-KPI-DASHBOARD": {
       const items = arr(c.items).slice(0, 6);
@@ -8831,7 +9028,11 @@ function renderVariantBody({
                           <div>
                             <div
                               className="uppercase font-mono"
-                              style={{ fontSize: fillPx(12, "kicker"), letterSpacing: "0.3em", color: ink.faint }}
+                              style={{
+                                fontSize: fillPx(12, "kicker"),
+                                letterSpacing: "0.3em",
+                                color: ink.faint,
+                              }}
                             >
                               Headline metric
                             </div>
@@ -8879,11 +9080,19 @@ function renderVariantBody({
                       {/* Chart column — bounded, never stretched past the card */}
                       <div
                         className="flex min-w-0 flex-col justify-end"
-                        style={{ width: "42%", borderLeft: `1px solid ${ink.hairline}`, paddingLeft: 22 }}
+                        style={{
+                          width: "42%",
+                          borderLeft: `1px solid ${ink.hairline}`,
+                          paddingLeft: 22,
+                        }}
                       >
                         <div
                           className="uppercase font-mono"
-                          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.28em", color: ink.faint }}
+                          style={{
+                            fontSize: fillPx(11, "kicker"),
+                            letterSpacing: "0.28em",
+                            color: ink.faint,
+                          }}
                         >
                           Trailing 14 periods
                         </div>
@@ -8892,7 +9101,11 @@ function renderVariantBody({
                         </div>
                         <div
                           className="mt-2 flex justify-between font-mono"
-                          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.18em", color: ink.faint }}
+                          style={{
+                            fontSize: fillPx(11, "kicker"),
+                            letterSpacing: "0.18em",
+                            color: ink.faint,
+                          }}
                         >
                           <span>T-13</span>
                           <span>NOW</span>
@@ -8959,14 +9172,19 @@ function renderVariantBody({
                           >
                             {label}
                             {unit && (
-                              <span style={{ color: ink.faint, fontSize: fillPx(16, "body") }}> · {unit}</span>
+                              <span style={{ color: ink.faint, fontSize: fillPx(16, "body") }}>
+                                {" "}
+                                · {unit}
+                              </span>
                             )}
                           </div>
                         </div>
                         {delta && (
                           <div className="mt-3 flex items-center gap-2.5">
                             {chip(tInk, arrow, delta, 14)}
-                            <span style={{ color: ink.faint, fontSize: fillPx(14, "kicker") }}>vs. baseline</span>
+                            <span style={{ color: ink.faint, fontSize: fillPx(14, "kicker") }}>
+                              vs. baseline
+                            </span>
                           </div>
                         )}
                       </div>
@@ -8987,7 +9205,11 @@ function renderVariantBody({
                           {iconChip(19, 42, 12)}
                           <div
                             className="truncate"
-                            style={{ fontSize: fillPx(16, "body"), color: ink.muted, letterSpacing: "-0.005em" }}
+                            style={{
+                              fontSize: fillPx(16, "body"),
+                              color: ink.muted,
+                              letterSpacing: "-0.005em",
+                            }}
                           >
                             {label}
                           </div>
@@ -9036,7 +9258,11 @@ function renderVariantBody({
                     {iconChip(20, 44, 13)}
                     <div
                       className="truncate"
-                      style={{ fontSize: fillPx(16, "body"), color: ink.muted, letterSpacing: "-0.005em" }}
+                      style={{
+                        fontSize: fillPx(16, "body"),
+                        color: ink.muted,
+                        letterSpacing: "-0.005em",
+                      }}
                     >
                       {label}
                     </div>
@@ -9106,7 +9332,6 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
           <div className={dense ? "mt-8" : "mt-14"}>
-
             <div
               className="grid gap-6"
               style={{ gridTemplateColumns: `240px repeat(${quarters.length}, minmax(0, 1fr))` }}
@@ -9196,7 +9421,10 @@ function renderVariantBody({
       const items = arr(c.items);
       const fstyle = resolveFunnelStyle((c as Record<string, unknown>).funnelStyle, brand);
       const stages: FunnelStage[] = items.map((it) => {
-        const raw = typeof it.value === "number" ? it.value : Number(String(it.value ?? "").replace(/[^0-9.]/g, ""));
+        const raw =
+          typeof it.value === "number"
+            ? it.value
+            : Number(String(it.value ?? "").replace(/[^0-9.]/g, ""));
         return {
           label: s(it.label),
           note: s(it.note),
@@ -9224,7 +9452,13 @@ function renderVariantBody({
                   hairline: ink.hairline,
                 }}
                 renderIcon={(st, i) => (
-                  <IconBadge brand={brand} label={st.label} index={i} size="md" override={st.icon} />
+                  <IconBadge
+                    brand={brand}
+                    label={st.label}
+                    index={i}
+                    size="md"
+                    override={st.icon}
+                  />
                 )}
               />
             </div>
@@ -9233,10 +9467,11 @@ function renderVariantBody({
       );
     }
 
-
     case "MV-FLYWHEEL": {
       const items = arr(c.items).slice(0, 6);
-      const list = items.length ? items : [{ label: "Create" }, { label: "Localize" }, { label: "Publish" }, { label: "Measure" }];
+      const list = items.length
+        ? items
+        : [{ label: "Create" }, { label: "Localize" }, { label: "Publish" }, { label: "Measure" }];
       const n = list.length;
       // Mode-aware accent: on dark grounds the raw division accent (Blue 500)
       // is too deep to read as text or as a hairline, so lift it onto the
@@ -9253,12 +9488,18 @@ function renderVariantBody({
       const NODE = 92; // node chip diameter
       const GAP = 0.23; // arc gap (fraction of a segment) reserved for the node
       const ang = (t: number) => t * Math.PI * 2 - Math.PI / 2;
-      const pt = (t: number, r = R) => ({ x: CX + Math.cos(ang(t)) * r, y: CY + Math.sin(ang(t)) * r });
+      const pt = (t: number, r = R) => ({
+        x: CX + Math.cos(ang(t)) * r,
+        y: CY + Math.sin(ang(t)) * r,
+      });
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col">
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-            <div className="mt-8 grid flex-1 items-center gap-12" style={{ gridTemplateColumns: "660px 1fr" }}>
+            <div
+              className="mt-8 grid flex-1 items-center gap-12"
+              style={{ gridTemplateColumns: "660px 1fr" }}
+            >
               {/* ── Wheel ─────────────────────────────────────────────── */}
               <div className="relative" style={{ width: S, height: S }}>
                 <svg
@@ -9393,7 +9634,12 @@ function renderVariantBody({
                   {s(c.hubNote) && (
                     <div
                       className="mt-2"
-                      style={{ fontSize: fillPx(15, "kicker"), lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
+                      style={{
+                        fontSize: fillPx(15, "kicker"),
+                        lineHeight: 1.35,
+                        color: ink.muted,
+                        maxWidth: 200,
+                      }}
                     >
                       {s(c.hubNote)}
                     </div>
@@ -9425,7 +9671,8 @@ function renderVariantBody({
                           label={s(it.label)}
                           index={i}
                           size="md"
-                          override={s(it.icon)} sizeToken={s(it.iconSize)}
+                          override={s(it.icon)}
+                          sizeToken={s(it.iconSize)}
                           treatment="glyph"
                         />
                       </div>
@@ -9451,7 +9698,14 @@ function renderVariantBody({
               {/* ── Ledger ────────────────────────────────────────────── */}
               <div className="flex flex-col gap-4">
                 {s(c.subtitle) && (
-                  <div style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: ink.muted, maxWidth: 640 }}>
+                  <div
+                    style={{
+                      fontSize: fillPx(21, "body"),
+                      lineHeight: 1.4,
+                      color: ink.muted,
+                      maxWidth: 640,
+                    }}
+                  >
                     {s(c.subtitle)}
                   </div>
                 )}
@@ -9481,7 +9735,10 @@ function renderVariantBody({
                         {s(it.label)}
                       </div>
                       {s(it.note) && (
-                        <div className="mt-1" style={{ fontSize: 16.5, lineHeight: 1.4, color: ink.muted }}>
+                        <div
+                          className="mt-1"
+                          style={{ fontSize: 16.5, lineHeight: 1.4, color: ink.muted }}
+                        >
                           {s(it.note)}
                         </div>
                       )}
@@ -9507,7 +9764,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-MATURITY-CURVE": {
       const items = arr(c.items);
@@ -9738,7 +9994,8 @@ function renderVariantBody({
                       label={s(it.phase)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)} sizeToken={s(it.iconSize)}
+                      override={s(it.icon)}
+                      sizeToken={s(it.iconSize)}
                       treatment="soft-circle"
                     />
                     <Kicker brand={brand}>Phase {String(i + 1).padStart(2, "0")}</Kicker>
@@ -9754,7 +10011,10 @@ function renderVariantBody({
                   >
                     {s(it.phase)}
                   </div>
-                  <div className="mt-2" style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.4 }}>
+                  <div
+                    className="mt-2"
+                    style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.4 }}
+                  >
                     {s(it.touchpoint)}
                   </div>
                 </div>
@@ -9859,7 +10119,11 @@ function renderVariantBody({
                       </div>
                       <div
                         className="uppercase"
-                        style={{ fontSize: fillPx(14, "kicker"), letterSpacing: "0.28em", color: ink.faint }}
+                        style={{
+                          fontSize: fillPx(14, "kicker"),
+                          letterSpacing: "0.28em",
+                          color: ink.faint,
+                        }}
                       >
                         {name}
                       </div>
@@ -9892,7 +10156,9 @@ function renderVariantBody({
                       className="flex items-start justify-start p-6"
                       style={{
                         border: `1px solid ${ink.hairline}`,
-                        background: isTarget ? `${hexA(brand.tokens.accent, 0.078)}` : "transparent",
+                        background: isTarget
+                          ? `${hexA(brand.tokens.accent, 0.078)}`
+                          : "transparent",
                       }}
                     >
                       <div
@@ -9996,7 +10262,8 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)} sizeToken={s(it.iconSize)}
+                      override={s(it.icon)}
+                      sizeToken={s(it.iconSize)}
                       treatment="glyph"
                     />
                     <Kicker brand={brand}>Visible</Kicker>
@@ -10012,7 +10279,10 @@ function renderVariantBody({
                   >
                     {s(it.label)}
                   </div>
-                  <div className="mt-2" style={{ fontSize: fillPx(20, "body"), lineHeight: 1.42, color: ink.body }}>
+                  <div
+                    className="mt-2"
+                    style={{ fontSize: fillPx(20, "body"), lineHeight: 1.42, color: ink.body }}
+                  >
                     {s(it.body)}
                   </div>
                 </div>
@@ -10063,7 +10333,8 @@ function renderVariantBody({
                       label={s(it.label)}
                       index={i}
                       size="sm"
-                      override={s(it.icon)} sizeToken={s(it.iconSize)}
+                      override={s(it.icon)}
+                      sizeToken={s(it.iconSize)}
                       treatment="soft-tile"
                     />
                   </div>
@@ -10078,7 +10349,10 @@ function renderVariantBody({
                   >
                     {s(it.label)}
                   </div>
-                  <div className="mt-2" style={{ fontSize: fillPx(18, "body"), lineHeight: 1.42, color: ink.body }}>
+                  <div
+                    className="mt-2"
+                    style={{ fontSize: fillPx(18, "body"), lineHeight: 1.42, color: ink.body }}
+                  >
                     {s(it.body)}
                   </div>
                 </div>
@@ -10103,7 +10377,9 @@ function renderVariantBody({
                   unit={s(c.pullUnit)}
                   label={s(c.pullLabel)}
                   size="xl"
-                icon={s(c.icon)} iconSize={s(c.iconSize)} />
+                  icon={s(c.icon)}
+                  iconSize={s(c.iconSize)}
+                />
               </div>
               <MetaRow>
                 <span>{s(c.folio)}</span>
@@ -10267,7 +10543,13 @@ function renderVariantBody({
                   >
                     <span>{s(it.value) || "—"}</span>
                     {s(it.unit) && (
-                      <span style={{ fontSize: fillPx(52, "figure"), fontWeight: 500, letterSpacing: "-0.02em" }}>
+                      <span
+                        style={{
+                          fontSize: fillPx(52, "figure"),
+                          fontWeight: 500,
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
                         {s(it.unit)}
                       </span>
                     )}
@@ -10275,7 +10557,12 @@ function renderVariantBody({
                   {s(it.note) && (
                     <div
                       className="mt-8"
-                      style={{ fontSize: fillPx(20, "body"), lineHeight: 1.5, color: ink.muted, maxWidth: 460 }}
+                      style={{
+                        fontSize: fillPx(20, "body"),
+                        lineHeight: 1.5,
+                        color: ink.muted,
+                        maxWidth: 460,
+                      }}
                     >
                       {s(it.note)}
                     </div>
@@ -10343,7 +10630,12 @@ function renderVariantBody({
                     </div>
                     <div
                       className="mt-2"
-                      style={{ fontSize: fillPx(22, "body"), lineHeight: 1.42, color: ink.muted, maxWidth: 1080 }}
+                      style={{
+                        fontSize: fillPx(22, "body"),
+                        lineHeight: 1.42,
+                        color: ink.muted,
+                        maxWidth: 1080,
+                      }}
                     >
                       {s(it.body)}
                     </div>
@@ -10433,9 +10725,7 @@ function renderVariantBody({
                     paddingTop: rowPad,
                     paddingBottom: rowPad,
                     borderTop:
-                      i > 0
-                        ? `1px solid color-mix(in oklab, ${tone} 16%, transparent)`
-                        : undefined,
+                      i > 0 ? `1px solid color-mix(in oklab, ${tone} 16%, transparent)` : undefined,
                   }}
                 >
                   <span
@@ -10458,7 +10748,9 @@ function renderVariantBody({
                       fontWeight: 700,
                       letterSpacing: "-0.02em",
                       lineHeight: 1.15,
-                      color: emphasis ? ink.strong : "color-mix(in oklab, currentColor 82%, transparent)",
+                      color: emphasis
+                        ? ink.strong
+                        : "color-mix(in oklab, currentColor 82%, transparent)",
                     }}
                   >
                     {label}
@@ -10477,7 +10769,6 @@ function renderVariantBody({
             <div
               data-title-subline
               className="mt-3"
-
               style={{
                 fontSize: fillPx(30, "figure"),
                 fontWeight: 600,
@@ -10536,7 +10827,6 @@ function renderVariantBody({
     }
 
     case "MV-COMPARE-SLIDER": {
-
       const before = obj(c.before);
       const after = obj(c.after);
       return (
@@ -10561,7 +10851,9 @@ function renderVariantBody({
                       unit={s(before.unit)}
                       size="lg"
                       valueColor={ink.muted}
-                    icon={s(before.icon)} iconSize={s(before.iconSize)} />
+                      icon={s(before.icon)}
+                      iconSize={s(before.iconSize)}
+                    />
                   </div>
                   <div
                     className="mt-6"
@@ -10580,9 +10872,19 @@ function renderVariantBody({
                 />
                 <Kicker brand={brand}>{s(after.label, "After")}</Kicker>
                 <div className="mt-8">
-                  <StatFigure brand={brand} value={s(after.value)} unit={s(after.unit)} size="xl" icon={s(after.icon)} iconSize={s(after.iconSize)} />
+                  <StatFigure
+                    brand={brand}
+                    value={s(after.value)}
+                    unit={s(after.unit)}
+                    size="xl"
+                    icon={s(after.icon)}
+                    iconSize={s(after.iconSize)}
+                  />
                 </div>
-                <div className="mt-6" style={{ fontSize: fillPx(24, "body"), lineHeight: 1.42, color: ink.body }}>
+                <div
+                  className="mt-6"
+                  style={{ fontSize: fillPx(24, "body"), lineHeight: 1.42, color: ink.body }}
+                >
                   {s(after.body)}
                 </div>
               </GlassTile>
@@ -10712,11 +11014,22 @@ function renderVariantBody({
             <div className="mt-6 flex flex-wrap items-baseline gap-6">
               <span
                 className="uppercase"
-                style={{ fontSize: fillPx(20, "body"), letterSpacing: "0.28em", color: ink.faint, fontWeight: 500 }}
+                style={{
+                  fontSize: fillPx(20, "body"),
+                  letterSpacing: "0.28em",
+                  color: ink.faint,
+                  fontWeight: 500,
+                }}
               >
                 {s(c.pronunciation)}
               </span>
-              <span style={{ fontSize: fillPx(24, "body"), color: "var(--slide-accent-text)", fontWeight: 600 }}>
+              <span
+                style={{
+                  fontSize: fillPx(24, "body"),
+                  color: "var(--slide-accent-text)",
+                  fontWeight: 600,
+                }}
+              >
                 {s(c.partOfSpeech, "n.")}
               </span>
             </div>
@@ -11000,7 +11313,9 @@ function renderVariantBody({
                   unit={s(balance.unit)}
                   label={s(balance.label)}
                   size="xl"
-                icon={s(balance.icon)} iconSize={s(balance.iconSize)} />
+                  icon={s(balance.icon)}
+                  iconSize={s(balance.iconSize)}
+                />
               </div>
               <div className="mt-10">
                 {bItems.map((it, i) => (
@@ -11100,7 +11415,12 @@ function renderVariantBody({
                 </div>
                 <div
                   className="mt-3"
-                  style={{ fontSize: fillPx(17, "body"), lineHeight: 1.45, color: ink.muted, maxWidth: 320 }}
+                  style={{
+                    fontSize: fillPx(17, "body"),
+                    lineHeight: 1.45,
+                    color: ink.muted,
+                    maxWidth: 320,
+                  }}
                 >
                   {s(it.body)}
                 </div>
@@ -11275,7 +11595,12 @@ function renderVariantBody({
                 {s(it.body) && (
                   <div
                     className="mt-2 text-center"
-                    style={{ fontSize: fillPx(14, "kicker"), lineHeight: 1.4, color: ink.muted, maxWidth: 220 }}
+                    style={{
+                      fontSize: fillPx(14, "kicker"),
+                      lineHeight: 1.4,
+                      color: ink.muted,
+                      maxWidth: 220,
+                    }}
                   >
                     {s(it.body)}
                   </div>
@@ -11559,7 +11884,11 @@ function renderVariantBody({
                   >
                     {s(it.value)}
                     <span
-                      style={{ fontSize: fillPx(22, "body"), color: "var(--slide-accent-text)", marginLeft: 4 }}
+                      style={{
+                        fontSize: fillPx(22, "body"),
+                        color: "var(--slide-accent-text)",
+                        marginLeft: 4,
+                      }}
                     >
                       {s(it.unit)}
                     </span>
@@ -11631,7 +11960,12 @@ function renderVariantBody({
                   {s(it.note) && (
                     <div
                       className="mt-1 text-center"
-                      style={{ fontSize: fillPx(13, "kicker"), lineHeight: 1.35, color: ink.muted, maxWidth: 200 }}
+                      style={{
+                        fontSize: fillPx(13, "kicker"),
+                        lineHeight: 1.35,
+                        color: ink.muted,
+                        maxWidth: 200,
+                      }}
                     >
                       {s(it.note)}
                     </div>
@@ -11711,7 +12045,9 @@ function renderVariantBody({
                 unit={s(stat.unit)}
                 label={s(stat.label)}
                 size="xl"
-              icon={s(stat.icon)} iconSize={s(stat.iconSize)} />
+                icon={s(stat.icon)}
+                iconSize={s(stat.iconSize)}
+              />
             </div>
             <div>
               {items.map((it, i) => {
@@ -11728,7 +12064,9 @@ function renderVariantBody({
                     }}
                   >
                     <div className="flex items-baseline justify-between">
-                      <div style={{ fontSize: fillPx(26, "body"), fontWeight: 600, color: ink.strong }}>
+                      <div
+                        style={{ fontSize: fillPx(26, "body"), fontWeight: 600, color: ink.strong }}
+                      >
                         {s(it.label)}
                       </div>
                       <div
@@ -11766,7 +12104,10 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="flex h-full flex-col justify-center">
             <Kicker brand={brand}>{s(c.kicker, "The number that matters")}</Kicker>
-            <div className="mt-8 grid items-end gap-20" style={{ gridTemplateColumns: "1.35fr 1fr" }}>
+            <div
+              className="mt-8 grid items-end gap-20"
+              style={{ gridTemplateColumns: "1.35fr 1fr" }}
+            >
               <div className="min-w-0">
                 <StatFigure
                   brand={brand}
@@ -11774,7 +12115,9 @@ function renderVariantBody({
                   unit={s(stat.unit, "%")}
                   size="monumental"
                   shape="auto"
-                icon={s(stat.icon)} iconSize={s(stat.iconSize)} />
+                  icon={s(stat.icon)}
+                  iconSize={s(stat.iconSize)}
+                />
                 <div
                   className="mt-8"
                   style={{
@@ -11833,7 +12176,11 @@ function renderVariantBody({
                 {s(c.source) && (
                   <div
                     className="mt-6 uppercase"
-                    style={{ fontSize: fillPx(15, "kicker"), letterSpacing: "0.26em", color: ink.faint }}
+                    style={{
+                      fontSize: fillPx(15, "kicker"),
+                      letterSpacing: "0.26em",
+                      color: ink.faint,
+                    }}
                   >
                     Source · {s(c.source)}
                   </div>
@@ -12001,8 +12348,7 @@ function renderVariantBody({
       const stat = obj(c.stat);
       const items = arr(c.items).slice(0, ORBIT_MAX_SEGMENTS);
       const legend = orbitLegendDensity(items.length);
-      const total =
-        items.reduce((n, it) => n + (Number(it.value) || 0), 0) || 1;
+      const total = items.reduce((n, it) => n + (Number(it.value) || 0), 0) || 1;
       // Ring geometry + label placement/wrapping come from the shared layout
       // module (src/lib/orbit-label-layout.ts) so the clipping regression suite
       // measures exactly what this renderer draws.
@@ -12036,17 +12382,18 @@ function renderVariantBody({
         };
       });
 
-
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} kicker={s(c.kicker)} />
-          <div className="mt-10 grid items-center gap-16" style={{ gridTemplateColumns: "1fr 1fr" }}>
+          <div
+            className="mt-10 grid items-center gap-16"
+            style={{ gridTemplateColumns: "1fr 1fr" }}
+          >
             <div className="relative flex justify-center">
               <svg
                 viewBox={`${-VB_PAD} 0 ${VB_W} 640`}
                 style={{ width: DISPLAY_W, maxWidth: "100%", overflow: "visible" }}
               >
-
                 <circle
                   cx={CX}
                   cy={CY}
@@ -12115,10 +12462,22 @@ function renderVariantBody({
                 >
                   <div
                     className="tabular-nums leading-none"
-                    style={{ fontSize: fillPx(Math.round(92 * SVG_SCALE), "display"), fontWeight: 600, letterSpacing: "-0.04em", color: ink.strong }}
+                    style={{
+                      fontSize: fillPx(Math.round(92 * SVG_SCALE), "display"),
+                      fontWeight: 600,
+                      letterSpacing: "-0.04em",
+                      color: ink.strong,
+                    }}
                   >
                     {s(stat.value, "24.1")}
-                    <span style={{ fontSize: fillPx(Math.round(38 * SVG_SCALE), "figure"), color: ink.muted }}>{s(stat.unit)}</span>
+                    <span
+                      style={{
+                        fontSize: fillPx(Math.round(38 * SVG_SCALE), "figure"),
+                        color: ink.muted,
+                      }}
+                    >
+                      {s(stat.unit)}
+                    </span>
                   </div>
                   <div
                     className="mt-2"
@@ -12133,7 +12492,6 @@ function renderVariantBody({
                   </div>
                 </OrbitDisc>
               </div>
-
             </div>
 
             <div className="min-w-0">
@@ -12162,12 +12520,22 @@ function renderVariantBody({
                       paddingBottom: legend.rowPadY,
                     }}
                   >
-                    <div style={{ fontSize: fillPx(legend.labelFs, "body"), fontWeight: 600, color: ink.body }}>
+                    <div
+                      style={{
+                        fontSize: fillPx(legend.labelFs, "body"),
+                        fontWeight: 600,
+                        color: ink.body,
+                      }}
+                    >
                       {s(it.label)}
                     </div>
                     <div
                       className="tabular-nums"
-                      style={{ fontSize: fillPx(legend.valueFs, "figure"), fontWeight: 600, color: ink.strong }}
+                      style={{
+                        fontSize: fillPx(legend.valueFs, "figure"),
+                        fontWeight: 600,
+                        color: ink.strong,
+                      }}
                     >
                       {Math.round(((Number(it.value) || 0) / total) * 100)}%
                     </div>
@@ -12328,7 +12696,10 @@ function renderVariantBody({
                 <div
                   key={i}
                   className="min-w-0 pt-10"
-                  style={{ borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`, paddingLeft: i === 0 ? 0 : 40 }}
+                  style={{
+                    borderLeft: i === 0 ? "none" : `1px solid ${ink.hairline}`,
+                    paddingLeft: i === 0 ? 0 : 40,
+                  }}
                 >
                   <div
                     className="uppercase"
@@ -12357,7 +12728,11 @@ function renderVariantBody({
                   {s(it.unit) && (
                     <div
                       className="mt-3 font-medium"
-                      style={{ fontSize: fillPx(24, "body"), color: ink.muted, letterSpacing: "-0.01em" }}
+                      style={{
+                        fontSize: fillPx(24, "body"),
+                        color: ink.muted,
+                        letterSpacing: "-0.01em",
+                      }}
                     >
                       {s(it.unit)}
                     </div>
@@ -12411,11 +12786,16 @@ function renderVariantBody({
                 size="xl"
                 shape="auto"
                 progress={(Number(lead?.percent) || 68) / 100}
-              icon={s(lead?.icon)} iconSize={s(lead?.iconSize)} />
+                icon={s(lead?.icon)}
+                iconSize={s(lead?.iconSize)}
+              />
             </div>
             <div
               className="grid gap-8"
-              style={{ gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gridAutoRows: "minmax(0, 1fr)" }}
+              style={{
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gridAutoRows: "minmax(0, 1fr)",
+              }}
             >
               {rest.map((it, i) => (
                 <div
@@ -12445,7 +12825,11 @@ function renderVariantBody({
                     {s(it.unit) && (
                       <span
                         className="align-top font-medium"
-                        style={{ fontSize: fillPx(28, "body"), marginLeft: 4, color: "var(--slide-accent-text)" }}
+                        style={{
+                          fontSize: fillPx(28, "body"),
+                          marginLeft: 4,
+                          color: "var(--slide-accent-text)",
+                        }}
                       >
                         {s(it.unit)}
                       </span>
@@ -12519,11 +12903,18 @@ function renderVariantBody({
               }}
             >
               {s(stat.value, "41")}
-              <span style={{ fontSize: fillPx(140, "display"), marginLeft: 8 }}>{s(stat.unit, "%")}</span>
+              <span style={{ fontSize: fillPx(140, "display"), marginLeft: 8 }}>
+                {s(stat.unit, "%")}
+              </span>
             </div>
             <div
               className="mt-6"
-              style={{ fontSize: fillPx(40, "figure"), fontWeight: 500, letterSpacing: "-0.02em", maxWidth: 860 }}
+              style={{
+                fontSize: fillPx(40, "figure"),
+                fontWeight: 500,
+                letterSpacing: "-0.02em",
+                maxWidth: 860,
+              }}
             >
               {s(stat.label)}
             </div>
@@ -12538,13 +12929,21 @@ function renderVariantBody({
                   <div key={i}>
                     <div
                       className="tabular-nums"
-                      style={{ fontSize: fillPx(46, "figure"), fontWeight: 600, letterSpacing: "-0.03em" }}
+                      style={{
+                        fontSize: fillPx(46, "figure"),
+                        fontWeight: 600,
+                        letterSpacing: "-0.03em",
+                      }}
                     >
                       {s(it.value)}
                     </div>
                     <div
                       className="mt-2 uppercase"
-                      style={{ fontSize: fillPx(15, "kicker"), letterSpacing: "0.24em", opacity: 0.78 }}
+                      style={{
+                        fontSize: fillPx(15, "kicker"),
+                        letterSpacing: "0.24em",
+                        opacity: 0.78,
+                      }}
                     >
                       {s(it.label)}
                     </div>
@@ -12629,7 +13028,12 @@ function renderVariantBody({
                   {s(it.body) && (
                     <div
                       className="mt-4"
-                      style={{ fontSize: fillPx(19, "body"), lineHeight: 1.45, opacity: 0.88, maxWidth: 380 }}
+                      style={{
+                        fontSize: fillPx(19, "body"),
+                        lineHeight: 1.45,
+                        opacity: 0.88,
+                        maxWidth: 380,
+                      }}
                     >
                       {s(it.body)}
                     </div>
@@ -12652,10 +13056,7 @@ function renderVariantBody({
               {s(c.narrative)}
             </SupportingText>
           )}
-          <div
-            className="relative mt-10 overflow-hidden rounded-[22px]"
-            style={{ height: 470 }}
-          >
+          <div className="relative mt-10 overflow-hidden rounded-[22px]" style={{ height: 470 }}>
             <MediaTile
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "stat-photo-band"))}
@@ -12669,7 +13070,9 @@ function renderVariantBody({
             <div
               data-on-media
               className="relative grid h-full items-end text-white"
-              style={{ gridTemplateColumns: `repeat(${Math.max(2, items.length)}, minmax(0, 1fr))` }}
+              style={{
+                gridTemplateColumns: `repeat(${Math.max(2, items.length)}, minmax(0, 1fr))`,
+              }}
             >
               {items.map((it, i) => (
                 <div
@@ -12694,7 +13097,11 @@ function renderVariantBody({
                     {s(it.unit) && (
                       <span
                         className="align-top font-medium"
-                        style={{ fontSize: fillPx(36, "figure"), marginLeft: 4, color: "var(--slide-accent-text)" }}
+                        style={{
+                          fontSize: fillPx(36, "figure"),
+                          marginLeft: 4,
+                          color: "var(--slide-accent-text)",
+                        }}
                       >
                         {s(it.unit)}
                       </span>
@@ -12773,7 +13180,12 @@ function renderVariantBody({
                 )}
               </div>
               <AccentRule accent={brand.tokens.accent} cap fade className="mt-8" />
-              <div className="mt-8 grid gap-10" style={{ gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))` }}>
+              <div
+                className="mt-8 grid gap-10"
+                style={{
+                  gridTemplateColumns: `repeat(${Math.max(1, items.length)}, minmax(0, 1fr))`,
+                }}
+              >
                 {items.map((it, i) => (
                   <StatFigure
                     key={i}
@@ -12782,7 +13194,9 @@ function renderVariantBody({
                     unit={s(it.unit)}
                     label={s(it.label)}
                     size="md"
-                  icon={s(it.icon)} iconSize={s(it.iconSize)} />
+                    icon={s(it.icon)}
+                    iconSize={s(it.iconSize)}
+                  />
                 ))}
               </div>
             </div>
@@ -12790,7 +13204,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     // ── Graph family (Batch 4) ──────────────────────────────────────────
 
@@ -12949,7 +13362,11 @@ function renderVariantBody({
                       >
                         {it.value}
                         <span
-                          style={{ fontSize: fillPx(16, "body"), color: "var(--slide-accent-text)", marginLeft: 4 }}
+                          style={{
+                            fontSize: fillPx(16, "body"),
+                            color: "var(--slide-accent-text)",
+                            marginLeft: 4,
+                          }}
                         >
                           {it.unit}
                         </span>
@@ -12982,7 +13399,9 @@ function renderVariantBody({
                 unit={s(stat.unit)}
                 label={s(stat.label)}
                 size="xl"
-              icon={s(stat.icon)} iconSize={s(stat.iconSize)} />
+                icon={s(stat.icon)}
+                iconSize={s(stat.iconSize)}
+              />
             </div>
           </div>
         </SlideFrame>
@@ -13035,7 +13454,13 @@ function renderVariantBody({
                     />
                     <div style={{ flex: 1 }}>
                       <div className="flex items-baseline justify-between">
-                        <div style={{ fontSize: fillPx(22, "body"), fontWeight: 600, color: ink.strong }}>
+                        <div
+                          style={{
+                            fontSize: fillPx(22, "body"),
+                            fontWeight: 600,
+                            color: ink.strong,
+                          }}
+                        >
                           {it.label}
                         </div>
                         <div
@@ -13114,7 +13539,10 @@ function renderVariantBody({
                     </div>
                     <div style={{ fontSize: fillPx(20, "body"), color: ink.faint }}>of 100%</div>
                   </div>
-                  <div className="mt-4 tabular-nums" style={{ fontSize: fillPx(16, "body"), color: ink.faint }}>
+                  <div
+                    className="mt-4 tabular-nums"
+                    style={{ fontSize: fillPx(16, "body"), color: ink.faint }}
+                  >
                     {done.toLocaleString()} / {total.toLocaleString()}
                   </div>
                   <div className="mt-6">
@@ -13181,7 +13609,6 @@ function renderVariantBody({
               const bench = Math.max(0, Math.min(100, Number(it.benchmark) || 0));
               return (
                 <div key={i} className={dense ? "py-3" : "py-7"}>
-
                   <div className="flex items-baseline justify-between gap-8 mb-4">
                     <div
                       style={{
@@ -13421,7 +13848,6 @@ function renderVariantBody({
               reclaim the height from flatter cells (see HeatmapChart) so the
               legend still lands above the footer band. */}
           <div className="mt-10">
-
             <HeatmapChart
               brand={brand}
               rows={rows}
@@ -13485,12 +13911,7 @@ function renderVariantBody({
         // The type stack owns the lower-left of the frame, so the lockup signs
         // off in the clear upper-right corner instead of sitting under the
         // title (LF-05 would otherwise pin it bottom-left).
-        <SlideFrame
-          brand={brand}
-          pageNumber={pageNumber}
-          variant="cover"
-          logoPosition="top-right"
-        >
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
           <MediaTile
             brand={brand}
             seed={s(c.mediaSeed, s(c.title, "editorial-bleed"))}
@@ -13538,7 +13959,6 @@ function renderVariantBody({
         </SlideFrame>
       );
     }
-
 
     case "MV-ED-HERO-ORB": {
       // Two soft aurora orbs behind minimal type. Tokens are palette-locked.
@@ -13686,12 +14106,7 @@ function renderVariantBody({
 
     case "MV-ED-STAT-PHOTO": {
       return (
-        <SlideFrame
-          brand={brand}
-          pageNumber={pageNumber}
-          variant="cover"
-          logoPosition="top-right"
-        >
+        <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
           <MediaTile
             brand={brand}
             seed={s(c.mediaSeed, s(c.label, "stat-photo"))}
@@ -13703,7 +14118,10 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none"
           />
           <HeroScrim brand={brand} anchor="bottom" />
-          <div data-on-media className="absolute inset-x-24 bottom-48 flex items-end justify-between gap-16 text-white">
+          <div
+            data-on-media
+            className="absolute inset-x-24 bottom-48 flex items-end justify-between gap-16 text-white"
+          >
             <div className="flex-shrink-0">
               <div
                 style={{
@@ -13715,7 +14133,9 @@ function renderVariantBody({
                 }}
               >
                 {s(c.stat, "97")}
-                <span style={{ fontSize: fillPx(130, "display"), marginLeft: 8 }}>{s(c.unit, "%")}</span>
+                <span style={{ fontSize: fillPx(130, "display"), marginLeft: 8 }}>
+                  {s(c.unit, "%")}
+                </span>
               </div>
               {s(c.label) && (
                 <div
@@ -13805,7 +14225,6 @@ function renderVariantBody({
       );
 
     default:
-
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, variant.name)} />
@@ -14035,7 +14454,13 @@ function renderLocationsVariant(
                     >
                       {it.value}
                       {it.unit && (
-                        <span style={{ fontSize: fillPx(12, "kicker"), color: ink.muted, marginLeft: 3 }}>
+                        <span
+                          style={{
+                            fontSize: fillPx(12, "kicker"),
+                            color: ink.muted,
+                            marginLeft: 3,
+                          }}
+                        >
                           {it.unit}
                         </span>
                       )}
@@ -14216,7 +14641,6 @@ function renderLocationsVariant(
     );
   };
 
-
   // Shared header — free-form Aurora v2. Left rail: kicker + 60px title +
   // muted headline. Right rail: hero stat (total cities) + delta-style meta.
   const Header = ({ compact = false }: { compact?: boolean } = {}) => (
@@ -14257,7 +14681,12 @@ function renderLocationsVariant(
         <div className="flex items-baseline gap-2">
           <span
             className="tabular-nums font-semibold"
-            style={{ fontSize: fillPx(104, "display"), lineHeight: 0.9, letterSpacing: "-0.04em", color: ink.strong }}
+            style={{
+              fontSize: fillPx(104, "display"),
+              lineHeight: 0.9,
+              letterSpacing: "-0.04em",
+              color: ink.strong,
+            }}
           >
             {heroStat?.value ?? totalCities}
           </span>
@@ -14272,7 +14701,12 @@ function renderLocationsVariant(
         </div>
         <div
           className="mt-3 uppercase"
-          style={{ fontSize: fillPx(13, "kicker"), letterSpacing: "0.3em", color: ink.muted, fontWeight: 600 }}
+          style={{
+            fontSize: fillPx(13, "kicker"),
+            letterSpacing: "0.3em",
+            color: ink.muted,
+            fontWeight: 600,
+          }}
         >
           {heroStat?.label ?? "Cities live"}
         </div>
@@ -14297,10 +14731,34 @@ function renderLocationsVariant(
     const tick = ink.hairline;
     const Corner = ({ pos }: { pos: "tl" | "tr" | "bl" | "br" }) => {
       const v: React.CSSProperties = { position: "absolute", width: 18, height: 18 };
-      if (pos === "tl") Object.assign(v, { top: 0, left: 0, borderTop: `1px solid ${tick}`, borderLeft: `1px solid ${tick}` });
-      if (pos === "tr") Object.assign(v, { top: 0, right: 0, borderTop: `1px solid ${tick}`, borderRight: `1px solid ${tick}` });
-      if (pos === "bl") Object.assign(v, { bottom: 0, left: 0, borderBottom: `1px solid ${tick}`, borderLeft: `1px solid ${tick}` });
-      if (pos === "br") Object.assign(v, { bottom: 0, right: 0, borderBottom: `1px solid ${tick}`, borderRight: `1px solid ${tick}` });
+      if (pos === "tl")
+        Object.assign(v, {
+          top: 0,
+          left: 0,
+          borderTop: `1px solid ${tick}`,
+          borderLeft: `1px solid ${tick}`,
+        });
+      if (pos === "tr")
+        Object.assign(v, {
+          top: 0,
+          right: 0,
+          borderTop: `1px solid ${tick}`,
+          borderRight: `1px solid ${tick}`,
+        });
+      if (pos === "bl")
+        Object.assign(v, {
+          bottom: 0,
+          left: 0,
+          borderBottom: `1px solid ${tick}`,
+          borderLeft: `1px solid ${tick}`,
+        });
+      if (pos === "br")
+        Object.assign(v, {
+          bottom: 0,
+          right: 0,
+          borderBottom: `1px solid ${tick}`,
+          borderRight: `1px solid ${tick}`,
+        });
       return <span aria-hidden style={v} />;
     };
     return (
@@ -14332,7 +14790,6 @@ function renderLocationsVariant(
       </SlideFrame>
     );
   }
-
 
   if (variantId === "MV-LOC-WORLD-STATS") {
     const metrics = coerceMetrics(c.metrics);
@@ -14645,7 +15102,9 @@ function renderLocationsVariant(
                     >
                       {totalCities}
                     </div>
-                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker"), marginTop: 6 }}>Cities</div>
+                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker"), marginTop: 6 }}>
+                      Cities
+                    </div>
                   </div>
                   <div>
                     <div
@@ -14659,7 +15118,9 @@ function renderLocationsVariant(
                     >
                       {totalRegions}
                     </div>
-                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker"), marginTop: 6 }}>Regions</div>
+                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker"), marginTop: 6 }}>
+                      Regions
+                    </div>
                   </div>
                   {(Object.keys(LOC_REGION_LABELS) as LocPin["region"][])
                     .filter((k) => counts[k] > 0)
@@ -14863,10 +15324,16 @@ function renderLocationsVariant(
                     >
                       {it.value ?? (typeof it.percent === "number" ? `${it.percent}%` : "")}
                     </div>
-                    {it.unit && <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker") }}>{it.unit}</div>}
+                    {it.unit && (
+                      <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker") }}>
+                        {it.unit}
+                      </div>
+                    )}
                   </div>
                   <div className="mt-1 flex items-baseline gap-2">
-                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker") }}>{it.label}</div>
+                    <div style={{ color: ink.muted, fontSize: fillPx(13, "kicker") }}>
+                      {it.label}
+                    </div>
                     {delta && (
                       <div
                         className="uppercase tabular-nums"
@@ -15096,8 +15563,6 @@ function ClientLogoImg({
       className={`size-full object-contain ${className ?? ""}`}
     />
   );
-
-
 }
 
 /**
@@ -15149,7 +15614,10 @@ function PlayOverlay({
             <path d="M5 3.2v15.6c0 .9 1 1.4 1.7.9l12-7.8c.7-.4.7-1.4 0-1.8l-12-7.8C6 1.8 5 2.3 5 3.2z" />
           </svg>
         </span>
-        <span data-on-fill className="rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white shadow-md backdrop-blur-sm">
+        <span
+          data-on-fill
+          className="rounded-full bg-black/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white shadow-md backdrop-blur-sm"
+        >
           {hint ?? label}
         </span>
       </div>
@@ -15493,7 +15961,6 @@ function MediaTile({
   fit,
   focus,
 
-
   mediaPath,
   videoUrl,
   videoPosterUrl,
@@ -15522,8 +15989,6 @@ function MediaTile({
   /** Focal point as a CSS object-position value ("50% 50%"). Decides which
    *  part of the photo survives the crop, and anchors the zoom. */
   focus?: string;
-
-
 
   /** Storage path in the private `slide-media` bucket for the override
    *  image. Re-signed on load via SlideMediaRefreshProvider. */
@@ -15566,8 +16031,6 @@ function MediaTile({
             : null),
         }
       : null;
-
-
 
   // Detect present/share playback context (client-only) so we autoplay
   // video there but not in the editor's slide grid — a wall of autoplaying
@@ -16099,7 +16562,9 @@ function StatTile({
         label={s(item.label)}
         source={s(item.source)}
         size={size}
-      icon={s(item.icon)} iconSize={s(item.iconSize)} />
+        icon={s(item.icon)}
+        iconSize={s(item.iconSize)}
+      />
     </div>
   );
 }
@@ -16224,7 +16689,12 @@ function AuroraStatCell({
           <span>{value || "—"}</span>
           {unit ? (
             <span
-              style={{ fontSize: fillPx(48, "figure"), fontWeight: 500, letterSpacing: "-0.02em", color: ink.strong }}
+              style={{
+                fontSize: fillPx(48, "figure"),
+                fontWeight: 500,
+                letterSpacing: "-0.02em",
+                color: ink.strong,
+              }}
             >
               {unit}
             </span>
@@ -16327,7 +16797,14 @@ function NumberedList({
               }}
             >
               <SlideNumeral value={i + 1} sizePx={40} className="pt-1" />
-              <IconBadge brand={brand} label={label} index={i} size="md" override={s(it.icon)} sizeToken={s(it.iconSize)} />
+              <IconBadge
+                brand={brand}
+                label={label}
+                index={i}
+                size="md"
+                override={s(it.icon)}
+                sizeToken={s(it.iconSize)}
+              />
               <div>
                 <div
                   style={{
@@ -16435,7 +16912,10 @@ function Card({
       >
         {title}
       </div>
-      <div className="mt-4" style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: bodyColor }}>
+      <div
+        className="mt-4"
+        style={{ fontSize: fillPx(21, "body"), lineHeight: 1.4, color: bodyColor }}
+      >
         {body}
       </div>
     </div>
@@ -16481,7 +16961,12 @@ function LabelBlock({ brand, label, body }: { brand: BrandMode; label: string; b
       <Kicker brand={brand}>{label}</Kicker>
       <div
         className="mt-5"
-        style={{ fontSize: fillPx(26, "body"), lineHeight: 1.38, letterSpacing: "-0.005em", color: bodyColor }}
+        style={{
+          fontSize: fillPx(26, "body"),
+          lineHeight: 1.38,
+          letterSpacing: "-0.005em",
+          color: bodyColor,
+        }}
       >
         {body}
       </div>
@@ -16721,7 +17206,15 @@ function ChartField({
   return (
     <g>
       {bands.map((b, i) => (
-        <rect key={`b${i}`} x={x0} y={b.y} width={x1 - x0} height={b.h} fill={ink.trackFill} opacity={0.5} />
+        <rect
+          key={`b${i}`}
+          x={x0}
+          y={b.y}
+          width={x1 - x0}
+          height={b.h}
+          fill={ink.trackFill}
+          opacity={0.5}
+        />
       ))}
       {lines.map((l, i) => (
         <line
@@ -16740,11 +17233,27 @@ function ChartField({
         [1, 2, 3, 4].map((i) => {
           const y = bottom - ((bottom - top) * i) / 5;
           return (
-            <line key={`t${i}`} x1={x0} y1={y} x2={x0 + 14} y2={y} stroke={ink.hairlineStrong} strokeWidth={1.4} />
+            <line
+              key={`t${i}`}
+              x1={x0}
+              y1={y}
+              x2={x0 + 14}
+              y2={y}
+              stroke={ink.hairlineStrong}
+              strokeWidth={1.4}
+            />
           );
         })}
       {cs.grid === "frame" && (
-        <rect x={x0} y={top} width={x1 - x0} height={bottom - top} fill="none" stroke={ink.hairline} strokeWidth={1} />
+        <rect
+          x={x0}
+          y={top}
+          width={x1 - x0}
+          height={bottom - top}
+          fill="none"
+          stroke={ink.hairline}
+          strokeWidth={1}
+        />
       )}
       {(cs.axis === "baseline" || cs.axis === "boxed" || cs.axis === "spine") && (
         <line
@@ -16757,10 +17266,25 @@ function ChartField({
         />
       )}
       {(cs.axis === "spine" || cs.axis === "boxed") && (
-        <line x1={x0} y1={top} x2={x0} y2={bottom} stroke={ink.hairlineStrong} strokeWidth={cs.axis === "spine" ? 2.5 : 1} />
+        <line
+          x1={x0}
+          y1={top}
+          x2={x0}
+          y2={bottom}
+          stroke={ink.hairlineStrong}
+          strokeWidth={cs.axis === "spine" ? 2.5 : 1}
+        />
       )}
       {cs.axis === "floating" && (
-        <line x1={x0} y1={bottom + 10} x2={x1} y2={bottom + 10} stroke={ink.hairline} strokeWidth={1} strokeDasharray="3 6" />
+        <line
+          x1={x0}
+          y1={bottom + 10}
+          x2={x1}
+          y2={bottom + 10}
+          stroke={ink.hairline}
+          strokeWidth={1}
+          strokeDasharray="3 6"
+        />
       )}
     </g>
   );
@@ -16801,24 +17325,38 @@ function StyledBar({
         <defs>
           <mask id={`${maskId}-cut`} maskUnits="userSpaceOnUse">
             <rect x={x - 2} y={y - 2} width={w + 4} height={h + 4} fill="#fff" />
-            <rect x={orn.cut.x - 2} y={orn.cut.y} width={orn.cut.w + 4} height={orn.cut.h} fill="#000" />
+            <rect
+              x={orn.cut.x - 2}
+              y={orn.cut.y}
+              width={orn.cut.w + 4}
+              height={orn.cut.h}
+              fill="#000"
+            />
           </mask>
         </defs>
       )}
       {orn.drop && (
-        <rect x={orn.drop.x} y={orn.drop.y} width={orn.drop.w} height={orn.drop.h} fill={ink.trackFill} opacity={0.7} />
+        <rect
+          x={orn.drop.x}
+          y={orn.drop.y}
+          width={orn.drop.w}
+          height={orn.drop.h}
+          fill={ink.trackFill}
+          opacity={0.7}
+        />
       )}
       <path
         d={barPath(cs, x, y, w, h)}
         fill={outline ? (emphasis ? fill : "transparent") : fill}
         fillOpacity={outline ? 0.35 : (fillOpacity ?? 1)}
-
         stroke={outline ? stroke : undefined}
         strokeWidth={outline ? 1.6 : undefined}
         mask={orn.cut ? `url(#${maskId}-cut)` : undefined}
       />
 
-      {orn.cap && <rect x={orn.cap.x} y={orn.cap.y} width={orn.cap.w} height={orn.cap.h} fill={stroke} />}
+      {orn.cap && (
+        <rect x={orn.cap.x} y={orn.cap.y} width={orn.cap.w} height={orn.cap.h} fill={stroke} />
+      )}
       {emphasis && !outline && cs.bar !== "pin" && (
         <rect x={x} y={y} width={w} height={2} fill={stroke} />
       )}
@@ -16837,7 +17375,6 @@ function barValueLabel(
   if (cs.valueLabel === "end") return { y: y - 22, hide: false, inside: false };
   return { y: y - 12, hide: false, inside: false };
 }
-
 
 /**
  * Area fill under a series, in the pack's language: airy gradient, flat wash,
@@ -16863,8 +17400,22 @@ function SeriesArea({
     <>
       <defs>
         {cs.area === "hatch" ? (
-          <pattern id={pid} width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
-            <line x1="0" y1="0" x2="0" y2="12" stroke="var(--slide-accent-text)" strokeWidth="2.2" strokeOpacity={0.34} />
+          <pattern
+            id={pid}
+            width="12"
+            height="12"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(38)"
+          >
+            <line
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="12"
+              stroke="var(--slide-accent-text)"
+              strokeWidth="2.2"
+              strokeOpacity={0.34}
+            />
           </pattern>
         ) : (
           <pattern id={pid} width="10" height="10" patternUnits="userSpaceOnUse">
@@ -16975,7 +17526,14 @@ function SegmentedBar({
                   {pct.toFixed(1)}%
                 </div>
                 {seg.note && (
-                  <div style={{ fontSize: fillPx(12, "kicker"), color: ink.muted, marginTop: 2, maxWidth: 220 }}>
+                  <div
+                    style={{
+                      fontSize: fillPx(12, "kicker"),
+                      color: ink.muted,
+                      marginTop: 2,
+                      maxWidth: 220,
+                    }}
+                  >
                     {seg.note}
                   </div>
                 )}
@@ -17000,11 +17558,20 @@ function EditorialNote({ title, body, accent }: { title: string; body: string; a
       <AccentTick accent={accent} height={2} />
       <div
         className="uppercase"
-        style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", color: ink.text, fontWeight: 700 }}
+        style={{
+          fontSize: fillPx(11, "kicker"),
+          letterSpacing: "0.24em",
+          color: ink.text,
+          fontWeight: 700,
+        }}
       >
         {title}
       </div>
-      <div style={{ fontSize: fillPx(14, "kicker"), color: ink.muted, lineHeight: 1.55, marginTop: 8 }}>{body}</div>
+      <div
+        style={{ fontSize: fillPx(14, "kicker"), color: ink.muted, lineHeight: 1.55, marginTop: 8 }}
+      >
+        {body}
+      </div>
     </div>
   );
 }
@@ -17027,7 +17594,12 @@ function SummaryStatCard({
     <div>
       <div
         className="uppercase"
-        style={{ fontSize: fillPx(18, "body"), letterSpacing: "0.28em", color: ink.muted, fontWeight: 600 }}
+        style={{
+          fontSize: fillPx(18, "body"),
+          letterSpacing: "0.28em",
+          color: ink.muted,
+          fontWeight: 600,
+        }}
       >
         {label}
       </div>
@@ -17043,7 +17615,13 @@ function SummaryStatCard({
       >
         <span className="tabular-nums">{value || "—"}</span>
         {unit && (
-          <span style={{ fontSize: fillPx(40, "figure"), marginLeft: 8, color: "var(--slide-accent-text)" }}>
+          <span
+            style={{
+              fontSize: fillPx(40, "figure"),
+              marginLeft: 8,
+              color: "var(--slide-accent-text)",
+            }}
+          >
             {unit}
           </span>
         )}
@@ -17113,8 +17691,6 @@ function Donut({
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
         clipPath={segmented ? `url(#${id}-arc)` : undefined}
       />
-
-
 
       <text
         x={size / 2}
@@ -17706,7 +18282,10 @@ function DashMetricViz({
     case "plate":
     default:
       return (
-        <div className="flex flex-col items-center justify-center" style={{ minHeight: size * 0.7 }}>
+        <div
+          className="flex flex-col items-center justify-center"
+          style={{ minHeight: size * 0.7 }}
+        >
           <div
             className="tabular-nums"
             style={{
@@ -17823,7 +18402,6 @@ function DashSeriesViz({
       return <FreeformAreaChart brand={brand} series={series} height={height} />;
   }
 }
-
 
 // Free-form breakdown row. Left-to-right feathered accent gradient, no
 // pill/track. When bloom=true, adds a radial halo + accent stroke tip at
@@ -18178,7 +18756,6 @@ function AreaChart({
           </text>
         ) : null,
       )}
-
     </svg>
   );
 }
@@ -18297,7 +18874,12 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
       {s(item.meta) && (
         <div
           className="mt-4 uppercase"
-          style={{ fontSize: fillPx(16, "body"), letterSpacing: "0.28em", color: ink.faint, fontWeight: 600 }}
+          style={{
+            fontSize: fillPx(16, "body"),
+            letterSpacing: "0.28em",
+            color: ink.faint,
+            fontWeight: 600,
+          }}
         >
           {s(item.meta)}
         </div>
@@ -18363,7 +18945,15 @@ function AxisBarChart({
   return (
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
       <AiryDefs id={id} />
-      <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
+      <ChartField
+        cs={cs}
+        ink={ink}
+        x0={padL}
+        x1={w - padR}
+        top={padT}
+        bottom={h - padB}
+        rows={ticks}
+      />
       {Array.from({ length: ticks + 1 }, (_, i) => {
         const y = padT + (chartH / ticks) * i;
         const val = niceMax * (1 - i / ticks);
@@ -18427,7 +19017,6 @@ function AxisBarChart({
           </g>
         );
       })}
-
     </svg>
   );
 }
@@ -18442,7 +19031,12 @@ function DonutBlock({ brand, item }: { brand: BrandMode; item: Item }) {
       </div>
       <div
         className="mt-8 uppercase"
-        style={{ fontSize: fillPx(20, "body"), letterSpacing: "0.28em", color: ink.text, fontWeight: 600 }}
+        style={{
+          fontSize: fillPx(20, "body"),
+          letterSpacing: "0.28em",
+          color: ink.text,
+          fontWeight: 600,
+        }}
       >
         {s(item.label)}
       </div>
@@ -18505,7 +19099,6 @@ function ConcentricRings({
       })}
     </svg>
   );
-
 }
 
 function DecadeAreaChart({
@@ -18617,7 +19210,6 @@ function DecadeAreaChart({
           </text>
         </g>
       )}
-
     </svg>
   );
 }
@@ -18659,12 +19251,27 @@ function LineMultiChart({
   return (
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
-        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
+        <ChartField
+          cs={cs}
+          ink={ink}
+          x0={padL}
+          x1={w - padR}
+          top={padT}
+          bottom={h - padB}
+          rows={ticks}
+        />
         {Array.from({ length: ticks + 1 }, (_, i) => {
           const y = padT + (chartH / ticks) * i;
           const val = niceMax * (1 - i / ticks);
           return (
-            <text key={i} x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(16, fillScale)} fill={ink.faint}>
+            <text
+              key={i}
+              x={padL - 12}
+              y={y + 6}
+              textAnchor="end"
+              fontSize={chartLabelSize(16, fillScale)}
+              fill={ink.faint}
+            >
               {Math.round(val)}
               {unit || ""}
             </text>
@@ -18688,7 +19295,12 @@ function LineMultiChart({
                 strokeLinejoin="round"
                 opacity={si === 0 ? 1 : 0.85}
               />
-              <SeriesMarkers cs={cs} pts={pts} color={cols[si] || ink.strong} base={si === 0 ? 5 : 4} />
+              <SeriesMarkers
+                cs={cs}
+                pts={pts}
+                color={cols[si] || ink.strong}
+                base={si === 0 ? 5 : 4}
+              />
             </g>
           );
         })}
@@ -18705,7 +19317,6 @@ function LineMultiChart({
             {lb}
           </text>
         ))}
-
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
         {series.map((sr, i) => (
@@ -18770,7 +19381,15 @@ function StackedBarChart({
     <div>
       <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} preserveAspectRatio="none" aria-hidden>
         <AiryDefs id={id} />
-        <ChartField cs={cs} ink={ink} x0={padL} x1={w - padR} top={padT} bottom={h - padB} rows={ticks} />
+        <ChartField
+          cs={cs}
+          ink={ink}
+          x0={padL}
+          x1={w - padR}
+          top={padT}
+          bottom={h - padB}
+          rows={ticks}
+        />
         {columns.map((col, i) => {
           const x = padL + i * slot + (slot - barW) / 2;
           let yCursor = h - padB;
@@ -18822,7 +19441,6 @@ function StackedBarChart({
             </g>
           );
         })}
-
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {segments.map((sg, i) => (
@@ -18845,7 +19463,9 @@ function StackedBarChart({
           </div>
         ))}
         {unit && (
-          <div style={{ fontSize: fillPx(14, "kicker"), color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
+          <div style={{ fontSize: fillPx(14, "kicker"), color: ink.faint, marginLeft: "auto" }}>
+            Units: {unit}
+          </div>
         )}
       </div>
     </div>
@@ -18929,7 +19549,6 @@ function StackedAreaChart({
             {lb}
           </text>
         ))}
-
       </svg>
       <div className="mt-3 flex flex-wrap gap-6">
         {series.map((sr, i) => (
@@ -18951,7 +19570,9 @@ function StackedAreaChart({
           </div>
         ))}
         {unit && (
-          <div style={{ fontSize: fillPx(14, "kicker"), color: ink.faint, marginLeft: "auto" }}>Units: {unit}</div>
+          <div style={{ fontSize: fillPx(14, "kicker"), color: ink.faint, marginLeft: "auto" }}>
+            Units: {unit}
+          </div>
         )}
       </div>
     </div>
@@ -19083,7 +19704,6 @@ function WaterfallChart({
               fill={ink.faint}
               style={lt}
             >
-
               {capLabel(b.label)}
             </text>
           </g>
@@ -19253,7 +19873,12 @@ function HeatmapChart({
           <Fragment key={ri}>
             <div
               className="pr-4 flex items-center justify-end uppercase"
-              style={{ fontSize: fillPx(14, "kicker"), letterSpacing: "0.2em", color: ink.strong, fontWeight: 600 }}
+              style={{
+                fontSize: fillPx(14, "kicker"),
+                letterSpacing: "0.2em",
+                color: ink.strong,
+                fontWeight: 600,
+              }}
             >
               {r}
             </div>
@@ -19272,7 +19897,11 @@ function HeatmapChart({
                     justifyContent: "center",
                   }}
                 >
-                  <span style={{ fontSize: fillPx(22, "body"), fontWeight: 700, color: ink.strong }}>{v}</span>
+                  <span
+                    style={{ fontSize: fillPx(22, "body"), fontWeight: 700, color: ink.strong }}
+                  >
+                    {v}
+                  </span>
                 </div>
               );
             })}
@@ -19282,7 +19911,12 @@ function HeatmapChart({
       <div className="mt-3 flex items-center gap-3">
         <span
           className="uppercase"
-          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
+          style={{
+            fontSize: fillPx(11, "kicker"),
+            letterSpacing: "0.24em",
+            color: ink.faint,
+            fontWeight: 600,
+          }}
         >
           Low
         </span>
@@ -19295,7 +19929,12 @@ function HeatmapChart({
         />
         <span
           className="uppercase"
-          style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", color: ink.faint, fontWeight: 600 }}
+          style={{
+            fontSize: fillPx(11, "kicker"),
+            letterSpacing: "0.24em",
+            color: ink.faint,
+            fontWeight: 600,
+          }}
         >
           High
         </span>
@@ -19417,7 +20056,6 @@ function Treemap({
               {r.meta}
             </text>
           )}
-
         </g>
       ))}
     </svg>
@@ -19473,7 +20111,13 @@ function ComboChart({
           return (
             <g key={i}>
               <line x1={padL} y1={y} x2={w - padR} y2={y} stroke={ink.hairline} strokeWidth={1} />
-              <text x={padL - 12} y={y + 6} textAnchor="end" fontSize={chartLabelSize(14, fillScale)} fill={ink.faint}>
+              <text
+                x={padL - 12}
+                y={y + 6}
+                textAnchor="end"
+                fontSize={chartLabelSize(14, fillScale)}
+                fill={ink.faint}
+              >
                 {bv.toFixed(1)}
                 {barUnit || ""}
               </text>
@@ -19534,7 +20178,10 @@ function ComboChart({
         ))}
       </svg>
       <div className="mt-2 flex flex-wrap gap-6">
-        <div className="flex items-center gap-2" style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>
+        <div
+          className="flex items-center gap-2"
+          style={{ fontSize: fillPx(16, "body"), color: ink.muted }}
+        >
           <span
             style={{
               display: "inline-block",
@@ -19546,7 +20193,10 @@ function ComboChart({
           />
           <span style={{ fontWeight: 600, color: ink.strong }}>{barLabel}</span>
         </div>
-        <div className="flex items-center gap-2" style={{ fontSize: fillPx(16, "body"), color: ink.muted }}>
+        <div
+          className="flex items-center gap-2"
+          style={{ fontSize: fillPx(16, "body"), color: ink.muted }}
+        >
           <span
             style={{
               display: "inline-block",
@@ -19677,10 +20327,20 @@ export function FunnelStageBand({
                 tone="onDark"
               />
               <div>
-                <div className="uppercase" style={{ fontSize: fillPx(14, "kicker"), letterSpacing: "0.3em", opacity: 0.75 }}>
+                <div
+                  className="uppercase"
+                  style={{ fontSize: fillPx(14, "kicker"), letterSpacing: "0.3em", opacity: 0.75 }}
+                >
                   Stage {stageNo}
                 </div>
-                <div className="mt-1.5" style={{ fontSize: fillPx(34, "figure"), fontWeight: 600, letterSpacing: "-0.02em" }}>
+                <div
+                  className="mt-1.5"
+                  style={{
+                    fontSize: fillPx(34, "figure"),
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
                   {label}
                 </div>
                 {note && (
@@ -19693,7 +20353,11 @@ export function FunnelStageBand({
             <div className="text-right">
               <div
                 className="tabular-nums font-semibold"
-                style={{ fontSize: fillPx(64, "display"), letterSpacing: "-0.03em", lineHeight: 0.95 }}
+                style={{
+                  fontSize: fillPx(64, "display"),
+                  letterSpacing: "-0.03em",
+                  lineHeight: 0.95,
+                }}
               >
                 {value}
                 <span className="ml-1" style={{ fontSize: fillPx(26, "body"), opacity: 0.85 }}>
@@ -19702,7 +20366,11 @@ export function FunnelStageBand({
               </div>
               <div
                 className="ml-auto mt-3 overflow-hidden rounded-full"
-                style={{ width: 132, height: 4, background: "color-mix(in oklab, white 22%, transparent)" }}
+                style={{
+                  width: 132,
+                  height: 4,
+                  background: "color-mix(in oklab, white 22%, transparent)",
+                }}
               >
                 <div
                   style={{
@@ -19731,18 +20399,29 @@ export function FunnelStageBand({
               color: inkStrong,
             }}
           >
-            <div className="uppercase" style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", opacity: 0.6 }}>
+            <div
+              className="uppercase"
+              style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.24em", opacity: 0.6 }}
+            >
               Stage {stageNo} of {String(total).padStart(2, "0")}
             </div>
             <div className="mt-1" style={{ fontSize: fillPx(20, "body"), fontWeight: 600 }}>
               {value}
               <span style={{ fontSize: fillPx(13, "kicker"), opacity: 0.75 }}>{unit || "%"}</span>
-              <span style={{ fontSize: fillPx(14, "kicker"), fontWeight: 400, opacity: 0.7 }}> · {label}</span>
+              <span style={{ fontSize: fillPx(14, "kicker"), fontWeight: 400, opacity: 0.7 }}>
+                {" "}
+                · {label}
+              </span>
             </div>
             <div className="mt-1" style={{ fontSize: fillPx(13, "kicker"), opacity: 0.78 }}>
-              {drop > 0 ? `${drop}% of the previous stage drops off` : "Top of funnel — full audience"}
+              {drop > 0
+                ? `${drop}% of the previous stage drops off`
+                : "Top of funnel — full audience"}
             </div>
-            <div className="mt-2" style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.18em", opacity: 0.5 }}>
+            <div
+              className="mt-2"
+              style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.18em", opacity: 0.5 }}
+            >
               CLICK FOR DETAIL
             </div>
           </div>
@@ -19783,10 +20462,16 @@ export function FunnelStageBand({
               Close
             </button>
           </div>
-          <div className="mt-4" style={{ fontSize: fillPx(12, "kicker"), letterSpacing: "0.22em", opacity: 0.55 }}>
+          <div
+            className="mt-4"
+            style={{ fontSize: fillPx(12, "kicker"), letterSpacing: "0.22em", opacity: 0.55 }}
+          >
             KEY MESSAGE
           </div>
-          <div className="mt-1" style={{ fontSize: fillPx(20, "body"), lineHeight: 1.45, opacity: 0.92 }}>
+          <div
+            className="mt-1"
+            style={{ fontSize: fillPx(20, "body"), lineHeight: 1.45, opacity: 0.92 }}
+          >
             {note || `${label} — ${value}${unit || "%"} of the audience reaches this stage.`}
           </div>
         </div>
@@ -19795,18 +20480,13 @@ export function FunnelStageBand({
   );
 }
 
-function Detail({
-  label,
-  value,
-  inkStrong,
-}: {
-  label: string;
-  value: string;
-  inkStrong: string;
-}) {
+function Detail({ label, value, inkStrong }: { label: string; value: string; inkStrong: string }) {
   return (
     <div style={{ color: inkStrong }}>
-      <div className="uppercase" style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.22em", opacity: 0.55 }}>
+      <div
+        className="uppercase"
+        style={{ fontSize: fillPx(11, "kicker"), letterSpacing: "0.22em", opacity: 0.55 }}
+      >
         {label}
       </div>
       <div className="mt-1 tabular-nums" style={{ fontSize: fillPx(24, "body"), fontWeight: 600 }}>

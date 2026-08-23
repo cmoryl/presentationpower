@@ -64,9 +64,7 @@ function BlockView({ block }: { block: Block }) {
     );
   }
   if (block.t === "p") {
-    return (
-      <p className="text-sm leading-relaxed text-black/70 dark:text-white/70">{block.v}</p>
-    );
+    return <p className="text-sm leading-relaxed text-black/70 dark:text-white/70">{block.v}</p>;
   }
   if (block.t === "list") {
     return (
@@ -214,9 +212,7 @@ function NextBuildReference() {
 
       <div className="mt-10 space-y-14 pb-24">
         {sections.length === 0 && (
-          <p className="text-sm text-black/60 dark:text-white/60">
-            No entries match “{query}”.
-          </p>
+          <p className="text-sm text-black/60 dark:text-white/60">No entries match “{query}”.</p>
         )}
         {sections.map((s) => (
           <section

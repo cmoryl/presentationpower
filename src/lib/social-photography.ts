@@ -36,7 +36,6 @@ import masterWide from "@/assets/backdrops/corporate-dark/bg-02.webp";
 import masterSquare from "@/assets/backdrops/corporate-dark/bg-05.webp";
 import masterTall from "@/assets/backdrops/corporate-dark/bg-08.webp";
 
-
 import type { SocialFormat } from "./social-formats";
 import { aspectClass } from "./social-formats";
 
@@ -114,7 +113,6 @@ export const SOCIAL_PHOTO_SETS: Record<string, PhotoSet> = {
     tall: cobrandTall,
   },
 };
-
 
 export function getPhotoSet(brandId: string): PhotoSet | undefined {
   return SOCIAL_PHOTO_SETS[brandId];

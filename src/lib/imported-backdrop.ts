@@ -45,7 +45,6 @@ function hex(color: unknown, theme?: Record<string, string | undefined>): string
   return m ? m[0].toUpperCase() : undefined;
 }
 
-
 function urlForPath(
   path: string | undefined,
   imagePaths?: string[],
@@ -150,7 +149,6 @@ export function extractImportedBackdrop(
     const hit = imageBackdrop(typeof sh.path === "string" ? sh.path : undefined);
     if (hit) return hit;
   }
-
 
   return null;
 }

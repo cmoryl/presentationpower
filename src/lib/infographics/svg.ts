@@ -98,7 +98,6 @@ export async function renderSpecToSvg(
       svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
       const { resolveSvgMarkupVars } = await import("../export-svg-vars");
       out = resolveSvgMarkupVars(new XMLSerializer().serializeToString(svg), svg);
-
     }
     inst.dispose();
     return out;

@@ -8,7 +8,6 @@ import { attachSlideFile } from "@/lib/slide-files.functions";
 import { blobToBase64 } from "@/lib/blob-base64";
 import { inferRoleFromVariant, type ModuleRole } from "@/lib/module-instance";
 
-
 const ROLES: { id: ModuleRole; label: string }[] = [
   { id: "hero", label: "Hero" },
   { id: "proof", label: "Proof" },
@@ -67,7 +66,6 @@ export function SaveModuleDialog({
    * "My files" groups it under Slides rather than the reusable module library.
    */
   origin?: "module" | "slide";
-
 }) {
   const inferredRole = inferRoleFromVariant(variantId);
   const [title, setTitle] = useState(variantName);
@@ -114,8 +112,7 @@ export function SaveModuleDialog({
               await Promise.all([import("@/lib/single-slide-pptx"), import("@/lib/taxonomy")]);
             const variant = byId(MODULE_VARIANTS, variantId);
             if (!variant) return null;
-            const brand =
-              BRAND_MODES.find((b) => b.id === (brandMode ?? "")) ?? BRAND_MODES[0];
+            const brand = BRAND_MODES.find((b) => b.id === (brandMode ?? "")) ?? BRAND_MODES[0];
             const res = await downloadSingleSlidePptx({
               variantId,
               layoutId: layoutId ?? variant.permittedLayoutIds[0],
@@ -194,7 +191,6 @@ export function SaveModuleDialog({
       queryClient.invalidateQueries({ queryKey: ["my-files"] });
       window.setTimeout(onClose, 1200);
     },
-
   });
 
   useEffect(() => {
@@ -374,8 +370,8 @@ export function SaveModuleDialog({
 
           {saveKind === "populated" && (
             <div className="rounded-lg bg-[#003FC7]/[0.06] px-3 py-2 text-xs text-[#003FC7]">
-              A real single-slide .pptx is generated and stored with this save, so you can
-              download and open it in PowerPoint from My files.
+              A real single-slide .pptx is generated and stored with this save, so you can download
+              and open it in PowerPoint from My files.
             </div>
           )}
 
@@ -396,7 +392,6 @@ export function SaveModuleDialog({
               {(mutation.error as Error)?.message ?? "Save failed."}
             </div>
           )}
-
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-black/10 bg-black/[0.02] px-5 py-3">

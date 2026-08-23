@@ -110,7 +110,6 @@ export function backdropPrompt(skin: DesignSkin, scene: SkinScene): BackdropProm
     `Museum-grade art direction, gallery print quality, quiet luxury. Absolutely no text, letters, numbers, logos, watermarks, people, UI, charts or slide furniture.`,
   ].join(" ");
 
-
   return {
     skinCode: skin.code,
     scene,
@@ -120,10 +119,7 @@ export function backdropPrompt(skin: DesignSkin, scene: SkinScene): BackdropProm
   };
 }
 
-export function backdropPromptForCode(
-  code: string,
-  scene: SkinScene,
-): BackdropPromptSpec | null {
+export function backdropPromptForCode(code: string, scene: SkinScene): BackdropPromptSpec | null {
   const skin = skinByCode(code);
   return skin ? backdropPrompt(skin, scene) : null;
 }

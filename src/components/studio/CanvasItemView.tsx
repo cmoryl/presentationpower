@@ -30,7 +30,8 @@ export function ModuleItemView({
   const slide = useMemo(() => {
     if (!variant) return null;
     const sectionId =
-      SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId))?.id ?? "SF-01";
+      SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId))?.id ??
+      "SF-01";
     return {
       id: `studio:${item.id}`,
       position: 0,
@@ -181,5 +182,4 @@ export function CanvasItemView({
       }}
     />
   );
-
 }

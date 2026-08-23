@@ -12,7 +12,6 @@ import {
 import { toast } from "sonner";
 import { ReferenceAssetGallery } from "@/components/ReferenceAssetGallery";
 
-
 export type ReferenceAsset = {
   id: string;
   name: string;
@@ -293,7 +292,6 @@ export function ReferenceAssetUploader({
     toast.success(`Replaced ${previous.name} with ${built.name}`);
   }
 
-
   return (
     <div className="mt-4">
       <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
@@ -399,7 +397,6 @@ export function ReferenceAssetUploader({
             }}
           />
 
-
           <label
             htmlFor={inputId}
             className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-black/15 px-3 py-2 text-[11px] font-medium text-black/65 transition hover:border-black/30 hover:text-black ${
@@ -425,7 +422,10 @@ export function ReferenceAssetUploader({
         </div>
 
         <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] text-black/40">
-          <span>PNG, JPG, WEBP, GIF or PDF · max {MAX_FILES} files · {formatBytes(MAX_BYTES)} each · PDFs ≤ {MAX_PDF_PAGES} pages</span>
+          <span>
+            PNG, JPG, WEBP, GIF or PDF · max {MAX_FILES} files · {formatBytes(MAX_BYTES)} each ·
+            PDFs ≤ {MAX_PDF_PAGES} pages
+          </span>
           {lastUploadSummary && (
             <span className="rounded-full bg-black/[0.04] px-2 py-0.5 text-black/60">
               {lastUploadSummary}
@@ -435,7 +435,6 @@ export function ReferenceAssetUploader({
       </div>
 
       <ReferenceAssetGallery assets={assets} />
-
 
       {summary && (
         <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-700">
@@ -452,7 +451,9 @@ export function ReferenceAssetUploader({
         >
           <div className="flex items-center gap-1.5 text-[11px] font-semibold text-rose-700">
             <AlertCircle className="h-3.5 w-3.5" aria-hidden />
-            {rejections.length === 1 ? "1 file could not be used" : `${rejections.length} files could not be used`}
+            {rejections.length === 1
+              ? "1 file could not be used"
+              : `${rejections.length} files could not be used`}
           </div>
           <ul className="mt-1 space-y-0.5">
             {rejections.map((r, idx) => (

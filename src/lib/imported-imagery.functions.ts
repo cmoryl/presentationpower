@@ -82,7 +82,8 @@ export const listExtractedDeckImages = createServerFn({ method: "GET" })
       .from("division_imagery")
       .select("id, division_id, storage_path, filename, content_type, size_bytes")
       .in("storage_path", paths.slice(0, 600));
-    if (rowErr) throw new Error((rowErr as { message?: string }).message ?? "Imagery lookup failed");
+    if (rowErr)
+      throw new Error((rowErr as { message?: string }).message ?? "Imagery lookup failed");
 
     const list = (rows ?? []) as Array<{
       id: string;
@@ -139,7 +140,8 @@ export const saveExtractedImagesToDivision = createServerFn({ method: "POST" })
           "id, division_id, storage_path, filename, content_type, size_bytes, kind, tags, note, variants",
         )
         .in("id", data.imageIds);
-      if (error) throw new Error((error as { message?: string }).message ?? "Imagery lookup failed");
+      if (error)
+        throw new Error((error as { message?: string }).message ?? "Imagery lookup failed");
 
       const list = (rows ?? []) as Array<{
         id: string;
@@ -157,10 +159,9 @@ export const saveExtractedImagesToDivision = createServerFn({ method: "POST" })
       // by default, so an admin's save lands visible instead of "pending".
       let isAdmin = false;
       try {
-        const res = await (s as unknown as { rpc: (n: string, a: unknown) => Promise<{ data: unknown }> }).rpc(
-          "has_role",
-          { _user_id: context.userId, _role: "admin" },
-        );
+        const res = await (
+          s as unknown as { rpc: (n: string, a: unknown) => Promise<{ data: unknown }> }
+        ).rpc("has_role", { _user_id: context.userId, _role: "admin" });
         isAdmin = res.data === true;
       } catch {
         isAdmin = false;
@@ -278,4 +279,3 @@ export const saveExtractedImagesToDivision = createServerFn({ method: "POST" })
       return { saved, skipped, already, approved, failures: failures.slice(0, 6) };
     },
   );
-

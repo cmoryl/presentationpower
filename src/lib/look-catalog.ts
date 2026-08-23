@@ -19,11 +19,7 @@
 
 import { designSkinByCode, INDUSTRY_RECIPES, type DesignSkin } from "./design-skins";
 import { industrySkinByCode } from "./industry-skins";
-import {
-  highContrastPackFromSkin,
-  isSkinPackId,
-  skinCodeFromPackId,
-} from "./design-skin-pack";
+import { highContrastPackFromSkin, isSkinPackId, skinCodeFromPackId } from "./design-skin-pack";
 import { isTemplatePackId, templateCodeFromPackId } from "./custom-templates";
 import { customTemplateMapping } from "./template-registry";
 import { withIndustryGround } from "./industry-backgrounds";
@@ -38,7 +34,11 @@ export type LookFamily = "core" | "industry" | "custom" | "legacy";
 export const LOOK_FAMILIES: Array<{ id: LookFamily; label: string; note: string }> = [
   { id: "core", label: "OnDeck core", note: "The 28 approved visual languages" },
   { id: "industry", label: "Industry", note: "Curated sector background systems" },
-  { id: "custom", label: "Approved templates", note: "Admin templates mapped to an approved style" },
+  {
+    id: "custom",
+    label: "Approved templates",
+    note: "Admin templates mapped to an approved style",
+  },
 ];
 
 export const LEGACY_FAMILY = {
@@ -153,9 +153,7 @@ function withThumb(
     approvedStyleCode: entry.approvedStyleCode ?? null,
     industryRecipeId,
     thumbScene: entry.thumbScene ?? "cover",
-    thumbPack: industryRecipeId
-      ? withIndustryGround(entry.pack, industryRecipeId)
-      : entry.pack,
+    thumbPack: industryRecipeId ? withIndustryGround(entry.pack, industryRecipeId) : entry.pack,
   };
 }
 
@@ -168,7 +166,11 @@ function entryFromSkin(
   skin: DesignSkin,
   pack: StylePack,
   family: LookFamily,
-  extra: { approvedStyleCode?: string | null; industryRecipeId?: string | null; thumbScene?: SkinScene } = {},
+  extra: {
+    approvedStyleCode?: string | null;
+    industryRecipeId?: string | null;
+    thumbScene?: SkinScene;
+  } = {},
 ): LookEntry {
   const industries = skin.industries?.length ? skin.industries : chipsFromText(skin.bestFit);
   return withThumb({
@@ -208,7 +210,11 @@ function chipsFromText(text: string): string[] {
 function entryFromPack(
   pack: StylePack,
   family: LookFamily,
-  extra: { approvedStyleCode?: string | null; industryRecipeId?: string | null; thumbScene?: SkinScene } = {},
+  extra: {
+    approvedStyleCode?: string | null;
+    industryRecipeId?: string | null;
+    thumbScene?: SkinScene;
+  } = {},
 ): LookEntry {
   const code = isTemplatePackId(pack.id)
     ? templateCodeFromPackId(pack.id)
@@ -314,7 +320,10 @@ export function lookEntryByPackId(
 
 /** Free-text search over any look list (code, name, reference, chips, density). */
 export function searchLooks(query: string, list: LookEntry[]): LookEntry[] {
-  const words = query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const words = query
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
   if (!words.length) return list;
   return list
     .map((e) => {
@@ -333,4 +342,3 @@ export function lookFamilyCounts(packs?: StylePack[]): Record<LookFamily, number
   for (const e of lookCatalog(packs, { includeLegacy: true })) out[e.family] += 1;
   return out;
 }
-

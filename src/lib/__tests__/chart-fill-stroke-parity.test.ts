@@ -252,9 +252,11 @@ describe("dark mode chart grammar parity", () => {
 
   it("exposes no hover/focus token on the dark path either", () => {
     setExportChartStyle(fakePack("skin-s07"));
-    expect(Object.keys(chartTheme({ dark: true })).join(" ").toLowerCase()).not.toMatch(
-      /hover|focus|active/,
-    );
+    expect(
+      Object.keys(chartTheme({ dark: true }))
+        .join(" ")
+        .toLowerCase(),
+    ).not.toMatch(/hover|focus|active/);
   });
 });
 

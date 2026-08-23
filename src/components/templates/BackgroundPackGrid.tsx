@@ -28,7 +28,13 @@ import { inputCls } from "./fields";
 import { BackdropSourcePicker } from "./BackdropSourcePicker";
 
 /** Which fields of the batch form get pushed into the selected sections. */
-type Fields = { intensity: boolean; tint: boolean; backdrop: boolean; swap: boolean; note: boolean };
+type Fields = {
+  intensity: boolean;
+  tint: boolean;
+  backdrop: boolean;
+  swap: boolean;
+  note: boolean;
+};
 
 const ALL: readonly string[] = SKIN_SCENES as readonly string[];
 
@@ -165,9 +171,7 @@ export function BackgroundPackGrid({
       }
       await loadTemplateRegistry(true);
       onChanged();
-      toast.success(
-        `${code} — updated ${scenes.length} section${scenes.length === 1 ? "" : "s"}.`,
-      );
+      toast.success(`${code} — updated ${scenes.length} section${scenes.length === 1 ? "" : "s"}.`);
       setPicked([]);
     } catch (e) {
       toast.error((e as Error).message);
@@ -205,7 +209,9 @@ export function BackgroundPackGrid({
       {/* ── header + selection ───────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]">
         <div>
-          <h3 className="text-sm font-semibold">All {ALL.length} section backgrounds on {code}</h3>
+          <h3 className="text-sm font-semibold">
+            All {ALL.length} section backgrounds on {code}
+          </h3>
           <p className="mt-0.5 text-[11px] opacity-55">
             {mine.length} tuned · {ALL.length - mine.length} still authored. Tick sections, then
             update any, a few, or the whole pack at once.
@@ -480,7 +486,6 @@ export function BackgroundPackGrid({
                     );
                   })}
                 </div>
-
               </div>
             )}
 

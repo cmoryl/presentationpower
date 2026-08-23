@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  TOOLBAR_SCALE_STEPS,
-  nextToolbarScale,
-  normalizeToolbarScale,
-} from "./use-toolbar-scale";
+import { TOOLBAR_SCALE_STEPS, nextToolbarScale, normalizeToolbarScale } from "./use-toolbar-scale";
 
 describe("toolbar scale setting", () => {
   it("reads the persisted string form back as a step", () => {

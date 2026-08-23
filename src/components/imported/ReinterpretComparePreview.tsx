@@ -40,10 +40,7 @@ export function ReinterpretComparePreview({
   brandModeId: string;
   mode?: "light" | "dark";
 }) {
-  const brand = useMemo(
-    () => byId(BRAND_MODES, brandModeId) ?? BRAND_MODES[0],
-    [brandModeId],
-  );
+  const brand = useMemo(() => byId(BRAND_MODES, brandModeId) ?? BRAND_MODES[0], [brandModeId]);
   const variant = designed ? byId(MODULE_VARIANTS, designed.variantId) : undefined;
   const deckSlide = useMemo(
     () => (designed ? toDeckSlide(designed, slideIndex) : null),
@@ -61,11 +58,7 @@ export function ReinterpretComparePreview({
           <span className="normal-case tracking-normal text-black/30">as imported</span>
         </figcaption>
         <div className="relative aspect-video overflow-hidden rounded-lg border border-black/10 bg-[#F7F8FB]">
-          <ImportedFaithfulSlide
-            deckId={importedDeckId}
-            slideIndex={slideIndex}
-            fitToContainer
-          />
+          <ImportedFaithfulSlide deckId={importedDeckId} slideIndex={slideIndex} fitToContainer />
         </div>
       </figure>
 
@@ -73,9 +66,7 @@ export function ReinterpretComparePreview({
         <figcaption className="mb-1 flex items-center justify-between text-[11px] uppercase tracking-wider text-[#003FC7]/70">
           <span>Reinterpreted design</span>
           {designed && (
-            <span className="normal-case tracking-normal text-black/30">
-              {designed.variantId}
-            </span>
+            <span className="normal-case tracking-normal text-black/30">{designed.variantId}</span>
           )}
         </figcaption>
         <div className="relative aspect-video overflow-hidden rounded-lg border border-[#003FC7]/25 bg-[#F7F8FB]">

@@ -18,7 +18,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toPowerPointSafeDataUrl } from "@/lib/pptx-image-compat";
-import { getImageEmbedLedger, resetImageEmbedLedger, type ImageFormat } from "@/lib/export-image-report";
+import {
+  getImageEmbedLedger,
+  resetImageEmbedLedger,
+  type ImageFormat,
+} from "@/lib/export-image-report";
 import { writeExportAlphaImages, writeExportLegacyImages } from "@/lib/export-quality";
 
 export const Route = createFileRoute("/dev/image-bench")({
@@ -34,7 +38,8 @@ export const Route = createFileRoute("/dev/image-bench")({
       { property: "og:title", content: "Image re-encode benchmark" },
       {
         property: "og:description",
-        content: "Measures encoding time and output size across common image formats and alpha cases.",
+        content:
+          "Measures encoding time and output size across common image formats and alpha cases.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -295,8 +300,8 @@ function ImageBenchHarness() {
       <h1 className="text-2xl font-semibold tracking-tight">Image re-encode benchmark</h1>
       <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
         Measures the export re-encode pipeline (decode → alpha scan → encode) across JPEG, PNG and
-        WebP sources, opaque and transparent, at slide and full-bleed resolutions — under each export
-        image option.
+        WebP sources, opaque and transparent, at slide and full-bleed resolutions — under each
+        export image option.
       </p>
       <div className="mt-6 flex gap-3">
         <button
@@ -327,13 +332,22 @@ function ImageBenchHarness() {
             <table className="w-full border-collapse text-left text-xs">
               <thead className="text-muted-foreground">
                 <tr>
-                  {["Option", "Sample", "Re-encoded", "Out", "In size", "Out size", "Ratio", "Median", "p95", "ms/MP"].map(
-                    (h) => (
-                      <th key={h} className="border-b border-border px-2 py-2 font-medium">
-                        {h}
-                      </th>
-                    ),
-                  )}
+                  {[
+                    "Option",
+                    "Sample",
+                    "Re-encoded",
+                    "Out",
+                    "In size",
+                    "Out size",
+                    "Ratio",
+                    "Median",
+                    "p95",
+                    "ms/MP",
+                  ].map((h) => (
+                    <th key={h} className="border-b border-border px-2 py-2 font-medium">
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>

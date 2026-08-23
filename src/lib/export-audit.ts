@@ -82,9 +82,7 @@ function intersection(a: Rect, b: Rect): number {
 function containedIn(t: Rect, f: Rect, tol = 0.02): boolean {
   const cx = t.x + t.w / 2;
   const cy = t.y + t.h / 2;
-  return (
-    cx >= f.x - tol && cx <= f.x + f.w + tol && cy >= f.y - tol && cy <= f.y + f.h + tol
-  );
+  return cx >= f.x - tol && cx <= f.x + f.w + tol && cy >= f.y - tol && cy <= f.y + f.h + tol;
 }
 
 /**

@@ -35,14 +35,7 @@ export const LIFESCI_SPOTLIGHTS: LifeSciSpotlightSeed[] = [
     teaser:
       "Spain's leading academic breast cancer research group standardized TMF management on Trial Interactive's eTMF — study setups in under four weeks and 50% less project management time.",
     collection: "Clinical technology",
-    tags: [
-      "trial interactive",
-      "etmf",
-      "tmf",
-      "clinical trials",
-      "oncology",
-      "spotlight",
-    ],
+    tags: ["trial interactive", "etmf", "tmf", "clinical trials", "oncology", "spotlight"],
     sourceFile: "GEICAM_Spotlight.pdf",
     content: {
       eyebrow: "Client Spotlight",
@@ -123,20 +116,12 @@ export const LIFESCI_SPOTLIGHTS: LifeSciSpotlightSeed[] = [
     teaser:
       "Laboratoires Vivacy validated SSCP IFP and PIL readability with patients under MDR, then extended user testing to HCPs to improve its IFU.",
     collection: "Regulatory & compliance",
-    tags: [
-      "vivacy",
-      "readability",
-      "user testing",
-      "mdr",
-      "patient materials",
-      "spotlight",
-    ],
+    tags: ["vivacy", "readability", "user testing", "mdr", "patient materials", "spotlight"],
     sourceFile: "Life_Sci_Vivacy_Spotlight.pdf",
     content: {
       eyebrow: "Spotlight",
       productName: "Readability & User Testing",
-      tagline:
-        "Vivacy successfully ensures and validates the readability of key patient materials",
+      tagline: "Vivacy successfully ensures and validates the readability of key patient materials",
       summary:
         "Laboratoires Vivacy was searching for a vendor to test the readability of their summary of safety and clinical performance (SSCP) information for patients (IFP), patient information leaflets (PILs), and instructions for use (IFU).",
       capabilities: [
@@ -292,20 +277,12 @@ export const LIFESCI_SPOTLIGHTS: LifeSciSpotlightSeed[] = [
     teaser:
       "An interactive escape room e-learning module replaced text-heavy PDF and in-person KPI training — trackable, localization-friendly, and rolled out globally.",
     collection: "Training & e-learning",
-    tags: [
-      "takeda",
-      "e-learning",
-      "gamification",
-      "supply chain",
-      "training",
-      "spotlight",
-    ],
+    tags: ["takeda", "e-learning", "gamification", "supply chain", "training", "spotlight"],
     sourceFile: "TPT_Life_Sciences_Spotlight_Takeda.pdf",
     content: {
       eyebrow: "Spotlight",
       productName: "TransPerfect E-Learning",
-      tagline:
-        "TransPerfect supports Takeda supply chain training with gamification",
+      tagline: "TransPerfect supports Takeda supply chain training with gamification",
       summary:
         "Takeda's supply chain team is responsible for knowing how to collect data and calculate KPIs. The training available for those accountabilities was excessively time consuming and impossible to track.",
       capabilities: [
@@ -377,14 +354,7 @@ export const LIFESCI_SPOTLIGHTS: LifeSciSpotlightSeed[] = [
     teaser:
       "TransPerfect Connect staffed certified, in-language resources who worked as UBC employees — cutting administrative load on a large pharma call center program.",
     collection: "Patient & contact center",
-    tags: [
-      "ubc",
-      "transperfect connect",
-      "call center",
-      "contact center",
-      "staffing",
-      "spotlight",
-    ],
+    tags: ["ubc", "transperfect connect", "call center", "contact center", "staffing", "spotlight"],
     sourceFile: "TPT_Life_Sciences_Spotlight_UBC_Pharma.pdf",
     content: {
       eyebrow: "Spotlight",

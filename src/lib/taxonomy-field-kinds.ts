@@ -17,9 +17,7 @@
 /** What a field holds. Only `text` carries a character budget. */
 export type FieldKind = "text" | "number" | "image" | "logo" | "icon" | "list";
 
-export type FieldSpec =
-  | { kind: "text"; chars: number }
-  | { kind: Exclude<FieldKind, "text"> };
+export type FieldSpec = { kind: "text"; chars: number } | { kind: Exclude<FieldKind, "text"> };
 
 /** Character budgets used when the variant declares no generic equivalent. */
 const SHORT = 24;

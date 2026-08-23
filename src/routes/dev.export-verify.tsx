@@ -132,7 +132,8 @@ async function auditBlob(
   const runs = count(xml, /<a:t>/g);
   const hasBlip = /<a:blip/.test(xml);
   const hasSolid = /<p:bg>[\s\S]*?<a:solidFill/.test(xml) || /<a:solidFill/.test(xml);
-  const bg: "image" | "solid" | "none" = hasBlip && media.length > 0 ? "image" : hasSolid ? "solid" : "none";
+  const bg: "image" | "solid" | "none" =
+    hasBlip && media.length > 0 ? "image" : hasSolid ? "solid" : "none";
 
   if (bg === "none") problems.push("slide has no background fill or image");
   // A layered module must contain a decor plate AND independently selectable
@@ -228,7 +229,8 @@ async function verifyOne(
       // let regressions that flattened layered exports pass CI unnoticed.
       fidelity: "layered",
     });
-    if (res.failedSlides?.length) base.problems.push(`renderer failed: ${res.failedSlides.join(",")}`);
+    if (res.failedSlides?.length)
+      base.problems.push(`renderer failed: ${res.failedSlides.join(",")}`);
     if (!res.blob) return { ...base, problems: [...base.problems, "no blob returned"] };
     const a = await auditBlob(res.blob);
     const problems = [...base.problems, ...a.problems];
@@ -243,7 +245,8 @@ async function verifyOne(
       );
     }
     // Pack exports must carry the rasterized sheet, not a bare solid.
-    if (pack && a.bg !== "image") problems.push(`pack export background is ${a.bg}, expected image`);
+    if (pack && a.bg !== "image")
+      problems.push(`pack export background is ${a.bg}, expected image`);
     return { ...base, ...a, problems, ok: problems.length === 0 };
   } catch (err) {
     return {
@@ -365,7 +368,6 @@ async function textFitOne(
   }
 }
 
-
 // -----------------------------------------------------------------------------
 // PATH-PARITY CAPTURE
 //
@@ -464,8 +466,6 @@ async function pairOne(
   }
 }
 
-
-
 // -----------------------------------------------------------------------------
 // PIXEL-DIFF CAPTURE (regression gate, NOT ground truth)
 //
@@ -513,7 +513,6 @@ export interface PixelCapture {
   graphicRects: Array<{ x: number; y: number; w: number; h: number }>;
   error?: string;
 }
-
 
 /** Both sides are normalized to this size before comparison. */
 const PIXEL_DIFF_W = 960;
@@ -579,7 +578,6 @@ async function rectsFromPptx(blob: Blob) {
 }
 
 async function pixelOne(
-
   variantId: string,
   packId: string | null,
   modeIn: "light" | "dark",
@@ -634,9 +632,7 @@ async function pixelOne(
       brandModeId: baseBrand.id,
       archetypeId: "single-module",
       slides: [slide],
-    } as unknown as Parameters<
-      Awaited<typeof import("@/lib/pptx-export")>["exportDeckToPptx"]
-    >[0];
+    } as unknown as Parameters<Awaited<typeof import("@/lib/pptx-export")>["exportDeckToPptx"]>[0];
 
     const [{ exportDeckToPptx }, { rasterizeExactSlide }] = await Promise.all([
       import("@/lib/pptx-export"),
@@ -656,7 +652,6 @@ async function pixelOne(
       out.graphicRects = rects.graphicRects;
     }
 
-
     const plate = await rasterizeExactSlide({
       slide,
       variant,
@@ -673,8 +668,6 @@ async function pixelOne(
     return { ...out, error: err instanceof Error ? err.message : String(err) };
   }
 }
-
-
 
 /** One certified-preview parity audit: capture vs what the preview paints. */
 type CertifiedAudit = {
@@ -901,9 +894,7 @@ declare global {
        * detection and not a PowerPoint fidelity measurement.
        */
       pixel: (
-        jobs: Array<
-          [string, string | null, "light" | "dark", ("editable" | "layered" | "exact")?]
-        >,
+        jobs: Array<[string, string | null, "light" | "dark", ("editable" | "layered" | "exact")?]>,
       ) => Promise<PixelCapture[]>;
       /** Same module through the deck path and the single-slide path, for diffing. */
       pair: (
@@ -914,9 +905,7 @@ declare global {
       ) => Promise<PathPair>;
       /** Tracked-text clipping audit straight from the emitted slide XML. */
       textFit: (
-        jobs: Array<
-          [string, string | null, "light" | "dark", ("editable" | "layered" | "exact")?]
-        >,
+        jobs: Array<[string, string | null, "light" | "dark", ("editable" | "layered" | "exact")?]>,
       ) => Promise<TextFitCapture[]>;
       /**
        * Certified-preview parity: does the "Preview in PowerPoint" canvas paint
@@ -925,11 +914,6 @@ declare global {
       certified: (
         jobs: Array<[string, string | null, "light" | "dark"]>,
       ) => Promise<CertifiedAudit[]>;
-
-
-
-
-
     };
   }
 }
@@ -949,8 +933,8 @@ function LayerReportTable({ report, index }: { report: LayerReport; index: numbe
       <header className="flex flex-wrap items-baseline justify-between gap-2">
         <h3 className="text-sm font-semibold">Slide {index + 1} layering report</h3>
         <p className="text-xs text-muted-foreground">
-          {report.objects.length} objects · {report.editableCount} editable ·{" "}
-          {report.layeredCount} layered
+          {report.objects.length} objects · {report.editableCount} editable · {report.layeredCount}{" "}
+          layered
           {report.flattened ? " · FLATTENED" : ""}
         </p>
       </header>
@@ -1028,11 +1012,7 @@ function TreeDiffPanel({ result }: { result: TreeDiffResult }) {
         <h3 className="text-sm font-semibold">
           Object-tree diff vs baseline · {result.ok ? "PASS" : "REGRESSION"}
         </h3>
-        <button
-          type="button"
-          className="text-xs underline"
-          onClick={() => setShowAll((v) => !v)}
-        >
+        <button type="button" className="text-xs underline" onClick={() => setShowAll((v) => !v)}>
           {showAll ? "Only differences" : "Show unchanged objects"}
         </button>
       </header>
@@ -1045,9 +1025,7 @@ function TreeDiffPanel({ result }: { result: TreeDiffResult }) {
         </ul>
       )}
       {result.slides.map((slide) => {
-        const rows = showAll
-          ? slide.objects
-          : slide.objects.filter((o) => o.kind !== "unchanged");
+        const rows = showAll ? slide.objects : slide.objects.filter((o) => o.kind !== "unchanged");
         return (
           <div key={slide.index} className="mt-3">
             <p className="text-xs font-medium">
@@ -1138,9 +1116,6 @@ function ExportVerifyHarness() {
         for (const [v, p, m, f] of jobs) out.push(await textFitOne(v, p, m, f));
         return out;
       },
-
-
-
     };
     setReady(true);
     return () => {
@@ -1152,9 +1127,8 @@ function ExportVerifyHarness() {
     <main className="mx-auto max-w-2xl p-10 font-sans">
       <h1 className="text-2xl font-semibold tracking-tight">Export verification harness</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        {ready ? "Ready" : "Loading"} · {MODULE_VARIANTS.length} modules ·{" "}
-        {STYLE_PACKS.length} alternate looks. Driven headlessly via{" "}
-        <code>window.__tpExportVerify.run()</code>.
+        {ready ? "Ready" : "Loading"} · {MODULE_VARIANTS.length} modules · {STYLE_PACKS.length}{" "}
+        alternate looks. Driven headlessly via <code>window.__tpExportVerify.run()</code>.
       </p>
 
       <div className="mt-6 flex flex-wrap items-end gap-3 rounded-lg border border-border p-4">
@@ -1259,9 +1233,7 @@ function ExportVerifyHarness() {
             >
               Diff vs baseline
             </button>
-            {baselineNote && (
-              <span className="text-xs text-muted-foreground">{baselineNote}</span>
-            )}
+            {baselineNote && <span className="text-xs text-muted-foreground">{baselineNote}</span>}
           </div>
           {treeDiff && <TreeDiffPanel result={treeDiff} />}
           {audit.layers.map((r, i) => (

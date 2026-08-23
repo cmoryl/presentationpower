@@ -96,7 +96,6 @@ export function orbitLabelFontScale(lines: string[]): number {
   return Math.max(ORBIT_LABEL_MIN_SCALE, ORBIT_LABEL_MAX_W / widest);
 }
 
-
 /** Text anchor for a label at cos(midAngle) — labels point away from centre. */
 export function orbitLabelAnchor(cos: number): OrbitAnchor {
   return cos < -0.2 ? "end" : cos > 0.2 ? "start" : "middle";
@@ -153,9 +152,7 @@ export interface OrbitLabelLayout {
 }
 
 /** Full label layout for a set of orbit shares (values need not sum to 100). */
-export function layoutOrbitLabels(
-  items: { label: string; value: number }[],
-): OrbitLabelLayout[] {
+export function layoutOrbitLabels(items: { label: string; value: number }[]): OrbitLabelLayout[] {
   const total = items.reduce((n, it) => n + (Number(it.value) || 0), 0) || 1;
   let acc = 0;
   return items.map((it, index) => {

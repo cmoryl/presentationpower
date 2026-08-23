@@ -8,10 +8,7 @@ import { useState } from "react";
 import { AlertTriangle, Check, ChevronDown, Contrast, Wand2 } from "lucide-react";
 import type { ContrastAudit, DeckContrastAudit, WcagTarget } from "@/lib/contrast-audit";
 
-const TONE: Record<
-  ContrastAudit["level"],
-  { chip: string; panel: string; label: string }
-> = {
+const TONE: Record<ContrastAudit["level"], { chip: string; panel: string; label: string }> = {
   pass: {
     chip: "border-[#A6FA87] bg-[#A6FA87]/25 text-[#03002C]",
     panel: "border-[#A6FA87]/50 bg-[#A6FA87]/10",
@@ -71,11 +68,7 @@ export function SlideContrastWarning({
             {audit.level === "pass" ? <Check size={9} /> : <AlertTriangle size={9} />}
             {tone.label}
           </span>
-          <ChevronDown
-            size={11}
-            className={`transition ${open ? "rotate-180" : ""}`}
-            aria-hidden
-          />
+          <ChevronDown size={11} className={`transition ${open ? "rotate-180" : ""}`} aria-hidden />
         </button>
         {audit.safeAccent && onUseSafeAccent && (
           <button
@@ -99,7 +92,6 @@ export function SlideContrastWarning({
           the {audit.mode} surface.
         </p>
       )}
-
 
       {open && (
         <ul className="mt-2 space-y-1.5">
@@ -167,9 +159,7 @@ export function WcagTargetToggle({
                 : "WCAG 2.1 AAA — 7:1 body text, 4.5:1 large text"
             }
             className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide transition ${
-              active
-                ? "bg-[#003FC7] text-white"
-                : "text-black/55 hover:bg-black/[0.04]"
+              active ? "bg-[#003FC7] text-white" : "text-black/55 hover:bg-black/[0.04]"
             }`}
           >
             {t}

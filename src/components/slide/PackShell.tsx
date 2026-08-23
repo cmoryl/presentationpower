@@ -36,7 +36,6 @@ export function useLibraryPack(): StylePack | null {
   return useContext(PackContext);
 }
 
-
 /** A pack owns its mode — the look IS light or dark. */
 export function usePackMode<M extends "light" | "dark">(mode: M): "light" | "dark" {
   const pack = useLibraryPack();

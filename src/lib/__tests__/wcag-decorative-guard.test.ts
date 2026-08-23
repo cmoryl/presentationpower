@@ -47,10 +47,10 @@ function find(root: HTMLElement, sel: string): HTMLElement {
 function touched(el: HTMLElement): boolean {
   return Boolean(
     el.dataset.wcagFixed ||
-      el.dataset.wcagShadow ||
-      el.dataset.wcagLightInk ||
-      el.dataset.wcagOriginal !== undefined ||
-      el.style.cssText !== (baselines.get(el) ?? ""),
+    el.dataset.wcagShadow ||
+    el.dataset.wcagLightInk ||
+    el.dataset.wcagOriginal !== undefined ||
+    el.style.cssText !== (baselines.get(el) ?? ""),
   );
 }
 
@@ -82,10 +82,7 @@ describe("wcag auto-fix never repaints decorative type", () => {
     ["data-decorative", `<span id="t" data-decorative`],
     ["aria-hidden", `<span id="t" aria-hidden="true"`],
     ["data-accent-glow", `<span id="t" data-accent-glow`],
-    [
-      "-webkit-text-stroke outline",
-      `<span id="t" style="-webkit-text-stroke-width: 3px;`,
-    ],
+    ["-webkit-text-stroke outline", `<span id="t" style="-webkit-text-stroke-width: 3px;`],
     [
       "transparent -webkit-text-fill-color",
       `<span id="t" style="-webkit-text-fill-color: rgba(0, 0, 0, 0);`,
@@ -156,10 +153,7 @@ describe("StatFigure ghost counterform keeps its decorative markers", () => {
   it("renders aria-hidden + data-decorative + data-accent-glow", async () => {
     const { readFileSync } = await import("node:fs");
     const src = readFileSync("src/components/slide/primitives.tsx", "utf8");
-    const ghost = src.slice(
-      src.indexOf('=== "ghost" ||'),
-      src.indexOf('WebkitTextStrokeWidth'),
-    );
+    const ghost = src.slice(src.indexOf('=== "ghost" ||'), src.indexOf("WebkitTextStrokeWidth"));
     expect(ghost.length).toBeGreaterThan(0);
     expect(ghost).toContain("aria-hidden");
     expect(ghost).toContain("data-decorative");

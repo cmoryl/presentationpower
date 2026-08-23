@@ -51,5 +51,3 @@ describe("native variant coverage", () => {
     expect(NATIVE_EMITTER_VARIANT_IDS).toContain("MV-CLOSE-CTA");
   });
 });
-
-

@@ -27,8 +27,9 @@ describe("bento sibling mapping", () => {
     expect(bentoSiblingFor("MV-PROC-BEFORE-AFTER-SPLIT", cards)).toBe("MV-BENTO-VALUE-CLOSE");
     expect(bentoSiblingFor("MV-CLOSE-DUAL-CTA", cards)).toBe("MV-BENTO-VALUE-CLOSE");
     expect(bentoSiblingFor("MV-PROC-BEFORE-AFTER-SPLIT", null)).toBeNull();
-    expect(bentoSiblingFor("MV-PROC-BEFORE-AFTER-SPLIT", new Set(designStyle("kpi").variantIds)))
-      .toBeNull();
+    expect(
+      bentoSiblingFor("MV-PROC-BEFORE-AFTER-SPLIT", new Set(designStyle("kpi").variantIds)),
+    ).toBeNull();
     expect(bentoSiblingFor("MV-KPI-DASHBOARD", cards)).toBeNull();
   });
 

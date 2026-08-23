@@ -127,9 +127,11 @@ describe("chart style metrics", () => {
 
   it("flags strokes exported far heavier than the preview", () => {
     const thin = blank();
-    for (let y = 10; y < 110; y += 20) paint(thin, { x0: 10, y0: y, x1: 110, y1: y + 1 }, () => [0, 0, 0]);
+    for (let y = 10; y < 110; y += 20)
+      paint(thin, { x0: 10, y0: y, x1: 110, y1: y + 1 }, () => [0, 0, 0]);
     const thick = blank();
-    for (let y = 10; y < 110; y += 20) paint(thick, { x0: 10, y0: y, x1: 110, y1: y + 8 }, () => [0, 0, 0]);
+    for (let y = 10; y < 110; y += 20)
+      paint(thick, { x0: 10, y0: y, x1: 110, y1: y + 8 }, () => [0, 0, 0]);
     const metrics = compare(thin, thick);
     expect(metrics.exportStroke).toBeGreaterThan(metrics.referenceStroke ?? 0);
     expect(metrics.strokeDelta).toBeGreaterThan(LIMITS.maxStroke);

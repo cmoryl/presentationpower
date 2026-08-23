@@ -9,13 +9,7 @@ import type { PresetPart } from "./canvas-block-presets";
 
 export type DataPoint = { label: string; value: number };
 
-export type DataVisualType =
-  | "column"
-  | "bar"
-  | "stacked100"
-  | "progress"
-  | "kpi"
-  | "matrix";
+export type DataVisualType = "column" | "bar" | "stacked100" | "progress" | "kpi" | "matrix";
 
 export type DataVisualSpec = {
   type: DataVisualType;
@@ -48,7 +42,12 @@ const fmt = (v: number, unit?: string) => {
   return unit ? `${n}${unit.startsWith("%") || unit.length <= 2 ? unit : ` ${unit}`}` : n;
 };
 
-function head(title: string, caption: string | undefined, ink: string, accent: string): PresetPart[] {
+function head(
+  title: string,
+  caption: string | undefined,
+  ink: string,
+  accent: string,
+): PresetPart[] {
   const parts: PresetPart[] = [
     {
       type: "text",
@@ -94,7 +93,13 @@ export function buildDataVisual(spec: DataVisualSpec): PresetPart[] {
   const parts = head(spec.title, spec.caption, ink, accent);
   const top = spec.caption ? 400 : 360;
 
-  const label = (x: number, y: number, w: number, text: string, align: "left" | "center" = "left") => ({
+  const label = (
+    x: number,
+    y: number,
+    w: number,
+    text: string,
+    align: "left" | "center" = "left",
+  ) => ({
     type: "text" as const,
     x,
     y,
@@ -226,7 +231,13 @@ export function buildDataVisual(spec: DataVisualSpec): PresetPart[] {
           y,
           w: 260,
           h: 56,
-          props: { text: `${Math.round(p.value)}%`, size: 34, weight: 700, align: "right", color: ink },
+          props: {
+            text: `${Math.round(p.value)}%`,
+            size: 34,
+            weight: 700,
+            align: "right",
+            color: ink,
+          },
         });
         parts.push({
           type: "surface",
@@ -278,7 +289,11 @@ export function buildDataVisual(spec: DataVisualSpec): PresetPart[] {
           y: cy,
           w,
           h,
-          props: { fill: frac > 0.66 ? accent : frac > 0.33 ? TRACK : "#F2F2F2", radius: 24, opacity: 1 },
+          props: {
+            fill: frac > 0.66 ? accent : frac > 0.33 ? TRACK : "#F2F2F2",
+            radius: 24,
+            opacity: 1,
+          },
         });
         parts.push({
           type: "text",

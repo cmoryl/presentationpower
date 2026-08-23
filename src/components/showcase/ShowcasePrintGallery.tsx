@@ -118,7 +118,12 @@ export function ShowcasePrintGallery(props: Props) {
                   <X size={16} strokeWidth={1.75} />
                 </button>
               </div>
-              <Page {...props} {...(entries[open].pageIndex !== undefined ? { pageIndex: entries[open].pageIndex } : {})} />
+              <Page
+                {...props}
+                {...(entries[open].pageIndex !== undefined
+                  ? { pageIndex: entries[open].pageIndex }
+                  : {})}
+              />
             </div>
           </div>,
           document.body,
@@ -138,7 +143,10 @@ export function ShowcasePrintGallery(props: Props) {
               className="group relative block w-full overflow-hidden rounded-2xl border border-black/10 bg-white text-left shadow-sm transition hover:shadow-md"
             >
               <LazyMount placeholder={<div className="aspect-[8.5/11] w-full bg-black/5" />}>
-                <Page {...props} {...(e.pageIndex !== undefined ? { pageIndex: e.pageIndex } : {})} />
+                <Page
+                  {...props}
+                  {...(e.pageIndex !== undefined ? { pageIndex: e.pageIndex } : {})}
+                />
               </LazyMount>
               <span
                 className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-lg text-[11px] font-semibold text-white"

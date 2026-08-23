@@ -6,10 +6,7 @@
  * seam for each override kind (image upload, tint, intensity, scene swap).
  */
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
-import {
-  setBackgroundOverrides,
-  type TemplateBackgroundOverride,
-} from "@/lib/template-registry";
+import { setBackgroundOverrides, type TemplateBackgroundOverride } from "@/lib/template-registry";
 import { stylePackById } from "@/lib/style-packs";
 import { effectivePack } from "@/lib/effective-pack";
 import { defaultOverride } from "@/lib/template-background";
@@ -62,9 +59,7 @@ describe("tint / intensity / scene swap propagate", () => {
   beforeEach(() => setBackgroundOverrides([]));
 
   it("tint veils the ground", () => {
-    setBackgroundOverrides([
-      override("S29", "stats", { tint: "#EC388A", tintStrength: 0.5 }),
-    ]);
+    setBackgroundOverrides([override("S29", "stats", { tint: "#EC388A", tintStrength: 0.5 })]);
     expect(stylePackById("skin-s29")!.ground("stats").join(", ")).toMatch(/236,\s*56,\s*138/);
   });
 

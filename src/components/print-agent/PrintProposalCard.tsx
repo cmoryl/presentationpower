@@ -13,8 +13,7 @@ export type PrintProposal = {
 
 export function printProposalFromTool(part: unknown): PrintProposal | null {
   const p = part as { input?: unknown; output?: unknown } | null;
-  const raw =
-    (p?.output as { proposal?: unknown } | undefined)?.proposal ?? p?.input ?? null;
+  const raw = (p?.output as { proposal?: unknown } | undefined)?.proposal ?? p?.input ?? null;
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Partial<PrintProposal>;
   if (!r.title || !Array.isArray(r.sections)) return null;

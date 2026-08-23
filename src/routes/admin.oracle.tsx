@@ -12,6 +12,24 @@ import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/oracle")({
+  head: () => ({
+    meta: [
+      { title: "Oracle intelligence · Admin · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Inspect the Element Oracle knowledge base and the synthesized brand intelligence behind it.",
+      },
+      { property: "og:title", content: "Oracle intelligence · Admin · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Inspect the Element Oracle knowledge base and the synthesized brand intelligence behind it.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: OracleAdminView,
 });
 

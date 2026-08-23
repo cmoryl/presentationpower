@@ -83,7 +83,7 @@ export function useDesignGroupPresets() {
   const lookFor = useCallback(
     (variantId: string): string | null => {
       const group = groupOfVariant(variantId);
-      return group ? presets[group] ?? null : null;
+      return group ? (presets[group] ?? null) : null;
     },
     [presets],
   );

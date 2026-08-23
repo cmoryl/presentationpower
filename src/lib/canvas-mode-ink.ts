@@ -28,7 +28,11 @@ function parseColor(input: string): Rgba | null {
   const hex = /^#?([a-f\d]{3}|[a-f\d]{6}|[a-f\d]{8})$/i.exec(value);
   if (hex) {
     let h = hex[1];
-    if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+    if (h.length === 3)
+      h = h
+        .split("")
+        .map((c) => c + c)
+        .join("");
     const int = parseInt(h.slice(0, 6), 16);
     return {
       r: (int >> 16) & 255,

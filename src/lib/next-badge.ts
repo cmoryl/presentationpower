@@ -84,8 +84,14 @@ export const BADGE_EVENT = {
 
 /** Back-of-badge utility content — identical across divisions. */
 export const BADGE_BACK_INFO: { label: string; lines: string[] }[] = [
-  { label: "Day 1 · 24 Sep", lines: ["08:30 Registration", "09:30 Keynote", "18:00 Evening reception"] },
-  { label: "Day 2 · 25 Sep", lines: ["09:00 Breakouts", "13:00 Networking lunch", "16:30 Closing"] },
+  {
+    label: "Day 1 · 24 Sep",
+    lines: ["08:30 Registration", "09:30 Keynote", "18:00 Evening reception"],
+  },
+  {
+    label: "Day 2 · 25 Sep",
+    lines: ["09:00 Breakouts", "13:00 Networking lunch", "16:30 Closing"],
+  },
   { label: "Wi-Fi", lines: ["Network: NEXT2026", "Password: globalnext"] },
   { label: "Help", lines: ["Info desk · Level 1", "next@transperfect.com"] },
 ];
@@ -110,7 +116,6 @@ export function badgeDivisionFor(id: string): NextDivisionBrand | undefined {
   return NEXT_DIVISIONS.find((d) => d.id === target);
 }
 
-
 /** Stacked all-white lockup src for a division (badges are always on navy). */
 export function badgeLockup(div: NextDivisionBrand, variant: "white" | "color" = "white") {
   const stacked =
@@ -121,6 +126,5 @@ export function badgeLockup(div: NextDivisionBrand, variant: "white" | "color" =
     div.lockups[0];
   return { src: stacked?.src ?? "", aspect: stacked?.aspect ?? 1.85 };
 }
-
 
 export const BADGE_NAVY = NEXT_NAVY_ARTWORK;

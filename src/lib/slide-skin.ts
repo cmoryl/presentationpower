@@ -95,7 +95,10 @@ export function enterprisePalette(mode: "light" | "dark") {
  * variant reads as one template. In dark mode the navy floor + white ink are
  * used instead of the white page.
  */
-export function enterpriseWhiteBrand(brand: BrandMode, mode: "light" | "dark" = "light"): BrandMode {
+export function enterpriseWhiteBrand(
+  brand: BrandMode,
+  mode: "light" | "dark" = "light",
+): BrandMode {
   const p = enterprisePalette(mode);
   return {
     ...brand,
@@ -134,5 +137,3 @@ function rgba(hex: string, alpha: number): string {
 export function enterpriseWhiteGround(seed: string, accentHex?: string): string {
   return enterpriseGroundFor(seed, accentHex);
 }
-
-

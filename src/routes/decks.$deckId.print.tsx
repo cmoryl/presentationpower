@@ -106,13 +106,13 @@ function PrintView() {
   const clientLogoUrl = resolvedLogo.url;
 
   return (
-      <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
-    <SlideMediaRefreshProvider slides={deck.slides}>
-      <div
-        className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0"
-        dir={isRtl ? "rtl" : undefined}
-      >
-        <style>{`
+    <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
+      <SlideMediaRefreshProvider slides={deck.slides}>
+        <div
+          className="print-root min-h-screen bg-neutral-200 py-8 print:bg-white print:py-0"
+          dir={isRtl ? "rtl" : undefined}
+        >
+          <style>{`
         @media print {
           @page { size: 1280px 720px landscape; margin: 0; }
           html, body { margin: 0 !important; padding: 0 !important; background: #fff !important; }
@@ -123,56 +123,55 @@ function PrintView() {
         }
         .print-slide, .print-slide * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
       `}</style>
-        <div className="no-print mx-auto mb-6 max-w-[1280px] space-y-3 px-6 text-xs text-black/60">
-          <AuthoringNav deckId={deckId} active="print" />
-          <div className="rounded-lg border border-black/10 bg-white p-3">
-
-            <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
-            {!loading && (
-              <>
-                If the dialog didn't open,{" "}
-                <button className="underline" onClick={() => window.print()}>
-                  click here
-                </button>
-                . Select "Save as PDF" for a print-faithful PDF at 16:9.
-              </>
-            )}
-            {lang && !loading && (
-              <span className="ml-1 text-black/40">Language: {lang.toUpperCase()}</span>
-            )}
+          <div className="no-print mx-auto mb-6 max-w-[1280px] space-y-3 px-6 text-xs text-black/60">
+            <AuthoringNav deckId={deckId} active="print" />
+            <div className="rounded-lg border border-black/10 bg-white p-3">
+              <strong>{loading ? "Preparing translated slides…" : "Ready to print."}</strong>{" "}
+              {!loading && (
+                <>
+                  If the dialog didn't open,{" "}
+                  <button className="underline" onClick={() => window.print()}>
+                    click here
+                  </button>
+                  . Select "Save as PDF" for a print-faithful PDF at 16:9.
+                </>
+              )}
+              {lang && !loading && (
+                <span className="ml-1 text-black/40">Language: {lang.toUpperCase()}</span>
+              )}
+            </div>
+          </div>
+          <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 print:max-w-none print:gap-0">
+            {overlaidSlides.map((slide, i) => {
+              const variant = byId(MODULE_VARIANTS, slide.variantId);
+              if (!variant) return null;
+              return (
+                <div
+                  key={slide.id}
+                  className="print-slide overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm"
+                  style={{ width: 1280, height: 720 }}
+                >
+                  <ScaledSlide>
+                    <DeckPackScope pack={pack}>
+                      <VariantRenderer
+                        slide={slide}
+                        variant={variant}
+                        brand={brand}
+                        pageNumber={i + 1}
+                        clientName={brief?.prospect}
+                        clientLogoUrl={clientLogoUrl}
+                        subCompany={deck.subCompany}
+                        logoOrientation={deck.context?.logoOrientation}
+                        mode={slide.mode ?? "light"}
+                      />
+                    </DeckPackScope>
+                  </ScaledSlide>
+                </div>
+              );
+            })}
           </div>
         </div>
-        <div className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 print:max-w-none print:gap-0">
-          {overlaidSlides.map((slide, i) => {
-            const variant = byId(MODULE_VARIANTS, slide.variantId);
-            if (!variant) return null;
-            return (
-              <div
-                key={slide.id}
-                className="print-slide overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm"
-                style={{ width: 1280, height: 720 }}
-              >
-                <ScaledSlide>
-                  <DeckPackScope pack={pack}>
-                    <VariantRenderer
-                      slide={slide}
-                      variant={variant}
-                      brand={brand}
-                      pageNumber={i + 1}
-                      clientName={brief?.prospect}
-                      clientLogoUrl={clientLogoUrl}
-                      subCompany={deck.subCompany}
-                      logoOrientation={deck.context?.logoOrientation}
-                      mode={slide.mode ?? "light"}
-                    />
-                  </DeckPackScope>
-                </ScaledSlide>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </SlideMediaRefreshProvider>
-      </SlideTemplateIndustryProvider>
+      </SlideMediaRefreshProvider>
+    </SlideTemplateIndustryProvider>
   );
 }

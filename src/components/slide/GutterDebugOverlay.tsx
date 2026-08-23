@@ -113,12 +113,7 @@ export function GutterDebugOverlay({ scope }: { scope: HTMLElement | null }) {
                 : "rail × asset";
           found.push({
             ...rel(
-              new DOMRect(
-                Math.max(cr.left, r.left),
-                Math.max(cr.top, r.top),
-                ov.w,
-                ov.h,
-              ),
+              new DOMRect(Math.max(cr.left, r.left), Math.max(cr.top, r.top), ov.w, ov.h),
               base,
               scale,
             ),

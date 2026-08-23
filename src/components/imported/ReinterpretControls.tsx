@@ -21,7 +21,6 @@ export type ReinterpretControlsValue = {
   lock: ColorLock;
 };
 
-
 /** Accent choices — the brand palette, so a lock can never leave the system. */
 const ACCENTS: Array<{ hex: string; label: string }> = [
   { hex: "#003fc7", label: "Blue 500" },
@@ -144,7 +143,6 @@ export function ReinterpretControls({
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-
         {/* Design style */}
         <div>
           <label className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-black/45">

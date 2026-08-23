@@ -164,7 +164,7 @@ function decodeDib(
   const getB = maskChannel(bMask);
   const getA = aMask ? maskChannel(aMask) : null;
   let sawAlpha = false;
-  let hasAlphaChannel = bitCount === 32 && (compression === 0 || !!aMask);
+  const hasAlphaChannel = bitCount === 32 && (compression === 0 || !!aMask);
 
   for (let y = 0; y < height; y++) {
     const srcRow = bitsOff + (topDown ? y : height - 1 - y) * stride;
@@ -179,9 +179,7 @@ function decodeDib(
         const bitAt = x * bitCount;
         const byte = buf[srcRow + (bitAt >>> 3)];
         const idx =
-          bitCount === 8
-            ? byte
-            : (byte >>> (8 - bitCount - (bitAt & 7))) & ((1 << bitCount) - 1);
+          bitCount === 8 ? byte : (byte >>> (8 - bitCount - (bitAt & 7))) & ((1 << bitCount) - 1);
         const p = paletteOff + Math.min(idx, Math.max(paletteCount - 1, 0)) * 4;
         b = buf[p];
         g = buf[p + 1];
@@ -199,8 +197,7 @@ function decodeDib(
       } else {
         const s = srcRow + x * 4;
         if (compression === 3 && (rMask || gMask || bMask)) {
-          const v =
-            (buf[s] | (buf[s + 1] << 8) | (buf[s + 2] << 16) | (buf[s + 3] << 24)) >>> 0;
+          const v = (buf[s] | (buf[s + 1] << 8) | (buf[s + 2] << 16) | (buf[s + 3] << 24)) >>> 0;
           r = getR(v);
           g = getG(v);
           b = getB(v);
@@ -245,7 +242,13 @@ function largestEmbeddedDib(buf: Uint8Array): Raster | null {
       const offBits = dv.getUint32(off + headerAt + 8, true);
       const cbBits = dv.getUint32(off + headerAt + 12, true);
       if (offBmi > 0 && offBits > 0 && cbBits > 0) {
-        const dib = decodeDib(buf, off + offBmi, off + offBits, cbBits, Math.min(off + size, buf.length));
+        const dib = decodeDib(
+          buf,
+          off + offBmi,
+          off + offBits,
+          cbBits,
+          Math.min(off + size, buf.length),
+        );
         const area = dib ? rasterArea(dib) : 0;
         if (dib && area > bestArea) {
           best = dib;

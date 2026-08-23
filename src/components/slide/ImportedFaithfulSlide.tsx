@@ -20,8 +20,7 @@ export type ImportedRef = {
 export function readImportedRef(c: Record<string, unknown>): ImportedRef | null {
   if (c.faithfulImport === false) return null;
   const deckId = typeof c.importedDeckId === "string" ? c.importedDeckId : "";
-  const slideIndex =
-    typeof c.importedSlideIndex === "number" ? c.importedSlideIndex : Number.NaN;
+  const slideIndex = typeof c.importedSlideIndex === "number" ? c.importedSlideIndex : Number.NaN;
   if (!deckId || !Number.isFinite(slideIndex)) return null;
   return { deckId, slideIndex };
 }
@@ -115,4 +114,3 @@ export function ImportedFaithfulSlide({
     </div>
   );
 }
-

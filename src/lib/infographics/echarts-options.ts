@@ -346,7 +346,6 @@ function calendarHeatmapOption(spec: InfographicSpec) {
   };
 }
 
-
 // ── Second-wave builders ──────────────────────────────────────────────────
 // Every builder below is pure: rows in, ECharts option out. Colours come from
 // the slide's own brand tokens so a chart re-inks with the look, and axis /
@@ -415,9 +414,30 @@ function waterfallOption(spec: InfographicSpec) {
     xAxis: catAxis(ink, labels),
     yAxis: valAxis(ink, spec.data.columns?.[valueKey]),
     series: [
-      { type: "bar", stack: "wf", itemStyle: { color: "transparent" }, emphasis: { itemStyle: { color: "transparent" } }, data: base, silent: true },
-      { name: "Increase", type: "bar", stack: "wf", data: rise, itemStyle: { color: palette[0], borderRadius: [4, 4, 0, 0] }, label: { show: true, position: "top", color: ink.muted, fontSize: 11 } },
-      { name: "Decrease", type: "bar", stack: "wf", data: fall, itemStyle: { color: palette[4] ?? palette[1], borderRadius: [0, 0, 4, 4] }, label: { show: true, position: "bottom", color: ink.muted, fontSize: 11 } },
+      {
+        type: "bar",
+        stack: "wf",
+        itemStyle: { color: "transparent" },
+        emphasis: { itemStyle: { color: "transparent" } },
+        data: base,
+        silent: true,
+      },
+      {
+        name: "Increase",
+        type: "bar",
+        stack: "wf",
+        data: rise,
+        itemStyle: { color: palette[0], borderRadius: [4, 4, 0, 0] },
+        label: { show: true, position: "top", color: ink.muted, fontSize: 11 },
+      },
+      {
+        name: "Decrease",
+        type: "bar",
+        stack: "wf",
+        data: fall,
+        itemStyle: { color: palette[4] ?? palette[1], borderRadius: [0, 0, 4, 4] },
+        label: { show: true, position: "bottom", color: ink.muted, fontSize: 11 },
+      },
     ],
   };
 }
@@ -549,7 +569,13 @@ function dumbbellOption(spec: InfographicSpec) {
         type: "scatter",
         symbolSize: 14,
         itemStyle: { color: palette[0] },
-        label: { show: true, position: "right", color: ink.muted, fontSize: 11, formatter: "{@[0]}" },
+        label: {
+          show: true,
+          position: "right",
+          color: ink.muted,
+          fontSize: 11,
+          formatter: "{@[0]}",
+        },
         data: b.map((v, i) => [v, i]),
       },
     ],
@@ -566,8 +592,22 @@ function radialBarOption(spec: InfographicSpec) {
   const labels = rows.map((r, i) => str(r[labelKey], `#${i + 1}`));
   const max = Math.max(100, ...rows.map((r) => n(r[valueKey])));
   return {
-    angleAxis: { max, startAngle: 90, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { show: false }, splitLine: { show: false } },
-    radiusAxis: { type: "category", data: labels, z: 10, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: ink.muted, fontSize: 12 } },
+    angleAxis: {
+      max,
+      startAngle: 90,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { show: false },
+      splitLine: { show: false },
+    },
+    radiusAxis: {
+      type: "category",
+      data: labels,
+      z: 10,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { color: ink.muted, fontSize: 12 },
+    },
     polar: { center: ["50%", "52%"], radius: ["26%", "88%"] },
     series: [
       {
@@ -577,8 +617,18 @@ function radialBarOption(spec: InfographicSpec) {
         barWidth: 14,
         showBackground: true,
         backgroundStyle: { color: ink.hairline },
-        data: rows.map((r, i) => ({ value: n(r[valueKey]), itemStyle: { color: palette[i % palette.length] } })),
-        label: { show: true, position: "middle", formatter: "{c}", color: ink.strong, fontSize: 11, fontWeight: 600 },
+        data: rows.map((r, i) => ({
+          value: n(r[valueKey]),
+          itemStyle: { color: palette[i % palette.length] },
+        })),
+        label: {
+          show: true,
+          position: "middle",
+          formatter: "{c}",
+          color: ink.strong,
+          fontSize: 11,
+          fontWeight: 600,
+        },
       },
     ],
   };
@@ -624,7 +674,11 @@ function sunburstOption(spec: InfographicSpec) {
         emphasis: { focus: "ancestor" },
         itemStyle: { borderColor: spec.theme.surface, borderWidth: 2 },
         label: { color: "#fff", fontSize: 12, minAngle: 12 },
-        levels: [{}, { r0: "18%", r: "52%", label: { rotate: "tangential", fontWeight: 600 } }, { r0: "52%", r: "92%", label: { align: "right" } }],
+        levels: [
+          {},
+          { r0: "18%", r: "52%", label: { rotate: "tangential", fontWeight: 600 } },
+          { r0: "52%", r: "92%", label: { align: "right" } },
+        ],
         tooltip: { textStyle: { color: ink.strong } },
       },
     ],
@@ -647,7 +701,13 @@ function ganttOption(spec: InfographicSpec) {
     xAxis: valAxis(ink, spec.data.columns?.[startKey] ?? "Weeks"),
     yAxis: { ...catAxis(ink, labels), inverse: true },
     series: [
-      { type: "bar", stack: "gantt", itemStyle: { color: "transparent" }, silent: true, data: rows.map((r) => n(r[startKey])) },
+      {
+        type: "bar",
+        stack: "gantt",
+        itemStyle: { color: "transparent" },
+        silent: true,
+        data: rows.map((r) => n(r[startKey])),
+      },
       {
         type: "bar",
         stack: "gantt",
@@ -665,7 +725,8 @@ function ganttOption(spec: InfographicSpec) {
           color: "#fff",
           fontSize: 11,
           fontWeight: 600,
-          formatter: (p: { dataIndex: number }) => (catKey ? str(rows[p.dataIndex]?.[catKey], "") : ""),
+          formatter: (p: { dataIndex: number }) =>
+            catKey ? str(rows[p.dataIndex]?.[catKey], "") : "",
         },
       },
     ],
@@ -692,7 +753,13 @@ function slopeOption(spec: InfographicSpec) {
       lineStyle: { width: 2.5, color: palette[i % palette.length] },
       itemStyle: { color: palette[i % palette.length] },
       data: [n(r[aKey]), n(r[bKey])],
-      endLabel: { show: true, color: ink.strong, fontSize: 12, fontWeight: 600, formatter: "{a} · {c}" },
+      endLabel: {
+        show: true,
+        color: ink.strong,
+        fontSize: 12,
+        fontWeight: 600,
+        formatter: "{a} · {c}",
+      },
       labelLayout: { moveOverlap: "shiftY" },
     })),
   };
@@ -715,13 +782,25 @@ function gaugeGridOption(spec: InfographicSpec) {
       endAngle: -30,
       min: 0,
       max: Math.max(100, n(r.max)),
-      progress: { show: true, width: 12, roundCap: true, itemStyle: { color: palette[i % palette.length] } },
+      progress: {
+        show: true,
+        width: 12,
+        roundCap: true,
+        itemStyle: { color: palette[i % palette.length] },
+      },
       axisLine: { lineStyle: { width: 12, color: [[1, ink.hairline]] } },
       pointer: { show: false },
       axisTick: { show: false },
       splitLine: { show: false },
       axisLabel: { show: false },
-      title: { show: true, offsetCenter: [0, "78%"], color: ink.muted, fontSize: 12, width: 140, overflow: "break" },
+      title: {
+        show: true,
+        offsetCenter: [0, "78%"],
+        color: ink.muted,
+        fontSize: 12,
+        width: 140,
+        overflow: "break",
+      },
       detail: {
         valueAnimation: true,
         offsetCenter: [0, "6%"],
@@ -750,7 +829,11 @@ function boxplotOption(spec: InfographicSpec) {
       {
         type: "boxplot",
         data: boxes,
-        itemStyle: { color: hexish(palette[0]), borderColor: palette[1] ?? palette[0], borderWidth: 2 },
+        itemStyle: {
+          color: hexish(palette[0]),
+          borderColor: palette[1] ?? palette[0],
+          borderWidth: 2,
+        },
         boxWidth: [18, 44],
       },
     ],

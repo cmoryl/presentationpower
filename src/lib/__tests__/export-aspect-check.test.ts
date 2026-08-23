@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  ASPECT_TOLERANCE,
-  checkExportAspect,
-  formatAspectWarning,
-} from "../export-aspect-check";
+import { ASPECT_TOLERANCE, checkExportAspect, formatAspectWarning } from "../export-aspect-check";
 
 const LETTER = { widthIn: 8.5, heightIn: 11 };
 

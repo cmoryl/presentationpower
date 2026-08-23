@@ -153,7 +153,6 @@ export function overlayLogoHubFillers(
     default:
       return content;
   }
-
 }
 
 // Neutral CLIENT placeholders for logo-wall seeds. Seeded decks must never

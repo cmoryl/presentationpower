@@ -181,7 +181,11 @@ export function PrintAgentChat({
 
       {latestAsset ? (
         <div className="border-t border-border bg-muted/40 px-4 py-2 text-xs sm:px-6">
-          <Link to="/asset/$assetId" params={{ assetId: latestAsset }} className="font-medium underline">
+          <Link
+            to="/asset/$assetId"
+            params={{ assetId: latestAsset }}
+            className="font-medium underline"
+          >
             Open the print piece in the editor
           </Link>
         </div>

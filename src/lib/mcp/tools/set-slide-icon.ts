@@ -34,6 +34,12 @@ export default defineTool({
       .eq("id", found.slide.id);
     if (error) return errorResult(error.message);
     await touchDeck(supabase, deck_id);
-    return textResult({ ok: true, deck_id, position, icon: icon_ref, item_index: item_index ?? null });
+    return textResult({
+      ok: true,
+      deck_id,
+      position,
+      icon: icon_ref,
+      item_index: item_index ?? null,
+    });
   },
 });

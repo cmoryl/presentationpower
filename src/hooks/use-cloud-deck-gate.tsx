@@ -83,11 +83,7 @@ export function useCloudDeckGate(
     fallback: failed ? (
       <DeckImportFailed onRetry={() => setAttempt((a) => a + 1)} />
     ) : (
-      <DeckImportProgress
-        stage={stage}
-        title={imported.title}
-        slideCount={imported.slideCount}
-      />
+      <DeckImportProgress stage={stage} title={imported.title} slideCount={imported.slideCount} />
     ),
   };
 }

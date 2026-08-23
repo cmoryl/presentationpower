@@ -15,7 +15,6 @@ import type { SlideBackgroundValue } from "./background-library";
 import { hexToRgba, resolveSlideBackground } from "./background-library";
 import { backdropRasterSize, STAGE_H, STAGE_W, type ExportQualityId } from "./export-quality";
 
-
 export type PptxBackgroundPlan =
   | { kind: "none" }
   | { kind: "solid"; color: string } // color WITHOUT the leading #
@@ -39,7 +38,6 @@ export type PptxBackgroundPlan =
 // Backdrop plate size comes from `backdropRasterSize()` — see EXPORT SPEC #3 in
 // pptx-backdrop-flatten.ts. It is deliberately fixed at the slide aspect rather
 // than derived from DPI, so nothing is ever scaled to fit.
-
 
 function stripHash(c: string | undefined, fallback = "FFFFFF"): string {
   if (!c) return fallback;
@@ -112,15 +110,11 @@ async function rasterizeCss(
   }
 }
 
-
-
-
 /** Produce a PPTX-ready plan for embedding a slide's background. */
 export async function planPptxBackground(
   raw: unknown,
   quality?: ExportQualityId | null,
 ): Promise<PptxBackgroundPlan> {
-
   const bg = resolveSlideBackground(raw);
   if (!bg) return { kind: "none" };
 
@@ -198,7 +192,6 @@ async function fetchDataUrl(url: string): Promise<string | null> {
     return null;
   }
 }
-
 
 function clamp01(n: number | undefined, d = 1): number {
   if (typeof n !== "number" || Number.isNaN(n)) return d;

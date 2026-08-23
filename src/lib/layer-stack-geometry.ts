@@ -77,7 +77,6 @@ export function laneLadderPx(count: number): { height: number; gap: number } {
   };
 }
 
-
 /** Lane height for a stack of `count` lanes inside a band, in inches. */
 export function laneHeightIn(
   bandTopIn: number,

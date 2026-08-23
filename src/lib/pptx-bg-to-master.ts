@@ -37,13 +37,10 @@ const BACKDROP_NAMES = /^TP (Background|Backdrop|Ground)$/i;
 /** Names that may legitimately be decor rather than user content. */
 const DECOR_NAMES = /^TP (Effect|Rule|Decor|Scaffold|Background scrim|Ground)/i;
 
-
-const LAYOUT_CT =
-  "application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml";
+const LAYOUT_CT = "application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml";
 const LAYOUT_REL_TYPE =
   "http://schemas.openxmlformats.org/officeDocument/2006/relationships/slideLayout";
-const IMAGE_REL_TYPE =
-  "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image";
+const IMAGE_REL_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/image";
 
 export interface BgToMasterReport {
   /** Slides whose background moved into a layout. */
@@ -91,10 +88,7 @@ export function readShapes(slideXml: string): Shape[] {
       tag: m[1] as Shape["tag"],
       name: nameMatch?.[1] ?? "",
       hasText: /<a:t>[^<]/.test(xml),
-      frame:
-        off && ext
-          ? { x: +off[1], y: +off[2], w: +ext[1], h: +ext[2] }
-          : null,
+      frame: off && ext ? { x: +off[1], y: +off[2], w: +ext[1], h: +ext[2] } : null,
       embed: xml.match(/r:embed="([^"]+)"/)?.[1] ?? null,
     });
   }
@@ -182,10 +176,7 @@ export function lockShapes(slideXml: string, lock: Shape[]): string {
         `<p:cNvPicPr><a:picLocks ${LOCKS} noChangeAspect="1"/></p:cNvPicPr>`,
       );
     } else if (/<p:cNvSpPr([^>]*)\/>/.test(xml)) {
-      xml = xml.replace(
-        /<p:cNvSpPr([^>]*)\/>/,
-        `<p:cNvSpPr$1><a:spLocks ${LOCKS}/></p:cNvSpPr>`,
-      );
+      xml = xml.replace(/<p:cNvSpPr([^>]*)\/>/, `<p:cNvSpPr$1><a:spLocks ${LOCKS}/></p:cNvSpPr>`);
     } else {
       continue;
     }
@@ -194,13 +185,8 @@ export function lockShapes(slideXml: string, lock: Shape[]): string {
   return out;
 }
 
-
 /** Replace (or insert) `<p:bg>` in a layout with a stretched full-bleed blipFill. */
-export function layoutWithImageBackground(
-  layoutXml: string,
-  relId: string,
-  name: string,
-): string {
+export function layoutWithImageBackground(layoutXml: string, relId: string, name: string): string {
   const bg =
     `<p:bg><p:bgPr>` +
     `<a:blipFill rotWithShape="0"><a:blip r:embed="${relId}"/>` +
@@ -279,11 +265,8 @@ export async function backgroundsToMaster(blob: Blob): Promise<Blob> {
       const { bgEmbed, drop, lock } = planSlideScrub(slideXml);
       if (!drop.length && !lock.length) continue;
 
-
       const mediaTarget = bgEmbed
-        ? relsXml.match(
-            new RegExp(`Id="${bgEmbed}"[^>]*Target="([^"]+)"`),
-          )?.[1] ?? null
+        ? (relsXml.match(new RegExp(`Id="${bgEmbed}"[^>]*Target="([^"]+)"`))?.[1] ?? null)
         : null;
 
       // --- background → layout -------------------------------------------
@@ -372,7 +355,6 @@ export async function backgroundsToMaster(blob: Blob): Promise<Blob> {
       return blob;
     }
 
-
     zip.file(masterPath, masterXml);
     zip.file(masterRelsPath, masterRels);
     zip.file("[Content_Types].xml", ctXml);
@@ -380,7 +362,6 @@ export async function backgroundsToMaster(blob: Blob): Promise<Blob> {
 
     const { repackPptx } = await import("./pptx-repack");
     return await repackPptx(zip);
-
   } catch (err) {
     console.warn("[pptx-bg-to-master] skipped", err);
     return blob;

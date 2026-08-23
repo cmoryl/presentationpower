@@ -59,7 +59,10 @@ function tileSizes(layer: string): number[] {
 function assertScale(layer: string, label: string) {
   if (!isTiled(layer)) return;
   const sizes = tileSizes(layer);
-  expect(sizes.length, `${label}: tiled layer without an explicit tile size -> ${layer}`).toBeGreaterThan(0);
+  expect(
+    sizes.length,
+    `${label}: tiled layer without an explicit tile size -> ${layer}`,
+  ).toBeGreaterThan(0);
   for (const s of sizes) {
     const grain = s <= MAX_GRAIN_TILE;
     const architectural = s >= MIN_ARCH_TILE;

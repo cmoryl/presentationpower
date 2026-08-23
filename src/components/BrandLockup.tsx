@@ -189,9 +189,6 @@ export function BrandLockup({
     );
   }
 
-
-
-
   // Mark-only mode: render just the letter tile. When a brand ships an
   // official image, we still fall back to the letter tile because the shipped
   // artwork always includes the wordmark. Bump the tile size for presence.
@@ -312,7 +309,8 @@ export function BrandLockup({
             <div
               className="min-w-0 max-w-full break-words font-semibold tracking-wide"
               style={{
-                fontSize: capH == null ? u(dims.wordPx) : `min(${asLen(u(dims.wordPx))}, ${capH}cqw)`,
+                fontSize:
+                  capH == null ? u(dims.wordPx) : `min(${asLen(u(dims.wordPx))}, ${capH}cqw)`,
                 letterSpacing: "0.02em",
               }}
             >

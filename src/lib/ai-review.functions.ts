@@ -189,7 +189,7 @@ export const reviewDeck = createServerFn({ method: "POST" })
           : "",
         groundingBlock,
         groundingBlock
-          ? "Treat the verified knowledge above as ground truth. Any deck claim that contradicts it is a \"critical\" finding under category \"claims\"; cite the excerpt number in `evidence`."
+          ? 'Treat the verified knowledge above as ground truth. Any deck claim that contradicts it is a "critical" finding under category "claims"; cite the excerpt number in `evidence`.'
           : "",
         "Slides (JSON):",
         JSON.stringify(data.slides, null, 0),

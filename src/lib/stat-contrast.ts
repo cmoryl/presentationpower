@@ -25,11 +25,7 @@ function parseHex(input: string): RGB | null {
         .split("")
         .map((c) => c + c)
         .join("");
-    return [
-      parseInt(h.slice(0, 2), 16),
-      parseInt(h.slice(2, 4), 16),
-      parseInt(h.slice(4, 6), 16),
-    ];
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
   }
   const rgb = /rgba?\(([^)]+)\)/i.exec(s);
   if (rgb) {
@@ -46,7 +42,11 @@ function parseHex(input: string): RGB | null {
 const toHex = ([r, g, b]: RGB) =>
   "#" +
   [r, g, b]
-    .map((n) => Math.round(Math.max(0, Math.min(255, n))).toString(16).padStart(2, "0"))
+    .map((n) =>
+      Math.round(Math.max(0, Math.min(255, n)))
+        .toString(16)
+        .padStart(2, "0"),
+    )
     .join("");
 
 function relLum([r, g, b]: RGB) {

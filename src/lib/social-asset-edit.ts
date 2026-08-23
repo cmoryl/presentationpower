@@ -135,10 +135,11 @@ export async function fetchSocialAssetDefaults(): Promise<EditMap> {
 /** Publish the current patch as the approved default for an asset (admin). */
 export async function saveSocialAssetDefault(key: string, patch: SocialAssetEdit): Promise<void> {
   const { data } = await supabase.auth.getUser();
-  const { error } = await supabase.from("social_asset_defaults").upsert(
-    { edit_key: key, patch: patch as never, updated_by: data.user?.id ?? null } as never,
-    { onConflict: "edit_key" },
-  );
+  const { error } = await supabase
+    .from("social_asset_defaults")
+    .upsert({ edit_key: key, patch: patch as never, updated_by: data.user?.id ?? null } as never, {
+      onConflict: "edit_key",
+    });
   if (error) throw new Error(error.message);
 }
 
@@ -229,11 +230,12 @@ export function useSocialAssetEdits() {
       const uid = userId.current;
       if (uid) {
         const op = keep
-          ? supabase
-              .from("social_asset_edits")
-              .upsert({ user_id: uid, edit_key: key, patch: edit as never }, {
+          ? supabase.from("social_asset_edits").upsert(
+              { user_id: uid, edit_key: key, patch: edit as never },
+              {
                 onConflict: "user_id,edit_key",
-              })
+              },
+            )
           : supabase.from("social_asset_edits").delete().eq("user_id", uid).eq("edit_key", key);
         void Promise.resolve(op).catch(() => {
           /* keep the local copy; next sync reconciles */

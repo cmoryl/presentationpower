@@ -162,7 +162,9 @@ export function buildKitAgentToolSet({
           const hits = SOCIAL_PLAYBOOKS.filter((p) => {
             if (divisionId && p.subBrand !== divisionId) return false;
             if (!q) return true;
-            return `${p.id} ${p.name} ${p.tagline} ${p.intent} ${p.angle}`.toLowerCase().includes(q);
+            return `${p.id} ${p.name} ${p.tagline} ${p.intent} ${p.angle}`
+              .toLowerCase()
+              .includes(q);
           });
           return {
             total: hits.length,
@@ -269,7 +271,9 @@ export function buildKitAgentToolSet({
           return { error: `Unknown division "${input.divisionId}". Call list_divisions first.` };
         const profile = KIT_PROFILES.find((p) => p.id === input.profileId);
         if (!profile)
-          return { error: `Unknown kit profile "${input.profileId}". Call list_kit_profiles first.` };
+          return {
+            error: `Unknown kit profile "${input.profileId}". Call list_kit_profiles first.`,
+          };
         const formatIds = (input.formatIds?.length ? input.formatIds : profile.formatIds).filter(
           (id) => SOCIAL_FORMATS_BY_ID[id],
         );
@@ -344,8 +348,7 @@ export function buildKitAgentToolSet({
           if (ids.length === 0) return { error: "None of those format ids exist." };
           patch["format_ids"] = ids;
         }
-        if (input.copy)
-          patch["copy"] = { ...((kit["copy"] as Rec) ?? {}), ...input.copy } as never;
+        if (input.copy) patch["copy"] = { ...((kit["copy"] as Rec) ?? {}), ...input.copy } as never;
         if (input.eventFacts)
           patch["event_facts"] = {
             ...((kit["event_facts"] as Rec) ?? {}),
@@ -480,13 +483,16 @@ export function buildKitAgentToolSet({
         const issues: string[] = [];
         const need = (key: string, label: string) => {
           const value = copy[key];
-          if (typeof value !== "string" || value.trim() === "") issues.push(`copy.${key} (${label})`);
+          if (typeof value !== "string" || value.trim() === "")
+            issues.push(`copy.${key} (${label})`);
         };
         need("title", "headline every format shows");
         need("summary", "support line");
         need("cta", "call to action");
         if (!copy["statValue"] || !copy["statLabel"])
-          issues.push("copy.statValue + copy.statLabel (proof point — number on one line, label on another)");
+          issues.push(
+            "copy.statValue + copy.statLabel (proof point — number on one line, label on another)",
+          );
 
         if (kitSurface === "event") {
           for (const [key, label] of [
@@ -549,7 +555,9 @@ export function buildKitAgentToolSet({
           .from("campaign_kits")
           .insert({
             user_id: userId,
-            name: name ?? `${String(kit["name"] ?? "Campaign")} — ${to === "event" ? "event" : "social"}`,
+            name:
+              name ??
+              `${String(kit["name"] ?? "Campaign")} — ${to === "event" ? "event" : "social"}`,
             surface: to,
             brand_id: kit["brand_id"],
             mode: kit["mode"],

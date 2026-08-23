@@ -17,7 +17,6 @@ import {
   sceneTakes,
 } from "@/lib/scene-background-gallery";
 
-
 type Mode = "all" | "light" | "dark";
 
 function Chip({
@@ -68,9 +67,6 @@ export function SceneBackgroundGallery({
     () => (compare ? sceneTakes(compare.code, compare.scene) : []),
     [compare],
   );
-
-
-
 
   return (
     <div className="mt-4 space-y-3">
@@ -127,7 +123,6 @@ export function SceneBackgroundGallery({
           </Chip>
         ))}
       </div>
-
 
       {/* Side-by-side comparison of every take of one skin × scene. */}
       {compare && compareTakes.length > 0 && (

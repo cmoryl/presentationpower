@@ -52,10 +52,48 @@ export function normalizeDivisionFilter(divisionId?: string | null): string | nu
 // ── keyword scoring ────────────────────────────────────────────────────────
 
 const STOPWORDS = new Set([
-  "this","that","with","from","have","will","your","their","about","into","been",
-  "they","them","were","what","when","which","would","there","these","those",
-  "should","could","also","more","than","then","only","some","such","most",
-  "make","made","need","want","help","using","used","like","just","very","much",
+  "this",
+  "that",
+  "with",
+  "from",
+  "have",
+  "will",
+  "your",
+  "their",
+  "about",
+  "into",
+  "been",
+  "they",
+  "them",
+  "were",
+  "what",
+  "when",
+  "which",
+  "would",
+  "there",
+  "these",
+  "those",
+  "should",
+  "could",
+  "also",
+  "more",
+  "than",
+  "then",
+  "only",
+  "some",
+  "such",
+  "most",
+  "make",
+  "made",
+  "need",
+  "want",
+  "help",
+  "using",
+  "used",
+  "like",
+  "just",
+  "very",
+  "much",
 ]);
 
 /** Splits text into scoreable terms: alphanumeric, >3 chars, non-stopword. */
@@ -90,11 +128,7 @@ const B = 0.75;
  *
  * @returns scores aligned by index with `docs`; 0 means no match.
  */
-export function bm25Scores(
-  docs: ScorableDoc[],
-  query: string,
-  brandTags: string[] = [],
-): number[] {
+export function bm25Scores(docs: ScorableDoc[], query: string, brandTags: string[] = []): number[] {
   const terms = Array.from(new Set(tokenize(query)));
   if (!docs.length) return [];
 

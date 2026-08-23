@@ -66,7 +66,9 @@ export function buildStatsMapping(input: {
 }): StatsMapping | { error: string } {
   const raw = Array.isArray(input.entries) ? input.entries : [];
   if (!raw.length)
-    return { error: "No figures supplied. List every number you plan to write, one entry per field." };
+    return {
+      error: "No figures supplied. List every number you plan to write, one entry per field.",
+    };
 
   const entries: StatMappingEntry[] = raw.map((e) => {
     const value = norm(e.value);
@@ -93,7 +95,9 @@ export function buildStatsMapping(input: {
   const missingValue = entries.filter((e) => !e.value);
 
   if (missingValue.length)
-    warnings.push(`${missingValue.length} entr${missingValue.length === 1 ? "y has" : "ies have"} no value — fill or drop them.`);
+    warnings.push(
+      `${missingValue.length} entr${missingValue.length === 1 ? "y has" : "ies have"} no value — fill or drop them.`,
+    );
   if (unsourced.length)
     warnings.push(
       `${unsourced.length} figure${unsourced.length === 1 ? "" : "s"} came from research or a calculation but carry no source — cite them before saving.`,
@@ -112,7 +116,8 @@ export function buildStatsMapping(input: {
   for (const e of entries) {
     const key = `${e.slide_position ?? e.slide_title}::${e.field}`;
     const prior = seen.get(key);
-    if (prior && prior !== e.value) warnings.push(`${e.field} is mapped twice with different values (${prior} vs ${e.value}).`);
+    if (prior && prior !== e.value)
+      warnings.push(`${e.field} is mapped twice with different values (${prior} vs ${e.value}).`);
     seen.set(key, e.value);
   }
 
@@ -143,7 +148,11 @@ export function buildStatsMappingToolSet(): ToolSet {
         entries: z
           .array(
             z.object({
-              slide_position: z.number().int().nullable().describe("0-based slide position from get_deck"),
+              slide_position: z
+                .number()
+                .int()
+                .nullable()
+                .describe("0-based slide position from get_deck"),
               slide_title: z.string().nullable().describe("Plain-language slide title"),
               field: z.string().describe("Content field path you will patch, e.g. stats[0].value"),
               label: z.string().nullable().describe("What the number means, in plain words"),
@@ -151,11 +160,18 @@ export function buildStatsMappingToolSet(): ToolSet {
               previous_value: z
                 .string()
                 .nullable()
-                .describe("What is on the slide today for that field; null or empty if blank/placeholder"),
+                .describe(
+                  "What is on the slide today for that field; null or empty if blank/placeholder",
+                ),
               origin: z
                 .enum(STAT_ORIGINS)
                 .describe("'user' | 'knowledge' | 'computed' | 'placeholder'"),
-              source: z.string().nullable().describe("Where it came from: the user's message, a knowledge entry title, or the calculation"),
+              source: z
+                .string()
+                .nullable()
+                .describe(
+                  "Where it came from: the user's message, a knowledge entry title, or the calculation",
+                ),
               note: z.string().nullable().describe("Anything the user should sanity-check"),
             }),
           )

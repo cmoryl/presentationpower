@@ -189,36 +189,216 @@ const DEVICES: MarginDevice[] = [
  *   • no two skins share the same full section-layout combination.
  */
 export const SKIN_GEOMETRY: Record<string, PackGeometry> = {
-  S01: { shape: "round", scaffold: "margin", device: "bracket", fill: 0.3, layout: { cover: "baseline", stats: "cards4", grid: "bento", rule: "bar" } },
-  S02: { shape: "capsule", scaffold: "shelf", device: "arc", fill: 0.45, layout: { cover: "centered", stats: "cards3", grid: "mosaic", rule: "dots" } },
-  S03: { shape: "leaf", scaffold: "split", device: "staff", fill: 0.6, layout: { cover: "split", stats: "cards4", grid: "columns", rule: "bar" } },
-  S04: { shape: "notch", scaffold: "quadrant", device: "notches", fill: 0.7, layout: { cover: "stacked", stats: "rail", grid: "mosaic", rule: "hairline" } },
-  S05: { shape: "underline", scaffold: "ledger", device: "index", fill: 0.5, layout: { cover: "baseline", stats: "band", grid: "columns", rule: "hairline" } },
-  S06: { shape: "bracket", scaffold: "column", device: "register", fill: 0.65, layout: { cover: "split", stats: "cards3", grid: "bento", rule: "bar" } },
-  S07: { shape: "chamfer", scaffold: "frame", device: "crosshair", fill: 0.4, layout: { cover: "centered", stats: "cards4", grid: "mosaic", rule: "dots" } },
-  S08: { shape: "arch", scaffold: "banner", device: "seal", fill: 0.55, layout: { cover: "banded", stats: "cards3", grid: "stack", rule: "bar" } },
-  S09: { shape: "double", scaffold: "gutter", device: "grid", fill: 0.6, layout: { cover: "stacked", stats: "rail", grid: "columns", rule: "dots" } },
-  S10: { shape: "halo", scaffold: "canyon", device: "dial", fill: 0.35, layout: { cover: "split", stats: "band", grid: "bento", rule: "hairline" } },
-  S11: { shape: "rail", scaffold: "stack", device: "barcode", fill: 0.75, layout: { cover: "baseline", stats: "cards4", grid: "columns", rule: "bar" } },
-  S12: { shape: "tab", scaffold: "corner", device: "steps", fill: 0.5, layout: { cover: "stacked", stats: "band", grid: "mosaic", rule: "hairline" } },
-  S13: { shape: "crest", scaffold: "shelf", device: "seal", fill: 0.45, layout: { cover: "banded", stats: "cards4", grid: "stack", rule: "dots" } },
-  S14: { shape: "offset", scaffold: "wedge", device: "chevron", fill: 0.8, layout: { cover: "split", stats: "band", grid: "columns", rule: "none" } },
-  S15: { shape: "ticket", scaffold: "plinth", device: "notches", fill: 0.6, layout: { cover: "centered", stats: "rail", grid: "stack", rule: "hairline" } },
-  S16: { shape: "lozenge", scaffold: "canyon", device: "tilt", fill: 0.4, layout: { cover: "centered", stats: "rail", grid: "mosaic", rule: "none" } },
-  S17: { shape: "scoop", scaffold: "quadrant", device: "arc", fill: 0.55, layout: { cover: "banded", stats: "cards3", grid: "bento", rule: "dots" } },
-  S18: { shape: "gem", scaffold: "frame", device: "register", fill: 0.45, layout: { cover: "baseline", stats: "cards3", grid: "mosaic", rule: "bar" } },
-  S19: { shape: "spine", scaffold: "column", device: "index", fill: 0.7, layout: { cover: "stacked", stats: "band", grid: "columns", rule: "hairline" } },
-  S20: { shape: "keyhole", scaffold: "banner", device: "dial", fill: 0.5, layout: { cover: "split", stats: "rail", grid: "bento", rule: "dots" } },
-  S21: { shape: "shutter", scaffold: "stack", device: "steps", fill: 0.65, layout: { cover: "centered", stats: "cards4", grid: "stack", rule: "bar" } },
-  S22: { shape: "slat", scaffold: "gutter", device: "staff", fill: 0.55, layout: { cover: "banded", stats: "rail", grid: "stack", rule: "hairline" } },
-  S23: { shape: "blade", scaffold: "wedge", device: "tilt", fill: 0.8, layout: { cover: "stacked", stats: "cards3", grid: "columns", rule: "none" } },
-  S24: { shape: "fold", scaffold: "ledger", device: "crosshair", fill: 0.5, layout: { cover: "centered", stats: "band", grid: "bento", rule: "bar" } },
-  S25: { shape: "stair", scaffold: "corner", device: "barcode", fill: 0.7, layout: { cover: "baseline", stats: "cards4", grid: "mosaic", rule: "none" } },
-  S26: { shape: "plinth", scaffold: "plinth", device: "bracket", fill: 0.75, layout: { cover: "stacked", stats: "cards3", grid: "bento", rule: "dots" } },
-  S27: { shape: "wedge", scaffold: "split", device: "chevron", fill: 0.6, layout: { cover: "split", stats: "rail", grid: "mosaic", rule: "bar" } },
-  S28: { shape: "diptych", scaffold: "margin", device: "grid", fill: 0.35, layout: { cover: "banded", stats: "cards4", grid: "columns", rule: "dots" } },
-  S29: { shape: "brick", scaffold: "shelf", device: "chevron", fill: 0.67, layout: { cover: "banded", stats: "band", grid: "bento", rule: "hairline" } },
-  S30: { shape: "keystone", scaffold: "canyon", device: "barcode", fill: 0.57, layout: { cover: "centered", stats: "rail", grid: "columns", rule: "dots" } },
+  S01: {
+    shape: "round",
+    scaffold: "margin",
+    device: "bracket",
+    fill: 0.3,
+    layout: { cover: "baseline", stats: "cards4", grid: "bento", rule: "bar" },
+  },
+  S02: {
+    shape: "capsule",
+    scaffold: "shelf",
+    device: "arc",
+    fill: 0.45,
+    layout: { cover: "centered", stats: "cards3", grid: "mosaic", rule: "dots" },
+  },
+  S03: {
+    shape: "leaf",
+    scaffold: "split",
+    device: "staff",
+    fill: 0.6,
+    layout: { cover: "split", stats: "cards4", grid: "columns", rule: "bar" },
+  },
+  S04: {
+    shape: "notch",
+    scaffold: "quadrant",
+    device: "notches",
+    fill: 0.7,
+    layout: { cover: "stacked", stats: "rail", grid: "mosaic", rule: "hairline" },
+  },
+  S05: {
+    shape: "underline",
+    scaffold: "ledger",
+    device: "index",
+    fill: 0.5,
+    layout: { cover: "baseline", stats: "band", grid: "columns", rule: "hairline" },
+  },
+  S06: {
+    shape: "bracket",
+    scaffold: "column",
+    device: "register",
+    fill: 0.65,
+    layout: { cover: "split", stats: "cards3", grid: "bento", rule: "bar" },
+  },
+  S07: {
+    shape: "chamfer",
+    scaffold: "frame",
+    device: "crosshair",
+    fill: 0.4,
+    layout: { cover: "centered", stats: "cards4", grid: "mosaic", rule: "dots" },
+  },
+  S08: {
+    shape: "arch",
+    scaffold: "banner",
+    device: "seal",
+    fill: 0.55,
+    layout: { cover: "banded", stats: "cards3", grid: "stack", rule: "bar" },
+  },
+  S09: {
+    shape: "double",
+    scaffold: "gutter",
+    device: "grid",
+    fill: 0.6,
+    layout: { cover: "stacked", stats: "rail", grid: "columns", rule: "dots" },
+  },
+  S10: {
+    shape: "halo",
+    scaffold: "canyon",
+    device: "dial",
+    fill: 0.35,
+    layout: { cover: "split", stats: "band", grid: "bento", rule: "hairline" },
+  },
+  S11: {
+    shape: "rail",
+    scaffold: "stack",
+    device: "barcode",
+    fill: 0.75,
+    layout: { cover: "baseline", stats: "cards4", grid: "columns", rule: "bar" },
+  },
+  S12: {
+    shape: "tab",
+    scaffold: "corner",
+    device: "steps",
+    fill: 0.5,
+    layout: { cover: "stacked", stats: "band", grid: "mosaic", rule: "hairline" },
+  },
+  S13: {
+    shape: "crest",
+    scaffold: "shelf",
+    device: "seal",
+    fill: 0.45,
+    layout: { cover: "banded", stats: "cards4", grid: "stack", rule: "dots" },
+  },
+  S14: {
+    shape: "offset",
+    scaffold: "wedge",
+    device: "chevron",
+    fill: 0.8,
+    layout: { cover: "split", stats: "band", grid: "columns", rule: "none" },
+  },
+  S15: {
+    shape: "ticket",
+    scaffold: "plinth",
+    device: "notches",
+    fill: 0.6,
+    layout: { cover: "centered", stats: "rail", grid: "stack", rule: "hairline" },
+  },
+  S16: {
+    shape: "lozenge",
+    scaffold: "canyon",
+    device: "tilt",
+    fill: 0.4,
+    layout: { cover: "centered", stats: "rail", grid: "mosaic", rule: "none" },
+  },
+  S17: {
+    shape: "scoop",
+    scaffold: "quadrant",
+    device: "arc",
+    fill: 0.55,
+    layout: { cover: "banded", stats: "cards3", grid: "bento", rule: "dots" },
+  },
+  S18: {
+    shape: "gem",
+    scaffold: "frame",
+    device: "register",
+    fill: 0.45,
+    layout: { cover: "baseline", stats: "cards3", grid: "mosaic", rule: "bar" },
+  },
+  S19: {
+    shape: "spine",
+    scaffold: "column",
+    device: "index",
+    fill: 0.7,
+    layout: { cover: "stacked", stats: "band", grid: "columns", rule: "hairline" },
+  },
+  S20: {
+    shape: "keyhole",
+    scaffold: "banner",
+    device: "dial",
+    fill: 0.5,
+    layout: { cover: "split", stats: "rail", grid: "bento", rule: "dots" },
+  },
+  S21: {
+    shape: "shutter",
+    scaffold: "stack",
+    device: "steps",
+    fill: 0.65,
+    layout: { cover: "centered", stats: "cards4", grid: "stack", rule: "bar" },
+  },
+  S22: {
+    shape: "slat",
+    scaffold: "gutter",
+    device: "staff",
+    fill: 0.55,
+    layout: { cover: "banded", stats: "rail", grid: "stack", rule: "hairline" },
+  },
+  S23: {
+    shape: "blade",
+    scaffold: "wedge",
+    device: "tilt",
+    fill: 0.8,
+    layout: { cover: "stacked", stats: "cards3", grid: "columns", rule: "none" },
+  },
+  S24: {
+    shape: "fold",
+    scaffold: "ledger",
+    device: "crosshair",
+    fill: 0.5,
+    layout: { cover: "centered", stats: "band", grid: "bento", rule: "bar" },
+  },
+  S25: {
+    shape: "stair",
+    scaffold: "corner",
+    device: "barcode",
+    fill: 0.7,
+    layout: { cover: "baseline", stats: "cards4", grid: "mosaic", rule: "none" },
+  },
+  S26: {
+    shape: "plinth",
+    scaffold: "plinth",
+    device: "bracket",
+    fill: 0.75,
+    layout: { cover: "stacked", stats: "cards3", grid: "bento", rule: "dots" },
+  },
+  S27: {
+    shape: "wedge",
+    scaffold: "split",
+    device: "chevron",
+    fill: 0.6,
+    layout: { cover: "split", stats: "rail", grid: "mosaic", rule: "bar" },
+  },
+  S28: {
+    shape: "diptych",
+    scaffold: "margin",
+    device: "grid",
+    fill: 0.35,
+    layout: { cover: "banded", stats: "cards4", grid: "columns", rule: "dots" },
+  },
+  S29: {
+    shape: "brick",
+    scaffold: "shelf",
+    device: "chevron",
+    fill: 0.67,
+    layout: { cover: "banded", stats: "band", grid: "bento", rule: "hairline" },
+  },
+  S30: {
+    shape: "keystone",
+    scaffold: "canyon",
+    device: "barcode",
+    fill: 0.57,
+    layout: { cover: "centered", stats: "rail", grid: "columns", rule: "dots" },
+  },
 };
 
 /**
@@ -231,36 +411,216 @@ export const SKIN_GEOMETRY: Record<string, PackGeometry> = {
  * expected to occupy the open half of the sheet rather than leave it airy.
  */
 export const INDUSTRY_GEOMETRY: Record<string, PackGeometry> = {
-  R01: { shape: "bracket", scaffold: "margin", device: "register", fill: 0.62, layout: { cover: "centered", stats: "cards3", grid: "mosaic", rule: "hairline" } },
-  R02: { shape: "rail", scaffold: "column", device: "barcode", fill: 0.72, layout: { cover: "centered", stats: "band", grid: "columns", rule: "dots" } },
-  R03: { shape: "halo", scaffold: "plinth", device: "index", fill: 0.58, layout: { cover: "split", stats: "rail", grid: "bento", rule: "hairline" } },
-  R04: { shape: "leaf", scaffold: "banner", device: "tilt", fill: 0.66, layout: { cover: "banded", stats: "cards3", grid: "columns", rule: "none" } },
-  R05: { shape: "double", scaffold: "quadrant", device: "grid", fill: 0.7, layout: { cover: "stacked", stats: "cards4", grid: "bento", rule: "bar" } },
-  R06: { shape: "rail", scaffold: "ledger", device: "bracket", fill: 0.74, layout: { cover: "baseline", stats: "band", grid: "columns", rule: "dots" } },
-  R07: { shape: "notch", scaffold: "split", device: "steps", fill: 0.8, layout: { cover: "centered", stats: "rail", grid: "bento", rule: "hairline" } },
-  R08: { shape: "arch", scaffold: "stack", device: "chevron", fill: 0.56, layout: { cover: "split", stats: "cards3", grid: "columns", rule: "none" } },
-  R09: { shape: "chamfer", scaffold: "wedge", device: "staff", fill: 0.76, layout: { cover: "banded", stats: "cards4", grid: "bento", rule: "bar" } },
-  R10: { shape: "ticket", scaffold: "frame", device: "arc", fill: 0.68, layout: { cover: "stacked", stats: "band", grid: "columns", rule: "dots" } },
-  R11: { shape: "diptych", scaffold: "gutter", device: "dial", fill: 0.82, layout: { cover: "baseline", stats: "rail", grid: "bento", rule: "hairline" } },
-  R12: { shape: "slat", scaffold: "shelf", device: "notches", fill: 0.78, layout: { cover: "centered", stats: "cards3", grid: "columns", rule: "none" } },
-  R13: { shape: "scoop", scaffold: "corner", device: "arc", fill: 0.6, layout: { cover: "split", stats: "cards4", grid: "bento", rule: "bar" } },
-  R14: { shape: "blade", scaffold: "canyon", device: "seal", fill: 0.54, layout: { cover: "banded", stats: "band", grid: "columns", rule: "dots" } },
-  R15: { shape: "tab", scaffold: "margin", device: "tilt", fill: 0.8, layout: { cover: "stacked", stats: "rail", grid: "bento", rule: "hairline" } },
-  R16: { shape: "double", scaffold: "column", device: "grid", fill: 0.76, layout: { cover: "baseline", stats: "cards3", grid: "columns", rule: "none" } },
-  R17: { shape: "double", scaffold: "plinth", device: "staff", fill: 0.79, layout: { cover: "centered", stats: "cards4", grid: "bento", rule: "bar" } },
-  R18: { shape: "gem", scaffold: "banner", device: "steps", fill: 0.64, layout: { cover: "split", stats: "band", grid: "columns", rule: "dots" } },
-  R19: { shape: "crest", scaffold: "quadrant", device: "chevron", fill: 0.66, layout: { cover: "banded", stats: "rail", grid: "bento", rule: "hairline" } },
-  R20: { shape: "lozenge", scaffold: "ledger", device: "staff", fill: 0.5, layout: { cover: "baseline", stats: "rail", grid: "stack", rule: "dots" } },
-  R21: { shape: "shutter", scaffold: "split", device: "crosshair", fill: 0.68, layout: { cover: "split", stats: "rail", grid: "columns", rule: "bar" } },
-  R22: { shape: "keyhole", scaffold: "stack", device: "dial", fill: 0.84, layout: { cover: "split", stats: "cards4", grid: "stack", rule: "none" } },
-  R23: { shape: "wedge", scaffold: "wedge", device: "notches", fill: 0.72, layout: { cover: "banded", stats: "band", grid: "mosaic", rule: "bar" } },
-  R24: { shape: "fold", scaffold: "frame", device: "barcode", fill: 0.58, layout: { cover: "stacked", stats: "rail", grid: "stack", rule: "dots" } },
-  R25: { shape: "offset", scaffold: "gutter", device: "seal", fill: 0.77, layout: { cover: "baseline", stats: "cards3", grid: "mosaic", rule: "hairline" } },
-  R26: { shape: "stair", scaffold: "shelf", device: "register", fill: 0.75, layout: { cover: "centered", stats: "cards4", grid: "stack", rule: "none" } },
-  R27: { shape: "capsule", scaffold: "corner", device: "grid", fill: 0.73, layout: { cover: "split", stats: "band", grid: "mosaic", rule: "bar" } },
-  R28: { shape: "round", scaffold: "canyon", device: "index", fill: 0.7, layout: { cover: "banded", stats: "rail", grid: "stack", rule: "dots" } },
-  R29: { shape: "underline", scaffold: "margin", device: "steps", fill: 0.55, layout: { cover: "stacked", stats: "cards3", grid: "mosaic", rule: "hairline" } },
-  R30: { shape: "halo", scaffold: "column", device: "chevron", fill: 0.62, layout: { cover: "baseline", stats: "cards4", grid: "stack", rule: "none" } },
+  R01: {
+    shape: "bracket",
+    scaffold: "margin",
+    device: "register",
+    fill: 0.62,
+    layout: { cover: "centered", stats: "cards3", grid: "mosaic", rule: "hairline" },
+  },
+  R02: {
+    shape: "rail",
+    scaffold: "column",
+    device: "barcode",
+    fill: 0.72,
+    layout: { cover: "centered", stats: "band", grid: "columns", rule: "dots" },
+  },
+  R03: {
+    shape: "halo",
+    scaffold: "plinth",
+    device: "index",
+    fill: 0.58,
+    layout: { cover: "split", stats: "rail", grid: "bento", rule: "hairline" },
+  },
+  R04: {
+    shape: "leaf",
+    scaffold: "banner",
+    device: "tilt",
+    fill: 0.66,
+    layout: { cover: "banded", stats: "cards3", grid: "columns", rule: "none" },
+  },
+  R05: {
+    shape: "double",
+    scaffold: "quadrant",
+    device: "grid",
+    fill: 0.7,
+    layout: { cover: "stacked", stats: "cards4", grid: "bento", rule: "bar" },
+  },
+  R06: {
+    shape: "rail",
+    scaffold: "ledger",
+    device: "bracket",
+    fill: 0.74,
+    layout: { cover: "baseline", stats: "band", grid: "columns", rule: "dots" },
+  },
+  R07: {
+    shape: "notch",
+    scaffold: "split",
+    device: "steps",
+    fill: 0.8,
+    layout: { cover: "centered", stats: "rail", grid: "bento", rule: "hairline" },
+  },
+  R08: {
+    shape: "arch",
+    scaffold: "stack",
+    device: "chevron",
+    fill: 0.56,
+    layout: { cover: "split", stats: "cards3", grid: "columns", rule: "none" },
+  },
+  R09: {
+    shape: "chamfer",
+    scaffold: "wedge",
+    device: "staff",
+    fill: 0.76,
+    layout: { cover: "banded", stats: "cards4", grid: "bento", rule: "bar" },
+  },
+  R10: {
+    shape: "ticket",
+    scaffold: "frame",
+    device: "arc",
+    fill: 0.68,
+    layout: { cover: "stacked", stats: "band", grid: "columns", rule: "dots" },
+  },
+  R11: {
+    shape: "diptych",
+    scaffold: "gutter",
+    device: "dial",
+    fill: 0.82,
+    layout: { cover: "baseline", stats: "rail", grid: "bento", rule: "hairline" },
+  },
+  R12: {
+    shape: "slat",
+    scaffold: "shelf",
+    device: "notches",
+    fill: 0.78,
+    layout: { cover: "centered", stats: "cards3", grid: "columns", rule: "none" },
+  },
+  R13: {
+    shape: "scoop",
+    scaffold: "corner",
+    device: "arc",
+    fill: 0.6,
+    layout: { cover: "split", stats: "cards4", grid: "bento", rule: "bar" },
+  },
+  R14: {
+    shape: "blade",
+    scaffold: "canyon",
+    device: "seal",
+    fill: 0.54,
+    layout: { cover: "banded", stats: "band", grid: "columns", rule: "dots" },
+  },
+  R15: {
+    shape: "tab",
+    scaffold: "margin",
+    device: "tilt",
+    fill: 0.8,
+    layout: { cover: "stacked", stats: "rail", grid: "bento", rule: "hairline" },
+  },
+  R16: {
+    shape: "double",
+    scaffold: "column",
+    device: "grid",
+    fill: 0.76,
+    layout: { cover: "baseline", stats: "cards3", grid: "columns", rule: "none" },
+  },
+  R17: {
+    shape: "double",
+    scaffold: "plinth",
+    device: "staff",
+    fill: 0.79,
+    layout: { cover: "centered", stats: "cards4", grid: "bento", rule: "bar" },
+  },
+  R18: {
+    shape: "gem",
+    scaffold: "banner",
+    device: "steps",
+    fill: 0.64,
+    layout: { cover: "split", stats: "band", grid: "columns", rule: "dots" },
+  },
+  R19: {
+    shape: "crest",
+    scaffold: "quadrant",
+    device: "chevron",
+    fill: 0.66,
+    layout: { cover: "banded", stats: "rail", grid: "bento", rule: "hairline" },
+  },
+  R20: {
+    shape: "lozenge",
+    scaffold: "ledger",
+    device: "staff",
+    fill: 0.5,
+    layout: { cover: "baseline", stats: "rail", grid: "stack", rule: "dots" },
+  },
+  R21: {
+    shape: "shutter",
+    scaffold: "split",
+    device: "crosshair",
+    fill: 0.68,
+    layout: { cover: "split", stats: "rail", grid: "columns", rule: "bar" },
+  },
+  R22: {
+    shape: "keyhole",
+    scaffold: "stack",
+    device: "dial",
+    fill: 0.84,
+    layout: { cover: "split", stats: "cards4", grid: "stack", rule: "none" },
+  },
+  R23: {
+    shape: "wedge",
+    scaffold: "wedge",
+    device: "notches",
+    fill: 0.72,
+    layout: { cover: "banded", stats: "band", grid: "mosaic", rule: "bar" },
+  },
+  R24: {
+    shape: "fold",
+    scaffold: "frame",
+    device: "barcode",
+    fill: 0.58,
+    layout: { cover: "stacked", stats: "rail", grid: "stack", rule: "dots" },
+  },
+  R25: {
+    shape: "offset",
+    scaffold: "gutter",
+    device: "seal",
+    fill: 0.77,
+    layout: { cover: "baseline", stats: "cards3", grid: "mosaic", rule: "hairline" },
+  },
+  R26: {
+    shape: "stair",
+    scaffold: "shelf",
+    device: "register",
+    fill: 0.75,
+    layout: { cover: "centered", stats: "cards4", grid: "stack", rule: "none" },
+  },
+  R27: {
+    shape: "capsule",
+    scaffold: "corner",
+    device: "grid",
+    fill: 0.73,
+    layout: { cover: "split", stats: "band", grid: "mosaic", rule: "bar" },
+  },
+  R28: {
+    shape: "round",
+    scaffold: "canyon",
+    device: "index",
+    fill: 0.7,
+    layout: { cover: "banded", stats: "rail", grid: "stack", rule: "dots" },
+  },
+  R29: {
+    shape: "underline",
+    scaffold: "margin",
+    device: "steps",
+    fill: 0.55,
+    layout: { cover: "stacked", stats: "cards3", grid: "mosaic", rule: "hairline" },
+  },
+  R30: {
+    shape: "halo",
+    scaffold: "column",
+    device: "chevron",
+    fill: 0.62,
+    layout: { cover: "baseline", stats: "cards4", grid: "stack", rule: "none" },
+  },
 };
 
 /** Declared geometry for every hand-authored language: catalog + industry. */
@@ -268,7 +628,6 @@ export const GEOMETRY_SHEET: Record<string, PackGeometry> = {
   ...SKIN_GEOMETRY,
   ...INDUSTRY_GEOMETRY,
 };
-
 
 function hash(s: string): number {
   let h = 0;
@@ -283,8 +642,40 @@ export function packGeometry(pack: StylePack): PackGeometry {
   const h = hash(pack.id);
   const hard = pack.card.radius <= 4;
   const shapePool = hard
-    ? (["offset", "notch", "underline", "bracket", "double", "ticket", "blade", "wedge", "stair", "spine", "plinth", "slat", "chamfer", "diptych"] as CardShape[])
-    : (["round", "capsule", "leaf", "tab", "bracket", "underline", "arch", "fold", "scoop", "halo", "crest", "keyhole", "lozenge", "rail", "shutter", "gem"] as CardShape[]);
+    ? ([
+        "offset",
+        "notch",
+        "underline",
+        "bracket",
+        "double",
+        "ticket",
+        "blade",
+        "wedge",
+        "stair",
+        "spine",
+        "plinth",
+        "slat",
+        "chamfer",
+        "diptych",
+      ] as CardShape[])
+    : ([
+        "round",
+        "capsule",
+        "leaf",
+        "tab",
+        "bracket",
+        "underline",
+        "arch",
+        "fold",
+        "scoop",
+        "halo",
+        "crest",
+        "keyhole",
+        "lozenge",
+        "rail",
+        "shutter",
+        "gem",
+      ] as CardShape[]);
   return {
     shape: pack.card.shape ?? shapePool[h % shapePool.length]!,
     scaffold: SCAFFOLDS[(h >> 3) % SCAFFOLDS.length]!,
@@ -371,9 +762,15 @@ export function shapeCss(
     case "capsule":
       return { radius: `${Math.max(r, 22)}px`, extraShadow: baseShadow };
     case "leaf":
-      return { radius: `${Math.max(r, 14)}px 3px ${Math.max(r, 14)}px 3px`, extraShadow: baseShadow };
+      return {
+        radius: `${Math.max(r, 14)}px 3px ${Math.max(r, 14)}px 3px`,
+        extraShadow: baseShadow,
+      };
     case "tab":
-      return { radius: `${Math.max(r, 12)}px ${Math.max(r, 12)}px 2px 2px`, extraShadow: baseShadow };
+      return {
+        radius: `${Math.max(r, 12)}px ${Math.max(r, 12)}px 2px 2px`,
+        extraShadow: baseShadow,
+      };
     case "bracket":
       return {
         radius: `2px ${r}px ${r}px 2px`,
@@ -415,7 +812,10 @@ export function shapeCss(
           "polygon(11px 0, calc(100% - 11px) 0, 100% 11px, 100% calc(100% - 11px), calc(100% - 11px) 100%, 11px 100%, 0 calc(100% - 11px), 0 11px)",
       };
     case "arch":
-      return { radius: `${Math.max(r, 30)}px ${Math.max(r, 30)}px 3px 3px`, extraShadow: baseShadow };
+      return {
+        radius: `${Math.max(r, 30)}px ${Math.max(r, 30)}px 3px 3px`,
+        extraShadow: baseShadow,
+      };
     case "fold":
       return {
         radius: `${Math.min(r, 8)}px`,
@@ -449,7 +849,10 @@ export function shapeCss(
           "polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px)",
       };
     case "scoop":
-      return { radius: `${Math.min(r, 6)}px ${Math.min(r, 6)}px ${Math.min(r, 6)}px ${Math.max(r, 34)}px`, extraShadow: baseShadow };
+      return {
+        radius: `${Math.min(r, 6)}px ${Math.min(r, 6)}px ${Math.min(r, 6)}px ${Math.max(r, 34)}px`,
+        extraShadow: baseShadow,
+      };
     case "spine":
       return {
         radius: `0px ${Math.min(r, 10)}px ${Math.min(r, 10)}px 0px`,
@@ -481,7 +884,8 @@ export function shapeCss(
       return {
         radius: "0px",
         extraShadow: baseShadow,
-        clipPath: "polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%)",
+        clipPath:
+          "polygon(18px 0, calc(100% - 18px) 0, 100% 50%, calc(100% - 18px) 100%, 18px 100%, 0 50%)",
       };
     case "halo":
       return {

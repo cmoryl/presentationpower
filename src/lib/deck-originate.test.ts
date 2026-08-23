@@ -83,9 +83,7 @@ describe("planDeck — rejections", () => {
 
   it("rejects a variant whose family the section does not permit, naming both", () => {
     const section = SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.length)!;
-    const outsider = MODULE_VARIANTS.find(
-      (v) => !section.permittedFamilyIds.includes(v.familyId),
-    )!;
+    const outsider = MODULE_VARIANTS.find((v) => !section.permittedFamilyIds.includes(v.familyId))!;
     const res = planDeck({
       brand_mode_id: brandModeId,
       slides: [{ section_id: section.id, variant_id: outsider.id }],
@@ -99,9 +97,9 @@ describe("planDeck — rejections", () => {
   });
 
   it("rejects an unknown section and an unknown variant", () => {
-    expect(planDeck({ brand_mode_id: brandModeId, slides: [{ section_id: "SF-999" }] })).toMatchObject(
-      { ok: false },
-    );
+    expect(
+      planDeck({ brand_mode_id: brandModeId, slides: [{ section_id: "SF-999" }] }),
+    ).toMatchObject({ ok: false });
     const res = planDeck({
       brand_mode_id: brandModeId,
       slides: [{ section_id: SECTION_FRAMEWORKS[0].id, variant_id: "MV-NOPE" }],

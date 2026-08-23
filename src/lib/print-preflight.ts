@@ -215,17 +215,15 @@ function checkImages(images: PreflightImage[], intent: PrintIntent): PreflightFi
         severity: "info",
         page: img.page,
         title: `${name} is full-bleed`,
-        detail: "Verify the art extends past trim on every bleeding edge rather than stopping at it.",
+        detail:
+          "Verify the art extends past trim on every bleeding edge rather than stopping at it.",
       });
     }
   }
   return out;
 }
 
-function checkText(
-  text: PreflightTextInk[],
-  stock: "coated" | "uncoated",
-): PreflightFinding[] {
+function checkText(text: PreflightTextInk[], stock: "coated" | "uncoated"): PreflightFinding[] {
   const out: PreflightFinding[] = [];
   const tac = stock === "coated" ? TAC_LIMIT_COATED : TAC_LIMIT_UNCOATED;
   for (const t of text) {
@@ -319,7 +317,8 @@ export function runPrintPreflight(input: PreflightInput): PreflightReport {
       id: "font-embed",
       severity: "fail",
       title: "Fonts not embedded",
-      detail: "Geist is OFL with fsType 0, so embedding is permitted — an unembedded font is a build bug, not a licensing limit.",
+      detail:
+        "Geist is OFL with fsType 0, so embedding is permitted — an unembedded font is a build bug, not a licensing limit.",
       remedy: "Embed all fonts as subsets in the output PDF.",
     });
   }

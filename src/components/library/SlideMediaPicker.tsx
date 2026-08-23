@@ -7,11 +7,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-  listSlideMedia,
-  uploadSlideMedia,
-  type SlideMediaItem,
-} from "@/lib/slide-media";
+import { listSlideMedia, uploadSlideMedia, type SlideMediaItem } from "@/lib/slide-media";
 
 export type PickedMedia = { url: string; path?: string };
 

@@ -7,6 +7,24 @@ import { getImageryAnalytics } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 
 export const Route = createFileRoute("/admin/imagery-analytics")({
+  head: () => ({
+    meta: [
+      { title: "Imagery analytics · Admin · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "See which generated backdrops and photo plates Element decks actually use, by prompt and division.",
+      },
+      { property: "og:title", content: "Imagery analytics · Admin · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "See which generated backdrops and photo plates Element decks actually use, by prompt and division.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: ImageryView,
 });
 

@@ -13,13 +13,7 @@
 //      pixel-for-pixel on the stage grid at every supported scale.
 
 import { describe, expect, it } from "vitest";
-import {
-  EXPORT_QUALITIES,
-  rasterSize,
-  stagePixelRatio,
-  STAGE_W,
-  STAGE_H,
-} from "../export-quality";
+import { EXPORT_QUALITIES, rasterSize, stagePixelRatio, STAGE_W, STAGE_H } from "../export-quality";
 import {
   EXPORT_RADIUS_IN,
   PX_PER_IN,
@@ -94,9 +88,7 @@ describe("corner rounding parity across export scales and DPI", () => {
         const first = perQuality[0];
         for (const got of perQuality) {
           expect(got.adj, `${t.name} on ${s.name}: adj changed with DPI`).toBe(first.adj);
-          expect(got.px, `${t.name} on ${s.name}: painted radius changed with DPI`).toBe(
-            first.px,
-          );
+          expect(got.px, `${t.name} on ${s.name}: painted radius changed with DPI`).toBe(first.px);
         }
       }
     }

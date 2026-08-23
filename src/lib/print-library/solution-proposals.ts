@@ -96,9 +96,19 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     timelineNote:
       "Standard delivery is estimated at X business days from written approval. Court-deadline matters can be accelerated to a rush X-day turnaround with dedicated review capacity.",
     costRows: [
-      { item: "Certified translation", detail: "Per word, 1 target language", qty: "0", price: "$0.00" },
+      {
+        item: "Certified translation",
+        detail: "Per word, 1 target language",
+        qty: "0",
+        price: "$0.00",
+      },
       { item: "Certificate of accuracy", detail: "Per document", qty: "0", price: "$0.00" },
-      { item: "Deposition interpreting", detail: "Per day, 2 interpreters", qty: "0", price: "$0.00" },
+      {
+        item: "Deposition interpreting",
+        detail: "Per day, 2 interpreters",
+        qty: "0",
+        price: "$0.00",
+      },
       { item: "Matter project management", detail: "Case oversight", qty: "1", price: "$0.00" },
     ],
     costNote:
@@ -163,7 +173,12 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     timelineNote:
       "Standard delivery is estimated at X business days from written approval and source-file freeze. Site-activation critical paths can be accelerated to a rush X-day turnaround.",
     costRows: [
-      { item: "Linguistic validation", detail: "Per instrument, per locale", qty: "0", price: "$0.00" },
+      {
+        item: "Linguistic validation",
+        detail: "Per instrument, per locale",
+        qty: "0",
+        price: "$0.00",
+      },
       { item: "Submission translation", detail: "Per word, per locale", qty: "0", price: "$0.00" },
       { item: "eCOA screen review", detail: "Per screen set", qty: "0", price: "$0.00" },
       { item: "Program management", detail: "Study oversight", qty: "1", price: "$0.00" },
@@ -364,7 +379,12 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     timelineNote:
       "Standard deployment is estimated at X business days from written approval and credential access. Phased rollouts can be accelerated to a rush X-day pilot.",
     costRows: [
-      { item: "Platform subscription", detail: "Annual, per environment", qty: "1", price: "$0.00" },
+      {
+        item: "Platform subscription",
+        detail: "Annual, per environment",
+        qty: "1",
+        price: "$0.00",
+      },
       { item: "Connector implementation", detail: "Per source system", qty: "0", price: "$0.00" },
       { item: "Managed translation", detail: "Per word, per locale", qty: "0", price: "$0.00" },
       { item: "Program management", detail: "Deployment oversight", qty: "1", price: "$0.00" },
@@ -468,10 +488,26 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     summary:
       "This proposal outlines the scope, governance model, delivery footprint, and investment for a consolidated multilingual program across your business units. One contract, one governance structure, and one reporting line covering every language, channel, and division involved.",
     included: [
-      { label: "Program governance", icon: "users", detail: "Single accountable program lead with quarterly business reviews." },
-      { label: "Consolidated language services", icon: "globe-alt", detail: "Translation, transcreation, and interpreting across all units." },
-      { label: "Technology and integration", icon: "grid", detail: "Connector-based automation into your content and product stack." },
-      { label: "Enterprise reporting", icon: "trending", detail: "Spend, quality, and turnaround reporting by business unit." },
+      {
+        label: "Program governance",
+        icon: "users",
+        detail: "Single accountable program lead with quarterly business reviews.",
+      },
+      {
+        label: "Consolidated language services",
+        icon: "globe-alt",
+        detail: "Translation, transcreation, and interpreting across all units.",
+      },
+      {
+        label: "Technology and integration",
+        icon: "grid",
+        detail: "Connector-based automation into your content and product stack.",
+      },
+      {
+        label: "Enterprise reporting",
+        icon: "trending",
+        detail: "Spend, quality, and turnaround reporting by business unit.",
+      },
     ],
     sourceFiles: ["Current vendor and spend baseline", "System and connector inventory"],
     deliverables: [
@@ -483,7 +519,12 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
       "Program mobilization is estimated at X weeks from written approval, with business units onboarded in agreed waves. Priority units can be accelerated to a rush X-week wave.",
     costRows: [
       { item: "Language services", detail: "Blended rate, per word", qty: "0", price: "$0.00" },
-      { item: "Technology and integration", detail: "Per connector, one-time", qty: "0", price: "$0.00" },
+      {
+        item: "Technology and integration",
+        detail: "Per connector, one-time",
+        qty: "0",
+        price: "$0.00",
+      },
       { item: "Program governance", detail: "Monthly, dedicated team", qty: "12", price: "$0.00" },
       { item: "Enterprise reporting", detail: "Annual platform access", qty: "1", price: "$0.00" },
     ],
@@ -519,10 +560,26 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     summary:
       "This proposal outlines the platform scope, connector footprint, rollout plan, and investment for automating your multilingual content operations on GlobalLink. Content moves from your systems into translation and back without manual handoffs.",
     included: [
-      { label: "Translation management", icon: "grid", detail: "Centralized workflow, TM, and terminology across all content." },
-      { label: "System connectors", icon: "globe-alt", detail: "Pre-built integrations for CMS, PIM, commerce, and repositories." },
-      { label: "Workflow automation", icon: "clock", detail: "Automated routing, review steps, and publishing triggers." },
-      { label: "Analytics and reporting", icon: "trending", detail: "Live visibility into volume, cost, and turnaround." },
+      {
+        label: "Translation management",
+        icon: "grid",
+        detail: "Centralized workflow, TM, and terminology across all content.",
+      },
+      {
+        label: "System connectors",
+        icon: "globe-alt",
+        detail: "Pre-built integrations for CMS, PIM, commerce, and repositories.",
+      },
+      {
+        label: "Workflow automation",
+        icon: "clock",
+        detail: "Automated routing, review steps, and publishing triggers.",
+      },
+      {
+        label: "Analytics and reporting",
+        icon: "trending",
+        detail: "Live visibility into volume, cost, and turnaround.",
+      },
     ],
     sourceFiles: ["System inventory and API access", "Existing TM and glossary assets"],
     deliverables: [
@@ -571,10 +628,26 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     summary:
       "This proposal outlines the scope, eTMF configuration, timelines, and investment for your clinical program on Trial Interactive. Every artifact is filed against a validated structure so the trial master file stays inspection-ready from first-patient-in.",
     included: [
-      { label: "eTMF implementation", icon: "check", detail: "Validated environment configured to your TMF reference model." },
-      { label: "Study start-up", icon: "clock", detail: "Site activation tracking, document collection, and workflows." },
-      { label: "Inspection readiness", icon: "star", detail: "Completeness metrics, QC review, and audit-ready exports." },
-      { label: "Training and support", icon: "users", detail: "Role-based training for sponsor, CRO, and site users." },
+      {
+        label: "eTMF implementation",
+        icon: "check",
+        detail: "Validated environment configured to your TMF reference model.",
+      },
+      {
+        label: "Study start-up",
+        icon: "clock",
+        detail: "Site activation tracking, document collection, and workflows.",
+      },
+      {
+        label: "Inspection readiness",
+        icon: "star",
+        detail: "Completeness metrics, QC review, and audit-ready exports.",
+      },
+      {
+        label: "Training and support",
+        icon: "users",
+        detail: "Role-based training for sponsor, CRO, and site users.",
+      },
     ],
     sourceFiles: ["TMF reference model and study documents", "Site and country list"],
     deliverables: [
@@ -623,10 +696,26 @@ const DIVISION_PROPOSALS: DivisionProposal[] = [
     summary:
       "This proposal outlines the scope, module library, enablement plan, and investment for standing up Element as your on-brand production system. Presentations, print, events, and social all come out of one approved library instead of being rebuilt each time.",
     included: [
-      { label: "Brand system setup", icon: "star", detail: "Palette, type, logo rules, and style packs encoded as tokens." },
-      { label: "Module library", icon: "grid", detail: "Approved slide, print, event, and social modules per division." },
-      { label: "Team enablement", icon: "users", detail: "Role-based onboarding for design, marketing, and sales teams." },
-      { label: "Governance and updates", icon: "check", detail: "Change control so every asset stays on the current brand." },
+      {
+        label: "Brand system setup",
+        icon: "star",
+        detail: "Palette, type, logo rules, and style packs encoded as tokens.",
+      },
+      {
+        label: "Module library",
+        icon: "grid",
+        detail: "Approved slide, print, event, and social modules per division.",
+      },
+      {
+        label: "Team enablement",
+        icon: "users",
+        detail: "Role-based onboarding for design, marketing, and sales teams.",
+      },
+      {
+        label: "Governance and updates",
+        icon: "check",
+        detail: "Change control so every asset stays on the current brand.",
+      },
     ],
     sourceFiles: ["Current brand guidelines and asset library", "Team and division list"],
     deliverables: [
@@ -707,9 +796,24 @@ function seedFor(d: DivisionProposal): SolutionProposalSeed {
       stats: d.stats,
       quote: d.quote,
       team: [
-        { name: "First Last", role: "Account Director", office: "New York", email: "email@transperfect.com" },
-        { name: "First Last", role: "Program Manager", office: "London", email: "email@transperfect.com" },
-        { name: "First Last", role: "Solutions Architect", office: "Barcelona", email: "email@transperfect.com" },
+        {
+          name: "First Last",
+          role: "Account Director",
+          office: "New York",
+          email: "email@transperfect.com",
+        },
+        {
+          name: "First Last",
+          role: "Program Manager",
+          office: "London",
+          email: "email@transperfect.com",
+        },
+        {
+          name: "First Last",
+          role: "Solutions Architect",
+          office: "Barcelona",
+          email: "email@transperfect.com",
+        },
       ],
       nextSteps: d.nextSteps,
       contacts: { ctaLabel: "Questions?", ctaEmail: "proposals@transperfect.com" },

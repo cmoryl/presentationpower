@@ -80,10 +80,12 @@ function heroSectionForItem(
     id: `hero-example-${item.id}-${variantId}`,
     kind: "hero",
     variantId,
-    ...(str("eyebrow") ? { eyebrow: str("eyebrow")! } : { eyebrow: printTypeMeta(item.kind).label }),
+    ...(str("eyebrow")
+      ? { eyebrow: str("eyebrow")! }
+      : { eyebrow: printTypeMeta(item.kind).label }),
     ...(str("client") ? { kicker: str("client")! } : {}),
     title,
-    ...(str("summary") ?? item.blurb ? { summary: str("summary") ?? item.blurb } : {}),
+    ...((str("summary") ?? item.blurb) ? { summary: str("summary") ?? item.blurb } : {}),
     ...(item.heroUrl ? { imageUrl: item.heroUrl } : {}),
     ...(item.focal ? { focalX: item.focal.x, focalY: item.focal.y } : {}),
     ...(meta.length ? { meta } : {}),

@@ -62,6 +62,5 @@ export function useClientWallPool(brandModeId: string | undefined): LogoFiller[]
       }
     }
     return [...primary, ...rest];
-
   }, [data, brandModeId]);
 }

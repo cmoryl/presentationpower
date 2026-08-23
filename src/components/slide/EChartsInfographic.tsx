@@ -128,8 +128,7 @@ export default function EChartsInfographic({ spec, ctx, className, style }: Prop
     inst.setOption(deepMerge(base as unknown as Record<string, unknown>, specific));
     const onResize = () => inst.resize(measure());
     window.addEventListener("resize", onResize);
-    const ro =
-      typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => onResize()) : null;
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => onResize()) : null;
     ro?.observe(host);
     return () => {
       window.removeEventListener("resize", onResize);

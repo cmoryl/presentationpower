@@ -49,9 +49,7 @@ import type { CustomTemplate } from "./custom-templates";
 export const listIntakes = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(
-    async ({
-      context,
-    }): Promise<{ intakes: TemplateIntake[]; urls: Record<string, string> }> => {
+    async ({ context }): Promise<{ intakes: TemplateIntake[]; urls: Record<string, string> }> => {
       const s = context.supabase as unknown as SbClient;
       await assertAdmin(s, context.userId);
       const { data, error } = await context.supabase

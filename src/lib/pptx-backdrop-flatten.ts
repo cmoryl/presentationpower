@@ -166,11 +166,14 @@ export function normalizeBackdropPictures(xml: string): {
     let out = pic;
 
     // 1. Self-closing blip: drop any extension list (svgBlip lives there).
-    out = out.replace(/<a:blip([^>]*?)>([\s\S]*?)<\/a:blip>/g, (_all, attrs: string, inner: string) => {
-      if (/svgBlip/i.test(inner)) svgStripped += 1;
-      const embed = attrs.match(/r:embed="[^"]*"/);
-      return `<a:blip ${embed ? embed[0] : ""}/>`;
-    });
+    out = out.replace(
+      /<a:blip([^>]*?)>([\s\S]*?)<\/a:blip>/g,
+      (_all, attrs: string, inner: string) => {
+        if (/svgBlip/i.test(inner)) svgStripped += 1;
+        const embed = attrs.match(/r:embed="[^"]*"/);
+        return `<a:blip ${embed ? embed[0] : ""}/>`;
+      },
+    );
 
     // 2. Lock it at the bottom of the z-order: unselectable, immovable.
     if (/<a:picLocks\b/.test(out)) {
@@ -242,11 +245,7 @@ export async function flattenBackdrops(
     onReport?.(report);
     console.info("[pptx-backdrop-flatten]", report);
 
-    if (
-      dedupe.removed === 0 &&
-      backdropsNormalized === 0 &&
-      svgFallbacksStripped === 0
-    ) {
+    if (dedupe.removed === 0 && backdropsNormalized === 0 && svgFallbacksStripped === 0) {
       return blob;
     }
 

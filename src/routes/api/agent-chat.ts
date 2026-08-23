@@ -20,7 +20,12 @@ import { z } from "zod";
 
 const MODEL = "google/gemini-3.6-flash";
 
-type Body = { messages?: UIMessage[]; threadId?: string; designDna?: unknown; designOverrides?: unknown };
+type Body = {
+  messages?: UIMessage[];
+  threadId?: string;
+  designDna?: unknown;
+  designOverrides?: unknown;
+};
 
 export const Route = createFileRoute("/api/agent-chat")({
   server: {
@@ -33,7 +38,8 @@ export const Route = createFileRoute("/api/agent-chat")({
         const publishableKey =
           process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
         const apiKey = process.env["LOVABLE_API_KEY"];
-        if (!supabaseUrl || !publishableKey) return new Response("Backend not configured", { status: 500 });
+        if (!supabaseUrl || !publishableKey)
+          return new Response("Backend not configured", { status: 500 });
         if (!apiKey) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
         const supabase = createClient(supabaseUrl, publishableKey, {
@@ -52,7 +58,6 @@ export const Route = createFileRoute("/api/agent-chat")({
         const threadId = typeof body.threadId === "string" ? body.threadId : "";
         if (messages.length === 0) return new Response("Messages are required", { status: 400 });
         if (!threadId) return new Response("threadId is required", { status: 400 });
-
 
         // The thread must belong to the caller before anything is streamed.
         const { data: thread, error: threadErr } = await supabase

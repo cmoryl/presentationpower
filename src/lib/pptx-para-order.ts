@@ -68,8 +68,7 @@ export function withParagraphOrder(xml: string): string {
     if (blocks.length === 0) {
       out += xml.slice(cursor, pEnd + "</a:p>".length);
     } else {
-      out +=
-        xml.slice(cursor, pStart) + "<a:p>" + blocks[0] + body + "</a:p>";
+      out += xml.slice(cursor, pStart) + "<a:p>" + blocks[0] + body + "</a:p>";
     }
     cursor = pEnd + "</a:p>".length;
   }

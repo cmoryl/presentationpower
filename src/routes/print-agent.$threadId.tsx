@@ -81,7 +81,9 @@ function PrintAgentThreadPage() {
   const onAssetDetected = useCallback(
     (id: string) => {
       setAssetId(id);
-      void setPrintThreadAsset(threadId, id).then(refreshThreads).catch(() => undefined);
+      void setPrintThreadAsset(threadId, id)
+        .then(refreshThreads)
+        .catch(() => undefined);
     },
     [threadId, refreshThreads],
   );
@@ -89,7 +91,9 @@ function PrintAgentThreadPage() {
   const onFirstUserMessage = useCallback(
     (text: string) => {
       const title = text.length > 60 ? `${text.slice(0, 57)}…` : text;
-      void renamePrintThread(threadId, title).then(refreshThreads).catch(() => undefined);
+      void renamePrintThread(threadId, title)
+        .then(refreshThreads)
+        .catch(() => undefined);
     },
     [threadId, refreshThreads],
   );
@@ -108,8 +112,7 @@ function PrintAgentThreadPage() {
       await deletePrintThread(id);
       const rest = threads.filter((t) => t.id !== id);
       setThreads(rest);
-      if (id === threadId)
-        void navigate({ to: "/print-agent", replace: true });
+      if (id === threadId) void navigate({ to: "/print-agent", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not delete that conversation.");
     }

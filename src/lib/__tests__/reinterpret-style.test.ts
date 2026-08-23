@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  applyColorLock,
-  applyTypeRhythm,
-  designStyle,
-  typeRhythm,
-} from "@/lib/reinterpret-style";
+import { applyColorLock, applyTypeRhythm, designStyle, typeRhythm } from "@/lib/reinterpret-style";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 
 const slide = (index: number, title: string, bullets: string[]): MappedSlide =>

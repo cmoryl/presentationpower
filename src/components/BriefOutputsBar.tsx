@@ -48,7 +48,10 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
   }
 
   const hasSiblings =
-    Boolean(deckId) || prints.length > 0 || masterSet?.eventPlaybookId || masterSet?.socialPlaybookId;
+    Boolean(deckId) ||
+    prints.length > 0 ||
+    masterSet?.eventPlaybookId ||
+    masterSet?.socialPlaybookId;
   if (!hasSiblings) return null;
 
   // Nothing to cross-link to: only the artifact already open.

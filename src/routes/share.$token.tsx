@@ -148,9 +148,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
         // per-slide background/template override) live inside the persisted
         // content blob. Restoring them here is what keeps a shared link on the
         // same designed grounds as the editor.
-        const { content, extras } = splitSlideContent(
-          (s.content ?? {}) as Record<string, unknown>,
-        );
+        const { content, extras } = splitSlideContent((s.content ?? {}) as Record<string, unknown>);
         return applySlideExtras(
           {
             id: `share-${i}`,
@@ -364,190 +362,193 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
 
   return (
     <SlideTemplateIndustryProvider industryId={deck.design_recipe_id ?? null}>
-    <div className="min-h-screen bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
-      {/* Minimal header */}
-      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-4">
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
-              TransPerfect · Shared
-            </div>
-            <div className="mt-0.5 truncate text-base font-semibold">{deck.title}</div>
-          </div>
-          <div className="flex items-center gap-2">
-            {(locales.length > 0 || currentLang !== "en") && (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setLangOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 text-xs font-medium text-white/90 hover:border-white/40"
-                >
-                  <Languages size={12} className="text-[#A1FBF9]" />
-                  {currentLang === "en"
-                    ? "Source (EN)"
-                    : (langById.get(currentLang)?.label ?? currentLang.toUpperCase())}
-                </button>
-                {langOpen && (
-                  <div className="absolute right-0 z-30 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-[#0B0B18] shadow-xl">
-                    <button
-                      type="button"
-                      onClick={() => selectLocale("en")}
-                      className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-white/5 ${
-                        currentLang === "en" ? "bg-[#A1FBF9]/10" : ""
-                      }`}
-                    >
-                      <span>Source (EN)</span>
-                      {currentLang === "en" && <Check size={14} className="text-[#A1FBF9]" />}
-                    </button>
-                    {locales.map((c) => {
-                      const l = langById.get(c.target_lang);
-                      return (
-                        <button
-                          key={c.target_lang}
-                          type="button"
-                          onClick={() => selectLocale(c.target_lang)}
-                          className={`flex w-full items-center justify-between border-t border-white/5 px-3 py-2 text-left text-sm hover:bg-white/5 ${
-                            currentLang === c.target_lang ? "bg-[#A1FBF9]/10" : ""
-                          }`}
-                        >
-                          <span className="truncate">
-                            <span>{l?.label ?? c.target_lang}</span>{" "}
-                            <span className="text-[10px] text-white/40">{l?.native}</span>
-                          </span>
-                          {langBusy === c.target_lang ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : currentLang === c.target_lang ? (
-                            <Check size={14} className="text-[#A1FBF9]" />
-                          ) : null}
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+      <div className="min-h-screen bg-[#03002C] text-white" dir={isRtl ? "rtl" : undefined}>
+        {/* Minimal header */}
+        <header className="sticky top-0 z-20 border-b border-white/10 bg-[#03002C]/85 backdrop-blur-xl">
+          <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-6 py-4">
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-[0.35em] text-white/40">
+                TransPerfect · Shared
               </div>
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                setPresenting(true);
-                setI(0);
-                requestFullscreen();
-              }}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:bg-white/90"
-            >
-              <Play size={14} /> Present
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 px-6 py-10">
-        {slides.map((slide, idx) => {
-          const variant = byId(MODULE_VARIANTS, slide.variantId);
-          if (!variant) return null;
-          return (
-            <div
-              key={slide.id}
-              data-slide-idx={idx}
-              ref={(el) => {
-                if (el) slideRefs.current.set(idx, el);
-                else slideRefs.current.delete(idx);
-              }}
-              className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl"
-              style={{ maxWidth: 1280 }}
-            >
-              <ScaledSlide>
-                <DeckPackScope pack={pack}>
-                  <VariantRenderer
-                    slide={viewSlide(slide)}
-                    variant={variant}
-                    brand={brand}
-                    pageNumber={idx + 1}
-                    clientName={clientName}
-                    clientLogoUrl={deck.client_logo_url}
-                    subCompany={deck.sub_company ?? undefined}
-                    mode={slide.mode ?? "light"}
-                  />
-                </DeckPackScope>
-              </ScaledSlide>
+              <div className="mt-0.5 truncate text-base font-semibold">{deck.title}</div>
             </div>
-          );
-        })}
-        <footer className="mt-6 text-[10px] uppercase tracking-[0.35em] text-white/30">
-          Presented with TransPerfect Element
-        </footer>
-      </main>
-
-      {presenting && slides[i] && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black">
-          <div className="flex items-center justify-between px-6 py-3 text-xs text-white/60">
-            <div>
-              {i + 1} / {slides.length} · {deck.title}
-            </div>
-            <button
-              type="button"
-              onClick={() => setPresenting(false)}
-              className="inline-flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 hover:border-white/40"
-            >
-              <X size={12} /> Exit
-            </button>
-          </div>
-          <div className="relative flex flex-1 items-center justify-center px-8 pb-8">
-            <button
-              type="button"
-              onClick={() => setI((n) => Math.max(n - 1, 0))}
-              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-icon-inverse-muted hover:text-icon-inverse"
-              aria-label="Previous"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <div className="w-full max-w-[92vw]">
-              <div className="mx-auto w-full" style={{ maxWidth: "min(92vw, calc(92vh * 16/9))" }}>
-                {(() => {
-                  const s = slides[i];
-                  const v = byId(MODULE_VARIANTS, s.variantId);
-                  if (!v) return null;
-                  return (
-                    <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-white shadow-2xl">
-                      <SectionCue
-                        sectionId={s.sectionId}
-                        label={byId(SECTION_FRAMEWORKS, s.sectionId ?? "")?.name ?? undefined}
-                      />
-                      <SlideStage
-                        slideKey={s.id}
-                        direction={presentDirection}
-                        transition={resolveSlideTransition(s, undefined)}
+            <div className="flex items-center gap-2">
+              {(locales.length > 0 || currentLang !== "en") && (
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setLangOpen((v) => !v)}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.06] px-4 py-2 text-xs font-medium text-white/90 hover:border-white/40"
+                  >
+                    <Languages size={12} className="text-[#A1FBF9]" />
+                    {currentLang === "en"
+                      ? "Source (EN)"
+                      : (langById.get(currentLang)?.label ?? currentLang.toUpperCase())}
+                  </button>
+                  {langOpen && (
+                    <div className="absolute right-0 z-30 mt-2 w-64 overflow-hidden rounded-xl border border-white/10 bg-[#0B0B18] shadow-xl">
+                      <button
+                        type="button"
+                        onClick={() => selectLocale("en")}
+                        className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-white/5 ${
+                          currentLang === "en" ? "bg-[#A1FBF9]/10" : ""
+                        }`}
                       >
-                        <DeckPackScope pack={pack}>
-                          <VariantRenderer
-                            slide={viewSlide(s)}
-                            variant={v}
-                            brand={brand}
-                            pageNumber={i + 1}
-                            clientName={clientName}
-                            clientLogoUrl={deck.client_logo_url}
-                            subCompany={deck.sub_company ?? undefined}
-                            mode={s.mode ?? "light"}
-                          />
-                        </DeckPackScope>
-                      </SlideStage>
+                        <span>Source (EN)</span>
+                        {currentLang === "en" && <Check size={14} className="text-[#A1FBF9]" />}
+                      </button>
+                      {locales.map((c) => {
+                        const l = langById.get(c.target_lang);
+                        return (
+                          <button
+                            key={c.target_lang}
+                            type="button"
+                            onClick={() => selectLocale(c.target_lang)}
+                            className={`flex w-full items-center justify-between border-t border-white/5 px-3 py-2 text-left text-sm hover:bg-white/5 ${
+                              currentLang === c.target_lang ? "bg-[#A1FBF9]/10" : ""
+                            }`}
+                          >
+                            <span className="truncate">
+                              <span>{l?.label ?? c.target_lang}</span>{" "}
+                              <span className="text-[10px] text-white/40">{l?.native}</span>
+                            </span>
+                            {langBusy === c.target_lang ? (
+                              <Loader2 size={12} className="animate-spin" />
+                            ) : currentLang === c.target_lang ? (
+                              <Check size={14} className="text-[#A1FBF9]" />
+                            ) : null}
+                          </button>
+                        );
+                      })}
                     </div>
-                  );
-                })()}
-              </div>
+                  )}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setPresenting(true);
+                  setI(0);
+                  requestFullscreen();
+                }}
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-medium text-[#03002C] hover:bg-white/90"
+              >
+                <Play size={14} /> Present
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setI((n) => Math.min(n + 1, slides.length - 1))}
-              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-icon-inverse-muted hover:text-icon-inverse"
-              aria-label="Next"
-            >
-              <ChevronRight size={20} />
-            </button>
           </div>
-        </div>
-      )}
-    </div>
+        </header>
+
+        <main className="mx-auto flex max-w-[1280px] flex-col items-center gap-6 px-6 py-10">
+          {slides.map((slide, idx) => {
+            const variant = byId(MODULE_VARIANTS, slide.variantId);
+            if (!variant) return null;
+            return (
+              <div
+                key={slide.id}
+                data-slide-idx={idx}
+                ref={(el) => {
+                  if (el) slideRefs.current.set(idx, el);
+                  else slideRefs.current.delete(idx);
+                }}
+                className="w-full overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl"
+                style={{ maxWidth: 1280 }}
+              >
+                <ScaledSlide>
+                  <DeckPackScope pack={pack}>
+                    <VariantRenderer
+                      slide={viewSlide(slide)}
+                      variant={variant}
+                      brand={brand}
+                      pageNumber={idx + 1}
+                      clientName={clientName}
+                      clientLogoUrl={deck.client_logo_url}
+                      subCompany={deck.sub_company ?? undefined}
+                      mode={slide.mode ?? "light"}
+                    />
+                  </DeckPackScope>
+                </ScaledSlide>
+              </div>
+            );
+          })}
+          <footer className="mt-6 text-[10px] uppercase tracking-[0.35em] text-white/30">
+            Presented with TransPerfect Element
+          </footer>
+        </main>
+
+        {presenting && slides[i] && (
+          <div className="fixed inset-0 z-50 flex flex-col bg-black">
+            <div className="flex items-center justify-between px-6 py-3 text-xs text-white/60">
+              <div>
+                {i + 1} / {slides.length} · {deck.title}
+              </div>
+              <button
+                type="button"
+                onClick={() => setPresenting(false)}
+                className="inline-flex items-center gap-1 rounded-full border border-white/20 px-3 py-1 hover:border-white/40"
+              >
+                <X size={12} /> Exit
+              </button>
+            </div>
+            <div className="relative flex flex-1 items-center justify-center px-8 pb-8">
+              <button
+                type="button"
+                onClick={() => setI((n) => Math.max(n - 1, 0))}
+                className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-icon-inverse-muted hover:text-icon-inverse"
+                aria-label="Previous"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <div className="w-full max-w-[92vw]">
+                <div
+                  className="mx-auto w-full"
+                  style={{ maxWidth: "min(92vw, calc(92vh * 16/9))" }}
+                >
+                  {(() => {
+                    const s = slides[i];
+                    const v = byId(MODULE_VARIANTS, s.variantId);
+                    if (!v) return null;
+                    return (
+                      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-white shadow-2xl">
+                        <SectionCue
+                          sectionId={s.sectionId}
+                          label={byId(SECTION_FRAMEWORKS, s.sectionId ?? "")?.name ?? undefined}
+                        />
+                        <SlideStage
+                          slideKey={s.id}
+                          direction={presentDirection}
+                          transition={resolveSlideTransition(s, undefined)}
+                        >
+                          <DeckPackScope pack={pack}>
+                            <VariantRenderer
+                              slide={viewSlide(s)}
+                              variant={v}
+                              brand={brand}
+                              pageNumber={i + 1}
+                              clientName={clientName}
+                              clientLogoUrl={deck.client_logo_url}
+                              subCompany={deck.sub_company ?? undefined}
+                              mode={s.mode ?? "light"}
+                            />
+                          </DeckPackScope>
+                        </SlideStage>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setI((n) => Math.min(n + 1, slides.length - 1))}
+                className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full border border-white/20 p-2 text-icon-inverse-muted hover:text-icon-inverse"
+                aria-label="Next"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </SlideTemplateIndustryProvider>
   );
 }

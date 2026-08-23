@@ -283,7 +283,10 @@ function PresentationSegment() {
                     {variants.map((v) => {
                       const ico = iconographyForVariant(v);
                       return (
-                        <li key={v.id} className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                        <li
+                          key={v.id}
+                          className="flex min-w-0 flex-wrap items-center justify-between gap-x-2 gap-y-1"
+                        >
                           <span className="truncate">{v.name}</span>
                           <span className="flex min-w-0 flex-wrap items-center gap-2">
                             <span

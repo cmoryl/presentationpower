@@ -338,7 +338,6 @@ export type PrintContactSection = {
   rows?: PrintTableRow[];
 };
 
-
 // ---------------------------------------------------------------------------
 // DEVICE SHOWCASE — laptop screen / desktop monitor mockups
 // ---------------------------------------------------------------------------
@@ -710,7 +709,6 @@ export type ProposalCostRow = {
   price?: string;
 };
 
-
 /** An account-team card. */
 export type ProposalTeamMember = {
   name: string;
@@ -834,7 +832,14 @@ export type MultiProposalPage = {
   costNote?: string;
   team?: Array<ProposalTeamMember & { bio?: string; phone?: string }>;
   /** Global locations page — editable vector map pins (add/delete dots). */
-  mapPins?: Array<{ x: number; y: number; r?: number; kind: "service" | "prod"; name?: string; id?: string }>;
+  mapPins?: Array<{
+    x: number;
+    y: number;
+    r?: number;
+    kind: "service" | "prod";
+    name?: string;
+    id?: string;
+  }>;
   locations?: Array<{ region?: string; offices?: string[] }>;
   /** Per-region locations page — which region crop/office list to render. */
   mapRegion?: "AMERICAS" | "EMEA" | "APAC";

@@ -31,7 +31,6 @@ export const ICON_SIZES: Record<
   lg: { glyphPx: 40, containerPx: 72, gapPx: 18, radiusPx: 18 },
   xl: { glyphPx: 54, containerPx: 96, gapPx: 22, radiusPx: 22 },
   display: { glyphPx: 84, containerPx: 144, gapPx: 28, radiusPx: 28 },
-
 };
 
 // ---------- Placements ----------
@@ -153,7 +152,6 @@ export function resolveEmphasisColors(
       return { bg: "rgba(255,255,255,0.18)", fg: "#FFFFFF" };
   }
 }
-
 
 // ---------- Composition helper ----------
 export function withDefaults(spec: Partial<IconSpec> & { placement: IconPlacement }): IconSpec {
@@ -298,7 +296,10 @@ const VARIANT_ICON_RULES: PatternRule[] = [
     rationale: "Agenda items are indexed",
   },
   {
-    test: (id) => /^MV-PROC-TIMELINE|MV-PROC-PHASES|MV-PROC-STEP-CHAIN|MV-PROC-STEP-SPOTLIGHT|MV-PROC-STAGE-ORBITS|MV-CLOSE-TIMELINE/.test(id),
+    test: (id) =>
+      /^MV-PROC-TIMELINE|MV-PROC-PHASES|MV-PROC-STEP-CHAIN|MV-PROC-STEP-SPOTLIGHT|MV-PROC-STAGE-ORBITS|MV-CLOSE-TIMELINE/.test(
+        id,
+      ),
     spec: {
       placement: "numbered-badge",
       size: "md",

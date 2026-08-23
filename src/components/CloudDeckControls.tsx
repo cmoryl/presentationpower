@@ -148,7 +148,6 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
       console.warn("[autosave] save failed", e);
       return false;
     }
-
   };
 
   // Expose the flush so the navigation guard can save on exit instead of
@@ -160,7 +159,6 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
     registerSaver(deckId, () => flush.current());
     return () => unregisterSaver(deckId);
   }, [deckId, signedIn, registerSaver, unregisterSaver]);
-
 
   useEffect(() => {
     if (!deck || !brief) return;
@@ -207,7 +205,6 @@ export function AutosaveIndicator({ deckId }: { deckId: string }) {
   }, []);
 
   if (!signedIn || !deck || !brief) return null;
-
 
   const label =
     status === "saving"
@@ -337,7 +334,6 @@ export function MyCloudDecks() {
           extras,
         );
       });
-
 
       // Use a stable local id so re-loading the same cloud deck reuses the same slot.
       const localDeckId = `cloud-${d.id}`;

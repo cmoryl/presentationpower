@@ -1670,7 +1670,6 @@ export function FaithfulSlideCanvas({
   /** Whether to render the metadata badge overlay (hidden/transition/animation/media chips). */
   showChrome?: boolean;
 }) {
-
   const salt = useId().replace(/[^a-zA-Z0-9]/g, "");
   const resolved = useMemo<ResolvedLayout | undefined>(
     () => (layout ? getResolvedLayout(layout, theme) : undefined),
@@ -1719,7 +1718,6 @@ export function FaithfulSlideCanvas({
       .join("\n");
   }, [fonts]);
 
-
   const size = resolved?.size ?? { w: 13.333, h: 7.5 };
   const innerPx = size.w * 96;
   const scale =
@@ -1728,7 +1726,6 @@ export function FaithfulSlideCanvas({
       : width / innerPx;
   const renderWidth = innerPx * scale;
   const height = size.h * 96 * scale;
-
 
   const badges: Array<{ label: string; tone: "hidden" | "info" | "accent" }> = [];
   if (assets?.hidden) badges.push({ label: "Hidden", tone: "hidden" });

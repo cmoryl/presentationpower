@@ -59,15 +59,18 @@ export function useUndoHistory<T>(opts?: { limit?: number; coalesceMs?: number }
     return entry;
   }, []);
 
-  const redo = useCallback((current: T): UndoEntry<T> | null => {
-    const entry = future.current[future.current.length - 1];
-    if (!entry) return null;
-    future.current = future.current.slice(0, -1);
-    past.current = [...past.current, { value: current, label: entry.label }].slice(-limit);
-    lastPush.current = null;
-    bump();
-    return entry;
-  }, [limit]);
+  const redo = useCallback(
+    (current: T): UndoEntry<T> | null => {
+      const entry = future.current[future.current.length - 1];
+      if (!entry) return null;
+      future.current = future.current.slice(0, -1);
+      past.current = [...past.current, { value: current, label: entry.label }].slice(-limit);
+      lastPush.current = null;
+      bump();
+      return entry;
+    },
+    [limit],
+  );
 
   const clear = useCallback(() => {
     past.current = [];

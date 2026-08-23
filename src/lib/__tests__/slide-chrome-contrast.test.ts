@@ -8,9 +8,8 @@ const AA = 4.5;
 describe("locked slide chrome contrast", () => {
   it.each(["light", "dark"] as const)("keeps muted and faint %s ink at AA", (mode) => {
     for (const brand of BRAND_MODES) {
-      const backgrounds = mode === "dark"
-        ? ["#03002C", "#0A1230"]
-        : ["#FFFFFF", brand.tokens.surface];
+      const backgrounds =
+        mode === "dark" ? ["#03002C", "#0A1230"] : ["#FFFFFF", brand.tokens.surface];
       const ink = makeSlideInk(
         mode,
         brand.tokens.accent,

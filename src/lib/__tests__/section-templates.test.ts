@@ -65,7 +65,9 @@ describe("section template library", () => {
     for (const s of SECTION_FRAMEWORKS) {
       const level = primaryLevelForSection(s.id);
       const picks = new Set(
-        INDUSTRY_RECIPES.map((r) => sectionTemplate({ industryId: r.id, sectionId: s.id, level })!.variantId),
+        INDUSTRY_RECIPES.map(
+          (r) => sectionTemplate({ industryId: r.id, sectionId: s.id, level })!.variantId,
+        ),
       );
       const pool = Math.min(6, variantsForSection(s.id).length);
       expect(picks.size, `${s.id}/${level}`).toBeGreaterThanOrEqual(Math.min(pool, 3));

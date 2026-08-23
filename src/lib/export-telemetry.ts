@@ -177,7 +177,11 @@ export class ExportTelemetry {
       while (seen < done && seen < order.length) {
         const target = order[seen];
         // Attribute the elapsed slice to the slide that just completed.
-        this.notePlate(target.slideIndex, (stamp - last) / Math.max(1, done - seen), target.variantId);
+        this.notePlate(
+          target.slideIndex,
+          (stamp - last) / Math.max(1, done - seen),
+          target.variantId,
+        );
         seen += 1;
       }
       last = stamp;
@@ -223,7 +227,12 @@ export class ExportTelemetry {
           reasons.push(`heavy plate (${Math.round(s.plateBytes / 1024)} KB)`);
         if (s.assemblyMs > s.plateMs && s.assemblyMs > 250)
           reasons.push(`${s.textRuns} text runs to place`);
-        return { slideIndex: s.slideIndex, variantId: s.variantId, ms: s.totalMs, reason: reasons.join(" · ") };
+        return {
+          slideIndex: s.slideIndex,
+          variantId: s.variantId,
+          ms: s.totalMs,
+          reason: reasons.join(" · "),
+        };
       })
       .filter((b) => b.reason.length > 0)
       .sort((a, b) => b.ms - a.ms)

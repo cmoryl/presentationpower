@@ -29,14 +29,7 @@ export const LIFESCI_MSA_PARTNERSHIPS: LifeSciMsaSeed[] = [
     title: "Novartis × TransPerfect MSA Partnership",
     teaser:
       "Account one-pager for the Novartis master service agreement — relationship metrics, the full solution set, and every department supported.",
-    tags: [
-      "novartis",
-      "msa",
-      "partnership",
-      "preferred provider",
-      "life sciences",
-      "account",
-    ],
+    tags: ["novartis", "msa", "partnership", "preferred provider", "life sciences", "account"],
     collection: "Partnership one-pagers",
     sourceFile: "TP_MSA-Partnership_Novartis.ai / Novartis_JW_26.pdf",
     content: emptyMsaPartnership({

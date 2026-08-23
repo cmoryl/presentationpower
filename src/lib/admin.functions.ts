@@ -318,7 +318,6 @@ export const activateAdminUser = createServerFn({ method: "POST" })
     return { ok: true, password, generated: !data.password };
   });
 
-
 // Re-send the invitation email to a teammate who has not confirmed yet.
 const resendInput = z.object({ userId: z.string().uuid(), email: z.string().email() });
 export const resendAdminInvite = createServerFn({ method: "POST" })
@@ -347,9 +346,6 @@ function generateTempPassword() {
   crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
 }
-
-
-
 
 const inviteInput = z.object({
   email: z.string().email(),

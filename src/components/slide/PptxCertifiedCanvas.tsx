@@ -262,7 +262,10 @@ export function useCertifiedInventory(capture: CertifiedCapture | null) {
     if (!capture) return null;
     const pictures = capture.shapes.filter((s) => s.kind === "image").length;
     const boxes = capture.shapes.length - pictures;
-    const words = capture.runs.reduce((n, r) => n + r.text.trim().split(/\s+/).filter(Boolean).length, 0);
+    const words = capture.runs.reduce(
+      (n, r) => n + r.text.trim().split(/\s+/).filter(Boolean).length,
+      0,
+    );
     return { pictures, boxes, runs: capture.runs.length, words };
   }, [capture]);
 }

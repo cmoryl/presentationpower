@@ -160,15 +160,18 @@ function fixSerOrder(xml: string): string {
 const MAX_LINE_W = 20116800;
 
 function fixLineWidths(xml: string): string {
-  return xml.replace(/(<a:ln\b[^>]*?\sw=")([^"]+)(")/g, (all, pre: string, raw: string, post: string) => {
-    const n = Number(raw);
-    if (Number.isInteger(n) && n >= 0 && n <= MAX_LINE_W) return all;
-    // A nonsense value carries no design intent, and clamping it to the legal
-    // maximum floods the plot area with a 22-inch stroke (seen in a real
-    // PowerPoint render), so fall back to a 1pt hairline instead.
-    const safe = Number.isFinite(n) && n >= 0 && n <= MAX_LINE_W ? Math.round(n) : 12700;
-    return `${pre}${safe}${post}`;
-  });
+  return xml.replace(
+    /(<a:ln\b[^>]*?\sw=")([^"]+)(")/g,
+    (all, pre: string, raw: string, post: string) => {
+      const n = Number(raw);
+      if (Number.isInteger(n) && n >= 0 && n <= MAX_LINE_W) return all;
+      // A nonsense value carries no design intent, and clamping it to the legal
+      // maximum floods the plot area with a 22-inch stroke (seen in a real
+      // PowerPoint render), so fall back to a 1pt hairline instead.
+      const safe = Number.isFinite(n) && n >= 0 && n <= MAX_LINE_W ? Math.round(n) : 12700;
+      return `${pre}${safe}${post}`;
+    },
+  );
 }
 
 /** Strip elements that are invalid on a value axis. */
@@ -181,7 +184,6 @@ function fixValAx(xml: string): string {
     return cleaned === inner ? all : `<c:valAx>${cleaned}</c:valAx>`;
   });
 }
-
 
 /**
  * Make one `ppt/charts/chartN.xml` schema-valid. Safe to run on already-valid
@@ -212,4 +214,3 @@ export function repairChartXml(xml: string): string {
   out = fixLineWidths(out);
   return out;
 }
-

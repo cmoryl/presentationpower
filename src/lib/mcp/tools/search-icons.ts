@@ -10,7 +10,13 @@ export default defineTool({
     "Fuzzy-search the curated brand icon library. Returns icon names usable with set_slide_icon.",
   inputSchema: {
     query: z.string().describe("What the icon should depict, e.g. 'security' or 'growth'."),
-    limit: z.number().int().min(1).max(25).describe("Max matches to return (default 10).").optional(),
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(25)
+      .describe("Max matches to return (default 10).")
+      .optional(),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: ({ query, limit }) => {

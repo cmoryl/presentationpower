@@ -108,9 +108,7 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
             Division lockup
           </div>
           <h3 className="mt-2 text-2xl font-semibold">{division.name}</h3>
-          <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-            {division.note}
-          </p>
+          <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">{division.note}</p>
         </div>
       </div>
 
@@ -161,7 +159,6 @@ function DivisionPanel({ division }: { division: NextDivisionBrand }) {
           the spec value for surrounding design and digital tokens.
         </p>
       )}
-
 
       <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {division.lockups.map((l) => (
@@ -253,7 +250,6 @@ function NextBrandGuide() {
             >
               All brand guides
             </Link>
-
           </div>
         </div>
         <div className="absolute inset-x-0 bottom-0 flex h-1.5">
@@ -292,11 +288,10 @@ function NextBrandGuide() {
           <div className="grid gap-8 lg:grid-cols-[1.2fr_1fr]">
             <div className="space-y-4 text-black/70 dark:text-white/70">
               <p>
-                Every NEXT lockup is built from the same two parts: a{" "}
-                <strong>track name</strong> set in Gotham Bold and the <strong>NEXT 26 mark</strong>
-                , where the chevron lines carry the track accent color. The relationship between
-                those two parts is fixed — it is the one thing that makes the family read as a
-                single event.
+                Every NEXT lockup is built from the same two parts: a <strong>track name</strong>{" "}
+                set in Gotham Bold and the <strong>NEXT 26 mark</strong>, where the chevron lines
+                carry the track accent color. The relationship between those two parts is fixed — it
+                is the one thing that makes the family read as a single event.
               </p>
               <p>
                 Two orientations ship for every track. <strong>Side by side</strong> is the default
@@ -431,7 +426,6 @@ function NextBrandGuide() {
                   <th className="py-3 pr-4 font-medium">CMYK</th>
                   <th className="py-3 pr-4 font-medium">HSL</th>
                   <th className="py-3 font-medium">Pantone</th>
-
                 </tr>
               </thead>
               <tbody>
@@ -449,7 +443,6 @@ function NextBrandGuide() {
                     <td className="py-3 pr-4 tabular-nums">{d.cmyk}</td>
                     <td className="py-3 pr-4 tabular-nums">{d.hsl}</td>
                     <td className="py-3">{d.pantone}</td>
-
                   </tr>
                 ))}
               </tbody>
@@ -462,7 +455,6 @@ function NextBrandGuide() {
             <span className="tabular-nums">#00AEEF</span>. Match the artwork on screen; specify
             Pantone 306 C for anything printed or fabricated.
           </p>
-
         </Section>
 
         {/* Typography */}
@@ -620,7 +612,6 @@ function NextBrandGuide() {
           </div>
         </Section>
 
-
         {/* Misuse */}
         <Section id="misuse" eyebrow="07 · Governance" title="Rules & misuse">
           <div className="grid gap-4 md:grid-cols-2">
@@ -635,7 +626,9 @@ function NextBrandGuide() {
               >
                 <div
                   className={`text-[11px] font-semibold uppercase tracking-[0.25em] ${
-                    r.do ? "text-emerald-700 dark:text-emerald-300" : "text-red-700 dark:text-red-300"
+                    r.do
+                      ? "text-emerald-700 dark:text-emerald-300"
+                      : "text-red-700 dark:text-red-300"
                   }`}
                 >
                   {r.do ? "Do" : "Don't"}
@@ -680,10 +673,7 @@ function NextBrandGuide() {
               ["SVG", "Web, apps, presentations. Mirrored in this guide for direct download."],
               ["PNG", "Transparent raster fallback. Only when vector is impossible."],
             ].map(([k, v]) => (
-              <div
-                key={k}
-                className="rounded-2xl border border-black/10 p-5 dark:border-white/10"
-              >
+              <div key={k} className="rounded-2xl border border-black/10 p-5 dark:border-white/10">
                 <div className="text-xl font-semibold">{k}</div>
                 <p className="mt-2 text-sm text-black/60 dark:text-white/60">{v}</p>
               </div>

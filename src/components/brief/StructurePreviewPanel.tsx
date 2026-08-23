@@ -117,76 +117,80 @@ export function StructurePreviewPanel({
           )}
 
           {previews.length === 0 ? null : (
-          <>
-          {/* Artifact tabs */}
-          <div role="tablist" aria-label="Selected artifacts" className="flex flex-wrap gap-1.5">
-            {previews.map((p) => {
-              const on = p.id === active.id;
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={on}
-                  onClick={() => setActiveId(p.id)}
-                  className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
-                    on
-                      ? "border-[#03002C] bg-[#03002C] text-white"
-                      : "border-black/10 bg-white text-black/60 hover:border-black/30 hover:text-black"
-                  }`}
-                >
-                  {p.label}
-                  <span className={`ml-2 font-normal ${on ? "text-white/60" : "text-black/40"}`}>
-                    {p.output}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {active.note && (
-            <div className="mt-3 text-[11px] text-black/50">{active.note}</div>
-          )}
-
-          {/* Block rail */}
-          <ol className="mt-3 max-h-[22rem] space-y-1.5 overflow-y-auto pr-1">
-            {active.blocks.map((b, i) => (
-              <li
-                key={`${active.id}-${b.index}-${i}`}
-                className="flex gap-3 rounded-lg border border-black/[0.07] bg-[#F2F2F2]/50 px-3 py-2"
+            <>
+              {/* Artifact tabs */}
+              <div
+                role="tablist"
+                aria-label="Selected artifacts"
+                className="flex flex-wrap gap-1.5"
               >
-                <span
-                  className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold tracking-widest"
-                  style={{ color: accent }}
-                >
-                  {b.index}
-                </span>
-                <span className="min-w-0">
-                  <span className="flex flex-wrap items-baseline gap-2">
-                    <span className="text-[12.5px] font-semibold leading-tight text-[#03002C]">
-                      {b.title}
-                    </span>
-                    {b.meta && (
-                      <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-black/50">
-                        {b.meta}
+                {previews.map((p) => {
+                  const on = p.id === active.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={on}
+                      onClick={() => setActiveId(p.id)}
+                      className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
+                        on
+                          ? "border-[#03002C] bg-[#03002C] text-white"
+                          : "border-black/10 bg-white text-black/60 hover:border-black/30 hover:text-black"
+                      }`}
+                    >
+                      {p.label}
+                      <span
+                        className={`ml-2 font-normal ${on ? "text-white/60" : "text-black/40"}`}
+                      >
+                        {p.output}
                       </span>
-                    )}
-                  </span>
-                  {b.detail && (
-                    <span className="mt-0.5 line-clamp-2 block text-[11.5px] leading-snug text-black/55">
-                      {b.detail}
-                    </span>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ol>
+                    </button>
+                  );
+                })}
+              </div>
 
-          <p className="mt-3 text-[11px] leading-relaxed text-black/45">
-            This is the structure that will be generated. AI personalization rewrites the copy
-            inside each block — the block order and layout stay as shown.
-          </p>
-          </>
+              {active.note && <div className="mt-3 text-[11px] text-black/50">{active.note}</div>}
+
+              {/* Block rail */}
+              <ol className="mt-3 max-h-[22rem] space-y-1.5 overflow-y-auto pr-1">
+                {active.blocks.map((b, i) => (
+                  <li
+                    key={`${active.id}-${b.index}-${i}`}
+                    className="flex gap-3 rounded-lg border border-black/[0.07] bg-[#F2F2F2]/50 px-3 py-2"
+                  >
+                    <span
+                      className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold tracking-widest"
+                      style={{ color: accent }}
+                    >
+                      {b.index}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex flex-wrap items-baseline gap-2">
+                        <span className="text-[12.5px] font-semibold leading-tight text-[#03002C]">
+                          {b.title}
+                        </span>
+                        {b.meta && (
+                          <span className="rounded-full bg-black/[0.05] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-black/50">
+                            {b.meta}
+                          </span>
+                        )}
+                      </span>
+                      {b.detail && (
+                        <span className="mt-0.5 line-clamp-2 block text-[11.5px] leading-snug text-black/55">
+                          {b.detail}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+
+              <p className="mt-3 text-[11px] leading-relaxed text-black/45">
+                This is the structure that will be generated. AI personalization rewrites the copy
+                inside each block — the block order and layout stay as shown.
+              </p>
+            </>
           )}
         </div>
       )}

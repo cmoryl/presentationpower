@@ -24,13 +24,14 @@ function quote(s: UxStep): string {
   return `${when} · ${s.route} · ${s.label}${s.detail ? ` — ${s.detail}` : ""}`;
 }
 
-function issue(
-  partial: Omit<UxIssue, "priority" | "id"> & { id?: string },
-): UxIssue {
-  const priority =
-    SEVERITY_WEIGHT[partial.severity] + Math.min(40, (partial.occurrences - 1) * 8);
+function issue(partial: Omit<UxIssue, "priority" | "id"> & { id?: string }): UxIssue {
+  const priority = SEVERITY_WEIGHT[partial.severity] + Math.min(40, (partial.occurrences - 1) * 8);
   return {
-    id: partial.id ?? `${partial.category}-${partial.area}-${partial.title}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    id:
+      partial.id ??
+      `${partial.category}-${partial.area}-${partial.title}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-"),
     ...partial,
     priority,
   };
@@ -239,7 +240,9 @@ export function analyzeSession(session: UxSession): UxReport {
         severity: list.length > 45 ? "medium" : "low",
         area: route,
         occurrences: list.length,
-        evidence: [`${list.length} clicks/toggles between ${new Date(list[0]!.t).toLocaleTimeString()} and ${new Date(list[list.length - 1]!.t).toLocaleTimeString()}`],
+        evidence: [
+          `${list.length} clicks/toggles between ${new Date(list[0]!.t).toLocaleTimeString()} and ${new Date(list[list.length - 1]!.t).toLocaleTimeString()}`,
+        ],
         recommendation:
           "Batch the repeated step (multi-select, presets, or a keyboard shortcut) to collapse the interaction count.",
         stepIds: list.slice(0, 12).map((s) => s.id),

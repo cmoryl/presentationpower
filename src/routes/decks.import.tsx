@@ -136,7 +136,9 @@ function ImportView() {
         ...m,
         title: m.title || file.name.replace(/\.(pptx|pptm|ppsx|potx)$/i, ""),
         prospect:
-          m.prospect || file.name.replace(/\.(pptx|pptm|ppsx|potx)$/i, "").split(/[-_ ]/)[0] || "Imported deck",
+          m.prospect ||
+          file.name.replace(/\.(pptx|pptm|ppsx|potx)$/i, "").split(/[-_ ]/)[0] ||
+          "Imported deck",
       }));
       await new Promise((r) => setTimeout(r, 250));
       setStage("review");
@@ -214,8 +216,7 @@ function ImportView() {
             : fixReport.fixes[0]?.detail,
         });
       }
-      const finalCount =
-        useDeckStore.getState().decks[deckId]?.slides.length ?? mapping.length;
+      const finalCount = useDeckStore.getState().decks[deckId]?.slides.length ?? mapping.length;
       setStep("create", "done", `Deck ready · ${finalCount} slides`);
       setProgress(100);
       setStage("done");
@@ -706,7 +707,6 @@ function ReviewPanel({
                       </option>
                     ))}
                   </optgroup>
-
                 </select>
               </div>
             );

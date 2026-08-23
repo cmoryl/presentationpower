@@ -208,11 +208,12 @@ describe("toPowerPointSafeDataUrl — routing across input formats", () => {
     expect(await toPowerPointSafeDataUrl(JPEG, { blobType: "image/jpeg" })).toBe(JPEG);
     expect(await toPowerPointSafeDataUrl(PNG, { blobType: "image/png" })).toBe(PNG);
     expect(encodeCalls).toHaveLength(0);
-    expect(getImageEmbedLedger().map((r) => [r.sourceFormat, r.embeddedFormat, r.transcoded]))
-      .toEqual([
-        ["jpeg", "jpeg", false],
-        ["png", "png", false],
-      ]);
+    expect(
+      getImageEmbedLedger().map((r) => [r.sourceFormat, r.embeddedFormat, r.transcoded]),
+    ).toEqual([
+      ["jpeg", "jpeg", false],
+      ["png", "png", false],
+    ]);
   });
 
   it("passes non-universal formats through unless 'legacy images' is on", async () => {

@@ -28,9 +28,21 @@ export type ElementBrickTone = "spectrum" | "accent" | "ink" | "reversed";
 function fills(tone: ElementBrickTone, accent: string): string[] {
   if (tone === "spectrum") return [...ELEMENT_BRICK_COLORS];
   if (tone === "reversed")
-    return ["#FFFFFF", "rgba(255,255,255,0.78)", "rgba(255,255,255,0.55)", "rgba(255,255,255,0.78)", "#FFFFFF"];
+    return [
+      "#FFFFFF",
+      "rgba(255,255,255,0.78)",
+      "rgba(255,255,255,0.55)",
+      "rgba(255,255,255,0.78)",
+      "#FFFFFF",
+    ];
   if (tone === "ink")
-    return ["#0D131D", "rgba(13,19,29,0.7)", "rgba(13,19,29,0.45)", "rgba(13,19,29,0.7)", "#0D131D"];
+    return [
+      "#0D131D",
+      "rgba(13,19,29,0.7)",
+      "rgba(13,19,29,0.45)",
+      "rgba(13,19,29,0.7)",
+      "#0D131D",
+    ];
   return [
     accent,
     `color-mix(in srgb, ${accent} 70%, #FFFFFF)`,

@@ -32,7 +32,10 @@ function imageShape(over: Partial<Extract<LayoutShape, { kind: "image" }>> = {})
   } as LayoutShape;
 }
 
-function slide(over: Partial<ParsedSlide> = {}, layoutOver: Partial<SlideLayout> = {}): ParsedSlide {
+function slide(
+  over: Partial<ParsedSlide> = {},
+  layoutOver: Partial<SlideLayout> = {},
+): ParsedSlide {
   const layout: SlideLayout = {
     size: SIZE,
     shapes: [textShape()],
@@ -80,7 +83,13 @@ function deck(slides: ParsedSlide[], over: Partial<ParsedDeck> = {}): ParsedDeck
     customXmlParts: [],
     templates: {
       masters: [
-        { kind: "master", path: "ppt/slideMasters/slideMaster1.xml", placeholders: [], decorLayers: [], usedBySlides: [0] },
+        {
+          kind: "master",
+          path: "ppt/slideMasters/slideMaster1.xml",
+          placeholders: [],
+          decorLayers: [],
+          usedBySlides: [0],
+        },
       ],
       layouts: [],
     },
@@ -97,7 +106,11 @@ describe("diagnoseImportedDeck — clean deck", () => {
   it("reports no issues and full scores for a simple recovered slide", () => {
     const report = diagnoseImportedDeck(deck([slide()]));
     expect(report.issues).toEqual([]);
-    expect(report.scores).toEqual({ compatibility: 100, editablePercent: 100, visualFidelity: 100 });
+    expect(report.scores).toEqual({
+      compatibility: 100,
+      editablePercent: 100,
+      visualFidelity: 100,
+    });
     expect(report.objects).toEqual({ source: 1, recovered: 1, editable: 1, fallback: 0 });
     expect(report.substitutedFonts).toEqual([]);
   });
@@ -105,16 +118,24 @@ describe("diagnoseImportedDeck — clean deck", () => {
 
 describe("diagnoseImportedDeck — fonts", () => {
   it("flags substituted fonts once at deck level", () => {
-    const s = slide({}, { shapes: [textShape({ text: { paras: [{ runs: [{ text: "a", font: "Futura PT" }] }] } })] });
+    const s = slide(
+      {},
+      { shapes: [textShape({ text: { paras: [{ runs: [{ text: "a", font: "Futura PT" }] }] } })] },
+    );
     const report = diagnoseImportedDeck(deck([s, s]));
-    const font = report.issues.filter((i) => i.category === "fonts" && i.code === "font-substitution");
+    const font = report.issues.filter(
+      (i) => i.category === "fonts" && i.code === "font-substitution",
+    );
     expect(font).toHaveLength(1);
     expect(font[0].severity).toBe("high");
     expect(report.substitutedFonts).toEqual(["Futura PT"]);
   });
 
   it("notes when the missing font is embedded in the source", () => {
-    const s = slide({}, { shapes: [textShape({ text: { paras: [{ runs: [{ text: "a", font: "Futura PT" }] }] } })] });
+    const s = slide(
+      {},
+      { shapes: [textShape({ text: { paras: [{ runs: [{ text: "a", font: "Futura PT" }] }] } })] },
+    );
     const report = diagnoseImportedDeck(
       deck([s], { embeddedFonts: [{ typeface: "Futura PT", variants: [] }] }),
     );
@@ -124,7 +145,10 @@ describe("diagnoseImportedDeck — fonts", () => {
   });
 
   it("respects a custom available-font list", () => {
-    const s = slide({}, { shapes: [textShape({ text: { paras: [{ runs: [{ text: "a", font: "Futura PT" }] }] } })] });
+    const s = slide(
+      {},
+      { shapes: [textShape({ text: { paras: [{ runs: [{ text: "a", font: "Futura PT" }] }] } })] },
+    );
     const report = diagnoseImportedDeck(deck([s]), { availableFonts: ["Futura PT"] });
     expect(report.substitutedFonts).toEqual([]);
   });
@@ -140,12 +164,15 @@ describe("diagnoseImportedDeck — layout and text", () => {
   });
 
   it("flags fully off-canvas and merely overhanging objects differently", () => {
-    const s = slide({}, {
-      shapes: [
-        textShape({ frame: { x: 14, y: 1, w: 2, h: 1 } }),
-        imageShape({ frame: { x: 12.5, y: 1, w: 3, h: 1 } }),
-      ],
-    });
+    const s = slide(
+      {},
+      {
+        shapes: [
+          textShape({ frame: { x: 14, y: 1, w: 2, h: 1 } }),
+          imageShape({ frame: { x: 12.5, y: 1, w: 3, h: 1 } }),
+        ],
+      },
+    );
     const report = diagnoseImportedDeck(deck([s]));
     expect(codes(report)).toContain("off-canvas");
     expect(codes(report)).toContain("overhangs-canvas");
@@ -184,9 +211,12 @@ describe("diagnoseImportedDeck — layout and text", () => {
 
 describe("diagnoseImportedDeck — imagery, charts and integrity", () => {
   it("flags a flattened single-image slide", () => {
-    const s = slide({ title: "", bullets: [] }, {
-      shapes: [imageShape({ frame: { x: 0, y: 0, w: SIZE.w, h: SIZE.h } })],
-    });
+    const s = slide(
+      { title: "", bullets: [] },
+      {
+        shapes: [imageShape({ frame: { x: 0, y: 0, w: SIZE.w, h: SIZE.h } })],
+      },
+    );
     const report = diagnoseImportedDeck(deck([s]));
     const issue = report.issues.find((i) => i.code === "flattened-slide")!;
     expect(issue.severity).toBe("high");
@@ -194,12 +224,15 @@ describe("diagnoseImportedDeck — imagery, charts and integrity", () => {
   });
 
   it("flags missing image data and preserved crops", () => {
-    const s = slide({}, {
-      shapes: [
-        imageShape({ path: undefined, embedId: undefined }),
-        imageShape({ srcRect: { l: 0.1, t: 0, r: 0, b: 0 } }),
-      ],
-    });
+    const s = slide(
+      {},
+      {
+        shapes: [
+          imageShape({ path: undefined, embedId: undefined }),
+          imageShape({ srcRect: { l: 0.1, t: 0, r: 0, b: 0 } }),
+        ],
+      },
+    );
     const report = diagnoseImportedDeck(deck([s]));
     expect(codes(report)).toContain("missing-image");
     expect(report.issues.find((i) => i.code === "image-crop-preserved")!.fix).toBe("safe");
@@ -209,15 +242,18 @@ describe("diagnoseImportedDeck — imagery, charts and integrity", () => {
     const layers: ImportLayerDescriptor[] = [
       { name: "TransPerfect Logo", node: "pic", role: "Picture" },
     ];
-    const s = slide({}, {
-      shapes: [imageShape()],
-      audit: {
-        source: { sp: 0, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 1 },
-        recovered: { slide: 1, masterDecor: 0, layoutDecor: 0, total: 1, byKind: { image: 1 } },
-        missing: 0,
-        sourceLayers: layers,
+    const s = slide(
+      {},
+      {
+        shapes: [imageShape()],
+        audit: {
+          source: { sp: 0, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 1 },
+          recovered: { slide: 1, masterDecor: 0, layoutDecor: 0, total: 1, byKind: { image: 1 } },
+          missing: 0,
+          sourceLayers: layers,
+        },
       },
-    });
+    );
     const report = diagnoseImportedDeck(deck([s]));
     const logo = report.issues.find((i) => i.code === "possible-logo")!;
     expect(logo.fix).toBe("review");
@@ -225,11 +261,19 @@ describe("diagnoseImportedDeck — imagery, charts and integrity", () => {
   });
 
   it("counts unrecoverable SmartArt as a visual fallback and a blocker-free high issue", () => {
-    const s = slide({}, {
-      shapes: [
-        { kind: "diagram", z: 0, frame: { x: 1, y: 1, w: 4, h: 3 }, fallbackReason: "smartart-empty-drawing" } as LayoutShape,
-      ],
-    });
+    const s = slide(
+      {},
+      {
+        shapes: [
+          {
+            kind: "diagram",
+            z: 0,
+            frame: { x: 1, y: 1, w: 4, h: 3 },
+            fallbackReason: "smartart-empty-drawing",
+          } as LayoutShape,
+        ],
+      },
+    );
     const report = diagnoseImportedDeck(deck([s]));
     const issue = report.issues.find((i) => i.code === "smartart-conversion")!;
     expect(issue.severity).toBe("high");
@@ -238,14 +282,17 @@ describe("diagnoseImportedDeck — imagery, charts and integrity", () => {
   });
 
   it("raises a blocker when the source XML had objects the importer did not rebuild", () => {
-    const s = slide({}, {
-      shapes: [textShape()],
-      audit: {
-        source: { sp: 4, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 5 },
-        recovered: { slide: 1, masterDecor: 0, layoutDecor: 0, total: 1, byKind: { text: 1 } },
-        missing: 4,
+    const s = slide(
+      {},
+      {
+        shapes: [textShape()],
+        audit: {
+          source: { sp: 4, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 5 },
+          recovered: { slide: 1, masterDecor: 0, layoutDecor: 0, total: 1, byKind: { text: 1 } },
+          missing: 4,
+        },
       },
-    });
+    );
     const report = diagnoseImportedDeck(deck([s]));
     const issue = report.issues.find((i) => i.code === "objects-not-recovered")!;
     expect(issue.severity).toBe("blocker");
@@ -260,15 +307,29 @@ describe("diagnoseImportedDeck — media, links and accessibility", () => {
     const s = slide({
       media: [
         { kind: "video", mime: "video/mp4", path: "ppt/media/a.mp4", dataUrl: "", bytes: 0 },
-        { kind: "ole", mime: "application/octet-stream", path: "ppt/embeddings/o1.bin", dataUrl: "data:,x", bytes: 10 },
-        { kind: "video", mime: "video/x-ms-wmv", path: "ppt/media/b.wmv", dataUrl: "data:,x", bytes: 10 },
+        {
+          kind: "ole",
+          mime: "application/octet-stream",
+          path: "ppt/embeddings/o1.bin",
+          dataUrl: "data:,x",
+          bytes: 10,
+        },
+        {
+          kind: "video",
+          mime: "video/x-ms-wmv",
+          path: "ppt/media/b.wmv",
+          dataUrl: "data:,x",
+          bytes: 10,
+        },
       ],
     });
     const report = diagnoseImportedDeck(deck([s]));
     expect(codes(report)).toContain("missing-linked-media");
     expect(codes(report)).toContain("ole-object");
     expect(codes(report)).toContain("unsupported-codec");
-    expect(report.issues.find((i) => i.code === "ole-object")!.detail).toMatch(/original data are both preserved/);
+    expect(report.issues.find((i) => i.code === "ole-object")!.detail).toMatch(
+      /original data are both preserved/,
+    );
   });
 
   it("flags empty and machine-local hyperlink targets but accepts real ones", () => {
@@ -289,15 +350,18 @@ describe("diagnoseImportedDeck — media, links and accessibility", () => {
       { name: "Picture 2", node: "pic", role: "Picture" },
       { name: "Title 1", node: "sp", role: "Title placeholder", placeholder: "title", altText: "" },
     ];
-    const s = slide({}, {
-      shapes: [imageShape(), textShape()],
-      audit: {
-        source: { sp: 1, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 2 },
-        recovered: { slide: 2, masterDecor: 0, layoutDecor: 0, total: 2, byKind: {} },
-        missing: 0,
-        sourceLayers: layers,
+    const s = slide(
+      {},
+      {
+        shapes: [imageShape(), textShape()],
+        audit: {
+          source: { sp: 1, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 2 },
+          recovered: { slide: 2, masterDecor: 0, layoutDecor: 0, total: 2, byKind: {} },
+          missing: 0,
+          sourceLayers: layers,
+        },
       },
-    });
+    );
     const report = diagnoseImportedDeck(deck([s]));
     expect(report.issues.filter((i) => i.code === "missing-alt-text")).toHaveLength(1);
     expect(codes(report)).toContain("reading-order");
@@ -307,27 +371,33 @@ describe("diagnoseImportedDeck — media, links and accessibility", () => {
     const layers: ImportLayerDescriptor[] = [
       { name: "Picture 2", node: "pic", role: "Picture", altText: "Team photo" },
     ];
-    const s = slide({}, {
-      shapes: [imageShape()],
-      audit: {
-        source: { sp: 0, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 1 },
-        recovered: { slide: 1, masterDecor: 0, layoutDecor: 0, total: 1, byKind: {} },
-        missing: 0,
-        sourceLayers: layers,
+    const s = slide(
+      {},
+      {
+        shapes: [imageShape()],
+        audit: {
+          source: { sp: 0, pic: 1, cxnSp: 0, graphicFrame: 0, grpSp: 0, total: 1 },
+          recovered: { slide: 1, masterDecor: 0, layoutDecor: 0, total: 1, byKind: {} },
+          missing: 0,
+          sourceLayers: layers,
+        },
       },
-    });
+    );
     expect(codes(diagnoseImportedDeck(deck([s])))).not.toContain("missing-alt-text");
   });
 
   it("flags low-contrast text against its resolved background", () => {
-    const s = slide({}, {
-      shapes: [
-        textShape({
-          fill: { kind: "solid", color: "#FFFFFF" },
-          text: { paras: [{ runs: [{ text: "faint", sizePt: 18, color: "#EFEFEF" }] }] },
-        }),
-      ],
-    });
+    const s = slide(
+      {},
+      {
+        shapes: [
+          textShape({
+            fill: { kind: "solid", color: "#FFFFFF" },
+            text: { paras: [{ runs: [{ text: "faint", sizePt: 18, color: "#EFEFEF" }] }] },
+          }),
+        ],
+      },
+    );
     const report = diagnoseImportedDeck(deck([s]));
     const issue = report.issues.find((i) => i.code === "low-contrast")!;
     expect(issue.category).toBe("accessibility");
@@ -353,11 +423,16 @@ describe("diagnoseImportedDeck — package findings and totals", () => {
     const macro = report.issues.find((i) => i.code === "package-macros-present")!;
     expect(macro.severity).toBe("medium");
     expect(macro.category).toBe("media");
-    expect(report.issues.find((i) => i.code === "package-path-traversal")!.severity).toBe("blocker");
+    expect(report.issues.find((i) => i.code === "package-path-traversal")!.severity).toBe(
+      "blocker",
+    );
   });
 
   it("aggregates totals by severity, category and slide", () => {
-    const bad = slide({ hasAnimation: true }, { shapes: [textShape({ frame: { x: 20, y: 1, w: 1, h: 1 } })] });
+    const bad = slide(
+      { hasAnimation: true },
+      { shapes: [textShape({ frame: { x: 20, y: 1, w: 1, h: 1 } })] },
+    );
     const report = diagnoseImportedDeck(deck([slide(), bad]));
     expect(report.totals.bySlide[1]).toBeGreaterThan(0);
     expect(report.totals.bySlide[0] ?? 0).toBe(0);
@@ -366,12 +441,18 @@ describe("diagnoseImportedDeck — package findings and totals", () => {
   });
 
   it("splits safe fixes from the review queue", () => {
-    const s = slide({ transition: "fade" }, {
-      shapes: [
-        textShape({ frame: { x: 1, y: 1, w: 3, h: 0.3 }, text: { paras: [{ runs: [{ text: "y".repeat(400), sizePt: 24 }] }] } }),
-        imageShape({ srcRect: { l: 0.2, t: 0, r: 0, b: 0 } }),
-      ],
-    });
+    const s = slide(
+      { transition: "fade" },
+      {
+        shapes: [
+          textShape({
+            frame: { x: 1, y: 1, w: 3, h: 0.3 },
+            text: { paras: [{ runs: [{ text: "y".repeat(400), sizePt: 24 }] }] },
+          }),
+          imageShape({ srcRect: { l: 0.2, t: 0, r: 0, b: 0 } }),
+        ],
+      },
+    );
     const report = diagnoseImportedDeck(deck([s]));
     expect(safeFixes(report).every((i) => i.fix === "safe")).toBe(true);
     expect(safeFixes(report).length).toBeGreaterThan(0);
@@ -380,12 +461,15 @@ describe("diagnoseImportedDeck — package findings and totals", () => {
   });
 
   it("gives every issue a unique id and a slide anchor", () => {
-    const s = slide({}, {
-      shapes: [
-        textShape({ frame: { x: 20, y: 1, w: 1, h: 1 } }),
-        textShape({ frame: { x: 25, y: 1, w: 1, h: 1 } }),
-      ],
-    });
+    const s = slide(
+      {},
+      {
+        shapes: [
+          textShape({ frame: { x: 20, y: 1, w: 1, h: 1 } }),
+          textShape({ frame: { x: 25, y: 1, w: 1, h: 1 } }),
+        ],
+      },
+    );
     const report = diagnoseImportedDeck(deck([s]));
     const ids = report.issues.map((i) => i.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -395,7 +479,8 @@ describe("diagnoseImportedDeck — package findings and totals", () => {
   });
 
   it("does not punish a large clean deck relative to a small one", () => {
-    const clean = (n: number) => diagnoseImportedDeck(deck(Array.from({ length: n }, () => slide())));
+    const clean = (n: number) =>
+      diagnoseImportedDeck(deck(Array.from({ length: n }, () => slide())));
     expect(clean(3).scores.compatibility).toBe(clean(40).scores.compatibility);
   });
 });

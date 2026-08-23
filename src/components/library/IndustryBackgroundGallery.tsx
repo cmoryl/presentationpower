@@ -79,10 +79,7 @@ export function BackgroundTile({
         }}
         className="rounded-[var(--tile-r)]"
       >
-        <span
-          className="block"
-          style={{ ["--tile-r" as string]: `${radius}px` }}
-        >
+        <span className="block" style={{ ["--tile-r" as string]: `${radius}px` }}>
           {seen ? (
             <ApprovedStyleThumb pack={set.pack} scene={scene} take={take} radius={radius} />
           ) : (
@@ -109,7 +106,6 @@ export function BackgroundTile({
     </figure>
   );
 }
-
 
 /* -------------------------------------------------------------------- filters */
 
@@ -196,7 +192,11 @@ export function GalleryFilterBar({
         <span className="mr-1 text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
           Family
         </span>
-        <button type="button" className={chip(filters.family === "all")} onClick={() => set({ family: "all", scene: "all" })}>
+        <button
+          type="button"
+          className={chip(filters.family === "all")}
+          onClick={() => set({ family: "all", scene: "all" })}
+        >
           All
         </button>
         {INDUSTRY_BG_FAMILIES.map((f) => (
@@ -216,7 +216,11 @@ export function GalleryFilterBar({
         <span className="mr-1 text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
           Scene
         </span>
-        <button type="button" className={chip(filters.scene === "all")} onClick={() => set({ scene: "all" })}>
+        <button
+          type="button"
+          className={chip(filters.scene === "all")}
+          onClick={() => set({ scene: "all" })}
+        >
           All
         </button>
         {activeScenes({ ...filters, scene: "all" }).map((s) => (
@@ -236,7 +240,11 @@ export function GalleryFilterBar({
         <span className="mr-1 text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
           Take
         </span>
-        <button type="button" className={chip(filters.take === "all")} onClick={() => set({ take: "all" })}>
+        <button
+          type="button"
+          className={chip(filters.take === "all")}
+          onClick={() => set({ take: "all" })}
+        >
           All
         </button>
         {Array.from({ length: SKIN_BG_TAKES }, (_, i) => (
@@ -371,7 +379,10 @@ export function AllBackgroundsGrid({
   }, [sets, scenes, takes]);
 
   const [shown, setShown] = React.useState(PAGE_SIZE);
-  React.useEffect(() => setShown(PAGE_SIZE), [filters.q, filters.family, filters.scene, filters.take]);
+  React.useEffect(
+    () => setShown(PAGE_SIZE),
+    [filters.q, filters.family, filters.scene, filters.take],
+  );
 
   const visible = rows.slice(0, shown);
   return (

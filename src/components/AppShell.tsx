@@ -28,7 +28,6 @@ export function AppShell({ children }: { children: ReactNode }) {
   // so it collapses into a single sheet toggled from the header.
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
-  
   const inAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
   const isAdminLinked = matchesAdminLinked(pathname);
   const [adminCtx, setAdminCtx] = useState(false);
@@ -145,8 +144,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     },
   ];
 
-
-
   const adminGroups: ReadonlyArray<{
     label: string;
     items: ReadonlyArray<{ to: string; label: string }>;
@@ -221,7 +218,6 @@ export function AppShell({ children }: { children: ReactNode }) {
     "after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-0.5 after:h-0.5 " +
     "after:bg-[#003FC7] after:dark:bg-[#A1FBF9]";
 
-
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
@@ -286,7 +282,6 @@ export function AppShell({ children }: { children: ReactNode }) {
           </button>
 
           <nav className="hidden max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] lg:flex dark:!border-white/10 dark:!bg-white/[0.03]">
-
             {visibleNav.map((n) => {
               if (n.to === "/elements") {
                 const elementsActive =
@@ -358,7 +353,6 @@ export function AppShell({ children }: { children: ReactNode }) {
                                       {s.label}
                                     </Link>
                                   );
-
                                 })}
                               </div>
                             </div>
@@ -448,8 +442,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               <div className="flex flex-col gap-1">
                 {visibleNav.map((n) => {
-                  const active =
-                    pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
+                  const active = pathname === n.to || (n.to !== "/" && pathname.startsWith(n.to));
                   return (
                     <Link
                       key={`m:${n.to}`}
@@ -502,7 +495,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             </nav>
           )}
         </div>
-
       </header>
       {/* --shell-pad-top is the contract full-bleed heroes cancel with `hero-flush`. */}
       <main

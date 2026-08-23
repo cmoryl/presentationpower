@@ -63,9 +63,7 @@ export function ReinterpretCopyDiff({
   }, [designed, source.title, source.bullets, source.notes]);
 
   if (diff.rows.length === 0) {
-    return (
-      <p className="mt-3 text-xs text-black/40">This slide has no text copy to compare.</p>
-    );
+    return <p className="mt-3 text-xs text-black/40">This slide has no text copy to compare.</p>;
   }
 
   return (
@@ -87,9 +85,7 @@ export function ReinterpretCopyDiff({
 
       <div className="grid gap-3 md:grid-cols-2">
         <div>
-          <p className="mb-1 text-[11px] uppercase tracking-wider text-black/35">
-            Original copy
-          </p>
+          <p className="mb-1 text-[11px] uppercase tracking-wider text-black/35">Original copy</p>
           <ul className="space-y-1">
             {diff.rows.map((r, i) => {
               const { label, className, Icon } = FATE_META[r.fate];

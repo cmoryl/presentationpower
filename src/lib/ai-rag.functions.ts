@@ -8,11 +8,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { SynthesisInput, synthesizeKnowledgeForBriefCore } from "@/lib/ai-rag.core";
 
-export type {
-  KnowledgeSource,
-  SynthesizedSnippet,
-  SynthesisCoreResult,
-} from "@/lib/ai-rag.core";
+export type { KnowledgeSource, SynthesizedSnippet, SynthesisCoreResult } from "@/lib/ai-rag.core";
 
 export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

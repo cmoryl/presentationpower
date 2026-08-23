@@ -18,7 +18,9 @@ export function PresetThumb({ preset }: { preset: BlockPreset }) {
         const isText = part.type === "text";
         const size = Number((part.props?.["size"] as number | undefined) ?? 32);
         // Text renders as a stack of type lines so hierarchy reads at thumb size.
-        const lines = isText ? Math.max(1, Math.min(4, Math.round(part.h / Math.max(size, 20)))) : 0;
+        const lines = isText
+          ? Math.max(1, Math.min(4, Math.round(part.h / Math.max(size, 20))))
+          : 0;
         return (
           <div
             key={i}

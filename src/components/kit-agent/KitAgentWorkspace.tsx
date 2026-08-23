@@ -26,7 +26,7 @@ const COPY: Record<
   KitSurface,
   {
     eyebrow: string;
-    headline: string
+    headline: string;
     blurb: string;
     starters: string[];
     threadRoute: "/events-agent/$threadId" | "/social-agent/$threadId";
@@ -109,7 +109,9 @@ export function KitAgentWorkspace({
   const onKitDetected = useCallback(
     (id: string) => {
       setKitId(id);
-      void setKitThreadKit(threadId, id).then(refreshThreads).catch(() => undefined);
+      void setKitThreadKit(threadId, id)
+        .then(refreshThreads)
+        .catch(() => undefined);
     },
     [threadId, refreshThreads],
   );
@@ -117,7 +119,9 @@ export function KitAgentWorkspace({
   const onFirstUserMessage = useCallback(
     (text: string) => {
       const title = text.length > 60 ? `${text.slice(0, 57)}…` : text;
-      void renameKitThread(threadId, title).then(refreshThreads).catch(() => undefined);
+      void renameKitThread(threadId, title)
+        .then(refreshThreads)
+        .catch(() => undefined);
     },
     [threadId, refreshThreads],
   );
@@ -158,7 +162,9 @@ export function KitAgentWorkspace({
           <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             <Icon className="size-3.5" aria-hidden /> {copy.eyebrow}
           </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{copy.headline}</h1>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
+            {copy.headline}
+          </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{copy.blurb}</p>
         </header>
 

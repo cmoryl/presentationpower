@@ -36,19 +36,9 @@ import {
   ReinterpretControls,
   type ReinterpretControlsValue,
 } from "@/components/imported/ReinterpretControls";
-import {
-  SlideOverridePanel,
-  hasSlideOverride,
-} from "@/components/imported/SlideOverridePanel";
-import {
-  DeckContrastSummary,
-  SlideContrastWarning,
-} from "@/components/imported/ContrastWarnings";
-import {
-  auditDeckColors,
-  DEFAULT_WCAG_TARGET,
-  type WcagTarget,
-} from "@/lib/contrast-audit";
+import { SlideOverridePanel, hasSlideOverride } from "@/components/imported/SlideOverridePanel";
+import { DeckContrastSummary, SlideContrastWarning } from "@/components/imported/ContrastWarnings";
+import { auditDeckColors, DEFAULT_WCAG_TARGET, type WcagTarget } from "@/lib/contrast-audit";
 
 import {
   applyColorLock,
@@ -67,11 +57,7 @@ import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
 import { DesignPicker } from "./DesignPicker";
 import { useDesignGroupPresets } from "@/lib/design-group-presets";
 
-import {
-  applyApprovedPlans,
-  validateAiPlans,
-  type ValidatedPlan,
-} from "@/lib/reinterpret-plan";
+import { applyApprovedPlans, validateAiPlans, type ValidatedPlan } from "@/lib/reinterpret-plan";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 import type { GroundingCitation } from "@/lib/grounding-citations";
 
@@ -192,8 +178,6 @@ export function ReinterpretApprovalDialog({
       ),
     [plans, controls.lock, overrides, wcagTarget],
   );
-
-
 
   const planFn = useServerFn(planDeckReinterpretation);
   const plan = useMutation({
@@ -389,8 +373,7 @@ export function ReinterpretApprovalDialog({
                     const src = rawMapped.find((m) => m.source.index === p.index);
                     const isApproved = approved.has(p.index);
                     const designedSlide = previewDesigned.get(p.index);
-                    const why =
-                      designedSlide && src ? explainDesign(designedSlide, src) : null;
+                    const why = designedSlide && src ? explainDesign(designedSlide, src) : null;
                     return (
                       <li
                         key={p.index}
@@ -477,31 +460,35 @@ export function ReinterpretApprovalDialog({
                                 )}
                               </div>
                             )}
-                            {designedSlide && designedSlide.variantId === p.variantId && forcedLayouts.has(p.index) && (
-                              <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                                <p className="text-[11px] text-[#0B7A3B]">
-                                  Forced — copy adapted to fit this layout
-                                  {p.index === 0 ? " (cover page overridden)" : ""}.
-                                </p>
+                            {designedSlide &&
+                              designedSlide.variantId === p.variantId &&
+                              forcedLayouts.has(p.index) && (
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                                  <p className="text-[11px] text-[#0B7A3B]">
+                                    Forced — copy adapted to fit this layout
+                                    {p.index === 0 ? " (cover page overridden)" : ""}.
+                                  </p>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleForced(p.index)}
+                                    className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60 hover:bg-black/5"
+                                  >
+                                    Undo force
+                                  </button>
+                                </div>
+                              )}
+                            {designedSlide &&
+                              designedSlide.variantId === p.variantId &&
+                              !forcedLayouts.has(p.index) &&
+                              p.index === 0 && (
                                 <button
                                   type="button"
                                   onClick={() => toggleForced(p.index)}
-                                  className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60 hover:bg-black/5"
+                                  className="mt-1.5 rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
                                 >
-                                  Undo force
+                                  Apply this design to the cover page
                                 </button>
-                              </div>
-                            )}
-                            {designedSlide && designedSlide.variantId === p.variantId && !forcedLayouts.has(p.index) && p.index === 0 && (
-                              <button
-                                type="button"
-                                onClick={() => toggleForced(p.index)}
-                                className="mt-1.5 rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
-                              >
-                                Apply this design to the cover page
-                              </button>
-                            )}
-
+                              )}
 
                             {p.title && (
                               <div className="mt-2 text-sm font-medium text-[#03002C]">
@@ -532,8 +519,6 @@ export function ReinterpretApprovalDialog({
                           />
                         )}
 
-
-
                         {compare.has(p.index) && compareView !== "copy" && (
                           <ReinterpretComparePreview
                             importedDeckId={deck.id}
@@ -543,9 +528,7 @@ export function ReinterpretApprovalDialog({
                             mode={
                               overrides[p.index]?.mode === null
                                 ? "light"
-                                : (overrides[p.index]?.mode ??
-                                  controls.lock.mode ??
-                                  "light")
+                                : (overrides[p.index]?.mode ?? controls.lock.mode ?? "light")
                             }
                           />
                         )}
@@ -563,7 +546,6 @@ export function ReinterpretApprovalDialog({
                             }}
                           />
                         )}
-
 
                         {why && (
                           <div className="mt-3 rounded-lg border border-[#003FC7]/15 bg-[#E0E8F5]/50 p-3">
@@ -634,7 +616,6 @@ export function ReinterpretApprovalDialog({
                             ))}
                           </div>
                         )}
-
                       </li>
                     );
                   })}

@@ -82,7 +82,9 @@ describe("per-module stat layouts", () => {
 
 describe("layout override chain", () => {
   it("lets slide content override the module default", () => {
-    const l = resolveStatLayout("MV-STAT-KPI-RAIL", { statLayout: { shape: "dial", progress: 0.4 } });
+    const l = resolveStatLayout("MV-STAT-KPI-RAIL", {
+      statLayout: { shape: "dial", progress: 0.4 },
+    });
     expect(l.shape).toBe("dial");
     expect(l.progress).toBe(0.4);
     // untouched keys inherit from the module default

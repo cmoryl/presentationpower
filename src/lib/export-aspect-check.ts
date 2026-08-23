@@ -146,7 +146,8 @@ export function checkExportAspect(
     const pageRatio = size.width / size.height;
     const deltaPct = (Math.abs(pageRatio - targetRatio) / targetRatio) * 100;
     const severity = severityFor(deltaPct);
-    const direction = deltaPct <= ASPECT_TOLERANCE.ok ? "match" : pageRatio < targetRatio ? "taller" : "wider";
+    const direction =
+      deltaPct <= ASPECT_TOLERANCE.ok ? "match" : pageRatio < targetRatio ? "taller" : "wider";
 
     // Stretch: the raster is scaled to the box on both axes independently.
     const scaleX = 1;

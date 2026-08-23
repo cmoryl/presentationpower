@@ -101,5 +101,4 @@ describe("industry background sets", () => {
       clashing.ground("scene:cover take:0"),
     );
   });
-
 });

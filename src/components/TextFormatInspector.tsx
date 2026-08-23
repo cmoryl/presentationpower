@@ -130,7 +130,11 @@ export function TextFormatInspector({
         v: p.lineSpacing === undefined ? "— (font metrics)" : `${p.lineSpacing} pt`,
         note: s.lineHeightRatio === null ? undefined : `${s.lineHeightRatio}× line height`,
       },
-      { k: "align", v: p.align, note: current.run.align === "justify" ? "justify → left" : undefined },
+      {
+        k: "align",
+        v: p.align,
+        note: current.run.align === "justify" ? "justify → left" : undefined,
+      },
       { k: "valign", v: p.valign, note: s.singleLine ? "single line" : "wrapped block" },
       { k: "wrap", v: p.wrap ? "true" : "false" },
       { k: "color", v: `#${p.color}` },
@@ -397,8 +401,8 @@ export function TextFormatInspector({
 
       <div className="flex items-center justify-between gap-3">
         <p className="text-[11px] leading-snug text-black/50">
-          Measured on the same offscreen stage the PPTX export uses — these are the exact
-          properties written to PowerPoint.
+          Measured on the same offscreen stage the PPTX export uses — these are the exact properties
+          written to PowerPoint.
         </p>
         <button
           type="button"
@@ -459,9 +463,7 @@ export function TextFormatInspector({
                     <dt className="text-[11px] uppercase tracking-widest text-black/45">{f.k}</dt>
                     <dd className="text-right text-xs">
                       <span className="font-medium tabular-nums">{f.v}</span>
-                      {f.note && (
-                        <span className="block text-[10px] text-black/40">{f.note}</span>
-                      )}
+                      {f.note && <span className="block text-[10px] text-black/40">{f.note}</span>}
                     </dd>
                   </div>
                 ))}

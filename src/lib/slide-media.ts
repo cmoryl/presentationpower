@@ -97,9 +97,7 @@ export async function listSlideMedia(limit = 60): Promise<SlideMediaItem[]> {
     .from(BUCKET)
     .createSignedUrls(paths, SIGNED_URL_TTL_SECONDS);
   if (signed.error) throw signed.error;
-  const urlByPath = new Map(
-    (signed.data ?? []).map((s) => [s.path ?? "", s.signedUrl ?? ""]),
-  );
+  const urlByPath = new Map((signed.data ?? []).map((s) => [s.path ?? "", s.signedUrl ?? ""]));
   return files
     .map((f, i) => ({
       path: paths[i]!,

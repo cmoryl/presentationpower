@@ -20,11 +20,7 @@ import {
 } from "./slide-image-export";
 import { fetchIccProfile, wrapPdfAsX4, type IccProfileKey } from "./pdf-x4";
 import { extendRasterForBleed } from "./print-bleed-extend";
-import {
-  checkExportAspect,
-  logAspectReport,
-  type AspectCheckReport,
-} from "./export-aspect-check";
+import { checkExportAspect, logAspectReport, type AspectCheckReport } from "./export-aspect-check";
 import {
   captureVectorText,
   enableHideTextForCapture,
@@ -292,7 +288,6 @@ export async function exportPrintAssetAsPdf(
   const bleedRasterPx = Math.round(bleed * resolved.dpi);
   let bleedApproximated = false;
 
-
   // --- aspect preflight -----------------------------------------------------
   // Measured against the TRIM box: that is the geometry the capture is placed
   // into (the bleed band is generated, not rendered).
@@ -376,7 +371,6 @@ export async function exportPrintAssetAsPdf(
       if (cropMarks && bleed > 0) {
         drawCropMarks(pdf, pageWidth, pageHeight, bleed);
       }
-
     } finally {
       restoreHide?.();
     }

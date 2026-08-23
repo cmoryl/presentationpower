@@ -46,7 +46,6 @@ function Sheet({
   );
 }
 
-
 function Kicker({ pack, children }: { pack: StylePack; children: React.ReactNode }) {
   return (
     <div
@@ -213,11 +212,7 @@ function StatWall({ pack }: { pack: StylePack }) {
           <div
             key={l}
             className="flex-1 px-[4%] py-[3%]"
-            style={
-              i === 0
-                ? undefined
-                : { borderLeft: `1px solid ${pack.tokens.hairline}` }
-            }
+            style={i === 0 ? undefined : { borderLeft: `1px solid ${pack.tokens.hairline}` }}
           >
             {figure(n, i === 0, 16)}
             <div className="mt-[8%]">
@@ -231,9 +226,7 @@ function StatWall({ pack }: { pack: StylePack }) {
     );
 
   return (
-    <div
-      className={`grid gap-[3%] ${layout.stats === "cards3" ? "grid-cols-3" : "grid-cols-4"}`}
-    >
+    <div className={`grid gap-[3%] ${layout.stats === "cards3" ? "grid-cols-3" : "grid-cols-4"}`}>
       {items.map(([n, l], i) => (
         <div key={l} className="px-[7%] py-[9%]" style={cardStyle(pack)}>
           {figure(n, i === 0)}
@@ -535,9 +528,7 @@ const FRAMES: Frame[] = [
   {
     key: "bento",
     label: "Bento grid",
-    render: (p) => (
-      <GridFrame pack={p} />
-    ),
+    render: (p) => <GridFrame pack={p} />,
   },
   {
     key: "chart",
@@ -597,7 +588,10 @@ const FRAMES: Frame[] = [
         <div className="mt-[4%] flex items-start gap-[2%]">
           {["Discover", "Pilot", "Scale", "Optimize"].map((t, i) => (
             <div key={t} className="flex-1">
-              <div className="h-[3px] w-full" style={{ background: p.tokens.accent, opacity: 1 - i * 0.2 }} />
+              <div
+                className="h-[3px] w-full"
+                style={{ background: p.tokens.accent, opacity: 1 - i * 0.2 }}
+              />
               <div className="mt-[8%]">
                 <Body pack={p} size={9} muted={false}>
                   {t}
@@ -766,9 +760,7 @@ export function LookLookbook({
             ))}
           </div>
           {meta.footer && <p className="mt-4 text-[11px] text-[#03002C]/50">{meta.footer}</p>}
-          {extra && (
-            <div className="mt-5 rounded-2xl bg-[#03002C] p-4 sm:p-5">{extra}</div>
-          )}
+          {extra && <div className="mt-5 rounded-2xl bg-[#03002C] p-4 sm:p-5">{extra}</div>}
         </div>
       </div>
     </div>
@@ -811,4 +803,3 @@ export function SkinLookbook({
     />
   );
 }
-

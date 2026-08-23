@@ -24,7 +24,6 @@ import auditDeckVisuals from "./tools/audit-deck-visuals";
 import auditDeckCompleteness from "./tools/audit-deck-completeness";
 import exportDeck from "./tools/export-deck";
 
-
 // The OAuth issuer must be the direct Supabase host; the project ref is the one
 // value that survives publish unchanged.
 const projectRef = import.meta.env.VITE_SUPABASE_PROJECT_ID ?? "project-ref-unset";
@@ -73,6 +72,5 @@ export default defineMcp({
     auditDeckVisuals,
     auditDeckCompleteness,
     exportDeck,
-
   ],
 });

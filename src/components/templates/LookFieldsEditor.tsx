@@ -126,7 +126,11 @@ export function LookFieldsEditor({
           />
         </Field>
         <Field label="Name">
-          <input className={inputCls} value={draft.name} onChange={(e) => set("name", e.target.value)} />
+          <input
+            className={inputCls}
+            value={draft.name}
+            onChange={(e) => set("name", e.target.value)}
+          />
         </Field>
         <Field label="Reference" hint="What the look is drawn from">
           <input
@@ -161,7 +165,9 @@ export function LookFieldsEditor({
       </div>
 
       <fieldset>
-        <legend className="text-xs font-medium uppercase tracking-[0.18em] opacity-60">Palette</legend>
+        <legend className="text-xs font-medium uppercase tracking-[0.18em] opacity-60">
+          Palette
+        </legend>
         <div className="mt-2 grid grid-cols-5 gap-3">
           {draft.palette.map((c, i) => (
             <label key={i} className="block text-[11px]">

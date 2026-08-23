@@ -134,7 +134,8 @@ export function typeBounds(px: number, axis: keyof FillScale): { min: number; ma
 const words = (v: unknown): number =>
   typeof v === "string" ? v.trim().split(/\s+/).filter(Boolean).length : 0;
 
-const TEXTY = /^(title|subtitle|kicker|eyebrow|heading|label|body|text|copy|lead|summary|caption|quote|note|takeaway|value|unit|stat|name|role|detail|description|question|answer)/i;
+const TEXTY =
+  /^(title|subtitle|kicker|eyebrow|heading|label|body|text|copy|lead|summary|caption|quote|note|takeaway|value|unit|stat|name|role|detail|description|question|answer)/i;
 
 /** Words carried anywhere inside a content tree (arrays and nested objects). */
 function countWords(value: unknown, depth = 0): number {
@@ -169,7 +170,9 @@ function hasVisual(content: Record<string, unknown>): boolean {
   return Object.entries(content).some(
     ([k, v]) =>
       Boolean(v) &&
-      /^(background|image|imageUrl|media|video|chart|infographic|spec|diagram|imagery|photo)/i.test(k),
+      /^(background|image|imageUrl|media|video|chart|infographic|spec|diagram|imagery|photo)/i.test(
+        k,
+      ),
   );
 }
 
@@ -216,12 +219,66 @@ export function fillFamilyFor(variantId: string | null | undefined): FillFamily 
 
 /** Per-family growth appetite: how much of the available slack each axis takes. */
 const APPETITE: Record<FillFamily, Record<keyof FillScale, number>> = {
-  cover: { label: 0.25, display: 1, body: 0.6, kicker: 0.5, figure: 0.7, block: 0.5, gap: 1, plate: 0.7 },
-  statement: { label: 0.25, display: 0.95, body: 0.7, kicker: 0.5, figure: 0.7, block: 0.5, gap: 0.9, plate: 0.7 },
-  stats: { label: 0.5, display: 0.6, body: 0.6, kicker: 0.45, figure: 1, block: 0.8, gap: 0.8, plate: 0.9 },
-  chart: { label: 0.6, display: 0.5, body: 0.55, kicker: 0.4, figure: 0.8, block: 1, gap: 0.7, plate: 0.8 },
-  grid: { display: 0.4, body: 0.5, kicker: 0.35, figure: 0.6, block: 0.7, gap: 0.5, plate: 0.6, label: 0.3 },
-  content: { display: 0.7, body: 0.7, kicker: 0.45, figure: 0.7, block: 0.8, gap: 0.8, plate: 0.75, label: 0.4 },
+  cover: {
+    label: 0.25,
+    display: 1,
+    body: 0.6,
+    kicker: 0.5,
+    figure: 0.7,
+    block: 0.5,
+    gap: 1,
+    plate: 0.7,
+  },
+  statement: {
+    label: 0.25,
+    display: 0.95,
+    body: 0.7,
+    kicker: 0.5,
+    figure: 0.7,
+    block: 0.5,
+    gap: 0.9,
+    plate: 0.7,
+  },
+  stats: {
+    label: 0.5,
+    display: 0.6,
+    body: 0.6,
+    kicker: 0.45,
+    figure: 1,
+    block: 0.8,
+    gap: 0.8,
+    plate: 0.9,
+  },
+  chart: {
+    label: 0.6,
+    display: 0.5,
+    body: 0.55,
+    kicker: 0.4,
+    figure: 0.8,
+    block: 1,
+    gap: 0.7,
+    plate: 0.8,
+  },
+  grid: {
+    display: 0.4,
+    body: 0.5,
+    kicker: 0.35,
+    figure: 0.6,
+    block: 0.7,
+    gap: 0.5,
+    plate: 0.6,
+    label: 0.3,
+  },
+  content: {
+    display: 0.7,
+    body: 0.7,
+    kicker: 0.45,
+    figure: 0.7,
+    block: 0.8,
+    gap: 0.8,
+    plate: 0.75,
+    label: 0.4,
+  },
 };
 
 /** Headroom at zero load — the most each axis may grow before appetite. */
@@ -425,7 +482,6 @@ export function chartLabelPx(px: number): string {
   return fillPx(px, "label");
 }
 
-
 // ── Line-height rules ─────────────────────────────────────────────────────
 //
 // Type that grows must lead tighter, or a display line that gained 26% gains
@@ -460,9 +516,7 @@ export function fillLeading(
   // `--lead-base-*`) is used, falling back to the global role default. The
   // clamp band is likewise industry-tunable through `--lead-min-*/--lead-max-*`.
   const b =
-    typeof base === "number" && base > 0
-      ? String(base)
-      : `var(--lead-base-${axis}, ${rule.base})`;
+    typeof base === "number" && base > 0 ? String(base) : `var(--lead-base-${axis}, ${rule.base})`;
   const min = `var(--lead-min-${axis}, ${rule.min})`;
   const max = `max(${b}, var(--lead-max-${axis}, ${rule.max}))`;
   return `clamp(${min}, calc(${b} - (var(--fill-${axis}, 1) - 1) * ${rule.rate}), ${max})`;

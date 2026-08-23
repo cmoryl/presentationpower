@@ -4,7 +4,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { UIMessage } from "ai";
 
-export type AgentStageId = "queued" | "planning" | "generating" | "refining" | "exporting" | "ready";
+export type AgentStageId =
+  | "queued"
+  | "planning"
+  | "generating"
+  | "refining"
+  | "exporting"
+  | "ready";
 
 const STAGES: { id: AgentStageId; label: string; hint: string }[] = [
   { id: "queued", label: "Queued", hint: "Brief received" },
@@ -229,4 +235,3 @@ function useAnimatedNumber(target: number) {
 
   return value;
 }
-

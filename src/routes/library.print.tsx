@@ -28,9 +28,6 @@ import { PrintAssetDirectory } from "@/components/print/PrintAssetDirectory";
 import { PrintLibraryBrowser } from "@/components/print/PrintLibraryBrowser";
 import type { PrintTypeId } from "@/lib/print-library/catalog";
 
-
-
-
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
@@ -291,7 +288,6 @@ const ADAPTOR_SEED: AdaptorBriefContent = emptyAdaptorBrief({
   },
 });
 
-
 // Example hero photo — a bundled, client-ready editorial shot with the whole
 // left half held as empty wall so the headline reads cleanly, and even
 // mid-tones so the auto-scrim resolves it in both light and dark modes.
@@ -396,7 +392,6 @@ function PrintCenterPage() {
     [brandModes, previewBrandId],
   );
 
-
   const listFn = useServerFn(listMyPrintAssets);
   const delFn = useServerFn(deletePrintAsset);
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
@@ -448,7 +443,6 @@ function PrintCenterPage() {
             your decks. Pick a design, see it in your division's look, then make it yours — the
             layout, type, and print-ready file are handled.
           </p>
-
         </div>
       </header>
 
@@ -460,7 +454,6 @@ function PrintCenterPage() {
         state={browserState}
         onStateChange={patchBrowserState}
       />
-
 
       {/* Approved shelf */}
       {isAuthed === true && previewBrand ? <ApprovedShelf brand={previewBrand} /> : null}
@@ -512,9 +505,7 @@ function PrintCenterPage() {
             onDelete={onDelete}
           />
         )}
-
       </section>
-
     </AppShell>
   );
 }
@@ -532,7 +523,6 @@ function PrintCenterPage() {
 // ---------------------------------------------------------------------------
 // Detail overlay — full-size Light + Dark render for the selected template
 // ---------------------------------------------------------------------------
-
 
 function renderPrintByKind(
   kind: PrintAssetKind,
@@ -617,7 +607,6 @@ function renderPrintByKind(
     );
   return null;
 }
-
 
 function PrintTemplateHtmlButton({
   kind,

@@ -4,7 +4,7 @@ import { withHiddenFlag } from "../pptx-native-xml";
 const SLD = `<?xml version="1.0"?><p:sld xmlns:p="ns"><p:cSld/></p:sld>`;
 
 describe("withHiddenFlag (PowerPoint Hide Slide parity)", () => {
-  it("adds show=\"0\" to the slide root when hidden", () => {
+  it('adds show="0" to the slide root when hidden', () => {
     expect(withHiddenFlag(SLD, true)).toContain('<p:sld xmlns:p="ns" show="0">');
   });
 

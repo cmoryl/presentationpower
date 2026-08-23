@@ -13,10 +13,7 @@
 // A locked snapshot of every fingerprint makes any authored change explicit.
 
 import { describe, expect, it } from "vitest";
-import {
-  INDUSTRY_BG_FAMILIES,
-  industryBackgroundSets,
-} from "../industry-backgrounds";
+import { INDUSTRY_BG_FAMILIES, industryBackgroundSets } from "../industry-backgrounds";
 import type { SkinScene } from "../skin-backgrounds";
 
 const sets = industryBackgroundSets();
@@ -67,7 +64,6 @@ function plates(tokens: Set<string>): string[] {
   return [...tokens].filter((t) => t.startsWith("plate:"));
 }
 
-
 function distance(a: Set<string>, b: Set<string>): number {
   let shared = 0;
   for (const t of a) if (b.has(t)) shared += 1;
@@ -99,7 +95,6 @@ function fingerprint(art: string) {
     hash: hashTokens(tokens),
   };
 }
-
 
 interface Thumb {
   id: string;
@@ -164,7 +159,6 @@ describe("R01–R30 thumbnail visual regression", () => {
         `${family.label}: too-similar thumbnails (closest vector pair ${worst.pair} d=${worst.d.toFixed(3)})`,
       ).toEqual([]);
     });
-
   }
 
   it("locks a fingerprint snapshot for every recipe × family thumbnail", () => {

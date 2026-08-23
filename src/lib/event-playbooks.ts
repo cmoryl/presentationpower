@@ -1216,7 +1216,6 @@ export const EVENT_PLAYBOOKS: EventPlaybook[] = [
   },
 ];
 
-
 export const EVENT_PLAYBOOKS_BY_ID: Record<string, EventPlaybook> = Object.fromEntries(
   EVENT_PLAYBOOKS.map((p) => [p.id, p]),
 );

@@ -52,15 +52,18 @@ function block(header: RegExp): string {
 
 const GLASS_DARK = block(/@utility\s+glass-dark\s*\{/);
 const GLASS = block(/@utility\s+glass\s*\{/);
-const GLASS_LIGHT_OPAQUE = block(
-  /\.contrast-boost\s+\.glass\s*,\s*\.contrast-boost\.glass\s*\{/,
-);
+const GLASS_LIGHT_OPAQUE = block(/\.contrast-boost\s+\.glass\s*,\s*\.contrast-boost\.glass\s*\{/);
 
 describe("export surface parity (CSS ↔ PPTX)", () => {
   it("dark gradient stops are byte-identical to `.glass-dark`", () => {
     expect(GLASS_DARK).toContain(`#${SURFACE_CSS_TOKENS.dark.gradientTop.toLowerCase()}`);
     expect(GLASS_DARK).toContain(`#${SURFACE_CSS_TOKENS.dark.gradientBottom.toLowerCase()}`);
-    const t = getSurfaceTreatment({ w: 4, h: 2.5, fill: SURFACE_CSS_TOKENS.dark.gradientTop, dark: true })!;
+    const t = getSurfaceTreatment({
+      w: 4,
+      h: 2.5,
+      fill: SURFACE_CSS_TOKENS.dark.gradientTop,
+      dark: true,
+    })!;
     expect(t.gradient.stops.map((s) => s.color)).toEqual([
       SURFACE_CSS_TOKENS.dark.gradientTop,
       SURFACE_CSS_TOKENS.dark.gradientBottom,
@@ -178,7 +181,10 @@ describe("surface tiering (card vs chip)", () => {
 
   it("a 0.3in chip gets the gradient fill but NO shadow or ambient wash", () => {
     const { slide, calls } = capture(true);
-    slide.addShape("rect" as never, { x: 1, y: 1, w: 1.6, h: 0.3, fill: { color: "A1FBF9" } } as never);
+    slide.addShape(
+      "rect" as never,
+      { x: 1, y: 1, w: 1.6, h: 0.3, fill: { color: "A1FBF9" } } as never,
+    );
     const o = calls[0].o;
     expect(o.shadow).toBeUndefined();
     const name = String(o.objectName ?? "");
@@ -189,9 +195,18 @@ describe("surface tiering (card vs chip)", () => {
   it("every surface box exports with No line (SURFACE_LINE_POLICY)", () => {
     const { slide, calls } = capture(true);
     // chip, glass card and generic surface tiers all obey the same contract
-    slide.addShape("rect" as never, { x: 1, y: 1, w: 1.6, h: 0.3, fill: { color: "A1FBF9" } } as never);
-    slide.addShape("rect" as never, { x: 1, y: 2, w: 4, h: 2.5, fill: { color: "141435" } } as never);
-    slide.addShape("rect" as never, { x: 6, y: 2, w: 3, h: 1.5, fill: { color: "EC388A" } } as never);
+    slide.addShape(
+      "rect" as never,
+      { x: 1, y: 1, w: 1.6, h: 0.3, fill: { color: "A1FBF9" } } as never,
+    );
+    slide.addShape(
+      "rect" as never,
+      { x: 1, y: 2, w: 4, h: 2.5, fill: { color: "141435" } } as never,
+    );
+    slide.addShape(
+      "rect" as never,
+      { x: 6, y: 2, w: 3, h: 1.5, fill: { color: "EC388A" } } as never,
+    );
     expect(SURFACE_LINE_POLICY).toBe("none");
     for (const c of calls) {
       expect((c.o.line as { type?: string })?.type).toBe("none");
@@ -200,33 +215,42 @@ describe("surface tiering (card vs chip)", () => {
 
   it("drops a module-authored hairline keyline on a surface tile", () => {
     const { slide, calls } = capture(false);
-    slide.addShape("roundRect" as never, {
-      x: 1,
-      y: 1,
-      w: 3.4,
-      h: 2,
-      fill: { color: "FFFFFF" },
-      line: { color: "E5E1DA", width: 0.75 },
-    } as never);
+    slide.addShape(
+      "roundRect" as never,
+      {
+        x: 1,
+        y: 1,
+        w: 3.4,
+        h: 2,
+        fill: { color: "FFFFFF" },
+        line: { color: "E5E1DA", width: 0.75 },
+      } as never,
+    );
     expect((calls[0].o.line as { type?: string }).type).toBe("none");
   });
 
   it("keeps a deliberate heavy or dashed outline on a non-glass tile", () => {
     const { slide, calls } = capture(true);
-    slide.addShape("rect" as never, {
-      x: 1,
-      y: 1,
-      w: 3,
-      h: 1.5,
-      fill: { color: "EC388A" },
-      line: { color: "FFEB66", width: 2 },
-    } as never);
+    slide.addShape(
+      "rect" as never,
+      {
+        x: 1,
+        y: 1,
+        w: 3,
+        h: 1.5,
+        fill: { color: "EC388A" },
+        line: { color: "FFEB66", width: 2 },
+      } as never,
+    );
     expect((calls[0].o.line as { color?: string }).color).toBe("FFEB66");
   });
 
   it("a 4x2.5in card painted in a neutral surface fill exports as the glass panel", () => {
     const { slide, calls } = capture(true);
-    slide.addShape("rect" as never, { x: 1, y: 1, w: 4, h: 2.5, fill: { color: "141435" } } as never);
+    slide.addShape(
+      "rect" as never,
+      { x: 1, y: 1, w: 4, h: 2.5, fill: { color: "141435" } } as never,
+    );
     const o = calls[0].o;
     expect(o.shadow).toBeTruthy();
     const name = String(o.objectName ?? "");
@@ -239,11 +263,13 @@ describe("surface tiering (card vs chip)", () => {
 
   it("a coloured (non-glass) tile keeps the generic 2-stop treatment", () => {
     const { slide, calls } = capture(true);
-    slide.addShape("rect" as never, { x: 1, y: 1, w: 4, h: 2.5, fill: { color: "EC388A" } } as never);
+    slide.addShape(
+      "rect" as never,
+      { x: 1, y: 1, w: 4, h: 2.5, fill: { color: "EC388A" } } as never,
+    );
     const name = String(calls[0].o.objectName ?? "");
     expect(parseGradientTag(name)!.stops).toHaveLength(2);
   });
-
 });
 
 // -----------------------------------------------------------------------------

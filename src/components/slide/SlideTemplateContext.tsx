@@ -22,9 +22,7 @@ export function SlideTemplateProvider({
   template: ResolvedSlideTemplate | null;
   children: React.ReactNode;
 }) {
-  return (
-    <SlideTemplateContext.Provider value={template}>{children}</SlideTemplateContext.Provider>
-  );
+  return <SlideTemplateContext.Provider value={template}>{children}</SlideTemplateContext.Provider>;
 }
 
 // Deck-level industry recipe (R01…R30) — the library axis that decides which

@@ -6,11 +6,7 @@
 // Presentational only: the parent owns the override map.
 
 import { SlidersHorizontal, X } from "lucide-react";
-import {
-  DESIGN_STYLES,
-  TYPE_RHYTHMS,
-  type SlideStyleOverride,
-} from "@/lib/reinterpret-style";
+import { DESIGN_STYLES, TYPE_RHYTHMS, type SlideStyleOverride } from "@/lib/reinterpret-style";
 
 /** Same brand accents offered by the deck-wide colour lock. */
 const ACCENTS: Array<{ hex: string; label: string }> = [
@@ -26,7 +22,11 @@ const ACCENTS: Array<{ hex: string; label: string }> = [
 
 export function hasSlideOverride(o: SlideStyleOverride | undefined): boolean {
   return Boolean(
-    o && (o.styleId !== undefined || o.rhythmId !== undefined || o.accent !== undefined || o.mode !== undefined),
+    o &&
+    (o.styleId !== undefined ||
+      o.rhythmId !== undefined ||
+      o.accent !== undefined ||
+      o.mode !== undefined),
   );
 }
 

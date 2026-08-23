@@ -21,7 +21,6 @@ type AppliedSwap = {
   at: number;
 };
 
-
 const SEVERITY_META: Record<Severity, { label: string; ring: string; chip: string; dot: string }> =
   {
     critical: {
@@ -91,7 +90,8 @@ export function ArtDirectorPanel({
   if (!deck) return null;
 
   function applySwap(note: ArtDirectorNote) {
-    if (!deck || !onSwapVariant || note.slideIndex === undefined || !note.suggestedVariantId) return;
+    if (!deck || !onSwapVariant || note.slideIndex === undefined || !note.suggestedVariantId)
+      return;
     const slideIndex = note.slideIndex;
     const target = deck.slides[slideIndex];
     if (!target) return;
@@ -135,8 +135,6 @@ export function ArtDirectorPanel({
 
     onNavigateToSlide?.(slideIndex);
   }
-
-
 
   async function onRun() {
     if (!deck) return;
@@ -303,7 +301,6 @@ export function ArtDirectorPanel({
               )}
             </div>
           </div>
-
 
           {/* Chapter balance + moments */}
           <div className="lg:col-span-8 space-y-4">
@@ -523,7 +520,6 @@ export function ArtDirectorPanel({
                                   </button>
                                 );
                               })()}
-
                           </div>
                           <div className="mt-2 text-sm font-medium">{n.headline}</div>
                           <div className="mt-1 text-sm text-white/70">{n.detail}</div>

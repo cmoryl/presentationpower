@@ -63,10 +63,23 @@ export const DATAFORCE_SPOTLIGHTS: DataForceSpotlightSeed[] = [
         },
       ],
       stats: [
-        { label: "Independent evaluations per item", value: "2", unit: "×", caption: "Plus a third-annotator tie-break" },
+        {
+          label: "Independent evaluations per item",
+          value: "2",
+          unit: "×",
+          caption: "Plus a third-annotator tie-break",
+        },
         { label: "Evaluation goals", value: "3", caption: "Query, response, ranking" },
-        { label: "Feedback loop", value: "Real time", caption: "Disagreement rate surfaced weekly" },
-        { label: "Follow-on scope", value: "Multiple batches", caption: "Added after the initial pilot" },
+        {
+          label: "Feedback loop",
+          value: "Real time",
+          caption: "Disagreement rate surfaced weekly",
+        },
+        {
+          label: "Follow-on scope",
+          value: "Multiple batches",
+          caption: "Added after the initial pilot",
+        },
       ],
       quote: {
         text: "Real-time feedback from the disagreement rate revealed when a posed question was simply too difficult to reach an agreeable state — so requirements could be refined mid-flight.",

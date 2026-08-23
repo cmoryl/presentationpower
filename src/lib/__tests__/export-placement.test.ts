@@ -50,9 +50,7 @@ describe("export placement fingerprints", () => {
   it("flags elements that appear or vanish across a capture", () => {
     const missing = BASE.slice(0, 2);
     expect(diffPlacement(BASE, missing).map((d) => d.field)).toEqual(["missing"]);
-    expect(
-      diffPlacement(missing, BASE).map((d) => d.field),
-    ).toEqual(["added"]);
+    expect(diffPlacement(missing, BASE).map((d) => d.field)).toEqual(["added"]);
   });
 
   it("measures every plane, copy, figure and media element", () => {

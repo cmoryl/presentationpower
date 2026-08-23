@@ -60,7 +60,14 @@ export function specCardToPng(card: SpecCard, width = 1600, height = 900): strin
   ctx.fillRect(0, 0, width, height);
 
   // Accent glow, matching the aurora treatment used on screen.
-  const orb = ctx.createRadialGradient(width * 0.86, height * 0.9, 0, width * 0.86, height * 0.9, height * 0.7);
+  const orb = ctx.createRadialGradient(
+    width * 0.86,
+    height * 0.9,
+    0,
+    width * 0.86,
+    height * 0.9,
+    height * 0.7,
+  );
   orb.addColorStop(0, "rgba(161,251,249,0.42)");
   orb.addColorStop(1, "rgba(161,251,249,0)");
   ctx.fillStyle = orb;

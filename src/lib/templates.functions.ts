@@ -89,9 +89,12 @@ function toOverride(r: Row): TemplateBackgroundOverride {
   };
 }
 
-async function assertAdmin(supabase: {
-  rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
-}, userId: string) {
+async function assertAdmin(
+  supabase: {
+    rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>;
+  },
+  userId: string,
+) {
   const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (!data) throw new Error("Admin access required.");
 }
@@ -107,7 +110,6 @@ export const PUBLIC_TEMPLATE_TABLES = {
 } as const;
 
 export { toTemplate as parseTemplateRow, toOverride as parseOverrideRow };
-
 
 /** Admin read — drafts included. */
 export const listAllTemplates = createServerFn({ method: "GET" })
@@ -153,7 +155,12 @@ export const saveTemplate = createServerFn({ method: "POST" })
       created_by: context.userId,
     };
     const q = data.id
-      ? context.supabase.from("custom_templates").update(payload).eq("id", data.id).select("*").single()
+      ? context.supabase
+          .from("custom_templates")
+          .update(payload)
+          .eq("id", data.id)
+          .select("*")
+          .single()
       : context.supabase.from("custom_templates").insert(payload).select("*").single();
     const { data: row, error } = await q;
     if (error) {

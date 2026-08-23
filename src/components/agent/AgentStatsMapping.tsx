@@ -29,7 +29,9 @@ function OriginBadge({ origin }: { origin: string }) {
     className: "bg-foreground/[0.07] text-foreground/60",
   };
   return (
-    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${s.className}`}>
+    <span
+      className={`inline-block rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${s.className}`}
+    >
       {s.label}
     </span>
   );
@@ -47,7 +49,12 @@ export function AgentStatsMapping({
   onSubmit?: (text: string) => void;
 }) {
   const groups = useMemo(() => {
-    const out: Array<{ key: string; title: string; position: number | null; rows: StatMappingEntry[] }> = [];
+    const out: Array<{
+      key: string;
+      title: string;
+      position: number | null;
+      rows: StatMappingEntry[];
+    }> = [];
     for (const e of mapping.entries) {
       const key = `${e.slide_position ?? "?"}::${e.slide_title}`;
       const hit = out.find((g) => g.key === key);
@@ -134,10 +141,14 @@ export function AgentStatsMapping({
                     <td className="px-3 py-1.5">
                       <OriginBadge origin={e.origin} />
                       {e.source ? (
-                        <span className="mt-1 block leading-snug text-foreground/55">{e.source}</span>
+                        <span className="mt-1 block leading-snug text-foreground/55">
+                          {e.source}
+                        </span>
                       ) : null}
                       {e.note ? (
-                        <span className="mt-0.5 block leading-snug text-foreground/45">{e.note}</span>
+                        <span className="mt-0.5 block leading-snug text-foreground/45">
+                          {e.note}
+                        </span>
                       ) : null}
                     </td>
                   </tr>
@@ -179,7 +190,9 @@ export function AgentStatsMapping({
             type="button"
             disabled={busy}
             onClick={() =>
-              onSubmit("Some of those numbers are wrong — show me the mapping again with these corrections: ")
+              onSubmit(
+                "Some of those numbers are wrong — show me the mapping again with these corrections: ",
+              )
             }
             className="rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-medium text-foreground/70 transition disabled:opacity-40 hover:bg-foreground/[0.05]"
           >
@@ -188,7 +201,11 @@ export function AgentStatsMapping({
           <button
             type="button"
             disabled={busy}
-            onClick={() => onSubmit("Only write the figures I supplied — leave the placeholders and unsourced ones off the slides.")}
+            onClick={() =>
+              onSubmit(
+                "Only write the figures I supplied — leave the placeholders and unsourced ones off the slides.",
+              )
+            }
             className="rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-medium text-foreground/70 transition disabled:opacity-40 hover:bg-foreground/[0.05]"
           >
             Skip unsourced

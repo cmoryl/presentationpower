@@ -33,7 +33,6 @@ export type MappedSlide = {
   };
 };
 
-
 export type MapOptions = {
   theme?: ParsedTheme;
 };

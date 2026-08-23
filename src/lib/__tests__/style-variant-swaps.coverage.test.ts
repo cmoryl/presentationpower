@@ -49,10 +49,16 @@ describe("bento swap coverage", () => {
     expect(mappedIds.length).toBeGreaterThanOrEqual(7);
     for (const id of mappedIds) {
       // source and target must both be real registered modules
-      expect(MODULE_VARIANTS.some((v) => v.id === id), `source ${id} missing`).toBe(true);
+      expect(
+        MODULE_VARIANTS.some((v) => v.id === id),
+        `source ${id} missing`,
+      ).toBe(true);
       const target = BENTO_SIBLINGS[id];
       expect(target.startsWith("MV-BENTO-"), `${id} → ${target} is not a bento module`).toBe(true);
-      expect(MODULE_VARIANTS.some((v) => v.id === target), `target ${target} missing`).toBe(true);
+      expect(
+        MODULE_VARIANTS.some((v) => v.id === target),
+        `target ${target} missing`,
+      ).toBe(true);
     }
   });
 
@@ -79,7 +85,12 @@ describe("bento swap coverage", () => {
   });
 
   it("leaves unmapped families alone even under the bento style", () => {
-    for (const id of ["MV-IMG-BEFORE-AFTER", "MV-CLOSE-CTA", "MV-CLOSE-THANKS", "MV-KPI-DASHBOARD"]) {
+    for (const id of [
+      "MV-IMG-BEFORE-AFTER",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-THANKS",
+      "MV-KPI-DASHBOARD",
+    ]) {
       expect(bentoSiblingFor(id, cards)).toBeNull();
     }
   });

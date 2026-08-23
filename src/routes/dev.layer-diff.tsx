@@ -31,7 +31,8 @@ export const Route = createFileRoute("/dev/layer-diff")({
       { property: "og:title", content: "Layer diff harness" },
       {
         property: "og:description",
-        content: "Compares layered vs. flat export previews and flags designed regions with no editable object.",
+        content:
+          "Compares layered vs. flat export previews and flags designed regions with no editable object.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -79,9 +80,9 @@ declare global {
   interface Window {
     __tpLayerDiff?: {
       variants: string[];
-      run: (jobs: Array<[string, "light" | "dark"]>) => Promise<
-        Array<Omit<LayerDiffResult, "flatPlate" | "decorPlate" | "diffOverlay">>
-      >;
+      run: (
+        jobs: Array<[string, "light" | "dark"]>,
+      ) => Promise<Array<Omit<LayerDiffResult, "flatPlate" | "decorPlate" | "diffOverlay">>>;
     };
   }
 }
@@ -155,12 +156,14 @@ function LayerDiffHarness() {
 
   return (
     <main className="mx-auto max-w-[1200px] p-8 font-sans">
-      <h1 className="text-2xl font-semibold tracking-tight">Layer diff · layered vs. previous export</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        Layer diff · layered vs. previous export
+      </h1>
       <p className="mt-2 max-w-[70ch] text-sm text-black/60">
         The flat plate is what the previous export produced. The decor plate is what the layered
         export ships as background — everything else must arrive as native objects. Magenta cells on
-        the heatmap are designed regions with no editable object behind them (missing layer);
-        green cells are covered. Fails above {Math.round(GAP_FAIL_RATIO * 100)}% uncovered.
+        the heatmap are designed regions with no editable object behind them (missing layer); green
+        cells are covered. Fails above {Math.round(GAP_FAIL_RATIO * 100)}% uncovered.
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -233,7 +236,9 @@ function LayerDiffHarness() {
         <ul className="mt-6 space-y-1 text-xs text-black/60">
           {log.map((r, i) => (
             <li key={`${r.variantId}-${r.mode}-${i}`}>
-              <span className={r.ok ? "text-[#0B7A3B]" : "text-[#B2003A]"}>{r.ok ? "PASS" : "FAIL"}</span>{" "}
+              <span className={r.ok ? "text-[#0B7A3B]" : "text-[#B2003A]"}>
+                {r.ok ? "PASS" : "FAIL"}
+              </span>{" "}
               {r.variantId} · {r.mode} · {r.shapes}sh / {r.pictures}pic / {r.textRuns}runs
               {r.coverage ? ` · ${Math.round(r.coverage.gapRatio * 100)}% uncovered` : ""}
             </li>

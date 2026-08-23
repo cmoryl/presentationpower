@@ -197,7 +197,6 @@ export function packBackgroundEnvelope(pack: StylePack, seed = "readability"): B
   return { lightest: rgbToHex(light), darkest: rgbToHex(dark) };
 }
 
-
 /* ── the guard ──────────────────────────────────────────────────────────── */
 
 /** Ink tokens the guard is allowed to correct, with their reading role. */
@@ -249,7 +248,12 @@ function worstRatio(ink: string, env: BackgroundEnvelope): { ratio: number; agai
  * sheets, darker on light sheets) until it clears `required` against BOTH ends
  * of the envelope. Hue is preserved; only lightness moves.
  */
-function correctInk(ink: string, env: BackgroundEnvelope, required: number, mode: "light" | "dark") {
+function correctInk(
+  ink: string,
+  env: BackgroundEnvelope,
+  required: number,
+  mode: "light" | "dark",
+) {
   const toward = mode === "dark" ? "white" : "black";
   const base = hexToRgb(ink);
   for (let step = 0; step <= 20; step++) {

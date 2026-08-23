@@ -35,9 +35,9 @@ function SceneQaPage() {
           <div className="text-xs uppercase tracking-[0.25em] text-[#003FC7]">Admin</div>
           <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em]">Industry Scene QA</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-            Every tile is the live background engine output — the same layers the slide stage and the
-            PPTX/PDF/PNG exporters paint. Use grayscale to confirm each industry stays distinct by
-            silhouette alone, and thumbnail size to check the art survives the /library card.
+            Every tile is the live background engine output — the same layers the slide stage and
+            the PPTX/PDF/PNG exporters paint. Use grayscale to confirm each industry stays distinct
+            by silhouette alone, and thumbnail size to check the art survives the /library card.
           </p>
         </header>
         <SceneQaViewer />

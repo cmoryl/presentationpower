@@ -300,7 +300,9 @@ export function BackgroundImageryPanel({
     setBusy(true);
     setError(null);
     try {
-      const { dataUrl } = await generate({ data: { prompt: aiPrompt.trim(), divisionId: divisionId ?? null } });
+      const { dataUrl } = await generate({
+        data: { prompt: aiPrompt.trim(), divisionId: divisionId ?? null },
+      });
       const uploaded = await uploadDataUrl(dataUrl, "ai-background.png");
       onChange({
         kind: "ai",
@@ -511,29 +513,27 @@ export function BackgroundImageryPanel({
                 "upload",
                 "ai",
               ] as Tab[]
-            ).map(
-              (t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => {
-                    setTab(t);
-                    if (t === "solid" && current?.kind !== "color") {
-                      commitSolid({});
-                    } else if (t === "gradient" && current?.kind !== "gradient") {
-                      commitGradient({});
-                    } else if (t === "pattern" && current?.kind !== "pattern") {
-                      commitPattern({});
-                    }
-                  }}
-                  className={`rounded-full px-2 py-1.5 uppercase tracking-widest transition ${
-                    tab === t ? "bg-black text-white" : "text-black/60 hover:text-black"
-                  }`}
-                >
-                  {t}
-                </button>
-              ),
-            )}
+            ).map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => {
+                  setTab(t);
+                  if (t === "solid" && current?.kind !== "color") {
+                    commitSolid({});
+                  } else if (t === "gradient" && current?.kind !== "gradient") {
+                    commitGradient({});
+                  } else if (t === "pattern" && current?.kind !== "pattern") {
+                    commitPattern({});
+                  }
+                }}
+                className={`rounded-full px-2 py-1.5 uppercase tracking-widest transition ${
+                  tab === t ? "bg-black text-white" : "text-black/60 hover:text-black"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
           </div>
 
           {error && (

@@ -82,9 +82,7 @@ function litPath(c: Ctx, d: string, color: string, width: number, strength = 0.5
 
 function node(c: Ctx, x: number, y: number, r: number, color: string, filled = true): string {
   const L = lift(c.s);
-  return (
-    `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="${filled ? a(color, 0.32 * c.k * L) : a(c.s.surface, 0.5 * c.k)}" stroke="${a(color, 0.75 * c.k * L)}" stroke-width="1.6"/>`
-  );
+  return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r.toFixed(1)}" fill="${filled ? a(color, 0.32 * c.k * L) : a(c.s.surface, 0.5 * c.k)}" stroke="${a(color, 0.75 * c.k * L)}" stroke-width="1.6"/>`;
 }
 
 /* ══════════════════════════════════════════════ ARCHITECTURE-FAMILY SIGNATURES
@@ -192,7 +190,9 @@ function decisionArch(c: Ctx): string {
       [ox + sgn * 620, y1],
       [ox + sgn * 980, y1 - 24],
     ]);
-    out.push(litPath(c, d, branch === 1 ? s.a1 : s.a2, branch === 1 ? 3 : 1.6, branch === 1 ? 0.75 : 0.4));
+    out.push(
+      litPath(c, d, branch === 1 ? s.a1 : s.a2, branch === 1 ? 3 : 1.6, branch === 1 ? 0.75 : 0.4),
+    );
     out.push(node(c, ox + sgn * 620, y1, branch === 1 ? 13 : 8, branch === 1 ? s.signal : s.a2));
   }
   out.push(node(c, ox, H * 0.58, 18, s.a1));
@@ -236,7 +236,15 @@ function sculptural(c: Ctx): string {
   }
   // Plinth + horizon rule.
   out.push(
-    plane(c, { id: uid(c, "pl"), x: cx - 300, y: H - 96, w: 600, h: 34, depth: 1, material: "stone" }),
+    plane(c, {
+      id: uid(c, "pl"),
+      x: cx - 300,
+      y: H - 96,
+      w: 600,
+      h: 34,
+      depth: 1,
+      material: "stone",
+    }),
     ground(c, cx, H - 58, 760, 20),
     `<path d="M0 ${H - 62} H${W}" stroke="${a(s.a1, 0.24 * k * L)}" stroke-width="1"/>`,
   );
@@ -365,7 +373,9 @@ function secureZones(c: Ctx): string {
     const pts: string[] = [];
     for (let i = 0; i < 6; i += 1) {
       const ang = (Math.PI / 3) * i - Math.PI / 2;
-      pts.push(`${(cx + Math.cos(ang) * r).toFixed(1)},${(cy + Math.sin(ang) * r * 1.06).toFixed(1)}`);
+      pts.push(
+        `${(cx + Math.cos(ang) * r).toFixed(1)},${(cy + Math.sin(ang) * r * 1.06).toFixed(1)}`,
+      );
     }
     const breach = ring === 3;
     out.push(
@@ -396,7 +406,9 @@ function coverageMesh(c: Ctx): string {
   }
   for (let i = 1; i <= 8; i += 1) {
     const y = hy + (H + 40 - hy) * Math.pow(i / 8, 2.2);
-    out.push(`<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(s.a2, 0.14 * k * L)}" stroke-width="1"/>`);
+    out.push(
+      `<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(s.a2, 0.14 * k * L)}" stroke-width="1"/>`,
+    );
   }
   // Three abstract vertical tower anchors at unequal thirds.
   const towers = [W * 0.22, W * 0.52, W * 0.79].map((x, i) => ({ x, top: H * (0.2 + i * 0.06) }));
@@ -487,7 +499,8 @@ function hubNetwork(c: Ctx): string {
   const { s, k } = c;
   const L = lift(s);
   const out = [atmosphere(c, { focusX: W * 0.5, focusY: H * 0.6, punch: 0.85 })];
-  const iso = (x: number, y: number) => [W * 0.5 + (x - y) * 0.86, H * 0.44 + (x + y) * 0.44] as const;
+  const iso = (x: number, y: number) =>
+    [W * 0.5 + (x - y) * 0.86, H * 0.44 + (x + y) * 0.44] as const;
   // Iso ground grid.
   for (let i = -6; i <= 6; i += 1) {
     const [ax, ay] = iso(i * 90, -560);
@@ -510,7 +523,15 @@ function hubNetwork(c: Ctx): string {
   // Lanes first, so hubs sit on top.
   centers.forEach((p, i) => {
     const q = centers[(i + 1) % centers.length]!;
-    out.push(litPath(c, `M${p[0].toFixed(0)} ${p[1].toFixed(0)} L${q[0].toFixed(0)} ${q[1].toFixed(0)}`, i % 2 ? s.a1 : s.a2, 2, 0.45));
+    out.push(
+      litPath(
+        c,
+        `M${p[0].toFixed(0)} ${p[1].toFixed(0)} L${q[0].toFixed(0)} ${q[1].toFixed(0)}`,
+        i % 2 ? s.a1 : s.a2,
+        2,
+        0.45,
+      ),
+    );
     // Directional chevrons along the lane.
     for (let t = 0.3; t < 0.9; t += 0.28) {
       const mx = p[0] + (q[0] - p[0]) * t;
@@ -560,7 +581,11 @@ function constellation(c: Ctx): string {
   people.forEach(([px, py], i) => {
     const q = people[(i + 4) % people.length]!;
     out.push(
-      `<path d="${spline([[px, py], [(px + q[0]) / 2, (py + q[1]) / 2 - 40], [q[0], q[1]]])}" fill="none" stroke="${a(s.a1, 0.2 * k * L)}" stroke-width="1"/>`,
+      `<path d="${spline([
+        [px, py],
+        [(px + q[0]) / 2, (py + q[1]) / 2 - 40],
+        [q[0], q[1]],
+      ])}" fill="none" stroke="${a(s.a1, 0.2 * k * L)}" stroke-width="1"/>`,
     );
   });
   people.forEach(([px, py, band], i) => {
@@ -592,10 +617,14 @@ function coverageShells(c: Ctx): string {
     const r = 120 + i * 62;
     const gid = uid(c, `cs${i}`);
     out.push(
-      `<defs>${linear(gid, [
-        { at: 0, color: a(i % 2 ? s.a1 : s.a2, (0.3 - i * 0.035) * k * L) },
-        { at: 1, color: a(i % 2 ? s.a1 : s.a2, 0.02 * k * L) },
-      ], { x1: "0%", y1: "0%", x2: "0%", y2: "100%" })}</defs>`,
+      `<defs>${linear(
+        gid,
+        [
+          { at: 0, color: a(i % 2 ? s.a1 : s.a2, (0.3 - i * 0.035) * k * L) },
+          { at: 1, color: a(i % 2 ? s.a1 : s.a2, 0.02 * k * L) },
+        ],
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+      )}</defs>`,
       `<path d="M${(cx - r).toFixed(0)} ${cy.toFixed(0)} a${r} ${(r * 0.86).toFixed(0)} 0 0 1 ${(r * 2).toFixed(0)} 0 Z" fill="url(#${gid})" stroke="${a(i === 0 ? s.a1 : contrastInk(s), (i === 0 ? 0.8 : 0.2) * k * L)}" stroke-width="${i === 0 ? 2.4 : 1.2}"/>`,
     );
   }
@@ -678,11 +707,23 @@ function corridor(c: Ctx): string {
 function membrane(c: Ctx): string {
   const { s, k } = c;
   const L = lift(s);
-  const out = [atmosphere(c, { focusX: c.dir > 0 ? W * 0.36 : W * 0.64, focusY: H * 0.5, punch: 1.2 })];
+  const out = [
+    atmosphere(c, { focusX: c.dir > 0 ? W * 0.36 : W * 0.64, focusY: H * 0.5, punch: 1.2 }),
+  ];
   // Bilayer band sweeping the lower half.
   const yb = H * 0.68;
-  const d1 = spline([[-40, yb - 40], [W * 0.3, yb + 30], [W * 0.7, yb - 40], [W + 40, yb + 20]]);
-  const d2 = spline([[-40, yb + 34], [W * 0.3, yb + 104], [W * 0.7, yb + 34], [W + 40, yb + 94]]);
+  const d1 = spline([
+    [-40, yb - 40],
+    [W * 0.3, yb + 30],
+    [W * 0.7, yb - 40],
+    [W + 40, yb + 20],
+  ]);
+  const d2 = spline([
+    [-40, yb + 34],
+    [W * 0.3, yb + 104],
+    [W * 0.7, yb + 34],
+    [W + 40, yb + 94],
+  ]);
   out.push(
     `<path d="${d1}" fill="none" stroke="${a(s.a1, 0.5 * k * L)}" stroke-width="3"/>`,
     `<path d="${d2}" fill="none" stroke="${a(s.a1, 0.34 * k * L)}" stroke-width="2"/>`,
@@ -758,12 +799,16 @@ function inquiry(c: Ctx): string {
   }
   // Radiating inquiry arcs fanning from the stack.
   for (let i = 0; i < 7; i += 1) {
-    const ang = (-Math.PI / 2) + (i - 3) * 0.24;
+    const ang = -Math.PI / 2 + (i - 3) * 0.24;
     const r = 250 + (i % 3) * 90;
     const ex = ax + Math.cos(ang) * r * (c.dir > 0 ? 1 : -1);
     const ey = ay + Math.sin(ang) * r * 0.9;
     out.push(
-      `<path d="${spline([[ax, ay], [(ax + ex) / 2 + 40, (ay + ey) / 2], [ex, ey]])}" fill="none" stroke="${a(i % 2 ? s.a1 : s.a2, (0.42 - (i % 3) * 0.08) * k * L)}" stroke-width="${i === 3 ? 2.4 : 1.2}"/>`,
+      `<path d="${spline([
+        [ax, ay],
+        [(ax + ex) / 2 + 40, (ay + ey) / 2],
+        [ex, ey],
+      ])}" fill="none" stroke="${a(i % 2 ? s.a1 : s.a2, (0.42 - (i % 3) * 0.08) * k * L)}" stroke-width="${i === 3 ? 2.4 : 1.2}"/>`,
       node(c, ex, ey, i === 3 ? 12 : 7, i === 3 ? s.signal : s.a2),
     );
   }
@@ -804,10 +849,18 @@ function energyGrid(c: Ctx): string {
       const nx = pyl[i + 1]!;
       const nt = H * (0.24 + ((i + 1) % 2) * 0.05);
       out.push(
-        litPath(c, `M${x} ${top + 30} Q ${(x + nx) / 2} ${(top + nt) / 2 + 60}, ${nx} ${nt + 30}`, s.signal, 1.6, 0.5),
+        litPath(
+          c,
+          `M${x} ${top + 30} Q ${(x + nx) / 2} ${(top + nt) / 2 + 60}, ${nx} ${nt + 30}`,
+          s.signal,
+          1.6,
+          0.5,
+        ),
       );
     }
-    out.push(`<circle cx="${x.toFixed(0)}" cy="${top.toFixed(0)}" r="5" fill="${a(s.signal, 0.9 * k * L)}"/>`);
+    out.push(
+      `<circle cx="${x.toFixed(0)}" cy="${top.toFixed(0)}" r="5" fill="${a(s.signal, 0.9 * k * L)}"/>`,
+    );
   });
   out.push(bloom(c, W * 0.5, H * 0.44, 340, s.a2, 0.24));
   return out.join("");
@@ -824,10 +877,14 @@ function horizonSpace(c: Ctx): string {
   for (let i = 0; i < 5; i += 1) {
     const gid = uid(c, `sk${i}`);
     out.push(
-      `<defs>${linear(gid, [
-        { at: 0, color: a(i % 2 ? s.a2 : s.a1, (0.2 - i * 0.03) * k * L) },
-        { at: 1, color: a(s.a2, 0) },
-      ], { x1: "0%", y1: "0%", x2: "0%", y2: "100%" })}</defs>`,
+      `<defs>${linear(
+        gid,
+        [
+          { at: 0, color: a(i % 2 ? s.a2 : s.a1, (0.2 - i * 0.03) * k * L) },
+          { at: 1, color: a(s.a2, 0) },
+        ],
+        { x1: "0%", y1: "0%", x2: "0%", y2: "100%" },
+      )}</defs>`,
       `<rect x="0" y="${(hy - 220 + i * 40).toFixed(0)}" width="${W}" height="60" fill="url(#${gid})"/>`,
     );
   }
@@ -837,7 +894,11 @@ function horizonSpace(c: Ctx): string {
     `<circle cx="${sunX.toFixed(0)}" cy="${(hy - 26).toFixed(0)}" r="72" fill="${a(shade(s.a2, 0.25), 0.42 * k * L)}" stroke="${a(s.a1, 0.5 * k * L)}" stroke-width="1.4"/>`,
   );
   // Distant headland silhouettes — depth planes.
-  [[0.55, 0.22], [0.75, 0.34], [1, 0.5]].forEach(([depth, alpha], i) => {
+  [
+    [0.55, 0.22],
+    [0.75, 0.34],
+    [1, 0.5],
+  ].forEach(([depth, alpha], i) => {
     const y = hy + i * 16;
     const pts: Array<[number, number]> = [];
     for (let x = -40; x <= W + 40; x += 120) {
@@ -865,19 +926,25 @@ function horizonSpace(c: Ctx): string {
 function aeroBody(c: Ctx): string {
   const { s, k } = c;
   const L = lift(s);
-  const out = [atmosphere(c, { focusX: c.dir > 0 ? W * 0.42 : W * 0.58, focusY: H * 0.44, punch: 0.95 })];
+  const out = [
+    atmosphere(c, { focusX: c.dir > 0 ? W * 0.42 : W * 0.58, focusY: H * 0.44, punch: 0.95 }),
+  ];
   const flip = c.dir > 0 ? 1 : -1;
   const mirror = (x: number) => (flip > 0 ? x : W - x);
   // Body surface: two long tapering panels with a specular sweep between them.
   const gid = uid(c, "car");
   out.push(
-    `<defs>${linear(gid, [
-      { at: 0, color: a(shade(s.ink, 0.1), 0.1 * k * L) },
-      { at: 0.44, color: a(shade(s.a2, 0.3), 0.5 * k * L) },
-      { at: 0.52, color: a(shade(s.ink, 0.4), 0.6 * k * L) },
-      { at: 0.62, color: a(s.a1, 0.24 * k * L) },
-      { at: 1, color: a(s.deep, 0.44 * k * L) },
-    ], { x1: "0%", y1: "0%", x2: "20%", y2: "100%" })}</defs>`,
+    `<defs>${linear(
+      gid,
+      [
+        { at: 0, color: a(shade(s.ink, 0.1), 0.1 * k * L) },
+        { at: 0.44, color: a(shade(s.a2, 0.3), 0.5 * k * L) },
+        { at: 0.52, color: a(shade(s.ink, 0.4), 0.6 * k * L) },
+        { at: 0.62, color: a(s.a1, 0.24 * k * L) },
+        { at: 1, color: a(s.deep, 0.44 * k * L) },
+      ],
+      { x1: "0%", y1: "0%", x2: "20%", y2: "100%" },
+    )}</defs>`,
   );
   const top = spline([
     [mirror(-80), H * 0.62],
@@ -892,7 +959,9 @@ function aeroBody(c: Ctx): string {
     [mirror(W * 0.35), H * 0.7],
     [mirror(-80), H * 0.82],
   ]);
-  out.push(`<path d="${top} L${mirror(W + 80).toFixed(0)} ${(H * 0.78).toFixed(0)} ${bottom.replace(/^M[^C]*/, "")} Z" fill="url(#${gid})" stroke="${a(shade(s.a2, 0.4), 0.5 * k * L)}" stroke-width="1.6"/>`);
+  out.push(
+    `<path d="${top} L${mirror(W + 80).toFixed(0)} ${(H * 0.78).toFixed(0)} ${bottom.replace(/^M[^C]*/, "")} Z" fill="url(#${gid})" stroke="${a(shade(s.a2, 0.4), 0.5 * k * L)}" stroke-width="1.6"/>`,
+  );
   // Crease lines following the body.
   for (let i = 1; i <= 3; i += 1) {
     const d = spline([
@@ -900,11 +969,21 @@ function aeroBody(c: Ctx): string {
       [mirror(W * 0.4), H * (0.48 + i * 0.035)],
       [mirror(W + 60), H * (0.62 + i * 0.03)],
     ]);
-    out.push(`<path d="${d}" fill="none" stroke="${a(shade(s.ink, 0.3), (0.3 - i * 0.06) * k * L)}" stroke-width="1.2"/>`);
+    out.push(
+      `<path d="${d}" fill="none" stroke="${a(shade(s.ink, 0.3), (0.3 - i * 0.06) * k * L)}" stroke-width="1.2"/>`,
+    );
   }
   // Headlight blade + speed streaks trailing behind.
   out.push(
-    beam(c, { x1: mirror(W * 0.86), y1: H * 0.52, x2: mirror(W * 0.2), y2: H * 0.5, width: 26, color: s.signal, strength: 0.6 }),
+    beam(c, {
+      x1: mirror(W * 0.86),
+      y1: H * 0.52,
+      x2: mirror(W * 0.2),
+      y2: H * 0.5,
+      width: 26,
+      color: s.signal,
+      strength: 0.6,
+    }),
   );
   for (let i = 0; i < 12; i += 1) {
     const y = H * 0.24 + c.r() * H * 0.6;
@@ -934,7 +1013,9 @@ function performanceLanes(c: Ctx): string {
   }
   for (let i = 1; i <= 7; i += 1) {
     const y = vpy + (H + 40 - vpy) * Math.pow(i / 7, 2.4);
-    out.push(`<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(contrastInk(s), 0.12 * k * L)}" stroke-width="1"/>`);
+    out.push(
+      `<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(contrastInk(s), 0.12 * k * L)}" stroke-width="1"/>`,
+    );
   }
   // Velocity bands: hard diagonal slashes with motion falloff.
   for (let i = 0; i < 7; i += 1) {
@@ -999,7 +1080,15 @@ function lensSpace(c: Ctx): string {
   out.push(bloom(c, fx, H * 0.42, 230, s.a1, 0.42));
   // Anamorphic streak through the focus.
   out.push(
-    beam(c, { x1: 0, y1: H * 0.42, x2: W, y2: H * 0.42 - 26, width: 10, color: s.signal, strength: 0.42 }),
+    beam(c, {
+      x1: 0,
+      y1: H * 0.42,
+      x2: W,
+      y2: H * 0.42 - 26,
+      width: 10,
+      color: s.signal,
+      strength: 0.42,
+    }),
   );
   // Cinema frame bars, top and bottom — the letterbox gesture.
   out.push(
@@ -1046,7 +1135,9 @@ function stageSpace(c: Ctx): string {
       `<path d="M${x} ${trussY} V${H * 0.78} M${x - 16} ${trussY} V${H * 0.78} M${x + 16} ${trussY} V${H * 0.78}" stroke="${a(contrastInk(s), 0.3 * k * L)}" stroke-width="1.2"/>`,
     );
     for (let y = trussY + 30; y < H * 0.78; y += 40) {
-      out.push(`<path d="M${x - 16} ${y} l16 20 l16 -20" fill="none" stroke="${a(contrastInk(s), 0.2 * k * L)}" stroke-width="1"/>`);
+      out.push(
+        `<path d="M${x - 16} ${y} l16 20 l16 -20" fill="none" stroke="${a(contrastInk(s), 0.2 * k * L)}" stroke-width="1"/>`,
+      );
     }
   });
   // Fixtures on the rig.
@@ -1073,12 +1164,24 @@ function stageSpace(c: Ctx): string {
 function judicial(c: Ctx): string {
   const { s, k } = c;
   const L = lift(s);
-  const out = [atmosphere(c, { focusX: c.dir > 0 ? W * 0.3 : W * 0.7, focusY: H * 0.3, punch: 1.1 })];
+  const out = [
+    atmosphere(c, { focusX: c.dir > 0 ? W * 0.3 : W * 0.7, focusY: H * 0.3, punch: 1.1 }),
+  ];
   // Heavy columns — few, tall, deeply shaded (authority, not civic openness).
   const colX = c.dir > 0 ? [70, 190, 310] : [W - 130, W - 250, W - 370];
   colX.forEach((x, i) => {
     out.push(
-      plane(c, { id: uid(c, `jc${i}`), x, y: 60, w: 60, h: H - 190, depth: 1 - i * 0.22, material: "stone", rim: "left", rimColor: s.signal }),
+      plane(c, {
+        id: uid(c, `jc${i}`),
+        x,
+        y: 60,
+        w: 60,
+        h: H - 190,
+        depth: 1 - i * 0.22,
+        material: "stone",
+        rim: "left",
+        rimColor: s.signal,
+      }),
       hatch(c, { x, y: 60, w: 60, h: H - 190, step: 7, alpha: 0.1, angle: 0 }),
     );
   });
@@ -1119,9 +1222,13 @@ function civicService(c: Ctx): string {
   const out = [atmosphere(c, { focusX: W * 0.5, focusY: H * 0.36, punch: 1.15 })];
   // Institutional grid across the whole sheet — measured, public, open.
   for (let x = 0; x <= W; x += 80)
-    out.push(`<path d="M${x} 0 V${H}" stroke="${a(contrastInk(s), 0.07 * k * L)}" stroke-width="1"/>`);
+    out.push(
+      `<path d="M${x} 0 V${H}" stroke="${a(contrastInk(s), 0.07 * k * L)}" stroke-width="1"/>`,
+    );
   for (let y = 0; y <= H; y += 80)
-    out.push(`<path d="M0 ${y} H${W}" stroke="${a(contrastInk(s), 0.07 * k * L)}" stroke-width="1"/>`);
+    out.push(
+      `<path d="M0 ${y} H${W}" stroke="${a(contrastInk(s), 0.07 * k * L)}" stroke-width="1"/>`,
+    );
   // A low, wide civic canopy: slender piers under a light roof plane.
   const base = H * 0.72;
   const piers = 11;
@@ -1132,7 +1239,17 @@ function civicService(c: Ctx): string {
     );
   }
   out.push(
-    plane(c, { id: uid(c, "cvroof"), x: 60, y: H * 0.36, w: W - 120, h: 46, depth: 0.9, material: "stone", rim: "top", rimColor: s.a1 }),
+    plane(c, {
+      id: uid(c, "cvroof"),
+      x: 60,
+      y: H * 0.36,
+      w: W - 120,
+      h: 46,
+      depth: 0.9,
+      material: "stone",
+      rim: "top",
+      rimColor: s.a1,
+    }),
     `<path d="M40 ${base} H${W - 40}" stroke="${a(contrastInk(s), 0.34 * k * L)}" stroke-width="2"/>`,
   );
   // Public-service modules: an even rank of open cards below the canopy.
@@ -1151,7 +1268,9 @@ function civicService(c: Ctx): string {
 function materialStrata(c: Ctx): string {
   const { s, k } = c;
   const L = lift(s);
-  const out = [atmosphere(c, { focusX: c.dir > 0 ? W * 0.66 : W * 0.34, focusY: H * 0.3, punch: 1.25 })];
+  const out = [
+    atmosphere(c, { focusX: c.dir > 0 ? W * 0.66 : W * 0.34, focusY: H * 0.3, punch: 1.25 }),
+  ];
   // Ingredient strata: thick, warm, slightly irregular horizontal layers.
   let y = H * 0.42;
   for (let i = 0; i < 6; i += 1) {
@@ -1164,7 +1283,10 @@ function materialStrata(c: Ctx): string {
     out.push(
       `<path d="${spline(pts)} L${W + 40} ${(y + h).toFixed(0)} L-40 ${(y + h).toFixed(0)} Z" fill="${a(tint, (0.3 - i * 0.025) * k * L)}" stroke="${a(shade(tint, -0.2), 0.3 * k * L)}" stroke-width="1"/>`,
     );
-    if (i % 2 === 0) out.push(hatch(c, { x: 0, y, w: W, h, step: 11, color: shade(tint, -0.3), alpha: 0.1, angle: 8 }));
+    if (i % 2 === 0)
+      out.push(
+        hatch(c, { x: 0, y, w: W, h, step: 11, color: shade(tint, -0.3), alpha: 0.1, angle: 8 }),
+      );
     y += h;
   }
   // Pack-form abstractions: soft-shouldered vessels standing in the top third.
@@ -1211,7 +1333,10 @@ function earthSystem(c: Ctx): string {
   const eco: Array<[number, number]> = [];
   for (let i = 0; i < 7; i += 1) {
     const ang = (i / 7) * Math.PI * 2 + 0.6;
-    eco.push([cx + Math.cos(ang) * (200 + (i % 3) * 90), cy + Math.sin(ang) * (140 + (i % 2) * 80)]);
+    eco.push([
+      cx + Math.cos(ang) * (200 + (i % 3) * 90),
+      cy + Math.sin(ang) * (140 + (i % 2) * 80),
+    ]);
   }
   eco.forEach((p, i) => {
     const q = eco[(i + 2) % eco.length]!;
@@ -1330,12 +1455,22 @@ function productionCell(c: Ctx): string {
       `<polygon points="${tx},${ty + w} ${tx + w},${ty + w * 0.5} ${tx + w},${ty + w * 0.5 + hgt} ${tx},${ty + w + hgt}" fill="${a(s.deep, 0.44 * k * L)}" stroke="${a(contrastInk(s), 0.24 * k * L)}" stroke-width="1"/>`,
     );
     if (i % 2 === 0)
-      out.push(`<polygon points="${tx},${ty} ${tx + w},${ty + w * 0.5} ${tx},${ty + w} ${tx - w},${ty + w * 0.5}" fill="none" stroke="${a(s.signal, 0.75 * k * L)}" stroke-width="1.8"/>`);
+      out.push(
+        `<polygon points="${tx},${ty} ${tx + w},${ty + w * 0.5} ${tx},${ty + w} ${tx - w},${ty + w * 0.5}" fill="none" stroke="${a(s.signal, 0.75 * k * L)}" stroke-width="1.8"/>`,
+      );
   }
   // Conveyor path linking the cells.
   const [sx, sy] = iso(-60, 240);
   const [ex, ey] = iso(720, 240);
-  out.push(litPath(c, `M${sx.toFixed(0)} ${sy.toFixed(0)} L${ex.toFixed(0)} ${ey.toFixed(0)}`, s.a1, 3, 0.55));
+  out.push(
+    litPath(
+      c,
+      `M${sx.toFixed(0)} ${sy.toFixed(0)} L${ex.toFixed(0)} ${ey.toFixed(0)}`,
+      s.a1,
+      3,
+      0.55,
+    ),
+  );
   return out.join("");
 }
 
@@ -1360,7 +1495,9 @@ function orbital(c: Ctx): string {
   // Instrument frame ticks along the top.
   for (let i = 0; i <= 26; i += 1) {
     const x = 60 + (i / 26) * (W - 120);
-    out.push(`<path d="M${x.toFixed(0)} 70 v${i % 4 === 0 ? 18 : 9}" stroke="${a(contrastInk(s), 0.3 * k * L)}" stroke-width="1"/>`);
+    out.push(
+      `<path d="M${x.toFixed(0)} 70 v${i % 4 === 0 ? 18 : 9}" stroke="${a(contrastInk(s), 0.3 * k * L)}" stroke-width="1"/>`,
+    );
   }
   // Star field + a single tracked craft with a trajectory tail.
   for (let i = 0; i < 60; i += 1) {
@@ -1370,7 +1507,17 @@ function orbital(c: Ctx): string {
   }
   const tx = c.dir > 0 ? W * 0.72 : W * 0.28;
   out.push(
-    litPath(c, spline([[tx - 300, H * 0.44], [tx - 120, H * 0.3], [tx, H * 0.26]]), s.signal, 2, 0.6),
+    litPath(
+      c,
+      spline([
+        [tx - 300, H * 0.44],
+        [tx - 120, H * 0.3],
+        [tx, H * 0.26],
+      ]),
+      s.signal,
+      2,
+      0.6,
+    ),
     `<polygon points="${tx},${(H * 0.26).toFixed(0)} ${(tx - 20).toFixed(0)},${(H * 0.29).toFixed(0)} ${(tx - 14).toFixed(0)},${(H * 0.25).toFixed(0)}" fill="${a(s.signal, 0.9 * k * L)}"/>`,
   );
   return out.join("");
@@ -1440,7 +1587,9 @@ function neonHorizon(c: Ctx): string {
   }
   for (let i = 1; i <= 9; i += 1) {
     const y = hy + (H + 60 - hy) * Math.pow(i / 9, 2.4);
-    out.push(`<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(s.a2, 0.24 * k * L)}" stroke-width="1"/>`);
+    out.push(
+      `<path d="M0 ${y.toFixed(0)} H${W}" stroke="${a(s.a2, 0.24 * k * L)}" stroke-width="1"/>`,
+    );
   }
   out.push(
     bloom(c, vpx, hy, 340, s.a2, 0.4),
@@ -1657,7 +1806,9 @@ export function dataTreatment(c: Ctx, id: DataTreatment): string {
       // Transaction pulses: short lit dashes travelling a pair of rails.
       for (let row = 0; row < 2; row += 1) {
         const y = baseY - row * 44;
-        out.push(`<path d="M70 ${y} H${W - 70}" stroke="${a(contrastInk(s), 0.14 * k * L)}" stroke-width="1"/>`);
+        out.push(
+          `<path d="M70 ${y} H${W - 70}" stroke="${a(contrastInk(s), 0.14 * k * L)}" stroke-width="1"/>`,
+        );
         for (let i = 0; i < 7; i += 1) {
           const x = 90 + i * ((W - 200) / 7) + (row ? 30 : 0);
           out.push(
@@ -1696,7 +1847,9 @@ export function dataTreatment(c: Ctx, id: DataTreatment): string {
     }
     case "editorial": {
       // Minimal editorial metric field: one rule, two measure marks.
-      out.push(`<path d="M${mx} ${baseY} h${c.dir > 0 ? 180 : -180}" stroke="${a(s.a1, 0.4 * k * L)}" stroke-width="2"/>`);
+      out.push(
+        `<path d="M${mx} ${baseY} h${c.dir > 0 ? 180 : -180}" stroke="${a(s.a1, 0.4 * k * L)}" stroke-width="2"/>`,
+      );
       for (let i = 1; i <= 2; i += 1) {
         out.push(
           `<path d="M${mx} ${(baseY - i * 78).toFixed(0)} h${c.dir > 0 ? 30 : -30}" stroke="${a(contrastInk(s), 0.2 * k * L)}" stroke-width="1"/>`,
@@ -1711,9 +1864,13 @@ export function dataTreatment(c: Ctx, id: DataTreatment): string {
         const x = 90 + (i / 9) * (W - 180);
         const y = baseY - 26 - Math.abs(Math.sin(i * 1.1 + c.take)) * 96;
         pts.push([x, y]);
-        out.push(`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="3.4" fill="${a(s.a2, 0.6 * k * L)}"/>`);
+        out.push(
+          `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="3.4" fill="${a(s.a2, 0.6 * k * L)}"/>`,
+        );
       }
-      out.push(`<path d="${spline(pts)}" fill="none" stroke="${a(s.a1, 0.4 * k * L)}" stroke-width="1.4"/>`);
+      out.push(
+        `<path d="${spline(pts)}" fill="none" stroke="${a(s.a1, 0.4 * k * L)}" stroke-width="1.4"/>`,
+      );
       break;
     }
     case "assurance":
@@ -1725,7 +1882,9 @@ export function dataTreatment(c: Ctx, id: DataTreatment): string {
           `<path d="M${inset} ${baseY} v-${(40 + i * 16).toFixed(0)} M${W - inset} ${baseY} v-${(40 + i * 16).toFixed(0)}" stroke="${a(i === 0 ? s.a1 : contrastInk(s), (0.4 - i * 0.1) * k * L)}" stroke-width="${i === 0 ? 2 : 1}"/>`,
         );
       }
-      out.push(`<path d="M84 ${baseY} H${W - 84}" stroke="${a(contrastInk(s), 0.16 * k * L)}" stroke-width="1"/>`);
+      out.push(
+        `<path d="M84 ${baseY} H${W - 84}" stroke="${a(contrastInk(s), 0.16 * k * L)}" stroke-width="1"/>`,
+      );
       break;
     }
   }
@@ -1752,7 +1911,9 @@ export function flowTreatment(c: Ctx, id: FlowTreatment): string {
       }
       for (let i = 0; i < 5; i += 1) {
         const x = ox + (c.dir > 0 ? 1 : -1) * (120 + i * 190);
-        out.push(node(c, x, y + Math.sin(i * 1.4) * 60, i === 2 ? 12 : 7, i === 2 ? s.signal : s.a2));
+        out.push(
+          node(c, x, y + Math.sin(i * 1.4) * 60, i === 2 ? 12 : 7, i === 2 ? s.signal : s.a2),
+        );
       }
       break;
     }
@@ -1780,7 +1941,9 @@ export function flowTreatment(c: Ctx, id: FlowTreatment): string {
       for (let i = 0; i <= 4; i += 1) {
         pts.push([from + ((to - from) * i) / 4, y - 40 + Math.sin(i * 1.25 + c.take) * 62]);
       }
-      out.push(`<path d="${spline(pts)}" fill="none" stroke="${a(s.a1, 0.42 * k * L)}" stroke-width="2.2"/>`);
+      out.push(
+        `<path d="${spline(pts)}" fill="none" stroke="${a(s.a1, 0.42 * k * L)}" stroke-width="2.2"/>`,
+      );
       pts.forEach(([px, py], i) => {
         const col = i === 4 ? s.signal : i % 2 ? s.a2 : s.a1;
         out.push(
@@ -1800,13 +1963,18 @@ export function flowTreatment(c: Ctx, id: FlowTreatment): string {
       out.push(litPath(c, d, s.a1, 3, 0.7));
       pts.forEach(([px, py], i) => {
         if (i % 2) return;
-        out.push(bloom(c, px, py, 74, i === 4 ? s.signal : s.a2, 0.4), node(c, px, py, 9, i === 4 ? s.signal : s.a2));
+        out.push(
+          bloom(c, px, py, 74, i === 4 ? s.signal : s.a2, 0.4),
+          node(c, px, py, 9, i === 4 ? s.signal : s.a2),
+        );
       });
       break;
     }
     case "transmission": {
       // Grid transmission: a trunk line with tapped spurs and load nodes.
-      out.push(`<path d="M${from} ${y} H${to}" stroke="${a(s.a1, 0.55 * k * L)}" stroke-width="3"/>`);
+      out.push(
+        `<path d="M${from} ${y} H${to}" stroke="${a(s.a1, 0.55 * k * L)}" stroke-width="3"/>`,
+      );
       for (let i = 0; i < 6; i += 1) {
         const x = from + (to - from) * (0.08 + i * 0.17);
         const up = i % 2 === 0;

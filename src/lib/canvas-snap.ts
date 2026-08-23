@@ -84,11 +84,7 @@ function axisTargets(
     for (const o of boxes) {
       const start = axis === "x" ? o.x : o.y;
       const size = axis === "x" ? o.w : o.h;
-      out.push(
-        { at: start, kind },
-        { at: start + size / 2, kind },
-        { at: start + size, kind },
-      );
+      out.push({ at: start, kind }, { at: start + size / 2, kind }, { at: start + size, kind });
     }
   };
   push(others, "object");
@@ -110,7 +106,6 @@ export function buildSnapTargets(
     y: axisTargets("y", others, moduleBoxes),
   };
 }
-
 
 /** Best snap for a set of candidate edge positions along one axis. */
 function bestSnap(
@@ -203,7 +198,6 @@ export function snapResize(
     tolerance?: number;
     targets?: SnapTargets;
   } = { enabled: true },
-
 ): SnapResult {
   const minW = opts.minW ?? 40;
   const minH = opts.minH ?? 24;
@@ -294,7 +288,6 @@ export function boundsOf(boxes: readonly Box[]): Box {
   }
   return { x, y, w: r - x, h: bt - y };
 }
-
 
 /** Keep a box inside the stage while allowing deliberate partial bleed. */
 export function clampToStage(b: Box, allowBleed = 0.5): Box {

@@ -47,10 +47,14 @@ export function plateIsHeroChrome(variant: PlateCalmVariant): boolean {
 function inkDensity(variant: PlateCalmVariant, layoutId?: string): 0 | 1 | 2 {
   const id = `${variant ?? ""} ${layoutId ?? ""}`.toLowerCase();
   // Data-dense: charts, tables, dashboards, matrices, KPI walls.
-  if (/chart|graph|viz|data|table|dash|matrix|kpi|stat|metric|waterfall|funnel|donut|radar/.test(id))
+  if (
+    /chart|graph|viz|data|table|dash|matrix|kpi|stat|metric|waterfall|funnel|donut|radar/.test(id)
+  )
     return 2;
   // Structured multi-block: bento, grids, timelines, process chains, cards.
-  if (/bento|grid|timeline|process|chain|step|card|list|bullet|agenda|column|compare|split/.test(id))
+  if (
+    /bento|grid|timeline|process|chain|step|card|list|bullet|agenda|column|compare|split/.test(id)
+  )
     return 1;
   return 0;
 }

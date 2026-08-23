@@ -110,8 +110,16 @@ const APP_RULES: Array<{ re: RegExp; id: PptxSourceId; weight: number }> = [
   { re: /illustrator/i, id: "illustrator", weight: 0.9 },
   { re: /indesign/i, id: "indesign", weight: 0.9 },
   { re: /sketch/i, id: "sketch", weight: 0.9 },
-  { re: /python-pptx|pptxgenjs|apache poi|aspose|officegen|node-pptx|docxtemplater|unoconv/i, id: "programmatic", weight: 0.95 },
-  { re: /acrobat|nitro|smallpdf|ilovepdf|pdf2?ppt|able2extract|foxit/i, id: "pdf-converter", weight: 0.9 },
+  {
+    re: /python-pptx|pptxgenjs|apache poi|aspose|officegen|node-pptx|docxtemplater|unoconv/i,
+    id: "programmatic",
+    weight: 0.95,
+  },
+  {
+    re: /acrobat|nitro|smallpdf|ilovepdf|pdf2?ppt|able2extract|foxit/i,
+    id: "pdf-converter",
+    weight: 0.9,
+  },
 ];
 
 /** Mac PowerPoint writes a Mac-specific app version tail (e.g. "16.0000"). */
@@ -119,7 +127,12 @@ const MAC_VERSION_RE = /^16\.0{2,}$/;
 
 type Score = { score: number; signals: SourceSignal[]; version?: string };
 
-function add(map: Map<PptxSourceId, Score>, id: PptxSourceId, signal: SourceSignal, version?: string) {
+function add(
+  map: Map<PptxSourceId, Score>,
+  id: PptxSourceId,
+  signal: SourceSignal,
+  version?: string,
+) {
   const cur = map.get(id) ?? { score: 0, signals: [] };
   cur.score += signal.weight;
   cur.signals.push(signal);
@@ -261,7 +274,10 @@ export function detectPptxSource(input: FingerprintInput): SourceFingerprint {
         weight: 0.2,
       });
     }
-    if (/schemas\.openxmlformats\.org\/drawingml\/2006\/main/.test(ns) === false && /libreoffice|openoffice/i.test(ns)) {
+    if (
+      /schemas\.openxmlformats\.org\/drawingml\/2006\/main/.test(ns) === false &&
+      /libreoffice|openoffice/i.test(ns)
+    ) {
       add(scores, "libreoffice", {
         channel: "namespace",
         detail: `Vendor namespace ${ns}`,
@@ -334,7 +350,8 @@ export function detectPptxSource(input: FingerprintInput): SourceFingerprint {
       });
     }
     const vectorHeavy = slides.filter(
-      (s) => s.kinds.filter((k) => k === "text" || k === "image").length === 0 && s.kinds.length > 20,
+      (s) =>
+        s.kinds.filter((k) => k === "text" || k === "image").length === 0 && s.kinds.length > 20,
     ).length;
     if (vectorHeavy >= Math.max(1, slides.length * 0.5)) {
       add(scores, "illustrator", {
@@ -411,8 +428,11 @@ export function fingerprintInputFromDeck(
       const images = shapes.filter((sh) => sh.kind === "image");
       const hasText =
         shapes.some(
-          (sh) => sh.kind === "text" && sh.text.paras.some((p) => p.runs.some((r) => r.text.trim())),
-        ) || Boolean(s.title.trim()) || s.bullets.some((b) => b.trim());
+          (sh) =>
+            sh.kind === "text" && sh.text.paras.some((p) => p.runs.some((r) => r.text.trim())),
+        ) ||
+        Boolean(s.title.trim()) ||
+        s.bullets.some((b) => b.trim());
       const fullBleed = images.some(
         (sh) => sh.frame.w >= size.w * 0.97 && sh.frame.h >= size.h * 0.97,
       );

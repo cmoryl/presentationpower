@@ -204,7 +204,10 @@ export function getGlassTreatment(opts: {
           {
             color: mixHex(GLASS_CARD_TOKENS.dark.base, accent, 0.75),
             pos: 0,
-            alpha: Math.min(0.85, (GLASS_CARD_TOKENS.dark.baseAlpha + GLASS_CARD_TOKENS.dark.washAlpha) * e),
+            alpha: Math.min(
+              0.85,
+              (GLASS_CARD_TOKENS.dark.baseAlpha + GLASS_CARD_TOKENS.dark.washAlpha) * e,
+            ),
           },
           {
             color: GLASS_CARD_TOKENS.dark.base,
@@ -287,9 +290,6 @@ export function isGlassFill(hex: string | undefined | null, dark?: boolean): boo
   return (dark ? GLASS_FILL_HEXES_DARK : GLASS_FILL_HEXES_LIGHT).has(h);
 }
 
-
-
-
 export interface GradientStop {
   /** 6-digit hex, uppercase, no `#`. */
   color: string;
@@ -368,7 +368,10 @@ export interface SurfaceTreatment {
 }
 
 function clampHex(hex: string): string {
-  const h = String(hex ?? "").replace(/^#/, "").trim().toUpperCase();
+  const h = String(hex ?? "")
+    .replace(/^#/, "")
+    .trim()
+    .toUpperCase();
   if (/^[0-9A-F]{6}$/.test(h)) return h;
   if (/^[0-9A-F]{3}$/.test(h)) return h.replace(/(.)/g, "$1$1");
   return "";
@@ -548,7 +551,7 @@ export function stripSurfaceTags(name: string): string {
 /** CSS degrees → OOXML `a:lin@ang` (60000ths of a degree, 0 = left→right). */
 export function cssAngleToOoxml(angleDeg: number): number {
   // CSS 180deg = top→bottom; OOXML 5400000 (90deg) = top→bottom.
-  const ooxml = ((angleDeg - 90) % 360 + 360) % 360;
+  const ooxml = (((angleDeg - 90) % 360) + 360) % 360;
   return Math.round(ooxml * 60000);
 }
 
@@ -572,8 +575,8 @@ export function gradFillXml(g: SurfaceGradient): string {
 }
 
 export function outerShdwXml(s: SurfaceShadow): string {
-  const blurEmu = Math.round(((s.blur / 72) * 914400));
-  const distEmu = Math.round(((s.offset / 72) * 914400));
+  const blurEmu = Math.round((s.blur / 72) * 914400);
+  const distEmu = Math.round((s.offset / 72) * 914400);
   const dir = Math.round((((s.angle % 360) + 360) % 360) * 60000);
   return (
     `<a:outerShdw blurRad="${blurEmu}" dist="${distEmu}" dir="${dir}" rotWithShape="0">` +

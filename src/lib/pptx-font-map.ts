@@ -114,10 +114,7 @@ function cleanName(raw: string): string {
  * still lands on a family we recognise rather than the unknown first entry.
  */
 export function mapFontFamily(stack: string | null | undefined): CanonicalFont {
-  const parts = (stack ?? "")
-    .split(",")
-    .map(cleanName)
-    .filter(Boolean);
+  const parts = (stack ?? "").split(",").map(cleanName).filter(Boolean);
   if (parts.length === 0) return CANONICAL_FONTS.sans;
 
   // Pass 1 — explicit alias anywhere in the stack.
@@ -273,7 +270,6 @@ export function hardenFontFallbacksInXml(
     },
   );
 
-
   if (opts?.embedded === false) {
     const scale = fallbackFontScale(opts?.font ?? CANONICAL_FONTS.sans);
     if (scale) {
@@ -297,4 +293,3 @@ export function hardenFontFallbacksInXml(
 
   return out;
 }
-

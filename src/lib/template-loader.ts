@@ -37,9 +37,7 @@ export async function loadTemplateRegistry(force = false): Promise<void> {
         name: t.name,
       })),
     );
-    setBackgroundOverrides(
-      ((ovr.data as Record<string, unknown>[]) ?? []).map(parseOverrideRow),
-    );
+    setBackgroundOverrides(((ovr.data as Record<string, unknown>[]) ?? []).map(parseOverrideRow));
     // Authored scene art is memoised per code/scene/palette — drop it so the
     // next render composes the refreshed templates instead of the old stack.
     clearSceneArtCache();

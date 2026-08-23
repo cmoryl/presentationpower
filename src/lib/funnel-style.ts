@@ -38,7 +38,6 @@ export type ResolvedFunnelStyle = {
   chipStyle: FunnelChipStyle;
 };
 
-
 export const FUNNEL_SHEEN_OPTIONS: Array<{ value: FunnelSheen; label: string }> = [
   { value: "none", label: "None (flat)" },
   { value: "soft", label: "Soft" },
@@ -120,7 +119,6 @@ export function resolveFunnelStyle(raw: unknown, brand: BrandMode): ResolvedFunn
     chipStyle: pick(s.chipStyle, ["tint", "outline", "solid", "bare"] as const, "tint"),
   };
 }
-
 
 /** Band background gradient for a stage at `depth` (0 = top, 1 = bottom). */
 export function funnelBandBackground(style: ResolvedFunnelStyle, depth: number): string {

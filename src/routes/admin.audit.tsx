@@ -7,6 +7,24 @@ import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/audit")({
+  head: () => ({
+    meta: [
+      { title: "Audit log · Admin · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Review every admin action taken in Element: module overrides, brand edits, role changes and exports.",
+      },
+      { property: "og:title", content: "Audit log · Admin · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Review every admin action taken in Element: module overrides, brand edits, role changes and exports.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AuditView,
 });
 

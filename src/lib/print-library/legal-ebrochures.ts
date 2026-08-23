@@ -42,11 +42,7 @@ const CTA = {
   url: "https://www.transperfectlegal.com",
 };
 
-const hero = (
-  url: string,
-  heightPct = 44,
-  focalY = 45,
-): EBrochureContent["heroMedia"] => ({
+const hero = (url: string, heightPct = 44, focalY = 45): EBrochureContent["heroMedia"] => ({
   imageUrl: url,
   aspect: "fill",
   heightPct,
@@ -97,7 +93,12 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Faster document delivery", value: "40", unit: "%", caption: "vs. legacy processing engines" },
+        {
+          label: "Faster document delivery",
+          value: "40",
+          unit: "%",
+          caption: "vs. legacy processing engines",
+        },
         { label: "Languages supported", value: "200", unit: "+", caption: "processing and review" },
         { label: "Global processing hubs", value: "8", caption: "around-the-clock coverage" },
         { label: "Cities with local support", value: "140", unit: "+", caption: "worldwide" },
@@ -158,9 +159,24 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Reduction in discovery spend", value: "50", unit: "%", caption: "up to, with automated workflows" },
-        { label: "Increase in discovery accuracy", value: "20", unit: "%", caption: "language-aware search and OCR" },
-        { label: "Languages covered", value: "200", unit: "+", caption: "bilingual review attorneys" },
+        {
+          label: "Reduction in discovery spend",
+          value: "50",
+          unit: "%",
+          caption: "up to, with automated workflows",
+        },
+        {
+          label: "Increase in discovery accuracy",
+          value: "20",
+          unit: "%",
+          caption: "language-aware search and OCR",
+        },
+        {
+          label: "Languages covered",
+          value: "200",
+          unit: "+",
+          caption: "bilingual review attorneys",
+        },
       ],
       cta: CTA,
       heroMedia: hero(heroMultilang.url, 40, 48),
@@ -213,7 +229,12 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
       stats: [
         { label: "Custom issues per review pass", value: "15", caption: "applied simultaneously" },
         { label: "Documents reviewed per hour", value: "1,000s", caption: "multilingual support" },
-        { label: "Coding decisions explained", value: "100", unit: "%", caption: "summary + rationale per document" },
+        {
+          label: "Coding decisions explained",
+          value: "100",
+          unit: "%",
+          caption: "summary + rationale per document",
+        },
       ],
       cta: CTA,
       heroMedia: hero(heroGenai.url, 42, 44),
@@ -317,8 +338,18 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Reduction in review cost", value: "30", unit: "%", caption: "vs. legacy review platforms" },
-        { label: "Client response time", value: "15", unit: "min", caption: "the TransPerfect 15-minute rule" },
+        {
+          label: "Reduction in review cost",
+          value: "30",
+          unit: "%",
+          caption: "vs. legacy review platforms",
+        },
+        {
+          label: "Client response time",
+          value: "15",
+          unit: "min",
+          caption: "the TransPerfect 15-minute rule",
+        },
         { label: "Support coverage", value: "24/7", caption: "follow-the-sun project management" },
       ],
       cta: CTA,
@@ -370,9 +401,19 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Faster to reviewable data", value: "40", unit: "%", caption: "vs. legacy processing engines" },
+        {
+          label: "Faster to reviewable data",
+          value: "40",
+          unit: "%",
+          caption: "vs. legacy processing engines",
+        },
         { label: "Processing throughput", value: "17", unit: "TB", caption: "in 24 hours" },
-        { label: "File types supported", value: "400", unit: "+", caption: "with OCR across languages" },
+        {
+          label: "File types supported",
+          value: "400",
+          unit: "+",
+          caption: "with OCR across languages",
+        },
       ],
       cta: CTA,
       heroMedia: hero(heroReefPlatform.url, 40, 48),
@@ -381,8 +422,7 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
   {
     slug: "digital-court-reporting",
     title: "Digital Court Reporting & Deposition Services",
-    teaser:
-      "Certified transcripts at 40% the cost, 50% the delivery time, and 99% accuracy.",
+    teaser: "Certified transcripts at 40% the cost, 50% the delivery time, and 99% accuracy.",
     tags: ["depositions", "court reporting", "transcripts", "asr", "litigation support"],
     collection: "Depositions & trial support",
     sourceFile: "TL_Digital Court Reporting_eBrochure v.2.pdf",
@@ -424,7 +464,12 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
       ],
       stats: [
         { label: "Transcript cost", value: "40", unit: "%", caption: "of traditional cost" },
-        { label: "Faster final delivery", value: "50", unit: "%", caption: "vs. standard turnaround" },
+        {
+          label: "Faster final delivery",
+          value: "50",
+          unit: "%",
+          caption: "vs. standard turnaround",
+        },
         { label: "Transcript accuracy", value: "99", unit: "%", caption: "certified record" },
       ],
       cta: {
@@ -479,7 +524,12 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Practice groups supported", value: "12", unit: "+", caption: "antitrust to pharma and biotech" },
+        {
+          label: "Practice groups supported",
+          value: "12",
+          unit: "+",
+          caption: "antitrust to pharma and biotech",
+        },
         { label: "Review hubs", value: "3", caption: "US, UK/EU, India" },
         { label: "Continents covered", value: "5", caption: "global review network" },
       ],
@@ -540,7 +590,12 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Practice groups supported", value: "12", unit: "+", caption: "antitrust to pharma and biotech" },
+        {
+          label: "Practice groups supported",
+          value: "12",
+          unit: "+",
+          caption: "antitrust to pharma and biotech",
+        },
         { label: "Review hubs", value: "3", caption: "US, UK/EU, India" },
         { label: "Continents covered", value: "5", caption: "global review network" },
       ],
@@ -749,7 +804,12 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Average cull rate", value: "91.5", unit: "%", caption: "vs. 80% industry standard" },
+        {
+          label: "Average cull rate",
+          value: "91.5",
+          unit: "%",
+          caption: "vs. 80% industry standard",
+        },
         { label: "Pricing phases", value: "3", caption: "collection, processing, review" },
         { label: "Pricing models", value: "3", caption: "line item, fixed fee, all-in" },
       ],
@@ -801,8 +861,18 @@ export const LEGAL_EBROCHURES: LegalEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "Review cost reduction", value: "40", unit: "%", caption: "via ECA and analytics" },
-        { label: "Reef Review savings", value: "30", unit: "%", caption: "vs. legacy review platforms" },
+        {
+          label: "Review cost reduction",
+          value: "40",
+          unit: "%",
+          caption: "via ECA and analytics",
+        },
+        {
+          label: "Reef Review savings",
+          value: "30",
+          unit: "%",
+          caption: "vs. legacy review platforms",
+        },
         { label: "Forensics laboratories", value: "17", caption: "worldwide" },
         { label: "Response time", value: "15", unit: "min", caption: "the 15-Minute Rule" },
       ],

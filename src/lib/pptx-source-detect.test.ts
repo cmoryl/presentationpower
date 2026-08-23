@@ -16,13 +16,19 @@ function input(over: Partial<FingerprintInput> = {}): FingerprintInput {
       "ppt/theme/theme1.xml",
     ],
     templates: {
-      masters: [{ kind: "master", path: "m1", placeholders: [], decorLayers: [], usedBySlides: [0] }],
+      masters: [
+        { kind: "master", path: "m1", placeholders: [], decorLayers: [], usedBySlides: [0] },
+      ],
       layouts: [
         { kind: "layout", path: "l1", placeholders: [], decorLayers: [], usedBySlides: [0] },
         { kind: "layout", path: "l2", placeholders: [], decorLayers: [], usedBySlides: [] },
       ],
     } as unknown as FingerprintInput["templates"],
-    theme: { accents: [], headingFont: "Calibri Light", bodyFont: "Calibri" } as FingerprintInput["theme"],
+    theme: {
+      accents: [],
+      headingFont: "Calibri Light",
+      bodyFont: "Calibri",
+    } as FingerprintInput["theme"],
     slides: [{ kinds: ["text", "image"], hasText: true, fullBleedImageOnly: false }],
     ...over,
   };

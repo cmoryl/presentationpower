@@ -395,9 +395,9 @@ async function runFormats(
   // Blended ground: mix in the NEXT industry look so the composed background is
   // provably neither pack's authored sheet.
   const other = edge.blend
-    ? (INDUSTRY_PACKS.find((p) => p.id !== packId)
-        ? stylePackById(INDUSTRY_PACKS.find((p) => p.id !== packId)!.id)
-        : null)
+    ? INDUSTRY_PACKS.find((p) => p.id !== packId)
+      ? stylePackById(INDUSTRY_PACKS.find((p) => p.id !== packId)!.id)
+      : null
     : null;
   const pack = authored && other ? blendedPack(authored, other) : authored;
   const result: FormatRunResult = {
@@ -566,7 +566,9 @@ async function runFormats(
         zipProblems.push("bundle is missing a light/dark PPTX pair");
       }
     } catch (err) {
-      zipProblems.push(`bundle failed to reopen: ${err instanceof Error ? err.message : String(err)}`);
+      zipProblems.push(
+        `bundle failed to reopen: ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
     result.artifacts.push({
       format: "zip",
@@ -635,9 +637,7 @@ async function dpiProbe(sizes: Array<[number, number]>): Promise<DpiProbeResult[
     await measureImageAspect(src);
     const ratio = getImageAspect(src) ?? null;
     const frame = aspectFrame(ratio ?? undefined, "contain", BOX.x, BOX.y, BOX.w, BOX.h);
-    const finite = [frame.x, frame.y, frame.w, frame.h].every(
-      (n) => Number.isFinite(n) && n >= 0,
-    );
+    const finite = [frame.x, frame.y, frame.w, frame.h].every((n) => Number.isFinite(n) && n >= 0);
     const insideBox =
       finite &&
       frame.w <= BOX.w + 1e-6 &&
@@ -653,8 +653,7 @@ async function dpiProbe(sizes: Array<[number, number]>): Promise<DpiProbeResult[
       frame,
       insideBox,
       finite,
-      ratioError:
-        ratio && frame.h > 0 ? Math.abs(frame.w / frame.h - ratio) / ratio : null,
+      ratioError: ratio && frame.h > 0 ? Math.abs(frame.w / frame.h - ratio) / ratio : null,
     });
   }
   return out;
@@ -675,11 +674,7 @@ declare global {
     __tpFormatVerify?: {
       variant: string;
       industryPacks: string[];
-      run: (
-        variantId: string,
-        packId: string,
-        edge?: EdgeOptions,
-      ) => Promise<FormatRunResult>;
+      run: (variantId: string, packId: string, edge?: EdgeOptions) => Promise<FormatRunResult>;
       dpiProbe: (sizes: Array<[number, number]>) => Promise<DpiProbeResult[]>;
     };
   }
@@ -713,8 +708,8 @@ function FormatVerifyHarness() {
     <main className="mx-auto max-w-3xl p-10 font-sans">
       <h1 className="text-2xl font-semibold tracking-tight">All-format export harness</h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        {ready ? "Ready" : "Loading"} · exports one module to PPTX (light + dark), PDF, PNG and a ZIP
-        bundle, then audits that each file opens and carries its industry background. Driven
+        {ready ? "Ready" : "Loading"} · exports one module to PPTX (light + dark), PDF, PNG and a
+        ZIP bundle, then audits that each file opens and carries its industry background. Driven
         headlessly via <code>window.__tpFormatVerify.run()</code>.
       </p>
 

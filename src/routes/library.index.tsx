@@ -92,11 +92,7 @@ import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
 import { formatKitValidationError } from "@/lib/kit-validation";
 import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-examples";
-import {
-  applyBentoPreset,
-  bentoPresetsFor,
-  type BentoPreset,
-} from "@/lib/bento-presets";
+import { applyBentoPreset, bentoPresetsFor, type BentoPreset } from "@/lib/bento-presets";
 import { listClientLogos } from "@/lib/client-logos.functions";
 import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
 import { SaveModuleDialog } from "@/components/SaveModuleDialog";
@@ -659,7 +655,6 @@ function Library() {
     moduleFamilies,
   ]);
 
-
   const active = openId ? moduleVariants.find((v) => v.id === openId) : null;
   const selectablePacks = useSelectablePacks();
   // Registry version keys the memo so an admin background retune repaints the
@@ -674,7 +669,6 @@ function Library() {
       ),
     [packId, recipeId, selectablePacks, registryVersion],
   );
-
 
   // Video example zoom (uses the same LightboxPortal as before, so the
   // ▶ badge inside the enlarged stage still plays the clip in-place).
@@ -775,727 +769,732 @@ function Library() {
 
   return (
     <LibraryPackProvider packId={packId} recipeId={recipeId}>
-    <AppShell>
-      <BackToTop />
-      <header className="full-bleed relative hero-flush mb-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
-        <HeroVideoLayer src={heroPresentationVideo.url} opacity={0.55} tint="#FFFFFF" />
-        <div className="relative z-10 mx-auto max-w-[1400px]">
-          <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
-            Element · Presentation
-          </div>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-            Slides that are already on brand.
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
-            Browse the ready-made slide designs Element builds your decks from — every one approved,
-            every one live in your brand's colors and type. Choose a division to see only what you're
-            cleared to use, or open{" "}
-            <Link to="/library/imported" className="underline hover:text-[#003FC7]">
-              imported slides
-            </Link>{" "}
-            to pick up a deck you brought in.
-          </p>
+      <AppShell>
+        <BackToTop />
+        <header className="full-bleed relative hero-flush mb-6 overflow-hidden border-b border-black/5 bg-gradient-to-br from-[#003FC70a] via-white/70 to-[#A1FBF922] py-10 dark:from-white/[0.03] dark:via-white/[0.02] dark:to-white/[0.04] dark:border-white/10">
+          <HeroVideoLayer src={heroPresentationVideo.url} opacity={0.55} tint="#FFFFFF" />
+          <div className="relative z-10 mx-auto max-w-[1400px]">
+            <div className="text-xs uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
+              Element · Presentation
+            </div>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+              Slides that are already on brand.
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
+              Browse the ready-made slide designs Element builds your decks from — every one
+              approved, every one live in your brand's colors and type. Choose a division to see
+              only what you're cleared to use, or open{" "}
+              <Link to="/library/imported" className="underline hover:text-[#003FC7]">
+                imported slides
+              </Link>{" "}
+              to pick up a deck you brought in.
+            </p>
 
-          <div className="mt-5">
-            <LibrarySubnav active="/library" />
+            <div className="mt-5">
+              <LibrarySubnav active="/library" />
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative min-w-[220px] flex-1">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search modules by name, id, family…"
-              className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 pr-8 text-sm shadow-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
-            />
-            {q && (
-              <button
-                type="button"
-                onClick={() => setQ("")}
-                aria-label="Clear search"
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-          <select
-            aria-label="Scope Brand"
-            value={scopeBrandId}
-            onChange={(e) => setScopeBrandId(e.target.value)}
-            className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
-            title="Filter to what's in-scope for a brand"
-          >
-            <option value="all">Any brand scope</option>
-            {brandModes.map((b) => (
-              <option key={b.id} value={b.id}>
-                Scope: {b.name}
-              </option>
-            ))}
-          </select>
-          <select
-            aria-label="Sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value as typeof sort)}
-            className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
-            title="Sort variants"
-          >
-            <option value="default">Sort: default</option>
-            <option value="pinned-first">Pinned first</option>
-            <option value="most-used">Most used by you</option>
-          </select>
-          <button
-            type="button"
-            onClick={() => setPinnedOnly((v) => !v)}
-            aria-pressed={pinnedOnly}
-            title={pins.size > 0 ? `${pins.size} pinned` : "No pins yet — star a card"}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
-              pinnedOnly
-                ? "border-amber-500 bg-amber-400/20 text-amber-900"
-                : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
-            }`}
-          >
-            <Star size={12} className={pinnedOnly ? "fill-amber-500 text-amber-600" : ""} />
-            Pinned{pins.size > 0 ? ` · ${pins.size}` : ""}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSelectMode((v) => {
-                if (v) setSelected([]);
-                return !v;
-              });
-            }}
-            aria-pressed={selectMode}
-            title="Pick multiple modules, then build a deck from the selection"
-            className={`rounded-full border px-3 py-1.5 text-xs transition ${
-              selectMode
-                ? "border-[#003FC7] bg-[#003FC7] text-white"
-                : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
-            }`}
-          >
-            {selectMode ? "✓ Selecting" : "☐ Select modules"}
-          </button>
-          <span className="ml-auto text-xs tabular-nums text-black/50">
-            {filtered.length} of {allEntries.length}
-          </span>
-        </div>
-
-        <details className="group mt-2 border-t border-black/5 pt-2 dark:border-white/10">
-          <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs text-black/60">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-[#003FC7]">
-              Filters &amp; view
-              {familyIds.size + tagIds.size > 0 ? ` · ${familyIds.size + tagIds.size}` : ""}
-              <span aria-hidden className="transition group-open:rotate-180">
-                ▾
-              </span>
+        <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative min-w-[220px] flex-1">
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search modules by name, id, family…"
+                className="w-full rounded-lg border border-black/15 bg-white px-3 py-2 pr-8 text-sm shadow-sm focus:border-[#003FC7] focus:outline-none focus:ring-2 focus:ring-[#003FC7]/20"
+              />
+              {q && (
+                <button
+                  type="button"
+                  onClick={() => setQ("")}
+                  aria-label="Clear search"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1 text-black/40 hover:bg-black/5 hover:text-black"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            <select
+              aria-label="Scope Brand"
+              value={scopeBrandId}
+              onChange={(e) => setScopeBrandId(e.target.value)}
+              className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
+              title="Filter to what's in-scope for a brand"
+            >
+              <option value="all">Any brand scope</option>
+              {brandModes.map((b) => (
+                <option key={b.id} value={b.id}>
+                  Scope: {b.name}
+                </option>
+              ))}
+            </select>
+            <select
+              aria-label="Sort"
+              value={sort}
+              onChange={(e) => setSort(e.target.value as typeof sort)}
+              className="rounded-lg border border-black/15 bg-white px-2.5 py-2 text-xs text-black/70"
+              title="Sort variants"
+            >
+              <option value="default">Sort: default</option>
+              <option value="pinned-first">Pinned first</option>
+              <option value="most-used">Most used by you</option>
+            </select>
+            <button
+              type="button"
+              onClick={() => setPinnedOnly((v) => !v)}
+              aria-pressed={pinnedOnly}
+              title={pins.size > 0 ? `${pins.size} pinned` : "No pins yet — star a card"}
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition ${
+                pinnedOnly
+                  ? "border-amber-500 bg-amber-400/20 text-amber-900"
+                  : "border-black/15 bg-white text-black/70 hover:border-amber-400 hover:text-amber-800"
+              }`}
+            >
+              <Star size={12} className={pinnedOnly ? "fill-amber-500 text-amber-600" : ""} />
+              Pinned{pins.size > 0 ? ` · ${pins.size}` : ""}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSelectMode((v) => {
+                  if (v) setSelected([]);
+                  return !v;
+                });
+              }}
+              aria-pressed={selectMode}
+              title="Pick multiple modules, then build a deck from the selection"
+              className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                selectMode
+                  ? "border-[#003FC7] bg-[#003FC7] text-white"
+                  : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+              }`}
+            >
+              {selectMode ? "✓ Selecting" : "☐ Select modules"}
+            </button>
+            <span className="ml-auto text-xs tabular-nums text-black/50">
+              {filtered.length} of {allEntries.length}
             </span>
-            {hasFilters && (
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={(e) => {
-                  e.preventDefault();
-                  clearFilters();
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
+          </div>
+
+          <details className="group mt-2 border-t border-black/5 pt-2 dark:border-white/10">
+            <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-xs text-black/60">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/15 bg-white px-3 py-1.5 transition group-open:border-[#003FC7] group-open:text-[#003FC7]">
+                Filters &amp; view
+                {familyIds.size + tagIds.size > 0 ? ` · ${familyIds.size + tagIds.size}` : ""}
+                <span aria-hidden className="transition group-open:rotate-180">
+                  ▾
+                </span>
+              </span>
+              {hasFilters && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => {
                     e.preventDefault();
                     clearFilters();
-                  }
-                }}
-                className="cursor-pointer rounded-full border border-black/15 bg-white px-3 py-1.5 text-black/70 hover:border-black/30 hover:text-black"
-              >
-                Clear filters
-              </span>
-            )}
-            {scopeBrand && (
-              <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
-                {preferred.size} preferred · {restricted.size} family restrictions
-              </span>
-            )}
-          </summary>
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      clearFilters();
+                    }
+                  }}
+                  className="cursor-pointer rounded-full border border-black/15 bg-white px-3 py-1.5 text-black/70 hover:border-black/30 hover:text-black"
+                >
+                  Clear filters
+                </span>
+              )}
+              {scopeBrand && (
+                <span className="rounded-full bg-black/5 px-3 py-1 text-[11px] text-black/70">
+                  {preferred.size} preferred · {restricted.size} family restrictions
+                </span>
+              )}
+            </summary>
 
-          <div className="mt-3 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
-                <button
-                  type="button"
-                  onClick={() => setMode("light")}
-                  className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                  aria-pressed={mode === "light"}
-                >
-                  ☀︎ Light
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("dark")}
-                  className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                  aria-pressed={mode === "dark"}
-                >
-                  ☾ Dark
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("ab")}
-                  className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                  aria-pressed={mode === "ab"}
-                  title="Compare light vs dark side-by-side"
-                >
-                  ⇋ A/B
-                </button>
-              </div>
-              <div
-                className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
-                role="group"
-                aria-label="Card density"
-              >
-                <button
-                  type="button"
-                  onClick={() => setDensity("comfortable")}
-                  className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                  aria-pressed={density === "comfortable"}
-                  title="Comfortable cards with full metadata"
-                >
-                  ▦ Cards
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDensity("thumb")}
-                  className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
-                  aria-pressed={density === "thumb"}
-                  title="Compact thumbnails — pick modules faster"
-                >
-                  ▨ Thumbs
-                </button>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-                Family
-              </span>
-              {moduleFamilies.map((mf) => {
-                const on = familyIds.has(mf.id);
-                return (
+            <div className="mt-3 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs">
                   <button
-                    key={mf.id}
                     type="button"
-                    onClick={() => setFamilyIds((s) => toggle(s, mf.id))}
-                    aria-pressed={on}
-                    className={`rounded-full border px-3 py-1 text-xs transition ${
-                      on
-                        ? "border-[#05041A] bg-[#05041A] text-white shadow-sm"
-                        : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
-                    }`}
-                    title={mf.name}
+                    onClick={() => setMode("light")}
+                    className={`px-3 py-1.5 ${mode === "light" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    aria-pressed={mode === "light"}
                   >
-                    {mf.name}
+                    ☀︎ Light
                   </button>
-                );
-              })}
+                  <button
+                    type="button"
+                    onClick={() => setMode("dark")}
+                    className={`px-3 py-1.5 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    aria-pressed={mode === "dark"}
+                  >
+                    ☾ Dark
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMode("ab")}
+                    className={`px-3 py-1.5 ${mode === "ab" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    aria-pressed={mode === "ab"}
+                    title="Compare light vs dark side-by-side"
+                  >
+                    ⇋ A/B
+                  </button>
+                </div>
+                <div
+                  className="inline-flex overflow-hidden rounded-full border border-black/15 bg-white text-xs"
+                  role="group"
+                  aria-label="Card density"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setDensity("comfortable")}
+                    className={`px-3 py-1.5 ${density === "comfortable" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    aria-pressed={density === "comfortable"}
+                    title="Comfortable cards with full metadata"
+                  >
+                    ▦ Cards
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDensity("thumb")}
+                    className={`px-3 py-1.5 ${density === "thumb" ? "bg-[#05041A] text-white" : "text-black/60 hover:text-black"}`}
+                    aria-pressed={density === "thumb"}
+                    title="Compact thumbnails — pick modules faster"
+                  >
+                    ▨ Thumbs
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                  Family
+                </span>
+                {moduleFamilies.map((mf) => {
+                  const on = familyIds.has(mf.id);
+                  return (
+                    <button
+                      key={mf.id}
+                      type="button"
+                      onClick={() => setFamilyIds((s) => toggle(s, mf.id))}
+                      aria-pressed={on}
+                      className={`rounded-full border px-3 py-1 text-xs transition ${
+                        on
+                          ? "border-[#05041A] bg-[#05041A] text-white shadow-sm"
+                          : "border-black/15 bg-white text-black/70 hover:border-black/30 hover:text-black"
+                      }`}
+                      title={mf.name}
+                    >
+                      {mf.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                  Structure
+                </span>
+                {STRUCTURAL_TAGS.map((t) => {
+                  const on = tagIds.has(t.id);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setTagIds((s) => toggle(s, t.id))}
+                      aria-pressed={on}
+                      className={`rounded-full border px-3 py-1 text-xs transition ${
+                        on
+                          ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
+                          : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/40 hover:text-black"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </details>
+        </div>
+        {!coverage.ok && (
+          <div
+            role="alert"
+            className="mt-6 rounded-2xl border border-amber-300/70 bg-amber-50 px-5 py-4 text-sm text-amber-900 shadow-sm"
+          >
+            <div className="flex items-start gap-3">
+              <span aria-hidden className="mt-0.5 text-lg">
+                ⚠︎
+              </span>
+              <div className="flex-1">
+                <div className="font-semibold">
+                  {coverage.failing.length} brand mode
+                  {coverage.failing.length === 1 ? "" : "s"} missing division-specific content
+                </div>
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-[12px] text-amber-900/80 underline">
+                    Show details
+                  </summary>
+                  <ul className="mt-3 space-y-3">
+                    {coverage.failing.map((r) => (
+                      <li
+                        key={r.brandId}
+                        className="rounded-xl border border-amber-300/60 bg-white/70 p-3"
+                      >
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className="font-semibold text-amber-950">{r.brandName}</span>
+                          <code className="rounded bg-amber-100 px-1.5 py-0.5 text-[11px] text-amber-900/80">
+                            {r.brandId}
+                          </code>
+                        </div>
+                        {r.notes.length > 0 && (
+                          <div className="mt-1 text-[12px] text-amber-900/70">
+                            {r.notes.join(" · ")}
+                          </div>
+                        )}
+                        {r.brandId !== "__inventory__" && (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {(Object.keys(OVERLAY_SLOT_LABELS) as OverlaySlot[]).map((slot) => {
+                              const m = r.metrics[slot];
+                              const state = m.skipped ? "skipped" : m.ok ? "ok" : "fail";
+                              const cls =
+                                state === "ok"
+                                  ? "border-emerald-300/70 bg-emerald-50 text-emerald-900"
+                                  : state === "skipped"
+                                    ? "border-black/10 bg-white/60 text-black/50"
+                                    : "border-amber-400/70 bg-amber-100 text-amber-950";
+                              const title = m.note
+                                ? `${OVERLAY_SLOT_LABELS[slot]} — ${m.note}`
+                                : `${OVERLAY_SLOT_LABELS[slot]} ${m.count}/${m.expected}`;
+                              return (
+                                <span
+                                  key={slot}
+                                  title={title}
+                                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${cls}`}
+                                >
+                                  <span aria-hidden>
+                                    {state === "ok" ? "✓" : state === "skipped" ? "–" : "!"}
+                                  </span>
+                                  {OVERLAY_SLOT_LABELS[slot]}
+                                  <span className="opacity-70">
+                                    {m.count}/{m.expected}
+                                  </span>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <ul className="mt-2 space-y-1.5">
+                          {r.issues.map((code) => {
+                            const fix = COVERAGE_FIX_HINTS[code];
+                            return (
+                              <li key={code} className="text-[12px] leading-snug">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                  <span className="rounded bg-amber-200/70 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-amber-950">
+                                    {code}
+                                  </span>
+                                  {fix && (
+                                    <>
+                                      <span className="text-amber-900/60">edit</span>
+                                      <code className="rounded bg-amber-100/80 px-1.5 py-0.5 font-mono text-[11px] text-amber-950">
+                                        {fix.file}
+                                      </code>
+                                      <span className="text-amber-900/60">→</span>
+                                      <code className="rounded bg-amber-100/80 px-1.5 py-0.5 font-mono text-[11px] text-amber-950">
+                                        {fix.field.replace(/<brandId>/g, r.brandId)}
+                                      </code>
+                                    </>
+                                  )}
+                                </div>
+                                {fix && (
+                                  <div className="mt-0.5 pl-1 text-amber-900/75">{fix.hint}</div>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+                <p className="mt-2 text-amber-900/70">
+                  Previews still render but may fall back to generic copy for the flagged brands.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Approved Visual Style Library — the 28 core OnDeck visual languages.
+          A curator edits a module's sample content while seeing it in the
+          approved style it will ship in. Industry recipes filter the grid;
+          legacy looks stay resolvable in the compatibility drawer. */}
+        <details className="group mt-8 rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
+            <div className="min-w-0">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+                Approved Visual Style Library
+              </div>
+
+              <div className="mt-1 truncate text-sm font-medium text-[#03002C] dark:text-white">
+                {activePack
+                  ? `${activePack.label} — ${activePack.tagline}`
+                  : "Approved brand system (TransPerfect)"}
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              {activePack && (
+                <span className="hidden items-center gap-1 sm:flex">
+                  {activePack.swatch.map((c) => (
+                    <span
+                      key={c}
+                      className="h-3.5 w-3.5 rounded-full ring-1 ring-black/10"
+                      style={{ background: c }}
+                    />
+                  ))}
+                </span>
+              )}
+              <span className="flex h-6 w-6 items-center justify-center rounded-full border border-black/15 text-[10px] text-black/50 transition group-open:rotate-180 dark:border-white/20 dark:text-white/50">
+                ▾
+              </span>
+            </div>
+          </summary>
+          <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#003FC7]/20 bg-[#003FC7]/[0.04] px-3 py-2">
+              <p className="text-[12px] text-black/60 dark:text-white/60">
+                One master background directory — 28 core languages (S01–S28) + 30 industry systems
+                (R01–R30), 2,552 authored compositions.
+              </p>
+              <Link
+                to="/library/industry-backgrounds"
+                className="shrink-0 rounded-full bg-[#003FC7] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#003FC7]/90"
+              >
+                Open background directory
+              </Link>
+            </div>
+            <StyleLookPicker
+              value={packId}
+              onChange={setPackId}
+              recipeId={recipeId}
+              onRecipeChange={setRecipeId}
+              intent={q}
+            />
+
+            {activePack && (
+              <p className="mt-4 text-[12px] text-black/55 dark:text-white/55">
+                Previews, the enlarged stage and the slide studio all render in this look — edits
+                you save from a module&rsquo;s studio apply to the {activePack.mode} layer and
+                persist across looks.
+              </p>
+            )}
+          </div>
+        </details>
+
+        {filtered.length === 0 ? (
+          <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white/60 px-6 py-10 sm:px-10">
+            <div className="mx-auto max-w-2xl text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl">
+                ⌕
+              </div>
+              <h3 className="text-lg font-semibold text-[#03002C]">
+                No modules match those filters
+              </h3>
+              <p className="mt-2 text-sm text-black/60">
+                The library holds {moduleVariants.length} approved variants — the current
+                combination is just too narrow. Loosen one thing below, or start from an example.
+              </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-                Structure
-              </span>
-              {STRUCTURAL_TAGS.map((t) => {
-                const on = tagIds.has(t.id);
-                return (
+            {/* Active filters — remove them one at a time */}
+            {hasFilters && (
+              <div className="mx-auto mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                  Active
+                </span>
+                {q.trim() && (
+                  <button
+                    type="button"
+                    onClick={() => setQ("")}
+                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                  >
+                    “{q.trim()}” ✕
+                  </button>
+                )}
+                {[...familyIds].map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFamilyIds((s) => toggle(s, id))}
+                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                  >
+                    {byId(moduleFamilies, id)?.name ?? id} ✕
+                  </button>
+                ))}
+                {activeTags.map((t) => (
                   <button
                     key={t.id}
                     type="button"
                     onClick={() => setTagIds((s) => toggle(s, t.id))}
-                    aria-pressed={on}
-                    className={`rounded-full border px-3 py-1 text-xs transition ${
-                      on
-                        ? "border-[#003FC7] bg-[#003FC7] text-white shadow-sm"
-                        : "border-black/15 bg-white text-black/70 hover:border-[#003FC7]/40 hover:text-black"
-                    }`}
+                    className="rounded-full border border-[#003FC7]/30 bg-white px-3 py-1 text-xs text-[#003FC7] hover:border-[#003FC7]"
                   >
-                    {t.label}
+                    {t.label} ✕
                   </button>
-                );
-              })}
-            </div>
-          </div>
-        </details>
-      </div>
-      {!coverage.ok && (
-        <div
-          role="alert"
-          className="mt-6 rounded-2xl border border-amber-300/70 bg-amber-50 px-5 py-4 text-sm text-amber-900 shadow-sm"
-        >
-          <div className="flex items-start gap-3">
-            <span aria-hidden className="mt-0.5 text-lg">
-              ⚠︎
-            </span>
-            <div className="flex-1">
-              <div className="font-semibold">
-                {coverage.failing.length} brand mode
-                {coverage.failing.length === 1 ? "" : "s"} missing division-specific content
-              </div>
-              <details className="mt-2">
-              <summary className="cursor-pointer text-[12px] text-amber-900/80 underline">
-                Show details
-              </summary>
-              <ul className="mt-3 space-y-3">
-                {coverage.failing.map((r) => (
-                  <li
-                    key={r.brandId}
-                    className="rounded-xl border border-amber-300/60 bg-white/70 p-3"
-                  >
-                    <div className="flex items-baseline justify-between gap-3">
-                      <span className="font-semibold text-amber-950">{r.brandName}</span>
-                      <code className="rounded bg-amber-100 px-1.5 py-0.5 text-[11px] text-amber-900/80">
-                        {r.brandId}
-                      </code>
-                    </div>
-                    {r.notes.length > 0 && (
-                      <div className="mt-1 text-[12px] text-amber-900/70">
-                        {r.notes.join(" · ")}
-                      </div>
-                    )}
-                    {r.brandId !== "__inventory__" && (
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {(Object.keys(OVERLAY_SLOT_LABELS) as OverlaySlot[]).map((slot) => {
-                          const m = r.metrics[slot];
-                          const state = m.skipped ? "skipped" : m.ok ? "ok" : "fail";
-                          const cls =
-                            state === "ok"
-                              ? "border-emerald-300/70 bg-emerald-50 text-emerald-900"
-                              : state === "skipped"
-                                ? "border-black/10 bg-white/60 text-black/50"
-                                : "border-amber-400/70 bg-amber-100 text-amber-950";
-                          const title = m.note
-                            ? `${OVERLAY_SLOT_LABELS[slot]} — ${m.note}`
-                            : `${OVERLAY_SLOT_LABELS[slot]} ${m.count}/${m.expected}`;
-                          return (
-                            <span
-                              key={slot}
-                              title={title}
-                              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10.5px] font-medium ${cls}`}
-                            >
-                              <span aria-hidden>
-                                {state === "ok" ? "✓" : state === "skipped" ? "–" : "!"}
-                              </span>
-                              {OVERLAY_SLOT_LABELS[slot]}
-                              <span className="opacity-70">
-                                {m.count}/{m.expected}
-                              </span>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-                    <ul className="mt-2 space-y-1.5">
-                      {r.issues.map((code) => {
-                        const fix = COVERAGE_FIX_HINTS[code];
-                        return (
-                          <li key={code} className="text-[12px] leading-snug">
-                            <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="rounded bg-amber-200/70 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-amber-950">
-                                {code}
-                              </span>
-                              {fix && (
-                                <>
-                                  <span className="text-amber-900/60">edit</span>
-                                  <code className="rounded bg-amber-100/80 px-1.5 py-0.5 font-mono text-[11px] text-amber-950">
-                                    {fix.file}
-                                  </code>
-                                  <span className="text-amber-900/60">→</span>
-                                  <code className="rounded bg-amber-100/80 px-1.5 py-0.5 font-mono text-[11px] text-amber-950">
-                                    {fix.field.replace(/<brandId>/g, r.brandId)}
-                                  </code>
-                                </>
-                              )}
-                            </div>
-                            {fix && <div className="mt-0.5 pl-1 text-amber-900/75">{fix.hint}</div>}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </li>
                 ))}
-              </ul>
-              </details>
-              <p className="mt-2 text-amber-900/70">
-                Previews still render but may fall back to generic copy for the flagged brands.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Approved Visual Style Library — the 28 core OnDeck visual languages.
-          A curator edits a module's sample content while seeing it in the
-          approved style it will ship in. Industry recipes filter the grid;
-          legacy looks stay resolvable in the compatibility drawer. */}
-      <details className="group mt-8 rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-4">
-          <div className="min-w-0">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
-              Approved Visual Style Library
-            </div>
-
-            <div className="mt-1 truncate text-sm font-medium text-[#03002C] dark:text-white">
-              {activePack
-                ? `${activePack.label} — ${activePack.tagline}`
-                : "Approved brand system (TransPerfect)"}
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center gap-3">
-            {activePack && (
-              <span className="hidden items-center gap-1 sm:flex">
-                {activePack.swatch.map((c) => (
-                  <span
-                    key={c}
-                    className="h-3.5 w-3.5 rounded-full ring-1 ring-black/10"
-                    style={{ background: c }}
-                  />
-                ))}
-              </span>
-            )}
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-black/15 text-[10px] text-black/50 transition group-open:rotate-180 dark:border-white/20 dark:text-white/50">
-              ▾
-            </span>
-          </div>
-        </summary>
-        <div className="border-t border-black/10 px-5 py-5 dark:border-white/10">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#003FC7]/20 bg-[#003FC7]/[0.04] px-3 py-2">
-            <p className="text-[12px] text-black/60 dark:text-white/60">
-              One master background directory — 28 core languages (S01–S28) + 30 industry
-              systems (R01–R30), 2,552 authored compositions.
-            </p>
-            <Link
-              to="/library/industry-backgrounds"
-              className="shrink-0 rounded-full bg-[#003FC7] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#003FC7]/90"
-            >
-              Open background directory
-            </Link>
-          </div>
-          <StyleLookPicker
-            value={packId}
-            onChange={setPackId}
-            recipeId={recipeId}
-            onRecipeChange={setRecipeId}
-            intent={q}
-          />
-
-          {activePack && (
-            <p className="mt-4 text-[12px] text-black/55 dark:text-white/55">
-              Previews, the enlarged stage and the slide studio all render in this look — edits you
-              save from a module&rsquo;s studio apply to the {activePack.mode} layer and persist
-              across looks.
-            </p>
-          )}
-        </div>
-
-      </details>
-
-      {filtered.length === 0 ? (
-        <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white/60 px-6 py-10 sm:px-10">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#03002C]/5 text-2xl">
-              ⌕
-            </div>
-            <h3 className="text-lg font-semibold text-[#03002C]">
-              No modules match those filters
-            </h3>
-            <p className="mt-2 text-sm text-black/60">
-              The library holds {moduleVariants.length} approved variants — the current combination
-              is just too narrow. Loosen one thing below, or start from an example.
-            </p>
-          </div>
-
-          {/* Active filters — remove them one at a time */}
-          {hasFilters && (
-            <div className="mx-auto mt-6 flex max-w-2xl flex-wrap items-center justify-center gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-                Active
-              </span>
-              {q.trim() && (
-                <button
-                  type="button"
-                  onClick={() => setQ("")}
-                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
-                >
-                  “{q.trim()}” ✕
-                </button>
-              )}
-              {[...familyIds].map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setFamilyIds((s) => toggle(s, id))}
-                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
-                >
-                  {byId(moduleFamilies, id)?.name ?? id} ✕
-                </button>
-              ))}
-              {activeTags.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTagIds((s) => toggle(s, t.id))}
-                  className="rounded-full border border-[#003FC7]/30 bg-white px-3 py-1 text-xs text-[#003FC7] hover:border-[#003FC7]"
-                >
-                  {t.label} ✕
-                </button>
-              ))}
-              {pinnedOnly && (
-                <button
-                  type="button"
-                  onClick={() => setPinnedOnly(false)}
-                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
-                >
-                  Pinned only ✕
-                </button>
-              )}
-              {scopeBrandId !== "all" && (
-                <button
-                  type="button"
-                  onClick={() => setScopeBrandId("all")}
-                  className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
-                >
-                  Scope: {brandModes.find((b) => b.id === scopeBrandId)?.name ?? scopeBrandId} ✕
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* One-click relaxations, ranked by how many results they bring back */}
-          {emptyHelp && emptyHelp.relax.length > 0 && (
-            <div className="mx-auto mt-7 max-w-2xl">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-                Try this
-              </div>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                {emptyHelp.relax.map((r) => (
+                {pinnedOnly && (
                   <button
-                    key={r.key}
                     type="button"
-                    onClick={r.apply}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm text-[#03002C] transition hover:border-[#003FC7]/50 hover:shadow-sm"
+                    onClick={() => setPinnedOnly(false)}
+                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
                   >
-                    <span>{r.label}</span>
-                    <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
-                      {r.count} result{r.count === 1 ? "" : "s"}
-                    </span>
+                    Pinned only ✕
                   </button>
-                ))}
+                )}
+                {scopeBrandId !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => setScopeBrandId("all")}
+                    className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-black/35"
+                  >
+                    Scope: {brandModes.find((b) => b.id === scopeBrandId)?.name ?? scopeBrandId} ✕
+                  </button>
+                )}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Example searches + families that always return something */}
-          {emptyHelp && (emptyHelp.exampleSearches.length > 0 || emptyHelp.exampleFamilies.length > 0) && (
-            <div className="mx-auto mt-7 max-w-2xl grid gap-5 sm:grid-cols-2">
-              {emptyHelp.exampleSearches.length > 0 && (
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-                    Example searches
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {emptyHelp.exampleSearches.map((term) => (
-                      <button
-                        key={term}
-                        type="button"
-                        onClick={() => {
-                          clearFilters();
-                          setQ(term);
-                        }}
-                        className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
-                      >
-                        {term}
-                      </button>
-                    ))}
-                  </div>
+            {/* One-click relaxations, ranked by how many results they bring back */}
+            {emptyHelp && emptyHelp.relax.length > 0 && (
+              <div className="mx-auto mt-7 max-w-2xl">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                  Try this
+                </div>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {emptyHelp.relax.map((r) => (
+                    <button
+                      key={r.key}
+                      type="button"
+                      onClick={r.apply}
+                      className="flex items-center justify-between gap-3 rounded-2xl border border-black/10 bg-white px-4 py-3 text-left text-sm text-[#03002C] transition hover:border-[#003FC7]/50 hover:shadow-sm"
+                    >
+                      <span>{r.label}</span>
+                      <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#003FC7]">
+                        {r.count} result{r.count === 1 ? "" : "s"}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Example searches + families that always return something */}
+            {emptyHelp &&
+              (emptyHelp.exampleSearches.length > 0 || emptyHelp.exampleFamilies.length > 0) && (
+                <div className="mx-auto mt-7 max-w-2xl grid gap-5 sm:grid-cols-2">
+                  {emptyHelp.exampleSearches.length > 0 && (
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                        Example searches
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {emptyHelp.exampleSearches.map((term) => (
+                          <button
+                            key={term}
+                            type="button"
+                            onClick={() => {
+                              clearFilters();
+                              setQ(term);
+                            }}
+                            className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                          >
+                            {term}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {emptyHelp.exampleFamilies.length > 0 && (
+                    <div>
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
+                        Browse a family
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {emptyHelp.exampleFamilies.map(({ mf, count }) => (
+                          <button
+                            key={mf.id}
+                            type="button"
+                            onClick={() => {
+                              clearFilters();
+                              setFamilyIds(new Set([mf.id]));
+                            }}
+                            className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                          >
+                            {mf.name}
+                            <span className="ml-1 tabular-nums text-black/40">{count}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-              {emptyHelp.exampleFamilies.length > 0 && (
-                <div>
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/40">
-                    Browse a family
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {emptyHelp.exampleFamilies.map(({ mf, count }) => (
-                      <button
-                        key={mf.id}
-                        type="button"
-                        onClick={() => {
-                          clearFilters();
-                          setFamilyIds(new Set([mf.id]));
-                        }}
-                        className="rounded-full border border-black/15 bg-white px-3 py-1 text-xs text-black/70 hover:border-[#003FC7]/50 hover:text-[#003FC7]"
-                      >
-                        {mf.name}
-                        <span className="ml-1 tabular-nums text-black/40">{count}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
 
-          {hasFilters && (
-            <div className="mt-8 text-center">
+            {hasFilters && (
+              <div className="mt-8 text-center">
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-white hover:bg-[#003FC7]"
+                >
+                  Clear all filters
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div
+            className={
+              density === "thumb"
+                ? "mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                : "mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
+            }
+          >
+            {filtered.map((entry) => {
+              const v = entry.variant;
+              const isVideo = entry.kind === "video";
+              const preset = entry.kind === "preset" ? entry.preset : undefined;
+              return (
+                <VariantCard
+                  key={
+                    isVideo ? `video:${entry.example.key}` : preset ? `preset:${preset.key}` : v.id
+                  }
+                  variant={v}
+                  familyName={byId(moduleFamilies, v.familyId)?.name}
+                  brand={scopeBrand ?? tpMaster}
+                  sectionId={
+                    sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ??
+                    ""
+                  }
+                  preferred={preferred.has(v.id)}
+                  pinned={pins.has(v.id)}
+                  usageCount={usageByVariant.get(v.id) ?? 0}
+                  onTogglePin={() => togglePin(v.id)}
+                  mode={mode}
+                  showImagery={showImagery}
+                  autoFixOn={autoFixOn}
+                  logoHubPool={logoHubPool}
+                  compact={density === "thumb"}
+                  onOpen={() => (isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id))}
+                  videoExample={isVideo ? entry.example : undefined}
+                  onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
+                  importBusy={isVideo && videoBusy === entry.example.key}
+                  preset={preset}
+                  selectable={selectMode && !isVideo && !preset}
+                  selected={selectedSet.has(v.id)}
+                  onToggleSelect={() => toggleSelected(v.id)}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        <div className="mt-10">
+          <Link
+            to="/brief/new"
+            className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white"
+          >
+            Start a brief →
+          </Link>
+        </div>
+
+        {selectMode && selected.length > 0 && (
+          <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
+            <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl">
+              <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
+                {selected.length} selected
+              </span>
               <button
                 type="button"
-                onClick={clearFilters}
-                className="rounded-full bg-[#03002C] px-4 py-2 text-sm text-white hover:bg-[#003FC7]"
+                onClick={clearSelection}
+                className="text-xs text-white/70 hover:text-white"
               >
-                Clear all filters
+                Clear
+              </button>
+              <div className="h-4 w-px bg-white/20" />
+              <button
+                type="button"
+                onClick={createDeckFromSelection}
+                className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
+              >
+                <Plus size={14} /> Create deck from selection →
               </button>
             </div>
-          )}
-        </div>
-      ) : (
-
-        <div
-          className={
-            density === "thumb"
-              ? "mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-              : "mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
-          }
-        >
-          {filtered.map((entry) => {
-            const v = entry.variant;
-            const isVideo = entry.kind === "video";
-            const preset = entry.kind === "preset" ? entry.preset : undefined;
-            return (
-              <VariantCard
-                key={
-                  isVideo ? `video:${entry.example.key}` : preset ? `preset:${preset.key}` : v.id
-                }
-                variant={v}
-                familyName={byId(moduleFamilies, v.familyId)?.name}
-                brand={scopeBrand ?? tpMaster}
-                sectionId={
-                  sectionFrameworks.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? ""
-                }
-                preferred={preferred.has(v.id)}
-                pinned={pins.has(v.id)}
-                usageCount={usageByVariant.get(v.id) ?? 0}
-                onTogglePin={() => togglePin(v.id)}
-                mode={mode}
-                showImagery={showImagery}
-                autoFixOn={autoFixOn}
-                logoHubPool={logoHubPool}
-                compact={density === "thumb"}
-                onOpen={() => (isVideo ? setVideoZoomKey(entry.example.key) : setOpenId(v.id))}
-                videoExample={isVideo ? entry.example : undefined}
-                onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
-                importBusy={isVideo && videoBusy === entry.example.key}
-                preset={preset}
-                selectable={selectMode && !isVideo && !preset}
-                selected={selectedSet.has(v.id)}
-                onToggleSelect={() => toggleSelected(v.id)}
-              />
-            );
-          })}
-        </div>
-      )}
-
-      <div className="mt-10">
-        <Link to="/brief/new" className="rounded-full bg-[#03002C] px-5 py-2.5 text-sm text-white">
-          Start a brief →
-        </Link>
-      </div>
-
-      {selectMode && selected.length > 0 && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-40 flex justify-center px-4">
-          <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-white/10 bg-[#03002C] px-4 py-2 text-sm text-white shadow-2xl">
-            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
-              {selected.length} selected
-            </span>
-            <button
-              type="button"
-              onClick={clearSelection}
-              className="text-xs text-white/70 hover:text-white"
-            >
-              Clear
-            </button>
-            <div className="h-4 w-px bg-white/20" />
-            <button
-              type="button"
-              onClick={createDeckFromSelection}
-              className="inline-flex items-center gap-2 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-medium hover:bg-[#0053ff]"
-            >
-              <Plus size={14} /> Create deck from selection →
-            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {active && (
-        <VariantDetailModal
-          variant={active}
-          brand={brandModes[Math.min(brandIdx, brandModes.length - 1)]}
-          brands={brandModes}
-          brandIdx={brandIdx}
-          setBrandIdx={setBrandIdx}
-          mode={mode === "ab" ? "light" : mode}
-
-          showImagery={showImagery}
-          setShowImagery={setShowImagery}
-          family={byId(moduleFamilies, active.familyId)}
-          fallback={
-            active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined
-          }
-          layouts={
-            active.permittedLayoutIds
-              .map((id) => byId(layoutFrameworks, id))
-              .filter(Boolean) as ReturnType<typeof useTaxonomy>["layoutFrameworks"]
-          }
-          sections={sectionFrameworks.filter((s) => s.permittedFamilyIds.includes(active.familyId))}
-          pinned={pins.has(active.id)}
-          onTogglePin={() => togglePin(active.id)}
-          usageCount={usageByVariant.get(active.id) ?? 0}
-          onClose={() => setOpenId(null)}
-          logoHubPool={logoHubPool}
-        />
-      )}
-
-      {(() => {
-        if (!videoZoomKey) return null;
-        const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.key === videoZoomKey);
-        if (!ex) return null;
-        const variant = byId(MODULE_VARIANTS, ex.variantId);
-        if (!variant) return null;
-        const brand = scopeBrand ?? tpMaster;
-        const previewSlide = {
-          id: ex.key,
-          position: 0,
-          sectionId: sectionForVariant(ex.variantId),
-          variantId: ex.variantId,
-          layoutId: variant.permittedLayoutIds[0] ?? "",
-          content: ex.content as Record<string, unknown>,
-          changes: [],
-        };
-        return (
-          <LightboxPortal
-            mode={videoZoomMode}
-            setMode={(m) => {
-              if (m === null) setVideoZoomKey(null);
-              else setVideoZoomMode(m);
-            }}
-            variant={variant}
-            brand={brand}
-            previewSlide={previewSlide}
-            lightBackdrop={backdropForVariant(variant, brand.id, "light")}
-            darkBackdrop={backdropForVariant(variant, brand.id, "dark")}
+        {active && (
+          <VariantDetailModal
+            variant={active}
+            brand={brandModes[Math.min(brandIdx, brandModes.length - 1)]}
+            brands={brandModes}
+            brandIdx={brandIdx}
+            setBrandIdx={setBrandIdx}
+            mode={mode === "ab" ? "light" : mode}
+            showImagery={showImagery}
+            setShowImagery={setShowImagery}
+            family={byId(moduleFamilies, active.familyId)}
+            fallback={
+              active.fallbackVariantId ? byId(moduleVariants, active.fallbackVariantId) : undefined
+            }
+            layouts={
+              active.permittedLayoutIds
+                .map((id) => byId(layoutFrameworks, id))
+                .filter(Boolean) as ReturnType<typeof useTaxonomy>["layoutFrameworks"]
+            }
+            sections={sectionFrameworks.filter((s) =>
+              s.permittedFamilyIds.includes(active.familyId),
+            )}
+            pinned={pins.has(active.id)}
+            onTogglePin={() => togglePin(active.id)}
+            usageCount={usageByVariant.get(active.id) ?? 0}
+            onClose={() => setOpenId(null)}
+            logoHubPool={logoHubPool}
           />
-        );
-      })()}
-    </AppShell>
-    </LibraryPackProvider>
+        )}
 
+        {(() => {
+          if (!videoZoomKey) return null;
+          const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.key === videoZoomKey);
+          if (!ex) return null;
+          const variant = byId(MODULE_VARIANTS, ex.variantId);
+          if (!variant) return null;
+          const brand = scopeBrand ?? tpMaster;
+          const previewSlide = {
+            id: ex.key,
+            position: 0,
+            sectionId: sectionForVariant(ex.variantId),
+            variantId: ex.variantId,
+            layoutId: variant.permittedLayoutIds[0] ?? "",
+            content: ex.content as Record<string, unknown>,
+            changes: [],
+          };
+          return (
+            <LightboxPortal
+              mode={videoZoomMode}
+              setMode={(m) => {
+                if (m === null) setVideoZoomKey(null);
+                else setVideoZoomMode(m);
+              }}
+              variant={variant}
+              brand={brand}
+              previewSlide={previewSlide}
+              lightBackdrop={backdropForVariant(variant, brand.id, "light")}
+              darkBackdrop={backdropForVariant(variant, brand.id, "dark")}
+            />
+          );
+        })()}
+      </AppShell>
+    </LibraryPackProvider>
   );
 }
 
@@ -1564,10 +1563,7 @@ const VariantCard = memo(function VariantCard({
     : samples.apply(
         variant.id,
         brand.id,
-        seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<
-          string,
-          unknown
-        >,
+        seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
       );
   const previewContent = useMemo(() => {
     if (videoExample) return rawContent;
@@ -1638,10 +1634,10 @@ const VariantCard = memo(function VariantCard({
   const singleBackdrop = pack
     ? null
     : isDark
-    ? backdropForVariant(variant, brand.id, "dark")
-    : showImagery
-      ? backdropForVariant(variant, brand.id, "light")
-      : null;
+      ? backdropForVariant(variant, brand.id, "dark")
+      : showImagery
+        ? backdropForVariant(variant, brand.id, "light")
+        : null;
   const lightRef = useRef<HTMLDivElement | null>(null);
   const darkRef = useRef<HTMLDivElement | null>(null);
   const singleRef = useRef<HTMLDivElement | null>(null);
@@ -1719,13 +1715,13 @@ const VariantCard = memo(function VariantCard({
                         <SlideThumbnailContext.Provider value={true}>
                           <SlideForceVideoAutoplayContext.Provider value={Boolean(videoExample)}>
                             <PackShell>
-                            <VariantRenderer
-                              slide={previewSlide}
-                              variant={variant}
-                              brand={packBrand}
-                              pageNumber={1}
-                              mode={m}
-                            />
+                              <VariantRenderer
+                                slide={previewSlide}
+                                variant={variant}
+                                brand={packBrand}
+                                pageNumber={1}
+                                mode={m}
+                              />
                             </PackShell>
                           </SlideForceVideoAutoplayContext.Provider>
                         </SlideThumbnailContext.Provider>
@@ -1750,17 +1746,26 @@ const VariantCard = memo(function VariantCard({
               </div>
             ))}
             {preferred && !videoExample && (
-              <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
+              <div
+                data-ui-chrome=""
+                className="pointer-events-none absolute left-2 top-2 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur"
+              >
                 In scope
               </div>
             )}
             {videoExample && (
-              <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
+              <div
+                data-ui-chrome=""
+                className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur"
+              >
                 <Play size={9} className="fill-white" /> Video
               </div>
             )}
             {preset && (
-              <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
+              <div
+                data-ui-chrome=""
+                className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur"
+              >
                 {preset.label}
               </div>
             )}
@@ -1784,19 +1789,18 @@ const VariantCard = memo(function VariantCard({
                   <SlideThumbnailContext.Provider value={true}>
                     <SlideForceVideoAutoplayContext.Provider value={Boolean(videoExample)}>
                       <PackShell>
-                      <VariantRenderer
-                        slide={previewSlide}
-                        variant={variant}
-                        brand={packBrand}
-                        pageNumber={1}
-                        mode={isDark ? "dark" : "light"}
-                      />
+                        <VariantRenderer
+                          slide={previewSlide}
+                          variant={variant}
+                          brand={packBrand}
+                          pageNumber={1}
+                          mode={isDark ? "dark" : "light"}
+                        />
                       </PackShell>
                     </SlideForceVideoAutoplayContext.Provider>
                   </SlideThumbnailContext.Provider>
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
-
 
               {/* Quick-action overlay */}
               <div className="absolute inset-0 flex items-center justify-center gap-3 bg-[#03002C]/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
@@ -1822,22 +1826,34 @@ const VariantCard = memo(function VariantCard({
               </div>
 
               {preferred && !videoExample && (
-                <div data-ui-chrome="" className="absolute left-2 top-2 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur">
+                <div
+                  data-ui-chrome=""
+                  className="absolute left-2 top-2 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-emerald-500/80 text-white ring-1 ring-white/20 backdrop-blur"
+                >
                   In scope
                 </div>
               )}
               {videoExample && (
-                <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                <div
+                  data-ui-chrome=""
+                  className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#EC388A]/85 text-white ring-1 ring-white/20 backdrop-blur"
+                >
                   <Play size={9} className="fill-white" /> Video
                 </div>
               )}
               {preset && (
-                <div data-ui-chrome="" className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur">
+                <div
+                  data-ui-chrome=""
+                  className="pointer-events-none absolute left-2 top-2 inline-flex max-w-[60%] items-center gap-1 truncate rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#003FC7]/85 text-white ring-1 ring-white/20 backdrop-blur"
+                >
                   {preset.label}
                 </div>
               )}
               {pack && (
-                <div data-ui-chrome="" className="pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-black/55 text-white/90 backdrop-blur">
+                <div
+                  data-ui-chrome=""
+                  className="pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-black/55 text-white/90 backdrop-blur"
+                >
                   {pack.label}
                 </div>
               )}
@@ -2016,7 +2032,8 @@ const VariantCard = memo(function VariantCard({
       {usageCount > 0 && !videoExample && (
         <span
           data-variant-usage-badge=""
-          data-ui-chrome="" className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur"
+          data-ui-chrome=""
+          className="pointer-events-none absolute left-2 bottom-2 z-10 rounded-md px-1 py-[1px] text-[7px] font-semibold uppercase tracking-[0.1em] bg-[#03002C]/80 text-white ring-1 ring-white/10 backdrop-blur"
           title={`Used in ${usageCount} of your slides`}
         >
           Used · {usageCount}
@@ -2112,7 +2129,6 @@ function VariantDetailModal({
   const modalPackBrand = usePackBrand(brand);
   const [saveOpen, setSaveOpen] = useState(false);
 
-
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const copyId = async () => {
@@ -2162,7 +2178,9 @@ function VariantDetailModal({
     try {
       const raw = window.localStorage.getItem(ZIP_STORAGE_KEY);
       if (raw) return JSON.parse(raw);
-    } catch {}
+    } catch {
+      /* ignore unreadable stored preference */
+    }
     return {
       pptxLight: true,
       pptxDark: true,
@@ -2191,7 +2209,9 @@ function VariantDetailModal({
     try {
       const raw = window.localStorage.getItem(CHOICE_KEY);
       if (raw) return (JSON.parse(raw).format as ExportFormat) ?? "pptx";
-    } catch {}
+    } catch {
+      /* ignore unreadable stored preference */
+    }
     return "pptx";
   });
   const [exportTheme, setExportTheme] = useState<ExportTheme>(() => {
@@ -2199,7 +2219,9 @@ function VariantDetailModal({
     try {
       const raw = window.localStorage.getItem(CHOICE_KEY);
       if (raw) return (JSON.parse(raw).theme as ExportTheme) ?? "light";
-    } catch {}
+    } catch {
+      /* ignore unreadable stored preference */
+    }
     return "light";
   });
   const [bundleParts, setBundleParts] = useState<{ pptx: boolean; pdf: boolean; png: boolean }>(
@@ -2208,7 +2230,9 @@ function VariantDetailModal({
       try {
         const raw = window.localStorage.getItem(CHOICE_KEY);
         if (raw) return JSON.parse(raw).parts ?? { pptx: true, pdf: true, png: false };
-      } catch {}
+      } catch {
+        /* ignore unreadable stored preference */
+      }
       return { pptx: true, pdf: true, png: false };
     },
   );
@@ -2219,7 +2243,6 @@ function VariantDetailModal({
       JSON.stringify({ format: exportFormat, theme: exportTheme, parts: bundleParts }),
     );
   }, [exportFormat, exportTheme, bundleParts]);
-
 
   useEffect(() => {
     return () => {
@@ -2377,11 +2400,9 @@ function VariantDetailModal({
         `[library] downloading module ${variant.id} · division=${brand.id} · mode=${exportMode}`,
       );
       const packBackground = modalPack
-        ? await (await import("@/lib/pack-background-raster")).rasterizePackBackground(
-            modalPack,
-            variant.id,
-            variant.permittedLayoutIds[0],
-          )
+        ? await (
+            await import("@/lib/pack-background-raster")
+          ).rasterizePackBackground(modalPack, variant.id, variant.permittedLayoutIds[0])
         : null;
       const { fileName } = await (
         await loadPptxExport()
@@ -2737,7 +2758,12 @@ function VariantDetailModal({
   const bundleFileCount = Object.values(bundleSelection).filter(Boolean).length;
 
   const exportBusy =
-    downloading || slideOnlyBusy !== null || pdfBusy !== null || bothBusy || zipBusy || pngBusy !== null;
+    downloading ||
+    slideOnlyBusy !== null ||
+    pdfBusy !== null ||
+    bothBusy ||
+    zipBusy ||
+    pngBusy !== null;
 
   /** Number of files the current choice produces. */
   const exportFileCount =
@@ -2749,10 +2775,15 @@ function VariantDetailModal({
 
   const exportLabel = (() => {
     if (exportFormat === "zip") return `Download ZIP · ${bundleFileCount} files`;
-    const kind =
-      exportFormat === "pptx" ? "PowerPoint" : exportFormat === "pdf" ? "PDF" : "PNG";
+    const kind = exportFormat === "pptx" ? "PowerPoint" : exportFormat === "pdf" ? "PDF" : "PNG";
     const theme =
-      exportTheme === "both" ? (exportFormat === "pdf" ? "Light + Dark" : "Both themes") : exportTheme === "light" ? "Light" : "Dark";
+      exportTheme === "both"
+        ? exportFormat === "pdf"
+          ? "Light + Dark"
+          : "Both themes"
+        : exportTheme === "light"
+          ? "Light"
+          : "Dark";
     return `Download ${kind} · ${theme}`;
   })();
 
@@ -2781,7 +2812,6 @@ function VariantDetailModal({
     // instead of a fused design plate.
     for (const m of exportThemes) await downloadSlideOnly(m);
   };
-
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -2818,8 +2848,7 @@ function VariantDetailModal({
     return overlayLogoHubFillers(raw, variant.id, logoHubPool);
   }, [variant.id, brief, sections, brand, logoHubPool]);
   const savedSample = samples.get(variant.id, brand.id);
-  const detailContent =
-    sampleDraft ?? samples.apply(variant.id, brand.id, seededContent);
+  const detailContent = sampleDraft ?? samples.apply(variant.id, brand.id, seededContent);
   const detailCopy = useMemo(() => splitSampleContent(detailContent).copy, [detailContent]);
   const previewSlide = {
     id: variant.id,
@@ -2913,9 +2942,6 @@ function VariantDetailModal({
                 <Star size={12} /> Save
               </button>
 
-
-
-
               {/* Unified Export control — the primary button downloads the
                   current choice (format + theme); the caret opens the chooser. */}
 
@@ -2935,7 +2961,6 @@ function VariantDetailModal({
                     <Download size={12} />
                   )}
                   {exportBusy ? (zipStage ?? pdfStage ?? "Exporting…") : exportLabel}
-
                 </button>
                 <button
                   type="button"
@@ -2968,297 +2993,298 @@ function VariantDetailModal({
                   // an inline panel was trapped inside the modal box and got
                   // clipped top and bottom.
                   createPortal(
-                  <>
-                    <button
-                      type="button"
-                      aria-label="Close export menu"
-                      className="fixed inset-0 z-40 cursor-default bg-transparent"
-                      onClick={() => setExportMenuOpen(false)}
-                    />
-                    <div
-                      role="menu"
-                      onWheel={(e) => e.stopPropagation()}
-                      onTouchMove={(e) => e.stopPropagation()}
-                      // Pinned between a top and bottom inset instead of a vh
-                      // max-height, so the panel can never run past the bottom
-                      // of the window (which cut off "Advanced settings").
-                      // `overscroll-contain` keeps wheel scrolling inside the
-                      // panel instead of leaking to the page behind it.
-                      className="fixed right-6 top-20 bottom-6 z-[60] flex w-[24rem] max-w-[calc(100vw-3rem)] flex-col overflow-y-auto overscroll-contain rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
-                    >
-
-                      {/* 1 — Header: what am I exporting, at what size */}
-                      <div className="flex items-start justify-between gap-3 pb-3">
-                        <div className="min-w-0">
-                          <div className="text-[10px] font-bold uppercase tracking-widest text-black/45">
-                            Export
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Close export menu"
+                        className="fixed inset-0 z-40 cursor-default bg-transparent"
+                        onClick={() => setExportMenuOpen(false)}
+                      />
+                      <div
+                        role="menu"
+                        onWheel={(e) => e.stopPropagation()}
+                        onTouchMove={(e) => e.stopPropagation()}
+                        // Pinned between a top and bottom inset instead of a vh
+                        // max-height, so the panel can never run past the bottom
+                        // of the window (which cut off "Advanced settings").
+                        // `overscroll-contain` keeps wheel scrolling inside the
+                        // panel instead of leaking to the page behind it.
+                        className="fixed right-6 top-20 bottom-6 z-[60] flex w-[24rem] max-w-[calc(100vw-3rem)] flex-col overflow-y-auto overscroll-contain rounded-2xl border border-black/10 bg-white p-4 text-[#03002C] shadow-2xl ring-1 ring-black/5"
+                      >
+                        {/* 1 — Header: what am I exporting, at what size */}
+                        <div className="flex items-start justify-between gap-3 pb-3">
+                          <div className="min-w-0">
+                            <div className="text-[10px] font-bold uppercase tracking-widest text-black/45">
+                              Export
+                            </div>
+                            <div className="truncate text-sm font-semibold">{variant.name}</div>
                           </div>
-                          <div className="truncate text-sm font-semibold">{variant.name}</div>
+                          <ResolutionToggle
+                            value={pixelRatio}
+                            onChange={setPixelRatio}
+                            disabled={exportBusy}
+                          />
                         </div>
-                        <ResolutionToggle
-                          value={pixelRatio}
-                          onChange={setPixelRatio}
-                          disabled={exportBusy}
-                        />
-                      </div>
 
-                      {/* 2 — Format */}
-                      <div className="border-t border-black/5 pt-3">
-                        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
-                          Format
-                        </div>
-                        <div className="grid grid-cols-2 gap-1.5">
-                          {(
-                            [
-                              {
-                                key: "pptx",
-                                label: "PowerPoint",
-                                hint: "Editable layers",
-                                icon: <Download size={12} />,
-                              },
-                              {
-                                key: "pdf",
-                                label: "PDF",
-                                hint: "Pixel-perfect",
-                                icon: <Eye size={12} />,
-                              },
-                              {
-                                key: "png",
-                                label: "PNG image",
-                                hint: "Single slide",
-                                icon: <ImageIcon size={12} />,
-                              },
-                              {
-                                key: "zip",
-                                label: "ZIP bundle",
-                                hint: "Multi-format",
-                                icon: <Package size={12} />,
-                              },
-                            ] as {
-                              key: ExportFormat;
-                              label: string;
-                              hint: string;
-                              icon: React.ReactNode;
-                            }[]
-                          ).map((f) => {
-                            const active = exportFormat === f.key;
-                            return (
-                              <button
-                                key={f.key}
-                                type="button"
-                                aria-pressed={active}
-                                onClick={() => setExportFormat(f.key)}
-                                className={`flex flex-col items-start gap-0.5 rounded-xl border px-2.5 py-2 text-left transition ${
-                                  active
-                                    ? "border-[#003FC7] bg-[#003FC7]/[0.06] ring-1 ring-[#003FC7]/30"
-                                    : "border-black/10 bg-white hover:border-[#003FC7]/40"
-                                }`}
-                              >
-                                <span className="inline-flex items-center gap-1.5 text-xs font-semibold">
-                                  {f.icon} {f.label}
-                                </span>
-                                <span className="text-[10px] text-black/45">{f.hint}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* 3 — Theme */}
-                      <div className="mt-3 border-t border-black/5 pt-3">
-                        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
-                          Theme
-                        </div>
-                        <div className="inline-flex w-full rounded-full border border-black/10 bg-black/[0.03] p-0.5">
-                          {(["light", "dark", "both"] as ExportTheme[]).map((t) => (
-                            <button
-                              key={t}
-                              type="button"
-                              aria-pressed={exportTheme === t}
-                              onClick={() => setExportTheme(t)}
-                              className={`flex-1 rounded-full px-2 py-1 text-xs font-semibold capitalize transition ${
-                                exportTheme === t
-                                  ? "bg-[#03002C] text-white"
-                                  : "text-black/60 hover:text-[#003FC7]"
-                              }`}
-                            >
-                              {t}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* 3b — Bundle contents (ZIP only) */}
-                      {exportFormat === "zip" ? (
-                        <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.02] p-3">
+                        {/* 2 — Format */}
+                        <div className="border-t border-black/5 pt-3">
                           <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
-                            Include in bundle
+                            Format
                           </div>
-                          <div className="grid grid-cols-3 gap-1.5">
+                          <div className="grid grid-cols-2 gap-1.5">
                             {(
                               [
-                                { key: "pptx", label: "PPTX" },
-                                { key: "pdf", label: "PDF" },
-                                { key: "png", label: "PNG" },
-                              ] as { key: keyof typeof bundleParts; label: string }[]
-                            ).map((p) => (
-                              <label
-                                key={p.key}
-                                className="flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 text-xs font-medium hover:bg-black/5"
+                                {
+                                  key: "pptx",
+                                  label: "PowerPoint",
+                                  hint: "Editable layers",
+                                  icon: <Download size={12} />,
+                                },
+                                {
+                                  key: "pdf",
+                                  label: "PDF",
+                                  hint: "Pixel-perfect",
+                                  icon: <Eye size={12} />,
+                                },
+                                {
+                                  key: "png",
+                                  label: "PNG image",
+                                  hint: "Single slide",
+                                  icon: <ImageIcon size={12} />,
+                                },
+                                {
+                                  key: "zip",
+                                  label: "ZIP bundle",
+                                  hint: "Multi-format",
+                                  icon: <Package size={12} />,
+                                },
+                              ] as {
+                                key: ExportFormat;
+                                label: string;
+                                hint: string;
+                                icon: React.ReactNode;
+                              }[]
+                            ).map((f) => {
+                              const active = exportFormat === f.key;
+                              return (
+                                <button
+                                  key={f.key}
+                                  type="button"
+                                  aria-pressed={active}
+                                  onClick={() => setExportFormat(f.key)}
+                                  className={`flex flex-col items-start gap-0.5 rounded-xl border px-2.5 py-2 text-left transition ${
+                                    active
+                                      ? "border-[#003FC7] bg-[#003FC7]/[0.06] ring-1 ring-[#003FC7]/30"
+                                      : "border-black/10 bg-white hover:border-[#003FC7]/40"
+                                  }`}
+                                >
+                                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold">
+                                    {f.icon} {f.label}
+                                  </span>
+                                  <span className="text-[10px] text-black/45">{f.hint}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* 3 — Theme */}
+                        <div className="mt-3 border-t border-black/5 pt-3">
+                          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
+                            Theme
+                          </div>
+                          <div className="inline-flex w-full rounded-full border border-black/10 bg-black/[0.03] p-0.5">
+                            {(["light", "dark", "both"] as ExportTheme[]).map((t) => (
+                              <button
+                                key={t}
+                                type="button"
+                                aria-pressed={exportTheme === t}
+                                onClick={() => setExportTheme(t)}
+                                className={`flex-1 rounded-full px-2 py-1 text-xs font-semibold capitalize transition ${
+                                  exportTheme === t
+                                    ? "bg-[#03002C] text-white"
+                                    : "text-black/60 hover:text-[#003FC7]"
+                                }`}
                               >
-                                <input
-                                  type="checkbox"
-                                  checked={bundleParts[p.key]}
-                                  onChange={(e) =>
-                                    setBundleParts((s) => ({ ...s, [p.key]: e.target.checked }))
-                                  }
-                                  className="h-3.5 w-3.5 accent-[#003FC7]"
-                                />
-                                {p.label}
-                              </label>
+                                {t}
+                              </button>
                             ))}
                           </div>
                         </div>
-                      ) : null}
 
-                      {/* 4 — Primary action */}
-                      <button
-                        type="button"
-                        onClick={() => void runExport()}
-                        disabled={exportBusy || previewBusy}
-                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#03002C] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:opacity-60"
-                      >
-                        {exportBusy ? (
-                          <Loader2 size={14} className="animate-spin" />
-                        ) : (
-                          <Download size={14} />
-                        )}
-                        {exportBusy ? (zipStage ?? pdfStage ?? "Exporting…") : exportLabel}
-                      </button>
-                      <p className="mt-1.5 text-center text-[10px] text-black/45">
-                        {exportFormat === "zip"
-                          ? `1 ZIP · ${bundleFileCount} file${bundleFileCount === 1 ? "" : "s"} inside`
-                          : `${exportFileCount} file${exportFileCount === 1 ? "" : "s"}`}{" "}
-                        · {pixelRatio === 3840 ? "4K" : "HD"} · settings saved
-                      </p>
-
-                      {/* 5 — Secondary: proof before downloading */}
-                      <button
-                        type="button"
-                        onClick={openPdfPreview}
-                        disabled={previewBusy || exportBusy}
-                        className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
-                      >
-                        {previewBusy ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <Eye size={12} />
-                        )}
-                        {previewBusy ? (previewStage ?? "Rendering…") : "Preview Light & Dark"}
-                      </button>
-
-                      {/* 6 — Advanced */}
-                      <details
-                        className="group mt-3 shrink-0 rounded-xl border border-black/10 bg-black/[0.02]"
-                        onToggle={(e) => {
-                          const el = e.currentTarget;
-                          if (!el.open) return;
-                          // Bring the freshly revealed controls into view inside
-                          // the scroll container rather than leaving them below
-                          // the fold.
-                          requestAnimationFrame(() =>
-                            el.scrollIntoView({ block: "end", behavior: "smooth" }),
-                          );
-                        }}
-                      >
-                        <summary className="cursor-pointer list-none px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-black/50 hover:text-[#003FC7]">
-                          Advanced settings
-                        </summary>
-
-                        <div className="space-y-2 border-t border-black/5 px-3 py-3">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-black/60">PPTX embeds</span>
-                            <VectorToggle />
-                          </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-black/60">Image resolution</span>
-                            <ExportQualitySelect
-                              compact
-                              value={exportQuality}
-                              onChange={setExportQuality}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-black/60">Fidelity</span>
-                            <ExportFidelitySelect
-                              compact
-                              value={exportFidelity}
-                              onChange={setExportFidelity}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-black/60">Embed brand fonts</span>
-                            <ExportFontEmbedToggle
-                              compact
-                              value={embedFonts}
-                              onChange={setEmbedFonts}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-black/60">JPEG/PNG images only</span>
-                            <ExportLegacyImagesToggle
-                              compact
-                              value={legacyImages}
-                              onChange={setLegacyImages}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-black/60">
-                              Transparent → PNG, photos → JPEG
-                            </span>
-                            <ExportAlphaImagesToggle
-                              compact
-                              value={alphaImages}
-                              onChange={setAlphaImages}
-                            />
-                          </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-[11px] text-black/60">Debug object tree</span>
-                            <ExportDebugTreeToggle
-                              compact
-                              value={exportDebugTree}
-                              onChange={setExportDebugTree}
-                            />
-                          </div>
-                          <div className="border-t border-black/5 pt-2">
+                        {/* 3b — Bundle contents (ZIP only) */}
+                        {exportFormat === "zip" ? (
+                          <div className="mt-3 rounded-xl border border-black/10 bg-black/[0.02] p-3">
                             <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
-                              Fast single-slide PPTX
+                              Include in bundle
                             </div>
-                            <div className="grid grid-cols-2 gap-1.5">
-                              {(["light", "dark"] as const).map((m) => (
-                                <button
-                                  key={m}
-                                  type="button"
-                                  onClick={() => void downloadSlideOnly(m)}
-                                  disabled={slideOnlyBusy !== null}
-                                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs font-medium capitalize hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+                            <div className="grid grid-cols-3 gap-1.5">
+                              {(
+                                [
+                                  { key: "pptx", label: "PPTX" },
+                                  { key: "pdf", label: "PDF" },
+                                  { key: "png", label: "PNG" },
+                                ] as { key: keyof typeof bundleParts; label: string }[]
+                              ).map((p) => (
+                                <label
+                                  key={p.key}
+                                  className="flex cursor-pointer items-center gap-1.5 rounded-lg px-1.5 py-1 text-xs font-medium hover:bg-black/5"
                                 >
-                                  {slideOnlyBusy === m ? (
-                                    <Loader2 size={12} className="animate-spin" />
-                                  ) : (
-                                    <Download size={12} />
-                                  )}
-                                  {m}
-                                </button>
+                                  <input
+                                    type="checkbox"
+                                    checked={bundleParts[p.key]}
+                                    onChange={(e) =>
+                                      setBundleParts((s) => ({ ...s, [p.key]: e.target.checked }))
+                                    }
+                                    className="h-3.5 w-3.5 accent-[#003FC7]"
+                                  />
+                                  {p.label}
+                                </label>
                               ))}
                             </div>
                           </div>
-                        </div>
-                      </details>
-                    </div>
-                  </>,
-                  document.body,
-                )}
+                        ) : null}
+
+                        {/* 4 — Primary action */}
+                        <button
+                          type="button"
+                          onClick={() => void runExport()}
+                          disabled={exportBusy || previewBusy}
+                          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#03002C] px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-[#003FC7] disabled:opacity-60"
+                        >
+                          {exportBusy ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <Download size={14} />
+                          )}
+                          {exportBusy ? (zipStage ?? pdfStage ?? "Exporting…") : exportLabel}
+                        </button>
+                        <p className="mt-1.5 text-center text-[10px] text-black/45">
+                          {exportFormat === "zip"
+                            ? `1 ZIP · ${bundleFileCount} file${bundleFileCount === 1 ? "" : "s"} inside`
+                            : `${exportFileCount} file${exportFileCount === 1 ? "" : "s"}`}{" "}
+                          · {pixelRatio === 3840 ? "4K" : "HD"} · settings saved
+                        </p>
+
+                        {/* 5 — Secondary: proof before downloading */}
+                        <button
+                          type="button"
+                          onClick={openPdfPreview}
+                          disabled={previewBusy || exportBusy}
+                          className="mt-2 inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#003FC7]/30 bg-[#003FC7]/5 px-3 py-1.5 text-xs font-medium text-[#003FC7] transition hover:bg-[#003FC7] hover:text-white disabled:opacity-60"
+                        >
+                          {previewBusy ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <Eye size={12} />
+                          )}
+                          {previewBusy ? (previewStage ?? "Rendering…") : "Preview Light & Dark"}
+                        </button>
+
+                        {/* 6 — Advanced */}
+                        <details
+                          className="group mt-3 shrink-0 rounded-xl border border-black/10 bg-black/[0.02]"
+                          onToggle={(e) => {
+                            const el = e.currentTarget;
+                            if (!el.open) return;
+                            // Bring the freshly revealed controls into view inside
+                            // the scroll container rather than leaving them below
+                            // the fold.
+                            requestAnimationFrame(() =>
+                              el.scrollIntoView({ block: "end", behavior: "smooth" }),
+                            );
+                          }}
+                        >
+                          <summary className="cursor-pointer list-none px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-black/50 hover:text-[#003FC7]">
+                            Advanced settings
+                          </summary>
+
+                          <div className="space-y-2 border-t border-black/5 px-3 py-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[11px] text-black/60">PPTX embeds</span>
+                              <VectorToggle />
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[11px] text-black/60">Image resolution</span>
+                              <ExportQualitySelect
+                                compact
+                                value={exportQuality}
+                                onChange={setExportQuality}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[11px] text-black/60">Fidelity</span>
+                              <ExportFidelitySelect
+                                compact
+                                value={exportFidelity}
+                                onChange={setExportFidelity}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[11px] text-black/60">Embed brand fonts</span>
+                              <ExportFontEmbedToggle
+                                compact
+                                value={embedFonts}
+                                onChange={setEmbedFonts}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[11px] text-black/60">
+                                JPEG/PNG images only
+                              </span>
+                              <ExportLegacyImagesToggle
+                                compact
+                                value={legacyImages}
+                                onChange={setLegacyImages}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[11px] text-black/60">
+                                Transparent → PNG, photos → JPEG
+                              </span>
+                              <ExportAlphaImagesToggle
+                                compact
+                                value={alphaImages}
+                                onChange={setAlphaImages}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-[11px] text-black/60">Debug object tree</span>
+                              <ExportDebugTreeToggle
+                                compact
+                                value={exportDebugTree}
+                                onChange={setExportDebugTree}
+                              />
+                            </div>
+                            <div className="border-t border-black/5 pt-2">
+                              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-black/45">
+                                Fast single-slide PPTX
+                              </div>
+                              <div className="grid grid-cols-2 gap-1.5">
+                                {(["light", "dark"] as const).map((m) => (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    onClick={() => void downloadSlideOnly(m)}
+                                    disabled={slideOnlyBusy !== null}
+                                    className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-black/15 bg-white px-2.5 py-1.5 text-xs font-medium capitalize hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
+                                  >
+                                    {slideOnlyBusy === m ? (
+                                      <Loader2 size={12} className="animate-spin" />
+                                    ) : (
+                                      <Download size={12} />
+                                    )}
+                                    {m}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </details>
+                      </div>
+                    </>,
+                    document.body,
+                  )}
               </div>
 
               {usageCount > 0 && (
@@ -3303,7 +3329,6 @@ function VariantDetailModal({
                       className={`px-2.5 py-1 ${mode === "dark" ? "bg-[#05041A] text-white" : "text-black/60"}`}
                     >
                       ☾
-
                     </button>
                   </div>
                   <button
@@ -3349,22 +3374,22 @@ function VariantDetailModal({
             <div className="max-h-[70vh] space-y-5 overflow-y-auto p-6 text-sm">
               {isModuleAdmin && (
                 <>
-                <button
-                  type="button"
-                  onClick={() => setStudioOpen(true)}
-                  className="w-full rounded-xl border border-[#003FC7]/30 bg-[#003FC7] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0034a6]"
-                >
-                  ⤢ Open slide studio — full live editor
-                </button>
-                <VariantSampleEditor
-                  variantId={variant.id}
-                  brandModeId={brand.id}
-                  brandName={brand.name}
-                  seeded={seededContent}
-                  draft={detailContent}
-                  onDraftChange={setSampleDraft}
-                  hasSavedSample={!!savedSample}
-                />
+                  <button
+                    type="button"
+                    onClick={() => setStudioOpen(true)}
+                    className="w-full rounded-xl border border-[#003FC7]/30 bg-[#003FC7] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0034a6]"
+                  >
+                    ⤢ Open slide studio — full live editor
+                  </button>
+                  <VariantSampleEditor
+                    variantId={variant.id}
+                    brandModeId={brand.id}
+                    brandName={brand.name}
+                    seeded={seededContent}
+                    draft={detailContent}
+                    onDraftChange={setSampleDraft}
+                    hasSavedSample={!!savedSample}
+                  />
                 </>
               )}
 
@@ -3935,9 +3960,7 @@ function LightboxPortal({
                 onClick={() => setMode(m)}
                 disabled={modeLocked && m !== effMode}
                 title={
-                  modeLocked
-                    ? `${activePack?.label} is a ${activePack?.mode}-only look`
-                    : undefined
+                  modeLocked ? `${activePack?.label} is a ${activePack?.mode}-only look` : undefined
                 }
                 className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition ${
                   effMode === m
@@ -3997,18 +4020,15 @@ function LightboxPortal({
                 <SlideVideoPreviewContext.Provider value={setPlayUrl}>
                   <SlideForceVideoAutoplayContext.Provider value={true}>
                     <PackShell>
-                    <SlideIntro
-                      variantId={variant.id}
-                      replayKey={`${effMode}:${introNonce}`}
-                    >
-                    <VariantRenderer
-                      slide={previewSlide}
-                      variant={variant}
-                      brand={lightboxBrand}
-                      pageNumber={1}
-                      mode={effMode}
-                    />
-                    </SlideIntro>
+                      <SlideIntro variantId={variant.id} replayKey={`${effMode}:${introNonce}`}>
+                        <VariantRenderer
+                          slide={previewSlide}
+                          variant={variant}
+                          brand={lightboxBrand}
+                          pageNumber={1}
+                          mode={effMode}
+                        />
+                      </SlideIntro>
                     </PackShell>
                   </SlideForceVideoAutoplayContext.Provider>
                 </SlideVideoPreviewContext.Provider>

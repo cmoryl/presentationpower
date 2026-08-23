@@ -7,12 +7,7 @@
 import { useMemo, useState } from "react";
 import { ChevronDown, RotateCcw, Type } from "lucide-react";
 
-import {
-  collectTextFields,
-  groupTextFields,
-  pathKey,
-  setAtPath,
-} from "@/lib/print-content-text";
+import { collectTextFields, groupTextFields, pathKey, setAtPath } from "@/lib/print-content-text";
 
 type Props = {
   content: unknown;

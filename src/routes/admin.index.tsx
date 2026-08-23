@@ -5,6 +5,24 @@ import { getAdminOverview } from "@/lib/admin.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 
 export const Route = createFileRoute("/admin/")({
+  head: () => ({
+    meta: [
+      { title: "Admin overview · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Control room for Element: brand modes, module libraries, taxonomy, users and generation analytics.",
+      },
+      { property: "og:title", content: "Admin overview · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Control room for Element: brand modes, module libraries, taxonomy, users and generation analytics.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: OverviewView,
 });
 
@@ -243,7 +261,9 @@ function OverviewView() {
         {/* Deck pipeline detail */}
         <div className="mt-8 mb-4 grid grid-cols-1 gap-3 border-t border-black/10 pt-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">Deck pipeline</div>
+            <div className="text-[10px] uppercase tracking-[0.3em] text-black/40">
+              Deck pipeline
+            </div>
             <h3 className="mt-1 font-[Geist] text-lg font-semibold tracking-tight sm:text-xl">
               Deck status, brand modes and archetypes
             </h3>
@@ -293,7 +313,9 @@ function OverviewView() {
                 <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">
                   Creation Trend · 30d
                 </div>
-                <div className="mt-1 font-[Geist] text-xl font-semibold text-[#03002C]">Decks per day</div>
+                <div className="mt-1 font-[Geist] text-xl font-semibold text-[#03002C]">
+                  Decks per day
+                </div>
               </div>
               <div className="shrink-0 text-[10px] whitespace-nowrap uppercase tracking-widest text-black/40">
                 {(q.data.decksPerDay ?? []).reduce((a, d) => a + d.count, 0)} total
@@ -332,7 +354,9 @@ function OverviewView() {
             <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">
               Status Pipeline
             </div>
-            <div className="mt-1 font-[Geist] text-xl font-semibold text-[#03002C]">By workflow state</div>
+            <div className="mt-1 font-[Geist] text-xl font-semibold text-[#03002C]">
+              By workflow state
+            </div>
             <div className="mt-5 space-y-3">
               {(q.data.decksByStatus ?? []).length === 0 ? (
                 <div className="rounded-lg border border-dashed border-black/20 p-4 text-center text-xs text-black/50">
@@ -397,7 +421,9 @@ function OverviewView() {
                 <div className="text-[10px] uppercase tracking-[0.25em] text-black/40">
                   Recent Activity
                 </div>
-                <div className="mt-1 font-[Geist] text-lg font-semibold text-[#03002C]">Latest decks</div>
+                <div className="mt-1 font-[Geist] text-lg font-semibold text-[#03002C]">
+                  Latest decks
+                </div>
               </div>
               <Link
                 to="/atlas"

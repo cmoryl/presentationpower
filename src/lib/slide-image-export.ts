@@ -150,7 +150,6 @@ export function describeCaptureFailure(err: unknown): string {
   return "the browser could not rasterize this page";
 }
 
-
 function report(cb: ExportProgressCallback | undefined, p: ExportProgress): void {
   if (cb) {
     try {
@@ -571,7 +570,6 @@ export async function captureSlideAsDataUrl(
       }
     }
     throw new Error(describeCaptureFailure(lastErr));
-
   } finally {
     releaseChrome();
     restoreBackdrop();

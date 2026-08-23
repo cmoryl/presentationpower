@@ -141,11 +141,7 @@ import {
   type PrintFitOverride,
 } from "@/components/print/PrintContentFitFrame";
 import { PrintFitAuditPanel } from "@/components/print/PrintFitAuditPanel";
-import type {
-  PrintFitAuditInput,
-  PrintFitFix,
-  PrintFitMeasurement,
-} from "@/lib/print-fit-audit";
+import type { PrintFitAuditInput, PrintFitFix, PrintFitMeasurement } from "@/lib/print-fit-audit";
 import {
   NEUTRAL_FIT,
   PRINT_CONTENT_FIT_DEFAULTS,
@@ -546,6 +542,10 @@ function AssetEditor() {
     );
   }, [kindForAudit, row]);
 
+  // Declared above the loading / not-found early returns so the hook order
+  // stays identical on every render.
+  const [imageBusy, setImageBusy] = useState(false);
+
   if (loading)
     return (
       <AppShell>
@@ -705,7 +705,6 @@ function AssetEditor() {
   // a nested path to keep `writePath` from creating accidental sub-objects.
   const imageOverrides = ((rawContent as { imageOverrides?: Record<string, string> })
     .imageOverrides ?? {}) as Record<string, string>;
-  const [imageBusy, setImageBusy] = useState(false);
 
   function setImageOverride(slot: string, url: string | null) {
     const next = { ...imageOverrides };
@@ -907,7 +906,6 @@ function AssetEditor() {
       setExportBusy(false);
     }
   }
-
 
   // Multi-page proposals render every page stacked inside the canvas, so the
   // canvas cannot be pinned to a single page aspect ratio.
@@ -1246,7 +1244,6 @@ function AssetEditor() {
                     >
                       {exportBusy ? "Rendering…" : "Download PDF"}
                     </button>
-
                   </div>
                 </div>
               )}
@@ -1370,141 +1367,146 @@ function AssetEditor() {
                           busy: imageBusy,
                         }}
                       >
-                      <PrintLogoListContext.Provider
-                        value={{ active: true, onChange: (path, next) => patchByPath(path, next) }}
-                      >
-                      <LiveEditOverlay
-                        enabled={true}
-                        slideId={`asset-${row.id}-${kind}`}
-                        content={rawContent}
-                        editableFields={editableFieldPaths}
-                        onChange={(path, value) => patchByPath(path, value)}
-                        inkOverrides={ctx.inkOverrides}
-                        inkScopeOverrides={ctx.inkScopeOverrides}
-                        onSetInkColor={(cp, color) => setInkColor(cp, color)}
-                        onClearInkColor={(cp) => setInkColor(cp, null)}
-                        onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
-                        onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
-                      >
-                        <PrintClientLogoProvider value={clientLogo}>
-                          {brand && kind === "case-study" && (
-                            <CaseStudyLayout
-                              content={rawContent as unknown as CaseStudyContent}
-                              brand={brand}
-                              mode={editorMode}
-                              pageSize={pageSize}
-                              density={density}
-                              seed={`asset-${row.id}`}
-                            />
-                          )}
-                          {brand && kind === "spotlight" && (
-                            <SpotlightLayout
-                              content={rawContent as unknown as SpotlightContent}
-                              brand={brand}
-                              mode={editorMode}
-                              pageSize={pageSize}
-                              density={density}
-                              seed={`asset-${row.id}`}
-                            />
-                          )}
-                          {brand && kind === "ebrochure" && (
-                            <EBrochureLayout
-                              content={rawContent as unknown as EBrochureContent}
-                              brand={brand}
-                              mode={editorMode}
-                              pageSize={pageSize}
-                              density={density}
-                              seed={`asset-${row.id}`}
-                            />
-                          )}
-                          {brand && kind === "msa-partnership" && (
-                            <MsaPartnershipLayout
-                              content={rawContent as unknown as MsaPartnershipContent}
-                              brand={brand}
-                              mode={editorMode}
-                              pageSize={pageSize}
-                              density={density}
-                              seed={`asset-${row.id}`}
-                            />
-                          )}
-                          {brand &&
-                            kind === "solution-proposal" &&
-                            isMultiProposal(rawContent as Partial<SolutionProposalContent>) && (
-                              <MultiProposalLayout
-                                content={rawContent as unknown as SolutionProposalContent}
-                                brand={brand}
-                                mode={editorMode}
-                                pageSize={pageSize}
-                                density={density}
-                                seed={`asset-${row.id}`}
+                        <PrintLogoListContext.Provider
+                          value={{
+                            active: true,
+                            onChange: (path, next) => patchByPath(path, next),
+                          }}
+                        >
+                          <LiveEditOverlay
+                            enabled={true}
+                            slideId={`asset-${row.id}-${kind}`}
+                            content={rawContent}
+                            editableFields={editableFieldPaths}
+                            onChange={(path, value) => patchByPath(path, value)}
+                            inkOverrides={ctx.inkOverrides}
+                            inkScopeOverrides={ctx.inkScopeOverrides}
+                            onSetInkColor={(cp, color) => setInkColor(cp, color)}
+                            onClearInkColor={(cp) => setInkColor(cp, null)}
+                            onSetInkScopeColor={(sc, color) => setInkScopeColor(sc, color)}
+                            onClearInkScopeColor={(sc) => setInkScopeColor(sc, null)}
+                          >
+                            <PrintClientLogoProvider value={clientLogo}>
+                              {brand && kind === "case-study" && (
+                                <CaseStudyLayout
+                                  content={rawContent as unknown as CaseStudyContent}
+                                  brand={brand}
+                                  mode={editorMode}
+                                  pageSize={pageSize}
+                                  density={density}
+                                  seed={`asset-${row.id}`}
+                                />
+                              )}
+                              {brand && kind === "spotlight" && (
+                                <SpotlightLayout
+                                  content={rawContent as unknown as SpotlightContent}
+                                  brand={brand}
+                                  mode={editorMode}
+                                  pageSize={pageSize}
+                                  density={density}
+                                  seed={`asset-${row.id}`}
+                                />
+                              )}
+                              {brand && kind === "ebrochure" && (
+                                <EBrochureLayout
+                                  content={rawContent as unknown as EBrochureContent}
+                                  brand={brand}
+                                  mode={editorMode}
+                                  pageSize={pageSize}
+                                  density={density}
+                                  seed={`asset-${row.id}`}
+                                />
+                              )}
+                              {brand && kind === "msa-partnership" && (
+                                <MsaPartnershipLayout
+                                  content={rawContent as unknown as MsaPartnershipContent}
+                                  brand={brand}
+                                  mode={editorMode}
+                                  pageSize={pageSize}
+                                  density={density}
+                                  seed={`asset-${row.id}`}
+                                />
+                              )}
+                              {brand &&
+                                kind === "solution-proposal" &&
+                                isMultiProposal(rawContent as Partial<SolutionProposalContent>) && (
+                                  <MultiProposalLayout
+                                    content={rawContent as unknown as SolutionProposalContent}
+                                    brand={brand}
+                                    mode={editorMode}
+                                    pageSize={pageSize}
+                                    density={density}
+                                    seed={`asset-${row.id}`}
+                                  />
+                                )}
+                              {brand &&
+                                kind === "solution-proposal" &&
+                                !isMultiProposal(
+                                  rawContent as Partial<SolutionProposalContent>,
+                                ) && (
+                                  <SolutionProposalLayout
+                                    content={rawContent as unknown as SolutionProposalContent}
+                                    brand={brand}
+                                    mode={editorMode}
+                                    pageSize={pageSize}
+                                    density={density}
+                                    seed={`asset-${row.id}`}
+                                  />
+                                )}
+                              {brand && kind === "adaptor-brief" && (
+                                <AdaptorBriefLayout
+                                  content={rawContent as unknown as AdaptorBriefContent}
+                                  brand={brand}
+                                  mode={editorMode}
+                                  pageSize={pageSize}
+                                  density={density}
+                                  seed={`asset-${row.id}`}
+                                />
+                              )}
+                            </PrintClientLogoProvider>
+                            {ctx.printSafeArea && (
+                              <div
+                                data-export-ignore="true"
+                                data-canvas-guide="safe-area"
+                                className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
                               />
                             )}
-                          {brand &&
-                            kind === "solution-proposal" &&
-                            !isMultiProposal(rawContent as Partial<SolutionProposalContent>) && (
-                            <SolutionProposalLayout
-                              content={rawContent as unknown as SolutionProposalContent}
-                              brand={brand}
-                              mode={editorMode}
-                              pageSize={pageSize}
-                              density={density}
-                              seed={`asset-${row.id}`}
+                            <HeroResizeHandle
+                              canvasRef={canvasRef}
+                              media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
+                              onChange={(next) => patchContent({ heroMedia: next } as never)}
+                              kind={kind as never}
+                              usedModuleUnits={(
+                                (rawContent as { modules?: PrintSection[] }).modules ?? []
+                              ).reduce((n, m) => n + weightForSection(m), 0)}
+                              hasTitle={!!(rawContent as { title?: string }).title}
+                              hasSummary={!!(rawContent as { summary?: string }).summary}
                             />
-                          )}
-                          {brand && kind === "adaptor-brief" && (
-                            <AdaptorBriefLayout
-                              content={rawContent as unknown as AdaptorBriefContent}
-                              brand={brand}
-                              mode={editorMode}
-                              pageSize={pageSize}
-                              density={density}
-                              seed={`asset-${row.id}`}
-                            />
-                          )}
-                        </PrintClientLogoProvider>
-                        {ctx.printSafeArea && (
-                          <div
-                            data-export-ignore="true"
-                            data-canvas-guide="safe-area"
-                            className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed border-black/25 dark:border-white/25"
-                          />
-                        )}
-                        <HeroResizeHandle
-                          canvasRef={canvasRef}
-                          media={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
-                          onChange={(next) => patchContent({ heroMedia: next } as never)}
-                          kind={kind as never}
-                          usedModuleUnits={(
-                            (rawContent as { modules?: PrintSection[] }).modules ?? []
-                          ).reduce((n, m) => n + weightForSection(m), 0)}
-                          hasTitle={!!(rawContent as { title?: string }).title}
-                          hasSummary={!!(rawContent as { summary?: string }).summary}
-                        />
 
-                        {showBleedGuides && (
-                          <>
-                            {/* Bleed edge (outer) — where the printed art bleeds off. */}
-                            <div
-                              className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
-                              style={{
-                                top: `${-bleedFraction * 100}%`,
-                                left: `${-bleedFraction * 100}%`,
-                                right: `${-bleedFraction * 100}%`,
-                                bottom: `${-bleedFraction * 100}%`,
-                              }}
-                              data-export-ignore="true"
-                              data-testid="bleed-guide-outer"
-                            />
-                            {/* Trim edge — the finished cut line. */}
-                            <div
-                              className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
-                              data-export-ignore="true"
-                              data-testid="bleed-guide-trim"
-                            />
-                          </>
-                        )}
-                      </LiveEditOverlay>
-                      </PrintLogoListContext.Provider>
+                            {showBleedGuides && (
+                              <>
+                                {/* Bleed edge (outer) — where the printed art bleeds off. */}
+                                <div
+                                  className="pointer-events-none absolute rounded-none border border-dashed border-[#E53D2E]/70"
+                                  style={{
+                                    top: `${-bleedFraction * 100}%`,
+                                    left: `${-bleedFraction * 100}%`,
+                                    right: `${-bleedFraction * 100}%`,
+                                    bottom: `${-bleedFraction * 100}%`,
+                                  }}
+                                  data-export-ignore="true"
+                                  data-testid="bleed-guide-outer"
+                                />
+                                {/* Trim edge — the finished cut line. */}
+                                <div
+                                  className="pointer-events-none absolute inset-0 border border-dashed border-[#003FC7]/70"
+                                  data-export-ignore="true"
+                                  data-testid="bleed-guide-trim"
+                                />
+                              </>
+                            )}
+                          </LiveEditOverlay>
+                        </PrintLogoListContext.Provider>
                       </PrintImageEditContext.Provider>
                       <PrintOverflowOverlay
                         state={overflow}
@@ -2003,7 +2005,8 @@ function AssetEditor() {
                     minScale: fit.minScale,
                     minPad: fit.minPad,
                     pageSize,
-                    moduleCount: ((rawContent as { modules?: PrintSection[] }).modules ?? []).length,
+                    moduleCount: ((rawContent as { modules?: PrintSection[] }).modules ?? [])
+                      .length,
                   };
                   const applyFix = (fix: PrintFitFix) => {
                     if (fix.advisory) return;
@@ -2864,8 +2867,6 @@ function LabeledField({
     </label>
   );
 }
-
-("w-full rounded-md border border-black/10 bg-white px-2 py-1.5 text-xs text-[#03002C] focus:border-[#003FC7] focus:outline-none dark:border-white/10 dark:bg-white/[0.03] dark:text-white");
 
 function Panel({
   title,

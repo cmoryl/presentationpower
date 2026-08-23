@@ -43,7 +43,10 @@ export function bytesToBase64(bytes: Uint8Array): string {
  * Data URL for a fetched response without FileReader (absent in the Worker
  * runtime, where `new FileReader()` throws).
  */
-export async function responseToDataUrl(res: Response, fallbackMime = "image/png"): Promise<string> {
+export async function responseToDataUrl(
+  res: Response,
+  fallbackMime = "image/png",
+): Promise<string> {
   const mime = res.headers.get("content-type")?.split(";")[0]?.trim() || fallbackMime;
   const bytes = new Uint8Array(await res.arrayBuffer());
   return `data:${mime};base64,${bytesToBase64(bytes)}`;

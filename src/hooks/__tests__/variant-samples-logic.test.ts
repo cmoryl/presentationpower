@@ -20,11 +20,17 @@ import {
 
 const payload = {
   title: "Shared title",
-  items: [{ kind: "media", mediaUrl: "a.jpg" }, { kind: "stat", value: "42" }],
+  items: [
+    { kind: "media", mediaUrl: "a.jpg" },
+    { kind: "stat", value: "42" },
+  ],
   [INK_KEY]: { title: "#003FC7" },
   [INK_SCOPE_KEY]: { heading: "#03002C" },
   [MODES_KEY]: {
-    dark: { copy: { title: "Dark title", "items[0].mediaUrl": "b.jpg" }, ink: { title: "#A1FBF9" } },
+    dark: {
+      copy: { title: "Dark title", "items[0].mediaUrl": "b.jpg" },
+      ink: { title: "#A1FBF9" },
+    },
   },
 } as Record<string, unknown>;
 

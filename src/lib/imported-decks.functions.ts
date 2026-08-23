@@ -36,7 +36,6 @@ import {
 
 const BUCKET = "division-pptx";
 
-
 // ~100MB raw → ~140MB base64. Client validates size; server caps here.
 const UploadInput = z.object({
   divisionId: z.string().min(1).max(120),
@@ -277,8 +276,7 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
       for (const sh of (sl.layout?.shapes as JsonRecord[] | undefined) ?? []) {
         if (sh?.kind === "image" && typeof sh.path === "string") allPaths.add(sh.path);
         const shFill = sh?.fill as JsonRecord | undefined;
-        if (shFill?.kind === "image" && typeof shFill.path === "string")
-          allPaths.add(shFill.path);
+        if (shFill?.kind === "image" && typeof shFill.path === "string") allPaths.add(shFill.path);
         if (sh?.kind === "table") {
           const cellGrid = (sh.cellGrid as Array<Array<JsonRecord>>) ?? [];
           for (const row of cellGrid) {
@@ -379,7 +377,6 @@ export const deleteImportedDeck = createServerFn({ method: "POST" })
     if (!deleted || deleted.length === 0)
       throw new Error("You do not have permission to delete this imported deck.");
     return { ok: true };
-
   });
 
 // ── IMAGE RELINKING (Layer 1b) ─────────────────────────────────────────
@@ -633,8 +630,6 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
 // Division-id translation lives in ./imported-deck-division and is
 // re-exported from the top of this module for existing callers.
 
-
-
 async function embedBatch(apiKey: string, inputs: string[]): Promise<number[][]> {
   const out: number[][] = [];
   const bs = 50;
@@ -707,7 +702,10 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
         insert: (row: JsonRecord) => SaQueryBuilder;
         update: (row: JsonRecord) => SaQueryBuilder;
         delete: () => SaQueryBuilder;
-        upsert: (rows: JsonRecord[], opts?: { onConflict?: string }) => Promise<{ error: { message?: string } | null }>;
+        upsert: (
+          rows: JsonRecord[],
+          opts?: { onConflict?: string },
+        ) => Promise<{ error: { message?: string } | null }>;
         eq: (col: string, val: unknown) => SaQueryBuilder;
         gte: (col: string, val: unknown) => SaQueryBuilder;
         maybeSingle: () => Promise<{ data: unknown; error: unknown }>;
@@ -791,7 +789,9 @@ export const embedImportedDecks = createServerFn({ method: "POST" })
               .select("id")
               .single();
             if (insErr || !ins)
-              throw new Error(String((insErr as { message?: string } | null)?.message ?? "asset insert failed"));
+              throw new Error(
+                String((insErr as { message?: string } | null)?.message ?? "asset insert failed"),
+              );
             assetId = (ins as { id: string }).id;
           }
 

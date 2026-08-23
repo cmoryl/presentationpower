@@ -33,8 +33,7 @@ const PHRASE_MAP: Array<[RegExp, string]> = [
 // Codes like MV-12, MV12, BENTO-5, HERO-3, MV… / MV...
 const CODE_RE = /\b[A-Z]{2,10}[-_ ]?(?:\d{1,3}[a-z]?\b|…|\.{3})/g;
 // Same code wrapped in brackets/parens/backticks/quotes, with leading space.
-const WRAPPED_CODE_RE =
-  /\s*[([`"'“‘]\s*[A-Z]{2,10}[-_ ]?(?:\d{1,3}[a-z]?|…|\.{3})\s*[)\]`"'”’]/g;
+const WRAPPED_CODE_RE = /\s*[([`"'“‘]\s*[A-Z]{2,10}[-_ ]?(?:\d{1,3}[a-z]?|…|\.{3})\s*[)\]`"'”’]/g;
 
 const QUOTED_LABEL_RE = /[`"'“‘]\s*([A-Za-z][A-Za-z \-]{2,24}?)\s*[`"'”’]/g;
 
@@ -72,7 +71,9 @@ export function sanitizeAgentReply(text: string): string {
 
   for (const [re, replacement] of PHRASE_MAP) {
     out = out.replace(re, (match) =>
-      /^[A-Z]/.test(match) ? replacement.charAt(0).toUpperCase() + replacement.slice(1) : replacement,
+      /^[A-Z]/.test(match)
+        ? replacement.charAt(0).toUpperCase() + replacement.slice(1)
+        : replacement,
     );
   }
 

@@ -104,7 +104,10 @@ function BriefOutputHub() {
   const primary = brand?.tokens?.primary || "#003FC7";
 
   const totalAssets =
-    1 + prints.length + (eventPb ? eventCollateral.length : 0) + (socialPb ? socialPb.deliverables.length : 0);
+    1 +
+    prints.length +
+    (eventPb ? eventCollateral.length : 0) +
+    (socialPb ? socialPb.deliverables.length : 0);
 
   const areas = [
     {
@@ -389,9 +392,7 @@ function BriefOutputHub() {
                       >
                         {ph.label}
                       </span>
-                      <span className="text-[13px] leading-[1.45] text-black/70">
-                        {ph.detail}
-                      </span>
+                      <span className="text-[13px] leading-[1.45] text-black/70">{ph.detail}</span>
                     </li>
                   ))}
                 </ol>

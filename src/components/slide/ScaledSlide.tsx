@@ -1,10 +1,4 @@
-import {
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 /**
  * ScaledSlide renders content at a fixed 1920×1080 stage and scales it to fit.
@@ -79,8 +73,6 @@ export function ScaledSlide({
           } as CSSProperties
         }
       >
-
-
         {children}
       </div>
     </div>

@@ -51,7 +51,6 @@ export const BulkSlideActions = forwardRef<
       role="group"
       tabIndex={-1}
       aria-label={`Bulk actions for ${n} selected slide${n === 1 ? "" : "s"}`}
-
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.stopPropagation();
