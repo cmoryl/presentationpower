@@ -235,6 +235,12 @@ function useSocialStyle(): SocialStyle {
   return useContext(StyleContext);
 }
 
+/** Photo for the trim currently rendering, resolved from ctx.photo + kind.
+ *  Field paints it under the motif so every photo-led trim shares one
+ *  treatment (cover crop + look-tinted scrim) with the social posts. */
+const PhotoContext = createContext<string | undefined>(undefined);
+
+
 
 /** Field graphic drawn behind the artwork — one geometry per look. */
 function MotifField({ opacity, color }: { opacity?: number; color?: string }) {
