@@ -64,3 +64,92 @@ export function pageGutter(extra = 0): CSSProperties {
     paddingRight: `calc(${PAGE_PAD_VAR} + ${cq(extra)})`,
   };
 }
+
+// ---------------------------------------------------------------------------
+// MODULE RHYTHM — one scale every non-hero print module obeys
+// ---------------------------------------------------------------------------
+// Before this existed each module carried its own hand-tuned margins, header
+// sizes, radii and paddings, so a page mixing "template" blocks with newer
+// modules read as two different design systems. All values are page px against
+// the 816pt sheet (pass them through `cq()`), so they scale with the document.
+export const MODULE = {
+  /** Vertical rhythm BETWEEN modules — owned by `PrintSectionsStack`, never by
+   *  a module's own margin. Keeps stacks even regardless of block order. */
+  stack: 22,
+  /** Header (eyebrow + title) → body. */
+  headerGap: 12,
+  /** Eyebrow → title. */
+  eyebrowGap: 4,
+  eyebrow: 9.5,
+  eyebrowTrack: "0.18em",
+  /** Module title (outside a panel). */
+  title: 18,
+  /** Title inside a panel / card header. */
+  panelTitle: 15,
+  /** Card heading (tri-card, verb card, feature row). */
+  cardTitle: 12.5,
+  titleTrack: "-0.015em",
+  body: 10,
+  bodyLead: 1.5,
+  meta: 9.4,
+  /** Panel + card corner radius. */
+  radius: 14,
+  /** Inner chip/tile radius. */
+  radiusInner: 10,
+  /** Panel padding (y, x). */
+  padY: 16,
+  padX: 18,
+  /** Card padding inside a grid. */
+  cardPad: 16,
+  /** Gap between cards/columns in a module grid. */
+  gridGap: 14,
+  /** Hairline row padding for list/table modules. */
+  rowPadY: 8,
+  /** Icon plate size for card/row icons. */
+  iconPlate: 32,
+} as const;
+
+/** Outer wrapper for a module — rhythm is owned by the stack, so no margin. */
+export const moduleShell: CSSProperties = { margin: 0 };
+
+/** Full-width glass panel at module level (uniform radius + padding). */
+export function modulePanel(mode: "light" | "dark", accent: string): CSSProperties {
+  return {
+    borderRadius: cq(MODULE.radius),
+    padding: `${cq(MODULE.padY)} ${cq(MODULE.padX)}`,
+    ...sectionGlass(mode, accent),
+  };
+}
+
+/** Card inside a module grid — same radius as the panel, tighter padding. */
+export function moduleCard(mode: "light" | "dark", accent: string): CSSProperties {
+  return {
+    borderRadius: cq(MODULE.radius),
+    padding: cq(MODULE.cardPad),
+    ...sectionGlass(mode, accent),
+  };
+}
+
+export function moduleEyebrowStyle(accent: string): CSSProperties {
+  return {
+    fontSize: cq(MODULE.eyebrow),
+    fontWeight: 700,
+    letterSpacing: MODULE.eyebrowTrack,
+    color: accent,
+    textTransform: "uppercase",
+  };
+}
+
+export function moduleTitleStyle(
+  mode: "light" | "dark",
+  scope: "module" | "panel" = "module",
+): CSSProperties {
+  return {
+    margin: `${cq(MODULE.eyebrowGap)} 0 0`,
+    fontSize: cq(scope === "panel" ? MODULE.panelTitle : MODULE.title),
+    fontWeight: 700,
+    lineHeight: 1.15,
+    letterSpacing: MODULE.titleTrack,
+    color: sectionInk(mode).strong,
+  };
+}
