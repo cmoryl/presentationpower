@@ -89,7 +89,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Gaming",
     slug: "gaming",
     accent: "#4ADE80",
-    stylePackId: "skin-s11",
+    stylePackId: "skin-r22",
     designRecipeId: "R22",
     industry: "Gaming",
   },
