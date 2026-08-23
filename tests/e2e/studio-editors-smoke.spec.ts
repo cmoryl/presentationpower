@@ -133,10 +133,12 @@ test.describe("Studios & editors smoke", () => {
     const discard = page.getByRole("button", { name: /Discard changes/i }).first();
     await expect(save).toBeVisible({ timeout: 30_000 });
 
-    // Clean draft: nothing to save, nothing to discard, no unload guard armed.
+    // Clean draft: nothing to save, nothing to discard, no extra unload guard.
+    // Other always-on listeners exist (HMR, session keepalive), so the guard is
+    // measured as a delta from the clean-state baseline.
     await expect(save).toBeDisabled();
     await expect(discard).toBeDisabled();
-    expect(await unloadGuards(page)).toBe(0);
+    const baseline = await unloadGuards(page);
 
     // Editing any copy field must flip the whole dirty contract at once.
     const copy = page.locator("aside input, aside textarea").first();
@@ -144,12 +146,12 @@ test.describe("Studios & editors smoke", () => {
     await copy.fill("E2E smoke copy");
     await expect(save).toBeEnabled();
     await expect(discard).toBeEnabled();
-    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBeGreaterThan(0);
+    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBeGreaterThan(baseline);
 
     // Discard returns to the saved master and disarms the guard.
     await discard.click();
     await expect(save).toBeDisabled();
-    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBe(0);
+    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBe(baseline);
 
     // Save path: ⌘S / Ctrl+S persists without hunting for the button.
     await copy.fill("E2E smoke copy 2");
@@ -158,7 +160,7 @@ test.describe("Studios & editors smoke", () => {
     await expect(page.getByRole("button", { name: /Master saved/i }).first()).toBeVisible({
       timeout: 30_000,
     });
-    expect(await unloadGuards(page)).toBe(0);
+    expect(await unloadGuards(page)).toBe(baseline);
 
     // Leave the master exactly as we found it.
     await page.getByRole("button", { name: /Reset to shipped/i }).first().click();
@@ -183,17 +185,17 @@ test.describe("Studios & editors smoke", () => {
       .first();
     await expect(save).toBeVisible({ timeout: 30_000 });
     await expect(save).toBeDisabled();
-    expect(await unloadGuards(page)).toBe(0);
+    const baseline = await unloadGuards(page);
 
     const title = page.locator("aside input").first();
     const original = await title.inputValue();
     await title.fill(`${original} `.trimEnd() + " E2E");
     await expect(save).toBeEnabled();
-    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBeGreaterThan(0);
+    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBeGreaterThan(baseline);
 
     // Restore the original value: dirty state must clear back to saved.
     await title.fill(original);
     await expect(save).toBeDisabled();
-    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBe(0);
+    await expect.poll(() => unloadGuards(page), { timeout: 10_000 }).toBe(baseline);
   });
 });
