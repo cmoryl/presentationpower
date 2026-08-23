@@ -7,12 +7,13 @@
 // background recipe — exactly what every visitor then sees on this page.
 
 import { useMemo, useState } from "react";
-import { Check, Paintbrush, RotateCcw } from "lucide-react";
+import { AlertTriangle, Check, Paintbrush, RotateCcw } from "lucide-react";
 
 import type { TemplatePayload } from "@/lib/deck-store";
 import { DESIGN_SKINS, INDUSTRY_RECIPES } from "@/lib/design-skins";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
+import { validateLook } from "@/lib/look-validate";
 import {
   usePublishDemoOverride,
   useResetDemoOverride,
@@ -56,10 +57,23 @@ export function DemoStyleAdmin({
     [],
   );
 
+  // Guard against mismatched pairings (R-only looks, an industry ground on an
+  // industry/product language, another sector's plates) before publishing.
+  const validation = useMemo(
+    () =>
+      validateLook({
+        stylePackId: packId || null,
+        designRecipeId: recipeId || null,
+        industry: (payload.brief?.industry as string | undefined) ?? divisionLabel,
+      }),
+    [packId, recipeId, payload.brief?.industry, divisionLabel],
+  );
+
   const dirty =
     packId !== currentPack || (recipeId || "") !== (currentRecipe || "") || clearSlideBackgrounds;
 
   function apply() {
+    if (!validation.ok) return;
     const slides = clearSlideBackgrounds
       ? payload.slides.map((s) => {
           const content = { ...(s.content as Record<string, unknown>) };
@@ -164,11 +178,32 @@ export function DemoStyleAdmin({
         Clear per-slide background overrides so every slide repaints from the new look
       </label>
 
+      {validation.issues.length ? (
+        <ul className="mt-3 space-y-1.5">
+          {validation.issues.map((issue) => (
+            <li
+              key={issue.code}
+              className={`flex items-start gap-2 rounded-xl px-3 py-2 text-[12px] ${
+                issue.level === "error"
+                  ? "bg-red-500/10 text-red-700 dark:text-red-300"
+                  : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+              }`}
+            >
+              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+              <span>
+                {issue.message}
+                {issue.fix ? <span className="opacity-70"> {issue.fix}</span> : null}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={apply}
-          disabled={!dirty || publish.isPending}
+          disabled={!dirty || !validation.ok || publish.isPending}
           className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#003FC7] px-5 text-sm font-semibold text-white transition hover:bg-[#0035a8] disabled:opacity-50"
         >
           <Check size={15} />
