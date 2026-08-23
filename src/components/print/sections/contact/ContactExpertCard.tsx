@@ -1,7 +1,7 @@
 // Subject-expert card — the "Speak to our expert" lockup used at the foot of
 // case studies and spotlights.
 import type { PrintContactSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, modulePanel } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 

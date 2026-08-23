@@ -1,7 +1,7 @@
 // Challenge / Approach / Impact triptych — the spine of every curated
 // e-brochure in the print library. Three glass cards, optional bullet rails.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, moduleCard } from "../shared";
 import { clampLines, type IconName } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";

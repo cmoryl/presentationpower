@@ -2,7 +2,7 @@
 // glass surfaces. Great for the tail of a case study or eBrochure.
 import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, moduleCard } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
