@@ -131,7 +131,7 @@ describe("R01–R30 thumbnail visual regression", () => {
 
     it(`${family.label} thumbnails are structurally unique across R01–R30`, () => {
       const thumbs = thumbsFor(scene);
-      const prints = thumbs.map((t) => fingerprint([...t.tokens].sort().join("|")).hash);
+      const prints = thumbs.map((t) => hashTokens(t.tokens));
       expect(new Set(prints).size, `${family.label} collision`).toBe(30);
     });
 
