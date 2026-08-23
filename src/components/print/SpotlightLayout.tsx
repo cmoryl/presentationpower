@@ -595,7 +595,12 @@ export function SpotlightLayout({
             )}
 
             {/* SHARED MODULES */}
-            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+            <PrintSectionsStack
+              sections={content.modules}
+              mode={mode}
+              accent={accent}
+              density={density}
+            />
 
             {/* Rhythm spacer — takes leftover column height as ONE uniform gap
                 above the CTA instead of inflating the top-aligned capability
@@ -608,17 +613,17 @@ export function SpotlightLayout({
             {/* ============================================================ */}
             {content.cta && (
               <div data-section="cta" data-section-label="Call to action">
-              <PrintCTABand
-                brand={brand}
-                mode={mode}
-                label={content.cta.label}
-                subhead={
-                  content.summary
-                    ? `Explore how ${brand.name} can transform your operations.`
-                    : undefined
-                }
-                cq={cq}
-              />
+                <PrintCTABand
+                  brand={brand}
+                  mode={mode}
+                  label={content.cta.label}
+                  subhead={
+                    content.summary
+                      ? `Explore how ${brand.name} can transform your operations.`
+                      : undefined
+                  }
+                  cq={cq}
+                />
               </div>
             )}
 

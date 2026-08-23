@@ -1,7 +1,7 @@
 // Scale rail — the MSA right-hand rail: big values over small labels, stacked
 // with hairlines. Reads as "languages / linguists / cities / studies".
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 
 export function TableScaleRail({
   section,
@@ -15,16 +15,16 @@ export function TableScaleRail({
   const ink = sectionInk(mode);
   const rows = section.rows.slice(0, 4);
   return (
-    <section aria-label={section.title ?? "Scale"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Scale"} style={{ margin: 0 }}>
       <div
         style={{
-          borderRadius: cq(14),
-          padding: `${cq(14)} ${cq(18)}`,
+          borderRadius: cq(MODULE.radius),
+          padding: `${cq(MODULE.padY)} ${cq(MODULE.padX)}`,
           ...sectionGlass(mode, accent),
         }}
       >
         {(section.eyebrow || section.title) && (
-          <div style={{ marginBottom: cq(8) }}>
+          <div style={{ marginBottom: cq(MODULE.headerGap) }}>
             {section.eyebrow && (
               <div
                 style={{
@@ -51,7 +51,7 @@ export function TableScaleRail({
           className="grid"
           style={{
             gridTemplateColumns: `repeat(${Math.max(1, rows.length)}, minmax(0, 1fr))`,
-            gap: cq(14),
+            gap: cq(MODULE.gridGap),
           }}
         >
           {rows.map((r, i) => (

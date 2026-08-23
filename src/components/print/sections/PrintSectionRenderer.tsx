@@ -1,6 +1,7 @@
 // Dispatch a `PrintSection` block to its portrait-native renderer. Any print
 // layout can render `content.modules?` by mapping through this component.
 import type { PrintHeroModuleVariant, PrintSection } from "@/lib/print-assets.types";
+import { cq, MODULE } from "./shared";
 import {
   HeroPhotoBand,
   HeroSplitPhoto,
@@ -258,13 +259,21 @@ export const PRINT_CONTACT_VARIANTS: Array<{
   label: string;
   description: string;
 }> = [
-  { id: "contact-expert-card", label: "Subject Expert Card", description: "Named subject expert lockup." },
+  {
+    id: "contact-expert-card",
+    label: "Subject Expert Card",
+    description: "Named subject expert lockup.",
+  },
   {
     id: "contact-global-panel",
     label: "Global Contacts Panel",
     description: "Navy panel with a region contact rail.",
   },
-  { id: "contact-cta-band", label: "Closing CTA Band", description: "Closing accent band with a button." },
+  {
+    id: "contact-cta-band",
+    label: "Closing CTA Band",
+    description: "Closing accent band with a button.",
+  },
 ];
 
 export const PRINT_DEVICE_VARIANTS: Array<{
@@ -288,7 +297,6 @@ export const PRINT_DEVICE_VARIANTS: Array<{
     description: "Monitor and laptop pair for a hero screen plus a companion view.",
   },
 ];
-
 
 export function PrintSectionRenderer({
   section,
@@ -407,20 +415,35 @@ export function PrintSectionsStack({
   sections,
   mode,
   accent,
+  density = "standard",
 }: {
   sections: PrintSection[] | undefined;
   mode: "light" | "dark";
   accent: string;
+  /** Page density — scales the rhythm between modules with the document. */
+  density?: "compact" | "standard" | "airy";
 }) {
   if (!sections?.length) return null;
+  // The STACK owns the vertical rhythm — modules themselves carry no margin, so
+  // any mix of template blocks and newer modules spaces identically, and a
+  // masthead hero that bleeds to the trim still sits flush at the top.
+  const rhythm = MODULE.stack * (density === "compact" ? 0.72 : density === "airy" ? 1.28 : 1);
   return (
-    <>
+    <div
+      data-print-module-stack
+      style={{ display: "flex", flexDirection: "column", rowGap: cq(rhythm) }}
+    >
       {sections.map((s) => (
-        <div key={s.id} data-section={`module:${s.id}`} data-section-label={sectionLabel(s)}>
+        <div
+          key={s.id}
+          data-section={`module:${s.id}`}
+          data-section-label={sectionLabel(s)}
+          style={{ minWidth: 0 }}
+        >
           <PrintSectionRenderer section={s} mode={mode} accent={accent} />
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -430,21 +453,21 @@ function sectionLabel(s: PrintSection): string {
     s.kind === "hero"
       ? "Hero"
       : s.kind === "stats"
-      ? "Stats"
-      : s.kind === "quote"
-        ? "Quote"
-        : s.kind === "logo-grid"
-          ? "Client logos"
-          : s.kind === "expertise"
-            ? "Expertise"
-            : s.kind === "feature-list"
-              ? "Features"
-              : s.kind === "narrative"
-                ? "Narrative"
-                : s.kind === "table"
-                  ? "Table"
-                  : s.kind === "contact"
-                    ? "Contact"
-                    : "Module";
+        ? "Stats"
+        : s.kind === "quote"
+          ? "Quote"
+          : s.kind === "logo-grid"
+            ? "Client logos"
+            : s.kind === "expertise"
+              ? "Expertise"
+              : s.kind === "feature-list"
+                ? "Features"
+                : s.kind === "narrative"
+                  ? "Narrative"
+                  : s.kind === "table"
+                    ? "Table"
+                    : s.kind === "contact"
+                      ? "Contact"
+                      : "Module";
   return kindLabel;
 }

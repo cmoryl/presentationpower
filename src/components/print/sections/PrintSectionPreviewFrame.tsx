@@ -109,7 +109,6 @@ export function PrintSectionPreviewFrame({
     };
   }, [maxScale, section, pad, pageSize, marginPreset]);
 
-
   return (
     <div
       ref={outerRef}

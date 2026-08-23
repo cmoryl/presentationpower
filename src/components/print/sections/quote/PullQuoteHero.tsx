@@ -1,6 +1,6 @@
 // Full-width pull quote — large italic body with big open glyph.
 import type { PrintQuoteSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 
 export function PullQuoteHero({
@@ -14,12 +14,12 @@ export function PullQuoteHero({
 }) {
   const ink = sectionInk(mode);
   return (
-    <section aria-label="Pull quote" style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label="Pull quote" style={{ margin: 0 }}>
       <div
         style={{
           position: "relative",
-          borderRadius: cq(18),
-          padding: `${cq(28)} ${cq(30)} ${cq(24)}`,
+          borderRadius: cq(MODULE.radius),
+          padding: `${cq(MODULE.padY * 1.5)} ${cq(MODULE.padX * 1.4)}`,
           ...sectionGlass(mode, accent),
         }}
       >

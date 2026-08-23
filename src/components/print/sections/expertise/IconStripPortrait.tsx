@@ -1,6 +1,6 @@
 // Horizontal expertise icon strip — port of the AdaptorBrief "We Know How".
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -21,14 +21,17 @@ export function IconStripPortrait({
   const items = section.items.slice(0, 6);
   if (items.length === 0) return null;
   return (
-    <section aria-label={section.title ?? "We know how"} style={{ margin: `${cq(20)} 0` }}>
-      <div className="flex items-center" style={{ gap: cq(14), marginBottom: cq(18) }}>
+    <section aria-label={section.title ?? "We know how"} style={{ margin: 0 }}>
+      <div
+        className="flex items-center"
+        style={{ gap: cq(MODULE.gridGap), marginBottom: cq(MODULE.headerGap) }}
+      >
         <div style={{ flex: 1, height: 1, background: ink.hairline }} />
         <div
           style={{
-            fontSize: cq(10),
+            fontSize: cq(MODULE.eyebrow),
             fontWeight: 700,
-            letterSpacing: "0.16em",
+            letterSpacing: MODULE.eyebrowTrack,
             color: accent,
             textTransform: "uppercase",
           }}
@@ -41,7 +44,7 @@ export function IconStripPortrait({
         className="grid"
         style={{
           gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))`,
-          gap: cq(12),
+          gap: cq(MODULE.gridGap),
           textAlign: "center",
         }}
       >

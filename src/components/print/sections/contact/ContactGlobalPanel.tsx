@@ -1,6 +1,6 @@
 // Global contacts panel — the MSA footer: primary contact plus a region rail.
 import type { PrintContactSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -17,11 +17,11 @@ export function ContactGlobalPanel({
   const icons = usePrintIcons();
   const rows = (section.rows ?? []).slice(0, 6);
   return (
-    <section aria-label={section.title ?? "Global contacts"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Global contacts"} style={{ margin: 0 }}>
       <div
         style={{
-          borderRadius: cq(14),
-          padding: `${cq(16)} ${cq(18)}`,
+          borderRadius: cq(MODULE.radius),
+          padding: `${cq(MODULE.padY)} ${cq(MODULE.padX)}`,
           background:
             mode === "dark"
               ? `linear-gradient(135deg, color-mix(in srgb, ${accent} 26%, #03002C), #03002C)`
@@ -30,7 +30,10 @@ export function ContactGlobalPanel({
       >
         <div
           className="grid"
-          style={{ gridTemplateColumns: rows.length ? "0.9fr 1.1fr" : "1fr", gap: cq(16) }}
+          style={{
+            gridTemplateColumns: rows.length ? "0.9fr 1.1fr" : "1fr",
+            gap: cq(MODULE.gridGap),
+          }}
         >
           <div>
             <div
@@ -130,7 +133,7 @@ export function ContactGlobalPanel({
                   className="flex items-baseline justify-between"
                   style={{
                     gap: cq(10),
-                    padding: `${cq(7)} 0`,
+                    padding: `${cq(MODULE.rowPadY)} 0`,
                     borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,0.16)",
                   }}
                 >

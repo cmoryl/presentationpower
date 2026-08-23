@@ -125,7 +125,10 @@ export function PrintFitAuditPanel({
             ],
             ["Side margin", formatInches(m.sideMarginPx, m, input.pageSize)],
             ["Smallest type", m.minFontPx ? `${m.minFontPx}px` : "—"],
-            ["Applied fit", `${Math.round(m.knobs.scale * 100)}% / ${Math.round(m.knobs.pad * 100)}%`],
+            [
+              "Applied fit",
+              `${Math.round(m.knobs.scale * 100)}% / ${Math.round(m.knobs.pad * 100)}%`,
+            ],
           ].map(([k, v]) => (
             <div key={k} className="flex items-baseline justify-between gap-2">
               <dt className="text-black/50 dark:text-white/50">{k}</dt>

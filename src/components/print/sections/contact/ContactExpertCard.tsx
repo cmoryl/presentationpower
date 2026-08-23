@@ -1,7 +1,7 @@
 // Subject-expert card — the "Speak to our expert" lockup used at the foot of
 // case studies and spotlights.
 import type { PrintContactSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, MODULE, modulePanel } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -22,14 +22,12 @@ export function ContactExpertCard({
     .map((w) => w[0]?.toUpperCase() ?? "")
     .join("");
   return (
-    <section aria-label={section.title ?? "Contact"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Contact"} style={{ margin: 0 }}>
       <div
         className="flex items-center"
         style={{
-          gap: cq(14),
-          borderRadius: cq(14),
-          padding: `${cq(14)} ${cq(16)}`,
-          ...sectionGlass(mode, accent),
+          gap: cq(MODULE.gridGap),
+          ...modulePanel(mode, accent),
         }}
       >
         <div

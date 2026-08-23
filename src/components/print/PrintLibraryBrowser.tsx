@@ -22,7 +22,6 @@ import {
   collectionsFor,
   curatedCount,
   curatedMasterFor,
-
   itemsForDivision,
   itemsForDivisionType,
   matchesQuery,
@@ -111,7 +110,6 @@ export function PrintLibraryBrowser({
   const [divisionPickerOpen, setDivisionPickerOpen] = useState(true);
   const { isAdmin } = useIsAdmin();
   const { overrides } = useModuleOverrides("library");
-
 
   const divisions = useMemo(
     () => brandModes.filter((b) => !HIDDEN_DIVISION_IDS.has(b.id)),
@@ -824,7 +822,6 @@ function PrintItemCard({
         ) : null}
       </button>
 
-
       <div className="flex flex-1 flex-col p-4">
         <div className="text-[11px] uppercase tracking-[0.18em] text-black/45">
           {printTypeMeta(item.kind).label}
@@ -866,7 +863,6 @@ function PrintItemCard({
             ) : (
               <CopyItemButton item={item} />
             )}
-
           </div>
         </div>
       </div>
@@ -923,7 +919,6 @@ function UseTemplateAction({ item, brand }: { item: PrintLibraryItem; brand: Bra
     </Link>
   );
 }
-
 
 function CopyItemButton({ item, label }: { item: PrintLibraryItem; label?: string }) {
   const createFn = useServerFn(createPrintAsset);

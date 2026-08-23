@@ -2,7 +2,7 @@
 // glass surfaces. Great for the tail of a case study or eBrochure.
 import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass } from "../shared";
+import { cq, sectionInk, MODULE, moduleCard } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -21,9 +21,9 @@ export function StatCalloutRowPortrait({
   const cols = Math.min(items.length || 1, 4);
 
   return (
-    <section aria-label={section.title ?? "Stat row"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Stat row"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(12) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
@@ -54,15 +54,13 @@ export function StatCalloutRowPortrait({
       )}
       <div
         className="grid"
-        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(12) }}
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(MODULE.gridGap) }}
       >
         {items.map((it, i) => (
           <div
             key={i}
             style={{
-              borderRadius: cq(14),
-              padding: `${cq(16)} ${cq(16)}`,
-              ...sectionGlass(mode, accent),
+              ...moduleCard(mode, accent),
             }}
           >
             {icons ? (

@@ -41,18 +41,10 @@ const PIN_INSET = 6; // keeps the whole dot (r ~2.6) inside the frame
 const TOP_CLEARANCE = 12; // breathing room under the page header rule
 
 export function clampPinPoint(x: number, y: number, frame = WORLD_MAP_VIEW) {
-  const nx = Math.min(
-    frame.x + frame.w - PIN_INSET,
-    Math.max(frame.x + PIN_INSET, x),
-  );
-  const ny = Math.min(
-    frame.y + frame.h - PIN_INSET,
-    Math.max(frame.y + TOP_CLEARANCE, y),
-  );
+  const nx = Math.min(frame.x + frame.w - PIN_INSET, Math.max(frame.x + PIN_INSET, x));
+  const ny = Math.min(frame.y + frame.h - PIN_INSET, Math.max(frame.y + TOP_CLEARANCE, y));
   return { x: Math.round(nx * 10) / 10, y: Math.round(ny * 10) / 10 };
 }
-
-
 
 export function ProposalWorldMap({
   pins,
@@ -120,7 +112,8 @@ export function ProposalWorldMap({
     const onKey = (event: KeyboardEvent) => {
       if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== "z") return;
       const target = event.target as HTMLElement | null;
-      if (target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName ?? "")) return;
+      if (target?.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName ?? ""))
+        return;
       event.preventDefault();
       if (event.shiftKey) redo();
       else undo();
@@ -129,18 +122,11 @@ export function ProposalWorldMap({
     return () => window.removeEventListener("keydown", onKey);
   }, [editable, onChange, redo, undo]);
 
-
   const w = BASE.w / zoom;
   const h = BASE.h / zoom;
   const clampCenter = (cx: number, cy: number, vw: number, vh: number) => ({
-    x: Math.min(
-      BASE.x + BASE.w - vw / 2,
-      Math.max(BASE.x + vw / 2, cx),
-    ),
-    y: Math.min(
-      BASE.y + BASE.h - vh / 2,
-      Math.max(BASE.y + vh / 2, cy),
-    ),
+    x: Math.min(BASE.x + BASE.w - vw / 2, Math.max(BASE.x + vw / 2, cx)),
+    y: Math.min(BASE.y + BASE.h - vh / 2, Math.max(BASE.y + vh / 2, cy)),
   });
   const safeCenter = clampCenter(center.x, center.y, w, h);
   const view = { x: safeCenter.x - w / 2, y: safeCenter.y - h / 2, w, h };
@@ -148,9 +134,7 @@ export function ProposalWorldMap({
   const setZoomLevel = (next: number) => {
     const z = Math.min(6, Math.max(1, Math.round(next * 100) / 100));
     setZoom(z);
-    setCenter((c) =>
-      clampCenter(c.x, c.y, BASE.w / z, BASE.h / z),
-    );
+    setCenter((c) => clampCenter(c.x, c.y, BASE.w / z, BASE.h / z));
   };
 
   const onPointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
@@ -169,7 +153,6 @@ export function ProposalWorldMap({
     );
   };
 
-
   const startPinDrag = (index: number) => (event: React.PointerEvent<SVGCircleElement>) => {
     if (!editable || !onChange) return;
     event.stopPropagation();
@@ -186,9 +169,7 @@ export function ProposalWorldMap({
       if (!point) return;
       p.moved = true;
       onChange(
-        list.map((pin, index) =>
-          index === p.index ? { ...pin, x: point.x, y: point.y } : pin,
-        ),
+        list.map((pin, index) => (index === p.index ? { ...pin, x: point.x, y: point.y } : pin)),
       );
       return;
     }
@@ -239,7 +220,6 @@ export function ProposalWorldMap({
         kind,
       },
     ]);
-
   };
 
   return (
@@ -260,7 +240,14 @@ export function ProposalWorldMap({
         style={{
           display: "block",
           touchAction: "none",
-          cursor: activePin !== null ? "grabbing" : zoom > 1 ? "grab" : editable ? "crosshair" : "default",
+          cursor:
+            activePin !== null
+              ? "grabbing"
+              : zoom > 1
+                ? "grab"
+                : editable
+                  ? "crosshair"
+                  : "default",
         }}
       >
         {WORLD_MAP_LAND.map((path, i) => (
@@ -279,7 +266,6 @@ export function ProposalWorldMap({
             />
           </g>
         ) : null}
-
 
         {list.map((pin, i) => (
           <circle
@@ -307,7 +293,6 @@ export function ProposalWorldMap({
           >
             {pin.name ? <title>{pin.name}</title> : null}
           </circle>
-
         ))}
       </svg>
 
@@ -350,63 +335,68 @@ export function ProposalWorldMap({
         </div>
       ) : null}
 
-
       {/* Zoom is an authoring aid only — never shown on a read-only page. */}
       {editable ? (
-      <div
-        data-export-ignore="true"
-        style={{
-          position: "absolute",
-          bottom: 8,
-          left: 8,
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
-          borderRadius: 999,
-          background: "rgba(255,255,255,0.92)",
-          padding: 4,
-          boxShadow: "0 1px 4px rgba(3,0,44,0.25)",
-        }}
-      >
-        <button
-          type="button"
-          aria-label="Zoom out map"
-          onClick={() => setZoomLevel(zoom / 1.4)}
-          disabled={zoom <= 1}
-          style={zoomBtn(zoom <= 1)}
-        >
-          −
-        </button>
-        <span
-          style={{ minWidth: 34, textAlign: "center", fontSize: 10, fontWeight: 700, color: "#03002C" }}
-        >
-          {Math.round(zoom * 100)}%
-        </span>
-        <button
-          type="button"
-          aria-label="Zoom in map"
-          onClick={() => setZoomLevel(zoom * 1.4)}
-          disabled={zoom >= 6}
-          style={zoomBtn(zoom >= 6)}
-        >
-          +
-        </button>
-        <button
-          type="button"
-          aria-label="Reset map zoom"
-          onClick={() => {
-            setZoom(1);
-            setCenter({
-              x: BASE.x + BASE.w / 2,
-              y: BASE.y + BASE.h / 2,
-            });
+        <div
+          data-export-ignore="true"
+          style={{
+            position: "absolute",
+            bottom: 8,
+            left: 8,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.92)",
+            padding: 4,
+            boxShadow: "0 1px 4px rgba(3,0,44,0.25)",
           }}
-          disabled={zoom === 1}
-          style={{ ...zoomBtn(zoom === 1), width: "auto", padding: "0 8px", fontSize: 10 }}
         >
-          Reset
-        </button>
-      </div>
+          <button
+            type="button"
+            aria-label="Zoom out map"
+            onClick={() => setZoomLevel(zoom / 1.4)}
+            disabled={zoom <= 1}
+            style={zoomBtn(zoom <= 1)}
+          >
+            −
+          </button>
+          <span
+            style={{
+              minWidth: 34,
+              textAlign: "center",
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#03002C",
+            }}
+          >
+            {Math.round(zoom * 100)}%
+          </span>
+          <button
+            type="button"
+            aria-label="Zoom in map"
+            onClick={() => setZoomLevel(zoom * 1.4)}
+            disabled={zoom >= 6}
+            style={zoomBtn(zoom >= 6)}
+          >
+            +
+          </button>
+          <button
+            type="button"
+            aria-label="Reset map zoom"
+            onClick={() => {
+              setZoom(1);
+              setCenter({
+                x: BASE.x + BASE.w / 2,
+                y: BASE.y + BASE.h / 2,
+              });
+            }}
+            disabled={zoom === 1}
+            style={{ ...zoomBtn(zoom === 1), width: "auto", padding: "0 8px", fontSize: 10 }}
+          >
+            Reset
+          </button>
+        </div>
       ) : null}
 
       {editable && onChange ? (
@@ -457,7 +447,9 @@ export function ProposalWorldMap({
               {k === "prod" ? "Service & production" : "Client service"}
             </button>
           ))}
-          <span style={{ opacity: 0.6, fontWeight: 500 }}>· drag a dot to move, click to delete</span>
+          <span style={{ opacity: 0.6, fontWeight: 500 }}>
+            · drag a dot to move, click to delete
+          </span>
         </div>
       ) : null}
     </div>

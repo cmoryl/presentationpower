@@ -63,10 +63,7 @@ import {
   parseAmount,
 } from "@/lib/print-library/cost-math";
 import { ProposalWorldMap, defaultWorldMapPins } from "./ProposalWorldMap";
-import {
-  WORLD_MAP_REGION_VIEWS,
-  type WorldMapPin,
-} from "@/lib/print-library/world-map-vector";
+import { WORLD_MAP_REGION_VIEWS, type WorldMapPin } from "@/lib/print-library/world-map-vector";
 
 // ---------------------------------------------------------------------------
 // Source-deck constants
@@ -167,7 +164,6 @@ function L({ x, y, w, h, children, style, ...rest }: BoxProps) {
     </div>
   );
 }
-
 
 /** Text layer — point size + weight straight off the source shape. */
 function T({
@@ -397,7 +393,6 @@ function FitT({
     [factor, floor, leading, minSize, onFit, size],
   );
 
-
   const measure = useCallback(() => {
     const host = hostRef.current;
     const inner = host?.firstElementChild as HTMLElement | null;
@@ -421,7 +416,6 @@ function FitT({
     report(fits, factor <= floor + 0.001);
     if (b.done) return;
 
-
     setFactor((prev) => {
       if (fits) b.lo = Math.max(b.lo, prev);
       else b.hi = Math.min(b.hi, prev);
@@ -441,8 +435,6 @@ function FitT({
     });
   }, [floor, size, w, maxH, factor, report]);
 
-
-
   useLayoutEffect(() => {
     measure();
     const host = hostRef.current;
@@ -453,8 +445,6 @@ function FitT({
     if (inner) ro.observe(inner);
     return () => ro.disconnect();
   }, [measure, children, factor]);
-
-
 
   return (
     <div
@@ -610,12 +600,7 @@ function SignatureHeader({
         {title}
       </T>
       {rule ? (
-        <Rule
-          x={HDR.marginX}
-          y={headerRuleY(titleLines)}
-          w={HDR_CONTENT_W}
-          color={ruleColor}
-        />
+        <Rule x={HDR.marginX} y={headerRuleY(titleLines)} w={HDR_CONTENT_W} color={ruleColor} />
       ) : null}
     </>
   );
@@ -975,9 +960,7 @@ function HeadlineFitBadge({
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: u(0.05) }}>
           {fit.shrunk || fit.clipped ? (
-            <FitBtn onClick={() => onSet(fit.suggestedPt)}>
-              Set {fit.suggestedPt}pt (fit)
-            </FitBtn>
+            <FitBtn onClick={() => onSet(fit.suggestedPt)}>Set {fit.suggestedPt}pt (fit)</FitBtn>
           ) : null}
           <FitBtn onClick={() => onSet(authoredPt - 1)} disabled={authoredPt <= HEADLINE_MIN_PT}>
             −1pt
@@ -1024,7 +1007,6 @@ function FitBtn({
     </button>
   );
 }
-
 
 function StatsPage({
   page,
@@ -1115,9 +1097,6 @@ function StatsPage({
           onReset={() => setHeadlinePt(null)}
         />
       ) : null}
-
-
-
 
       {/* Column divider + hairlines */}
       <L x={3.62} y={5.42} w={0.01} h={3.5} style={{ background: "rgba(255,255,255,0.35)" }} />
@@ -1615,7 +1594,6 @@ function CostPage({
   );
 }
 
-
 // ---------------------------------------------------------------------------
 // Page 5 — Global locations
 // ---------------------------------------------------------------------------
@@ -1655,14 +1633,7 @@ function LocationsPage({
 
       {/* Shared signature header rhythm (eyebrow, left-aligned display title,
           logo top-right, hairline rule) in a dark-field key. */}
-      <SignatureHeader
-        title={title.join("\n")}
-        logo={logoWhite}
-        eyebrow="Our Footprint"
-        rule
-      />
-
-
+      <SignatureHeader title={title.join("\n")} logo={logoWhite} eyebrow="Our Footprint" rule />
 
       {/* Vector map: landmass artwork + author-editable office pins. */}
       <L x={-0.61} y={2.62} w={9.72} h={5.3}>
@@ -1815,7 +1786,13 @@ function RegionLocationsPage({
       </L>
 
       {/* Legend */}
-      <L x={0.47} y={7.6} w={0.058} h={0.058} style={{ background: "#FFFFFF", borderRadius: 999 }} />
+      <L
+        x={0.47}
+        y={7.6}
+        w={0.058}
+        h={0.058}
+        style={{ background: "#FFFFFF", borderRadius: 999 }}
+      />
       <T x={0.59} y={7.55} w={1.5} size={7.2} weight={700} upper>
         Client Service
       </T>
@@ -1835,14 +1812,7 @@ function RegionLocationsPage({
         {regionKey}
       </T>
       {cols.map((col, ci) => (
-        <T
-          key={ci}
-          x={0.47 + ci * colW}
-          y={8.42}
-          w={colW - 0.12}
-          size={6.6}
-          leading={1.55}
-        >
+        <T key={ci} x={0.47 + ci * colW} y={8.42} w={colW - 0.12} size={6.6} leading={1.55}>
           {col.map((city, i) => (
             <div key={i} style={{ color: city.prod ? PROPOSAL_TEAL : "#FFFFFF" }}>
               {city.name}
@@ -1881,15 +1851,19 @@ function ClientsPage({
   const showCaptions = editing || entries.some((e) => (e.name ?? "").trim().length > 0);
   const captionH = showCaptions ? 0.28 : 0;
   // Wall region sits inside the plate with an even safe margin on all sides.
-  const boxes = autoLogoWall(entries.length, { x: 1.0, y: 4.74, w: 6.45, h: 4.3 }, {
-    maxCols: 4,
-    gutterX: 0.3,
-    gutterY: 0.34,
-    captionH,
-    maxTileW: 1.4,
-    maxTileH: 0.66,
-    safe: 0.14,
-  });
+  const boxes = autoLogoWall(
+    entries.length,
+    { x: 1.0, y: 4.74, w: 6.45, h: 4.3 },
+    {
+      maxCols: 4,
+      gutterX: 0.3,
+      gutterY: 0.34,
+      captionH,
+      maxTileW: 1.4,
+      maxTileH: 0.66,
+      safe: 0.14,
+    },
+  );
 
   return (
     <>
@@ -2017,7 +1991,6 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
           <path d="M0.98 10.42 L4.05 10.42" />
           <path d="M4.05 10.36 L4.22 10.42 L4.05 10.48 Z" />
         </g>
-
       </svg>
 
       {/* Card 1 */}
@@ -2052,7 +2025,6 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
       <QuoteBody x={3.72} y={3.33} w={3.5} maxH={1.6} size={10} quote={first} />
       <QuoteAttribution x={3.72} y={5.02} w={3.5} size={10} quote={first} />
 
-
       {/* Card 2 */}
       <L x={0.64} y={6.8} w={7.38} h={3.62} style={{ border: cardBorder, borderRadius: u(0.34) }} />
       <Img
@@ -2081,18 +2053,8 @@ function StoriesPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: 
       <T x={1.07} y={7.9} w={3.44} size={10} color={NAVY} align="right" leading={1.42}>
         {second?.headline || ""}
       </T>
-      <QuoteBody
-        x={1.07}
-        y={8.36}
-        w={3.44}
-        maxH={1.02}
-        size={10}
-        quote={second}
-        align="right"
-      />
+      <QuoteBody x={1.07} y={8.36} w={3.44} maxH={1.02} size={10} quote={second} align="right" />
       <QuoteAttribution x={1.07} y={9.52} w={3.44} size={10} quote={second} align="right" />
-
-
     </>
   );
 }
@@ -2267,7 +2229,6 @@ function QuoteAttribution({
   );
 }
 
-
 /** 7b — three-up story cards (photo top, logo, trimmed quote). */
 function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhite: string }) {
   const pb = useProposalBrand();
@@ -2347,7 +2308,6 @@ function StoriesGridPage({ page, logoWhite }: { page: MultiProposalPage; logoWhi
               weight={600}
               quote={q}
             />
-
           </Fragment>
         );
       })}
@@ -2456,7 +2416,6 @@ function StoryFeaturePage({ page }: { page: MultiProposalPage }) {
         color={PROPOSAL_AQUA}
         quote={q}
       />
-
 
       {stats.map((s, i) => (
         <Fragment key={i}>
@@ -2604,7 +2563,6 @@ function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string
         );
       })}
 
-
       {/* White statement bubble with a downward tail. */}
       <svg
         viewBox={`0 0 ${PAGE_W_IN} ${PAGE_H_IN}`}
@@ -2655,7 +2613,6 @@ function WhyPage({ page, logoDark }: { page: MultiProposalPage; logoDark: string
 
 /** Left editorial rail geometry for the advocates page. */
 const ADV_RAIL_W = 2.62;
-
 
 type Box = { x: number; y: number; w: number; h: number };
 
@@ -2762,20 +2719,27 @@ function AdvocatesPage({
   const causeBoxes = autoLogoWall(
     causes.length,
     { x: 3.06, y: 2.42, w: 4.98, h: 2.02 },
-    { maxCols: causes.length > 8 ? 4 : 3, gutterX: 0.2, gutterY: 0.22, maxTileW: 1.2, maxTileH: 0.6 },
+    {
+      maxCols: causes.length > 8 ? 4 : 3,
+      gutterX: 0.2,
+      gutterY: 0.22,
+      maxTileW: 1.2,
+      maxTileH: 0.6,
+    },
   );
   const affinityBoxes = autoLogoWall(
     affinities.length,
     { x: 3.06, y: 8.6, w: 4.98, h: 1.5 },
-    { maxCols: affinities.length > 4 ? 4 : 2, gutterX: 0.24, gutterY: 0.2, maxTileW: 1.9, maxTileH: 0.62 },
+    {
+      maxCols: affinities.length > 4 ? 4 : 2,
+      gutterX: 0.24,
+      gutterY: 0.2,
+      maxTileW: 1.9,
+      maxTileH: 0.62,
+    },
   );
 
-  const wall = (
-    entries: PrintLogoEntry[],
-    boxes: Box[],
-    path: string,
-    legacyPrefix: string,
-  ) =>
+  const wall = (entries: PrintLogoEntry[], boxes: Box[], path: string, legacyPrefix: string) =>
     entries.map((entry, i) => {
       const box = boxes[i];
       if (!box) return null;
@@ -2892,7 +2856,16 @@ function AdvocatesPage({
 
       {/* Rail foot stats keep the lower column active instead of idle space. */}
       <Rule x={0.44} y={8.34} w={1.74} color="rgba(255,255,255,0.16)" />
-      <T x={0.44} y={8.56} w={1.74} size={30} weight={600} color={AQUA_FIELD} leading={1} tracking="-0.03em">
+      <T
+        x={0.44}
+        y={8.56}
+        w={1.74}
+        size={30}
+        weight={600}
+        color={AQUA_FIELD}
+        leading={1}
+        tracking="-0.03em"
+      >
         {String(causes.length)}
       </T>
       <T
@@ -2907,7 +2880,16 @@ function AdvocatesPage({
       >
         Cause partners supported
       </T>
-      <T x={0.44} y={9.42} w={1.74} size={30} weight={600} color={LAV} leading={1} tracking="-0.03em">
+      <T
+        x={0.44}
+        y={9.42}
+        w={1.74}
+        size={30}
+        weight={600}
+        color={LAV}
+        leading={1}
+        tracking="-0.03em"
+      >
         {String(affinities.length)}
       </T>
       <T
@@ -2922,7 +2904,6 @@ function AdvocatesPage({
       >
         Employee affinity groups
       </T>
-
 
       <Img x={0.44} y={10.22} w={1.5} h={0.19} src={logoWhite} alt="TransPerfect" align="left" />
       <T
@@ -2968,7 +2949,16 @@ function AdvocatesPage({
           border: `${u(0.008)} solid rgba(255,255,255,0.28)`,
         }}
       />
-      <T x={3.06} y={2.4} w={4.98} size={8.4} weight={600} color={AQUA_FIELD} tracking="0.18em" upper>
+      <T
+        x={3.06}
+        y={2.4}
+        w={4.98}
+        size={8.4}
+        weight={600}
+        color={AQUA_FIELD}
+        tracking="0.18em"
+        upper
+      >
         Cause partners
       </T>
 
@@ -3054,8 +3044,6 @@ function AdvocatesPage({
     </>
   );
 }
-
-
 
 // ---------------------------------------------------------------------------
 // Pages 10–11 — team + closing (source uses a white plate over the band)
@@ -3588,5 +3576,4 @@ export function MultiProposalLayout({
       </SlideModeContext.Provider>
     </ProposalBrandProvider>
   );
-
 }

@@ -524,7 +524,12 @@ export function MsaPartnershipLayout({
 
           {/* SHARED MODULES */}
           <div style={{ paddingLeft: padCq(padX(density)), paddingRight: padCq(padX(density)) }}>
-            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+            <PrintSectionsStack
+              sections={content.modules}
+              mode={mode}
+              accent={accent}
+              density={density}
+            />
           </div>
 
           {/* ---------- 4. FOOTER RULE ---------- */}

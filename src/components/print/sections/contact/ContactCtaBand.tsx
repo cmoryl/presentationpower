@@ -1,6 +1,6 @@
 // Full-width CTA band — the closing lockup on every curated print piece.
 import type { PrintContactSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -16,13 +16,13 @@ export function ContactCtaBand({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   return (
-    <section aria-label={section.title ?? "Call to action"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Call to action"} style={{ margin: 0 }}>
       <div
         className="flex items-center justify-between"
         style={{
-          gap: cq(16),
-          borderRadius: cq(14),
-          padding: `${cq(15)} ${cq(18)}`,
+          gap: cq(MODULE.gridGap),
+          borderRadius: cq(MODULE.radius),
+          padding: `${cq(MODULE.padY)} ${cq(MODULE.padX)}`,
           background: `color-mix(in srgb, ${accent} ${mode === "dark" ? 26 : 14}%, ${mode === "dark" ? "#03002C" : "#FFFFFF"})`,
           border: `1px solid color-mix(in srgb, ${accent} 34%, transparent)`,
         }}

@@ -1,6 +1,6 @@
 // Two-column list table — the MSA "Departments supported" pattern.
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, MODULE } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -17,13 +17,13 @@ export function TableTwoColList({
   const icons = usePrintIcons();
   const rows = section.rows.slice(0, 16);
   return (
-    <section aria-label={section.title ?? "Table"} style={{ margin: `${cq(18)} 0` }}>
+    <section aria-label={section.title ?? "Table"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
-        <header style={{ marginBottom: cq(9) }}>
+        <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
             <div
               style={{
-                fontSize: cq(9),
+                fontSize: cq(MODULE.eyebrow),
                 fontWeight: 700,
                 letterSpacing: "0.18em",
                 color: accent,
@@ -57,14 +57,14 @@ export function TableTwoColList({
             key={i}
             className="flex items-baseline justify-between"
             style={{
-              gap: cq(10),
-              padding: `${cq(7)} 0`,
+              gap: cq(12),
+              padding: `${cq(MODULE.rowPadY)} 0`,
               borderTop: `1px solid ${ink.hairline}`,
             }}
           >
             <span
               className="flex items-center"
-              style={{ gap: cq(7), fontSize: cq(10), color: ink.strong, fontWeight: 600 }}
+              style={{ gap: cq(7), fontSize: cq(MODULE.body), color: ink.strong, fontWeight: 600 }}
             >
               {icons ? (
                 <EditableIcon
@@ -78,7 +78,7 @@ export function TableTwoColList({
               {r.label}
             </span>
             {r.value && (
-              <span style={{ fontSize: cq(9.4), color: ink.faint, whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: cq(MODULE.meta), color: ink.faint, whiteSpace: "nowrap" }}>
                 {r.value}
               </span>
             )}
