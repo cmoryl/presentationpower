@@ -134,7 +134,9 @@ export function verifyExportBytes(
         for (const part of ["[Content_Types].xml", "ppt/presentation.xml"]) {
           if (!text.includes(part)) problems.push(`missing part name ${part}`);
         }
-        const slides = (text.match(/ppt\/slides\/slide\d+\.xml/g) ?? []).length;
+        // Every part name appears twice in a zip (local header + central
+        // directory), so count distinct slide part names.
+        const slides = new Set(text.match(/ppt\/slides\/slide\d+\.xml/g) ?? []).size;
         if (slides === 0) problems.push("no slide parts in package");
         else details.push(`${slides} slide entries`);
       }
