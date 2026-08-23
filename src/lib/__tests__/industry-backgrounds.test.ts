@@ -79,13 +79,27 @@ describe("industry background sets", () => {
   });
 
   it("composites an industry ground onto an approved visual language", () => {
-    const base = SKIN_PACKS[0]!;
+    const set = industryBackgroundSet("R14")!;
+    // Appearance must match: pick a host pack on the same light/dark side so the
+    // ground is taken wholesale rather than re-inked over the host field.
+    const base = SKIN_PACKS.find((p) => p.mode === set.mode)!;
     const composed = withIndustryGround(base, "R14");
     expect(composed.type).toBe(base.type);
     expect(composed.card).toBe(base.card);
-    expect(composed.ground("scene:cover take:0")).toEqual(
-      industryBackgroundSet("R14")!.layers("cover", 0),
-    );
+    expect(composed.ground("scene:cover take:0")).toEqual(set.layers("cover", 0));
     expect(withIndustryGround(base, null)).toBe(base);
   });
+
+  it("re-inks a clashing sector plate over the host pack's own field", () => {
+    const set = industryBackgroundSet("R14")!;
+    const clashing = SKIN_PACKS.find((p) => p.mode !== set.mode)!;
+    const composed = withIndustryGround(clashing, "R14");
+    const layers = composed.ground("scene:cover take:0");
+    // The host's own ground is preserved underneath the toned sector geometry.
+    expect(layers.length).toBeGreaterThan(clashing.ground("scene:cover take:0").length);
+    expect(layers.slice(-clashing.ground("scene:cover take:0").length)).toEqual(
+      clashing.ground("scene:cover take:0"),
+    );
+  });
+
 });

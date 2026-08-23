@@ -91,15 +91,30 @@ describe("blended industry backgrounds", () => {
     }
   });
 
-  it("blends a custom industry photo BEHIND the composed geometry", () => {
-    const out = composeOverrideLayers(
+  it("paints a replacement image in FRONT by default and behind on request", () => {
+    const front = composeOverrideLayers(
       GROUND,
       { ...defaultOverride("S05", "atlas"), imageUrl: "https://cdn.example/steel.jpg" },
       "#FFFFFF",
     );
-    expect(out[out.length - 1]).toContain("steel.jpg");
-    expect(out[out.length - 1]).toContain("cover");
+    // Default priority is "front": a replacement cover image must be visible
+    // over the authored geometry, never buried under it.
+    expect(front[0]).toContain("steel.jpg");
+    expect(front[0]).toContain("cover");
+
+    const behind = composeOverrideLayers(
+      GROUND,
+      {
+        ...defaultOverride("S05", "atlas"),
+        imageUrl: "https://cdn.example/steel.jpg",
+        imagePriority: "behind",
+      },
+      "#FFFFFF",
+    );
+    expect(behind[behind.length - 1]).toContain("steel.jpg");
+    expect(behind[behind.length - 1]).toContain("cover");
   });
+
 
   it("treats an all-default override as neutral so authored packs are untouched", () => {
     expect(isNeutralOverride(defaultOverride("S06", "atlas"))).toBe(true);
