@@ -108,10 +108,29 @@ of the short edge, and multiplying by the raw pixel edge produced radii in the
 thousands of px that browsers clamp to 50% — the plate rendered as an ellipse.
 
 ```bash
-bun run verify:social-corners           # 406 plate cases, gate on geometry
+bun run verify:social-corners           # gate every derived case on geometry
 bun run verify:social-corners:update    # re-record after an intended change
 node scripts/visual-regression-social-corners.mjs --pixel   # also gate crops
 ```
 
-Flags: `--styles`, `--formats`, `--modes`, `--tolerance`, `--radius-tolerance`,
-`--url`, `--out`, `--baseline`, `--pixel`, `--update`.
+Flags: `--styles`, `--formats`, `--modes`, `--brands`, `--tolerance`,
+`--radius-tolerance`, `--crop`, `--url`, `--out`, `--baseline`, `--pixel`,
+`--update`.
+
+## Coverage is config-driven
+
+Nothing about the matrix is hard-coded in the script or in this doc. The single
+config file `src/lib/social-corner-sweep.ts` derives coverage from the live
+registries — `SOCIAL_STYLES` × `SOCIAL_FORMATS` × its own `modes` and `brands`
+lists — along with the radius cap, tolerances and crop size. The harness
+publishes that plan on `window.__SOCIAL_CORNER_SWEEP__`, and the script:
+
+- sweeps **every** style and format it finds, so a newly added social format or
+  template style is covered on the very next run with no script edit,
+- prints the coverage fingerprint and lists any cases picked up automatically,
+- **fails** when a case the config expects never rendered (coverage gap),
+- stores `fingerprint` + `coverage` in the baseline, so intentional coverage
+  changes are visible in the diff of `social-corners.baseline.json`.
+
+To widen coverage (extra appearance mode, extra brand), edit `modes`/`brands`
+in `src/lib/social-corner-sweep.ts` and re-record.
