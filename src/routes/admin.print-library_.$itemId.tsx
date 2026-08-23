@@ -21,6 +21,8 @@ import { toast } from "sonner";
 import { ArrowLeft, Eye, EyeOff, RotateCcw, Save, Undo2 } from "lucide-react";
 
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
+import { SaveActionButton } from "@/components/editor/SaveActionButton";
+import { useDirtyExitGuard } from "@/hooks/use-dirty-exit-guard";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { Button } from "@/components/ui/button";
 
@@ -409,15 +411,15 @@ function MasterItemEditorPage() {
           >
             <RotateCcw size={13} aria-hidden /> Reset to shipped
           </button>
-          <button
-            type="button"
-            onClick={() => save.mutate(draft)}
-            disabled={!dirty || save.isPending}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#03002C] disabled:opacity-40"
-          >
-            <Save size={13} aria-hidden />
-            {save.isPending ? "Updating…" : "Update master item"}
-          </button>
+          {/* Shared save control: same wording, state and ⌘S shortcut as every
+              other editing surface. */}
+          <SaveActionButton
+            state={save.isPending ? "saving" : dirty ? "dirty" : "saved"}
+            onSave={() => save.mutate(draft)}
+            label="Update master item"
+            savedLabel="Master saved"
+            disabled={!dirty}
+          />
         </div>
       </header>
 
