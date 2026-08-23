@@ -225,13 +225,6 @@ function PrintDemoPage() {
           shown in both light and dark so both finishes are verifiable here. */}
       <section className="mt-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-6">
-          <PrintDemoContentEditor
-            content={draft}
-            onChange={setDraft}
-            onReset={() => setDraft(previewContent)}
-            dirty={dirty}
-            accent={accent}
-          />
           <PrintDemoStudioPanel
             kind={item.kind}
             content={draft}
@@ -242,6 +235,13 @@ function PrintDemoPage() {
               setLook(baseLook);
               setDraft(previewContent);
             }}
+            accent={accent}
+          />
+          <PrintDemoContentEditor
+            content={draft}
+            onChange={setDraft}
+            onReset={() => setDraft(previewContent)}
+            dirty={dirty}
             accent={accent}
           />
         </div>
