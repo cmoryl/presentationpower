@@ -75,9 +75,8 @@ function distance(a: Set<string>, b: Set<string>): number {
   return union === 0 ? 0 : 1 - shared / union;
 }
 
-/** Compact, human-readable fingerprint for the snapshot baseline. */
-function fingerprint(art: string) {
-  const tokens = tokenize(art);
+/** FNV-1a over an already-tokenized set (re-tokenizing would drop plate ids). */
+function hashTokens(tokens: Set<string>): string {
   let hash = 0x811c9dc5;
   for (const t of [...tokens].sort()) {
     for (let i = 0; i < t.length; i += 1) {
@@ -85,14 +84,22 @@ function fingerprint(art: string) {
       hash = Math.imul(hash, 0x01000193) >>> 0;
     }
   }
+  return hash.toString(16).padStart(8, "0");
+}
+
+/** Compact, human-readable fingerprint for the snapshot baseline. */
+function fingerprint(art: string) {
+  const tokens = tokenize(art);
   return {
     tokens: tokens.size,
     hues: new Set([...tokens].filter((t) => t.startsWith("hex:"))).size,
     gradients: [...tokens].filter((t) => t.startsWith("grad:")).length,
     shapes: [...tokens].filter((t) => t.startsWith("shape:")).length,
-    hash: hash.toString(16).padStart(8, "0"),
+    plates: plates(tokens).length,
+    hash: hashTokens(tokens),
   };
 }
+
 
 interface Thumb {
   id: string;
