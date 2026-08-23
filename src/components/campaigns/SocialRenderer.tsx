@@ -863,6 +863,10 @@ export function SocialRenderer({
         >
           <div
             className="flex flex-col"
+            // Marker for the corner-rounding visual regression sweep
+            // (scripts/visual-regression-social-corners.mjs): only the plate
+            // carries a measurable corner radius.
+            data-social-plate={bleedImage ? "true" : undefined}
             style={{
               gap: (short * 2.4 * copyScale) / 100,
               // NOTE: width is constrained on the text itself, not here — the

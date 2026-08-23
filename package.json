@@ -37,7 +37,9 @@
     "verify:charts:style:ci": "node scripts/chart-style-regression.mjs --all --modes light,dark --ci --update",
     "verify:print-modules": "node scripts/print-module-pdf-snapshots.mjs",
     "verify:print-modules:update": "node scripts/print-module-pdf-snapshots.mjs --update",
-    "verify:print-modules:ci": "node scripts/print-module-pdf-snapshots.mjs --ci --modes light,dark"
+    "verify:print-modules:ci": "node scripts/print-module-pdf-snapshots.mjs --ci --modes light,dark",
+    "verify:social-corners": "node scripts/visual-regression-social-corners.mjs",
+    "verify:social-corners:update": "node scripts/visual-regression-social-corners.mjs --update"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.30",

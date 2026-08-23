@@ -62,6 +62,7 @@ import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
 import { Route as DevUxDebugRouteImport } from './routes/dev.ux-debug'
+import { Route as DevSocialCornersRouteImport } from './routes/dev.social-corners'
 import { Route as DevSlidestageDemoRouteImport } from './routes/dev.slidestage-demo'
 import { Route as DevProposalQaRouteImport } from './routes/dev.proposal-qa'
 import { Route as DevPrintModulePdfRouteImport } from './routes/dev.print-module-pdf'
@@ -410,6 +411,11 @@ const EventsAgentThreadIdRoute = EventsAgentThreadIdRouteImport.update({
 const DevUxDebugRoute = DevUxDebugRouteImport.update({
   id: '/dev/ux-debug',
   path: '/dev/ux-debug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevSocialCornersRoute = DevSocialCornersRouteImport.update({
+  id: '/dev/social-corners',
+  path: '/dev/social-corners',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevSlidestageDemoRoute = DevSlidestageDemoRouteImport.update({
@@ -911,6 +917,7 @@ export interface FileRoutesByFullPath {
   '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
+  '/dev/social-corners': typeof DevSocialCornersRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
@@ -1045,6 +1052,7 @@ export interface FileRoutesByTo {
   '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
+  '/dev/social-corners': typeof DevSocialCornersRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
@@ -1184,6 +1192,7 @@ export interface FileRoutesById {
   '/dev/print-module-pdf': typeof DevPrintModulePdfRoute
   '/dev/proposal-qa': typeof DevProposalQaRoute
   '/dev/slidestage-demo': typeof DevSlidestageDemoRoute
+  '/dev/social-corners': typeof DevSocialCornersRoute
   '/dev/ux-debug': typeof DevUxDebugRoute
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
@@ -1324,6 +1333,7 @@ export interface FileRouteTypes {
     | '/dev/print-module-pdf'
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
+    | '/dev/social-corners'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
     | '/events/new'
@@ -1458,6 +1468,7 @@ export interface FileRouteTypes {
     | '/dev/print-module-pdf'
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
+    | '/dev/social-corners'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
     | '/events/new'
@@ -1596,6 +1607,7 @@ export interface FileRouteTypes {
     | '/dev/print-module-pdf'
     | '/dev/proposal-qa'
     | '/dev/slidestage-demo'
+    | '/dev/social-corners'
     | '/dev/ux-debug'
     | '/events-agent/$threadId'
     | '/events/new'
@@ -1708,6 +1720,7 @@ export interface RootRouteChildren {
   DevPrintModulePdfRoute: typeof DevPrintModulePdfRoute
   DevProposalQaRoute: typeof DevProposalQaRoute
   DevSlidestageDemoRoute: typeof DevSlidestageDemoRoute
+  DevSocialCornersRoute: typeof DevSocialCornersRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
   EventsAgentThreadIdRoute: typeof EventsAgentThreadIdRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
@@ -2118,6 +2131,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/ux-debug'
       fullPath: '/dev/ux-debug'
       preLoaderRoute: typeof DevUxDebugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/social-corners': {
+      id: '/dev/social-corners'
+      path: '/dev/social-corners'
+      fullPath: '/dev/social-corners'
+      preLoaderRoute: typeof DevSocialCornersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/slidestage-demo': {
@@ -2906,6 +2926,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevPrintModulePdfRoute: DevPrintModulePdfRoute,
   DevProposalQaRoute: DevProposalQaRoute,
   DevSlidestageDemoRoute: DevSlidestageDemoRoute,
+  DevSocialCornersRoute: DevSocialCornersRoute,
   DevUxDebugRoute: DevUxDebugRoute,
   EventsAgentThreadIdRoute: EventsAgentThreadIdRoute,
   LibraryImportedRoute: LibraryImportedRoute,
