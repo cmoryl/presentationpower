@@ -14,6 +14,7 @@
 
 import type { TemplatePayload } from "./deck-store";
 import { applyLexicon, lexiconRules, type LexiconRule } from "./division-lexicon";
+import { normalizeLook } from "./look-validate";
 
 export type DemoDivision = {
   /** Canonical bm-* brand mode id. */
