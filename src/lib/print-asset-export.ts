@@ -139,6 +139,13 @@ export interface PrintExportOptions {
    * about it.
    */
   onAspectReport?: (report: AspectCheckReport) => void;
+  /**
+   * Receives the finished PDF bytes before download. The export audit uses
+   * this to verify real output; combine with `download: false` to skip saving.
+   */
+  onBlob?: (blob: Blob) => void;
+  /** Set false to skip the browser download (verification runs). */
+  download?: boolean;
 }
 
 export interface VectorTextReport {
@@ -437,12 +444,12 @@ export async function exportPrintAssetAsPdf(
       iccProfileName: opts.iccProfile,
       title: opts.filename,
     });
-    triggerBlobDownload(x4Bytes, filename, "application/pdf");
+    emitPdf(x4Bytes, filename, opts);
   } else {
     // press / digital paths — ship the overlaid bytes so vector text
     // survives on non-X4 exports too. Digital bypasses overlay above so
     // `workingBytes === rasterBytesArr` in that case.
-    triggerBlobDownload(workingBytes, filename, "application/pdf");
+    emitPdf(workingBytes, filename, opts);
   }
 }
 
@@ -468,6 +475,15 @@ async function pngDataUrlToJpeg(
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0);
   return canvas.toDataURL("image/jpeg", quality);
+}
+
+/** Hand the finished PDF to the audit hook and (unless suppressed) the user. */
+function emitPdf(bytes: Uint8Array, filename: string, opts: PrintExportOptions): void {
+  if (opts.onBlob) {
+    opts.onBlob(new Blob([bytes.buffer as ArrayBuffer], { type: "application/pdf" }));
+  }
+  if (opts.download === false) return;
+  triggerBlobDownload(bytes, filename, "application/pdf");
 }
 
 function triggerBlobDownload(bytes: Uint8Array, filename: string, mime: string): void {

@@ -14,12 +14,12 @@ import { useModalA11y } from "@/hooks/use-modal-a11y";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { SocialAssetEditorButton } from "@/components/campaigns/SocialAssetEditor";
 import type { SocialAssetEdit } from "@/lib/social-asset-edit";
+import { AssetExportMenu } from "@/components/AssetExportMenu";
 
 /** Division accent for the card aura — falls back to TransPerfect blue. */
 function divisionAccent(brandId: string): string {
   return BRAND_MODES.find((b) => b.id === brandId)?.tokens.accent ?? "#003FC7";
 }
-
 
 type Props = {
   rendererProps: Omit<SocialRendererProps, "displayShortEdge">;
@@ -52,8 +52,8 @@ export function AssetPreviewCard({
   editKey,
   onEditReset,
 }: Props) {
-
   const [open, setOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const accent = divisionAccent(rendererProps.brandId);
   const editable = Boolean(onEditChange);
   const liveProps = { ...rendererProps, edit };
@@ -62,6 +62,7 @@ export function AssetPreviewCard({
   const isLight = rendererProps.mode === "light";
   return (
     <div
+      ref={cardRef}
       className="flex min-w-0 flex-col gap-1.5"
       data-testid="asset-preview-card"
       data-asset-mode={rendererProps.mode}
@@ -109,7 +110,9 @@ export function AssetPreviewCard({
                   <span
                     aria-hidden
                     className="pointer-events-none absolute -inset-4 -z-10 blur-2xl"
-                    style={{ background: `radial-gradient(60% 60% at 50% 50%, ${accent}40, transparent 70%)` }}
+                    style={{
+                      background: `radial-gradient(60% 60% at 50% 50%, ${accent}40, transparent 70%)`,
+                    }}
                   />
                 ) : null}
                 <SocialRenderer {...liveProps} displayShortEdge={displayShortEdge} />
@@ -136,6 +139,21 @@ export function AssetPreviewCard({
           <span>
             {formatWidth}×{formatHeight} · {mode}
           </span>
+          <AssetExportMenu
+            label="Export"
+            filename={`${formatLabel}-${formatWidth}x${formatHeight}`}
+            bundleName={formatLabel}
+            allowZip={false}
+            resolveTargets={() => {
+              // The renderer paints at native size inside a scaled frame; the
+              // export captures that inner frame so output is platform-exact.
+              const node =
+                cardRef.current?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
+              return node
+                ? [{ node, width: formatWidth, height: formatHeight, label: formatLabel }]
+                : [];
+            }}
+          />
           {editable ? (
             <SocialAssetEditorButton
               rendererProps={rendererProps}
