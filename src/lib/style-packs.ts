@@ -1881,11 +1881,29 @@ export function backgroundCodeForPackId(id: string | null | undefined): string |
   return skin ? skinCodeFromPackId(skin.id) : null;
 }
 
-/** Re-apply admin background overrides on a pack whose ground was recomposed. */
-export function reapplyBackgroundOverrides(pack: StylePack, packId: string): StylePack {
+/**
+ * Re-apply background treatment on a pack whose `ground()` was recomposed.
+ *
+ * `authoredArt` (default true) also re-applies the pack's OWN authored plate
+ * kits (Element / Games / industry photo art). That is wrong for a recomposed
+ * ground — e.g. after an industry recipe replaced it — because the pack's
+ * default plates would silently win and the chosen recipe would never show.
+ * Pass `{ authoredArt: false }` to re-apply only ADMIN tuning/uploads.
+ */
+export function reapplyBackgroundOverrides(
+  pack: StylePack,
+  packId: string,
+  opts?: { authoredArt?: boolean },
+): StylePack {
   const code = backgroundCodeForPackId(packId);
-  return code ? withOverrides(pack, code) : pack;
+  if (!code) return pack;
+  if (opts?.authoredArt === false) {
+    const tuned = backgroundOverrides().some((o) => o.skinCode.toUpperCase() === code.toUpperCase());
+    return tuned ? withBackgroundOverrides(pack, code) : pack;
+  }
+  return withOverrides(pack, code);
 }
+
 
 
 /** Every selectable look including admin-authored templates. */
