@@ -321,6 +321,8 @@ function CanvasStudioPage() {
     });
   };
 
+  const effMode = (stageComp ?? comp)?.mode ?? "light";
+
   const exportPptx = useMutation({
     mutationFn: async () => {
       if (!comp) throw new Error("Nothing to export");
@@ -355,7 +357,7 @@ function CanvasStudioPage() {
             <span>{brand.name}</span>
             <MetaDot />
             <span>
-              {(stageComp ?? comp).mode === "dark" ? "Dark" : "Light"} mode
+              {effMode === "dark" ? "Dark" : "Light"} mode
               {pack ? ` · ${pack.label}` : ""}
             </span>
           </>
