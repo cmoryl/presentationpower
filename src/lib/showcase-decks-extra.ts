@@ -397,9 +397,8 @@ function buildGamingLaunch(): TemplatePayload {
     brandModeId: "bm-tp-games",
     archetypeId: "arch-problem-solution",
     context: {
-      // Design-led gaming look: S03 Gradient Infrastructure, no photoreal
-      // industry plate family.
-      stylePackId: "skin-s03",
+      // Authored Games plate kit (R22 gaming language) paints every slide.
+      stylePackId: "skin-r22",
       designRecipeId: null,
       defaultTransition: { type: "push", durationMs: 420 },
     },
