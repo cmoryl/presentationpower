@@ -101,15 +101,53 @@ const KIND_META: Record<
 
 type SortKey = "recent" | "created" | "title";
 
+/** First-run paths into real work, one per element area. */
+const STARTERS = [
+  {
+    to: "/brief/new" as const,
+    icon: Rocket,
+    accent: "#003FC7",
+    title: "Start a deck brief",
+    body: "Six questions in, a governed presentation out.",
+    cta: "New brief",
+  },
+  {
+    to: "/library/print" as const,
+    icon: FileText,
+    accent: "#EC388A",
+    title: "Build a print asset",
+    body: "Brochures, case studies and solution proposals.",
+    cta: "Print library",
+  },
+  {
+    to: "/library" as const,
+    icon: LayoutGrid,
+    accent: "#12B8B4",
+    title: "Browse slide modules",
+    body: "Save the layouts you like straight into My files.",
+    cta: "Open library",
+  },
+  {
+    to: "/social" as const,
+    icon: Share2,
+    accent: "#E39A00",
+    title: "Make a social surface",
+    body: "Every platform size, rendered on brand.",
+    cta: "Social studio",
+  },
+];
+
 function MyFilesPage() {
   const listFn = useServerFn(listMyFiles);
   const delFn = useServerFn(deleteMyFile);
   const queryClient = useQueryClient();
+  const signedIn = useSignedIn();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["my-files"],
     queryFn: () => listFn(),
   });
+
   const rows = (data ?? []) as MyFile[];
 
   const [q, setQ] = useState("");
