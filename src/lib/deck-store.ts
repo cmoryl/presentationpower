@@ -21,6 +21,7 @@ import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
 import { mergeTemplateOverride, type SlideTemplateOverride } from "./section-templates";
 import { autoFixQa } from "./qa-autofix";
+import { normalizeLook } from "./look-validate";
 import type { SlideTextFormat, SlideTextFormats, SlideTextScope } from "./slide-text-format";
 
 export type BrandModeId = string;
