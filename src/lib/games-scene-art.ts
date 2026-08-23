@@ -288,6 +288,11 @@ export function gamesMediaPool(mode: GamesArtMode = "dark"): string[] {
   // slide-level photograph they read as a blank navy field, which is exactly
   // what made the Gaming title slides look empty. Media uses the textured
   // compositions only.
-  const ordered = loud.length ? loud : textured.length ? textured : inMode;
+  // Highest-energy compositions first: a cover or full-bleed wants the loudest
+  // plate in the kit, not the quietest textured one.
+  const ranked = [...(loud.length ? loud : textured.length ? textured : inMode)].sort(
+    (a, b) => ACTIVITY_RANK[b.activity] - ACTIVITY_RANK[a.activity],
+  );
+  const ordered = ranked;
   return ordered.map((p) => p.url);
 }
