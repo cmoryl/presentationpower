@@ -397,8 +397,8 @@ function buildGamingLaunch(): TemplatePayload {
     brandModeId: "bm-tp-games",
     archetypeId: "arch-problem-solution",
     context: {
-      stylePackId: "skin-s11",
-      designRecipeId: "R13",
+      stylePackId: "skin-r22",
+      designRecipeId: "R22",
       defaultTransition: { type: "push", durationMs: 420 },
     },
     slides,

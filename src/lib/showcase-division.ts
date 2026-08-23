@@ -27,6 +27,12 @@ export type DemoDivision = {
   accent: string;
   /** Style pack the retargeted deck should open with. */
   stylePackId: string;
+  /**
+   * Industry background recipe (R-code) the division's art should paint from.
+   * Divisions with an authored plate kit (Gaming = R22) must name it here or
+   * the deck falls back to whatever recipe the source narrative carried.
+   */
+  designRecipeId?: string;
   /** Industry stamped into the brief. */
   industry: string;
 };
@@ -83,7 +89,8 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Gaming",
     slug: "gaming",
     accent: "#4ADE80",
-    stylePackId: "skin-s11",
+    stylePackId: "skin-r22",
+    designRecipeId: "R22",
     industry: "Gaming",
   },
   {
@@ -197,7 +204,13 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
     ...payload,
     title: retargetedTitle(payload.title, target),
     brandModeId: target.id,
-    context: { ...(payload.context ?? {}), stylePackId: target.stylePackId },
+    context: {
+      ...(payload.context ?? {}),
+      stylePackId: target.stylePackId,
+      // Keep the source recipe only when the target division has no authored
+      // background family of its own.
+      designRecipeId: target.designRecipeId ?? payload.context?.designRecipeId ?? null,
+    },
     slides,
     brief: payload.brief
       ? {
