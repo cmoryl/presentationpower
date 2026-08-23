@@ -365,20 +365,25 @@ function CanvasStudioPage() {
             <button
               type="button"
               role="switch"
-              aria-checked={comp.mode === "dark"}
+              aria-checked={effMode === "dark"}
               aria-label="Toggle dark mode"
-              title={comp.mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              onClick={() =>
-                switchAppearance(comp.mode === "dark" ? "light" : "dark")
+              disabled={Boolean(pack)}
+              title={
+                pack
+                  ? `${pack.label} sets the appearance`
+                  : effMode === "dark"
+                    ? "Switch to light mode"
+                    : "Switch to dark mode"
               }
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition ${
-                comp.mode === "dark"
+              onClick={() => switchAppearance(effMode === "dark" ? "light" : "dark")}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                effMode === "dark"
                   ? "bg-[#03002C] text-white"
                   : "bg-black/[0.04] text-[#03002C] hover:bg-black/[0.07]"
               }`}
             >
-              <span aria-hidden>{comp.mode === "dark" ? "☾" : "☀"}</span>
-              {comp.mode === "dark" ? "Dark" : "Light"}
+              <span aria-hidden>{effMode === "dark" ? "☾" : "☀"}</span>
+              {effMode === "dark" ? "Dark" : "Light"}
             </button>
             <SaveActionButton
               state={
