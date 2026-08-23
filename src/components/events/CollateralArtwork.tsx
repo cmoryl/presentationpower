@@ -39,7 +39,40 @@ export type CollateralContext = {
    * generated social assets for the same campaign. Omit for the default.
    */
   styleId?: string;
+  /**
+   * Division photography set (see `social-photography.ts`). When supplied the
+   * large-format, digital and social trims paint a correctly-cropped photo
+   * under the brand field so a kit's digital extensions read in the same
+   * photo-led language as the generated social posts for the campaign.
+   */
+  photo?: { wide: string; square: string; tall: string };
 };
+
+/** Which trims are photo-led, and which crop each one needs. Print, document
+ *  and merch trims stay design-only so the kit keeps a deliberate mix. */
+const PHOTO_KINDS: Partial<Record<ArtKind, "wide" | "square" | "tall">> = {
+  backdrop: "wide",
+  zoom: "wide",
+  video: "wide",
+  "video-vertical": "tall",
+  "web-hero": "wide",
+  "hall-banner": "wide",
+  "desk-runner": "wide",
+  "linkedin-header": "wide",
+  "social-wide": "wide",
+  "social-square": "square",
+  "social-story": "tall",
+  retractable: "tall",
+  tower: "tall",
+  email: "tall",
+};
+
+function photoForKind(kind: ArtKind, ctx: CollateralContext): string | undefined {
+  const crop = PHOTO_KINDS[kind];
+  if (!crop || !ctx.photo) return undefined;
+  return ctx.photo[crop];
+}
+
 
 export type ArtKind =
   | "badge"
