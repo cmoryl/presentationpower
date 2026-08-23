@@ -20,6 +20,7 @@ import {
   MetaDot,
   ToolbarSep,
 } from "@/components/editor/EditorChrome";
+import { EditorHistoryControls } from "@/components/editor/EditorHistoryControls";
 import { BRAND_MODES, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
@@ -43,13 +44,7 @@ import {
   updateCustomModule,
 } from "@/lib/custom-modules.functions";
 import { compositionToModuleParts, moduleToItems } from "@/lib/module-studio-bridge";
-import {
-  STAGE_H,
-  STAGE_W,
-  makeItem,
-  useCanvasStudio,
-  type CanvasItem,
-} from "@/lib/canvas-studio";
+import { STAGE_H, STAGE_W, makeItem, useCanvasStudio, type CanvasItem } from "@/lib/canvas-studio";
 
 export const Route = createFileRoute("/admin/module-studio")({
   head: () => ({
@@ -266,10 +261,7 @@ function ModuleStudioPage() {
 
   // ---- module record: validation, publish, export -------------------------
 
-  const parts = useMemo(
-    () => (comp ? compositionToModuleParts(comp, brand) : null),
-    [comp, brand],
-  );
+  const parts = useMemo(() => (comp ? compositionToModuleParts(comp, brand) : null), [comp, brand]);
 
   const issues = useMemo(
     () =>
@@ -377,7 +369,11 @@ function ModuleStudioPage() {
     const mode = (row.brand_mode?.includes("dark") ? "dark" : "light") as "light" | "dark";
     const id = createComposition(asCopy ? `${row.name} copy` : row.name, row.brand_mode ?? brandId);
     patchComposition(id, { brandId: row.brand_mode ?? brandId, mode });
-    for (const item of moduleToItems(row.base_variant_id, normalizeCanvasBlocks(row.canvas_blocks), mode)) {
+    for (const item of moduleToItems(
+      row.base_variant_id,
+      normalizeCanvasBlocks(row.canvas_blocks),
+      mode,
+    )) {
       addItem(id, item);
     }
     setMeta({
@@ -425,9 +421,7 @@ function ModuleStudioPage() {
               aria-checked={comp.mode === "dark"}
               aria-label="Toggle dark mode"
               title={comp.mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              onClick={() =>
-                switchAppearance(comp.mode === "dark" ? "light" : "dark")
-              }
+              onClick={() => switchAppearance(comp.mode === "dark" ? "light" : "dark")}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 comp.mode === "dark"
                   ? "bg-[#03002C] text-white"
@@ -734,25 +728,15 @@ function ModuleStudioPage() {
 
               <ToolbarSep />
 
-              <div role="group" aria-label="History" className="inline-flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={undo}
-                  disabled={!canUndo}
-                  title="Undo (⌘Z) — steps back through every canvas edit"
-                  className="inline-flex h-8 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2.5 text-[11px] font-semibold text-black/65 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
-                >
-                  ⟲ Undo
-                </button>
-                <button
-                  type="button"
-                  onClick={redo}
-                  disabled={!canRedo}
-                  title="Redo (⇧⌘Z)"
-                  className="inline-flex h-8 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2.5 text-[11px] font-semibold text-black/65 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
-                >
-                  ⟳ Redo
-                </button>
+              <div role="group" aria-label="History" className="inline-flex items-center">
+                <EditorHistoryControls
+                  canUndo={canUndo}
+                  canRedo={canRedo}
+                  onUndo={undo}
+                  onRedo={redo}
+                  undoLabel="canvas edit"
+                  redoLabel="canvas edit"
+                />
               </div>
             </>
           }

@@ -16,9 +16,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, RotateCcw, Save, Undo2 } from "lucide-react";
+import { ArrowLeft, RotateCcw, Undo2 } from "lucide-react";
 
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
+import { SaveActionButton } from "@/components/editor/SaveActionButton";
+import { useDirtyExitGuard } from "@/hooks/use-dirty-exit-guard";
 import { AdminLoading } from "@/components/admin/AdminPage";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PrintSectionPreviewFrame } from "@/components/print/sections/PrintSectionPreviewFrame";
@@ -114,6 +116,12 @@ function PrintModuleStudioPage() {
       toast.error(e instanceof Error ? e.message : "Could not reset this module"),
   });
 
+  // Computed before the early returns so the unsaved-work guard keeps a stable
+  // hook order.
+  const dirty = draft ? JSON.stringify(draft) !== savedKey : false;
+  // Warn before a reload / tab close throws unsaved master edits away.
+  useDirtyExitGuard(dirty);
+
   if (rowsQ.isLoading) return <AdminLoading label="Loading module…" />;
   if (isForbidden(rowsQ.error)) return <AdminForbidden />;
 
@@ -132,7 +140,6 @@ function PrintModuleStudioPage() {
   }
 
   const merged = applyPrintOverride(shipped, override);
-  const dirty = JSON.stringify(draft) !== savedKey;
   const variants = sectionVariantsFor(draft.kind);
   const textPaths = enumerateLeafPaths(draft as unknown as Record<string, unknown>).filter((p) => {
     const v = readLeaf(draft as unknown as Record<string, unknown>, p);
@@ -224,23 +231,23 @@ function PrintModuleStudioPage() {
           >
             <RotateCcw size={13} aria-hidden /> Reset to shipped
           </button>
-          <button
-            type="button"
-            onClick={() => save.mutate(draft)}
-            disabled={!dirty || save.isPending}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-[#03002C] disabled:opacity-40"
-          >
-            <Save size={13} aria-hidden />
-            {save.isPending ? "Updating…" : "Update master module"}
-          </button>
+          {/* Shared save control: same wording, state and ⌘S shortcut as the
+              deck editor and the canvas studios. */}
+          <SaveActionButton
+            state={save.isPending ? "saving" : dirty ? "dirty" : "saved"}
+            onSave={() => save.mutate(draft)}
+            label="Update master module"
+            savedLabel="Master saved"
+            disabled={!dirty}
+          />
         </div>
       </header>
 
       <p className="mt-3 max-w-3xl text-sm leading-[1.5] text-black/60">
-        Click any line on the page to edit it in place, swap the variant, and check the block against
-        each page format. Saving updates the master block: the library preview, the insert drawer and
-        every newly created asset stamp this content from now on. Assets already built keep their own
-        copy.
+        Click any line on the page to edit it in place, swap the variant, and check the block
+        against each page format. Saving updates the master block: the library preview, the insert
+        drawer and every newly created asset stamp this content from now on. Assets already built
+        keep their own copy.
       </p>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
@@ -337,7 +344,9 @@ function PrintModuleStudioPage() {
           <StudioPanel title={`Copy (${textPaths.length} fields)`}>
             <div className="space-y-2.5">
               {textPaths.map((p) => {
-                const value = String(readLeaf(draft as unknown as Record<string, unknown>, p) ?? "");
+                const value = String(
+                  readLeaf(draft as unknown as Record<string, unknown>, p) ?? "",
+                );
                 const long = value.length > 60;
                 return (
                   <label key={p} className="block">

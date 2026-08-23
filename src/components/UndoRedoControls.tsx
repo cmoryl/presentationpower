@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useDeckStore } from "@/lib/deck-store";
+import { EditorHistoryControls } from "@/components/editor/EditorHistoryControls";
 
 /**
  * Session-scoped undo/redo toolbar + keyboard shortcuts for the deck editor.
@@ -44,31 +45,13 @@ export function UndoRedoControls() {
   }, [undo, redo]);
 
   return (
-    <div className="inline-flex items-center">
-      <button
-        type="button"
-        onClick={() => undo()}
-        disabled={!canUndo}
-        title={`${undoLabel ? `Undo ${undoLabel}` : "Undo"} (${navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}+Z)`}
-        aria-label={undoLabel ? `Undo ${undoLabel}` : "Undo"}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
-      >
-        <span aria-hidden className="text-base leading-none">
-          ↶
-        </span>
-      </button>
-      <button
-        type="button"
-        onClick={() => redo()}
-        disabled={!canRedo}
-        title={`${redoLabel ? `Redo ${redoLabel}` : "Redo"} (${navigator.platform.includes("Mac") ? "⌘⇧" : "Ctrl+Shift"}+Z)`}
-        aria-label={redoLabel ? `Redo ${redoLabel}` : "Redo"}
-        className="inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition hover:bg-black/[0.05] hover:text-black disabled:cursor-not-allowed disabled:text-black/25 disabled:hover:bg-transparent dark:text-white/70 dark:hover:bg-white/[0.06] dark:hover:text-white"
-      >
-        <span aria-hidden className="text-base leading-none">
-          ↷
-        </span>
-      </button>
-    </div>
+    <EditorHistoryControls
+      canUndo={canUndo}
+      canRedo={canRedo}
+      onUndo={() => undo()}
+      onRedo={() => redo()}
+      undoLabel={undoLabel}
+      redoLabel={redoLabel}
+    />
   );
 }
