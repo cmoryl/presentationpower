@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Rocket, Search, X, Eye, Share2, LayoutGrid } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { useSignedIn } from "@/components/CloudDeckControls";
+import { useSignedIn, MyCloudDecks } from "@/components/CloudDeckControls";
 import { useDeckStore, type Deck } from "@/lib/deck-store";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
