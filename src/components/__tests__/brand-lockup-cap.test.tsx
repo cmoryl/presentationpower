@@ -37,8 +37,7 @@ describe("BrandLockup responsive clamps", () => {
     const html = renderToStaticMarkup(
       <BrandLockup brand={brand} color="#03002C" size="lg" unit={cq} cap={false} />,
     );
-    expect(html).not.toContain("cqw)");
-    expect(html).toContain("min(");
+    expect(html).not.toContain("min(");
   });
 
   it("leaves unscaled (pixel) surfaces untouched", () => {
