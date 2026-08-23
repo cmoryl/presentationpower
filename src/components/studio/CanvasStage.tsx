@@ -367,8 +367,14 @@ export function CanvasStage({
 
       {items.length === 0 && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-2 text-center">
-          <p className="text-lg font-semibold text-black/45">Blank slide</p>
-          <p className="max-w-md text-sm text-black/40">
+          <p
+            className={`text-lg font-semibold ${comp.mode === "dark" ? "text-white/55" : "text-black/45"}`}
+          >
+            Blank slide
+          </p>
+          <p
+            className={`max-w-md text-sm ${comp.mode === "dark" ? "text-white/45" : "text-black/40"}`}
+          >
             Drag preset modules, text, stats, imagery or surfaces from the left rail. Drop image
             files straight onto the canvas.
           </p>

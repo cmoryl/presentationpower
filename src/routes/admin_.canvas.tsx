@@ -486,7 +486,22 @@ function CanvasStudioPage() {
           }
           slideRow={
             <>
-              <EditorMenu label="Appearance" hint={comp.mode === "dark" ? "Dark" : "Light"}>
+              <EditorMenu
+                label="Appearance"
+                hint={
+                  pack
+                    ? `${pack.mode === "dark" ? "Dark" : "Light"} · template`
+                    : comp.mode === "dark"
+                      ? "Dark"
+                      : "Light"
+                }
+              >
+                {pack && (
+                  <p className="mb-1.5 px-1 text-[11px] leading-relaxed text-black/55">
+                    {pack.label} is a {pack.mode} template, so it sets the canvas appearance. Reset
+                    to the brand system to choose light or dark yourself.
+                  </p>
+                )}
                 <div
                   role="group"
                   aria-label="Canvas appearance mode"
@@ -496,10 +511,11 @@ function CanvasStudioPage() {
                     <button
                       key={m}
                       type="button"
-                      aria-pressed={comp.mode === m}
+                      aria-pressed={(pack ? pack.mode : comp.mode) === m}
+                      disabled={Boolean(pack)}
                       onClick={() => switchAppearance(m)}
-                      className={`rounded-full px-3 py-1 transition ${
-                        comp.mode === m
+                      className={`rounded-full px-3 py-1 transition disabled:cursor-not-allowed disabled:opacity-60 ${
+                        (pack ? pack.mode : comp.mode) === m
                           ? m === "dark"
                             ? "bg-[#03002C] text-white shadow-sm"
                             : "bg-white text-[#03002C] shadow-sm"
