@@ -1,10 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Send } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Sparkles, Send, BookOpen, ArrowUpRight, Plus, Compass } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { oracleChat, type OracleSource } from "@/lib/ai-oracle.functions";
+import { listKnowledgeEntries, KNOWLEDGE_KIND_META } from "@/lib/knowledge.functions";
 
 export const Route = createFileRoute("/knowledge/ask")({
   head: () => ({
@@ -15,6 +17,13 @@ export const Route = createFileRoute("/knowledge/ask")({
         content:
           "Chat with the TransPerfect knowledge base — cited answers from Oracle, KB, and brand assets.",
       },
+      { property: "og:title", content: "Ask Oracle · TransPerfect Element" },
+      {
+        property: "og:description",
+        content: "Cited answers from the TransPerfect Element knowledge base.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: OracleAskView,
@@ -28,13 +37,35 @@ type ChatMsg = {
   setup?: boolean;
 };
 
-const STARTERS = [
-  "What is GlobalLink?",
-  "What's our WCAG guidance?",
-  "Which divisions serve life sciences?",
-  "How should we describe TransPerfect's voice?",
-  "What are our sub-brand governance rules?",
+/** Starters grouped by intent so the blank state reads as a map of what Oracle
+ *  actually knows, instead of five unlabelled pills. */
+const STARTER_GROUPS: Array<{ label: string; items: string[] }> = [
+  {
+    label: "Brand & voice",
+    items: [
+      "How should we describe TransPerfect's voice?",
+      "What are our sub-brand governance rules?",
+      "What are the logo clear-space rules?",
+    ],
+  },
+  {
+    label: "Divisions & capabilities",
+    items: [
+      "What is GlobalLink?",
+      "Which divisions serve life sciences?",
+      "Summarize our legal tech capabilities.",
+    ],
+  },
+  {
+    label: "Design system & delivery",
+    items: [
+      "What's our WCAG guidance?",
+      "Which style pack suits a gaming pitch?",
+      "What are our print colour rules?",
+    ],
+  },
 ];
+
 
 function OracleAskView() {
   const ask = useServerFn(oracleChat);
