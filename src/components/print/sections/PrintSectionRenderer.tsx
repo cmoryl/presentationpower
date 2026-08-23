@@ -259,13 +259,21 @@ export const PRINT_CONTACT_VARIANTS: Array<{
   label: string;
   description: string;
 }> = [
-  { id: "contact-expert-card", label: "Subject Expert Card", description: "Named subject expert lockup." },
+  {
+    id: "contact-expert-card",
+    label: "Subject Expert Card",
+    description: "Named subject expert lockup.",
+  },
   {
     id: "contact-global-panel",
     label: "Global Contacts Panel",
     description: "Navy panel with a region contact rail.",
   },
-  { id: "contact-cta-band", label: "Closing CTA Band", description: "Closing accent band with a button." },
+  {
+    id: "contact-cta-band",
+    label: "Closing CTA Band",
+    description: "Closing accent band with a button.",
+  },
 ];
 
 export const PRINT_DEVICE_VARIANTS: Array<{
@@ -289,7 +297,6 @@ export const PRINT_DEVICE_VARIANTS: Array<{
     description: "Monitor and laptop pair for a hero screen plus a companion view.",
   },
 ];
-
 
 export function PrintSectionRenderer({
   section,
@@ -442,21 +449,21 @@ function sectionLabel(s: PrintSection): string {
     s.kind === "hero"
       ? "Hero"
       : s.kind === "stats"
-      ? "Stats"
-      : s.kind === "quote"
-        ? "Quote"
-        : s.kind === "logo-grid"
-          ? "Client logos"
-          : s.kind === "expertise"
-            ? "Expertise"
-            : s.kind === "feature-list"
-              ? "Features"
-              : s.kind === "narrative"
-                ? "Narrative"
-                : s.kind === "table"
-                  ? "Table"
-                  : s.kind === "contact"
-                    ? "Contact"
-                    : "Module";
+        ? "Stats"
+        : s.kind === "quote"
+          ? "Quote"
+          : s.kind === "logo-grid"
+            ? "Client logos"
+            : s.kind === "expertise"
+              ? "Expertise"
+              : s.kind === "feature-list"
+                ? "Features"
+                : s.kind === "narrative"
+                  ? "Narrative"
+                  : s.kind === "table"
+                    ? "Table"
+                    : s.kind === "contact"
+                      ? "Contact"
+                      : "Module";
   return kindLabel;
 }

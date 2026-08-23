@@ -26,7 +26,7 @@ export function ContactExpertCard({
       <div
         className="flex items-center"
         style={{
-                    gap: cq(MODULE.gridGap),
+          gap: cq(MODULE.gridGap),
           ...modulePanel(mode, accent),
         }}
       >

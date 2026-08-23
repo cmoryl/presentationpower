@@ -30,7 +30,10 @@ export function ContactGlobalPanel({
       >
         <div
           className="grid"
-          style={{ gridTemplateColumns: rows.length ? "0.9fr 1.1fr" : "1fr", gap: cq(MODULE.gridGap) }}
+          style={{
+            gridTemplateColumns: rows.length ? "0.9fr 1.1fr" : "1fr",
+            gap: cq(MODULE.gridGap),
+          }}
         >
           <div>
             <div

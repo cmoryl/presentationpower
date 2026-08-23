@@ -463,7 +463,6 @@ type Family = PrintModuleFamily;
 
 const FAMILIES = PRINT_MODULE_FAMILIES;
 
-
 function variantsForFamily(
   family: Family,
 ): Array<{ id: string; label: string; description: string }> {
@@ -612,7 +611,9 @@ export function PrintSectionPicker({
                     aria-hidden
                   />
                   <div>
-                    <div className="text-sm font-semibold text-black">{printVariantLabel(v.id)}</div>
+                    <div className="text-sm font-semibold text-black">
+                      {printVariantLabel(v.id)}
+                    </div>
                     <div className="mt-0.5 text-[11px] text-black/60">{v.description}</div>
                   </div>
                 </div>

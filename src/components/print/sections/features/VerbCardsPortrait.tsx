@@ -57,7 +57,10 @@ export function VerbCardsPortrait({
       <div style={modulePanel(mode, accent)}>
         <div
           className="grid"
-          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gap: cq(MODULE.gridGap) }}
+          style={{
+            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+            gap: cq(MODULE.gridGap),
+          }}
         >
           {items.map((f, i) => {
             const name =

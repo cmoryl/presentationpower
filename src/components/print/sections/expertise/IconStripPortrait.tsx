@@ -22,7 +22,10 @@ export function IconStripPortrait({
   if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "We know how"} style={{ margin: 0 }}>
-      <div className="flex items-center" style={{ gap: cq(MODULE.gridGap), marginBottom: cq(MODULE.headerGap) }}>
+      <div
+        className="flex items-center"
+        style={{ gap: cq(MODULE.gridGap), marginBottom: cq(MODULE.headerGap) }}
+      >
         <div style={{ flex: 1, height: 1, background: ink.hairline }} />
         <div
           style={{

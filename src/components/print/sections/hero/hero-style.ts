@@ -34,11 +34,7 @@ export function heroRuleGap(s: HeroStyleSource, def: number): string {
 }
 
 /** Closing hairline under the title block. */
-export function heroHairline(
-  s: HeroStyleSource,
-  ink: { hairline: string },
-  shownByDefault = true,
-) {
+export function heroHairline(s: HeroStyleSource, ink: { hairline: string }, shownByDefault = true) {
   const shown = s.rule?.hairline ?? shownByDefault;
   if (!shown) return { borderBottom: "none" as const };
   return { borderBottom: `1px solid ${s.rule?.hairlineColor ?? ink.hairline}` };

@@ -14,7 +14,11 @@
 
 import { DeviceFrame, DeviceScreenPlaceholder } from "@/components/device/DeviceFrame";
 import { DeviceScreenPicker } from "@/components/device/DeviceScreenPicker";
-import { EditableImage, resolveImageSlot, usePrintImageEdit } from "@/components/print/PrintImageEdit";
+import {
+  EditableImage,
+  resolveImageSlot,
+  usePrintImageEdit,
+} from "@/components/print/PrintImageEdit";
 import type { PrintDeviceSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, MODULE } from "../shared";
 
@@ -71,12 +75,7 @@ function Screen({
   );
 }
 
-function Copy({
-  section,
-  mode,
-  accent,
-  align = "left",
-}: Props & { align?: "left" | "center" }) {
+function Copy({ section, mode, accent, align = "left" }: Props & { align?: "left" | "center" }) {
   const ink = sectionInk(mode);
   return (
     <div style={{ minWidth: 0, textAlign: align }}>

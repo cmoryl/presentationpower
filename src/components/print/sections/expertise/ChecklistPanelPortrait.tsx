@@ -41,7 +41,13 @@ export function ChecklistPanelPortrait({
             )}
             {section.title && (
               <div
-                style={{ marginTop: cq(MODULE.eyebrowGap), fontSize: cq(MODULE.panelTitle), fontWeight: 700, letterSpacing: MODULE.titleTrack, color: ink.strong }}
+                style={{
+                  marginTop: cq(MODULE.eyebrowGap),
+                  fontSize: cq(MODULE.panelTitle),
+                  fontWeight: 700,
+                  letterSpacing: MODULE.titleTrack,
+                  color: ink.strong,
+                }}
               >
                 {section.title}
               </div>
@@ -91,7 +97,12 @@ export function ChecklistPanelPortrait({
                 />
               )}
               <div
-                style={{ fontSize: cq(MODULE.body), lineHeight: 1.45, color: ink.soft, ...clampLines(2) }}
+                style={{
+                  fontSize: cq(MODULE.body),
+                  lineHeight: 1.45,
+                  color: ink.soft,
+                  ...clampLines(2),
+                }}
               >
                 {it.label}
               </div>
