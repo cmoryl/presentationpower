@@ -99,7 +99,7 @@ export function PrintCTABand({
               color="#FFFFFF"
               size="2xs"
               orientation="mark-only"
-              unit={cq}
+
             />
           </div>
         )}
