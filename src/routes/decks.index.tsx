@@ -515,28 +515,92 @@ function DeckTile({
   );
 }
 
-function EmptyNew() {
+/** Blank state with three real routes into work, plus a sign-in nudge when the
+ *  local store is empty only because the account isn't connected yet. */
+function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
+  const paths = [
+    {
+      to: "/brief/new" as const,
+      icon: Rocket,
+      title: "Start from a brief",
+      body: "Answer six questions and get a governed, on-brand deck in about a minute.",
+      cta: "Create a brief",
+      primary: true,
+    },
+    {
+      to: "/library" as const,
+      icon: LayoutGrid,
+      title: "Build from the library",
+      body: "Pick slide modules and a style pack, then assemble a deck module by module.",
+      cta: "Open the library",
+      primary: false,
+    },
+    {
+      to: "/decks/import" as const,
+      icon: Share2,
+      title: "Import a PowerPoint",
+      body: "Drop an existing .pptx and we stage it as editable slides on brand.",
+      cta: "Import a deck",
+      primary: false,
+    },
+  ];
+
   return (
-    <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white p-12 text-center dark:border-white/15 dark:bg-white/[0.03]">
-      <div className="mx-auto max-w-md">
+    <div className="mt-10 rounded-3xl border border-dashed border-black/15 bg-white p-8 dark:border-white/15 dark:bg-white/[0.03] sm:p-10">
+      <div className="mx-auto max-w-md text-center">
         <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
           ✦
         </div>
-        <h3 className="mt-4 text-xl font-semibold">No decks yet</h3>
+        <h3 className="mt-4 text-xl font-semibold">No decks in this workspace yet</h3>
         <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-          Start with a brief. In under a minute you'll have a governed, on-brand deck ready to
-          personalize.
+          Three ways to get a first deck on screen — all of them end in the same editor.
         </p>
-        <Link
-          to="/brief/new"
-          className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:opacity-90"
-        >
-          <Rocket size={14} /> Create your first brief
-        </Link>
       </div>
+
+      <div className="mt-8 grid gap-4 md:grid-cols-3">
+        {paths.map((p) => {
+          const Icon = p.icon;
+          return (
+            <div
+              key={p.to}
+              className="flex flex-col rounded-2xl border border-black/10 bg-white p-5 text-left shadow-sm transition hover:border-[#003FC7]/40 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]"
+            >
+              <span className="inline-flex size-9 items-center justify-center rounded-xl bg-[#003FC7]/10 text-[#003FC7]">
+                <Icon size={16} />
+              </span>
+              <div className="mt-3 text-sm font-semibold tracking-[-0.01em]">{p.title}</div>
+              <p className="mt-1 flex-1 text-[12px] leading-relaxed text-black/55 dark:text-white/55">
+                {p.body}
+              </p>
+              <Link
+                to={p.to}
+                className={
+                  "mt-4 inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-medium transition " +
+                  (p.primary
+                    ? "bg-[#0B2A4A] text-white hover:opacity-90"
+                    : "border border-black/15 text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/70")
+                }
+              >
+                {p.cta}
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+
+      {signedIn === false && (
+        <div className="mt-6 rounded-2xl border border-[#003FC7]/25 bg-[#003FC7]/[0.05] px-4 py-3 text-center text-xs text-[#03002C] dark:text-white/80">
+          Already made decks?{" "}
+          <Link to="/auth" className="font-semibold underline">
+            Sign in
+          </Link>{" "}
+          to pull the ones saved to your account into this browser.
+        </div>
+      )}
     </div>
   );
 }
+
 
 function EmptyNoMatches({ onClear }: { onClear: () => void }) {
   return (
