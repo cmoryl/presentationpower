@@ -1346,9 +1346,12 @@ export function CollateralArtwork(props: {
   return (
     <LookContext.Provider value={props.ctx.look ?? eventLookById(props.ctx.lookId)}>
       <StyleContext.Provider value={resolveSocialStyle(props.ctx.styleId)}>
-        <CollateralArtworkFramed {...props} />
+        <PhotoContext.Provider value={photoForKind(props.kind, props.ctx)}>
+          <CollateralArtworkFramed {...props} />
+        </PhotoContext.Provider>
       </StyleContext.Provider>
     </LookContext.Provider>
+
   );
 
 }
