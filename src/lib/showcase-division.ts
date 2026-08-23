@@ -211,8 +211,12 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
       ...(payload.context ?? {}),
       stylePackId: target.stylePackId,
       // Keep the source recipe only when the target division has no authored
-      // background family of its own.
-      designRecipeId: target.designRecipeId ?? payload.context?.designRecipeId ?? null,
+      // background family of its own. An explicit `null` clears it, so
+      // design-led divisions never inherit the source industry plates.
+      designRecipeId:
+        target.designRecipeId === null
+          ? null
+          : (target.designRecipeId ?? payload.context?.designRecipeId ?? null),
     },
     slides,
     brief: payload.brief
