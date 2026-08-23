@@ -263,9 +263,16 @@ export function hardenFontFallbacksInXml(
       const canonical = (Object.values(CANONICAL_FONTS) as string[]).includes(name)
         ? (name as CanonicalFont)
         : mapFontFamily(name);
-      return `<a:${tag}${pre}typeface="${name}"${post}${panoseAttrs(canonical)}${selfClose}>`;
+      // pptxgenjs already emits `pitchFamily`/`charset` on some font tags. Our
+      // metadata must replace those, not sit beside them — a repeated attribute
+      // is invalid XML and makes PowerPoint drop the slide ("couldn't read some
+      // content" / [Repaired]).
+      const strip = (attrs: string) =>
+        attrs.replace(/\s(?:pitchFamily|charset|panose)="[^"]*"/g, "");
+      return `<a:${tag}${strip(pre)}typeface="${name}"${strip(post)}${panoseAttrs(canonical)}${selfClose}>`;
     },
   );
+
 
   if (opts?.embedded === false) {
     const scale = fallbackFontScale(opts?.font ?? CANONICAL_FONTS.sans);
