@@ -15703,12 +15703,22 @@ function MediaTile({
   // identical frame whether it is viewed light or dark — only the scrim and
   // ink treatment change. (Previously dark mode fell back to the dusk /
   // abstract set, which made the two versions of a slide look unrelated.)
+  // Games wears its authored plate kit for slide media too, so a Gaming cover
+  // or split carries the same compositions as the template background instead
+  // of the generic TP dark gradient set.
+  const gamesPool =
+    brand.id === "bm-tp-games" && pool !== "portrait"
+      ? gamesMediaPool(mode === "light" ? "light" : "dark")
+      : null;
   const tileBackdrops =
     pool === "portrait"
       ? HEADSHOTS
-      : divSet.light && divSet.light.length > 0
-        ? [...divSet.light, ...divSet.photos]
-        : [...divSet.photos, ...divSet.abstracts];
+      : gamesPool && gamesPool.length > 0
+        ? gamesPool
+        : divSet.light && divSet.light.length > 0
+          ? [...divSet.light, ...divSet.photos]
+          : [...divSet.photos, ...divSet.abstracts];
+
   const url =
     resolvedPosterUrl && resolvedPosterUrl.length > 0
       ? resolvedPosterUrl
