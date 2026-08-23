@@ -253,9 +253,7 @@ export function SolutionProposalLayout({
                 >
                   {party?.label || (idx === 0 ? "Prepared for:" : "Prepared by:")}
                 </div>
-                <div
-                  style={{ marginTop: cq(6), fontSize: cq(11.5), fontWeight: 700, color: ink }}
-                >
+                <div style={{ marginTop: cq(6), fontSize: cq(11.5), fontWeight: 700, color: ink }}>
                   {party?.contact ?? ""}
                 </div>
                 {party?.role && (
@@ -557,10 +555,7 @@ export function SolutionProposalLayout({
             {(stats.length > 0 || content.quote) && (
               <div data-section="proof" data-section-label="Proof rail">
                 {stats.length > 0 && (
-                  <div
-                    className="grid"
-                    style={{ gridTemplateColumns: "1fr 1fr", gap: cq(10) }}
-                  >
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: cq(10) }}>
                     {stats.map((s, i) => (
                       <div
                         key={i}
@@ -688,9 +683,7 @@ export function SolutionProposalLayout({
                         <div style={{ fontSize: cq(9), color: inkSoft }}>{m.office}</div>
                       )}
                       {m.email && (
-                        <div
-                          style={{ fontSize: cq(9), color: inkSoft, wordBreak: "break-all" }}
-                        >
+                        <div style={{ fontSize: cq(9), color: inkSoft, wordBreak: "break-all" }}>
                           {m.email}
                         </div>
                       )}
@@ -750,7 +743,12 @@ export function SolutionProposalLayout({
 
           {/* SHARED MODULES */}
           <div style={{ paddingLeft: pad, paddingRight: pad }}>
-            <PrintSectionsStack sections={content.modules} mode={mode} accent={accent} />
+            <PrintSectionsStack
+              sections={content.modules}
+              mode={mode}
+              accent={accent}
+              density={density}
+            />
           </div>
 
           {/* ---------- 6. FOOTER RULE ---------- */}

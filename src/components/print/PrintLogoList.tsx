@@ -36,7 +36,10 @@ export function usePrintLogoList() {
 /** Stable slot id for an entry (falls back to a name slug, then the index). */
 export function logoEntryId(entry: PrintLogoEntry, index: number): string {
   if (entry.id?.trim()) return entry.id.trim();
-  const slug = (entry.name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const slug = (entry.name ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
   return slug || `slot-${index + 1}`;
 }
 
@@ -98,7 +101,12 @@ export function LogoSlotChrome({
           type="button"
           className={`${BTN} bg-[#E53D2E] hover:bg-[#b32b1f]`}
           aria-label="Remove logo"
-          onClick={() => ctx.onChange(path, list.filter((_, i) => i !== index))}
+          onClick={() =>
+            ctx.onChange(
+              path,
+              list.filter((_, i) => i !== index),
+            )
+          }
         >
           <X size={11} aria-hidden />
         </button>

@@ -427,14 +427,12 @@ export function PrintSectionsStack({
   // The STACK owns the vertical rhythm — modules themselves carry no margin, so
   // any mix of template blocks and newer modules spaces identically, and a
   // masthead hero that bleeds to the trim still sits flush at the top.
-  const rhythm =
-    MODULE.stack * (density === "compact" ? 0.72 : density === "airy" ? 1.28 : 1);
+  const rhythm = MODULE.stack * (density === "compact" ? 0.72 : density === "airy" ? 1.28 : 1);
   return (
     <div
       data-print-module-stack
       style={{ display: "flex", flexDirection: "column", rowGap: cq(rhythm) }}
     >
-
       {sections.map((s) => (
         <div
           key={s.id}

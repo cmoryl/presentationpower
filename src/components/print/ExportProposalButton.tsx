@@ -94,9 +94,9 @@ export function ExportProposalButton({
           import("@/lib/export-aspect-check"),
           import("@/lib/print-asset-export"),
         ]);
-        const trim = (
-          PRINT_PAGE_PRESETS as Record<string, { widthIn: number; heightIn: number }>
-        )[String(pageSize)] ?? { widthIn: 8.5, heightIn: 11 };
+        const trim = (PRINT_PAGE_PRESETS as Record<string, { widthIn: number; heightIn: number }>)[
+          String(pageSize)
+        ] ?? { widthIn: 8.5, heightIn: 11 };
         if (!cancelled) {
           setAspect(
             checkExportAspect(nodes, {
@@ -180,7 +180,6 @@ export function ExportProposalButton({
         const { describeCaptureFailure } = await import("@/lib/slide-image-export");
         toast.error(`Export failed: ${describeCaptureFailure(err)}`);
       } finally {
-
         if (!cancelled) {
           runRef.current = null;
           setPending(null);
@@ -304,9 +303,7 @@ export function ExportProposalButton({
             {pages.length > 1 && (
               <button
                 type="button"
-                onClick={() =>
-                  setSelected(allOn ? new Set() : new Set(pages.map((p) => p.index)))
-                }
+                onClick={() => setSelected(allOn ? new Set() : new Set(pages.map((p) => p.index)))}
                 className="text-[10px] font-medium text-[#003FC7] hover:underline"
               >
                 {allOn ? "Clear all" : "Select all"}

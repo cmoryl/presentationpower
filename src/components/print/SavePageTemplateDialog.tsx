@@ -72,9 +72,7 @@ export function SavePageTemplateDialog({
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: PAGE_TEMPLATE_QUERY_KEY });
       toast.success(
-        scope === "shared"
-          ? "Published as a shared page template"
-          : "Saved to your page templates",
+        scope === "shared" ? "Published as a shared page template" : "Saved to your page templates",
         { description: "Find it under Print → Modules → Page templates." },
       );
       onClose();
@@ -106,8 +104,8 @@ export function SavePageTemplateDialog({
             </h2>
             <p className="mt-1 text-xs leading-relaxed text-black/55 dark:text-white/55">
               Captures the hero, {sections.length} section
-              {sections.length === 1 ? "" : "s"}, layout and typography as a reusable template.
-              When someone starts from it they can keep this copy or reset it to prompts.
+              {sections.length === 1 ? "" : "s"}, layout and typography as a reusable template. When
+              someone starts from it they can keep this copy or reset it to prompts.
             </p>
           </div>
           <button
@@ -177,8 +175,8 @@ export function SavePageTemplateDialog({
                 className="mt-0.5"
               />
               <span className={isAdmin ? "" : "opacity-50"}>
-                <strong className="font-semibold">Shared</strong> — published for everyone
-                alongside the curated modules.
+                <strong className="font-semibold">Shared</strong> — published for everyone alongside
+                the curated modules.
                 {!isAdmin ? " Admin only." : ""}
               </span>
             </label>

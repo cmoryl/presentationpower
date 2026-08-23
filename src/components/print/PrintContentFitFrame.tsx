@@ -155,10 +155,13 @@ export function PrintContentFitFrame({
       }
       if (timer) clearTimeout(timer);
       cancelAnimationFrame(raf);
-      timer = setTimeout(() => {
-        steps = 0;
-        raf = requestAnimationFrame(tick);
-      }, fromObserver ? 120 : 0);
+      timer = setTimeout(
+        () => {
+          steps = 0;
+          raf = requestAnimationFrame(tick);
+        },
+        fromObserver ? 120 : 0,
+      );
     };
 
     schedule(false);

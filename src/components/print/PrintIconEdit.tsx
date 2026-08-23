@@ -38,7 +38,8 @@ export function resolveSlotPath(
   fallback: { name?: IconName; d?: string },
 ): { d: string; name: IconName | null } {
   const ov = overrides?.[slot];
-  if (ov && ICON_PATHS[ov as IconName]) return { d: ICON_PATHS[ov as IconName], name: ov as IconName };
+  if (ov && ICON_PATHS[ov as IconName])
+    return { d: ICON_PATHS[ov as IconName], name: ov as IconName };
   if (fallback.name && ICON_PATHS[fallback.name]) {
     return { d: ICON_PATHS[fallback.name], name: fallback.name };
   }
@@ -103,7 +104,6 @@ export function EditableIcon({
     </svg>
   );
 
-
   if (!ctx?.active) return glyph;
 
   const glyphName = resolved.name ? resolved.name.replace(/-/g, " ") : null;
@@ -138,4 +138,3 @@ export function EditableIcon({
     </button>
   );
 }
-

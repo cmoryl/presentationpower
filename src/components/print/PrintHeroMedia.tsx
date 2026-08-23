@@ -200,7 +200,7 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
     if (!autoFocalOn || !analysis.ready || !bandSize || !natural) return null;
     const targetX = copyZone === "left" ? 0.74 : copyZone === "right" ? 0.26 : 0.5;
     const targetY = 0.46;
-    const zx = (bandSize.w / bandSize.h) / (natural.w / natural.h); // >1 → crops vertically
+    const zx = bandSize.w / bandSize.h / (natural.w / natural.h); // >1 → crops vertically
     const solve = (subject: number, target: number, zoom: number) => {
       if (!Number.isFinite(zoom) || Math.abs(zoom - 1) < 0.001) return null; // no overflow on this axis
       return clamp01((subject - target / zoom) / (1 - 1 / zoom));
@@ -216,9 +216,7 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
   const fx = explicitFx ?? autoFxPct;
   const fy = explicitFy ?? autoFyPct;
   const objectPosition =
-    fx !== null || fy !== null
-      ? `${fx ?? 50}% ${fy ?? 40}%`
-      : (media.focalPoint ?? "50% 40%");
+    fx !== null || fy !== null ? `${fx ?? 50}% ${fy ?? 40}%` : (media.focalPoint ?? "50% 40%");
 
   // Band sizing. Container-query units (cqw) keep the band proportional to
   // the page width across every preview breakpoint. For "fill" we also
@@ -421,17 +419,19 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
         />
       )}
       {/* Soft feathered bottom edge so the seam blends into the page */}
-      {!rawImage && <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: `max(${cq(120)}, ${safeY * 1.6}%)`,
-          background: `linear-gradient(180deg, transparent 0%, ${pageBg} 92%, ${pageBg} 100%)`,
-          opacity: washStrength * 0.7,
-        }}
-      />}
+      {!rawImage && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: `max(${cq(120)}, ${safeY * 1.6}%)`,
+            background: `linear-gradient(180deg, transparent 0%, ${pageBg} 92%, ${pageBg} 100%)`,
+            opacity: washStrength * 0.7,
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -450,4 +450,3 @@ function clampPct(n: number): number {
   if (Number.isNaN(n)) return 50;
   return Math.max(0, Math.min(100, n));
 }
-

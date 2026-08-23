@@ -31,9 +31,7 @@ export function MultiPageThumbRail({
         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-black/45">
           Pages · {pages.length}
         </span>
-        <span className="text-[11px] text-black/45">
-          Click a page to open it above and edit it
-        </span>
+        <span className="text-[11px] text-black/45">Click a page to open it above and edit it</span>
       </div>
       <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
         {pages.map((page, i) => {
@@ -51,9 +49,7 @@ export function MultiPageThumbRail({
                   className="overflow-hidden rounded-lg border bg-white transition"
                   style={{
                     borderColor: on ? "#003FC7" : "rgba(3,0,44,0.12)",
-                    boxShadow: on
-                      ? "0 0 0 2px rgba(0,63,199,0.28)"
-                      : "0 1px 4px rgba(3,0,44,0.08)",
+                    boxShadow: on ? "0 0 0 2px rgba(0,63,199,0.28)" : "0 1px 4px rgba(3,0,44,0.08)",
                   }}
                 >
                   <div className="pointer-events-none">

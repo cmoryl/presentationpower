@@ -3,7 +3,11 @@
 // fresh signed URLs, so whatever we hand back is immediately renderable.
 import { useMemo, useState } from "react";
 import { Search, ImageOff, Library } from "lucide-react";
-import { useClientLogos, clientLogoUrlForMode, normalizeClientName } from "@/hooks/use-client-logos";
+import {
+  useClientLogos,
+  clientLogoUrlForMode,
+  normalizeClientName,
+} from "@/hooks/use-client-logos";
 
 export type PickedClientLogo = {
   id: string;

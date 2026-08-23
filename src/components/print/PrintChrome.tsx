@@ -99,7 +99,6 @@ export function PrintCTABand({
               color="#FFFFFF"
               size="2xs"
               orientation="mark-only"
-
             />
           </div>
         )}
@@ -160,7 +159,6 @@ function IconGlyph({
       strokeLinejoin="round"
       aria-hidden
       style={{ display: "block", width: size, height: size, flexShrink: 0 }}
-
     >
       <path d={d} />
     </svg>
