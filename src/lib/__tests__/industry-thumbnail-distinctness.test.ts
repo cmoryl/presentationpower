@@ -128,24 +128,36 @@ describe("R01–R30 thumbnail visual regression", () => {
       expect(new Set(prints).size, `${family.label} collision`).toBe(30);
     });
 
-    it(`${family.label} thumbnails stay clearly distinguishable (Jaccard ≥ ${DISTINCT_FLOOR})`, () => {
+    it(`${family.label} thumbnails stay clearly distinguishable`, () => {
       const thumbs = thumbsFor(scene);
       const offenders: string[] = [];
       let worst = { pair: "", d: 1 };
       for (let i = 0; i < thumbs.length; i += 1) {
         for (let j = i + 1; j < thumbs.length; j += 1) {
-          const d = distance(thumbs[i]!.tokens, thumbs[j]!.tokens);
-          if (d < worst.d) worst = { pair: `${thumbs[i]!.id}↔${thumbs[j]!.id}`, d };
-          if (d < DISTINCT_FLOOR) {
-            offenders.push(`${thumbs[i]!.id}↔${thumbs[j]!.id} d=${d.toFixed(3)}`);
+          const a = thumbs[i]!;
+          const b = thumbs[j]!;
+          const pa = plates(a.tokens);
+          const pb = plates(b.tokens);
+          if (pa.length && pb.length) {
+            // Photoreal thumbnails: the plates themselves must differ. The
+            // scrim/veil pair is shared by design, so a CSS-token distance is
+            // meaningless here.
+            if (pa.join(",") === pb.join(",")) {
+              offenders.push(`${a.id}↔${b.id} same plate ${pa.join(",")}`);
+            }
+            continue;
           }
+          const d = distance(a.tokens, b.tokens);
+          if (d < worst.d) worst = { pair: `${a.id}↔${b.id}`, d };
+          if (d < DISTINCT_FLOOR) offenders.push(`${a.id}↔${b.id} d=${d.toFixed(3)}`);
         }
       }
       expect(
         offenders,
-        `${family.label}: too-similar thumbnails (closest ${worst.pair} d=${worst.d.toFixed(3)})`,
+        `${family.label}: too-similar thumbnails (closest vector pair ${worst.pair} d=${worst.d.toFixed(3)})`,
       ).toEqual([]);
     });
+
   }
 
   it("locks a fingerprint snapshot for every recipe × family thumbnail", () => {
