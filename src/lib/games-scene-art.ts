@@ -284,7 +284,10 @@ export function gamesMediaPool(mode: GamesArtMode = "dark"): string[] {
   const inMode = GAMES_PLATES.filter((p) => p.mode === mode);
   const textured = inMode.filter((p) => p.texture === "textured");
   const loud = textured.filter((p) => ACTIVITY_RANK[p.activity] >= ACTIVITY_RANK.medium);
-  const flat = inMode.filter((p) => p.texture === "flat");
-  const ordered = [...(loud.length ? loud : textured), ...flat];
+  // Flat plates are near-plain grounds: correct behind dense copy, but as a
+  // slide-level photograph they read as a blank navy field, which is exactly
+  // what made the Gaming title slides look empty. Media uses the textured
+  // compositions only.
+  const ordered = loud.length ? loud : textured.length ? textured : inMode;
   return ordered.map((p) => p.url);
 }
