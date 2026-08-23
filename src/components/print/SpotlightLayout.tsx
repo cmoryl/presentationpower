@@ -176,6 +176,7 @@ export function SpotlightLayout({
                 cq={cq}
               />
               <BrandLockup
+                unit={cq}
                 brand={brand}
                 color={mode === "dark" ? "#FFFFFF" : "#000000"}
                 size="xs"

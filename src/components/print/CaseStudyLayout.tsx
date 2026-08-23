@@ -214,6 +214,7 @@ export function CaseStudyLayout({
                   </>
                 ) : null}
                 <BrandLockup
+                  unit={cq}
                   brand={brand}
                   color={mode === "dark" ? "#FFFFFF" : "#000000"}
                   size="xs"
