@@ -24,6 +24,10 @@ import { parseLook } from "@/lib/print-library/look";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";
+import {
+  PrintDemoStudioPanel,
+  type DemoLook,
+} from "@/components/showcase/PrintDemoStudioPanel";
 
 
 export const Route = createFileRoute("/demo/print/$demoId")({
@@ -112,8 +116,20 @@ function PrintDemoPage() {
   );
   const renderKey = dirty ? "edited" : "base";
 
+  // Layout studio state — the pinned master look is the starting point, then the
+  // studio panel can retune trim, density and auto-fit live on this page.
+  const baseLook = useMemo<DemoLook>(() => {
+    const pinned = item ? (parseLook(item.look) ?? {}) : {};
+    return {
+      pageSize: pinned.pageSize ?? "Letter",
+      density: pinned.density ?? "standard",
+      fit: false,
+    };
+  }, [item]);
+  const [look, setLook] = useState<DemoLook>(baseLook);
+  useEffect(() => setLook(baseLook), [baseLook]);
+
   if (!def || !item) return null;
-  const previewLook = parseLook(item.look) ?? {};
   const previewBrand =
     BRAND_MODES.find((b) => b.id === (item.divisionId ?? "bm-enterprise")) ?? BRAND_MODES[0];
   const accent = def.accent;
@@ -208,13 +224,27 @@ function PrintDemoPage() {
       {/* Rendered comps — the real print layout, live from the edited content,
           shown in both light and dark so both finishes are verifiable here. */}
       <section className="mt-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <PrintDemoContentEditor
-          content={draft}
-          onChange={setDraft}
-          onReset={() => setDraft(previewContent)}
-          dirty={dirty}
-          accent={accent}
-        />
+        <div className="space-y-6">
+          <PrintDemoStudioPanel
+            kind={item.kind}
+            content={draft}
+            onChange={setDraft}
+            look={look}
+            onLook={setLook}
+            onResetLayout={() => {
+              setLook(baseLook);
+              setDraft(previewContent);
+            }}
+            accent={accent}
+          />
+          <PrintDemoContentEditor
+            content={draft}
+            onChange={setDraft}
+            onReset={() => setDraft(previewContent)}
+            dirty={dirty}
+            accent={accent}
+          />
+        </div>
         <div>
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3">
             <h2 className="min-w-0 truncate text-lg font-semibold tracking-tight">
@@ -236,8 +266,9 @@ function PrintDemoPage() {
                   content={draft}
                   brand={previewBrand}
                   mode={mode}
-                  pageSize={previewLook.pageSize}
-                  density={previewLook.density}
+                  pageSize={look.pageSize}
+                  density={look.density}
+                  fit={look.fit}
                   accent={accent}
                 />
               </div>
