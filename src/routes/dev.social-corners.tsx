@@ -19,6 +19,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { SOCIAL_FORMATS } from "@/lib/social-formats";
 import { SOCIAL_STYLES, DEFAULT_SOCIAL_STYLE_ID, type SocialStyleId } from "@/lib/social-styles";
+import { SOCIAL_CORNER_SWEEP, sweepPlan } from "@/lib/social-corner-sweep";
 import type { CampaignCopy } from "@/lib/campaigns";
 
 type Search = { style: SocialStyleId; mode: "light" | "dark"; brand: string };
@@ -54,8 +55,11 @@ export const Route = createFileRoute("/dev/social-corners")({
   }),
 });
 
-/** Stable display short edge — corner radius is measured relative to it. */
-export const HARNESS_SHORT_EDGE = 360;
+/**
+ * Stable display short edge — corner radius is measured relative to it. Comes
+ * from the shared sweep config so the harness and the script can never drift.
+ */
+export const HARNESS_SHORT_EDGE = SOCIAL_CORNER_SWEEP.shortEdge;
 
 /** Fixed copy: no dates, no randomness, so runs are byte-stable. */
 const COPY: CampaignCopy = {
@@ -80,11 +84,22 @@ const PHOTO =
 function SocialCornersHarness() {
   const { style, mode, brand } = Route.useSearch();
 
+  // Publish the derived coverage matrix so the sweep script can enumerate
+  // styles/formats/modes/brands without hard-coding any of them.
+  const plan = sweepPlan();
+  if (typeof window !== "undefined") {
+    (window as unknown as { __SOCIAL_CORNER_SWEEP__?: unknown }).__SOCIAL_CORNER_SWEEP__ = plan;
+  }
+
   return (
     <main className="min-h-screen bg-background p-6">
       <h1 className="mb-4 text-lg font-semibold">
         Corner sweep · {style} · {mode}
       </h1>
+      <p data-corner-plan className="mb-4 text-xs text-muted-foreground">
+        {plan.counts.styles} styles × {plan.counts.formats} formats × {plan.counts.modes} modes ×{" "}
+        {plan.counts.brands} brands = {plan.counts.cases} cases · fp {plan.fingerprint}
+      </p>
       <div data-corner-grid className="flex flex-wrap items-start gap-6">
         {SOCIAL_FORMATS.map((format) => (
           <figure
