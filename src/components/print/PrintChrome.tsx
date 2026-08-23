@@ -216,6 +216,13 @@ export function PrintFooterLockup({
     color: inkSoft,
   };
 
+  // The TransPerfect (and division) wordmarks in the footer sit 30% smaller than
+  // the masthead lockup — the sheet's signature, not a second masthead. Scaling
+  // the unit shrinks the whole lockup (mark + wordmark + gap) proportionally so
+  // the official artwork is never distorted.
+  const FOOTER_LOGO_SCALE = 0.7;
+  const logoCq = (px: number) => cq(px * FOOTER_LOGO_SCALE);
+
   return (
     <div
       className="flex items-center justify-between"
@@ -232,11 +239,16 @@ export function PrintFooterLockup({
           <img
             src={productLogoSrc}
             alt={`${productLogoKey ?? "Product"} logo`}
-            style={{ height: cq(24), width: "auto", maxWidth: cq(170), objectFit: "contain" }}
+            style={{
+              height: cq(24 * FOOTER_LOGO_SCALE),
+              width: "auto",
+              maxWidth: cq(170 * FOOTER_LOGO_SCALE),
+              objectFit: "contain",
+            }}
           />
         ) : (
           <BrandLockup
-            unit={cq}
+            unit={logoCq}
             brand={enterpriseBrand}
             color={enterpriseLogoInk}
             size="xs"
@@ -247,11 +259,11 @@ export function PrintFooterLockup({
         {!isEnterprise && (
           <>
             <div
-              style={{ width: 1, height: cq(20), background: dividerCol, flexShrink: 0 }}
+              style={{ width: 1, height: cq(20 * FOOTER_LOGO_SCALE), background: dividerCol, flexShrink: 0 }}
               aria-hidden
             />
             <BrandLockup
-              unit={cq}
+              unit={logoCq}
               brand={brand}
               color={enterpriseLogoInk}
               size="xs"
@@ -260,6 +272,7 @@ export function PrintFooterLockup({
             />
           </>
         )}
+
         {clientLogo?.url && (
           <>
             <div
