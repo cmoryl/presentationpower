@@ -4,8 +4,8 @@ import { SKIN_GEOMETRY, SHAPE_LABEL, SCAFFOLD_LABEL } from "../pack-geometry";
 const rows = Object.entries(SKIN_GEOMETRY);
 
 describe("catalog geometry is non-repeating", () => {
-  it("covers S01–S28", () => {
-    expect(rows).toHaveLength(28);
+  it("covers S01–S30", () => {
+    expect(rows).toHaveLength(30);
   });
 
   it("gives every skin its own card shape", () => {
