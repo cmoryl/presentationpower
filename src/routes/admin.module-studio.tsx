@@ -734,25 +734,15 @@ function ModuleStudioPage() {
 
               <ToolbarSep />
 
-              <div role="group" aria-label="History" className="inline-flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={undo}
-                  disabled={!canUndo}
-                  title="Undo (⌘Z) — steps back through every canvas edit"
-                  className="inline-flex h-8 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2.5 text-[11px] font-semibold text-black/65 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
-                >
-                  ⟲ Undo
-                </button>
-                <button
-                  type="button"
-                  onClick={redo}
-                  disabled={!canRedo}
-                  title="Redo (⇧⌘Z)"
-                  className="inline-flex h-8 items-center gap-1 rounded-full border border-black/[0.08] bg-white px-2.5 text-[11px] font-semibold text-black/65 transition hover:border-primary/40 hover:text-primary disabled:cursor-not-allowed disabled:opacity-35"
-                >
-                  ⟳ Redo
-                </button>
+              <div role="group" aria-label="History" className="inline-flex items-center">
+                <EditorHistoryControls
+                  canUndo={canUndo}
+                  canRedo={canRedo}
+                  onUndo={undo}
+                  onRedo={redo}
+                  undoLabel="canvas edit"
+                  redoLabel="canvas edit"
+                />
               </div>
             </>
           }
