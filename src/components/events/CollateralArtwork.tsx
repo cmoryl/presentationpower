@@ -559,7 +559,15 @@ function CopyPlate({
 }) {
   const style = useSocialStyle();
   const look = useLook();
-  const radius = style.plateFullBleed ? 0 : Math.round(shortEdge * style.plateRadiusPct);
+  // `plateRadiusPct` is a PERCENT of the short edge (same contract as
+  // SocialRenderer). Multiplying by the raw edge produced radii in the
+  // thousands of px, which the browser clamps to 50% — the plate rendered as a
+  // giant ellipse/pill instead of a rounded rectangle. Divide by 100, and cap
+  // the corner so no plate can ever round past a soft rectangle.
+  const radius = style.plateFullBleed
+    ? 0
+    : Math.round(Math.min((shortEdge * style.plateRadiusPct) / 100, shortEdge * 0.06));
+
   const base: CSSProperties = {
     position: "relative",
     display: "flex",
