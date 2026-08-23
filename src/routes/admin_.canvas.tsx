@@ -514,7 +514,7 @@ function CanvasStudioPage() {
 
               <EditorMenu
                 label="Template"
-                hint={pack ? pack.name : "Brand system"}
+                hint={pack ? pack.label : "Brand system"}
                 wide
               >
                 <div className="w-full">
