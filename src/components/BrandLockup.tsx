@@ -63,6 +63,7 @@ export function BrandLockup({
   orientation: orientationRaw = "horizontal",
   monochromeOfficialLogo = false,
   unit,
+  cap,
 }: {
   brand: BrandMode;
   color: string;
