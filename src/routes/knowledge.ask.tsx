@@ -69,6 +69,7 @@ const STARTER_GROUPS: Array<{ label: string; items: string[] }> = [
 
 function OracleAskView() {
   const ask = useServerFn(oracleChat);
+  const listEntries = useServerFn(listKnowledgeEntries);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -76,6 +77,18 @@ function OracleAskView() {
   const [divisionId, setDivisionId] = useState<string>("master");
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
+
+  // Real content for the blank state: what Oracle can actually cite right now.
+  const recent = useQuery({
+    queryKey: ["knowledge", "ask-recent", divisionId],
+    queryFn: () =>
+      listEntries({
+        data: divisionId === "master" ? {} : { divisionId },
+      }).catch(() => []),
+    retry: false,
+    staleTime: 60_000,
+  });
+
 
   useEffect(() => {
     inputRef.current?.focus();
