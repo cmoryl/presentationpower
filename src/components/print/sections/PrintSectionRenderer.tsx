@@ -413,14 +413,25 @@ export function PrintSectionsStack({
   accent: string;
 }) {
   if (!sections?.length) return null;
+  // The STACK owns the vertical rhythm — modules themselves carry no margin, so
+  // any mix of template blocks and newer modules spaces identically, and a
+  // masthead hero that bleeds to the trim still sits flush at the top.
   return (
-    <>
+    <div
+      data-print-module-stack
+      style={{ display: "flex", flexDirection: "column", rowGap: cq(MODULE.stack) }}
+    >
       {sections.map((s) => (
-        <div key={s.id} data-section={`module:${s.id}`} data-section-label={sectionLabel(s)}>
+        <div
+          key={s.id}
+          data-section={`module:${s.id}`}
+          data-section-label={sectionLabel(s)}
+          style={{ minWidth: 0 }}
+        >
           <PrintSectionRenderer section={s} mode={mode} accent={accent} />
         </div>
       ))}
-    </>
+    </div>
   );
 }
 
