@@ -56,6 +56,14 @@ export type PrintPptxOptions = {
    * `progress` is 0..1 across the whole document, including the final assembly.
    */
   onProgress?: ExportProgressCallback;
+  /**
+   * Receives the finished package before it is handed to the browser. The
+   * export audit uses this to verify the real bytes; pass `download: false`
+   * to inspect without triggering a save.
+   */
+  onBlob?: (blob: Blob) => void;
+  /** Set false to skip the browser download (verification runs). */
+  download?: boolean;
 };
 
 /** Re-encode a PNG data URL as opaque JPEG so PowerPoint files stay openable. */
@@ -244,7 +252,8 @@ export async function exportPrintPagesAsPptx(
   const native = await applyNativePptxFeatures(blob, { altText: true });
   opts.onProgress?.({ stage: "encode", progress: 0.96, message: "Finalizing slides…" });
   const fixed = await reorderPresentationXml(native);
-  triggerDownload(fixed, fileName);
+  opts.onBlob?.(fixed);
+  if (opts.download !== false) triggerDownload(fixed, fileName);
   opts.onProgress?.({ stage: "done", progress: 1, message: "Saved" });
 
   return aspectReport;
