@@ -47,7 +47,9 @@ export type CardShape =
   | "halo" // outer soft ring glow
   | "crest" // rounded shoulders, cut base centre
   | "slat" // heavy right-edge accent slat
-  | "diptych"; // hairline box with split accent edges
+  | "diptych" // hairline box with split accent edges
+  | "brick" // squared brick with heavy top accent — Element five-brick motif
+  | "keystone"; // tapered top edge, wider base
 
 export type CoverLayout = "baseline" | "centered" | "split" | "banded" | "stacked";
 export type StatLayout = "cards4" | "cards3" | "rail" | "band";
@@ -138,6 +140,8 @@ const SHAPES: CardShape[] = [
   "crest",
   "slat",
   "diptych",
+  "brick",
+  "keystone",
 ];
 const COVERS: CoverLayout[] = ["baseline", "centered", "split", "banded", "stacked"];
 const STATS: StatLayout[] = ["cards4", "cards3", "rail", "band"];
@@ -213,8 +217,8 @@ export const SKIN_GEOMETRY: Record<string, PackGeometry> = {
   S26: { shape: "plinth", scaffold: "plinth", device: "bracket", fill: 0.75, layout: { cover: "stacked", stats: "cards3", grid: "bento", rule: "dots" } },
   S27: { shape: "wedge", scaffold: "split", device: "chevron", fill: 0.6, layout: { cover: "split", stats: "rail", grid: "mosaic", rule: "bar" } },
   S28: { shape: "diptych", scaffold: "margin", device: "grid", fill: 0.35, layout: { cover: "banded", stats: "cards4", grid: "columns", rule: "dots" } },
-  S29: { shape: "notch", scaffold: "margin", device: "grid", fill: 0.62, layout: { cover: "split", stats: "cards4", grid: "bento", rule: "bar" } },
-  S30: { shape: "notch", scaffold: "margin", device: "grid", fill: 0.6, layout: { cover: "split", stats: "cards4", grid: "bento", rule: "bar" } },
+  S29: { shape: "brick", scaffold: "shelf", device: "chevron", fill: 0.67, layout: { cover: "banded", stats: "band", grid: "bento", rule: "hairline" } },
+  S30: { shape: "keystone", scaffold: "canyon", device: "barcode", fill: 0.57, layout: { cover: "centered", stats: "rail", grid: "columns", rule: "dots" } },
 };
 
 /**
@@ -327,6 +331,8 @@ export const SHAPE_LABEL: Record<CardShape, string> = {
   crest: "crest shoulders",
   slat: "right slat",
   diptych: "split diptych",
+  brick: "brick head",
+  keystone: "keystone taper",
 };
 
 export const SCAFFOLD_LABEL: Record<ScaffoldFamily, string> = {
@@ -493,6 +499,17 @@ export function shapeCss(
       return {
         radius: `${Math.min(r, 10)}px 0 0 ${Math.min(r, 10)}px`,
         extraShadow: join(`inset -8px 0 0 0 ${accent}`, baseShadow),
+      };
+    case "brick":
+      return {
+        radius: `${Math.min(r, 6)}px`,
+        extraShadow: join(`inset 0 6px 0 0 ${accent}`, `inset 0 0 0 1px ${veil}`, baseShadow),
+      };
+    case "keystone":
+      return {
+        radius: `${Math.min(r, 8)}px`,
+        extraShadow: baseShadow,
+        clipPath: "polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%)",
       };
     case "diptych":
       return {

@@ -41,12 +41,18 @@ function expandLayers(layers: string[]): string {
     .join("\n");
 }
 
-/** Stable structural tokens: colors, gradient kinds, angles, stops, shapes. */
+/** Stable structural tokens: plates, colors, gradient kinds, angles, stops, shapes. */
 function tokenize(art: string): Set<string> {
   const tokens = new Set<string>();
   const push = (re: RegExp, prefix: string) => {
     for (const m of art.matchAll(re)) tokens.add(`${prefix}:${m[0].toLowerCase()}`);
   };
+  // Authored PHOTOREAL plates carry the recipe identity in the asset itself, so
+  // the plate file is a first-class structural token (the kits share scrims).
+  for (const m of art.matchAll(/url\("([^"]+)"\)/g)) {
+    const file = (m[1] ?? "").split("/").pop() ?? "";
+    if (!file.startsWith("data:")) tokens.add(`plate:${file.toLowerCase()}`);
+  }
   push(/#[0-9a-f]{3,8}\b/gi, "hex");
   push(/(?:linear|radial|conic)-gradient/gi, "grad");
   push(/-?\d+(?:\.\d+)?deg/g, "angle");
@@ -56,6 +62,12 @@ function tokenize(art: string): Set<string> {
   return tokens;
 }
 
+/** Authored plate files referenced by a thumbnail's layer stack. */
+function plates(tokens: Set<string>): string[] {
+  return [...tokens].filter((t) => t.startsWith("plate:"));
+}
+
+
 function distance(a: Set<string>, b: Set<string>): number {
   let shared = 0;
   for (const t of a) if (b.has(t)) shared += 1;
@@ -63,9 +75,8 @@ function distance(a: Set<string>, b: Set<string>): number {
   return union === 0 ? 0 : 1 - shared / union;
 }
 
-/** Compact, human-readable fingerprint for the snapshot baseline. */
-function fingerprint(art: string) {
-  const tokens = tokenize(art);
+/** FNV-1a over an already-tokenized set (re-tokenizing would drop plate ids). */
+function hashTokens(tokens: Set<string>): string {
   let hash = 0x811c9dc5;
   for (const t of [...tokens].sort()) {
     for (let i = 0; i < t.length; i += 1) {
@@ -73,14 +84,22 @@ function fingerprint(art: string) {
       hash = Math.imul(hash, 0x01000193) >>> 0;
     }
   }
+  return hash.toString(16).padStart(8, "0");
+}
+
+/** Compact, human-readable fingerprint for the snapshot baseline. */
+function fingerprint(art: string) {
+  const tokens = tokenize(art);
   return {
     tokens: tokens.size,
     hues: new Set([...tokens].filter((t) => t.startsWith("hex:"))).size,
     gradients: [...tokens].filter((t) => t.startsWith("grad:")).length,
     shapes: [...tokens].filter((t) => t.startsWith("shape:")).length,
-    hash: hash.toString(16).padStart(8, "0"),
+    plates: plates(tokens).length,
+    hash: hashTokens(tokens),
   };
 }
+
 
 interface Thumb {
   id: string;
@@ -112,28 +131,40 @@ describe("R01–R30 thumbnail visual regression", () => {
 
     it(`${family.label} thumbnails are structurally unique across R01–R30`, () => {
       const thumbs = thumbsFor(scene);
-      const prints = thumbs.map((t) => fingerprint([...t.tokens].sort().join("|")).hash);
+      const prints = thumbs.map((t) => hashTokens(t.tokens));
       expect(new Set(prints).size, `${family.label} collision`).toBe(30);
     });
 
-    it(`${family.label} thumbnails stay clearly distinguishable (Jaccard ≥ ${DISTINCT_FLOOR})`, () => {
+    it(`${family.label} thumbnails stay clearly distinguishable`, () => {
       const thumbs = thumbsFor(scene);
       const offenders: string[] = [];
       let worst = { pair: "", d: 1 };
       for (let i = 0; i < thumbs.length; i += 1) {
         for (let j = i + 1; j < thumbs.length; j += 1) {
-          const d = distance(thumbs[i]!.tokens, thumbs[j]!.tokens);
-          if (d < worst.d) worst = { pair: `${thumbs[i]!.id}↔${thumbs[j]!.id}`, d };
-          if (d < DISTINCT_FLOOR) {
-            offenders.push(`${thumbs[i]!.id}↔${thumbs[j]!.id} d=${d.toFixed(3)}`);
+          const a = thumbs[i]!;
+          const b = thumbs[j]!;
+          const pa = plates(a.tokens);
+          const pb = plates(b.tokens);
+          if (pa.length && pb.length) {
+            // Photoreal thumbnails: the plates themselves must differ. The
+            // scrim/veil pair is shared by design, so a CSS-token distance is
+            // meaningless here.
+            if (pa.join(",") === pb.join(",")) {
+              offenders.push(`${a.id}↔${b.id} same plate ${pa.join(",")}`);
+            }
+            continue;
           }
+          const d = distance(a.tokens, b.tokens);
+          if (d < worst.d) worst = { pair: `${a.id}↔${b.id}`, d };
+          if (d < DISTINCT_FLOOR) offenders.push(`${a.id}↔${b.id} d=${d.toFixed(3)}`);
         }
       }
       expect(
         offenders,
-        `${family.label}: too-similar thumbnails (closest ${worst.pair} d=${worst.d.toFixed(3)})`,
+        `${family.label}: too-similar thumbnails (closest vector pair ${worst.pair} d=${worst.d.toFixed(3)})`,
       ).toEqual([]);
     });
+
   }
 
   it("locks a fingerprint snapshot for every recipe × family thumbnail", () => {

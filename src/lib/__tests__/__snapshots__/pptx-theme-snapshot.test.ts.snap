@@ -68,6 +68,40 @@ exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token
 }
 `;
 
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-element / dark 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": false,
+  "brand": "bm-element",
+  "expected": {
+    "accent": "08BFC1",
+    "ink": "D6DEF2",
+    "primary": "FFFFFF",
+    "surface": "141435",
+  },
+  "mode": "dark",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": false,
+}
+`;
+
+exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-element / light 1`] = `
+{
+  "backgroundContainsPrimary": false,
+  "backgroundContainsSurface": true,
+  "brand": "bm-element",
+  "expected": {
+    "accent": "08BFC1",
+    "ink": "0D131D",
+    "primary": "135CFB",
+    "surface": "FFFFFF",
+  },
+  "mode": "light",
+  "payloadContainsAccent": true,
+  "payloadContainsInk": true,
+}
+`;
+
 exports[`PPTX theme-color snapshot (all brand modes × modes) > embeds the token-derived palette in bm-enterprise / dark 1`] = `
 {
   "backgroundContainsPrimary": false,

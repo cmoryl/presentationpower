@@ -164,7 +164,30 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
       const url = industryPhotoUrl(plateCode, scene, take);
 
       if (!url) return base(seed);
-      return [scrim, veil, `url("${url}") center center / cover no-repeat`];
+      // Every take must READ as a different backdrop. The family pair only
+      // yields two plates, so takes beyond the pair re-frame the plate
+      // (different crop anchor + mirrored scrim) instead of repeating take 0 —
+      // otherwise the studio's four alternates collapse into two.
+      const frame = TAKE_FRAMES[Math.abs(take) % TAKE_FRAMES.length]!;
+      return [
+        frame.mirror ? mirror(scrim) : scrim,
+        veil,
+        `url("${url}") ${frame.position} / cover no-repeat`,
+      ];
     },
   };
 }
+
+/** Crop anchor + scrim direction per take, so all four takes stay distinct. */
+const TAKE_FRAMES: Array<{ position: string; mirror: boolean }> = [
+  { position: "center center", mirror: false },
+  { position: "center center", mirror: false },
+  { position: "30% center", mirror: true },
+  { position: "70% 40%", mirror: true },
+];
+
+/** Flip a linear-gradient scrim to the opposite side of the plate. */
+function mirror(layer: string): string {
+  return layer.replace("100deg", "280deg");
+}
+

@@ -40,8 +40,13 @@ export function composeEffectivePack(
 ): StylePack | null {
   if (!base) return null;
   if (!designRecipeId) return base;
-  return reapplyBackgroundOverrides(withIndustryGround(base, designRecipeId), base.id);
+  // Only ADMIN tuning re-applies here: re-running the pack's own authored plate
+  // kits would repaint its default ground and cancel the industry selection.
+  return reapplyBackgroundOverrides(withIndustryGround(base, designRecipeId), base.id, {
+    authoredArt: false,
+  });
 }
+
 
 
 /** Resolve both ids into the one effective pack. Null = brand default. */
