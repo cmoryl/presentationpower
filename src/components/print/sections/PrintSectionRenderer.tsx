@@ -415,20 +415,26 @@ export function PrintSectionsStack({
   sections,
   mode,
   accent,
+  density = "standard",
 }: {
   sections: PrintSection[] | undefined;
   mode: "light" | "dark";
   accent: string;
+  /** Page density — scales the rhythm between modules with the document. */
+  density?: "compact" | "standard" | "airy";
 }) {
   if (!sections?.length) return null;
   // The STACK owns the vertical rhythm — modules themselves carry no margin, so
   // any mix of template blocks and newer modules spaces identically, and a
   // masthead hero that bleeds to the trim still sits flush at the top.
+  const rhythm =
+    MODULE.stack * (density === "compact" ? 0.72 : density === "airy" ? 1.28 : 1);
   return (
     <div
       data-print-module-stack
-      style={{ display: "flex", flexDirection: "column", rowGap: cq(MODULE.stack) }}
+      style={{ display: "flex", flexDirection: "column", rowGap: cq(rhythm) }}
     >
+
       {sections.map((s) => (
         <div
           key={s.id}
