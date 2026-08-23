@@ -17,10 +17,13 @@ import {
   FolderOpen,
   ArrowUpRight,
   Download,
+  Rocket,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { useSignedIn } from "@/components/CloudDeckControls";
 import { listMyFiles, deleteMyFile, type MyFile, type MyFileKind } from "@/lib/my-files.functions";
 import { getSlideFileUrl } from "@/lib/slide-files.functions";
+
 
 export const Route = createFileRoute("/files")({
   head: () => ({
