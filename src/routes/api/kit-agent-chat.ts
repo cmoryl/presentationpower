@@ -99,7 +99,8 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
               role: "assistant",
               parts: responseMessage.parts as never,
             } as never);
-            if (error) console.error("kit agent_messages insert (assistant) failed:", error.message);
+            if (error)
+              console.error("kit agent_messages insert (assistant) failed:", error.message);
             await supabase
               .from("agent_threads")
               .update({ updated_at: new Date().toISOString() } as never)

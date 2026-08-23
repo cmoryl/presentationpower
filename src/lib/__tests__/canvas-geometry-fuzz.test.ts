@@ -30,7 +30,7 @@ const KINDS: CanvasBlock["kind"][] = ["heading", "body", "caption", "image", "sh
 
 type Rand = () => number;
 
-const pick = <T,>(r: Rand, xs: readonly T[]) => xs[Math.floor(r() * xs.length)]!;
+const pick = <T>(r: Rand, xs: readonly T[]) => xs[Math.floor(r() * xs.length)]!;
 const between = (r: Rand, lo: number, hi: number) => lo + r() * (hi - lo);
 
 /** One block spanning the interesting space: sane, bleeding, huge, degenerate. */
@@ -39,20 +39,60 @@ function fuzzBlock(r: Rand, i: number): CanvasBlock {
   const base = { id: `fz-${i}`, kind: pick(r, KINDS), text: `Block ${i}` };
   switch (flavour) {
     case 0: // healthy, fully inside the stage
-      return { ...base, x: between(r, 0, 900), y: between(r, 0, 500), w: between(r, 40, 900), h: between(r, 30, 500), size: between(r, 12, 96) } as CanvasBlock;
+      return {
+        ...base,
+        x: between(r, 0, 900),
+        y: between(r, 0, 500),
+        w: between(r, 40, 900),
+        h: between(r, 30, 500),
+        size: between(r, 12, 96),
+      } as CanvasBlock;
     case 1: // slight intentional bleed past an edge
-      return { ...base, x: between(r, -40, 10), y: between(r, -30, 10), w: STAGE_W + between(r, 0, 60), h: STAGE_H + between(r, 0, 40), size: between(r, 16, 72) } as CanvasBlock;
-    case 2: // measured on an unscaled stage (2x–4x)
-      {
-        const k = between(r, 2, 4);
-        return { ...base, x: between(r, 0, 800) * k, y: between(r, 0, 400) * k, w: between(r, 100, 900) * k, h: between(r, 80, 500) * k, size: between(r, 14, 80) * k } as CanvasBlock;
-      }
+      return {
+        ...base,
+        x: between(r, -40, 10),
+        y: between(r, -30, 10),
+        w: STAGE_W + between(r, 0, 60),
+        h: STAGE_H + between(r, 0, 40),
+        size: between(r, 16, 72),
+      } as CanvasBlock;
+    case 2: { // measured on an unscaled stage (2x–4x)
+      const k = between(r, 2, 4);
+      return {
+        ...base,
+        x: between(r, 0, 800) * k,
+        y: between(r, 0, 400) * k,
+        w: between(r, 100, 900) * k,
+        h: between(r, 80, 500) * k,
+        size: between(r, 14, 80) * k,
+      } as CanvasBlock;
+    }
     case 3: // extreme overflow
-      return { ...base, x: between(r, 0, 40000), y: between(r, 0, 30000), w: between(r, 1000, 20000), h: between(r, 800, 12000), size: between(r, 100, 4000) } as CanvasBlock;
+      return {
+        ...base,
+        x: between(r, 0, 40000),
+        y: between(r, 0, 30000),
+        w: between(r, 1000, 20000),
+        h: between(r, 800, 12000),
+        size: between(r, 100, 4000),
+      } as CanvasBlock;
     case 4: // degenerate / sub-pixel
-      return { ...base, x: between(r, -5, 5), y: between(r, -5, 5), w: between(r, 0.1, 3), h: between(r, 0.1, 3), size: between(r, 0.5, 6) } as CanvasBlock;
+      return {
+        ...base,
+        x: between(r, -5, 5),
+        y: between(r, -5, 5),
+        w: between(r, 0.1, 3),
+        h: between(r, 0.1, 3),
+        size: between(r, 0.5, 6),
+      } as CanvasBlock;
     default: // no explicit size (shapes/images often omit it)
-      return { ...base, x: between(r, -200, 5000), y: between(r, -200, 3000), w: between(r, 20, 6000), h: between(r, 20, 4000) } as CanvasBlock;
+      return {
+        ...base,
+        x: between(r, -200, 5000),
+        y: between(r, -200, 3000),
+        w: between(r, 20, 6000),
+        h: between(r, 20, 4000),
+      } as CanvasBlock;
   }
 }
 
@@ -111,7 +151,6 @@ describe("fuzz: canvas geometry healing invariants", () => {
     }
   });
 
-
   it("never distorts aspect ratio (uniform scale only) or reorders blocks", () => {
     for (const seed of SEEDS) {
       const r = rng(seed);
@@ -149,9 +188,10 @@ describe("fuzz: canvas geometry healing invariants", () => {
       });
       // Re-healing a healed deck must be a no-op.
       const again = healDeckCanvasGeometry(JSON.parse(JSON.stringify(reloaded)) as Deck);
-      expect(again.slides.map((s) => s.canvasBlocks), `seed ${seed}`).toEqual(
-        reloaded.slides.map((s) => s.canvasBlocks),
-      );
+      expect(
+        again.slides.map((s) => s.canvasBlocks),
+        `seed ${seed}`,
+      ).toEqual(reloaded.slides.map((s) => s.canvasBlocks));
     }
   });
 

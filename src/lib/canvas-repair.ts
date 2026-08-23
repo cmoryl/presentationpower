@@ -40,7 +40,6 @@ export function repairBlockGeometry<T extends RepairableBlock>(b: T): T {
     h: Math.max(1, Math.round(b.h * k)),
     ...(typeof b.size === "number" ? { size: Math.max(8, Math.round(b.size * k)) } : null),
   };
-
 }
 
 /** Repair an entire block list; returns the same array when nothing changed. */

@@ -38,48 +38,48 @@ export const backfillOracleMirror = createServerFn({ method: "POST" })
       updated: number;
       errors: string[];
     }> => {
-    const s = context.supabase as unknown as Sb;
-    const { data: isAdmin } = await s.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    if (!isAdmin) throw new Error("Forbidden: admin required");
+      const s = context.supabase as unknown as Sb;
+      const { data: isAdmin } = await s.rpc("has_role", {
+        _user_id: context.userId,
+        _role: "admin",
+      });
+      if (!isAdmin) throw new Error("Forbidden: admin required");
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sa = supabaseAdmin as unknown as Sb;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const sa = supabaseAdmin as unknown as Sb;
 
-    const { data: rows, error } = await sa
-      .from("brand_assets")
-      .select("id, title, division_id, kind, entity_type, tags, extracted_text")
-      .not("extracted_text", "is", null)
-      .order("updated_at", { ascending: false })
-      .limit(data.limit);
-    if (error) throw new Error(String((error as { message?: string }).message ?? error));
+      const { data: rows, error } = await sa
+        .from("brand_assets")
+        .select("id, title, division_id, kind, entity_type, tags, extracted_text")
+        .not("extracted_text", "is", null)
+        .order("updated_at", { ascending: false })
+        .limit(data.limit);
+      if (error) throw new Error(String((error as { message?: string }).message ?? error));
 
-    const list = (rows ?? []) as Array<{
-      id: string;
-      title: string;
-      division_id: string | null;
-      kind: string | null;
-      entity_type: string | null;
-      tags: string[] | null;
-      extracted_text: string | null;
-    }>;
+      const list = (rows ?? []) as Array<{
+        id: string;
+        title: string;
+        division_id: string | null;
+        kind: string | null;
+        entity_type: string | null;
+        tags: string[] | null;
+        extracted_text: string | null;
+      }>;
 
-    const docs: OracleMirrorDoc[] = list
-      .filter((r) => (r.extracted_text ?? "").trim().length >= 120)
-      .map((r) => ({
-        mirrorKey:
-          r.entity_type === "print-library" ? `print-asset:${r.id}` : `brand-asset:${r.id}`,
-        title: r.title,
-        text: r.extracted_text as string,
-        divisionId: r.division_id,
-        sourceType: r.entity_type === "print-library" ? "print" : (r.kind ?? "pdf"),
-        assetId: r.id,
-        tags: r.tags ?? [],
-      }));
+      const docs: OracleMirrorDoc[] = list
+        .filter((r) => (r.extracted_text ?? "").trim().length >= 120)
+        .map((r) => ({
+          mirrorKey:
+            r.entity_type === "print-library" ? `print-asset:${r.id}` : `brand-asset:${r.id}`,
+          title: r.title,
+          text: r.extracted_text as string,
+          divisionId: r.division_id,
+          sourceType: r.entity_type === "print-library" ? "print" : (r.kind ?? "pdf"),
+          assetId: r.id,
+          tags: r.tags ?? [],
+        }));
 
-    const res = await mirrorOracleKnowledge(sa, docs, context.userId);
+      const res = await mirrorOracleKnowledge(sa, docs, context.userId);
       return { ok: res.errors.length === 0, considered: docs.length, ...res };
     },
   );

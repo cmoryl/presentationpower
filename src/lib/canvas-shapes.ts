@@ -467,7 +467,9 @@ export const SHAPES: readonly ShapeDef[] = [
     label: "Dot field",
     group: "Marks",
     d: [10, 30, 50, 70, 90]
-      .flatMap((y) => [10, 30, 50, 70, 90].map((x) => `M ${x} ${y} m -5 0 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0`))
+      .flatMap((y) =>
+        [10, 30, 50, 70, 90].map((x) => `M ${x} ${y} m -5 0 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0`),
+      )
       .join(" "),
     aspect: 1,
   },

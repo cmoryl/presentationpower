@@ -70,7 +70,6 @@ export function surfaceCopyScale(s: { width: number; height: number }): number {
   return Math.min(s.width / LI_BANNER_W, s.height / LI_BANNER_H);
 }
 
-
 export type BannerMode = "light" | "dark";
 
 export type BannerBlob = {
@@ -326,7 +325,7 @@ function rng(seed: number) {
   };
 }
 
-const pick = <T,>(r: () => number, arr: readonly T[]): T => arr[Math.floor(r() * arr.length)]!;
+const pick = <T>(r: () => number, arr: readonly T[]): T => arr[Math.floor(r() * arr.length)]!;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /**
@@ -361,9 +360,27 @@ export function generateBanner(family: BannerFamily, seed: number): BannerRecipe
         { at: 1, color: pick(r, ["#F7FAF9", "#F6F6F8", "#F4F6FA"]) },
       ],
       blobs: [
-        { x: lerp(0.0, 0.1, r()), y: lerp(0.25, 0.6, r()), r: lerp(0.24, 0.32, r()), color: left, alpha: lerp(0.75, 0.9, r()) },
-        { x: lerp(0.2, 0.34, r()), y: lerp(0.35, 0.7, r()), r: lerp(0.26, 0.34, r()), color: mid, alpha: lerp(0.65, 0.85, r()) },
-        { x: lerp(0.52, 0.66, r()), y: lerp(0.3, 0.6, r()), r: lerp(0.28, 0.34, r()), color: P.white, alpha: lerp(0.65, 0.85, r()) },
+        {
+          x: lerp(0.0, 0.1, r()),
+          y: lerp(0.25, 0.6, r()),
+          r: lerp(0.24, 0.32, r()),
+          color: left,
+          alpha: lerp(0.75, 0.9, r()),
+        },
+        {
+          x: lerp(0.2, 0.34, r()),
+          y: lerp(0.35, 0.7, r()),
+          r: lerp(0.26, 0.34, r()),
+          color: mid,
+          alpha: lerp(0.65, 0.85, r()),
+        },
+        {
+          x: lerp(0.52, 0.66, r()),
+          y: lerp(0.3, 0.6, r()),
+          r: lerp(0.28, 0.34, r()),
+          color: P.white,
+          alpha: lerp(0.65, 0.85, r()),
+        },
       ],
       ink: { ...inkPair, wordmark: P.blue800 },
     };
@@ -385,9 +402,27 @@ export function generateBanner(family: BannerFamily, seed: number): BannerRecipe
         { at: 1, color: pick(r, ["#6F76C8", "#7A6FC4", "#6B84CC"]) },
       ],
       blobs: [
-        { x: lerp(0.4, 0.6, r()), y: lerp(0.88, 1.0, r()), r: lerp(0.48, 0.6, r()), color: P.lavender, alpha: lerp(0.45, 0.6, r()) },
-        { x: lerp(0.08, 0.22, r()), y: lerp(0.0, 0.14, r()), r: lerp(0.26, 0.34, r()), color: P.aqua, alpha: lerp(0.55, 0.7, r()) },
-        { x: lerp(0.82, 0.98, r()), y: lerp(0.0, 0.2, r()), r: lerp(0.26, 0.34, r()), color: a, alpha: lerp(0.4, 0.6, r()) },
+        {
+          x: lerp(0.4, 0.6, r()),
+          y: lerp(0.88, 1.0, r()),
+          r: lerp(0.48, 0.6, r()),
+          color: P.lavender,
+          alpha: lerp(0.45, 0.6, r()),
+        },
+        {
+          x: lerp(0.08, 0.22, r()),
+          y: lerp(0.0, 0.14, r()),
+          r: lerp(0.26, 0.34, r()),
+          color: P.aqua,
+          alpha: lerp(0.55, 0.7, r()),
+        },
+        {
+          x: lerp(0.82, 0.98, r()),
+          y: lerp(0.0, 0.2, r()),
+          r: lerp(0.26, 0.34, r()),
+          color: a,
+          alpha: lerp(0.4, 0.6, r()),
+        },
       ],
       ink: { line1: P.white, line2From: P.white, line2To: P.aqua, wordmark: P.white },
     };
@@ -408,9 +443,27 @@ export function generateBanner(family: BannerFamily, seed: number): BannerRecipe
         { at: 1, color: pick(r, ["#7B5BF0", "#8B6BFF", "#6C5BE0"]) },
       ],
       blobs: [
-        { x: lerp(0.04, 0.12, r()), y: lerp(0.25, 0.5, r()), r: lerp(0.2, 0.28, r()), color: "#BDF4FF", alpha: lerp(0.65, 0.82, r()) },
-        { x: lerp(0.4, 0.52, r()), y: lerp(0.4, 0.6, r()), r: lerp(0.2, 0.26, r()), color: "#050427", alpha: lerp(0.5, 0.68, r()) },
-        { x: lerp(0.92, 1.0, r()), y: lerp(0.4, 0.6, r()), r: lerp(0.24, 0.32, r()), color: "#8B6BFF", alpha: lerp(0.5, 0.68, r()) },
+        {
+          x: lerp(0.04, 0.12, r()),
+          y: lerp(0.25, 0.5, r()),
+          r: lerp(0.2, 0.28, r()),
+          color: "#BDF4FF",
+          alpha: lerp(0.65, 0.82, r()),
+        },
+        {
+          x: lerp(0.4, 0.52, r()),
+          y: lerp(0.4, 0.6, r()),
+          r: lerp(0.2, 0.26, r()),
+          color: "#050427",
+          alpha: lerp(0.5, 0.68, r()),
+        },
+        {
+          x: lerp(0.92, 1.0, r()),
+          y: lerp(0.4, 0.6, r()),
+          r: lerp(0.24, 0.32, r()),
+          color: "#8B6BFF",
+          alpha: lerp(0.5, 0.68, r()),
+        },
       ],
       ink: { line1: P.white, line2From: P.aqua, line2To: P.aqua, wordmark: P.white },
     };
@@ -433,9 +486,27 @@ export function generateBanner(family: BannerFamily, seed: number): BannerRecipe
       { at: 1, color: deep },
     ],
     blobs: [
-      { x: lerp(0.0, 0.08, r()), y: lerp(0.28, 0.48, r()), r: lerp(0.22, 0.3, r()), color: glow, alpha: lerp(0.72, 0.88, r()) },
-      { x: lerp(0.24, 0.62, r()), y: lerp(0.55, 0.78, r()), r: lerp(0.24, 0.32, r()), color: pick(r, [P.blue500, P.violet]), alpha: lerp(0.28, 0.5, r()) },
-      { x: lerp(0.7, 0.92, r()), y: lerp(0.4, 0.55, r()), r: lerp(0.3, 0.42, r()), color: deep, alpha: lerp(0.6, 0.8, r()) },
+      {
+        x: lerp(0.0, 0.08, r()),
+        y: lerp(0.28, 0.48, r()),
+        r: lerp(0.22, 0.3, r()),
+        color: glow,
+        alpha: lerp(0.72, 0.88, r()),
+      },
+      {
+        x: lerp(0.24, 0.62, r()),
+        y: lerp(0.55, 0.78, r()),
+        r: lerp(0.24, 0.32, r()),
+        color: pick(r, [P.blue500, P.violet]),
+        alpha: lerp(0.28, 0.5, r()),
+      },
+      {
+        x: lerp(0.7, 0.92, r()),
+        y: lerp(0.4, 0.55, r()),
+        r: lerp(0.3, 0.42, r()),
+        color: deep,
+        alpha: lerp(0.6, 0.8, r()),
+      },
     ],
     ink: {
       line1: P.white,
@@ -526,7 +597,6 @@ export function paintBanner(
   const size = 62 * scale;
   const lineGap = size * 1.16;
   const baseY = h * surface.anchorY;
-
 
   ctx.save();
   ctx.textAlign = "right";

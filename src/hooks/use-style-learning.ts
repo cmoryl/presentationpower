@@ -52,7 +52,6 @@ export function useStyleLearning(profile: LearningProfile) {
     staleTime: 60_000,
   });
 
-
   const learning: LearnedStyleWeights = learningQ.data ?? { ...EMPTY_LEARNING, profileKey: key };
 
   const logSignal = useCallback(
@@ -84,7 +83,6 @@ export function useStyleLearning(profile: LearningProfile) {
     },
     [record, key, profile, signedIn],
   );
-
 
   const prefsM = useMutation({
     mutationFn: (input: { learningEnabled?: boolean; resetHistory?: boolean }) =>

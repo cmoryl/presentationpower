@@ -200,7 +200,6 @@ export const BRAND_MODES: BrandMode[] = [
   },
 ];
 
-
 // ────────────────────────────────────────────────────────────────────────────
 // Section Frameworks (SF-01..SF-16, Atlas Part 02)
 // ────────────────────────────────────────────────────────────────────────────
@@ -346,7 +345,6 @@ export const MODULE_FAMILIES: ModuleFamily[] = [
     description: "Blank canvas base and admin-authored custom modules",
   },
 ];
-
 
 // ────────────────────────────────────────────────────────────────────────────
 // Layout Frameworks (Atlas Section 35, LF-01..LF-24). MVP subset with full metadata.
@@ -599,7 +597,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — classic",
     description: "Deck cover with client, title, date, presenter",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "clientName": { kind: "text", chars: 80 }, "presenter": { kind: "text", chars: 80 }, "date": { kind: "text", chars: 24 } }, titleChars: 80, bodyChars: 120 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        clientName: { kind: "text", chars: 80 },
+        presenter: { kind: "text", chars: 80 },
+        date: { kind: "text", chars: 24 },
+      },
+      titleChars: 80,
+      bodyChars: 120,
+    },
     editableFields: ["title", "subtitle", "clientName", "presenter", "date"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -609,7 +617,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — full-bleed media",
     description: "Cover with a hero image behind the title",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "clientName": { kind: "text", chars: 60 }, "date": { kind: "text", chars: 24 } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        clientName: { kind: "text", chars: 60 },
+        date: { kind: "text", chars: 24 },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "subtitle", "clientName", "date"],
     lockedFields: ["logo", "brandBar", "overlayGradient"],
   },
@@ -619,7 +636,14 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — minimal",
     description: "Restrained cover: brand mark, title, date",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "date": { kind: "text", chars: 24 } }, titleChars: 60 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        date: { kind: "text", chars: 24 },
+      },
+      titleChars: 60,
+    },
     editableFields: ["title", "subtitle", "date"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -629,7 +653,12 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Agenda — two column",
     description: "Numbered agenda list, 2-column layout",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 6, fields: { "label": { kind: "text", chars: 60 } } }, titleChars: 60, bodyChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: { min: 3, max: 6, fields: { label: { kind: "text", chars: 60 } } },
+      titleChars: 60,
+      bodyChars: 80,
+    },
     editableFields: ["title", "items[].label"],
     lockedFields: ["footer", "logo"],
   },
@@ -639,7 +668,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Agenda — vertical",
     description: "Single-column numbered agenda with descriptions",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 7, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 140 } } }, titleChars: 60, bodyChars: 140 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 7,
+        fields: { label: { kind: "text", chars: 60 }, body: { kind: "text", chars: 140 } },
+      },
+      titleChars: 60,
+      bodyChars: 140,
+    },
     editableFields: ["title", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -649,7 +687,10 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Section divider",
     description: "Chapter break between deck sections",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "kicker": { kind: "text", chars: 60 } }, titleChars: 60 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 }, kicker: { kind: "text", chars: 60 } },
+      titleChars: 60,
+    },
     editableFields: ["title", "kicker"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -659,7 +700,14 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Section divider — numbered",
     description: "Chapter break with large chapter number",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "chapterNumber": { kind: "number" }, "title": { kind: "text", chars: 60 }, "kicker": { kind: "text", chars: 60 } }, titleChars: 60 },
+    capacity: {
+      fields: {
+        chapterNumber: { kind: "number" },
+        title: { kind: "text", chars: 60 },
+        kicker: { kind: "text", chars: 60 },
+      },
+      titleChars: 60,
+    },
     editableFields: ["chapterNumber", "title", "kicker"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -669,7 +717,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Who's presenting",
     description: "Introduce the presenting team",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 2, max: 4, fields: { "name": { kind: "text", chars: 40 }, "role": { kind: "text", chars: 24 }, "note": { kind: "text", chars: 100 } } }, titleChars: 40, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 2,
+        max: 4,
+        fields: {
+          name: { kind: "text", chars: 40 },
+          role: { kind: "text", chars: 24 },
+          note: { kind: "text", chars: 100 },
+        },
+      },
+      titleChars: 40,
+      bodyChars: 100,
+    },
     editableFields: ["title", "items[].name", "items[].role", "items[].note"],
     lockedFields: ["footer", "logo"],
   },
@@ -681,7 +742,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Two challenge cards",
     description: "Two parallel challenges, more room per card",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 2, max: 2, fields: { "title": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 200 } } }, titleChars: 40, bodyChars: 200 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 2,
+        max: 2,
+        fields: { title: { kind: "text", chars: 40 }, body: { kind: "text", chars: 200 } },
+      },
+      titleChars: 40,
+      bodyChars: 200,
+    },
     editableFields: ["title", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -691,7 +761,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Three challenge cards",
     description: "Three parallel challenges with title + body",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 3, max: 3, fields: { "title": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 140 } } }, titleChars: 40, bodyChars: 140 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: { title: { kind: "text", chars: 40 }, body: { kind: "text", chars: 140 } },
+      },
+      titleChars: 40,
+      bodyChars: 140,
+    },
     fallbackVariantId: "MV-CTX-CARDS-2",
     editableFields: ["title", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
@@ -702,7 +781,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Four challenge tiles",
     description: "2×2 grid of challenges",
     permittedLayoutIds: ["LF-10"],
-    capacity: { fields: { "title": { kind: "text", chars: 32 } }, items: { min: 4, max: 4, fields: { "title": { kind: "text", chars: 32 }, "body": { kind: "text", chars: 100 } } }, titleChars: 32, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 32 } },
+      items: {
+        min: 4,
+        max: 4,
+        fields: { title: { kind: "text", chars: 32 }, body: { kind: "text", chars: 100 } },
+      },
+      titleChars: 32,
+      bodyChars: 100,
+    },
     editableFields: ["title", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -712,7 +800,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cost of inaction",
     description: "Headline stat + narrative on cost of doing nothing",
     permittedLayoutIds: ["LF-07"],
-    capacity: { fields: { "stat": { kind: "text", chars: 40 }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 40 }, "narrative": { kind: "text", chars: 220 } }, titleChars: 40, bodyChars: 220 },
+    capacity: {
+      fields: {
+        stat: { kind: "text", chars: 40 },
+        unit: { kind: "text", chars: 24 },
+        label: { kind: "text", chars: 40 },
+        narrative: { kind: "text", chars: 220 },
+      },
+      titleChars: 40,
+      bodyChars: 220,
+    },
     editableFields: ["stat", "unit", "label", "narrative"],
     lockedFields: ["source_style", "footer"],
   },
@@ -722,7 +819,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Market stat grid",
     description: "Four supporting market stats",
     permittedLayoutIds: ["LF-10"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 4, max: 4, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 } } } },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 4,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+        },
+      },
+    },
     editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
@@ -732,7 +840,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Trend narrative",
     description: "Directional trend headline + supporting narrative",
     permittedLayoutIds: ["LF-02"],
-    capacity: { fields: { "direction": { kind: "text", chars: 24 }, "headline": { kind: "text", chars: 100 }, "narrative": { kind: "text", chars: 260 } }, titleChars: 100, bodyChars: 260 },
+    capacity: {
+      fields: {
+        direction: { kind: "text", chars: 24 },
+        headline: { kind: "text", chars: 100 },
+        narrative: { kind: "text", chars: 260 },
+      },
+      titleChars: 100,
+      bodyChars: 260,
+    },
     editableFields: ["direction", "headline", "narrative"],
     lockedFields: ["footer", "logo"],
   },
@@ -742,7 +858,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Challenge stack",
     description: "Numbered vertical list of challenges we heard",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 6, fields: { "title": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 160 } } }, titleChars: 60, bodyChars: 160 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 6,
+        fields: { title: { kind: "text", chars: 60 }, body: { kind: "text", chars: 160 } },
+      },
+      titleChars: 60,
+      bodyChars: 160,
+    },
     editableFields: ["title", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -754,7 +879,11 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Insight callout",
     description: "Single insight with supporting narrative",
     permittedLayoutIds: ["LF-02", "LF-06"],
-    capacity: { fields: { "insight": { kind: "text", chars: 260 }, "narrative": { kind: "text", chars: 260 } }, titleChars: 100, bodyChars: 260 },
+    capacity: {
+      fields: { insight: { kind: "text", chars: 260 }, narrative: { kind: "text", chars: 260 } },
+      titleChars: 100,
+      bodyChars: 260,
+    },
     editableFields: ["insight", "narrative"],
     lockedFields: ["footer", "logo"],
   },
@@ -764,7 +893,10 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Big idea",
     description: "One-line big idea, maximum focus",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "idea": { kind: "text", chars: 120 }, "kicker": { kind: "text", chars: 120 } }, titleChars: 120 },
+    capacity: {
+      fields: { idea: { kind: "text", chars: 120 }, kicker: { kind: "text", chars: 120 } },
+      titleChars: 120,
+    },
     editableFields: ["idea", "kicker"],
     lockedFields: ["footer", "logo"],
   },
@@ -774,7 +906,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Insight → So what → Now what",
     description: "Insight paired with implication and action",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "insight": { kind: "text", chars: 180 }, "soWhat": { kind: "text", chars: 180 }, "nowWhat": { kind: "text", chars: 180 } }, titleChars: 60, bodyChars: 180 },
+    capacity: {
+      fields: {
+        insight: { kind: "text", chars: 180 },
+        soWhat: { kind: "text", chars: 180 },
+        nowWhat: { kind: "text", chars: 180 },
+      },
+      titleChars: 60,
+      bodyChars: 180,
+    },
     editableFields: ["insight", "soWhat", "nowWhat"],
     lockedFields: ["footer", "logo"],
   },
@@ -784,7 +924,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Opportunity size",
     description: "TAM / SAM / SOM stack",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 } } } },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+        },
+      },
+    },
     editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
@@ -794,7 +945,14 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client quote",
     description: "Pull-quote with attribution",
     permittedLayoutIds: ["LF-20"],
-    capacity: { fields: { "quote": { kind: "text", chars: 260 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 } }, bodyChars: 260 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 260 },
+        attribution: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+      },
+      bodyChars: 260,
+    },
     editableFields: ["quote", "attribution", "role"],
     lockedFields: ["footer", "logo", "quoteMark"],
   },
@@ -806,7 +964,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Two solution pillars",
     description: "Two focused pillars, longer body",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 2, max: 2, fields: { "title": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 200 } } }, titleChars: 40, bodyChars: 200 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 2,
+        max: 2,
+        fields: { title: { kind: "text", chars: 40 }, body: { kind: "text", chars: 200 } },
+      },
+      titleChars: 40,
+      bodyChars: 200,
+    },
     editableFields: ["title", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -816,7 +983,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Three solution pillars",
     description: "Three pillars of the solution",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 3, max: 3, fields: { "title": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 140 } } }, titleChars: 40, bodyChars: 140 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: { title: { kind: "text", chars: 40 }, body: { kind: "text", chars: 140 } },
+      },
+      titleChars: 40,
+      bodyChars: 140,
+    },
     editableFields: ["title", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -826,7 +1002,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Four solution tiles",
     description: "2×2 tiles of solution capabilities",
     permittedLayoutIds: ["LF-10"],
-    capacity: { fields: { "title": { kind: "text", chars: 32 } }, items: { min: 4, max: 4, fields: { "title": { kind: "text", chars: 32 }, "body": { kind: "text", chars: 100 } } }, titleChars: 32, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 32 } },
+      items: {
+        min: 4,
+        max: 4,
+        fields: { title: { kind: "text", chars: 32 }, body: { kind: "text", chars: 100 } },
+      },
+      titleChars: 32,
+      bodyChars: 100,
+    },
     editableFields: ["title", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -836,7 +1021,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Hero + four tiles",
     description: "One hero capability with four supporting",
     permittedLayoutIds: ["LF-12"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "hero.title": { kind: "text", chars: 40 }, "hero.body": { kind: "text", chars: 120 } }, items: { min: 4, max: 4, fields: { "title": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 120 } } }, titleChars: 40, bodyChars: 120 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 40 },
+        "hero.title": { kind: "text", chars: 40 },
+        "hero.body": { kind: "text", chars: 120 },
+      },
+      items: {
+        min: 4,
+        max: 4,
+        fields: { title: { kind: "text", chars: 40 }, body: { kind: "text", chars: 120 } },
+      },
+      titleChars: 40,
+      bodyChars: 120,
+    },
     editableFields: ["title", "hero.title", "hero.body", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -846,7 +1044,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Layered architecture",
     description: "Stacked layers of a solution architecture",
     permittedLayoutIds: ["LF-22"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 120 } } }, titleChars: 40, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: { label: { kind: "text", chars: 40 }, body: { kind: "text", chars: 120 } },
+      },
+      titleChars: 40,
+      bodyChars: 120,
+    },
     editableFields: ["title", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -856,7 +1063,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Feature list",
     description: "Bulleted feature list with short descriptions",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 4, max: 8, fields: { "label": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 120 } } }, titleChars: 40, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 4,
+        max: 8,
+        fields: { label: { kind: "text", chars: 40 }, body: { kind: "text", chars: 120 } },
+      },
+      titleChars: 40,
+      bodyChars: 120,
+    },
     editableFields: ["title", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -866,7 +1082,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Process timeline",
     description: "Sequential steps across the engagement",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 30 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 30 }, "body": { kind: "text", chars: 90 } } }, titleChars: 30, bodyChars: 90 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 30 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: { label: { kind: "text", chars: 30 }, body: { kind: "text", chars: 90 } },
+      },
+      titleChars: 30,
+      bodyChars: 90,
+    },
     editableFields: ["title", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo", "connector"],
   },
@@ -876,7 +1101,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Numbered phases",
     description: "Discovery / build / scale style vertical phases",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 160 } } }, titleChars: 40, bodyChars: 160 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: { label: { kind: "text", chars: 40 }, body: { kind: "text", chars: 160 } },
+      },
+      titleChars: 40,
+      bodyChars: 160,
+    },
     editableFields: ["title", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -886,7 +1120,26 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Step chain (up to 9)",
     description: "Connected numbered tiles across one rail — long processes at a glance",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "summary.lead": { kind: "text", chars: 40 }, "summary.emphasis": { kind: "text", chars: 40 } }, items: { min: 3, max: 9, fields: { "label": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 70 }, "icon": { kind: "icon" }, "highlight": { kind: "text", chars: 40 }, "note": { kind: "text", chars: 70 } } }, titleChars: 40, bodyChars: 70 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 40 },
+        "summary.lead": { kind: "text", chars: 40 },
+        "summary.emphasis": { kind: "text", chars: 40 },
+      },
+      items: {
+        min: 3,
+        max: 9,
+        fields: {
+          label: { kind: "text", chars: 40 },
+          body: { kind: "text", chars: 70 },
+          icon: { kind: "icon" },
+          highlight: { kind: "text", chars: 40 },
+          note: { kind: "text", chars: 70 },
+        },
+      },
+      titleChars: 40,
+      bodyChars: 70,
+    },
     editableFields: [
       "title",
       "items[].label",
@@ -905,7 +1158,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Numbered step spotlight",
     description: "Big step numeral over a circular photo, with an icon-led capability chain",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 44 }, "subtitle": { kind: "text", chars: 44 }, "stepNumber": { kind: "number" } }, items: { min: 2, max: 5, fields: { "label": { kind: "text", chars: 44 }, "body": { kind: "text", chars: 90 }, "icon": { kind: "icon" } } }, titleChars: 44, bodyChars: 90 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 44 },
+        subtitle: { kind: "text", chars: 44 },
+        stepNumber: { kind: "number" },
+      },
+      items: {
+        min: 2,
+        max: 5,
+        fields: {
+          label: { kind: "text", chars: 44 },
+          body: { kind: "text", chars: 90 },
+          icon: { kind: "icon" },
+        },
+      },
+      titleChars: 44,
+      bodyChars: 90,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -920,9 +1190,25 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     id: "MV-PROC-STAGE-ORBITS",
     familyId: "MF-04",
     name: "Stage orbits (numbered medallions)",
-    description: "Two to four numbered photo medallions in orbit rings, each with an icon task chain beneath",
+    description:
+      "Two to four numbered photo medallions in orbit rings, each with an icon task chain beneath",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 44 }, "subtitle": { kind: "text", chars: 44 } }, items: { path: "stages", min: 2, max: 4, fields: { "label": { kind: "text", chars: 44 }, "stepNumber": { kind: "number" }, "items[].label": { kind: "text", chars: 44 }, "items[].icon": { kind: "icon" } } }, titleChars: 44, bodyChars: 70 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 44 }, subtitle: { kind: "text", chars: 44 } },
+      items: {
+        path: "stages",
+        min: 2,
+        max: 4,
+        fields: {
+          label: { kind: "text", chars: 44 },
+          stepNumber: { kind: "number" },
+          "items[].label": { kind: "text", chars: 44 },
+          "items[].icon": { kind: "icon" },
+        },
+      },
+      titleChars: 44,
+      bodyChars: 70,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -939,7 +1225,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Before → After",
     description: "Two-state view of the workflow change",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "before.title": { kind: "text", chars: 40 }, "before.body": { kind: "text", chars: 200 }, "after.title": { kind: "text", chars: 40 }, "after.body": { kind: "text", chars: 200 } }, titleChars: 40, bodyChars: 200 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 40 },
+        "before.title": { kind: "text", chars: 40 },
+        "before.body": { kind: "text", chars: 200 },
+        "after.title": { kind: "text", chars: 40 },
+        "after.body": { kind: "text", chars: 200 },
+      },
+      titleChars: 40,
+      bodyChars: 200,
+    },
     editableFields: ["title", "before.title", "before.body", "after.title", "after.body"],
     lockedFields: ["footer", "logo"],
   },
@@ -949,7 +1245,27 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Before → After split (centre hub)",
     description: "Two-column without/with comparison around a centre promise hub",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "before.label": { kind: "text", chars: 40 }, "after.label": { kind: "text", chars: 40 }, "after.items[].label": { kind: "text", chars: 40 }, "after.items[].body": { kind: "text", chars: 110 }, "hub.title": { kind: "text", chars: 40 }, "hub.lines": { kind: "list" }, "summary.lead": { kind: "text", chars: 40 }, "summary.emphasis": { kind: "text", chars: 40 } }, items: { path: "before.items", min: 3, max: 5, fields: { "label": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 110 } } }, titleChars: 40, bodyChars: 110 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 40 },
+        "before.label": { kind: "text", chars: 40 },
+        "after.label": { kind: "text", chars: 40 },
+        "after.items[].label": { kind: "text", chars: 40 },
+        "after.items[].body": { kind: "text", chars: 110 },
+        "hub.title": { kind: "text", chars: 40 },
+        "hub.lines": { kind: "list" },
+        "summary.lead": { kind: "text", chars: 40 },
+        "summary.emphasis": { kind: "text", chars: 40 },
+      },
+      items: {
+        path: "before.items",
+        min: 3,
+        max: 5,
+        fields: { label: { kind: "text", chars: 40 }, body: { kind: "text", chars: 110 } },
+      },
+      titleChars: 40,
+      bodyChars: 110,
+    },
     editableFields: [
       "title",
       "before.label",
@@ -966,14 +1282,32 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
 
-
   {
     id: "MV-INFO-HUB-SATELLITES",
     familyId: "MF-04",
     name: "Hub & satellites (4-8)",
     description: "Centre hub circled by icon satellites, with a feature block per satellite",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "hub.title": { kind: "text", chars: 40 }, "hub.subtitle": { kind: "text", chars: 40 }, "summary.lead": { kind: "text", chars: 40 }, "summary.emphasis": { kind: "text", chars: 40 } }, items: { min: 4, max: 8, fields: { "label": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 130 }, "icon": { kind: "icon" } } }, titleChars: 40, bodyChars: 130 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 40 },
+        "hub.title": { kind: "text", chars: 40 },
+        "hub.subtitle": { kind: "text", chars: 40 },
+        "summary.lead": { kind: "text", chars: 40 },
+        "summary.emphasis": { kind: "text", chars: 40 },
+      },
+      items: {
+        min: 4,
+        max: 8,
+        fields: {
+          label: { kind: "text", chars: 40 },
+          body: { kind: "text", chars: 130 },
+          icon: { kind: "icon" },
+        },
+      },
+      titleChars: 40,
+      bodyChars: 130,
+    },
     editableFields: [
       "title",
       "hub.title",
@@ -992,7 +1326,23 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Hub & pill orbit (4-12)",
     description: "Centre hub flanked by two stacks of pill chips whose edges trace the hub arc",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 46 }, "subtitle": { kind: "text", chars: 46 }, "hub.title": { kind: "text", chars: 46 }, "hub.subtitle": { kind: "text", chars: 46 }, "summary.lead": { kind: "text", chars: 46 }, "summary.emphasis": { kind: "text", chars: 46 } }, items: { min: 4, max: 12, fields: { "label": { kind: "text", chars: 46 }, "icon": { kind: "icon" } } }, titleChars: 46, bodyChars: 40 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 46 },
+        subtitle: { kind: "text", chars: 46 },
+        "hub.title": { kind: "text", chars: 46 },
+        "hub.subtitle": { kind: "text", chars: 46 },
+        "summary.lead": { kind: "text", chars: 46 },
+        "summary.emphasis": { kind: "text", chars: 46 },
+      },
+      items: {
+        min: 4,
+        max: 12,
+        fields: { label: { kind: "text", chars: 46 }, icon: { kind: "icon" } },
+      },
+      titleChars: 46,
+      bodyChars: 40,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1011,7 +1361,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Arc flow (2-6 steps)",
     description: "Alternating arc segments with icon nodes and numbered feature copy",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "summary.lead": { kind: "text", chars: 40 }, "summary.emphasis": { kind: "text", chars: 40 } }, items: { min: 2, max: 6, fields: { "label": { kind: "text", chars: 40 }, "body": { kind: "text", chars: 150 }, "icon": { kind: "icon" } } }, titleChars: 40, bodyChars: 150 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 40 },
+        "summary.lead": { kind: "text", chars: 40 },
+        "summary.emphasis": { kind: "text", chars: 40 },
+      },
+      items: {
+        min: 2,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 40 },
+          body: { kind: "text", chars: 150 },
+          icon: { kind: "icon" },
+        },
+      },
+      titleChars: 40,
+      bodyChars: 150,
+    },
     editableFields: [
       "title",
       "items[].label",
@@ -1029,7 +1396,27 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Horizontal axis with icon nodes and alternating above/below cards, each with a date or duration marker",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "summary.lead": { kind: "text", chars: 60 }, "summary.emphasis": { kind: "text", chars: 60 } }, items: { min: 3, max: 7, fields: { "meta": { kind: "text", chars: 60 }, "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 120 }, "icon": { kind: "icon" }, "highlight": { kind: "text", chars: 60 } } }, titleChars: 60, bodyChars: 120 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        "summary.lead": { kind: "text", chars: 60 },
+        "summary.emphasis": { kind: "text", chars: 60 },
+      },
+      items: {
+        min: 3,
+        max: 7,
+        fields: {
+          meta: { kind: "text", chars: 60 },
+          label: { kind: "text", chars: 60 },
+          body: { kind: "text", chars: 120 },
+          icon: { kind: "icon" },
+          highlight: { kind: "text", chars: 60 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 120,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1050,7 +1437,27 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Vertical rail with icon nodes, phase chips and a full paragraph per stage — for journeys that need explaining",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "summary.lead": { kind: "text", chars: 60 }, "summary.emphasis": { kind: "text", chars: 60 } }, items: { min: 3, max: 6, fields: { "meta": { kind: "text", chars: 60 }, "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 220 }, "icon": { kind: "icon" }, "highlight": { kind: "text", chars: 60 } } }, titleChars: 60, bodyChars: 220 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        "summary.lead": { kind: "text", chars: 60 },
+        "summary.emphasis": { kind: "text", chars: 60 },
+      },
+      items: {
+        min: 3,
+        max: 6,
+        fields: {
+          meta: { kind: "text", chars: 60 },
+          label: { kind: "text", chars: 60 },
+          body: { kind: "text", chars: 220 },
+          icon: { kind: "icon" },
+          highlight: { kind: "text", chars: 60 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 220,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1071,7 +1478,32 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Phases across the top, workstream lanes down the side, icon chips per cell — who does what, when",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "phases[].label": { kind: "text", chars: 60 }, "phases[].meta": { kind: "text", chars: 60 }, "summary.lead": { kind: "text", chars: 60 }, "summary.emphasis": { kind: "text", chars: 60 } }, items: { path: "lanes", min: 2, max: 4, fields: { "label": { kind: "text", chars: 60 }, "meta": { kind: "text", chars: 60 }, "icon": { kind: "icon" }, "items[].label": { kind: "text", chars: 60 }, "items[].body": { kind: "text", chars: 90 }, "items[].icon": { kind: "icon" }, "items[].highlight": { kind: "text", chars: 60 } } }, titleChars: 60, bodyChars: 90 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        "phases[].label": { kind: "text", chars: 60 },
+        "phases[].meta": { kind: "text", chars: 60 },
+        "summary.lead": { kind: "text", chars: 60 },
+        "summary.emphasis": { kind: "text", chars: 60 },
+      },
+      items: {
+        path: "lanes",
+        min: 2,
+        max: 4,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          meta: { kind: "text", chars: 60 },
+          icon: { kind: "icon" },
+          "items[].label": { kind: "text", chars: 60 },
+          "items[].body": { kind: "text", chars: 90 },
+          "items[].icon": { kind: "icon" },
+          "items[].highlight": { kind: "text", chars: 60 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 90,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1096,7 +1528,27 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Stacked capability layers — each lane opens with an arrow-headed label block and carries 3-4 hairline-divided capability cells",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "question": { kind: "text", chars: 60 }, "summary.lead": { kind: "text", chars: 60 }, "summary.emphasis": { kind: "text", chars: 60 } }, items: { min: 2, max: 5, fields: { "meta": { kind: "text", chars: 60 }, "label": { kind: "text", chars: 60 }, "icon": { kind: "icon" }, "cells[].label": { kind: "text", chars: 60 } } }, titleChars: 60, bodyChars: 90 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        question: { kind: "text", chars: 60 },
+        "summary.lead": { kind: "text", chars: 60 },
+        "summary.emphasis": { kind: "text", chars: 60 },
+      },
+      items: {
+        min: 2,
+        max: 5,
+        fields: {
+          meta: { kind: "text", chars: 60 },
+          label: { kind: "text", chars: 60 },
+          icon: { kind: "icon" },
+          "cells[].label": { kind: "text", chars: 60 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 90,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1117,7 +1569,28 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Paired rows — muted problem pill on the left, elevated outcome pill on the right, joined by a chevron transition marker",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "question": { kind: "text", chars: 60 }, "before.label": { kind: "text", chars: 60 }, "after.label": { kind: "text", chars: 60 }, "summary.lead": { kind: "text", chars: 60 }, "summary.emphasis": { kind: "text", chars: 60 } }, items: { min: 3, max: 6, fields: { "before": { kind: "text", chars: 60 }, "after": { kind: "text", chars: 60 }, "icon": { kind: "icon" } } }, titleChars: 60, bodyChars: 90 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        question: { kind: "text", chars: 60 },
+        "before.label": { kind: "text", chars: 60 },
+        "after.label": { kind: "text", chars: 60 },
+        "summary.lead": { kind: "text", chars: 60 },
+        "summary.emphasis": { kind: "text", chars: 60 },
+      },
+      items: {
+        min: 3,
+        max: 6,
+        fields: {
+          before: { kind: "text", chars: 60 },
+          after: { kind: "text", chars: 60 },
+          icon: { kind: "icon" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 90,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1139,7 +1612,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Serpentine capability pipeline that wraps across two rows and feeds three pillar claims closed by a full-width promise band",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "question": { kind: "text", chars: 60 }, "pillars[].label": { kind: "text", chars: 60 }, "summary.lead": { kind: "text", chars: 60 }, "summary.emphasis": { kind: "text", chars: 60 } }, items: { min: 6, max: 16, fields: { "label": { kind: "text", chars: 60 } } }, titleChars: 60, bodyChars: 60 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        question: { kind: "text", chars: 60 },
+        "pillars[].label": { kind: "text", chars: 60 },
+        "summary.lead": { kind: "text", chars: 60 },
+        "summary.emphasis": { kind: "text", chars: 60 },
+      },
+      items: { min: 6, max: 16, fields: { label: { kind: "text", chars: 60 } } },
+      titleChars: 60,
+      bodyChars: 60,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1152,9 +1637,6 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo", "connector"],
   },
 
-
-
-
   // ── MF-05 Proof, Data & Decision ────────────────────────────────────────
   {
     id: "MV-PROOF-STATS-2",
@@ -1162,7 +1644,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Two proof stats",
     description: "Two large stats with narrative",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 2, max: 2, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 } } } },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 2,
+        max: 2,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+        },
+      },
+    },
     editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
@@ -1172,7 +1665,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Three proof stats",
     description: "Three big-number stats with labels + sources",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 } } } },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+        },
+      },
+    },
     editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
@@ -1182,7 +1686,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Four proof stats",
     description: "Four big-number stats in a 2×2 grid",
     permittedLayoutIds: ["LF-10"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 4, max: 4, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 } } } },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 4,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+        },
+      },
+    },
     editableFields: ["title", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["items[].source", "footer", "logo"],
   },
@@ -1192,7 +1707,22 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client logo wall",
     description: "Grid of representative client / partner logos",
     permittedLayoutIds: ["LF-19"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 6, max: 12, fields: { "name": { kind: "text", chars: 60 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 6,
+        max: 12,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+    },
     editableFields: [
       "title",
       "items[].name",
@@ -1210,7 +1740,22 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client logo strip",
     description: "Minimal single-row strip of six client / partner logos",
     permittedLayoutIds: ["LF-19"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "kicker": { kind: "text", chars: 60 } }, items: { min: 4, max: 6, fields: { "name": { kind: "text", chars: 60 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 }, kicker: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 6,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -1229,7 +1774,22 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client logo marquee",
     description: "Two-row offset grid of up to ten client logos for scale",
     permittedLayoutIds: ["LF-19"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 } }, items: { min: 8, max: 10, fields: { "name": { kind: "text", chars: 60 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 }, subtitle: { kind: "text", chars: 60 } },
+      items: {
+        min: 8,
+        max: 10,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -1248,7 +1808,28 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Featured client + supporting wall",
     description: "One hero client logo with four supporting proof logos",
     permittedLayoutIds: ["LF-12"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "featuredName": { kind: "text", chars: 60 }, "featuredNote": { kind: "text", chars: 220 }, "featuredLogoUrl": { kind: "image" } }, items: { min: 5, max: 5, fields: { "name": { kind: "text", chars: 60 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60, bodyChars: 220 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        featuredName: { kind: "text", chars: 60 },
+        featuredNote: { kind: "text", chars: 220 },
+        featuredLogoUrl: { kind: "image" },
+      },
+      items: {
+        min: 5,
+        max: 5,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 220,
+    },
     editableFields: [
       "title",
       "featuredName",
@@ -1269,7 +1850,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client logos by category",
     description: "Two grouped columns of logos with a category label each",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 2, max: 2, fields: { "label": { kind: "text", chars: 60 }, "logos[].name": { kind: "text", chars: 60 }, "logos[].logoUrl": { kind: "logo" }, "logos[].logoPath": { kind: "logo" }, "logos[].logoVariant": { kind: "logo" }, "logos[].logoVariants": { kind: "logo" }, "logos[].logoPaths": { kind: "logo" } } }, titleChars: 60, bodyChars: 60 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 2,
+        max: 2,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          "logos[].name": { kind: "text", chars: 60 },
+          "logos[].logoUrl": { kind: "logo" },
+          "logos[].logoPath": { kind: "logo" },
+          "logos[].logoVariant": { kind: "logo" },
+          "logos[].logoVariants": { kind: "logo" },
+          "logos[].logoPaths": { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 60,
+    },
     editableFields: [
       "title",
       "items[].label",
@@ -1288,7 +1886,22 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client logo mosaic",
     description: "Bento-style asymmetric mosaic mixing wordmark tiles at different scales",
     permittedLayoutIds: ["LF-09"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "kicker": { kind: "text", chars: 60 } }, items: { min: 6, max: 8, fields: { "name": { kind: "text", chars: 60 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 }, kicker: { kind: "text", chars: 60 } },
+      items: {
+        min: 6,
+        max: 8,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -1307,7 +1920,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Testimonial card",
     description: "Client testimonial with headshot + metric",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "quote": { kind: "text", chars: 300 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "metric": { kind: "text", chars: 60 } }, bodyChars: 300 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 300 },
+        attribution: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+        metric: { kind: "text", chars: 60 },
+      },
+      bodyChars: 300,
+    },
     editableFields: ["quote", "attribution", "role", "metric"],
     lockedFields: ["footer", "logo", "clientLogo"],
   },
@@ -1317,7 +1938,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Decision matrix",
     description: "2×2 comparison / positioning matrix",
     permittedLayoutIds: ["LF-16"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "axisX": { kind: "text", chars: 24 }, "axisY": { kind: "text", chars: 24 }, "q1": { kind: "text", chars: 24 }, "q2": { kind: "text", chars: 24 }, "q3": { kind: "text", chars: 24 }, "q4": { kind: "text", chars: 24 } }, titleChars: 60, bodyChars: 140 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        axisX: { kind: "text", chars: 24 },
+        axisY: { kind: "text", chars: 24 },
+        q1: { kind: "text", chars: 24 },
+        q2: { kind: "text", chars: 24 },
+        q3: { kind: "text", chars: 24 },
+        q4: { kind: "text", chars: 24 },
+      },
+      titleChars: 60,
+      bodyChars: 140,
+    },
     editableFields: ["title", "axisX", "axisY", "q1", "q2", "q3", "q4"],
     lockedFields: ["footer", "logo"],
   },
@@ -1327,7 +1960,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Comparison table",
     description: "Criteria × options table",
     permittedLayoutIds: ["LF-17"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "columns[].label": { kind: "text", chars: 60 } }, items: { min: 3, max: 6, fields: { "criterion": { kind: "text", chars: 60 }, "values[]": { kind: "list" } } }, titleChars: 60 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        "columns[].label": { kind: "text", chars: 60 },
+      },
+      items: {
+        min: 3,
+        max: 6,
+        fields: { criterion: { kind: "text", chars: 60 }, "values[]": { kind: "list" } },
+      },
+      titleChars: 60,
+    },
     editableFields: ["title", "columns[].label", "items[].criterion", "items[].values[]"],
     lockedFields: ["footer", "logo"],
   },
@@ -1337,7 +1981,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Decision checklist",
     description: "Criteria to meet, framed as a checklist",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 4, max: 8, fields: { "label": { kind: "text", chars: 60 }, "note": { kind: "text", chars: 100 } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 8,
+        fields: { label: { kind: "text", chars: 60 }, note: { kind: "text", chars: 100 } },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "items[].label", "items[].note"],
     lockedFields: ["footer", "logo", "checkStyle"],
   },
@@ -1347,7 +2000,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Pricing tiers",
     description: "Three parallel pricing / package tiers",
     permittedLayoutIds: ["LF-23"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "name": { kind: "text", chars: 60 }, "price": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "features[]": { kind: "list" } } }, titleChars: 60, bodyChars: 200 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          price: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          "features[]": { kind: "list" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 200,
+    },
     editableFields: [
       "title",
       "items[].name",
@@ -1363,7 +2030,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Investment summary",
     description: "Single price + what's included",
     permittedLayoutIds: ["LF-07"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "amount": { kind: "number" }, "unit": { kind: "text", chars: 24 } }, items: { min: 3, max: 6, fields: { "label": { kind: "text", chars: 40 } } }, titleChars: 40, bodyChars: 260 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 40 },
+        amount: { kind: "number" },
+        unit: { kind: "text", chars: 24 },
+      },
+      items: { min: 3, max: 6, fields: { label: { kind: "text", chars: 40 } } },
+      titleChars: 40,
+      bodyChars: 260,
+    },
     editableFields: ["title", "amount", "unit", "items[].label"],
     lockedFields: ["footer", "logo", "currency"],
   },
@@ -1373,7 +2049,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Risk & mitigation",
     description: "Pairs of risks and how we address them",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 5, fields: { "risk": { kind: "text", chars: 160 }, "mitigation": { kind: "text", chars: 160 } } }, titleChars: 60, bodyChars: 160 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: { risk: { kind: "text", chars: 160 }, mitigation: { kind: "text", chars: 160 } },
+      },
+      titleChars: 60,
+      bodyChars: 160,
+    },
     editableFields: ["title", "items[].risk", "items[].mitigation"],
     lockedFields: ["footer", "logo"],
   },
@@ -1385,7 +2070,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Case study spread",
     description: "Client, challenge, solution, result",
     permittedLayoutIds: ["LF-18"],
-    capacity: { fields: { "client": { kind: "text", chars: 60 }, "challenge": { kind: "text", chars: 160 }, "solution": { kind: "text", chars: 160 }, "result": { kind: "text", chars: 160 }, "metric": { kind: "text", chars: 60 } }, bodyChars: 160 },
+    capacity: {
+      fields: {
+        client: { kind: "text", chars: 60 },
+        challenge: { kind: "text", chars: 160 },
+        solution: { kind: "text", chars: 160 },
+        result: { kind: "text", chars: 160 },
+        metric: { kind: "text", chars: 60 },
+      },
+      bodyChars: 160,
+    },
     editableFields: ["client", "challenge", "solution", "result", "metric"],
     lockedFields: ["clientLogo", "source", "footer"],
   },
@@ -1395,7 +2089,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Case study — metrics forward",
     description: "Case study with three headline metrics",
     permittedLayoutIds: ["LF-06"],
-    capacity: { fields: { "client": { kind: "text", chars: 60 }, "summary": { kind: "text", chars: 200 } }, items: { min: 3, max: 3, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 } } }, bodyChars: 200 },
+    capacity: {
+      fields: { client: { kind: "text", chars: 60 }, summary: { kind: "text", chars: 200 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 60 },
+        },
+      },
+      bodyChars: 200,
+    },
     editableFields: ["client", "summary", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["clientLogo", "source", "footer"],
   },
@@ -1405,7 +2111,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Case study — narrative",
     description: "Long-form narrative case study",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "client": { kind: "text", chars: 60 }, "headline": { kind: "text", chars: 60 }, "story": { kind: "text", chars: 600 }, "result": { kind: "text", chars: 600 } }, bodyChars: 600 },
+    capacity: {
+      fields: {
+        client: { kind: "text", chars: 60 },
+        headline: { kind: "text", chars: 60 },
+        story: { kind: "text", chars: 600 },
+        result: { kind: "text", chars: 600 },
+      },
+      bodyChars: 600,
+    },
     editableFields: ["client", "headline", "story", "result"],
     lockedFields: ["clientLogo", "source", "footer"],
   },
@@ -1415,7 +2129,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Case study logo grid",
     description: "Grid of case studies with client + one-line result",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 4, max: 6, fields: { "client": { kind: "text", chars: 60 }, "result": { kind: "text", chars: 100 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 6,
+        fields: {
+          client: { kind: "text", chars: 60 },
+          result: { kind: "text", chars: 100 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: [
       "title",
       "items[].client",
@@ -1436,7 +2167,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Team — three bios",
     description: "Three team members with role and short bio",
     permittedLayoutIds: ["LF-21"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "name": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "bio": { kind: "text", chars: 120 } } }, titleChars: 60, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          role: { kind: "text", chars: 24 },
+          bio: { kind: "text", chars: 120 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 120,
+    },
     editableFields: ["title", "items[].name", "items[].role", "items[].bio"],
     lockedFields: ["items[].headshot", "footer", "logo"],
   },
@@ -1446,7 +2190,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Team — four bios",
     description: "Four team members with role and short bio",
     permittedLayoutIds: ["LF-21"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 4, max: 4, fields: { "name": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "bio": { kind: "text", chars: 100 } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 4,
+        fields: {
+          name: { kind: "text", chars: 60 },
+          role: { kind: "text", chars: 24 },
+          bio: { kind: "text", chars: 100 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "items[].name", "items[].role", "items[].bio"],
     lockedFields: ["items[].headshot", "footer", "logo"],
   },
@@ -1456,7 +2213,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Governance model",
     description: "Governance rhythm — who meets when, deciding what",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 5, fields: { "forum": { kind: "text", chars: 60 }, "cadence": { kind: "text", chars: 24 }, "purpose": { kind: "text", chars: 160 } } }, titleChars: 60, bodyChars: 160 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: {
+          forum: { kind: "text", chars: 60 },
+          cadence: { kind: "text", chars: 24 },
+          purpose: { kind: "text", chars: 160 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 160,
+    },
     editableFields: ["title", "items[].forum", "items[].cadence", "items[].purpose"],
     lockedFields: ["footer", "logo"],
   },
@@ -1466,7 +2236,14 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Recommendation",
     description: "Recommended path and rationale",
     permittedLayoutIds: ["LF-06", "LF-02"],
-    capacity: { fields: { "recommendation": { kind: "text", chars: 100 }, "rationale": { kind: "text", chars: 320 } }, titleChars: 100, bodyChars: 320 },
+    capacity: {
+      fields: {
+        recommendation: { kind: "text", chars: 100 },
+        rationale: { kind: "text", chars: 320 },
+      },
+      titleChars: 100,
+      bodyChars: 320,
+    },
     editableFields: ["recommendation", "rationale"],
     lockedFields: ["footer", "logo"],
   },
@@ -1476,7 +2253,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Close & CTA",
     description: "Sign-off with next steps + owner",
     permittedLayoutIds: ["LF-24"],
-    capacity: { fields: { "message": { kind: "text", chars: 80 }, "nextSteps": { kind: "text", chars: 200 }, "owner": { kind: "text", chars: 80 }, "followUp": { kind: "text", chars: 200 } }, titleChars: 80, bodyChars: 200 },
+    capacity: {
+      fields: {
+        message: { kind: "text", chars: 80 },
+        nextSteps: { kind: "text", chars: 200 },
+        owner: { kind: "text", chars: 80 },
+        followUp: { kind: "text", chars: 200 },
+      },
+      titleChars: 80,
+      bodyChars: 200,
+    },
     editableFields: ["message", "nextSteps", "owner", "followUp"],
     lockedFields: ["footer", "logo"],
   },
@@ -1486,7 +2272,11 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Thank you",
     description: "Simple thank-you close",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "message": { kind: "text", chars: 40 }, "signoff": { kind: "text", chars: 40 } }, titleChars: 40, bodyChars: 120 },
+    capacity: {
+      fields: { message: { kind: "text", chars: 40 }, signoff: { kind: "text", chars: 40 } },
+      titleChars: 40,
+      bodyChars: 120,
+    },
     editableFields: ["message", "signoff"],
     lockedFields: ["footer", "logo", "brandBar"],
   },
@@ -1496,7 +2286,11 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Q & A",
     description: "Open discussion / questions prompt",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 }, "prompt": { kind: "text", chars: 40 } }, titleChars: 40, bodyChars: 160 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 }, prompt: { kind: "text", chars: 40 } },
+      titleChars: 40,
+      bodyChars: 160,
+    },
     editableFields: ["title", "prompt"],
     lockedFields: ["footer", "logo"],
   },
@@ -1506,7 +2300,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Contact card",
     description: "Follow-up owner(s) with contact details",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 40 } }, items: { min: 1, max: 3, fields: { "name": { kind: "text", chars: 40 }, "role": { kind: "text", chars: 24 }, "email": { kind: "text", chars: 24 }, "phone": { kind: "text", chars: 24 } } }, titleChars: 40, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 40 } },
+      items: {
+        min: 1,
+        max: 3,
+        fields: {
+          name: { kind: "text", chars: 40 },
+          role: { kind: "text", chars: 24 },
+          email: { kind: "text", chars: 24 },
+          phone: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 40,
+      bodyChars: 120,
+    },
     editableFields: ["title", "items[].name", "items[].role", "items[].email", "items[].phone"],
     lockedFields: ["footer", "logo"],
   },
@@ -1516,7 +2324,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Next-step timeline",
     description: "30 / 60 / 90-day plan for what happens after sign-off",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 4, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 140 }, "owner": { kind: "text", chars: 60 } } }, titleChars: 60, bodyChars: 140 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 4,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          body: { kind: "text", chars: 140 },
+          owner: { kind: "text", chars: 60 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 140,
+    },
     editableFields: ["title", "items[].label", "items[].body", "items[].owner"],
     lockedFields: ["footer", "logo", "connector"],
   },
@@ -1526,7 +2347,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "What happens next",
     description: "Checklist of concrete next actions with owners",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 6, fields: { "label": { kind: "text", chars: 60 }, "owner": { kind: "text", chars: 60 }, "when": { kind: "text", chars: 24 } } }, titleChars: 60, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          owner: { kind: "text", chars: 60 },
+          when: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 120,
+    },
     editableFields: ["title", "items[].label", "items[].owner", "items[].when"],
     lockedFields: ["footer", "logo", "checkStyle"],
   },
@@ -1536,7 +2370,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Decision ask",
     description: "Single clear ask with the specific decision being requested",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 100 }, "ask": { kind: "text", chars: 100 }, "rationale": { kind: "text", chars: 260 }, "decisionBy": { kind: "text", chars: 24 } }, titleChars: 100, bodyChars: 260 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 100 },
+        ask: { kind: "text", chars: 100 },
+        rationale: { kind: "text", chars: 260 },
+        decisionBy: { kind: "text", chars: 24 },
+      },
+      titleChars: 100,
+      bodyChars: 260,
+    },
     editableFields: ["kicker", "ask", "rationale", "decisionBy"],
     lockedFields: ["footer", "logo"],
   },
@@ -1546,7 +2389,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Book the kickoff",
     description: "Concrete kickoff date with a calendar-style anchor",
     permittedLayoutIds: ["LF-07"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "date": { kind: "text", chars: 24 }, "day": { kind: "text", chars: 24 }, "monthYear": { kind: "text", chars: 24 }, "body": { kind: "text", chars: 200 }, "owner": { kind: "text", chars: 60 } }, titleChars: 60, bodyChars: 200 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        date: { kind: "text", chars: 24 },
+        day: { kind: "text", chars: 24 },
+        monthYear: { kind: "text", chars: 24 },
+        body: { kind: "text", chars: 200 },
+        owner: { kind: "text", chars: 60 },
+      },
+      titleChars: 60,
+      bodyChars: 200,
+    },
     editableFields: ["title", "date", "day", "monthYear", "body", "owner"],
     lockedFields: ["footer", "logo"],
   },
@@ -1556,7 +2410,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Statement close",
     description: "Poster-scale sign-off statement on a solid brand field",
     permittedLayoutIds: ["LF-28"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 100 }, "statement": { kind: "text", chars: 100 }, "signoff": { kind: "text", chars: 100 } }, titleChars: 100, bodyChars: 120 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 100 },
+        statement: { kind: "text", chars: 100 },
+        signoff: { kind: "text", chars: 100 },
+      },
+      titleChars: 100,
+      bodyChars: 120,
+    },
     editableFields: ["kicker", "statement", "signoff"],
     lockedFields: ["footer", "logo", "brandBar"],
   },
@@ -1566,7 +2428,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Split — image + CTA",
     description: "Half-bleed image paired with a CTA panel and owner",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 220 }, "ctaLabel": { kind: "text", chars: 60 }, "ctaDetail": { kind: "text", chars: 60 }, "owner": { kind: "text", chars: 60 }, "mediaSeed": { kind: "image" } }, titleChars: 60, bodyChars: 220 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        body: { kind: "text", chars: 220 },
+        ctaLabel: { kind: "text", chars: 60 },
+        ctaDetail: { kind: "text", chars: 60 },
+        owner: { kind: "text", chars: 60 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 220,
+    },
     editableFields: ["title", "body", "ctaLabel", "ctaDetail", "owner", "mediaSeed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1576,7 +2449,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Two-path CTA",
     description: "Two commit paths side-by-side — e.g. pilot vs. full program",
     permittedLayoutIds: ["LF-04"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 2, max: 2, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 180 }, "ctaLabel": { kind: "text", chars: 60 }, "note": { kind: "text", chars: 180 } } }, titleChars: 60, bodyChars: 180 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 2,
+        max: 2,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          body: { kind: "text", chars: 180 },
+          ctaLabel: { kind: "text", chars: 60 },
+          note: { kind: "text", chars: 180 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 180,
+    },
     editableFields: ["title", "items[].label", "items[].body", "items[].ctaLabel", "items[].note"],
     lockedFields: ["footer", "logo"],
   },
@@ -1586,7 +2473,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Metric promise",
     description: "The number we're going after, framed as the commitment",
     permittedLayoutIds: ["LF-07"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 80 }, "metric": { kind: "text", chars: 80 }, "unit": { kind: "text", chars: 24 }, "promise": { kind: "text", chars: 80 }, "timeframe": { kind: "text", chars: 24 }, "owner": { kind: "text", chars: 80 } }, titleChars: 80, bodyChars: 200 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 80 },
+        metric: { kind: "text", chars: 80 },
+        unit: { kind: "text", chars: 24 },
+        promise: { kind: "text", chars: 80 },
+        timeframe: { kind: "text", chars: 24 },
+        owner: { kind: "text", chars: 80 },
+      },
+      titleChars: 80,
+      bodyChars: 200,
+    },
     editableFields: ["kicker", "metric", "unit", "promise", "timeframe", "owner"],
     lockedFields: ["footer", "logo"],
   },
@@ -1598,7 +2496,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — editorial",
     description: "Magazine-style cover with oversized type and a small photo tile",
     permittedLayoutIds: ["LF-25"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 80 }, "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "clientName": { kind: "text", chars: 80 }, "date": { kind: "text", chars: 24 }, "mediaSeed": { kind: "image" } }, titleChars: 80, bodyChars: 120 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 80 },
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        clientName: { kind: "text", chars: 80 },
+        date: { kind: "text", chars: 24 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 80,
+      bodyChars: 120,
+    },
     editableFields: ["kicker", "title", "subtitle", "clientName", "date", "mediaSeed"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -1608,7 +2517,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — split image",
     description: "50/50 split with hero image on one side, title on the other",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "title": { kind: "text", chars: 70 }, "subtitle": { kind: "text", chars: 70 }, "clientName": { kind: "text", chars: 70 }, "date": { kind: "text", chars: 24 }, "mediaSeed": { kind: "image" } }, titleChars: 70, bodyChars: 140 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 70 },
+        subtitle: { kind: "text", chars: 70 },
+        clientName: { kind: "text", chars: 70 },
+        date: { kind: "text", chars: 24 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 70,
+      bodyChars: 140,
+    },
     editableFields: ["title", "subtitle", "clientName", "date", "mediaSeed"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -1618,7 +2537,14 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — poster",
     description: "Poster-scale typography on a solid brand field",
     permittedLayoutIds: ["LF-28"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 40 }, "title": { kind: "text", chars: 40 }, "meta": { kind: "text", chars: 40 } }, titleChars: 40 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 40 },
+        title: { kind: "text", chars: 40 },
+        meta: { kind: "text", chars: 40 },
+      },
+      titleChars: 40,
+    },
     editableFields: ["kicker", "title", "meta"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -1628,7 +2554,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — media grid",
     description: "Four-tile media grid backdrop behind the title lockup",
     permittedLayoutIds: ["LF-10"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "date": { kind: "text", chars: 24 } }, items: { min: 4, max: 4, fields: { "seed": { kind: "image" } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        date: { kind: "text", chars: 24 },
+      },
+      items: { min: 4, max: 4, fields: { seed: { kind: "image" } } },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "subtitle", "date", "items[].seed"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -1638,7 +2573,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — dossier",
     description: "Confidential-dossier style cover with stamp and metadata",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "reference": { kind: "text", chars: 80 }, "title": { kind: "text", chars: 80 }, "clientName": { kind: "text", chars: 80 }, "prepared": { kind: "text", chars: 80 }, "date": { kind: "text", chars: 24 } }, titleChars: 80, bodyChars: 200 },
+    capacity: {
+      fields: {
+        reference: { kind: "text", chars: 80 },
+        title: { kind: "text", chars: 80 },
+        clientName: { kind: "text", chars: 80 },
+        prepared: { kind: "text", chars: 80 },
+        date: { kind: "text", chars: 24 },
+      },
+      titleChars: 80,
+      bodyChars: 200,
+    },
     editableFields: ["reference", "title", "clientName", "prepared", "date"],
     lockedFields: ["logo", "brandBar", "stamp"],
   },
@@ -1648,7 +2593,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — chromatic",
     description: "Soft chromatic gradient hero with restrained typography",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "clientName": { kind: "text", chars: 80 }, "date": { kind: "text", chars: 24 } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        clientName: { kind: "text", chars: 80 },
+        date: { kind: "text", chars: 24 },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "clientName", "date"],
     lockedFields: ["logo", "brandBar", "gradient"],
   },
@@ -1658,7 +2611,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — monogram",
     description: "Massive monogram / initials treatment as visual anchor",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "monogram": { kind: "icon" }, "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 }, "date": { kind: "text", chars: 24 } }, titleChars: 60 },
+    capacity: {
+      fields: {
+        monogram: { kind: "icon" },
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+        date: { kind: "text", chars: 24 },
+      },
+      titleChars: 60,
+    },
     editableFields: ["monogram", "title", "subtitle", "date"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -1668,7 +2629,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Cover — stacked",
     description: "Kicker + headline + framed portrait stacked vertically",
     permittedLayoutIds: ["LF-25"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 80 }, "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "date": { kind: "text", chars: 24 }, "mediaSeed": { kind: "image" } }, titleChars: 80, bodyChars: 140 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 80 },
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        date: { kind: "text", chars: 24 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 80,
+      bodyChars: 140,
+    },
     editableFields: ["kicker", "title", "subtitle", "date", "mediaSeed"],
     lockedFields: ["logo", "brandBar"],
   },
@@ -1680,7 +2651,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Full-bleed image",
     description: "Edge-to-edge hero visual with overlay title",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 80 }, "title": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 180 }, "mediaSeed": { kind: "image" } }, titleChars: 80, bodyChars: 180 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 80 },
+        title: { kind: "text", chars: 80 },
+        body: { kind: "text", chars: 180 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 80,
+      bodyChars: 180,
+    },
     editableFields: ["kicker", "title", "body", "mediaSeed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1690,7 +2670,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Split — media + copy",
     description: "50/50 media panel with narrative alongside",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 320 }, "caption": { kind: "text", chars: 60 }, "mediaSeed": { kind: "image" } }, titleChars: 60, bodyChars: 320 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        body: { kind: "text", chars: 320 },
+        caption: { kind: "text", chars: 60 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 320,
+    },
     editableFields: ["title", "body", "caption", "mediaSeed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1700,7 +2689,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Framed image + caption",
     description: "Centered framed image with a short caption below",
     permittedLayoutIds: ["LF-29"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "caption": { kind: "text", chars: 60 }, "credit": { kind: "text", chars: 24 }, "mediaSeed": { kind: "image" } }, titleChars: 60, bodyChars: 200 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        caption: { kind: "text", chars: 60 },
+        credit: { kind: "text", chars: 24 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 200,
+    },
     editableFields: ["title", "caption", "credit", "mediaSeed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1710,7 +2708,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Laptop screen showcase",
     description: "Laptop mockup with the product screen alongside supporting copy",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "eyebrow": { kind: "text", chars: 28 }, "title": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 280 }, "caption": { kind: "text", chars: 60 }, "mediaSeed": { kind: "image" } }, titleChars: 60, bodyChars: 280 },
+    capacity: {
+      fields: {
+        eyebrow: { kind: "text", chars: 28 },
+        title: { kind: "text", chars: 60 },
+        body: { kind: "text", chars: 280 },
+        caption: { kind: "text", chars: 60 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 280,
+    },
     editableFields: ["eyebrow", "title", "body", "caption", "mediaSeed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1720,7 +2728,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Desktop monitor showcase",
     description: "Centered desktop monitor mockup with headline above and caption below",
     permittedLayoutIds: ["LF-29"],
-    capacity: { fields: { "eyebrow": { kind: "text", chars: 28 }, "title": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 200 }, "caption": { kind: "text", chars: 60 }, "mediaSeed": { kind: "image" } }, titleChars: 60, bodyChars: 200 },
+    capacity: {
+      fields: {
+        eyebrow: { kind: "text", chars: 28 },
+        title: { kind: "text", chars: 60 },
+        body: { kind: "text", chars: 200 },
+        caption: { kind: "text", chars: 60 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 200,
+    },
     editableFields: ["eyebrow", "title", "body", "caption", "mediaSeed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1730,7 +2748,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Media trio",
     description: "Three media tiles side-by-side with captions",
     permittedLayoutIds: ["LF-26"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "caption": { kind: "text", chars: 60 }, "label": { kind: "text", chars: 60 }, "seed": { kind: "image" } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          caption: { kind: "text", chars: 60 },
+          label: { kind: "text", chars: 60 },
+          seed: { kind: "image" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "items[].caption", "items[].label", "items[].seed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1740,7 +2771,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Media grid — six",
     description: "3×2 gallery of media tiles for portfolio / product proof",
     permittedLayoutIds: ["LF-26"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 6, max: 6, fields: { "caption": { kind: "text", chars: 60 }, "seed": { kind: "image" } } }, titleChars: 60, bodyChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 6,
+        max: 6,
+        fields: { caption: { kind: "text", chars: 60 }, seed: { kind: "image" } },
+      },
+      titleChars: 60,
+      bodyChars: 80,
+    },
     editableFields: ["title", "items[].caption", "items[].seed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1750,7 +2790,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Portrait feature",
     description: "Full-height portrait with narrative panel — for spokesperson / leader",
     permittedLayoutIds: ["LF-27"],
-    capacity: { fields: { "name": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "quote": { kind: "text", chars: 320 }, "narrative": { kind: "text", chars: 320 }, "mediaSeed": { kind: "image" } }, titleChars: 60, bodyChars: 320 },
+    capacity: {
+      fields: {
+        name: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+        quote: { kind: "text", chars: 320 },
+        narrative: { kind: "text", chars: 320 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 320,
+    },
     editableFields: ["name", "role", "quote", "narrative", "mediaSeed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1760,7 +2810,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Quote over image",
     description: "Photographic backdrop with a pull-quote and attribution",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "quote": { kind: "text", chars: 220 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "mediaSeed": { kind: "image" } }, bodyChars: 220 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 220 },
+        attribution: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+        mediaSeed: { kind: "image" },
+      },
+      bodyChars: 220,
+    },
     editableFields: ["quote", "attribution", "role", "mediaSeed"],
     lockedFields: ["footer", "logo", "overlay"],
   },
@@ -1770,7 +2828,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Before / after — visual",
     description: "Two media panels showing the state change",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "before.label": { kind: "text", chars: 60 }, "before.body": { kind: "text", chars: 140 }, "before.seed": { kind: "image" }, "after.label": { kind: "text", chars: 60 }, "after.body": { kind: "text", chars: 140 }, "after.seed": { kind: "image" } }, titleChars: 60, bodyChars: 140 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        "before.label": { kind: "text", chars: 60 },
+        "before.body": { kind: "text", chars: 140 },
+        "before.seed": { kind: "image" },
+        "after.label": { kind: "text", chars: 60 },
+        "after.body": { kind: "text", chars: 140 },
+        "after.seed": { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 140,
+    },
     editableFields: [
       "title",
       "before.label",
@@ -1788,7 +2858,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Image + stat callout",
     description: "Full-height image beside an oversized proof stat",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "stat": { kind: "text", chars: 60 }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 }, "narrative": { kind: "text", chars: 200 }, "mediaSeed": { kind: "image" } }, titleChars: 60, bodyChars: 200 },
+    capacity: {
+      fields: {
+        stat: { kind: "text", chars: 60 },
+        unit: { kind: "text", chars: 24 },
+        label: { kind: "text", chars: 60 },
+        narrative: { kind: "text", chars: 200 },
+        mediaSeed: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 200,
+    },
     editableFields: ["stat", "unit", "label", "narrative", "mediaSeed"],
     lockedFields: ["footer", "logo", "source"],
   },
@@ -1798,7 +2878,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Filmstrip",
     description: "Horizontal filmstrip of five media frames",
     permittedLayoutIds: ["LF-30"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 5, max: 5, fields: { "caption": { kind: "text", chars: 60 }, "seed": { kind: "image" } } }, titleChars: 60 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 5,
+        max: 5,
+        fields: { caption: { kind: "text", chars: 60 }, seed: { kind: "image" } },
+      },
+      titleChars: 60,
+    },
     editableFields: ["title", "items[].caption", "items[].seed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1810,7 +2898,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Quote wall — three voices",
     description: "Three short pull-quotes stacked as a chorus of client voices",
     permittedLayoutIds: ["LF-38"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "quote": { kind: "text", chars: 180 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 } } }, titleChars: 60, bodyChars: 180 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          quote: { kind: "text", chars: 180 },
+          attribution: { kind: "text", chars: 60 },
+          role: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 180,
+    },
     editableFields: ["title", "items[].quote", "items[].attribution", "items[].role"],
     lockedFields: ["footer", "logo", "quoteMark"],
   },
@@ -1820,7 +2921,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Quote — portrait",
     description: "Full-height portrait beside an oversized pull-quote",
     permittedLayoutIds: ["LF-27"],
-    capacity: { fields: { "quote": { kind: "text", chars: 260 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "org": { kind: "text", chars: 60 }, "mediaSeed": { kind: "image" } }, bodyChars: 260 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 260 },
+        attribution: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+        org: { kind: "text", chars: 60 },
+        mediaSeed: { kind: "image" },
+      },
+      bodyChars: 260,
+    },
     editableFields: ["quote", "attribution", "role", "org", "mediaSeed"],
     lockedFields: ["footer", "logo", "quoteMark", "clientLogo"],
   },
@@ -1830,7 +2940,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Quote — framed card",
     description: "Centered framed quote card with brand bar and attribution",
     permittedLayoutIds: ["LF-20"],
-    capacity: { fields: { "quote": { kind: "text", chars: 240 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "org": { kind: "text", chars: 60 } }, bodyChars: 240 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 240 },
+        attribution: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+        org: { kind: "text", chars: 60 },
+      },
+      bodyChars: 240,
+    },
     editableFields: ["quote", "attribution", "role", "org"],
     lockedFields: ["footer", "logo", "quoteMark", "clientLogo"],
   },
@@ -1840,7 +2958,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Quote + proof metric",
     description: "Pull-quote paired with a headline proof metric",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "quote": { kind: "text", chars: 240 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 }, "metric": { kind: "text", chars: 60 }, "unit": { kind: "text", chars: 24 }, "metricLabel": { kind: "text", chars: 60 } }, bodyChars: 240 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 240 },
+        attribution: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+        metric: { kind: "text", chars: 60 },
+        unit: { kind: "text", chars: 24 },
+        metricLabel: { kind: "text", chars: 60 },
+      },
+      bodyChars: 240,
+    },
     editableFields: ["quote", "attribution", "role", "metric", "unit", "metricLabel"],
     lockedFields: ["footer", "logo", "quoteMark", "source"],
   },
@@ -1850,7 +2978,14 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Quote — poster",
     description: "Poster-scale quote on a solid brand field",
     permittedLayoutIds: ["LF-28"],
-    capacity: { fields: { "quote": { kind: "text", chars: 160 }, "attribution": { kind: "text", chars: 60 }, "role": { kind: "text", chars: 24 } }, bodyChars: 160 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 160 },
+        attribution: { kind: "text", chars: 60 },
+        role: { kind: "text", chars: 24 },
+      },
+      bodyChars: 160,
+    },
     editableFields: ["quote", "attribution", "role"],
     lockedFields: ["footer", "logo", "brandBar"],
   },
@@ -1862,7 +2997,25 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Donut infographic",
     description: "Donut chart with center callout and a segmented legend",
     permittedLayoutIds: ["LF-31"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "centerValue": { kind: "number" }, "centerUnit": { kind: "text", chars: 24 }, "centerLabel": { kind: "text", chars: 60 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 60 }, "value": { kind: "number" }, "note": { kind: "text", chars: 160 } } }, titleChars: 60, bodyChars: 160 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 60 },
+        centerValue: { kind: "number" },
+        centerUnit: { kind: "text", chars: 24 },
+        centerLabel: { kind: "text", chars: 60 },
+      },
+      items: {
+        min: 3,
+        max: 5,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          value: { kind: "number" },
+          note: { kind: "text", chars: 160 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 160,
+    },
     editableFields: [
       "title",
       "centerValue",
@@ -1880,7 +3033,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Funnel infographic",
     description: "Vertical funnel showing stage-to-stage conversion",
     permittedLayoutIds: ["LF-32"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 60 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "note": { kind: "text", chars: 140 } } }, titleChars: 60, bodyChars: 140 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          note: { kind: "text", chars: 140 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 140,
+    },
     editableFields: ["title", "items[].label", "items[].value", "items[].unit", "items[].note"],
     lockedFields: ["footer", "logo", "source"],
   },
@@ -1890,7 +3057,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Bar comparison",
     description: "Horizontal bar comparison across items or options",
     permittedLayoutIds: ["LF-33"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "unit": { kind: "text", chars: 24 } }, items: { min: 3, max: 6, fields: { "label": { kind: "text", chars: 60 }, "value": { kind: "number" }, "note": { kind: "text", chars: 120 } } }, titleChars: 60, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 }, unit: { kind: "text", chars: 24 } },
+      items: {
+        min: 3,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          value: { kind: "number" },
+          note: { kind: "text", chars: 120 },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 120,
+    },
     editableFields: ["title", "unit", "items[].label", "items[].value", "items[].note"],
     lockedFields: ["footer", "logo", "source"],
   },
@@ -1900,7 +3080,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Circular flow",
     description: "Cyclical process with 4 steps around a central hub",
     permittedLayoutIds: ["LF-34"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "hub": { kind: "list" } }, items: { min: 4, max: 6, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 100 } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 }, hub: { kind: "list" } },
+      items: {
+        min: 4,
+        max: 6,
+        fields: { label: { kind: "text", chars: 60 }, body: { kind: "text", chars: 100 } },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "hub", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -1910,7 +3099,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Pyramid",
     description: "Stacked tiers from foundation to peak",
     permittedLayoutIds: ["LF-35"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 120 } } }, titleChars: 60, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: { label: { kind: "text", chars: 60 }, body: { kind: "text", chars: 120 } },
+      },
+      titleChars: 60,
+      bodyChars: 120,
+    },
     editableFields: ["title", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -1920,7 +3118,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Venn — three sets",
     description: "Three overlapping sets with a named intersection",
     permittedLayoutIds: ["LF-36"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 }, "intersection": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 100 } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 }, intersection: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: { label: { kind: "text", chars: 60 }, body: { kind: "text", chars: 100 } },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "intersection", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -1932,7 +3139,27 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client outcome matrix",
     description: "Grid of client cards — logo, one-line result, headline metric",
     permittedLayoutIds: ["LF-39"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 4, max: 6, fields: { "client": { kind: "text", chars: 60 }, "sector": { kind: "text", chars: 24 }, "result": { kind: "text", chars: 100 }, "metric": { kind: "text", chars: 60 }, "unit": { kind: "text", chars: 24 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 6,
+        fields: {
+          client: { kind: "text", chars: 60 },
+          sector: { kind: "text", chars: 24 },
+          result: { kind: "text", chars: 100 },
+          metric: { kind: "text", chars: 60 },
+          unit: { kind: "text", chars: 24 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: [
       "title",
       "items[].client",
@@ -1954,7 +3181,27 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client detail cards",
     description: "Three client cards with portrait, logo, and short story",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "client": { kind: "text", chars: 60 }, "sector": { kind: "text", chars: 24 }, "story": { kind: "text", chars: 200 }, "metric": { kind: "text", chars: 60 }, "seed": { kind: "image" }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60, bodyChars: 200 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          client: { kind: "text", chars: 60 },
+          sector: { kind: "text", chars: 24 },
+          story: { kind: "text", chars: 200 },
+          metric: { kind: "text", chars: 60 },
+          seed: { kind: "image" },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 200,
+    },
     editableFields: [
       "title",
       "items[].client",
@@ -1976,7 +3223,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Media matrix — four",
     description: "2×2 matrix pairing an image with a short label + body",
     permittedLayoutIds: ["LF-37"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 4, max: 4, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 120 }, "seed": { kind: "image" } } }, titleChars: 60, bodyChars: 120 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 4,
+        max: 4,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          body: { kind: "text", chars: 120 },
+          seed: { kind: "image" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 120,
+    },
     editableFields: ["title", "items[].label", "items[].body", "items[].seed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1986,7 +3246,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Media matrix — six",
     description: "3×2 matrix pairing images with labels + body copy",
     permittedLayoutIds: ["LF-37"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 6, max: 6, fields: { "label": { kind: "text", chars: 60 }, "body": { kind: "text", chars: 100 }, "seed": { kind: "image" } } }, titleChars: 60, bodyChars: 100 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 6,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 60 },
+          body: { kind: "text", chars: 100 },
+          seed: { kind: "image" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 100,
+    },
     editableFields: ["title", "items[].label", "items[].body", "items[].seed"],
     lockedFields: ["footer", "logo"],
   },
@@ -1996,7 +3269,26 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Client comparison strip",
     description: "Vertical strip comparing three client engagements side-by-side",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 60 } }, items: { min: 3, max: 3, fields: { "client": { kind: "text", chars: 60 }, "challenge": { kind: "text", chars: 160 }, "outcome": { kind: "text", chars: 160 }, "metric": { kind: "text", chars: 60 }, "logoUrl": { kind: "logo" }, "logoPath": { kind: "logo" }, "logoVariant": { kind: "logo" }, "logoVariants": { kind: "logo" }, "logoPaths": { kind: "logo" } } }, titleChars: 60, bodyChars: 160 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 60 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          client: { kind: "text", chars: 60 },
+          challenge: { kind: "text", chars: 160 },
+          outcome: { kind: "text", chars: 160 },
+          metric: { kind: "text", chars: 60 },
+          logoUrl: { kind: "logo" },
+          logoPath: { kind: "logo" },
+          logoVariant: { kind: "logo" },
+          logoVariants: { kind: "logo" },
+          logoPaths: { kind: "logo" },
+        },
+      },
+      titleChars: 60,
+      bodyChars: 160,
+    },
     editableFields: [
       "title",
       "items[].client",
@@ -2020,7 +3312,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Asymmetric bento grid: one anchor feature + four supporting cells (title, body, stat, media)",
     permittedLayoutIds: ["LF-09", "LF-12"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 5, max: 5, fields: { "kind": { kind: "text", chars: 24 }, "title": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 200 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "mediaSeed": { kind: "image" } } }, titleChars: 80, bodyChars: 200 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 5,
+        max: 5,
+        fields: {
+          kind: { kind: "text", chars: 24 },
+          title: { kind: "text", chars: 80 },
+          body: { kind: "text", chars: 200 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          mediaSeed: { kind: "image" },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 200,
+    },
     editableFields: [
       "title",
       "items[].kind",
@@ -2040,7 +3349,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Six-cell bento mosaic: anchor feature plus five supporting cells (title, body, stat, media)",
     permittedLayoutIds: ["LF-09", "LF-12"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 6, max: 6, fields: { "kind": { kind: "text", chars: 24 }, "title": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 180 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "mediaSeed": { kind: "image" } } }, titleChars: 80, bodyChars: 180 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 6,
+        max: 6,
+        fields: {
+          kind: { kind: "text", chars: 24 },
+          title: { kind: "text", chars: 80 },
+          body: { kind: "text", chars: 180 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          mediaSeed: { kind: "image" },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 180,
+    },
     editableFields: [
       "title",
       "items[].kind",
@@ -2060,7 +3386,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Seven-cell bento mosaic: anchor feature, a row of compact proof cells and two wide cells",
     permittedLayoutIds: ["LF-09", "LF-12"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 7, max: 7, fields: { "kind": { kind: "text", chars: 24 }, "title": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 160 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "mediaSeed": { kind: "image" } } }, titleChars: 80, bodyChars: 160 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 7,
+        max: 7,
+        fields: {
+          kind: { kind: "text", chars: 24 },
+          title: { kind: "text", chars: 80 },
+          body: { kind: "text", chars: 160 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          mediaSeed: { kind: "image" },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 160,
+    },
     editableFields: [
       "title",
       "items[].kind",
@@ -2080,7 +3423,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Eight-cell bento mosaic across three rows: anchor feature plus seven supporting cells",
     permittedLayoutIds: ["LF-09", "LF-12"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 8, max: 8, fields: { "kind": { kind: "text", chars: 24 }, "title": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 140 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "mediaSeed": { kind: "image" } } }, titleChars: 80, bodyChars: 140 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 8,
+        max: 8,
+        fields: {
+          kind: { kind: "text", chars: 24 },
+          title: { kind: "text", chars: 80 },
+          body: { kind: "text", chars: 140 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          mediaSeed: { kind: "image" },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 140,
+    },
     editableFields: [
       "title",
       "items[].kind",
@@ -2100,7 +3460,30 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Closing argument in one bento: promise band, up to six icon value cells, and a two-clause close band with the CTA",
     permittedLayoutIds: ["LF-09", "LF-12"],
-    capacity: { fields: { "title": { kind: "text", chars: 70 }, "subtitle": { kind: "text", chars: 70 }, "itemsLabel": { kind: "text", chars: 70 }, "promise.lead": { kind: "text", chars: 70 }, "promise.emphasis": { kind: "text", chars: 70 }, "close.lead": { kind: "text", chars: 70 }, "close.emphasis": { kind: "text", chars: 70 }, "close.ctaTitle": { kind: "text", chars: 70 }, "close.ctaBody": { kind: "text", chars: 140 } }, items: { min: 4, max: 6, fields: { "icon": { kind: "icon" }, "title": { kind: "text", chars: 70 }, "body": { kind: "text", chars: 140 } } }, titleChars: 70, bodyChars: 140 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 70 },
+        subtitle: { kind: "text", chars: 70 },
+        itemsLabel: { kind: "text", chars: 70 },
+        "promise.lead": { kind: "text", chars: 70 },
+        "promise.emphasis": { kind: "text", chars: 70 },
+        "close.lead": { kind: "text", chars: 70 },
+        "close.emphasis": { kind: "text", chars: 70 },
+        "close.ctaTitle": { kind: "text", chars: 70 },
+        "close.ctaBody": { kind: "text", chars: 140 },
+      },
+      items: {
+        min: 4,
+        max: 6,
+        fields: {
+          icon: { kind: "icon" },
+          title: { kind: "text", chars: 70 },
+          body: { kind: "text", chars: 140 },
+        },
+      },
+      titleChars: 70,
+      bodyChars: 140,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -2118,8 +3501,6 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
 
-
-
   // ── MV-VIZ-* · Spec-driven ECharts family (Phase 1 infographic engine) ──
   {
     id: "MV-VIZ-SANKEY",
@@ -2128,7 +3509,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Weighted flow diagram from source to target nodes. Ideal for revenue splits, funnel drop-off, workload allocation.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 40, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 40, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2139,7 +3530,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Circular relationship diagram: bilateral links between entities weighted by volume or affinity.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 30, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 30, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2150,7 +3550,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Non-overlapping dot distribution across one or more categories. Good for benchmarks and score comparisons.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 5, max: 400, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 5, max: 400, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2161,7 +3570,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Rank-over-time chart: shows position changes across periods for a small set of competing entities.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 60, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 60, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2172,7 +3590,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Two-axis bubble plot with size + optional category. For competitive maps, portfolio review, opportunity vs. effort.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 4, max: 80, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 4, max: 80, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2183,7 +3610,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Nested rectangles sized by value with optional category grouping. For portfolio share and revenue mix.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 40, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 40, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2194,7 +3630,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Daily-value heatmap over a calendar year. Great for activity, incidents, engagement cadence.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 30, max: 366, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 30, max: 366, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2205,7 +3650,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Running-total bars showing what adds and what takes away between two states. For cost builds, margin bridges, headcount.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 20, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 20, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2216,7 +3671,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Multi-axis profile comparing two or three programmes across the same criteria. For maturity and readiness reviews.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 6, max: 30, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 6, max: 30, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2227,7 +3692,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Volume composition across periods, stacked by channel or segment. For mix shift and growth-by-source.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 6, max: 60, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 6, max: 60, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2238,7 +3713,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Paired dots with a connecting gap per row. The cleanest way to show change without two bar charts.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 20, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 20, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2249,7 +3734,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Rounded progress arcs, one per initiative. For rollout status and completion scoreboards.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 6, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 6, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2260,7 +3755,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Two-level hierarchy of share: business unit outward to content type. For portfolio and inventory splits.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 30, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 30, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2271,7 +3776,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Schedule bars per workstream across a numeric timeline, coloured by track. For implementation plans.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 20, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 20, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2282,7 +3797,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Connected two-point lines comparing every metric between two periods. Ranks winners and losers at a glance.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 12, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 12, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2293,7 +3818,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Up to four brand-inked dials with value and label. For SLA and health scorecards.",
     permittedLayoutIds: ["LF-11", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 2, max: 4, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 2, max: 4, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2304,7 +3839,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Min / quartile / median spread per category. For turnaround variance and benchmark ranges.",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "encoding": { kind: "text", chars: 24 }, "source": { kind: "text", chars: 80 } }, items: { path: "rows", min: 3, max: 16, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        encoding: { kind: "text", chars: 24 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: { path: "rows", min: 3, max: 16, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "subtitle", "rows", "encoding", "source"],
     lockedFields: ["footer", "logo"],
   },
@@ -2315,7 +3860,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "6–8 compact KPIs in a baseline-aligned grid with hairline rules, tiny trend arrows and deltas",
     permittedLayoutIds: ["LF-11", "LF-10"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 6, max: 8, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "delta": { kind: "number" }, "trend": { kind: "text", chars: 24 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 6,
+        max: 8,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          delta: { kind: "number" },
+          trend: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "items[].value",
@@ -2333,7 +3892,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Horizontal quarterly roadmap: Q1–Q4 columns with workstream bars spanning quarters",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "quarters": { kind: "list" } }, items: { min: 3, max: 6, fields: { "label": { kind: "text", chars: 80 }, "start": { kind: "number" }, "end": { kind: "number" }, "note": { kind: "text", chars: 200 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, quarters: { kind: "list" } },
+      items: {
+        min: 3,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          start: { kind: "number" },
+          end: { kind: "number" },
+          note: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "quarters",
@@ -2350,7 +3922,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Funnel — vertical",
     description: "Vertical funnel of 4–5 stages, progressively narrower bands with tabular values",
     permittedLayoutIds: ["LF-32"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "note": { kind: "text", chars: 200 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          note: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].label", "items[].value", "items[].unit", "items[].note"],
     lockedFields: ["footer", "logo"],
   },
@@ -2361,7 +3946,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Circular flywheel: 4–6 nodes on a thin track with a centre label and momentum arrows",
     permittedLayoutIds: ["LF-34"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "hub": { kind: "list" } }, items: { min: 4, max: 6, fields: { "label": { kind: "text", chars: 80 }, "note": { kind: "text", chars: 200 }, "icon": { kind: "icon" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, hub: { kind: "list" } },
+      items: {
+        min: 4,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          note: { kind: "text", chars: 200 },
+          icon: { kind: "icon" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "hub", "items[].label", "items[].note", "items[].icon"],
     lockedFields: ["footer", "logo"],
   },
@@ -2372,7 +3969,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Ascending SVG curve with 4 milestone dots from Today to Target, current position marked",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 80 }, "note": { kind: "text", chars: 200 }, "current": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          note: { kind: "text", chars: 200 },
+          current: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].label", "items[].note", "items[].current"],
     lockedFields: ["footer", "logo"],
   },
@@ -2383,7 +3992,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Horizontal customer journey: 5 phases with touchpoints and an emotion/effort polyline",
     permittedLayoutIds: ["LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 4, max: 5, fields: { "phase": { kind: "text", chars: 24 }, "touchpoint": { kind: "text", chars: 80 }, "sentiment": { kind: "text", chars: 24 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 4,
+        max: 5,
+        fields: {
+          phase: { kind: "text", chars: 24 },
+          touchpoint: { kind: "text", chars: 80 },
+          sentiment: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].phase", "items[].touchpoint", "items[].sentiment"],
     lockedFields: ["footer", "logo"],
   },
@@ -2393,7 +4014,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Logo wall",
     description: "Client logo wall — grid of 8–12 monochrome initials/wordmarks in hairline cells",
     permittedLayoutIds: ["LF-19"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 6, max: 12, fields: { "name": { kind: "text", chars: 80 }, "logoUrl": { kind: "logo" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 6,
+        max: 12,
+        fields: { name: { kind: "text", chars: 80 }, logoUrl: { kind: "logo" } },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].name", "items[].logoUrl"],
     lockedFields: ["footer", "logo"],
   },
@@ -2403,7 +4032,25 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Strategy 2×2 matrix",
     description: "2×2 quadrant with axis labels, plotted items and one target quadrant tinted",
     permittedLayoutIds: ["LF-16"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "axisX": { kind: "text", chars: 24 }, "axisY": { kind: "text", chars: 24 }, "quadrants": { kind: "list" }, "target": { kind: "list" } }, items: { min: 3, max: 8, fields: { "label": { kind: "text", chars: 80 }, "x": { kind: "number" }, "y": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        axisX: { kind: "text", chars: 24 },
+        axisY: { kind: "text", chars: 24 },
+        quadrants: { kind: "list" },
+        target: { kind: "list" },
+      },
+      items: {
+        min: 3,
+        max: 8,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          x: { kind: "number" },
+          y: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "axisX",
@@ -2423,7 +4070,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Above-and-below-waterline metaphor: visible items above a hairline waterline, hidden items below",
     permittedLayoutIds: ["LF-22"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "waterline": { kind: "number" }, "below[].label": { kind: "text", chars: 80 }, "below[].body": { kind: "text", chars: 200 } }, items: { path: "above", min: 4, max: 6, fields: { "label": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 200 } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        waterline: { kind: "number" },
+        "below[].label": { kind: "text", chars: 80 },
+        "below[].body": { kind: "text", chars: 200 },
+      },
+      items: {
+        path: "above",
+        min: 4,
+        max: 6,
+        fields: { label: { kind: "text", chars: 80 }, body: { kind: "text", chars: 200 } },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "waterline",
@@ -2443,7 +4104,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Magazine spread — oversized left-column pull-stat or drop-cap, two body columns with hairline column rule, folio meta",
     permittedLayoutIds: ["LF-25"],
-    capacity: { fields: { "title": { kind: "text", chars: 90 }, "kicker": { kind: "text", chars: 90 }, "pullValue": { kind: "number" }, "pullUnit": { kind: "text", chars: 24 }, "pullLabel": { kind: "text", chars: 90 }, "bodyLeft": { kind: "text", chars: 900 }, "bodyRight": { kind: "text", chars: 900 }, "folio": { kind: "text", chars: 24 } }, titleChars: 90, bodyChars: 900 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 90 },
+        kicker: { kind: "text", chars: 90 },
+        pullValue: { kind: "number" },
+        pullUnit: { kind: "text", chars: 24 },
+        pullLabel: { kind: "text", chars: 90 },
+        bodyLeft: { kind: "text", chars: 900 },
+        bodyRight: { kind: "text", chars: 900 },
+        folio: { kind: "text", chars: 24 },
+      },
+      titleChars: 90,
+      bodyChars: 900,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -2463,7 +4137,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Asymmetric split — left dark manifesto panel, right light with 3 hairline-topped proof points",
     permittedLayoutIds: ["LF-15", "LF-03"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 120 }, "statement": { kind: "text", chars: 120 }, "signoff": { kind: "text", chars: 120 } }, items: { min: 3, max: 3, fields: { "title": { kind: "text", chars: 120 }, "body": { kind: "text", chars: 200 } } }, titleChars: 120 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 120 },
+        statement: { kind: "text", chars: 120 },
+        signoff: { kind: "text", chars: 120 },
+      },
+      items: {
+        min: 3,
+        max: 3,
+        fields: { title: { kind: "text", chars: 120 }, body: { kind: "text", chars: 200 } },
+      },
+      titleChars: 120,
+    },
     editableFields: ["kicker", "statement", "signoff", "items[].title", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2474,7 +4160,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Three monumental stats side-by-side with full-height hairline dividers and short context lines",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 90 } }, items: { min: 3, max: 3, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 90 }, "note": { kind: "text", chars: 200 }, "source": { kind: "text", chars: 90 } } }, titleChars: 90 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 90 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 90 },
+          note: { kind: "text", chars: 200 },
+          source: { kind: "text", chars: 90 },
+        },
+      },
+      titleChars: 90,
+    },
     editableFields: [
       "title",
       "items[].value",
@@ -2492,7 +4192,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Vertical milestone timeline with an accent spine, tabular date, dot nodes, label + short body per entry",
     permittedLayoutIds: ["LF-13", "LF-14"],
-    capacity: { fields: { "title": { kind: "text", chars: 90 } }, items: { min: 4, max: 6, fields: { "date": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 90 }, "body": { kind: "text", chars: 200 } } }, titleChars: 90 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 90 } },
+      items: {
+        min: 4,
+        max: 6,
+        fields: {
+          date: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 90 },
+          body: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 90,
+    },
     editableFields: ["title", "items[].date", "items[].label", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2503,7 +4215,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Two head-to-head label lists with accent seam heads, hairline rows and a centre VS disc, closed by a summary band",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 90 }, "subtitle": { kind: "text", chars: 90 }, "left.label": { kind: "text", chars: 90 }, "right.label": { kind: "text", chars: 90 }, "right.items[].label": { kind: "text", chars: 90 }, "summary.lead": { kind: "text", chars: 90 }, "summary.emphasis": { kind: "text", chars: 90 } }, items: { path: "left.items", min: 3, max: 8, fields: { "label": { kind: "text", chars: 90 } } }, titleChars: 90 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 90 },
+        subtitle: { kind: "text", chars: 90 },
+        "left.label": { kind: "text", chars: 90 },
+        "right.label": { kind: "text", chars: 90 },
+        "right.items[].label": { kind: "text", chars: 90 },
+        "summary.lead": { kind: "text", chars: 90 },
+        "summary.emphasis": { kind: "text", chars: 90 },
+      },
+      items: { path: "left.items", min: 3, max: 8, fields: { label: { kind: "text", chars: 90 } } },
+      titleChars: 90,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -2523,7 +4247,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Before/after with strong vertical accent divider + arrow, matched StatFigures, after side visually elevated",
     permittedLayoutIds: ["LF-15"],
-    capacity: { fields: { "title": { kind: "text", chars: 90 }, "before.label": { kind: "text", chars: 90 }, "before.value": { kind: "number" }, "before.unit": { kind: "text", chars: 24 }, "before.body": { kind: "text", chars: 200 }, "after.label": { kind: "text", chars: 90 }, "after.value": { kind: "number" }, "after.unit": { kind: "text", chars: 24 }, "after.body": { kind: "text", chars: 200 } }, titleChars: 90 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 90 },
+        "before.label": { kind: "text", chars: 90 },
+        "before.value": { kind: "number" },
+        "before.unit": { kind: "text", chars: 24 },
+        "before.body": { kind: "text", chars: 200 },
+        "after.label": { kind: "text", chars: 90 },
+        "after.value": { kind: "number" },
+        "after.unit": { kind: "text", chars: 24 },
+        "after.body": { kind: "text", chars: 200 },
+      },
+      titleChars: 90,
+    },
     editableFields: [
       "title",
       "before.label",
@@ -2544,7 +4281,25 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Dominant hero quote with quote-mark treatment plus two smaller supporting quotes in a hairline row",
     permittedLayoutIds: ["LF-20", "LF-38"],
-    capacity: { fields: { "hero.quote": { kind: "text", chars: 200 }, "hero.name": { kind: "text", chars: 240 }, "hero.role": { kind: "text", chars: 24 }, "hero.org": { kind: "text", chars: 240 } }, items: { min: 2, max: 2, fields: { "quote": { kind: "text", chars: 200 }, "name": { kind: "text", chars: 240 }, "role": { kind: "text", chars: 24 }, "org": { kind: "text", chars: 240 } } }, titleChars: 240 },
+    capacity: {
+      fields: {
+        "hero.quote": { kind: "text", chars: 200 },
+        "hero.name": { kind: "text", chars: 240 },
+        "hero.role": { kind: "text", chars: 24 },
+        "hero.org": { kind: "text", chars: 240 },
+      },
+      items: {
+        min: 2,
+        max: 2,
+        fields: {
+          quote: { kind: "text", chars: 200 },
+          name: { kind: "text", chars: 240 },
+          role: { kind: "text", chars: 24 },
+          org: { kind: "text", chars: 240 },
+        },
+      },
+      titleChars: 240,
+    },
     editableFields: [
       "hero.quote",
       "hero.name",
@@ -2564,7 +4319,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Dictionary-style term, pronunciation meta, italic part-of-speech, large definition and italic usage example",
     permittedLayoutIds: ["LF-01", "LF-02"],
-    capacity: { fields: { "term": { kind: "text", chars: 60 }, "pronunciation": { kind: "text", chars: 24 }, "partOfSpeech": { kind: "text", chars: 24 }, "definition": { kind: "text", chars: 400 }, "usage": { kind: "text", chars: 400 } }, titleChars: 60, bodyChars: 400 },
+    capacity: {
+      fields: {
+        term: { kind: "text", chars: 60 },
+        pronunciation: { kind: "text", chars: 24 },
+        partOfSpeech: { kind: "text", chars: 24 },
+        definition: { kind: "text", chars: 400 },
+        usage: { kind: "text", chars: 400 },
+      },
+      titleChars: 60,
+      bodyChars: 400,
+    },
     editableFields: ["term", "pronunciation", "partOfSpeech", "definition", "usage"],
     lockedFields: ["footer", "logo"],
   },
@@ -2575,7 +4340,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "3–5 numbered principles with oversized accent ordinals, bold statement, one-line supporting text, hairline dividers",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 90 } }, items: { min: 3, max: 5, fields: { "statement": { kind: "text", chars: 90 }, "body": { kind: "text", chars: 200 } } }, titleChars: 90 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 90 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: { statement: { kind: "text", chars: 90 }, body: { kind: "text", chars: 200 } },
+      },
+      titleChars: 90,
+    },
     editableFields: ["title", "items[].statement", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2586,7 +4359,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Three full-width rows with monumental accent numerals and big statements, hairline dividers",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 90 }, "title": { kind: "text", chars: 90 } }, items: { min: 3, max: 3, fields: { "statement": { kind: "text", chars: 90 }, "body": { kind: "text", chars: 200 } } }, titleChars: 90 },
+    capacity: {
+      fields: { kicker: { kind: "text", chars: 90 }, title: { kind: "text", chars: 90 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: { statement: { kind: "text", chars: 90 }, body: { kind: "text", chars: 200 } },
+      },
+      titleChars: 90,
+    },
     editableFields: ["kicker", "title", "items[].statement", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2597,7 +4378,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Three horizontal bands (Now/Next/Later) with hairline dividers and progressively muted ink",
     permittedLayoutIds: ["LF-22"],
-    capacity: { fields: { "title": { kind: "text", chars: 90 } }, items: { min: 3, max: 3, fields: { "label": { kind: "text", chars: 90 }, "headline": { kind: "text", chars: 90 }, "body": { kind: "text", chars: 200 } } }, titleChars: 90 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 90 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          label: { kind: "text", chars: 90 },
+          headline: { kind: "text", chars: 90 },
+          body: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 90,
+    },
     editableFields: ["title", "items[].label", "items[].headline", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2610,7 +4403,29 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Two stacked stat cards with sparklines plus a balance panel with a hero stat and secondary rows",
     permittedLayoutIds: ["LF-08", "LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "primary.label": { kind: "text", chars: 80 }, "primary.value": { kind: "number" }, "primary.unit": { kind: "text", chars: 24 }, "primary.series": { kind: "list" }, "secondary.label": { kind: "text", chars: 80 }, "secondary.value": { kind: "number" }, "secondary.unit": { kind: "text", chars: 24 }, "secondary.series": { kind: "list" }, "balance.value": { kind: "number" }, "balance.unit": { kind: "text", chars: 24 }, "balance.label": { kind: "text", chars: 80 } }, items: { path: "balance.items", min: 1, max: 6, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        "primary.label": { kind: "text", chars: 80 },
+        "primary.value": { kind: "number" },
+        "primary.unit": { kind: "text", chars: 24 },
+        "primary.series": { kind: "list" },
+        "secondary.label": { kind: "text", chars: 80 },
+        "secondary.value": { kind: "number" },
+        "secondary.unit": { kind: "text", chars: 24 },
+        "secondary.series": { kind: "list" },
+        "balance.value": { kind: "number" },
+        "balance.unit": { kind: "text", chars: 24 },
+        "balance.label": { kind: "text", chars: 80 },
+      },
+      items: {
+        path: "balance.items",
+        min: 1,
+        max: 6,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "primary.label",
@@ -2636,7 +4451,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Three donut gauges side-by-side with tabular % centered, label + one-line body beneath",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 3, max: 3, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" }, "body": { kind: "text", chars: 200 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          value: { kind: "number" },
+          body: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].label", "items[].value", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2647,7 +4474,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Large area/line chart across months with side rail: kicker, headline, primary stat with delta",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "headline": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 }, "stat.delta": { kind: "number" }, "series": { kind: "list" } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        headline: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+        "stat.delta": { kind: "number" },
+        series: { kind: "list" },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -2666,7 +4505,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Dashboard — gauge row",
     description: "Four semicircular gauges with % and labels, baseline-aligned",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 3, max: 5, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].label", "items[].value"],
     lockedFields: ["footer", "logo"],
   },
@@ -2677,7 +4524,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Vertical bar chart on the left with a big StatFigure and a color-swatch legend on the right",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "highlight": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 }, "legend[].label": { kind: "text", chars: 80 }, "legend[].value": { kind: "number" } }, items: { path: "bars", min: 1, max: 6, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        highlight: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+        "legend[].label": { kind: "text", chars: 80 },
+        "legend[].value": { kind: "number" },
+      },
+      items: {
+        path: "bars",
+        min: 1,
+        max: 6,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "bars[].label",
@@ -2698,7 +4562,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Two side-by-side report cards with big delta headlines, sparklines, and small-caps meta",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 2, max: 2, fields: { "delta": { kind: "number" }, "label": { kind: "text", chars: 80 }, "meta": { kind: "text", chars: 80 }, "series": { kind: "list" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 2,
+        max: 2,
+        fields: {
+          delta: { kind: "number" },
+          label: { kind: "text", chars: 80 },
+          meta: { kind: "text", chars: 80 },
+          series: { kind: "list" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].delta", "items[].label", "items[].meta", "items[].series"],
     lockedFields: ["footer", "logo"],
   },
@@ -2709,7 +4586,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Year columns with ascending SVG bars and value headlines; final year emphasized in accent",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 3, max: 5, fields: { "year": { kind: "text", chars: 24 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "note": { kind: "text", chars: 200 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: {
+          year: { kind: "text", chars: 24 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          note: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].year", "items[].value", "items[].unit", "items[].note"],
     lockedFields: ["footer", "logo"],
   },
@@ -2720,7 +4610,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Rows with label, big value, delta chip, and a horizontal progress bar with % right-aligned",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 2, max: 4, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "delta": { kind: "number" }, "percent": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 2,
+        max: 4,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          delta: { kind: "number" },
+          percent: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "items[].label",
@@ -2738,7 +4642,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Monumental headline stat left with a right column of region/market rows, deltas, and progress bars",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 } }, items: { min: 1, max: 6, fields: { "label": { kind: "text", chars: 80 }, "delta": { kind: "number" }, "percent": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+      },
+      items: {
+        min: 1,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          delta: { kind: "number" },
+          percent: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "stat.value",
@@ -2758,7 +4679,23 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — year series",
     description: "Multi-year vertical column trend; most recent year in accent, priors graded",
     permittedLayoutIds: ["LF-08", "LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "headline": { kind: "text", chars: 80 } }, items: { min: 4, max: 10, fields: { "year": { kind: "text", chars: 24 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        headline: { kind: "text", chars: 80 },
+      },
+      items: {
+        min: 4,
+        max: 10,
+        fields: {
+          year: { kind: "text", chars: 24 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -2775,7 +4712,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — axis bars",
     description: "Monthly bar chart with visible y-axis gridlines and a highlighted month",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "highlight": { kind: "text", chars: 80 }, "legend": { kind: "list" }, "unit": { kind: "text", chars: 24 } }, items: { path: "bars", min: 4, max: 12, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        highlight: { kind: "text", chars: 80 },
+        legend: { kind: "list" },
+        unit: { kind: "text", chars: 24 },
+      },
+      items: {
+        path: "bars",
+        min: 4,
+        max: 12,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "bars[].label", "bars[].value", "highlight", "legend", "unit"],
     lockedFields: ["footer", "logo"],
   },
@@ -2785,7 +4736,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — category bars",
     description: "Horizontal category bars paired with a supporting monumental stat",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 } }, items: { min: 3, max: 6, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" }, "unit": { kind: "text", chars: 24 } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+      },
+      items: {
+        min: 3,
+        max: 6,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "items[].label",
@@ -2803,7 +4771,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — dual donut",
     description: "Two donut gauges with analysis blocks and small-caps year chips",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 2, max: 2, fields: { "value": { kind: "number" }, "label": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 200 }, "meta": { kind: "text", chars: 80 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 2,
+        max: 2,
+        fields: {
+          value: { kind: "number" },
+          label: { kind: "text", chars: 80 },
+          body: { kind: "text", chars: 200 },
+          meta: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].value", "items[].label", "items[].body", "items[].meta"],
     lockedFields: ["footer", "logo"],
   },
@@ -2813,7 +4794,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — concentric rings",
     description: "3–4 nested progress rings paired with a right-side legend",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 3, max: 4, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" }, "body": { kind: "text", chars: 200 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 4,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          value: { kind: "number" },
+          body: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].label", "items[].value", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2823,7 +4816,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — task cards",
     description: "Three progress panels with title, done/total pair, bar, and body",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 3, max: 3, fields: { "label": { kind: "text", chars: 80 }, "done": { kind: "number" }, "total": { kind: "number" }, "body": { kind: "text", chars: 200 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          done: { kind: "number" },
+          total: { kind: "number" },
+          body: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].label", "items[].done", "items[].total", "items[].body"],
     lockedFields: ["footer", "logo"],
   },
@@ -2833,7 +4839,22 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — decade area",
     description: "Smooth area chart over ~10 years with one highlighted year and callout",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "headline": { kind: "text", chars: 80 }, "callout.year": { kind: "text", chars: 24 }, "callout.note": { kind: "text", chars: 200 } }, items: { path: "series", min: 5, max: 12, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        headline: { kind: "text", chars: 80 },
+        "callout.year": { kind: "text", chars: 24 },
+        "callout.note": { kind: "text", chars: 200 },
+      },
+      items: {
+        path: "series",
+        min: 5,
+        max: 12,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -2851,7 +4872,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — percent compare",
     description: "Rows comparing current vs benchmark % with dual bars and a meta range",
     permittedLayoutIds: ["LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 2, max: 5, fields: { "label": { kind: "text", chars: 80 }, "current": { kind: "number" }, "benchmark": { kind: "text", chars: 24 }, "range": { kind: "text", chars: 24 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 2,
+        max: 5,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          current: { kind: "number" },
+          benchmark: { kind: "text", chars: 24 },
+          range: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "items[].label",
@@ -2870,7 +4904,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Two or three trend lines over a shared timeline with axis, legend, and a highlighted latest point",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "headline": { kind: "text", chars: 80 }, "unit": { kind: "text", chars: 24 } }, items: { path: "series", min: 2, max: 3, fields: { "label": { kind: "text", chars: 80 }, "points": { kind: "list" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        headline: { kind: "text", chars: 80 },
+        unit: { kind: "text", chars: 24 },
+      },
+      items: {
+        path: "series",
+        min: 2,
+        max: 3,
+        fields: { label: { kind: "text", chars: 80 }, points: { kind: "list" } },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "kicker", "headline", "unit", "series[].label", "series[].points"],
     lockedFields: ["footer", "logo"],
   },
@@ -2880,7 +4928,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — stacked bars",
     description: "Vertical stacked columns split across 2–3 segments per period with legend",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "unit": { kind: "text", chars: 24 }, "segments[].label": { kind: "text", chars: 80 } }, items: { path: "columns", min: 4, max: 8, fields: { "label": { kind: "text", chars: 80 }, "values": { kind: "list" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        unit: { kind: "text", chars: 24 },
+        "segments[].label": { kind: "text", chars: 80 },
+      },
+      items: {
+        path: "columns",
+        min: 4,
+        max: 8,
+        fields: { label: { kind: "text", chars: 80 }, values: { kind: "list" } },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "unit", "segments[].label", "columns[].label", "columns[].values"],
     lockedFields: ["footer", "logo"],
   },
@@ -2890,7 +4951,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — stacked area",
     description: "Stacked area chart showing composition of a growing total over time",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "headline": { kind: "text", chars: 80 }, "unit": { kind: "text", chars: 24 } }, items: { path: "series", min: 5, max: 10, fields: { "label": { kind: "text", chars: 80 }, "points": { kind: "list" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        headline: { kind: "text", chars: 80 },
+        unit: { kind: "text", chars: 24 },
+      },
+      items: {
+        path: "series",
+        min: 5,
+        max: 10,
+        fields: { label: { kind: "text", chars: 80 }, points: { kind: "list" } },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "kicker", "headline", "unit", "series[].label", "series[].points"],
     lockedFields: ["footer", "logo"],
   },
@@ -2900,7 +4975,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — waterfall",
     description: "Bridge chart with positive/negative deltas and start/end totals",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "unit": { kind: "text", chars: 24 } }, items: { path: "steps", min: 4, max: 8, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" }, "kind": { kind: "text", chars: 24 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, unit: { kind: "text", chars: 24 } },
+      items: {
+        path: "steps",
+        min: 4,
+        max: 8,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          value: { kind: "number" },
+          kind: { kind: "text", chars: 24 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "unit", "steps[].label", "steps[].value", "steps[].kind"],
     lockedFields: ["footer", "logo"],
   },
@@ -2910,7 +4998,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — bubble scatter",
     description: "Scatter plot with sized bubbles on an XY plane with axis labels and legend",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "axis.x": { kind: "number" }, "axis.y": { kind: "number" } }, items: { min: 3, max: 8, fields: { "label": { kind: "text", chars: 80 }, "x": { kind: "number" }, "y": { kind: "number" }, "size": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        "axis.x": { kind: "number" },
+        "axis.y": { kind: "number" },
+      },
+      items: {
+        min: 3,
+        max: 8,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          x: { kind: "number" },
+          y: { kind: "number" },
+          size: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "axis.x",
@@ -2928,7 +5033,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — heatmap grid",
     description: "Rectangular grid heatmap with row/column headers and a value scale",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "rows": { kind: "list" }, "columns": { kind: "list" }, "cells": { kind: "list" }, "scale.min": { kind: "number" }, "scale.max": { kind: "number" } }, items: { path: "rows", min: 3, max: 7, fields: {  } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        rows: { kind: "list" },
+        columns: { kind: "list" },
+        cells: { kind: "list" },
+        "scale.min": { kind: "number" },
+        "scale.max": { kind: "number" },
+      },
+      items: { path: "rows", min: 3, max: 7, fields: {} },
+      titleChars: 80,
+    },
     editableFields: ["title", "rows", "columns", "cells", "scale.min", "scale.max"],
     lockedFields: ["footer", "logo"],
   },
@@ -2938,7 +5054,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — treemap",
     description: "Nested rectangles sized by weight — proportional composition view",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, items: { min: 4, max: 8, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" }, "meta": { kind: "text", chars: 80 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 4,
+        max: 8,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          value: { kind: "number" },
+          meta: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "items[].label", "items[].value", "items[].meta"],
     lockedFields: ["footer", "logo"],
   },
@@ -2948,7 +5076,26 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Graph — combo bar + line",
     description: "Bars on primary axis with an overlaid trend line on a secondary axis",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "bars.unit": { kind: "text", chars: 24 }, "line.unit": { kind: "text", chars: 24 }, "bars.label": { kind: "text", chars: 80 }, "line.label": { kind: "text", chars: 80 } }, items: { path: "points", min: 4, max: 10, fields: { "label": { kind: "text", chars: 80 }, "bar": { kind: "number" }, "line": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        "bars.unit": { kind: "text", chars: 24 },
+        "line.unit": { kind: "text", chars: 24 },
+        "bars.label": { kind: "text", chars: 80 },
+        "line.label": { kind: "text", chars: 80 },
+      },
+      items: {
+        path: "points",
+        min: 4,
+        max: 10,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          bar: { kind: "number" },
+          line: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "bars.unit",
@@ -2972,7 +5119,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Editorial — full-bleed hero",
     description: "Single message over an edge-to-edge photo. One line. Enormous.",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 90 }, "title": { kind: "text", chars: 90 }, "subtitle": { kind: "text", chars: 90 }, "mediaSeed": { kind: "image" }, "mediaUrl": { kind: "image" } }, titleChars: 90, bodyChars: 120 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 90 },
+        title: { kind: "text", chars: 90 },
+        subtitle: { kind: "text", chars: 90 },
+        mediaSeed: { kind: "image" },
+        mediaUrl: { kind: "image" },
+      },
+      titleChars: 90,
+      bodyChars: 120,
+    },
     editableFields: ["kicker", "title", "subtitle", "mediaSeed", "mediaUrl"],
     lockedFields: ["footer", "logo"],
   },
@@ -2982,7 +5139,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Editorial — orb composition",
     description: "Two soft aurora orbs behind a minimalist type stack. High air.",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 80 }, "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 } }, titleChars: 80, bodyChars: 140 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 80 },
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+      },
+      titleChars: 80,
+      bodyChars: 140,
+    },
     editableFields: ["kicker", "title", "subtitle"],
     lockedFields: ["footer", "logo", "orbs"],
   },
@@ -2992,7 +5157,16 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Editorial — numbered divider",
     description: "Chapter break: oversized numeral + kicker + title. Poster energy.",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "numeral": { kind: "number" }, "kicker": { kind: "text", chars: 60 }, "title": { kind: "text", chars: 60 }, "subtitle": { kind: "text", chars: 60 } }, titleChars: 60, bodyChars: 90 },
+    capacity: {
+      fields: {
+        numeral: { kind: "number" },
+        kicker: { kind: "text", chars: 60 },
+        title: { kind: "text", chars: 60 },
+        subtitle: { kind: "text", chars: 60 },
+      },
+      titleChars: 60,
+      bodyChars: 90,
+    },
     editableFields: ["numeral", "kicker", "title", "subtitle"],
     lockedFields: ["footer", "logo"],
   },
@@ -3002,7 +5176,15 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Editorial — kicker poster",
     description: "Massive tracked kicker over a display headline on solid brand.",
     permittedLayoutIds: ["LF-28"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 60 }, "title": { kind: "text", chars: 60 }, "meta": { kind: "text", chars: 60 } }, titleChars: 60, bodyChars: 80 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 60 },
+        title: { kind: "text", chars: 60 },
+        meta: { kind: "text", chars: 60 },
+      },
+      titleChars: 60,
+      bodyChars: 80,
+    },
     editableFields: ["kicker", "title", "meta"],
     lockedFields: ["footer", "logo"],
   },
@@ -3012,7 +5194,18 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Editorial — stat over photo",
     description: "One giant proof stat lockup floating over a full-bleed photo.",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "stat": { kind: "text", chars: 60 }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 60 }, "narrative": { kind: "text", chars: 160 }, "mediaSeed": { kind: "image" }, "mediaUrl": { kind: "image" } }, titleChars: 60, bodyChars: 160 },
+    capacity: {
+      fields: {
+        stat: { kind: "text", chars: 60 },
+        unit: { kind: "text", chars: 24 },
+        label: { kind: "text", chars: 60 },
+        narrative: { kind: "text", chars: 160 },
+        mediaSeed: { kind: "image" },
+        mediaUrl: { kind: "image" },
+      },
+      titleChars: 60,
+      bodyChars: 160,
+    },
     editableFields: ["stat", "unit", "label", "narrative", "mediaSeed", "mediaUrl"],
     lockedFields: ["footer", "logo"],
   },
@@ -3022,7 +5215,17 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Editorial — full-bleed quote",
     description: "Hero quote treated editorially over a portrait or environment shot.",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "quote": { kind: "text", chars: 120 }, "attribution": { kind: "text", chars: 240 }, "role": { kind: "text", chars: 24 }, "mediaSeed": { kind: "image" }, "mediaUrl": { kind: "image" } }, titleChars: 240, bodyChars: 120 },
+    capacity: {
+      fields: {
+        quote: { kind: "text", chars: 120 },
+        attribution: { kind: "text", chars: 240 },
+        role: { kind: "text", chars: 24 },
+        mediaSeed: { kind: "image" },
+        mediaUrl: { kind: "image" },
+      },
+      titleChars: 240,
+      bodyChars: 120,
+    },
     editableFields: ["quote", "attribution", "role", "mediaSeed", "mediaUrl"],
     lockedFields: ["footer", "logo"],
   },
@@ -3034,7 +5237,24 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Full-bleed stylized world map with brand-tinted pins for every office. Pre-seeded per division, fully editable.",
     permittedLayoutIds: ["LF-05", "LF-06"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 } }, items: { min: 3, max: 60, fields: { "city": { kind: "text", chars: 24 }, "country": { kind: "text", chars: 24 }, "region": { kind: "text", chars: 24 }, "lat": { kind: "number" }, "lon": { kind: "number" }, "role": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 } } }, titleChars: 80, bodyChars: 140 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, subtitle: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 60,
+        fields: {
+          city: { kind: "text", chars: 24 },
+          country: { kind: "text", chars: 24 },
+          region: { kind: "text", chars: 24 },
+          lat: { kind: "number" },
+          lon: { kind: "number" },
+          role: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 140,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -3054,7 +5274,37 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Locations — world map + region stats",
     description: "World map on one side, region-by-region counts + KPI stack on the other.",
     permittedLayoutIds: ["LF-03"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "narrative": { kind: "text", chars: 200 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 }, "regionMetrics[].region": { kind: "text", chars: 24 }, "regionMetrics[].label": { kind: "text", chars: 80 }, "regionMetrics[].value": { kind: "number" }, "regionMetrics[].unit": { kind: "text", chars: 24 }, "regionMetrics[].percent": { kind: "number" }, "regionMetrics[].delta": { kind: "number" } }, items: { min: 3, max: 60, fields: { "city": { kind: "text", chars: 24 }, "country": { kind: "text", chars: 24 }, "region": { kind: "text", chars: 24 }, "lat": { kind: "number" }, "lon": { kind: "number" }, "role": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 } } }, titleChars: 80, bodyChars: 200 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        narrative: { kind: "text", chars: 200 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+        "regionMetrics[].region": { kind: "text", chars: 24 },
+        "regionMetrics[].label": { kind: "text", chars: 80 },
+        "regionMetrics[].value": { kind: "number" },
+        "regionMetrics[].unit": { kind: "text", chars: 24 },
+        "regionMetrics[].percent": { kind: "number" },
+        "regionMetrics[].delta": { kind: "number" },
+      },
+      items: {
+        min: 3,
+        max: 60,
+        fields: {
+          city: { kind: "text", chars: 24 },
+          country: { kind: "text", chars: 24 },
+          region: { kind: "text", chars: 24 },
+          lat: { kind: "number" },
+          lon: { kind: "number" },
+          role: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 200,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -3085,7 +5335,38 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Zoomed regional map (Americas, EMEA, APAC, LATAM, or MEA) with labeled pins and a supporting caption.",
     permittedLayoutIds: ["LF-03", "LF-06"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "region": { kind: "text", chars: 24 }, "narrative": { kind: "text", chars: 200 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 }, "regionMetrics[].region": { kind: "text", chars: 24 }, "regionMetrics[].label": { kind: "text", chars: 80 }, "regionMetrics[].value": { kind: "number" }, "regionMetrics[].unit": { kind: "text", chars: 24 }, "regionMetrics[].percent": { kind: "number" }, "regionMetrics[].delta": { kind: "number" } }, items: { min: 3, max: 40, fields: { "city": { kind: "text", chars: 24 }, "country": { kind: "text", chars: 24 }, "region": { kind: "text", chars: 24 }, "lat": { kind: "number" }, "lon": { kind: "number" }, "role": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 } } }, titleChars: 80, bodyChars: 200 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        region: { kind: "text", chars: 24 },
+        narrative: { kind: "text", chars: 200 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+        "regionMetrics[].region": { kind: "text", chars: 24 },
+        "regionMetrics[].label": { kind: "text", chars: 80 },
+        "regionMetrics[].value": { kind: "number" },
+        "regionMetrics[].unit": { kind: "text", chars: 24 },
+        "regionMetrics[].percent": { kind: "number" },
+        "regionMetrics[].delta": { kind: "number" },
+      },
+      items: {
+        min: 3,
+        max: 40,
+        fields: {
+          city: { kind: "text", chars: 24 },
+          country: { kind: "text", chars: 24 },
+          region: { kind: "text", chars: 24 },
+          lat: { kind: "number" },
+          lon: { kind: "number" },
+          role: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 200,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -3117,7 +5398,36 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Primary HQ pin with curved arcs to every satellite office, over the stylized world map.",
     permittedLayoutIds: ["LF-05"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "subtitle": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 }, "regionMetrics[].region": { kind: "text", chars: 24 }, "regionMetrics[].label": { kind: "text", chars: 80 }, "regionMetrics[].value": { kind: "number" }, "regionMetrics[].unit": { kind: "text", chars: 24 }, "regionMetrics[].percent": { kind: "number" }, "regionMetrics[].delta": { kind: "number" } }, items: { min: 3, max: 60, fields: { "city": { kind: "text", chars: 24 }, "country": { kind: "text", chars: 24 }, "region": { kind: "text", chars: 24 }, "lat": { kind: "number" }, "lon": { kind: "number" }, "role": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 } } }, titleChars: 80, bodyChars: 140 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        subtitle: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+        "regionMetrics[].region": { kind: "text", chars: 24 },
+        "regionMetrics[].label": { kind: "text", chars: 80 },
+        "regionMetrics[].value": { kind: "number" },
+        "regionMetrics[].unit": { kind: "text", chars: 24 },
+        "regionMetrics[].percent": { kind: "number" },
+        "regionMetrics[].delta": { kind: "number" },
+      },
+      items: {
+        min: 3,
+        max: 60,
+        fields: {
+          city: { kind: "text", chars: 24 },
+          country: { kind: "text", chars: 24 },
+          region: { kind: "text", chars: 24 },
+          lat: { kind: "number" },
+          lon: { kind: "number" },
+          role: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+      bodyChars: 140,
+    },
     editableFields: [
       "title",
       "subtitle",
@@ -3149,7 +5459,22 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "One monumental hero numeral filling the stage with a supporting dek and three micro facts on a hairline rail",
     permittedLayoutIds: ["LF-08", "LF-11"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 }, "narrative": { kind: "text", chars: 200 }, "source": { kind: "text", chars: 80 } }, items: { min: 0, max: 3, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+        narrative: { kind: "text", chars: 200 },
+        source: { kind: "text", chars: 80 },
+      },
+      items: {
+        min: 0,
+        max: 3,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "kicker",
       "stat.value",
@@ -3169,7 +5494,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "A wall of 6–9 numerals set at graded sizes with no boxes; the grid itself is the composition",
     permittedLayoutIds: ["LF-11", "LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 } }, items: { min: 4, max: 9, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, kicker: { kind: "text", chars: 80 } },
+      items: {
+        min: 4,
+        max: 9,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: ["title", "kicker", "items[].value", "items[].unit", "items[].label"],
     lockedFields: ["footer", "logo"],
   },
@@ -3180,7 +5517,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Four to five KPIs on a single horizontal rail divided by hairlines, huge tabular numerals with delta chips",
     permittedLayoutIds: ["LF-11", "LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 } }, items: { min: 3, max: 5, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "delta": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, kicker: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 5,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          delta: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3198,7 +5548,21 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Distribution ring at centre with share labels orbiting radially; type positions carry the data",
     permittedLayoutIds: ["LF-08", "LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 } }, items: { min: 3, max: 6, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+      },
+      items: {
+        min: 3,
+        max: 6,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3217,7 +5581,23 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Oversized three-beat progression: actual, target, and the delta between them, joined by arrow rules",
     permittedLayoutIds: ["LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "actual.value": { kind: "number" }, "actual.unit": { kind: "text", chars: 24 }, "actual.label": { kind: "text", chars: 80 }, "target.value": { kind: "number" }, "target.unit": { kind: "text", chars: 24 }, "target.label": { kind: "text", chars: 80 }, "delta.value": { kind: "number" }, "delta.unit": { kind: "text", chars: 24 }, "delta.label": { kind: "text", chars: 80 }, "narrative": { kind: "text", chars: 200 } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        "actual.value": { kind: "number" },
+        "actual.unit": { kind: "text", chars: 24 },
+        "actual.label": { kind: "text", chars: 80 },
+        "target.value": { kind: "number" },
+        "target.unit": { kind: "text", chars: 24 },
+        "target.label": { kind: "text", chars: 80 },
+        "delta.value": { kind: "number" },
+        "delta.unit": { kind: "text", chars: 24 },
+        "delta.label": { kind: "text", chars: 80 },
+        narrative: { kind: "text", chars: 200 },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3241,7 +5621,25 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Newspaper-style dashboard: masthead rule, column rules, numerals set as headlines with sparklines beneath",
     permittedLayoutIds: ["LF-11", "LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "standfirst": { kind: "text", chars: 80 } }, items: { min: 3, max: 4, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 200 }, "series": { kind: "list" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        standfirst: { kind: "text", chars: 80 },
+      },
+      items: {
+        min: 3,
+        max: 4,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          body: { kind: "text", chars: 200 },
+          series: { kind: "list" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3261,7 +5659,20 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Deliberately uneven mosaic of stats: one dominant figure with satellites at graded weights and spans",
     permittedLayoutIds: ["LF-11", "LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 } }, items: { min: 4, max: 6, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "percent": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, kicker: { kind: "text", chars: 80 } },
+      items: {
+        min: 4,
+        max: 6,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          percent: { kind: "number" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3279,7 +5690,23 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Half-bleed photography with an oversized numeral crossing the image edge and a stacked caption rail",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "kicker": { kind: "text", chars: 80 }, "stat.value": { kind: "number" }, "stat.unit": { kind: "text", chars: 24 }, "stat.label": { kind: "text", chars: 80 }, "narrative": { kind: "text", chars: 200 }, "mediaSeed": { kind: "image" }, "mediaUrl": { kind: "image" } }, items: { min: 0, max: 3, fields: { "label": { kind: "text", chars: 80 }, "value": { kind: "number" } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        kicker: { kind: "text", chars: 80 },
+        "stat.value": { kind: "number" },
+        "stat.unit": { kind: "text", chars: 24 },
+        "stat.label": { kind: "text", chars: 80 },
+        narrative: { kind: "text", chars: 200 },
+        mediaSeed: { kind: "image" },
+        mediaUrl: { kind: "image" },
+      },
+      items: {
+        min: 0,
+        max: 3,
+        fields: { label: { kind: "text", chars: 80 }, value: { kind: "number" } },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "kicker",
       "stat.value",
@@ -3302,7 +5729,22 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Three full-bleed photo cards, each carrying one oversized stat figure and caption locked to the frame",
     permittedLayoutIds: ["LF-11", "LF-13"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 } }, items: { min: 2, max: 3, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 }, "body": { kind: "text", chars: 200 }, "mediaSeed": { kind: "image" }, "mediaUrl": { kind: "image" } } }, titleChars: 80 },
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 }, kicker: { kind: "text", chars: 80 } },
+      items: {
+        min: 2,
+        max: 3,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+          body: { kind: "text", chars: 200 },
+          mediaSeed: { kind: "image" },
+          mediaUrl: { kind: "image" },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3322,7 +5764,25 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Editorial headline above a full-width photographic band with four KPIs set on the image in tabular type",
     permittedLayoutIds: ["LF-08", "LF-11"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "narrative": { kind: "text", chars: 200 }, "mediaSeed": { kind: "image" }, "mediaUrl": { kind: "image" } }, items: { min: 3, max: 4, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        narrative: { kind: "text", chars: 200 },
+        mediaSeed: { kind: "image" },
+        mediaUrl: { kind: "image" },
+      },
+      items: {
+        min: 3,
+        max: 4,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3342,7 +5802,27 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     description:
       "Headshot portrait beside an attributed claim with two supporting stat figures on a hairline rail",
     permittedLayoutIds: ["LF-08"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 }, "kicker": { kind: "text", chars: 80 }, "quote": { kind: "text", chars: 200 }, "attribution": { kind: "text", chars: 80 }, "role": { kind: "text", chars: 24 }, "mediaSeed": { kind: "image" }, "mediaUrl": { kind: "image" } }, items: { min: 1, max: 3, fields: { "value": { kind: "number" }, "unit": { kind: "text", chars: 24 }, "label": { kind: "text", chars: 80 } } }, titleChars: 80 },
+    capacity: {
+      fields: {
+        title: { kind: "text", chars: 80 },
+        kicker: { kind: "text", chars: 80 },
+        quote: { kind: "text", chars: 200 },
+        attribution: { kind: "text", chars: 80 },
+        role: { kind: "text", chars: 24 },
+        mediaSeed: { kind: "image" },
+        mediaUrl: { kind: "image" },
+      },
+      items: {
+        min: 1,
+        max: 3,
+        fields: {
+          value: { kind: "number" },
+          unit: { kind: "text", chars: 24 },
+          label: { kind: "text", chars: 80 },
+        },
+      },
+      titleChars: 80,
+    },
     editableFields: [
       "title",
       "kicker",
@@ -3366,13 +5846,11 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     name: "Blank canvas",
     description: "Empty branded stage — compose freely with canvas objects",
     permittedLayoutIds: ["LF-01"],
-    capacity: { fields: { "title": { kind: "text", chars: 80 } }, titleChars: 80 },
+    capacity: { fields: { title: { kind: "text", chars: 80 } }, titleChars: 80 },
     editableFields: ["title"],
     lockedFields: ["footer", "logo", "brandBar"],
   },
 ];
-
-
 
 export const NARRATIVE_ARCHETYPES: NarrativeArchetype[] = [
   {

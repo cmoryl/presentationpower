@@ -32,16 +32,19 @@ export function iconSvgString(name: string, opts: IconRenderOptions = {}): strin
   if (!Icon) return null;
   const { size, color, strokeWidth } = { ...DEFAULTS, ...opts };
   const markup = renderToStaticMarkup(
-    createElement(Icon as never, {
-      width: size,
-      height: size,
-      color,
-      strokeWidth,
-      // Lucide defaults, restated so the file is self-contained.
-      strokeLinecap: "round",
-      strokeLinejoin: "round",
-      "aria-hidden": true,
-    } as never),
+    createElement(
+      Icon as never,
+      {
+        width: size,
+        height: size,
+        color,
+        strokeWidth,
+        // Lucide defaults, restated so the file is self-contained.
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+        "aria-hidden": true,
+      } as never,
+    ),
   );
   const withNs = markup.includes("xmlns=")
     ? markup

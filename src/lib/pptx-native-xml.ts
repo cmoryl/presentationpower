@@ -92,8 +92,9 @@ export function withGradientFills(xml: string): string {
  * panel reads as No line. See SURFACE_LINE_POLICY in export-surface.ts.
  */
 export function withNoLine(xml: string): string {
-  return xml.replace(/<a:ln(\s[^>]*)?><\/a:ln>/g, (_all, attrs: string | undefined) =>
-    `<a:ln${attrs ?? ""}><a:noFill/></a:ln>`,
+  return xml.replace(
+    /<a:ln(\s[^>]*)?><\/a:ln>/g,
+    (_all, attrs: string | undefined) => `<a:ln${attrs ?? ""}><a:noFill/></a:ln>`,
   );
 }
 
@@ -255,8 +256,11 @@ export function transitionXml(t: SlideTransition | null | undefined): string | n
 /** Insert (or replace) the transition block in a slide part. */
 export function withTransition(xml: string, block: string | null): string {
   // Never stack transitions: drop anything already present first.
-  let out = xml
-    .replace(/<mc:AlternateContent[^>]*>(?:(?!<\/mc:AlternateContent>)[\s\S])*?<p:transition[\s\S]*?<\/mc:AlternateContent>/g, "")
+  const out = xml
+    .replace(
+      /<mc:AlternateContent[^>]*>(?:(?!<\/mc:AlternateContent>)[\s\S])*?<p:transition[\s\S]*?<\/mc:AlternateContent>/g,
+      "",
+    )
     .replace(/<p:transition\b[\s\S]*?<\/p:transition>/g, "")
     .replace(/<p:transition\b[^>]*\/>/g, "");
   if (!block) return out;
@@ -428,8 +432,6 @@ export async function applyNativePptxFeatures(
     !wantMasterBg
   );
 
-
-
   try {
     const JSZip = (await import("jszip")).default;
     const zip = await JSZip.loadAsync(await blob.arrayBuffer());
@@ -466,7 +468,6 @@ export async function applyNativePptxFeatures(
         // Effect lists must hold at most one of each effect kind — otherwise
         // PowerPoint (and the Office converter) refuses the package.
         xml = dedupeEffectLists(xml);
-
 
         if (xml !== before) {
           zip.file(parts[i], xml);
@@ -557,7 +558,6 @@ export async function applyNativePptxFeatures(
     if (touched === 0) return blob;
     const { repackPptx } = await import("./pptx-repack");
     return await repackPptx(zip);
-
   } catch (err) {
     console.warn("[pptx-native-xml] post-processing skipped", err);
     return blob;

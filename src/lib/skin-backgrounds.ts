@@ -24,7 +24,6 @@
 import type { DesignSkin } from "./design-skins";
 import { skinSpecTokens } from "./skin-spec-tokens";
 
-
 export type SkinScene =
   | "cover"
   | "agenda"
@@ -92,7 +91,6 @@ export const MOTIF_LABEL: Record<MotifFamily, string> = {
   brutal: "Brutalist blocks",
   isotype: "Isometric lattice",
 };
-
 
 /* ------------------------------------------------------------------ colours */
 
@@ -231,7 +229,6 @@ export interface SkinSignature {
   signal?: number;
 }
 
-
 export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
   S01: { rake: -18, weight: 0.9, texture: 0.25, anchor: "26% 20%", ratio: 1.18 },
   S02: { rake: 14, weight: 1.15, texture: 0.2, anchor: "68% 26%", ratio: 1.3 },
@@ -274,67 +271,306 @@ export const SKIN_SIGNATURE: Record<string, SkinSignature> = {
    * same background with a swapped palette.
    */
   // Cool boardroom field, disciplined executive grid, cobalt decision rail.
-  R01: { rake: -8, weight: 0.82, texture: 0.62, anchor: "20% 22%", ratio: 1.12, safeBias: 0.62, signal: 0.85 },
+  R01: {
+    rake: -8,
+    weight: 0.82,
+    texture: 0.62,
+    anchor: "20% 22%",
+    ratio: 1.12,
+    safeBias: 0.62,
+    signal: 0.85,
+  },
   // Graphite product system, modular architectural layers, electric seams.
-  R02: { rake: 10, weight: 0.95, texture: 0.92, anchor: "78% 20%", ratio: 0.88, safeBias: 0.5, signal: 1.15 },
+  R02: {
+    rake: 10,
+    weight: 0.95,
+    texture: 0.92,
+    anchor: "78% 20%",
+    ratio: 0.88,
+    safeBias: 0.5,
+    signal: 1.15,
+  },
   // Luminous layered intelligence field, explainable planes, blue→violet edge.
-  R03: { rake: 22, weight: 1.12, texture: 0.34, anchor: "62% 30%", ratio: 1.26, safeBias: 0.55, signal: 1.05 },
+  R03: {
+    rake: 22,
+    weight: 1.12,
+    texture: 0.34,
+    anchor: "62% 30%",
+    ratio: 1.26,
+    safeBias: 0.55,
+    signal: 1.05,
+  },
   // Indigo transaction flow, directional liquidity ribbons, cyan motion.
-  R04: { rake: 34, weight: 1.05, texture: 0.5, anchor: "26% 70%", ratio: 1.06, safeBias: 0.5, signal: 1.2 },
+  R04: {
+    rake: 34,
+    weight: 1.05,
+    texture: 0.5,
+    anchor: "26% 70%",
+    ratio: 1.06,
+    safeBias: 0.5,
+    signal: 1.2,
+  },
   // Ink/champagne ledger atmosphere, understated gold rule system.
-  R05: { rake: -3, weight: 0.78, texture: 0.86, anchor: "12% 80%", ratio: 0.82, safeBias: 0.68, signal: 0.7 },
+  R05: {
+    rake: -3,
+    weight: 0.78,
+    texture: 0.86,
+    anchor: "12% 80%",
+    ratio: 0.82,
+    safeBias: 0.68,
+    signal: 0.7,
+  },
   // Calm navy protective structure, nested coverage bands, claims lanes.
-  R06: { rake: 0, weight: 0.74, texture: 0.8, anchor: "50% 16%", ratio: 0.94, safeBias: 0.7, signal: 0.75 },
+  R06: {
+    rake: 0,
+    weight: 0.74,
+    texture: 0.8,
+    anchor: "50% 16%",
+    ratio: 0.94,
+    safeBias: 0.7,
+    signal: 0.75,
+  },
   // Near-black security field, isolated zones, telemetry traces at the edges.
-  R07: { rake: 6, weight: 0.88, texture: 1.05, anchor: "86% 84%", ratio: 0.74, safeBias: 0.58, signal: 1.35 },
+  R07: {
+    rake: 6,
+    weight: 0.88,
+    texture: 1.05,
+    anchor: "86% 84%",
+    ratio: 0.74,
+    safeBias: 0.58,
+    signal: 1.35,
+  },
   // Bright clinical atmosphere, soft pathway ribbons, generous white space.
-  R08: { rake: -18, weight: 0.7, texture: 0.44, anchor: "30% 30%", ratio: 1.2, safeBias: 0.74, signal: 0.7 },
+  R08: {
+    rake: -18,
+    weight: 0.7,
+    texture: 0.44,
+    anchor: "30% 30%",
+    ratio: 1.2,
+    safeBias: 0.74,
+    signal: 0.7,
+  },
   // Lab-white scientific field, membranes, evidence rails, precise annotation.
-  R09: { rake: 16, weight: 0.86, texture: 0.7, anchor: "72% 66%", ratio: 0.9, safeBias: 0.62, signal: 0.9 },
+  R09: {
+    rake: 16,
+    weight: 0.86,
+    texture: 0.7,
+    anchor: "72% 66%",
+    ratio: 0.9,
+    safeBias: 0.62,
+    signal: 0.9,
+  },
   // Ivory/parchment editorial authority, filing logic, evidence bands.
-  R10: { rake: -6, weight: 0.76, texture: 0.78, anchor: "22% 84%", ratio: 1, safeBias: 0.72, signal: 0.62 },
+  R10: {
+    rake: -6,
+    weight: 0.76,
+    texture: 0.78,
+    anchor: "22% 84%",
+    ratio: 1,
+    safeBias: 0.72,
+    signal: 0.62,
+  },
   // Warm-white decision architecture, exhibit-grid rhythm, very crisp.
-  R11: { rake: 2, weight: 0.72, texture: 0.68, anchor: "16% 26%", ratio: 0.86, safeBias: 0.76, signal: 0.8 },
+  R11: {
+    rake: 2,
+    weight: 0.72,
+    texture: 0.68,
+    anchor: "16% 26%",
+    ratio: 0.86,
+    safeBias: 0.76,
+    signal: 0.8,
+  },
   // Steel blueprint field, isometric production geometry, amber quality signal.
-  R12: { rake: -12, weight: 0.9, texture: 1.08, anchor: "84% 26%", ratio: 0.78, safeBias: 0.55, signal: 1.15 },
+  R12: {
+    rake: -12,
+    weight: 0.9,
+    texture: 1.08,
+    anchor: "84% 26%",
+    ratio: 0.78,
+    safeBias: 0.55,
+    signal: 1.15,
+  },
   // Deep infrastructure field, contour flows, luminous transition gradients.
-  R13: { rake: 26, weight: 1, texture: 0.56, anchor: "34% 76%", ratio: 1.16, safeBias: 0.58, signal: 0.95 },
+  R13: {
+    rake: 26,
+    weight: 1,
+    texture: 0.56,
+    anchor: "34% 76%",
+    ratio: 1.16,
+    safeBias: 0.58,
+    signal: 0.95,
+  },
   // Dark premium motion field, aerodynamic light blades, metallic planes.
-  R14: { rake: 42, weight: 1.28, texture: 0.4, anchor: "68% 24%", ratio: 1.22, safeBias: 0.48, signal: 1.25 },
+  R14: {
+    rake: 42,
+    weight: 1.28,
+    texture: 0.4,
+    anchor: "68% 24%",
+    ratio: 1.22,
+    safeBias: 0.48,
+    signal: 1.25,
+  },
   // Deep navy mission field, orbital trajectories, drafting coordinates.
-  R15: { rake: 12, weight: 0.92, texture: 1, anchor: "88% 72%", ratio: 0.8, safeBias: 0.6, signal: 0.9 },
+  R15: {
+    rake: 12,
+    weight: 0.92,
+    texture: 1,
+    anchor: "88% 72%",
+    ratio: 0.8,
+    safeBias: 0.6,
+    signal: 0.9,
+  },
   // Connectivity field, coverage meshes, node lattices, network-scale framing.
-  R16: { rake: 18, weight: 1.02, texture: 0.86, anchor: "50% 40%", ratio: 1.3, safeBias: 0.54, signal: 1.1 },
+  R16: {
+    rake: 18,
+    weight: 1.02,
+    texture: 0.86,
+    anchor: "50% 40%",
+    ratio: 1.3,
+    safeBias: 0.54,
+    signal: 1.1,
+  },
   // Operational field, route lanes, node-to-node flow, amber exceptions.
-  R17: { rake: -24, weight: 0.96, texture: 0.94, anchor: "8% 58%", ratio: 0.84, safeBias: 0.56, signal: 1.2 },
+  R17: {
+    rake: -24,
+    weight: 0.96,
+    texture: 0.94,
+    anchor: "8% 58%",
+    ratio: 0.84,
+    safeBias: 0.56,
+    signal: 1.2,
+  },
   // Warm commerce field, modular order-flow arcs and tile cadence.
-  R18: { rake: 28, weight: 0.9, texture: 0.6, anchor: "76% 30%", ratio: 1.08, safeBias: 0.6, signal: 1 },
+  R18: {
+    rake: 28,
+    weight: 0.9,
+    texture: 0.6,
+    anchor: "76% 30%",
+    ratio: 1.08,
+    safeBias: 0.6,
+    signal: 1,
+  },
   // Warm tactile rhythm, curved ingredient blocks, layered organic forms.
-  R19: { rake: -30, weight: 1.06, texture: 0.48, anchor: "38% 34%", ratio: 1.14, safeBias: 0.6, signal: 0.95 },
+  R19: {
+    rake: -30,
+    weight: 1.06,
+    texture: 0.48,
+    anchor: "38% 34%",
+    ratio: 1.14,
+    safeBias: 0.6,
+    signal: 0.95,
+  },
   // Quiet ivory monumental planes, bronze edge light, extremely low noise.
-  R20: { rake: 38, weight: 1.2, texture: 0.14, anchor: "60% 44%", ratio: 1.36, safeBias: 0.66, signal: 0.6 },
+  R20: {
+    rake: 38,
+    weight: 1.2,
+    texture: 0.14,
+    anchor: "60% 44%",
+    ratio: 1.36,
+    safeBias: 0.66,
+    signal: 0.6,
+  },
   // Near-black cinematic field, high-contrast light sweeps, slate rhythm.
-  R21: { rake: 46, weight: 1.34, texture: 0.42, anchor: "28% 18%", ratio: 1.24, safeBias: 0.5, signal: 1.3 },
+  R21: {
+    rake: 46,
+    weight: 1.34,
+    texture: 0.42,
+    anchor: "28% 18%",
+    ratio: 1.24,
+    safeBias: 0.5,
+    signal: 1.3,
+  },
   // Dark indigo field, angular neon spatial forms, orbital HUD-like geometry.
-  R22: { rake: -34, weight: 1.22, texture: 0.66, anchor: "82% 34%", ratio: 0.96, safeBias: 0.5, signal: 1.4 },
+  R22: {
+    rake: -34,
+    weight: 1.22,
+    texture: 0.66,
+    anchor: "82% 34%",
+    ratio: 0.96,
+    safeBias: 0.5,
+    signal: 1.4,
+  },
   // Kinetic field, directional speed geometry, performance bands.
-  R23: { rake: 50, weight: 1.3, texture: 0.52, anchor: "14% 66%", ratio: 0.92, safeBias: 0.52, signal: 1.3 },
+  R23: {
+    rake: 50,
+    weight: 1.3,
+    texture: 0.52,
+    anchor: "14% 66%",
+    ratio: 0.92,
+    safeBias: 0.52,
+    signal: 1.3,
+  },
   // Warm sea-glass horizon field, tidal abstraction, airy invitation.
-  R24: { rake: -20, weight: 0.98, texture: 0.28, anchor: "44% 62%", ratio: 1.28, safeBias: 0.66, signal: 0.8 },
+  R24: {
+    rake: -20,
+    weight: 0.98,
+    texture: 0.28,
+    anchor: "44% 62%",
+    ratio: 1.28,
+    safeBias: 0.66,
+    signal: 0.8,
+  },
   // Warm stone plan/elevation geometry, structural grids, material planes.
-  R25: { rake: 4, weight: 0.84, texture: 0.98, anchor: "10% 18%", ratio: 0.76, safeBias: 0.64, signal: 0.75 },
+  R25: {
+    rake: 4,
+    weight: 0.84,
+    texture: 0.98,
+    anchor: "10% 18%",
+    ratio: 0.76,
+    safeBias: 0.64,
+    signal: 0.75,
+  },
   // Warm paper learning bands, citation rhythm, discovery geometry.
-  R26: { rake: -10, weight: 0.8, texture: 0.74, anchor: "26% 78%", ratio: 1.02, safeBias: 0.7, signal: 0.85 },
+  R26: {
+    rake: -10,
+    weight: 0.8,
+    texture: 0.74,
+    anchor: "26% 78%",
+    ratio: 1.02,
+    safeBias: 0.7,
+    signal: 0.85,
+  },
   // Bright civic field, accessible grid, institutional bands, gold signal.
-  R27: { rake: 0, weight: 0.86, texture: 0.9, anchor: "50% 10%", ratio: 0.98, safeBias: 0.72, signal: 0.9 },
+  R27: {
+    rake: 0,
+    weight: 0.86,
+    texture: 0.9,
+    anchor: "50% 10%",
+    ratio: 0.98,
+    safeBias: 0.72,
+    signal: 0.9,
+  },
   // Recycled-paper earth-system contours abstracted into evidence layers.
-  R28: { rake: -28, weight: 0.92, texture: 0.58, anchor: "36% 68%", ratio: 1.1, safeBias: 0.68, signal: 0.8 },
+  R28: {
+    rake: -28,
+    weight: 0.92,
+    texture: 0.58,
+    anchor: "36% 68%",
+    ratio: 1.1,
+    safeBias: 0.68,
+    signal: 0.8,
+  },
   // Warm connected people-system pathways and soft modules.
-  R29: { rake: 20, weight: 0.88, texture: 0.5, anchor: "64% 72%", ratio: 1.04, safeBias: 0.7, signal: 0.9 },
+  R29: {
+    rake: 20,
+    weight: 0.88,
+    texture: 0.5,
+    anchor: "64% 72%",
+    ratio: 1.04,
+    safeBias: 0.7,
+    signal: 0.9,
+  },
   // Dark-to-cobalt prismatic stage atmosphere, programme rhythm bands.
-  R30: { rake: 30, weight: 1.26, texture: 0.36, anchor: "72% 52%", ratio: 1.18, safeBias: 0.54, signal: 1.25 },
+  R30: {
+    rake: 30,
+    weight: 1.26,
+    texture: 0.36,
+    anchor: "72% 52%",
+    ratio: 1.18,
+    safeBias: 0.54,
+    signal: 1.25,
+  },
 };
-
 
 const NEUTRAL_SIGNATURE: SkinSignature = { rake: 0, weight: 1, texture: 1, ratio: 1 };
 
@@ -342,8 +578,6 @@ const NEUTRAL_SIGNATURE: SkinSignature = { rake: 0, weight: 1, texture: 1, ratio
 export function skinSignature(skin: DesignSkin): SkinSignature {
   return SKIN_SIGNATURE[(skin.code ?? "").toUpperCase()] ?? NEUTRAL_SIGNATURE;
 }
-
-
 
 /** Resolve the skin's industry fit + imagery note into one motif family. */
 export function motifFamilyFor(skin: DesignSkin): MotifFamily {
@@ -364,8 +598,7 @@ export function motifFamilyFor(skin: DesignSkin): MotifFamily {
   if (has(/glass|iridescen|prism|spectrum|holograph|refract|light/)) return "prism";
   if (has(/space|research|science|lab|orbit|satellite|astro/)) return "orbit";
   if (has(/marine|ocean|water|fluid|wellness|calm|spa|travel|tourism|hospitality/)) return "wave";
-  if (has(/playful|confetti|pop|festival|community|culture|craft|food|beverage/))
-    return "terrazzo";
+  if (has(/playful|confetti|pop|festival|community|culture|craft|food|beverage/)) return "terrazzo";
   if (has(/bold|swiss|brutal|poster|type-led|editorial statement|architecture studio/))
     return "brutal";
   if (has(/creative|agency|brand|entertain|sport|kinetic|expressive|music|game/)) return "shards";
@@ -376,7 +609,6 @@ export function motifFamilyFor(skin: DesignSkin): MotifFamily {
   const fallbacks: MotifFamily[] = ["mesh", "prism", "aurora", "orbit", "wave", "terrazzo"];
   return fallbacks[skinSeed(skin) % fallbacks.length]!;
 }
-
 
 /* --------------------------------------------------------------- primitives */
 
@@ -470,14 +702,7 @@ const caustic = (at: string, hexA: string, hexB: string, a: number): string[] =>
  * `w` = sheet width as a percentage of the sweep; `at` picks which side it
  * hugs; `h` gently modulates strength.
  */
-const blade = (
-  at: string,
-  hex: string,
-  a: number,
-  w: string,
-  h: string,
-  deg = 24,
-): string => {
+const blade = (at: string, hex: string, a: number, w: string, h: string, deg = 24): string => {
   const span = Math.max(16, Math.min(100, parseFloat(w) || 50));
   const gainH = Math.max(0.55, Math.min(1, (parseFloat(h) || 100) / 100 + 0.3));
   const far = /right|bottom/.test(at) && !/left|top/.test(at);
@@ -528,13 +753,7 @@ const spot = (at: string, hex: string, a: number, size = 54): string =>
  * `size` positions the band (larger = further from the anchor edge),
  * `thick` is its weight.
  */
-const arcBand = (
-  at: string,
-  hex: string,
-  a: number,
-  size: number,
-  thick = 8,
-): string => {
+const arcBand = (at: string, hex: string, a: number, size: number, thick = 8): string => {
   const parts = at.trim().split(/\s+/);
   const x = parseFloat(parts[0] ?? "50");
   const y = parseFloat(parts[1] ?? "50");
@@ -570,7 +789,6 @@ const chips = (hex: string, hexB: string, a: number, seed: number, n = 14): stri
   return out;
 };
 
-
 /**
  * Vertical plate — architectural column of colour.
  *
@@ -595,9 +813,7 @@ const plateH = (y: number, h: number, hex: string, a: number): string => {
 /** Layered horizon terraces — landscape/energy register. */
 const strata = (hex: string, hexB: string, a: number, flip: boolean): string[] => {
   const ys = flip ? [44, 60, 76] : [52, 66, 82];
-  return ys.map((y, i) =>
-    plateH(y, i === 0 ? 16 : 12, i % 2 ? hexB : hex, a * (1 - i * 0.22)),
-  );
+  return ys.map((y, i) => plateH(y, i === 0 ? 16 : 12, i % 2 ? hexB : hex, a * (1 - i * 0.22)));
 };
 
 /** Corner frame — two rules and a corner block, drafting-table register. */
@@ -621,10 +837,6 @@ const wedge = (hex: string, a: number, deg: number, span: number, flip: boolean)
   const s = flip ? 100 - span : span;
   return `linear-gradient(${deg}deg, ${rgba(hex, a)} 0%, ${rgba(hex, a * 0.78)} ${Math.max(0, s - 14)}%, ${rgba(hex, a * 0.4)} ${s}%, ${rgba(hex, 0)} ${Math.min(100, s + 16)}%)`;
 };
-
-
-
-
 
 /* ------------------------------------------- zoned apparatus (crisp marks) */
 // The soft primitives above supply light. These supply DRAWING: hard-edged,
@@ -695,7 +907,6 @@ const zoned = (grad: string, x: number, y: number, w: number, h: number): string
   const c = clearReadingZone(x, y, w, h);
   return `${grad} ${c.x}% ${c.y}% / ${c.w}% ${c.h}% no-repeat`;
 };
-
 
 /** Column series — a bar chart drawn in the field. */
 const barsZone = (
@@ -1018,7 +1229,6 @@ const SCENE_GAIN: Record<SkinScene, number> = {
   chart: 0.22,
 };
 
-
 /** Anchor point per scene so consecutive slides don't look identical. */
 const SCENE_ANCHOR: Record<SkinScene, string> = {
   cover: "18% 14%",
@@ -1091,16 +1301,14 @@ export function skinBackgroundLayers(
   const baseAnchor =
     t === 0
       ? (sig.anchor ?? SCENE_ANCHOR[scene] ?? "76% 14%")
-      : (SCENE_ANCHOR[
-          sceneOrder[(sceneOrder.indexOf(scene) + t * 3) % sceneOrder.length]!
-        ] ?? "76% 14%");
+      : (SCENE_ANCHOR[sceneOrder[(sceneOrder.indexOf(scene) + t * 3) % sceneOrder.length]!] ??
+        "76% 14%");
   const anchor = flip
     ? baseAnchor
         .split(" ")
         .map((p, i) => (i === 0 ? `${100 - parseFloat(p)}%` : p))
         .join(" ")
     : baseAnchor;
-
 
   const dark = r.dark;
   // Pale accents on a pale field (or near-black on near-black) need more alpha
@@ -1141,7 +1349,10 @@ export function skinBackgroundLayers(
   const line = (base: number) =>
     Math.min(
       oCeil * 0.46,
-      Math.max(base * 0.4, base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * sig.texture * (dark ? 1.5 : 1.35)),
+      Math.max(
+        base * 0.4,
+        base * (0.6 + g * 0.6) * Math.min(punch, 1.8) * sig.texture * (dark ? 1.5 : 1.35),
+      ),
     );
 
   // Near-black fields swallow hairlines, so drawn apparatus gets extra body.
@@ -1154,12 +1365,14 @@ export function skinBackgroundLayers(
       oCeil * 0.57,
       Math.max(
         base * 0.28 * inkyBoost * sig.texture,
-        base * (0.34 + g * 0.42) * Math.min(punch, 1.6) * sig.texture * (dark ? 1.2 : 1.05) * inkyBoost,
+        base *
+          (0.34 + g * 0.42) *
+          Math.min(punch, 1.6) *
+          sig.texture *
+          (dark ? 1.2 : 1.05) *
+          inkyBoost,
       ),
     );
-
-
-
 
   const gap = (n: number) => Math.max(8, Math.round(n * gapK));
   const tint = mixHex(r.accent, r.accentAlt, 0.5);
@@ -1187,7 +1400,18 @@ export function skinBackgroundLayers(
       L.push(plateH(scene === "chart" ? 84 : 8, 2.4, r.accent, a(0.46)));
       L.push(arcBand(flip ? "-4% 104%" : "104% -4%", r.accentAlt, a(0.2), wide ? 52 : 40, 7));
       L.push(spot(anchor, r.accent, a(0.14), 62));
-      L.push(barsZone(r.accent, mark(0.4), flip ? 8 : 46, wide ? 52 : 58, 46, wide ? 34 : 28, 8, gap(24)));
+      L.push(
+        barsZone(
+          r.accent,
+          mark(0.4),
+          flip ? 8 : 46,
+          wide ? 52 : 58,
+          46,
+          wide ? 34 : 28,
+          8,
+          gap(24),
+        ),
+      );
       L.push(...railZone(r.ink, mark(0.24), flip ? 8 : 46, wide ? 86 : 87, 46, 3.4, gap(20)));
       L.push(rules(r.ink, line(0.05), gap(56), 0));
       break;
@@ -1197,8 +1421,21 @@ export function skinBackgroundLayers(
       L.push(...cross(r.accent, r.accentAlt, a(0.13), flip));
       L.push(arcBand(flip ? "-6% 50%" : "106% 50%", r.accent, a(0.2), wide ? 62 : 48, 7));
       L.push(spot("50% 44%", r.accentAlt, a(0.18), 74));
-      L.push(...pulseZone(r.accent, mark(0.54), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, seed, 8));
-      L.push(...gridZone(r.ink, mark(0.22), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, gap(26)));
+      L.push(
+        ...pulseZone(
+          r.accent,
+          mark(0.54),
+          flip ? 6 : 44,
+          wide ? 60 : 64,
+          50,
+          wide ? 24 : 20,
+          seed,
+          8,
+        ),
+      );
+      L.push(
+        ...gridZone(r.ink, mark(0.22), flip ? 6 : 44, wide ? 60 : 64, 50, wide ? 24 : 20, gap(26)),
+      );
       L.push(rules(r.ink, line(0.026), gap(46)));
       break;
     }
@@ -1207,7 +1444,19 @@ export function skinBackgroundLayers(
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
       L.push(wedge(r.accent, a(0.2), 104 + rot, flip ? 62 : 38, flip));
       L.push(plateH(flip ? 92 : 6, 1.2, r.accentAlt, a(0.5)));
-      L.push(...slatZone(r.accentAlt, r.accent, mark(0.26), flip ? 2 : 54, 12, 44, wide ? 76 : 70, 104 + rot, gap(18)));
+      L.push(
+        ...slatZone(
+          r.accentAlt,
+          r.accent,
+          mark(0.26),
+          flip ? 2 : 54,
+          12,
+          44,
+          wide ? 76 : 70,
+          104 + rot,
+          gap(18),
+        ),
+      );
       L.push(grade(160, r.accentAlt, r.accent, a(0.12)));
       L.push(vignette(dark ? "#000000" : r.ink, dark ? 0.38 * g : 0.08 * g));
       break;
@@ -1217,7 +1466,17 @@ export function skinBackgroundLayers(
       L.push(...frame(r.accent, a(0.34), wide ? 7 : 5, flip));
       L.push(plateV(flip ? 62 : 26, 12, r.accent, a(0.12)));
       L.push(arcBand(flip ? "-6% 92%" : "106% 8%", r.accentAlt, a(0.18), wide ? 50 : 38, 7));
-      L.push(...gridZone(r.accent, mark(0.3), flip ? 8 : 52, wide ? 40 : 46, 40, wide ? 48 : 42, gap(22)));
+      L.push(
+        ...gridZone(
+          r.accent,
+          mark(0.3),
+          flip ? 8 : 52,
+          wide ? 40 : 46,
+          40,
+          wide ? 48 : 42,
+          gap(22),
+        ),
+      );
       L.push(...railZone(r.accent, mark(0.3), flip ? 8 : 52, wide ? 34 : 40, 40, 2.6, gap(16)));
       L.push(rules(r.accent, line(0.05), gap(88)));
       L.push(rules(r.ink, line(0.024), gap(22)));
@@ -1229,7 +1488,18 @@ export function skinBackgroundLayers(
       L.push(wedge(r.accentAlt, a(0.24), 148 + rot, flip ? 40 : 60, !flip));
       L.push(shard(flip ? "left bottom" : "right top", tint, a(0.2), "34%", "48%", 62));
       L.push(plateH(flip ? 4 : 94, wide ? 4 : 2, tint, a(0.45)));
-      L.push(...chevronZone(tint, mark(0.3), flip ? 4 : 50, wide ? 46 : 54, 46, wide ? 44 : 38, gap(24), 38));
+      L.push(
+        ...chevronZone(
+          tint,
+          mark(0.3),
+          flip ? 4 : 50,
+          wide ? 46 : 54,
+          46,
+          wide ? 44 : 38,
+          gap(24),
+          38,
+        ),
+      );
       break;
     }
     case "civic": {
@@ -1238,7 +1508,17 @@ export function skinBackgroundLayers(
       L.push(plateH(wide ? 92 : 95, wide ? 6 : 3, r.accentAlt, a(0.3)));
       L.push(plateV(flip ? 8 : 72, wide ? 20 : 14, r.accentAlt, a(0.12)));
       L.push(spot(anchor, r.accent, a(0.16), 66));
-      L.push(pillarZone(r.accent, mark(0.26), flip ? 6 : 46, wide ? 40 : 46, 48, wide ? 50 : 44, gap(56)));
+      L.push(
+        pillarZone(
+          r.accent,
+          mark(0.26),
+          flip ? 6 : 46,
+          wide ? 40 : 46,
+          48,
+          wide ? 50 : 44,
+          gap(56),
+        ),
+      );
       L.push(rules(r.ink, line(0.03), gap(68), 0));
       break;
     }
@@ -1246,7 +1526,19 @@ export function skinBackgroundLayers(
       // Energy/climate/agriculture: terraced horizons plus survey contours.
       L.push(...strata(r.accent, r.accentAlt, a(0.26), flip));
       L.push(arcBand(flip ? "12% 116%" : "88% 116%", r.accent, a(0.16), wide ? 56 : 44, 9));
-      L.push(...slatZone(r.accent, r.accentAlt, mark(0.24), 0, wide ? 52 : 58, 100, wide ? 44 : 40, 6, gap(20)));
+      L.push(
+        ...slatZone(
+          r.accent,
+          r.accentAlt,
+          mark(0.24),
+          0,
+          wide ? 52 : 58,
+          100,
+          wide ? 44 : 40,
+          6,
+          gap(20),
+        ),
+      );
       L.push(...railZone(r.ink, mark(0.18), flip ? 6 : 48, wide ? 26 : 30, 46, 3, gap(22)));
       L.push(spot(anchor, tint, a(0.18), 84));
       break;
@@ -1257,7 +1549,18 @@ export function skinBackgroundLayers(
       L.push(arcBand(pivot, r.accent, a(0.26), wide ? 44 : 34, 8));
       L.push(arcBand(pivot, r.accentAlt, a(0.19), wide ? 64 : 50, 6));
       L.push(arcBand(pivot, tint, a(0.13), wide ? 84 : 68, 5));
-      L.push(...chevronZone(r.accentAlt, mark(0.28), flip ? 2 : 52, wide ? 50 : 56, 46, wide ? 42 : 36, gap(26), 30));
+      L.push(
+        ...chevronZone(
+          r.accentAlt,
+          mark(0.28),
+          flip ? 2 : 52,
+          wide ? 50 : 56,
+          46,
+          wide ? 42 : 36,
+          gap(26),
+          30,
+        ),
+      );
       L.push(spot(anchor, r.accent, a(0.2), 62));
       break;
     }
@@ -1267,7 +1570,9 @@ export function skinBackgroundLayers(
       L.push(plateV(flip ? 34 : 64, 0.4, r.ink, a(0.3)));
       L.push(plateV(flip ? 4 : 66, wide ? 30 : 24, r.accentAlt, a(0.12)));
       L.push(spot(anchor, r.accent, a(0.2), wide ? 72 : 56));
-      L.push(...screenZone(r.ink, mark(0.2), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 52 : 44, gap(14)));
+      L.push(
+        ...screenZone(r.ink, mark(0.2), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 52 : 44, gap(14)),
+      );
       L.push(dots(r.ink, line(0.05), gap(wide ? 13 : 19), 1.5));
       break;
     }
@@ -1276,7 +1581,19 @@ export function skinBackgroundLayers(
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.26)));
       L.push(...glassPane(flip ? "left top" : "right top", r.accentAlt, a(0.22), "38%", "100%"));
       L.push(wedge(tint, a(0.16), 68 + rot, flip ? 56 : 44, flip));
-      L.push(...slatZone(r.accent, r.accentAlt, mark(0.28), flip ? 4 : 50, 14, 46, wide ? 72 : 66, 96 + rot, gap(20)));
+      L.push(
+        ...slatZone(
+          r.accent,
+          r.accentAlt,
+          mark(0.28),
+          flip ? 4 : 50,
+          14,
+          46,
+          wide ? 72 : 66,
+          96 + rot,
+          gap(20),
+        ),
+      );
       L.push(plateH(74, 26, tint, a(0.1)));
       break;
     }
@@ -1297,7 +1614,19 @@ export function skinBackgroundLayers(
       L.push(tide(r.accent, a(0.3), flip ? "right bottom" : "left bottom", "130%", "62%"));
       L.push(tide(r.accentAlt, a(0.22), flip ? "left bottom" : "right bottom", "110%", "44%"));
       L.push(arcBand(flip ? "6% 122%" : "94% 122%", tint, a(0.18), wide ? 60 : 46, 9));
-      L.push(...slatZone(tint, r.accentAlt, mark(0.22), 0, wide ? 58 : 64, 100, wide ? 38 : 32, 172, gap(18)));
+      L.push(
+        ...slatZone(
+          tint,
+          r.accentAlt,
+          mark(0.22),
+          0,
+          wide ? 58 : 64,
+          100,
+          wide ? 38 : 32,
+          172,
+          gap(18),
+        ),
+      );
       L.push(spot(anchor, tint, a(0.18), 84));
       break;
     }
@@ -1305,17 +1634,19 @@ export function skinBackgroundLayers(
       // Semiconductor/hardware: routed traces, a bus plate and a via node.
       L.push(plateV(flip ? 66 : 22, wide ? 14 : 10, r.accent, a(0.14)));
       L.push(plateH(flip ? 22 : 70, wide ? 10 : 7, r.accentAlt, a(0.12)));
+      L.push(band(`${flip ? 18 : 68}% ${wide ? 60 : 66}%`, r.accentAlt, a(0.5), "11px", "11px"));
+      L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
       L.push(
-        band(
-          `${flip ? 18 : 68}% ${wide ? 60 : 66}%`,
-          r.accentAlt,
-          a(0.5),
-          "11px",
-          "11px",
+        ...traceZone(
+          r.accent,
+          mark(0.32),
+          flip ? 4 : 50,
+          wide ? 40 : 46,
+          46,
+          wide ? 50 : 44,
+          gap(32),
         ),
       );
-      L.push(arcBand(flip ? "-4% 6%" : "104% 6%", r.accent, a(0.16), wide ? 46 : 36, 6));
-      L.push(...traceZone(r.accent, mark(0.32), flip ? 4 : 50, wide ? 40 : 46, 46, wide ? 50 : 44, gap(32)));
       L.push(trace(r.accent, line(0.05), gap(36)));
       break;
     }
@@ -1324,7 +1655,17 @@ export function skinBackgroundLayers(
       L.push(plateV(flip ? 2 : 68, wide ? 30 : 22, r.accent, a(0.13)));
       L.push(arcBand(flip ? "-6% 6%" : "106% 6%", r.accentAlt, a(0.17), wide ? 52 : 40, 8));
       L.push(...chips(r.accent, r.accentAlt, a(0.34), seed, wide ? 18 : 13));
-      L.push(...screenZone(r.accentAlt, mark(0.16), flip ? 4 : 52, wide ? 46 : 52, 44, wide ? 44 : 38, gap(18)));
+      L.push(
+        ...screenZone(
+          r.accentAlt,
+          mark(0.16),
+          flip ? 4 : 52,
+          wide ? 46 : 52,
+          44,
+          wide ? 44 : 38,
+          gap(18),
+        ),
+      );
       L.push(spot(anchor, r.accent, a(0.2), wide ? 74 : 58));
       break;
     }
@@ -1333,7 +1674,19 @@ export function skinBackgroundLayers(
       L.push(...meshField(r.accent, r.accentAlt, tint, a(0.34), flip));
       L.push(...caustic(anchor, r.accent, r.accentAlt, a(0.18)));
       L.push(arcBand(flip ? "10% 118%" : "90% 118%", tint, a(0.14), wide ? 68 : 54, 11));
-      L.push(...slatZone(tint, r.accent, mark(0.2), flip ? 2 : 54, wide ? 50 : 56, 44, wide ? 40 : 34, 90 + rot, gap(22)));
+      L.push(
+        ...slatZone(
+          tint,
+          r.accent,
+          mark(0.2),
+          flip ? 2 : 54,
+          wide ? 50 : 56,
+          44,
+          wide ? 40 : 34,
+          90 + rot,
+          gap(22),
+        ),
+      );
       L.push(grade(20 + rot, r.accentAlt, r.accent, a(0.12)));
       break;
     }
@@ -1343,7 +1696,18 @@ export function skinBackgroundLayers(
       L.push(plateH(wide ? 93 : 96, wide ? 5 : 2.4, r.ink, a(0.4)));
       L.push(plateH(flip ? 12 : 0, wide ? 8 : 4, r.accentAlt, a(0.28)));
       L.push(wedge(r.accentAlt, a(0.14), 0, flip ? 30 : 70, flip));
-      L.push(...chevronZone(r.ink, mark(0.22), flip ? 4 : 50, wide ? 44 : 50, 46, wide ? 46 : 40, gap(22), 45));
+      L.push(
+        ...chevronZone(
+          r.ink,
+          mark(0.22),
+          flip ? 4 : 50,
+          wide ? 44 : 50,
+          46,
+          wide ? 46 : 40,
+          gap(22),
+          45,
+        ),
+      );
       L.push(stripes(r.ink, line(0.04), gap(22), 45, 3));
       break;
     }
@@ -1352,12 +1716,13 @@ export function skinBackgroundLayers(
       L.push(...cross(r.accent, r.accentAlt, a(0.15), flip));
       L.push(arcBand(flip ? "-8% 104%" : "108% 104%", r.accentAlt, a(0.18), wide ? 54 : 42, 8));
       L.push(spot(anchor, r.accentAlt, a(0.18), 78));
-      L.push(...isoZone(r.accent, mark(0.3), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 50 : 44, gap(28)));
+      L.push(
+        ...isoZone(r.accent, mark(0.3), flip ? 4 : 50, wide ? 40 : 48, 46, wide ? 50 : 44, gap(28)),
+      );
       L.push(isoGrid(r.accent, line(0.04), gap(40)));
       break;
     }
   }
-
 
   // ---------------------------------------------------------------------
   // COHESION BUDGET.
@@ -1409,9 +1774,6 @@ export function skinBackgroundLayers(
     L.push(...kept);
   }
 
-
-
-
   // ---------------------------------------------------------------------
   // HYPER-REAL ATMOSPHERE (topmost).
   //
@@ -1442,7 +1804,6 @@ export function skinBackgroundLayers(
   L.push(grade(dark ? 200 : 340, tint, r.accent, a(0.08)));
   L.push(vignette(dark ? "#000000" : r.ink, (dark ? 0.22 : 0.05) * (0.5 + g * 0.5)));
 
-
   if (dark && (scene === "cover" || scene === "closing")) {
     L.push(vignette("#000000", 0.35));
   }
@@ -1468,9 +1829,7 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
   // "agenda" as a closing slide (it contains "end").
   if ((SKIN_SCENES as string[]).includes(s)) return s as SkinScene;
   if (/cover|title|hero|opening/.test(s)) return "cover";
-  if (/closing|thanks|\bend\b|cta|contact|\bclose\b|\bqna\b|next-steps/.test(s))
-    return "closing";
-
+  if (/closing|thanks|\bend\b|cta|contact|\bclose\b|\bqna\b|next-steps/.test(s)) return "closing";
 
   if (/agenda|contents|index|roadmap-list/.test(s)) return "agenda";
   if (/statement|manifesto|big|impact/.test(s)) return "statement";
@@ -1479,24 +1838,29 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
   if (/bento|mosaic|grid-cards|modular/.test(s)) return "bento";
   if (/chart|graph|plot|table|data/.test(s)) return "chart";
   if (/quote|testimonial|voice/.test(s)) return "quote";
-  if (/timeline|phase|milestone|process|cycle|step|roadmap|journey|flow/.test(s))
-    return "timeline";
+  if (/timeline|phase|milestone|process|cycle|step|roadmap|journey|flow/.test(s)) return "timeline";
   // Second pass: the module vocabulary below has no scene word in it, but the
   // layouts are unmistakable. Without these, most of the catalogue collapsed
   // onto the "section" plate and a whole deck wore a single background.
-  if (/card|tile|grid|mosaic|matrix|feature|pillar|icon|logo|list/.test(s))
-    return "bento";
+  if (/card|tile|grid|mosaic|matrix|feature|pillar|icon|logo|list/.test(s)) return "bento";
   if (/team|portrait|people|headshot|profile|showcase|device|laptop|monitor/.test(s))
     return "split";
   if (/table|pricing|compare|scorecard|budget|cost|breakdown/.test(s)) return "chart";
-  if (/why|value|benefit|approach|solution|capabilit|service|offer/.test(s))
-    return "agenda";
+  if (/why|value|benefit|approach|solution|capabilit|service|offer/.test(s)) return "agenda";
   // Third pass: the module *families* (MV-VIZ-…, MV-DASH-…, MV-INFO-…) name
   // their geometry, not a deck section, so they used to fall straight through
   // to "section". Route each family to the plate its composition wants.
-  if (/\b(viz|dash)\b|donut|funnel|pyramid|venn|sankey|chord|beeswarm|bump|treemap|heatmap|curve|gauge|performance|columns|market-map/.test(s))
+  if (
+    /\b(viz|dash)\b|donut|funnel|pyramid|venn|sankey|chord|beeswarm|bump|treemap|heatmap|curve|gauge|performance|columns|market-map/.test(
+      s,
+    )
+  )
     return "chart";
-  if (/hub|satellit|orbit|flywheel|layer-stack|platform-loop|architecture|countdown|horizon|before-after|maturity|stack/.test(s))
+  if (
+    /hub|satellit|orbit|flywheel|layer-stack|platform-loop|architecture|countdown|horizon|before-after|maturity|stack/.test(
+      s,
+    )
+  )
     return "timeline";
   if (/\bimg\b|\bloc\b|world|region|spoke|map|pins|bleed|strip|caption|spread/.test(s))
     return "split";
@@ -1504,8 +1868,7 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
     return "statement";
   if (/case|client|\bgov\b|raci|risk|mitigation|\bcomm\b|investment|\brec\b|next/.test(s))
     return "bento";
-  if (/divider|section|chapter|break|title-only|blank|kicker|poster/.test(s))
-    return "section";
+  if (/divider|section|chapter|break|title-only|blank|kicker|poster/.test(s)) return "section";
   // Deterministic spread instead of a "section" magnet: anything still
   // unmatched hashes across the content plates so a deck never wears one
   // background just because its modules use novel names.
@@ -1524,8 +1887,6 @@ export function sceneFromSeed(seed: string | undefined | null): SkinScene {
     h = Math.imul(h, 16777619);
   }
   return SPREAD[Math.abs(h) % SPREAD.length]!;
-
-
 }
 
 /** Human-readable description of a skin's background library, for the UI. */

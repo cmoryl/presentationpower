@@ -89,9 +89,9 @@ export interface EffectCandidate {
   borderColor?: DomColor | null;
 }
 
-
 /** Filter functions whose result depends on pixels BEHIND the element. */
-const BACKDROP_DEPENDENT = /\b(brightness|contrast|saturate|grayscale|sepia|hue-rotate|invert)\s*\(/i;
+const BACKDROP_DEPENDENT =
+  /\b(brightness|contrast|saturate|grayscale|sepia|hue-rotate|invert)\s*\(/i;
 
 function num(v: string | undefined): number {
   const n = parseFloat(v ?? "");
@@ -123,7 +123,8 @@ export function parseDropShadows(
   let m: RegExpExecArray | null;
   while ((m = re.exec(filter || ""))) {
     const body = m[1];
-    const colorText = (body.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
+    const colorText =
+      (body.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
     const color = resolveColor(colorText) ?? { hex: "000000", alpha: 0.35 };
     const nums = lengths(body);
     const [dx = 0, dy = 0, blur = 0] = nums;
@@ -166,7 +167,8 @@ export function parseBoxShadowLayers(
   if (!raw || raw === "none") return { outer, inset };
   for (const layer of splitLayers(raw)) {
     const isInset = /\binset\b/i.test(layer);
-    const colorText = (layer.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
+    const colorText =
+      (layer.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/i) ?? [])[0] ?? "";
     const color = resolveColor(colorText);
     const nums = lengths(layer);
     if (!color || color.alpha <= 0 || nums.length < 2) continue;
@@ -194,7 +196,6 @@ export function parseBoxShadowLayers(
 export function isStrokeGlow(s: EffectShadow): boolean {
   return Math.abs(s.dx) < 0.5 && Math.abs(s.dy) < 0.5 && (s.blurPx > 0 || s.spreadPx > 0);
 }
-
 
 /** A `mask-image` gradient describing a feathered edge. */
 export function parseFeather(
@@ -325,14 +326,12 @@ export function effectPadPx(style: EffectStyle): number {
   return Math.ceil(Math.max(style.blurPx * 1.6, shadowReach, strokeReach));
 }
 
-
 function rgba(c: DomColor, mul = 1): string {
   const a = Math.max(0, Math.min(1, c.alpha * mul));
   if (a >= 1) return `#${c.hex}`;
   const ch = (i: number) => parseInt(c.hex.slice(i, i + 2), 16);
   return `rgba(${ch(0)},${ch(2)},${ch(4)},${Math.round(a * 1000) / 1000})`;
 }
-
 
 /** CSS gradient angle → SVG x1/y1/x2/y2 on the unit square. */
 function linearVector(angleDeg: number): { x1: number; y1: number; x2: number; y2: number } {
@@ -497,7 +496,6 @@ export function effectSvg(
   ]
     .filter(Boolean)
     .join(" ");
-
 
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${fw}" height="${fh}" ` +

@@ -23,10 +23,7 @@ import { aspectClass } from "@/lib/social-formats";
 import type { CampaignCopy, EventFacts } from "@/lib/campaigns";
 import { resolveSocialStyle, type SocialStyleId } from "@/lib/social-styles";
 import { statGradient } from "@/lib/stat-contrast";
-import {
-  applySocialCopyEdit,
-  type SocialAssetEdit,
-} from "@/lib/social-asset-edit";
+import { applySocialCopyEdit, type SocialAssetEdit } from "@/lib/social-asset-edit";
 
 type Preset = {
   padPct: number;
@@ -633,7 +630,6 @@ export function SocialRenderer({
     // Percent of the short edge, capped at 6% so no aspect ratio (1:1, 4:5,
     // 9:16, 1200×628) can round the plate past a soft rectangle into a pill.
     borderRadius: Math.min((short * style.plateRadiusPct) / 100, short * 0.06),
-
   };
   const auraMask =
     copyAlign === "end"

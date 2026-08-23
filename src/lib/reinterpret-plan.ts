@@ -181,4 +181,3 @@ export function baselineReinterpretation(
 ): MappedSlide[] {
   return designReinterpretedDeck(mapped, { styleVariantIds, styleVariantIdsByIndex });
 }
-

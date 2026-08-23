@@ -81,9 +81,7 @@ export default defineTool({
       slides_needing_in_app_export: out.degradedSlides,
       failed_slides: out.failedSlides,
       warnings: out.warnings,
-      note:
-        "Show the download link to the user. Slides listed in slides_needing_in_app_export use design plates that only the app renderer can produce — if that list is non-empty, offer full_fidelity_url instead: it opens the deck in the app and downloads a pixel-exact file automatically.",
+      note: "Show the download link to the user. Slides listed in slides_needing_in_app_export use design plates that only the app renderer can produce — if that list is non-empty, offer full_fidelity_url instead: it opens the deck in the app and downloads a pixel-exact file automatically.",
     });
   },
 });
-

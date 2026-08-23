@@ -14,7 +14,9 @@ import {
 
 const EMU = 914400;
 
-function slideXml(objects: Array<{ tag: "p:sp" | "p:pic"; x: number; y: number; w: number; h: number }>) {
+function slideXml(
+  objects: Array<{ tag: "p:sp" | "p:pic"; x: number; y: number; w: number; h: number }>,
+) {
   return objects
     .map(
       (o) =>

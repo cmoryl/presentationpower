@@ -24,17 +24,12 @@ import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { byId, SECTION_FRAMEWORKS, NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 import { recordAssetVersion, useAssetVersions } from "@/lib/asset-versions";
-import {
-  ReferenceAssetUploader,
-  type ReferenceAsset,
-} from "@/components/ReferenceAssetUploader";
+import { ReferenceAssetUploader, type ReferenceAsset } from "@/components/ReferenceAssetUploader";
 import { analyzeReferenceAssets } from "@/lib/reference-assets.functions";
 import { ProspectPanel, type ProspectDetails } from "@/components/ProspectPanel";
 import { StructurePreviewPanel } from "@/components/brief/StructurePreviewPanel";
 import { buildStructurePreviews } from "@/lib/brief-structure-preview";
 import { validateBrief } from "@/lib/brief-validation";
-
-
 
 export const Route = createFileRoute("/brief/new")({
   head: () => ({
@@ -254,10 +249,12 @@ function BriefCommandCenter() {
       ? inheritedReferences
       : null;
 
-
   const REQUEST_RULES: Array<{ match: RegExp; dests: Destination[] }> = [
     { match: /\b(deck|slides?|presentation|pitch|ppt|powerpoint)\b/i, dests: ["presentation"] },
-    { match: /\b(case ?study|success story|win story|proof point)\b/i, dests: ["print:case-study"] },
+    {
+      match: /\b(case ?study|success story|win story|proof point)\b/i,
+      dests: ["print:case-study"],
+    },
     {
       match: /\b(one[- ]?pager|onepager|spotlight|leave[- ]?behind|flyer|sell ?sheet)\b/i,
       dests: ["print:spotlight"],
@@ -288,9 +285,7 @@ function BriefCommandCenter() {
   }, [assetRequest]);
 
   function setFromDestinations(dests: Destination[]): MasterSet {
-    const kinds = dests
-      .filter((d) => d.startsWith("print:"))
-      .map((d) => d.slice(6) as PrintKind);
+    const kinds = dests.filter((d) => d.startsWith("print:")).map((d) => d.slice(6) as PrintKind);
     const next: MasterSet = {
       presentation: dests.includes("presentation"),
       print: { enabled: kinds.length > 0, kinds },
@@ -347,9 +342,7 @@ function BriefCommandCenter() {
     return {
       prospect: inferredProspect || "New prospect",
       industry:
-        prospectDetails.industry.trim() ||
-        brand?.contentScope?.industries?.[0] ||
-        "Life sciences",
+        prospectDetails.industry.trim() || brand?.contentScope?.industries?.[0] || "Life sciences",
       audience: prospectDetails.audience.trim() || "Decision makers",
       meetingObjective:
         prospectDetails.meetingObjective.trim() || raw || "Introduce TransPerfect capabilities",
@@ -426,7 +419,6 @@ function BriefCommandCenter() {
       patchJob("social", { status: "running", detail: "Linking social playbook…" });
     }
 
-
     setDeckContext(deckId, {
       masterSet: {
         eventPlaybookId: set.event.enabled ? set.event.playbookId : null,
@@ -451,14 +443,12 @@ function BriefCommandCenter() {
       patchJob("social", { status: "done", detail: "Social kit linked" });
     setExpanding(false);
 
-
     const parts: string[] = ["Deck"];
     if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
     if (set.event.enabled && set.event.playbookId) parts.push("event kit");
     if (set.social.enabled && set.social.playbookId) parts.push("social kit");
     toast.success(`Master set ready · ${parts.join(" · ")}`);
   }
-
 
   // Every artifact the current selection will produce, as trackable jobs.
   function buildJobPlan(set: MasterSet) {
@@ -613,7 +603,6 @@ function BriefCommandCenter() {
         : "No matching sources — using brief only",
     });
 
-
     const personalizerKb: Array<{
       source: "oracle" | "kb" | "asset" | "brand-intel";
       title: string;
@@ -717,7 +706,6 @@ function BriefCommandCenter() {
       }
     }
 
-
     setAiStatus("personalizing");
 
     patchJob("personalize", {
@@ -782,18 +770,17 @@ function BriefCommandCenter() {
     navigate({ to: "/brief/$deckId", params: { deckId } });
   }
 
-
-
   async function generateFast() {
     const submission = buildSubmission();
-    startJobs(buildJobPlan(masterSet).filter((j) => j.id !== "knowledge" && j.id !== "personalize"));
+    startJobs(
+      buildJobPlan(masterSet).filter((j) => j.id !== "knowledge" && j.id !== "personalize"),
+    );
     patchJob("deck", { status: "running" });
     const { deckId } = create(submission);
     patchJob("deck", { status: "done", detail: "Deck assembled" });
     await expandMasterSet(deckId, submission);
     navigate({ to: "/brief/$deckId", params: { deckId } });
   }
-
 
   // "Request a specific asset" → auto-produce it in the selected division's
   // style, then drop the user into the editor to fine-tune (or hand to Copilot).
@@ -804,7 +791,6 @@ function BriefCommandCenter() {
     setMasterSet(set);
     await generateWithAi({ set, request: text });
   }
-
 
   const busy =
     aiStatus === "assembling" || aiStatus === "knowledge" || aiStatus === "personalizing";
@@ -832,7 +818,13 @@ function BriefCommandCenter() {
         { k: "Length", v: "10–14 slides" },
         { k: "Export", v: "PPTX · PDF · link" },
       ],
-      includes: ["Title + agenda", "Challenge framing", "Solution modules", "Proof stats", "Next steps"],
+      includes: [
+        "Title + agenda",
+        "Challenge framing",
+        "Solution modules",
+        "Proof stats",
+        "Next steps",
+      ],
     },
     {
       id: "print:case-study",
@@ -846,7 +838,13 @@ function BriefCommandCenter() {
         { k: "Length", v: "2 pages" },
         { k: "Export", v: "Print-ready PDF" },
       ],
-      includes: ["Photo hero", "Challenge · Approach · Outcome", "3 outcome stats", "Client quote", "Contact card"],
+      includes: [
+        "Photo hero",
+        "Challenge · Approach · Outcome",
+        "3 outcome stats",
+        "Client quote",
+        "Contact card",
+      ],
     },
     {
       id: "print:spotlight",
@@ -902,7 +900,13 @@ function BriefCommandCenter() {
         { k: "Pieces", v: "6–10 assets" },
         { k: "Export", v: "Print + digital" },
       ],
-      includes: ["Booth backwall", "Pull-up banner", "Badge + lanyard", "Wearables", "Digital screen loop"],
+      includes: [
+        "Booth backwall",
+        "Pull-up banner",
+        "Badge + lanyard",
+        "Wearables",
+        "Digital screen loop",
+      ],
     },
     {
       id: "social",
@@ -919,7 +923,6 @@ function BriefCommandCenter() {
       includes: ["LinkedIn 1200×627", "Instagram 1080×1350", "Story 1080×1920", "Caption copy"],
     },
   ];
-
 
   const DEST_PRESETS: Array<{ id: string; label: string; hint: string; dests: Destination[] }> = [
     {
@@ -967,7 +970,9 @@ function BriefCommandCenter() {
         seed: {
           prospect: prospectDetails.prospect.trim() || "New prospect",
           industry:
-            prospectDetails.industry.trim() || brand?.contentScope?.industries?.[0] || "Life sciences",
+            prospectDetails.industry.trim() ||
+            brand?.contentScope?.industries?.[0] ||
+            "Life sciences",
           audience: prospectDetails.audience.trim() || "Decision makers",
           meetingObjective:
             prospectDetails.meetingObjective.trim() ||
@@ -988,7 +993,6 @@ function BriefCommandCenter() {
       }),
     [prospectDetails, prompt, brandModeId, brand, narrativeArchetypes, masterSet],
   );
-
 
   // Pre-submit validation: missing required fields + incompatible combos.
   const validation = useMemo(
@@ -1025,7 +1029,6 @@ function BriefCommandCenter() {
         ? "Select at least one asset to continue."
         : null;
 
-
   const pct = Math.round(((step - 1) / (STEPS.length - 1)) * 100);
   const digest: Array<{ k: string; v: string }> = [
     { k: "Output", v: activeChannels.length ? activeChannels.join(" · ") : "—" },
@@ -1051,7 +1054,8 @@ function BriefCommandCenter() {
         <div className="relative mx-auto flex w-full max-w-[1400px] flex-wrap items-end justify-between gap-6 px-6 py-8 lg:px-10">
           <div className="min-w-0">
             <span className="font-mono text-[10px] uppercase tracking-[0.34em] text-white/45">
-              Brief console · {String(step).padStart(2, "0")} / {String(STEPS.length).padStart(2, "0")}
+              Brief console · {String(step).padStart(2, "0")} /{" "}
+              {String(STEPS.length).padStart(2, "0")}
             </span>
             <h1 className="mt-2 text-[34px] font-semibold leading-[0.98] tracking-tight sm:text-[44px]">
               What are we making today?
@@ -1153,681 +1157,699 @@ function BriefCommandCenter() {
         </aside>
 
         <div className="min-w-0">
-
-
-
-        {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
-        {step === 1 && (
-        <section className="mt-8">
-          <div className={CARD_SHELL}>
-            <SectionHead
-              kicker="Step 1"
-              title="Output type"
-              hint={`${activeChannels.length} selected`}
-            />
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
-              Start here — whether this is a PowerPoint, print collateral, an event kit or a social
-              set determines which assets get built, which layouts are available, and how the story
-              is written.
-            </p>
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {CHANNELS.map((c) => {
-                const on = isChannelOn(c.id);
-                const Icon = c.icon;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => toggleChannel(c.id)}
-                    aria-pressed={on}
-                    className={`hairline-frame group relative flex flex-col items-start gap-1.5 rounded-2xl border px-4 py-4 text-left transition duration-200 ${
-                      on
-                        ? "border-black/[0.06] bg-white shadow-[0_10px_30px_-18px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-white/[0.06]"
-                        : "border-black/10 bg-white hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.04]"
-                    }`}
-                  >
-                    <span className="relative flex w-full items-start justify-between">
-                      <span
-                        className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+          {/* Step 1 — Output type (channel). Defines which assets exist at all. */}
+          {step === 1 && (
+            <section className="mt-8">
+              <div className={CARD_SHELL}>
+                <SectionHead
+                  kicker="Step 1"
+                  title="Output type"
+                  hint={`${activeChannels.length} selected`}
+                />
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
+                  Start here — whether this is a PowerPoint, print collateral, an event kit or a
+                  social set determines which assets get built, which layouts are available, and how
+                  the story is written.
+                </p>
+                <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {CHANNELS.map((c) => {
+                    const on = isChannelOn(c.id);
+                    const Icon = c.icon;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => toggleChannel(c.id)}
+                        aria-pressed={on}
+                        className={`hairline-frame group relative flex flex-col items-start gap-1.5 rounded-2xl border px-4 py-4 text-left transition duration-200 ${
                           on
-                            ? "bg-[#003FC7] text-white shadow-[0_0_0_5px_rgba(0,63,199,0.12)]"
-                            : "bg-black/[0.05] text-[#03002C] dark:bg-white/10 dark:text-white"
+                            ? "border-black/[0.06] bg-white shadow-[0_10px_30px_-18px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-white/[0.06]"
+                            : "border-black/10 bg-white hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.04]"
                         }`}
                       >
-                        <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
-                      </span>
-                      <span
-                        aria-hidden
-                        className={`mt-1 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold transition ${
-                          on
-                            ? "border-transparent bg-[#003FC7] text-white"
-                            : "border-black/15 text-transparent dark:border-white/20"
-                        }`}
-                      >
-                        ✓
-                      </span>
-                    </span>
-                    <span className="relative mt-1 text-sm font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
-                      {c.label}
-                    </span>
-                    <span
-                      className={`relative font-mono text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7] dark:text-[#A1FBF9]" : "text-black/40 dark:text-white/40"}`}
-                    >
-                      {c.kicker}
-                    </span>
-                    <span className="relative text-[12px] leading-relaxed text-black/55 dark:text-white/55">
-                      {c.desc}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {activeChannels.length === 0 && (
-              <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
-                Pick at least one output type — nothing can be generated until you do.
-              </div>
-            )}
-            <StepNav
-              step={1}
-              setStep={setStep}
-              nextLabel="Next: Brand mode"
-              blocked={stepBlocked}
-            />
-          </div>
-        </section>
-        )}
-
-        {/* Step 2 — Brand mode */}
-        {step === 2 && (
-        <section className="mt-8">
-          <div className={CARD_SHELL}>
-            <SectionHead
-              kicker="Step 2"
-              title="Brand mode"
-              aside={
-                <div className="text-xs text-black/45 dark:text-white/45">
-                  Everything below is generated in{" "}
-                  <strong className="font-semibold text-[#03002C] dark:text-white">
-                    {brand?.name ?? "this brand"}
-                  </strong>
-                  .
-                </div>
-              }
-            />
-            {/* Grouped: abstract brand modes vs concrete divisions / sub-brands.
-                One flat row made it unclear what you were actually switching. */}
-            {[
-              { key: "mode", label: "Brand mode", ids: ["bm-enterprise", "bm-subcompany", "bm-division", "bm-product"] },
-              { key: "division", label: "Division / sub-brand", ids: null as string[] | null },
-            ].map((group) => {
-              const list =
-                group.ids
-                  ? brandModes.filter((b) => group.ids!.includes(b.id))
-                  : brandModes.filter(
-                      (b) => !["bm-enterprise", "bm-subcompany", "bm-division", "bm-product"].includes(b.id),
+                        <span className="relative flex w-full items-start justify-between">
+                          <span
+                            className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${
+                              on
+                                ? "bg-[#003FC7] text-white shadow-[0_0_0_5px_rgba(0,63,199,0.12)]"
+                                : "bg-black/[0.05] text-[#03002C] dark:bg-white/10 dark:text-white"
+                            }`}
+                          >
+                            <Icon className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+                          </span>
+                          <span
+                            aria-hidden
+                            className={`mt-1 flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-bold transition ${
+                              on
+                                ? "border-transparent bg-[#003FC7] text-white"
+                                : "border-black/15 text-transparent dark:border-white/20"
+                            }`}
+                          >
+                            ✓
+                          </span>
+                        </span>
+                        <span className="relative mt-1 text-sm font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
+                          {c.label}
+                        </span>
+                        <span
+                          className={`relative font-mono text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7] dark:text-[#A1FBF9]" : "text-black/40 dark:text-white/40"}`}
+                        >
+                          {c.kicker}
+                        </span>
+                        <span className="relative text-[12px] leading-relaxed text-black/55 dark:text-white/55">
+                          {c.desc}
+                        </span>
+                      </button>
                     );
-              if (list.length === 0) return null;
-              return (
-                <div key={group.key} className="mt-4">
-                  <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-black/40 dark:text-white/40">
-                    {group.label}
+                  })}
+                </div>
+
+                {activeChannels.length === 0 && (
+                  <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
+                    Pick at least one output type — nothing can be generated until you do.
                   </div>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {list.map((b) => {
-                      const active = b.id === brandModeId;
-                      const c = b.tokens?.primary || "#003FC7";
+                )}
+                <StepNav
+                  step={1}
+                  setStep={setStep}
+                  nextLabel="Next: Brand mode"
+                  blocked={stepBlocked}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Step 2 — Brand mode */}
+          {step === 2 && (
+            <section className="mt-8">
+              <div className={CARD_SHELL}>
+                <SectionHead
+                  kicker="Step 2"
+                  title="Brand mode"
+                  aside={
+                    <div className="text-xs text-black/45 dark:text-white/45">
+                      Everything below is generated in{" "}
+                      <strong className="font-semibold text-[#03002C] dark:text-white">
+                        {brand?.name ?? "this brand"}
+                      </strong>
+                      .
+                    </div>
+                  }
+                />
+                {/* Grouped: abstract brand modes vs concrete divisions / sub-brands.
+                One flat row made it unclear what you were actually switching. */}
+                {[
+                  {
+                    key: "mode",
+                    label: "Brand mode",
+                    ids: ["bm-enterprise", "bm-subcompany", "bm-division", "bm-product"],
+                  },
+                  { key: "division", label: "Division / sub-brand", ids: null as string[] | null },
+                ].map((group) => {
+                  const list = group.ids
+                    ? brandModes.filter((b) => group.ids!.includes(b.id))
+                    : brandModes.filter(
+                        (b) =>
+                          !["bm-enterprise", "bm-subcompany", "bm-division", "bm-product"].includes(
+                            b.id,
+                          ),
+                      );
+                  if (list.length === 0) return null;
+                  return (
+                    <div key={group.key} className="mt-4">
+                      <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-black/40 dark:text-white/40">
+                        {group.label}
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {list.map((b) => {
+                          const active = b.id === brandModeId;
+                          const c = b.tokens?.primary || "#003FC7";
+                          return (
+                            <button
+                              key={b.id}
+                              type="button"
+                              onClick={() => setBrandModeId(b.id)}
+                              aria-pressed={active}
+                              className={`rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
+                                active
+                                  ? "border-[#03002C] bg-[#03002C] text-white"
+                                  : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/30 dark:hover:text-white"
+                              }`}
+                              style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
+                              title={b.description || b.name}
+                            >
+                              {b.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+                {brand?.contentScope?.industries?.length ? (
+                  <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-3 py-2.5 text-[11px] text-black/60 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/60">
+                    <span className="font-semibold text-[#03002C] dark:text-white">
+                      Industries in scope:
+                    </span>{" "}
+                    {brand.contentScope.industries.join(" · ")} — pick one in Step 3.
+                  </div>
+                ) : null}
+                <StepNav
+                  step={2}
+                  setStep={setStep}
+                  nextLabel="Next: Prospect"
+                  blocked={stepBlocked}
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Step 3 — Prospect */}
+          {step === 3 && (
+            <section className="mt-8">
+              <ProspectPanel
+                value={prospectDetails}
+                onChange={setProspectDetails}
+                industryOptions={brand?.contentScope?.industries ?? []}
+                signedIn={!!signedIn}
+              />
+              <div className={`mt-4 ${CARD_SHELL} py-4`}>
+                <StepNav
+                  step={3}
+                  setStep={setStep}
+                  nextLabel="Next: Assets"
+                  blocked={stepBlocked}
+                  bare
+                />
+              </div>
+            </section>
+          )}
+
+          {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
+          {step === 4 && (
+            <section className="mt-8">
+              <div className={CARD_SHELL}>
+                <SectionHead
+                  kicker="Step 4"
+                  title="Which assets"
+                  hint={`${selectedCount} selected`}
+                />
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
+                  {activeChannels.length === 0
+                    ? "Choose an output type in Step 1 to see the assets available for it."
+                    : "Fine-tune the exact artifacts within your chosen output types. Each one is drafted from the same story and brand mode, so a deck and its leave-behind stay in sync."}
+                </p>
+
+                {/* Quick bundles */}
+                <div className="mt-5">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
+                    Common bundles
+                  </div>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {DEST_PRESETS.map((p) => {
+                      const active = presetIsActive(p.dests);
                       return (
                         <button
-                          key={b.id}
+                          key={p.id}
                           type="button"
-                          onClick={() => setBrandModeId(b.id)}
                           aria-pressed={active}
-                          className={`rounded-xl border px-3 py-2 text-left text-[11px] font-semibold tracking-tight transition ${
+                          onClick={() => setMasterSet(setFromDestinations(p.dests))}
+                          className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
                             active
                               ? "border-[#03002C] bg-[#03002C] text-white"
                               : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/30 dark:hover:text-white"
                           }`}
-                          style={active ? { boxShadow: `inset 0 -2px 0 0 ${c}` } : undefined}
-                          title={b.description || b.name}
+                          title={p.hint}
                         >
-                          {b.name}
+                          {p.label}
+                          <span
+                            className={`ml-2 font-normal ${active ? "text-white/60" : "text-black/40"}`}
+                          >
+                            {p.hint}
+                          </span>
                         </button>
                       );
                     })}
                   </div>
                 </div>
-              );
-            })}
-            {brand?.contentScope?.industries?.length ? (
-              <div className="mt-4 rounded-xl border border-black/10 bg-[#F2F2F2]/60 px-3 py-2.5 text-[11px] text-black/60 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/60">
-                <span className="font-semibold text-[#03002C] dark:text-white">Industries in scope:</span>{" "}
-                {brand.contentScope.industries.join(" · ")} — pick one in Step 3.
-              </div>
-            ) : null}
-            <StepNav step={2} setStep={setStep} nextLabel="Next: Prospect" blocked={stepBlocked} />
-          </div>
-        </section>
-        )}
 
-        {/* Step 3 — Prospect */}
-        {step === 3 && (
-        <section className="mt-8">
-          <ProspectPanel
-            value={prospectDetails}
-            onChange={setProspectDetails}
-            industryOptions={brand?.contentScope?.industries ?? []}
-            signedIn={!!signedIn}
-          />
-          <div className={`mt-4 ${CARD_SHELL} py-4`}>
-            <StepNav
-              step={3}
-              setStep={setStep}
-              nextLabel="Next: Assets"
-              blocked={stepBlocked}
-              bare
-            />
-          </div>
-        </section>
-        )}
-
-        {/* Step 4 — Destinations, scoped to the output types chosen in Step 1 */}
-        {step === 4 && (
-        <section className="mt-8">
-          <div className={CARD_SHELL}>
-            <SectionHead
-              kicker="Step 4"
-              title="Which assets"
-              hint={`${selectedCount} selected`}
-            />
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
-              {activeChannels.length === 0
-                ? "Choose an output type in Step 1 to see the assets available for it."
-                : "Fine-tune the exact artifacts within your chosen output types. Each one is drafted from the same story and brand mode, so a deck and its leave-behind stay in sync."}
-            </p>
-
-
-            {/* Quick bundles */}
-            <div className="mt-5">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/40 dark:text-white/40">
-                Common bundles
-              </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {DEST_PRESETS.map((p) => {
-                  const active = presetIsActive(p.dests);
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      aria-pressed={active}
-                      onClick={() => setMasterSet(setFromDestinations(p.dests))}
-                      className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition ${
-                        active
-                          ? "border-[#03002C] bg-[#03002C] text-white"
-                          : "border-black/10 bg-white text-black/65 hover:border-black/30 hover:text-black dark:border-white/10 dark:bg-white/[0.04] dark:text-white/70 dark:hover:border-white/30 dark:hover:text-white"
-                      }`}
-                      title={p.hint}
-                    >
-                      {p.label}
-                      <span
-                        className={`ml-2 font-normal ${active ? "text-white/60" : "text-black/40"}`}
-                      >
-                        {p.hint}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Destination cards, limited to the chosen output types */}
-            <div className="mt-6 space-y-6">
-              {destGroups
-                .filter((g) => visibleDests.some((d) => d.group === g))
-                .map((g) => (
-                <div key={g}>
-                  <div className="flex items-center gap-3">
-                    <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.32em] text-black/40 dark:text-white/40">
-                      {g}
-                    </div>
-                    <div className="h-px flex-1 bg-black/[0.07] dark:bg-white/10" />
-                  </div>
-                  <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
-                    {visibleDests
-                      .filter((d) => d.group === g)
-                      .map((t) => {
-                        const on = isDestOn(t.id);
-                        return (
-                          <button
-                            key={t.id}
-                            type="button"
-                            onClick={() => toggleDest(t.id)}
-                            aria-pressed={on}
-                            className={`hairline-frame group relative rounded-2xl border px-5 py-4 text-left transition duration-200 ${
-                              on
-                                ? "border-black/[0.06] bg-white shadow-[0_10px_30px_-18px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-white/[0.06]"
-                                : "border-black/10 bg-white hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.04]"
-                            }`}
-                          >
-                            <span className="relative flex items-start justify-between gap-3">
-                              <span className="min-w-0">
-                                <span className="block text-[15px] font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
-                                  {t.label}
-                                </span>
-                                <span
-                                  className={`mt-1 block font-mono text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7] dark:text-[#A1FBF9]" : "text-black/40 dark:text-white/40"}`}
-                                >
-                                  {t.sub} · {t.output}
-                                </span>
-                              </span>
-                              <span
-                                aria-hidden
-                                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition ${
-                                  on
-                                    ? "border-transparent bg-[#003FC7] text-white shadow-[0_0_0_4px_rgba(0,63,199,0.12)]"
-                                    : "border-black/15 text-transparent dark:border-white/20"
-                                }`}
-                              >
-                                ✓
-                              </span>
-                            </span>
-
-                            <span className="relative mt-2 block text-[12px] leading-relaxed text-black/55 dark:text-white/55">
-                              {t.desc}
-                            </span>
-
-                            {/* concrete spec strip — sharpens on selection */}
-                            <span
-                              className={`relative mt-3 grid grid-cols-3 gap-2 rounded-xl border px-3 py-2 transition duration-200 ${
-                                on
-                                  ? "border-[#003FC7]/25 bg-[#003FC7]/[0.05] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:border-[#A1FBF9]/25 dark:bg-[#A1FBF9]/[0.06] dark:shadow-none"
-                                  : "border-black/[0.07] bg-[#F7F8FB] dark:border-white/10 dark:bg-white/[0.03]"
-                              }`}
-                            >
-                              {t.spec.map((s, i) => (
-                                <span
-                                  key={s.k}
-                                  className={`block min-w-0 ${
-                                    i > 0
-                                      ? on
-                                        ? "border-l border-[#003FC7]/15 pl-2 dark:border-[#A1FBF9]/20"
-                                        : "border-l border-black/[0.06] pl-2 dark:border-white/[0.08]"
-                                      : ""
-                                  }`}
-                                >
-                                  <span
-                                    className={`block font-mono text-[8px] uppercase tracking-[0.26em] transition ${
-                                      on
-                                        ? "text-[#003FC7]/70 dark:text-[#A1FBF9]/70"
-                                        : "text-black/35 dark:text-white/35"
-                                    }`}
-                                  >
-                                    {s.k}
-                                  </span>
-                                  <span
-                                    className={`mt-0.5 block truncate text-[11px] transition ${
-                                      on
-                                        ? "font-semibold text-[#03002C] dark:text-white"
-                                        : "font-medium text-[#03002C]/80 dark:text-white/85"
-                                    }`}
-                                  >
-                                    {s.v}
-                                  </span>
-                                </span>
-                              ))}
-                            </span>
-
-
-                            {/* what's actually inside */}
-                            <span className="relative mt-2.5 flex flex-wrap gap-1.5">
-                              {t.includes.map((inc) => (
-                                <span
-                                  key={inc}
-                                  className={`rounded-full border px-2 py-0.5 text-[10px] leading-tight transition ${
+                {/* Destination cards, limited to the chosen output types */}
+                <div className="mt-6 space-y-6">
+                  {destGroups
+                    .filter((g) => visibleDests.some((d) => d.group === g))
+                    .map((g) => (
+                      <div key={g}>
+                        <div className="flex items-center gap-3">
+                          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.32em] text-black/40 dark:text-white/40">
+                            {g}
+                          </div>
+                          <div className="h-px flex-1 bg-black/[0.07] dark:bg-white/10" />
+                        </div>
+                        <div className="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-2">
+                          {visibleDests
+                            .filter((d) => d.group === g)
+                            .map((t) => {
+                              const on = isDestOn(t.id);
+                              return (
+                                <button
+                                  key={t.id}
+                                  type="button"
+                                  onClick={() => toggleDest(t.id)}
+                                  aria-pressed={on}
+                                  className={`hairline-frame group relative rounded-2xl border px-5 py-4 text-left transition duration-200 ${
                                     on
-                                      ? "border-[#003FC7]/25 bg-[#003FC7]/[0.06] text-[#003FC7] dark:border-[#A1FBF9]/30 dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
-                                      : "border-black/10 text-black/50 dark:border-white/10 dark:text-white/50"
+                                      ? "border-black/[0.06] bg-white shadow-[0_10px_30px_-18px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-white/[0.06]"
+                                      : "border-black/10 bg-white hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.04]"
                                   }`}
                                 >
-                                  {inc}
-                                </span>
-                              ))}
-                            </span>
-                          </button>
-                        );
-                      })}
-                  </div>
+                                  <span className="relative flex items-start justify-between gap-3">
+                                    <span className="min-w-0">
+                                      <span className="block text-[15px] font-semibold leading-tight tracking-tight text-[#03002C] dark:text-white">
+                                        {t.label}
+                                      </span>
+                                      <span
+                                        className={`mt-1 block font-mono text-[9px] font-semibold uppercase tracking-[0.3em] ${on ? "text-[#003FC7] dark:text-[#A1FBF9]" : "text-black/40 dark:text-white/40"}`}
+                                      >
+                                        {t.sub} · {t.output}
+                                      </span>
+                                    </span>
+                                    <span
+                                      aria-hidden
+                                      className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-bold transition ${
+                                        on
+                                          ? "border-transparent bg-[#003FC7] text-white shadow-[0_0_0_4px_rgba(0,63,199,0.12)]"
+                                          : "border-black/15 text-transparent dark:border-white/20"
+                                      }`}
+                                    >
+                                      ✓
+                                    </span>
+                                  </span>
+
+                                  <span className="relative mt-2 block text-[12px] leading-relaxed text-black/55 dark:text-white/55">
+                                    {t.desc}
+                                  </span>
+
+                                  {/* concrete spec strip — sharpens on selection */}
+                                  <span
+                                    className={`relative mt-3 grid grid-cols-3 gap-2 rounded-xl border px-3 py-2 transition duration-200 ${
+                                      on
+                                        ? "border-[#003FC7]/25 bg-[#003FC7]/[0.05] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] dark:border-[#A1FBF9]/25 dark:bg-[#A1FBF9]/[0.06] dark:shadow-none"
+                                        : "border-black/[0.07] bg-[#F7F8FB] dark:border-white/10 dark:bg-white/[0.03]"
+                                    }`}
+                                  >
+                                    {t.spec.map((s, i) => (
+                                      <span
+                                        key={s.k}
+                                        className={`block min-w-0 ${
+                                          i > 0
+                                            ? on
+                                              ? "border-l border-[#003FC7]/15 pl-2 dark:border-[#A1FBF9]/20"
+                                              : "border-l border-black/[0.06] pl-2 dark:border-white/[0.08]"
+                                            : ""
+                                        }`}
+                                      >
+                                        <span
+                                          className={`block font-mono text-[8px] uppercase tracking-[0.26em] transition ${
+                                            on
+                                              ? "text-[#003FC7]/70 dark:text-[#A1FBF9]/70"
+                                              : "text-black/35 dark:text-white/35"
+                                          }`}
+                                        >
+                                          {s.k}
+                                        </span>
+                                        <span
+                                          className={`mt-0.5 block truncate text-[11px] transition ${
+                                            on
+                                              ? "font-semibold text-[#03002C] dark:text-white"
+                                              : "font-medium text-[#03002C]/80 dark:text-white/85"
+                                          }`}
+                                        >
+                                          {s.v}
+                                        </span>
+                                      </span>
+                                    ))}
+                                  </span>
+
+                                  {/* what's actually inside */}
+                                  <span className="relative mt-2.5 flex flex-wrap gap-1.5">
+                                    {t.includes.map((inc) => (
+                                      <span
+                                        key={inc}
+                                        className={`rounded-full border px-2 py-0.5 text-[10px] leading-tight transition ${
+                                          on
+                                            ? "border-[#003FC7]/25 bg-[#003FC7]/[0.06] text-[#003FC7] dark:border-[#A1FBF9]/30 dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]"
+                                            : "border-black/10 text-black/50 dark:border-white/10 dark:text-white/50"
+                                        }`}
+                                      >
+                                        {inc}
+                                      </span>
+                                    ))}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                        </div>
+                      </div>
+                    ))}
                 </div>
-              ))}
-            </div>
 
+                {/* Running summary */}
+                <div className="mt-5 rounded-2xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
+                  {selectedCount === 0 ? (
+                    <>Nothing selected yet — pick at least one output before generating.</>
+                  ) : (
+                    <>
+                      This brief will produce{" "}
+                      <strong className="font-semibold text-[#03002C] dark:text-white">
+                        {selected.map((d) => d.label).join(", ")}
+                      </strong>{" "}
+                      in{" "}
+                      <strong className="font-semibold text-[#03002C] dark:text-white">
+                        {brand?.name}
+                      </strong>{" "}
+                      styling.
+                    </>
+                  )}
+                </div>
 
-            {/* Running summary */}
-            <div className="mt-5 rounded-2xl border border-black/10 bg-[#F2F2F2]/60 px-4 py-3 text-[12px] text-black/65 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/65">
-              {selectedCount === 0 ? (
-                <>Nothing selected yet — pick at least one output before generating.</>
-              ) : (
-                <>
-                  This brief will produce{" "}
-                  <strong className="font-semibold text-[#03002C] dark:text-white">
-                    {selected.map((d) => d.label).join(", ")}
-                  </strong>{" "}
-                  in <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name}</strong> styling.
-                </>
-              )}
-            </div>
-
-            {/* Live structure preview of exactly what gets generated */}
-            <StructurePreviewPanel
-              previews={structurePreviews}
-              accent={brandPrimary}
-              validation={validation}
-            />
-            <StepNav step={4} setStep={setStep} nextLabel="Next: Generate" blocked={stepBlocked} />
-          </div>
-        </section>
-        )}
-
-        {/* Step 5 — Write the brief and generate */}
-        {step === 5 && (
-        <section className="mt-8">
-          <div className={`mb-4 ${CARD_SHELL}`}>
-            <SectionHead kicker="Step 5" title="Brief the AI" />
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
-              One or two sentences of context. Everything you picked in steps 1–4 is already locked
-              in — this is just the story.
-            </p>
-            <div className="mt-3 text-[12px] text-black/60 dark:text-white/60">
-              Producing{" "}
-              <strong className="font-semibold text-[#03002C] dark:text-white">
-                {selected.map((d) => d.label).join(", ") || "nothing yet"}
-              </strong>{" "}
-              in <strong className="font-semibold text-[#03002C] dark:text-white">{brand?.name}</strong> styling.
-            </div>
-          </div>
-
-
-          <div className="rounded-2xl border border-black/10 bg-white p-2 transition focus-within:border-[#003FC7]/50 focus-within:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                    e.preventDefault();
-                    if (!busy) void generateWithAi();
-                  }
-                }}
-                rows={2}
-                placeholder="e.g. Pilot pitch for Acme Global expanding into 12 markets, meeting VP Marketing next Tuesday…"
-                className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-[#03002C] placeholder:text-black/35 focus:outline-none dark:text-white dark:placeholder:text-white/35"
-              />
-              <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch sm:justify-between sm:px-1 sm:pb-1">
-                <button
-                  type="button"
-                  onClick={() => void generateWithAi()}
-                  disabled={busy || selectedCount === 0 || !validation.canSubmit}
-                  title={
-                    validation.canSubmit
-                      ? undefined
-                      : `Resolve ${validation.errors.length} issue(s) in the structure preview first`
-                  }
-                  className={BTN_PRIMARY}
-                >
-                  {busy
-                    ? aiStatus === "assembling"
-                      ? "Assembling…"
-                      : aiStatus === "knowledge"
-                        ? "Pulling context…"
-                        : "Personalizing…"
-                    : "Generate"}
-                  <span className="hidden font-mono text-[10px] font-normal opacity-70 sm:inline">
-                    ⌘↵
-                  </span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void generateFast()}
-                  disabled={busy || selectedCount === 0 || !validation.canSubmit}
-                  className="text-[11px] font-medium uppercase tracking-widest text-black/50 transition hover:text-black disabled:opacity-40"
-                >
-                  {expanding ? "Producing…" : "or skip AI →"}
-                </button>
+                {/* Live structure preview of exactly what gets generated */}
+                <StructurePreviewPanel
+                  previews={structurePreviews}
+                  accent={brandPrimary}
+                  validation={validation}
+                />
+                <StepNav
+                  step={4}
+                  setStep={setStep}
+                  nextLabel="Next: Generate"
+                  blocked={stepBlocked}
+                />
               </div>
-            </div>
-          </div>
-
-          {aiStatus === "error" && aiError && (
-            <div className="mt-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700">
-              AI failed: {aiError}
-            </div>
+            </section>
           )}
 
-          <GenerationProgress jobs={jobs} />
-          <div className={`mt-4 ${CARD_SHELL} py-4`}>
-            <StepNav step={5} setStep={setStep} blocked={stepBlocked} bare />
-          </div>
-        </section>
-        )}
-
-        {/* Side path, offered only on the first step so it never competes
-            with the main sequence further in. */}
-        {step === 1 && (
-        <section className="mt-14">
-          <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-6 dark:border-[#A1FBF9]/25 dark:bg-white/[0.03]">
-            <SectionHead kicker="Shortcut" title="Need one specific asset?" />
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
-              Describe it. We’ll auto-generate a {brand?.name ?? "division"}-styled starting point —
-              then you (or the Copilot) fine-tune it in the editor.
-            </p>
-
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-              <input
-                value={assetRequest}
-                onChange={(e) => setAssetRequest(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    void generateRequestedAsset();
-                  }
-                }}
-                placeholder="e.g. a one-pager for a pharma RFP response"
-                aria-label="Describe the specific asset you need"
-                className="flex-1 rounded-full border border-black/10 bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/35"
-              />
-              <button
-                type="button"
-                onClick={() => void generateRequestedAsset()}
-                disabled={busy || !assetRequest.trim()}
-                className={BTN_PRIMARY}
-              >
-                {busy ? "Generating…" : "Auto-generate"}
-              </button>
-            </div>
-
-            <ReferenceAssetUploader
-              assets={referenceAssets}
-              onChange={setReferenceAssetsAndClearSummary}
-              disabled={busy}
-            />
-
-            {referenceAssets.length > 0 && (
-              <div className="mt-3 rounded-lg border border-black/10 bg-white p-3">
-                <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
-                  Will use during generation
+          {/* Step 5 — Write the brief and generate */}
+          {step === 5 && (
+            <section className="mt-8">
+              <div className={`mb-4 ${CARD_SHELL}`}>
+                <SectionHead kicker="Step 5" title="Brief the AI" />
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
+                  One or two sentences of context. Everything you picked in steps 1–4 is already
+                  locked in — this is just the story.
+                </p>
+                <div className="mt-3 text-[12px] text-black/60 dark:text-white/60">
+                  Producing{" "}
+                  <strong className="font-semibold text-[#03002C] dark:text-white">
+                    {selected.map((d) => d.label).join(", ") || "nothing yet"}
+                  </strong>{" "}
+                  in{" "}
+                  <strong className="font-semibold text-[#03002C] dark:text-white">
+                    {brand?.name}
+                  </strong>{" "}
+                  styling.
                 </div>
-                <ul className="mt-2 space-y-1">
-                  {referenceAssets.map((a) => (
-                    <li key={a.id} className="flex items-center gap-2 text-xs text-black/70">
-                      <FileText className="h-3.5 w-3.5 text-icon-muted" aria-hidden />
-                      <span className="truncate">{a.name}</span>
-                      {a.pages && (
-                        <span className="rounded-full bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-black/50">
-                          {a.pages} page{a.pages > 1 ? "s" : ""}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
               </div>
-            )}
 
-            {referenceSummary && (
-              <div
-                className={`mt-3 rounded-lg border p-3 ${
-                  referenceSummary.accepted.length > 0
-                    ? "border-emerald-200 bg-emerald-50"
-                    : "border-rose-200 bg-rose-50"
-                }`}
-                role="status"
-                aria-live="polite"
-              >
-                {referenceSummary.accepted.length > 0 && (
-                  <div className="flex items-start gap-2 text-xs text-emerald-800">
-                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-                    <div>
-                      <div className="font-medium">Analysed and applied</div>
-                      <div className="mt-0.5 text-emerald-700/80">
-                        {referenceSummary.accepted.join(", ")}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                {referenceSummary.rejected.length > 0 && (
-                  <div className="mt-2 flex items-start gap-2 text-xs text-rose-800">
-                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-                    <div>
-                      <div className="font-medium">Not used</div>
-                      <div className="mt-0.5 text-rose-700/80">
-                        {referenceSummary.rejected.join(", ")}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-
-
-            <div className="mt-3 flex flex-wrap items-center gap-1.5">
-              {assetRequest.trim() ? (
-                <>
-                  <span className="text-[11px] text-black/45">Will produce:</span>
-                  {matchedDests.map((d) => (
-                    <span
-                      key={d}
-                      className="rounded-full border border-[#003FC7]/30 bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7]"
-                    >
-                      {destLabel(d)}
-                    </span>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <span className="text-[11px] text-black/45">Try:</span>
-                  {[
-                    "case study for a life sciences win",
-                    "one-pager leave-behind",
-                    "LinkedIn campaign post",
-                    "booth signage for the event",
-                  ].map((s) => (
+              <div className="rounded-2xl border border-black/10 bg-white p-2 transition focus-within:border-[#003FC7]/50 focus-within:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                  <textarea
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                        e.preventDefault();
+                        if (!busy) void generateWithAi();
+                      }
+                    }}
+                    rows={2}
+                    placeholder="e.g. Pilot pitch for Acme Global expanding into 12 markets, meeting VP Marketing next Tuesday…"
+                    className="flex-1 resize-none bg-transparent px-4 py-3 text-[15px] leading-snug text-[#03002C] placeholder:text-black/35 focus:outline-none dark:text-white dark:placeholder:text-white/35"
+                  />
+                  <div className="flex flex-row items-center gap-2 sm:flex-col sm:items-stretch sm:justify-between sm:px-1 sm:pb-1">
                     <button
-                      key={s}
                       type="button"
-                      onClick={() => setAssetRequest(s)}
-                      className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-black/60 transition hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                      onClick={() => void generateWithAi()}
+                      disabled={busy || selectedCount === 0 || !validation.canSubmit}
+                      title={
+                        validation.canSubmit
+                          ? undefined
+                          : `Resolve ${validation.errors.length} issue(s) in the structure preview first`
+                      }
+                      className={BTN_PRIMARY}
                     >
-                      {s}
+                      {busy
+                        ? aiStatus === "assembling"
+                          ? "Assembling…"
+                          : aiStatus === "knowledge"
+                            ? "Pulling context…"
+                            : "Personalizing…"
+                        : "Generate"}
+                      <span className="hidden font-mono text-[10px] font-normal opacity-70 sm:inline">
+                        ⌘↵
+                      </span>
                     </button>
-                  ))}
-                </>
-              )}
-            </div>
-
-            {/* Versions of this request */}
-            {assetVersions.length > 0 ? (
-              <div className="mt-4 rounded-xl border border-black/10 bg-white p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/45 dark:text-white/45">
-                    Versions of this request · {assetVersions.length}
+                    <button
+                      type="button"
+                      onClick={() => void generateFast()}
+                      disabled={busy || selectedCount === 0 || !validation.canSubmit}
+                      className="text-[11px] font-medium uppercase tracking-widest text-black/50 transition hover:text-black disabled:opacity-40"
+                    >
+                      {expanding ? "Producing…" : "or skip AI →"}
+                    </button>
                   </div>
+                </div>
+              </div>
+
+              {aiStatus === "error" && aiError && (
+                <div className="mt-3 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                  AI failed: {aiError}
+                </div>
+              )}
+
+              <GenerationProgress jobs={jobs} />
+              <div className={`mt-4 ${CARD_SHELL} py-4`}>
+                <StepNav step={5} setStep={setStep} blocked={stepBlocked} bare />
+              </div>
+            </section>
+          )}
+
+          {/* Side path, offered only on the first step so it never competes
+            with the main sequence further in. */}
+          {step === 1 && (
+            <section className="mt-14">
+              <div className="rounded-2xl border border-dashed border-[#003FC7]/30 bg-[#003FC7]/[0.03] p-6 dark:border-[#A1FBF9]/25 dark:bg-white/[0.03]">
+                <SectionHead kicker="Shortcut" title="Need one specific asset?" />
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-black/60 dark:text-white/60">
+                  Describe it. We’ll auto-generate a {brand?.name ?? "division"}-styled starting
+                  point — then you (or the Copilot) fine-tune it in the editor.
+                </p>
+
+                <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                  <input
+                    value={assetRequest}
+                    onChange={(e) => setAssetRequest(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        void generateRequestedAsset();
+                      }
+                    }}
+                    placeholder="e.g. a one-pager for a pharma RFP response"
+                    aria-label="Describe the specific asset you need"
+                    className="flex-1 rounded-full border border-black/10 bg-white px-4 py-3 text-sm text-[#03002C] placeholder:text-black/35 focus:border-[#003FC7]/60 focus:outline-none dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-white/35"
+                  />
                   <button
                     type="button"
                     onClick={() => void generateRequestedAsset()}
-                    disabled={busy}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7]/30 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10 disabled:opacity-40"
+                    disabled={busy || !assetRequest.trim()}
+                    className={BTN_PRIMARY}
                   >
-                    {busy ? "Regenerating…" : `Regenerate this asset → v${assetVersions.length + 1}`}
+                    {busy ? "Generating…" : "Auto-generate"}
                   </button>
                 </div>
 
-                {inheritedReferences && (
-                  <div className="mt-2 rounded-lg border border-black/10 bg-black/[0.02] p-2.5">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="text-[11px] text-black/60">
-                        {referenceMode === "reuse" ? (
-                          <>
-                            <span className="font-semibold text-[#03002C] dark:text-white">
-                              Reusing the same reference assets
-                            </span>{" "}
-                            · {inheritedReferences.fileNames.join(", ")}
-                          </>
-                        ) : (
-                          <>
-                            <span className="font-semibold text-[#03002C] dark:text-white">
-                              Using newly attached references
-                            </span>{" "}
-                            · attach files above for different guidance
-                          </>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        disabled={busy}
-                        onClick={() =>
-                          setReferenceMode((m) => (m === "reuse" ? "swap" : "reuse"))
-                        }
-                        className="rounded-lg border border-black/15 px-2.5 py-1 text-[11px] font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:opacity-40"
-                      >
-                        {referenceMode === "reuse" ? "Swap references" : "Reuse previous"}
-                      </button>
+                <ReferenceAssetUploader
+                  assets={referenceAssets}
+                  onChange={setReferenceAssetsAndClearSummary}
+                  disabled={busy}
+                />
+
+                {referenceAssets.length > 0 && (
+                  <div className="mt-3 rounded-lg border border-black/10 bg-white p-3">
+                    <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-black/45">
+                      Will use during generation
                     </div>
+                    <ul className="mt-2 space-y-1">
+                      {referenceAssets.map((a) => (
+                        <li key={a.id} className="flex items-center gap-2 text-xs text-black/70">
+                          <FileText className="h-3.5 w-3.5 text-icon-muted" aria-hidden />
+                          <span className="truncate">{a.name}</span>
+                          {a.pages && (
+                            <span className="rounded-full bg-black/[0.04] px-1.5 py-0.5 text-[10px] text-black/50">
+                              {a.pages} page{a.pages > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
 
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {assetVersions.map((v) => (
-                    <Link
-                      key={v.id}
-                      to="/decks/$deckId"
-                      params={{ deckId: v.deckId }}
-                      title={`${v.matched.join(", ") || "Asset"} · ${new Date(v.createdAt).toLocaleString()}`}
-                      className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-[#03002C] transition hover:border-[#003FC7]/50 hover:text-[#003FC7]"
-                    >
-                      v{v.version}
-                      <span className="ml-1.5 text-black/40">
-                        {new Date(v.createdAt).toLocaleTimeString([], {
-                          hour: "numeric",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ) : lastRequest && !assetRequest.trim() ? (
-              <button
-                type="button"
-                onClick={() => setAssetRequest(lastRequest)}
-                className="mt-4 text-[11px] text-black/50 underline decoration-dotted underline-offset-4 transition hover:text-[#003FC7]"
-              >
-                Reload your last request: “{lastRequest}”
-              </button>
-            ) : null}
-          </div>
-        </section>
-        )}
+                {referenceSummary && (
+                  <div
+                    className={`mt-3 rounded-lg border p-3 ${
+                      referenceSummary.accepted.length > 0
+                        ? "border-emerald-200 bg-emerald-50"
+                        : "border-rose-200 bg-rose-50"
+                    }`}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {referenceSummary.accepted.length > 0 && (
+                      <div className="flex items-start gap-2 text-xs text-emerald-800">
+                        <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                        <div>
+                          <div className="font-medium">Analysed and applied</div>
+                          <div className="mt-0.5 text-emerald-700/80">
+                            {referenceSummary.accepted.join(", ")}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {referenceSummary.rejected.length > 0 && (
+                      <div className="mt-2 flex items-start gap-2 text-xs text-rose-800">
+                        <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                        <div>
+                          <div className="font-medium">Not used</div>
+                          <div className="mt-0.5 text-rose-700/80">
+                            {referenceSummary.rejected.join(", ")}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
+                <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                  {assetRequest.trim() ? (
+                    <>
+                      <span className="text-[11px] text-black/45">Will produce:</span>
+                      {matchedDests.map((d) => (
+                        <span
+                          key={d}
+                          className="rounded-full border border-[#003FC7]/30 bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7]"
+                        >
+                          {destLabel(d)}
+                        </span>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-[11px] text-black/45">Try:</span>
+                      {[
+                        "case study for a life sciences win",
+                        "one-pager leave-behind",
+                        "LinkedIn campaign post",
+                        "booth signage for the event",
+                      ].map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setAssetRequest(s)}
+                          className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] text-black/60 transition hover:border-[#003FC7]/40 hover:text-[#003FC7]"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </div>
+
+                {/* Versions of this request */}
+                {assetVersions.length > 0 ? (
+                  <div className="mt-4 rounded-xl border border-black/10 bg-white p-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-black/45 dark:text-white/45">
+                        Versions of this request · {assetVersions.length}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => void generateRequestedAsset()}
+                        disabled={busy}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7]/30 px-3 py-1.5 text-[11px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10 disabled:opacity-40"
+                      >
+                        {busy
+                          ? "Regenerating…"
+                          : `Regenerate this asset → v${assetVersions.length + 1}`}
+                      </button>
+                    </div>
+
+                    {inheritedReferences && (
+                      <div className="mt-2 rounded-lg border border-black/10 bg-black/[0.02] p-2.5">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="text-[11px] text-black/60">
+                            {referenceMode === "reuse" ? (
+                              <>
+                                <span className="font-semibold text-[#03002C] dark:text-white">
+                                  Reusing the same reference assets
+                                </span>{" "}
+                                · {inheritedReferences.fileNames.join(", ")}
+                              </>
+                            ) : (
+                              <>
+                                <span className="font-semibold text-[#03002C] dark:text-white">
+                                  Using newly attached references
+                                </span>{" "}
+                                · attach files above for different guidance
+                              </>
+                            )}
+                          </div>
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() =>
+                              setReferenceMode((m) => (m === "reuse" ? "swap" : "reuse"))
+                            }
+                            className="rounded-lg border border-black/15 px-2.5 py-1 text-[11px] font-semibold text-black/65 transition hover:border-black/35 hover:text-black disabled:opacity-40"
+                          >
+                            {referenceMode === "reuse" ? "Swap references" : "Reuse previous"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {assetVersions.map((v) => (
+                        <Link
+                          key={v.id}
+                          to="/decks/$deckId"
+                          params={{ deckId: v.deckId }}
+                          title={`${v.matched.join(", ") || "Asset"} · ${new Date(v.createdAt).toLocaleString()}`}
+                          className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-[#03002C] transition hover:border-[#003FC7]/50 hover:text-[#003FC7]"
+                        >
+                          v{v.version}
+                          <span className="ml-1.5 text-black/40">
+                            {new Date(v.createdAt).toLocaleTimeString([], {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ) : lastRequest && !assetRequest.trim() ? (
+                  <button
+                    type="button"
+                    onClick={() => setAssetRequest(lastRequest)}
+                    className="mt-4 text-[11px] text-black/50 underline decoration-dotted underline-offset-4 transition hover:text-[#003FC7]"
+                  >
+                    Reload your last request: “{lastRequest}”
+                  </button>
+                ) : null}
+              </div>
+            </section>
+          )}
         </div>
       </div>
 
@@ -1855,7 +1877,6 @@ function BriefCommandCenter() {
           />
         </div>
       </div>
-
     </AppShell>
   );
 }

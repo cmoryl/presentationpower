@@ -33,9 +33,18 @@ const STEPS: Array<{ title: string; body: string }> = [
 ];
 
 const FIELDS: Array<[string, string]> = [
-  ["Code", "2–12 characters, letters, numbers and dashes. Becomes the pack id (tpl-<code>) and must be unique."],
-  ["Name / Reference", "Shown in every picker. Reference names what the look is drawn from so reviewers can name what they like."],
-  ["Description", "One line. The presentation agent reads it when it recommends looks, so write it in terms of the story it suits."],
+  [
+    "Code",
+    "2–12 characters, letters, numbers and dashes. Becomes the pack id (tpl-<code>) and must be unique.",
+  ],
+  [
+    "Name / Reference",
+    "Shown in every picker. Reference names what the look is drawn from so reviewers can name what they like.",
+  ],
+  [
+    "Description",
+    "One line. The presentation agent reads it when it recommends looks, so write it in terms of the story it suits.",
+  ],
   ["Best fit", "Industries and objectives, separated by middots."],
   ["Mode", "Light or dark. Must agree with the page field's luminance — the suite checks this."],
   ["Density", "Low, Medium or High. Drives corner radius and how much ground pattern survives."],
@@ -43,10 +52,22 @@ const FIELDS: Array<[string, string]> = [
 ];
 
 const OVERRIDES: Array<[string, string]> = [
-  ["Intensity", "0 flattens the ground toward the page field, 1 is exactly as authored, 2 double-strikes the same geometry for a punchier read. Geometry never changes, so readability zones stay intact."],
-  ["Tint / strength", "A colour veil over the ground — use for brand passes and warm/cool shifts. Keep strength under 0.25 on text-heavy sections."],
-  ["Section swap", "Paints another section's composition on this one, e.g. give a stats page the cover's mass."],
-  ["Backdrop image", "Painted behind the CSS layers, cover-fitted. Use the generated backdrop library paths or any absolute URL."],
+  [
+    "Intensity",
+    "0 flattens the ground toward the page field, 1 is exactly as authored, 2 double-strikes the same geometry for a punchier read. Geometry never changes, so readability zones stay intact.",
+  ],
+  [
+    "Tint / strength",
+    "A colour veil over the ground — use for brand passes and warm/cool shifts. Keep strength under 0.25 on text-heavy sections.",
+  ],
+  [
+    "Section swap",
+    "Paints another section's composition on this one, e.g. give a stats page the cover's mass.",
+  ],
+  [
+    "Backdrop image",
+    "Painted behind the CSS layers, cover-fitted. Use the generated backdrop library paths or any absolute URL.",
+  ],
 ];
 
 const QA: string[] = [

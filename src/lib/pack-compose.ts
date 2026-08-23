@@ -151,10 +151,15 @@ export const COMPOSE_LABEL: Record<ComposePlate, string> = {
 
 /** One-line description of how a skin composes its modules. */
 export function composeSummary(c: PackCompose): string {
-  const anchor = { top: "top-anchored", center: "centred", bottom: "bottom-anchored", baseline: "baseline-set" }[
-    c.anchor
+  const anchor = {
+    top: "top-anchored",
+    center: "centred",
+    bottom: "bottom-anchored",
+    baseline: "baseline-set",
+  }[c.anchor];
+  const bias = { left: "left mass", right: "right mass", center: "symmetric", wide: "full-bleed" }[
+    c.bias
   ];
-  const bias = { left: "left mass", right: "right mass", center: "symmetric", wide: "full-bleed" }[c.bias];
   return `${anchor} · ${bias} · ${Math.round(c.column * 100)}% column · ${COMPOSE_LABEL[c.plate].toLowerCase()}`;
 }
 
@@ -247,7 +252,8 @@ export function composePlateCss(
       return {
         style: {
           backgroundColor: veil,
-          clipPath: "polygon(0 0, calc(100% - 42px) 0, 100% 42px, 100% 100%, 42px 100%, 0 calc(100% - 42px))",
+          clipPath:
+            "polygon(0 0, calc(100% - 42px) 0, 100% 42px, 100% 100%, 42px 100%, 0 calc(100% - 42px))",
         },
         pad: { x: 46, y: 38 },
       };

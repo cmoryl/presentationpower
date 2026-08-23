@@ -44,7 +44,11 @@ export function readPath(obj: unknown, path: string): unknown {
   return cur;
 }
 
-export function setPath<T extends Record<string, unknown>>(obj: T, path: string, value: unknown): T {
+export function setPath<T extends Record<string, unknown>>(
+  obj: T,
+  path: string,
+  value: unknown,
+): T {
   const parts = pathParts(path);
   const clone = structuredClone(obj);
   let cur: unknown = clone;

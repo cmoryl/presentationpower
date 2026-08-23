@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  coverCropTag,
-  withCroppedPictures,
-  withRoundedPictures,
-} from "@/lib/pptx-shape-normalize";
+import { coverCropTag, withCroppedPictures, withRoundedPictures } from "@/lib/pptx-shape-normalize";
 
 /** The shape pptxgenjs emits when a `sizing` hint is present on a data URL. */
 const picWithZeroSrcRect = (name: string) =>

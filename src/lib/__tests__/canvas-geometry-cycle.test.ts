@@ -57,9 +57,7 @@ describe("canvas geometry survives the publish/export/reload cycle", () => {
 
   it("reload (hydrate) returns healed blocks, not just healed pixels", () => {
     const deck = deckWith([corrupt(block())]);
-    const reloaded = healDeckCanvasGeometry(
-      JSON.parse(JSON.stringify(deck)) as Deck,
-    );
+    const reloaded = healDeckCanvasGeometry(JSON.parse(JSON.stringify(deck)) as Deck);
     const blocks = reloaded.slides[0]!.canvasBlocks!;
     expect(blocks.every(inStage)).toBe(true);
     expect(blocksAreHealthy(blocks)).toBe(true);
@@ -69,8 +67,13 @@ describe("canvas geometry survives the publish/export/reload cycle", () => {
     const bad = corrupt(block());
     const rendered = repairBlocks([bad])[0]!;
     const exported = canvasBlocksForExport([bad])[0]!;
-    expect({ x: exported.x, y: exported.y, w: exported.w, h: exported.h, size: exported.size })
-      .toEqual({ x: rendered.x, y: rendered.y, w: rendered.w, h: rendered.h, size: rendered.size });
+    expect({
+      x: exported.x,
+      y: exported.y,
+      w: exported.w,
+      h: exported.h,
+      size: exported.size,
+    }).toEqual({ x: rendered.x, y: rendered.y, w: rendered.w, h: rendered.h, size: rendered.size });
   });
 
   it("is idempotent across repeated save/reload/export cycles", () => {

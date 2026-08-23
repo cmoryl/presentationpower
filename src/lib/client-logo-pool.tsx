@@ -60,8 +60,5 @@ export function useClientLogoMark(opts: {
   mode?: "light" | "dark";
 }): { name: string; url: string } | null {
   const pool = useClientLogoPool();
-  return useMemo(
-    () => pickClientLogo(pool, opts),
-    [pool, opts.clientName, opts.seed, opts.mode],
-  );
+  return useMemo(() => pickClientLogo(pool, opts), [pool, opts.clientName, opts.seed, opts.mode]);
 }

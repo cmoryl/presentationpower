@@ -64,7 +64,12 @@ export function AgentDesignDnaImport({
         <button type="button" className={btn} onClick={() => fileRef.current?.click()}>
           Upload map
         </button>
-        <button type="button" className={btn} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+        <button
+          type="button"
+          className={btn}
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+        >
           {open ? "Cancel paste" : "Paste map"}
         </button>
         {dna && (
@@ -127,12 +132,16 @@ export function AgentDesignDnaImport({
               {dna.name}
             </span>
             {dna.mode && (
-              <span className={`text-[10px] uppercase tracking-widest ${dark ? "text-white/50" : "text-[#03002C]/50"}`}>
+              <span
+                className={`text-[10px] uppercase tracking-widest ${dark ? "text-white/50" : "text-[#03002C]/50"}`}
+              >
                 {dna.mode} mode
               </span>
             )}
             {dna.fileName && (
-              <span className={`text-[10px] ${dark ? "text-white/40" : "text-[#03002C]/40"}`}>{dna.fileName}</span>
+              <span className={`text-[10px] ${dark ? "text-white/40" : "text-[#03002C]/40"}`}>
+                {dna.fileName}
+              </span>
             )}
           </div>
           {dna.palette.length > 0 && (
@@ -147,7 +156,9 @@ export function AgentDesignDnaImport({
               ))}
             </div>
           )}
-          <p className={`mt-1.5 text-[11px] leading-snug ${dark ? "text-white/60" : "text-[#03002C]/60"}`}>
+          <p
+            className={`mt-1.5 text-[11px] leading-snug ${dark ? "text-white/60" : "text-[#03002C]/60"}`}
+          >
             {designDnaSummary(dna)} — the agent will design this deck against it.
           </p>
         </div>

@@ -139,7 +139,9 @@ export const draftCampaignCopy = createServerFn({ method: "POST" })
       }
 
       const json = (await res.json()) as {
-        choices?: Array<{ message?: { tool_calls?: Array<{ function?: { arguments?: string } }> } }>;
+        choices?: Array<{
+          message?: { tool_calls?: Array<{ function?: { arguments?: string } }> };
+        }>;
       };
       const argStr = json.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
       if (!argStr) return { title: "", error: "AI returned no result" };

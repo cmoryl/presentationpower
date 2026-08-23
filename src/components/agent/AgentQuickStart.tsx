@@ -7,7 +7,6 @@ import { designSkinByCode, industryRecipeById } from "@/lib/design-skins";
 import { isSkinPackId, skinCodeFromPackId } from "@/lib/design-skin-pack";
 import { AgentDesignOverrides } from "@/components/agent/AgentDesignOverrides";
 
-
 // ---- per-thread filter persistence (browser-local) ----
 type QuickFilters = {
   purpose: string;
@@ -43,7 +42,6 @@ function writeFilters(threadId: string | undefined, value: QuickFilters) {
     /* quota or disabled storage — filters just won't persist */
   }
 }
-
 
 export const QUICK_LENGTH_AUTO = "Auto — let the AI decide";
 export const QUICK_LENGTHS = [
@@ -117,9 +115,7 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
   if (input.industries.length) lines.push(`Industry focus: ${input.industries.join(", ")}`);
   if (input.tones.length) lines.push(`Tone of voice: ${input.tones.join(", ")}`);
   if (recipe) {
-    lines.push(
-      `Industry recipe: ${recipe.name} — ${recipe.summary}. Story tone ${recipe.tone}.`,
-    );
+    lines.push(`Industry recipe: ${recipe.name} — ${recipe.summary}. Story tone ${recipe.tone}.`);
   }
   if (skin) {
     lines.push(
@@ -140,14 +136,12 @@ export function buildQuickStartPrompt(input: QuickStartSelection) {
   return lines.join("\n");
 }
 
-
-const selectClass = (
-  v: "light" | "dark",
-) => `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
-  v === "dark"
-    ? "border-white/10 bg-[#03002C]/50 text-white/90 placeholder:text-white/35 focus:border-[#A1FBF9]"
-    : "border-black/10 bg-white text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7]"
-}`;
+const selectClass = (v: "light" | "dark") =>
+  `rounded-lg border px-2.5 py-1.5 text-xs outline-none transition ${
+    v === "dark"
+      ? "border-white/10 bg-[#03002C]/50 text-white/90 placeholder:text-white/35 focus:border-[#A1FBF9]"
+      : "border-black/10 bg-white text-[#03002C] placeholder:text-[#03002C]/35 focus:border-[#003FC7]"
+  }`;
 
 function FilterChips({
   legend,
@@ -279,14 +273,13 @@ export function AgentQuickStart({
   }, [threadId, purpose, length, audience, stylePackId, recipeId, industries, tones, showFilters]);
 
   const ready = brief.trim().length >= 12 && !disabled;
-  const filterCount =
-    industries.length + tones.length + (stylePackId ? 1 : 0) + (recipeId ? 1 : 0);
+  const filterCount = industries.length + tones.length + (stylePackId ? 1 : 0) + (recipeId ? 1 : 0);
 
-
-  const toggle = (setter: (fn: (prev: string[]) => string[]) => void, max: number) => (value: string) =>
-    setter((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value].slice(-max),
-    );
+  const toggle =
+    (setter: (fn: (prev: string[]) => string[]) => void, max: number) => (value: string) =>
+      setter((prev) =>
+        prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value].slice(-max),
+      );
 
   return (
     <form
@@ -306,7 +299,6 @@ export function AgentQuickStart({
           }),
         );
       }}
-
       className={`relative mt-0 space-y-2 rounded-xl border p-3 ${
         variant === "dark"
           ? "border-white/10 bg-white/[0.05] backdrop-blur"
@@ -343,7 +335,9 @@ export function AgentQuickStart({
         }`}
       >
         <span>
-          {brief.trim() ? `${brief.trim().length.toLocaleString()} characters` : "Long paste supported"}
+          {brief.trim()
+            ? `${brief.trim().length.toLocaleString()} characters`
+            : "Long paste supported"}
           {brief.length > 55000 ? " — approaching the 60,000 character limit" : ""}
         </span>
         <button
@@ -358,7 +352,6 @@ export function AgentQuickStart({
           {briefExpanded ? "Collapse brief" : "Expand brief"}
         </button>
       </div>
-
 
       <div className="flex flex-wrap items-center gap-2">
         <select
@@ -465,7 +458,7 @@ export function AgentQuickStart({
             onToggle={toggle(setTones, 2)}
             variant={variant}
           />
-          
+
           <AgentDesignOverrides threadId={threadId} variant={variant} />
 
           {filterCount > 0 && (
@@ -488,11 +481,7 @@ export function AgentQuickStart({
         </div>
       )}
 
-      <p
-        className={`text-[11px] ${
-          variant === "dark" ? "text-white/50" : "text-[#03002C]/50"
-        }`}
-      >
+      <p className={`text-[11px] ${variant === "dark" ? "text-white/50" : "text-[#03002C]/50"}`}>
         The brief goes straight into the conversation — you can keep refining the deck in the chat.
       </p>
     </form>

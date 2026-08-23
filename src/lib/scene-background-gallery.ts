@@ -27,7 +27,6 @@ import {
   type SkinScene,
 } from "./skin-backgrounds";
 
-
 export const SCENE_LABEL: Record<SkinScene, string> = {
   cover: "Cover",
   agenda: "Agenda",
@@ -130,13 +129,10 @@ export const SCENE_BACKGROUNDS: SceneBackgroundPreset[] = buildGallery();
 
 const BY_ID = new Map(SCENE_BACKGROUNDS.map((p) => [p.id, p]));
 
-export function sceneBackgroundById(
-  id: string | null | undefined,
-): SceneBackgroundPreset | null {
+export function sceneBackgroundById(id: string | null | undefined): SceneBackgroundPreset | null {
   if (!id) return null;
   return BY_ID.get(id) ?? null;
 }
-
 
 /** Distinct motif families present in the gallery, with labels, for filters. */
 export const GALLERY_FAMILIES: { id: MotifFamily; label: string; count: number }[] = (() => {
@@ -183,4 +179,3 @@ export function sceneTakes(code: string, scene: SkinScene): SceneBackgroundPrese
     (p) => p.skinCode.toLowerCase() === code.toLowerCase() && p.scene === scene,
   ).sort((a, b) => a.take - b.take);
 }
-

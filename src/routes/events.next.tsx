@@ -29,7 +29,6 @@ import {
   deckPagesFor,
   isPowerpointDeck,
   loadNextRegistry,
-
   nextHeadline,
   type NextDivision,
   type NextFormatGroupId,
@@ -130,13 +129,14 @@ function NextHub() {
         onPick={(g) => {
           setGroup(g);
           setQuery("");
-          document.getElementById("registry")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          document
+            .getElementById("registry")
+            ?.scrollIntoView({ behavior: "smooth", block: "start" });
         }}
       />
 
       {/* Registry controls */}
       <div id="registry" className="mt-8 flex scroll-mt-24 flex-wrap items-center gap-2">
-
         <FilterChip active={group === "all"} onClick={() => setGroup("all")}>
           All formats
         </FilterChip>
@@ -209,8 +209,6 @@ function NextHub() {
           </DialogTitle>
           {preview && deckPagesFor(preview) ? (
             <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
-
-
           ) : preview?.badgeSide && badgeDivisionFor(preview.divisionId) ? (
             <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
               <NextBadge
@@ -348,14 +346,15 @@ function Hero({
               >
                 <Search size={14} style={{ color: division.accent }} /> Browse the registry
               </a>
-
-
-
             </div>
 
             <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-4 text-sm text-white/85 sm:grid-cols-4">
               <Fact icon={CalendarDays} label="Dates" value={NEXT_EVENT.datesLabel} />
-              <Fact icon={MapPin} label="Venue" value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`} />
+              <Fact
+                icon={MapPin}
+                label="Venue"
+                value={`${NEXT_EVENT.venue} · ${NEXT_EVENT.city}`}
+              />
               <Fact icon={Globe2} label="Naming" value={NEXT_EVENT.namePattern} />
               <Fact icon={Sparkles} label="CTA" value={NEXT_EVENT.ctaLabel} />
             </dl>
@@ -400,7 +399,6 @@ function Hero({
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </Link>
-
           </div>
         </div>
       </div>
@@ -587,15 +585,8 @@ function NextWatermark({ accent }: { accent: string }) {
   );
 }
 
-
 /** Renders a division lockup on a light plate — the color lockups are navy artwork. */
-function LockupPlate({
-  division,
-  className = "",
-}: {
-  division: NextDivision;
-  className?: string;
-}) {
+function LockupPlate({ division, className = "" }: { division: NextDivision; className?: string }) {
   return (
     <div
       className={`flex items-center justify-center rounded-xl border border-black/5 bg-white p-6 ${className}`}
@@ -629,7 +620,6 @@ function Fact({
   );
 }
 
-
 /** Role-based entry points into the NEXT system. */
 const NEXT_PATHWAYS: {
   id: string;
@@ -651,7 +641,8 @@ const NEXT_PATHWAYS: {
     id: "social",
     title: "Campaign & social",
     who: "Marketing / demand gen",
-    detail: "Paid + organic ads, content banners, email headers, advocacy squares and speaker cards.",
+    detail:
+      "Paid + organic ads, content banners, email headers, advocacy squares and speaker cards.",
     group: "asset-subsection",
     cta: "Open digital formats",
   },
@@ -659,7 +650,8 @@ const NEXT_PATHWAYS: {
     id: "signage",
     title: "On-site signage",
     who: "Event producers",
-    detail: "G-series printable posters in US Letter and A4 for wayfinding, rooms and registration.",
+    detail:
+      "G-series printable posters in US Letter and A4 for wayfinding, rooms and registration.",
     group: "event-signage",
     cta: "Open signage set",
   },
@@ -681,13 +673,7 @@ const NEXT_PATHWAYS: {
   },
 ];
 
-function Pathways({
-  accent,
-  onPick,
-}: {
-  accent: string;
-  onPick: (g: NextFormatGroupId) => void;
-}) {
+function Pathways({ accent, onPick }: { accent: string; onPick: (g: NextFormatGroupId) => void }) {
   return (
     <section className="mt-10" aria-labelledby="next-pathways">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -773,7 +759,6 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
             Front + back, print-ready at 4.58″ × 6.55″ bleed.
           </span>
         </div>
-
       </div>
     </section>
   );
@@ -803,7 +788,6 @@ function FilterChip({
 
 /** Page-by-page viewer for a division's multi-page deck (packet or PowerPoint). */
 function DeckPages({ pages, label }: { pages: string[]; label: string }) {
-
   const [index, setIndex] = useState(0);
   const total = pages.length;
   const go = (delta: number) => setIndex((i) => (i + delta + total) % total);
@@ -859,7 +843,6 @@ function DeckPages({ pages, label }: { pages: string[]; label: string }) {
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2" role="tablist" aria-label={`${label} pages`}>
-
         {pages.map((src, i) => (
           <button
             key={src}
@@ -883,7 +866,6 @@ function DeckPages({ pages, label }: { pages: string[]; label: string }) {
 }
 
 function RegistryCard({
-
   row,
   accent,
   onPreview,
@@ -931,7 +913,6 @@ function RegistryCard({
         {packetPages ? (
           <span className="absolute bottom-1.5 right-1.5 rounded-full bg-foreground/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-background">
             {packetPages.length} {isDeck ? "slides" : "pages"}
-
           </span>
         ) : null}
       </button>
@@ -1024,42 +1005,40 @@ function PlaybookCta() {
     <section id="generate" className="mt-14 scroll-mt-24">
       <h2 className="text-xl font-semibold tracking-tight">Generate</h2>
       <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-        Both kits render live through the existing engine — pick a division, and accents, lockups and
-        headline suffixes are applied automatically.
+        Both kits render live through the existing engine — pick a division, and accents, lockups
+        and headline suffixes are applied automatically.
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-
-      {[
-        {
-          to: "/events/demo/$playbookId",
-          params: { playbookId: "next-flagship-london" },
-          title: "Generate the flagship kit",
-          detail:
-            "London edition — social drumbeat, speaker cards, advocacy squares, signage and deck, rendered live per division.",
-        },
-        {
-          to: "/events/demo/$playbookId",
-          params: { playbookId: "next-city-series" },
-          title: "Generate a City Series kit",
-          detail:
-            "Same system, regional stop — city/venue line swaps while lockups, accents and formats stay locked.",
-        },
-      ].map((c) => (
-        <Link
-          key={c.params.playbookId}
-          to={c.to}
-          params={c.params}
-          className="group rounded-2xl border border-border p-5 transition hover:bg-muted"
-        >
-          <h3 className="flex items-center gap-2 text-sm font-semibold">
-            {c.title}
-            <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
-          </h3>
-          <p className="mt-2 text-sm text-muted-foreground">{c.detail}</p>
-        </Link>
-      ))}
+        {[
+          {
+            to: "/events/demo/$playbookId",
+            params: { playbookId: "next-flagship-london" },
+            title: "Generate the flagship kit",
+            detail:
+              "London edition — social drumbeat, speaker cards, advocacy squares, signage and deck, rendered live per division.",
+          },
+          {
+            to: "/events/demo/$playbookId",
+            params: { playbookId: "next-city-series" },
+            title: "Generate a City Series kit",
+            detail:
+              "Same system, regional stop — city/venue line swaps while lockups, accents and formats stay locked.",
+          },
+        ].map((c) => (
+          <Link
+            key={c.params.playbookId}
+            to={c.to}
+            params={c.params}
+            className="group rounded-2xl border border-border p-5 transition hover:bg-muted"
+          >
+            <h3 className="flex items-center gap-2 text-sm font-semibold">
+              {c.title}
+              <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">{c.detail}</p>
+          </Link>
+        ))}
       </div>
     </section>
-
   );
 }

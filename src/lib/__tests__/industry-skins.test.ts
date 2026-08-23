@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { INDUSTRY_GEOMETRY, SKIN_GEOMETRY, GEOMETRY_SHEET, SHAPE_LABEL, SCAFFOLD_LABEL } from "../pack-geometry";
+import {
+  INDUSTRY_GEOMETRY,
+  SKIN_GEOMETRY,
+  GEOMETRY_SHEET,
+  SHAPE_LABEL,
+  SCAFFOLD_LABEL,
+} from "../pack-geometry";
 import { INDUSTRY_SKINS } from "../industry-skins";
 import { INDUSTRY_RECIPES, designSkinByCode } from "../design-skins";
 import { INDUSTRY_PACKS, skinPackId, isSkinPackId } from "../design-skin-pack";

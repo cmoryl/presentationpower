@@ -71,7 +71,6 @@ export function sortBlocksForEdit(blocks: readonly CanvasBlock[]): CanvasBlock[]
     .map(({ b }) => b);
 }
 
-
 /**
  * Paint order for every shipping surface (read-only layer, present, share,
  * PPTX export): suppressed AND hidden blocks removed.
@@ -112,7 +111,6 @@ export function canvasBlockTextStyle(b: CanvasBlock, ink: string): React.CSSProp
   };
 }
 
-
 export const CanvasBlockContent = memo(function CanvasBlockContent({
   block,
   ink,
@@ -120,7 +118,6 @@ export const CanvasBlockContent = memo(function CanvasBlockContent({
   block: CanvasBlock;
   ink: string;
 }) {
-
   if (block.kind === "image") {
     if (!block.src) {
       return (
@@ -180,4 +177,3 @@ export const CanvasBlockContent = memo(function CanvasBlockContent({
   }
   return <div style={canvasBlockTextStyle(block, ink)}>{block.text}</div>;
 });
-

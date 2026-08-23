@@ -281,17 +281,16 @@ function overlayDivisionContent(
       ...base,
       title: `${client}: before and after ${divisionName}`,
       after: {
-        ...(base as Record<string, unknown>).after as Record<string, unknown>,
+        ...((base as Record<string, unknown>).after as Record<string, unknown>),
         label: `With ${divisionName}`,
       },
       hub: {
-        ...(base as Record<string, unknown>).hub as Record<string, unknown>,
+        ...((base as Record<string, unknown>).hub as Record<string, unknown>),
         title: divisionName,
       },
     } as SlideContent;
   }
   if (variantId === "MV-PROC-BEFORE-AFTER") {
-
     return {
       ...base,
       title: `What changes for ${client}`,
@@ -505,7 +504,6 @@ export function seedDivisionContent(
   for (const k of Object.keys(seeded)) out[k] = divisionizeValue(seeded[k], k, ctx);
   return out as SlideContent;
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Validation

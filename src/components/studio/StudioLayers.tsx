@@ -57,7 +57,9 @@ export function StudioLayers({
   const ordered = useMemo(() => [...items].sort((a, b) => b.z - a.z), [items]);
 
   return (
-    <aside className={`w-60 shrink-0 rounded-2xl border border-black/10 bg-white/80 p-2 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] ${className}`}>
+    <aside
+      className={`w-60 shrink-0 rounded-2xl border border-black/10 bg-white/80 p-2 backdrop-blur dark:border-white/10 dark:bg-white/[0.04] ${className}`}
+    >
       <div className="flex items-center justify-between px-1 pb-2">
         <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/55 dark:text-white/55">
           Layers
@@ -127,7 +129,11 @@ export function StudioLayers({
                     onClick={() => onPatch(item.id, { hidden: !item.hidden })}
                     className="rounded p-0.5 text-black/55 hover:bg-black/5 dark:text-white/55 dark:hover:bg-white/10"
                   >
-                    {item.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                    {item.hidden ? (
+                      <EyeOff className="h-3.5 w-3.5" />
+                    ) : (
+                      <Eye className="h-3.5 w-3.5" />
+                    )}
                   </button>
                   <button
                     type="button"
@@ -136,7 +142,11 @@ export function StudioLayers({
                     onClick={() => onPatch(item.id, { locked: !item.locked })}
                     className="rounded p-0.5 text-black/55 hover:bg-black/5 dark:text-white/55 dark:hover:bg-white/10"
                   >
-                    {item.locked ? <Lock className="h-3.5 w-3.5" /> : <Unlock className="h-3.5 w-3.5" />}
+                    {item.locked ? (
+                      <Lock className="h-3.5 w-3.5" />
+                    ) : (
+                      <Unlock className="h-3.5 w-3.5" />
+                    )}
                   </button>
                 </div>
 

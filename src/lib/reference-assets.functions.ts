@@ -91,7 +91,11 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
 
     // ---- Validate each file, skipping unsupported / oversized / too-long PDFs. ----
     const validationErrors: string[] = [];
-    const validated: { file: ReferenceFileInput; parts: { mime: string; base64: string }; size: number }[] = [];
+    const validated: {
+      file: ReferenceFileInput;
+      parts: { mime: string; base64: string };
+      size: number;
+    }[] = [];
     let totalBytes = 0;
 
     for (const file of data.files) {
@@ -101,7 +105,9 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
         continue;
       }
       if (!ACCEPTED_MIMES.includes(parts.mime)) {
-        validationErrors.push(`${file.name}: unsupported format (${parts.mime}). PNG, JPG, WEBP, GIF or PDF only.`);
+        validationErrors.push(
+          `${file.name}: unsupported format (${parts.mime}). PNG, JPG, WEBP, GIF or PDF only.`,
+        );
         continue;
       }
       if (parts.size > MAX_FILE_BYTES) {
@@ -115,7 +121,9 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
           continue;
         }
         if (pages === null) {
-          validationErrors.push(`${file.name}: could not read page count; try re-exporting the PDF.`);
+          validationErrors.push(
+            `${file.name}: could not read page count; try re-exporting the PDF.`,
+          );
           continue;
         }
       }
@@ -186,7 +194,10 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
         });
         if (!res.ok) {
           const body = await res.text().catch(() => "");
-          return { ok: false, error: `Reference analysis failed (${res.status}) ${body.slice(0, 200)}` };
+          return {
+            ok: false,
+            error: `Reference analysis failed (${res.status}) ${body.slice(0, 200)}`,
+          };
         }
         const json = (await res.json()) as { content?: Array<{ type: string; text?: string }> };
         const text = (json.content ?? [])
@@ -232,7 +243,10 @@ export const analyzeReferenceAssets = createServerFn({ method: "POST" })
           return { ok: false, error: "AI rate limit hit — try the references again in a moment." };
         if (res.status === 402)
           return { ok: false, error: "AI credits exhausted — add credits to analyse references." };
-        return { ok: false, error: `Reference analysis failed (${res.status}) ${body.slice(0, 200)}` };
+        return {
+          ok: false,
+          error: `Reference analysis failed (${res.status}) ${body.slice(0, 200)}`,
+        };
       }
       const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
       const text = (json.choices?.[0]?.message?.content ?? "").trim();

@@ -47,10 +47,7 @@ export const NEXT_CITY_TOKENS = {
   ink: "#03002C",
 } as const;
 
-export function nextCityLogo(
-  lockup: NextLogoLockup,
-  colorway: NextLogoColorway = "color",
-): Entry {
+export function nextCityLogo(lockup: NextLogoLockup, colorway: NextLogoColorway = "color"): Entry {
   return SUITE[lockup][colorway];
 }
 

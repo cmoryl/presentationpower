@@ -146,7 +146,10 @@ export function findArrowOverlaps(scope: HTMLElement, minRatio = 0.04): ArrowOve
  * Scan every slide frame inside `root`. Frames opt in by carrying
  * `data-arrow-check-slide="<slideId>"`.
  */
-export function scanArrowOverlaps(root: ParentNode = document, minRatio = 0.04): ArrowOverlapReport {
+export function scanArrowOverlaps(
+  root: ParentNode = document,
+  minRatio = 0.04,
+): ArrowOverlapReport {
   const frames = Array.from(root.querySelectorAll<HTMLElement>("[data-arrow-check-slide]"));
   let arrows = 0;
   const slides: SlideArrowOverlap[] = [];

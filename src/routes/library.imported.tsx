@@ -20,7 +20,6 @@ import {
   Sparkles,
   ClipboardCheck,
   Trash2,
-
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LibrarySubnav } from "@/components/LibrarySubnav";
@@ -35,9 +34,12 @@ import {
 } from "@/components/imported/VisualConversionPanel";
 import { ReinterpretApprovalDialog } from "@/components/imported/ReinterpretApprovalDialog";
 import type { MappedSlide } from "@/lib/pptx-mapping";
-import { applyVisualOverrides, mapStoredImportedDeck, themePaletteOverride } from "@/lib/imported-to-deck";
+import {
+  applyVisualOverrides,
+  mapStoredImportedDeck,
+  themePaletteOverride,
+} from "@/lib/imported-to-deck";
 import { ExtractedImageSaver } from "@/components/library/ExtractedImageSaver";
-
 
 import {
   listImportedDecksForDivision,
@@ -62,7 +64,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
 
 export const Route = createFileRoute("/library/imported")({
   head: () => ({
@@ -175,7 +176,6 @@ function DeleteImportedDeckButton({
   );
 }
 
-
 function ImportedLibrary() {
   const [brandModeId, setBrandModeId] = useState<string>("bm-enterprise");
   const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
@@ -243,7 +243,6 @@ function ImportedLibrary() {
           <ClipboardCheck className="size-4" strokeWidth={1.75} />
           Import audit report
         </Link>
-
       </div>
 
       {/* Brand mode scope */}
@@ -341,7 +340,6 @@ function ImportedLibrary() {
                 </div>
               );
             })
-
           )}
         </aside>
 
@@ -569,8 +567,8 @@ function DeckSlides({
         approval
           ? `AI reinterpretation applied · ${approval.approved} approved, ${approval.rejected} standard`
           : reinterpret
-          ? `Reinterpreted deck created · ${mapped.length} slides`
-          : `Editable deck created · ${mapped.length} slides`,
+            ? `Reinterpreted deck created · ${mapped.length} slides`
+            : `Editable deck created · ${mapped.length} slides`,
       );
       navigate({ to: "/decks/$deckId", params: { deckId } });
     } catch (e) {
@@ -579,7 +577,6 @@ function DeckSlides({
       setBuilding(false);
     }
   }
-
 
   return (
     <div>

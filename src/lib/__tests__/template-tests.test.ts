@@ -3,12 +3,22 @@ import { runTemplateTests, testSummary, contrastRatio } from "../template-tests"
 import type { CustomTemplate } from "../custom-templates";
 
 const good: CustomTemplate = {
-  id: "", code: "C01", name: "Cobalt Field",
-  reference: "TransPerfect", description: "A calm cobalt system for enterprise proposals.",
-  bestFit: "Enterprise", mode: "light",
+  id: "",
+  code: "C01",
+  name: "Cobalt Field",
+  reference: "TransPerfect",
+  description: "A calm cobalt system for enterprise proposals.",
+  bestFit: "Enterprise",
+  mode: "light",
   palette: ["#FFFFFF", "#111214", "#003FC7", "#EC388A", "#E0E8F5"],
-  typography: "Large scale", surfaceNote: "flat", imagery: "Wide crop",
-  density: "Medium", baseSkinCode: "S01", spec: "", status: "draft", notes: "",
+  typography: "Large scale",
+  surfaceNote: "flat",
+  imagery: "Wide crop",
+  density: "Medium",
+  baseSkinCode: "S01",
+  spec: "",
+  status: "draft",
+  notes: "",
 };
 
 describe("template readiness suite", () => {
@@ -24,7 +34,10 @@ describe("template readiness suite", () => {
     expect(t.find((x) => x.id === "mode")?.status).toBe("fail");
   });
   it("fails low body contrast", () => {
-    const t = runTemplateTests({ ...good, palette: ["#FFFFFF", "#EEEEEE", "#003FC7", "#EC388A", "#E0E8F5"] });
+    const t = runTemplateTests({
+      ...good,
+      palette: ["#FFFFFF", "#EEEEEE", "#003FC7", "#EC388A", "#E0E8F5"],
+    });
     expect(t.find((x) => x.id === "contrast-body")?.status).toBe("fail");
   });
   it("computes WCAG ratios", () => {

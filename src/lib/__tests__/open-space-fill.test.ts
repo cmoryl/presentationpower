@@ -69,7 +69,10 @@ describe("open-space auto-fill", () => {
 
   it("tightens gaps before type when a page is over-full", () => {
     const crowded = computeFill({
-      content: { ...fullContent, extra: Array.from({ length: 14 }, (_, i) => `Item ${i} of the row`) },
+      content: {
+        ...fullContent,
+        extra: Array.from({ length: 14 }, (_, i) => `Item ${i} of the row`),
+      },
       variantId: "SF-20-GRID",
     });
     expect(crowded.load).toBeGreaterThan(1);
@@ -79,7 +82,10 @@ describe("open-space auto-fill", () => {
   });
 
   it("grows charts on the block axis for chart families", () => {
-    const chart = computeFill({ content: { title: "Growth", spec: { kind: "bar" } }, variantId: "MV-DASH-TREND" });
+    const chart = computeFill({
+      content: { title: "Growth", spec: { kind: "bar" } },
+      variantId: "MV-DASH-TREND",
+    });
     expect(chart.family).toBe("chart");
     expect(chart.block).toBeGreaterThan(chart.display);
   });
@@ -128,12 +134,16 @@ describe("open-space auto-fill", () => {
   it("publishes css vars including a re-based spacing unit", () => {
     const vars = fillCssVars(clampFill({ ...NEUTRAL_FILL, gap: 1.25 }));
     expect(vars["--fill-display"]).toBe("1");
-    expect(vars["--spacing"]).toBe(`calc(0.25rem * ${fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })})`);
+    expect(vars["--spacing"]).toBe(
+      `calc(0.25rem * ${fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })})`,
+    );
     expect(fillSpaceScale({ ...NEUTRAL_FILL, gap: 1.25 })).toBeLessThanOrEqual(1.1);
     // The clamp now reads the per-industry floor/ceiling vars, falling back to
     // the global bounds (18px / 46px) when a slide carries no industry.
     const css = fillPx(24, "body");
-    expect(css.startsWith("clamp(max(22.08px, min(24px, var(--type-floor-body, 18px)))")).toBe(true);
+    expect(css.startsWith("clamp(max(22.08px, min(24px, var(--type-floor-body, 18px)))")).toBe(
+      true,
+    );
     expect(css).toContain("calc(24px * var(--fill-body, 1))");
     expect(css).toContain("var(--type-ceil-body, 46px)");
   });

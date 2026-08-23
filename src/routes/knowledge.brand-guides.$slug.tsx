@@ -466,7 +466,6 @@ function BrandGuideView() {
         <BrandIconLibrary slug={guide.slug} hero={hero} />
       </Section>
 
-
       {/* Social media */}
       {guide.socialMedia && guide.socialMedia.length > 0 && (
         <Section title="Social image watermarks" eyebrow="08">

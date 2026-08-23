@@ -137,7 +137,9 @@ export function NextBadge({
       {side === "front" ? (
         <div style={{ ...safeBox, alignItems: "center", textAlign: "center" }}>
           {/* lockup */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: u(0.1) }}>
+          <div
+            style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: u(0.1) }}
+          >
             {lockup.src ? (
               <img
                 src={lockup.src}
@@ -169,7 +171,13 @@ export function NextBadge({
 
           <div
             aria-hidden
-            style={{ marginTop: u(0.16), height: u(0.03), width: u(0.9), background: accent, borderRadius: 99 }}
+            style={{
+              marginTop: u(0.16),
+              height: u(0.03),
+              width: u(0.9),
+              background: accent,
+              borderRadius: 99,
+            }}
           />
 
           {/* identity */}
@@ -247,7 +255,9 @@ export function NextBadge({
             >
               {attendee.jobTitle}
             </div>
-            <div style={{ fontSize: u(0.15), fontWeight: 600, lineHeight: 1.3, marginTop: u(0.03) }}>
+            <div
+              style={{ fontSize: u(0.15), fontWeight: 600, lineHeight: 1.3, marginTop: u(0.03) }}
+            >
               {attendee.company}
             </div>
           </div>
@@ -263,8 +273,19 @@ export function NextBadge({
               width: "100%",
             }}
           >
-            <div style={{ background: "#FFFFFF", padding: u(0.045), borderRadius: u(0.05), lineHeight: 0 }}>
-              <QrBlock seed={`${attendee.reference ?? ""}${attendee.lastName}`} size={u(0.78)} dark={BADGE_NAVY} />
+            <div
+              style={{
+                background: "#FFFFFF",
+                padding: u(0.045),
+                borderRadius: u(0.05),
+                lineHeight: 0,
+              }}
+            >
+              <QrBlock
+                seed={`${attendee.reference ?? ""}${attendee.lastName}`}
+                size={u(0.78)}
+                dark={BADGE_NAVY}
+              />
             </div>
             <div style={{ textAlign: "center" }}>
               <div
@@ -277,14 +298,15 @@ export function NextBadge({
               >
                 Scan to connect
               </div>
-              <div style={{ fontSize: u(0.095), marginTop: u(0.03), color: "rgba(255,255,255,0.85)" }}>
+              <div
+                style={{ fontSize: u(0.095), marginTop: u(0.03), color: "rgba(255,255,255,0.85)" }}
+              >
                 {attendee.reference ?? BADGE_EVENT.url}
               </div>
             </div>
           </div>
         </div>
       ) : (
-
         <div style={safeBox}>
           <div
             style={{
@@ -296,7 +318,14 @@ export function NextBadge({
           >
             {division.name}
           </div>
-          <div style={{ fontSize: u(0.17), fontWeight: 700, letterSpacing: "-0.02em", marginTop: u(0.04) }}>
+          <div
+            style={{
+              fontSize: u(0.17),
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+              marginTop: u(0.04),
+            }}
+          >
             {BADGE_EVENT.datesLabel}
           </div>
           <div style={{ fontSize: u(0.105), color: "rgba(255,255,255,0.72)", marginTop: u(0.02) }}>
@@ -346,7 +375,6 @@ export function NextBadge({
             ) : null}
           </div>
 
-
           <div
             style={{
               marginTop: u(0.2),
@@ -387,7 +415,9 @@ export function NextBadge({
           </div>
 
           <div style={{ marginTop: "auto", paddingBottom: u(0.62) }}>
-            <div style={{ fontSize: u(0.12), fontWeight: 600, color: accent }}>{BADGE_EVENT.hashtag}</div>
+            <div style={{ fontSize: u(0.12), fontWeight: 600, color: accent }}>
+              {BADGE_EVENT.hashtag}
+            </div>
             <div style={{ fontSize: u(0.09), color: "rgba(255,255,255,0.6)", marginTop: u(0.02) }}>
               {BADGE_EVENT.url} · Please return your badge and lanyard at the end of the event.
             </div>
@@ -395,22 +425,23 @@ export function NextBadge({
         </div>
       )}
 
-
       {/* --- die cuts ------------------------------------------------------ */}
       <div aria-hidden>
         {[0, 1].map((i) => (
           <div
             key={i}
-            style={{
-              position: "absolute",
-              top: u(slot.fromTop),
-              [i === 0 ? "left" : "right"]: u(slot.fromSide),
-              width: u(slot.w),
-              height: u(slot.h),
-              borderRadius: u(slot.radius),
-              background: "#FFFFFF",
-              boxShadow: `inset 0 0 0 ${Math.max(1, u(0.008))}px rgba(0,0,0,0.25)`,
-            } as CSSProperties}
+            style={
+              {
+                position: "absolute",
+                top: u(slot.fromTop),
+                [i === 0 ? "left" : "right"]: u(slot.fromSide),
+                width: u(slot.w),
+                height: u(slot.h),
+                borderRadius: u(slot.radius),
+                background: "#FFFFFF",
+                boxShadow: `inset 0 0 0 ${Math.max(1, u(0.008))}px rgba(0,0,0,0.25)`,
+              } as CSSProperties
+            }
           />
         ))}
         <div

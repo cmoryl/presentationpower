@@ -37,8 +37,9 @@ describe("canvas block export geometry", () => {
       { left: 150, top: 40, width: 960, height: 540 },
     ]) {
       expect(stageScaleFromRect(rect)).toBeCloseTo(rect.width / 1920, 8);
-      expect(clientPointToStage(rect.left + rect.width * 0.5, rect.top + rect.height * 0.25, rect))
-        .toEqual({ x: 960, y: 270 });
+      expect(
+        clientPointToStage(rect.left + rect.width * 0.5, rect.top + rect.height * 0.25, rect),
+      ).toEqual({ x: 960, y: 270 });
     }
   });
 

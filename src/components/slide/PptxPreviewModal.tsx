@@ -28,7 +28,6 @@ import {
   useCertifiedInventory,
 } from "./PptxCertifiedCanvas";
 
-
 // Preview canvas is 640×360 (16:9). PPTX slide is 13.333"×7.5". Everything we
 // draw uses a single px/inch scale so scrim positions and image sizing are
 // visually identical to what pptxgenjs will emit.
@@ -52,7 +51,6 @@ function exportModeFor(slide: DeckSlide): "light" | "dark" {
   const v = slide.variantId;
   return v.startsWith("MV-COVER") || v.startsWith("MV-DIVIDER") ? "dark" : "light";
 }
-
 
 export function PptxPreviewModal({
   deck,
@@ -79,7 +77,6 @@ export function PptxPreviewModal({
   /** Where the reconstruction's ground came from: the author's Backgrounds &
    *  Imagery selection, or the renderer plate the default export captures. */
   const [source, setSource] = useState<"background" | "plate" | null>(null);
-
 
   const content = slide.content as Record<string, unknown>;
   const bg = useMemo(() => resolveSlideBackground(content.background), [content.background]);
@@ -190,9 +187,6 @@ export function PptxPreviewModal({
   const inventory = useCertifiedInventory(capture);
   const updateSlideCanvasBlocks = useDeckStore((s) => s.updateSlideCanvasBlocks);
 
-
-
-
   async function handleDownload() {
     setExporting(true);
     try {
@@ -264,7 +258,9 @@ export function PptxPreviewModal({
                     type="button"
                     onClick={() => setView(v)}
                     className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest transition ${
-                      view === v ? "bg-white text-[#003FC7] shadow-sm" : "text-black/50 hover:text-black/80"
+                      view === v
+                        ? "bg-white text-[#003FC7] shadow-sm"
+                        : "text-black/50 hover:text-black/80"
                     }`}
                   >
                     {v === "certified" ? "All layers" : "Background"}
@@ -274,7 +270,9 @@ export function PptxPreviewModal({
                   type="button"
                   onClick={() => setOutlines((o) => !o)}
                   className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest transition ${
-                    outlines ? "bg-white text-[#EC388A] shadow-sm" : "text-black/50 hover:text-black/80"
+                    outlines
+                      ? "bg-white text-[#EC388A] shadow-sm"
+                      : "text-black/50 hover:text-black/80"
                   }`}
                 >
                   Outlines
@@ -330,14 +328,11 @@ export function PptxPreviewModal({
                       coalesceKey: null,
                     })
                   }
-
                   onOpenEditor={onClose}
                 />
               </div>
             )}
           </section>
-
-
 
           <section>
             <div className="mb-2 text-[11px] uppercase tracking-widest text-black/50">
@@ -511,7 +506,6 @@ function buildChecks(
       },
     });
   } else if (!plan) {
-
     out.push({ level: "warn", label: "Background plan pending…" });
   } else if (plan.kind === "solid") {
     out.push({

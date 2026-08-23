@@ -69,12 +69,7 @@ export function GenerationProgress({
         />
       </div>
 
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {running
           ? `${running.label}: generating. ${settled} of ${jobs.length} complete.`
           : `${settled} of ${jobs.length} assets complete.`}

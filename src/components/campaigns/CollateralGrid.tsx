@@ -153,12 +153,8 @@ export function CollateralGrid({
   // Demos are fully rendered: when an artwork context is supplied every piece
   // gets a finished comp, so there is no roadmap bucket to split off.
   const allRendered = Boolean(artworkCtx);
-  const liveItems = allRendered
-    ? items
-    : items.filter((d) => (d.status ?? "live") === "live");
-  const soonItems = allRendered
-    ? []
-    : items.filter((d) => (d.status ?? "live") === "coming-soon");
+  const liveItems = allRendered ? items : items.filter((d) => (d.status ?? "live") === "live");
+  const soonItems = allRendered ? [] : items.filter((d) => (d.status ?? "live") === "coming-soon");
 
   const renderGroups = (rows: PlaybookDeliverable[], soon: boolean) => {
     const byCat = new Map<string, PlaybookDeliverable[]>();

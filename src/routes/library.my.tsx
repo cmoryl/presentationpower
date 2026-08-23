@@ -427,7 +427,6 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
 
   return (
     <div className="relative" ref={anchorRef}>
-
       <div className="flex items-center gap-2">
         {active ? (
           <button
@@ -482,65 +481,64 @@ function UseOnSurfaceAction({ row }: { row: SavedRow }) {
             style={{ left: anchor.left, top: anchor.top, width: 288 }}
             className="fixed z-[200] max-h-[70vh] overflow-y-auto rounded-xl border border-black/10 bg-white p-3 shadow-2xl"
           >
-
-          {surfaceList.length > 0 && (
-            <>
-              <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
-                Add to existing
-              </div>
-              <div className="mb-3 max-h-40 space-y-0.5 overflow-y-auto">
-                {surfaceList.map((s) => {
-                  const ok = variantSupportsSurface(row.variant_id, s.kind, s.format);
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      disabled={!ok}
-                      onClick={() => addTo(s.id)}
-                      className="flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-xs hover:bg-[#003FC7]/5 disabled:cursor-not-allowed disabled:opacity-40"
-                      title={ok ? "" : "Variant doesn't fit this format"}
-                    >
-                      <span className="truncate">{s.title}</span>
-                      <span className="shrink-0 text-[10px] text-black/40">{s.format}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </>
-          )}
-          <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
-            Create new surface
-          </div>
-          <div className="space-y-2">
-            {(Object.keys(SURFACE_FORMATS) as SurfaceKind[]).map((kind) => (
-              <div key={kind}>
-                <div className="mb-0.5 text-[11px] font-medium text-black/70">
-                  {SURFACE_LABELS[kind]}
+            {surfaceList.length > 0 && (
+              <>
+                <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
+                  Add to existing
                 </div>
-                <div className="flex flex-wrap gap-1">
-                  {SURFACE_FORMATS[kind].map((fmt) => {
-                    const ok = variantSupportsSurface(row.variant_id, kind, fmt.id);
+                <div className="mb-3 max-h-40 space-y-0.5 overflow-y-auto">
+                  {surfaceList.map((s) => {
+                    const ok = variantSupportsSurface(row.variant_id, s.kind, s.format);
                     return (
                       <button
-                        key={fmt.id}
+                        key={s.id}
                         type="button"
                         disabled={!ok}
-                        onClick={() => createAndAdd(kind, fmt.id)}
-                        className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-30"
-                        title={
-                          ok
-                            ? `Create ${SURFACE_LABELS[kind]} · ${fmt.label}`
-                            : "Not supported for this variant"
-                        }
+                        onClick={() => addTo(s.id)}
+                        className="flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-xs hover:bg-[#003FC7]/5 disabled:cursor-not-allowed disabled:opacity-40"
+                        title={ok ? "" : "Variant doesn't fit this format"}
                       >
-                        {fmt.label}
+                        <span className="truncate">{s.title}</span>
+                        <span className="shrink-0 text-[10px] text-black/40">{s.format}</span>
                       </button>
                     );
                   })}
                 </div>
-              </div>
-            ))}
-          </div>
+              </>
+            )}
+            <div className="mb-1 text-[10px] font-medium uppercase tracking-wider text-black/40">
+              Create new surface
+            </div>
+            <div className="space-y-2">
+              {(Object.keys(SURFACE_FORMATS) as SurfaceKind[]).map((kind) => (
+                <div key={kind}>
+                  <div className="mb-0.5 text-[11px] font-medium text-black/70">
+                    {SURFACE_LABELS[kind]}
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {SURFACE_FORMATS[kind].map((fmt) => {
+                      const ok = variantSupportsSurface(row.variant_id, kind, fmt.id);
+                      return (
+                        <button
+                          key={fmt.id}
+                          type="button"
+                          disabled={!ok}
+                          onClick={() => createAndAdd(kind, fmt.id)}
+                          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] text-black/70 transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:cursor-not-allowed disabled:opacity-30"
+                          title={
+                            ok
+                              ? `Create ${SURFACE_LABELS[kind]} · ${fmt.label}`
+                              : "Not supported for this variant"
+                          }
+                        >
+                          {fmt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>,
           document.body,
         )}
@@ -567,4 +565,3 @@ function stripCanvasBlocks(content: Record<string, unknown>): Record<string, unk
   } = content as Record<string, unknown>;
   return rest;
 }
-

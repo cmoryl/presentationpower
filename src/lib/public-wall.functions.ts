@@ -86,7 +86,8 @@ export const listPublicWallLogos = createServerFn({ method: "GET" }).handler(
 
     const out: PublicWallLogo[] = [];
     for (const r of rows) {
-      const light = (r.light_path && urls.get(r.light_path)) || (r.primary_path && urls.get(r.primary_path));
+      const light =
+        (r.light_path && urls.get(r.light_path)) || (r.primary_path && urls.get(r.primary_path));
       const dark = (r.dark_path && urls.get(r.dark_path)) || light;
       if (!light || !dark || !r.client_name) continue;
       out.push({

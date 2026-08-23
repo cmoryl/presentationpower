@@ -29,7 +29,6 @@ import React, {
 } from "react";
 import { AnchoredPortal, useAnchoredPosition } from "@/components/ui/anchored-panel";
 
-
 // -----------------------------------------------------------------------------
 // Page header
 // -----------------------------------------------------------------------------
@@ -60,7 +59,9 @@ export function EditorPageHeader({
           {title}
         </h1>
         {meta ? (
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-[13px] text-black/55">{meta}</div>
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-[13px] text-black/55">
+            {meta}
+          </div>
         ) : null}
       </div>
       {status ? (
@@ -85,8 +86,18 @@ export type AuthoringSurface = "edit" | "present" | "print" | "export" | "docume
 
 const SURFACES: Array<{ id: AuthoringSurface; label: string; to: string; hint: string }> = [
   { id: "edit", label: "Edit", to: "/decks/$deckId", hint: "Build and restyle slides" },
-  { id: "present", label: "Present", to: "/decks/$deckId/present", hint: "Full-screen run-through" },
-  { id: "document", label: "Document", to: "/decks/$deckId/document", hint: "Long-form document view" },
+  {
+    id: "present",
+    label: "Present",
+    to: "/decks/$deckId/present",
+    hint: "Full-screen run-through",
+  },
+  {
+    id: "document",
+    label: "Document",
+    to: "/decks/$deckId/document",
+    hint: "Long-form document view",
+  },
   { id: "print", label: "Print", to: "/decks/$deckId/print", hint: "Printable / PDF layout" },
   { id: "export", label: "Export", to: "/decks/$deckId/export", hint: "PowerPoint and hand-off" },
 ];
@@ -220,7 +231,6 @@ export function EditorMenu({
     width: wide ? 900 : 340,
   });
 
-
   const getFocusable = useCallback((): HTMLElement[] => {
     const panel = panelRef.current;
     if (!panel) return [];
@@ -302,7 +312,6 @@ export function EditorMenu({
           triggerRef.current = el;
           setTriggerEl(el);
         }}
-
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
@@ -364,7 +373,6 @@ export function EditorMenu({
           </div>
         </AnchoredPortal>
       )}
-
     </div>
   );
 }
@@ -402,7 +410,6 @@ export function EditorMenuRow({
         <span className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-2 [&>*]:min-w-0 [&>*]:max-w-full">
           {children}
         </span>
-
       </div>
     );
   }
@@ -416,7 +423,6 @@ export function EditorMenuRow({
     </div>
   );
 }
-
 
 // -----------------------------------------------------------------------------
 // Inspector tabs — one panel column, grouped instead of endlessly stacked
@@ -455,10 +461,7 @@ export function InspectorTabs({
   onCollapse?: () => void;
   storageKey?: string;
 }) {
-  const sections = useMemo(
-    () => React.Children.toArray(children).filter(isSection),
-    [children],
-  );
+  const sections = useMemo(() => React.Children.toArray(children).filter(isSection), [children]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // Remember the last tab per surface so switching slides doesn't reset it.
@@ -472,8 +475,7 @@ export function InspectorTabs({
     }
   }, [storageKey]);
 
-  const current =
-    sections.find((s) => s.props.id === activeId) ?? sections[0] ?? null;
+  const current = sections.find((s) => s.props.id === activeId) ?? sections[0] ?? null;
 
   const select = (id: string) => {
     setActiveId(id);

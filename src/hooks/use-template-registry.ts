@@ -19,11 +19,7 @@ import { subscribeTemplateRegistry, templateRegistryVersion } from "@/lib/templa
 export function useTemplateRegistryVersion(): number {
   // Server snapshot is 0 and the registry only loads client-side after mount,
   // so the first client render still matches the server output.
-  return useSyncExternalStore(
-    subscribeTemplateRegistry,
-    templateRegistryVersion,
-    () => 0,
-  );
+  return useSyncExternalStore(subscribeTemplateRegistry, templateRegistryVersion, () => 0);
 }
 
 /** Resolve a pack id, re-resolving when the registry updates. */

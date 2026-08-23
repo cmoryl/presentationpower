@@ -62,7 +62,10 @@ export function AgentVisualPreview({
 }) {
   const [showData, setShowData] = useState(false);
 
-  const variant = useMemo(() => byId(MODULE_VARIANTS, preview.module_id) ?? null, [preview.module_id]);
+  const variant = useMemo(
+    () => byId(MODULE_VARIANTS, preview.module_id) ?? null,
+    [preview.module_id],
+  );
   const pack = useResolvedStylePack(preview.style_pack_id ?? null);
   const brand = useMemo(() => {
     const base = BRAND_MODES[0]!;
@@ -116,16 +119,16 @@ export function AgentVisualPreview({
         ) : null}
         <span
           className={`ml-auto rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${
-            problems.length
-              ? "bg-[#E53D2E]/15 text-[#a02a20]"
-              : "bg-[#A6FA87]/35 text-[#2c6a1c]"
+            problems.length ? "bg-[#E53D2E]/15 text-[#a02a20]" : "bg-[#A6FA87]/35 text-[#2c6a1c]"
           }`}
         >
           {problems.length ? `${problems.length} to fix` : "Checks passed"}
         </span>
       </header>
 
-      {preview.why ? <p className="text-xs leading-relaxed text-foreground/70">{preview.why}</p> : null}
+      {preview.why ? (
+        <p className="text-xs leading-relaxed text-foreground/70">{preview.why}</p>
+      ) : null}
 
       <div
         className="relative w-full overflow-hidden rounded-xl border border-border/50 bg-[#03002C]"
@@ -181,7 +184,9 @@ export function AgentVisualPreview({
             <button
               type="button"
               disabled={busy}
-              onClick={() => onSubmit("Try a different visual for that data — show me another option first.")}
+              onClick={() =>
+                onSubmit("Try a different visual for that data — show me another option first.")
+              }
               className="rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-medium text-foreground/70 transition disabled:opacity-40 hover:bg-foreground/[0.05]"
             >
               Try another

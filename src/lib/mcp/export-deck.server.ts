@@ -46,12 +46,14 @@ export type HeadlessExportResult =
       warnings: string[];
     };
 
-const DECK_COLS =
-  "id, title, brand_mode_id, archetype_id, created_at, context, brief_id, owner_id";
+const DECK_COLS = "id, title, brand_mode_id, archetype_id, created_at, context, brief_id, owner_id";
 const SLIDE_COLS = "id, position, section_id, variant_id, layout_id, notes, content";
 
 function safeName(title: string): string {
-  const base = title.replace(/[^a-z0-9-_ ]+/gi, "").trim().replace(/\s+/g, "-");
+  const base = title
+    .replace(/[^a-z0-9-_ ]+/gi, "")
+    .trim()
+    .replace(/\s+/g, "-");
   return `${base || "deck"}.pptx`;
 }
 

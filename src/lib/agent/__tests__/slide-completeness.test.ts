@@ -5,7 +5,8 @@ import { auditDeckCompleteness, slideCompleteness } from "../slide-completeness"
 
 /** A variant with a repeating item contract, used for the grid assertions. */
 const gridVariant = MODULE_VARIANTS.find(
-  (v) => v.capacity.items && v.capacity.items.min >= 3 && v.capacity.items.max > v.capacity.items.min,
+  (v) =>
+    v.capacity.items && v.capacity.items.min >= 3 && v.capacity.items.max > v.capacity.items.min,
 )!;
 
 describe("slideCompleteness", () => {

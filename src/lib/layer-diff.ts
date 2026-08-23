@@ -246,7 +246,12 @@ export function renderDiffOverlay(flatPixels: Uint8ClampedArray, coverage: Cover
 export async function compareLayeredExport(args: {
   variantId: string;
   mode: "light" | "dark";
-  buildDeck: (variantId: string) => { deck: unknown; brand: unknown; slide: unknown; variant: unknown };
+  buildDeck: (variantId: string) => {
+    deck: unknown;
+    brand: unknown;
+    slide: unknown;
+    variant: unknown;
+  };
 }): Promise<LayerDiffResult> {
   const base: LayerDiffResult = {
     variantId: args.variantId,

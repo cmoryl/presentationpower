@@ -124,7 +124,10 @@ export function ArrowLabel({
   style?: React.CSSProperties;
 }) {
   return (
-    <span className={className} style={{ display: "inline-flex", alignItems: "center", gap: 14, ...style }}>
+    <span
+      className={className}
+      style={{ display: "inline-flex", alignItems: "center", gap: 14, ...style }}
+    >
       <span>{children}</span>
       <FlowArrow accent={accent} color={color} size={size} />
     </span>

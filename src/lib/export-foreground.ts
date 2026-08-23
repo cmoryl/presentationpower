@@ -69,9 +69,7 @@ export function relativeLuminance(hex: string): number {
     const s = c / 255;
     return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
   };
-  return (
-    0.2126 * chan((n >> 16) & 255) + 0.7152 * chan((n >> 8) & 255) + 0.0722 * chan(n & 255)
-  );
+  return 0.2126 * chan((n >> 16) & 255) + 0.7152 * chan((n >> 8) & 255) + 0.0722 * chan(n & 255);
 }
 
 /** WCAG 2.1 contrast ratio between two hex colours (1 → identical). */
@@ -93,9 +91,7 @@ export function foregroundOn(fillHex: string | null | undefined): string {
   if (fill.length !== 6) return BRAND_NAVY;
   const paired = SURFACE_FOREGROUND[fill];
   if (paired) return paired;
-  return contrastRatio("FFFFFF", fill) >= contrastRatio(BRAND_NAVY, fill)
-    ? "FFFFFF"
-    : BRAND_NAVY;
+  return contrastRatio("FFFFFF", fill) >= contrastRatio(BRAND_NAVY, fill) ? "FFFFFF" : BRAND_NAVY;
 }
 
 /**

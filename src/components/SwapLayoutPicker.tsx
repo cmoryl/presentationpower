@@ -47,7 +47,8 @@ export function SwapLayoutButton({
   );
 
   const options = useMemo(() => {
-    const base = scope === "all" ? MODULE_VARIANTS : MODULE_VARIANTS.filter((v) => sectionIds.has(v.id));
+    const base =
+      scope === "all" ? MODULE_VARIANTS : MODULE_VARIANTS.filter((v) => sectionIds.has(v.id));
     const scoped = familyId === "all" ? base : base.filter((v) => v.familyId === familyId);
     const q = query.trim().toLowerCase();
     const matched = q
@@ -85,12 +86,12 @@ export function SwapLayoutButton({
   }, [options]);
 
   const familyCounts = useMemo(() => {
-    const base = scope === "all" ? MODULE_VARIANTS : MODULE_VARIANTS.filter((v) => sectionIds.has(v.id));
+    const base =
+      scope === "all" ? MODULE_VARIANTS : MODULE_VARIANTS.filter((v) => sectionIds.has(v.id));
     const counts = new Map<string, number>();
     for (const v of base) counts.set(v.familyId, (counts.get(v.familyId) ?? 0) + 1);
     return counts;
   }, [scope, sectionIds]);
-
 
   return (
     <>
@@ -124,8 +125,8 @@ export function SwapLayoutButton({
                   Swap layout · {byId(SECTION_FRAMEWORKS, slide.sectionId)?.name}
                 </div>
                 <div className="mt-1 text-sm text-black/70">
-                  Overlapping fields carry over. {options.length} of {MODULE_VARIANTS.length} modules
-                  shown.
+                  Overlapping fields carry over. {options.length} of {MODULE_VARIANTS.length}{" "}
+                  modules shown.
                 </div>
               </div>
               <button
@@ -169,24 +170,30 @@ export function SwapLayoutButton({
               </div>
             </div>
             <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-black/10 bg-black/[0.02] px-6 pb-3">
-              <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">Family</span>
-              {[{ id: "all" as const, name: `All (${options.length})` }, ...MODULE_FAMILIES.filter((f) => (familyCounts.get(f.id) ?? 0) > 0).map((f) => ({ id: f.id, name: `${f.name} (${familyCounts.get(f.id)})` }))].map(
-                (f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    onClick={() => setFamilyId(f.id)}
-                    aria-pressed={familyId === f.id}
-                    className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
-                      familyId === f.id
-                        ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7]"
-                        : "border-black/12 text-black/60 hover:border-black/30 hover:text-black"
-                    }`}
-                  >
-                    {f.name}
-                  </button>
-                ),
-              )}
+              <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">
+                Family
+              </span>
+              {[
+                { id: "all" as const, name: `All (${options.length})` },
+                ...MODULE_FAMILIES.filter((f) => (familyCounts.get(f.id) ?? 0) > 0).map((f) => ({
+                  id: f.id,
+                  name: `${f.name} (${familyCounts.get(f.id)})`,
+                })),
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFamilyId(f.id)}
+                  aria-pressed={familyId === f.id}
+                  className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition ${
+                    familyId === f.id
+                      ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7]"
+                      : "border-black/12 text-black/60 hover:border-black/30 hover:text-black"
+                  }`}
+                >
+                  {f.name}
+                </button>
+              ))}
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-5">
               <div className="space-y-8">
@@ -271,7 +278,6 @@ export function SwapLayoutButton({
                 </p>
               )}
             </div>
-
           </div>
         </div>
       )}

@@ -114,8 +114,6 @@ export function composeOverrideLayers(
   return out;
 }
 
-
-
 /** Wrap a pack so its ground honours the admin overrides for `code`. */
 export function withBackgroundOverrides(pack: StylePack, code: string): StylePack {
   const base = pack.ground;

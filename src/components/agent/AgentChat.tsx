@@ -13,12 +13,8 @@ import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
 import { AgentDesignOverrides } from "@/components/agent/AgentDesignOverrides";
 import { readStoredDesignOverrides } from "@/lib/agent/design-overrides";
 
-
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
-import {
-  AgentOutlinePreview,
-  outlineFromToolInput,
-} from "@/components/agent/AgentOutlinePreview";
+import { AgentOutlinePreview, outlineFromToolInput } from "@/components/agent/AgentOutlinePreview";
 import { OUTLINE_TOOL_NAME } from "@/lib/agent/outline-tool";
 import { VISUAL_PLAN_TOOL_NAME } from "@/lib/agent/design-knowledge";
 import { AgentVisualPlan, planFromToolOutput } from "./AgentVisualPlan";
@@ -26,8 +22,10 @@ import { AgentVisualPreview, visualPreviewFromToolOutput } from "./AgentVisualPr
 import { AgentVisualOptions, visualOptionsFromToolOutput } from "./AgentVisualOptions";
 import { AgentStatsMapping, statsMappingFromToolOutput } from "./AgentStatsMapping";
 import { STATS_MAPPING_TOOL_NAME } from "@/lib/agent/stats-mapping";
-import { DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME } from "@/lib/agent/data-visuals";
-
+import {
+  DATA_VISUAL_PREVIEW_TOOL_NAME,
+  DATA_VISUAL_OPTIONS_TOOL_NAME,
+} from "@/lib/agent/data-visuals";
 
 const STARTERS = [
   "Build a 10-slide GlobalLink pitch for a global retail prospect moving to continuous localization.",
@@ -129,7 +127,6 @@ export function AgentChat({
     [busy, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
 
-
   // The newest outline proposal is the only one that still offers actions.
   const lastOutlineMessage = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i -= 1) {
@@ -153,9 +150,11 @@ export function AgentChat({
           p.type === `tool-${DATA_VISUAL_OPTIONS_TOOL_NAME}` ||
           p.type === `tool-${STATS_MAPPING_TOOL_NAME}` ||
           (p.type === "dynamic-tool" &&
-            [DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME, STATS_MAPPING_TOOL_NAME].includes(
-              (p as { toolName?: string }).toolName ?? "",
-            )),
+            [
+              DATA_VISUAL_PREVIEW_TOOL_NAME,
+              DATA_VISUAL_OPTIONS_TOOL_NAME,
+              STATS_MAPPING_TOOL_NAME,
+            ].includes((p as { toolName?: string }).toolName ?? "")),
       );
       if (hit) return i;
     }
@@ -224,24 +223,23 @@ export function AgentChat({
         {error && <p className="text-xs text-red-600">{error.message}</p>}
       </div>
 
-      {progressContainer
-        ? createPortal(
-            <AgentStatusTimeline
-              messages={messages}
-              status={status}
-              hasDeck={Boolean(seenDeck.current)}
-              variant="hero"
-            />,
-            progressContainer,
-          )
-        : (
-            <AgentStatusTimeline
-              messages={messages}
-              status={status}
-              hasDeck={Boolean(seenDeck.current)}
-            />
-          )}
-
+      {progressContainer ? (
+        createPortal(
+          <AgentStatusTimeline
+            messages={messages}
+            status={status}
+            hasDeck={Boolean(seenDeck.current)}
+            variant="hero"
+          />,
+          progressContainer,
+        )
+      ) : (
+        <AgentStatusTimeline
+          messages={messages}
+          status={status}
+          hasDeck={Boolean(seenDeck.current)}
+        />
+      )}
 
       <div className="border-t border-border/60 bg-background/60 px-3 pt-2">
         <AgentDesignDnaImport threadId={threadId} />
@@ -255,7 +253,6 @@ export function AgentChat({
         }}
         className="bg-background/80 p-3"
       >
-
         <div className="flex items-end gap-2 rounded-2xl border border-border/70 bg-background px-3 py-2 focus-within:border-[#003FC7]">
           <textarea
             ref={inputRef}
@@ -320,7 +317,8 @@ function toolErrorText(output: unknown): string | null {
         const parsed = JSON.parse(c.text) as { error?: unknown; ok?: boolean };
         if (typeof parsed?.error === "string" && parsed.error.trim()) return parsed.error.trim();
       } catch {
-        if (/^(ERROR:|Rejected:)/i.test(c.text.trim())) return c.text.trim().replace(/^ERROR:\s*/i, "");
+        if (/^(ERROR:|Rejected:)/i.test(c.text.trim()))
+          return c.text.trim().replace(/^ERROR:\s*/i, "");
       }
     }
   }
@@ -348,9 +346,12 @@ function MessageBubble({
       p.type === `tool-${DATA_VISUAL_OPTIONS_TOOL_NAME}` ||
       p.type === `tool-${STATS_MAPPING_TOOL_NAME}` ||
       (p.type === "dynamic-tool" &&
-        [VISUAL_PLAN_TOOL_NAME, DATA_VISUAL_PREVIEW_TOOL_NAME, DATA_VISUAL_OPTIONS_TOOL_NAME, STATS_MAPPING_TOOL_NAME].includes(
-          (p as { toolName?: string }).toolName ?? "",
-        )),
+        [
+          VISUAL_PLAN_TOOL_NAME,
+          DATA_VISUAL_PREVIEW_TOOL_NAME,
+          DATA_VISUAL_OPTIONS_TOOL_NAME,
+          STATS_MAPPING_TOOL_NAME,
+        ].includes((p as { toolName?: string }).toolName ?? "")),
   );
   const hasOutline = message.parts.some(
     (p) =>
@@ -361,7 +362,6 @@ function MessageBubble({
     <div className={isUser ? "flex justify-end" : "flex justify-start"}>
       <div
         className={`${hasOutline || hasWide ? "w-full max-w-full" : "max-w-[85%]"} space-y-2 rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-
           isUser
             ? "bg-[#003FC7] text-white"
             : "border border-border/60 bg-background/70 text-foreground/85"
@@ -481,10 +481,14 @@ function MessageBubble({
                 >
                   <span>{failed ? "✕" : done ? "✓" : "⏳"}</span>
                   <span className="truncate">{name}</span>
-                  {failed ? <span className="ml-auto normal-case tracking-normal">not applied</span> : null}
+                  {failed ? (
+                    <span className="ml-auto normal-case tracking-normal">not applied</span>
+                  ) : null}
                 </div>
                 {errText ? (
-                  <p className="mt-1 text-[11px] normal-case leading-snug text-[#a02a20]">{errText}</p>
+                  <p className="mt-1 text-[11px] normal-case leading-snug text-[#a02a20]">
+                    {errText}
+                  </p>
                 ) : null}
               </div>
             );
@@ -512,7 +516,11 @@ function RichText({ text }: { text: string }) {
             key={i}
             className={`${heading ? "pt-1 text-[13px] font-semibold" : ""} ${bullet ? "pl-4 -indent-3" : ""}`}
           >
-            {bullet && <span aria-hidden className="mr-1.5 opacity-50">•</span>}
+            {bullet && (
+              <span aria-hidden className="mr-1.5 opacity-50">
+                •
+              </span>
+            )}
             {inlineBold(body)}
           </p>
         );

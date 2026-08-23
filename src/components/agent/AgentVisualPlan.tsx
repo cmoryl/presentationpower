@@ -58,7 +58,9 @@ export function AgentVisualPlan({ plan }: { plan: PlanOutput }) {
   return (
     <section className="w-full space-y-3 rounded-2xl border border-border/60 bg-background/60 p-4 backdrop-blur-xl">
       <header className="space-y-1.5">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/45">Visual direction</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/45">
+          Visual direction
+        </p>
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-base font-semibold tracking-tight text-foreground">{skin.name}</h3>
           {skin.mode ? (
@@ -77,7 +79,9 @@ export function AgentVisualPlan({ plan }: { plan: PlanOutput }) {
             ))}
           </span>
         </div>
-        {plan.rationale ? <p className="text-xs leading-relaxed text-foreground/70">{plan.rationale}</p> : null}
+        {plan.rationale ? (
+          <p className="text-xs leading-relaxed text-foreground/70">{plan.rationale}</p>
+        ) : null}
       </header>
 
       <dl className="grid grid-cols-2 gap-2 text-[11px] leading-snug text-foreground/65 sm:grid-cols-4">
@@ -89,7 +93,9 @@ export function AgentVisualPlan({ plan }: { plan: PlanOutput }) {
         ].map(([label, value]) =>
           value ? (
             <div key={label as string} className="rounded-lg bg-foreground/[0.04] px-2.5 py-2">
-              <dt className="font-mono text-[9px] uppercase tracking-widest text-foreground/40">{label}</dt>
+              <dt className="font-mono text-[9px] uppercase tracking-widest text-foreground/40">
+                {label}
+              </dt>
               <dd className="mt-0.5">{value}</dd>
             </div>
           ) : null,
@@ -102,10 +108,14 @@ export function AgentVisualPlan({ plan }: { plan: PlanOutput }) {
             key={`${s.title}-${i}`}
             className="flex items-start gap-2.5 rounded-lg border border-border/40 bg-background/50 px-2.5 py-2"
           >
-            <span className="mt-0.5 font-mono text-[10px] text-foreground/40">{String(i + 1).padStart(2, "0")}</span>
+            <span className="mt-0.5 font-mono text-[10px] text-foreground/40">
+              {String(i + 1).padStart(2, "0")}
+            </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium text-foreground/85">{s.title}</p>
-              <p className="text-[11px] leading-snug text-foreground/55">{s.visual_note ?? s.role}</p>
+              <p className="text-[11px] leading-snug text-foreground/55">
+                {s.visual_note ?? s.role}
+              </p>
             </div>
             <span
               className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] uppercase tracking-widest ${

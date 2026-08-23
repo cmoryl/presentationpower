@@ -176,7 +176,6 @@ function RootShell({ children }: { children: ReactNode }) {
     // data-theme is rendered server-side (ELEMENT is light-only) so the boot
     // script below is a no-op re-write instead of a hydration mismatch.
     <html lang="en" data-theme="light">
-
       <head>
         <HeadContent />
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />

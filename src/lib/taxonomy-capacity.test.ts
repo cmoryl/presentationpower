@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  assertCapacityIntegrity,
-  capacityProblems,
-  resolveCapacity,
-} from "./taxonomy-capacity";
+import { assertCapacityIntegrity, capacityProblems, resolveCapacity } from "./taxonomy-capacity";
 import { MODULE_VARIANTS, byId, type ModuleVariant } from "./taxonomy";
 
 const variant = (id: string): ModuleVariant => {
@@ -43,12 +39,7 @@ describe("capacity is addressable by field", () => {
 
   it("MV-CLOSE-CTA budgets all four fields, not two", () => {
     const fields = resolveCapacity(variant("MV-CLOSE-CTA")).fields;
-    expect(fields.map((f) => f.path).sort()).toEqual([
-      "followUp",
-      "message",
-      "nextSteps",
-      "owner",
-    ]);
+    expect(fields.map((f) => f.path).sort()).toEqual(["followUp", "message", "nextSteps", "owner"]);
     for (const f of fields) expect(f.chars).toBeGreaterThan(0);
   });
 

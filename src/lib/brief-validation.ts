@@ -54,7 +54,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "error",
       step: "Step 1",
       title: "No output type selected",
-      detail: "Pick at least one of Presentation, Print, Event or Social — this defines every asset that gets built.",
+      detail:
+        "Pick at least one of Presentation, Print, Event or Social — this defines every asset that gets built.",
     });
   }
 
@@ -123,7 +124,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "warning",
       step: "Step 3",
       title: "No prospect or account name",
-      detail: 'Without a name every artifact is written for a generic "New prospect" and titles stay placeholder.',
+      detail:
+        'Without a name every artifact is written for a generic "New prospect" and titles stay placeholder.',
     });
   }
   if (!prospect.industry.trim()) {
@@ -141,7 +143,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "warning",
       step: "Step 3",
       title: "No objective or brief line",
-      detail: "Add a meeting objective or a one-line brief so the narrative has a point of view to argue.",
+      detail:
+        "Add a meeting objective or a one-line brief so the narrative has a point of view to argue.",
     });
   }
   if (!prospect.audience.trim()) {
@@ -150,7 +153,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "warning",
       step: "Step 3",
       title: "No audience set",
-      detail: "Audience sets the register — executive, procurement or practitioner copy differ substantially.",
+      detail:
+        "Audience sets the register — executive, procurement or practitioner copy differ substantially.",
     });
   }
 
@@ -161,7 +165,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "warning",
       step: "Step 3 / 4",
       title: "Adaptor brief on a net-new relationship",
-      detail: "Adaptor briefs assume an existing account with known systems. For a cold prospect a spotlight or case study lands better.",
+      detail:
+        "Adaptor briefs assume an existing account with known systems. For a cold prospect a spotlight or case study lands better.",
     });
   }
   if (has("event") && !has("presentation")) {
@@ -170,7 +175,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "warning",
       step: "Step 4",
       title: "Event kit without a deck",
-      detail: "Event kits reference the main narrative deck for stage content. Add the presentation for a complete kit.",
+      detail:
+        "Event kits reference the main narrative deck for stage content. Add the presentation for a complete kit.",
     });
   }
   if (has("social") && selectedDestinations.length === 1) {
@@ -179,7 +185,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "warning",
       step: "Step 4",
       title: "Social set with no source asset",
-      detail: "Social posts are derived from deck or print messaging. Add at least one to give the copy something to pull from.",
+      detail:
+        "Social posts are derived from deck or print messaging. Add at least one to give the copy something to pull from.",
     });
   }
   if (selectedDestinations.length > 6) {
@@ -188,7 +195,8 @@ export function validateBrief(input: BriefValidationInput): BriefValidation {
       level: "warning",
       step: "Step 4",
       title: `${selectedDestinations.length} artifacts in one brief`,
-      detail: "Large batches take noticeably longer and are harder to review. Consider splitting into two briefs.",
+      detail:
+        "Large batches take noticeably longer and are harder to review. Consider splitting into two briefs.",
     });
   }
 

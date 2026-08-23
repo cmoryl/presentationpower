@@ -302,7 +302,7 @@ function AuthPage() {
                   setInfo(null);
                 }}
                 data-allow-small-tap
-                  className="font-medium text-[#03002C] underline underline-offset-2"
+                className="font-medium text-[#03002C] underline underline-offset-2"
               >
                 Back to sign in
               </button>
@@ -411,7 +411,7 @@ function TeamAccessCard({ onBack, onDone }: { onBack: () => void; onDone: () => 
               type="button"
               onClick={onBack}
               data-allow-small-tap
-                  className="font-medium text-[#03002C] underline underline-offset-2"
+              className="font-medium text-[#03002C] underline underline-offset-2"
             >
               Back to sign in
             </button>

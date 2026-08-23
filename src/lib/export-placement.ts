@@ -98,7 +98,6 @@ function isTextLeaf(el: Element): boolean {
   return true;
 }
 
-
 /** Markers folded into an element's key so keys survive DOM reordering. */
 const KEY_ATTRS = [
   "data-plane",

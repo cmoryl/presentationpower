@@ -716,12 +716,8 @@ function analyzeSolutionProposal(c: SolutionProposalContent): CapacityIssue[] {
     });
   }
 
-  (c.sourceFiles ?? []).forEach((v, i) =>
-    pushLen(issues, `Source file ${i + 1}`, v, t.listLine),
-  );
-  (c.deliverables ?? []).forEach((v, i) =>
-    pushLen(issues, `Deliverable ${i + 1}`, v, t.listLine),
-  );
+  (c.sourceFiles ?? []).forEach((v, i) => pushLen(issues, `Source file ${i + 1}`, v, t.listLine));
+  (c.deliverables ?? []).forEach((v, i) => pushLen(issues, `Deliverable ${i + 1}`, v, t.listLine));
   if ((c.sourceFiles?.length ?? 0) > t.listMax || (c.deliverables?.length ?? 0) > t.listMax) {
     issues.push({
       level: "block",

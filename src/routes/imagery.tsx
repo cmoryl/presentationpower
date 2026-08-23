@@ -64,7 +64,11 @@ function ImageryPage() {
     setBusy(true);
     try {
       const memory = aggregateMemory(brandId);
-      const { url, prompt: fullPrompt, sources } = await generateBrandImage({
+      const {
+        url,
+        prompt: fullPrompt,
+        sources,
+      } = await generateBrandImage({
         data: {
           brandId,
           divisionId: brandId,

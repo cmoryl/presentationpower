@@ -21,8 +21,6 @@
 import { MODULE_VARIANTS, type ModuleVariant } from "./taxonomy";
 import { type FieldSpec } from "./taxonomy-field-kinds";
 
-
-
 /** One resolved field: the path a caller writes, and what fits there. */
 export type ResolvedField = {
   /** Path as listed in `editableFields`, e.g. `items[].label`. */
@@ -107,10 +105,11 @@ export function capacityProblems(variant: ModuleVariant): string[] {
   // (`rows`, `cells` on the data-viz variants) that the caller sends whole.
   const itemFieldCount = Object.keys(variant.capacity.items?.fields ?? {}).length;
   const listRoot = variant.capacity.items?.path;
-  const boundsAList =
-    !!listRoot && variant.capacity.fields[listRoot]?.kind === "list";
+  const boundsAList = !!listRoot && variant.capacity.fields[listRoot]?.kind === "list";
   if (variant.capacity.items && itemFieldCount === 0 && !boundsAList) {
-    problems.push(`${variant.id}: declares items ${variant.capacity.items.min}-${variant.capacity.items.max} but no item fields`);
+    problems.push(
+      `${variant.id}: declares items ${variant.capacity.items.min}-${variant.capacity.items.max} but no item fields`,
+    );
   }
   if (variant.capacity.items && variant.capacity.items.min > variant.capacity.items.max) {
     problems.push(`${variant.id}: items min exceeds max`);

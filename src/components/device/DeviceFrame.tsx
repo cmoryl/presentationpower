@@ -30,7 +30,9 @@ export function deviceScreenAspect(kind: DeviceKind): number {
 
 /** Normalise loose authored values ("Laptop", "desktop", undefined). */
 export function deviceKindFrom(value: unknown, fallback: DeviceKind = "laptop"): DeviceKind {
-  const v = String(value ?? "").trim().toLowerCase();
+  const v = String(value ?? "")
+    .trim()
+    .toLowerCase();
   if (v === "laptop" || v === "notebook") return "laptop";
   if (v === "monitor" || v === "desktop" || v === "display") return "monitor";
   return fallback;

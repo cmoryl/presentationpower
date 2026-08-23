@@ -55,9 +55,7 @@ describe("orbit label wrapping", () => {
     for (const label of LABEL_CASES) {
       const lines = wrapOrbitLabel(label);
       // Hard-split words gain a line break, so compare letters only.
-      expect(lines.join("").replace(/\s/g, "")).toBe(
-        label.trim().toUpperCase().replace(/\s/g, ""),
-      );
+      expect(lines.join("").replace(/\s/g, "")).toBe(label.trim().toUpperCase().replace(/\s/g, ""));
     }
   });
 
@@ -151,11 +149,7 @@ describe("orbit label framing", () => {
         expect(lab.bounds.right).toBeLessThanOrEqual(view.max);
         // Each wrapped line must fit the horizontal budget on its own.
         for (const line of lab.lines) {
-          const w = approxTextWidth(
-            line,
-            ORBIT_LABEL_FS * lab.fontScale,
-            ORBIT_LABEL_TRACKING_EM,
-          );
+          const w = approxTextWidth(line, ORBIT_LABEL_FS * lab.fontScale, ORBIT_LABEL_TRACKING_EM);
           expect(w).toBeLessThanOrEqual(ORBIT_LABEL_MAX_W + 1e-6);
         }
       }
@@ -245,11 +239,7 @@ describe("orbit labels — dense 7–10 segment rings", () => {
         );
         expect(lab.fontScale).toBe(orbitLabelFontScale(lab.lines));
         for (const line of lab.lines) {
-          const w = approxTextWidth(
-            line,
-            ORBIT_LABEL_FS * lab.fontScale,
-            ORBIT_LABEL_TRACKING_EM,
-          );
+          const w = approxTextWidth(line, ORBIT_LABEL_FS * lab.fontScale, ORBIT_LABEL_TRACKING_EM);
           expect(w).toBeLessThanOrEqual(ORBIT_LABEL_MAX_W + 1e-6);
         }
       }
@@ -306,9 +296,7 @@ describe.each(THEMES)("orbit labels — %s theme", (theme) => {
     for (const label of LABEL_CASES) {
       const lines = wrapOrbitLabel(label);
       expect(lines.length, `${theme}: "${label}"`).toBeLessThanOrEqual(2);
-      expect(lines.join("").replace(/\s/g, "")).toBe(
-        label.trim().toUpperCase().replace(/\s/g, ""),
-      );
+      expect(lines.join("").replace(/\s/g, "")).toBe(label.trim().toUpperCase().replace(/\s/g, ""));
       for (const line of lines) {
         const w = approxTextWidth(
           line,
@@ -345,8 +333,14 @@ describe("orbit labels — light/dark consistency", () => {
 
   it("keeps wrapping identical for each individual label in both themes", () => {
     for (const label of LABEL_CASES) {
-      const light = layoutForTheme("light", [{ label, value: 50 }, { label, value: 50 }]);
-      const dark = layoutForTheme("dark", [{ label, value: 50 }, { label, value: 50 }]);
+      const light = layoutForTheme("light", [
+        { label, value: 50 },
+        { label, value: 50 },
+      ]);
+      const dark = layoutForTheme("dark", [
+        { label, value: 50 },
+        { label, value: 50 },
+      ]);
       expect(dark).toEqual(light);
       expect(dark[0].lines).toEqual(light[0].lines);
       expect(dark[0].fontScale).toBe(light[0].fontScale);

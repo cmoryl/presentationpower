@@ -103,15 +103,16 @@ function SeverityIcon({ severity }: { severity: IssueSeverity }) {
 }
 
 function ScoreDial({ label, value, hint }: { label: string; value: number; hint: string }) {
-  const tone =
-    value >= 90 ? "text-primary" : value >= 70 ? "text-foreground" : "text-destructive";
+  const tone = value >= 90 ? "text-primary" : value >= 70 ? "text-foreground" : "text-destructive";
   return (
     <div className="rounded-lg border border-border bg-card p-3">
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className={`mt-0.5 text-2xl font-semibold tabular-nums ${tone}`}>{value}%</div>
       <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
         <div
-          className={value >= 70 ? "h-full rounded-full bg-primary" : "h-full rounded-full bg-destructive"}
+          className={
+            value >= 70 ? "h-full rounded-full bg-primary" : "h-full rounded-full bg-destructive"
+          }
           style={{ width: `${Math.max(2, Math.min(100, value))}%` }}
         />
       </div>
@@ -246,8 +247,8 @@ export function CompatibilityReport({
             <div className="flex items-start gap-2 rounded-md border border-border bg-muted/40 p-2.5 text-xs">
               <AlertTriangle className="mt-0.5 size-3.5 text-primary" strokeWidth={1.75} />
               <span>
-                Fonts not available here: {screening.compat.substitutedFonts.join(", ")} — text keeps
-                its size and spacing, but glyphs are substituted.
+                Fonts not available here: {screening.compat.substitutedFonts.join(", ")} — text
+                keeps its size and spacing, but glyphs are substituted.
               </span>
             </div>
           )}

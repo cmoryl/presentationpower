@@ -95,9 +95,7 @@ export function SkinBackdropStudio({ skin }: { skin: DesignSkin }) {
     setBusy(k);
     try {
       await remove({ data: { skinCode: code, scene, take } });
-      setRows((prev) =>
-        prev.filter((r) => keyOf(r.skinCode.toUpperCase(), r.scene, r.take) !== k),
-      );
+      setRows((prev) => prev.filter((r) => keyOf(r.skinCode.toUpperCase(), r.scene, r.take) !== k));
       toast.success("Backdrop cleared — this scene falls back to its composed design");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Clearing the backdrop failed");
@@ -117,8 +115,8 @@ export function SkinBackdropStudio({ skin }: { skin: DesignSkin }) {
             Backdrop studio
           </h3>
           <p className="mt-1 text-xs leading-relaxed text-white/60">
-            Art-directed imagery generated for this look and its sector. Scenes without a
-            rendered backdrop keep their composed design.
+            Art-directed imagery generated for this look and its sector. Scenes without a rendered
+            backdrop keep their composed design.
           </p>
         </div>
         <span className="rounded-full border border-white/15 px-3 py-1 text-[11px] uppercase tracking-wider text-white/70">

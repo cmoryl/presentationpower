@@ -94,7 +94,6 @@ export async function embedFontsInPptx(
     // Blob argument throws, which silently dropped font embedding.
     const zip = await JSZip.loadAsync(await blob.arrayBuffer());
 
-
     // Prepare font parts (only those we actually fetched).
     const parts: Array<{ kind: keyof typeof FONT_URLS; data: Uint8Array; fileName?: string }> = [];
     if (regular) parts.push({ kind: "regular", data: regular });
@@ -122,8 +121,6 @@ export async function embedFontsInPptx(
         );
         zip.file(ctPath, ct);
       }
-
-
 
       // --- presentation.xml.rels — add font relationships ---
       const relsPath = "ppt/_rels/presentation.xml.rels";
@@ -206,11 +203,8 @@ export async function embedFontsInPptx(
     // same empirical reason, so no further reordering is required.
     if (parts.length) zip.file(presPath, pres);
 
-
-
     const { repackPptx } = await import("./pptx-repack");
     return await repackPptx(zip);
-
   } catch (e) {
     console.warn("[pptx-font-embed] failed, returning original blob", e);
     return blob;

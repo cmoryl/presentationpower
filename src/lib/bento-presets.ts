@@ -68,9 +68,17 @@ export const BENTO_PRESETS: BentoPreset[] = [
           `A single global program spanning every ${c} market, content type, and channel — with local precision built in.`,
         ),
         stat("62", "%", "Faster launch cycles", "Timer"),
-        body("Human + AI", "Reviewer network paired with adaptive MT — quality that survives audit.", "Cpu"),
+        body(
+          "Human + AI",
+          "Reviewer network paired with adaptive MT — quality that survives audit.",
+          "Cpu",
+        ),
         media("In-market presence", `${c}-bento-balanced`),
-        body("Governance-ready", "Terminology, brand voice and regulatory guardrails codified per market.", "ShieldCheck"),
+        body(
+          "Governance-ready",
+          "Terminology, brand voice and regulatory guardrails codified per market.",
+          "ShieldCheck",
+        ),
         stat("170", "+", "Languages in scope", "Globe2"),
       ],
     }),
@@ -83,12 +91,20 @@ export const BENTO_PRESETS: BentoPreset[] = [
     build: (c) => ({
       title: `${c} — the program in numbers`,
       items: [
-        feature("Measured every week", `Every ${c} workstream reports against the same scorecard — no vanity metrics.`, "Gauge"),
+        feature(
+          "Measured every week",
+          `Every ${c} workstream reports against the same scorecard — no vanity metrics.`,
+          "Gauge",
+        ),
         stat("62", "%", "Faster launch cycles", "Timer"),
         stat("99.5", "%", "On-time delivery", "BadgeCheck"),
         stat("38", "%", "Lower cost per word", "PiggyBank"),
         stat("170", "+", "Languages in scope", "Globe2"),
-        body("How we hold the line", "Quality gates at translation, review and publish — audited quarterly.", "ClipboardCheck"),
+        body(
+          "How we hold the line",
+          "Quality gates at translation, review and publish — audited quarterly.",
+          "ClipboardCheck",
+        ),
       ],
     }),
   },
@@ -100,11 +116,19 @@ export const BENTO_PRESETS: BentoPreset[] = [
     build: (c) => ({
       title: `${c} in market`,
       items: [
-        feature("Local presence, global system", `Regional teams execute in-country while ${c} keeps one source of truth.`, "MapPin"),
+        feature(
+          "Local presence, global system",
+          `Regional teams execute in-country while ${c} keeps one source of truth.`,
+          "MapPin",
+        ),
         media("Retail activation", `${c}-bento-media-a`),
         stat("24", "h", "Turnaround on priority markets", "Timer"),
         media("Campaign localization", `${c}-bento-media-b`),
-        body("Brand-safe by default", "Voice, terminology and legal review baked into every route.", "ShieldCheck"),
+        body(
+          "Brand-safe by default",
+          "Voice, terminology and legal review baked into every route.",
+          "ShieldCheck",
+        ),
         stat("18", "", "Markets live", "Globe2"),
       ],
     }),
@@ -119,12 +143,28 @@ export const BENTO_PRESETS: BentoPreset[] = [
     build: (c) => ({
       title: `The capability stack behind ${c}`,
       items: [
-        feature("One connected platform", `GlobalLink orchestrates every ${c} request from intake to publish.`, "Layers3"),
-        body("Connected workflow", `Plugged straight into the ${c} stack — no copy-paste hand-offs.`, "Workflow"),
+        feature(
+          "One connected platform",
+          `GlobalLink orchestrates every ${c} request from intake to publish.`,
+          "Layers3",
+        ),
+        body(
+          "Connected workflow",
+          `Plugged straight into the ${c} stack — no copy-paste hand-offs.`,
+          "Workflow",
+        ),
         body("Human + AI", "Adaptive MT with reviewer-in-the-loop for regulated content.", "Cpu"),
-        body("Governance-ready", "Terminology, brand voice and audit trails per market.", "ShieldCheck"),
+        body(
+          "Governance-ready",
+          "Terminology, brand voice and audit trails per market.",
+          "ShieldCheck",
+        ),
         media("Delivery centres", `${c}-bento-capability`),
-        body("Always-on analytics", "Live dashboards on cost, throughput and quality by market.", "BarChart3"),
+        body(
+          "Always-on analytics",
+          "Live dashboards on cost, throughput and quality by market.",
+          "BarChart3",
+        ),
         stat("99.5", "%", "On-time delivery", "BadgeCheck"),
       ],
     }),
@@ -137,13 +177,25 @@ export const BENTO_PRESETS: BentoPreset[] = [
     build: (c) => ({
       title: `Proof from the ${c} program`,
       items: [
-        feature("Outcomes, not activity", `Each number below is drawn from live ${c}-comparable programs.`, "Target"),
+        feature(
+          "Outcomes, not activity",
+          `Each number below is drawn from live ${c}-comparable programs.`,
+          "Target",
+        ),
         stat("62", "%", "Faster launch cycles", "Timer"),
         stat("170", "+", "Languages in scope", "Globe2"),
         stat("38", "%", "Lower cost per word", "PiggyBank"),
         stat("99.5", "%", "On-time delivery", "BadgeCheck"),
-        body("Where the gains come from", "Reuse, automation and a single reviewer network across markets.", "Recycle"),
-        body("What we watch", "Quality escapes, cycle time and cost per market — reviewed monthly.", "ClipboardCheck"),
+        body(
+          "Where the gains come from",
+          "Reuse, automation and a single reviewer network across markets.",
+          "Recycle",
+        ),
+        body(
+          "What we watch",
+          "Quality escapes, cycle time and cost per market — reviewed monthly.",
+          "ClipboardCheck",
+        ),
       ],
     }),
   },
@@ -157,11 +209,19 @@ export const BENTO_PRESETS: BentoPreset[] = [
     build: (c) => ({
       title: `The ${c} program at a glance`,
       items: [
-        feature("One operating model", `A single global program across every ${c} market, content type and channel.`, "Layers3"),
+        feature(
+          "One operating model",
+          `A single global program across every ${c} market, content type and channel.`,
+          "Layers3",
+        ),
         stat("62", "%", "Faster launch cycles", "Timer"),
         body("Human + AI", "Reviewer network paired with adaptive MT.", "Cpu"),
         media("In-market presence", `${c}-bento-overview`),
-        body("Governance-ready", "Terminology and regulatory guardrails per market.", "ShieldCheck"),
+        body(
+          "Governance-ready",
+          "Terminology and regulatory guardrails per market.",
+          "ShieldCheck",
+        ),
         stat("170", "+", "Languages in scope", "Globe2"),
         body("Connected workflow", `Plugged into the ${c} stack — no hand-offs.`, "Workflow"),
         stat("99.5", "%", "On-time delivery", "BadgeCheck"),
@@ -176,14 +236,22 @@ export const BENTO_PRESETS: BentoPreset[] = [
     build: (c) => ({
       title: `${c} — measured performance`,
       items: [
-        feature("One scorecard, every market", `Reported to ${c} monthly, with the same definitions worldwide.`, "Gauge"),
+        feature(
+          "One scorecard, every market",
+          `Reported to ${c} monthly, with the same definitions worldwide.`,
+          "Gauge",
+        ),
         stat("62", "%", "Faster launch cycles", "Timer"),
         stat("170", "+", "Languages in scope", "Globe2"),
         stat("99.5", "%", "On-time delivery", "BadgeCheck"),
         stat("38", "%", "Lower cost per word", "PiggyBank"),
         stat("24", "h", "Priority turnaround", "Clock"),
         stat("4.8", "/5", "Reviewer satisfaction", "Star"),
-        body("How we hold the line", "Quality gates at translation, review and publish — audited quarterly.", "ClipboardCheck"),
+        body(
+          "How we hold the line",
+          "Quality gates at translation, review and publish — audited quarterly.",
+          "ClipboardCheck",
+        ),
       ],
     }),
   },
@@ -195,7 +263,11 @@ export const BENTO_PRESETS: BentoPreset[] = [
     build: (c) => ({
       title: `How the ${c} program runs`,
       items: [
-        feature("From intake to publish", `Every ${c} request follows one route, with owners named at each step.`, "Route"),
+        feature(
+          "From intake to publish",
+          `Every ${c} request follows one route, with owners named at each step.`,
+          "Route",
+        ),
         media("Intake and briefing", `${c}-bento-editorial-a`),
         body("Translate", "Adaptive MT with market-specific glossaries.", "Languages"),
         body("Review", "In-country reviewers with SLA-backed turnaround.", "UserCheck"),

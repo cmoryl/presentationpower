@@ -66,14 +66,11 @@ export function fixContentTypes(zip: JSZip, xml: string): ContentTypeFixResult &
       .map((n) => `/${n}`),
   );
   const removed: string[] = [];
-  let out = xml.replace(
-    /<Override\s+PartName="([^"]+)"[^>]*\/>/g,
-    (whole, partName: string) => {
-      if (present.has(partName)) return whole;
-      removed.push(partName);
-      return "";
-    },
-  );
+  let out = xml.replace(/<Override\s+PartName="([^"]+)"[^>]*\/>/g, (whole, partName: string) => {
+    if (present.has(partName)) return whole;
+    removed.push(partName);
+    return "";
+  });
 
   const declared = new Set(
     Array.from(out.matchAll(/<Override\s+PartName="([^"]+)"/g), (m) => m[1] as string),

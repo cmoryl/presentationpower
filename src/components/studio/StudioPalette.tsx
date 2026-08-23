@@ -3,11 +3,20 @@
 // the stage with the HTML5 drag-and-drop payload `application/x-tp-canvas`.
 
 import { useMemo, useState } from "react";
-import { MODULE_VARIANTS, SECTION_FRAMEWORKS, variantsForSection, type BrandMode } from "@/lib/taxonomy";
+import {
+  MODULE_VARIANTS,
+  SECTION_FRAMEWORKS,
+  variantsForSection,
+  type BrandMode,
+} from "@/lib/taxonomy";
 import { LazyMount } from "@/components/LazyMount";
 import { ModuleItemView } from "./CanvasItemView";
 import type { CanvasItemType, ModuleItem } from "@/lib/canvas-studio";
-import { presetsForCategory, type PresetCategory, type PresetPart } from "@/lib/canvas-block-presets";
+import {
+  presetsForCategory,
+  type PresetCategory,
+  type PresetPart,
+} from "@/lib/canvas-block-presets";
 import { PresetThumb } from "./PresetThumb";
 import {
   DATA_VISUAL_TYPES,
@@ -104,7 +113,9 @@ export function StudioPalette({
               onClick={() => onAdd({ kind: "block", type: b.type })}
               className="w-full cursor-grab rounded-xl border border-black/10 bg-white p-3 text-left transition hover:border-[#003FC7] hover:shadow-sm dark:border-white/10 dark:bg-white/[0.05]"
             >
-              <div className="text-sm font-semibold text-black/85 dark:text-white/90">{b.label}</div>
+              <div className="text-sm font-semibold text-black/85 dark:text-white/90">
+                {b.label}
+              </div>
               <div className="mt-0.5 text-[11px] text-black/50 dark:text-white/50">{b.hint}</div>
             </button>
           ))}
@@ -124,7 +135,9 @@ export function StudioPalette({
               <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/60 dark:text-white/60">
                 Advanced layouts
               </span>
-              <span className="text-xs text-black/45 dark:text-white/45">{advanced ? "Hide" : "Show"}</span>
+              <span className="text-xs text-black/45 dark:text-white/45">
+                {advanced ? "Hide" : "Show"}
+              </span>
             </button>
 
             {advanced && (
@@ -157,7 +170,8 @@ export function StudioPalette({
                       onDragStart={(e) => setDrag(e, { kind: "preset", presetId: p.id })}
                       onClick={() => onAdd({ kind: "preset", presetId: p.id })}
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") onAdd({ kind: "preset", presetId: p.id });
+                        if (e.key === "Enter" || e.key === " ")
+                          onAdd({ kind: "preset", presetId: p.id });
                       }}
                       className="cursor-grab rounded-xl border border-black/10 bg-white p-1.5 transition hover:border-[#003FC7] hover:shadow-sm dark:border-white/10 dark:bg-white/[0.05]"
                     >
@@ -180,7 +194,6 @@ export function StudioPalette({
             )}
           </div>
         </div>
-
       ) : (
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="space-y-2 border-b border-black/10 p-3 dark:border-white/10">
@@ -219,7 +232,8 @@ export function StudioPalette({
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") onAdd({ kind: "module", variantId: v.id });
+                  if (e.key === "Enter" || e.key === " ")
+                    onAdd({ kind: "module", variantId: v.id });
                 }}
                 className="cursor-grab overflow-hidden rounded-xl border border-black/10 bg-white transition hover:border-[#003FC7] hover:shadow-sm dark:border-white/10 dark:bg-white/[0.05]"
               >
@@ -260,7 +274,9 @@ export function StudioPalette({
               </div>
             ))}
             {variants.length === 0 && (
-              <p className="text-xs text-black/50 dark:text-white/50">No modules match that search.</p>
+              <p className="text-xs text-black/50 dark:text-white/50">
+                No modules match that search.
+              </p>
             )}
           </div>
         </div>
@@ -312,17 +328,36 @@ function DataVisualBuilder({ onAdd }: { onAdd: (payload: DragPayload) => void })
       <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-black/60 dark:text-white/60">
         Custom data visual
       </div>
-      <select value={type} onChange={(e) => setType(e.target.value as DataVisualType)} className={field}>
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value as DataVisualType)}
+        className={field}
+      >
         {DATA_VISUAL_TYPES.map((t) => (
           <option key={t.id} value={t.id}>
             {t.label}
           </option>
         ))}
       </select>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Chart title" className={field} />
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Chart title"
+        className={field}
+      />
       <div className="flex gap-2">
-        <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="Caption / basis" className={`${field} min-w-0 flex-1`} />
-        <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="Unit" className={`${field} w-20 shrink-0`} />
+        <input
+          value={caption}
+          onChange={(e) => setCaption(e.target.value)}
+          placeholder="Caption / basis"
+          className={`${field} min-w-0 flex-1`}
+        />
+        <input
+          value={unit}
+          onChange={(e) => setUnit(e.target.value)}
+          placeholder="Unit"
+          className={`${field} w-20 shrink-0`}
+        />
       </div>
       <textarea
         value={raw}

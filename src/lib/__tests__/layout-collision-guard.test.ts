@@ -122,9 +122,7 @@ describe("Variant bodies keep clearance below the hero title", () => {
     // header block: TitleBlock's own mb-N already reserves the clearance below
     // the title, so the sub-line hugs it deliberately and the body element AFTER
     // it is the one that must keep the gap.
-    const tag = opens.find(
-      (t) => !/data-title-subline/.test(t) && !/<SegmentedBar\b/.test(t),
-    );
+    const tag = opens.find((t) => !/data-title-subline/.test(t) && !/<SegmentedBar\b/.test(t));
     // SegmentedBar carries its own inline margins, tested above.
     if (!tag) continue;
 
@@ -136,7 +134,6 @@ describe("Variant bodies keep clearance below the hero title", () => {
       const line = `${id}: first body sibling below <SlideTitle/> = "${tag.slice(0, 90)}…" (mt=${mt ?? "none"}, min=${min})`;
       (isChart ? chartViolations : violations).push(line);
     }
-
   }
 
   it("keeps ≥ mt-10 on the first body sibling of every section variant", () => {

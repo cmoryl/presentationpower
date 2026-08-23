@@ -91,5 +91,4 @@ describe("exported package ordering (PowerPoint open gate)", () => {
     ).toBeGreaterThan(-1);
     expect(notes).toBeGreaterThan(slides);
   });
-
 });

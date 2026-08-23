@@ -20,10 +20,7 @@ import {
   LEGAL_DIVISION_ID,
   type LegalCaseStudySeed,
 } from "@/lib/print-library/legal-case-studies";
-import {
-  LEGAL_EBROCHURES,
-  type LegalEbrochureSeed,
-} from "@/lib/print-library/legal-ebrochures";
+import { LEGAL_EBROCHURES, type LegalEbrochureSeed } from "@/lib/print-library/legal-ebrochures";
 import {
   MEDIA_CASE_STUDIES,
   MEDIA_DIVISION_ID,
@@ -87,8 +84,6 @@ import {
   GAMES_DIVISION_ID,
   type GamesCaseStudySeed,
 } from "@/lib/print-library/games-case-studies";
-
-
 
 export type PrintTypeId = PrintAssetKind;
 
@@ -231,7 +226,6 @@ function fromLegalEbrochure(seed: LegalEbrochureSeed): PrintLibraryItem {
 }
 
 function fromMedia(seed: MediaCaseStudySeed): PrintLibraryItem {
-
   return {
     id: `media-${seed.slug}`,
     kind: "case-study",
@@ -522,7 +516,6 @@ function retargetTrialInteractive(item: PrintLibraryItem): PrintLibraryItem {
 
 /** Every catalog entry, templates first. */
 export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
-
   ...TEMPLATE_ITEMS,
   ...LEGAL_CASE_STUDIES.map(fromLegal),
   ...LEGAL_EBROCHURES.map(fromLegalEbrochure),
@@ -544,9 +537,7 @@ export const PRINT_LIBRARY_ITEMS: PrintLibraryItem[] = [
 
 /** Items visible inside a division folder (its own + the shared templates). */
 export function itemsForDivision(divisionId: string): PrintLibraryItem[] {
-  return PRINT_LIBRARY_ITEMS.filter(
-    (i) => i.divisionId === null || i.divisionId === divisionId,
-  );
+  return PRINT_LIBRARY_ITEMS.filter((i) => i.divisionId === null || i.divisionId === divisionId);
 }
 
 export function itemsForDivisionType(divisionId: string, kind: PrintTypeId): PrintLibraryItem[] {
@@ -555,9 +546,8 @@ export function itemsForDivisionType(divisionId: string, kind: PrintTypeId): Pri
 
 /** Curated (non-template) count for a division — drives the folder badges. */
 export function curatedCount(divisionId: string): number {
-  return PRINT_LIBRARY_ITEMS.filter(
-    (i) => i.divisionId === divisionId && i.source === "curated",
-  ).length;
+  return PRINT_LIBRARY_ITEMS.filter((i) => i.divisionId === divisionId && i.source === "curated")
+    .length;
 }
 
 /** Sub-folder names present in a division × type folder, in stable order. */
@@ -589,7 +579,6 @@ export function curatedMasterFor(
   }
   return curated[0];
 }
-
 
 export function matchesQuery(item: PrintLibraryItem, q: string): boolean {
   if (!q.trim()) return true;

@@ -43,7 +43,9 @@ function fakeClient() {
           : { data: null, error: { message: "no rows" } };
       },
       then(resolve: (v: { data: Row[]; error: null }) => unknown) {
-        let out = rows().filter(match).map((r) => ({ ...r }));
+        let out = rows()
+          .filter(match)
+          .map((r) => ({ ...r }));
         if (state.order) {
           const col = state.order;
           out = out.sort((a, b) => Number(a[col]) - Number(b[col]));
@@ -207,7 +209,9 @@ describe("list_variants", () => {
   });
 
   it("filters by section and by query", async () => {
-    const bySection = payload(await call(listVariants, { section_id: swapSection.s.id, limit: 400 }));
+    const bySection = payload(
+      await call(listVariants, { section_id: swapSection.s.id, limit: 400 }),
+    );
     expect(bySection.total).toBe(swapSection.vs.length);
     const byQuery = payload(
       await call(listVariants, { query: swapSection.vs[0]!.name, limit: 400 }),
@@ -267,11 +271,7 @@ describe("update_slide_content", () => {
   });
 
   it("requires authentication", async () => {
-    const res = await call(
-      updateSlideContent,
-      { deck_id: DECK_ID, position: 0, patch: {} },
-      anon,
-    );
+    const res = await call(updateSlideContent, { deck_id: DECK_ID, position: 0, patch: {} }, anon);
     expect(message(res)).toBe("Not authenticated");
   });
 });
@@ -287,9 +287,7 @@ describe("change_slide_variant", () => {
   });
 
   it("rejects a variant that is not permitted for the section", async () => {
-    const outsider = MODULE_VARIANTS.find(
-      (v) => !swapSection.vs.some((p) => p.id === v.id),
-    )!;
+    const outsider = MODULE_VARIANTS.find((v) => !swapSection.vs.some((p) => p.id === v.id))!;
     const res = await call(changeSlideVariant, {
       deck_id: DECK_ID,
       position: 0,
@@ -327,9 +325,9 @@ describe("set_slide_icon / update_slide_notes", () => {
   });
 
   it("both require authentication", async () => {
-    expect(message(await call(setSlideIcon, { deck_id: DECK_ID, position: 0, icon_ref: "x" }, anon))).toBe(
-      "Not authenticated",
-    );
+    expect(
+      message(await call(setSlideIcon, { deck_id: DECK_ID, position: 0, icon_ref: "x" }, anon)),
+    ).toBe("Not authenticated");
     expect(
       message(await call(updateSlideNotes, { deck_id: DECK_ID, position: 0, notes: "x" }, anon)),
     ).toBe("Not authenticated");

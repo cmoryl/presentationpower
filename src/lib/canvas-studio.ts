@@ -74,7 +74,6 @@ export type SurfaceItem = CanvasItemBase &
     stroke?: string;
   };
 
-
 export type CanvasItem = ModuleItem | TextItem | ImageItem | StatItem | SurfaceItem;
 export type CanvasItemType = CanvasItem["type"];
 
@@ -230,7 +229,11 @@ type StudioState = {
   removeItem: (compId: string, itemId: string) => void;
   removeItems: (compId: string, itemIds: readonly string[]) => void;
   duplicateItem: (compId: string, itemId: string) => void;
-  reorderItem: (compId: string, itemId: string, dir: "front" | "back" | "forward" | "backward") => void;
+  reorderItem: (
+    compId: string,
+    itemId: string,
+    dir: "front" | "back" | "forward" | "backward",
+  ) => void;
   setSelected: (ids: string[]) => void;
   clearItems: (compId: string) => void;
   /** Coalesce the next N mutations into the previous history step (drag streams). */
@@ -394,7 +397,12 @@ export const useCanvasStudio = create<StudioState>()(
           set((s) => ({
             ...step(s),
             compositions: s.compositions.map((c) =>
-              c.id === compId ? touch(c, c.items.filter((i) => i.id !== itemId)) : c,
+              c.id === compId
+                ? touch(
+                    c,
+                    c.items.filter((i) => i.id !== itemId),
+                  )
+                : c,
             ),
             selectedIds: s.selectedIds.filter((x) => x !== itemId),
           })),
@@ -402,7 +410,12 @@ export const useCanvasStudio = create<StudioState>()(
           set((s) => ({
             ...step(s),
             compositions: s.compositions.map((c) =>
-              c.id === compId ? touch(c, c.items.filter((i) => !itemIds.includes(i.id))) : c,
+              c.id === compId
+                ? touch(
+                    c,
+                    c.items.filter((i) => !itemIds.includes(i.id)),
+                  )
+                : c,
             ),
             selectedIds: s.selectedIds.filter((x) => !itemIds.includes(x)),
           })),
@@ -465,7 +478,6 @@ export const useCanvasStudio = create<StudioState>()(
     },
   ),
 );
-
 
 /** Snap a stage coordinate to the studio grid (40 stage units ≈ 2% width). */
 export const GRID = 40;

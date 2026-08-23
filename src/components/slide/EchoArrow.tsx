@@ -91,7 +91,9 @@ export function EchoArrow({
   const armX = size * 0.3;
   const armY = size * 0.34;
   const v = VARIANTS[variant] ?? VARIANTS.echo;
-  const dash = v.dash ? `${(size * v.dash[0]).toFixed(2)} ${(size * v.dash[1]).toFixed(2)}` : undefined;
+  const dash = v.dash
+    ? `${(size * v.dash[0]).toFixed(2)} ${(size * v.dash[1]).toFixed(2)}`
+    : undefined;
 
   return (
     <span

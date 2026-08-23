@@ -191,7 +191,8 @@ async function runAudit(opts: {
       forceMode: "light",
       fidelity: "layered",
     });
-    if (res.failedSlides?.length) base.problems.push(`renderer failed: ${res.failedSlides.join(",")}`);
+    if (res.failedSlides?.length)
+      base.problems.push(`renderer failed: ${res.failedSlides.join(",")}`);
     if (!res.blob) return { ...base, error: "no blob returned" };
 
     const report = await buildImageCompatReport(res.blob);

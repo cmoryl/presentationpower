@@ -75,7 +75,10 @@ function OptionCard({
   onSubmit?: (text: string) => void;
 }) {
   const [showData, setShowData] = useState(false);
-  const variant = useMemo(() => byId(MODULE_VARIANTS, option.module_id) ?? null, [option.module_id]);
+  const variant = useMemo(
+    () => byId(MODULE_VARIANTS, option.module_id) ?? null,
+    [option.module_id],
+  );
   const slide: DeckSlide | null = useMemo(() => {
     if (!variant) return null;
     return {
@@ -131,7 +134,9 @@ function OptionCard({
         </SlideThumbnailContext.Provider>
       </div>
 
-      {option.why ? <p className="text-[11px] leading-snug text-foreground/65">{option.why}</p> : null}
+      {option.why ? (
+        <p className="text-[11px] leading-snug text-foreground/65">{option.why}</p>
+      ) : null}
       {problems.length ? (
         <ul className="space-y-0.5 text-[10px] leading-snug text-[#a02a20]">
           {problems.map((p) => (
@@ -222,7 +227,9 @@ export function AgentVisualOptions({
             option={o}
             index={i}
             recommended={
-              optionSet.recommended_module_id ? o.module_id === optionSet.recommended_module_id && i === 0 : i === 0
+              optionSet.recommended_module_id
+                ? o.module_id === optionSet.recommended_module_id && i === 0
+                : i === 0
             }
             pack={pack}
             brand={brand}
@@ -237,7 +244,11 @@ export function AgentVisualOptions({
         <button
           type="button"
           disabled={busy}
-          onClick={() => onSubmit("None of these fit — show me a different set of visual options for that slide.")}
+          onClick={() =>
+            onSubmit(
+              "None of these fit — show me a different set of visual options for that slide.",
+            )
+          }
           className="rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-medium text-foreground/70 transition disabled:opacity-40 hover:bg-foreground/[0.05]"
         >
           Show other options

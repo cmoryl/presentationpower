@@ -49,10 +49,13 @@ import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackCo
 import { BrandSystemThumb, StylePackThumb } from "@/components/slide/StylePackThumb";
 import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
 
-import { APPROVED_STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
+import {
+  APPROVED_STYLE_PACKS,
+  packToneBrand,
+  stylePackById,
+  type StylePack,
+} from "@/lib/style-packs";
 import { useResolvedStylePack } from "@/hooks/use-template-registry";
-
-
 
 type Mode = "light" | "dark";
 
@@ -114,7 +117,6 @@ function useSlide(variant: ModuleVariant, brand: BrandMode, preset?: BentoPreset
   }, [variant, brief, brand, wallPool, samples, preset]);
 }
 
-
 /** Live 16:9 render of one variant at 1920×1080, scaled into its container. */
 function VariantStage({
   variant,
@@ -166,11 +168,7 @@ function VariantStage({
       {...attr}
       className="absolute inset-0"
       style={{
-        background: pack
-          ? pack.tokens.surface
-          : effMode === "dark"
-            ? "#03002C"
-            : "#F2F2F2",
+        background: pack ? pack.tokens.surface : effMode === "dark" ? "#03002C" : "#F2F2F2",
       }}
     >
       <ScaledSlide>
@@ -198,7 +196,6 @@ function VariantStage({
       </ScaledSlide>
     </div>
   );
-
 }
 
 function ModeToggle({
@@ -264,7 +261,6 @@ function PublicModuleLibrary() {
   // Registry-aware so an admin background retune lands here too.
   const pack = useResolvedStylePack(packId);
 
-
   // Deep-linkable: /public/modules?style=neo-brutal opens on that look, and
   // switching packs rewrites the URL so reviewers can share exactly what they
   // are looking at without adding a history entry per click.
@@ -281,8 +277,6 @@ function PublicModuleLibrary() {
 
   const brand =
     byId(BRAND_MODES, brandId) ?? byId(BRAND_MODES, DEFAULT_BRAND_ID) ?? BRAND_MODES[0]!;
-
-
 
   // Each variant contributes its canonical card; MV-BENTO-6/7/8 also
   // contribute one card per arrangement preset so reviewers can compare the
@@ -339,7 +333,6 @@ function PublicModuleLibrary() {
 
   const open = openIndex === null ? null : (variants[openIndex] ?? null);
 
-
   const copyLink = async () => {
     try {
       await navigator.clipboard.writeText(window.location.href);
@@ -363,7 +356,8 @@ function PublicModuleLibrary() {
               <Search
                 size={14}
                 strokeWidth={1.75}
-                data-ui-chrome="" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
+                data-ui-chrome=""
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-black/40"
               />
               <input
                 value={query}
@@ -478,11 +472,8 @@ function PublicModuleLibrary() {
             </div>
             <StyleLookPicker value={pack?.id ?? null} onChange={(id) => setPackId(id)} />
           </div>
-
         </details>
       </section>
-
-
 
       <div className="mx-auto max-w-[1400px] px-6 py-10">
         {variants.length === 0 ? (
@@ -557,9 +548,10 @@ function PublicModuleLibrary() {
           mode={mode}
           index={openIndex}
           total={variants.length}
-
           onClose={() => setOpenIndex(null)}
-          onPrev={() => setOpenIndex((i) => (i === null ? null : (i - 1 + variants.length) % variants.length))}
+          onPrev={() =>
+            setOpenIndex((i) => (i === null ? null : (i - 1 + variants.length) % variants.length))
+          }
           onNext={() => setOpenIndex((i) => (i === null ? null : (i + 1) % variants.length))}
         />
       )}
@@ -591,7 +583,6 @@ function Lightbox({
   onPrev: () => void;
   onNext: () => void;
 }) {
-
   // Local to this enlarged view only — flipping light/dark here must not
   // restyle the whole module grid behind the overlay.
   const [mode, setMode] = useState<Mode>(initialMode);
@@ -604,7 +595,6 @@ function Lightbox({
   // module navigation replay it automatically via the composed key.
   const [introNonce, setIntroNonce] = useState(0);
   const recipe = introRecipeFor(variant.id);
-
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -717,24 +707,23 @@ function Lightbox({
                     role="group"
                     aria-label="Preview mode"
                   >
-                    {([
-                      ["light", Sun, "Light"] as const,
-                      ["dark", Moon, "Dark"] as const,
-                    ]).map(([m, Icon, label]) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => setMode(m)}
-                        aria-pressed={mode === m}
-                        className={`inline-flex h-7 items-center gap-1.5 rounded-[5px] px-2.5 text-xs font-medium transition ${
-                          mode === m
-                            ? "bg-white text-[#03002C]"
-                            : "text-white/60 hover:text-white"
-                        }`}
-                      >
-                        <Icon size={12} strokeWidth={1.75} /> {label}
-                      </button>
-                    ))}
+                    {[["light", Sun, "Light"] as const, ["dark", Moon, "Dark"] as const].map(
+                      ([m, Icon, label]) => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => setMode(m)}
+                          aria-pressed={mode === m}
+                          className={`inline-flex h-7 items-center gap-1.5 rounded-[5px] px-2.5 text-xs font-medium transition ${
+                            mode === m
+                              ? "bg-white text-[#03002C]"
+                              : "text-white/60 hover:text-white"
+                          }`}
+                        >
+                          <Icon size={12} strokeWidth={1.75} /> {label}
+                        </button>
+                      ),
+                    )}
                   </div>
                 )}
                 <button
@@ -788,17 +777,9 @@ function Lightbox({
                 {/* Brand font files packed inside the .pptx (typography parity). */}
                 <ExportFontEmbedToggle compact value={embedFonts} onChange={setEmbedFonts} />
                 {/* Force JPEG/PNG bitmaps for pre-2019 PowerPoint / Slides / Keynote. */}
-                <ExportLegacyImagesToggle
-                  compact
-                  value={legacyImages}
-                  onChange={setLegacyImages}
-                />
+                <ExportLegacyImagesToggle compact value={legacyImages} onChange={setLegacyImages} />
                 {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
-                <ExportAlphaImagesToggle
-                  compact
-                  value={alphaImages}
-                  onChange={setAlphaImages}
-                />
+                <ExportAlphaImagesToggle compact value={alphaImages} onChange={setAlphaImages} />
                 {/* Object-tree metadata: .layers.json sidecar + debug .pptx notes. */}
                 <ExportDebugTreeToggle
                   compact
@@ -856,7 +837,6 @@ function Lightbox({
           </div>
         </div>
       </div>
-
 
       <div className="mt-5 flex flex-1 items-center gap-3">
         <button

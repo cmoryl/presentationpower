@@ -15,7 +15,6 @@ import {
   type VariantSample,
 } from "@/lib/variant-samples.functions";
 
-
 const SAMPLES_KEY = ["module-variant-samples"] as const;
 
 /** Reserved keys inside a saved sample payload: per-field / per-scope text
@@ -44,15 +43,13 @@ export type SampleModes = Partial<Record<SlideModeId, SampleModeLayer>>;
 
 /** Assign `value` at a dotted/bracket path inside a cloned object. */
 function assignPath<T extends Record<string, unknown>>(obj: T, path: string, value: unknown): T {
-  const parts = path
-    .split(".")
-    .flatMap((seg) => {
-      const m = /^([^[]+)((\[\d+\])+)?$/.exec(seg);
-      if (!m) return [seg] as (string | number)[];
-      const out: (string | number)[] = [m[1] as string];
-      for (const idx of m[2]?.match(/\d+/g) ?? []) out.push(Number(idx));
-      return out;
-    });
+  const parts = path.split(".").flatMap((seg) => {
+    const m = /^([^[]+)((\[\d+\])+)?$/.exec(seg);
+    if (!m) return [seg] as (string | number)[];
+    const out: (string | number)[] = [m[1] as string];
+    for (const idx of m[2]?.match(/\d+/g) ?? []) out.push(Number(idx));
+    return out;
+  });
   const clone = structuredClone(obj);
   let cur: unknown = clone;
   for (let i = 0; i < parts.length - 1; i++) {
@@ -240,11 +237,7 @@ export function countSampleStyle(style: SampleStylePayload): number {
 const HISTORY_KEY = ["module-variant-sample-versions"] as const;
 
 /** Restore points for one variant scope (admin only; empty otherwise). */
-export function useVariantSampleHistory(
-  variantId: string,
-  brandModeId: string,
-  enabled = true,
-) {
+export function useVariantSampleHistory(variantId: string, brandModeId: string, enabled = true) {
   const qc = useQueryClient();
   const query = useQuery({
     queryKey: [...HISTORY_KEY, variantId, brandModeId],
@@ -316,4 +309,3 @@ export function diffSampleContent(
 
 export { ALL_BRANDS };
 export type { SampleStylePayload };
-

@@ -21,23 +21,88 @@ export type PrintSubsection = {
 export const HIDDEN_DIVISION_IDS = new Set<string>(["bm-subcompany"]);
 
 const GLOBALLINK_PRODUCTS: PrintSubsection[] = [
-  { id: "gl-suite", label: "GlobalLink Suite", blurb: "Full-suite overview collateral", match: ["globallink suite", "suite", "globallink"] },
-  { id: "gl-tms", label: "GlobalLink TMS", blurb: "Translation management system", match: ["tms", "translation management"] },
-  { id: "gl-web", label: "GlobalLink Web", blurb: "Website proxy & web localization", match: ["web", "onelink", "proxy", "website"] },
-  { id: "gl-live", label: "GlobalLink Live", blurb: "Live interpretation & meetings", match: ["live", "interpretation", "interpreting", "meeting"] },
-  { id: "gl-stream", label: "GlobalLink Stream", blurb: "Media & streaming workflows", match: ["stream", "media", "subtitl", "dubbing"] },
-  { id: "gl-now", label: "GlobalLink NOW", blurb: "Secure machine translation", match: ["now", "machine translation", "mt"] },
-  { id: "gl-connect", label: "GlobalLink Connect", blurb: "Connectors & integrations", match: ["connect", "connector", "integration", "veeva", "vault", "rim"] },
-  { id: "gl-dashboard", label: "GlobalLink Dashboard", blurb: "Program reporting & analytics", match: ["dashboard", "analytics", "report"] },
-  { id: "gl-vasont", label: "GlobalLink Vasont", blurb: "Structured content management", match: ["vasont", "structured content", "cms"] },
-  { id: "gl-ai", label: "GlobalLink AI", blurb: "AI-assisted language workflows", match: ["ai", "artificial intelligence", "genai"] },
+  {
+    id: "gl-suite",
+    label: "GlobalLink Suite",
+    blurb: "Full-suite overview collateral",
+    match: ["globallink suite", "suite", "globallink"],
+  },
+  {
+    id: "gl-tms",
+    label: "GlobalLink TMS",
+    blurb: "Translation management system",
+    match: ["tms", "translation management"],
+  },
+  {
+    id: "gl-web",
+    label: "GlobalLink Web",
+    blurb: "Website proxy & web localization",
+    match: ["web", "onelink", "proxy", "website"],
+  },
+  {
+    id: "gl-live",
+    label: "GlobalLink Live",
+    blurb: "Live interpretation & meetings",
+    match: ["live", "interpretation", "interpreting", "meeting"],
+  },
+  {
+    id: "gl-stream",
+    label: "GlobalLink Stream",
+    blurb: "Media & streaming workflows",
+    match: ["stream", "media", "subtitl", "dubbing"],
+  },
+  {
+    id: "gl-now",
+    label: "GlobalLink NOW",
+    blurb: "Secure machine translation",
+    match: ["now", "machine translation", "mt"],
+  },
+  {
+    id: "gl-connect",
+    label: "GlobalLink Connect",
+    blurb: "Connectors & integrations",
+    match: ["connect", "connector", "integration", "veeva", "vault", "rim"],
+  },
+  {
+    id: "gl-dashboard",
+    label: "GlobalLink Dashboard",
+    blurb: "Program reporting & analytics",
+    match: ["dashboard", "analytics", "report"],
+  },
+  {
+    id: "gl-vasont",
+    label: "GlobalLink Vasont",
+    blurb: "Structured content management",
+    match: ["vasont", "structured content", "cms"],
+  },
+  {
+    id: "gl-ai",
+    label: "GlobalLink AI",
+    blurb: "AI-assisted language workflows",
+    match: ["ai", "artificial intelligence", "genai"],
+  },
 ];
 
 export const DIVISION_SUBSECTIONS: Record<string, PrintSubsection[]> = {
   "bm-division": [
-    { id: "div-finance", label: "Finance", blurb: "Financial services & banking", match: ["financ", "bank", "insur", "investment", "fintech"] },
-    { id: "div-travel", label: "Travel", blurb: "Travel, hospitality & mobility", match: ["travel", "hospitality", "hotel", "airline", "tourism"] },
-    { id: "div-hr", label: "Human Resources", blurb: "HR, talent & workforce programs", match: ["human resources", "hr", "talent", "workforce", "employee", "training"] },
+    {
+      id: "div-finance",
+      label: "Finance",
+      blurb: "Financial services & banking",
+      match: ["financ", "bank", "insur", "investment", "fintech"],
+    },
+    {
+      id: "div-travel",
+      label: "Travel",
+      blurb: "Travel, hospitality & mobility",
+      match: ["travel", "hospitality", "hotel", "airline", "tourism"],
+    },
+    {
+      id: "div-hr",
+      label: "Human Resources",
+      blurb: "HR, talent & workforce programs",
+      match: ["human resources", "hr", "talent", "workforce", "employee", "training"],
+    },
   ],
   "bm-product": [
     {
@@ -47,7 +112,12 @@ export const DIVISION_SUBSECTIONS: Record<string, PrintSubsection[]> = {
       match: ["globallink"],
       children: GLOBALLINK_PRODUCTS,
     },
-    { id: "prod-dataforce", label: "DataForce", blurb: "AI training data & data services", match: ["dataforce", "training data", "annotation"] },
+    {
+      id: "prod-dataforce",
+      label: "DataForce",
+      blurb: "AI training data & data services",
+      match: ["dataforce", "training data", "annotation"],
+    },
     {
       id: "prod-trial-interactive",
       label: "Trial Interactive",
@@ -57,7 +127,6 @@ export const DIVISION_SUBSECTIONS: Record<string, PrintSubsection[]> = {
       // surface it here too, keyword-filtered.
       pull: ["bm-trial-interactive", "bm-tp-lifesci"],
     },
-
   ],
 };
 
@@ -65,10 +134,7 @@ export function subsectionsFor(divisionId: string): PrintSubsection[] {
   return DIVISION_SUBSECTIONS[divisionId] ?? [];
 }
 
-export function findSubsection(
-  divisionId: string,
-  id: string | null,
-): PrintSubsection | null {
+export function findSubsection(divisionId: string, id: string | null): PrintSubsection | null {
   if (!id) return null;
   for (const s of subsectionsFor(divisionId)) {
     if (s.id === id) return s;

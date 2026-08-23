@@ -65,18 +65,13 @@ export const PROPOSAL_ART = {
  * without a photo so the team pages read as finished documents; every slot is
  * still drag-and-drop replaceable in the editor.
  */
-export const DEMO_HEADSHOTS: string[] = [
-  hs1.url,
-  hs2.url,
-  hs3.url,
-  hs4.url,
-  hs5.url,
-  hs6.url,
-];
+export const DEMO_HEADSHOTS: string[] = [hs1.url, hs2.url, hs3.url, hs4.url, hs5.url, hs6.url];
 
 /** Deterministic demo headshot for a given index. */
 export function demoHeadshot(i: number): string {
-  return DEMO_HEADSHOTS[((i % DEMO_HEADSHOTS.length) + DEMO_HEADSHOTS.length) % DEMO_HEADSHOTS.length]!;
+  return DEMO_HEADSHOTS[
+    ((i % DEMO_HEADSHOTS.length) + DEMO_HEADSHOTS.length) % DEMO_HEADSHOTS.length
+  ]!;
 }
 
 export const STORY_LOGOS: Record<string, string> = {};

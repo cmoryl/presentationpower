@@ -12,7 +12,13 @@ import {
   assertDiagramRecovery,
   validateSlideDiagrams,
 } from "@/lib/pptx-diagram-validate";
-import type { ParsedDeck, ParsedSlide, LayoutTextBody, ParsedDiagram, SlideLayout } from "@/lib/pptx-import";
+import type {
+  ParsedDeck,
+  ParsedSlide,
+  LayoutTextBody,
+  ParsedDiagram,
+  SlideLayout,
+} from "@/lib/pptx-import";
 
 const FRAME = { x: 1, y: 1, w: 6, h: 3 };
 
@@ -97,9 +103,7 @@ describe("diagram recovery validation", () => {
       slide({
         layout: {
           size: { w: 13.333, h: 7.5 },
-          shapes: [
-            { kind: "diagram", z: 1, frame: FRAME, fallbackReason: "smartart-no-drawing" },
-          ],
+          shapes: [{ kind: "diagram", z: 1, frame: FRAME, fallbackReason: "smartart-no-drawing" }],
         } as SlideLayout,
       }),
     );
@@ -134,8 +138,13 @@ describe("diagram recovery validation", () => {
   it("flags labels that never reached a rendered layer", () => {
     const issues = validateSlideDiagrams(
       slide({
-        diagrams: [{ kind: "smartart", nodes: [{ text: "Match Type", level: 0 }] } as ParsedDiagram],
-        layout: { size: { w: 13.333, h: 7.5 }, shapes: [textShape("Unrelated title")] } as SlideLayout,
+        diagrams: [
+          { kind: "smartart", nodes: [{ text: "Match Type", level: 0 }] } as ParsedDiagram,
+        ],
+        layout: {
+          size: { w: 13.333, h: 7.5 },
+          shapes: [textShape("Unrelated title")],
+        } as SlideLayout,
       }),
     );
     expect(issues.map((i) => i.code)).toContain("missing-node-labels");

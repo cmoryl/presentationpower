@@ -34,7 +34,6 @@ import type { StylePack } from "./style-packs";
 import { skinBackgroundSummary } from "./skin-backgrounds";
 import { skinSpecSummary } from "./skin-spec-tokens";
 
-
 /** The approved catalog codes, in curated catalog order. */
 export const APPROVED_STYLE_CODES: string[] = DESIGN_SKINS.map((s) => s.code);
 
@@ -126,7 +125,6 @@ export function approvedStyles(): ApprovedStyle[] {
   return cache;
 }
 
-
 export function approvedStyleByCode(code: string | null | undefined): ApprovedStyle | null {
   if (!code) return null;
   const want = code.trim().toUpperCase();
@@ -144,11 +142,15 @@ export function approvedStyleByPackId(id: string | null | undefined): ApprovedSt
  */
 export function searchApprovedStyles(query: string, from?: ApprovedStyle[]): ApprovedStyle[] {
   const list = from ?? approvedStyles();
-  const words = query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const words = query
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
   if (!words.length) return list;
   return list
     .map((s) => {
-      const hay = `${s.code} ${s.name} ${s.reference} ${s.description} ${s.chips.join(" ")} ${s.density}`.toLowerCase();
+      const hay =
+        `${s.code} ${s.name} ${s.reference} ${s.description} ${s.chips.join(" ")} ${s.density}`.toLowerCase();
       const score = words.reduce((n, w) => (hay.includes(w) ? n + 1 : n), 0);
       return { s, score };
     })
@@ -182,10 +184,11 @@ export function recommendApprovedStyles(opts: {
   const implied = recipe ? [] : matchRecipes(opts.intent ?? "", 2);
   for (const r of implied) for (const name of r.dna) push(designSkinByName(name));
 
-  const words = `${opts.intent ?? ""} ${recipe?.name ?? ""} ${recipe?.summary ?? ""} ${(recipe?.keywords ?? []).join(" ")}`
-    .toLowerCase()
-    .split(/[^a-z]+/)
-    .filter((w) => w.length > 3);
+  const words =
+    `${opts.intent ?? ""} ${recipe?.name ?? ""} ${recipe?.summary ?? ""} ${(recipe?.keywords ?? []).join(" ")}`
+      .toLowerCase()
+      .split(/[^a-z]+/)
+      .filter((w) => w.length > 3);
   if (words.length) {
     const scored = approvedStyles()
       .map((s) => {
@@ -226,9 +229,7 @@ export function recipePresets(
 export function recipeDnaCodes(recipeId: string | null | undefined): string[] {
   const recipe = industryRecipeById(recipeId);
   if (!recipe) return [];
-  return recipe.dna
-    .map((n) => designSkinByName(n)?.code)
-    .filter((c): c is string => Boolean(c));
+  return recipe.dna.map((n) => designSkinByName(n)?.code).filter((c): c is string => Boolean(c));
 }
 
 export { designSkinByCode };

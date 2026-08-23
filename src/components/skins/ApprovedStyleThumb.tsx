@@ -111,7 +111,6 @@ export function ApprovedStyleThumb({
   );
 }
 
-
 const SCENES: SkinScene[] = [
   "cover",
   "statement",

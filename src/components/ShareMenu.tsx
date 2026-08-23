@@ -53,7 +53,6 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   const [triggerEl, setTriggerEl] = useState<HTMLButtonElement | null>(null);
   const pos = useAnchoredPosition(triggerEl, open, { align: "end", width: 340 });
 
-
   const save = useServerFn(saveDeckToCloud);
   const signShareLogo = useServerFn(signClientLogoForShare);
   const getStatus = useServerFn(getDeckShareStatus);
@@ -402,192 +401,191 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       </button>
       {open && (
         <AnchoredPortal>
-        <div
-          ref={panelRef}
-          role="menu"
-          aria-label="Share and export"
-          style={{
-            position: "fixed",
-            top: pos.top,
-            left: pos.left,
-            width: pos.width,
-            maxHeight: pos.maxHeight,
-          }}
-          className="z-[140] overflow-y-auto overscroll-contain rounded-2xl border border-black/10 bg-white shadow-[0_24px_60px_-20px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-[#07061F]"
-        >
+          <div
+            ref={panelRef}
+            role="menu"
+            aria-label="Share and export"
+            style={{
+              position: "fixed",
+              top: pos.top,
+              left: pos.left,
+              width: pos.width,
+              maxHeight: pos.maxHeight,
+            }}
+            className="z-[140] overflow-y-auto overscroll-contain rounded-2xl border border-black/10 bg-white shadow-[0_24px_60px_-20px_rgba(3,0,44,0.45)] dark:border-white/10 dark:bg-[#07061F]"
+          >
+            <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
+              <div className="text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
+                Share &amp; export
+              </div>
+              <div className="mt-0.5 truncate text-sm font-medium text-black dark:text-white">
+                {deck.title}
+              </div>
+            </div>
 
-          <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
-            <div className="text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
-              Share &amp; export
-            </div>
-            <div className="mt-0.5 truncate text-sm font-medium text-black dark:text-white">
-              {deck.title}
-            </div>
-          </div>
+            {/* Share link section */}
+            <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
+              <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
+                <span className="inline-flex items-center gap-2">
+                  <Link2 size={12} /> Share link
+                </span>
+                {shareToken && <StatusPill expired={shareExpired} expiresAt={shareExpiresAt} />}
+              </div>
+              {!signedIn ? (
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/auth" })}
+                  className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-left text-xs text-black hover:border-black/30 dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
+                >
+                  Sign in to create a shareable view-only link.
+                </button>
+              ) : shareToken && shareUrl ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 rounded-lg border border-black/10 bg-black/[0.03] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.05]">
+                    <input
+                      readOnly
+                      value={shareUrl}
+                      onFocus={(e) => e.currentTarget.select()}
+                      className="min-w-0 flex-1 truncate bg-transparent text-[11px] text-black/80 outline-none dark:text-white/80"
+                    />
+                    <button
+                      type="button"
+                      onClick={onCopyLink}
+                      disabled={shareExpired}
+                      className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-40"
+                    >
+                      {copied ? <Check size={12} /> : <Copy size={12} />}
+                      {copied ? "Copied" : "Copy"}
+                    </button>
+                  </div>
 
-          {/* Share link section */}
-          <div className="border-b border-black/[0.06] px-4 py-3 dark:border-white/10">
-            <div className="mb-2 flex items-center justify-between gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
-              <span className="inline-flex items-center gap-2">
-                <Link2 size={12} /> Share link
-              </span>
-              {shareToken && <StatusPill expired={shareExpired} expiresAt={shareExpiresAt} />}
-            </div>
-            {!signedIn ? (
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/auth" })}
-                className="w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-left text-xs text-black hover:border-black/30 dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
-              >
-                Sign in to create a shareable view-only link.
-              </button>
-            ) : shareToken && shareUrl ? (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 rounded-lg border border-black/10 bg-black/[0.03] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.05]">
-                  <input
-                    readOnly
-                    value={shareUrl}
-                    onFocus={(e) => e.currentTarget.select()}
-                    className="min-w-0 flex-1 truncate bg-transparent text-[11px] text-black/80 outline-none dark:text-white/80"
+                  <ExpiryPicker
+                    value={shareExpiresAt}
+                    disabled={shareBusy}
+                    onChange={(v) => void onSetExpiry(v)}
                   />
-                  <button
-                    type="button"
-                    onClick={onCopyLink}
-                    disabled={shareExpired}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-md bg-[#003FC7] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-40"
-                  >
-                    {copied ? <Check size={12} /> : <Copy size={12} />}
-                    {copied ? "Copied" : "Copy"}
-                  </button>
-                </div>
 
-                <ExpiryPicker
-                  value={shareExpiresAt}
+                  <div className="flex items-center justify-between gap-3 text-[10px] text-black/60 dark:text-white/60">
+                    <button
+                      type="button"
+                      onClick={() => void onRegenerate()}
+                      disabled={shareBusy}
+                      className="inline-flex items-center gap-1 text-black/70 hover:text-black disabled:opacity-50 dark:text-white/70 dark:hover:text-white"
+                      title="Generates a brand-new link. The old URL stops working."
+                    >
+                      <RefreshCw size={12} /> Regenerate
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onDisableShare}
+                      disabled={shareBusy}
+                      className="text-black/70 underline underline-offset-2 hover:text-black disabled:opacity-50 dark:text-white/70 dark:hover:text-white"
+                    >
+                      {shareBusy ? "Working…" : "Disable"}
+                    </button>
+                  </div>
+                  <AnalyticsLine analytics={analytics} />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void onEnableShare(null)}
                   disabled={shareBusy}
-                  onChange={(v) => void onSetExpiry(v)}
-                />
-
-                <div className="flex items-center justify-between gap-3 text-[10px] text-black/60 dark:text-white/60">
-                  <button
-                    type="button"
-                    onClick={() => void onRegenerate()}
-                    disabled={shareBusy}
-                    className="inline-flex items-center gap-1 text-black/70 hover:text-black disabled:opacity-50 dark:text-white/70 dark:hover:text-white"
-                    title="Generates a brand-new link. The old URL stops working."
-                  >
-                    <RefreshCw size={12} /> Regenerate
-                  </button>
-                  <button
-                    type="button"
-                    onClick={onDisableShare}
-                    disabled={shareBusy}
-                    className="text-black/70 underline underline-offset-2 hover:text-black disabled:opacity-50 dark:text-white/70 dark:hover:text-white"
-                  >
-                    {shareBusy ? "Working…" : "Disable"}
-                  </button>
-                </div>
-                <AnalyticsLine analytics={analytics} />
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => void onEnableShare(null)}
-                disabled={shareBusy}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-60"
-              >
-                {shareBusy ? <Loader2 size={12} className="animate-spin" /> : <Link2 size={12} />}
-                {shareBusy ? "Preparing…" : "Create view-only link"}
-              </button>
-            )}
-            {shareErr && <div className="mt-2 text-[10px] text-red-500">{shareErr}</div>}
-          </div>
-
-          <ShareItem
-            icon={<Play size={16} />}
-            title="Present"
-            hint="Fullscreen, keyboard nav"
-            onClick={onPresent}
-          />
-          <ShareItem
-            icon={<Printer size={16} />}
-            title="Export PDF"
-            hint="Print → Save as PDF"
-            onClick={onPrint}
-          />
-          <ShareItem
-            icon={<FileDown size={16} />}
-            title={busy ? "Preparing…" : "Export PowerPoint"}
-            hint="Native .pptx with brand logo"
-            onClick={onPptx}
-            disabled={busy}
-          />
-
-          {cachedLocales && cachedLocales.length > 0 && (
-            <div className="border-t border-black/[0.06] px-4 py-3 dark:border-white/10">
-              <div className="mb-2 flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
-                <Languages size={12} /> Translated exports
-              </div>
-              <ul className="space-y-1.5">
-                {cachedLocales.map((l) => {
-                  const label = langLabels[l.target_lang] ?? l.target_lang.toUpperCase();
-                  const partial = l.ready < l.total;
-                  const pptxBusy = translatedBusy === `pptx:${l.target_lang}`;
-                  return (
-                    <li key={l.target_lang} className="flex items-center gap-2">
-                      <span className="min-w-0 flex-1 truncate text-xs text-black dark:text-white">
-                        {label}
-                        <span className="ml-1 text-[10px] text-black/45 dark:text-white/45">
-                          {l.ready}/{l.total}
-                          {partial ? " · partial" : ""}
-                        </span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => void onTranslatedPptx(l.target_lang)}
-                        disabled={!!translatedBusy}
-                        className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 disabled:opacity-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
-                        title={`Export .pptx in ${label}`}
-                      >
-                        {pptxBusy ? (
-                          <Loader2 size={12} className="animate-spin" />
-                        ) : (
-                          <FileDown size={12} />
-                        )}
-                        PPTX
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onTranslatedPdf(l.target_lang)}
-                        className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
-                        title={`Print/PDF in ${label}`}
-                      >
-                        <Printer size={12} /> PDF
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-              <div className="mt-2 text-[10px] text-black/45 dark:text-white/45">
-                Manage languages in the deck's Translate panel.
-              </div>
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#003FC7] px-3 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-60"
+                >
+                  {shareBusy ? <Loader2 size={12} className="animate-spin" /> : <Link2 size={12} />}
+                  {shareBusy ? "Preparing…" : "Create view-only link"}
+                </button>
+              )}
+              {shareErr && <div className="mt-2 text-[10px] text-red-500">{shareErr}</div>}
             </div>
-          )}
-          <div className="border-t border-black/[0.06] px-4 py-2 text-[10px] text-black/50 dark:border-white/10 dark:text-white/50">
-            <Link
-              to="/decks/$deckId/export"
-              params={{ deckId }}
-              className="hover:text-black dark:hover:text-white"
-            >
-              Advanced export &amp; QA →
-            </Link>
-            {deck.context?.lastExportedAt && (
-              <div className="mt-1">
-                Last {deck.context.lastExportKind ?? "export"}:{" "}
-                {new Date(deck.context.lastExportedAt).toLocaleString()}
+
+            <ShareItem
+              icon={<Play size={16} />}
+              title="Present"
+              hint="Fullscreen, keyboard nav"
+              onClick={onPresent}
+            />
+            <ShareItem
+              icon={<Printer size={16} />}
+              title="Export PDF"
+              hint="Print → Save as PDF"
+              onClick={onPrint}
+            />
+            <ShareItem
+              icon={<FileDown size={16} />}
+              title={busy ? "Preparing…" : "Export PowerPoint"}
+              hint="Native .pptx with brand logo"
+              onClick={onPptx}
+              disabled={busy}
+            />
+
+            {cachedLocales && cachedLocales.length > 0 && (
+              <div className="border-t border-black/[0.06] px-4 py-3 dark:border-white/10">
+                <div className="mb-2 flex items-center gap-2 text-[10px] font-medium uppercase tracking-widest text-black/50 dark:text-white/50">
+                  <Languages size={12} /> Translated exports
+                </div>
+                <ul className="space-y-1.5">
+                  {cachedLocales.map((l) => {
+                    const label = langLabels[l.target_lang] ?? l.target_lang.toUpperCase();
+                    const partial = l.ready < l.total;
+                    const pptxBusy = translatedBusy === `pptx:${l.target_lang}`;
+                    return (
+                      <li key={l.target_lang} className="flex items-center gap-2">
+                        <span className="min-w-0 flex-1 truncate text-xs text-black dark:text-white">
+                          {label}
+                          <span className="ml-1 text-[10px] text-black/45 dark:text-white/45">
+                            {l.ready}/{l.total}
+                            {partial ? " · partial" : ""}
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => void onTranslatedPptx(l.target_lang)}
+                          disabled={!!translatedBusy}
+                          className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 disabled:opacity-50 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
+                          title={`Export .pptx in ${label}`}
+                        >
+                          {pptxBusy ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : (
+                            <FileDown size={12} />
+                          )}
+                          PPTX
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onTranslatedPdf(l.target_lang)}
+                          className="inline-flex items-center gap-1 rounded-md border border-black/10 bg-white px-2 py-1 text-[10px] font-medium text-black hover:border-black/30 dark:border-white/15 dark:bg-white/[0.06] dark:text-white"
+                          title={`Print/PDF in ${label}`}
+                        >
+                          <Printer size={12} /> PDF
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className="mt-2 text-[10px] text-black/45 dark:text-white/45">
+                  Manage languages in the deck's Translate panel.
+                </div>
               </div>
             )}
+            <div className="border-t border-black/[0.06] px-4 py-2 text-[10px] text-black/50 dark:border-white/10 dark:text-white/50">
+              <Link
+                to="/decks/$deckId/export"
+                params={{ deckId }}
+                className="hover:text-black dark:hover:text-white"
+              >
+                Advanced export &amp; QA →
+              </Link>
+              {deck.context?.lastExportedAt && (
+                <div className="mt-1">
+                  Last {deck.context.lastExportKind ?? "export"}:{" "}
+                  {new Date(deck.context.lastExportedAt).toLocaleString()}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
         </AnchoredPortal>
       )}
 

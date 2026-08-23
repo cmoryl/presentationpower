@@ -50,7 +50,6 @@ export function deckPack(deck: PackSource): StylePack | null {
   });
 }
 
-
 /**
  * Tone a resolved brand mode toward the active pack so slide primitives that
  * read `brand.tokens` (charts, rules, accents) match the pack, not the default

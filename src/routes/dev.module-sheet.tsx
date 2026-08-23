@@ -5,7 +5,12 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, type ModuleVariant } from "@/lib/taxonomy";
+import {
+  BRAND_MODES,
+  MODULE_VARIANTS,
+  SECTION_FRAMEWORKS,
+  type ModuleVariant,
+} from "@/lib/taxonomy";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
@@ -37,9 +42,7 @@ export const Route = createFileRoute("/dev/module-sheet")({
 });
 
 function sectionForVariant(v: ModuleVariant): string {
-  return (
-    SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? "SF-01"
-  );
+  return SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(v.familyId))?.id ?? "SF-01";
 }
 
 export function stageForAspect(ar: string): { w: number; h: number } {

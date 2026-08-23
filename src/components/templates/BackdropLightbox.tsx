@@ -44,10 +44,7 @@ export function BackdropLightbox({
       className="fixed inset-0 z-[120] flex items-center justify-center bg-[#03002C]/85 p-6 backdrop-blur-sm"
       onClick={onClose}
     >
-      <div
-        className="w-full max-w-5xl"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between gap-3 pb-2 text-white">
           <p className="truncate text-sm font-medium">{shot.label ?? "Backdrop"}</p>
           <div className="flex items-center gap-2">

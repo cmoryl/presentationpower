@@ -38,10 +38,7 @@ export function BackdropSourcePicker({
   value: string | null | undefined;
   onPick: (url: string | null) => void;
 }) {
-  const divisions = useMemo(
-    () => NEXT_DIVISIONS.map((d) => ({ id: d.id, name: d.name })),
-    [],
-  );
+  const divisions = useMemo(() => NEXT_DIVISIONS.map((d) => ({ id: d.id, name: d.name })), []);
   const [divisionId, setDivisionId] = useState(divisions[0]?.id ?? "transperfect");
   const [tab, setTab] = useState<"library" | "upload">("library");
   const [busy, setBusy] = useState(false);

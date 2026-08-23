@@ -69,10 +69,7 @@ function distance(a: string, b: string): number {
  * Dominant colours of a bitmap, most-used first, with the most colourful
  * survivor promoted so a brand accent is never buried under grey.
  */
-export async function swatchesFromImage(
-  src: string,
-  limit = 8,
-): Promise<DecodedImage> {
+export async function swatchesFromImage(src: string, limit = 8): Promise<DecodedImage> {
   const img = new Image();
   img.crossOrigin = "anonymous";
   img.decoding = "sync";
@@ -163,7 +160,12 @@ export async function sampleUpload(file: File): Promise<SampledFile> {
   const dataUrl = await readAsDataUrl(file);
 
   if (/\.(json|txt|md)$/.test(name)) {
-    return { dataUrl, swatches: swatchesFromText(await readAsText(file)), width: null, height: null };
+    return {
+      dataUrl,
+      swatches: swatchesFromText(await readAsText(file)),
+      width: null,
+      height: null,
+    };
   }
 
   if (name.endsWith(".svg")) {

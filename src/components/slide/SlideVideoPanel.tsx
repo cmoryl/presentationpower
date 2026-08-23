@@ -194,7 +194,6 @@ export function SlideVideoPanel({
       <div className="mt-3 flex items-stretch gap-3">
         <div className="relative h-24 w-40 shrink-0 overflow-hidden rounded-xl border border-black/10 bg-black/80">
           {posterUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={posterUrl}
               alt="Video poster"

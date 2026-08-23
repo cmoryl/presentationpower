@@ -26,12 +26,12 @@ async function captureAsset(asset: CampaignAsset): Promise<Blob | null> {
 
   const dataUrl = await withExportChrome(() =>
     toPng(inner, {
-    width: asset.format.width,
-    height: asset.format.height,
-    canvasWidth: asset.format.width,
-    canvasHeight: asset.format.height,
-    pixelRatio: 1,
-    cacheBust: true,
+      width: asset.format.width,
+      height: asset.format.height,
+      canvasWidth: asset.format.width,
+      canvasHeight: asset.format.height,
+      pixelRatio: 1,
+      cacheBust: true,
       filter: exportNodeFilter,
       style: {
         transform: "none",

@@ -56,10 +56,7 @@ describe("withTransition", () => {
   });
 
   it("removes an existing transition when the slide is set to none", () => {
-    const out = withTransition(
-      withTransition(SLIDE(""), transitionXml({ type: "fade" })),
-      null,
-    );
+    const out = withTransition(withTransition(SLIDE(""), transitionXml({ type: "fade" })), null);
     expect(out).not.toContain("p:transition");
   });
 });
@@ -73,7 +70,9 @@ describe("withAltText", () => {
   });
 
   it("falls back to a meaningful objectName for pictures", () => {
-    const xml = SLIDE('<p:pic><p:nvPicPr><p:cNvPr id="4" name="TP Design plate"/></p:nvPicPr></p:pic>');
+    const xml = SLIDE(
+      '<p:pic><p:nvPicPr><p:cNvPr id="4" name="TP Design plate"/></p:nvPicPr></p:pic>',
+    );
     expect(withAltText(xml)).toContain('descr="TP Design plate"');
   });
 
@@ -83,7 +82,9 @@ describe("withAltText", () => {
   });
 
   it("never overwrites existing alt text", () => {
-    const xml = SLIDE('<p:pic><p:nvPicPr><p:cNvPr id="6" name="Logo" descr="Brand logo"/></p:nvPicPr></p:pic>');
+    const xml = SLIDE(
+      '<p:pic><p:nvPicPr><p:cNvPr id="6" name="Logo" descr="Brand logo"/></p:nvPicPr></p:pic>',
+    );
     expect(withAltText(xml)).toContain('descr="Brand logo"');
     expect((withAltText(xml).match(/descr=/g) ?? []).length).toBe(1);
   });

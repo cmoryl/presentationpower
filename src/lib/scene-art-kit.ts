@@ -52,7 +52,13 @@ export interface Ctx {
 
 export function a(hex: string, alpha: number): string {
   const h = hex.replace("#", "");
-  const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const f =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const r = parseInt(f.slice(0, 2), 16);
   const g = parseInt(f.slice(2, 4), 16);
   const b = parseInt(f.slice(4, 6), 16);
@@ -61,12 +67,14 @@ export function a(hex: string, alpha: number): string {
 
 function chan(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
-  const f = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
-  return [
-    parseInt(f.slice(0, 2), 16),
-    parseInt(f.slice(2, 4), 16),
-    parseInt(f.slice(4, 6), 16),
-  ];
+  const f =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
+  return [parseInt(f.slice(0, 2), 16), parseInt(f.slice(2, 4), 16), parseInt(f.slice(4, 6), 16)];
 }
 
 /** Blend two hexes; `t` = 0 keeps `from`, 1 keeps `to`. */
@@ -75,7 +83,9 @@ export function mix(from: string, to: string, t: number): string {
   const [r2, g2, b2] = chan(to);
   const q = Math.max(0, Math.min(1, t));
   const h = (v1: number, v2: number) =>
-    Math.round(v1 + (v2 - v1) * q).toString(16).padStart(2, "0");
+    Math.round(v1 + (v2 - v1) * q)
+      .toString(16)
+      .padStart(2, "0");
   return `#${h(r1, r2)}${h(g1, g2)}${h(b1, b2)}`;
 }
 
@@ -106,7 +116,6 @@ export function lift(s: ArtSpec): number {
   return s.dark ? 1 : 1.42;
 }
 
-
 /* ───────────────────────────────────────────────────────── gradient builders */
 
 export interface Stop {
@@ -129,13 +138,7 @@ export function linear(
   );
 }
 
-export function radial(
-  id: string,
-  cx: number,
-  cy: number,
-  r: number,
-  stops: Stop[],
-): string {
+export function radial(id: string, cx: number, cy: number, r: number, stops: Stop[]): string {
   return (
     `<radialGradient id="${id}" cx="${((cx / W) * 100).toFixed(1)}%" cy="${((cy / H) * 100).toFixed(1)}%" r="${(r * 100).toFixed(1)}%">` +
     stops
@@ -285,16 +288,30 @@ export function plane(
     const h = o.h ?? 0;
     const alpha = (0.4 + o.depth * 0.45) * k * L;
     if (o.rim === "left")
-      out.push(`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="2.4" height="${h.toFixed(1)}" fill="${a(rc, alpha)}"/>`);
+      out.push(
+        `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="2.4" height="${h.toFixed(1)}" fill="${a(rc, alpha)}"/>`,
+      );
     else if (o.rim === "right")
-      out.push(`<rect x="${(x + w - 2.4).toFixed(1)}" y="${y.toFixed(1)}" width="2.4" height="${h.toFixed(1)}" fill="${a(rc, alpha)}"/>`);
-    else out.push(`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="2.4" fill="${a(rc, alpha)}"/>`);
+      out.push(
+        `<rect x="${(x + w - 2.4).toFixed(1)}" y="${y.toFixed(1)}" width="2.4" height="${h.toFixed(1)}" fill="${a(rc, alpha)}"/>`,
+      );
+    else
+      out.push(
+        `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="2.4" fill="${a(rc, alpha)}"/>`,
+      );
   }
   return out.join("");
 }
 
 /** Soft light bloom — a controlled glow, never a page-wide blur. */
-export function bloom(c: Ctx, x: number, y: number, r: number, color: string, strength = 0.5): string {
+export function bloom(
+  c: Ctx,
+  x: number,
+  y: number,
+  r: number,
+  color: string,
+  strength = 0.5,
+): string {
   const id = uid(c, `bl${Math.round(x)}${Math.round(y)}${Math.round(r)}`);
   return (
     `<defs>${radial(id, x, y, r / W, [
@@ -309,7 +326,15 @@ export function bloom(c: Ctx, x: number, y: number, r: number, color: string, st
 /** A single luminous beam / blade of light. */
 export function beam(
   c: Ctx,
-  o: { x1: number; y1: number; x2: number; y2: number; width: number; color: string; strength?: number },
+  o: {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    width: number;
+    color: string;
+    strength?: number;
+  },
 ): string {
   const id = uid(c, `bm${Math.round(o.x1)}${Math.round(o.y1)}`);
   const st = (o.strength ?? 0.5) * c.k * lift(c.s);
@@ -336,7 +361,16 @@ export function beam(
 /** Fine hairline hatch — material texture without raster grain. */
 export function hatch(
   c: Ctx,
-  o: { x: number; y: number; w: number; h: number; step?: number; color?: string; alpha?: number; angle?: number },
+  o: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    step?: number;
+    color?: string;
+    alpha?: number;
+    angle?: number;
+  },
 ): string {
   const step = o.step ?? 9;
   const col = o.color ?? contrastInk(c.s);

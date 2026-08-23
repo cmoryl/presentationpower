@@ -67,7 +67,6 @@ import {
   ChevronDown,
   Layers,
   LayoutList,
-
   MessageSquare,
   RectangleHorizontal,
   Rows2,
@@ -613,7 +612,6 @@ function DeckEditor() {
                         : "Flagship 2026")
                     }
                   >
-
                     <EditorMenuRow
                       label="Base skin"
                       hint="Brand chrome for every slide"
@@ -848,9 +846,7 @@ function DeckEditor() {
                 aria-expanded={slidesRailOpen}
                 title={slidesRailOpen ? "Collapse the slide list" : "Show the slide list"}
                 className={`flex w-9 flex-col items-center gap-1.5 rounded-lg py-3 transition ${
-                  slidesRailOpen
-                    ? "bg-[#003FC7] text-white"
-                    : "text-black/60 hover:bg-black/5"
+                  slidesRailOpen ? "bg-[#003FC7] text-white" : "text-black/60 hover:bg-black/5"
                 }`}
               >
                 <LayoutList className="h-4 w-4" />
@@ -2762,7 +2758,6 @@ function SlideLightbox({
             <div className="absolute inset-0 overflow-hidden rounded-xl bg-white shadow-2xl">
               {children}
             </div>
-
           </div>
         </div>
         <div

@@ -14,7 +14,10 @@ export const Route = createFileRoute("/dev/proposal-qa")({
   head: () => ({
     meta: [
       { title: "Proposal QA harness | TransPerfect Element" },
-      { name: "description", content: "Internal visual QA harness for the multi-page solution proposal layout." },
+      {
+        name: "description",
+        content: "Internal visual QA harness for the multi-page solution proposal layout.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -27,7 +30,12 @@ function ProposalQa() {
     <main style={{ background: "#DADDE5", padding: 24 }}>
       <div style={{ width: 816, margin: "0 auto", display: "grid", gap: 24 }}>
         <PrintLogoListContext.Provider value={{ active: true, onChange: () => {} }}>
-          <MultiProposalLayout content={seed.content} brand={BRAND_MODES[0]!} mode="light" pageSize="Letter" />
+          <MultiProposalLayout
+            content={seed.content}
+            brand={BRAND_MODES[0]!}
+            mode="light"
+            pageSize="Letter"
+          />
         </PrintLogoListContext.Provider>
       </div>
     </main>

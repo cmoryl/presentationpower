@@ -19,7 +19,6 @@ import {
   readExportEmbedFonts,
 } from "./export-quality";
 
-
 export interface SingleSlideExportArgs {
   variantId: string;
   layoutId: string;
@@ -70,8 +69,6 @@ export interface SingleSlideExportArgs {
   output?: "download" | "blob";
 }
 
-
-
 export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
   const { exportDeckToPptx } = await import("./pptx-export");
   const pack: StylePack | null =
@@ -93,7 +90,6 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
           return rasterizePackBackground(pack, args.variantId, args.layoutId, quality);
         })()
       : null;
-
 
   const deck = {
     id: `slide-${args.variantId}-${Date.now()}`,
@@ -155,7 +151,4 @@ export async function downloadSingleSlidePptx(args: SingleSlideExportArgs) {
     debugObjectTree,
     embedFonts,
   });
-
 }
-
-

@@ -222,7 +222,6 @@
   filter: saturate(1.15) contrast(1.12);
 }
 
-
 /* -----------------------------------------------------------------------------
  * Liquid glass system
  * Frames read as thin, wet glass sitting over colored ambient light.
@@ -604,7 +603,7 @@
  * (e.g. plain <p> without a text- class) still meets contrast. */
 [data-theme="light"] body {
   background-color: #ffffff;
-  color: #03002C;
+  color: #03002c;
 }
 [data-theme="dark"] body {
   background-color: #0a0929;
@@ -897,9 +896,8 @@ body.export-mode [data-print-surface] {
   --tp-accent-7: #c2a3ff;
 
   --tp-accent-ramp:
-    var(--tp-accent-1), var(--tp-accent-2), var(--tp-accent-3),
-    var(--tp-accent-4), var(--tp-accent-5), var(--tp-accent-6),
-    var(--tp-accent-7), var(--tp-accent-1);
+    var(--tp-accent-1), var(--tp-accent-2), var(--tp-accent-3), var(--tp-accent-4),
+    var(--tp-accent-5), var(--tp-accent-6), var(--tp-accent-7), var(--tp-accent-1);
 
   /* Shared hairline-frame intensity contract */
   --tp-frame-width: 1px;
@@ -973,7 +971,6 @@ body.export-mode [data-print-surface] {
   }
 }
 
-
 /* ── Light-mode slide modules: no drop shadows ─────────────────────────────
    In light mode, module slides read as flat editorial surfaces: no text
    shadows, no drop-shadow filters, and no outer box-shadow stacks. Inset
@@ -1016,7 +1013,6 @@ body.export-mode [data-print-surface] {
   text-shadow: none !important;
 }
 
-
 /* ── Light-mode: keep white ink legible ────────────────────────────────────
    The flat-surface reset above strips text shadows everywhere, which also
    removed the legibility halo from white copy that sits on photography,
@@ -1041,17 +1037,17 @@ body.export-mode [data-print-surface] {
    into the image; light mode only covered `data-media-backing`. Now both
    modes, and both markers, resolve to pure white. Accent-tokened type (inline
    `var(--slide-accent-*)`) keeps its colour so division accents survive. */
- [data-media-backing] > :not([data-media-tile]):not([style*="accent"]),
- [data-media-backing] > :not([data-media-tile]) *:not([style*="accent"]),
- [data-on-media]:not([style*="accent"]),
- [data-on-media] *:not([style*="accent"]),
- [data-chrome-on-media]:not([style*="accent"]),
- [data-chrome-on-media] *:not([style*="accent"]),
- [data-slide-mode="light"] [data-on-media="funnel-graphic"],
- [data-slide-mode="light"] [data-on-media="funnel-graphic"] * {
-   color: #ffffff !important;
-   -webkit-text-fill-color: #ffffff !important;
- }
+[data-media-backing] > :not([data-media-tile]):not([style*="accent"]),
+[data-media-backing] > :not([data-media-tile]) *:not([style*="accent"]),
+[data-on-media]:not([style*="accent"]),
+[data-on-media] *:not([style*="accent"]),
+[data-chrome-on-media]:not([style*="accent"]),
+[data-chrome-on-media] *:not([style*="accent"]),
+[data-slide-mode="light"] [data-on-media="funnel-graphic"],
+[data-slide-mode="light"] [data-on-media="funnel-graphic"] * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
 
 /* Dark mode gets the same legibility halo over photography as light mode. */
 [data-slide-mode="dark"] [data-on-media],
@@ -1087,7 +1083,6 @@ body.export-mode [data-print-surface] {
     rgb(3 0 44 / 0) 100%
   );
 }
-
 
 /* ─────────────────────────────────────────────────────────────────────────
    STYLE PACKS — alternate master designs used for taste-testing in the
@@ -1411,15 +1406,24 @@ body.export-mode [data-print-surface] {
   }
 }
 
-
 /* Agent status timeline — animated progress feedback. */
 @keyframes tl-shimmer {
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(220%); }
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
 }
 @keyframes tl-step-pop {
-  0% { transform: translateY(1px) scale(0.98); opacity: 0.55; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+  0% {
+    transform: translateY(1px) scale(0.98);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 @utility tl-shimmer {
   animation: tl-shimmer 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -1429,7 +1433,9 @@ body.export-mode [data-print-surface] {
 }
 @media (prefers-reduced-motion: reduce) {
   .tl-shimmer,
-  .tl-step-pop { animation: none !important; }
+  .tl-step-pop {
+    animation: none !important;
+  }
 }
 
 /* ── Vertical open-space fill ────────────────────────────────────────────

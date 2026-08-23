@@ -308,8 +308,6 @@ export function BackgroundTuner({
     [mine, code, persist, onChanged, scene],
   );
 
-
-
   const swatches = [
     pack.tokens.accent,
     pack.tokens.accentAlt,
@@ -415,7 +413,6 @@ export function BackgroundTuner({
       )}
       {/* ── LIVE STAGE ─────────────────────────────────────────────── */}
       <div className="flex flex-col gap-3">
-
         <div className="order-2 rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
           <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -492,8 +489,6 @@ export function BackgroundTuner({
           </p>
         </div>
 
-
-
         {/* ── SECTION FILMSTRIP ─────────────────────────────────────── */}
         <div className="order-1 rounded-2xl border border-black/10 bg-white/60 p-3 dark:border-white/15 dark:bg-white/[0.03]">
           <div className="mb-2 flex items-center justify-between gap-2">
@@ -510,8 +505,8 @@ export function BackgroundTuner({
             )}
           </div>
           <p className="mb-2 text-[11px] opacity-60">
-            Each section can keep the look's own artwork or use a picture you upload — drop a file on
-            a tile, or use “Replace”.
+            Each section can keep the look's own artwork or use a picture you upload — drop a file
+            on a tile, or use “Replace”.
           </p>
           <input
             ref={tileFileRef}
@@ -527,7 +522,8 @@ export function BackgroundTuner({
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {SKIN_SCENES.map((s) => {
               const o = mine.find((x) => x.scene === s);
-              const live = s === scene ? previewLayers : layersFor(o ?? defaultOverride(code, s), s);
+              const live =
+                s === scene ? previewLayers : layersFor(o ?? defaultOverride(code, s), s);
               const on = s === scene;
               const custom = s === scene ? !!edit.imageUrl : !!o?.imageUrl;
               const uploading = uploadingScene === s;
@@ -603,11 +599,8 @@ export function BackgroundTuner({
                 </div>
               );
             })}
-
           </div>
-
         </div>
-
       </div>
 
       {/* ── CONTROLS ───────────────────────────────────────────────── */}
@@ -649,7 +642,6 @@ export function BackgroundTuner({
               );
             })}
           </div>
-
 
           <div className="mt-4 space-y-4 border-t border-black/10 pt-4 dark:border-white/15">
             <h4 className="flex items-center gap-2 text-[11px] font-semibold">
@@ -759,7 +751,12 @@ export function BackgroundTuner({
               Its own
             </button>
             {SKIN_SCENES.filter((s) => s !== scene).map((s) => (
-              <button key={s} type="button" onClick={() => upd("sceneSwap", s)} className="text-left">
+              <button
+                key={s}
+                type="button"
+                onClick={() => upd("sceneSwap", s)}
+                className="text-left"
+              >
                 <span
                   className={`block aspect-[16/9] w-full rounded-lg border ${
                     edit.sceneSwap === s
@@ -820,7 +817,6 @@ export function BackgroundTuner({
               </div>
             )}
             {edit.imageUrl && (
-
               <div className="mt-3 flex items-center gap-2">
                 <button
                   type="button"
@@ -894,7 +890,9 @@ export function BackgroundTuner({
           <button
             type="button"
             disabled={isNeutralOverride(edit)}
-            onClick={() => setEdit((e) => ({ ...defaultOverride(code, scene), note: e.note ?? "" }))}
+            onClick={() =>
+              setEdit((e) => ({ ...defaultOverride(code, scene), note: e.note ?? "" }))
+            }
             className="rounded-xl border border-black/15 px-3 py-2 text-xs disabled:opacity-40 dark:border-white/20"
           >
             Reset knobs

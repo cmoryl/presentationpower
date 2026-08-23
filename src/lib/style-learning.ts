@@ -122,7 +122,13 @@ export interface LearningProfile {
  */
 export function profileKey(p: LearningProfile): string {
   const part = (v?: string | null) => (v ? String(v) : "any");
-  return [part(p.recipeId), part(p.objective), part(p.audience), part(p.density), part(p.data)].join("|");
+  return [
+    part(p.recipeId),
+    part(p.objective),
+    part(p.audience),
+    part(p.density),
+    part(p.data),
+  ].join("|");
 }
 
 export function describeProfile(key: string, recipeName?: string | null): string {
@@ -166,7 +172,8 @@ export function learningActive(l?: LearnedStyleWeights | null): boolean {
   if (!l || !l.enabled) return false;
   return (
     (l.userSamples >= LEARNING_LIMITS.userMinSamples && Object.keys(l.userBoost).length > 0) ||
-    (l.profileSamples >= LEARNING_LIMITS.aggregateMinSamples && Object.keys(l.profileBoost).length > 0)
+    (l.profileSamples >= LEARNING_LIMITS.aggregateMinSamples &&
+      Object.keys(l.profileBoost).length > 0)
   );
 }
 
@@ -208,7 +215,11 @@ export function learnedFactorsFor(
   if (learning.userSamples >= LEARNING_LIMITS.userMinSamples) {
     const b = learning.userBoost[code] ?? 0;
     if (b) {
-      const pts = clamp(b * LEARNING_LIMITS.userCap, -LEARNING_LIMITS.userCap, LEARNING_LIMITS.userCap);
+      const pts = clamp(
+        b * LEARNING_LIMITS.userCap,
+        -LEARNING_LIMITS.userCap,
+        LEARNING_LIMITS.userCap,
+      );
       out.push({
         label: b > 0 ? "you reuse this look" : "you usually move away from this look",
         points: Math.round(pts * 10) / 10,
@@ -268,7 +279,10 @@ export function provenanceFor(
   const learnedPoints = Math.round(learned.reduce((n, f) => n + f.points, 0) * 10) / 10;
   const cold = !learningActive(learning);
   const userConf = Math.min(1, (learning?.userSamples ?? 0) / (LEARNING_LIMITS.userMinSamples * 4));
-  const aggConf = Math.min(1, (learning?.profileSamples ?? 0) / (LEARNING_LIMITS.aggregateMinSamples * 4));
+  const aggConf = Math.min(
+    1,
+    (learning?.profileSamples ?? 0) / (LEARNING_LIMITS.aggregateMinSamples * 4),
+  );
   return {
     catalogPoints: Math.round(catalogPoints * 10) / 10,
     learnedPoints,

@@ -40,7 +40,6 @@ import { sRgbIccBytes } from "./icc-srgb";
 import gracolAsset from "@/assets/icc/GRACoL2013_CRPC6.icc.asset.json";
 import swopAsset from "@/assets/icc/SWOP2013_CRPC5.icc.asset.json";
 
-
 export type IccProfileKey = "GRACoL2013_CRPC6" | "SWOP2013_CRPC5";
 
 /** Public catalog of supported output-intent profiles. */
@@ -186,9 +185,6 @@ export async function wrapPdfAsX4(
     `[pdf-x4] OutputIntent ${opts.iccProfileName} (${profileSpace}, N=${destSpace.n}); ` +
       `${tagged} raster${tagged === 1 ? "" : "s"} tagged ICCBased/sRGB.`,
   );
-
-
-
 
   // ── XMP metadata (PDF/X-4 identification) ─────────────────────────────
   const xmp = buildXmpMetadata({

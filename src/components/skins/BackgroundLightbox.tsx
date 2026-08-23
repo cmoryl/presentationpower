@@ -22,7 +22,6 @@ import {
   type GroundPngSizeId,
 } from "@/lib/ground-png";
 
-
 export type BackgroundShot = {
   pack: StylePack;
   /** `R07` / `S04` — used for the caption and the download filename. */
@@ -35,8 +34,7 @@ export type BackgroundShot = {
   palette?: string[];
 };
 
-const seedFor = (shot: BackgroundShot) =>
-  `scene:${shot.scene} take:${((shot.take % 4) + 4) % 4}`;
+const seedFor = (shot: BackgroundShot) => `scene:${shot.scene} take:${((shot.take % 4) + 4) % 4}`;
 
 export function BackgroundLightbox({
   shot,
@@ -94,7 +92,6 @@ export function BackgroundLightbox({
     setShowCss(true);
     void write(groundCss(shot.pack, seed), "all", "Full layer stack");
   };
-
 
   return (
     <div
@@ -232,7 +229,6 @@ export function BackgroundLightbox({
             </section>
           )}
         </div>
-
       </div>
     </div>
   );

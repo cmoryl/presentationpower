@@ -107,10 +107,22 @@ function buildLegalEdiscovery(): TemplatePayload {
       content: {
         title: "Four moving parts",
         items: [
-          { title: "Early case assessment", body: "Dedupe, threading and date culling before review starts." },
-          { title: "GenAI triage", body: "Ranked responsiveness with human validation on every batch." },
-          { title: "Native-language reviewers", body: "Attorneys reviewing in the document's own language." },
-          { title: "Defensible record", body: "Sampling rates, QC results and decisions logged per batch." },
+          {
+            title: "Early case assessment",
+            body: "Dedupe, threading and date culling before review starts.",
+          },
+          {
+            title: "GenAI triage",
+            body: "Ranked responsiveness with human validation on every batch.",
+          },
+          {
+            title: "Native-language reviewers",
+            body: "Attorneys reviewing in the document's own language.",
+          },
+          {
+            title: "Defensible record",
+            body: "Sampling rates, QC results and decisions logged per batch.",
+          },
         ],
       },
       notes: "Four nouns that survive a Rule 26 conference.",
@@ -152,7 +164,11 @@ function buildLegalEdiscovery(): TemplatePayload {
         centerUnit: "K",
         centerLabel: "Documents actually reviewed",
         items: [
-          { label: "Deduplicated and threaded", value: 41, note: "Exact and near-duplicate families collapsed." },
+          {
+            label: "Deduplicated and threaded",
+            value: 41,
+            note: "Exact and near-duplicate families collapsed.",
+          },
           { label: "Outside the date range", value: 24, note: "Culled against the agreed scope." },
           { label: "Ranked non-responsive", value: 22, note: "Validated by sampled human review." },
           { label: "Human review set", value: 13, note: "Coded by native-language attorneys." },
@@ -265,7 +281,10 @@ function buildGamingLaunch(): TemplatePayload {
       content: {
         title: "Run of show",
         items: [
-          { label: "The launch constraint", body: "Cert dates, not translation, set the calendar." },
+          {
+            label: "The launch constraint",
+            body: "Cert dates, not translation, set the calendar.",
+          },
           { label: "What breaks sim-ship", body: "Late strings, unbaked VO, no LQA time." },
           { label: "The pipeline", body: "Continuous localization straight from your build." },
           { label: "Proof", body: "Titles shipped at the same scope and cadence." },
@@ -300,10 +319,16 @@ function buildGamingLaunch(): TemplatePayload {
       content: {
         title: "The pipeline",
         items: [
-          { title: "Build-connected strings", body: "Localization pulls from your repo on every merge." },
+          {
+            title: "Build-connected strings",
+            body: "Localization pulls from your repo on every merge.",
+          },
           { title: "Voice at scale", body: "Casting, direction and recording in 8 dub languages." },
           { title: "In-game LQA", body: "Native testers playing real builds, not spreadsheets." },
-          { title: "Cert-aware scheduling", body: "Every milestone anchored to your submission dates." },
+          {
+            title: "Cert-aware scheduling",
+            body: "Every milestone anchored to your submission dates.",
+          },
         ],
       },
       notes: "Four pillars, all mapped to a milestone the producer already tracks.",
@@ -477,7 +502,10 @@ function buildDigitalGrowth(): TemplatePayload {
         title: "How the model works",
         items: [
           { title: "CMS connector", body: "Pages and components localized in place, on publish." },
-          { title: "Market-aware copy", body: "Transcreated headlines, local proof, local claims." },
+          {
+            title: "Market-aware copy",
+            body: "Transcreated headlines, local proof, local claims.",
+          },
           { title: "Multilingual SEO", body: "Keyword mapping and hreflang handled per market." },
           { title: "Measured funnels", body: "Conversion tracked per language, not per region." },
         ],
@@ -521,8 +549,16 @@ function buildDigitalGrowth(): TemplatePayload {
         centerUnit: "%",
         centerLabel: "Clicks landing in the wrong language",
         items: [
-          { label: "English landing page", value: 38, note: "Localized ad, non-localized destination." },
-          { label: "Partially localized page", value: 21, note: "Hero translated, proof and forms in English." },
+          {
+            label: "English landing page",
+            value: 38,
+            note: "Localized ad, non-localized destination.",
+          },
+          {
+            label: "Partially localized page",
+            value: 21,
+            note: "Hero translated, proof and forms in English.",
+          },
           { label: "Localized, off-brand", value: 17, note: "Rewritten locally with no review." },
           { label: "Fully localized", value: 24, note: "The only path that converts at target." },
         ],
@@ -552,7 +588,10 @@ function buildDigitalGrowth(): TemplatePayload {
           { label: "Weeks 1–2", body: "CMS connector, glossary, tone guide per market." },
           { label: "Weeks 3–5", body: "Pilot funnels live in DE and ES with tracking in place." },
           { label: "Weeks 6–9", body: "Paid and lifecycle assets localized against the pilot." },
-          { label: "Weeks 10–12", body: "Readout, then rollout plan for the remaining four markets." },
+          {
+            label: "Weeks 10–12",
+            body: "Readout, then rollout plan for the remaining four markets.",
+          },
         ],
       },
       notes: "Pilot ends in a readout, not a renewal conversation.",

@@ -67,16 +67,17 @@ export function placeDomShapes(
     if (x >= bounds.wIn || y >= bounds.hIn) continue;
 
     const radiusIn = pxToRadiusIn(s.radiusPx);
-    const shadow = s.shadow && s.shadow.color.alpha >= 0.04
-      ? {
-          type: "outer" as const,
-          blur: pxToPt(s.shadow.blurPx),
-          offset: pxToPt(s.shadow.offsetPx),
-          angle: Math.round(s.shadow.angleDeg),
-          color: s.shadow.color.hex,
-          opacity: s.shadow.color.alpha,
-        }
-      : undefined;
+    const shadow =
+      s.shadow && s.shadow.color.alpha >= 0.04
+        ? {
+            type: "outer" as const,
+            blur: pxToPt(s.shadow.blurPx),
+            offset: pxToPt(s.shadow.offsetPx),
+            angle: Math.round(s.shadow.angleDeg),
+            color: s.shadow.color.hex,
+            opacity: s.shadow.color.alpha,
+          }
+        : undefined;
 
     if (s.kind === "image") {
       if (!s.src) continue;
@@ -87,9 +88,7 @@ export function placeDomShapes(
       // real pixel size, the aspect-correct frame is computed here so every
       // logo lands at its exact native ratio, every time.
       const ratio =
-        s.natW && s.natH && s.natW > 0 && s.natH > 0
-          ? s.natW / s.natH
-          : getImageAspect(s.src);
+        s.natW && s.natH && s.natW > 0 && s.natH > 0 ? s.natW / s.natH : getImageAspect(s.src);
       const frame = aspectFrame(ratio, s.fit, x, y, w, h);
       // A `cover` tile keeps its measured box and crops the overflow natively,
       // exactly like `object-fit: cover` on screen.
@@ -98,9 +97,7 @@ export function placeDomShapes(
           ? ""
           : coverCropTag(ratio, frame.w, frame.h);
       const round =
-        s.radiusPx >= 1
-          ? `${roundPicTag(rectRadiusAdj(radiusIn, frame.w, frame.h))} `
-          : "";
+        s.radiusPx >= 1 ? `${roundPicTag(rectRadiusAdj(radiusIn, frame.w, frame.h))} ` : "";
       const tag = `${crop ? `${crop} ` : ""}${round}`;
       const common: Record<string, unknown> = {
         x: frame.x,
@@ -131,7 +128,6 @@ export function placeDomShapes(
       }
       continue;
     }
-
 
     if (invisible(s.fill) && !s.gradient && (!s.line || invisible(s.line))) continue;
 

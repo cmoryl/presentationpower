@@ -138,7 +138,10 @@ export async function measureMediaExtents(zip: JSZipT): Promise<Map<string, numb
 }
 
 /** Target long-edge pixels for a media part drawn at `inches` under `quality`. */
-export function rasterTargetPx(inches: number | undefined, quality?: ExportQualityId | null): number {
+export function rasterTargetPx(
+  inches: number | undefined,
+  quality?: ExportQualityId | null,
+): number {
   if (!inches || !Number.isFinite(inches) || inches <= 0) return FALLBACK_PX;
   const dpi = exportQualityById(quality ?? null).dpi;
   return Math.min(MAX_PX, Math.max(MIN_PX, Math.round(inches * dpi)));

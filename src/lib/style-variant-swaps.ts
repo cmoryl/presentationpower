@@ -48,7 +48,8 @@ export function bentoSiblingFor(
 type Rec = Record<string, unknown>;
 
 const s = (v: unknown) => (typeof v === "string" ? v.trim() : "");
-const obj = (v: unknown): Rec => (v && typeof v === "object" && !Array.isArray(v) ? (v as Rec) : {});
+const obj = (v: unknown): Rec =>
+  v && typeof v === "object" && !Array.isArray(v) ? (v as Rec) : {};
 const arr = (v: unknown): Rec[] => (Array.isArray(v) ? v.filter(Boolean).map(obj) : []);
 
 /** Pull `{ lead, emphasis }` out of a band-shaped field or a plain string. */

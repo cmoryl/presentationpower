@@ -102,7 +102,10 @@ function signalsFrom(
     .map((b) => {
       const d = DATE_RE.exec(b);
       if (!d) return null;
-      const label = b.replace(d[0], " ").replace(/^[\s—–:|,.-]+/, "").trim();
+      const label = b
+        .replace(d[0], " ")
+        .replace(/^[\s—–:|,.-]+/, "")
+        .trim();
       return { date: d[0], label: (label || b).slice(0, 80), raw: b };
     })
     .filter(Boolean) as SlideSignals["dated"];
@@ -362,7 +365,8 @@ const DESIGNS: Design[] = [
     variantId: "MV-MATURITY-CURVE",
     score: 9,
     build: (g) =>
-      g.bullets.length >= 3 && kw(g, /maturity|evolv|journey to|from .* to |scal(e|ing) up|growth path/i)
+      g.bullets.length >= 3 &&
+      kw(g, /maturity|evolv|journey to|from .* to |scal(e|ing) up|growth path/i)
         ? {
             title: g.title,
             items: g.bullets.slice(0, 5).map((b, i) => {
@@ -378,7 +382,8 @@ const DESIGNS: Design[] = [
     variantId: "MV-JOURNEY-MAP",
     score: 10,
     build: (g) =>
-      g.bullets.length >= 4 && kw(g, /journey|experience|touchpoint|patient|customer|candidate|onboard/i)
+      g.bullets.length >= 4 &&
+      kw(g, /journey|experience|touchpoint|patient|customer|candidate|onboard/i)
         ? {
             title: g.title,
             items: g.bullets.slice(0, 5).map((b, i) => {
@@ -435,9 +440,7 @@ const DESIGNS: Design[] = [
     variantId: "MV-PRINCIPLES",
     score: 9,
     build: (g) =>
-      g.bullets.length >= 3 &&
-      g.bullets.length <= 5 &&
-      g.bullets.every((b) => b.length < 200)
+      g.bullets.length >= 3 && g.bullets.length <= 5 && g.bullets.every((b) => b.length < 200)
         ? {
             title: g.title,
             items: g.bullets.slice(0, 5).map((b) => {
@@ -805,8 +808,6 @@ for (const [baseId, alts] of Object.entries(STYLE_ALTERNATES)) {
   });
 }
 
-
-
 // ── chooser ──────────────────────────────────────────────────────────────
 
 /** Variants we never rotate away from — they are already the right answer. */
@@ -848,7 +849,6 @@ const FAMILY_OF: Record<string, string> = {
 };
 
 const PINNED = new Set([
-
   "MV-OP-COVER",
   "MV-OP-COVER-MEDIA",
   "MV-OP-COVER-EDITORIAL",
@@ -894,7 +894,11 @@ export function collectStrings(value: unknown, out: string[] = []): string[] {
   return out;
 }
 
-export const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+export const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 
 /** True when `bullet` is represented (whole or clipped) somewhere on the slide. */
 export function isCovered(bullet: string, haystack: string): boolean {
@@ -955,9 +959,7 @@ function finalize(
   };
 
   // Park the overflow in speaker notes so no imported fact is ever lost.
-  const priorNotes = (base.source.notes ?? "")
-    .split(OVERFLOW_HEADER)[0]
-    .trimEnd();
+  const priorNotes = (base.source.notes ?? "").split(OVERFLOW_HEADER)[0].trimEnd();
   const notes = dropped.length
     ? [priorNotes, `${OVERFLOW_HEADER}\n${dropped.map((d) => `• ${d}`).join("\n")}`]
         .filter(Boolean)
@@ -975,7 +977,6 @@ function finalize(
     coverage,
   };
 }
-
 
 /**
  * Re-design a reinterpreted deck: upgrade each slide to the richest native
@@ -1022,10 +1023,9 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
       description: v?.description ?? "",
       group: isLogoVariant(d.variantId)
         ? LOGO_GROUP
-        : GROUP_BY_DESIGN_ID[d.id] ?? "Other layouts",
+        : (GROUP_BY_DESIGN_ID[d.id] ?? "Other layouts"),
       isPrimary,
     });
-
   }
   // Extended options: every remaining module variant is selectable too. These
   // have no deterministic planner builder, so they are reviewer-only choices
@@ -1045,8 +1045,6 @@ export const DESIGN_CATALOG: DesignCatalogEntry[] = (() => {
   }
   return out;
 })();
-
-
 
 export type DesignOptions = {
   /**
@@ -1091,7 +1089,10 @@ function adaptSignals(g: SlideSignals): SlideSignals[] {
   // Sentence-split long bullets, then top up from notes lines (real source copy).
   const split: string[] = [];
   for (const b of g.bullets) {
-    const parts = b.split(/(?<=[.!?])\s+(?=[A-Z0-9])/).map((x) => x.trim()).filter(Boolean);
+    const parts = b
+      .split(/(?<=[.!?])\s+(?=[A-Z0-9])/)
+      .map((x) => x.trim())
+      .filter(Boolean);
     if (parts.length > 1) split.push(...parts);
     else split.push(b);
   }
@@ -1189,9 +1190,7 @@ export function designReinterpretedDeck(
       const cells = Array.isArray((content as { items?: unknown[] }).items)
         ? ((content as { items?: unknown[] }).items as unknown[]).length
         : 0;
-      if (g.bullets.length > 0 && cells > 0)
-        score += Math.min(2, (cells / g.bullets.length) * 2);
-
+      if (g.bullets.length > 0 && cells > 0) score += Math.min(2, (cells / g.bullets.length) * 2);
 
       if (!best || score > best.score) best = { d, content, score };
     }
@@ -1219,8 +1218,6 @@ export function designReinterpretedDeck(
     const aiPicked = Boolean(forced);
     if (!aiPicked && !mappedRepeat && best.score < 7) return keep();
 
-
-
     const designed = finalize(
       m,
       best.d.sectionId,
@@ -1229,8 +1226,8 @@ export function designReinterpretedDeck(
       forceThis && aiPicked
         ? `Forced by reviewer — ${best.d.id} (${best.d.variantId})`
         : aiPicked
-        ? `AI-designed — ${best.d.id} (${best.d.variantId})`
-        : `Re-designed — ${best.d.id} (${best.d.variantId})`,
+          ? `AI-designed — ${best.d.id} (${best.d.variantId})`
+          : `Re-designed — ${best.d.id} (${best.d.variantId})`,
     );
     recent.push(designed.variantId);
     usedCount.set(designed.variantId, (usedCount.get(designed.variantId) ?? 0) + 1);

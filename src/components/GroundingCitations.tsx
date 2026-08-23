@@ -50,7 +50,9 @@ export function GroundingCitations({
   return (
     <div className={`rounded-xl border p-3 ${t.shell} ${className}`}>
       <div className="flex items-center justify-between gap-2">
-        <div className={`flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] ${t.label}`}>
+        <div
+          className={`flex items-center gap-1.5 text-[10px] uppercase tracking-[0.22em] ${t.label}`}
+        >
           <BookOpen className="size-3" strokeWidth={1.75} aria-hidden />
           {label}
           {list.length > 0 && <span className={`rounded px-1 ${t.chip}`}>{list.length}</span>}
@@ -73,7 +75,9 @@ export function GroundingCitations({
         <ul className="mt-2 space-y-2">
           {list.map((c) => (
             <li key={c.ref} className="flex gap-2 text-[11px] leading-relaxed">
-              <span className={`mt-px shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] ${t.chip}`}>
+              <span
+                className={`mt-px shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] ${t.chip}`}
+              >
                 {c.ref}
               </span>
               <span className="min-w-0">

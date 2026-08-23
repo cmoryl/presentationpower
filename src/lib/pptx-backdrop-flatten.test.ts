@@ -12,7 +12,6 @@ import {
   normalizeBackdropPictures,
 } from "./pptx-backdrop-flatten";
 
-
 /** Minimal slide XML wrapper. */
 function slide(inner: string): string {
   return `<?xml version="1.0"?><p:sld xmlns:p="p" xmlns:a="a" xmlns:r="r"><p:cSld><p:spTree>${inner}</p:spTree></p:cSld></p:sld>`;
@@ -105,7 +104,9 @@ describe("flattenBackdrops (media dedupe)", () => {
       }),
     );
     const zip = await JSZip.loadAsync(await out.arrayBuffer());
-    const media = Object.keys(zip.files).filter((n) => n.startsWith("ppt/media/") && !zip.files[n].dir);
+    const media = Object.keys(zip.files).filter(
+      (n) => n.startsWith("ppt/media/") && !zip.files[n].dir,
+    );
     // Unique media parts == total media parts: no byte-identical duplicates.
     expect(media).toEqual(["ppt/media/image1.png"]);
     const r2 = await zip.file("ppt/slides/_rels/slide2.xml.rels")!.async("string");
@@ -121,7 +122,9 @@ describe("flattenBackdrops (media dedupe)", () => {
       }),
     );
     const zip = await JSZip.loadAsync(await out.arrayBuffer());
-    const media = Object.keys(zip.files).filter((n) => n.startsWith("ppt/media/") && !zip.files[n].dir);
+    const media = Object.keys(zip.files).filter(
+      (n) => n.startsWith("ppt/media/") && !zip.files[n].dir,
+    );
     expect(media.sort()).toEqual(["ppt/media/image1.png", "ppt/media/image2.png"]);
   });
 

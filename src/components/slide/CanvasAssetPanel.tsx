@@ -54,7 +54,10 @@ export function CanvasAssetPanel({
               // Aspect is unknown until it decodes; 16:9 is the sane placement
               // default and `contain` keeps it honest either way.
               aspect: 16 / 9,
-              alt: i.name.replace(/^\d+-/, "").replace(/\.[a-z0-9]+$/i, "").replace(/[-_]+/g, " "),
+              alt: i.name
+                .replace(/^\d+-/, "")
+                .replace(/\.[a-z0-9]+$/i, "")
+                .replace(/[-_]+/g, " "),
               kind: /\.svg$/i.test(i.name) ? "vector" : "photo",
               path: i.path,
               inline: false,
@@ -102,10 +105,7 @@ export function CanvasAssetPanel({
   );
 
   const card = (asset: UploadedAsset) => (
-    <figure
-      key={asset.id}
-      className="overflow-hidden rounded-xl border border-white/12 bg-white/5"
-    >
+    <figure key={asset.id} className="overflow-hidden rounded-xl border border-white/12 bg-white/5">
       <div className="grid h-20 place-items-center bg-[#03002C] p-1.5">
         <img
           src={asset.src}
@@ -182,9 +182,7 @@ export function CanvasAssetPanel({
             background: dragOver ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.04)",
           }}
         >
-          <p className="text-[11px] text-white/70">
-            Drop photos, icons or SVGs here
-          </p>
+          <p className="text-[11px] text-white/70">Drop photos, icons or SVGs here</p>
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
@@ -205,7 +203,9 @@ export function CanvasAssetPanel({
               e.target.value = "";
             }}
           />
-          <p className="mt-1.5 text-[10px] text-white/45">PNG, JPEG, WebP, GIF, SVG · up to 12 MB</p>
+          <p className="mt-1.5 text-[10px] text-white/45">
+            PNG, JPEG, WebP, GIF, SVG · up to 12 MB
+          </p>
         </div>
 
         <p className="text-[10px] leading-snug text-white/55">

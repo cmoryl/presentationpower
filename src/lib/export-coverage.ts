@@ -68,7 +68,10 @@ function partIndex(name: string): number {
  * moved into notes. Together these are the original source bullets, so the
  * totals line up with the reviewer's coverage chip.
  */
-function expectedLines(content: unknown, notes: string | undefined): {
+function expectedLines(
+  content: unknown,
+  notes: string | undefined,
+): {
   onSlide: string[];
   overflow: string[];
 } {

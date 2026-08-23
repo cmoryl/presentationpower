@@ -89,9 +89,7 @@ export function StylePackThumb({
       <div
         className="absolute inset-0"
         style={{
-          background: minimalPackLayers(
-            packLayoutLayers(pack, composition, THUMB_SEED),
-          ).join(", "),
+          background: minimalPackLayers(packLayoutLayers(pack, composition, THUMB_SEED)).join(", "),
         }}
       />
       {pack.grain > 0 ? (
@@ -101,12 +99,8 @@ export function StylePackThumb({
         />
       ) : null}
 
-
       {pack.topBar ? (
-        <div
-          className="absolute inset-x-0 top-0 h-[3px]"
-          style={{ backgroundColor: t.accent }}
-        />
+        <div className="absolute inset-x-0 top-0 h-[3px]" style={{ backgroundColor: t.accent }} />
       ) : null}
 
       <div className="relative flex h-full flex-col justify-between p-[9px]">
@@ -125,25 +119,22 @@ export function StylePackThumb({
             </div>
           ) : null}
           {label ? (
-          <div
-            className="mt-[3px] truncate"
-            style={{
-              fontFamily: pack.type.display,
-              fontWeight: pack.type.displayWeight,
-              letterSpacing: pack.type.displayTracking,
-              textTransform: pack.type.displayTransform,
-              fontSize: `${12 * pack.type.displayScale}px`,
-              lineHeight: 1.05,
-              color: t.ink,
-            }}
-          >
-            {pack.label}
-          </div>
+            <div
+              className="mt-[3px] truncate"
+              style={{
+                fontFamily: pack.type.display,
+                fontWeight: pack.type.displayWeight,
+                letterSpacing: pack.type.displayTracking,
+                textTransform: pack.type.displayTransform,
+                fontSize: `${12 * pack.type.displayScale}px`,
+                lineHeight: 1.05,
+                color: t.ink,
+              }}
+            >
+              {pack.label}
+            </div>
           ) : null}
-          <div
-            className="mt-[5px] h-[2px] w-[34%]"
-            style={{ backgroundColor: t.accent }}
-          />
+          <div className="mt-[5px] h-[2px] w-[34%]" style={{ backgroundColor: t.accent }} />
           <div
             className="mt-[5px] h-[2px] w-[62%] rounded-full"
             style={{ backgroundColor: t.inkMuted, opacity: 0.5 }}
@@ -210,7 +201,10 @@ export function BrandSystemThumb({ className = "" }: { className?: string }) {
               className="flex-1 rounded-[8px] border border-white/15 bg-white/10 p-[6px]"
               style={{ backdropFilter: "blur(6px)" }}
             >
-              <div className="h-[3px] w-[55%] rounded-full" style={{ backgroundColor: "#A1FBF9" }} />
+              <div
+                className="h-[3px] w-[55%] rounded-full"
+                style={{ backgroundColor: "#A1FBF9" }}
+              />
               <div className="mt-[5px] h-[2px] w-full rounded-full bg-white/40" />
               <div className="mt-[3px] h-[2px] w-[70%] rounded-full bg-white/25" />
             </div>

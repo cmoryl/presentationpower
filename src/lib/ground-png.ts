@@ -78,7 +78,6 @@ export function groundCssLayers(pack: StylePack, seed: string): GroundCssLayer[]
   ];
 }
 
-
 async function crop(dataUrl: string, ratio: number): Promise<string | null> {
   const img = new Image();
   const ok = await new Promise<boolean>((resolve) => {
@@ -175,11 +174,6 @@ export function downloadDataUrl(dataUrl: string, filename: string): void {
 }
 
 /** `r07-stats-take3-2560x1440.png` — stable, sortable, self-describing. */
-export function groundFileName(
-  code: string,
-  scene: string,
-  take: number,
-  ratio: number,
-): string {
+export function groundFileName(code: string, scene: string, take: number, ratio: number): string {
   return `${code.toLowerCase()}-${scene}-take${take + 1}-${W * ratio}x${H * ratio}.png`;
 }

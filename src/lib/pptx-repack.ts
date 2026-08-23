@@ -14,8 +14,7 @@
  */
 import type JSZip from "jszip";
 
-const PPTX_MIME =
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+const PPTX_MIME = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
 
 /** Rebuild `zip` into a PowerPoint-safe archive blob. */
 export async function repackPptx(zip: JSZip): Promise<Blob> {

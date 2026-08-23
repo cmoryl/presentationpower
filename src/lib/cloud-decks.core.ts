@@ -4,14 +4,11 @@
 import { z } from "zod";
 import { pickSlideExtras } from "@/lib/cloud-slide-extras";
 
-
 // Schemas are deliberately forgiving: a deck assembled in the browser may be
 // missing an optional field or carry newer authoring props, and none of that is
 // a reason to refuse a save. Unknown keys pass through, missing scalars fall
 // back to safe defaults.
-const str = (fallback = "") =>
-  z.coerce.string().catch(fallback).default(fallback);
-
+const str = (fallback = "") => z.coerce.string().catch(fallback).default(fallback);
 
 export const BriefSchema = z
   .object({
@@ -100,18 +97,13 @@ type MinimalSb = { from: (t: string) => QueryBuilder };
  * synthetic ids (agent runs, open-canvas, single-module previews) or an empty
  * string, and those must not abort the whole save with an FK violation.
  */
-async function existingRefId(
-  sb: MinimalSb,
-  table: string,
-  id: unknown,
-): Promise<string | null> {
+async function existingRefId(sb: MinimalSb, table: string, id: unknown): Promise<string | null> {
   const raw = typeof id === "string" ? id.trim() : "";
   if (!raw) return null;
   const { data, error } = await sb.from(table).select("id").eq("id", raw);
   if (error) return null;
   return Array.isArray(data) && data.length > 0 ? raw : null;
 }
-
 
 /** Upsert a brief + deck + its slides. Owner-scoped through RLS. */
 export async function saveDeckToCloudCore(
@@ -126,21 +118,9 @@ export async function saveDeckToCloudCore(
 
   // Reference columns are FK-checked in the database; unknown/synthetic ids are
   // stored as NULL rather than failing the whole save.
-  const briefBrandMode = await existingRefId(
-    sb,
-    "brand_modes",
-    data.brief.brandModeId,
-  );
-  const deckBrandMode = await existingRefId(
-    sb,
-    "brand_modes",
-    data.deck.brandModeId,
-  );
-  const deckArchetype = await existingRefId(
-    sb,
-    "narrative_archetypes",
-    data.deck.archetypeId,
-  );
+  const briefBrandMode = await existingRefId(sb, "brand_modes", data.brief.brandModeId);
+  const deckBrandMode = await existingRefId(sb, "brand_modes", data.deck.brandModeId);
+  const deckArchetype = await existingRefId(sb, "narrative_archetypes", data.deck.archetypeId);
 
   const { error: briefErr } = await sb.from("briefs").upsert({
     id: briefUuid,

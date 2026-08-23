@@ -116,7 +116,6 @@ async function settleStageImages(stage: HTMLElement, timeoutMs = 8000): Promise<
   await nextFrames(1);
 }
 
-
 /**
  * Mount the exact stage offscreen, settle it (layout + readability auto-fix),
  * hand the settled stage element to `fn`, then tear the host down.
@@ -160,7 +159,6 @@ export async function withExactStage<T>(
     // image-strip slide shipped with its imagery missing while the copy landed
     // perfectly. Wait for every picture, and give any failure one clean retry.
     await settleStageImages(stage);
-
 
     // Readability + typography auto-fix run on screen too, so the plate must
     // include them or the export would be *better* aligned than the build.
@@ -253,8 +251,16 @@ export async function rasterizeDecorPlates(
 export async function captureGroundPlates(
   items: ExactPlateArgs[],
   onProgress?: (done: number, total: number) => void,
-): Promise<Array<{ plate: string | null; media: import("./export-media-frames").MediaTileMeasurement[] } | null>> {
-  const out: Array<{ plate: string | null; media: import("./export-media-frames").MediaTileMeasurement[] } | null> = [];
+): Promise<
+  Array<{
+    plate: string | null;
+    media: import("./export-media-frames").MediaTileMeasurement[];
+  } | null>
+> {
+  const out: Array<{
+    plate: string | null;
+    media: import("./export-media-frames").MediaTileMeasurement[];
+  } | null> = [];
   // EXPORT SPEC #3: one backdrop raster per background variant per mode. Two
   // slides on the same variant + brand + mode + pack paint the same ground, so
   // they must reference the SAME bytes — the previous per-slide capture is what
@@ -262,9 +268,13 @@ export async function captureGroundPlates(
   // measured per slide (they carry per-slide photographs).
   const plateCache = new Map<string, string | null>();
   const plateKey = (it: ExactPlateArgs) =>
-    [it.variant.id, it.brand.id, it.pack ? it.pack.mode : it.mode, it.pack?.id ?? "-", it.quality ?? "-"].join(
-      "|",
-    );
+    [
+      it.variant.id,
+      it.brand.id,
+      it.pack ? it.pack.mode : it.mode,
+      it.pack?.id ?? "-",
+      it.quality ?? "-",
+    ].join("|");
   for (let i = 0; i < items.length; i += 1) {
     const key = plateKey(items[i]);
     const res = await withExactStage({ ...items[i], decorOnly: true }, async (stage) => {
@@ -290,7 +300,6 @@ export async function captureGroundPlates(
   }
   return out;
 }
-
 
 /**
  * Layered-editable export: one plate per slide carrying every designed pixel
@@ -335,7 +344,11 @@ export async function rasterizeTextEditablePlate(
  */
 export async function rasterizeObjectPlate(
   args: ExactPlateArgs,
-): Promise<{ plate: string; runs: TextRun[]; shapes: import("./export-dom-decompose").DomShape[] } | null> {
+): Promise<{
+  plate: string;
+  runs: TextRun[];
+  shapes: import("./export-dom-decompose").DomShape[];
+} | null> {
   return withExactStage(args, async (stage) => {
     const [{ captureSlideAsDataUrl }, textLayer, dom] = await Promise.all([
       import("./slide-image-export"),
@@ -378,8 +391,18 @@ export async function rasterizeObjectPlate(
 export async function rasterizeObjectPlates(
   items: ExactPlateArgs[],
   onProgress?: (done: number, total: number) => void,
-): Promise<Array<{ plate: string; runs: TextRun[]; shapes: import("./export-dom-decompose").DomShape[] } | null>> {
-  const out: Array<{ plate: string; runs: TextRun[]; shapes: import("./export-dom-decompose").DomShape[] } | null> = [];
+): Promise<
+  Array<{
+    plate: string;
+    runs: TextRun[];
+    shapes: import("./export-dom-decompose").DomShape[];
+  } | null>
+> {
+  const out: Array<{
+    plate: string;
+    runs: TextRun[];
+    shapes: import("./export-dom-decompose").DomShape[];
+  } | null> = [];
   for (let i = 0; i < items.length; i += 1) {
     out.push(await rasterizeObjectPlate(items[i]));
     onProgress?.(i + 1, items.length);

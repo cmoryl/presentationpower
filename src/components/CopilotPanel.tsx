@@ -187,7 +187,6 @@ export function CopilotPanel({
           "Swap the icon on slide 2 for something about speed",
         ];
 
-
   if (!open) {
     return (
       <button

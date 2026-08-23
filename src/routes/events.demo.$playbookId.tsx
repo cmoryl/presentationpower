@@ -123,9 +123,7 @@ function PlaybookDemoView() {
     const stored = readCampaignLookId(playbook.subBrand);
     setLookId(stored && EVENT_LOOKS_BY_ID[stored] ? stored : eventLookForPlaybook(playbook.id).id);
   }, [playbook.id, playbook.subBrand]);
-  const look = lookId.includes("--")
-    ? eventLookForPlaybook(playbook.id)
-    : eventLookById(lookId);
+  const look = lookId.includes("--") ? eventLookForPlaybook(playbook.id) : eventLookById(lookId);
   const pickLook = (id: string) => {
     setLookId(id);
     saveCampaignLook(playbook.subBrand, { lookId: id });
@@ -179,7 +177,6 @@ function PlaybookDemoView() {
       photo: getPhotoSet(playbook.subBrand),
     };
   }, [nextSuite, playbook, look, styleId]);
-
 
   const startDate = playbook.facts.startDate
     ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
@@ -265,11 +262,7 @@ function PlaybookDemoView() {
           desc="Photographic direction for this archetype — staging, lighting and texture the kit is designed to sit inside."
         />
         <div className="mt-6">
-          <PlaybookGallery
-            playbookId={playbook.id}
-            accent={look.accent}
-            name={playbook.name}
-          />
+          <PlaybookGallery playbookId={playbook.id} accent={look.accent} name={playbook.name} />
         </div>
       </section>
 
@@ -288,10 +281,18 @@ function PlaybookDemoView() {
                 className="overflow-hidden rounded-2xl border border-black/10 bg-white/85"
               >
                 <div className="flex h-32 items-center justify-center bg-white p-6">
-                  <img src={l.color} alt={`${l.label} lockup, full colour`} className="max-h-full w-auto" />
+                  <img
+                    src={l.color}
+                    alt={`${l.label} lockup, full colour`}
+                    className="max-h-full w-auto"
+                  />
                 </div>
                 <div className="flex h-32 items-center justify-center bg-[#03002C] p-6">
-                  <img src={l.white} alt={`${l.label} lockup, all white`} className="max-h-full w-auto" />
+                  <img
+                    src={l.white}
+                    alt={`${l.label} lockup, all white`}
+                    className="max-h-full w-auto"
+                  />
                 </div>
                 <div className="space-y-1 p-4">
                   <div className="text-sm font-semibold text-[#03002C]">{l.label}</div>
@@ -418,7 +419,6 @@ function PlaybookDemoView() {
             );
           })}
         </div>
-
       </section>
 
       {/* Marketing collateral — full kit scope, grouped, with status ribbons */}

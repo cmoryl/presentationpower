@@ -312,7 +312,13 @@ export const INDUSTRY_DETAIL: Record<string, IndustryDetail> = {
 
 function luminance(hex: string): number {
   const h = hex.replace("#", "");
-  const n = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const r = parseInt(n.slice(0, 2), 16) / 255;
   const g = parseInt(n.slice(2, 4), 16) / 255;
   const b = parseInt(n.slice(4, 6), 16) / 255;

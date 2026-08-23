@@ -6,21 +6,13 @@ import { AppShell } from "@/components/AppShell";
 import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { useDemoOverride } from "@/lib/demo-overrides";
-import {
-  useDeckStore,
-  type DeckSnapshot,
-  type TemplatePayload,
-} from "@/lib/deck-store";
+import { useDeckStore, type DeckSnapshot, type TemplatePayload } from "@/lib/deck-store";
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
 import { DemoStyleAdmin } from "@/components/showcase/DemoStyleAdmin";
 import { showcaseArt } from "@/lib/showcase-art";
-import {
-  DEMO_DIVISIONS,
-  retargetPayload,
-  type DemoDivision,
-} from "@/lib/showcase-division";
+import { DEMO_DIVISIONS, retargetPayload, type DemoDivision } from "@/lib/showcase-division";
 
 export const Route = createFileRoute("/demo/deck/$demoId")({
   loader: ({ params }) => {
@@ -33,8 +25,7 @@ export const Route = createFileRoute("/demo/deck/$demoId")({
       ? `${loaderData.eyebrow} · ${loaderData.name} demo deck`
       : "Demo deck · Element";
     const description =
-      loaderData?.blurb ??
-      "A fully authored example deck you can open, edit, present and export.";
+      loaderData?.blurb ?? "A fully authored example deck you can open, edit, present and export.";
     return {
       meta: [
         { title: `${title} · Element` },
@@ -73,8 +64,7 @@ function ShowcaseDeckDemoPage() {
 
   const home = def ? nativeDivision(def.divisionLabel) : DEMO_DIVISIONS[0];
   const [divisionId, setDivisionId] = useState(home.id);
-  const division =
-    DEMO_DIVISIONS.find((d) => d.id === divisionId) ?? home;
+  const division = DEMO_DIVISIONS.find((d) => d.id === divisionId) ?? home;
 
   const authored = useMemo(() => {
     if (!def) return null;
@@ -140,7 +130,6 @@ function ShowcaseDeckDemoPage() {
     void navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 
-
   return (
     <AppShell>
       <div className="relative overflow-hidden rounded-3xl border border-black/10 dark:border-white/10">
@@ -173,9 +162,7 @@ function ShowcaseDeckDemoPage() {
               className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-[#03002C] transition hover:bg-white/90"
             >
               <Sparkles size={15} />
-              {existingId
-                ? `Open my ${division.label} copy`
-                : `Generate for ${division.label}`}
+              {existingId ? `Open my ${division.label} copy` : `Generate for ${division.label}`}
               <ArrowRight size={15} />
             </button>
             {existingId ? (
@@ -220,19 +207,15 @@ function ShowcaseDeckDemoPage() {
               Division
             </div>
             <p className="mt-1 text-[12px] text-black/55 dark:text-white/55">
-              Same narrative, re-branded: brand mode, style pack, copy and generated
-              imagery all follow the division you pick.
+              Same narrative, re-branded: brand mode, style pack, copy and generated imagery all
+              follow the division you pick.
             </p>
           </div>
           <div className="text-[11px] text-black/45 dark:text-white/45">
             {division.name} · {division.stylePackId.toUpperCase().replace("SKIN-", "")}
           </div>
         </div>
-        <div
-          role="group"
-          aria-label="Choose division"
-          className="mt-3 flex flex-wrap gap-2"
-        >
+        <div role="group" aria-label="Choose division" className="mt-3 flex flex-wrap gap-2">
           {DEMO_DIVISIONS.map((d) => {
             const on = d.id === division.id;
             return (
@@ -255,16 +238,13 @@ function ShowcaseDeckDemoPage() {
                 />
                 {d.label}
                 {d.id === home.id ? (
-                  <span className="text-[10px] uppercase tracking-[0.14em] opacity-70">
-                    native
-                  </span>
+                  <span className="text-[10px] uppercase tracking-[0.14em] opacity-70">native</span>
                 ) : null}
               </button>
             );
           })}
         </div>
       </div>
-
 
       {isAdmin ? (
         <DemoStyleAdmin
@@ -294,9 +274,7 @@ function ShowcaseDeckDemoPage() {
 
       <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_minmax(0,0.85fr)]">
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold tracking-tight">
-            Every slide, already written
-          </h2>
+          <h2 className="text-lg font-semibold tracking-tight">Every slide, already written</h2>
           <ol className="mt-4 space-y-2">
             {payload.slides.map((s, i) => {
               const variant = byId(MODULE_VARIANTS, s.variantId);
@@ -383,7 +361,9 @@ function ShowcaseDeckDemoPage() {
                   params={{ demoId: d.id }}
                   className="flex min-h-[44px] items-center justify-between gap-3 rounded-xl border border-black/10 px-3 py-2 text-sm transition hover:border-black/30 dark:border-white/10 dark:hover:border-white/30"
                 >
-                  <span className="min-w-0 break-words">{d.eyebrow} · {d.name}</span>
+                  <span className="min-w-0 break-words">
+                    {d.eyebrow} · {d.name}
+                  </span>
                   <ArrowRight size={14} />
                 </Link>
               ))}

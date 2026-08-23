@@ -34,6 +34,11 @@ export default defineTool({
       if (shiftErr) return errorResult(`Deleted, but resequencing failed: ${shiftErr.message}`);
     }
     await touchDeck(supabase, deck_id);
-    return textResult({ ok: true, deck_id, deleted_position: position, remaining: existing.slides.length - 1 });
+    return textResult({
+      ok: true,
+      deck_id,
+      deleted_position: position,
+      remaining: existing.slides.length - 1,
+    });
   },
 });

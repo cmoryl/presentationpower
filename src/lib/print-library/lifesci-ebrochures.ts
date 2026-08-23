@@ -34,16 +34,11 @@ export type LifeSciEbrochureSeed = {
 
 const CTA = {
   label: "Talk to TransPerfect Life Sciences",
-  subhead:
-    "Lab to Launch. Practitioner to Patient. — lifesciences@transperfect.com",
+  subhead: "Lab to Launch. Practitioner to Patient. — lifesciences@transperfect.com",
   url: "https://lifesciences.transperfect.com",
 };
 
-const hero = (
-  url: string,
-  heightPct = 42,
-  focalY = 50,
-): EBrochureContent["heroMedia"] => ({
+const hero = (url: string, heightPct = 42, focalY = 50): EBrochureContent["heroMedia"] => ({
   imageUrl: url,
   aspect: "fill",
   heightPct,
@@ -56,14 +51,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
     title: "GlobalLink & Veeva Vault RIM Integration",
     teaser:
       "Automate regulatory content translation with a validated integration that keeps every step inspection-ready — without leaving Vault.",
-    tags: [
-      "veeva vault",
-      "rim",
-      "regulatory",
-      "globallink",
-      "automation",
-      "integration",
-    ],
+    tags: ["veeva vault", "rim", "regulatory", "globallink", "automation", "integration"],
     collection: "Regulatory & technology",
     sourceFile: "eBro | TPLS | Veeva Vault Integration.pdf",
     content: {
@@ -84,11 +72,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
         {
           heading: "The solution",
           body: "TransPerfect's GlobalLink integration with Veeva RIM replaces the manual workflow with a streamlined three-step automated process: submit via Vault, review the translation, finalize. Human-in-the-loop review is combined with industry-leading AI to produce submission-ready files faster, and every step stays inside the Vault ecosystem for full traceability, compliance, and security.",
-          bullets: [
-            "1. Submit request via Vault",
-            "2. Review translation",
-            "3. Translation final",
-          ],
+          bullets: ["1. Submit request via Vault", "2. Review translation", "3. Translation final"],
         },
         {
           heading: "Confidence at every stage of the submission process",
@@ -138,14 +122,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
     title: "Trial Interactive eClinical Platform for Global Product Development",
     teaser:
       "Streamline site activation and clinical management lifecycles, and accelerate timelines to an inspection-ready eTMF across ten connected modules.",
-    tags: [
-      "trial interactive",
-      "eclinical",
-      "etmf",
-      "ctms",
-      "site activation",
-      "platform",
-    ],
+    tags: ["trial interactive", "eclinical", "etmf", "ctms", "site activation", "platform"],
     collection: "Clinical technology",
     sourceFile: "Platform_eBrochure.pdf",
     content: {
@@ -226,8 +203,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
       },
       cta: {
         label: "Talk to Trial Interactive",
-        subhead:
-          "eClinical platform for global product development — info@trialinteractive.com",
+        subhead: "eClinical platform for global product development — info@trialinteractive.com",
         url: "https://www.trialinteractive.com",
       },
       heroMedia: hero(heroTiPlatform.url, 34, 50),
@@ -321,8 +297,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
       },
       cta: {
         label: "Talk to Trial Interactive",
-        subhead:
-          "TMF Quality Services — info@trialinteractive.com",
+        subhead: "TMF Quality Services — info@trialinteractive.com",
         url: "https://www.trialinteractive.com",
       },
       heroMedia: hero(heroTmfQuality.url, 38, 50),
@@ -333,14 +308,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
     title: "Applanga for Digital Health & eCOA",
     teaser:
       "A cloud-based localization platform that automates app localization for digital health and eCOA, and stores completed content for re-use across studies.",
-    tags: [
-      "applanga",
-      "digital health",
-      "ecoa",
-      "app localization",
-      "content reuse",
-      "platform",
-    ],
+    tags: ["applanga", "digital health", "ecoa", "app localization", "content reuse", "platform"],
     collection: "Clinical technology",
     sourceFile: "Life_Sciences_Applanga_for_Digital_Health_and_eCOA_2024.pdf",
     content: {
@@ -415,13 +383,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
     title: "Local Literature Monitoring",
     teaser:
       "Centralized, automated literature monitoring with multilingual support across every stage of case processing — increasing safety reporting activities up to 85%.",
-    tags: [
-      "literature monitoring",
-      "pharmacovigilance",
-      "safety",
-      "automation",
-      "case processing",
-    ],
+    tags: ["literature monitoring", "pharmacovigilance", "safety", "automation", "case processing"],
     collection: "Pharmacovigilance & safety",
     sourceFile: "Life_Sciences_Literature_Monitoring_Solutions.pdf",
     content: {
@@ -487,8 +449,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
       },
       cta: {
         label: "Talk to TransPerfect Life Sciences",
-        subhead:
-          "A measure of confidence for your global studies — lifesciences@transperfect.com",
+        subhead: "A measure of confidence for your global studies — lifesciences@transperfect.com",
         url: "https://lifesciences.transperfect.com",
       },
       heroMedia: hero(heroLitMonitoring.url, 40, 45),
@@ -570,8 +531,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
       },
       cta: {
         label: "Talk to TransPerfect Life Sciences",
-        subhead:
-          "Lab to Launch. Patient to Practitioner. — PVSafetySolutions@transperfect.com",
+        subhead: "Lab to Launch. Patient to Practitioner. — PVSafetySolutions@transperfect.com",
         url: "https://lifesciences.transperfect.com",
       },
       heroMedia: hero(heroPvSafety.url, 40, 50),
@@ -582,14 +542,7 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
     title: "Commercial & Corporate AI Transformation Program",
     teaser:
       "A proven strategy tested with top 10 pharmaceutical companies to transform commercial and corporate content work with machine learning and AI.",
-    tags: [
-      "ai",
-      "generative ai",
-      "machine translation",
-      "commercial",
-      "corporate",
-      "workflow",
-    ],
+    tags: ["ai", "generative ai", "machine translation", "commercial", "corporate", "workflow"],
     collection: "AI & automation",
     sourceFile: "LifeSci_AI_Programme_One_Pager_for_Commercial_Corporate.pdf",
     content: {
@@ -662,12 +615,10 @@ export const LIFESCI_EBROCHURES: LifeSciEbrochureSeed[] = [
       },
       cta: {
         label: "Talk to TransPerfect Life Sciences",
-        subhead:
-          "Commercial & corporate AI transformation — lifesciences@transperfect.com",
+        subhead: "Commercial & corporate AI transformation — lifesciences@transperfect.com",
         url: "https://lifesciences.transperfect.com",
       },
       heroMedia: hero(heroCommercialAi.url, 38, 50),
     },
   },
 ];
-

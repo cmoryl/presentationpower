@@ -14,11 +14,7 @@ import { DESIGN_SKINS, INDUSTRY_RECIPES } from "@/lib/design-skins";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
 import { validateLook } from "@/lib/look-validate";
-import {
-  usePublishDemoOverride,
-  useResetDemoOverride,
-  type DemoKind,
-} from "@/lib/demo-overrides";
+import { usePublishDemoOverride, useResetDemoOverride, type DemoKind } from "@/lib/demo-overrides";
 
 type Props = {
   demoKind: DemoKind;
@@ -111,8 +107,8 @@ export function DemoStyleAdmin({
               Admin · demo look &amp; backgrounds
             </div>
             <p className="mt-1 text-[12px] text-black/55 dark:text-white/55">
-              Swap the visual language or background family for the {divisionLabel} demo and
-              publish it live. For slide-by-slide background art, use “Edit live demo”.
+              Swap the visual language or background family for the {divisionLabel} demo and publish
+              it live. For slide-by-slide background art, use “Edit live demo”.
             </p>
           </div>
         </div>
@@ -150,9 +146,7 @@ export function DemoStyleAdmin({
         </label>
 
         <label className="block text-[12px]">
-          <span className="font-medium text-black/60 dark:text-white/60">
-            Background family
-          </span>
+          <span className="font-medium text-black/60 dark:text-white/60">Background family</span>
           <select
             value={recipeId ?? ""}
             onChange={(e) => setRecipeId(e.target.value)}

@@ -51,7 +51,7 @@ export async function loadSlides(
     .eq("deck_id", deckId)
     .order("position", { ascending: true });
   if (error) return { ok: false, error: error.message };
-  return { ok: true, slides: ((data ?? []) as unknown as SlideRow[]) };
+  return { ok: true, slides: (data ?? []) as unknown as SlideRow[] };
 }
 
 /** Touch the deck so the app's lists and version history see the change. */

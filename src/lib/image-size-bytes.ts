@@ -52,7 +52,8 @@ function jpeg(b: Uint8Array): PixelSize | null {
     }
     const len = u16(b, i + 2);
     // SOF0..SOF15 except the DHT/JPG/DAC slots hold the frame dimensions.
-    const isSof = marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc;
+    const isSof =
+      marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc;
     if (isSof) return { width: u16(b, i + 7), height: u16(b, i + 5) };
     i += 2 + Math.max(len, 2);
   }

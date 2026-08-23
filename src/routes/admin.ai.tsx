@@ -8,6 +8,24 @@ import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
 export const Route = createFileRoute("/admin/ai")({
+  head: () => ({
+    meta: [
+      { title: "AI usage · Admin · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Track Element AI generation volume, model mix and per-surface spend across decks, print and social.",
+      },
+      { property: "og:title", content: "AI usage · Admin · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Track Element AI generation volume, model mix and per-surface spend across decks, print and social.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: AiView,
 });
 

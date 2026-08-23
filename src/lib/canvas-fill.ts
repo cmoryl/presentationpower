@@ -56,5 +56,5 @@ export function canvasFillCss(spec: CanvasFillSpec, fallback = "rgba(255,255,255
  * "to top"; OOXML `lin@ang` measures clockwise from "to right".
  */
 export function cssAngleToOoxml(angleDeg: number): number {
-  return ((Math.round(angleDeg) - 90) % 360 + 360) % 360;
+  return (((Math.round(angleDeg) - 90) % 360) + 360) % 360;
 }

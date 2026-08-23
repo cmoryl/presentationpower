@@ -151,7 +151,12 @@ export function coerceDesignOverrides(value: unknown): DesignOverrides | null {
 export function designOverridesSummary(o: DesignOverrides): string {
   const bits: string[] = [];
   if (o.mode) bits.push(`${o.mode} mode`);
-  const colors = [o.palette?.background, o.palette?.ink, o.palette?.accent, o.palette?.accent2].filter(Boolean);
+  const colors = [
+    o.palette?.background,
+    o.palette?.ink,
+    o.palette?.accent,
+    o.palette?.accent2,
+  ].filter(Boolean);
   if (colors.length) bits.push(`${colors.length} color${colors.length > 1 ? "s" : ""}`);
   if (o.cardShape) bits.push(SHAPE_OVERRIDE_LABEL[o.cardShape].toLowerCase());
   if (o.cornerRadius) bits.push(`${o.cornerRadius} corners`);
@@ -173,7 +178,8 @@ export function designOverridesPromptBlock(o: DesignOverrides): string {
   if (p.ink) lines.push(`- Primary text / ink: ${p.ink}`);
   if (p.accent) lines.push(`- Primary accent: ${p.accent}`);
   if (p.accent2) lines.push(`- Secondary accent: ${p.accent2}`);
-  if (o.cardShape) lines.push(`- Box / card layout: ${SHAPE_OVERRIDE_LABEL[o.cardShape]} (${o.cardShape})`);
+  if (o.cardShape)
+    lines.push(`- Box / card layout: ${SHAPE_OVERRIDE_LABEL[o.cardShape]} (${o.cardShape})`);
   if (o.cornerRadius) lines.push(`- Corner treatment: ${o.cornerRadius}`);
   if (o.backdrop)
     lines.push(
@@ -182,7 +188,9 @@ export function designOverridesPromptBlock(o: DesignOverrides): string {
         : `- Backdrop motif: ${BACKDROP_OVERRIDE_LABEL[o.backdrop]} (${o.backdrop}) on every section scene`,
     );
   if (o.backdropIntensity !== undefined)
-    lines.push(`- Backdrop intensity: ${o.backdropIntensity}/100 (0 = flat, 100 = maximum presence)`);
+    lines.push(
+      `- Backdrop intensity: ${o.backdropIntensity}/100 (0 = flat, 100 = maximum presence)`,
+    );
   if (o.notes?.trim()) lines.push(`- Extra direction: ${o.notes.trim()}`);
   lines.push(
     "Reflect these values verbatim in plan_visual_design (palette, geometry, scenes) and in the slides you build. Where an override conflicts with the imported DNA or the chosen skin, the override wins and you say so in one short line.",
@@ -204,7 +212,10 @@ export function readStoredDesignOverrides(threadId: string | undefined): DesignO
   }
 }
 
-export function writeStoredDesignOverrides(threadId: string | undefined, o: DesignOverrides | null) {
+export function writeStoredDesignOverrides(
+  threadId: string | undefined,
+  o: DesignOverrides | null,
+) {
   if (!threadId || typeof window === "undefined") return;
   try {
     if (o && !isEmptyOverrides(o)) window.localStorage.setItem(key(threadId), JSON.stringify(o));

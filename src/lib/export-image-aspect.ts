@@ -69,7 +69,6 @@ async function measureImageAspectHeadless(src: string): Promise<void> {
   }
 }
 
-
 /**
  * Aspect-correct rectangle for a picture inside a box.
  *

@@ -65,7 +65,8 @@ function block(xml: string, tag: string): { start: number; end: number; text: st
  */
 export function orderPresentationLists(xml: string): string {
   const found = PRES_ORDER.map((tag) => ({ tag, ...(block(xml, tag) ?? {}) })).filter(
-    (b): b is { tag: string; start: number; end: number; text: string } => typeof b.start === "number",
+    (b): b is { tag: string; start: number; end: number; text: string } =>
+      typeof b.start === "number",
   );
   if (found.length < 2) return xml;
 

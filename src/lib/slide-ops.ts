@@ -152,7 +152,8 @@ export function resolveVariantSwap(
   const id = String(variantId ?? "").trim();
   if (!id) return { ok: false, error: "variantId required" };
   const permitted = sectionId ? variantsForSection(sectionId) : [];
-  const next = permitted.find((v) => v.id === id) ?? (sectionId ? undefined : byId(MODULE_VARIANTS, id));
+  const next =
+    permitted.find((v) => v.id === id) ?? (sectionId ? undefined : byId(MODULE_VARIANTS, id));
   if (!next) {
     return {
       ok: false,

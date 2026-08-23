@@ -107,10 +107,7 @@ export async function buildDebugManifest(
 }
 
 function esc(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function objectLine(o: LayerObject): string {
@@ -175,7 +172,6 @@ export async function annotateDebugPptx(zip: JSZip, manifest: DebugManifest): Pr
 
   const { repackPptx } = await import("./pptx-repack");
   return await repackPptx(zip);
-
 }
 
 /** Trigger a browser download for the sidecar manifest. */

@@ -322,7 +322,6 @@ function DecksIndex() {
           empty (new device, cleared storage) while the workspace is not. */}
       <MyCloudDecks />
     </AppShell>
-
   );
 }
 
@@ -600,7 +599,6 @@ function EmptyNew({ signedIn }: { signedIn: boolean | null }) {
     </div>
   );
 }
-
 
 function EmptyNoMatches({ onClear }: { onClear: () => void }) {
   return (

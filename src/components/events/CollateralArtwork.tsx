@@ -73,7 +73,6 @@ function photoForKind(kind: ArtKind, ctx: CollateralContext): string | undefined
   return ctx.photo[crop];
 }
 
-
 export type ArtKind =
   | "badge"
   | "lanyard"
@@ -240,8 +239,6 @@ function useSocialStyle(): SocialStyle {
  *  treatment (cover crop + look-tinted scrim) with the social posts. */
 const PhotoContext = createContext<string | undefined>(undefined);
 
-
-
 /** Field graphic drawn behind the artwork — one geometry per look. */
 function MotifField({ opacity, color }: { opacity?: number; color?: string }) {
   const look = useLook();
@@ -260,10 +257,26 @@ function MotifField({ opacity, color }: { opacity?: number; color?: string }) {
       return (
         <svg aria-hidden viewBox="0 0 200 100" preserveAspectRatio="none" style={common}>
           {Array.from({ length: 21 }).map((_, i) => (
-            <line key={`v${i}`} x1={i * 10} y1={0} x2={i * 10} y2={100} stroke={c} strokeWidth={0.5} />
+            <line
+              key={`v${i}`}
+              x1={i * 10}
+              y1={0}
+              x2={i * 10}
+              y2={100}
+              stroke={c}
+              strokeWidth={0.5}
+            />
           ))}
           {Array.from({ length: 11 }).map((_, i) => (
-            <line key={`h${i}`} x1={0} y1={i * 10} x2={200} y2={i * 10} stroke={c} strokeWidth={0.5} />
+            <line
+              key={`h${i}`}
+              x1={0}
+              y1={i * 10}
+              x2={200}
+              y2={i * 10}
+              stroke={c}
+              strokeWidth={0.5}
+            />
           ))}
         </svg>
       );
@@ -428,7 +441,6 @@ function Field({
     </div>
   );
 }
-
 
 function Logo({
   ctx,
@@ -740,7 +752,6 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
   const sstyle = useSocialStyle();
   const lockupRow = lockupRowStyle(sstyle);
 
-
   switch (kind) {
     case "badge": {
       const track = label.toLowerCase().includes("speaker")
@@ -751,27 +762,67 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
       return (
         <Field light chevron={0.07}>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
-            <div style={{ background: NAVY, padding: "34px 30px 26px", display: "flex", justifyContent: "center" }}>
+            <div
+              style={{
+                background: NAVY,
+                padding: "34px 30px 26px",
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
               <Logo ctx={ctx} stacked width={300} />
             </div>
-            <div style={{ padding: "36px 34px", display: "flex", flexDirection: "column", gap: 14, flex: 1 }}>
-              <div style={{ fontSize: 20, letterSpacing: "0.22em", color: "rgba(3,0,44,0.5)", fontWeight: 700 }}>
+            <div
+              style={{
+                padding: "36px 34px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+                flex: 1,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 20,
+                  letterSpacing: "0.22em",
+                  color: "rgba(3,0,44,0.5)",
+                  fontWeight: 700,
+                }}
+              >
                 {ctx.city.toUpperCase()}
               </div>
-              <div style={{ fontSize: 62, fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1 }}>
+              <div
+                style={{ fontSize: 62, fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1 }}
+              >
                 Alex Moreau
               </div>
               <div style={{ fontSize: 26, color: "rgba(3,0,44,0.62)" }}>
                 VP Localization · Northwind Health
               </div>
               <div style={{ marginTop: "auto", display: "flex", alignItems: "center", gap: 14 }}>
-                <span style={{ width: 26, height: 26, borderRadius: 99, background: track.color }} />
-                <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "0.16em", color: NAVY }}>
+                <span
+                  style={{ width: 26, height: 26, borderRadius: 99, background: track.color }}
+                />
+                <span
+                  style={{ fontSize: 22, fontWeight: 800, letterSpacing: "0.16em", color: NAVY }}
+                >
                   {track.name}
                 </span>
               </div>
             </div>
-            <div style={{ height: 66, background: track.color, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 30px", fontSize: 20, fontWeight: 700, color: INK }}>
+            <div
+              style={{
+                height: 66,
+                background: track.color,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "0 30px",
+                fontSize: 20,
+                fontWeight: 700,
+                color: INK,
+              }}
+            >
               <span>{ctx.dateLine}</span>
               <span>{ctx.hashtag}</span>
             </div>
@@ -783,7 +834,17 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "lanyard":
       return (
         <Field chevron={0}>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-around", padding: "24px 0" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "space-around",
+              padding: "24px 0",
+            }}
+          >
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} style={{ transform: "rotate(-90deg)" }}>
                 <Logo ctx={ctx} width={150} />
@@ -798,9 +859,28 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
       const tier = tiers[label.length % tiers.length];
       return (
         <Field chevron={0.1}>
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", gap: 40, padding: "0 40px" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: 40,
+              padding: "0 40px",
+            }}
+          >
             <Logo ctx={ctx} width={320} />
-            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 34, fontWeight: 800, letterSpacing: "0.2em" }}>
+            <div
+              style={{
+                flex: 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                fontSize: 34,
+                fontWeight: 800,
+                letterSpacing: "0.2em",
+              }}
+            >
               <span>{tier}</span>
               <span style={{ color: "#7FD0FF" }}>{ctx.city}</span>
               <span style={{ opacity: 0.7 }}>{ctx.hashtag}</span>
@@ -814,9 +894,26 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "tower":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 56, display: "flex", flexDirection: "column", gap: 30 }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 56,
+              display: "flex",
+              flexDirection: "column",
+              gap: 30,
+            }}
+          >
             <Logo ctx={ctx} stacked width={kind === "tower" ? 340 : 420} />
-            <div style={{ marginTop: 30, fontSize: kind === "tower" ? 68 : 84, fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.02 }}>
+            <div
+              style={{
+                marginTop: 30,
+                fontSize: kind === "tower" ? 68 : 84,
+                fontWeight: 800,
+                letterSpacing: "-0.035em",
+                lineHeight: 1.02,
+              }}
+            >
               {kind === "tower" ? "This way to the main stage" : "One brand system, every market."}
             </div>
             <Rule />
@@ -833,7 +930,17 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "desk-runner":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 48, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 40 }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 48,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 40,
+            }}
+          >
             <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
               <Logo ctx={ctx} width={520} />
               <Rule w={180} />
@@ -843,7 +950,9 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
             </div>
             <div style={{ textAlign: "right", fontSize: 28, color: "#7FD0FF", fontWeight: 700 }}>
               {ctx.hashtag}
-              <div style={{ fontSize: 22, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>{ctx.url}</div>
+              <div style={{ fontSize: 22, color: "rgba(255,255,255,0.55)", fontWeight: 500 }}>
+                {ctx.url}
+              </div>
             </div>
           </div>
         </Field>
@@ -854,13 +963,36 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "video":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 64, display: "flex", flexDirection: "column", justifyContent: "center", gap: 26 }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 64,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: 26,
+            }}
+          >
             <Logo ctx={ctx} stacked width={430} />
-            <div style={{ fontSize: 46, fontWeight: 700, letterSpacing: "-0.02em", maxWidth: "70%" }}>
-              {kind === "video" ? "Session sizzle · sponsor loop" : "One brand system, every market."}
+            <div
+              style={{ fontSize: 46, fontWeight: 700, letterSpacing: "-0.02em", maxWidth: "70%" }}
+            >
+              {kind === "video"
+                ? "Session sizzle · sponsor loop"
+                : "One brand system, every market."}
             </div>
             <Meta ctx={ctx} size={26} />
-            <div style={{ position: "absolute", right: 64, bottom: 56, fontSize: 26, color: "#7FD0FF", fontWeight: 700 }}>
+            <div
+              style={{
+                position: "absolute",
+                right: 64,
+                bottom: 56,
+                fontSize: 26,
+                color: "#7FD0FF",
+                fontWeight: 700,
+              }}
+            >
               {ctx.hashtag}
             </div>
           </div>
@@ -870,12 +1002,26 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "video-vertical":
       return (
         <Field>
-          <div style={{ position: "absolute", inset: 0, padding: 46, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 26, textAlign: "center" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 46,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 26,
+              textAlign: "center",
+            }}
+          >
             <Logo ctx={ctx} stacked width={330} />
             <div style={{ fontSize: 96, fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1 }}>
               04:59
             </div>
-            <div style={{ fontSize: 26, letterSpacing: "0.2em", color: "#7FD0FF", fontWeight: 700 }}>
+            <div
+              style={{ fontSize: 26, letterSpacing: "0.2em", color: "#7FD0FF", fontWeight: 700 }}
+            >
               DOORS OPEN
             </div>
             <Meta ctx={ctx} size={22} />
@@ -886,9 +1032,23 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "floor-decal":
       return (
         <Field chevron={0.18}>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22, borderRadius: "50%", overflow: "hidden" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 22,
+              borderRadius: "50%",
+              overflow: "hidden",
+            }}
+          >
             <Logo ctx={ctx} stacked width={330} />
-            <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: "0.08em" }}>REGISTRATION →</div>
+            <div style={{ fontSize: 40, fontWeight: 800, letterSpacing: "0.08em" }}>
+              REGISTRATION →
+            </div>
             <div style={{ fontSize: 24, color: "rgba(255,255,255,0.7)" }}>{ctx.city}</div>
           </div>
         </Field>
@@ -896,7 +1056,16 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
 
     case "gobo":
       return (
-        <div style={{ position: "absolute", inset: 0, background: "#05070F", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "#05070F",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <div
             style={{
               width: "78%",
@@ -905,7 +1074,8 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "radial-gradient(circle, rgba(127,208,255,0.22) 0%, rgba(127,208,255,0.05) 62%, rgba(0,0,0,0) 72%)",
+              background:
+                "radial-gradient(circle, rgba(127,208,255,0.22) 0%, rgba(127,208,255,0.05) 62%, rgba(0,0,0,0) 72%)",
               boxShadow: "0 0 120px rgba(127,208,255,0.35)",
             }}
           >
@@ -917,9 +1087,20 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "rate-card":
       return (
         <Field light chevron={0.05}>
-          <div style={{ position: "absolute", inset: 0, padding: pad, display: "flex", flexDirection: "column", gap: 22 }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: pad,
+              display: "flex",
+              flexDirection: "column",
+              gap: 22,
+            }}
+          >
             <Logo ctx={ctx} width={330} colorway="color" />
-            <div style={{ fontSize: 42, fontWeight: 800, letterSpacing: "-0.03em" }}>Sponsor rate card</div>
+            <div style={{ fontSize: 42, fontWeight: 800, letterSpacing: "-0.03em" }}>
+              Sponsor rate card
+            </div>
             <Rule w={120} h={5} />
             {[
               ["Platinum", "$75,000", "Stage · keynote · 6 passes"],
@@ -927,7 +1108,17 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               ["Silver", "$22,000", "Expo pod · 2 passes"],
               ["Community", "$8,500", "Logo rail · 1 pass"],
             ].map(([tier, price, inc]) => (
-              <div key={tier} style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16, borderBottom: "1px solid rgba(3,0,44,0.12)", paddingBottom: 12 }}>
+              <div
+                key={tier}
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                  gap: 16,
+                  borderBottom: "1px solid rgba(3,0,44,0.12)",
+                  paddingBottom: 12,
+                }}
+              >
                 <div>
                   <div style={{ fontSize: 26, fontWeight: 800, color: NAVY }}>{tier}</div>
                   <div style={{ fontSize: 18, color: "rgba(3,0,44,0.6)" }}>{inc}</div>
@@ -945,13 +1136,41 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "certificate":
       return (
         <Field light chevron={0.05}>
-          <div style={{ position: "absolute", inset: 26, border: `4px solid ${NAVY}`, borderRadius: 8 }} />
-          <div style={{ position: "absolute", inset: 0, padding: 76, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, textAlign: "center" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 26,
+              border: `4px solid ${NAVY}`,
+              borderRadius: 8,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 76,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 20,
+              textAlign: "center",
+            }}
+          >
             <Logo ctx={ctx} width={300} colorway="color" />
-            <div style={{ fontSize: 22, letterSpacing: "0.3em", color: "rgba(3,0,44,0.55)", fontWeight: 700 }}>
+            <div
+              style={{
+                fontSize: 22,
+                letterSpacing: "0.3em",
+                color: "rgba(3,0,44,0.55)",
+                fontWeight: 700,
+              }}
+            >
               CERTIFICATE OF PARTNERSHIP
             </div>
-            <div style={{ fontSize: 52, fontWeight: 800, letterSpacing: "-0.03em" }}>Northwind Health</div>
+            <div style={{ fontSize: 52, fontWeight: 800, letterSpacing: "-0.03em" }}>
+              Northwind Health
+            </div>
             <div style={{ fontSize: 22, color: "rgba(3,0,44,0.62)", maxWidth: 640 }}>
               recognised as a Platinum partner of {ctx.eventName}, {ctx.city}.
             </div>
@@ -969,14 +1188,33 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
             <div style={{ background: NAVY, padding: 34 }}>
               <Logo ctx={ctx} width={300} />
             </div>
-            <div style={{ padding: 34, display: "flex", flexDirection: "column", gap: 16, flex: 1 }}>
+            <div
+              style={{ padding: 34, display: "flex", flexDirection: "column", gap: 16, flex: 1 }}
+            >
               <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-0.02em" }}>
                 {kind === "program" ? "Programme" : "Session 3 · Global content ops"}
               </div>
               <Rule w={90} h={5} />
-              {["09:00 Doors + coffee", "09:45 Opening keynote", "11:00 Track sessions", "13:00 Partner lunch", "15:30 City spotlight"].map((row) => (
-                <div key={row} style={{ display: "flex", gap: 12, fontSize: 20, color: "rgba(3,0,44,0.72)" }}>
-                  <span style={{ width: 8, height: 8, borderRadius: 99, background: BLUE, marginTop: 8 }} />
+              {[
+                "09:00 Doors + coffee",
+                "09:45 Opening keynote",
+                "11:00 Track sessions",
+                "13:00 Partner lunch",
+                "15:30 City spotlight",
+              ].map((row) => (
+                <div
+                  key={row}
+                  style={{ display: "flex", gap: 12, fontSize: 20, color: "rgba(3,0,44,0.72)" }}
+                >
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: 99,
+                      background: BLUE,
+                      marginTop: 8,
+                    }}
+                  />
                   {row}
                 </div>
               ))}
@@ -1010,8 +1248,12 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
                   <>
                     <Logo ctx={ctx} stacked width={230} />
                     <div style={{ fontSize: 24, fontWeight: 700 }}>{ctx.city}</div>
-                    <div style={{ fontSize: 18, color: "rgba(255,255,255,0.7)" }}>{ctx.dateLine}</div>
-                    <div style={{ marginTop: "auto", fontSize: 18, color: "#7FD0FF" }}>{ctx.hashtag}</div>
+                    <div style={{ fontSize: 18, color: "rgba(255,255,255,0.7)" }}>
+                      {ctx.dateLine}
+                    </div>
+                    <div style={{ marginTop: "auto", fontSize: 18, color: "#7FD0FF" }}>
+                      {ctx.hashtag}
+                    </div>
                   </>
                 ) : (
                   <>
@@ -1032,7 +1274,16 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "business-card":
       return (
         <Field chevron={0.1}>
-          <div style={{ position: "absolute", inset: 0, padding: 46, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 46,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
             <Logo ctx={ctx} width={kind === "business-card" ? 340 : 380} />
             {kind === "business-card" ? (
               <div style={{ fontSize: 22, lineHeight: 1.5 }}>
@@ -1051,10 +1302,26 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
 
     case "email":
       return (
-        <div style={{ position: "absolute", inset: 0, background: "#F4F6FB", display: "flex", flexDirection: "column" }}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "#F4F6FB",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <div style={{ position: "relative", height: 250, ...darkField() }}>
             <ChevronField opacity={0.14} />
-            <div style={{ position: "relative", padding: 34, display: "flex", flexDirection: "column", gap: 14 }}>
+            <div
+              style={{
+                position: "relative",
+                padding: 34,
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+              }}
+            >
               <div style={lockupRow}>
                 <Logo ctx={ctx} width={280} />
               </div>
@@ -1064,7 +1331,9 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               </div>
             </div>
           </div>
-          <div style={{ padding: 34, display: "flex", flexDirection: "column", gap: 18, color: INK }}>
+          <div
+            style={{ padding: 34, display: "flex", flexDirection: "column", gap: 18, color: INK }}
+          >
             <div style={titleStyle(sstyle, 26)}>You&rsquo;re invited</div>
             <StyleRule w={104} h={6} />
             <Lines n={6} />
@@ -1136,7 +1405,13 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
                     }}
                   >
                     <div style={{ fontSize: 34, fontWeight: 800 }}>{n}</div>
-                    <div style={{ fontSize: 14, color: "rgba(255,255,255,0.6)", letterSpacing: "0.14em" }}>
+                    <div
+                      style={{
+                        fontSize: 14,
+                        color: "rgba(255,255,255,0.6)",
+                        letterSpacing: "0.14em",
+                      }}
+                    >
                       {["DAYS", "HRS", "MIN", "SEC"][i]}
                     </div>
                   </div>
@@ -1148,13 +1423,24 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
         </Field>
       );
 
-
     case "tshirt":
       return (
         <Field chevron={0}>
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 24 }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              gap: 24,
+            }}
+          >
             <Logo ctx={ctx} stacked width={420} />
-            <div style={{ fontSize: 26, letterSpacing: "0.28em", color: "#7FD0FF", fontWeight: 700 }}>
+            <div
+              style={{ fontSize: 26, letterSpacing: "0.28em", color: "#7FD0FF", fontWeight: 700 }}
+            >
               {ctx.city.toUpperCase()}
             </div>
           </div>
@@ -1165,7 +1451,17 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "notebook":
       return (
         <Field chevron={kind === "tote" ? 0.12 : 0.08}>
-          <div style={{ position: "absolute", inset: 0, padding: 56, display: "flex", flexDirection: "column", justifyContent: "center", gap: 22 }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 56,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: 22,
+            }}
+          >
             <Logo ctx={ctx} stacked width={kind === "tote" ? 380 : 300} />
             <Rule w={120} />
             <div style={{ fontSize: 24, color: "rgba(255,255,255,0.72)" }}>
@@ -1178,7 +1474,16 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "bottle":
       return (
         <Field chevron={0.12}>
-          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 60px" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 60px",
+            }}
+          >
             <Logo ctx={ctx} width={420} />
             <div style={{ fontSize: 26, fontWeight: 700, color: "#7FD0FF" }}>{ctx.hashtag}</div>
           </div>
@@ -1188,7 +1493,17 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     case "stickers":
       return (
         <Field light chevron={0.05}>
-          <div style={{ position: "absolute", inset: 0, padding: 40, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 26, alignContent: "start" }}>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 40,
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 26,
+              alignContent: "start",
+            }}
+          >
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
@@ -1216,8 +1531,22 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
     // composition instead of an empty tile.
     case "social-square":
       return (
-        <Field chevron={0.1} style={{ background: `linear-gradient(150deg, ${NAVY} 0%, #0B1226 62%, ${ctx.accent}44 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 84, display: "flex", flexDirection: "column", gap: 26}}>
+        <Field
+          chevron={0.1}
+          style={{
+            background: `linear-gradient(150deg, ${NAVY} 0%, #0B1226 62%, ${ctx.accent}44 100%)`,
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 84,
+              display: "flex",
+              flexDirection: "column",
+              gap: 26,
+            }}
+          >
             <div style={lockupRow}>
               <Logo ctx={ctx} width={360} />
             </div>
@@ -1227,7 +1556,14 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
               <div style={{ fontSize: 30, color: "rgba(255,255,255,0.72)", lineHeight: 1.3 }}>
                 {ctx.city} · {ctx.venue}
               </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 26 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 26,
+                }}
+              >
                 <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
                 <span style={{ color: "rgba(255,255,255,0.55)" }}>{ctx.url}</span>
               </div>
@@ -1238,15 +1574,31 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
 
     case "social-story":
       return (
-        <Field chevron={0.09} style={{ background: `linear-gradient(190deg, ${NAVY} 0%, #0A1023 58%, ${ctx.accent}3d 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 92, display: "flex", flexDirection: "column", gap: 30}}>
+        <Field
+          chevron={0.09}
+          style={{
+            background: `linear-gradient(190deg, ${NAVY} 0%, #0A1023 58%, ${ctx.accent}3d 100%)`,
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 92,
+              display: "flex",
+              flexDirection: "column",
+              gap: 30,
+            }}
+          >
             <div style={lockupRow}>
               <Logo ctx={ctx} width={340} />
             </div>
             <CopyPlate shortEdge={1080} pad={60}>
               <Eyebrow size={26}>{ctx.dateLine.toUpperCase()}</Eyebrow>
               <div style={titleStyle(sstyle, 96)}>{ctx.eventName}</div>
-              <div style={{ fontSize: 34, color: "rgba(255,255,255,0.7)", lineHeight: 1.32 }}>{ctx.venue}</div>
+              <div style={{ fontSize: 34, color: "rgba(255,255,255,0.7)", lineHeight: 1.32 }}>
+                {ctx.venue}
+              </div>
               <Cta size={30}>{ctx.hashtag}</Cta>
             </CopyPlate>
           </div>
@@ -1255,18 +1607,53 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
 
     case "social-wide":
       return (
-        <Field chevron={0.11} style={{ background: `linear-gradient(115deg, ${NAVY} 0%, #0B1226 55%, ${ctx.accent}3a 100%)` }}>
-          <div style={{ position: "absolute", inset: 0, padding: 72, display: "flex", flexDirection: "column", gap: 22}}>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", ...lockupRow }}>
+        <Field
+          chevron={0.11}
+          style={{
+            background: `linear-gradient(115deg, ${NAVY} 0%, #0B1226 55%, ${ctx.accent}3a 100%)`,
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 72,
+              display: "flex",
+              flexDirection: "column",
+              gap: 22,
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-start",
+                justifyContent: "space-between",
+                ...lockupRow,
+              }}
+            >
               <Logo ctx={ctx} width={330} />
-              <span style={{ fontSize: 22, letterSpacing: "0.18em", color: "rgba(255,255,255,0.6)", fontWeight: 700 }}>
+              <span
+                style={{
+                  fontSize: 22,
+                  letterSpacing: "0.18em",
+                  color: "rgba(255,255,255,0.6)",
+                  fontWeight: 700,
+                }}
+              >
                 {ctx.city.toUpperCase()}
               </span>
             </div>
             <CopyPlate shortEdge={628} pad={44}>
               <StyleRule w={120} h={7} />
               <div style={titleStyle(sstyle, 62, "82%")}>{ctx.eventName}</div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 24 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  fontSize: 24,
+                }}
+              >
                 <span style={{ color: "rgba(255,255,255,0.7)" }}>{ctx.venue}</span>
                 <span style={{ color: ctx.accent, fontWeight: 700 }}>{ctx.hashtag}</span>
               </div>
@@ -1277,7 +1664,12 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
 
     case "signature-strip":
       return (
-        <Field chevron={0.07} style={{ background: `linear-gradient(100deg, ${NAVY} 0%, #0B1226 70%, ${ctx.accent}33 100%)` }}>
+        <Field
+          chevron={0.07}
+          style={{
+            background: `linear-gradient(100deg, ${NAVY} 0%, #0B1226 70%, ${ctx.accent}33 100%)`,
+          }}
+        >
           <div
             style={{
               position: "absolute",
@@ -1302,7 +1694,6 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
         </Field>
       );
 
-
     case "doc":
     default:
       return (
@@ -1310,9 +1701,19 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column" }}>
             <div style={{ position: "relative", height: 330, ...darkField() }}>
               <ChevronField opacity={0.16} />
-              <div style={{ position: "relative", padding: 44, display: "flex", flexDirection: "column", gap: 16 }}>
+              <div
+                style={{
+                  position: "relative",
+                  padding: 44,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 16,
+                }}
+              >
                 <Logo ctx={ctx} width={340} />
-                <div style={{ color: "#fff", fontSize: 40, fontWeight: 800, letterSpacing: "-0.03em" }}>
+                <div
+                  style={{ color: "#fff", fontSize: 40, fontWeight: 800, letterSpacing: "-0.03em" }}
+                >
                   {label}
                 </div>
                 <div style={{ color: "rgba(255,255,255,0.7)", fontSize: 20 }}>
@@ -1320,18 +1721,34 @@ function Artwork({ kind, ctx, label }: { kind: ArtKind; ctx: CollateralContext; 
                 </div>
               </div>
             </div>
-            <div style={{ padding: 44, display: "flex", flexDirection: "column", gap: 20, flex: 1 }}>
+            <div
+              style={{ padding: 44, display: "flex", flexDirection: "column", gap: 20, flex: 1 }}
+            >
               <div style={{ fontSize: 26, fontWeight: 800, color: NAVY }}>Audience & reach</div>
               <div style={{ display: "flex", gap: 14 }}>
-                {[["6", "cities"], ["180", "per stop"], ["600", "registrations"]].map(([n, l]) => (
-                  <div key={l} style={{ flex: 1, border: "1px solid rgba(3,0,44,0.12)", borderRadius: 14, padding: 16 }}>
+                {[
+                  ["6", "cities"],
+                  ["180", "per stop"],
+                  ["600", "registrations"],
+                ].map(([n, l]) => (
+                  <div
+                    key={l}
+                    style={{
+                      flex: 1,
+                      border: "1px solid rgba(3,0,44,0.12)",
+                      borderRadius: 14,
+                      padding: 16,
+                    }}
+                  >
                     <div style={{ fontSize: 34, fontWeight: 800, color: BLUE }}>{n}</div>
                     <div style={{ fontSize: 16, color: "rgba(3,0,44,0.55)" }}>{l}</div>
                   </div>
                 ))}
               </div>
               <Lines n={8} />
-              <div style={{ marginTop: "auto", fontSize: 16, color: "rgba(3,0,44,0.5)" }}>{ctx.url}</div>
+              <div style={{ marginTop: "auto", fontSize: 16, color: "rgba(3,0,44,0.5)" }}>
+                {ctx.url}
+              </div>
             </div>
           </div>
         </Field>
@@ -1359,9 +1776,7 @@ export function CollateralArtwork(props: {
         </PhotoContext.Provider>
       </StyleContext.Provider>
     </LookContext.Provider>
-
   );
-
 }
 
 function CollateralArtworkFramed({
@@ -1411,7 +1826,14 @@ function CollateralArtworkFramed({
             backgroundColor: "#7C879F",
           }}
         />
-        <div style={{ width: displayWidth * 0.1, height: displayWidth * 0.05, background: "#C7CEDD", borderRadius: 2 }} />
+        <div
+          style={{
+            width: displayWidth * 0.1,
+            height: displayWidth * 0.05,
+            background: "#C7CEDD",
+            borderRadius: 2,
+          }}
+        />
         <div style={{ borderRadius: 14, overflow: "hidden", boxShadow: shadow }}>{art}</div>
       </div>
     );
@@ -1449,7 +1871,12 @@ function CollateralArtworkFramed({
         }}
       >
         <div style={{ width: displayWidth * 0.52, borderRadius: 6, overflow: "hidden" }}>
-          <CollateralArtworkInner kind="tshirt" ctx={ctx} label={label} width={displayWidth * 0.52} />
+          <CollateralArtworkInner
+            kind="tshirt"
+            ctx={ctx}
+            label={label}
+            width={displayWidth * 0.52}
+          />
         </div>
       </div>
     );
@@ -1457,7 +1884,14 @@ function CollateralArtworkFramed({
 
   if (kind === "tote") {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: displayWidth }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: displayWidth,
+        }}
+      >
         <div style={{ display: "flex", gap: displayWidth * 0.3 }}>
           {[0, 1].map((i) => (
             <div
@@ -1473,7 +1907,14 @@ function CollateralArtworkFramed({
             />
           ))}
         </div>
-        <div style={{ borderRadius: "4px 4px 12px 12px", overflow: "hidden", boxShadow: shadow, width: "100%" }}>
+        <div
+          style={{
+            borderRadius: "4px 4px 12px 12px",
+            overflow: "hidden",
+            boxShadow: shadow,
+            width: "100%",
+          }}
+        >
           {art}
         </div>
       </div>
@@ -1507,7 +1948,9 @@ function CollateralArtworkFramed({
 
   if (kind === "gobo" || kind === "floor-decal") {
     return (
-      <div style={{ width: displayWidth, borderRadius: "50%", overflow: "hidden", boxShadow: shadow }}>
+      <div
+        style={{ width: displayWidth, borderRadius: "50%", overflow: "hidden", boxShadow: shadow }}
+      >
         {art}
       </div>
     );
@@ -1515,8 +1958,24 @@ function CollateralArtworkFramed({
 
   if (kind === "web-hero" || kind === "zoom" || kind === "video" || kind === "video-vertical") {
     return (
-      <div style={{ width: displayWidth, borderRadius: 12, overflow: "hidden", boxShadow: shadow, background: "#0B1020" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 10px", background: "#151C33" }}>
+      <div
+        style={{
+          width: displayWidth,
+          borderRadius: 12,
+          overflow: "hidden",
+          boxShadow: shadow,
+          background: "#0B1020",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "8px 10px",
+            background: "#151C33",
+          }}
+        >
           {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => (
             <span key={c} style={{ width: 8, height: 8, borderRadius: 99, background: c }} />
           ))}
@@ -1558,12 +2017,16 @@ function CollateralArtworkFramed({
 
   if (kind === "lanyard") {
     return (
-      <div style={{ width: displayWidth, borderRadius: 6, overflow: "hidden", boxShadow: shadow }}>{art}</div>
+      <div style={{ width: displayWidth, borderRadius: 6, overflow: "hidden", boxShadow: shadow }}>
+        {art}
+      </div>
     );
   }
 
   return (
-    <div style={{ width: displayWidth, borderRadius: 10, overflow: "hidden", boxShadow: shadow }}>{art}</div>
+    <div style={{ width: displayWidth, borderRadius: 10, overflow: "hidden", boxShadow: shadow }}>
+      {art}
+    </div>
   );
 }
 

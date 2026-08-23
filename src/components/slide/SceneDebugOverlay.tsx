@@ -67,7 +67,11 @@ export function SceneDebugOverlay({
   aiBackdrop,
 }: Props) {
   const on = useSceneDebug();
-  const [assets, setAssets] = useState<{ layers: number; media: string[]; backdropPainted: boolean }>({
+  const [assets, setAssets] = useState<{
+    layers: number;
+    media: string[];
+    backdropPainted: boolean;
+  }>({
     layers: 0,
     media: [],
     backdropPainted: false,
@@ -82,7 +86,9 @@ export function SceneDebugOverlay({
           img.getAttribute("data-media-kind") ??
           (img.hasAttribute("data-pack-ai-backdrop") ? "ai-backdrop" : "img");
         const src = img.currentSrc || img.src || "";
-        const fmt = /\.(webp|png|jpe?g|svg|avif)/i.exec(src)?.[1]?.toLowerCase() ?? (src.startsWith("data:") ? src.slice(5, src.indexOf(";")) : "?");
+        const fmt =
+          /\.(webp|png|jpe?g|svg|avif)/i.exec(src)?.[1]?.toLowerCase() ??
+          (src.startsWith("data:") ? src.slice(5, src.indexOf(";")) : "?");
         return `${kind}:${fmt}`;
       });
       setAssets({
@@ -148,7 +154,10 @@ export function SceneDebugOverlay({
         <span style={{ fontSize: 10, opacity: 0.6 }}>Shift+D</span>
       </div>
       <Row k="module" v={`${variant}${layoutId && layoutId !== variant ? ` · ${layoutId}` : ""}`} />
-      <Row k="look" v={pack ? `${pack.id} — ${pack.label} (${pack.mode})` : "brand system (no pack)"} />
+      <Row
+        k="look"
+        v={pack ? `${pack.id} — ${pack.label} (${pack.mode})` : "brand system (no pack)"}
+      />
       <Row k="scene" v={`${scene} · via ${sceneSource}`} />
       <Row k="composition" v={`${info.comp} · seed ${info.seed}`} />
       {info.geo && (
@@ -170,10 +179,25 @@ export function SceneDebugOverlay({
         />
       )}
       <Row k="chart" v={`bar ${info.chart.bar} · ratio ${info.chart.barRatio.toFixed(2)}`} />
-      <Row k="ground" v={pack ? (isCuratedGroundPack(pack) ? "curated (full sheet)" : "damped + masked") : "brand aurora"} />
+      <Row
+        k="ground"
+        v={
+          pack
+            ? isCuratedGroundPack(pack)
+              ? "curated (full sheet)"
+              : "damped + masked"
+            : "brand aurora"
+        }
+      />
       <Row
         k="ai backdrop"
-        v={aiBackdrop ? (assets.backdropPainted ? "resolved + painted" : "resolved, NOT painted") : "none"}
+        v={
+          aiBackdrop
+            ? assets.backdropPainted
+              ? "resolved + painted"
+              : "resolved, NOT painted"
+            : "none"
+        }
         warn={mismatch}
       />
       <Row k="mode" v={mode} />

@@ -143,7 +143,6 @@ export function ExtractedImageSaver({
     }
   }
 
-
   function toggle(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -166,8 +165,8 @@ export function ExtractedImageSaver({
           <DialogTitle>Extracted imagery</DialogTitle>
           <DialogDescription>
             Pick the pictures recovered from this deck and choose a division — they are filed into
-            that division&apos;s master imagery library, available everywhere it&apos;s used (briefs,
-            print and social).
+            that division&apos;s master imagery library, available everywhere it&apos;s used
+            (briefs, print and social).
           </DialogDescription>
         </DialogHeader>
 
@@ -198,9 +197,7 @@ export function ExtractedImageSaver({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() =>
-              setSelected(allSelected ? new Set() : new Set(images.map((i) => i.id)))
-            }
+            onClick={() => setSelected(allSelected ? new Set() : new Set(images.map((i) => i.id)))}
             disabled={!images.length}
           >
             {allSelected ? "Clear selection" : "Select all"}
@@ -317,7 +314,6 @@ export function ExtractedImageSaver({
                         <Maximize2 className="h-4 w-4" strokeWidth={1.75} />
                       </Button>
                     </div>
-
                   </li>
                 );
               })}
@@ -327,8 +323,7 @@ export function ExtractedImageSaver({
 
         {(() => {
           const img = images.find((i) => i.id === inspectId);
-          const divisionLabel =
-            BRAND_MODES.find((b) => b.id === divisionId)?.name ?? divisionId;
+          const divisionLabel = BRAND_MODES.find((b) => b.id === divisionId)?.name ?? divisionId;
           return (
             <ImageAlphaInspector
               open={!!img}
@@ -384,7 +379,6 @@ export function ExtractedImageSaver({
                       <Download className="h-4 w-4" strokeWidth={1.75} /> Download original
                     </Button>
                   </>
-
                 ) : undefined
               }
             />

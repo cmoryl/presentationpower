@@ -44,11 +44,7 @@ export function ExactSlideStage({
 }: ExactSlideStageProps) {
   // A pack owns its mode — the look IS light or dark.
   const effMode = pack ? pack.mode : mode;
-  const surface = pack
-    ? pack.tokens.surface
-    : effMode === "dark"
-      ? "#03002C"
-      : "#F2F2F2";
+  const surface = pack ? pack.tokens.surface : effMode === "dark" ? "#03002C" : "#F2F2F2";
 
   return (
     <div

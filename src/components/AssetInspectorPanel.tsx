@@ -20,12 +20,10 @@ import {
   Zap,
   Package,
   Shapes,
-
 } from "lucide-react";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { SaveAssetButton } from "@/components/library/SaveToDivisionButton";
 import { imageUrlToPng, safeFilename, specCardToPng } from "@/lib/inspector-asset-save";
-
 
 type SlideAssets = {
   images?: Array<{
@@ -70,7 +68,6 @@ type SlideAssets = {
     charCount?: number;
   }>;
   background?: {
-
     kind: string;
     embedId?: string;
     path?: string;
@@ -206,7 +203,6 @@ function deriveShapes(layoutShapes: any[]): ShapeAsset[] {
   return out;
 }
 
-
 export function AssetInspectorPanel({
   slide,
   extras,
@@ -260,7 +256,6 @@ export function AssetInspectorPanel({
     { key: "deck", label: "Deck", icon: Package },
   ];
 
-
   const [tab, setTab] = useState<TabKey>(() => {
     return tabs.find((t) => counts[t.key] > 0)?.key ?? "images";
   });
@@ -308,7 +303,6 @@ export function AssetInspectorPanel({
           </label>
         </div>
       </div>
-
 
       <div className="flex flex-wrap gap-1 border-b border-black/5 px-3 py-2">
         {tabs.map((t) => {
@@ -379,7 +373,6 @@ export function AssetInspectorPanel({
         {tab === "comments" && <CommentsTab items={a.comments ?? []} />}
         {tab === "deck" && <DeckTab extras={extras} />}
       </div>
-
     </div>
   );
 }
@@ -447,11 +440,7 @@ function ShapePreview({ shape }: { shape: ShapeAsset }) {
               : fillColor
                 ? "none"
                 : "1px dashed rgba(0,0,0,0.25)",
-            borderRadius: /ellipse|circle/i.test(shape.geometry)
-              ? "50%"
-              : rounded
-                ? "8px"
-                : "2px",
+            borderRadius: /ellipse|circle/i.test(shape.geometry) ? "50%" : rounded ? "8px" : "2px",
             opacity: shape.opacity ?? 1,
           }}
         />
@@ -475,8 +464,8 @@ function ShapesTab({
   return (
     <div className="space-y-4">
       <div className="text-[11px] text-black/50">
-        {items.length} PowerPoint-authored vector object{items.length === 1 ? "" : "s"} — autoshapes,
-        freeforms and connectors extracted with their geometry, fill and outline.
+        {items.length} PowerPoint-authored vector object{items.length === 1 ? "" : "s"} —
+        autoshapes, freeforms and connectors extracted with their geometry, fill and outline.
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {items.map((sh) => (
@@ -578,7 +567,6 @@ function ShapesTab({
   );
 }
 
-
 function ImagesTab({
   urls,
   paths,
@@ -595,7 +583,6 @@ function ImagesTab({
   layers: NonNullable<SlideAssets["layers"]>;
   background?: SlideAssets["background"];
 } & SaveCtx) {
-
   if (urls.length === 0 && paths.length === 0)
     return <Empty label="No embedded images on this slide." />;
   const byEmbed = new Map(assets.map((img) => [img.embedId, img]));
@@ -689,7 +676,6 @@ function ImagesTab({
           {layers.length} captured layers on this slide — see the Shapes tab for the full stack.
         </div>
       )}
-
     </div>
   );
 }
@@ -742,7 +728,6 @@ function MediaTab({
     </ul>
   );
 }
-
 
 function ChartsTab({
   items,

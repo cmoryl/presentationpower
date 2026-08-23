@@ -76,4 +76,3 @@ export function exportNodeFilter(node: Node): boolean {
   if (!(node instanceof Element)) return true;
   return !isAuthoringChrome(node);
 }
-

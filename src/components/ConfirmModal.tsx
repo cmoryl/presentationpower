@@ -11,7 +11,6 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 
-
 export function ConfirmModal({
   open,
   title,
@@ -55,7 +54,6 @@ export function ConfirmModal({
   const width = body ? "max-w-[560px]" : "max-w-[420px]";
 
   return createPortal(
-
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm"
       onClick={onCancel}
@@ -102,5 +100,4 @@ export function ConfirmModal({
     </div>,
     document.body,
   );
-
 }

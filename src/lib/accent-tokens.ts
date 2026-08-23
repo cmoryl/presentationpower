@@ -73,7 +73,9 @@ function rgbOf(hex: string): { r: number; g: number; b: number } | null {
 
 function toHex({ r, g, b }: { r: number; g: number; b: number }): string {
   const c = (n: number) =>
-    Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0");
+    Math.max(0, Math.min(255, Math.round(n)))
+      .toString(16)
+      .padStart(2, "0");
   return `#${c(r)}${c(g)}${c(b)}`;
 }
 
@@ -148,10 +150,7 @@ export function accentInk(
 }
 
 /** Convenience: accent ink for large display figures (AA large = 3:1). */
-export function accentFigureInk(
-  accentHex: string | null | undefined,
-  mode: AccentMode,
-): string {
+export function accentFigureInk(accentHex: string | null | undefined, mode: AccentMode): string {
   return accentInk(accentHex, mode, 3);
 }
 

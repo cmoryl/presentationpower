@@ -31,16 +31,25 @@ export default defineTool({
   description:
     "Filtered catalogue of every module variant. Filter by family, section, brand mode (respects that division's restricted families and preferred modules) or a free-text query. Returns each variant's id, family, name, layout hint, whether the PPTX exporter has a dedicated renderer for it, and a one-line 'use this when'.",
   inputSchema: {
-    family: z.string().describe("Module family id (e.g. 'MF-03') or a family name fragment.")
+    family: z
+      .string()
+      .describe("Module family id (e.g. 'MF-03') or a family name fragment.")
       .optional(),
-    section_id: z.string().describe("Restrict to variants permitted for a section, e.g. 'SF-06'.")
+    section_id: z
+      .string()
+      .describe("Restrict to variants permitted for a section, e.g. 'SF-06'.")
       .optional(),
     brand_mode_id: z
       .string()
       .describe("Restrict to what this division is allowed to use, e.g. 'bm-tp-legal'.")
       .optional(),
     query: z.string().describe("Free-text match against id, name and description.").optional(),
-    limit: z.number().int().min(1).max(400).describe("Max variants to return (default 60).")
+    limit: z
+      .number()
+      .int()
+      .min(1)
+      .max(400)
+      .describe("Max variants to return (default 60).")
       .optional(),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
@@ -71,9 +80,7 @@ export default defineTool({
 
     if (query) {
       const q = query.toLowerCase();
-      pool = pool.filter((v) =>
-        `${v.id} ${v.name} ${v.description}`.toLowerCase().includes(q),
-      );
+      pool = pool.filter((v) => `${v.id} ${v.name} ${v.description}`.toLowerCase().includes(q));
     }
 
     // Division-preferred modules float to the top so callers see the

@@ -55,10 +55,7 @@ describe("PPTX export corner rounding (no pixel drift)", () => {
 
   it("derives every exported radius from the app's design tokens", () => {
     for (const t of TOKEN_RADII) {
-      expect(t.inches, `${t.name} radius is not token-derived`).toBeCloseTo(
-        pxToRadiusIn(t.px),
-        9,
-      );
+      expect(t.inches, `${t.name} radius is not token-derived`).toBeCloseTo(pxToRadiusIn(t.px), 9);
     }
     // Media plates and bento tiles share one radius (surface-token contract).
     expect(EXPORT_RADIUS_IN.media).toBe(pxToRadiusIn(22));
@@ -81,10 +78,7 @@ describe("PPTX export corner rounding (no pixel drift)", () => {
       const w = 4.6;
       const adj = rectRadiusAdj(pillRadiusIn(h), w, h);
       expect(adj, `pill h=${h} lost its full round`).toBe(50000);
-      expect(renderedRadiusPx(pillRadiusIn(h), w, h)).toBeCloseTo(
-        (h / 2) * PX_PER_IN,
-        6,
-      );
+      expect(renderedRadiusPx(pillRadiusIn(h), w, h)).toBeCloseTo((h / 2) * PX_PER_IN, 6);
     }
   });
 
@@ -101,9 +95,7 @@ describe("PPTX export corner rounding (no pixel drift)", () => {
       } catch {
         continue; // optional module
       }
-      const literals = [...src.matchAll(/rectRadius:\s*([^,\n]+)/g)].map((m) =>
-        m[1].trim(),
-      );
+      const literals = [...src.matchAll(/rectRadius:\s*([^,\n]+)/g)].map((m) => m[1].trim());
       for (const value of literals) {
         expect(
           /^EXPORT_RADIUS_IN\.|^pillRadiusIn\(|^laneCornerRadiusIn\(|\.rectRadius$/.test(value),

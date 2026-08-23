@@ -28,7 +28,6 @@ import { showcaseArt } from "@/lib/showcase-art";
 import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
 import { PRINT_DEMOS } from "@/lib/showcase-print";
 
-
 type ShowcaseEntry = {
   id: string;
   surface: "social" | "event";
@@ -86,7 +85,6 @@ const SHOWCASE: ShowcaseEntry[] = [
     blurb: "Launch party kit: LED stage plates, invite set and social cut-downs.",
   },
 ];
-
 
 const SURFACE_META = {
   social: { label: "Social kit", icon: Share2, accent: "#FF9B70" },
@@ -154,7 +152,6 @@ export function ShowcaseGallery() {
           />
         ))}
 
-
         {PRINT_DEMOS.map((p) => (
           <MediaCard
             key={p.id}
@@ -170,7 +167,6 @@ export function ShowcaseGallery() {
           />
         ))}
 
-
         {SHOWCASE.map((entry) => (
           <ShowcaseCard key={entry.id} entry={entry} />
         ))}
@@ -185,7 +181,6 @@ type CardLink =
   | { to: "/demo/deck/$demoId"; params: { demoId: string } }
   | { to: "/demo/print/$demoId"; params: { demoId: string } }
   | { to: "/library/print"; search: { division: string; type: string; q: string } };
-
 
 function MediaCard({
   to,
@@ -219,7 +214,9 @@ function MediaCard({
         feature ? "sm:col-span-2" : ""
       }`}
     >
-      <div className={`relative overflow-hidden ${feature ? "h-[300px] sm:h-[360px]" : "h-[230px]"}`}>
+      <div
+        className={`relative overflow-hidden ${feature ? "h-[300px] sm:h-[360px]" : "h-[230px]"}`}
+      >
         <img
           src={art}
           alt={artAlt}
@@ -237,10 +234,7 @@ function MediaCard({
             background: `linear-gradient(180deg, ${accent}00 34%, ${accent}CC 100%)`,
           }}
         />
-        <span
-          aria-hidden
-          className="absolute bottom-0 left-0 flex h-1.5 w-full"
-        >
+        <span aria-hidden className="absolute bottom-0 left-0 flex h-1.5 w-full">
           {[0.9, 0.5, 0.28, 0.5, 0.9].map((o, i) => (
             <span key={i} className="flex-1" style={{ background: accent, opacity: o }} />
           ))}

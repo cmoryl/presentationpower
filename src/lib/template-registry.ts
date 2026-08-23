@@ -82,10 +82,7 @@ export function backgroundOverrides(): TemplateBackgroundOverride[] {
 }
 
 /** Most specific override for a code × scene: exact scene beats the "*" rule. */
-export function overrideFor(
-  skinCode: string,
-  scene: string,
-): TemplateBackgroundOverride | null {
+export function overrideFor(skinCode: string, scene: string): TemplateBackgroundOverride | null {
   const code = skinCode.toUpperCase();
   const mine = overrides.filter((o) => o.skinCode.toUpperCase() === code);
   return mine.find((o) => o.scene === scene) ?? mine.find((o) => o.scene === "*") ?? null;

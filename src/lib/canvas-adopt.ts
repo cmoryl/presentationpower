@@ -57,7 +57,10 @@ function rgbToHex(color: string): string | undefined {
   if (!m) return /^#[0-9a-f]{3,8}$/i.test(color) ? color : undefined;
   const [r, g, b, a] = m[1].split(",").map((v) => Number.parseFloat(v.trim()));
   if (a !== undefined && a < 0.05) return undefined;
-  const hex = (n: number) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0");
+  const hex = (n: number) =>
+    Math.max(0, Math.min(255, Math.round(n)))
+      .toString(16)
+      .padStart(2, "0");
   return `#${hex(r)}${hex(g)}${hex(b)}`;
 }
 
@@ -274,7 +277,11 @@ const CARD_MIN_H = 110;
 
 function paintsSurface(cs: CSSStyleDeclaration): boolean {
   if (cs.backgroundImage && cs.backgroundImage !== "none") return true;
-  if (cs.backgroundColor && cs.backgroundColor !== "rgba(0, 0, 0, 0)" && cs.backgroundColor !== "transparent")
+  if (
+    cs.backgroundColor &&
+    cs.backgroundColor !== "rgba(0, 0, 0, 0)" &&
+    cs.backgroundColor !== "transparent"
+  )
     return true;
   return (Number.parseFloat(cs.borderTopWidth) || 0) > 0 && cs.borderTopStyle !== "none";
 }

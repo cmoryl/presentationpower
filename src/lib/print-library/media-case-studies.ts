@@ -44,7 +44,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "toei-ten-year-localization",
     title: "Turning Caution into Confidence",
-    teaser: "A ten-year localization strategy with a global content studio, built one language at a time.",
+    teaser:
+      "A ten-year localization strategy with a global content studio, built one language at a time.",
     tags: ["anime", "theatrical", "long-term partnership", "IP security"],
     sourceFile: "GLMedia_TOEI_CaseStudy_2.pdf",
     content: {
@@ -68,9 +69,17 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
       },
       stats: [
         { label: "Episodes across languages", value: "1,000", caption: "Localized to date" },
-        { label: "Global theatrical rollout", value: "Successful", caption: "Multi-region releases" },
+        {
+          label: "Global theatrical rollout",
+          value: "Successful",
+          caption: "Multi-region releases",
+        },
         { label: "Growth in project scale", value: "Consistent", caption: "Year over year" },
-        { label: "Partner for global expansion", value: "Trusted", caption: "10-year relationship" },
+        {
+          label: "Partner for global expansion",
+          value: "Trusted",
+          caption: "10-year relationship",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -89,7 +98,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "accessibility-at-work",
     title: "Accessibility at Work",
-    teaser: "Three real-world examples of meeting compliance standards while widening audience reach.",
+    teaser:
+      "Three real-world examples of meeting compliance standards while widening audience reach.",
     tags: ["SDH", "audio description", "compliance", "EAA"],
     sourceFile: "TPMedia_Accessibility_CaseStudy_FINAL_2.pdf",
     content: {
@@ -114,7 +124,12 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
       stats: [
         { label: "Minutes of subtitles & SDH", value: "1M+", caption: "Global streaming service" },
         { label: "Quality adherence", value: "99", unit: "%", caption: "Sustained standard" },
-        { label: "Of a media group's EU language needs", value: "80", unit: "%", caption: "FR, IT, DE, ES, AR, HE, EN" },
+        {
+          label: "Of a media group's EU language needs",
+          value: "80",
+          unit: "%",
+          caption: "FR, IT, DE, ES, AR, HE, EN",
+        },
         { label: "Source episodes supported", value: "300+", caption: "More in progress" },
       ],
       engagement: {
@@ -179,7 +194,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "tv5monde-genai-subtitling",
     title: "Cutting Subtitling Costs with Generative AI",
-    teaser: "A French public broadcaster reduced subtitling cost 30% across 9,800+ hours — quality intact.",
+    teaser:
+      "A French public broadcaster reduced subtitling cost 30% across 9,800+ hours — quality intact.",
     tags: ["GenAI", "subtitling", "broadcast", "cost reduction"],
     sourceFile: "TPMedia_TV5Monde_CaseStudy_1.pdf",
     content: {
@@ -229,7 +245,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "hpe-virtual-conference",
     title: "A 50,000-Attendee Virtual Conference in Nine Languages",
-    teaser: "Cloud recording replaced manual file transfer for Hewlett Packard Enterprise's global event.",
+    teaser:
+      "Cloud recording replaced manual file transfer for Hewlett Packard Enterprise's global event.",
     tags: ["events", "interpretation", "cloud recording", "enterprise"],
     sourceFile: "TransPerfect_Media_HPE_Case_Study.pdf",
     content: {
@@ -255,7 +272,12 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
         { label: "Audio files delivered", value: "1,000+", caption: "Across the event" },
         { label: "Videos localized", value: "129", caption: "Session and keynote content" },
         { label: "Languages", value: "9", caption: "Live conference delivery" },
-        { label: "Time savings per project", value: "30–40", unit: "%", caption: "Versus manual workflow" },
+        {
+          label: "Time savings per project",
+          value: "30–40",
+          unit: "%",
+          caption: "Versus manual workflow",
+        },
       ],
       quote: {
         text: "We would have never been able to achieve our required turnaround times without the interpreters recording in TransPerfect's cloud recording platform. Utilizing state-of-the-art technology for this global event provided our clients an extensive and exceptional experience that we were looking for.",
@@ -279,7 +301,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "mga-rainbow-high",
     title: "Rainbow High, Launched in Eight Markets",
-    teaser: "18 episodes, 12-day batch turnarounds, and studio-quality remote recording through a pandemic.",
+    teaser:
+      "18 episodes, 12-day batch turnarounds, and studio-quality remote recording through a pandemic.",
     tags: ["dubbing", "remote recording", "kids & family", "fast turnaround"],
     sourceFile: "TransPerfect_Media_MGA_Case_Study.pdf",
     content: {
@@ -329,7 +352,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "text-to-speech-dubbing",
     title: "Text-to-Speech Dubbing in Action",
-    teaser: "Two hybrid AI-human dubbing programs: 50%+ and 40% cost reductions, zero platform rejections.",
+    teaser:
+      "Two hybrid AI-human dubbing programs: 50%+ and 40% cost reductions, zero platform rejections.",
     tags: ["TTS", "AI dubbing", "voice cloning", "cost reduction"],
     sourceFile: "TransPerfect_Media_Text-to-Speech_Dual_Case_Study.pdf",
     content: {
@@ -354,7 +378,12 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
       stats: [
         { label: "Pilot turnaround", value: "6", unit: "weeks", caption: "Film distributor" },
         { label: "Dubbing cost reduction", value: "50", unit: "%+", caption: "Film distributor" },
-        { label: "Dubbing cost reduction", value: "40", unit: "%", caption: "Broadcaster — goal was 30%" },
+        {
+          label: "Dubbing cost reduction",
+          value: "40",
+          unit: "%",
+          caption: "Broadcaster — goal was 30%",
+        },
         { label: "Rejections from partners", value: "0", caption: "Both engagements" },
       ],
       engagement: {
@@ -374,7 +403,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "viacom-single-vendor",
     title: "One Vendor, One Million Minutes",
-    teaser: "Consolidating French localization for MTV, Nickelodeon, BET, Paramount, and Smithsonian.",
+    teaser:
+      "Consolidating French localization for MTV, Nickelodeon, BET, Paramount, and Smithsonian.",
     tags: ["subtitling", "dubbing", "vendor consolidation", "broadcast"],
     sourceFile: "TransPerfect_Media_Viacom_Case_Study.pdf",
     content: {
@@ -400,7 +430,11 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
         { label: "Minutes of content streamlined", value: "1M+", caption: "Across the portfolio" },
         { label: "Years of programming", value: "7+", caption: "Continuous partnership" },
         { label: "Overall savings", value: "30", unit: "%", caption: "Versus multi-vendor model" },
-        { label: "Top brands localized", value: "5", caption: "MTV, Nickelodeon, BET, Paramount, Smithsonian" },
+        {
+          label: "Top brands localized",
+          value: "5",
+          caption: "MTV, Nickelodeon, BET, Paramount, Smithsonian",
+        },
       ],
       engagement: {
         title: "Engagement snapshot",
@@ -419,7 +453,8 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
   {
     slug: "wondery-podcast-localization",
     title: "Immersive Podcasts, Eight Languages",
-    teaser: "Remote recording and in-context review kept Wondery's audio experience intact worldwide.",
+    teaser:
+      "Remote recording and in-context review kept Wondery's audio experience intact worldwide.",
     tags: ["podcast", "audio", "remote recording", "transcreation"],
     sourceFile: "TransPerfect_Media_Wondery_Case_Study.pdf",
     content: {
@@ -442,7 +477,12 @@ export const MEDIA_CASE_STUDIES: MediaCaseStudySeed[] = [
         body: "More than 150 recorded hours delivered to over a million listeners, at an average time saving of 50% per hour of finished audio — with the immersive character of the original storytelling intact in every language.",
       },
       stats: [
-        { label: "Average time savings per hour", value: "50", unit: "%", caption: "Versus prior workflow" },
+        {
+          label: "Average time savings per hour",
+          value: "50",
+          unit: "%",
+          caption: "Versus prior workflow",
+        },
         { label: "Recorded hours", value: "150+", caption: "Premium localized audio" },
         { label: "Happy listeners", value: "1MM+", caption: "Across markets" },
         { label: "Languages", value: "8", caption: "In-country talent" },

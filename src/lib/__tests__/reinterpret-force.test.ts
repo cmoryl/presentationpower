@@ -14,7 +14,9 @@ function slide(index: number, bullets: string[]): MappedSlide {
 }
 
 describe("forced layouts", () => {
-  const deck = [slide(0, ["Why enrollment stalls", "Study", "Design", "Protocol", "Finalized", "Sites"])];
+  const deck = [
+    slide(0, ["Why enrollment stalls", "Study", "Design", "Protocol", "Finalized", "Sites"]),
+  ];
   it("leaves the cover alone without force", () => {
     const out = designReinterpretedDeck(deck, { preferred: { 0: "MV-PROC-PHASES" } });
     expect(out[0].variantId).toBe("MV-OP-COVER-MEDIA");

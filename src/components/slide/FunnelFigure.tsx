@@ -52,7 +52,10 @@ export function FunnelFigure({
   const ratio = stages.map((st, i) => (st.num > 0 ? Math.min(1, st.num / top) : 1 - (i / n) * 0.7));
   // The cone scales to the stage: long funnels shrink their segments (and the
   // read-out type with them) instead of running off the bottom of the slide.
-  const SEG_H = Math.max(84, Math.min(SEG_H_MAX, Math.floor((AVAIL_H - (n - 1) * GAP) / Math.max(1, n))));
+  const SEG_H = Math.max(
+    84,
+    Math.min(SEG_H_MAX, Math.floor((AVAIL_H - (n - 1) * GAP) / Math.max(1, n))),
+  );
   const FIG_W = SEG_H < 140 ? 620 : FIG_W_MAX;
   const valueFs = Math.round(Math.max(34, Math.min(66, SEG_H * 0.4)));
   const wAt = (r: number) => FIG_W * (MIN_W + (1 - MIN_W) * Math.max(0, Math.min(1, r)));
@@ -123,10 +126,20 @@ export function FunnelFigure({
               style={{ left: 0, right: 0, top: y, height: SEG_H }}
             >
               <div className="flex items-baseline tabular-nums" style={{ color: "#ffffff" }}>
-                <span style={{ fontSize: valueFs, fontWeight: 600, letterSpacing: "-0.04em", lineHeight: 1.12 }}>
+                <span
+                  style={{
+                    fontSize: valueFs,
+                    fontWeight: 600,
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.12,
+                  }}
+                >
                   {st.value || "—"}
                 </span>
-                <span className="ml-1" style={{ fontSize: Math.round(valueFs * 0.36), opacity: 0.78 }}>
+                <span
+                  className="ml-1"
+                  style={{ fontSize: Math.round(valueFs * 0.36), opacity: 0.78 }}
+                >
                   {st.unit || "%"}
                 </span>
               </div>
@@ -139,7 +152,8 @@ export function FunnelFigure({
       <div className="min-w-0 flex-1">
         {stages.map((st, i) => {
           const prev = i > 0 ? stages[i - 1].num : 0;
-          const drop = i > 0 && prev > 0 && st.num > 0 ? Math.round(((prev - st.num) / prev) * 100) : 0;
+          const drop =
+            i > 0 && prev > 0 && st.num > 0 ? Math.round(((prev - st.num) / prev) * 100) : 0;
           const retained = st.num > 0 ? Math.round((st.num / top) * 100) : 0;
           return (
             <div
@@ -160,7 +174,12 @@ export function FunnelFigure({
                 </div>
                 <div
                   className="mt-1 truncate"
-                  style={{ fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}
+                  style={{
+                    fontSize: 34,
+                    fontWeight: 600,
+                    letterSpacing: "-0.02em",
+                    color: ink.strong,
+                  }}
                 >
                   {st.label}
                 </div>
@@ -188,11 +207,19 @@ export function FunnelFigure({
                   <>
                     <div
                       className="tabular-nums"
-                      style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", color: ink.strong }}
+                      style={{
+                        fontSize: 30,
+                        fontWeight: 600,
+                        letterSpacing: "-0.02em",
+                        color: ink.strong,
+                      }}
                     >
                       −{drop}%
                     </div>
-                    <div className="uppercase" style={{ fontSize: 12, letterSpacing: "0.22em", color: ink.muted }}>
+                    <div
+                      className="uppercase"
+                      style={{ fontSize: 12, letterSpacing: "0.22em", color: ink.muted }}
+                    >
                       drop-off
                     </div>
                   </>

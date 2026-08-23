@@ -166,9 +166,8 @@ export function previewPrint(kind: PrintKind, seed: PreviewSeed): StructurePrevi
         title: label,
         meta: `${items.length} item${items.length === 1 ? "" : "s"}`,
         detail: items
-          .map(
-            (it) =>
-              String(it.heading ?? it.label ?? it.verb ?? it.kind ?? it.value ?? "").trim(),
+          .map((it) =>
+            String(it.heading ?? it.label ?? it.verb ?? it.kind ?? it.value ?? "").trim(),
           )
           .filter(Boolean)
           .join(" · "),

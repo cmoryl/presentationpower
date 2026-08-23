@@ -39,7 +39,13 @@ function parse(hex: string): [number, number, number] | null {
 }
 
 function toHex([r, g, b]: [number, number, number]): string {
-  return `#${[r, g, b].map((n) => Math.round(Math.min(255, Math.max(0, n))).toString(16).padStart(2, "0")).join("")}`;
+  return `#${[r, g, b]
+    .map((n) =>
+      Math.round(Math.min(255, Math.max(0, n)))
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`;
 }
 
 function relLuminance(hex: string): number {
@@ -62,11 +68,7 @@ function mix(hex: string, toward: string, t: number): string {
   const a = parse(hex);
   const b = parse(toward);
   if (!a || !b) return hex;
-  return toHex([
-    a[0] + (b[0] - a[0]) * t,
-    a[1] + (b[1] - a[1]) * t,
-    a[2] + (b[2] - a[2]) * t,
-  ]);
+  return toHex([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]);
 }
 
 /**
@@ -102,13 +104,9 @@ export function vizTheme({ brand, mode, pack }: VizThemeInput): InfographicTheme
       ? DARK_SURFACE
       : brand.tokens.surface;
 
-  const ink = pack
-    ? pack.tokens.ink
-    : effectiveMode === "dark"
-      ? DARK_INK
-      : brand.tokens.ink;
+  const ink = pack ? pack.tokens.ink : effectiveMode === "dark" ? DARK_INK : brand.tokens.ink;
 
-  const rawAccent = pack ? (pack.tokens.accentText || pack.tokens.accent) : brand.tokens.accent;
+  const rawAccent = pack ? pack.tokens.accentText || pack.tokens.accent : brand.tokens.accent;
   const rawPrimary = pack ? pack.tokens.primary : brand.tokens.primary;
 
   const accent = ensureVizContrast(rawAccent, surface, 3);

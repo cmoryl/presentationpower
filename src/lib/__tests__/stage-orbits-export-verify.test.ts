@@ -110,7 +110,11 @@ describe("MV-PROC-STAGE-ORBITS export verification", () => {
   it("flags content that breaks the manifest capacity", () => {
     const tooMany = {
       ...content,
-      stages: [...content.stages, { stepNumber: "4", label: "Extra", items: [] }, { stepNumber: "5", label: "Extra 2", items: [] }],
+      stages: [
+        ...content.stages,
+        { stepNumber: "4", label: "Extra", items: [] },
+        { stepNumber: "5", label: "Extra 2", items: [] },
+      ],
     };
     const exp = expectationFor(VARIANT, tooMany);
     expect(exp.capacityProblems.join(" ")).toMatch(/maximum is 4/);

@@ -16,7 +16,11 @@ import {
   type OverrideCardShape,
 } from "@/lib/agent/design-overrides";
 
-const SWATCH_FIELDS: { key: keyof NonNullable<DesignOverrides["palette"]>; label: string; fallback: string }[] = [
+const SWATCH_FIELDS: {
+  key: keyof NonNullable<DesignOverrides["palette"]>;
+  label: string;
+  fallback: string;
+}[] = [
   { key: "background", label: "Background", fallback: "#03002C" },
   { key: "ink", label: "Text", fallback: "#FFFFFF" },
   { key: "accent", label: "Accent", fallback: "#003FC7" },
@@ -32,7 +36,9 @@ export function AgentDesignOverrides({
   variant?: "light" | "dark";
   onChange?: (overrides: DesignOverrides | null) => void;
 }) {
-  const [overrides, setOverrides] = useState<DesignOverrides>(() => readStoredDesignOverrides(threadId) ?? {});
+  const [overrides, setOverrides] = useState<DesignOverrides>(
+    () => readStoredDesignOverrides(threadId) ?? {},
+  );
   const [open, setOpen] = useState(false);
   const dark = variant === "dark";
   const active = !isEmptyOverrides(overrides);
@@ -71,7 +77,12 @@ export function AgentDesignOverrides({
     <div className="min-w-0 space-y-2">
       <div className="flex flex-wrap items-center gap-2">
         <span className={label}>Overrides for this deck</span>
-        <button type="button" className={btn} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+        <button
+          type="button"
+          className={btn}
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+        >
           {open ? "Done" : active ? "Edit overrides" : "Override look"}
         </button>
         {active && (
@@ -107,7 +118,9 @@ export function AgentDesignOverrides({
                         onChange={(e) => setPalette(f.key, e.target.value)}
                         className="h-5 w-5 shrink-0 cursor-pointer rounded border-0 bg-transparent p-0"
                       />
-                      <span className={`truncate text-[11px] ${dark ? "text-white/75" : "text-[#03002C]/75"}`}>
+                      <span
+                        className={`truncate text-[11px] ${dark ? "text-white/75" : "text-[#03002C]/75"}`}
+                      >
                         {f.label}
                       </span>
                     </label>
@@ -136,7 +149,12 @@ export function AgentDesignOverrides({
                 aria-label="Deck mode"
                 className={field}
                 value={overrides.mode ?? ""}
-                onChange={(e) => commit({ ...overrides, mode: (e.target.value || undefined) as DesignOverrides["mode"] })}
+                onChange={(e) =>
+                  commit({
+                    ...overrides,
+                    mode: (e.target.value || undefined) as DesignOverrides["mode"],
+                  })
+                }
               >
                 <option value="">Let the agent decide</option>
                 <option value="light">Light</option>
@@ -150,7 +168,10 @@ export function AgentDesignOverrides({
                 className={field}
                 value={overrides.cardShape ?? ""}
                 onChange={(e) =>
-                  commit({ ...overrides, cardShape: (e.target.value || undefined) as OverrideCardShape | undefined })
+                  commit({
+                    ...overrides,
+                    cardShape: (e.target.value || undefined) as OverrideCardShape | undefined,
+                  })
                 }
               >
                 <option value="">Follow the knowledge map</option>
@@ -191,7 +212,10 @@ export function AgentDesignOverrides({
                 className={field}
                 value={overrides.backdrop ?? ""}
                 onChange={(e) =>
-                  commit({ ...overrides, backdrop: (e.target.value || undefined) as OverrideBackdrop | undefined })
+                  commit({
+                    ...overrides,
+                    backdrop: (e.target.value || undefined) as OverrideBackdrop | undefined,
+                  })
                 }
               >
                 <option value="">Follow the knowledge map</option>
@@ -204,7 +228,10 @@ export function AgentDesignOverrides({
             </div>
             <div className="space-y-1">
               <span className={label}>
-                Backdrop intensity{overrides.backdropIntensity !== undefined ? ` — ${overrides.backdropIntensity}%` : ""}
+                Backdrop intensity
+                {overrides.backdropIntensity !== undefined
+                  ? ` — ${overrides.backdropIntensity}%`
+                  : ""}
               </span>
               <div className="flex items-center gap-2">
                 <input
@@ -214,7 +241,9 @@ export function AgentDesignOverrides({
                   step={5}
                   aria-label="Backdrop intensity"
                   value={overrides.backdropIntensity ?? 50}
-                  onChange={(e) => commit({ ...overrides, backdropIntensity: Number(e.target.value) })}
+                  onChange={(e) =>
+                    commit({ ...overrides, backdropIntensity: Number(e.target.value) })
+                  }
                   className="h-1.5 w-full cursor-pointer accent-[#003FC7]"
                 />
                 {overrides.backdropIntensity !== undefined && (
@@ -248,7 +277,8 @@ export function AgentDesignOverrides({
 
       {active && !open && (
         <p className={`text-[11px] leading-snug ${dark ? "text-white/60" : "text-[#03002C]/60"}`}>
-          Overriding: {designOverridesSummary(overrides)} — applied over the knowledge map for this deck.
+          Overriding: {designOverridesSummary(overrides)} — applied over the knowledge map for this
+          deck.
         </p>
       )}
     </div>

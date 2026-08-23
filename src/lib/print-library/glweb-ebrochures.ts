@@ -101,10 +101,20 @@ export const GLWEB_EBROCHURES: GlWebEbrochureSeed[] = [
         },
       ],
       stats: [
-        { label: "eCommerce SKUs localized with AI", value: "1M", unit: "+", caption: "Single retailer program" },
+        {
+          label: "eCommerce SKUs localized with AI",
+          value: "1M",
+          unit: "+",
+          caption: "Single retailer program",
+        },
         { label: "Languages in a multilingual UX rollout", value: "20", unit: "+" },
         { label: "Support content instantly translated", value: "15", unit: " languages" },
-        { label: "Reduction in time-to-market", value: "40", unit: "%", caption: "New feature launches" },
+        {
+          label: "Reduction in time-to-market",
+          value: "40",
+          unit: "%",
+          caption: "New feature launches",
+        },
       ],
       discover: {
         body: "Inside the guide",
@@ -611,7 +621,7 @@ export const GLWEB_EBROCHURES: GlWebEbrochureSeed[] = [
           heading: "Speak the language of leadership",
           body: "Executive buy-in depends on ROI and risk mitigation. Top performers track conversions, measure growth, and expect localization to improve both revenue and compliance outcomes — so present clear, data-driven business metrics and address objections directly.",
           bullets: [
-            "\"Managing languages is a burden\" — cloud-based tools automate updates and workflows",
+            '"Managing languages is a burden" — cloud-based tools automate updates and workflows',
             "Tie localization to broader company goals and cross-functional partners",
             "Show regulatory and accessibility risk reduction alongside revenue",
           ],

@@ -32,12 +32,7 @@
  * and the offscreen export stage all resolve the same numbers.
  */
 
-import {
-  TYPE_CEIL_PX,
-  TYPE_FLOOR_PX,
-  leadingBounds,
-  type FillScale,
-} from "./open-space-fill";
+import { TYPE_CEIL_PX, TYPE_FLOOR_PX, leadingBounds, type FillScale } from "./open-space-fill";
 
 export type TypeAxis = "display" | "body" | "kicker" | "figure" | "label";
 export type LeadRole = TypeAxis;
@@ -348,7 +343,10 @@ const AXIS_LIMIT: Record<TypeAxis, { floor: [number, number]; ceil: [number, num
   label: { floor: [12, 18], ceil: [22, 34] },
 };
 
-const LEAD_LIMIT: Record<LeadRole, { base: [number, number]; min: [number, number]; max: [number, number] }> = {
+const LEAD_LIMIT: Record<
+  LeadRole,
+  { base: [number, number]; min: [number, number]; max: [number, number] }
+> = {
   display: { base: [0.94, 1.2], min: [0.88, 1.1], max: [1.05, 1.3] },
   body: { base: [1.3, 1.6], min: [1.2, 1.45], max: [1.4, 1.75] },
   kicker: { base: [1.1, 1.45], min: [1.05, 1.3], max: [1.25, 1.6] },

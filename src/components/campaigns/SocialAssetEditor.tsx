@@ -405,7 +405,6 @@ function SocialAssetEditorModal({
                 </p>
               ) : (
                 <>
-
                   <Segmented
                     label="Layout"
                     value={edit.imageLayout ?? rendererProps.imageLayout ?? "bleed"}
@@ -529,7 +528,12 @@ function PhotoPicker({
   onClose: () => void;
 }) {
   const cls = aspectClass(format);
-  const key = cls === "portrait-tall" || cls === "portrait" ? "tall" : cls.startsWith("landscape") ? "wide" : "square";
+  const key =
+    cls === "portrait-tall" || cls === "portrait"
+      ? "tall"
+      : cls.startsWith("landscape")
+        ? "wide"
+        : "square";
   const sets = Object.entries(SOCIAL_PHOTO_SETS);
   const ordered = [
     ...sets.filter(([id]) => id === brandId),

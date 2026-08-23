@@ -31,18 +31,13 @@
 // stays a one-way dependency.
 import { skinPackById, ALL_SKIN_PACKS, skinCodeFromPackId } from "./design-skin-pack";
 import { packGeometry, shapeCss } from "./pack-geometry";
-import {
-  backgroundOverrides,
-  customPackById,
-  customTemplatePacks,
-} from "./template-registry";
+import { backgroundOverrides, customPackById, customTemplatePacks } from "./template-registry";
 import { withBackgroundOverrides } from "./template-background";
 import { withElementSceneArt } from "./element-scene-art";
 import { withGamesSceneArt } from "./games-scene-art";
 import { withIndustryPhotoArt } from "./industry-photo-art";
 
 import { templateCodeFromPackId } from "./custom-templates";
-
 
 export type StylePackId =
   | "swiss-noir"
@@ -76,7 +71,6 @@ export type StylePackId =
   | "verdant-corporate"
   | "crimson-editorial"
   | "atelier-orange";
-
 
 export interface StylePackTokens {
   /** Page field. */
@@ -211,11 +205,7 @@ function block(pos: string, w: string, h: string, hex: string, a = 1): string {
 
 function tileSvg(body: string, w: number, h: number): string {
   const doc = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${w} ${h}' width='${w}' height='${h}'>${body}</svg>`;
-  const enc = doc
-    .replace(/#/g, "%23")
-    .replace(/"/g, "'")
-    .replace(/</g, "%3C")
-    .replace(/>/g, "%3E");
+  const enc = doc.replace(/#/g, "%23").replace(/"/g, "'").replace(/</g, "%3C").replace(/>/g, "%3E");
   return `url("data:image/svg+xml;utf8,${enc}")`;
 }
 
@@ -263,8 +253,6 @@ function motifAlpha(a: number, size: number): number {
   const growth = motifSize(size) / Math.max(size, 1);
   return Number((a / Math.max(1, growth * 0.62)).toFixed(4));
 }
-
-
 
 function checkers(hex: string, a: number, size: number): string {
   const A = motifAlpha(a, size);
@@ -417,7 +405,9 @@ function diagonalCut(hex: string, a: number, from: "tl" | "tr" = "tl"): string {
 /** Stack of flat horizontal bars of varying weight. */
 function bandStack(hex: string, a: number, ys: number[]): string {
   const c = rgba(hex, a);
-  const body = ys.map((y, i) => `<rect x='0' y='${y}' width='1440' height='${6 + i * 4}' fill='${c}'/>`).join("");
+  const body = ys
+    .map((y, i) => `<rect x='0' y='${y}' width='1440' height='${6 + i * 4}' fill='${c}'/>`)
+    .join("");
   return cut(body, "center", "100% 100%");
 }
 
@@ -440,7 +430,6 @@ function panelFrame(hex: string, a: number): string {
   );
 }
 
-
 /** Wedge fan of flat rays from one corner. */
 function rayFan(hex: string, a: number, cx: number, cy: number): string {
   let body = "";
@@ -452,7 +441,6 @@ function rayFan(hex: string, a: number, cx: number, cy: number): string {
   }
   return cut(body, "center", "cover");
 }
-
 
 /** Grain plate — shared tactile finish, tuned per pack via `grain`. */
 export const GRAIN_PLATE =
@@ -1039,7 +1027,7 @@ export const STYLE_PACKS: StylePack[] = [
     /* Strategy: a single foil rule as the couture margin, one low spotlight
      * from the footer. The page stays black so type and product read first. */
     ground: (seed) => [
-      block(pick(seed, 9, ["left 96px top", "right 96px top"]), "1px", "100%", "#D9C08A", 0.30),
+      block(pick(seed, 9, ["left 96px top", "right 96px top"]), "1px", "100%", "#D9C08A", 0.3),
       block("left bottom", "100%", "2px", "#D9C08A", 0.22),
       bloom("50% 116%", 92, 52, "#D9C08A", 0.07),
       bloom(pick(seed, 6, ["10% 4%", "90% 6%"]), 66, 48, "#F4F1EA", 0.04),
@@ -1047,7 +1035,6 @@ export const STYLE_PACKS: StylePack[] = [
     ],
     swatch: ["#0B0B0D", "#F4F1EA", "#D9C08A", "#8E7F6A"],
   },
-
 
   {
     id: "optic-moire",
@@ -1149,7 +1136,6 @@ export const STYLE_PACKS: StylePack[] = [
     ],
     swatch: ["#0E1113", "#ECEFF1", "#5AD2D2", "#E08A3C"],
   },
-
 
   {
     id: "atlas-plate",
@@ -1287,7 +1273,14 @@ export const STYLE_PACKS: StylePack[] = [
     ground: (seed) => [
       rules("#E9EEF5", 0.03, 72, 90),
       rules("#E9EEF5", 0.02, 72),
-      bandStack("#33D6FF", 0.06, pick(seed, 17, [[612, 668, 724], [86, 150, 214]])),
+      bandStack(
+        "#33D6FF",
+        0.06,
+        pick(seed, 17, [
+          [612, 668, 724],
+          [86, 150, 214],
+        ]),
+      ),
       triangleGrid("#FF2D8A", "#33D6FF", 0.05, 96),
       flat("#0E1116"),
     ],
@@ -1624,7 +1617,14 @@ export const STYLE_PACKS: StylePack[] = [
     grain: 0.06,
     ground: (seed) => [
       chevron("#D9A24B", 0.1, 96),
-      bandStack("#D9A24B", 0.14, pick(seed, 26, [[36, 60, 84], [700, 724, 748]])),
+      bandStack(
+        "#D9A24B",
+        0.14,
+        pick(seed, 26, [
+          [36, 60, 84],
+          [700, 724, 748],
+        ]),
+      ),
       herringbone("#7CA8A0", 0.06, 120),
       flat("#25121B"),
     ],
@@ -1822,7 +1822,6 @@ export const STYLE_PACKS: StylePack[] = [
   },
 ];
 
-
 export const STYLE_PACK_IDS = STYLE_PACKS.map((p) => p.id);
 
 /**
@@ -1832,7 +1831,6 @@ export const STYLE_PACK_IDS = STYLE_PACKS.map((p) => p.id);
  * their manifests don't drift.
  */
 export const ALL_STYLE_PACKS: StylePack[] = [...STYLE_PACKS, ...ALL_SKIN_PACKS];
-
 
 /**
  * APPROVED packs only — the OnDeck core languages (S01–S28) plus the industry
@@ -1866,7 +1864,6 @@ function withOverrides(pack: StylePack, code: string): StylePack {
   return withBackgroundOverrides(art, code);
 }
 
-
 /**
  * The admin tuning code behind a pack id ("skin-s29" → "S29", "tpl-x" → "X").
  * Exported so composition layers (e.g. the industry ground) can re-apply the
@@ -1898,20 +1895,18 @@ export function reapplyBackgroundOverrides(
   const code = backgroundCodeForPackId(packId);
   if (!code) return pack;
   if (opts?.authoredArt === false) {
-    const tuned = backgroundOverrides().some((o) => o.skinCode.toUpperCase() === code.toUpperCase());
+    const tuned = backgroundOverrides().some(
+      (o) => o.skinCode.toUpperCase() === code.toUpperCase(),
+    );
     return tuned ? withBackgroundOverrides(pack, code) : pack;
   }
   return withOverrides(pack, code);
 }
 
-
-
 /** Every selectable look including admin-authored templates. */
 export function allSelectablePacks(): StylePack[] {
   return [...ALL_STYLE_PACKS, ...customTemplatePacks()];
 }
-
-
 
 /* ── page layout designs, per composition ────────────────────────────────
  * A pack is not one background. Every module type gets its own PAGE LAYOUT:
@@ -2343,19 +2338,11 @@ function scaffoldLayers(pack: StylePack, comp: PackComposition, seed: string): s
   }
 }
 
-
-
-
-
 /**
  * The page layout scaffold for a pack in a given composition. Seed rotates the
  * arrangement so sibling modules of the same type still differ.
  */
-export function packLayoutLayers(
-  pack: StylePack,
-  comp: PackComposition,
-  seed: string,
-): string[] {
+export function packLayoutLayers(pack: StylePack, comp: PackComposition, seed: string): string[] {
   // Curated OnDeck languages (S01–S28 / R01–R30 / published templates) already
   // paint an art-directed industry scene. Dressing that scene with a second
   // scaffold — mat frames, corner brackets, register/crosshair "target" marks,
@@ -2397,12 +2384,7 @@ function curatedScaffoldLayers(pack: StylePack, comp: PackComposition): string[]
   }
 }
 
-
-function compositionLayers(
-  pack: StylePack,
-  comp: PackComposition,
-  seed: string,
-): string[] {
+function compositionLayers(pack: StylePack, comp: PackComposition, seed: string): string[] {
   const t = pack.tokens;
   // Design review: the scaffold is structure, not decoration. Hard-edged packs
   // still carry more weight, but the whole plane sits a step back so the ground
@@ -2456,7 +2438,6 @@ function compositionLayers(
         topRightDevice(pack, A(0.18)),
       ];
 
-
     case "quote":
       return [
         quoteMark(t.accent, A(0.18), pick(seed, 7, [86, 1090]), 96, pick(seed, 8, [2.4, 3])),
@@ -2465,10 +2446,7 @@ function compositionLayers(
       ];
 
     case "closing":
-      return [
-        block("left bottom", "100%", "14px", t.accent, 0.9),
-        topRightDevice(pack, A(0.22)),
-      ];
+      return [block("left bottom", "100%", "14px", t.accent, 0.9), topRightDevice(pack, A(0.22))];
   }
 }
 
@@ -2503,7 +2481,6 @@ export function minimalPackLayers(layers: string[]): string[] {
     return true;
   });
 }
-
 
 /** Joined `background` shorthand for a pack on a given module seed. */
 export function stylePackGround(
@@ -2602,7 +2579,6 @@ export function packGroundOpacity(pack: StylePack): number {
   return PATTERN_FIRST.includes(pack.id) ? 0.42 : 0.68;
 }
 
-
 /**
  * The CSS custom properties a pack publishes. Applied to a wrapper around the
  * slide; every primitive reads these with a fallback, so packs are additive.
@@ -2650,7 +2626,6 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
     // the single biggest break in the alternate looks.
     "--pack-emphasis": ty.display,
     "--pack-emphasis-ink": t.accentText,
-
   };
 }
 

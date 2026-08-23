@@ -51,7 +51,6 @@ export type IntroRecipe = {
   arcStepMs?: number;
 };
 
-
 const RECIPES: Record<string, IntroRecipe> = {
   bento: {
     id: "bento",
@@ -256,7 +255,10 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
   [/(DONUT|PIE|BREAKDOWN-RING)/, RECIPES.donut],
   [/(ORBIT|GAUGE|RADIAL|RING|DIAL)/, RECIPES.orbit],
   [/(FLYWHEEL|CYCLE|LOOP)/, RECIPES.cycle],
-  [/(BAR-COMPARE|PERCENT-COMPARE|STACKED-BAR|CATEGORY-BARS|GAUGE-ROW|RANKING|LEADERBOARD)/, RECIPES.plotX],
+  [
+    /(BAR-COMPARE|PERCENT-COMPARE|STACKED-BAR|CATEGORY-BARS|GAUGE-ROW|RANKING|LEADERBOARD)/,
+    RECIPES.plotX,
+  ],
   [
     /(GRAPH|CHART|BARS?|COLUMNS?|AREA|WATERFALL|HEATMAP|TREEMAP|BUBBLE|LINE-MULTI|SERIES|TREND|SPARK|FUNNEL|BREAKDOWN)/,
     RECIPES.plot,
@@ -266,10 +268,7 @@ const MATCHERS: Array<[RegExp, IntroRecipe]> = [
     RECIPES.figures,
   ],
   // Anything else that numbers or sequences its content gets the step build.
-  [
-    /^MV-(TIMELINE|TIME|JOURNEY|ROADMAP|PHASE|PROCESS|STEPS|NUMBERED)/,
-    RECIPES.steps,
-  ],
+  [/^MV-(TIMELINE|TIME|JOURNEY|ROADMAP|PHASE|PROCESS|STEPS|NUMBERED)/, RECIPES.steps],
   [/(BEFORE-AFTER|COMPARE|COMPARISON|VERSUS|SPLIT-COMPARE|TWO-COL)/, RECIPES.split],
   [/^MV-(NUMBERS|KPI|DASH|PROOF|GRAPH|STAT|COUNTDOWN|ICEBERG|MATRIX|CLIENT-MATRIX)/, RECIPES.data],
   [/^MV-(IMG|EDITORIAL-IMAGE|OP-COVER|STAT-IMAGE|MEDIA|VIDEO|HERO)/, RECIPES.media],
@@ -314,9 +313,7 @@ export function orderIntroItems<T extends { x: number; y: number; w: number }>(
     }
     case "center-out": {
       const cx = 960;
-      return [...items].sort(
-        (a, b) => Math.abs(a.x + a.w / 2 - cx) - Math.abs(b.x + b.w / 2 - cx),
-      );
+      return [...items].sort((a, b) => Math.abs(a.x + a.w / 2 - cx) - Math.abs(b.x + b.w / 2 - cx));
     }
     case "top-down":
     default:

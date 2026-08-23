@@ -13,7 +13,17 @@
  * in those formats surviving into the package is flagged.
  */
 
-export type ImageFormat = "webp" | "jpeg" | "png" | "gif" | "bmp" | "tiff" | "svg" | "avif" | "heic" | "unknown";
+export type ImageFormat =
+  | "webp"
+  | "jpeg"
+  | "png"
+  | "gif"
+  | "bmp"
+  | "tiff"
+  | "svg"
+  | "avif"
+  | "heic"
+  | "unknown";
 
 export type ImageEmbedRecord = {
   label: string;
@@ -89,7 +99,8 @@ export function sniffImageFormat(bytes: Uint8Array): ImageFormat {
   if (ascii(4, 4) === "ftyp") {
     const brand = ascii(8, 4).toLowerCase();
     if (brand.startsWith("avif") || brand.startsWith("avis")) return "avif";
-    if (brand.startsWith("heic") || brand.startsWith("heix") || brand.startsWith("hevc")) return "heic";
+    if (brand.startsWith("heic") || brand.startsWith("heix") || brand.startsWith("hevc"))
+      return "heic";
   }
   const head = ascii(0, Math.min(400, b.length));
   if (/<svg[\s>]/i.test(head) || /<\?xml/.test(head)) return "svg";
@@ -108,9 +119,7 @@ export function formatFromHints(opts: {
   // letters "svg"/"gif"/"png" by chance, which used to misclassify a
   // transparent PNG as SVG and skip its re-encode entirely.
   const rawUrl = opts.url ?? "";
-  const urlHint = /^data:/i.test(rawUrl)
-    ? (/^data:([^;,]+)/i.exec(rawUrl)?.[1] ?? "")
-    : rawUrl;
+  const urlHint = /^data:/i.test(rawUrl) ? (/^data:([^;,]+)/i.exec(rawUrl)?.[1] ?? "") : rawUrl;
   const src = `${mime} ${dataMime} ${urlHint}`.toLowerCase();
   if (src.includes("webp")) return "webp";
   if (src.includes("svg")) return "svg";

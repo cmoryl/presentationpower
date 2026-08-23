@@ -24,7 +24,6 @@ import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
 import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
 
-
 export interface DomColor {
   /** 6-digit uppercase hex, no `#`. */
   hex: string;
@@ -93,7 +92,10 @@ let probeCtx: CanvasRenderingContext2D | null | undefined;
 
 function hex3(r: number, g: number, b: number): string {
   const hx = (n: number) =>
-    Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0").toUpperCase();
+    Math.max(0, Math.min(255, Math.round(n)))
+      .toString(16)
+      .padStart(2, "0")
+      .toUpperCase();
   return `${hx(r)}${hx(g)}${hx(b)}`;
 }
 
@@ -429,7 +431,6 @@ function svgDataUrl(el: SVGSVGElement, w: number, h: number): string | null {
     // live element before serializing.
     const xml = resolveSvgMarkupVars(new XMLSerializer().serializeToString(clone), el);
     return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(xml)))}`;
-
   } catch {
     return null;
   }
@@ -500,8 +501,6 @@ function hasUnexpressibleShadow(cs: CSSStyleDeclaration): boolean {
   return layers.length > 1 || layers.some((l) => /\binset\b/i.test(l));
 }
 
-
-
 /**
  * Background paint with no OOXML shape-fill equivalent: radial / conic washes
  * and stacked multi-layer gradients. These stay baked on the design plate.
@@ -515,7 +514,6 @@ function hasUnexpressibleBackground(cs: CSSStyleDeclaration): boolean {
   const layers = bg.split(/,(?![^()]*\))/).filter((p) => /gradient\(/.test(p));
   return layers.length > 1;
 }
-
 
 /**
  * Build a picture record that reproduces an element's decorative effect exactly.
@@ -538,7 +536,6 @@ function effectShapeFor(
   const h = r.height * sy;
   if (w < MIN_SIDE_PX || h < MIN_SIDE_PX) return null;
   if (w > spaceW * 1.5 || h > spaceH * 1.5) return null;
-
 
   const { fill, gradient } = paintOf(cs);
   const radiusPx = radiusOf(cs, w, h);
@@ -571,12 +568,9 @@ function effectShapeFor(
   );
   if (!style) return null;
 
-
   let payload: { src: string; padPx: number; frameW: number; frameH: number };
   try {
-    payload = effectSvgDataUrl(style, w, h, (xml) =>
-      btoa(unescape(encodeURIComponent(xml))),
-    );
+    payload = effectSvgDataUrl(style, w, h, (xml) => btoa(unescape(encodeURIComponent(xml))));
   } catch {
     return null;
   }
@@ -584,7 +578,6 @@ function effectShapeFor(
   const x = (r.left - root.left) * sx - payload.padPx;
   const y = (r.top - root.top) * sy - payload.padPx;
   if (x > spaceW || y > spaceH || x + payload.frameW < 0 || y + payload.frameH < 0) return null;
-
 
   return {
     kind: "image",
@@ -606,8 +599,6 @@ function effectShapeFor(
     node: el,
   };
 }
-
-
 
 export interface DecomposeOptions {
   /**
@@ -714,7 +705,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         }
       }
 
-
       // Frosted glass: the blur only samples what is BEHIND the card, so the
       // card itself keeps exporting as a native rounded rectangle carrying its
       // own tint (the shipping contract's 90-degree linear fill, no line), and
@@ -725,9 +715,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         surfaceRoots.push(el);
         continue;
       }
-
-
-
 
       const r = el.getBoundingClientRect();
       const w = r.width * sx;
@@ -791,7 +778,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         continue;
       }
 
-
       // EXPORT SPEC #3 — never interpret a diffuse backdrop glow as an object.
       // An aurora orb is a radial gradient behind a blur; OOXML has no mesh
       // gradient, so reconstructing it yields the hard-edged circle reported on
@@ -807,8 +793,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         surfaceRoots.push(el);
         continue;
       }
-
-
 
       // ---- painted boxes -------------------------------------------------
       const { fill, gradient } = paintOf(cs);
@@ -978,7 +962,6 @@ export function pruneOccludingPaint(
     return !surfaceOnPlate.some((p) => behind(p) && overlaps(el, p));
   });
 }
-
 
 /**
  * Take the captured paint OFF the plate without touching layout.

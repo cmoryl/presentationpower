@@ -84,8 +84,8 @@ function IndustryBackgroundGalleryPage() {
             Approved background directory
           </h1>
           <p className="mt-1 max-w-2xl text-[13px] leading-relaxed text-black/55 dark:text-white/55">
-            Every approved background system in one place — the 28 core visual languages
-            (S01–S28) and the 30 industry systems (R01–R30) — rendered live through the same{" "}
+            Every approved background system in one place — the 28 core visual languages (S01–S28)
+            and the 30 industry systems (R01–R30) — rendered live through the same{" "}
             <code className="rounded bg-black/[0.05] px-1 dark:bg-white/10">ground()</code> engine
             the slide stage and PPTX/PDF/PNG exporters use. {sets.length} systems ×{" "}
             {INDUSTRY_BG_COMBOS} scene × take compositions = {sets.length * INDUSTRY_BG_COMBOS}{" "}

@@ -12,14 +12,7 @@
 
 const EMU_PER_IN = 914400;
 
-export type LayerObjectType =
-  | "text"
-  | "image"
-  | "icon"
-  | "logo"
-  | "shape"
-  | "chart"
-  | "plate";
+export type LayerObjectType = "text" | "image" | "icon" | "logo" | "shape" | "chart" | "plate";
 
 export interface LayerObject {
   /** Drawing id from p:cNvPr. */
@@ -151,14 +144,15 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
       const ext = /<a:ext\s+cx="(\d+)"\s+cy="(\d+)"/.exec(block);
       const cn = /<p:cNvPr[^>]*\bid="(\d+)"[^>]*\bname="([^"]*)"/.exec(block);
       const runs = [...block.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((m) => decode(m[1]));
-      const rect = off && ext
-        ? {
-            x: Number(off[1]) / size.cx,
-            y: Number(off[2]) / size.cy,
-            w: Number(ext[1]) / size.cx,
-            h: Number(ext[2]) / size.cy,
-          }
-        : { x: 0, y: 0, w: 0, h: 0 };
+      const rect =
+        off && ext
+          ? {
+              x: Number(off[1]) / size.cx,
+              y: Number(off[2]) / size.cy,
+              w: Number(ext[1]) / size.cx,
+              h: Number(ext[2]) / size.cy,
+            }
+          : { x: 0, y: 0, w: 0, h: 0 };
       const name = cn?.[2] ?? "";
       const hasText = runs.some((t) => t.trim().length > 0);
       const { type, editable, note } = classify(kind, name, rect, hasText, slideInches, block);

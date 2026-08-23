@@ -111,7 +111,8 @@ export function expectationFor(variantId: string, content: unknown): VariantExpo
   let mediaCount = 0;
   for (const p of Object.keys(collections)) {
     for (const node of resolveFieldPath(content, p)) {
-      if (isRecord(node) && Object.keys(node).some((k) => isMediaKey(k) && node[k])) mediaCount += 1;
+      if (isRecord(node) && Object.keys(node).some((k) => isMediaKey(k) && node[k]))
+        mediaCount += 1;
     }
   }
   if (isRecord(content) && Object.keys(content).some((k) => isMediaKey(k) && content[k])) {
@@ -147,7 +148,7 @@ export function expectationFor(variantId: string, content: unknown): VariantExpo
 
 export interface VariantExportVerdict {
   variantId: string;
-  ok: boolean
+  ok: boolean;
   /** Human-readable mismatches; empty when the export matches the manifest. */
   problems: string[];
   /** Copy the manifest requires that never reached a native text object. */
@@ -156,7 +157,11 @@ export interface VariantExportVerdict {
   counts: Record<LayerObjectType, number>;
 }
 
-const norm = (s: string) => s.replace(/[\s\u00a0]+/g, " ").trim().toLowerCase();
+const norm = (s: string) =>
+  s
+    .replace(/[\s\u00a0]+/g, " ")
+    .trim()
+    .toLowerCase();
 
 /**
  * Compare one exported slide's layer report against a manifest expectation.

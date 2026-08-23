@@ -167,7 +167,8 @@ export const EVENT_LOOKS: EventLook[] = [
     id: "gala-spotlight",
     label: "Gala Spotlight",
     tag: "Awards",
-    blurb: "Pink-on-black spotlight terrazzo with a poster headline stack — awards and gala nights.",
+    blurb:
+      "Pink-on-black spotlight terrazzo with a poster headline stack — awards and gala nights.",
     deep: "#150011",
     accent: "#EC388A",
     accentAlt: "#FFEB66",
@@ -184,7 +185,8 @@ export const EVENT_LOOKS: EventLook[] = [
     id: "build-lab",
     label: "Build Lab",
     tag: "Hackathon",
-    blurb: "Dot-matrix build field in green and aqua — hackathons, labs and technical field events.",
+    blurb:
+      "Dot-matrix build field in green and aqua — hackathons, labs and technical field events.",
     deep: "#04140F",
     accent: "#A6FA87",
     accentAlt: "#A1FBF9",
@@ -297,7 +299,6 @@ export function reinkLook(look: EventLook, accent: string | null | undefined): E
 }
 
 export function channelLook(args: {
-
   /** Demo set id — used only as the deterministic fallback key. */
   key: string;
   /** Brand mode / division id, e.g. "bm-tp-legal". */
@@ -333,7 +334,6 @@ export function channelLook(args: {
   };
 }
 
-
 // ---------------------------------------------------------------------------
 // Per-demo derived looks
 // ---------------------------------------------------------------------------
@@ -350,13 +350,22 @@ function hashKey(key: string): number {
 function mix(hex: string, target: string, amount: number): string {
   const parse = (v: string) => {
     const s = v.replace("#", "");
-    const f = s.length === 3 ? s.split("").map((c) => c + c).join("") : s;
+    const f =
+      s.length === 3
+        ? s
+            .split("")
+            .map((c) => c + c)
+            .join("")
+        : s;
     return [0, 2, 4].map((i) => parseInt(f.slice(i, i + 2), 16));
   };
   const [r1, g1, b1] = parse(hex);
   const [r2, g2, b2] = parse(target);
   const t = Math.max(0, Math.min(1, amount));
-  const to = (a: number, b: number) => Math.round(a + (b - a) * t).toString(16).padStart(2, "0");
+  const to = (a: number, b: number) =>
+    Math.round(a + (b - a) * t)
+      .toString(16)
+      .padStart(2, "0");
   return `#${to(r1!, r2!)}${to(g1!, g2!)}${to(b1!, b2!)}`;
 }
 
@@ -370,9 +379,7 @@ export function derivedLook(
 ): EventLook {
   const mapped = PLAYBOOK_LOOK_ID[key];
   const pool = EVENT_LOOKS;
-  const base = mapped
-    ? EVENT_LOOKS_BY_ID[mapped]!
-    : pool[hashKey(key) % pool.length]!;
+  const base = mapped ? EVENT_LOOKS_BY_ID[mapped]! : pool[hashKey(key) % pool.length]!;
   const accent = overrides?.accent ?? base.accent;
   const accentAlt = overrides?.accentAlt ?? mix(accent, base.accentAlt, 0.55);
   const h = hashKey(`${key}:tune`);
@@ -386,7 +393,9 @@ export function derivedLook(
     lightFrom: mix(base.lightFrom, accent, 0.06),
     lightTo: base.lightTo,
     ink: overrides?.ink ?? base.ink,
-    motif: mapped ? base.motif : (["grid", "arcs", "rays", "dots", "waves", "terrazzo", "bars", "chevron"] as const)[h % 8]!,
+    motif: mapped
+      ? base.motif
+      : (["grid", "arcs", "rays", "dots", "waves", "terrazzo", "bars", "chevron"] as const)[h % 8]!,
     motifOpacity: mapped ? base.motifOpacity : 0.1 + ((h >> 3) % 5) * 0.03,
     radius: mapped ? base.radius : [4, 8, 12, 18, 24][(h >> 6) % 5]!,
   };

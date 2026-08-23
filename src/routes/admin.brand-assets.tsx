@@ -37,6 +37,24 @@ type BrandAssetRow = {
 };
 
 export const Route = createFileRoute("/admin/brand-assets")({
+  head: () => ({
+    meta: [
+      { title: "Brand assets · Admin · TransPerfect Element" },
+      {
+        name: "description",
+        content:
+          "Manage the Element brand asset library: source documents, chunked knowledge and division imagery.",
+      },
+      { property: "og:title", content: "Brand assets · Admin · TransPerfect Element" },
+      {
+        property: "og:description",
+        content:
+          "Manage the Element brand asset library: source documents, chunked knowledge and division imagery.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: BrandAssetsAdminView,
 });
 
@@ -272,7 +290,8 @@ function BrandAssetsAdminView() {
           <h2 className="text-lg font-semibold">Uploaded brand assets</h2>
           <div className="text-xs text-black/50">
             {(q.data ?? []).length} assets ·{" "}
-            {(q.data ?? []).reduce((a: number, r: BrandAssetRow) => a + (r.chunkCount ?? 0), 0)} chunks
+            {(q.data ?? []).reduce((a: number, r: BrandAssetRow) => a + (r.chunkCount ?? 0), 0)}{" "}
+            chunks
           </div>
         </div>
         {q.isLoading ? (

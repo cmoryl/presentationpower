@@ -116,12 +116,7 @@ function proposedFor(_hex: string): { cmyk?: Cmyk; spot?: SpotColor; note?: stri
   return undefined;
 }
 
-function slotFor(
-
-  role: PrintColorSlot["role"],
-  hex: string,
-  intent: PrintIntent,
-): PrintColorSlot {
+function slotFor(role: PrintColorSlot["role"], hex: string, intent: PrintIntent): PrintColorSlot {
   // Ink is the one slot with a settled answer: text is 100K, everywhere.
   if (role === "ink") {
     return {
@@ -169,9 +164,7 @@ export function printColorBuild(
   intent: PrintIntent,
   brands: BrandMode[] = BRAND_MODES,
 ): PrintColorBuild | undefined {
-  return printColorBuilds(brands).find(
-    (b) => b.brandModeId === brandModeId && b.intent === intent,
-  );
+  return printColorBuilds(brands).find((b) => b.brandModeId === brandModeId && b.intent === intent);
 }
 
 export type QueueSummary = {

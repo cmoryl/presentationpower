@@ -58,21 +58,23 @@ function slim(item: PrintLibraryItem) {
   };
 }
 
-function seedContent(kind: z.infer<typeof KindEnum>, data: {
-  title: string;
-  prospect?: string;
-  industry?: string;
-  audience?: string;
-  objective?: string;
-}): Rec {
+function seedContent(
+  kind: z.infer<typeof KindEnum>,
+  data: {
+    title: string;
+    prospect?: string;
+    industry?: string;
+    audience?: string;
+    objective?: string;
+  },
+): Rec {
   const summary = data.objective ?? "";
   if (kind === "spotlight")
     return emptySpotlight({
       productName: data.prospect || data.title,
       summary,
     }) as unknown as Rec;
-  if (kind === "ebrochure")
-    return emptyEBrochure({ title: data.title, summary }) as unknown as Rec;
+  if (kind === "ebrochure") return emptyEBrochure({ title: data.title, summary }) as unknown as Rec;
   if (kind === "adaptor-brief")
     return emptyAdaptorBrief({ title: data.title, summary }) as unknown as Rec;
   if (kind === "msa-partnership")
@@ -102,7 +104,13 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!data) throw new Error("That print piece was not found.");
-    return data as { id: string; kind: string; title: string; brand_mode_id: string | null; content: Rec };
+    return data as {
+      id: string;
+      kind: string;
+      title: string;
+      brand_mode_id: string | null;
+      content: Rec;
+    };
   };
 
   return {
@@ -261,7 +269,9 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       execute: async (input) => {
         const known = BRAND_MODES.some((m) => m.id === input.divisionId);
         if (!known)
-          return { error: `Unknown division "${input.divisionId}". Call list_print_divisions first.` };
+          return {
+            error: `Unknown division "${input.divisionId}". Call list_print_divisions first.`,
+          };
         const content = seedContent(input.kind, input);
         const { data, error } = await supabase
           .from("print_assets")
@@ -300,7 +310,9 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
         if (!mod) return { error: `Unknown module "${moduleId}".` };
         const asset = await loadAsset(assetId);
         const content = { ...(asset.content ?? {}) } as Rec;
-        const modules = Array.isArray(content["modules"]) ? [...(content["modules"] as unknown[])] : [];
+        const modules = Array.isArray(content["modules"])
+          ? [...(content["modules"] as unknown[])]
+          : [];
         const block = mod.make() as unknown;
         const at = position === undefined ? modules.length : Math.min(position, modules.length);
         modules.splice(at, 0, block);
@@ -320,7 +332,9 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       execute: async ({ assetId, index }) => {
         const asset = await loadAsset(assetId);
         const content = { ...(asset.content ?? {}) } as Rec;
-        const modules = Array.isArray(content["modules"]) ? [...(content["modules"] as unknown[])] : [];
+        const modules = Array.isArray(content["modules"])
+          ? [...(content["modules"] as unknown[])]
+          : [];
         if (index >= modules.length) return { error: `There is no module at index ${index}.` };
         modules.splice(index, 1);
         content["modules"] = modules;
@@ -351,7 +365,11 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
               .filter(([k]) => k !== "modules")
               .map(([k, v]) => [
                 k,
-                typeof v === "string" ? v.slice(0, 400) : Array.isArray(v) ? `[${v.length} items]` : typeof v,
+                typeof v === "string"
+                  ? v.slice(0, 400)
+                  : Array.isArray(v)
+                    ? `[${v.length} items]`
+                    : typeof v,
               ]),
           ),
           modules: modules.map((m, i) => ({

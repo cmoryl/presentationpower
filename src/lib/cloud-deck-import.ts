@@ -4,7 +4,6 @@
 import type { Brief, Deck, DeckSlide } from "@/lib/deck-store";
 import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
 
-
 export type CloudDeckPayload = {
   deck: unknown;
   brief?: unknown;
@@ -81,7 +80,6 @@ export function cloudDeckToLocal(res: CloudDeckPayload): { brief: Brief; deck: D
       extras,
     );
   });
-
 
   const deckContext = d.context;
   const contextSubCompany =

@@ -38,8 +38,7 @@ function keywordSignals(g: SlideSignals): string[] {
 export function describeSignals(m: MappedSlide): string[] {
   const g = readSignals(m);
   const out: string[] = [];
-  if (g.stats.length >= 2)
-    out.push(`${g.stats.length} numeric figures in the copy`);
+  if (g.stats.length >= 2) out.push(`${g.stats.length} numeric figures in the copy`);
   else if (g.stats.length === 1) out.push("one numeric figure");
   if (g.dated.length >= 2) out.push(`${g.dated.length} dated milestones`);
   if (g.stepped) out.push("numbered / stepped bullets");

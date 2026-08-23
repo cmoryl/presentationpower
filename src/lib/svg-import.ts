@@ -80,8 +80,8 @@ export function importSvgMarkup(markup: string, label: string): ImportedSvg | nu
     .trim()
     .split(/[\s,]+/)
     .map(Number);
-  let w = vb.length === 4 && vb[2] > 0 ? vb[2] : num(svg.getAttribute("width")) ?? 100;
-  let h = vb.length === 4 && vb[3] > 0 ? vb[3] : num(svg.getAttribute("height")) ?? 100;
+  let w = vb.length === 4 && vb[2] > 0 ? vb[2] : (num(svg.getAttribute("width")) ?? 100);
+  let h = vb.length === 4 && vb[3] > 0 ? vb[3] : (num(svg.getAttribute("height")) ?? 100);
   if (!(w > 0) || !(h > 0)) {
     w = 100;
     h = 100;
@@ -98,7 +98,12 @@ export function importSvgMarkup(markup: string, label: string): ImportedSvg | nu
   return {
     src: `data:image/svg+xml;utf8,${encodeURIComponent(xml)}`,
     aspect: w / h,
-    alt: `${label.replace(/\.svg$/i, "").replace(/[-_]+/g, " ").trim() || "Uploaded"} graphic`,
+    alt: `${
+      label
+        .replace(/\.svg$/i, "")
+        .replace(/[-_]+/g, " ")
+        .trim() || "Uploaded"
+    } graphic`,
   };
 }
 

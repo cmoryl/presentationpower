@@ -29,7 +29,9 @@ describe("repairChartXml", () => {
 
   it("adds grouping to a lineChart and keeps it before the first series", () => {
     const out = repairChartXml(
-      space('<c:lineChart><c:ser><c:idx val="0"/></c:ser><c:axId val="1"/></c:lineChart>' + CAT_VAL),
+      space(
+        '<c:lineChart><c:ser><c:idx val="0"/></c:ser><c:axId val="1"/></c:lineChart>' + CAT_VAL,
+      ),
     );
     expect(out).toContain('<c:grouping val="standard"/>');
     expect(out.indexOf("<c:grouping")).toBeLessThan(out.indexOf("<c:ser>"));
@@ -38,7 +40,11 @@ describe("repairChartXml", () => {
   it("re-sequences series children into schema order (dLbls before cat/val)", () => {
     const ser =
       '<c:ser><c:idx val="1"/><c:order val="1"/><c:cat><c:strRef><c:f>A</c:f></c:strRef></c:cat><c:val><c:numRef><c:f>B</c:f></c:numRef></c:val><c:dLbls><c:showVal val="0"/></c:dLbls><c:marker><c:symbol val="circle"/></c:marker></c:ser>';
-    const out = repairChartXml(space(`<c:lineChart><c:grouping val="standard"/>${ser}<c:axId val="1"/></c:lineChart>` + CAT_VAL));
+    const out = repairChartXml(
+      space(
+        `<c:lineChart><c:grouping val="standard"/>${ser}<c:axId val="1"/></c:lineChart>` + CAT_VAL,
+      ),
+    );
     const body = /<c:ser>([\s\S]*?)<\/c:ser>/.exec(out)![1];
     expect(body.indexOf("<c:marker")).toBeLessThan(body.indexOf("<c:dLbls"));
     expect(body.indexOf("<c:dLbls")).toBeLessThan(body.indexOf("<c:cat"));
@@ -50,7 +56,9 @@ describe("repairChartXml", () => {
 
   it("replaces an illegal line width with a 1pt hairline", () => {
     const out = repairChartXml(
-      space('<c:barChart><c:ser><c:spPr><a:ln w="3.996568951241272e+28" cap="flat"/></c:spPr></c:ser></c:barChart>'),
+      space(
+        '<c:barChart><c:ser><c:spPr><a:ln w="3.996568951241272e+28" cap="flat"/></c:spPr></c:ser></c:barChart>',
+      ),
     );
     expect(out).toContain('<a:ln w="12700" cap="flat"/>');
   });

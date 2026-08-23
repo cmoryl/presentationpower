@@ -8,7 +8,6 @@ import {
   NEXT_PALETTE_DIVISIONS,
 } from "@/lib/next-palette-showcase";
 
-
 export const Route = createFileRoute("/decks/next-palette")({
   head: () => ({
     meta: [
@@ -35,8 +34,8 @@ function NextPaletteShowcasePage() {
   const navigate = useNavigate();
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
   const setSlideMode = useDeckStore((s) => s.setSlideMode);
-  const existingId = useDeckStore((s) =>
-    Object.values(s.decks).find((d) => d.title === NEXT_PALETTE_DECK_TITLE)?.id,
+  const existingId = useDeckStore(
+    (s) => Object.values(s.decks).find((d) => d.title === NEXT_PALETTE_DECK_TITLE)?.id,
   );
 
   function create() {
@@ -89,7 +88,6 @@ function NextPaletteShowcasePage() {
             </button>
           )}
         </div>
-
 
         <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {NEXT_PALETTE_DIVISIONS.map((d, i) => (

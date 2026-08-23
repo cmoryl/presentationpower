@@ -181,14 +181,22 @@ export const VisualPlanSchema = z.object({
   style_pack_id: z
     .string()
     .describe("Chosen visual language, as a style pack id like 'skin-s04' (or its S-code)"),
-  design_recipe_id: z.string().optional().describe("Industry recipe id like 'R07', when one applies"),
-  rationale: z.string().describe("One or two sentences: why this look suits this audience and story"),
+  design_recipe_id: z
+    .string()
+    .optional()
+    .describe("Industry recipe id like 'R07', when one applies"),
+  rationale: z
+    .string()
+    .describe("One or two sentences: why this look suits this audience and story"),
   slides: z
     .array(
       z.object({
         title: z.string().describe("Slide title, matching the approved outline"),
         scene: z.string().describe(`Section scene: one of ${SKIN_SCENES.join(", ")}`),
-        visual_note: z.string().optional().describe("Short note on the imagery or emphasis for this slide"),
+        visual_note: z
+          .string()
+          .optional()
+          .describe("Short note on the imagery or emphasis for this slide"),
       }),
     )
     .describe("Visual assignment per slide, in deck order"),
@@ -270,10 +278,21 @@ export function buildDesignKnowledgeToolSet(): ToolSet {
         intent: z
           .string()
           .optional()
-          .describe("Free text about audience, industry, tone or objective, e.g. 'life sciences board review, sober'"),
+          .describe(
+            "Free text about audience, industry, tone or objective, e.g. 'life sciences board review, sober'",
+          ),
         mode: z.enum(["light", "dark"]).optional().describe("Preferred page field"),
-        limit: z.number().int().min(1).max(58).optional().describe("How many languages to return (default 6)"),
-        include_all: z.boolean().optional().describe("Return the whole catalog instead of a shortlist"),
+        limit: z
+          .number()
+          .int()
+          .min(1)
+          .max(58)
+          .optional()
+          .describe("How many languages to return (default 6)"),
+        include_all: z
+          .boolean()
+          .optional()
+          .describe("Return the whole catalog instead of a shortlist"),
       }),
       execute: async ({ intent, mode, limit, include_all }) => {
         const recipes = matchRecipes(intent ?? "", 4);
@@ -295,7 +314,8 @@ export function buildDesignKnowledgeToolSet(): ToolSet {
           industry_signatures: signatures.map(skinDigest),
           recommended: skins.map(skinDigest),
           industry_recipes: (recipes.length ? recipes : INDUSTRY_RECIPES.slice(0, 4)).map(
-            (r) => `${r.id} · ${r.name} — ${r.summary} (tone: ${r.tone}; languages: ${r.dna.join(", ")})`,
+            (r) =>
+              `${r.id} · ${r.name} — ${r.summary} (tone: ${r.tone}; languages: ${r.dna.join(", ")})`,
           ),
           section_scenes: SCENE_MAP,
           how_to_use:
@@ -308,7 +328,9 @@ export function buildDesignKnowledgeToolSet(): ToolSet {
       description:
         "Get the full visual knowledge map for one design language: palette roles, typographic character, box shape, section layout families, backdrop motif and imagery direction.",
       inputSchema: z.object({
-        style_pack_id: z.string().describe("Style pack id like 'skin-s04', an S-code, or the language name"),
+        style_pack_id: z
+          .string()
+          .describe("Style pack id like 'skin-s04', an S-code, or the language name"),
       }),
       execute: async ({ style_pack_id }) => {
         const skin = resolveSkin(style_pack_id);

@@ -34,7 +34,9 @@ describe("imported graphics rehydration", () => {
   });
 
   it("classifies structured data, stripped charts, pictures and copy figures", () => {
-    expect(classifyVisualSignal({ index: 0, assets: chartAssets as never }).kind).toBe("structured");
+    expect(classifyVisualSignal({ index: 0, assets: chartAssets as never }).kind).toBe(
+      "structured",
+    );
     expect(
       classifyVisualSignal({
         index: 1,
@@ -48,9 +50,9 @@ describe("imported graphics rehydration", () => {
         imageCount: 1,
       }).kind,
     ).toBe("image-graphic");
-    expect(
-      classifyVisualSignal({ index: 3, bullets: ["99.98% uptime", "$284K saved"] }).kind,
-    ).toBe("stat-copy");
+    expect(classifyVisualSignal({ index: 3, bullets: ["99.98% uptime", "$284K saved"] }).kind).toBe(
+      "stat-copy",
+    );
     expect(classifyVisualSignal({ index: 4, bullets: ["We partner closely"] }).kind).toBe("none");
   });
 
@@ -84,7 +86,10 @@ describe("accepted visual overrides", () => {
 
   it("swaps the module, merges content and clears faithful-import flags", () => {
     const out = applyVisualOverrides(base, {
-      2: { variantId: "MV-VIZ-BAR", content: { title: "Uptime", bars: [{ label: "EMEA", value: 99.98 }] } },
+      2: {
+        variantId: "MV-VIZ-BAR",
+        content: { title: "Uptime", bars: [{ label: "EMEA", value: 99.98 }] },
+      },
     });
     expect(out[0].variantId).toBe("MV-VIZ-BAR");
     expect(out[0].content.bars).toHaveLength(1);

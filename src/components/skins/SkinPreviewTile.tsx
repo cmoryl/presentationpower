@@ -162,7 +162,9 @@ function Body({
 }
 
 function Rule({ pack, width = "22%" }: { pack: StylePack; width?: string }) {
-  return <div className="h-[2px]" style={{ background: pack.tokens.accent, width, opacity: 0.9 }} />;
+  return (
+    <div className="h-[2px]" style={{ background: pack.tokens.accent, width, opacity: 0.9 }} />
+  );
 }
 
 function StatCard({
@@ -277,10 +279,18 @@ function Agenda({ ctx }: { ctx: Ctx }) {
       </div>
       <div className="mt-[4%] grid flex-1 grid-cols-2 gap-x-[6%] gap-y-[3%] content-start">
         {items.map((label, i) => (
-          <div key={label} className="flex items-baseline gap-[4%] border-t pt-[2%]" style={{ borderColor: pack.tokens.hairline }}>
+          <div
+            key={label}
+            className="flex items-baseline gap-[4%] border-t pt-[2%]"
+            style={{ borderColor: pack.tokens.hairline }}
+          >
             <span
               className="text-[7px] leading-none"
-              style={{ color: pack.tokens.accentText, fontFamily: pack.type.display, fontWeight: 700 }}
+              style={{
+                color: pack.tokens.accentText,
+                fontFamily: pack.type.display,
+                fontWeight: 700,
+              }}
             >
               {String(i + 1).padStart(2, "0")}
             </span>
@@ -368,7 +378,10 @@ function Split({ ctx }: { ctx: Ctx }) {
         <div className="mt-[4%] space-y-[4%]">
           {["Single source of truth", "Local nuance preserved", "Editable everywhere"].map((s) => (
             <div key={s} className="flex items-center gap-[3%]">
-              <span className="h-[3px] w-[3px] shrink-0" style={{ background: pack.tokens.accent }} />
+              <span
+                className="h-[3px] w-[3px] shrink-0"
+                style={{ background: pack.tokens.accent }}
+              />
               <Body pack={pack} size={6}>
                 {s}
               </Body>
@@ -407,7 +420,11 @@ function Bento({ ctx }: { ctx: Ctx }) {
         <div className="p-[6%]" style={card}>
           <div
             className="text-[11px] leading-none"
-            style={{ color: pack.tokens.accentText, fontFamily: pack.type.display, fontWeight: 700 }}
+            style={{
+              color: pack.tokens.accentText,
+              fontFamily: pack.type.display,
+              fontWeight: 700,
+            }}
           >
             42%
           </div>
@@ -503,7 +520,10 @@ function Timeline({ ctx }: { ctx: Ctx }) {
         </Display>
       </div>
       <div className="relative mt-[8%]">
-        <div className="absolute left-0 right-0 top-[3px] h-[2px]" style={{ background: pack.tokens.hairline }} />
+        <div
+          className="absolute left-0 right-0 top-[3px] h-[2px]"
+          style={{ background: pack.tokens.hairline }}
+        />
         <div className="relative flex justify-between">
           {steps.map((s, i) => (
             <div key={s} className="flex w-[22%] flex-col items-start gap-[6px]">
@@ -575,7 +595,12 @@ function SectionDivider({ ctx }: { ctx: Ctx }) {
       </div>
       <div
         className="text-[34px] leading-none"
-        style={{ color: pack.tokens.accent, fontFamily: pack.type.display, fontWeight: 800, opacity: 0.5 }}
+        style={{
+          color: pack.tokens.accent,
+          fontFamily: pack.type.display,
+          fontWeight: 800,
+          opacity: 0.5,
+        }}
       >
         02
       </div>

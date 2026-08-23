@@ -43,7 +43,6 @@ export function normalizeImagesByAlpha(): boolean {
   }
 }
 
-
 /** Formats every PowerPoint version since 2007 decodes natively. */
 function isUniversalBitmap(fmt: string): boolean {
   return fmt === "jpeg" || fmt === "png";

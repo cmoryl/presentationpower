@@ -66,7 +66,9 @@ export const getStyleLearning = createServerFn({ method: "GET" })
     const enabled = prefs.data?.learning_enabled ?? true;
     if (!enabled) return { ...EMPTY_LEARNING, profileKey: data.profileKey };
 
-    const ignoreBefore = prefs.data?.ignore_before ? new Date(prefs.data.ignore_before).getTime() : 0;
+    const ignoreBefore = prefs.data?.ignore_before
+      ? new Date(prefs.data.ignore_before).getTime()
+      : 0;
 
     // 1. PERSONAL — own rows only (RLS enforces it anyway).
     const since = new Date(Date.now() - LEARNING_LIMITS.maxAgeDays * 86400_000).toISOString();
@@ -103,7 +105,11 @@ export const getStyleLearning = createServerFn({ method: "GET" })
         _profile_key: data.profileKey,
       });
       if (!agg.error) {
-        for (const row of (agg.data ?? []) as { style_code: string; raw: number; samples: number }[]) {
+        for (const row of (agg.data ?? []) as {
+          style_code: string;
+          raw: number;
+          samples: number;
+        }[]) {
           const code = (row.style_code ?? "").toUpperCase();
           if (!code) continue;
           rawProfile[code] = (rawProfile[code] ?? 0) + Number(row.raw ?? 0);

@@ -1,4 +1,3 @@
-
 /**
  * Enterprise White — the saved ground set.
  *
@@ -121,7 +120,6 @@ function region(layer: string, pos: string, w: string, h: string): string {
   return `${layer} ${pos} / ${w} ${h} no-repeat`;
 }
 
-
 /** A single measured hairline at a fractional position (0–1) on an axis. */
 function line(pos: number, hex: string, alpha: number, axis: "x" | "y" = "x"): string {
   const deg = axis === "x" ? 90 : 180;
@@ -153,11 +151,12 @@ function spine(side: "left" | "right" | "top" | "bottom", hex: string, w = 6): s
   const grad = horiz
     ? `linear-gradient(90deg, ${rgba(hex, 0.9)}, ${rgba(hex, 0.12)})`
     : `linear-gradient(180deg, ${rgba(hex, 0.9)}, ${rgba(hex, 0.12)})`;
-  const pos = { left: "left top", right: "right top", top: "left top", bottom: "left bottom" }[side];
+  const pos = { left: "left top", right: "right top", top: "left top", bottom: "left bottom" }[
+    side
+  ];
   const size = horiz ? `100% ${w}px` : `${w}px 100%`;
   return `${grad} ${pos} / ${size} no-repeat`;
 }
-
 
 export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = {
   "veil-corners": {
@@ -386,7 +385,8 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
   "media-shelf": {
     id: "media-shelf",
     label: "Media shelf",
-    description: "A ruled, tinted shelf under a full-width image strip so the row sits on something.",
+    description:
+      "A ruled, tinted shelf under a full-width image strip so the row sits on something.",
     contentZone: "lower",
     media: true,
     build: (a) => [
@@ -404,7 +404,8 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
   "media-frame": {
     id: "media-frame",
     label: "Media frame",
-    description: "Colour and crop marks pressed to the outer margin so a centred image reads framed.",
+    description:
+      "Colour and crop marks pressed to the outer margin so a centred image reads framed.",
     contentZone: "center",
     media: true,
     build: (a) => [
@@ -417,7 +418,6 @@ export const ENTERPRISE_GROUNDS: Record<EnterpriseGroundId, EnterpriseGround> = 
     ],
   },
 };
-
 
 export const ENTERPRISE_GROUND_IDS = Object.keys(ENTERPRISE_GROUNDS) as EnterpriseGroundId[];
 
@@ -555,7 +555,6 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   "MV-PROC-PROOF-PAIRS": "thirds-right",
   "MV-PROC-PLATFORM-LOOP": "horizon",
 
-
   "MV-TIMELINE-VERTICAL": "column-rail",
   "MV-ROADMAP-QUARTERS": "horizon",
   "MV-JOURNEY-MAP": "horizon",
@@ -574,7 +573,6 @@ export const GROUND_BY_LAYOUT: Partial<Record<string, EnterpriseGroundId>> = {
   "MV-BENTO-7": "grid-mesh",
   "MV-BENTO-8": "grid-mesh",
   "MV-BENTO-VALUE-CLOSE": "thirds-lower",
-
 
   // Close.
   "MV-CLOSE-CTA": "thirds-lower",
@@ -655,4 +653,3 @@ export function enterpriseGroundFor(
   const ground = ENTERPRISE_GROUNDS[groundId ?? groundIdForLayout(layoutId)];
   return minimalGroundLayers(ground.build(accentHex || DEFAULT_ACCENT)).join(", ");
 }
-

@@ -9,7 +9,6 @@ import {
   brandIconSetForDivision,
   APPROVED_SET_SIZE,
   SUB_AREA_MIN_SIZE,
-
   flatIcons,
   iconColorOptions,
 } from "@/lib/brand-icon-sets";
@@ -53,8 +52,6 @@ describe("brand icon sets", () => {
       expect(new Set(all).size).toBeGreaterThanOrEqual(all.length - 10);
     }
   });
-
-
 
   it("matches labels to the division's own approved vocabulary", () => {
     expect(approvedIconForLabel("bm-tp-legal", "Document review workflow")).toBeTruthy();

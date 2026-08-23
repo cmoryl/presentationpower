@@ -85,7 +85,9 @@ describe("surface / foreground pairing", () => {
   });
 
   it("ignores translucent fills and fills that do not contain the text", () => {
-    expect(auditContrast([label("03002C")], [{ ...panel("03002C"), transparency: 60 }])).toEqual([]);
+    expect(auditContrast([label("03002C")], [{ ...panel("03002C"), transparency: 60 }])).toEqual(
+      [],
+    );
     expect(auditContrast([label("03002C")], [{ ...panel("03002C"), x: 8 }])).toEqual([]);
   });
 });
@@ -103,7 +105,9 @@ describe("text overlap assertion", () => {
 
   it("flags the split styled line and the pre-wrapped continuation", () => {
     // Cover: two shapes at y=4.11in, both h=1.21in, overlapping after a metric shift.
-    expect(auditTextOverlap([box("The Module", 1, 4.11), box("Library", 2.2, 4.11)])).toHaveLength(1);
+    expect(auditTextOverlap([box("The Module", 1, 4.11), box("Library", 2.2, 4.11)])).toHaveLength(
+      1,
+    );
     // Slide 70: tail word inside the headline box's vertical span.
     const headline = box("headline", 1, 2.71, 8, 2.76);
     const tail = box("markets.", 1, 4.33, 1.4, 0.6);

@@ -84,7 +84,6 @@ export async function loadAgentThread(
   return { thread: thread as AgentThread, messages };
 }
 
-
 /** Pull the deck id out of any tool output text the agent produced. */
 export function findDeckIdInMessages(messages: UIMessage[]): string | null {
   const uuid = /"deck_id"\s*:\s*"([0-9a-f-]{36})"/i;

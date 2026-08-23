@@ -99,8 +99,7 @@ function collectPaths(slides: ReadonlyArray<Pick<DeckSlide, "content">>): Paths 
     // Imported master/layout backdrops keep their storage path alongside the
     // signed URL so the backdrop re-signs like any other slide image.
     const bg = c.background as Record<string, unknown> | undefined;
-    if (bg && typeof bg === "object" && typeof bg.path === "string" && bg.path)
-      images.add(bg.path);
+    if (bg && typeof bg === "object" && typeof bg.path === "string" && bg.path) images.add(bg.path);
 
     const items = Array.isArray(c.items) ? (c.items as Array<Record<string, unknown>>) : [];
     for (const it of items) {

@@ -65,8 +65,6 @@ export default defineTool({
       );
     }
 
-
-
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
     if (!userId) return errorResult("Not authenticated");
@@ -124,7 +122,11 @@ export default defineTool({
       // Slides are created empty, so every chart/diagram module on the plan
       // needs its plotted values written before the deck is presentable.
       visuals_needing_data: auditVisualData(
-        plan.value.slides.map((s) => ({ position: s.position, variant_id: s.variantId, content: {} })),
+        plan.value.slides.map((s) => ({
+          position: s.position,
+          variant_id: s.variantId,
+          content: {},
+        })),
       ),
     });
   },

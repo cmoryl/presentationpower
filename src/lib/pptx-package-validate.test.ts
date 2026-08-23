@@ -55,7 +55,9 @@ describe("kindFromFilename / kindFromContentTypes", () => {
     expect(kindFromContentTypes(CT("presentationml.presentation.main+xml"))).toBe("pptx");
     expect(kindFromContentTypes(CT("presentationml.slideshow.main+xml"))).toBe("ppsx");
     expect(kindFromContentTypes(CT("presentationml.template.main+xml"))).toBe("potx");
-    expect(kindFromContentTypes(CT("presentationml.presentation.macroEnabled.main+xml"))).toBe("pptm");
+    expect(kindFromContentTypes(CT("presentationml.presentation.macroEnabled.main+xml"))).toBe(
+      "pptm",
+    );
     expect(kindFromContentTypes(CT("wordprocessingml.document.main+xml"))).toBe("unknown");
   });
 });
@@ -137,9 +139,14 @@ describe("validatePackageEntries", () => {
       path: `ppt/media/image${i}.png`,
       bytes: 10,
     }));
-    expect(validatePackageEntries(many).risks.some((r) => r.code === "too-many-entries")).toBe(true);
+    expect(validatePackageEntries(many).risks.some((r) => r.code === "too-many-entries")).toBe(
+      true,
+    );
 
-    const huge = validatePackageEntries([...OK_ENTRIES, { path: "ppt/media/big.mov", bytes: 90_000_000 }]);
+    const huge = validatePackageEntries([
+      ...OK_ENTRIES,
+      { path: "ppt/media/big.mov", bytes: 90_000_000 },
+    ]);
     expect(huge.risks.some((r) => r.code === "entry-too-large")).toBe(true);
     expect(huge.safeToParse).toBe(false);
 
@@ -171,9 +178,9 @@ describe("validatePackageEntries", () => {
 
     const abs = validatePackageEntries([...OK_ENTRIES, { path: "/etc/passwd", bytes: 10 }]);
     expect(abs.risks.some((r) => r.code === "absolute-path")).toBe(true);
-    expect(validatePackageEntries([...OK_ENTRIES, { path: "C:\\win\\a.dll", bytes: 1 }]).safeToParse).toBe(
-      false,
-    );
+    expect(
+      validatePackageEntries([...OK_ENTRIES, { path: "C:\\win\\a.dll", bytes: 1 }]).safeToParse,
+    ).toBe(false);
   });
 
   it("reports macros and OLE embeds as findings, never as blockers", () => {
@@ -192,7 +199,9 @@ describe("validatePackageEntries", () => {
 
 describe("XML and relationship hardening helpers", () => {
   it("flags DOCTYPE / ENTITY declarations", () => {
-    expect(containsDoctypeOrEntity('<?xml version="1.0"?><!DOCTYPE x [ <!ENTITY a "b"> ]><x/>')).toBe(true);
+    expect(
+      containsDoctypeOrEntity('<?xml version="1.0"?><!DOCTYPE x [ <!ENTITY a "b"> ]><x/>'),
+    ).toBe(true);
     expect(containsDoctypeOrEntity("<p:sld><p:cSld/></p:sld>")).toBe(false);
   });
 

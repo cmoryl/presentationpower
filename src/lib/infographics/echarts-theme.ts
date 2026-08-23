@@ -6,8 +6,6 @@ import type { InfographicTheme } from "./spec";
 // Shared accent helper — single implementation project-wide.
 import { hexA } from "@/lib/accent-tokens";
 
-
-
 /** Rotate hue of a hex color by `deg` degrees. Cheap HSL round-trip. */
 function shift(hex: string, deg: number, lPct = 0): string {
   const h = hex.replace("#", "");

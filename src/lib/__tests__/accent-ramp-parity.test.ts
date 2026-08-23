@@ -1,11 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import {
-  DIVISION_ACCENT_RAMP,
-  ACCENT_RAMP_INTENSITY,
-  accentConicGradient,
-} from "../accent-ramp";
+import { DIVISION_ACCENT_RAMP, ACCENT_RAMP_INTENSITY, accentConicGradient } from "../accent-ramp";
 
 const css = readFileSync(resolve(process.cwd(), "src/styles.css"), "utf8");
 

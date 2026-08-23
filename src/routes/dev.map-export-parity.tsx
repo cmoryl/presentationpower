@@ -60,9 +60,7 @@ function MapExportParityHarness() {
     ...base,
     pages: [{ ...locations, mapPins: probePins() }],
   };
-  const document = (
-    <MultiProposalLayout content={content} brand={BRAND_MODES[0]!} mode="dark" />
-  );
+  const document = <MultiProposalLayout content={content} brand={BRAND_MODES[0]!} mode="dark" />;
 
   return (
     <div style={{ width: 1100, padding: 0 }}>

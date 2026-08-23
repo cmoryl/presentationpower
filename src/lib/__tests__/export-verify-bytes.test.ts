@@ -74,9 +74,9 @@ describe("verifyExportBytes", () => {
   });
 
   it("verifies svg and html documents", () => {
-    expect(verifyExportBytes(textBytes('<?xml version="1.0"?><svg xmlns="x"></svg>'), "svg").ok).toBe(
-      true,
-    );
+    expect(
+      verifyExportBytes(textBytes('<?xml version="1.0"?><svg xmlns="x"></svg>'), "svg").ok,
+    ).toBe(true);
     expect(verifyExportBytes(textBytes("<!doctype html><html></html>", 512), "html").ok).toBe(true);
     expect(verifyExportBytes(textBytes("plain text", 512), "html").ok).toBe(false);
   });

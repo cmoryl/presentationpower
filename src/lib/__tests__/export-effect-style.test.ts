@@ -17,7 +17,10 @@ const resolve = (css: string) => {
   if (!s || s === "transparent" || s === "none") return null;
   const m = /rgba?\(([^)]+)\)/i.exec(s);
   if (m) {
-    const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number);
+    const p = m[1]
+      .split(/[\s,/]+/)
+      .filter(Boolean)
+      .map(Number);
     const hx = (n: number) => Math.round(n).toString(16).padStart(2, "0").toUpperCase();
     return { hex: `${hx(p[0])}${hx(p[1])}${hx(p[2])}`, alpha: p.length > 3 ? p[3] : 1 };
   }
@@ -54,9 +57,9 @@ describe("effect-style parsing", () => {
     );
     expect(f?.kind).toBe("linear");
     expect(f?.stops.map((s) => s.opacity)).toEqual([1, 1, 0]);
-    expect(parseFeather("radial-gradient(circle, #000000 0%, transparent 100%)", resolve)?.kind).toBe(
-      "radial",
-    );
+    expect(
+      parseFeather("radial-gradient(circle, #000000 0%, transparent 100%)", resolve)?.kind,
+    ).toBe("radial");
     expect(parseFeather("none", resolve)).toBeNull();
   });
 });
@@ -68,7 +71,9 @@ describe("classifyEffectStyle", () => {
   });
 
   it("rejects text hosts, blend modes and backdrop-sampling filters", () => {
-    expect(classifyEffectStyle({ ...base, filter: "blur(12px)", hasText: true }, resolve)).toBeNull();
+    expect(
+      classifyEffectStyle({ ...base, filter: "blur(12px)", hasText: true }, resolve),
+    ).toBeNull();
     expect(
       classifyEffectStyle({ ...base, filter: "blur(12px)", mixBlendMode: "screen" }, resolve),
     ).toBeNull();
@@ -114,12 +119,12 @@ describe("effectSvg", () => {
   it("emits real blur, shadow and mask primitives with no CSS variables", () => {
     const { svg } = effectSvg(style, 200, 100);
     expect(svg).toContain("<feGaussianBlur");
-    expect(svg).toContain("stdDeviation=\"10\"");
+    expect(svg).toContain('stdDeviation="10"');
     expect(svg).toContain("<feDropShadow");
-    expect(svg).toContain("mask=\"url(#m)\"");
+    expect(svg).toContain('mask="url(#m)"');
     expect(svg).toContain("<ellipse");
     expect(svg).not.toMatch(/var\(|currentColor/);
-    expect(svg).toContain("color-interpolation-filters=\"sRGB\"");
+    expect(svg).toContain('color-interpolation-filters="sRGB"');
   });
 
   it("is mode-agnostic: identical geometry, measured paint", () => {

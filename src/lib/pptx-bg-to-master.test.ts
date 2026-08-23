@@ -68,10 +68,7 @@ describe("planSlideScrub", () => {
   it("drops full-height scaffold hairlines and full-bleed effect washes", () => {
     const rule = sp("TP Rule", '<a:off x="500000" y="0"/><a:ext cx="12700" cy="6858000"/>');
     const wash = sp("TP Effect", CANVAS);
-    const card = sp(
-      "TP Shape",
-      '<a:off x="500000" y="900000"/><a:ext cx="3000000" cy="2000000"/>',
-    );
+    const card = sp("TP Shape", '<a:off x="500000" y="900000"/><a:ext cx="3000000" cy="2000000"/>');
     const plan = planSlideScrub(slide(rule + wash + card));
     expect(plan.drop.map((s) => s.name).sort()).toEqual(["TP Effect", "TP Rule"]);
     expect(plan.lock).toHaveLength(0);

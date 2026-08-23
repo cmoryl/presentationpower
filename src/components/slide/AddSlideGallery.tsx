@@ -25,7 +25,6 @@ type Props = {
 };
 
 export function AddSlideGallery({ brand, brief, onInsert }: Props) {
-
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -96,7 +95,6 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
 
   const sectionName = byId(SECTION_FRAMEWORKS, sectionId)?.name ?? "";
 
-
   if (typeof document === "undefined") return null;
 
   return createPortal(
@@ -122,9 +120,7 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
               setQ("");
             }}
             className={`mb-1 block w-full rounded-md px-2 py-1.5 text-left text-xs transition ${
-              !q && sectionId === "*"
-                ? "bg-[#003FC7] text-white"
-                : "hover:bg-black/5 text-black/80"
+              !q && sectionId === "*" ? "bg-[#003FC7] text-white" : "hover:bg-black/5 text-black/80"
             }`}
           >
             All modules ({MODULE_VARIANTS.length})
@@ -303,7 +299,6 @@ function GalleryModal({ brand, brief, onClose, onInsert }: Props & { onClose: ()
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>,

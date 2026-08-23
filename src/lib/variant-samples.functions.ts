@@ -209,14 +209,16 @@ export const listVariantSampleVersions = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(HISTORY_LIMIT);
     if (error) throw new Error(error.message);
-    return ((rows ?? []) as Array<{
-      id: string;
-      variant_id: string;
-      brand_mode_id: string;
-      content: unknown;
-      label: string | null;
-      created_at: string;
-    }>).map((r) => ({
+    return (
+      (rows ?? []) as Array<{
+        id: string;
+        variant_id: string;
+        brand_mode_id: string;
+        content: unknown;
+        label: string | null;
+        created_at: string;
+      }>
+    ).map((r) => ({
       id: r.id,
       variantId: r.variant_id,
       brandModeId: r.brand_mode_id,
@@ -243,7 +245,6 @@ export const deleteVariantSampleVersion = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
-
 
 /* ── Bulk style apply ─────────────────────────────────────────────────────
  * Curators style one slide in the studio, then push just the *style* layer
@@ -331,7 +332,10 @@ export const bulkApplySampleStyle = createServerFn({ method: "POST" })
     const { data: existing } = await ctx.supabase
       .from("module_variant_samples")
       .select("variant_id, brand_mode_id, content")
-      .in("variant_id", data.targets.map((t) => t.variantId));
+      .in(
+        "variant_id",
+        data.targets.map((t) => t.variantId),
+      );
     for (const r of (existing ?? []) as Row[]) {
       rows.set(`${r.variant_id}|${r.brand_mode_id}`, (r.content as SampleContent) ?? {});
     }
@@ -345,18 +349,16 @@ export const bulkApplySampleStyle = createServerFn({ method: "POST" })
       const key = `${t.variantId}|${brand}`;
       const base = rows.get(key) ?? rows.get(`${t.variantId}|${ALL_BRANDS}`) ?? {};
       const content = mergeStyle(base, data.style, !!data.replace);
-      const { error } = await ctx.supabase
-        .from("module_variant_samples")
-        .upsert(
-          {
-            variant_id: t.variantId,
-            brand_mode_id: brand,
-            content,
-            updated_by: ctx.userId,
-            updated_at: stamp,
-          },
-          { onConflict: "variant_id,brand_mode_id" },
-        );
+      const { error } = await ctx.supabase.from("module_variant_samples").upsert(
+        {
+          variant_id: t.variantId,
+          brand_mode_id: brand,
+          content,
+          updated_by: ctx.userId,
+          updated_at: stamp,
+        },
+        { onConflict: "variant_id,brand_mode_id" },
+      );
       if (error) {
         failed.push(t.variantId);
         continue;

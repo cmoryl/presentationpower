@@ -12,7 +12,6 @@ if (import.meta.env.DEV) {
   void Promise.all(Object.values(serverFnModules).map((load) => load().catch(() => undefined)));
 }
 
-
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };

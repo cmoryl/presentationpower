@@ -57,8 +57,7 @@ export function useAnchoredPosition(
     };
   }, [open, measure]);
 
-  const width_ =
-    typeof window === "undefined" ? width : Math.min(width, window.innerWidth - 24);
+  const width_ = typeof window === "undefined" ? width : Math.min(width, window.innerWidth - 24);
 
   return { ...style, width: width_ };
 }

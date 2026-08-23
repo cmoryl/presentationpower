@@ -39,7 +39,9 @@ function LooksPage() {
             <div className="text-xs uppercase tracking-[0.25em] text-[#003FC7] dark:text-[#A1FBF9]">
               Design system
             </div>
-            <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em]">Template Studio — alternate looks</h1>
+            <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em]">
+              Template Studio — alternate looks
+            </h1>
             <p className="mt-2 max-w-3xl text-sm text-black/65 dark:text-white/65">
               Every look a deck can wear, with live section previews — click any slide to view it
               larger. Admins can edit palettes and geometry, retune each section background, fork a

@@ -66,7 +66,6 @@ const STARTER_GROUPS: Array<{ label: string; items: string[] }> = [
   },
 ];
 
-
 function OracleAskView() {
   const ask = useServerFn(oracleChat);
   const listEntries = useServerFn(listKnowledgeEntries);
@@ -88,7 +87,6 @@ function OracleAskView() {
     retry: false,
     staleTime: 60_000,
   });
-
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -270,7 +268,9 @@ function OracleAskView() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => send(`Summarize what we know about “${e.title}” and cite it.`)}
+                        onClick={() =>
+                          send(`Summarize what we know about “${e.title}” and cite it.`)
+                        }
                         className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/60"
                       >
                         Ask
@@ -282,7 +282,6 @@ function OracleAskView() {
             </div>
           </div>
         )}
-
 
         <div className="space-y-4">
           {messages.map((m, i) => (

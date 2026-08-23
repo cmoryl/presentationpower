@@ -22,7 +22,10 @@ describe("MV-VIZ-* export mapping", () => {
     });
 
     it(`${variant.id} seeds rows and builds a non-empty ECharts option`, () => {
-      const content = (seedContent(variant.id, {} as never, "Overview") ?? {}) as Record<string, unknown>;
+      const content = (seedContent(variant.id, {} as never, "Overview") ?? {}) as Record<
+        string,
+        unknown
+      >;
       const declared = content.spec as Record<string, unknown> | undefined;
       const rows =
         ((declared?.data as Record<string, unknown> | undefined)?.rows as unknown[]) ??
@@ -35,7 +38,7 @@ describe("MV-VIZ-* export mapping", () => {
         kind: vizKindForVariant(variant.id),
         title: "t",
         data: { rows: rows as never },
-        encoding: ((declared?.encoding ?? content.encoding ?? {}) as never),
+        encoding: (declared?.encoding ?? content.encoding ?? {}) as never,
         theme: {
           mode: "light",
           accent: "#003FC7",

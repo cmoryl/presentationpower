@@ -48,7 +48,9 @@ export const listMyFiles = createServerFn({ method: "GET" })
         .limit(300),
       supabase
         .from("saved_modules")
-        .select("id, title, variant_id, save_kind, thumbnail_url, content, source_slide_id, file_path, file_name, file_size, updated_at, created_at")
+        .select(
+          "id, title, variant_id, save_kind, thumbnail_url, content, source_slide_id, file_path, file_name, file_size, updated_at, created_at",
+        )
         .order("updated_at", { ascending: false })
         .limit(300),
       supabase
@@ -146,13 +148,14 @@ const deleteInput = z.object({
   id: z.string().uuid(),
 });
 
-const TABLE_FOR_KIND: Record<MyFileKind, "decks" | "print_assets" | "saved_modules" | "surfaces"> = {
-  deck: "decks",
-  print: "print_assets",
-  module: "saved_modules",
-  slide: "saved_modules",
-  surface: "surfaces",
-};
+const TABLE_FOR_KIND: Record<MyFileKind, "decks" | "print_assets" | "saved_modules" | "surfaces"> =
+  {
+    deck: "decks",
+    print: "print_assets",
+    module: "saved_modules",
+    slide: "saved_modules",
+    surface: "surfaces",
+  };
 
 export const deleteMyFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

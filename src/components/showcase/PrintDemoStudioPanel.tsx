@@ -83,10 +83,7 @@ export function PrintDemoStudioPanel({
     hasTitle: typeof bag["title"] === "string" && !!bag["title"],
     hasSummary: typeof bag["summary"] === "string" && !!bag["summary"],
   };
-  const used = useMemo(
-    () => modules.reduce((n, m) => n + weightForSection(m), 0),
-    [modules],
-  );
+  const used = useMemo(() => modules.reduce((n, m) => n + weightForSection(m), 0), [modules]);
   const budget = capacityKind ? effectiveModuleBudget(capacityKind, hero, copy) : 0;
   const heroMax = capacityKind ? maxHeroHeightPct(capacityKind, used, hero, copy) : 70;
   const report = useMemo(
@@ -273,8 +270,8 @@ export function PrintDemoStudioPanel({
             data-testid="demo-fit-toggle"
           />
           <span>
-            Auto-fit content to the page — pulls margins in, then scales type and
-            spacing uniformly until the page stops clipping.
+            Auto-fit content to the page — pulls margins in, then scales type and spacing uniformly
+            until the page stops clipping.
           </span>
         </label>
 

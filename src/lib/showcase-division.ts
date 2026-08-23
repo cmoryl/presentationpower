@@ -211,7 +211,8 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
     target.designRecipeId === null
       ? null
       : (target.designRecipeId ??
-        ((payload.context?.designRecipeId as string | null | undefined) ?? null));
+        (payload.context?.designRecipeId as string | null | undefined) ??
+        null);
   const look = normalizeLook({
     stylePackId: target.stylePackId,
     designRecipeId: wantedRecipe,
@@ -228,8 +229,7 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
       stylePackId: look.stylePackId ?? undefined,
       // An inherited recipe from another sector is dropped rather than shipped;
       // a recipe the division names itself always wins.
-      designRecipeId:
-        mismatched && !target.designRecipeId ? null : look.designRecipeId,
+      designRecipeId: mismatched && !target.designRecipeId ? null : look.designRecipeId,
     },
     slides,
     brief: payload.brief

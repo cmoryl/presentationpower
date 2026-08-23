@@ -25,7 +25,6 @@ import {
   userMentionsNumbers,
 } from "@/lib/slide-ops";
 
-
 // ---------------------------------------------------------------------------
 // Input
 // ---------------------------------------------------------------------------
@@ -93,7 +92,6 @@ export type CopilotResult =
 // tools apply exactly the same rules to persisted slides.
 // ---------------------------------------------------------------------------
 
-
 function copilotInstructions(userMessage: string): string {
   const canTouchStats = userMentionsNumbers(userMessage);
   return [
@@ -113,7 +111,6 @@ function copilotInstructions(userMessage: string): string {
     "- Variant swaps must be valid for the slide's sectionId; use list_taxonomy_variants first if unsure.",
     "- Keep the final reply short (1-3 sentences) summarizing what you changed and why.",
     `\n# Current user turn\n${userMessage}`,
-
   ].join("\n");
 }
 
@@ -221,7 +218,6 @@ const TOOLS: AnthropicToolDef[] = [
   },
 ];
 
-
 // ---------------------------------------------------------------------------
 // Server function
 // ---------------------------------------------------------------------------
@@ -232,10 +228,8 @@ export const copilotTurn = createServerFn({ method: "POST" })
   .handler(async ({ data, context: authContext }): Promise<CopilotResult> => {
     if (!hasAnthropicKey()) return { ok: false, error: ANTHROPIC_SETUP_MESSAGE };
 
-    const { retrieveGrounding, formatGroundingBlock } = await import(
-      "@/lib/knowledge-grounding.server"
-    );
-
+    const { retrieveGrounding, formatGroundingBlock } =
+      await import("@/lib/knowledge-grounding.server");
 
     // In-memory working copy the tools mutate.
     type WorkSlide = {
@@ -432,7 +426,6 @@ export const copilotTurn = createServerFn({ method: "POST" })
     ]
       .filter(Boolean)
       .join("\n\n");
-
 
     // Compact slide summary for context (Claude reads full via get_slide).
     const slideSummary = working

@@ -80,8 +80,7 @@ export function SaveAssetButton({
           duration: 8000,
           action: {
             label: "View library",
-            onClick: () =>
-              router.navigate({ to: "/imagery", search: { division: divisionId } }),
+            onClick: () => router.navigate({ to: "/imagery", search: { division: divisionId } }),
           },
         },
       );

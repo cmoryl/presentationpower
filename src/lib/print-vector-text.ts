@@ -334,7 +334,8 @@ export function captureVectorText(root: HTMLElement): VectorTextCapture {
     const opacity = colorAlpha * (Number(cs.opacity) || 1);
     const letterSpacing = parseLetterSpacing(cs.letterSpacing, sizeCss);
     const smallCaps = /small-caps/.test(cs.fontVariantCaps || cs.fontVariant || "");
-    const transform = cs.textTransform !== "none" ? cs.textTransform : smallCaps ? "uppercase" : "none";
+    const transform =
+      cs.textTransform !== "none" ? cs.textTransform : smallCaps ? "uppercase" : "none";
     const rawLines = collectLinesForTextNode(curr, rootBounds, transform);
     if (rawLines.length === 0 && curr.data.trim()) skippedClamped += 1;
     for (const l of rawLines) {
@@ -481,7 +482,6 @@ export async function overlayVectorText(
     const trimHeightPt = pageHeightPt - bleedPt * 2;
     const scaleX = trimWidthPt / cap.root.widthCss;
     const scaleY = trimHeightPt / cap.root.heightCss;
-
 
     for (const line of cap.lines) {
       const key = pickGeistKey(line.weight, line.italic);

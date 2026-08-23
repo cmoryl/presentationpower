@@ -31,21 +31,123 @@ export type InsertPayload = {
 
 /** Curated icon set: business-deck vocabulary, not the whole 1,500-icon dump. */
 const ICON_NAMES = [
-  "Activity", "AlertTriangle", "Award", "BarChart3", "BarChart4", "Battery", "Bell", "Bookmark",
-  "Box", "Brain", "Briefcase", "Building2", "Calendar", "Camera", "CheckCircle2", "CircleDot",
-  "Clock", "Cloud", "Code2", "Compass", "Cpu", "CreditCard", "Database", "DollarSign",
-  "Download", "Droplet", "Eye", "Factory", "FileText", "Filter", "Flag", "Flame",
-  "Folder", "Gauge", "Gem", "Gift", "Globe2", "GraduationCap", "Grid3x3", "Handshake",
-  "HeartPulse", "Hexagon", "Home", "Image", "Infinity", "Info", "Key", "Landmark",
-  "Languages", "Layers", "Layout", "Leaf", "Lightbulb", "LineChart", "Link2", "ListChecks",
-  "Lock", "Mail", "MapPin", "Megaphone", "MessageSquare", "Mic", "Monitor", "Moon",
-  "Network", "Package", "Palette", "PenTool", "Percent", "PieChart", "Plane", "Play",
-  "Plug", "Presentation", "Puzzle", "QrCode", "Radar", "Recycle", "Refresh_Cw", "Rocket",
-  "Route", "Ruler", "Scale", "Scan", "Search", "Send", "Server", "Settings",
-  "Share2", "Shield", "ShieldCheck", "ShoppingCart", "Signal", "Smartphone", "Sparkles", "Star",
-  "Store", "Sun", "Table2", "Tag", "Target", "Terminal", "ThumbsUp", "Timer",
-  "TrendingDown", "TrendingUp", "Trophy", "Truck", "Users", "UserCheck", "Video", "Wallet",
-  "Wand2", "Waves", "Workflow", "Wrench", "Zap",
+  "Activity",
+  "AlertTriangle",
+  "Award",
+  "BarChart3",
+  "BarChart4",
+  "Battery",
+  "Bell",
+  "Bookmark",
+  "Box",
+  "Brain",
+  "Briefcase",
+  "Building2",
+  "Calendar",
+  "Camera",
+  "CheckCircle2",
+  "CircleDot",
+  "Clock",
+  "Cloud",
+  "Code2",
+  "Compass",
+  "Cpu",
+  "CreditCard",
+  "Database",
+  "DollarSign",
+  "Download",
+  "Droplet",
+  "Eye",
+  "Factory",
+  "FileText",
+  "Filter",
+  "Flag",
+  "Flame",
+  "Folder",
+  "Gauge",
+  "Gem",
+  "Gift",
+  "Globe2",
+  "GraduationCap",
+  "Grid3x3",
+  "Handshake",
+  "HeartPulse",
+  "Hexagon",
+  "Home",
+  "Image",
+  "Infinity",
+  "Info",
+  "Key",
+  "Landmark",
+  "Languages",
+  "Layers",
+  "Layout",
+  "Leaf",
+  "Lightbulb",
+  "LineChart",
+  "Link2",
+  "ListChecks",
+  "Lock",
+  "Mail",
+  "MapPin",
+  "Megaphone",
+  "MessageSquare",
+  "Mic",
+  "Monitor",
+  "Moon",
+  "Network",
+  "Package",
+  "Palette",
+  "PenTool",
+  "Percent",
+  "PieChart",
+  "Plane",
+  "Play",
+  "Plug",
+  "Presentation",
+  "Puzzle",
+  "QrCode",
+  "Radar",
+  "Recycle",
+  "Refresh_Cw",
+  "Rocket",
+  "Route",
+  "Ruler",
+  "Scale",
+  "Scan",
+  "Search",
+  "Send",
+  "Server",
+  "Settings",
+  "Share2",
+  "Shield",
+  "ShieldCheck",
+  "ShoppingCart",
+  "Signal",
+  "Smartphone",
+  "Sparkles",
+  "Star",
+  "Store",
+  "Sun",
+  "Table2",
+  "Tag",
+  "Target",
+  "Terminal",
+  "ThumbsUp",
+  "Timer",
+  "TrendingDown",
+  "TrendingUp",
+  "Trophy",
+  "Truck",
+  "Users",
+  "UserCheck",
+  "Video",
+  "Wallet",
+  "Wand2",
+  "Waves",
+  "Workflow",
+  "Wrench",
+  "Zap",
 ].map((n) => n.replace("_", ""));
 
 type IconEntry = { name: string; Comp: React.ComponentType<{ className?: string }> };
@@ -115,9 +217,11 @@ export function CanvasInsertLibrary({
   const fileRef = useRef<HTMLInputElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-
   const swatches = useMemo(
-    () => [accent, ...Object.keys(SWATCH_LABELS).filter((c) => c.toLowerCase() !== accent.toLowerCase())],
+    () => [
+      accent,
+      ...Object.keys(SWATCH_LABELS).filter((c) => c.toLowerCase() !== accent.toLowerCase()),
+    ],
     [accent],
   );
 
@@ -188,7 +292,6 @@ export function CanvasInsertLibrary({
     </button>
   );
 
-
   return (
     <div
       {...{ [CANVAS_UI_ATTR]: "" }}
@@ -212,10 +315,7 @@ export function CanvasInsertLibrary({
         </button>
       </div>
 
-      <div
-        className="space-y-2.5 border-b border-white/10 px-3 py-2.5"
-        hidden={tab === "upload"}
-      >
+      <div className="space-y-2.5 border-b border-white/10 px-3 py-2.5" hidden={tab === "upload"}>
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}

@@ -119,7 +119,11 @@ export function BulkStylePanel({
       <div className="rounded-lg border border-white/10 bg-[#03002C]/40 p-3">
         <div className="font-semibold uppercase tracking-widest text-white/45">Apply for</div>
         <div className="mt-2 flex gap-1.5">
-          <button type="button" onClick={() => setScope("brand")} className={chip(scope === "brand")}>
+          <button
+            type="button"
+            onClick={() => setScope("brand")}
+            className={chip(scope === "brand")}
+          >
             {brandName} only
           </button>
           <button type="button" onClick={() => setScope("all")} className={chip(scope === "all")}>
@@ -171,7 +175,9 @@ export function BulkStylePanel({
       <div className="space-y-2">
         <button
           type="button"
-          onClick={() => apply(picked, `${picked.length} selected slide${picked.length === 1 ? "" : "s"}`)}
+          onClick={() =>
+            apply(picked, `${picked.length} selected slide${picked.length === 1 ? "" : "s"}`)
+          }
           disabled={bulkStyle.isPending || ruleCount === 0 || picked.length === 0}
           className="w-full rounded-full bg-[#003FC7] px-4 py-2 text-xs font-semibold text-white disabled:opacity-40"
         >
@@ -194,7 +200,8 @@ export function BulkStylePanel({
           disabled={bulkStyle.isPending || ruleCount === 0}
           className="w-full rounded-full border border-white/25 px-4 py-2 text-xs font-medium text-white/80 hover:border-white/60 hover:text-white disabled:opacity-40"
         >
-          Apply to the whole {scope === "brand" ? brandName : "library"} ({MODULE_VARIANTS.length - 1})
+          Apply to the whole {scope === "brand" ? brandName : "library"} (
+          {MODULE_VARIANTS.length - 1})
         </button>
         <p className="text-[10px] text-white/40">
           Every target gets a restore point, so a bulk push can be rolled back per slide from its

@@ -40,9 +40,7 @@ export type OriginatePlan = {
   slides: PlannedSlide[];
 };
 
-export type PlanResult =
-  | { ok: true; value: OriginatePlan }
-  | { ok: false; error: string };
+export type PlanResult = { ok: true; value: OriginatePlan } | { ok: false; error: string };
 
 /** An explicit slide request: a section, optionally pinned to a variant. */
 export type SlideRequest = { section_id: string; variant_id?: string };
@@ -79,7 +77,10 @@ function pickVariant(
 
   const permitted = variantsForSection(sectionId);
   if (!permitted.length) {
-    return { ok: false, error: `Section ${sectionId} (${section.name}) permits no module variants` };
+    return {
+      ok: false,
+      error: `Section ${sectionId} (${section.name}) permits no module variants`,
+    };
   }
 
   let chosen = permitted[0];
@@ -189,7 +190,9 @@ export function planDeck(input: OriginateInput): PlanResult {
     value: {
       title: input.title?.trim() || defaultTitle(input),
       brandModeId: input.brand_mode_id,
-      archetypeId: input.slides?.length ? (input.archetype_id ?? null) : (input.archetype_id ?? null),
+      archetypeId: input.slides?.length
+        ? (input.archetype_id ?? null)
+        : (input.archetype_id ?? null),
       slides,
     },
   };

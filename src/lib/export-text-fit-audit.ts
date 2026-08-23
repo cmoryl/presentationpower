@@ -26,12 +26,7 @@ const PT_PER_IN = 72;
 const DEFAULT_INSET_EMU = 91440; // 0.1in, the OOXML default for lIns/rIns
 
 /** Measure one string's advance width, in points, at `sizePt` for this face. */
-export type MeasureText = (
-  text: string,
-  sizePt: number,
-  bold: boolean,
-  family: string,
-) => number;
+export type MeasureText = (text: string, sizePt: number, bold: boolean, family: string) => number;
 
 export interface TextRunAudit {
   text: string;
@@ -208,7 +203,9 @@ export function auditSlideTextFit(
             ...text
               .trim()
               .split(/\s+/)
-              .map((w) => measure(w, sizePt, bold, family) + trackingPt * Math.max(0, w.length - 1)),
+              .map(
+                (w) => measure(w, sizePt, bold, family) + trackingPt * Math.max(0, w.length - 1),
+              ),
           );
           reflowFits =
             widestWord <= availablePt + tolerance &&

@@ -72,8 +72,22 @@ describe("retintItemsForMode", () => {
   });
 
   it("keeps modules that were following the slide mode in sync", () => {
-    const mod = { ...box, id: "m1", type: "module", variantId: "MV-X", fit: "contain", mode: "light" } as CanvasItem;
-    const pinned = { ...box, id: "m2", type: "module", variantId: "MV-Y", fit: "contain", mode: "dark" } as CanvasItem;
+    const mod = {
+      ...box,
+      id: "m1",
+      type: "module",
+      variantId: "MV-X",
+      fit: "contain",
+      mode: "light",
+    } as CanvasItem;
+    const pinned = {
+      ...box,
+      id: "m2",
+      type: "module",
+      variantId: "MV-Y",
+      fit: "contain",
+      mode: "dark",
+    } as CanvasItem;
     const { items } = retintItemsForMode([mod, pinned], "light", "dark");
     expect((items[0] as { mode: string }).mode).toBe("dark");
     expect((items[1] as { mode: string }).mode).toBe("dark");

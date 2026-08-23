@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { auditVisualData, plottedFieldsFor, visualDataGap, visualDigestFor } from "../visual-data-gaps";
+import {
+  auditVisualData,
+  plottedFieldsFor,
+  visualDataGap,
+  visualDigestFor,
+} from "../visual-data-gaps";
 
 describe("visual data gaps", () => {
   it("flags a chart slide that only carries copy", () => {

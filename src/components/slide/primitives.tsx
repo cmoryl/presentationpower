@@ -9,7 +9,6 @@ import type { IconSizeToken } from "@/lib/iconography";
 import { useStatLayout } from "./StatLayoutContext";
 import { fillLeading, fillPx, typeBounds } from "@/lib/open-space-fill";
 
-
 /**
  * Editorial slide primitives — a small, disciplined typographic system used
  * across the 94 module variants so cover, divider, and content families feel
@@ -70,7 +69,6 @@ export function Kicker({
   );
 }
 
-
 // ── Display / Title ───────────────────────────────────────────────────────
 // The single dominant type element on a slide. Sizes are named, not free-form,
 // so covers stay cinematic and titles stay quiet.
@@ -119,7 +117,8 @@ export function DisplayTitle({
     lineHeight: fillLeading("display", enterprise ? spec.lineHeight + 0.04 : spec.lineHeight),
     letterSpacing: `var(--pack-display-tracking, ${enterprise ? "-0.015em" : spec.letterSpacing})`,
     // Enterprise White headlines are light-weight editorial, not bold.
-    fontWeight: `var(--pack-display-weight, ${enterprise ? 400 : spec.weight})` as unknown as number,
+    fontWeight:
+      `var(--pack-display-weight, ${enterprise ? 400 : spec.weight})` as unknown as number,
     fontFamily: "var(--pack-display, inherit)",
     textTransform: "var(--pack-display-transform, none)" as CSSProperties["textTransform"],
     maxWidth: maxWidthPx,
@@ -130,7 +129,6 @@ export function DisplayTitle({
       {children}
     </Tag>
   );
-
 }
 
 // ── Hairline / Rule ───────────────────────────────────────────────────────
@@ -203,8 +201,7 @@ export function SlideNumeral({
   className?: string;
   style?: CSSProperties;
 }) {
-  const text =
-    typeof value === "number" && pad ? String(value).padStart(2, "0") : String(value);
+  const text = typeof value === "number" && pad ? String(value).padStart(2, "0") : String(value);
   return (
     <span
       className={`tabular-nums ${className}`}
@@ -221,7 +218,6 @@ export function SlideNumeral({
     </span>
   );
 }
-
 
 // ── Body / Supporting text ────────────────────────────────────────────────
 export function SupportingText({
@@ -401,8 +397,7 @@ export function StatFigure({
   // An explicit icon override implies the caller wants the icon on screen, so
   // promote non-icon shapes to `icon-lead` rather than dropping the pick.
   const baseShape: StatShape = shape ?? moduleLayout.shape ?? "auto";
-  const resolvedShape: StatShape =
-    icon && !baseShape.startsWith("icon-") ? "icon-lead" : baseShape;
+  const resolvedShape: StatShape = icon && !baseShape.startsWith("icon-") ? "icon-lead" : baseShape;
   const resolvedAlign = align ?? moduleLayout.align ?? "start";
   const isIconShape = resolvedShape.startsWith("icon-");
   // Explicit overrides may name a curated stat preset *or* any icon from the
@@ -410,8 +405,7 @@ export function StatFigure({
   // both before falling back to the module layout / inferred icon.
   const overrideIcon = icon ? (statIconPreset(icon)?.Icon ?? iconByName(icon)) : null;
   const iconPreset = isIconShape
-    ? (statIconPreset(moduleLayout.icon) ??
-      statIconPreset(inferStatIcon({ value, unit, label })))
+    ? (statIconPreset(moduleLayout.icon) ?? statIconPreset(inferStatIcon({ value, unit, label })))
     : null;
   const StatIcon = (isIconShape ? (overrideIcon ?? iconPreset?.Icon) : null) ?? null;
   // md === the figure's intrinsic proportion; other tokens scale around it.
@@ -432,9 +426,7 @@ export function StatFigure({
   const p = Math.max(0, Math.min(1, progress ?? moduleLayout.progress ?? 0.72));
   const centeredShape = resolvedAlign === "center";
   const ruleWeight = Math.max(3, Math.round(spec.valuePx * 0.035));
-  const ruleWidth = centeredShape
-    ? "58%"
-    : `${Math.min(100, Math.round(34 + p * 60))}%`;
+  const ruleWidth = centeredShape ? "58%" : `${Math.min(100, Math.round(34 + p * 60))}%`;
 
   const vc = valueColor ?? ink.text;
   const uc = unitColor ?? ink.muted;
@@ -492,52 +484,55 @@ export function StatFigure({
               padding: `${Math.round(spec.valuePx * 0.14)}px ${Math.round(spec.valuePx * 0.16)}px`,
             }
           : null),
-        ...(resolvedShape === "spine"
-          ? { paddingLeft: Math.round(spec.valuePx * 0.16) }
-          : null),
+        ...(resolvedShape === "spine" ? { paddingLeft: Math.round(spec.valuePx * 0.16) } : null),
         ...(resolvedShape === "bracket"
-          ? { paddingLeft: Math.round(spec.valuePx * 0.16), paddingRight: Math.round(spec.valuePx * 0.16) }
+          ? {
+              paddingLeft: Math.round(spec.valuePx * 0.16),
+              paddingRight: Math.round(spec.valuePx * 0.16),
+            }
           : null),
       }}
     >
-      {(resolvedShape === "ghost" || resolvedShape === "auto") && !valueIsPhrase && (() => {
-        // The ghost counterform is a single nowrap line inside an
-        // `overflow:hidden` container, so a long value ("$220k", "1,240 hrs")
-        // used to run past the right edge and read as a clipped/broken figure.
-        // Budget the type size against the character count so the whole
-        // counterform always fits the track: width ≈ chars × 0.56em.
-        const ghostText = value || "\u2014";
-        const chars = Math.max(1, ghostText.replace(/\s/g, "").length);
-        const cqwCeiling = Math.max(8, Math.min(mode === "dark" ? 34 : 26, 96 / (chars * 0.56)));
-        const pxCeiling = Math.round(spec.valuePx * (mode === "dark" ? 1.7 : 1.35));
-        return (
-          <span
-            aria-hidden
-            data-accent-glow
-            data-decorative
-            className="pointer-events-none absolute select-none font-semibold tabular-nums"
-            style={{
-              // Light surfaces get a smaller, quieter counterform so it reads as
-              // texture behind the numeral instead of a second competing figure.
-              fontSize: `min(${pxCeiling}px, ${cqwCeiling.toFixed(2)}cqw)`,
-              lineHeight: 0.74,
-              letterSpacing: "-0.05em",
-              top: `-${Math.round(spec.valuePx * (mode === "dark" ? 0.3 : 0.2))}px`,
-              left: centeredShape ? "50%" : 0,
-              transform: centeredShape ? "translateX(-50%)" : undefined,
-              color: "transparent",
-              WebkitTextFillColor: "transparent",
-              WebkitTextStrokeWidth: Math.max(1, Math.round(spec.valuePx * 0.012)),
-              WebkitTextStrokeColor: hexA(aFig, mode === "dark" ? 0.18 : 0.1),
-              whiteSpace: "nowrap",
-              maxWidth: "100%",
-              zIndex: 0,
-            }}
-          >
-            {ghostText}
-          </span>
-        );
-      })()}
+      {(resolvedShape === "ghost" || resolvedShape === "auto") &&
+        !valueIsPhrase &&
+        (() => {
+          // The ghost counterform is a single nowrap line inside an
+          // `overflow:hidden` container, so a long value ("$220k", "1,240 hrs")
+          // used to run past the right edge and read as a clipped/broken figure.
+          // Budget the type size against the character count so the whole
+          // counterform always fits the track: width ≈ chars × 0.56em.
+          const ghostText = value || "\u2014";
+          const chars = Math.max(1, ghostText.replace(/\s/g, "").length);
+          const cqwCeiling = Math.max(8, Math.min(mode === "dark" ? 34 : 26, 96 / (chars * 0.56)));
+          const pxCeiling = Math.round(spec.valuePx * (mode === "dark" ? 1.7 : 1.35));
+          return (
+            <span
+              aria-hidden
+              data-accent-glow
+              data-decorative
+              className="pointer-events-none absolute select-none font-semibold tabular-nums"
+              style={{
+                // Light surfaces get a smaller, quieter counterform so it reads as
+                // texture behind the numeral instead of a second competing figure.
+                fontSize: `min(${pxCeiling}px, ${cqwCeiling.toFixed(2)}cqw)`,
+                lineHeight: 0.74,
+                letterSpacing: "-0.05em",
+                top: `-${Math.round(spec.valuePx * (mode === "dark" ? 0.3 : 0.2))}px`,
+                left: centeredShape ? "50%" : 0,
+                transform: centeredShape ? "translateX(-50%)" : undefined,
+                color: "transparent",
+                WebkitTextFillColor: "transparent",
+                WebkitTextStrokeWidth: Math.max(1, Math.round(spec.valuePx * 0.012)),
+                WebkitTextStrokeColor: hexA(aFig, mode === "dark" ? 0.18 : 0.1),
+                whiteSpace: "nowrap",
+                maxWidth: "100%",
+                zIndex: 0,
+              }}
+            >
+              {ghostText}
+            </span>
+          );
+        })()}
 
       {resolvedShape === "slab" && (
         <span
@@ -557,7 +552,11 @@ export function StatFigure({
         />
       )}
       {resolvedShape === "notch" && (
-        <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0" style={{ zIndex: 0 }}>
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0"
+          style={{ zIndex: 0 }}
+        >
           <span
             className="absolute left-0 top-0"
             style={{
@@ -756,15 +755,20 @@ export function StatFigure({
             zIndex: 1,
           }}
         >
-          <StatIcon size={Math.round(spec.valuePx * 0.92 * iconK)} strokeWidth={1.4} absoluteStrokeWidth />
+          <StatIcon
+            size={Math.round(spec.valuePx * 0.92 * iconK)}
+            strokeWidth={1.4}
+            absoluteStrokeWidth
+          />
         </span>
       )}
       <div
         className={isIconRow ? "relative flex items-center" : "relative"}
         style={{ zIndex: 1, gap: isIconRow ? Math.round(spec.valuePx * 0.2) : undefined }}
       >
-        {isIconRow && StatIcon && (
-          resolvedShape === "icon-tile" ? (
+        {isIconRow &&
+          StatIcon &&
+          (resolvedShape === "icon-tile" ? (
             <span
               aria-hidden
               data-decorative
@@ -801,55 +805,54 @@ export function StatFigure({
                 absoluteStrokeWidth
               />
             </span>
-          )
-        )}
-      <div className="relative min-w-0 max-w-full">
-      <div
-        // Marks the value-carrying numeral so the intro choreography can give
-        // the headline figure its own emphasis beat (presentation only).
-        data-stat-value={valueIsPhrase ? "phrase" : "figure"}
-        className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
-        style={{
-          fontSize: valueFontSize,
-          lineHeight: fillLeading("figure", valueIsPhrase ? 1.05 : 0.92),
-          letterSpacing: valueIsPhrase ? "-0.02em" : "-0.035em",
-          color: vc,
-          whiteSpace: valueIsPhrase ? "normal" : "nowrap",
-          overflowWrap: valueIsPhrase ? "anywhere" : "normal",
-          wordBreak: "normal",
-          maxWidth: "100%",
-          overflow: "hidden",
-          textOverflow: "clip",
-        }}
-      >
-        <span>{value || "—"}</span>
-        {unitText && !unitIsLong && (
-          <span
-            className="ml-2 font-medium align-top"
-            style={{ fontSize: unitFontSize, color: uc, letterSpacing: "-0.02em" }}
+          ))}
+        <div className="relative min-w-0 max-w-full">
+          <div
+            // Marks the value-carrying numeral so the intro choreography can give
+            // the headline figure its own emphasis beat (presentation only).
+            data-stat-value={valueIsPhrase ? "phrase" : "figure"}
+            className={valueIsPhrase ? "font-semibold" : "font-semibold tabular-nums"}
+            style={{
+              fontSize: valueFontSize,
+              lineHeight: fillLeading("figure", valueIsPhrase ? 1.05 : 0.92),
+              letterSpacing: valueIsPhrase ? "-0.02em" : "-0.035em",
+              color: vc,
+              whiteSpace: valueIsPhrase ? "normal" : "nowrap",
+              overflowWrap: valueIsPhrase ? "anywhere" : "normal",
+              wordBreak: "normal",
+              maxWidth: "100%",
+              overflow: "hidden",
+              textOverflow: "clip",
+            }}
           >
-            {unitText}
-          </span>
-        )}
-      </div>
-      {unitText && unitIsLong && (
-        <div
-          className={centeredShape ? "mx-auto mt-2 font-medium" : "mt-2 font-medium"}
-          style={{
-            fontSize: unitFontSize,
-            lineHeight: 1.08,
-            letterSpacing: "-0.015em",
-            color: uc,
-            maxWidth: "100%",
-            overflow: "hidden",
-            overflowWrap: "anywhere",
-            wordBreak: "normal",
-          }}
-        >
-          {unitText}
+            <span>{value || "—"}</span>
+            {unitText && !unitIsLong && (
+              <span
+                className="ml-2 font-medium align-top"
+                style={{ fontSize: unitFontSize, color: uc, letterSpacing: "-0.02em" }}
+              >
+                {unitText}
+              </span>
+            )}
+          </div>
+          {unitText && unitIsLong && (
+            <div
+              className={centeredShape ? "mx-auto mt-2 font-medium" : "mt-2 font-medium"}
+              style={{
+                fontSize: unitFontSize,
+                lineHeight: 1.08,
+                letterSpacing: "-0.015em",
+                color: uc,
+                maxWidth: "100%",
+                overflow: "hidden",
+                overflowWrap: "anywhere",
+                wordBreak: "normal",
+              }}
+            >
+              {unitText}
+            </div>
+          )}
         </div>
-      )}
-      </div>
       </div>
       {(resolvedShape === "auto" || resolvedShape === "rule" || resolvedShape === "notch") && (
         <span
@@ -866,7 +869,9 @@ export function StatFigure({
           }}
         />
       )}
-      {(resolvedShape === "column" || resolvedShape === "slab" || resolvedShape === "icon-tile") && (
+      {(resolvedShape === "column" ||
+        resolvedShape === "slab" ||
+        resolvedShape === "icon-tile") && (
         <span
           aria-hidden
           className="relative block overflow-hidden"

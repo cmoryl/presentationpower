@@ -118,7 +118,8 @@ export function describeCanvasBlockText(
   if (!b.text || !b.text.trim()) return null;
   const px = blockFontSize(b);
   const fontSize = Math.round(pxToPt(px) * 10) / 10;
-  const parsed = parseCssColorToPptx(b.color) ?? parseCssColorToPptx(inkHex) ?? { hex: "0B0B12", alpha: 1 };
+  const parsed = parseCssColorToPptx(b.color) ??
+    parseCssColorToPptx(inkHex) ?? { hex: "0B0B12", alpha: 1 };
   const weight = blockFontWeight(b);
   return {
     text: b.text,
@@ -151,9 +152,7 @@ export function canvasBlocksForExport(
   if (!blocks || blocks.length === 0) return [];
   // Heal geometry that was measured on an unscaled stage before shipping it:
   // the on-screen renderer repairs these blocks, so the export must match.
-  return repairBlocks(blocks).filter(
-    (b) => !b.exportExcluded && !b.hidden,
-  ) as CanvasBlock[];
+  return repairBlocks(blocks).filter((b) => !b.exportExcluded && !b.hidden) as CanvasBlock[];
 }
 
 /**
@@ -192,7 +191,6 @@ export function placeCanvasBlocks(
 
   let placed = 0;
   sortBlocks(scoped).forEach((b, i) => {
-
     const r = canvasBlockRectIn(b);
     const opacity = b.opacity ?? 1;
     const frameTransparency = opacity < 1 ? Math.round((1 - opacity) * 100) : 0;
@@ -204,7 +202,7 @@ export function placeCanvasBlocks(
         alpha: 0.16,
       };
       const stroke = parseCssColorToPptx(b.stroke);
-      const radiusIn = Math.max(0, (b.radius ?? 28)) * IN_PER_UNIT_X;
+      const radiusIn = Math.max(0, b.radius ?? 28) * IN_PER_UNIT_X;
       const combinedAlpha = fill.alpha * opacity;
       // Translucent neutral fills ARE the glass surface on screen; let the
       // canonical treatment own the gradient, ring and elevation.
@@ -214,8 +212,7 @@ export function placeCanvasBlocks(
         const to = parseCssColorToPptx(gradientSpec.to) ?? { hex: fill.hex, alpha: 1 };
         // A radial fill has no lossless linear equivalent, so it ships as the
         // closest diagonal sweep rather than as a flat colour.
-        const angle =
-          gradientSpec.kind === "radial" ? 135 : gradientSpec.angleDeg;
+        const angle = gradientSpec.kind === "radial" ? 135 : gradientSpec.angleDeg;
         name = `${gradientTag({
           angleDeg: cssAngleToOoxml(angle),
           stops: [
@@ -250,7 +247,10 @@ export function placeCanvasBlocks(
     if (b.kind === "image") {
       if (!b.src) return;
       const radiusIn = Math.max(0, b.radius ?? 24) * IN_PER_UNIT_X;
-      const adj = Math.min(rectRadiusAdj(Math.min(radiusIn, Math.min(r.w, r.h) / 2), r.w, r.h), 50000);
+      const adj = Math.min(
+        rectRadiusAdj(Math.min(radiusIn, Math.min(r.w, r.h) / 2), r.w, r.h),
+        50000,
+      );
       const isData = b.src.startsWith("data:");
       const ratio = getImageAspect(b.src);
       // Exact-ratio contract: a measured logo is placed at its own aspect
@@ -281,12 +281,10 @@ export function placeCanvasBlocks(
         // not re-prefix a rounding tag ahead of it and break the group run.
         rounded: adj > 0 && !b.groupId,
         objectName: nameFor(b, `${tags}TP Canvas image ${i + 1}`.trim()),
-
       });
       placed += 1;
       return;
     }
-
 
     const t = describeCanvasBlockText(b, opts.inkHex);
     if (!t) return;

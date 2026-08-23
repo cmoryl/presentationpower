@@ -47,8 +47,6 @@ export function composeEffectivePack(
   });
 }
 
-
-
 /** Resolve both ids into the one effective pack. Null = brand default. */
 export function effectivePack(sel: LookSelection | null | undefined): StylePack | null {
   return composeEffectivePack(stylePackById(sel?.stylePackId ?? null), sel?.designRecipeId ?? null);

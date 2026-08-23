@@ -186,7 +186,12 @@ export function SlideLogoPicker({
             type="button"
             disabled={!/^https?:\/\//i.test(url.trim())}
             onClick={() => {
-              onPick({ logoPath: "", logoUrl: url.trim(), logoUrlDark: "", name: currentName ?? "" });
+              onPick({
+                logoPath: "",
+                logoUrl: url.trim(),
+                logoUrlDark: "",
+                name: currentName ?? "",
+              });
               onClose();
             }}
             className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-[#03002C] disabled:opacity-40"

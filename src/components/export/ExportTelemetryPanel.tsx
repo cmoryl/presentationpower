@@ -43,8 +43,8 @@ export function ExportTelemetryPanel({
           </div>
           <div className="mt-1 text-sm text-black/70">
             {formatMs(report.totalMs)} total · {report.slideCount}{" "}
-            {report.slideCount === 1 ? "slide" : "slides"} · {formatMs(report.totals.avgSlideMs)} avg
-            per slide · <span className={health.tone}>{health.label}</span>
+            {report.slideCount === 1 ? "slide" : "slides"} · {formatMs(report.totals.avgSlideMs)}{" "}
+            avg per slide · <span className={health.tone}>{health.label}</span>
           </div>
         </div>
         <button
@@ -69,7 +69,9 @@ export function ExportTelemetryPanel({
           {report.bottlenecks.map((b) => (
             <li key={b.slideIndex}>
               <span className="font-mono text-xs text-amber-900/60">Slide {b.slideIndex + 1}</span>{" "}
-              {b.variantId ? <span className="text-xs text-amber-900/60">{b.variantId}</span> : null}{" "}
+              {b.variantId ? (
+                <span className="text-xs text-amber-900/60">{b.variantId}</span>
+              ) : null}{" "}
               · {formatMs(b.ms)} — {b.reason}
             </li>
           ))}

@@ -899,7 +899,6 @@ function ImageCard({
     <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
       <div className="relative aspect-[4/3] w-full bg-black/5">
         {row.signedUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={row.signedUrl}
             alt={row.filename}

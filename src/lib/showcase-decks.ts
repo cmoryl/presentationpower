@@ -15,7 +15,6 @@ import { enrichShowcasePayload } from "./showcase-enrich";
 
 export type { ShowcaseDeckDef };
 
-
 /* ------------------------------------------------------------------ */
 /* 1. GlobalLink enterprise localization — executive pitch            */
 /* ------------------------------------------------------------------ */
@@ -44,7 +43,10 @@ function buildGlobalLinkPitch(): TemplatePayload {
         title: "What we'll cover",
         items: [
           { label: "Where content slows down", body: "Four handoffs, six tools, no single owner." },
-          { label: "The GlobalLink model", body: "Connectors, translation memory, and one review lane." },
+          {
+            label: "The GlobalLink model",
+            body: "Connectors, translation memory, and one review lane.",
+          },
           { label: "Proof from your sector", body: "Retail programs at the same catalogue depth." },
           { label: "Commercials", body: "Cost per market and the reuse curve over 24 months." },
           { label: "The first 90 days", body: "Pilot markets, owners, and go-live gates." },
@@ -112,8 +114,14 @@ function buildGlobalLinkPitch(): TemplatePayload {
         title: "Four moving parts",
         items: [
           { title: "Connectors", body: "Certified links into your PIM, CMS, and support desk." },
-          { title: "Translation memory", body: "One shared memory across every market and vendor." },
-          { title: "In-context review", body: "Local teams approve on the live page, not in a doc." },
+          {
+            title: "Translation memory",
+            body: "One shared memory across every market and vendor.",
+          },
+          {
+            title: "In-context review",
+            body: "Local teams approve on the live page, not in a doc.",
+          },
           { title: "Program analytics", body: "Cost, throughput, and quality per market, weekly." },
         ],
       },
@@ -156,10 +164,26 @@ function buildGlobalLinkPitch(): TemplatePayload {
         centerUnit: "days",
         centerLabel: "Median wait before work starts",
         items: [
-          { label: "Chasing files and approvals", value: 38, note: "Email threads between merchandising, agency, and legal." },
-          { label: "Re-translating known content", value: 27, note: "Strings that already exist in another market's memory." },
-          { label: "Formatting and QA rework", value: 21, note: "Layout breaks found after the file is back." },
-          { label: "Actual translation", value: 14, note: "The only step anyone was billed to think about." },
+          {
+            label: "Chasing files and approvals",
+            value: 38,
+            note: "Email threads between merchandising, agency, and legal.",
+          },
+          {
+            label: "Re-translating known content",
+            value: 27,
+            note: "Strings that already exist in another market's memory.",
+          },
+          {
+            label: "Formatting and QA rework",
+            value: 21,
+            note: "Layout breaks found after the file is back.",
+          },
+          {
+            label: "Actual translation",
+            value: 14,
+            note: "The only step anyone was billed to think about.",
+          },
         ],
       },
       notes: "Only 14% of the elapsed time is the work itself.",
@@ -225,7 +249,11 @@ function buildGlobalLinkPitch(): TemplatePayload {
     title: "GlobalLink · Enterprise localization pitch (demo)",
     brandModeId: "bm-globallink",
     archetypeId: "arch-problem-solution",
-    context: { stylePackId: "skin-s06", designRecipeId: "R04", defaultTransition: { type: "fade", durationMs: 420 } },
+    context: {
+      stylePackId: "skin-s06",
+      designRecipeId: "R04",
+      defaultTransition: { type: "fade", durationMs: 420 },
+    },
     slides,
     brief: {
       prospect: "Northwind Retail Group",
@@ -300,8 +328,14 @@ function buildLifeSciencesProgram(): TemplatePayload {
       content: {
         title: "Program design",
         items: [
-          { title: "Locked sources", body: "Every translation is bound to a versioned English master." },
-          { title: "Linguistic validation", body: "Clinician review and cognitive debriefing on patient-facing text." },
+          {
+            title: "Locked sources",
+            body: "Every translation is bound to a versioned English master.",
+          },
+          {
+            title: "Linguistic validation",
+            body: "Clinician review and cognitive debriefing on patient-facing text.",
+          },
           { title: "Two-stage QC", body: "Independent back-translation plus terminology audit." },
           { title: "Audit trail", body: "Every step timestamped, exportable for inspection." },
         ],
@@ -396,7 +430,11 @@ function buildLifeSciencesProgram(): TemplatePayload {
     title: "Life Sciences · Regulated content program (demo)",
     brandModeId: "bm-tp-lifesci",
     archetypeId: "arch-problem-solution",
-    context: { stylePackId: "skin-s14", designRecipeId: "R08", defaultTransition: { type: "fade", durationMs: 560 } },
+    context: {
+      stylePackId: "skin-s14",
+      designRecipeId: "R08",
+      defaultTransition: { type: "fade", durationMs: 560 },
+    },
     slides,
     brief: {
       prospect: "Meridian Therapeutics",
@@ -448,7 +486,6 @@ export const SHOWCASE_DECKS: ShowcaseDeckDef[] = [
   },
   ...EXTRA_SHOWCASE_DECKS,
 ];
-
 
 export function getShowcaseDeck(id: string): ShowcaseDeckDef | undefined {
   return SHOWCASE_DECKS.find((d) => d.id === id);

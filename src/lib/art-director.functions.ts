@@ -70,7 +70,6 @@ export type ArtDirectorReport = z.infer<typeof Rhythm> & {
 export type ArtDirectorNote = z.infer<typeof Note>;
 export type ArtDirectorSource = z.infer<typeof Source>;
 
-
 // ---------------------------------------------------------------------------
 // Input
 // ---------------------------------------------------------------------------
@@ -99,7 +98,6 @@ const Input = z.object({
     })
     .optional(),
 });
-
 
 export type ArtDirectorInput = z.infer<typeof Input>;
 
@@ -166,8 +164,6 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
         excerpt: s.body.slice(0, 400).trim(),
         crossDivision: s.crossDivision,
       }));
-
-
 
       const stableSystem = [
         "You are the TransPerfect Art Director — a senior editorial/presentation designer.",
@@ -241,7 +237,6 @@ export const critiqueDeckRhythm = createServerFn({ method: "POST" })
       ]
         .filter(Boolean)
         .join("\n");
-
 
       async function attempt(extra?: string) {
         const res = await callAnthropic(

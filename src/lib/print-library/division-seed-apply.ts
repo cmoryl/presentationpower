@@ -9,7 +9,10 @@ import type { DivisionSeed } from "@/lib/division-seeds";
 type Rec = Record<string, unknown>;
 
 /** Rewrite the "Why <division>" page from the division seed override. */
-export function applyDivisionSeedToContent<T extends Rec>(content: T, seed?: DivisionSeed | null): T {
+export function applyDivisionSeedToContent<T extends Rec>(
+  content: T,
+  seed?: DivisionSeed | null,
+): T {
   if (!seed) return content;
   const pages = content["pages"];
   if (!Array.isArray(pages)) return content;

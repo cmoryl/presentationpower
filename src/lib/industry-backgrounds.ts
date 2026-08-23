@@ -129,8 +129,7 @@ export interface IndustryBackgroundSet {
 }
 
 function buildSet(skin: DesignSkin): IndustryBackgroundSet {
-  const recipe: IndustryRecipe =
-    INDUSTRY_RECIPES.find((r) => r.id === skin.code) ??
+  const recipe: IndustryRecipe = INDUSTRY_RECIPES.find((r) => r.id === skin.code) ??
     // Core language (S01–S28): synthesise the same descriptor shape from the
     // catalog entry so one gallery can list core and sector systems together.
     {
@@ -194,11 +193,8 @@ export function allBackgroundSets(): IndustryBackgroundSet[] {
   return [...coreBackgroundSets(), ...industryBackgroundSets()];
 }
 
-
 /** One industry background set by recipe id (`R07`) or pack id (`skin-r07`). */
-export function industryBackgroundSet(
-  id: string | null | undefined,
-): IndustryBackgroundSet | null {
+export function industryBackgroundSet(id: string | null | undefined): IndustryBackgroundSet | null {
   if (!id) return null;
   const code = /^skin-r\d{2}$/i.test(id.trim())
     ? id.trim().slice(-3).toUpperCase()

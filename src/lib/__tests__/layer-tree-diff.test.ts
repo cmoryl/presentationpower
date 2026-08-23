@@ -119,7 +119,11 @@ describe("layer-tree-diff", () => {
   });
 
   it("reports new objects as informational, not regressions", () => {
-    const extra = obj({ name: "Caption", text: "New line", rect: { x: 0.1, y: 0.7, w: 0.3, h: 0.06 } });
+    const extra = obj({
+      name: "Caption",
+      text: "New line",
+      rect: { x: 0.1, y: 0.7, w: 0.3, h: 0.06 },
+    });
     const res = diffLayerTrees(baseline([PLATE, TITLE]), [report([PLATE, TITLE, extra])]);
     expect(res.ok).toBe(true);
     expect(res.totals.added).toBe(1);

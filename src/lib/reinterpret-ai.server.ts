@@ -95,7 +95,7 @@ export async function planReinterpretation(args: {
     "- Prefer a layout that matches the content's structure: numbers → stat layouts, dates/phases → sequence layouts, layered systems → architecture/pyramid, one long statement → editorial/manifesto, section title only → poster/divider.",
     "- Vary the layouts across the deck: never recommend the same variantId for two consecutive slides.",
     "- `title`: one clause, under 90 characters, sentence case, no hype words (unlock, revolutionize, seamless, leverage, game-changing).",
-    "- `bullets`: short parallel phrases. For stat layouts write each bullet as \"<number><unit> — <label>\". For sequence layouts lead with the date/phase token.",
+    '- `bullets`: short parallel phrases. For stat layouts write each bullet as "<number><unit> — <label>". For sequence layouts lead with the date/phase token.',
     "- `rationale`: one sentence naming the signal that drove the layout choice. A human reviewer reads this before approving.",
     "- `confidence`: 0–1, lower it when the copy only weakly fits the layout.",
     "- `sourceRefs`: excerpt numbers from the verified knowledge above that you relied on; empty array when none.",
@@ -144,7 +144,12 @@ export async function planReinterpretation(args: {
     });
 
     if (res.status === 429)
-      return { plans: [], sources, model: MODEL, error: "AI rate limit reached — try again shortly." };
+      return {
+        plans: [],
+        sources,
+        model: MODEL,
+        error: "AI rate limit reached — try again shortly.",
+      };
     if (res.status === 402)
       return { plans: [], sources, model: MODEL, error: "AI credits exhausted." };
     if (!res.ok)

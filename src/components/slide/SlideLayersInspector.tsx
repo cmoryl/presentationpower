@@ -2,12 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import type { CanvasBlock, DeckSlide } from "@/lib/deck-store";
 import { useDeckStore } from "@/lib/deck-store";
-import {
-  clearCanvasEmphasis,
-  setCanvasEmphasis,
-  useCanvasEmphasis,
-} from "@/lib/canvas-emphasis";
-
+import { clearCanvasEmphasis, setCanvasEmphasis, useCanvasEmphasis } from "@/lib/canvas-emphasis";
 
 /**
  * Read/adjust the slide's canvas layers from the right-hand inspector rail.
@@ -54,7 +49,6 @@ export function SlideLayersInspector({
   const [drag, setDrag] = useState<{ ids: string[] } | null>(null);
   const [dropAt, setDropAt] = useState<{ id: string; edge: "above" | "below" } | null>(null);
 
-
   // Undo / redo of layer edits rides the deck-wide session history so the
   // panel, the stage and ⌘Z all agree on the same stack.
   const undo = useDeckStore((s) => s.undo);
@@ -77,7 +71,6 @@ export function SlideLayersInspector({
     },
     [redo, undo],
   );
-
 
   // Never leave a highlight behind when the panel closes or the slide changes.
   useEffect(() => clearCanvasEmphasis, []);
@@ -112,9 +105,7 @@ export function SlideLayersInspector({
         }
       }
       if (e.metaKey || e.ctrlKey) {
-        setPicked((prev) =>
-          prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-        );
+        setPicked((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
         anchorRef.current = id;
         setCanvasEmphasis({ selectedId: id, hoverId: id });
         return;
@@ -139,8 +130,8 @@ export function SlideLayersInspector({
     return (
       <div className="space-y-3">
         <p className="text-sm text-black/60">
-          This slide has no canvas layers yet. Open the full-size stage and pick any module
-          element to turn it into a movable layer.
+          This slide has no canvas layers yet. Open the full-size stage and pick any module element
+          to turn it into a movable layer.
         </p>
         <button
           type="button"
@@ -248,7 +239,6 @@ export function SlideLayersInspector({
   const bulkBtn =
     "rounded-md border border-black/15 bg-white px-2 py-1 text-[11px] font-medium text-black/70 hover:bg-black/[0.05]";
 
-
   return (
     <div className="space-y-2" onKeyDown={onKeyDown}>
       <div className="flex items-center justify-between text-[11px] uppercase tracking-widest text-black/45">
@@ -286,9 +276,7 @@ export function SlideLayersInspector({
           <button
             type="button"
             onClick={() =>
-              picked.length === ordered.length
-                ? setPicked([])
-                : setPicked(ordered.map((b) => b.id))
+              picked.length === ordered.length ? setPicked([]) : setPicked(ordered.map((b) => b.id))
             }
             className="hover:text-black/70"
           >
@@ -298,7 +286,6 @@ export function SlideLayersInspector({
             Edit ⤢
           </button>
         </div>
-
       </div>
 
       {picked.length > 0 && (
@@ -425,7 +412,6 @@ export function SlideLayersInspector({
             <input
               type="checkbox"
               checked={pickedSet.has(b.id)}
-
               onChange={() => toggleCheck(b.id)}
               aria-label={`Select ${labelFor(b)}`}
               className="h-3.5 w-3.5 shrink-0 accent-[#003FC7]"
@@ -441,9 +427,7 @@ export function SlideLayersInspector({
               onClick={(e) => selectRow(b.id, e)}
               className={`min-w-0 flex-1 truncate text-left text-xs ${
                 b.hidden ? "text-black/35 line-through" : "text-black/75"
-              } ${
-                pickedSet.has(b.id) ? "font-semibold text-[#003FC7]" : "hover:text-black"
-              }`}
+              } ${pickedSet.has(b.id) ? "font-semibold text-[#003FC7]" : "hover:text-black"}`}
               title={`${labelFor(b)} — click to highlight, ⌘/Ctrl-click or ⇧-click to multi-select`}
             >
               {labelFor(b)}
@@ -472,7 +456,9 @@ export function SlideLayersInspector({
               title={b.hidden ? "Show layer" : "Hide layer"}
               aria-label={b.hidden ? `Show ${labelFor(b)}` : `Hide ${labelFor(b)}`}
               aria-pressed={Boolean(b.hidden)}
-              onClick={() => patch(b.id, { hidden: !b.hidden }, b.hidden ? "Show layer" : "Hide layer")}
+              onClick={() =>
+                patch(b.id, { hidden: !b.hidden }, b.hidden ? "Show layer" : "Hide layer")
+              }
               className="rounded px-1 text-[11px] text-black/40 hover:bg-black/5 hover:text-black/70"
             >
               {b.hidden ? "◌" : "◉"}
@@ -482,7 +468,9 @@ export function SlideLayersInspector({
               title={b.locked ? "Unlock layer" : "Lock layer"}
               aria-label={b.locked ? `Unlock ${labelFor(b)}` : `Lock ${labelFor(b)}`}
               aria-pressed={Boolean(b.locked)}
-              onClick={() => patch(b.id, { locked: !b.locked }, b.locked ? "Unlock layer" : "Lock layer")}
+              onClick={() =>
+                patch(b.id, { locked: !b.locked }, b.locked ? "Unlock layer" : "Lock layer")
+              }
               className="rounded px-1 text-[11px] text-black/40 hover:bg-black/5 hover:text-black/70"
             >
               {b.locked ? "🔒" : "🔓"}
@@ -519,7 +507,6 @@ export function SlideLayersInspector({
         handle (moves the whole selection) or use the bulk bar. Top of the list paints on top.
         Hidden layers stay out of present, share and export.
       </p>
-
     </div>
   );
 }

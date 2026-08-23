@@ -27,7 +27,12 @@
 
 import { SECTION_FRAMEWORKS, byId, variantsForSection, type ModuleVariant } from "./taxonomy";
 import { INDUSTRY_RECIPES, industryRecipeById } from "./design-skins";
-import { INDUSTRY_GEOMETRY, packGeometry, type PackGeometry, type ScaffoldFamily } from "./pack-geometry";
+import {
+  INDUSTRY_GEOMETRY,
+  packGeometry,
+  type PackGeometry,
+  type ScaffoldFamily,
+} from "./pack-geometry";
 import type { StylePack } from "./style-packs";
 import type { SkinScene } from "./skin-backgrounds";
 import { resolveTypography, type TypographyConstraint } from "./industry-typography";
@@ -351,7 +356,8 @@ export function sectionTemplate(query: TemplateQuery): LayoutTreatment | null {
   if (!recipe || !section) return null;
 
   const levels = levelsForSection(section.id);
-  const level = query.level && levels.includes(query.level) ? query.level : (levels[0] as TemplateLevel);
+  const level =
+    query.level && levels.includes(query.level) ? query.level : (levels[0] as TemplateLevel);
 
   const candidates = candidatesForLevel(section.id, level);
   const seed = industryIndex(recipe.id) + sectionIndex(section.id) * 2 + LEVEL_OFFSET[level] * 5;
@@ -419,7 +425,8 @@ export function describeTreatment(t: LayoutTreatment): string {
 /** Infer a level from free text about the slide's job. */
 export function inferLevel(text: string, sectionId?: string): TemplateLevel {
   const t = text.toLowerCase();
-  if (/\b(appendix|backup|table|matrix|reference|detail sheet|glossary)\b/.test(t)) return "appendix";
+  if (/\b(appendix|backup|table|matrix|reference|detail sheet|glossary)\b/.test(t))
+    return "appendix";
   if (/\b(kpi|metric|number|figure|dashboard|%|growth|revenue|roi|stat)/.test(t)) return "kpi";
   if (/\b(process|phase|step|flow|journey|timeline|roadmap|cycle|workflow|sequence)\b/.test(t))
     return "process";
@@ -468,7 +475,14 @@ export interface SlideTemplateOverride {
 }
 
 /** Which resolved fields came from the slide rather than the library. */
-export type TemplateOverrideField = "level" | "scene" | "display" | "body" | "figure" | "fill" | "density";
+export type TemplateOverrideField =
+  | "level"
+  | "scene"
+  | "display"
+  | "body"
+  | "figure"
+  | "fill"
+  | "density";
 
 export interface ResolvedSlideTemplate {
   /** Library cell the slide resolves to (null when the industry is unknown). */
@@ -520,13 +534,16 @@ export function clampTemplateType(axis: keyof LevelRole["typeScale"], px: number
 
 export interface ResolveSlideTemplateArgs {
   /** The slide: section, variant, title text and its optional override. */
-  slide: {
-    sectionId?: string | null;
-    variantId?: string | null;
-    layoutId?: string | null;
-    content?: unknown;
-    templateOverride?: SlideTemplateOverride | null;
-  } | null | undefined;
+  slide:
+    | {
+        sectionId?: string | null;
+        variantId?: string | null;
+        layoutId?: string | null;
+        content?: unknown;
+        templateOverride?: SlideTemplateOverride | null;
+      }
+    | null
+    | undefined;
   /** Deck context — `designRecipeId` names the industry recipe (R01…R30). */
   industryId?: string | null;
 }
@@ -553,12 +570,12 @@ export function resolveSlideTemplate(args: ResolveSlideTemplateArgs): ResolvedSl
   const level = ov?.level ?? defaultLevel;
 
   const industryId = args.industryId ?? null;
-  const libDefault = industryId && sectionId
-    ? sectionTemplate({ industryId, sectionId, level: defaultLevel })
-    : null;
-  const treatment = industryId && sectionId
-    ? sectionTemplate({ industryId, sectionId, level })
-    : null;
+  const libDefault =
+    industryId && sectionId
+      ? sectionTemplate({ industryId, sectionId, level: defaultLevel })
+      : null;
+  const treatment =
+    industryId && sectionId ? sectionTemplate({ industryId, sectionId, level }) : null;
 
   const role = LEVEL_ROLE[level];
   const defaults = {
@@ -622,10 +639,10 @@ export function hasTemplateOverride(ov: SlideTemplateOverride | null | undefined
   if (!ov) return false;
   return Boolean(
     ov.level ||
-      ov.scene ||
-      typeof ov.fillBias === "number" ||
-      (ov.typeScale && Object.keys(ov.typeScale).length) ||
-      (ov.density && Object.keys(ov.density).length),
+    ov.scene ||
+    typeof ov.fillBias === "number" ||
+    (ov.typeScale && Object.keys(ov.typeScale).length) ||
+    (ov.density && Object.keys(ov.density).length),
   );
 }
 
@@ -636,23 +653,33 @@ export function mergeTemplateOverride(
 ): SlideTemplateOverride | null {
   if (patch === null) return null;
   const next: SlideTemplateOverride = { ...(current ?? {}) };
-  if ("level" in patch) patch.level ? (next.level = patch.level) : delete next.level;
-  if ("scene" in patch) patch.scene ? (next.scene = patch.scene) : delete next.scene;
-  if ("fillBias" in patch)
-    typeof patch.fillBias === "number" ? (next.fillBias = patch.fillBias) : delete next.fillBias;
+  if ("level" in patch) {
+    if (patch.level) next.level = patch.level;
+    else delete next.level;
+  }
+  if ("scene" in patch) {
+    if (patch.scene) next.scene = patch.scene;
+    else delete next.scene;
+  }
+  if ("fillBias" in patch) {
+    if (typeof patch.fillBias === "number") next.fillBias = patch.fillBias;
+    else delete next.fillBias;
+  }
   if ("typeScale" in patch) {
     const merged = { ...(next.typeScale ?? {}), ...(patch.typeScale ?? {}) };
     for (const k of Object.keys(merged) as Array<keyof LevelRole["typeScale"]>) {
       if (typeof merged[k] !== "number") delete merged[k];
     }
-    Object.keys(merged).length ? (next.typeScale = merged) : delete next.typeScale;
+    if (Object.keys(merged).length) next.typeScale = merged;
+    else delete next.typeScale;
   }
   if ("density" in patch) {
     const merged = { ...(next.density ?? {}), ...(patch.density ?? {}) };
     for (const k of Object.keys(merged) as Array<keyof LevelRole["density"]>) {
       if (typeof merged[k] !== "number") delete merged[k];
     }
-    Object.keys(merged).length ? (next.density = merged) : delete next.density;
+    if (Object.keys(merged).length) next.density = merged;
+    else delete next.density;
   }
   return hasTemplateOverride(next) ? next : null;
 }

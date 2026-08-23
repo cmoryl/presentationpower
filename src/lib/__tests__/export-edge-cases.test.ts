@@ -115,7 +115,6 @@ describe("blended industry backgrounds", () => {
     expect(behind[behind.length - 1]).toContain("cover");
   });
 
-
   it("treats an all-default override as neutral so authored packs are untouched", () => {
     expect(isNeutralOverride(defaultOverride("S06", "atlas"))).toBe(true);
     expect(
@@ -213,7 +212,9 @@ describe("unusual image DPI", () => {
 
 describe("missing assets fallback", () => {
   it("leaves an unmeasurable asset unmeasured rather than throwing", async () => {
-    await expect(measureImageAspect("https://example.invalid/missing.png")).resolves.toBeUndefined();
+    await expect(
+      measureImageAspect("https://example.invalid/missing.png"),
+    ).resolves.toBeUndefined();
     expect(getImageAspect("https://example.invalid/missing.png")).toBeUndefined();
     await expect(measureImageAspect(null)).resolves.toBeUndefined();
     await expect(measureImageAspect("")).resolves.toBeUndefined();

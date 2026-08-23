@@ -63,7 +63,8 @@ function hasData(value: unknown, depth = 0): boolean {
 function hasNumber(value: unknown, depth = 0): boolean {
   if (typeof value === "number") return Number.isFinite(value) && value !== 0;
   // "99.98%", "$284K", "1.24" all count — a bare label does not.
-  if (typeof value === "string") return /\d/.test(value) && Number.isFinite(Number(value.replace(/[^\d.-]/g, "")));
+  if (typeof value === "string")
+    return /\d/.test(value) && Number.isFinite(Number(value.replace(/[^\d.-]/g, "")));
   if (Array.isArray(value)) return value.some((v) => hasNumber(v, depth + 1));
   if (value && typeof value === "object") {
     if (depth > 3) return false;
@@ -132,14 +133,18 @@ export function visualDataGap(
         ? [
             `This visual renders nothing: ${empty
               .map((k) => `"${k}"`)
-              .join(", ")} carries no values, so the chart/diagram exports as an empty frame. Write the real figures into those exact keys with update_slide_content.`,
+              .join(
+                ", ",
+              )} carries no values, so the chart/diagram exports as an empty frame. Write the real figures into those exact keys with update_slide_content.`,
           ]
         : []),
       ...(numberless
         ? [
             `This chart has labels but no figures: ${plotted
               .map((k) => `"${k}"`)
-              .join(", ")} contain no numeric values, so nothing is plotted. Write the actual numbers as numbers.`,
+              .join(
+                ", ",
+              )} contain no numeric values, so nothing is plotted. Write the actual numbers as numbers.`,
           ]
         : []),
     ],
@@ -147,7 +152,6 @@ export function visualDataGap(
     example_content: digest.example_content,
   };
 }
-
 
 export type SlideForAudit = {
   position: number;

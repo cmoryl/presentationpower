@@ -42,7 +42,6 @@ import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
 import { ElementBrickRail } from "@/components/brand/ElementBrickMotif";
 
-
 // Every slide can render in light or dark mode. VariantRenderer sets this
 // context per slide; SlideFrame and helpers read it to flip content surfaces
 // and text colors without every switch case having to know about the mode.
@@ -207,10 +206,9 @@ export function makeSlideInk(
   const accentText = accentHex ? readableAccent(accentHex, mode, surfaceHex ?? undefined) : textHex;
   const rgb = hexToRgb(bodyHex) ?? (dark ? { r: 255, g: 255, b: 255 } : { r: 10, g: 15, b: 28 });
   const base = `${rgb.r},${rgb.g},${rgb.b}`;
-  const textBackgrounds = dark
-    ? ["#03002C", "#0A1230"]
-    : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
-  const surfaceRgb = hexToRgb(dark ? "#03002C" : surfaceHex ?? "#FFFFFF") ??
+  const textBackgrounds = dark ? ["#03002C", "#0A1230"] : ["#FFFFFF", surfaceHex ?? "#FFFFFF"];
+  const surfaceRgb =
+    hexToRgb(dark ? "#03002C" : (surfaceHex ?? "#FFFFFF")) ??
     (dark ? { r: 3, g: 0, b: 44 } : { r: 255, g: 255, b: 255 });
   // Secondary and tertiary copy used to be translucent ink. On bright scene
   // plates that alpha composited to only 1–3:1, which made locked footers,
@@ -350,19 +348,19 @@ function HeroPlate({
     if (!el) return;
     let raf = 0;
     const measure = () => {
-      const multiColumn = Array.from(el.querySelectorAll<HTMLElement>(":scope > *, :scope > * > *")).some(
-        (node) => {
-          const cs = getComputedStyle(node);
-          if (cs.display.includes("grid")) {
-            const tracks = cs.gridTemplateColumns.split(" ").filter(Boolean);
-            return tracks.length > 1;
-          }
-          if (cs.display.includes("flex") && cs.flexDirection === "row") {
-            return node.childElementCount > 1;
-          }
-          return false;
-        },
-      );
+      const multiColumn = Array.from(
+        el.querySelectorAll<HTMLElement>(":scope > *, :scope > * > *"),
+      ).some((node) => {
+        const cs = getComputedStyle(node);
+        if (cs.display.includes("grid")) {
+          const tracks = cs.gridTemplateColumns.split(" ").filter(Boolean);
+          return tracks.length > 1;
+        }
+        if (cs.display.includes("flex") && cs.flexDirection === "row") {
+          return node.childElementCount > 1;
+        }
+        return false;
+      });
       setWide(multiColumn);
     };
     raf = requestAnimationFrame(measure);
@@ -484,7 +482,6 @@ export function SlideFrame({
       (l) => /url\(\s*["']?(?:https?:)?\/\//i.test(l) || /url\(\s*["']?\//i.test(l),
     );
 
-
   const hasBackdrop = !!backdrop && !packOwnsGround;
   const hasBackdropImage = !!backdrop?.url && !packOwnsGround;
   const hasBackdropAurora = !!backdrop?.aurora && !packOwnsGround;
@@ -550,7 +547,12 @@ export function SlideFrame({
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(measure);
     });
-    obs.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "style", "src"] });
+    obs.observe(root, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["class", "style", "src"],
+    });
     return () => {
       cancelAnimationFrame(raf);
       obs.disconnect();
@@ -650,7 +652,6 @@ export function SlideFrame({
         // Open-space auto-fill multipliers (see lib/open-space-fill.ts). The
         // shared primitives read these to grow type into an empty sheet.
         ...fillVars,
-
       }}
     >
       {hasBackdropCss && (
@@ -733,7 +734,6 @@ export function SlideFrame({
       {!hasBackdrop &&
         !packOwnsGround &&
         slideDark &&
-
         (() => {
           const isHero = variant === "cover" || variant === "divider" || variant === "close";
           const primary = brand.tokens.primary;
@@ -793,7 +793,8 @@ export function SlideFrame({
       {/* Style pack sheet — four discrete planes (see the layering contract in
           style-packs.ts): flat field, damped + centre-cleared ground, crisp
           layout scaffold, then one zoned signature motif. */}
-      {packOwnsGround && pack &&
+      {packOwnsGround &&
+        pack &&
         (() => {
           const comp = packCompositionFor(variant, layoutId);
           // `groundSeed` is computed once above so the ground plane, the
@@ -820,7 +821,6 @@ export function SlideFrame({
             layoutId,
             pack.mode === "dark" ? "dark" : "light",
             calmBias,
-
           );
 
           return (
@@ -913,7 +913,9 @@ export function SlideFrame({
                 data-decorative="true"
                 className="pointer-events-none absolute inset-0"
                 style={{
-                  background: minimalPackLayers(packLayoutLayers(pack, comp, groundSeed)).join(", "),
+                  background: minimalPackLayers(packLayoutLayers(pack, comp, groundSeed)).join(
+                    ", ",
+                  ),
                 }}
               />
             </>
@@ -921,7 +923,8 @@ export function SlideFrame({
         })()}
       {/* 4 — signature motif: the pack's one piece of art, confined to its
           reserve zone and dissolved into the field. Decorative, never content. */}
-      {packOwnsGround && pack &&
+      {packOwnsGround &&
+        pack &&
         (() => {
           // Tiled signature motifs are wallpaper; the minimal direction keeps
           // only non-repeating gestures.
@@ -966,7 +969,8 @@ export function SlideFrame({
           decorative planes produce (see pack-readability.ts). A veil of the
           page field collapses the texture back toward the surface colour so
           copy never blends into grain, rails or blooms. */}
-      {packOwnsGround && pack &&
+      {packOwnsGround &&
+        pack &&
         (() => {
           const { scrimAlpha } = packReadability(pack);
           if (scrimAlpha <= 0) return null;
@@ -997,7 +1001,6 @@ export function SlideFrame({
           />
           {/* Grain — barely-there tactile finish, matches media tiles. */}
           <div
-
             aria-hidden
             data-decorative="true"
             className="pointer-events-none absolute inset-0"
@@ -1029,9 +1032,6 @@ export function SlideFrame({
         />
       )}
 
-
-
-
       {/* Brand bar (locked) — hairline accent rule, editorial not decorative.
           Enterprise White replaces the full-bleed bar with nothing at the top
           (the master template keeps the page edge clean) and instead closes
@@ -1045,7 +1045,6 @@ export function SlideFrame({
         ) : null
       ) : null}
       {!enterprise && !packOwnsGround && (
-
         <div
           className="absolute left-0 top-0 h-[2px] w-full"
           style={{
@@ -1140,9 +1139,6 @@ export function SlideFrame({
         </div>
       )}
 
-
-
-
       {/* Content — 96px side margin. Vertical reserves grow when a logo
           hugs the top or bottom so text never runs under the lockup or the
           locked footer band. Baseline: pt=128, pb=96.
@@ -1204,7 +1200,6 @@ export function SlideFrame({
                   }
                 : null),
             }}
-
           >
             {compose && plate ? (
               <HeroPlate
@@ -1238,7 +1233,6 @@ export function SlideFrame({
           </div>
         );
       })()}
-
 
       {/* Footer (locked) — micro uppercase, hairline aligned to page number.
           When a bottom-center lockup is present, the centered footer text
@@ -1311,5 +1305,3 @@ export function SlideFrame({
     </div>
   );
 }
-
-

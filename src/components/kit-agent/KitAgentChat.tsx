@@ -180,7 +180,10 @@ export function KitAgentChat({
                     const state = (part as { state?: string }).state ?? "";
                     const done = state === "output-available" || state === "output-error";
                     return (
-                      <div key={key} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <div
+                        key={key}
+                        className="flex items-center gap-2 text-xs text-muted-foreground"
+                      >
                         {done ? (
                           <Wrench className="size-3.5" aria-hidden />
                         ) : (
@@ -237,7 +240,9 @@ export function KitAgentChat({
               ? "e.g. Build a LinkedIn + IG launch kit for GlobalLink continuous localization"
               : "e.g. Build an event kit for DIA 2026 in Boston, life sciences, booth E42"
           }
-          aria-label={surface === "social" ? "Message the social agent" : "Message the events agent"}
+          aria-label={
+            surface === "social" ? "Message the social agent" : "Message the events agent"
+          }
           className="min-h-[56px] resize-none"
         />
         <Button

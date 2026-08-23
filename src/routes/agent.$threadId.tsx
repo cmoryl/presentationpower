@@ -90,7 +90,8 @@ function ParallaxAgentWatermark() {
       className="pointer-events-none absolute inset-x-0 -bottom-6 select-none text-center font-semibold leading-none tracking-[-0.04em] will-change-transform"
       style={{
         fontSize: "clamp(120px, 22vw, 320px)",
-        background: "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.04) 35%, rgba(3,0,44,0.02) 75%, transparent 100%)",
+        background:
+          "linear-gradient(180deg, rgba(3,0,44,0) 0%, rgba(3,0,44,0.04) 35%, rgba(3,0,44,0.02) 75%, transparent 100%)",
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
         color: "transparent",
@@ -246,7 +247,6 @@ function AgentHero({
       <ParallaxAgentWatermark />
 
       <div className="relative px-6 sm:px-8">
-
         {/* Eyebrow */}
         <div className="flex flex-wrap items-center gap-3">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7]/20 bg-[#003FC7]/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#003FC7] backdrop-blur">
@@ -356,7 +356,6 @@ function AgentHero({
   );
 }
 
-
 /** Slim hero shown once the conversation is underway: progress takes centre stage. */
 function AgentProgressHero({
   onExpand,
@@ -408,8 +407,6 @@ function AgentProgressHero({
     </section>
   );
 }
-
-
 
 export const Route = createFileRoute("/agent/$threadId")({
   ssr: false,
@@ -523,7 +520,9 @@ function AgentThreadPage() {
     (id: string) => {
       setDeckId(id);
       setRefreshKey((k) => k + 1);
-      void setAgentThreadDeck(threadId, id).then(reloadThreads).catch(() => undefined);
+      void setAgentThreadDeck(threadId, id)
+        .then(reloadThreads)
+        .catch(() => undefined);
     },
     [threadId, reloadThreads],
   );
@@ -533,7 +532,9 @@ function AgentThreadPage() {
   const onFirstUserMessage = useCallback(
     (text: string) => {
       const title = text.length > 60 ? `${text.slice(0, 57)}…` : text;
-      void renameAgentThread(threadId, title).then(reloadThreads).catch(() => undefined);
+      void renameAgentThread(threadId, title)
+        .then(reloadThreads)
+        .catch(() => undefined);
     },
     [threadId, reloadThreads],
   );
@@ -639,8 +640,6 @@ function AgentThreadPage() {
             />
           </div>
         )}
-
-
 
         <div
           ref={workspaceRef}

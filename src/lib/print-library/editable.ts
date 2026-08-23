@@ -188,7 +188,6 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
     modules.push(section);
   }
 
-
   // Capability-style copy: spotlights use `capabilities`, briefs use `verbs`,
   // e-brochures use `sections` — all heading/body pairs.
   const capSource = ["capabilities", "verbs", "features"].find(
@@ -249,7 +248,6 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
       items: bulletRail.bullets.slice(0, 8).map((label) => ({ label })),
     });
   }
-
 
   // Narrative spine — the seed's own Challenge/Approach/Impact or C→S→R copy.
   const narrative = narrativeItemsFrom(content);
@@ -415,7 +413,6 @@ export function deriveModulesFromContent(content: Rec): PrintSection[] {
   }
 
   return modules;
-
 }
 
 /**

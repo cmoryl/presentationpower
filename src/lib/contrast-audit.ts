@@ -37,7 +37,6 @@ export const DEFAULT_ACCENT = "#003fc7";
 
 export type ContrastLevel = "pass" | "warn" | "fail";
 
-
 export type ContrastFinding = {
   /** Stable id, e.g. `accent-heading`. */
   id: string;
@@ -73,7 +72,6 @@ export type ContrastAudit = {
   safeAccent?: string;
 };
 
-
 const round = (n: number) => Math.round(n * 100) / 100;
 
 const HEX_RE = /^#[0-9a-f]{6}$/i;
@@ -106,11 +104,7 @@ export function contrastRatio(a: string, b: string): number {
 function toRgb(hex: string): [number, number, number] | null {
   const h = normalizeHex(hex, "");
   if (!HEX_RE.test(h)) return null;
-  return [
-    parseInt(h.slice(1, 3), 16),
-    parseInt(h.slice(3, 5), 16),
-    parseInt(h.slice(5, 7), 16),
-  ];
+  return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
 }
 
 /** Score one foreground/background pair. `warnAt` softens a near miss. */
@@ -221,9 +215,7 @@ export function auditSlideColors(input: {
 
   const textFinding = findings.find((f) => f.id === "accent-text")!;
   const safeAccent =
-    textFinding.level === "pass"
-      ? undefined
-      : correctAccent(accent, bg, mode, ink, t.large);
+    textFinding.level === "pass" ? undefined : correctAccent(accent, bg, mode, ink, t.large);
 
   return {
     accent,
@@ -316,4 +308,3 @@ export function auditDeckColors(
     level: failingSlides.length > 0 ? "fail" : warningSlides.length > 0 ? "warn" : "pass",
   };
 }
-

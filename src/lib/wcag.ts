@@ -37,7 +37,6 @@ function isDecorative(el: HTMLElement): boolean {
   return false;
 }
 
-
 // Ink tokens used by the auto-fix. On light slides only these two are allowed:
 // brand navy for body/heading ink, brand blue for stats/figures.
 const LIGHT_INK = "#03002C";
@@ -73,9 +72,7 @@ function applyLightInk(el: HTMLElement) {
   // Copy that sits on photography, a gradient scrim or a solid accent fill is
   // not on a flat editorial surface — white ink is correct there. Keep it white
   // and let the stylesheet supply the halo/scrim instead of swapping to navy.
-  const onDarkBacking = el.closest?.(
-    "[data-on-media], [data-on-fill], [data-media-backing]",
-  );
+  const onDarkBacking = el.closest?.("[data-on-media], [data-on-fill], [data-media-backing]");
   if (onDarkBacking) {
     el.style.setProperty("color", "#FFFFFF", "important");
     el.style.setProperty("-webkit-text-fill-color", "#FFFFFF", "important");

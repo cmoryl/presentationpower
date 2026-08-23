@@ -46,7 +46,8 @@ export const Route = createFileRoute("/dev/social-corners")({
       { property: "og:title", content: "Social corner-rounding harness" },
       {
         property: "og:description",
-        content: "Renders every social aspect ratio for one style to verify copy-plate corner rounding.",
+        content:
+          "Renders every social aspect ratio for one style to verify copy-plate corner rounding.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

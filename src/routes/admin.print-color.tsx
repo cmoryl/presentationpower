@@ -65,10 +65,7 @@ const INTENTS: Array<{ id: PrintIntent; label: string; sub: string }> = [
 function PrintColorPage() {
   const [intent, setIntent] = useState<PrintIntent>("offset");
   const builds = useMemo(() => printColorBuilds(BRAND_MODES), []);
-  const forIntent = useMemo(
-    () => builds.filter((b) => b.intent === intent),
-    [builds, intent],
-  );
+  const forIntent = useMemo(() => builds.filter((b) => b.intent === intent), [builds, intent]);
   const summary = useMemo(() => queueSummary(forIntent), [forIntent]);
   const profile = PREFLIGHT_PROFILES[intent];
 
@@ -125,9 +122,7 @@ function PrintColorPage() {
           </div>
           <div>
             <dt className="font-semibold uppercase tracking-[0.16em] text-black/45">Bleed</dt>
-            <dd className="mt-0.5">
-              {BLEED_3MM_IN.toFixed(3)}in (3 mm) + crop marks + safe area
-            </dd>
+            <dd className="mt-0.5">{BLEED_3MM_IN.toFixed(3)}in (3 mm) + crop marks + safe area</dd>
           </div>
         </dl>
         <p className="mt-3 text-xs text-black/60">{profile.note}</p>
@@ -140,8 +135,8 @@ function PrintColorPage() {
         </h2>
         <ul className="space-y-2 text-sm text-black/75">
           <Rule>
-            Body copy and hairline rules separate to <strong>{cmykString(TEXT_BLACK)}</strong>.
-            Navy #03002C as a four-color build fringes at small sizes on any registration slip.
+            Body copy and hairline rules separate to <strong>{cmykString(TEXT_BLACK)}</strong>. Navy
+            #03002C as a four-color build fringes at small sizes on any registration slip.
           </Rule>
           <Rule>
             Display type at or below <strong>{SMALL_TYPE_PT_CEILING}pt</strong> follows the same
@@ -149,8 +144,8 @@ function PrintColorPage() {
           </Rule>
           <Rule>
             Rich black for large fills is a <strong>press decision</strong>, not a value this tool
-            supplies — the support screen depends on stock and the printer&rsquo;s TAC limit. Ask for
-            it alongside the brand build.
+            supplies — the support screen depends on stock and the printer&rsquo;s TAC limit. Ask
+            for it alongside the brand build.
           </Rule>
 
           <Rule>
@@ -167,18 +162,16 @@ function PrintColorPage() {
       {/* Resolution ceiling */}
       <section className="mb-10 rounded-2xl border border-amber-500/30 bg-amber-50/70 p-5">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-[#03002C]">
-          <AlertTriangle size={14} className="text-amber-600" /> Media resolution is capped
-          upstream
+          <AlertTriangle size={14} className="text-amber-600" /> Media resolution is capped upstream
         </h2>
         <p className="mt-2 text-xs leading-relaxed text-black/70">
-          Deck media was optimized for file size: anything over{" "}
-          {DECK_MEDIA_LONG_EDGE_PX} px on the long edge was resized to roughly 150 DPI across a
-          13.33in slide, and a batch of PNGs was re-encoded as JPEG. The pre-optimization
-          originals were not retained, so any print piece drawing on that pool is permanently
-          limited — no downstream setting recovers it. Preflight reports those placements as
-          failures below {SOFT_IMAGE_DPI} DPI and as soft between {SOFT_IMAGE_DPI} and{" "}
-          {MIN_IMAGE_DPI} DPI ({MIN_LINEART_DPI} DPI for rasterized line art). New print imagery
-          must be acquired at final size and kept unoptimized.
+          Deck media was optimized for file size: anything over {DECK_MEDIA_LONG_EDGE_PX} px on the
+          long edge was resized to roughly 150 DPI across a 13.33in slide, and a batch of PNGs was
+          re-encoded as JPEG. The pre-optimization originals were not retained, so any print piece
+          drawing on that pool is permanently limited — no downstream setting recovers it. Preflight
+          reports those placements as failures below {SOFT_IMAGE_DPI} DPI and as soft between{" "}
+          {SOFT_IMAGE_DPI} and {MIN_IMAGE_DPI} DPI ({MIN_LINEART_DPI} DPI for rasterized line art).
+          New print imagery must be acquired at final size and kept unoptimized.
         </p>
       </section>
 
@@ -202,8 +195,8 @@ function PrintColorPage() {
                     <p className="text-xs text-black/55">{brand.description}</p>
                   </div>
                   <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/45">
-                    {build.slots.filter((s) => s.status === "approved").length}/
-                    {build.slots.length} approved
+                    {build.slots.filter((s) => s.status === "approved").length}/{build.slots.length}{" "}
+                    approved
                   </div>
                 </header>
                 <div className="grid gap-2 sm:grid-cols-2">
@@ -244,7 +237,9 @@ function SlotCard({ slot }: { slot: PrintColorSlot }) {
               <CircleDashed size={11} className="text-amber-600" />
             )}
             <span className={approved ? "text-emerald-700" : "text-amber-700"}>
-              {approved ? `Approved${slot.approvedBy ? ` · ${slot.approvedBy}` : ""}` : "Awaiting brand sign-off"}
+              {approved
+                ? `Approved${slot.approvedBy ? ` · ${slot.approvedBy}` : ""}`
+                : "Awaiting brand sign-off"}
             </span>
           </div>
         </div>
@@ -277,15 +272,7 @@ function Rule({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "ok" | "warn";
-}) {
+function Stat({ label, value, tone }: { label: string; value: string; tone?: "ok" | "warn" }) {
   const color =
     tone === "ok" ? "text-emerald-700" : tone === "warn" ? "text-amber-700" : "text-[#03002C]";
   return (

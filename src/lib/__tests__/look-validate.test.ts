@@ -10,9 +10,9 @@ describe("look validation", () => {
   it("accepts a coherent S + R pairing", () => {
     const r = recipeForIndustry("Gaming");
     expect(r).toBeTruthy();
-    expect(validateLook({ stylePackId: "skin-s03", designRecipeId: r, industry: "Gaming" }).ok).toBe(
-      true,
-    );
+    expect(
+      validateLook({ stylePackId: "skin-s03", designRecipeId: r, industry: "Gaming" }).ok,
+    ).toBe(true);
   });
 
   it("rejects an R-only look", () => {
@@ -25,7 +25,9 @@ describe("look validation", () => {
   it("rejects an industry ground on an industry language", () => {
     const v = validateLook({ stylePackId: "skin-r22", designRecipeId: "R13" });
     expect(v.issues.map((i) => i.code)).toContain("double-industry");
-    expect(normalizeLook({ stylePackId: "skin-r22", designRecipeId: "R13" }).designRecipeId).toBeNull();
+    expect(
+      normalizeLook({ stylePackId: "skin-r22", designRecipeId: "R13" }).designRecipeId,
+    ).toBeNull();
   });
 
   it("rejects industry plates on the Element product languages", () => {
@@ -55,8 +57,9 @@ describe("look validation", () => {
     expect(v.issues.map((i) => i.code)).toContain("industry-mismatch");
     expect(v.suggestedRecipeId).toBe(gaming);
     // Warnings never silently rewrite art direction.
-    expect(normalizeLook({ stylePackId: "skin-s11", designRecipeId: retail, industry: "Gaming" }).designRecipeId).toBe(
-      retail,
-    );
+    expect(
+      normalizeLook({ stylePackId: "skin-s11", designRecipeId: retail, industry: "Gaming" })
+        .designRecipeId,
+    ).toBe(retail);
   });
 });

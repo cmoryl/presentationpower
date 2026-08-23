@@ -120,7 +120,6 @@ export function backdropRasterSize(quality?: ExportQualityId | null): {
   return { width: BACKDROP_W, height: BACKDROP_H };
 }
 
-
 const STORE_KEY = "tp:export-quality";
 
 /** Persisted preference — read lazily so SSR never touches localStorage. */
@@ -196,7 +195,6 @@ const FIDELITY_KEY = "tp:export-fidelity:v3";
 export function exportFidelityById(id: string | null | undefined): ExportFidelityId {
   return id === "layered" || id === "exact" ? id : "editable";
 }
-
 
 export function readExportFidelity(): ExportFidelityId {
   if (typeof window === "undefined") return DEFAULT_EXPORT_FIDELITY;

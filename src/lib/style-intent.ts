@@ -26,7 +26,6 @@ import {
   type RecommendationProvenance,
 } from "./style-learning";
 
-
 /* ------------------------------------------------------------------ brief -- */
 
 export type DeckObjective =
@@ -152,34 +151,342 @@ export interface StyleTraits {
 }
 
 export const STYLE_TRAITS: Record<string, StyleTraits> = {
-  S01: { objectives: ["product-launch", "executive-briefing", "case-study"], audiences: ["executive", "buyer", "creative"], jobs: ["hero", "content"], energy: "calm", data: 0.4, imagery: 0.8, noise: 0.2, complexity: 0.4, outputs: ["stage", "boardroom", "send-ahead"], contrastSafe: true },
-  S02: { objectives: ["product-launch", "event-keynote", "sales-pitch"], audiences: ["creative", "public-broad", "buyer"], jobs: ["hero", "content"], energy: "bold", data: 0.3, imagery: 0.7, noise: 0.6, complexity: 0.3, outputs: ["stage", "webinar"], contrastSafe: false },
-  S03: { objectives: ["sales-pitch", "product-launch", "proposal-rfp"], audiences: ["buyer", "technical", "executive"], jobs: ["hero", "content", "data"], energy: "confident", data: 0.6, imagery: 0.5, noise: 0.5, complexity: 0.6, outputs: ["boardroom", "webinar", "send-ahead"], contrastSafe: true },
-  S04: { objectives: ["executive-briefing", "research-report", "proposal-rfp"], audiences: ["technical", "executive"], jobs: ["content", "data", "appendix"], energy: "confident", data: 0.9, imagery: 0.3, noise: 0.3, complexity: 0.9, outputs: ["boardroom", "send-ahead", "webinar"], contrastSafe: true },
-  S05: { objectives: ["research-report", "training", "internal-update"], audiences: ["technical", "academic"], jobs: ["content", "data", "appendix"], energy: "calm", data: 0.8, imagery: 0.2, noise: 0.15, complexity: 0.9, outputs: ["send-ahead", "print", "webinar"], contrastSafe: true },
-  S06: { objectives: ["executive-briefing", "proposal-rfp", "internal-update"], audiences: ["executive", "buyer", "internal-team"], jobs: ["content", "data", "flow"], energy: "calm", data: 0.9, imagery: 0.3, noise: 0.15, complexity: 0.95, outputs: ["boardroom", "send-ahead", "print"], contrastSafe: true },
-  S07: { objectives: ["training", "internal-update", "product-launch"], audiences: ["internal-team", "public-broad", "buyer"], jobs: ["content", "flow"], energy: "calm", data: 0.6, imagery: 0.6, noise: 0.3, complexity: 0.6, outputs: ["webinar", "send-ahead", "boardroom"], contrastSafe: true },
-  S08: { objectives: ["product-launch", "event-keynote", "training"], audiences: ["public-broad", "creative", "internal-team"], jobs: ["hero", "content", "flow"], energy: "bold", data: 0.5, imagery: 0.6, noise: 0.7, complexity: 0.4, outputs: ["stage", "webinar"], contrastSafe: true },
-  S09: { objectives: ["product-launch", "research-report", "training"], audiences: ["technical"], jobs: ["content", "data", "appendix"], energy: "confident", data: 0.9, imagery: 0.2, noise: 0.35, complexity: 0.95, outputs: ["webinar", "send-ahead"], contrastSafe: true },
-  S10: { objectives: ["internal-update", "training", "proposal-rfp"], audiences: ["internal-team", "buyer"], jobs: ["flow", "content"], energy: "confident", data: 0.6, imagery: 0.4, noise: 0.4, complexity: 0.7, outputs: ["webinar", "boardroom"], contrastSafe: true },
-  S11: { objectives: ["sales-pitch", "product-launch", "case-study"], audiences: ["buyer", "public-broad"], jobs: ["content", "data"], energy: "confident", data: 0.7, imagery: 0.7, noise: 0.35, complexity: 0.6, outputs: ["boardroom", "webinar", "print"], contrastSafe: true },
-  S12: { objectives: ["executive-briefing", "internal-update", "proposal-rfp"], audiences: ["executive", "internal-team", "technical"], jobs: ["data", "flow", "appendix"], energy: "calm", data: 0.95, imagery: 0.2, noise: 0.2, complexity: 0.95, outputs: ["boardroom", "send-ahead", "print"], contrastSafe: true },
-  S13: { objectives: ["executive-briefing", "sales-pitch", "internal-update"], audiences: ["executive", "buyer", "internal-team"], jobs: ["content", "data"], energy: "confident", data: 0.85, imagery: 0.5, noise: 0.3, complexity: 0.85, outputs: ["boardroom", "send-ahead", "webinar"], contrastSafe: true },
-  S14: { objectives: ["research-report", "executive-briefing", "proposal-rfp"], audiences: ["academic", "executive", "technical"], jobs: ["content", "data", "appendix"], energy: "calm", data: 0.85, imagery: 0.4, noise: 0.1, complexity: 0.9, outputs: ["print", "send-ahead", "boardroom"], contrastSafe: true },
-  S15: { objectives: ["research-report", "case-study", "executive-briefing"], audiences: ["academic", "executive", "public-broad"], jobs: ["content", "data", "appendix"], energy: "calm", data: 0.8, imagery: 0.5, noise: 0.2, complexity: 0.85, outputs: ["send-ahead", "print"], contrastSafe: true },
-  S16: { objectives: ["product-launch", "event-keynote", "case-study"], audiences: ["creative", "executive", "public-broad"], jobs: ["hero", "content"], energy: "bold", data: 0.25, imagery: 0.95, noise: 0.45, complexity: 0.3, outputs: ["stage", "print"], contrastSafe: false },
-  S17: { objectives: ["training", "case-study", "internal-update"], audiences: ["internal-team", "public-broad"], jobs: ["content", "flow"], energy: "calm", data: 0.5, imagery: 0.8, noise: 0.3, complexity: 0.5, outputs: ["webinar", "print", "send-ahead"], contrastSafe: true },
-  S18: { objectives: ["event-keynote", "sales-pitch", "product-launch"], audiences: ["public-broad", "creative", "buyer"], jobs: ["hero"], energy: "bold", data: 0.2, imagery: 0.9, noise: 0.8, complexity: 0.25, outputs: ["stage"], contrastSafe: false },
-  S19: { objectives: ["research-report", "proposal-rfp", "training"], audiences: ["technical", "academic"], jobs: ["flow", "data", "appendix"], energy: "calm", data: 0.85, imagery: 0.3, noise: 0.25, complexity: 0.95, outputs: ["print", "send-ahead", "boardroom"], contrastSafe: true },
-  S20: { objectives: ["investor-finance", "research-report", "executive-briefing"], audiences: ["investor", "executive", "technical"], jobs: ["data", "content"], energy: "confident", data: 1, imagery: 0.2, noise: 0.35, complexity: 0.95, outputs: ["boardroom", "webinar", "send-ahead"], contrastSafe: true },
-  S21: { objectives: ["research-report", "case-study", "training"], audiences: ["academic", "public-broad", "internal-team"], jobs: ["content", "flow"], energy: "calm", data: 0.6, imagery: 0.7, noise: 0.45, complexity: 0.6, outputs: ["send-ahead", "webinar", "print"], contrastSafe: true },
-  S22: { objectives: ["research-report", "case-study", "proposal-rfp"], audiences: ["academic", "executive", "buyer"], jobs: ["content", "appendix", "data"], energy: "calm", data: 0.7, imagery: 0.5, noise: 0.2, complexity: 0.9, outputs: ["print", "send-ahead"], contrastSafe: true },
-  S23: { objectives: ["event-keynote", "product-launch", "case-study"], audiences: ["creative", "public-broad"], jobs: ["hero", "content"], energy: "bold", data: 0.35, imagery: 0.6, noise: 0.85, complexity: 0.35, outputs: ["stage", "webinar"], contrastSafe: true },
-  S24: { objectives: ["product-launch", "event-keynote", "investor-finance"], audiences: ["investor", "creative", "technical"], jobs: ["hero", "content"], energy: "bold", data: 0.45, imagery: 0.6, noise: 0.65, complexity: 0.4, outputs: ["stage", "webinar"], contrastSafe: false },
-  S25: { objectives: ["event-keynote", "sales-pitch", "product-launch"], audiences: ["public-broad", "creative"], jobs: ["hero"], energy: "bold", data: 0.2, imagery: 0.5, noise: 0.9, complexity: 0.2, outputs: ["stage"], contrastSafe: true },
-  S26: { objectives: ["product-launch", "investor-finance", "research-report"], audiences: ["technical", "investor", "executive"], jobs: ["content", "data", "hero"], energy: "confident", data: 0.8, imagery: 0.4, noise: 0.5, complexity: 0.8, outputs: ["boardroom", "stage", "webinar"], contrastSafe: false },
-  S27: { objectives: ["executive-briefing", "case-study", "internal-update"], audiences: ["executive", "public-broad", "creative"], jobs: ["hero", "content"], energy: "calm", data: 0.4, imagery: 0.8, noise: 0.4, complexity: 0.4, outputs: ["stage", "boardroom", "send-ahead"], contrastSafe: false },
-  S28: { objectives: ["executive-briefing", "internal-update", "research-report"], audiences: ["executive", "internal-team", "technical"], jobs: ["content", "data", "flow"], energy: "confident", data: 0.85, imagery: 0.5, noise: 0.4, complexity: 0.85, outputs: ["boardroom", "send-ahead", "webinar"], contrastSafe: true },
+  S01: {
+    objectives: ["product-launch", "executive-briefing", "case-study"],
+    audiences: ["executive", "buyer", "creative"],
+    jobs: ["hero", "content"],
+    energy: "calm",
+    data: 0.4,
+    imagery: 0.8,
+    noise: 0.2,
+    complexity: 0.4,
+    outputs: ["stage", "boardroom", "send-ahead"],
+    contrastSafe: true,
+  },
+  S02: {
+    objectives: ["product-launch", "event-keynote", "sales-pitch"],
+    audiences: ["creative", "public-broad", "buyer"],
+    jobs: ["hero", "content"],
+    energy: "bold",
+    data: 0.3,
+    imagery: 0.7,
+    noise: 0.6,
+    complexity: 0.3,
+    outputs: ["stage", "webinar"],
+    contrastSafe: false,
+  },
+  S03: {
+    objectives: ["sales-pitch", "product-launch", "proposal-rfp"],
+    audiences: ["buyer", "technical", "executive"],
+    jobs: ["hero", "content", "data"],
+    energy: "confident",
+    data: 0.6,
+    imagery: 0.5,
+    noise: 0.5,
+    complexity: 0.6,
+    outputs: ["boardroom", "webinar", "send-ahead"],
+    contrastSafe: true,
+  },
+  S04: {
+    objectives: ["executive-briefing", "research-report", "proposal-rfp"],
+    audiences: ["technical", "executive"],
+    jobs: ["content", "data", "appendix"],
+    energy: "confident",
+    data: 0.9,
+    imagery: 0.3,
+    noise: 0.3,
+    complexity: 0.9,
+    outputs: ["boardroom", "send-ahead", "webinar"],
+    contrastSafe: true,
+  },
+  S05: {
+    objectives: ["research-report", "training", "internal-update"],
+    audiences: ["technical", "academic"],
+    jobs: ["content", "data", "appendix"],
+    energy: "calm",
+    data: 0.8,
+    imagery: 0.2,
+    noise: 0.15,
+    complexity: 0.9,
+    outputs: ["send-ahead", "print", "webinar"],
+    contrastSafe: true,
+  },
+  S06: {
+    objectives: ["executive-briefing", "proposal-rfp", "internal-update"],
+    audiences: ["executive", "buyer", "internal-team"],
+    jobs: ["content", "data", "flow"],
+    energy: "calm",
+    data: 0.9,
+    imagery: 0.3,
+    noise: 0.15,
+    complexity: 0.95,
+    outputs: ["boardroom", "send-ahead", "print"],
+    contrastSafe: true,
+  },
+  S07: {
+    objectives: ["training", "internal-update", "product-launch"],
+    audiences: ["internal-team", "public-broad", "buyer"],
+    jobs: ["content", "flow"],
+    energy: "calm",
+    data: 0.6,
+    imagery: 0.6,
+    noise: 0.3,
+    complexity: 0.6,
+    outputs: ["webinar", "send-ahead", "boardroom"],
+    contrastSafe: true,
+  },
+  S08: {
+    objectives: ["product-launch", "event-keynote", "training"],
+    audiences: ["public-broad", "creative", "internal-team"],
+    jobs: ["hero", "content", "flow"],
+    energy: "bold",
+    data: 0.5,
+    imagery: 0.6,
+    noise: 0.7,
+    complexity: 0.4,
+    outputs: ["stage", "webinar"],
+    contrastSafe: true,
+  },
+  S09: {
+    objectives: ["product-launch", "research-report", "training"],
+    audiences: ["technical"],
+    jobs: ["content", "data", "appendix"],
+    energy: "confident",
+    data: 0.9,
+    imagery: 0.2,
+    noise: 0.35,
+    complexity: 0.95,
+    outputs: ["webinar", "send-ahead"],
+    contrastSafe: true,
+  },
+  S10: {
+    objectives: ["internal-update", "training", "proposal-rfp"],
+    audiences: ["internal-team", "buyer"],
+    jobs: ["flow", "content"],
+    energy: "confident",
+    data: 0.6,
+    imagery: 0.4,
+    noise: 0.4,
+    complexity: 0.7,
+    outputs: ["webinar", "boardroom"],
+    contrastSafe: true,
+  },
+  S11: {
+    objectives: ["sales-pitch", "product-launch", "case-study"],
+    audiences: ["buyer", "public-broad"],
+    jobs: ["content", "data"],
+    energy: "confident",
+    data: 0.7,
+    imagery: 0.7,
+    noise: 0.35,
+    complexity: 0.6,
+    outputs: ["boardroom", "webinar", "print"],
+    contrastSafe: true,
+  },
+  S12: {
+    objectives: ["executive-briefing", "internal-update", "proposal-rfp"],
+    audiences: ["executive", "internal-team", "technical"],
+    jobs: ["data", "flow", "appendix"],
+    energy: "calm",
+    data: 0.95,
+    imagery: 0.2,
+    noise: 0.2,
+    complexity: 0.95,
+    outputs: ["boardroom", "send-ahead", "print"],
+    contrastSafe: true,
+  },
+  S13: {
+    objectives: ["executive-briefing", "sales-pitch", "internal-update"],
+    audiences: ["executive", "buyer", "internal-team"],
+    jobs: ["content", "data"],
+    energy: "confident",
+    data: 0.85,
+    imagery: 0.5,
+    noise: 0.3,
+    complexity: 0.85,
+    outputs: ["boardroom", "send-ahead", "webinar"],
+    contrastSafe: true,
+  },
+  S14: {
+    objectives: ["research-report", "executive-briefing", "proposal-rfp"],
+    audiences: ["academic", "executive", "technical"],
+    jobs: ["content", "data", "appendix"],
+    energy: "calm",
+    data: 0.85,
+    imagery: 0.4,
+    noise: 0.1,
+    complexity: 0.9,
+    outputs: ["print", "send-ahead", "boardroom"],
+    contrastSafe: true,
+  },
+  S15: {
+    objectives: ["research-report", "case-study", "executive-briefing"],
+    audiences: ["academic", "executive", "public-broad"],
+    jobs: ["content", "data", "appendix"],
+    energy: "calm",
+    data: 0.8,
+    imagery: 0.5,
+    noise: 0.2,
+    complexity: 0.85,
+    outputs: ["send-ahead", "print"],
+    contrastSafe: true,
+  },
+  S16: {
+    objectives: ["product-launch", "event-keynote", "case-study"],
+    audiences: ["creative", "executive", "public-broad"],
+    jobs: ["hero", "content"],
+    energy: "bold",
+    data: 0.25,
+    imagery: 0.95,
+    noise: 0.45,
+    complexity: 0.3,
+    outputs: ["stage", "print"],
+    contrastSafe: false,
+  },
+  S17: {
+    objectives: ["training", "case-study", "internal-update"],
+    audiences: ["internal-team", "public-broad"],
+    jobs: ["content", "flow"],
+    energy: "calm",
+    data: 0.5,
+    imagery: 0.8,
+    noise: 0.3,
+    complexity: 0.5,
+    outputs: ["webinar", "print", "send-ahead"],
+    contrastSafe: true,
+  },
+  S18: {
+    objectives: ["event-keynote", "sales-pitch", "product-launch"],
+    audiences: ["public-broad", "creative", "buyer"],
+    jobs: ["hero"],
+    energy: "bold",
+    data: 0.2,
+    imagery: 0.9,
+    noise: 0.8,
+    complexity: 0.25,
+    outputs: ["stage"],
+    contrastSafe: false,
+  },
+  S19: {
+    objectives: ["research-report", "proposal-rfp", "training"],
+    audiences: ["technical", "academic"],
+    jobs: ["flow", "data", "appendix"],
+    energy: "calm",
+    data: 0.85,
+    imagery: 0.3,
+    noise: 0.25,
+    complexity: 0.95,
+    outputs: ["print", "send-ahead", "boardroom"],
+    contrastSafe: true,
+  },
+  S20: {
+    objectives: ["investor-finance", "research-report", "executive-briefing"],
+    audiences: ["investor", "executive", "technical"],
+    jobs: ["data", "content"],
+    energy: "confident",
+    data: 1,
+    imagery: 0.2,
+    noise: 0.35,
+    complexity: 0.95,
+    outputs: ["boardroom", "webinar", "send-ahead"],
+    contrastSafe: true,
+  },
+  S21: {
+    objectives: ["research-report", "case-study", "training"],
+    audiences: ["academic", "public-broad", "internal-team"],
+    jobs: ["content", "flow"],
+    energy: "calm",
+    data: 0.6,
+    imagery: 0.7,
+    noise: 0.45,
+    complexity: 0.6,
+    outputs: ["send-ahead", "webinar", "print"],
+    contrastSafe: true,
+  },
+  S22: {
+    objectives: ["research-report", "case-study", "proposal-rfp"],
+    audiences: ["academic", "executive", "buyer"],
+    jobs: ["content", "appendix", "data"],
+    energy: "calm",
+    data: 0.7,
+    imagery: 0.5,
+    noise: 0.2,
+    complexity: 0.9,
+    outputs: ["print", "send-ahead"],
+    contrastSafe: true,
+  },
+  S23: {
+    objectives: ["event-keynote", "product-launch", "case-study"],
+    audiences: ["creative", "public-broad"],
+    jobs: ["hero", "content"],
+    energy: "bold",
+    data: 0.35,
+    imagery: 0.6,
+    noise: 0.85,
+    complexity: 0.35,
+    outputs: ["stage", "webinar"],
+    contrastSafe: true,
+  },
+  S24: {
+    objectives: ["product-launch", "event-keynote", "investor-finance"],
+    audiences: ["investor", "creative", "technical"],
+    jobs: ["hero", "content"],
+    energy: "bold",
+    data: 0.45,
+    imagery: 0.6,
+    noise: 0.65,
+    complexity: 0.4,
+    outputs: ["stage", "webinar"],
+    contrastSafe: false,
+  },
+  S25: {
+    objectives: ["event-keynote", "sales-pitch", "product-launch"],
+    audiences: ["public-broad", "creative"],
+    jobs: ["hero"],
+    energy: "bold",
+    data: 0.2,
+    imagery: 0.5,
+    noise: 0.9,
+    complexity: 0.2,
+    outputs: ["stage"],
+    contrastSafe: true,
+  },
+  S26: {
+    objectives: ["product-launch", "investor-finance", "research-report"],
+    audiences: ["technical", "investor", "executive"],
+    jobs: ["content", "data", "hero"],
+    energy: "confident",
+    data: 0.8,
+    imagery: 0.4,
+    noise: 0.5,
+    complexity: 0.8,
+    outputs: ["boardroom", "stage", "webinar"],
+    contrastSafe: false,
+  },
+  S27: {
+    objectives: ["executive-briefing", "case-study", "internal-update"],
+    audiences: ["executive", "public-broad", "creative"],
+    jobs: ["hero", "content"],
+    energy: "calm",
+    data: 0.4,
+    imagery: 0.8,
+    noise: 0.4,
+    complexity: 0.4,
+    outputs: ["stage", "boardroom", "send-ahead"],
+    contrastSafe: false,
+  },
+  S28: {
+    objectives: ["executive-briefing", "internal-update", "research-report"],
+    audiences: ["executive", "internal-team", "technical"],
+    jobs: ["content", "data", "flow"],
+    energy: "confident",
+    data: 0.85,
+    imagery: 0.5,
+    noise: 0.4,
+    complexity: 0.85,
+    outputs: ["boardroom", "send-ahead", "webinar"],
+    contrastSafe: true,
+  },
 };
 
 const FALLBACK_TRAITS: StyleTraits = {
@@ -220,7 +527,11 @@ const WEIGHT = {
 const DENSITY_VALUE: Record<string, number> = { low: 0.25, medium: 0.55, high: 0.9 };
 const DATA_VALUE: Record<DataIntensity, number> = { none: 0.1, some: 0.5, heavy: 0.95 };
 const IMAGERY_VALUE: Record<ImageryPosture, number> = { none: 0.05, available: 0.55, led: 0.95 };
-const COMPLEXITY_VALUE: Record<ComplexityLevel, number> = { simple: 0.2, moderate: 0.55, complex: 0.95 };
+const COMPLEXITY_VALUE: Record<ComplexityLevel, number> = {
+  simple: 0.2,
+  moderate: 0.55,
+  complex: 0.95,
+};
 const ENERGY_VALUE: Record<EnergyTone, number> = { calm: 0.15, confident: 0.55, bold: 0.95 };
 
 /** 1 when the two capacities match, falling to 0 as they diverge. */
@@ -248,7 +559,6 @@ export interface StyleRecommendationResult {
   coldStart: boolean;
 }
 
-
 function briefWords(brief: StyleIntentBrief): string[] {
   const recipe = industryRecipeById(brief.recipeId);
   return `${brief.intent ?? ""} ${recipe?.name ?? ""} ${recipe?.summary ?? ""} ${(recipe?.keywords ?? []).join(" ")}`
@@ -268,13 +578,15 @@ export function rankApprovedStyles(
   brief: StyleIntentBrief,
   learning?: LearnedStyleWeights | null,
 ): StyleRecommendation[] {
-
   const styles = approvedStyles();
   const recipe =
-    industryRecipeById(brief.recipeId) ?? (brief.intent ? matchRecipes(brief.intent, 1)[0] ?? null : null);
+    industryRecipeById(brief.recipeId) ??
+    (brief.intent ? (matchRecipes(brief.intent, 1)[0] ?? null) : null);
 
   const dnaCodes = new Set(
-    (recipe?.dna ?? []).map((n) => designSkinByName(n)?.code).filter((c): c is string => Boolean(c)),
+    (recipe?.dna ?? [])
+      .map((n) => designSkinByName(n)?.code)
+      .filter((c): c is string => Boolean(c)),
   );
   const words = briefWords(brief);
 
@@ -290,7 +602,11 @@ export function rankApprovedStyles(
     else if (words.length) {
       const hay = `${style.chips.join(" ")} ${style.description} ${style.name}`.toLowerCase();
       const hits = words.reduce((n, w) => (hay.includes(w) ? n + 1 : n), 0);
-      if (hits) add(`sector fit (${style.chips.slice(0, 2).join(", ").toLowerCase()})`, Math.min(1, hits / 3) * WEIGHT.bestFit);
+      if (hits)
+        add(
+          `sector fit (${style.chips.slice(0, 2).join(", ").toLowerCase()})`,
+          Math.min(1, hits / 3) * WEIGHT.bestFit,
+        );
     }
 
     // 2. Objective / audience / narrative job.
@@ -315,12 +631,25 @@ export function rankApprovedStyles(
     }
     if (brief.imagery) {
       const need = IMAGERY_VALUE[brief.imagery];
-      add(brief.imagery === "led" ? "imagery-led" : brief.imagery === "none" ? "no photography needed" : "some imagery", fit(need, t.imagery) * WEIGHT.imagery);
+      add(
+        brief.imagery === "led"
+          ? "imagery-led"
+          : brief.imagery === "none"
+            ? "no photography needed"
+            : "some imagery",
+        fit(need, t.imagery) * WEIGHT.imagery,
+      );
     }
     if (brief.complexity)
-      add(`${brief.complexity} narrative`, fit(COMPLEXITY_VALUE[brief.complexity], t.complexity) * WEIGHT.complexity);
+      add(
+        `${brief.complexity} narrative`,
+        fit(COMPLEXITY_VALUE[brief.complexity], t.complexity) * WEIGHT.complexity,
+      );
     if (brief.energy)
-      add(`${brief.energy} energy`, fit(ENERGY_VALUE[brief.energy], ENERGY_VALUE[t.energy]) * WEIGHT.energy);
+      add(
+        `${brief.energy} energy`,
+        fit(ENERGY_VALUE[brief.energy], ENERGY_VALUE[t.energy]) * WEIGHT.energy,
+      );
 
     // 4. Delivery: mode, accessibility, output context.
     if (brief.mode && brief.mode !== "any" && style.nativeMode === brief.mode)
@@ -365,7 +694,6 @@ export function rankApprovedStyles(
   }));
 }
 
-
 function reasonFor(
   style: ApprovedStyle,
   factors: { label: string; points: number }[],
@@ -374,7 +702,8 @@ function reasonFor(
   const top = factors.slice(0, 3).map((f) => f.label);
   if (!top.length)
     return `${style.name} is the catalog default for this brief — best fit ${style.chips.slice(0, 2).join(", ").toLowerCase()}.`;
-  const tail = top.length > 1 ? `${top.slice(0, -1).join(", ")} and ${top[top.length - 1]}` : top[0];
+  const tail =
+    top.length > 1 ? `${top.slice(0, -1).join(", ")} and ${top[top.length - 1]}` : top[0];
   const mode =
     brief.mode && brief.mode !== "any" && style.nativeMode === brief.mode
       ? ` Renders natively in ${style.nativeMode} mode.`
@@ -416,7 +745,6 @@ export function recommendStylesForBrief(
     coldStart: !learningActive(opts.learning),
   };
 }
-
 
 export function summarizeBrief(brief: StyleIntentBrief): string {
   const recipe = industryRecipeById(brief.recipeId);

@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { orderPresentationLists } from "../pptx-presentation-order";
 
-const pres = (body: string) => `<?xml version="1.0"?><p:presentation xmlns:p="p">${body}</p:presentation>`;
+const pres = (body: string) =>
+  `<?xml version="1.0"?><p:presentation xmlns:p="p">${body}</p:presentation>`;
 
 const MASTERS = '<p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst>';
 const SLIDES = '<p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst>';

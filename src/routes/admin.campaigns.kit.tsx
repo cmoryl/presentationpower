@@ -33,11 +33,7 @@ import { SocialRenderer } from "@/components/campaigns/SocialRenderer";
 import { AdminPageHeader, AdminSection, AdminEmpty } from "@/components/admin/AdminPage";
 import { GroundedCopyDrafter } from "@/components/campaigns/GroundedCopyDrafter";
 import { SocialAssetEditorButton } from "@/components/campaigns/SocialAssetEditor";
-import {
-  useSocialAssetEdits,
-  socialEditKey,
-  type SocialAssetEdit,
-} from "@/lib/social-asset-edit";
+import { useSocialAssetEdits, socialEditKey, type SocialAssetEdit } from "@/lib/social-asset-edit";
 
 const searchSchema = z.object({
   source: z.string().optional(),

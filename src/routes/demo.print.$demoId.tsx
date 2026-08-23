@@ -11,7 +11,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { ArrowRight, Printer, Sparkles, FileText } from "lucide-react";
 
-
 import { AppShell } from "@/components/AppShell";
 import { showcaseArt } from "@/lib/showcase-art";
 import { getPrintDemo, printDemoItem } from "@/lib/showcase-print";
@@ -24,11 +23,7 @@ import { parseLook } from "@/lib/print-library/look";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";
-import {
-  PrintDemoStudioPanel,
-  type DemoLook,
-} from "@/components/showcase/PrintDemoStudioPanel";
-
+import { PrintDemoStudioPanel, type DemoLook } from "@/components/showcase/PrintDemoStudioPanel";
 
 export const Route = createFileRoute("/demo/print/$demoId")({
   loader: ({ params }) => {
@@ -277,7 +272,6 @@ function PrintDemoPage() {
         </div>
       </section>
 
-
       <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <h2 className="text-lg font-semibold tracking-tight">
@@ -372,8 +366,8 @@ function PrintDemoPage() {
               <FileText size={15} /> Exports
             </div>
             <p className="mt-2 text-[12px] leading-relaxed text-black/60 dark:text-white/60">
-              Press-ready PDF (PDF/X-4, bleed and crop marks) plus a layered,
-              editable PowerPoint — both generated from this same content.
+              Press-ready PDF (PDF/X-4, bleed and crop marks) plus a layered, editable PowerPoint —
+              both generated from this same content.
             </p>
           </div>
         </aside>

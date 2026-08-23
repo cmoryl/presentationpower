@@ -29,7 +29,6 @@ export type SbClient = {
   };
 };
 
-
 // ── Asset metadata builders ────────────────────────────────────────────
 // The Asset Inspector panel needs a compact per-slide + per-deck manifest
 // of everything the parser extracted (media, hyperlinks, comments, charts,
@@ -388,7 +387,10 @@ export async function persistParsedSlideImages({
   return refs;
 }
 
-export function rewriteLayoutImageRefs(slide: ParsedDeck["slides"][number], imageRefs: SavedImageRef[]) {
+export function rewriteLayoutImageRefs(
+  slide: ParsedDeck["slides"][number],
+  imageRefs: SavedImageRef[],
+) {
   const embedToPath = new Map(imageRefs.map((r) => [r.embedId, r.path]));
   const rewriteFill = (fill: unknown): unknown => {
     if (!fill || typeof fill !== "object") return fill;

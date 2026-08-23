@@ -51,14 +51,11 @@ export const teamSignIn = createServerFn({ method: "POST" })
     await recordTeamLoginAttempt(supabaseAdmin, clientKey, true);
     const { createClient } = await import("@supabase/supabase-js");
 
-
     // 1. Find or create the shared account, keeping its password in sync
     //    with the current TEAM_ACCESS_PASSWORD value.
     let userId: string | null = null;
     const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    const existing = list?.users?.find(
-      (u) => (u.email ?? "").toLowerCase() === TEAM_ACCOUNT_EMAIL,
-    );
+    const existing = list?.users?.find((u) => (u.email ?? "").toLowerCase() === TEAM_ACCOUNT_EMAIL);
 
     if (existing) {
       userId = existing.id;

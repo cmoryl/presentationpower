@@ -39,7 +39,8 @@ export function parseLook(raw: unknown): PrintLibraryLook | undefined {
   const r = raw as Record<string, unknown>;
   const look: PrintLibraryLook = {};
   if (MODES.includes(r["mode"] as PrintMode)) look.mode = r["mode"] as PrintMode;
-  if (SIZES.includes(r["pageSize"] as PrintPageSize)) look.pageSize = r["pageSize"] as PrintPageSize;
+  if (SIZES.includes(r["pageSize"] as PrintPageSize))
+    look.pageSize = r["pageSize"] as PrintPageSize;
   if ((MARGINS as readonly string[]).includes(String(r["marginPreset"])))
     look.marginPreset = r["marginPreset"] as PrintLibraryLook["marginPreset"];
   if ((DENSITIES as readonly string[]).includes(String(r["density"])))

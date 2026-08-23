@@ -57,7 +57,6 @@ const DARK: Record<SkinScene, string> = {
   section: `${CDN}/33920940-19e3-4d32-831f-e0afc22d110a/element-dark-section.png`,
 };
 
-
 /** Which Element skins carry authored plates, and in which tonality. */
 export const ELEMENT_ART_MODE: Record<string, ElementArtMode> = {
   S29: "light",
@@ -120,5 +119,3 @@ export function withElementSceneArt(pack: StylePack, code: string): StylePack {
     },
   };
 }
-
-

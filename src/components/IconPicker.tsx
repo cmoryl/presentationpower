@@ -68,7 +68,6 @@ export function IconPicker({ value, onChange, autoLabel, ai }: Props) {
     );
   }, [q, approvedOnly, approvedEntries, approvedNames]);
 
-
   const runSuggest = async () => {
     if (!ai) return;
     setBusy(true);

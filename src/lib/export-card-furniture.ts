@@ -40,7 +40,6 @@ export function registerDarkFurniture(
   guard.__darkPatches.push({ ...rect, hex });
 }
 
-
 /**
  * AccentTick parity: the tick lives INSIDE the card's rounded clip, so it starts
  * after the corner radius (a full-width bar overhangs the corners and reads as a
@@ -124,7 +123,6 @@ export function percentGaugeFraction(value: unknown, unit = ""): number | null {
   if (!Number.isFinite(numeric)) return null;
   return Math.max(0.02, Math.min(1, numeric / 100));
 }
-
 
 /** Accent progress meter under a stat figure (track + proportional fill). */
 export function addGaugeMeter(
