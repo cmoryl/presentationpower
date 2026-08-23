@@ -152,8 +152,6 @@ function IconGlyph({
 }) {
   return (
     <svg
-      width={size}
-      height={size}
       viewBox="0 0 24 24"
       fill="none"
       stroke={color}
@@ -161,7 +159,8 @@ function IconGlyph({
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
-      style={{ display: "block" }}
+      style={{ display: "block", width: size, height: size, flexShrink: 0 }}
+
     >
       <path d={d} />
     </svg>
