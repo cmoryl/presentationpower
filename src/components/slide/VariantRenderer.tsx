@@ -974,6 +974,12 @@ function renderVariantBody({
     case "MV-OP-COVER-MEDIA": {
       const _titleLen = s(c.title).length + s(c.subtitle).length;
       const _titleSize = _titleLen > 60 ? "title" : _titleLen > 30 ? "section" : "cover";
+      // Authored plate kits (Games) are finished compositions in the brand
+      // palette. Running the photographic duotone + heavy cinematic scrim over
+      // one flattened it back to plain navy, which is why Gaming title slides
+      // read as empty. Plate covers get a light touch so the template artwork
+      // stays visible.
+      const platedCover = brand.id === "bm-tp-games" && !s(c.mediaUrl) && !s(c.mediaPath);
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover" logoPosition="top-right">
 
@@ -996,13 +1002,20 @@ function renderVariantBody({
             className="absolute inset-0 h-full w-full rounded-none tp-kenburns"
           />
           {/* Duotone-style color wash tinted to the brand accent, plus grain */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{ background: brand.tokens.accent, mixBlendMode: "color", opacity: 0.28 }}
-          />
-          <GrainOverlay opacity={0.09} />
-          <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
+          {!platedCover && (
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ background: brand.tokens.accent, mixBlendMode: "color", opacity: 0.28 }}
+            />
+          )}
+          <GrainOverlay opacity={platedCover ? 0.05 : 0.09} />
+          {platedCover ? (
+            <CinematicScrim anchor="bottom" strength={0.5} tint="#03002C" vignette={0.12} />
+          ) : (
+            <CinematicScrim anchor="bottom" strength={0.9} tint="#050418" vignette={0.28} />
+          )}
+
           <div data-on-media className="absolute inset-x-24 top-32 bottom-40 flex flex-col justify-end overflow-hidden text-white">
             <div className="flex items-center gap-4 tp-rise">
               <span
