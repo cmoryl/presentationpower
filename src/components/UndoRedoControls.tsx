@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useDeckStore } from "@/lib/deck-store";
+import { EditorHistoryControls } from "@/components/editor/EditorHistoryControls";
 
 /**
  * Session-scoped undo/redo toolbar + keyboard shortcuts for the deck editor.
