@@ -17,6 +17,19 @@ import legalTall from "@/assets/social-photo/legal-tall.jpg";
 import lifesciWide from "@/assets/social-photo/lifesci-wide.jpg";
 import lifesciSquare from "@/assets/social-photo/lifesci-square.jpg";
 import lifesciTall from "@/assets/social-photo/lifesci-tall.jpg";
+import digitalWide from "@/assets/social-photo/digital-wide.jpg";
+import digitalSquare from "@/assets/social-photo/digital-square.jpg";
+import digitalTall from "@/assets/social-photo/digital-tall.jpg";
+import enterpriseWide from "@/assets/social-photo/enterprise-wide.jpg";
+import enterpriseSquare from "@/assets/social-photo/enterprise-square.jpg";
+import enterpriseTall from "@/assets/social-photo/enterprise-tall.jpg";
+import trialWide from "@/assets/social-photo/trial-wide.jpg";
+import trialSquare from "@/assets/social-photo/trial-square.jpg";
+import trialTall from "@/assets/social-photo/trial-tall.jpg";
+import cobrandWide from "@/assets/social-photo/cobrand-wide.jpg";
+import cobrandSquare from "@/assets/social-photo/cobrand-square.jpg";
+import cobrandTall from "@/assets/social-photo/cobrand-tall.jpg";
+
 // Master TransPerfect — the curated corporate-dark brand backdrop set, used
 // in place of a flat gradient for the house-level anthem demos.
 import masterWide from "@/assets/backdrops/corporate-dark/bg-02.webp";
@@ -72,7 +85,36 @@ export const SOCIAL_PHOTO_SETS: Record<string, PhotoSet> = {
     square: lifesciSquare,
     tall: lifesciTall,
   },
+  "bm-tp-digital": {
+    label: "Digital — campaign operations",
+    credit: "Generated example set · digital marketing",
+    wide: digitalWide,
+    square: digitalSquare,
+    tall: digitalTall,
+  },
+  "bm-enterprise": {
+    label: "Enterprise — leadership & scale",
+    credit: "Generated example set · enterprise solutions",
+    wide: enterpriseWide,
+    square: enterpriseSquare,
+    tall: enterpriseTall,
+  },
+  "bm-trial-interactive": {
+    label: "Trial Interactive — clinical sites & eTMF",
+    credit: "Generated example set · Trial Interactive",
+    wide: trialWide,
+    square: trialSquare,
+    tall: trialTall,
+  },
+  "bm-cobrand": {
+    label: "Partner co-brand — shared teams",
+    credit: "Generated example set · co-branded partnerships",
+    wide: cobrandWide,
+    square: cobrandSquare,
+    tall: cobrandTall,
+  },
 };
+
 
 export function getPhotoSet(brandId: string): PhotoSet | undefined {
   return SOCIAL_PHOTO_SETS[brandId];

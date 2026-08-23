@@ -170,8 +170,12 @@ function SocialDemoView() {
       lookId: look.id,
       look,
       styleId,
+      // Division photography — the digital/social trims paint from the same
+      // photo set as the generated posts so the kit reads end-to-end.
+      photo: getPhotoSet(playbook.subBrand),
     };
   }, [playbook, look, styleId]);
+
   const assets = useMemo(
     () =>
       buildCampaignAssets(source, facts, {

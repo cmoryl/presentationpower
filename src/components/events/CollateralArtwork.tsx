@@ -39,7 +39,40 @@ export type CollateralContext = {
    * generated social assets for the same campaign. Omit for the default.
    */
   styleId?: string;
+  /**
+   * Division photography set (see `social-photography.ts`). When supplied the
+   * large-format, digital and social trims paint a correctly-cropped photo
+   * under the brand field so a kit's digital extensions read in the same
+   * photo-led language as the generated social posts for the campaign.
+   */
+  photo?: { wide: string; square: string; tall: string };
 };
+
+/** Which trims are photo-led, and which crop each one needs. Print, document
+ *  and merch trims stay design-only so the kit keeps a deliberate mix. */
+const PHOTO_KINDS: Partial<Record<ArtKind, "wide" | "square" | "tall">> = {
+  backdrop: "wide",
+  zoom: "wide",
+  video: "wide",
+  "video-vertical": "tall",
+  "web-hero": "wide",
+  "hall-banner": "wide",
+  "desk-runner": "wide",
+  "linkedin-header": "wide",
+  "social-wide": "wide",
+  "social-square": "square",
+  "social-story": "tall",
+  retractable: "tall",
+  tower: "tall",
+  email: "tall",
+};
+
+function photoForKind(kind: ArtKind, ctx: CollateralContext): string | undefined {
+  const crop = PHOTO_KINDS[kind];
+  if (!crop || !ctx.photo) return undefined;
+  return ctx.photo[crop];
+}
+
 
 export type ArtKind =
   | "badge"
@@ -202,6 +235,12 @@ function useSocialStyle(): SocialStyle {
   return useContext(StyleContext);
 }
 
+/** Photo for the trim currently rendering, resolved from ctx.photo + kind.
+ *  Field paints it under the motif so every photo-led trim shares one
+ *  treatment (cover crop + look-tinted scrim) with the social posts. */
+const PhotoContext = createContext<string | undefined>(undefined);
+
+
 
 /** Field graphic drawn behind the artwork — one geometry per look. */
 function MotifField({ opacity, color }: { opacity?: number; color?: string }) {
@@ -341,6 +380,7 @@ function Field({
   light?: boolean;
 }) {
   const look = useLook();
+  const photo = useContext(PhotoContext);
   const motif = chevron ?? look.motifOpacity;
   return (
     <div
@@ -355,14 +395,40 @@ function Field({
         ...style,
       }}
     >
+      {photo ? (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              backgroundImage: `url(${photo})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              filter: light ? "saturate(0.95)" : "saturate(1.05) contrast(1.02)",
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: light
+                ? `linear-gradient(160deg, ${look.lightFrom}F2 0%, ${look.lightTo}D9 62%, ${look.lightTo}F2 100%)`
+                : `linear-gradient(105deg, ${look.deep}F0 0%, ${look.deep}C4 46%, ${look.deep}5C 78%, ${look.accent}33 100%)`,
+            }}
+          />
+        </>
+      ) : null}
       <MotifField
-        opacity={light ? motif * 0.55 : motif}
+        opacity={(light ? motif * 0.55 : motif) * (photo ? 0.5 : 1)}
         color={light ? look.accent : look.accentAlt}
       />
       <div style={{ position: "relative", width: "100%", height: "100%" }}>{children}</div>
     </div>
   );
 }
+
 
 function Logo({
   ctx,
@@ -1280,9 +1346,12 @@ export function CollateralArtwork(props: {
   return (
     <LookContext.Provider value={props.ctx.look ?? eventLookById(props.ctx.lookId)}>
       <StyleContext.Provider value={resolveSocialStyle(props.ctx.styleId)}>
-        <CollateralArtworkFramed {...props} />
+        <PhotoContext.Provider value={photoForKind(props.kind, props.ctx)}>
+          <CollateralArtworkFramed {...props} />
+        </PhotoContext.Provider>
       </StyleContext.Provider>
     </LookContext.Provider>
+
   );
 
 }

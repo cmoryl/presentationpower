@@ -30,7 +30,7 @@ import {
 import { KIT_PROFILES_BY_ID, SOCIAL_FORMATS_BY_ID } from "@/lib/social-formats";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets, sourceFromVariant } from "@/lib/campaigns";
-import { photoForFormat } from "@/lib/social-photography";
+import { getPhotoSet, photoForFormat } from "@/lib/social-photography";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
@@ -174,8 +174,12 @@ function PlaybookDemoView() {
       lookId: look.id,
       look,
       styleId,
+      // Same division photography as the social demos, so an event kit's
+      // digital extensions match the campaign's social posts.
+      photo: getPhotoSet(playbook.subBrand),
     };
   }, [nextSuite, playbook, look, styleId]);
+
 
   const startDate = playbook.facts.startDate
     ? new Date(playbook.facts.startDate).toLocaleDateString(undefined, {
