@@ -128,15 +128,89 @@ function LogoHubBrowse() {
               Sign in
             </Link>
           </div>
+        ) : (q.data ?? []).length === 0 ? (
+          <div className="mt-8 rounded-3xl border border-dashed border-black/15 bg-black/[0.02] p-8">
+            <div className="mx-auto max-w-lg text-center">
+              <div className="text-base font-semibold text-black/80">
+                LogoHub is empty — let&apos;s fill it
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-black/55">
+                Once a client is in here, every deck, case study and proposal can pull the right
+                variant automatically — no hunting for files, no stretched logos.
+              </p>
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              {[
+                {
+                  step: "1",
+                  title: "Upload the four variants",
+                  body: "Primary, on-light, on-dark and mono — SVG or transparent PNG.",
+                },
+                {
+                  step: "2",
+                  title: "Tag it",
+                  body: "Industry, division and free-form tags drive search and auto-placement.",
+                },
+                {
+                  step: "3",
+                  title: "Use it anywhere",
+                  body: "Client logo strips in decks and print pick the right variant per surface.",
+                },
+              ].map((s) => (
+                <div key={s.step} className="rounded-2xl border border-black/10 bg-white p-4">
+                  <span className="inline-flex size-7 items-center justify-center rounded-lg bg-[#003FC7]/10 text-xs font-semibold text-[#003FC7]">
+                    {s.step}
+                  </span>
+                  <div className="mt-2 text-sm font-semibold">{s.title}</div>
+                  <p className="mt-1 text-[11px] leading-relaxed text-black/55">{s.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              <Link
+                to="/admin/logohub"
+                className="rounded-full bg-[#003FC7] px-4 py-2 text-xs font-medium text-white hover:bg-[#0033a8]"
+              >
+                Add a client logo
+              </Link>
+              <Link
+                to="/knowledge/brand-guides"
+                className="rounded-full border border-black/15 px-4 py-2 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+              >
+                Logo usage rules
+              </Link>
+            </div>
+          </div>
         ) : (
-          <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center text-sm text-black/50">
-            No logos match those filters.{" "}
-            <Link to="/admin/logohub" className="underline">
-              Add one in the admin console.
-            </Link>
+          <div className="mt-8 rounded-2xl border border-dashed border-black/15 bg-black/[0.02] p-8 text-center">
+            <div className="text-sm font-semibold text-black/70">No logos match those filters</div>
+            <p className="mt-1 text-xs text-black/50">
+              {(q.data ?? []).length} clients are in LogoHub — they&apos;re just hidden by the
+              current search, division or industry.
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setDivision("all");
+                  setIndustry("all");
+                }}
+                className="rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white hover:opacity-90"
+              >
+                Clear filters
+              </button>
+              <Link
+                to="/admin/logohub"
+                className="rounded-full border border-black/15 px-4 py-2 text-xs text-black/70 hover:border-[#003FC7] hover:text-[#003FC7]"
+              >
+                Add a client logo
+              </Link>
+            </div>
           </div>
         )
       ) : (
+
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((r) => (
             <LogoCard key={r.id} row={r} />

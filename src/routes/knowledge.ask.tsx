@@ -1,10 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Send } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Sparkles, Send, BookOpen, ArrowUpRight, Plus, Compass } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { oracleChat, type OracleSource } from "@/lib/ai-oracle.functions";
+import { listKnowledgeEntries, KNOWLEDGE_KIND_META } from "@/lib/knowledge.functions";
 
 export const Route = createFileRoute("/knowledge/ask")({
   head: () => ({
@@ -15,6 +17,13 @@ export const Route = createFileRoute("/knowledge/ask")({
         content:
           "Chat with the TransPerfect knowledge base — cited answers from Oracle, KB, and brand assets.",
       },
+      { property: "og:title", content: "Ask Oracle · TransPerfect Element" },
+      {
+        property: "og:description",
+        content: "Cited answers from the TransPerfect Element knowledge base.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: OracleAskView,
@@ -28,16 +37,39 @@ type ChatMsg = {
   setup?: boolean;
 };
 
-const STARTERS = [
-  "What is GlobalLink?",
-  "What's our WCAG guidance?",
-  "Which divisions serve life sciences?",
-  "How should we describe TransPerfect's voice?",
-  "What are our sub-brand governance rules?",
+/** Starters grouped by intent so the blank state reads as a map of what Oracle
+ *  actually knows, instead of five unlabelled pills. */
+const STARTER_GROUPS: Array<{ label: string; items: string[] }> = [
+  {
+    label: "Brand & voice",
+    items: [
+      "How should we describe TransPerfect's voice?",
+      "What are our sub-brand governance rules?",
+      "What are the logo clear-space rules?",
+    ],
+  },
+  {
+    label: "Divisions & capabilities",
+    items: [
+      "What is GlobalLink?",
+      "Which divisions serve life sciences?",
+      "Summarize our legal tech capabilities.",
+    ],
+  },
+  {
+    label: "Design system & delivery",
+    items: [
+      "What's our WCAG guidance?",
+      "Which style pack suits a gaming pitch?",
+      "What are our print colour rules?",
+    ],
+  },
 ];
+
 
 function OracleAskView() {
   const ask = useServerFn(oracleChat);
+  const listEntries = useServerFn(listKnowledgeEntries);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -45,6 +77,18 @@ function OracleAskView() {
   const [divisionId, setDivisionId] = useState<string>("master");
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
+
+  // Real content for the blank state: what Oracle can actually cite right now.
+  const recent = useQuery({
+    queryKey: ["knowledge", "ask-recent", divisionId],
+    queryFn: () =>
+      listEntries({
+        data: divisionId === "master" ? {} : { divisionId },
+      }).catch(() => []),
+    retry: false,
+    staleTime: 60_000,
+  });
+
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -142,24 +186,103 @@ function OracleAskView() {
         </div>
 
         {messages.length === 0 && (
-          <div className="mb-6 rounded-2xl border border-black/10 bg-white/60 p-5 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
-            <div className="mb-3 text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
-              Try a starter
+          <div className="mb-6 space-y-4">
+            <div className="rounded-2xl border border-black/10 bg-white/60 p-5 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
+              <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
+                <Compass size={12} /> Start here
+              </div>
+              <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                {STARTER_GROUPS.map((g) => (
+                  <div key={g.label}>
+                    <div className="text-[11px] font-semibold tracking-tight text-[#03002C] dark:text-white">
+                      {g.label}
+                    </div>
+                    <div className="mt-2 flex flex-col items-start gap-1.5">
+                      {g.items.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => send(s)}
+                          className="rounded-lg border border-black/10 bg-white px-2.5 py-1.5 text-left text-[11px] leading-snug text-black/75 transition hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.05] dark:text-white/75 dark:hover:border-[#A1FBF9] dark:hover:text-[#A1FBF9]"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {STARTERS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => send(s)}
-                  className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-xs text-black/80 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:bg-white/[0.05] dark:text-white/80 dark:hover:border-[#A1FBF9] dark:hover:text-[#A1FBF9]"
+
+            <div className="rounded-2xl border border-black/10 bg-white/60 p-5 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-black/50 dark:text-white/50">
+                  <BookOpen size={12} /> In your knowledge base
+                </div>
+                <Link
+                  to="/knowledge"
+                  className="text-[11px] text-[#003FC7] hover:underline dark:text-[#A1FBF9]"
                 >
-                  {s}
-                </button>
-              ))}
+                  Browse all
+                </Link>
+              </div>
+
+              {recent.isLoading ? (
+                <div className="mt-3 text-xs text-black/50 dark:text-white/50">
+                  Loading recent entries…
+                </div>
+              ) : (recent.data ?? []).length === 0 ? (
+                <div className="mt-3 space-y-3">
+                  <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">
+                    Oracle can still answer from the built-in brand guides, but nothing has been
+                    added to your division knowledge base yet. Add a fact, proof point or case study
+                    and every future answer can cite it.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      to="/knowledge/new"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-1.5 text-[11px] font-medium text-white hover:bg-[#0033a8]"
+                    >
+                      <Plus size={12} /> Add an entry
+                    </Link>
+                    <Link
+                      to="/knowledge/brand-guides"
+                      className="inline-flex items-center gap-1.5 rounded-full border border-black/15 px-3 py-1.5 text-[11px] text-black/70 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/70"
+                    >
+                      Read the brand guides <ArrowUpRight size={12} />
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {(recent.data ?? []).slice(0, 6).map((e) => (
+                    <div
+                      key={e.id}
+                      className="flex items-start justify-between gap-2 rounded-xl border border-black/10 bg-white px-3 py-2 dark:border-white/10 dark:bg-white/[0.04]"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-[12px] font-semibold text-[#03002C] dark:text-white">
+                          {e.title}
+                        </div>
+                        <div className="mt-0.5 text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40">
+                          {KNOWLEDGE_KIND_META[e.kind]?.label ?? e.kind}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => send(`Summarize what we know about “${e.title}” and cite it.`)}
+                        className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/60"
+                      >
+                        Ask
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
+
 
         <div className="space-y-4">
           {messages.map((m, i) => (
