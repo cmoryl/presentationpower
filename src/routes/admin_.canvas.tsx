@@ -29,6 +29,11 @@ import { saveModule, updateSavedModule } from "@/lib/saved-modules.functions";
 import { SaveActionButton } from "@/components/editor/SaveActionButton";
 import { attachSlideFile } from "@/lib/slide-files.functions";
 import { blobToBase64 } from "@/lib/blob-base64";
+import { LibraryPackProvider } from "@/components/slide/PackShell";
+import { StylePackProvider, StylePackVars } from "@/components/slide/StylePackContext";
+import { StyleLookPicker } from "@/components/skins/StyleLookPicker";
+import { useEffectiveStylePack } from "@/hooks/use-template-registry";
+import { packToneBrand } from "@/lib/style-packs";
 import {
   STAGE_H,
   STAGE_W,
@@ -129,6 +134,20 @@ function CanvasStudioPage() {
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === (comp?.brandId ?? brandId)) ?? BRAND_MODES[0]!,
     [comp?.brandId, brandId],
+  );
+
+  // TEMPLATE LOOK — the composition can wear any approved style pack (plus an
+  // optional industry ground). The pack owns mode, palette and typography, so
+  // the stage, the module palette previews and every placed module all render
+  // through it; with no pack selected nothing changes.
+  const pack = useEffectiveStylePack(comp?.packId ?? null, comp?.recipeId ?? null);
+  const stageBrand = useMemo(() => (pack ? packToneBrand(brand, pack) : brand), [brand, pack]);
+  const stageComp = useMemo(
+    () =>
+      comp && pack
+        ? { ...comp, mode: pack.mode, background: comp.background ?? pack.tokens.surface }
+        : comp,
+    [comp, pack],
   );
 
   const selectedItem = comp?.items.find((i) => i.id === selectedIds[0]) ?? null;
@@ -493,6 +512,36 @@ function CanvasStudioPage() {
                 </div>
               </EditorMenu>
 
+              <EditorMenu
+                label="Template"
+                hint={pack ? pack.name : "Brand system"}
+                wide
+              >
+                <div className="w-[min(78vw,880px)] max-w-[880px]">
+                  <p className="mb-2 text-[11px] leading-relaxed text-black/55">
+                    Pick an approved template look. The canvas ground, type and every module you
+                    drop in adopt it — modules stay fully editable.
+                  </p>
+                  <StyleLookPicker
+                    value={comp.packId ?? null}
+                    onChange={(id) => patchComposition(comp.id, { packId: id })}
+                    recipeId={comp.recipeId ?? null}
+                    onRecipeChange={(id) => patchComposition(comp.id, { recipeId: id })}
+                  />
+                  {(comp.packId || comp.recipeId) && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        patchComposition(comp.id, { packId: null, recipeId: null })
+                      }
+                      className="mt-2 rounded-full border border-black/[0.08] bg-white px-3 py-1.5 text-[11px] font-semibold text-black/60 transition hover:border-primary/40 hover:text-primary"
+                    >
+                      Reset to brand system
+                    </button>
+                  )}
+                </div>
+              </EditorMenu>
+
               <EditorMenu label="Brand" hint={brand.name}>
                 <select
                   value={comp.brandId}
@@ -570,16 +619,19 @@ function CanvasStudioPage() {
 
       <div className="h-3" />
 
+      <LibraryPackProvider packId={comp.packId ?? null} recipeId={comp.recipeId ?? null}>
+      <StylePackProvider pack={pack}>
+      <StylePackVars pack={pack} className="contents">
       <div className="flex h-[70vh] min-h-[540px] gap-3">
         <StudioPalette
-          brand={brand}
-          mode={comp.mode}
+          brand={stageBrand}
+          mode={stageComp?.mode ?? comp.mode}
           onAdd={(payload) => place(payload, { x: STAGE_W / 2, y: STAGE_H / 2 })}
         />
         <div className="flex min-w-0 flex-1 flex-col justify-center">
           <CanvasStage
-            comp={comp}
-            brand={brand}
+            comp={stageComp ?? comp}
+            brand={stageBrand}
             selectedIds={selectedIds}
             snapOn={snapOn}
             showGrid={showGrid}
@@ -636,6 +688,9 @@ function CanvasStudioPage() {
           }
         />
       </div>
+      </StylePackVars>
+      </StylePackProvider>
+      </LibraryPackProvider>
     </AppShell>
   );
 }
