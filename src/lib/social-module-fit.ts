@@ -98,21 +98,25 @@ export type SocialSafeRect = {
   height: number;
 };
 
-/** Frame padding as a fraction of the short edge, per aspect class. */
+/** Frame padding as a fraction of the short edge, per aspect class.
+ *  Kept tight: page modules already carry their own internal margins, so a
+ *  generous frame pad on top of that is what left social frames looking
+ *  under-filled. */
 function padPct(format: SocialFormat): number {
   switch (aspectClass(format)) {
     case "landscape-wide":
-      return 4.5;
+      return 3.5;
     case "landscape":
-      return 5;
+      return 4;
     case "square":
-      return 5.5;
+      return 4;
     case "portrait":
-      return 5.5;
+      return 4.25;
     case "portrait-tall":
-      return 6.5;
+      return 5;
   }
 }
+
 
 /** Safe rect in format pixels: platform chrome insets + frame padding. */
 export function socialSafeRect(format: SocialFormat, padScale = 1): SocialSafeRect {
@@ -138,6 +142,8 @@ export type SocialFitInput = {
   relief: SocialFitRelief;
   /** Growth multiplier from the growth ladder (1 = native page width). */
   growth?: number;
+  /** Air multiplier from the air ladder (1 = native internal padding). */
+  air?: number;
 };
 
 export type SocialFitResult = {
@@ -154,6 +160,10 @@ export type SocialFitResult = {
   overflowPct: number;
   /** Fraction of the safe rect the module occupies vertically. */
   fillPct: number;
+  /** The fill fraction this frame shape aims for. */
+  fillTarget: number;
+  /** Internal padding multiplier fed to `--print-fit-pad`. */
+  air: number;
   ok: boolean;
   /** Too little content for the frame — leaves an awkward empty band. */
   sparse: boolean;
@@ -175,15 +185,54 @@ export function pageWidthFor(relief: SocialFitRelief, growth = 1): number {
  * loop cannot oscillate: growth only ever steps up, and only while the
  * measured fill stays under the comfortable band.
  */
-export const SOCIAL_GROWTH_STEPS = [1, 1.12, 1.26, 1.42] as const;
+export const SOCIAL_GROWTH_STEPS = [1, 1.12, 1.26, 1.42, 1.6, 1.8] as const;
 export const SOCIAL_GROWTH_MAX = SOCIAL_GROWTH_STEPS.length - 1;
 
 function clampGrowth(growth: number): number {
   return Math.max(1, Math.min(SOCIAL_GROWTH_STEPS[SOCIAL_GROWTH_MAX], growth));
 }
 
-/** Fill fraction we aim for before we stop enlarging. */
-export const SOCIAL_FILL_TARGET = 0.72;
+/**
+ * AIR LADDER — the second half of the fill story.
+ * ------------------------------------------------------------------------
+ * Growth scales type *and* boxes together, so a wide-but-short module (a photo
+ * band, an accent band, a logo row) hits its width ceiling long before it fills
+ * a square or story frame. Air multiplies only the module's internal padding
+ * (`--print-fit-pad`), which grows the block vertically and lets its own plates
+ * and surfaces reach the safe rect instead of floating in a letterbox.
+ *
+ * Same monotonic discipline as growth: quantized rungs, step up only, ceiling
+ * pinned the moment a rung overflows.
+ */
+export const SOCIAL_AIR_STEPS = [1, 1.25, 1.55, 1.9, 2.3] as const;
+export const SOCIAL_AIR_MAX = SOCIAL_AIR_STEPS.length - 1;
+
+function clampAir(air: number): number {
+  return Math.max(1, Math.min(SOCIAL_AIR_STEPS[SOCIAL_AIR_MAX], air));
+}
+
+/** Fill fraction we aim for before we stop enlarging (legacy default). */
+export const SOCIAL_FILL_TARGET = 0.86;
+
+/**
+ * Frame-shape-aware fill target. Square and portrait frames read as broken
+ * when a module floats in the middle, so they aim high; extreme landscape
+ * banners genuinely want breathing room above and below the type.
+ */
+export function fillTargetFor(format: SocialFormat): number {
+  switch (aspectClass(format)) {
+    case "landscape-wide":
+      return 0.74;
+    case "landscape":
+      return 0.82;
+    case "square":
+      return 0.9;
+    case "portrait":
+      return 0.9;
+    case "portrait-tall":
+      return 0.86;
+  }
+}
 
 /**
  * Next growth rung to try, or null when the module already reads full enough
@@ -192,7 +241,22 @@ export const SOCIAL_FILL_TARGET = 0.72;
 export function nextGrowthStep(fit: SocialFitResult, stepIndex: number): number | null {
   if (!fit.ok) return null;
   if (stepIndex >= SOCIAL_GROWTH_MAX) return null;
-  if (fit.fillPct >= SOCIAL_FILL_TARGET) return null;
+  if (fit.fillPct >= fit.fillTarget) return null;
+  return stepIndex + 1;
+}
+
+/**
+ * Next air rung to try once growth is exhausted — pads the module out to the
+ * safe rect instead of leaving a dead band.
+ */
+export function nextAirStep(
+  fit: SocialFitResult,
+  stepIndex: number,
+  growthExhausted: boolean,
+): number | null {
+  if (!fit.ok || !growthExhausted) return null;
+  if (stepIndex >= SOCIAL_AIR_MAX) return null;
+  if (fit.fillPct >= fit.fillTarget) return null;
   return stepIndex + 1;
 }
 
@@ -201,6 +265,7 @@ export function computeSocialFit({
   naturalHeight,
   relief,
   growth = 1,
+  air = 1,
 }: SocialFitInput): SocialFitResult {
   const safe = socialSafeRect(format);
   const pageWidth = pageWidthFor(relief, growth);
@@ -215,8 +280,10 @@ export function computeSocialFit({
     overflowPx,
     overflowPct: overflowPx / safe.height,
     fillPct: renderedHeight / safe.height,
+    fillTarget: fillTargetFor(format),
+    air: clampAir(air),
     ok: overflowPx <= 1,
-    sparse: renderedHeight > 0 && renderedHeight < safe.height * 0.45,
+    sparse: renderedHeight > 0 && renderedHeight < safe.height * 0.55,
   };
 }
 
@@ -239,5 +306,7 @@ export function fitSummary(fit: SocialFitResult, relief: SocialFitRelief): strin
   if (fit.sparse) {
     return `Fits, but fills only ${Math.round(fit.fillPct * 100)}% of the safe area — a taller module or more content would read better.`;
   }
-  return `Fits the safe area at ${Math.round(fit.fillPct * 100)}% fill · ${relief.note.toLowerCase()}.`;
+  const airNote = fit.air > 1 ? ` · padded out ${Math.round((fit.air - 1) * 100)}% to fill the frame` : "";
+  return `Fits the safe area at ${Math.round(fit.fillPct * 100)}% fill · ${relief.note.toLowerCase()}${airNote}.`;
 }
+
