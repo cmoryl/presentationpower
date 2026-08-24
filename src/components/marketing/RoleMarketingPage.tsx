@@ -282,7 +282,7 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
               playsInline
               muted
               loop
-              preload="metadata"
+              preload="auto"
               aria-label={`${persona?.label ?? role} process film — ${copy.demo.title}`}
             />
             <figcaption
