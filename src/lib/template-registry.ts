@@ -103,6 +103,8 @@ export interface CustomTemplateMapping {
   /** Free text used to infer the industry background system. */
   bestFit: string;
   name: string;
+  /** Admin has cleared this look for sales-enablement (create-only) users. */
+  salesApproved?: boolean;
 }
 
 let templateMappings: CustomTemplateMapping[] = [];
@@ -120,3 +122,11 @@ export function customTemplateMapping(
   const key = code.toUpperCase();
   return templateMappings.find((m) => m.code.toUpperCase() === key) ?? null;
 }
+
+/** Pack ids (`tpl-<code>`) of custom templates an admin approved for sales use. */
+export function salesApprovedTemplatePackIds(): string[] {
+  return templateMappings
+    .filter((m) => m.salesApproved)
+    .map((m) => `tpl-${m.code.trim().toLowerCase()}`);
+}
+
