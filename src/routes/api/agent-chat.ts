@@ -1,3 +1,4 @@
+import { CREATE_ONLY_AGENT_PROMPT, fetchAgentScope } from "@/lib/agent-scope";
 // Streaming endpoint for the PowerPoint agent page. Runs an AI SDK tool loop
 // over the app's MCP deck-authoring tools, scoped to the caller's Supabase
 // session, and persists the finished turn to agent_messages.
@@ -103,10 +104,13 @@ export const Route = createFileRoute("/api/agent-chat")({
             }
           : {};
 
+        const scope = await fetchAgentScope(supabase as never);
+
         const result = streamText({
           model: gateway(MODEL),
           system: [
             AGENT_SYSTEM_PROMPT,
+            scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : "",
             dna ? designDnaPromptBlock(dna) : "",
             overrides ? designOverridesPromptBlock(overrides) : "",
           ]

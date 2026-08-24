@@ -1,3 +1,4 @@
+import { CREATE_ONLY_AGENT_PROMPT, fetchAgentScope } from "@/lib/agent-scope";
 // Streaming endpoint shared by the Events Agent and the Social Agent. Same
 // tool-loop shape as the print agent, but the tool set is scoped to the format
 // catalog, the playbook library and the caller's own campaign_kits rows.
@@ -71,9 +72,13 @@ export const Route = createFileRoute("/api/kit-agent-chat")({
           headers: { "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
         });
 
+        const scope = await fetchAgentScope(supabase as never);
+
         const result = streamText({
           model: gateway(MODEL),
-          system: kitAgentSystemPrompt(surface),
+          system: [kitAgentSystemPrompt(surface), scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
+            .filter(Boolean)
+            .join("\n"),
           messages: await convertToModelMessages(messages),
           tools: buildKitAgentToolSet({ supabase, userId, surface, threadId }),
           stopWhen: stepCountIs(40),

@@ -10,6 +10,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { PrintAgentChat } from "@/components/print-agent/PrintAgentChat";
+import { AgentScopeNotice } from "@/components/agent/AgentScopeNotice";
 import { AgentSignInGate } from "@/components/AgentSignInGate";
 import {
   createPrintThread,
@@ -201,6 +202,9 @@ function PrintAgentThreadPage() {
                     ))}
                   </div>
                 ) : null}
+                <div className="px-4 pb-3">
+                  <AgentScopeNotice surface="print agent" />
+                </div>
                 <div className="min-h-0 flex-1">
                   <PrintAgentChat
                     threadId={threadId}
