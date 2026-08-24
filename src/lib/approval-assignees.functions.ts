@@ -22,7 +22,7 @@ export type ApprovalAssigneeRow = {
   lane: string;
   decision: string;
   decision_note: string | null;
-  decided_at: string | null
+  decided_at: string | null;
   created_at: string;
 };
 
@@ -160,7 +160,7 @@ export const assignApprovalReviewer = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const { notifyAssignee } = await import("./notify-approvals.server");
-    await notifyAssignee?.(data.requestId, data.assigneeId, req?.title ?? "an asset", userId);
+    await notifyAssignee(data.requestId, data.assigneeId, req?.title ?? "an asset", userId);
 
     await (await import("./approval-events.server")).logApprovalEvent(supabase, {
       requestId: data.requestId,
