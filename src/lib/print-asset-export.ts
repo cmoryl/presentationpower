@@ -427,7 +427,9 @@ export async function exportPrintAssetAsPdf(
     skippedClamped: captures.reduce((n, c) => n + c.stats.skippedClamped, 0),
   };
   if (vectorText && captures.length > 0) {
+    emit(0.93, "Embedding selectable text…", "encode");
     try {
+
       const overlay = await overlayVectorText(workingBytes, {
         pageWidthIn: pageWidth,
         pageHeightIn: pageHeight,
