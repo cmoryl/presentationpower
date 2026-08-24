@@ -17,6 +17,8 @@ import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "./case-studies";
 import { clientPlaceholderItems } from "./logohub-fillers";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
+import { notifySlideEdit } from "./deck-feedback";
+
 import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
 import { mergeTemplateOverride, type SlideTemplateOverride } from "./section-templates";
