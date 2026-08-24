@@ -36,6 +36,7 @@ import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
+import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 
 import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
 
@@ -594,9 +595,29 @@ function ExportView() {
             </div>
           )}
 
-          <div className="mx-auto mb-6 max-w-[1400px] px-6 print:hidden">
+          <div className="mx-auto mb-6 max-w-[1400px] space-y-4 px-6 print:hidden">
+            <ApprovalGate
+              subjectType="deck"
+              subjectId={deckId}
+              title={deck.title || "Untitled deck"}
+              subjectPath={`/decks/${deckId}`}
+              summary={`${deck.slides.length} slides · ${brand.name}`}
+              checks={[
+                ...blocks.map((issue, i) => ({
+                  id: `block-${i}`,
+                  label: issue.message,
+                  severity: "blocking" as const,
+                })),
+                ...warns.map((issue, i) => ({
+                  id: `warn-${i}`,
+                  label: issue.message,
+                  severity: "warning" as const,
+                })),
+              ]}
+            />
             <ArrowOverlapCheck />
           </div>
+
 
           <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-6 print:max-w-none print:gap-0 print:p-0">
             {deck.slides.map((slide, i) => {

@@ -376,6 +376,98 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          id: string
+          request_id: string
+          resolved: boolean
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          id?: string
+          request_id: string
+          resolved?: boolean
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          request_id?: string
+          resolved?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_comments_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "approval_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      approval_requests: {
+        Row: {
+          checks: Json
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          id: string
+          priority: string
+          requested_by: string
+          status: string
+          subject_id: string
+          subject_path: string | null
+          subject_type: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          checks?: Json
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          priority?: string
+          requested_by: string
+          status?: string
+          subject_id: string
+          subject_path?: string | null
+          subject_type: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          checks?: Json
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          id?: string
+          priority?: string
+          requested_by?: string
+          status?: string
+          subject_id?: string
+          subject_path?: string | null
+          subject_type?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       approved_print_suggestions: {
         Row: {
           asset_id: string
