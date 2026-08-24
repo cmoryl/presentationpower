@@ -8,6 +8,8 @@
  * suggestion) is coerced back to the matching enterprise pack for its mode.
  */
 
+import { salesApprovedTemplatePackIds } from "./template-registry";
+
 export type SalesLookMode = "light" | "dark";
 
 /** The only style packs a sales-enablement deck may use. */
