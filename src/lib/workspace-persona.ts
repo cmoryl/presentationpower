@@ -22,17 +22,35 @@ export type PersonaShortcut = {
   search?: Record<string, string>;
 };
 
+export type PersonaAction = {
+  label: string;
+  hint: string;
+  to: string;
+  search?: Record<string, string>;
+};
+
+export type WorkKind = "decks" | "print" | "kits";
+
 export type Persona = {
   id: PersonaId;
   label: string;
   tagline: string;
   /** Roles that land on this persona by default, most specific first. */
   roles: readonly string[];
+  /** The one thing this audience most often comes here to do. */
+  primary: PersonaAction;
+  /** The obvious alternative route to the same outcome. */
+  secondary: PersonaAction;
   steps: readonly PersonaStep[];
   shortcuts: readonly PersonaShortcut[];
   /** Which live work counters matter to this audience. */
-  counters: readonly ("decks" | "print" | "kits")[];
+  counters: readonly WorkKind[];
+  /** Which kinds of recent work to surface, in priority order. */
+  resume: readonly WorkKind[];
+  /** Short "how do I…" pointers into the guides. */
+  guides: readonly PersonaAction[];
 };
+
 
 export const PERSONAS: readonly Persona[] = [
   {
@@ -41,6 +59,23 @@ export const PERSONAS: readonly Persona[] = [
     tagline: "Own the system: templates, modules, brand assets and the guardrails everyone else inherits.",
     roles: ["admin", "brand_reviewer"],
     counters: ["decks", "print", "kits"],
+    resume: ["decks", "print", "kits"],
+    primary: {
+      label: "Open the command center",
+      hint: "Usage, approvals and anything the audit log flagged",
+      to: "/admin",
+    },
+    secondary: {
+      label: "Template Studio",
+      hint: "Tune a look and publish it to every picker",
+      to: "/admin/templates",
+    },
+    guides: [
+      { label: "Publishing a template", hint: "Step-by-step", to: "/about" },
+      { label: "Module authoring rules", hint: "Geometry + spacing", to: "/library/print/modules" },
+      { label: "Export contract", hint: "PPTX, PDF, CMYK", to: "/faq" },
+    ],
+
     steps: [
       {
         title: "Check the command center",
@@ -84,6 +119,23 @@ export const PERSONAS: readonly Persona[] = [
     tagline: "Run campaigns end to end: social, events, print collateral and the look that ties them together.",
     roles: ["brand_lead", "content_owner", "editor"],
     counters: ["kits", "print", "decks"],
+    resume: ["kits", "print", "decks"],
+    primary: {
+      label: "Start a campaign brief",
+      hint: "One brief, then every asset inherits the look",
+      to: "/brief/new",
+    },
+    secondary: {
+      label: "Talk to the social agent",
+      hint: "Lay out every format in one pass",
+      to: "/social-agent",
+    },
+    guides: [
+      { label: "Campaign look memory", hint: "Keeping a set cohesive", to: "/about" },
+      { label: "Print CMYK contract", hint: "What ships to press", to: "/faq" },
+      { label: "Brand guides", hint: "Palettes and rules", to: "/knowledge/brand-guides" },
+    ],
+
     steps: [
       {
         title: "Brief the campaign",
@@ -127,6 +179,23 @@ export const PERSONAS: readonly Persona[] = [
     tagline: "Get a client-ready, on-brand deck or one-pager out the door in minutes.",
     roles: ["sales", "viewer"],
     counters: ["decks", "print"],
+    resume: ["decks", "print"],
+    primary: {
+      label: "Build a deck with the agent",
+      hint: "Describe the meeting, get an outline and a built deck",
+      to: "/agent",
+    },
+    secondary: {
+      label: "Start from a brief",
+      hint: "Prospect, division, one objective",
+      to: "/brief/new",
+    },
+    guides: [
+      { label: "Deck agent walkthrough", hint: "From chat to export", to: "/about" },
+      { label: "Sharing a deck", hint: "Read-only links + locales", to: "/faq" },
+      { label: "Ask Oracle", hint: "Facts you can cite", to: "/knowledge/ask" },
+    ],
+
     steps: [
       {
         title: "Describe the meeting",
