@@ -5,7 +5,12 @@ import { ApprovedPrintFrame } from "@/components/print/ApprovedPrintFrame";
 import { PrintKindPreview } from "@/components/print/PrintKindPreview";
 import { pageAspect } from "@/components/print/print-primitives";
 import { BRAND_MODES, type BrandMode } from "@/lib/taxonomy";
-import type { PrintAssetKind, PrintDensity, PrintMode, PrintPageSize } from "@/lib/print-assets.types";
+import type {
+  PrintAssetKind,
+  PrintDensity,
+  PrintMode,
+  PrintPageSize,
+} from "@/lib/print-assets.types";
 
 export function brandModeFor(divisionId: string | null | undefined): BrandMode {
   return (

@@ -66,7 +66,9 @@ export function PrintModulePaletteCard({
                 <span className="min-w-0">
                   <span className="text-xs font-medium">{f.label}</span>
                   {f.description ? (
-                    <span className="ml-1.5 text-[11px] text-muted-foreground">{f.description}</span>
+                    <span className="ml-1.5 text-[11px] text-muted-foreground">
+                      {f.description}
+                    </span>
                   ) : null}
                 </span>
                 <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">

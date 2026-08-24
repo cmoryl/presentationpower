@@ -72,7 +72,8 @@ function MyPiecePreview({
     };
   }, [assetId]);
 
-  if (!content) return <div className="aspect-[8.5/11] rounded-lg border border-border bg-muted/40" />;
+  if (!content)
+    return <div className="aspect-[8.5/11] rounded-lg border border-border bg-muted/40" />;
   return (
     <PrintPagePreview
       kind={kind as PrintAssetKind}
@@ -164,7 +165,9 @@ export function PrintSuggestionCards({
                     size="sm"
                     className="mt-2 h-7 text-[11px]"
                     onClick={() =>
-                      onPick?.(`Use the library piece "${s.title}" (${s.id}) as the starting point.`)
+                      onPick?.(
+                        `Use the library piece "${s.title}" (${s.id}) as the starting point.`,
+                      )
                     }
                   >
                     Use this

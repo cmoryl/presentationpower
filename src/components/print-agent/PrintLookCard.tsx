@@ -90,7 +90,10 @@ export function PrintLookCard({
           </p>
           <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {heroes.map((h, i) => (
-              <div key={`${h.label}-${i}`} className="overflow-hidden rounded-lg border border-border">
+              <div
+                key={`${h.label}-${i}`}
+                className="overflow-hidden rounded-lg border border-border"
+              >
                 {h.url ? (
                   <img
                     src={h.url}
@@ -162,14 +165,20 @@ export function PrintLookCard({
       ) : null}
 
       <div className="mt-3 flex flex-wrap gap-1.5">
-        <Button size="sm" className="h-7 text-[11px]" onClick={() => onPick?.("Apply this look and build it.")}>
+        <Button
+          size="sm"
+          className="h-7 text-[11px]"
+          onClick={() => onPick?.("Apply this look and build it.")}
+        >
           Apply this look
         </Button>
         <Button
           size="sm"
           variant="ghost"
           className="h-7 text-[11px]"
-          onClick={() => onPick?.(`Show me the ${look.mode === "dark" ? "light" : "dark"} version instead.`)}
+          onClick={() =>
+            onPick?.(`Show me the ${look.mode === "dark" ? "light" : "dark"} version instead.`)
+          }
         >
           Try {look.mode === "dark" ? "light" : "dark"}
         </Button>

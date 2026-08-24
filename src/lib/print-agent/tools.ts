@@ -48,7 +48,6 @@ const KindEnum = z.enum([
   "solution-proposal",
 ]);
 
-
 export type PrintToolContext = {
   supabase: SupabaseClient;
   userId: string;
@@ -392,7 +391,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       inputSchema: z.object({
         divisionId: z.string().min(1),
         mode: z.enum(["light", "dark"]),
-        pageSize: z.enum(["A4","Letter","Square","HalfLetter","A5"]).optional(),
+        pageSize: z.enum(["A4", "Letter", "Square", "HalfLetter", "A5"]).optional(),
         density: z.enum(["compact", "standard", "airy"]).optional(),
         rationale: z.string().max(400).optional(),
         heroOptions: z
@@ -449,7 +448,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       inputSchema: z.object({
         assetId: z.string().uuid(),
         mode: z.enum(["light", "dark"]).optional(),
-        pageSize: z.enum(["A4","Letter","Square","HalfLetter","A5"]).optional(),
+        pageSize: z.enum(["A4", "Letter", "Square", "HalfLetter", "A5"]).optional(),
         density: z.enum(["compact", "standard", "airy"]).optional(),
         heroImageUrl: z.string().optional(),
         heroHeightPct: z.number().min(20).max(70).optional(),
@@ -525,8 +524,6 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
         };
       },
     }),
-
-
 
     list_my_print_assets: tool({
       description: "List the print pieces the signed-in user already owns.",

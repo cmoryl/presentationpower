@@ -24,12 +24,8 @@ import { PrintLookCard, printLookFromTool } from "./PrintLookCard";
 import { PrintModulePaletteCard, printModulePaletteFromTool } from "./PrintModulePaletteCard";
 import { PrintLivePreviewCard, printLivePreviewFromTool } from "./PrintLivePreviewCard";
 
-import {
-  AgentDocumentUpload,
-  useAgentDocuments,
-} from "@/components/agent/AgentDocumentUpload";
+import { AgentDocumentUpload, useAgentDocuments } from "@/components/agent/AgentDocumentUpload";
 import { withDocumentContext } from "@/lib/agent/doc-intake";
-
 
 const TOOL_LABELS: Record<string, string> = {
   list_print_types: "Checking print types",
@@ -51,7 +47,6 @@ const TOOL_LABELS: Record<string, string> = {
   list_hero_imagery: "Finding approved hero imagery",
   set_print_look: "Applying the look & feel",
 };
-
 
 function toolNameOf(type: string) {
   return type.startsWith("tool-") ? type.slice(5) : type;
@@ -124,7 +119,6 @@ export function PrintAgentChat({
     },
     [busy, docs, messages.length, onFirstUserMessage, sendMessage],
   );
-
 
   const sentPending = useRef(false);
   useEffect(() => {
