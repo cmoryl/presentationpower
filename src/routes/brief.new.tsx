@@ -31,7 +31,29 @@ import { StructurePreviewPanel } from "@/components/brief/StructurePreviewPanel"
 import { buildStructurePreviews } from "@/lib/brief-structure-preview";
 import { validateBrief } from "@/lib/brief-validation";
 
+/**
+ * `?output=` pre-selects Step 1 so entering the brief from a homepage element
+ * card lands on exactly that output type — nothing extra pre-checked. The user
+ * can still add more channels in Step 1.
+ */
+const OUTPUT_CHANNELS = ["presentation", "print", "event", "social"] as const;
+type OutputChannel = (typeof OUTPUT_CHANNELS)[number];
+
+function parseOutputSearch(raw: unknown): OutputChannel[] | undefined {
+  const value = (raw as { output?: unknown } | undefined)?.output;
+  if (typeof value !== "string" || !value.trim()) return undefined;
+  const picked = value
+    .split(",")
+    .map((v) => v.trim().toLowerCase())
+    .filter((v): v is OutputChannel => (OUTPUT_CHANNELS as readonly string[]).includes(v));
+  return picked.length ? Array.from(new Set(picked)) : undefined;
+}
+
 export const Route = createFileRoute("/brief/new")({
+  validateSearch: (raw: Record<string, unknown>) => {
+    const output = parseOutputSearch(raw);
+    return output ? { output: output.join(",") } : {};
+  },
   head: () => ({
     meta: [
       { title: "New master brief · TransPerfect Element" },
@@ -114,11 +136,28 @@ function BriefCommandCenter() {
     event: { enabled: boolean; playbookId: string | null };
     social: { enabled: boolean; playbookId: string | null };
   };
-  const [masterSet, setMasterSet] = useState<MasterSet>({
-    presentation: true,
-    print: { enabled: true, kinds: ["case-study"] },
-    event: { enabled: false, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
-    social: { enabled: false, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
+  // When the brief is opened from an element card (?output=event), Step 1 starts
+  // with only that output type on. With no param we fall back to the classic
+  // deck + case-study pairing.
+  const requestedOutputs = parseOutputSearch(Route.useSearch());
+  const [masterSet, setMasterSet] = useState<MasterSet>(() => {
+    const wants = (c: OutputChannel) => !!requestedOutputs?.includes(c);
+    if (!requestedOutputs)
+      return {
+        presentation: true,
+        print: { enabled: true, kinds: ["case-study"] as PrintKind[] },
+        event: { enabled: false, playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
+        social: { enabled: false, playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
+      };
+    return {
+      presentation: wants("presentation"),
+      print: {
+        enabled: wants("print"),
+        kinds: (wants("print") ? ["case-study"] : []) as PrintKind[],
+      },
+      event: { enabled: wants("event"), playbookId: EVENT_PLAYBOOKS[0]?.id ?? null },
+      social: { enabled: wants("social"), playbookId: SOCIAL_PLAYBOOKS[0]?.id ?? null },
+    };
   });
 
   const brand = useMemo(
