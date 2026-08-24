@@ -985,8 +985,8 @@ export function keepBackgroundPaintOnPlate(
   space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
 ): DomShape[] {
   const nearFull = (v: number, total: number) => v >= total * 0.94;
-  const spans = (v: number, total: number) => v >= total * 0.9;
-  const thin = (v: number, total: number) => v <= total * 0.045;
+  const spans = (v: number, total: number) => v >= total * 0.72;
+  const thin = (v: number, total: number) => v <= total * 0.07;
   return shapes.filter((s) => {
     // Pictures with real content (photographs, logos, icons, effect artwork)
     // stay native unless they cover the entire stage.
@@ -995,8 +995,20 @@ export function keepBackgroundPaintOnPlate(
     if (fullBleed) return false;
     const sliver =
       (spans(s.h, space.h) && thin(s.w, space.w)) || (spans(s.w, space.w) && thin(s.h, space.h));
-    return !sliver;
+    if (sliver) return false;
+    // Decorative bands: extreme-aspect, text-free boxes (column rails, scanline
+    // rows, hairline stacks). These are the translucent "opacity bars" that
+    // PowerPoint shows as selectable strips chopping up the artwork.
+    const el = s.node as HTMLElement | undefined;
+    const hasText = !!el && (el.textContent ?? "").trim().length > 0;
+    const min = Math.min(s.w, s.h);
+    const max = Math.max(s.w, s.h);
+    const extreme = max > 0 && min / max <= 0.14;
+    const translucent = (s.fill?.alpha ?? 1) < 0.9;
+    if (!hasText && extreme && (translucent || min <= 6)) return false;
+    return true;
   });
+
 }
 
 
