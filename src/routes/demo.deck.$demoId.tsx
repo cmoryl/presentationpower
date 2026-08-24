@@ -80,7 +80,30 @@ function ShowcaseDeckDemoPage() {
     payload ? Object.values(s.decks).find((d) => d.title === payload.title)?.id : undefined,
   );
 
-  if (!def || !payload) return null;
+  // Admin look controls preview *before* publishing: the rendered gallery below
+  // repaints from the draft look, so switching a language is visible instantly.
+  const [draftLook, setDraftLook] = useState<DemoDraftLook | null>(null);
+  const previewPayload = useMemo(() => {
+    if (!payload || !draftLook) return payload;
+    const slides = draftLook.clearSlideBackgrounds
+      ? payload.slides.map((s) => {
+          const content = { ...(s.content as Record<string, unknown>) };
+          delete content["background"];
+          return { ...s, content: content as typeof s.content };
+        })
+      : payload.slides;
+    return {
+      ...payload,
+      slides,
+      context: {
+        ...(payload.context ?? {}),
+        stylePackId: draftLook.stylePackId ?? undefined,
+        designRecipeId: draftLook.designRecipeId,
+      },
+    } as TemplatePayload;
+  }, [payload, draftLook]);
+
+  if (!def || !payload || !previewPayload) return null;
   const accent = division.accent;
 
   /** Create (or reopen) the visitor's own editable copy of the demo. */
