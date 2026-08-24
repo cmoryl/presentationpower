@@ -15,18 +15,22 @@ import { PrintPageProvider } from "@/components/print/print-page-context";
 import { BrandLockup } from "@/components/BrandLockup";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type { PrintSection } from "@/lib/print-assets.types";
-import type { SocialFormat } from "@/lib/social-formats";
+import { aspectClass, type SocialFormat } from "@/lib/social-formats";
 import {
   computeSocialFit,
   nextRelief,
   nextGrowthStep,
+  nextAirStep,
   SOCIAL_GROWTH_MAX,
   SOCIAL_GROWTH_STEPS,
+  SOCIAL_AIR_MAX,
+  SOCIAL_AIR_STEPS,
   reliefAt,
   socialSafeRect,
   type SocialFitRelief,
   type SocialFitResult,
 } from "@/lib/social-module-fit";
+
 import { applyReliefToSection } from "@/lib/social-module-layouts";
 
 export type SocialModuleFrameProps = {
@@ -75,24 +79,32 @@ export function SocialModuleFrame({
   // measure/decide/render loop from oscillating.
   const [growthIndex, setGrowthIndex] = useState(0);
   const growthCeiling = useRef(SOCIAL_GROWTH_MAX);
+  // Air index picks up where growth stops: it pads the module out so its own
+  // surfaces reach the safe rect instead of floating in a letterbox.
+  const [airIndex, setAirIndex] = useState(0);
+  const airCeiling = useRef(SOCIAL_AIR_MAX);
 
   const pinned = typeof reliefLevel === "number";
   const relief = reliefAt(pinned ? (reliefLevel as number) : autoLevel);
   const rendered = useMemo(() => applyReliefToSection(section, relief), [section, relief]);
   const growth = SOCIAL_GROWTH_STEPS[Math.min(growthIndex, growthCeiling.current)];
+  const air = SOCIAL_AIR_STEPS[Math.min(airIndex, airCeiling.current)];
 
   const fit = useMemo(
-    () => computeSocialFit({ format, naturalHeight, relief, growth }),
-    [format, naturalHeight, relief, growth],
+    () => computeSocialFit({ format, naturalHeight, relief, growth, air }),
+    [format, naturalHeight, relief, growth, air],
   );
 
-  // Reset both ladders whenever the inputs change so we always start from the
-  // most generous rung — both ladders are monotonic, so this terminates.
+  // Reset every ladder whenever the inputs change so we always start from the
+  // most generous rung — all three are monotonic, so this terminates.
   useEffect(() => {
     if (!pinned) setAutoLevel(0);
     setGrowthIndex(0);
+    setAirIndex(0);
     growthCeiling.current = SOCIAL_GROWTH_MAX;
+    airCeiling.current = SOCIAL_AIR_MAX;
   }, [pinned, section, format.id]);
+
 
   // Measure the module at the current virtual page width. rAF-coalesced and
   // threshold-damped, the same discipline the print preview frame uses.
@@ -119,13 +131,19 @@ export function SocialModuleFrame({
       if (raf) cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [rendered, fit.pageWidth]);
+  }, [rendered, fit.pageWidth, air]);
 
   // Auto-escalate relief until the module clears the safe rect; when it clears
-  // with room to spare, enlarge instead so short modules fill the frame.
+  // with room to spare, enlarge, then pad it out so the frame reads full.
   useEffect(() => {
     if (naturalHeight <= 0) return;
     if (!fit.ok) {
+      // Air is the newest and cheapest thing to give back.
+      if (airIndex > 0) {
+        airCeiling.current = Math.min(airCeiling.current, airIndex - 1);
+        setAirIndex(airIndex - 1);
+        return;
+      }
       // Enlarging caused (or failed to fix) the overflow: pin the ceiling below
       // the current rung before touching relief.
       if (growthIndex > 0) {
@@ -139,8 +157,16 @@ export function SocialModuleFrame({
       return;
     }
     const grow = nextGrowthStep(fit, growthIndex);
-    if (grow !== null && grow <= growthCeiling.current) setGrowthIndex(grow);
-  }, [pinned, naturalHeight, fit, relief, growthIndex]);
+    if (grow !== null && grow <= growthCeiling.current) {
+      setGrowthIndex(grow);
+      return;
+    }
+    const growthExhausted =
+      growthIndex >= Math.min(SOCIAL_GROWTH_MAX, growthCeiling.current) || grow === null;
+    const nextAir = nextAirStep(fit, airIndex, growthExhausted);
+    if (nextAir !== null && nextAir <= airCeiling.current) setAirIndex(nextAir);
+  }, [pinned, naturalHeight, fit, relief, growthIndex, airIndex]);
+
 
   useEffect(() => {
     if (naturalHeight > 0) onFit?.(fit, relief);
@@ -148,8 +174,34 @@ export function SocialModuleFrame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fit, relief, naturalHeight]);
 
+  // The virtual sheet the module lays out on takes the safe rect's proportions,
+  // so every "% of page height" measurement in the library (masthead bands,
+  // split panels, plate heights) resolves against the social frame instead of
+  // against a Letter page.
+  //
+  // Height must be expressed in the 816px-wide template coordinate system that
+  // `cq()` normalises against — not in rendered px — otherwise growth-narrowed
+  // pages silently shrink every band back down.
+  const framePageHeight = Math.round(816 * (safe.height / safe.width));
+
+  const frameBandPct = useMemo(() => {
+    switch (aspectClass(format)) {
+      case "landscape-wide":
+        return 104;
+      case "landscape":
+        return 112;
+      case "square":
+        return 128;
+      case "portrait":
+        return 126;
+      case "portrait-tall":
+        return 118;
+    }
+  }, [format]);
+
   const ink = mode === "dark" ? "#FFFFFF" : "#03002C";
   const paper = mode === "dark" ? "#03002C" : "#FFFFFF";
+
   // Center the module inside the safe rect so short modules never leave a
   // lopsided band at one edge.
   const top = safe.top + Math.max(0, (safe.height - fit.renderedHeight) / 2);
@@ -206,13 +258,27 @@ export function SocialModuleFrame({
               transformOrigin: "top left",
               ["--print-page-pad" as string]: "0px",
               ["--print-page-pad-top" as string]: "0px",
+              // Air ladder: multiplies only the module's internal padding so
+              // its own plates and surfaces reach the safe rect.
+              ["--print-fit-pad" as string]: String(fit.air),
             }}
+
           >
-            <PrintPageProvider size="Letter" margin="standard">
+            {/* The virtual sheet takes the FRAME's aspect, not Letter's. Band
+                and masthead heights are a share of page height, so this is what
+                makes a photo band fill a square post instead of sitting in a
+                letterbox. */}
+            <PrintPageProvider
+              size="Letter"
+              margin="standard"
+              heightPx={framePageHeight}
+              heroBandPct={frameBandPct}
+            >
               <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
                 <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
               </PrintDocModeProvider>
             </PrintPageProvider>
+
           </div>
         </div>
 
