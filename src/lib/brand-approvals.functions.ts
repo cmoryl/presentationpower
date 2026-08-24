@@ -31,35 +31,14 @@ const CheckSchema = z.object({
 const SubjectType = z.enum(APPROVAL_SUBJECT_TYPES);
 const Status = z.enum(APPROVAL_STATUSES);
 
-// Structural type: just enough of the authed client to read the caller's roles.
+type RoleRow = { role: string };
 
-
-async function reviewerFlags(
-  supabase: {
-    from: (table: string) => {
-      select: (columns: string) => {
-        eq: (
-          column: string,
-          value: string,
-        ) => {
-          in: (
-            column: string,
-            values: readonly string[],
-          ) => PromiseLike<{ data: { role: string }[] | null }>;
-        };
-      };
-    };
-  },
-  userId: string,
-) {
-  const { data } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .in("role", ["admin", "brand_reviewer"]);
-  const roles = (data ?? []).map((r) => r.role);
-
-  return { isAdmin: roles.includes("admin"), isReviewer: roles.length > 0 };
+function flagsFromRoles(rows: RoleRow[] | null) {
+  const roles = (rows ?? []).map((r) => String(r.role));
+  return {
+    isAdmin: roles.includes("admin"),
+    isReviewer: roles.includes("admin") || roles.includes("brand_reviewer"),
+  };
 }
 
 /** Submit (or re-submit) an item for brand/compliance review. */
@@ -138,7 +117,11 @@ export const listApprovalRequests = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { isAdmin, isReviewer } = await reviewerFlags(supabase, userId);
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const { isAdmin, isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
 
     const sel = (s: string): string => s;
     let q = supabase
@@ -240,7 +223,11 @@ export const decideApproval = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { isReviewer } = await reviewerFlags(supabase, userId);
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const { isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
 
     const decided = data.status !== "pending";
@@ -284,7 +271,11 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { isReviewer } = await reviewerFlags(supabase, userId);
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const { isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
     const { error } = await supabase
       .from("approval_requests")
