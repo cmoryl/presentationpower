@@ -19,6 +19,7 @@ const KIND_META: Record<string, { label: string; dot: string }> = {
   approved: { label: "Approved", dot: "bg-[#A6FA87]" },
   changes_requested: { label: "Changes requested", dot: "bg-[#FF9B70]" },
   submitted: { label: "Sent for review", dot: "bg-[#C2A3FF]" },
+  admin_alert: { label: "Announcement", dot: "bg-[#FFEB66]" },
 };
 
 function relative(iso: string): string {
