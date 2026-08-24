@@ -44,7 +44,14 @@ const TOOL_LABELS: Record<string, string> = {
   add_print_module: "Adding a section",
   remove_print_module: "Removing a section",
   write_print_copy: "Writing copy",
+  [PRINT_SUGGEST_TOOL_NAME]: "Looking for pieces you can reuse",
+  [PRINT_LOOK_TOOL_NAME]: "Proposing the look & feel",
+  [PRINT_MODULES_TOOL_NAME]: "Listing supported sections",
+  [PRINT_PREVIEW_TOOL_NAME]: "Rendering a live preview",
+  list_hero_imagery: "Finding approved hero imagery",
+  set_print_look: "Applying the look & feel",
 };
+
 
 function toolNameOf(type: string) {
   return type.startsWith("tool-") ? type.slice(5) : type;
