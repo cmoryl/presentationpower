@@ -106,7 +106,7 @@ describe("single-line fit", () => {
         letterSpacingPx: 3,
         fontSizePx: 22,
       }),
-    );
+    )!;
     // Stage px → pt is 0.5, so an unshrunk 22px eyebrow would be 11pt.
     expect(wide.fontSize).toBeLessThan(11 * 0.85);
     // Still on the slide.
@@ -114,7 +114,7 @@ describe("single-line fit", () => {
   });
 
   it("does not shrink a line that already fits", () => {
-    const ok = describeTextRun(run({ x: 96, w: 300, text: "OVERVIEW", fontSizePx: 20 }));
+    const ok = describeTextRun(run({ x: 96, w: 300, text: "OVERVIEW", fontSizePx: 20 }))!;
     expect(ok.fontSize).toBe(10);
   });
 });
