@@ -72,6 +72,9 @@ function BriefOutputHub() {
     BRAND_MODES.find((b) => b.id === deck?.brandModeId)?.name ?? brand?.name ?? "TransPerfect";
 
   const masterSet = deck?.context?.masterSet;
+  // Older briefs have no flag and always produced a deck; new briefs record it
+  // explicitly so a social/print-only brief doesn't surface a deck nobody asked for.
+  const hasDeck = masterSet?.presentation !== false;
   const prints = masterSet?.printAssets ?? [];
   const eventPb = masterSet?.eventPlaybookId ? getPlaybook(masterSet.eventPlaybookId) : undefined;
   const socialPb = masterSet?.socialPlaybookId
@@ -80,6 +83,7 @@ function BriefOutputHub() {
   const eventCollateral = eventPb ? getExpandedCollateral(eventPb) : [];
   const cover = deck?.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
+
 
   if (!deck) {
     return (
