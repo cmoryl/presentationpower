@@ -144,7 +144,7 @@ export function ReviewerAssignments({
                     {people[r.assignee_id] ?? "Member"}
                     {mine && <span className="ml-2 text-xs text-foreground/45">you</span>}
                   </div>
-                  <div className="mt-0.5 text-[11px] uppercase tracking-wide text-foreground/45">
+                  <div className="mt-0.5 truncate text-[11px] uppercase tracking-wide text-foreground/45">
                     {LANE_LABEL[r.lane] ?? r.lane}
                     {r.decided_at
                       ? ` · decided ${new Date(r.decided_at).toLocaleDateString()}`
@@ -153,7 +153,7 @@ export function ReviewerAssignments({
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                    className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium ${
                       DECISION_STYLE[r.decision] ?? DECISION_STYLE.pending
                     }`}
                   >
@@ -172,7 +172,7 @@ export function ReviewerAssignments({
               </div>
 
               {r.decision_note && (
-                <p className="mt-2 whitespace-pre-wrap text-xs text-foreground/60">
+                <p className="mt-2 whitespace-pre-wrap break-words text-xs leading-relaxed text-foreground/60">
                   {r.decision_note}
                 </p>
               )}

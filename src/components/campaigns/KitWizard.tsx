@@ -617,12 +617,12 @@ export function KitWizard({
                 <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#003FC7]">
                   Layout source
                 </div>
-                <div className="mt-1 text-sm font-medium text-[#03002C]">
+                <div className="mt-1 break-words text-sm font-medium leading-snug text-[#03002C]">
                   {moduleLayout
                     ? moduleLayout.label
                     : "Default kit composition (auto-designed per format)"}
                 </div>
-                <p className="mt-1 text-xs text-black/55">
+                <p className="mt-1 break-words text-xs leading-relaxed text-black/55">
                   {moduleLayout
                     ? `${printModuleFamilyMeta(moduleLayout.family).label} module · applied to every format in this kit.`
                     : "Or start from a visual module in the section library — previews are fitted to each format."}
@@ -1305,10 +1305,14 @@ function KitAssetZoom({
         onClick={(e) => e.stopPropagation()}
         className="relative flex max-h-full max-w-full flex-col gap-3 rounded-2xl bg-white p-4 shadow-2xl outline-none"
       >
-        <div className="flex items-center justify-between gap-6">
-          <div>
-            <div className="text-sm font-semibold text-[#03002C]">{label}</div>
-            <div className="text-[11px] text-black/55">{meta}</div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="break-words text-sm font-semibold leading-snug text-[#03002C]">
+              {label}
+            </div>
+            <div className="mt-0.5 break-words text-[11px] leading-relaxed text-black/55">
+              {meta}
+            </div>
           </div>
           <button
             type="button"
@@ -1347,8 +1351,14 @@ function StepCard({
           <div className="text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
             {eyebrow}
           </div>
-          <h2 className="mt-1 text-xl font-bold tracking-tight text-[#03002C]">{title}</h2>
-          {description && <p className="mt-1.5 max-w-2xl text-xs text-black/55">{description}</p>}
+          <h2 className="mt-1 break-words text-lg font-bold leading-snug tracking-tight text-[#03002C] sm:text-xl">
+            {title}
+          </h2>
+          {description && (
+            <p className="mt-1.5 max-w-2xl break-words text-xs leading-relaxed text-black/55">
+              {description}
+            </p>
+          )}
         </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}
       </header>
@@ -1389,8 +1399,8 @@ function BrandPreview({
 
   return (
     <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
+      <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
           <div className="text-[10px] font-semibold uppercase tracking-widest text-black/50">
             Live preview · {brand.name}
           </div>
@@ -1405,7 +1415,7 @@ function BrandPreview({
           </div>
         </div>
         {usingExample && (
-          <span className="rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/50">
+          <span className="shrink-0 whitespace-nowrap rounded-full bg-black/[0.04] px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/50">
             Showing example
           </span>
         )}
@@ -1421,7 +1431,7 @@ function BrandPreview({
               facts={{}}
               displayShortEdge={140}
             />
-            <div className="text-[10px] uppercase tracking-widest text-black/50">{f.label}</div>
+            <div className="truncate text-[10px] uppercase tracking-widest text-black/50">{f.label}</div>
           </div>
         ))}
       </div>
