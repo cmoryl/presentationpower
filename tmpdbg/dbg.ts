@@ -1,10 +1,10 @@
-import { PRINT_DEMOS } from "../src/lib/showcase-print";
+import { getPrintDemo, printDemoItem } from "../src/lib/showcase-print";
 import { toEditableContent } from "../src/lib/print-library/editable";
 import { approvePrintDemoContent } from "../src/lib/print-library/demo-approve";
-import { PRINT_LIBRARY } from "../src/lib/print-library";
-const d = (PRINT_DEMOS as any[]).find((x) => x.id === "pd-media-genai");
-const item = (PRINT_LIBRARY as any[]).find((i) => i.id === d.itemId || i.slug === d.itemId) ?? (PRINT_LIBRARY as any[])[0];
+const def = getPrintDemo("pd-media-genai")!;
+const item = printDemoItem(def)!;
 const base: any = toEditableContent(item);
-console.log("kind", item.kind, "before", base.modules.map((m: any) => `${m.kind}:${m.variantId}`));
+console.log("kind", item.kind);
+console.log("before", base.modules.map((m: any) => m.kind));
 const out: any = approvePrintDemoContent(item.kind, base);
 console.log("after", out.modules.map((m: any) => m.kind));
