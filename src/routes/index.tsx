@@ -1198,9 +1198,45 @@ function RecentActivity({
   const userId = useSessionUser();
   const listPrint = useServerFn(listMyPrintAssets);
   const listKits = useServerFn(listMyKits);
+  const listApproved = useServerFn(listApprovedActivity);
   const [printItems, setPrintItems] = useState<ActivityItem[]>([]);
   const [kitItems, setKitItems] = useState<ActivityItem[]>([]);
+  const [approved, setApproved] = useState<Map<string, string> | null>(null);
+  const [scope, setScope] = useState<"self" | "workspace">("self");
   const [filter, setFilter] = useState<"all" | ActivityKind>("all");
+
+  useEffect(() => {
+    if (!userId) {
+      setApproved(new Map());
+      return;
+    }
+    let cancelled = false;
+    listApproved()
+      .then((res: { items: ApprovedActivityRow[]; isReviewer: boolean }) => {
+        if (cancelled) return;
+        const map = new Map<string, string>();
+        (res?.items ?? []).forEach((r) => {
+          const at = r.decided_at ?? r.updated_at ?? "";
+          const keys = [`${r.subject_type}:${r.subject_id}`];
+          // Kit-backed social/event assets are filed under either label.
+          if (r.subject_type === "kit") keys.push(`social:${r.subject_id}`, `event:${r.subject_id}`);
+          if (r.subject_type === "social" || r.subject_type === "event")
+            keys.push(`kit:${r.subject_id}`);
+          keys.forEach((k) => {
+            if (!map.has(k) || (map.get(k) ?? "") < at) map.set(k, at);
+          });
+        });
+        setApproved(map);
+        setScope(res?.isReviewer ? "workspace" : "self");
+      })
+      .catch(() => {
+        if (!cancelled) setApproved(new Map());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [listApproved, userId]);
+
 
   useEffect(() => {
     // Both feeds hit auth-protected server fns; skip entirely when signed out.
