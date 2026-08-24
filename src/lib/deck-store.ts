@@ -4731,7 +4731,12 @@ export const useDeckStore = create<DeckState>()(
               },
             },
           }));
+          notifySlideEdit(
+            `${slideIds.length} ${slideIds.length === 1 ? "slide" : "slides"} ${hidden ? "hidden from playback" : "shown in playback"}`,
+            { kind: "hidden", undo: () => get().undo() },
+          );
         },
+
 
         setSlidesMode: (deckId, slideIds, mode) => {
           const deck = get().decks[deckId];
