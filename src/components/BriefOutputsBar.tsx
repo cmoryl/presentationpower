@@ -78,7 +78,8 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
         From this brief
       </span>
 
-      {deckId ? (
+      {deckId && deckIsArtifact ? (
+
         <Link to="/brief/$deckId" params={{ deckId }} className={`${chip} ${idle}`}>
           <LayoutGrid size={14} strokeWidth={1.75} />
           Brief overview
