@@ -42,7 +42,7 @@ function AlertsView() {
 
   const q = useQuery({
     queryKey: ["admin", "alert-recipients"],
-    queryFn: () => listFn({ data: {} }),
+    queryFn: () => listFn(),
     retry: false,
   });
 
