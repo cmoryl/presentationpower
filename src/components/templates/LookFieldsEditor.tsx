@@ -102,6 +102,7 @@ export function LookFieldsEditor({
           baseSkinCode: draft.baseSkinCode,
           spec: draft.spec,
           status,
+          salesApproved: Boolean(draft.salesApproved),
           notes: draft.notes,
         },
       });
@@ -254,6 +255,24 @@ export function LookFieldsEditor({
           />
         </Field>
       </div>
+
+      <label className="flex items-start gap-3 rounded-xl border border-black/10 p-3 text-sm dark:border-white/15">
+        <input
+          type="checkbox"
+          className="mt-0.5 h-4 w-4"
+          checked={Boolean(draft.salesApproved)}
+          onChange={(e) => set("salesApproved", e.target.checked)}
+        />
+        <span>
+          <span className="font-medium">Approved for sales enablement</span>
+          <span className="mt-0.5 block text-xs opacity-70">
+            Sales users build in Enterprise light/dark only. Tick this to add this custom look to
+            the set they may create from (division accents still apply).
+          </span>
+        </span>
+      </label>
+
+
 
       <div className="flex flex-wrap items-center gap-3 border-t border-black/10 pt-4 dark:border-white/15">
         <button

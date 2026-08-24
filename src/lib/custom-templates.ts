@@ -33,6 +33,8 @@ export interface CustomTemplate {
   baseSkinCode: string | null;
   spec: string;
   status: "draft" | "published";
+  /** Cleared for sales-enablement (create-only) users to build from. */
+  salesApproved?: boolean;
   notes: string;
   updatedAt?: string;
 }

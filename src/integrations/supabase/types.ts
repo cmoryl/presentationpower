@@ -1139,6 +1139,7 @@ export type Database = {
           notes: string
           palette: string[]
           reference: string
+          sales_approved: boolean
           spec: string
           status: string
           surface_note: string
@@ -1160,6 +1161,7 @@ export type Database = {
           notes?: string
           palette: string[]
           reference?: string
+          sales_approved?: boolean
           spec?: string
           status?: string
           surface_note?: string
@@ -1181,6 +1183,7 @@ export type Database = {
           notes?: string
           palette?: string[]
           reference?: string
+          sales_approved?: boolean
           spec?: string
           status?: string
           surface_note?: string

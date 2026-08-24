@@ -1,0 +1,1 @@
+ALTER TABLE public.custom_templates ADD COLUMN IF NOT EXISTS sales_approved boolean NOT NULL DEFAULT false;
