@@ -316,7 +316,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
           return {
             family: fam,
             label: meta?.label ?? fam,
-            description: meta?.description ?? "",
+            description: meta?.tagline ?? meta?.desc ?? "",
             variants: variants.map((m) => ({
               moduleId: m.id,
               variantId: m.variantId,
