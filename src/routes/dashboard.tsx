@@ -24,6 +24,8 @@ import { listMyPrintAssets } from "@/lib/print-assets.functions";
 import { listMyKits } from "@/lib/kits.functions";
 import { taxonomyQueryOptions } from "@/hooks/use-taxonomy";
 import { QuickCreate } from "@/components/dashboard/QuickCreate";
+import { PersonaHero, type HeroCounter } from "@/components/dashboard/PersonaHero";
+import { personaTheme, type PersonaTheme } from "@/lib/persona-theme";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -71,9 +73,36 @@ const KIND_ICON: Record<WorkKind, typeof Presentation> = {
   kits: LayoutGrid,
 };
 
-const CARD =
-  "rounded-2xl border border-black/10 bg-white p-5 dark:border-white/15 dark:bg-white/5";
+const CARD = "rounded-2xl border border-black/10 bg-white p-5 dark:border-white/15 dark:bg-white/5";
 const CARD_LINK = `${CARD} transition-colors hover:border-black/30 dark:hover:border-white/35`;
+function SectionHead({
+  theme,
+  title,
+  hint,
+  icon: Icon,
+}: {
+  theme: PersonaTheme;
+  title: string;
+  hint?: string;
+  icon?: typeof Clock;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span
+        aria-hidden
+        className="mt-1.5 h-6 w-1.5 shrink-0 rounded-full"
+        style={{ background: `linear-gradient(${theme.accent}, ${theme.accent2})` }}
+      />
+      <div className="min-w-0">
+        <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+          {Icon ? <Icon className="size-4" style={{ color: theme.ink }} aria-hidden /> : null}
+          {title}
+        </h2>
+        {hint ? <p className="mt-0.5 text-sm text-black/55 dark:text-white/55">{hint}</p> : null}
+      </div>
+    </div>
+  );
+}
 
 type RecentItem = {
   key: string;
@@ -244,7 +273,9 @@ function RoleDashboard() {
           key: `deck-${row.id}`,
           title: row.title?.trim() || "Untitled deck",
           reason:
-            status === "changes_requested" ? "Changes requested by review" : "Waiting on brand review",
+            status === "changes_requested"
+              ? "Changes requested by review"
+              : "Waiting on brand review",
           to: "/decks/$deckId",
           params: { deckId: row.id },
         });
@@ -267,45 +298,51 @@ function RoleDashboard() {
   }, [deckRows, printRows]);
 
   const Primary = persona.primary;
-  const Secondary = persona.secondary;
+  const theme = personaTheme(personaId);
+  const heroCounters: HeroCounter[] = persona.counters.map((kind) => ({
+    kind,
+    label: counters[kind].label,
+    count: counters[kind].count,
+    to: counters[kind].to,
+  }));
 
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        <header className="max-w-3xl">
-          <p className="text-xs font-medium uppercase tracking-[0.18em] text-black/50 dark:text-white/50">
-            Your workspace
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-            {persona.label} dashboard
-          </h1>
-          <p className="mt-3 text-base leading-relaxed text-black/65 dark:text-white/65">
-            {persona.tagline}
-          </p>
-        </header>
-
         {/* Persona switcher */}
-        <div className="mt-6 flex flex-wrap items-center gap-2">
-          {PERSONAS.map((p) => {
-            const Icon = PERSONA_ICON[p.id];
-            const active = p.id === personaId;
-            return (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => choose(p.id)}
-                aria-pressed={active}
-                className={
-                  active
-                    ? "inline-flex min-h-11 items-center gap-2 rounded-xl bg-black px-4 text-sm font-medium text-white dark:bg-white dark:text-black"
-                    : "inline-flex min-h-11 items-center gap-2 rounded-xl border border-black/12 px-4 text-sm font-medium text-black/70 hover:border-black/30 dark:border-white/18 dark:text-white/70 dark:hover:border-white/40"
-                }
-              >
-                <Icon className="size-4" aria-hidden />
-                {p.label}
-              </button>
-            );
-          })}
+        <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="inline-flex flex-wrap items-center gap-1 rounded-2xl border border-black/10 bg-black/[0.03] p-1 dark:border-white/15 dark:bg-white/[0.06]"
+            role="group"
+            aria-label="Choose a workspace"
+          >
+            {PERSONAS.map((p) => {
+              const Icon = PERSONA_ICON[p.id];
+              const active = p.id === personaId;
+              const t = personaTheme(p.id);
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => choose(p.id)}
+                  aria-pressed={active}
+                  style={active ? { background: t.base, color: t.onHero } : undefined}
+                  className={
+                    active
+                      ? "inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-sm font-semibold"
+                      : "inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-sm font-medium text-black/60 hover:bg-black/[0.05] dark:text-white/65 dark:hover:bg-white/[0.08]"
+                  }
+                >
+                  <Icon
+                    className="size-4"
+                    style={active ? { color: t.accent } : undefined}
+                    aria-hidden
+                  />
+                  {p.label}
+                </button>
+              );
+            })}
+          </div>
           {isOverridden ? (
             <button
               type="button"
@@ -333,65 +370,8 @@ function RoleDashboard() {
           </p>
         )}
 
-        {/* Persona primary action */}
-        <section className="mt-8 grid gap-3 md:grid-cols-3">
-          <Link
-            to={Primary.to}
-            search={Primary.search}
-            className="group rounded-2xl bg-black p-6 text-white transition-opacity hover:opacity-90 md:col-span-2 dark:bg-white dark:text-black"
-          >
-            <p className="text-xs font-medium uppercase tracking-[0.18em] opacity-60">
-              Start here
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">{Primary.label}</h2>
-            <p className="mt-2 text-sm opacity-75">{Primary.hint}</p>
-            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium">
-              Go
-              <ArrowRight
-                className="size-4 transition-transform group-hover:translate-x-0.5"
-                aria-hidden
-              />
-            </span>
-          </Link>
-          <Link to={Secondary.to} search={Secondary.search} className={`${CARD_LINK} flex flex-col justify-between`}>
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
-                Or
-              </p>
-              <h3 className="mt-2 text-lg font-medium">{Secondary.label}</h3>
-              <p className="mt-2 text-sm text-black/60 dark:text-white/60">{Secondary.hint}</p>
-            </div>
-            <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 group-hover:underline">
-              Open
-              <ArrowRight className="size-4" aria-hidden />
-            </span>
-          </Link>
-        </section>
-
-        {/* Live work counters */}
-        {signedIn ? (
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {persona.counters.map((key) => {
-              const c = counters[key];
-              const Icon = KIND_ICON[key];
-              return (
-                <Link key={key} to={c.to} className={CARD_LINK}>
-                  <div className="flex items-center justify-between">
-                    <div className="text-3xl font-semibold tabular-nums">
-                      {c.count === null ? (
-                        <span className="inline-block h-8 w-10 animate-pulse rounded bg-black/10 align-middle dark:bg-white/10" />
-                      ) : (
-                        c.count
-                      )}
-                    </div>
-                    <Icon className="size-5 text-black/35 dark:text-white/35" aria-hidden />
-                  </div>
-                  <div className="mt-1 text-sm text-black/60 dark:text-white/60">{c.label}</div>
-                </Link>
-              );
-            })}
-          </div>
-        ) : null}
+        {/* Interactive persona hero */}
+        <PersonaHero persona={persona} counters={heroCounters} signedIn={signedIn} />
 
         {/* Quick create — one click into the right template set */}
         <QuickCreate personaId={personaId} signedIn={signedIn} />
@@ -399,10 +379,13 @@ function RoleDashboard() {
         {/* Needs attention */}
         {signedIn && attention.length > 0 ? (
           <section className="mt-10">
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <AlertTriangle className="size-4 text-amber-500" aria-hidden />
-              Needs attention
-            </h2>
+            <SectionHead
+              theme={theme}
+              title="Needs attention"
+              hint="Blocked on review or still a draft"
+              icon={AlertTriangle}
+            />
+
             <ul className="mt-4 divide-y divide-black/8 overflow-hidden rounded-2xl border border-black/10 dark:divide-white/10 dark:border-white/15">
               {attention.map((a) => (
                 <li key={a.key}>
@@ -431,10 +414,13 @@ function RoleDashboard() {
         {/* Pick up where you left off */}
         {signedIn ? (
           <section className="mt-10">
-            <h2 className="flex items-center gap-2 text-lg font-semibold">
-              <Clock className="size-4 text-black/40 dark:text-white/40" aria-hidden />
-              Pick up where you left off
-            </h2>
+            <SectionHead
+              theme={theme}
+              title="Pick up where you left off"
+              hint="Your most recent work across this workspace"
+              icon={Clock}
+            />
+
             {loading ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {[0, 1, 2].map((i) => (
@@ -488,12 +474,24 @@ function RoleDashboard() {
 
         {/* Workflow */}
         <section className="mt-10">
-          <h2 className="text-lg font-semibold">Your workflow</h2>
+          <SectionHead
+            theme={theme}
+            title="Your workflow"
+            hint="The path this role runs, end to end"
+          />
           <ol className="mt-4 grid gap-4 md:grid-cols-2">
             {persona.steps.map((step, i) => (
-              <li key={step.title} className={CARD}>
+              <li
+                key={step.title}
+                className={`${CARD} relative overflow-hidden pl-6 transition-transform hover:-translate-y-0.5`}
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-y-4 left-0 w-1.5 rounded-r"
+                  style={{ background: theme.bricks[i % theme.bricks.length] }}
+                />
                 <div className="flex items-baseline gap-3">
-                  <span className="text-sm font-semibold tabular-nums text-black/40 dark:text-white/40">
+                  <span className="text-sm font-semibold tabular-nums" style={{ color: theme.ink }}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <h3 className="text-base font-medium">{step.title}</h3>
@@ -504,7 +502,8 @@ function RoleDashboard() {
                 <Link
                   to={step.to}
                   search={step.search}
-                  className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium underline-offset-4 hover:underline"
+                  className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline-offset-4 hover:underline"
+                  style={{ color: theme.ink }}
                 >
                   {step.cta}
                   <ArrowRight className="size-4" aria-hidden />
@@ -516,17 +515,31 @@ function RoleDashboard() {
 
         {/* Task shortcuts */}
         <section className="mt-10">
-          <h2 className="text-lg font-semibold">Task shortcuts</h2>
+          <SectionHead theme={theme} title="Task shortcuts" hint="Jump straight to a tool" />
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {persona.shortcuts.map((s) => (
+            {persona.shortcuts.map((s, i) => (
               <Link
                 key={`${s.label}-${s.to}`}
                 to={s.to}
                 search={s.search}
-                className={`${CARD_LINK} flex min-h-24 flex-col justify-between`}
+                className={`${CARD_LINK} group flex min-h-28 flex-col justify-between transition-transform hover:-translate-y-0.5`}
               >
-                <span className="text-sm font-medium">{s.label}</span>
+                <span className="flex items-center gap-2">
+                  <span
+                    aria-hidden
+                    className="size-2.5 rounded-[2px]"
+                    style={{ background: theme.bricks[i % theme.bricks.length] }}
+                  />
+                  <span className="min-w-0 truncate text-sm font-medium">{s.label}</span>
+                </span>
                 <span className="mt-2 text-xs text-black/55 dark:text-white/55">{s.hint}</span>
+                <span
+                  className="mt-3 inline-flex items-center gap-1 text-xs font-semibold opacity-0 transition-opacity group-hover:opacity-100"
+                  style={{ color: theme.ink }}
+                >
+                  Open
+                  <ArrowRight className="size-3.5" aria-hidden />
+                </span>
               </Link>
             ))}
           </div>
@@ -534,13 +547,21 @@ function RoleDashboard() {
 
         {/* Guides */}
         <section className="mt-10 mb-4">
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <BookOpen className="size-4 text-black/40 dark:text-white/40" aria-hidden />
-            Learn the workflow
-          </h2>
+          <SectionHead
+            theme={theme}
+            title="Learn the workflow"
+            hint="Short guides written for this role"
+            icon={BookOpen}
+          />
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            {persona.guides.map((g) => (
-              <Link key={`${g.label}-${g.to}`} to={g.to} search={g.search} className={CARD_LINK}>
+            {persona.guides.map((g, i) => (
+              <Link
+                key={`${g.label}-${g.to}`}
+                to={g.to}
+                search={g.search}
+                className={`${CARD_LINK} border-l-4`}
+                style={{ borderLeftColor: theme.bricks[i % theme.bricks.length] }}
+              >
                 <span className="block text-sm font-medium">{g.label}</span>
                 <span className="mt-1 block text-xs text-black/55 dark:text-white/55">
                   {g.hint}
