@@ -171,7 +171,19 @@ export async function withExactStage<T>(
       /* auto-fix is opportunistic */
     }
 
-    return await fn(stage);
+    // ADOPTED MIRRORS — canvas blocks taken over from the module hide their
+    // original on screen; the capture must do the same or the plate AND the
+    // measured runs both carry copy that `placeCanvasBlocks` emits again,
+    // which is how exported slides ended up with doubled titles/body.
+    const restoreAdopted = hideAdoptedSourcesIn(stage, canvasBlocksOf(args.slide));
+    if (restoreAdopted !== undefined) await nextFrames(1);
+
+    try {
+      return await fn(stage);
+    } finally {
+      restoreAdopted();
+    }
+
   } catch (err) {
     console.error("[exact-export] offscreen stage failed", args.variant?.id, err);
     return null;
