@@ -5,6 +5,7 @@ import {
   iconContrastRatio,
   iconPageBackground,
   parseIconColor,
+  printIconInk,
   suggestIconAccent,
 } from "@/lib/print-icon-contrast";
 
@@ -83,5 +84,32 @@ describe("suggestIconAccent", () => {
     // Cyan stays blue/green dominant after darkening.
     expect(rgb.b).toBeGreaterThan(rgb.r);
     expect(rgb.g).toBeGreaterThan(rgb.r);
+  });
+});
+
+describe("printIconInk", () => {
+  it("leaves brand blue alone on white stock", () => {
+    expect(printIconInk("light", "#003FC7")).toBe("#003FC7");
+  });
+
+  it("lifts brand blue so it reads on the dark sheet", () => {
+    const ink = printIconInk("dark", "#003FC7");
+    expect(ink).not.toBe("#003FC7");
+    expect(iconContrastRatio(ink, iconPageBackground("dark"))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("rescues near-black navy from the dark sheet it matches", () => {
+    const ink = printIconInk("dark", "#03002C");
+    expect(iconContrastRatio(ink, "#03002C")).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("keeps an already-light accent on dark stock", () => {
+    expect(printIconInk("dark", "#A1FBF9")).toBe("#A1FBF9");
+  });
+
+  it("passes through colours it cannot reason about", () => {
+    expect(printIconInk("dark", "color-mix(in srgb, red, blue)")).toBe(
+      "color-mix(in srgb, red, blue)",
+    );
   });
 });
