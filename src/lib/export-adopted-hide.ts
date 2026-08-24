@@ -19,11 +19,28 @@
 import { matchAdoptedElement, resolveAdopted } from "./canvas-adopt";
 import type { CanvasBlock } from "./deck-store";
 
+/**
+ * An adopted mirror the export should NOT re-emit natively.
+ *
+ * Untouched adopted SHAPE / PLATE / IMAGE mirrors carry no authoring work — the
+ * module already paints that pixel, and re-emitting an approximation of a
+ * frosted icon plate produced stray dark blobs over the real one. Text mirrors
+ * are kept (they stay editable and match glyph for glyph), as is anything the
+ * user actually touched, hid, or removed.
+ */
+export function isDroppableAdoptedMirror(b: CanvasBlock): boolean {
+  if (!b.sourceSelector) return false;
+  if (b.touched || b.suppressed || b.hidden) return false;
+  const isText = b.kind === "heading" || b.kind === "body" || b.kind === "caption";
+  return !(isText && !!(b.text ?? "").trim());
+}
+
 /** Blocks that mirror a module element (adopted), including suppressed ones. */
 function adoptedOf(blocks: readonly CanvasBlock[] | undefined | null): CanvasBlock[] {
   if (!blocks || blocks.length === 0) return [];
-  return blocks.filter((b) => !!b.sourceSelector);
+  return blocks.filter((b) => !!b.sourceSelector && !isDroppableAdoptedMirror(b));
 }
+
 
 /**
  * Hide every module element that an adopted canvas block has taken over.
