@@ -174,8 +174,29 @@ export function SocialModuleFrame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fit, relief, naturalHeight]);
 
+  // The virtual sheet the module lays out on takes the safe rect's proportions,
+  // so every "% of page height" measurement in the library (masthead bands,
+  // split panels, plate heights) resolves against the social frame instead of
+  // against a Letter page.
+  const framePageHeight = Math.round(fit.pageWidth * (safe.height / safe.width));
+  const frameBandPct = useMemo(() => {
+    switch (aspectClass(format)) {
+      case "landscape-wide":
+        return 104;
+      case "landscape":
+        return 112;
+      case "square":
+        return 128;
+      case "portrait":
+        return 126;
+      case "portrait-tall":
+        return 118;
+    }
+  }, [format]);
+
   const ink = mode === "dark" ? "#FFFFFF" : "#03002C";
   const paper = mode === "dark" ? "#03002C" : "#FFFFFF";
+
   // Center the module inside the safe rect so short modules never leave a
   // lopsided band at one edge.
   const top = safe.top + Math.max(0, (safe.height - fit.renderedHeight) / 2);
