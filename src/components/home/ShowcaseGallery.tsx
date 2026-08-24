@@ -478,7 +478,11 @@ function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compac
       {...href}
       className="group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
     >
-      <div className="relative flex h-[230px] items-center justify-center overflow-hidden p-4">
+      <div
+        className={`relative flex items-center justify-center overflow-hidden p-4 ${
+          compact ? "h-[148px]" : "h-[230px]"
+        }`}
+      >
         <img
           src={showcaseArt(entry.id).src}
           alt=""
