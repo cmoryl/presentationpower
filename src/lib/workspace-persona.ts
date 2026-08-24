@@ -119,6 +119,23 @@ export const PERSONAS: readonly Persona[] = [
     tagline: "Run campaigns end to end: social, events, print collateral and the look that ties them together.",
     roles: ["brand_lead", "content_owner", "editor"],
     counters: ["kits", "print", "decks"],
+    resume: ["kits", "print", "decks"],
+    primary: {
+      label: "Start a campaign brief",
+      hint: "One brief, then every asset inherits the look",
+      to: "/brief/new",
+    },
+    secondary: {
+      label: "Talk to the social agent",
+      hint: "Lay out every format in one pass",
+      to: "/social-agent",
+    },
+    guides: [
+      { label: "Campaign look memory", hint: "Keeping a set cohesive", to: "/about" },
+      { label: "Print CMYK contract", hint: "What ships to press", to: "/faq" },
+      { label: "Brand guides", hint: "Palettes and rules", to: "/knowledge/brand-guides" },
+    ],
+
     steps: [
       {
         title: "Brief the campaign",
