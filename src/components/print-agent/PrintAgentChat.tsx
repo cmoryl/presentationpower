@@ -13,6 +13,12 @@ import { findPrintAssetIdInMessages } from "@/lib/print-agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { PRINT_PROPOSAL_TOOL_NAME } from "@/lib/print-agent/tools";
 import { PrintProposalCard, printProposalFromTool } from "./PrintProposalCard";
+import {
+  AgentDocumentUpload,
+  useAgentDocuments,
+} from "@/components/agent/AgentDocumentUpload";
+import { withDocumentContext } from "@/lib/agent/doc-intake";
+
 
 const TOOL_LABELS: Record<string, string> = {
   list_print_types: "Checking print types",
