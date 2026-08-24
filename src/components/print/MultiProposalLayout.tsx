@@ -16,6 +16,7 @@
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
 import { statUnitParts } from "@/lib/print-stat-unit";
+import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -3549,6 +3550,8 @@ export function MultiProposalLayout({
     <ProposalBrandProvider brand={brand}>
       <SlideModeContext.Provider value={mode}>
         <SlideAccentContext.Provider value={accent}>
+      {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+      <PrintSurfaceProvider mode={mode}>
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", ...style }}>
             {shown.map((page, i) => (
               <div
@@ -3572,7 +3575,8 @@ export function MultiProposalLayout({
               </div>
             ))}
           </div>
-        </SlideAccentContext.Provider>
+        </PrintSurfaceProvider>
+      </SlideAccentContext.Provider>
       </SlideModeContext.Provider>
     </ProposalBrandProvider>
   );

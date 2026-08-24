@@ -18,6 +18,7 @@ import {
   heroTitleFontPx,
   heroTitleStyle,
 } from "@/components/print/sections/hero/hero-style";
+import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
@@ -133,6 +134,8 @@ export function SpotlightLayout({
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
+      {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+      <PrintSurfaceProvider mode={mode}>
         <div
           className="relative w-full overflow-hidden [container-type:inline-size]"
           data-print-page
@@ -650,6 +653,7 @@ export function SpotlightLayout({
             )}
           </div>
         </div>
+      </PrintSurfaceProvider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
   );

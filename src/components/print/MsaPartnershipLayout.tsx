@@ -6,6 +6,7 @@ import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideCh
 import { BrandLockup } from "@/components/BrandLockup";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
+import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
@@ -118,6 +119,8 @@ export function MsaPartnershipLayout({
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
+      {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+      <PrintSurfaceProvider mode={mode}>
         <div
           className="relative w-full overflow-hidden [container-type:inline-size]"
           data-print-page
@@ -562,6 +565,7 @@ export function MsaPartnershipLayout({
             <div style={{ flex: 1, height: 1, background: rowLine }} />
           </div>
         </div>
+      </PrintSurfaceProvider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
   );
