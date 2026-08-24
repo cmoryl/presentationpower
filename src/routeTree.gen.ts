@@ -62,6 +62,7 @@ import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryI
 import { Route as ForSalesRouteImport } from './routes/for.sales'
 import { Route as ForMarketingRouteImport } from './routes/for.marketing'
 import { Route as ForAdminRouteImport } from './routes/for.admin'
+import { Route as EventsProductionRouteImport } from './routes/events.production'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
@@ -419,6 +420,11 @@ const ForAdminRoute = ForAdminRouteImport.update({
   id: '/for/admin',
   path: '/for/admin',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EventsProductionRoute = EventsProductionRouteImport.update({
+  id: '/production',
+  path: '/production',
+  getParentRoute: () => EventsRoute,
 } as any)
 const EventsPresetsRoute = EventsPresetsRouteImport.update({
   id: '/presets',
@@ -969,6 +975,7 @@ export interface FileRoutesByFullPath {
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
+  '/events/production': typeof EventsProductionRoute
   '/for/admin': typeof ForAdminRoute
   '/for/marketing': typeof ForMarketingRoute
   '/for/sales': typeof ForSalesRoute
@@ -1111,6 +1118,7 @@ export interface FileRoutesByTo {
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
+  '/events/production': typeof EventsProductionRoute
   '/for/admin': typeof ForAdminRoute
   '/for/marketing': typeof ForMarketingRoute
   '/for/sales': typeof ForSalesRoute
@@ -1258,6 +1266,7 @@ export interface FileRoutesById {
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
+  '/events/production': typeof EventsProductionRoute
   '/for/admin': typeof ForAdminRoute
   '/for/marketing': typeof ForMarketingRoute
   '/for/sales': typeof ForSalesRoute
@@ -1406,6 +1415,7 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/events/next'
     | '/events/presets'
+    | '/events/production'
     | '/for/admin'
     | '/for/marketing'
     | '/for/sales'
@@ -1548,6 +1558,7 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/events/next'
     | '/events/presets'
+    | '/events/production'
     | '/for/admin'
     | '/for/marketing'
     | '/for/sales'
@@ -1694,6 +1705,7 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/events/next'
     | '/events/presets'
+    | '/events/production'
     | '/for/admin'
     | '/for/marketing'
     | '/for/sales'
@@ -2221,6 +2233,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/for/admin'
       preLoaderRoute: typeof ForAdminRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/events/production': {
+      id: '/events/production'
+      path: '/production'
+      fullPath: '/events/production'
+      preLoaderRoute: typeof EventsProductionRouteImport
+      parentRoute: typeof EventsRoute
     }
     '/events/presets': {
       id: '/events/presets'
@@ -2950,6 +2969,7 @@ interface EventsRouteChildren {
   EventsNewRoute: typeof EventsNewRoute
   EventsNextRoute: typeof EventsNextRoute
   EventsPresetsRoute: typeof EventsPresetsRoute
+  EventsProductionRoute: typeof EventsProductionRoute
   EventsIndexRoute: typeof EventsIndexRoute
   EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
   EventsNextBadgesRoute: typeof EventsNextBadgesRoute
@@ -2959,6 +2979,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNewRoute: EventsNewRoute,
   EventsNextRoute: EventsNextRoute,
   EventsPresetsRoute: EventsPresetsRoute,
+  EventsProductionRoute: EventsProductionRoute,
   EventsIndexRoute: EventsIndexRoute,
   EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
   EventsNextBadgesRoute: EventsNextBadgesRoute,

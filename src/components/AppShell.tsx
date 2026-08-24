@@ -139,6 +139,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/events-agent", label: "Events agent" },
         { to: "/events", label: "Event assets" },
         { to: "/events/new", label: "New event asset" },
+        { to: "/events/production", label: "Venue print production" },
         { to: "/events/presets", label: "Presets" },
       ],
     },
