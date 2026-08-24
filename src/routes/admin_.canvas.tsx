@@ -2,7 +2,7 @@
 // Preset modules, text fields, stat blocks, imagery and colour surfaces are all
 // draggable onto one 1920×1080 stage and can be mixed freely.
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -124,6 +124,32 @@ function CanvasStudioPage() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [undo, redo]);
+
+  /**
+   * RESET TO BLANK — the fastest way out of a messy canvas: drop every layer,
+   * drop the template look (style pack + industry ground) and the selection, so
+   * what's left is a genuinely empty slide. One history entry, so ⌘Z restores
+   * the whole composition.
+   */
+  const resetToBlank = useCallback(() => {
+    const target = compRef.current;
+    if (!target) return;
+    const had = target.items.length;
+    beginBatch();
+    try {
+      setSelected([]);
+      clearItems(target.id);
+      patchComposition(target.id, { packId: null, recipeId: null });
+    } finally {
+      endBatch();
+    }
+    toast.success("Slide reset to blank", {
+      description:
+        had > 0
+          ? `${had} layer${had === 1 ? "" : "s"} and the template look removed. Undo (⌘Z) restores them.`
+          : "Template look removed. Undo (⌘Z) restores it.",
+    });
+  }, [beginBatch, clearItems, endBatch, patchComposition, setSelected]);
 
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === (comp?.brandId ?? brandId)) ?? BRAND_MODES[0]!,
@@ -437,8 +463,8 @@ function CanvasStudioPage() {
                     ⧉
                   </StudioMenuBtn>
                 </EditorMenuRow>
-                <EditorMenuRow label="Clear canvas" hint="Remove all layers, keep the slide">
-                  <StudioMenuBtn label="Clear canvas" onClick={() => clearItems(comp.id)}>
+                <EditorMenuRow label="Reset to blank" hint="Remove all layers and the template look">
+                  <StudioMenuBtn label="Reset to blank" onClick={() => resetToBlank()}>
                     ⌫
                   </StudioMenuBtn>
                 </EditorMenuRow>
@@ -596,6 +622,23 @@ function CanvasStudioPage() {
 
               <ToolbarSep />
 
+              {/* RESET TO BLANK — one click back to an empty slide. Clearing
+                  layers alone still leaves the template look applied, which
+                  reads as "not really blank", so this also drops the style
+                  pack / industry ground and the selection. Undoable. */}
+              <button
+                type="button"
+                onClick={() => resetToBlank()}
+                disabled={comp.items.length === 0 && !comp.packId && !comp.recipeId}
+                title="Clear every layer and the template look (⌘Z restores)"
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3 py-1.5 text-[11px] font-semibold text-black/70 transition hover:border-black/20 hover:text-primary disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                <span aria-hidden>⟲</span>
+                Reset to blank
+              </button>
+
+              <ToolbarSep />
+
               {/* Same control the deck editor uses, so history looks and reads
                   identically on every editing surface. */}
               <div role="group" aria-label="History" className="inline-flex items-center">
@@ -608,6 +651,7 @@ function CanvasStudioPage() {
                   redoLabel="canvas edit"
                 />
               </div>
+
             </>
           }
           slideRowEnd={
