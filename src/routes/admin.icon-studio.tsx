@@ -30,6 +30,7 @@ import { IconRenderer } from "@/components/IconRenderer";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
 import { BRAND_ICON_SETS, totalApprovedIcons } from "@/lib/brand-icon-sets";
 import { getBrandGuide } from "@/lib/brand-guides";
+import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 
 export const Route = createFileRoute("/admin/icon-studio")({
   head: () => ({
@@ -48,19 +49,29 @@ export const Route = createFileRoute("/admin/icon-studio")({
 const MASTER = BRAND_MODES[0];
 type TabId = "system" | "approved" | "curated" | "packs" | "search";
 const TABS: Array<{ id: TabId; label: string; sub: string }> = [
-  { id: "system", label: "System", sub: "Placement · treatment · emphasis" },
   {
     id: "approved",
     label: "Approved sets",
     sub: `${BRAND_ICON_SETS.length} divisions · ${totalApprovedIcons()} glyphs`,
   },
+  { id: "system", label: "System", sub: "Placement · treatment · emphasis" },
   { id: "curated", label: "Curated", sub: "100 hand-picked Lucide marks" },
   { id: "packs", label: "Browse packs", sub: "30 packs · 111k icons" },
   { id: "search", label: "Search all", sub: "Cross-pack fuzzy find" },
 ];
 
+/** Marcomm and sales-enablement users only ever see the approved sets. */
+const APPROVED_ONLY_TABS = TABS.filter((t) => t.id === "approved");
+
 function IconStudio() {
-  const [tab, setTab] = useState<TabId>("system");
+  const caps = useWorkspaceCapabilities();
+  const fullAccess = caps.isAdmin;
+  const tabs = fullAccess ? TABS : APPROVED_ONLY_TABS;
+  const [tab, setTab] = useState<TabId>("approved");
+
+  useEffect(() => {
+    if (!fullAccess && tab !== "approved") setTab("approved");
+  }, [fullAccess, tab]);
 
   return (
     <div className="space-y-8">
@@ -74,11 +85,17 @@ function IconStudio() {
           and sizing live here — as does the full local library of 111,000+ icons ported from
           BrandHUB.
         </p>
+        {!fullAccess && !caps.isLoading && (
+          <p className="mt-3 max-w-2xl rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2 text-xs text-black/60 dark:border-white/10 dark:bg-white/5 dark:text-white/60">
+            You're seeing the approved icon sets for your role. The wider libraries and the
+            iconography system settings are managed by admin and design.
+          </p>
+        )}
       </header>
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-1 rounded-2xl border border-black/10 bg-white/70 p-1 backdrop-blur dark:border-white/10 dark:bg-white/5">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
@@ -100,11 +117,11 @@ function IconStudio() {
         ))}
       </div>
 
-      {tab === "system" && <SystemTab />}
       {tab === "approved" && <ApprovedSetsTab />}
-      {tab === "curated" && <CuratedTab />}
-      {tab === "packs" && <PacksTab />}
-      {tab === "search" && <SearchTab />}
+      {fullAccess && tab === "system" && <SystemTab />}
+      {fullAccess && tab === "curated" && <CuratedTab />}
+      {fullAccess && tab === "packs" && <PacksTab />}
+      {fullAccess && tab === "search" && <SearchTab />}
     </div>
   );
 }

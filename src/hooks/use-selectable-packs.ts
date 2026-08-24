@@ -8,7 +8,12 @@
  */
 
 import { useSyncExternalStore } from "react";
-import { allSelectablePacks, ALL_STYLE_PACKS, type StylePack } from "@/lib/style-packs";
+import {
+  allSelectablePacks,
+  ALL_STYLE_PACKS,
+  resolvedPack,
+  type StylePack,
+} from "@/lib/style-packs";
 import { subscribeTemplateRegistry, templateRegistryVersion } from "@/lib/template-registry";
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 import { salesApprovedPackIds } from "@/lib/sales-deck-looks";
@@ -25,7 +30,7 @@ export function useSelectablePacks(): StylePack[] {
     () => true,
     () => false,
   );
-  const packs = hydrated ? allSelectablePacks() : ALL_STYLE_PACKS;
+  const packs = hydrated ? allSelectablePacks() : ALL_STYLE_PACKS.map(resolvedPack);
   if (caps.createOnly) {
     const allowed = salesApprovedPackIds();
     const only = packs.filter((p) => allowed.includes(p.id));
