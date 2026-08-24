@@ -149,7 +149,8 @@ export function ShowcasePrintGallery(props: Props) {
                 />
               </LazyMount>
               <span
-                className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-lg text-[11px] font-semibold text-white"
+                // Bottom-left: the page number must never cover the piece's headline.
+                className="absolute bottom-2 left-2 grid h-6 w-6 place-items-center rounded-lg text-[11px] font-semibold text-white shadow-sm"
                 style={{ background: accent ?? "#003FC7" }}
               >
                 {i + 1}
