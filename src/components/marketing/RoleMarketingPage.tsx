@@ -379,9 +379,15 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
         <div
           className="relative overflow-hidden rounded-[32px] px-6 py-14 text-center sm:px-12"
           style={{
-            background: `linear-gradient(120deg, ${theme.base} 0%, ${theme.base} 45%, ${theme.accent2}66 100%)`,
+            background: `linear-gradient(120deg, ${theme.base} 0%, ${theme.base} 52%, ${theme.accent2}59 100%)`,
           }}
         >
+          {/* Keeps reversed copy legible where the accent wash goes pale. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{ background: `${theme.base}A6` }}
+          />
           <div
             aria-hidden
             className="pointer-events-none absolute -top-32 left-1/2 size-[30rem] -translate-x-1/2 rounded-full blur-[110px]"
@@ -412,7 +418,7 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
               <button
                 type="button"
                 onClick={openWorkspace}
-                className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-white/25 px-6 text-sm font-semibold text-white transition-colors hover:border-white/60"
+                className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-6 text-sm font-semibold text-white transition-colors hover:border-white/70"
               >
                 Open the workspace
               </button>
