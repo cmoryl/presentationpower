@@ -10,7 +10,7 @@ import { useDeckStore, type DeckSnapshot, type TemplatePayload } from "@/lib/dec
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
-import { DemoStyleAdmin } from "@/components/showcase/DemoStyleAdmin";
+import { DemoStyleAdmin, type DemoDraftLook } from "@/components/showcase/DemoStyleAdmin";
 import { showcaseArt } from "@/lib/showcase-art";
 import { DEMO_DIVISIONS, retargetPayload, type DemoDivision } from "@/lib/showcase-division";
 
@@ -271,6 +271,8 @@ function ShowcaseDeckDemoPage() {
 
       {isAdmin ? (
         <DemoStyleAdmin
+          key={division.id}
+          onDraftLook={setDraftLook}
           demoKind="deck"
           demoId={demoId}
           divisionKey={division.id}
@@ -284,14 +286,14 @@ function ShowcaseDeckDemoPage() {
       <section className="mt-10">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-lg font-semibold tracking-tight">
-            Rendered preview · all {payload.slides.length} slides
+            Rendered preview · all {previewPayload.slides.length} slides
           </h2>
           <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
             Click any slide to enlarge
           </span>
         </div>
         <div className="mt-4">
-          <ShowcaseSlideGallery payload={payload} accent={accent} />
+          <ShowcaseSlideGallery payload={previewPayload} accent={accent} />
         </div>
       </section>
 
