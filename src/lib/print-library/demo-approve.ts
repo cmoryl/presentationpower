@@ -237,7 +237,12 @@ export function approvePrintDemoContent<T>(kind: PrintAssetKind, content: T): T 
     .map(approveSection);
 
   // 3 — shed the least essential module until the load fits the budget.
-  const budget = effectiveModuleBudget(ck, hero, copy);
+  // Trade hero height for content first: the band shrinks to a slim 22% band
+  // before any module is dropped, so approved demos keep their story.
+  const heroForBudget = hero
+    ? { ...hero, heightPct: Math.min(Math.round(hero.heightPct ?? 46), 22) }
+    : hero;
+  const budget = effectiveModuleBudget(ck, heroForBudget, copy);
   const load = (list: PrintSection[]) => list.reduce((n, m) => n + weightForSection(m), 0);
   while (modules.length > 1 && load(modules) > budget + 0.001) {
     let drop = modules.length - 1;
