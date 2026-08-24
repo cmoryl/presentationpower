@@ -182,7 +182,6 @@ function ExportView() {
     let ok = false;
     try {
 
-    try {
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
       setPerf(null);
       const {
