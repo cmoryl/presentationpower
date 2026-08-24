@@ -3,12 +3,12 @@ export type AgentSurface = "presentation" | "print" | "event" | "social";
 
 const KEY = "element:agent-seed";
 
-export const AGENT_ROUTE: Record<AgentSurface, string> = {
+export const AGENT_ROUTE = {
   presentation: "/agent",
   print: "/print-agent",
   event: "/events-agent",
   social: "/social-agent",
-};
+} as const satisfies Record<AgentSurface, string>;
 
 export const AGENT_LABEL: Record<AgentSurface, string> = {
   presentation: "Presentation agent",
