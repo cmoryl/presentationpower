@@ -570,7 +570,13 @@ function BriefCommandCenter() {
       navigate({ to: "/decks/$deckId", params: { deckId } });
       return;
     }
-    patchJob("deck", { status: "done", detail: `${deck.slides.length} slides assembled` });
+    patchJob("deck", {
+      status: "done",
+      detail: activeSet.presentation
+        ? `${deck.slides.length} slides assembled`
+        : "Story framed for the campaign",
+    });
+
 
     setAiStatus("knowledge");
     patchJob("knowledge", { status: "running", detail: "Searching knowledge base…" });
