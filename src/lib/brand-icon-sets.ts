@@ -15,6 +15,8 @@
 
 import { ICON_LIBRARY } from "./icon-library";
 import { BRAND_GUIDES, getBrandGuide, type BrandGuide } from "./brand-guides";
+import { NEXT_DIVISIONS } from "./next-brand-guide";
+
 
 export interface ApprovedIcon {
   /** Lucide name, as used by `iconByName` and icon overrides. */
@@ -58,8 +60,12 @@ export interface IconColorOption {
  * pops, plus the two mono options every guide allows.
  */
 export function iconColorOptions(slugOrGuide: string | BrandGuide): IconColorOption[] {
+  if (typeof slugOrGuide === "string" && slugOrGuide.startsWith("next-2026")) {
+    return nextIconColorOptions(slugOrGuide);
+  }
   const guide = typeof slugOrGuide === "string" ? getBrandGuide(slugOrGuide) : slugOrGuide;
   const out: IconColorOption[] = [
+
     { name: "Blue 800", hex: "#03002C", note: "Default on light surfaces" },
     { name: "Blue 500", hex: "#003FC7", note: "Primary brand blue" },
   ];
@@ -77,6 +83,35 @@ export function iconColorOptions(slugOrGuide: string | BrandGuide): IconColorOpt
   push("Dark Gray", "#666666", "Muted / secondary rows");
   return out;
 }
+
+/**
+ * Approved icon colours for the NEXT 2026 system: NEXT Navy ink, the track
+ * accent (when a track set is requested), then the shared mono options.
+ */
+export function nextIconColorOptions(slug: string): IconColorOption[] {
+  const divisionId = slug.replace(/^next-2026-?/, "");
+  const division = NEXT_DIVISIONS.find((d) => d.id === divisionId);
+  const out: IconColorOption[] = [
+    { name: "NEXT Navy", hex: "#1B3E6F", note: "Default ink on light surfaces" },
+  ];
+  const push = (name: string, hex: string, note: string, onDark?: boolean) => {
+    if (!hex || out.some((o) => o.hex.toLowerCase() === hex.toLowerCase())) return;
+    out.push({ name, hex, note, onDark });
+  };
+  if (division) {
+    push(`${division.name} accent`, division.accent, "Track accent — highlights only");
+    push(`${division.name} artwork accent`, division.accentArtwork, "As built in the vector masters");
+  } else {
+    for (const d of NEXT_DIVISIONS.slice(0, 6)) {
+      push(`${d.name} accent`, d.accent, "Track accent — highlights only");
+    }
+  }
+  push("City Series Navy", "#001450", "Deep navy reserved for City Series");
+  push("White", "#FFFFFF", "On navy plates and photography", true);
+  push("Dark Gray", "#666666", "Muted / secondary rows");
+  return out;
+}
+
 
 // ── Shared cores ────────────────────────────────────────────────────────
 // Every division inherits these two sub-areas so a deck built in any division
@@ -546,7 +581,279 @@ const SETS: BrandIconSet[] = [
   },
 ];
 
+/* ── NEXT 2026 event icon system ─────────────────────────────────────────
+ * The NEXT 2026 guide publishes its own icon system: one full event set for
+ * the master program, plus a track-specific set for every NEXT division so
+ * each track can download glyphs that match its own sessions and story.
+ */
+
+const NEXT_EVENT_PROGRAM: IconSubArea = {
+  id: "next-program",
+  name: "Program & sessions",
+  note: "Agenda architecture — one glyph per session type, reused on every schedule surface.",
+  icons: [
+    { name: "Calendar", label: "Agenda & schedule", keywords: ["day", "programme"] },
+    { name: "CalendarCheck", label: "Confirmed session", keywords: ["booked", "rsvp"] },
+    { name: "Clock", label: "Time slot", keywords: ["start", "duration"] },
+    { name: "Mic2", label: "Keynote", keywords: ["speaker", "stage"] },
+    { name: "Presentation", label: "Breakout session", keywords: ["talk", "track"] },
+    { name: "MessagesSquare", label: "Panel discussion", keywords: ["fireside", "q&a"] },
+    { name: "Wrench", label: "Workshop", keywords: ["hands on", "lab"] },
+    { name: "Users2", label: "Roundtable", keywords: ["group", "discussion"] },
+    { name: "MonitorPlay", label: "Demo theater", keywords: ["product demo", "showcase"] },
+    { name: "GraduationCap", label: "Certification & training" },
+    { name: "Lightbulb", label: "Innovation spotlight", keywords: ["ideas"] },
+    { name: "Timer", label: "Lightning talk", keywords: ["quickfire"] },
+    { name: "ListChecks", label: "Session tracks", keywords: ["streams"] },
+    { name: "NotebookPen", label: "Session notes & takeaways" },
+    { name: "Languages", label: "Interpretation & captions", keywords: ["multilingual"] },
+    { name: "Accessibility", label: "Accessible session", keywords: ["inclusive"] },
+  ],
+};
+
+const NEXT_EVENT_LOGISTICS: IconSubArea = {
+  id: "next-logistics",
+  name: "Logistics & venue",
+  note: "Wayfinding, travel and on-site operations. Keep these neutral navy on signage.",
+  icons: [
+    { name: "MapPin", label: "Venue & location" },
+    { name: "Map", label: "Floor plan & wayfinding", keywords: ["site map"] },
+    { name: "Signpost", label: "Directions", keywords: ["wayfinding"] },
+    { name: "Ticket", label: "Registration & passes", keywords: ["entry"] },
+    { name: "QrCode", label: "Check-in code", keywords: ["scan", "badge scan"] },
+    { name: "BadgeCheck", label: "Credentialed attendee", keywords: ["badge"] },
+    { name: "ScanLine", label: "On-site scanning", keywords: ["lead capture"] },
+    { name: "Plane", label: "Travel", keywords: ["flights"] },
+    { name: "Hotel", label: "Accommodation", keywords: ["stay", "rooms"] },
+    { name: "Bus", label: "Shuttle & transfers" },
+    { name: "Luggage", label: "Bag drop & coat check" },
+    { name: "Utensils", label: "Catering & dining" },
+    { name: "Coffee", label: "Breaks & refreshments" },
+    { name: "Wifi", label: "Connectivity", keywords: ["network"] },
+    { name: "LifeBuoy", label: "Attendee support", keywords: ["help desk"] },
+    { name: "Info", label: "Information point" },
+    { name: "Recycle", label: "Sustainability", keywords: ["green", "waste"] },
+    { name: "Bell", label: "Announcements", keywords: ["paging"] },
+  ],
+};
+
+const NEXT_EVENT_EXPERIENCE: IconSubArea = {
+  id: "next-experience",
+  name: "Experience & activation",
+  note: "The show floor and everything that makes NEXT feel like NEXT. Accent pops belong here.",
+  icons: [
+    { name: "Sparkles", label: "Signature experience", keywords: ["moment"] },
+    { name: "Tent", label: "Expo & stands", keywords: ["booth", "exhibit"] },
+    { name: "Store", label: "Partner pavilion", keywords: ["sponsor booth"] },
+    { name: "Handshake", label: "Sponsorship", keywords: ["partner"] },
+    { name: "PartyPopper", label: "Evening reception", keywords: ["celebration"] },
+    { name: "Music", label: "Entertainment", keywords: ["live music"] },
+    { name: "Trophy", label: "Awards program" },
+    { name: "Medal", label: "Recognition", keywords: ["honoree"] },
+    { name: "Gift", label: "Swag & giveaways" },
+    { name: "Shirt", label: "Merch & apparel" },
+    { name: "Camera", label: "Photo & capture", keywords: ["photography"] },
+    { name: "Video", label: "Recording & highlights" },
+    { name: "Radio", label: "Livestream & broadcast", keywords: ["hybrid"] },
+    { name: "Headphones", label: "Audio & headsets" },
+    { name: "Puzzle", label: "Interactive activation", keywords: ["game", "challenge"] },
+    { name: "Compass", label: "Attendee journey", keywords: ["route"] },
+    { name: "Star", label: "Featured highlight" },
+    { name: "Flag", label: "City & host market", keywords: ["destination"] },
+  ],
+};
+
+const NEXT_EVENT_MARKETING: IconSubArea = {
+  id: "next-marketing",
+  name: "Promotion & follow-up",
+  note: "Pre-event demand and post-event proof. Use one glyph per channel across the campaign.",
+  icons: [
+    { name: "Megaphone", label: "Campaign & promotion" },
+    { name: "Send", label: "Invitation & email" },
+    { name: "Hash", label: "Event hashtag", keywords: ["social tag"] },
+    { name: "Instagram", label: "Instagram" },
+    { name: "Linkedin", label: "LinkedIn" },
+    { name: "Youtube", label: "YouTube & video channel" },
+    { name: "Share2", label: "Share & amplify" },
+    { name: "Podcast", label: "Podcast & audio series" },
+    { name: "Rss", label: "Content feed & blog" },
+    { name: "Printer", label: "Printed collateral" },
+    { name: "Package", label: "Kits & shipping" },
+    { name: "Eye", label: "Reach & impressions" },
+    { name: "TrendingUp", label: "Registration growth" },
+    { name: "Percent", label: "Attendance & conversion" },
+    { name: "ClipboardCheck", label: "Post-event survey", keywords: ["feedback", "nps"] },
+    { name: "LineChart", label: "Event ROI reporting" },
+    { name: "Download", label: "On-demand assets" },
+    { name: "Rocket", label: "Launch moment", keywords: ["announcement"] },
+  ],
+};
+
+const NEXT_TRACK_ICONS: Record<string, ApprovedIcon[]> = {
+  transperfect: [
+    { name: "Building2", label: "Enterprise program" },
+    { name: "Globe2", label: "Global markets" },
+    { name: "Layers", label: "Full solution stack" },
+    { name: "Crown", label: "Executive track" },
+    { name: "Handshake", label: "Client partnership" },
+    { name: "Target", label: "Strategy & vision" },
+  ],
+  "city-series": [
+    { name: "Flag", label: "Host city" },
+    { name: "Landmark", label: "City landmark" },
+    { name: "Map", label: "City guide" },
+    { name: "Route", label: "City tour" },
+    { name: "Bus", label: "Getting around" },
+    { name: "Utensils", label: "Local dining" },
+  ],
+  globallink: [
+    { name: "Cpu", label: "AI translation" },
+    { name: "GitBranch", label: "Connectors" },
+    { name: "Database", label: "Translation memory" },
+    { name: "Cloud", label: "Platform & cloud" },
+    { name: "LayoutDashboard", label: "Analytics dashboard" },
+    { name: "Lock", label: "Security & SSO" },
+  ],
+  finance: [
+    { name: "Landmark", label: "Banking & capital markets" },
+    { name: "Banknote", label: "Payments" },
+    { name: "LineChart", label: "Market reporting" },
+    { name: "ShieldCheck", label: "Regulatory compliance" },
+    { name: "Wallet", label: "Wealth & investor content" },
+    { name: "Percent", label: "Rates & performance" },
+  ],
+  games: [
+    { name: "Gamepad2", label: "Game localization" },
+    { name: "Headphones", label: "Voice & audio" },
+    { name: "Users2", label: "Player community" },
+    { name: "Trophy", label: "Esports & competition" },
+    { name: "Sparkles", label: "Live service events" },
+    { name: "MonitorPlay", label: "Playtest & QA" },
+  ],
+  legal: [
+    { name: "Scale", label: "Litigation" },
+    { name: "Search", label: "eDiscovery" },
+    { name: "FileCheck2", label: "Document review" },
+    { name: "Lock", label: "Confidentiality" },
+    { name: "Landmark", label: "Court & filings" },
+    { name: "Timer", label: "Deadlines" },
+  ],
+  "life-sci": [
+    { name: "HeartPulse", label: "Clinical operations" },
+    { name: "ClipboardList", label: "Protocols" },
+    { name: "ShieldCheck", label: "Regulatory & GxP" },
+    { name: "Database", label: "Clinical data" },
+    { name: "Users2", label: "Sites & investigators" },
+    { name: "BookOpen", label: "Patient materials" },
+  ],
+  experience: [
+    { name: "Sparkles", label: "Customer experience" },
+    { name: "Palette", label: "Creative studio" },
+    { name: "Smartphone", label: "Digital touchpoints" },
+    { name: "Heart", label: "Brand affinity" },
+    { name: "Compass", label: "Journey mapping" },
+    { name: "Wand2", label: "Personalization" },
+  ],
+  learn: [
+    { name: "GraduationCap", label: "Learning programs" },
+    { name: "BookOpen", label: "Courseware" },
+    { name: "Video", label: "Learning video" },
+    { name: "ListChecks", label: "Assessment" },
+    { name: "Award", label: "Certification" },
+    { name: "Users2", label: "Cohorts" },
+  ],
+  media: [
+    { name: "Film", label: "Film & TV" },
+    { name: "Mic2", label: "Dubbing & voice" },
+    { name: "Volume2", label: "Audio mastering" },
+    { name: "MonitorPlay", label: "Streaming delivery" },
+    { name: "Newspaper", label: "Editorial & news" },
+    { name: "Camera", label: "Production" },
+  ],
+  digital: [
+    { name: "Code2", label: "Web & app builds" },
+    { name: "Search", label: "Multilingual SEO" },
+    { name: "Megaphone", label: "Paid media" },
+    { name: "Store", label: "Commerce" },
+    { name: "LineChart", label: "Performance analytics" },
+    { name: "Zap", label: "Campaign velocity" },
+  ],
+  dataforce: [
+    { name: "Database", label: "Training data" },
+    { name: "Boxes", label: "Data collection" },
+    { name: "ScanLine", label: "Annotation" },
+    { name: "Cpu", label: "Model evaluation" },
+    { name: "Users2", label: "Global contributor pool" },
+    { name: "ShieldCheck", label: "Data ethics & privacy" },
+  ],
+};
+
+const NEXT_EVENT_AREAS = [
+  NEXT_EVENT_PROGRAM,
+  NEXT_EVENT_LOGISTICS,
+  NEXT_EVENT_EXPERIENCE,
+  NEXT_EVENT_MARKETING,
+];
+
+/** Slug for the full NEXT 2026 event icon set. */
+export const NEXT_EVENT_ICON_SLUG = "next-2026-event";
+
+/** Slug for a NEXT track's icon set. */
+export function nextTrackIconSlug(divisionId: string): string {
+  return `next-2026-${divisionId}`;
+}
+
+/** Keep the first occurrence of each glyph across a set's sub-areas. */
+function dedupeAreas(areas: IconSubArea[]): IconSubArea[] {
+  const seen = new Set<string>();
+  return areas.map((area) => ({
+    ...area,
+    icons: area.icons.filter((i) => (seen.has(i.name) ? false : (seen.add(i.name), true))),
+  }));
+}
+
+SETS.push({
+  slug: NEXT_EVENT_ICON_SLUG,
+  title: "TransPerfect NEXT 2026",
+  headline: "NEXT 2026 event icon set",
+  body: "The full event system: program and session types, venue and logistics wayfinding, show-floor experience and campaign follow-up. Single-weight outline glyphs on NEXT Navy, with track accents reserved for highlights.",
+  subAreas: dedupeAreas([
+    ...NEXT_EVENT_AREAS,
+    CORE_PROCESS,
+    CORE_PROOF,
+    CORE_PEOPLE,
+    CORE_CONTENT,
+    CORE_TECH,
+  ]),
+});
+
+for (const division of NEXT_DIVISIONS) {
+  const track = NEXT_TRACK_ICONS[division.id];
+  if (!track) continue;
+  SETS.push({
+    slug: nextTrackIconSlug(division.id),
+    title: division.name,
+    headline: `${division.name} icon set`,
+    body: `${division.note} Track glyphs first, then the shared NEXT event system — download in ${division.name}'s accent (${division.accent}) or NEXT Navy for signage.`,
+    subAreas: dedupeAreas([
+      {
+        id: "track",
+        name: `${division.name} track`,
+        note: "Track-specific vocabulary — lead every track layout with these.",
+        icons: track,
+      },
+      ...NEXT_EVENT_AREAS,
+      CORE_PROCESS,
+      CORE_PROOF,
+      CORE_PEOPLE,
+      CORE_CONTENT,
+      CORE_TECH,
+    ]),
+  });
+}
+
 const VALID_NAMES = new Set(ICON_LIBRARY.map((e) => e.name));
+
 
 /** Minimum approved glyphs published in every sub-area of every guide. */
 export const SUB_AREA_MIN_SIZE = 50;

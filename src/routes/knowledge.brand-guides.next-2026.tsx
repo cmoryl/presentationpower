@@ -1,6 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
+import {
+  NEXT_EVENT_ICON_SLUG,
+  brandIconSet,
+  iconColorOptions,
+  nextTrackIconSlug,
+} from "@/lib/brand-icon-sets";
 import {
   NEXT_APPLICATION_RULES,
   NEXT_CORE_COLORS,
@@ -45,11 +52,13 @@ function Section({
   id,
   eyebrow,
   title,
+  intro,
   children,
 }: {
   id: string;
   eyebrow: string;
   title: string;
+  intro?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -58,10 +67,23 @@ function Section({
         {eyebrow}
       </div>
       <h2 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h2>
+      {intro ? (
+        <p className="mt-3 max-w-3xl text-sm text-black/65 dark:text-white/65">{intro}</p>
+      ) : null}
       <div className="mt-7">{children}</div>
     </section>
   );
 }
+
+const ICON_SET_TABS: { slug: string; label: string; accent: string }[] = [
+  { slug: NEXT_EVENT_ICON_SLUG, label: "Full event system", accent: "#1B3E6F" },
+  ...NEXT_DIVISIONS.map((d) => ({
+    slug: nextTrackIconSlug(d.id),
+    label: d.name,
+    accent: d.accent,
+  })),
+];
+
 
 function LockupTile({ item, accent }: { item: NextLockup; accent: string }) {
   const dark = item.variant !== "color";
@@ -178,6 +200,13 @@ function NextBrandGuide() {
     [activeDivision],
   );
 
+  const [iconSlug, setIconSlug] = useState(NEXT_EVENT_ICON_SLUG);
+  const iconHero = useMemo(() => iconColorOptions(iconSlug)[1]?.hex ?? NAVY, [iconSlug]);
+  const iconGlyphCount = useMemo(
+    () => brandIconSet(NEXT_EVENT_ICON_SLUG).subAreas.reduce((n, a) => n + a.icons.length, 0),
+    [],
+  );
+
   const lockupCount = NEXT_DIVISIONS.reduce((n, d) => n + d.lockups.length, 0);
 
   return (
@@ -216,6 +245,7 @@ function NextBrandGuide() {
               [String(NEXT_DIVISIONS.length), "Lockup families"],
               [String(lockupCount), "Approved lockups"],
               [String(NEXT_DIVISIONS.length - 2), "Track accents"],
+              [String(iconGlyphCount), "Event icons"],
             ].map(([n, l]) => (
               <div key={l}>
                 <div className="text-3xl font-semibold tabular-nums">{n}</div>
@@ -271,6 +301,7 @@ function NextBrandGuide() {
           ["misuse", "Rules & misuse"],
           ["applications", "Applications"],
           ["files", "File formats"],
+          ["icons", "Icon system"],
         ].map(([id, label]) => (
           <a
             key={id}
@@ -689,7 +720,41 @@ function NextBrandGuide() {
             Open the NEXT 2026 logo library →
           </a>
         </Section>
+
+        {/* Icons */}
+        <Section
+          id="icons"
+          eyebrow="10 · Icons"
+          title="Icon system — event set & track sets"
+          intro="One event-wide icon set for the NEXT 2026 program, plus a set for every track. Pick a set, choose your size and approved colour, then download a single glyph, a whole sub-area or the full set as SVG or PNG."
+        >
+          <div className="flex flex-wrap gap-2">
+            {ICON_SET_TABS.map((tab) => {
+              const active = tab.slug === iconSlug;
+              return (
+                <button
+                  key={tab.slug}
+                  type="button"
+                  onClick={() => setIconSlug(tab.slug)}
+                  aria-pressed={active}
+                  className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
+                    active
+                      ? "text-white"
+                      : "border-black/15 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70"
+                  }`}
+                  style={active ? { background: tab.accent, borderColor: tab.accent } : undefined}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-6">
+            <BrandIconLibrary slug={iconSlug} hero={iconHero} />
+          </div>
+        </Section>
       </div>
+
     </AppShell>
   );
 }
