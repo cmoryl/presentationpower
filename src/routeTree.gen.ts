@@ -24,6 +24,7 @@ import { Route as ElementsRouteImport } from './routes/elements'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AtlasRouteImport } from './routes/atlas'
+import { Route as ApprovalsRouteImport } from './routes/approvals'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
@@ -222,6 +223,11 @@ const AuthRoute = AuthRouteImport.update({
 const AtlasRoute = AtlasRouteImport.update({
   id: '/atlas',
   path: '/atlas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApprovalsRoute = ApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
@@ -861,6 +867,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/approvals': typeof ApprovalsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
@@ -1001,6 +1008,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
+  '/approvals': typeof ApprovalsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
@@ -1140,6 +1148,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/analytics': typeof AnalyticsRoute
+  '/approvals': typeof ApprovalsRoute
   '/atlas': typeof AtlasRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
@@ -1283,6 +1292,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/analytics'
+    | '/approvals'
     | '/atlas'
     | '/auth'
     | '/dashboard'
@@ -1423,6 +1433,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/analytics'
+    | '/approvals'
     | '/atlas'
     | '/auth'
     | '/dashboard'
@@ -1561,6 +1572,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/analytics'
+    | '/approvals'
     | '/atlas'
     | '/auth'
     | '/dashboard'
@@ -1703,6 +1715,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AnalyticsRoute: typeof AnalyticsRoute
+  ApprovalsRoute: typeof ApprovalsRoute
   AtlasRoute: typeof AtlasRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
@@ -1890,6 +1903,13 @@ declare module '@tanstack/react-router' {
       path: '/atlas'
       fullPath: '/atlas'
       preLoaderRoute: typeof AtlasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/approvals': {
+      id: '/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof ApprovalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analytics': {
@@ -2925,6 +2945,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AnalyticsRoute: AnalyticsRoute,
+  ApprovalsRoute: ApprovalsRoute,
   AtlasRoute: AtlasRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
