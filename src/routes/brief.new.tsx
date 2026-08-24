@@ -763,6 +763,8 @@ function BriefCommandCenter() {
       }
     }
 
+    // Slide copy is only written when a presentation was actually requested.
+    if (activeSet.presentation) {
     setAiStatus("personalizing");
 
     patchJob("personalize", {
@@ -770,6 +772,7 @@ function BriefCommandCenter() {
       detail: `Writing copy for ${deck.slides.length} slides…`,
     });
     try {
+
       const result = await personalize({
         data: {
           brief: {
