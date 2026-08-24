@@ -11,14 +11,21 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { findPrintAssetIdInMessages } from "@/lib/print-agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
-import { PRINT_PROPOSAL_TOOL_NAME } from "@/lib/print-agent/tools";
-import { PrintProposalCard, printProposalFromTool } from "./PrintProposalCard";
 import {
-  AgentDocumentUpload,
-  useAgentDocuments,
-} from "@/components/agent/AgentDocumentUpload";
-import { withDocumentContext } from "@/lib/agent/doc-intake";
+  PRINT_PROPOSAL_TOOL_NAME,
+  PRINT_SUGGEST_TOOL_NAME,
+  PRINT_LOOK_TOOL_NAME,
+  PRINT_MODULES_TOOL_NAME,
+  PRINT_PREVIEW_TOOL_NAME,
+} from "@/lib/print-agent/tools";
+import { PrintProposalCard, printProposalFromTool } from "./PrintProposalCard";
+import { PrintSuggestionCards, printSuggestionsFromTool } from "./PrintSuggestionCards";
+import { PrintLookCard, printLookFromTool } from "./PrintLookCard";
+import { PrintModulePaletteCard, printModulePaletteFromTool } from "./PrintModulePaletteCard";
+import { PrintLivePreviewCard, printLivePreviewFromTool } from "./PrintLivePreviewCard";
 
+import { AgentDocumentUpload, useAgentDocuments } from "@/components/agent/AgentDocumentUpload";
+import { withDocumentContext } from "@/lib/agent/doc-intake";
 
 const TOOL_LABELS: Record<string, string> = {
   list_print_types: "Checking print types",
@@ -33,6 +40,12 @@ const TOOL_LABELS: Record<string, string> = {
   add_print_module: "Adding a section",
   remove_print_module: "Removing a section",
   write_print_copy: "Writing copy",
+  [PRINT_SUGGEST_TOOL_NAME]: "Looking for pieces you can reuse",
+  [PRINT_LOOK_TOOL_NAME]: "Proposing the look & feel",
+  [PRINT_MODULES_TOOL_NAME]: "Listing supported sections",
+  [PRINT_PREVIEW_TOOL_NAME]: "Rendering a live preview",
+  list_hero_imagery: "Finding approved hero imagery",
+  set_print_look: "Applying the look & feel",
 };
 
 function toolNameOf(type: string) {
@@ -107,7 +120,6 @@ export function PrintAgentChat({
     [busy, docs, messages.length, onFirstUserMessage, sendMessage],
   );
 
-
   const sentPending = useRef(false);
   useEffect(() => {
     if (!pendingPrompt || sentPending.current || busy) return;
@@ -156,6 +168,27 @@ export function PrintAgentChat({
                       const proposal = printProposalFromTool(part);
                       if (proposal) return <PrintProposalCard key={key} proposal={proposal} />;
                     }
+                    if (name === PRINT_SUGGEST_TOOL_NAME) {
+                      const s = printSuggestionsFromTool(part);
+                      if (s)
+                        return <PrintSuggestionCards key={key} suggestions={s} onPick={submit} />;
+                    }
+                    if (name === PRINT_LOOK_TOOL_NAME) {
+                      const look = printLookFromTool(part);
+                      if (look) return <PrintLookCard key={key} look={look} onPick={submit} />;
+                    }
+                    if (name === PRINT_MODULES_TOOL_NAME) {
+                      const palette = printModulePaletteFromTool(part);
+                      if (palette)
+                        return (
+                          <PrintModulePaletteCard key={key} palette={palette} onPick={submit} />
+                        );
+                    }
+                    if (name === PRINT_PREVIEW_TOOL_NAME) {
+                      const preview = printLivePreviewFromTool(part);
+                      if (preview) return <PrintLivePreviewCard key={key} preview={preview} />;
+                    }
+
                     const state = (part as { state?: string }).state ?? "";
                     const done = state === "output-available" || state === "output-error";
                     return (
