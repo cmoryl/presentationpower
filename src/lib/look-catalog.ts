@@ -23,7 +23,13 @@ import { highContrastPackFromSkin, isSkinPackId, skinCodeFromPackId } from "./de
 import { isTemplatePackId, templateCodeFromPackId } from "./custom-templates";
 import { customTemplateMapping } from "./template-registry";
 import { withIndustryGround } from "./industry-backgrounds";
-import { ALL_STYLE_PACKS, allSelectablePacks, type StylePack } from "./style-packs";
+import {
+  ALL_STYLE_PACKS,
+  allSelectablePacks,
+  reapplyBackgroundOverrides,
+  resolvedPack,
+  type StylePack,
+} from "./style-packs";
 import { approvedStyles, isApprovedStyleId, type ApprovedStyle } from "./approved-visual-styles";
 import { skinBackgroundSummary, type SkinScene } from "./skin-backgrounds";
 import { skinSpecSummary } from "./skin-spec-tokens";
@@ -153,7 +159,15 @@ function withThumb(
     approvedStyleCode: entry.approvedStyleCode ?? null,
     industryRecipeId,
     thumbScene: entry.thumbScene ?? "cover",
-    thumbPack: industryRecipeId ? withIndustryGround(entry.pack, industryRecipeId) : entry.pack,
+    // Thumbnails must show what the slide actually renders: authored art plus
+    // any admin background tuning/uploads for this look.
+    thumbPack: industryRecipeId
+      ? reapplyBackgroundOverrides(
+          withIndustryGround(resolvedPack(entry.pack), industryRecipeId),
+          entry.pack.id,
+          { authoredArt: false },
+        )
+      : resolvedPack(entry.pack),
   };
 }
 
