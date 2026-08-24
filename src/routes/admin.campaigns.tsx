@@ -27,6 +27,9 @@ export const Route = createFileRoute("/admin/campaigns")({
 // Demo divisions — pull from taxonomy so we never fork palette.
 const DEMO_DIVISIONS = ["bm-tp-lifesci", "bm-tp-media"] as const;
 
+/** Uniform demo tile: the long edge of every preview scales into this box. */
+const PREVIEW_BOX = 260;
+
 const DEMO_EVENT: EventFacts = {
   name: "TransPerfect NEXT",
   subBrand: "bm-tp-lifesci",
@@ -294,7 +297,7 @@ function FormatRow({ format }: { format: SocialFormat }) {
           {format.kitId ? ` · kit ${format.kitId}` : ""}
         </div>
       </div>
-      <div className="text-right text-[11px] text-black/60">
+      <div className="shrink-0 text-right text-[11px] text-black/60">
         <div>
           {format.width}×{format.height}
         </div>
