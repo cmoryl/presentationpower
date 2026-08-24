@@ -4,6 +4,7 @@
 // or export anyway.
 
 import { useRef } from "react";
+import { createPortal } from "react-dom";
 import type { PreflightIssue } from "@/lib/export-preflight";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 
