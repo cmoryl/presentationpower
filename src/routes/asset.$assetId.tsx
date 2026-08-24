@@ -1221,11 +1221,49 @@ function AssetEditor() {
                     )}
                   </div>
 
+                  {/* Live export progress — rasterizing a print page can take
+                      tens of seconds per page, so show real stages, not a
+                      frozen button label. */}
+                  {exportBusy && (
+                    <div className="mt-3 rounded-xl border border-black/10 bg-white p-2.5 dark:border-white/15 dark:bg-white/[0.04]">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[11px] font-semibold text-[#03002C] dark:text-white">
+                          Building your file
+                        </span>
+                        <span className="text-[11px] font-medium text-[#003FC7] tabular-nums dark:text-[#A1FBF9]">
+                          {Math.round((exportProgress?.pct ?? 0) * 100)}%
+                        </span>
+                      </div>
+                      <div
+                        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E0E8F5] dark:bg-white/15"
+                        role="progressbar"
+                        aria-label="Export progress"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={Math.round((exportProgress?.pct ?? 0) * 100)}
+                      >
+                        <div
+                          className="h-full rounded-full bg-[#003FC7] transition-[width] duration-300 ease-out dark:bg-[#A1FBF9]"
+                          style={{
+                            width: `${Math.max(3, Math.round((exportProgress?.pct ?? 0) * 100))}%`,
+                          }}
+                        />
+                      </div>
+                      <p
+                        className="mt-1.5 text-[11px] leading-snug text-black/60 dark:text-white/60"
+                        aria-live="polite"
+                      >
+                        {exportProgress?.message ?? "Preparing pages…"}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="mt-3 flex items-center justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => setExportOpen(false)}
-                      className="rounded-full px-3 py-1 text-[11px] text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                      disabled={exportBusy}
+                      className="rounded-full px-3 py-1 text-[11px] text-black/60 hover:text-black disabled:opacity-40 dark:text-white/60 dark:hover:text-white"
                     >
                       Cancel
                     </button>
@@ -1235,7 +1273,9 @@ function AssetEditor() {
                       disabled={exportBusy}
                       className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] font-semibold text-[#03002C] disabled:opacity-40 dark:border-white/20 dark:bg-white/[0.06] dark:text-white"
                     >
-                      {exportBusy ? "Rendering…" : "Download PPTX"}
+                      {exportBusy
+                        ? `Rendering… ${Math.round((exportProgress?.pct ?? 0) * 100)}%`
+                        : "Download PPTX"}
                     </button>
                     <button
                       type="button"
@@ -1243,9 +1283,12 @@ function AssetEditor() {
                       disabled={exportBusy}
                       className="rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
                     >
-                      {exportBusy ? "Rendering…" : "Download PDF"}
+                      {exportBusy
+                        ? `Rendering… ${Math.round((exportProgress?.pct ?? 0) * 100)}%`
+                        : "Download PDF"}
                     </button>
                   </div>
+
                 </div>
               )}
             </div>
