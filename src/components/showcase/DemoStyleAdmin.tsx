@@ -98,9 +98,10 @@ export function DemoStyleAdmin({
     });
   }, [packId, effectiveRecipe, clearSlideBackgrounds, onDraftLook]);
 
-
   const dirty =
-    packId !== currentPack || (recipeId || "") !== (currentRecipe || "") || clearSlideBackgrounds;
+    packId !== currentPack ||
+    (effectiveRecipe || "") !== (currentRecipe || "") ||
+    clearSlideBackgrounds;
 
   function apply() {
     if (!validation.ok) return;
