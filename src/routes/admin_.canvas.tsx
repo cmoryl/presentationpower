@@ -733,6 +733,17 @@ function CanvasStudioPage() {
                 }
               />
             </div>
+            {/* Deck view: every other composition sits under the stage so a
+              multi-slide canvas deck is editable without hunting a menu. */}
+            <CanvasSlideStrip
+              compositions={compositions}
+              activeId={comp.id}
+              onSelect={setActive}
+              onAdd={() => createComposition("Untitled slide", brandId)}
+              onDuplicate={(id) => duplicateComposition(id)}
+              onDelete={(id) => deleteComposition(id)}
+            />
+
           </StylePackVars>
         </StylePackProvider>
       </LibraryPackProvider>
