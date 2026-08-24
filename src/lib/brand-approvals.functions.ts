@@ -262,6 +262,12 @@ export const decideApproval = createServerFn({ method: "POST" })
     const { isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
 
+    const { data: before } = await supabase
+      .from("approval_requests")
+      .select("status")
+      .eq("id", data.id)
+      .maybeSingle();
+
     const decided = data.status !== "pending";
     const { error } = await supabase
       .from("approval_requests")
@@ -273,6 +279,20 @@ export const decideApproval = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+      requestId: data.id,
+      actorId: userId,
+      kind:
+        data.status === "approved"
+          ? "approved"
+          : data.status === "changes_requested"
+            ? "changes_requested"
+            : "reopened",
+      fromStatus: before?.status ?? null,
+      toStatus: data.status,
+      note: data.note?.trim() || null,
+    });
 
     if (data.note?.trim()) {
       await supabase.from("approval_comments").insert({
@@ -287,6 +307,7 @@ export const decideApproval = createServerFn({ method: "POST" })
         }] ${data.note.trim()}`,
       });
     }
+
     await (await import("./notify-approvals.server")).notifyRequesters(
       [data.id],
       data.status === "approved" ? "approved" : "changes_requested",
