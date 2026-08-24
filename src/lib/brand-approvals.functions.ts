@@ -444,3 +444,62 @@ export const resolveApprovalComment = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- Audit timeline ----------
+
+export type ApprovalTimelineEvent = {
+  id: string;
+  kind: string;
+  from_status: string | null;
+  to_status: string | null;
+  note: string | null;
+  actor_id: string | null;
+  created_at: string;
+  meta: Record<string, unknown> | null;
+};
+
+/**
+ * Full audit trail for one subject (e.g. a deck): every state change, reviewer
+ * action and decision note, oldest first. Returns an empty list when the item
+ * has never been submitted.
+ */
+export const listApprovalTimeline = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ subjectType: SubjectType, subjectId: z.string().min(1).max(200) }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: req } = await supabase
+      .from("approval_requests")
+      .select("id, status, title, created_at, requested_by")
+      .eq("subject_type", data.subjectType)
+      .eq("subject_id", data.subjectId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (!req) return { request: null, events: [] as ApprovalTimelineEvent[], people: {} };
+
+    const { data: rows, error } = await supabase
+      .from("approval_events")
+      .select("id, kind, from_status, to_status, note, actor_id, created_at, meta")
+      .eq("request_id", req.id)
+      .order("created_at", { ascending: true })
+      .returns<ApprovalTimelineEvent[]>();
+    if (error) throw new Error(error.message);
+
+    const ids = Array.from(
+      new Set(
+        [req.requested_by, ...(rows ?? []).map((r) => r.actor_id)].filter(Boolean) as string[],
+      ),
+    );
+    let people: Record<string, string> = {};
+    if (ids.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", ids);
+      people = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
+    }
+    return { request: req, events: rows ?? [], people };
+  });
