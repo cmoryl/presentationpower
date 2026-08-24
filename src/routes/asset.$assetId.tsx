@@ -278,6 +278,11 @@ function AssetEditor() {
   const [fitMeasure, setFitMeasure] = useState<PrintFitMeasurement | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
+  // Live export progress (0..1 + stage message) shown while a PDF/PPTX renders.
+  const [exportProgress, setExportProgress] = useState<{ pct: number; message: string } | null>(
+    null,
+  );
+
   // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
   // back to ctx on every change via updateExportPref so a user's preset
   // survives reload and can be duplicated with the asset.
