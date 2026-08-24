@@ -13,8 +13,11 @@ import {
 } from "@/lib/print-library/catalog";
 import {
   PRINT_SECTION_MODULES,
+  PRINT_MODULE_FAMILY_ORDER,
   findPrintModule,
+  printModuleFamilyMeta,
   printModuleMatches,
+  type PrintModuleFamily,
 } from "@/lib/print-library/section-modules";
 import { toEditableContent, editableContextFor } from "@/lib/print-library/editable";
 import {
@@ -27,6 +30,14 @@ import {
 } from "@/lib/print-assets.types";
 
 export const PRINT_PROPOSAL_TOOL_NAME = "propose_print_piece";
+/** Reuse-first: ranked existing pieces the user can start from. */
+export const PRINT_SUGGEST_TOOL_NAME = "suggest_existing_pieces";
+/** Visual look & feel proposal — palette, hero imagery options, module plan. */
+export const PRINT_LOOK_TOOL_NAME = "propose_look_and_feel";
+/** The module/variation palette for a print kind. */
+export const PRINT_MODULES_TOOL_NAME = "list_module_variations";
+/** Renders a live, to-scale preview of the piece inside the chat. */
+export const PRINT_PREVIEW_TOOL_NAME = "preview_print_asset";
 
 const KindEnum = z.enum([
   "case-study",
@@ -36,6 +47,7 @@ const KindEnum = z.enum([
   "msa-partnership",
   "solution-proposal",
 ]);
+
 
 export type PrintToolContext = {
   supabase: SupabaseClient;
