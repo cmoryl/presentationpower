@@ -2,12 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { FileText, Layers, Megaphone, CalendarDays, LayoutGrid } from "lucide-react";
 
 export type BriefOutputsMasterSet = {
+  /** False when the brief never asked for a deck (the deck is just the spine). */
+  presentation?: boolean;
   eventPlaybookId?: string | null;
   socialPlaybookId?: string | null;
   printAssetIds?: string[];
   printAssets?: Array<{ id: string; kind: string; title: string }>;
   brandDivisionId?: string | null;
 };
+
 
 type Props = {
   /** Deck produced by the same brief (omit when the deck itself is unknown). */
