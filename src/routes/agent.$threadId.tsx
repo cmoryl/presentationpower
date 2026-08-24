@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { AgentScopeNotice } from "@/components/agent/AgentScopeNotice";
 import { consumeAgentPrompt } from "@/lib/agent-seed";
 import { AgentChat } from "@/components/agent/AgentChat";
 import { AgentDeckPreview } from "@/components/agent/AgentDeckPreview";
@@ -740,6 +741,10 @@ function AgentThreadPage() {
                 Loading conversation…
               </div>
             ) : (
+              <>
+              <div className="px-4 pb-3">
+                <AgentScopeNotice surface="presentation agent" />
+              </div>
               <AgentChat
                 key={threadId}
                 threadId={threadId}

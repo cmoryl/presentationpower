@@ -21,6 +21,7 @@ import {
   type KitSurface,
 } from "@/lib/kit-agent/threads";
 import { useKitThreadListSync } from "@/lib/kit-agent/sync";
+import { AgentScopeNotice } from "@/components/agent/AgentScopeNotice";
 import { AgentSignInGate } from "@/components/AgentSignInGate";
 
 const COPY: Record<
@@ -228,6 +229,11 @@ export function KitAgentWorkspace({
                     ))}
                   </div>
                 ) : null}
+                <div className="px-4 pb-3">
+                  <AgentScopeNotice
+                    surface={surface === "social" ? "social agent" : "events agent"}
+                  />
+                </div>
                 <div className="min-h-0 flex-1">
                   <KitAgentChat
                     surface={surface}
