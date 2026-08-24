@@ -6,6 +6,9 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 
+import { CreateOnlyNotice } from "@/components/access/CreateOnlyNotice";
+import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
+
 export type EditorRailTab = {
   id: string;
   label: string;
@@ -143,21 +146,35 @@ export function UnifiedEditorShell({
   rail: ReactNode;
   className?: string;
 }) {
+  // Sales-enablement / viewer accounts get a read-only frame: the stage still
+  // renders (present, review, export) but the authoring rails are inert.
+  const caps = useWorkspaceCapabilities();
+  const locked = caps.createOnly;
+  const lockProps = locked
+    ? { "aria-disabled": true, className: "pointer-events-none select-none opacity-55" }
+    : { className: "" };
+
   // Below `lg` the three zones stack: a 260px palette plus a 320px tool rail
   // cannot coexist with the stage at phone widths, so the rails become
   // full-width sections above/below the canvas instead of shoving it offscreen.
   return (
-    <div className={`flex flex-col gap-4 lg:flex-row ${className}`}>
-      {left ? (
-        <div
-          className="w-full min-w-0 shrink-0 lg:w-[var(--editor-left-w)]"
-          style={{ "--editor-left-w": `${leftWidth}px` } as CSSProperties}
-        >
-          {left}
+    <div className="flex flex-col gap-4">
+      {locked ? <CreateOnlyNotice /> : null}
+      <div className={`flex flex-col gap-4 lg:flex-row ${className}`}>
+        {left ? (
+          <div
+            {...lockProps}
+            className={`w-full min-w-0 shrink-0 lg:w-[var(--editor-left-w)] ${lockProps.className}`}
+            style={{ "--editor-left-w": `${leftWidth}px` } as CSSProperties}
+          >
+            {left}
+          </div>
+        ) : null}
+        <div className="flex min-w-0 flex-1 flex-col">{center}</div>
+        <div {...lockProps} className={`min-w-0 max-w-full ${lockProps.className}`}>
+          {rail}
         </div>
-      ) : null}
-      <div className="flex min-w-0 flex-1 flex-col">{center}</div>
-      <div className="min-w-0 max-w-full">{rail}</div>
+      </div>
     </div>
   );
 }

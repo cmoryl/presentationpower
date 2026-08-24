@@ -18,7 +18,9 @@ import { createPrintAssetWithBrief } from "@/lib/print-assets.functions";
 import { saveKit } from "@/lib/kits.functions";
 import { normalizeLook } from "@/lib/look-validate";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
+import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 import {
+  isAdminPreset,
   quickCreatePresets,
   type QuickCreateKind,
   type QuickCreatePreset,
@@ -39,7 +41,11 @@ const KIND_LABEL: Record<QuickCreateKind, string> = {
 };
 
 export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; signedIn: boolean }) {
-  const presets = useMemo(() => quickCreatePresets(personaId), [personaId]);
+  const caps = useWorkspaceCapabilities();
+  const presets = useMemo(
+    () => quickCreatePresets(personaId, { includeAdminPresets: caps.canUseAdminPresets }),
+    [personaId, caps.canUseAdminPresets],
+  );
   const theme = personaTheme(personaId);
   const { brandModes } = useTaxonomy();
   const navigate = useNavigate();
@@ -163,6 +169,9 @@ export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; sig
           <p className="mt-1 max-w-xl text-sm text-black/60 dark:text-white/60">
             Every card seeds the correct template set, applies a validated look and drops you into
             the editor — no blank canvas.
+            {caps.canUseAdminPresets
+              ? " Cards marked Admin are extra preset sets only admins can start on a sales user's behalf."
+              : ""}
           </p>
         </div>
         <label className="flex items-center gap-2 text-sm">
@@ -207,6 +216,11 @@ export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; sig
                   <Icon className="size-3.5" aria-hidden />
                   {KIND_LABEL[preset.kind]}
                 </span>
+                {isAdminPreset(preset) ? (
+                  <span className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-black/55 dark:border-white/25 dark:text-white/60">
+                    Admin
+                  </span>
+                ) : null}
                 {running ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
               </span>
               <span className="mt-3 text-base font-semibold tracking-tight">{preset.label}</span>
