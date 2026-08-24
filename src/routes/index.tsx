@@ -1307,17 +1307,28 @@ function RecentActivity({
     [decks, briefs],
   );
 
+  // Approved final creations only. Each item must carry an approved decision,
+  // and the timestamp shown is the approval date, not the last edit.
+  const approvedItems = useMemo(() => {
+    if (!approved) return [] as ActivityItem[];
+    const rawId = (item: ActivityItem) => item.id.replace(/^(deck|print|kit)-/, "");
+    return [...deckItems, ...printItems, ...kitItems].flatMap((item) => {
+      const at = approved.get(`${item.kind}:${rawId(item)}`);
+      return at === undefined ? [] : [{ ...item, at: at || item.at }];
+    });
+  }, [approved, deckItems, printItems, kitItems]);
+
   const items = useMemo(() => {
-    const all = [...deckItems, ...printItems, ...kitItems];
-    const scoped = filter === "all" ? all : all.filter((i) => i.kind === filter);
+    const scoped =
+      filter === "all" ? approvedItems : approvedItems.filter((i) => i.kind === filter);
     return scoped.sort((a, b) => (b.at ?? "").localeCompare(a.at ?? "")).slice(0, 9);
-  }, [deckItems, printItems, kitItems, filter]);
+  }, [approvedItems, filter]);
 
   const counts: Record<ActivityKind, number> = {
-    deck: allDeckCount,
-    print: printItems.length,
-    social: kitItems.filter((k) => k.kind === "social").length,
-    event: kitItems.filter((k) => k.kind === "event").length,
+    deck: approvedItems.filter((i) => i.kind === "deck").length,
+    print: approvedItems.filter((i) => i.kind === "print").length,
+    social: approvedItems.filter((i) => i.kind === "social").length,
+    event: approvedItems.filter((i) => i.kind === "event").length,
   };
 
   const chips: { id: "all" | ActivityKind; label: string; count?: number }[] = [
@@ -1334,9 +1345,14 @@ function RecentActivity({
         <SectionHeader
           kicker="Workspace"
           title="Recent activity"
-          hint="Decks, print, social, and events"
+          hint={
+            scope === "workspace"
+              ? "Approved final decks, print, social, and events across the workspace"
+              : "Approved final work you submitted"
+          }
           inline
         />
+
         <Link
           to="/decks"
           className="inline-flex min-h-11 items-center text-sm text-black/60 hover:text-black sm:min-h-0 dark:text-white/60 dark:hover:text-white"
