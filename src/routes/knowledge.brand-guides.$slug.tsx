@@ -42,6 +42,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Download } from "lucide-react";
+import { toast } from "sonner";
+import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: ({ params }) => {
