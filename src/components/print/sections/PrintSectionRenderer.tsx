@@ -1,6 +1,7 @@
 // Dispatch a `PrintSection` block to its portrait-native renderer. Any print
 // layout can render `content.modules?` by mapping through this component.
 import type { PrintHeroModuleVariant, PrintSection } from "@/lib/print-assets.types";
+import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { cq, MODULE } from "./shared";
 import {
   HeroPhotoBand,
@@ -429,6 +430,9 @@ export function PrintSectionsStack({
   // masthead hero that bleeds to the trim still sits flush at the top.
   const rhythm = MODULE.stack * (density === "compact" ? 0.72 : density === "airy" ? 1.28 : 1);
   return (
+    // Modules draw brand-coloured glyphs; the stack tells them which sheet
+    // they are on so those strokes stay readable in dark mode.
+    <PrintSurfaceProvider mode={mode}>
     <div
       data-print-module-stack
       style={{ display: "flex", flexDirection: "column", rowGap: cq(rhythm) }}
@@ -444,6 +448,7 @@ export function PrintSectionsStack({
         </div>
       ))}
     </div>
+    </PrintSurfaceProvider>
   );
 }
 
