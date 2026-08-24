@@ -1881,8 +1881,9 @@ function BriefCommandCenter() {
                       {assetVersions.map((v) => (
                         <Link
                           key={v.id}
-                          to="/decks/$deckId"
+                          to="/brief/$deckId"
                           params={{ deckId: v.deckId }}
+
                           title={`${v.matched.join(", ") || "Asset"} · ${new Date(v.createdAt).toLocaleString()}`}
                           className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-[#03002C] transition hover:border-[#003FC7]/50 hover:text-[#003FC7]"
                         >
