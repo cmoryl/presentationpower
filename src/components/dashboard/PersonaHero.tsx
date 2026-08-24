@@ -68,7 +68,7 @@ export function PersonaHero({
           color: theme.onHero,
         } as React.CSSProperties
       }
-      className="relative isolate mt-6 overflow-hidden rounded-[28px] px-5 py-7 sm:px-8 sm:py-10"
+      className="full-bleed relative isolate mt-6 overflow-hidden border-y border-white/10 py-9 sm:py-12"
     >
       {/* Pointer glow + authored orbs */}
       <div
