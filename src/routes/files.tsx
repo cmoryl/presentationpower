@@ -353,6 +353,59 @@ function MyFilesPage() {
           </span>
         </div>
 
+        {/* ============ BULK ACTIONS ============ */}
+        {filtered.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-2 text-xs shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+            <label className="inline-flex cursor-pointer items-center gap-2 font-medium">
+              <input
+                type="checkbox"
+                className="size-4 accent-[#003FC7]"
+                checked={allVisibleSelected}
+                onChange={(e) =>
+                  setSelected(e.target.checked ? new Set(filtered.map(keyOf)) : new Set())
+                }
+                aria-label="Select all visible files"
+              />
+              Select all ({filtered.length})
+            </label>
+            <span className="text-black/50 dark:text-white/50">
+              {visibleSelected.length} selected
+            </span>
+            {visibleSelected.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSelected(new Set())}
+                  className="rounded-full border border-black/15 px-3 py-1 font-medium hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/10"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  disabled={bulkDelete.isPending}
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        `Delete ${visibleSelected.length} ${visibleSelected.length === 1 ? "file" : "files"}? This can’t be undone.`,
+                      )
+                    )
+                      bulkDelete.mutate(visibleSelected);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                >
+                  {bulkDelete.isPending ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={12} />
+                  )}
+                  Delete selected
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+
         <div className="mt-6">
           {isLoading && (
             <div className="flex items-center gap-2 text-sm text-black/60">
