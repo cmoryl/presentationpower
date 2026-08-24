@@ -160,12 +160,12 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
       Math.min(
         exportSlideBounds().hIn,
         run.singleLine && run.letterSpacingPx > 0
-          ? Math.max(inY(run.h) + 0.02, (size * 1.45) / 72)
+          ? Math.max(inY(run.h) + 0.02, (sizeOut * 1.45) / 72)
           : inY(run.h) + 0.02,
       ),
     ),
 
-    fontSize: r1(size),
+    fontSize: r1(sizeOut),
     fontFace: run.fontFamily,
     bold: run.bold,
     italic: run.italic,
@@ -174,8 +174,9 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     transparency: run.transparency > 0 ? run.transparency : undefined,
     align,
     valign: run.valign,
-    lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx)) : undefined,
-    charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx)) : undefined,
+    lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx) * fit) : undefined,
+    charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx) * fit) : undefined,
+
     // A no-wrap body (`wrap="none"`) makes some renderers lay the string out at its
     // UNTRACKED width and clip the tail once `spc` widens it — letter-spaced
     // eyebrows and footers lost their last ~25% of characters ("CONFIDENTIAL ·
