@@ -1905,7 +1905,16 @@ export function reapplyBackgroundOverrides(
 
 /** Every selectable look including admin-authored templates. */
 export function allSelectablePacks(): StylePack[] {
-  return [...ALL_STYLE_PACKS, ...customTemplatePacks()];
+  // Resolve each pack through `stylePackById` so authored plate kits AND admin
+  // background tuning/uploads are baked into every list surface (look studio,
+  // pickers, thumbnails). Raw registry packs paint the untouched ground, which
+  // is why a replaced cover looked like it "didn't save".
+  return [...ALL_STYLE_PACKS, ...customTemplatePacks()].map((p) => stylePackById(p.id) ?? p);
+}
+
+/** One pack, resolved with authored art + admin background overrides applied. */
+export function resolvedPack(pack: StylePack): StylePack {
+  return stylePackById(pack.id) ?? pack;
 }
 
 /* ── page layout designs, per composition ────────────────────────────────
