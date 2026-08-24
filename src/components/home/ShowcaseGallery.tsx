@@ -7,9 +7,17 @@
 // SocialRenderer previews from the same playbook data /events/demo and
 // /social/demo use. Hyper-real photography backs every card.
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarDays, Presentation, Printer, Share2 } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Presentation,
+  Printer,
+  Share2,
+} from "lucide-react";
 
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
@@ -130,8 +138,9 @@ export function ShowcaseGallery() {
         </div>
       </div>
 
+      {/* Top line — the hero pair, full size. */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {SHOWCASE_DECKS.map((d, i) => (
+        {SHOWCASE_DECKS.slice(0, 2).map((d, i) => (
           <MediaCard
             key={d.id}
             feature={i === 0}
@@ -151,27 +160,132 @@ export function ShowcaseGallery() {
             ]}
           />
         ))}
+      </div>
+
+      {/* Second line — everything else, as a horizontal scroll rail. */}
+      <ScrollRail count={SHOWCASE_DECKS.length - 2 + PRINT_DEMOS.length + SHOWCASE.length}>
+        {SHOWCASE_DECKS.slice(2).map((d) => (
+          <RailItem key={d.id}>
+            <MediaCard
+              compact
+              to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
+              art={showcaseArt(d.id).src}
+              artAlt={showcaseArt(d.id).alt}
+              accent={d.accent}
+              icon={<Presentation size={12} />}
+              label={`Deck · ${d.eyebrow}`}
+              title={d.name}
+              blurb={d.blurb}
+              pills={[`${d.build().slides.length} slides`, "PPTX + PDF"]}
+            />
+          </RailItem>
+        ))}
 
         {PRINT_DEMOS.map((p) => (
-          <MediaCard
-            key={p.id}
-            to={{ to: "/demo/print/$demoId", params: { demoId: p.id } }}
-            art={showcaseArt(p.id).src}
-            artAlt={showcaseArt(p.id).alt}
-            accent={p.accent}
-            icon={<Printer size={12} />}
-            label={`Print · ${p.eyebrow}`}
-            title={p.name}
-            blurb={p.blurb}
-            pills={[...p.pills]}
-          />
+          <RailItem key={p.id}>
+            <MediaCard
+              compact
+              to={{ to: "/demo/print/$demoId", params: { demoId: p.id } }}
+              art={showcaseArt(p.id).src}
+              artAlt={showcaseArt(p.id).alt}
+              accent={p.accent}
+              icon={<Printer size={12} />}
+              label={`Print · ${p.eyebrow}`}
+              title={p.name}
+              blurb={p.blurb}
+              pills={p.pills.slice(0, 2)}
+            />
+          </RailItem>
         ))}
 
         {SHOWCASE.map((entry) => (
-          <ShowcaseCard key={entry.id} entry={entry} />
+          <RailItem key={entry.id}>
+            <ShowcaseCard entry={entry} compact />
+          </RailItem>
         ))}
-      </div>
+      </ScrollRail>
     </section>
+  );
+}
+
+/* ---------------- horizontal scroll rail ---------------- */
+
+function RailItem({ children }: { children: React.ReactNode }) {
+  return <div className="w-[264px] shrink-0 snap-start sm:w-[292px]">{children}</div>;
+}
+
+function ScrollRail({ children, count }: { children: React.ReactNode; count: number }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  // Vertical mouse wheel over the rail scrolls it horizontally, and we only
+  // swallow the gesture while there is still track left in that direction.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      const max = el.scrollWidth - el.clientWidth;
+      if (max <= 1) return;
+      const next = el.scrollLeft + e.deltaY;
+      if ((e.deltaY < 0 && el.scrollLeft <= 0) || (e.deltaY > 0 && el.scrollLeft >= max - 1)) return;
+      e.preventDefault();
+      el.scrollLeft = Math.max(0, Math.min(max, next));
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
+
+  const nudge = (dir: -1 | 1) => {
+    const el = ref.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(280, el.clientWidth * 0.8), behavior: "smooth" });
+  };
+
+  return (
+    <div className="mt-4">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="text-[11px] text-black/50 dark:text-white/50">
+          {count} more finished demos — scroll across
+        </div>
+        <div className="flex items-center gap-2">
+          <RailButton label="Scroll left" onClick={() => nudge(-1)}>
+            <ChevronLeft size={16} strokeWidth={1.75} />
+          </RailButton>
+          <RailButton label="Scroll right" onClick={() => nudge(1)}>
+            <ChevronRight size={16} strokeWidth={1.75} />
+          </RailButton>
+        </div>
+      </div>
+      <div className="relative">
+        <div
+          ref={ref}
+          className="tp-no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2"
+        >
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RailButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className="grid h-9 w-9 place-items-center rounded-full border border-black/12 text-[#03002C] transition hover:bg-black/5 dark:border-white/15 dark:text-white dark:hover:bg-white/10"
+    >
+      {children}
+    </button>
   );
 }
 
@@ -193,6 +307,7 @@ function MediaCard({
   blurb,
   pills,
   feature = false,
+  compact = false,
 }: {
   to: CardLink;
   art: string;
@@ -205,6 +320,8 @@ function MediaCard({
   pills: string[];
   /** Feature cards span two columns with a taller, cinematic art plate. */
   feature?: boolean;
+  /** Compact cards live in the horizontal rail: shorter plate, tighter copy. */
+  compact?: boolean;
 }) {
   const linkProps = to as unknown as React.ComponentProps<typeof Link>;
   return (
@@ -215,7 +332,9 @@ function MediaCard({
       }`}
     >
       <div
-        className={`relative overflow-hidden ${feature ? "h-[300px] sm:h-[360px]" : "h-[230px]"}`}
+        className={`relative overflow-hidden ${
+          feature ? "h-[300px] sm:h-[360px]" : compact ? "h-[148px]" : "h-[230px]"
+        }`}
       >
         <img
           src={art}
@@ -241,7 +360,7 @@ function MediaCard({
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className={`flex flex-1 flex-col gap-2 ${compact ? "p-4" : "p-5"}`}>
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
           <span
             className="grid h-6 w-6 place-items-center rounded-lg text-white"
@@ -267,13 +386,27 @@ function MediaCard({
         >
           {title}
         </div>
-        <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">{blurb}</p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3 text-[11px] text-black/55 dark:text-white/55">
+        <p
+          className={`text-xs leading-relaxed text-black/60 dark:text-white/60 ${
+            compact ? "line-clamp-2" : ""
+          }`}
+        >
+          {blurb}
+        </p>
+        <div
+          className={`mt-auto flex flex-wrap items-center gap-1.5 text-[11px] text-black/55 dark:text-white/55 ${
+            compact ? "pt-2" : "pt-3"
+          }`}
+        >
           {pills.map((p) => (
             <Pill key={p}>{p}</Pill>
           ))}
         </div>
-        <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
+        <div
+          className={`inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9] ${
+            compact ? "mt-2" : "mt-3"
+          }`}
+        >
           Open full example{" "}
           <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
         </div>
@@ -284,7 +417,7 @@ function MediaCard({
 
 /* ---------------- live-rendered social / event cards ---------------- */
 
-function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
+function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compact?: boolean }) {
   const meta = SURFACE_META[entry.surface];
   const Icon = meta.icon;
 
@@ -345,7 +478,11 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
       {...href}
       className="group flex flex-col overflow-hidden rounded-3xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
     >
-      <div className="relative flex h-[230px] items-center justify-center overflow-hidden p-4">
+      <div
+        className={`relative flex items-center justify-center overflow-hidden p-4 ${
+          compact ? "h-[148px]" : "h-[230px]"
+        }`}
+      >
         <img
           src={showcaseArt(entry.id).src}
           alt=""
@@ -366,8 +503,8 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
           <AssetPreviewFrame
             width={hero.format.width}
             height={hero.format.height}
-            maxShortEdge={210}
-            maxHeight={198}
+            maxShortEdge={compact ? 150 : 210}
+            maxHeight={compact ? 122 : 198}
           >
             {(displayShortEdge) => (
               <SocialRenderer
@@ -384,7 +521,7 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className={`flex flex-1 flex-col gap-2 ${compact ? "p-4" : "p-5"}`}>
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
           <span
             className="grid h-6 w-6 place-items-center rounded-lg text-white"
@@ -396,14 +533,28 @@ function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
           {meta.label} · {built.chip}
         </div>
         <div className="text-base font-semibold text-[#03002C] dark:text-white">{built.name}</div>
-        <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">{entry.blurb}</p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3 text-[11px] text-black/55 dark:text-white/55">
+        <p
+          className={`text-xs leading-relaxed text-black/60 dark:text-white/60 ${
+            compact ? "line-clamp-2" : ""
+          }`}
+        >
+          {entry.blurb}
+        </p>
+        <div
+          className={`mt-auto flex flex-wrap items-center gap-1.5 text-[11px] text-black/55 dark:text-white/55 ${
+            compact ? "pt-2" : "pt-3"
+          }`}
+        >
           <Pill>{built.assets.length} rendered sizes</Pill>
-          <Pill>{built.deliverables} deliverables</Pill>
+          {compact ? null : <Pill>{built.deliverables} deliverables</Pill>}
           <Pill>{built.phases} phases</Pill>
-          {built.photo ? <Pill>Photography</Pill> : null}
+          {built.photo && !compact ? <Pill>Photography</Pill> : null}
         </div>
-        <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
+        <div
+          className={`inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9] ${
+            compact ? "mt-2" : "mt-3"
+          }`}
+        >
           Open full example{" "}
           <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
         </div>
