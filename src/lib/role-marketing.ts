@@ -364,7 +364,7 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
   sales: {
     id: "sales",
     nav: "For sales",
-    eyebrow: "Element for Sales Enablement",
+    eyebrow: "Element for Sales",
     headline: ["Client-ready", "in minutes, not days."],
     sub: "Describe the meeting and get a real pitch deck — the right narrative, the right proof points, the client's logo, your division's look — editable in PowerPoint and already through brand review.",
     primary: { label: "Build a deck with the agent", to: "/agent" },
