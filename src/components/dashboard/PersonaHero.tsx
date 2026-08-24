@@ -68,7 +68,7 @@ export function PersonaHero({
           color: theme.onHero,
         } as React.CSSProperties
       }
-      className="relative isolate mt-6 overflow-hidden rounded-[28px] px-5 py-7 sm:px-8 sm:py-10"
+      className="full-bleed relative isolate mt-6 overflow-hidden border-y border-white/10 py-9 sm:py-12"
     >
       {/* Pointer glow + authored orbs */}
       <div
@@ -89,7 +89,7 @@ export function PersonaHero({
         style={{ background: `${theme.accent}33` }}
       />
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="min-w-0">
           <p
             className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]"
