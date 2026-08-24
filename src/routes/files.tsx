@@ -191,6 +191,45 @@ function MyFilesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // ---- Bulk selection ------------------------------------------------------
+  // Keys are `${kind}:${id}` so the same numeric id in two tables never clashes.
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const keyOf = (f: MyFile) => `${f.kind}:${f.id}`;
+  const toggleOne = (f: MyFile) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const k = keyOf(f);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
+  const visibleSelected = filtered.filter((f) => selected.has(keyOf(f)));
+  const allVisibleSelected = filtered.length > 0 && visibleSelected.length === filtered.length;
+
+  const bulkDelete = useMutation({
+    mutationFn: async (files: MyFile[]) => {
+      let ok = 0;
+      const failures: string[] = [];
+      for (const f of files) {
+        try {
+          await delFn({ data: { kind: f.kind, id: f.id } });
+          ok += 1;
+        } catch (e) {
+          failures.push(`${f.title}: ${(e as Error).message}`);
+        }
+      }
+      return { ok, failures };
+    },
+    onSuccess: ({ ok, failures }) => {
+      if (ok > 0) toast.success(`${ok} ${ok === 1 ? "file" : "files"} deleted`);
+      if (failures.length > 0) toast.error(`${failures.length} could not be deleted`);
+      setSelected(new Set());
+      queryClient.invalidateQueries({ queryKey: ["my-files"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   return (
     <AppShell>
       <div>
@@ -314,6 +353,59 @@ function MyFilesPage() {
           </span>
         </div>
 
+        {/* ============ BULK ACTIONS ============ */}
+        {filtered.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-black/10 bg-white px-3 py-2 text-xs shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+            <label className="inline-flex cursor-pointer items-center gap-2 font-medium">
+              <input
+                type="checkbox"
+                className="size-4 accent-[#003FC7]"
+                checked={allVisibleSelected}
+                onChange={(e) =>
+                  setSelected(e.target.checked ? new Set(filtered.map(keyOf)) : new Set())
+                }
+                aria-label="Select all visible files"
+              />
+              Select all ({filtered.length})
+            </label>
+            <span className="text-black/50 dark:text-white/50">
+              {visibleSelected.length} selected
+            </span>
+            {visibleSelected.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSelected(new Set())}
+                  className="rounded-full border border-black/15 px-3 py-1 font-medium hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/10"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  disabled={bulkDelete.isPending}
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        `Delete ${visibleSelected.length} ${visibleSelected.length === 1 ? "file" : "files"}? This can’t be undone.`,
+                      )
+                    )
+                      bulkDelete.mutate(visibleSelected);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                >
+                  {bulkDelete.isPending ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Trash2 size={12} />
+                  )}
+                  Delete selected
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+
         <div className="mt-6">
           {isLoading && (
             <div className="flex items-center gap-2 text-sm text-black/60">
@@ -415,12 +507,18 @@ function MyFilesPage() {
               <FileCard
                 key={`${f.kind}:${f.id}`}
                 file={f}
+                selected={selected.has(keyOf(f))}
+                onToggleSelect={() => toggleOne(f)}
                 onDelete={() => {
                   if (window.confirm(`Delete “${f.title}”? This can’t be undone.`))
                     delMutation.mutate(f);
                 }}
-                deleting={delMutation.isPending && delMutation.variables?.id === f.id}
+                deleting={
+                  (delMutation.isPending && delMutation.variables?.id === f.id) ||
+                  (bulkDelete.isPending && selected.has(keyOf(f)))
+                }
               />
+
             ))}
           </div>
         </div>
@@ -433,18 +531,36 @@ function FileCard({
   file,
   onDelete,
   deleting,
+  selected,
+  onToggleSelect,
 }: {
   file: MyFile;
   onDelete: () => void;
   deleting: boolean;
+  selected: boolean;
+  onToggleSelect: () => void;
 }) {
   const meta = KIND_META[file.kind];
   const Icon = meta.icon;
   return (
-    <div className="group relative flex items-start gap-3 rounded-2xl border border-black/10 bg-white p-4 shadow-sm transition hover:border-[#003FC7]/40 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]">
+    <div
+      className={`group relative flex items-start gap-3 rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md dark:bg-white/[0.04] ${
+        selected
+          ? "border-[#003FC7] ring-2 ring-[#003FC7]/20"
+          : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/10"
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={selected}
+        onChange={onToggleSelect}
+        aria-label={`Select ${file.title}`}
+        className="mt-1 size-4 shrink-0 cursor-pointer accent-[#003FC7]"
+      />
       <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${meta.tint}`}>
         <Icon size={16} />
       </div>
+
       <div className="min-w-0 flex-1">
         <Link
           to={file.href}
