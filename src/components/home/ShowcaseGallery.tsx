@@ -307,6 +307,7 @@ function MediaCard({
   blurb,
   pills,
   feature = false,
+  compact = false,
 }: {
   to: CardLink;
   art: string;
