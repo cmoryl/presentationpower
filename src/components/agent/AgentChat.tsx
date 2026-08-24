@@ -79,7 +79,9 @@ export function AgentChat({
   });
 
   const [input, setInput] = useState("");
+  const { docs, setDocs } = useAgentDocuments();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const busy = status === "submitted" || status === "streaming";
   const seenDeck = useRef<string | null>(null);
