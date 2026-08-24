@@ -6,15 +6,22 @@
 // demo override for the current demo + division with a new style pack and/or
 // background recipe — exactly what every visitor then sees on this page.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Check, Paintbrush, RotateCcw } from "lucide-react";
 
 import type { TemplatePayload } from "@/lib/deck-store";
 import { DESIGN_SKINS, INDUSTRY_RECIPES } from "@/lib/design-skins";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
-import { skinPackId } from "@/lib/design-skin-pack";
+import { skinCodeFromPackId, isSkinPackId, skinPackId } from "@/lib/design-skin-pack";
 import { validateLook } from "@/lib/look-validate";
 import { usePublishDemoOverride, useResetDemoOverride, type DemoKind } from "@/lib/demo-overrides";
+
+/** The look the panel is currently previewing (not yet published). */
+export type DemoDraftLook = {
+  stylePackId: string | null;
+  designRecipeId: string | null;
+  clearSlideBackgrounds: boolean;
+};
 
 type Props = {
   demoKind: DemoKind;
@@ -23,7 +30,16 @@ type Props = {
   divisionLabel: string;
   payload: TemplatePayload;
   hasOverride: boolean;
+  /** Lifts the in-progress look up so the rendered preview repaints live. */
+  onDraftLook?: (look: DemoDraftLook) => void;
 };
+
+/** True when the pack carries its own authored ground (R industry, S29/S30). */
+function packOwnsGround(packId: string): boolean {
+  if (!packId || !isSkinPackId(packId)) return false;
+  const code = skinCodeFromPackId(packId);
+  return Boolean(code && (/^R\d{2}$/.test(code) || code === "S29" || code === "S30"));
+}
 
 export function DemoStyleAdmin({
   demoKind,
@@ -32,6 +48,7 @@ export function DemoStyleAdmin({
   divisionLabel,
   payload,
   hasOverride,
+  onDraftLook,
 }: Props) {
   const ctx = (payload.context ?? {}) as Record<string, unknown>;
   const currentPack = (ctx["stylePackId"] as string | undefined) ?? "";
@@ -53,17 +70,34 @@ export function DemoStyleAdmin({
     [],
   );
 
-  // Guard against mismatched pairings (R-only looks, an industry ground on an
-  // industry/product language, another sector's plates) before publishing.
+  // Languages that ship their own ground can't also wear an R family. Rather
+  // than stacking red rows for a combination the panel already knows is wrong,
+  // the ground select simply switches off and the value is dropped.
+  const groundLocked = packOwnsGround(packId);
+  const effectiveRecipe = groundLocked || !packId ? "" : recipeId;
+
+  // Guard against mismatched pairings before publishing. Because the structural
+  // conflicts are now prevented in the UI, what's left here is art-direction
+  // advice (one warning at most).
   const validation = useMemo(
     () =>
       validateLook({
         stylePackId: packId || null,
-        designRecipeId: recipeId || null,
+        designRecipeId: effectiveRecipe || null,
         industry: (payload.brief?.industry as string | undefined) ?? divisionLabel,
       }),
-    [packId, recipeId, payload.brief?.industry, divisionLabel],
+    [packId, effectiveRecipe, payload.brief?.industry, divisionLabel],
   );
+
+  // Repaint the rendered preview from the draft look, before publishing.
+  useEffect(() => {
+    onDraftLook?.({
+      stylePackId: packId || null,
+      designRecipeId: effectiveRecipe || null,
+      clearSlideBackgrounds,
+    });
+  }, [packId, effectiveRecipe, clearSlideBackgrounds, onDraftLook]);
+
 
   const dirty =
     packId !== currentPack || (recipeId || "") !== (currentRecipe || "") || clearSlideBackgrounds;
