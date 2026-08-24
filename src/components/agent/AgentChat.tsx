@@ -122,10 +122,12 @@ export function AgentChat({
         ...(dna ? { designDna: dna } : {}),
         ...(designOverrides ? { designOverrides } : {}),
       };
-      void sendMessage({ text: value }, Object.keys(body).length ? { body } : undefined);
+      const withDocs = withDocumentContext(value, docs);
+      void sendMessage({ text: withDocs }, Object.keys(body).length ? { body } : undefined);
     },
-    [busy, messages.length, onFirstUserMessage, sendMessage, threadId],
+    [busy, docs, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
+
 
   // The newest outline proposal is the only one that still offers actions.
   const lastOutlineMessage = useMemo(() => {
