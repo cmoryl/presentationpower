@@ -31,11 +31,8 @@ const CheckSchema = z.object({
 const SubjectType = z.enum(APPROVAL_SUBJECT_TYPES);
 const Status = z.enum(APPROVAL_STATUSES);
 
-type AuthedSupabase = Parameters<
-  Parameters<ReturnType<typeof requireSupabaseAuth>["server"]>[0]["next"]
-> extends never
-  ? never
-  : never;
+// Structural type: just enough of the authed client to read the caller's roles.
+
 
 async function reviewerFlags(
   supabase: {
