@@ -18,6 +18,7 @@ import {
   heroTitleFontPx,
   heroTitleStyle,
 } from "@/components/print/sections/hero/hero-style";
+import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
@@ -110,351 +111,356 @@ export function EBrochureLayout({
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
-        <div
-          className="relative w-full overflow-hidden [container-type:inline-size]"
-          data-print-page
-          style={{
-            aspectRatio: pageAspect(pageSize),
-            backgroundColor: mode === "light" ? "#FFFFFF" : bg,
-            color: ink,
-            fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-            ...style,
-          }}
-        >
-          {mode === "light" && (
-            <div
-              className="pointer-events-none absolute inset-0"
-              aria-hidden
-              style={{ background: "#FFFFFF", zIndex: 0 }}
-            />
-          )}
-          {content.heroMedia ? (
-            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          ) : null}
-
+        {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+        <PrintSurfaceProvider mode={mode}>
           <div
-            className="relative flex h-full flex-col"
+            className="relative w-full overflow-hidden [container-type:inline-size]"
+            data-print-page
             style={{
-              paddingLeft: padCq(padX(density)),
-              paddingRight: padCq(padX(density)),
-              paddingTop: cq(padTop(density)),
-              paddingBottom: cq(26),
+              aspectRatio: pageAspect(pageSize),
+              backgroundColor: mode === "light" ? "#FFFFFF" : bg,
+              color: ink,
+              fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
+              ...style,
             }}
           >
-            {/* HEADER */}
-            <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
-              <PrintEyebrow
-                label={content.eyebrow ?? "EBROCHURE"}
-                mode={mode}
-                accent={accent}
-                cq={cq}
+            {mode === "light" && (
+              <div
+                className="pointer-events-none absolute inset-0"
+                aria-hidden
+                style={{ background: "#FFFFFF", zIndex: 0 }}
               />
-              <BrandLockup
-                unit={cq}
-                brand={brand}
-                color={mode === "dark" ? "#FFFFFF" : "#000000"}
-                size="xs"
-                orientation="horizontal"
-                monochromeOfficialLogo
-              />
-            </div>
+            )}
+            {content.heroMedia ? (
+              <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+            ) : null}
 
-            {/* HERO — title + summary. Reserve hero band height when a photo
-                is present so the summary cards drop into the fade seam. */}
             <div
+              className="relative flex h-full flex-col"
               style={{
-                paddingTop: cq(22),
-                minHeight: content.heroMedia?.imageUrl
-                  ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${cq(padTop(density))})`
-                  : undefined,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
+                paddingLeft: padCq(padX(density)),
+                paddingRight: padCq(padX(density)),
+                paddingTop: cq(padTop(density)),
+                paddingBottom: cq(26),
               }}
             >
+              {/* HEADER */}
+              <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
+                <PrintEyebrow
+                  label={content.eyebrow ?? "EBROCHURE"}
+                  mode={mode}
+                  accent={accent}
+                  cq={cq}
+                />
+                <BrandLockup
+                  unit={cq}
+                  brand={brand}
+                  color={mode === "dark" ? "#FFFFFF" : "#000000"}
+                  size="xs"
+                  orientation="horizontal"
+                  monochromeOfficialLogo
+                />
+              </div>
+
+              {/* HERO — title + summary. Reserve hero band height when a photo
+                is present so the summary cards drop into the fade seam. */}
               <div
                 style={{
-                  transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
-                  willChange: "transform",
+                  paddingTop: cq(22),
+                  minHeight: content.heroMedia?.imageUrl
+                    ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${cq(padTop(density))})`
+                    : undefined,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
                 }}
               >
                 <div
                   style={{
-                    ...heroRuleTop(heroStyle, accent, 0),
-                    marginBottom: content.heroRule?.weight ? heroRuleGap(heroStyle, 12) : undefined,
-                  }}
-                />
-                <div
-                  ref={heroRef}
-                  style={{
-                    margin: 0,
-                    fontWeight: 700,
-                    fontSize: cq(titlePx),
-                    lineHeight: 1.16,
-                    letterSpacing: "-0.015em",
-                    color: ink,
-                    maxWidth: cq(440),
-                    ...heroTitleStyle(heroStyle),
+                    transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
+                    willChange: "transform",
                   }}
                 >
-                  {content.title || "Untitled brochure"}
-                </div>
-                {content.summary && (
-                  <p
-                    ref={introRef}
+                  <div
                     style={{
-                      margin: `${cq(12)} 0 0`,
-                      fontSize: cq(summaryPx),
-                      lineHeight: 1.65,
-                      color: inkSoft,
-                      maxWidth: cq(430),
-                      ...heroSummaryStyle(heroStyle),
+                      ...heroRuleTop(heroStyle, accent, 0),
+                      marginBottom: content.heroRule?.weight
+                        ? heroRuleGap(heroStyle, 12)
+                        : undefined,
+                    }}
+                  />
+                  <div
+                    ref={heroRef}
+                    style={{
+                      margin: 0,
+                      fontWeight: 700,
+                      fontSize: cq(titlePx),
+                      lineHeight: 1.16,
+                      letterSpacing: "-0.015em",
+                      color: ink,
+                      maxWidth: cq(440),
+                      ...heroTitleStyle(heroStyle),
                     }}
                   >
-                    {content.summary}
-                  </p>
-                )}
-                <div
-                  style={{
-                    ...heroHairline(heroStyle, { hairline: dividerCol }, false),
-                    marginTop: cq(14),
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* 3 SUMMARY CARDS — Challenge / Approach / Impact in one panel (Canva ref). */}
-            <div style={{ paddingTop: cq(38), marginTop: cq(-6) }}>
-              <div style={{ borderRadius: cq(16), padding: cq(16), ...glass(mode, accent) }}>
-                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
-                  {sections.map((s, i) => (
-                    <div
-                      key={i}
+                    {content.title || "Untitled brochure"}
+                  </div>
+                  {content.summary && (
+                    <p
+                      ref={introRef}
                       style={{
-                        borderRadius: cq(12),
-                        padding: `${cq(10)} ${cq(8)}`,
-                        background: "transparent",
+                        margin: `${cq(12)} 0 0`,
+                        fontSize: cq(summaryPx),
+                        lineHeight: 1.65,
+                        color: inkSoft,
+                        maxWidth: cq(430),
+                        ...heroSummaryStyle(heroStyle),
                       }}
                     >
-                      <div className="flex items-center" style={{ gap: cq(8) }}>
-                        <div
-                          className="flex items-center justify-center"
-                          style={{
-                            width: cq(30),
-                            height: cq(30),
-                            borderRadius: cq(8),
-                            ...chipStyle(mode, accent, SECTION_WARM[i]!),
-                          }}
-                        >
-                          <EditableIcon
-                            slot={`eb.section.${i}`}
-                            d={SECTION_ICONS[i]!}
-                            size={cq(16)}
-                            color={accentInk}
-                          />
-                        </div>
-                        <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>
-                          {s.heading}
-                        </div>
-                      </div>
-                      {s.body && (
-                        <p
-                          style={{
-                            margin: `${cq(9)} 0 0`,
-                            fontSize: cq(9.5),
-                            lineHeight: 1.55,
-                            color: inkSoft,
-                            ...clampLines(5),
-                          }}
-                        >
-                          {s.body}
-                        </p>
-                      )}
-                      {s.bullets.length > 0 && (
-                        <ul
-                          style={{
-                            margin: `${cq(8)} 0 0`,
-                            paddingLeft: cq(14),
-                            fontSize: cq(9),
-                            lineHeight: 1.6,
-                            color: inkFaint,
-                          }}
-                        >
-                          {s.bullets.slice(0, 4).map((b, k) => (
-                            <li key={k} style={clampLines(2)}>
-                              {b}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
+                      {content.summary}
+                    </p>
+                  )}
+                  <div
+                    style={{
+                      ...heroHairline(heroStyle, { hairline: dividerCol }, false),
+                      marginTop: cq(14),
+                    }}
+                  />
                 </div>
               </div>
-            </div>
 
-            {/* STAT ROW — icon + big number × 5 */}
-            {stats.length > 0 && (
-              <div
-                className="grid"
-                data-section="stats"
-                data-section-label="Stat row"
-                style={{
-                  gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
-                  gap: cq(12),
-                  paddingTop: cq(28),
-                  textAlign: "center",
-                }}
-              >
-                {stats.map((s, i) => (
-                  <div key={i}>
-                    <div className="flex items-center justify-center" style={{ gap: cq(6) }}>
-                      <Icon
-                        d={
-                          [
-                            ICONS["globe-alt"],
-                            ICONS.trending,
-                            ICONS.star,
-                            ICONS.bolt,
-                            ICONS.target,
-                          ][i % 5]!
-                        }
-                        size={cq(15)}
-                        color={accentInk}
-                      />
-                      <span
+              {/* 3 SUMMARY CARDS — Challenge / Approach / Impact in one panel (Canva ref). */}
+              <div style={{ paddingTop: cq(38), marginTop: cq(-6) }}>
+                <div style={{ borderRadius: cq(16), padding: cq(16), ...glass(mode, accent) }}>
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
+                    {sections.map((s, i) => (
+                      <div
+                        key={i}
                         style={{
-                          fontWeight: 700,
-                          fontSize: cq(19),
-                          color: accentInk,
-                          letterSpacing: "-0.02em",
-                          ...STAT_VALUE_NOWRAP,
+                          borderRadius: cq(12),
+                          padding: `${cq(10)} ${cq(8)}`,
+                          background: "transparent",
                         }}
                       >
-                        {s.value}
-                        {statUnitParts(s.unit).inline ?? ""}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(4) }}>
-                      {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
-                      {s.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* QUOTE + DISCOVER PANEL */}
-            {(content.quote || content.discover) && (
-              <div className="flex" style={{ gap: cq(16), paddingTop: cq(26), flex: 1 }}>
-                {content.quote && (
-                  <div
-                    data-section="quote"
-                    data-section-label="Quote"
-                    style={{
-                      flex: "1.3 1 0",
-                      borderRadius: cq(14),
-                      padding: `${cq(20)} ${cq(22)}`,
-                      ...glass(mode, accent),
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontFamily: "Georgia, serif",
-                        fontSize: cq(40),
-                        lineHeight: 0.6,
-                        color: accentInk,
-                        fontWeight: 700,
-                      }}
-                      aria-hidden
-                    >
-                      &ldquo;
-                    </div>
-                    <p
-                      style={{
-                        margin: `${cq(10)} 0 0`,
-                        fontSize: cq(12.5),
-                        lineHeight: 1.6,
-                        color: ink,
-                        ...clampLines(6),
-                      }}
-                    >
-                      {content.quote.text}
-                    </p>
-                    <div
-                      style={{
-                        marginTop: cq(10),
-                        fontSize: cq(11),
-                        fontWeight: 700,
-                        color: accentInk,
-                      }}
-                    >
-                      — {content.quote.author}
-                      {content.quote.company ? ` · ${content.quote.company}` : ""}
-                    </div>
-                  </div>
-                )}
-                {content.discover && (
-                  <div style={{ flex: "1 1 0", padding: `${cq(6)} 0` }}>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: cq(10),
-                        lineHeight: 1.6,
-                        color: inkSoft,
-                        ...clampLines(6),
-                      }}
-                    >
-                      {content.discover.body}
-                    </p>
-                    {content.discover.bullets.slice(0, 4).map((b, k) => (
-                      <div
-                        key={k}
-                        className="flex items-center"
-                        style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}
-                      >
-                        <EditableIcon
-                          slot="eb.check"
-                          d={ICONS.check}
-                          size={cq(11)}
-                          color={accentInk}
-                          strokeWidth={2.5}
-                        />
-                        <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
-                          {b}
+                        <div className="flex items-center" style={{ gap: cq(8) }}>
+                          <div
+                            className="flex items-center justify-center"
+                            style={{
+                              width: cq(30),
+                              height: cq(30),
+                              borderRadius: cq(8),
+                              ...chipStyle(mode, accent, SECTION_WARM[i]!),
+                            }}
+                          >
+                            <EditableIcon
+                              slot={`eb.section.${i}`}
+                              d={SECTION_ICONS[i]!}
+                              size={cq(16)}
+                              color={accentInk}
+                            />
+                          </div>
+                          <div style={{ fontWeight: 700, fontSize: cq(12.5), color: ink }}>
+                            {s.heading}
+                          </div>
                         </div>
+                        {s.body && (
+                          <p
+                            style={{
+                              margin: `${cq(9)} 0 0`,
+                              fontSize: cq(9.5),
+                              lineHeight: 1.55,
+                              color: inkSoft,
+                              ...clampLines(5),
+                            }}
+                          >
+                            {s.body}
+                          </p>
+                        )}
+                        {s.bullets.length > 0 && (
+                          <ul
+                            style={{
+                              margin: `${cq(8)} 0 0`,
+                              paddingLeft: cq(14),
+                              fontSize: cq(9),
+                              lineHeight: 1.6,
+                              color: inkFaint,
+                            }}
+                          >
+                            {s.bullets.slice(0, 4).map((b, k) => (
+                              <li key={k} style={clampLines(2)}>
+                                {b}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     ))}
                   </div>
-                )}
+                </div>
               </div>
-            )}
 
-            {/* SHARED MODULES */}
-            <PrintSectionsStack
-              sections={content.modules}
-              mode={mode}
-              accent={accent}
-              density={density}
-            />
+              {/* STAT ROW — icon + big number × 5 */}
+              {stats.length > 0 && (
+                <div
+                  className="grid"
+                  data-section="stats"
+                  data-section-label="Stat row"
+                  style={{
+                    gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
+                    gap: cq(12),
+                    paddingTop: cq(28),
+                    textAlign: "center",
+                  }}
+                >
+                  {stats.map((s, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-center" style={{ gap: cq(6) }}>
+                        <Icon
+                          d={
+                            [
+                              ICONS["globe-alt"],
+                              ICONS.trending,
+                              ICONS.star,
+                              ICONS.bolt,
+                              ICONS.target,
+                            ][i % 5]!
+                          }
+                          size={cq(15)}
+                          color={accentInk}
+                        />
+                        <span
+                          style={{
+                            fontWeight: 700,
+                            fontSize: cq(19),
+                            color: accentInk,
+                            letterSpacing: "-0.02em",
+                            ...STAT_VALUE_NOWRAP,
+                          }}
+                        >
+                          {s.value}
+                          {statUnitParts(s.unit).inline ?? ""}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: cq(9), color: inkFaint, marginTop: cq(4) }}>
+                        {statUnitParts(s.unit).word ? `${statUnitParts(s.unit).word} · ` : ""}
+                        {s.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            {/* CTA BAND */}
-            {content.cta && (
-              <div data-section="cta" data-section-label="Call to action">
-                <PrintCTABand
-                  brand={brand}
-                  mode={mode}
-                  label={content.cta.label}
-                  subhead={content.cta.subhead}
-                  cq={cq}
-                />
-              </div>
-            )}
+              {/* QUOTE + DISCOVER PANEL */}
+              {(content.quote || content.discover) && (
+                <div className="flex" style={{ gap: cq(16), paddingTop: cq(26), flex: 1 }}>
+                  {content.quote && (
+                    <div
+                      data-section="quote"
+                      data-section-label="Quote"
+                      style={{
+                        flex: "1.3 1 0",
+                        borderRadius: cq(14),
+                        padding: `${cq(20)} ${cq(22)}`,
+                        ...glass(mode, accent),
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: "Georgia, serif",
+                          fontSize: cq(40),
+                          lineHeight: 0.6,
+                          color: accentInk,
+                          fontWeight: 700,
+                        }}
+                        aria-hidden
+                      >
+                        &ldquo;
+                      </div>
+                      <p
+                        style={{
+                          margin: `${cq(10)} 0 0`,
+                          fontSize: cq(12.5),
+                          lineHeight: 1.6,
+                          color: ink,
+                          ...clampLines(6),
+                        }}
+                      >
+                        {content.quote.text}
+                      </p>
+                      <div
+                        style={{
+                          marginTop: cq(10),
+                          fontSize: cq(11),
+                          fontWeight: 700,
+                          color: accentInk,
+                        }}
+                      >
+                        — {content.quote.author}
+                        {content.quote.company ? ` · ${content.quote.company}` : ""}
+                      </div>
+                    </div>
+                  )}
+                  {content.discover && (
+                    <div style={{ flex: "1 1 0", padding: `${cq(6)} 0` }}>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: cq(10),
+                          lineHeight: 1.6,
+                          color: inkSoft,
+                          ...clampLines(6),
+                        }}
+                      >
+                        {content.discover.body}
+                      </p>
+                      {content.discover.bullets.slice(0, 4).map((b, k) => (
+                        <div
+                          key={k}
+                          className="flex items-center"
+                          style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}
+                        >
+                          <EditableIcon
+                            slot="eb.check"
+                            d={ICONS.check}
+                            size={cq(11)}
+                            color={accentInk}
+                            strokeWidth={2.5}
+                          />
+                          <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
+                            {b}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
-            {/* FOOTER */}
-            <PrintFooterLockup brand={brand} mode={mode} cq={cq} links={["transperfect.com"]} />
+              {/* SHARED MODULES */}
+              <PrintSectionsStack
+                sections={content.modules}
+                mode={mode}
+                accent={accent}
+                density={density}
+              />
+
+              {/* CTA BAND */}
+              {content.cta && (
+                <div data-section="cta" data-section-label="Call to action">
+                  <PrintCTABand
+                    brand={brand}
+                    mode={mode}
+                    label={content.cta.label}
+                    subhead={content.cta.subhead}
+                    cq={cq}
+                  />
+                </div>
+              )}
+
+              {/* FOOTER */}
+              <PrintFooterLockup brand={brand} mode={mode} cq={cq} links={["transperfect.com"]} />
+            </div>
           </div>
-        </div>
+        </PrintSurfaceProvider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
   );

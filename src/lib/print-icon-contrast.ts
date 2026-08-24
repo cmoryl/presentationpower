@@ -177,3 +177,31 @@ export function checkIconAccentContrast(
     background: bg,
   };
 }
+
+// -----------------------------------------------------------------------------
+// Runtime ink resolution
+// -----------------------------------------------------------------------------
+// Print layouts draw their glyphs in the brand colour — usually Blue 500
+// (#003FC7) or Blue 800 (#03002C). On white stock that is exactly right. On the
+// dark variant of the same template the sheet itself is Blue 800, so those
+// strokes all but vanish (the dark MSA preview shows them as barely-there
+// shapes). Instead of each layout hand-picking a second palette, glyphs step
+// their own colour toward the paper's opposite until it clears the same 3:1
+// non-text minimum the contrast warning enforces.
+
+export type PrintSurface = "light" | "dark";
+
+/**
+ * Stroke colour a print glyph should actually use on a given sheet.
+ * Returns the input untouched when it already reads, or when it is a colour
+ * form we cannot reason about (color-mix, var, currentColor).
+ */
+export function printIconInk(surface: PrintSurface, color: string): string {
+  if (!color) return color;
+  const background = iconPageBackground(surface);
+  if (!parseIconColor(color)) return color;
+  // 4.5:1 rather than the bare 3:1 floor — these are hairline strokes, and the
+  // extra headroom is what makes them read at print size as well as on screen.
+  if (iconContrastRatio(color, background) >= 4.5) return color;
+  return suggestIconAccent(color, background, 4.5) ?? color;
+}

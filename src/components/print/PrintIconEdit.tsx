@@ -15,7 +15,8 @@
 
 import { createContext, useContext } from "react";
 import { ICON_PATHS, type IconName } from "./print-primitives";
-import { usePrintIconStyle } from "./print-doc-mode";
+import { usePrintIconStyle, usePrintSurface } from "./print-doc-mode";
+import { printIconInk } from "@/lib/print-icon-contrast";
 
 export type IconOverrides = Record<string, string>;
 
@@ -73,6 +74,8 @@ export function EditableIcon({
 }) {
   const ctx = usePrintIconEdit();
   const style = usePrintIconStyle();
+  // Brand ink, resolved against the sheet this glyph is actually drawn on.
+  const surface = usePrintSurface();
   const resolved = resolveSlotPath(ctx?.overrides, slot, { name, d });
 
   // `size` is usually a cqw string from cq(); scale it with calc() so glyph
@@ -88,7 +91,7 @@ export function EditableIcon({
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke={style.accent ?? color}
+      stroke={printIconInk(surface, style.accent ?? color)}
       strokeWidth={strokeWidth * style.stroke}
       strokeLinecap="round"
       strokeLinejoin="round"

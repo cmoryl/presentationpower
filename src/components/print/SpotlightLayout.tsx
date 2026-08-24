@@ -18,6 +18,7 @@ import {
   heroTitleFontPx,
   heroTitleStyle,
 } from "@/components/print/sections/hero/hero-style";
+import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
   PAGE_W,
@@ -133,248 +134,323 @@ export function SpotlightLayout({
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
-        <div
-          className="relative w-full overflow-hidden [container-type:inline-size]"
-          data-print-page
-          style={{
-            aspectRatio: pageAspect(pageSize),
-            backgroundColor: mode === "light" ? "#FFFFFF" : bg,
-            color: ink,
-            fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-            ...style,
-          }}
-        >
-          {/* Light mode: hard white base under everything (belt-and-suspenders). */}
-          {mode === "light" && (
-            <div
-              className="pointer-events-none absolute inset-0"
-              aria-hidden
-              style={{ background: "#FFFFFF", zIndex: 0 }}
-            />
-          )}
-          {content.heroMedia ? (
-            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          ) : null}
-
+        {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+        <PrintSurfaceProvider mode={mode}>
           <div
-            className="relative flex h-full flex-col"
+            className="relative w-full overflow-hidden [container-type:inline-size]"
+            data-print-page
             style={{
-              paddingLeft: padXcq,
-              paddingRight: padXcq,
-              paddingTop: padTopCq,
-              paddingBottom: cq(26),
+              aspectRatio: pageAspect(pageSize),
+              backgroundColor: mode === "light" ? "#FFFFFF" : bg,
+              color: ink,
+              fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
+              ...style,
             }}
           >
-            {/* ============================================================ */}
-            {/* HEADER — brand lockup + CLIENT SPOTLIGHT eyebrow              */}
-            {/* ============================================================ */}
-            <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
-              <PrintEyebrow
-                label={content.eyebrow ?? "Client spotlight"}
-                mode={mode}
-                accent={accent}
-                cq={cq}
+            {/* Light mode: hard white base under everything (belt-and-suspenders). */}
+            {mode === "light" && (
+              <div
+                className="pointer-events-none absolute inset-0"
+                aria-hidden
+                style={{ background: "#FFFFFF", zIndex: 0 }}
               />
-              <BrandLockup
-                unit={cq}
-                brand={brand}
-                color={mode === "dark" ? "#FFFFFF" : "#000000"}
-                size="xs"
-                orientation="horizontal"
-                monochromeOfficialLogo
-              />
-            </div>
+            )}
+            {content.heroMedia ? (
+              <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+            ) : null}
 
-            {/* ============================================================ */}
-            {/* HERO — title + intro (left)  |  quote glass card (right)      */}
-            {/* ============================================================ */}
             <div
-              className="flex"
+              className="relative flex h-full flex-col"
               style={{
-                gap: cq(28),
-                paddingTop: cq(26),
-                minHeight: content.heroMedia?.imageUrl
-                  ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${padTopCq})`
-                  : undefined,
+                paddingLeft: padXcq,
+                paddingRight: padXcq,
+                paddingTop: padTopCq,
+                paddingBottom: cq(26),
               }}
             >
+              {/* ============================================================ */}
+              {/* HEADER — brand lockup + CLIENT SPOTLIGHT eyebrow              */}
+              {/* ============================================================ */}
+              <div className="flex items-center justify-between" style={{ gap: cq(10) }}>
+                <PrintEyebrow
+                  label={content.eyebrow ?? "Client spotlight"}
+                  mode={mode}
+                  accent={accent}
+                  cq={cq}
+                />
+                <BrandLockup
+                  unit={cq}
+                  brand={brand}
+                  color={mode === "dark" ? "#FFFFFF" : "#000000"}
+                  size="xs"
+                  orientation="horizontal"
+                  monochromeOfficialLogo
+                />
+              </div>
+
+              {/* ============================================================ */}
+              {/* HERO — title + intro (left)  |  quote glass card (right)      */}
+              {/* ============================================================ */}
               <div
+                className="flex"
                 style={{
-                  flex: "1.15 1 0",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
+                  gap: cq(28),
+                  paddingTop: cq(26),
+                  minHeight: content.heroMedia?.imageUrl
+                    ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${padTopCq})`
+                    : undefined,
                 }}
               >
                 <div
                   style={{
-                    transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
-                    willChange: "transform",
+                    flex: "1.15 1 0",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
                   }}
                 >
                   <div
                     style={{
-                      ...heroRuleTop(heroStyle, accent, 0),
-                      marginBottom: content.heroRule?.weight
-                        ? heroRuleGap(heroStyle, 12)
-                        : undefined,
-                    }}
-                  />
-                  <div
-                    ref={heroRef}
-                    style={{
-                      margin: 0,
-                      fontWeight: 700,
-                      fontSize: cq(titlePx),
-                      lineHeight: 1.14,
-                      letterSpacing: "-0.015em",
-                      color: ink,
-                      ...heroTitleStyle(heroStyle),
+                      transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
+                      willChange: "transform",
                     }}
                   >
-                    {content.productName || "Untitled spotlight"}
+                    <div
+                      style={{
+                        ...heroRuleTop(heroStyle, accent, 0),
+                        marginBottom: content.heroRule?.weight
+                          ? heroRuleGap(heroStyle, 12)
+                          : undefined,
+                      }}
+                    />
+                    <div
+                      ref={heroRef}
+                      style={{
+                        margin: 0,
+                        fontWeight: 700,
+                        fontSize: cq(titlePx),
+                        lineHeight: 1.14,
+                        letterSpacing: "-0.015em",
+                        color: ink,
+                        ...heroTitleStyle(heroStyle),
+                      }}
+                    >
+                      {content.productName || "Untitled spotlight"}
+                    </div>
+                    {content.tagline && (
+                      <p
+                        style={{
+                          margin: `${cq(10)} 0 0`,
+                          fontSize: cq(12.5),
+                          lineHeight: 1.35,
+                          fontWeight: 600,
+                          color: accentInk,
+                          maxWidth: cq(340),
+                        }}
+                      >
+                        {content.tagline}
+                      </p>
+                    )}
+                    {content.summary && (
+                      <p
+                        ref={introRef}
+                        style={{
+                          margin: `${cq(12)} 0 0`,
+                          fontSize: cq(summaryPx),
+                          lineHeight: 1.65,
+                          color: inkSoft,
+                          maxWidth: cq(320),
+                          ...heroSummaryStyle(heroStyle),
+                        }}
+                      >
+                        {content.summary}
+                      </p>
+                    )}
+                    <div
+                      style={{
+                        ...heroHairline(heroStyle, { hairline: dividerCol }, false),
+                        marginTop: cq(14),
+                      }}
+                    />
                   </div>
-                  {content.tagline && (
+                </div>
+
+                {content.quote && (
+                  <div
+                    data-section="quote"
+                    data-section-label="Quote"
+                    style={{
+                      flex: "1 1 0",
+                      borderRadius: cq(14),
+                      padding: `${cq(20)} ${cq(22)}`,
+                      ...glass(mode, accent),
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontFamily: "Georgia, serif",
+                        fontSize: cq(42),
+                        lineHeight: 0.6,
+                        color: accentInk,
+                        fontWeight: 700,
+                      }}
+                      aria-hidden
+                    >
+                      &ldquo;
+                    </div>
                     <p
                       style={{
                         margin: `${cq(10)} 0 0`,
                         fontSize: cq(12.5),
-                        lineHeight: 1.35,
-                        fontWeight: 600,
-                        color: accentInk,
-                        maxWidth: cq(340),
+                        lineHeight: 1.6,
+                        color: ink,
+                        ...clampLines(6),
                       }}
                     >
-                      {content.tagline}
+                      {content.quote.text}
                     </p>
-                  )}
-                  {content.summary && (
-                    <p
-                      ref={introRef}
+                    {(content.quote.role || content.quote.company) && (
+                      <div
+                        style={{
+                          marginTop: cq(14),
+                          fontSize: cq(10),
+                          fontWeight: 700,
+                          letterSpacing: "0.1em",
+                          color: accentInk,
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {content.quote.role ?? "Client title"}
+                      </div>
+                    )}
+                    <div
                       style={{
-                        margin: `${cq(12)} 0 0`,
-                        fontSize: cq(summaryPx),
-                        lineHeight: 1.65,
-                        color: inkSoft,
-                        maxWidth: cq(320),
-                        ...heroSummaryStyle(heroStyle),
+                        marginTop: cq(2),
+                        fontSize: cq(11),
+                        fontWeight: 700,
+                        color: ink,
                       }}
                     >
-                      {content.summary}
-                    </p>
-                  )}
-                  <div
-                    style={{
-                      ...heroHairline(heroStyle, { hairline: dividerCol }, false),
-                      marginTop: cq(14),
-                    }}
-                  />
-                </div>
+                      — {content.quote.author}
+                      {content.quote.company ? ` · ${content.quote.company}` : ""}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {content.quote && (
-                <div
-                  data-section="quote"
-                  data-section-label="Quote"
-                  style={{
-                    flex: "1 1 0",
-                    borderRadius: cq(14),
-                    padding: `${cq(20)} ${cq(22)}`,
-                    ...glass(mode, accent),
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "Georgia, serif",
-                      fontSize: cq(42),
-                      lineHeight: 0.6,
-                      color: accentInk,
-                      fontWeight: 700,
-                    }}
-                    aria-hidden
-                  >
-                    &ldquo;
+              {/* ============================================================ */}
+              {/* STATS — 4 tiles  |  expert glass panel                        */}
+              {/* ============================================================ */}
+              {(stats.length > 0 || content.expert || content.cta) && (
+                <div style={{ paddingTop: cq(30) }}>
+                  <div style={{ fontWeight: 700, fontSize: cq(13), color: ink }}>
+                    Project statistics
                   </div>
-                  <p
-                    style={{
-                      margin: `${cq(10)} 0 0`,
-                      fontSize: cq(12.5),
-                      lineHeight: 1.6,
-                      color: ink,
-                      ...clampLines(6),
-                    }}
-                  >
-                    {content.quote.text}
-                  </p>
-                  {(content.quote.role || content.quote.company) && (
-                    <div
-                      style={{
-                        marginTop: cq(14),
-                        fontSize: cq(10),
-                        fontWeight: 700,
-                        letterSpacing: "0.1em",
-                        color: accentInk,
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {content.quote.role ?? "Client title"}
-                    </div>
-                  )}
-                  <div
-                    style={{
-                      marginTop: cq(2),
-                      fontSize: cq(11),
-                      fontWeight: 700,
-                      color: ink,
-                    }}
-                  >
-                    — {content.quote.author}
-                    {content.quote.company ? ` · ${content.quote.company}` : ""}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* ============================================================ */}
-            {/* STATS — 4 tiles  |  expert glass panel                        */}
-            {/* ============================================================ */}
-            {(stats.length > 0 || content.expert || content.cta) && (
-              <div style={{ paddingTop: cq(30) }}>
-                <div style={{ fontWeight: 700, fontSize: cq(13), color: ink }}>
-                  Project statistics
-                </div>
-                <div className="flex" style={{ gap: cq(14), marginTop: cq(12) }}>
-                  {stats.length > 0 && (
-                    <div
-                      className="grid"
-                      style={{
-                        flex: "2.2 1 0",
-                        gridTemplateColumns: `repeat(${Math.max(1, stats.length)}, minmax(0, 1fr))`,
-                        gap: cq(12),
-                      }}
-                    >
-                      {stats.map((s, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            borderRadius: cq(12),
-                            padding: `${cq(16)} ${cq(12)}`,
-                            textAlign: "center",
-                            ...glass(mode, accent),
-                          }}
-                        >
+                  <div className="flex" style={{ gap: cq(14), marginTop: cq(12) }}>
+                    {stats.length > 0 && (
+                      <div
+                        className="grid"
+                        style={{
+                          flex: "2.2 1 0",
+                          gridTemplateColumns: `repeat(${Math.max(1, stats.length)}, minmax(0, 1fr))`,
+                          gap: cq(12),
+                        }}
+                      >
+                        {stats.map((s, i) => (
                           <div
-                            className="mx-auto flex items-center justify-center"
+                            key={i}
                             style={{
-                              width: cq(34),
-                              height: cq(34),
+                              borderRadius: cq(12),
+                              padding: `${cq(16)} ${cq(12)}`,
+                              textAlign: "center",
+                              ...glass(mode, accent),
+                            }}
+                          >
+                            <div
+                              className="mx-auto flex items-center justify-center"
+                              style={{
+                                width: cq(34),
+                                height: cq(34),
+                                borderRadius: "50%",
+                                ...chipStyle(mode, accent),
+                              }}
+                            >
+                              <EditableIcon
+                                slot={`sp.stat.${i}`}
+                                name={pickStatIcon(s.label, i)}
+                                size={cq(15)}
+                                color={accentInk}
+                              />
+                            </div>
+                            <div
+                              style={{
+                                fontWeight: 700,
+                                fontSize: cq(18),
+                                color: accentInk,
+                                marginTop: cq(8),
+                                lineHeight: 1,
+                                letterSpacing: "-0.02em",
+                                ...STAT_VALUE_NOWRAP,
+                              }}
+                            >
+                              {s.value}
+                              {statUnitParts(s.unit).inline && (
+                                <span style={{ fontSize: cq(14), marginLeft: cq(1) }}>
+                                  {statUnitParts(s.unit).inline}
+                                </span>
+                              )}
+                            </div>
+                            {statUnitParts(s.unit).word && (
+                              <div
+                                style={{
+                                  fontSize: cq(10),
+                                  fontWeight: 600,
+                                  color: accentInk,
+                                  marginTop: cq(2),
+                                }}
+                              >
+                                {statUnitParts(s.unit).word}
+                              </div>
+                            )}
+                            <div
+                              style={{
+                                fontSize: cq(9),
+                                lineHeight: 1.4,
+                                color: inkFaint,
+                                marginTop: cq(3),
+                                ...clampLines(2),
+                              }}
+                            >
+                              {s.label}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {(content.expert || content.cta) && (
+                      <div
+                        style={{
+                          flex: "1 1 0",
+                          borderRadius: cq(12),
+                          padding: cq(16),
+                          ...glass(mode, accent),
+                        }}
+                      >
+                        <div className="flex items-center" style={{ gap: cq(8) }}>
+                          <div
+                            className="flex items-center justify-center"
+                            style={{
+                              width: cq(30),
+                              height: cq(30),
                               borderRadius: "50%",
+                              flexShrink: 0,
                               ...chipStyle(mode, accent),
                             }}
                           >
                             <EditableIcon
-                              slot={`sp.stat.${i}`}
-                              name={pickStatIcon(s.label, i)}
+                              slot="sp.quote"
+                              name="chat"
                               size={cq(15)}
                               color={accentInk}
                             />
@@ -382,274 +458,202 @@ export function SpotlightLayout({
                           <div
                             style={{
                               fontWeight: 700,
-                              fontSize: cq(18),
+                              fontSize: cq(12),
+                              lineHeight: 1.3,
                               color: accentInk,
-                              marginTop: cq(8),
-                              lineHeight: 1,
-                              letterSpacing: "-0.02em",
-                              ...STAT_VALUE_NOWRAP,
                             }}
                           >
-                            {s.value}
-                            {statUnitParts(s.unit).inline && (
-                              <span style={{ fontSize: cq(14), marginLeft: cq(1) }}>
-                                {statUnitParts(s.unit).inline}
-                              </span>
-                            )}
+                            {content.expert
+                              ? `Talk to ${content.expert.name.split(" ")[0]}`
+                              : `Talk to a ${brand.name} expert`}
                           </div>
-                          {statUnitParts(s.unit).word && (
+                        </div>
+                        <p
+                          style={{
+                            margin: `${cq(8)} 0 0`,
+                            fontSize: cq(9.5),
+                            lineHeight: 1.55,
+                            color: inkSoft,
+                          }}
+                        >
+                          {content.expert?.role
+                            ? content.expert.role
+                            : "Our experts help teams operationalize this at scale — with measurable impact."}
+                        </p>
+                        {expertBullets.slice(0, 3).map((b, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center"
+                            style={{ gap: cq(6), marginTop: i === 0 ? cq(10) : cq(6) }}
+                          >
+                            <EditableIcon
+                              slot="sp.check"
+                              name="check"
+                              size={cq(11)}
+                              color={accentInk}
+                              strokeWidth={2.5}
+                            />
                             <div
                               style={{
-                                fontSize: cq(10),
-                                fontWeight: 600,
-                                color: accentInk,
-                                marginTop: cq(2),
+                                fontSize: cq(9),
+                                color: inkSoft,
+                                lineHeight: 1.3,
+                                ...clampLines(2),
                               }}
                             >
-                              {statUnitParts(s.unit).word}
+                              {b}
                             </div>
-                          )}
+                          </div>
+                        ))}
+                        {(content.cta || content.expert?.email) && (
                           <div
+                            className="inline-flex items-center"
                             style={{
-                              fontSize: cq(9),
-                              lineHeight: 1.4,
-                              color: inkFaint,
-                              marginTop: cq(3),
-                              ...clampLines(2),
+                              marginTop: cq(12),
+                              border: `1.5px solid ${accentInk}`,
+                              borderRadius: 999,
+                              padding: `${cq(5)} ${cq(14)}`,
+                              fontSize: cq(9.5),
+                              fontWeight: 700,
+                              color: accentInk,
+                              gap: cq(4),
                             }}
                           >
-                            {s.label}
+                            {content.cta?.label ?? "Contact an expert"} »
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {(content.expert || content.cta) && (
-                    <div
-                      style={{
-                        flex: "1 1 0",
-                        borderRadius: cq(12),
-                        padding: cq(16),
-                        ...glass(mode, accent),
-                      }}
-                    >
-                      <div className="flex items-center" style={{ gap: cq(8) }}>
-                        <div
-                          className="flex items-center justify-center"
-                          style={{
-                            width: cq(30),
-                            height: cq(30),
-                            borderRadius: "50%",
-                            flexShrink: 0,
-                            ...chipStyle(mode, accent),
-                          }}
-                        >
-                          <EditableIcon
-                            slot="sp.quote"
-                            name="chat"
-                            size={cq(15)}
-                            color={accentInk}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            fontSize: cq(12),
-                            lineHeight: 1.3,
-                            color: accentInk,
-                          }}
-                        >
-                          {content.expert
-                            ? `Talk to ${content.expert.name.split(" ")[0]}`
-                            : `Talk to a ${brand.name} expert`}
-                        </div>
+                        )}
                       </div>
-                      <p
-                        style={{
-                          margin: `${cq(8)} 0 0`,
-                          fontSize: cq(9.5),
-                          lineHeight: 1.55,
-                          color: inkSoft,
-                        }}
-                      >
-                        {content.expert?.role
-                          ? content.expert.role
-                          : "Our experts help teams operationalize this at scale — with measurable impact."}
-                      </p>
-                      {expertBullets.slice(0, 3).map((b, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center"
-                          style={{ gap: cq(6), marginTop: i === 0 ? cq(10) : cq(6) }}
-                        >
-                          <EditableIcon
-                            slot="sp.check"
-                            name="check"
-                            size={cq(11)}
-                            color={accentInk}
-                            strokeWidth={2.5}
-                          />
-                          <div
-                            style={{
-                              fontSize: cq(9),
-                              color: inkSoft,
-                              lineHeight: 1.3,
-                              ...clampLines(2),
-                            }}
-                          >
-                            {b}
-                          </div>
-                        </div>
-                      ))}
-                      {(content.cta || content.expert?.email) && (
-                        <div
-                          className="inline-flex items-center"
-                          style={{
-                            marginTop: cq(12),
-                            border: `1.5px solid ${accentInk}`,
-                            borderRadius: 999,
-                            padding: `${cq(5)} ${cq(14)}`,
-                            fontSize: cq(9.5),
-                            fontWeight: 700,
-                            color: accentInk,
-                            gap: cq(4),
-                          }}
-                        >
-                          {content.cta?.label ?? "Contact an expert"} »
-                        </div>
-                      )}
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* ============================================================ */}
-            {/* 3-COL — capabilities as Need / Approach / Impact              */}
-            {/* ============================================================ */}
-            {columns.length > 0 && (
-              <div
-                className="grid"
-                style={{
-                  gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`,
-                  paddingTop: cq(26),
-                }}
-              >
-                {columns.map((c, i) => {
-                  const isFirst = i === 0;
-                  const isLast = i === columns.length - 1;
-                  const iconName: IconName =
-                    i === 0 ? "globe-flat" : i === 1 ? "target" : "trending";
-                  return (
-                    <div
-                      key={i}
-                      style={{
-                        paddingLeft: isFirst ? 0 : cq(18),
-                        paddingRight: isLast ? 0 : cq(18),
-                        borderRight: isLast ? "none" : `1px solid ${dividerCol}`,
-                      }}
-                    >
-                      <div className="flex items-center" style={{ gap: cq(8) }}>
-                        <div
-                          className="flex items-center justify-center"
-                          style={{
-                            width: cq(26),
-                            height: cq(26),
-                            borderRadius: "50%",
-                            ...chipStyle(mode, accent),
-                          }}
-                        >
-                          <EditableIcon
-                            slot={`sp.item.${i}`}
-                            name={iconName}
-                            size={cq(13)}
-                            color={accentInk}
-                          />
-                        </div>
-                        <div
-                          style={{
-                            fontWeight: 700,
-                            fontSize: cq(12),
-                            color: accentInk,
-                          }}
-                        >
-                          {c.heading}
-                        </div>
-                      </div>
-                      <p
+              {/* ============================================================ */}
+              {/* 3-COL — capabilities as Need / Approach / Impact              */}
+              {/* ============================================================ */}
+              {columns.length > 0 && (
+                <div
+                  className="grid"
+                  style={{
+                    gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))`,
+                    paddingTop: cq(26),
+                  }}
+                >
+                  {columns.map((c, i) => {
+                    const isFirst = i === 0;
+                    const isLast = i === columns.length - 1;
+                    const iconName: IconName =
+                      i === 0 ? "globe-flat" : i === 1 ? "target" : "trending";
+                    return (
+                      <div
+                        key={i}
                         style={{
-                          margin: `${cq(8)} 0 0`,
-                          fontSize: cq(10),
-                          lineHeight: 1.6,
-                          color: inkSoft,
-                          ...clampLines(6),
+                          paddingLeft: isFirst ? 0 : cq(18),
+                          paddingRight: isLast ? 0 : cq(18),
+                          borderRight: isLast ? "none" : `1px solid ${dividerCol}`,
                         }}
                       >
-                        {c.body}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                        <div className="flex items-center" style={{ gap: cq(8) }}>
+                          <div
+                            className="flex items-center justify-center"
+                            style={{
+                              width: cq(26),
+                              height: cq(26),
+                              borderRadius: "50%",
+                              ...chipStyle(mode, accent),
+                            }}
+                          >
+                            <EditableIcon
+                              slot={`sp.item.${i}`}
+                              name={iconName}
+                              size={cq(13)}
+                              color={accentInk}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: cq(12),
+                              color: accentInk,
+                            }}
+                          >
+                            {c.heading}
+                          </div>
+                        </div>
+                        <p
+                          style={{
+                            margin: `${cq(8)} 0 0`,
+                            fontSize: cq(10),
+                            lineHeight: 1.6,
+                            color: inkSoft,
+                            ...clampLines(6),
+                          }}
+                        >
+                          {c.body}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
-            {/* SHARED MODULES */}
-            <PrintSectionsStack
-              sections={content.modules}
-              mode={mode}
-              accent={accent}
-              density={density}
-            />
+              {/* SHARED MODULES */}
+              <PrintSectionsStack
+                sections={content.modules}
+                mode={mode}
+                accent={accent}
+                density={density}
+              />
 
-            {/* Rhythm spacer — takes leftover column height as ONE uniform gap
+              {/* Rhythm spacer — takes leftover column height as ONE uniform gap
                 above the CTA instead of inflating the top-aligned capability
                 row. Fixes the dead-space band that appeared when capability
                 bodies were short and shared-modules were empty. */}
-            <div style={{ flex: 1, minHeight: cq(12) }} aria-hidden />
+              <div style={{ flex: 1, minHeight: cq(12) }} aria-hidden />
 
-            {/* ============================================================ */}
-            {/* CTA BAND — division-tokenized gradient                        */}
-            {/* ============================================================ */}
-            {content.cta && (
-              <div data-section="cta" data-section-label="Call to action">
-                <PrintCTABand
-                  brand={brand}
-                  mode={mode}
-                  label={content.cta.label}
-                  subhead={
-                    content.summary
-                      ? `Explore how ${brand.name} can transform your operations.`
-                      : undefined
-                  }
-                  cq={cq}
-                />
-              </div>
-            )}
+              {/* ============================================================ */}
+              {/* CTA BAND — division-tokenized gradient                        */}
+              {/* ============================================================ */}
+              {content.cta && (
+                <div data-section="cta" data-section-label="Call to action">
+                  <PrintCTABand
+                    brand={brand}
+                    mode={mode}
+                    label={content.cta.label}
+                    subhead={
+                      content.summary
+                        ? `Explore how ${brand.name} can transform your operations.`
+                        : undefined
+                    }
+                    cq={cq}
+                  />
+                </div>
+              )}
 
-            {/* ============================================================ */}
-            {/* FOOTER — TP + division lockup + contact strip                 */}
-            {/* ============================================================ */}
-            <PrintFooterLockup
-              brand={brand}
-              mode={mode}
-              cq={cq}
-              links={["transperfect.com"]}
-              email={content.expert?.email}
-            />
-
-            {showSafeArea && (
-              <div
-                data-export-ignore="true"
-                data-canvas-guide="safe-area"
-                className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed"
-                style={{
-                  borderColor: mode === "dark" ? "rgba(255,255,255,0.25)" : "rgba(3,0,44,0.22)",
-                }}
+              {/* ============================================================ */}
+              {/* FOOTER — TP + division lockup + contact strip                 */}
+              {/* ============================================================ */}
+              <PrintFooterLockup
+                brand={brand}
+                mode={mode}
+                cq={cq}
+                links={["transperfect.com"]}
+                email={content.expert?.email}
               />
-            )}
+
+              {showSafeArea && (
+                <div
+                  data-export-ignore="true"
+                  data-canvas-guide="safe-area"
+                  className="pointer-events-none absolute inset-6 rounded-2xl border border-dashed"
+                  style={{
+                    borderColor: mode === "dark" ? "rgba(255,255,255,0.25)" : "rgba(3,0,44,0.22)",
+                  }}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        </PrintSurfaceProvider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
   );

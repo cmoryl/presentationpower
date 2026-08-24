@@ -16,6 +16,7 @@
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
 import { statUnitParts } from "@/lib/print-stat-unit";
+import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
@@ -3549,29 +3550,32 @@ export function MultiProposalLayout({
     <ProposalBrandProvider brand={brand}>
       <SlideModeContext.Provider value={mode}>
         <SlideAccentContext.Provider value={accent}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", ...style }}>
-            {shown.map((page, i) => (
-              <div
-                key={page.id || `${page.kind}-${i}`}
-                data-print-page
-                data-proposal-page={page.kind}
-                className="relative w-full overflow-hidden [container-type:inline-size]"
-                style={{
-                  aspectRatio: `${PAGE_W_IN} / ${PAGE_H_IN}`,
-                  background: "#FFFFFF",
-                  color: NAVY,
-                  fontFamily: FONT,
-                }}
-              >
-                <PageBody
-                  page={page}
-                  logoWhite={logoWhite}
-                  logoDark={logoDark}
-                  pageIndex={(pageIndex ?? 0) + i}
-                />
-              </div>
-            ))}
-          </div>
+          {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+          <PrintSurfaceProvider mode={mode}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", ...style }}>
+              {shown.map((page, i) => (
+                <div
+                  key={page.id || `${page.kind}-${i}`}
+                  data-print-page
+                  data-proposal-page={page.kind}
+                  className="relative w-full overflow-hidden [container-type:inline-size]"
+                  style={{
+                    aspectRatio: `${PAGE_W_IN} / ${PAGE_H_IN}`,
+                    background: "#FFFFFF",
+                    color: NAVY,
+                    fontFamily: FONT,
+                  }}
+                >
+                  <PageBody
+                    page={page}
+                    logoWhite={logoWhite}
+                    logoDark={logoDark}
+                    pageIndex={(pageIndex ?? 0) + i}
+                  />
+                </div>
+              ))}
+            </div>
+          </PrintSurfaceProvider>
         </SlideAccentContext.Provider>
       </SlideModeContext.Provider>
     </ProposalBrandProvider>

@@ -13,6 +13,7 @@
  * section renderer.
  */
 import { createContext, useContext, type ReactNode } from "react";
+import type { PrintSurface } from "@/lib/print-icon-contrast";
 
 export type PrintIconStyle = {
   /** Multiplier applied to every glyph's rendered size (1 = layout default). */
@@ -77,4 +78,29 @@ export function PrintDocModeProvider({
       {children}
     </PrintDocModeContext.Provider>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Sheet surface
+// ---------------------------------------------------------------------------
+// Glyph ink is brand-coloured, and the brand's blues are dark: on the dark
+// variant of a template a Blue 500 / Blue 800 stroke sits on a Blue 800 sheet
+// and disappears. Layouts publish which sheet they are drawing so glyphs can
+// resolve a readable version of that same colour instead of each layout
+// hand-picking a second palette.
+const PrintSurfaceContext = createContext<PrintSurface>("light");
+
+/** Which sheet the glyphs are being drawn on. Defaults to a white page. */
+export function usePrintSurface(): PrintSurface {
+  return useContext(PrintSurfaceContext);
+}
+
+export function PrintSurfaceProvider({
+  mode,
+  children,
+}: {
+  mode: PrintSurface;
+  children: ReactNode;
+}) {
+  return <PrintSurfaceContext.Provider value={mode}>{children}</PrintSurfaceContext.Provider>;
 }
