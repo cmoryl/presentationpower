@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useDeckStore, type Deck, type Brief } from "@/lib/deck-store";
 import { toast } from "sonner";
+import { describeExportError } from "@/lib/export-feedback";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 import { runExportPreflight, type PreflightIssue } from "@/lib/export-preflight";
 import { ExportPreflightModal } from "@/components/ExportPreflightModal";
@@ -207,8 +208,14 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     window.open(`/decks/${deckId}/print`, "_blank", "noopener,noreferrer");
   };
   const runPptxExport = async () => {
-    if (!deck) return;
+    if (!deck) {
+      toast.error("This deck is still loading — try again in a moment.");
+      return;
+    }
     setBusy(true);
+    const progressId = toast.loading("Building your PowerPoint…", {
+      description: `${deck.slides.length} slide${deck.slides.length === 1 ? "" : "s"} — this can take a few seconds.`,
+    });
     try {
       const res = await exportDeckToPptx(deck, brand, {
         strategy: deck.context?.strategy ?? null,
@@ -220,6 +227,18 @@ export function ShareMenu({ deckId }: { deckId: string }) {
         });
       }
       stamp("pptx");
+      toast.success("PowerPoint downloaded", {
+        id: progressId,
+        description: "Check your browser's Downloads folder.",
+        duration: 7000,
+      });
+    } catch (err) {
+      console.error("[ShareMenu] pptx export failed:", err);
+      toast.error("PowerPoint export failed", {
+        id: progressId,
+        description: describeExportError(err),
+        duration: 14000,
+      });
     } finally {
       setBusy(false);
       setOpen(false);
@@ -264,8 +283,13 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       };
       await exportDeckToPptx(translatedDeck, brand, { strategy: deck.context?.strategy ?? null });
       stamp("pptx");
+      toast.success(`${langLabel} PowerPoint downloaded`, { duration: 7000 });
     } catch (e) {
       console.error("[translated pptx export]", e);
+      toast.error(`${langLabels[lang] ?? lang.toUpperCase()} export failed`, {
+        description: describeExportError(e),
+        duration: 14000,
+      });
     } finally {
       setTranslatedBusy(null);
     }
