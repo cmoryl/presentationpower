@@ -153,6 +153,7 @@ export const saveTemplate = createServerFn({ method: "POST" })
       base_skin_code: data.baseSkinCode ? data.baseSkinCode.toUpperCase() : null,
       spec: data.spec,
       status: data.status,
+      sales_approved: data.salesApproved,
       notes: data.notes,
       created_by: context.userId,
     };
