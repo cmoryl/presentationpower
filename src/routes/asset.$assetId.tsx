@@ -951,6 +951,16 @@ function AssetEditor() {
   // spread and looked flat). Landscape stays at native 1280×720.
   const auroraAspect: { w: number; h: number } | undefined = pageAuroraFrame(pageSize);
 
+  // The PDF page must match the AUTHORED trim. Exporting a Letter canvas onto
+  // an A4 page letterboxed the artwork (white bands, nothing full bleed), so
+  // the export size follows the layout unless the user picks another size
+  // themselves.
+  const sizeTouchedRef = useRef(false);
+  useEffect(() => {
+    if (sizeTouchedRef.current) return;
+    setExportSize((prev) => (prev === pageSize ? prev : pageSize));
+  }, [pageSize]);
+
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
 
@@ -1139,7 +1149,11 @@ function AssetEditor() {
                       <span className="text-black/60 dark:text-white/60">Page size</span>
                       <select
                         value={exportSize}
-                        onChange={(e) => setExportSize(e.target.value as PrintPageSizeKey)}
+                        data-export-size
+                        onChange={(e) => {
+                          sizeTouchedRef.current = true;
+                          setExportSize(e.target.value as PrintPageSizeKey);
+                        }}
                         className={inspectorInput}
                       >
                         <option value="A4">A4 (210 × 297 mm)</option>

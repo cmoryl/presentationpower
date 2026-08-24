@@ -441,8 +441,10 @@ export function LiveEditOverlay({
       {canPickColor ? (
         <div
           data-live-color-picker
+          data-export-ignore="true"
+          data-editing-chrome="true"
           data-ink-target={target}
-          className="pointer-events-auto absolute left-1/2 top-3 z-40 -translate-x-1/2 rounded-2xl border border-black/10 bg-white/95 px-2.5 py-2 shadow-lg backdrop-blur"
+          className="pointer-events-auto absolute left-1/2 top-3 z-40 -translate-x-1/2 rounded-2xl border border-black/10 bg-white/95 px-2.5 py-2 shadow-lg backdrop-blur print:hidden"
           onMouseDown={(e) => e.preventDefault()} // keep focus on the editable element
         >
           <div className="mb-1.5 flex items-center gap-1">
