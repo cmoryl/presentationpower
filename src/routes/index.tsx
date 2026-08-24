@@ -454,7 +454,7 @@ function Dashboard() {
                 } catch {
                   /* ignore */
                 }
-                navigate({ to: "/brief/new" });
+                navigate({ to: "/brief/new", search: { output: mode.id } });
               }}
               accent={mode.accent}
               agentLabel={AGENT_LABEL[mode.id]}
@@ -491,7 +491,8 @@ function Dashboard() {
             return (
               <Link
                 key={m.id}
-                to={m.actions[0]?.to ?? "/library"}
+                to="/brief/new"
+                search={{ output: m.id }}
                 className="group relative overflow-hidden rounded-2xl border border-black/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-black/25 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04] dark:hover:border-white/25"
               >
                 {/* ELEMENT accent: brick rail on the left edge, echoing the five-brick E */}
