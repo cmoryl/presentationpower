@@ -6,15 +6,22 @@
 // demo override for the current demo + division with a new style pack and/or
 // background recipe — exactly what every visitor then sees on this page.
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Check, Paintbrush, RotateCcw } from "lucide-react";
 
 import type { TemplatePayload } from "@/lib/deck-store";
 import { DESIGN_SKINS, INDUSTRY_RECIPES } from "@/lib/design-skins";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
-import { skinPackId } from "@/lib/design-skin-pack";
+import { skinCodeFromPackId, isSkinPackId, skinPackId } from "@/lib/design-skin-pack";
 import { validateLook } from "@/lib/look-validate";
 import { usePublishDemoOverride, useResetDemoOverride, type DemoKind } from "@/lib/demo-overrides";
+
+/** The look the panel is currently previewing (not yet published). */
+export type DemoDraftLook = {
+  stylePackId: string | null;
+  designRecipeId: string | null;
+  clearSlideBackgrounds: boolean;
+};
 
 type Props = {
   demoKind: DemoKind;
@@ -23,7 +30,16 @@ type Props = {
   divisionLabel: string;
   payload: TemplatePayload;
   hasOverride: boolean;
+  /** Lifts the in-progress look up so the rendered preview repaints live. */
+  onDraftLook?: (look: DemoDraftLook) => void;
 };
+
+/** True when the pack carries its own authored ground (R industry, S29/S30). */
+function packOwnsGround(packId: string): boolean {
+  if (!packId || !isSkinPackId(packId)) return false;
+  const code = skinCodeFromPackId(packId);
+  return Boolean(code && (/^R\d{2}$/.test(code) || code === "S29" || code === "S30"));
+}
 
 export function DemoStyleAdmin({
   demoKind,
@@ -32,6 +48,7 @@ export function DemoStyleAdmin({
   divisionLabel,
   payload,
   hasOverride,
+  onDraftLook,
 }: Props) {
   const ctx = (payload.context ?? {}) as Record<string, unknown>;
   const currentPack = (ctx["stylePackId"] as string | undefined) ?? "";
@@ -53,20 +70,38 @@ export function DemoStyleAdmin({
     [],
   );
 
-  // Guard against mismatched pairings (R-only looks, an industry ground on an
-  // industry/product language, another sector's plates) before publishing.
+  // Languages that ship their own ground can't also wear an R family. Rather
+  // than stacking red rows for a combination the panel already knows is wrong,
+  // the ground select simply switches off and the value is dropped.
+  const groundLocked = packOwnsGround(packId);
+  const effectiveRecipe = groundLocked || !packId ? "" : recipeId;
+
+  // Guard against mismatched pairings before publishing. Because the structural
+  // conflicts are now prevented in the UI, what's left here is art-direction
+  // advice (one warning at most).
   const validation = useMemo(
     () =>
       validateLook({
         stylePackId: packId || null,
-        designRecipeId: recipeId || null,
+        designRecipeId: effectiveRecipe || null,
         industry: (payload.brief?.industry as string | undefined) ?? divisionLabel,
       }),
-    [packId, recipeId, payload.brief?.industry, divisionLabel],
+    [packId, effectiveRecipe, payload.brief?.industry, divisionLabel],
   );
 
+  // Repaint the rendered preview from the draft look, before publishing.
+  useEffect(() => {
+    onDraftLook?.({
+      stylePackId: packId || null,
+      designRecipeId: effectiveRecipe || null,
+      clearSlideBackgrounds,
+    });
+  }, [packId, effectiveRecipe, clearSlideBackgrounds, onDraftLook]);
+
   const dirty =
-    packId !== currentPack || (recipeId || "") !== (currentRecipe || "") || clearSlideBackgrounds;
+    packId !== currentPack ||
+    (effectiveRecipe || "") !== (currentRecipe || "") ||
+    clearSlideBackgrounds;
 
   function apply() {
     if (!validation.ok) return;
@@ -84,7 +119,7 @@ export function DemoStyleAdmin({
       context: {
         ...(payload.context ?? {}),
         stylePackId: packId || undefined,
-        designRecipeId: recipeId ? recipeId : null,
+        designRecipeId: effectiveRecipe ? effectiveRecipe : null,
       },
     };
     publish.mutate({
@@ -148,9 +183,10 @@ export function DemoStyleAdmin({
         <label className="block text-[12px]">
           <span className="font-medium text-black/60 dark:text-white/60">Background family</span>
           <select
-            value={recipeId ?? ""}
+            value={effectiveRecipe}
+            disabled={groundLocked || !packId}
             onChange={(e) => setRecipeId(e.target.value)}
-            className="mt-1 min-h-[44px] w-full rounded-xl border border-black/12 bg-white px-3 text-sm dark:border-white/15 dark:bg-white/[0.06]"
+            className="mt-1 min-h-[44px] w-full rounded-xl border border-black/12 bg-white px-3 text-sm disabled:cursor-not-allowed disabled:opacity-55 dark:border-white/15 dark:bg-white/[0.06]"
           >
             <option value="">None — design-led backgrounds</option>
             {INDUSTRY_RECIPES.map((r) => (
@@ -159,6 +195,13 @@ export function DemoStyleAdmin({
               </option>
             ))}
           </select>
+          <span className="mt-1 block text-[11px] text-black/45 dark:text-white/45">
+            {groundLocked
+              ? "This language ships its own authored ground — no separate family needed."
+              : !packId
+                ? "Pick a visual language first; a family on its own is ignored."
+                : "Optional: paints an industry ground under the chosen language."}
+          </span>
         </label>
       </div>
 
@@ -173,25 +216,23 @@ export function DemoStyleAdmin({
       </label>
 
       {validation.issues.length ? (
-        <ul className="mt-3 space-y-1.5">
-          {validation.issues.map((issue) => (
-            <li
-              key={issue.code}
-              className={`flex items-start gap-2 rounded-xl px-3 py-2 text-[12px] ${
-                issue.level === "error"
-                  ? "bg-red-500/10 text-red-700 dark:text-red-300"
-                  : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
-              }`}
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[12px] text-amber-800 dark:text-amber-300">
+          <AlertTriangle size={14} className="shrink-0" />
+          <span>{validation.issues[0]!.message}</span>
+          {validation.suggestedRecipeId &&
+          validation.issues[0]!.code === "industry-mismatch" &&
+          !groundLocked ? (
+            <button
+              type="button"
+              onClick={() => setRecipeId(validation.suggestedRecipeId!)}
+              className="rounded-full border border-amber-600/40 px-2.5 py-1 text-[11px] font-semibold hover:bg-amber-500/15"
             >
-              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-              <span>
-                {issue.message}
-                {issue.fix ? <span className="opacity-70"> {issue.fix}</span> : null}
-              </span>
-            </li>
-          ))}
-        </ul>
+              Use {validation.suggestedRecipeId}
+            </button>
+          ) : null}
+        </div>
       ) : null}
+
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button

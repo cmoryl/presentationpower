@@ -10,7 +10,7 @@ import { useDeckStore, type DeckSnapshot, type TemplatePayload } from "@/lib/dec
 import { SHOWCASE_DECKS, getShowcaseDeck } from "@/lib/showcase-decks";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery";
-import { DemoStyleAdmin } from "@/components/showcase/DemoStyleAdmin";
+import { DemoStyleAdmin, type DemoDraftLook } from "@/components/showcase/DemoStyleAdmin";
 import { showcaseArt } from "@/lib/showcase-art";
 import { DEMO_DIVISIONS, retargetPayload, type DemoDivision } from "@/lib/showcase-division";
 
@@ -80,7 +80,30 @@ function ShowcaseDeckDemoPage() {
     payload ? Object.values(s.decks).find((d) => d.title === payload.title)?.id : undefined,
   );
 
-  if (!def || !payload) return null;
+  // Admin look controls preview *before* publishing: the rendered gallery below
+  // repaints from the draft look, so switching a language is visible instantly.
+  const [draftLook, setDraftLook] = useState<DemoDraftLook | null>(null);
+  const previewPayload = useMemo(() => {
+    if (!payload || !draftLook) return payload;
+    const slides = draftLook.clearSlideBackgrounds
+      ? payload.slides.map((s) => {
+          const content = { ...(s.content as Record<string, unknown>) };
+          delete content["background"];
+          return { ...s, content: content as typeof s.content };
+        })
+      : payload.slides;
+    return {
+      ...payload,
+      slides,
+      context: {
+        ...(payload.context ?? {}),
+        stylePackId: draftLook.stylePackId ?? undefined,
+        designRecipeId: draftLook.designRecipeId,
+      },
+    } as TemplatePayload;
+  }, [payload, draftLook]);
+
+  if (!def || !payload || !previewPayload) return null;
   const accent = division.accent;
 
   /** Create (or reopen) the visitor's own editable copy of the demo. */
@@ -248,6 +271,8 @@ function ShowcaseDeckDemoPage() {
 
       {isAdmin ? (
         <DemoStyleAdmin
+          key={division.id}
+          onDraftLook={setDraftLook}
           demoKind="deck"
           demoId={demoId}
           divisionKey={division.id}
@@ -261,14 +286,14 @@ function ShowcaseDeckDemoPage() {
       <section className="mt-10">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-lg font-semibold tracking-tight">
-            Rendered preview · all {payload.slides.length} slides
+            Rendered preview · all {previewPayload.slides.length} slides
           </h2>
           <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
             Click any slide to enlarge
           </span>
         </div>
         <div className="mt-4">
-          <ShowcaseSlideGallery payload={payload} accent={accent} />
+          <ShowcaseSlideGallery payload={previewPayload} accent={accent} />
         </div>
       </section>
 
