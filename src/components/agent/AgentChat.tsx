@@ -12,6 +12,12 @@ import { readStoredDesignDna } from "@/lib/agent/design-dna";
 import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
 import { AgentDesignOverrides } from "@/components/agent/AgentDesignOverrides";
 import { readStoredDesignOverrides } from "@/lib/agent/design-overrides";
+import {
+  AgentDocumentUpload,
+  useAgentDocuments,
+} from "@/components/agent/AgentDocumentUpload";
+import { withDocumentContext } from "@/lib/agent/doc-intake";
+
 
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
 import { AgentOutlinePreview, outlineFromToolInput } from "@/components/agent/AgentOutlinePreview";
