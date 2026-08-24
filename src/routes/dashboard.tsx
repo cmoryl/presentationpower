@@ -95,7 +95,7 @@ function SectionHead({
       />
       <div className="min-w-0">
         <h2 className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-          {Icon ? <Icon className="size-4" style={{ color: theme.accent2 }} aria-hidden /> : null}
+          {Icon ? <Icon className="size-4" style={{ color: theme.ink }} aria-hidden /> : null}
           {title}
         </h2>
         {hint ? <p className="mt-0.5 text-sm text-black/55 dark:text-white/55">{hint}</p> : null}
@@ -493,7 +493,7 @@ function RoleDashboard() {
                 <div className="flex items-baseline gap-3">
                   <span
                     className="text-sm font-semibold tabular-nums"
-                    style={{ color: theme.accent2 }}
+                    style={{ color: theme.ink }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -506,7 +506,7 @@ function RoleDashboard() {
                   to={step.to}
                   search={step.search}
                   className="mt-3 inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline-offset-4 hover:underline"
-                  style={{ color: theme.accent2 }}
+                  style={{ color: theme.ink }}
                 >
                   {step.cta}
                   <ArrowRight className="size-4" aria-hidden />
@@ -538,7 +538,7 @@ function RoleDashboard() {
                 <span className="mt-2 text-xs text-black/55 dark:text-white/55">{s.hint}</span>
                 <span
                   className="mt-3 inline-flex items-center gap-1 text-xs font-semibold opacity-0 transition-opacity group-hover:opacity-100"
-                  style={{ color: theme.accent2 }}
+                  style={{ color: theme.ink }}
                 >
                   Open
                   <ArrowRight className="size-3.5" aria-hidden />

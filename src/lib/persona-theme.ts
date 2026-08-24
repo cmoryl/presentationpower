@@ -18,6 +18,8 @@ export type PersonaTheme = {
   accent: string;
   /** Secondary accent — used for the far end of gradients. */
   accent2: string;
+  /** Accessible accent for accent-colored text/icons on white surfaces. */
+  ink: string;
   /** Text color that sits on top of the hero plate. */
   onHero: string;
   /** Five brick colors for the interactive Element motif. */
@@ -31,6 +33,7 @@ export const PERSONA_THEME: Record<PersonaId, PersonaTheme> = {
     base: "#03002C",
     accent: "#C2A3FF",
     accent2: "#003FC7",
+    ink: "#003FC7",
     onHero: "#FFFFFF",
     bricks: ["#C2A3FF", "#A1FBF9", "#003FC7", "#FFEB66", "#E0E8F5"],
   },
@@ -40,6 +43,7 @@ export const PERSONA_THEME: Record<PersonaId, PersonaTheme> = {
     base: "#1A0B2E",
     accent: "#FF9B70",
     accent2: "#EC388A",
+    ink: "#B3216B",
     onHero: "#FFFFFF",
     bricks: ["#FF9B70", "#EC388A", "#FFEB66", "#C2A3FF", "#F2F2F2"],
   },
@@ -49,6 +53,7 @@ export const PERSONA_THEME: Record<PersonaId, PersonaTheme> = {
     base: "#00203A",
     accent: "#A1FBF9",
     accent2: "#A6FA87",
+    ink: "#0F6B3C",
     onHero: "#FFFFFF",
     bricks: ["#A1FBF9", "#A6FA87", "#003FC7", "#FFEB66", "#E0E8F5"],
   },

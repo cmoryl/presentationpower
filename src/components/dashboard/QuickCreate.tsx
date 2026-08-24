@@ -152,7 +152,7 @@ export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; sig
         <div className="min-w-0">
           <p
             className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]"
-            style={{ background: `${theme.accent2}1A`, color: theme.accent2 }}
+            style={{ background: `${theme.ink}14`, color: theme.ink }}
           >
             <Zap className="size-3.5" aria-hidden />
             Quick create
@@ -202,7 +202,7 @@ export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; sig
               <span className="flex w-full items-center justify-between gap-2">
                 <span
                   className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]"
-                  style={{ background: `${theme.accent2}14`, color: theme.accent2 }}
+                  style={{ background: `${theme.ink}14`, color: theme.ink }}
                 >
                   <Icon className="size-3.5" aria-hidden />
                   {KIND_LABEL[preset.kind]}
