@@ -13,6 +13,12 @@ import { findPrintAssetIdInMessages } from "@/lib/print-agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { PRINT_PROPOSAL_TOOL_NAME } from "@/lib/print-agent/tools";
 import { PrintProposalCard, printProposalFromTool } from "./PrintProposalCard";
+import {
+  AgentDocumentUpload,
+  useAgentDocuments,
+} from "@/components/agent/AgentDocumentUpload";
+import { withDocumentContext } from "@/lib/agent/doc-intake";
+
 
 const TOOL_LABELS: Record<string, string> = {
   list_print_types: "Checking print types",
@@ -70,6 +76,8 @@ export function PrintAgentChat({
   });
 
   const [input, setInput] = useState("");
+  const { docs, setDocs } = useAgentDocuments();
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seenAsset = useRef<string | null>(null);
@@ -94,10 +102,11 @@ export function PrintAgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage?.(value);
       setInput("");
-      void sendMessage({ text: value });
+      void sendMessage({ text: withDocumentContext(value, docs) });
     },
-    [busy, messages.length, onFirstUserMessage, sendMessage],
+    [busy, docs, messages.length, onFirstUserMessage, sendMessage],
   );
+
 
   const sentPending = useRef(false);
   useEffect(() => {
@@ -190,6 +199,10 @@ export function PrintAgentChat({
           </Link>
         </div>
       ) : null}
+
+      <div className="border-t border-border bg-background px-4 pt-2 sm:px-6">
+        <AgentDocumentUpload docs={docs} onChange={setDocs} disabled={busy} />
+      </div>
 
       <form
         className="flex items-end gap-2 border-t border-border bg-background px-4 py-3 sm:px-6"

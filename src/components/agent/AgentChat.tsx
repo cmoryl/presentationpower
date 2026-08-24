@@ -12,6 +12,12 @@ import { readStoredDesignDna } from "@/lib/agent/design-dna";
 import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";
 import { AgentDesignOverrides } from "@/components/agent/AgentDesignOverrides";
 import { readStoredDesignOverrides } from "@/lib/agent/design-overrides";
+import {
+  AgentDocumentUpload,
+  useAgentDocuments,
+} from "@/components/agent/AgentDocumentUpload";
+import { withDocumentContext } from "@/lib/agent/doc-intake";
+
 
 import { AgentStatusTimeline } from "@/components/agent/AgentStatusTimeline";
 import { AgentOutlinePreview, outlineFromToolInput } from "@/components/agent/AgentOutlinePreview";
@@ -79,7 +85,9 @@ export function AgentChat({
   });
 
   const [input, setInput] = useState("");
+  const { docs, setDocs } = useAgentDocuments();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const busy = status === "submitted" || status === "streaming";
   const seenDeck = useRef<string | null>(null);
@@ -122,10 +130,12 @@ export function AgentChat({
         ...(dna ? { designDna: dna } : {}),
         ...(designOverrides ? { designOverrides } : {}),
       };
-      void sendMessage({ text: value }, Object.keys(body).length ? { body } : undefined);
+      const withDocs = withDocumentContext(value, docs);
+      void sendMessage({ text: withDocs }, Object.keys(body).length ? { body } : undefined);
     },
-    [busy, messages.length, onFirstUserMessage, sendMessage, threadId],
+    [busy, docs, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
+
 
   // The newest outline proposal is the only one that still offers actions.
   const lastOutlineMessage = useMemo(() => {
@@ -244,6 +254,10 @@ export function AgentChat({
       <div className="border-t border-border/60 bg-background/60 px-3 pt-2">
         <AgentDesignDnaImport threadId={threadId} />
         <AgentDesignOverrides threadId={threadId} />
+        <div className="pb-2 pt-1">
+          <AgentDocumentUpload docs={docs} onChange={setDocs} disabled={busy} />
+        </div>
+
       </div>
 
       <form
