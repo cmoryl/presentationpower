@@ -1110,9 +1110,14 @@ export function gamesPlatesForScene(scene: SkinScene, mode: GamesArtMode): Games
     const covered = brief.copy.filter((rg) =>
       p.quiet.some((q) => q === rg || q === "any" || q.includes(rg)),
     ).length;
-    const want = brief.loud ? 3 : 1;
+    // Content scenes still want a composed plate, just not a flat field: the
+    // old target of "low" activity pulled the near-plain flats to the top and
+    // every content slide wore a bare navy ground.
+    const want = brief.loud ? 4 : 2;
     const activityGap = Math.abs(ACTIVITY_RANK[p.activity] - want);
-    return { p, score: covered * 10 - activityGap };
+    // Textured compositions are the visual kit; flats are the fallback ground.
+    const textureBonus = p.texture === "textured" ? 4 : 0;
+    return { p, score: covered * 10 + textureBonus - activityGap };
   });
   scored.sort(
     (x, y) =>
