@@ -460,6 +460,7 @@ function BriefCommandCenter() {
 
     setDeckContext(deckId, {
       masterSet: {
+        presentation: set.presentation,
         eventPlaybookId: set.event.enabled ? set.event.playbookId : null,
         socialPlaybookId: set.social.enabled ? set.social.playbookId : null,
         printAssetIds: prints.map((p) => p.id),
@@ -482,11 +483,15 @@ function BriefCommandCenter() {
       patchJob("social", { status: "done", detail: "Social kit linked" });
     setExpanding(false);
 
-    const parts: string[] = ["Deck"];
+    // Only announce what the user actually asked for — a social-only brief must
+    // never report a deck it never wanted.
+    const parts: string[] = [];
+    if (set.presentation) parts.push("Deck");
     if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
     if (set.event.enabled && set.event.playbookId) parts.push("event kit");
     if (set.social.enabled && set.social.playbookId) parts.push("social kit");
-    toast.success(`Master set ready · ${parts.join(" · ")}`);
+    toast.success(`Ready · ${parts.join(" · ") || "brief saved"}`);
+
   }
 
   // Every artifact the current selection will produce, as trackable jobs.
