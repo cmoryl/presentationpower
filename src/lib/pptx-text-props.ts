@@ -120,17 +120,31 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     : 0;
   const contentPx = Math.max(run.w, estAdvancePx);
 
+  // SINGLE-LINE FIT — a tracked line whose PowerPoint advance is wider than the
+  // room left on the slide cannot be solved by widening the box: PowerPoint
+  // wraps it to a second line, which then overruns whatever sits below (an
+  // eyebrow spilling onto its own title). Shrink the type (and its tracking)
+  // just enough to keep the line single, exactly like the on-screen fit does.
+  const availIn =
+    align === "left"
+      ? Math.max(0.4, exportSlideBounds().wIn - Math.max(0, inX(run.x)))
+      : exportSlideBounds().wIn;
+  const needIn = inX(contentPx) + slack;
+  const fit =
+    run.singleLine && needIn > availIn ? Math.max(0.62, (availIn / needIn) * 0.995) : 1;
+  const sizeOut = size * fit;
+  const fittedPx = inX(contentPx) * fit;
+  const fittedSlack = slack * fit;
+
   const wRaw =
     run.singleLine && align === "left"
-      ? Math.max(
-          0.1,
-          Math.min(exportSlideBounds().wIn - Math.max(0, inX(run.x)), inX(contentPx) + slack + 1),
-        )
-      : Math.min(exportSlideBounds().wIn, inX(contentPx) + slack);
+      ? Math.max(0.1, Math.min(availIn, fittedPx + fittedSlack + 1))
+      : Math.min(exportSlideBounds().wIn, fittedPx + fittedSlack);
   // Extra width lands on the right edge, so centred / right-aligned copy shifts
   // left by the same amount to stay optically anchored where it sits on screen.
   const grow = Math.max(0, wRaw - inX(run.w));
   const xShift = align === "center" ? grow / 2 : align === "right" ? grow : 0;
+
 
   return {
     text,
@@ -146,12 +160,12 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
       Math.min(
         exportSlideBounds().hIn,
         run.singleLine && run.letterSpacingPx > 0
-          ? Math.max(inY(run.h) + 0.02, (size * 1.45) / 72)
+          ? Math.max(inY(run.h) + 0.02, (sizeOut * 1.45) / 72)
           : inY(run.h) + 0.02,
       ),
     ),
 
-    fontSize: r1(size),
+    fontSize: r1(sizeOut),
     fontFace: run.fontFamily,
     bold: run.bold,
     italic: run.italic,
@@ -160,8 +174,9 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
     transparency: run.transparency > 0 ? run.transparency : undefined,
     align,
     valign: run.valign,
-    lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx)) : undefined,
-    charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx)) : undefined,
+    lineSpacing: run.lineHeightPx > 0 ? r1(pxToPt(run.lineHeightPx) * fit) : undefined,
+    charSpacing: run.letterSpacingPx ? r1(pxToPt(run.letterSpacingPx) * fit) : undefined,
+
     // A no-wrap body (`wrap="none"`) makes some renderers lay the string out at its
     // UNTRACKED width and clip the tail once `spc` widens it — letter-spaced
     // eyebrows and footers lost their last ~25% of characters ("CONFIDENTIAL ·

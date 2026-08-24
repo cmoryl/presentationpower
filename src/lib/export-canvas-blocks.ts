@@ -36,6 +36,8 @@ import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
 import { cssAngleToOoxml } from "./canvas-fill";
 import { rectRadiusAdj } from "./export-radius";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
+import { isDroppableAdoptedMirror } from "./export-adopted-hide";
+
 
 import { coverCropTag, roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { mapFontFamily } from "./pptx-font-map";
@@ -152,8 +154,16 @@ export function canvasBlocksForExport(
   if (!blocks || blocks.length === 0) return [];
   // Heal geometry that was measured on an unscaled stage before shipping it:
   // the on-screen renderer repairs these blocks, so the export must match.
-  return repairBlocks(blocks).filter((b) => !b.exportExcluded && !b.hidden) as CanvasBlock[];
+  return repairBlocks(blocks).filter(
+    (b) =>
+      !b.exportExcluded &&
+      !b.hidden &&
+      // Untouched adopted non-text mirrors are left to the module itself (the
+      // capture keeps their source visible), so they never double up.
+      !isDroppableAdoptedMirror(b as CanvasBlock),
+  ) as CanvasBlock[];
 }
+
 
 /**
  * Emit a slide's canvas blocks as native objects, in editor paint order, on top
