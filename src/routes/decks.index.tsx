@@ -90,7 +90,15 @@ function DecksIndex() {
     return m;
   }, [analytics]);
 
-  const allDecks = useMemo<Deck[]>(() => Object.values(decksMap), [decksMap]);
+  // A brief that only asked for print/social/event still creates a deck record
+  // as its campaign spine (it carries the brief + sibling artifact ids). Those
+  // are not user artifacts, so they never appear in the deck library.
+  const allDecks = useMemo<Deck[]>(
+    () =>
+      Object.values(decksMap).filter((d) => d.context?.masterSet?.presentation !== false),
+    [decksMap],
+  );
+
 
   const enriched = useMemo(() => {
     return allDecks.map((d) => {
