@@ -417,7 +417,7 @@ function MediaCard({
 
 /* ---------------- live-rendered social / event cards ---------------- */
 
-function ShowcaseCard({ entry }: { entry: ShowcaseEntry }) {
+function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compact?: boolean }) {
   const meta = SURFACE_META[entry.surface];
   const Icon = meta.icon;
 
