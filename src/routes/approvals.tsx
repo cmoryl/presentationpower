@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -324,12 +324,12 @@ function ApprovalQueuePage() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   {r.subject_path && (
-                    <Link
-                      to={r.subject_path}
+                    <a
+                      href={r.subject_path}
                       className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs hover:bg-foreground/5"
                     >
                       Open asset
-                    </Link>
+                    </a>
                   )}
                   <button
                     type="button"
