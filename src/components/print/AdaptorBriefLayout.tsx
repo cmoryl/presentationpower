@@ -119,328 +119,330 @@ export function AdaptorBriefLayout({
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
-      {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
-      <PrintSurfaceProvider mode={mode}>
-        <div
-          className="relative w-full overflow-hidden [container-type:inline-size]"
-          data-print-page
-          style={{
-            aspectRatio: pageAspect(pageSize),
-            backgroundColor: mode === "light" ? "#FFFFFF" : bg,
-            color: ink,
-            fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-            ...style,
-          }}
-        >
-          {mode === "light" && (
-            <div
-              className="pointer-events-none absolute inset-0"
-              aria-hidden
-              style={{ background: "#FFFFFF", zIndex: 0 }}
-            />
-          )}
-          {content.heroMedia ? (
-            <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
-          ) : null}
-
+        {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+        <PrintSurfaceProvider mode={mode}>
           <div
-            className="relative flex h-full flex-col"
+            className="relative w-full overflow-hidden [container-type:inline-size]"
+            data-print-page
             style={{
-              paddingLeft: padCq(padX(density)),
-              paddingRight: padCq(padX(density)),
-              paddingTop: cq(padTop(density)),
-              paddingBottom: cq(28),
+              aspectRatio: pageAspect(pageSize),
+              backgroundColor: mode === "light" ? "#FFFFFF" : bg,
+              color: ink,
+              fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
+              ...style,
             }}
           >
-            {/* HERO — wrapped in a relative container so a localized text-backing
-                scrim travels with the copy block rather than introducing a
-                full-width top wash. */}
+            {mode === "light" && (
+              <div
+                className="pointer-events-none absolute inset-0"
+                aria-hidden
+                style={{ background: "#FFFFFF", zIndex: 0 }}
+              />
+            )}
+            {content.heroMedia ? (
+              <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
+            ) : null}
+
             <div
-              data-section="hero"
-              data-section-label="Hero"
+              className="relative flex h-full flex-col"
               style={{
-                position: "relative",
-                minHeight: content.heroMedia?.imageUrl
-                  ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${cq(padTop(density))})`
-                  : undefined,
-                display: "flex",
-                flexDirection: "column",
+                paddingLeft: padCq(padX(density)),
+                paddingRight: padCq(padX(density)),
+                paddingTop: cq(padTop(density)),
+                paddingBottom: cq(28),
               }}
             >
-              {/* No local copy scrim — it left a hard-edged gradient rectangle
-                  over the photo. Readability comes from the hero media layer's
-                  own feathered scrim/mask (same treatment as the case study). */}
-              <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
-                <PrintEyebrow
-                  label={content.eyebrow ?? "ADAPTOR BRIEF"}
-                  mode={mode}
-                  accent={accent}
-                  cq={cq}
-                  onDark
-                />
-
-                <BrandLockup
-                  unit={cq}
-                  brand={brand}
-                  color={mode === "dark" ? "#FFFFFF" : "#000000"}
-                  size="xs"
-                  orientation="horizontal"
-                  monochromeOfficialLogo
-                />
-              </div>
+              {/* HERO — wrapped in a relative container so a localized text-backing
+                scrim travels with the copy block rather than introducing a
+                full-width top wash. */}
               <div
+                data-section="hero"
+                data-section-label="Hero"
                 style={{
-                  flex: 1,
+                  position: "relative",
+                  minHeight: content.heroMedia?.imageUrl
+                    ? `calc(${(content.heroMedia.heightPct ?? 46) - 6}% - ${cq(padTop(density))})`
+                    : undefined,
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "center",
-                  transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
-                  willChange: "transform",
                 }}
               >
+                {/* No local copy scrim — it left a hard-edged gradient rectangle
+                  over the photo. Readability comes from the hero media layer's
+                  own feathered scrim/mask (same treatment as the case study). */}
+                <div className="relative flex items-center justify-between" style={{ gap: cq(10) }}>
+                  <PrintEyebrow
+                    label={content.eyebrow ?? "ADAPTOR BRIEF"}
+                    mode={mode}
+                    accent={accent}
+                    cq={cq}
+                    onDark
+                  />
+
+                  <BrandLockup
+                    unit={cq}
+                    brand={brand}
+                    color={mode === "dark" ? "#FFFFFF" : "#000000"}
+                    size="xs"
+                    orientation="horizontal"
+                    monochromeOfficialLogo
+                  />
+                </div>
                 <div
                   style={{
-                    ...heroRuleTop(heroStyle, accent, 0),
-                    marginBottom: content.heroRule?.weight ? heroRuleGap(heroStyle, 12) : undefined,
-                  }}
-                />
-                <div
-                  ref={heroRef}
-                  style={{
-                    position: "relative",
-                    margin: 0,
-                    fontWeight: 700,
-                    fontSize: cq(titlePx),
-                    lineHeight: 1.12,
-                    letterSpacing: "-0.015em",
-                    color: heroInk,
-                    maxWidth: cq(480),
-                    ...heroTitleStyle(heroStyle),
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    transform: `translateY(${content.heroMedia?.copyOffsetPct ?? 0}%)`,
+                    willChange: "transform",
                   }}
                 >
-                  {content.title || "Untitled adaptor brief"}
-                </div>
-                {content.summary && (
-                  <p
-                    ref={introRef}
+                  <div
+                    style={{
+                      ...heroRuleTop(heroStyle, accent, 0),
+                      marginBottom: content.heroRule?.weight
+                        ? heroRuleGap(heroStyle, 12)
+                        : undefined,
+                    }}
+                  />
+                  <div
+                    ref={heroRef}
                     style={{
                       position: "relative",
-                      margin: `${cq(14)} 0 0`,
-                      fontSize: cq(summaryPx),
-                      lineHeight: 1.6,
-                      color: heroSubInk,
-                      maxWidth: cq(380),
-                      ...heroSummaryStyle(heroStyle),
+                      margin: 0,
+                      fontWeight: 700,
+                      fontSize: cq(titlePx),
+                      lineHeight: 1.12,
+                      letterSpacing: "-0.015em",
+                      color: heroInk,
+                      maxWidth: cq(480),
+                      ...heroTitleStyle(heroStyle),
                     }}
                   >
-                    {content.summary}
-                  </p>
-                )}
-                <div
-                  style={{
-                    ...heroHairline(heroStyle, { hairline: dividerCol }, false),
-                    marginTop: cq(14),
-                  }}
-                />
+                    {content.title || "Untitled adaptor brief"}
+                  </div>
+                  {content.summary && (
+                    <p
+                      ref={introRef}
+                      style={{
+                        position: "relative",
+                        margin: `${cq(14)} 0 0`,
+                        fontSize: cq(summaryPx),
+                        lineHeight: 1.6,
+                        color: heroSubInk,
+                        maxWidth: cq(380),
+                        ...heroSummaryStyle(heroStyle),
+                      }}
+                    >
+                      {content.summary}
+                    </p>
+                  )}
+                  <div
+                    style={{
+                      ...heroHairline(heroStyle, { hairline: dividerCol }, false),
+                      marginTop: cq(14),
+                    }}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* 6 FEATURE CARDS — grouped in one rounded panel (Canva ref). */}
-            <div
-              data-section="features"
-              data-section-label="Feature grid"
-              style={{ paddingTop: cq(28) }}
-            >
-              <div style={{ borderRadius: cq(16), padding: cq(18), ...glassCard(mode, accent) }}>
-                <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
-                  {features.map((f, i) => {
-                    const glyph = VERB_ICONS[f.verb.toLowerCase()] ?? VERB_ICONS.default;
-                    return (
-                      <div
-                        key={i}
-                        style={{
-                          borderRadius: cq(12),
-                          padding: `${cq(14)} ${cq(12)}`,
-                          background: "transparent",
-                        }}
-                      >
+              {/* 6 FEATURE CARDS — grouped in one rounded panel (Canva ref). */}
+              <div
+                data-section="features"
+                data-section-label="Feature grid"
+                style={{ paddingTop: cq(28) }}
+              >
+                <div style={{ borderRadius: cq(16), padding: cq(18), ...glassCard(mode, accent) }}>
+                  <div className="grid" style={{ gridTemplateColumns: "1fr 1fr 1fr", gap: cq(14) }}>
+                    {features.map((f, i) => {
+                      const glyph = VERB_ICONS[f.verb.toLowerCase()] ?? VERB_ICONS.default;
+                      return (
+                        <div
+                          key={i}
+                          style={{
+                            borderRadius: cq(12),
+                            padding: `${cq(14)} ${cq(12)}`,
+                            background: "transparent",
+                          }}
+                        >
+                          <div
+                            className="flex items-center justify-center"
+                            style={{
+                              width: cq(38),
+                              height: cq(38),
+                              borderRadius: cq(10),
+                              ...chipStyle(mode, accent),
+                            }}
+                          >
+                            <EditableIcon
+                              slot={`ab.item.${i}`}
+                              d={glyph!}
+                              size={cq(18)}
+                              color={accentInk}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              fontWeight: 700,
+                              fontSize: cq(15),
+                              color: accentInk,
+                              marginTop: cq(10),
+                            }}
+                          >
+                            {f.verb}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: cq(10.5),
+                              lineHeight: 1.5,
+                              color: inkSoft,
+                              marginTop: cq(4),
+                              ...clampLines(4),
+                            }}
+                          >
+                            {f.body}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* WE KNOW HOW strip */}
+              {knowHow.length > 0 && (
+                <div data-section="knowHow" data-section-label="We know how">
+                  <div className="flex items-center" style={{ gap: cq(14), paddingTop: cq(28) }}>
+                    <div style={{ flex: 1, height: 1, background: dividerCol }} />
+                    <div
+                      style={{
+                        fontSize: cq(10),
+                        fontWeight: 700,
+                        letterSpacing: "0.14em",
+                        color: ink,
+                      }}
+                    >
+                      WE KNOW HOW
+                    </div>
+                    <div style={{ flex: 1, height: 1, background: dividerCol }} />
+                  </div>
+                  <div
+                    className="grid"
+                    style={{
+                      gridTemplateColumns: `repeat(${knowHow.length}, minmax(0, 1fr))`,
+                      gap: cq(12),
+                      paddingTop: cq(22),
+                      textAlign: "center",
+                    }}
+                  >
+                    {knowHow.map((k, i) => (
+                      <div key={i} className="flex flex-col items-center" style={{ gap: cq(8) }}>
                         <div
                           className="flex items-center justify-center"
                           style={{
-                            width: cq(38),
-                            height: cq(38),
-                            borderRadius: cq(10),
+                            width: cq(34),
+                            height: cq(34),
+                            borderRadius: "50%",
                             ...chipStyle(mode, accent),
                           }}
                         >
-                          <EditableIcon
-                            slot={`ab.item.${i}`}
-                            d={glyph!}
-                            size={cq(18)}
+                          <Icon
+                            d={KNOW_ICONS[i % KNOW_ICONS.length]!}
+                            size={cq(17)}
                             color={accentInk}
                           />
                         </div>
                         <div
                           style={{
-                            fontWeight: 700,
-                            fontSize: cq(15),
-                            color: accentInk,
-                            marginTop: cq(10),
-                          }}
-                        >
-                          {f.verb}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: cq(10.5),
-                            lineHeight: 1.5,
+                            fontSize: cq(9.5),
+                            lineHeight: 1.45,
                             color: inkSoft,
-                            marginTop: cq(4),
-                            ...clampLines(4),
+                            ...clampLines(3),
                           }}
                         >
-                          {f.body}
+                          {k}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* WE KNOW HOW strip */}
-            {knowHow.length > 0 && (
-              <div data-section="knowHow" data-section-label="We know how">
-                <div className="flex items-center" style={{ gap: cq(14), paddingTop: cq(28) }}>
-                  <div style={{ flex: 1, height: 1, background: dividerCol }} />
-                  <div
-                    style={{
-                      fontSize: cq(10),
-                      fontWeight: 700,
-                      letterSpacing: "0.14em",
-                      color: ink,
-                    }}
-                  >
-                    WE KNOW HOW
+                    ))}
                   </div>
-                  <div style={{ flex: 1, height: 1, background: dividerCol }} />
                 </div>
-                <div
-                  className="grid"
-                  style={{
-                    gridTemplateColumns: `repeat(${knowHow.length}, minmax(0, 1fr))`,
-                    gap: cq(12),
-                    paddingTop: cq(22),
-                    textAlign: "center",
-                  }}
-                >
-                  {knowHow.map((k, i) => (
-                    <div key={i} className="flex flex-col items-center" style={{ gap: cq(8) }}>
-                      <div
-                        className="flex items-center justify-center"
-                        style={{
-                          width: cq(34),
-                          height: cq(34),
-                          borderRadius: "50%",
-                          ...chipStyle(mode, accent),
-                        }}
-                      >
-                        <Icon
-                          d={KNOW_ICONS[i % KNOW_ICONS.length]!}
-                          size={cq(17)}
-                          color={accentInk}
-                        />
-                      </div>
-                      <div
-                        style={{
-                          fontSize: cq(9.5),
-                          lineHeight: 1.45,
-                          color: inkSoft,
-                          ...clampLines(3),
-                        }}
-                      >
-                        {k}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* QUOTE */}
-            {content.quote && (
-              <div
-                data-section="quote"
-                data-section-label="Quote"
-                className="flex items-start"
-                style={{ gap: cq(16), paddingTop: cq(30), flex: 1 }}
-              >
+              {/* QUOTE */}
+              {content.quote && (
                 <div
-                  style={{
-                    fontFamily: "Georgia, serif",
-                    fontSize: cq(54),
-                    lineHeight: 0.8,
-                    color: accentInk,
-                    fontWeight: 700,
-                  }}
-                  aria-hidden
+                  data-section="quote"
+                  data-section-label="Quote"
+                  className="flex items-start"
+                  style={{ gap: cq(16), paddingTop: cq(30), flex: 1 }}
                 >
-                  &ldquo;
-                </div>
-                <div style={{ flex: 1 }}>
-                  <p
-                    style={{
-                      margin: `${cq(4)} 0 0`,
-                      fontSize: cq(16),
-                      lineHeight: 1.6,
-                      color: ink,
-                      fontWeight: 500,
-                      ...clampLines(5),
-                    }}
-                  >
-                    {content.quote.text}
-                  </p>
                   <div
                     style={{
-                      marginTop: cq(8),
-                      fontSize: cq(11),
-                      fontWeight: 700,
+                      fontFamily: "Georgia, serif",
+                      fontSize: cq(54),
+                      lineHeight: 0.8,
                       color: accentInk,
+                      fontWeight: 700,
                     }}
+                    aria-hidden
                   >
-                    — {content.quote.author}
-                    {content.quote.company ? ` · ${content.quote.company}` : ""}
+                    &ldquo;
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p
+                      style={{
+                        margin: `${cq(4)} 0 0`,
+                        fontSize: cq(16),
+                        lineHeight: 1.6,
+                        color: ink,
+                        fontWeight: 500,
+                        ...clampLines(5),
+                      }}
+                    >
+                      {content.quote.text}
+                    </p>
+                    <div
+                      style={{
+                        marginTop: cq(8),
+                        fontSize: cq(11),
+                        fontWeight: 700,
+                        color: accentInk,
+                      }}
+                    >
+                      — {content.quote.author}
+                      {content.quote.company ? ` · ${content.quote.company}` : ""}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* SHARED MODULES */}
-            <PrintSectionsStack
-              sections={content.modules}
-              mode={mode}
-              accent={accent}
-              density={density}
-            />
+              {/* SHARED MODULES */}
+              <PrintSectionsStack
+                sections={content.modules}
+                mode={mode}
+                accent={accent}
+                density={density}
+              />
 
-            {/* CTA BAND */}
-            {content.cta && (
-              <div data-section="cta" data-section-label="Call to action">
-                <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
-              </div>
-            )}
+              {/* CTA BAND */}
+              {content.cta && (
+                <div data-section="cta" data-section-label="Call to action">
+                  <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
+                </div>
+              )}
 
-            {/* FOOTER */}
-            <PrintFooterLockup
-              brand={brand}
-              mode={mode}
-              cq={cq}
-              links={["transperfect.com"]}
-              productLogoKey="globallink"
-            />
+              {/* FOOTER */}
+              <PrintFooterLockup
+                brand={brand}
+                mode={mode}
+                cq={cq}
+                links={["transperfect.com"]}
+                productLogoKey="globallink"
+              />
+            </div>
           </div>
-        </div>
-      </PrintSurfaceProvider>
+        </PrintSurfaceProvider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
   );

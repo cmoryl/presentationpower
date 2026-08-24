@@ -433,21 +433,21 @@ export function PrintSectionsStack({
     // Modules draw brand-coloured glyphs; the stack tells them which sheet
     // they are on so those strokes stay readable in dark mode.
     <PrintSurfaceProvider mode={mode}>
-    <div
-      data-print-module-stack
-      style={{ display: "flex", flexDirection: "column", rowGap: cq(rhythm) }}
-    >
-      {sections.map((s) => (
-        <div
-          key={s.id}
-          data-section={`module:${s.id}`}
-          data-section-label={sectionLabel(s)}
-          style={{ minWidth: 0 }}
-        >
-          <PrintSectionRenderer section={s} mode={mode} accent={accent} />
-        </div>
-      ))}
-    </div>
+      <div
+        data-print-module-stack
+        style={{ display: "flex", flexDirection: "column", rowGap: cq(rhythm) }}
+      >
+        {sections.map((s) => (
+          <div
+            key={s.id}
+            data-section={`module:${s.id}`}
+            data-section-label={sectionLabel(s)}
+            style={{ minWidth: 0 }}
+          >
+            <PrintSectionRenderer section={s} mode={mode} accent={accent} />
+          </div>
+        ))}
+      </div>
     </PrintSurfaceProvider>
   );
 }

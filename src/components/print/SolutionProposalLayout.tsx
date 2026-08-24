@@ -125,126 +125,169 @@ export function SolutionProposalLayout({
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
-      {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
-      <PrintSurfaceProvider mode={mode}>
-        <div
-          className="relative w-full overflow-hidden [container-type:inline-size]"
-          data-print-page
-          style={{
-            aspectRatio: pageAspect(pageSize),
-            backgroundColor: pageBg,
-            color: ink,
-            fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
-            display: "flex",
-            flexDirection: "column",
-            ...style,
-          }}
-        >
-          {/* ---------- 1. MASTHEAD ---------- */}
+        {/* Glyph ink resolves against the sheet: brand blues get lifted on dark. */}
+        <PrintSurfaceProvider mode={mode}>
           <div
-            data-section="masthead"
-            data-section-label="Proposal masthead"
+            className="relative w-full overflow-hidden [container-type:inline-size]"
+            data-print-page
             style={{
-              paddingLeft: pad,
-              paddingRight: pad,
-              paddingTop: cq(28),
-              paddingBottom: cq(18),
-              borderBottom: `${cq(3)} solid ${accent}`,
+              aspectRatio: pageAspect(pageSize),
+              backgroundColor: pageBg,
+              color: ink,
+              fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif",
+              display: "flex",
+              flexDirection: "column",
+              ...style,
             }}
           >
-            <div className="flex items-center justify-between" style={{ gap: cq(18) }}>
-              <BrandLockup
-                unit={cq}
-                brand={brand}
-                color={mode === "dark" ? "#FFFFFF" : primary}
-                size="sm"
-                orientation="horizontal"
-              />
-              {content.clientLogoUrl ? (
-                <img
-                  src={content.clientLogoUrl}
-                  alt={content.preparedFor?.company ? `${content.preparedFor.company} logo` : ""}
-                  style={{
-                    height: cq(30),
-                    width: "auto",
-                    maxWidth: cq(190),
-                    objectFit: "contain",
-                  }}
-                />
-              ) : null}
-            </div>
-
-            {content.eyebrow && (
-              <div
-                style={{
-                  marginTop: cq(20),
-                  fontSize: cq(9),
-                  fontWeight: 700,
-                  letterSpacing: "0.22em",
-                  textTransform: "uppercase",
-                  color: primary,
-                }}
-              >
-                {content.eyebrow}
-              </div>
-            )}
-            <h1
+            {/* ---------- 1. MASTHEAD ---------- */}
+            <div
+              data-section="masthead"
+              data-section-label="Proposal masthead"
               style={{
-                margin: `${cq(8)} 0 0`,
-                fontSize: cq(34),
-                lineHeight: 1.05,
-                fontWeight: 700,
-                letterSpacing: "-0.03em",
-                color: ink,
-                ...clampLines(2),
+                paddingLeft: pad,
+                paddingRight: pad,
+                paddingTop: cq(28),
+                paddingBottom: cq(18),
+                borderBottom: `${cq(3)} solid ${accent}`,
               }}
             >
-              {content.title || "Solutions proposal"}
-            </h1>
-            {content.subtitle && (
-              <div
+              <div className="flex items-center justify-between" style={{ gap: cq(18) }}>
+                <BrandLockup
+                  unit={cq}
+                  brand={brand}
+                  color={mode === "dark" ? "#FFFFFF" : primary}
+                  size="sm"
+                  orientation="horizontal"
+                />
+                {content.clientLogoUrl ? (
+                  <img
+                    src={content.clientLogoUrl}
+                    alt={content.preparedFor?.company ? `${content.preparedFor.company} logo` : ""}
+                    style={{
+                      height: cq(30),
+                      width: "auto",
+                      maxWidth: cq(190),
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : null}
+              </div>
+
+              {content.eyebrow && (
+                <div
+                  style={{
+                    marginTop: cq(20),
+                    fontSize: cq(9),
+                    fontWeight: 700,
+                    letterSpacing: "0.22em",
+                    textTransform: "uppercase",
+                    color: primary,
+                  }}
+                >
+                  {content.eyebrow}
+                </div>
+              )}
+              <h1
                 style={{
-                  marginTop: cq(6),
-                  fontSize: cq(12),
-                  fontWeight: 600,
-                  color: primary,
+                  margin: `${cq(8)} 0 0`,
+                  fontSize: cq(34),
+                  lineHeight: 1.05,
+                  fontWeight: 700,
+                  letterSpacing: "-0.03em",
+                  color: ink,
                   ...clampLines(2),
                 }}
               >
-                {content.subtitle}
-              </div>
-            )}
-            {content.summary && (
-              <p
-                ref={summaryRef}
-                style={{
-                  margin: `${cq(10)} 0 0`,
-                  maxWidth: cq(620),
-                  fontSize: cq(11),
-                  lineHeight: 1.55,
-                  color: inkSoft,
-                }}
-              >
-                {content.summary}
-              </p>
-            )}
-          </div>
+                {content.title || "Solutions proposal"}
+              </h1>
+              {content.subtitle && (
+                <div
+                  style={{
+                    marginTop: cq(6),
+                    fontSize: cq(12),
+                    fontWeight: 600,
+                    color: primary,
+                    ...clampLines(2),
+                  }}
+                >
+                  {content.subtitle}
+                </div>
+              )}
+              {content.summary && (
+                <p
+                  ref={summaryRef}
+                  style={{
+                    margin: `${cq(10)} 0 0`,
+                    maxWidth: cq(620),
+                    fontSize: cq(11),
+                    lineHeight: 1.55,
+                    color: inkSoft,
+                  }}
+                >
+                  {content.summary}
+                </p>
+              )}
+            </div>
 
-          {/* ---------- 2. COVER BLOCK ---------- */}
-          <div
-            data-section="parties"
-            data-section-label="Prepared for / by"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr auto",
-              gap: cq(18),
-              paddingLeft: pad,
-              paddingRight: pad,
-              paddingTop: cq(18),
-            }}
-          >
-            {parties.map(({ key, party }, idx) => (
-              <div key={key}>
+            {/* ---------- 2. COVER BLOCK ---------- */}
+            <div
+              data-section="parties"
+              data-section-label="Prepared for / by"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr auto",
+                gap: cq(18),
+                paddingLeft: pad,
+                paddingRight: pad,
+                paddingTop: cq(18),
+              }}
+            >
+              {parties.map(({ key, party }, idx) => (
+                <div key={key}>
+                  <div
+                    style={{
+                      fontSize: cq(8.5),
+                      fontWeight: 700,
+                      letterSpacing: "0.18em",
+                      textTransform: "uppercase",
+                      color: primary,
+                    }}
+                  >
+                    {party?.label || (idx === 0 ? "Prepared for:" : "Prepared by:")}
+                  </div>
+                  <div
+                    style={{ marginTop: cq(6), fontSize: cq(11.5), fontWeight: 700, color: ink }}
+                  >
+                    {party?.contact ?? ""}
+                  </div>
+                  {party?.role && (
+                    <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.role}</div>
+                  )}
+                  {party?.company && (
+                    <div
+                      style={{ marginTop: cq(4), fontSize: cq(10), fontWeight: 600, color: ink }}
+                    >
+                      {party.company}
+                    </div>
+                  )}
+                  {party?.address1 && (
+                    <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.address1}</div>
+                  )}
+                  {party?.address2 && (
+                    <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.address2}</div>
+                  )}
+                  {party?.email && (
+                    <div style={{ fontSize: cq(9.5), color: inkSoft, wordBreak: "break-all" }}>
+                      {party.email}
+                    </div>
+                  )}
+                  {party?.phone && (
+                    <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.phone}</div>
+                  )}
+                </div>
+              ))}
+              <div style={{ textAlign: "right" }}>
                 <div
                   style={{
                     fontSize: cq(8.5),
@@ -254,145 +297,135 @@ export function SolutionProposalLayout({
                     color: primary,
                   }}
                 >
-                  {party?.label || (idx === 0 ? "Prepared for:" : "Prepared by:")}
+                  Date:
                 </div>
-                <div style={{ marginTop: cq(6), fontSize: cq(11.5), fontWeight: 700, color: ink }}>
-                  {party?.contact ?? ""}
+                <div style={{ marginTop: cq(6), fontSize: cq(12), fontWeight: 700, color: ink }}>
+                  {content.dateLabel || ""}
                 </div>
-                {party?.role && (
-                  <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.role}</div>
-                )}
-                {party?.company && (
-                  <div style={{ marginTop: cq(4), fontSize: cq(10), fontWeight: 600, color: ink }}>
-                    {party.company}
-                  </div>
-                )}
-                {party?.address1 && (
-                  <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.address1}</div>
-                )}
-                {party?.address2 && (
-                  <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.address2}</div>
-                )}
-                {party?.email && (
-                  <div style={{ fontSize: cq(9.5), color: inkSoft, wordBreak: "break-all" }}>
-                    {party.email}
-                  </div>
-                )}
-                {party?.phone && (
-                  <div style={{ fontSize: cq(9.5), color: inkSoft }}>{party.phone}</div>
-                )}
-              </div>
-            ))}
-            <div style={{ textAlign: "right" }}>
-              <div
-                style={{
-                  fontSize: cq(8.5),
-                  fontWeight: 700,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: primary,
-                }}
-              >
-                Date:
-              </div>
-              <div style={{ marginTop: cq(6), fontSize: cq(12), fontWeight: 700, color: ink }}>
-                {content.dateLabel || ""}
               </div>
             </div>
-          </div>
 
-          {/* ---------- 3. SCOPE BAND ---------- */}
-          <div
-            data-section="scope"
-            data-section-label="Scope & timeline"
-            style={{ paddingLeft: pad, paddingRight: pad, paddingTop: cq(20) }}
-          >
-            {included.length > 0 && (
-              <>
-                <div
-                  style={{
-                    fontSize: cq(13),
-                    fontWeight: 700,
-                    letterSpacing: "-0.01em",
-                    color: ink,
-                  }}
-                >
-                  {content.includedTitle || "What's included"}
-                </div>
-                <div
-                  className="grid"
-                  style={{
-                    marginTop: cq(10),
-                    gridTemplateColumns: `repeat(${Math.min(included.length, 4)}, minmax(0, 1fr))`,
-                    gap: cq(10),
-                  }}
-                >
-                  {included.map((item, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        borderRadius: cq(12),
-                        border: `1px solid ${line}`,
-                        background: cardBg,
-                        padding: `${cq(12)} ${cq(10)}`,
-                      }}
-                    >
-                      <EditableIcon
-                        slot={`proposal.included.${i}`}
-                        d={iconFor(item.icon, i)}
-                        size={cq(18)}
-                        color={primary}
-                      />
+            {/* ---------- 3. SCOPE BAND ---------- */}
+            <div
+              data-section="scope"
+              data-section-label="Scope & timeline"
+              style={{ paddingLeft: pad, paddingRight: pad, paddingTop: cq(20) }}
+            >
+              {included.length > 0 && (
+                <>
+                  <div
+                    style={{
+                      fontSize: cq(13),
+                      fontWeight: 700,
+                      letterSpacing: "-0.01em",
+                      color: ink,
+                    }}
+                  >
+                    {content.includedTitle || "What's included"}
+                  </div>
+                  <div
+                    className="grid"
+                    style={{
+                      marginTop: cq(10),
+                      gridTemplateColumns: `repeat(${Math.min(included.length, 4)}, minmax(0, 1fr))`,
+                      gap: cq(10),
+                    }}
+                  >
+                    {included.map((item, i) => (
                       <div
+                        key={i}
                         style={{
-                          marginTop: cq(8),
-                          fontSize: cq(10),
-                          lineHeight: 1.35,
-                          fontWeight: 700,
-                          color: ink,
-                          ...clampLines(2),
+                          borderRadius: cq(12),
+                          border: `1px solid ${line}`,
+                          background: cardBg,
+                          padding: `${cq(12)} ${cq(10)}`,
                         }}
                       >
-                        {item.label}
-                      </div>
-                      {item.detail && (
+                        <EditableIcon
+                          slot={`proposal.included.${i}`}
+                          d={iconFor(item.icon, i)}
+                          size={cq(18)}
+                          color={primary}
+                        />
                         <div
                           style={{
-                            marginTop: cq(4),
-                            fontSize: cq(8.5),
-                            lineHeight: 1.4,
-                            color: inkSoft,
-                            ...clampLines(3),
+                            marginTop: cq(8),
+                            fontSize: cq(10),
+                            lineHeight: 1.35,
+                            fontWeight: 700,
+                            color: ink,
+                            ...clampLines(2),
                           }}
                         >
-                          {item.detail}
+                          {item.label}
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+                        {item.detail && (
+                          <div
+                            style={{
+                              marginTop: cq(4),
+                              fontSize: cq(8.5),
+                              lineHeight: 1.4,
+                              color: inkSoft,
+                              ...clampLines(3),
+                            }}
+                          >
+                            {item.detail}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
 
-            <div
-              className="grid"
-              style={{
-                marginTop: cq(16),
-                gridTemplateColumns: "1fr 1fr 1.4fr",
-                gap: cq(12),
-              }}
-            >
-              {[
-                { title: content.sourceFilesTitle || "Source files", items: sourceFiles },
-                { title: content.deliverablesTitle || "Deliverables", items: deliverables },
-              ].map((col, i) => (
-                <div
-                  key={i}
-                  style={{
-                    borderTop: `1px solid ${line}`,
-                    paddingTop: cq(10),
-                  }}
-                >
+              <div
+                className="grid"
+                style={{
+                  marginTop: cq(16),
+                  gridTemplateColumns: "1fr 1fr 1.4fr",
+                  gap: cq(12),
+                }}
+              >
+                {[
+                  { title: content.sourceFilesTitle || "Source files", items: sourceFiles },
+                  { title: content.deliverablesTitle || "Deliverables", items: deliverables },
+                ].map((col, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      borderTop: `1px solid ${line}`,
+                      paddingTop: cq(10),
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: cq(8.5),
+                        fontWeight: 700,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        color: primary,
+                      }}
+                    >
+                      {col.title}
+                    </div>
+                    <ul style={{ margin: `${cq(8)} 0 0`, padding: 0, listStyle: "none" }}>
+                      {col.items.map((v, j) => (
+                        <li
+                          key={j}
+                          style={{
+                            fontSize: cq(9.5),
+                            lineHeight: 1.5,
+                            color: ink,
+                            ...clampLines(2),
+                          }}
+                        >
+                          {v}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+                <div style={{ borderTop: `1px solid ${line}`, paddingTop: cq(10) }}>
                   <div
                     style={{
                       fontSize: cq(8.5),
@@ -402,389 +435,367 @@ export function SolutionProposalLayout({
                       color: primary,
                     }}
                   >
-                    {col.title}
+                    {content.timelineTitle || "Timeline"}
                   </div>
-                  <ul style={{ margin: `${cq(8)} 0 0`, padding: 0, listStyle: "none" }}>
-                    {col.items.map((v, j) => (
-                      <li
-                        key={j}
-                        style={{
-                          fontSize: cq(9.5),
-                          lineHeight: 1.5,
-                          color: ink,
-                          ...clampLines(2),
-                        }}
-                      >
-                        {v}
-                      </li>
-                    ))}
-                  </ul>
+                  <p
+                    ref={timelineRef}
+                    style={{
+                      margin: `${cq(8)} 0 0`,
+                      fontSize: cq(9.5),
+                      lineHeight: 1.5,
+                      color: inkSoft,
+                    }}
+                  >
+                    {content.timelineNote}
+                  </p>
                 </div>
-              ))}
-              <div style={{ borderTop: `1px solid ${line}`, paddingTop: cq(10) }}>
-                <div
-                  style={{
-                    fontSize: cq(8.5),
-                    fontWeight: 700,
-                    letterSpacing: "0.16em",
-                    textTransform: "uppercase",
-                    color: primary,
-                  }}
-                >
-                  {content.timelineTitle || "Timeline"}
-                </div>
-                <p
-                  ref={timelineRef}
-                  style={{
-                    margin: `${cq(8)} 0 0`,
-                    fontSize: cq(9.5),
-                    lineHeight: 1.5,
-                    color: inkSoft,
-                  }}
-                >
-                  {content.timelineNote}
-                </p>
               </div>
             </div>
-          </div>
 
-          {/* ---------- 4. COST SUMMARY + PROOF ---------- */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: stats.length || content.quote ? "1.6fr 1fr" : "1fr",
-              gap: cq(18),
-              alignItems: "start",
-              paddingLeft: pad,
-              paddingRight: pad,
-              paddingTop: cq(20),
-            }}
-          >
-            <div data-section="cost" data-section-label="Cost summary">
-              <div
-                style={{
-                  borderTopLeftRadius: cq(12),
-                  borderTopRightRadius: cq(12),
-                  background: primary,
-                  color: "#FFFFFF",
-                  padding: `${cq(9)} ${cq(14)}`,
-                  fontSize: cq(12),
-                  fontWeight: 700,
-                  letterSpacing: "0.04em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {content.costTitle || "Cost summary"}
-              </div>
-              <div style={{ border: `1px solid ${line}`, borderTop: "none" }}>
-                {costRows.map((r, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "1.5fr 0.4fr 0.6fr",
-                      borderTop: i === 0 ? "none" : `1px solid ${line}`,
-                      background: i % 2 === 1 ? rowAlt : "transparent",
-                      padding: `${cq(7)} ${cq(12)}`,
-                      gap: cq(8),
-                      alignItems: "baseline",
-                    }}
-                  >
-                    <div>
-                      <div style={{ fontSize: cq(10), fontWeight: 700, color: ink }}>{r.item}</div>
-                      {r.detail && (
-                        <div style={{ fontSize: cq(8.5), color: inkSoft, ...clampLines(2) }}>
-                          {r.detail}
-                        </div>
-                      )}
-                    </div>
-                    <div style={{ fontSize: cq(9.5), color: inkSoft, textAlign: "center" }}>
-                      {r.qty ?? ""}
-                    </div>
+            {/* ---------- 4. COST SUMMARY + PROOF ---------- */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: stats.length || content.quote ? "1.6fr 1fr" : "1fr",
+                gap: cq(18),
+                alignItems: "start",
+                paddingLeft: pad,
+                paddingRight: pad,
+                paddingTop: cq(20),
+              }}
+            >
+              <div data-section="cost" data-section-label="Cost summary">
+                <div
+                  style={{
+                    borderTopLeftRadius: cq(12),
+                    borderTopRightRadius: cq(12),
+                    background: primary,
+                    color: "#FFFFFF",
+                    padding: `${cq(9)} ${cq(14)}`,
+                    fontSize: cq(12),
+                    fontWeight: 700,
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {content.costTitle || "Cost summary"}
+                </div>
+                <div style={{ border: `1px solid ${line}`, borderTop: "none" }}>
+                  {costRows.map((r, i) => (
                     <div
+                      key={i}
                       style={{
-                        fontSize: cq(10.5),
-                        fontWeight: 700,
-                        color: ink,
-                        textAlign: "right",
+                        display: "grid",
+                        gridTemplateColumns: "1.5fr 0.4fr 0.6fr",
+                        borderTop: i === 0 ? "none" : `1px solid ${line}`,
+                        background: i % 2 === 1 ? rowAlt : "transparent",
+                        padding: `${cq(7)} ${cq(12)}`,
+                        gap: cq(8),
+                        alignItems: "baseline",
                       }}
                     >
-                      {r.price ?? ""}
+                      <div>
+                        <div style={{ fontSize: cq(10), fontWeight: 700, color: ink }}>
+                          {r.item}
+                        </div>
+                        {r.detail && (
+                          <div style={{ fontSize: cq(8.5), color: inkSoft, ...clampLines(2) }}>
+                            {r.detail}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize: cq(9.5), color: inkSoft, textAlign: "center" }}>
+                        {r.qty ?? ""}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: cq(10.5),
+                          fontWeight: 700,
+                          color: ink,
+                          textAlign: "right",
+                        }}
+                      >
+                        {r.price ?? ""}
+                      </div>
                     </div>
-                  </div>
-                ))}
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr auto",
-                    borderTop: `1px solid ${line}`,
-                    background: cardBg,
-                    padding: `${cq(9)} ${cq(12)}`,
-                    alignItems: "baseline",
-                    gap: cq(10),
-                  }}
-                >
+                  ))}
                   <div
                     style={{
-                      fontSize: cq(9),
-                      fontWeight: 700,
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      color: primary,
+                      display: "grid",
+                      gridTemplateColumns: "1fr auto",
+                      borderTop: `1px solid ${line}`,
+                      background: cardBg,
+                      padding: `${cq(9)} ${cq(12)}`,
+                      alignItems: "baseline",
+                      gap: cq(10),
                     }}
                   >
-                    {content.costTotalLabel || "Total"}
-                  </div>
-                  <div style={{ fontSize: cq(16), fontWeight: 700, color: ink }}>
-                    {content.costTotal ?? ""}
+                    <div
+                      style={{
+                        fontSize: cq(9),
+                        fontWeight: 700,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                        color: primary,
+                      }}
+                    >
+                      {content.costTotalLabel || "Total"}
+                    </div>
+                    <div style={{ fontSize: cq(16), fontWeight: 700, color: ink }}>
+                      {content.costTotal ?? ""}
+                    </div>
                   </div>
                 </div>
+                {content.costNote && (
+                  <div
+                    style={{
+                      marginTop: cq(8),
+                      fontSize: cq(8),
+                      lineHeight: 1.45,
+                      color: inkSoft,
+                      ...clampLines(3),
+                    }}
+                  >
+                    {content.costNote}
+                  </div>
+                )}
               </div>
-              {content.costNote && (
-                <div
-                  style={{
-                    marginTop: cq(8),
-                    fontSize: cq(8),
-                    lineHeight: 1.45,
-                    color: inkSoft,
-                    ...clampLines(3),
-                  }}
-                >
-                  {content.costNote}
+
+              {(stats.length > 0 || content.quote) && (
+                <div data-section="proof" data-section-label="Proof rail">
+                  {stats.length > 0 && (
+                    <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: cq(10) }}>
+                      {stats.map((s, i) => (
+                        <div
+                          key={i}
+                          style={{
+                            borderRadius: cq(12),
+                            border: `1px solid ${line}`,
+                            padding: `${cq(10)} ${cq(8)}`,
+                            textAlign: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: cq(20),
+                              fontWeight: 700,
+                              lineHeight: 1.05,
+                              letterSpacing: "-0.02em",
+                              color: primary,
+                            }}
+                          >
+                            {statValue(s)}
+                          </div>
+                          <div
+                            style={{
+                              marginTop: cq(4),
+                              fontSize: cq(8),
+                              lineHeight: 1.35,
+                              fontWeight: 600,
+                              color: inkSoft,
+                              ...clampLines(2),
+                            }}
+                          >
+                            {statLabel(s)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {content.quote?.text && (
+                    <blockquote
+                      style={{
+                        margin: `${cq(12)} 0 0`,
+                        borderLeft: `${cq(3)} solid ${accent}`,
+                        paddingLeft: cq(12),
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: cq(10),
+                          lineHeight: 1.5,
+                          fontStyle: "italic",
+                          color: ink,
+                          ...clampLines(5),
+                        }}
+                      >
+                        “{content.quote.text}”
+                      </div>
+                      <div
+                        style={{
+                          marginTop: cq(6),
+                          fontSize: cq(8.5),
+                          fontWeight: 700,
+                          color: primary,
+                        }}
+                      >
+                        {[content.quote.author, content.quote.role, content.quote.company]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </div>
+                    </blockquote>
+                  )}
                 </div>
               )}
             </div>
 
-            {(stats.length > 0 || content.quote) && (
-              <div data-section="proof" data-section-label="Proof rail">
-                {stats.length > 0 && (
-                  <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: cq(10) }}>
-                    {stats.map((s, i) => (
+            {/* ---------- 5. TEAM + NEXT STEPS ---------- */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: nextSteps.length ? "1.6fr 1fr" : "1fr",
+                gap: cq(18),
+                alignItems: "start",
+                paddingLeft: pad,
+                paddingRight: pad,
+                paddingTop: cq(20),
+              }}
+            >
+              {team.length > 0 && (
+                <div data-section="team" data-section-label="Your team">
+                  <div
+                    style={{
+                      fontSize: cq(8.5),
+                      fontWeight: 700,
+                      letterSpacing: "0.16em",
+                      textTransform: "uppercase",
+                      color: primary,
+                    }}
+                  >
+                    {content.teamTitle || "Your team"}
+                  </div>
+                  <div
+                    className="grid"
+                    style={{
+                      marginTop: cq(10),
+                      gridTemplateColumns: `repeat(${Math.min(team.length, 3)}, minmax(0, 1fr))`,
+                      gap: cq(10),
+                    }}
+                  >
+                    {team.map((m, i) => (
                       <div
                         key={i}
                         style={{
-                          borderRadius: cq(12),
-                          border: `1px solid ${line}`,
-                          padding: `${cq(10)} ${cq(8)}`,
-                          textAlign: "center",
+                          borderTop: `${cq(2)} solid ${accent}`,
+                          paddingTop: cq(8),
                         }}
                       >
-                        <div
-                          style={{
-                            fontSize: cq(20),
-                            fontWeight: 700,
-                            lineHeight: 1.05,
-                            letterSpacing: "-0.02em",
-                            color: primary,
-                          }}
-                        >
-                          {statValue(s)}
+                        <div style={{ fontSize: cq(10.5), fontWeight: 700, color: ink }}>
+                          {m.name}
                         </div>
-                        <div
-                          style={{
-                            marginTop: cq(4),
-                            fontSize: cq(8),
-                            lineHeight: 1.35,
-                            fontWeight: 600,
-                            color: inkSoft,
-                            ...clampLines(2),
-                          }}
-                        >
-                          {statLabel(s)}
-                        </div>
+                        {m.role && (
+                          <div style={{ fontSize: cq(9), color: inkSoft, ...clampLines(2) }}>
+                            {m.role}
+                          </div>
+                        )}
+                        {m.office && (
+                          <div style={{ fontSize: cq(9), color: inkSoft }}>{m.office}</div>
+                        )}
+                        {m.email && (
+                          <div style={{ fontSize: cq(9), color: inkSoft, wordBreak: "break-all" }}>
+                            {m.email}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
-                )}
-                {content.quote?.text && (
-                  <blockquote
+                </div>
+              )}
+
+              {nextSteps.length > 0 && (
+                <div data-section="next-steps" data-section-label="Next steps">
+                  <div
                     style={{
-                      margin: `${cq(12)} 0 0`,
-                      borderLeft: `${cq(3)} solid ${accent}`,
-                      paddingLeft: cq(12),
+                      fontSize: cq(8.5),
+                      fontWeight: 700,
+                      letterSpacing: "0.16em",
+                      textTransform: "uppercase",
+                      color: primary,
                     }}
                   >
+                    {content.nextStepsTitle || "Next steps"}
+                  </div>
+                  <ol
+                    style={{
+                      margin: `${cq(10)} 0 0`,
+                      padding: 0,
+                      listStyle: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: cq(6),
+                    }}
+                  >
+                    {nextSteps.map((s, i) => (
+                      <li
+                        key={i}
+                        className="flex"
+                        style={{ gap: cq(8), fontSize: cq(9.5), lineHeight: 1.45, color: ink }}
+                      >
+                        <span style={{ fontWeight: 700, color: primary }}>{i + 1}.</span>
+                        <span style={clampLines(3)}>{s}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  {content.contacts?.ctaLabel && (
                     <div
                       style={{
+                        marginTop: cq(10),
                         fontSize: cq(10),
-                        lineHeight: 1.5,
-                        fontStyle: "italic",
-                        color: ink,
-                        ...clampLines(5),
-                      }}
-                    >
-                      “{content.quote.text}”
-                    </div>
-                    <div
-                      style={{
-                        marginTop: cq(6),
-                        fontSize: cq(8.5),
                         fontWeight: 700,
                         color: primary,
                       }}
                     >
-                      {[content.quote.author, content.quote.role, content.quote.company]
-                        .filter(Boolean)
-                        .join(" · ")}
+                      {content.contacts.ctaLabel}{" "}
+                      <span style={{ color: ink, fontWeight: 600 }}>
+                        {content.contacts.ctaEmail ?? ""}
+                      </span>
                     </div>
-                  </blockquote>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* ---------- 5. TEAM + NEXT STEPS ---------- */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: nextSteps.length ? "1.6fr 1fr" : "1fr",
-              gap: cq(18),
-              alignItems: "start",
-              paddingLeft: pad,
-              paddingRight: pad,
-              paddingTop: cq(20),
-            }}
-          >
-            {team.length > 0 && (
-              <div data-section="team" data-section-label="Your team">
-                <div
-                  style={{
-                    fontSize: cq(8.5),
-                    fontWeight: 700,
-                    letterSpacing: "0.16em",
-                    textTransform: "uppercase",
-                    color: primary,
-                  }}
-                >
-                  {content.teamTitle || "Your team"}
+                  )}
                 </div>
-                <div
-                  className="grid"
-                  style={{
-                    marginTop: cq(10),
-                    gridTemplateColumns: `repeat(${Math.min(team.length, 3)}, minmax(0, 1fr))`,
-                    gap: cq(10),
-                  }}
-                >
-                  {team.map((m, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        borderTop: `${cq(2)} solid ${accent}`,
-                        paddingTop: cq(8),
-                      }}
-                    >
-                      <div style={{ fontSize: cq(10.5), fontWeight: 700, color: ink }}>
-                        {m.name}
-                      </div>
-                      {m.role && (
-                        <div style={{ fontSize: cq(9), color: inkSoft, ...clampLines(2) }}>
-                          {m.role}
-                        </div>
-                      )}
-                      {m.office && (
-                        <div style={{ fontSize: cq(9), color: inkSoft }}>{m.office}</div>
-                      )}
-                      {m.email && (
-                        <div style={{ fontSize: cq(9), color: inkSoft, wordBreak: "break-all" }}>
-                          {m.email}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {nextSteps.length > 0 && (
-              <div data-section="next-steps" data-section-label="Next steps">
-                <div
-                  style={{
-                    fontSize: cq(8.5),
-                    fontWeight: 700,
-                    letterSpacing: "0.16em",
-                    textTransform: "uppercase",
-                    color: primary,
-                  }}
-                >
-                  {content.nextStepsTitle || "Next steps"}
-                </div>
-                <ol
-                  style={{
-                    margin: `${cq(10)} 0 0`,
-                    padding: 0,
-                    listStyle: "none",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: cq(6),
-                  }}
-                >
-                  {nextSteps.map((s, i) => (
-                    <li
-                      key={i}
-                      className="flex"
-                      style={{ gap: cq(8), fontSize: cq(9.5), lineHeight: 1.45, color: ink }}
-                    >
-                      <span style={{ fontWeight: 700, color: primary }}>{i + 1}.</span>
-                      <span style={clampLines(3)}>{s}</span>
-                    </li>
-                  ))}
-                </ol>
-                {content.contacts?.ctaLabel && (
-                  <div
-                    style={{ marginTop: cq(10), fontSize: cq(10), fontWeight: 700, color: primary }}
-                  >
-                    {content.contacts.ctaLabel}{" "}
-                    <span style={{ color: ink, fontWeight: 600 }}>
-                      {content.contacts.ctaEmail ?? ""}
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+            {/* SHARED MODULES */}
+            <div style={{ paddingLeft: pad, paddingRight: pad }}>
+              <PrintSectionsStack
+                sections={content.modules}
+                mode={mode}
+                accent={accent}
+                density={density}
+              />
+            </div>
 
-          {/* SHARED MODULES */}
-          <div style={{ paddingLeft: pad, paddingRight: pad }}>
-            <PrintSectionsStack
-              sections={content.modules}
-              mode={mode}
-              accent={accent}
-              density={density}
-            />
-          </div>
-
-          {/* ---------- 6. FOOTER RULE ---------- */}
-          <div
-            data-section="footer"
-            data-section-label="Footer"
-            className="flex items-center"
-            style={{
-              gap: cq(14),
-              paddingLeft: pad,
-              paddingRight: pad,
-              paddingTop: cq(18),
-              paddingBottom: cq(24),
-              marginTop: "auto",
-            }}
-          >
-            <div style={{ flex: 1, height: 1, background: line }} />
+            {/* ---------- 6. FOOTER RULE ---------- */}
             <div
+              data-section="footer"
+              data-section-label="Footer"
+              className="flex items-center"
               style={{
-                fontSize: cq(10),
-                fontWeight: 700,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: primary,
-                whiteSpace: "nowrap",
+                gap: cq(14),
+                paddingLeft: pad,
+                paddingRight: pad,
+                paddingTop: cq(18),
+                paddingBottom: cq(24),
+                marginTop: "auto",
               }}
             >
-              {content.footerUrl || "transperfect.com"}
+              <div style={{ flex: 1, height: 1, background: line }} />
+              <div
+                style={{
+                  fontSize: cq(10),
+                  fontWeight: 700,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  color: primary,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {content.footerUrl || "transperfect.com"}
+              </div>
+              <div style={{ flex: 1, height: 1, background: line }} />
             </div>
-            <div style={{ flex: 1, height: 1, background: line }} />
           </div>
-        </div>
-      </PrintSurfaceProvider>
+        </PrintSurfaceProvider>
       </SlideAccentContext.Provider>
     </SlideModeContext.Provider>
   );
