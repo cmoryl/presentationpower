@@ -302,7 +302,6 @@ function ExportView() {
     } finally {
       setExporting(false);
       setPreflightIssues(null);
-      if (!ok) toast.dismiss(progressId);
     }
     // Auto-share after the local download succeeds — non-blocking, best-effort.
     if (ok && glShareConfigured && glAutoShare && !glShareBusy) {
