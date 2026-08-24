@@ -11,7 +11,7 @@ import { useSyncExternalStore } from "react";
 import { allSelectablePacks, ALL_STYLE_PACKS, type StylePack } from "@/lib/style-packs";
 import { subscribeTemplateRegistry, templateRegistryVersion } from "@/lib/template-registry";
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
-import { SALES_DECK_PACK_IDS } from "@/lib/sales-deck-looks";
+import { salesApprovedPackIds } from "@/lib/sales-deck-looks";
 
 const emptySubscribe = () => () => {};
 
@@ -27,7 +27,8 @@ export function useSelectablePacks(): StylePack[] {
   );
   const packs = hydrated ? allSelectablePacks() : ALL_STYLE_PACKS;
   if (caps.createOnly) {
-    const only = packs.filter((p) => SALES_DECK_PACK_IDS.includes(p.id));
+    const allowed = salesApprovedPackIds();
+    const only = packs.filter((p) => allowed.includes(p.id));
     if (only.length) return only;
   }
   return packs;

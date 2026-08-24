@@ -35,6 +35,7 @@ export async function loadTemplateRegistry(force = false): Promise<void> {
         baseSkinCode: t.baseSkinCode,
         bestFit: t.bestFit,
         name: t.name,
+        salesApproved: Boolean(t.salesApproved),
       })),
     );
     setBackgroundOverrides(((ovr.data as Record<string, unknown>[]) ?? []).map(parseOverrideRow));

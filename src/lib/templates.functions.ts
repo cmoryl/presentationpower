@@ -34,6 +34,7 @@ const TemplateInput = z.object({
   baseSkinCode: z.string().trim().max(8).optional().nullable(),
   spec: z.string().trim().max(200).default(""),
   status: z.enum(["draft", "published"]).default("draft"),
+  salesApproved: z.boolean().default(false),
   notes: z.string().trim().max(2000).default(""),
 });
 
@@ -69,6 +70,7 @@ function toTemplate(r: Row): CustomTemplate {
     baseSkinCode: (r.base_skin_code as string | null) ?? null,
     spec: String(r.spec ?? ""),
     status: r.status === "published" ? "published" : "draft",
+    salesApproved: Boolean(r.sales_approved),
     notes: String(r.notes ?? ""),
     updatedAt: r.updated_at ? String(r.updated_at) : undefined,
   };

@@ -102,6 +102,7 @@ export function LookFieldsEditor({
           baseSkinCode: draft.baseSkinCode,
           spec: draft.spec,
           status,
+          salesApproved: Boolean(draft.salesApproved),
           notes: draft.notes,
         },
       });
