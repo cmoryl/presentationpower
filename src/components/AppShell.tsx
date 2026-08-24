@@ -309,6 +309,12 @@ export function AppShell({ children }: { children: ReactNode }) {
             </button>
           </div>
 
+          {(presOpen || adminOpen) && (
+            <div
+              aria-hidden
+              className="fixed inset-0 z-30 hidden bg-[#03002C]/45 lg:block"
+            />
+          )}
           <nav className="hidden max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] lg:flex dark:!border-white/10 dark:!bg-white/[0.03]">
             {visibleNav.map((n) => {
               if (n.to === "/elements") {
@@ -340,7 +346,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <div className="absolute left-1/2 top-full z-50 w-[760px] max-w-[94vw] -translate-x-1/2 pt-2">
                         <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] sm:grid-cols-4 dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {visibleElementGroups.map((g) => (
-                            <div key={g.label} className="min-w-0">
+                            <div key={g.label} className="min-w-0 sm:border-l sm:border-black/[0.06] sm:pl-3 sm:first:border-l-0 sm:first:pl-0 dark:sm:border-white/10">
                               <Link
                                 to={g.to}
                                 onClick={() => setPresOpen(false)}
@@ -417,7 +423,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <div className="absolute left-1/2 top-full z-50 w-[720px] max-w-[92vw] -translate-x-1/2 pt-2">
                         <div className="grid grid-cols-3 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {adminGroups.map((g) => (
-                            <div key={g.label} className="min-w-0">
+                            <div key={g.label} className="min-w-0 sm:border-l sm:border-black/[0.06] sm:pl-3 sm:first:border-l-0 sm:first:pl-0 dark:sm:border-white/10">
                               <div className="mb-1 border-b border-black/[0.08] px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#003FC7] dark:border-white/10 dark:text-[#A1FBF9]">
                                 {g.label}
                               </div>
