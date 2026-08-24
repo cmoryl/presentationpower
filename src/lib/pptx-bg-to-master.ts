@@ -109,9 +109,13 @@ function isFullBleedDecor(s: Shape): boolean {
   if (coversCanvas(f)) return true;
   const fullHeight = f.h >= CANVAS_CY * 0.9;
   const fullWidth = f.w >= CANVAS_CX * 0.9;
-  const hairlineW = f.w <= CANVAS_CX * 0.03;
-  const hairlineH = f.h <= CANVAS_CY * 0.03;
-  return (fullHeight && hairlineW) || (fullWidth && hairlineH && f.y <= 0);
+  const hairlineW = f.w <= CANVAS_CX * 0.045;
+  const hairlineH = f.h <= CANVAS_CY * 0.045;
+  // A sliver that spans the whole canvas in one axis is background scaffolding
+  // wherever it sits — top edge, bottom edge or mid-slide. Keeping any of them
+  // as objects is what makes an exported slide look sliced into strips.
+  return (fullHeight && hairlineW) || (fullWidth && hairlineH);
+
 }
 
 /**
