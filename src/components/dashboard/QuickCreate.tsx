@@ -10,7 +10,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, Presentation, FileText, LayoutGrid, Zap } from "lucide-react";
+import { ArrowRight, Loader2, Presentation, FileText, LayoutGrid, Zap } from "lucide-react";
 
 import { useTaxonomy } from "@/hooks/use-taxonomy";
 import { useDeckStore } from "@/lib/deck-store";
@@ -23,6 +23,8 @@ import {
   type QuickCreateKind,
   type QuickCreatePreset,
 } from "@/lib/quick-create";
+import { personaTheme } from "@/lib/persona-theme";
+import type { PersonaId } from "@/lib/workspace-persona";
 
 const KIND_ICON: Record<QuickCreateKind, typeof Presentation> = {
   deck: Presentation,
@@ -36,14 +38,9 @@ const KIND_LABEL: Record<QuickCreateKind, string> = {
   kit: "Kit",
 };
 
-export function QuickCreate({
-  personaId,
-  signedIn,
-}: {
-  personaId: string;
-  signedIn: boolean;
-}) {
+export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; signedIn: boolean }) {
   const presets = useMemo(() => quickCreatePresets(personaId), [personaId]);
+  const theme = personaTheme(personaId);
   const { brandModes } = useTaxonomy();
   const navigate = useNavigate();
 
@@ -145,15 +142,27 @@ export function QuickCreate({
   }
 
   return (
-    <section className="mt-10">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <Zap className="size-4 text-black/40 dark:text-white/40" aria-hidden />
+    <section className="relative mt-10 overflow-hidden rounded-[28px] border border-black/10 bg-white p-5 sm:p-7 dark:border-white/15 dark:bg-white/[0.04]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 -top-28 size-[22rem] rounded-full blur-3xl"
+        style={{ background: `${theme.accent}26` }}
+      />
+      <div className="relative flex flex-wrap items-end justify-between gap-4">
+        <div className="min-w-0">
+          <p
+            className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]"
+            style={{ background: `${theme.accent2}1A`, color: theme.accent2 }}
+          >
+            <Zap className="size-3.5" aria-hidden />
             Quick create
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight">
+            Start the real thing in one click
           </h2>
-          <p className="mt-1 text-sm text-black/60 dark:text-white/60">
-            One click starts the real thing in the right template set — no blank canvas.
+          <p className="mt-1 max-w-xl text-sm text-black/60 dark:text-white/60">
+            Every card seeds the correct template set, applies a validated look and drops you into
+            the editor — no blank canvas.
           </p>
         </div>
         <label className="flex items-center gap-2 text-sm">
@@ -172,29 +181,44 @@ export function QuickCreate({
         </label>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {presets.map((preset) => {
+      <div className="relative mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {presets.map((preset, i) => {
           const Icon = KIND_ICON[preset.kind];
           const running = busy === preset.id;
+          const brick = theme.bricks[i % theme.bricks.length];
           return (
             <button
               key={preset.id}
               type="button"
               disabled={!!busy}
               onClick={() => void run(preset)}
-              className="group flex min-h-[7.5rem] flex-col items-start rounded-2xl border border-black/10 bg-white p-5 text-left transition-colors hover:border-black/30 disabled:opacity-60 dark:border-white/15 dark:bg-white/5 dark:hover:border-white/35"
+              className="group relative flex min-h-[8.5rem] flex-col items-start overflow-hidden rounded-2xl border border-black/10 bg-white p-5 pl-6 text-left transition-[transform,border-color] hover:-translate-y-0.5 hover:border-black/30 disabled:opacity-60 dark:border-white/15 dark:bg-white/5 dark:hover:border-white/35"
             >
+              <span
+                aria-hidden
+                className="absolute inset-y-0 left-0 w-1.5"
+                style={{ background: brick }}
+              />
               <span className="flex w-full items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-black/45 dark:text-white/45">
-                  <Icon className="size-4" aria-hidden />
+                <span
+                  className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]"
+                  style={{ background: `${theme.accent2}14`, color: theme.accent2 }}
+                >
+                  <Icon className="size-3.5" aria-hidden />
                   {KIND_LABEL[preset.kind]}
                 </span>
                 {running ? <Loader2 className="size-4 animate-spin" aria-hidden /> : null}
               </span>
-              <span className="mt-2 text-base font-medium">{preset.label}</span>
+              <span className="mt-3 text-base font-semibold tracking-tight">{preset.label}</span>
               <span className="mt-1 text-sm text-black/60 dark:text-white/60">{preset.hint}</span>
-              <span className="mt-3 text-xs text-black/45 dark:text-white/45">
-                {preset.templateSet}
+              <span className="mt-auto flex w-full items-center justify-between gap-2 pt-3">
+                <span className="min-w-0 truncate text-xs text-black/45 dark:text-white/45">
+                  {preset.templateSet}
+                </span>
+                <ArrowRight
+                  className="size-4 shrink-0 opacity-40 transition-transform group-hover:translate-x-0.5 group-hover:opacity-100"
+                  aria-hidden
+                />
               </span>
             </button>
           );
@@ -202,7 +226,7 @@ export function QuickCreate({
       </div>
 
       {!signedIn ? (
-        <p className="mt-3 text-xs text-black/50 dark:text-white/50">
+        <p className="relative mt-4 text-xs text-black/50 dark:text-white/50">
           Decks start locally right away.{" "}
           <Link to="/auth" className="underline underline-offset-4">
             Sign in
