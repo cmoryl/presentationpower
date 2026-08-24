@@ -174,6 +174,27 @@ export function PrintAgentChat({
                       const proposal = printProposalFromTool(part);
                       if (proposal) return <PrintProposalCard key={key} proposal={proposal} />;
                     }
+                    if (name === PRINT_SUGGEST_TOOL_NAME) {
+                      const s = printSuggestionsFromTool(part);
+                      if (s)
+                        return <PrintSuggestionCards key={key} suggestions={s} onPick={submit} />;
+                    }
+                    if (name === PRINT_LOOK_TOOL_NAME) {
+                      const look = printLookFromTool(part);
+                      if (look) return <PrintLookCard key={key} look={look} onPick={submit} />;
+                    }
+                    if (name === PRINT_MODULES_TOOL_NAME) {
+                      const palette = printModulePaletteFromTool(part);
+                      if (palette)
+                        return (
+                          <PrintModulePaletteCard key={key} palette={palette} onPick={submit} />
+                        );
+                    }
+                    if (name === PRINT_PREVIEW_TOOL_NAME) {
+                      const preview = printLivePreviewFromTool(part);
+                      if (preview) return <PrintLivePreviewCard key={key} preview={preview} />;
+                    }
+
                     const state = (part as { state?: string }).state ?? "";
                     const done = state === "output-available" || state === "output-error";
                     return (
