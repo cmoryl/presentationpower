@@ -7,9 +7,17 @@
 // SocialRenderer previews from the same playbook data /events/demo and
 // /social/demo use. Hyper-real photography backs every card.
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CalendarDays, Presentation, Printer, Share2 } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Presentation,
+  Printer,
+  Share2,
+} from "lucide-react";
 
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
