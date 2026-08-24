@@ -11,8 +11,19 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { findPrintAssetIdInMessages } from "@/lib/print-agent/threads";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
-import { PRINT_PROPOSAL_TOOL_NAME } from "@/lib/print-agent/tools";
+import {
+  PRINT_PROPOSAL_TOOL_NAME,
+  PRINT_SUGGEST_TOOL_NAME,
+  PRINT_LOOK_TOOL_NAME,
+  PRINT_MODULES_TOOL_NAME,
+  PRINT_PREVIEW_TOOL_NAME,
+} from "@/lib/print-agent/tools";
 import { PrintProposalCard, printProposalFromTool } from "./PrintProposalCard";
+import { PrintSuggestionCards, printSuggestionsFromTool } from "./PrintSuggestionCards";
+import { PrintLookCard, printLookFromTool } from "./PrintLookCard";
+import { PrintModulePaletteCard, printModulePaletteFromTool } from "./PrintModulePaletteCard";
+import { PrintLivePreviewCard, printLivePreviewFromTool } from "./PrintLivePreviewCard";
+
 import {
   AgentDocumentUpload,
   useAgentDocuments,
