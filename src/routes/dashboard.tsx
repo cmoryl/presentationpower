@@ -491,10 +491,7 @@ function RoleDashboard() {
                   style={{ background: theme.bricks[i % theme.bricks.length] }}
                 />
                 <div className="flex items-baseline gap-3">
-                  <span
-                    className="text-sm font-semibold tabular-nums"
-                    style={{ color: theme.ink }}
-                  >
+                  <span className="text-sm font-semibold tabular-nums" style={{ color: theme.ink }}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <h3 className="text-base font-medium">{step.title}</h3>
