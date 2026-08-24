@@ -187,6 +187,36 @@ function EventsView() {
                 </span>
               </div>
             </Link>
+            <Link
+              to="/events/next/london"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/10 p-5 transition hover:border-[#003FC7] hover:shadow-[0_10px_30px_-14px_rgba(3,0,44,0.3)]"
+              style={{
+                background:
+                  "radial-gradient(60% 90% at 10% 92%, #C6BCFB 0%, transparent 62%), radial-gradient(60% 90% at 96% 30%, #CFF6F7 0%, transparent 64%), #EDF6F8",
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#03002C]/10 text-[#03002C]">
+                  <Map size={16} />
+                </span>
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-[#03002C]/55">
+                  Location signage
+                </span>
+              </div>
+              <div className="mt-4 text-lg font-semibold text-[#03002C]">
+                NEXT 2026 London · QEII Centre
+              </div>
+              <p className="mt-1 flex-1 text-sm text-[#03002C]/70">
+                Job 2281 — all 54 scenic panels with trim/bleed geometry, gradient grounds, measured
+                banding and vector-first downloads.
+              </p>
+              <div className="mt-4 flex items-center justify-between text-[11px] text-[#03002C]/65">
+                <span>54 panels · 5 floors</span>
+                <span className="inline-flex items-center gap-1 font-medium text-[#003FC7]">
+                  Open kit <ArrowRight size={12} />
+                </span>
+              </div>
+            </Link>
             {EVENT_PLAYBOOKS.map((p) => {
               const Icon = PLAYBOOK_ICON[p.kind] ?? CalendarDays;
               return (
