@@ -22,17 +22,35 @@ export type PersonaShortcut = {
   search?: Record<string, string>;
 };
 
+export type PersonaAction = {
+  label: string;
+  hint: string;
+  to: string;
+  search?: Record<string, string>;
+};
+
+export type WorkKind = "decks" | "print" | "kits";
+
 export type Persona = {
   id: PersonaId;
   label: string;
   tagline: string;
   /** Roles that land on this persona by default, most specific first. */
   roles: readonly string[];
+  /** The one thing this audience most often comes here to do. */
+  primary: PersonaAction;
+  /** The obvious alternative route to the same outcome. */
+  secondary: PersonaAction;
   steps: readonly PersonaStep[];
   shortcuts: readonly PersonaShortcut[];
   /** Which live work counters matter to this audience. */
-  counters: readonly ("decks" | "print" | "kits")[];
+  counters: readonly WorkKind[];
+  /** Which kinds of recent work to surface, in priority order. */
+  resume: readonly WorkKind[];
+  /** Short "how do I…" pointers into the guides. */
+  guides: readonly PersonaAction[];
 };
+
 
 export const PERSONAS: readonly Persona[] = [
   {
