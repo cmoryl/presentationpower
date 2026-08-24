@@ -238,11 +238,21 @@ export function SocialModuleFrame({
             }}
 
           >
-            <PrintPageProvider size="Letter" margin="standard">
+            {/* The virtual sheet takes the FRAME's aspect, not Letter's. Band
+                and masthead heights are a share of page height, so this is what
+                makes a photo band fill a square post instead of sitting in a
+                letterbox. */}
+            <PrintPageProvider
+              size="Letter"
+              margin="standard"
+              heightPx={framePageHeight}
+              heroBandPct={frameBandPct}
+            >
               <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
                 <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
               </PrintDocModeProvider>
             </PrintPageProvider>
+
           </div>
         </div>
 
