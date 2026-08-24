@@ -46,6 +46,10 @@ import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
+import {
+  listApprovedActivity,
+  type ApprovedActivityRow,
+} from "@/lib/brand-approvals.functions";
 import { listMyKits, type SavedKit } from "@/lib/kits.functions";
 import { useSessionUser } from "@/hooks/use-session-user";
 
@@ -559,7 +563,6 @@ function Dashboard() {
       {/* ================= RECENT ACTIVITY ================= */}
       <RecentActivity
         decks={Object.values(decksMap).slice(0, 12)}
-        allDeckCount={cloudCount ?? Object.keys(decksMap).length}
         briefs={briefs}
       />
 
@@ -1188,11 +1191,9 @@ const ACTIVITY_META: Record<
 
 function RecentActivity({
   decks,
-  allDeckCount,
   briefs,
 }: {
   decks: Deck[];
-  allDeckCount: number;
   briefs: Record<string, { industry?: string } | undefined>;
 }) {
   const userId = useSessionUser();
@@ -1392,10 +1393,10 @@ function RecentActivity({
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
               ✦
             </div>
-            <h3 className="mt-4 text-xl font-semibold">Nothing here yet</h3>
+            <h3 className="mt-4 text-xl font-semibold">No approved work yet</h3>
             <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-              Start with a brief, a print asset, or a campaign kit — anything you make shows up
-              here.
+              This feed shows final, brand-approved creations only. Build a deck, print asset or
+              campaign kit, send it for brand review, and it appears here once approved.
             </p>
             <Link
               to="/brief/new"
