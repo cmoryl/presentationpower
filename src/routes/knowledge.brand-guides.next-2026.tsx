@@ -45,11 +45,13 @@ function Section({
   id,
   eyebrow,
   title,
+  intro,
   children,
 }: {
   id: string;
   eyebrow: string;
   title: string;
+  intro?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -58,10 +60,23 @@ function Section({
         {eyebrow}
       </div>
       <h2 className="mt-3 text-3xl font-semibold tracking-tight">{title}</h2>
+      {intro ? (
+        <p className="mt-3 max-w-3xl text-sm text-black/65 dark:text-white/65">{intro}</p>
+      ) : null}
       <div className="mt-7">{children}</div>
     </section>
   );
 }
+
+const ICON_SET_TABS: { slug: string; label: string; accent: string }[] = [
+  { slug: NEXT_EVENT_ICON_SLUG, label: "Full event system", accent: "#1B3E6F" },
+  ...NEXT_DIVISIONS.map((d) => ({
+    slug: nextTrackIconSlug(d.id),
+    label: d.name,
+    accent: d.accent,
+  })),
+];
+
 
 function LockupTile({ item, accent }: { item: NextLockup; accent: string }) {
   const dark = item.variant !== "color";
@@ -689,7 +704,41 @@ function NextBrandGuide() {
             Open the NEXT 2026 logo library →
           </a>
         </Section>
+
+        {/* Icons */}
+        <Section
+          id="icons"
+          eyebrow="10 · Icons"
+          title="Icon system — event set & track sets"
+          intro="One event-wide icon set for the NEXT 2026 program, plus a set for every track. Pick a set, choose your size and approved colour, then download a single glyph, a whole sub-area or the full set as SVG or PNG."
+        >
+          <div className="flex flex-wrap gap-2">
+            {ICON_SET_TABS.map((tab) => {
+              const active = tab.slug === iconSlug;
+              return (
+                <button
+                  key={tab.slug}
+                  type="button"
+                  onClick={() => setIconSlug(tab.slug)}
+                  aria-pressed={active}
+                  className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
+                    active
+                      ? "text-white"
+                      : "border-black/15 text-black/70 hover:border-black/40 dark:border-white/15 dark:text-white/70"
+                  }`}
+                  style={active ? { background: tab.accent, borderColor: tab.accent } : undefined}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-6">
+            <BrandIconLibrary slug={iconSlug} hero={iconHero} />
+          </div>
+        </Section>
       </div>
+
     </AppShell>
   );
 }

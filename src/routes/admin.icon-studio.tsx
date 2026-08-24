@@ -28,7 +28,7 @@ import {
 } from "@/lib/icon-packs";
 import { IconRenderer } from "@/components/IconRenderer";
 import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
-import { BRAND_ICON_SETS, totalApprovedIcons } from "@/lib/brand-icon-sets";
+import { BRAND_ICON_SETS, iconColorOptions, totalApprovedIcons } from "@/lib/brand-icon-sets";
 import { getBrandGuide } from "@/lib/brand-guides";
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 
@@ -371,7 +371,10 @@ function SystemTab() {
 function ApprovedSetsTab() {
   const [slug, setSlug] = useState(BRAND_ICON_SETS[0]?.slug ?? "transperfect-master");
   const guide = getBrandGuide(slug);
-  const hero = guide?.secondaryColors?.[0]?.hex ?? "#003FC7";
+  const hero = slug.startsWith("next-2026")
+    ? (iconColorOptions(slug)[1]?.hex ?? "#1B3E6F")
+    : (guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
+
 
   return (
     <section className="space-y-4">
