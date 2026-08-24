@@ -22,6 +22,7 @@ import { retintItemsForMode } from "@/lib/canvas-mode-ink";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
 import { expandParts, expandPreset, presetById } from "@/lib/canvas-block-presets";
+import { CanvasSlideStrip } from "@/components/studio/CanvasSlideStrip";
 import { StudioSideAccordion } from "@/components/studio/StudioSideAccordion";
 import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
