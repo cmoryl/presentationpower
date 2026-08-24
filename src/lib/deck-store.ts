@@ -4876,7 +4876,9 @@ export const useDeckStore = create<DeckState>()(
             moduleFamily: byId(MODULE_VARIANTS, newSlide.variantId)?.familyId ?? null,
             props: { sectionId, source: "addSlide" },
           });
+          notifySlideEdit("Slide added", { kind: "add", undo: () => get().undo() });
         },
+
 
         insertVariantSlide: (deckId, variantId) => {
           const deck = get().decks[deckId];
