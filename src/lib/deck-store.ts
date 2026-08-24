@@ -18,6 +18,8 @@ import { clientPlaceholderItems } from "./logohub-fillers";
 import { variantSupportsImagery, variantSupportsVideo } from "./variant-media";
 import { track } from "./analytics-track";
 import { notifySlideEdit } from "./deck-feedback";
+import { pickVariedVariant } from "./module-variety";
+
 
 import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
@@ -671,18 +673,26 @@ export function assembleDeck(
       : BRAND_PROFILES[brief.brandModeId];
   const restricted = new Set(profile?.contentScope.restrictedFamilyIds ?? []);
   const preferred = new Set(profile?.contentScope.preferredVariantIds ?? []);
+  // Layout variety is tracked across the whole assembly pass: without this the
+  // picker took pool[0] every time, so a recipe that repeats a section shipped
+  // the same module on four slides.
+  const usedVariantIds: string[] = [];
   const slides: DeckSlide[] = recipe.map((sfId, i) => {
     const sf = byId(SECTION_FRAMEWORKS, sfId);
     const permitted = variantsForSection(sfId).filter((v) => !restricted.has(v.familyId));
     const pool = permitted.length > 0 ? permitted : variantsForSection(sfId);
-    // Rank: strategy-suggested first, then preferredVariantIds, then original order.
     const suggestedVariantId = strategyOverride?.variantById?.[sfId];
-    const options = [...pool].sort((a, b) => {
-      const av = a.id === suggestedVariantId ? -1 : preferred.has(a.id) ? 0 : 1;
-      const bv = b.id === suggestedVariantId ? -1 : preferred.has(b.id) ? 0 : 1;
-      return av - bv;
-    });
-    const variant = options[0] ?? MODULE_VARIANTS[0];
+    const variant =
+      pickVariedVariant({
+        pool,
+        usedVariantIds,
+        suggestedVariantId,
+        preferredVariantIds: preferred,
+        seed: `${brief.id}:${brief.archetypeId}:${sfId}`,
+      }) ??
+      pool[0] ??
+      MODULE_VARIANTS[0];
+    usedVariantIds.push(variant.id);
     const suggestedLayoutId = strategyOverride?.layoutById?.[sfId];
     const layoutId =
       suggestedLayoutId && variant.permittedLayoutIds.includes(suggestedLayoutId)
@@ -698,6 +708,7 @@ export function assembleDeck(
       changes: [],
     };
   });
+
   return {
     id: nanoid(10),
     createdAt: new Date().toISOString(),

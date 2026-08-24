@@ -4,6 +4,8 @@ import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { loadSlides, touchDeck } from "../deck-access";
 import { resolveVariantSwap } from "@/lib/slide-ops";
 import { visualDataGap } from "@/lib/agent/visual-data-gaps";
+import { variantsForSection } from "@/lib/taxonomy";
+
 
 export default defineTool({
   name: "insert_slide",
@@ -76,10 +78,30 @@ export default defineTool({
     // A chart/diagram module inserted without its plotted values renders as an
     // empty frame on screen and in PowerPoint, so say so loudly right here.
     const gap = visualDataGap(resolved.value.variantId, (content ?? {}) as Record<string, unknown>);
+    // In-loop variety nudge: the agent inserts one slide at a time and cannot
+    // see that it has already spent this layout twice. Tell it now, with the
+    // permitted layouts still on the table, rather than at audit time.
+    const priorUses = existing.slides.filter(
+      (s) => s.variant_id === resolved.value.variantId,
+    ).length;
+    let varietyWarning: Record<string, unknown> | undefined;
+    if (priorUses >= 2) {
+      const used = new Set(existing.slides.map((s) => s.variant_id));
+      const alternates = variantsForSection(section_id)
+        .filter((v) => !used.has(v.id) && v.id !== resolved.value.variantId)
+        .slice(0, 5)
+        .map((v) => ({ id: v.id, name: v.name, description: v.description }));
+      varietyWarning = {
+        message: `This deck now uses ${resolved.value.variantId} on ${priorUses + 1} slides, so those slides read as one template. Move this slide (or an earlier one) to a different permitted layout with change_slide_variant and rewrite its content for that layout's fields.`,
+        alternates,
+      };
+    }
     return textResult({
       ok: true,
       slide: data,
       ...(gap ? { visual_data_required: gap } : {}),
+      ...(varietyWarning ? { layout_variety_warning: varietyWarning } : {}),
     });
+
   },
 });
