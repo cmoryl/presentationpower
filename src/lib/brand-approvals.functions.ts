@@ -336,6 +336,13 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       .eq("user_id", userId);
     const { isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
+    const { data: before } = await supabase
+      .from("approval_requests")
+      .select("id, status")
+      .in("id", data.ids);
+    const priorStatus = Object.fromEntries(
+      (before ?? []).map((r) => [r.id, r.status as string]),
+    );
     const { error } = await supabase
       .from("approval_requests")
       .update({
@@ -346,6 +353,19 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })
       .in("id", data.ids);
     if (error) throw new Error(error.message);
+    await (await import("./approval-events.server")).logApprovalEvents(
+      supabase,
+      data.ids.map((id) => ({
+        requestId: id,
+        actorId: userId,
+        kind: data.status === "approved" ? ("approved" as const) : ("changes_requested" as const),
+        fromStatus: priorStatus[id] ?? null,
+        toStatus: data.status,
+        note: data.note?.trim() || null,
+        meta: { bulk: true },
+      })),
+    );
+
     await (await import("./notify-approvals.server")).notifyRequesters(
       data.ids,
       data.status,
