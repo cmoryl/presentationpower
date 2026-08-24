@@ -176,7 +176,8 @@ export async function withExactStage<T>(
     // measured runs both carry copy that `placeCanvasBlocks` emits again,
     // which is how exported slides ended up with doubled titles/body.
     const restoreAdopted = hideAdoptedSourcesIn(stage, canvasBlocksOf(args.slide));
-    if (restoreAdopted !== undefined) await nextFrames(1);
+    await nextFrames(1);
+
 
     try {
       return await fn(stage);
