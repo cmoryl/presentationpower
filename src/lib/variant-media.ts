@@ -13,8 +13,8 @@ const IMAGE_VARIANT_IDS = new Set<string>([
   "MV-OP-COVER-MEDIA",
   "MV-OP-COVER-EDITORIAL",
   "MV-OP-COVER-SPLIT",
-  "MV-OP-COVER-DOSSIER",
   "MV-OP-COVER-STACKED",
+  "MV-OP-COVER-GRADIENT",
   // Image-forward family
   "MV-IMG-FULL-BLEED",
   "MV-IMG-SPLIT",

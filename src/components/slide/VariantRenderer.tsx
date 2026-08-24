@@ -5942,6 +5942,8 @@ function renderVariantBody({
             </div>
             <div className="flex items-center">
               <MediaTile
+                overrideUrl={s(c.mediaUrl)}
+                mediaPath={s(c.mediaPath)}
                 brand={brand}
                 seed={s(c.mediaSeed, s(c.clientName, "editorial"))}
                 className="aspect-[3/4] w-full"
@@ -5960,6 +5962,8 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <div className="-m-24 grid h-[calc(100%+192px)] grid-cols-2">
             <MediaTile
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
               brand={brand}
               seed={s(c.mediaSeed, s(c.clientName, "split"))}
               className="h-full w-full rounded-none"
@@ -6033,6 +6037,8 @@ function renderVariantBody({
           <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-2 p-2">
             {(items.length ? items : [{}, {}, {}, {}]).slice(0, 4).map((it, i) => (
               <MediaTile
+                overrideUrl={s(it.mediaUrl)}
+                mediaPath={s(it.mediaPath)}
                 key={i}
                 brand={brand}
                 seed={s(it.seed, `grid-${i}`)}
@@ -6144,6 +6150,8 @@ function renderVariantBody({
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber} variant="cover">
           <MediaTile
+            overrideUrl={s(c.mediaUrl)}
+            mediaPath={s(c.mediaPath)}
             brand={brand}
             seed={s(c.mediaSeed, s(c.clientName, "cover-image"))}
             className="absolute inset-0 h-full w-full rounded-none"
@@ -6233,6 +6241,8 @@ function renderVariantBody({
             <Kicker brand={brand}>{s(c.kicker, "A proposal")}</Kicker>
             <div className="grid grid-cols-[1fr_1.4fr] items-end gap-16">
               <MediaTile
+                overrideUrl={s(c.mediaUrl)}
+                mediaPath={s(c.mediaPath)}
                 brand={brand}
                 seed={s(c.mediaSeed, "stacked")}
                 className="aspect-[4/5] w-full"
@@ -6495,6 +6505,8 @@ function renderVariantBody({
             {arr(c.items).map((it, i) => (
               <div key={i}>
                 <MediaTile
+                  overrideUrl={s(it.mediaUrl)}
+                  mediaPath={s(it.mediaPath)}
                   brand={brand}
                   seed={s(it.seed, `grid3-${i}`)}
                   className="aspect-[4/3] w-full"
@@ -6529,6 +6541,8 @@ function renderVariantBody({
               .map((it, i) => (
                 <div key={i}>
                   <MediaTile
+                    overrideUrl={s(it.mediaUrl)}
+                    mediaPath={s(it.mediaPath)}
                     brand={brand}
                     seed={s(it.seed, `grid6-${i}`)}
                     className="h-[286px] w-full"
@@ -6683,6 +6697,8 @@ function renderVariantBody({
             ].map((p, i) => (
               <div key={i} className="pt-0">
                 <MediaTile
+                  overrideUrl={s(p.panel.mediaUrl)}
+                  mediaPath={s(p.panel.mediaPath)}
                   brand={brand}
                   seed={s(p.panel.seed, `${p.label}-${s(p.panel.label)}`)}
                   className="aspect-[16/9] w-full rounded-[22px]"
@@ -6724,6 +6740,8 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-16">
             <MediaTile
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
               brand={brand}
               seed={s(c.mediaSeed, s(c.label, "stat"))}
               className="h-full w-full"
@@ -6763,6 +6781,8 @@ function renderVariantBody({
               .map((it, i) => (
                 <div key={i}>
                   <MediaTile
+                    overrideUrl={s(it.mediaUrl)}
+                    mediaPath={s(it.mediaPath)}
                     brand={brand}
                     seed={s(it.seed, `strip-${i}`)}
                     className="aspect-[3/4] w-full"
@@ -6822,6 +6842,8 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-[420px_1fr] items-stretch gap-16">
             <MediaTile
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
               brand={brand}
               seed={s(c.mediaSeed, s(c.attribution, "portrait"))}
               pool="portrait"
@@ -7600,6 +7622,8 @@ function renderVariantBody({
                       </div>
                     ) : (
                       <MediaTile
+                        overrideUrl={s(it.mediaUrl)}
+                        mediaPath={s(it.mediaPath)}
                         brand={brand}
                         seed={s(it.seed, s(it.client, `client-${i}`))}
                         className="aspect-[16/10] w-full"
@@ -7665,6 +7689,8 @@ function renderVariantBody({
                 <div key={i} data-intro-item="" data-intro-step={i} className="min-w-0">
                   <GlassTile radius={26} padding="p-6" className="flex h-full min-w-0 gap-7">
                     <MediaTile
+                      overrideUrl={s(it.mediaUrl)}
+                      mediaPath={s(it.mediaPath)}
                       brand={brand}
                       seed={s(it.seed, `mx-${i}`)}
                       className="h-full w-[236px] shrink-0 rounded-[18px]"
@@ -7732,6 +7758,8 @@ function renderVariantBody({
                   <GlassTile radius={24} padding="p-5" className="flex h-full min-w-0 flex-col">
                     <div className="relative">
                       <MediaTile
+                        overrideUrl={s(it.mediaUrl)}
+                        mediaPath={s(it.mediaPath)}
                         brand={brand}
                         seed={s(it.seed, `mx6-${i}`)}
                         className="h-[196px] w-full rounded-[16px]"
@@ -8132,6 +8160,8 @@ function renderVariantBody({
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <div className="grid h-full grid-cols-2 gap-16">
             <MediaTile
+              overrideUrl={s(c.mediaUrl)}
+              mediaPath={s(c.mediaPath)}
               brand={brand}
               seed={s(c.mediaSeed, s(c.title, "cta"))}
               className="h-full w-full"
