@@ -178,7 +178,12 @@ export function SocialModuleFrame({
   // so every "% of page height" measurement in the library (masthead bands,
   // split panels, plate heights) resolves against the social frame instead of
   // against a Letter page.
-  const framePageHeight = Math.round(fit.pageWidth * (safe.height / safe.width));
+  //
+  // Height must be expressed in the 816px-wide template coordinate system that
+  // `cq()` normalises against — not in rendered px — otherwise growth-narrowed
+  // pages silently shrink every band back down.
+  const framePageHeight = Math.round(816 * (safe.height / safe.width));
+
   const frameBandPct = useMemo(() => {
     switch (aspectClass(format)) {
       case "landscape-wide":
