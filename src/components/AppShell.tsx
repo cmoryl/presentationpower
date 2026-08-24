@@ -178,7 +178,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/knowledge/ask", label: "Ask Oracle" },
         { to: "/admin/oracle", label: "Oracle KB" },
         { to: "/admin/knowledge", label: "KB manager" },
-        { to: "/admin/approvals", label: "Approvals" },
+        { to: "/admin/approvals", label: "Module approvals" },
+        { to: "/approvals", label: "Brand approval queue" },
+
       ],
     },
     {
