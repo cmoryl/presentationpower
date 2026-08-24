@@ -175,6 +175,13 @@ function ExportView() {
 
   async function runPptxExport() {
     setExporting(true);
+    const { toast } = await import("sonner");
+    const progressId = toast.loading("Building your PowerPoint…", {
+      description: `${deck.slides.length} slide${deck.slides.length === 1 ? "" : "s"} — this can take a few seconds.`,
+    });
+    let ok = false;
+    try {
+
     try {
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
       setPerf(null);
