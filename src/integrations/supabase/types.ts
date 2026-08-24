@@ -376,6 +376,53 @@ export type Database = {
         }
         Relationships: []
       }
+      approval_assignees: {
+        Row: {
+          assigned_by: string
+          assignee_id: string
+          created_at: string
+          decided_at: string | null
+          decision: string
+          decision_note: string | null
+          id: string
+          lane: string
+          request_id: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_by: string
+          assignee_id: string
+          created_at?: string
+          decided_at?: string | null
+          decision?: string
+          decision_note?: string | null
+          id?: string
+          lane?: string
+          request_id: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_by?: string
+          assignee_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decision?: string
+          decision_note?: string | null
+          id?: string
+          lane?: string
+          request_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "approval_assignees_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "approval_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       approval_comments: {
         Row: {
           author_id: string
