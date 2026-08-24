@@ -78,6 +78,8 @@ type ModeAction = {
   label: string;
   to: string;
   params?: Record<string, string>;
+  /** Pre-selects the brief's Step 1 output type, e.g. { output: "event" }. */
+  search?: Record<string, string>;
   hint?: string;
   primary?: boolean;
 };
@@ -114,7 +116,13 @@ const MODES: ModeDef[] = [
     headline: "Built to own the room.",
     copy: "From brief to board-ready in minutes. Element assembles the right story, layout, and approved visuals — you just refine and present.",
     actions: [
-      { label: "New deck from brief", to: "/brief/new", primary: true, hint: "≈ 60s" },
+      {
+        label: "New deck from brief",
+        to: "/brief/new",
+        search: { output: "presentation" },
+        primary: true,
+        hint: "≈ 60s",
+      },
       { label: "Open library", to: "/library" },
     ],
     subnav: [
@@ -545,7 +553,7 @@ function Dashboard() {
                     color: "currentColor",
                   }}
                 >
-                  Open element
+                  Start a {m.label.toLowerCase()} brief
                   <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
                 </span>
               </Link>
@@ -809,6 +817,7 @@ function ModeActionButton({ action, ink }: { action: ModeAction; ink: string }) 
       <Link
         to={action.to}
         {...(action.params ? { params: action.params as never } : {})}
+        {...(action.search ? { search: action.search as never } : {})}
         className={`${shared} bg-white text-[#03002C] shadow-lg shadow-black/25 hover:shadow-xl hover:-translate-y-0.5`}
       >
         <Rocket size={14} style={{ color: ink }} />
@@ -825,6 +834,7 @@ function ModeActionButton({ action, ink }: { action: ModeAction; ink: string }) 
     <Link
       to={action.to}
       {...(action.params ? { params: action.params as never } : {})}
+      {...(action.search ? { search: action.search as never } : {})}
       className={`${shared} border border-white/20 bg-white/[0.05] text-white/85 backdrop-blur hover:border-white/40 hover:bg-white/[0.1]`}
     >
       {action.label}
