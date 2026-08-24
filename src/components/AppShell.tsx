@@ -338,13 +338,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </Link>
                     {presOpen && (
                       <div className="absolute left-1/2 top-full z-50 w-[760px] max-w-[94vw] -translate-x-1/2 pt-2">
-                        <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-3 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] sm:grid-cols-4 dark:!border-white/10 dark:!bg-[#0B0A2A]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_20px_60px_-15px_rgba(0,0,0,0.8)]">
+                        <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] sm:grid-cols-4 dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {visibleElementGroups.map((g) => (
                             <div key={g.label} className="min-w-0">
                               <Link
                                 to={g.to}
                                 onClick={() => setPresOpen(false)}
-                                className="block px-2 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 transition hover:text-[#003FC7] dark:text-white/45 dark:hover:!text-[#A1FBF9]"
+                                className="mb-1 block border-b border-black/[0.08] px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#003FC7] transition hover:text-[#03002C] dark:border-white/10 dark:text-[#A1FBF9] dark:hover:!text-white"
                               >
                                 {g.label}
                               </Link>
@@ -371,10 +371,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                                       key={`${s.to}:${s.label}`}
                                       to={s.to}
                                       search={s.search ?? {}}
-                                      className={`block rounded-lg px-2.5 py-1.5 text-[13px] leading-tight transition ${
+                                      className={`block rounded-lg px-2.5 py-2 text-sm font-medium leading-tight transition ${
                                         active
-                                          ? "bg-white/80 text-[#03002C] dark:!bg-white/10 dark:!text-white"
-                                          : "text-black/70 hover:bg-white/50 hover:text-black dark:text-white/75 dark:hover:!bg-white/[0.06] dark:hover:text-white"
+                                          ? "bg-[#003FC7] text-white dark:!bg-white/15 dark:!text-white"
+                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-white/80 dark:hover:!bg-white/10 dark:hover:!text-white"
                                       }`}
                                       onClick={() => setPresOpen(false)}
                                     >
@@ -415,10 +415,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </Link>
                     {adminOpen && (
                       <div className="absolute left-1/2 top-full z-50 w-[720px] max-w-[92vw] -translate-x-1/2 pt-2">
-                        <div className="grid grid-cols-3 gap-1 overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-3 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] dark:!border-white/10 dark:!bg-[#0B0A2A]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_20px_60px_-15px_rgba(0,0,0,0.8)]">
+                        <div className="grid grid-cols-3 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {adminGroups.map((g) => (
                             <div key={g.label} className="min-w-0">
-                              <div className="px-2 pb-1.5 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+                              <div className="mb-1 border-b border-black/[0.08] px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#003FC7] dark:border-white/10 dark:text-[#A1FBF9]">
                                 {g.label}
                               </div>
                               <div className="flex flex-col gap-0.5">
@@ -429,10 +429,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                                     <Link
                                       key={s.to}
                                       to={s.to}
-                                      className={`block rounded-lg px-2.5 py-1.5 text-[13px] leading-tight transition ${
+                                      className={`block rounded-lg px-2.5 py-2 text-sm font-medium leading-tight transition ${
                                         active
-                                          ? "bg-white/80 text-[#03002C] shadow-[inset_0_1px_0_0_rgba(255,255,255,1)] dark:!bg-white/10 dark:!text-white"
-                                          : "text-black/70 hover:bg-white/50 hover:text-black dark:text-white/75 dark:hover:!bg-white/[0.06] dark:hover:text-white"
+                                          ? "bg-[#003FC7] text-white dark:!bg-white/15 dark:!text-white"
+                                          : "text-[#03002C]/85 hover:bg-[#E0E8F5] hover:text-[#03002C] dark:text-white/80 dark:hover:!bg-white/10 dark:hover:!text-white"
                                       }`}
                                       onClick={() => setAdminOpen(false)}
                                     >
