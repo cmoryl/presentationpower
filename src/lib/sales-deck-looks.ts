@@ -32,19 +32,35 @@ export const SALES_DECK_PACK_IDS: readonly string[] = [
   SALES_DECK_LOOKS.dark.stylePackId,
 ];
 
+/**
+ * Custom (admin-authored) templates are NOT available to sales by default. A
+ * look only joins the sales set when an admin flags it `sales_approved`, which
+ * the template registry publishes as `tpl-<code>` pack ids.
+ */
+export function salesApprovedPackIds(): readonly string[] {
+  return [...SALES_DECK_PACK_IDS, ...salesApprovedTemplatePackIds()];
+}
+
 /** True when the pack is one of the two approved sales enterprise looks. */
 export function isSalesDeckPack(stylePackId?: string | null): boolean {
   return !!stylePackId && SALES_DECK_PACK_IDS.includes(stylePackId);
 }
 
+/** True when sales may use this pack: enterprise light/dark, or an approved custom look. */
+export function isSalesAllowedPack(stylePackId?: string | null): boolean {
+  return !!stylePackId && salesApprovedPackIds().includes(stylePackId);
+}
+
 /**
- * Coerce any style pack to the approved sales enterprise pack. When the pack is
- * already approved it is kept, so the user's light/dark choice survives.
+ * Coerce any style pack to a sales-approved pack. Enterprise light/dark and
+ * admin-approved custom templates are kept, so the user's light/dark choice (or
+ * an approved brand look) survives; everything else falls back to Enterprise.
  */
 export function enforceSalesDeckPack(
   stylePackId?: string | null,
   prefer: SalesLookMode = "light",
 ): string {
-  if (isSalesDeckPack(stylePackId)) return stylePackId as string;
+  if (isSalesAllowedPack(stylePackId)) return stylePackId as string;
   return SALES_DECK_LOOKS[prefer].stylePackId;
 }
+
