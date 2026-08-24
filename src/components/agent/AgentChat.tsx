@@ -254,6 +254,10 @@ export function AgentChat({
       <div className="border-t border-border/60 bg-background/60 px-3 pt-2">
         <AgentDesignDnaImport threadId={threadId} />
         <AgentDesignOverrides threadId={threadId} />
+        <div className="pb-2 pt-1">
+          <AgentDocumentUpload docs={docs} onChange={setDocs} disabled={busy} />
+        </div>
+
       </div>
 
       <form
