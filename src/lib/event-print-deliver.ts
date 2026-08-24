@@ -130,10 +130,14 @@ async function platePng(
   if (clamped) scale = MAX_PLATE_EDGE_PX / Math.max(item.width, item.height);
   scale = Math.max(0.5, scale);
 
-  const restore = suppressPreviewChrome(item.node);
+  // The review card scales the frame with a CSS transform on a wrapper; capture
+  // the native-size frame itself so the artwork fills the plate.
+  const frame =
+    item.node.querySelector<HTMLElement>("[data-kit-asset-frame='true']") ?? item.node;
+  const restore = suppressPreviewChrome(frame);
   try {
     const canvas = await captureAssetCanvas(
-      { node: item.node, width: item.width, height: item.height, label: item.spec.label },
+      { node: frame, width: item.width, height: item.height, label: item.spec.label },
       { scale, background: "#ffffff" },
     );
     if (!(canvas.width > 0 && canvas.height > 0)) throw new Error("capture produced no pixels");
@@ -170,10 +174,15 @@ function drawCropMarks(pdf: jsPDF, pageW: number, pageH: number, bleed: number):
   }
 }
 
+/** Clear margin outside the bleed so crop marks sit off the artwork. */
+const SLUG_IN = 0.25;
+
 async function pressPdf(item: DeliveryItem, geometry: PressGeometry) {
   const plate = await platePng(item, geometry);
-  const pageW = geometry.trimWidthIn + geometry.bleedIn * 2;
-  const pageH = geometry.trimHeightIn + geometry.bleedIn * 2;
+  const artW = geometry.trimWidthIn + geometry.bleedIn * 2;
+  const artH = geometry.trimHeightIn + geometry.bleedIn * 2;
+  const pageW = artW + SLUG_IN * 2;
+  const pageH = artH + SLUG_IN * 2;
   const pdf = new jsPDF({
     orientation: pageW >= pageH ? "landscape" : "portrait",
     unit: "in",
@@ -184,9 +193,11 @@ async function pressPdf(item: DeliveryItem, geometry: PressGeometry) {
   // the page it actually created rather than the requested numbers.
   const w = pdf.internal.pageSize.getWidth();
   const h = pdf.internal.pageSize.getHeight();
-  // Art runs to the bleed edge; the trim box sits `bleedIn` inside every side.
-  pdf.addImage(plate.dataUrl, "JPEG", 0, 0, w, h, undefined, "FAST");
-  drawCropMarks(pdf, w, h, geometry.bleedIn);
+  // Art runs to the bleed edge, inset by the slug so the marks stay off it.
+  const ox = (w - artW) / 2;
+  const oy = (h - artH) / 2;
+  pdf.addImage(plate.dataUrl, "JPEG", ox, oy, artW, artH, undefined, "FAST");
+  drawCropMarks(pdf, w, h, geometry.bleedIn + SLUG_IN);
   const blob = pdf.output("blob");
   return { blob, plate };
 }
@@ -249,7 +260,8 @@ function readme(opts: DeliveryOptions, files: DeliveryFileReport[], stamp: strin
     "  manifest.csv  every item with trim, bleed, safe area, quantity, substrate and scale.",
     "",
     "GEOMETRY",
-    "  Page = trim + bleed on all four sides. The trim sits one bleed width inside each edge.",
+    "  Page = trim + bleed + a 0.25in clear slug. Crop marks sit in the slug, off the artwork;",
+    "  the trim sits one bleed width inside the art edge.",
     "  Copy and logos are held inside the safe area listed per item in the manifest.",
     "",
     "OUTPUT",
