@@ -22,6 +22,7 @@ import { retintItemsForMode } from "@/lib/canvas-mode-ink";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
 import { expandParts, expandPreset, presetById } from "@/lib/canvas-block-presets";
+import { CanvasSlideStrip } from "@/components/studio/CanvasSlideStrip";
 import { StudioSideAccordion } from "@/components/studio/StudioSideAccordion";
 import { StudioInspector } from "@/components/studio/StudioInspector";
 import { CanvasStage } from "@/components/studio/CanvasStage";
@@ -733,6 +734,17 @@ function CanvasStudioPage() {
                 }
               />
             </div>
+            {/* Deck view: every other composition sits under the stage so a
+              multi-slide canvas deck is editable without hunting a menu. */}
+            <CanvasSlideStrip
+              compositions={compositions}
+              activeId={comp.id}
+              onSelect={setActive}
+              onAdd={() => createComposition("Untitled slide", brandId)}
+              onDuplicate={(id) => duplicateComposition(id)}
+              onDelete={(id) => deleteComposition(id)}
+            />
+
           </StylePackVars>
         </StylePackProvider>
       </LibraryPackProvider>
