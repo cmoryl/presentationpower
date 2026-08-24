@@ -507,3 +507,41 @@ export const listApprovalTimeline = createServerFn({ method: "POST" })
     }
     return { request: req, events: rows ?? [], people };
   });
+
+export type ApprovedActivityRow = {
+  subject_type: string;
+  subject_id: string;
+  title: string;
+  subject_path: string | null;
+  decided_at: string | null;
+  updated_at: string;
+};
+
+/**
+ * Approved, final items only — the feed behind the homepage "Recent activity".
+ * Role scope: admins and brand reviewers see every approved creation in the
+ * workspace; everyone else (marketing contributors, sales) sees only the
+ * approved items they submitted themselves.
+ */
+export const listApprovedActivity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data: roleRows } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId);
+    const { isAdmin, isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
+
+    let q = supabase
+      .from("approval_requests")
+      .select("subject_type, subject_id, title, subject_path, decided_at, updated_at")
+      .eq("status", "approved")
+      .order("decided_at", { ascending: false })
+      .limit(120);
+    if (!isReviewer) q = q.eq("requested_by", userId);
+
+    const { data: rows, error } = await q.returns<ApprovedActivityRow[]>();
+    if (error) throw new Error(error.message);
+    return { items: rows ?? [], isAdmin, isReviewer };
+  });

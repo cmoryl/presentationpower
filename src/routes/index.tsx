@@ -46,6 +46,7 @@ import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
+import { listApprovedActivity, type ApprovedActivityRow } from "@/lib/brand-approvals.functions";
 import { listMyKits, type SavedKit } from "@/lib/kits.functions";
 import { useSessionUser } from "@/hooks/use-session-user";
 
@@ -552,16 +553,11 @@ function Dashboard() {
         </div>
       </section>
 
-
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
 
       {/* ================= RECENT ACTIVITY ================= */}
-      <RecentActivity
-        decks={Object.values(decksMap).slice(0, 12)}
-        allDeckCount={cloudCount ?? Object.keys(decksMap).length}
-        briefs={briefs}
-      />
+      <RecentActivity decks={Object.values(decksMap).slice(0, 12)} briefs={briefs} />
 
       {/* ================= KNOWLEDGE & BRAND ================= */}
       <section className="mt-12">
@@ -1188,19 +1184,53 @@ const ACTIVITY_META: Record<
 
 function RecentActivity({
   decks,
-  allDeckCount,
   briefs,
 }: {
   decks: Deck[];
-  allDeckCount: number;
   briefs: Record<string, { industry?: string } | undefined>;
 }) {
   const userId = useSessionUser();
   const listPrint = useServerFn(listMyPrintAssets);
   const listKits = useServerFn(listMyKits);
+  const listApproved = useServerFn(listApprovedActivity);
   const [printItems, setPrintItems] = useState<ActivityItem[]>([]);
   const [kitItems, setKitItems] = useState<ActivityItem[]>([]);
+  const [approved, setApproved] = useState<Map<string, string> | null>(null);
+  const [scope, setScope] = useState<"self" | "workspace">("self");
   const [filter, setFilter] = useState<"all" | ActivityKind>("all");
+
+  useEffect(() => {
+    if (!userId) {
+      setApproved(new Map());
+      return;
+    }
+    let cancelled = false;
+    listApproved()
+      .then((res: { items: ApprovedActivityRow[]; isReviewer: boolean }) => {
+        if (cancelled) return;
+        const map = new Map<string, string>();
+        (res?.items ?? []).forEach((r) => {
+          const at = r.decided_at ?? r.updated_at ?? "";
+          const keys = [`${r.subject_type}:${r.subject_id}`];
+          // Kit-backed social/event assets are filed under either label.
+          if (r.subject_type === "kit")
+            keys.push(`social:${r.subject_id}`, `event:${r.subject_id}`);
+          if (r.subject_type === "social" || r.subject_type === "event")
+            keys.push(`kit:${r.subject_id}`);
+          keys.forEach((k) => {
+            if (!map.has(k) || (map.get(k) ?? "") < at) map.set(k, at);
+          });
+        });
+        setApproved(map);
+        setScope(res?.isReviewer ? "workspace" : "self");
+      })
+      .catch(() => {
+        if (!cancelled) setApproved(new Map());
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [listApproved, userId]);
 
   useEffect(() => {
     // Both feeds hit auth-protected server fns; skip entirely when signed out.
@@ -1271,17 +1301,28 @@ function RecentActivity({
     [decks, briefs],
   );
 
+  // Approved final creations only. Each item must carry an approved decision,
+  // and the timestamp shown is the approval date, not the last edit.
+  const approvedItems = useMemo(() => {
+    if (!approved) return [] as ActivityItem[];
+    const rawId = (item: ActivityItem) => item.id.replace(/^(deck|print|kit)-/, "");
+    return [...deckItems, ...printItems, ...kitItems].flatMap((item) => {
+      const at = approved.get(`${item.kind}:${rawId(item)}`);
+      return at === undefined ? [] : [{ ...item, at: at || item.at }];
+    });
+  }, [approved, deckItems, printItems, kitItems]);
+
   const items = useMemo(() => {
-    const all = [...deckItems, ...printItems, ...kitItems];
-    const scoped = filter === "all" ? all : all.filter((i) => i.kind === filter);
+    const scoped =
+      filter === "all" ? approvedItems : approvedItems.filter((i) => i.kind === filter);
     return scoped.sort((a, b) => (b.at ?? "").localeCompare(a.at ?? "")).slice(0, 9);
-  }, [deckItems, printItems, kitItems, filter]);
+  }, [approvedItems, filter]);
 
   const counts: Record<ActivityKind, number> = {
-    deck: allDeckCount,
-    print: printItems.length,
-    social: kitItems.filter((k) => k.kind === "social").length,
-    event: kitItems.filter((k) => k.kind === "event").length,
+    deck: approvedItems.filter((i) => i.kind === "deck").length,
+    print: approvedItems.filter((i) => i.kind === "print").length,
+    social: approvedItems.filter((i) => i.kind === "social").length,
+    event: approvedItems.filter((i) => i.kind === "event").length,
   };
 
   const chips: { id: "all" | ActivityKind; label: string; count?: number }[] = [
@@ -1298,9 +1339,14 @@ function RecentActivity({
         <SectionHeader
           kicker="Workspace"
           title="Recent activity"
-          hint="Decks, print, social, and events"
+          hint={
+            scope === "workspace"
+              ? "Approved final decks, print, social, and events across the workspace"
+              : "Approved final work you submitted"
+          }
           inline
         />
+
         <Link
           to="/decks"
           className="inline-flex min-h-11 items-center text-sm text-black/60 hover:text-black sm:min-h-0 dark:text-white/60 dark:hover:text-white"
@@ -1340,10 +1386,10 @@ function RecentActivity({
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#003FC7]/10 text-2xl text-[#003FC7] dark:bg-[#A1FBF9]/10 dark:text-[#A1FBF9]">
               ✦
             </div>
-            <h3 className="mt-4 text-xl font-semibold">Nothing here yet</h3>
+            <h3 className="mt-4 text-xl font-semibold">No approved work yet</h3>
             <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-              Start with a brief, a print asset, or a campaign kit — anything you make shows up
-              here.
+              This feed shows final, brand-approved creations only. Build a deck, print asset or
+              campaign kit, send it for brand review, and it appears here once approved.
             </p>
             <Link
               to="/brief/new"
