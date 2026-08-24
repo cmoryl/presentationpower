@@ -1534,3 +1534,12 @@ body.export-mode [data-print-surface] {
     animation: none;
   }
 }
+
+/* Hides the native scrollbar on horizontal card rails (arrows + wheel drive it). */
+@utility tp-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
