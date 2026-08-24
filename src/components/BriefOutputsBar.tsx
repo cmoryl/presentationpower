@@ -36,6 +36,9 @@ function kindLabel(kind: string) {
  * social) so finishing one never dead-ends the user.
  */
 export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props) {
+  // A brief that only produced print/social/event still owns a deck record as
+  // its spine; never advertise it as a presentation the user can open.
+  const deckIsArtifact = masterSet?.presentation !== false || active.kind === "deck";
   const prints = [
     ...(masterSet?.printAssets ??
       (masterSet?.printAssetIds ?? []).map((id) => ({
@@ -59,13 +62,14 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
 
   // Nothing to cross-link to: only the artifact already open.
   const total =
-    (deckId ? 1 : 0) +
+    (deckId && deckIsArtifact ? 1 : 0) +
     prints.length +
     (masterSet?.eventPlaybookId ? 1 : 0) +
     (masterSet?.socialPlaybookId ? 1 : 0);
-  if (total < 2 && !(deckId && active.kind !== "deck")) return null;
+  if (total < 2 && !(deckId && deckIsArtifact && active.kind !== "deck")) return null;
 
   return (
+
     <nav
       aria-label="Other assets from this brief"
       className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/70 px-3 py-2.5 backdrop-blur"
