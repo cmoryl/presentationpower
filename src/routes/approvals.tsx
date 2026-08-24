@@ -15,6 +15,8 @@ import {
 } from "@/lib/brand-approvals.functions";
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 import { ApprovalAnalyticsPanel } from "@/components/approvals/ApprovalAnalyticsPanel";
+import { ReviewerAssignments } from "@/components/approvals/ReviewerAssignments";
+
 
 export const Route = createFileRoute("/approvals")({
   head: () => ({
