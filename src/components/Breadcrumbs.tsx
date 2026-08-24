@@ -62,7 +62,13 @@ const STATIC_LABELS: Record<string, string> = {
   "print-agent": "Print agent",
   "events-agent": "Events agent",
   "social-agent": "Social agent",
+  // Role marketing pages (/for/admin, /for/marketing, /for/sales).
+  for: "Element by role",
+  marketing: "Marketing",
+  sales: "Sales",
+  dashboard: "Workspace",
 };
+
 
 // Segments that should be hidden from the trail entirely (they're internal
 // routing artifacts, not meaningful location context for the user).
