@@ -392,7 +392,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       inputSchema: z.object({
         divisionId: z.string().min(1),
         mode: z.enum(["light", "dark"]),
-        pageSize: z.string().optional(),
+        pageSize: z.enum(["A4","Letter","Square","HalfLetter","A5"]).optional(),
         density: z.enum(["compact", "standard", "airy"]).optional(),
         rationale: z.string().max(400).optional(),
         heroOptions: z
@@ -449,7 +449,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       inputSchema: z.object({
         assetId: z.string().uuid(),
         mode: z.enum(["light", "dark"]).optional(),
-        pageSize: z.string().optional(),
+        pageSize: z.enum(["A4","Letter","Square","HalfLetter","A5"]).optional(),
         density: z.enum(["compact", "standard", "airy"]).optional(),
         heroImageUrl: z.string().optional(),
         heroHeightPct: z.number().min(20).max(70).optional(),
