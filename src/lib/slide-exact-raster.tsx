@@ -26,6 +26,8 @@ import {
   type ExportQualityId,
 } from "./export-quality";
 import { beginExportChrome } from "./export-chrome-suppress";
+import { canvasBlocksOf, hideAdoptedSourcesIn } from "./export-adopted-hide";
+
 import type { StylePack } from "./style-packs";
 import type { TextRun } from "./export-text-layer";
 import type { BrandMode, ModuleVariant } from "./taxonomy";
