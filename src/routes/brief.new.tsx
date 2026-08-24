@@ -813,6 +813,8 @@ function BriefCommandCenter() {
       // every remaining artifact stuck at QUEUED.
       handlePersonalizeFailure((e as Error).message);
     }
+    }
+
     await expandMasterSet(deckId, submission, activeSet, opts?.request);
     if (opts?.request?.trim()) {
       recordAssetVersion({
