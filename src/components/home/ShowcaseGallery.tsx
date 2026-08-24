@@ -332,7 +332,9 @@ function MediaCard({
       }`}
     >
       <div
-        className={`relative overflow-hidden ${feature ? "h-[300px] sm:h-[360px]" : "h-[230px]"}`}
+        className={`relative overflow-hidden ${
+          feature ? "h-[300px] sm:h-[360px]" : compact ? "h-[148px]" : "h-[230px]"
+        }`}
       >
         <img
           src={art}
