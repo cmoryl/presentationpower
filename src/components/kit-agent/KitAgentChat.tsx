@@ -77,6 +77,8 @@ export function KitAgentChat({
   });
 
   const [input, setInput] = useState("");
+  const { docs, setDocs } = useAgentDocuments();
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seenKit = useRef<string | null>(null);
