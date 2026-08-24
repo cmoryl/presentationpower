@@ -22,6 +22,8 @@ import { PERSONAS, personaById, type PersonaId, type WorkKind } from "@/lib/work
 import { listMyCloudDecks } from "@/lib/cloud-decks.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
 import { listMyKits } from "@/lib/kits.functions";
+import { taxonomyQueryOptions } from "@/hooks/use-taxonomy";
+import { QuickCreate } from "@/components/dashboard/QuickCreate";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -43,7 +45,18 @@ export const Route = createFileRoute("/dashboard")({
     ],
     links: [{ rel: "canonical", href: "https://transperfectelement.lovable.app/dashboard" }],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(taxonomyQueryOptions),
   component: RoleDashboard,
+  errorComponent: ({ error }) => (
+    <AppShell>
+      <div className="p-10 text-sm text-red-600">Dashboard failed to load: {error.message}</div>
+    </AppShell>
+  ),
+  notFoundComponent: () => (
+    <AppShell>
+      <div className="p-10 text-sm">Not found.</div>
+    </AppShell>
+  ),
 });
 
 const PERSONA_ICON: Record<PersonaId, typeof ShieldCheck> = {
@@ -379,6 +392,9 @@ function RoleDashboard() {
             })}
           </div>
         ) : null}
+
+        {/* Quick create — one click into the right template set */}
+        <QuickCreate personaId={personaId} signedIn={signedIn} />
 
         {/* Needs attention */}
         {signedIn && attention.length > 0 ? (
