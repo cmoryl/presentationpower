@@ -26,6 +26,7 @@ import {
   Search,
   CornerDownLeft,
 } from "lucide-react";
+import { AGENT_ROUTE, AGENT_LABEL, seedAgentPrompt } from "@/lib/agent-seed";
 import { AppShell } from "@/components/AppShell";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useSignedIn } from "@/components/CloudDeckControls";
@@ -257,12 +258,8 @@ function Dashboard() {
   const sendToOracle = (prompt: string) => {
     const q = prompt.trim();
     if (!q) return;
-    try {
-      window.sessionStorage.setItem("oracle:seed", q);
-    } catch {
-      /* ignore */
-    }
-    navigate({ to: "/knowledge/ask" });
+    seedAgentPrompt(mode.id, q);
+    navigate({ to: AGENT_ROUTE[mode.id] });
   };
 
   return (
@@ -459,6 +456,7 @@ function Dashboard() {
                 navigate({ to: "/brief/new" });
               }}
               accent={mode.accent}
+              agentLabel={AGENT_LABEL[mode.id]}
             />
           </div>
         </div>
@@ -848,10 +846,12 @@ function AgentBar({
   onSubmit,
   onDeck,
   accent,
+  agentLabel,
 }: {
   onSubmit: (q: string) => void;
   onDeck: (q: string) => void;
   accent: string;
+  agentLabel: string;
 }) {
   const [value, setValue] = useState("");
   const ref = useRef<HTMLTextAreaElement | null>(null);
@@ -883,7 +883,7 @@ function AgentBar({
               htmlFor="agent-prompt"
               className="block text-[10px] font-semibold uppercase tracking-[0.28em] text-white/50"
             >
-              Ask the Oracle · or describe what you need
+              Ask the {agentLabel.toLowerCase()} · or describe what you need
             </label>
             <textarea
               id="agent-prompt"
@@ -906,7 +906,7 @@ function AgentBar({
         <div className="flex shrink-0 items-center gap-2 self-stretch sm:self-end">
           <button
             type="button"
-            onClick={() => onDeck(value.trim() || "New deck from Oracle prompt")}
+            onClick={() => onDeck(value.trim() || "New deck from hero prompt")}
             disabled={!value.trim()}
             className="hidden items-center gap-1.5 rounded-full border border-white/20 bg-white/[0.06] px-3 py-2 text-xs font-medium text-white/85 backdrop-blur transition hover:border-white/40 hover:bg-white/[0.12] disabled:cursor-not-allowed disabled:opacity-40 sm:inline-flex"
           >

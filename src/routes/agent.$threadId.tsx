@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { consumeAgentPrompt } from "@/lib/agent-seed";
 import { AgentChat } from "@/components/agent/AgentChat";
 import { AgentDeckPreview } from "@/components/agent/AgentDeckPreview";
 import { AgentQuickStart } from "@/components/agent/AgentQuickStart";
@@ -439,6 +440,13 @@ function AgentThreadPage() {
   const [messages, setMessages] = useState<UIMessage[] | null>(null);
   const [deckId, setDeckId] = useState<string | null>(null);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+
+  // Pick up a prompt handed off from a hero / quick-start CTA.
+  useEffect(() => {
+    const seed = consumeAgentPrompt("presentation");
+    if (seed) setPendingPrompt(seed);
+  }, []);
+
   const [liveCount, setLiveCount] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
