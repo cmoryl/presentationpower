@@ -797,8 +797,8 @@
       },
       {
         "name": "audit_deck_completeness",
-        "title": "Audit deck for empty or under-filled slides",
-        "description": "Check every slide against its own layout contract and report what is not finished: empty content fields, grids with fewer cards than the layout is built for, copy far under the space the block reserves, charts with no plotted data and missing speaker notes. Returns a per-slide fill score, the exact writable content paths (with character budgets) and blocking vs advisory issues. Run this after any build or batch of writes, fix everything blocking with update_slide_content, and re-run until ok — never tell the user a deck is ready while slides render blank regions.",
+        "title": "Audit deck for empty, under-filled or repetitive slides",
+        "description": "Check every slide against its own layout contract and report what is not finished: empty content fields, grids with fewer cards than the layout is built for, copy far under the space the block reserves, charts with no plotted data and missing speaker notes. Also reports layout variety — which module layouts are over-used, how many distinct layouts the deck spends, and the permitted layouts it has not used yet. Returns a per-slide fill score, the exact writable content paths (with character budgets) and blocking vs advisory issues. Run this after any build or batch of writes, fix everything blocking with update_slide_content or change_slide_variant, and re-run until ok — never tell the user a deck is ready while slides render blank regions or three slides share one layout.",
         "annotations": {
           "readOnlyHint": true,
           "destructiveHint": false,
