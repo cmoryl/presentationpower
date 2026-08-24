@@ -731,17 +731,32 @@ export function SocialRenderer({
     pointerEvents: "none",
   };
 
+  // ---- Lockup inset --------------------------------------------------------
+  // Copy honours the full platform chrome reserve, but the logo must not: on a
+  // story/reel the top reserve is 13–14% of a 1920px frame, which pushed the
+  // lockup ~18% down the canvas and read as "the logo isn't in the corner".
+  // The lockup uses the design pad plus only a capped slice of the chrome
+  // reserve, so it hugs the corner on every format while still clearing the
+  // platform UI.
+  const lockupChromeCap = (short * 3) / 100;
+  const lockupInset = {
+    top: padPx + Math.min((safe.top ?? 0) * format.height, lockupChromeCap),
+    bottom: padPx + Math.min((safe.bottom ?? 0) * format.height, lockupChromeCap),
+    left: padPx + Math.min((safe.left ?? 0) * format.width, lockupChromeCap),
+    right: padPx + Math.min((safe.right ?? 0) * format.width, lockupChromeCap),
+  };
+
   // Panel layouts own their corners: the wordmark moves into the copy zone so
   // it never lands on the photo panel or on the headline.
   const lockupPos: CSSProperties = panelMode
     ? panelSide === "right"
-      ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
-      : { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
+      ? { top: lockupInset.top, left: lockupInset.left, transformOrigin: "top left" }
+      : { bottom: lockupInset.bottom, right: lockupInset.right, transformOrigin: "bottom right" }
     : style.lockup === "top-left"
-      ? { top: safeInset.top, left: safeInset.left, transformOrigin: "top left" }
+      ? { top: lockupInset.top, left: lockupInset.left, transformOrigin: "top left" }
       : style.lockup === "bottom-right"
-        ? { bottom: safeInset.bottom, right: safeInset.right, transformOrigin: "bottom right" }
-        : { top: safeInset.top, right: safeInset.right, transformOrigin: "top right" };
+        ? { bottom: lockupInset.bottom, right: lockupInset.right, transformOrigin: "bottom right" }
+        : { top: lockupInset.top, right: lockupInset.right, transformOrigin: "top right" };
 
   return (
     <div
