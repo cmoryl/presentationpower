@@ -1029,43 +1029,54 @@ export function KitWizard({
                 description="Pick a kit profile or toggle at least one format in step 3."
               />
             ) : (
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-1 items-start gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {assets.map((asset) => (
-                  <div key={asset.id} className="min-w-0 space-y-2">
-                    <div className="text-[11px] uppercase tracking-widest text-black/60">
-                      {asset.format.label}
-                    </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="text-[10px] text-black/40">
-                        {asset.format.width}×{asset.format.height} ·{" "}
-                        {nextDesign ? "NEXT 2026" : asset.mode}
+                  <div
+                    key={asset.id}
+                    className="flex min-w-0 flex-col gap-3 rounded-2xl border border-black/10 bg-white/70 p-3"
+                  >
+                    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2">
+                      <div className="min-w-0">
+                        <div className="truncate text-[11px] font-semibold uppercase tracking-widest text-black/60">
+                          {asset.format.label}
+                        </div>
+                        <div className="mt-0.5 truncate text-[10px] tabular-nums text-black/40">
+                          {asset.format.width}×{asset.format.height} ·{" "}
+                          {nextDesign ? "NEXT 2026" : asset.mode}
+                        </div>
                       </div>
-                      <AssetExportMenu
-                        label="Export"
-                        allowZip={false}
-                        filename={`${asset.format.label}-${asset.format.width}x${asset.format.height}`}
-                        bundleName={asset.format.label}
-                        resolveTargets={() => {
-                          const root = document.querySelector<HTMLElement>(
-                            `[data-kit-asset-id="${asset.id}"]`,
-                          );
-                          const node =
-                            root?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
-                          return node
-                            ? [
-                                {
-                                  node,
-                                  width: asset.format.width,
-                                  height: asset.format.height,
-                                  label: asset.format.label,
-                                },
-                              ]
-                            : [];
-                        }}
-                      />
+                      <div className="shrink-0">
+                        <AssetExportMenu
+                          label="Export"
+                          allowZip={false}
+                          filename={`${asset.format.label}-${asset.format.width}x${asset.format.height}`}
+                          bundleName={asset.format.label}
+                          resolveTargets={() => {
+                            const root = document.querySelector<HTMLElement>(
+                              `[data-kit-asset-id="${asset.id}"]`,
+                            );
+                            const node =
+                              root?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
+                            return node
+                              ? [
+                                  {
+                                    node,
+                                    width: asset.format.width,
+                                    height: asset.format.height,
+                                    label: asset.format.label,
+                                  },
+                                ]
+                              : [];
+                          }}
+                        />
+                      </div>
                     </div>
+
                     <div className="relative min-w-0">
-                      <div data-kit-asset-id={asset.id} className="min-w-0">
+                      <div
+                        data-kit-asset-id={asset.id}
+                        className="flex h-56 w-full min-w-0 items-center justify-center overflow-hidden rounded-xl bg-[#F2F2F2]/70 p-2"
+                      >
                         <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
                           {(displayShortEdge) =>
                             moduleLayout && !nextDesign ? (

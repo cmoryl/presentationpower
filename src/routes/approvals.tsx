@@ -15,6 +15,7 @@ import {
 } from "@/lib/brand-approvals.functions";
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 import { ApprovalAnalyticsPanel } from "@/components/approvals/ApprovalAnalyticsPanel";
+import { ReviewerAssignments } from "@/components/approvals/ReviewerAssignments";
 
 export const Route = createFileRoute("/approvals")({
   head: () => ({
@@ -412,9 +413,7 @@ function ApprovalQueuePage() {
                           <button
                             type="button"
                             disabled={decide.isPending}
-                            onClick={() =>
-                              decide.mutate({ id: r.id, status: "changes_requested" })
-                            }
+                            onClick={() => decide.mutate({ id: r.id, status: "changes_requested" })}
                             className="rounded-full border border-foreground/20 px-4 py-2 text-xs font-medium hover:bg-foreground/5 disabled:opacity-40"
                           >
                             Request changes
@@ -434,7 +433,10 @@ function ApprovalQueuePage() {
                     )}
                   </section>
 
-                  <CommentThread requestId={r.id} />
+                  <div className="space-y-4">
+                    <ReviewerAssignments requestId={r.id} isReviewer={isReviewer} />
+                    <CommentThread requestId={r.id} />
+                  </div>
                 </div>
               )}
             </li>

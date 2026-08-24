@@ -5,7 +5,6 @@
 import { notifyUsers } from "./notify.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-
 export async function notifyReviewers(requestId: string, title: string, actorId: string) {
   try {
     const { data: reviewers } = await supabaseAdmin
@@ -90,5 +89,27 @@ export async function notifyThread(requestId: string, actorId: string, body: str
     });
   } catch (e) {
     console.error("[approvals] comment notify failed:", e);
+  }
+}
+
+/** Tell one person they have been put on the hook for a review. */
+export async function notifyAssignee(
+  requestId: string,
+  assigneeId: string,
+  title: string,
+  actorId: string,
+) {
+  try {
+    await notifyUsers({
+      userIds: [assigneeId],
+      kind: "submitted",
+      title,
+      body: "You were assigned as a reviewer on this item.",
+      link: `/approvals?request=${requestId}`,
+      requestId,
+      actorId,
+    });
+  } catch (e) {
+    console.error("[approvals] assignee notify failed:", e);
   }
 }
