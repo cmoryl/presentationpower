@@ -108,7 +108,7 @@ function BriefOutputHub() {
   const primary = brand?.tokens?.primary || "#003FC7";
 
   const totalAssets =
-    1 +
+    (hasDeck ? 1 : 0) +
     prints.length +
     (eventPb ? eventCollateral.length : 0) +
     (socialPb ? socialPb.deliverables.length : 0);
@@ -116,10 +116,11 @@ function BriefOutputHub() {
   const areas = [
     {
       id: "sales",
-      count: 1,
+      count: hasDeck ? 1 : 0,
       label: "Sales enablement",
       icon: Presentation,
     },
+
     { id: "print", count: prints.length, label: "Print & leave-behinds", icon: FileText },
     {
       id: "event",
