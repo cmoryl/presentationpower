@@ -312,9 +312,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           {(presOpen || adminOpen) && (
             <div
               aria-hidden
-              className="fixed inset-0 z-30 hidden bg-[#03002C]/45 lg:block"
+              className="pointer-events-none fixed inset-0 -z-10 hidden bg-[#03002C]/45 lg:block"
             />
           )}
+
           <nav className="hidden max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] lg:flex dark:!border-white/10 dark:!bg-white/[0.03]">
             {visibleNav.map((n) => {
               if (n.to === "/elements") {
