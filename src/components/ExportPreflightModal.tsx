@@ -4,6 +4,7 @@
 // or export anyway.
 
 import { useRef } from "react";
+import { createPortal } from "react-dom";
 import type { PreflightIssue } from "@/lib/export-preflight";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 
@@ -24,12 +25,16 @@ export function ExportPreflightModal({
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalA11y({ open, onClose: onCancel, containerRef: dialogRef });
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
   const corsCount = issues.filter((i) => i.kind === "cors-image").length;
 
-  return (
+  // Portal to <body>: this modal is rendered from inside anchored panels /
+  // toolbars that create their own stacking + transform contexts, which used
+  // to leave it clipped behind the share panel (z-[140]) — the export button
+  // appeared to do nothing.
+  return createPortal(
     <div
-      className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm"
       onClick={onCancel}
     >
       <div
@@ -105,6 +110,7 @@ export function ExportPreflightModal({
           </button>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

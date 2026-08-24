@@ -247,15 +247,28 @@ export function ShareMenu({ deckId }: { deckId: string }) {
   };
 
   const onPptx = async () => {
-    if (busy || preflightBusy || !deck) return;
+    if (busy || preflightBusy) {
+      toast.info("An export is already running…");
+      return;
+    }
+    if (!deck) {
+      toast.error("Deck isn't loaded yet — try again in a moment.");
+      return;
+    }
     setPreflightBusy(true);
     try {
       const issues = await runExportPreflight(deck);
       if (issues.length === 0) {
         await runPptxExport();
       } else {
+        // Close the anchored share panel so the preflight dialog owns focus.
+        setOpen(false);
         setPreflightIssues(issues);
       }
+    } catch (err) {
+      console.error("[export] preflight failed", err);
+      toast.error("Couldn't check the deck before export — exporting anyway…");
+      await runPptxExport();
     } finally {
       setPreflightBusy(false);
     }
