@@ -15,7 +15,7 @@ import { PrintPageProvider } from "@/components/print/print-page-context";
 import { BrandLockup } from "@/components/BrandLockup";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type { PrintSection } from "@/lib/print-assets.types";
-import type { SocialFormat } from "@/lib/social-formats";
+import { aspectClass, type SocialFormat } from "@/lib/social-formats";
 import {
   computeSocialFit,
   nextRelief,
