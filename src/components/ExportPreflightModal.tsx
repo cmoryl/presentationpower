@@ -110,6 +110,7 @@ export function ExportPreflightModal({
           </button>
         </footer>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
