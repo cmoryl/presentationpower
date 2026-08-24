@@ -415,6 +415,13 @@ export const postApprovalComment = createServerFn({ method: "POST" })
       body: data.body.trim(),
     });
     if (error) throw new Error(error.message);
+    await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+      requestId: data.requestId,
+      actorId: userId,
+      kind: "comment",
+      note: data.body.trim(),
+    });
+
     await (await import("./notify-approvals.server")).notifyThread(
       data.requestId,
       userId,
