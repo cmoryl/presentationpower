@@ -214,30 +214,11 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
             </ul>
           </div>
 
-          {/* proof band, sitting on the hero plate */}
-          <dl className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-white/12 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
-            {copy.stats.map((s, i) => (
-              <div key={s.label} className="bg-[#03002C]/45 p-6 [backdrop-filter:blur(12px)]">
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
-                  {s.label}
-                </dt>
-                <dd className="mt-3">
-                  <span
-                    className="text-4xl font-semibold tracking-[-0.03em]"
-                    style={{ color: theme.bricks[i % theme.bricks.length] }}
-                  >
-                    {s.value}
-                    {s.unit ? (
-                      <span className="text-xl font-medium tracking-normal">{s.unit}</span>
-                    ) : null}
-                  </span>
-                  <span className="mt-2 block text-xs text-white/55">{s.foot}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
+          {/* No stat band here by design — the 30-second film below carries the
+              proof, so the hero stays a single clear message. */}
         </div>
       </section>
+
 
       {/* ---------------- FEATURES ---------------- */}
       <section className="mx-auto max-w-[1180px] px-0 py-16 sm:py-20">
