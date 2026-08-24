@@ -381,11 +381,17 @@ export async function rasterizeObjectPlate(
     // is what erased full-bleed photographs in PowerPoint. Frosted/wash
     // surfaces prune only what overlaps them, so the boxes, icons and accents
     // layered on the glass stay editable native objects.
-    const shapes = dom.pruneOccludingPaint(
-      resolved,
-      [...droppedNodes, ...dom.platedPaintRoots(stage)],
-      dom.surfacePaintRoots(stage),
+    // Background artwork is delivered FLAT: full-bleed washes and full-bleed
+    // slivers (rails, hairline rules, edge bands) stay painted on the plate
+    // rather than shipping as selectable strips stacked over it.
+    const shapes = dom.keepBackgroundPaintOnPlate(
+      dom.pruneOccludingPaint(
+        resolved,
+        [...droppedNodes, ...dom.platedPaintRoots(stage)],
+        dom.surfacePaintRoots(stage),
+      ),
     );
+
 
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);
