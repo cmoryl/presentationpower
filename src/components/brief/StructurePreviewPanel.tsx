@@ -162,7 +162,6 @@ export function StructurePreviewPanel({
                     "linear-gradient(to bottom, #000 0, #000 calc(100% - 20px), transparent 100%)",
                 }}
               >
-
                 {active.blocks.map((b, i) => (
                   <li
                     key={`${active.id}-${b.index}-${i}`}

@@ -1916,8 +1916,6 @@ function BriefCommandCenter() {
           />
         </div>
       </div>
-
-
     </AppShell>
   );
 }
