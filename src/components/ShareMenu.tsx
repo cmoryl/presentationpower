@@ -331,19 +331,34 @@ export function ShareMenu({ deckId }: { deckId: string }) {
 
   async function onEnableShare(expiresAt: string | null = null) {
     if (!signedIn) {
+      toast.info("Sign in to publish a share link", {
+        description: "Share links live in the cloud, so they need an account.",
+      });
       navigate({ to: "/auth" });
       return;
     }
     setShareBusy(true);
     setShareErr(null);
+    const toastId = toast.loading("Publishing your share link…");
     try {
       const id = await ensureCloudSaved();
       const res = await enableFn({ data: { deckId: id, expiresAt } });
       setShareToken(res.token);
       setShareExpiresAt(expiresAt);
       setShareExpired(false);
+      toast.success("Deck published — share link is live", {
+        id: toastId,
+        description: expiresAt
+          ? `Link expires ${new Date(expiresAt).toLocaleString()}.`
+          : "Anyone with the link can view this deck.",
+      });
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not enable sharing");
+      toast.error("Could not publish the share link", {
+        id: toastId,
+        description: describeExportError(e),
+        duration: 10000,
+      });
     } finally {
       setShareBusy(false);
     }
@@ -353,13 +368,23 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     if (!cloudDeckId) return;
     setShareBusy(true);
     setShareErr(null);
+    const toastId = toast.loading("Unpublishing this deck…");
     try {
       await disableFn({ data: { deckId: cloudDeckId } });
       setShareToken(null);
       setShareExpiresAt(null);
       setShareExpired(false);
+      toast.success("Sharing turned off", {
+        id: toastId,
+        description: "The old link no longer opens this deck.",
+      });
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not disable sharing");
+      toast.error("Could not turn off sharing", {
+        id: toastId,
+        description: describeExportError(e),
+        duration: 10000,
+      });
     } finally {
       setShareBusy(false);
     }
@@ -369,6 +394,7 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     if (!cloudDeckId) return;
     setShareBusy(true);
     setShareErr(null);
+    const toastId = toast.loading("Generating a new link…");
     try {
       const id = await ensureCloudSaved();
       const res = await enableFn({
@@ -376,8 +402,17 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       });
       setShareToken(res.token);
       setShareExpired(false);
+      toast.success("New share link created", {
+        id: toastId,
+        description: "The previous link has been revoked.",
+      });
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not regenerate link");
+      toast.error("Could not regenerate the link", {
+        id: toastId,
+        description: describeExportError(e),
+        duration: 10000,
+      });
     } finally {
       setShareBusy(false);
     }
@@ -391,8 +426,19 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       await setExpiryFn({ data: { deckId: cloudDeckId, expiresAt } });
       setShareExpiresAt(expiresAt);
       setShareExpired(!!(expiresAt && new Date(expiresAt).getTime() <= Date.now()));
+      toast.success(
+        expiresAt
+          ? `Link expires ${new Date(expiresAt).toLocaleString()}`
+          : "Link no longer expires",
+        { id: "share-expiry" },
+      );
     } catch (e) {
       setShareErr(e instanceof Error ? e.message : "Could not update expiry");
+      toast.error("Could not update the link expiry", {
+        id: "share-expiry",
+        description: describeExportError(e),
+        duration: 10000,
+      });
     } finally {
       setShareBusy(false);
     }
@@ -404,10 +450,15 @@ export function ShareMenu({ deckId }: { deckId: string }) {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // no-op
+      toast.success("Share link copied to your clipboard", { id: "share-copy" });
+    } catch (e) {
+      toast.error("Could not copy the link", {
+        id: "share-copy",
+        description: describeExportError(e),
+      });
     }
   }
+
 
   return (
     <div ref={ref} className="relative">
