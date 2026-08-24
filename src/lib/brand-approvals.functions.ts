@@ -59,6 +59,7 @@ export const requestApproval = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { logApprovalEvent } = await import("./approval-events.server");
 
     // Re-submitting the same item reopens the existing request so the comment
     // thread and history stay in one place.
@@ -84,12 +85,24 @@ export const requestApproval = createServerFn({ method: "POST" })
       decision_note: null,
     };
 
+    const blocking = (data.checks ?? []).filter((c) => c.severity === "blocking").length;
+    const warnings = (data.checks ?? []).filter((c) => c.severity === "warning").length;
+
     if (existing) {
       const { error } = await supabase
         .from("approval_requests")
         .update(patch)
         .eq("id", existing.id);
       if (error) throw new Error(error.message);
+      await logApprovalEvent(supabase, {
+        requestId: existing.id,
+        actorId: userId,
+        kind: "resubmitted",
+        fromStatus: existing.status,
+        toStatus: "pending",
+        note: data.summary ?? null,
+        meta: { blocking, warnings, title: data.title.trim() },
+      });
       await (await import("./notify-approvals.server")).notifyReviewers(
         existing.id,
         data.title.trim(),
@@ -109,6 +122,14 @@ export const requestApproval = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await logApprovalEvent(supabase, {
+      requestId: row.id,
+      actorId: userId,
+      kind: "submitted",
+      toStatus: "pending",
+      note: data.summary ?? null,
+      meta: { blocking, warnings, title: data.title.trim() },
+    });
     await (await import("./notify-approvals.server")).notifyReviewers(
       row.id,
       data.title.trim(),
@@ -116,6 +137,7 @@ export const requestApproval = createServerFn({ method: "POST" })
     );
     return { id: row.id, reopened: false as const };
   });
+
 
 /** The reviewer queue. Reviewers see everything; others see their own submissions. */
 export const listApprovalRequests = createServerFn({ method: "POST" })
