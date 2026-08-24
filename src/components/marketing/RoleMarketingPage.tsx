@@ -21,6 +21,9 @@ import { HomeHeroVideo } from "@/components/home/HomeHeroVideo";
 import adminDemo from "@/assets/role-demo-admin.mp4.asset.json";
 import marketingDemo from "@/assets/role-demo-marketing.mp4.asset.json";
 import salesDemo from "@/assets/role-demo-sales.mp4.asset.json";
+import adminPoster from "@/assets/role-demo-admin-poster.jpg.asset.json";
+import marketingPoster from "@/assets/role-demo-marketing-poster.jpg.asset.json";
+import salesPoster from "@/assets/role-demo-sales-poster.jpg.asset.json";
 import { personaTheme } from "@/lib/persona-theme";
 import { roleMarketing } from "@/lib/role-marketing";
 import { PERSONAS, PERSONA_STORAGE_KEY } from "@/lib/workspace-persona";
@@ -37,6 +40,13 @@ const ROLE_FILM: Record<PersonaId, string> = {
   admin: adminDemo.url,
   marketing: marketingDemo.url,
   sales: salesDemo.url,
+};
+
+/** Still shown before playback so the frame never reads as a dead black box. */
+const ROLE_FILM_POSTER: Record<PersonaId, string> = {
+  admin: adminPoster.url,
+  marketing: marketingPoster.url,
+  sales: salesPoster.url,
 };
 
 function Eyebrow({ color, children }: { color: string; children: React.ReactNode }) {
@@ -277,6 +287,7 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
             <video
               ref={filmRef}
               src={ROLE_FILM[role]}
+              poster={ROLE_FILM_POSTER[role]}
               className="block aspect-video w-full"
               controls
               playsInline
