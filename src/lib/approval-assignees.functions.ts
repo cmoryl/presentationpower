@@ -53,7 +53,7 @@ export const listAssignableReviewers = createServerFn({ method: "GET" })
     const { data: roleRows, error } = await supabase
       .from("user_roles")
       .select("user_id, role")
-      .in("role", REVIEWER_ROLES as unknown as string[]);
+      .in("role", [...REVIEWER_ROLES]);
     if (error) throw new Error(error.message);
 
     const byUser = new Map<string, Set<string>>();
