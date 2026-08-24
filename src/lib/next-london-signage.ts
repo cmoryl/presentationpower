@@ -1,0 +1,279 @@
+// TransPerfect NEXT 2026 — London (QEII Centre) location signage kit.
+//
+// Job 2281 · Queen Elizabeth II Centre, Westminster · 54 scenic panels.
+// Transcribed from the venue print pack supplied by the London location team
+// (PRINT SCHEDULE.csv + PRINT SPEC.txt + the scenic asset master). Artwork is
+// live vector gradient: the per-panel SVG/AI sources live in a CDN asset pack
+// and are loaded lazily by the London signage route.
+
+import artworkAsset from "@/assets/next-london-signage-artwork.json.asset.json";
+
+export type LondonFloorId = "GF" | "2F" | "3F" | "4F" | "5F";
+
+export type LondonPanel = {
+  id: string;
+  floor: LondonFloorId;
+  room: string;
+  /** Source proof PDF from the Bespoke pack. */
+  proof: string;
+  /** Page inside that proof. */
+  page: number;
+  name: string;
+  /** Human ground description, e.g. "Light column". */
+  ground: string;
+  /** Gradient treatment id, e.g. "01-beam-violet-aqua". */
+  style: string;
+  trimW: number;
+  trimH: number;
+  bleedW: number;
+  bleedH: number;
+  bleedEdge: number;
+  /** Packaged raster size, e.g. "2409x3742". */
+  rasterPx: string;
+  rasterPpi: number;
+  /** Measured worst-case flat-tone run, in mm. */
+  bandMm: number;
+  rasterMb: number;
+};
+
+export const LONDON_VENUE = {
+  id: "next-2026-london",
+  job: "2281",
+  eventId: "next-2026",
+  name: "TransPerfect NEXT 2026 — London",
+  venue: "Queen Elizabeth II Centre",
+  address: "Broad Sanctuary, Westminster, London SW1P 3EE",
+  city: "London, UK",
+  datesLabel: "24 & 25 September 2026",
+  panelCount: 54,
+  producer: "Bespoke (venue production partner)",
+  colourSpace: "Untagged 8-bit RGB (effectively sRGB)",
+} as const;
+
+export const LONDON_FLOORS: { id: LondonFloorId; label: string }[] = [
+  { id: "GF", label: "Ground floor" },
+  { id: "2F", label: "Second floor" },
+  { id: "3F", label: "Third floor" },
+  { id: "4F", label: "Fourth floor" },
+  { id: "5F", label: "Fifth floor" },
+];
+
+/** Gradient treatments used across the London panel set. */
+export const LONDON_STYLES: Record<string, { label: string; note: string; stops: string[] }> = {
+  "01-beam-violet-aqua": {
+    label: "Beam · violet → aqua",
+    note: "Hero treatment. Vertical beam of brand violet resolving into aqua — used on the Churchill demo columns and the Whittle stage wings.",
+    stops: ["#7C4EF4", "#8FA6FF", "#7FE3E8"],
+  },
+  "03-wash-diagonal": {
+    label: "Wash · diagonal",
+    note: "Low-energy diagonal wash for long horizontal runs: coffee bars, merch mart, stage fascias.",
+    stops: ["#7C4EF4", "#B9A6FF", "#CFF6F7"],
+  },
+  "04-horizon": {
+    label: "Horizon",
+    note: "Single soft horizon band — reads calmly behind help-desk copy and wide desk fronts.",
+    stops: ["#135CFB", "#8FA6FF", "#CFF6F7"],
+  },
+  "05-bloom-corner": {
+    label: "Bloom · corner",
+    note: "Corner bloom that anchors a panel to its neighbour. Used inside the Flemming LED surround set.",
+    stops: ["#7C4EF4", "#B9A6FF", "#7FE3E8"],
+  },
+  "07-prism-sweep": {
+    label: "Prism sweep",
+    note: "Widest hue travel in the set — reserved for the merch mart and the Westminster/Cambridge screens.",
+    stops: ["#7C4EF4", "#135CFB", "#7FE3E8"],
+  },
+  "08-halo": {
+    label: "Halo",
+    note: "Centred halo for small square and semicircular panels seen close-up.",
+    stops: ["#8FA6FF", "#CFF6F7", "#7FE3E8"],
+  },
+  "09-dawn": {
+    label: "Dawn",
+    note: "Lightest ground in the pack. Default for plinths, tall surrounds and the Whittle centre panels.",
+    stops: ["#B9A6FF", "#CFF6F7", "#F7F9FC"],
+  },
+  "10-veil": {
+    label: "Veil",
+    note: "Near-flat veil for slivers and thin fascia strips where a gradient would band.",
+    stops: ["#8FA6FF", "#B9A6FF"],
+  },
+};
+
+/**
+ * Print specification, as issued with the pack. These are hard rules for the
+ * London run — the app surfaces them next to every download.
+ */
+export const LONDON_PRINT_SPEC = [
+  {
+    id: "which-file",
+    title: "Which file to print",
+    body: "Print the .ai (or .svg). They are live vector gradients — the RIP renders the shading at device resolution and applies its own halftone dithering, the cleanest path for artwork that is nothing but gradient. Use the raster PNG only if a RIP refuses vector shading. Preview JPGs are for screen approval only and must never be printed.",
+  },
+  {
+    id: "banding",
+    title: "Banding — measured, not assumed",
+    body: "Rasters carry triangular-PDF dither (1.4 LSB) applied before quantisation. Across all 54 panels the measured flat-tone run is median 2.1 mm, worst 2.8 mm, and the quantisation boundary is noise rather than a line. Do not denoise or \u201cclean up\u201d these files — the noise is the fix.",
+  },
+  {
+    id: "no-jpeg",
+    title: "JPEG removed from the print path",
+    body: "q94 JPEG masters carried 2.7\u00d7 more edge energy on the 8\u00d78 DCT grid than between it — a visible mesh across flat sky at 4 m. All print rasters are lossless PNG (1.00\u00d7). If you must re-encode, q98 4:4:4 measures 1.21\u00d7; anything below that will show.",
+  },
+  {
+    id: "resolution",
+    title: "Resolution tiers",
+    body: "Tiered by panel size, since gradients have no edge detail to resolve: up to 800 mm \u2192 120 ppi, up to 2000 mm \u2192 72 ppi, over 2000 mm \u2192 36 ppi. At 36 ppi one pixel is 0.7 mm, below what reads at the 2\u20133 m viewing distance. If a RIP objects, upscale — or use the vector file.",
+  },
+  {
+    id: "colour",
+    title: "Colour — profile needed before output",
+    body: "Supplied untagged 8-bit RGB. Violet #7C4EF4 and aqua #7FE3E8 both sit outside FOGRA39 / GRACoL process gamut; on CMYK expect the violet to dull toward blue-grey and the aqua to lose glow. Soft-proof one panel against the device profile first, and consider extended gamut (OGV) or a spot violet on the hero panels. Churchill demo areas p02\u2013p09 are eight panels seen together and must match as a set.",
+  },
+  {
+    id: "geometry",
+    title: "Geometry",
+    body: "Trim and bleed boxes are set on every .ai exactly as read from the Bespoke proofs. Bleed is 10 / 25 / 100 mm per edge depending on panel; rasters are sized to bleed. Cut lines are not included — shaped panels (Churchill semicircles, curved Flemming surrounds) ship as full-bleed rectangles, so apply the cutting paths from your proofs. The proof pack mixes scales (some pages 1:10), so check the schedule before scaling anything by hand.",
+  },
+] as const;
+
+export const LONDON_PANELS: LondonPanel[] = [
+  { id: "ldn-01", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 2, name: "CHURCHILL DEMO AREAS - p02 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-02", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 3, name: "CHURCHILL DEMO AREAS - p03 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-03", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 4, name: "CHURCHILL DEMO AREAS - p04 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-04", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 5, name: "CHURCHILL DEMO AREAS - p05 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-05", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 6, name: "CHURCHILL DEMO AREAS - p06 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-06", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 7, name: "CHURCHILL DEMO AREAS - p07 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-07", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 8, name: "CHURCHILL DEMO AREAS - p08 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-08", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 9, name: "CHURCHILL DEMO AREAS - p09 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-09", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 10, name: "CHURCHILL DEMO AREAS - p10 - 75x2440mm", ground: "Dawn column", style: "09-dawn", trimW: 75.0, trimH: 2440.0, bleedW: 125.0, bleedH: 2490.0, bleedEdge: 25.0, rasterPx: "177x3529", rasterPpi: 36, bandMm: 2.12, rasterMb: 0.5 },
+  { id: "ldn-10", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 11, name: "CHURCHILL DEMO AREAS - p11 - 75x2440mm", ground: "Dawn column", style: "09-dawn", trimW: 75.0, trimH: 2440.0, bleedW: 125.0, bleedH: 2490.0, bleedEdge: 25.0, rasterPx: "177x3529", rasterPpi: 36, bandMm: 2.65, rasterMb: 0.5 },
+  { id: "ldn-11", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO AREAS.pdf", page: 12, name: "CHURCHILL DEMO AREAS - p12 - 1524x75mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 1524.0, trimH: 75.0, bleedW: 1574.0, bleedH: 125.0, bleedEdge: 25.0, rasterPx: "4462x354", rasterPpi: 72, bandMm: 1.06, rasterMb: 1.2 },
+  { id: "ldn-12", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO SCREEN & DESK.pdf", page: 2, name: "CHURCHILL DEMO SCREEN & DESK - p02 - 2440x2440mm", ground: "Banner wash", style: "01-beam-violet-aqua", trimW: 2440.0, trimH: 2440.0, bleedW: 2640.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "3742x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 10.5 },
+  { id: "ldn-13", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO SCREEN & DESK.pdf", page: 3, name: "CHURCHILL DEMO SCREEN & DESK - p03 - 2440x2440mm", ground: "Banner wash", style: "01-beam-violet-aqua", trimW: 2440.0, trimH: 2440.0, bleedW: 2640.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "3742x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 10.5 },
+  { id: "ldn-14", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL DEMO SCREEN & DESK.pdf", page: 4, name: "CHURCHILL DEMO SCREEN & DESK - p04 - 4430x1082mm", ground: "Banner wash", style: "04-horizon", trimW: 4430.0, trimH: 1082.0, bleedW: 4630.0, bleedH: 1282.0, bleedEdge: 100.0, rasterPx: "6562x1817", rasterPpi: 36, bandMm: 2.12, rasterMb: 8.7 },
+  { id: "ldn-15", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL MERCH MART.pdf", page: 2, name: "CHURCHILL MERCH MART - p02 - 4345x1141mm", ground: "Banner wash", style: "07-prism-sweep", trimW: 4345.0, trimH: 1141.0, bleedW: 4545.0, bleedH: 1341.0, bleedEdge: 100.0, rasterPx: "6442x1901", rasterPpi: 36, bandMm: 2.12, rasterMb: 8.6 },
+  { id: "ldn-16", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL MERCH MART.pdf", page: 3, name: "CHURCHILL MERCH MART - p03 - 3770x1159mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 3770.0, trimH: 1159.0, bleedW: 3970.0, bleedH: 1359.0, bleedEdge: 100.0, rasterPx: "5627x1926", rasterPpi: 36, bandMm: 2.12, rasterMb: 8.1 },
+  { id: "ldn-17", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL STAGE SET.pdf", page: 2, name: "CHURCHILL STAGE SET - p02 - 732x366mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 732.0, trimH: 366.0, bleedW: 752.0, bleedH: 386.0, bleedEdge: 10.0, rasterPx: "3553x1824", rasterPpi: 120, bandMm: 0.63, rasterMb: 4.9 },
+  { id: "ldn-18", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL STAGE SET.pdf", page: 3, name: "CHURCHILL STAGE SET - p03 - 488x244mm", ground: "Banner wash", style: "08-halo", trimW: 488.0, trimH: 244.0, bleedW: 508.0, bleedH: 264.0, bleedEdge: 10.0, rasterPx: "2400x1247", rasterPpi: 120, bandMm: 0.64, rasterMb: 2.3 },
+  { id: "ldn-19", floor: "GF", room: "CHURCHILL", proof: "CHURCHILL STAGE SET.pdf", page: 4, name: "CHURCHILL STAGE SET - p04 - 732x366mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 732.0, trimH: 366.0, bleedW: 732.0, bleedH: 366.0, bleedEdge: 0.0, rasterPx: "3458x1729", rasterPpi: 120, bandMm: 0.85, rasterMb: 4.5 },
+  { id: "ldn-20", floor: "2F", room: "BURTON & OLIVIER", proof: "BURTON & OLIVIER SCREEN SURROUND.pdf", page: 2, name: "BURTON & OLIVIER SCREEN SURROUND - p02 - 732x244mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 732.0, trimH: 244.0, bleedW: 752.0, bleedH: 264.0, bleedEdge: 10.0, rasterPx: "3553x1247", rasterPpi: 120, bandMm: 0.63, rasterMb: 3.3 },
+  { id: "ldn-21", floor: "2F", room: "GEILGUD", proof: "GIELGUD SCREEN SURROUND.pdf", page: 2, name: "GIELGUD SCREEN SURROUND - p02 - 2440x2440mm", ground: "Banner wash", style: "09-dawn", trimW: 2440.0, trimH: 2440.0, bleedW: 2640.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "3742x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 10.5 },
+  { id: "ldn-22", floor: "3F", room: "BRITTEN", proof: "3F HELP DESK.pdf", page: 2, name: "3F HELP DESK - p02 - 2166x519mm", ground: "Banner wash", style: "04-horizon", trimW: 2166.0, trimH: 519.0, bleedW: 2216.0, bleedH: 569.0, bleedEdge: 25.0, rasterPx: "3141x806", rasterPpi: 36, bandMm: 2.12, rasterMb: 1.9 },
+  { id: "ldn-23", floor: "3F", room: "BRITTEN", proof: "3F PLINTHS.pdf", page: 2, name: "3F PLINTHS - p02 - 500x500mm", ground: "Banner wash", style: "09-dawn", trimW: 500.0, trimH: 500.0, bleedW: 500.0, bleedH: 500.0, bleedEdge: 0.0, rasterPx: "2362x2362", rasterPpi: 120, bandMm: 0.64, rasterMb: 4.2 },
+  { id: "ldn-24", floor: "3F", room: "BRITTEN", proof: "BRITTEN COFFEE BAR.pdf", page: 2, name: "BRITTEN COFFEE BAR - p02 - 488x244mm", ground: "Banner wash", style: "05-bloom-corner", trimW: 488.0, trimH: 244.0, bleedW: 508.0, bleedH: 264.0, bleedEdge: 10.0, rasterPx: "2400x1247", rasterPpi: 120, bandMm: 0.64, rasterMb: 2.3 },
+  { id: "ldn-25", floor: "3F", room: "BRITTEN", proof: "BRITTEN COFFEE BAR.pdf", page: 3, name: "BRITTEN COFFEE BAR - p03 - 732x1300mm", ground: "Dawn column", style: "09-dawn", trimW: 732.0, trimH: 1300.0, bleedW: 782.0, bleedH: 1350.0, bleedEdge: 25.0, rasterPx: "2217x3827", rasterPpi: 72, bandMm: 1.06, rasterMb: 6.4 },
+  { id: "ldn-26", floor: "3F", room: "BRITTEN", proof: "BRITTEN COFFEE BAR.pdf", page: 4, name: "BRITTEN COFFEE BAR - p04 - 1587x1300mm", ground: "Banner wash", style: "09-dawn", trimW: 1587.0, trimH: 1300.0, bleedW: 1637.0, bleedH: 1350.0, bleedEdge: 25.0, rasterPx: "4640x3827", rasterPpi: 72, bandMm: 1.06, rasterMb: 13.3 },
+  { id: "ldn-27", floor: "3F", room: "BRITTEN", proof: "BRITTEN COFFEE BAR.pdf", page: 5, name: "BRITTEN COFFEE BAR - p05 - 732x1300mm", ground: "Dawn column", style: "09-dawn", trimW: 732.0, trimH: 1300.0, bleedW: 782.0, bleedH: 1350.0, bleedEdge: 25.0, rasterPx: "2217x3827", rasterPpi: 72, bandMm: 1.06, rasterMb: 6.4 },
+  { id: "ldn-28", floor: "3F", room: "BRITTEN", proof: "BRITTEN COFFEE BAR.pdf", page: 6, name: "BRITTEN COFFEE BAR - p06 - 2394x846mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 2394.0, trimH: 846.0, bleedW: 2444.0, bleedH: 896.0, bleedEdge: 25.0, rasterPx: "3464x1270", rasterPpi: 36, bandMm: 2.12, rasterMb: 3.3 },
+  { id: "ldn-29", floor: "3F", room: "BRITTEN", proof: "BRITTEN COFFEE BAR.pdf", page: 7, name: "BRITTEN COFFEE BAR - p07 - 2394x846mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 2394.0, trimH: 846.0, bleedW: 2444.0, bleedH: 896.0, bleedEdge: 25.0, rasterPx: "3464x1270", rasterPpi: 36, bandMm: 2.12, rasterMb: 3.3 },
+  { id: "ldn-30", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 2, name: "FLEMMING PLENARY STAGE - p02 - 1450x60mm", ground: "Banner wash", style: "10-veil", trimW: 1450.0, trimH: 60.0, bleedW: 1470.0, bleedH: 80.0, bleedEdge: 10.0, rasterPx: "4167x227", rasterPpi: 72, bandMm: 1.06, rasterMb: 0.7 },
+  { id: "ldn-31", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 3, name: "FLEMMING PLENARY STAGE - p03 - 589x428mm", ground: "Banner wash", style: "05-bloom-corner", trimW: 589.1, trimH: 428.2, bleedW: 609.1, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "2878x2117", rasterPpi: 120, bandMm: 0.63, rasterMb: 4.6 },
+  { id: "ldn-32", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 4, name: "FLEMMING PLENARY STAGE - p04 - 256x428mm", ground: "Dawn column", style: "09-dawn", trimW: 256.3, trimH: 428.2, bleedW: 276.3, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "1305x2117", rasterPpi: 120, bandMm: 0.64, rasterMb: 2.1 },
+  { id: "ldn-33", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 5, name: "FLEMMING PLENARY STAGE - p05 - 596x428mm", ground: "Banner wash", style: "08-halo", trimW: 595.8, trimH: 428.2, bleedW: 615.8, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "2909x2117", rasterPpi: 120, bandMm: 0.64, rasterMb: 4.6 },
+  { id: "ldn-34", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 6, name: "FLEMMING PLENARY STAGE - p06 - 239x368mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 239.1, trimH: 368.2, bleedW: 259.1, bleedH: 388.2, bleedEdge: 10.0, rasterPx: "1224x1834", rasterPpi: 120, bandMm: 0.64, rasterMb: 1.7 },
+  { id: "ldn-35", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 7, name: "FLEMMING PLENARY STAGE - p07 - 610x428mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 610.5, trimH: 428.2, bleedW: 630.5, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "2979x2117", rasterPpi: 120, bandMm: 0.63, rasterMb: 4.7 },
+  { id: "ldn-36", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 8, name: "FLEMMING PLENARY STAGE - p08 - 239x368mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 239.1, trimH: 368.2, bleedW: 259.1, bleedH: 388.2, bleedEdge: 10.0, rasterPx: "1224x1834", rasterPpi: 120, bandMm: 0.64, rasterMb: 1.7 },
+  { id: "ldn-37", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 9, name: "FLEMMING PLENARY STAGE - p09 - 589x428mm", ground: "Banner wash", style: "05-bloom-corner", trimW: 589.1, trimH: 428.2, bleedW: 609.1, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "2878x2117", rasterPpi: 120, bandMm: 0.63, rasterMb: 4.6 },
+  { id: "ldn-38", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 10, name: "FLEMMING PLENARY STAGE - p10 - 256x428mm", ground: "Dawn column", style: "09-dawn", trimW: 256.3, trimH: 428.2, bleedW: 276.3, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "1305x2117", rasterPpi: 120, bandMm: 0.64, rasterMb: 2.1 },
+  { id: "ldn-39", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 11, name: "FLEMMING PLENARY STAGE - p11 - 596x428mm", ground: "Banner wash", style: "08-halo", trimW: 595.8, trimH: 428.2, bleedW: 615.8, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "2909x2117", rasterPpi: 120, bandMm: 0.64, rasterMb: 4.6 },
+  { id: "ldn-40", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 12, name: "FLEMMING PLENARY STAGE - p12 - 239x368mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 239.1, trimH: 368.2, bleedW: 259.1, bleedH: 388.2, bleedEdge: 10.0, rasterPx: "1224x1834", rasterPpi: 120, bandMm: 0.77, rasterMb: 1.7 },
+  { id: "ldn-41", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 13, name: "FLEMMING PLENARY STAGE - p13 - 610x428mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 610.5, trimH: 428.2, bleedW: 630.5, bleedH: 448.2, bleedEdge: 10.0, rasterPx: "2979x2117", rasterPpi: 120, bandMm: 0.63, rasterMb: 4.7 },
+  { id: "ldn-42", floor: "3F", room: "FLEMMING", proof: "FLEMMING PLENARY STAGE.pdf", page: 14, name: "FLEMMING PLENARY STAGE - p14 - 239x368mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 239.1, trimH: 368.2, bleedW: 259.1, bleedH: 388.2, bleedEdge: 10.0, rasterPx: "1224x1834", rasterPpi: 120, bandMm: 0.64, rasterMb: 1.7 },
+  { id: "ldn-43", floor: "3F", room: "WHITTLE", proof: "WHITTLE STAGE.pdf", page: 2, name: "WHITTLE STAGE - p02 - 610x4000mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 610.0, trimH: 4000.0, bleedW: 810.0, bleedH: 4200.0, bleedEdge: 100.0, rasterPx: "1148x5953", rasterPpi: 36, bandMm: 2.82, rasterMb: 5.1 },
+  { id: "ldn-44", floor: "3F", room: "WHITTLE", proof: "WHITTLE STAGE.pdf", page: 3, name: "WHITTLE STAGE - p03 - 2440x4000mm", ground: "Dawn column", style: "09-dawn", trimW: 2440.0, trimH: 4000.0, bleedW: 2640.0, bleedH: 4200.0, bleedEdge: 100.0, rasterPx: "3742x5953", rasterPpi: 36, bandMm: 2.12, rasterMb: 16.7 },
+  { id: "ldn-45", floor: "3F", room: "WHITTLE", proof: "WHITTLE STAGE.pdf", page: 4, name: "WHITTLE STAGE - p04 - 610x4000mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 610.0, trimH: 4000.0, bleedW: 810.0, bleedH: 4200.0, bleedEdge: 100.0, rasterPx: "1148x5953", rasterPpi: 36, bandMm: 2.12, rasterMb: 5.1 },
+  { id: "ldn-46", floor: "3F", room: "WHITTLE", proof: "WHITTLE STAGE.pdf", page: 5, name: "WHITTLE STAGE - p05 - 2440x4000mm", ground: "Dawn column", style: "09-dawn", trimW: 2440.0, trimH: 4000.0, bleedW: 2640.0, bleedH: 4200.0, bleedEdge: 100.0, rasterPx: "3742x5953", rasterPpi: 36, bandMm: 2.12, rasterMb: 16.7 },
+  { id: "ldn-47", floor: "4F", room: "ST JAMES", proof: "ST JAMES PROJECTOR SCREEN SURROUND.pdf", page: 1, name: "ST JAMES PROJECTOR SCREEN SURROUND - p01 - 850x300mm", ground: "Banner wash", style: "03-wash-diagonal", trimW: 850.0, trimH: 300.0, bleedW: 870.0, bleedH: 320.0, bleedEdge: 10.0, rasterPx: "2466x907", rasterPpi: 72, bandMm: 1.06, rasterMb: 1.7 },
+  { id: "ldn-48", floor: "4F", room: "WESTMINSTER", proof: "WESTMINSTER SCREEN SURROUND.pdf", page: 2, name: "WESTMINSTER SCREEN SURROUND - p02 - 732x244mm", ground: "Banner wash", style: "07-prism-sweep", trimW: 732.0, trimH: 244.0, bleedW: 752.0, bleedH: 264.0, bleedEdge: 10.0, rasterPx: "3553x1247", rasterPpi: 120, bandMm: 0.63, rasterMb: 3.1 },
+  { id: "ldn-49", floor: "5F", room: "CAMBRIDGE", proof: "5F HELP DESK.pdf", page: 2, name: "5F HELP DESK - p02 - 2166x519mm", ground: "Banner wash", style: "04-horizon", trimW: 2166.0, trimH: 519.0, bleedW: 2216.0, bleedH: 569.0, bleedEdge: 25.0, rasterPx: "3141x806", rasterPpi: 36, bandMm: 2.12, rasterMb: 1.9 },
+  { id: "ldn-50", floor: "5F", room: "CAMBRIDGE", proof: "CAMBRIDGE COFFEE BAR.pdf", page: 2, name: "CAMBRIDGE COFFEE BAR - p02 - 2394x846mm", ground: "Banner wash", style: "07-prism-sweep", trimW: 2394.0, trimH: 846.0, bleedW: 2444.0, bleedH: 896.0, bleedEdge: 25.0, rasterPx: "3464x1270", rasterPpi: 36, bandMm: 2.12, rasterMb: 3.1 },
+  { id: "ldn-51", floor: "5F", room: "CAMBRIDGE", proof: "CAMBRIDGE COFFEE BAR.pdf", page: 3, name: "CAMBRIDGE COFFEE BAR - p03 - 2394x846mm", ground: "Banner wash", style: "07-prism-sweep", trimW: 2394.0, trimH: 846.0, bleedW: 2444.0, bleedH: 896.0, bleedEdge: 25.0, rasterPx: "3464x1270", rasterPpi: 36, bandMm: 2.12, rasterMb: 3.1 },
+  { id: "ldn-52", floor: "5F", room: "CAMBRIDGE", proof: "CAMBRIDGE DEMO AREA.pdf", page: 2, name: "CAMBRIDGE DEMO AREA - p02 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 6.8 },
+  { id: "ldn-53", floor: "5F", room: "CAMBRIDGE", proof: "CAMBRIDGE DEMO AREA.pdf", page: 3, name: "CAMBRIDGE DEMO AREA - p03 - 2440x2440mm", ground: "Banner wash", style: "05-bloom-corner", trimW: 2440.0, trimH: 2440.0, bleedW: 2640.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "3742x3742", rasterPpi: 36, bandMm: 2.12, rasterMb: 10.5 },
+  { id: "ldn-54", floor: "5F", room: "CAMBRIDGE", proof: "CAMBRIDGE DEMO AREA.pdf", page: 4, name: "CAMBRIDGE DEMO AREA - p04 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.26, rasterMb: 6.8 },
+];
+
+export function londonPanelsByFloor(): { id: LondonFloorId; label: string; rooms: { room: string; panels: LondonPanel[] }[] }[] {
+  return LONDON_FLOORS.map((floor) => {
+    const panels = LONDON_PANELS.filter((p) => p.floor === floor.id);
+    const rooms: { room: string; panels: LondonPanel[] }[] = [];
+    for (const panel of panels) {
+      const bucket = rooms.find((r) => r.room === panel.room);
+      if (bucket) bucket.panels.push(panel);
+      else rooms.push({ room: panel.room, panels: [panel] });
+    }
+    return { ...floor, rooms };
+  }).filter((f) => f.rooms.length > 0);
+}
+
+/** Recommended output resolution for a panel, per the spec tiers. */
+export function recommendedPpi(panel: LondonPanel): 36 | 72 | 120 {
+  const longest = Math.max(panel.trimW, panel.trimH);
+  if (longest > 2000) return 36;
+  if (longest > 800) return 72;
+  return 120;
+}
+
+const MAX_PX = 6000;
+
+/** Pixel size for a panel at a chosen ppi, capped like the asset master. */
+export function rasterSizeFor(panel: LondonPanel, ppi: number): { w: number; h: number } {
+  let w = Math.round((panel.bleedW / 25.4) * ppi);
+  let h = Math.round((panel.bleedH / 25.4) * ppi);
+  const longest = Math.max(w, h);
+  if (longest > MAX_PX) {
+    const k = MAX_PX / longest;
+    w = Math.round(w * k);
+    h = Math.round(h * k);
+  }
+  return { w: Math.max(2, w), h: Math.max(2, h) };
+}
+
+export function panelSlug(panel: LondonPanel): string {
+  return panel.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+export function londonScheduleCsv(): string {
+  const header = [
+    "Floor", "Room", "Proof file", "Proof page", "Trim W mm", "Trim H mm",
+    "Bleed W mm", "Bleed H mm", "Bleed/edge mm", "Style", "Raster px",
+    "Raster ppi", "Measured band width mm", "Raster MB",
+  ];
+  const lines = LONDON_PANELS.map((p) => [
+    p.floor, p.room, p.proof, p.page, p.trimW.toFixed(1), p.trimH.toFixed(1),
+    p.bleedW.toFixed(1), p.bleedH.toFixed(1), p.bleedEdge.toFixed(1), p.style,
+    p.rasterPx, p.rasterPpi, p.bandMm.toFixed(2), p.rasterMb.toFixed(1),
+  ].map((v) => {
+    const s = String(v);
+    return /[",]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }).join(","));
+  return [header.join(","), ...lines].join("\n");
+}
+
+export type LondonArtwork = Record<string, { svg: string; ai: string }>;
+
+let artworkPromise: Promise<LondonArtwork> | null = null;
+
+/** Lazily fetch the vector artwork pack (54 SVG + 54 AI sources). */
+export function loadLondonArtwork(): Promise<LondonArtwork> {
+  if (!artworkPromise) {
+    artworkPromise = fetch(artworkAsset.url)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Artwork pack unavailable (${res.status})`);
+        return res.json() as Promise<LondonArtwork>;
+      })
+      .catch((err) => {
+        artworkPromise = null;
+        throw err;
+      });
+  }
+  return artworkPromise;
+}
+
+/** Total packaged raster weight, in MB. */
+export function londonRasterWeightMb(): number {
+  return LONDON_PANELS.reduce((sum, p) => sum + p.rasterMb, 0);
+}
