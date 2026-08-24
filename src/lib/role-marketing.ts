@@ -105,12 +105,12 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
       runtime: "0:30",
       chapters: [
         {
-          at: 0,
+          at: 4,
           title: "Define the look",
           body: "Style pack, industry recipe, type floors and background art lock into one governed template set.",
         },
         {
-          at: 10,
+          at: 11,
           title: "Set the gates",
           body: "Modules pass a contrast and brand check before they are available to anyone; the rest are held back.",
         },
@@ -241,12 +241,12 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
       runtime: "0:30",
       chapters: [
         {
-          at: 0,
+          at: 4,
           title: "Brief it once",
           body: "A single brief opens the right template set and fills the shapes each channel actually needs.",
         },
         {
-          at: 10,
+          at: 11,
           title: "Apply one look",
           body: "Switch the style pack and the whole campaign retints together — decks, print, social, event.",
         },
@@ -378,12 +378,12 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
       runtime: "0:30",
       chapters: [
         {
-          at: 0,
+          at: 4,
           title: "Describe the meeting",
           body: "Tell the deck agent who you are meeting and what you need to land; it drafts the narrative.",
         },
         {
-          at: 10,
+          at: 11,
           title: "Assemble from approved",
           body: "Only signed-off Enterprise light and dark modules are in play, so the result is on brand by construction.",
         },
