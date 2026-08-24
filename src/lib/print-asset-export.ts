@@ -362,9 +362,15 @@ export async function exportPrintAssetAsPdf(
         captureSlideAsDataUrl(pageNode, {
           mode: opts.mode ?? "light",
           targetWidth: trimWidthPx,
-          onProgress: opts.onProgress,
+          // Fold this page's capture progress into its slice of the bar.
+          onProgress: (p) =>
+            emit(
+              pageStart + pageSpan * 0.8 * Math.max(0, Math.min(1, p.progress ?? 0)),
+              `${p.message ? p.message.replace(/…$/, "") : "Rendering"} — ${pageLabel(i)}…`,
+            ),
         }),
       );
+      emit(pageStart + pageSpan * 0.85, `Placing ${pageLabel(i)} in the PDF…`);
       if (isDigital) {
         // No bleed on digital by definition — trim IS the page.
         const jpegDataUrl = await pngDataUrlToJpeg(
@@ -386,10 +392,12 @@ export async function exportPrintAssetAsPdf(
       if (cropMarks && bleed > 0) {
         drawCropMarks(pdf, pageWidth, pageHeight, bleed);
       }
+      emit(pageStart + pageSpan, `Finished ${pageLabel(i)}`);
     } finally {
       restoreHide?.();
     }
   }
+
 
   if (bleedApproximated) {
     console.warn(
