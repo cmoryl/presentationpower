@@ -411,7 +411,9 @@ export async function exportPrintAssetAsPdf(
     opts.filename ?? `print-asset-${opts.pageSize.toLowerCase()}-${format}-${Date.now()}.pdf`;
 
   // Serialize raster PDF once so we can chain vector overlay → X-4 wrap.
+  emit(0.9, "Writing the PDF file…", "encode");
   const rasterBytesArr = new Uint8Array(pdf.output("arraybuffer"));
+
 
   // PASS B — vector-text overlay.
   let workingBytes: Uint8Array = rasterBytesArr;
