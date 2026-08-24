@@ -81,7 +81,12 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
         label: "Approved style packs",
         foot: "Locked S-codes, never renumbered",
       },
-      { value: "189", unit: "+", label: "Governed modules", foot: "Slide + print section geometry" },
+      {
+        value: "189",
+        unit: "+",
+        label: "Governed modules",
+        foot: "Slide + print section geometry",
+      },
       { value: "100", unit: "%", label: "Exports byte-verified", foot: "PPTX, PDF and image sets" },
       { value: "1", unit: " source", label: "Of brand truth", foot: "Guides, logos, colour, type" },
     ],
@@ -184,8 +189,18 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
     plate: "social",
     bricks: ["Brief", "Social", "Print", "Events", "Approve"],
     stats: [
-      { value: "4", unit: " channels", label: "From one brief", foot: "Deck, print, social, events" },
-      { value: "406", unit: "+", label: "Format renders swept", foot: "Every aspect ratio, every style" },
+      {
+        value: "4",
+        unit: " channels",
+        label: "From one brief",
+        foot: "Deck, print, social, events",
+      },
+      {
+        value: "406",
+        unit: "+",
+        label: "Format renders swept",
+        foot: "Every aspect ratio, every style",
+      },
       { value: "10", unit: "×", label: "Faster campaign kits", foot: "Versus assembling by hand" },
       { value: "0", label: "Off-brand exports", foot: "Blocked at the approval gate" },
     ],
@@ -289,7 +304,12 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
     bricks: ["Describe", "Generate", "Refine", "Check", "Send"],
     stats: [
       { value: "5", unit: " min", label: "Brief to pitch deck", foot: "Versus a half-day rebuild" },
-      { value: "12", unit: " slides", label: "Typical client narrative", foot: "Problem → solution → proof" },
+      {
+        value: "12",
+        unit: " slides",
+        label: "Typical client narrative",
+        foot: "Problem → solution → proof",
+      },
       { value: "0", label: "Design tickets filed", foot: "No queue, no waiting" },
       { value: "100", unit: "%", label: "Brand-passing output", foot: "Gated before it leaves" },
     ],
@@ -333,7 +353,10 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
         title: "Describe the meeting",
         body: "Prospect, division and one objective — that is the whole input.",
       },
-      { title: "Get the narrative", body: "A full outline plus a built deck in the approved look." },
+      {
+        title: "Get the narrative",
+        body: "A full outline plus a built deck in the approved look.",
+      },
       {
         title: "Swap in the specifics",
         body: "Client logo, their numbers, the modules that match the conversation.",

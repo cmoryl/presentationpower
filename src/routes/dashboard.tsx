@@ -368,7 +368,6 @@ function RoleDashboard() {
           </Link>
         </div>
 
-
         {signedIn ? (
           <p className="mt-2 text-xs text-black/50 dark:text-white/50">
             {roles.length
