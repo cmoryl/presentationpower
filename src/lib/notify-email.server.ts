@@ -43,14 +43,9 @@ export async function sendApprovalNotificationEmail(
   if (!senderConfigured()) {
     return { sent: false, reason: "sender_domain_not_configured" };
   }
-  const { sendLovableEmail } = (await import("@lovable.dev/email-js")) as unknown as {
-    sendLovableEmail: (args: {
-      to: string;
-      subject: string;
-      text: string;
-    }) => Promise<{ sent: boolean; reason?: string }>;
-  };
-  return sendLovableEmail({
+  // Sender domain present: hand the rendered message to managed delivery.
+  const { sendManagedEmail } = await import("./managed-email.server");
+  return sendManagedEmail({
     to: mail.to,
     subject: approvalEmailSubject(mail),
     text: approvalEmailText(mail),

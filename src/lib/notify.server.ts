@@ -122,10 +122,6 @@ type EmailSender = {
  * it lazily keeps notifications working before that point.
  */
 async function loadEmailSender(): Promise<EmailSender | null> {
-  try {
-    const mod = (await import("./notify-email.server")) as unknown as EmailSender;
-    return typeof mod.sendApprovalNotificationEmail === "function" ? mod : null;
-  } catch {
-    return null;
-  }
+  const mod = (await import("./notify-email.server")) as unknown as EmailSender;
+  return typeof mod.sendApprovalNotificationEmail === "function" ? mod : null;
 }
