@@ -179,6 +179,23 @@ export const PERSONAS: readonly Persona[] = [
     tagline: "Get a client-ready, on-brand deck or one-pager out the door in minutes.",
     roles: ["sales", "viewer"],
     counters: ["decks", "print"],
+    resume: ["decks", "print"],
+    primary: {
+      label: "Build a deck with the agent",
+      hint: "Describe the meeting, get an outline and a built deck",
+      to: "/agent",
+    },
+    secondary: {
+      label: "Start from a brief",
+      hint: "Prospect, division, one objective",
+      to: "/brief/new",
+    },
+    guides: [
+      { label: "Deck agent walkthrough", hint: "From chat to export", to: "/about" },
+      { label: "Sharing a deck", hint: "Read-only links + locales", to: "/faq" },
+      { label: "Ask Oracle", hint: "Facts you can cite", to: "/knowledge/ask" },
+    ],
+
     steps: [
       {
         title: "Describe the meeting",
