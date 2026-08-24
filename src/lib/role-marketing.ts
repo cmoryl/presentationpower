@@ -67,7 +67,12 @@ export type RoleMarketing = {
   plate: "presentation" | "print" | "event" | "social";
   /** Five brick captions for the Element motif under the hero. */
   bricks: readonly [string, string, string, string, string];
+  /** Legacy proof numbers. Kept for data reference; the hero no longer shows a
+   *  stat band — the 30-second film carries the proof instead. */
   stats: readonly RoleStat[];
+  /** The 30-second on-brand process film for this role. */
+  demo: RoleDemo;
+
   featureKicker: string;
   featureTitle: string;
   features: readonly RoleFeature[];
