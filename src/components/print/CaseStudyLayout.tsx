@@ -4,6 +4,7 @@ import type { BrandMode } from "@/lib/taxonomy";
 import type { CaseStudyContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
+import { mastheadUnit } from "@/components/print/print-masthead-scale";
 import { PrintHeroMediaLayer } from "@/components/print/PrintHeroMedia";
 import { PrintCTABand, PrintFooterLockup } from "@/components/print/PrintChrome";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
@@ -217,7 +218,7 @@ export function CaseStudyLayout({
                     </>
                   ) : null}
                   <BrandLockup
-                    unit={cq}
+                    unit={mastheadUnit(cq)}
                     brand={brand}
                     color={mode === "dark" ? "#FFFFFF" : "#000000"}
                     size="xs"

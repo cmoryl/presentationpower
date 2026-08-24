@@ -8,6 +8,7 @@ import type {
 } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
 import { BrandLockup } from "@/components/BrandLockup";
+import { mastheadUnit } from "@/components/print/print-masthead-scale";
 import { PrintSectionsStack } from "@/components/print/sections/PrintSectionRenderer";
 import { useTextFit } from "@/lib/text-fit";
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
@@ -154,7 +155,7 @@ export function SolutionProposalLayout({
             >
               <div className="flex items-center justify-between" style={{ gap: cq(18) }}>
                 <BrandLockup
-                  unit={cq}
+                  unit={mastheadUnit(cq)}
                   brand={brand}
                   color={mode === "dark" ? "#FFFFFF" : primary}
                   size="sm"
