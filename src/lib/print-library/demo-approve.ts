@@ -140,6 +140,19 @@ function approveSection(section: PrintSection): PrintSection {
 function moduleKey(section: PrintSection): string {
   // One contact block per piece — a demo never ends with two "talk to us" cards.
   if (section.kind === "contact") return "contact";
+  // Narrative blocks are deduped on their item headings, so a piece never
+  // tells the same challenge/solution/result story twice in two variants.
+  if (section.kind === "narrative") {
+    const items = (section as Bag)["items"];
+    const heads = Array.isArray(items)
+      ? items
+          .map((it) =>
+            it && typeof it === "object" ? String((it as Bag)["heading"] ?? "").toLowerCase() : "",
+          )
+          .join("~")
+      : "";
+    if (heads.replace(/~/g, "")) return `narrative|${heads}`;
+  }
   const title = (section as Bag)["title"];
   return `${section.kind}|${section.variantId}|${typeof title === "string" ? title.toLowerCase().trim() : ""}`;
 }
