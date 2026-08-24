@@ -26,6 +26,7 @@ import {
   Search,
   CornerDownLeft,
 } from "lucide-react";
+import { AGENT_ROUTE, AGENT_LABEL, seedAgentPrompt } from "@/lib/agent-seed";
 import { AppShell } from "@/components/AppShell";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useSignedIn } from "@/components/CloudDeckControls";
@@ -257,12 +258,8 @@ function Dashboard() {
   const sendToOracle = (prompt: string) => {
     const q = prompt.trim();
     if (!q) return;
-    try {
-      window.sessionStorage.setItem("oracle:seed", q);
-    } catch {
-      /* ignore */
-    }
-    navigate({ to: "/knowledge/ask" });
+    seedAgentPrompt(mode.id, q);
+    navigate({ to: AGENT_ROUTE[mode.id] });
   };
 
   return (
@@ -459,6 +456,7 @@ function Dashboard() {
                 navigate({ to: "/brief/new" });
               }}
               accent={mode.accent}
+              agentLabel={AGENT_LABEL[mode.id]}
             />
           </div>
         </div>
@@ -852,6 +850,7 @@ function AgentBar({
   onSubmit: (q: string) => void;
   onDeck: (q: string) => void;
   accent: string;
+  agentLabel: string;
 }) {
   const [value, setValue] = useState("");
   const ref = useRef<HTMLTextAreaElement | null>(null);
