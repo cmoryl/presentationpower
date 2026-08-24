@@ -849,9 +849,19 @@ function AssetEditor() {
     }
   }
 
+  /** Feeds the export progress bar from an exporter's stage callbacks. */
+  function reportExportProgress(p: { stage: string; progress?: number; message?: string }) {
+    const pct = Math.max(0, Math.min(1, typeof p.progress === "number" ? p.progress : 0));
+    setExportProgress({
+      pct: p.stage === "done" ? 1 : pct,
+      message: p.message || (p.stage === "done" ? "Saved" : "Working…"),
+    });
+  }
+
   async function handleExportPdf() {
     if (!canvasRef.current) return;
     setExportBusy(true);
+    setExportProgress({ pct: 0.02, message: "Preparing pages…" });
     try {
       const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
       const suffix =
@@ -873,6 +883,7 @@ function AssetEditor() {
         format: exportFormat,
         iccProfile: exportFormat === "press-x4" ? iccProfile : undefined,
         filename: `${safeTitle}-${exportSize.toLowerCase()}-${suffix}.pdf`,
+        onProgress: reportExportProgress,
         onQualityClamp: (info) => {
           alert(
             `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
@@ -880,11 +891,13 @@ function AssetEditor() {
           );
         },
       });
+      toast.success("PDF saved to your downloads");
       setExportOpen(false);
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
     } finally {
       setExportBusy(false);
+      setExportProgress(null);
     }
   }
 
@@ -892,6 +905,7 @@ function AssetEditor() {
   async function handleExportPptx() {
     if (!canvasRef.current) return;
     setExportBusy(true);
+    setExportProgress({ pct: 0.02, message: "Preparing pages…" });
     try {
       const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
       const pageNodes = Array.from(
@@ -904,14 +918,18 @@ function AssetEditor() {
         mode: exportMode,
         title: row?.title ?? "Print asset",
         filename: `${safeTitle}.pptx`,
+        onProgress: reportExportProgress,
       });
+      toast.success("PowerPoint saved to your downloads");
       setExportOpen(false);
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
     } finally {
       setExportBusy(false);
+      setExportProgress(null);
     }
   }
+
 
   // Multi-page proposals render every page stacked inside the canvas, so the
   // canvas cannot be pinned to a single page aspect ratio.
