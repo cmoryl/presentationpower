@@ -31,14 +31,25 @@ const CheckSchema = z.object({
 const SubjectType = z.enum(APPROVAL_SUBJECT_TYPES);
 const Status = z.enum(APPROVAL_STATUSES);
 
+type AuthedSupabase = Parameters<
+  Parameters<ReturnType<typeof requireSupabaseAuth>["server"]>[0]["next"]
+> extends never
+  ? never
+  : never;
+
 async function reviewerFlags(
   supabase: {
-    from: (t: "user_roles") => {
-      select: (c: string) => {
+    from: (table: string) => {
+      select: (columns: string) => {
         eq: (
-          c: string,
-          v: string,
-        ) => { in: (c: string, v: string[]) => Promise<{ data: { role: string }[] | null }> };
+          column: string,
+          value: string,
+        ) => {
+          in: (
+            column: string,
+            values: readonly string[],
+          ) => PromiseLike<{ data: { role: string }[] | null }>;
+        };
       };
     };
   },
@@ -50,6 +61,7 @@ async function reviewerFlags(
     .eq("user_id", userId)
     .in("role", ["admin", "brand_reviewer"]);
   const roles = (data ?? []).map((r) => r.role);
+
   return { isAdmin: roles.includes("admin"), isReviewer: roles.length > 0 };
 }
 
