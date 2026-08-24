@@ -98,9 +98,10 @@ export async function captureAssetCanvas(
     toCanvas(node, {
       width,
       height,
-      canvasWidth: Math.round(width * scale),
-      canvasHeight: Math.round(height * scale),
-      pixelRatio: 1,
+      // `pixelRatio` is what actually re-renders the DOM at a larger size;
+      // canvasWidth/Height alone only resize the canvas and leave the artwork
+      // drawn 1:1 in the top-left corner.
+      pixelRatio: scale,
       cacheBust: false,
       filter: exportNodeFilter,
       fontEmbedCSS,
