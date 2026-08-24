@@ -14,6 +14,7 @@ import {
   type ApprovalRequestRow,
 } from "@/lib/brand-approvals.functions";
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
+import { ApprovalAnalyticsPanel } from "@/components/approvals/ApprovalAnalyticsPanel";
 
 export const Route = createFileRoute("/approvals")({
   head: () => ({
@@ -209,6 +210,8 @@ function ApprovalQueuePage() {
           </button>
         ))}
       </div>
+
+      {isReviewer && <ApprovalAnalyticsPanel />}
 
       {isReviewer && selected.size > 0 && (
         <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-foreground/5 px-4 py-3 text-sm">
