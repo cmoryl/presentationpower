@@ -7,6 +7,8 @@
 // page/aurora geometry live here.
 
 import type { CSSProperties } from "react";
+import { printIconInk } from "@/lib/print-icon-contrast";
+import { usePrintSurface } from "./print-doc-mode";
 import type { PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import {
   pageAspectRatio,
@@ -310,11 +312,12 @@ export function Icon({
   color: string;
   strokeWidth?: number;
 }) {
+  const surface = usePrintSurface();
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke={color}
+      stroke={printIconInk(surface, color)}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -338,11 +341,12 @@ export function IconPath({
   color: string;
   strokeWidth?: number;
 }) {
+  const surface = usePrintSurface();
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke={color}
+      stroke={printIconInk(surface, color)}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
