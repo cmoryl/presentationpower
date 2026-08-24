@@ -320,6 +320,8 @@ function MediaCard({
   pills: string[];
   /** Feature cards span two columns with a taller, cinematic art plate. */
   feature?: boolean;
+  /** Compact cards live in the horizontal rail: shorter plate, tighter copy. */
+  compact?: boolean;
 }) {
   const linkProps = to as unknown as React.ComponentProps<typeof Link>;
   return (
