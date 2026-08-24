@@ -386,13 +386,27 @@ function MediaCard({
         >
           {title}
         </div>
-        <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">{blurb}</p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3 text-[11px] text-black/55 dark:text-white/55">
+        <p
+          className={`text-xs leading-relaxed text-black/60 dark:text-white/60 ${
+            compact ? "line-clamp-2" : ""
+          }`}
+        >
+          {blurb}
+        </p>
+        <div
+          className={`mt-auto flex flex-wrap items-center gap-1.5 text-[11px] text-black/55 dark:text-white/55 ${
+            compact ? "pt-2" : "pt-3"
+          }`}
+        >
           {pills.map((p) => (
             <Pill key={p}>{p}</Pill>
           ))}
         </div>
-        <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
+        <div
+          className={`inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9] ${
+            compact ? "mt-2" : "mt-3"
+          }`}
+        >
           Open full example{" "}
           <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
         </div>
