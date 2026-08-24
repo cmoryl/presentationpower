@@ -1110,9 +1110,14 @@ export function gamesPlatesForScene(scene: SkinScene, mode: GamesArtMode): Games
     const covered = brief.copy.filter((rg) =>
       p.quiet.some((q) => q === rg || q === "any" || q.includes(rg)),
     ).length;
-    const want = brief.loud ? 3 : 1;
+    // Content scenes still want a composed plate, just not a flat field: the
+    // old target of "low" activity pulled the near-plain flats to the top and
+    // every content slide wore a bare navy ground.
+    const want = brief.loud ? 4 : 2;
     const activityGap = Math.abs(ACTIVITY_RANK[p.activity] - want);
-    return { p, score: covered * 10 - activityGap };
+    // Textured compositions are the visual kit; flats are the fallback ground.
+    const textureBonus = p.texture === "textured" ? 4 : 0;
+    return { p, score: covered * 10 + textureBonus - activityGap };
   });
   scored.sort(
     (x, y) =>
@@ -1161,12 +1166,12 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
   // contrast — heavier values flattened the art back into a flat navy field.
   const veil =
     mode === "dark"
-      ? "linear-gradient(0deg, rgba(3,0,44,0.20), rgba(3,0,44,0.20))"
-      : "linear-gradient(0deg, rgba(255,255,255,0.26), rgba(255,255,255,0.26))";
+      ? "linear-gradient(0deg, rgba(3,0,44,0.12), rgba(3,0,44,0.12))"
+      : "linear-gradient(0deg, rgba(255,255,255,0.18), rgba(255,255,255,0.18))";
   const scrim =
     mode === "dark"
-      ? "linear-gradient(100deg, rgba(3,0,44,0.46) 0%, rgba(3,0,44,0.10) 56%, rgba(3,0,44,0) 100%)"
-      : "linear-gradient(100deg, rgba(255,255,255,0.56) 0%, rgba(255,255,255,0.12) 56%, rgba(255,255,255,0) 100%)";
+      ? "linear-gradient(100deg, rgba(3,0,44,0.38) 0%, rgba(3,0,44,0.06) 56%, rgba(3,0,44,0) 100%)"
+      : "linear-gradient(100deg, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.08) 56%, rgba(255,255,255,0) 100%)";
   return {
     ...pack,
     ground: (seed: string) => {
@@ -1174,7 +1179,9 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
       const custom = overrideFor(code, scene);
       if (custom?.imageUrl) return base(seed);
       const takeMatch = /take:(\d+)/i.exec(seed);
-      const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
+      // Without an explicit take, rotate on the rest of the seed (module scene
+      // + layout id) so two slides sharing a scene don't wear the same plate.
+      const take = takeMatch ? parseInt(takeMatch[1]!, 10) : sceneOffset(seed);
       const url = gamesSceneArtUrl(code, scene, take);
       if (!url) return base(seed);
       return [scrim, veil, `url("${url}") center center / cover no-repeat`];

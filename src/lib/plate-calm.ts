@@ -24,6 +24,17 @@ import type { ComposeBias } from "./pack-compose";
 
 export type PlateCalmVariant = string | undefined;
 
+/** How hard to calm the plate: photoreal art vs authored graphic kits. */
+export type PlateCalmStrength = "full" | "graphic";
+
+/** Ground layers from the authored graphic kits (Games / Element brick art). */
+const GRAPHIC_PLATE_RE = /\/games-[a-z0-9-]+\.(?:webp|png|jpg)|\/element-(?:light|dark)-[a-z0-9-]+\.(?:webp|png|jpg)/i;
+
+/** True when the plate url belongs to an authored graphic kit, not photography. */
+export function plateIsGraphicKit(layers: string[]): boolean {
+  return layers.some((l) => GRAPHIC_PLATE_RE.test(l));
+}
+
 export type PlateCalm = {
   /** CSS `filter` for the plate layer; "" when the plate stays sharp. */
   filter: string;
@@ -91,31 +102,87 @@ export function plateCalmFor(
   layoutId: string | undefined,
   mode: "light" | "dark",
   bias?: ComposeBias,
+  /**
+   * "full" — photoreal industry plates: full depth-of-field treatment.
+   * "graphic" — authored graphic kits (Games R22, Element S29/S30). These are
+   * designed compositions with broad shapes and no fine micro-detail, so the
+   * photographic calming buried them in a flat field. They keep most of their
+   * punch: a light defocus and a thin veil are all the copy needs.
+   */
+  strength: PlateCalmStrength = "full",
 ): PlateCalm {
   if (plateIsHeroChrome(variant)) return SHARP;
 
   const density = inkDensity(variant, layoutId);
   const dark = mode === "dark";
+  const graphic = strength === "graphic";
 
   // Defocus grows with density; even a plain content sheet gets a touch so the
   // plate sits behind the copy plane rather than fighting it.
-  const blur = density === 2 ? 16 : density === 1 ? 10 : 6;
-  const sat = density === 2 ? 0.62 : density === 1 ? 0.74 : 0.86;
-  const bright = dark
+  const blur = graphic
     ? density === 2
-      ? 0.72
+      ? 6
       : density === 1
-        ? 0.8
-        : 0.88
+        ? 4
+        : 2
     : density === 2
-      ? 1.1
+      ? 16
       : density === 1
-        ? 1.06
-        : 1.03;
-  const contrast = density === 2 ? 0.86 : density === 1 ? 0.92 : 0.97;
+        ? 10
+        : 6;
+  const sat = graphic
+    ? density === 2
+      ? 0.94
+      : 1
+    : density === 2
+      ? 0.62
+      : density === 1
+        ? 0.74
+        : 0.86;
+  const bright = graphic
+    ? dark
+      ? density === 2
+        ? 0.94
+        : 1
+      : density === 2
+        ? 1.03
+        : 1
+    : dark
+      ? density === 2
+        ? 0.72
+        : density === 1
+          ? 0.8
+          : 0.88
+      : density === 2
+        ? 1.1
+        : density === 1
+          ? 1.06
+          : 1.03;
+  const contrast = graphic ? 1 : density === 2 ? 0.86 : density === 1 ? 0.92 : 0.97;
 
-  const veilAlpha =
-    density === 2 ? (dark ? 0.52 : 0.6) : density === 1 ? (dark ? 0.4 : 0.46) : dark ? 0.26 : 0.3;
+  const veilAlpha = graphic
+    ? density === 2
+      ? dark
+        ? 0.24
+        : 0.3
+      : density === 1
+        ? dark
+          ? 0.16
+          : 0.22
+        : dark
+          ? 0.08
+          : 0.12
+    : density === 2
+      ? dark
+        ? 0.52
+        : 0.6
+      : density === 1
+        ? dark
+          ? 0.4
+          : 0.46
+        : dark
+          ? 0.26
+          : 0.3;
 
   return {
     filter: `blur(${blur}px) saturate(${sat}) brightness(${bright}) contrast(${contrast})`,
