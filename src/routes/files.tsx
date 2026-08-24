@@ -191,6 +191,45 @@ function MyFilesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  // ---- Bulk selection ------------------------------------------------------
+  // Keys are `${kind}:${id}` so the same numeric id in two tables never clashes.
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const keyOf = (f: MyFile) => `${f.kind}:${f.id}`;
+  const toggleOne = (f: MyFile) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      const k = keyOf(f);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
+  const visibleSelected = filtered.filter((f) => selected.has(keyOf(f)));
+  const allVisibleSelected = filtered.length > 0 && visibleSelected.length === filtered.length;
+
+  const bulkDelete = useMutation({
+    mutationFn: async (files: MyFile[]) => {
+      let ok = 0;
+      const failures: string[] = [];
+      for (const f of files) {
+        try {
+          await delFn({ data: { kind: f.kind, id: f.id } });
+          ok += 1;
+        } catch (e) {
+          failures.push(`${f.title}: ${(e as Error).message}`);
+        }
+      }
+      return { ok, failures };
+    },
+    onSuccess: ({ ok, failures }) => {
+      if (ok > 0) toast.success(`${ok} ${ok === 1 ? "file" : "files"} deleted`);
+      if (failures.length > 0) toast.error(`${failures.length} could not be deleted`);
+      setSelected(new Set());
+      queryClient.invalidateQueries({ queryKey: ["my-files"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+
   return (
     <AppShell>
       <div>
