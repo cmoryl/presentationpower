@@ -544,25 +544,7 @@ function SwatchRow({
         className={`mt-2 grid gap-3 ${large ? "grid-cols-1 md:grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"}`}
       >
         {swatches.map((c) => (
-          <div key={c.hex} className="overflow-hidden rounded-xl border border-border bg-card">
-            <div
-              className={`flex items-end p-4 ${large ? "h-32" : "h-20"}`}
-              style={{ background: c.hex, color: c.onDark ? "#fff" : "#03002C" }}
-            >
-              <div className="text-xs font-mono opacity-80">{c.hex}</div>
-            </div>
-            <div className="p-3">
-              <div className="text-sm font-semibold">{c.name}</div>
-              {c.role && <div className="text-[11px] text-muted-foreground">{c.role}</div>}
-              {(c.pantone || c.rgb) && (
-                <div className="mt-1 space-y-0.5 text-[10px] text-muted-foreground">
-                  {c.pantone && <div>{c.pantone}</div>}
-                  {c.rgb && <div>RGB {c.rgb}</div>}
-                  {c.cmyk && <div>CMYK {c.cmyk}</div>}
-                </div>
-              )}
-            </div>
-          </div>
+          <SwatchCard key={c.hex} swatch={c} large={large} />
         ))}
       </div>
     </div>
