@@ -1,6 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
+import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
+import {
+  NEXT_EVENT_ICON_SLUG,
+  brandIconSet,
+  iconColorOptions,
+  nextTrackIconSlug,
+} from "@/lib/brand-icon-sets";
 import {
   NEXT_APPLICATION_RULES,
   NEXT_CORE_COLORS,
@@ -193,6 +200,13 @@ function NextBrandGuide() {
     [activeDivision],
   );
 
+  const [iconSlug, setIconSlug] = useState(NEXT_EVENT_ICON_SLUG);
+  const iconHero = useMemo(() => iconColorOptions(iconSlug)[1]?.hex ?? NAVY, [iconSlug]);
+  const iconGlyphCount = useMemo(
+    () => brandIconSet(NEXT_EVENT_ICON_SLUG).subAreas.reduce((n, a) => n + a.icons.length, 0),
+    [],
+  );
+
   const lockupCount = NEXT_DIVISIONS.reduce((n, d) => n + d.lockups.length, 0);
 
   return (
@@ -231,6 +245,7 @@ function NextBrandGuide() {
               [String(NEXT_DIVISIONS.length), "Lockup families"],
               [String(lockupCount), "Approved lockups"],
               [String(NEXT_DIVISIONS.length - 2), "Track accents"],
+              [String(iconGlyphCount), "Event icons"],
             ].map(([n, l]) => (
               <div key={l}>
                 <div className="text-3xl font-semibold tabular-nums">{n}</div>
@@ -286,6 +301,7 @@ function NextBrandGuide() {
           ["misuse", "Rules & misuse"],
           ["applications", "Applications"],
           ["files", "File formats"],
+          ["icons", "Icon system"],
         ].map(([id, label]) => (
           <a
             key={id}
