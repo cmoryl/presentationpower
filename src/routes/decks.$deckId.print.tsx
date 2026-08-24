@@ -16,6 +16,9 @@ import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
+import { toast } from "sonner";
+import { describeExportError } from "@/lib/export-feedback";
+
 
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Element" }] }),
@@ -52,6 +55,7 @@ function PrintView() {
       const t = setTimeout(() => window.print(), 700);
       return () => clearTimeout(t);
     }
+    const toastId = toast.loading(`Preparing ${lang.toUpperCase()} slides for print…`);
     (async () => {
       try {
         const { data } = await supabase.auth.getSession();
@@ -71,8 +75,19 @@ function PrintView() {
         setOverlay(map);
         const l = (langs as Array<{ id: string; rtl: boolean }>).find((x) => x.id === lang);
         setIsRtl(!!l?.rtl);
-      } catch {
-        // fall through with no overlay
+        toast.success(`Print view ready in ${lang.toUpperCase()}`, {
+          id: toastId,
+          description: `${map.size} translated ${map.size === 1 ? "slide" : "slides"} applied.`,
+        });
+      } catch (e) {
+        // Print still proceeds with the original language — say so out loud
+        // instead of silently handing over an untranslated deck.
+        if (!cancelled)
+          toast.error(`Could not load ${lang.toUpperCase()} translations`, {
+            id: toastId,
+            description: `${describeExportError(e)} Printing in the original language instead.`,
+            duration: 10000,
+          });
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -80,6 +95,7 @@ function PrintView() {
         }
       }
     })();
+
     return () => {
       cancelled = true;
     };
