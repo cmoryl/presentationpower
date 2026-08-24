@@ -6,7 +6,13 @@
 // a member read/update their own rows).
 import type { Database } from "@/integrations/supabase/types";
 
-export type NotifyKind = "comment" | "approved" | "changes_requested" | "submitted";
+export type NotifyKind =
+  | "comment"
+  | "approved"
+  | "changes_requested"
+  | "submitted"
+  /** Custom message broadcast by an admin. */
+  | "admin_alert";
 
 export type NotifyInput = {
   /** Recipient user ids. Duplicates and the actor are filtered out. */
@@ -31,6 +37,7 @@ export const NOTIFY_LABEL: Record<NotifyKind, string> = {
   approved: "Approved",
   changes_requested: "Changes requested",
   submitted: "Sent for review",
+  admin_alert: "Announcement",
 };
 
 export async function notifyUsers(input: NotifyInput): Promise<{ delivered: number }> {

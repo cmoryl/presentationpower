@@ -222,7 +222,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     },
     {
       label: "Governance",
-      items: [{ to: "/admin/users", label: "Users & roles" }],
+      items: [
+        { to: "/admin/users", label: "Users & roles" },
+        { to: "/admin/alerts", label: "Send an alert" },
+      ],
     },
   ];
   const footerNav = [
