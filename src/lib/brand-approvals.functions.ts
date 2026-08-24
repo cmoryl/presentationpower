@@ -455,7 +455,7 @@ export type ApprovalTimelineEvent = {
   note: string | null;
   actor_id: string | null;
   created_at: string;
-  meta: Record<string, unknown> | null;
+  meta: Record<string, string | number | boolean | null> | null;
 };
 
 /**

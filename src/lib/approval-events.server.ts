@@ -3,7 +3,10 @@
 // Every submission, reviewer decision, reopen and comment writes one row so
 // export surfaces can render a complete, ordered timeline of who did what,
 // when, and with which note.
-import type { SupabaseClient } from "@supabase/supabase-js";
+/** Minimal shape we need — keeps this helper usable with any Supabase client. */
+type InsertClient = {
+  from: (table: string) => { insert: (values: Record<string, unknown>) => Promise<unknown> };
+};
 
 export type ApprovalEventKind =
   | "submitted"
@@ -20,18 +23,16 @@ export type ApprovalEventInput = {
   fromStatus?: string | null;
   toStatus?: string | null;
   note?: string | null;
-  meta?: Record<string, unknown>;
+  meta?: Record<string, string | number | boolean | null>;
 };
 
 /** Best-effort: an audit write must never fail the user's action. */
 export async function logApprovalEvent(
-  // The generated client is typed; the audit table shape is narrow enough that
-  // a loose client type keeps this helper reusable from any caller.
-  supabase: SupabaseClient<never, "public", never>,
+  supabase: unknown,
   input: ApprovalEventInput,
 ): Promise<void> {
   try {
-    await (supabase as unknown as SupabaseClient).from("approval_events").insert({
+    await (supabase as InsertClient).from("approval_events").insert({
       request_id: input.requestId,
       actor_id: input.actorId,
       kind: input.kind,
@@ -46,7 +47,7 @@ export async function logApprovalEvent(
 }
 
 export async function logApprovalEvents(
-  supabase: SupabaseClient<never, "public", never>,
+  supabase: unknown,
   inputs: ApprovalEventInput[],
 ): Promise<void> {
   for (const input of inputs) await logApprovalEvent(supabase, input);
