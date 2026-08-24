@@ -531,18 +531,36 @@ function FileCard({
   file,
   onDelete,
   deleting,
+  selected,
+  onToggleSelect,
 }: {
   file: MyFile;
   onDelete: () => void;
   deleting: boolean;
+  selected: boolean;
+  onToggleSelect: () => void;
 }) {
   const meta = KIND_META[file.kind];
   const Icon = meta.icon;
   return (
-    <div className="group relative flex items-start gap-3 rounded-2xl border border-black/10 bg-white p-4 shadow-sm transition hover:border-[#003FC7]/40 hover:shadow-md dark:border-white/10 dark:bg-white/[0.04]">
+    <div
+      className={`group relative flex items-start gap-3 rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md dark:bg-white/[0.04] ${
+        selected
+          ? "border-[#003FC7] ring-2 ring-[#003FC7]/20"
+          : "border-black/10 hover:border-[#003FC7]/40 dark:border-white/10"
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={selected}
+        onChange={onToggleSelect}
+        aria-label={`Select ${file.title}`}
+        className="mt-1 size-4 shrink-0 cursor-pointer accent-[#003FC7]"
+      />
       <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${meta.tint}`}>
         <Icon size={16} />
       </div>
+
       <div className="min-w-0 flex-1">
         <Link
           to={file.href}
