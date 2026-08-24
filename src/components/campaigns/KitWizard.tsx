@@ -402,7 +402,7 @@ export function KitWizard({
           <div className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-widest text-[#003FC7]">
             <Sparkles size={12} /> New {surfaceLabel} · Step by step
           </div>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-[#03002C] sm:text-4xl">
+          <h1 className="mt-3 break-words text-2xl font-black tracking-tight text-[#03002C] sm:text-3xl md:text-4xl">
             Start from a blank kit
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-black/60">
