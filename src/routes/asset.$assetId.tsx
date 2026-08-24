@@ -1150,7 +1150,10 @@ function AssetEditor() {
                       <select
                         value={exportSize}
                         data-export-size
-                        onChange={(e) => setExportSize(e.target.value as PrintPageSizeKey)}
+                        onChange={(e) => {
+                          sizeTouchedRef.current = true;
+                          setExportSize(e.target.value as PrintPageSizeKey);
+                        }}
                         className={inspectorInput}
                       >
                         <option value="A4">A4 (210 × 297 mm)</option>
