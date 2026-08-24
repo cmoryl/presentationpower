@@ -217,8 +217,10 @@ function BriefOutputHub() {
           ) : null}
         </header>
 
-        {/* ---- Sales enablement ---------------------------------------- */}
+        {/* ---- Sales enablement (only when a deck was requested) -------- */}
+        {hasDeck ? (
         <Section
+
           id="sales"
           icon={Presentation}
           kicker="Sales enablement"
