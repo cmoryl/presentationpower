@@ -25,6 +25,24 @@ export type RoleStep = {
   body: string;
 };
 
+/** One captioned beat of the 30-second role film. */
+export type RoleDemoChapter = {
+  /** Seek position in seconds inside the film. */
+  at: number;
+  title: string;
+  body: string;
+};
+
+export type RoleDemo = {
+  eyebrow: string;
+  title: string;
+  sub: string;
+  /** Spoken-word length of the film, shown as a badge. */
+  runtime: string;
+  chapters: readonly [RoleDemoChapter, RoleDemoChapter, RoleDemoChapter];
+};
+
+
 export type RoleFaq = {
   q: string;
   a: string;
