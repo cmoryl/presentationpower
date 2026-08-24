@@ -112,6 +112,8 @@ function isFullBleedDecor(s: Shape): boolean {
   const hairlineW = f.w <= CANVAS_CX * 0.03;
   const hairlineH = f.h <= CANVAS_CY * 0.03;
   return (fullHeight && hairlineW) || (fullWidth && hairlineH && f.y <= 0);
+
+
 }
 
 /**

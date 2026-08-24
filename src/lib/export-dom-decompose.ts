@@ -964,6 +964,43 @@ export function pruneOccludingPaint(
 }
 
 /**
+ * BACKGROUND STAYS FLAT.
+ *
+ * PowerPoint does not need the artwork behind the content as objects — the plate
+ * is already pixel-exact. Two classes of measured paint therefore stay ON the
+ * plate instead of shipping as native shapes:
+ *
+ *   • full-bleed paint (a wash, scrim or ground covering the whole stage), which
+ *     otherwise stacks a selectable rectangle over the flat background; and
+ *   • full-bleed SLIVERS — rails, hairline grid rules and edge bands that span
+ *     one axis and are a few percent of the other. Those are what read in
+ *     PowerPoint as the slide being "chopped into narrow strips".
+ *
+ * Because this filter runs BEFORE `neutralizeCapturedPaint`, the dropped paint is
+ * never removed from the raster, so nothing disappears — it simply lives in the
+ * flat background image where it belongs.
+ */
+export function keepBackgroundPaintOnPlate(
+  shapes: DomShape[],
+  space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
+): DomShape[] {
+  const nearFull = (v: number, total: number) => v >= total * 0.94;
+  const spans = (v: number, total: number) => v >= total * 0.9;
+  const thin = (v: number, total: number) => v <= total * 0.045;
+  return shapes.filter((s) => {
+    // Pictures with real content (photographs, logos, icons, effect artwork)
+    // stay native unless they cover the entire stage.
+    const fullBleed = nearFull(s.w, space.w) && nearFull(s.h, space.h);
+    if (s.kind === "image") return !fullBleed;
+    if (fullBleed) return false;
+    const sliver =
+      (spans(s.h, space.h) && thin(s.w, space.w)) || (spans(s.w, space.w) && thin(s.h, space.h));
+    return !sliver;
+  });
+}
+
+
+/**
  * Take the captured paint OFF the plate without touching layout.
  *
  * Every object we re-emitted natively must not also be baked into the raster,
