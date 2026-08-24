@@ -314,11 +314,26 @@ export async function exportPrintAssetAsPdf(
   const vectorText = opts.vectorText ?? !isDigital;
   const captures: VectorTextCapture[] = [];
 
+  // --- progress -------------------------------------------------------------
+  // Page rasterization owns 0 → 0.88 of the bar; the overlay/X-4/write tail
+  // owns the rest. Per-page capture progress is folded into that page's slice
+  // so the bar only ever moves forward, and the message always names the page
+  // being worked on (multi-page exports otherwise looked frozen for minutes).
+  const emit = (progress: number, message: string, stage: "render" | "encode" | "done" = "render") =>
+    opts.onProgress?.({ stage, progress: Math.max(0, Math.min(1, progress)), message });
+  const pageSpan = 0.88 / pages.length;
+  const pageLabel = (i: number) =>
+    pages.length === 1 ? "page" : `page ${i + 1} of ${pages.length}`;
+  emit(0.02, pages.length === 1 ? "Preparing the page…" : `Preparing ${pages.length} pages…`);
+
   for (let i = 0; i < pages.length; i++) {
+    const pageStart = 0.02 + i * pageSpan;
+    emit(pageStart, `Rendering ${pageLabel(i)}…`);
     if (i > 0) pdf.addPage([pageWidth, pageHeight], orientation);
     const pageNode = pages[i]!;
 
     // PASS A — raster with text hidden (vector) or full raster (digital).
+
     let restoreHide: (() => void) | null = null;
     if (vectorText) {
       // Snapshot vector-text positions BEFORE hiding text so line breaks are
