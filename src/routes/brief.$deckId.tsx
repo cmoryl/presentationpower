@@ -289,6 +289,8 @@ function BriefOutputHub() {
             </div>
           </div>
         </Section>
+        ) : null}
+
 
         {/* ---- Print --------------------------------------------------- */}
         {prints.length ? (
