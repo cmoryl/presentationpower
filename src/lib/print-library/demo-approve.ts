@@ -68,7 +68,7 @@ export function printDemoOverBudget(kind: PrintAssetKind, content: unknown): boo
 }
 
 /** Word-safe truncation: cut on the last sentence or word boundary under max. */
-function tighten(value: string, max: number): string {
+export function tighten(value: string, max: number): string {
   if (value.length <= max) return value;
   const slice = value.slice(0, max);
   const sentence = Math.max(slice.lastIndexOf(". "), slice.lastIndexOf("? "));
@@ -174,6 +174,24 @@ const SHED_ORDER: Record<string, number> = {
   narrative: -1,
   contact: -2,
 };
+
+/**
+ * Drop the least essential module (highest SHED_ORDER rank, last of its rank).
+ * Never empties a piece: the first module always survives.
+ */
+export function shedLeastEssential(modules: PrintSection[]): PrintSection[] {
+  if (modules.length <= 1) return modules;
+  let drop = modules.length - 1;
+  let rank = -1;
+  modules.forEach((m, i) => {
+    const r = SHED_ORDER[m.kind] ?? 0;
+    if (r >= rank) {
+      rank = r;
+      drop = i;
+    }
+  });
+  return modules.filter((_, i) => i !== drop);
+}
 
 /** Content-level copy ceilings that mirror print-capacity's TEXT_LIMITS. */
 const CONTENT_CAPS: Record<string, number> = {

@@ -38,6 +38,7 @@ import {
 import { editableContextFor, toEditableContent } from "@/lib/print-library/editable";
 import { useDivisionSeed } from "@/lib/division-seeds";
 import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-apply";
+import { approvePrintDemoContent } from "@/lib/print-library/demo-approve";
 import { applyLibraryOverrides, useModuleOverrides } from "@/lib/module-overrides";
 import { useIsAdmin } from "@/lib/use-is-admin";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -931,7 +932,11 @@ function CopyItemButton({ item, label }: { item: PrintLibraryItem; label?: strin
 
   const makeCopy = async () => {
     const base = toEditableContent(item);
-    const content = base ? applyDivisionSeedToContent(base, seed) : base;
+    const seeded = base ? applyDivisionSeedToContent(base, seed) : base;
+    // Curated library pieces are approved examples: normalize the new copy to
+    // the page budget so the editor opens a piece that already fits its trim
+    // instead of one that overflows until the user manually fits it.
+    const content = seeded ? approvePrintDemoContent(item.kind, seeded) : seeded;
     if (!content) {
       toast.error("This item has no editable content yet.");
       return;

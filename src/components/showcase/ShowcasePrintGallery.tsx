@@ -11,7 +11,7 @@ import { Maximize2, X } from "lucide-react";
 import { LazyMount } from "@/components/LazyMount";
 import { PrintKindPreview } from "@/components/print/PrintKindPreview";
 import { PrintPageProvider } from "@/components/print/print-page-context";
-import { PrintContentFitFrame } from "@/components/print/PrintContentFitFrame";
+import { ApprovedPrintFrame } from "@/components/print/ApprovedPrintFrame";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
 import { isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { multiPageLabel } from "@/components/print/MultiProposalLayout";
@@ -46,11 +46,11 @@ function Page({
   pageIndex,
   fit = false,
 }: Props & { pageIndex?: number }) {
-  const page = (
+  const renderPage = (shown: unknown) => (
     <div className="pointer-events-none">
       <PrintKindPreview
         kind={kind}
-        content={content}
+        content={shown}
         brand={brand}
         mode={mode}
         pageSize={pageSize}
@@ -63,14 +63,16 @@ function Page({
     <PrintPageProvider size={pageSize} margin="standard" density={density}>
       <PrintDocModeProvider icons iconStyle={resolvePrintIconStyle({ scale: 1 })}>
         {fit ? (
-          <PrintContentFitFrame
-            settings={{ enabled: true }}
-            dep={{ content, pageSize, density, pageIndex }}
-          >
-            {page}
-          </PrintContentFitFrame>
+          // Approved-demo contract: fit knobs first, then the content relief
+          // ladder, until the page measures clean inside its trim.
+          <ApprovedPrintFrame
+            kind={kind}
+            content={content}
+            signature={`${pageSize}|${density}|${pageIndex ?? "x"}`}
+            render={renderPage}
+          />
         ) : (
-          page
+          renderPage(content)
         )}
       </PrintDocModeProvider>
     </PrintPageProvider>

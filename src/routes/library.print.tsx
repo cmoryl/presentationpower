@@ -1,5 +1,7 @@
 import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
 import heroPrintVideo from "@/assets/hero-print.mp4.asset.json";
+import { ApprovedPrintFrame } from "@/components/print/ApprovedPrintFrame";
+import { approvePrintDemoContent } from "@/lib/print-library/demo-approve";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -450,7 +452,7 @@ function PrintCenterPage() {
         brandModes={brandModes}
         divisionId={previewBrandId}
         onDivisionChange={setPreviewBrandId}
-        renderPreview={renderPrintByKind}
+        renderPreview={renderPrintPreviewApproved}
         state={browserState}
         onStateChange={patchBrowserState}
       />
@@ -606,6 +608,30 @@ function renderPrintByKind(
       />
     );
   return null;
+}
+
+/**
+ * On-screen preview wrapper. Library cards and the detail overlay are curated
+ * examples, so they render under the approved-demo contract: content normalized
+ * to the page budget, then measured fit + relief so nothing clips at the trim.
+ * Export paths keep using the raw `renderPrintByKind` element.
+ */
+function renderPrintPreviewApproved(
+  kind: PrintAssetKind,
+  brand: BrandMode,
+  mode: "light" | "dark",
+  content?: unknown,
+  pageIndex?: number,
+): React.ReactElement | null {
+  const seeded = content ? approvePrintDemoContent(kind, content) : content;
+  return (
+    <ApprovedPrintFrame
+      kind={kind}
+      content={seeded}
+      signature={`${brand.id}|${mode}|${pageIndex ?? "x"}`}
+      render={(shown) => renderPrintByKind(kind, brand, mode, shown, pageIndex)}
+    />
+  );
 }
 
 function PrintTemplateHtmlButton({
