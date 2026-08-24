@@ -59,6 +59,7 @@ import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeIconLibraryRouteImport } from './routes/knowledge.icon-library'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
+import { Route as ForMarketingRouteImport } from './routes/for.marketing'
 import { Route as ForAdminRouteImport } from './routes/for.admin'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
@@ -401,6 +402,11 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   id: '/$entryId',
   path: '/$entryId',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const ForMarketingRoute = ForMarketingRouteImport.update({
+  id: '/for/marketing',
+  path: '/for/marketing',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ForAdminRoute = ForAdminRouteImport.update({
   id: '/for/admin',
@@ -951,6 +957,7 @@ export interface FileRoutesByFullPath {
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/for/admin': typeof ForAdminRoute
+  '/for/marketing': typeof ForMarketingRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
@@ -1090,6 +1097,7 @@ export interface FileRoutesByTo {
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/for/admin': typeof ForAdminRoute
+  '/for/marketing': typeof ForMarketingRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
@@ -1234,6 +1242,7 @@ export interface FileRoutesById {
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
   '/for/admin': typeof ForAdminRoute
+  '/for/marketing': typeof ForMarketingRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
@@ -1379,6 +1388,7 @@ export interface FileRouteTypes {
     | '/events/next'
     | '/events/presets'
     | '/for/admin'
+    | '/for/marketing'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/icon-library'
@@ -1518,6 +1528,7 @@ export interface FileRouteTypes {
     | '/events/next'
     | '/events/presets'
     | '/for/admin'
+    | '/for/marketing'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/icon-library'
@@ -1661,6 +1672,7 @@ export interface FileRouteTypes {
     | '/events/next'
     | '/events/presets'
     | '/for/admin'
+    | '/for/marketing'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/icon-library'
@@ -1774,6 +1786,7 @@ export interface RootRouteChildren {
   DevUxDebugRoute: typeof DevUxDebugRoute
   EventsAgentThreadIdRoute: typeof EventsAgentThreadIdRoute
   ForAdminRoute: typeof ForAdminRoute
+  ForMarketingRoute: typeof ForMarketingRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -2162,6 +2175,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/$entryId'
       preLoaderRoute: typeof KnowledgeEntryIdRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/for/marketing': {
+      id: '/for/marketing'
+      path: '/for/marketing'
+      fullPath: '/for/marketing'
+      preLoaderRoute: typeof ForMarketingRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/for/admin': {
       id: '/for/admin'
@@ -3013,6 +3033,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevUxDebugRoute: DevUxDebugRoute,
   EventsAgentThreadIdRoute: EventsAgentThreadIdRoute,
   ForAdminRoute: ForAdminRoute,
+  ForMarketingRoute: ForMarketingRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
