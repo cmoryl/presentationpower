@@ -174,10 +174,15 @@ function drawCropMarks(pdf: jsPDF, pageW: number, pageH: number, bleed: number):
   }
 }
 
+/** Clear margin outside the bleed so crop marks sit off the artwork. */
+const SLUG_IN = 0.25;
+
 async function pressPdf(item: DeliveryItem, geometry: PressGeometry) {
   const plate = await platePng(item, geometry);
-  const pageW = geometry.trimWidthIn + geometry.bleedIn * 2;
-  const pageH = geometry.trimHeightIn + geometry.bleedIn * 2;
+  const artW = geometry.trimWidthIn + geometry.bleedIn * 2;
+  const artH = geometry.trimHeightIn + geometry.bleedIn * 2;
+  const pageW = artW + SLUG_IN * 2;
+  const pageH = artH + SLUG_IN * 2;
   const pdf = new jsPDF({
     orientation: pageW >= pageH ? "landscape" : "portrait",
     unit: "in",
@@ -188,9 +193,11 @@ async function pressPdf(item: DeliveryItem, geometry: PressGeometry) {
   // the page it actually created rather than the requested numbers.
   const w = pdf.internal.pageSize.getWidth();
   const h = pdf.internal.pageSize.getHeight();
-  // Art runs to the bleed edge; the trim box sits `bleedIn` inside every side.
-  pdf.addImage(plate.dataUrl, "JPEG", 0, 0, w, h, undefined, "FAST");
-  drawCropMarks(pdf, w, h, geometry.bleedIn);
+  // Art runs to the bleed edge, inset by the slug so the marks stay off it.
+  const ox = (w - artW) / 2;
+  const oy = (h - artH) / 2;
+  pdf.addImage(plate.dataUrl, "JPEG", ox, oy, artW, artH, undefined, "FAST");
+  drawCropMarks(pdf, w, h, geometry.bleedIn + SLUG_IN);
   const blob = pdf.output("blob");
   return { blob, plate };
 }
