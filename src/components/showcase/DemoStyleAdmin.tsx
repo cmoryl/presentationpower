@@ -183,9 +183,10 @@ export function DemoStyleAdmin({
         <label className="block text-[12px]">
           <span className="font-medium text-black/60 dark:text-white/60">Background family</span>
           <select
-            value={recipeId ?? ""}
+            value={effectiveRecipe}
+            disabled={groundLocked || !packId}
             onChange={(e) => setRecipeId(e.target.value)}
-            className="mt-1 min-h-[44px] w-full rounded-xl border border-black/12 bg-white px-3 text-sm dark:border-white/15 dark:bg-white/[0.06]"
+            className="mt-1 min-h-[44px] w-full rounded-xl border border-black/12 bg-white px-3 text-sm disabled:cursor-not-allowed disabled:opacity-55 dark:border-white/15 dark:bg-white/[0.06]"
           >
             <option value="">None — design-led backgrounds</option>
             {INDUSTRY_RECIPES.map((r) => (
@@ -194,6 +195,13 @@ export function DemoStyleAdmin({
               </option>
             ))}
           </select>
+          <span className="mt-1 block text-[11px] text-black/45 dark:text-white/45">
+            {groundLocked
+              ? "This language ships its own authored ground — no separate family needed."
+              : !packId
+                ? "Pick a visual language first; a family on its own is ignored."
+                : "Optional: paints an industry ground under the chosen language."}
+          </span>
         </label>
       </div>
 
@@ -208,25 +216,23 @@ export function DemoStyleAdmin({
       </label>
 
       {validation.issues.length ? (
-        <ul className="mt-3 space-y-1.5">
-          {validation.issues.map((issue) => (
-            <li
-              key={issue.code}
-              className={`flex items-start gap-2 rounded-xl px-3 py-2 text-[12px] ${
-                issue.level === "error"
-                  ? "bg-red-500/10 text-red-700 dark:text-red-300"
-                  : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
-              }`}
+        <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-[12px] text-amber-800 dark:text-amber-300">
+          <AlertTriangle size={14} className="shrink-0" />
+          <span>{validation.issues[0]!.message}</span>
+          {validation.suggestedRecipeId &&
+          validation.issues[0]!.code === "industry-mismatch" &&
+          !groundLocked ? (
+            <button
+              type="button"
+              onClick={() => setRecipeId(validation.suggestedRecipeId!)}
+              className="rounded-full border border-amber-600/40 px-2.5 py-1 text-[11px] font-semibold hover:bg-amber-500/15"
             >
-              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-              <span>
-                {issue.message}
-                {issue.fix ? <span className="opacity-70"> {issue.fix}</span> : null}
-              </span>
-            </li>
-          ))}
-        </ul>
+              Use {validation.suggestedRecipeId}
+            </button>
+          ) : null}
+        </div>
       ) : null}
+
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button
