@@ -46,10 +46,7 @@ import { BRAND_GUIDES } from "@/lib/brand-guides";
 import { hasAiKey } from "@/lib/ai-status.functions";
 import { listMyCloudDecks, deleteCloudDeck } from "@/lib/cloud-decks.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
-import {
-  listApprovedActivity,
-  type ApprovedActivityRow,
-} from "@/lib/brand-approvals.functions";
+import { listApprovedActivity, type ApprovedActivityRow } from "@/lib/brand-approvals.functions";
 import { listMyKits, type SavedKit } from "@/lib/kits.functions";
 import { useSessionUser } from "@/hooks/use-session-user";
 
@@ -556,15 +553,11 @@ function Dashboard() {
         </div>
       </section>
 
-
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
 
       {/* ================= RECENT ACTIVITY ================= */}
-      <RecentActivity
-        decks={Object.values(decksMap).slice(0, 12)}
-        briefs={briefs}
-      />
+      <RecentActivity decks={Object.values(decksMap).slice(0, 12)} briefs={briefs} />
 
       {/* ================= KNOWLEDGE & BRAND ================= */}
       <section className="mt-12">
@@ -1220,7 +1213,8 @@ function RecentActivity({
           const at = r.decided_at ?? r.updated_at ?? "";
           const keys = [`${r.subject_type}:${r.subject_id}`];
           // Kit-backed social/event assets are filed under either label.
-          if (r.subject_type === "kit") keys.push(`social:${r.subject_id}`, `event:${r.subject_id}`);
+          if (r.subject_type === "kit")
+            keys.push(`social:${r.subject_id}`, `event:${r.subject_id}`);
           if (r.subject_type === "social" || r.subject_type === "event")
             keys.push(`kit:${r.subject_id}`);
           keys.forEach((k) => {
@@ -1237,7 +1231,6 @@ function RecentActivity({
       cancelled = true;
     };
   }, [listApproved, userId]);
-
 
   useEffect(() => {
     // Both feeds hit auth-protected server fns; skip entirely when signed out.
