@@ -277,12 +277,13 @@ function ApprovalQueuePage() {
               key={r.id}
               className="rounded-2xl border border-foreground/10 bg-background p-4 sm:p-5"
             >
-              <div className="flex flex-wrap items-start gap-3">
+              <div className="flex items-start gap-3">
                 {isReviewer && (
                   <input
                     type="checkbox"
                     aria-label={`Select ${r.title}`}
-                    className="mt-1.5"
+                    className="mt-2 shrink-0"
+
                     checked={selected.has(r.id)}
                     onChange={() =>
                       setSelected((prev) => {
@@ -295,38 +296,45 @@ function ApprovalQueuePage() {
                   />
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="rounded-full bg-foreground/5 px-2 py-0.5 font-medium uppercase tracking-wide text-foreground/60">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                    <span className="shrink-0 rounded-full bg-foreground/5 px-2 py-0.5 font-medium uppercase tracking-wide text-foreground/60">
                       {SUBJECT_LABEL[r.subject_type] ?? r.subject_type}
                     </span>
                     {r.priority === "high" && (
-                      <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">
+                      <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">
                         High priority
                       </span>
                     )}
                     {blocking > 0 && (
-                      <span className="rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">
+                      <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 font-medium text-red-900">
                         {blocking} blocking check{blocking === 1 ? "" : "s"}
                       </span>
                     )}
-                    <span className="text-foreground/45">
+                    <span className="min-w-0 truncate text-foreground/45">
                       {people[r.requested_by] ?? "Member"} · {relative(r.created_at)}
                     </span>
                     {commentCounts[r.id] ? (
-                      <span className="text-foreground/45">{commentCounts[r.id]} comments</span>
+                      <span className="shrink-0 text-foreground/45">
+                        {commentCounts[r.id]} comments
+                      </span>
                     ) : null}
                   </div>
-                  <h2 className="mt-2 truncate text-lg font-medium">{r.title}</h2>
+                  <h2 className="mt-2 line-clamp-2 break-words text-base font-medium leading-snug sm:text-lg">
+                    {r.title}
+                  </h2>
                   {r.summary && (
-                    <p className="mt-1 line-clamp-2 text-sm text-foreground/60">{r.summary}</p>
+                    <p className="mt-1.5 line-clamp-3 break-words text-sm leading-relaxed text-foreground/60">
+                      {r.summary}
+                    </p>
                   )}
                   {r.decision_note && (
-                    <p className="mt-2 rounded-xl bg-foreground/5 px-3 py-2 text-xs text-foreground/70">
+                    <p className="mt-2 whitespace-pre-wrap break-words rounded-xl bg-foreground/5 px-3 py-2 text-xs leading-relaxed text-foreground/70">
                       Reviewer note: {r.decision_note}
                     </p>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
+
+                <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                   {r.subject_path && (
                     <a
                       href={r.subject_path}
@@ -362,9 +370,9 @@ function ApprovalQueuePage() {
                           key={c.id}
                           className="rounded-xl border border-foreground/10 px-3 py-2 text-sm"
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-start gap-2">
                             <span
-                              className={`h-2 w-2 rounded-full ${
+                              className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
                                 c.severity === "blocking"
                                   ? "bg-red-500"
                                   : c.severity === "warning"
@@ -373,14 +381,19 @@ function ApprovalQueuePage() {
                               }`}
                               aria-hidden
                             />
-                            <span className="font-medium">{c.label}</span>
-                            <span className="ml-auto text-xs uppercase tracking-wide text-foreground/45">
+                            <span className="min-w-0 flex-1 break-words font-medium leading-snug">
+                              {c.label}
+                            </span>
+                            <span className="shrink-0 pt-0.5 text-xs uppercase tracking-wide text-foreground/45">
                               {c.severity}
                             </span>
                           </div>
                           {c.detail && (
-                            <p className="mt-1 text-xs text-foreground/60">{c.detail}</p>
+                            <p className="mt-1.5 break-words pl-4 text-xs leading-relaxed text-foreground/60">
+                              {c.detail}
+                            </p>
                           )}
+
                         </li>
                       ))}
                     </ul>
@@ -506,19 +519,20 @@ function CommentThread({ requestId }: { requestId: string }) {
             }`}
           >
             <div className="flex items-center gap-2 text-xs text-foreground/50">
-              <span className="font-medium text-foreground/70">
+              <span className="min-w-0 truncate font-medium text-foreground/70">
                 {people[c.author_id] ?? "Member"}
               </span>
-              <span>{relative(c.created_at)}</span>
+              <span className="shrink-0">{relative(c.created_at)}</span>
               <button
                 type="button"
                 onClick={() => resolve.mutate({ id: c.id, resolved: !c.resolved })}
-                className="ml-auto rounded-full border border-foreground/15 px-2 py-0.5 hover:bg-foreground/5"
+                className="ml-auto shrink-0 rounded-full border border-foreground/15 px-2 py-0.5 hover:bg-foreground/5"
               >
                 {c.resolved ? "Unresolve" : "Resolve"}
               </button>
             </div>
-            <p className="mt-1 whitespace-pre-wrap">{c.body}</p>
+            <p className="mt-1.5 whitespace-pre-wrap break-words leading-relaxed">{c.body}</p>
+
           </li>
         ))}
       </ul>
