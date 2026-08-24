@@ -81,6 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const nav = [
     { to: "/", label: "Home" },
+    { to: "/dashboard", label: "Dashboard" },
     { to: "/brief/new", label: "New brief" },
 
     { to: "/elements", label: "Elements" },
