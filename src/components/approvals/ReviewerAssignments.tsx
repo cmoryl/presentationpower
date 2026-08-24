@@ -90,10 +90,8 @@ export function ReviewerAssignments({
   });
 
   const decide = useMutation({
-    mutationFn: (input: {
-      id: string;
-      decision: "approved" | "changes_requested" | "pending";
-    }) => decideFn({ data: { ...input, note: notes[input.id]?.trim() || undefined } }),
+    mutationFn: (input: { id: string; decision: "approved" | "changes_requested" | "pending" }) =>
+      decideFn({ data: { ...input, note: notes[input.id]?.trim() || undefined } }),
     onSuccess: (r) => {
       invalidate();
       toast.success(
@@ -148,7 +146,9 @@ export function ReviewerAssignments({
                   </div>
                   <div className="mt-0.5 text-[11px] uppercase tracking-wide text-foreground/45">
                     {LANE_LABEL[r.lane] ?? r.lane}
-                    {r.decided_at ? ` · decided ${new Date(r.decided_at).toLocaleDateString()}` : ""}
+                    {r.decided_at
+                      ? ` · decided ${new Date(r.decided_at).toLocaleDateString()}`
+                      : ""}
                   </div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">

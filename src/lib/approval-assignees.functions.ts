@@ -106,9 +106,7 @@ export const listApprovalAssignees = createServerFn({ method: "POST" })
       .returns<ApprovalAssigneeRow[]>();
     if (error) throw new Error(error.message);
 
-    const ids = Array.from(
-      new Set((rows ?? []).flatMap((r) => [r.assignee_id, r.assigned_by])),
-    );
+    const ids = Array.from(new Set((rows ?? []).flatMap((r) => [r.assignee_id, r.assigned_by])));
     let people: Record<string, string> = {};
     if (ids.length) {
       const { data: profs } = await supabase
@@ -162,7 +160,9 @@ export const assignApprovalReviewer = createServerFn({ method: "POST" })
     const { notifyAssignee } = await import("./notify-approvals.server");
     await notifyAssignee(data.requestId, data.assigneeId, req?.title ?? "an asset", userId);
 
-    await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+    await (
+      await import("./approval-events.server")
+    ).logApprovalEvent(supabase, {
       requestId: data.requestId,
       actorId: userId,
       kind: "comment",
@@ -234,7 +234,9 @@ export const recordAssigneeDecision = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     if (decided) {
-      await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+      await (
+        await import("./approval-events.server")
+      ).logApprovalEvent(supabase, {
         requestId: row.request_id,
         actorId: userId,
         kind: data.decision === "approved" ? "approved" : "changes_requested",

@@ -5,7 +5,6 @@
 import { notifyUsers } from "./notify.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-
 export async function notifyReviewers(requestId: string, title: string, actorId: string) {
   try {
     const { data: reviewers } = await supabaseAdmin

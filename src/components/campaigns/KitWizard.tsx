@@ -1046,30 +1046,29 @@ export function KitWizard({
                         </div>
                       </div>
                       <div className="shrink-0">
-
-                      <AssetExportMenu
-                        label="Export"
-                        allowZip={false}
-                        filename={`${asset.format.label}-${asset.format.width}x${asset.format.height}`}
-                        bundleName={asset.format.label}
-                        resolveTargets={() => {
-                          const root = document.querySelector<HTMLElement>(
-                            `[data-kit-asset-id="${asset.id}"]`,
-                          );
-                          const node =
-                            root?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
-                          return node
-                            ? [
-                                {
-                                  node,
-                                  width: asset.format.width,
-                                  height: asset.format.height,
-                                  label: asset.format.label,
-                                },
-                              ]
-                            : [];
-                        }}
-                      />
+                        <AssetExportMenu
+                          label="Export"
+                          allowZip={false}
+                          filename={`${asset.format.label}-${asset.format.width}x${asset.format.height}`}
+                          bundleName={asset.format.label}
+                          resolveTargets={() => {
+                            const root = document.querySelector<HTMLElement>(
+                              `[data-kit-asset-id="${asset.id}"]`,
+                            );
+                            const node =
+                              root?.querySelector<HTMLElement>("[data-kit-asset-frame]") ?? null;
+                            return node
+                              ? [
+                                  {
+                                    node,
+                                    width: asset.format.width,
+                                    height: asset.format.height,
+                                    label: asset.format.label,
+                                  },
+                                ]
+                              : [];
+                          }}
+                        />
                       </div>
                     </div>
 
@@ -1079,7 +1078,6 @@ export function KitWizard({
                         className="flex h-56 w-full min-w-0 items-center justify-center overflow-hidden rounded-xl bg-[#F2F2F2]/70 p-2"
                       >
                         <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
-
                           {(displayShortEdge) =>
                             moduleLayout && !nextDesign ? (
                               <SocialModuleFrame

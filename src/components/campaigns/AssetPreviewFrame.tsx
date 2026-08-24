@@ -45,7 +45,10 @@ export function AssetPreviewFrame({
   const displayShortEdge = Math.max(80, Math.min(maxShortEdge, widthLimited, heightLimited));
 
   return (
-    <div ref={ref} className="flex h-full w-full min-w-0 items-center justify-center overflow-hidden">
+    <div
+      ref={ref}
+      className="flex h-full w-full min-w-0 items-center justify-center overflow-hidden"
+    >
       {box.w > 0 ? children(displayShortEdge) : null}
     </div>
   );
