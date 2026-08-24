@@ -556,11 +556,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </main>
       <footer className="border-t border-black/10 bg-[#E8E4DC]/60 dark:!border-white/[0.06] dark:!bg-[#07061F]/70">
-        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-8 py-8 md:flex-row">
-          <div className="text-xs text-black/50 dark:text-white/50">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-6 py-8 md:flex-row md:px-8">
+          <div className="text-center text-xs text-black/50 md:text-left dark:text-white/50">
             TransPerfect Element · Built for sales enablement
           </div>
-          <nav className="flex items-center gap-1">
+          <nav className="flex flex-wrap items-center justify-center gap-1">
+
             {footerNav.map((n) => {
               const active = pathname === n.to;
               return (

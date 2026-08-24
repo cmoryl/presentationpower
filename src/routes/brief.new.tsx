@@ -1893,28 +1893,30 @@ function BriefCommandCenter() {
       </div>
 
       {/* Sticky command dock */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
-        <div className="pointer-events-auto mx-auto flex w-full max-w-[1100px] flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#03002C]/90 px-4 py-3 text-white shadow-2xl shadow-black/40 backdrop-blur-xl">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.3em] text-white/45">
-            Step {step}/{STEPS.length}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-3 sm:px-4 sm:pb-4">
+        <div className="pointer-events-auto mx-auto flex w-full max-w-[1100px] items-center gap-3 rounded-2xl border border-white/10 bg-[#03002C]/90 px-4 py-2.5 text-white shadow-2xl shadow-black/40 backdrop-blur-xl sm:py-3">
+          <span className="shrink-0 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/45 sm:tracking-[0.3em]">
+            {step}/{STEPS.length}
           </span>
-          <div className="min-w-0 flex-1 px-2 text-center">
+          <div className="min-w-0 flex-1 text-center">
             {stepBlocked ? (
               <p className="truncate text-[12px] text-white/60" role="status">
                 {stepBlocked}
               </p>
             ) : (
-              <p className="truncate font-mono text-[10px] uppercase tracking-[0.3em] text-white/45">
+              <p className="truncate font-mono text-[10px] uppercase tracking-[0.18em] text-white/45 sm:tracking-[0.3em]">
                 {STEPS[step - 1].label} · {brand?.name ?? "brand"}
               </p>
             )}
           </div>
           <span
-            className="inline-block h-2 w-16 rounded-full"
+            className="hidden h-2 w-16 shrink-0 rounded-full sm:inline-block"
             style={{ background: `linear-gradient(90deg, ${brandPrimary}, ${brandAccent})` }}
             aria-hidden
           />
         </div>
+      </div>
+
       </div>
     </AppShell>
   );
