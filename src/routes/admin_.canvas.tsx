@@ -596,6 +596,23 @@ function CanvasStudioPage() {
 
               <ToolbarSep />
 
+              {/* RESET TO BLANK — one click back to an empty slide. Clearing
+                  layers alone still leaves the template look applied, which
+                  reads as "not really blank", so this also drops the style
+                  pack / industry ground and the selection. Undoable. */}
+              <button
+                type="button"
+                onClick={() => resetToBlank()}
+                disabled={comp.items.length === 0 && !comp.packId && !comp.recipeId}
+                title="Clear every layer and the template look (⌘Z restores)"
+                className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-white px-3 py-1.5 text-[11px] font-semibold text-black/70 transition hover:border-black/20 hover:text-primary disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                <span aria-hidden>⟲</span>
+                Reset to blank
+              </button>
+
+              <ToolbarSep />
+
               {/* Same control the deck editor uses, so history looks and reads
                   identically on every editing surface. */}
               <div role="group" aria-label="History" className="inline-flex items-center">
@@ -608,6 +625,7 @@ function CanvasStudioPage() {
                   redoLabel="canvas edit"
                 />
               </div>
+
             </>
           }
           slideRowEnd={
