@@ -494,10 +494,14 @@ function BriefCommandCenter() {
 
   }
 
-  // Every artifact the current selection will produce, as trackable jobs.
+  // Every artifact the current selection will produce, as trackable jobs. When
+  // no presentation was requested the deck record is just the campaign spine,
+  // so the slide-authoring jobs are not shown or run at all.
   function buildJobPlan(set: MasterSet) {
     const plan: Array<{ id: string; label: string; detail?: string }> = [
-      { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
+      set.presentation
+        ? { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" }
+        : { id: "deck", label: "Campaign story", detail: "Framing the brief" },
       ...(referenceAssets.length || reusableReferences
         ? [
             {
@@ -510,8 +514,11 @@ function BriefCommandCenter() {
           ]
         : []),
       { id: "knowledge", label: "Knowledge context", detail: "Retrieving proof points" },
-      { id: "personalize", label: "AI personalization", detail: "Writing slide copy" },
+      ...(set.presentation
+        ? [{ id: "personalize", label: "AI personalization", detail: "Writing slide copy" }]
+        : []),
     ];
+
     if (set.print.enabled)
       for (const kind of set.print.kinds)
         plan.push({
