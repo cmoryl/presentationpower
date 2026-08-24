@@ -15,6 +15,12 @@ import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { KIT_PROPOSAL_TOOL_NAME } from "@/lib/kit-agent/tools";
 import { KitProposalCard, kitProposalFromTool } from "./KitProposalCard";
 import { messagesFingerprint, useKitThreadMessageSync } from "@/lib/kit-agent/sync";
+import {
+  AgentDocumentUpload,
+  useAgentDocuments,
+} from "@/components/agent/AgentDocumentUpload";
+import { withDocumentContext } from "@/lib/agent/doc-intake";
+
 
 const TOOL_LABELS: Record<string, string> = {
   list_divisions: "Checking divisions",
