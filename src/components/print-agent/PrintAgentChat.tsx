@@ -200,6 +200,10 @@ export function PrintAgentChat({
         </div>
       ) : null}
 
+      <div className="border-t border-border bg-background px-4 pt-2 sm:px-6">
+        <AgentDocumentUpload docs={docs} onChange={setDocs} disabled={busy} />
+      </div>
+
       <form
         className="flex items-end gap-2 border-t border-border bg-background px-4 py-3 sm:px-6"
         onSubmit={(e) => {
