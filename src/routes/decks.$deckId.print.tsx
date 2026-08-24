@@ -16,6 +16,9 @@ import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { supabase } from "@/integrations/supabase/client";
 import { deckCloudId } from "@/lib/deck-uuid";
 import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
+import { toast } from "sonner";
+import { describeExportError } from "@/lib/export-feedback";
+
 
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Element" }] }),
