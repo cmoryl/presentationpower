@@ -13,6 +13,8 @@
  * section renderer.
  */
 import { createContext, useContext, type ReactNode } from "react";
+import type { PrintSurface } from "@/lib/print-icon-contrast";
+
 
 export type PrintIconStyle = {
   /** Multiplier applied to every glyph's rendered size (1 = layout default). */
