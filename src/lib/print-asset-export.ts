@@ -457,6 +457,7 @@ export async function exportPrintAssetAsPdf(
     if (!opts.iccProfile) {
       throw new Error("press-x4 export requires an `iccProfile` option.");
     }
+    emit(0.96, "Applying the press colour profile…", "encode");
     const iccBytes = await fetchIccProfile(opts.iccProfile);
     const x4Bytes = await wrapPdfAsX4(workingBytes, {
       trimSize: { widthIn: trim.widthIn, heightIn: trim.heightIn },
@@ -465,14 +466,18 @@ export async function exportPrintAssetAsPdf(
       iccProfileName: opts.iccProfile,
       title: opts.filename,
     });
+    emit(0.99, "Saving the file…", "encode");
     emitPdf(x4Bytes, filename, opts);
   } else {
     // press / digital paths — ship the overlaid bytes so vector text
     // survives on non-X4 exports too. Digital bypasses overlay above so
     // `workingBytes === rasterBytesArr` in that case.
+    emit(0.99, "Saving the file…", "encode");
     emitPdf(workingBytes, filename, opts);
   }
+  emit(1, "Saved", "done");
 }
+
 
 /** Convert a PNG data URL to a JPEG data URL with a mode-appropriate flat
  *  background so transparent pixels don't come out black. Runs in-browser. */
