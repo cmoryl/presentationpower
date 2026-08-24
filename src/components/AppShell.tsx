@@ -347,7 +347,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <div className="absolute left-1/2 top-full z-50 w-[760px] max-w-[94vw] -translate-x-1/2 pt-2">
                         <div className="grid grid-cols-2 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] sm:grid-cols-4 dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {visibleElementGroups.map((g) => (
-                            <div key={g.label} className="min-w-0 sm:border-l sm:border-black/[0.06] sm:pl-3 sm:first:border-l-0 sm:first:pl-0 dark:sm:border-white/10">
+                            <div
+                              key={g.label}
+                              className="min-w-0 sm:border-l sm:border-black/[0.06] sm:pl-3 sm:first:border-l-0 sm:first:pl-0 dark:sm:border-white/10"
+                            >
                               <Link
                                 to={g.to}
                                 onClick={() => setPresOpen(false)}
@@ -424,7 +427,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                       <div className="absolute left-1/2 top-full z-50 w-[720px] max-w-[92vw] -translate-x-1/2 pt-2">
                         <div className="grid grid-cols-3 gap-2 overflow-hidden rounded-2xl border border-black/10 bg-white p-4 shadow-[0_24px_70px_-18px_rgba(3,0,44,0.45)] dark:!border-white/15 dark:!bg-[#0B0A2A] dark:shadow-[0_24px_70px_-18px_rgba(0,0,0,0.9)]">
                           {adminGroups.map((g) => (
-                            <div key={g.label} className="min-w-0 sm:border-l sm:border-black/[0.06] sm:pl-3 sm:first:border-l-0 sm:first:pl-0 dark:sm:border-white/10">
+                            <div
+                              key={g.label}
+                              className="min-w-0 sm:border-l sm:border-black/[0.06] sm:pl-3 sm:first:border-l-0 sm:first:pl-0 dark:sm:border-white/10"
+                            >
                               <div className="mb-1 border-b border-black/[0.08] px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#003FC7] dark:border-white/10 dark:text-[#A1FBF9]">
                                 {g.label}
                               </div>
@@ -556,11 +562,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
       </main>
       <footer className="border-t border-black/10 bg-[#E8E4DC]/60 dark:!border-white/[0.06] dark:!bg-[#07061F]/70">
-        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-8 py-8 md:flex-row">
-          <div className="text-xs text-black/50 dark:text-white/50">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-6 py-8 md:flex-row md:px-8">
+          <div className="text-center text-xs text-black/50 md:text-left dark:text-white/50">
             TransPerfect Element · Built for sales enablement
           </div>
-          <nav className="flex items-center gap-1">
+          <nav className="flex flex-wrap items-center justify-center gap-1">
             {footerNav.map((n) => {
               const active = pathname === n.to;
               return (
