@@ -4971,7 +4971,12 @@ export const useDeckStore = create<DeckState>()(
             variantId: src.variantId,
             moduleFamily: byId(MODULE_VARIANTS, src.variantId)?.familyId ?? null,
           });
+          notifySlideEdit("Slide duplicated", {
+            kind: "duplicate",
+            undo: () => get().undo(),
+          });
         },
+
 
         renameDeck: (deckId, title) => {
           pushHistory(`rename:${deckId}`);
