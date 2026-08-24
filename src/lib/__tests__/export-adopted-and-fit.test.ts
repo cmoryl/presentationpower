@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 /**
  * Regression: the two defects that made exported decks diverge from the build —
  *  1. adopted canvas mirrors shipping TWICE (module glyphs + native mirror),
@@ -106,13 +107,14 @@ describe("single-line fit", () => {
         fontSizePx: 22,
       }),
     );
-    expect(wide.fontSize).toBeLessThan(22 * 0.75);
+    // Stage px → pt is 0.5, so an unshrunk 22px eyebrow would be 11pt.
+    expect(wide.fontSize).toBeLessThan(11 * 0.85);
     // Still on the slide.
     expect((wide.x as number) + (wide.w as number)).toBeLessThanOrEqual(13.34);
   });
 
   it("does not shrink a line that already fits", () => {
     const ok = describeTextRun(run({ x: 96, w: 300, text: "OVERVIEW", fontSizePx: 20 }));
-    expect(ok.fontSize).toBeGreaterThanOrEqual(14);
+    expect(ok.fontSize).toBe(10);
   });
 });
