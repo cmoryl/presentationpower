@@ -4,6 +4,8 @@ import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { loadSlides, touchDeck } from "../deck-access";
 import { resolveVariantSwap } from "@/lib/slide-ops";
 import { visualDataGap } from "@/lib/agent/visual-data-gaps";
+import { variantsForSection } from "@/lib/taxonomy";
+
 
 export default defineTool({
   name: "insert_slide",
