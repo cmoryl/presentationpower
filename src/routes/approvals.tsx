@@ -434,7 +434,11 @@ function ApprovalQueuePage() {
                     )}
                   </section>
 
-                  <CommentThread requestId={r.id} />
+                  <div className="space-y-4">
+                    <ReviewerAssignments requestId={r.id} isReviewer={isReviewer} />
+                    <CommentThread requestId={r.id} />
+                  </div>
+
                 </div>
               )}
             </li>
