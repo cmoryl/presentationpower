@@ -478,7 +478,11 @@ export const listApprovalTimeline = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!req) return { request: null, events: [] as ApprovalTimelineEvent[], people: {} };
+    if (!req) return {
+        request: null,
+        events: [] as ApprovalTimelineEvent[],
+        people: {} as Record<string, string>,
+      };
 
     const { data: rows, error } = await supabase
       .from("approval_events")
