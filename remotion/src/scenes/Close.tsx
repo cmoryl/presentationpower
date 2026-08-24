@@ -10,6 +10,30 @@ export const Close: React.FC<{ film: Film }> = ({ film }) => {
   const fade = interpolate(frame, [0, 14], [0, 1], { extrapolateRight: "clamp" });
   return (
     <AbsoluteFill style={{ opacity: fade, padding: "0 132px", justifyContent: "center" }}>
+      <div style={{ position: "absolute", right: 132, top: "50%", transform: "translateY(-50%)", width: 470 }}>
+        {film.beats.map((b, i) => (
+          <Rise key={b.n} delay={14 + i * 8} y={24}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: 18,
+                background: "rgba(255,255,255,0.86)",
+                border: `1px solid ${C.hair}`,
+                borderRadius: 18,
+                padding: "20px 24px",
+                marginBottom: 14,
+              }}
+            >
+              <span style={{ fontSize: 44, fontWeight: 600, color: C.navy, letterSpacing: "-0.04em" }}>
+                {b.stat.to}
+                <span style={{ fontSize: 22, color: C.inkSoft }}>{b.stat.suffix ?? ""}</span>
+              </span>
+              <span style={{ fontSize: 21, color: C.inkSoft, lineHeight: 1.3 }}>{b.stat.label}</span>
+            </div>
+          </Rise>
+        ))}
+      </div>
       <Rise delay={2} y={18}>
         <div
           style={{
