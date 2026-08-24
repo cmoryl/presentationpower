@@ -1,3 +1,4 @@
+import { CREATE_ONLY_AGENT_PROMPT, fetchAgentScope } from "@/lib/agent-scope";
 // Streaming endpoint for the Print Agent page. Same tool-loop shape as the
 // deck agent, but the tool set is scoped entirely to the print library and the
 // caller's own print_assets rows.
@@ -69,9 +70,13 @@ export const Route = createFileRoute("/api/print-agent-chat")({
           headers: { "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
         });
 
+        const scope = await fetchAgentScope(supabase as never);
+
         const result = streamText({
           model: gateway(MODEL),
-          system: PRINT_AGENT_SYSTEM_PROMPT,
+          system: [PRINT_AGENT_SYSTEM_PROMPT, scope.createOnly ? CREATE_ONLY_AGENT_PROMPT : ""]
+            .filter(Boolean)
+            .join("\n"),
           messages: await convertToModelMessages(messages),
           tools: buildPrintAgentToolSet({ supabase, userId }),
           stopWhen: stepCountIs(40),
