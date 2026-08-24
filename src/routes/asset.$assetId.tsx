@@ -158,6 +158,7 @@ import {
   weightForSection,
   effectiveModuleBudget,
 } from "@/lib/print-capacity";
+import { fitPrintModuleIntoPage } from "@/lib/print-module-fit";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
