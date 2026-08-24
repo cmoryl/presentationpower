@@ -503,8 +503,8 @@ function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compac
           <AssetPreviewFrame
             width={hero.format.width}
             height={hero.format.height}
-            maxShortEdge={210}
-            maxHeight={198}
+            maxShortEdge={compact ? 150 : 210}
+            maxHeight={compact ? 122 : 198}
           >
             {(displayShortEdge) => (
               <SocialRenderer
