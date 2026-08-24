@@ -165,7 +165,7 @@ export const assignApprovalReviewer = createServerFn({ method: "POST" })
     await (await import("./approval-events.server")).logApprovalEvent(supabase, {
       requestId: data.requestId,
       actorId: userId,
-      kind: "commented",
+      kind: "comment",
       note: null,
       meta: { assigned: data.assigneeId, lane: data.lane ?? "brand" },
     });
