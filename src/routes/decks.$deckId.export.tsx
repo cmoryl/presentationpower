@@ -310,8 +310,29 @@ function ExportView() {
   }
 
 
+  // A click must never be a no-op: when QA blocks the export we say so and
+  // offer the override right there, instead of leaving a dead button.
+  function explainBlocked(what: string, run: () => void) {
+    void import("@/lib/export-feedback").then(({ notifyBlocked }) =>
+      notifyBlocked(
+        `${what} is on hold — ${blocks.length} blocking QA ${blocks.length === 1 ? "issue" : "issues"} to resolve first.`,
+        {
+          label: "Export anyway",
+          onClick: () => {
+            setOverride(true);
+            run();
+          },
+        },
+      ),
+    );
+  }
+
   async function handlePptx() {
-    if (blocked || exporting || preflightBusy) return;
+    if (exporting || preflightBusy) return;
+    if (blocked) {
+      explainBlocked("PowerPoint export", () => void runPptxExport());
+      return;
+    }
     setPreflightBusy(true);
     try {
       const issues = approvedDemo ? [] : await runExportPreflight(deck);
@@ -425,8 +446,8 @@ function ExportView() {
             <div className="flex items-center gap-2">
               <button
                 onClick={handlePptx}
-                disabled={exporting || preflightBusy || blocked}
-                title={blocked ? "Resolve blocking QA issues first" : ""}
+                disabled={exporting || preflightBusy}
+                title={blocked ? "Resolve blocking QA issues first, or override" : ""}
                 className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {exporting ? "Preparing…" : preflightBusy ? "Checking…" : "Download .pptx"}
@@ -439,16 +460,27 @@ function ExportView() {
                 As document…
               </Link>
               <button
-                onClick={() => !blocked && window.print()}
-                disabled={blocked}
+                onClick={() => {
+                  if (blocked) {
+                    explainBlocked("Print / PDF", () => window.print());
+                    return;
+                  }
+                  window.print();
+                }}
                 className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Print / Save PDF
               </button>
               {glShareConfigured ? (
                 <button
-                  onClick={handleShareViaGlobalLink}
-                  disabled={glShareBusy || blocked}
+                  onClick={() => {
+                    if (blocked) {
+                      explainBlocked("GlobalLink upload", () => void handleShareViaGlobalLink());
+                      return;
+                    }
+                    void handleShareViaGlobalLink();
+                  }}
+                  disabled={glShareBusy}
                   title={
                     blocked
                       ? "Resolve blocking QA issues first"
