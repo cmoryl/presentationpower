@@ -84,7 +84,6 @@ function BriefOutputHub() {
   const cover = deck?.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
 
-
   if (!deck) {
     return (
       <AppShell>
@@ -219,78 +218,76 @@ function BriefOutputHub() {
 
         {/* ---- Sales enablement (only when a deck was requested) -------- */}
         {hasDeck ? (
-        <Section
-
-          id="sales"
-          icon={Presentation}
-          kicker="Sales enablement"
-          title="The narrative deck"
-          blurb="Your first-meeting story — open it to edit, present live, or export to PowerPoint."
-        >
-          <div className="grid gap-5 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-            <Link
-              to="/decks/$deckId"
-              params={{ deckId }}
-              className="group block overflow-hidden rounded-2xl border border-black/[0.08] bg-white transition hover:border-[#003FC7]/40 hover:shadow-[0_12px_36px_rgba(3,0,44,0.10)]"
-            >
-              <div className="aspect-[16/9] overflow-hidden bg-[#F2F2F2]">
-                {cover && coverVariant && brand ? (
-                  <ScaledSlide>
-                    <VariantRenderer
-                      slide={cover}
-                      variant={coverVariant}
-                      brand={brand}
-                      pageNumber={1}
-                      clientName={brief?.prospect}
-                      clientLogoUrl={deck.clientLogo?.primaryUrl ?? null}
-                      subCompany={deck.subCompany}
-                      logoOrientation={deck.context?.logoOrientation}
-                    />
-                  </ScaledSlide>
-                ) : null}
-              </div>
-              <div className="flex items-center justify-between px-4 py-3">
-                <div className="min-w-0">
-                  <div className="truncate text-[14px] font-medium text-[#03002C]">
-                    {deck.title}
-                  </div>
-                  <div className="text-[12px] text-black/50">{deck.slides.length} slides</div>
+          <Section
+            id="sales"
+            icon={Presentation}
+            kicker="Sales enablement"
+            title="The narrative deck"
+            blurb="Your first-meeting story — open it to edit, present live, or export to PowerPoint."
+          >
+            <div className="grid gap-5 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+              <Link
+                to="/decks/$deckId"
+                params={{ deckId }}
+                className="group block overflow-hidden rounded-2xl border border-black/[0.08] bg-white transition hover:border-[#003FC7]/40 hover:shadow-[0_12px_36px_rgba(3,0,44,0.10)]"
+              >
+                <div className="aspect-[16/9] overflow-hidden bg-[#F2F2F2]">
+                  {cover && coverVariant && brand ? (
+                    <ScaledSlide>
+                      <VariantRenderer
+                        slide={cover}
+                        variant={coverVariant}
+                        brand={brand}
+                        pageNumber={1}
+                        clientName={brief?.prospect}
+                        clientLogoUrl={deck.clientLogo?.primaryUrl ?? null}
+                        subCompany={deck.subCompany}
+                        logoOrientation={deck.context?.logoOrientation}
+                      />
+                    </ScaledSlide>
+                  ) : null}
                 </div>
-                <ArrowRight
-                  size={16}
-                  strokeWidth={1.75}
-                  className="shrink-0 text-black/30 transition group-hover:translate-x-0.5 group-hover:text-[#003FC7]"
+                <div className="flex items-center justify-between px-4 py-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-[14px] font-medium text-[#03002C]">
+                      {deck.title}
+                    </div>
+                    <div className="text-[12px] text-black/50">{deck.slides.length} slides</div>
+                  </div>
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={1.75}
+                    className="shrink-0 text-black/30 transition group-hover:translate-x-0.5 group-hover:text-[#003FC7]"
+                  />
+                </div>
+              </Link>
+
+              <div className="flex flex-col gap-2.5">
+                <ActionRow
+                  to="/decks/$deckId"
+                  deckId={deckId}
+                  icon={Layers}
+                  title="Edit the deck"
+                  desc="Slide-by-slide editing, brand review and Copilot refinement."
+                />
+                <ActionRow
+                  to="/decks/$deckId/present"
+                  deckId={deckId}
+                  icon={Play}
+                  title="Present now"
+                  desc="Full-screen presenter mode with transitions."
+                />
+                <ActionRow
+                  to="/decks/$deckId/export"
+                  deckId={deckId}
+                  icon={Share2}
+                  title="Export & share"
+                  desc="PPTX, PDF or a tracked share link."
                 />
               </div>
-            </Link>
-
-            <div className="flex flex-col gap-2.5">
-              <ActionRow
-                to="/decks/$deckId"
-                deckId={deckId}
-                icon={Layers}
-                title="Edit the deck"
-                desc="Slide-by-slide editing, brand review and Copilot refinement."
-              />
-              <ActionRow
-                to="/decks/$deckId/present"
-                deckId={deckId}
-                icon={Play}
-                title="Present now"
-                desc="Full-screen presenter mode with transitions."
-              />
-              <ActionRow
-                to="/decks/$deckId/export"
-                deckId={deckId}
-                icon={Share2}
-                title="Export & share"
-                desc="PPTX, PDF or a tracked share link."
-              />
             </div>
-          </div>
-        </Section>
+          </Section>
         ) : null}
-
 
         {/* ---- Print --------------------------------------------------- */}
         {prints.length ? (

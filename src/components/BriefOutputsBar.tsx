@@ -11,7 +11,6 @@ export type BriefOutputsMasterSet = {
   brandDivisionId?: string | null;
 };
 
-
 type Props = {
   /** Deck produced by the same brief (omit when the deck itself is unknown). */
   deckId?: string | null;
@@ -69,7 +68,6 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
   if (total < 2 && !(deckId && deckIsArtifact && active.kind !== "deck")) return null;
 
   return (
-
     <nav
       aria-label="Other assets from this brief"
       className="flex flex-wrap items-center gap-2 rounded-2xl border border-black/[0.07] bg-white/70 px-3 py-2.5 backdrop-blur"
@@ -86,7 +84,6 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
       ) : null}
 
       {deckId && deckIsArtifact ? (
-
         active.kind === "deck" ? (
           <span className={`${chip} ${here}`}>
             <Layers size={14} strokeWidth={1.75} />

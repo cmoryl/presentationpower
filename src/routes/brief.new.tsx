@@ -491,7 +491,6 @@ function BriefCommandCenter() {
     if (set.event.enabled && set.event.playbookId) parts.push("event kit");
     if (set.social.enabled && set.social.playbookId) parts.push("social kit");
     toast.success(`Ready · ${parts.join(" · ") || "brief saved"}`);
-
   }
 
   // Every artifact the current selection will produce, as trackable jobs. When
@@ -576,7 +575,6 @@ function BriefCommandCenter() {
         ? `${deck.slides.length} slides assembled`
         : "Story framed for the campaign",
     });
-
 
     setAiStatus("knowledge");
     patchJob("knowledge", { status: "running", detail: "Searching knowledge base…" });
@@ -765,54 +763,53 @@ function BriefCommandCenter() {
 
     // Slide copy is only written when a presentation was actually requested.
     if (activeSet.presentation) {
-    setAiStatus("personalizing");
+      setAiStatus("personalizing");
 
-    patchJob("personalize", {
-      status: "running",
-      detail: `Writing copy for ${deck.slides.length} slides…`,
-    });
-    try {
-
-      const result = await personalize({
-        data: {
-          brief: {
-            prospect: submission.prospect,
-            industry: submission.industry,
-            audience: submission.audience,
-            meetingObjective: submission.meetingObjective,
-            clientFacts: submission.clientFacts,
-            archetypeName: byId(NARRATIVE_ARCHETYPES, submission.archetypeId)?.name ?? "Deck",
-            brandScope: scope
-              ? {
-                  brandName: brand?.name,
-                  role: brand?.role,
-                  industries: scope.industries,
-                  serviceLines: scope.serviceLines,
-                  caseStudyTags: scope.caseStudyTags,
-                }
-              : undefined,
-          },
-          slides: deck.slides.map((s) => ({
-            id: s.id,
-            variantId: s.variantId,
-            sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
-            content: s.content as Record<string, unknown>,
-          })),
-          knowledgeSnippets: personalizerKb.slice(0, 12),
-        },
+      patchJob("personalize", {
+        status: "running",
+        detail: `Writing copy for ${deck.slides.length} slides…`,
       });
-      if (result.error) {
-        handlePersonalizeFailure(result.error);
-      } else {
-        applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
-        patchJob("personalize", { status: "done", detail: "Copy personalized" });
+      try {
+        const result = await personalize({
+          data: {
+            brief: {
+              prospect: submission.prospect,
+              industry: submission.industry,
+              audience: submission.audience,
+              meetingObjective: submission.meetingObjective,
+              clientFacts: submission.clientFacts,
+              archetypeName: byId(NARRATIVE_ARCHETYPES, submission.archetypeId)?.name ?? "Deck",
+              brandScope: scope
+                ? {
+                    brandName: brand?.name,
+                    role: brand?.role,
+                    industries: scope.industries,
+                    serviceLines: scope.serviceLines,
+                    caseStudyTags: scope.caseStudyTags,
+                  }
+                : undefined,
+            },
+            slides: deck.slides.map((s) => ({
+              id: s.id,
+              variantId: s.variantId,
+              sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
+              content: s.content as Record<string, unknown>,
+            })),
+            knowledgeSnippets: personalizerKb.slice(0, 12),
+          },
+        });
+        if (result.error) {
+          handlePersonalizeFailure(result.error);
+        } else {
+          applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
+          patchJob("personalize", { status: "done", detail: "Copy personalized" });
+        }
+      } catch (e) {
+        // Never dead-end the run: the structural deck already exists, so we keep
+        // producing the rest of the set with template copy instead of leaving
+        // every remaining artifact stuck at QUEUED.
+        handlePersonalizeFailure((e as Error).message);
       }
-    } catch (e) {
-      // Never dead-end the run: the structural deck already exists, so we keep
-      // producing the rest of the set with template copy instead of leaving
-      // every remaining artifact stuck at QUEUED.
-      handlePersonalizeFailure((e as Error).message);
-    }
     }
 
     await expandMasterSet(deckId, submission, activeSet, opts?.request);
