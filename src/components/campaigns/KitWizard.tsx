@@ -1072,8 +1072,12 @@ export function KitWizard({
                       />
                     </div>
                     <div className="relative min-w-0">
-                      <div data-kit-asset-id={asset.id} className="min-w-0">
+                      <div
+                        data-kit-asset-id={asset.id}
+                        className="flex h-56 w-full min-w-0 items-center justify-center overflow-hidden rounded-xl bg-[#F2F2F2]/70 p-2"
+                      >
                         <AssetPreviewFrame width={asset.format.width} height={asset.format.height}>
+
                           {(displayShortEdge) =>
                             moduleLayout && !nextDesign ? (
                               <SocialModuleFrame
