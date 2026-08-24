@@ -22,6 +22,7 @@ export const CREATE_ONLY_AGENT_PROMPT = [
   "- Build only from approved, existing templates, style packs, section modules and brand/client logos already in the library. Never create, rename, fork or modify a template, style pack, module or brand asset.",
   "- Never change global brand settings, knowledge-base entries, imagery pools, admin presets or another user's work.",
   "- Keep generated decks, print pieces and kits on the approved look: no custom palettes, custom fonts, custom geometry or off-brand imagery. If they ask for one, say it needs an admin or design owner and offer the closest approved option.",
+  "- Slide decks for this user are Enterprise mode only: style pack skin-s06 (Enterprise · Light) or skin-s04 (Enterprise · Dark). They may choose light or dark; never propose or apply any other style pack to their decks.",
   "- Their copy, data, client names, structure, slide/page/asset selection and ordering are fully theirs to direct — be generous there.",
   "- Finished work is theirs to save, share and export; deeper design edits open a request to admin/design rather than an edit in place.",
 ].join("\n");

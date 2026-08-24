@@ -10,6 +10,8 @@
  * on a blank, unskinned canvas.
  */
 
+import { SALES_DECK_LOOKS } from "./sales-deck-looks";
+
 export type QuickCreateKind = "deck" | "print" | "kit";
 
 export type PrintMasterKind =
@@ -51,24 +53,48 @@ const SALES: readonly QuickCreatePreset[] = [
   {
     id: "sales-pitch-deck",
     kind: "deck",
-    label: "Client pitch deck",
-    hint: "Problem → solution narrative, 12 slides, enterprise look",
-    templateSet: "Enterprise Grid · R01 Corporate",
+    label: "Client pitch deck · Light",
+    hint: "Problem → solution narrative, 12 slides, Enterprise light",
+    templateSet: `${SALES_DECK_LOOKS.light.label} · R01 Corporate`,
     archetypeId: "arch-problem-solution",
     lengthTarget: 12,
-    stylePackId: "skin-s06",
+    stylePackId: SALES_DECK_LOOKS.light.stylePackId,
+    designRecipeId: "R01",
+    industry: "Corporate / Enterprise",
+  },
+  {
+    id: "sales-pitch-deck-dark",
+    kind: "deck",
+    label: "Client pitch deck · Dark",
+    hint: "Same narrative on the Enterprise dark look, 12 slides",
+    templateSet: `${SALES_DECK_LOOKS.dark.label} · R01 Corporate`,
+    archetypeId: "arch-problem-solution",
+    lengthTarget: 12,
+    stylePackId: SALES_DECK_LOOKS.dark.stylePackId,
     designRecipeId: "R01",
     industry: "Corporate / Enterprise",
   },
   {
     id: "sales-exec-briefing",
     kind: "deck",
-    label: "Executive briefing",
-    hint: "Tight decision deck, 8 slides, boardroom look",
-    templateSet: "Spatial Clarity · R01 Corporate",
+    label: "Executive briefing · Light",
+    hint: "Tight decision deck, 8 slides, Enterprise light",
+    templateSet: `${SALES_DECK_LOOKS.light.label} · R01 Corporate`,
     archetypeId: "arch-exec-briefing",
     lengthTarget: 8,
-    stylePackId: "skin-s01",
+    stylePackId: SALES_DECK_LOOKS.light.stylePackId,
+    designRecipeId: "R01",
+    industry: "Corporate / Enterprise",
+  },
+  {
+    id: "sales-exec-briefing-dark",
+    kind: "deck",
+    label: "Executive briefing · Dark",
+    hint: "Boardroom decision deck on the Enterprise dark look, 8 slides",
+    templateSet: `${SALES_DECK_LOOKS.dark.label} · R01 Corporate`,
+    archetypeId: "arch-exec-briefing",
+    lengthTarget: 8,
+    stylePackId: SALES_DECK_LOOKS.dark.stylePackId,
     designRecipeId: "R01",
     industry: "Corporate / Enterprise",
   },
