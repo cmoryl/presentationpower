@@ -12,6 +12,7 @@ import {
   type ApprovalCheck,
   type ApprovalSubjectType,
 } from "@/lib/brand-approvals.functions";
+import { ApprovalTimeline } from "@/components/approvals/ApprovalTimeline";
 
 export type ApprovalGateProps = {
   subjectType: ApprovalSubjectType;
@@ -74,6 +75,7 @@ export function ApprovalGate(props: ApprovalGateProps) {
       setNote("");
       void qc.invalidateQueries({ queryKey: key });
       void qc.invalidateQueries({ queryKey: ["approval-queue"] });
+      void qc.invalidateQueries({ queryKey: ["approval-timeline"] });
       toast.success("Sent for brand review");
     },
     onError: (e: Error) =>
@@ -138,6 +140,7 @@ export function ApprovalGate(props: ApprovalGateProps) {
           className="mt-3 w-full rounded-full border border-foreground/15 bg-background px-3 py-1.5 text-sm"
         />
       )}
+      <ApprovalTimeline subjectType={props.subjectType} subjectId={props.subjectId} />
     </div>
   );
 }

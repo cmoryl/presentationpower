@@ -59,6 +59,7 @@ export const requestApproval = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { logApprovalEvent } = await import("./approval-events.server");
 
     // Re-submitting the same item reopens the existing request so the comment
     // thread and history stay in one place.
@@ -84,12 +85,24 @@ export const requestApproval = createServerFn({ method: "POST" })
       decision_note: null,
     };
 
+    const blocking = (data.checks ?? []).filter((c) => c.severity === "blocking").length;
+    const warnings = (data.checks ?? []).filter((c) => c.severity === "warning").length;
+
     if (existing) {
       const { error } = await supabase
         .from("approval_requests")
         .update(patch)
         .eq("id", existing.id);
       if (error) throw new Error(error.message);
+      await logApprovalEvent(supabase, {
+        requestId: existing.id,
+        actorId: userId,
+        kind: "resubmitted",
+        fromStatus: existing.status,
+        toStatus: "pending",
+        note: data.summary ?? null,
+        meta: { blocking, warnings, title: data.title.trim() },
+      });
       await (await import("./notify-approvals.server")).notifyReviewers(
         existing.id,
         data.title.trim(),
@@ -109,6 +122,14 @@ export const requestApproval = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await logApprovalEvent(supabase, {
+      requestId: row.id,
+      actorId: userId,
+      kind: "submitted",
+      toStatus: "pending",
+      note: data.summary ?? null,
+      meta: { blocking, warnings, title: data.title.trim() },
+    });
     await (await import("./notify-approvals.server")).notifyReviewers(
       row.id,
       data.title.trim(),
@@ -116,6 +137,7 @@ export const requestApproval = createServerFn({ method: "POST" })
     );
     return { id: row.id, reopened: false as const };
   });
+
 
 /** The reviewer queue. Reviewers see everything; others see their own submissions. */
 export const listApprovalRequests = createServerFn({ method: "POST" })
@@ -240,6 +262,12 @@ export const decideApproval = createServerFn({ method: "POST" })
     const { isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
 
+    const { data: before } = await supabase
+      .from("approval_requests")
+      .select("status")
+      .eq("id", data.id)
+      .maybeSingle();
+
     const decided = data.status !== "pending";
     const { error } = await supabase
       .from("approval_requests")
@@ -251,6 +279,20 @@ export const decideApproval = createServerFn({ method: "POST" })
       })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+
+    await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+      requestId: data.id,
+      actorId: userId,
+      kind:
+        data.status === "approved"
+          ? "approved"
+          : data.status === "changes_requested"
+            ? "changes_requested"
+            : "reopened",
+      fromStatus: before?.status ?? null,
+      toStatus: data.status,
+      note: data.note?.trim() || null,
+    });
 
     if (data.note?.trim()) {
       await supabase.from("approval_comments").insert({
@@ -265,6 +307,7 @@ export const decideApproval = createServerFn({ method: "POST" })
         }] ${data.note.trim()}`,
       });
     }
+
     await (await import("./notify-approvals.server")).notifyRequesters(
       [data.id],
       data.status === "approved" ? "approved" : "changes_requested",
@@ -293,6 +336,13 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       .eq("user_id", userId);
     const { isReviewer } = flagsFromRoles(roleRows as RoleRow[] | null);
     if (!isReviewer) throw new Error("Forbidden: reviewer role required");
+    const { data: before } = await supabase
+      .from("approval_requests")
+      .select("id, status")
+      .in("id", data.ids);
+    const priorStatus = Object.fromEntries(
+      (before ?? []).map((r) => [r.id, r.status as string]),
+    );
     const { error } = await supabase
       .from("approval_requests")
       .update({
@@ -303,6 +353,19 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })
       .in("id", data.ids);
     if (error) throw new Error(error.message);
+    await (await import("./approval-events.server")).logApprovalEvents(
+      supabase,
+      data.ids.map((id) => ({
+        requestId: id,
+        actorId: userId,
+        kind: data.status === "approved" ? ("approved" as const) : ("changes_requested" as const),
+        fromStatus: priorStatus[id] ?? null,
+        toStatus: data.status,
+        note: data.note?.trim() || null,
+        meta: { bulk: true },
+      })),
+    );
+
     await (await import("./notify-approvals.server")).notifyRequesters(
       data.ids,
       data.status,
@@ -352,6 +415,13 @@ export const postApprovalComment = createServerFn({ method: "POST" })
       body: data.body.trim(),
     });
     if (error) throw new Error(error.message);
+    await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+      requestId: data.requestId,
+      actorId: userId,
+      kind: "comment",
+      note: data.body.trim(),
+    });
+
     await (await import("./notify-approvals.server")).notifyThread(
       data.requestId,
       userId,
@@ -373,4 +443,67 @@ export const resolveApprovalComment = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+// ---------- Audit timeline ----------
+
+export type ApprovalTimelineEvent = {
+  id: string;
+  kind: string;
+  from_status: string | null;
+  to_status: string | null;
+  note: string | null;
+  actor_id: string | null;
+  created_at: string;
+  meta: Record<string, string | number | boolean | null> | null;
+};
+
+/**
+ * Full audit trail for one subject (e.g. a deck): every state change, reviewer
+ * action and decision note, oldest first. Returns an empty list when the item
+ * has never been submitted.
+ */
+export const listApprovalTimeline = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((raw: unknown) =>
+    z.object({ subjectType: SubjectType, subjectId: z.string().min(1).max(200) }).parse(raw),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: req } = await supabase
+      .from("approval_requests")
+      .select("id, status, title, created_at, requested_by")
+      .eq("subject_type", data.subjectType)
+      .eq("subject_id", data.subjectId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (!req) return {
+        request: null,
+        events: [] as ApprovalTimelineEvent[],
+        people: {} as Record<string, string>,
+      };
+
+    const { data: rows, error } = await supabase
+      .from("approval_events")
+      .select("id, kind, from_status, to_status, note, actor_id, created_at, meta")
+      .eq("request_id", req.id)
+      .order("created_at", { ascending: true })
+      .returns<ApprovalTimelineEvent[]>();
+    if (error) throw new Error(error.message);
+
+    const ids = Array.from(
+      new Set(
+        [req.requested_by, ...(rows ?? []).map((r) => r.actor_id)].filter(Boolean) as string[],
+      ),
+    );
+    let people: Record<string, string> = {};
+    if (ids.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .in("id", ids);
+      people = Object.fromEntries((profs ?? []).map((p) => [p.id, p.display_name ?? "Member"]));
+    }
+    return { request: req, events: rows ?? [], people };
   });
