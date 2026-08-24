@@ -20,6 +20,10 @@ import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-ap
 import { useDivisionSeed } from "@/lib/division-seeds";
 import { printTypeMeta } from "@/lib/print-library/catalog";
 import { parseLook } from "@/lib/print-library/look";
+import {
+  approvePrintDemoContent,
+  approvePrintDemoLook,
+} from "@/lib/print-library/demo-approve";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";
@@ -95,10 +99,13 @@ function PrintDemoPage() {
 
   // Rendered comp inputs: division-seeded content through the real layout, with
   // the master's pinned look & feel so the demo matches the editable copy.
+  // The hero band is clamped to the capacity-safe max so the piece is inside
+  // its trim on FIRST paint — an approved demo never loads over-filled.
   const previewContent = useMemo(() => {
     if (!item) return null;
     const base = toEditableContent(item);
-    return base ? applyDivisionSeedToContent(base, seed) : null;
+    if (!base) return null;
+    return approvePrintDemoContent(item.kind, applyDivisionSeedToContent(base, seed));
   }, [item, seed]);
 
   // Live draft: every copy edit re-renders the real print layout below and is
@@ -111,18 +118,20 @@ function PrintDemoPage() {
   );
   const renderKey = dirty ? "edited" : "base";
 
-  // Layout studio state — the pinned master look is the starting point, then the
-  // studio panel can retune trim, density and auto-fit live on this page.
+  // Layout studio state — the pinned master look, normalized to an approved
+  // starting state (auto content-fit on, density relaxed if still over budget),
+  // then retunable live from the studio panel.
   const baseLook = useMemo<DemoLook>(() => {
-    const pinned = item ? (parseLook(item.look) ?? {}) : {};
-    return {
-      pageSize: pinned.pageSize ?? "Letter",
-      density: pinned.density ?? "standard",
-      fit: false,
-    };
-  }, [item]);
+    if (!item) return { pageSize: "Letter", density: "standard", fit: true };
+    const pinned = parseLook(item.look) ?? {};
+    return approvePrintDemoLook(item.kind, previewContent, {
+      ...(pinned.pageSize ? { pageSize: pinned.pageSize } : {}),
+      ...(pinned.density ? { density: pinned.density } : {}),
+    });
+  }, [item, previewContent]);
   const [look, setLook] = useState<DemoLook>(baseLook);
   useEffect(() => setLook(baseLook), [baseLook]);
+
 
   if (!def || !item) return null;
   const previewBrand =
