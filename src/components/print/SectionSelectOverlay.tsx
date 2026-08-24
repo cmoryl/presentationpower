@@ -79,8 +79,16 @@ export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, scanKey }
     [sections, selectedKey],
   );
 
+  // Authoring-only: never measured, decomposed, or rasterized into a PDF /
+  // PNG / PPTX export. Both markers are checked by the export suppressor.
+  if (isExportingChrome()) return null;
+
   return (
-    <div className="pointer-events-none absolute inset-0 z-30">
+    <div
+      data-export-ignore="true"
+      data-editing-chrome
+      className="pointer-events-none absolute inset-0 z-30 print:hidden"
+    >
       {sections.map((s) => {
         const isActive = s.key === selectedKey;
         const isHover = s.key === hoverKey;
