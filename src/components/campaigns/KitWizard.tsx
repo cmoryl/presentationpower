@@ -1070,7 +1070,9 @@ export function KitWizard({
                             : [];
                         }}
                       />
+                      </div>
                     </div>
+
                     <div className="relative min-w-0">
                       <div
                         data-kit-asset-id={asset.id}
