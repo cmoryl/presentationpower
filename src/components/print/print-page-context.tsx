@@ -55,11 +55,19 @@ export function PrintPageProvider({
   size = "Letter",
   margin = "standard",
   density = "standard",
+  heightPx: heightPxOverride,
+  heroBandPct: heroBandPctOverride,
   children,
 }: {
   size?: PrintPageSize;
   margin?: PrintMarginPreset;
   density?: PrintDensity;
+  /** Override the virtual sheet height in template px. Social frames use this
+   *  so band-height modules follow the frame's aspect instead of a Letter page
+   *  (which is what left square posts half empty). */
+  heightPx?: number;
+  /** Override the default masthead band share of page height. */
+  heroBandPct?: number;
   children: ReactNode;
 }) {
   const value = useMemo<PrintPageContextValue>(
@@ -68,12 +76,13 @@ export function PrintPageProvider({
       margin,
       density,
       preset: pagePreset(size),
-      heightPx: pageHeightPx(size),
+      heightPx: heightPxOverride ?? pageHeightPx(size),
       sideMarginPx: pageSideMarginPx(size, density, margin),
       topMarginPx: pageTopMarginPx(size, density, margin),
-      heroBandPct: heroBandPct(size),
+      heroBandPct: heroBandPctOverride ?? heroBandPct(size),
     }),
-    [size, margin, density],
+    [size, margin, density, heightPxOverride, heroBandPctOverride],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
+
