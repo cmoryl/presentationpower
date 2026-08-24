@@ -4,6 +4,7 @@
 // but stops propagation on its own controls so text editing still works.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Trash2, Replace, X } from "lucide-react";
+import { isExportingChrome } from "@/lib/export-chrome-suppress";
 
 export type SectionAction = "delete" | "replace";
 
@@ -86,7 +87,7 @@ export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, scanKey }
   return (
     <div
       data-export-ignore="true"
-      data-editing-chrome
+      data-editing-chrome="true"
       className="pointer-events-none absolute inset-0 z-30 print:hidden"
     >
       {sections.map((s) => {
