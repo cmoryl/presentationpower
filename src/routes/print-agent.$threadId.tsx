@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { UIMessage } from "ai";
 import { toast } from "sonner";
 import { Plus, Printer, Trash2 } from "lucide-react";
+import { consumeAgentPrompt } from "@/lib/agent-seed";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useSessionUser } from "@/hooks/use-session-user";
@@ -57,6 +58,13 @@ function PrintAgentThreadPage() {
   const [assetId, setAssetId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
+
+  // Pick up a prompt handed off from a hero / quick-start CTA.
+  useEffect(() => {
+    const seed = consumeAgentPrompt("print");
+    if (seed) setPending(seed);
+  }, []);
+
 
   const refreshThreads = useCallback(() => {
     listPrintThreads()

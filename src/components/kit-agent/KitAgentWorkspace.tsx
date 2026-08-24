@@ -8,6 +8,7 @@ import { CalendarDays, Megaphone, Plus, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { useSessionUser } from "@/hooks/use-session-user";
+import { consumeAgentPrompt } from "@/lib/agent-seed";
 import { KitAgentChat } from "./KitAgentChat";
 import {
   createKitThread,
@@ -82,6 +83,13 @@ export function KitAgentWorkspace({
   const [kitId, setKitId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<string | null>(null);
+
+  // Pick up a prompt handed off from a hero / quick-start CTA.
+  useEffect(() => {
+    const seed = consumeAgentPrompt(surface === "social" ? "social" : "event");
+    if (seed) setPending(seed);
+  }, []);
+
 
   const refreshThreads = useCallback(() => {
     listKitThreads(surface)
