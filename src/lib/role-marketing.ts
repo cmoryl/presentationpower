@@ -25,6 +25,24 @@ export type RoleStep = {
   body: string;
 };
 
+/** One captioned beat of the 30-second role film. */
+export type RoleDemoChapter = {
+  /** Seek position in seconds inside the film. */
+  at: number;
+  title: string;
+  body: string;
+};
+
+export type RoleDemo = {
+  eyebrow: string;
+  title: string;
+  sub: string;
+  /** Spoken-word length of the film, shown as a badge. */
+  runtime: string;
+  chapters: readonly [RoleDemoChapter, RoleDemoChapter, RoleDemoChapter];
+};
+
+
 export type RoleFaq = {
   q: string;
   a: string;
@@ -49,7 +67,12 @@ export type RoleMarketing = {
   plate: "presentation" | "print" | "event" | "social";
   /** Five brick captions for the Element motif under the hero. */
   bricks: readonly [string, string, string, string, string];
+  /** Legacy proof numbers. Kept for data reference; the hero no longer shows a
+   *  stat band — the 30-second film carries the proof instead. */
   stats: readonly RoleStat[];
+  /** The 30-second on-brand process film for this role. */
+  demo: RoleDemo;
+
   featureKicker: string;
   featureTitle: string;
   features: readonly RoleFeature[];
@@ -75,6 +98,29 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
     secondary: { label: "Tour Template Studio", to: "/admin/templates" },
     plate: "presentation",
     bricks: ["Templates", "Modules", "Imagery", "Guardrails", "Exports"],
+    demo: {
+      eyebrow: "30-second film",
+      title: "Watch the system get set",
+      sub: "Three beats, thirty seconds: the look gets defined, the modules get approved, and every downstream asset inherits both without anyone asking.",
+      runtime: "0:30",
+      chapters: [
+        {
+          at: 0,
+          title: "Define the look",
+          body: "Style pack, industry recipe, type floors and background art lock into one governed template set.",
+        },
+        {
+          at: 10,
+          title: "Set the gates",
+          body: "Modules pass a contrast and brand check before they are available to anyone; the rest are held back.",
+        },
+        {
+          at: 19,
+          title: "Publish everywhere",
+          body: "One master change fans out to every deck, brochure, booth panel and post already in flight.",
+        },
+      ],
+    },
     stats: [
       {
         value: "29",
@@ -188,6 +234,29 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
     secondary: { label: "Talk to the social agent", to: "/agent" },
     plate: "social",
     bricks: ["Brief", "Social", "Print", "Events", "Approve"],
+    demo: {
+      eyebrow: "30-second film",
+      title: "Watch a campaign come together",
+      sub: "One brief in, a full cross-channel set out — same look, correct sizes, export-ready in a single pass.",
+      runtime: "0:30",
+      chapters: [
+        {
+          at: 0,
+          title: "Brief it once",
+          body: "A single brief opens the right template set and fills the shapes each channel actually needs.",
+        },
+        {
+          at: 10,
+          title: "Apply one look",
+          body: "Switch the style pack and the whole campaign retints together — decks, print, social, event.",
+        },
+        {
+          at: 19,
+          title: "Ship the set",
+          body: "Layered PowerPoint, print-ready PDF and verified image sets leave as one checked bundle.",
+        },
+      ],
+    },
     stats: [
       {
         value: "4",
@@ -302,6 +371,29 @@ export const ROLE_MARKETING: Record<PersonaId, RoleMarketing> = {
     secondary: { label: "Start from a brief", to: "/brief/new" },
     plate: "presentation",
     bricks: ["Describe", "Generate", "Refine", "Check", "Send"],
+    demo: {
+      eyebrow: "30-second film",
+      title: "Watch a deck get built before the call",
+      sub: "Describe the meeting, let the agent assemble approved modules, send the link — no design queue, nothing off-brand.",
+      runtime: "0:30",
+      chapters: [
+        {
+          at: 0,
+          title: "Describe the meeting",
+          body: "Tell the deck agent who you are meeting and what you need to land; it drafts the narrative.",
+        },
+        {
+          at: 10,
+          title: "Assemble from approved",
+          body: "Only signed-off Enterprise light and dark modules are in play, so the result is on brand by construction.",
+        },
+        {
+          at: 19,
+          title: "Send it",
+          body: "Editable PowerPoint, PDF or a read-only share link with a locale switcher — in minutes, not days.",
+        },
+      ],
+    },
     stats: [
       { value: "5", unit: " min", label: "Brief to pitch deck", foot: "Versus a half-day rebuild" },
       {

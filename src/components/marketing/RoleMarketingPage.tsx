@@ -11,13 +11,16 @@
  * under prefers-reduced-motion.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { ArrowRight, Minus, Plus, Quote } from "lucide-react";
+import { ArrowLeft, ArrowRight, Minus, Plus, Play, Quote } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { BackToTop } from "@/components/BackToTop";
 import { HomeHeroVideo } from "@/components/home/HomeHeroVideo";
+import adminDemo from "@/assets/role-demo-admin.mp4.asset.json";
+import marketingDemo from "@/assets/role-demo-marketing.mp4.asset.json";
+import salesDemo from "@/assets/role-demo-sales.mp4.asset.json";
 import { personaTheme } from "@/lib/persona-theme";
 import { roleMarketing } from "@/lib/role-marketing";
 import { PERSONAS, PERSONA_STORAGE_KEY } from "@/lib/workspace-persona";
@@ -27,6 +30,13 @@ const ROLE_PATH: Record<PersonaId, string> = {
   admin: "/for/admin",
   marketing: "/for/marketing",
   sales: "/for/sales",
+};
+
+/** The 30-second process film for each role. */
+const ROLE_FILM: Record<PersonaId, string> = {
+  admin: adminDemo.url,
+  marketing: marketingDemo.url,
+  sales: salesDemo.url,
 };
 
 function Eyebrow({ color, children }: { color: string; children: React.ReactNode }) {
@@ -80,6 +90,17 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
   const persona = PERSONAS.find((p) => p.id === role);
   const [open, setOpen] = useState<number | null>(0);
   const navigate = useNavigate();
+  const filmRef = useRef<HTMLVideoElement | null>(null);
+
+  /** Jump the film to a chapter and play from there. */
+  function seek(at: number) {
+    const v = filmRef.current;
+    if (!v) return;
+    v.currentTime = at;
+    void v.play().catch(() => {
+      /* autoplay blocked — the frame still moves to the chapter */
+    });
+  }
 
   // The dashboard reads its persona from local storage, so entering the
   // workspace from a role page should pre-select that room.
@@ -119,8 +140,27 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
         />
 
         <div className="relative mx-auto max-w-[1180px] px-4 pb-14 pt-16 sm:pt-24 lg:px-8">
+          {/* Way back out — these pages are reached from the dashboard, so the
+              return path has to be visible without relying on the browser. */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <button
+              type="button"
+              onClick={openWorkspace}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-white/10 px-3.5 text-sm text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+            >
+              <ArrowLeft className="size-3.5" aria-hidden />
+              Back to the {persona?.label ?? role} dashboard
+            </button>
+            <Link
+              to="/"
+              className="text-sm text-white/55 underline-offset-4 transition-colors hover:text-white hover:underline"
+            >
+              Home
+            </Link>
+          </div>
+
           {/* role switch — reads as an advertising ribbon, not app chrome */}
-          <nav aria-label="Element by role" className="flex flex-wrap items-center gap-2">
+          <nav aria-label="Element by role" className="mt-5 flex flex-wrap items-center gap-2">
             {PERSONAS.map((p) => {
               const active = p.id === role;
               return (
@@ -214,28 +254,74 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
             </ul>
           </div>
 
-          {/* proof band, sitting on the hero plate */}
-          <dl className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-white/12 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
-            {copy.stats.map((s, i) => (
-              <div key={s.label} className="bg-[#03002C]/45 p-6 [backdrop-filter:blur(12px)]">
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/55">
-                  {s.label}
-                </dt>
-                <dd className="mt-3">
-                  <span
-                    className="text-4xl font-semibold tracking-[-0.03em]"
-                    style={{ color: theme.bricks[i % theme.bricks.length] }}
-                  >
-                    {s.value}
-                    {s.unit ? (
-                      <span className="text-xl font-medium tracking-normal">{s.unit}</span>
-                    ) : null}
+          {/* No stat band here by design — the 30-second film below carries the
+              proof, so the hero stays a single clear message. */}
+        </div>
+      </section>
+
+
+      {/* ---------------- 30-SECOND FILM ---------------- */}
+      <section className="mx-auto max-w-[1180px] py-16 sm:py-20">
+        <SectionHead
+          kicker={copy.demo.eyebrow}
+          title={copy.demo.title}
+          sub={copy.demo.sub}
+          ink={theme.ink}
+          accent={theme.accent}
+        />
+        <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)] lg:items-start">
+          <figure
+            className="relative overflow-hidden rounded-3xl border border-black/10 dark:border-white/12"
+            style={{ background: theme.base }}
+          >
+            <video
+              ref={filmRef}
+              src={ROLE_FILM[role]}
+              className="block aspect-video w-full"
+              controls
+              playsInline
+              muted
+              loop
+              preload="auto"
+              aria-label={`${persona?.label ?? role} process film — ${copy.demo.title}`}
+            />
+            <figcaption
+              className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
+              style={{ background: `${theme.base}CC`, color: theme.accent }}
+            >
+              <Play className="size-3" aria-hidden />
+              {copy.demo.runtime}
+            </figcaption>
+          </figure>
+
+          <ol className="grid gap-3">
+            {copy.demo.chapters.map((c, i) => (
+              <li key={c.title}>
+                <button
+                  type="button"
+                  onClick={() => seek(c.at)}
+                  className="group w-full rounded-3xl border border-black/10 bg-white p-5 pl-6 text-left transition-[transform,border-color] hover:-translate-y-0.5 hover:border-black/25 dark:border-white/12 dark:bg-white/[0.04] dark:hover:border-white/30"
+                >
+                  <span className="flex items-center gap-3">
+                    <span
+                      aria-hidden
+                      className="size-3 shrink-0 rounded-[4px]"
+                      style={{ background: theme.bricks[i % theme.bricks.length] }}
+                    />
+                    <span className="font-mono text-[11px] text-black/45 dark:text-white/45">
+                      {`0:${String(c.at).padStart(2, "0")}`}
+                    </span>
+                    <span className="min-w-0 flex-1 text-base font-semibold tracking-tight">
+                      {c.title}
+                    </span>
                   </span>
-                  <span className="mt-2 block text-xs text-white/55">{s.foot}</span>
-                </dd>
-              </div>
+                  <span className="mt-2 block text-sm leading-[1.55] text-black/62 dark:text-white/62">
+                    {c.body}
+                  </span>
+                </button>
+              </li>
             ))}
-          </dl>
+          </ol>
         </div>
       </section>
 
