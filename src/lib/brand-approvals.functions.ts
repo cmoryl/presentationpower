@@ -90,6 +90,11 @@ export const requestApproval = createServerFn({ method: "POST" })
         .update(patch)
         .eq("id", existing.id);
       if (error) throw new Error(error.message);
+      await (await import("./notify-approvals.server")).notifyReviewers(
+        existing.id,
+        data.title.trim(),
+        userId,
+      );
       return { id: existing.id, reopened: true as const };
     }
 
@@ -104,6 +109,11 @@ export const requestApproval = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await (await import("./notify-approvals.server")).notifyReviewers(
+      row.id,
+      data.title.trim(),
+      userId,
+    );
     return { id: row.id, reopened: false as const };
   });
 
@@ -255,6 +265,12 @@ export const decideApproval = createServerFn({ method: "POST" })
         }] ${data.note.trim()}`,
       });
     }
+    await (await import("./notify-approvals.server")).notifyRequesters(
+      [data.id],
+      data.status === "approved" ? "approved" : "changes_requested",
+      userId,
+      data.note?.trim() || null,
+    );
     return { ok: true, status: data.status };
   });
 
@@ -287,6 +303,12 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })
       .in("id", data.ids);
     if (error) throw new Error(error.message);
+    await (await import("./notify-approvals.server")).notifyRequesters(
+      data.ids,
+      data.status,
+      userId,
+      data.note?.trim() || null,
+    );
     return { ok: true, count: data.ids.length };
   });
 
@@ -330,6 +352,11 @@ export const postApprovalComment = createServerFn({ method: "POST" })
       body: data.body.trim(),
     });
     if (error) throw new Error(error.message);
+    await (await import("./notify-approvals.server")).notifyThread(
+      data.requestId,
+      userId,
+      data.body.trim(),
+    );
     return { ok: true };
   });
 
