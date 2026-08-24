@@ -314,11 +314,26 @@ export async function exportPrintAssetAsPdf(
   const vectorText = opts.vectorText ?? !isDigital;
   const captures: VectorTextCapture[] = [];
 
+  // --- progress -------------------------------------------------------------
+  // Page rasterization owns 0 → 0.88 of the bar; the overlay/X-4/write tail
+  // owns the rest. Per-page capture progress is folded into that page's slice
+  // so the bar only ever moves forward, and the message always names the page
+  // being worked on (multi-page exports otherwise looked frozen for minutes).
+  const emit = (progress: number, message: string, stage: "render" | "encode" | "done" = "render") =>
+    opts.onProgress?.({ stage, progress: Math.max(0, Math.min(1, progress)), message });
+  const pageSpan = 0.88 / pages.length;
+  const pageLabel = (i: number) =>
+    pages.length === 1 ? "page" : `page ${i + 1} of ${pages.length}`;
+  emit(0.02, pages.length === 1 ? "Preparing the page…" : `Preparing ${pages.length} pages…`);
+
   for (let i = 0; i < pages.length; i++) {
+    const pageStart = 0.02 + i * pageSpan;
+    emit(pageStart, `Rendering ${pageLabel(i)}…`);
     if (i > 0) pdf.addPage([pageWidth, pageHeight], orientation);
     const pageNode = pages[i]!;
 
     // PASS A — raster with text hidden (vector) or full raster (digital).
+
     let restoreHide: (() => void) | null = null;
     if (vectorText) {
       // Snapshot vector-text positions BEFORE hiding text so line breaks are
@@ -347,9 +362,15 @@ export async function exportPrintAssetAsPdf(
         captureSlideAsDataUrl(pageNode, {
           mode: opts.mode ?? "light",
           targetWidth: trimWidthPx,
-          onProgress: opts.onProgress,
+          // Fold this page's capture progress into its slice of the bar.
+          onProgress: (p) =>
+            emit(
+              pageStart + pageSpan * 0.8 * Math.max(0, Math.min(1, p.progress ?? 0)),
+              `${p.message ? p.message.replace(/…$/, "") : "Rendering"} — ${pageLabel(i)}…`,
+            ),
         }),
       );
+      emit(pageStart + pageSpan * 0.85, `Placing ${pageLabel(i)} in the PDF…`);
       if (isDigital) {
         // No bleed on digital by definition — trim IS the page.
         const jpegDataUrl = await pngDataUrlToJpeg(
@@ -371,10 +392,12 @@ export async function exportPrintAssetAsPdf(
       if (cropMarks && bleed > 0) {
         drawCropMarks(pdf, pageWidth, pageHeight, bleed);
       }
+      emit(pageStart + pageSpan, `Finished ${pageLabel(i)}`);
     } finally {
       restoreHide?.();
     }
   }
+
 
   if (bleedApproximated) {
     console.warn(
@@ -388,7 +411,9 @@ export async function exportPrintAssetAsPdf(
     opts.filename ?? `print-asset-${opts.pageSize.toLowerCase()}-${format}-${Date.now()}.pdf`;
 
   // Serialize raster PDF once so we can chain vector overlay → X-4 wrap.
+  emit(0.9, "Writing the PDF file…", "encode");
   const rasterBytesArr = new Uint8Array(pdf.output("arraybuffer"));
+
 
   // PASS B — vector-text overlay.
   let workingBytes: Uint8Array = rasterBytesArr;
@@ -402,7 +427,9 @@ export async function exportPrintAssetAsPdf(
     skippedClamped: captures.reduce((n, c) => n + c.stats.skippedClamped, 0),
   };
   if (vectorText && captures.length > 0) {
+    emit(0.93, "Embedding selectable text…", "encode");
     try {
+
       const overlay = await overlayVectorText(workingBytes, {
         pageWidthIn: pageWidth,
         pageHeightIn: pageHeight,
@@ -430,6 +457,7 @@ export async function exportPrintAssetAsPdf(
     if (!opts.iccProfile) {
       throw new Error("press-x4 export requires an `iccProfile` option.");
     }
+    emit(0.96, "Applying the press colour profile…", "encode");
     const iccBytes = await fetchIccProfile(opts.iccProfile);
     const x4Bytes = await wrapPdfAsX4(workingBytes, {
       trimSize: { widthIn: trim.widthIn, heightIn: trim.heightIn },
@@ -438,14 +466,18 @@ export async function exportPrintAssetAsPdf(
       iccProfileName: opts.iccProfile,
       title: opts.filename,
     });
+    emit(0.99, "Saving the file…", "encode");
     emitPdf(x4Bytes, filename, opts);
   } else {
     // press / digital paths — ship the overlaid bytes so vector text
     // survives on non-X4 exports too. Digital bypasses overlay above so
     // `workingBytes === rasterBytesArr` in that case.
+    emit(0.99, "Saving the file…", "encode");
     emitPdf(workingBytes, filename, opts);
   }
+  emit(1, "Saved", "done");
 }
+
 
 /** Convert a PNG data URL to a JPEG data URL with a mode-appropriate flat
  *  background so transparent pixels don't come out black. Runs in-browser. */

@@ -278,6 +278,11 @@ function AssetEditor() {
   const [fitMeasure, setFitMeasure] = useState<PrintFitMeasurement | null>(null);
   const [exportOpen, setExportOpen] = useState(false);
   const [exportBusy, setExportBusy] = useState(false);
+  // Live export progress (0..1 + stage message) shown while a PDF/PPTX renders.
+  const [exportProgress, setExportProgress] = useState<{ pct: number; message: string } | null>(
+    null,
+  );
+
   // Export panel state — hydrated from ctx.exportPrefs on load, then mirrored
   // back to ctx on every change via updateExportPref so a user's preset
   // survives reload and can be duplicated with the asset.
@@ -844,9 +849,19 @@ function AssetEditor() {
     }
   }
 
+  /** Feeds the export progress bar from an exporter's stage callbacks. */
+  function reportExportProgress(p: { stage: string; progress?: number; message?: string }) {
+    const pct = Math.max(0, Math.min(1, typeof p.progress === "number" ? p.progress : 0));
+    setExportProgress({
+      pct: p.stage === "done" ? 1 : pct,
+      message: p.message || (p.stage === "done" ? "Saved" : "Working…"),
+    });
+  }
+
   async function handleExportPdf() {
     if (!canvasRef.current) return;
     setExportBusy(true);
+    setExportProgress({ pct: 0.02, message: "Preparing pages…" });
     try {
       const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
       const suffix =
@@ -868,6 +883,7 @@ function AssetEditor() {
         format: exportFormat,
         iccProfile: exportFormat === "press-x4" ? iccProfile : undefined,
         filename: `${safeTitle}-${exportSize.toLowerCase()}-${suffix}.pdf`,
+        onProgress: reportExportProgress,
         onQualityClamp: (info) => {
           alert(
             `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
@@ -875,11 +891,13 @@ function AssetEditor() {
           );
         },
       });
+      toast.success("PDF saved to your downloads");
       setExportOpen(false);
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
     } finally {
       setExportBusy(false);
+      setExportProgress(null);
     }
   }
 
@@ -887,6 +905,7 @@ function AssetEditor() {
   async function handleExportPptx() {
     if (!canvasRef.current) return;
     setExportBusy(true);
+    setExportProgress({ pct: 0.02, message: "Preparing pages…" });
     try {
       const safeTitle = (row?.title ?? "print-asset").replace(/[^a-z0-9-_]+/gi, "-").toLowerCase();
       const pageNodes = Array.from(
@@ -899,14 +918,18 @@ function AssetEditor() {
         mode: exportMode,
         title: row?.title ?? "Print asset",
         filename: `${safeTitle}.pptx`,
+        onProgress: reportExportProgress,
       });
+      toast.success("PowerPoint saved to your downloads");
       setExportOpen(false);
     } catch (e) {
       alert(`Export failed: ${(e as Error).message}`);
     } finally {
       setExportBusy(false);
+      setExportProgress(null);
     }
   }
+
 
   // Multi-page proposals render every page stacked inside the canvas, so the
   // canvas cannot be pinned to a single page aspect ratio.
@@ -1221,11 +1244,49 @@ function AssetEditor() {
                     )}
                   </div>
 
+                  {/* Live export progress — rasterizing a print page can take
+                      tens of seconds per page, so show real stages, not a
+                      frozen button label. */}
+                  {exportBusy && (
+                    <div className="mt-3 rounded-xl border border-black/10 bg-white p-2.5 dark:border-white/15 dark:bg-white/[0.04]">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[11px] font-semibold text-[#03002C] dark:text-white">
+                          Building your file
+                        </span>
+                        <span className="text-[11px] font-medium text-[#003FC7] tabular-nums dark:text-[#A1FBF9]">
+                          {Math.round((exportProgress?.pct ?? 0) * 100)}%
+                        </span>
+                      </div>
+                      <div
+                        className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#E0E8F5] dark:bg-white/15"
+                        role="progressbar"
+                        aria-label="Export progress"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={Math.round((exportProgress?.pct ?? 0) * 100)}
+                      >
+                        <div
+                          className="h-full rounded-full bg-[#003FC7] transition-[width] duration-300 ease-out dark:bg-[#A1FBF9]"
+                          style={{
+                            width: `${Math.max(3, Math.round((exportProgress?.pct ?? 0) * 100))}%`,
+                          }}
+                        />
+                      </div>
+                      <p
+                        className="mt-1.5 text-[11px] leading-snug text-black/60 dark:text-white/60"
+                        aria-live="polite"
+                      >
+                        {exportProgress?.message ?? "Preparing pages…"}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="mt-3 flex items-center justify-end gap-2">
                     <button
                       type="button"
                       onClick={() => setExportOpen(false)}
-                      className="rounded-full px-3 py-1 text-[11px] text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white"
+                      disabled={exportBusy}
+                      className="rounded-full px-3 py-1 text-[11px] text-black/60 hover:text-black disabled:opacity-40 dark:text-white/60 dark:hover:text-white"
                     >
                       Cancel
                     </button>
@@ -1235,7 +1296,9 @@ function AssetEditor() {
                       disabled={exportBusy}
                       className="rounded-full border border-black/15 bg-white px-3 py-1.5 text-[11px] font-semibold text-[#03002C] disabled:opacity-40 dark:border-white/20 dark:bg-white/[0.06] dark:text-white"
                     >
-                      {exportBusy ? "Rendering…" : "Download PPTX"}
+                      {exportBusy
+                        ? `Rendering… ${Math.round((exportProgress?.pct ?? 0) * 100)}%`
+                        : "Download PPTX"}
                     </button>
                     <button
                       type="button"
@@ -1243,9 +1306,12 @@ function AssetEditor() {
                       disabled={exportBusy}
                       className="rounded-full bg-[#03002C] px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-[#03002C]"
                     >
-                      {exportBusy ? "Rendering…" : "Download PDF"}
+                      {exportBusy
+                        ? `Rendering… ${Math.round((exportProgress?.pct ?? 0) * 100)}%`
+                        : "Download PDF"}
                     </button>
                   </div>
+
                 </div>
               )}
             </div>
