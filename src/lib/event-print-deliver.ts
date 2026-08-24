@@ -130,10 +130,14 @@ async function platePng(
   if (clamped) scale = MAX_PLATE_EDGE_PX / Math.max(item.width, item.height);
   scale = Math.max(0.5, scale);
 
-  const restore = suppressPreviewChrome(item.node);
+  // The review card scales the frame with a CSS transform on a wrapper; capture
+  // the native-size frame itself so the artwork fills the plate.
+  const frame =
+    item.node.querySelector<HTMLElement>("[data-kit-asset-frame='true']") ?? item.node;
+  const restore = suppressPreviewChrome(frame);
   try {
     const canvas = await captureAssetCanvas(
-      { node: item.node, width: item.width, height: item.height, label: item.spec.label },
+      { node: frame, width: item.width, height: item.height, label: item.spec.label },
       { scale, background: "#ffffff" },
     );
     if (!(canvas.width > 0 && canvas.height > 0)) throw new Error("capture produced no pixels");
