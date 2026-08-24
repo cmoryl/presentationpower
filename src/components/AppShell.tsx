@@ -19,6 +19,8 @@ function matchesAdminLinked(pathname: string): boolean {
   return ADMIN_LINKED_PATTERNS.some((re) => re.test(pathname));
 }
 
+import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
+
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const locSearch = useRouterState({ select: (s) => s.location.searchStr });
@@ -80,6 +82,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [pathname, inAdmin, isAdminLinked]);
 
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
+  const caps = useWorkspaceCapabilities();
+  const createOnly = caps.createOnly;
+
   const nav = [
     { to: "/", label: "Home" },
     { to: "/dashboard", label: "Dashboard" },
@@ -91,8 +96,11 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/admin", label: "Admin" },
   ] as const;
 
-  // Hide the Home link when the user is already on the homepage.
-  const visibleNav = nav.filter((n) => !(n.to === "/" && pathname === "/"));
+  // Hide the Home link when the user is already on the homepage, and hide the
+  // Admin entry entirely from create-only (sales enablement) accounts.
+  const visibleNav = nav.filter(
+    (n) => !(n.to === "/" && pathname === "/") && !(createOnly && n.to === "/admin"),
+  );
 
   // Elements mega-menu: the four output channels and their sub-options.
   const elementGroups: ReadonlyArray<{
@@ -145,6 +153,17 @@ export function AppShell({ children }: { children: ReactNode }) {
       ],
     },
   ];
+
+  // Authoring surfaces are removed from the Elements menu for create-only
+  // accounts — they build from approved templates, not the system itself.
+  const visibleElementGroups = createOnly
+    ? elementGroups.map((g) => ({
+        ...g,
+        items: g.items.filter(
+          (i) => !i.to.startsWith("/admin") && i.to !== "/library/print/modules",
+        ),
+      }))
+    : elementGroups;
 
   const adminGroups: ReadonlyArray<{
     label: string;
@@ -295,7 +314,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               if (n.to === "/elements") {
                 const elementsActive =
                   pathname === "/elements" ||
-                  elementGroups.some((g) =>
+                  visibleElementGroups.some((g) =>
                     g.items.some((s) => pathname === s.to || pathname.startsWith(s.to + "/")),
                   );
                 return (
@@ -320,7 +339,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     {presOpen && (
                       <div className="absolute left-1/2 top-full z-50 w-[760px] max-w-[94vw] -translate-x-1/2 pt-2">
                         <div className="grid grid-cols-2 gap-1 overflow-hidden rounded-2xl border border-white/50 bg-white/70 p-3 [backdrop-filter:blur(28px)_saturate(180%)] shadow-[inset_0_1px_0_0_rgba(255,255,255,1),0_20px_60px_-15px_rgba(11,42,74,0.35)] sm:grid-cols-4 dark:!border-white/10 dark:!bg-[#0B0A2A]/80 dark:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1),0_20px_60px_-15px_rgba(0,0,0,0.8)]">
-                          {elementGroups.map((g) => (
+                          {visibleElementGroups.map((g) => (
                             <div key={g.label} className="min-w-0">
                               <Link
                                 to={g.to}
@@ -474,7 +493,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
               {[
                 ...(visibleNav.some((n) => n.to === "/elements")
-                  ? [{ title: "Elements", groups: elementGroups }]
+                  ? [{ title: "Elements", groups: visibleElementGroups }]
                   : []),
                 ...(visibleNav.some((n) => n.to === "/admin")
                   ? [{ title: "Admin", groups: adminGroups }]

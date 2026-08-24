@@ -158,12 +158,58 @@ const MARKETING: readonly QuickCreatePreset[] = [
   },
 ];
 
+/**
+ * Admin-level preset template sets. These are *not* available to sales
+ * enablement users; an admin browsing the Sales workspace can start from them
+ * on a sales user's behalf.
+ */
+const SALES_ADMIN_EXTRAS: readonly QuickCreatePreset[] = [
+  {
+    id: "sales-admin-industry-pitch",
+    kind: "deck",
+    label: "Industry pitch (admin preset)",
+    hint: "Vertical-specific narrative on a premium look, 14 slides",
+    templateSet: "Element System · R21 Media & Entertainment",
+    archetypeId: "arch-product-pitch",
+    lengthTarget: 14,
+    stylePackId: "skin-s29",
+    designRecipeId: "R21",
+    industry: "Media / Entertainment",
+  },
+  {
+    id: "sales-admin-msa",
+    kind: "print",
+    label: "MSA / partnership brief (admin preset)",
+    hint: "Contract-grade partnership piece",
+    templateSet: "MSA & partnership master",
+    printKind: "msa-partnership",
+  },
+  {
+    id: "sales-admin-ebrochure",
+    kind: "print",
+    label: "e-Brochure (admin preset)",
+    hint: "Multi-page collateral on the CMYK contract",
+    templateSet: "e-Brochure master",
+    printKind: "ebrochure",
+  },
+];
+
 /** Presets per persona. Admins get the full system surfaces instead. */
 export const QUICK_CREATE_PRESETS: Record<string, readonly QuickCreatePreset[]> = {
   sales: SALES,
   marketing: MARKETING,
 };
 
-export function quickCreatePresets(personaId: string): readonly QuickCreatePreset[] {
-  return QUICK_CREATE_PRESETS[personaId] ?? [];
+export function quickCreatePresets(
+  personaId: string,
+  opts?: { includeAdminPresets?: boolean },
+): readonly QuickCreatePreset[] {
+  const base = QUICK_CREATE_PRESETS[personaId] ?? [];
+  if (personaId === "sales" && opts?.includeAdminPresets) return [...base, ...SALES_ADMIN_EXTRAS];
+  return base;
+}
+
+/** True when the preset is an admin-only template set. */
+export function isAdminPreset(preset: QuickCreatePreset): boolean {
+  return SALES_ADMIN_EXTRAS.some((p) => p.id === preset.id);
 }
