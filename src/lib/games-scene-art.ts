@@ -1166,12 +1166,12 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
   // contrast — heavier values flattened the art back into a flat navy field.
   const veil =
     mode === "dark"
-      ? "linear-gradient(0deg, rgba(3,0,44,0.20), rgba(3,0,44,0.20))"
-      : "linear-gradient(0deg, rgba(255,255,255,0.26), rgba(255,255,255,0.26))";
+      ? "linear-gradient(0deg, rgba(3,0,44,0.12), rgba(3,0,44,0.12))"
+      : "linear-gradient(0deg, rgba(255,255,255,0.18), rgba(255,255,255,0.18))";
   const scrim =
     mode === "dark"
-      ? "linear-gradient(100deg, rgba(3,0,44,0.46) 0%, rgba(3,0,44,0.10) 56%, rgba(3,0,44,0) 100%)"
-      : "linear-gradient(100deg, rgba(255,255,255,0.56) 0%, rgba(255,255,255,0.12) 56%, rgba(255,255,255,0) 100%)";
+      ? "linear-gradient(100deg, rgba(3,0,44,0.38) 0%, rgba(3,0,44,0.06) 56%, rgba(3,0,44,0) 100%)"
+      : "linear-gradient(100deg, rgba(255,255,255,0.48) 0%, rgba(255,255,255,0.08) 56%, rgba(255,255,255,0) 100%)";
   return {
     ...pack,
     ground: (seed: string) => {
@@ -1179,7 +1179,9 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
       const custom = overrideFor(code, scene);
       if (custom?.imageUrl) return base(seed);
       const takeMatch = /take:(\d+)/i.exec(seed);
-      const take = takeMatch ? parseInt(takeMatch[1]!, 10) : 0;
+      // Without an explicit take, rotate on the rest of the seed (module scene
+      // + layout id) so two slides sharing a scene don't wear the same plate.
+      const take = takeMatch ? parseInt(takeMatch[1]!, 10) : sceneOffset(seed);
       const url = gamesSceneArtUrl(code, scene, take);
       if (!url) return base(seed);
       return [scrim, veil, `url("${url}") center center / cover no-repeat`];
