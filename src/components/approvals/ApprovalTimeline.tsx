@@ -69,10 +69,10 @@ export function ApprovalTimeline(props: {
         aria-expanded={open}
         className="flex w-full items-center justify-between gap-3 text-left"
       >
-        <span className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/50">
+        <span className="min-w-0 truncate text-xs font-semibold uppercase tracking-[0.2em] text-foreground/50">
           Audit timeline
         </span>
-        <span className="text-xs text-foreground/60">
+        <span className="shrink-0 text-xs text-foreground/60">
           {q.isLoading
             ? "Loading…"
             : hasHistory
@@ -112,9 +112,13 @@ export function ApprovalTimeline(props: {
                       className={`absolute left-0 top-1.5 h-2 w-2 rounded-full ${copy.dot}`}
                     />
                     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                      <span className="text-sm font-medium">{copy.label}</span>
-                      <span className="text-xs text-foreground/60">by {actor}</span>
-                      <span className="text-xs text-foreground/45">{when(e.created_at)}</span>
+                      <span className="break-words text-sm font-medium leading-snug">{copy.label}</span>
+                      <span className="min-w-0 truncate text-xs text-foreground/60">
+                        by {actor}
+                      </span>
+                      <span className="shrink-0 text-xs text-foreground/45">
+                        {when(e.created_at)}
+                      </span>
                     </div>
                     {e.from_status && e.to_status && e.from_status !== e.to_status && (
                       <div className="mt-0.5 text-xs text-foreground/55">
@@ -123,7 +127,7 @@ export function ApprovalTimeline(props: {
                     )}
                     {checks && <div className="mt-0.5 text-xs text-foreground/55">{checks}</div>}
                     {e.note && (
-                      <p className="mt-1 rounded-xl bg-foreground/5 px-3 py-2 text-xs text-foreground/75">
+                      <p className="mt-1.5 whitespace-pre-wrap break-words rounded-xl bg-foreground/5 px-3 py-2 text-xs leading-relaxed text-foreground/75">
                         {e.note}
                       </p>
                     )}
