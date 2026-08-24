@@ -177,36 +177,52 @@ function CampaignsView() {
           </div>
         }
       >
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {assets.map((asset) => {
             const brand = BRAND_MODES.find((b) => b.id === asset.brandId);
+            // Every tile is the same size regardless of aspect: scale by the
+            // LONG edge so tall stories and wide banners both fit the box
+            // instead of bleeding over their neighbours.
+            const long = Math.max(asset.format.width, asset.format.height);
+            const short = Math.min(asset.format.width, asset.format.height);
+            const shortEdge = Math.round((PREVIEW_BOX * short) / long);
             return (
-              <div key={asset.id} className="space-y-2">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-widest text-black/50">
-                      {asset.format.label} · {asset.format.width}×{asset.format.height}
-                    </div>
-                    <div className="text-xs text-black/40">
-                      {brand?.name} · {asset.mode} · {aspectClass(asset.format)}
-                    </div>
-                  </div>
+              <figure
+                key={asset.id}
+                className="flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white/70 backdrop-blur"
+              >
+                <div
+                  className="grid place-items-center border-b border-black/[0.06] bg-black/[0.03] p-3"
+                  style={{ height: PREVIEW_BOX + 24 }}
+                >
+                  <SocialRenderer
+                    format={asset.format}
+                    brandId={asset.brandId}
+                    mode={asset.mode}
+                    copy={asset.copy}
+                    facts={{
+                      hashtag: DEMO_EVENT.hashtag,
+                      registrationUrl: DEMO_EVENT.registrationUrl,
+                    }}
+                    displayShortEdge={shortEdge}
+                  />
                 </div>
-                <SocialRenderer
-                  format={asset.format}
-                  brandId={asset.brandId}
-                  mode={asset.mode}
-                  copy={asset.copy}
-                  facts={{
-                    hashtag: DEMO_EVENT.hashtag,
-                    registrationUrl: DEMO_EVENT.registrationUrl,
-                  }}
-                  displayShortEdge={280}
-                />
-              </div>
+                <figcaption className="min-w-0 space-y-1 p-3">
+                  <div className="truncate text-[11px] uppercase tracking-widest text-black/50">
+                    {asset.format.label}
+                  </div>
+                  <div className="truncate text-xs text-black/45">
+                    {asset.format.width}×{asset.format.height} · {aspectClass(asset.format)}
+                  </div>
+                  <div className="truncate text-xs text-black/55">
+                    {brand?.name} · {asset.mode}
+                  </div>
+                </figcaption>
+              </figure>
             );
           })}
         </div>
+
       </AdminSection>
 
       {/* Pipeline stub CTA */}
