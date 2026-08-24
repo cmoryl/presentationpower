@@ -757,6 +757,7 @@ function AgentThreadPage() {
                 onPendingPromptConsumed={clearPendingPrompt}
                 progressContainer={liveCount > 0 && !heroExpanded ? progressEl : null}
               />
+              </>
             )}
           </section>
 
