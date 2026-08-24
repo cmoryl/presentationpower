@@ -125,6 +125,32 @@ function CanvasStudioPage() {
     return () => window.removeEventListener("keydown", onKey);
   }, [undo, redo]);
 
+  /**
+   * RESET TO BLANK — the fastest way out of a messy canvas: drop every layer,
+   * drop the template look (style pack + industry ground) and the selection, so
+   * what's left is a genuinely empty slide. One history entry, so ⌘Z restores
+   * the whole composition.
+   */
+  const resetToBlank = useCallback(() => {
+    const target = compRef.current;
+    if (!target) return;
+    const had = target.items.length;
+    beginBatch();
+    try {
+      setSelected([]);
+      clearItems(target.id);
+      patchComposition(target.id, { packId: null, recipeId: null });
+    } finally {
+      endBatch();
+    }
+    toast.success("Slide reset to blank", {
+      description:
+        had > 0
+          ? `${had} layer${had === 1 ? "" : "s"} and the template look removed. Undo (⌘Z) restores them.`
+          : "Template look removed. Undo (⌘Z) restores it.",
+    });
+  }, [beginBatch, clearItems, endBatch, patchComposition, setSelected]);
+
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === (comp?.brandId ?? brandId)) ?? BRAND_MODES[0]!,
     [comp?.brandId, brandId],
@@ -437,8 +463,8 @@ function CanvasStudioPage() {
                     ⧉
                   </StudioMenuBtn>
                 </EditorMenuRow>
-                <EditorMenuRow label="Clear canvas" hint="Remove all layers, keep the slide">
-                  <StudioMenuBtn label="Clear canvas" onClick={() => clearItems(comp.id)}>
+                <EditorMenuRow label="Reset to blank" hint="Remove all layers and the template look">
+                  <StudioMenuBtn label="Reset to blank" onClick={() => resetToBlank()}>
                     ⌫
                   </StudioMenuBtn>
                 </EditorMenuRow>
