@@ -181,7 +181,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         { to: "/admin/knowledge", label: "KB manager" },
         { to: "/admin/approvals", label: "Module approvals" },
         { to: "/approvals", label: "Brand approval queue" },
-
       ],
     },
     {
@@ -208,6 +207,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     },
   ];
   const footerNav = [
+    { to: "/for/admin", label: "For admins & design" },
+    { to: "/for/marketing", label: "For marketing" },
+    { to: "/for/sales", label: "For sales" },
     { to: "/about", label: "About" },
     { to: "/faq", label: "FAQ" },
   ] as const;
@@ -275,16 +277,16 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex shrink-0 items-center gap-2 lg:hidden">
             <NotificationBell />
             <button
-            type="button"
-            aria-expanded={mobileNavOpen}
-            aria-controls="mobile-nav-sheet"
-            aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
-            onClick={() => setMobileNavOpen((v) => !v)}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/[0.06] bg-white/60 text-[#03002C] transition hover:bg-white lg:hidden"
-          >
-            <span aria-hidden className="text-base leading-none">
-              {mobileNavOpen ? "✕" : "☰"}
-            </span>
+              type="button"
+              aria-expanded={mobileNavOpen}
+              aria-controls="mobile-nav-sheet"
+              aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMobileNavOpen((v) => !v)}
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-black/[0.06] bg-white/60 text-[#03002C] transition hover:bg-white lg:hidden"
+            >
+              <span aria-hidden className="text-base leading-none">
+                {mobileNavOpen ? "✕" : "☰"}
+              </span>
             </button>
           </div>
 

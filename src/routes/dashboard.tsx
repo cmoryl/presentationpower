@@ -353,6 +353,19 @@ function RoleDashboard() {
               Back to my role ({personaById(defaultPersona).label})
             </button>
           ) : null}
+          <Link
+            to={
+              personaId === "admin"
+                ? "/for/admin"
+                : personaId === "marketing"
+                  ? "/for/marketing"
+                  : "/for/sales"
+            }
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm underline-offset-4 hover:underline"
+            style={{ color: theme.ink }}
+          >
+            What this workspace does
+          </Link>
         </div>
 
         {signedIn ? (

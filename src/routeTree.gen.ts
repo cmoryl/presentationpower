@@ -59,6 +59,9 @@ import { Route as KnowledgeNewRouteImport } from './routes/knowledge.new'
 import { Route as KnowledgeIconLibraryRouteImport } from './routes/knowledge.icon-library'
 import { Route as KnowledgeAskRouteImport } from './routes/knowledge.ask'
 import { Route as KnowledgeEntryIdRouteImport } from './routes/knowledge.$entryId'
+import { Route as ForSalesRouteImport } from './routes/for.sales'
+import { Route as ForMarketingRouteImport } from './routes/for.marketing'
+import { Route as ForAdminRouteImport } from './routes/for.admin'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
@@ -400,6 +403,21 @@ const KnowledgeEntryIdRoute = KnowledgeEntryIdRouteImport.update({
   id: '/$entryId',
   path: '/$entryId',
   getParentRoute: () => KnowledgeRoute,
+} as any)
+const ForSalesRoute = ForSalesRouteImport.update({
+  id: '/for/sales',
+  path: '/for/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForMarketingRoute = ForMarketingRouteImport.update({
+  id: '/for/marketing',
+  path: '/for/marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForAdminRoute = ForAdminRouteImport.update({
+  id: '/for/admin',
+  path: '/for/admin',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const EventsPresetsRoute = EventsPresetsRouteImport.update({
   id: '/presets',
@@ -944,6 +962,9 @@ export interface FileRoutesByFullPath {
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
+  '/for/admin': typeof ForAdminRoute
+  '/for/marketing': typeof ForMarketingRoute
+  '/for/sales': typeof ForSalesRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
@@ -1082,6 +1103,9 @@ export interface FileRoutesByTo {
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
+  '/for/admin': typeof ForAdminRoute
+  '/for/marketing': typeof ForMarketingRoute
+  '/for/sales': typeof ForSalesRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
@@ -1225,6 +1249,9 @@ export interface FileRoutesById {
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
   '/events/presets': typeof EventsPresetsRoute
+  '/for/admin': typeof ForAdminRoute
+  '/for/marketing': typeof ForMarketingRoute
+  '/for/sales': typeof ForSalesRoute
   '/knowledge/$entryId': typeof KnowledgeEntryIdRoute
   '/knowledge/ask': typeof KnowledgeAskRoute
   '/knowledge/icon-library': typeof KnowledgeIconLibraryRoute
@@ -1369,6 +1396,9 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/events/next'
     | '/events/presets'
+    | '/for/admin'
+    | '/for/marketing'
+    | '/for/sales'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/icon-library'
@@ -1507,6 +1537,9 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/events/next'
     | '/events/presets'
+    | '/for/admin'
+    | '/for/marketing'
+    | '/for/sales'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/icon-library'
@@ -1649,6 +1682,9 @@ export interface FileRouteTypes {
     | '/events/new'
     | '/events/next'
     | '/events/presets'
+    | '/for/admin'
+    | '/for/marketing'
+    | '/for/sales'
     | '/knowledge/$entryId'
     | '/knowledge/ask'
     | '/knowledge/icon-library'
@@ -1761,6 +1797,9 @@ export interface RootRouteChildren {
   DevSocialCornersRoute: typeof DevSocialCornersRoute
   DevUxDebugRoute: typeof DevUxDebugRoute
   EventsAgentThreadIdRoute: typeof EventsAgentThreadIdRoute
+  ForAdminRoute: typeof ForAdminRoute
+  ForMarketingRoute: typeof ForMarketingRoute
+  ForSalesRoute: typeof ForSalesRoute
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
@@ -2149,6 +2188,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/knowledge/$entryId'
       preLoaderRoute: typeof KnowledgeEntryIdRouteImport
       parentRoute: typeof KnowledgeRoute
+    }
+    '/for/sales': {
+      id: '/for/sales'
+      path: '/for/sales'
+      fullPath: '/for/sales'
+      preLoaderRoute: typeof ForSalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/marketing': {
+      id: '/for/marketing'
+      path: '/for/marketing'
+      fullPath: '/for/marketing'
+      preLoaderRoute: typeof ForMarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/for/admin': {
+      id: '/for/admin'
+      path: '/for/admin'
+      fullPath: '/for/admin'
+      preLoaderRoute: typeof ForAdminRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/events/presets': {
       id: '/events/presets'
@@ -2992,6 +3052,9 @@ const rootRouteChildren: RootRouteChildren = {
   DevSocialCornersRoute: DevSocialCornersRoute,
   DevUxDebugRoute: DevUxDebugRoute,
   EventsAgentThreadIdRoute: EventsAgentThreadIdRoute,
+  ForAdminRoute: ForAdminRoute,
+  ForMarketingRoute: ForMarketingRoute,
+  ForSalesRoute: ForSalesRoute,
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
