@@ -803,12 +803,28 @@ export function nextTrackIconSlug(divisionId: string): string {
   return `next-2026-${divisionId}`;
 }
 
+/** Keep the first occurrence of each glyph across a set's sub-areas. */
+function dedupeAreas(areas: IconSubArea[]): IconSubArea[] {
+  const seen = new Set<string>();
+  return areas.map((area) => ({
+    ...area,
+    icons: area.icons.filter((i) => (seen.has(i.name) ? false : (seen.add(i.name), true))),
+  }));
+}
+
 SETS.push({
   slug: NEXT_EVENT_ICON_SLUG,
   title: "TransPerfect NEXT 2026",
   headline: "NEXT 2026 event icon set",
   body: "The full event system: program and session types, venue and logistics wayfinding, show-floor experience and campaign follow-up. Single-weight outline glyphs on NEXT Navy, with track accents reserved for highlights.",
-  subAreas: [...NEXT_EVENT_AREAS, CORE_PROCESS, CORE_PROOF, CORE_PEOPLE, CORE_CONTENT, CORE_TECH],
+  subAreas: dedupeAreas([
+    ...NEXT_EVENT_AREAS,
+    CORE_PROCESS,
+    CORE_PROOF,
+    CORE_PEOPLE,
+    CORE_CONTENT,
+    CORE_TECH,
+  ]),
 });
 
 for (const division of NEXT_DIVISIONS) {
@@ -819,7 +835,7 @@ for (const division of NEXT_DIVISIONS) {
     title: division.name,
     headline: `${division.name} icon set`,
     body: `${division.note} Track glyphs first, then the shared NEXT event system — download in ${division.name}'s accent (${division.accent}) or NEXT Navy for signage.`,
-    subAreas: [
+    subAreas: dedupeAreas([
       {
         id: "track",
         name: `${division.name} track`,
@@ -832,7 +848,7 @@ for (const division of NEXT_DIVISIONS) {
       CORE_PEOPLE,
       CORE_CONTENT,
       CORE_TECH,
-    ],
+    ]),
   });
 }
 
