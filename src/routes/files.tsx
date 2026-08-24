@@ -507,12 +507,18 @@ function MyFilesPage() {
               <FileCard
                 key={`${f.kind}:${f.id}`}
                 file={f}
+                selected={selected.has(keyOf(f))}
+                onToggleSelect={() => toggleOne(f)}
                 onDelete={() => {
                   if (window.confirm(`Delete “${f.title}”? This can’t be undone.`))
                     delMutation.mutate(f);
                 }}
-                deleting={delMutation.isPending && delMutation.variables?.id === f.id}
+                deleting={
+                  (delMutation.isPending && delMutation.variables?.id === f.id) ||
+                  (bulkDelete.isPending && selected.has(keyOf(f)))
+                }
               />
+
             ))}
           </div>
         </div>
