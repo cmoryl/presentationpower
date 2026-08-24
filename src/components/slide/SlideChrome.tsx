@@ -816,11 +816,15 @@ export function SlideFrame({
                 : comp === "grid"
                   ? "wide"
                   : "center";
+          // Authored GRAPHIC kits (Games R22, Element S29/S30) are designed
+          // compositions, not photography: the photographic depth-of-field pass
+          // flattened them into near-plain fields. They calm far more gently.
           const calm = plateCalmFor(
             variant,
             layoutId,
             pack.mode === "dark" ? "dark" : "light",
             calmBias,
+            plateIsGraphicKit(packGroundPaint(pack, groundSeed)) ? "graphic" : "full",
           );
 
           return (
