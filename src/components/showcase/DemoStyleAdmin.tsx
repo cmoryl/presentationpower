@@ -119,7 +119,7 @@ export function DemoStyleAdmin({
       context: {
         ...(payload.context ?? {}),
         stylePackId: packId || undefined,
-        designRecipeId: recipeId ? recipeId : null,
+        designRecipeId: effectiveRecipe ? effectiveRecipe : null,
       },
     };
     publish.mutate({
