@@ -94,10 +94,11 @@ export function PrintAgentChat({
       if (!value || busy) return;
       if (messages.length === 0) onFirstUserMessage?.(value);
       setInput("");
-      void sendMessage({ text: value });
+      void sendMessage({ text: withDocumentContext(value, docs) });
     },
-    [busy, messages.length, onFirstUserMessage, sendMessage],
+    [busy, docs, messages.length, onFirstUserMessage, sendMessage],
   );
+
 
   const sentPending = useRef(false);
   useEffect(() => {
