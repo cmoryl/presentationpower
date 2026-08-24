@@ -352,6 +352,13 @@ export type DeckContext = {
   lastExportedAt?: string;
   lastExportKind?: "pptx" | "pdf" | "present";
   masterSet?: {
+    /**
+     * Whether the brief actually asked for a presentation. When false the deck
+     * record exists only as the campaign spine (it carries the brief, brand
+     * mode and sibling artifact ids) and must not be surfaced as a user
+     * artifact in deck listings or the brief hub.
+     */
+    presentation?: boolean;
     eventPlaybookId?: string | null;
     socialPlaybookId?: string | null;
     printAssetIds?: string[];
@@ -359,6 +366,7 @@ export type DeckContext = {
     printAssets?: Array<{ id: string; kind: string; title: string }>;
     brandDivisionId?: string | null;
   };
+
   // Deck-level default transition (Pass 1 — on-screen only).
   defaultTransition?: SlideTransition;
   /** Deck-wide look and feel ("flagship" | "enterprise-white"). */

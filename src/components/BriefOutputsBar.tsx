@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { FileText, Layers, Megaphone, CalendarDays, LayoutGrid } from "lucide-react";
 
 export type BriefOutputsMasterSet = {
+  /** False when the brief never asked for a deck (the deck is just the spine). */
+  presentation?: boolean;
   eventPlaybookId?: string | null;
   socialPlaybookId?: string | null;
   printAssetIds?: string[];
@@ -33,6 +35,9 @@ function kindLabel(kind: string) {
  * social) so finishing one never dead-ends the user.
  */
 export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props) {
+  // A brief that only produced print/social/event still owns a deck record as
+  // its spine; never advertise it as a presentation the user can open.
+  const deckIsArtifact = masterSet?.presentation !== false || active.kind === "deck";
   const prints = [
     ...(masterSet?.printAssets ??
       (masterSet?.printAssetIds ?? []).map((id) => ({
@@ -56,11 +61,11 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
 
   // Nothing to cross-link to: only the artifact already open.
   const total =
-    (deckId ? 1 : 0) +
+    (deckId && deckIsArtifact ? 1 : 0) +
     prints.length +
     (masterSet?.eventPlaybookId ? 1 : 0) +
     (masterSet?.socialPlaybookId ? 1 : 0);
-  if (total < 2 && !(deckId && active.kind !== "deck")) return null;
+  if (total < 2 && !(deckId && deckIsArtifact && active.kind !== "deck")) return null;
 
   return (
     <nav
@@ -78,7 +83,7 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
         </Link>
       ) : null}
 
-      {deckId ? (
+      {deckId && deckIsArtifact ? (
         active.kind === "deck" ? (
           <span className={`${chip} ${here}`}>
             <Layers size={14} strokeWidth={1.75} />

@@ -460,6 +460,7 @@ function BriefCommandCenter() {
 
     setDeckContext(deckId, {
       masterSet: {
+        presentation: set.presentation,
         eventPlaybookId: set.event.enabled ? set.event.playbookId : null,
         socialPlaybookId: set.social.enabled ? set.social.playbookId : null,
         printAssetIds: prints.map((p) => p.id),
@@ -482,17 +483,24 @@ function BriefCommandCenter() {
       patchJob("social", { status: "done", detail: "Social kit linked" });
     setExpanding(false);
 
-    const parts: string[] = ["Deck"];
+    // Only announce what the user actually asked for — a social-only brief must
+    // never report a deck it never wanted.
+    const parts: string[] = [];
+    if (set.presentation) parts.push("Deck");
     if (prints.length) parts.push(`${prints.length} print asset${prints.length > 1 ? "s" : ""}`);
     if (set.event.enabled && set.event.playbookId) parts.push("event kit");
     if (set.social.enabled && set.social.playbookId) parts.push("social kit");
-    toast.success(`Master set ready · ${parts.join(" · ")}`);
+    toast.success(`Ready · ${parts.join(" · ") || "brief saved"}`);
   }
 
-  // Every artifact the current selection will produce, as trackable jobs.
+  // Every artifact the current selection will produce, as trackable jobs. When
+  // no presentation was requested the deck record is just the campaign spine,
+  // so the slide-authoring jobs are not shown or run at all.
   function buildJobPlan(set: MasterSet) {
     const plan: Array<{ id: string; label: string; detail?: string }> = [
-      { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" },
+      set.presentation
+        ? { id: "deck", label: "Narrative deck", detail: "Assembling slide structure" }
+        : { id: "deck", label: "Campaign story", detail: "Framing the brief" },
       ...(referenceAssets.length || reusableReferences
         ? [
             {
@@ -505,8 +513,11 @@ function BriefCommandCenter() {
           ]
         : []),
       { id: "knowledge", label: "Knowledge context", detail: "Retrieving proof points" },
-      { id: "personalize", label: "AI personalization", detail: "Writing slide copy" },
+      ...(set.presentation
+        ? [{ id: "personalize", label: "AI personalization", detail: "Writing slide copy" }]
+        : []),
     ];
+
     if (set.print.enabled)
       for (const kind of set.print.kinds)
         plan.push({
@@ -558,7 +569,12 @@ function BriefCommandCenter() {
       navigate({ to: "/decks/$deckId", params: { deckId } });
       return;
     }
-    patchJob("deck", { status: "done", detail: `${deck.slides.length} slides assembled` });
+    patchJob("deck", {
+      status: "done",
+      detail: activeSet.presentation
+        ? `${deck.slides.length} slides assembled`
+        : "Story framed for the campaign",
+    });
 
     setAiStatus("knowledge");
     patchJob("knowledge", { status: "running", detail: "Searching knowledge base…" });
@@ -745,53 +761,57 @@ function BriefCommandCenter() {
       }
     }
 
-    setAiStatus("personalizing");
+    // Slide copy is only written when a presentation was actually requested.
+    if (activeSet.presentation) {
+      setAiStatus("personalizing");
 
-    patchJob("personalize", {
-      status: "running",
-      detail: `Writing copy for ${deck.slides.length} slides…`,
-    });
-    try {
-      const result = await personalize({
-        data: {
-          brief: {
-            prospect: submission.prospect,
-            industry: submission.industry,
-            audience: submission.audience,
-            meetingObjective: submission.meetingObjective,
-            clientFacts: submission.clientFacts,
-            archetypeName: byId(NARRATIVE_ARCHETYPES, submission.archetypeId)?.name ?? "Deck",
-            brandScope: scope
-              ? {
-                  brandName: brand?.name,
-                  role: brand?.role,
-                  industries: scope.industries,
-                  serviceLines: scope.serviceLines,
-                  caseStudyTags: scope.caseStudyTags,
-                }
-              : undefined,
-          },
-          slides: deck.slides.map((s) => ({
-            id: s.id,
-            variantId: s.variantId,
-            sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
-            content: s.content as Record<string, unknown>,
-          })),
-          knowledgeSnippets: personalizerKb.slice(0, 12),
-        },
+      patchJob("personalize", {
+        status: "running",
+        detail: `Writing copy for ${deck.slides.length} slides…`,
       });
-      if (result.error) {
-        handlePersonalizeFailure(result.error);
-      } else {
-        applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
-        patchJob("personalize", { status: "done", detail: "Copy personalized" });
+      try {
+        const result = await personalize({
+          data: {
+            brief: {
+              prospect: submission.prospect,
+              industry: submission.industry,
+              audience: submission.audience,
+              meetingObjective: submission.meetingObjective,
+              clientFacts: submission.clientFacts,
+              archetypeName: byId(NARRATIVE_ARCHETYPES, submission.archetypeId)?.name ?? "Deck",
+              brandScope: scope
+                ? {
+                    brandName: brand?.name,
+                    role: brand?.role,
+                    industries: scope.industries,
+                    serviceLines: scope.serviceLines,
+                    caseStudyTags: scope.caseStudyTags,
+                  }
+                : undefined,
+            },
+            slides: deck.slides.map((s) => ({
+              id: s.id,
+              variantId: s.variantId,
+              sectionName: byId(SECTION_FRAMEWORKS, s.sectionId)?.name ?? "",
+              content: s.content as Record<string, unknown>,
+            })),
+            knowledgeSnippets: personalizerKb.slice(0, 12),
+          },
+        });
+        if (result.error) {
+          handlePersonalizeFailure(result.error);
+        } else {
+          applyAi(deckId, result.slides as Array<{ id: string; content: Record<string, unknown> }>);
+          patchJob("personalize", { status: "done", detail: "Copy personalized" });
+        }
+      } catch (e) {
+        // Never dead-end the run: the structural deck already exists, so we keep
+        // producing the rest of the set with template copy instead of leaving
+        // every remaining artifact stuck at QUEUED.
+        handlePersonalizeFailure((e as Error).message);
       }
-    } catch (e) {
-      // Never dead-end the run: the structural deck already exists, so we keep
-      // producing the rest of the set with template copy instead of leaving
-      // every remaining artifact stuck at QUEUED.
-      handlePersonalizeFailure((e as Error).message);
     }
+
     await expandMasterSet(deckId, submission, activeSet, opts?.request);
     if (opts?.request?.trim()) {
       recordAssetVersion({
@@ -1861,8 +1881,9 @@ function BriefCommandCenter() {
                       {assetVersions.map((v) => (
                         <Link
                           key={v.id}
-                          to="/decks/$deckId"
+                          to="/brief/$deckId"
                           params={{ deckId: v.deckId }}
+
                           title={`${v.matched.join(", ") || "Asset"} · ${new Date(v.createdAt).toLocaleString()}`}
                           className="rounded-full border border-black/10 bg-white px-2.5 py-1 text-[11px] font-medium text-[#03002C] transition hover:border-[#003FC7]/50 hover:text-[#003FC7]"
                         >
