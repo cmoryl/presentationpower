@@ -22,7 +22,7 @@ export type Film = {
   close: {
     from: string;
     to: string;
-    pct: { to: number; label: string };
+    pct: { to: number; suffix?: string; label: string };
     kicker: string;
   };
 };
