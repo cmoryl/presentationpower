@@ -4796,6 +4796,10 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: { ...deck, slides: out.map((sl, i) => ({ ...sl, position: i })) },
             },
           }));
+          notifySlideEdit(
+            `${slideIds.length} ${slideIds.length === 1 ? "slide" : "slides"} duplicated`,
+            { kind: "duplicate", undo: () => get().undo() },
+          );
         },
 
         removeSlides: (deckId, slideIds) => {
@@ -4807,6 +4811,10 @@ export const useDeckStore = create<DeckState>()(
             .filter((sl) => !ids.has(sl.id))
             .map((sl, i) => ({ ...sl, position: i }));
           set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+          notifySlideEdit(`${slideIds.length} ${slideIds.length === 1 ? "slide" : "slides"} deleted`, {
+            kind: "remove",
+            undo: () => get().undo(),
+          });
         },
 
         moveSlidesTo: (deckId, slideIds, target) => {
@@ -4820,6 +4828,10 @@ export const useDeckStore = create<DeckState>()(
             (sl, i) => ({ ...sl, position: i }),
           );
           set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+          notifySlideEdit(`Moved to ${target === "start" ? "the start" : "the end"} of the deck`, {
+            kind: "reorder",
+            undo: () => get().undo(),
+          });
         },
 
         moveSlidesToIndex: (deckId, slideIds, beforeIndex) => {
@@ -4847,7 +4859,12 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) },
             },
           }));
+          notifySlideEdit(
+            picked.length === 1 ? "Slide reordered" : `${picked.length} slides reordered`,
+            { kind: "reorder", undo: () => get().undo() },
+          );
         },
+
 
         addSlide: (deckId, sectionId, afterSlideId) => {
           const deck = get().decks[deckId];
