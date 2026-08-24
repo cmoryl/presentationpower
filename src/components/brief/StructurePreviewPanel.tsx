@@ -153,7 +153,16 @@ export function StructurePreviewPanel({
               {active.note && <div className="mt-3 text-[11px] text-black/50">{active.note}</div>}
 
               {/* Block rail */}
-              <ol className="mt-3 max-h-[22rem] space-y-1.5 overflow-y-auto pr-1">
+              <ol
+                className="mt-3 max-h-[18rem] space-y-1.5 overflow-y-auto pb-2 pr-1 sm:max-h-[22rem]"
+                style={{
+                  maskImage:
+                    "linear-gradient(to bottom, #000 0, #000 calc(100% - 20px), transparent 100%)",
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, #000 0, #000 calc(100% - 20px), transparent 100%)",
+                }}
+              >
+
                 {active.blocks.map((b, i) => (
                   <li
                     key={`${active.id}-${b.index}-${i}`}
