@@ -360,7 +360,7 @@ function MediaCard({
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className={`flex flex-1 flex-col gap-2 ${compact ? "p-4" : "p-5"}`}>
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
           <span
             className="grid h-6 w-6 place-items-center rounded-lg text-white"
