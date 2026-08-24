@@ -76,6 +76,8 @@ export function PrintAgentChat({
   });
 
   const [input, setInput] = useState("");
+  const { docs, setDocs } = useAgentDocuments();
+
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const seenAsset = useRef<string | null>(null);
