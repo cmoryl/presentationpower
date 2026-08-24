@@ -425,7 +425,7 @@ function buildGamingLaunch(): TemplatePayload {
       // Authored Games plate kit (R22 gaming language) paints every slide.
       stylePackId: "skin-r22",
       designRecipeId: null,
-      defaultTransition: { type: "push", durationMs: 420 },
+      defaultTransition: { type: "push-left", durationMs: 420 },
     },
     slides,
     brief: {

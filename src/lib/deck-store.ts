@@ -426,6 +426,9 @@ export type TemplatePayload = {
     notes?: string | null;
     /** Optional per-slide template override (backdrop scene, type register…). */
     templateOverride?: DeckSlide["templateOverride"];
+    /** Authored playback transition; demos ship one on every slide. */
+    transition?: SlideTransition;
+
   }>;
   brief?: {
     prospect?: string;
@@ -5127,8 +5130,12 @@ export const useDeckStore = create<DeckState>()(
                 templateOverride: s.templateOverride
                   ? structuredClone(s.templateOverride)
                   : undefined,
+                // Authored playback transition (demos ship one per slide) must
+                // survive instantiation, or the editable copy plays hard cuts.
+                transition: s.transition ? { ...s.transition } : undefined,
               };
             }),
+
           };
           set((s) => ({
             briefs: { ...s.briefs, [briefId]: brief },
