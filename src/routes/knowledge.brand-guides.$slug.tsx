@@ -42,6 +42,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Download } from "lucide-react";
+import { toast } from "sonner";
+import { brandSwatchSpec, brandSwatchSpecText } from "@/lib/brand-swatch-spec";
 
 export const Route = createFileRoute("/knowledge/brand-guides/$slug")({
   loader: ({ params }) => {
@@ -528,6 +530,62 @@ function Section({
   );
 }
 
+/** One swatch card: HEX + RGB + CMYK + Pantone, copyable as a block. */
+function SwatchCard({ swatch, large }: { swatch: ColorSwatch; large?: boolean }) {
+  const spec = brandSwatchSpec(swatch);
+  const rows: { label: string; value: string; pending?: boolean }[] = [
+    { label: "HEX", value: spec.hex },
+    { label: "RGB", value: spec.rgb.value },
+    { label: "CMYK", value: spec.cmyk.value, pending: spec.cmyk.status === "reference" },
+    { label: "PMS", value: spec.pantone?.value ?? "Not specified", pending: !spec.pantone },
+  ];
+  return (
+    <div className="overflow-hidden rounded-xl border border-border bg-card">
+      <div
+        className={`flex items-end p-4 ${large ? "h-32" : "h-20"}`}
+        style={{ background: spec.hex, color: swatch.onDark ? "#fff" : "#03002C" }}
+      >
+        <div className="font-mono text-xs opacity-80">{spec.hex}</div>
+      </div>
+      <div className="p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <div className="text-sm font-semibold break-words">{swatch.name}</div>
+            {swatch.role && (
+              <div className="text-[11px] break-words text-muted-foreground">{swatch.role}</div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              void navigator.clipboard?.writeText(brandSwatchSpecText(swatch));
+              toast.success(`${swatch.name} values copied`);
+            }}
+            className="shrink-0 rounded-md border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground hover:bg-muted"
+          >
+            Copy
+          </button>
+        </div>
+        <dl className="mt-2 space-y-0.5 text-[10px] text-muted-foreground">
+          {rows.map((r) => (
+            <div key={r.label} className="flex items-baseline gap-1.5">
+              <dt className="w-10 shrink-0 tracking-[0.12em]">{r.label}</dt>
+              <dd className="min-w-0 font-mono break-words">
+                {r.value}
+                {r.pending && (
+                  <span className="ml-1 font-sans tracking-[0.08em] opacity-60">
+                    · pending sign-off
+                  </span>
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  );
+}
+
 function SwatchRow({
   label,
   swatches,
@@ -544,25 +602,7 @@ function SwatchRow({
         className={`mt-2 grid gap-3 ${large ? "grid-cols-1 md:grid-cols-2" : "grid-cols-2 md:grid-cols-3 lg:grid-cols-5"}`}
       >
         {swatches.map((c) => (
-          <div key={c.hex} className="overflow-hidden rounded-xl border border-border bg-card">
-            <div
-              className={`flex items-end p-4 ${large ? "h-32" : "h-20"}`}
-              style={{ background: c.hex, color: c.onDark ? "#fff" : "#03002C" }}
-            >
-              <div className="text-xs font-mono opacity-80">{c.hex}</div>
-            </div>
-            <div className="p-3">
-              <div className="text-sm font-semibold">{c.name}</div>
-              {c.role && <div className="text-[11px] text-muted-foreground">{c.role}</div>}
-              {(c.pantone || c.rgb) && (
-                <div className="mt-1 space-y-0.5 text-[10px] text-muted-foreground">
-                  {c.pantone && <div>{c.pantone}</div>}
-                  {c.rgb && <div>RGB {c.rgb}</div>}
-                  {c.cmyk && <div>CMYK {c.cmyk}</div>}
-                </div>
-              )}
-            </div>
-          </div>
+          <SwatchCard key={c.hex} swatch={c} large={large} />
         ))}
       </div>
     </div>

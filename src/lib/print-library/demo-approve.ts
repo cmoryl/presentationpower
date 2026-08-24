@@ -78,7 +78,7 @@ function tighten(value: string, max: number): string {
 }
 
 /** Cap per-family item counts and body copy so no module clips its layout. */
-function approveSection(section: PrintSection): PrintSection {
+export function approveSection(section: PrintSection): PrintSection {
   const s = section as PrintSection & Bag;
   const capItems = (max: number) => {
     const items = s["items"];

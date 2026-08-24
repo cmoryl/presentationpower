@@ -158,6 +158,7 @@ import {
   weightForSection,
   effectiveModuleBudget,
 } from "@/lib/print-capacity";
+import { fitPrintModuleIntoPage } from "@/lib/print-module-fit";
 import { SpotlightLayout } from "@/components/print/SpotlightLayout";
 import { EBrochureLayout } from "@/components/print/EBrochureLayout";
 import { AdaptorBriefLayout } from "@/components/print/AdaptorBriefLayout";
@@ -2343,8 +2344,26 @@ function AssetEditor() {
         open={pickerOpen}
         onClose={() => setPickerOpen(false)}
         onInsert={(section) => {
-          const next = [...(content.modules ?? []), section];
+          // Library modules are authored for a generous page; fit them to THIS
+          // template's remaining space before they land, so a dense piece never
+          // clips the trim on insert.
+          const fit = fitPrintModuleIntoPage(kind, content, section);
+          const next = [...(content.modules ?? []), fit.section];
           patchContent({ modules: next });
+          if (fit.overBudget) {
+            // Absorb the remainder uniformly instead of clipping.
+            patchCtx({
+              density: "compact",
+              contentFit: { ...resolveContentFit(ctx.contentFit), enabled: true },
+            });
+          }
+          if (fit.note) {
+            toast.success(`Module added — ${fit.note}`, {
+              description: "Fitted to this template's page budget.",
+            });
+          } else {
+            toast.success("Module added");
+          }
           // Keep drawer open so the user can insert multiple modules.
         }}
         brand={brand}
