@@ -59,6 +59,23 @@ export const PERSONAS: readonly Persona[] = [
     tagline: "Own the system: templates, modules, brand assets and the guardrails everyone else inherits.",
     roles: ["admin", "brand_reviewer"],
     counters: ["decks", "print", "kits"],
+    resume: ["decks", "print", "kits"],
+    primary: {
+      label: "Open the command center",
+      hint: "Usage, approvals and anything the audit log flagged",
+      to: "/admin",
+    },
+    secondary: {
+      label: "Template Studio",
+      hint: "Tune a look and publish it to every picker",
+      to: "/admin/templates",
+    },
+    guides: [
+      { label: "Publishing a template", hint: "Step-by-step", to: "/about" },
+      { label: "Module authoring rules", hint: "Geometry + spacing", to: "/library/print/modules" },
+      { label: "Export contract", hint: "PPTX, PDF, CMYK", to: "/faq" },
+    ],
+
     steps: [
       {
         title: "Check the command center",
