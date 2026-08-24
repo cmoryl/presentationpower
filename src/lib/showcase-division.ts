@@ -45,7 +45,8 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "GlobalLink",
     slug: "globallink",
     accent: "#003FC7",
-    stylePackId: "skin-s06",
+    stylePackId: "skin-s03",
+    designRecipeId: "R02",
     industry: "Enterprise localization",
   },
   {
@@ -54,7 +55,8 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Enterprise",
     slug: "enterprise",
     accent: "#003FC7",
-    stylePackId: "skin-s02",
+    stylePackId: "skin-s06",
+    designRecipeId: "R01",
     industry: "Enterprise",
   },
   {
@@ -64,6 +66,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     slug: "lifesci",
     accent: "#58ED21",
     stylePackId: "skin-s14",
+    designRecipeId: "R09",
     industry: "Life Sciences",
   },
   {
@@ -73,6 +76,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     slug: "legal",
     accent: "#3BBEB6",
     stylePackId: "skin-s10",
+    designRecipeId: "R10",
     industry: "Legal",
   },
   {
@@ -81,7 +85,8 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Media",
     slug: "media",
     accent: "#EC388A",
-    stylePackId: "skin-s16",
+    stylePackId: "skin-s18",
+    designRecipeId: "R21",
     industry: "Media & Entertainment",
   },
   {
@@ -103,6 +108,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     slug: "digital",
     accent: "#C2A3FF",
     stylePackId: "skin-s07",
+    designRecipeId: "R18",
     industry: "Digital marketing",
   },
   {
@@ -111,7 +117,8 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Trial Interactive",
     slug: "trial-interactive",
     accent: "#5CE1E6",
-    stylePackId: "skin-s05",
+    stylePackId: "skin-s01",
+    designRecipeId: "R08",
     industry: "eClinical",
   },
   {
@@ -121,6 +128,8 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     slug: "element",
     accent: "#08BFC1",
     stylePackId: "skin-s29",
+    // S29 ships the Element brand ground; no industry plates ride along.
+    designRecipeId: null,
     industry: "Product marketing",
   },
 ];

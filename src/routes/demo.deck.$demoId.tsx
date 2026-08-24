@@ -73,8 +73,24 @@ function ShowcaseDeckDemoPage() {
   }, [def, division, home.id]);
 
   // A published admin edit *is* the demo; the authored build is the fallback.
+  // The DIVISION's look always wins though: an override saved for a division
+  // carries whatever pack was current when it was published, so re-stamping the
+  // division's canonical style pack + industry ground keeps every division
+  // visually distinct instead of inheriting a stale (or source-division) look.
   const { override } = useDemoOverride("deck", demoId, division.id);
-  const payload = (override?.payload as unknown as TemplatePayload | undefined) ?? authored;
+  const overridePayload = override?.payload as unknown as TemplatePayload | undefined;
+  const payload = useMemo(() => {
+    if (!overridePayload) return authored;
+    return {
+      ...overridePayload,
+      context: {
+        ...(overridePayload.context ?? {}),
+        stylePackId: division.stylePackId,
+        designRecipeId: division.designRecipeId ?? undefined,
+      },
+    } as TemplatePayload;
+  }, [overridePayload, authored, division]);
+
 
   const existingId = useDeckStore((s) =>
     payload ? Object.values(s.decks).find((d) => d.title === payload.title)?.id : undefined,

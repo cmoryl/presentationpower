@@ -256,9 +256,13 @@ export function withIndustryGround(
             },
             takeFromSeed(seed),
           ),
-          ...basePack.ground(seed),
+          // Keep only the host pack's TONAL layers (gradients/washes). Its own
+          // authored imagery — photo plates, data-URI scene art — must not ride
+          // along, or the wrong sector's artwork wins over the chosen recipe.
+          ...basePack.ground(seed).filter((layer) => !layer.includes("url(")),
         ]
       : (seed) => set.pack.ground(seed),
     swatch: basePack.swatch,
   };
+
 }
