@@ -48,7 +48,7 @@ export const PERSONA_THEME: Record<PersonaId, PersonaTheme> = {
     bricks: ["#FF9B70", "#EC388A", "#FFEB66", "#C2A3FF", "#F2F2F2"],
   },
   sales: {
-    kicker: "Sales enablement",
+    kicker: "Sales",
     blurb: "Client-ready in minutes — pitch decks and leave-behinds that pass brand review.",
     base: "#00203A",
     accent: "#A1FBF9",

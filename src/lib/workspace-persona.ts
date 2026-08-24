@@ -175,7 +175,7 @@ export const PERSONAS: readonly Persona[] = [
   },
   {
     id: "sales",
-    label: "Sales enablement",
+    label: "Sales",
     tagline: "Get a client-ready, on-brand deck or one-pager out the door in minutes.",
     roles: ["sales", "viewer"],
     counters: ["decks", "print"],

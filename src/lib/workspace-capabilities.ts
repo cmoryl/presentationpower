@@ -56,7 +56,7 @@ export function capabilitiesFor(
     canAuthorSystem: canEdit,
     canUseAdminPresets: isAdmin && persona === "sales",
     reason: createOnly
-      ? "Sales enablement accounts build from pre-approved templates and modules. Editing the underlying design is handled by admins and design."
+      ? "Sales accounts build from pre-approved templates and modules. Editing the underlying design is handled by admins and design."
       : "",
   };
 }
