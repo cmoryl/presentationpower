@@ -554,7 +554,6 @@ function Dashboard() {
         </div>
       </section>
 
-      {/* ================= SHOWREEL ================= */}
 
       {/* ================= FINISHED EXAMPLES ================= */}
       <ShowcaseGallery />
