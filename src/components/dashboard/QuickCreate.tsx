@@ -17,6 +17,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { createPrintAssetWithBrief } from "@/lib/print-assets.functions";
 import { saveKit } from "@/lib/kits.functions";
 import { normalizeLook } from "@/lib/look-validate";
+import { enforceSalesDeckPack } from "@/lib/sales-deck-looks";
 import { KIT_PROFILES_BY_ID } from "@/lib/social-formats";
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 import {
@@ -80,13 +81,19 @@ export function QuickCreate({ personaId, signedIn }: { personaId: PersonaId; sig
           lengthTarget: preset.lengthTarget ?? 12,
           clientFacts: "",
         });
+        // Sales-enablement decks ship in Enterprise mode only (light or dark).
+        const packId = caps.createOnly
+          ? enforceSalesDeckPack(preset.stylePackId, "light")
+          : (preset.stylePackId ?? null);
         const look = normalizeLook({
-          stylePackId: preset.stylePackId ?? null,
+          stylePackId: packId ?? null,
           designRecipeId: preset.designRecipeId ?? null,
           industry: preset.industry ?? null,
         });
         setDeckContext(deckId, {
-          stylePackId: look.stylePackId,
+          stylePackId: caps.createOnly
+            ? enforceSalesDeckPack(look.stylePackId, "light")
+            : look.stylePackId,
           designRecipeId: look.designRecipeId,
         });
         toast.success(`New deck started · ${preset.templateSet}`);
