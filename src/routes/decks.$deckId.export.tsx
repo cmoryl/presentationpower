@@ -285,15 +285,31 @@ function ExportView() {
           profile: { recipeId: deck.context?.designRecipeId ?? null },
         }),
       );
+      ok = true;
+      toast.success(`${fileName} downloaded`, {
+        id: progressId,
+        description: "Check your browser's Downloads folder.",
+        duration: 7000,
+      });
+    } catch (err) {
+      const { describeExportError } = await import("@/lib/export-feedback");
+      toast.error("PowerPoint export failed", {
+        id: progressId,
+        description: describeExportError(err),
+        duration: 14000,
+      });
+      console.error("[deck-export] pptx export failed:", err);
     } finally {
       setExporting(false);
       setPreflightIssues(null);
+      if (!ok) toast.dismiss(progressId);
     }
     // Auto-share after the local download succeeds — non-blocking, best-effort.
-    if (glShareConfigured && glAutoShare && !glShareBusy) {
+    if (ok && glShareConfigured && glAutoShare && !glShareBusy) {
       void handleShareViaGlobalLink();
     }
   }
+
 
   async function handlePptx() {
     if (blocked || exporting || preflightBusy) return;
