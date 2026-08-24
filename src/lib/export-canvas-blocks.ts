@@ -36,6 +36,8 @@ import { SLIDE_H_IN, SLIDE_W_IN, gradientTag, pxToPt } from "./export-surface";
 import { cssAngleToOoxml } from "./canvas-fill";
 import { rectRadiusAdj } from "./export-radius";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
+import { isDroppableAdoptedMirror } from "./export-adopted-hide";
+
 
 import { coverCropTag, roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { mapFontFamily } from "./pptx-font-map";
