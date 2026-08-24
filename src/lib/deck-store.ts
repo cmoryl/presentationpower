@@ -5277,7 +5277,12 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) },
             },
           }));
+          notifySlideEdit(`Slide moved to position ${toIndex + 1}`, {
+            kind: "reorder",
+            undo: () => get().undo(),
+          });
         },
+
       };
     },
     {
