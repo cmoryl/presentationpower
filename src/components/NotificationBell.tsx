@@ -98,7 +98,8 @@ export function NotificationBell() {
       await markRead({ data: { ids: [n.id] } }).catch(() => undefined);
       void qc.invalidateQueries({ queryKey: ["notifications", userId] });
     }
-    if (n.link) void navigate({ to: n.link });
+    // Links are app-authored paths (e.g. /approvals?request=…), not typed routes.
+    if (n.link) void navigate({ to: n.link as never });
   };
 
   return (

@@ -2,6 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { AdminSidebar } from "@/components/AdminShell";
+import { NotificationBell } from "@/components/NotificationBell";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ElementLockup } from "@/components/brand/ElementLogo";
 
@@ -271,7 +272,9 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Link>
 
-          <button
+          <div className="flex shrink-0 items-center gap-2 lg:hidden">
+            <NotificationBell />
+            <button
             type="button"
             aria-expanded={mobileNavOpen}
             aria-controls="mobile-nav-sheet"
@@ -282,7 +285,8 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span aria-hidden className="text-base leading-none">
               {mobileNavOpen ? "✕" : "☰"}
             </span>
-          </button>
+            </button>
+          </div>
 
           <nav className="hidden max-w-full flex-wrap items-center justify-center gap-1 rounded-lg border border-black/[0.04] bg-white/[0.42] px-2 py-1.5 [backdrop-filter:blur(24px)_saturate(160%)] lg:flex dark:!border-white/10 dark:!bg-white/[0.03]">
             {visibleNav.map((n) => {
@@ -436,6 +440,10 @@ export function AppShell({ children }: { children: ReactNode }) {
               );
             })}
           </nav>
+
+          <div className="hidden lg:flex lg:items-center lg:gap-2">
+            <NotificationBell />
+          </div>
 
           {mobileNavOpen && (
             <nav
