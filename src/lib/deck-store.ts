@@ -4697,6 +4697,10 @@ export const useDeckStore = create<DeckState>()(
               [deckId]: { ...deck, slides: next.map((sl, i) => ({ ...sl, position: i })) },
             },
           }));
+          notifySlideEdit(`Slide moved ${direction < 0 ? "up" : "down"}`, {
+            kind: "reorder",
+            undo: () => get().undo(),
+          });
         },
 
         removeSlide: (deckId, slideId) => {
@@ -4707,7 +4711,9 @@ export const useDeckStore = create<DeckState>()(
             .filter((sl) => sl.id !== slideId)
             .map((sl, i) => ({ ...sl, position: i }));
           set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
+          notifySlideEdit("Slide deleted", { kind: "remove", undo: () => get().undo() });
         },
+
 
         setSlidesHidden: (deckId, slideIds, hidden) => {
           const deck = get().decks[deckId];
