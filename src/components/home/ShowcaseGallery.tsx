@@ -521,7 +521,7 @@ function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compac
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-2 p-5">
+      <div className={`flex flex-1 flex-col gap-2 ${compact ? "p-4" : "p-5"}`}>
         <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest text-black/45 dark:text-white/45">
           <span
             className="grid h-6 w-6 place-items-center rounded-lg text-white"
@@ -533,14 +533,28 @@ function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compac
           {meta.label} · {built.chip}
         </div>
         <div className="text-base font-semibold text-[#03002C] dark:text-white">{built.name}</div>
-        <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">{entry.blurb}</p>
-        <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-3 text-[11px] text-black/55 dark:text-white/55">
+        <p
+          className={`text-xs leading-relaxed text-black/60 dark:text-white/60 ${
+            compact ? "line-clamp-2" : ""
+          }`}
+        >
+          {entry.blurb}
+        </p>
+        <div
+          className={`mt-auto flex flex-wrap items-center gap-1.5 text-[11px] text-black/55 dark:text-white/55 ${
+            compact ? "pt-2" : "pt-3"
+          }`}
+        >
           <Pill>{built.assets.length} rendered sizes</Pill>
-          <Pill>{built.deliverables} deliverables</Pill>
+          {compact ? null : <Pill>{built.deliverables} deliverables</Pill>}
           <Pill>{built.phases} phases</Pill>
-          {built.photo ? <Pill>Photography</Pill> : null}
+          {built.photo && !compact ? <Pill>Photography</Pill> : null}
         </div>
-        <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9]">
+        <div
+          className={`inline-flex items-center gap-1 text-[11px] font-medium text-[#003FC7] dark:text-[#A1FBF9] ${
+            compact ? "mt-2" : "mt-3"
+          }`}
+        >
           Open full example{" "}
           <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
         </div>
