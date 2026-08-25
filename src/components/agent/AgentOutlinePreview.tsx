@@ -110,26 +110,60 @@ export function AgentOutlinePreview({
               </div>
             </>
           ) : (
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() =>
-                  onSubmit("The outline looks good — build the full presentation from it now.")
-                }
-                className="rounded-xl bg-[#003FC7] px-3.5 py-2 text-xs font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
-              >
-                Approve &amp; build deck
-              </button>
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => setEditing(true)}
-                className="rounded-xl border border-border/70 px-3.5 py-2 text-xs font-medium text-foreground/70 transition hover:border-[#003FC7] hover:text-foreground disabled:opacity-40"
-              >
-                Adjust sections
-              </button>
-            </div>
+            <>
+              <fieldset>
+                <legend className="sr-only">Deck appearance</legend>
+                <div
+                  role="radiogroup"
+                  aria-label="Deck appearance"
+                  className="flex flex-wrap gap-1.5"
+                >
+                  {APPEARANCES.map((a) => {
+                    const active = appearance === a.id;
+                    return (
+                      <button
+                        key={a.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        title={a.hint}
+                        onClick={() => setAppearance(a.id)}
+                        className={
+                          "rounded-full border px-3 py-1.5 text-xs font-medium transition " +
+                          (active
+                            ? "border-[#003FC7] bg-[#003FC7] text-white"
+                            : "border-border/70 text-foreground/65 hover:border-[#003FC7] hover:text-foreground")
+                        }
+                      >
+                        {a.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() =>
+                    onSubmit(
+                      `The outline looks good — build the full presentation from it now${appearanceLine}.`,
+                    )
+                  }
+                  className="rounded-xl bg-[#003FC7] px-3.5 py-2 text-xs font-semibold text-white transition disabled:opacity-40 hover:brightness-110"
+                >
+                  Approve &amp; build deck
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setEditing(true)}
+                  className="rounded-xl border border-border/70 px-3.5 py-2 text-xs font-medium text-foreground/70 transition hover:border-[#003FC7] hover:text-foreground disabled:opacity-40"
+                >
+                  Adjust sections
+                </button>
+              </div>
+            </>
           )}
         </div>
       )}
