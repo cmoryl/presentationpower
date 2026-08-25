@@ -1952,6 +1952,29 @@ export function VariantSampleStudio({
         </aside>
       </div>
 
+      {layerImageFor !== null && (
+        <SlideMediaPicker
+          title="Image for freeform layer"
+          currentUrl={
+            layout.layers?.find((l) => l.id === layerImageFor)?.mediaUrl || undefined
+          }
+          onClose={() => setLayerImageFor(null)}
+          onPick={(picked) =>
+            writeLayout(
+              {
+                ...layout,
+                layers: (layout.layers ?? []).map((l) =>
+                  l.id === layerImageFor
+                    ? { ...l, mediaUrl: picked.url, mediaPath: picked.path ?? "" }
+                    : l,
+                ),
+              },
+              "Layer image",
+            )
+          }
+        />
+      )}
+
       {pickerFor !== null && (pickerFor === SLIDE_MEDIA || items?.[pickerFor]) && (
         <SlideMediaPicker
           title={pickerFor === SLIDE_MEDIA ? "Slide image" : `Image for cell ${pickerFor + 1}`}
