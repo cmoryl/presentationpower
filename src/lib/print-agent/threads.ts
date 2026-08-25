@@ -66,6 +66,7 @@ export async function loadPrintThread(
     .from("agent_threads")
     .select(SELECT)
     .eq("id", id)
+    .eq("kind", "print")
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!thread) throw new Error("Conversation not found");

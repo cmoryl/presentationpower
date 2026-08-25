@@ -11,10 +11,16 @@ export type AgentThread = {
   updated_at: string;
 };
 
+// Presentation threads predate the `kind` column, so they may be stored as
+// kind = 'presentation' OR kind = null — treat both as presentation, and never
+// return print/social/event rows here.
+const PRESENTATION_KIND_FILTER = "kind.is.null,kind.eq.presentation";
+
 export async function listAgentThreads(): Promise<AgentThread[]> {
   const { data, error } = await supabase
     .from("agent_threads")
     .select("id, title, deck_id, updated_at")
+    .or(PRESENTATION_KIND_FILTER)
     .order("updated_at", { ascending: false })
     .limit(100);
   if (error) throw new Error(error.message);
@@ -27,7 +33,7 @@ export async function createAgentThread(title = "New presentation"): Promise<Age
   if (!ownerId) throw new Error("You need to be signed in.");
   const { data, error } = await supabase
     .from("agent_threads")
-    .insert({ owner_id: ownerId, title } as never)
+    .insert({ owner_id: ownerId, title, kind: "presentation" } as never)
     .select("id, title, deck_id, updated_at")
     .single();
   if (error) throw new Error(error.message);
@@ -60,11 +66,15 @@ export async function loadAgentThread(
 ): Promise<{ thread: AgentThread; messages: UIMessage[] }> {
   const { data: thread, error } = await supabase
     .from("agent_threads")
-    .select("id, title, deck_id, updated_at")
+    .select("id, title, deck_id, updated_at, kind")
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!thread) throw new Error("Conversation not found");
+  // Direct-link guard: a print/social/event thread id pasted into the
+  // presentation agent must not load that conversation here.
+  const kind = (thread as { kind?: string | null }).kind;
+  if (kind && kind !== "presentation") throw new Error("Conversation not found");
   const { data: rows, error: mErr } = await supabase
     .from("agent_messages")
     .select("id, role, parts, created_at")
