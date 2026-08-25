@@ -188,7 +188,15 @@ export function downloadLondonDirectoryPdf(panels: LondonPanel[] = LONDON_PANELS
     doc.addPage();
     floorPage(doc, floor.label, floor.rooms, i + 2, totalPages);
   });
-  doc.save("next-2026-london-panel-kit-master-directory.pdf");
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "next-2026-london-panel-kit-master-directory.pdf";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 /** Click handler with toast acknowledgement. */
