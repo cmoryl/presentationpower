@@ -471,35 +471,56 @@ export function CaseStudyLayout({
                       <div style={{ fontWeight: 700, fontSize: cq(12), color: accentInk }}>
                         {engagement.title ?? "Engagement Snapshot"}
                       </div>
-                      {engagement.bullets.slice(0, 4).map((b, k) => (
-                        <div
-                          key={k}
-                          className="flex items-center"
-                          style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(9) }}
-                        >
+                      {/* Without a quote alongside, a single checklist column
+                          leaves a dead blank area on the right half of the
+                          page — spread the bullets over two columns (and allow
+                          up to 6) so the section fills its row. */}
+                      <div
+                        style={
+                          content.quote
+                            ? undefined
+                            : {
+                                display: "grid",
+                                gridTemplateColumns: "1fr 1fr",
+                                columnGap: cq(28),
+                              }
+                        }
+                      >
+                        {engagement.bullets.slice(0, content.quote ? 4 : 6).map((b, k) => (
                           <div
-                            className="flex items-center justify-center"
+                            key={k}
+                            className="flex items-center"
                             style={{
-                              width: cq(22),
-                              height: cq(22),
-                              borderRadius: "50%",
-                              background: chipBg,
-                              flexShrink: 0,
+                              gap: cq(8),
+                              minWidth: 0,
+                              marginTop:
+                                k === 0 || (!content.quote && k === 1) ? cq(12) : cq(9),
                             }}
                           >
-                            <EditableIcon
-                              slot={`cs.bullet.${k}`}
-                              d={ICON_PATHS.check}
-                              size={cq(12)}
-                              color={accentInk}
-                              strokeWidth={2}
-                            />
+                            <div
+                              className="flex items-center justify-center"
+                              style={{
+                                width: cq(22),
+                                height: cq(22),
+                                borderRadius: "50%",
+                                background: chipBg,
+                                flexShrink: 0,
+                              }}
+                            >
+                              <EditableIcon
+                                slot={`cs.bullet.${k}`}
+                                d={ICON_PATHS.check}
+                                size={cq(12)}
+                                color={accentInk}
+                                strokeWidth={2}
+                              />
+                            </div>
+                            <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
+                              {b}
+                            </div>
                           </div>
-                          <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
-                            {b}
-                          </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
