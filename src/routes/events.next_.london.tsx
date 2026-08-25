@@ -319,10 +319,55 @@ function LondonSignagePage() {
               >
                 <Layers className="h-4 w-4" /> Open production studio
               </Link>
-
+              <button
+                type="button"
+                onClick={runKitQa}
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+              >
+                <ShieldCheck className="h-4 w-4" /> Run spec QA (all panels)
+              </button>
             </div>
+
+            {/* Result of the last kit-wide audit. */}
+            {qa ? (
+              <div className="mt-5 max-w-2xl rounded-xl border border-black/10 bg-white/80 p-4">
+                <p className="text-sm font-semibold text-[#03002C]">
+                  {(() => {
+                    const r = rollup(qa);
+                    return `${r.total} files audited — ${r.pass} pass, ${r.warn} warning, ${r.fail} fail`;
+                  })()}
+                </p>
+                {qa.filter((r) => r.status !== "pass").length ? (
+                  <ul className="mt-2 space-y-1.5">
+                    {qa
+                      .filter((r) => r.status !== "pass")
+                      .slice(0, 6)
+                      .map((r) => (
+                        <li key={`${r.file}-${r.kind}`} className="text-[12.5px] leading-relaxed">
+                          <span
+                            className={`mr-2 rounded px-1.5 py-0.5 font-mono text-[10px] uppercase ${
+                              r.status === "fail"
+                                ? "bg-[#E53D2E]/15 text-[#8f1d13]"
+                                : "bg-[#FFEB66] text-[#03002C]"
+                            }`}
+                          >
+                            {r.status}
+                          </span>
+                          <span className="font-medium text-[#03002C]">{r.file}</span>{" "}
+                          <span className="text-[#03002C]/70">{qaSummary(r)}</span>
+                        </li>
+                      ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1 text-[12.5px] text-[#03002C]/70">
+                    Every vector master matches its trim, bleed, ppi tier and banding spec.
+                  </p>
+                )}
+              </div>
+            ) : null}
           </div>
         </header>
+
 
         {/* Print specification */}
         <section className="mt-10">
