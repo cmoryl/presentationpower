@@ -37,12 +37,21 @@ describe("slide accent resolution", () => {
   it("keeps every showcase division accent through resolution", () => {
     const payload = buildNextPaletteShowcase();
     const overrides = payload.slides
-      .map((s) => readAccentOverride(s.content))
-      .filter((v): v is string => !!v);
+      .map((s) => ({ content: s.content, hex: readAccentOverride(s.content) }))
+      .filter((v): v is { content: unknown; hex: string } => !!v.hex);
     expect(overrides.length).toBeGreaterThan(10);
-    for (const hex of overrides) {
-      expect(resolveSlideAccent({ content: { accentOverride: hex } }, brand)).toBe(hex);
+    for (const { content, hex } of overrides) {
+      expect(resolveSlideAccent({ content }, brand)).toBe(hex);
     }
+  });
+
+  it("ignores unauthorized TransPerfect accent overrides", () => {
+    expect(resolveSlideAccent(slide({ accentOverride: "#EC388A" }), brand)).toBe(
+      brand.tokens.accent,
+    );
+    expect(
+      resolveSlideAccent(slide({ accentOverride: "#EC388A", authorizedAccentOverride: true }), brand),
+    ).toBe("#EC388A");
   });
 });
 

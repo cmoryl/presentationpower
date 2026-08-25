@@ -959,9 +959,9 @@ export async function exportDeckToPptx(
   };
 
   // Fallback: when a slide has no explicit Backgrounds & Imagery selection,
-  // honor the variant's deterministic backdrop (curated corporate-dark set,
-  // division photograph, or abstract atmospheric — same asset the editor's
-  // dark-mode preview and Present view render). Without this the exported
+  // honor the variant's deterministic backdrop (the approved enterprise set
+  // for all TransPerfect division scope, or an explicit non-TP brand pool —
+  // same asset the editor's dark-mode preview and Present view render). Without this the exported
   // PPTX/PDF drops the entire backdrop layer and slides land on a flat
   // color, which is the "no background/imagery in exports" symptom.
   await Promise.all(
@@ -979,9 +979,7 @@ export async function exportDeckToPptx(
 
       // Aurora backdrops have no url — render the AuroraLayer SVG for this
       // brand+seed, rasterize to PNG, and embed so PPTX/PDF gets the same
-      // brand-accented atmosphere the editor shows (previously exports for
-      // non-Corporate/Media/Games brands landed on a flat white slide with
-      // zero backdrop, formatting or brand signature).
+      // enterprise atmosphere the editor shows.
       if (backdrop.aurora) {
         const seed = backdrop.auroraSeed ?? variant.id;
         const tint = (

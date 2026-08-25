@@ -167,6 +167,7 @@ export function buildNextPaletteShowcase(): TemplatePayload {
         presenter: "Brand & Creative",
         date: "NEXT 2026",
         accentOverride: MASTER_BLUE,
+        authorizedAccentOverride: true,
       },
       notes: "Cover — master TransPerfect blue on the #03002C navy field.",
     },
@@ -184,6 +185,7 @@ export function buildNextPaletteShowcase(): TemplatePayload {
         title: d.name,
         titleEmphasis: d.name.split(" ").slice(-1)[0],
         accentOverride: d.accent,
+        authorizedAccentOverride: true,
       },
       notes: `${d.name} divider — accent ${d.accent}.`,
     });
@@ -196,6 +198,7 @@ export function buildNextPaletteShowcase(): TemplatePayload {
         subtitle: d.tagline,
         items: d.pillars.map((p) => ({ title: p.title, body: p.body })),
         accentOverride: d.accent,
+        authorizedAccentOverride: true,
       },
       notes: `${d.name} content — same module, accent swapped to ${d.accent}.`,
     });
