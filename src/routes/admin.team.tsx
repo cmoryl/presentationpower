@@ -2,7 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { getTeamOverview, type TeamFileKind } from "@/lib/admin-team.functions";
+import { toast } from "sonner";
+import { getTeamOverview, type TeamFileKind, type TeamMember } from "@/lib/admin-team.functions";
+import {
+  APP_ROLES,
+  ROLE_DESCRIPTIONS,
+  ROLE_LABELS,
+  setUserRoles,
+  type AppRole,
+} from "@/lib/admin-roles.functions";
 import { AdminForbidden, isForbidden } from "@/components/AdminShell";
 import { AdminPageHeader, AdminLoading } from "@/components/admin/AdminPage";
 
@@ -41,9 +49,107 @@ function fmtDate(iso: string) {
   return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
 }
 
+function RoleEditor({
+  member,
+  onClose,
+  onSaved,
+}: {
+  member: TeamMember;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const save = useServerFn(setUserRoles);
+  const [selected, setSelected] = useState<Set<AppRole>>(
+    new Set((member.roles ?? []).filter((r): r is AppRole => (APP_ROLES as readonly string[]).includes(r))),
+  );
+  const [saving, setSaving] = useState(false);
+
+  const toggle = (role: AppRole) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(role)) next.delete(role);
+      else next.add(role);
+      return next;
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await save({ data: { userId: member.userId, roles: [...selected] } });
+      toast.success("Roles updated", {
+        description: `${member.displayName || member.email || "Member"}: ${[...selected].map((r) => ROLE_LABELS[r]).join(", ") || "no roles"}`,
+      });
+      onSaved();
+      onClose();
+    } catch (e) {
+      toast.error("Couldn't update roles", { description: (e as Error).message });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Manage roles for ${member.displayName || member.email || "member"}`}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl border border-black/10 bg-white p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-lg font-semibold">Manage roles</h3>
+        <p className="mt-1 text-sm text-black/60">
+          {member.displayName || member.email || member.userId} — select any combination of roles.
+        </p>
+        <div className="mt-4 space-y-2">
+          {APP_ROLES.map((role) => (
+            <label
+              key={role}
+              className="flex cursor-pointer items-start gap-3 rounded-xl border border-black/10 p-3 hover:bg-black/[0.03]"
+            >
+              <input
+                type="checkbox"
+                checked={selected.has(role)}
+                onChange={() => toggle(role)}
+                className="mt-0.5 h-4 w-4 accent-[#003FC7]"
+              />
+              <span>
+                <span className="block text-sm font-medium">{ROLE_LABELS[role]}</span>
+                <span className="block text-xs text-black/55">{ROLE_DESCRIPTIONS[role]}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-black/15 px-3 py-2 text-sm hover:bg-black/5"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="rounded-lg bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:bg-[#0034a5] disabled:opacity-50"
+          >
+            {saving ? "Saving…" : "Save roles"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TeamView() {
   const fn = useServerFn(getTeamOverview);
   const q = useQuery({ queryKey: ["admin", "team"], queryFn: () => fn(), retry: false });
+  const [roleTarget, setRoleTarget] = useState<TeamMember | null>(null);
   const [kind, setKind] = useState<TeamFileKind | "all">("all");
   const [owner, setOwner] = useState<string>("all");
   const [search, setSearch] = useState("");
@@ -131,7 +237,19 @@ function TeamView() {
                       <div className="text-xs text-black/50">{m.email}</div>
                     ) : null}
                   </td>
-                  <td className="py-2 text-xs text-black/60">{m.roles.join(", ") || "user"}</td>
+                  <td className="py-2 text-xs text-black/60">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span>{m.roles.join(", ") || "user"}</span>
+                      <button
+                        type="button"
+                        onClick={() => setRoleTarget(m)}
+                        title="Add, switch, or remove roles (multiple allowed)"
+                        className="rounded-md border border-black/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-black/60 hover:bg-black/5"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </td>
                   <td className="py-2 text-xs text-black/60">
                     {m.lastSignInAt ? fmtDate(m.lastSignInAt) : "—"}
                   </td>
@@ -251,6 +369,14 @@ function TeamView() {
           </table>
         </div>
       </section>
+
+      {roleTarget ? (
+        <RoleEditor
+          member={roleTarget}
+          onClose={() => setRoleTarget(null)}
+          onSaved={() => q.refetch()}
+        />
+      ) : null}
     </div>
   );
 }
