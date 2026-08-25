@@ -182,16 +182,18 @@ export function StudioLayoutLayer({
     const { tx, ty } = snapTargets(drag.state);
 
     if (drag.state.kind === "field") {
-      const { rect } = drag.state;
+      // `rect` is the field's base (un-offset) rect; the live position starts
+      // from the committed offset plus this drag's pointer delta.
+      const { rect, startDx, startDy } = drag.state;
       const moved: Rect = {
         ...rect,
-        x: rect.x + dx,
-        y: rect.y + dy,
+        x: rect.x + startDx + dx,
+        y: rect.y + startDy + dy,
       };
       const snapped = snapRect(clampRect(moved), tx, ty);
       const out = clampRect(snapped.rect);
-      const offX = out.x - rect.x + drag.state.startDx;
-      const offY = out.y - rect.y + drag.state.startDy;
+      const offX = out.x - rect.x;
+      const offY = out.y - rect.y;
       // Live preview: transform the node directly; commit happens on release.
       drag.state.el.style.transform = `translate(${offX}px, ${offY}px)`;
       dragRef.current = { ...drag, lastOffset: { dx: offX, dy: offY } } as never;
