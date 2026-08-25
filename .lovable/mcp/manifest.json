@@ -385,7 +385,11 @@
             },
             "style_pack_id": {
               "type": "string",
-              "description": "Design skin / style pack id for the whole deck — an OnDeck catalog skin ('skin-s01'…'skin-s28') or a built-in pack id. Omit to keep the approved brand system."
+              "description": "AUTHORIZED OVERRIDES ONLY: a design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit for every normal build so the deck is created on the approved Enterprise brand system — set this only when the user explicitly named a different look, and then also set allow_non_enterprise_look: true."
+            },
+            "allow_non_enterprise_look": {
+              "type": "boolean",
+              "description": "Must be true when style_pack_id is set. Confirms the user explicitly authorized a look other than the approved Enterprise brand system."
             },
             "design_recipe_id": {
               "type": "string",
