@@ -349,7 +349,7 @@ function Dashboard() {
           {/* Mode content — remounts on change for a soft fade-in */}
           <div
             key={mode.id}
-            className="mt-6 grid animate-fade-in gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-end"
+            className="mt-6 grid animate-fade-in gap-8 lg:grid-cols-[1.6fr_1fr] lg:items-start"
           >
             <div>
               <div
