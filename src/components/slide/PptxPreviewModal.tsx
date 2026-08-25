@@ -22,6 +22,7 @@ import {
 } from "@/lib/pptx-background";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { variantSupportsImagery } from "@/lib/variant-media";
+import { estimateRelativeLuminance } from "@/lib/export-text-layer";
 import {
   PptxCertifiedCanvas,
   useCertifiedCapture,
@@ -48,8 +49,12 @@ type Check = {
 function exportModeFor(slide: DeckSlide): "light" | "dark" {
   const own = (slide as { mode?: "light" | "dark" }).mode;
   if (own === "light" || own === "dark") return own;
+  const bg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
+  if (bg.type === "color") return estimateRelativeLuminance(bg.color) < 0.42 ? "dark" : "light";
   const v = slide.variantId;
-  return v.startsWith("MV-COVER") || v.startsWith("MV-DIVIDER") ? "dark" : "light";
+  return v.startsWith("MV-COVER") || v.startsWith("MV-OP-COVER") || v.startsWith("MV-DIVIDER")
+    ? "dark"
+    : "light";
 }
 
 export function PptxPreviewModal({
@@ -196,7 +201,11 @@ export function PptxPreviewModal({
         slides: [{ ...slide, position: 0 }],
       };
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
-      await exportDeckToPptx(singleDeck, brand);
+      await exportDeckToPptx(singleDeck, brand, {
+        fidelity: "editable",
+        forceMode: exportModeFor(slide),
+        pack: pack ?? undefined,
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Export failed");
     } finally {
