@@ -1906,6 +1906,7 @@ function AssetEditor() {
                     setPickerOpen(true);
                   }}
                   onChange={(next) => patchContent({ modules: next })}
+                  onDropInsert={(section, index) => insertPickedSection(section, index)}
                   mode={editorMode}
                 />
 
