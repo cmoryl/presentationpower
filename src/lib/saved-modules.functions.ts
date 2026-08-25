@@ -24,7 +24,7 @@ const savedModuleInput = z.object({
   /** Industry design recipe composed under the pack, when one was active. */
   designRecipe: z.string().optional().nullable(),
   /** Light / dark appearance the module was authored in. */
-  mode: z.enum(["light", "dark"]).optional().nullable(),
+  mode: z.enum(["light", "dark", "mixed"]).optional().nullable(),
 });
 
 /** Canvas blocks ride along inside the content JSON — no schema migration. */
