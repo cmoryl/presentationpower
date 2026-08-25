@@ -162,7 +162,9 @@ function Editor({
   const [recipeId, setRecipeId] = useState<string | null>(
     typeof sidecars.__designRecipe === "string" ? (sidecars.__designRecipe as string) : null,
   );
-  const [mode, setMode] = useState<"light" | "dark">(sidecars.__mode === "dark" ? "dark" : "light");
+  const [mode, setMode] = useState<"light" | "dark" | "mixed">(
+    sidecars.__mode === "dark" ? "dark" : sidecars.__mode === "mixed" ? "mixed" : "light",
+  );
   const [liveEdit, setLiveEdit] = useState(true);
 
   const variant: ModuleVariant | undefined = byId(MODULE_VARIANTS, row.variant_id);
@@ -171,7 +173,9 @@ function Editor({
     BRAND_MODES.find((b) => b.id === (row.brand_mode ?? "bm-enterprise")) ?? BRAND_MODES[0],
     pack,
   );
-  const backdrop = variant ? backdropForVariant(variant, brand.id, mode) : null;
+  // Mixed previews render both appearances; single-mode previews use that mode.
+  const backdropFor = (m: "light" | "dark") =>
+    variant ? backdropForVariant(variant, brand.id, m) : null;
   const canvasBlocks = Array.isArray(sidecars.__canvasBlocks)
     ? (sidecars.__canvasBlocks as ModuleInstance["canvasBlocks"])
     : undefined;
@@ -237,7 +241,7 @@ function Editor({
     setRecipeId(
       typeof sidecars.__designRecipe === "string" ? (sidecars.__designRecipe as string) : null,
     );
-    setMode(sidecars.__mode === "dark" ? "dark" : "light");
+    setMode(sidecars.__mode === "dark" ? "dark" : sidecars.__mode === "mixed" ? "mixed" : "light");
   }
 
   return (
@@ -369,7 +373,7 @@ function Editor({
                 Look &amp; feel
               </div>
               <div className="flex rounded-full border border-black/10 p-0.5">
-                {(["light", "dark"] as const).map((m) => (
+                {(["light", "dark", "mixed"] as const).map((m) => (
                   <button
                     key={m}
                     type="button"
