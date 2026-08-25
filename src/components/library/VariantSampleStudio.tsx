@@ -35,17 +35,22 @@ import {
   ALL_BRANDS,
   INK_KEY,
   INK_SCOPE_KEY,
+  LAYOUT_KEY,
   MODES_KEY,
   applyModeCopy,
   diffSampleContent,
+  hasSampleLayout,
   mergeModeInk,
+  readSampleLayout,
   splitSampleContent,
   useVariantSampleHistory,
   useVariantSampleMutations,
+  type SampleLayout,
   type SampleModeLayer,
   type SampleModes,
   type SlideModeId,
 } from "@/hooks/use-variant-samples";
+import { StudioLayoutLayer } from "@/components/library/StudioLayoutLayer";
 import {
   collectStringPaths,
   fieldLabel,
@@ -194,6 +199,12 @@ export function VariantSampleStudio({
   const [iconPickerFor, setIconPickerFor] = useState<number | null>(null);
   /** Copy path of the logo cell whose logo-hub gallery is open. */
   const [logoPickerFor, setLogoPickerFor] = useState<string | null>(null);
+  /** Arrange mode: drag/resize every field frame + freeform layers. */
+  const [arrange, setArrange] = useState(false);
+  /** Freeform layer currently selected in arrange mode. */
+  const [selLayerId, setSelLayerId] = useState<string | null>(null);
+  /** Freeform image layer whose media picker is open. */
+  const [layerImageFor, setLayerImageFor] = useState<string | null>(null);
 
   /** Index of the imagery cell currently being dragged over. */
   const [dropTarget, setDropTarget] = useState<number | null>(null);
@@ -505,6 +516,43 @@ export function VariantSampleStudio({
     history.push(structuredClone(draft ?? {}), label, coalesceKey);
     onDraftChange(next);
     setDirty(true);
+  };
+
+  /** Arrange-mode layout (field offsets + freeform layers), kept in the
+   *  reserved `__layout` bucket so it never leaks into rendered copy. */
+  const layout = useMemo(() => readSampleLayout(draft ?? {}), [draft]);
+  const writeLayout = (next: SampleLayout, label = "Arrange") =>
+    commit({ ...draft, [LAYOUT_KEY]: next }, label);
+
+  /** Add a freeform layer centred on the slide (1920×1080 space). */
+  const addFreeLayer = (kind: "text" | "image") => {
+    const id = `fl${Date.now().toString(36)}`;
+    const layerDef =
+      kind === "text"
+        ? {
+            id,
+            kind: "text" as const,
+            x: 660,
+            y: 120,
+            w: 600,
+            h: 120,
+            text: "Double-click to edit",
+            size: 56,
+            ink: mode === "dark" ? "#FFFFFF" : "#03002C",
+          }
+        : {
+            id,
+            kind: "image" as const,
+            x: 720,
+            y: 380,
+            w: 480,
+            h: 320,
+            mediaUrl: "",
+            mediaPath: "",
+          };
+    writeLayout({ ...layout, layers: [...(layout.layers ?? []), layerDef] }, `Add ${kind} layer`);
+    setSelLayerId(id);
+    if (kind === "image") setLayerImageFor(id);
   };
 
   const applyHistory = (
