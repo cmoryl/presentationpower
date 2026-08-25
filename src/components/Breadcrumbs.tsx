@@ -2,6 +2,7 @@ import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
+import { personaById } from "@/lib/workspace-persona";
 
 // The playbook catalogs are large data modules. Breadcrumbs render in the app
 // shell on every route, so importing them statically drags all of that data
