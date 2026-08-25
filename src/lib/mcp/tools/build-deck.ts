@@ -174,12 +174,15 @@ export default defineTool({
       deck_id: deckId,
       title: input.title,
       brand_mode_id: input.brand_mode_id,
+      appearance: input.appearance ?? "light",
+      style_pack_id: stylePackId,
       slide_count: planned.length,
       slides: planned.map((s) => ({
         position: s.position,
         section_id: s.sectionId,
         variant_id: s.variantId,
         layout_id: s.layoutId,
+        mode: s.mode,
       })),
       editor_url: `/deck/${deckId}`,
       visuals_needing_data: auditVisualData(
