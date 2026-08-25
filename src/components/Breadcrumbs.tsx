@@ -67,7 +67,7 @@ const STATIC_LABELS: Record<string, string> = {
   for: "Element by role",
   marketing: "Marketing",
   sales: "Sales",
-  dashboard: "Workspace",
+  // `dashboard` is resolved dynamically from the active persona below.
 };
 
 // Segments that should be hidden from the trail entirely (they're internal
