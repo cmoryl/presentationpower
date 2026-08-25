@@ -399,6 +399,86 @@
         "outputSchema": null
       },
       {
+        "name": "build_deck",
+        "title": "Build deck (batch)",
+        "description": "Create a deck AND write every slide's full content, notes and icons in ONE call. Strongly preferred over create_deck + per-slide insert_slide/update_slide_content whenever you are building a whole approved outline at once: pass the ordered slide list with each slide's complete content object (every field filled to its capacity budget), speaker notes and optional icon. Validates every section/variant pairing before writing anything; on failure nothing is written. Returns the deck id, per-slide summary and any visuals that still need plotted data.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "brand_mode_id": {
+              "type": "string",
+              "description": "Division / brand mode id, e.g. 'bm-tp-legal'."
+            },
+            "title": {
+              "type": "string",
+              "description": "Deck title."
+            },
+            "client_name": {
+              "type": "string",
+              "description": "Prospect/client, for context."
+            },
+            "style_pack_id": {
+              "type": "string",
+              "description": "Design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit to keep the approved brand system."
+            },
+            "design_recipe_id": {
+              "type": "string",
+              "description": "Industry recipe id from the design skin catalog, e.g. 'R01'."
+            },
+            "slides": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "section_id": {
+                    "type": "string",
+                    "description": "Section framework id, e.g. 'SF-06'."
+                  },
+                  "variant_id": {
+                    "type": "string",
+                    "description": "Module variant id permitted for that section."
+                  },
+                  "content": {
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {},
+                    "description": "The slide's COMPLETE content object — every non-decorative field the variant declares, filled to its capacity budget, including plotted data keys for chart/process modules."
+                  },
+                  "notes": {
+                    "type": "string",
+                    "description": "Speaker notes for this slide."
+                  },
+                  "icon": {
+                    "type": "string",
+                    "description": "Slide-level icon name for icon-bearing modules (see search_icons)."
+                  }
+                },
+                "required": [
+                  "section_id",
+                  "variant_id",
+                  "content"
+                ]
+              },
+              "description": "Ordered slide list, position 0 first."
+            }
+          },
+          "required": [
+            "brand_mode_id",
+            "title",
+            "slides"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
         "name": "search_icons",
         "title": "Search icon library",
         "description": "Fuzzy-search the curated brand icon library. Returns icon names usable with set_slide_icon.",
