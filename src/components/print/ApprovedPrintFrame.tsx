@@ -47,6 +47,11 @@ export function ApprovedPrintFrame({
   const stepRef = useRef(0);
   stepRef.current = step;
 
+  // The fit ladder converges over several frames after mount. Keep the page
+  // hidden until the measurement settles so viewers never see the content
+  // visibly shrinking/scaling in steps — only the final, approved layout.
+  const [settled, setSettled] = useState(false);
+
   const key = useMemo(() => {
     try {
       return `${kind}|${signature ?? ""}|${JSON.stringify(content).length}`;
@@ -58,6 +63,7 @@ export function ApprovedPrintFrame({
   useEffect(() => {
     stepRef.current = 0;
     setStep(0);
+    setSettled(false);
   }, [key]);
 
   const shown = useMemo(() => relievePrintDemoContent(kind, content, step), [kind, content, step]);
@@ -67,14 +73,31 @@ export function ApprovedPrintFrame({
       settings={APPROVED_FIT_SETTINGS}
       dep={{ key, step }}
       onMeasure={(m) => {
-        if (m.overflowFrac <= DEMO_RELIEF_TOLERANCE) return;
-        if (stepRef.current >= DEMO_RELIEF_MAX_STEPS) return;
-        const next = stepRef.current + 1;
-        stepRef.current = next;
-        setStep(next);
+        if (m.overflowFrac <= DEMO_RELIEF_TOLERANCE) {
+          setSettled(true);
+          return;
+        }
+        // Still overflowing: hide while the next relief step re-measures.
+        if (stepRef.current < DEMO_RELIEF_MAX_STEPS) {
+          setSettled(false);
+          const next = stepRef.current + 1;
+          stepRef.current = next;
+          setStep(next);
+        } else {
+          setSettled(true);
+        }
       }}
     >
-      {render(shown)}
+      <div
+        aria-hidden={!settled}
+        style={{
+          opacity: settled ? 1 : 0,
+          transition: "opacity 180ms ease-out",
+          pointerEvents: settled ? undefined : "none",
+        }}
+      >
+        {render(shown)}
+      </div>
     </PrintContentFitFrame>
   );
 }
