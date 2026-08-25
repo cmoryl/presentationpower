@@ -83,12 +83,14 @@ export default defineTool({
     }
 
     // Validate + resolve every slide before any row is written.
+    const lastIdx = input.slides.length - 1;
     const planned: Array<{
       position: number;
       sectionId: string;
       variantId: string;
       layoutId: string;
       content: Record<string, unknown>;
+      mode: "light" | "dark" | null;
       notes: string | null;
     }> = [];
     for (let i = 0; i < input.slides.length; i++) {
@@ -103,15 +105,28 @@ export default defineTool({
         if (!withIcon.ok) return errorResult(`Slide ${i + 1}: ${withIcon.error}`);
         content = withIcon.value as Record<string, unknown>;
       }
+      // Mixed look: dark bookends (cover + closing), light working slides,
+      // unless the agent picked an explicit per-slide mode.
+      const mode =
+        input.appearance === "mixed"
+          ? (s.mode ?? (i === 0 || i === lastIdx ? "dark" : "light"))
+          : (s.mode ?? null);
       planned.push({
         position: i,
         sectionId: s.section_id,
         variantId: resolved.value.variantId,
         layoutId: resolved.value.layoutId,
         content,
+        mode,
         notes: s.notes ?? null,
       });
     }
+
+    // Appearance → whole-deck pack when no explicit skin was requested:
+    // dark builds on Enterprise Dark; light/mixed stay on the approved
+    // (light) brand system with per-slide dark modes doing the contrast.
+    const stylePackId =
+      input.style_pack_id ?? (input.appearance === "dark" ? "skin-s04" : null);
 
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
