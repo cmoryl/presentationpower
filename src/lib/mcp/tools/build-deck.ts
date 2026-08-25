@@ -28,6 +28,12 @@ export default defineTool({
         "Design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit to keep the approved brand system.",
       )
       .optional(),
+    appearance: z
+      .enum(["light", "dark", "mixed"])
+      .describe(
+        "Light/dark treatment. 'light' = Enterprise Light (default), 'dark' = Enterprise Dark whole-deck, 'mixed' = dark cover and closing with light working slides (override per slide with each slide's mode). Ignored for the base look when style_pack_id is set.",
+      )
+      .optional(),
     design_recipe_id: z
       .string()
       .describe("Industry recipe id from the design skin catalog, e.g. 'R01'.")
@@ -48,6 +54,12 @@ export default defineTool({
           icon: z
             .string()
             .describe("Slide-level icon name for icon-bearing modules (see search_icons).")
+            .optional(),
+          mode: z
+            .enum(["light", "dark"])
+            .describe(
+              "Per-slide light/dark override — set dark slides in a mixed deck (e.g. cover and closing dark, working slides light).",
+            )
             .optional(),
         }),
       )
