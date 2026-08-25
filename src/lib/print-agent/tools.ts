@@ -676,7 +676,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
         // Page-aware insert: right-size/trim the module to the remaining
         // budget instead of dropping it in blind and overflowing the trim.
         const fit = fitPrintModuleIntoPage(
-          asset.kind,
+          asset.kind as Parameters<typeof fitPrintModuleIntoPage>[0],
           content,
           mod.make() as Parameters<typeof fitPrintModuleIntoPage>[2],
         );
