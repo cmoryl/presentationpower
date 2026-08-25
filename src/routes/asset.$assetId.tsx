@@ -5135,14 +5135,62 @@ function ArrayEditor<T>({
     onChange(next);
   };
   const remove = (i: number) => onChange(items.filter((_, k) => k !== i));
+  // Drag-to-reorder within the list (rows also keep the arrow buttons as a
+  // keyboard-accessible fallback).
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
+  const dropAt = (target: number) => {
+    if (dragIdx === null || dragIdx === target) return;
+    const next = [...items];
+    const [moved] = next.splice(dragIdx, 1);
+    next.splice(target, 0, moved!);
+    onChange(next);
+  };
   return (
     <div className="space-y-1">
       {items.map((it, idx) => (
         <div
           key={idx}
-          className="rounded border border-black/5 bg-black/[0.02] p-1.5 dark:border-white/10 dark:bg-white/5"
+          draggable
+          onDragStart={(e) => {
+            setDragIdx(idx);
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", String(idx));
+          }}
+          onDragOver={(e) => {
+            if (dragIdx === null) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = "move";
+            if (overIdx !== idx) setOverIdx(idx);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            dropAt(idx);
+            setDragIdx(null);
+            setOverIdx(null);
+          }}
+          onDragEnd={() => {
+            setDragIdx(null);
+            setOverIdx(null);
+          }}
+          className={`relative rounded border p-1.5 transition-colors ${
+            dragIdx === idx
+              ? "border-[#003FC7]/40 opacity-50"
+              : overIdx === idx && dragIdx !== null
+                ? "border-[#003FC7] bg-[#003FC7]/5"
+                : "border-black/5 bg-black/[0.02] dark:border-white/10 dark:bg-white/5"
+          }`}
         >
-          {row(it, idx)}
+          <div className="flex items-start gap-1">
+            <span
+              className="mt-1 shrink-0 cursor-grab text-icon-subtle active:cursor-grabbing"
+              aria-label="Drag to reorder"
+              title="Drag to reorder"
+            >
+              <GripVertical size={12} />
+            </span>
+            <div className="min-w-0 flex-1">{row(it, idx)}</div>
+          </div>
           <div className="mt-1 flex items-center justify-end gap-1">
             <button
               type="button"
