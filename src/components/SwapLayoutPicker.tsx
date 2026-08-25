@@ -183,6 +183,19 @@ export function SwapLayoutButton({
                   </button>
                 ))}
               </div>
+              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-black/40">
+                Sort
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as "fit" | "name" | "family")}
+                  aria-label="Sort modules"
+                  className="rounded-full border border-black/15 bg-white px-2.5 py-1 text-[11px] font-medium normal-case tracking-normal text-black/70 outline-none focus:border-[#003FC7]"
+                >
+                  <option value="fit">Best fit</option>
+                  <option value="name">Name A–Z</option>
+                  <option value="family">Family</option>
+                </select>
+              </label>
             </div>
             <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-black/10 bg-black/[0.02] px-6 pb-3">
               <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">
@@ -294,7 +307,8 @@ export function SwapLayoutButton({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
