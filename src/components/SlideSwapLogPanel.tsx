@@ -9,6 +9,7 @@ const SOURCE_LABEL: Record<string, string> = {
   "import-map": "Import mapping",
   bulk: "Bulk apply",
   ai: "AI",
+  revert: "Revert",
   unknown: "—",
 };
 
@@ -25,7 +26,16 @@ function when(iso: string) {
 }
 
 /** Append-only audit trail of module layout/variant swaps for one slide. */
-export function SlideSwapLogPanel({ slide, onClear }: { slide: DeckSlide; onClear?: () => void }) {
+export function SlideSwapLogPanel({
+  slide,
+  onClear,
+  onRevert,
+}: {
+  slide: DeckSlide;
+  onClear?: () => void;
+  /** Revert the slide to the module it had before that log entry. */
+  onRevert?: (entry: SlideSwapLogEntry) => void;
+}) {
   const log: SlideSwapLogEntry[] = slide.swapLog ?? [];
   const entries = [...log].reverse();
 
@@ -68,12 +78,28 @@ export function SlideSwapLogPanel({ slide, onClear }: { slide: DeckSlide; onClea
                 {e.fromVariantId} → {e.toVariantId}
                 {e.fromLayoutId !== e.toLayoutId && ` · ${e.fromLayoutId} → ${e.toLayoutId}`}
               </div>
-              <div className="mt-1 text-[11px] text-black/50">
-                by {e.actorLabel ?? e.actorId ?? "unknown user"}
+              <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-black/50">
+                <span>by {e.actorLabel ?? e.actorId ?? "unknown user"}</span>
+                {onRevert && slide.variantId !== e.fromVariantId && (
+                  <button
+                    type="button"
+                    onClick={() => onRevert(e)}
+                    className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/55 hover:border-black/40 hover:text-black"
+                    title={`Swap back to ${e.fromVariantName ?? e.fromVariantId} — other edits are kept`}
+                  >
+                    Revert
+                  </button>
+                )}
               </div>
             </li>
           ))}
         </ol>
+      )}
+      {entries.length > 0 && onRevert && (
+        <p className="mt-2 text-[11px] leading-snug text-black/45">
+          Revert swaps this slide back to an earlier module only — your other edits are kept, and
+          the revert itself can be undone.
+        </p>
       )}
     </div>
   );

@@ -168,6 +168,7 @@ function DeckEditor() {
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const updateField = useDeckStore((s) => s.updateSlideField);
   const swapVariant = useDeckStore((s) => s.swapVariant);
+  const revertSlideSwap = useDeckStore((s) => s.revertSlideSwap);
   const clearSlideSwapLog = useDeckStore((s) => s.clearSlideSwapLog);
   // Register the signed-in user so swap audit entries record who made them.
   useAuditActor();
@@ -315,6 +316,52 @@ function DeckEditor() {
   const canRedoAll = futureLen > 0 || Boolean(topViewRedo);
   const undoLabelAll = viewUndoActive ? (topViewUndo?.label ?? null) : docUndoLabel;
   const redoLabelAll = futureLen > 0 ? docRedoLabel : (topViewRedo?.label ?? null);
+
+  // ⌘/Ctrl+Z undo, ⌘/Ctrl+Shift+Z (or Ctrl+Y) redo — covers module swaps and
+  // every other document edit. Skips text inputs so typing undo stays native.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA"))
+        return;
+      const key = e.key.toLowerCase();
+      if (key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      } else if ((key === "z" && e.shiftKey) || key === "y") {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [handleUndo, handleRedo]);
+
+  /**
+   * Revert one slide to the module it had before a specific swap-log entry.
+   * Targeted at that slide only — unlike global undo it never touches other
+   * edits made after the swap. The revert is itself a labelled history entry.
+   */
+  const handleRevertSwap = useCallback(
+    (slideId: string, entryId: string) => {
+      const ok = revertSlideSwap(deckId, slideId, entryId);
+      if (!ok) {
+        toast.error("Couldn't revert that swap", {
+          description: "The slide is already on that module or the entry no longer exists.",
+        });
+        return;
+      }
+      toast("Swap reverted", {
+        description: "Only this slide's module changed — your other edits were kept.",
+        cancel: {
+          label: "Undo",
+          onClick: () => useDeckStore.getState().undo(),
+        },
+      });
+    },
+    [deckId, revertSlideSwap],
+  );
   void viewVersion;
   const [saveModuleOpen, setSaveModuleOpen] = useState(false);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
@@ -1916,6 +1963,13 @@ function DeckEditor() {
                                 </p>
                               </div>
                             </Panel>
+                            <Panel label="Swap history" collapsible defaultOpen={false}>
+                              <SlideSwapLogPanel
+                                slide={active}
+                                onClear={() => clearSlideSwapLog(deck.id, active.id)}
+                                onRevert={(entry) => handleRevertSwap(active.id, entry.id)}
+                              />
+                            </Panel>
                             <Panel label="Related modules">
                               <div className="mb-2 text-xs text-black/50">
                                 Same family — ranked by shared layouts, section fit, and fallback
@@ -2084,14 +2138,6 @@ function DeckEditor() {
                                   })
                                 }
                                 onOpenEditor={() => setZoomedTracked(true)}
-                              />
-                            </Panel>
-                          )}
-                          {active && (
-                            <Panel label="Swap history">
-                              <SlideSwapLogPanel
-                                slide={active}
-                                onClear={() => clearSlideSwapLog(deck.id, active.id)}
                               />
                             </Panel>
                           )}
