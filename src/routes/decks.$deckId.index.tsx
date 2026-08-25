@@ -132,6 +132,7 @@ import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/li
 import { gateQaIssues } from "@/lib/demo-approved";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { QaAiCopyFixButton } from "@/components/deck/QaAiCopyFixButton";
+import { RelatedModulesPanel } from "@/components/deck/RelatedModulesPanel";
 
 import {
   BRAND_MODES,
@@ -140,7 +141,6 @@ import {
   LAYOUT_FRAMEWORKS,
   byId,
   variantsForSection,
-  relatedVariants,
 } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 
