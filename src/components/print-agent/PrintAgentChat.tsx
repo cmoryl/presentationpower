@@ -17,12 +17,14 @@ import {
   PRINT_LOOK_TOOL_NAME,
   PRINT_MODULES_TOOL_NAME,
   PRINT_PREVIEW_TOOL_NAME,
+  PRINT_EXPORT_TOOL_NAME,
 } from "@/lib/print-agent/tools";
 import { PrintProposalCard, printProposalFromTool } from "./PrintProposalCard";
 import { PrintSuggestionCards, printSuggestionsFromTool } from "./PrintSuggestionCards";
 import { PrintLookCard, printLookFromTool } from "./PrintLookCard";
 import { PrintModulePaletteCard, printModulePaletteFromTool } from "./PrintModulePaletteCard";
 import { PrintLivePreviewCard, printLivePreviewFromTool } from "./PrintLivePreviewCard";
+import { PrintExportCard, printExportFromTool } from "./PrintExportCard";
 
 import { AgentDocumentUpload, useAgentDocuments } from "@/components/agent/AgentDocumentUpload";
 import { withDocumentContext } from "@/lib/agent/doc-intake";
@@ -44,6 +46,7 @@ const TOOL_LABELS: Record<string, string> = {
   [PRINT_LOOK_TOOL_NAME]: "Proposing the look & feel",
   [PRINT_MODULES_TOOL_NAME]: "Listing supported sections",
   [PRINT_PREVIEW_TOOL_NAME]: "Rendering a live preview",
+  [PRINT_EXPORT_TOOL_NAME]: "Preparing print-ready files",
   list_hero_imagery: "Finding approved hero imagery",
   set_print_look: "Applying the look & feel",
 };
@@ -187,6 +190,10 @@ export function PrintAgentChat({
                     if (name === PRINT_PREVIEW_TOOL_NAME) {
                       const preview = printLivePreviewFromTool(part);
                       if (preview) return <PrintLivePreviewCard key={key} preview={preview} />;
+                    }
+                    if (name === PRINT_EXPORT_TOOL_NAME) {
+                      const req = printExportFromTool(part);
+                      if (req) return <PrintExportCard key={key} request={req} />;
                     }
 
                     const state = (part as { state?: string }).state ?? "";
