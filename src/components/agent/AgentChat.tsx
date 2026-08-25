@@ -102,6 +102,7 @@ export function AgentChat({
   const [appearance, setAppearance] = useState<DeckAppearance>("mixed");
   const { docs, setDocs } = useAgentDocuments();
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const hasUserBrief = useMemo(() => messages.some((m) => m.role === "user"), [messages]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const busy = status === "submitted" || status === "streaming";
@@ -136,7 +137,7 @@ export function AgentChat({
     (text: string) => {
       const value = text.trim();
       if (!value || busy) return;
-      const isFirstCreationTurn = messages.length === 0;
+      const isFirstCreationTurn = !hasUserBrief;
       if (isFirstCreationTurn) onFirstUserMessage(value);
       setInput("");
       // An imported knowledge map + one-off overrides travel with every turn.
@@ -150,7 +151,7 @@ export function AgentChat({
       const withDocs = withDocumentContext(agentText, docs);
       void sendMessage({ text: withDocs }, Object.keys(body).length ? { body } : undefined);
     },
-    [appearance, busy, docs, messages.length, onFirstUserMessage, sendMessage, threadId],
+    [appearance, busy, docs, hasUserBrief, onFirstUserMessage, sendMessage, threadId],
   );
 
   // The newest outline proposal is the only one that still offers actions.
@@ -202,7 +203,7 @@ export function AgentChat({
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-auto px-5 py-6">
-        {messages.length === 0 && (
+        {!hasUserBrief && (
           <div className="mx-auto max-w-lg space-y-4 py-10 text-center">
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
               Build a presentation by talking it through
