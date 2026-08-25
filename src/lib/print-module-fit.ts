@@ -260,7 +260,10 @@ export function qaFitPrintContent(
     let page = printPageBudget(ck, content, { budgetScale: FRESH_CONTENT_BUDGET_SCALE });
     while (page && page.used > page.budget + 0.001 && fitted.length > 0) {
       const dropped = fitted.pop()!;
-      notes.push(`removed “${dropped.title ?? dropped.kind}” to keep the page inside the trim`);
+      const droppedTitle = (dropped as unknown as Bag)["title"];
+      notes.push(
+        `removed “${typeof droppedTitle === "string" && droppedTitle ? droppedTitle : dropped.kind}” to keep the page inside the trim`,
+      );
       content["modules"] = fitted;
       page = printPageBudget(ck, content, { budgetScale: FRESH_CONTENT_BUDGET_SCALE });
       anyOver = true;
