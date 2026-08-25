@@ -688,10 +688,10 @@ function ApprovedStyleCard({
 
   return (
     <div
-      className={`group relative rounded-lg border p-1.5 transition ${
+      className={`group relative flex flex-col overflow-hidden rounded-xl border transition ${
         active
-          ? "border-[#003FC7] bg-[#003FC7]/[0.05]"
-          : "border-black/10 bg-white hover:border-[#003FC7]/60 dark:border-white/10 dark:bg-white/[0.03]"
+          ? "border-[#003FC7] shadow-[0_2px_10px_rgba(0,63,199,0.12)]"
+          : "border-black/10 bg-white hover:border-[#003FC7]/60 hover:shadow-[0_2px_10px_rgba(3,0,44,0.08)] dark:border-white/10 dark:bg-white/[0.03]"
       }`}
     >
       <button
@@ -701,62 +701,81 @@ function ApprovedStyleCard({
         aria-pressed={active}
         className="block w-full text-left"
       >
-        <div className="relative overflow-hidden rounded">
-          <ApprovedStyleThumb pack={shown} scene={style.thumbScene} />
+        <div className="relative">
+          <ApprovedStyleThumb pack={shown} scene={style.thumbScene} radius={0} />
           {recommended && (
-            <span className="absolute left-1 top-1 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white">
+            <span className="absolute left-1.5 top-1.5 rounded-full bg-[#003FC7] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white">
               Recommended
+            </span>
+          )}
+          {active && (
+            <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#003FC7] text-white">
+              <Check size={10} strokeWidth={3} />
             </span>
           )}
         </div>
 
-        {/* The background SET, not one image: hero, content, data, flow. */}
-        <div className="mt-1">
-          <ApprovedStyleSet pack={shown} showLabels />
-        </div>
-
-        <div className="mt-1.5 flex items-start gap-1">
-          <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#03002C] dark:text-white">
-            {style.name}
-          </span>
-          {active && <Check size={11} className="text-[#003FC7]" />}
-        </div>
-        <div className="truncate text-[9px] uppercase tracking-wider text-black/40 dark:text-white/40">
-          {style.code} · {style.density}
-        </div>
-
-        <div className="mt-1 flex flex-wrap gap-1">
-          {style.chips.slice(0, 4).map((c) => (
-            <span
-              key={c}
-              className="rounded border border-black/10 px-1 py-px text-[8px] text-[#03002C]/55 dark:border-white/10 dark:text-white/55"
-            >
-              {c}
+        <div className="space-y-1.5 px-2.5 pb-2 pt-2">
+          <div className="flex items-baseline gap-1.5">
+            <span className="min-w-0 flex-1 truncate text-[11px] font-semibold leading-tight text-[#03002C] dark:text-white">
+              {style.name}
             </span>
-          ))}
-        </div>
+            <span className="shrink-0 text-[9px] font-semibold uppercase tracking-wider text-black/40 dark:text-white/40">
+              {style.code}
+            </span>
+          </div>
+          <div className="truncate text-[9px] uppercase tracking-wider text-black/40 dark:text-white/40">
+            {style.density} density
+          </div>
 
-        <div className="mt-1 flex items-center gap-1.5">
-          <span aria-hidden className="flex overflow-hidden rounded">
-            {style.palette.map((c) => (
-              <span key={c} className="h-2.5 w-2.5" style={{ background: c }} />
-            ))}
-          </span>
-          <span className="truncate text-[8px] text-black/35 dark:text-white/35">
-            {style.specSummary}
-          </span>
+          {style.chips.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {style.chips.slice(0, 3).map((c) => (
+                <span
+                  key={c}
+                  className="rounded-full bg-black/[0.05] px-1.5 py-px text-[8px] text-[#03002C]/60 dark:bg-white/[0.08] dark:text-white/60"
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center gap-1.5 pt-0.5">
+            <span aria-hidden className="flex shrink-0 overflow-hidden rounded-full">
+              {style.palette.slice(0, 5).map((c) => (
+                <span key={c} className="h-2 w-2" style={{ background: c }} />
+              ))}
+            </span>
+            <span className="min-w-0 flex-1 truncate text-[8px] text-black/35 dark:text-white/35">
+              {style.specSummary}
+            </span>
+          </div>
         </div>
       </button>
 
-      <button
-        type="button"
-        onClick={onView}
-        aria-haspopup="dialog"
-        aria-label={`View the full ${style.code} ${style.name} card`}
-        className="mt-1.5 inline-flex w-full items-center justify-center gap-1 rounded border border-black/10 py-1 text-[9px] font-semibold uppercase tracking-wider text-[#03002C]/60 transition hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/15 dark:text-white/60"
-      >
-        <Maximize2 size={9} /> View card
-      </button>
+      <div className="mt-auto flex divide-x divide-black/[0.07] border-t border-black/[0.07] dark:divide-white/10 dark:border-white/10">
+        <button
+          type="button"
+          onClick={onPick}
+          className={`flex-1 py-1.5 text-[9px] font-semibold uppercase tracking-wider transition ${
+            active
+              ? "bg-[#003FC7]/[0.06] text-[#003FC7]"
+              : "text-[#03002C]/55 hover:bg-black/[0.03] hover:text-[#003FC7] dark:text-white/55 dark:hover:bg-white/[0.05]"
+          }`}
+        >
+          {active ? "Selected" : "Use"}
+        </button>
+        <button
+          type="button"
+          onClick={onView}
+          aria-haspopup="dialog"
+          aria-label={`View the full ${style.code} ${style.name} card`}
+          className="inline-flex flex-1 items-center justify-center gap-1 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-[#03002C]/55 transition hover:bg-black/[0.03] hover:text-[#003FC7] dark:text-white/55 dark:hover:bg-white/[0.05]"
+        >
+          <Maximize2 size={9} /> View card
+        </button>
+      </div>
     </div>
   );
 }
