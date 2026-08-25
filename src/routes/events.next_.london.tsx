@@ -411,7 +411,10 @@ function LondonSignagePage() {
                 {openPanel.floor} · {openPanel.room} · {openPanel.proof} p
                 {String(openPanel.page).padStart(2, "0")}
               </p>
-              <PanelThumb panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
+              {/* Cap the hero thumb so the tier preview and downloads stay in view. */}
+              <div className="mx-auto w-full max-w-[240px]">
+                <PanelThumb panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
+              </div>
 
               <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {[
