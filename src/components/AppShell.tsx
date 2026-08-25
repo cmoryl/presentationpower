@@ -16,6 +16,10 @@ const ADMIN_LINKED_PATTERNS = [
 ];
 
 function matchesAdminLinked(pathname: string): boolean {
+  // Brand guides are a public, user-facing surface — never carry the admin
+  // sidebar/chrome into them, even when the visitor arrived from the admin
+  // console.
+  if (pathname.startsWith("/knowledge/brand-guides")) return false;
   return ADMIN_LINKED_PATTERNS.some((re) => re.test(pathname));
 }
 
