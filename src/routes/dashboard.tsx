@@ -151,6 +151,7 @@ function RoleDashboard() {
     defaultPersona,
     isOverridden,
     roles,
+    allowed,
     choose,
     reset,
   } = useWorkspacePersona();
@@ -316,7 +317,7 @@ function RoleDashboard() {
             role="group"
             aria-label="Choose a workspace"
           >
-            {PERSONAS.map((p) => {
+            {PERSONAS.filter((p) => allowed.includes(p.id)).map((p) => {
               const Icon = PERSONA_ICON[p.id];
               const active = p.id === personaId;
               const t = personaTheme(p.id);
