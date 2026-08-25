@@ -132,8 +132,15 @@ function PrintDemoPage() {
   const [look, setLook] = useState<DemoLook>(baseLook);
   useEffect(() => setLook(baseLook), [baseLook]);
 
+  // Language preview: the whole page content blob goes through the ephemeral
+  // demo translator, so every module's copy localizes while the approved
+  // layout, look and imagery stay exactly as pinned.
+  const txItems = useMemo(() => [draft as unknown], [draft]);
+  const tx = useDemoTranslate(txItems);
+  const localizedDraft = tx.isTranslated ? (tx.items[0] as unknown) : draft;
 
   if (!def || !item) return null;
+
   const previewBrand =
     BRAND_MODES.find((b) => b.id === (item.divisionId ?? "bm-enterprise")) ?? BRAND_MODES[0];
   const accent = def.accent;
