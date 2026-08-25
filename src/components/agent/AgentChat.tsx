@@ -115,8 +115,82 @@ export function AgentChat({
   const hasUserBrief = useMemo(() => messages.some((m) => m.role === "user"), [messages]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const busy = status === "submitted" || status === "streaming";
+  const streamBusy = status === "submitted" || status === "streaming";
+  const [demoBusy, setDemoBusy] = useState(false);
+  const busy = streamBusy || demoBusy;
   const seenDeck = useRef<string | null>(null);
+  // Incremented to cancel an in-flight demo build (thread switch / unmount).
+  const demoRunId = useRef(0);
+  useEffect(() => {
+    return () => {
+      demoRunId.current += 1;
+    };
+  }, [threadId]);
+
+  /**
+   * Demo fast-path: when the brief matches the demo trigger, skip the server
+   * round-trip and play a staged build against a pre-authored, QA-clean deck
+   * snapshot. The same message parts and tool states the live stream produces
+   * drive the UI, so the timeline, tool chips and preview all behave normally.
+   */
+  const runDemoBuild = useCallback(
+    async (briefText: string, isFirstCreationTurn: boolean) => {
+      const runId = (demoRunId.current += 1);
+      const alive = () => demoRunId.current === runId;
+      const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+      setDemoBusy(true);
+      setInput("");
+      if (isFirstCreationTurn) onFirstUserMessage(briefText);
+
+      const userMsg: UIMessage = {
+        id: `demo-u-${runId}-${Date.now()}`,
+        role: "user",
+        parts: [{ type: "text", text: briefText }],
+      };
+      const asstId = `demo-a-${runId}-${Date.now()}`;
+      const render = (text: string, tools: DemoToolPart[]): UIMessage => ({
+        id: asstId,
+        role: "assistant",
+        parts: [
+          { type: "text", text },
+          ...(tools as unknown as UIMessage["parts"]),
+        ],
+      });
+      const push = (msg: UIMessage) =>
+        setMessages((prev) => {
+          const idx = prev.findIndex((m) => m.id === msg.id);
+          if (idx === -1) return [...prev, msg];
+          const next = prev.slice();
+          next[idx] = msg;
+          return next;
+        });
+
+      try {
+        // Create the deck up front (fast, local) so the mid-build createDeck
+        // tool part can carry the real id and the preview can pop live.
+        const { deckId } = useDeckStore.getState().createDeckFromSnapshot(GLOBALLINK_Q3_QBR_DECK);
+        const steps = demoBuildSteps(deckId);
+        push(userMsg);
+        for (const step of steps) {
+          if (!alive()) return;
+          push(render(step.text, step.tools));
+          onActivity();
+          await sleep(step.holdMs);
+        }
+        if (!alive()) return;
+        const finalMsg = render(demoFinalAssistantText(), steps[steps.length - 1]!.tools);
+        push(finalMsg);
+        onActivity();
+        // Persist so a reload shows the same conversation and linked deck.
+        void appendAgentMessages(threadId, [userMsg, finalMsg]).catch(() => {});
+        void setAgentThreadDeck(threadId, deckId).catch(() => {});
+        toast.success("Deck ready — open it in the editor or export to PowerPoint.");
+      } finally {
+        if (alive()) setDemoBusy(false);
+      }
+    },
+    [onActivity, onFirstUserMessage, setMessages, threadId],
+  );
 
   useEffect(() => {
     inputRef.current?.focus();
