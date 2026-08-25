@@ -115,10 +115,17 @@ function CanvasStudioPage() {
   // but never while typing into a field.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey)) return;
       const t = e.target as HTMLElement | null;
       const tag = t?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t?.isContentEditable) return;
+      // Escape clears the selection no matter where focus sits (palette,
+      // layers rail, inspector) — a full-bleed module leaves no empty canvas
+      // to click, so this is the reliable way out of a group selection.
+      if (e.key === "Escape") {
+        setSelected([]);
+        return;
+      }
+      if (!(e.metaKey || e.ctrlKey)) return;
       const k = e.key.toLowerCase();
       if (k === "z") {
         e.preventDefault();
