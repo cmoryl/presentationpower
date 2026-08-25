@@ -191,29 +191,55 @@ function LondonRevisePage() {
   const regenerate = async (panels: LondonPanel[], rev: number, kind: "vector" | "raster") => {
     const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
-    const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint"];
+    const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint,qa"];
+    // Every regenerated file is audited against the revised spec before it is
+    // packaged, and the audit ships inside the ZIP as qa-report.csv.
+    const reports: LondonQaReport[] = [];
     for (const panel of panels) {
       const base = londonPanelFileBase(panel, rev);
       const svg = buildLondonPanelSvg(panel);
       if (kind === "vector") {
         const ai = buildLondonPanelAi(panel);
+        const svgQa = auditSvg(panel, svg);
+        const aiQa = auditAi(panel, ai);
+        reports.push(svgQa, aiQa);
         zip.file(`vector/${base}.svg`, svg);
         zip.file(`vector/${base}.ai`, ai);
         manifest.push(
-          `${base}.ai,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(ai)}`,
+          `${base}.ai,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(ai)},${aiQa.status}`,
         );
       }
       const size = rasterSizeFor(panel, panel.rasterPpi);
       const png = await renderDitheredPng(svg, size.w, size.h);
+      const pngQa = auditPng(panel, panel.rasterPpi, new Uint8Array(await png.arrayBuffer()));
+      reports.push(pngQa);
       zip.file(`raster/${base}-${panel.rasterPpi}ppi.png`, png);
       manifest.push(
-        `${base}-${panel.rasterPpi}ppi.png,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(svg)}`,
+        `${base}-${panel.rasterPpi}ppi.png,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(svg)},${pngQa.status}`,
       );
     }
     zip.file("manifest.csv", manifest.join("\n"));
+    zip.file("qa-report.csv", qaReportCsv(reports));
     const blob = await zip.generateAsync({ type: "blob" });
     download(blob, `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
+
+    const r = rollup(reports);
+    setQa(reports);
+    if (r.fail) {
+      toast.error(`${r.fail} of ${r.total} regenerated files failed spec QA`, {
+        description: qaSummary(reports.find((x) => x.status === "fail")!),
+      });
+    } else if (r.warn) {
+      toast.warning(`${r.warn} of ${r.total} regenerated files carry QA warnings`, {
+        description: qaSummary(reports.find((x) => x.status === "warn")!),
+      });
+    } else {
+      toast.success(`Spec QA passed on all ${r.total} regenerated files`, {
+        description: "Trim, bleed, ppi and banding verified against the revised spec.",
+      });
+    }
   };
+
 
   const regenAffected = () => {
     const vectorPanels = draft.filter((p) => plan.vector.includes(p.id));
