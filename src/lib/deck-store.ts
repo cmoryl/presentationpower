@@ -4700,7 +4700,7 @@ export const useDeckStore = create<DeckState>()(
             // Fall back to the Enterprise master profile so accent-legibility
             // and brand-variant fixes still run on decks with no explicit
             // brand mode (agent-built decks default to Enterprise anyway).
-            brandModeId: deck.brandModeId ?? "bm-master",
+            brandModeId: deck.brandModeId ?? "bm-enterprise",
             industryId: deck.context?.designRecipeId ?? null,
             includeWarnings: opts?.includeWarnings !== false,
           });
