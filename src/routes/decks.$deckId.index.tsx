@@ -132,6 +132,7 @@ import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/li
 import { gateQaIssues } from "@/lib/demo-approved";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
 import { QaAiCopyFixButton } from "@/components/deck/QaAiCopyFixButton";
+import { RelatedModulesPanel } from "@/components/deck/RelatedModulesPanel";
 
 import {
   BRAND_MODES,
@@ -140,7 +141,6 @@ import {
   LAYOUT_FRAMEWORKS,
   byId,
   variantsForSection,
-  relatedVariants,
 } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 
@@ -1972,35 +1972,11 @@ function DeckEditor() {
                               />
                             </Panel>
                             <Panel label="Related modules">
-                              <div className="mb-2 text-xs text-black/50">
-                                Same family — ranked by shared layouts, section fit, and fallback
-                                links.
-                              </div>
-                              <ul className="space-y-1.5">
-                                {relatedVariants(mv.id, active.sectionId, 5).map((rv) => (
-                                  <li
-                                    key={rv.id}
-                                    className="flex items-center justify-between gap-2 text-sm"
-                                  >
-                                    <span className="min-w-0 truncate">{rv.name}</span>
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        swapVariantWithRefit(active.id, rv.id, "related")
-                                      }
-                                      className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
-                                      title={`Swap to ${rv.id}`}
-                                    >
-                                      Swap
-                                    </button>
-                                  </li>
-                                ))}
-                                {relatedVariants(mv.id, active.sectionId, 1).length === 0 && (
-                                  <li className="text-sm text-black/50">
-                                    No sibling variants in this family.
-                                  </li>
-                                )}
-                              </ul>
+                              <RelatedModulesPanel
+                                variant={mv}
+                                sectionId={active.sectionId}
+                                onSwap={(vid) => swapVariantWithRefit(active.id, vid, "related")}
+                              />
                             </Panel>
                           </InspectorSection>
                         )}
