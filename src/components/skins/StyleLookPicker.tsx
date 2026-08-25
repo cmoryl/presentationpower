@@ -576,7 +576,7 @@ export function StyleLookPicker({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 items-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
             {/* Approved brand system always leads the grid. */}
             <button
               type="button"
