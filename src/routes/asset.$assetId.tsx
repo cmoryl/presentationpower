@@ -749,6 +749,73 @@ function AssetEditor() {
     }
   }
 
+  // Single entry point for landing a library module on the page — used by the
+  // picker's click-insert AND drag-and-drop onto the Shared modules list, so
+  // both honor an armed Replace target. When replaceTarget is set the picked
+  // module takes that section's place (stacked modules swap in their slot;
+  // built-in sections like "features" are cleared); otherwise it appends (or
+  // inserts at dropIndex for drag-and-drop).
+  function insertPickedSection(section: PrintSection, dropIndex?: number) {
+    // Library modules are authored for a generous page; fit them to THIS
+    // template's remaining space before they land, so a dense piece never
+    // clips the trim on insert.
+    const fit = fitPrintModuleIntoPage(kind, content, section);
+    const mods = content.modules ?? [];
+    let next: PrintSection[];
+    let replacedLabel: string | null = null;
+    const patch: Record<string, unknown> = {};
+    if (replaceTarget?.startsWith("module:")) {
+      // Swap in place so the new module keeps the old one's slot.
+      const id = replaceTarget.slice("module:".length);
+      const idx = mods.findIndex((m) => m.id === id);
+      if (idx >= 0) {
+        replacedLabel = sectionKindLabel(mods[idx].kind);
+        next = [...mods.slice(0, idx), fit.section, ...mods.slice(idx + 1)];
+      } else {
+        next = [...mods, fit.section];
+      }
+    } else {
+      next = [...mods];
+      const at =
+        dropIndex == null ? mods.length : Math.max(0, Math.min(dropIndex, mods.length));
+      next.splice(at, 0, fit.section);
+      if (replaceTarget) {
+        // Built-in section (e.g. "features") being replaced by a module:
+        // clear its content field so it actually comes off the page.
+        const field = SECTION_CLEARABLE_FIELDS[replaceTarget];
+        if (field) {
+          const prev = (content as unknown as Record<string, unknown>)[field];
+          patch[field] = Array.isArray(prev) ? [] : undefined;
+          replacedLabel =
+            SECTION_DELETE_LABELS[replaceTarget] ??
+            replaceTarget.replace(/([A-Z])/g, " $1");
+        }
+      }
+    }
+    patchContent({ ...patch, modules: next } as never);
+    const wasReplace = replacedLabel !== null;
+    setReplaceTarget(null);
+    if (fit.overBudget) {
+      // Absorb the remainder uniformly instead of clipping.
+      patchCtx({
+        density: "compact",
+        contentFit: { ...resolveContentFit(ctx.contentFit), enabled: true },
+      });
+    }
+    if (wasReplace) {
+      toast.success(
+        `${replacedLabel} replaced with ${sectionKindLabel(fit.section.kind)}`,
+        { description: fit.note ?? undefined },
+      );
+    } else if (fit.note) {
+      toast.success(`Module added — ${fit.note}`, {
+        description: "Fitted to this template's page budget.",
+      });
+    } else {
+      toast.success("Module added");
+    }
+  }
+
   // Collect all non-empty string paths in the content object so LiveEditOverlay
   // can bind DOM text nodes back to structured content.
   function collectStringPaths(v: unknown, prefix = ""): string[] {
