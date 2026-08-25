@@ -22,6 +22,8 @@ import {
 
 import { toast } from "sonner";
 
+import { useServerFn } from "@tanstack/react-start";
+
 import { AppShell } from "@/components/AppShell";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -51,6 +53,13 @@ import {
   type LondonArtwork,
   type LondonPanel,
 } from "@/lib/next-london-signage";
+import {
+  effectiveLondonPanels,
+  isAddedPanel,
+  londonPanelSvgFor,
+  resolveLondonArtwork,
+} from "@/lib/next-london-revise";
+import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 
 export const Route = createFileRoute("/events/next_/london")({
   head: () => ({
@@ -122,7 +131,11 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
 }
 
 function LondonSignagePage() {
-  const floors = useMemo(() => londonPanelsByFloor(), []);
+  const fetchRevisions = useServerFn(listLondonRevisions);
+  // The kit shows the panel set IN FORCE: the newest published revision, or the
+  // issued venue pack when there is none (or when the viewer is not signed in).
+  const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
+  const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
   const [floorId, setFloorId] = useState<string>("all");
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
@@ -145,15 +158,41 @@ function LondonSignagePage() {
   }, []);
 
   useEffect(() => {
+    let live = true;
+    fetchRevisions({})
+      .then((res) => {
+        if (!live) return;
+        const inForce = effectiveLondonPanels(res.revisions);
+        if (inForce.length) setPanels(inForce);
+      })
+      .catch(() => {
+        /* Not signed in or history unavailable — the issued pack stands. */
+      });
+    return () => {
+      live = false;
+    };
+  }, [fetchRevisions]);
+
+  useEffect(() => {
     if (openPanel) setPpi(recommendedPpi(openPanel));
   }, [openPanel]);
 
   const shown = floorId === "all" ? floors : floors.filter((f) => f.id === floorId);
-  const styleCount = new Set(LONDON_PANELS.map((p) => p.style)).size;
-  const roomCount = new Set(LONDON_PANELS.map((p) => `${p.floor}·${p.room}`)).size;
-  const worstBand = Math.max(...LONDON_PANELS.map((p) => p.bandMm));
+  const styleCount = new Set(panels.map((p) => p.style)).size;
+  const roomCount = new Set(panels.map((p) => `${p.floor}·${p.room}`)).size;
+  const worstBand = Math.max(...panels.map((p) => p.bandMm));
 
   const target = openPanel ? rasterSizeFor(openPanel, ppi) : null;
+
+  const packOrNull = async () => {
+    if (artwork) return artwork;
+    try {
+      return await loadLondonArtwork();
+    } catch {
+      // Added and revised panels do not need the packaged masters at all.
+      return null;
+    }
+  };
 
   const downloadVector = (panel: LondonPanel, fmt: "svg" | "ai") =>
     runWithExportFeedback(
@@ -167,11 +206,15 @@ function LondonSignagePage() {
             : "Live vector gradient sized to bleed.",
       },
       async () => {
-        const pack = artwork ?? (await loadLondonArtwork());
-        const entry = pack[panel.id];
-        if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
-        const body = fmt === "svg" ? entry.svg : entry.ai;
-        gateOnQa(fmt === "svg" ? auditSvg(panel, entry.svg) : auditAi(panel, entry.ai));
+        const pack = await packOrNull();
+        const art = resolveLondonArtwork(panel, pack);
+        const body: BlobPart =
+          fmt === "svg"
+            ? art.svg
+            : typeof art.ai === "string"
+              ? art.ai
+              : new Uint8Array(art.ai).slice();
+        gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
         const type = fmt === "svg" ? "image/svg+xml" : "application/postscript";
         download(new Blob([body], { type }), `${panelSlug(panel)}.${fmt}`);
       },
@@ -186,11 +229,9 @@ function LondonSignagePage() {
         successDescription: "Lossless PNG, sized to bleed, triangular-PDF dither applied.",
       },
       async () => {
-        const pack = artwork ?? (await loadLondonArtwork());
-        const entry = pack[panel.id];
-        if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
+        const pack = await packOrNull();
         const size = rasterSizeFor(panel, ppi);
-        const blob = await renderDitheredPng(entry.svg, size.w, size.h);
+        const blob = await renderDitheredPng(resolveLondonArtwork(panel, pack).svg, size.w, size.h);
         gateOnQa(auditPng(panel, ppi, new Uint8Array(await blob.arrayBuffer())));
         download(blob, `${panelSlug(panel)}-${ppi}ppi.png`);
       },
@@ -202,11 +243,11 @@ function LondonSignagePage() {
         pending: "Building the print schedule…",
         success: "NEXT-London-print-schedule.csv downloaded",
         failure: "Schedule export failed",
-        successDescription: "54 panels with trim, bleed, ground, raster size and measured banding.",
+        successDescription: `${panels.length} panels with trim, bleed, ground, raster size and measured banding.`,
       },
       async () => {
         download(
-          new Blob([londonScheduleCsv()], { type: "text/csv" }),
+          new Blob([londonScheduleCsv(panels)], { type: "text/csv" }),
           "NEXT-London-print-schedule.csv",
         );
       },
@@ -215,44 +256,27 @@ function LondonSignagePage() {
   const runKitQa = () =>
     runWithExportFeedback(
       {
-        pending: "Auditing all 54 panels…",
+        pending: `Auditing all ${panels.length} panels…`,
         success: "NEXT-London-qa-report.csv downloaded",
         failure: "QA sweep failed",
         successDescription: "Trim, bleed, ppi tier and banding checked for every vector master.",
       },
       async () => {
-        const pack = artwork ?? (await loadLondonArtwork());
+        const pack = await packOrNull();
         const reports: LondonQaReport[] = [];
-        for (const panel of LONDON_PANELS) {
-          const entry = pack[panel.id];
-          if (!entry) {
-            reports.push({
-              panelId: panel.id,
-              panelName: panel.name,
-              file: `${panelSlug(panel)}.svg`,
-              kind: "svg",
-              status: "fail",
-              checks: [
-                {
-                  id: "pack-present",
-                  label: "Artwork present in the pack",
-                  status: "fail",
-                  expected: "svg + ai master",
-                  actual: "missing",
-                },
-              ],
-            });
-            continue;
-          }
-          reports.push(auditSvg(panel, entry.svg), auditAi(panel, entry.ai));
+        for (const panel of panels) {
+          const art = resolveLondonArtwork(panel, pack);
+          reports.push(auditSvg(panel, art.svg), auditAi(panel, art.ai));
         }
         setQa(reports);
-        download(new Blob([qaReportCsv(reports)], { type: "text/csv" }), "NEXT-London-qa-report.csv");
+        download(
+          new Blob([qaReportCsv(reports)], { type: "text/csv" }),
+          "NEXT-London-qa-report.csv",
+        );
       },
     );
 
-  const chip =
-    "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
+  const chip = "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
 
   return (
     <AppShell>
@@ -368,7 +392,6 @@ function LondonSignagePage() {
           </div>
         </header>
 
-
         {/* Print specification */}
         <section className="mt-10">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
@@ -376,10 +399,7 @@ function LondonSignagePage() {
           </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {LONDON_PRINT_SPEC.map((rule) => (
-              <article
-                key={rule.id}
-                className="rounded-xl border border-black/10 bg-white p-5"
-              >
+              <article key={rule.id} className="rounded-xl border border-black/10 bg-white p-5">
                 <h3 className="text-sm font-semibold text-[#03002C]">{rule.title}</h3>
                 <p className="mt-2 text-[13px] leading-relaxed text-[#03002C]/70">{rule.body}</p>
               </article>
@@ -398,9 +418,12 @@ function LondonSignagePage() {
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {Object.entries(LONDON_STYLES)
-              .filter(([id]) => LONDON_PANELS.some((p) => p.style === id))
+              .filter(([id]) => panels.some((p) => p.style === id))
               .map(([id, style]) => (
-                <article key={id} className="overflow-hidden rounded-xl border border-black/10 bg-white">
+                <article
+                  key={id}
+                  className="overflow-hidden rounded-xl border border-black/10 bg-white"
+                >
                   <div
                     className="h-20 w-full"
                     style={{ background: `linear-gradient(120deg, ${style.stops.join(", ")})` }}
@@ -414,7 +437,7 @@ function LondonSignagePage() {
                       {style.note}
                     </p>
                     <p className="mt-2 font-mono text-[11px] text-[#03002C]/55">
-                      {LONDON_PANELS.filter((p) => p.style === id).length} panels
+                      {panels.filter((p) => p.style === id).length} panels
                     </p>
                   </div>
                 </article>
@@ -437,7 +460,7 @@ function LondonSignagePage() {
                   : "border-black/15 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
               }`}
             >
-              All floors · {LONDON_PANELS.length}
+              All floors · {panels.length}
             </button>
             {floors.map((floor) => (
               <button
@@ -490,9 +513,17 @@ function LondonSignagePage() {
                         onClick={() => setOpenPanel(panel)}
                         className="group rounded-xl border border-black/10 bg-white p-3 text-left transition-shadow hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
                       >
-                        <PanelThumb panel={panel} svg={artwork?.[panel.id]?.svg} />
-                        <p className="mt-3 text-[13px] font-semibold leading-snug text-[#03002C]">
-                          {panel.proof.replace(/\.pdf$/i, "")} · p{String(panel.page).padStart(2, "0")}
+                        <PanelThumb panel={panel} svg={londonPanelSvgFor(panel, artwork)} />
+                        <p className="mt-3 flex flex-wrap items-center gap-1.5 text-[13px] font-semibold leading-snug text-[#03002C]">
+                          <span>
+                            {panel.proof.replace(/\.pdf$/i, "")} · p
+                            {String(panel.page).padStart(2, "0")}
+                          </span>
+                          {isAddedPanel(panel) ? (
+                            <span className="rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                              Added
+                            </span>
+                          ) : null}
                         </p>
                         <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
                           {panel.trimW} × {panel.trimH} mm · {panel.ground}
@@ -523,7 +554,7 @@ function LondonSignagePage() {
               </p>
               {/* Cap the hero thumb so the tier preview and downloads stay in view. */}
               <div className="mx-auto w-full max-w-[240px]">
-                <PanelThumb panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
+                <PanelThumb panel={openPanel} svg={londonPanelSvgFor(openPanel, artwork)} />
               </div>
 
               <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -552,8 +583,6 @@ function LondonSignagePage() {
 
               {/* Check every resolution tier on screen before downloading. */}
               <LondonPpiPreview panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
-
-
 
               <div className="rounded-xl border border-black/10 p-4">
                 <div className="flex flex-wrap items-center gap-2">
