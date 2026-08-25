@@ -289,7 +289,10 @@ function SavedModuleCard({
             </span>
           )}
         </div>
-      </div>
+        <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#003FC7] opacity-0 transition group-hover:opacity-100">
+          Click to edit
+        </span>
+      </Link>
 
       <div className="px-4 pb-4 pt-3">
         <div className="flex items-start justify-between gap-2">
