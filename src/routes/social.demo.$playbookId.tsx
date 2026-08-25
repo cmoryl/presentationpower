@@ -50,6 +50,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { buildCampaignAssets } from "@/lib/campaigns";
 import { AssetPreviewCard } from "@/components/campaigns/AssetPreviewCard";
 import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
+import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
 
@@ -181,6 +182,11 @@ function SocialDemoView() {
   );
   const assetEdits = useSocialAssetEdits();
 
+  // Language preview: rendered asset copy is translated in place so the whole
+  // kit previews localized while art direction and photography stay identical.
+  const tx = useDemoTranslate(assets as unknown[]);
+  const localizedAssets = (tx.isTranslated ? (tx.items as typeof assets) : assets) ?? assets;
+
   return (
     <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
@@ -285,7 +291,7 @@ function SocialDemoView() {
       <section id="assets">
         <SectionHead
           eyebrow="Live preview"
-          title={`${assets.length} rendered assets · light + dark`}
+          title={`${localizedAssets.length} rendered assets · light + dark`}
           desc={
             photoSet
               ? "Rendered right now from the deterministic pipeline. Dark variants use the division photography set — each ad size pulls the crop built for its aspect."
@@ -360,8 +366,20 @@ function SocialDemoView() {
             <span>{photoSet.credit} — wide, square and vertical crops</span>
           </div>
         ) : null}
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {assets.map((a) => {
+        <DemoTranslateBar
+          className="mt-4"
+          lang={tx.lang}
+          setLang={tx.setLang}
+          busy={tx.busy}
+          error={tx.error}
+          isTranslated={tx.isTranslated}
+          note="Preview the whole kit in another language. Every rendered post re-paints with translated copy — format, photography and lockups stay untouched."
+        />
+        <div
+          className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          dir={tx.rtl ? "rtl" : undefined}
+        >
+          {localizedAssets.map((a) => {
             // Both modes carry photography now. Dark variants run the photo
             // full bleed; light variants crop it into a designed panel sized to
             // the frame's own aspect, with the copy owning the rest.
