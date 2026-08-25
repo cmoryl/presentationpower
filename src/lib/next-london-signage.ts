@@ -196,9 +196,9 @@ export const LONDON_PANELS: LondonPanel[] = [
   { id: "ldn-54", floor: "5F", room: "CAMBRIDGE", proof: "CAMBRIDGE DEMO AREA.pdf", page: 4, name: "CAMBRIDGE DEMO AREA - p04 - 1500x2440mm", ground: "Light column", style: "01-beam-violet-aqua", trimW: 1500.0, trimH: 2440.0, bleedW: 1700.0, bleedH: 2640.0, bleedEdge: 100.0, rasterPx: "2409x3742", rasterPpi: 36, bandMm: 2.26, rasterMb: 6.8 },
 ];
 
-export function londonPanelsByFloor(): { id: LondonFloorId; label: string; rooms: { room: string; panels: LondonPanel[] }[] }[] {
+export function londonPanelsByFloor(source: LondonPanel[] = LONDON_PANELS): { id: LondonFloorId; label: string; rooms: { room: string; panels: LondonPanel[] }[] }[] {
   return LONDON_FLOORS.map((floor) => {
-    const panels = LONDON_PANELS.filter((p) => p.floor === floor.id);
+    const panels = source.filter((p) => p.floor === floor.id);
     const rooms: { room: string; panels: LondonPanel[] }[] = [];
     for (const panel of panels) {
       const bucket = rooms.find((r) => r.room === panel.room);
@@ -236,13 +236,13 @@ export function panelSlug(panel: LondonPanel): string {
   return panel.name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function londonScheduleCsv(): string {
+export function londonScheduleCsv(source: LondonPanel[] = LONDON_PANELS): string {
   const header = [
     "Floor", "Room", "Proof file", "Proof page", "Trim W mm", "Trim H mm",
     "Bleed W mm", "Bleed H mm", "Bleed/edge mm", "Style", "Raster px",
     "Raster ppi", "Measured band width mm", "Raster MB",
   ];
-  const lines = LONDON_PANELS.map((p) => [
+  const lines = source.map((p) => [
     p.floor, p.room, p.proof, p.page, p.trimW.toFixed(1), p.trimH.toFixed(1),
     p.bleedW.toFixed(1), p.bleedH.toFixed(1), p.bleedEdge.toFixed(1), p.style,
     p.rasterPx, p.rasterPpi, p.bandMm.toFixed(2), p.rasterMb.toFixed(1),
