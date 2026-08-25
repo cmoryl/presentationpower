@@ -18,6 +18,7 @@ import { deckCloudId } from "@/lib/deck-uuid";
 import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.functions";
 import { toast } from "sonner";
 import { describeExportError } from "@/lib/export-feedback";
+import { notifyPrintToPdf } from "@/lib/deck-feedback";
 
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Element" }] }),
@@ -51,7 +52,9 @@ function PrintView() {
     let cancelled = false;
     if (!lang || !deck) {
       setLoading(false);
-      const t = setTimeout(() => window.print(), 700);
+      // Route the auto-print through the acknowledgement helper so the user
+      // always sees a "Preparing PDF export…" toast before the dialog opens.
+      const t = setTimeout(() => notifyPrintToPdf("deck"), 700);
       return () => clearTimeout(t);
     }
     const toastId = toast.loading(`Preparing ${lang.toUpperCase()} slides for print…`);
@@ -90,7 +93,7 @@ function PrintView() {
       } finally {
         if (!cancelled) {
           setLoading(false);
-          setTimeout(() => window.print(), 700);
+          setTimeout(() => notifyPrintToPdf("deck"), 700);
         }
       }
     })();
@@ -145,7 +148,7 @@ function PrintView() {
               {!loading && (
                 <>
                   If the dialog didn't open,{" "}
-                  <button className="underline" onClick={() => window.print()}>
+                  <button className="underline" onClick={() => notifyPrintToPdf("deck")}>
                     click here
                   </button>
                   . Select "Save as PDF" for a print-faithful PDF at 16:9.

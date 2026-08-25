@@ -2257,6 +2257,10 @@ function VariantDetailModal({
     if (previewBusy || pdfBusy || bothBusy) return;
     // The export panel would otherwise sit on top of the proof modal.
     setExportMenuOpen(false);
+    toast.loading("Building PDF preview…", {
+      id: "library-pdf-preview",
+      description: "Rendering light and dark proofs — downloads unlock when they're ready.",
+    });
     setPreviewBusy(true);
     setPreviewStage(null);
     try {
@@ -2301,9 +2305,16 @@ function VariantDetailModal({
         filenameDark,
         ratio: pixelRatio,
       });
+      toast.success("PDF preview ready", {
+        id: "library-pdf-preview",
+        description: "Pick Light or Dark to download the file.",
+      });
     } catch (err) {
       console.error("[library] PDF preview failed", err);
-      toast.error("PDF preview failed", { description: "Check console for details." });
+      toast.error("PDF preview failed", {
+        id: "library-pdf-preview",
+        description: "Check console for details.",
+      });
     } finally {
       setPreviewBusy(false);
       setPreviewStage(null);
