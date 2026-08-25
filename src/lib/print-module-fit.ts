@@ -41,7 +41,17 @@ import {
   type PrintTemplateKind,
 } from "@/lib/print-capacity";
 import { approveSection } from "@/lib/print-library/demo-approve";
-import { PRINT_CONTENT_FIT_DEFAULTS } from "@/lib/print-content-fit";
+import { PRINT_CONTENT_FIT_DEFAULTS, type PrintContentFitSettings } from "@/lib/print-content-fit";
+import { HERO_HEIGHT_HARD_MIN, maxHeroHeightPct } from "@/lib/print-capacity";
+
+/**
+ * Safety factor applied to the module budget when fitting FRESH content.
+ * Module weights are calibrated estimates; a page that fits them at 100%
+ * can still clip real pixels (the live editor's own warning fires around
+ * 15% overflow on a "within budget" seed). Fitting against 85% of the
+ * budget keeps a first-run file comfortably inside the trim.
+ */
+const FRESH_CONTENT_BUDGET_SCALE = 0.85;
 import type { PrintAssetKind, PrintHeroMedia, PrintSection } from "@/lib/print-assets.types";
 
 type Bag = Record<string, unknown>;
@@ -89,16 +99,18 @@ export type PrintPageBudget = {
 export function printPageBudget(
   kind: PrintAssetKind | PrintTemplateKind,
   content: unknown,
+  opts?: { budgetScale?: number },
 ): PrintPageBudget | null {
   const ck = capacityKind(kind);
   if (!ck || !content || typeof content !== "object") return null;
   const bag = content as Bag;
   const modules = Array.isArray(bag["modules"]) ? (bag["modules"] as PrintSection[]) : [];
   const used = modules.reduce((n, m) => n + weightForSection(m), 0);
-  const budget = effectiveModuleBudget(ck, bag["heroMedia"] as PrintHeroMedia | undefined, {
-    hasTitle: typeof bag["title"] === "string" && !!bag["title"],
-    hasSummary: typeof bag["summary"] === "string" && !!bag["summary"],
-  });
+  const budget =
+    effectiveModuleBudget(ck, bag["heroMedia"] as PrintHeroMedia | undefined, {
+      hasTitle: typeof bag["title"] === "string" && !!bag["title"],
+      hasSummary: typeof bag["summary"] === "string" && !!bag["summary"],
+    }) * (opts?.budgetScale ?? 1);
   return { kind: ck, budget, used, remaining: Math.max(0, budget - used) };
 }
 
@@ -131,12 +143,13 @@ export function fitPrintModuleIntoPage(
   kind: PrintAssetKind | PrintTemplateKind,
   content: unknown,
   raw: PrintSection,
+  opts?: { budgetScale?: number },
 ): PrintModuleFitReport {
   // 1 — normalize against the variant's own hard limits.
   let section = approveSection(raw);
   const normalized = section !== raw;
 
-  const page = printPageBudget(kind, content);
+  const page = printPageBudget(kind, content, opts);
   const remaining = page?.remaining ?? Number.POSITIVE_INFINITY;
 
   let swappedFrom: string | undefined;
@@ -224,24 +237,71 @@ export function qaFitPrintContent(
   const rawModules = Array.isArray(content["modules"]) ? (content["modules"] as PrintSection[]) : [];
 
   // Fit modules one at a time against the RUNNING page state so each insert
-  // sees the budget left by the modules already placed.
+  // sees the budget left by the modules already placed. Fresh content fits
+  // against a SCALED-DOWN budget — module weights are estimates, and a page
+  // that fits them at 100% can still clip real pixels on first render.
   const fitted: PrintSection[] = [];
   let anyOver = false;
   for (const mod of rawModules) {
     const running: Bag = { ...content, modules: fitted };
-    const report = fitPrintModuleIntoPage(kind, running, mod);
+    const report = fitPrintModuleIntoPage(kind, running, mod, {
+      budgetScale: FRESH_CONTENT_BUDGET_SCALE,
+    });
     if (report.note) notes.push(report.note);
     if (report.overBudget) anyOver = true;
     fitted.push(report.section);
   }
   content["modules"] = fitted;
 
+  // If still over after right-sizing + trimming, drop trailing modules until
+  // the scaled budget closes — a fresh file must NEVER open overflowing.
+  const ck = capacityKind(kind);
+  if (ck) {
+    let page = printPageBudget(ck, content, { budgetScale: FRESH_CONTENT_BUDGET_SCALE });
+    while (page && page.used > page.budget + 0.001 && fitted.length > 0) {
+      const dropped = fitted.pop()!;
+      const droppedTitle = (dropped as unknown as Bag)["title"];
+      notes.push(
+        `removed “${typeof droppedTitle === "string" && droppedTitle ? droppedTitle : dropped.kind}” to keep the page inside the trim`,
+      );
+      content["modules"] = fitted;
+      page = printPageBudget(ck, content, { budgetScale: FRESH_CONTENT_BUDGET_SCALE });
+      anyOver = true;
+    }
+  }
+
+  // Pre-shrink an oversized hero photo so the first render doesn't rely on
+  // the editor's "shrink hero" corrective — apply it up front instead.
+  const hero = content["heroMedia"] as PrintHeroMedia | undefined;
+  if (hero?.imageUrl && ck) {
+    const usedNow = fitted.reduce((n, m) => n + weightForSection(m), 0);
+    const copy = {
+      hasTitle: typeof content["title"] === "string" && !!content["title"],
+      hasSummary: typeof content["summary"] === "string" && !!content["summary"],
+    };
+    const target = maxHeroHeightPct(ck, usedNow, hero, copy);
+    const currentPct = hero.heightPct ?? 46;
+    const clamped = Math.max(HERO_HEIGHT_HARD_MIN, Math.min(currentPct, target));
+    if (clamped < currentPct) {
+      content["heroMedia"] = { ...hero, heightPct: Math.round(clamped) };
+      notes.push(`hero band pre-sized to ${Math.round(clamped)}% so the page fits`);
+    }
+  }
+
   // Arm the auto-fit ladder on every fresh piece (the live editor + exports
   // read these settings; without them a page renders with fitting off).
-  if (!content["contentFit"]) {
-    content["contentFit"] = { ...PRINT_CONTENT_FIT_DEFAULTS };
-    notes.push("auto content-fit armed");
-  }
+  // Fresh files use a ZERO threshold so ANY measurable overflow — not just
+  // the default 15% — triggers margin + scale relief on first render.
+  const armed: PrintContentFitSettings = {
+    ...PRINT_CONTENT_FIT_DEFAULTS,
+    threshold: 0.02,
+    minScale: 0.78,
+    minPad: 0.6,
+  };
+  const existing = content["contentFit"] as Partial<PrintContentFitSettings> | undefined;
+  content["contentFit"] = { ...armed, ...(existing ?? {}), enabled: true };
+  if (!existing) notes.push("auto content-fit armed");
+
   if (anyOver && content["density"] !== "compact") {
     content["density"] = "compact";
     notes.push("page switched to compact spacing");
