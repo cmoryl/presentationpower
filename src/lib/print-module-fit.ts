@@ -41,6 +41,7 @@ import {
   type PrintTemplateKind,
 } from "@/lib/print-capacity";
 import { approveSection } from "@/lib/print-library/demo-approve";
+import { PRINT_CONTENT_FIT_DEFAULTS } from "@/lib/print-content-fit";
 import type { PrintAssetKind, PrintHeroMedia, PrintSection } from "@/lib/print-assets.types";
 
 type Bag = Record<string, unknown>;
@@ -190,4 +191,61 @@ export function fitPrintModuleIntoPage(
     overBudget,
     note: parts.length ? parts.join(" · ") : null,
   };
+}
+
+export type QaFitResult = {
+  /** The fitted content — ready to persist as a first-run, overflow-free page. */
+  content: Bag;
+  /** Human-readable adjustments, empty when the seed already fit. */
+  notes: string[];
+};
+
+/**
+ * FIRST-RUN QA FIT — a newly created print piece must open 100% laid out,
+ * never overflowing. Every module seeded into fresh content is run through
+ * the same fit ladder an editor insert uses (normalize → right-size variant
+ * → trim items), and the page is armed with the auto content-fit ladder so
+ * the live canvas keeps it inside the trim from the very first render:
+ *
+ *   • contentFit enabled with the standard relief settings (margin relief
+ *     first, then uniform scale — floors keep it readable).
+ *   • If a module STILL can't fit the page budget the piece drops to compact
+ *     density so the page closes without clipping.
+ *
+ * Pure + deterministic; used by the print agent's create paths so a brand-new
+ * live file is QA-approved the moment it exists.
+ */
+export function qaFitPrintContent(
+  kind: PrintAssetKind | PrintTemplateKind,
+  rawContent: unknown,
+): QaFitResult {
+  const content: Bag = { ...((rawContent as Bag | null | undefined) ?? {}) };
+  const notes: string[] = [];
+  const rawModules = Array.isArray(content["modules"]) ? (content["modules"] as PrintSection[]) : [];
+
+  // Fit modules one at a time against the RUNNING page state so each insert
+  // sees the budget left by the modules already placed.
+  const fitted: PrintSection[] = [];
+  let anyOver = false;
+  for (const mod of rawModules) {
+    const running: Bag = { ...content, modules: fitted };
+    const report = fitPrintModuleIntoPage(kind, running, mod);
+    if (report.note) notes.push(report.note);
+    if (report.overBudget) anyOver = true;
+    fitted.push(report.section);
+  }
+  content["modules"] = fitted;
+
+  // Arm the auto-fit ladder on every fresh piece (the live editor + exports
+  // read these settings; without them a page renders with fitting off).
+  if (!content["contentFit"]) {
+    content["contentFit"] = { ...PRINT_CONTENT_FIT_DEFAULTS };
+    notes.push("auto content-fit armed");
+  }
+  if (anyOver && content["density"] !== "compact") {
+    content["density"] = "compact";
+    notes.push("page switched to compact spacing");
+  }
+
+  return { content, notes };
 }
