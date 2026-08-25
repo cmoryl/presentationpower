@@ -2770,7 +2770,8 @@ function ModulesPanel({
               const inserted = readInsertPayload(e);
               if (inserted) {
                 if (!gate.ok) return;
-                insertAt(targetIdx, inserted);
+                if (onDropInsert) onDropInsert(inserted, targetIdx);
+                else insertAt(targetIdx, inserted);
                 return;
               }
               const from = Number(e.dataTransfer.getData("text/plain"));
@@ -2827,7 +2828,8 @@ function ModulesPanel({
           if (!inserted) return;
           e.preventDefault();
           if (!gate.ok) return;
-          insertAt(modules.length, inserted);
+          if (onDropInsert) onDropInsert(inserted, modules.length);
+          else insertAt(modules.length, inserted);
         }}
         className="mt-3 flex items-center justify-center rounded-md border border-dashed border-black/15 px-2 py-3 text-[11px] uppercase tracking-widest text-black/40 transition dark:border-white/15 dark:text-white/40"
       >
