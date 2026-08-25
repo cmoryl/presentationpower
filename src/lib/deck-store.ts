@@ -5215,6 +5215,14 @@ export const useDeckStore = create<DeckState>()(
               };
             }),
           };
+          // Template-instantiated decks get the same QA-clean guarantee as
+          // agent-built ones: fix empty fields, overflow and brand-variant
+          // drift before the copy is ever shown.
+          deck.slides = autoFixQa(deck.slides, {
+            brandModeId: payload.brandModeId ?? "bm-enterprise",
+            industryId: (payload.context as DeckContext | undefined)?.designRecipeId ?? null,
+            includeWarnings: true,
+          }).slides.map((sl, i) => ({ ...sl, position: i }));
           set((s) => ({
             briefs: { ...s.briefs, [briefId]: brief },
             decks: { ...s.decks, [deckId]: deck },
