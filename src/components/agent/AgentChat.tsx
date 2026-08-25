@@ -240,7 +240,7 @@ export function AgentChat({
       const withDocs = withDocumentContext(agentText, docs);
       void sendMessage({ text: withDocs }, Object.keys(body).length ? { body } : undefined);
     },
-    [appearance, busy, docs, hasUserBrief, onFirstUserMessage, sendMessage, threadId],
+    [appearance, busy, docs, hasUserBrief, onFirstUserMessage, runDemoBuild, sendMessage, threadId],
   );
 
   // The newest outline proposal is the only one that still offers actions.
