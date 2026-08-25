@@ -2,6 +2,7 @@ import type { ModuleVariant } from "@/lib/taxonomy";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type { SlideBackdrop } from "./SlideChrome";
 import { getDivisionImagery, hasOwnBackdropPool } from "@/assets/backdrops/divisions";
+import { isTransPerfectBrandScope } from "@/lib/brand-profiles";
 
 import portrait1 from "@/assets/portraits/portrait-1.webp";
 import portrait2 from "@/assets/portraits/portrait-2.webp";
@@ -23,28 +24,6 @@ import corp08 from "@/assets/backdrops/corporate-dark/bg-08.webp";
 import corp09 from "@/assets/backdrops/corporate-dark/bg-09.webp";
 import corp10 from "@/assets/backdrops/corporate-dark/bg-10.webp";
 
-// TP Media — 6 curated dark-mode gradient stills (navy + magenta/lavender).
-import media01 from "@/assets/backdrops/tp-media-dark/bg-01.webp";
-import media02 from "@/assets/backdrops/tp-media-dark/bg-02.webp";
-import media03 from "@/assets/backdrops/tp-media-dark/bg-03.webp";
-import media04 from "@/assets/backdrops/tp-media-dark/bg-04.webp";
-import media05 from "@/assets/backdrops/tp-media-dark/bg-05.webp";
-import media06 from "@/assets/backdrops/tp-media-dark/bg-06.webp";
-
-// TP Games — 10 curated dark-mode aurora stills (navy + emerald/aqua).
-// bg-01..06 are the base uploads; bg-07..10 are same-palette remixes
-// (mirrored/flipped) so we always have enough distinct backdrops across the
-// full ~60-variant module library without repeating.
-import games01 from "@/assets/backdrops/tp-games-dark/bg-01.webp";
-import games02 from "@/assets/backdrops/tp-games-dark/bg-02.webp";
-import games03 from "@/assets/backdrops/tp-games-dark/bg-03.webp";
-import games04 from "@/assets/backdrops/tp-games-dark/bg-04.webp";
-import games05 from "@/assets/backdrops/tp-games-dark/bg-05.webp";
-import games06 from "@/assets/backdrops/tp-games-dark/bg-06.webp";
-import games07 from "@/assets/backdrops/tp-games-dark/bg-07.webp";
-import games08 from "@/assets/backdrops/tp-games-dark/bg-08.webp";
-import games09 from "@/assets/backdrops/tp-games-dark/bg-09.webp";
-import games10 from "@/assets/backdrops/tp-games-dark/bg-10.webp";
 
 export const CORPORATE_DARK_BACKDROPS: string[] = [
   corp01,
@@ -59,43 +38,11 @@ export const CORPORATE_DARK_BACKDROPS: string[] = [
   corp10,
 ];
 
-export const TP_MEDIA_DARK_BACKDROPS: string[] = [
-  media01,
-  media02,
-  media03,
-  media04,
-  media05,
-  media06,
-];
-
-export const TP_GAMES_DARK_BACKDROPS: string[] = [
-  games01,
-  games02,
-  games03,
-  games04,
-  games05,
-  games06,
-  games07,
-  games08,
-  games09,
-  games10,
-];
-
 const PORTRAITS = [portrait1, portrait2, portrait3, portrait4];
 
 /** Returns the deterministic corporate-dark backdrop URL for a variant id. */
 export function pickCorporateDarkBackdrop(variantId: string): string {
   return CORPORATE_DARK_BACKDROPS[hashStr(variantId) % CORPORATE_DARK_BACKDROPS.length];
-}
-
-/** Returns the deterministic TP Media dark backdrop URL for a variant id. */
-export function pickTpMediaDarkBackdrop(variantId: string): string {
-  return TP_MEDIA_DARK_BACKDROPS[hashStr(variantId) % TP_MEDIA_DARK_BACKDROPS.length];
-}
-
-/** Returns the deterministic TP Games dark backdrop URL for a variant id. */
-export function pickTpGamesDarkBackdrop(variantId: string): string {
-  return TP_GAMES_DARK_BACKDROPS[hashStr(variantId) % TP_GAMES_DARK_BACKDROPS.length];
 }
 
 function hashStr(s: string): number {
@@ -124,40 +71,34 @@ function _computeBackdrop(
 ): SlideBackdrop | null {
   const id = variant.id;
   const seed = hashStr(id);
-  const set = getDivisionImagery(brandId);
+  const effectiveBrandId = isTransPerfectBrandScope(brandId) ? "bm-enterprise" : brandId;
+  const set = getDivisionImagery(effectiveBrandId);
   const photos = set.photos;
   const abstracts = set.abstracts;
 
-  // Resolve brand tokens so we can honor each division's own surface color
-  // as the aurora base tint in light mode (instead of forcing white).
-  const brand = BRAND_MODES.find((b) => b.id === brandId);
+  // TransPerfect division scope uses the approved enterprise surface; non-TP
+  // product/cobrand modes can still carry their own authored surface.
+  const brand = BRAND_MODES.find((b) => b.id === effectiveBrandId);
   const surface = brand?.tokens.surface ?? "#FFFFFF";
 
   // ── Brand-swap integrity guard ──────────────────────────────────────────
-  // Raster stills carry a baked palette. If the active brand does not own a
-  // palette-matched pool (Life Sciences, Trial Interactive, Product, Co-brand),
-  // never borrow another division's artwork: render the brand-derived aurora so
-  // the backdrop reskins with the accent tokens on every swap.
-  if (!hasOwnBackdropPool(brandId)) {
+  // Raster stills carry a baked palette. For TransPerfect division scope the
+  // enterprise pool is canonical; for non-TP modes without an owned pool, fall
+  // back to aurora instead of borrowing a mismatched image set.
+  if (!hasOwnBackdropPool(effectiveBrandId)) {
     return mode === "dark"
       ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
-  // Curated PNG backdrop sets — Corporate, TP Media, TP Gaming (dark only).
-  const useCorporateDark = mode === "dark" && brandId === "bm-enterprise";
-  const useMediaDark = mode === "dark" && brandId === "bm-tp-media";
-  const useGamesDark = mode === "dark" && brandId === "bm-tp-games";
-  const hasCuratedDarkSet = useCorporateDark || useMediaDark || useGamesDark;
+  // Curated PNG backdrop set — Enterprise/corporate dark only. Division modules
+  // intentionally stay on this same approved backdrop system.
+  const useCorporateDark = mode === "dark" && effectiveBrandId === "bm-enterprise";
+  const hasCuratedDarkSet = useCorporateDark;
 
   // ── Aurora backdrop (Flagship 2026, "Aesop" spec) ───────────────────────
   // A curated set of hero variants renders on the procedural AuroraLayer.
-  // Dark mode: navy field + 3 soft orbs derived from the brand's own primary,
-  // accent, and a computed sibling hue — so Corporate stays blue, Life Sci
-  // teal, Legal gold, Media magenta, Gaming emerald+aqua, etc.
-  // Light mode: brand-surface field with the same brand-derived orbs at low
-  // opacity (the "light aura" wash), so every division keeps its accent
-  // signature regardless of theme.
+  // Dark mode: approved navy field; light mode: approved enterprise surface.
   const auroraHeroes = new Set<string>([
     "MV-INS-QUOTE",
     "MV-CASE-SPREAD",
@@ -168,56 +109,39 @@ function _computeBackdrop(
     "MV-INS-BIG-IDEA",
   ]);
   if (auroraHeroes.has(id)) {
-    // Dark mode with a curated approved backdrop set (Corporate / TP Media /
-    // TP Gaming): use the approved still instead of the procedural aurora, so
-    // every module — heroes included — ships on an approved background.
+    // Dark mode with the curated approved enterprise backdrop set: use the
+    // approved still instead of procedural aurora.
     if (mode === "dark" && hasCuratedDarkSet) {
-      const heroBg = useCorporateDark
-        ? pickCorporateDarkBackdrop(id)
-        : useMediaDark
-          ? pickTpMediaDarkBackdrop(id)
-          : pickTpGamesDarkBackdrop(id);
       return {
-        url: heroBg,
+        url: pickCorporateDarkBackdrop(id),
         scrim: "left",
         scrimStrength: 0.7,
         imageDim: 0.08,
         tint: "#03002C",
       };
     }
-    // Hero variants otherwise aurora — honor the brand's own surface color as
-    // the light-mode base so the hero doesn't break the deck's surface tint.
+    // Hero variants otherwise aurora — use the effective brand surface.
     return mode === "dark"
       ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
-  // Default aurora wash — extends the per-division accent signature to every
-  // slide when the brand+mode has no curated PNG set. Applies to:
-  //   • All divisions in light mode (except curated ones, currently none)
-  //   • Non-Corporate/Media/Gaming divisions in dark mode
+  // Default aurora wash for modes without a curated PNG set.
   if (!hasCuratedDarkSet) {
     return mode === "dark"
       ? { aurora: true, auroraSeed: id, darkChrome: true, tint: "#03002C" }
       : { aurora: true, auroraSeed: id, darkChrome: false, tint: surface };
   }
 
-  // Curated PNG-backdrop path — Corporate, TP Media (magenta/lavender), and
-  // TP Gaming (emerald/aqua aurora stills) each ship a hand-picked set of
-  // dark-mode gradients. Deterministic per variant id.
-  const corporateBg = useCorporateDark
-    ? pickCorporateDarkBackdrop(id)
-    : useMediaDark
-      ? pickTpMediaDarkBackdrop(id)
-      : useGamesDark
-        ? pickTpGamesDarkBackdrop(id)
-        : null;
+  // Curated PNG-backdrop path — enterprise dark gradients, deterministic per
+  // variant id, shared by every TransPerfect division module.
+  const corporateBg = useCorporateDark ? pickCorporateDarkBackdrop(id) : null;
 
   const pickPhoto = (offset = 0) => corporateBg ?? photos[(seed + offset) % photos.length];
   const pickAbstract = (offset = 0) => corporateBg ?? abstracts[(seed + offset) % abstracts.length];
   const pickPortrait = () => corporateBg ?? PORTRAITS[seed % PORTRAITS.length];
 
-  // Full-bleed cover / hero — division photograph, strong side scrim.
+  // Full-bleed cover / hero — enterprise photograph, strong side scrim.
   if (/^MV-OP-COVER(-MEDIA)?$/.test(id) || id === "MV-CS-HERO" || id === "MV-CTA-CLOSING-HERO") {
     return {
       url: pickPhoto(0),
@@ -243,12 +167,12 @@ function _computeBackdrop(
     };
   }
 
-  // Agendas — subtle side gradient over a quieter division photo.
+  // Agendas — subtle side gradient over a quieter enterprise photo.
   if (/^MV-OP-AGENDA/.test(id)) {
     return { url: pickPhoto(1), scrim: "left", scrimStrength: 0.85, imageDim: 0.1 };
   }
 
-  // Team bios / intro — portrait treatment layered over division photo.
+  // Team bios / intro — portrait treatment layered over enterprise photo.
   if (/BIOS|INTRO-TEAM/.test(id)) {
     return { url: pickPhoto(2), scrim: "bottom", scrimStrength: 0.7, imageDim: 0.05 };
   }
@@ -264,7 +188,7 @@ function _computeBackdrop(
     };
   }
 
-  // Stats / proof / cost — division photo full-frame with heavier dim.
+  // Stats / proof / cost — enterprise photo full-frame with heavier dim.
   if (/^MV-PROOF-|STAT-GRID|OPPORTUNITY-SIZE|MV-CTX-COST/.test(id)) {
     return { url: pickPhoto(3), scrim: "full", scrimStrength: 0.65, imageDim: 0.2 };
   }

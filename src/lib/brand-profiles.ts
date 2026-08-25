@@ -7,6 +7,38 @@
 import type { BrandLogoLockup, BrandContentScope, BrandRole, BrandMode } from "@/lib/taxonomy";
 import { BRAND_MODES, byId } from "@/lib/taxonomy";
 
+export const ENTERPRISE_BRAND_TOKENS: BrandMode["tokens"] = {
+  primary: "#03002C",
+  accent: "#003FC7",
+  surface: "#EEF1F7",
+  ink: "#03002C",
+};
+
+const TRANSPERFECT_BRAND_SCOPE_IDS = new Set([
+  "bm-enterprise",
+  "bm-subcompany",
+  "bm-division",
+  "bm-product",
+  "bm-tp-media",
+  "bm-tp-legal",
+  "bm-tp-games",
+  "bm-tp-digital",
+  "bm-tp-lifesci",
+  "bm-trial-interactive",
+]);
+
+export function isTransPerfectBrandScope(id: string | null | undefined): boolean {
+  return !!id && TRANSPERFECT_BRAND_SCOPE_IDS.has(id);
+}
+
+export function normalizeBrandModeTokens<T extends Pick<BrandMode, "id" | "tokens">>(brand: T): T {
+  if (!isTransPerfectBrandScope(brand.id)) return brand;
+  return {
+    ...brand,
+    tokens: { ...ENTERPRISE_BRAND_TOKENS },
+  };
+}
+
 export type BrandProfile = {
   role: BrandRole;
   parentId?: string;
@@ -388,15 +420,15 @@ export function getSubCompanyProfile(baseId: string, subCompany: string): BrandP
 // BrandMode is consumed (brief preview, deck editor, assembler) so the lockup
 // and content scope are always resolved to a real TransPerfect entity.
 export function brandModeWithSubCompany(brand: BrandMode, subCompany?: string): BrandMode {
-  if (!subCompany || brand.id !== "bm-subcompany") return brand;
+  if (!subCompany || brand.id !== "bm-subcompany") return normalizeBrandModeTokens(brand);
   const profile = getSubCompanyProfile(brand.id, subCompany);
-  return {
+  return normalizeBrandModeTokens({
     ...brand,
     name: subCompany,
     role: "subcompany",
     logo: profile.logo,
     contentScope: profile.contentScope,
-  };
+  });
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -420,11 +452,11 @@ export function resolveBrandMode(brandModeId: string, subCompany?: string | null
     return brandModeWithSubCompany(base, subCompany);
   }
   const profile = BRAND_PROFILES[base.id] ?? enrichBrandProfile(base.id, base.name);
-  return {
+  return normalizeBrandModeTokens({
     ...base,
     role: profile.role,
     parentId: profile.parentId,
     logo: profile.logo,
     contentScope: profile.contentScope,
-  };
+  });
 }

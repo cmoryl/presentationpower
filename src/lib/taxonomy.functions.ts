@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
-import { enrichBrandProfile } from "./brand-profiles";
+import { enrichBrandProfile, normalizeBrandModeTokens } from "./brand-profiles";
 import type {
   BrandMode,
   ModuleFamily,
@@ -53,7 +53,7 @@ export const getTaxonomy = createServerFn({ method: "GET" }).handler(
     return {
       brandModes: (bm.data ?? []).map((r) => {
         const profile = enrichBrandProfile(r.id, r.name);
-        return {
+        return normalizeBrandModeTokens({
           id: r.id,
           name: r.name,
           description: r.description ?? "",
@@ -67,7 +67,7 @@ export const getTaxonomy = createServerFn({ method: "GET" }).handler(
           parentId: profile.parentId,
           logo: profile.logo,
           contentScope: profile.contentScope,
-        };
+        });
       }),
       moduleFamilies: (mf.data ?? []).map((r) => ({
         id: r.id,
