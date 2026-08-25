@@ -300,6 +300,9 @@ export function StudioLayoutLayer({
             height: `${(layer.h / SLIDE_H) * 100}%`,
             pointerEvents: enabled ? "auto" : "none",
             cursor: enabled ? "move" : undefined,
+            // Layers sit above the field frames so a drag on a layer always
+            // reaches the layer, even where a frame overlaps it.
+            zIndex: 2,
             outline:
               enabled && selectedLayerId === layer.id
                 ? "2px solid #A1FBF9"
@@ -432,6 +435,7 @@ export function StudioLayoutLayer({
               className="absolute cursor-move rounded-sm border border-dashed border-[#A1FBF9]/70 bg-[#A1FBF9]/5 hover:bg-[#A1FBF9]/10"
               style={{
                 pointerEvents: "auto",
+                zIndex: 1,
                 left: `${(r.x / SLIDE_W) * 100}%`,
                 top: `${(r.y / SLIDE_H) * 100}%`,
                 width: `${(r.w / SLIDE_W) * 100}%`,
