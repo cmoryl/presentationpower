@@ -351,7 +351,7 @@ function RoleDashboard() {
               className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm text-black/55 underline-offset-4 hover:underline dark:text-white/55"
             >
               <RotateCcw className="size-3.5" aria-hidden />
-              Back to my role ({personaById(defaultPersona).label})
+              Back to my dashboard ({personaById(defaultPersona).label})
             </button>
           ) : null}
           <Link

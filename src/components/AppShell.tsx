@@ -20,6 +20,8 @@ function matchesAdminLinked(pathname: string): boolean {
 }
 
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
+import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
+import { personaById } from "@/lib/workspace-persona";
 
 export function AppShell({ children, bare = false }: { children: ReactNode; bare?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -84,10 +86,14 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   const showAdminChrome = !inAdmin && isAdminLinked && adminCtx;
   const caps = useWorkspaceCapabilities();
   const createOnly = caps.createOnly;
+  const { persona } = useWorkspacePersona();
+  // The sidebar/top-nav Dashboard entry names the active persona dashboard so
+  // it matches the dashboard tabs and the page breadcrumb.
+  const dashboardLabel = personaById(persona).label;
 
   const nav = [
     { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
+    { to: "/dashboard", label: dashboardLabel },
     { to: "/brief/new", label: "New brief" },
 
     { to: "/elements", label: "Elements" },

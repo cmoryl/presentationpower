@@ -1,6 +1,8 @@
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
+import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
+import { personaById } from "@/lib/workspace-persona";
 
 // The playbook catalogs are large data modules. Breadcrumbs render in the app
 // shell on every route, so importing them statically drags all of that data
@@ -66,7 +68,7 @@ const STATIC_LABELS: Record<string, string> = {
   for: "Element by role",
   marketing: "Marketing",
   sales: "Sales",
-  dashboard: "Workspace",
+  // `dashboard` is resolved dynamically from the active persona below.
 };
 
 // Segments that should be hidden from the trail entirely (they're internal
@@ -114,6 +116,10 @@ export function Breadcrumbs() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const router = useRouter();
   const decks = useDeckStore((s) => s.decks);
+  const { persona } = useWorkspacePersona();
+  // The /dashboard crumb follows the active persona so the trail always names
+  // the dashboard the user actually sees (Sales / MarOps / Admin dashboard).
+  const dashboardLabel = personaById(persona).label;
 
   const routePatterns = useMemo(() => Object.keys(router.routesByPath ?? {}), [router]);
 
@@ -162,6 +168,8 @@ export function Breadcrumbs() {
       } else if (prev === "demo" && (parts[i - 2] === "events" || parts[i - 2] === "social")) {
         const kind = parts[i - 2] as "events" | "social";
         label = playbookNames.get(`${kind}:${seg}`) ?? shortenId(seg);
+      } else if (seg === "dashboard") {
+        label = dashboardLabel;
       } else if (STATIC_LABELS[seg]) {
         label = STATIC_LABELS[seg];
       } else if (/^[0-9a-f-]{20,}$/i.test(seg) || /^[a-z]+-[a-z0-9-]{10,}/i.test(seg)) {
@@ -181,7 +189,7 @@ export function Breadcrumbs() {
       });
     }
     return items;
-  }, [pathname, decks, routePatterns, catalogVersion]);
+  }, [pathname, decks, routePatterns, catalogVersion, dashboardLabel]);
 
   if (crumbs.length === 0) return null;
 
