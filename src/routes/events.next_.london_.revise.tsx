@@ -1,0 +1,583 @@
+// /events/next/london/revise — spec revision workflow for the NEXT 2026 London
+// signage kit.
+//
+// The venue team re-issues measurements during build-up. This screen takes those
+// changes, shows exactly what moves (including the derived raster size, ppi tier,
+// dither band and file weight), works out which panels need new vector artwork
+// versus only a re-rendered PNG, regenerates the affected files, and publishes
+// the whole panel snapshot as an append-only revision. Nothing overwrites
+// history: restoring an older revision republishes it forward.
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  ArrowLeft,
+  Check,
+  FileDown,
+  History,
+  Loader2,
+  RotateCcw,
+  Save,
+  Sparkles,
+  Undo2,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { AppShell } from "@/components/AppShell";
+import { runWithExportFeedback } from "@/lib/export-feedback";
+import {
+  LONDON_STYLES,
+  LONDON_VENUE,
+  londonPanelsByFloor,
+  panelSlug,
+  rasterSizeFor,
+  type LondonPanel,
+} from "@/lib/next-london-signage";
+import {
+  applyLondonEdits,
+  baseRevision,
+  buildLondonPanelAi,
+  buildLondonPanelSvg,
+  diffLondonPanels,
+  editsBetween,
+  effectiveLondonPanels,
+  fingerprint,
+  londonPanelFileBase,
+  planLondonRegeneration,
+  regenerationSummary,
+  type LondonEditMap,
+  type LondonPanelEdit,
+  type LondonRevision,
+} from "@/lib/next-london-revise";
+import {
+  listLondonRevisions,
+  publishLondonRevision,
+} from "@/lib/next-london-revise.functions";
+
+export const Route = createFileRoute("/events/next_/london_/revise")({
+  head: () => ({
+    meta: [
+      { title: "Revise London signage specs · NEXT 2026" },
+      {
+        name: "description",
+        content:
+          "Re-issue QEII Centre panel measurements, see exactly which panels need new .ai/.svg or PNG artwork, regenerate them, and publish the change as a versioned revision.",
+      },
+      { property: "og:title", content: "Revise NEXT 2026 London signage specs" },
+      {
+        property: "og:description",
+        content:
+          "Spec revisions with full version history and targeted artwork regeneration for the QEII Centre panel kit.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: LondonRevisePage,
+});
+
+function download(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+async function renderDitheredPng(svg: string, w: number, h: number): Promise<Blob> {
+  const img = new Image();
+  img.src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("Could not rasterise the regenerated artwork."));
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas unavailable in this browser.");
+  ctx.drawImage(img, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h);
+  const p = data.data;
+  for (let i = 0; i < p.length; i += 4) {
+    const n = (Math.random() - Math.random()) * 1.4;
+    p[i] = Math.max(0, Math.min(255, p[i]! + n));
+    p[i + 1] = Math.max(0, Math.min(255, p[i + 1]! + n));
+    p[i + 2] = Math.max(0, Math.min(255, p[i + 2]! + n));
+  }
+  ctx.putImageData(data, 0, 0);
+  const blob = await new Promise<Blob | null>((r) => canvas.toBlob((b) => r(b), "image/png"));
+  if (!blob) throw new Error("PNG encoding failed.");
+  return blob;
+}
+
+const NUM_FIELDS: { key: keyof LondonPanelEdit; label: string; width: string }[] = [
+  { key: "trimW", label: "Trim W", width: "w-20" },
+  { key: "trimH", label: "Trim H", width: "w-20" },
+  { key: "bleedEdge", label: "Bleed/edge", width: "w-20" },
+  { key: "rasterPpi", label: "ppi", width: "w-16" },
+];
+
+function LondonRevisePage() {
+  const fetchRevisions = useServerFn(listLondonRevisions);
+  const publish = useServerFn(publishLondonRevision);
+
+  const [revisions, setRevisions] = useState<LondonRevision[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [edits, setEdits] = useState<LondonEditMap>({});
+  const [note, setNote] = useState("");
+  const [restoredFrom, setRestoredFrom] = useState<number | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
+  const [floor, setFloor] = useState<string>("all");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetchRevisions({});
+      setRevisions(res.revisions);
+      setHistoryError(null);
+    } catch (err) {
+      setHistoryError(err instanceof Error ? err.message : "Could not load the revision history.");
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchRevisions]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const history = useMemo<LondonRevision[]>(
+    () => [...revisions, baseRevision()].sort((a, b) => b.rev - a.rev),
+    [revisions],
+  );
+  const head = history[0] ?? baseRevision();
+  const current = useMemo(() => effectiveLondonPanels(revisions), [revisions]);
+  const draft = useMemo(() => applyLondonEdits(edits, current), [edits, current]);
+  const changes = useMemo(() => diffLondonPanels(current, draft), [current, draft]);
+  const plan = useMemo(() => planLondonRegeneration(changes), [changes]);
+  const dirty = changes.length > 0;
+
+  const byFloor = useMemo(() => londonPanelsByFloor(draft), [draft]);
+  const floors = useMemo(() => Object.keys(byFloor), [byFloor]);
+  const visible = floor === "all" ? draft : (byFloor[floor] ?? []);
+
+  const setField = (panelId: string, field: keyof LondonPanelEdit, raw: string) => {
+    setEdits((prev) => {
+      const next: LondonEditMap = { ...prev, [panelId]: { ...prev[panelId] } };
+      const entry = next[panelId]!;
+      if (raw === "") delete (entry as Record<string, unknown>)[field];
+      else if (field === "style" || field === "room" || field === "name" || field === "ground") {
+        (entry as Record<string, unknown>)[field] = raw;
+      } else {
+        const n = Number(raw);
+        if (Number.isFinite(n) && n > 0) (entry as Record<string, unknown>)[field] = n;
+        else delete (entry as Record<string, unknown>)[field];
+      }
+      if (Object.keys(entry).length === 0) delete next[panelId];
+      return next;
+    });
+  };
+
+  const regenerate = async (panels: LondonPanel[], rev: number, kind: "vector" | "raster") => {
+    const { default: JSZip } = await import("jszip");
+    const zip = new JSZip();
+    const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint"];
+    for (const panel of panels) {
+      const base = londonPanelFileBase(panel, rev);
+      const svg = buildLondonPanelSvg(panel);
+      if (kind === "vector") {
+        const ai = buildLondonPanelAi(panel);
+        zip.file(`vector/${base}.svg`, svg);
+        zip.file(`vector/${base}.ai`, ai);
+        manifest.push(
+          `${base}.ai,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(ai)}`,
+        );
+      }
+      const size = rasterSizeFor(panel, panel.rasterPpi);
+      const png = await renderDitheredPng(svg, size.w, size.h);
+      zip.file(`raster/${base}-${panel.rasterPpi}ppi.png`, png);
+      manifest.push(
+        `${base}-${panel.rasterPpi}ppi.png,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(svg)}`,
+      );
+    }
+    zip.file("manifest.csv", manifest.join("\n"));
+    const blob = await zip.generateAsync({ type: "blob" });
+    download(blob, `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
+  };
+
+  const regenAffected = () => {
+    const vectorPanels = draft.filter((p) => plan.vector.includes(p.id));
+    const rasterPanels = draft.filter((p) => plan.raster.includes(p.id));
+    if (vectorPanels.length === 0 && rasterPanels.length === 0) {
+      toast.info("No artwork is affected — these changes are schedule-only.");
+      return;
+    }
+    void runWithExportFeedback(
+      {
+        label: `Regenerating ${vectorPanels.length + rasterPanels.length} panels`,
+        success: "Regenerated artwork downloaded",
+        failure: "Regeneration failed",
+      },
+      async () => {
+        const rev = head.rev + 1;
+        if (vectorPanels.length) await regenerate(vectorPanels, rev, "vector");
+        if (rasterPanels.length) await regenerate(rasterPanels, rev, "raster");
+      },
+    );
+  };
+
+  const publishRevision = async () => {
+    if (!dirty) return;
+    setSaving(true);
+    try {
+      const res = await publish({
+        data: {
+          note: note.trim() || undefined,
+          panels: draft,
+          changes: changes as unknown as Record<string, unknown>[],
+          regen: plan as unknown as Record<string, unknown>,
+          restoredFrom,
+        },
+      });
+      setRevisions((prev) => [res.revision, ...prev]);
+      setEdits({});
+      setNote("");
+      setRestoredFrom(undefined);
+      toast.success(`Revision ${res.revision.rev} published`, {
+        description: regenerationSummary(plan),
+      });
+    } catch (err) {
+      toast.error("Could not publish the revision", {
+        description: err instanceof Error ? err.message : "Unexpected error.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const restore = (rev: LondonRevision) => {
+    setEdits(editsBetween(current, rev.panels));
+    setRestoredFrom(rev.rev);
+    setNote(`Restore revision ${rev.rev}${rev.note ? ` — ${rev.note}` : ""}`);
+    toast.info(`Loaded revision ${rev.rev} as a draft`, {
+      description: "Publish it to move the restore forward — earlier revisions stay untouched.",
+    });
+  };
+
+  return (
+    <AppShell>
+      <div className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+        <Link
+          to="/events/next/london"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          Back to the London signage kit
+        </Link>
+
+        <header className="mt-4 flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#666]">
+              Job {LONDON_VENUE.job} · {LONDON_VENUE.venue}
+            </p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-[-0.02em] text-[#03002C]">
+              Revise signage specifications
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-[1.45] text-[#666]">
+              Re-issue trim, bleed or gradient for any panel. Element recomputes the raster tier,
+              dither band and file weight, works out which panels need new vector artwork versus a
+              PNG re-render, and stores the full snapshot as revision {head.rev + 1}.
+            </p>
+          </div>
+          <div className="rounded-xl border border-black/10 bg-white px-4 py-3 text-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#666]">
+              In force
+            </p>
+            <p className="mt-0.5 text-lg font-semibold text-[#03002C]">Revision {head.rev}</p>
+            <p className="text-xs text-[#666]">{head.note ?? "No note"}</p>
+          </div>
+        </header>
+
+        {/* Change summary + publish */}
+        <section className="mt-6 rounded-2xl border border-black/10 bg-[#F2F2F2] p-4 sm:p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#03002C]">
+              <Sparkles className="h-4 w-4 text-[#003FC7]" aria-hidden="true" />
+              {dirty
+                ? `${changes.filter((c) => !c.derived).length} spec change${changes.filter((c) => !c.derived).length === 1 ? "" : "s"} · ${regenerationSummary(plan)}`
+                : "No pending changes"}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEdits({});
+                  setRestoredFrom(undefined);
+                }}
+                disabled={!dirty}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#03002C] disabled:opacity-40"
+              >
+                <Undo2 className="h-4 w-4" aria-hidden="true" />
+                Discard
+              </button>
+              <button
+                type="button"
+                onClick={regenAffected}
+                disabled={!dirty}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#03002C] disabled:opacity-40"
+              >
+                <FileDown className="h-4 w-4" aria-hidden="true" />
+                Regenerate affected artwork
+              </button>
+              <button
+                type="button"
+                onClick={() => void publishRevision()}
+                disabled={!dirty || saving}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3.5 py-2 text-sm font-semibold text-white disabled:opacity-40"
+              >
+                {saving ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                ) : (
+                  <Save className="h-4 w-4" aria-hidden="true" />
+                )}
+                Publish revision {head.rev + 1}
+              </button>
+            </div>
+          </div>
+
+          <label className="mt-3 block">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#666]">
+              Revision note
+            </span>
+            <input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="e.g. Churchill columns re-measured on site, 3mm bleed added"
+              className="mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-[#999]"
+            />
+          </label>
+
+          {dirty ? (
+            <ul className="mt-3 max-h-52 space-y-1 overflow-y-auto text-xs">
+              {changes.map((c, i) => (
+                <li
+                  key={`${c.panelId}-${c.field}-${i}`}
+                  className="flex flex-wrap items-baseline gap-x-2 rounded-md bg-white px-2.5 py-1.5"
+                >
+                  <span className="font-semibold text-[#03002C]">{c.panelName}</span>
+                  <span className="text-[#666]">{c.label}</span>
+                  <span className="text-[#666] line-through">{String(c.from)}</span>
+                  <span aria-hidden="true" className="text-[#666]">
+                    →
+                  </span>
+                  <span className="font-semibold text-[#003FC7]">{String(c.to)}</span>
+                  {c.derived ? (
+                    <span className="rounded bg-[#E0E8F5] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#003FC7]">
+                      derived
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          {/* Panel editor */}
+          <section>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-lg font-semibold text-[#03002C]">Panel schedule</h2>
+              <div className="ml-auto flex flex-wrap gap-1.5">
+                {["all", ...floors].map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setFloor(f)}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                      floor === f
+                        ? "bg-[#003FC7] text-white"
+                        : "border border-black/10 bg-white text-[#03002C]"
+                    }`}
+                  >
+                    {f === "all" ? `All ${draft.length}` : f}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-3 overflow-x-auto rounded-2xl border border-black/10 bg-white">
+              <table className="w-full min-w-[880px] text-sm">
+                <caption className="sr-only">
+                  Editable panel specifications with recomputed raster values
+                </caption>
+                <thead>
+                  <tr className="border-b border-black/10 text-left text-[11px] uppercase tracking-[0.12em] text-[#666]">
+                    <th scope="col" className="px-3 py-2.5">
+                      Panel
+                    </th>
+                    <th scope="col" className="px-3 py-2.5">
+                      Gradient
+                    </th>
+                    {NUM_FIELDS.map((f) => (
+                      <th key={String(f.key)} scope="col" className="px-2 py-2.5">
+                        {f.label}
+                      </th>
+                    ))}
+                    <th scope="col" className="px-3 py-2.5">
+                      Derived
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visible.map((panel) => {
+                    const touched = plan.touched.includes(panel.id);
+                    return (
+                      <tr
+                        key={panel.id}
+                        className={`border-b border-black/5 align-top ${touched ? "bg-[#E0E8F5]/60" : ""}`}
+                      >
+                        <td className="px-3 py-2.5">
+                          <p className="font-semibold text-[#03002C]">{panel.name}</p>
+                          <p className="text-xs text-[#666]">
+                            {panel.floor} · {panel.room}
+                          </p>
+                        </td>
+                        <td className="px-3 py-2.5">
+                          <select
+                            aria-label={`Gradient style for ${panel.name}`}
+                            value={panel.style}
+                            onChange={(e) => setField(panel.id, "style", e.target.value)}
+                            className="w-40 rounded-md border border-black/15 bg-white px-2 py-1.5 text-xs text-[#03002C]"
+                          >
+                            {Object.entries(LONDON_STYLES).map(([id, s]) => (
+                              <option key={id} value={id}>
+                                {s.label}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        {NUM_FIELDS.map((f) => (
+                          <td key={String(f.key)} className="px-2 py-2.5">
+                            <input
+                              type="number"
+                              min={1}
+                              step={f.key === "rasterPpi" ? 1 : 0.5}
+                              aria-label={`${f.label} for ${panel.name}`}
+                              value={String(panel[f.key as keyof LondonPanel] ?? "")}
+                              onChange={(e) => setField(panel.id, f.key, e.target.value)}
+                              className={`${f.width} rounded-md border border-black/15 bg-white px-2 py-1.5 text-xs text-[#03002C]`}
+                            />
+                          </td>
+                        ))}
+                        <td className="px-3 py-2.5 text-xs text-[#666]">
+                          <p>
+                            {panel.bleedW}×{panel.bleedH}mm bleed
+                          </p>
+                          <p>
+                            {panel.rasterPx}px · {panel.rasterMb}MB · band {panel.bandMm}mm
+                          </p>
+                          <p className="mt-0.5 font-mono text-[10px] text-[#999]">
+                            {panelSlug(panel)}
+                          </p>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* History */}
+          <aside>
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
+              <History className="h-4 w-4 text-[#003FC7]" aria-hidden="true" />
+              Version history
+            </h2>
+            {loading ? (
+              <p className="mt-3 flex items-center gap-2 text-sm text-[#666]">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                Loading revisions…
+              </p>
+            ) : null}
+            {historyError ? (
+              <p className="mt-3 rounded-lg border border-[#E53D2E]/30 bg-[#E53D2E]/5 px-3 py-2 text-xs text-[#03002C]">
+                {historyError} The issued pack is still editable — publishing will retry.
+              </p>
+            ) : null}
+            <ol className="mt-3 space-y-2">
+              {history.map((rev) => (
+                <li key={rev.id} className="rounded-xl border border-black/10 bg-white p-3">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-sm font-semibold text-[#03002C]">
+                      Revision {rev.rev}
+                      {rev.rev === head.rev ? (
+                        <span className="ml-2 inline-flex items-center gap-1 rounded bg-[#A6FA87]/40 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]">
+                          <Check className="h-3 w-3" aria-hidden="true" />
+                          In force
+                        </span>
+                      ) : null}
+                    </p>
+                    <time className="text-[11px] text-[#666]" dateTime={rev.createdAt}>
+                      {new Date(rev.createdAt).toLocaleDateString()}
+                    </time>
+                  </div>
+                  <p className="mt-1 text-xs leading-[1.45] text-[#666]">
+                    {rev.note ?? "No note"}
+                  </p>
+                  {rev.restoredFrom != null ? (
+                    <p className="mt-1 text-[11px] text-[#666]">
+                      Restored from revision {rev.restoredFrom}
+                    </p>
+                  ) : null}
+                  {rev.changes.length ? (
+                    <p className="mt-1 text-[11px] text-[#666]">
+                      {rev.changes.filter((c) => !c.derived).length} spec change(s) ·{" "}
+                      {regenerationSummary(
+                        "vector" in rev.regen
+                          ? (rev.regen as ReturnType<typeof planLondonRegeneration>)
+                          : { vector: [], raster: [], metadata: [], touched: [] },
+                      )}
+                    </p>
+                  ) : null}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => restore(rev)}
+                      disabled={rev.rev === head.rev}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-2.5 py-1.5 text-xs font-medium text-[#03002C] disabled:opacity-40"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+                      Restore
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void runWithExportFeedback(
+                          {
+                            label: `Rebuilding revision ${rev.rev}`,
+                            success: `Revision ${rev.rev} artwork downloaded`,
+                            failure: "Rebuild failed",
+                          },
+                          () => regenerate(rev.panels, rev.rev, "vector"),
+                        )
+                      }
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-black/10 px-2.5 py-1.5 text-xs font-medium text-[#03002C]"
+                    >
+                      <FileDown className="h-3.5 w-3.5" aria-hidden="true" />
+                      Rebuild files
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        </div>
+      </div>
+    </AppShell>
+  );
+}

@@ -154,6 +154,7 @@ import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.prin
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as EventsNextLondonReviseRouteImport } from './routes/events.next_.london_.revise'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -891,6 +892,11 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsNextLondonReviseRoute = EventsNextLondonReviseRouteImport.update({
+  id: '/next_/london_/revise',
+  path: '/next/london/revise',
+  getParentRoute: () => EventsRoute,
+} as any)
 const AdminModulesPrintModuleIdRoute =
   AdminModulesPrintModuleIdRouteImport.update({
     id: '/modules_/print/$moduleId',
@@ -1045,6 +1051,7 @@ export interface FileRoutesByFullPath {
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/events/next/london/revise': typeof EventsNextLondonReviseRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1189,6 +1196,7 @@ export interface FileRoutesByTo {
   '/decks/$deckId': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/events/next/london/revise': typeof EventsNextLondonReviseRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1338,6 +1346,7 @@ export interface FileRoutesById {
   '/decks/$deckId/': typeof DecksDeckIdIndexRoute
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
+  '/events/next_/london_/revise': typeof EventsNextLondonReviseRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1488,6 +1497,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
     | '/admin/modules/print/$moduleId'
+    | '/events/next/london/revise'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1632,6 +1642,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId'
     | '/knowledge/brand-guides'
     | '/admin/modules/print/$moduleId'
+    | '/events/next/london/revise'
   id:
     | '__root__'
     | '/'
@@ -1780,6 +1791,7 @@ export interface FileRouteTypes {
     | '/decks/$deckId/'
     | '/knowledge/brand-guides/'
     | '/admin/modules_/print/$moduleId'
+    | '/events/next_/london_/revise'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -2890,6 +2902,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/next_/london_/revise': {
+      id: '/events/next_/london_/revise'
+      path: '/next/london/revise'
+      fullPath: '/events/next/london/revise'
+      preLoaderRoute: typeof EventsNextLondonReviseRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/admin/modules_/print/$moduleId': {
       id: '/admin/modules_/print/$moduleId'
       path: '/modules/print/$moduleId'
@@ -2993,6 +3012,7 @@ interface EventsRouteChildren {
   EventsDemoPlaybookIdRoute: typeof EventsDemoPlaybookIdRoute
   EventsNextBadgesRoute: typeof EventsNextBadgesRoute
   EventsNextLondonRoute: typeof EventsNextLondonRoute
+  EventsNextLondonReviseRoute: typeof EventsNextLondonReviseRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
@@ -3004,6 +3024,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsDemoPlaybookIdRoute: EventsDemoPlaybookIdRoute,
   EventsNextBadgesRoute: EventsNextBadgesRoute,
   EventsNextLondonRoute: EventsNextLondonRoute,
+  EventsNextLondonReviseRoute: EventsNextLondonReviseRoute,
 }
 
 const EventsRouteWithChildren =
