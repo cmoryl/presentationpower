@@ -133,6 +133,11 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
 
 function LondonSignagePage() {
   const fetchRevisions = useServerFn(listLondonRevisions);
+  // `undefined` while the session resolves, `null` when signed out. The kit is
+  // public — downloads and QA are available to everyone — but editor entry
+  // points (revise workflow, production studio) are only shown to signed-in
+  // users.
+  const userId = useSessionUser();
   // The kit shows the panel set IN FORCE: the newest published revision, or the
   // issued venue pack when there is none (or when the viewer is not signed in).
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
@@ -332,18 +337,22 @@ function LondonSignagePage() {
               >
                 <Table2 className="h-4 w-4" /> Print schedule (CSV)
               </button>
-              <Link
-                to="/events/next/london/revise"
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <Ruler className="h-4 w-4" /> Revise specs &amp; regenerate
-              </Link>
-              <Link
-                to="/events/production"
-                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
-              >
-                <Layers className="h-4 w-4" /> Open production studio
-              </Link>
+              {userId ? (
+                <>
+                  <Link
+                    to="/events/next/london/revise"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+                  >
+                    <Ruler className="h-4 w-4" /> Revise specs &amp; regenerate
+                  </Link>
+                  <Link
+                    to="/events/production"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+                  >
+                    <Layers className="h-4 w-4" /> Open production studio
+                  </Link>
+                </>
+              ) : null}
               <button
                 type="button"
                 onClick={runKitQa}
