@@ -2261,6 +2261,42 @@ export type Database = {
           },
         ]
       }
+      london_signage_revisions: {
+        Row: {
+          author_id: string | null
+          changes: Json
+          created_at: string
+          id: string
+          note: string | null
+          panels: Json
+          regen: Json
+          restored_from: number | null
+          rev: number
+        }
+        Insert: {
+          author_id?: string | null
+          changes?: Json
+          created_at?: string
+          id?: string
+          note?: string | null
+          panels: Json
+          regen?: Json
+          restored_from?: number | null
+          rev: number
+        }
+        Update: {
+          author_id?: string | null
+          changes?: Json
+          created_at?: string
+          id?: string
+          note?: string | null
+          panels?: Json
+          regen?: Json
+          restored_from?: number | null
+          rev?: number
+        }
+        Relationships: []
+      }
       module_families: {
         Row: {
           description: string | null

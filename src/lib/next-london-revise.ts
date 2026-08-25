@@ -1,0 +1,492 @@
+// TransPerfect NEXT 2026 — London signage SPEC REVISION ENGINE.
+//
+// The venue team re-issues panel measurements during build-up: a column grows a
+// bleed, a fascia is re-cut, a room swaps its gradient. This module is the
+// deterministic core of that workflow:
+//
+//   1. edits            — field-level changes against a base panel set
+//   2. derive           — recompute everything downstream (bleed box, raster
+//                         pixel size, ppi tier, dither band width, file weight)
+//   3. diff             — a field-level change list, human readable
+//   4. regeneration plan — which panels need new VECTOR (.ai/.svg), which need
+//                         only a new RASTER, which are metadata-only
+//   5. regenerate       — rebuild the vector artwork from the spec itself, so a
+//                         revision is reproducible from its snapshot alone
+//
+// Version history is preserved because a revision stores the FULL panel
+// snapshot: any past revision can rebuild byte-identical artwork, and restoring
+// an old revision publishes it forward as a new revision rather than rewriting
+// the past.
+
+import {
+  LONDON_PANELS,
+  LONDON_STYLES,
+  panelSlug,
+  rasterSizeFor,
+  recommendedPpi,
+  type LondonPanel,
+} from "@/lib/next-london-signage";
+
+/** Fields the location team is allowed to re-issue. */
+export const LONDON_EDITABLE_FIELDS = [
+  "room",
+  "name",
+  "ground",
+  "style",
+  "trimW",
+  "trimH",
+  "bleedEdge",
+  "bleedW",
+  "bleedH",
+  "rasterPpi",
+] as const;
+
+export type LondonEditableField = (typeof LONDON_EDITABLE_FIELDS)[number];
+
+export type LondonPanelEdit = Partial<Pick<LondonPanel, LondonEditableField>>;
+
+export type LondonEditMap = Record<string, LondonPanelEdit>;
+
+/** Changing any of these invalidates the vector artwork itself. */
+const VECTOR_FIELDS = new Set<LondonEditableField>([
+  "style",
+  "trimW",
+  "trimH",
+  "bleedEdge",
+  "bleedW",
+  "bleedH",
+]);
+
+/** Changing this only re-renders the PNG. */
+const RASTER_FIELDS = new Set<LondonEditableField>(["rasterPpi"]);
+
+export const LONDON_FIELD_LABELS: Record<LondonEditableField, string> = {
+  room: "Room",
+  name: "Panel name",
+  ground: "Ground",
+  style: "Gradient style",
+  trimW: "Trim width (mm)",
+  trimH: "Trim height (mm)",
+  bleedEdge: "Bleed per edge (mm)",
+  bleedW: "Bleed width (mm)",
+  bleedH: "Bleed height (mm)",
+  rasterPpi: "Raster ppi",
+};
+
+// ---------------------------------------------------------------------------
+// Derivation
+// ---------------------------------------------------------------------------
+
+/** Estimated lossless-PNG weight, in MB, for a gradient plate of w×h px. */
+function estimateRasterMb(w: number, h: number): number {
+  // Smooth gradients + triangular dither compress to roughly 0.28 B/px in the
+  // packaged masters (measured across the 54 issued plates).
+  return Math.max(0.1, (w * h * 0.28) / (1024 * 1024));
+}
+
+/**
+ * Worst-case flat-tone run for a dithered 8-bit gradient at a given ppi: about
+ * three device pixels before the quantisation boundary is crossed.
+ */
+function bandWidthMm(ppi: number): number {
+  return (25.4 / Math.max(1, ppi)) * 3;
+}
+
+/**
+ * Apply one panel's edits and recompute every derived value. Bleed boxes follow
+ * `bleedEdge` unless the team overrides a box explicitly in the same edit.
+ */
+export function derivePanel(base: LondonPanel, edit: LondonPanelEdit = {}): LondonPanel {
+  // Untouched panels keep their issued values verbatim: the estimators below are
+  // only ever allowed to move a panel that was actually re-issued.
+  if (Object.keys(edit).length === 0) return base;
+
+  const trimW = num(edit.trimW, base.trimW);
+  const trimH = num(edit.trimH, base.trimH);
+  const bleedEdge = num(edit.bleedEdge, base.bleedEdge);
+  const bleedW = edit.bleedW !== undefined ? num(edit.bleedW, base.bleedW) : trimW + bleedEdge * 2;
+  const bleedH = edit.bleedH !== undefined ? num(edit.bleedH, base.bleedH) : trimH + bleedEdge * 2;
+
+  const style = edit.style && LONDON_STYLES[edit.style] ? edit.style : base.style;
+  const geometryMoved =
+    trimW !== base.trimW ||
+    trimH !== base.trimH ||
+    bleedW !== base.bleedW ||
+    bleedH !== base.bleedH;
+
+  const draft: LondonPanel = {
+    ...base,
+    room: (edit.room ?? base.room).trim() || base.room,
+    name: (edit.name ?? base.name).trim() || base.name,
+    ground: (edit.ground ?? base.ground).trim() || base.ground,
+    style,
+    trimW,
+    trimH,
+    bleedEdge,
+    bleedW,
+    bleedH,
+  };
+
+  // ppi: honour an explicit override, otherwise re-tier from the new size.
+  const ppi =
+    edit.rasterPpi !== undefined
+      ? clampPpi(num(edit.rasterPpi, base.rasterPpi))
+      : geometryMoved
+        ? recommendedPpi(draft)
+        : base.rasterPpi;
+
+  const rasterMoved = geometryMoved || ppi !== base.rasterPpi;
+  if (!rasterMoved) return { ...draft, rasterPpi: ppi };
+
+  const size = rasterSizeFor(draft, ppi);
+  return {
+    ...draft,
+    rasterPpi: ppi,
+    rasterPx: `${size.w}x${size.h}`,
+    rasterMb: round(estimateRasterMb(size.w, size.h), 1),
+    bandMm: round(bandWidthMm(ppi), 2),
+  };
+}
+
+/** Apply an edit map over a base set (defaults to the issued London pack). */
+export function applyLondonEdits(
+  edits: LondonEditMap,
+  base: LondonPanel[] = LONDON_PANELS,
+): LondonPanel[] {
+  return base.map((p) => derivePanel(p, edits[p.id] ?? {}));
+}
+
+function num(value: unknown, fallback: number): number {
+  const n = typeof value === "string" ? Number(value) : (value as number);
+  return Number.isFinite(n) && (n as number) > 0 ? round(n as number, 1) : fallback;
+}
+
+function clampPpi(ppi: number): number {
+  return Math.min(300, Math.max(18, Math.round(ppi)));
+}
+
+function round(n: number, dp: number): number {
+  const k = 10 ** dp;
+  return Math.round(n * k) / k;
+}
+
+// ---------------------------------------------------------------------------
+// Diff + regeneration plan
+// ---------------------------------------------------------------------------
+
+export type LondonChange = {
+  panelId: string;
+  panelName: string;
+  field: LondonEditableField | "rasterPx" | "rasterMb" | "bandMm";
+  label: string;
+  from: string | number;
+  to: string | number;
+  /** Derived values move as a consequence of an edit; they are not edits. */
+  derived: boolean;
+};
+
+const DERIVED_FIELDS: { key: "rasterPx" | "rasterMb" | "bandMm"; label: string }[] = [
+  { key: "rasterPx", label: "Raster size (px)" },
+  { key: "rasterMb", label: "File weight (MB)" },
+  { key: "bandMm", label: "Measured band (mm)" },
+];
+
+export function diffLondonPanels(prev: LondonPanel[], next: LondonPanel[]): LondonChange[] {
+  const byId = new Map(prev.map((p) => [p.id, p]));
+  const out: LondonChange[] = [];
+  for (const panel of next) {
+    const before = byId.get(panel.id);
+    if (!before) continue;
+    for (const field of LONDON_EDITABLE_FIELDS) {
+      if (before[field] !== panel[field]) {
+        out.push({
+          panelId: panel.id,
+          panelName: panel.name,
+          field,
+          label: LONDON_FIELD_LABELS[field],
+          from: before[field],
+          to: panel[field],
+          derived: false,
+        });
+      }
+    }
+    for (const d of DERIVED_FIELDS) {
+      if (before[d.key] !== panel[d.key]) {
+        out.push({
+          panelId: panel.id,
+          panelName: panel.name,
+          field: d.key,
+          label: d.label,
+          from: before[d.key],
+          to: panel[d.key],
+          derived: true,
+        });
+      }
+    }
+  }
+  return out;
+}
+
+export type LondonRegenPlan = {
+  /** Needs new .ai + .svg (and therefore a new PNG too). */
+  vector: string[];
+  /** Vector still valid — only the PNG must be re-rendered. */
+  raster: string[];
+  /** Schedule/metadata only; no artwork changes. */
+  metadata: string[];
+  /** Every panel touched, in issue order. */
+  touched: string[];
+};
+
+export function planLondonRegeneration(changes: LondonChange[]): LondonRegenPlan {
+  const vector = new Set<string>();
+  const raster = new Set<string>();
+  const metadata = new Set<string>();
+
+  for (const c of changes) {
+    if (!c.derived && VECTOR_FIELDS.has(c.field as LondonEditableField)) vector.add(c.panelId);
+    else if (!c.derived && RASTER_FIELDS.has(c.field as LondonEditableField)) raster.add(c.panelId);
+    else if (c.derived && c.field === "rasterPx") raster.add(c.panelId);
+    else if (!c.derived) metadata.add(c.panelId);
+  }
+  for (const id of vector) raster.delete(id);
+  for (const id of [...vector, ...raster]) metadata.delete(id);
+
+  const order = (ids: Set<string>) => LONDON_PANELS.filter((p) => ids.has(p.id)).map((p) => p.id);
+  const touched = new Set<string>([...vector, ...raster, ...metadata]);
+  return {
+    vector: order(vector),
+    raster: order(raster),
+    metadata: order(metadata),
+    touched: order(touched),
+  };
+}
+
+export function regenerationSummary(plan: LondonRegenPlan): string {
+  if (plan.touched.length === 0) return "No changes — nothing to regenerate.";
+  const bits: string[] = [];
+  if (plan.vector.length) bits.push(`${plan.vector.length} × new .ai/.svg + PNG`);
+  if (plan.raster.length) bits.push(`${plan.raster.length} × PNG re-render`);
+  if (plan.metadata.length) bits.push(`${plan.metadata.length} × schedule only`);
+  return bits.join(" · ");
+}
+
+// ---------------------------------------------------------------------------
+// Artwork regeneration — vector, straight from the spec
+// ---------------------------------------------------------------------------
+
+const MM_TO_PT = 72 / 25.4;
+
+type Vec = { x1: number; y1: number; x2: number; y2: number };
+
+/** Gradient axis per treatment, in unit space. */
+function styleAxis(styleId: string): Vec {
+  if (styleId.includes("diagonal")) return { x1: 0, y1: 0, x2: 1, y2: 1 };
+  if (styleId.includes("horizon")) return { x1: 0, y1: 0, x2: 0, y2: 1 };
+  if (styleId.includes("bloom")) return { x1: 0, y1: 0, x2: 0.85, y2: 0.85 };
+  if (styleId.includes("prism")) return { x1: 0, y1: 1, x2: 1, y2: 0 };
+  if (styleId.includes("veil")) return { x1: 0, y1: 0, x2: 0.25, y2: 1 };
+  return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
+}
+
+function stopsFor(panel: LondonPanel): string[] {
+  return LONDON_STYLES[panel.style]?.stops ?? ["#7C4EF4", "#7FE3E8"];
+}
+
+/**
+ * Rebuild a panel's SVG from its own specification: full-bleed artboard in mm,
+ * live linear gradient, trim box marked as metadata only (never a drawn line).
+ */
+export function buildLondonPanelSvg(panel: LondonPanel): string {
+  const stops = stopsFor(panel);
+  const axis = styleAxis(panel.style);
+  const id = `g-${panel.id}`;
+  const isHalo = panel.style.includes("halo");
+  const ramp = stops
+    .map((hex, i) => `<stop offset="${((i / (stops.length - 1)) * 100).toFixed(2)}%" stop-color="${hex}"/>`)
+    .join("");
+
+  const paint = isHalo
+    ? `<radialGradient id="${id}" cx="50%" cy="45%" r="72%">${ramp}</radialGradient>`
+    : `<linearGradient id="${id}" x1="${axis.x1 * 100}%" y1="${axis.y1 * 100}%" x2="${axis.x2 * 100}%" y2="${axis.y2 * 100}%">${ramp}</linearGradient>`;
+
+  const marginX = ((panel.bleedW - panel.trimW) / 2).toFixed(2);
+  const marginY = ((panel.bleedH - panel.trimH) / 2).toFixed(2);
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
+    ` viewBox="0 0 ${panel.bleedW} ${panel.bleedH}" data-panel="${panel.id}"`,
+    ` data-trim="${panel.trimW}x${panel.trimH}mm" data-bleed="${panel.bleedEdge}mm"`,
+    ` data-trim-origin="${marginX},${marginY}" data-style="${panel.style}">`,
+    `<title>${escapeXml(panel.name)}</title>`,
+    `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style}</desc>`,
+    `<defs>${paint}</defs>`,
+    `<rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/>`,
+    `</svg>`,
+  ].join("");
+}
+
+function escapeXml(s: string): string {
+  return s.replace(/[<>&"]/g, (c) =>
+    c === "<" ? "&lt;" : c === ">" ? "&gt;" : c === "&" ? "&amp;" : "&quot;",
+  );
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n = parseInt(full, 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+
+/**
+ * Rebuild a panel's `.ai` from its specification. Illustrator's native format
+ * is PDF-compatible, so we emit a single-page PDF that carries a real axial
+ * (type 2) shading — live vector gradient, editable in Illustrator, with
+ * MediaBox/BleedBox at bleed and TrimBox at trim. No raster is embedded.
+ */
+export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
+  const w = panel.bleedW * MM_TO_PT;
+  const h = panel.bleedH * MM_TO_PT;
+  const trimX = ((panel.bleedW - panel.trimW) / 2) * MM_TO_PT;
+  const trimY = ((panel.bleedH - panel.trimH) / 2) * MM_TO_PT;
+  const stops = stopsFor(panel);
+  const axis = styleAxis(panel.style);
+
+  // Stitching function over exponential (type 2) sub-functions: one per stop
+  // pair, giving Illustrator a normal multi-stop gradient.
+  const subs: string[] = [];
+  for (let i = 0; i < stops.length - 1; i += 1) {
+    const a = hexToRgb(stops[i]!);
+    const b = hexToRgb(stops[i + 1]!);
+    subs.push(
+      `<< /FunctionType 2 /Domain [0 1] /C0 [${a.map(f3).join(" ")}] /C1 [${b.map(f3).join(" ")}] /N 1 >>`,
+    );
+  }
+  const bounds = stops
+    .slice(1, -1)
+    .map((_, i) => f3((i + 1) / (stops.length - 1)))
+    .join(" ");
+  const encode = subs.map(() => "0 1").join(" ");
+  const fn =
+    subs.length === 1
+      ? subs[0]!
+      : `<< /FunctionType 3 /Domain [0 1] /Functions [${subs.join(" ")}] /Bounds [${bounds}] /Encode [${encode}] >>`;
+
+  const coords = [axis.x1 * w, h - axis.y1 * h, axis.x2 * w, h - axis.y2 * h]
+    .map(f3)
+    .join(" ");
+  const shading = `<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [${coords}] /Function ${fn} /Extend [true true] >>`;
+  const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
+
+  const objects: string[] = [
+    `<< /Type /Catalog /Pages 2 0 R >>`,
+    `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
+    `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
+      `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
+      `/Resources << /Shading << /Sh0 ${shading} >> >> /Contents 4 0 R >>`,
+    `<< /Length ${content.length} >>\nstream\n${content}endstream`,
+    `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
+      `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)}) >>`,
+  ];
+
+  let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
+  const offsets: number[] = [];
+  objects.forEach((body, i) => {
+    offsets.push(pdf.length);
+    pdf += `${i + 1} 0 obj\n${body}\nendobj\n`;
+  });
+  const xrefAt = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (const off of offsets) pdf += `${String(off).padStart(10, "0")} 00000 n \n`;
+  pdf +=
+    `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R /Info ${objects.length} 0 R >>\n` +
+    `startxref\n${xrefAt}\n%%EOF\n`;
+
+  const bytes = new Uint8Array(pdf.length);
+  for (let i = 0; i < pdf.length; i += 1) bytes[i] = pdf.charCodeAt(i) & 0xff;
+  return bytes;
+}
+
+function f3(n: number): string {
+  return (Math.round(n * 1000) / 1000).toString();
+}
+
+function pdfText(s: string): string {
+  return s.replace(/[\\()]/g, (c) => `\\${c}`);
+}
+
+/** Stable file base for a regenerated panel, versioned by revision number. */
+export function londonPanelFileBase(panel: LondonPanel, rev: number): string {
+  return `r${String(rev).padStart(3, "0")}-${panelSlug(panel)}`;
+}
+
+/**
+ * Cheap content fingerprint (FNV-1a) recorded per regenerated file, so a
+ * revision's manifest proves which bytes were shipped for it.
+ */
+export function fingerprint(input: string | Uint8Array): string {
+  let hash = 0x811c9dc5;
+  const len = typeof input === "string" ? input.length : input.byteLength;
+  for (let i = 0; i < len; i += 1) {
+    const code = typeof input === "string" ? input.charCodeAt(i) & 0xff : input[i]!;
+    hash ^= code;
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash.toString(16).padStart(8, "0");
+}
+
+// ---------------------------------------------------------------------------
+// Revisions
+// ---------------------------------------------------------------------------
+
+export type LondonRevision = {
+  id: string;
+  rev: number;
+  note: string | null;
+  authorId: string | null;
+  panels: LondonPanel[];
+  changes: LondonChange[];
+  regen: LondonRegenPlan | Record<string, never>;
+  restoredFrom: number | null;
+  createdAt: string;
+};
+
+/** Revision 0 is the issued venue pack — always the base of the history. */
+export function baseRevision(): LondonRevision {
+  return {
+    id: "issued",
+    rev: 0,
+    note: "Issued venue pack (Job 2281, Bespoke proofs)",
+    authorId: null,
+    panels: LONDON_PANELS,
+    changes: [],
+    regen: {},
+    restoredFrom: null,
+    createdAt: "2026-01-01T00:00:00.000Z",
+  };
+}
+
+/** The panel set in force: latest revision, or the issued pack. */
+export function effectiveLondonPanels(revisions: LondonRevision[]): LondonPanel[] {
+  const latest = [...revisions].sort((a, b) => b.rev - a.rev)[0];
+  return latest?.panels?.length ? latest.panels : LONDON_PANELS;
+}
+
+/** Edit map that turns `from` into `to` — used when restoring an old revision. */
+export function editsBetween(from: LondonPanel[], to: LondonPanel[]): LondonEditMap {
+  const byId = new Map(from.map((p) => [p.id, p]));
+  const edits: LondonEditMap = {};
+  for (const panel of to) {
+    const before = byId.get(panel.id);
+    if (!before) continue;
+    const edit: LondonPanelEdit = {};
+    for (const field of LONDON_EDITABLE_FIELDS) {
+      if (before[field] !== panel[field]) {
+        (edit as Record<string, unknown>)[field] = panel[field];
+      }
+    }
+    if (Object.keys(edit).length > 0) edits[panel.id] = edit;
+  }
+  return edits;
+}
