@@ -4697,7 +4697,10 @@ export const useDeckStore = create<DeckState>()(
           const deck = get().decks[deckId];
           if (!deck) return null;
           const report = autoFixQa(deck.slides, {
-            brandModeId: deck.brandModeId,
+            // Fall back to the Enterprise master profile so accent-legibility
+            // and brand-variant fixes still run on decks with no explicit
+            // brand mode (agent-built decks default to Enterprise anyway).
+            brandModeId: deck.brandModeId ?? "bm-master",
             industryId: deck.context?.designRecipeId ?? null,
             includeWarnings: opts?.includeWarnings !== false,
           });
