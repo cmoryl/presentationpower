@@ -118,10 +118,10 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
       label: "Presentation",
       to: "/library",
       items: [
+        { to: "/agent", label: "Deck agent" },
         { to: "/library", label: "Slide modules" },
         { to: "/library/my", label: "My decks" },
         { to: "/decks", label: "All decks" },
-        { to: "/agent", label: "Deck agent" },
         { to: "/admin/canvas", label: "Canvas creator" },
       ],
     },
