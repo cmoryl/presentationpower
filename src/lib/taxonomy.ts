@@ -126,15 +126,16 @@ export const BRAND_MODES: BrandMode[] = [
     id: "bm-subcompany",
     name: "Subcompany",
     description: "Named subcompany within TransPerfect",
-    // Blue 500 ink + Aqua accent — bright, corporate-adjacent.
-    tokens: { primary: "#003FC7", accent: "#A1FBF9", surface: "#E0F2F4", ink: "#03002C" },
+    // Approved brand system — same enterprise palette as the master brand.
+    // Division scope differs by logo and info only, never by accent colour.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-division",
     name: "Division",
     description: "Business division brand mode",
-    // Deep indigo + Lavender-tinged sky accent — distinct from Digital's true lavender.
-    tokens: { primary: "#130F4D", accent: "#7DA7FF", surface: "#EAEEFB", ink: "#03002C" },
+    // Approved brand system — enterprise palette, logo/info carry the division.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-element",
@@ -148,49 +149,50 @@ export const BRAND_MODES: BrandMode[] = [
     id: "bm-product",
     name: "Product",
     description: "Named product brand mode",
-    // Ink field with a peach-adjacent aqua sibling to keep it distinct from Subcompany.
-    tokens: { primary: "#03002C", accent: "#5CE1E6", surface: "#E4F6F7", ink: "#03002C" },
+    // Approved brand system — enterprise palette.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-tp-media",
     name: "TransPerfect Media",
     description: "Media localization: dubbing, subtitling, access services",
-    // NEXT Media pink #EC388A on ink — pale rose light surface for cohesion.
-    tokens: { primary: "#03002C", accent: "#EC388A", surface: "#FBE7EF", ink: "#03002C" },
+    // Approved brand system — enterprise palette; Media shows via lockup + copy.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-tp-legal",
     name: "TransPerfect Legal",
     description: "Legal solutions: eDiscovery, litigation, IP, legal translation",
-    // NEXT Legal teal #3BBEB6 — deep blue ink with muted teal light surface.
-    tokens: { primary: "#002673", accent: "#3BBEB6", surface: "#E4F4F2", ink: "#03002C" },
+    // Approved brand system — enterprise palette; Legal shows via lockup + copy.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-tp-games",
     name: "TransPerfect Gaming",
     description: "Game localization, LQA, audio & community services",
-    tokens: { primary: "#0A1230", accent: "#4ADE80", surface: "#E6F7EE", ink: "#03002C" },
+    // Approved brand system — enterprise palette; Gaming shows via lockup + copy.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-tp-digital",
     name: "TransPerfect Digital",
     description: "Digital marketing, web localization & experience",
-    // NEXT Digital lavender #C2A3FF — Blue 500 ink for corporate anchor.
-    tokens: { primary: "#003FC7", accent: "#C2A3FF", surface: "#EFEAFB", ink: "#03002C" },
+    // Approved brand system — enterprise palette; Digital shows via lockup + copy.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-tp-lifesci",
     name: "TransPerfect Life Sciences",
     description: "Life sciences: regulatory, clinical, medical translation",
-    // NEXT Life Sci green #58ED21 — Blue 500 ink + pale-lime surface.
-    tokens: { primary: "#003FC7", accent: "#58ED21", surface: "#EBFADE", ink: "#03002C" },
+    // Approved brand system — enterprise palette; Life Sciences shows via lockup + copy.
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-trial-interactive",
     name: "Trial Interactive",
     description: "eClinical platform for eTMF, study start-up and investigator portals",
-    // Dataforce cyan #5CE1E6 — clinical/data clarity, housed under Life Sciences.
-    tokens: { primary: "#003FC7", accent: "#5CE1E6", surface: "#E1F6F7", ink: "#03002C" },
+    // Approved brand system — enterprise palette (TI lockup still ships its own mark).
+    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-cobrand",
