@@ -2581,6 +2581,7 @@ function ModulesPanel({
   heroMedia,
   hasTitle,
   hasSummary,
+  onDropInsert,
 }: {
   kind:
     | "case-study"
@@ -2596,6 +2597,10 @@ function ModulesPanel({
   heroMedia?: PrintHeroMedia;
   hasTitle?: boolean;
   hasSummary?: boolean;
+  // When provided, drag-and-drop inserts from the library drawer route through
+  // this instead of the local append — it applies page-fit and honors an armed
+  // canvas Replace target so dropping a module swaps rather than piles on.
+  onDropInsert?: (section: PrintSection, index: number) => void;
 }) {
   const editorMode = mode;
   function move(i: number, dir: -1 | 1) {
