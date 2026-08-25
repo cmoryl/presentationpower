@@ -1,4 +1,4 @@
-import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { SpotlightContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
@@ -386,7 +386,9 @@ export function SpotlightLayout({
                             <div
                               style={{
                                 fontWeight: 700,
-                                fontSize: cq(18),
+                                fontSize: cq(
+                                  18 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 7),
+                                ),
                                 color: accentInk,
                                 marginTop: cq(8),
                                 lineHeight: 1,

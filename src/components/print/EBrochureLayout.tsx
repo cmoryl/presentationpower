@@ -1,4 +1,4 @@
-import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { EBrochureContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
@@ -331,7 +331,9 @@ export function EBrochureLayout({
                         <span
                           style={{
                             fontWeight: 700,
-                            fontSize: cq(19),
+                            fontSize: cq(
+                              19 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 8),
+                            ),
                             color: accentInk,
                             letterSpacing: "-0.02em",
                             ...STAT_VALUE_NOWRAP,

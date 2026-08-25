@@ -1,6 +1,6 @@
 // Portrait-native "big number pill" row — three hero stats side-by-side in
 // glass surfaces. Great for the tail of a case study or eBrochure.
-import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, MODULE, moduleCard } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
@@ -77,7 +77,9 @@ export function StatCalloutRowPortrait({
             <div style={{ display: "flex", alignItems: "baseline", gap: cq(4) }}>
               <span
                 style={{
-                  fontSize: cq(38),
+                  fontSize: cq(
+                    38 * statValueFitScale(it.value, statUnitParts(it.unit).inline, 6),
+                  ),
                   fontWeight: 700,
                   lineHeight: 0.95,
                   letterSpacing: "-0.035em",
