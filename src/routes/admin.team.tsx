@@ -369,6 +369,14 @@ function TeamView() {
           </table>
         </div>
       </section>
+
+      {roleTarget ? (
+        <RoleEditor
+          member={roleTarget}
+          onClose={() => setRoleTarget(null)}
+          onSaved={() => q.refetch()}
+        />
+      ) : null}
     </div>
   );
 }
