@@ -83,7 +83,7 @@ import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
 import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
 import { effectivePack } from "./effective-pack";
-import { packToneBrand, type StylePack } from "./style-packs";
+import { packField, packToneBrand, stylePackById, type StylePack } from "./style-packs";
 
 // Cursor for the slide currently being emitted. The exporter draws through many
 // module-level helpers (glyphs, logo lockups, imagery) that have no access to
@@ -773,8 +773,14 @@ export async function exportDeckToPptx(
   },
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
+  const suppliedPack =
+    typeof opts?.pack === "string"
+      ? stylePackById(opts.pack)
+      : opts?.pack && typeof opts.pack === "object" && "tokens" in opts.pack
+        ? (opts.pack as StylePack)
+        : null;
   const activePack: StylePack | null =
-    ((opts?.pack as StylePack | null | undefined) ??
+    (suppliedPack ??
       effectivePack({
         stylePackId: deck.context?.stylePackId ?? null,
         designRecipeId: deck.context?.designRecipeId ?? null,
@@ -1050,6 +1056,11 @@ export async function exportDeckToPptx(
             offsetY: 0,
           }
         : { kind: "solid", color: pb.surface.replace("#", "") };
+    }
+  } else if (activePack && typeof document === "undefined") {
+    const surface = packField(activePack).replace("#", "");
+    for (let i = 0; i < backgroundPlans.length; i += 1) {
+      if (backgroundPlans[i].kind === "none") backgroundPlans[i] = { kind: "solid", color: surface };
     }
   }
 
