@@ -20,14 +20,12 @@ import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-ap
 import { useDivisionSeed } from "@/lib/division-seeds";
 import { printTypeMeta } from "@/lib/print-library/catalog";
 import { parseLook } from "@/lib/print-library/look";
-import {
-  approvePrintDemoContent,
-  approvePrintDemoLook,
-} from "@/lib/print-library/demo-approve";
+import { approvePrintDemoContent, approvePrintDemoLook } from "@/lib/print-library/demo-approve";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";
 import { PrintDemoStudioPanel, type DemoLook } from "@/components/showcase/PrintDemoStudioPanel";
+import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 
 export const Route = createFileRoute("/demo/print/$demoId")({
   loader: ({ params }) => {
@@ -132,8 +130,15 @@ function PrintDemoPage() {
   const [look, setLook] = useState<DemoLook>(baseLook);
   useEffect(() => setLook(baseLook), [baseLook]);
 
+  // Language preview: the whole page content blob goes through the ephemeral
+  // demo translator, so every module's copy localizes while the approved
+  // layout, look and imagery stay exactly as pinned.
+  const txItems = useMemo(() => [draft as unknown], [draft]);
+  const tx = useDemoTranslate(txItems);
+  const localizedDraft = tx.isTranslated ? (tx.items[0] as unknown) : draft;
 
   if (!def || !item) return null;
+
   const previewBrand =
     BRAND_MODES.find((b) => b.id === (item.divisionId ?? "bm-enterprise")) ?? BRAND_MODES[0];
   const accent = def.accent;
@@ -241,6 +246,15 @@ function PrintDemoPage() {
             }}
             accent={accent}
           />
+          <DemoTranslateBar
+            lang={tx.lang}
+            setLang={tx.setLang}
+            busy={tx.busy}
+            error={tx.error}
+            isTranslated={tx.isTranslated}
+            accent={accent}
+            note="Preview this piece in another language. Copy is translated live; the approved layout, hero art and page geometry stay locked."
+          />
           <PrintDemoContentEditor
             content={draft}
             onChange={setDraft}
@@ -265,9 +279,9 @@ function PrintDemoPage() {
                   {mode} version
                 </div>
                 <ShowcasePrintGallery
-                  key={`${mode}-${renderKey}`}
+                  key={`${mode}-${renderKey}-${tx.lang}`}
                   kind={item.kind}
-                  content={draft}
+                  content={localizedDraft}
                   brand={previewBrand}
                   mode={mode}
                   pageSize={look.pageSize}

@@ -13,6 +13,7 @@ import { ShowcaseSlideGallery } from "@/components/showcase/ShowcaseSlideGallery
 import { DemoStyleAdmin, type DemoDraftLook } from "@/components/showcase/DemoStyleAdmin";
 import { showcaseArt } from "@/lib/showcase-art";
 import { DEMO_DIVISIONS, retargetPayload, type DemoDivision } from "@/lib/showcase-division";
+import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 
 export const Route = createFileRoute("/demo/deck/$demoId")({
   loader: ({ params }) => {
@@ -91,7 +92,6 @@ function ShowcaseDeckDemoPage() {
     } as TemplatePayload;
   }, [overridePayload, authored, division]);
 
-
   const existingId = useDeckStore((s) =>
     payload ? Object.values(s.decks).find((d) => d.title === payload.title)?.id : undefined,
   );
@@ -119,7 +119,27 @@ function ShowcaseDeckDemoPage() {
     } as TemplatePayload;
   }, [payload, draftLook]);
 
-  if (!def || !payload || !previewPayload) return null;
+  // Language preview: translate every slide's content blob in place. The
+  // renderer receives the translated payload, so backgrounds, looks and layout
+  // stay identical — only the copy changes.
+  const slideContents = useMemo(
+    () => (previewPayload?.slides ?? []).map((s) => s.content as unknown),
+    [previewPayload],
+  );
+  const tx = useDemoTranslate(slideContents);
+  const localizedPayload = useMemo(() => {
+    if (!previewPayload || !tx.isTranslated) return previewPayload;
+    return {
+      ...previewPayload,
+      slides: previewPayload.slides.map((s, i) => ({
+        ...s,
+        content: (tx.items[i] ?? s.content) as typeof s.content,
+      })),
+    } as TemplatePayload;
+  }, [previewPayload, tx.isTranslated, tx.items]);
+
+  if (!def || !payload || !previewPayload || !localizedPayload) return null;
+
   const accent = division.accent;
 
   /** Create (or reopen) the visitor's own editable copy of the demo. */
@@ -298,18 +318,29 @@ function ShowcaseDeckDemoPage() {
         />
       ) : null}
 
+      <DemoTranslateBar
+        className="mt-5"
+        lang={tx.lang}
+        setLang={tx.setLang}
+        busy={tx.busy}
+        error={tx.error}
+        isTranslated={tx.isTranslated}
+        accent={accent}
+        note="Preview this deck in another language. Every slide's copy is translated live through the same engine the deck translator uses — the look, imagery and layout stay locked."
+      />
+
       {/* Rendered comps — every slide of the demo, live from the renderer. */}
-      <section className="mt-10">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <section className="mt-10" dir={tx.rtl ? "rtl" : undefined}>
+        <div className="flex flex-wrap items-baseline justify-between gap-2" dir="ltr">
           <h2 className="text-lg font-semibold tracking-tight">
-            Rendered preview · all {previewPayload.slides.length} slides
+            Rendered preview · all {localizedPayload.slides.length} slides
           </h2>
           <span className="text-[11px] uppercase tracking-widest text-black/45 dark:text-white/45">
             Click any slide to enlarge
           </span>
         </div>
         <div className="mt-4">
-          <ShowcaseSlideGallery payload={previewPayload} accent={accent} />
+          <ShowcaseSlideGallery payload={localizedPayload} accent={accent} />
         </div>
       </section>
 
