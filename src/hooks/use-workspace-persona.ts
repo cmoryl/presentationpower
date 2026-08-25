@@ -1,11 +1,13 @@
 // Resolves which dashboard persona to show: the user's own choice if they made
-// one, otherwise the default implied by their `user_roles` rows.
+// one, otherwise the default implied by their `user_roles` rows. Choices are
+// clamped to the personas the user's roles actually unlock.
 
 import { useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   PERSONA_STORAGE_KEY,
+  allowedPersonas,
   isPersonaId,
   personaForRoles,
   type PersonaId,
@@ -40,15 +42,23 @@ export function useWorkspacePersona() {
     if (isPersonaId(stored)) setOverride(stored);
   }, []);
 
+  const allowed = allowedPersonas(roles);
   const defaultPersona = personaForRoles(roles);
-  const persona = override ?? defaultPersona;
+  // A stored pick only holds when the user's roles unlock that workspace;
+  // otherwise fall back to the role-implied default.
+  const wanted = override ?? defaultPersona;
+  const persona: PersonaId = allowed.includes(wanted) ? wanted : defaultPersona;
 
-  const choose = useCallback((next: PersonaId) => {
-    setOverride(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(PERSONA_STORAGE_KEY, next);
-    }
-  }, []);
+  const choose = useCallback(
+    (next: PersonaId) => {
+      if (!allowedPersonas(roles).includes(next)) return; // locked workspace
+      setOverride(next);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(PERSONA_STORAGE_KEY, next);
+      }
+    },
+    [roles],
+  );
 
   const reset = useCallback(() => {
     setOverride(null);
@@ -60,8 +70,9 @@ export function useWorkspacePersona() {
   return {
     persona,
     defaultPersona,
-    isOverridden: override !== null && override !== defaultPersona,
+    isOverridden: persona !== defaultPersona,
     roles,
+    allowed,
     isLoading,
     choose,
     reset,
