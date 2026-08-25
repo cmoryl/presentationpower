@@ -75,9 +75,11 @@ export const setUserRoles = createServerFn({ method: "POST" })
 
     // 4. Audit trail.
     await supabaseAdmin.from("admin_audit_log").insert({
-      actor_id: context.userId,
+      actor_user_id: context.userId,
       action: "user_roles.set",
-      detail: { target_user_id: data.userId, roles: data.roles },
+      target_type: "user",
+      target_id: data.userId,
+      meta: { roles: data.roles },
     });
 
     return { ok: true as const, userId: data.userId, roles: data.roles };
