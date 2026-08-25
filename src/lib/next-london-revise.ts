@@ -342,7 +342,8 @@ export function planLondonRegeneration(changes: LondonChange[]): LondonRegenPlan
     if (c.field === "panel") {
       if (c.to === "—") metadata.add(c.panelId);
       else vector.add(c.panelId);
-    } else if (!c.derived && VECTOR_FIELDS.has(c.field as LondonEditableField)) vector.add(c.panelId);
+    } else if (!c.derived && VECTOR_FIELDS.has(c.field as LondonEditableField))
+      vector.add(c.panelId);
     else if (!c.derived && RASTER_FIELDS.has(c.field as LondonEditableField)) raster.add(c.panelId);
     else if (c.derived && c.field === "rasterPx") raster.add(c.panelId);
     else if (!c.derived) metadata.add(c.panelId);
@@ -405,7 +406,10 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
   const id = `g-${panel.id}`;
   const isHalo = panel.style.includes("halo");
   const ramp = stops
-    .map((hex, i) => `<stop offset="${((i / (stops.length - 1)) * 100).toFixed(2)}%" stop-color="${hex}"/>`)
+    .map(
+      (hex, i) =>
+        `<stop offset="${((i / (stops.length - 1)) * 100).toFixed(2)}%" stop-color="${hex}"/>`,
+    )
     .join("");
 
   const paint = isHalo
@@ -436,7 +440,13 @@ function escapeXml(s: string): string {
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
-  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const n = parseInt(full, 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
@@ -475,9 +485,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
       ? subs[0]!
       : `<< /FunctionType 3 /Domain [0 1] /Functions [${subs.join(" ")}] /Bounds [${bounds}] /Encode [${encode}] >>`;
 
-  const coords = [axis.x1 * w, h - axis.y1 * h, axis.x2 * w, h - axis.y2 * h]
-    .map(f3)
-    .join(" ");
+  const coords = [axis.x1 * w, h - axis.y1 * h, axis.x2 * w, h - axis.y2 * h].map(f3).join(" ");
   const shading = `<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [${coords}] /Function ${fn} /Extend [true true] >>`;
   const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
 
@@ -609,9 +617,7 @@ export function londonPanelSvgFor(
   panel: LondonPanel,
   pack: Record<string, { svg: string; ai: string }> | null | undefined,
 ): string {
-  return matchesIssuedArtwork(panel, pack)
-    ? pack![panel.id]!.svg
-    : buildLondonPanelSvg(panel);
+  return matchesIssuedArtwork(panel, pack) ? pack![panel.id]!.svg : buildLondonPanelSvg(panel);
 }
 
 export function resolveLondonArtwork(

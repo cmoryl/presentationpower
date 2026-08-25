@@ -67,10 +67,7 @@ import {
   type LondonPanelEdit,
   type LondonRevision,
 } from "@/lib/next-london-revise";
-import {
-  listLondonRevisions,
-  publishLondonRevision,
-} from "@/lib/next-london-revise.functions";
+import { listLondonRevisions, publishLondonRevision } from "@/lib/next-london-revise.functions";
 
 export const Route = createFileRoute("/events/next_/london_/revise")({
   head: () => ({
@@ -162,10 +159,12 @@ function AddPanelForm({
   const w = Number(trimW);
   const h = Number(trimH);
   const edge = Number(bleedEdge);
-  const valid = [w, h].every((n) => Number.isFinite(n) && n > 0) && Number.isFinite(edge) && edge >= 0;
+  const valid =
+    [w, h].every((n) => Number.isFinite(n) && n > 0) && Number.isFinite(edge) && edge >= 0;
   const autoName = `${(room || "ADDITIONAL").toUpperCase()} ADDITION - ${valid ? `${w}x${h}mm` : "…"}`;
 
-  const field = "mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-[#999]";
+  const field =
+    "mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-[#999]";
   const label = "text-[11px] font-semibold uppercase tracking-[0.14em] text-[#666]";
 
   return (
@@ -241,19 +240,49 @@ function AddPanelForm({
       </label>
       <label>
         <span className={label}>Trim W (mm)</span>
-        <input type="number" min={1} step={0.5} value={trimW} onChange={(e) => setTrimW(e.target.value)} className={field} />
+        <input
+          type="number"
+          min={1}
+          step={0.5}
+          value={trimW}
+          onChange={(e) => setTrimW(e.target.value)}
+          className={field}
+        />
       </label>
       <label>
         <span className={label}>Trim H (mm)</span>
-        <input type="number" min={1} step={0.5} value={trimH} onChange={(e) => setTrimH(e.target.value)} className={field} />
+        <input
+          type="number"
+          min={1}
+          step={0.5}
+          value={trimH}
+          onChange={(e) => setTrimH(e.target.value)}
+          className={field}
+        />
       </label>
       <label>
         <span className={label}>Bleed / edge (mm)</span>
-        <input type="number" min={0} step={0.5} value={bleedEdge} onChange={(e) => setBleedEdge(e.target.value)} className={field} />
+        <input
+          type="number"
+          min={0}
+          step={0.5}
+          value={bleedEdge}
+          onChange={(e) => setBleedEdge(e.target.value)}
+          className={field}
+        />
       </label>
       <label>
         <span className={label}>ppi (blank = auto tier)</span>
-        <input type="number" min={18} max={300} step={1} value={ppi} onChange={(e) => setPpi(e.target.value)} placeholder="auto" className={field} />
+        <input
+          type="number"
+          min={18}
+          max={300}
+          step={1}
+          value={ppi}
+          onChange={(e) => setPpi(e.target.value)}
+          placeholder="auto"
+          className={field}
+        />
       </label>
       <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-4">
         <p className="mr-auto text-xs text-[#666]">
@@ -323,7 +352,12 @@ function LondonRevisePage() {
   const head = history[0] ?? baseRevision();
   const current = useMemo(() => effectiveLondonPanels(revisions), [revisions]);
   const draft = useMemo(
-    () => applyLondonEdits(edits, current.filter((p) => !removed.includes(p.id)), added),
+    () =>
+      applyLondonEdits(
+        edits,
+        current.filter((p) => !removed.includes(p.id)),
+        added,
+      ),
     [edits, current, added, removed],
   );
   const changes = useMemo(() => diffLondonPanels(current, draft), [current, draft]);
@@ -377,7 +411,8 @@ function LondonRevisePage() {
     });
     if (previewId === panel.id) setPreviewId(null);
     toast.info(`${panel.name} removed from the draft schedule`, {
-      description: "Publish the revision to take it out of the kit — history keeps the old snapshot.",
+      description:
+        "Publish the revision to take it out of the kit — history keeps the old snapshot.",
     });
   };
 
@@ -432,7 +467,6 @@ function LondonRevisePage() {
       });
     }
   };
-
 
   const regenAffected = () => {
     const vectorPanels = draft.filter((p) => plan.vector.includes(p.id));
@@ -594,7 +628,10 @@ function LondonRevisePage() {
                   .filter((r) => r.status !== "pass")
                   .slice(0, 5)
                   .map((r) => (
-                    <li key={`${r.file}-${r.kind}`} className="text-[12px] leading-relaxed text-[#666]">
+                    <li
+                      key={`${r.file}-${r.kind}`}
+                      className="text-[12px] leading-relaxed text-[#666]"
+                    >
                       <span className="font-medium text-[#03002C]">{r.file}</span> — {qaSummary(r)}
                     </li>
                   ))}
@@ -606,7 +643,6 @@ function LondonRevisePage() {
               </ul>
             </div>
           ) : null}
-
 
           <label className="mt-3 block">
             <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#666]">
@@ -841,9 +877,7 @@ function LondonRevisePage() {
                       {new Date(rev.createdAt).toLocaleDateString()}
                     </time>
                   </div>
-                  <p className="mt-1 text-xs leading-[1.45] text-[#666]">
-                    {rev.note ?? "No note"}
-                  </p>
+                  <p className="mt-1 text-xs leading-[1.45] text-[#666]">{rev.note ?? "No note"}</p>
                   {rev.restoredFrom != null ? (
                     <p className="mt-1 text-[11px] text-[#666]">
                       Restored from revision {rev.restoredFrom}
@@ -904,9 +938,9 @@ function LondonRevisePage() {
               </DialogTitle>
               <p className="text-xs text-[#666]">
                 {previewPanel.floor} · {previewPanel.room} · previewing the{" "}
-                {plan.touched.includes(previewPanel.id) ? "revised" : "current"} specification
-                {" "}({previewPanel.trimW}×{previewPanel.trimH}mm trim, {previewPanel.bleedEdge}mm
-                bleed per edge).
+                {plan.touched.includes(previewPanel.id) ? "revised" : "current"} specification (
+                {previewPanel.trimW}×{previewPanel.trimH}mm trim, {previewPanel.bleedEdge}mm bleed
+                per edge).
               </p>
               <LondonPpiPreview panel={previewPanel} />
             </>

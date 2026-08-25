@@ -269,12 +269,14 @@ function LondonSignagePage() {
           reports.push(auditSvg(panel, art.svg), auditAi(panel, art.ai));
         }
         setQa(reports);
-        download(new Blob([qaReportCsv(reports)], { type: "text/csv" }), "NEXT-London-qa-report.csv");
+        download(
+          new Blob([qaReportCsv(reports)], { type: "text/csv" }),
+          "NEXT-London-qa-report.csv",
+        );
       },
     );
 
-  const chip =
-    "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
+  const chip = "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
 
   return (
     <AppShell>
@@ -390,7 +392,6 @@ function LondonSignagePage() {
           </div>
         </header>
 
-
         {/* Print specification */}
         <section className="mt-10">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-[#03002C]">
@@ -398,10 +399,7 @@ function LondonSignagePage() {
           </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {LONDON_PRINT_SPEC.map((rule) => (
-              <article
-                key={rule.id}
-                className="rounded-xl border border-black/10 bg-white p-5"
-              >
+              <article key={rule.id} className="rounded-xl border border-black/10 bg-white p-5">
                 <h3 className="text-sm font-semibold text-[#03002C]">{rule.title}</h3>
                 <p className="mt-2 text-[13px] leading-relaxed text-[#03002C]/70">{rule.body}</p>
               </article>
@@ -422,7 +420,10 @@ function LondonSignagePage() {
             {Object.entries(LONDON_STYLES)
               .filter(([id]) => panels.some((p) => p.style === id))
               .map(([id, style]) => (
-                <article key={id} className="overflow-hidden rounded-xl border border-black/10 bg-white">
+                <article
+                  key={id}
+                  className="overflow-hidden rounded-xl border border-black/10 bg-white"
+                >
                   <div
                     className="h-20 w-full"
                     style={{ background: `linear-gradient(120deg, ${style.stops.join(", ")})` }}
@@ -582,8 +583,6 @@ function LondonSignagePage() {
 
               {/* Check every resolution tier on screen before downloading. */}
               <LondonPpiPreview panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
-
-
 
               <div className="rounded-xl border border-black/10 p-4">
                 <div className="flex flex-wrap items-center gap-2">
