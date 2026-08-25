@@ -25,6 +25,7 @@ import {
   Wand2,
   Search,
   CornerDownLeft,
+  Trophy,
 } from "lucide-react";
 import { AGENT_ROUTE, AGENT_LABEL, seedAgentPrompt } from "@/lib/agent-seed";
 import { AppShell } from "@/components/AppShell";
@@ -66,6 +67,7 @@ export const Route = createFileRoute("/")({
           "Governed brand engine for TransPerfect. Assemble presentations, print, event, and social — from one modular library, powered by the Oracle.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
@@ -126,8 +128,9 @@ const MODES: ModeDef[] = [
       { label: "Open library", to: "/library" },
     ],
     subnav: [
-      { label: "Modules", to: "/library", icon: Shapes },
       { label: "Agent", to: "/agent", icon: Brain },
+      { label: "Judging prep", to: "/demo/judging", icon: Trophy },
+      { label: "Modules", to: "/library", icon: Shapes },
       { label: "Canvas creator", to: "/admin/canvas", icon: Palette },
       { label: "Decks", to: "/decks", icon: Presentation },
     ],
