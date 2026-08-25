@@ -23,6 +23,7 @@ import { isAuthoringChrome } from "./export-chrome-suppress";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { resolveSvgMarkupVars } from "./export-svg-vars";
 import { classifyEffectStyle, effectSvgDataUrl } from "./export-effect-style";
+import { resolveAssetUrl, responseToDataUrl } from "./asset-base-url";
 
 export interface DomColor {
   /** 6-digit uppercase hex, no `#`. */
@@ -1093,18 +1094,22 @@ async function inlineImage(src: string, w: number, h: number): Promise<string | 
   try {
     if (src.startsWith("data:image/svg+xml")) return await svgToPng(src, w, h);
     if (src.startsWith("data:")) return src;
-    const res = await fetch(src, { cache: "force-cache" });
-    if (!res.ok) return null;
-    const blob = await res.blob();
-    const dataUrl = await new Promise<string | null>((resolve) => {
-      const fr = new FileReader();
-      fr.onload = () => resolve(typeof fr.result === "string" ? fr.result : null);
-      fr.onerror = () => resolve(null);
-      fr.readAsDataURL(blob);
-    });
+    const { retryAsset } = await import("./pptx-integrity");
+    const dataUrl = await retryAsset<string>(
+      async (tryIndex) => {
+        const res = await fetch(resolveAssetUrl(src), {
+          mode: "cors",
+          cache: tryIndex > 0 ? "reload" : "default",
+        });
+        if (!res.ok) return null;
+        return responseToDataUrl(res);
+      },
+      { attempts: 3 },
+    );
     if (!dataUrl) return null;
     if (dataUrl.startsWith("data:image/svg+xml")) return await svgToPng(dataUrl, w, h);
-    return dataUrl;
+    const { toPowerPointSafeDataUrl } = await import("./pptx-image-compat");
+    return await toPowerPointSafeDataUrl(dataUrl, { url: src, label: "DOM image" });
   } catch {
     return null;
   }
