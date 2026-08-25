@@ -99,7 +99,7 @@ export function PersonaHero({
             {theme.kicker}
           </p>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight sm:text-[2.75rem] sm:leading-[1.05]">
-            {step ? step.title : `${persona.label} workspace`}
+            {step ? step.title : persona.label}
           </h1>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed opacity-80">
             {step ? step.body : theme.blurb}
