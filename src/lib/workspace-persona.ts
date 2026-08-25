@@ -261,6 +261,26 @@ export function personaForRoles(roles: readonly string[]): PersonaId {
   return "sales";
 }
 
+/**
+ * Personas a user may view, based on their `user_roles` rows. The Sales
+ * dashboard is the floor — everyone (including signed-out visitors) may see
+ * it. Admin and MarOps dashboards require the matching roles.
+ */
+export function allowedPersonas(roles: readonly string[]): readonly PersonaId[] {
+  const allowed: PersonaId[] = ["sales"];
+  if (roles.some((r) => ["brand_lead", "content_owner", "editor"].includes(r))) {
+    allowed.unshift("marketing");
+  }
+  if (roles.some((r) => ["admin", "brand_reviewer"].includes(r))) {
+    allowed.unshift("admin");
+  }
+  return allowed;
+}
+
+export function canViewPersona(id: PersonaId, roles: readonly string[]): boolean {
+  return allowedPersonas(roles).includes(id);
+}
+
 export const PERSONA_STORAGE_KEY = "tpm.dashboardPersona";
 
 export function isPersonaId(value: unknown): value is PersonaId {
