@@ -40,7 +40,7 @@ function withSidecars(
     blocks?: unknown[] | null;
     pack?: string | null;
     designRecipe?: string | null;
-    mode?: "light" | "dark" | null;
+    mode?: "light" | "dark" | "mixed" | null;
   },
 ): Record<string, unknown> {
   const next = { ...content };
