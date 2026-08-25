@@ -59,8 +59,15 @@ export function SwapLayoutButton({
           return `${v.id} ${v.name} ${v.description} ${family}`.toLowerCase().includes(q);
         })
       : scoped;
-    // Rank: section-compatible first, then same family, then the rest.
+    // Rank: section-compatible first, then same family, then the rest —
+    // unless the user picks a flat sort (name / family).
     return [...matched].sort((a, b) => {
+      if (sort === "name") return a.name.localeCompare(b.name);
+      if (sort === "family") {
+        const fam = a.familyId.localeCompare(b.familyId);
+        if (fam !== 0) return fam;
+        return a.name.localeCompare(b.name);
+      }
       const aSec = sectionIds.has(a.id) ? 0 : 1;
       const bSec = sectionIds.has(b.id) ? 0 : 1;
       if (aSec !== bSec) return aSec - bSec;
@@ -69,7 +76,7 @@ export function SwapLayoutButton({
       if (aFam !== bFam) return aFam - bFam;
       return a.name.localeCompare(b.name);
     });
-  }, [scope, query, familyId, sectionIds, currentFamilyId]);
+  }, [scope, query, familyId, sort, sectionIds, currentFamilyId]);
 
   // Group into readable family sections so the grid reads as a catalogue,
   // not a wall of truncated codes.
