@@ -324,16 +324,38 @@ function RoleDashboard() {
             role="group"
             aria-label="Choose a workspace"
           >
-            {PERSONAS.filter((p) => allowed.includes(p.id)).map((p) => {
+            {PERSONAS.map((p) => {
               const Icon = PERSONA_ICON[p.id];
               const active = p.id === personaId;
+              const unlocked = allowed.includes(p.id);
               const t = personaTheme(p.id);
+              if (!unlocked) {
+                // Locked dashboards stay visible (greyed out, non-clickable)
+                // with a tooltip naming the role that unlocks them.
+                return (
+                  <span
+                    key={p.id}
+                    role="button"
+                    aria-disabled="true"
+                    title={`${p.label} is locked — ${PERSONA_ROLE_REQUIREMENT[p.id]}`}
+                    className="inline-flex min-h-11 cursor-not-allowed items-center gap-2 rounded-xl px-4 text-sm font-medium text-black/30 dark:text-white/30"
+                  >
+                    <Lock className="size-3.5" aria-hidden />
+                    {p.label}
+                  </span>
+                );
+              }
               return (
                 <button
                   key={p.id}
                   type="button"
                   onClick={() => choose(p.id)}
                   aria-pressed={active}
+                  title={
+                    active
+                      ? undefined
+                      : `Switch to the ${p.label}`
+                  }
                   style={active ? { background: t.base, color: t.onHero } : undefined}
                   className={
                     active
