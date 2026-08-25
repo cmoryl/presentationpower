@@ -1159,6 +1159,19 @@ export function VariantSampleStudio({
               </ScaledSlide>
             </LiveEditOverlay>
 
+            {/* Arrange layer: freeform text/image layers (always rendered) +
+                draggable, snapping field frames while arrange mode is on. */}
+            <StudioLayoutLayer
+              stageRef={stageRef}
+              enabled={arrange}
+              layout={layout}
+              revision={`${mode}:${items?.length ?? 0}:${fields.length}`}
+              onCommit={writeLayout}
+              onPickImage={(id) => setLayerImageFor(id)}
+              selectedLayerId={selLayerId}
+              onSelectLayer={setSelLayerId}
+            />
+
             {/* Drag-to-crop frame over the selected photo */}
             {cropRect && cropItem ? (
               <div data-crop-overlay="" className="pointer-events-none absolute inset-0">
