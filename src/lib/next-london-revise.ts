@@ -47,6 +47,72 @@ export type LondonPanelEdit = Partial<Pick<LondonPanel, LondonEditableField>>;
 
 export type LondonEditMap = Record<string, LondonPanelEdit>;
 
+/**
+ * Spec for a panel the venue team adds mid-build (a late column, an extra
+ * fascia). Everything downstream — bleed box, raster size, ppi tier, band and
+ * weight — is derived, and the artwork is built from the spec, so an added
+ * panel behaves exactly like an issued one.
+ */
+export type LondonPanelAdd = {
+  floor: LondonPanel["floor"];
+  room: string;
+  name: string;
+  ground: string;
+  style: string;
+  trimW: number;
+  trimH: number;
+  bleedEdge: number;
+  rasterPpi?: number;
+};
+
+/** True for panels that were added in Element rather than issued by the venue. */
+export function isAddedPanel(panel: LondonPanel): boolean {
+  return panel.id.startsWith("ldn-add-");
+}
+
+/** Build a fully derived panel from an addition spec. */
+export function newLondonPanel(add: LondonPanelAdd, existing: LondonPanel[]): LondonPanel {
+  const taken = new Set(existing.map((p) => p.id));
+  let n = existing.filter(isAddedPanel).length + 1;
+  while (taken.has(`ldn-add-${n}`)) n += 1;
+
+  const trimW = Math.max(1, round(add.trimW, 1));
+  const trimH = Math.max(1, round(add.trimH, 1));
+  const bleedEdge = Math.max(0, round(add.bleedEdge, 1));
+  const style = LONDON_STYLES[add.style] ? add.style : "01-beam-violet-aqua";
+  const name = add.name.trim() || `ADDED PANEL ${n} - ${trimW}x${trimH}mm`;
+
+  const seed: LondonPanel = {
+    id: `ldn-add-${n}`,
+    floor: add.floor,
+    room: add.room.trim().toUpperCase() || "ADDITIONAL",
+    proof: "Element addition (no venue proof)",
+    page: 1,
+    name,
+    ground: add.ground.trim() || "Banner wash",
+    style,
+    trimW,
+    trimH,
+    bleedW: trimW + bleedEdge * 2,
+    bleedH: trimH + bleedEdge * 2,
+    bleedEdge,
+    rasterPx: "0x0",
+    rasterPpi: 0,
+    bandMm: 0,
+    rasterMb: 0,
+  };
+
+  const ppi = add.rasterPpi ? clampPpi(add.rasterPpi) : recommendedPpi(seed);
+  const size = rasterSizeFor(seed, ppi);
+  return {
+    ...seed,
+    rasterPpi: ppi,
+    rasterPx: `${size.w}x${size.h}`,
+    rasterMb: round(estimateRasterMb(size.w, size.h), 1),
+    bandMm: round(bandWidthMm(ppi), 2),
+  };
+}
+
 /** Changing any of these invalidates the vector artwork itself. */
 const VECTOR_FIELDS = new Set<LondonEditableField>([
   "style",
@@ -148,12 +214,17 @@ export function derivePanel(base: LondonPanel, edit: LondonPanelEdit = {}): Lond
   };
 }
 
-/** Apply an edit map over a base set (defaults to the issued London pack). */
+/**
+ * Apply an edit map over a base set (defaults to the issued London pack),
+ * appending any panels added in this draft. Added panels are edited through the
+ * same map, so the table treats them identically to issued panels.
+ */
 export function applyLondonEdits(
   edits: LondonEditMap,
   base: LondonPanel[] = LONDON_PANELS,
+  added: LondonPanel[] = [],
 ): LondonPanel[] {
-  return base.map((p) => derivePanel(p, edits[p.id] ?? {}));
+  return [...base, ...added].map((p) => derivePanel(p, edits[p.id] ?? {}));
 }
 
 function num(value: unknown, fallback: number): number {
@@ -177,7 +248,7 @@ function round(n: number, dp: number): number {
 export type LondonChange = {
   panelId: string;
   panelName: string;
-  field: LondonEditableField | "rasterPx" | "rasterMb" | "bandMm";
+  field: LondonEditableField | "rasterPx" | "rasterMb" | "bandMm" | "panel";
   label: string;
   from: string | number;
   to: string | number;
@@ -193,10 +264,22 @@ const DERIVED_FIELDS: { key: "rasterPx" | "rasterMb" | "bandMm"; label: string }
 
 export function diffLondonPanels(prev: LondonPanel[], next: LondonPanel[]): LondonChange[] {
   const byId = new Map(prev.map((p) => [p.id, p]));
+  const nextIds = new Set(next.map((p) => p.id));
   const out: LondonChange[] = [];
   for (const panel of next) {
     const before = byId.get(panel.id);
-    if (!before) continue;
+    if (!before) {
+      out.push({
+        panelId: panel.id,
+        panelName: panel.name,
+        field: "panel",
+        label: "Panel added",
+        from: "—",
+        to: `${panel.floor} · ${panel.room} · ${panel.trimW}×${panel.trimH}mm`,
+        derived: false,
+      });
+      continue;
+    }
     for (const field of LONDON_EDITABLE_FIELDS) {
       if (before[field] !== panel[field]) {
         out.push({
@@ -224,6 +307,18 @@ export function diffLondonPanels(prev: LondonPanel[], next: LondonPanel[]): Lond
       }
     }
   }
+  for (const panel of prev) {
+    if (nextIds.has(panel.id)) continue;
+    out.push({
+      panelId: panel.id,
+      panelName: panel.name,
+      field: "panel",
+      label: "Panel removed",
+      from: `${panel.floor} · ${panel.room} · ${panel.trimW}×${panel.trimH}mm`,
+      to: "—",
+      derived: false,
+    });
+  }
   return out;
 }
 
@@ -244,7 +339,10 @@ export function planLondonRegeneration(changes: LondonChange[]): LondonRegenPlan
   const metadata = new Set<string>();
 
   for (const c of changes) {
-    if (!c.derived && VECTOR_FIELDS.has(c.field as LondonEditableField)) vector.add(c.panelId);
+    if (c.field === "panel") {
+      if (c.to === "—") metadata.add(c.panelId);
+      else vector.add(c.panelId);
+    } else if (!c.derived && VECTOR_FIELDS.has(c.field as LondonEditableField)) vector.add(c.panelId);
     else if (!c.derived && RASTER_FIELDS.has(c.field as LondonEditableField)) raster.add(c.panelId);
     else if (c.derived && c.field === "rasterPx") raster.add(c.panelId);
     else if (!c.derived) metadata.add(c.panelId);
@@ -252,7 +350,11 @@ export function planLondonRegeneration(changes: LondonChange[]): LondonRegenPlan
   for (const id of vector) raster.delete(id);
   for (const id of [...vector, ...raster]) metadata.delete(id);
 
-  const order = (ids: Set<string>) => LONDON_PANELS.filter((p) => ids.has(p.id)).map((p) => p.id);
+  const issued = LONDON_PANELS.map((p) => p.id);
+  const order = (ids: Set<string>) => [
+    ...issued.filter((id) => ids.has(id)),
+    ...[...ids].filter((id) => !issued.includes(id)),
+  ];
   const touched = new Set<string>([...vector, ...raster, ...metadata]);
   return {
     vector: order(vector),
@@ -471,6 +573,41 @@ export function baseRevision(): LondonRevision {
 export function effectiveLondonPanels(revisions: LondonRevision[]): LondonPanel[] {
   const latest = [...revisions].sort((a, b) => b.rev - a.rev)[0];
   return latest?.panels?.length ? latest.panels : LONDON_PANELS;
+}
+
+/** Panels present in `to` but not in `from` — used when restoring a revision. */
+export function addedBetween(from: LondonPanel[], to: LondonPanel[]): LondonPanel[] {
+  const known = new Set(from.map((p) => p.id));
+  return to.filter((p) => !known.has(p.id));
+}
+
+/**
+ * The artwork that matches a panel's CURRENT spec. The packaged venue master is
+ * used only while the panel still matches the issued geometry, style and bleed;
+ * revised and added panels are rebuilt from the spec so downloads can never ship
+ * stale artwork.
+ */
+export function resolveLondonArtwork(
+  panel: LondonPanel,
+  pack: Record<string, { svg: string; ai: string }> | null,
+): { svg: string; ai: string | Uint8Array; source: "issued" | "rebuilt" } {
+  const issued = LONDON_PANELS.find((p) => p.id === panel.id);
+  const entry = pack?.[panel.id];
+  const matchesIssue =
+    !!issued &&
+    !!entry &&
+    issued.style === panel.style &&
+    issued.trimW === panel.trimW &&
+    issued.trimH === panel.trimH &&
+    issued.bleedW === panel.bleedW &&
+    issued.bleedH === panel.bleedH &&
+    issued.bleedEdge === panel.bleedEdge;
+  if (matchesIssue) return { svg: entry.svg, ai: entry.ai, source: "issued" };
+  return {
+    svg: buildLondonPanelSvg(panel),
+    ai: buildLondonPanelAi(panel),
+    source: "rebuilt",
+  };
 }
 
 /** Edit map that turns `from` into `to` — used when restoring an old revision. */
