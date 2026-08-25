@@ -24,6 +24,7 @@ export interface ExactSlideStageProps {
   brand: BrandMode;
   mode: "light" | "dark";
   pack?: StylePack | null;
+  industryId?: string | null;
   pageNumber?: number;
   /**
    * Layered export: paint ONLY the decor planes (ground, scaffold, motif, grain,
@@ -39,6 +40,7 @@ export function ExactSlideStage({
   brand,
   mode,
   pack = null,
+  industryId = null,
   pageNumber = 1,
   decorOnly = false,
 }: ExactSlideStageProps) {
@@ -77,6 +79,7 @@ export function ExactSlideStage({
                 brand={packToneBrand(brand, pack)}
                 pageNumber={pageNumber}
                 mode={effMode}
+                industryId={industryId}
               />
             </SlideBackdropContext.Provider>
           </StylePackVars>

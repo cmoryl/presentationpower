@@ -82,6 +82,8 @@ import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
 import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
+import { effectivePack } from "./effective-pack";
+import { packField, packToneBrand, stylePackById, type StylePack } from "./style-packs";
 
 // Cursor for the slide currently being emitted. The exporter draws through many
 // module-level helpers (glyphs, logo lockups, imagery) that have no access to
@@ -771,11 +773,24 @@ export async function exportDeckToPptx(
   },
 ): Promise<PptxExportResult> {
   const forceMode = opts?.forceMode;
+  const suppliedPack =
+    typeof opts?.pack === "string"
+      ? stylePackById(opts.pack)
+      : opts?.pack && typeof opts.pack === "object" && "tokens" in opts.pack
+        ? (opts.pack as StylePack)
+        : null;
+  const activePack: StylePack | null =
+    (suppliedPack ??
+      effectivePack({
+        stylePackId: deck.context?.stylePackId ?? null,
+        designRecipeId: deck.context?.designRecipeId ?? null,
+      })) || null;
+  const renderBrand = activePack ? packToneBrand(brand, activePack) : brand;
 
   // Chart grammar for this run: every exported fill, stroke, gradient and track
   // below resolves through `export-chart-grammar`, so a pack that draws thick
   // segmented dials on screen exports thick segmented dials.
-  setExportChartStyle(opts?.pack ?? null);
+  setExportChartStyle(activePack);
 
   // Fresh transcode ledger per run so the post-export compatibility report only
   // describes the file we are about to produce.
@@ -819,10 +834,10 @@ export async function exportDeckToPptx(
   pptx.company = "TransPerfect";
 
   const palette: Palette = {
-    primary: brand.tokens.primary.replace("#", ""),
-    accent: brand.tokens.accent.replace("#", ""),
-    surface: brand.tokens.surface.replace("#", ""),
-    ink: brand.tokens.ink.replace("#", ""),
+    primary: renderBrand.tokens.primary.replace("#", ""),
+    accent: renderBrand.tokens.accent.replace("#", ""),
+    surface: renderBrand.tokens.surface.replace("#", ""),
+    ink: renderBrand.tokens.ink.replace("#", ""),
   };
 
   // ---------------------------------------------------------------------------
@@ -953,7 +968,7 @@ export async function exportDeckToPptx(
     backgroundPlans.map(async (plan, i) => {
       // A style pack owns the whole sheet — never layer a division photo
       // backdrop under an alternate look.
-      if (opts?.packBackground) return;
+      if (opts?.packBackground || activePack) return;
       if (plan.kind !== "none") return;
 
       const slide = deck.slides[i];
@@ -970,11 +985,11 @@ export async function exportDeckToPptx(
       if (backdrop.aurora) {
         const seed = backdrop.auroraSeed ?? variant.id;
         const tint = (
-          backdrop.tint ?? (backdrop.darkChrome ? "#03002C" : brand.tokens.surface)
+          backdrop.tint ?? (backdrop.darkChrome ? "#03002C" : renderBrand.tokens.surface)
         ).replace(/^#/, "");
         const svgUrl = auroraSvgDataUrl(
           seed,
-          brand,
+          renderBrand,
           backdrop.darkChrome ? "dark" : "light",
           `#${tint}`,
         );
@@ -1042,6 +1057,11 @@ export async function exportDeckToPptx(
           }
         : { kind: "solid", color: pb.surface.replace("#", "") };
     }
+  } else if (activePack && typeof document === "undefined") {
+    const surface = packField(activePack).replace("#", "");
+    for (let i = 0; i < backgroundPlans.length; i += 1) {
+      if (backgroundPlans[i].kind === "none") backgroundPlans[i] = { kind: "solid", color: surface };
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -1086,7 +1106,8 @@ export async function exportDeckToPptx(
               variant,
               brand,
               mode: baseModeFor(i),
-              pack: (opts?.pack ?? null) as never,
+              pack: activePack as never,
+              industryId: deck.context?.designRecipeId ?? null,
               pageNumber: i + 1,
               quality: opts?.quality ?? null,
             };
@@ -1186,7 +1207,7 @@ export async function exportDeckToPptx(
       // Fully-layered capture: paint we can express in OOXML leaves the plate
       // and ships as native objects, so plated modules are editable too.
       const rasterizeTextEditablePlates = rasterizeObjectPlates;
-      const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
+      const packArg = activePack as null | { mode: "light" | "dark" };
       // Every module slide gets a plate — including ones with photographic
       // backgrounds, since the plate is captured from the renderer and already
       // contains that photograph exactly as the build paints it.
@@ -1206,6 +1227,7 @@ export async function exportDeckToPptx(
           brand,
           mode: baseModeFor(i),
           pack: packArg as never,
+          industryId: deck.context?.designRecipeId ?? null,
           pageNumber: i + 1,
           quality: opts?.quality ?? null,
         };
@@ -1506,7 +1528,7 @@ export async function exportDeckToPptx(
     );
     try {
       const { rasterizeExactSlides } = await import("./slide-exact-raster");
-      const packArg = (opts?.pack ?? null) as null | { mode: "light" | "dark" };
+      const packArg = activePack as null | { mode: "light" | "dark" };
       exactPlates = await rasterizeExactSlides(
         deck.slides.map((sl, i) => {
           const variant = byId(MODULE_VARIANTS, sl.variantId);
@@ -1518,6 +1540,7 @@ export async function exportDeckToPptx(
             brand,
             mode,
             pack: packArg as never,
+            industryId: deck.context?.designRecipeId ?? null,
             pageNumber: i + 1,
             quality: opts?.quality ?? null,
           };
