@@ -17,8 +17,10 @@ import {
   FileDown,
   History,
   Loader2,
+  Plus,
   RotateCcw,
   Save,
+  Trash2,
   ScanEye,
   Sparkles,
   Undo2,
@@ -46,6 +48,7 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import {
+  addedBetween,
   applyLondonEdits,
   baseRevision,
   buildLondonPanelAi,
@@ -54,10 +57,13 @@ import {
   editsBetween,
   effectiveLondonPanels,
   fingerprint,
+  isAddedPanel,
+  newLondonPanel,
   londonPanelFileBase,
   planLondonRegeneration,
   regenerationSummary,
   type LondonEditMap,
+  type LondonPanelAdd,
   type LondonPanelEdit,
   type LondonRevision,
 } from "@/lib/next-london-revise";
@@ -139,6 +145,9 @@ function LondonRevisePage() {
   const [loading, setLoading] = useState(true);
   const [historyError, setHistoryError] = useState<string | null>(null);
   const [edits, setEdits] = useState<LondonEditMap>({});
+  const [added, setAdded] = useState<LondonPanel[]>([]);
+  const [removed, setRemoved] = useState<string[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
   const [note, setNote] = useState("");
   const [restoredFrom, setRestoredFrom] = useState<number | undefined>(undefined);
   const [saving, setSaving] = useState(false);
@@ -169,7 +178,10 @@ function LondonRevisePage() {
   );
   const head = history[0] ?? baseRevision();
   const current = useMemo(() => effectiveLondonPanels(revisions), [revisions]);
-  const draft = useMemo(() => applyLondonEdits(edits, current), [edits, current]);
+  const draft = useMemo(
+    () => applyLondonEdits(edits, current.filter((p) => !removed.includes(p.id)), added),
+    [edits, current, added, removed],
+  );
   const changes = useMemo(() => diffLondonPanels(current, draft), [current, draft]);
   const plan = useMemo(() => planLondonRegeneration(changes), [changes]);
   const dirty = changes.length > 0;
@@ -195,6 +207,33 @@ function LondonRevisePage() {
       }
       if (Object.keys(entry).length === 0) delete next[panelId];
       return next;
+    });
+  };
+
+  const addPanel = (spec: LondonPanelAdd) => {
+    const panel = newLondonPanel(spec, draft);
+    setAdded((prev) => [...prev, panel]);
+    setFloor(panel.floor);
+    toast.success(`${panel.name} added as a draft panel`, {
+      description:
+        "Its bleed box, ppi tier, band and weight are derived — regenerate to build the .ai/.svg/PNG.",
+    });
+  };
+
+  const dropPanel = (panel: LondonPanel) => {
+    if (isAddedPanel(panel) && added.some((p) => p.id === panel.id)) {
+      setAdded((prev) => prev.filter((p) => p.id !== panel.id));
+    } else {
+      setRemoved((prev) => (prev.includes(panel.id) ? prev : [...prev, panel.id]));
+    }
+    setEdits((prev) => {
+      const next = { ...prev };
+      delete next[panel.id];
+      return next;
+    });
+    if (previewId === panel.id) setPreviewId(null);
+    toast.info(`${panel.name} removed from the draft schedule`, {
+      description: "Publish the revision to take it out of the kit — history keeps the old snapshot.",
     });
   };
 
@@ -287,6 +326,8 @@ function LondonRevisePage() {
       });
       setRevisions((prev) => [res.revision, ...prev]);
       setEdits({});
+      setAdded([]);
+      setRemoved([]);
       setNote("");
       setRestoredFrom(undefined);
       toast.success(`Revision ${res.revision.rev} published`, {
@@ -303,6 +344,8 @@ function LondonRevisePage() {
 
   const restore = (rev: LondonRevision) => {
     setEdits(editsBetween(current, rev.panels));
+    setAdded(addedBetween(current, rev.panels));
+    setRemoved(current.filter((p) => !rev.panels.some((q) => q.id === p.id)).map((p) => p.id));
     setRestoredFrom(rev.rev);
     setNote(`Restore revision ${rev.rev}${rev.note ? ` — ${rev.note}` : ""}`);
     toast.info(`Loaded revision ${rev.rev} as a draft`, {
@@ -358,6 +401,8 @@ function LondonRevisePage() {
                 type="button"
                 onClick={() => {
                   setEdits({});
+                  setAdded([]);
+                  setRemoved([]);
                   setRestoredFrom(undefined);
                 }}
                 disabled={!dirty}
