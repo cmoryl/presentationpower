@@ -2141,14 +2141,6 @@ function DeckEditor() {
                               />
                             </Panel>
                           )}
-                          {active && (
-                            <Panel label="Swap history">
-                              <SlideSwapLogPanel
-                                slide={active}
-                                onClear={() => clearSlideSwapLog(deck.id, active.id)}
-                              />
-                            </Panel>
-                          )}
                         </InspectorSection>
 
                         <InspectorSection id="layout" label="Layout">
