@@ -216,7 +216,7 @@ function LondonRevisePage() {
     }
     void runWithExportFeedback(
       {
-        label: `Regenerating ${vectorPanels.length + rasterPanels.length} panels`,
+        pending: `Regenerating ${vectorPanels.length + rasterPanels.length} panels…`,
         success: "Regenerated artwork downloaded",
         failure: "Regeneration failed",
       },
