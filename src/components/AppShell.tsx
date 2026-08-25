@@ -247,6 +247,16 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
     "after:pointer-events-none after:absolute after:inset-x-1 after:-bottom-0.5 after:h-0.5 " +
     "after:bg-[#003FC7] after:dark:bg-[#A1FBF9]";
 
+  // Public-facing pages (e.g. shared asset kits): render content only — no
+  // app logo, navigation, breadcrumbs, or account chrome.
+  if (bare) {
+    return (
+      <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
