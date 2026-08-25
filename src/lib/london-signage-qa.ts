@@ -138,10 +138,11 @@ export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
       "svg-viewbox",
       "User-unit grid matches the bleed aspect",
       viewBox.length === 4 &&
-        viewBox[0] === 0 &&
-        viewBox[1] === 0 &&
+        viewBox.every((n) => Number.isFinite(n)) &&
+        viewBox[2]! > 0 &&
+        viewBox[3]! > 0 &&
         near(viewBox[2]! / viewBox[3]!, panel.bleedW / panel.bleedH, 0.005),
-      `origin 0 0, aspect ${(panel.bleedW / panel.bleedH).toFixed(3)}`,
+      `aspect ${(panel.bleedW / panel.bleedH).toFixed(3)} (crop origin is free)`,
       viewBox.length === 4
         ? `${viewBox.join(" ")} (aspect ${(viewBox[2]! / viewBox[3]!).toFixed(3)})`
         : "missing viewBox",
