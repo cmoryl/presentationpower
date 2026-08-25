@@ -39,6 +39,7 @@ import {
 } from "@/lib/agent/data-visuals";
 
 const STARTERS = [
+  DEMO_FAST_BUILD_TRIGGER,
   "Build a 10-slide GlobalLink pitch for a global retail prospect moving to continuous localization.",
   "Create a QBR deck for a life-sciences client: SLA performance, cost savings, roadmap.",
   "I need an event keynote deck introducing TransPerfect NEXT 2026 to enterprise marketing leaders.",
@@ -99,7 +100,7 @@ export function AgentChat({
     [threadId],
   );
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, setMessages, status, error } = useChat({
     id: threadId,
     messages: initialMessages,
     transport,
