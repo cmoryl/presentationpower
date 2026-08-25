@@ -169,6 +169,10 @@ export function AgentChat({
         // Create the deck up front (fast, local) so the mid-build createDeck
         // tool part can carry the real id and the preview can pop live.
         const { deckId } = useDeckStore.getState().createDeckFromSnapshot(GLOBALLINK_Q3_QBR_DECK);
+        // Local snapshot decks use short nanoids, not the UUIDs the message
+        // scanner expects — hand the id to the preview directly.
+        seenDeck.current = deckId;
+        onDeckDetected(deckId);
         const steps = demoBuildSteps(deckId);
         push(userMsg);
         for (const step of steps) {
