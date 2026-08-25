@@ -30,6 +30,15 @@ import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
+  auditAi,
+  auditPng,
+  auditSvg,
+  qaReportCsv,
+  qaSummary,
+  rollup,
+  type LondonQaReport,
+} from "@/lib/london-signage-qa";
+import {
   LONDON_STYLES,
   LONDON_VENUE,
   panelSlug,
@@ -135,6 +144,7 @@ function LondonRevisePage() {
   const [saving, setSaving] = useState(false);
   const [floor, setFloor] = useState<string>("all");
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
