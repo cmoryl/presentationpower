@@ -63,11 +63,15 @@ export async function signOutAndRedirect(options: SignOutOptions = {}): Promise<
   const { queryClient, reason = "user" } = options;
   if (signingOut) return;
   signingOut = true;
+  const stayOnPublicPage =
+    reason === "expired" &&
+    typeof window !== "undefined" &&
+    isPublicNoLoginPath(window.location.pathname);
 
-  if (reason === "expired") {
+  if (reason === "expired" && !stayOnPublicPage) {
     toast.error("Session expired", { description: SESSION_EXPIRED_MESSAGE });
   } else {
-    toast.success("Signed out");
+    if (!stayOnPublicPage) toast.success("Signed out");
   }
 
   const next = options.next === undefined ? currentReturnPath() : options.next;
@@ -89,7 +93,7 @@ export async function signOutAndRedirect(options: SignOutOptions = {}): Promise<
   }
 
   if (typeof window !== "undefined") {
-    if (reason === "expired" && isPublicNoLoginPath(window.location.pathname)) {
+    if (stayOnPublicPage) {
       signingOut = false;
       return;
     }
