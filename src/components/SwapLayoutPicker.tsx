@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import {
   MODULE_FAMILIES,
@@ -36,6 +37,7 @@ export function SwapLayoutButton({
   const [scope, setScope] = useState<"section" | "all">("section");
   const [query, setQuery] = useState("");
   const [familyId, setFamilyId] = useState<string | "all">("all");
+  const [sort, setSort] = useState<"fit" | "name" | "family">("fit");
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalA11y({ open, onClose: () => setOpen(false), containerRef: dialogRef });
   const currentVariant = byId(MODULE_VARIANTS, slide.variantId);
