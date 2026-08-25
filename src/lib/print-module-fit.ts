@@ -41,7 +41,17 @@ import {
   type PrintTemplateKind,
 } from "@/lib/print-capacity";
 import { approveSection } from "@/lib/print-library/demo-approve";
-import { PRINT_CONTENT_FIT_DEFAULTS } from "@/lib/print-content-fit";
+import { PRINT_CONTENT_FIT_DEFAULTS, type PrintContentFitSettings } from "@/lib/print-content-fit";
+import { HERO_HEIGHT_HARD_MIN, maxHeroHeightPct } from "@/lib/print-capacity";
+
+/**
+ * Safety factor applied to the module budget when fitting FRESH content.
+ * Module weights are calibrated estimates; a page that fits them at 100%
+ * can still clip real pixels (the live editor's own warning fires around
+ * 15% overflow on a "within budget" seed). Fitting against 85% of the
+ * budget keeps a first-run file comfortably inside the trim.
+ */
+const FRESH_CONTENT_BUDGET_SCALE = 0.85;
 import type { PrintAssetKind, PrintHeroMedia, PrintSection } from "@/lib/print-assets.types";
 
 type Bag = Record<string, unknown>;
@@ -89,16 +99,18 @@ export type PrintPageBudget = {
 export function printPageBudget(
   kind: PrintAssetKind | PrintTemplateKind,
   content: unknown,
+  opts?: { budgetScale?: number },
 ): PrintPageBudget | null {
   const ck = capacityKind(kind);
   if (!ck || !content || typeof content !== "object") return null;
   const bag = content as Bag;
   const modules = Array.isArray(bag["modules"]) ? (bag["modules"] as PrintSection[]) : [];
   const used = modules.reduce((n, m) => n + weightForSection(m), 0);
-  const budget = effectiveModuleBudget(ck, bag["heroMedia"] as PrintHeroMedia | undefined, {
-    hasTitle: typeof bag["title"] === "string" && !!bag["title"],
-    hasSummary: typeof bag["summary"] === "string" && !!bag["summary"],
-  });
+  const budget =
+    effectiveModuleBudget(ck, bag["heroMedia"] as PrintHeroMedia | undefined, {
+      hasTitle: typeof bag["title"] === "string" && !!bag["title"],
+      hasSummary: typeof bag["summary"] === "string" && !!bag["summary"],
+    }) * (opts?.budgetScale ?? 1);
   return { kind: ck, budget, used, remaining: Math.max(0, budget - used) };
 }
 
@@ -131,12 +143,13 @@ export function fitPrintModuleIntoPage(
   kind: PrintAssetKind | PrintTemplateKind,
   content: unknown,
   raw: PrintSection,
+  opts?: { budgetScale?: number },
 ): PrintModuleFitReport {
   // 1 — normalize against the variant's own hard limits.
   let section = approveSection(raw);
   const normalized = section !== raw;
 
-  const page = printPageBudget(kind, content);
+  const page = printPageBudget(kind, content, opts);
   const remaining = page?.remaining ?? Number.POSITIVE_INFINITY;
 
   let swappedFrom: string | undefined;
