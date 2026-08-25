@@ -54,7 +54,7 @@ export type Persona = {
 export const PERSONAS: readonly Persona[] = [
   {
     id: "admin",
-    label: "Admin & design",
+    label: "Admin dashboard",
     tagline:
       "Own the system: templates, modules, brand assets and the guardrails everyone else inherits.",
     roles: ["admin", "brand_reviewer"],
@@ -115,7 +115,7 @@ export const PERSONAS: readonly Persona[] = [
   },
   {
     id: "marketing",
-    label: "Marketing",
+    label: "MarOps dashboard",
     tagline:
       "Run campaigns end to end: social, events, print collateral and the look that ties them together.",
     roles: ["brand_lead", "content_owner", "editor"],
@@ -176,7 +176,7 @@ export const PERSONAS: readonly Persona[] = [
   },
   {
     id: "sales",
-    label: "Sales",
+    label: "Sales dashboard",
     tagline: "Get a client-ready, on-brand deck or one-pager out the door in minutes.",
     roles: ["sales", "viewer"],
     counters: ["decks", "print"],
