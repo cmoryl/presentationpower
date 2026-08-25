@@ -20,13 +20,19 @@ export const SESSION_EXPIRED_MESSAGE = "Your session expired. Please sign in aga
 /** Login route for this app. Single source of truth for sign-out redirects. */
 export const LOGIN_PATH = "/auth";
 
+const PUBLIC_NO_LOGIN_PATHS = ["/events/next/london"];
+
+export function isPublicNoLoginPath(pathname: string): boolean {
+  return PUBLIC_NO_LOGIN_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
 let signingOut = false;
 
 /** Same-origin path (with query + hash) to return to after signing back in. */
 function currentReturnPath(): string | null {
   if (typeof window === "undefined") return null;
   const { pathname, search, hash } = window.location;
-  if (!pathname || pathname.startsWith(LOGIN_PATH)) return null;
+  if (!pathname || pathname.startsWith(LOGIN_PATH) || isPublicNoLoginPath(pathname)) return null;
   const path = `${pathname}${search}${hash}`;
   return path.startsWith("/") && !path.startsWith("//") ? path : null;
 }
@@ -83,6 +89,10 @@ export async function signOutAndRedirect(options: SignOutOptions = {}): Promise<
   }
 
   if (typeof window !== "undefined") {
+    if (reason === "expired" && isPublicNoLoginPath(window.location.pathname)) {
+      signingOut = false;
+      return;
+    }
     // Brief pause so the toast is visible before the login page renders it again.
     const target = loginUrl({ expired: reason === "expired", next });
     window.setTimeout(() => window.location.replace(target), reason === "expired" ? 350 : 0);
