@@ -309,36 +309,104 @@ function Editor({
 
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="relative self-start overflow-hidden rounded-2xl border border-black/10 bg-[#0a0a1a] lg:sticky lg:top-4">
-          <div className="aspect-[16/9]">
-            <SlideBackdropContext.Provider value={backdrop}>
-              <LiveEditOverlay
-                enabled={liveEdit}
-                slideId={row.id}
-                content={content}
-                editableFields={paths}
-                onChange={updatePath}
-              >
-                <ScaledSlide>
-                  {variant && slide ? (
-                    <DeckPackScope pack={pack}>
-                      <VariantRenderer
-                        slide={slide}
-                        variant={variant}
-                        brand={brand}
-                        pageNumber={1}
-                        subCompany={row.sub_company ?? undefined}
-                        mode={mode}
-                      />
-                    </DeckPackScope>
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-sm text-white/70">
-                      Variant not found: {row.variant_id}
-                    </div>
-                  )}
-                </ScaledSlide>
-              </LiveEditOverlay>
-            </SlideBackdropContext.Provider>
-          </div>
+          {mode === "mixed" ? (
+            <div className="space-y-4 p-4">
+              {(
+                [
+                  { m: "dark" as const, label: "Dark — cover & closing slides" },
+                  { m: "light" as const, label: "Light — body slides" },
+                ]
+              ).map(({ m, label }, i) => (
+                <div key={m}>
+                  <div className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white/55">
+                    {label}
+                  </div>
+                  <div className="aspect-[16/9] overflow-hidden rounded-lg">
+                    <SlideBackdropContext.Provider value={backdropFor(m)}>
+                      {i === 0 ? (
+                        <LiveEditOverlay
+                          enabled={liveEdit}
+                          slideId={row.id}
+                          content={content}
+                          editableFields={paths}
+                          onChange={updatePath}
+                        >
+                          <ScaledSlide>
+                            {variant && slide ? (
+                              <DeckPackScope pack={pack}>
+                                <VariantRenderer
+                                  slide={slide}
+                                  variant={variant}
+                                  brand={brand}
+                                  pageNumber={1}
+                                  subCompany={row.sub_company ?? undefined}
+                                  mode={m}
+                                />
+                              </DeckPackScope>
+                            ) : (
+                              <div className="flex h-full items-center justify-center text-sm text-white/70">
+                                Variant not found: {row.variant_id}
+                              </div>
+                            )}
+                          </ScaledSlide>
+                        </LiveEditOverlay>
+                      ) : (
+                        <ScaledSlide>
+                          {variant && slide ? (
+                            <DeckPackScope pack={pack}>
+                              <VariantRenderer
+                                slide={slide}
+                                variant={variant}
+                                brand={brand}
+                                pageNumber={1}
+                                subCompany={row.sub_company ?? undefined}
+                                mode={m}
+                              />
+                            </DeckPackScope>
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-sm text-white/70">
+                              Variant not found: {row.variant_id}
+                            </div>
+                          )}
+                        </ScaledSlide>
+                      )}
+                    </SlideBackdropContext.Provider>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="aspect-[16/9]">
+              <SlideBackdropContext.Provider value={backdropFor(mode)}>
+                <LiveEditOverlay
+                  enabled={liveEdit}
+                  slideId={row.id}
+                  content={content}
+                  editableFields={paths}
+                  onChange={updatePath}
+                >
+                  <ScaledSlide>
+                    {variant && slide ? (
+                      <DeckPackScope pack={pack}>
+                        <VariantRenderer
+                          slide={slide}
+                          variant={variant}
+                          brand={brand}
+                          pageNumber={1}
+                          subCompany={row.sub_company ?? undefined}
+                          mode={mode}
+                        />
+                      </DeckPackScope>
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-sm text-white/70">
+                        Variant not found: {row.variant_id}
+                      </div>
+                    )}
+                  </ScaledSlide>
+                </LiveEditOverlay>
+              </SlideBackdropContext.Provider>
+            </div>
+          )}
         </div>
 
         <div className="space-y-5">
