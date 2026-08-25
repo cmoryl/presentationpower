@@ -240,7 +240,7 @@ export const saveExtractedImagesToDivision = createServerFn({ method: "POST" })
         }
         const bytes = new Uint8Array(await dl.data.arrayBuffer());
         const newId = crypto.randomUUID();
-        const safeName = row.filename.replace(/[^\w.\-]+/g, "_").slice(-160);
+        const safeName = row.filename.replace(/[^\w.-]+/g, "_").slice(-160);
         const newPath = `${context.userId}/${newId}-${safeName}`;
         const up = await s.storage
           .from(BUCKET)

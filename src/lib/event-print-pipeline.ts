@@ -68,8 +68,7 @@ export function pressGeometryFor(spec: EventPrintSpec): PressGeometry {
 
   // Pixels needed are a property of the FINAL size — supplying at 50% does not
   // reduce them. Whichever final edge is longest decides the achievable DPI.
-  const longestFinalIn =
-    Math.max(spec.widthIn, spec.heightIn) + spec.bleedIn * 2;
+  const longestFinalIn = Math.max(spec.widthIn, spec.heightIn) + spec.bleedIn * 2;
   const ceilingDpi = Math.floor(MAX_PLATE_EDGE_PX / Math.max(longestFinalIn, 1));
   const finalDpi = Math.max(24, Math.min(target, ceilingDpi));
   const fileDpi = Math.min(600, Math.round(finalDpi / scale));
@@ -85,7 +84,6 @@ export function pressGeometryFor(spec: EventPrintSpec): PressGeometry {
     rasterLimited: ceilingDpi < target,
   };
 }
-
 
 /**
  * The DOM frame for a spec. Aspect matches the trim exactly (within rounding),

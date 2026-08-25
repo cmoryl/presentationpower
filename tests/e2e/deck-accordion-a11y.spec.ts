@@ -2,8 +2,6 @@ import { test, expect } from "@playwright/test";
 import { createDeckViaSkipAI } from "./helpers/create-deck";
 import type { Page } from "@playwright/test";
 
-
-
 async function firstAvailableTrigger(page: Page) {
   // Prefer triggers whose panels host focusable actions.
   const labels = ["Distribute", "Slide", "Appearance", "Motion", "History"];
@@ -47,7 +45,9 @@ test.describe("Deck toolbar accordion popover a11y", () => {
     await page.keyboard.press("Escape");
     await expect(btn).toHaveAttribute("aria-expanded", "false");
 
-    const focused = await page.evaluate(() => document.activeElement?.getAttribute("aria-controls"));
+    const focused = await page.evaluate(() =>
+      document.activeElement?.getAttribute("aria-controls"),
+    );
     const controls = await btn.getAttribute("aria-controls");
     expect(focused).toBe(controls);
   });

@@ -38,7 +38,9 @@ async function readLightAssets(page: Page): Promise<LightAsset[]> {
         frameW: fr ? Math.round(fr.width) : 0,
         frameH: fr ? Math.round(fr.height) : 0,
         text: (frame?.innerText ?? "").replace(/\s+/g, " ").trim(),
-        overflowX: fr ? Math.max(0, Math.round(fr.right - cr.right), Math.round(cr.left - fr.left)) : 0,
+        overflowX: fr
+          ? Math.max(0, Math.round(fr.right - cr.right), Math.round(cr.left - fr.left))
+          : 0,
       };
     }),
   );
@@ -53,7 +55,7 @@ async function validateDemo(page: Page, url: string) {
   // The gallery is client-rendered; wait for the first card to paint.
   const cards = page.locator('[data-testid="asset-preview-card"]');
   await expect(cards.first()).toBeVisible();
-  await page.locator('[data-kit-asset-frame]').first().waitFor();
+  await page.locator("[data-kit-asset-frame]").first().waitFor();
   // Let the aspect-fit pass settle before measuring geometry.
   await page.waitForTimeout(400);
 
@@ -79,7 +81,10 @@ async function validateDemo(page: Page, url: string) {
     expect(a.text.length, `${where}: artwork rendered without visible copy`).toBeGreaterThan(8);
 
     // Artwork stays inside its card.
-    expect(a.overflowX, `${where}: artwork overflows the card by ${a.overflowX}px`).toBeLessThanOrEqual(2);
+    expect(
+      a.overflowX,
+      `${where}: artwork overflows the card by ${a.overflowX}px`,
+    ).toBeLessThanOrEqual(2);
   }
 
   // Page-level horizontal overflow.

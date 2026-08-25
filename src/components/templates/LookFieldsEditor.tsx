@@ -272,8 +272,6 @@ export function LookFieldsEditor({
         </span>
       </label>
 
-
-
       <div className="flex flex-wrap items-center gap-3 border-t border-black/10 pt-4 dark:border-white/15">
         <button
           type="button"

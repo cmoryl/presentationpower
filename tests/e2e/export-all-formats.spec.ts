@@ -78,10 +78,9 @@ test.describe("module export — every format", () => {
       expect(run.error, `${label}: run threw`).toBeFalsy();
 
       // Every format was produced.
-      expect(
-        run.artifacts.map((a) => a.format).sort(),
-        `${label}: missing formats`,
-      ).toEqual([...FORMATS].sort());
+      expect(run.artifacts.map((a) => a.format).sort(), `${label}: missing formats`).toEqual(
+        [...FORMATS].sort(),
+      );
 
       for (const a of run.artifacts) {
         const at = `${label} · ${a.format}`;
@@ -117,10 +116,9 @@ test.describe("module export — every format", () => {
       // ZIP: reopens with every artifact inside, none empty.
       const zip = byFormat.get("zip")!;
       expect(Number(zip.detail.entries), `${label} · zip: entries`).toBeGreaterThanOrEqual(4);
-      expect(
-        Number(zip.detail.smallestEntryBytes),
-        `${label} · zip: empty entry`,
-      ).toBeGreaterThan(0);
+      expect(Number(zip.detail.smallestEntryBytes), `${label} · zip: empty entry`).toBeGreaterThan(
+        0,
+      );
 
       // 2. Industry background evidence.
       //    The pack sheet is rasterized in the look's own mode, so only the
@@ -151,8 +149,7 @@ test.describe("module export — every format", () => {
 
     // Two different industry looks must not produce interchangeable artwork.
     const [a, b] = runs.map((r) => r.artifacts.find((x) => x.format === "png")!.fingerprint!);
-    const drift =
-      a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0) / Math.max(1, a.length);
+    const drift = a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0) / Math.max(1, a.length);
     expect(drift, "two industry looks rendered the same background").toBeGreaterThan(2);
   });
 });

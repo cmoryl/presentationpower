@@ -742,21 +742,21 @@ function AgentThreadPage() {
               </div>
             ) : (
               <>
-              <div className="px-4 pb-3">
-                <AgentScopeNotice surface="presentation agent" />
-              </div>
-              <AgentChat
-                key={threadId}
-                threadId={threadId}
-                initialMessages={messages}
-                onDeckDetected={onDeckDetected}
-                onActivity={onActivity}
-                onFirstUserMessage={onFirstUserMessage}
-                onMessageCountChange={setLiveCount}
-                pendingPrompt={pendingPrompt}
-                onPendingPromptConsumed={clearPendingPrompt}
-                progressContainer={liveCount > 0 && !heroExpanded ? progressEl : null}
-              />
+                <div className="px-4 pb-3">
+                  <AgentScopeNotice surface="presentation agent" />
+                </div>
+                <AgentChat
+                  key={threadId}
+                  threadId={threadId}
+                  initialMessages={messages}
+                  onDeckDetected={onDeckDetected}
+                  onActivity={onActivity}
+                  onFirstUserMessage={onFirstUserMessage}
+                  onMessageCountChange={setLiveCount}
+                  pendingPrompt={pendingPrompt}
+                  onPendingPromptConsumed={clearPendingPrompt}
+                  progressContainer={liveCount > 0 && !heroExpanded ? progressEl : null}
+                />
               </>
             )}
           </section>

@@ -77,7 +77,6 @@ function UxDebugReportPage() {
   useEffect(() => {
     refresh();
     return uxRecorder.subscribe(() => refresh());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const session = sessions.find((s) => s.id === activeId) ?? null;

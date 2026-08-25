@@ -69,9 +69,7 @@ export async function gotoAsAdmin(
   if (!material) return false;
 
   if (material.cookies.length) {
-    await context.addCookies(
-      material.cookies.map((c) => ({ ...c, url: baseURL })) as never,
-    );
+    await context.addCookies(material.cookies.map((c) => ({ ...c, url: baseURL })) as never);
   }
 
   // Establish the origin first so the localStorage write lands on it.

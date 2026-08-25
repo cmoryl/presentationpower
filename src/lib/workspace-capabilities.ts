@@ -39,10 +39,7 @@ export type WorkspaceCapabilities = {
   reason: string;
 };
 
-export function capabilitiesFor(
-  roles: readonly string[],
-  persona?: string,
-): WorkspaceCapabilities {
+export function capabilitiesFor(roles: readonly string[], persona?: string): WorkspaceCapabilities {
   const set = new Set(roles.map((r) => String(r)));
   const isAdmin = set.has("admin");
   const canEdit = isAdmin || EDIT_ROLES.some((r) => set.has(r));

@@ -180,13 +180,11 @@ export async function withExactStage<T>(
     const restoreAdopted = hideAdoptedSourcesIn(stage, canvasBlocksOf(args.slide));
     await nextFrames(1);
 
-
     try {
       return await fn(stage);
     } finally {
       restoreAdopted();
     }
-
   } catch (err) {
     console.error("[exact-export] offscreen stage failed", args.variant?.id, err);
     return null;
@@ -357,9 +355,7 @@ export async function rasterizeTextEditablePlate(
  * are all independent PowerPoint objects, with only genuinely CSS-only artwork
  * (aurora grounds, masks, filters, radial washes) remaining as a backdrop.
  */
-export async function rasterizeObjectPlate(
-  args: ExactPlateArgs,
-): Promise<{
+export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
   plate: string;
   runs: TextRun[];
   shapes: import("./export-dom-decompose").DomShape[];
@@ -391,7 +387,6 @@ export async function rasterizeObjectPlate(
         dom.surfacePaintRoots(stage),
       ),
     );
-
 
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);

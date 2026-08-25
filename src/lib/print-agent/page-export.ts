@@ -43,7 +43,11 @@ export function printPageTrim(
 }
 
 export function printPageFilename(base: string, format: PrintPageExportFormat): string {
-  const safe = base.replace(/[^a-z0-9-_]+/gi, "-").replace(/-+/g, "-").toLowerCase() || "print-page";
+  const safe =
+    base
+      .replace(/[^a-z0-9-_]+/gi, "-")
+      .replace(/-+/g, "-")
+      .toLowerCase() || "print-page";
   return `${safe}.${format}`;
 }
 

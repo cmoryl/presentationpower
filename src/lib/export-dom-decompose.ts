@@ -1008,9 +1008,7 @@ export function keepBackgroundPaintOnPlate(
     if (!hasText && extreme && (translucent || min <= 6)) return false;
     return true;
   });
-
 }
-
 
 /**
  * Take the captured paint OFF the plate without touching layout.

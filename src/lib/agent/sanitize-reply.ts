@@ -35,7 +35,7 @@ const CODE_RE = /\b[A-Z]{2,10}[-_ ]?(?:\d{1,3}[a-z]?\b|…|\.{3})/g;
 // Same code wrapped in brackets/parens/backticks/quotes, with leading space.
 const WRAPPED_CODE_RE = /\s*[([`"'“‘]\s*[A-Z]{2,10}[-_ ]?(?:\d{1,3}[a-z]?|…|\.{3})\s*[)\]`"'”’]/g;
 
-const QUOTED_LABEL_RE = /[`"'“‘]\s*([A-Za-z][A-Za-z \-]{2,24}?)\s*[`"'”’]/g;
+const QUOTED_LABEL_RE = /[`"'“‘]\s*([A-Za-z][A-Za-z -]{2,24}?)\s*[`"'”’]/g;
 
 function plainLabel(raw: string): string | null {
   const key = raw.trim().toLowerCase();

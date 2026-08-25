@@ -112,7 +112,9 @@ export function ApprovalTimeline(props: {
                       className={`absolute left-0 top-1.5 h-2 w-2 rounded-full ${copy.dot}`}
                     />
                     <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                      <span className="break-words text-sm font-medium leading-snug">{copy.label}</span>
+                      <span className="break-words text-sm font-medium leading-snug">
+                        {copy.label}
+                      </span>
                       <span className="min-w-0 truncate text-xs text-foreground/60">
                         by {actor}
                       </span>

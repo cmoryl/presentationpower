@@ -111,7 +111,9 @@ async function auditPackage(buf) {
 
   // relationship id -> target for font rels
   const fontRels = new Map();
-  for (const m of (rels ?? "").matchAll(/<Relationship Id="([^"]+)"[^>]*Type="[^"]*\/font"[^>]*Target="([^"]+)"/g))
+  for (const m of (rels ?? "").matchAll(
+    /<Relationship Id="([^"]+)"[^>]*Type="[^"]*\/font"[^>]*Target="([^"]+)"/g,
+  ))
     fontRels.set(m[1], m[2]);
 
   const lst = pres?.match(/<p:embeddedFontLst>[\s\S]*?<\/p:embeddedFontLst>/)?.[0] ?? null;
@@ -120,10 +122,16 @@ async function auditPackage(buf) {
     const body = block[1];
     const f = body.match(/<p:font ([^>]*)\/>/)?.[1] ?? "";
     const attr = (k) => f.match(new RegExp(`${k}="([^"]*)"`))?.[1] ?? null;
-    const ids = Array.from(body.matchAll(/<p:(regular|bold|italic|boldItalic) r:id="([^"]+)"\/>/g)).map(
-      (m) => ({ style: m[1], rid: m[2] }),
-    );
-    entries.push({ typeface: attr("typeface"), panose: attr("panose"), pitchFamily: attr("pitchFamily"), charset: attr("charset"), ids });
+    const ids = Array.from(
+      body.matchAll(/<p:(regular|bold|italic|boldItalic) r:id="([^"]+)"\/>/g),
+    ).map((m) => ({ style: m[1], rid: m[2] }));
+    entries.push({
+      typeface: attr("typeface"),
+      panose: attr("panose"),
+      pitchFamily: attr("pitchFamily"),
+      charset: attr("charset"),
+      ids,
+    });
   }
 
   // Element ordering inside <p:presentation>
@@ -195,9 +203,12 @@ function evaluateMatrix(a, { embed }) {
         for (const { style, rid } of e.ids)
           if (!a.fontRels.has(rid))
             fail.push(`${e.typeface}/${style} points at ${rid} with no font relationship`);
-        if (!e.panose || !e.pitchFamily) warn.push(`${e.typeface}: missing panose/pitchFamily metadata`);
+        if (!e.panose || !e.pitchFamily)
+          warn.push(`${e.typeface}: missing panose/pitchFamily metadata`);
         if (e.ids.length < 4)
-          warn.push(`${e.typeface}: only ${e.ids.map((i) => i.style).join("+") || "no"} face(s) embedded`);
+          warn.push(
+            `${e.typeface}: only ${e.ids.map((i) => i.style).join("+") || "no"} face(s) embedded`,
+          );
       }
       for (const rid of a.fontRels.keys())
         if (!a.entries.some((e) => e.ids.some((i) => i.rid === rid)))
@@ -250,11 +261,22 @@ function evaluateMatrix(a, { embed }) {
 async function libreOfficeFonts(file) {
   const { execFile } = await import("node:child_process");
   const run = (cmd, args) =>
-    new Promise((res) => execFile(cmd, args, { timeout: 180_000 }, (e, so, se) => res({ e, so, se })));
+    new Promise((res) =>
+      execFile(cmd, args, { timeout: 180_000 }, (e, so, se) => res({ e, so, se })),
+    );
   const dir = path.dirname(file);
-  const r = await run("python3", ["/tmp/run_libreoffice.py", "--headless", "--convert-to", "pdf", "--outdir", dir, file]);
+  const r = await run("python3", [
+    "/tmp/run_libreoffice.py",
+    "--headless",
+    "--convert-to",
+    "pdf",
+    "--outdir",
+    dir,
+    file,
+  ]);
   const pdf = file.replace(/\.pptx$/, ".pdf");
-  if (!existsSync(pdf)) return { ok: false, note: `conversion failed: ${(r.se || r.so || "").slice(-200)}` };
+  if (!existsSync(pdf))
+    return { ok: false, note: `conversion failed: ${(r.se || r.so || "").slice(-200)}` };
   const f = await run("pdffonts", [pdf]);
   const names = (f.so ?? "")
     .split("\n")

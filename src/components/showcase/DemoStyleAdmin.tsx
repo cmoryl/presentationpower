@@ -233,7 +233,6 @@ export function DemoStyleAdmin({
         </div>
       ) : null}
 
-
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"

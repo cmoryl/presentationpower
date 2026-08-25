@@ -25,11 +25,7 @@
 import JSZip from "jszip";
 import jsPDF from "jspdf";
 import { captureAssetCanvas } from "./asset-export";
-import {
-  MAX_PLATE_EDGE_PX,
-  pressGeometryFor,
-  type PressGeometry,
-} from "./event-print-pipeline";
+import { MAX_PLATE_EDGE_PX, pressGeometryFor, type PressGeometry } from "./event-print-pipeline";
 import type { EventPrintSpec } from "./event-spec-intake";
 
 export type DeliveryItem = {
@@ -132,8 +128,7 @@ async function platePng(
 
   // The review card scales the frame with a CSS transform on a wrapper; capture
   // the native-size frame itself so the artwork fills the plate.
-  const frame =
-    item.node.querySelector<HTMLElement>("[data-kit-asset-frame='true']") ?? item.node;
+  const frame = item.node.querySelector<HTMLElement>("[data-kit-asset-frame='true']") ?? item.node;
   const restore = suppressPreviewChrome(frame);
   try {
     const canvas = await captureAssetCanvas(

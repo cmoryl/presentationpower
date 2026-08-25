@@ -189,9 +189,7 @@ export function varietyReport(slides: SlideForVariety[]): VarietyReport {
     }
   }
 
-  const varietyScore = slides.length
-    ? Math.round((usedIds.size / slides.length) * 100)
-    : 100;
+  const varietyScore = slides.length ? Math.round((usedIds.size / slides.length) * 100) : 100;
   const mostUsed = Array.from(counts.entries())
     .map(([variant_id, positions]) => ({
       variant_id,

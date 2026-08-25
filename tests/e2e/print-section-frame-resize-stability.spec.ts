@@ -56,7 +56,9 @@ async function sample(page: Page): Promise<FrameSample[]> {
         pageHeight: Math.round(inner.offsetHeight * 100) / 100,
         renderedHeight: Math.round(box.getBoundingClientRect().height * 100) / 100,
         scale: Number(inner.dataset["previewScale"] ?? "0"),
-        pageWidth: Math.round(inner.getBoundingClientRect().width / (Number(inner.dataset["previewScale"]) || 1)),
+        pageWidth: Math.round(
+          inner.getBoundingClientRect().width / (Number(inner.dataset["previewScale"]) || 1),
+        ),
         fonts,
       };
     });

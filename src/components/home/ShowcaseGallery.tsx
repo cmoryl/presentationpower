@@ -227,7 +227,8 @@ function ScrollRail({ children, count }: { children: React.ReactNode; count: num
       const max = el.scrollWidth - el.clientWidth;
       if (max <= 1) return;
       const next = el.scrollLeft + e.deltaY;
-      if ((e.deltaY < 0 && el.scrollLeft <= 0) || (e.deltaY > 0 && el.scrollLeft >= max - 1)) return;
+      if ((e.deltaY < 0 && el.scrollLeft <= 0) || (e.deltaY > 0 && el.scrollLeft >= max - 1))
+        return;
       e.preventDefault();
       el.scrollLeft = Math.max(0, Math.min(max, next));
     };

@@ -119,4 +119,3 @@ export function enrichShowcasePayload(payload: TemplatePayload, key: string): Te
     },
   };
 }
-

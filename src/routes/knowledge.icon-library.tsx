@@ -37,7 +37,6 @@ function IconLibraryPage() {
     ? (iconColorOptions(slug)[1]?.hex ?? "#1B3E6F")
     : (guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
 
-
   return (
     <AppShell>
       <div className="mx-auto max-w-6xl px-6 py-12">

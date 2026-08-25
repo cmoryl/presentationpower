@@ -91,9 +91,7 @@ test.describe("Mobile navigation drawer", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await settle(page, "/");
 
-    const trigger = page
-      .getByRole("button", { name: /menu|navigation|open menu/i })
-      .first();
+    const trigger = page.getByRole("button", { name: /menu|navigation|open menu/i }).first();
     if (!(await trigger.isVisible().catch(() => false))) {
       test.skip(true, "no mobile menu trigger on this build");
     }

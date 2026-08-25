@@ -16,11 +16,11 @@ import { test, expect, type Page } from "@playwright/test";
  */
 
 const BREAKPOINTS = [
-  { name: "mobile-portrait",  width: 375,  height: 812  },
-  { name: "mobile-landscape", width: 640,  height: 480  },
-  { name: "tablet",           width: 768,  height: 1024 },
-  { name: "laptop",           width: 1280, height: 900  },
-  { name: "desktop",          width: 1600, height: 1000 },
+  { name: "mobile-portrait", width: 375, height: 812 },
+  { name: "mobile-landscape", width: 640, height: 480 },
+  { name: "tablet", width: 768, height: 1024 },
+  { name: "laptop", width: 1280, height: 900 },
+  { name: "desktop", width: 1600, height: 1000 },
 ] as const;
 
 async function assertNoHorizontalOverflow(page: Page) {
@@ -44,7 +44,9 @@ test.describe("Print library — responsive layout", () => {
       await page.waitForTimeout(400);
 
       // Template grid must render at least the four base templates.
-      const cards = page.locator("h3", { hasText: /Client Spotlight|Case Study|eBrochure|Adaptor Brief/i });
+      const cards = page.locator("h3", {
+        hasText: /Client Spotlight|Case Study|eBrochure|Adaptor Brief/i,
+      });
       await expect(cards.first()).toBeVisible();
       const cardCount = await cards.count();
       expect(cardCount).toBeGreaterThanOrEqual(3);
@@ -54,7 +56,7 @@ test.describe("Print library — responsive layout", () => {
 
       // Each visible template thumbnail must maintain the 8.5:11 portrait aspect
       // (allowing a 3% tolerance for subpixel rounding on narrow viewports).
-      const thumbs = page.locator('.aspect-\\[8\\.5\\/11\\]');
+      const thumbs = page.locator(".aspect-\\[8\\.5\\/11\\]");
       const thumbCount = await thumbs.count();
       expect(thumbCount).toBeGreaterThan(0);
       for (let i = 0; i < Math.min(thumbCount, 4); i++) {

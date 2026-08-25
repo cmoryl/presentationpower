@@ -73,7 +73,8 @@ function tightenTopCopy(bag: Bag, caps: Record<string, number>): Bag {
   };
   for (const key of ["summary", "tagline", "subtitle"]) {
     const v = next[key];
-    if (typeof v === "string" && v.length > caps["summary"]!) set(key, tighten(v, caps["summary"]!));
+    if (typeof v === "string" && v.length > caps["summary"]!)
+      set(key, tighten(v, caps["summary"]!));
   }
   for (const key of ["intro"]) {
     const v = next[key];
@@ -151,7 +152,8 @@ export function relievePrintDemoContent<T>(_kind: PrintAssetKind, content: T, st
 export function describeRelief(step: number): string {
   if (step <= 0) return "as authored";
   if (step <= HERO_LADDER.length) return "hero band slimmed to clear the trim";
-  if (step <= HERO_LADDER.length + COPY_LADDER.length) return "body copy tightened to clear the trim";
+  if (step <= HERO_LADDER.length + COPY_LADDER.length)
+    return "body copy tightened to clear the trim";
   const shed = step - HERO_LADDER.length - COPY_LADDER.length;
   return `${shed} supporting module${shed === 1 ? "" : "s"} held back to clear the trim`;
 }

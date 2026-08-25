@@ -148,8 +148,8 @@ export function LondonPpiPreview({
         <div className="min-w-0">
           <h3 className="text-sm font-semibold text-[#03002C]">Live ppi preview</h3>
           <p className="mt-0.5 text-xs text-[#666]">
-            {panel.trimW}×{panel.trimH}mm trim · {style?.label ?? panel.style} · rendered through the
-            same dither pipeline as the shipped PNG.
+            {panel.trimW}×{panel.trimH}mm trim · {style?.label ?? panel.style} · rendered through
+            the same dither pipeline as the shipped PNG.
           </p>
         </div>
         <button
@@ -164,7 +164,11 @@ export function LondonPpiPreview({
       </header>
 
       {/* Tier chooser */}
-      <div className="mt-3 flex flex-wrap gap-1.5" role="tablist" aria-label="Print resolution tier">
+      <div
+        className="mt-3 flex flex-wrap gap-1.5"
+        role="tablist"
+        aria-label="Print resolution tier"
+      >
         {tiers.map((t) => (
           <button
             key={t.ppi}
@@ -311,7 +315,11 @@ export function LondonPpiPreview({
 
       <p className={`mt-2 rounded-lg px-3 py-2 text-xs leading-[1.45] ${TONE_CLASS[verdict.tone]}`}>
         <strong className="font-semibold">
-          {verdict.tone === "good" ? "Good to print" : verdict.tone === "watch" ? "Check first" : "Not recommended"}
+          {verdict.tone === "good"
+            ? "Good to print"
+            : verdict.tone === "watch"
+              ? "Check first"
+              : "Not recommended"}
           :{" "}
         </strong>
         {verdict.note}

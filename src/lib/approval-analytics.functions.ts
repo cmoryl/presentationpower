@@ -136,7 +136,8 @@ export const getApprovalAnalytics = createServerFn({ method: "POST" })
       if (r.status === "pending") waiting.push(hoursBetween(r.created_at, now));
       else if (r.status === "changes_requested") {
         rework.push(hoursBetween(r.updated_at, now));
-        if (r.decided_at) inReview.push(hoursBetween(r.created_at, new Date(r.decided_at).getTime()));
+        if (r.decided_at)
+          inReview.push(hoursBetween(r.created_at, new Date(r.decided_at).getTime()));
       } else if (r.status === "approved" && r.decided_at) {
         inReview.push(hoursBetween(r.created_at, new Date(r.decided_at).getTime()));
       }

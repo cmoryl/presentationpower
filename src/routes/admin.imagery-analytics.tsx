@@ -126,8 +126,6 @@ function ImageryView() {
     queryFn: () => fn({ data: { days, brandId: brand || undefined } }),
     retry: false,
   });
-  if (q.error && isForbidden(q.error)) return <AdminForbidden />;
-
   const data = q.data;
 
   const derived = useMemo(() => {
@@ -159,12 +157,13 @@ function ImageryView() {
       null as null | { date: string; count: number },
     );
     const rows =
-      source === "all"
-        ? data.byImage
-        : data.byImage.filter((i) => classify(i.image_id) === source);
+      source === "all" ? data.byImage : data.byImage.filter((i) => classify(i.image_id) === source);
 
     return { sources, eventMix, adoption, memoryPct, peakDay, rows, distinct };
   }, [data, source]);
+
+  // Declared after every hook so the hook order never changes between renders.
+  if (q.error && isForbidden(q.error)) return <AdminForbidden />;
 
   const maxDay = Math.max(1, ...(data?.perDay.map((d) => d.count) ?? [1]));
   const brandMax = Math.max(1, ...(data?.byBrand.map((b) => b.total) ?? [1]));
@@ -262,7 +261,9 @@ function ImageryView() {
                       className={`rounded-2xl border p-4 text-left transition ${active ? "border-[#003FC7] bg-[#003FC7]/[0.04]" : "border-black/10 bg-white/70 hover:border-[#003FC7]/40"}`}
                     >
                       <div className="flex items-center gap-2">
-                        <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${meta.tint}`}>
+                        <span
+                          className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${meta.tint}`}
+                        >
                           <Icon size={14} />
                         </span>
                         <span className="min-w-0 truncate text-sm font-medium">{meta.label}</span>
@@ -470,15 +471,7 @@ function EmptyHint() {
   );
 }
 
-function Stat({
-  label,
-  value,
-  hint,
-}: {
-  label: string;
-  value: string | number;
-  hint?: string;
-}) {
+function Stat({ label, value, hint }: { label: string; value: string | number; hint?: string }) {
   return (
     <div className="rounded-2xl border border-black/10 bg-white/70 p-4 backdrop-blur">
       <div className="text-xs uppercase tracking-widest text-black/50">{label}</div>

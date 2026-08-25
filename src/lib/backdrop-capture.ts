@@ -114,6 +114,6 @@ export function backdropFilename(b: ImportedBackdrop | null, slideIndex: number)
     ? backdropBasename(b.path).replace(/\.[a-z0-9]+$/i, "")
     : (b?.kind ?? "backdrop");
   return (
-    `backdrop-slide-${slideIndex + 1}-${base}`.replace(/[^\w.\-]+/g, "-").slice(0, 120) + ".png"
+    `backdrop-slide-${slideIndex + 1}-${base}`.replace(/[^\w.-]+/g, "-").slice(0, 120) + ".png"
   );
 }

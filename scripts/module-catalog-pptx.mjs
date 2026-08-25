@@ -130,7 +130,6 @@ async function main() {
   if (bad.length) process.exitCode = 1;
 }
 
-
 main().catch((err) => {
   console.error(err);
   process.exitCode = 1;

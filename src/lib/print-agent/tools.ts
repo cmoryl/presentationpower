@@ -533,7 +533,10 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       inputSchema: z.object({
         assetId: z.string().uuid(),
         page: z.number().int().min(0).max(40).optional(),
-        formats: z.array(z.enum(["pdf", "png", "svg"])).min(1).optional(),
+        formats: z
+          .array(z.enum(["pdf", "png", "svg"]))
+          .min(1)
+          .optional(),
         note: z.string().max(200).optional(),
       }),
       execute: async ({ assetId, page, formats, note }) => {
@@ -551,8 +554,6 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
         };
       },
     }),
-
-
 
     list_my_print_assets: tool({
       description: "List the print pieces the signed-in user already owns.",

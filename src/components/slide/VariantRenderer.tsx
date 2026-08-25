@@ -8878,7 +8878,7 @@ function renderVariantBody({
         };
       };
       const numeric = (v: string) => {
-        const m = String(v).replace(/[^0-9.\-]/g, "");
+        const m = String(v).replace(/[^0-9.-]/g, "");
         const n = parseFloat(m);
         return Number.isFinite(n) ? n : 60;
       };

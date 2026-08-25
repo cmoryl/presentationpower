@@ -41,7 +41,6 @@ function adoptedOf(blocks: readonly CanvasBlock[] | undefined | null): CanvasBlo
   return blocks.filter((b) => !!b.sourceSelector && !isDroppableAdoptedMirror(b));
 }
 
-
 /**
  * Hide every module element that an adopted canvas block has taken over.
  * Returns a restore function. Safe to call with no blocks (no-op).

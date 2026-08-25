@@ -8,7 +8,7 @@ import { paletteFromTheme, echartsInk } from "./echarts-theme";
 function n(v: unknown): number {
   if (typeof v === "number" && Number.isFinite(v)) return v;
   if (typeof v === "string") {
-    const parsed = Number(v.replace(/[^0-9.\-]/g, ""));
+    const parsed = Number(v.replace(/[^0-9.-]/g, ""));
     return Number.isFinite(parsed) ? parsed : 0;
   }
   return 0;

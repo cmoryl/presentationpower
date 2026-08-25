@@ -112,11 +112,9 @@ const page = await context.newPage();
  * style anywhere in the app and it is swept on the next run — no counts here.
  */
 await page.goto(`${BASE}/dev/social-corners`, { waitUntil: "domcontentloaded" });
-const PLAN = await page.waitForFunction(
-  () => window.__SOCIAL_CORNER_SWEEP__ ?? null,
-  undefined,
-  { timeout: 60_000 },
-).then((h) => h.jsonValue());
+const PLAN = await page
+  .waitForFunction(() => window.__SOCIAL_CORNER_SWEEP__ ?? null, undefined, { timeout: 60_000 })
+  .then((h) => h.jsonValue());
 
 const CFG = PLAN.config;
 /** Max share of differing pixels in a corner crop before it's a regression. */
@@ -161,150 +159,156 @@ const results = [];
 const nextBaseline = { ...baseline, cases: { ...(baseline.cases ?? {}) } };
 
 for (const mode of MODES) {
- for (const brand of BRANDS) {
-  for (const style of STYLES) {
-    await page.goto(`${BASE}/dev/social-corners?style=${style}&mode=${mode}&brand=${brand}`, {
-      waitUntil: "domcontentloaded",
-    });
-    await page.waitForFunction(
-      () => document.querySelectorAll("[data-corner-case]").length > 0,
-      undefined,
-      { timeout: 60_000 },
-    );
-    await page.waitForTimeout(600); // let backdrop-filter/blur settle
-
-    const count = await page.locator("[data-corner-case]").count();
-    for (let i = 0; i < count; i++) {
-      // Re-resolve per iteration: a dev-server HMR ping can invalidate a held
-      // element handle mid-sweep ("Cannot find context with specified id").
-      const frame = page.locator("[data-corner-case]").nth(i);
-      const key = await frame.getAttribute("data-corner-case");
-      const formatId = await frame.getAttribute("data-corner-format");
-      if (FORMAT_FILTER && !FORMAT_FILTER.has(formatId)) continue;
-      const caseKey = `${mode}/${key}`;
-
-      // ---- Geometry: what the browser will actually paint ------------------
-      const geom = await frame.evaluate((el) => {
-        const plate = el.querySelector("[data-social-plate]");
-        const stage = el.querySelector("[data-kit-asset-frame]");
-        if (!plate || !stage) return null;
-        const pr = plate.getBoundingClientRect();
-        const sr = stage.getBoundingClientRect();
-        const cs = getComputedStyle(plate);
-        // Radius as painted, in the plate's own (already scaled) CSS px.
-        const raw = parseFloat(cs.borderTopLeftRadius) || 0;
-        const scale = pr.width ? pr.width / plate.offsetWidth : 1;
-        return {
-          radiusPx: raw * scale,
-          plateW: pr.width,
-          plateH: pr.height,
-          shortEdge: Math.min(sr.width, sr.height),
-          corners: [
-            cs.borderTopLeftRadius,
-            cs.borderTopRightRadius,
-            cs.borderBottomRightRadius,
-            cs.borderBottomLeftRadius,
-          ],
-          x: pr.x,
-          y: pr.y,
-        };
+  for (const brand of BRANDS) {
+    for (const style of STYLES) {
+      await page.goto(`${BASE}/dev/social-corners?style=${style}&mode=${mode}&brand=${brand}`, {
+        waitUntil: "domcontentloaded",
       });
+      await page.waitForFunction(
+        () => document.querySelectorAll("[data-corner-case]").length > 0,
+        undefined,
+        { timeout: 60_000 },
+      );
+      await page.waitForTimeout(600); // let backdrop-filter/blur settle
 
-      if (!geom) {
-        // Panel/plate-less compositions legitimately have no plate; skip but
-        // record so a plate vanishing from a style that had one is visible.
-        results.push({ case: caseKey, ok: true, skipped: "no-plate" });
-        continue;
-      }
+      const count = await page.locator("[data-corner-case]").count();
+      for (let i = 0; i < count; i++) {
+        // Re-resolve per iteration: a dev-server HMR ping can invalidate a held
+        // element handle mid-sweep ("Cannot find context with specified id").
+        const frame = page.locator("[data-corner-case]").nth(i);
+        const key = await frame.getAttribute("data-corner-case");
+        const formatId = await frame.getAttribute("data-corner-format");
+        if (FORMAT_FILTER && !FORMAT_FILTER.has(formatId)) continue;
+        const caseKey = `${mode}/${key}`;
 
-      const radiusPct = geom.shortEdge ? (geom.radiusPx / geom.shortEdge) * 100 : 0;
-      const problems = [];
-      if (radiusPct > MAX_RADIUS_PCT + 0.25)
-        problems.push(
-          `corner radius ${radiusPct.toFixed(2)}% of short edge exceeds the ${MAX_RADIUS_PCT}% cap (ellipse/pill regression)`,
-        );
-      if (geom.radiusPx > Math.min(geom.plateW, geom.plateH) / 2 - 0.5)
-        problems.push("corner radius reaches half the plate's short side — plate renders as a pill");
-      if (new Set(geom.corners).size > 1)
-        problems.push(`unequal corners: ${geom.corners.join(" / ")}`);
-
-      // ---- Pixel: crop the four corners out of the rendered frame ---------
-      const shot = await screenshotWithRetry(frame);
-      const png = PNG.sync.read(shot);
-      const fbox = await frame.boundingBox();
-      const ox = Math.round(geom.x - fbox.x);
-      const oy = Math.round(geom.y - fbox.y);
-      const corners = {
-        tl: [ox, oy],
-        tr: [Math.round(ox + geom.plateW - CROP), oy],
-        br: [Math.round(ox + geom.plateW - CROP), Math.round(oy + geom.plateH - CROP)],
-        bl: [ox, Math.round(oy + geom.plateH - CROP)],
-      };
-
-      const dir = path.join(OUT, mode, style);
-      await mkdir(dir, { recursive: true });
-
-      let worstMismatch = 0;
-      for (const [name, [cx, cy]] of Object.entries(corners)) {
-        const crop = new PNG({ width: CROP, height: CROP });
-        // Clamp so a plate flush to the frame edge still yields a full crop.
-        const sx = Math.max(0, Math.min(cx, png.width - CROP));
-        const sy = Math.max(0, Math.min(cy, png.height - CROP));
-        PNG.bitblt(png, crop, sx, sy, CROP, CROP, 0, 0);
-        const file = path.join(dir, `${formatId}.${name}.png`);
-
-        if (UPDATE || !existsSync(file)) {
-          await writeFile(file, PNG.sync.write(crop));
-          continue;
-        }
-        const golden = PNG.sync.read(await readFile(file));
-        if (golden.width !== CROP || golden.height !== CROP) {
-          problems.push(`${name}: golden crop is ${golden.width}×${golden.height}, expected ${CROP}×${CROP}`);
-          continue;
-        }
-        const diff = new PNG({ width: CROP, height: CROP });
-        const differing = pixelmatch(golden.data, crop.data, diff.data, CROP, CROP, {
-          threshold: 0.12,
+        // ---- Geometry: what the browser will actually paint ------------------
+        const geom = await frame.evaluate((el) => {
+          const plate = el.querySelector("[data-social-plate]");
+          const stage = el.querySelector("[data-kit-asset-frame]");
+          if (!plate || !stage) return null;
+          const pr = plate.getBoundingClientRect();
+          const sr = stage.getBoundingClientRect();
+          const cs = getComputedStyle(plate);
+          // Radius as painted, in the plate's own (already scaled) CSS px.
+          const raw = parseFloat(cs.borderTopLeftRadius) || 0;
+          const scale = pr.width ? pr.width / plate.offsetWidth : 1;
+          return {
+            radiusPx: raw * scale,
+            plateW: pr.width,
+            plateH: pr.height,
+            shortEdge: Math.min(sr.width, sr.height),
+            corners: [
+              cs.borderTopLeftRadius,
+              cs.borderTopRightRadius,
+              cs.borderBottomRightRadius,
+              cs.borderBottomLeftRadius,
+            ],
+            x: pr.x,
+            y: pr.y,
+          };
         });
-        const pct = (differing / (CROP * CROP)) * 100;
-        worstMismatch = Math.max(worstMismatch, pct);
-        if (pct > TOLERANCE_PCT && PIXEL_GATE) {
-          const actual = path.join(dir, `${formatId}.${name}.actual.png`);
-          await writeFile(actual, PNG.sync.write(crop));
-          await writeFile(path.join(dir, `${formatId}.${name}.diff.png`), PNG.sync.write(diff));
-          problems.push(`${name} corner drifted ${pct.toFixed(3)}% (tolerance ${TOLERANCE_PCT}%)`);
+
+        if (!geom) {
+          // Panel/plate-less compositions legitimately have no plate; skip but
+          // record so a plate vanishing from a style that had one is visible.
+          results.push({ case: caseKey, ok: true, skipped: "no-plate" });
+          continue;
         }
-      }
 
-      // ---- Golden geometry fingerprint ------------------------------------
-      const fingerprint = {
-        radiusPx: Number(geom.radiusPx.toFixed(3)),
-        radiusPct: Number(radiusPct.toFixed(3)),
-        shortEdge: Math.round(geom.shortEdge),
-      };
-      const prior = nextBaseline.cases[caseKey];
-      if (UPDATE || !prior) {
-        nextBaseline.cases[caseKey] = fingerprint;
-      } else {
-        if (Math.abs(prior.radiusPx - fingerprint.radiusPx) > RADIUS_TOL_PX)
+        const radiusPct = geom.shortEdge ? (geom.radiusPx / geom.shortEdge) * 100 : 0;
+        const problems = [];
+        if (radiusPct > MAX_RADIUS_PCT + 0.25)
           problems.push(
-            `radius drifted ${prior.radiusPx}px → ${fingerprint.radiusPx}px (tolerance ${RADIUS_TOL_PX}px)`,
+            `corner radius ${radiusPct.toFixed(2)}% of short edge exceeds the ${MAX_RADIUS_PCT}% cap (ellipse/pill regression)`,
           );
-        if (prior.shortEdge !== fingerprint.shortEdge)
-          problems.push(`frame short edge changed ${prior.shortEdge} → ${fingerprint.shortEdge}`);
-      }
+        if (geom.radiusPx > Math.min(geom.plateW, geom.plateH) / 2 - 0.5)
+          problems.push(
+            "corner radius reaches half the plate's short side — plate renders as a pill",
+          );
+        if (new Set(geom.corners).size > 1)
+          problems.push(`unequal corners: ${geom.corners.join(" / ")}`);
 
-      results.push({
-        case: caseKey,
-        brand,
-        ok: problems.length === 0,
-        ...fingerprint,
-        worstMismatchPct: Number(worstMismatch.toFixed(3)),
-        problems,
-      });
+        // ---- Pixel: crop the four corners out of the rendered frame ---------
+        const shot = await screenshotWithRetry(frame);
+        const png = PNG.sync.read(shot);
+        const fbox = await frame.boundingBox();
+        const ox = Math.round(geom.x - fbox.x);
+        const oy = Math.round(geom.y - fbox.y);
+        const corners = {
+          tl: [ox, oy],
+          tr: [Math.round(ox + geom.plateW - CROP), oy],
+          br: [Math.round(ox + geom.plateW - CROP), Math.round(oy + geom.plateH - CROP)],
+          bl: [ox, Math.round(oy + geom.plateH - CROP)],
+        };
+
+        const dir = path.join(OUT, mode, style);
+        await mkdir(dir, { recursive: true });
+
+        let worstMismatch = 0;
+        for (const [name, [cx, cy]] of Object.entries(corners)) {
+          const crop = new PNG({ width: CROP, height: CROP });
+          // Clamp so a plate flush to the frame edge still yields a full crop.
+          const sx = Math.max(0, Math.min(cx, png.width - CROP));
+          const sy = Math.max(0, Math.min(cy, png.height - CROP));
+          PNG.bitblt(png, crop, sx, sy, CROP, CROP, 0, 0);
+          const file = path.join(dir, `${formatId}.${name}.png`);
+
+          if (UPDATE || !existsSync(file)) {
+            await writeFile(file, PNG.sync.write(crop));
+            continue;
+          }
+          const golden = PNG.sync.read(await readFile(file));
+          if (golden.width !== CROP || golden.height !== CROP) {
+            problems.push(
+              `${name}: golden crop is ${golden.width}×${golden.height}, expected ${CROP}×${CROP}`,
+            );
+            continue;
+          }
+          const diff = new PNG({ width: CROP, height: CROP });
+          const differing = pixelmatch(golden.data, crop.data, diff.data, CROP, CROP, {
+            threshold: 0.12,
+          });
+          const pct = (differing / (CROP * CROP)) * 100;
+          worstMismatch = Math.max(worstMismatch, pct);
+          if (pct > TOLERANCE_PCT && PIXEL_GATE) {
+            const actual = path.join(dir, `${formatId}.${name}.actual.png`);
+            await writeFile(actual, PNG.sync.write(crop));
+            await writeFile(path.join(dir, `${formatId}.${name}.diff.png`), PNG.sync.write(diff));
+            problems.push(
+              `${name} corner drifted ${pct.toFixed(3)}% (tolerance ${TOLERANCE_PCT}%)`,
+            );
+          }
+        }
+
+        // ---- Golden geometry fingerprint ------------------------------------
+        const fingerprint = {
+          radiusPx: Number(geom.radiusPx.toFixed(3)),
+          radiusPct: Number(radiusPct.toFixed(3)),
+          shortEdge: Math.round(geom.shortEdge),
+        };
+        const prior = nextBaseline.cases[caseKey];
+        if (UPDATE || !prior) {
+          nextBaseline.cases[caseKey] = fingerprint;
+        } else {
+          if (Math.abs(prior.radiusPx - fingerprint.radiusPx) > RADIUS_TOL_PX)
+            problems.push(
+              `radius drifted ${prior.radiusPx}px → ${fingerprint.radiusPx}px (tolerance ${RADIUS_TOL_PX}px)`,
+            );
+          if (prior.shortEdge !== fingerprint.shortEdge)
+            problems.push(`frame short edge changed ${prior.shortEdge} → ${fingerprint.shortEdge}`);
+        }
+
+        results.push({
+          case: caseKey,
+          brand,
+          ok: problems.length === 0,
+          ...fingerprint,
+          worstMismatchPct: Number(worstMismatch.toFixed(3)),
+          problems,
+        });
+      }
     }
   }
- }
 }
 
 await browser.close();

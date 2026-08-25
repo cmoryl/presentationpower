@@ -199,7 +199,10 @@ function verdictFor({ error, build, lo, textBoxes, score }) {
   const ratio = b.coverage > 0 ? l.coverage / b.coverage : 1;
 
   if (loWhite > 0.97)
-    return { verdict: "BROKEN", defect: "LibreOffice render is blank white — no slide content survived the export" };
+    return {
+      verdict: "BROKEN",
+      defect: "LibreOffice render is blank white — no slide content survived the export",
+    };
   if (l.colors < 12)
     return {
       verdict: "BROKEN",
@@ -213,7 +216,8 @@ function verdictFor({ error, build, lo, textBoxes, score }) {
   if (textBoxes === 0)
     return {
       verdict: "DEGRADED",
-      defect: "exporter emitted zero text objects — copy is baked into imagery instead of being editable",
+      defect:
+        "exporter emitted zero text objects — copy is baked into imagery instead of being editable",
     };
   if (ratio < 0.7)
     return {
@@ -237,7 +241,10 @@ function verdictFor({ error, build, lo, textBoxes, score }) {
 }
 
 function esc(s) {
-  return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  return String(s).replace(
+    /[&<>"]/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+  );
 }
 
 async function toWebp(pngPath, width = 620, quality = 55) {
@@ -248,7 +255,18 @@ async function toWebp(pngPath, width = 620, quality = 55) {
     await new Promise((resolve, reject) => {
       const ps = spawn(
         "ffmpeg",
-        ["-y", "-loglevel", "error", "-i", pngPath, "-vf", `scale=${width}:-1`, "-quality", String(quality), out],
+        [
+          "-y",
+          "-loglevel",
+          "error",
+          "-i",
+          pngPath,
+          "-vf",
+          `scale=${width}:-1`,
+          "-quality",
+          String(quality),
+          out,
+        ],
         { stdio: "ignore" },
       );
       ps.on("error", reject);
@@ -262,8 +280,8 @@ async function toWebp(pngPath, width = 620, quality = 55) {
   }
 }
 
-
-const HARNESS_RE = /reading 'pixel'|__tpExportVerify|Execution context was destroyed|navigation|Target (page|closed)|detached/i;
+const HARNESS_RE =
+  /reading 'pixel'|__tpExportVerify|Execution context was destroyed|navigation|Target (page|closed)|detached/i;
 const CELLS_PER_PAGE = 8; // proactive recycle: a fresh page every N cells beats waiting for HMR to kill us
 
 async function openHarness(ctx, existing) {
@@ -289,13 +307,19 @@ async function main() {
   let page = await openHarness(ctx, null);
 
   const all = await page.evaluate(() => window.__tpExportVerify.variants);
-  let variants = ONLY.length ? all.filter((v) => ONLY.includes(v)) : all.filter((v) => FAMILY_RE.test(v));
+  let variants = ONLY.length
+    ? all.filter((v) => ONLY.includes(v))
+    : all.filter((v) => FAMILY_RE.test(v));
   if (SAMPLE > 0 && SAMPLE < variants.length) {
     const step = variants.length / SAMPLE;
-    variants = [...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)]))];
+    variants = [
+      ...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)])),
+    ];
   }
 
-  console.log(`export-gallery: ${variants.length} variant(s), mode ${MODE}, fidelity = shipping default`);
+  console.log(
+    `export-gallery: ${variants.length} variant(s), mode ${MODE}, fidelity = shipping default`,
+  );
 
   const tmpRoot = await mkdtemp(path.join(os.tmpdir(), "export-gallery-"));
   const rows = [];
@@ -344,7 +368,9 @@ async function main() {
         build: null,
         lo: null,
       });
-      console.log(`  ${i + 1}/${variants.length} ${id} · ${harness ? "UNTESTED (harness)" : "BROKEN"}`);
+      console.log(
+        `  ${i + 1}/${variants.length} ${id} · ${harness ? "UNTESTED (harness)" : "BROKEN"}`,
+      );
       continue;
     }
     if (!cap?.pptx || !cap?.build) {
@@ -358,7 +384,6 @@ async function main() {
       console.log(`  ${i + 1}/${variants.length} ${id} · BROKEN (${cap?.error ?? "no capture"})`);
       continue;
     }
-
 
     const workDir = path.join(tmpRoot, id.replace(/[^A-Za-z0-9-]/g, "_"));
     await mkdir(workDir, { recursive: true });
@@ -389,7 +414,12 @@ async function main() {
         });
         score = Number((1 - mismatched / (W * H)).toFixed(4));
       }
-      judged = verdictFor({ build: buildPng, lo: loPng, textBoxes: (cap.textRects ?? []).length, score });
+      judged = verdictFor({
+        build: buildPng,
+        lo: loPng,
+        textBoxes: (cap.textRects ?? []).length,
+        score,
+      });
     }
 
     rows.push({
@@ -400,7 +430,6 @@ async function main() {
       textBoxes: (cap.textRects ?? []).length,
       build: await toWebp(buildPath),
       lo: loPath ? await toWebp(loPath) : null,
-
     });
     console.log(
       `  ${i + 1}/${variants.length} ${id} · ${judged.verdict} · ${judged.defect.slice(0, 110)}`,

@@ -189,8 +189,5 @@ export async function assertNoSpillOrCollision(page: Page, root: string, label: 
   const spills = await measureTextSpill(page, root);
   expect(spills, `${label}: text spills its container — ${JSON.stringify(spills)}`).toEqual([]);
   const collisions = await measureCollisions(page, root);
-  expect(
-    collisions,
-    `${label}: text blocks collide — ${JSON.stringify(collisions)}`,
-  ).toEqual([]);
+  expect(collisions, `${label}: text blocks collide — ${JSON.stringify(collisions)}`).toEqual([]);
 }

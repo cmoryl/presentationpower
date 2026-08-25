@@ -35,11 +35,9 @@ type Metrics = {
 };
 
 function metricsFor(image: string): Metrics {
-  const out = execFileSync(
-    "python3",
-    [METRICS, image, "--band", ...BAND, "--header", ...HEADER],
-    { maxBuffer: 64 * 1024 * 1024 },
-  ).toString();
+  const out = execFileSync("python3", [METRICS, image, "--band", ...BAND, "--header", ...HEADER], {
+    maxBuffer: 64 * 1024 * 1024,
+  }).toString();
   return JSON.parse(out) as Metrics;
 }
 
@@ -80,7 +78,6 @@ function pairPins(expected: Pt[], got: Pt[], tol: number) {
   return { matched: used.size, leftover: got.length - used.size, worst };
 }
 
-
 /** Pin centres from the live SVG, normalised to the print page box. */
 async function domPins(page: Page) {
   return page.evaluate(() => {
@@ -96,7 +93,6 @@ async function domPins(page: Page) {
         kind: fill.includes("139dd8") ? "service" : "prod",
       };
     });
-
   });
 }
 
@@ -115,8 +111,8 @@ async function domHeader(page: Page) {
       };
     };
     const logo = host.querySelector('img[alt="TransPerfect"]');
-    const text = Array.from(host.querySelectorAll<HTMLElement>("*")).filter((el) =>
-      /OUR FOOTPRINT/i.test(el.textContent ?? "") && el.children.length === 0,
+    const text = Array.from(host.querySelectorAll<HTMLElement>("*")).filter(
+      (el) => /OUR FOOTPRINT/i.test(el.textContent ?? "") && el.children.length === 0,
     );
     return {
       logo: logo ? norm(logo) : null,
@@ -167,10 +163,19 @@ test.describe("Global Locations map — export parity", () => {
     const screenPair = pairPins(dom, sortPins(screen.pins), POS_TOL);
     expect(screenPair.matched, "detector could not pair on-screen pins").toBe(dom.length);
 
-
     // ---- PDF -------------------------------------------------------------
     const pdf = await exportAs(page, "PDF", dir, "parity.pdf");
-    execFileSync("pdftoppm", ["-png", "-r", "150", "-f", "1", "-l", "1", pdf, path.join(dir, "pdf")]);
+    execFileSync("pdftoppm", [
+      "-png",
+      "-r",
+      "150",
+      "-f",
+      "1",
+      "-l",
+      "1",
+      pdf,
+      path.join(dir, "pdf"),
+    ]);
     const pdfPng = readdirSync(dir)
       .filter((f) => f.startsWith("pdf-") && f.endsWith(".png"))
       .map((f) => path.join(dir, f))[0]!;
@@ -208,11 +213,9 @@ test.describe("Global Locations map — export parity", () => {
         `${label}: pin kind colours drifted`,
       ).toEqual([]);
 
-
       // Header band signature must match the on-screen header.
       const delta =
-        m.header.reduce((sum, v, i) => sum + Math.abs(v - screen.header[i]!), 0) /
-        m.header.length;
+        m.header.reduce((sum, v, i) => sum + Math.abs(v - screen.header[i]!), 0) / m.header.length;
       expect(delta, `${label}: header layout drifted (mean Δ ${delta.toFixed(1)})`).toBeLessThan(
         HEADER_TOL,
       );

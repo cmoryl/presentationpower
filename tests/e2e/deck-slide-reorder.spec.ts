@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { createDeckViaSkipAI } from "./helpers/create-deck";
 
-
 test.describe("Deck editor gallery drag reordering", () => {
   test("dragging a thumbnail onto another slot swaps their order", async ({ page }) => {
     await createDeckViaSkipAI(page);
@@ -20,9 +19,7 @@ test.describe("Deck editor gallery drag reordering", () => {
     // HTML5 drag events are simulated so the reorder is deterministic across
     // browsers — mouse-based dragging is flaky for native DnD in Chromium.
     await page.evaluate(() => {
-      const nodes = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-slide-thumb]"),
-      );
+      const nodes = Array.from(document.querySelectorAll<HTMLElement>("[data-slide-thumb]"));
       const dt = new DataTransfer();
       const fire = (el: HTMLElement, type: string) =>
         el.dispatchEvent(

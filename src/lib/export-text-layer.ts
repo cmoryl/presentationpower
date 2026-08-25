@@ -88,7 +88,7 @@ function resolveColor(color: string): { hex: string; alpha: number } | null {
   const m = color.match(/rgba?\(([^)]+)\)/i);
   if (m) {
     const parts = m[1]
-      .split(/[\s,\/]+/)
+      .split(/[\s,/]+/)
       .filter(Boolean)
       .map((p) => parseFloat(p));
     const [r, g, b] = parts;

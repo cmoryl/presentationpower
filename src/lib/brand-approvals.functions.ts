@@ -103,11 +103,9 @@ export const requestApproval = createServerFn({ method: "POST" })
         note: data.summary ?? null,
         meta: { blocking, warnings, title: data.title.trim() },
       });
-      await (await import("./notify-approvals.server")).notifyReviewers(
-        existing.id,
-        data.title.trim(),
-        userId,
-      );
+      await (
+        await import("./notify-approvals.server")
+      ).notifyReviewers(existing.id, data.title.trim(), userId);
       return { id: existing.id, reopened: true as const };
     }
 
@@ -130,22 +128,17 @@ export const requestApproval = createServerFn({ method: "POST" })
       note: data.summary ?? null,
       meta: { blocking, warnings, title: data.title.trim() },
     });
-    await (await import("./notify-approvals.server")).notifyReviewers(
-      row.id,
-      data.title.trim(),
-      userId,
-    );
+    await (
+      await import("./notify-approvals.server")
+    ).notifyReviewers(row.id, data.title.trim(), userId);
     return { id: row.id, reopened: false as const };
   });
-
 
 /** The reviewer queue. Reviewers see everything; others see their own submissions. */
 export const listApprovalRequests = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) =>
-    z
-      .object({ status: Status.optional(), subjectType: SubjectType.optional() })
-      .parse(raw ?? {}),
+    z.object({ status: Status.optional(), subjectType: SubjectType.optional() }).parse(raw ?? {}),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -280,7 +273,9 @@ export const decideApproval = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
 
-    await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+    await (
+      await import("./approval-events.server")
+    ).logApprovalEvent(supabase, {
       requestId: data.id,
       actorId: userId,
       kind:
@@ -308,7 +303,9 @@ export const decideApproval = createServerFn({ method: "POST" })
       });
     }
 
-    await (await import("./notify-approvals.server")).notifyRequesters(
+    await (
+      await import("./notify-approvals.server")
+    ).notifyRequesters(
       [data.id],
       data.status === "approved" ? "approved" : "changes_requested",
       userId,
@@ -340,9 +337,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       .from("approval_requests")
       .select("id, status")
       .in("id", data.ids);
-    const priorStatus = Object.fromEntries(
-      (before ?? []).map((r) => [r.id, r.status as string]),
-    );
+    const priorStatus = Object.fromEntries((before ?? []).map((r) => [r.id, r.status as string]));
     const { error } = await supabase
       .from("approval_requests")
       .update({
@@ -353,7 +348,9 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })
       .in("id", data.ids);
     if (error) throw new Error(error.message);
-    await (await import("./approval-events.server")).logApprovalEvents(
+    await (
+      await import("./approval-events.server")
+    ).logApprovalEvents(
       supabase,
       data.ids.map((id) => ({
         requestId: id,
@@ -366,12 +363,9 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
       })),
     );
 
-    await (await import("./notify-approvals.server")).notifyRequesters(
-      data.ids,
-      data.status,
-      userId,
-      data.note?.trim() || null,
-    );
+    await (
+      await import("./notify-approvals.server")
+    ).notifyRequesters(data.ids, data.status, userId, data.note?.trim() || null);
     return { ok: true, count: data.ids.length };
   });
 
@@ -403,9 +397,7 @@ export const listApprovalComments = createServerFn({ method: "POST" })
 export const postApprovalComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) =>
-    z
-      .object({ requestId: z.string().uuid(), body: z.string().min(1).max(4000) })
-      .parse(raw),
+    z.object({ requestId: z.string().uuid(), body: z.string().min(1).max(4000) }).parse(raw),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -415,18 +407,18 @@ export const postApprovalComment = createServerFn({ method: "POST" })
       body: data.body.trim(),
     });
     if (error) throw new Error(error.message);
-    await (await import("./approval-events.server")).logApprovalEvent(supabase, {
+    await (
+      await import("./approval-events.server")
+    ).logApprovalEvent(supabase, {
       requestId: data.requestId,
       actorId: userId,
       kind: "comment",
       note: data.body.trim(),
     });
 
-    await (await import("./notify-approvals.server")).notifyThread(
-      data.requestId,
-      userId,
-      data.body.trim(),
-    );
+    await (
+      await import("./notify-approvals.server")
+    ).notifyThread(data.requestId, userId, data.body.trim());
     return { ok: true };
   });
 
@@ -478,7 +470,8 @@ export const listApprovalTimeline = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    if (!req) return {
+    if (!req)
+      return {
         request: null,
         events: [] as ApprovalTimelineEvent[],
         people: {} as Record<string, string>,

@@ -17,7 +17,6 @@ import { ICON_LIBRARY } from "./icon-library";
 import { BRAND_GUIDES, getBrandGuide, type BrandGuide } from "./brand-guides";
 import { NEXT_DIVISIONS } from "./next-brand-guide";
 
-
 export interface ApprovedIcon {
   /** Lucide name, as used by `iconByName` and icon overrides. */
   name: string;
@@ -65,7 +64,6 @@ export function iconColorOptions(slugOrGuide: string | BrandGuide): IconColorOpt
   }
   const guide = typeof slugOrGuide === "string" ? getBrandGuide(slugOrGuide) : slugOrGuide;
   const out: IconColorOption[] = [
-
     { name: "Blue 800", hex: "#03002C", note: "Default on light surfaces" },
     { name: "Blue 500", hex: "#003FC7", note: "Primary brand blue" },
   ];
@@ -100,7 +98,11 @@ export function nextIconColorOptions(slug: string): IconColorOption[] {
   };
   if (division) {
     push(`${division.name} accent`, division.accent, "Track accent — highlights only");
-    push(`${division.name} artwork accent`, division.accentArtwork, "As built in the vector masters");
+    push(
+      `${division.name} artwork accent`,
+      division.accentArtwork,
+      "As built in the vector masters",
+    );
   } else {
     for (const d of NEXT_DIVISIONS.slice(0, 6)) {
       push(`${d.name} accent`, d.accent, "Track accent — highlights only");
@@ -111,7 +113,6 @@ export function nextIconColorOptions(slug: string): IconColorOption[] {
   push("Dark Gray", "#666666", "Muted / secondary rows");
   return out;
 }
-
 
 // ── Shared cores ────────────────────────────────────────────────────────
 // Every division inherits these two sub-areas so a deck built in any division
@@ -853,7 +854,6 @@ for (const division of NEXT_DIVISIONS) {
 }
 
 const VALID_NAMES = new Set(ICON_LIBRARY.map((e) => e.name));
-
 
 /** Minimum approved glyphs published in every sub-area of every guide. */
 export const SUB_AREA_MIN_SIZE = 50;

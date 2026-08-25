@@ -26,7 +26,7 @@ function s(v: unknown, fb = ""): string {
 function n(v: unknown): number | null {
   if (typeof v === "number" && Number.isFinite(v)) return v;
   if (typeof v === "string") {
-    const parsed = Number(v.replace(/[^0-9.\-]/g, ""));
+    const parsed = Number(v.replace(/[^0-9.-]/g, ""));
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;

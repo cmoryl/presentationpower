@@ -138,7 +138,7 @@ export function safeFilename(parts: Array<string | number | undefined>, ext = "p
     parts
       .filter(Boolean)
       .join("-")
-      .replace(/[^\w.\-]+/g, "-")
+      .replace(/[^\w.-]+/g, "-")
       .slice(0, 120) + `.${ext}`
   );
 }

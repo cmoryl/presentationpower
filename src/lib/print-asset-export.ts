@@ -319,8 +319,11 @@ export async function exportPrintAssetAsPdf(
   // owns the rest. Per-page capture progress is folded into that page's slice
   // so the bar only ever moves forward, and the message always names the page
   // being worked on (multi-page exports otherwise looked frozen for minutes).
-  const emit = (progress: number, message: string, stage: "render" | "encode" | "done" = "render") =>
-    opts.onProgress?.({ stage, progress: Math.max(0, Math.min(1, progress)), message });
+  const emit = (
+    progress: number,
+    message: string,
+    stage: "render" | "encode" | "done" = "render",
+  ) => opts.onProgress?.({ stage, progress: Math.max(0, Math.min(1, progress)), message });
   const pageSpan = 0.88 / pages.length;
   const pageLabel = (i: number) =>
     pages.length === 1 ? "page" : `page ${i + 1} of ${pages.length}`;
@@ -398,7 +401,6 @@ export async function exportPrintAssetAsPdf(
     }
   }
 
-
   if (bleedApproximated) {
     console.warn(
       `[print-asset-export] Bleed band (${bleed}in) was filled by edge clamp, not by authored ` +
@@ -414,7 +416,6 @@ export async function exportPrintAssetAsPdf(
   emit(0.9, "Writing the PDF file…", "encode");
   const rasterBytesArr = new Uint8Array(pdf.output("arraybuffer"));
 
-
   // PASS B — vector-text overlay.
   let workingBytes: Uint8Array = rasterBytesArr;
   const vectorReport: VectorTextReport = {
@@ -429,7 +430,6 @@ export async function exportPrintAssetAsPdf(
   if (vectorText && captures.length > 0) {
     emit(0.93, "Embedding selectable text…", "encode");
     try {
-
       const overlay = await overlayVectorText(workingBytes, {
         pageWidthIn: pageWidth,
         pageHeightIn: pageHeight,
@@ -477,7 +477,6 @@ export async function exportPrintAssetAsPdf(
   }
   emit(1, "Saved", "done");
 }
-
 
 /** Convert a PNG data URL to a JPEG data URL with a mode-appropriate flat
  *  background so transparent pixels don't come out black. Runs in-browser. */

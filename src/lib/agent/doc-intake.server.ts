@@ -27,7 +27,10 @@ function attr(tag: string, name: string): string | null {
 }
 
 /** Inner XML of the first `<tag ...>…</tag>`, nesting-aware. */
-function firstBlock(xml: string, tag: string): { inner: string; start: number; end: number } | null {
+function firstBlock(
+  xml: string,
+  tag: string,
+): { inner: string; start: number; end: number } | null {
   const open = new RegExp(`<${tag}(?:\\s[^>]*)?>`, "g");
   const m = open.exec(xml);
   if (!m) return null;
@@ -67,7 +70,10 @@ function blocks(xml: string, tag: string): string[] {
 }
 
 function collapse(s: string): string {
-  return s.replace(/[ \t]{2,}/g, " ").replace(/[ \t]+$/gm, "").trim();
+  return s
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/[ \t]+$/gm, "")
+    .trim();
 }
 
 function tidy(s: string): string {

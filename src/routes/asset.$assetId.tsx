@@ -552,6 +552,18 @@ function AssetEditor() {
   // stays identical on every render.
   const [imageBusy, setImageBusy] = useState(false);
 
+  // The PDF page must match the AUTHORED trim. Exporting a Letter canvas onto
+  // an A4 page letterboxed the artwork (white bands, nothing full bleed), so
+  // the export size follows the layout unless the user picks another size
+  // themselves. Read from the row directly — this runs before `ctx` exists.
+  const authoredPageSize = ((row?.context as PrintAssetContext | null)?.pageSize ??
+    "A4") as PrintPageSize;
+  const sizeTouchedRef = useRef(false);
+  useEffect(() => {
+    if (sizeTouchedRef.current) return;
+    setExportSize((prev) => (prev === authoredPageSize ? prev : authoredPageSize));
+  }, [authoredPageSize]);
+
   if (loading)
     return (
       <AppShell>
@@ -676,7 +688,7 @@ function AssetEditor() {
     value: unknown,
   ): Record<string, unknown> {
     const parts: (string | number)[] = path.split(".").flatMap((p) => {
-      const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
+      const m = /^([^[]+)(\[(\d+)\])?$/.exec(p);
       if (!m) return [p];
       return m[3] !== undefined ? [m[1]!, Number(m[3])] : [m[1]!];
     });
@@ -930,7 +942,6 @@ function AssetEditor() {
     }
   }
 
-
   // Multi-page proposals render every page stacked inside the canvas, so the
   // canvas cannot be pinned to a single page aspect ratio.
   const multiDoc =
@@ -951,15 +962,8 @@ function AssetEditor() {
   // spread and looked flat). Landscape stays at native 1280×720.
   const auroraAspect: { w: number; h: number } | undefined = pageAuroraFrame(pageSize);
 
-  // The PDF page must match the AUTHORED trim. Exporting a Letter canvas onto
-  // an A4 page letterboxed the artwork (white bands, nothing full bleed), so
-  // the export size follows the layout unless the user picks another size
-  // themselves.
-  const sizeTouchedRef = useRef(false);
-  useEffect(() => {
-    if (sizeTouchedRef.current) return;
-    setExportSize((prev) => (prev === pageSize ? prev : pageSize));
-  }, [pageSize]);
+  // (the trim-follows-layout effect is declared above the early returns so the
+  // hook order stays identical on every render)
 
   const densityPad = density === "compact" ? "p-8" : density === "airy" ? "p-16" : "p-12";
   const densityGap = density === "compact" ? "gap-4" : density === "airy" ? "gap-10" : "gap-6";
@@ -1325,7 +1329,6 @@ function AssetEditor() {
                         : "Download PDF"}
                     </button>
                   </div>
-
                 </div>
               )}
             </div>

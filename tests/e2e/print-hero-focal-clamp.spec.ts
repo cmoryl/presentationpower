@@ -42,7 +42,8 @@ function url(q: HeroQuery): string {
 async function readObjectPosition(page: Page): Promise<string> {
   await page.waitForSelector('[data-testid="hero-img"]');
   const val = await page.evaluate(() => {
-    const api = (window as unknown as { __printHero?: { getObjectPosition: () => string | null } }).__printHero;
+    const api = (window as unknown as { __printHero?: { getObjectPosition: () => string | null } })
+      .__printHero;
     return api?.getObjectPosition() ?? null;
   });
   expect(val, "object-position must be readable").not.toBeNull();
@@ -116,7 +117,9 @@ test.describe("PrintHeroMedia — focal clamp & safe-area behavior", () => {
     expect(y).toBe(95);
   });
 
-  test("object-position is identical across all breakpoints (viewport-invariant)", async ({ page }) => {
+  test("object-position is identical across all breakpoints (viewport-invariant)", async ({
+    page,
+  }) => {
     // The clamp is JS math against props, not viewport size, so the emitted
     // percentages must never drift as the container reflows. Regression guard
     // against anyone reintroducing pixel-based clamping.
@@ -127,7 +130,9 @@ test.describe("PrintHeroMedia — focal clamp & safe-area behavior", () => {
       seen.push(await readObjectPosition(page));
     }
     const unique = Array.from(new Set(seen));
-    expect(unique, `object-position varied across breakpoints: ${seen.join(" | ")}`).toHaveLength(1);
+    expect(unique, `object-position varied across breakpoints: ${seen.join(" | ")}`).toHaveLength(
+      1,
+    );
     // And the single value is the expected clamp: 88 → 85, 22 → 22.
     const { x, y } = parseObjectPosition(unique[0]!);
     expect(x).toBe(85);

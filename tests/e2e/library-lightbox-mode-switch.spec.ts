@@ -16,8 +16,7 @@ const LIGHTBOX = '[data-preview-role="module-lightbox"]';
 async function scrollToLoadAll(page: Page) {
   await page.evaluate(async () => {
     const step = Math.floor(window.innerHeight * 0.85);
-    const max = () =>
-      Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+    const max = () => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
     for (let y = 0; y < max(); y += step) {
       window.scrollTo(0, y);
       await new Promise((r) => setTimeout(r, 150));
@@ -84,9 +83,7 @@ test.describe("Library lightbox mode switch", () => {
     await scrollToLoadAll(page);
 
     // Video-demo cards render a "Zoom" affordance (non-video cards say "Details").
-    const zoomCard = page
-      .locator('button:has(span:has-text("Zoom"))')
-      .first();
+    const zoomCard = page.locator('button:has(span:has-text("Zoom"))').first();
     await expect(zoomCard, "no video-demo card with a Zoom affordance").toBeVisible({
       timeout: 15_000,
     });
@@ -104,9 +101,7 @@ test.describe("Library lightbox mode switch", () => {
     const lightBeforeSwitch = await readActiveVideo(page, "light");
     expect(lightBeforeSwitch).not.toBeNull();
     const persistedTime = lightBeforeSwitch!.currentTime;
-    expect(persistedTime, "light video did not advance before switch").toBeGreaterThan(
-      0.3,
-    );
+    expect(persistedTime, "light video did not advance before switch").toBeGreaterThan(0.3);
     const lightSrc = lightSnap.src;
 
     // Flip the in-lightbox toggle to DARK (scope to lightbox — the page

@@ -76,7 +76,8 @@ const value = (n, fb) => {
   const i = argv.indexOf(`--${n}`);
   return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : fb;
 };
-const values = (n) => argv.reduce((a, v, i) => (v === `--${n}` && argv[i + 1] ? [...a, argv[i + 1]] : a), []);
+const values = (n) =>
+  argv.reduce((a, v, i) => (v === `--${n}` && argv[i + 1] ? [...a, argv[i + 1]] : a), []);
 
 const BASE_URL = value("url", process.env.VERIFY_URL ?? "http://localhost:8080");
 const SAMPLE = Number(value("sample", 3));
@@ -87,9 +88,7 @@ const UPDATE = flag("update");
 const CI = flag("ci");
 const TOLERANCE = Number(value("tolerance", 0.02));
 const OUT_DIR = path.resolve(value("out", "artifacts/pixel-diff"));
-const BASELINE = path.resolve(
-  value("baseline", "tests/snapshots/export-pixel-diff.baseline.json"),
-);
+const BASELINE = path.resolve(value("baseline", "tests/snapshots/export-pixel-diff.baseline.json"));
 
 /**
  * Per-pixel perceptual tolerance for pixelmatch.
@@ -186,7 +185,21 @@ async function renderPptxToPng(pptxPath, workDir) {
   // dimensions as the build side, so no resampling happens at compare time.
   await run(
     "pdftoppm",
-    ["-png", "-r", "96", "-f", "1", "-l", "1", "-scale-to-x", String(W), "-scale-to-y", String(H), pdf, path.join(workDir, "lo")],
+    [
+      "-png",
+      "-r",
+      "96",
+      "-f",
+      "1",
+      "-l",
+      "1",
+      "-scale-to-x",
+      String(W),
+      "-scale-to-y",
+      String(H),
+      pdf,
+      path.join(workDir, "lo"),
+    ],
     { timeout: 120_000 },
   );
   const png = (await readdir(workDir)).find((f) => f.startsWith("lo") && f.endsWith(".png"));
@@ -306,7 +319,6 @@ function surfaceScore(build, lo, textRects) {
 }
 
 function quantiles(scores) {
-
   const s = [...scores].sort((a, b) => a - b);
   const at = (q) => s[Math.min(s.length - 1, Math.floor(q * (s.length - 1)))];
   return {
@@ -333,12 +345,15 @@ async function main() {
   if (ONLY.length) variants = variants.filter((v) => ONLY.includes(v));
   else if (SAMPLE < variants.length) {
     const step = variants.length / SAMPLE;
-    variants = [...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)]))];
+    variants = [
+      ...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)])),
+    ];
   }
   const looks = [null, ...matrix.p.slice(0, LOOKS)];
 
   const jobs = [];
-  for (const look of looks) for (const mode of MODES) for (const v of variants) jobs.push([v, look, mode]);
+  for (const look of looks)
+    for (const mode of MODES) for (const v of variants) jobs.push([v, look, mode]);
 
   console.log(
     `pixel-diff (ADVISORY regression gate — LibreOffice is not a PowerPoint renderer):\n` +
@@ -354,11 +369,21 @@ async function main() {
     try {
       [cap] = await page.evaluate((j) => window.__tpExportVerify.pixel([j]), job);
     } catch (err) {
-      rows.push({ variantId: job[0], packId: job[1], mode: job[2], score: null, error: `capture threw: ${String(err).slice(0, 160)}` });
+      rows.push({
+        variantId: job[0],
+        packId: job[1],
+        mode: job[2],
+        score: null,
+        error: `capture threw: ${String(err).slice(0, 160)}`,
+      });
       continue;
     }
     if (!cap?.pptx || !cap?.build) {
-      rows.push({ ...(cap ?? { variantId: job[0], packId: job[1], mode: job[2] }), score: null, error: cap?.error ?? "no capture" });
+      rows.push({
+        ...(cap ?? { variantId: job[0], packId: job[1], mode: job[2] }),
+        score: null,
+        error: cap?.error ?? "no capture",
+      });
       console.log(`  ${i + 1}/${jobs.length} ${label} · SKIP (${cap?.error ?? "no capture"})`);
       continue;
     }
@@ -373,7 +398,9 @@ async function main() {
       const lo = PNG.sync.read(await readFile(loPng));
       const build = PNG.sync.read(Buffer.from(cap.build, "base64"));
       if (lo.width !== build.width || lo.height !== build.height) {
-        throw new Error(`dimension mismatch lo=${lo.width}x${lo.height} build=${build.width}x${build.height}`);
+        throw new Error(
+          `dimension mismatch lo=${lo.width}x${lo.height} build=${build.width}x${build.height}`,
+        );
       }
       const diff = new PNG({ width: lo.width, height: lo.height });
       const mismatched = pixelmatch(build.data, lo.data, diff.data, lo.width, lo.height, {
@@ -415,9 +442,14 @@ async function main() {
           surf.score === null ? `null (${surf.reason})` : surf.score
         } · masked ${(surf.maskedFraction * 100).toFixed(1)}% of frame (${(cap.textRects ?? []).length} text box(es))`,
       );
-
     } catch (err) {
-      rows.push({ variantId: cap.variantId, packId: cap.packId, mode: cap.mode, score: null, error: String(err).slice(0, 200) });
+      rows.push({
+        variantId: cap.variantId,
+        packId: cap.packId,
+        mode: cap.mode,
+        score: null,
+        error: String(err).slice(0, 200),
+      });
       console.log(`  ${i + 1}/${jobs.length} ${label} · ERROR ${String(err).slice(0, 140)}`);
     }
   }
@@ -515,7 +547,6 @@ async function main() {
     console.log("\nNo drift beyond tolerance against the recorded baseline (either metric).");
   }
 
-
   if (UPDATE) {
     // DOWNGRADE PROTECTION (same rule as the export-verify manifest guard):
     // a narrow run merges into the recorded baseline and may never shrink it,
@@ -597,7 +628,6 @@ async function main() {
       2,
     )}\n`,
   );
-
 
   if (CI && drift.length) {
     console.error(

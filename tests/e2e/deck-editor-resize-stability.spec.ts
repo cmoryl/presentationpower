@@ -46,9 +46,7 @@ async function sample(page: Page): Promise<Sample> {
     const k = sr.width > 0 ? stageW / sr.width : 0;
     const round = (n: number) => Math.round(n * 10) / 10;
 
-    const type = Array.from(
-      surface.querySelectorAll<HTMLElement>("h1,h2,h3,h4,p,li,span,td,th"),
-    )
+    const type = Array.from(surface.querySelectorAll<HTMLElement>("h1,h2,h3,h4,p,li,span,td,th"))
       .filter((el) => (el.textContent ?? "").trim().length > 0)
       .slice(0, 40)
       .map((el) => {
@@ -62,18 +60,18 @@ async function sample(page: Page): Promise<Sample> {
         ].join("/");
       });
 
-    const geometry = Array.from(
-      surface.querySelectorAll<HTMLElement>("[data-canvas-block]"),
-    ).map((el) => {
-      const r = el.getBoundingClientRect();
-      return [
-        el.dataset["canvasBlock"] ?? "?",
-        round((r.left - sr.left) * k),
-        round((r.top - sr.top) * k),
-        round(r.width * k),
-        round(r.height * k),
-      ].join("/");
-    });
+    const geometry = Array.from(surface.querySelectorAll<HTMLElement>("[data-canvas-block]")).map(
+      (el) => {
+        const r = el.getBoundingClientRect();
+        return [
+          el.dataset["canvasBlock"] ?? "?",
+          round((r.left - sr.left) * k),
+          round((r.top - sr.top) * k),
+          round(r.width * k),
+          round(r.height * k),
+        ].join("/");
+      },
+    );
 
     return { surfaceAspect: round((sr.width / sr.height) * 1000) / 1000, type, geometry };
   }, STAGE_W);

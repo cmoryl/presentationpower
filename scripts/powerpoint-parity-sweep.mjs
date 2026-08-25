@@ -151,7 +151,21 @@ async function pdfPageToPng(pdfPath, dir, tag) {
   const stem = path.join(dir, `page-${tag}`);
   await run(
     "pdftoppm",
-    ["-png", "-r", "96", "-f", "1", "-l", "1", "-scale-to-x", String(W), "-scale-to-y", String(H), pdfPath, stem],
+    [
+      "-png",
+      "-r",
+      "96",
+      "-f",
+      "1",
+      "-l",
+      "1",
+      "-scale-to-x",
+      String(W),
+      "-scale-to-y",
+      String(H),
+      pdfPath,
+      stem,
+    ],
     { timeout: 120_000 },
   );
   const found = (await readdir(dir)).find((f) => f.startsWith(`page-${tag}`) && f.endsWith(".png"));
@@ -262,7 +276,9 @@ async function main() {
   if (ONLY.length) variants = variants.filter((v) => ONLY.includes(v));
   else if (SAMPLE > 0 && SAMPLE < variants.length) {
     const step = variants.length / SAMPLE;
-    variants = [...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)]))];
+    variants = [
+      ...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)])),
+    ];
   }
 
   const cells = [];
@@ -344,7 +360,6 @@ async function main() {
   }
   await browser.close();
 
-
   // ------------------------------------------------- 2. render with PowerPoint
   const renderable = captured.filter((c) => !c.error);
   let rendered = 0;
@@ -395,7 +410,9 @@ async function main() {
       continue;
     }
     try {
-      const officePng = PNG.sync.read(await readFile(await pdfPageToPng(cell.pdfPath, cell.dir, cell.key)));
+      const officePng = PNG.sync.read(
+        await readFile(await pdfPageToPng(cell.pdfPath, cell.dir, cell.key)),
+      );
       const buildPng = PNG.sync.read(await readFile(cell.buildPath));
       const meta = JSON.parse(await readFile(cell.metaPath, "utf8"));
       row.graphicObjects = meta.graphicRects.length;
@@ -493,7 +510,8 @@ async function main() {
   const blocks = [];
   for (const r of sheetCells) {
     const cell = byKey.get(`${r.variantId}@${r.mode}`);
-    const img = async (p) => (p && existsSync(p) ? `data:image/png;base64,${b64(await readFile(p))}` : null);
+    const img = async (p) =>
+      p && existsSync(p) ? `data:image/png;base64,${b64(await readFile(p))}` : null;
     const build = await img(cell?.pngs?.build);
     const office = await img(cell?.pngs?.powerpoint);
     const diff = await img(cell?.pngs?.diff);

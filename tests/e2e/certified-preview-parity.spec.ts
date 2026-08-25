@@ -79,10 +79,7 @@ test.describe("certified PowerPoint preview", () => {
       // The capture itself must be substantive — a preview of nothing proves nothing.
       expect(audit.captured.plate, report(audit)).toBe(true);
       expect(audit.captured.runs, report(audit)).toBeGreaterThan(0);
-      expect(
-        audit.captured.shapes + audit.captured.images,
-        report(audit),
-      ).toBeGreaterThan(0);
+      expect(audit.captured.shapes + audit.captured.images, report(audit)).toBeGreaterThan(0);
 
       // Nothing captured may be missing from the painted preview.
       expect(audit.painted.plate, report(audit)).toBe(true);

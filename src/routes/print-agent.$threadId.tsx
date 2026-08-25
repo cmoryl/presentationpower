@@ -66,7 +66,6 @@ function PrintAgentThreadPage() {
     if (seed) setPending(seed);
   }, []);
 
-
   const refreshThreads = useCallback(() => {
     listPrintThreads()
       .then(setThreads)

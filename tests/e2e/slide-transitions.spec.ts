@@ -24,16 +24,23 @@ test.describe("SlideStage transitions", () => {
     await expect(page.getByTestId("demo-index")).toHaveText("2 / 3");
 
     // Mid-transition (default 800ms duration): previous layer mounts.
-    await expect(page.locator("[data-slidestage-layer='previous']")).toHaveCount(1, { timeout: 500 });
+    await expect(page.locator("[data-slidestage-layer='previous']")).toHaveCount(1, {
+      timeout: 500,
+    });
     await expect(page.locator("[data-slidestage-layer='current']")).toHaveCount(1);
 
     // After the transition + cleanup buffer completes, previous is gone.
-    await expect(page.locator("[data-slidestage-layer='previous']")).toHaveCount(0, { timeout: 2000 });
+    await expect(page.locator("[data-slidestage-layer='previous']")).toHaveCount(0, {
+      timeout: 2000,
+    });
     await expect(page.getByTestId("demo-slide-d-2")).toBeVisible();
   });
 
   test("reduced motion skips the previous layer entirely", async ({ browser }) => {
-    const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1280, height: 1800 } });
+    const context = await browser.newContext({
+      reducedMotion: "reduce",
+      viewport: { width: 1280, height: 1800 },
+    });
     const page = await context.newPage();
     await page.goto(URL, { waitUntil: "networkidle" });
     await page.getByTestId("demo-slide-d-1").waitFor();

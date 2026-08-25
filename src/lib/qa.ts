@@ -234,7 +234,7 @@ export function expandPath(pattern: string, content: Record<string, unknown>): s
 
 export function readPath(obj: unknown, path: string): unknown {
   const parts = path.split(".").flatMap((p) => {
-    const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
+    const m = /^([^[]+)(\[(\d+)\])?$/.exec(p);
     if (!m) return [p];
     return m[3] !== undefined ? [m[1], Number(m[3])] : [m[1]];
   });

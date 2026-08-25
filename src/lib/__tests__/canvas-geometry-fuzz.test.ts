@@ -56,7 +56,8 @@ function fuzzBlock(r: Rand, i: number): CanvasBlock {
         h: STAGE_H + between(r, 0, 40),
         size: between(r, 16, 72),
       } as CanvasBlock;
-    case 2: { // measured on an unscaled stage (2x–4x)
+    case 2: {
+      // measured on an unscaled stage (2x–4x)
       const k = between(r, 2, 4);
       return {
         ...base,

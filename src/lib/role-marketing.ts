@@ -42,7 +42,6 @@ export type RoleDemo = {
   chapters: readonly [RoleDemoChapter, RoleDemoChapter, RoleDemoChapter];
 };
 
-
 export type RoleFaq = {
   q: string;
   a: string;

@@ -24,11 +24,7 @@ import {
   setPath,
 } from "@/components/library/VariantSampleEditor";
 
-import {
-  listMyModules,
-  updateSavedModule,
-  deleteSavedModule,
-} from "@/lib/saved-modules.functions";
+import { listMyModules, updateSavedModule, deleteSavedModule } from "@/lib/saved-modules.functions";
 import { byId, MODULE_VARIANTS, BRAND_MODES, type ModuleVariant } from "@/lib/taxonomy";
 import type { ModuleInstance } from "@/lib/module-instance";
 
@@ -369,7 +365,9 @@ function Editor({
 
           <section className="rounded-2xl border border-black/10 bg-white p-4">
             <div className="flex items-center justify-between">
-              <div className="text-xs uppercase tracking-[0.2em] text-black/45">Look &amp; feel</div>
+              <div className="text-xs uppercase tracking-[0.2em] text-black/45">
+                Look &amp; feel
+              </div>
               <div className="flex rounded-full border border-black/10 p-0.5">
                 {(["light", "dark"] as const).map((m) => (
                   <button
@@ -398,7 +396,9 @@ function Editor({
             <div className="text-xs uppercase tracking-[0.2em] text-black/45">Copy fields</div>
             <div className="mt-3 space-y-3">
               {paths.length === 0 && (
-                <div className="text-xs text-black/50">This module has no editable text fields.</div>
+                <div className="text-xs text-black/50">
+                  This module has no editable text fields.
+                </div>
               )}
               {paths.map((p) => {
                 const value = String(readPath(content, p) ?? "");

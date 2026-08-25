@@ -51,12 +51,12 @@ export type Persona = {
   guides: readonly PersonaAction[];
 };
 
-
 export const PERSONAS: readonly Persona[] = [
   {
     id: "admin",
     label: "Admin & design",
-    tagline: "Own the system: templates, modules, brand assets and the guardrails everyone else inherits.",
+    tagline:
+      "Own the system: templates, modules, brand assets and the guardrails everyone else inherits.",
     roles: ["admin", "brand_reviewer"],
     counters: ["decks", "print", "kits"],
     resume: ["decks", "print", "kits"],
@@ -116,7 +116,8 @@ export const PERSONAS: readonly Persona[] = [
   {
     id: "marketing",
     label: "Marketing",
-    tagline: "Run campaigns end to end: social, events, print collateral and the look that ties them together.",
+    tagline:
+      "Run campaigns end to end: social, events, print collateral and the look that ties them together.",
     roles: ["brand_lead", "content_owner", "editor"],
     counters: ["kits", "print", "decks"],
     resume: ["kits", "print", "decks"],
@@ -223,9 +224,24 @@ export const PERSONAS: readonly Persona[] = [
       },
     ],
     shortcuts: [
-      { label: "Solution proposal", hint: "Division-specific master", to: "/library/print", search: { type: "proposal" } },
-      { label: "Case studies", hint: "Proof for the deal", to: "/library/print", search: { type: "case-study" } },
-      { label: "Client spotlights", hint: "One-page wins", to: "/library/print", search: { type: "spotlight" } },
+      {
+        label: "Solution proposal",
+        hint: "Division-specific master",
+        to: "/library/print",
+        search: { type: "proposal" },
+      },
+      {
+        label: "Case studies",
+        hint: "Proof for the deal",
+        to: "/library/print",
+        search: { type: "case-study" },
+      },
+      {
+        label: "Client spotlights",
+        hint: "One-page wins",
+        to: "/library/print",
+        search: { type: "spotlight" },
+      },
       { label: "Slide modules", hint: "Browse the library", to: "/library" },
       { label: "Import a deck", hint: "Bring in a client file", to: "/decks/import" },
       { label: "Ask Oracle", hint: "Facts you can cite", to: "/knowledge/ask" },

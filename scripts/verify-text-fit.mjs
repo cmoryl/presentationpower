@@ -39,7 +39,8 @@ const OUT = path.resolve(value("out", "artifacts/text-fit/report.json"));
 
 async function launchChromium() {
   const envExe = process.env.PW_CHROME || process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE;
-  if (envExe && existsSync(envExe)) return chromium.launch({ headless: true, executablePath: envExe });
+  if (envExe && existsSync(envExe))
+    return chromium.launch({ headless: true, executablePath: envExe });
   try {
     return await chromium.launch({ headless: true });
   } catch (err) {

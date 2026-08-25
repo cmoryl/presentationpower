@@ -283,7 +283,6 @@ function ApprovalQueuePage() {
                     type="checkbox"
                     aria-label={`Select ${r.title}`}
                     className="mt-2 shrink-0"
-
                     checked={selected.has(r.id)}
                     onChange={() =>
                       setSelected((prev) => {
@@ -393,7 +392,6 @@ function ApprovalQueuePage() {
                               {c.detail}
                             </p>
                           )}
-
                         </li>
                       ))}
                     </ul>
@@ -532,7 +530,6 @@ function CommentThread({ requestId }: { requestId: string }) {
               </button>
             </div>
             <p className="mt-1.5 whitespace-pre-wrap break-words leading-relaxed">{c.body}</p>
-
           </li>
         ))}
       </ul>

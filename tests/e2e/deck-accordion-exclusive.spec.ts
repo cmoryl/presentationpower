@@ -10,7 +10,6 @@ import type { Page, Locator } from "@playwright/test";
 
 const TRIGGER_LABELS = ["Distribute", "Slide", "Appearance", "Motion", "History"];
 
-
 async function visibleTriggers(page: Page) {
   const found: { label: string; btn: Locator }[] = [];
   for (const label of TRIGGER_LABELS) {

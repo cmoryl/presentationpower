@@ -20,7 +20,6 @@ import { track } from "./analytics-track";
 import { notifySlideEdit } from "./deck-feedback";
 import { pickVariedVariant } from "./module-variety";
 
-
 import type { SlideSkin } from "./slide-skin";
 import { hasTextFormats } from "./slide-text-format";
 import { mergeTemplateOverride, type SlideTemplateOverride } from "./section-templates";
@@ -440,7 +439,6 @@ export type TemplatePayload = {
     templateOverride?: DeckSlide["templateOverride"];
     /** Authored playback transition; demos ship one on every slide. */
     transition?: SlideTransition;
-
   }>;
   brief?: {
     prospect?: string;
@@ -4735,7 +4733,6 @@ export const useDeckStore = create<DeckState>()(
           notifySlideEdit("Slide deleted", { kind: "remove", undo: () => get().undo() });
         },
 
-
         setSlidesHidden: (deckId, slideIds, hidden) => {
           const deck = get().decks[deckId];
           if (!deck || slideIds.length === 0) return;
@@ -4757,7 +4754,6 @@ export const useDeckStore = create<DeckState>()(
             { kind: "hidden", undo: () => get().undo() },
           );
         },
-
 
         setSlidesMode: (deckId, slideIds, mode) => {
           const deck = get().decks[deckId];
@@ -4832,10 +4828,13 @@ export const useDeckStore = create<DeckState>()(
             .filter((sl) => !ids.has(sl.id))
             .map((sl, i) => ({ ...sl, position: i }));
           set((s) => ({ decks: { ...s.decks, [deckId]: { ...deck, slides: next } } }));
-          notifySlideEdit(`${slideIds.length} ${slideIds.length === 1 ? "slide" : "slides"} deleted`, {
-            kind: "remove",
-            undo: () => get().undo(),
-          });
+          notifySlideEdit(
+            `${slideIds.length} ${slideIds.length === 1 ? "slide" : "slides"} deleted`,
+            {
+              kind: "remove",
+              undo: () => get().undo(),
+            },
+          );
         },
 
         moveSlidesTo: (deckId, slideIds, target) => {
@@ -4886,7 +4885,6 @@ export const useDeckStore = create<DeckState>()(
           );
         },
 
-
         addSlide: (deckId, sectionId, afterSlideId) => {
           const deck = get().decks[deckId];
           if (!deck) return;
@@ -4927,7 +4925,6 @@ export const useDeckStore = create<DeckState>()(
           });
           notifySlideEdit("Slide added", { kind: "add", undo: () => get().undo() });
         },
-
 
         insertVariantSlide: (deckId, variantId) => {
           const deck = get().decks[deckId];
@@ -5027,7 +5024,6 @@ export const useDeckStore = create<DeckState>()(
             undo: () => get().undo(),
           });
         },
-
 
         renameDeck: (deckId, title) => {
           pushHistory(`rename:${deckId}`);
@@ -5191,7 +5187,6 @@ export const useDeckStore = create<DeckState>()(
                 transition: s.transition ? { ...s.transition } : undefined,
               };
             }),
-
           };
           set((s) => ({
             briefs: { ...s.briefs, [briefId]: brief },
@@ -5338,7 +5333,6 @@ export const useDeckStore = create<DeckState>()(
             undo: () => get().undo(),
           });
         },
-
       };
     },
     {
@@ -5443,7 +5437,7 @@ function setPath(
   value: unknown,
 ): Record<string, unknown> {
   const parts = path.split(".").flatMap((p) => {
-    const m = /^([^\[]+)(\[(\d+)\])?$/.exec(p);
+    const m = /^([^[]+)(\[(\d+)\])?$/.exec(p);
     if (!m) return [p];
     return m[3] !== undefined ? [m[1], Number(m[3])] : [m[1]];
   });

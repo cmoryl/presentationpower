@@ -80,11 +80,11 @@ test.describe("Smoke: key library affordances", () => {
   test("/library shows module cards + subnav", async ({ page }) => {
     await gotoAndSettle(page, "/library");
     // Subnav present (Modules / Print / etc.)
-    await expect(
-      page.getByRole("link", { name: /print/i }).first(),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("link", { name: /print/i }).first()).toBeVisible({
+      timeout: 10_000,
+    });
     // At least one module preview card should mount.
-    const cards = page.locator('[data-variant-id], [data-module-card]');
+    const cards = page.locator("[data-variant-id], [data-module-card]");
     await expect(cards.first()).toBeVisible({ timeout: 15_000 });
   });
 
@@ -96,23 +96,19 @@ test.describe("Smoke: key library affordances", () => {
 });
 
 test.describe("Smoke: admin surfaces (when gated, /auth is acceptable)", () => {
-  test("/admin either loads command center or bounces to /auth", async ({
-    page,
-  }) => {
+  test("/admin either loads command center or bounces to /auth", async ({ page }) => {
     await gotoAndSettle(page, "/admin");
     const url = page.url();
     if (/\/auth(\?|$)/.test(url)) {
       await expect(page.getByText(/sign in|continue|email/i).first()).toBeVisible();
       return;
     }
-    await expect(
-      page.getByText(/Analytics|Imagery|Knowledge|Brand Assets/i).first(),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Analytics|Imagery|Knowledge|Brand Assets/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
-  test("/admin/imagery either loads uploader or bounces to /auth", async ({
-    page,
-  }) => {
+  test("/admin/imagery either loads uploader or bounces to /auth", async ({ page }) => {
     await gotoAndSettle(page, "/admin/imagery");
     const url = page.url();
     if (/\/auth(\?|$)/.test(url)) return; // gated: acceptable

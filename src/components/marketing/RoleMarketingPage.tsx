@@ -269,7 +269,6 @@ export function RoleMarketingPage({ role }: { role: PersonaId }) {
         </div>
       </section>
 
-
       {/* ---------------- 30-SECOND FILM ---------------- */}
       <section className="mx-auto max-w-[1180px] py-16 sm:py-20">
         <SectionHead

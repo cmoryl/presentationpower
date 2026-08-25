@@ -33,7 +33,8 @@ async function armUnloadProbe(context: BrowserContext) {
       return (add as (...a: unknown[]) => void)(type, ...rest);
     }) as typeof window.addEventListener;
     window.removeEventListener = ((type: string, ...rest: unknown[]) => {
-      if (type === "beforeunload") w.__beforeUnloadCount = Math.max(0, (w.__beforeUnloadCount ?? 0) - 1);
+      if (type === "beforeunload")
+        w.__beforeUnloadCount = Math.max(0, (w.__beforeUnloadCount ?? 0) - 1);
       return (remove as (...a: unknown[]) => void)(type, ...rest);
     }) as typeof window.removeEventListener;
   });
@@ -55,10 +56,11 @@ async function layers(page: Page) {
 /** Add the first palette block and return the resulting layer count. */
 async function addFirstBlock(page: Page) {
   const before = await layers(page);
-  await page.getByRole("button", { name: /Text field/i }).first().click();
-  await expect
-    .poll(() => layers(page), { timeout: 10_000 })
-    .toBeGreaterThan(before);
+  await page
+    .getByRole("button", { name: /Text field/i })
+    .first()
+    .click();
+  await expect.poll(() => layers(page), { timeout: 10_000 }).toBeGreaterThan(before);
   return before;
 }
 
@@ -163,7 +165,10 @@ test.describe("Studios & editors smoke", () => {
     expect(await unloadGuards(page)).toBe(baseline);
 
     // Leave the master exactly as we found it.
-    await page.getByRole("button", { name: /Reset to shipped/i }).first().click();
+    await page
+      .getByRole("button", { name: /Reset to shipped/i })
+      .first()
+      .click();
     await page.waitForTimeout(1500);
   });
 

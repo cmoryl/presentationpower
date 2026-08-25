@@ -85,7 +85,7 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
     if (buf.length > MAX_BYTES) throw new Error("Image exceeds 20MB.");
 
     const id = crypto.randomUUID();
-    const safeName = data.filename.replace(/[^\w.\-]+/g, "_").slice(-160);
+    const safeName = data.filename.replace(/[^\w.-]+/g, "_").slice(-160);
     const path = `${context.userId}/${id}-${safeName}`;
 
     const up = await s.storage.from(BUCKET).upload(path, buf, {
@@ -111,7 +111,7 @@ export const uploadDivisionImagery = createServerFn({ method: "POST" })
       for (const v of data.variants) {
         const vBuf = decodeBase64Payload(v.data);
         if (vBuf.length === 0 || vBuf.length > MAX_BYTES) continue;
-        const vSafe = v.filename.replace(/[^\w.\-]+/g, "_").slice(-180);
+        const vSafe = v.filename.replace(/[^\w.-]+/g, "_").slice(-180);
         const vPath = `${context.userId}/${id}/${v.preset}-${vSafe}`;
         const vUp = await s.storage.from(BUCKET).upload(vPath, vBuf, {
           contentType: v.contentType,
@@ -454,7 +454,7 @@ export const attachDivisionImageryVariants = createServerFn({ method: "POST" })
       for (const v of data.variants) {
         const vBuf = decodeBase64Payload(v.data);
         if (vBuf.length === 0 || vBuf.length > MAX_BYTES) continue;
-        const vSafe = v.filename.replace(/[^\w.\-]+/g, "_").slice(-180);
+        const vSafe = v.filename.replace(/[^\w.-]+/g, "_").slice(-180);
         const vPath = `${r.uploaded_by}/${r.id}/${v.preset}-${vSafe}`;
         const vUp = await s.storage.from(BUCKET).upload(vPath, vBuf, {
           contentType: v.contentType,

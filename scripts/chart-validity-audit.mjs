@@ -103,11 +103,13 @@ function auditChart(name, xml) {
   const issues = [];
   const add = (rule, detail) => issues.push({ part: name, rule, detail });
 
-  const declaredAxes = [
-    ...xml.matchAll(/<c:(catAx|dateAx|valAx|serAx)>([\s\S]*?)<\/c:\1>/g),
-  ].map((m) => ({ kind: m[1], body: m[2] }));
+  const declaredAxes = [...xml.matchAll(/<c:(catAx|dateAx|valAx|serAx)>([\s\S]*?)<\/c:\1>/g)].map(
+    (m) => ({ kind: m[1], body: m[2] }),
+  );
   const axIdsDeclared = new Set(
-    declaredAxes.flatMap((a) => [...a.body.matchAll(/<c:axId val="(\d+)"\s*\/>/g)].map((x) => x[1])),
+    declaredAxes.flatMap((a) =>
+      [...a.body.matchAll(/<c:axId val="(\d+)"\s*\/>/g)].map((x) => x[1]),
+    ),
   );
 
   for (const { kind, body } of declaredAxes) {
@@ -269,7 +271,10 @@ async function main() {
   }
 
   if (jsonOut) {
-    await writeFile(jsonOut, JSON.stringify({ generatedAt: new Date().toISOString(), results }, null, 2));
+    await writeFile(
+      jsonOut,
+      JSON.stringify({ generatedAt: new Date().toISOString(), results }, null, 2),
+    );
     console.log(`\n· report → ${jsonOut}`);
   }
   console.log(`\n${total === 0 ? "✓ clean" : `✗ ${total} violation(s)`}`);

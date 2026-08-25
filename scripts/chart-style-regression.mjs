@@ -201,7 +201,8 @@ async function pdfToPng(pdfPath, workDir) {
 /** Open the exported package and screenshot slide 1 at the comparison size. */
 async function renderPptxToPng(pptxPath, workDir) {
   if (RENDERER === "powerpoint") {
-    const { renderPptxWithPowerPoint, deleteDriveItem } = await import("./render-via-powerpoint.mjs");
+    const { renderPptxWithPowerPoint, deleteDriveItem } =
+      await import("./render-via-powerpoint.mjs");
     const rendered = await renderPptxWithPowerPoint(
       await readFile(pptxPath),
       `chart-style-${path.basename(workDir)}-${Date.now()}.pptx`,
@@ -280,7 +281,13 @@ function keyOf(r) {
 function quantiles(nums) {
   const s = [...nums].sort((a, b) => a - b);
   const at = (q) => s[Math.min(s.length - 1, Math.floor(q * (s.length - 1)))] ?? null;
-  return { n: s.length, min: s[0] ?? null, median: at(0.5), p90: at(0.9), max: s[s.length - 1] ?? null };
+  return {
+    n: s.length,
+    min: s[0] ?? null,
+    median: at(0.5),
+    p90: at(0.9),
+    max: s[s.length - 1] ?? null,
+  };
 }
 
 async function main() {
@@ -303,7 +310,9 @@ async function main() {
   for (const mode of MODES) for (const v of variants) jobs.push([v, null, mode, FIDELITY]);
   console.log(
     `chart STYLE regression (renderer=${RENDERER}${
-      RENDERER === "powerpoint" ? " — real Office, ground truth" : " — ADVISORY, LibreOffice is not PowerPoint"
+      RENDERER === "powerpoint"
+        ? " — real Office, ground truth"
+        : " — ADVISORY, LibreOffice is not PowerPoint"
     }):\n` +
       `  ${variants.length} chart module(s) × ${MODES.length} mode(s) = ${jobs.length} cell(s)\n` +
       `  fidelity=${FIDELITY} · fill≥${LIMITS.minFill} strokeΔ≤${LIMITS.maxStroke} gradientΔ≤${LIMITS.maxGradient} trackΔ≤${LIMITS.maxTrack} hue≤${LIMITS.maxHueShift}°`,
@@ -321,7 +330,10 @@ async function main() {
     // destroyed", which read as chart failures but are really tab exhaustion.
     // Recycle the tab periodically, and retry a cell once on a fresh tab.
     if (i > 0 && i % RECYCLE_EVERY === 0) {
-      await page.context().close().catch(() => {});
+      await page
+        .context()
+        .close()
+        .catch(() => {});
       page = await boot(browser);
     }
     let cap;
@@ -333,7 +345,10 @@ async function main() {
         break;
       } catch (err) {
         captureErr = err;
-        await page.context().close().catch(() => {});
+        await page
+          .context()
+          .close()
+          .catch(() => {});
         page = await boot(browser);
       }
     }
@@ -354,13 +369,21 @@ async function main() {
         flagged: true,
         reasons: [cap?.error ?? "capture incomplete"],
       });
-      console.log(`  ${i + 1}/${jobs.length} ${label} · ERROR ${cap?.error ?? "capture incomplete"}`);
+      console.log(
+        `  ${i + 1}/${jobs.length} ${label} · ERROR ${cap?.error ?? "capture incomplete"}`,
+      );
       continue;
     }
 
     const cellDir = path.join(tmpRoot, safe);
     await mkdir(cellDir, { recursive: true });
-    const row = { variantId: cap.variantId, mode: cap.mode, fidelity: FIDELITY, flagged: false, reasons: [] };
+    const row = {
+      variantId: cap.variantId,
+      mode: cap.mode,
+      fidelity: FIDELITY,
+      flagged: false,
+      reasons: [],
+    };
     try {
       const pptxPath = path.join(cellDir, "deck.pptx");
       await writeFile(pptxPath, Buffer.from(cap.pptx, "base64"));
@@ -494,7 +517,8 @@ async function main() {
     `\nchartScore n=${stats.n} min=${stats.min} median=${stats.median} p90=${stats.p90} max=${stats.max}`,
   );
   for (const r of flagged) console.log(`  ⚠️ ${keyOf(r)}: ${r.reasons.join("; ")}`);
-  if (fresh.length) console.log(`\n${fresh.length} cell(s) have no baseline yet (recorded, not gated).`);
+  if (fresh.length)
+    console.log(`\n${fresh.length} cell(s) have no baseline yet (recorded, not gated).`);
   if (drift.length) {
     console.log(`\nDRIFT from baseline (${drift.length}):`);
     for (const d of drift) {
@@ -529,7 +553,9 @@ async function main() {
         2,
       )}\n`,
     );
-    console.log(`baseline updated: ${path.relative(process.cwd(), BASELINE)} (${Object.keys(cells).length} cells)`);
+    console.log(
+      `baseline updated: ${path.relative(process.cwd(), BASELINE)} (${Object.keys(cells).length} cells)`,
+    );
   }
 
   if (CI && (flagged.length || drift.length)) process.exit(1);
