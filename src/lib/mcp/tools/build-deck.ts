@@ -126,7 +126,7 @@ export default defineTool({
       const mode =
         appearance === "mixed"
           ? (s.mode ?? (i === 0 || i === lastIdx ? "dark" : "light"))
-          : (s.mode ?? null);
+          : (s.mode ?? appearance);
       planned.push({
         position: i,
         sectionId: s.section_id,
