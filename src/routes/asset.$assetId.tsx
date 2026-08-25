@@ -301,6 +301,9 @@ function AssetEditor() {
   // "features") instead of appending — this is what the canvas Replace action
   // arms so picking a module swaps rather than piles on.
   const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
+  // Canvas "Edit" deep-link: id of the stacked module to reveal in the Shared
+  // modules panel, plus a nonce that force-opens the panel on each click.
+  const [moduleFocus, setModuleFocus] = useState<{ id: string; nonce: number } | null>(null);
   // Delete confirmation modal state.
   const [deleteOpen, setDeleteOpen] = useState(false);
   // "Save as page template" dialog — captures the section stack for reuse.
@@ -1755,6 +1758,13 @@ function AssetEditor() {
                           }
                           toast.info(`Edit "${key}" in the inspector panel →`);
                         }}
+                        onEditModule={(key) => {
+                          // Deep-link from the canvas into the module's inline
+                          // editor (per-item fields, e.g. each client logo).
+                          const id = key.slice("module:".length);
+                          setModuleFocus((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }));
+                          window.setTimeout(() => setModuleFocus(null), 4000);
+                        }}
                       />
 
                       {/* Hero affordance — click straight into the hero editor from
@@ -1855,7 +1865,11 @@ function AssetEditor() {
                 )}
               </Panel>
 
-              <Panel title="Shared modules" defaultOpen={false}>
+              <Panel
+                title="Shared modules"
+                defaultOpen={false}
+                openNonce={moduleFocus?.nonce ?? 0}
+              >
                 {overflow.clipped && !approvedDemo && (
                   <div
                     data-testid="overflow-inspector-note"
@@ -2583,6 +2597,7 @@ function ModulesPanel({
   hasTitle,
   hasSummary,
   onDropInsert,
+  focusModuleId = null,
 }: {
   kind:
     | "case-study"
@@ -2602,8 +2617,22 @@ function ModulesPanel({
   // this instead of the local append — it applies page-fit and honors an armed
   // canvas Replace target so dropping a module swaps rather than piles on.
   onDropInsert?: (section: PrintSection, index: number) => void;
+  /** Canvas "Edit" deep-link — scroll to + highlight this module's card so the
+   *  per-item editor (e.g. each client logo) is right there. */
+  focusModuleId?: string | null;
 }) {
   const editorMode = mode;
+  useEffect(() => {
+    if (!focusModuleId) return;
+    // The Shared modules Panel force-opens via openNonce on the same render —
+    // give it a beat to mount before scrolling.
+    const t = window.setTimeout(() => {
+      document
+        .querySelector(`[data-module-card="${CSS.escape(focusModuleId)}"]`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 160);
+    return () => window.clearTimeout(t);
+  }, [focusModuleId]);
   function move(i: number, dir: -1 | 1) {
     const j = i + dir;
     if (j < 0 || j >= modules.length) return;
@@ -2739,6 +2768,7 @@ function ModulesPanel({
             editorMode={editorMode}
             draggingIdx={draggingIdx}
             dropIdx={dropIdx}
+            highlighted={focusModuleId === m.id}
             DropIndicator={DropIndicator}
             onDragStart={(e) => {
               const src = e.target as HTMLElement | null;
@@ -2861,6 +2891,7 @@ function ModuleCard({
   editorMode: PrintMode;
   draggingIdx: number | null;
   dropIdx: number | null;
+  highlighted?: boolean;
   DropIndicator: (props: { active: boolean }) => React.ReactElement;
   onDragStart: (e: React.DragEvent) => void;
   onDragEnd: () => void;
@@ -2880,6 +2911,7 @@ function ModuleCard({
     <div>
       <DropIndicator active={dropIdx === i} />
       <div
+        data-module-card={m.id}
         draggable
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
@@ -2887,9 +2919,11 @@ function ModuleCard({
         onDrop={onDrop}
         className={
           "rounded-lg border bg-white/60 p-2 transition dark:bg-white/[0.02] " +
-          (draggingIdx === i
-            ? "border-[#003FC7]/60 bg-[#003FC7]/[0.04] opacity-50 shadow-sm"
-            : "border-black/10 dark:border-white/10")
+          (highlighted
+            ? "border-[#003FC7] ring-2 ring-[#003FC7]/50 shadow-md"
+            : draggingIdx === i
+              ? "border-[#003FC7]/60 bg-[#003FC7]/[0.04] opacity-50 shadow-sm"
+              : "border-black/10 dark:border-white/10")
         }
       >
         <div
@@ -3042,12 +3076,18 @@ function Panel({
   title,
   children,
   defaultOpen = false,
+  openNonce = 0,
 }: {
   title: string;
   children: React.ReactNode;
   defaultOpen?: boolean;
+  /** Bump to force the panel open (e.g. canvas "Edit" deep-link). */
+  openNonce?: number;
 }) {
   const [open, setOpen] = useState(defaultOpen);
+  useEffect(() => {
+    if (openNonce > 0) setOpen(true);
+  }, [openNonce]);
   return (
     <div className="rounded-2xl border border-black/10 bg-white dark:border-white/10 dark:bg-white/[0.03]">
       <button
