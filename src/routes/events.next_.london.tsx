@@ -16,14 +16,26 @@ import {
   Layers,
   MapPin,
   Ruler,
+  ShieldCheck,
   Table2,
 } from "lucide-react";
+
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { renderDitheredPng } from "@/lib/london-panel-raster";
+import {
+  auditAi,
+  auditSvg,
+  auditPng,
+  qaReportCsv,
+  qaSummary,
+  rollup,
+  type LondonQaReport,
+} from "@/lib/london-signage-qa";
 import {
   LONDON_PANELS,
   LONDON_PRINT_SPEC,
@@ -71,6 +83,17 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
+/**
+ * Blocks a download whose bytes disagree with the panel specification, and
+ * surfaces tolerated deviations (e.g. the 6000 px ceiling) as a warning.
+ */
+function gateOnQa(report: LondonQaReport) {
+  if (report.status === "fail") throw new Error(`QA failed — ${qaSummary(report)}`);
+  if (report.status === "warn") {
+    toast.warning(`${report.file} — QA warning`, { description: qaSummary(report) });
+  }
+}
+
 function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   const style = LONDON_STYLES[panel.style];
   const ratio = panel.bleedW / panel.bleedH;
@@ -105,6 +128,7 @@ function LondonSignagePage() {
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [openPanel, setOpenPanel] = useState<LondonPanel | null>(null);
   const [ppi, setPpi] = useState<number>(72);
+  const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
   useEffect(() => {
     let live = true;
@@ -147,6 +171,7 @@ function LondonSignagePage() {
         const entry = pack[panel.id];
         if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
         const body = fmt === "svg" ? entry.svg : entry.ai;
+        gateOnQa(fmt === "svg" ? auditSvg(panel, entry.svg) : auditAi(panel, entry.ai));
         const type = fmt === "svg" ? "image/svg+xml" : "application/postscript";
         download(new Blob([body], { type }), `${panelSlug(panel)}.${fmt}`);
       },
@@ -166,6 +191,7 @@ function LondonSignagePage() {
         if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
         const size = rasterSizeFor(panel, ppi);
         const blob = await renderDitheredPng(entry.svg, size.w, size.h);
+        gateOnQa(auditPng(panel, ppi, new Uint8Array(await blob.arrayBuffer())));
         download(blob, `${panelSlug(panel)}-${ppi}ppi.png`);
       },
     );
@@ -183,6 +209,45 @@ function LondonSignagePage() {
           new Blob([londonScheduleCsv()], { type: "text/csv" }),
           "NEXT-London-print-schedule.csv",
         );
+      },
+    );
+
+  const runKitQa = () =>
+    runWithExportFeedback(
+      {
+        pending: "Auditing all 54 panels…",
+        success: "NEXT-London-qa-report.csv downloaded",
+        failure: "QA sweep failed",
+        successDescription: "Trim, bleed, ppi tier and banding checked for every vector master.",
+      },
+      async () => {
+        const pack = artwork ?? (await loadLondonArtwork());
+        const reports: LondonQaReport[] = [];
+        for (const panel of LONDON_PANELS) {
+          const entry = pack[panel.id];
+          if (!entry) {
+            reports.push({
+              panelId: panel.id,
+              panelName: panel.name,
+              file: `${panelSlug(panel)}.svg`,
+              kind: "svg",
+              status: "fail",
+              checks: [
+                {
+                  id: "pack-present",
+                  label: "Artwork present in the pack",
+                  status: "fail",
+                  expected: "svg + ai master",
+                  actual: "missing",
+                },
+              ],
+            });
+            continue;
+          }
+          reports.push(auditSvg(panel, entry.svg), auditAi(panel, entry.ai));
+        }
+        setQa(reports);
+        download(new Blob([qaReportCsv(reports)], { type: "text/csv" }), "NEXT-London-qa-report.csv");
       },
     );
 
