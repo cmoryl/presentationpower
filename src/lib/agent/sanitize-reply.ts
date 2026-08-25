@@ -94,5 +94,6 @@ export function sanitizeAgentReply(text: string): string {
 
   out = tidy(out);
 
+  // eslint-disable-next-line no-control-regex -- NUL sentinels mark protected blocks
   return out.replace(/\u0000(\d+)\u0000/g, (_m, i: string) => blocks[Number(i)] ?? "");
 }

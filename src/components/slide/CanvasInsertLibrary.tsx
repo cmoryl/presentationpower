@@ -420,7 +420,6 @@ export function CanvasInsertLibrary({
                         dark panel, and letterboxes so nothing is distorted. */}
                     <span
                       className="grid h-full w-full place-items-center [&>svg]:h-full [&>svg]:w-full"
-                      // eslint-disable-next-line react/no-danger
                       dangerouslySetInnerHTML={{
                         __html: shapeThumbSvg(s, "#FFFFFF", style, style === "outline" ? 7 : 6),
                       }}

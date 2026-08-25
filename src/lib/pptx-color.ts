@@ -57,7 +57,8 @@ function hslToHex(h: number, s: number, l: number): string {
 
 /** Apply PPTX color modifiers to a hex color. Order: satMod → lumMod/lumOff → shade/tint. */
 export function applyColorMods(hex: string, mods: ColorMods): string {
-  let [h, s, l] = hexToHsl(hex);
+  const [h] = hexToHsl(hex);
+  let [, s, l] = hexToHsl(hex);
   if (mods.satMod !== undefined) s = Math.max(0, Math.min(1, s * mods.satMod));
   if (mods.lumMod !== undefined) l = Math.max(0, Math.min(1, l * mods.lumMod));
   if (mods.lumOff !== undefined) l = Math.max(0, Math.min(1, l + mods.lumOff));
