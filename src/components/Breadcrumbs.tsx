@@ -188,7 +188,7 @@ export function Breadcrumbs() {
       });
     }
     return items;
-  }, [pathname, decks, routePatterns, catalogVersion]);
+  }, [pathname, decks, routePatterns, catalogVersion, dashboardLabel]);
 
   if (crumbs.length === 0) return null;
 
