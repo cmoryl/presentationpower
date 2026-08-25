@@ -131,6 +131,7 @@ import { resolveDivisionBrief } from "@/lib/library-preview";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 import { gateQaIssues } from "@/lib/demo-approved";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
+import { QaAiCopyFixButton } from "@/components/deck/QaAiCopyFixButton";
 
 import {
   BRAND_MODES,
