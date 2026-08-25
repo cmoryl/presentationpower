@@ -222,6 +222,11 @@ export function AgentChat({
       const value = text.trim();
       if (!value || busy) return;
       const isFirstCreationTurn = !hasUserBrief;
+      // Demo fast-path: pre-authored QA-clean deck, staged like a live build.
+      if (isDemoFastBuildPrompt(value)) {
+        void runDemoBuild(value, isFirstCreationTurn);
+        return;
+      }
       if (isFirstCreationTurn) onFirstUserMessage(value);
       setInput("");
       // An imported knowledge map + one-off overrides travel with every turn.
@@ -365,7 +370,7 @@ export function AgentChat({
         createPortal(
           <AgentStatusTimeline
             messages={messages}
-            status={status}
+            status={demoBusy ? "streaming" : status}
             hasDeck={Boolean(seenDeck.current)}
             variant="hero"
           />,
@@ -374,7 +379,7 @@ export function AgentChat({
       ) : (
         <AgentStatusTimeline
           messages={messages}
-          status={status}
+          status={demoBusy ? "streaming" : status}
           hasDeck={Boolean(seenDeck.current)}
         />
       )}
