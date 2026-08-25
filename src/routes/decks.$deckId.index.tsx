@@ -131,6 +131,7 @@ import { resolveDivisionBrief } from "@/lib/library-preview";
 import { runQa, blockingIssues, warningIssues, expandPath, readPath } from "@/lib/qa";
 import { gateQaIssues } from "@/lib/demo-approved";
 import { QaAutoFixButton } from "@/components/deck/QaAutoFixButton";
+import { QaAiCopyFixButton } from "@/components/deck/QaAiCopyFixButton";
 
 import {
   BRAND_MODES,
@@ -2047,6 +2048,7 @@ function DeckEditor() {
                                   includeWarnings
                                   label="Auto-fix all"
                                 />
+                                <QaAiCopyFixButton deckId={deckId} />
                                 {blockingIssues(qa).length > 0 && (
                                   <QaAutoFixButton
                                     deckId={deckId}
@@ -2059,7 +2061,9 @@ function DeckEditor() {
                               <p className="mb-3 text-[11px] leading-relaxed text-black/50">
                                 Auto-fix never deletes copy: overflow items become new continuation
                                 slides, empty fields fill from the slide's own content or imported
-                                notes, and long copy is resized rather than cut.
+                                notes, and long copy is resized rather than cut. AI fix remaining
+                                rewrites over-cap titles and bodies to fit their layout's character
+                                limit — meaning kept, nothing dropped.
                               </p>
                               <ul className="space-y-2 text-sm">
                                 {qa.map((issue, k) => {
