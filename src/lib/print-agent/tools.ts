@@ -20,6 +20,7 @@ import {
   type PrintModuleFamily,
 } from "@/lib/print-library/section-modules";
 import { toEditableContent, editableContextFor } from "@/lib/print-library/editable";
+import { qaFitPrintContent, fitPrintModuleIntoPage } from "@/lib/print-module-fit";
 import {
   emptyCaseStudy,
   emptySpotlight,
@@ -580,8 +581,10 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
       execute: async ({ libraryItemId, title }) => {
         const item = PRINT_LIBRARY_ITEMS.find((i) => i.id === libraryItemId);
         if (!item) return { error: `Unknown library item "${libraryItemId}".` };
-        const content = toEditableContent(item);
-        if (!content) return { error: "That library item has no editable content yet." };
+        const seeded = toEditableContent(item);
+        if (!seeded) return { error: "That library item has no editable content yet." };
+        // First-run QA fit: the new file opens 100% laid out, never overflowing.
+        const qa = qaFitPrintContent(item.kind, seeded);
         const { data, error } = await supabase
           .from("print_assets")
           .insert({
@@ -589,7 +592,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
             kind: item.kind,
             title: title ?? item.title,
             brand_mode_id: item.divisionId ?? "bm-enterprise",
-            content: content as never,
+            content: qa.content as never,
             context: editableContextFor(item) as never,
           })
           .select("id, kind, title")
@@ -602,6 +605,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
           kind: row.kind,
           title: row.title,
           editorPath: `/asset/${row.id}`,
+          qa_fit: qa.notes.length ? qa.notes : ["fits the trim — no adjustments needed"],
         };
       },
     }),
@@ -625,6 +629,9 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
             error: `Unknown division "${input.divisionId}". Call list_print_divisions first.`,
           };
         const content = seedContent(input.kind, input);
+        // First-run QA fit: normalize/right-size seeded modules and arm the
+        // auto content-fit ladder so the live file opens overflow-free.
+        const qa = qaFitPrintContent(input.kind, content);
         const { data, error } = await supabase
           .from("print_assets")
           .insert({
@@ -632,7 +639,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
             kind: input.kind,
             title: input.title,
             brand_mode_id: input.divisionId,
-            content: content as never,
+            content: qa.content as never,
             context: { createdBy: "print-agent" } as never,
           })
           .select("id, kind, title")
@@ -645,6 +652,7 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
           kind: row.kind,
           title: row.title,
           editorPath: `/asset/${row.id}`,
+          qa_fit: qa.notes.length ? qa.notes : ["fits the trim — no adjustments needed"],
         };
       },
     }),
@@ -665,16 +673,29 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
         const modules = Array.isArray(content["modules"])
           ? [...(content["modules"] as unknown[])]
           : [];
-        const block = mod.make() as unknown;
+        // Page-aware insert: right-size/trim the module to the remaining
+        // budget instead of dropping it in blind and overflowing the trim.
+        const fit = fitPrintModuleIntoPage(
+          asset.kind,
+          content,
+          mod.make() as Parameters<typeof fitPrintModuleIntoPage>[2],
+        );
+        if (fit.overBudget && content["density"] !== "compact") content["density"] = "compact";
         const at = position === undefined ? modules.length : Math.min(position, modules.length);
-        modules.splice(at, 0, block);
+        modules.splice(at, 0, fit.section);
         content["modules"] = modules;
         const { error } = await supabase
           .from("print_assets")
           .update({ content: content as never, updated_at: new Date().toISOString() } as never)
           .eq("id", assetId);
         if (error) return { error: error.message };
-        return { ok: true, print_asset_id: assetId, added: mod.label, moduleCount: modules.length };
+        return {
+          ok: true,
+          print_asset_id: assetId,
+          added: mod.label,
+          moduleCount: modules.length,
+          fit_note: fit.note ?? "fits the page — no adjustments needed",
+        };
       },
     }),
 
