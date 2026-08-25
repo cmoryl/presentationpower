@@ -35,6 +35,24 @@ const STARTERS = [
   "I need an event keynote deck introducing TransPerfect NEXT 2026 to enterprise marketing leaders.",
 ];
 
+type DeckAppearance = "light" | "dark" | "mixed";
+
+const APPEARANCE_OPTIONS: Array<{ id: DeckAppearance; label: string; description: string }> = [
+  { id: "light", label: "Light", description: "Enterprise Light" },
+  { id: "dark", label: "Dark", description: "Enterprise Dark" },
+  { id: "mixed", label: "Mixed", description: "Dark bookends, light body" },
+];
+
+function creationAppearanceLine(appearance: DeckAppearance) {
+  if (appearance === "mixed") {
+    return "Deck appearance: mixed — use a dark cover and closing slide, with light working slides between.";
+  }
+  if (appearance === "dark") {
+    return "Deck appearance: dark — use Enterprise Dark across the whole deck.";
+  }
+  return "Deck appearance: light — use Enterprise Light across the whole deck.";
+}
+
 export function AgentChat({
   threadId,
   initialMessages,
@@ -81,6 +99,7 @@ export function AgentChat({
   });
 
   const [input, setInput] = useState("");
+  const [appearance, setAppearance] = useState<DeckAppearance>("mixed");
   const { docs, setDocs } = useAgentDocuments();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -117,7 +136,8 @@ export function AgentChat({
     (text: string) => {
       const value = text.trim();
       if (!value || busy) return;
-      if (messages.length === 0) onFirstUserMessage(value);
+      const isFirstCreationTurn = messages.length === 0;
+      if (isFirstCreationTurn) onFirstUserMessage(value);
       setInput("");
       // An imported knowledge map + one-off overrides travel with every turn.
       const dna = readStoredDesignDna(threadId);
@@ -126,10 +146,11 @@ export function AgentChat({
         ...(dna ? { designDna: dna } : {}),
         ...(designOverrides ? { designOverrides } : {}),
       };
-      const withDocs = withDocumentContext(value, docs);
+      const agentText = isFirstCreationTurn ? `${value}\n\n${creationAppearanceLine(appearance)}` : value;
+      const withDocs = withDocumentContext(agentText, docs);
       void sendMessage({ text: withDocs }, Object.keys(body).length ? { body } : undefined);
     },
-    [busy, docs, messages.length, onFirstUserMessage, sendMessage, threadId],
+    [appearance, busy, docs, messages.length, onFirstUserMessage, sendMessage, threadId],
   );
 
   // The newest outline proposal is the only one that still offers actions.
@@ -191,6 +212,33 @@ export function AgentChat({
               narrative archetype and brand-approved modules, writes the copy and speaker notes, and
               hands back a deck you can open in the editor or export to PowerPoint.
             </p>
+            <fieldset className="rounded-2xl border border-border/70 bg-background/70 p-3 text-left">
+              <legend className="px-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/50">
+                Deck appearance
+              </legend>
+              <div className="mt-1 grid gap-2 sm:grid-cols-3">
+                {APPEARANCE_OPTIONS.map((option) => {
+                  const active = appearance === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setAppearance(option.id)}
+                      aria-pressed={active}
+                      className={
+                        "rounded-xl border px-3 py-2 text-left transition " +
+                        (active
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border/70 bg-background text-foreground/70 hover:border-primary hover:text-foreground")
+                      }
+                    >
+                      <span className="block text-xs font-semibold">{option.label}</span>
+                      <span className="block text-[10px] opacity-70">{option.description}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
             <div className="space-y-2 pt-2 text-left">
               {STARTERS.map((s) => (
                 <button
