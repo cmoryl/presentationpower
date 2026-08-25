@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, FileDown, Printer, Ruler } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { notifyPrintToPdf } from "@/lib/deck-feedback";
 import { NextBadge } from "@/components/next/NextBadge";
 import {
   BADGE_SPEC,
@@ -182,7 +183,7 @@ function BadgesPage() {
               </button>
               <button
                 type="button"
-                onClick={() => window.print()}
+                onClick={() => notifyPrintToPdf("badge sheet")}
                 className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
               >
                 <Printer size={13} /> Print sheet

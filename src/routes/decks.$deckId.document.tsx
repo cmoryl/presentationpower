@@ -8,6 +8,7 @@ import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BrandLockup } from "@/components/BrandLockup";
+import { notifyPrintToPdf } from "@/lib/deck-feedback";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import {
@@ -106,7 +107,7 @@ function DocumentView() {
               </p>
             </div>
             <button
-              onClick={() => window.print()}
+              onClick={() => notifyPrintToPdf("document")}
               className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90"
             >
               Print / Save PDF

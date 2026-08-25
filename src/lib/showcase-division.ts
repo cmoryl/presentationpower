@@ -14,7 +14,6 @@
 
 import type { TemplatePayload } from "./deck-store";
 import { applyLexicon, lexiconRules, type LexiconRule } from "./division-lexicon";
-import { normalizeLook } from "./look-validate";
 
 export type DemoDivision = {
   /** Canonical bm-* brand mode id. */
@@ -26,14 +25,6 @@ export type DemoDivision = {
   /** Slug used to seed imagery. */
   slug: string;
   accent: string;
-  /** Style pack the retargeted deck should open with. */
-  stylePackId: string;
-  /**
-   * Industry background recipe (R-code) the division's art should paint from.
-   * Divisions with an authored plate kit (Gaming = R22) must name it here or
-   * the deck falls back to whatever recipe the source narrative carried.
-   */
-  designRecipeId?: string | null;
   /** Industry stamped into the brief. */
   industry: string;
 };
@@ -45,8 +36,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "GlobalLink",
     slug: "globallink",
     accent: "#003FC7",
-    stylePackId: "skin-s03",
-    designRecipeId: "R02",
     industry: "Enterprise localization",
   },
   {
@@ -55,8 +44,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Enterprise",
     slug: "enterprise",
     accent: "#003FC7",
-    stylePackId: "skin-s06",
-    designRecipeId: "R01",
     industry: "Enterprise",
   },
   {
@@ -65,8 +52,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Life Sciences",
     slug: "lifesci",
     accent: "#58ED21",
-    stylePackId: "skin-s14",
-    designRecipeId: "R09",
     industry: "Life Sciences",
   },
   {
@@ -75,8 +60,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Legal",
     slug: "legal",
     accent: "#3BBEB6",
-    stylePackId: "skin-s10",
-    designRecipeId: "R10",
     industry: "Legal",
   },
   {
@@ -85,8 +68,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Media",
     slug: "media",
     accent: "#EC388A",
-    stylePackId: "skin-s18",
-    designRecipeId: "R21",
     industry: "Media & Entertainment",
   },
   {
@@ -95,10 +76,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Gaming",
     slug: "gaming",
     accent: "#4ADE80",
-    // Gaming wears its own authored plate kit (bm-tp-games, R22): the
-    // industry language IS the pack, so no second R recipe rides along.
-    stylePackId: "skin-r22",
-    designRecipeId: null,
     industry: "Gaming",
   },
   {
@@ -107,8 +84,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Digital",
     slug: "digital",
     accent: "#C2A3FF",
-    stylePackId: "skin-s07",
-    designRecipeId: "R18",
     industry: "Digital marketing",
   },
   {
@@ -117,8 +92,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Trial Interactive",
     slug: "trial-interactive",
     accent: "#5CE1E6",
-    stylePackId: "skin-s01",
-    designRecipeId: "R08",
     industry: "eClinical",
   },
   {
@@ -127,9 +100,6 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     label: "Element",
     slug: "element",
     accent: "#08BFC1",
-    stylePackId: "skin-s29",
-    // S29 ships the Element brand ground; no industry plates ride along.
-    designRecipeId: null,
     industry: "Product marketing",
   },
 ];
@@ -212,33 +182,18 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
     notes: s.notes ? rewriteText(s.notes, target, rules) : s.notes,
   }));
 
-  // Keep the source recipe only when the target division has no authored
-  // background family of its own. An explicit `null` clears it, so design-led
-  // divisions never inherit the source industry plates. The pairing is then
-  // validated so a division can never end up wearing another sector's ground.
-  const wantedRecipe =
-    target.designRecipeId === null
-      ? null
-      : (target.designRecipeId ??
-        (payload.context?.designRecipeId as string | null | undefined) ??
-        null);
-  const look = normalizeLook({
-    stylePackId: target.stylePackId,
-    designRecipeId: wantedRecipe,
-    industry: target.industry,
-  });
-  const mismatched = look.issues.some((i) => i.code === "industry-mismatch");
-
+  // Demo decks always wear the DECK DEFAULT look (approved brand system): no
+  // style pack, no industry ground. Switching division changes the brand mode
+  // — which carries the division accent, wordmark and chrome — plus the copy
+  // and imagery seeds. The layout language itself never leaves the default.
   return {
     ...payload,
     title: retargetedTitle(payload.title, target),
     brandModeId: target.id,
     context: {
       ...(payload.context ?? {}),
-      stylePackId: look.stylePackId ?? undefined,
-      // An inherited recipe from another sector is dropped rather than shipped;
-      // a recipe the division names itself always wins.
-      designRecipeId: mismatched && !target.designRecipeId ? null : look.designRecipeId,
+      stylePackId: null,
+      designRecipeId: null,
     },
     slides,
     brief: payload.brief

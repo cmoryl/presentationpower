@@ -250,8 +250,11 @@ function buildGlobalLinkPitch(): TemplatePayload {
     brandModeId: "bm-globallink",
     archetypeId: "arch-problem-solution",
     context: {
-      stylePackId: "skin-s06",
-      designRecipeId: "R04",
+      // Deck default look (approved brand system): no style pack, no industry
+      // ground. The division brandMode carries the accent; the layout language
+      // is the same default a fresh brief deck opens with.
+      stylePackId: null,
+      designRecipeId: null,
       defaultTransition: { type: "fade", durationMs: 420 },
     },
     slides,
@@ -431,8 +434,9 @@ function buildLifeSciencesProgram(): TemplatePayload {
     brandModeId: "bm-tp-lifesci",
     archetypeId: "arch-problem-solution",
     context: {
-      stylePackId: "skin-s14",
-      designRecipeId: "R08",
+      // Deck default look — division accent comes from the brand mode only.
+      stylePackId: null,
+      designRecipeId: null,
       defaultTransition: { type: "fade", durationMs: 560 },
     },
     slides,

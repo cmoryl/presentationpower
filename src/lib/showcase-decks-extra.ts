@@ -238,8 +238,9 @@ function buildLegalEdiscovery(): TemplatePayload {
     brandModeId: "bm-tp-legal",
     archetypeId: "arch-problem-solution",
     context: {
-      stylePackId: "skin-s10",
-      designRecipeId: "R11",
+      // Deck default look — division accent comes from the brand mode only.
+      stylePackId: null,
+      designRecipeId: null,
       defaultTransition: { type: "fade", durationMs: 480 },
     },
     slides,
@@ -422,8 +423,8 @@ function buildGamingLaunch(): TemplatePayload {
     brandModeId: "bm-tp-games",
     archetypeId: "arch-problem-solution",
     context: {
-      // Authored Games plate kit (R22 gaming language) paints every slide.
-      stylePackId: "skin-r22",
+      // Deck default look — division accent comes from the brand mode only.
+      stylePackId: null,
       designRecipeId: null,
       defaultTransition: { type: "push-left", durationMs: 420 },
     },
@@ -630,8 +631,9 @@ function buildDigitalGrowth(): TemplatePayload {
     brandModeId: "bm-tp-digital",
     archetypeId: "arch-problem-solution",
     context: {
-      stylePackId: "skin-s07",
-      designRecipeId: "R06",
+      // Deck default look — division accent comes from the brand mode only.
+      stylePackId: null,
+      designRecipeId: null,
       defaultTransition: { type: "fade", durationMs: 400 },
     },
     slides,

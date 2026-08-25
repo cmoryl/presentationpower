@@ -25,6 +25,7 @@ import {
   uploadToGlobalLinkShare,
 } from "@/lib/globallink-share.functions";
 import { trackNow } from "@/lib/analytics-track";
+import { notifyPrintToPdf } from "@/lib/deck-feedback";
 import { ExportTelemetryPanel } from "@/components/export/ExportTelemetryPanel";
 import {
   ExportLegacyImagesToggle,
@@ -459,10 +460,10 @@ function ExportView() {
               <button
                 onClick={() => {
                   if (blocked) {
-                    explainBlocked("Print / PDF", () => window.print());
+                    explainBlocked("Print / PDF", () => notifyPrintToPdf("deck"));
                     return;
                   }
-                  window.print();
+                  notifyPrintToPdf("deck");
                 }}
                 className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-50"
               >
