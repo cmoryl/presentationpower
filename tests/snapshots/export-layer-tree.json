@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-25T11:30:22.638Z",
+  "generatedAt": "2026-08-25T12:49:40.746Z",
   "trees": {
     "MV-OP-COVER@swiss-noir@light": {
       "key": "MV-OP-COVER@swiss-noir@light",
@@ -1135,6 +1135,18 @@
               0.2137,
               0.7424,
               0.0581
+            ]
+          },
+          {
+            "type": "image",
+            "name": "TP Image",
+            "editable": true,
+            "layered": true,
+            "rect": [
+              0.0822,
+              0.3275,
+              0.8359,
+              0.4954
             ]
           },
           {

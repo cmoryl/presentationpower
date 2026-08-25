@@ -1,5 +1,5 @@
 {
-  "fingerprint": "9cc80be4",
+  "fingerprint": "30d7c080",
   "variants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -164,6 +164,8 @@
     "MV-REC-NEXT",
     "MV-RISK-MITIGATION",
     "MV-ROADMAP-QUARTERS",
+    "MV-SHOW-LAPTOP",
+    "MV-SHOW-MONITOR",
     "MV-SOL-ARCHITECTURE",
     "MV-SOL-FEATURE-LIST",
     "MV-SOL-PILLARS-2",
@@ -186,12 +188,22 @@
     "MV-TEAM-BIOS-4",
     "MV-TIMELINE-VERTICAL",
     "MV-VIZ-BEESWARM",
+    "MV-VIZ-BOXPLOT",
     "MV-VIZ-BUMP",
     "MV-VIZ-CALENDAR-HEATMAP",
     "MV-VIZ-CHORD",
+    "MV-VIZ-DUMBBELL",
+    "MV-VIZ-GANTT",
+    "MV-VIZ-GAUGE-GRID",
     "MV-VIZ-MARKET-MAP",
+    "MV-VIZ-RADAR",
+    "MV-VIZ-RADIAL-BAR",
     "MV-VIZ-SANKEY",
-    "MV-VIZ-TREEMAP"
+    "MV-VIZ-SLOPE",
+    "MV-VIZ-STACKED-AREA",
+    "MV-VIZ-SUNBURST",
+    "MV-VIZ-TREEMAP",
+    "MV-VIZ-WATERFALL"
   ],
   "packs": [
     "atelier-lumen",
@@ -223,14 +235,18 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 11078,
-  "verifiedAt": "2026-08-18T13:55:20.656Z",
+  "jobs": 11774,
+  "verifiedAt": "2026-08-25T12:49:41.123Z",
   "coverage": "sampled",
   "sampledVariants": [
-    "MV-HORIZON",
+    "MV-CLOSE-DUAL-CTA",
+    "MV-DEFINITION",
+    "MV-GRAPH-BUBBLE",
     "MV-OP-COVER",
-    "MV-PROOF-TESTIMONIAL",
-    "MV-QUOTE-PORTRAIT"
+    "MV-PROOF-LOGOS-MOSAIC",
+    "MV-QUOTE-METRIC",
+    "MV-SOL-FEATURE-LIST",
+    "MV-VIZ-WATERFALL"
   ],
   "allowedProblems": {}
 }
