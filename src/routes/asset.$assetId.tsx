@@ -1834,7 +1834,10 @@ function AssetEditor() {
                   heroMedia={(rawContent as { heroMedia?: PrintHeroMedia }).heroMedia}
                   hasTitle={!!(rawContent as { title?: string }).title}
                   hasSummary={!!(rawContent as { summary?: string }).summary}
-                  onAdd={() => setPickerOpen(true)}
+                  onAdd={() => {
+                    setReplaceTarget(null);
+                    setPickerOpen(true);
+                  }}
                   onChange={(next) => patchContent({ modules: next })}
                   mode={editorMode}
                 />
@@ -2434,14 +2437,47 @@ function AssetEditor() {
         )}
       <PrintSectionPicker
         open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
+        onClose={() => {
+          setPickerOpen(false);
+          setReplaceTarget(null);
+        }}
         onInsert={(section) => {
           // Library modules are authored for a generous page; fit them to THIS
           // template's remaining space before they land, so a dense piece never
           // clips the trim on insert.
           const fit = fitPrintModuleIntoPage(kind, content, section);
-          const next = [...(content.modules ?? []), fit.section];
-          patchContent({ modules: next });
+          const mods = content.modules ?? [];
+          let next: PrintSection[];
+          let replacedLabel: string | null = null;
+          const patch: Record<string, unknown> = {};
+          if (replaceTarget?.startsWith("module:")) {
+            // Swap in place so the new module keeps the old one's slot.
+            const id = replaceTarget.slice("module:".length);
+            const idx = mods.findIndex((m) => m.id === id);
+            if (idx >= 0) {
+              replacedLabel = sectionKindLabel(mods[idx].kind);
+              next = [...mods.slice(0, idx), fit.section, ...mods.slice(idx + 1)];
+            } else {
+              next = [...mods, fit.section];
+            }
+          } else {
+            next = [...mods, fit.section];
+            if (replaceTarget) {
+              // Built-in section (e.g. "features") being replaced by a module:
+              // clear its content field so it actually comes off the page.
+              const field = SECTION_CLEARABLE_FIELDS[replaceTarget];
+              if (field) {
+                const prev = (content as unknown as Record<string, unknown>)[field];
+                patch[field] = Array.isArray(prev) ? [] : undefined;
+                replacedLabel =
+                  SECTION_DELETE_LABELS[replaceTarget] ??
+                  replaceTarget.replace(/([A-Z])/g, " $1");
+              }
+            }
+          }
+          patchContent({ ...patch, modules: next } as never);
+          const wasReplace = replacedLabel !== null;
+          setReplaceTarget(null);
           if (fit.overBudget) {
             // Absorb the remainder uniformly instead of clipping.
             patchCtx({
@@ -2449,7 +2485,12 @@ function AssetEditor() {
               contentFit: { ...resolveContentFit(ctx.contentFit), enabled: true },
             });
           }
-          if (fit.note) {
+          if (wasReplace) {
+            toast.success(
+              `${replacedLabel} replaced with ${sectionKindLabel(fit.section.kind)}`,
+              { description: fit.note ?? undefined },
+            );
+          } else if (fit.note) {
             toast.success(`Module added — ${fit.note}`, {
               description: "Fitted to this template's page budget.",
             });
