@@ -27,6 +27,7 @@ export function RelatedModulesPanel({
 }) {
   const [query, setQuery] = useState("");
   const [familyId, setFamilyId] = useState<string>("all");
+  const [sort, setSort] = useState<"fit" | "name" | "family">("fit");
 
   const families = useMemo(
     () =>
@@ -40,33 +41,48 @@ export function RelatedModulesPanel({
   const filtering = query.trim().length > 0 || familyId !== "all";
 
   const results = useMemo((): ModuleVariant[] => {
-    if (!filtering) return relatedVariants(variant.id, sectionId, 5);
+    const applySort = (list: ModuleVariant[], sectionPool: Set<string> | null) =>
+      [...list]
+        .sort((a, b) => {
+          if (sort === "name") return a.name.localeCompare(b.name);
+          if (sort === "family") {
+            const fam = a.familyId.localeCompare(b.familyId);
+            if (fam !== 0) return fam;
+            return a.name.localeCompare(b.name);
+          }
+          // "fit": section-fit first, then same family, then name.
+          const secA = sectionPool?.has(a.id) ? 1 : 0;
+          const secB = sectionPool?.has(b.id) ? 1 : 0;
+          if (secA !== secB) return secB - secA;
+          const famA = a.familyId === variant.familyId ? 1 : 0;
+          const famB = b.familyId === variant.familyId ? 1 : 0;
+          if (famA !== famB) return famB - famA;
+          return a.name.localeCompare(b.name);
+        });
 
-    const q = query.trim().toLowerCase();
     const sectionPool = sectionId
       ? new Set(variantsForSection(sectionId).map((v) => v.id))
       : null;
 
-    return MODULE_VARIANTS.filter((v) => v.id !== variant.id)
-      .filter((v) => (familyId === "all" ? true : v.familyId === familyId))
-      .filter((v) =>
-        q
-          ? v.name.toLowerCase().includes(q) ||
-            v.description.toLowerCase().includes(q) ||
-            v.id.toLowerCase().includes(q)
-          : true,
-      )
-      .sort((a, b) => {
-        const secA = sectionPool?.has(a.id) ? 1 : 0;
-        const secB = sectionPool?.has(b.id) ? 1 : 0;
-        if (secA !== secB) return secB - secA;
-        const famA = a.familyId === variant.familyId ? 1 : 0;
-        const famB = b.familyId === variant.familyId ? 1 : 0;
-        if (famA !== famB) return famB - famA;
-        return a.name.localeCompare(b.name);
-      })
-      .slice(0, 25);
-  }, [filtering, query, familyId, variant.id, variant.familyId, sectionId]);
+    if (!filtering) {
+      const ranked = relatedVariants(variant.id, sectionId, 25);
+      return (sort === "fit" ? ranked : applySort(ranked, sectionPool)).slice(0, sort === "fit" ? 5 : 25);
+    }
+
+    const q = query.trim().toLowerCase();
+    return applySort(
+      MODULE_VARIANTS.filter((v) => v.id !== variant.id)
+        .filter((v) => (familyId === "all" ? true : v.familyId === familyId))
+        .filter((v) =>
+          q
+            ? v.name.toLowerCase().includes(q) ||
+              v.description.toLowerCase().includes(q) ||
+              v.id.toLowerCase().includes(q)
+            : true,
+        ),
+      sectionPool,
+    ).slice(0, 25);
+  }, [filtering, query, familyId, sort, variant.id, variant.familyId, sectionId]);
 
   return (
     <div>
@@ -100,6 +116,20 @@ export function RelatedModulesPanel({
               {f.name} ({f.count})
             </option>
           ))}
+        </select>
+      </div>
+
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-[10px] uppercase tracking-widest text-black/40">Sort</span>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as "fit" | "name" | "family")}
+          aria-label="Sort modules"
+          className="rounded-lg border border-black/15 bg-white px-2 py-1 text-xs text-black/70 focus:border-black/40 focus:outline-none"
+        >
+          <option value="fit">Best fit</option>
+          <option value="name">Name A–Z</option>
+          <option value="family">Category</option>
         </select>
       </div>
 
