@@ -28,6 +28,12 @@ export default defineTool({
         "Design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit to keep the approved brand system.",
       )
       .optional(),
+    appearance: z
+      .enum(["light", "dark", "mixed"])
+      .describe(
+        "Light/dark treatment. 'light' = Enterprise Light (default), 'dark' = Enterprise Dark whole-deck, 'mixed' = dark cover and closing with light working slides (override per slide with each slide's mode). Ignored for the base look when style_pack_id is set.",
+      )
+      .optional(),
     design_recipe_id: z
       .string()
       .describe("Industry recipe id from the design skin catalog, e.g. 'R01'.")
@@ -48,6 +54,12 @@ export default defineTool({
           icon: z
             .string()
             .describe("Slide-level icon name for icon-bearing modules (see search_icons).")
+            .optional(),
+          mode: z
+            .enum(["light", "dark"])
+            .describe(
+              "Per-slide light/dark override — set dark slides in a mixed deck (e.g. cover and closing dark, working slides light).",
+            )
             .optional(),
         }),
       )
@@ -71,12 +83,14 @@ export default defineTool({
     }
 
     // Validate + resolve every slide before any row is written.
+    const lastIdx = input.slides.length - 1;
     const planned: Array<{
       position: number;
       sectionId: string;
       variantId: string;
       layoutId: string;
       content: Record<string, unknown>;
+      mode: "light" | "dark" | null;
       notes: string | null;
     }> = [];
     for (let i = 0; i < input.slides.length; i++) {
@@ -91,15 +105,28 @@ export default defineTool({
         if (!withIcon.ok) return errorResult(`Slide ${i + 1}: ${withIcon.error}`);
         content = withIcon.value as Record<string, unknown>;
       }
+      // Mixed look: dark bookends (cover + closing), light working slides,
+      // unless the agent picked an explicit per-slide mode.
+      const mode =
+        input.appearance === "mixed"
+          ? (s.mode ?? (i === 0 || i === lastIdx ? "dark" : "light"))
+          : (s.mode ?? null);
       planned.push({
         position: i,
         sectionId: s.section_id,
         variantId: resolved.value.variantId,
         layoutId: resolved.value.layoutId,
         content,
+        mode,
         notes: s.notes ?? null,
       });
     }
+
+    // Appearance → whole-deck pack when no explicit skin was requested:
+    // dark builds on Enterprise Dark; light/mixed stay on the approved
+    // (light) brand system with per-slide dark modes doing the contrast.
+    const stylePackId =
+      input.style_pack_id ?? (input.appearance === "dark" ? "skin-s04" : null);
 
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
@@ -114,7 +141,7 @@ export default defineTool({
         status: "draft",
         context: {
           clientName: input.client_name ?? null,
-          stylePackId: input.style_pack_id ?? null,
+          stylePackId,
           designRecipeId: input.design_recipe_id ?? null,
         } as never,
       } as never)
@@ -130,7 +157,9 @@ export default defineTool({
         section_id: s.sectionId,
         variant_id: s.variantId,
         layout_id: s.layoutId,
-        content: s.content as never,
+        // Per-slide light/dark rides in the slide extras so it round-trips
+        // through save/load exactly like editor-set modes.
+        content: (s.mode ? { ...s.content, __extras: { mode: s.mode } } : s.content) as never,
         notes: s.notes,
       })) as never,
     );
@@ -145,12 +174,15 @@ export default defineTool({
       deck_id: deckId,
       title: input.title,
       brand_mode_id: input.brand_mode_id,
+      appearance: input.appearance ?? "light",
+      style_pack_id: stylePackId,
       slide_count: planned.length,
       slides: planned.map((s) => ({
         position: s.position,
         section_id: s.sectionId,
         variant_id: s.variantId,
         layout_id: s.layoutId,
+        mode: s.mode,
       })),
       editor_url: `/deck/${deckId}`,
       visuals_needing_data: auditVisualData(

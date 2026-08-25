@@ -427,6 +427,15 @@
               "type": "string",
               "description": "Design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit to keep the approved brand system."
             },
+            "appearance": {
+              "type": "string",
+              "enum": [
+                "light",
+                "dark",
+                "mixed"
+              ],
+              "description": "Light/dark treatment. 'light' = Enterprise Light (default), 'dark' = Enterprise Dark whole-deck, 'mixed' = dark cover and closing with light working slides (override per slide with each slide's mode). Ignored for the base look when style_pack_id is set."
+            },
             "design_recipe_id": {
               "type": "string",
               "description": "Industry recipe id from the design skin catalog, e.g. 'R01'."
@@ -459,6 +468,14 @@
                   "icon": {
                     "type": "string",
                     "description": "Slide-level icon name for icon-bearing modules (see search_icons)."
+                  },
+                  "mode": {
+                    "type": "string",
+                    "enum": [
+                      "light",
+                      "dark"
+                    ],
+                    "description": "Per-slide light/dark override — set dark slides in a mixed deck (e.g. cover and closing dark, working slides light)."
                   }
                 },
                 "required": [
