@@ -14,11 +14,18 @@ import {
   FileText,
   LayoutGrid,
   BookOpen,
+  Lock,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
-import { PERSONAS, personaById, type PersonaId, type WorkKind } from "@/lib/workspace-persona";
+import {
+  PERSONAS,
+  PERSONA_ROLE_REQUIREMENT,
+  personaById,
+  type PersonaId,
+  type WorkKind,
+} from "@/lib/workspace-persona";
 import { listMyCloudDecks } from "@/lib/cloud-decks.functions";
 import { listMyPrintAssets } from "@/lib/print-assets.functions";
 import { listMyKits } from "@/lib/kits.functions";
