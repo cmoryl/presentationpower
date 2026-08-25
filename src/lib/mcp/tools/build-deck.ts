@@ -141,7 +141,7 @@ export default defineTool({
         status: "draft",
         context: {
           clientName: input.client_name ?? null,
-          stylePackId: input.style_pack_id ?? null,
+          stylePackId,
           designRecipeId: input.design_recipe_id ?? null,
         } as never,
       } as never)
@@ -157,7 +157,9 @@ export default defineTool({
         section_id: s.sectionId,
         variant_id: s.variantId,
         layout_id: s.layoutId,
-        content: s.content as never,
+        // Per-slide light/dark rides in the slide extras so it round-trips
+        // through save/load exactly like editor-set modes.
+        content: (s.mode ? { ...s.content, __extras: { mode: s.mode } } : s.content) as never,
         notes: s.notes,
       })) as never,
     );
