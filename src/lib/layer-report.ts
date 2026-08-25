@@ -179,7 +179,20 @@ export function buildLayerReport(slideXml: string, presentationXml: string): Lay
   if (objects.length === 0) problems.push("slide has no objects at all");
   if (counts.text === 0) problems.push("no editable text objects");
   if (contentObjects.length === 0) problems.push("slide is a single flattened picture");
-  if (counts.shape === 0 && counts.image === 0 && counts.icon === 0 && counts.chart === 0)
+  // Typographic modules (definition slides, pull quotes, logo-name mosaics)
+  // are legitimately text-only above the plate: their glass cards and accent
+  // washes are pixel-exact plate surfaces by contract (see
+  // export-dom-decompose.ts, `surfaceRoots`), and their editable content is the
+  // copy itself. Only flag a slide that carries essentially NO native content
+  // at all — the element-level object-tree diff is what guards real layering
+  // regressions for content-bearing modules.
+  if (
+    counts.shape === 0 &&
+    counts.image === 0 &&
+    counts.icon === 0 &&
+    counts.chart === 0 &&
+    counts.text < 2
+  )
     problems.push("no native shapes, icons or pictures above the plate");
 
   return {
