@@ -22,6 +22,8 @@ import {
 
 import { toast } from "sonner";
 
+import { useServerFn } from "@tanstack/react-start";
+
 import { AppShell } from "@/components/AppShell";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -122,7 +124,11 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
 }
 
 function LondonSignagePage() {
-  const floors = useMemo(() => londonPanelsByFloor(), []);
+  const fetchRevisions = useServerFn(listLondonRevisions);
+  // The kit shows the panel set IN FORCE: the newest published revision, or the
+  // issued venue pack when there is none (or when the viewer is not signed in).
+  const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
+  const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
   const [floorId, setFloorId] = useState<string>("all");
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
@@ -145,15 +151,41 @@ function LondonSignagePage() {
   }, []);
 
   useEffect(() => {
+    let live = true;
+    fetchRevisions({})
+      .then((res) => {
+        if (!live) return;
+        const inForce = effectiveLondonPanels(res.revisions);
+        if (inForce.length) setPanels(inForce);
+      })
+      .catch(() => {
+        /* Not signed in or history unavailable — the issued pack stands. */
+      });
+    return () => {
+      live = false;
+    };
+  }, [fetchRevisions]);
+
+  useEffect(() => {
     if (openPanel) setPpi(recommendedPpi(openPanel));
   }, [openPanel]);
 
   const shown = floorId === "all" ? floors : floors.filter((f) => f.id === floorId);
-  const styleCount = new Set(LONDON_PANELS.map((p) => p.style)).size;
-  const roomCount = new Set(LONDON_PANELS.map((p) => `${p.floor}·${p.room}`)).size;
-  const worstBand = Math.max(...LONDON_PANELS.map((p) => p.bandMm));
+  const styleCount = new Set(panels.map((p) => p.style)).size;
+  const roomCount = new Set(panels.map((p) => `${p.floor}·${p.room}`)).size;
+  const worstBand = Math.max(...panels.map((p) => p.bandMm));
 
   const target = openPanel ? rasterSizeFor(openPanel, ppi) : null;
+
+  const packOrNull = async () => {
+    if (artwork) return artwork;
+    try {
+      return await loadLondonArtwork();
+    } catch {
+      // Added and revised panels do not need the packaged masters at all.
+      return null;
+    }
+  };
 
   const downloadVector = (panel: LondonPanel, fmt: "svg" | "ai") =>
     runWithExportFeedback(
@@ -167,11 +199,10 @@ function LondonSignagePage() {
             : "Live vector gradient sized to bleed.",
       },
       async () => {
-        const pack = artwork ?? (await loadLondonArtwork());
-        const entry = pack[panel.id];
-        if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
-        const body = fmt === "svg" ? entry.svg : entry.ai;
-        gateOnQa(fmt === "svg" ? auditSvg(panel, entry.svg) : auditAi(panel, entry.ai));
+        const pack = await packOrNull();
+        const art = resolveLondonArtwork(panel, pack);
+        const body = fmt === "svg" ? art.svg : art.ai;
+        gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
         const type = fmt === "svg" ? "image/svg+xml" : "application/postscript";
         download(new Blob([body], { type }), `${panelSlug(panel)}.${fmt}`);
       },
@@ -186,11 +217,9 @@ function LondonSignagePage() {
         successDescription: "Lossless PNG, sized to bleed, triangular-PDF dither applied.",
       },
       async () => {
-        const pack = artwork ?? (await loadLondonArtwork());
-        const entry = pack[panel.id];
-        if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
+        const pack = await packOrNull();
         const size = rasterSizeFor(panel, ppi);
-        const blob = await renderDitheredPng(entry.svg, size.w, size.h);
+        const blob = await renderDitheredPng(resolveLondonArtwork(panel, pack).svg, size.w, size.h);
         gateOnQa(auditPng(panel, ppi, new Uint8Array(await blob.arrayBuffer())));
         download(blob, `${panelSlug(panel)}-${ppi}ppi.png`);
       },
@@ -206,7 +235,7 @@ function LondonSignagePage() {
       },
       async () => {
         download(
-          new Blob([londonScheduleCsv()], { type: "text/csv" }),
+          new Blob([londonScheduleCsv(panels)], { type: "text/csv" }),
           "NEXT-London-print-schedule.csv",
         );
       },
@@ -221,30 +250,11 @@ function LondonSignagePage() {
         successDescription: "Trim, bleed, ppi tier and banding checked for every vector master.",
       },
       async () => {
-        const pack = artwork ?? (await loadLondonArtwork());
+        const pack = await packOrNull();
         const reports: LondonQaReport[] = [];
-        for (const panel of LONDON_PANELS) {
-          const entry = pack[panel.id];
-          if (!entry) {
-            reports.push({
-              panelId: panel.id,
-              panelName: panel.name,
-              file: `${panelSlug(panel)}.svg`,
-              kind: "svg",
-              status: "fail",
-              checks: [
-                {
-                  id: "pack-present",
-                  label: "Artwork present in the pack",
-                  status: "fail",
-                  expected: "svg + ai master",
-                  actual: "missing",
-                },
-              ],
-            });
-            continue;
-          }
-          reports.push(auditSvg(panel, entry.svg), auditAi(panel, entry.ai));
+        for (const panel of panels) {
+          const art = resolveLondonArtwork(panel, pack);
+          reports.push(auditSvg(panel, art.svg), auditAi(panel, art.ai));
         }
         setQa(reports);
         download(new Blob([qaReportCsv(reports)], { type: "text/csv" }), "NEXT-London-qa-report.csv");
