@@ -304,6 +304,9 @@ function AssetEditor() {
   // Canvas "Edit" deep-link: id of the stacked module to reveal in the Shared
   // modules panel, plus a nonce that force-opens the panel on each click.
   const [moduleFocus, setModuleFocus] = useState<{ id: string; nonce: number } | null>(null);
+  // Live drag-over state when a library module is dragged onto the canvas —
+  // idx is where it will land in the modules stack, top is the indicator Y.
+  const [canvasDrop, setCanvasDrop] = useState<{ idx: number; top: number } | null>(null);
   // Delete confirmation modal state.
   const [deleteOpen, setDeleteOpen] = useState(false);
   // "Save as page template" dialog — captures the section stack for reuse.
@@ -818,6 +821,47 @@ function AssetEditor() {
       toast.success("Module added");
     }
   }
+
+  // Parse a library-module drag payload (drawer + right rail tiles both send
+  // the full PrintSection JSON). Re-issues the id like the list drop does.
+  function readCanvasDragPayload(e: React.DragEvent): PrintSection | null {
+    const raw = e.dataTransfer.getData(PRINT_SECTION_DND_MIME);
+    if (!raw) return null;
+    try {
+      const parsed = JSON.parse(raw) as PrintSection;
+      if (!parsed || typeof parsed !== "object" || !("kind" in parsed)) return null;
+      return { ...parsed, id: `sec-${Math.random().toString(36).slice(2, 10)}` } as PrintSection;
+    } catch {
+      return null;
+    }
+  }
+
+  // Where a module dropped at clientY should land in the modules stack: count
+  // the rendered module bands whose midpoint sits above the cursor, and
+  // position the insertion indicator at that boundary.
+  function canvasInsertPoint(clientY: number): { idx: number; top: number } {
+    const canvas = canvasRef.current;
+    const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
+    if (!canvas) return { idx: mods.length, top: 0 };
+    const cRect = canvas.getBoundingClientRect();
+    const nodes = Array.from(
+      canvas.querySelectorAll<HTMLElement>('[data-section^="module:"]'),
+    );
+    if (nodes.length === 0) {
+      return { idx: 0, top: Math.max(8, clientY - cRect.top) };
+    }
+    let idx = 0;
+    let top = nodes[0]!.getBoundingClientRect().top - cRect.top;
+    for (const el of nodes) {
+      const r = el.getBoundingClientRect();
+      if (clientY > r.top + r.height / 2) {
+        idx++;
+        top = r.bottom - cRect.top;
+      }
+    }
+    return { idx: Math.min(idx, mods.length), top };
+  }
+
 
   // Collect all non-empty string paths in the content object so LiveEditOverlay
   // can bind DOM text nodes back to structured content.
@@ -1507,7 +1551,42 @@ function AssetEditor() {
               ref={canvasRef}
               className="relative overflow-hidden rounded-3xl border border-black/10 bg-white shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
               style={multiDoc ? undefined : { aspectRatio: canvasAspect }}
+              onDragOver={(e) => {
+                if (!e.dataTransfer.types.includes(PRINT_SECTION_DND_MIME)) return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "copy";
+                const { idx, top } = canvasInsertPoint(e.clientY);
+                setCanvasDrop((prev) =>
+                  prev && prev.idx === idx && Math.abs(prev.top - top) < 2 ? prev : { idx, top },
+                );
+              }}
+              onDragLeave={(e) => {
+                const related = e.relatedTarget as Node | null;
+                if (!related || !(e.currentTarget as HTMLElement).contains(related)) {
+                  setCanvasDrop(null);
+                }
+              }}
+              onDrop={(e) => {
+                const section = readCanvasDragPayload(e);
+                if (!section) return;
+                e.preventDefault();
+                const target = canvasDrop?.idx;
+                setCanvasDrop(null);
+                insertPickedSection(section, target);
+              }}
             >
+              {canvasDrop && (
+                <div
+                  data-export-ignore="true"
+                  className="pointer-events-none absolute inset-x-3 z-30"
+                  style={{ top: Math.max(4, canvasDrop.top - 1) }}
+                >
+                  <div className="h-0.5 rounded-full bg-[#003FC7] shadow-[0_0_0_3px_rgba(0,63,199,0.18)]" />
+                  <div className="absolute -top-2.5 left-2 rounded-md bg-[#003FC7] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow">
+                    Drop module here
+                  </div>
+                </div>
+              )}
               <PrintPageProvider size={pageSize} margin={marginPreset} density={density}>
                 <PrintContentFitFrame
                   settings={ctx.contentFit}
