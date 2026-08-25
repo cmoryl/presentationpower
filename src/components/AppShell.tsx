@@ -125,10 +125,6 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
       items: [
         { to: "/print-agent", label: "Print agent" },
         { to: "/library/print", label: "Print templates" },
-
-        { to: "/library/print", label: "Case studies", search: { type: "case-study" } },
-        { to: "/library/print", label: "Client spotlights", search: { type: "spotlight" } },
-        { to: "/library/print", label: "E-brochures", search: { type: "ebrochure" } },
         { to: "/library/print/modules", label: "Section modules" },
       ],
     },
