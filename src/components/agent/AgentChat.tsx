@@ -193,7 +193,7 @@ export function AgentChat({
         if (alive()) setDemoBusy(false);
       }
     },
-    [onActivity, onFirstUserMessage, setMessages, threadId],
+    [onActivity, onDeckDetected, onFirstUserMessage, setMessages, threadId],
   );
 
   useEffect(() => {
