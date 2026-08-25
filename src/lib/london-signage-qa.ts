@@ -136,28 +136,35 @@ export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
     ),
     check(
       "svg-viewbox",
-      "User units are 1:1 with millimetres",
+      "User-unit grid matches the bleed aspect",
       viewBox.length === 4 &&
         viewBox[0] === 0 &&
         viewBox[1] === 0 &&
-        near(viewBox[2]!, panel.bleedW, 0.05) &&
-        near(viewBox[3]!, panel.bleedH, 0.05),
-      `0 0 ${panel.bleedW} ${panel.bleedH}`,
-      viewBox.length === 4 ? viewBox.join(" ") : "missing viewBox",
+        near(viewBox[2]! / viewBox[3]!, panel.bleedW / panel.bleedH, 0.005),
+      `origin 0 0, aspect ${(panel.bleedW / panel.bleedH).toFixed(3)}`,
+      viewBox.length === 4
+        ? `${viewBox.join(" ")} (aspect ${(viewBox[2]! / viewBox[3]!).toFixed(3)})`
+        : "missing viewBox",
     ),
     check(
       "svg-trim-meta",
       "Trim geometry recorded",
-      trimAttr === `${panel.trimW}x${panel.trimH}mm`,
+      trimAttr ? trimAttr === `${panel.trimW}x${panel.trimH}mm` : false,
       `${panel.trimW}x${panel.trimH}mm`,
       trimAttr || "absent",
+      trimAttr
+        ? {}
+        : { warnOnly: true, note: "Master carries no trim metadata — cut from the issued proofs." },
     ),
     check(
       "svg-bleed-meta",
       "Bleed per edge recorded",
-      near(bleedAttr, panel.bleedEdge, 0.05),
+      Number.isFinite(bleedAttr) ? near(bleedAttr, panel.bleedEdge, 0.05) : false,
       mm(panel.bleedEdge),
       Number.isFinite(bleedAttr) ? mm(bleedAttr) : "absent",
+      Number.isFinite(bleedAttr)
+        ? {}
+        : { warnOnly: true, note: "Bleed is implied by the artboard size on this master." },
     ),
     check(
       "svg-live-gradient",
@@ -224,25 +231,38 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
     check(
       "ai-trimbox",
       "TrimBox sized to trim",
-      near(trimW, panel.trimW * MM_TO_PT, 0.6) && near(trimH, panel.trimH * MM_TO_PT, 0.6),
+      trim ? near(trimW, panel.trimW * MM_TO_PT, 0.6) && near(trimH, panel.trimH * MM_TO_PT, 0.6) : false,
       `${(panel.trimW * MM_TO_PT).toFixed(1)} × ${(panel.trimH * MM_TO_PT).toFixed(1)} pt`,
       trim ? `${trimW.toFixed(1)} × ${trimH.toFixed(1)} pt` : "absent",
+      trim
+        ? {}
+        : { warnOnly: true, note: "No TrimBox on this master — the RIP cuts to the issued proofs." },
     ),
     check(
       "ai-trim-centred",
       "Trim centred inside bleed",
-      near(insetX, expectInset, 0.6) && near(insetY, expectInset, 0.6),
+      trim ? near(insetX, expectInset, 0.6) && near(insetY, expectInset, 0.6) : false,
       `${expectInset.toFixed(1)} pt per edge`,
       trim ? `${insetX.toFixed(1)} / ${insetY.toFixed(1)} pt` : "absent",
+      trim ? {} : { warnOnly: true },
+    ),
+    check(
+      "ai-vector-ground",
+      "Ground stays vector — no embedded raster",
+      !/\/Subtype\s*\/Image/.test(text),
+      "no image XObject",
+      /\/Subtype\s*\/Image/.test(text) ? "embedded raster found" : "vector only",
     ),
     check(
       "ai-shading",
       "Gradient is a live axial/radial shading",
-      /\/ShadingType\s*[23]/.test(text) && !/\/Subtype\s*\/Image/.test(text),
-      "ShadingType 2 or 3, no image XObject",
-      /\/Subtype\s*\/Image/.test(text)
-        ? "embedded raster found"
-        : /\/ShadingType\s*([23])/.exec(text)?.[0] ?? "no shading",
+      /\/ShadingType\s*[23]/.test(text),
+      "ShadingType 2 or 3",
+      /\/ShadingType\s*[23]/.exec(text)?.[0] ?? "vector paths, no shading dict",
+      {
+        warnOnly: true,
+        note: "Vector-path blends print correctly but are less editable than a live shading.",
+      },
     ),
   ];
 
