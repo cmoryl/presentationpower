@@ -44,8 +44,10 @@ export function ExactSlideStage({
   pageNumber = 1,
   decorOnly = false,
 }: ExactSlideStageProps) {
-  // A pack owns its mode — the look IS light or dark.
-  const effMode = pack ? pack.mode : mode;
+  // Export mode is a slide-level brand-system decision. A style pack can still
+  // publish its own tokens, but it must not override a slide explicitly marked
+  // light/dark in the editor or agent output.
+  const effMode = mode;
   const surface = pack ? pack.tokens.surface : effMode === "dark" ? "#03002C" : "#F2F2F2";
 
   return (
@@ -53,6 +55,7 @@ export function ExactSlideStage({
       data-exact-slide-stage=""
       data-decor-only={decorOnly ? "" : undefined}
       data-variant-id={variant.id}
+      className={effMode === "dark" ? "dark" : undefined}
       style={
         {
           position: "relative",
