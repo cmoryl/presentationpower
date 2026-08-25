@@ -38,6 +38,8 @@ export const PRINT_LOOK_TOOL_NAME = "propose_look_and_feel";
 export const PRINT_MODULES_TOOL_NAME = "list_module_variations";
 /** Renders a live, to-scale preview of the piece inside the chat. */
 export const PRINT_PREVIEW_TOOL_NAME = "preview_print_asset";
+/** Offers print-ready downloads (PDF + PNG + SVG) for one page in the chat. */
+export const PRINT_EXPORT_TOOL_NAME = "export_print_page";
 
 const KindEnum = z.enum([
   "case-study",
@@ -524,6 +526,33 @@ export function buildPrintAgentToolSet(ctx: PrintToolContext): ToolSet {
         };
       },
     }),
+
+    [PRINT_EXPORT_TOOL_NAME]: tool({
+      description:
+        "Final step: offer print-ready downloads for ONE page of a piece the user owns. Renders an export card in the chat with PDF (300 dpi press, bleed + crop marks), PNG (300 dpi) and SVG buttons. Call this when the user asks to export, download, send to print or hand off files.",
+      inputSchema: z.object({
+        assetId: z.string().uuid(),
+        page: z.number().int().min(0).max(40).optional(),
+        formats: z.array(z.enum(["pdf", "png", "svg"])).min(1).optional(),
+        note: z.string().max(200).optional(),
+      }),
+      execute: async ({ assetId, page, formats, note }) => {
+        const asset = await loadAsset(assetId);
+        return {
+          ok: true,
+          assetId: asset.id,
+          print_asset_id: asset.id,
+          kind: asset.kind,
+          title: asset.title,
+          divisionId: asset.brand_mode_id,
+          page: page ?? 0,
+          ...(formats ? { formats } : {}),
+          ...(note ? { note } : {}),
+        };
+      },
+    }),
+
+
 
     list_my_print_assets: tool({
       description: "List the print pieces the signed-in user already owns.",
