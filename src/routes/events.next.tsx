@@ -35,6 +35,11 @@ import {
   type NextRegistryRow,
 } from "@/lib/next-event";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  LONDON_STYLES,
+  LONDON_VENUE,
+  londonPanelsByFloor,
+} from "@/lib/next-london-signage";
 import { NextBadge } from "@/components/next/NextBadge";
 import { badgeDivisionFor, SAMPLE_ATTENDEE } from "@/lib/next-badge";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
@@ -197,6 +202,8 @@ function NextHub() {
           })}
         </div>
       )}
+
+      <LondonKit />
 
       <CitySeries />
 
