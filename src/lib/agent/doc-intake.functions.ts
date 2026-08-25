@@ -35,7 +35,7 @@ async function extractViaAi(
           content: [
             {
               type: "text",
-              text: "Extract ALL readable text from this document as plain text. Preserve headings and paragraph breaks with double newlines. Keep tables as simple rows. Do not summarize. Do not add commentary. Output text only.",
+              text: "Extract ALL readable text from this document as lightweight Markdown. Keep the structure: headings become # / ## lines (matching their level), bulleted or numbered items become - list items indented by nesting level, and tables become Markdown pipe tables with a header separator row. Keep the original reading order, preserve paragraph breaks with blank lines, and label slides as '## Slide N: title' when the file is a presentation. Do not summarize. Do not add commentary. Output the extracted content only.",
             },
             { type: "file", file: { filename, file_data: `data:${mime};base64,${base64}` } },
           ],
