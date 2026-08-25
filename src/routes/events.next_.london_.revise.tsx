@@ -137,6 +137,150 @@ const NUM_FIELDS: { key: keyof LondonPanelEdit; label: string; width: string }[]
   { key: "rasterPpi", label: "ppi", width: "w-16" },
 ];
 
+const FLOOR_OPTIONS: LondonPanel["floor"][] = ["GF", "2F", "3F", "4F", "5F"];
+
+/** Spec form for a panel the venue team adds mid-build. */
+function AddPanelForm({
+  rooms,
+  onAdd,
+  onClose,
+}: {
+  rooms: string[];
+  onAdd: (spec: LondonPanelAdd) => void;
+  onClose: () => void;
+}) {
+  const [floor, setFloor] = useState<LondonPanel["floor"]>("GF");
+  const [room, setRoom] = useState(rooms[0] ?? "ADDITIONAL");
+  const [name, setName] = useState("");
+  const [ground, setGround] = useState("Banner wash");
+  const [style, setStyle] = useState(Object.keys(LONDON_STYLES)[0]!);
+  const [trimW, setTrimW] = useState("2000");
+  const [trimH, setTrimH] = useState("1000");
+  const [bleedEdge, setBleedEdge] = useState("25");
+  const [ppi, setPpi] = useState("");
+
+  const w = Number(trimW);
+  const h = Number(trimH);
+  const edge = Number(bleedEdge);
+  const valid = [w, h].every((n) => Number.isFinite(n) && n > 0) && Number.isFinite(edge) && edge >= 0;
+  const autoName = `${(room || "ADDITIONAL").toUpperCase()} ADDITION - ${valid ? `${w}x${h}mm` : "…"}`;
+
+  const field = "mt-1 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] placeholder:text-[#999]";
+  const label = "text-[11px] font-semibold uppercase tracking-[0.14em] text-[#666]";
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!valid) return;
+        onAdd({
+          floor,
+          room,
+          name: name.trim() || autoName,
+          ground,
+          style,
+          trimW: w,
+          trimH: h,
+          bleedEdge: edge,
+          rasterPpi: ppi ? Number(ppi) : undefined,
+        });
+        setName("");
+      }}
+      className="mt-3 grid gap-3 rounded-2xl border border-[#003FC7]/25 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4"
+    >
+      <label className="sm:col-span-2">
+        <span className={label}>Panel name</span>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={autoName}
+          className={field}
+        />
+      </label>
+      <label>
+        <span className={label}>Floor</span>
+        <select
+          value={floor}
+          onChange={(e) => setFloor(e.target.value as LondonPanel["floor"])}
+          className={field}
+        >
+          {FLOOR_OPTIONS.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        <span className={label}>Room</span>
+        <input
+          value={room}
+          onChange={(e) => setRoom(e.target.value)}
+          list="london-rooms"
+          className={field}
+        />
+        <datalist id="london-rooms">
+          {rooms.map((r) => (
+            <option key={r} value={r} />
+          ))}
+        </datalist>
+      </label>
+      <label>
+        <span className={label}>Gradient</span>
+        <select value={style} onChange={(e) => setStyle(e.target.value)} className={field}>
+          {Object.entries(LONDON_STYLES).map(([id, st]) => (
+            <option key={id} value={id}>
+              {st.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        <span className={label}>Ground</span>
+        <input value={ground} onChange={(e) => setGround(e.target.value)} className={field} />
+      </label>
+      <label>
+        <span className={label}>Trim W (mm)</span>
+        <input type="number" min={1} step={0.5} value={trimW} onChange={(e) => setTrimW(e.target.value)} className={field} />
+      </label>
+      <label>
+        <span className={label}>Trim H (mm)</span>
+        <input type="number" min={1} step={0.5} value={trimH} onChange={(e) => setTrimH(e.target.value)} className={field} />
+      </label>
+      <label>
+        <span className={label}>Bleed / edge (mm)</span>
+        <input type="number" min={0} step={0.5} value={bleedEdge} onChange={(e) => setBleedEdge(e.target.value)} className={field} />
+      </label>
+      <label>
+        <span className={label}>ppi (blank = auto tier)</span>
+        <input type="number" min={18} max={300} step={1} value={ppi} onChange={(e) => setPpi(e.target.value)} placeholder="auto" className={field} />
+      </label>
+      <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-4">
+        <p className="mr-auto text-xs text-[#666]">
+          {valid
+            ? `Bleed box ${(w + edge * 2).toFixed(1)}×${(h + edge * 2).toFixed(1)}mm · artwork is built from this spec, then spec-QA'd on regeneration.`
+            : "Enter a positive trim size to continue."}
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-[#03002C]"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={!valid}
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-semibold text-white disabled:opacity-40"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Add panel
+        </button>
+      </div>
+    </form>
+  );
+}
+
 function LondonRevisePage() {
   const fetchRevisions = useServerFn(listLondonRevisions);
   const publish = useServerFn(publishLondonRevision);
@@ -506,6 +650,14 @@ function LondonRevisePage() {
           <section>
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-lg font-semibold text-[#03002C]">Panel schedule</h2>
+              <button
+                type="button"
+                onClick={() => setAddOpen((v) => !v)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7]/30 bg-white px-3 py-1.5 text-xs font-semibold text-[#003FC7]"
+              >
+                <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+                Add panel
+              </button>
               <div className="ml-auto flex flex-wrap gap-1.5">
                 {["all", ...floors].map((f) => (
                   <button
@@ -523,6 +675,36 @@ function LondonRevisePage() {
                 ))}
               </div>
             </div>
+
+            {addOpen ? (
+              <AddPanelForm
+                rooms={[...new Set(draft.map((p) => p.room))]}
+                onAdd={addPanel}
+                onClose={() => setAddOpen(false)}
+              />
+            ) : null}
+
+            {removed.length ? (
+              <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#E53D2E]/25 bg-[#E53D2E]/5 px-3 py-2 text-xs text-[#03002C]">
+                <span className="font-semibold">
+                  {removed.length} panel{removed.length === 1 ? "" : "s"} removed in this draft
+                </span>
+                {removed.map((id) => {
+                  const panel = current.find((p) => p.id === id);
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setRemoved((prev) => prev.filter((x) => x !== id))}
+                      className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-2 py-1 font-medium"
+                    >
+                      <RotateCcw className="h-3 w-3" aria-hidden="true" />
+                      Restore {panel?.name ?? id}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
 
             <div className="mt-3 overflow-x-auto rounded-2xl border border-black/10 bg-white">
               <table className="w-full min-w-[880px] text-sm">
@@ -560,6 +742,11 @@ function LondonRevisePage() {
                           <p className="text-xs text-[#666]">
                             {panel.floor} · {panel.room}
                           </p>
+                          {isAddedPanel(panel) ? (
+                            <span className="mt-1 inline-block rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]">
+                              Added
+                            </span>
+                          ) : null}
                         </td>
                         <td className="px-3 py-2.5">
                           <select
@@ -602,6 +789,14 @@ function LondonRevisePage() {
                           >
                             <ScanEye className="h-3.5 w-3.5" aria-hidden="true" />
                             Preview ppi tiers
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => dropPanel(panel)}
+                            className="ml-1.5 mt-1 inline-flex items-center gap-1.5 rounded-md border border-[#E53D2E]/30 px-2 py-1 text-[11px] font-semibold text-[#E53D2E]"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                            Remove
                           </button>
                         </td>
                       </tr>
