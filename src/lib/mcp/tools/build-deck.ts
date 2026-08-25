@@ -138,11 +138,10 @@ export default defineTool({
       });
     }
 
-    // Appearance → whole-deck pack when no explicit skin was requested:
-    // dark builds on Enterprise Dark; light/mixed stay on the approved
-    // (light) brand system with per-slide dark modes doing the contrast.
-    const stylePackId =
-      input.style_pack_id ?? (appearance === "dark" ? "skin-s04" : null);
+    // Appearance is expressed through per-slide modes on the approved
+    // Enterprise brand system. Alternate skins are stored only when explicitly
+    // authorized above.
+    const stylePackId = input.style_pack_id ?? null;
 
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
