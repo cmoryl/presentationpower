@@ -6,7 +6,16 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { findDeckIdInMessages } from "@/lib/agent/threads";
+import { findDeckIdInMessages, appendAgentMessages, setAgentThreadDeck } from "@/lib/agent/threads";
+import {
+  DEMO_FAST_BUILD_TRIGGER,
+  GLOBALLINK_Q3_QBR_DECK,
+  demoBuildSteps,
+  demoFinalAssistantText,
+  isDemoFastBuildPrompt,
+  type DemoToolPart,
+} from "@/lib/agent/demo-fast-build";
+import { useDeckStore } from "@/lib/deck-store";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { readStoredDesignDna } from "@/lib/agent/design-dna";
 import { AgentDesignDnaImport } from "@/components/agent/AgentDesignDnaImport";

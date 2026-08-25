@@ -47,6 +47,10 @@ const AGENT_CAPABILITIES: Array<{ label: string; icon: LucideIcon; color: string
 
 const STARTER_BRIEFS = [
   {
+    label: "GlobalLink Q3 QBR · demo",
+    text: "Create a 6-slide GlobalLink Q3 business review with stats and a case study",
+  },
+  {
     label: "Q1 board review",
     text: "Build a Q1 board review deck for TransPerfect that highlights revenue growth, major client wins, and our AI-enabled language platform roadmap.",
   },
