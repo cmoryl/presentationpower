@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
-  Check,
   ClipboardCheck,
   FileText,
   Gauge,
@@ -136,7 +135,7 @@ function JudgingDemoPrepPage() {
                   </div>
                 </div>
               </div>
-              <div className="mt-5 rounded-lg bg-primary-foreground/10 p-4 text-sm leading-relaxed text-primary-foreground/78">
+              <div className="mt-5 rounded-lg bg-primary-foreground/10 p-4 text-sm leading-relaxed text-primary-foreground/80">
                 Final score = Sell more x5 + Automate & innovate x4 + Scale x3 = /180.
               </div>
             </div>
@@ -256,7 +255,7 @@ function JudgingDemoPrepPage() {
 
         <section className="mt-8 grid gap-4 md:grid-cols-3">
           <Link to="/agent" className="group rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-sm transition hover:border-primary/35">
-            <BrainIcon />
+            <Rocket className="size-8 text-primary" aria-hidden />
             <h2 className="mt-4 text-lg font-semibold tracking-tight">Start from the agent</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Create the live deck from a judging-specific prompt.</p>
           </Link>
@@ -276,6 +275,3 @@ function JudgingDemoPrepPage() {
   );
 }
 
-function BrainIcon() {
-  return <Rocket className="size-8 text-primary" aria-hidden />;
-}
