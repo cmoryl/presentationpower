@@ -1,4 +1,4 @@
-import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { CaseStudyContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
@@ -333,7 +333,9 @@ export function CaseStudyLayout({
                       <div
                         style={{
                           fontWeight: 700,
-                          fontSize: cq(13),
+                          fontSize: cq(
+                            13 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 10),
+                          ),
                           color: accentInk,
                           letterSpacing: "-0.01em",
                           ...STAT_VALUE_NOWRAP,

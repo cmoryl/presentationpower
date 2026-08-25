@@ -5,7 +5,7 @@
 // band, split photo, typographic stack, accent band, stat lockup, and the
 // case-study client lockup.
 
-import { statUnitParts, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
@@ -464,7 +464,9 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
             <div key={i}>
               <div
                 style={{
-                  fontSize: cq(24),
+                  fontSize: cq(
+                    24 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 6),
+                  ),
                   fontWeight: 700,
                   letterSpacing: "-0.03em",
                   color: accent,
