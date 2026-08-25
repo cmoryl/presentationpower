@@ -29,7 +29,6 @@ import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
   LONDON_STYLES,
   LONDON_VENUE,
-  londonPanelsByFloor,
   panelSlug,
   rasterSizeFor,
   type LondonPanel,
@@ -161,9 +160,8 @@ function LondonRevisePage() {
   const plan = useMemo(() => planLondonRegeneration(changes), [changes]);
   const dirty = changes.length > 0;
 
-  const byFloor = useMemo(() => londonPanelsByFloor(draft), [draft]);
-  const floors = useMemo(() => Object.keys(byFloor), [byFloor]);
-  const visible = floor === "all" ? draft : (byFloor[floor] ?? []);
+  const floors = useMemo(() => [...new Set(draft.map((p) => p.floor))], [draft]);
+  const visible = floor === "all" ? draft : draft.filter((p) => p.floor === floor);
 
   const setField = (panelId: string, field: keyof LondonPanelEdit, raw: string) => {
     setEdits((prev) => {
