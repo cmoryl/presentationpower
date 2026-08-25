@@ -357,7 +357,6 @@ export function StudioLayoutLayer({
               }}
               style={{
                 color: layer.ink ?? "#03002C",
-                fontSize: scale ? layer.size ?? 64 : undefined,
                 lineHeight: 1.15,
                 fontWeight: 600,
                 letterSpacing: "-0.02em",
