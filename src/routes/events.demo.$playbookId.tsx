@@ -38,6 +38,7 @@ import { CollateralGrid } from "@/components/campaigns/CollateralGrid";
 import { PlaybookGallery } from "@/components/events/PlaybookGallery";
 import type { CollateralContext } from "@/components/events/CollateralArtwork";
 import { getDivisionLogos } from "@/lib/division-logos";
+import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 import { nextLockupSuite, nextTrackIdForPlaybook } from "@/lib/next-event-logos";
 import { useSocialAssetEdits, socialEditKey } from "@/lib/social-asset-edit";
 import {
@@ -103,6 +104,11 @@ function PlaybookDemoView() {
       }),
     [source, playbook.facts, kit, brand.id],
   );
+
+  // Language preview: translate the rendered asset copy in place so every
+  // social/OOH comp shows localized wording with identical art direction.
+  const tx = useDemoTranslate(assets as unknown[]);
+  const localizedAssets = (tx.isTranslated ? (tx.items as typeof assets) : assets) ?? assets;
 
   // NEXT events lead with their own lockup suite: the City Series roadshow
   // uses the City Series mark, every other NEXT edition (London flagship
@@ -346,7 +352,7 @@ function PlaybookDemoView() {
       <section id="assets">
         <SectionHead
           eyebrow="Live preview"
-          title={`${assets.length} rendered assets · light + dark`}
+          title={`${localizedAssets.length} rendered assets · light + dark`}
           desc="Rendered right now from the deterministic pipeline on this demo set's own art direction. Switch the look to retarget every asset and collateral comp below."
         />
         <div className="mt-4 rounded-2xl border border-black/10 bg-white/70 p-4">
@@ -381,8 +387,20 @@ function PlaybookDemoView() {
           </div>
           <p className="mt-2 max-w-3xl text-xs text-black/60">{look.blurb}</p>
         </div>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {assets.map((a) => {
+        <DemoTranslateBar
+          className="mt-4"
+          lang={tx.lang}
+          setLang={tx.setLang}
+          busy={tx.busy}
+          error={tx.error}
+          isTranslated={tx.isTranslated}
+          note="Preview the whole kit in another language. Every rendered asset re-paints with translated copy — layout, photography and lockups stay untouched."
+        />
+        <div
+          className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          dir={tx.rtl ? "rtl" : undefined}
+        >
+          {localizedAssets.map((a) => {
             // Light variants crop the division photography into a designed
             // panel sized to the frame's aspect; dark variants run full bleed.
             const imageUrl = photoForFormat(a.brandId, a.format);
@@ -390,7 +408,7 @@ function PlaybookDemoView() {
             const editKey = socialEditKey(`events-demo:${playbook.id}:${look.id}`, a.id);
             return (
               <AssetPreviewCard
-                key={`${look.id}-${a.id}`}
+                key={`${look.id}-${tx.lang}-${a.id}`}
                 edit={assetEdits.get(editKey)}
                 onEditChange={(next) => assetEdits.set(editKey, next)}
                 onEditReset={() => assetEdits.reset(editKey)}
