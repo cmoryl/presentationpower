@@ -20,6 +20,7 @@ function matchesAdminLinked(pathname: string): boolean {
 }
 
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
+import { useWorkspacePersona } from "@/hooks/use-workspace-persona";
 
 export function AppShell({ children, bare = false }: { children: ReactNode; bare?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
