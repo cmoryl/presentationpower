@@ -78,6 +78,7 @@ export async function loadKitThread(
     .from("agent_threads")
     .select(SELECT)
     .eq("id", id)
+    .in("kind", ["social", "event"])
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!thread) throw new Error("That conversation no longer exists.");

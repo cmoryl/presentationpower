@@ -53,6 +53,7 @@ import {
   saveModuleOverride,
 } from "@/lib/module-overrides.functions";
 import { blankPrintContent } from "@/lib/print-assets.types";
+import { demoSeedForKind } from "@/lib/print-library/demo-seeds";
 import type {
   SolutionProposalContent,
   PrintDensity,
@@ -113,11 +114,13 @@ function draftFrom(item: PrintLibraryItem, hidden: boolean): Draft {
     heroUrl: item.heroUrl ?? "",
     hidden,
     look: { ...(item.look ?? {}) },
-    // Blank starting points ship without content — seed the kind's empty shape
-    // so blank templates (MSA Partnership included) are previewable + editable.
+    // Templates whose master ships without saved content preview with the
+    // kind's demo seed — open that exact document here so "Edit master" edits
+    // what the library preview showed. Kinds with no demo seed fall back to
+    // the empty shape so they stay previewable + editable.
     content: item.content
       ? (structuredClone(item.content) as Record<string, unknown>)
-      : blankPrintContent(item.kind),
+      : (demoSeedForKind(item.kind) ?? blankPrintContent(item.kind)),
   };
 }
 
