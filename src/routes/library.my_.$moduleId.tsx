@@ -303,8 +303,8 @@ function Editor({
         re-skins the module without touching the copy.
       </p>
 
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="relative overflow-hidden rounded-2xl border border-black/10 bg-[#0a0a1a]">
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="relative self-start overflow-hidden rounded-2xl border border-black/10 bg-[#0a0a1a] lg:sticky lg:top-4">
           <div className="aspect-[16/9]">
             <SlideBackdropContext.Provider value={backdrop}>
               <LiveEditOverlay
