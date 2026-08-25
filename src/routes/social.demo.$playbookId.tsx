@@ -388,7 +388,7 @@ function SocialDemoView() {
             const editKey = socialEditKey(`social-demo:${playbook.id}:${styleId}`, a.id);
             return (
               <AssetPreviewCard
-                key={`${styleId}-${a.id}`}
+                key={`${styleId}-${tx.lang}-${a.id}`}
                 edit={assetEdits.get(editKey)}
                 onEditChange={(next) => assetEdits.set(editKey, next)}
                 onEditReset={() => assetEdits.reset(editKey)}
