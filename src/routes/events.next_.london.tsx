@@ -20,8 +20,10 @@ import {
 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
+import { renderDitheredPng } from "@/lib/london-panel-raster";
 import {
   LONDON_PANELS,
   LONDON_PRINT_SPEC,
@@ -67,37 +69,6 @@ function download(blob: Blob, name: string) {
   a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-}
-
-/** Renders the panel SVG to PNG with triangular-PDF dither, per the spec. */
-async function renderDitheredPng(svg: string, w: number, h: number): Promise<Blob> {
-  const img = new Image();
-  const src = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error("Could not rasterise the vector artwork."));
-    img.src = src;
-  });
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Canvas unavailable in this browser.");
-  ctx.drawImage(img, 0, 0, w, h);
-  const data = ctx.getImageData(0, 0, w, h);
-  const p = data.data;
-  for (let i = 0; i < p.length; i += 4) {
-    const n = (Math.random() - Math.random()) * 1.4;
-    p[i] = Math.max(0, Math.min(255, p[i] + n));
-    p[i + 1] = Math.max(0, Math.min(255, p[i + 1] + n));
-    p[i + 2] = Math.max(0, Math.min(255, p[i + 2] + n));
-  }
-  ctx.putImageData(data, 0, 0);
-  const blob = await new Promise<Blob | null>((resolve) =>
-    canvas.toBlob((b) => resolve(b), "image/png"),
-  );
-  if (!blob) throw new Error("PNG encoding failed.");
-  return blob;
 }
 
 function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
