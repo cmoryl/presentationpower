@@ -132,7 +132,7 @@ export function splitSampleContent(content: Record<string, unknown>): {
 } {
   const copy: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(content)) {
-    if (k === INK_KEY || k === INK_SCOPE_KEY || k === MODES_KEY) continue;
+    if (k === INK_KEY || k === INK_SCOPE_KEY || k === MODES_KEY || k === LAYOUT_KEY) continue;
     copy[k] = v;
   }
   return {
