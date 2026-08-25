@@ -387,7 +387,7 @@ export function SpotlightLayout({
                               style={{
                                 fontWeight: 700,
                                 fontSize: cq(
-                                  18 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 7),
+                                  18 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 6.5),
                                 ),
                                 color: accentInk,
                                 marginTop: cq(8),
