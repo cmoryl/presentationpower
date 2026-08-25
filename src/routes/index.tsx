@@ -67,6 +67,7 @@ export const Route = createFileRoute("/")({
           "Governed brand engine for TransPerfect. Assemble presentations, print, event, and social — from one modular library, powered by the Oracle.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
