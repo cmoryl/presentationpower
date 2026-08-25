@@ -290,10 +290,20 @@ export function VariantSampleStudio({
       // A picker modal owns Escape while it is open — closing the whole
       // studio out from under it would drop the edit in progress.
       if (pickerFor !== null || iconPickerFor !== null || logoPickerFor !== null) return;
+      if (layerImageFor !== null) return;
       // While live editing, Escape should only blur the focused field.
       const el = document.activeElement as HTMLElement | null;
       if (el?.isContentEditable) {
         el.blur();
+        return;
+      }
+      // In arrange mode, Escape first drops the layer selection, then the mode.
+      if (arrange && selLayerId) {
+        setSelLayerId(null);
+        return;
+      }
+      if (arrange) {
+        setArrange(false);
         return;
       }
       requestClose();
@@ -346,6 +356,8 @@ export function VariantSampleStudio({
       const t = e.target as HTMLElement | null;
       if (!t) return;
       if (t.closest("[data-crop-overlay]")) return;
+      // Freeform arrange layers own their own clicks.
+      if (t.closest("[data-free-layer]")) return;
       // Step chain: clicking a tile picks that step for editing. Text inside a
       // tile still belongs to live edit, and Alt-click keeps the icon gallery.
       if (isStepChain && !e.altKey && !t.closest('[contenteditable="true"]')) {
@@ -430,6 +442,7 @@ export function VariantSampleStudio({
       const t = e.target as HTMLElement | null;
       if (!t) return;
       if (t.closest("[data-crop-overlay]")) return;
+      if (t.closest("[data-free-layer]")) return;
       if (t.closest("[data-logo-tile]") || t.closest("[data-icon-well]")) return;
       const tile = t.closest("[data-media-tile]");
       const img = tile ? null : (t.closest("img") ?? (t.tagName === "IMG" ? t : null));
