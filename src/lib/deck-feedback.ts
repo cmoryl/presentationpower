@@ -106,20 +106,35 @@ export function notifyPrintToPdf(what = "document"): void {
     if (typeof window !== "undefined") window.print();
     return;
   }
-  toast.info("Opening print dialog…", {
+  // 1) Immediate "started" signal. A native print dialog blocks the main
+  // thread the instant `window.print()` runs, so this toast must paint first —
+  // we delay the print call long enough for at least one visible frame.
+  toast.loading(`Preparing ${what} for PDF export…`, {
     id: "print-to-pdf",
-    description: `Choose “Save as PDF” as the destination to download this ${what} as a PDF.`,
-    duration: 6000,
+    description: `The print dialog opens in a moment — choose “Save as PDF” as the destination.`,
   });
+  let printed = false;
   const onAfterPrint = () => {
-    toast.success("Print view closed", {
-      id: "print-to-pdf-done",
-      description: "If you saved a PDF, it is in your downloads folder.",
-      duration: 4000,
+    printed = true;
+    // Same toast id: the loading toast resolves into the completion state
+    // whether the user saved or cancelled the dialog.
+    toast.success("PDF export finished", {
+      id: "print-to-pdf",
+      description: `If you saved the PDF, it is in your downloads folder.`,
+      duration: 5000,
     });
   };
   window.addEventListener("afterprint", onAfterPrint, { once: true });
-  // Safety: if the dialog never opens (blocked), don't leak the listener.
-  setTimeout(() => window.removeEventListener("afterprint", onAfterPrint), 60_000);
-  window.print();
+  // Safety: if the dialog never opens (blocked), don't leak the listener —
+  // resolve the pending toast so it never spins forever.
+  setTimeout(() => {
+    window.removeEventListener("afterprint", onAfterPrint);
+    if (printed) return;
+    toast.info("Print dialog didn't open", {
+      id: "print-to-pdf",
+      description: "Your browser may have blocked it — try again, or allow pop-ups for this site.",
+      duration: 6000,
+    });
+  }, 60_000);
+  setTimeout(() => window.print(), 650);
 }

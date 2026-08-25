@@ -872,6 +872,9 @@ function AssetEditor() {
 
   async function handleExportPdf() {
     if (!canvasRef.current) return;
+    const exportToast = toast.loading("Preparing PDF export…", {
+      description: "Rendering pages — you'll get a confirmation when the file is saved.",
+    });
     setExportBusy(true);
     setExportProgress({ pct: 0.02, message: "Preparing pages…" });
     try {
@@ -897,16 +900,18 @@ function AssetEditor() {
         filename: `${safeTitle}-${exportSize.toLowerCase()}-${suffix}.pdf`,
         onProgress: reportExportProgress,
         onQualityClamp: (info) => {
-          alert(
-            `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
+          toast.warning("Export resolution adjusted", {
+            description:
+              `Requested ${info.requestedDpi} DPI exceeded the browser canvas ceiling ` +
               `(${info.reason}). Exporting at ~${info.effectiveDpi} DPI instead.`,
-          );
+            duration: 8000,
+          });
         },
       });
-      toast.success("PDF saved to your downloads");
+      toast.success("PDF saved to your downloads", { id: exportToast });
       setExportOpen(false);
     } catch (e) {
-      alert(`Export failed: ${(e as Error).message}`);
+      toast.error(`PDF export failed: ${(e as Error).message}`, { id: exportToast, duration: 10000 });
     } finally {
       setExportBusy(false);
       setExportProgress(null);
@@ -916,6 +921,9 @@ function AssetEditor() {
   // Same pages, PowerPoint container: one slide per print page at trim size.
   async function handleExportPptx() {
     if (!canvasRef.current) return;
+    const exportToast = toast.loading("Preparing PowerPoint export…", {
+      description: "Building slides — you'll get a confirmation when the file is saved.",
+    });
     setExportBusy(true);
     setExportProgress({ pct: 0.02, message: "Preparing pages…" });
     try {
@@ -932,10 +940,13 @@ function AssetEditor() {
         filename: `${safeTitle}.pptx`,
         onProgress: reportExportProgress,
       });
-      toast.success("PowerPoint saved to your downloads");
+      toast.success("PowerPoint saved to your downloads", { id: exportToast });
       setExportOpen(false);
     } catch (e) {
-      alert(`Export failed: ${(e as Error).message}`);
+      toast.error(`PowerPoint export failed: ${(e as Error).message}`, {
+        id: exportToast,
+        duration: 10000,
+      });
     } finally {
       setExportBusy(false);
       setExportProgress(null);

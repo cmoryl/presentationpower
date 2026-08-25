@@ -8,6 +8,7 @@ import { exportPrintAssetAsPdf } from "@/lib/print-asset-export";
 import { PrintDocModeProvider, resolvePrintIconStyle } from "@/components/print/print-doc-mode";
 import { usePrintIconPrefs } from "@/lib/print-icon-prefs";
 import { FileDown } from "lucide-react";
+import { toast } from "sonner";
 
 // TEMPORARY preview route for Phase 1 spotlight approval.
 // Renders a Letter-portrait spotlight in LIGHT + DARK side-by-side, seeded
@@ -149,6 +150,9 @@ function SpotlightPreview() {
   const exportPdf = async (mode: "light" | "dark") => {
     const node = (mode === "light" ? lightRef : darkRef).current;
     if (!node) return;
+    const exportToast = toast.loading(`Preparing ${mode} PDF export…`, {
+      description: "Rendering the spotlight at 300 DPI — you'll get a confirmation when it's saved.",
+    });
     setBusy(mode);
     try {
       await exportPrintAssetAsPdf(node, {
@@ -158,6 +162,13 @@ function SpotlightPreview() {
         mode,
         quality: "300dpi",
         filename: `spotlight-globallink-${mode}.pdf`,
+      });
+      toast.success("PDF saved to your downloads", { id: exportToast });
+    } catch (err) {
+      toast.error("PDF export failed", {
+        id: exportToast,
+        description: err instanceof Error ? err.message : String(err),
+        duration: 10000,
       });
     } finally {
       setBusy(null);
