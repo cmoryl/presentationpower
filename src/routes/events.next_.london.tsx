@@ -466,6 +466,11 @@ function LondonSignagePage() {
                 ))}
               </dl>
 
+              {/* Check every resolution tier on screen before downloading. */}
+              <LondonPpiPreview panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
+
+
+
               <div className="rounded-xl border border-black/10 p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
