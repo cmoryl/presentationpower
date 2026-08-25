@@ -74,10 +74,10 @@ function ShowcaseDeckDemoPage() {
   }, [def, division, home.id]);
 
   // A published admin edit *is* the demo; the authored build is the fallback.
-  // The DIVISION's look always wins though: an override saved for a division
-  // carries whatever pack was current when it was published, so re-stamping the
-  // division's canonical style pack + industry ground keeps every division
-  // visually distinct instead of inheriting a stale (or source-division) look.
+  // The DECK DEFAULT look always wins though: an override saved earlier carries
+  // whatever pack was current when it was published, so clearing the pack +
+  // recipe keeps every demo on the approved brand system. Divisions stay
+  // distinct through the brand mode (accent + wordmark) and rewritten copy.
   const { override } = useDemoOverride("deck", demoId, division.id);
   const overridePayload = override?.payload as unknown as TemplatePayload | undefined;
   const payload = useMemo(() => {
@@ -86,8 +86,8 @@ function ShowcaseDeckDemoPage() {
       ...overridePayload,
       context: {
         ...(overridePayload.context ?? {}),
-        stylePackId: division.stylePackId,
-        designRecipeId: division.designRecipeId ?? undefined,
+        stylePackId: null,
+        designRecipeId: null,
       },
     } as TemplatePayload;
   }, [overridePayload, authored, division]);
@@ -265,14 +265,14 @@ function ShowcaseDeckDemoPage() {
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
               Division
             </div>
-            <p className="mt-1 text-[12px] text-black/55 dark:text-white/55">
-              Same narrative, re-branded: brand mode, style pack, copy and generated imagery all
-              follow the division you pick.
-            </p>
-          </div>
-          <div className="text-[11px] text-black/45 dark:text-white/45">
-            {division.name} · {division.stylePackId.toUpperCase().replace("SKIN-", "")}
-          </div>
+             <p className="mt-1 text-[12px] text-black/55 dark:text-white/55">
+               Same narrative, re-branded: accent color, wordmark, copy and generated imagery
+               follow the division you pick — the layout stays on the default look.
+             </p>
+           </div>
+           <div className="text-[11px] text-black/45 dark:text-white/45">
+             {division.name} · Default look
+           </div>
         </div>
         <div role="group" aria-label="Choose division" className="mt-3 flex flex-wrap gap-2">
           {DEMO_DIVISIONS.map((d) => {

@@ -94,3 +94,32 @@ export async function runDeckAction<T>(
     return null;
   }
 }
+
+/**
+ * Print / Save-as-PDF acknowledgement. `window.print()` itself is silent, so
+ * wrap every caller: announce that the dialog is opening (and how to save a
+ * PDF from it), then confirm when the print view closes. Also fires the print
+ * so callers can replace a bare `window.print()` with this one call.
+ */
+export function notifyPrintToPdf(what = "document"): void {
+  if (!canToast()) {
+    if (typeof window !== "undefined") window.print();
+    return;
+  }
+  toast.info("Opening print dialog…", {
+    id: "print-to-pdf",
+    description: `Choose “Save as PDF” as the destination to download this ${what} as a PDF.`,
+    duration: 6000,
+  });
+  const onAfterPrint = () => {
+    toast.success("Print view closed", {
+      id: "print-to-pdf-done",
+      description: "If you saved a PDF, it is in your downloads folder.",
+      duration: 4000,
+    });
+  };
+  window.addEventListener("afterprint", onAfterPrint, { once: true });
+  // Safety: if the dialog never opens (blocked), don't leak the listener.
+  setTimeout(() => window.removeEventListener("afterprint", onAfterPrint), 60_000);
+  window.print();
+}
