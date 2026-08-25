@@ -246,7 +246,7 @@ function SavedModuleCard({
   return (
     <div className="glass group rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/40 hover:shadow-lg">
       <Link
-        to="/library/my_/$moduleId"
+        to="/library/my/$moduleId"
         params={{ moduleId: row.id }}
         aria-label={`Edit ${row.title}`}
         title="Click to edit this module"
