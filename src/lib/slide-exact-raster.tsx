@@ -38,6 +38,7 @@ export interface ExactPlateArgs {
   brand: BrandMode;
   mode: "light" | "dark";
   pack?: StylePack | null;
+  industryId?: string | null;
   pageNumber?: number;
   quality?: ExportQualityId | null;
   /** Layered export: rasterize the decor planes only (no content/logo/footer). */
@@ -145,6 +146,7 @@ export async function withExactStage<T>(
         brand={args.brand}
         mode={args.mode}
         pack={args.pack ?? null}
+        industryId={args.industryId ?? null}
         pageNumber={args.pageNumber ?? 1}
         decorOnly={args.decorOnly ?? false}
       />,
@@ -280,9 +282,20 @@ export async function captureGroundPlates(
   // produced 840 media parts for 235 unique images. Media tiles are still
   // measured per slide (they carry per-slide photographs).
   const plateCache = new Map<string, string | null>();
+  const slideSignature = (slide: unknown): string => {
+    if (!slide || typeof slide !== "object") return "-";
+    const s = slide as { layoutId?: unknown; sectionId?: unknown; templateOverride?: unknown };
+    return [
+      typeof s.layoutId === "string" ? s.layoutId : "-",
+      typeof s.sectionId === "string" ? s.sectionId : "-",
+      s.templateOverride ? JSON.stringify(s.templateOverride) : "-",
+    ].join("@");
+  };
   const plateKey = (it: ExactPlateArgs) =>
     [
       it.variant.id,
+      slideSignature(it.slide),
+      it.industryId ?? "-",
       it.brand.id,
       it.pack ? it.pack.mode : it.mode,
       it.pack?.id ?? "-",
