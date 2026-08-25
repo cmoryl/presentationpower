@@ -243,7 +243,7 @@ function LondonSignagePage() {
         pending: "Building the print schedule…",
         success: "NEXT-London-print-schedule.csv downloaded",
         failure: "Schedule export failed",
-        successDescription: "54 panels with trim, bleed, ground, raster size and measured banding.",
+        successDescription: `${panels.length} panels with trim, bleed, ground, raster size and measured banding.`,
       },
       async () => {
         download(
@@ -256,7 +256,7 @@ function LondonSignagePage() {
   const runKitQa = () =>
     runWithExportFeedback(
       {
-        pending: "Auditing all 54 panels…",
+        pending: `Auditing all ${panels.length} panels…`,
         success: "NEXT-London-qa-report.csv downloaded",
         failure: "QA sweep failed",
         successDescription: "Trim, bleed, ppi tier and banding checked for every vector master.",
@@ -459,7 +459,7 @@ function LondonSignagePage() {
                   : "border-black/15 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
               }`}
             >
-              All floors · {LONDON_PANELS.length}
+              All floors · {panels.length}
             </button>
             {floors.map((floor) => (
               <button
@@ -513,8 +513,16 @@ function LondonSignagePage() {
                         className="group rounded-xl border border-black/10 bg-white p-3 text-left transition-shadow hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
                       >
                         <PanelThumb panel={panel} svg={londonPanelSvgFor(panel, artwork)} />
-                        <p className="mt-3 text-[13px] font-semibold leading-snug text-[#03002C]">
-                          {panel.proof.replace(/\.pdf$/i, "")} · p{String(panel.page).padStart(2, "0")}
+                        <p className="mt-3 flex flex-wrap items-center gap-1.5 text-[13px] font-semibold leading-snug text-[#03002C]">
+                          <span>
+                            {panel.proof.replace(/\.pdf$/i, "")} · p
+                            {String(panel.page).padStart(2, "0")}
+                          </span>
+                          {isAddedPanel(panel) ? (
+                            <span className="rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                              Added
+                            </span>
+                          ) : null}
                         </p>
                         <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
                           {panel.trimW} × {panel.trimH} mm · {panel.ground}
