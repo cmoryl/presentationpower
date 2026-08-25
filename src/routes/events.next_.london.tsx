@@ -287,14 +287,16 @@ function LondonSignagePage() {
   const chip = "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors";
 
   return (
-    <AppShell>
+    <AppShell bare={!userId}>
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
-        <Link
-          to="/events/next"
-          className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
-        >
-          <ArrowLeft className="h-4 w-4" /> NEXT 2026 event system
-        </Link>
+        {userId && (
+          <Link
+            to="/events/next"
+            className="inline-flex items-center gap-2 text-sm font-medium text-[#003FC7] hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" /> NEXT 2026 event system
+          </Link>
+        )}
 
         <header className="mt-5 overflow-hidden rounded-2xl border border-black/10">
           <div
