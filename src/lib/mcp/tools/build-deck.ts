@@ -25,13 +25,19 @@ export default defineTool({
     style_pack_id: z
       .string()
       .describe(
-        "Design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit to keep the approved brand system.",
+        "AUTHORIZED OVERRIDES ONLY: a design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit for every normal build so the deck is created on the approved Enterprise brand system — set this only when the user explicitly named a different look, and then also set allow_non_enterprise_look: true.",
+      )
+      .optional(),
+    allow_non_enterprise_look: z
+      .boolean()
+      .describe(
+        "Must be true when style_pack_id is set. Confirms the user explicitly authorized a look other than the approved Enterprise brand system.",
       )
       .optional(),
     appearance: z
       .enum(["light", "dark", "mixed"])
       .describe(
-        "Light/dark treatment. 'light' = Enterprise Light (default), 'dark' = Enterprise Dark whole-deck, 'mixed' = dark cover and closing with light working slides (override per slide with each slide's mode). Ignored for the base look when style_pack_id is set.",
+        "Light/dark treatment within the approved brand system. 'mixed' (DEFAULT) = dark cover and closing with light working slides (override per slide with each slide's mode), 'light' = Enterprise Light whole-deck, 'dark' = Enterprise Dark whole-deck. Ignored for the base look when style_pack_id is set.",
       )
       .optional(),
     design_recipe_id: z
@@ -81,6 +87,16 @@ export default defineTool({
         `Unknown style_pack_id "${input.style_pack_id}". Use a design skin id ('skin-s01'…'skin-s28') or a built-in style pack id.`,
       );
     }
+    // Approved brand system is the creation default: a different skin is only
+    // written when the caller explicitly confirms an authorized override.
+    if (input.style_pack_id && !input.allow_non_enterprise_look) {
+      return errorResult(
+        "New decks are created on the approved Enterprise brand system. Omit style_pack_id (light/dark mixing is done with per-slide modes), or set allow_non_enterprise_look: true only when the user explicitly authorized a different look.",
+      );
+    }
+
+    // Mixed is the default appearance: dark bookends, light working slides.
+    const appearance = input.appearance ?? "mixed";
 
     // Validate + resolve every slide before any row is written.
     const lastIdx = input.slides.length - 1;
