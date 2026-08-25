@@ -936,6 +936,58 @@ export function VariantSampleStudio({
         <button type="button" onClick={() => setLiveEdit((v) => !v)} className={pill(liveEdit)}>
           ✎ Live edit {liveEdit ? "on" : "off"}
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setArrange((v) => !v);
+            setSelLayerId(null);
+          }}
+          aria-pressed={arrange}
+          title="Drag any field or layer — positions snap to margins, centres and neighbours, and stay inside the safe area"
+          className={pill(arrange)}
+        >
+          ▦ Arrange {arrange ? "on" : "off"}
+        </button>
+        {arrange && (
+          <div className="flex overflow-hidden rounded-full border border-white/25">
+            <button
+              type="button"
+              onClick={() => addFreeLayer("text")}
+              title="Add a freeform text area you can place anywhere"
+              className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white"
+            >
+              ＋ Text
+            </button>
+            <span className="w-px bg-white/15" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={() => addFreeLayer("image")}
+              title="Add a freeform image asset you can place anywhere"
+              className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white"
+            >
+              ＋ Asset
+            </button>
+            {hasSampleLayout(layout) && (
+              <>
+                <span className="w-px bg-white/15" aria-hidden="true" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    writeLayout({}, "Reset arrangement");
+                    setSelLayerId(null);
+                    toast.success("Arrangement reset", {
+                      description: "All field offsets and freeform layers were removed.",
+                    });
+                  }}
+                  title="Remove every field offset and freeform layer"
+                  className="px-3 py-1 text-[11px] text-red-300/80 hover:bg-red-500/10 hover:text-red-200"
+                >
+                  Reset
+                </button>
+              </>
+            )}
+          </div>
+        )}
         <div className="flex overflow-hidden rounded-full border border-white/25">
           <button
             type="button"
