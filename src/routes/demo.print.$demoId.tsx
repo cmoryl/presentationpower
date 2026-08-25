@@ -28,6 +28,7 @@ import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";
 import { PrintDemoStudioPanel, type DemoLook } from "@/components/showcase/PrintDemoStudioPanel";
+import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 
 export const Route = createFileRoute("/demo/print/$demoId")({
   loader: ({ params }) => {
@@ -248,6 +249,15 @@ function PrintDemoPage() {
             }}
             accent={accent}
           />
+          <DemoTranslateBar
+            lang={tx.lang}
+            setLang={tx.setLang}
+            busy={tx.busy}
+            error={tx.error}
+            isTranslated={tx.isTranslated}
+            accent={accent}
+            note="Preview this piece in another language. Copy is translated live; the approved layout, hero art and page geometry stay locked."
+          />
           <PrintDemoContentEditor
             content={draft}
             onChange={setDraft}
@@ -272,9 +282,9 @@ function PrintDemoPage() {
                   {mode} version
                 </div>
                 <ShowcasePrintGallery
-                  key={`${mode}-${renderKey}`}
+                  key={`${mode}-${renderKey}-${tx.lang}`}
                   kind={item.kind}
-                  content={draft}
+                  content={localizedDraft}
                   brand={previewBrand}
                   mode={mode}
                   pageSize={look.pageSize}
