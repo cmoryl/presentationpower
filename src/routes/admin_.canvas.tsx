@@ -266,14 +266,89 @@ function CanvasStudioPage() {
     }
     const { explodeModuleRender } = await import("@/lib/canvas-studio-explode");
     const startZ = comp.items.reduce((m, i) => Math.max(m, i.z), 0) + 1;
-    const { items, counts, truncated } = explodeModuleRender(el, stage, startZ);
-    if (!items.length) {
+    const { items: exploded, counts, truncated } = explodeModuleRender(el, stage, startZ + 1);
+    if (!exploded.length) {
       toast.error("Nothing to convert", {
         description: "This module rendered no editable pieces.",
       });
       return;
     }
+
+    // Keep the module's exact ground. The exploder flattens gradients, aurora
+    // orbs and frosted planes to their first solid colour, so a module that
+    // painted a soft brand backdrop exploded onto a bare slide. Rasterize the
+    // decor-only plate (the same capture the PPTX exporter uses) and pin it
+    // under the editable layers as a locked full-bleed image.
+    let backdrop: CanvasItem | null = null;
+    try {
+      const variant = MODULE_VARIANTS.find((v) => v.id === item.variantId);
+      const brand =
+        BRAND_MODES.find((b) => b.id === comp.brandId) ?? BRAND_MODES[0] ?? null;
+      if (variant && brand) {
+        const brief = resolveDivisionBrief(brand);
+        const sectionId =
+          SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId))?.id ??
+          "SF-01";
+        const slide = {
+          id: `studio:${item.id}`,
+          position: 0,
+          sectionId,
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: seedDivisionContent(
+            variant.id,
+            brief,
+            byId(SECTION_FRAMEWORKS, sectionId)?.name ?? "Section",
+            brand,
+          ),
+          changes: [],
+        };
+        const { rasterizeExactSlide } = await import("@/lib/slide-exact-raster");
+        const url = await rasterizeExactSlide({
+          slide,
+          variant,
+          brand,
+          mode: item.mode ?? comp.mode,
+          pageNumber: 1,
+          decorOnly: true,
+        });
+        if (url) {
+          backdrop = {
+            id: `ci-${nanoid(8)}`,
+            z: startZ,
+            type: "image",
+            url,
+            fit: "cover",
+            radius: 0,
+            name: "Module backdrop",
+            locked: true,
+            x: 0,
+            y: 0,
+            w: STAGE_W,
+            h: STAGE_H,
+          };
+        }
+      }
+    } catch {
+      /* backdrop is best-effort — the flat surface fallback still applies */
+    }
+
+    // With the raster ground pinned underneath, the exploder's flattened
+    // full-stage "Backdrop" surface would sit over it and hide it — drop it.
+    const items = backdrop
+      ? exploded.filter(
+          (i) =>
+            !(
+              i.type === "surface" &&
+              i.name === "Backdrop" &&
+              i.w >= STAGE_W - 16 &&
+              i.h >= STAGE_H - 16
+            ),
+        )
+      : exploded;
+
     removeItem(comp.id, itemId);
+    if (backdrop) addItem(comp.id, backdrop);
     for (const next of items) addItem(comp.id, next);
     setSelected(items.map((i) => i.id));
     toast.success("Module is now yours to edit", {
