@@ -53,6 +53,12 @@ import {
   type LondonArtwork,
   type LondonPanel,
 } from "@/lib/next-london-signage";
+import {
+  effectiveLondonPanels,
+  isAddedPanel,
+  resolveLondonArtwork,
+} from "@/lib/next-london-revise";
+import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 
 export const Route = createFileRoute("/events/next_/london")({
   head: () => ({
