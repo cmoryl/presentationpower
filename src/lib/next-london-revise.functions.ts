@@ -122,9 +122,9 @@ export const publishLondonRevision = createServerFn({ method: "POST" })
         rev: nextRev,
         note: data.note?.trim() ? data.note.trim() : null,
         author_id: context.userId,
-        panels: data.panels,
-        changes: data.changes,
-        regen: data.regen,
+        panels: data.panels as unknown as never,
+        changes: data.changes as unknown as never,
+        regen: data.regen as unknown as never,
         restored_from: data.restoredFrom ?? null,
       })
       .select("id, rev, note, author_id, panels, changes, regen, restored_from, created_at")

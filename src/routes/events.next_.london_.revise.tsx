@@ -557,7 +557,7 @@ function LondonRevisePage() {
                       onClick={() =>
                         void runWithExportFeedback(
                           {
-                            label: `Rebuilding revision ${rev.rev}`,
+                            pending: `Rebuilding revision ${rev.rev}`,
                             success: `Revision ${rev.rev} artwork downloaded`,
                             failure: "Rebuild failed",
                           },
