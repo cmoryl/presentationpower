@@ -314,6 +314,9 @@ function AddPanelForm({
 function LondonRevisePage() {
   const fetchRevisions = useServerFn(listLondonRevisions);
   const publish = useServerFn(publishLondonRevision);
+  // The London kit hub is public, but this revision workflow is an editor —
+  // signed-out visitors are bounced to the public kit instead.
+  const userId = useSessionUser();
 
   const [revisions, setRevisions] = useState<LondonRevision[]>([]);
   const [loading, setLoading] = useState(true);
