@@ -1119,10 +1119,20 @@ export function VariantSampleStudio({
                 outline: 2px dashed rgba(161,251,249,0.95);
                 outline-offset: -2px;
               }
+              ${
+                // Arrange-mode field offsets: translate the rendered node in
+                // slide px without disturbing the variant's own layout flow.
+                Object.entries(layout.offsets ?? {})
+                  .map(
+                    ([p, o]) =>
+                      `[data-live-path="${p}"] { transform: translate(${o.dx}px, ${o.dy}px); }`,
+                  )
+                  .join("\n")
+              }
             `}</style>
 
             <LiveEditOverlay
-              enabled={liveEdit}
+              enabled={liveEdit && !arrange}
               slideId={`${previewSlide.id}:${mode}`}
               content={copy}
               editableFields={variant.editableFields}
