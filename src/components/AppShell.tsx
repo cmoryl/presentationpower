@@ -21,7 +21,7 @@ function matchesAdminLinked(pathname: string): boolean {
 
 import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children, bare = false }: { children: ReactNode; bare?: boolean }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const locSearch = useRouterState({ select: (s) => s.location.searchStr });
 
