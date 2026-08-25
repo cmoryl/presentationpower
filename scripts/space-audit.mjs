@@ -18,7 +18,8 @@ import { writeFile } from "node:fs/promises";
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((acc, cur, i, arr) => {
-    if (cur.startsWith("--")) acc.push([cur.slice(2), arr[i + 1] && !arr[i + 1].startsWith("--") ? arr[i + 1] : "true"]);
+    if (cur.startsWith("--"))
+      acc.push([cur.slice(2), arr[i + 1] && !arr[i + 1].startsWith("--") ? arr[i + 1] : "true"]);
     return acc;
   }, []),
 );
@@ -30,13 +31,25 @@ const LIMIT = args.limit ? Number(args.limit) : Infinity;
 const BAND_ALERT = 0.14;
 const RIGHT_ALERT = 0.1;
 
-const browser = await chromium.launch({ headless: true, executablePath: process.env.PW_CHROME || undefined });
-const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, deviceScaleFactor: 1 });
+const browser = await chromium.launch({
+  headless: true,
+  executablePath: process.env.PW_CHROME || undefined,
+});
+const context = await browser.newContext({
+  viewport: { width: 1440, height: 1800 },
+  deviceScaleFactor: 1,
+});
 const page = await context.newPage();
 await page.goto(URL, { waitUntil: "domcontentloaded" });
 await page.waitForSelector("[data-variant-card]", { timeout: 60_000 });
 await page.waitForTimeout(9000);
-await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 800) { window.scrollTo(0, y); await new Promise((r) => setTimeout(r, 120)); } window.scrollTo(0, 0); });
+await page.evaluate(async () => {
+  for (let y = 0; y < document.body.scrollHeight; y += 800) {
+    window.scrollTo(0, y);
+    await new Promise((r) => setTimeout(r, 120));
+  }
+  window.scrollTo(0, 0);
+});
 await page.waitForTimeout(3000);
 
 const rows = await page.evaluate(
@@ -51,21 +64,29 @@ const rows = await page.evaluate(
       const stageArea = sr.width * sr.height;
       const leaves = Array.from(stage.querySelectorAll("*")).filter((el) => {
         const cs = getComputedStyle(el);
-        if (cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) < 0.06) return false;
+        if (cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) < 0.06)
+          return false;
         const r = el.getBoundingClientRect();
         if (r.width < 2 || r.height < 2) return false;
         // Backdrop / full-sheet planes are atmosphere, not content.
         const coversSheet = r.width * r.height > stageArea * 0.85;
         // Ink = text leaves, media, any visible border edge, or a real fill.
-        const hasText = Array.from(el.childNodes).some((n) => n.nodeType === 3 && n.textContent.trim());
+        const hasText = Array.from(el.childNodes).some(
+          (n) => n.nodeType === 3 && n.textContent.trim(),
+        );
         const borderSide = ["Top", "Right", "Bottom", "Left"].some(
           (side) => cs[`border${side}Width`] !== "0px" && cs[`border${side}Style`] !== "none",
         );
         const bg = cs.backgroundColor;
-        const bgAlpha = bg.startsWith("rgba") ? Number(bg.split(",")[3]) : bg === "transparent" ? 0 : 1;
+        const bgAlpha = bg.startsWith("rgba")
+          ? Number(bg.split(",")[3])
+          : bg === "transparent"
+            ? 0
+            : 1;
         // Glass surfaces paint through backdrop-filter / shadow rather than a fill.
         const glass =
-          (cs.backdropFilter && cs.backdropFilter !== "none") || (cs.boxShadow && cs.boxShadow !== "none");
+          (cs.backdropFilter && cs.backdropFilter !== "none") ||
+          (cs.boxShadow && cs.boxShadow !== "none");
         const filled = bgAlpha > 0.02 || cs.backgroundImage !== "none" || glass;
         const painted =
           hasText ||
@@ -108,7 +129,7 @@ const rows = await page.evaluate(
         bandPct: +(band / H).toFixed(3),
         bandAtPct: +(bandStart / H).toFixed(3),
         bandEndPct: +((bandEnd + 1) / H).toFixed(3),
-        mode: card.getAttribute('data-variant-mode') ?? '',
+        mode: card.getAttribute("data-variant-mode") ?? "",
         rightPct: +Math.max(0, (sr.right - maxX) / sr.width).toFixed(3),
         leftPct: +Math.max(0, (minX - sr.left) / sr.width).toFixed(3),
         fillPct: +fill.toFixed(3),

@@ -43,10 +43,7 @@ import { PNG } from "pngjs";
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((acc, cur, i, arr) => {
     if (cur.startsWith("--"))
-      acc.push([
-        cur.slice(2),
-        arr[i + 1] && !arr[i + 1].startsWith("--") ? arr[i + 1] : "true",
-      ]);
+      acc.push([cur.slice(2), arr[i + 1] && !arr[i + 1].startsWith("--") ? arr[i + 1] : "true"]);
     return acc;
   }, []),
 );
@@ -70,12 +67,14 @@ const VIEWPORTS = (args.viewports ?? "1280,1600,960")
 const CHART_PREFIXES = ["MV-GRAPH-", "MV-STAT-", "MV-DATA-", "MV-CHART-"];
 
 async function chartVariantIds() {
-  if (args.ids) return args.ids.split(",").map((s) => s.trim()).filter(Boolean);
+  if (args.ids)
+    return args.ids
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   const src = await readFile(path.resolve("src/lib/taxonomy.ts"), "utf8");
   const ids = [...src.matchAll(/id:\s*"(MV-[A-Z0-9-]+)"/g)].map((m) => m[1]);
-  const chart = [...new Set(ids)].filter((id) =>
-    CHART_PREFIXES.some((p) => id.startsWith(p)),
-  );
+  const chart = [...new Set(ids)].filter((id) => CHART_PREFIXES.some((p) => id.startsWith(p)));
   if (args.all === "true") return chart;
   return chart.slice(0, Number(args.sample ?? 6));
 }
@@ -155,12 +154,8 @@ function auditSheetPage(page) {
       const oy = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
       if (ox <= 3 || oy <= 3) continue;
       const area = ox * oy;
-      const smaller = Math.max(
-        1,
-        Math.min(a.r.width * a.r.height, b.r.width * b.r.height),
-      );
-      if (area / smaller > 0.35)
-        findings.push({ kind: "overlap", text: `${ta} ↔ ${tb}` });
+      const smaller = Math.max(1, Math.min(a.r.width * a.r.height, b.r.width * b.r.height));
+      if (area / smaller > 0.35) findings.push({ kind: "overlap", text: `${ta} ↔ ${tb}` });
     }
   }
   return { findings };
@@ -246,8 +241,7 @@ async function main() {
             (node, src) => new Function(`return (${src})`)()(node),
             auditSheetPage.toString(),
           );
-          for (const f of res.findings ?? [])
-            failures.push({ id, vw, ratio, mode, ...f });
+          for (const f of res.findings ?? []) failures.push({ id, vw, ratio, mode, ...f });
           if (res.error) failures.push({ id, vw, ratio, mode, kind: "audit", text: res.error });
 
           const shot = await el.screenshot();

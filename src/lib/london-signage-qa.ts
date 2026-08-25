@@ -86,7 +86,10 @@ export function auditPanelSpec(panel: LondonPanel): QaCheck[] {
     check(
       "spec-trim-positive",
       "Trim inside bleed",
-      panel.trimW > 0 && panel.trimH > 0 && panel.trimW <= panel.bleedW && panel.trimH <= panel.bleedH,
+      panel.trimW > 0 &&
+        panel.trimH > 0 &&
+        panel.trimW <= panel.bleedW &&
+        panel.trimH <= panel.bleedH,
       "trim ≤ bleed",
       `${mm(panel.trimW)} × ${mm(panel.trimH)}`,
     ),
@@ -198,10 +201,7 @@ function box(pdf: string, name: string): number[] | null {
 }
 
 export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaReport {
-  const text =
-    typeof ai === "string"
-      ? ai
-      : Array.from(ai, (b) => String.fromCharCode(b)).join("");
+  const text = typeof ai === "string" ? ai : Array.from(ai, (b) => String.fromCharCode(b)).join("");
 
   const media = box(text, "MediaBox");
   const trim = box(text, "TrimBox");
@@ -225,19 +225,28 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
     check(
       "ai-mediabox",
       "MediaBox sized to bleed",
-      !!media && near(media[2]! - media[0]!, expectW, 0.6) && near(media[3]! - media[1]!, expectH, 0.6),
+      !!media &&
+        near(media[2]! - media[0]!, expectW, 0.6) &&
+        near(media[3]! - media[1]!, expectH, 0.6),
       `${expectW.toFixed(1)} × ${expectH.toFixed(1)} pt`,
-      media ? `${(media[2]! - media[0]!).toFixed(1)} × ${(media[3]! - media[1]!).toFixed(1)} pt` : "absent",
+      media
+        ? `${(media[2]! - media[0]!).toFixed(1)} × ${(media[3]! - media[1]!).toFixed(1)} pt`
+        : "absent",
     ),
     check(
       "ai-trimbox",
       "TrimBox sized to trim",
-      trim ? near(trimW, panel.trimW * MM_TO_PT, 0.6) && near(trimH, panel.trimH * MM_TO_PT, 0.6) : false,
+      trim
+        ? near(trimW, panel.trimW * MM_TO_PT, 0.6) && near(trimH, panel.trimH * MM_TO_PT, 0.6)
+        : false,
       `${(panel.trimW * MM_TO_PT).toFixed(1)} × ${(panel.trimH * MM_TO_PT).toFixed(1)} pt`,
       trim ? `${trimW.toFixed(1)} × ${trimH.toFixed(1)} pt` : "absent",
       trim
         ? {}
-        : { warnOnly: true, note: "No TrimBox on this master — the RIP cuts to the issued proofs." },
+        : {
+            warnOnly: true,
+            note: "No TrimBox on this master — the RIP cuts to the issued proofs.",
+          },
     ),
     check(
       "ai-trim-centred",
@@ -295,17 +304,14 @@ export function readPngHeader(bytes: Uint8Array): PngHeader | null {
   return { w: u32(16), h: u32(20), bitDepth: bytes[24]!, colorType: bytes[25]! };
 }
 
-export function auditPng(
-  panel: LondonPanel,
-  ppi: number,
-  bytes: Uint8Array,
-): LondonQaReport {
+export function auditPng(panel: LondonPanel, ppi: number, bytes: Uint8Array): LondonQaReport {
   const header = readPngHeader(bytes);
   const expect = rasterSizeFor(panel, ppi);
-  const capped = Math.max((panel.bleedW / 25.4) * ppi, (panel.bleedH / 25.4) * ppi) > LONDON_MAX_PX + 1;
+  const capped =
+    Math.max((panel.bleedW / 25.4) * ppi, (panel.bleedH / 25.4) * ppi) > LONDON_MAX_PX + 1;
   const w = header?.w ?? 0;
   const h = header?.h ?? 0;
-  const effPpi = w > 0 ? (w / (panel.bleedW / 25.4)) : 0;
+  const effPpi = w > 0 ? w / (panel.bleedW / 25.4) : 0;
   const bandMm = effPpi > 0 ? (25.4 / effPpi) * 3 : Infinity;
   const mb = bytes.byteLength / (1024 * 1024);
 
@@ -391,7 +397,8 @@ export function failedChecks(report: LondonQaReport): QaCheck[] {
 /** One-line human summary used in download toasts. */
 export function qaSummary(report: LondonQaReport): string {
   const bad = failedChecks(report);
-  if (!bad.length) return `QA passed — ${report.checks.length} checks on trim, bleed, ppi and banding.`;
+  if (!bad.length)
+    return `QA passed — ${report.checks.length} checks on trim, bleed, ppi and banding.`;
   const first = bad[0]!;
   const rest = bad.length > 1 ? ` (+${bad.length - 1} more)` : "";
   return `${first.label}: expected ${first.expected}, got ${first.actual}${rest}`;

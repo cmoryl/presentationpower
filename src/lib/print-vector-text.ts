@@ -197,7 +197,7 @@ export function applyTextTransform(raw: string, transform: string): string {
     else if (t.startsWith("lowercase")) out = ch.toLowerCase();
     else if (t.startsWith("capitalize")) {
       const prev = i > 0 ? raw[i - 1]! : " ";
-      out = /[\s\-—–(\[/"']/.test(prev) ? ch.toUpperCase() : ch;
+      out = /[\s\-—–([/"']/.test(prev) ? ch.toUpperCase() : ch;
     }
     return out.length === 1 ? out : ch;
   };

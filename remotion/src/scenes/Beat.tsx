@@ -62,7 +62,12 @@ const GatesVisual: React.FC<{ rows: readonly string[] }> = ({ rows }) => {
       {rows.map((r, i) => {
         const p = spring({ frame: frame - 10 - i * 10, fps, config: { damping: 200 } });
         const held = i === rows.length - 1;
-        const bar = spring({ frame: frame - 20 - i * 10, fps, durationInFrames: 34, config: { damping: 200 } });
+        const bar = spring({
+          frame: frame - 20 - i * 10,
+          fps,
+          durationInFrames: 34,
+          config: { damping: 200 },
+        });
         return (
           <div
             key={r}
@@ -174,11 +179,20 @@ export const Beat: React.FC<{ beat: BeatType; duration: number }> = ({ beat, dur
         justifyContent: "center",
       }}
     >
-      <div style={{ display: "grid", gridTemplateColumns: "1.02fr 0.98fr", gap: 74, alignItems: "center" }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1.02fr 0.98fr",
+          gap: 74,
+          alignItems: "center",
+        }}
+      >
         <div>
           <Rise delay={0} y={16}>
             <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 22 }}>
-              <span style={{ fontSize: 19, fontWeight: 600, letterSpacing: "0.2em", color: C.blue }}>
+              <span
+                style={{ fontSize: 19, fontWeight: 600, letterSpacing: "0.2em", color: C.blue }}
+              >
                 {beat.n}
               </span>
               <span style={{ height: 1, width: 74, background: C.hair }} />
@@ -221,7 +235,9 @@ export const Beat: React.FC<{ beat: BeatType; duration: number }> = ({ beat, dur
                 color={C.navy}
               />
               <Rise delay={52} y={12}>
-                <div style={{ fontSize: 22, color: C.inkSoft, marginTop: 8 }}>{beat.stat.label}</div>
+                <div style={{ fontSize: 22, color: C.inkSoft, marginTop: 8 }}>
+                  {beat.stat.label}
+                </div>
               </Rise>
             </div>
           </div>

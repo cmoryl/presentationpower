@@ -69,7 +69,6 @@ const STATIC_LABELS: Record<string, string> = {
   dashboard: "Workspace",
 };
 
-
 // Segments that should be hidden from the trail entirely (they're internal
 // routing artifacts, not meaningful location context for the user).
 const HIDDEN_SEGMENTS = new Set(["api", "_authenticated"]);

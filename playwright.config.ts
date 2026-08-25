@@ -47,4 +47,3 @@ export default defineConfig({
     // Chromium runs — that's the honest scope of local + CI coverage.
   ],
 });
-

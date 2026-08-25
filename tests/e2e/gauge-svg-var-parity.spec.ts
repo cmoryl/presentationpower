@@ -184,7 +184,10 @@ test.describe("Gauge / effect SVG export parity", () => {
       await page.getByPlaceholder("Search by name, ID, or purpose").waitFor({ timeout: 60_000 });
 
       if (mode === "dark") {
-        await page.getByRole("button", { name: /^dark$/i }).first().click();
+        await page
+          .getByRole("button", { name: /^dark$/i })
+          .first()
+          .click();
         await page.waitForTimeout(400);
       }
 

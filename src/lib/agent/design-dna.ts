@@ -145,8 +145,8 @@ function fromText(text: string, fileName?: string): DesignDna {
     .map((l) => l.trim())
     .filter(Boolean);
   const fontLine = lines.find((l) => /font|typeface|typography/i.test(l));
-  const headingFont = fontLine?.match(/heading[s]?\s*[:\-]?\s*([^,;|]+)/i)?.[1]?.trim();
-  const bodyFont = fontLine?.match(/body\s*[:\-]?\s*([^,;|]+)/i)?.[1]?.trim();
+  const headingFont = fontLine?.match(/heading[s]?\s*[:-]?\s*([^,;|]+)/i)?.[1]?.trim();
+  const bodyFont = fontLine?.match(/body\s*[:-]?\s*([^,;|]+)/i)?.[1]?.trim();
   const first = lines[0] ?? "";
   return {
     name:

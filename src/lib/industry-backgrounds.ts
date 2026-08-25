@@ -264,5 +264,4 @@ export function withIndustryGround(
       : (seed) => set.pack.ground(seed),
     swatch: basePack.swatch,
   };
-
 }

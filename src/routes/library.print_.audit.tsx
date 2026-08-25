@@ -81,7 +81,6 @@ function AuditRow({
   const [metrics, setMetrics] = useState<PrintModuleMetrics | null>(null);
 
   useEffect(() => {
-    let t: ReturnType<typeof setTimeout> | undefined;
     const run = () => {
       // Measure the un-transformed page-width container: offsetHeight there is
       // real print px, while the outer wrapper is already scaled to the card.
@@ -96,11 +95,11 @@ function AuditRow({
     };
     // One pass after layout + fonts; measurement is deliberately not observed
     // continuously here so the grid never enters a measure/render loop.
-    t = setTimeout(run, 260);
+    const t = setTimeout(run, 260);
     const fonts = (document as Document & { fonts?: FontFaceSet }).fonts;
     fonts?.ready?.then(() => setTimeout(run, 60)).catch(() => {});
     return () => {
-      if (t) clearTimeout(t);
+      clearTimeout(t);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageContentH, runKey]);

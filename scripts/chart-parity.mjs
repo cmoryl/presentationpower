@@ -60,7 +60,6 @@ import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
 import { renderPptxWithPowerPoint, deleteDriveItem } from "./render-via-powerpoint.mjs";
 
-
 const run = promisify(execFile);
 const argv = process.argv.slice(2);
 const flag = (n) => argv.includes(`--${n}`);
@@ -68,7 +67,8 @@ const value = (n, fb) => {
   const i = argv.indexOf(`--${n}`);
   return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : fb;
 };
-const values = (n) => argv.reduce((a, v, i) => (v === `--${n}` && argv[i + 1] ? [...a, argv[i + 1]] : a), []);
+const values = (n) =>
+  argv.reduce((a, v, i) => (v === `--${n}` && argv[i + 1] ? [...a, argv[i + 1]] : a), []);
 
 const BASE_URL = value("url", process.env.VERIFY_URL ?? "http://localhost:8080");
 const SAMPLE = Number(value("sample", 6));
@@ -87,7 +87,6 @@ const OUT_DIR = path.resolve(value("out", "artifacts/chart-parity"));
  * offline, but its chart plot-area scaling and text layout are not PowerPoint's.
  */
 const RENDERER = value("renderer", "powerpoint");
-
 
 const W = 960;
 const H = 540;
@@ -127,7 +126,13 @@ async function launchChromium() {
 }
 
 async function assertTooling() {
-  const bins = RENDERER === "powerpoint" ? [["pdftoppm", ["-v"]]] : [["soffice", ["--version"]], ["pdftoppm", ["-v"]]];
+  const bins =
+    RENDERER === "powerpoint"
+      ? [["pdftoppm", ["-v"]]]
+      : [
+          ["soffice", ["--version"]],
+          ["pdftoppm", ["-v"]],
+        ];
   for (const [bin, args] of bins) {
     try {
       await run(bin, args, { timeout: 120_000 });
@@ -137,7 +142,10 @@ async function assertTooling() {
       );
     }
   }
-  if (RENDERER === "powerpoint" && !(process.env.LOVABLE_API_KEY && process.env.MICROSOFT_POWERPOINT_API_KEY)) {
+  if (
+    RENDERER === "powerpoint" &&
+    !(process.env.LOVABLE_API_KEY && process.env.MICROSOFT_POWERPOINT_API_KEY)
+  ) {
     throw new Error(
       "renderer=powerpoint needs the Microsoft PowerPoint connection (LOVABLE_API_KEY + MICROSOFT_POWERPOINT_API_KEY). Re-run with --renderer libreoffice for the offline advisory check.",
     );
@@ -215,7 +223,6 @@ async function renderPptxToPng(pptxPath, workDir) {
   return await pdfToPng(pdf, workDir);
 }
 
-
 /**
  * Build the comparison mask: 1 where a pixel COUNTS.
  * = union(graphic rects, padded) minus union(text rects, padded).
@@ -284,7 +291,13 @@ function regionScore(build, lo, mask, count) {
 function quantiles(scores) {
   const s = [...scores].sort((x, y) => x - y);
   const at = (q) => s[Math.min(s.length - 1, Math.floor(q * (s.length - 1)))] ?? null;
-  return { n: s.length, min: s[0] ?? null, median: at(0.5), p90: at(0.9), max: s[s.length - 1] ?? null };
+  return {
+    n: s.length,
+    min: s[0] ?? null,
+    median: at(0.5),
+    p90: at(0.9),
+    max: s[s.length - 1] ?? null,
+  };
 }
 
 async function main() {
@@ -298,7 +311,9 @@ async function main() {
   if (ONLY.length) variants = variants.filter((v) => ONLY.includes(v));
   else if (!ALL && SAMPLE < variants.length) {
     const step = variants.length / SAMPLE;
-    variants = [...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)]))];
+    variants = [
+      ...new Set(Array.from({ length: SAMPLE }, (_, i) => variants[Math.floor(i * step)])),
+    ];
   }
 
   const jobs = [];
@@ -319,11 +334,21 @@ async function main() {
     try {
       [cap] = await page.evaluate((j) => window.__tpExportVerify.pixel([j]), job);
     } catch (err) {
-      rows.push({ variantId: job[0], mode: job[2], flagged: true, reason: `capture threw: ${String(err).slice(0, 140)}` });
+      rows.push({
+        variantId: job[0],
+        mode: job[2],
+        flagged: true,
+        reason: `capture threw: ${String(err).slice(0, 140)}`,
+      });
       continue;
     }
     if (!cap?.pptx || !cap?.build) {
-      rows.push({ variantId: job[0], mode: job[2], flagged: true, reason: cap?.error ?? "no capture" });
+      rows.push({
+        variantId: job[0],
+        mode: job[2],
+        flagged: true,
+        reason: cap?.error ?? "no capture",
+      });
       console.log(`  ${i + 1}/${jobs.length} ${label} · FLAG (${cap?.error ?? "no capture"})`);
       continue;
     }
@@ -338,7 +363,9 @@ async function main() {
       const lo = PNG.sync.read(await readFile(renderPng));
       const build = PNG.sync.read(Buffer.from(cap.build, "base64"));
       if (lo.width !== W || lo.height !== H || build.width !== W || build.height !== H) {
-        throw new Error(`dimension mismatch lo=${lo.width}x${lo.height} build=${build.width}x${build.height}`);
+        throw new Error(
+          `dimension mismatch lo=${lo.width}x${lo.height} build=${build.width}x${build.height}`,
+        );
       }
 
       const frame = pixelmatch(build.data, lo.data, null, W, H, {
@@ -369,7 +396,8 @@ async function main() {
           inkExport === null || inkBuild === null
             ? null
             : Number(Math.abs(inkExport - inkBuild).toFixed(4));
-        if (graphicScore < MIN_SCORE) reason = `graphicScore ${graphicScore} below floor ${MIN_SCORE}`;
+        if (graphicScore < MIN_SCORE)
+          reason = `graphicScore ${graphicScore} below floor ${MIN_SCORE}`;
         else if (inkDelta !== null && inkDelta > MAX_INK_DELTA)
           reason = `ink fraction differs by ${inkDelta} (limit ${MAX_INK_DELTA}) — graphic present but drawn at a different weight/size`;
       }
@@ -398,7 +426,12 @@ async function main() {
         }`,
       );
     } catch (err) {
-      rows.push({ variantId: cap.variantId, mode: cap.mode, flagged: true, reason: `render failed: ${String(err).slice(0, 160)}` });
+      rows.push({
+        variantId: cap.variantId,
+        mode: cap.mode,
+        flagged: true,
+        reason: `render failed: ${String(err).slice(0, 160)}`,
+      });
       console.log(`  ${i + 1}/${jobs.length} ${label} · FLAG (render failed)`);
     }
   }
@@ -443,7 +476,9 @@ async function main() {
   console.log(
     `\ngraphicScore n=${stats.n} min=${stats.min} median=${stats.median} p90=${stats.p90} max=${stats.max}`,
   );
-  console.log(`flagged ${flagged.length}/${rows.length} → ${path.relative(process.cwd(), OUT_DIR)}/report.md`);
+  console.log(
+    `flagged ${flagged.length}/${rows.length} → ${path.relative(process.cwd(), OUT_DIR)}/report.md`,
+  );
   for (const r of flagged) console.log(`  ⚠️ ${r.variantId}@${r.mode}: ${r.reason}`);
 
   await browser.close();

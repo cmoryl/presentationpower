@@ -14,7 +14,7 @@ const SIGNED_TTL = 60 * 10;
 
 function sanitizeName(name: string): string {
   const base = name
-    .replace(/[^\w.\-]+/g, "-")
+    .replace(/[^\w.-]+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
   const safe = base || "slide.pptx";

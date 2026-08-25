@@ -35,7 +35,6 @@ export type SbClient = {
 // tables, diagrams, fonts, custom XML). We persist metadata only — never
 // base64 payloads for media/OLE — so slide rows stay small.
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function buildSlideAssets(sl: any) {
   const layoutShapes = sl.layout?.shapes ?? [];
   const images = (sl.imageEmbedIds ?? []).map((embedId: string, idx: number) => {
@@ -227,7 +226,6 @@ export function buildSlideAssets(sl: any) {
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function buildDeckExtras(parsed: any) {
   return {
     metadata: parsed.metadata ?? {},
@@ -258,7 +256,6 @@ export function buildDeckExtras(parsed: any) {
 /** Row payloads stay bounded: keep the scores/totals whole, cap the issue list. */
 const MAX_STORED_ISSUES = 500;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function buildScreeningExtra(screening: any) {
   if (!screening) return null;
   const issues = (screening.compat?.issues ?? []) as any[];
@@ -320,7 +317,6 @@ export async function persistParsedSlideImages({
   imageCache,
   tag,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   slide: any;
   existingRefs?: SavedImageRef[];
   filename: string;
@@ -355,7 +351,7 @@ export async function persistParsedSlideImages({
     const imgId = crypto.randomUUID();
     const baseName = filename.replace(/\.pptx$/i, "");
     const imgFilename = `${baseName}__slide-${slide.index + 1}-${j + 1}.${ext}`
-      .replace(/[^\w.\-]+/g, "_")
+      .replace(/[^\w.-]+/g, "_")
       .slice(-160);
     const imgPath = `${userId}/${imgId}-${imgFilename}`;
     const upImg = await client.storage

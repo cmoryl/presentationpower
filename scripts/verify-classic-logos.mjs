@@ -29,9 +29,10 @@ try {
   mod = JSON.parse(out);
 }
 
-const issues = typeof mod.validateClassicManifest === "function"
-  ? mod.validateClassicManifest()
-  : mod.issues ?? [];
+const issues =
+  typeof mod.validateClassicManifest === "function"
+    ? mod.validateClassicManifest()
+    : (mod.issues ?? []);
 
 let failed = issues.length > 0;
 if (issues.length) {

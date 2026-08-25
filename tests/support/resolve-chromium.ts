@@ -75,6 +75,7 @@ export function resolveChromiumExecutable(): string | undefined {
   // Let Playwright resolve itself when its expected build is actually present.
   try {
     // Lazy require so this module stays usable without @playwright/test loaded.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy load keeps this usable without @playwright/test
     const { chromium } = require("@playwright/test") as typeof import("@playwright/test");
     const own = chromium.executablePath();
     if (own && existsSync(own)) return undefined; // undefined = use Playwright default

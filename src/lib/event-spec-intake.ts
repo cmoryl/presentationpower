@@ -258,7 +258,6 @@ function labelOf(line: string): string {
   return cleaned || "Signage item";
 }
 
-
 function slug(label: string, index: number): string {
   const base = label
     .toLowerCase()
@@ -324,7 +323,7 @@ export function parseEventSpecSheet(input: string): SpecParseResult {
 
     const bleedIn =
       measurement(line, /bleed/, "in") ??
-      (/no bleed|0 ?bleed|full ?bleed off/i.test(line) ? 0 : preset?.bleedIn ?? 0.125);
+      (/no bleed|0 ?bleed|full ?bleed off/i.test(line) ? 0 : (preset?.bleedIn ?? 0.125));
     const safeIn =
       measurement(line, /safe(?: ?area| ?zone| ?margin)?/, "in") ??
       Math.max(0.25, Math.min(widthIn, heightIn) * DEFAULT_SAFE_FRACTION);

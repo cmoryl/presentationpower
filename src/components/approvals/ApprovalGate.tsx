@@ -66,9 +66,7 @@ export function ApprovalGate(props: ApprovalGateProps) {
           subjectPath: props.subjectPath,
           summary: note.trim() || props.summary,
           checks: props.checks ?? [],
-          priority: (props.checks ?? []).some((c) => c.severity === "blocking")
-            ? "high"
-            : "normal",
+          priority: (props.checks ?? []).some((c) => c.severity === "blocking") ? "high" : "normal",
         },
       }),
     onSuccess: () => {
@@ -79,9 +77,7 @@ export function ApprovalGate(props: ApprovalGateProps) {
       toast.success("Sent for brand review");
     },
     onError: (e: Error) =>
-      toast.error(
-        e.message.includes("Unauthorized") ? "Sign in to request approval" : e.message,
-      ),
+      toast.error(e.message.includes("Unauthorized") ? "Sign in to request approval" : e.message),
   });
 
   const request = state.data?.request ?? null;
@@ -95,7 +91,9 @@ export function ApprovalGate(props: ApprovalGateProps) {
             Brand &amp; compliance
           </div>
           {copy ? (
-            <div className={`mt-2 inline-flex max-w-full rounded-full border px-3 py-1 text-xs leading-snug ${copy.tone}`}>
+            <div
+              className={`mt-2 inline-flex max-w-full rounded-full border px-3 py-1 text-xs leading-snug ${copy.tone}`}
+            >
               {copy.label}
             </div>
           ) : (

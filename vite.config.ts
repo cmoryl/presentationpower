@@ -20,9 +20,8 @@ function packContrastGate(): Plugin {
     name: "pack-contrast-gate",
     apply: "build",
     async buildStart() {
-      const { auditAllPackContrast, formatPackContrastFailures } = await import(
-        "./src/lib/pack-contrast-regression"
-      );
+      const { auditAllPackContrast, formatPackContrastFailures } =
+        await import("./src/lib/pack-contrast-regression");
       const report = auditAllPackContrast();
       if (!report.passes) this.error(formatPackContrastFailures(report));
       this.info?.(
@@ -73,7 +72,6 @@ function exportVerifyGate(): Plugin {
         `export-verify-gate: ${shape.variants.length} modules × ${shape.packs.length} looks verified (${manifest.coverage} sweep, ${manifest.verifiedAt})`,
       );
     },
-
   };
 }
 

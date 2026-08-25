@@ -98,10 +98,7 @@ function EventProductionPage() {
   const [receipt, setReceipt] = useState<string | null>(null);
   const nodes = useRef(new Map<string, HTMLDivElement>());
 
-  const look = useMemo(
-    () => EVENT_LOOKS.find((l) => l.id === lookId) ?? EVENT_LOOKS[0]!,
-    [lookId],
-  );
+  const look = useMemo(() => EVENT_LOOKS.find((l) => l.id === lookId) ?? EVENT_LOOKS[0]!, [lookId]);
 
   const rows = useMemo(
     () =>
@@ -151,9 +148,7 @@ function EventProductionPage() {
     const items = rows
       .map(({ spec, format }) => {
         const node = nodes.current.get(spec.id);
-        return node
-          ? { spec, node, width: format.width, height: format.height }
-          : null;
+        return node ? { spec, node, width: format.width, height: format.height } : null;
       })
       .filter((i): i is NonNullable<typeof i> => Boolean(i));
     if (items.length === 0) {
@@ -245,7 +240,9 @@ function EventProductionPage() {
             value={sheet}
             onChange={(e) => setSheet(e.target.value)}
             rows={8}
-            placeholder={"Hanging banner — 120 x 48 in, bleed 1in, 13oz vinyl, qty 2\nMeter board — 1000 x 2000 mm, bleed 5mm\nRetractable banner, qty 4"}
+            placeholder={
+              "Hanging banner — 120 x 48 in, bleed 1in, 13oz vinyl, qty 2\nMeter board — 1000 x 2000 mm, bleed 5mm\nRetractable banner, qty 4"
+            }
             className="w-full rounded-xl border border-foreground/15 bg-background p-3 font-mono text-xs leading-relaxed focus:border-foreground/40 focus:outline-none"
           />
           <div className="flex flex-wrap items-center gap-2">
@@ -290,13 +287,21 @@ function EventProductionPage() {
             <h2 className="text-sm font-semibold">2 · Event look and copy</h2>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <Field label="Event name">
-                <input value={eventName} onChange={(e) => setEventName(e.target.value)} className={INPUT} />
+                <input
+                  value={eventName}
+                  onChange={(e) => setEventName(e.target.value)}
+                  className={INPUT}
+                />
               </Field>
               <Field label="Venue / location">
                 <input value={venue} onChange={(e) => setVenue(e.target.value)} className={INPUT} />
               </Field>
               <Field label="Event look">
-                <select value={lookId} onChange={(e) => setLookId(e.target.value)} className={INPUT}>
+                <select
+                  value={lookId}
+                  onChange={(e) => setLookId(e.target.value)}
+                  className={INPUT}
+                >
                   {EVENT_LOOKS.map((l) => (
                     <option key={l.id} value={l.id}>
                       {l.label}
@@ -305,7 +310,11 @@ function EventProductionPage() {
                 </select>
               </Field>
               <Field label="Brand">
-                <select value={brandId} onChange={(e) => setBrandId(e.target.value)} className={INPUT}>
+                <select
+                  value={brandId}
+                  onChange={(e) => setBrandId(e.target.value)}
+                  className={INPUT}
+                >
                   {BRAND_MODES.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name}
@@ -445,7 +454,9 @@ function EventProductionPage() {
                         label="Qty"
                         value={spec.quantity}
                         step={1}
-                        onChange={(v) => updateSpec(spec.id, { quantity: Math.max(1, Math.round(v)) })}
+                        onChange={(v) =>
+                          updateSpec(spec.id, { quantity: Math.max(1, Math.round(v)) })
+                        }
                       />
                     </div>
                     <div className="flex flex-wrap items-center gap-3 text-[11px] text-foreground/50">

@@ -18,8 +18,8 @@ export function CreateOnlyNotice({
       <Lock className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
       <p className="min-w-0 flex-1 text-muted-foreground">
         <span className="font-medium text-foreground">{what} is read-only for your role.</span>{" "}
-        Sales builds from pre-approved templates and modules — start a new piece from an
-        approved set instead.
+        Sales builds from pre-approved templates and modules — start a new piece from an approved
+        set instead.
       </p>
       <Link
         to="/dashboard"

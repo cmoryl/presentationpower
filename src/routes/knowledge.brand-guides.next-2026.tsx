@@ -84,7 +84,6 @@ const ICON_SET_TABS: { slug: string; label: string; accent: string }[] = [
   })),
 ];
 
-
 function LockupTile({ item, accent }: { item: NextLockup; accent: string }) {
   const dark = item.variant !== "color";
   return (
@@ -754,7 +753,6 @@ function NextBrandGuide() {
           </div>
         </Section>
       </div>
-
     </AppShell>
   );
 }

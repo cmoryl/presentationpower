@@ -14,7 +14,10 @@ const sa = createClient(SUPA_URL, SR, {
   global: {
     fetch: (input, init) => {
       const h = new Headers(init?.headers);
-      if ((SR.startsWith("sb_publishable_") || SR.startsWith("sb_secret_")) && h.get("Authorization") === `Bearer ${SR}`) {
+      if (
+        (SR.startsWith("sb_publishable_") || SR.startsWith("sb_secret_")) &&
+        h.get("Authorization") === `Bearer ${SR}`
+      ) {
         h.delete("Authorization");
       }
       h.set("apikey", SR);
@@ -34,7 +37,10 @@ const PDF_ENTITY_TO_DIVISION = {
 };
 
 function chunkText(text, size = 1200, overlap = 200) {
-  const clean = text.replace(/\r\n/g, "\n").replace(/[ \t]+\n/g, "\n").trim();
+  const clean = text
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+\n/g, "\n")
+    .trim();
   if (clean.length <= size) return clean.length > 40 ? [clean] : [];
   const chunks = [];
   let i = 0;
@@ -86,7 +92,9 @@ async function embedBatch(inputs) {
 // Fetch pending — process all 170
 const { data: rows, error: qErr } = await sa
   .from("pdf_extractions")
-  .select("id, entity_slug, entity_name, entity_type, title, source_url, extracted_text, char_count, chunk_count")
+  .select(
+    "id, entity_slug, entity_name, entity_type, title, source_url, extracted_text, char_count, chunk_count",
+  )
   .eq("status", "ok")
   .eq("chunk_count", 0)
   .order("char_count", { ascending: true });
@@ -94,7 +102,10 @@ if (qErr) throw qErr;
 
 console.log(`Pending: ${rows.length} docs`);
 
-let embedded = 0, skipped = 0, failed = 0, totalChunks = 0;
+let embedded = 0,
+  skipped = 0,
+  failed = 0,
+  totalChunks = 0;
 const failures = [];
 
 for (const [idx, row] of rows.entries()) {
@@ -182,7 +193,9 @@ for (const [idx, row] of rows.entries()) {
 }
 
 console.log(`\n═══ DONE ═══`);
-console.log(`Embedded: ${embedded} · Skipped: ${skipped} · Failed: ${failed} · Total chunks: ${totalChunks}`);
+console.log(
+  `Embedded: ${embedded} · Skipped: ${skipped} · Failed: ${failed} · Total chunks: ${totalChunks}`,
+);
 if (failures.length) {
   console.log(`\nFailures:`);
   for (const f of failures) console.log(`  - [${f.entity}] ${f.title}: ${f.err.slice(0, 200)}`);

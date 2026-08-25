@@ -44,9 +44,8 @@ async function isolate(page: Page, id: string) {
 
 async function auditEffects(page: Page, id: string) {
   return await page.evaluate(async (variantId: string) => {
-    const { classifyEffectStyle, effectSvg, effectPadPx } = await import(
-      "/src/lib/export-effect-style.ts"
-    );
+    const { classifyEffectStyle, effectSvg, effectPadPx } =
+      await import("/src/lib/export-effect-style.ts");
     const { resolveCssColor, parseBoxShadow } = await import("/src/lib/export-dom-decompose.ts");
     void parseBoxShadow;
 
@@ -111,7 +110,8 @@ async function auditEffects(page: Page, id: string) {
       if (out.padPx <= 0 && (style.blurPx > 0 || style.shadows.length > 0)) {
         issues.push("blur/shadow effect reserved no bleed padding");
       }
-      if (/var\(|currentColor/.test(out.svg)) issues.push("unresolved var()/currentColor in effect");
+      if (/var\(|currentColor/.test(out.svg))
+        issues.push("unresolved var()/currentColor in effect");
       const doc = new DOMParser().parseFromString(out.svg, "image/svg+xml");
       if (doc.querySelector("parsererror")) issues.push("effect markup is not parseable XML");
       if (style.blurPx > 0 && !out.svg.includes("<feGaussianBlur")) {
@@ -143,7 +143,10 @@ test.describe("Effect layer export parity", () => {
       await page.getByPlaceholder("Search by name, ID, or purpose").waitFor({ timeout: 60_000 });
 
       if (mode === "dark") {
-        await page.getByRole("button", { name: /^dark$/i }).first().click();
+        await page
+          .getByRole("button", { name: /^dark$/i })
+          .first()
+          .click();
         await page.waitForTimeout(400);
       }
 

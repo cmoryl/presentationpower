@@ -69,7 +69,7 @@ function tokenizePath(path: string): Array<string | number> {
     let rest = chunk;
 
     while (true) {
-      const m = /^([^\[]+)?(\[(\d+)\])?(.*)$/.exec(rest);
+      const m = /^([^[]+)?(\[(\d+)\])?(.*)$/.exec(rest);
       if (!m) break;
       if (m[1]) out.push(m[1]);
       if (m[3] !== undefined) out.push(Number(m[3]));

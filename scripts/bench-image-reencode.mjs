@@ -29,7 +29,11 @@ const jsonOut = flag("json", "");
 const maxMsPerMp = flag("max-ms-per-mp", "") ? Number(flag("max-ms-per-mp", "")) : null;
 
 const fmtBytes = (n) =>
-  n >= 1_000_000 ? `${(n / 1_048_576).toFixed(2)}MB` : n >= 1_000 ? `${(n / 1024).toFixed(1)}KB` : `${n}B`;
+  n >= 1_000_000
+    ? `${(n / 1_048_576).toFixed(2)}MB`
+    : n >= 1_000
+      ? `${(n / 1024).toFixed(1)}KB`
+      : `${n}B`;
 
 const pad = (s, w) => String(s).padEnd(w);
 const padL = (s, w) => String(s).padStart(w);
@@ -101,7 +105,9 @@ try {
         `(${(a.out / Math.max(1, a.inp)).toFixed(2)}x)`,
     );
   }
-  console.log(`\nslowest case: ${slowest.option}/${slowest.sample} @ ${slowest.msPerMegapixel.toFixed(1)} ms/MP`);
+  console.log(
+    `\nslowest case: ${slowest.option}/${slowest.sample} @ ${slowest.msPerMegapixel.toFixed(1)} ms/MP`,
+  );
 
   if (jsonOut) {
     writeFileSync(jsonOut, JSON.stringify(report, null, 2));

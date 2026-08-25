@@ -65,4 +65,3 @@ export function enforceSalesDeckPack(
   if (isSalesAllowedPack(stylePackId)) return stylePackId as string;
   return SALES_DECK_LOOKS[prefer].stylePackId;
 }
-

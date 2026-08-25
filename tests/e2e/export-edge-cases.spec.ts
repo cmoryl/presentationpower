@@ -74,9 +74,7 @@ test.describe("module export — edge cases", () => {
     test.setTimeout(420_000);
     await openHarness(page);
 
-    const packId = (await page.evaluate(
-      () => window.__tpFormatVerify!.industryPacks[0],
-    )) as string;
+    const packId = (await page.evaluate(() => window.__tpFormatVerify!.industryPacks[0])) as string;
 
     const blended = (await page.evaluate(
       async (p) =>
@@ -126,13 +124,9 @@ test.describe("module export — edge cases", () => {
     // photography, AI backdrops. Routing the whole app up front starves the
     // Vite module graph, so the interception is scoped to bitmaps/vectors and
     // installed once the page is ready to export.
-    await page.route(/\.(png|jpe?g|webp|avif|gif|svg)(\?|#|$)/i, (route) =>
-      route.abort("failed"),
-    );
+    await page.route(/\.(png|jpe?g|webp|avif|gif|svg)(\?|#|$)/i, (route) => route.abort("failed"));
 
-    const packId = (await page.evaluate(
-      () => window.__tpFormatVerify!.industryPacks[0],
-    )) as string;
+    const packId = (await page.evaluate(() => window.__tpFormatVerify!.industryPacks[0])) as string;
 
     const run = (await page.evaluate(
       async (p) => await window.__tpFormatVerify!.run(window.__tpFormatVerify!.variant, p),
@@ -198,9 +192,7 @@ test.describe("module export — edge cases", () => {
     test.setTimeout(420_000);
     await openHarness(page);
 
-    const packId = (await page.evaluate(
-      () => window.__tpFormatVerify!.industryPacks[0],
-    )) as string;
+    const packId = (await page.evaluate(() => window.__tpFormatVerify!.industryPacks[0])) as string;
 
     for (const quality of ["standard", "ultra"] as const) {
       const run = (await page.evaluate(

@@ -66,7 +66,12 @@ describe("adopted mirrors at export", () => {
   });
 
   it("keeps adopted TEXT mirrors and anything the user touched", () => {
-    const text = block({ id: "t", kind: "heading", text: "Live Demo", sourceSelector: ":nth-child(1)" });
+    const text = block({
+      id: "t",
+      kind: "heading",
+      text: "Live Demo",
+      sourceSelector: ":nth-child(1)",
+    });
     const moved = block({ id: "m", kind: "shape", sourceSelector: ":nth-child(3)", touched: true });
     expect(isDroppableAdoptedMirror(text)).toBe(false);
     expect(isDroppableAdoptedMirror(moved)).toBe(false);

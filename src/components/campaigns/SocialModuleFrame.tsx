@@ -105,7 +105,6 @@ export function SocialModuleFrame({
     airCeiling.current = SOCIAL_AIR_MAX;
   }, [pinned, section, format.id]);
 
-
   // Measure the module at the current virtual page width. rAF-coalesced and
   // threshold-damped, the same discipline the print preview frame uses.
   useLayoutEffect(() => {
@@ -166,7 +165,6 @@ export function SocialModuleFrame({
     const nextAir = nextAirStep(fit, airIndex, growthExhausted);
     if (nextAir !== null && nextAir <= airCeiling.current) setAirIndex(nextAir);
   }, [pinned, naturalHeight, fit, relief, growthIndex, airIndex]);
-
 
   useEffect(() => {
     if (naturalHeight > 0) onFit?.(fit, relief);
@@ -262,7 +260,6 @@ export function SocialModuleFrame({
               // its own plates and surfaces reach the safe rect.
               ["--print-fit-pad" as string]: String(fit.air),
             }}
-
           >
             {/* The virtual sheet takes the FRAME's aspect, not Letter's. Band
                 and masthead heights are a share of page height, so this is what
@@ -278,7 +275,6 @@ export function SocialModuleFrame({
                 <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
               </PrintDocModeProvider>
             </PrintPageProvider>
-
           </div>
         </div>
 

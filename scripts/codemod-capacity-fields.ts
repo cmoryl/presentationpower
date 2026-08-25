@@ -43,9 +43,8 @@ function build(variant: (typeof MODULE_VARIANTS)[number]): string {
   const cap = variant.capacity as Cap;
   const root = collectionRoot(variant.editableFields);
   // A count over an opaque list has no per-field sub-paths to strip.
-  const prefix = root && variant.editableFields.some((f) => f.startsWith(`${root}[].`))
-    ? `${root}[].`
-    : null;
+  const prefix =
+    root && variant.editableFields.some((f) => f.startsWith(`${root}[].`)) ? `${root}[].` : null;
   const flat: string[] = [];
   const itemFields: string[] = [];
 
@@ -64,7 +63,9 @@ function build(variant: (typeof MODULE_VARIANTS)[number]): string {
     const min = cap.items?.min ?? 1;
     const max = cap.items?.max ?? Math.max(min, 6);
     const pathAttr = root && root !== "items" ? `path: ${JSON.stringify(root)}, ` : "";
-    parts.push(`items: { ${pathAttr}min: ${min}, max: ${max}, fields: { ${itemFields.join(", ")} } }`);
+    parts.push(
+      `items: { ${pathAttr}min: ${min}, max: ${max}, fields: { ${itemFields.join(", ")} } }`,
+    );
   }
   // Deprecated generic aliases stay for existing readers (library UI, export
   // verifier, skill-pack writer). They are documentation of the old contract,
@@ -80,7 +81,7 @@ let cursor = 0;
 let rewritten = 0;
 
 for (let i = 0; i < lines.length; i += 1) {
-  if (!/^    capacity: \{.*\},$/.test(lines[i])) continue;
+  if (!/^ {4}capacity: \{.*\},$/.test(lines[i])) continue;
   const variant = MODULE_VARIANTS[cursor];
   if (!variant) throw new Error(`more capacity literals than variants at line ${i + 1}`);
   lines[i] = build(variant);

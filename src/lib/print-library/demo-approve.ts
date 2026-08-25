@@ -291,8 +291,7 @@ export function approvePrintDemoContent<T>(kind: PrintAssetKind, content: T): T 
 
   let next: Bag | null = approveContentCopy(bag);
   const original = readModules(bag);
-  const changed =
-    modules.length !== original.length || modules.some((m, i) => m !== original[i]);
+  const changed = modules.length !== original.length || modules.some((m, i) => m !== original[i]);
   if (changed) next = { ...(next ?? bag), modules };
 
   // 4 — hero band clamp against the final module load.
@@ -306,8 +305,6 @@ export function approvePrintDemoContent<T>(kind: PrintAssetKind, content: T): T 
 
   return (next ?? content) as T;
 }
-
-
 
 /**
  * Starting look for a demo page: the pinned trim, auto content-fit always on,

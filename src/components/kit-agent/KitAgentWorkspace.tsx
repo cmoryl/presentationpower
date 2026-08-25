@@ -91,7 +91,6 @@ export function KitAgentWorkspace({
     if (seed) setPending(seed);
   }, []);
 
-
   const refreshThreads = useCallback(() => {
     listKitThreads(surface)
       .then(setThreads)

@@ -43,7 +43,10 @@ export default defineTool({
         section_id: s.section_id,
       })),
     );
-    const variance = include_advisory === false ? { ...variety, issues: variety.issues.filter((i) => i.severity === "blocking") } : variety;
+    const variance =
+      include_advisory === false
+        ? { ...variety, issues: variety.issues.filter((i) => i.severity === "blocking") }
+        : variety;
     return textResult({
       deck_id,
       ...report,
@@ -52,4 +55,3 @@ export default defineTool({
     });
   },
 });
-

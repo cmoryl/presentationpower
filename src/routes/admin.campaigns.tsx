@@ -225,7 +225,6 @@ function CampaignsView() {
             );
           })}
         </div>
-
       </AdminSection>
 
       {/* Pipeline stub CTA */}

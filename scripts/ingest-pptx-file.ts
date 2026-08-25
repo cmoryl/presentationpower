@@ -26,7 +26,8 @@ const argv = process.argv.slice(2);
 const file = argv.find((a) => !a.startsWith("--"));
 const divisionId = argv[argv.indexOf("--division") + 1];
 const uploaderArg = argv.includes("--uploader") ? argv[argv.indexOf("--uploader") + 1] : null;
-if (!file || !divisionId) throw new Error("usage: <file.pptx> --division <slug> [--uploader <uuid>]");
+if (!file || !divisionId)
+  throw new Error("usage: <file.pptx> --division <slug> [--uploader <uuid>]");
 
 const sb = createClient(SUPA_URL, SR, {
   auth: { persistSession: false, autoRefreshToken: false },
@@ -58,7 +59,7 @@ if (!userId) {
 if (!userId) throw new Error("no uploader id available; pass --uploader <uuid>");
 
 const id = crypto.randomUUID();
-const safeName = filename.replace(/[^\w.\-]+/g, "_").slice(-160);
+const safeName = filename.replace(/[^\w.-]+/g, "_").slice(-160);
 const storagePath = `${userId}/${id}-${safeName}`;
 const up = await sb.storage.from(BUCKET).upload(storagePath, buf, {
   contentType: "application/vnd.openxmlformats-officedocument.presentationml.presentation",

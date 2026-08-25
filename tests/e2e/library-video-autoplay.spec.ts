@@ -18,11 +18,7 @@ async function scrollToLoadAll(page: Page) {
   // top-to-bottom to force every video-demo tile to mount.
   await page.evaluate(async () => {
     const step = Math.floor(window.innerHeight * 0.85);
-    const max = () =>
-      Math.max(
-        document.body.scrollHeight,
-        document.documentElement.scrollHeight,
-      );
+    const max = () => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
     for (let y = 0; y < max(); y += step) {
       window.scrollTo(0, y);
       await new Promise((r) => setTimeout(r, 150));
@@ -60,11 +56,8 @@ async function readVideoState(page: Page) {
   });
 }
 
-
 test.describe("Module preview video-demo autoplay matrix", () => {
-  test("autoplays in light + dark previews on /library", async ({
-    page,
-  }, testInfo) => {
+  test("autoplays in light + dark previews on /library", async ({ page }, testInfo) => {
     const consoleErrors: string[] = [];
     page.on("pageerror", (err) => {
       consoleErrors.push(String(err));
@@ -107,10 +100,9 @@ test.describe("Module preview video-demo autoplay matrix", () => {
     await scrollToLoadAll(page);
 
     // Wait for at least one <video> to appear.
-    await page.waitForFunction(
-      () => document.querySelectorAll("video").length > 0,
-      { timeout: 20_000 },
-    );
+    await page.waitForFunction(() => document.querySelectorAll("video").length > 0, {
+      timeout: 20_000,
+    });
 
     // Poll until at least one light + one dark video are actively playing.
     const deadline = Date.now() + AUTOPLAY_POLL_MS;
@@ -131,9 +123,7 @@ test.describe("Module preview video-demo autoplay matrix", () => {
     });
 
     const totalVideos = snapshot.length;
-    expect(totalVideos, "no <video> elements found on /library").toBeGreaterThan(
-      0,
-    );
+    expect(totalVideos, "no <video> elements found on /library").toBeGreaterThan(0);
 
     const unknownMode = snapshot.filter((v) => v.mode === "unknown");
     expect(
@@ -143,9 +133,7 @@ test.describe("Module preview video-demo autoplay matrix", () => {
         .join(", ")}`,
     ).toBe(0);
 
-    const playing = snapshot.filter(
-      (v) => !v.paused && v.currentTime > 0.05 && v.readyState >= 2,
-    );
+    const playing = snapshot.filter((v) => !v.paused && v.currentTime > 0.05 && v.readyState >= 2);
     const playingLight = playing.filter((v) => v.mode === "light");
     const playingDark = playing.filter((v) => v.mode === "dark");
 
@@ -157,7 +145,6 @@ test.describe("Module preview video-demo autoplay matrix", () => {
       playingDark.length,
       `no DARK-mode video demo autoplayed (of ${totalVideos} videos)`,
     ).toBeGreaterThan(0);
-
 
     expect(
       consoleErrors,

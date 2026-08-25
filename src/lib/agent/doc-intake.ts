@@ -51,7 +51,10 @@ export const DOC_ACCEPT =
   ".txt,.md,.markdown,.csv,.tsv,.json,.html,.htm,.xml,.rtf,.vtt,.srt,.docx,.pdf,.pptx,.xlsx,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 export function clampDocText(raw: string): { text: string; truncated: boolean } {
-  const clean = raw.replace(/\r\n/g, "\n").replace(/\n{4,}/g, "\n\n\n").trim();
+  const clean = raw
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{4,}/g, "\n\n\n")
+    .trim();
   if (clean.length <= PER_DOC_CHARS) return { text: clean, truncated: false };
   return { text: clean.slice(0, PER_DOC_CHARS), truncated: true };
 }

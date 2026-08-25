@@ -229,7 +229,6 @@ function MyFilesPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-
   return (
     <AppShell>
       <div>
@@ -405,7 +404,6 @@ function MyFilesPage() {
           </div>
         )}
 
-
         <div className="mt-6">
           {isLoading && (
             <div className="flex items-center gap-2 text-sm text-black/60">
@@ -518,7 +516,6 @@ function MyFilesPage() {
                   (bulkDelete.isPending && selected.has(keyOf(f)))
                 }
               />
-
             ))}
           </div>
         </div>

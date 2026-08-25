@@ -337,7 +337,7 @@ export function parseSeries(raw: string): DataPoint[] {
     .filter(Boolean)
     .map((line) => {
       const m = line.split(/[\t,:;|]+/);
-      const value = Number(String(m[m.length - 1] ?? "").replace(/[^0-9.\-]/g, ""));
+      const value = Number(String(m[m.length - 1] ?? "").replace(/[^0-9.-]/g, ""));
       const label = m.slice(0, -1).join(" ").trim() || line;
       return { label, value: Number.isFinite(value) ? value : 0 };
     });

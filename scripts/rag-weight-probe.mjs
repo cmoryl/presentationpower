@@ -30,7 +30,10 @@ async function embed(q) {
 
 const CASES = [
   { query: "DataForce data collection and annotation services", division: "bm-product" },
-  { query: "life sciences clinical trial translation and regulatory submissions", division: "bm-tp-lifesci" },
+  {
+    query: "life sciences clinical trial translation and regulatory submissions",
+    division: "bm-tp-lifesci",
+  },
 ];
 
 async function probe(query, division, weights) {
@@ -58,7 +61,9 @@ async function probe(query, division, weights) {
   });
 }
 
-function quotaFor(k) { return k <= 2 ? 0 : Math.min(3, Math.max(1, Math.round(k * 0.25))); }
+function quotaFor(k) {
+  return k <= 2 ? 0 : Math.min(3, Math.max(1, Math.round(k * 0.25)));
+}
 
 async function match(vec, division, sourceTypes, k) {
   const args = { query_embedding: `[${vec.join(",")}]`, filter_division: division, match_count: k };

@@ -6,7 +6,6 @@ import { resolveVariantSwap } from "@/lib/slide-ops";
 import { visualDataGap } from "@/lib/agent/visual-data-gaps";
 import { variantsForSection } from "@/lib/taxonomy";
 
-
 export default defineTool({
   name: "insert_slide",
   title: "Insert slide",
@@ -102,6 +101,5 @@ export default defineTool({
       ...(gap ? { visual_data_required: gap } : {}),
       ...(varietyWarning ? { layout_variety_warning: varietyWarning } : {}),
     });
-
   },
 });

@@ -375,7 +375,6 @@ function ApprovedSetsTab() {
     ? (iconColorOptions(slug)[1]?.hex ?? "#1B3E6F")
     : (guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
 
-
   return (
     <section className="space-y-4">
       <SectionHead

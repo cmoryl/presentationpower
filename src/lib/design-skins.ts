@@ -987,7 +987,6 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
  * the industry module can import this one without a cycle.
  */
 export function allDesignLanguages(): DesignSkin[] {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   return [...DESIGN_SKINS, ...industrySkins()];
 }
 

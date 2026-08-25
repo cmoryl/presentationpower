@@ -42,10 +42,19 @@ for (const f of files) {
       await sleep(GAP);
     }
   }
-  rows.push({ file: f, mib: Number((bytes.length / 1048576).toFixed(2)), ok, attempts, pdfBytes, error });
+  rows.push({
+    file: f,
+    mib: Number((bytes.length / 1048576).toFixed(2)),
+    ok,
+    attempts,
+    pdfBytes,
+    error,
+  });
   console.log(
     `${f.padEnd(34)} ${(bytes.length / 1048576).toFixed(2)} MiB · ` +
-      (ok ? `OPENED on attempt ${attempts} (pdf ${(pdfBytes / 1024).toFixed(0)} KiB)` : `REFUSED: ${error}`),
+      (ok
+        ? `OPENED on attempt ${attempts} (pdf ${(pdfBytes / 1024).toFixed(0)} KiB)`
+        : `REFUSED: ${error}`),
   );
   await sleep(GAP);
 }

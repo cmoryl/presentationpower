@@ -33,7 +33,9 @@ function StateCard({ stat }: { stat: ApprovalStateStat }) {
         {stat.label}
       </p>
       <p className="mt-2 text-2xl font-medium tabular-nums">{dur(stat.avgHours)}</p>
-      <p className="text-xs text-foreground/50">average across {stat.items} item{stat.items === 1 ? "" : "s"}</p>
+      <p className="text-xs text-foreground/50">
+        average across {stat.items} item{stat.items === 1 ? "" : "s"}
+      </p>
       <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-foreground/10 pt-3 text-xs">
         <div>
           <dt className="text-foreground/45">Median</dt>
@@ -109,7 +111,11 @@ export function ApprovalAnalyticsPanel() {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <div className="flex rounded-full border border-foreground/15 p-0.5" role="group" aria-label="Time window">
+          <div
+            className="flex rounded-full border border-foreground/15 p-0.5"
+            role="group"
+            aria-label="Time window"
+          >
             {WINDOWS.map((w) => (
               <button
                 key={w}

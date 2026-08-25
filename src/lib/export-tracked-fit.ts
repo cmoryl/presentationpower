@@ -29,7 +29,7 @@ function charEm(ch: string): number {
   if (ch === " ") return 0.29;
   if (/[.,:;'`!|]/.test(ch)) return 0.3;
   if (/[ilj]/.test(ch)) return 0.31;
-  if (/[ftr(){}\[\]\-–—]/.test(ch)) return 0.37;
+  if (/[ftr(){}[\]\-–—]/.test(ch)) return 0.37;
   if (/[·•]/.test(ch)) return 0.42;
   if (/[a-z]/.test(ch)) return 0.56;
   if (/[0-9]/.test(ch)) return 0.62;

@@ -101,30 +101,111 @@ const SLIDE_H = 7.5 * EMU_PER_IN;
 /** Preset geometries we actually emit, plus the rest of the common ST_ShapeType
  *  surface. Unknown tokens make PowerPoint drop the shape silently. */
 const PRST = new Set([
-  "rect", "roundRect", "round1Rect", "round2SameRect", "round2DiagRect",
-  "snip1Rect", "snip2SameRect", "snipRoundRect", "ellipse", "circle",
-  "triangle", "rtTriangle", "diamond", "pentagon", "hexagon", "heptagon",
-  "octagon", "decagon", "dodecagon", "star4", "star5", "star6", "star8",
-  "star10", "star12", "star16", "star24", "star32", "parallelogram",
-  "trapezoid", "nonIsoscelesTrapezoid", "chevron", "homePlate", "arc", "pie",
-  "pieWedge", "chord", "teardrop", "plaque", "can", "cube", "bevel", "donut",
-  "noSmoking", "blockArc", "foldedCorner", "smileyFace", "heart", "lightningBolt",
-  "sun", "moon", "cloud", "arrow", "leftArrow", "rightArrow", "upArrow",
-  "downArrow", "leftRightArrow", "upDownArrow", "quadArrow", "bentArrow",
-  "uturnArrow", "circularArrow", "notchedRightArrow", "stripedRightArrow",
-  "flowChartProcess", "flowChartDecision", "flowChartTerminator",
-  "flowChartConnector", "flowChartPredefinedProcess", "flowChartDocument",
-  "line", "straightConnector1", "bentConnector2", "bentConnector3",
-  "bentConnector4", "bentConnector5", "curvedConnector2", "curvedConnector3",
-  "curvedConnector4", "curvedConnector5", "wedgeRectCallout",
-  "wedgeRoundRectCallout", "wedgeEllipseCallout", "cloudCallout", "frame",
-  "halfFrame", "corner", "diagStripe", "chartX", "chartStar", "chartPlus",
-  "leftBracket", "rightBracket", "leftBrace", "rightBrace", "bracketPair",
-  "bracePair", "gear6", "gear9", "funnel", "pyramid", "flowChartMagneticTape",
+  "rect",
+  "roundRect",
+  "round1Rect",
+  "round2SameRect",
+  "round2DiagRect",
+  "snip1Rect",
+  "snip2SameRect",
+  "snipRoundRect",
+  "ellipse",
+  "circle",
+  "triangle",
+  "rtTriangle",
+  "diamond",
+  "pentagon",
+  "hexagon",
+  "heptagon",
+  "octagon",
+  "decagon",
+  "dodecagon",
+  "star4",
+  "star5",
+  "star6",
+  "star8",
+  "star10",
+  "star12",
+  "star16",
+  "star24",
+  "star32",
+  "parallelogram",
+  "trapezoid",
+  "nonIsoscelesTrapezoid",
+  "chevron",
+  "homePlate",
+  "arc",
+  "pie",
+  "pieWedge",
+  "chord",
+  "teardrop",
+  "plaque",
+  "can",
+  "cube",
+  "bevel",
+  "donut",
+  "noSmoking",
+  "blockArc",
+  "foldedCorner",
+  "smileyFace",
+  "heart",
+  "lightningBolt",
+  "sun",
+  "moon",
+  "cloud",
+  "arrow",
+  "leftArrow",
+  "rightArrow",
+  "upArrow",
+  "downArrow",
+  "leftRightArrow",
+  "upDownArrow",
+  "quadArrow",
+  "bentArrow",
+  "uturnArrow",
+  "circularArrow",
+  "notchedRightArrow",
+  "stripedRightArrow",
+  "flowChartProcess",
+  "flowChartDecision",
+  "flowChartTerminator",
+  "flowChartConnector",
+  "flowChartPredefinedProcess",
+  "flowChartDocument",
+  "line",
+  "straightConnector1",
+  "bentConnector2",
+  "bentConnector3",
+  "bentConnector4",
+  "bentConnector5",
+  "curvedConnector2",
+  "curvedConnector3",
+  "curvedConnector4",
+  "curvedConnector5",
+  "wedgeRectCallout",
+  "wedgeRoundRectCallout",
+  "wedgeEllipseCallout",
+  "cloudCallout",
+  "frame",
+  "halfFrame",
+  "corner",
+  "diagStripe",
+  "chartX",
+  "chartStar",
+  "chartPlus",
+  "leftBracket",
+  "rightBracket",
+  "leftBrace",
+  "rightBrace",
+  "bracketPair",
+  "bracePair",
+  "gear6",
+  "gear9",
+  "funnel",
+  "pyramid",
+  "flowChartMagneticTape",
 ]);
-const CONNECTOR_PRST = new Set(
-  [...PRST].filter((p) => p === "line" || /Connector\d$/.test(p)),
-);
+const CONNECTOR_PRST = new Set([...PRST].filter((p) => p === "line" || /Connector\d$/.test(p)));
 
 /* ---------------------------------------------------------------- tiny scans */
 const attr = (xml, name) => {
@@ -210,7 +291,6 @@ function spTreeChildren(slideXml) {
   return { children: out, header: src.slice(0, headerEnd) };
 }
 
-
 const isFullCover = (b) =>
   b &&
   b.cx !== null &&
@@ -227,15 +307,13 @@ function isOpaque(xml) {
   return /<a:solidFill>|<a:gradFill|<a:blip\b/.test(xml);
 }
 
-const textRuns = (xml) =>
-  [...xml.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((m) => m[1]);
+const textRuns = (xml) => [...xml.matchAll(/<a:t>([\s\S]*?)<\/a:t>/g)].map((m) => m[1]);
 const hasText = (xml) => textRuns(xml).some((t) => t.trim().length > 0);
 
 /* --------------------------------------------------------------- slide audit */
 function auditSlide(part, xml, relTargets) {
   const issues = [];
-  const add = (rule, detail, shape) =>
-    issues.push({ part, rule, detail, shape: shape ?? null });
+  const add = (rule, detail, shape) => issues.push({ part, rule, detail, shape: shape ?? null });
 
   const { children, header } = spTreeChildren(xml);
   if (!children.length) return { issues, shapes: 0, connectors: 0, texts: 0 };
@@ -274,13 +352,15 @@ function auditSlide(part, xml, relTargets) {
     const placeholder = /<p:ph\b/.test(sx);
 
     if (kind === "p:sp" || kind === "p:pic" || kind === "p:cxnSp" || kind === "p:graphicFrame") {
-      if (!box && !placeholder) add("xfrm-present", `${label}: no transform (a:xfrm / p:xfrm)`, label);
+      if (!box && !placeholder)
+        add("xfrm-present", `${label}: no transform (a:xfrm / p:xfrm)`, label);
       if (box) {
         if (!box.hasOff && !placeholder) add("xfrm-present", `${label}: xfrm without a:off`, label);
         if (!box.hasExt && !placeholder) add("xfrm-present", `${label}: xfrm without a:ext`, label);
         for (const [k, v] of Object.entries({ x: box.x, y: box.y, cx: box.cx, cy: box.cy })) {
           if (v === null) continue;
-          if (Math.abs(v) > EMU_MAX) add("emu-range", `${label}: ${k}=${v} out of ST_Coordinate`, label);
+          if (Math.abs(v) > EMU_MAX)
+            add("emu-range", `${label}: ${k}=${v} out of ST_Coordinate`, label);
         }
         // Rules, dividers and hairlines legitimately collapse one axis; a
         // filled/2-D geometry with a zero axis is invisible instead.
@@ -307,7 +387,8 @@ function auditSlide(part, xml, relTargets) {
       if (prst && !PRST.has(prst)) add("prst-known", `${label}: unknown prst "${prst}"`, label);
       if (custom) {
         const pathLst = /<a:pathLst>([\s\S]*?)<\/a:pathLst>/.exec(sx)?.[1] ?? "";
-        if (!/<a:path\b/.test(pathLst)) add("custgeom-path", `${label}: custGeom with empty pathLst`, label);
+        if (!/<a:path\b/.test(pathLst))
+          add("custgeom-path", `${label}: custGeom with empty pathLst`, label);
       }
       for (const m of sx.matchAll(/<a:gd\b[^>]*fmla="val ([^"]*)"/g)) {
         if (!/^-?\d+$/.test(m[1].trim())) add("adj-numeric", `${label}: adjust "${m[1]}"`, label);
@@ -316,7 +397,8 @@ function auditSlide(part, xml, relTargets) {
 
     /* ------------------------------------------------------------- pictures */
     for (const m of sx.matchAll(/<a:blip\b[^>]*r:embed="([^"]+)"/g)) {
-      if (!relTargets.has(m[1])) add("blip-rel", `${label}: r:embed ${m[1]} not in slide rels`, label);
+      if (!relTargets.has(m[1]))
+        add("blip-rel", `${label}: r:embed ${m[1]} not in slide rels`, label);
     }
 
     /* ----------------------------------------------------------- connectors */
@@ -335,7 +417,10 @@ function auditSlide(part, xml, relTargets) {
       }
       const st = attr(/<a:stCxn\b[^>]*\/>/.exec(sx)?.[0] ?? "", "id");
       const en = attr(/<a:endCxn\b[^>]*\/>/.exec(sx)?.[0] ?? "", "id");
-      for (const [which, ref] of [["stCxn", st], ["endCxn", en]]) {
+      for (const [which, ref] of [
+        ["stCxn", st],
+        ["endCxn", en],
+      ]) {
         if (ref && !shapeIds.has(ref)) {
           add("cxn-endpoint", `${label}: ${which} id=${ref} has no shape on this slide`, label);
         }
@@ -365,15 +450,17 @@ function auditSlide(part, xml, relTargets) {
       //                 stacks, card copy). PowerPoint owns the wrap here by
       //                 design, so wrap="square" is correct; only the inset and
       //                 vertical-fit contracts apply.
-      const bakedLines =
-        /<a:br\b/.test(body) || /<a:lnSpc><a:spcPts\b/.test(body);
+      const bakedLines = /<a:br\b/.test(body) || /<a:lnSpc><a:spcPts\b/.test(body);
       const baked = bakedLines || paras.length > 1;
-
 
       if (baked) {
         const wrap = attr(bodyPr, "wrap");
         if (bakedLines && wrap !== "none") {
-          add("wrap-contract", `${label}: baked ${paras.length}-line body wrap="${wrap ?? "square"}"`, label);
+          add(
+            "wrap-contract",
+            `${label}: baked ${paras.length}-line body wrap="${wrap ?? "square"}"`,
+            label,
+          );
         }
         if (/<a:normAutofit\b[^>]*fontScale=/.test(body) || /<a:spAutoFit\s*\/>/.test(body)) {
           add("autofit-conflict", `${label}: autofit on a baked line layout`, label);
@@ -389,16 +476,18 @@ function auditSlide(part, xml, relTargets) {
         // big display line must not be charged the display size), honour an
         // explicit <a:lnSpc> pitch when the exporter baked one, and allow a
         // 6% slack so ordinary rounding does not read as an overflow.
-        const lnSpcPts = num(/<a:lnSpc><a:spcPts val="(\d+)"\/><\/a:lnSpc>/.exec(body)?.[1] ?? null);
-        const lnSpcPct = num(/<a:lnSpc><a:spcPct val="(\d+)"\/><\/a:lnSpc>/.exec(body)?.[1] ?? null);
+        const lnSpcPts = num(
+          /<a:lnSpc><a:spcPts val="(\d+)"\/><\/a:lnSpc>/.exec(body)?.[1] ?? null,
+        );
+        const lnSpcPct = num(
+          /<a:lnSpc><a:spcPct val="(\d+)"\/><\/a:lnSpc>/.exec(body)?.[1] ?? null,
+        );
         let needed = 0;
         for (const p of paras) {
           const sizes = [...p.matchAll(/\bsz="(\d+)"/g)].map((m) => Number(m[1]) / 100);
           const sz = sizes.length ? Math.max(...sizes) : 18;
           const linesInPara = 1 + (p.match(/<a:br\b/g)?.length ?? 0);
-          const pitch = lnSpcPts
-            ? lnSpcPts / 100
-            : sz * (lnSpcPct ? lnSpcPct / 100000 : 1.2);
+          const pitch = lnSpcPts ? lnSpcPts / 100 : sz * (lnSpcPct ? lnSpcPct / 100000 : 1.2);
           needed += linesInPara * pitch;
         }
         if (needed && box?.cy) {
@@ -414,7 +503,6 @@ function auditSlide(part, xml, relTargets) {
             );
           }
         }
-
       }
       for (const r of runs) {
         const t = /<a:t>([\s\S]*?)<\/a:t>/.exec(r)?.[1] ?? "";
@@ -446,7 +534,6 @@ function auditSlide(part, xml, relTargets) {
         );
       }
     } else if (opaque && box && !hasText(sx) && paintedText.length) {
-
       // A later opaque shape that fully covers an earlier text box hides it.
       for (const t of paintedText) {
         if (
@@ -468,7 +555,13 @@ function auditSlide(part, xml, relTargets) {
     }
   });
 
-  return { issues, shapes: shapeCount, connectors: cxnCount, texts: textCount, children: children.length };
+  return {
+    issues,
+    shapes: shapeCount,
+    connectors: cxnCount,
+    texts: textCount,
+    children: children.length,
+  };
 }
 
 /* ------------------------------------------------------------------- package */
@@ -558,7 +651,6 @@ function groupByRule(issues) {
   );
 }
 
-
 async function main() {
   if (!files.length) {
     console.error(
@@ -572,7 +664,14 @@ async function main() {
     try {
       results.push(await auditFile(f));
     } catch (err) {
-      results.push({ file: f, slides: 0, shapes: 0, connectors: 0, texts: 0, issues: [{ part: "-", rule: "read-error", detail: String(err).slice(0, 200) }] });
+      results.push({
+        file: f,
+        slides: 0,
+        shapes: 0,
+        connectors: 0,
+        texts: 0,
+        issues: [{ part: "-", rule: "read-error", detail: String(err).slice(0, 200) }],
+      });
     }
   }
 
@@ -663,7 +762,6 @@ async function main() {
 
   if (blocking && CI) process.exit(1);
 }
-
 
 main().catch((e) => {
   console.error(e);

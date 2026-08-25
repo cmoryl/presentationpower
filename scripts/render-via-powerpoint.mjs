@@ -70,7 +70,9 @@ async function graph(method, url, { headers = {}, body } = {}) {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`PowerPoint/Graph ${method} ${url} failed [${res.status}]: ${text.slice(0, 600)}`);
+    throw new Error(
+      `PowerPoint/Graph ${method} ${url} failed [${res.status}]: ${text.slice(0, 600)}`,
+    );
   }
   return res;
 }
@@ -102,7 +104,10 @@ export async function stripEmbeddedFonts(bytes) {
       stripped += 1;
     }
   }
-  zip.file("ppt/presentation.xml", xml.replace(/<p:embeddedFontLst>[\s\S]*?<\/p:embeddedFontLst>/g, ""));
+  zip.file(
+    "ppt/presentation.xml",
+    xml.replace(/<p:embeddedFontLst>[\s\S]*?<\/p:embeddedFontLst>/g, ""),
+  );
   const relsFile = zip.file("ppt/_rels/presentation.xml.rels");
   if (relsFile) {
     const rels = await relsFile.async("string");
@@ -139,8 +144,7 @@ export async function renderPptxWithPowerPoint(bytes, remoteName, { keepFonts = 
   const name = remoteName ?? `lovable-qa-${Date.now()}.pptx`;
   const up = await graph("PUT", `/me/drive/root:/${encodeURIComponent(name)}:/content`, {
     headers: {
-      "Content-Type":
-        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "Content-Type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     },
     body: payload,
   });
@@ -172,7 +176,9 @@ async function main() {
   await mkdir(OUT, { recursive: true });
   const bytes = await readFile(input);
   const base = path.basename(input, ".pptx");
-  console.log(`→ uploading ${input} (${(bytes.length / 1024 / 1024).toFixed(2)} MB) to PowerPoint…`);
+  console.log(
+    `→ uploading ${input} (${(bytes.length / 1024 / 1024).toFixed(2)} MB) to PowerPoint…`,
+  );
 
   let rendered;
   try {

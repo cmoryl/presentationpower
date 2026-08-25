@@ -98,7 +98,11 @@ function imageSize(buf) {
     }
     return { format: "jpeg", w: null, h: null };
   }
-  if (buf.length > 15 && buf.toString("ascii", 0, 4) === "RIFF" && buf.toString("ascii", 8, 12) === "WEBP") {
+  if (
+    buf.length > 15 &&
+    buf.toString("ascii", 0, 4) === "RIFF" &&
+    buf.toString("ascii", 8, 12) === "WEBP"
+  ) {
     return { format: "webp", w: null, h: null };
   }
   if (buf.length > 32 && buf.toString("utf8", 0, 200).includes("<svg")) {
@@ -192,7 +196,7 @@ async function main() {
           compat: null,
         };
         try {
-          const importer = parse && (parse.parsePptxBuffer);
+          const importer = parse && parse.parsePptxBuffer;
           if (importer) {
             const deck = await importer(bin.slice(), "cell.pptx", { validateDiagrams: false });
             const cd = await import("/src/lib/pptx-compat-diagnose.ts");
@@ -215,7 +219,12 @@ async function main() {
 
     const outFile = path.join(OUT_DIR, `${cell.label.replace(/[^a-z0-9@.-]/gi, "_")}.pptx`);
     await writeFile(outFile, bytes);
-    rows.push({ ...cell, pkg: { ...pkg, media: pkg.media, entries: undefined }, verdict, file: outFile });
+    rows.push({
+      ...cell,
+      pkg: { ...pkg, media: pkg.media, entries: undefined },
+      verdict,
+      file: outFile,
+    });
     console.log(
       `  ${cell.control ? "control " : ""}${cell.label} · zip ${mib(pkg.zipBytes)} MiB · ` +
         `parts ${pkg.entryCount} · media ${pkg.mediaCount} (${mib(pkg.mediaBytes)} MiB) · ` +

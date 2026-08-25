@@ -27,4 +27,6 @@ writeFileSync(
   )}\n`,
 );
 
-console.log(`manifest refreshed: ${shape.variants.length} variants, ${shape.jobs} jobs, ${shape.fingerprint}`);
+console.log(
+  `manifest refreshed: ${shape.variants.length} variants, ${shape.jobs} jobs, ${shape.fingerprint}`,
+);

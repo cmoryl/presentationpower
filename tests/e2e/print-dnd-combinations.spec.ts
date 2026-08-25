@@ -122,9 +122,7 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
         for (let i = 0; i < combo.length; i++) {
           const variant = combo[i]!;
           const priorLevel = expectedLevel(kind, combo.slice(0, i));
-          const prospectiveUsed = combo
-            .slice(0, i + 1)
-            .reduce((n, v) => n + WEIGHT[v], 0);
+          const prospectiveUsed = combo.slice(0, i + 1).reduce((n, v) => n + WEIGHT[v], 0);
           if (priorLevel === "block" || prospectiveUsed > BUDGETS[kind]) {
             // Harness gates the add button when the next add would exceed
             // the page budget. Stop the walk — the "gates" test proves the
@@ -137,10 +135,7 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
             String(i + 1),
           );
           const expected = expectedLevel(kind, combo.slice(0, i + 1));
-          await expect(page.getByTestId("layout-health")).toHaveAttribute(
-            "data-level",
-            expected,
-          );
+          await expect(page.getByTestId("layout-health")).toHaveAttribute("data-level", expected);
         }
 
         // Teardown: remove the head module and confirm the verdict reverts
@@ -180,7 +175,10 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
       await addVariant(page, "stat-callout-row-portrait");
       // adaptor-brief has a 3.5pu budget; callout(1.6) + bento(2.0) = 3.6pu
       // exceeds it, so use a lighter second variant on that template.
-      await addVariant(page, kind === "adaptor-brief" ? "stat-callout-row-portrait" : "stat-bento-portrait");
+      await addVariant(
+        page,
+        kind === "adaptor-brief" ? "stat-callout-row-portrait" : "stat-bento-portrait",
+      );
       const before = await readOrder(page);
       const levelBefore = await readLevel(page);
       expect(before.length).toBe(2);
@@ -198,7 +196,9 @@ for (const kind of Object.keys(COMBOS) as Kind[]) {
       expect(await readLevel(page)).toBe(levelBefore);
     });
 
-    test("variant item overflow surfaces a block issue AND gates further adds", async ({ page }) => {
+    test("variant item overflow surfaces a block issue AND gates further adds", async ({
+      page,
+    }) => {
       await openHarness(page, kind);
       // The dedicated overflow affordance forces the callout row past its
       // 4-item cap in a single click — this is the ONLY way to reach the

@@ -76,7 +76,6 @@ describe("accentOverride export parity (real .pptx bytes)", () => {
       });
     });
 
-    // eslint-disable-next-line no-console
     console.table(report);
 
     const missing = report.filter((r) => !r.found);

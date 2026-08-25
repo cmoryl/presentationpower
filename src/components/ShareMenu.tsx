@@ -472,7 +472,6 @@ export function ShareMenu({ deckId }: { deckId: string }) {
     }
   }
 
-
   return (
     <div ref={ref} className="relative">
       <button

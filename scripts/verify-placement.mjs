@@ -40,9 +40,7 @@ const FULL = flag("full");
 const SAMPLE = Number(value("sample", 10));
 const UPDATE = flag("update");
 const RASTER = !flag("no-raster");
-const BASELINE = path.resolve(
-  value("baseline", "tests/snapshots/export-placement.baseline.json"),
-);
+const BASELINE = path.resolve(value("baseline", "tests/snapshots/export-placement.baseline.json"));
 const BATCH = Number(value("batch", 4));
 
 async function launchChromium() {
@@ -99,7 +97,9 @@ async function main() {
   const variants = await page.evaluate(() => window.__tpPlacementVerify.variants);
   const printKinds = await page.evaluate(() => window.__tpPlacementVerify.printKinds);
 
-  const picked = FULL ? variants : variants.filter((_, i) => i % Math.max(1, Math.ceil(variants.length / SAMPLE)) === 0);
+  const picked = FULL
+    ? variants
+    : variants.filter((_, i) => i % Math.max(1, Math.ceil(variants.length / SAMPLE)) === 0);
   const modes = FULL ? ["light", "dark"] : ["dark"];
 
   /** @type {any[]} */
@@ -164,10 +164,11 @@ async function main() {
         {
           version: 1,
           generatedAt: new Date().toISOString(),
-          note:
-            "Placement fingerprints for exported slides / print pages. Regenerate with `npm run verify:placement:update` and review the digest diff — a change here means content moved in every export.",
+          note: "Placement fingerprints for exported slides / print pages. Regenerate with `npm run verify:placement:update` and review the digest diff — a change here means content moved in every export.",
           allowedDrift: baseline.allowedDrift ?? {},
-          entries: Object.fromEntries(Object.entries(nextEntries).sort(([a], [b]) => a.localeCompare(b))),
+          entries: Object.fromEntries(
+            Object.entries(nextEntries).sort(([a], [b]) => a.localeCompare(b)),
+          ),
         },
         null,
         2,

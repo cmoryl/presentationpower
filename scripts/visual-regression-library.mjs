@@ -27,7 +27,8 @@ import path from "node:path";
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((acc, cur, i, arr) => {
-    if (cur.startsWith("--")) acc.push([cur.slice(2), arr[i + 1] && !arr[i + 1].startsWith("--") ? arr[i + 1] : "true"]);
+    if (cur.startsWith("--"))
+      acc.push([cur.slice(2), arr[i + 1] && !arr[i + 1].startsWith("--") ? arr[i + 1] : "true"]);
     return acc;
   }, []),
 );
@@ -42,8 +43,8 @@ const TOLERANCE_PX = Number(args.tolerance ?? 2);
 // mobile (<768) / tablet (768–1279) / desktop (≥1280) tiers so we exercise
 // each grid column count the library switches through.
 const BREAKPOINT_PRESETS = {
-  mobile:  { width: 390,  height: 1800, deviceScaleFactor: 1 },
-  tablet:  { width: 834,  height: 1800, deviceScaleFactor: 1 },
+  mobile: { width: 390, height: 1800, deviceScaleFactor: 1 },
+  tablet: { width: 834, height: 1800, deviceScaleFactor: 1 },
   desktop: { width: 1440, height: 1800, deviceScaleFactor: 1 },
 };
 const BREAKPOINTS = (args.breakpoints ?? "mobile,tablet,desktop")
@@ -53,7 +54,9 @@ const BREAKPOINTS = (args.breakpoints ?? "mobile,tablet,desktop")
 
 for (const bp of BREAKPOINTS) {
   if (!BREAKPOINT_PRESETS[bp]) {
-    console.error(`Unknown breakpoint '${bp}'. Choose from: ${Object.keys(BREAKPOINT_PRESETS).join(", ")}`);
+    console.error(
+      `Unknown breakpoint '${bp}'. Choose from: ${Object.keys(BREAKPOINT_PRESETS).join(", ")}`,
+    );
     process.exit(2);
   }
 }
@@ -80,10 +83,15 @@ for (const bp of BREAKPOINTS) {
   const bpOut = path.join(OUT, bp);
   await mkdir(bpOut, { recursive: true });
 
-  const context = await browser.newContext({ viewport, deviceScaleFactor: viewport.deviceScaleFactor });
+  const context = await browser.newContext({
+    viewport,
+    deviceScaleFactor: viewport.deviceScaleFactor,
+  });
   const page = await context.newPage();
   // Force all preview cards to mount eagerly so no snapshot captures a skeleton.
-  await page.addInitScript(() => { (window).__EAGER_PREVIEWS__ = true; });
+  await page.addInitScript(() => {
+    window.__EAGER_PREVIEWS__ = true;
+  });
 
   const eagerUrl = URL.includes("?") ? `${URL}&eager=1` : `${URL}?eager=1`;
   console.log(`\n→ [${bp}] ${viewport.width}×${viewport.height} · loading ${eagerUrl}`);
@@ -138,7 +146,9 @@ for (const bp of BREAKPOINTS) {
           hops++;
         }
         if (!parent) continue;
-        const siblings = Array.from(parent.children).filter((c) => c !== s && !s.contains(c) && !c.contains(s));
+        const siblings = Array.from(parent.children).filter(
+          (c) => c !== s && !s.contains(c) && !c.contains(s),
+        );
         for (const sib of siblings) {
           const sbr = sib.getBoundingClientRect();
           if (sbr.width === 0 || sbr.height === 0) continue;
@@ -229,7 +239,9 @@ for (const bp of BREAKPOINTS) {
     for (const o of unexpected) {
       console.error(`   ✖ [${bp}] ${o.variantId} · ${o.family}`);
       for (const f of o.findings.statOverlaps.slice(0, 2)) {
-        console.error(`       stat "${f.statText}" ↔ "${f.siblingText}" (${f.overlapPx.x}×${f.overlapPx.y}px)`);
+        console.error(
+          `       stat "${f.statText}" ↔ "${f.siblingText}" (${f.overlapPx.x}×${f.overlapPx.y}px)`,
+        );
       }
       for (const f of o.findings.stageOverflows.slice(0, 2)) {
         console.error(`       stage overflow "${f.text}" (+${f.overflowPx.x}×${f.overflowPx.y}px)`);

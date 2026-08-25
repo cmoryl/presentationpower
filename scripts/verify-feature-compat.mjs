@@ -58,7 +58,16 @@ const FEATURES = [
   {
     id: "presentation-child-order",
     detect: () => 1,
-    support: (p) => (p.presOrdered ? ok() : { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "WARN", "mac-2016-365": "WARN", "web-365": "WARN" }),
+    support: (p) =>
+      p.presOrdered
+        ? ok()
+        : {
+            "win-2007": "FAIL",
+            "win-2010-2016": "FAIL",
+            "win-2019-365": "WARN",
+            "mac-2016-365": "WARN",
+            "web-365": "WARN",
+          },
     note: "CT_Presentation child sequence; out-of-order children make 2007/2010 offer to repair the file.",
   },
   {
@@ -70,7 +79,13 @@ const FEATURES = [
   {
     id: "embedded-fonts",
     detect: (p) => p.names.filter((n) => /^ppt\/fonts\/.+\.fntdata$/.test(n)).length,
-    support: () => ({ "win-2007": "PASS", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "WARN", "web-365": "WARN" }),
+    support: () => ({
+      "win-2007": "PASS",
+      "win-2010-2016": "PASS",
+      "win-2019-365": "PASS",
+      "mac-2016-365": "WARN",
+      "web-365": "WARN",
+    }),
     note: "Mac and Web ignore embedded font parts and substitute; text may rewrap but never drops.",
   },
   {
@@ -136,19 +151,40 @@ const FEATURES = [
   {
     id: "slide-transitions",
     detect: (p) => p.count(/<p:transition/g),
-    support: (p) => (p.count(/<p14:/g) ? { "win-2007": "WARN", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "WARN" } : ok()),
+    support: (p) =>
+      p.count(/<p14:/g)
+        ? {
+            "win-2007": "WARN",
+            "win-2010-2016": "PASS",
+            "win-2019-365": "PASS",
+            "mac-2016-365": "PASS",
+            "web-365": "WARN",
+          }
+        : ok(),
     note: "Classic transitions are 2007-safe; p14 (Morph-era) ones degrade to a cut on 2007 and Web.",
   },
   {
     id: "charts",
     detect: (p) => p.names.filter((n) => /^ppt\/charts\/chart\d+\.xml$/.test(n)).length,
-    support: () => ({ "win-2007": "PASS", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "WARN" }),
+    support: () => ({
+      "win-2007": "PASS",
+      "win-2010-2016": "PASS",
+      "win-2019-365": "PASS",
+      "mac-2016-365": "PASS",
+      "web-365": "WARN",
+    }),
     note: "Chart parts stay data-editable on desktop; Web renders but limits chart data editing.",
   },
   {
     id: "smartart-diagrams",
     detect: (p) => p.names.filter((n) => /^ppt\/diagrams\//.test(n)).length,
-    support: () => ({ "win-2007": "PASS", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "WARN", "web-365": "WARN" }),
+    support: () => ({
+      "win-2007": "PASS",
+      "win-2010-2016": "PASS",
+      "win-2019-365": "PASS",
+      "mac-2016-365": "WARN",
+      "web-365": "WARN",
+    }),
     note: "SmartArt needs a drawing fallback for Mac/Web; check the dsp/drawing part exists.",
   },
   {
@@ -166,7 +202,13 @@ const FEATURES = [
   {
     id: "text-autofit",
     detect: (p) => p.count(/<a:normAutofit/g),
-    support: () => ({ "win-2007": "PASS", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "WARN", "web-365": "WARN" }),
+    support: () => ({
+      "win-2007": "PASS",
+      "win-2010-2016": "PASS",
+      "win-2019-365": "PASS",
+      "mac-2016-365": "WARN",
+      "web-365": "WARN",
+    }),
     note: "Autofit recomputes per platform metrics; Mac/Web may shrink text differently. Measured placement is preferred.",
   },
   {
@@ -202,50 +244,110 @@ const FEATURES = [
     // draws the vector, so the deck is correct everywhere.
     support: (p) =>
       p.count(/<asvg:svgBlip/g) > 0 && p.count(/<a:blip r:embed/g) > 0
-        ? { "win-2007": "WARN", "win-2010-2016": "WARN", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" }
-        : { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" },
+        ? {
+            "win-2007": "WARN",
+            "win-2010-2016": "WARN",
+            "win-2019-365": "PASS",
+            "mac-2016-365": "PASS",
+            "web-365": "PASS",
+          }
+        : {
+            "win-2007": "FAIL",
+            "win-2010-2016": "FAIL",
+            "win-2019-365": "PASS",
+            "mac-2016-365": "PASS",
+            "web-365": "PASS",
+          },
     note: "SVG needs the svgBlip extension plus a raster fallback blip; with the fallback pre-2019 renders the PNG instead of the vector.",
   },
   {
     id: "svg-raster-fallback",
     detect: (p) => p.count(/<asvg:svgBlip/g),
-    support: (p) => (p.count(/<asvg:svgBlip/g) === 0 || p.count(/<a:blip r:embed/g) > 0 ? ok() : { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" }),
+    support: (p) =>
+      p.count(/<asvg:svgBlip/g) === 0 || p.count(/<a:blip r:embed/g) > 0
+        ? ok()
+        : {
+            "win-2007": "FAIL",
+            "win-2010-2016": "FAIL",
+            "win-2019-365": "PASS",
+            "mac-2016-365": "PASS",
+            "web-365": "PASS",
+          },
     note: "Every svgBlip must sit beside an r:embed raster blip so older builds have something to draw.",
   },
   {
     id: "video-audio-media",
     detect: (p) => p.names.filter((n) => /^ppt\/media\/.+\.(mp4|mov|m4a|mp3|wav)$/i.test(n)).length,
-    support: () => ({ "win-2007": "WARN", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "WARN", "web-365": "FAIL" }),
+    support: () => ({
+      "win-2007": "WARN",
+      "win-2010-2016": "PASS",
+      "win-2019-365": "PASS",
+      "mac-2016-365": "WARN",
+      "web-365": "FAIL",
+    }),
     note: "Web refuses to play embedded media and Mac codec support is partial — avoid for shipped decks.",
   },
   {
     id: "macros-vba",
     detect: (p) => p.names.filter((n) => /vbaProject/i.test(n)).length,
-    support: () => ({ "win-2007": "WARN", "win-2010-2016": "WARN", "win-2019-365": "WARN", "mac-2016-365": "FAIL", "web-365": "FAIL" }),
+    support: () => ({
+      "win-2007": "WARN",
+      "win-2010-2016": "WARN",
+      "win-2019-365": "WARN",
+      "mac-2016-365": "FAIL",
+      "web-365": "FAIL",
+    }),
     note: "Any macro part blocks Web entirely and trips enterprise trust policies. Must stay at zero.",
   },
   {
     id: "activex-ole",
     detect: (p) => p.count(/<p:control\b/g) + p.names.filter((n) => /activeX/i.test(n)).length,
-    support: () => ({ "win-2007": "WARN", "win-2010-2016": "WARN", "win-2019-365": "WARN", "mac-2016-365": "FAIL", "web-365": "FAIL" }),
+    support: () => ({
+      "win-2007": "WARN",
+      "win-2010-2016": "WARN",
+      "win-2019-365": "WARN",
+      "mac-2016-365": "FAIL",
+      "web-365": "FAIL",
+    }),
     note: "ActiveX/OLE controls do not exist off Windows. Must stay at zero.",
   },
   {
     id: "3d-scene-effects",
     detect: (p) => p.count(/<a:scene3d/g) + p.count(/<a:sp3d/g),
-    support: () => ({ "win-2007": "WARN", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "WARN", "web-365": "WARN" }),
+    support: () => ({
+      "win-2007": "WARN",
+      "win-2010-2016": "PASS",
+      "win-2019-365": "PASS",
+      "mac-2016-365": "WARN",
+      "web-365": "WARN",
+    }),
     note: "3D bevels flatten on Web/Mac; avoid load-bearing use.",
   },
   {
     id: "p15-p14-extensions",
     detect: (p) => p.count(/<p14:|<p15:/g),
-    support: () => ({ "win-2007": "WARN", "win-2010-2016": "PASS", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "WARN" }),
+    support: () => ({
+      "win-2007": "WARN",
+      "win-2010-2016": "PASS",
+      "win-2019-365": "PASS",
+      "mac-2016-365": "PASS",
+      "web-365": "WARN",
+    }),
     note: "Namespaced extension blocks are ignored (not fatal) by consumers that do not know them.",
   },
   {
     id: "slide-masters-layouts",
     detect: (p) => p.names.filter((n) => /^ppt\/slideLayouts\/slideLayout\d+\.xml$/.test(n)).length,
-    support: (p) => (p.names.some((n) => /^ppt\/slideMasters\//.test(n)) ? ok() : { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "FAIL", "mac-2016-365": "FAIL", "web-365": "FAIL" }),
+    support: (p) =>
+      p.names.some((n) => /^ppt\/slideMasters\//.test(n))
+        ? ok()
+        : {
+            "win-2007": "FAIL",
+            "win-2010-2016": "FAIL",
+            "win-2019-365": "FAIL",
+            "mac-2016-365": "FAIL",
+            "web-365": "FAIL",
+          },
     note: "Every slide must resolve a layout -> master chain or the file is invalid.",
   },
 ];
@@ -271,7 +373,13 @@ function formatSupport({ media }) {
   // AVIF/HEIC/unknown: no PowerPoint build decodes them anywhere.
   const onlyWebp = [...formats].every((f) => f === "webp");
   return onlyWebp
-    ? { "win-2007": "FAIL", "win-2010-2016": "FAIL", "win-2019-365": "PASS", "mac-2016-365": "PASS", "web-365": "PASS" }
+    ? {
+        "win-2007": "FAIL",
+        "win-2010-2016": "FAIL",
+        "win-2019-365": "PASS",
+        "mac-2016-365": "PASS",
+        "web-365": "PASS",
+      }
     : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"]));
 }
 
@@ -294,12 +402,22 @@ function sniffImageFormat(u8, name) {
   return "unknown";
 }
 
-
-
 const PRES_ORDER = [
-  "sldMasterIdLst", "sldIdLst", "notesMasterIdLst", "handoutMasterIdLst", "sldSz",
-  "notesSz", "smartTags", "custShowLst", "photoAlbum",
-  "custDataLst", "kinsoku", "defaultTextStyle", "modifyVerifier", "extLst", "embeddedFontLst",
+  "sldMasterIdLst",
+  "sldIdLst",
+  "notesMasterIdLst",
+  "handoutMasterIdLst",
+  "sldSz",
+  "notesSz",
+  "smartTags",
+  "custShowLst",
+  "photoAlbum",
+  "custDataLst",
+  "kinsoku",
+  "defaultTextStyle",
+  "modifyVerifier",
+  "extLst",
+  "embeddedFontLst",
 ];
 
 async function loadPackage(buf) {
@@ -308,10 +426,14 @@ async function loadPackage(buf) {
   const read = async (n) => (zip.file(n) ? zip.file(n).async("string") : "");
   const pres = await read("ppt/presentation.xml");
   const ct = await read("[Content_Types].xml");
-  const slidePaths = names.filter((n) => /^ppt\/(slides|slideLayouts|slideMasters|notesSlides|diagrams)\/[^/]+\.xml$/.test(n));
+  const slidePaths = names.filter((n) =>
+    /^ppt\/(slides|slideLayouts|slideMasters|notesSlides|diagrams)\/[^/]+\.xml$/.test(n),
+  );
   const slideParts = await Promise.all(slidePaths.map(async (n) => [n, await read(n)]));
   const slideXml = slideParts.map(([, x]) => x).join("\n");
-  const themes = await Promise.all(names.filter((n) => /^ppt\/theme\/theme\d+\.xml$/.test(n)).map(read));
+  const themes = await Promise.all(
+    names.filter((n) => /^ppt\/theme\/theme\d+\.xml$/.test(n)).map(read),
+  );
   const all = [pres, ct, slideXml, themes.join("\n")].join("\n");
 
   const seq = PRES_ORDER.filter((n) => new RegExp(`<p:${n}[\\s/>]`).test(pres)).map((n) => ({
@@ -381,7 +503,6 @@ async function loadPackage(buf) {
     backdrops: [...backdrops],
     count: (re) => (all.match(re) ?? []).length,
   };
-
 }
 
 function scorePackage(pkg) {
@@ -417,7 +538,6 @@ function imageOffenders(pkg) {
     }));
 }
 
-
 async function launchChromium() {
   // Explicit binary wins: shared CI images often ship a system chromium while the
   // bundled playwright build is missing its shared libraries.
@@ -449,7 +569,9 @@ async function main() {
   await page.waitForFunction("!!window.__tpExportVerify", null, { timeout: 180_000 });
   const variants = await page.evaluate(() => window.__tpExportVerify.variants);
   const step = variants.length / COUNT;
-  const picked = Array.from({ length: COUNT }, (_, i) => variants[Math.floor(i * step)]).filter(Boolean);
+  const picked = Array.from({ length: COUNT }, (_, i) => variants[Math.floor(i * step)]).filter(
+    Boolean,
+  );
 
   const results = [];
   for (const variantId of picked) {
@@ -497,7 +619,6 @@ async function main() {
           console.log(`     FAIL ${r.id} (x${r.uses}) ${r.note}`);
         for (const o of offenders)
           console.log(`     FAIL image-embed ${o.role} ${o.name} is ${o.format} (${o.kb}KB)`);
-
       }
     }
   }
@@ -523,9 +644,7 @@ async function main() {
   const pad = (s, n) => String(s).padEnd(n);
   console.log(pad("feature", 28) + TARGETS.map((t) => pad(t, 15)).join("") + "uses");
   for (const row of table)
-    console.log(
-      pad(row.id, 28) + TARGETS.map((t) => pad(row.targets[t], 15)).join("") + row.uses,
-    );
+    console.log(pad(row.id, 28) + TARGETS.map((t) => pad(row.targets[t], 15)).join("") + row.uses);
 
   const guardrails = FEATURES.filter((f) => /macros-vba|activex-ole/.test(f.id)).map((f) => f.id);
   const guardBreaches = table.filter((r) => guardrails.includes(r.id));
@@ -537,11 +656,19 @@ async function main() {
   for (const res of results)
     for (const m of res.media ?? []) fmtCount.set(m.format, (fmtCount.get(m.format) ?? 0) + 1);
   const allOffenders = results.flatMap((r) =>
-    (r.imageOffenders ?? []).map((o) => ({ ...o, where: `${r.variantId} ${r.mode}/${r.fidelity}` })),
+    (r.imageOffenders ?? []).map((o) => ({
+      ...o,
+      where: `${r.variantId} ${r.mode}/${r.fidelity}`,
+    })),
   );
   console.log(`\nIMAGE EMBED AUDIT`);
   console.log(
-    `  formats: ${[...fmtCount.entries()].sort().map(([f, n]) => `${f}=${n}`).join(" ") || "none"}`,
+    `  formats: ${
+      [...fmtCount.entries()]
+        .sort()
+        .map(([f, n]) => `${f}=${n}`)
+        .join(" ") || "none"
+    }`,
   );
   console.log(
     `  backdrops/crops audited: ${results.reduce((n, r) => n + (r.backdrops?.length ?? 0), 0)}`,
@@ -581,7 +708,6 @@ async function main() {
     table.some((r) => TARGETS.some((t) => r.targets[t] === "FAIL"));
   process.exit(failed ? 1 : 0);
 }
-
 
 main().catch((e) => {
   console.error(e);

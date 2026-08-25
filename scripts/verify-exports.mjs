@@ -87,9 +87,7 @@ const SAMPLE = Number(value("sample", 8));
 const LOOKS = value("looks", null) == null ? null : Number(value("looks", 0));
 
 const UPDATE = !flag("no-update");
-const MANIFEST = path.resolve(
-  value("manifest", "tests/snapshots/export-verify.manifest.json"),
-);
+const MANIFEST = path.resolve(value("manifest", "tests/snapshots/export-verify.manifest.json"));
 const BATCH = Number(value("batch", 8));
 const TREE_SNAPSHOT = path.resolve(
   value("tree-manifest", "tests/snapshots/export-layer-tree.json"),
@@ -136,9 +134,10 @@ async function main() {
   const browser = await launchChromium();
   let page = await boot(browser);
 
-  const matrix = await page.evaluate(
-    () => ({ v: window.__tpExportVerify.variants, p: window.__tpExportVerify.packs }),
-  );
+  const matrix = await page.evaluate(() => ({
+    v: window.__tpExportVerify.variants,
+    p: window.__tpExportVerify.packs,
+  }));
   const variants = matrix.v;
   const allPacks = matrix.p.filter(Boolean);
   const packs = LOOKS == null ? allPacks : allPacks.slice(0, Math.max(0, LOOKS));
@@ -209,10 +208,7 @@ async function main() {
       const baseline = trees[key];
       if (!baseline) {
         tree.missing += 1;
-        trees[key] = await page.evaluate(
-          (r) => window.__tpExportVerify.snapshot(r),
-          row,
-        );
+        trees[key] = await page.evaluate((r) => window.__tpExportVerify.snapshot(r), row);
         tree.updated += 1;
         continue;
       }
@@ -290,7 +286,6 @@ async function main() {
     process.exit(1);
   }
 
-
   console.log(`\nAll ${rows.length} exports passed (backgrounds + layers intact).`);
 
   if (!UPDATE) return;
@@ -327,7 +322,9 @@ async function main() {
       2,
     )}\n`,
   );
-  console.log(`Manifest refreshed: ${path.relative(process.cwd(), MANIFEST)} (${shape.fingerprint})`);
+  console.log(
+    `Manifest refreshed: ${path.relative(process.cwd(), MANIFEST)} (${shape.fingerprint})`,
+  );
 }
 
 /** Mirror of the FNV-1a digest in src/lib/export-matrix.ts. */

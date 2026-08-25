@@ -29,8 +29,6 @@ const RULES = [
   "tabindex",
 ];
 
-
-
 test.describe.configure({ mode: "serial" });
 
 test.describe("Deck accordion popovers — axe-core", () => {

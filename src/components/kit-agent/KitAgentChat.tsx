@@ -15,12 +15,8 @@ import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { KIT_PROPOSAL_TOOL_NAME } from "@/lib/kit-agent/tools";
 import { KitProposalCard, kitProposalFromTool } from "./KitProposalCard";
 import { messagesFingerprint, useKitThreadMessageSync } from "@/lib/kit-agent/sync";
-import {
-  AgentDocumentUpload,
-  useAgentDocuments,
-} from "@/components/agent/AgentDocumentUpload";
+import { AgentDocumentUpload, useAgentDocuments } from "@/components/agent/AgentDocumentUpload";
 import { withDocumentContext } from "@/lib/agent/doc-intake";
-
 
 const TOOL_LABELS: Record<string, string> = {
   list_divisions: "Checking divisions",
@@ -134,7 +130,6 @@ export function KitAgentChat({
     [busy, docs, messages.length, onFirstUserMessage, sendMessage],
   );
 
-
   const sentPending = useRef(false);
   useEffect(() => {
     if (!pendingPrompt || sentPending.current || busy) return;
@@ -229,7 +224,6 @@ export function KitAgentChat({
       <div className="border-t border-border bg-background px-4 pt-2 sm:px-6">
         <AgentDocumentUpload docs={docs} onChange={setDocs} disabled={busy} />
       </div>
-
 
       <form
         className="flex items-end gap-2 border-t border-border bg-background px-4 py-3 sm:px-6"

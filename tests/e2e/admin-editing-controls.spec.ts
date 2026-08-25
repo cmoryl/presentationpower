@@ -64,7 +64,9 @@ test.describe("Admin editing controls", () => {
 
     // Typing into the term field must be accepted (field is not read-only).
     await page.getByPlaceholder(/Term \(e\.g\. GlobalLink\)/i).fill("E2E Probe Term");
-    await expect(page.getByPlaceholder(/Term \(e\.g\. GlobalLink\)/i)).toHaveValue("E2E Probe Term");
+    await expect(page.getByPlaceholder(/Term \(e\.g\. GlobalLink\)/i)).toHaveValue(
+      "E2E Probe Term",
+    );
 
     // Selecting "division" un-gates the scope-id field.
     await scope.selectOption("division");

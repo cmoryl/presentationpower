@@ -63,20 +63,29 @@ async function stats(ids?: string[]): Promise<Row[]> {
   if (error) throw new Error(error.message);
   return (data ?? [])
     .filter((r: { id: string }) => !ids || ids.includes(r.id))
-    .map((r: { id: string; original_filename: string; division_id: string; slide_count: number | null; slides: unknown }) => {
-      const slides: Array<{ layout?: unknown }> = Array.isArray(r.slides) ? r.slides : [];
-      return {
-        id: r.id,
-        original_filename: r.original_filename,
-        division_id: r.division_id,
-        slide_count: r.slide_count ?? slides.length,
-        slides_bytes: JSON.stringify(slides).length,
-        slides_with_layout: slides.filter((s) => s?.layout).length,
-      } satisfies Row;
-    });
+    .map(
+      (r: {
+        id: string;
+        original_filename: string;
+        division_id: string;
+        slide_count: number | null;
+        slides: unknown;
+      }) => {
+        const slides: Array<{ layout?: unknown }> = Array.isArray(r.slides) ? r.slides : [];
+        return {
+          id: r.id,
+          original_filename: r.original_filename,
+          division_id: r.division_id,
+          slide_count: r.slide_count ?? slides.length,
+          slides_bytes: JSON.stringify(slides).length,
+          slides_with_layout: slides.filter((s) => s?.layout).length,
+        } satisfies Row;
+      },
+    );
 }
 
-const fmt = (n: number) => (n >= 1_000_000 ? `${(n / 1e6).toFixed(1)} MB` : `${(n / 1e3).toFixed(1)} kB`);
+const fmt = (n: number) =>
+  n >= 1_000_000 ? `${(n / 1e6).toFixed(1)} MB` : `${(n / 1e3).toFixed(1)} kB`;
 
 async function main() {
   const before = await stats(IDS.length ? IDS : undefined);

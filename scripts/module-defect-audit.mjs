@@ -26,8 +26,13 @@ const val = (n, fb) => {
   return i >= 0 && argv[i + 1] && !argv[i + 1].startsWith("--") ? argv[i + 1] : fb;
 };
 const BASE_URL = val("url", "http://localhost:8080");
-const IDS = val("ids", "").split(",").map((s) => s.trim()).filter(Boolean);
-const RATIOS = val("ratios", "16:9").split(",").map((s) => s.trim());
+const IDS = val("ids", "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+const RATIOS = val("ratios", "16:9")
+  .split(",")
+  .map((s) => s.trim());
 const VIEWPORTS = val("viewports", "1280").split(",").map(Number).filter(Boolean);
 
 if (!IDS.length) {
@@ -55,7 +60,8 @@ const collect = (root) => {
   const S = stage.getBoundingClientRect();
   const vis = (el) => {
     const cs = getComputedStyle(el);
-    if (cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) < 0.05) return false;
+    if (cs.visibility === "hidden" || cs.display === "none" || Number(cs.opacity) < 0.05)
+      return false;
     const r = el.getBoundingClientRect();
     return r.width > 1 && r.height > 1;
   };
@@ -83,7 +89,8 @@ const collect = (root) => {
     if ((el.textContent || "").trim()) continue;
     const r = el.getBoundingClientRect();
     devices.push({
-      tag: el.getAttribute("data-device") || el.getAttribute("data-logo") || el.tagName.toLowerCase(),
+      tag:
+        el.getAttribute("data-device") || el.getAttribute("data-logo") || el.tagName.toLowerCase(),
       box: { x: r.left - S.left, y: r.top - S.top, w: r.width, h: r.height },
     });
   }
@@ -165,7 +172,12 @@ for (const vw of VIEWPORTS) {
             lums.push(at(bx - pad, fy), at(bx + bw + pad, fy));
           }
           for (let n = 0; n < 40; n++) {
-            lums.push(at(bx + Math.round((n % 8) * (bw / 7)), by + Math.round(Math.floor(n / 8) * (bh / 4))));
+            lums.push(
+              at(
+                bx + Math.round((n % 8) * (bw / 7)),
+                by + Math.round(Math.floor(n / 8) * (bh / 4)),
+              ),
+            );
           }
           lums.sort((a, b) => a - b);
           const fgL = lum(fg.r, fg.g, fg.b);
@@ -173,7 +185,16 @@ for (const vw of VIEWPORTS) {
           const worst = ratioOf(fgL, plateL);
           const need = run.large ? 3 : 4.5;
           if (worst < need - 0.15)
-            findings.push({ id, mode, vw, ratio, kind: "contrast", text: run.text, ratio_: Number(worst.toFixed(2)), need });
+            findings.push({
+              id,
+              mode,
+              vw,
+              ratio,
+              kind: "contrast",
+              text: run.text,
+              ratio_: Number(worst.toFixed(2)),
+              need,
+            });
         }
         // collision with decorative devices
         for (const run of data.runs) {
@@ -183,7 +204,14 @@ for (const vw of VIEWPORTS) {
             if (!a) continue;
             const smaller = Math.max(1, Math.min(run.box.w * run.box.h, dev.box.w * dev.box.h));
             if (a / smaller > 0.6 && dev.tag !== "img")
-              findings.push({ id, mode, vw, ratio, kind: "collision", text: `${run.text} ↔ ${dev.tag}` });
+              findings.push({
+                id,
+                mode,
+                vw,
+                ratio,
+                kind: "collision",
+                text: `${run.text} ↔ ${dev.tag}`,
+              });
           }
         }
       }
@@ -195,11 +223,15 @@ await browser.close();
 
 const byId = {};
 for (const f of findings) (byId[`${f.id}@${f.mode}`] ??= []).push(f);
-console.log(`module-defect-audit · ${IDS.length} variants · ${cases} cases · ${findings.length} findings`);
+console.log(
+  `module-defect-audit · ${IDS.length} variants · ${cases} cases · ${findings.length} findings`,
+);
 for (const [k, list] of Object.entries(byId)) {
   console.log(`\n${k}`);
   for (const f of list.slice(0, 12))
-    console.log(`  ${f.kind.padEnd(9)} ${f.ratio_ ? `${f.ratio_}:1 (need ${f.need}) ` : ""}${f.text}`);
+    console.log(
+      `  ${f.kind.padEnd(9)} ${f.ratio_ ? `${f.ratio_}:1 (need ${f.need}) ` : ""}${f.text}`,
+    );
   if (list.length > 12) console.log(`  … ${list.length - 12} more`);
 }
 if (val("json")) await writeFile(val("json"), JSON.stringify(findings, null, 2));

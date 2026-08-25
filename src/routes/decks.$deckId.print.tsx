@@ -19,7 +19,6 @@ import { getDeckSlideTranslations, listLanguages } from "@/lib/translation.funct
 import { toast } from "sonner";
 import { describeExportError } from "@/lib/export-feedback";
 
-
 export const Route = createFileRoute("/decks/$deckId/print")({
   head: () => ({ meta: [{ title: "Print · TransPerfect Element" }] }),
   validateSearch: (raw) => z.object({ lang: z.string().min(2).max(10).optional() }).parse(raw),

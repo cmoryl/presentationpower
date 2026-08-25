@@ -53,7 +53,9 @@ try {
 
   const missing = meta.requiredCheckIds.filter((id) => !meta.checkIds.includes(id));
   if (missing.length > 0) {
-    console.error(`✗ registry references checks the harness does not implement: ${missing.join(", ")}`);
+    console.error(
+      `✗ registry references checks the harness does not implement: ${missing.join(", ")}`,
+    );
     exitCode = 1;
   }
 

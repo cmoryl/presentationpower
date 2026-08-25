@@ -464,7 +464,10 @@ function CanvasStudioPage() {
                     ⧉
                   </StudioMenuBtn>
                 </EditorMenuRow>
-                <EditorMenuRow label="Reset to blank" hint="Remove all layers and the template look">
+                <EditorMenuRow
+                  label="Reset to blank"
+                  hint="Remove all layers and the template look"
+                >
                   <StudioMenuBtn label="Reset to blank" onClick={() => resetToBlank()}>
                     ⌫
                   </StudioMenuBtn>
@@ -652,7 +655,6 @@ function CanvasStudioPage() {
                   redoLabel="canvas edit"
                 />
               </div>
-
             </>
           }
           slideRowEnd={
@@ -744,7 +746,6 @@ function CanvasStudioPage() {
               onDuplicate={(id) => duplicateComposition(id)}
               onDelete={(id) => deleteComposition(id)}
             />
-
           </StylePackVars>
         </StylePackProvider>
       </LibraryPackProvider>

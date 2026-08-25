@@ -139,7 +139,6 @@ function ExportView() {
     // which would defeat the point of a one-click link. Its findings still
     // surface as post-export warnings.
     void runPptxExport();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auto, autoFidelity]);
@@ -181,7 +180,6 @@ function ExportView() {
     });
     let ok = false;
     try {
-
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
       setPerf(null);
       const {
@@ -308,7 +306,6 @@ function ExportView() {
       void handleShareViaGlobalLink();
     }
   }
-
 
   // A click must never be a no-op: when QA blocks the export we say so and
   // offer the override right there, instead of leaving a dead button.
@@ -670,7 +667,6 @@ function ExportView() {
             />
             <ArrowOverlapCheck />
           </div>
-
 
           <div className="mx-auto flex max-w-[1400px] flex-col items-center gap-6 px-6 print:max-w-none print:gap-0 print:p-0">
             {deck.slides.map((slide, i) => {

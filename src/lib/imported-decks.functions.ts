@@ -64,7 +64,7 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
     }
 
     const id = crypto.randomUUID();
-    const safeName = data.filename.replace(/[^\w.\-]+/g, "_").slice(-160);
+    const safeName = data.filename.replace(/[^\w.-]+/g, "_").slice(-160);
     const storagePath = `${context.userId}/${id}-${safeName}`;
 
     const up = await s.storage.from(BUCKET).upload(storagePath, buf, {
@@ -545,7 +545,7 @@ export const relinkDeckImage = createServerFn({ method: "POST" })
       const imgId = crypto.randomUUID();
       const base = data.filename!.replace(/\.[a-z0-9]+$/i, "");
       const imgFilename = `${base}__relink-s${data.slideIndex + 1}.${ext}`
-        .replace(/[^\w.\-]+/g, "_")
+        .replace(/[^\w.-]+/g, "_")
         .slice(-160);
       const imgPath = `${context.userId}/${imgId}-${imgFilename}`;
       const up = await s.storage

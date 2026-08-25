@@ -28,7 +28,8 @@ export type PlateCalmVariant = string | undefined;
 export type PlateCalmStrength = "full" | "graphic";
 
 /** Ground layers from the authored graphic kits (Games / Element brick art). */
-const GRAPHIC_PLATE_RE = /\/games-[a-z0-9-]+\.(?:webp|png|jpg)|\/element-(?:light|dark)-[a-z0-9-]+\.(?:webp|png|jpg)/i;
+const GRAPHIC_PLATE_RE =
+  /\/games-[a-z0-9-]+\.(?:webp|png|jpg)|\/element-(?:light|dark)-[a-z0-9-]+\.(?:webp|png|jpg)/i;
 
 /** True when the plate url belongs to an authored graphic kit, not photography. */
 export function plateIsGraphicKit(layers: string[]): boolean {

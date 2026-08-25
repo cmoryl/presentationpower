@@ -88,7 +88,6 @@ export async function capturePrintPageLayers(
       opts.space,
     );
 
-
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);
     // Two frames so the browser has settled the neutralised paint before capture.

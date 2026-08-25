@@ -95,10 +95,15 @@ describe("industry background sets", () => {
     const clashing = SKIN_PACKS.find((p) => p.mode !== set.mode)!;
     const composed = withIndustryGround(clashing, "R14");
     const layers = composed.ground("scene:cover take:0");
-    // The host's own ground is preserved underneath the toned sector geometry.
-    expect(layers.length).toBeGreaterThan(clashing.ground("scene:cover take:0").length);
-    expect(layers.slice(-clashing.ground("scene:cover take:0").length)).toEqual(
-      clashing.ground("scene:cover take:0"),
-    );
+    const host = clashing.ground("scene:cover take:0");
+    // The sector geometry is painted on top, re-inked in the host's palette.
+    expect(layers[0]).toMatch(/data:image\/svg\+xml/);
+    // The host's own TONAL layers are preserved underneath, in order. Its
+    // authored imagery (url(...) plates) is dropped so the wrong sector's
+    // artwork can never win over the chosen recipe.
+    const hostTonal = host.filter((l) => !l.includes("url("));
+    expect(layers.slice(1)).toEqual(hostTonal);
+    expect(layers.length).toBe(hostTonal.length + 1);
   });
+
 });

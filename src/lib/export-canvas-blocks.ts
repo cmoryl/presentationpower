@@ -38,7 +38,6 @@ import { rectRadiusAdj } from "./export-radius";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { isDroppableAdoptedMirror } from "./export-adopted-hide";
 
-
 import { coverCropTag, roundPicTag, withDesignSurfaces } from "./pptx-shape-normalize";
 import { mapFontFamily } from "./pptx-font-map";
 import { groupTag } from "./pptx-group-xml";
@@ -163,7 +162,6 @@ export function canvasBlocksForExport(
       !isDroppableAdoptedMirror(b as CanvasBlock),
   ) as CanvasBlock[];
 }
-
 
 /**
  * Emit a slide's canvas blocks as native objects, in editor paint order, on top

@@ -117,7 +117,6 @@ function padPct(format: SocialFormat): number {
   }
 }
 
-
 /** Safe rect in format pixels: platform chrome insets + frame padding. */
 export function socialSafeRect(format: SocialFormat, padScale = 1): SocialSafeRect {
   const short = Math.min(format.width, format.height);
@@ -306,7 +305,7 @@ export function fitSummary(fit: SocialFitResult, relief: SocialFitRelief): strin
   if (fit.sparse) {
     return `Fits, but fills only ${Math.round(fit.fillPct * 100)}% of the safe area — a taller module or more content would read better.`;
   }
-  const airNote = fit.air > 1 ? ` · padded out ${Math.round((fit.air - 1) * 100)}% to fill the frame` : "";
+  const airNote =
+    fit.air > 1 ? ` · padded out ${Math.round((fit.air - 1) * 100)}% to fill the frame` : "";
   return `Fits the safe area at ${Math.round(fit.fillPct * 100)}% fill · ${relief.note.toLowerCase()}${airNote}.`;
 }
-

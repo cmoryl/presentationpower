@@ -2,8 +2,6 @@ import { test, expect } from "@playwright/test";
 import { createDeckViaSkipAI } from "./helpers/create-deck";
 import type { Page } from "@playwright/test";
 
-
-
 async function openPresentMode(page: Page, deckUrl: string) {
   const deckId = deckUrl.match(/\/decks\/([A-Za-z0-9_-]+)/)?.[1];
   if (!deckId) throw new Error("Could not extract deck id from " + deckUrl);
@@ -13,9 +11,7 @@ async function openPresentMode(page: Page, deckUrl: string) {
 }
 
 test.describe("Present mode transitions", () => {
-  test("advancing a slide mounts the transition layer, then unmounts it", async ({
-    page,
-  }) => {
+  test("advancing a slide mounts the transition layer, then unmounts it", async ({ page }) => {
     const deckUrl = await createDeckViaSkipAI(page);
     await openPresentMode(page, deckUrl);
 

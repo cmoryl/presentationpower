@@ -130,8 +130,7 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
       ? Math.max(0.4, exportSlideBounds().wIn - Math.max(0, inX(run.x)))
       : exportSlideBounds().wIn;
   const needIn = inX(contentPx) + slack;
-  const fit =
-    run.singleLine && needIn > availIn ? Math.max(0.62, (availIn / needIn) * 0.995) : 1;
+  const fit = run.singleLine && needIn > availIn ? Math.max(0.62, (availIn / needIn) * 0.995) : 1;
   const sizeOut = size * fit;
   const fittedPx = inX(contentPx) * fit;
   const fittedSlack = slack * fit;
@@ -144,7 +143,6 @@ export function describeTextRun(run: TextRun): PptxTextProps | null {
   // left by the same amount to stay optically anchored where it sits on screen.
   const grow = Math.max(0, wRaw - inX(run.w));
   const xShift = align === "center" ? grow / 2 : align === "right" ? grow : 0;
-
 
   return {
     text,

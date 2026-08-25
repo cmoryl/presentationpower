@@ -95,18 +95,17 @@ test.describe("PPTX export embedded image formats", () => {
       if (webp) {
         expect(webp.sourceFormat, `${label}: sample was not WebP`).toBe("webp");
         expect(webp.transcoded, `${label}: WebP passed through`).toBe(true);
-        expect(["png", "jpeg"], `${label}: WebP re-encode target`).toContain(
-          webp.embeddedFormat,
-        );
+        expect(["png", "jpeg"], `${label}: WebP re-encode target`).toContain(webp.embeddedFormat);
       }
 
       // 5. Toggle-specific expectations.
       if (audit.legacyImages) {
         // "JPEG/PNG only": the whole package, not just our samples.
-        expect(
-          Object.keys(audit.formatCounts).sort(),
-          `${label}: non JPEG/PNG media`,
-        ).toEqual(Object.keys(audit.formatCounts).filter((f) => f === "jpeg" || f === "png").sort());
+        expect(Object.keys(audit.formatCounts).sort(), `${label}: non JPEG/PNG media`).toEqual(
+          Object.keys(audit.formatCounts)
+            .filter((f) => f === "jpeg" || f === "png")
+            .sort(),
+        );
       }
       if (audit.alphaImages) {
         // "transparent → PNG, photos → JPEG": the opaque sample must be JPEG and

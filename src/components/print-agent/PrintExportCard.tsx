@@ -145,7 +145,8 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
           </p>
           <p className="text-xs text-muted-foreground">
             {(row?.kind ?? request.kind ?? "print").replace(/-/g, " ")} · {pageSize} ·{" "}
-            {trim.widthIn.toFixed(2)} × {trim.heightIn.toFixed(2)} in{mode === "dark" ? " · dark" : ""}
+            {trim.widthIn.toFixed(2)} × {trim.heightIn.toFixed(2)} in
+            {mode === "dark" ? " · dark" : ""}
           </p>
         </div>
       </div>

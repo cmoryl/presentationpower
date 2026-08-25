@@ -1431,7 +1431,9 @@ function BrandPreview({
               facts={{}}
               displayShortEdge={140}
             />
-            <div className="truncate text-[10px] uppercase tracking-widest text-black/50">{f.label}</div>
+            <div className="truncate text-[10px] uppercase tracking-widest text-black/50">
+              {f.label}
+            </div>
           </div>
         ))}
       </div>
