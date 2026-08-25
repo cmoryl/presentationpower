@@ -30,6 +30,15 @@ import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
+  auditAi,
+  auditPng,
+  auditSvg,
+  qaReportCsv,
+  qaSummary,
+  rollup,
+  type LondonQaReport,
+} from "@/lib/london-signage-qa";
+import {
   LONDON_STYLES,
   LONDON_VENUE,
   panelSlug,
@@ -135,6 +144,7 @@ function LondonRevisePage() {
   const [saving, setSaving] = useState(false);
   const [floor, setFloor] = useState<string>("all");
   const [previewId, setPreviewId] = useState<string | null>(null);
+  const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -191,29 +201,55 @@ function LondonRevisePage() {
   const regenerate = async (panels: LondonPanel[], rev: number, kind: "vector" | "raster") => {
     const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
-    const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint"];
+    const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint,qa"];
+    // Every regenerated file is audited against the revised spec before it is
+    // packaged, and the audit ships inside the ZIP as qa-report.csv.
+    const reports: LondonQaReport[] = [];
     for (const panel of panels) {
       const base = londonPanelFileBase(panel, rev);
       const svg = buildLondonPanelSvg(panel);
       if (kind === "vector") {
         const ai = buildLondonPanelAi(panel);
+        const svgQa = auditSvg(panel, svg);
+        const aiQa = auditAi(panel, ai);
+        reports.push(svgQa, aiQa);
         zip.file(`vector/${base}.svg`, svg);
         zip.file(`vector/${base}.ai`, ai);
         manifest.push(
-          `${base}.ai,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(ai)}`,
+          `${base}.ai,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(ai)},${aiQa.status}`,
         );
       }
       const size = rasterSizeFor(panel, panel.rasterPpi);
       const png = await renderDitheredPng(svg, size.w, size.h);
+      const pngQa = auditPng(panel, panel.rasterPpi, new Uint8Array(await png.arrayBuffer()));
+      reports.push(pngQa);
       zip.file(`raster/${base}-${panel.rasterPpi}ppi.png`, png);
       manifest.push(
-        `${base}-${panel.rasterPpi}ppi.png,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(svg)}`,
+        `${base}-${panel.rasterPpi}ppi.png,${panel.name},${panel.room},${panel.trimW}x${panel.trimH},${panel.bleedW}x${panel.bleedH},${panel.rasterPpi},${fingerprint(svg)},${pngQa.status}`,
       );
     }
     zip.file("manifest.csv", manifest.join("\n"));
+    zip.file("qa-report.csv", qaReportCsv(reports));
     const blob = await zip.generateAsync({ type: "blob" });
     download(blob, `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
+
+    const r = rollup(reports);
+    setQa(reports);
+    if (r.fail) {
+      toast.error(`${r.fail} of ${r.total} regenerated files failed spec QA`, {
+        description: qaSummary(reports.find((x) => x.status === "fail")!),
+      });
+    } else if (r.warn) {
+      toast.warning(`${r.warn} of ${r.total} regenerated files carry QA warnings`, {
+        description: qaSummary(reports.find((x) => x.status === "warn")!),
+      });
+    } else {
+      toast.success(`Spec QA passed on all ${r.total} regenerated files`, {
+        description: "Trim, bleed, ppi and banding verified against the revised spec.",
+      });
+    }
   };
+
 
   const regenAffected = () => {
     const vectorPanels = draft.filter((p) => plan.vector.includes(p.id));
@@ -354,6 +390,34 @@ function LondonRevisePage() {
               </button>
             </div>
           </div>
+
+          {/* Audit of the most recent regeneration, mirroring qa-report.csv. */}
+          {qa ? (
+            <div className="mt-3 rounded-lg border border-black/10 bg-[#F7F9FC] p-3">
+              <p className="text-[13px] font-semibold text-[#03002C]">
+                {(() => {
+                  const r = rollup(qa);
+                  return `Spec QA — ${r.pass} pass · ${r.warn} warning · ${r.fail} fail of ${r.total} files`;
+                })()}
+              </p>
+              <ul className="mt-1.5 space-y-1">
+                {qa
+                  .filter((r) => r.status !== "pass")
+                  .slice(0, 5)
+                  .map((r) => (
+                    <li key={`${r.file}-${r.kind}`} className="text-[12px] leading-relaxed text-[#666]">
+                      <span className="font-medium text-[#03002C]">{r.file}</span> — {qaSummary(r)}
+                    </li>
+                  ))}
+                {qa.every((r) => r.status === "pass") ? (
+                  <li className="text-[12px] text-[#666]">
+                    Trim, bleed, ppi and banding verified on every regenerated file.
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+          ) : null}
+
 
           <label className="mt-3 block">
             <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#666]">

@@ -16,14 +16,26 @@ import {
   Layers,
   MapPin,
   Ruler,
+  ShieldCheck,
   Table2,
 } from "lucide-react";
+
+import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { renderDitheredPng } from "@/lib/london-panel-raster";
+import {
+  auditAi,
+  auditSvg,
+  auditPng,
+  qaReportCsv,
+  qaSummary,
+  rollup,
+  type LondonQaReport,
+} from "@/lib/london-signage-qa";
 import {
   LONDON_PANELS,
   LONDON_PRINT_SPEC,
@@ -71,6 +83,17 @@ function download(blob: Blob, name: string) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
+/**
+ * Blocks a download whose bytes disagree with the panel specification, and
+ * surfaces tolerated deviations (e.g. the 6000 px ceiling) as a warning.
+ */
+function gateOnQa(report: LondonQaReport) {
+  if (report.status === "fail") throw new Error(`QA failed — ${qaSummary(report)}`);
+  if (report.status === "warn") {
+    toast.warning(`${report.file} — QA warning`, { description: qaSummary(report) });
+  }
+}
+
 function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   const style = LONDON_STYLES[panel.style];
   const ratio = panel.bleedW / panel.bleedH;
@@ -105,6 +128,7 @@ function LondonSignagePage() {
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [openPanel, setOpenPanel] = useState<LondonPanel | null>(null);
   const [ppi, setPpi] = useState<number>(72);
+  const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
   useEffect(() => {
     let live = true;
@@ -147,6 +171,7 @@ function LondonSignagePage() {
         const entry = pack[panel.id];
         if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
         const body = fmt === "svg" ? entry.svg : entry.ai;
+        gateOnQa(fmt === "svg" ? auditSvg(panel, entry.svg) : auditAi(panel, entry.ai));
         const type = fmt === "svg" ? "image/svg+xml" : "application/postscript";
         download(new Blob([body], { type }), `${panelSlug(panel)}.${fmt}`);
       },
@@ -166,6 +191,7 @@ function LondonSignagePage() {
         if (!entry) throw new Error("Artwork for this panel is missing from the pack.");
         const size = rasterSizeFor(panel, ppi);
         const blob = await renderDitheredPng(entry.svg, size.w, size.h);
+        gateOnQa(auditPng(panel, ppi, new Uint8Array(await blob.arrayBuffer())));
         download(blob, `${panelSlug(panel)}-${ppi}ppi.png`);
       },
     );
@@ -183,6 +209,45 @@ function LondonSignagePage() {
           new Blob([londonScheduleCsv()], { type: "text/csv" }),
           "NEXT-London-print-schedule.csv",
         );
+      },
+    );
+
+  const runKitQa = () =>
+    runWithExportFeedback(
+      {
+        pending: "Auditing all 54 panels…",
+        success: "NEXT-London-qa-report.csv downloaded",
+        failure: "QA sweep failed",
+        successDescription: "Trim, bleed, ppi tier and banding checked for every vector master.",
+      },
+      async () => {
+        const pack = artwork ?? (await loadLondonArtwork());
+        const reports: LondonQaReport[] = [];
+        for (const panel of LONDON_PANELS) {
+          const entry = pack[panel.id];
+          if (!entry) {
+            reports.push({
+              panelId: panel.id,
+              panelName: panel.name,
+              file: `${panelSlug(panel)}.svg`,
+              kind: "svg",
+              status: "fail",
+              checks: [
+                {
+                  id: "pack-present",
+                  label: "Artwork present in the pack",
+                  status: "fail",
+                  expected: "svg + ai master",
+                  actual: "missing",
+                },
+              ],
+            });
+            continue;
+          }
+          reports.push(auditSvg(panel, entry.svg), auditAi(panel, entry.ai));
+        }
+        setQa(reports);
+        download(new Blob([qaReportCsv(reports)], { type: "text/csv" }), "NEXT-London-qa-report.csv");
       },
     );
 
@@ -254,10 +319,55 @@ function LondonSignagePage() {
               >
                 <Layers className="h-4 w-4" /> Open production studio
               </Link>
-
+              <button
+                type="button"
+                onClick={runKitQa}
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+              >
+                <ShieldCheck className="h-4 w-4" /> Run spec QA (all panels)
+              </button>
             </div>
+
+            {/* Result of the last kit-wide audit. */}
+            {qa ? (
+              <div className="mt-5 max-w-2xl rounded-xl border border-black/10 bg-white/80 p-4">
+                <p className="text-sm font-semibold text-[#03002C]">
+                  {(() => {
+                    const r = rollup(qa);
+                    return `${r.total} files audited — ${r.pass} pass, ${r.warn} warning, ${r.fail} fail`;
+                  })()}
+                </p>
+                {qa.filter((r) => r.status !== "pass").length ? (
+                  <ul className="mt-2 space-y-1.5">
+                    {qa
+                      .filter((r) => r.status !== "pass")
+                      .slice(0, 6)
+                      .map((r) => (
+                        <li key={`${r.file}-${r.kind}`} className="text-[12.5px] leading-relaxed">
+                          <span
+                            className={`mr-2 rounded px-1.5 py-0.5 font-mono text-[10px] uppercase ${
+                              r.status === "fail"
+                                ? "bg-[#E53D2E]/15 text-[#8f1d13]"
+                                : "bg-[#FFEB66] text-[#03002C]"
+                            }`}
+                          >
+                            {r.status}
+                          </span>
+                          <span className="font-medium text-[#03002C]">{r.file}</span>{" "}
+                          <span className="text-[#03002C]/70">{qaSummary(r)}</span>
+                        </li>
+                      ))}
+                  </ul>
+                ) : (
+                  <p className="mt-1 text-[12.5px] text-[#03002C]/70">
+                    Every vector master matches its trim, bleed, ppi tier and banding spec.
+                  </p>
+                )}
+              </div>
+            ) : null}
           </div>
         </header>
+
 
         {/* Print specification */}
         <section className="mt-10">
