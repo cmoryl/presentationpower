@@ -11,6 +11,7 @@ import getTaxonomy from "@/lib/mcp/tools/get-taxonomy";
 import listVariants from "@/lib/mcp/tools/list-variants";
 import listSectionVariants from "@/lib/mcp/tools/list-section-variants";
 import createDeck from "@/lib/mcp/tools/create-deck";
+import buildDeck from "@/lib/mcp/tools/build-deck";
 import generateDeck from "@/lib/mcp/tools/generate-deck";
 import insertSlide from "@/lib/mcp/tools/insert-slide";
 import deleteSlide from "@/lib/mcp/tools/delete-slide";
@@ -39,6 +40,7 @@ const AGENT_TOOLS: AnyToolDef[] = [
   listVariants,
   listSectionVariants,
   createDeck,
+  buildDeck,
   generateDeck,
   insertSlide,
   deleteSlide,
