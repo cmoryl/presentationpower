@@ -5172,7 +5172,11 @@ function renderSplitManifesto(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   });
 }
 
-// 13. MV-NUMBERS-TRIPTYCH
+// 13. MV-NUMBERS-TRIPTYCH — mirrors the live VariantRenderer: under the title
+// zone, up to three columns separated by full-height hairlines. Each column is
+// label kicker (13px) → oversized figure (108px value / 52px unit) → note
+// (20px) → source kicker pinned at the cell bottom. Pure typography: the
+// on-screen module has no gauge meters, so the export draws none.
 function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 3);
@@ -5180,78 +5184,70 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
   const n = items.length;
   const marginX = 0.6;
   const colW = (SLIDE_W - marginX * 2) / n;
-  const cellY = y0 + 0.3;
-  const cellH = 6.2 - cellY;
+  const cellY = y0 + 0.25;
+  const cellH = 6.9 - cellY;
+  const inset = 40 * PX; // px-10
   items.forEach((it, k) => {
     const x = marginX + k * colW;
     if (k > 0) {
       s.addShape("rect", {
-        x: x - 0.005,
-        y: cellY + 0.2,
-        w: 0.01,
-        h: cellH - 0.4,
-        fill: { color: LIGHT_GRAY },
-        line: { color: LIGHT_GRAY },
+        x: x - 0.5 * PX,
+        y: cellY,
+        w: PX,
+        h: cellH,
+        fill: { color: p.ink, transparency: 82 },
+        line: { type: "none" },
+        objectName: "TP Hairline",
       });
     }
-    // A meter asserts proportion toward a target, so it is only drawn for a
-    // true percentage. Currency, counts, durations and word volumes get NO
-    // track and NO fill, and the label reclaims the gauge band.
-    const tFrac = percentGaugeFraction(str(it.value), str(it.unit));
-    s.addText(
-      statRuns(str(it.value), str(it.unit), { size: 96, unitSize: 40, color: p.primary }).map(
-        (run, ri) => (ri === 0 ? run : { ...run, options: { ...run.options, color: p.accent } }),
-      ),
-      {
-        x: x + 0.2,
-        y: cellY,
-        w: colW - 0.4,
-        h: cellH * (tFrac === null ? 0.48 : 0.45),
-        fontFace: "Geist",
-      },
-    );
-    if (tFrac !== null) {
-      addGaugeMeter(
-        s as never,
-        { x: x + 0.2, y: cellY + cellH * 0.46, w: colW - 0.4 },
-        p.accent,
-        tFrac,
-        `Triptych gauge ${k + 1}`,
-      );
-    }
-
-    s.addText(str(it.label).toUpperCase(), {
-      x: x + 0.2,
-      y: cellY + cellH * (tFrac === null ? 0.48 : 0.5),
-      w: colW - 0.4,
-      h: 0.5,
-
-      fontSize: 12,
+    const tx = x + inset;
+    const tw = colW - inset * 2;
+    s.addText((str(it.label) || `0${k + 1}`).toUpperCase(), {
+      x: tx,
+      y: cellY + 0.05,
+      w: tw,
+      h: 0.26,
+      fontSize: PT(13),
       bold: true,
-      color: p.ink,
+      color: p.accent,
       fontFace: "Geist",
-      charSpacing: 4,
+      charSpacing: 2,
     });
-    s.addText(str(it.note), {
-      x: x + 0.2,
-      y: cellY + cellH * 0.62,
-      w: colW - 0.4,
-      h: 1.4,
-      fontSize: 11,
-      color: p.ink,
+    s.addText(statRuns(str(it.value) || "—", str(it.unit), { size: PT(108), unitSize: PT(52), color: p.ink }), {
+      x: tx,
+      y: cellY + 0.38,
+      w: tw,
+      h: 1.3,
       fontFace: "Geist",
       valign: "top",
+      fit: "shrink",
     });
-    if (it.source) {
-      s.addText(str(it.source), {
-        x: x + 0.2,
-        y: cellY + cellH - 0.4,
-        w: colW - 0.4,
-        h: 0.3,
-        fontSize: 8,
-        italic: true,
-        color: MID_GRAY,
+    const note = str(it.note);
+    if (note) {
+      s.addText(note, {
+        x: tx,
+        y: cellY + 1.85,
+        w: Math.min(tw, 460 * PX),
+        h: cellH - 2.25,
+        fontSize: PT(20),
+        color: p.ink,
         fontFace: "Geist",
+        lineSpacingMultiple: 1.5,
+        valign: "top",
+        fit: "shrink",
+      });
+    }
+    if (it.source) {
+      s.addText(str(it.source).toUpperCase(), {
+        x: tx,
+        y: cellY + cellH - 0.3,
+        w: tw,
+        h: 0.26,
+        fontSize: PT(11),
+        bold: true,
+        color: isDarkPalette(p) ? "9AA6CF" : MID_GRAY,
+        fontFace: "Geist",
+        charSpacing: 1.5,
       });
     }
   });
@@ -9548,267 +9544,339 @@ function renderImgBeforeAfter(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
   });
 }
 
-// ── MV-CASE-SPREAD ── magazine spread: client + challenge/solution/result columns
-function renderCaseSpread(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  const client = str(c.client);
-  const challenge = str(c.challenge);
-  const solution = str(c.solution);
-  const result = str(c.result);
-  const metric = str(c.metric);
-  // Left banner
-  s.addShape("rect", {
-    x: 0,
-    y: 0,
-    w: 4.2,
-    h: SLIDE_H,
-    fill: { color: p.primary },
-    line: { color: p.primary },
-  });
+// ── Case-study family shared header ─────────────────────────────────────
+// Mirrors the live VariantRenderer block: "Case study" kicker, an 88×2px
+// accent hairline, the client name as the section DisplayTitle (72px → 36pt,
+// editorial light weight), then the client chip row ("CLIENT — NAME").
+function drawCaseHeader(
+  s: PptxGenJS.Slide,
+  c: Record<string, unknown>,
+  p: Palette,
+  opts: { hairlinePx?: number; w?: number } = {},
+): number {
+  const w = opts.w ?? SLIDE_W - 1.2;
+  let y = 0.55;
   s.addText("CASE STUDY", {
-    x: 0.5,
-    y: 0.9,
-    w: 3.5,
-    h: 0.4,
-    fontSize: 11,
+    x: 0.6,
+    y,
+    w,
+    h: 0.24,
+    fontSize: PT(17),
     bold: true,
     color: p.accent,
     fontFace: "Geist",
-    charSpacing: 5,
+    charSpacing: 2,
   });
-  s.addText(client || "Client", {
-    x: 0.5,
-    y: 1.4,
-    w: 3.5,
-    h: 2.6,
-    fontSize: 34,
-    bold: true,
-    color: "FFFFFF",
+  y += 0.24 + 24 * PX; // mt-6
+  s.addShape("rect", {
+    x: 0.6,
+    y,
+    w: (opts.hairlinePx ?? 88) * PX,
+    h: 2 * PX,
+    fill: { color: p.accent },
+    line: { type: "none" },
+    objectName: "TP Hairline",
+  });
+  y += 2 * PX + 32 * PX; // mb-8
+  s.addText(str(c.client) || "Client", {
+    x: 0.6,
+    y,
+    w,
+    h: 0.6,
+    fontSize: PT(72),
+    color: p.ink,
     fontFace: "Geist",
     valign: "top",
+    fit: "shrink",
+  });
+  y += 0.64 + 24 * PX; // mt-6 before the chip
+  const client = str(c.client);
+  if (client) {
+    s.addText(
+      [
+        {
+          text: "CLIENT",
+          options: { fontSize: PT(11), bold: true, color: p.accent, charSpacing: 2 },
+        },
+        { text: "   —   ", options: { fontSize: PT(11), color: p.ink } },
+        {
+          text: client.toUpperCase(),
+          options: { fontSize: PT(15), bold: true, color: p.ink, charSpacing: 1.5 },
+        },
+      ],
+      { x: 0.6, y, w, h: 0.26, fontFace: "Geist", valign: "middle" },
+    );
+    y += 0.26;
+  }
+  return y;
+}
+
+// Rounded module glass tile exactly as the on-screen GlassTile: the module-card
+// gradient recipe (getGlassTreatment + gradientTag), token radius, accent top
+// seam.
+function addGlassPanel(
+  s: PptxGenJS.Slide,
+  box: { x: number; y: number; w: number; h: number },
+  p: Palette,
+  name: string,
+) {
+  const glass = getGlassTreatment({ w: box.w, h: box.h, accent: p.accent, dark: isDarkPalette(p) });
+  s.addShape("roundRect", {
+    ...box,
+    rectRadius: EXPORT_RADIUS_IN.media,
+    fill: { color: glass ? glass.fill : p.surface },
+    line: glass ? glass.line : { color: p.accent, transparency: 70, width: 0.75 },
+    objectName: glass ? `${gradientTag(glass.gradient)} ${name}` : name,
+  });
+  const seamInset = box.w * 0.14;
+  s.addShape("rect", {
+    x: box.x + seamInset,
+    y: box.y,
+    w: box.w - seamInset * 2,
+    h: SEAM_HEIGHT_PX * PX,
+    fill: { color: p.accent, transparency: 15 },
+    line: { type: "none" },
+    flat: true,
+    objectName: `${name} seam`,
+  } as unknown as PptxGenJS.ShapeProps);
+}
+
+// ── MV-CASE-SPREAD ── case-study header, three glass tiles
+// (Challenge / Solution / Result with icon wells), optional outcome metric —
+// mirrors the live VariantRenderer magazine spread, NOT a sidebar banner.
+function renderCaseSpread(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const metric = str(c.metric);
+  const yHead = drawCaseHeader(s, c, p);
+  const rows = [
+    { label: "CHALLENGE", body: str(c.challenge), glyph: "◇" },
+    { label: "SOLUTION", body: str(c.solution), glyph: "◆" },
+    { label: "RESULT", body: str(c.result), glyph: "★" },
+  ];
+  const gridY = yHead + 40 * PX; // mt-10
+  const gridBottom = metric ? 6.9 - 1.15 - 40 * PX : 6.9;
+  const gap = 32 * PX; // gap-8
+  const tileW = (SLIDE_W - 1.2 - gap * 2) / 3;
+  const tileH = Math.max(1.6, gridBottom - gridY);
+  const pad = 32 * PX; // px-8 py-8
+  const well = 44 * PX;
+  rows.forEach((r, k) => {
+    const x = 0.6 + k * (tileW + gap);
+    addGlassPanel(s, { x, y: gridY, w: tileW, h: tileH }, p, `TP Case tile ${r.label}`);
+    const wellX = x + pad;
+    const wellY = gridY + pad;
+    // IconWell: 44px rounded accent wash + glyph.
+    s.addShape("roundRect", {
+      x: wellX,
+      y: wellY,
+      w: well,
+      h: well,
+      rectRadius: EXPORT_RADIUS_IN.chip,
+      fill: { color: p.accent, transparency: 90 },
+      line: { color: p.accent, transparency: 65, width: 0.75 },
+      objectName: "TP Icon well",
+    });
+    s.addText(r.glyph, {
+      x: wellX,
+      y: wellY,
+      w: well,
+      h: well,
+      fontSize: PT(20),
+      color: p.accent,
+      fontFace: "Geist",
+      align: "center",
+      valign: "middle",
+    });
+    s.addText(r.label, {
+      x: wellX + well + 16 * PX, // gap-4
+      y: wellY,
+      w: tileW - pad * 2 - well - 16 * PX,
+      h: well,
+      fontSize: PT(12),
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+      charSpacing: 1.7,
+      valign: "middle",
+    });
+    const bodyY = wellY + well + 24 * PX; // mt-6
+    s.addText(r.body, {
+      x: x + pad,
+      y: bodyY,
+      w: tileW - pad * 2,
+      h: Math.max(0.5, gridY + tileH - pad - bodyY),
+      fontSize: PT(22),
+      color: p.ink,
+      fontFace: "Geist",
+      lineSpacingMultiple: 1.35,
+      valign: "top",
+      fit: "shrink",
+    });
   });
   if (metric) {
-    s.addShape("rect", {
-      x: 0.5,
-      y: 4.6,
-      w: 0.12,
-      h: 1.2,
-      fill: { color: p.accent },
-      line: { color: p.accent },
-    });
+    const my = gridY + tileH + 40 * PX;
     s.addText(metric, {
-      x: 0.7,
-      y: 4.55,
-      w: 3.3,
-      h: 1.3,
-      fontSize: 30,
+      x: 0.6,
+      y: my,
+      w: 6.4,
+      h: 1.0,
+      fontSize: PT(116),
       bold: true,
       color: p.accent,
       fontFace: "Geist",
       valign: "middle",
+      fit: "shrink",
+    });
+    s.addText("OUTCOME", {
+      x: 7.2,
+      y: my,
+      w: SLIDE_W - 7.2 - 0.6,
+      h: 1.0,
+      fontSize: PT(22),
+      bold: true,
+      color: p.ink,
+      fontFace: "Geist",
+      charSpacing: 3,
+      valign: "middle",
     });
   }
-  // right columns
-  const cols = [
-    { label: "CHALLENGE", body: challenge },
-    { label: "SOLUTION", body: solution },
-    { label: "RESULT", body: result },
-  ];
-  const colX = 4.5;
-  const colW = (SLIDE_W - colX - 0.5) / 3;
-  cols.forEach((col, k) => {
-    const x = colX + k * colW;
-    s.addText(col.label, {
-      x,
-      y: 0.9,
-      w: colW - 0.3,
-      h: 0.4,
-      fontSize: 11,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
-      charSpacing: 4,
-    });
-    s.addShape("rect", {
-      x,
-      y: 1.35,
-      w: 0.5,
-      h: 0.03,
-      fill: { color: p.primary },
-      line: { color: p.primary },
-    });
-    s.addText(col.body, {
-      x,
-      y: 1.55,
-      w: colW - 0.3,
-      h: 5.0,
-      fontSize: 13,
-      color: p.ink,
-      fontFace: "Geist",
-      valign: "top",
-    });
-  });
 }
 
-// ── MV-CASE-METRICS ── client + summary + 3 metric callouts
+// ── MV-CASE-METRICS ── case-study header + summary + up to three large
+// measured stat figures separated by hairlines (live StatFigure size "lg":
+// 156px value / 54px unit / 24px label). No boxed stat cards.
 function renderCaseMetrics(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  const client = str(c.client);
+  const yHead = drawCaseHeader(s, c, p);
+  let y = yHead + 32 * PX; // mt-8
   const summary = str(c.summary);
-  s.addText("CASE", {
-    x: 0.6,
-    y: 0.6,
-    w: 2,
-    h: 0.4,
-    fontSize: 11,
-    bold: true,
-    color: p.accent,
-    fontFace: "Geist",
-    charSpacing: 5,
-  });
-  s.addText(client, {
-    x: 0.6,
-    y: 1.05,
-    w: SLIDE_W - 1.2,
-    h: 0.9,
-    fontSize: 34,
-    bold: true,
-    color: p.primary,
-    fontFace: "Geist",
-  });
-  s.addText(summary, {
-    x: 0.6,
-    y: 2.05,
-    w: SLIDE_W - 1.2,
-    h: 1.5,
-    fontSize: 15,
-    color: p.ink,
-    fontFace: "Geist",
-    valign: "top",
-  });
-  const items = arr(c.items).slice(0, 3);
-  const colW = (SLIDE_W - 1.2 - 0.4) / 3;
-  const y = 3.9;
-  items.forEach((it, k) => {
-    const x = 0.6 + k * (colW + 0.2);
-    s.addShape("rect", {
-      x,
+  if (summary) {
+    s.addText(summary, {
+      x: 0.6,
       y,
-      w: colW,
-      h: 2.5,
-      fill: { color: p.surface },
-      line: { color: LIGHT_GRAY },
-    });
-    s.addShape("rect", {
-      x,
-      y,
-      w: colW,
-      h: 0.08,
-      fill: { color: p.accent },
-      line: { color: p.accent },
-    });
-    s.addText(`${str(it.value)}${str(it.unit)}`, {
-      x: x + 0.2,
-      y: y + 0.4,
-      w: colW - 0.4,
-      h: 1.3,
-      fontSize: 54,
-      bold: true,
-      color: p.primary,
-      fontFace: "Geist",
-    });
-    s.addText(str(it.label), {
-      x: x + 0.2,
-      y: y + 1.75,
-      w: colW - 0.4,
-      h: 0.7,
-      fontSize: 12,
+      w: Math.min(1180 * PX, SLIDE_W - 1.2),
+      h: 0.95,
+      fontSize: PT(32),
       color: p.ink,
       fontFace: "Geist",
+      lineSpacingMultiple: 1.38,
       valign: "top",
+      fit: "shrink",
+    });
+    y += 1.0;
+  }
+  const items = arr(c.items).slice(0, 3);
+  if (!items.length) return;
+  const rowY = y + 56 * PX; // mt-14
+  const rowH = Math.max(1.4, 6.9 - rowY);
+  const gap = 56 * PX; // gap-14
+  const colW = (SLIDE_W - 1.2 - gap * (items.length - 1)) / items.length;
+  // The figure block (value + label) is vertically centred in the row.
+  const blockH = 1.45;
+  const by = rowY + Math.max(0, (rowH - blockH) / 2);
+  items.forEach((it, k) => {
+    const x = 0.6 + k * (colW + gap);
+    if (k > 0) {
+      s.addShape("rect", {
+        x: x - gap / 2,
+        y: rowY + 0.1,
+        w: PX,
+        h: rowH - 0.2,
+        fill: { color: p.ink, transparency: 82 },
+        line: { type: "none" },
+        objectName: "TP Hairline",
+      });
+    }
+    s.addText(
+      statRuns(str(it.value) || "—", str(it.unit), {
+        size: PT(156),
+        unitSize: PT(54),
+        color: p.ink,
+      }).map((run, ri) =>
+        ri === 0 ? run : { ...run, options: { ...run.options, color: p.accent } },
+      ),
+      { x, y: by, w: colW, h: 1.05, fontFace: "Geist", valign: "middle", fit: "shrink" },
+    );
+    s.addText(str(it.label).toUpperCase(), {
+      x,
+      y: by + 1.1,
+      w: colW,
+      h: 0.3,
+      fontSize: PT(24),
+      bold: true,
+      color: p.ink,
+      fontFace: "Geist",
+      charSpacing: 1.5,
     });
   });
 }
 
-// ── MV-CASE-STORY ── narrative long-form
+// ── MV-CASE-STORY ── two-column narrative: header + headline left, story +
+// accent-ruled result block right. Mirrors the live VariantRenderer.
 function renderCaseStory(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  s.addText("CASE STUDY", {
-    x: 0.6,
-    y: 0.6,
-    w: 4,
-    h: 0.4,
-    fontSize: 11,
-    bold: true,
-    color: p.accent,
-    fontFace: "Geist",
-    charSpacing: 5,
-  });
-  s.addText(str(c.client), {
-    x: 0.6,
-    y: 1.0,
-    w: SLIDE_W - 1.2,
-    h: 0.6,
-    fontSize: 16,
-    color: MID_GRAY,
-    fontFace: "Geist",
-  });
-  s.addText(str(c.headline), {
-    x: 0.6,
-    y: 1.6,
-    w: SLIDE_W - 1.2,
-    h: 1.4,
-    fontSize: 34,
-    bold: true,
-    color: p.primary,
-    fontFace: "Geist",
-  });
-  s.addShape("rect", {
-    x: 0.6,
-    y: 3.1,
-    w: 0.6,
-    h: 0.04,
-    fill: { color: p.accent },
-    line: { color: p.accent },
-  });
+  const colGap = 80 * PX; // gap-20
+  const colW = (SLIDE_W - 1.2 - colGap) / 2;
+  const yHead = drawCaseHeader(s, c, p, { hairlinePx: 72, w: colW });
+  const headline = str(c.headline);
+  if (headline) {
+    s.addText(headline, {
+      x: 0.6,
+      y: yHead + 32 * PX, // mt-8
+      w: colW,
+      h: 1.6,
+      fontSize: PT(42),
+      bold: true,
+      color: p.ink,
+      fontFace: "Geist",
+      lineSpacingMultiple: 1.1,
+      valign: "top",
+      fit: "shrink",
+    });
+  }
+  const rx = 0.6 + colW + colGap;
   s.addText(str(c.story), {
-    x: 0.6,
-    y: 3.3,
-    w: (SLIDE_W - 1.6) * 0.65,
-    h: 3.4,
-    fontSize: 14,
+    x: rx,
+    y: 1.0,
+    w: colW,
+    h: 3.0,
+    fontSize: PT(32),
     color: p.ink,
     fontFace: "Geist",
+    lineSpacingMultiple: 1.38,
     valign: "top",
+    fit: "shrink",
   });
-  // result callout right
-  const resX = 0.6 + (SLIDE_W - 1.2) * 0.68;
-  const resW = SLIDE_W - resX - 0.6;
+  const ruleY = 4.25;
   s.addShape("rect", {
-    x: resX,
-    y: 3.3,
-    w: resW,
-    h: 3.3,
-    fill: { color: p.primary },
-    line: { color: p.primary },
+    x: rx,
+    y: ruleY,
+    w: colW,
+    h: 2 * PX,
+    fill: { color: p.accent },
+    line: { type: "none" },
+    objectName: "TP Hairline",
   });
   s.addText("RESULT", {
-    x: resX + 0.25,
-    y: 3.5,
-    w: resW - 0.5,
-    h: 0.4,
-    fontSize: 10,
+    x: rx,
+    y: ruleY + 32 * PX, // pt-8
+    w: colW,
+    h: 0.24,
+    fontSize: PT(17),
     bold: true,
     color: p.accent,
     fontFace: "Geist",
-    charSpacing: 4,
+    charSpacing: 2,
   });
   s.addText(str(c.result), {
-    x: resX + 0.25,
-    y: 3.95,
-    w: resW - 0.5,
-    h: 2.5,
-    fontSize: 15,
-    color: "FFFFFF",
+    x: rx,
+    y: ruleY + 32 * PX + 0.24 + 16 * PX, // mt-4
+    w: colW,
+    h: 6.9 - (ruleY + 0.5),
+    fontSize: PT(40),
+    bold: true,
+    color: p.ink,
     fontFace: "Geist",
+    lineSpacingMultiple: 1.15,
     valign: "top",
+    fit: "shrink",
   });
 }
 
