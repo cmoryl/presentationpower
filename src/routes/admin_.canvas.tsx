@@ -17,7 +17,14 @@ import {
   ToolbarSep,
 } from "@/components/editor/EditorChrome";
 import { EditorHistoryControls } from "@/components/editor/EditorHistoryControls";
-import { BRAND_MODES } from "@/lib/taxonomy";
+import { nanoid } from "nanoid";
+import {
+  BRAND_MODES,
+  MODULE_VARIANTS,
+  SECTION_FRAMEWORKS,
+  byId,
+} from "@/lib/taxonomy";
+import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { retintItemsForMode } from "@/lib/canvas-mode-ink";
 import { useImageDrop } from "@/hooks/use-image-drop";
 import { StudioPalette, type DragPayload } from "@/components/studio/StudioPalette";
@@ -108,10 +115,17 @@ function CanvasStudioPage() {
   // but never while typing into a field.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey)) return;
       const t = e.target as HTMLElement | null;
       const tag = t?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t?.isContentEditable) return;
+      // Escape clears the selection no matter where focus sits (palette,
+      // layers rail, inspector) — a full-bleed module leaves no empty canvas
+      // to click, so this is the reliable way out of a group selection.
+      if (e.key === "Escape") {
+        setSelected([]);
+        return;
+      }
+      if (!(e.metaKey || e.ctrlKey)) return;
       const k = e.key.toLowerCase();
       if (k === "z") {
         e.preventDefault();
@@ -252,14 +266,89 @@ function CanvasStudioPage() {
     }
     const { explodeModuleRender } = await import("@/lib/canvas-studio-explode");
     const startZ = comp.items.reduce((m, i) => Math.max(m, i.z), 0) + 1;
-    const { items, counts, truncated } = explodeModuleRender(el, stage, startZ);
-    if (!items.length) {
+    const { items: exploded, counts, truncated } = explodeModuleRender(el, stage, startZ + 1);
+    if (!exploded.length) {
       toast.error("Nothing to convert", {
         description: "This module rendered no editable pieces.",
       });
       return;
     }
+
+    // Keep the module's exact ground. The exploder flattens gradients, aurora
+    // orbs and frosted planes to their first solid colour, so a module that
+    // painted a soft brand backdrop exploded onto a bare slide. Rasterize the
+    // decor-only plate (the same capture the PPTX exporter uses) and pin it
+    // under the editable layers as a locked full-bleed image.
+    let backdrop: CanvasItem | null = null;
+    try {
+      const variant = MODULE_VARIANTS.find((v) => v.id === item.variantId);
+      const brand =
+        BRAND_MODES.find((b) => b.id === comp.brandId) ?? BRAND_MODES[0] ?? null;
+      if (variant && brand) {
+        const brief = resolveDivisionBrief(brand);
+        const sectionId =
+          SECTION_FRAMEWORKS.find((s) => s.permittedFamilyIds.includes(variant.familyId))?.id ??
+          "SF-01";
+        const slide = {
+          id: `studio:${item.id}`,
+          position: 0,
+          sectionId,
+          variantId: variant.id,
+          layoutId: variant.permittedLayoutIds[0],
+          content: seedDivisionContent(
+            variant.id,
+            brief,
+            byId(SECTION_FRAMEWORKS, sectionId)?.name ?? "Section",
+            brand,
+          ),
+          changes: [],
+        };
+        const { rasterizeExactSlide } = await import("@/lib/slide-exact-raster");
+        const url = await rasterizeExactSlide({
+          slide,
+          variant,
+          brand,
+          mode: item.mode ?? comp.mode,
+          pageNumber: 1,
+          decorOnly: true,
+        });
+        if (url) {
+          backdrop = {
+            id: `ci-${nanoid(8)}`,
+            z: startZ,
+            type: "image",
+            url,
+            fit: "cover",
+            radius: 0,
+            name: "Module backdrop",
+            locked: true,
+            x: 0,
+            y: 0,
+            w: STAGE_W,
+            h: STAGE_H,
+          };
+        }
+      }
+    } catch {
+      /* backdrop is best-effort — the flat surface fallback still applies */
+    }
+
+    // With the raster ground pinned underneath, the exploder's flattened
+    // full-stage "Backdrop" surface would sit over it and hide it — drop it.
+    const items = backdrop
+      ? exploded.filter(
+          (i) =>
+            !(
+              i.type === "surface" &&
+              i.name === "Backdrop" &&
+              i.w >= STAGE_W - 16 &&
+              i.h >= STAGE_H - 16
+            ),
+        )
+      : exploded;
+
     removeItem(comp.id, itemId);
+    if (backdrop) addItem(comp.id, backdrop);
     for (const next of items) addItem(comp.id, next);
     setSelected(items.map((i) => i.id));
     toast.success("Module is now yours to edit", {
@@ -701,7 +790,8 @@ function CanvasStudioPage() {
                 {imageDrop.error && <p className="mt-2 text-xs text-rose-600">{imageDrop.error}</p>}
                 <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
                   Drag to move · corner handle to resize · drag across empty canvas to lasso-select
-                  · shift-click to add · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z
+                  · shift-click to add · click a selected item to select just it · Esc clears the
+                  selection · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z
                   steps through history. Double-click a placed module to make it fully editable.
                   Compositions save automatically in this browser.
                 </p>

@@ -66,6 +66,13 @@ export function CanvasStage({
         dy: number;
         /** Origins of every item moving with this drag (group move). */
         group: { id: string; x: number; y: number }[];
+        /** Press origin in stage units — a press that never passes the drag
+            threshold is a click, not a move. */
+        startX: number;
+        startY: number;
+        moved: boolean;
+        /** How many items were selected when the press started. */
+        groupSize: number;
       }
     | { mode: "resize"; id: string; startX: number; startY: number; w: number; h: number }
     | null
@@ -182,6 +189,15 @@ export function CanvasStage({
           onSelect(items.filter((i) => !i.locked).map((i) => i.id));
           return;
         }
+        // Escape always clears the selection — essential once a full-bleed
+        // module covers the whole stage and there is no empty canvas to click.
+        if (e.key === "Escape") {
+          if (selectedIds.length) {
+            e.preventDefault();
+            onSelect([]);
+          }
+          return;
+        }
         if (!selectedIds.length) return;
         const step = e.shiftKey ? GRID : 8;
         const map: Record<string, [number, number]> = {
@@ -275,6 +291,10 @@ export function CanvasStage({
                   id: it.id,
                   dx: s.x - it.x,
                   dy: s.y - it.y,
+                  startX: s.x,
+                  startY: s.y,
+                  moved: false,
+                  groupSize: groupIds.length,
                   group: comp.items
                     .filter((i) => groupIds.includes(i.id) && !i.locked)
                     .map((i) => ({ id: i.id, x: i.x, y: i.y })),
@@ -285,6 +305,7 @@ export function CanvasStage({
                 if (!d || d.id !== it.id) return;
                 const s = stageFrom(e.clientX, e.clientY);
                 if (d.mode === "move") {
+                  if (!d.moved && Math.hypot(s.x - d.startX, s.y - d.startY) > 6) d.moved = true;
                   const nx = Math.max(0, Math.min(STAGE_W - it.w, snap(s.x - d.dx, snapOn)));
                   const ny = Math.max(0, Math.min(STAGE_H - it.h, snap(s.y - d.dy, snapOn)));
                   const shiftX = nx - it.x;
@@ -311,7 +332,23 @@ export function CanvasStage({
                 }
               }}
               onPointerUp={() => {
-                if (drag.current) onEndBatch?.();
+                const d = drag.current;
+                // A plain click (no drag) on an item inside a multi-selection
+                // collapses the selection to just that item — this is the only
+                // way to escape a group selection when a full-bleed module
+                // leaves no empty canvas to click.
+                if (
+                  d &&
+                  d.mode === "move" &&
+                  !d.moved &&
+                  d.groupSize > 1 &&
+                  selectedIds.includes(it.id)
+                ) {
+                  onEndBatch?.();
+                  onSelect([it.id]);
+                } else if (d) {
+                  onEndBatch?.();
+                }
                 drag.current = null;
               }}
             >
