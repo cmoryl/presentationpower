@@ -19,12 +19,15 @@ import {
   Loader2,
   RotateCcw,
   Save,
+  ScanEye,
   Sparkles,
   Undo2,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
   LONDON_STYLES,
@@ -131,6 +134,7 @@ function LondonRevisePage() {
   const [restoredFrom, setRestoredFrom] = useState<number | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const [floor, setFloor] = useState<string>("all");
+  const [previewId, setPreviewId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -159,6 +163,10 @@ function LondonRevisePage() {
   const changes = useMemo(() => diffLondonPanels(current, draft), [current, draft]);
   const plan = useMemo(() => planLondonRegeneration(changes), [changes]);
   const dirty = changes.length > 0;
+  const previewPanel = useMemo(
+    () => draft.find((p) => p.id === previewId) ?? null,
+    [draft, previewId],
+  );
 
   const floors = useMemo(() => [...new Set(draft.map((p) => p.floor))], [draft]);
   const visible = floor === "all" ? draft : draft.filter((p) => p.floor === floor);
@@ -478,9 +486,14 @@ function LondonRevisePage() {
                           <p>
                             {panel.rasterPx}px · {panel.rasterMb}MB · band {panel.bandMm}mm
                           </p>
-                          <p className="mt-0.5 font-mono text-[10px] text-[#999]">
-                            {panelSlug(panel)}
-                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewId(panel.id)}
+                            className="mt-1 inline-flex items-center gap-1.5 rounded-md border border-black/10 px-2 py-1 text-[11px] font-semibold text-[#03002C]"
+                          >
+                            <ScanEye className="h-3.5 w-3.5" aria-hidden="true" />
+                            Preview ppi tiers
+                          </button>
                         </td>
                       </tr>
                     );
@@ -576,6 +589,26 @@ function LondonRevisePage() {
           </aside>
         </div>
       </div>
+
+      {/* On-screen check of every resolution tier before anything is generated. */}
+      <Dialog open={!!previewPanel} onOpenChange={(o) => !o && setPreviewId(null)}>
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+          {previewPanel ? (
+            <>
+              <DialogTitle className="text-base font-semibold text-[#03002C]">
+                {previewPanel.name}
+              </DialogTitle>
+              <p className="text-xs text-[#666]">
+                {previewPanel.floor} · {previewPanel.room} · previewing the{" "}
+                {plan.touched.includes(previewPanel.id) ? "revised" : "current"} specification
+                {" "}({previewPanel.trimW}×{previewPanel.trimH}mm trim, {previewPanel.bleedEdge}mm
+                bleed per edge).
+              </p>
+              <LondonPpiPreview panel={previewPanel} />
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </AppShell>
   );
 }
