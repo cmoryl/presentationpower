@@ -9,6 +9,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
+  BookOpen,
   Download,
   FileDown,
   ImageIcon,
@@ -29,6 +30,7 @@ import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
+import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
 import { renderDitheredPng } from "@/lib/london-panel-raster";
 import {
   auditAi,
@@ -336,6 +338,13 @@ function LondonSignagePage() {
                 className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 <Table2 className="h-4 w-4" /> Print schedule (CSV)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleLondonDirectoryDownload(panels)}
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+              >
+                <BookOpen className="h-4 w-4" /> Master directory (PDF)
               </button>
               {userId ? (
                 <>
