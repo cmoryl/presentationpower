@@ -587,6 +587,33 @@ export function addedBetween(from: LondonPanel[], to: LondonPanel[]): LondonPane
  * revised and added panels are rebuilt from the spec so downloads can never ship
  * stale artwork.
  */
+export function matchesIssuedArtwork(
+  panel: LondonPanel,
+  pack: Record<string, { svg: string; ai: string }> | null | undefined,
+): boolean {
+  const issued = LONDON_PANELS.find((p) => p.id === panel.id);
+  return (
+    !!issued &&
+    !!pack?.[panel.id] &&
+    issued.style === panel.style &&
+    issued.trimW === panel.trimW &&
+    issued.trimH === panel.trimH &&
+    issued.bleedW === panel.bleedW &&
+    issued.bleedH === panel.bleedH &&
+    issued.bleedEdge === panel.bleedEdge
+  );
+}
+
+/** SVG only — cheap enough for thumbnails, never stale. */
+export function londonPanelSvgFor(
+  panel: LondonPanel,
+  pack: Record<string, { svg: string; ai: string }> | null | undefined,
+): string {
+  return matchesIssuedArtwork(panel, pack)
+    ? pack![panel.id]!.svg
+    : buildLondonPanelSvg(panel);
+}
+
 export function resolveLondonArtwork(
   panel: LondonPanel,
   pack: Record<string, { svg: string; ai: string }> | null,
