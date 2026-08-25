@@ -25,6 +25,7 @@ import {
   Wand2,
   Search,
   CornerDownLeft,
+  Trophy,
 } from "lucide-react";
 import { AGENT_ROUTE, AGENT_LABEL, seedAgentPrompt } from "@/lib/agent-seed";
 import { AppShell } from "@/components/AppShell";
@@ -126,8 +127,9 @@ const MODES: ModeDef[] = [
       { label: "Open library", to: "/library" },
     ],
     subnav: [
-      { label: "Modules", to: "/library", icon: Shapes },
       { label: "Agent", to: "/agent", icon: Brain },
+      { label: "Judging prep", to: "/demo/judging", icon: Trophy },
+      { label: "Modules", to: "/library", icon: Shapes },
       { label: "Canvas creator", to: "/admin/canvas", icon: Palette },
       { label: "Decks", to: "/decks", icon: Presentation },
     ],

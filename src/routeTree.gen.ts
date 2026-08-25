@@ -81,6 +81,7 @@ import { Route as DevImageFormatVerifyRouteImport } from './routes/dev.image-for
 import { Route as DevImageBenchRouteImport } from './routes/dev.image-bench'
 import { Route as DevFormatVerifyRouteImport } from './routes/dev.format-verify'
 import { Route as DevExportVerifyRouteImport } from './routes/dev.export-verify'
+import { Route as DemoJudgingRouteImport } from './routes/demo.judging'
 import { Route as DecksNextPaletteRouteImport } from './routes/decks.next-palette'
 import { Route as DecksImportRouteImport } from './routes/decks.import'
 import { Route as BriefNewRouteImport } from './routes/brief.new'
@@ -517,6 +518,11 @@ const DevFormatVerifyRoute = DevFormatVerifyRouteImport.update({
 const DevExportVerifyRoute = DevExportVerifyRouteImport.update({
   id: '/dev/export-verify',
   path: '/dev/export-verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoJudgingRoute = DemoJudgingRouteImport.update({
+  id: '/demo/judging',
+  path: '/demo/judging',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DecksNextPaletteRoute = DecksNextPaletteRouteImport.update({
@@ -975,6 +981,7 @@ export interface FileRoutesByFullPath {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
+  '/demo/judging': typeof DemoJudgingRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
   '/dev/format-verify': typeof DevFormatVerifyRoute
   '/dev/image-bench': typeof DevImageBenchRoute
@@ -1121,6 +1128,7 @@ export interface FileRoutesByTo {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
+  '/demo/judging': typeof DemoJudgingRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
   '/dev/format-verify': typeof DevFormatVerifyRoute
   '/dev/image-bench': typeof DevImageBenchRoute
@@ -1272,6 +1280,7 @@ export interface FileRoutesById {
   '/brief/new': typeof BriefNewRoute
   '/decks/import': typeof DecksImportRoute
   '/decks/next-palette': typeof DecksNextPaletteRoute
+  '/demo/judging': typeof DemoJudgingRoute
   '/dev/export-verify': typeof DevExportVerifyRoute
   '/dev/format-verify': typeof DevFormatVerifyRoute
   '/dev/image-bench': typeof DevImageBenchRoute
@@ -1424,6 +1433,7 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
+    | '/demo/judging'
     | '/dev/export-verify'
     | '/dev/format-verify'
     | '/dev/image-bench'
@@ -1570,6 +1580,7 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
+    | '/demo/judging'
     | '/dev/export-verify'
     | '/dev/format-verify'
     | '/dev/image-bench'
@@ -1720,6 +1731,7 @@ export interface FileRouteTypes {
     | '/brief/new'
     | '/decks/import'
     | '/decks/next-palette'
+    | '/demo/judging'
     | '/dev/export-verify'
     | '/dev/format-verify'
     | '/dev/image-bench'
@@ -1842,6 +1854,7 @@ export interface RootRouteChildren {
   BriefNewRoute: typeof BriefNewRoute
   DecksImportRoute: typeof DecksImportRoute
   DecksNextPaletteRoute: typeof DecksNextPaletteRoute
+  DemoJudgingRoute: typeof DemoJudgingRoute
   DevExportVerifyRoute: typeof DevExportVerifyRoute
   DevFormatVerifyRoute: typeof DevFormatVerifyRoute
   DevImageBenchRoute: typeof DevImageBenchRoute
@@ -2402,6 +2415,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/export-verify'
       fullPath: '/dev/export-verify'
       preLoaderRoute: typeof DevExportVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/judging': {
+      id: '/demo/judging'
+      path: '/demo/judging'
+      fullPath: '/demo/judging'
+      preLoaderRoute: typeof DemoJudgingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/decks/next-palette': {
@@ -3141,6 +3161,7 @@ const rootRouteChildren: RootRouteChildren = {
   BriefNewRoute: BriefNewRoute,
   DecksImportRoute: DecksImportRoute,
   DecksNextPaletteRoute: DecksNextPaletteRoute,
+  DemoJudgingRoute: DemoJudgingRoute,
   DevExportVerifyRoute: DevExportVerifyRoute,
   DevFormatVerifyRoute: DevFormatVerifyRoute,
   DevImageBenchRoute: DevImageBenchRoute,
