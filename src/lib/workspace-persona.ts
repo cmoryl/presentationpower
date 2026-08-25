@@ -264,18 +264,27 @@ export function personaForRoles(roles: readonly string[]): PersonaId {
 /**
  * Personas a user may view, based on their `user_roles` rows. The Sales
  * dashboard is the floor — everyone (including signed-out visitors) may see
- * it. Admin and MarOps dashboards require the matching roles.
+ * it. MarOps requires a marketing role. Admin (admin / brand_reviewer) is the
+ * supervisory tier and unlocks ALL three dashboards, including MarOps.
  */
 export function allowedPersonas(roles: readonly string[]): readonly PersonaId[] {
   const allowed: PersonaId[] = ["sales"];
-  if (roles.some((r) => ["brand_lead", "content_owner", "editor"].includes(r))) {
+  const isAdmin = roles.some((r) => ["admin", "brand_reviewer"].includes(r));
+  if (isAdmin || roles.some((r) => ["brand_lead", "content_owner", "editor"].includes(r))) {
     allowed.unshift("marketing");
   }
-  if (roles.some((r) => ["admin", "brand_reviewer"].includes(r))) {
+  if (isAdmin) {
     allowed.unshift("admin");
   }
   return allowed;
 }
+
+/** Human-readable role requirement for a locked dashboard tab. */
+export const PERSONA_ROLE_REQUIREMENT: Record<PersonaId, string> = {
+  admin: "Admin or brand reviewer role required",
+  marketing: "Brand lead, content owner, or editor role required",
+  sales: "Available to everyone",
+};
 
 export function canViewPersona(id: PersonaId, roles: readonly string[]): boolean {
   return allowedPersonas(roles).includes(id);
