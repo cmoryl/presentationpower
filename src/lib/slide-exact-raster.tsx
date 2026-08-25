@@ -27,6 +27,7 @@ import {
 } from "./export-quality";
 import { beginExportChrome } from "./export-chrome-suppress";
 import { canvasBlocksOf, hideAdoptedSourcesIn } from "./export-adopted-hide";
+import { resolveAssetUrl } from "./asset-base-url";
 
 import type { StylePack } from "./style-packs";
 import type { TextRun } from "./export-text-layer";
@@ -78,6 +79,40 @@ function nextFrames(n: number): Promise<void> {
     requestAnimationFrame(step);
   });
 }
+
+function extractCssUrls(value: string | null | undefined): string[] {
+  if (!value || value === "none") return [];
+  const urls: string[] = [];
+  for (const match of value.matchAll(/url\((['"]?)(.*?)\1\)/g)) {
+    const raw = match[2]?.trim();
+    if (!raw || raw.startsWith("data:")) continue;
+    urls.push(raw);
+  }
+  return urls;
+}
+
+function preloadImage(src: string, allowRetry: boolean): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    const done = () => {
+      img.onload = null;
+      img.onerror = null;
+      resolve();
+    };
+    img.onload = done;
+    img.onerror = () => {
+      img.onload = null;
+      img.onerror = null;
+      if (!allowRetry) return resolve();
+      const base = src.split("#")[0]!;
+      const retryUrl = `${base}${base.includes("?") ? "&" : "?"}tpRetry=${Date.now()}`;
+      void preloadImage(retryUrl, false).then(resolve);
+    };
+    img.src = resolveAssetUrl(src);
+  });
+}
+
 /**
  * Wait until every picture on a mounted stage has actually decoded.
  *
@@ -88,7 +123,27 @@ function nextFrames(n: number): Promise<void> {
  */
 async function settleStageImages(stage: HTMLElement, timeoutMs = 8000): Promise<void> {
   const imgs = Array.from(stage.querySelectorAll("img"));
-  if (imgs.length === 0) return;
+  const cssUrls = new Set<string>();
+  const elements = [stage, ...Array.from(stage.querySelectorAll<HTMLElement>("*"))];
+  for (const el of elements) {
+    let cs: CSSStyleDeclaration;
+    try {
+      cs = getComputedStyle(el);
+    } catch {
+      continue;
+    }
+    extractCssUrls(cs.backgroundImage).forEach((url) => cssUrls.add(url));
+    extractCssUrls((cs as unknown as { borderImageSource?: string }).borderImageSource).forEach(
+      (url) => cssUrls.add(url),
+    );
+    extractCssUrls((cs as unknown as { maskImage?: string }).maskImage).forEach((url) =>
+      cssUrls.add(url),
+    );
+    extractCssUrls((cs as unknown as { webkitMaskImage?: string }).webkitMaskImage).forEach(
+      (url) => cssUrls.add(url),
+    );
+  }
+  if (imgs.length === 0 && cssUrls.size === 0) return;
   const settle = (img: HTMLImageElement, allowRetry: boolean): Promise<void> =>
     new Promise<void>((resolve) => {
       if (img.complete && img.naturalWidth > 0) return resolve();
@@ -105,14 +160,18 @@ async function settleStageImages(stage: HTMLElement, timeoutMs = 8000): Promise<
         if (!allowRetry) return resolve();
         const base = img.src.split("#")[0];
         const retryUrl = `${base}${base.includes("?") ? "&" : "?"}tpRetry=${Date.now()}`;
-        img.src = retryUrl;
+        img.src = resolveAssetUrl(retryUrl);
         void settle(img, false).then(resolve);
       };
       img.addEventListener("load", onLoad);
       img.addEventListener("error", onError);
+      img.src = resolveAssetUrl(img.src);
     });
   await Promise.race([
-    Promise.all(imgs.map((img) => settle(img, true))),
+    Promise.all([
+      ...imgs.map((img) => settle(img, true)),
+      ...Array.from(cssUrls).map((url) => preloadImage(url, true)),
+    ]),
     new Promise<void>((resolve) => setTimeout(resolve, timeoutMs)),
   ]);
   // One extra frame so the decoded bitmaps are composited before capture.
@@ -223,7 +282,7 @@ export async function withExactStage<T>(
 export async function rasterizeExactSlide(args: ExactPlateArgs): Promise<string | null> {
   return withExactStage(args, async (stage) => {
     const { captureSlideAsDataUrl } = await import("./slide-image-export");
-    const effMode = args.pack ? args.pack.mode : args.mode;
+    const effMode = args.mode;
     const { width } = rasterSize(args.quality ?? null);
     const data = await captureSlideAsDataUrl(stage, {
       mode: effMode,
@@ -325,7 +384,7 @@ export async function captureGroundPlates(
       ]);
       const media = measureMediaFrames(stage);
       if (plateCache.has(key)) return { plate: plateCache.get(key) ?? null, media };
-      const effMode = items[i].pack ? items[i].pack!.mode : items[i].mode;
+      const effMode = items[i].mode;
       const { width } = backdropRasterSize(items[i].quality ?? null);
       const plate = await captureSlideAsDataUrl(stage, {
         mode: effMode,
@@ -360,7 +419,7 @@ export async function rasterizeTextEditablePlate(
     const { runs, nodes } = textLayer.extractTextRuns(stage);
     textLayer.hideTextRuns(nodes);
     await nextFrames(2);
-    const effMode = args.pack ? args.pack.mode : args.mode;
+    const effMode = args.mode;
     const { width } = rasterSize(args.quality ?? null);
     const data = await captureSlideAsDataUrl(stage, {
       mode: effMode,
@@ -419,7 +478,7 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
     textLayer.hideTextRuns(nodes);
     dom.neutralizeCapturedPaint(shapes);
     await nextFrames(2);
-    const effMode = args.pack ? args.pack.mode : args.mode;
+    const effMode = args.mode;
     const { width } = rasterSize(args.quality ?? null);
     const data = await captureSlideAsDataUrl(stage, {
       mode: effMode,

@@ -28,6 +28,16 @@ import {
   useCertifiedInventory,
 } from "./PptxCertifiedCanvas";
 
+function relativeLuminance(hex: string): number {
+  const h = hex.replace("#", "");
+  if (h.length < 6) return 1;
+  const n = parseInt(h.slice(0, 6), 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
 // Preview canvas is 640×360 (16:9). PPTX slide is 13.333"×7.5". Everything we
 // draw uses a single px/inch scale so scrim positions and image sizing are
 // visually identical to what pptxgenjs will emit.
@@ -48,8 +58,14 @@ type Check = {
 function exportModeFor(slide: DeckSlide): "light" | "dark" {
   const own = (slide as { mode?: "light" | "dark" }).mode;
   if (own === "light" || own === "dark") return own;
+  const bg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
+  if (bg?.kind === "color" && bg.solid) {
+    return relativeLuminance(bg.solid) < 0.42 ? "dark" : "light";
+  }
   const v = slide.variantId;
-  return v.startsWith("MV-COVER") || v.startsWith("MV-DIVIDER") ? "dark" : "light";
+  return v.startsWith("MV-COVER") || v.startsWith("MV-OP-COVER") || v.startsWith("MV-DIVIDER")
+    ? "dark"
+    : "light";
 }
 
 export function PptxPreviewModal({
@@ -196,7 +212,11 @@ export function PptxPreviewModal({
         slides: [{ ...slide, position: 0 }],
       };
       const { exportDeckToPptx } = await import("@/lib/pptx-export");
-      await exportDeckToPptx(singleDeck, brand);
+      await exportDeckToPptx(singleDeck, brand, {
+        fidelity: "editable",
+        forceMode: exportModeFor(slide),
+        pack: pack ?? undefined,
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Export failed");
     } finally {

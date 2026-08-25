@@ -191,6 +191,9 @@ export function PptxCertifiedCanvas({
               alt=""
               data-cert-layer="image"
               data-cert-index={i}
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
               style={{ ...common, objectFit: sh.fit ?? "contain" }}
             />
           );
