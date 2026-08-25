@@ -70,6 +70,7 @@ export type SlideSwapSource =
   | "import-map"
   | "bulk"
   | "ai"
+  | "revert"
   | "unknown";
 
 export type SlideSwapLogEntry = {
@@ -588,6 +589,15 @@ type DeckState = {
     newVariantId: string,
     source?: SlideSwapSource,
   ) => void;
+  /**
+   * Targeted swap revert: swap the slide back to the module it had before a
+   * specific audit-log entry, without touching any other edit in the deck.
+   * Content merges over shared keys, so copy typed after the swap survives.
+   * The revert itself is a normal history entry (undoable) and is logged.
+   * Returns false when the entry is unknown or the slide is already on the
+   * revert target.
+   */
+  revertSlideSwap: (deckId: string, slideId: string, entryId: string) => boolean;
   clearSlideSwapLog: (deckId: string, slideId: string) => void;
   /**
    * Run the QA auto-fix engine over the deck. Non-destructive: overflow moves
@@ -4667,6 +4677,20 @@ export const useDeckStore = create<DeckState>()(
               },
             },
           }));
+        },
+
+        revertSlideSwap: (deckId, slideId, entryId) => {
+          const deck = get().decks[deckId];
+          if (!deck) return false;
+          const slide = deck.slides.find((sl) => sl.id === slideId);
+          const entry = slide?.swapLog?.find((e) => e.id === entryId);
+          if (!slide || !entry) return false;
+          if (!byId(MODULE_VARIANTS, entry.fromVariantId)) return false;
+          if (slide.variantId === entry.fromVariantId) return false;
+          // Reuse swapVariant so the revert gets identical content-merge,
+          // history, and audit semantics as any other swap.
+          get().swapVariant(deckId, slideId, entry.fromVariantId, "revert");
+          return true;
         },
 
         applyQaFixes: (deckId, opts) => {
