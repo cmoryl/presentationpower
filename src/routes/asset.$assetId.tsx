@@ -2876,6 +2876,7 @@ function ModuleCard({
   editorMode,
   draggingIdx,
   dropIdx,
+  highlighted = false,
   DropIndicator,
   onDragStart,
   onDragEnd,
