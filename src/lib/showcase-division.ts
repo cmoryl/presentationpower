@@ -51,7 +51,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Life Sciences",
     label: "Life Sciences",
     slug: "lifesci",
-    accent: "#58ED21",
+    accent: "#003FC7",
     industry: "Life Sciences",
   },
   {
@@ -59,7 +59,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Legal",
     label: "Legal",
     slug: "legal",
-    accent: "#3BBEB6",
+    accent: "#003FC7",
     industry: "Legal",
   },
   {
@@ -67,7 +67,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Media",
     label: "Media",
     slug: "media",
-    accent: "#EC388A",
+    accent: "#003FC7",
     industry: "Media & Entertainment",
   },
   {
@@ -75,7 +75,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Gaming",
     label: "Gaming",
     slug: "gaming",
-    accent: "#4ADE80",
+    accent: "#003FC7",
     industry: "Gaming",
   },
   {
@@ -83,7 +83,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "TransPerfect Digital",
     label: "Digital",
     slug: "digital",
-    accent: "#C2A3FF",
+    accent: "#003FC7",
     industry: "Digital marketing",
   },
   {
@@ -91,7 +91,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
     name: "Trial Interactive",
     label: "Trial Interactive",
     slug: "trial-interactive",
-    accent: "#5CE1E6",
+    accent: "#003FC7",
     industry: "eClinical",
   },
   {
