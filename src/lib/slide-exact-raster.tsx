@@ -157,6 +157,21 @@ export async function withExactStage<T>(
 
     const stage = mount.querySelector<HTMLElement>("[data-exact-slide-stage]") ?? mount;
 
+    // Fonts BEFORE anything measures: extractTextRuns bakes the browser's line
+    // breaks off this DOM, so a webfont that is still in flight would freeze
+    // fallback-metric wrapping into the export (the headline then breaks
+    // differently than on screen and boxes sized for the fallback clip or
+    // collide). captureSlideAsDataUrl waits for fonts too, but that wait runs
+    // AFTER measurement — too late. Settle fonts first, then measure.
+    try {
+      const { ensureFontsReady } = await import("./slide-image-export");
+      await ensureFontsReady(stage, 4000);
+      await nextFrames(1);
+    } catch {
+      /* font wait is opportunistic — measurement still proceeds */
+    }
+
+
     // Photographs must be decoded BEFORE the plate is rasterized. A tile that
     // is still in flight (or that lost its fetch to resource pressure during a
     // batch export) rasterized as empty, which is how a photographic quote or

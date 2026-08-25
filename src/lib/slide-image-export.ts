@@ -270,7 +270,7 @@ async function inlineCrossOriginImages(
  * Wait for web fonts. Uses `document.fonts.ready` for the coarse signal,
  * then probes each font-family declared on the node with `document.fonts.check`.
  */
-async function ensureFontsReady(
+export async function ensureFontsReady(
   node: HTMLElement,
   timeoutMs: number,
   onProgress?: ExportProgressCallback,

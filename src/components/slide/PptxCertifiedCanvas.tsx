@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { STAGE_H, STAGE_W } from "@/lib/export-quality";
 import type { DomShape } from "@/lib/export-dom-decompose";
 import type { TextRun } from "@/lib/export-text-layer";
+import { mergeTextRuns } from "@/lib/export-text-merge";
 import type { BrandMode, ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { StylePack } from "@/lib/style-packs";
@@ -217,8 +218,50 @@ export function PptxCertifiedCanvas({
           />
         );
       })}
-      {capture.runs.map((r, i) => {
-        const text = r.lines?.length ? r.lines.map((l) => l.text).join("\n") : r.text;
+      {mergeTextRuns(capture.runs).map((block, i) => {
+        const r = block.runs[0]!;
+        // Paint the MERGED block — the object PowerPoint actually receives:
+        // a wrapped paragraph renders its baked lines, and styled tail
+        // fragments (an italic final word) join the line they sit on.
+        type Span = { text: string; italic?: boolean; color?: string; bold?: boolean };
+        let lineSpans: Span[][] | null = null;
+        if (r.lines?.length) {
+          lineSpans = r.lines.map((l) => [{ text: l.text.trim() }]);
+          block.runs.slice(1).forEach((f) => {
+            const mid = f.y + f.h / 2;
+            let best = -1;
+            let bestD = Infinity;
+            r.lines!.forEach((l, li) => {
+              const d = Math.abs(mid - (l.y + l.h / 2));
+              if (d < l.h * 1.0 && d < bestD) {
+                bestD = d;
+                best = li;
+              }
+            });
+            if (best >= 0)
+              lineSpans![best]!.push({
+                text: f.text.trim(),
+                italic: f.italic,
+                bold: f.bold,
+                color: `#${f.color}`,
+              });
+          });
+        }
+        const spans: Span[] =
+          lineSpans?.flatMap((ls, li) =>
+            li === 0
+              ? ls
+              : [{ text: "\n" } as Span, ...ls.map((sp) => ({ ...sp, text: ` ${sp.text}` }))],
+          ) ??
+          block.runs
+            .slice(1)
+            .reduce<Span[]>(
+              (acc, f) => [
+                ...acc,
+                { text: ` ${f.text.trim()}`, italic: f.italic, bold: f.bold, color: `#${f.color}` },
+              ],
+              [{ text: r.text }],
+            );
         return (
           <div
             key={`tx-${i}`}
@@ -226,10 +269,10 @@ export function PptxCertifiedCanvas({
             data-cert-index={i}
             style={{
               position: "absolute",
-              left: r.x * s,
-              top: r.y * s,
-              width: r.w * s,
-              height: r.h * s,
+              left: block.x * s,
+              top: block.y * s,
+              width: block.w * s,
+              height: block.h * s,
               display: "flex",
               flexDirection: "column",
               justifyContent: r.valign === "middle" ? "center" : "flex-start",
@@ -248,7 +291,22 @@ export function PptxCertifiedCanvas({
               outline: showLayerOutlines ? "1px solid rgba(236,56,138,0.55)" : undefined,
             }}
           >
-            {text}
+            {spans.map((sp, si) =>
+              sp.text === "\n" ? (
+                "\n"
+              ) : (
+                <span
+                  key={si}
+                  style={{
+                    fontStyle: sp.italic ? "italic" : undefined,
+                    fontWeight: sp.bold ? 700 : undefined,
+                    color: sp.color,
+                  }}
+                >
+                  {sp.text}
+                </span>
+              ),
+            )}
           </div>
         );
       })}
