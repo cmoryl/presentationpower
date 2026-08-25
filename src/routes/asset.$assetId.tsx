@@ -1657,18 +1657,7 @@ function AssetEditor() {
                           // Optional sections map to the content field they own.
                           // Every removal is undoable: we snapshot the previous
                           // value and restore it from the toast action.
-                          const clearable: Record<string, string> = {
-                            features: "features",
-                            knowHow: "knowHow",
-                            quote: "quote",
-                            cta: "cta",
-                            hero: "heroMedia",
-                            stats: "stats",
-                            engagement: "engagement",
-                            expert: "expert",
-                            footer: "footer",
-                          };
-                          const field = clearable[key];
+                          const field = SECTION_CLEARABLE_FIELDS[key];
                           if (!field) {
                             toast.info(
                               `"${key}" is a core part of this layout — edit it in the inspector instead.`,
@@ -4022,6 +4011,20 @@ const SECTION_DELETE_LABELS: Record<string, string> = {
   engagement: "Engagement snapshot",
   expert: "Expert contact",
   footer: "Footer links",
+};
+
+// Canvas section key → the content field it owns. Shared by the delete and
+// replace actions so both clear exactly the same data.
+const SECTION_CLEARABLE_FIELDS: Record<string, string> = {
+  features: "features",
+  knowHow: "knowHow",
+  quote: "quote",
+  cta: "cta",
+  hero: "heroMedia",
+  stats: "stats",
+  engagement: "engagement",
+  expert: "expert",
+  footer: "footer",
 };
 
 function sectionKindLabel(kind: PrintSection["kind"]): string {
