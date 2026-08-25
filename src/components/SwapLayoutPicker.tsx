@@ -111,9 +111,15 @@ export function SwapLayoutButton({
       >
         Swap layout…
       </button>
-      {open && (
+      {/* Portal to document.body: this button lives inside the inspector
+          side rail, whose backdrop-blur makes it a containing block — a
+          plain `fixed` modal would be trapped inside the 360px rail and
+          render as a broken single-column strip. */}
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
+          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/70 p-6"
           onClick={() => setOpen(false)}
         >
           <div
