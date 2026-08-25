@@ -35,6 +35,7 @@ import { SHOWCASE_DECKS } from "@/lib/showcase-decks";
 import { showcaseArt } from "@/lib/showcase-art";
 import { RegenerateApprovedCopiesButton } from "@/components/home/RegenerateApprovedCopiesButton";
 import { PRINT_DEMOS } from "@/lib/showcase-print";
+import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 
 type ShowcaseEntry = {
   id: string;
@@ -99,9 +100,138 @@ const SURFACE_META = {
   event: { label: "Event kit", icon: CalendarDays, accent: "#A6FA87" },
 } as const;
 
+/* ---------------- on-the-fly translation ---------------- */
+
+/** Every translatable string a gallery card shows, keyed by card/demo id. */
+type GalleryText = {
+  id: string;
+  title: string;
+  blurb: string;
+  label: string;
+  pillsFeature: string[];
+  pillsRail: string[];
+  /** Live social/event cards only. */
+  chip?: string;
+  /** Live cards only — the SocialRenderer copy of the hero asset. */
+  heroCopy?: unknown;
+};
+
+type ShowcasePreview = {
+  name: string;
+  accent: string;
+  chip: string;
+  brandId: string;
+  assets: ReturnType<typeof buildCampaignAssets>;
+  deliverables: number;
+  phases: number;
+  photo: boolean;
+};
+
+/** Builds the live social/event preview for a showcase entry (pure, memo-friendly). */
+function buildShowcasePreview(entry: ShowcaseEntry): ShowcasePreview | null {
+  if (entry.surface === "social") {
+    const pb = getSocialPlaybook(entry.playbookId);
+    if (!pb) return null;
+    const kit = KIT_PROFILES_BY_ID[pb.kitProfileId];
+    const assets = buildCampaignAssets(
+      sourceFromSocialPlaybook(pb),
+      factsFromSocialPlaybook(pb),
+      { formatIds: kit?.formatIds ?? [], mode: "dark", brandId: pb.subBrand },
+    );
+    return {
+      name: pb.name,
+      accent: pb.accent,
+      chip: pb.chip,
+      brandId: pb.subBrand,
+      assets,
+      deliverables: pb.deliverables.length,
+      phases: pb.phases.length,
+      photo: Boolean(getPhotoSet(pb.subBrand)),
+    };
+  }
+  const pb = getPlaybook(entry.playbookId);
+  if (!pb) return null;
+  const brand = BRAND_MODES.find((b) => b.id === pb.subBrand) ?? BRAND_MODES[0];
+  const kit = KIT_PROFILES_BY_ID[pb.kitProfileId];
+  const assets = buildCampaignAssets(sourceFromVariant(pb.seedVariantId, brand), pb.facts, {
+    formatIds: kit?.formatIds ?? [],
+    mode: "dark",
+    brandId: brand.id,
+  });
+  return {
+    name: pb.name,
+    accent: pb.accent,
+    chip: pb.chip,
+    brandId: brand.id,
+    assets,
+    deliverables: pb.deliverables.length,
+    phases: pb.phases.length,
+    photo: Boolean(getPhotoSet(brand.id)),
+  };
+}
+
 export function ShowcaseGallery() {
+  // Pre-build the live social/event previews once so the translate pass can
+  // include their rendered copy and cards never rebuild per render.
+  const livePreviews = useMemo(
+    () => SHOWCASE.map((entry) => ({ entry, built: buildShowcasePreview(entry) })),
+    [],
+  );
+
+  // One translatable text bundle per card on the wall — titles, blurbs,
+  // labels, pills, and the live preview copy. ~35 items, under the cap.
+  const textItems = useMemo<GalleryText[]>(
+    () => [
+      ...SHOWCASE_DECKS.map((d) => ({
+        id: d.id,
+        title: d.name,
+        blurb: d.blurb,
+        label: `Deck · ${d.eyebrow}`,
+        pillsFeature: [
+          `${d.build().slides.length} slides`,
+          "Authored copy",
+          "Style pack set",
+          "PPTX + PDF",
+        ],
+        pillsRail: [`${d.build().slides.length} slides`, "PPTX + PDF"],
+      })),
+      ...PRINT_DEMOS.map((p) => ({
+        id: p.id,
+        title: p.name,
+        blurb: p.blurb,
+        label: `Print · ${p.eyebrow}`,
+        pillsFeature: p.pills,
+        pillsRail: p.pills.slice(0, 2),
+      })),
+      ...livePreviews.flatMap(({ entry, built }) =>
+        built
+          ? [
+              {
+                id: entry.id,
+                title: built.name,
+                blurb: entry.blurb,
+                label: SURFACE_META[entry.surface].label,
+                pillsFeature: [] as string[],
+                pillsRail: [] as string[],
+                chip: built.chip,
+                heroCopy: built.assets[0]?.copy,
+              },
+            ]
+          : [],
+      ),
+    ],
+    [livePreviews],
+  );
+
+  const tx = useDemoTranslate(textItems);
+  const textById = useMemo(() => {
+    const m = new Map<string, GalleryText>();
+    for (const t of tx.items) m.set(t.id, t);
+    return m;
+  }, [tx.items]);
+
   return (
-    <section className="mt-12">
+    <section className="mt-12" dir={tx.rtl ? "rtl" : "ltr"}>
       <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
@@ -138,69 +268,90 @@ export function ShowcaseGallery() {
         </div>
       </div>
 
+      <DemoTranslateBar
+        className="mb-5"
+        lang={tx.lang}
+        setLang={tx.setLang}
+        busy={tx.busy}
+        error={tx.error}
+        isTranslated={tx.isTranslated}
+        note="Switch language and every card on this wall — including the live social and event previews — translates on the fly. Nothing is saved."
+      />
+
       {/* Top line — the hero pair, full size. */}
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {SHOWCASE_DECKS.slice(0, 2).map((d, i) => (
-          <MediaCard
-            key={d.id}
-            feature={i === 0}
-            to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
-            art={showcaseArt(d.id).src}
-            artAlt={showcaseArt(d.id).alt}
-            accent={d.accent}
-            icon={<Presentation size={12} />}
-            label={`Deck · ${d.eyebrow}`}
-            title={d.name}
-            blurb={d.blurb}
-            pills={[
-              `${d.build().slides.length} slides`,
-              "Authored copy",
-              "Style pack set",
-              "PPTX + PDF",
-            ]}
-          />
-        ))}
-      </div>
-
-      {/* Second line — everything else, as a horizontal scroll rail. */}
-      <ScrollRail count={SHOWCASE_DECKS.length - 2 + PRINT_DEMOS.length + SHOWCASE.length}>
-        {SHOWCASE_DECKS.slice(2).map((d) => (
-          <RailItem key={d.id}>
+        {SHOWCASE_DECKS.slice(0, 2).map((d, i) => {
+          const t = textById.get(d.id);
+          return (
             <MediaCard
-              compact
+              key={d.id}
+              feature={i === 0}
               to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
               art={showcaseArt(d.id).src}
               artAlt={showcaseArt(d.id).alt}
               accent={d.accent}
               icon={<Presentation size={12} />}
-              label={`Deck · ${d.eyebrow}`}
-              title={d.name}
-              blurb={d.blurb}
-              pills={[`${d.build().slides.length} slides`, "PPTX + PDF"]}
+              label={t?.label ?? `Deck · ${d.eyebrow}`}
+              title={t?.title ?? d.name}
+              blurb={t?.blurb ?? d.blurb}
+              pills={
+                t?.pillsFeature ?? [
+                  `${d.build().slides.length} slides`,
+                  "Authored copy",
+                  "Style pack set",
+                  "PPTX + PDF",
+                ]
+              }
             />
-          </RailItem>
-        ))}
+          );
+        })}
+      </div>
 
-        {PRINT_DEMOS.map((p) => (
-          <RailItem key={p.id}>
-            <MediaCard
-              compact
-              to={{ to: "/demo/print/$demoId", params: { demoId: p.id } }}
-              art={showcaseArt(p.id).src}
-              artAlt={showcaseArt(p.id).alt}
-              accent={p.accent}
-              icon={<Printer size={12} />}
-              label={`Print · ${p.eyebrow}`}
-              title={p.name}
-              blurb={p.blurb}
-              pills={p.pills.slice(0, 2)}
-            />
-          </RailItem>
-        ))}
+      {/* Second line — everything else, as a horizontal scroll rail. */}
+      <ScrollRail count={SHOWCASE_DECKS.length - 2 + PRINT_DEMOS.length + SHOWCASE.length}>
+        {SHOWCASE_DECKS.slice(2).map((d) => {
+          const t = textById.get(d.id);
+          return (
+            <RailItem key={d.id}>
+              <MediaCard
+                compact
+                to={{ to: "/demo/deck/$demoId", params: { demoId: d.id } }}
+                art={showcaseArt(d.id).src}
+                artAlt={showcaseArt(d.id).alt}
+                accent={d.accent}
+                icon={<Presentation size={12} />}
+                label={t?.label ?? `Deck · ${d.eyebrow}`}
+                title={t?.title ?? d.name}
+                blurb={t?.blurb ?? d.blurb}
+                pills={t?.pillsRail ?? [`${d.build().slides.length} slides`, "PPTX + PDF"]}
+              />
+            </RailItem>
+          );
+        })}
 
-        {SHOWCASE.map((entry) => (
+        {PRINT_DEMOS.map((p) => {
+          const t = textById.get(p.id);
+          return (
+            <RailItem key={p.id}>
+              <MediaCard
+                compact
+                to={{ to: "/demo/print/$demoId", params: { demoId: p.id } }}
+                art={showcaseArt(p.id).src}
+                artAlt={showcaseArt(p.id).alt}
+                accent={p.accent}
+                icon={<Printer size={12} />}
+                label={t?.label ?? `Print · ${p.eyebrow}`}
+                title={t?.title ?? p.name}
+                blurb={t?.blurb ?? p.blurb}
+                pills={t?.pillsRail ?? p.pills.slice(0, 2)}
+              />
+            </RailItem>
+          );
+        })}
+
+        {livePreviews.map(({ entry, built }) => (
           <RailItem key={entry.id}>
-            <ShowcaseCard entry={entry} compact />
+            <ShowcaseCard entry={entry} compact built={built} text={textById.get(entry.id)} />
           </RailItem>
         ))}
       </ScrollRail>
@@ -418,55 +569,26 @@ function MediaCard({
 
 /* ---------------- live-rendered social / event cards ---------------- */
 
-function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compact?: boolean }) {
+function ShowcaseCard({
+  entry,
+  compact = false,
+  built,
+  text,
+}: {
+  entry: ShowcaseEntry;
+  compact?: boolean;
+  /** Pre-built preview from the gallery — shared with the translate pass. */
+  built: ShowcasePreview | null;
+  /** Translated card text + live hero copy (falls back to source when unset). */
+  text?: GalleryText;
+}) {
   const meta = SURFACE_META[entry.surface];
   const Icon = meta.icon;
-
-  const built = useMemo(() => {
-    if (entry.surface === "social") {
-      const pb = getSocialPlaybook(entry.playbookId);
-      if (!pb) return null;
-      const kit = KIT_PROFILES_BY_ID[pb.kitProfileId];
-      const assets = buildCampaignAssets(
-        sourceFromSocialPlaybook(pb),
-        factsFromSocialPlaybook(pb),
-        { formatIds: kit?.formatIds ?? [], mode: "dark", brandId: pb.subBrand },
-      );
-      return {
-        name: pb.name,
-        accent: pb.accent,
-        chip: pb.chip,
-        brandId: pb.subBrand,
-        assets,
-        deliverables: pb.deliverables.length,
-        phases: pb.phases.length,
-        photo: Boolean(getPhotoSet(pb.subBrand)),
-      };
-    }
-    const pb = getPlaybook(entry.playbookId);
-    if (!pb) return null;
-    const brand = BRAND_MODES.find((b) => b.id === pb.subBrand) ?? BRAND_MODES[0];
-    const kit = KIT_PROFILES_BY_ID[pb.kitProfileId];
-    const assets = buildCampaignAssets(sourceFromVariant(pb.seedVariantId, brand), pb.facts, {
-      formatIds: kit?.formatIds ?? [],
-      mode: "dark",
-      brandId: brand.id,
-    });
-    return {
-      name: pb.name,
-      accent: pb.accent,
-      chip: pb.chip,
-      brandId: brand.id,
-      assets,
-      deliverables: pb.deliverables.length,
-      phases: pb.phases.length,
-      photo: Boolean(getPhotoSet(brand.id)),
-    };
-  }, [entry]);
 
   if (!built || built.assets.length === 0) return null;
 
   const hero = built.assets[0];
+  const heroCopy = (text?.heroCopy ?? hero.copy) as typeof hero.copy;
   const imageUrl = photoForFormat(built.brandId, hero.format);
 
   const href =
@@ -512,7 +634,7 @@ function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compac
                 format={hero.format}
                 brandId={hero.brandId}
                 mode={hero.mode}
-                copy={hero.copy}
+                copy={heroCopy}
                 imageUrl={imageUrl}
                 imageScrimPct={62}
                 displayShortEdge={displayShortEdge}
@@ -531,15 +653,17 @@ function ShowcaseCard({ entry, compact = false }: { entry: ShowcaseEntry; compac
           >
             <Icon size={12} />
           </span>
-          {meta.label} · {built.chip}
+          {text?.label ?? meta.label} · {text?.chip ?? built.chip}
         </div>
-        <div className="text-base font-semibold text-[#03002C] dark:text-white">{built.name}</div>
+        <div className="text-base font-semibold text-[#03002C] dark:text-white">
+          {text?.title ?? built.name}
+        </div>
         <p
           className={`text-xs leading-relaxed text-black/60 dark:text-white/60 ${
             compact ? "line-clamp-2" : ""
           }`}
         >
-          {entry.blurb}
+          {text?.blurb ?? entry.blurb}
         </p>
         <div
           className={`mt-auto flex flex-wrap items-center gap-1.5 text-[11px] text-black/55 dark:text-white/55 ${
