@@ -28,7 +28,7 @@ import {
 } from "@/lib/look-selection";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
 import { LookLookbook, type LookMeta } from "@/components/skins/SkinLookbook";
-import { ApprovedStyleSet, ApprovedStyleThumb } from "@/components/skins/ApprovedStyleThumb";
+import { ApprovedStyleThumb } from "@/components/skins/ApprovedStyleThumb";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
 import { BrandSystemThumb } from "@/components/slide/StylePackThumb";
 import {
