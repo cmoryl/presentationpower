@@ -3,7 +3,7 @@
 // inspector panel. Rendered ABOVE LiveEditOverlay's text-editing overlays,
 // but stops propagation on its own controls so text editing still works.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Trash2, Replace, X } from "lucide-react";
+import { Trash2, Replace, X, PencilLine } from "lucide-react";
 import { isExportingChrome } from "@/lib/export-chrome-suppress";
 
 export type SectionAction = "delete" | "replace";
@@ -22,11 +22,14 @@ type Props = {
   onDelete: (sectionKey: string) => void;
   /** Called when the user hits replace on a section. */
   onReplace?: (sectionKey: string) => void;
+  /** Called when the user hits edit on a stacked module (module:<id>) — the
+   *  route deep-links to that module's inline editor. */
+  onEditModule?: (sectionKey: string) => void;
   /** Optional dependency list — re-scan when any of these change. */
   scanKey?: unknown;
 };
 
-export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, scanKey }: Props) {
+export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, onEditModule, scanKey }: Props) {
   const [sections, setSections] = useState<Section[]>([]);
   const [hoverKey, setHoverKey] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
@@ -143,6 +146,17 @@ export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, scanKey }
           <span className="px-2 text-[10px] font-semibold uppercase tracking-widest text-black/60 dark:text-white/60">
             {active.label}
           </span>
+          {onEditModule && active.key.startsWith("module:") && (
+            <button
+              type="button"
+              className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+              onClick={() => {
+                onEditModule(active.key);
+              }}
+            >
+              <PencilLine size={12} /> Edit
+            </button>
+          )}
           {onReplace && (
             <button
               type="button"
