@@ -17,7 +17,20 @@ export function AgentOutlinePreview({
 }) {
   const [notes, setNotes] = useState("");
   const [editing, setEditing] = useState(false);
+  const [appearance, setAppearance] = useState<"light" | "dark" | "mixed">("mixed");
   const slides = Array.isArray(outline.slides) ? outline.slides : [];
+
+  const APPEARANCES = [
+    { id: "light" as const, label: "Light", hint: "Enterprise Light throughout" },
+    { id: "dark" as const, label: "Dark", hint: "Enterprise Dark throughout" },
+    { id: "mixed" as const, label: "Mixed", hint: "Dark cover + close, light body" },
+  ];
+  const appearanceLine =
+    appearance === "mixed"
+      ? " with a mixed appearance — dark cover and closing slide, light working slides between"
+      : appearance === "dark"
+        ? " with a dark appearance (Enterprise Dark) across the whole deck"
+        : " with a light appearance (Enterprise Light) across the whole deck";
 
   return (
     <div className="not-prose w-full overflow-hidden rounded-2xl border border-[#003FC7]/25 bg-[#E0E8F5]/40">
