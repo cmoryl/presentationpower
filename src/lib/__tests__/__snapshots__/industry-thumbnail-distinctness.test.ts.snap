@@ -676,7 +676,7 @@ exports[`R01–R30 thumbnail visual regression > locks a fingerprint snapshot fo
   },
   "R22/content": {
     "gradients": 1,
-    "hash": "8d907df8",
+    "hash": "8a5db871",
     "hues": 0,
     "plates": 1,
     "shapes": 0,
@@ -684,7 +684,7 @@ exports[`R01–R30 thumbnail visual regression > locks a fingerprint snapshot fo
   },
   "R22/data": {
     "gradients": 1,
-    "hash": "57d5c8c1",
+    "hash": "47b6cc28",
     "hues": 0,
     "plates": 1,
     "shapes": 0,
@@ -692,7 +692,7 @@ exports[`R01–R30 thumbnail visual regression > locks a fingerprint snapshot fo
   },
   "R22/flow": {
     "gradients": 1,
-    "hash": "57d5c8c1",
+    "hash": "47b6cc28",
     "hues": 0,
     "plates": 1,
     "shapes": 0,
@@ -700,7 +700,7 @@ exports[`R01–R30 thumbnail visual regression > locks a fingerprint snapshot fo
   },
   "R22/hero": {
     "gradients": 1,
-    "hash": "4eb6cf1e",
+    "hash": "9e515296",
     "hues": 0,
     "plates": 1,
     "shapes": 0,
