@@ -119,6 +119,20 @@ export function RelatedModulesPanel({
         </select>
       </div>
 
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-[10px] uppercase tracking-widest text-black/40">Sort</span>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as "fit" | "name" | "family")}
+          aria-label="Sort modules"
+          className="rounded-lg border border-black/15 bg-white px-2 py-1 text-xs text-black/70 focus:border-black/40 focus:outline-none"
+        >
+          <option value="fit">Best fit</option>
+          <option value="name">Name A–Z</option>
+          <option value="family">Category</option>
+        </select>
+      </div>
+
       <ul className="max-h-[320px] space-y-1.5 overflow-y-auto">
         {results.map((rv) => {
           const fam = byId(MODULE_FAMILIES, rv.familyId);
