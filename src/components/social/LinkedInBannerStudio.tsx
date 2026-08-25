@@ -4,6 +4,7 @@
 
 import { useMemo, useState } from "react";
 import { Download, RefreshCw, Sparkles, Check } from "lucide-react";
+import { toast } from "sonner";
 import {
   APPROVED_BANNERS,
   BANNER_FAMILIES,
@@ -128,6 +129,7 @@ export function LinkedInBannerStudio() {
   };
 
   const download = async (rec: BannerRecipe, scale = 1) => {
+    const t = toast.loading(`Rendering ${surface.platform} banner PNG…`);
     setBusy(true);
     try {
       const blob = await exportBannerPng(rec, copy, scale, surface);
@@ -137,18 +139,31 @@ export function LinkedInBannerStudio() {
           scale > 1 ? `@${scale}x` : ""
         }.png`,
       );
+      toast.success("Banner PNG saved to your downloads", { id: t });
+    } catch (err) {
+      toast.error("Banner export failed", {
+        id: t,
+        description: err instanceof Error ? err.message : String(err),
+      });
     } finally {
       setBusy(false);
     }
   };
 
   const downloadAllSurfaces = async (rec: BannerRecipe) => {
+    const t = toast.loading(`Rendering ${BANNER_SURFACES.length} banner PNGs…`);
     setBusy(true);
     try {
       for (const s of BANNER_SURFACES) {
         const blob = await exportBannerPng(rec, copy, 1, s);
         downloadBlob(blob, `transperfect-${s.platform}-${s.width}x${s.height}-${rec.id}.png`);
       }
+      toast.success(`${BANNER_SURFACES.length} banner PNGs saved to your downloads`, { id: t });
+    } catch (err) {
+      toast.error("Banner export failed", {
+        id: t,
+        description: err instanceof Error ? err.message : String(err),
+      });
     } finally {
       setBusy(false);
     }
