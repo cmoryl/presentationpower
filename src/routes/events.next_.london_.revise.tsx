@@ -535,6 +535,36 @@ function LondonRevisePage() {
     });
   };
 
+  if (userId === null) {
+    return (
+      <AppShell>
+        <div className="mx-auto max-w-xl px-5 py-24 text-center">
+          <h1 className="text-2xl font-bold tracking-tight text-[#03002C]">
+            Sign in to revise the London kit
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-[#03002C]/70">
+            The scenic panel kit is public — anyone can view and download the artwork — but
+            changing venue specifications and publishing revisions requires an account.
+          </p>
+          <div className="mt-7 flex justify-center gap-3">
+            <Link
+              to="/events/next/london"
+              className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to the panel kit
+            </Link>
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-[#03002C]/5"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
