@@ -82,15 +82,35 @@ function blockOf(runs: TextRun[], wrap: boolean): MergedTextBlock {
  * gap no wider than a space, are one line with mixed styling.
  */
 function sameLine(a: TextRun, b: TextRun): boolean {
-  if (!a.singleLine || !b.singleLine) return false;
-  if (a.align !== b.align || a.valign !== b.valign) return false;
+  if (!b.singleLine) return false;
+  if (a.align !== b.align) return false;
   const sizeRatio =
     Math.max(a.fontSizePx, b.fontSizePx) / Math.max(1, Math.min(a.fontSizePx, b.fontSizePx));
   if (sizeRatio > 1.35) return false;
-  if (vOverlapRatio(a, b) < 0.6) return false;
-  const gap = b.x - right(a);
   const em = Math.max(a.fontSizePx, b.fontSizePx);
-  return gap <= em * 0.75 && gap >= -em * 0.35;
+
+  if (a.singleLine) {
+    if (a.valign !== b.valign) return false;
+    if (vOverlapRatio(a, b) < 0.6) return false;
+    const gap = b.x - right(a);
+    return gap <= em * 0.75 && gap >= -em * 0.35;
+  }
+
+  // `a` is a wrapped paragraph whose lines were baked off the settled DOM. A
+  // styled single-line fragment (an italic tail word, a coloured span — e.g.
+  // the italic "Performance" closing a headline) that sits on the paragraph's
+  // LAST measured line belongs to that line. Folding it in keeps the exporter
+  // from floating it as a separate box, which font-metric drift in PowerPoint
+  // then collides with the baked line it sits on (the classic
+  // "tail word overlaps the line above" defect).
+  const line = a.lines?.length ? a.lines[a.lines.length - 1]! : null;
+  if (!line) return false;
+  const vTop = Math.max(b.y, line.y);
+  const vBot = Math.min(b.y + b.h, line.y + line.h);
+  const span = Math.min(b.h, line.h);
+  if (span <= 0 || (vBot - vTop) / span < 0.5) return false;
+  const gap = b.x - (line.x + line.w);
+  return gap <= em * 0.75 && gap >= -em * 0.6;
 }
 
 /**

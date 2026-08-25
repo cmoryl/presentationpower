@@ -1849,6 +1849,107 @@ function DeckEditor() {
                         storageKey="deck-inspector-tab"
                         onCollapse={() => setRailTab(null)}
                       >
+                        {active && mv && (
+                          <InspectorSection id="swap" label="Swap">
+                            <Panel label="Current module">
+                              <div className="font-mono text-xs text-black/50">{mv.id}</div>
+                              <div className="mt-1 font-medium">{mv.name}</div>
+                              <div className="mt-2 text-sm text-black/60">{mv.description}</div>
+                              <div className="mt-4 space-y-2">
+                                <div className="text-xs uppercase tracking-widest text-black/50">
+                                  Swap layout
+                                </div>
+                                <SwapLayoutButton
+                                  slide={active}
+                                  brand={brand}
+                                  onSwap={(vid) => swapVariantWithRefit(active.id, vid)}
+                                  clientLogoUrl={clientLogoUrl}
+                                  clientName={brief?.prospect}
+                                  subCompany={deck?.subCompany}
+                                />
+                                <details className="text-[11px] text-black/50">
+                                  <summary className="cursor-pointer hover:text-black/70">
+                                    Quick select…
+                                  </summary>
+                                  <select
+                                    aria-label="Option"
+                                    className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
+                                    value={mv.id}
+                                    onChange={(e) =>
+                                      swapVariantWithRefit(
+                                        active.id,
+                                        e.target.value,
+                                        "quick-select",
+                                      )
+                                    }
+                                  >
+                                    <optgroup label="This section">
+                                      {variantsForSection(active.sectionId).map((v) => (
+                                        <option key={v.id} value={v.id}>
+                                          {v.name}
+                                        </option>
+                                      ))}
+                                    </optgroup>
+                                    <optgroup
+                                      label={`All other modules (${
+                                        MODULE_VARIANTS.length -
+                                        variantsForSection(active.sectionId).length
+                                      })`}
+                                    >
+                                      {MODULE_VARIANTS.filter(
+                                        (v) =>
+                                          !variantsForSection(active.sectionId).some(
+                                            (sv) => sv.id === v.id,
+                                          ),
+                                      ).map((v) => (
+                                        <option key={v.id} value={v.id}>
+                                          {v.name}
+                                        </option>
+                                      ))}
+                                    </optgroup>
+                                  </select>
+                                </details>
+                                <SlideRefitButton deckId={deck.id} slide={active} />
+                                <p className="text-[11px] leading-snug text-black/45">
+                                  Re-authors this slide&rsquo;s existing copy and speaker notes
+                                  into the current layout&rsquo;s fields. Never invents new facts.
+                                </p>
+                              </div>
+                            </Panel>
+                            <Panel label="Related modules">
+                              <div className="mb-2 text-xs text-black/50">
+                                Same family — ranked by shared layouts, section fit, and fallback
+                                links.
+                              </div>
+                              <ul className="space-y-1.5">
+                                {relatedVariants(mv.id, active.sectionId, 5).map((rv) => (
+                                  <li
+                                    key={rv.id}
+                                    className="flex items-center justify-between gap-2 text-sm"
+                                  >
+                                    <span className="min-w-0 truncate">{rv.name}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        swapVariantWithRefit(active.id, rv.id, "related")
+                                      }
+                                      className="shrink-0 rounded-full border border-black/15 px-2 py-0.5 text-[10px] uppercase tracking-widest text-black/60 hover:border-black/40 hover:text-black"
+                                      title={`Swap to ${rv.id}`}
+                                    >
+                                      Swap
+                                    </button>
+                                  </li>
+                                ))}
+                                {relatedVariants(mv.id, active.sectionId, 1).length === 0 && (
+                                  <li className="text-sm text-black/50">
+                                    No sibling variants in this family.
+                                  </li>
+                                )}
+                              </ul>
+                            </Panel>
+                          </InspectorSection>
+                        )}
+
                         {qa.length > 0 && (
                           <InspectorSection
                             id="qa"
@@ -1949,68 +2050,10 @@ function DeckEditor() {
                               <div className="font-mono text-xs text-black/50">{mv.id}</div>
                               <div className="mt-1 font-medium">{mv.name}</div>
                               <div className="mt-2 text-sm text-black/60">{mv.description}</div>
-                              {active && (
-                                <div className="mt-4 space-y-2">
-                                  <div className="text-xs uppercase tracking-widest text-black/50">
-                                    Swap layout
-                                  </div>
-                                  <SwapLayoutButton
-                                    slide={active}
-                                    brand={brand}
-                                    onSwap={(vid) => swapVariantWithRefit(active.id, vid)}
-                                    clientLogoUrl={clientLogoUrl}
-                                    clientName={brief?.prospect}
-                                    subCompany={deck?.subCompany}
-                                  />
-                                  <details className="text-[11px] text-black/50">
-                                    <summary className="cursor-pointer hover:text-black/70">
-                                      Quick select…
-                                    </summary>
-                                    <select
-                                      aria-label="Option"
-                                      className="mt-1.5 w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm"
-                                      value={mv.id}
-                                      onChange={(e) =>
-                                        swapVariantWithRefit(
-                                          active.id,
-                                          e.target.value,
-                                          "quick-select",
-                                        )
-                                      }
-                                    >
-                                      <optgroup label="This section">
-                                        {variantsForSection(active.sectionId).map((v) => (
-                                          <option key={v.id} value={v.id}>
-                                            {v.name}
-                                          </option>
-                                        ))}
-                                      </optgroup>
-                                      <optgroup
-                                        label={`All other modules (${
-                                          MODULE_VARIANTS.length -
-                                          variantsForSection(active.sectionId).length
-                                        })`}
-                                      >
-                                        {MODULE_VARIANTS.filter(
-                                          (v) =>
-                                            !variantsForSection(active.sectionId).some(
-                                              (sv) => sv.id === v.id,
-                                            ),
-                                        ).map((v) => (
-                                          <option key={v.id} value={v.id}>
-                                            {v.name}
-                                          </option>
-                                        ))}
-                                      </optgroup>
-                                    </select>
-                                  </details>
-                                  <SlideRefitButton deckId={deck.id} slide={active} />
-                                  <p className="text-[11px] leading-snug text-black/45">
-                                    Re-authors this slide&rsquo;s existing copy and speaker notes
-                                    into the current layout&rsquo;s fields. Never invents new facts.
-                                  </p>
-                                </div>
-                              )}
+                              <p className="mt-2 text-[11px] leading-snug text-black/45">
+                                Swaps live in the dedicated <span className="font-semibold">Swap</span>{" "}
+                                tab at the top of this panel.
+                              </p>
                             </Panel>
                           )}
                           {active && mv && (

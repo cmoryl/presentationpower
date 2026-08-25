@@ -50,31 +50,33 @@ function runProps(run: TextRun) {
  * paragraph with its own font metrics (the single biggest visual difference
  * between the on-screen slide and the exported one).
  */
-function bakedLineParts(run: TextRun, props: NonNullable<ReturnType<typeof runProps>>) {
-  const lines = run.lines ?? [];
-  return lines
-    .map((l) => l.text.trim())
-    .filter(Boolean)
-    .map((text, i) => ({
-      text,
-      options: { ...props.options, breakLine: i < lines.length - 1 },
-    }));
-}
-
-/** Union rect of the measured lines, with tracking slack on the wide edge. */
-function bakedGeometry(run: TextRun, align: "left" | "center" | "right") {
+/** Union rect of the measured lines (plus any folded-in styled fragments),
+ *  with tracking slack on the wide edge. */
+function bakedGeometry(
+  run: TextRun,
+  align: "left" | "center" | "right",
+  extras: { x: number; y: number; w: number; h: number; chars: number; lineIdx: number }[] = [],
+) {
   const lines = run.lines!;
-  const left = Math.min(...lines.map((l) => l.x));
-  const top = Math.min(...lines.map((l) => l.y));
-  const measured = Math.max(...lines.map((l) => l.x + l.w)) - left;
-  const tall = Math.max(...lines.map((l) => l.y + l.h)) - top;
+  const rects: { x: number; y: number; w: number; h: number }[] = [...lines, ...extras];
+  const left = Math.min(...rects.map((l) => l.x));
+  const top = Math.min(...rects.map((l) => l.y));
+  const measured = Math.max(...rects.map((l) => l.x + l.w)) - left;
+  const tall = Math.max(...rects.map((l) => l.y + l.h)) - top;
   // `wrap="none"` means PowerPoint never re-breaks, but a metric difference can
   // still make a line marginally wider than the DOM measured it; the slack keeps
   // that from clipping, and centred / right copy shifts to stay anchored.
   // Tracking is applied after EVERY character in PowerPoint, so the allowance has
   // to scale with the longest baked line, not with a fixed couple of characters —
   // otherwise letter-spaced eyebrows and footers clip ("CONFIDENTIAL · INTERN…").
-  const longest = Math.max(...lines.map((l) => l.text.trim().length), 1);
+  const longest = Math.max(
+    ...lines.map(
+      (l, li) =>
+        l.text.trim().length +
+        extras.filter((e) => e.lineIdx === li).reduce((n, e) => n + e.chars + 1, 0),
+    ),
+    1,
+  );
   const track = Math.max(0, run.letterSpacingPx) * (longest + 1);
   // Width FLOOR from the estimated tracked advance of the longest baked line: a
   // nowrap DOM line can be wider than the box that measured it, so the union rect
@@ -130,11 +132,66 @@ export function placeTextRuns(
     if (!parts.length) return;
 
     // BAKED path — one measured line per run, no wrapping, measured pitch.
-    if (block.runs.length === 1 && (lead.lines?.length ?? 0) > 1) {
-      const lineParts = bakedLineParts(lead, parts[0]!);
-      if (lineParts.length > 1) {
+    // Styled single-line fragments folded onto a measured line (an italic tail
+    // word, a coloured span) are emitted as sibling runs INSIDE that line's
+    // paragraph, so they keep their own style yet can never float as a separate
+    // box and collide with the baked line when PowerPoint's font metrics drift.
+    if (
+      (lead.lines?.length ?? 0) > 1 &&
+      block.runs.every((r, ri) => ri === 0 || r.singleLine)
+    ) {
+      const lines = lead.lines!;
+      const frags = block.runs.slice(1);
+      const fragParts = frags.map((f) => runProps(f));
+      if (fragParts.every(Boolean)) {
+        type BakedPart = { text: string; options: Record<string, unknown> };
+        const lineParts: BakedPart[] = [];
+        const extras: { x: number; y: number; w: number; h: number; chars: number; lineIdx: number }[] = [];
+        const fragUsed = new Set<number>();
+        lines.forEach((line, li) => {
+          const leadOpts = { ...parts[0]!.options } as Record<string, unknown>;
+          lineParts.push({ text: line.text.trim(), options: leadOpts });
+          frags.forEach((f, fi) => {
+            if (fragUsed.has(fi)) return;
+            const mid = f.y + f.h / 2;
+            if (mid < line.y - line.h * 0.5 || mid > line.y + line.h * 1.5) return;
+            const p = fragParts[fi]!;
+            const em = Math.max(lead.fontSizePx, f.fontSizePx);
+            const gap = f.x - (line.x + line.w);
+            const spacer = /\s$/.test(line.text) || /^\s/.test(f.text) ? "" : gap > em * 0.06 ? " " : "";
+            lineParts.push({
+              text: `${spacer}${p.text.trim()}`,
+              options: { ...p.options } as Record<string, unknown>,
+            });
+            extras.push({ x: f.x, y: f.y, w: f.w, h: f.h, chars: p.text.trim().length + (spacer ? 1 : 0), lineIdx: li });
+            fragUsed.add(fi);
+          });
+          lineParts[lineParts.length - 1]!.options.breakLine = li < lines.length - 1;
+        });
+        // A fragment that matched no line (geometry drift at capture) must not
+        // be dropped: append it to the nearest line.
+        frags.forEach((f, fi) => {
+          if (fragUsed.has(fi)) return;
+          const p = fragParts[fi]!;
+          const mid = f.y + f.h / 2;
+          let best = 0;
+          let bestD = Infinity;
+          lines.forEach((line, li) => {
+            const d = Math.abs(mid - (line.y + line.h / 2));
+            if (d < bestD) {
+              bestD = d;
+              best = li;
+            }
+          });
+          lineParts.push({
+            text: ` ${p.text.trim()}`,
+            options: { ...p.options } as Record<string, unknown>,
+          });
+          extras.push({ x: f.x, y: f.y, w: f.w, h: f.h, chars: p.text.trim().length + 1, lineIdx: best });
+        });
+
         slide.addText(lineParts, {
-          ...bakedGeometry(lead, base.align),
+          ...bakedGeometry(lead, base.align, extras),
           align: base.align,
           valign: "top",
           lineSpacing: lead.linePitchPx
@@ -146,7 +203,7 @@ export function placeTextRuns(
           // untracked width by some renderers and the tail of every line is clipped.
           // The geometry above carries the full tracking allowance, so the baked
           // breaks still survive.
-          wrap: lead.letterSpacingPx > 0,
+          wrap: block.runs.some((r) => r.letterSpacingPx > 0),
           shrinkText: false,
           isTextBox: true,
           objectName: `${opts?.objectNamePrefix ?? "TP Text"} ${i + 1}`,
