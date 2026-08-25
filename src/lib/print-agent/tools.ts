@@ -38,6 +38,8 @@ export const PRINT_LOOK_TOOL_NAME = "propose_look_and_feel";
 export const PRINT_MODULES_TOOL_NAME = "list_module_variations";
 /** Renders a live, to-scale preview of the piece inside the chat. */
 export const PRINT_PREVIEW_TOOL_NAME = "preview_print_asset";
+/** Offers print-ready downloads (PDF + PNG + SVG) for one page in the chat. */
+export const PRINT_EXPORT_TOOL_NAME = "export_print_page";
 
 const KindEnum = z.enum([
   "case-study",
