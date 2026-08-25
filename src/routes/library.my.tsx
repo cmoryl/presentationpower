@@ -244,8 +244,14 @@ function SavedModuleCard({
     : null;
 
   return (
-    <div className="glass rounded-2xl border border-black/10 bg-white">
-      <div className="relative aspect-[16/9] overflow-hidden rounded-t-2xl bg-[#0a0a1a]">
+    <div className="glass group rounded-2xl border border-black/10 bg-white transition hover:border-[#003FC7]/40 hover:shadow-lg">
+      <Link
+        to="/library/my/$moduleId"
+        params={{ moduleId: row.id }}
+        aria-label={`Edit ${row.title}`}
+        title="Click to edit this module"
+        className="relative block aspect-[16/9] overflow-hidden rounded-t-2xl bg-[#0a0a1a]"
+      >
         <LazyMount placeholder={<div className="h-full w-full bg-[#0a0a1a]" />}>
           <SlideBackdropContext.Provider value={backdrop}>
             <ScaledSlide>
@@ -283,7 +289,10 @@ function SavedModuleCard({
             </span>
           )}
         </div>
-      </div>
+        <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#003FC7] opacity-0 transition group-hover:opacity-100">
+          Click to edit
+        </span>
+      </Link>
 
       <div className="px-4 pb-4 pt-3">
         <div className="flex items-start justify-between gap-2">
