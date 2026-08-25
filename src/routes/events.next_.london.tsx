@@ -166,6 +166,7 @@ function LondonSignagePage() {
   }, []);
 
   useEffect(() => {
+    if (!userId) return;
     let live = true;
     fetchRevisions({})
       .then((res) => {
@@ -179,7 +180,7 @@ function LondonSignagePage() {
     return () => {
       live = false;
     };
-  }, [fetchRevisions]);
+  }, [fetchRevisions, userId]);
 
   useEffect(() => {
     if (openPanel) setPpi(recommendedPpi(openPanel));

@@ -19,7 +19,7 @@ import { ToastAssertiveLiveRegion, installToastA11y } from "@/lib/toast-a11y";
 import { UxDebugDock } from "@/components/debug/UxDebugDock";
 import { BackToTop } from "@/components/BackToTop";
 import { supabase } from "@/integrations/supabase/client";
-import { LOGIN_PATH, loginUrl } from "@/lib/sign-out";
+import { LOGIN_PATH, isPublicNoLoginPath, loginUrl } from "@/lib/sign-out";
 
 function NotFoundComponent() {
   return (
@@ -199,7 +199,11 @@ function RootComponent() {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       if (event === "SIGNED_OUT") {
         queryClient.clear();
-        if (typeof window !== "undefined" && !window.location.pathname.startsWith(LOGIN_PATH)) {
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.startsWith(LOGIN_PATH) &&
+          !isPublicNoLoginPath(window.location.pathname)
+        ) {
           window.location.replace(loginUrl({ expired: true }));
         }
         return;
