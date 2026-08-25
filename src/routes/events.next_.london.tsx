@@ -420,7 +420,7 @@ function LondonSignagePage() {
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {Object.entries(LONDON_STYLES)
-              .filter(([id]) => LONDON_PANELS.some((p) => p.style === id))
+              .filter(([id]) => panels.some((p) => p.style === id))
               .map(([id, style]) => (
                 <article key={id} className="overflow-hidden rounded-xl border border-black/10 bg-white">
                   <div
@@ -436,7 +436,7 @@ function LondonSignagePage() {
                       {style.note}
                     </p>
                     <p className="mt-2 font-mono text-[11px] text-[#03002C]/55">
-                      {LONDON_PANELS.filter((p) => p.style === id).length} panels
+                      {panels.filter((p) => p.style === id).length} panels
                     </p>
                   </div>
                 </article>
