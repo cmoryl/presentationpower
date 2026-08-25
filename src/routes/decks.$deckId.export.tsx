@@ -426,8 +426,8 @@ function ExportView() {
           <div className="no-print mx-auto mb-4 max-w-[1200px] px-6">
             <AuthoringNav deckId={deckId} active="export" />
           </div>
-          <div className="no-print mx-auto mb-8 flex max-w-[1200px] items-center justify-between gap-6 px-6">
-            <div>
+          <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
+            <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
               <Link
                 to="/decks/$deckId"
                 params={{ deckId }}
@@ -435,76 +435,97 @@ function ExportView() {
               >
                 ← Back to editor
               </Link>
-              <h1 className="mt-2 text-2xl font-semibold">Export · {deck.title}</h1>
-              <p className="mt-1 text-sm text-black/60">
-                Download a native PowerPoint file, or use your browser's print dialog to save as
-                PDF.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handlePptx}
-                disabled={exporting || preflightBusy}
-                title={blocked ? "Resolve blocking QA issues first, or override" : ""}
-                className="rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {exporting ? "Preparing…" : preflightBusy ? "Checking…" : "Download .pptx"}
-              </button>
-              <Link
-                to="/decks/$deckId/document"
-                params={{ deckId }}
-                className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30"
-              >
-                As document…
-              </Link>
-              <button
-                onClick={() => {
-                  if (blocked) {
-                    explainBlocked("Print / PDF", () => notifyPrintToPdf("deck"));
-                    return;
-                  }
-                  notifyPrintToPdf("deck");
-                }}
-                className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Print / Save PDF
-              </button>
-              {glShareConfigured ? (
-                <button
-                  onClick={() => {
-                    if (blocked) {
-                      explainBlocked("GlobalLink upload", () => void handleShareViaGlobalLink());
-                      return;
-                    }
-                    void handleShareViaGlobalLink();
-                  }}
-                  disabled={glShareBusy}
-                  title={
-                    blocked
-                      ? "Resolve blocking QA issues first"
-                      : "Upload the .pptx directly to GlobalLink Share"
-                  }
-                  className="rounded-full bg-[#E11D48] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#be1740] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {glShareBusy ? "Uploading…" : "Share via GlobalLink"}
-                </button>
-              ) : (
-                <button
-                  onClick={openShareHandoff}
-                  title="Direct upload available once GlobalLink Share API credentials are added in Settings → Secrets."
-                  className="rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black hover:border-black/30"
-                >
-                  Send via GlobalLink Share ↗
-                </button>
-              )}
-            </div>
-          </div>
+              <div className="mt-3 flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
+                <div className="min-w-0">
+                  <h1 className="text-2xl font-semibold tracking-tight">
+                    Export <span className="text-black/40">·</span> {deck.title}
+                  </h1>
+                  <p className="mt-1 max-w-md text-sm text-black/60">
+                    Download a native PowerPoint file, or use your browser's print dialog to save
+                    as PDF.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={handlePptx}
+                    disabled={exporting || preflightBusy}
+                    title={blocked ? "Resolve blocking QA issues first, or override" : ""}
+                    className="inline-flex items-center gap-2 rounded-full bg-[#0B2A4A] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#0B2A4A]/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {exporting || preflightBusy ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Download size={14} />
+                    )}
+                    {exporting ? "Preparing…" : preflightBusy ? "Checking…" : "Download .pptx"}
+                  </button>
+                  <Link
+                    to="/decks/$deckId/document"
+                    params={{ deckId }}
+                    className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:border-black/30"
+                  >
+                    <FileText size={14} className="text-black/50" /> As document…
+                  </Link>
+                  <button
+                    onClick={() => {
+                      if (blocked) {
+                        explainBlocked("Print / PDF", () => notifyPrintToPdf("deck"));
+                        return;
+                      }
+                      notifyPrintToPdf("deck");
+                    }}
+                    className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:border-black/30 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Printer size={14} className="text-black/50" /> Print / Save PDF
+                  </button>
+                  {glShareConfigured ? (
+                    <button
+                      onClick={() => {
+                        if (blocked) {
+                          explainBlocked("GlobalLink upload", () => void handleShareViaGlobalLink());
+                          return;
+                        }
+                        void handleShareViaGlobalLink();
+                      }}
+                      disabled={glShareBusy}
+                      title={
+                        blocked
+                          ? "Resolve blocking QA issues first"
+                          : "Upload the .pptx directly to GlobalLink Share"
+                      }
+                      className="inline-flex items-center gap-2 rounded-full bg-[#E11D48] px-5 py-2.5 text-sm font-medium text-white hover:bg-[#be1740] disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {glShareBusy ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Share2 size={14} />
+                      )}
+                      {glShareBusy ? "Uploading…" : "Share via GlobalLink"}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={openShareHandoff}
+                      title="Direct upload available once GlobalLink Share API credentials are added in Settings → Secrets."
+                      className="inline-flex items-center gap-2 rounded-full border border-black/15 bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:border-black/30"
+                    >
+                      <Share2 size={14} className="text-black/50" /> Send via GlobalLink Share ↗
+                    </button>
+                  )}
+                </div>
+              </div>
 
-          {/* Image compatibility option — applies to the next export. */}
-          <div className="no-print mx-auto mb-6 max-w-[1200px] px-6">
-            <ExportLegacyImagesToggle value={legacyImages} onChange={setLegacyImages} />
-            {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
-            <ExportAlphaImagesToggle value={alphaImages} onChange={setAlphaImages} />
+              {/* Image compatibility options — apply to the next export. */}
+              <div className="mt-5 border-t border-black/[0.06] pt-4">
+                <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-black/45">
+                  Image format options
+                </div>
+                <div className="grid gap-x-10 gap-y-1 sm:grid-cols-2">
+                  <ExportLegacyImagesToggle value={legacyImages} onChange={setLegacyImages} />
+                  {/* Alpha-aware encoding: transparency → PNG, opaque → JPEG. */}
+                  <ExportAlphaImagesToggle value={alphaImages} onChange={setAlphaImages} />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* GlobalLink Share result / handoff note */}
