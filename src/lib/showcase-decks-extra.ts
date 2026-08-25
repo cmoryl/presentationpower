@@ -238,7 +238,7 @@ function buildLegalEdiscovery(): TemplatePayload {
     brandModeId: "bm-tp-legal",
     archetypeId: "arch-problem-solution",
     context: {
-      // Deck default look — division accent comes from the brand mode only.
+      // Deck default look — division changes lockup/copy only, never palette.
       stylePackId: null,
       designRecipeId: null,
       defaultTransition: { type: "fade", durationMs: 480 },
@@ -423,7 +423,7 @@ function buildGamingLaunch(): TemplatePayload {
     brandModeId: "bm-tp-games",
     archetypeId: "arch-problem-solution",
     context: {
-      // Deck default look — division accent comes from the brand mode only.
+      // Deck default look — division changes lockup/copy only, never palette.
       stylePackId: null,
       designRecipeId: null,
       defaultTransition: { type: "push-left", durationMs: 420 },
@@ -631,7 +631,7 @@ function buildDigitalGrowth(): TemplatePayload {
     brandModeId: "bm-tp-digital",
     archetypeId: "arch-problem-solution",
     context: {
-      // Deck default look — division accent comes from the brand mode only.
+      // Deck default look — division changes lockup/copy only, never palette.
       stylePackId: null,
       designRecipeId: null,
       defaultTransition: { type: "fade", durationMs: 400 },

@@ -434,7 +434,7 @@ function buildLifeSciencesProgram(): TemplatePayload {
     brandModeId: "bm-tp-lifesci",
     archetypeId: "arch-problem-solution",
     context: {
-      // Deck default look — division accent comes from the brand mode only.
+      // Deck default look — division changes lockup/copy only, never palette.
       stylePackId: null,
       designRecipeId: null,
       defaultTransition: { type: "fade", durationMs: 560 },

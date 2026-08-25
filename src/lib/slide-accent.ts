@@ -6,6 +6,7 @@
 // resolve it the same way, so the logic lives here and nowhere else.
 
 import type { BrandMode } from "@/lib/taxonomy";
+import { isTransPerfectBrandScope } from "@/lib/brand-profiles";
 
 export const ACCENT_HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
@@ -18,12 +19,32 @@ export function readAccentOverride(content: unknown): string | undefined {
   return ACCENT_HEX_RE.test(v) ? v : undefined;
 }
 
+function hasAuthorizedAccentOverride(content: unknown): boolean {
+  if (!content || typeof content !== "object") return false;
+  const record = content as Record<string, unknown>;
+  return (
+    record.authorizedAccentOverride === true ||
+    record.brandColorOverrideAuthorized === true ||
+    record.allowAccentOverride === true
+  );
+}
+
+function readRenderableAccentOverride(
+  content: unknown,
+  brand: Pick<BrandMode, "id">,
+): string | undefined {
+  const override = readAccentOverride(content);
+  if (!override) return undefined;
+  if (!isTransPerfectBrandScope(brand.id)) return override;
+  return hasAuthorizedAccentOverride(content) ? override : undefined;
+}
+
 /** Resolved accent for a slide: validated override → deck brand accent. */
 export function resolveSlideAccent(
   slide: { content?: unknown } | null | undefined,
-  brand: Pick<BrandMode, "tokens">,
+  brand: Pick<BrandMode, "id" | "tokens">,
 ): string {
-  return readAccentOverride(slide?.content) ?? brand.tokens.accent;
+  return readRenderableAccentOverride(slide?.content, brand) ?? brand.tokens.accent;
 }
 
 /** Brand mode with the slide's resolved accent swapped in (identity if none). */
@@ -31,7 +52,7 @@ export function applySlideAccent<T extends BrandMode>(
   slide: { content?: unknown } | null | undefined,
   brand: T,
 ): T {
-  const override = readAccentOverride(slide?.content);
+  const override = readRenderableAccentOverride(slide?.content, brand);
   if (!override) return brand;
   return { ...brand, tokens: { ...brand.tokens, accent: override } };
 }

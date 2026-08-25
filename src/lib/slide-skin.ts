@@ -89,11 +89,9 @@ export function enterprisePalette(mode: "light" | "dark") {
 }
 
 /**
- * Re-tokens a brand for the Enterprise skin. The division's own accent
- * is preserved (so Legal gold / Media magenta still signs the page) but the
- * page field, ink and primary snap to the master enterprise values so every
- * variant reads as one template. In dark mode the navy floor + white ink are
- * used instead of the white page.
+ * Re-tokens a brand for the Enterprise skin. Division scope changes only the
+ * lockup/copy; the palette and background grammar stay on the approved
+ * Enterprise light/dark template for every TransPerfect division.
  */
 export function enterpriseWhiteBrand(
   brand: BrandMode,
@@ -105,7 +103,7 @@ export function enterpriseWhiteBrand(
     tokens: {
       ...brand.tokens,
       primary: p.primary,
-      accent: brand.tokens.accent || p.accent,
+      accent: p.accent,
       surface: p.surface,
       ink: p.ink,
     },

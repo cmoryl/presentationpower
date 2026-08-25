@@ -3,13 +3,11 @@
 //
 // The /demo/deck/$demoId pages ship one authored narrative per demo. A user
 // pitching from Legal, Media or Element needs the *same* deck — same slides,
-// same numbers, same story beats — wearing another division's brand mode,
-// style pack and generated imagery.
+// same numbers, same story beats — with another division's lockup/copy only.
 //
 // `retargetPayload()` is a pure transform over a TemplatePayload: it swaps the
-// brand mode + style pack, rewrites the division name wherever the authored
-// copy names it, and re-seeds every `mediaSeed` so the background/imagery
-// engine renders division-specific art instead of reusing the source plates.
+// brand mode, rewrites the division name wherever the authored copy names it,
+// and keeps the approved Enterprise palette/background system intact.
 // ---------------------------------------------------------------------------
 
 import type { TemplatePayload } from "./deck-store";
@@ -184,8 +182,8 @@ export function retargetPayload(payload: TemplatePayload, target: DemoDivision):
 
   // Demo decks always wear the DECK DEFAULT look (approved brand system): no
   // style pack, no industry ground. Switching division changes the brand mode
-  // — which carries the division accent, wordmark and chrome — plus the copy
-  // and imagery seeds. The layout language itself never leaves the default.
+  // — which carries the division lockup — plus the copy. The palette,
+  // background system and layout language never leave the default.
   return {
     ...payload,
     title: retargetedTitle(payload.title, target),

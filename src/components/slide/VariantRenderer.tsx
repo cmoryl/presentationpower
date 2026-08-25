@@ -672,9 +672,8 @@ function VariantRendererInner(props: Props) {
   const contentClientName = s((slide.content as Record<string, unknown>).clientName) || undefined;
   const resolvedClient = clientName || contentClientName;
   // Optional per-slide accent override (`content.accentOverride`, a hex string).
-  // Lets a single deck travel a multi-colour palette without inventing new
-  // brand modes — the deck's brand mode still supplies every other token.
-  // Resolution lives in `@/lib/slide-accent` so export paths can't drift.
+  // Admin-authored one-off overrides still work, but brand/division selection
+  // itself no longer changes the TransPerfect module palette.
   const rawBrand: BrandMode = applySlideAccent(slide, brand);
   const baseBrand: BrandMode = enterprise ? enterpriseWhiteBrand(rawBrand, mode) : rawBrand;
 
@@ -691,10 +690,9 @@ function VariantRendererInner(props: Props) {
   // so variants that render their own MediaTile / deterministic backdrops are
   // unaffected.
   const resolvedBg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
-  // Fallback: master TransPerfect/Corporate brand in dark mode auto-applies
-  // the curated 10-gradient backdrop set when the slide has no explicit
-  // background configured. Light mode intentionally stays clean (white
-  // surface + ink text) — do not inject a photo backdrop there.
+  // Fallback: the approved Enterprise brand system in dark mode auto-applies
+  // the corporate 10-gradient backdrop set when the slide has no explicit
+  // background configured. Division changes never swap the module backdrop.
   // Enterprise White draws its own pastel ground in SlideFrame — never inject
   // a photographic/gradient backdrop underneath it.
   const fallbackBackdrop =
