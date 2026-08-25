@@ -38,7 +38,7 @@ describe("slide accent resolution", () => {
     const payload = buildNextPaletteShowcase();
     const overrides = payload.slides
       .map((s) => ({ content: s.content, hex: readAccentOverride(s.content) }))
-      .filter((v): v is { content: unknown; hex: string } => !!v.hex);
+      .filter((v): v is { content: typeof v.content; hex: string } => !!v.hex);
     expect(overrides.length).toBeGreaterThan(10);
     for (const { content, hex } of overrides) {
       expect(resolveSlideAccent({ content }, brand)).toBe(hex);
@@ -57,14 +57,20 @@ describe("slide accent resolution", () => {
 
 describe("QA accent contrast guard", () => {
   it("warns (never blocks) on a high-luminance accent in light mode", () => {
-    const issues = runQa([slide({ accentOverride: "#FFEB66", title: "T" }, "light")], brand.id);
+    const issues = runQa(
+      [slide({ accentOverride: "#FFEB66", authorizedAccentOverride: true, title: "T" }, "light")],
+      brand.id,
+    );
     const hit = issues.find((i) => i.code.startsWith("accent-contrast"));
     expect(hit?.severity).toBe("warn");
     expect(hit?.message).toContain("#FFEB66");
   });
 
   it("stays quiet when the accent is legible for the mode", () => {
-    const issues = runQa([slide({ accentOverride: "#A1FBF9", title: "T" }, "dark")], brand.id);
+    const issues = runQa(
+      [slide({ accentOverride: "#A1FBF9", authorizedAccentOverride: true, title: "T" }, "dark")],
+      brand.id,
+    );
     expect(issues.filter((i) => i.code.startsWith("accent-contrast"))).toEqual([]);
   });
 
