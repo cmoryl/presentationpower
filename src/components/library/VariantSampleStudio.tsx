@@ -35,17 +35,22 @@ import {
   ALL_BRANDS,
   INK_KEY,
   INK_SCOPE_KEY,
+  LAYOUT_KEY,
   MODES_KEY,
   applyModeCopy,
   diffSampleContent,
+  hasSampleLayout,
   mergeModeInk,
+  readSampleLayout,
   splitSampleContent,
   useVariantSampleHistory,
   useVariantSampleMutations,
+  type SampleLayout,
   type SampleModeLayer,
   type SampleModes,
   type SlideModeId,
 } from "@/hooks/use-variant-samples";
+import { StudioLayoutLayer } from "@/components/library/StudioLayoutLayer";
 import {
   collectStringPaths,
   fieldLabel,
@@ -194,6 +199,12 @@ export function VariantSampleStudio({
   const [iconPickerFor, setIconPickerFor] = useState<number | null>(null);
   /** Copy path of the logo cell whose logo-hub gallery is open. */
   const [logoPickerFor, setLogoPickerFor] = useState<string | null>(null);
+  /** Arrange mode: drag/resize every field frame + freeform layers. */
+  const [arrange, setArrange] = useState(false);
+  /** Freeform layer currently selected in arrange mode. */
+  const [selLayerId, setSelLayerId] = useState<string | null>(null);
+  /** Freeform image layer whose media picker is open. */
+  const [layerImageFor, setLayerImageFor] = useState<string | null>(null);
 
   /** Index of the imagery cell currently being dragged over. */
   const [dropTarget, setDropTarget] = useState<number | null>(null);
@@ -279,10 +290,20 @@ export function VariantSampleStudio({
       // A picker modal owns Escape while it is open — closing the whole
       // studio out from under it would drop the edit in progress.
       if (pickerFor !== null || iconPickerFor !== null || logoPickerFor !== null) return;
+      if (layerImageFor !== null) return;
       // While live editing, Escape should only blur the focused field.
       const el = document.activeElement as HTMLElement | null;
       if (el?.isContentEditable) {
         el.blur();
+        return;
+      }
+      // In arrange mode, Escape first drops the layer selection, then the mode.
+      if (arrange && selLayerId) {
+        setSelLayerId(null);
+        return;
+      }
+      if (arrange) {
+        setArrange(false);
         return;
       }
       requestClose();
@@ -335,6 +356,8 @@ export function VariantSampleStudio({
       const t = e.target as HTMLElement | null;
       if (!t) return;
       if (t.closest("[data-crop-overlay]")) return;
+      // Freeform arrange layers own their own clicks.
+      if (t.closest("[data-free-layer]")) return;
       // Step chain: clicking a tile picks that step for editing. Text inside a
       // tile still belongs to live edit, and Alt-click keeps the icon gallery.
       if (isStepChain && !e.altKey && !t.closest('[contenteditable="true"]')) {
@@ -419,6 +442,7 @@ export function VariantSampleStudio({
       const t = e.target as HTMLElement | null;
       if (!t) return;
       if (t.closest("[data-crop-overlay]")) return;
+      if (t.closest("[data-free-layer]")) return;
       if (t.closest("[data-logo-tile]") || t.closest("[data-icon-well]")) return;
       const tile = t.closest("[data-media-tile]");
       const img = tile ? null : (t.closest("img") ?? (t.tagName === "IMG" ? t : null));
@@ -505,6 +529,43 @@ export function VariantSampleStudio({
     history.push(structuredClone(draft ?? {}), label, coalesceKey);
     onDraftChange(next);
     setDirty(true);
+  };
+
+  /** Arrange-mode layout (field offsets + freeform layers), kept in the
+   *  reserved `__layout` bucket so it never leaks into rendered copy. */
+  const layout = useMemo(() => readSampleLayout(draft ?? {}), [draft]);
+  const writeLayout = (next: SampleLayout, label = "Arrange") =>
+    commit({ ...draft, [LAYOUT_KEY]: next }, label);
+
+  /** Add a freeform layer centred on the slide (1920×1080 space). */
+  const addFreeLayer = (kind: "text" | "image") => {
+    const id = `fl${Date.now().toString(36)}`;
+    const layerDef =
+      kind === "text"
+        ? {
+            id,
+            kind: "text" as const,
+            x: 660,
+            y: 120,
+            w: 600,
+            h: 120,
+            text: "Double-click to edit",
+            size: 56,
+            ink: mode === "dark" ? "#FFFFFF" : "#03002C",
+          }
+        : {
+            id,
+            kind: "image" as const,
+            x: 720,
+            y: 380,
+            w: 480,
+            h: 320,
+            mediaUrl: "",
+            mediaPath: "",
+          };
+    writeLayout({ ...layout, layers: [...(layout.layers ?? []), layerDef] }, `Add ${kind} layer`);
+    setSelLayerId(id);
+    if (kind === "image") setLayerImageFor(id);
   };
 
   const applyHistory = (
@@ -875,6 +936,58 @@ export function VariantSampleStudio({
         <button type="button" onClick={() => setLiveEdit((v) => !v)} className={pill(liveEdit)}>
           ✎ Live edit {liveEdit ? "on" : "off"}
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setArrange((v) => !v);
+            setSelLayerId(null);
+          }}
+          aria-pressed={arrange}
+          title="Drag any field or layer — positions snap to margins, centres and neighbours, and stay inside the safe area"
+          className={pill(arrange)}
+        >
+          ▦ Arrange {arrange ? "on" : "off"}
+        </button>
+        {arrange && (
+          <div className="flex overflow-hidden rounded-full border border-white/25">
+            <button
+              type="button"
+              onClick={() => addFreeLayer("text")}
+              title="Add a freeform text area you can place anywhere"
+              className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white"
+            >
+              ＋ Text
+            </button>
+            <span className="w-px bg-white/15" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={() => addFreeLayer("image")}
+              title="Add a freeform image asset you can place anywhere"
+              className="px-3 py-1 text-[11px] text-white/75 hover:bg-white/10 hover:text-white"
+            >
+              ＋ Asset
+            </button>
+            {hasSampleLayout(layout) && (
+              <>
+                <span className="w-px bg-white/15" aria-hidden="true" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    writeLayout({}, "Reset arrangement");
+                    setSelLayerId(null);
+                    toast.success("Arrangement reset", {
+                      description: "All field offsets and freeform layers were removed.",
+                    });
+                  }}
+                  title="Remove every field offset and freeform layer"
+                  className="px-3 py-1 text-[11px] text-red-300/80 hover:bg-red-500/10 hover:text-red-200"
+                >
+                  Reset
+                </button>
+              </>
+            )}
+          </div>
+        )}
         <div className="flex overflow-hidden rounded-full border border-white/25">
           <button
             type="button"
@@ -1006,10 +1119,20 @@ export function VariantSampleStudio({
                 outline: 2px dashed rgba(161,251,249,0.95);
                 outline-offset: -2px;
               }
+              ${
+                // Arrange-mode field offsets: translate the rendered node in
+                // slide px without disturbing the variant's own layout flow.
+                Object.entries(layout.offsets ?? {})
+                  .map(
+                    ([p, o]) =>
+                      `[data-live-path="${p}"] { transform: translate(${o.dx}px, ${o.dy}px); }`,
+                  )
+                  .join("\n")
+              }
             `}</style>
 
             <LiveEditOverlay
-              enabled={liveEdit}
+              enabled={liveEdit && !arrange}
               slideId={`${previewSlide.id}:${mode}`}
               content={copy}
               editableFields={variant.editableFields}
@@ -1035,6 +1158,19 @@ export function VariantSampleStudio({
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
             </LiveEditOverlay>
+
+            {/* Arrange layer: freeform text/image layers (always rendered) +
+                draggable, snapping field frames while arrange mode is on. */}
+            <StudioLayoutLayer
+              stageRef={stageRef}
+              enabled={arrange}
+              layout={layout}
+              revision={`${mode}:${items?.length ?? 0}:${fields.length}`}
+              onCommit={writeLayout}
+              onPickImage={(id) => setLayerImageFor(id)}
+              selectedLayerId={selLayerId}
+              onSelectLayer={setSelLayerId}
+            />
 
             {/* Drag-to-crop frame over the selected photo */}
             {cropRect && cropItem ? (
@@ -1815,6 +1951,29 @@ export function VariantSampleStudio({
           )}
         </aside>
       </div>
+
+      {layerImageFor !== null && (
+        <SlideMediaPicker
+          title="Image for freeform layer"
+          currentUrl={
+            layout.layers?.find((l) => l.id === layerImageFor)?.mediaUrl || undefined
+          }
+          onClose={() => setLayerImageFor(null)}
+          onPick={(picked) =>
+            writeLayout(
+              {
+                ...layout,
+                layers: (layout.layers ?? []).map((l) =>
+                  l.id === layerImageFor
+                    ? { ...l, mediaUrl: picked.url, mediaPath: picked.path ?? "" }
+                    : l,
+                ),
+              },
+              "Layer image",
+            )
+          }
+        />
+      )}
 
       {pickerFor !== null && (pickerFor === SLIDE_MEDIA || items?.[pickerFor]) && (
         <SlideMediaPicker

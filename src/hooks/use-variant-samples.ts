@@ -24,6 +24,50 @@ export const INK_KEY = "__ink";
 export const INK_SCOPE_KEY = "__inkScope";
 /** Per-mode bucket: edits an admin marked as light-only / dark-only. */
 export const MODES_KEY = "__modes";
+/** Arrange-mode layout: per-field nudge offsets + freeform text/image layers.
+ *  Never rendered as copy — `apply()` strips it like the other reserved keys. */
+export const LAYOUT_KEY = "__layout";
+
+/** A freeform layer added in Slide Studio's arrange mode. Coordinates are in
+ *  the slide's 1920×1080 space; the studio scales them to the stage. */
+export type StudioFreeLayer = {
+  id: string;
+  kind: "text" | "image";
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** text layers */
+  text?: string;
+  /** font size in slide px (text layers) */
+  size?: number;
+  /** hex ink (text layers) */
+  ink?: string;
+  /** image layers: signed URL + storage path for re-signing */
+  mediaUrl?: string;
+  mediaPath?: string;
+};
+
+export type SampleLayout = {
+  /** Per-field translate offsets in slide px, keyed by live-edit copy path. */
+  offsets?: Record<string, { dx: number; dy: number }>;
+  /** Freeform layers stacked on top of the rendered variant. */
+  layers?: StudioFreeLayer[];
+};
+
+/** Read the arrange-mode layout payload from a sample draft. */
+export function readSampleLayout(draft: Record<string, unknown>): SampleLayout {
+  const raw = draft[LAYOUT_KEY] as SampleLayout | undefined;
+  return {
+    offsets: raw?.offsets ?? {},
+    layers: Array.isArray(raw?.layers) ? raw.layers : [],
+  };
+}
+
+/** True when arrange mode has produced anything worth keeping. */
+export function hasSampleLayout(layout: SampleLayout): boolean {
+  return Object.keys(layout.offsets ?? {}).length > 0 || (layout.layers ?? []).length > 0;
+}
 
 export type SampleInk = {
   inkOverrides?: Record<string, string>;
@@ -88,7 +132,7 @@ export function splitSampleContent(content: Record<string, unknown>): {
 } {
   const copy: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(content)) {
-    if (k === INK_KEY || k === INK_SCOPE_KEY || k === MODES_KEY) continue;
+    if (k === INK_KEY || k === INK_SCOPE_KEY || k === MODES_KEY || k === LAYOUT_KEY) continue;
     copy[k] = v;
   }
   return {
