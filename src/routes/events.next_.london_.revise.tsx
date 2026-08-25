@@ -391,6 +391,34 @@ function LondonRevisePage() {
             </div>
           </div>
 
+          {/* Audit of the most recent regeneration, mirroring qa-report.csv. */}
+          {qa ? (
+            <div className="mt-3 rounded-lg border border-black/10 bg-[#F7F9FC] p-3">
+              <p className="text-[13px] font-semibold text-[#03002C]">
+                {(() => {
+                  const r = rollup(qa);
+                  return `Spec QA — ${r.pass} pass · ${r.warn} warning · ${r.fail} fail of ${r.total} files`;
+                })()}
+              </p>
+              <ul className="mt-1.5 space-y-1">
+                {qa
+                  .filter((r) => r.status !== "pass")
+                  .slice(0, 5)
+                  .map((r) => (
+                    <li key={`${r.file}-${r.kind}`} className="text-[12px] leading-relaxed text-[#666]">
+                      <span className="font-medium text-[#03002C]">{r.file}</span> — {qaSummary(r)}
+                    </li>
+                  ))}
+                {qa.every((r) => r.status === "pass") ? (
+                  <li className="text-[12px] text-[#666]">
+                    Trim, bleed, ppi and banding verified on every regenerated file.
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+          ) : null}
+
+
           <label className="mt-3 block">
             <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#666]">
               Revision note
