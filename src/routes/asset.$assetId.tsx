@@ -296,6 +296,11 @@ function AssetEditor() {
   const [exportFormat, setExportFormat] = useState<PrintExportFormat>("digital");
   const [iccProfile, setIccProfile] = useState<IccProfileKey>("GRACoL2013_CRPC6");
   const [pickerOpen, setPickerOpen] = useState(false);
+  // When set, the next module picked from the library REPLACES this section
+  // ("module:<id>" for stacked modules, or a clearable content field key like
+  // "features") instead of appending — this is what the canvas Replace action
+  // arms so picking a module swaps rather than piles on.
+  const [replaceTarget, setReplaceTarget] = useState<string | null>(null);
   // Delete confirmation modal state.
   const [deleteOpen, setDeleteOpen] = useState(false);
   // "Save as page template" dialog — captures the section stack for reuse.
@@ -1684,7 +1689,11 @@ function AssetEditor() {
                           });
                         }}
                         onReplace={(key) => {
-                          if (key.startsWith("module:")) {
+                          // Arm replace mode: the picked module takes this
+                          // section's place (stacked modules swap in place;
+                          // built-in sections like "features" are cleared).
+                          if (key.startsWith("module:") || SECTION_CLEARABLE_FIELDS[key]) {
+                            setReplaceTarget(key);
                             setPickerOpen(true);
                             return;
                           }
