@@ -15,7 +15,6 @@ import { showcaseArt } from "@/lib/showcase-art";
 import { DEMO_DIVISIONS, retargetPayload, type DemoDivision } from "@/lib/showcase-division";
 import { DemoTranslateBar, useDemoTranslate } from "@/components/demo/DemoTranslate";
 
-
 export const Route = createFileRoute("/demo/deck/$demoId")({
   loader: ({ params }) => {
     const def = getShowcaseDeck(params.demoId);
@@ -92,7 +91,6 @@ function ShowcaseDeckDemoPage() {
       },
     } as TemplatePayload;
   }, [overridePayload, authored, division]);
-
 
   const existingId = useDeckStore((s) =>
     payload ? Object.values(s.decks).find((d) => d.title === payload.title)?.id : undefined,
@@ -344,7 +342,6 @@ function ShowcaseDeckDemoPage() {
         <div className="mt-4">
           <ShowcaseSlideGallery payload={localizedPayload} accent={accent} />
         </div>
-
       </section>
 
       <section className="mt-10 grid gap-6 lg:grid-cols-[1.15fr_minmax(0,0.85fr)]">

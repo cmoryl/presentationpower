@@ -20,10 +20,7 @@ import { applyDivisionSeedToContent } from "@/lib/print-library/division-seed-ap
 import { useDivisionSeed } from "@/lib/division-seeds";
 import { printTypeMeta } from "@/lib/print-library/catalog";
 import { parseLook } from "@/lib/print-library/look";
-import {
-  approvePrintDemoContent,
-  approvePrintDemoLook,
-} from "@/lib/print-library/demo-approve";
+import { approvePrintDemoContent, approvePrintDemoLook } from "@/lib/print-library/demo-approve";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { ShowcasePrintGallery } from "@/components/showcase/ShowcasePrintGallery";
 import { PrintDemoContentEditor } from "@/components/showcase/PrintDemoContentEditor";

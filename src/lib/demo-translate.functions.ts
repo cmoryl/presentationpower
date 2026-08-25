@@ -29,9 +29,8 @@ export const translateDemoContent = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { extractStrings, protectStrings, unprotectStrings, applyGlossaryOverrides } =
       await import("@/lib/translation-glossary");
-    const { runTranslationBatched, resolveEngine } = await import(
-      "@/lib/translation-engine.server"
-    );
+    const { runTranslationBatched, resolveEngine } =
+      await import("@/lib/translation-engine.server");
 
     const engine = resolveEngine(data.engine);
 
@@ -64,11 +63,7 @@ export const translateDemoContent = createServerFn({ method: "POST" })
       sourceLang: "en",
       humanReview: false,
     });
-    const finalStrings = applyGlossaryOverrides(
-      unprotectStrings(translated),
-      [],
-      data.targetLang,
-    );
+    const finalStrings = applyGlossaryOverrides(unprotectStrings(translated), [], data.targetLang);
 
     const itemsJson = walkers.map((w, i) => {
       const { start, len } = spans[i]!;
