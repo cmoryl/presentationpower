@@ -8,9 +8,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import caseStudyHero from "@/assets/case-study-hero.jpg";
-import adaptorBriefHero from "@/assets/adaptor-brief-hero.jpg";
-import aesopLogo from "@/assets/aesop-logo.svg";
+import {
+  SPOTLIGHT_SEED,
+  EBROCHURE_SEED,
+  MSA_SEED,
+  PROPOSAL_SEED,
+  ADAPTOR_SEED,
+  CASE_STUDY_SEED,
+} from "@/lib/print-library/demo-seeds";
 import {
   FileText,
   Layers,
@@ -39,12 +44,6 @@ import { SolutionProposalLayout } from "@/components/print/SolutionProposalLayou
 import { MultiProposalLayout, isMultiProposal } from "@/components/print/MultiProposalLayout";
 import { CaseStudyLayout } from "@/components/print/CaseStudyLayout";
 import {
-  emptySpotlight,
-  emptyEBrochure,
-  emptyAdaptorBrief,
-  emptyMsaPartnership,
-  emptySolutionProposal,
-  emptyCaseStudy,
   type SpotlightContent,
   type EBrochureContent,
   type AdaptorBriefContent,
