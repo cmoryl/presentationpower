@@ -506,7 +506,7 @@ function LondonSignagePage() {
                         onClick={() => setOpenPanel(panel)}
                         className="group rounded-xl border border-black/10 bg-white p-3 text-left transition-shadow hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
                       >
-                        <PanelThumb panel={panel} svg={artwork?.[panel.id]?.svg} />
+                        <PanelThumb panel={panel} svg={resolveLondonArtwork(panel, artwork).svg} />
                         <p className="mt-3 text-[13px] font-semibold leading-snug text-[#03002C]">
                           {panel.proof.replace(/\.pdf$/i, "")} · p{String(panel.page).padStart(2, "0")}
                         </p>
@@ -539,7 +539,7 @@ function LondonSignagePage() {
               </p>
               {/* Cap the hero thumb so the tier preview and downloads stay in view. */}
               <div className="mx-auto w-full max-w-[240px]">
-                <PanelThumb panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
+                <PanelThumb panel={openPanel} svg={resolveLondonArtwork(openPanel, artwork).svg} />
               </div>
 
               <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
