@@ -1,14 +1,13 @@
 // Renders a single Open Canvas Studio item inside the 1920×1080 stage.
-// Module items mount a real VariantRenderer, so what an admin composes is what
-// the deck renderer produces — no separate preview approximation.
+// Module items mount the canonical ExactSlideStage — the same tree the deck
+// cards, library and PPTX export use — so a dropped module keeps its surface,
+// ground decor and backdrop exactly; no separate preview approximation.
 
 import { useMemo } from "react";
 import { canvasFillCss } from "@/lib/canvas-fill";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId, type BrandMode } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
-import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { SlideBackdropContext } from "@/components/slide/SlideChrome";
-import { backdropForVariant } from "@/components/slide/variantBackdrop";
+import { ExactSlideStage } from "@/components/slide/ExactSlideStage";
 import { STAGE_H, STAGE_W, type CanvasItem, type ModuleItem } from "@/lib/canvas-studio";
 
 export function ModuleItemView({
@@ -71,15 +70,13 @@ export function ModuleItemView({
           transform: `translate(-50%, -50%) scale(${scale}) translate(${item.offsetX ?? 0}px, ${item.offsetY ?? 0}px)`,
         }}
       >
-        <SlideBackdropContext.Provider value={backdropForVariant(variant, brand.id, effMode)}>
-          <VariantRenderer
-            slide={slide as never}
-            variant={variant}
-            brand={brand}
-            pageNumber={1}
-            mode={effMode}
-          />
-        </SlideBackdropContext.Provider>
+        <ExactSlideStage
+          slide={slide}
+          variant={variant}
+          brand={brand}
+          mode={effMode}
+          pageNumber={1}
+        />
       </div>
     </div>
   );

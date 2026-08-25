@@ -701,7 +701,8 @@ function CanvasStudioPage() {
                 {imageDrop.error && <p className="mt-2 text-xs text-rose-600">{imageDrop.error}</p>}
                 <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
                   Drag to move · corner handle to resize · drag across empty canvas to lasso-select
-                  · shift-click to add · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z
+                  · shift-click to add · click a selected item to select just it · Esc clears the
+                  selection · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z
                   steps through history. Double-click a placed module to make it fully editable.
                   Compositions save automatically in this browser.
                 </p>
