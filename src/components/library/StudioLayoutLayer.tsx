@@ -250,19 +250,12 @@ export function StudioLayoutLayer({
 
     const r = drag.lastRect;
     if (r) {
-      const nextLayers = layers.map((l) =>
-        l.id === drag.state.kind === true && l.id === (drag.state as { id: string }).id
-          ? { ...l, x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.w), h: Math.round(r.h) }
-          : l,
-      );
-      // The map above is intentionally narrow; rewrite plainly to be safe.
       const id = (drag.state as { id: string }).id;
       const fixed = layers.map((l) =>
         l.id === id
           ? { ...l, x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.w), h: Math.round(r.h) }
           : l,
       );
-      void nextLayers;
       onCommit(
         { offsets, layers: fixed },
         drag.state.resize ? "Resize layer" : "Move layer",
