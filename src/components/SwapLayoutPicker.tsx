@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useModalA11y } from "@/hooks/use-modal-a11y";
 import {
   MODULE_FAMILIES,
@@ -36,6 +37,7 @@ export function SwapLayoutButton({
   const [scope, setScope] = useState<"section" | "all">("section");
   const [query, setQuery] = useState("");
   const [familyId, setFamilyId] = useState<string | "all">("all");
+  const [sort, setSort] = useState<"fit" | "name" | "family">("fit");
   const dialogRef = useRef<HTMLDivElement>(null);
   useModalA11y({ open, onClose: () => setOpen(false), containerRef: dialogRef });
   const currentVariant = byId(MODULE_VARIANTS, slide.variantId);
@@ -57,8 +59,15 @@ export function SwapLayoutButton({
           return `${v.id} ${v.name} ${v.description} ${family}`.toLowerCase().includes(q);
         })
       : scoped;
-    // Rank: section-compatible first, then same family, then the rest.
+    // Rank: section-compatible first, then same family, then the rest —
+    // unless the user picks a flat sort (name / family).
     return [...matched].sort((a, b) => {
+      if (sort === "name") return a.name.localeCompare(b.name);
+      if (sort === "family") {
+        const fam = a.familyId.localeCompare(b.familyId);
+        if (fam !== 0) return fam;
+        return a.name.localeCompare(b.name);
+      }
       const aSec = sectionIds.has(a.id) ? 0 : 1;
       const bSec = sectionIds.has(b.id) ? 0 : 1;
       if (aSec !== bSec) return aSec - bSec;
@@ -67,7 +76,7 @@ export function SwapLayoutButton({
       if (aFam !== bFam) return aFam - bFam;
       return a.name.localeCompare(b.name);
     });
-  }, [scope, query, familyId, sectionIds, currentFamilyId]);
+  }, [scope, query, familyId, sort, sectionIds, currentFamilyId]);
 
   // Group into readable family sections so the grid reads as a catalogue,
   // not a wall of truncated codes.
@@ -102,9 +111,15 @@ export function SwapLayoutButton({
       >
         Swap layout…
       </button>
-      {open && (
+      {/* Portal to document.body: this button lives inside the inspector
+          side rail, whose backdrop-blur makes it a containing block — a
+          plain `fixed` modal would be trapped inside the 360px rail and
+          render as a broken single-column strip. */}
+      {open &&
+        typeof document !== "undefined" &&
+        createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6"
+          className="fixed inset-0 z-[130] flex items-center justify-center bg-black/70 p-6"
           onClick={() => setOpen(false)}
         >
           <div
@@ -168,6 +183,19 @@ export function SwapLayoutButton({
                   </button>
                 ))}
               </div>
+              <label className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-black/40">
+                Sort
+                <select
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as "fit" | "name" | "family")}
+                  aria-label="Sort modules"
+                  className="rounded-full border border-black/15 bg-white px-2.5 py-1 text-[11px] font-medium normal-case tracking-normal text-black/70 outline-none focus:border-[#003FC7]"
+                >
+                  <option value="fit">Best fit</option>
+                  <option value="name">Name A–Z</option>
+                  <option value="family">Family</option>
+                </select>
+              </label>
             </div>
             <div className="flex shrink-0 flex-wrap items-center gap-1.5 border-b border-black/10 bg-black/[0.02] px-6 pb-3">
               <span className="mr-1 text-[10px] uppercase tracking-widest text-black/40">
@@ -279,7 +307,8 @@ export function SwapLayoutButton({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
