@@ -42,7 +42,13 @@ export default defineTool({
     style_pack_id: z
       .string()
       .describe(
-        "Design skin / style pack id for the whole deck — an OnDeck catalog skin ('skin-s01'…'skin-s28') or a built-in pack id. Omit to keep the approved brand system.",
+        "AUTHORIZED OVERRIDES ONLY: a design skin / style pack id for the whole deck ('skin-s01'…'skin-s28' or a built-in pack id). Omit for every normal build so the deck is created on the approved Enterprise brand system — set this only when the user explicitly named a different look, and then also set allow_non_enterprise_look: true.",
+      )
+      .optional(),
+    allow_non_enterprise_look: z
+      .boolean()
+      .describe(
+        "Must be true when style_pack_id is set. Confirms the user explicitly authorized a look other than the approved Enterprise brand system.",
       )
       .optional(),
     design_recipe_id: z
@@ -62,6 +68,13 @@ export default defineTool({
     if (input.style_pack_id && !stylePackById(input.style_pack_id)) {
       return errorResult(
         `Unknown style_pack_id "${input.style_pack_id}". Use a design skin id ('skin-s01'…'skin-s28') or a built-in style pack id.`,
+      );
+    }
+    // Approved brand system is the creation default: a different skin is only
+    // written when the caller explicitly confirms an authorized override.
+    if (input.style_pack_id && !input.allow_non_enterprise_look) {
+      return errorResult(
+        "New decks are created on the approved Enterprise brand system. Omit style_pack_id, or set allow_non_enterprise_look: true only when the user explicitly authorized a different look.",
       );
     }
 
