@@ -5238,6 +5238,22 @@ export const useDeckStore = create<DeckState>()(
             clientFacts: snapshot.brief?.clientFacts ?? "",
           };
           const deckId = nanoid(10);
+          // A freshly built deck must open QA-clean: run the deterministic
+          // fixer (empty fields filled from context, overflow continued onto
+          // new slides, brand-preferred variants, accent legibility) before
+          // the deck is ever shown — the user should never open a new deck to
+          // a wall of blockers.
+          const builtSlides = snapshot.slides.map((s, i) => ({
+            ...(structuredClone(s) as DeckSlide),
+            id: nanoid(8),
+            position: i,
+            changes: [],
+          }));
+          const cleanSlides = autoFixQa(builtSlides, {
+            brandModeId: snapshot.brandModeId ?? "bm-enterprise",
+            industryId: (snapshot.context as DeckContext | undefined)?.designRecipeId ?? null,
+            includeWarnings: true,
+          }).slides.map((sl, i) => ({ ...sl, position: i }));
           const deck: Deck = {
             id: deckId,
             createdAt: new Date().toISOString(),
@@ -5249,12 +5265,7 @@ export const useDeckStore = create<DeckState>()(
             isTemplate: false,
             clientLogo: snapshot.clientLogo ?? undefined,
             context: (snapshot.context as DeckContext) ?? undefined,
-            slides: snapshot.slides.map((s, i) => ({
-              ...(structuredClone(s) as DeckSlide),
-              id: nanoid(8),
-              position: i,
-              changes: [],
-            })),
+            slides: cleanSlides,
           };
           set((s) => ({
             briefs: { ...s.briefs, [briefId]: brief },
