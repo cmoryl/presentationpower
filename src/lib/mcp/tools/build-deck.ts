@@ -124,7 +124,7 @@ export default defineTool({
       // Mixed look: dark bookends (cover + closing), light working slides,
       // unless the agent picked an explicit per-slide mode.
       const mode =
-        input.appearance === "mixed"
+        appearance === "mixed"
           ? (s.mode ?? (i === 0 || i === lastIdx ? "dark" : "light"))
           : (s.mode ?? null);
       planned.push({
@@ -142,7 +142,7 @@ export default defineTool({
     // dark builds on Enterprise Dark; light/mixed stay on the approved
     // (light) brand system with per-slide dark modes doing the contrast.
     const stylePackId =
-      input.style_pack_id ?? (input.appearance === "dark" ? "skin-s04" : null);
+      input.style_pack_id ?? (appearance === "dark" ? "skin-s04" : null);
 
     const supabase = supabaseForUser(ctx);
     const userId = ctx.getUserId?.();
@@ -190,7 +190,7 @@ export default defineTool({
       deck_id: deckId,
       title: input.title,
       brand_mode_id: input.brand_mode_id,
-      appearance: input.appearance ?? "light",
+      appearance,
       style_pack_id: stylePackId,
       slide_count: planned.length,
       slides: planned.map((s) => ({
