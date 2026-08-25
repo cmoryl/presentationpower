@@ -97,6 +97,10 @@ function bandWidthMm(ppi: number): number {
  * `bleedEdge` unless the team overrides a box explicitly in the same edit.
  */
 export function derivePanel(base: LondonPanel, edit: LondonPanelEdit = {}): LondonPanel {
+  // Untouched panels keep their issued values verbatim: the estimators below are
+  // only ever allowed to move a panel that was actually re-issued.
+  if (Object.keys(edit).length === 0) return base;
+
   const trimW = num(edit.trimW, base.trimW);
   const trimH = num(edit.trimH, base.trimH);
   const bleedEdge = num(edit.bleedEdge, base.bleedEdge);
@@ -130,6 +134,9 @@ export function derivePanel(base: LondonPanel, edit: LondonPanelEdit = {}): Lond
       : geometryMoved
         ? recommendedPpi(draft)
         : base.rasterPpi;
+
+  const rasterMoved = geometryMoved || ppi !== base.rasterPpi;
+  if (!rasterMoved) return { ...draft, rasterPpi: ppi };
 
   const size = rasterSizeFor(draft, ppi);
   return {
