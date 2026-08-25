@@ -981,6 +981,93 @@ function RegistryCard({
   );
 }
 
+/** London location signage — the QEII Centre scenic panel kit, part of the program. */
+function LondonKit() {
+  const floors = londonPanelsByFloor();
+  const styleIds = Object.keys(LONDON_STYLES);
+  return (
+    <section id="london" className="mt-14 scroll-mt-24" aria-labelledby="next-london-kit">
+      <div className="overflow-hidden rounded-2xl border border-border">
+        {/* Header band painted with the venue's own gradient grounds. */}
+        <div className="flex h-2.5" aria-hidden>
+          {styleIds.map((id) => (
+            <span
+              key={id}
+              className="flex-1"
+              style={{ background: `linear-gradient(120deg, ${LONDON_STYLES[id].stops.join(", ")})` }}
+            />
+          ))}
+        </div>
+        <div className="p-6 sm:p-8">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            Location signage · Job {LONDON_VENUE.job}
+          </p>
+          <h2 id="next-london-kit" className="mt-2 text-xl font-semibold tracking-tight">
+            London — scenic panel kit
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            {LONDON_VENUE.venue}, {LONDON_VENUE.city} · {LONDON_VENUE.datesLabel}. All{" "}
+            {LONDON_VENUE.panelCount} scenic panels the location team specified — trim and bleed
+            geometry, gradient treatments and measured banding — with vector-first .ai/.svg and
+            dithered PNG downloads for the RIP. The kit is public: the venue team can pull artwork
+            straight from the link, no sign-in needed.
+          </p>
+
+          <dl className="mt-6 flex flex-wrap gap-x-9 gap-y-4">
+            {[
+              { k: "Panels", v: String(LONDON_VENUE.panelCount) },
+              { k: "Floors", v: String(floors.length) },
+              { k: "Gradient grounds", v: String(styleIds.length) },
+              { k: "Colour space", v: LONDON_VENUE.colourSpace },
+            ].map((s) => (
+              <div key={s.k}>
+                <dd className="text-lg font-semibold tracking-tight">{s.v}</dd>
+                <dt className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+                  {s.k}
+                </dt>
+              </div>
+            ))}
+          </dl>
+
+          {/* Ground swatches actually in force at the venue. */}
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {styleIds.map((id) => {
+              const style = LONDON_STYLES[id];
+              return (
+                <article key={id} className="overflow-hidden rounded-xl border border-border">
+                  <div
+                    className="h-16 w-full"
+                    style={{ background: `linear-gradient(120deg, ${style.stops.join(", ")})` }}
+                  />
+                  <div className="p-3">
+                    <h3 className="text-[13px] font-semibold">{style.label}</h3>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                      {style.note}
+                    </p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              to="/events/next/london"
+              className="group inline-flex items-center gap-2 rounded-full bg-[#03002C] px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            >
+              Open the London panel kit
+              <ArrowRight size={15} className="transition group-hover:translate-x-0.5" />
+            </Link>
+            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin size={13} aria-hidden /> {LONDON_VENUE.address}
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CitySeries() {
   return (
     <section id="cities" className="mt-14 scroll-mt-24">
