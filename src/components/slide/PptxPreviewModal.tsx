@@ -59,7 +59,9 @@ function exportModeFor(slide: DeckSlide): "light" | "dark" {
   const own = (slide as { mode?: "light" | "dark" }).mode;
   if (own === "light" || own === "dark") return own;
   const bg = resolveSlideBackground((slide.content as Record<string, unknown>).background);
-  if (bg.type === "color") return relativeLuminance(bg.color) < 0.42 ? "dark" : "light";
+  if (bg?.kind === "color" && bg.solid) {
+    return relativeLuminance(bg.solid) < 0.42 ? "dark" : "light";
+  }
   const v = slide.variantId;
   return v.startsWith("MV-COVER") || v.startsWith("MV-OP-COVER") || v.startsWith("MV-DIVIDER")
     ? "dark"
