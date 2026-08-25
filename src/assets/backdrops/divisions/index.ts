@@ -1,8 +1,11 @@
 // ──────────────────────────────────────────────────────────────────────
-// Division-specific backdrop image repositories.
-// Each brand mode has 6 photographic + 4 abstract atmospheric backdrops.
-// bm-product and bm-cobrand fall back to bm-enterprise.
+// Backdrop image repositories.
+// TransPerfect division scope resolves to the approved enterprise repository;
+// division identity is expressed by lockup/copy/info, not color or background.
+// bm-cobrand falls back to bm-enterprise.
 // ──────────────────────────────────────────────────────────────────────
+
+import { isTransPerfectBrandScope } from "@/lib/brand-profiles";
 
 // Enterprise — uses the curated 10-gradient corporate backdrop set as the
 // canonical imagery pool. Split into 6 "photo" slots + 4 "abstract" slots so
@@ -173,12 +176,14 @@ export const OWN_BACKDROP_BRANDS = new Set<string>([
 
 /** True when the brand owns a palette-matched raster backdrop pool. */
 export function hasOwnBackdropPool(brandId: string): boolean {
-  return OWN_BACKDROP_BRANDS.has(brandId) && !!DIVISION_IMAGERY[brandId];
+  const effectiveBrandId = isTransPerfectBrandScope(brandId) ? "bm-enterprise" : brandId;
+  return OWN_BACKDROP_BRANDS.has(effectiveBrandId) && !!DIVISION_IMAGERY[effectiveBrandId];
 }
 
 /** Get the image set for a given brand id, falling back to enterprise. */
 export function getDivisionImagery(brandId: string): DivisionImageSet {
-  return DIVISION_IMAGERY[brandId] ?? enterpriseSet;
+  const effectiveBrandId = isTransPerfectBrandScope(brandId) ? "bm-enterprise" : brandId;
+  return DIVISION_IMAGERY[effectiveBrandId] ?? enterpriseSet;
 }
 
 /** Deterministic pick from a division's combined image pool (photos + abstracts). */
