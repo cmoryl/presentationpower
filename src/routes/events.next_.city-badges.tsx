@@ -12,6 +12,7 @@ import { exportCityBadge } from "@/lib/next-city-badge-export";
 import {
   BADGE_SPEC,
   CITY_BADGE_DEFAULT,
+  CITY_BADGE_DIVISIONS,
   CITY_BADGE_FACES,
   CITY_BADGE_ROLES,
   CITY_BADGE_SOURCE,
@@ -211,6 +212,50 @@ function CityBadgePage() {
           {/* Controls */}
           <div className="space-y-6">
             <section className="rounded-2xl border border-black/10 bg-white p-5">
+              <h2 className="text-sm font-semibold text-[#03002C]">Division area</h2>
+              <p className="mt-1 text-xs text-black/55">
+                Same approved template and geometry — only the NEXT lockup changes, so every
+                division area gets its own live badge file.
+              </p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {CITY_BADGE_DIVISIONS.map((div) => {
+                  const active = config.divisionId === div.id;
+                  return (
+                    <button
+                      key={div.id}
+                      type="button"
+                      onClick={() => set("divisionId", div.id)}
+                      className={`flex items-center gap-2 rounded-lg border p-2 text-left transition ${
+                        active
+                          ? "border-[#003FC7] bg-[#003FC7]/5"
+                          : "border-black/10 hover:border-black/25"
+                      }`}
+                    >
+                      <span className="flex h-9 w-14 shrink-0 items-center justify-center rounded bg-[#03002C] p-1">
+                        <img
+                          src={div.whiteUrl || div.colorUrl}
+                          alt={div.name}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </span>
+                      <span className="text-[11px] font-medium leading-tight text-[#03002C]">
+                        {div.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <label className="mt-3 flex items-center gap-2 text-xs text-black/70">
+                <input
+                  type="checkbox"
+                  checked={config.showLockup}
+                  onChange={(e) => set("showLockup", e.target.checked)}
+                />
+                Print the division lockup on the badge
+              </label>
+            </section>
+
+            <section className="rounded-2xl border border-black/10 bg-white p-4">
               <h2 className="text-sm font-semibold text-[#03002C]">Artwork face</h2>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {CITY_BADGE_FACES.map((face) => {

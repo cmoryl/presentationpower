@@ -5,6 +5,8 @@ import {
   SAFE_INSET_X,
   SAFE_INSET_Y,
   cityBadgeFace,
+  cityBadgeDivision,
+  cityBadgeLockup,
   type CityBadgeConfig,
 } from "@/lib/next-city-badge";
 
@@ -25,6 +27,11 @@ type Props = {
  */
 export function CityBadge({ config, ppi = 96, guides = false, style, className }: Props) {
   const face = cityBadgeFace(config.face);
+  const lockup = cityBadgeLockup(config.divisionId);
+  // The supplied artwork carries the City Series mark in its head. For any
+  // other division area we cover that head with a clean brand plate and set
+  // the division lockup in it, so the badge stays on-brand per area.
+  const swapLockup = config.showLockup && !!lockup.url && config.divisionId !== "city-series";
   const px = (inches: number) => inches * ppi;
   const w = px(BADGE_SPEC.bleedW);
   const h = px(BADGE_SPEC.bleedH);
@@ -64,6 +71,38 @@ export function CityBadge({ config, ppi = 96, guides = false, style, className }
           display: "block",
         }}
       />
+
+      {swapLockup ? (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 0,
+            height: px(2.62),
+            background:
+              face.id === "light"
+                ? "linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 90%,rgba(255,255,255,0) 100%)"
+                : "linear-gradient(180deg,#03002C 0%,#03002C 90%,rgba(3,0,44,0) 100%)",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            paddingTop: px(0.42),
+          }}
+        >
+          <img
+            src={face.id === "light" ? cityBadgeDivision(config.divisionId).colorUrl || lockup.url : lockup.url}
+            alt=""
+            aria-hidden
+            style={{
+              width: px(2.5),
+              height: px(2.5) / lockup.ratio,
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        </div>
+      ) : null}
 
       {/* Safe-area copy */}
       <div

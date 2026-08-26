@@ -16,7 +16,7 @@ import JSZip from "jszip";
 import jsPDF from "jspdf";
 
 import { captureAssetCanvas } from "./asset-export";
-import { BADGE_SPEC, badgeVersionSlug, type CityBadgeConfig } from "./next-city-badge";
+import { BADGE_SPEC, badgeVersionSlug, cityBadgeDivision, type CityBadgeConfig } from "./next-city-badge";
 
 const SLUG_IN = 0.25;
 const PROOF_DPI = 150;
@@ -69,6 +69,7 @@ function readme(config: CityBadgeConfig, name: string, dpi: number): string {
     `TransPerfect NEXT — City Series attendee badge`,
     `Version: ${name}`,
     ``,
+    `Division track: ${cityBadgeDivision(config.divisionId).name}`,
     `Artwork face:   ${config.face === "light" ? "LIGHT (diagonal aqua)" : "DARK (chevron ascent)"}`,
     `Trim:           ${BADGE_SPEC.trimW}in x ${BADGE_SPEC.trimH}in`,
     `Bleed:          ${BADGE_SPEC.bleedW}in x ${BADGE_SPEC.bleedH}in (${BADGE_SPEC.bleed}in per edge)`,
