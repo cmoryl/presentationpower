@@ -156,8 +156,11 @@ export function AgendaStudio({
     });
 
   const geo = agendaGeometry(config);
-  const fitScale = Math.min(1, 760 / (geo.bleedH * NATIVE_PX_PER_MM));
+  // Fit the tallest edge to the viewer, scaling small formats (A4) up as well as
+  // large boards down, so every format fills the same review area.
+  const fitScale = Math.min(2.4, 760 / (geo.bleedH * NATIVE_PX_PER_MM));
   const previewScale = fitScale * zoom;
+
   const division = agendaDivision(config.divisionId);
 
   const runExport = async () => {
