@@ -236,11 +236,13 @@ export function AgendaStudio({
           </div>
           <div ref={plateRef} className="max-h-[780px] overflow-auto">
             <div
+              className="mx-auto"
               style={{
                 width: geo.bleedW * NATIVE_PX_PER_MM * previewScale,
                 height: geo.bleedH * NATIVE_PX_PER_MM * previewScale,
               }}
             >
+
               <div style={{ transform: `scale(${previewScale})`, transformOrigin: "top left" }}>
                 <AgendaSheet config={config} pxPerMm={NATIVE_PX_PER_MM} guides={guides} />
               </div>
