@@ -768,13 +768,47 @@ export function PillarStudio({
 
           {/* Live files */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
-            <div className={label}>Live event file</div>
-            <input
+            <div className={label}>Event</div>
+            <select
               className={field}
-              placeholder="Event (e.g. NEXT 2026 London)"
-              value={config.eventLabel}
-              onChange={(e) => set("eventLabel", e.target.value)}
-            />
+              value={
+                EVENT_OPTIONS.some((o) => o.value === config.eventLabel)
+                  ? config.eventLabel
+                  : config.eventLabel
+                    ? "__custom"
+                    : ""
+              }
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "__custom") set("eventLabel", customEvent || " ");
+                else set("eventLabel", v);
+              }}
+            >
+              <option value="">Unassigned — no event</option>
+              {EVENT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+              <option value="__custom">Other event…</option>
+            </select>
+            {config.eventLabel && !EVENT_OPTIONS.some((o) => o.value === config.eventLabel) ? (
+              <input
+                className={field}
+                placeholder="Event name"
+                value={config.eventLabel.trim()}
+                onChange={(e) => {
+                  setCustomEvent(e.target.value);
+                  set("eventLabel", e.target.value || " ");
+                }}
+              />
+            ) : null}
+            <p className="text-xs leading-relaxed text-black/55">
+              Saved files are filed against this event, so its pillar art shows up with the rest of
+              that event&apos;s production kit.
+            </p>
+            <div className={label}>File name</div>
+
             <input
               className={field}
               placeholder={pillarName(config)}
