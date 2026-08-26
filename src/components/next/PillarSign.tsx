@@ -298,7 +298,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
                     const cx = i % qr.size;
                     const cy = Math.floor(i / qr.size);
                     return qrStyle === "dot" ? (
-                      <circle key={i} cx={cx + 0.5} cy={cy + 0.5} r={0.42} fill={qrFore} />
+                      <circle key={i} cx={cx + 0.5} cy={cy + 0.5} r={0.5} fill={qrFore} />
                     ) : (
                       <rect
                         key={i}

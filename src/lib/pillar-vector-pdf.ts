@@ -558,8 +558,8 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
           page.drawEllipse({
             x: x + unit / 2,
             y: y + unit / 2,
-            xScale: unit * 0.42,
-            yScale: unit * 0.42,
+            xScale: unit * 0.5,
+            yScale: unit * 0.5,
             color: rgb(...dark),
           });
         } else if (qrStyle === "rounded") {
