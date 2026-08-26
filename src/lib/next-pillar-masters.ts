@@ -66,6 +66,23 @@ export const PILLAR_SUB_SIZE = { min: 12, max: 120, step: 2 };
 /** Printed QR module block size range in mm (edge length of the code). */
 export const PILLAR_QR_SIZE = { min: 60, max: 500, step: 10 };
 
+/** QR caption cap height range in mm. 0 = follow the sub-line size. */
+export const PILLAR_CAPTION_SIZE = { min: 8, max: 90, step: 1 };
+
+/** Padding kept between the QR block, its caption and the safe edges (mm). */
+export const PILLAR_CAPTION_PAD = { min: 0, max: 80, step: 2 };
+
+/** Caption type treatments available on the QR block. */
+export type PillarCaptionFontId = "bold-caps" | "bold" | "regular";
+
+export const PILLAR_CAPTION_FONTS: { id: PillarCaptionFontId; name: string; uppercase: boolean; weight: number; tracking: number }[] = [
+  { id: "bold-caps", name: "Geist Bold · caps", uppercase: true, weight: 600, tracking: 0.06 },
+  { id: "bold", name: "Geist Bold", uppercase: false, weight: 600, tracking: 0.01 },
+  { id: "regular", name: "Geist Regular", uppercase: false, weight: 400, tracking: 0.01 },
+];
+
+export type PillarCaptionAlign = "left" | "center" | "right";
+
 /** Module rendering styles for printed QR codes. */
 export type PillarQrStyleId = "block" | "rounded" | "dot";
 export const PILLAR_QR_STYLES: { id: PillarQrStyleId; label: string; note: string }[] = [
