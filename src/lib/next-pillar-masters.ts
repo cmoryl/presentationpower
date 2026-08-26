@@ -373,6 +373,7 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     qrStyle: "block",
     qrForeground: "",
     qrBackground: "",
+    qrTransparent: false,
     qrOffsetX: null,
     qrOffsetY: null,
     eventLabel: "",
@@ -505,9 +506,33 @@ export function pillarContrastRatio(a: string, b: string): number {
   return (l1 + 0.05) / (l2 + 0.05);
 }
 
-/** True when the QR pairing is dark-enough-on-light to scan reliably. */
+/** True when the plate is dropped and the code prints straight on the gradient. */
+export function pillarQrTransparent(config: PillarConfig): boolean {
+  return config.qrTransparent === true;
+}
+
+/**
+ * Colour the code actually sits on: the plate, or — when the plate is dropped —
+ * the lightest gradient stop of the active face, which is the worst case the
+ * modules have to survive.
+ */
+export function pillarQrPlateColor(config: PillarConfig): string {
+  if (!pillarQrTransparent(config)) return pillarQrBackground(config);
+  const stops = pillarStops(config.styleId, pillarFace(config.face).id);
+  let best = stops[0] ?? "#003FC7";
+  let bestRatio = -1;
+  for (const s of stops) {
+    const r = pillarContrastRatio(pillarQrForeground(config), s);
+    if (r > bestRatio) continue;
+    bestRatio = r;
+    best = s;
+  }
+  return best.toUpperCase();
+}
+
+/** True when the QR pairing is contrasty enough to scan reliably. */
 export function pillarQrScanSafe(config: PillarConfig): boolean {
-  return pillarContrastRatio(pillarQrForeground(config), pillarQrBackground(config)) >= PILLAR_QR_MIN_CONTRAST;
+  return pillarContrastRatio(pillarQrForeground(config), pillarQrPlateColor(config)) >= PILLAR_QR_MIN_CONTRAST;
 }
 
 
