@@ -1842,6 +1842,42 @@ export type Database = {
         }
         Relationships: []
       }
+      event_pillar_versions: {
+        Row: {
+          config: Json
+          created_at: string
+          event_label: string
+          id: string
+          name: string
+          notes: string
+          scope: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          event_label?: string
+          id?: string
+          name: string
+          notes?: string
+          scope?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          event_label?: string
+          id?: string
+          name?: string
+          notes?: string
+          scope?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       globallink_config: {
         Row: {
           batch_size: number

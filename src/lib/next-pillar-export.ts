@@ -17,6 +17,7 @@ import type { LondonPanel } from "./next-london-signage";
 import {
   PILLAR_SPEC,
   pillarDivision,
+  pillarGeometry,
   pillarKind,
   pillarName,
   pillarPanelSpec,
@@ -59,8 +60,15 @@ function drawCropMarks(pdf: jsPDF, pageW: number, pageH: number, inset: number):
   }
 }
 
-async function plate(node: HTMLElement, nativeW: number, nativeH: number, ppi: number, bg: string) {
-  const wantPx = PILLAR_SPEC.bleedW * MM_TO_IN * ppi;
+async function plate(
+  node: HTMLElement,
+  nativeW: number,
+  nativeH: number,
+  ppi: number,
+  bg: string,
+  bleedWmm: number,
+) {
+  const wantPx = bleedWmm * MM_TO_IN * ppi;
   const scale = Math.max(0.25, wantPx / nativeW);
   const canvas = await captureAssetCanvas(
     { node, width: nativeW, height: nativeH, label: "NEXT master pillar" },
@@ -71,6 +79,8 @@ async function plate(node: HTMLElement, nativeW: number, nativeH: number, ppi: n
 }
 
 function readme(config: PillarConfig, ppi: number): string {
+  const geo = pillarGeometry(config);
+  const qr = (config.qrData ?? "").trim();
   return [
     `TransPerfect NEXT — master pillar sign`,
     `Sign:            ${pillarName(config)}`,
@@ -79,9 +89,13 @@ function readme(config: PillarConfig, ppi: number): string {
     `Gradient:        ${pillarStyleLabel(config.styleId)} (${config.styleId})`,
     `Face:            ${pillarFace(config.face).name}`,
     ``,
-    `Trim:            ${PILLAR_SPEC.trimW} x ${PILLAR_SPEC.trimH} mm`,
-    `Bleed:           ${PILLAR_SPEC.bleedW} x ${PILLAR_SPEC.bleedH} mm (${PILLAR_SPEC.bleedEdge} mm per edge)`,
-    `Safe area:       ${PILLAR_SPEC.safeInset} mm inside trim`,
+    `Pillar size:     ${geo.sizeName}`,
+    `Trim:            ${geo.trimW} x ${geo.trimH} mm`,
+    `Bleed:           ${geo.bleedW} x ${geo.bleedH} mm (${geo.bleedEdge} mm per edge)`,
+    `Safe area:       ${Math.round(geo.safeInset)} mm inside trim`,
+    `Sub-line:        ${(config.subheadline ?? "").trim() || "none"}`,
+    `QR payload:      ${qr || "none"}`,
+    qr ? `QR block:        ${Math.round(Number(config.qrSize) || 180)} mm square, quiet zone included, ECC level H` : `QR block:        n/a`,
     `Plate:           ${ppi} ppi (large-format issued tier ${PILLAR_SPEC.rasterPpi} ppi)`,
     `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
     `Export preset:   ${PILLAR_SPEC.exportPreset}`,
@@ -108,17 +122,18 @@ export async function exportPillarSign(opts: {
   const ppi = opts.ppi ?? PILLAR_SPEC.rasterPpi;
   const slug = pillarSlug(config);
   const groundBg = pillarStops(config.styleId, config.face ?? "dark")[0]!;
+  const geo = pillarGeometry(config);
 
   opts.onProgress?.({ stage: "render", label: `Rasterising the plate at ${ppi} ppi` });
-  const canvas = await plate(node, nativeWidth, nativeHeight, ppi, groundBg);
+  const canvas = await plate(node, nativeWidth, nativeHeight, ppi, groundBg, geo.bleedW);
   const jpeg = canvas.toDataURL("image/jpeg", 0.96);
-  const artW = PILLAR_SPEC.bleedW * MM_TO_IN;
-  const artH = PILLAR_SPEC.bleedH * MM_TO_IN;
+  const artW = geo.bleedW * MM_TO_IN;
+  const artH = geo.bleedH * MM_TO_IN;
   const effectivePpi = Math.round(canvas.width / artW);
 
   opts.onProgress?.({ stage: "pdf", label: "Writing the press PDF" });
   const pdf = new jsPDF({
-    orientation: "portrait",
+    orientation: artW > artH ? "landscape" : "portrait",
     unit: "in",
     format: [artW + SLUG_IN * 2, artH + SLUG_IN * 2],
     compress: true,
@@ -126,14 +141,14 @@ export async function exportPillarSign(opts: {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
   pdf.addImage(jpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
-  drawCropMarks(pdf, pageW, pageH, SLUG_IN + PILLAR_SPEC.bleedEdge * MM_TO_IN);
+  drawCropMarks(pdf, pageW, pageH, SLUG_IN + geo.bleedEdge * MM_TO_IN);
   const pdfBuffer = await pdf.output("blob").arrayBuffer();
 
   opts.onProgress?.({ stage: "vector", label: "Building the editable vector ground" });
   const groundAi = buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel);
 
   opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
-  const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_PPI, groundBg);
+  const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_PPI, groundBg, geo.bleedW);
   const proofBlob: Blob = await new Promise((resolve, reject) => {
     proofCanvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");
   });
