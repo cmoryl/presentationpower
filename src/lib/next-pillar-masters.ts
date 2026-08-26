@@ -168,14 +168,16 @@ export type PillarConfig = {
   divisionId: string;
   styleId: string;
   headline: string;
-  subline: string;
-  detail: string;
   arrow: PillarArrow;
   showLockup: boolean;
   /** Approved gradient face: full-saturation dark, or the light tint. */
   face: PillarFaceId;
   /** Run the headline up the column so long words get the full pillar height. */
   verticalHeadline: boolean;
+  /** Headline cap height in mm on the trim sheet. */
+  headlineSize: number;
+  /** Headline ink. Empty string = the face default ink. */
+  headlineColor: string;
 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
@@ -185,13 +187,27 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     divisionId: pillarDivision(divisionId).id,
     styleId: kind.defaultStyle,
     headline: kind.headline,
-    subline: kind.subline,
-    detail: kind.detail,
     arrow: "right",
     showLockup: true,
     face: "dark",
     verticalHeadline: false,
+    headlineSize: kind.headlineSize,
+    headlineColor: "",
   };
+}
+
+/** Clamp a headline size into the approved range. */
+export function pillarHeadlineSize(config: PillarConfig): number {
+  const raw = Number(config.headlineSize);
+  const fallback = pillarKind(config.kind).headlineSize;
+  const value = Number.isFinite(raw) && raw > 0 ? raw : fallback;
+  return Math.min(PILLAR_HEADLINE_SIZE.max, Math.max(PILLAR_HEADLINE_SIZE.min, value));
+}
+
+/** Resolve the headline ink, falling back to the face default. */
+export function pillarHeadlineInk(config: PillarConfig): string {
+  const hex = (config.headlineColor || "").trim();
+  return /^#[0-9a-f]{6}$/i.test(hex) ? hex : pillarInk(config.face ?? "dark");
 }
 
 /** Swap the sign kind while keeping any copy the operator has already typed. */
@@ -205,10 +221,10 @@ export function withPillarKind(config: PillarConfig, kindId: PillarKindId): Pill
     kind: to.id,
     styleId: config.styleId === from.defaultStyle ? to.defaultStyle : config.styleId,
     headline: keep(config.headline, from.headline, to.headline),
-    subline: keep(config.subline, from.subline, to.subline),
-    detail: keep(config.detail, from.detail, to.detail),
+    headlineSize: config.headlineSize === from.headlineSize ? to.headlineSize : config.headlineSize,
   };
 }
+
 
 export function pillarName(config: PillarConfig): string {
   return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar · ${pillarFace(config.face).name.toLowerCase()}`;
