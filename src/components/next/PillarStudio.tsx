@@ -53,6 +53,13 @@ import {
   pillarQrSize,
   pillarQrPlacement,
   pillarQrStyle,
+  pillarCaptionAlign,
+  pillarCaptionFont,
+  pillarCaptionPad,
+  pillarCaptionSize,
+  PILLAR_CAPTION_FONTS,
+  PILLAR_CAPTION_PAD,
+  PILLAR_CAPTION_SIZE,
   PILLAR_QR_MIN_CONTRAST,
   PILLAR_QR_STYLES,
   pillarStyleLabel,
@@ -168,6 +175,7 @@ export function PillarStudio({
   }, [scopeKey, presets]);
 
   const scopePresets = pillarQrPresetsFor(config);
+  const pillarCaptionFontId = pillarCaptionFont(config).id;
 
   // ── QR placement undo / redo ───────────────────────────────────────────────
   type QrSpot = { x: number | null; y: number | null };
@@ -930,6 +938,90 @@ export function PillarStudio({
                   value={config.qrCaption}
                   onChange={(e) => set("qrCaption", e.target.value)}
                 />
+                {config.qrCaption.trim() ? (
+                  <div className="rounded-lg border border-black/10 bg-[#F2F2F2] px-3 py-2.5 space-y-3">
+                    <div className={label}>Caption formatting</div>
+                    <div>
+                      <div className="text-[11px] text-black/55">Type treatment</div>
+                      <select
+                        className={`${field} mt-1`}
+                        value={pillarCaptionFontId}
+                        onChange={(e) => set("qrCaptionFont", e.target.value as never)}
+                      >
+                        {PILLAR_CAPTION_FONTS.map((f) => (
+                          <option key={f.id} value={f.id}>
+                            {f.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <div className="text-[11px] text-black/55">Alignment</div>
+                      <div className="mt-1 grid grid-cols-3 gap-1.5">
+                        {(["left", "center", "right"] as const).map((a) => (
+                          <button
+                            key={a}
+                            type="button"
+                            onClick={() => set("qrCaptionAlign", a)}
+                            className={`rounded-md border px-2 py-1 text-[11px] capitalize ${
+                              pillarCaptionAlign(config) === a
+                                ? "border-[#003FC7] bg-[#003FC7] text-white"
+                                : "border-black/15 bg-white text-black/65"
+                            }`}
+                          >
+                            {a}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-[11px] text-black/55">Caption size</div>
+                        <div className="text-xs tabular-nums text-black/55">
+                          {Number(config.qrCaptionSize) > 0
+                            ? `${Math.round(pillarCaptionSize(config))} mm`
+                            : `Auto · ${Math.round(pillarCaptionSize(config))} mm`}
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        className="mt-2 w-full accent-[#003FC7]"
+                        min={PILLAR_CAPTION_SIZE.min}
+                        max={PILLAR_CAPTION_SIZE.max}
+                        step={PILLAR_CAPTION_SIZE.step}
+                        value={Math.round(pillarCaptionSize(config))}
+                        onChange={(e) => set("qrCaptionSize", Number(e.target.value))}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => set("qrCaptionSize", 0)}
+                        className="mt-1 text-[11px] text-[#003FC7] underline-offset-2 hover:underline"
+                      >
+                        Follow the sub-line size
+                      </button>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-[11px] text-black/55">Safe-area padding</div>
+                        <div className="text-xs tabular-nums text-black/55">
+                          {pillarCaptionPad(config)} mm
+                        </div>
+                      </div>
+                      <input
+                        type="range"
+                        className="mt-2 w-full accent-[#003FC7]"
+                        min={PILLAR_CAPTION_PAD.min}
+                        max={PILLAR_CAPTION_PAD.max}
+                        step={PILLAR_CAPTION_PAD.step}
+                        value={pillarCaptionPad(config)}
+                        onChange={(e) => set("qrCaptionPad", Number(e.target.value))}
+                      />
+                      <p className="mt-1 text-[11px] leading-relaxed text-black/55">
+                        Sets the gap under the code and holds the whole block off the safe edges.
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
                 <div>
                   <div className="flex items-center justify-between">
                     <div className={label}>QR size</div>
@@ -999,7 +1091,8 @@ export function PillarStudio({
                     <div className="text-[11px] text-black/50">{pillarQrScopeLabel(config)}</div>
                   </div>
                   <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
-                    Save this placement against the current footprint and sign template. The newest
+                    Save this placement and its caption formatting (type, size, alignment and
+                    safe-area padding) against the current footprint and sign template. The newest
                     preset for a footprint is re-applied automatically when you switch back to it.
                   </p>
                   <div className="mt-2 flex gap-2">

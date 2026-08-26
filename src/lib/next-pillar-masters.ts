@@ -66,6 +66,23 @@ export const PILLAR_SUB_SIZE = { min: 12, max: 120, step: 2 };
 /** Printed QR module block size range in mm (edge length of the code). */
 export const PILLAR_QR_SIZE = { min: 60, max: 500, step: 10 };
 
+/** QR caption cap height range in mm. 0 = follow the sub-line size. */
+export const PILLAR_CAPTION_SIZE = { min: 8, max: 90, step: 1 };
+
+/** Padding kept between the QR block, its caption and the safe edges (mm). */
+export const PILLAR_CAPTION_PAD = { min: 0, max: 80, step: 2 };
+
+/** Caption type treatments available on the QR block. */
+export type PillarCaptionFontId = "bold-caps" | "bold" | "regular";
+
+export const PILLAR_CAPTION_FONTS: { id: PillarCaptionFontId; name: string; uppercase: boolean; weight: number; tracking: number }[] = [
+  { id: "bold-caps", name: "Geist Bold · caps", uppercase: true, weight: 600, tracking: 0.06 },
+  { id: "bold", name: "Geist Bold", uppercase: false, weight: 600, tracking: 0.01 },
+  { id: "regular", name: "Geist Regular", uppercase: false, weight: 400, tracking: 0.01 },
+];
+
+export type PillarCaptionAlign = "left" | "center" | "right";
+
 /** Module rendering styles for printed QR codes. */
 export type PillarQrStyleId = "block" | "rounded" | "dot";
 export const PILLAR_QR_STYLES: { id: PillarQrStyleId; label: string; note: string }[] = [
@@ -300,6 +317,14 @@ export type PillarConfig = {
   qrSize: number;
   /** Optional caption printed under the QR block. */
   qrCaption: string;
+  /** Caption type treatment. */
+  qrCaptionFont: PillarCaptionFontId;
+  /** Caption cap height in mm. 0 = derive from the sub-line size. */
+  qrCaptionSize: number;
+  /** Caption alignment relative to the QR block. */
+  qrCaptionAlign: PillarCaptionAlign;
+  /** Padding between the code, its caption and the safe edges (mm). */
+  qrCaptionPad: number;
   /** QR module shape. */
   qrStyle: PillarQrStyleId;
   /** QR ink hex. Empty = the approved default (Blue 800). */
@@ -339,6 +364,10 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     qrData: "",
     qrSize: 180,
     qrCaption: "",
+    qrCaptionFont: "bold-caps",
+    qrCaptionSize: 0,
+    qrCaptionAlign: "center",
+    qrCaptionPad: 14,
     qrStyle: "block",
     qrForeground: "",
     qrBackground: "",
@@ -362,6 +391,33 @@ export function pillarQrSize(config: PillarConfig): number {
   return Math.min(PILLAR_QR_SIZE.max, Math.max(PILLAR_QR_SIZE.min, value));
 }
 
+/** Caption type treatment for the QR block. */
+export function pillarCaptionFont(config: PillarConfig) {
+  return (
+    PILLAR_CAPTION_FONTS.find((f) => f.id === config.qrCaptionFont) ?? PILLAR_CAPTION_FONTS[0]!
+  );
+}
+
+/** Caption cap height in mm. 0 / unset follows the sub-line size. */
+export function pillarCaptionSize(config: PillarConfig): number {
+  const raw = Number(config.qrCaptionSize);
+  if (!Number.isFinite(raw) || raw <= 0) return Math.max(10, pillarSubSize(config) * 0.55);
+  return Math.min(PILLAR_CAPTION_SIZE.max, Math.max(PILLAR_CAPTION_SIZE.min, raw));
+}
+
+export function pillarCaptionAlign(config: PillarConfig): PillarCaptionAlign {
+  return config.qrCaptionAlign === "left" || config.qrCaptionAlign === "right"
+    ? config.qrCaptionAlign
+    : "center";
+}
+
+/** Padding kept between the code, its caption and the safe edges (mm). */
+export function pillarCaptionPad(config: PillarConfig): number {
+  const raw = Number(config.qrCaptionPad);
+  const value = Number.isFinite(raw) && raw >= 0 ? raw : 14;
+  return Math.min(PILLAR_CAPTION_PAD.max, Math.max(PILLAR_CAPTION_PAD.min, value));
+}
+
 /**
  * Resolved geometry of the QR block (code + caption) in mm from the trim
  * top-left. Positions are always clamped inside the safe area so a dragged QR
@@ -371,13 +427,18 @@ export function pillarQrPlacement(config: PillarConfig) {
   const geo = pillarGeometry(config);
   const edge = Math.min(pillarQrSize(config), geo.trimW - geo.safeInset * 2);
   const caption = (config.qrCaption ?? "").trim();
-  const captionSize = Math.max(10, pillarSubSize(config) * 0.55);
-  const captionBlock = caption ? captionSize * 2.2 : 0;
+  const captionSize = pillarCaptionSize(config);
+  const captionPad = pillarCaptionPad(config);
+  const captionAlign = pillarCaptionAlign(config);
+  const captionBlock = caption ? captionPad + captionSize * 1.25 : 0;
   const blockH = edge + captionBlock;
-  const minX = geo.safeInset;
-  const maxX = Math.max(minX, geo.trimW - geo.safeInset - edge);
-  const minY = geo.safeInset;
-  const maxY = Math.max(minY, geo.trimH - geo.safeInset - blockH);
+  // The caption padding also holds the whole block off the safe edges, so a
+  // formatted caption never crowds the trim.
+  const inset = geo.safeInset + (caption ? captionPad : 0);
+  const minX = inset;
+  const maxX = Math.max(minX, geo.trimW - inset - edge);
+  const minY = inset;
+  const maxY = Math.max(minY, geo.trimH - inset - blockH);
   const defaultX = (geo.trimW - edge) / 2;
   const defaultY = maxY;
   const rawX = Number(config.qrOffsetX);
@@ -393,6 +454,9 @@ export function pillarQrPlacement(config: PillarConfig) {
     caption,
     captionSize,
     captionBlock,
+    captionPad,
+    captionAlign,
+    captionFont: pillarCaptionFont(config),
     blockH,
     placed,
     x: clamp(placed ? rawX : defaultX, minX, maxX),

@@ -62,7 +62,7 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   },
   "rasterImages": 0,
   "subsetFont": false,
-  "textShowOps": 1,
+  "textShowOps": 10,
 }
 `;
 

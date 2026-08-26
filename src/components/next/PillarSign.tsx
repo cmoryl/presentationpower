@@ -100,7 +100,18 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   ) : null;
 
   const qrBlock = qr ? (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems:
+          qrPlace.captionAlign === "left"
+            ? "flex-start"
+            : qrPlace.captionAlign === "right"
+              ? "flex-end"
+              : "center",
+      }}
+    >
               <div
                 style={{
                   width: qrEdge,
@@ -142,14 +153,17 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
                   )}
                 </svg>
               </div>
-              {(config.qrCaption ?? "").trim() ? (
+              {qrPlace.caption ? (
                 <div
                   style={{
-                    marginTop: mm(14),
-                    fontSize: mm(Math.max(10, subSize * 0.55)),
-                    fontWeight: 600,
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
+                    marginTop: mm(qrPlace.captionPad),
+                    maxWidth: qrEdge,
+                    fontSize: mm(qrPlace.captionSize),
+                    fontWeight: qrPlace.captionFont.weight,
+                    letterSpacing: `${qrPlace.captionFont.tracking}em`,
+                    textTransform: qrPlace.captionFont.uppercase ? "uppercase" : "none",
+                    textAlign: qrPlace.captionAlign,
+                    lineHeight: 1.15,
                     color: headlineInk,
                   }}
                 >
