@@ -21,6 +21,8 @@ import {
   pillarName,
   pillarPanelSpec,
   pillarSlug,
+  pillarFace,
+  pillarStops,
   pillarStyleLabel,
   type PillarConfig,
 } from "./next-pillar-masters";
@@ -57,12 +59,12 @@ function drawCropMarks(pdf: jsPDF, pageW: number, pageH: number, inset: number):
   }
 }
 
-async function plate(node: HTMLElement, nativeW: number, nativeH: number, ppi: number) {
+async function plate(node: HTMLElement, nativeW: number, nativeH: number, ppi: number, bg: string) {
   const wantPx = PILLAR_SPEC.bleedW * MM_TO_IN * ppi;
   const scale = Math.max(0.25, wantPx / nativeW);
   const canvas = await captureAssetCanvas(
     { node, width: nativeW, height: nativeH, label: "NEXT master pillar" },
-    { scale, background: "#03002C" },
+    { scale, background: bg },
   );
   if (!(canvas.width > 0 && canvas.height > 0)) throw new Error("pillar capture produced no pixels");
   return canvas;
@@ -75,6 +77,7 @@ function readme(config: PillarConfig, ppi: number): string {
     `Kind:            ${pillarKind(config.kind).name}`,
     `Division area:   ${pillarDivision(config.divisionId).name}`,
     `Gradient:        ${pillarStyleLabel(config.styleId)} (${config.styleId})`,
+    `Face:            ${pillarFace(config.face).name}`,
     ``,
     `Trim:            ${PILLAR_SPEC.trimW} x ${PILLAR_SPEC.trimH} mm`,
     `Bleed:           ${PILLAR_SPEC.bleedW} x ${PILLAR_SPEC.bleedH} mm (${PILLAR_SPEC.bleedEdge} mm per edge)`,
@@ -104,9 +107,10 @@ export async function exportPillarSign(opts: {
   const { node, nativeWidth, nativeHeight, config } = opts;
   const ppi = opts.ppi ?? PILLAR_SPEC.rasterPpi;
   const slug = pillarSlug(config);
+  const groundBg = pillarStops(config.styleId, config.face ?? "dark")[0]!;
 
   opts.onProgress?.({ stage: "render", label: `Rasterising the plate at ${ppi} ppi` });
-  const canvas = await plate(node, nativeWidth, nativeHeight, ppi);
+  const canvas = await plate(node, nativeWidth, nativeHeight, ppi, groundBg);
   const jpeg = canvas.toDataURL("image/jpeg", 0.96);
   const artW = PILLAR_SPEC.bleedW * MM_TO_IN;
   const artH = PILLAR_SPEC.bleedH * MM_TO_IN;
@@ -129,7 +133,7 @@ export async function exportPillarSign(opts: {
   const groundAi = buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel);
 
   opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
-  const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_PPI);
+  const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_PPI, groundBg);
   const proofBlob: Blob = await new Promise((resolve, reject) => {
     proofCanvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");
   });

@@ -99,8 +99,53 @@ export const PILLAR_ARROWS: { id: PillarArrow; label: string }[] = [
 
 export const PILLAR_STYLE_IDS = Object.keys(LONDON_STYLES);
 
-export function pillarStops(styleId: string): string[] {
-  return LONDON_STYLES[styleId]?.stops ?? LONDON_STYLES["01-beam-violet-aqua"]!.stops;
+/** Approved pillar faces: the issued gradient ground, or its light tint. */
+export type PillarFaceId = "dark" | "light";
+
+export const PILLAR_FACES: { id: PillarFaceId; name: string; note: string }[] = [
+  {
+    id: "dark",
+    name: "Dark face",
+    note: "The issued gradient ground at full saturation, white lockup and white copy. Default for entrances, stage wings and low-light halls.",
+  },
+  {
+    id: "light",
+    name: "Light face",
+    note: "The same gradient tinted back toward blue-white, with the colour lockup and Blue 800 copy. For bright concourses, daylight atria and print economy.",
+  },
+];
+
+const LIGHT_TINT = 0.68;
+const LIGHT_BASE = [247, 249, 252] as const;
+
+function tint(hex: string, amount: number): string {
+  const h = hex.replace("#", "");
+  const n = parseInt(
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h,
+    16,
+  );
+  const rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  const out = rgb.map((c, i) => Math.round(c + (LIGHT_BASE[i]! - c) * amount));
+  return `#${out.map((c) => c.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
+export function pillarStops(styleId: string, face: PillarFaceId = "dark"): string[] {
+  const stops = LONDON_STYLES[styleId]?.stops ?? LONDON_STYLES["01-beam-violet-aqua"]!.stops;
+  return face === "light" ? stops.map((s) => tint(s, LIGHT_TINT)) : stops;
+}
+
+/** Copy / lockup ink for a face. */
+export function pillarInk(face: PillarFaceId): string {
+  return face === "light" ? "#03002C" : "#FFFFFF";
+}
+
+export function pillarFace(id: string | undefined) {
+  return PILLAR_FACES.find((f) => f.id === id) ?? PILLAR_FACES[0]!;
 }
 
 export function pillarStyleLabel(styleId: string): string {
@@ -116,6 +161,10 @@ export type PillarConfig = {
   detail: string;
   arrow: PillarArrow;
   showLockup: boolean;
+  /** Approved gradient face: full-saturation dark, or the light tint. */
+  face: PillarFaceId;
+  /** Run the headline up the column so long words get the full pillar height. */
+  verticalHeadline: boolean;
 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
@@ -129,6 +178,8 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     detail: kind.detail,
     arrow: "right",
     showLockup: true,
+    face: "dark",
+    verticalHeadline: false,
   };
 }
 
@@ -149,11 +200,11 @@ export function withPillarKind(config: PillarConfig, kindId: PillarKindId): Pill
 }
 
 export function pillarName(config: PillarConfig): string {
-  return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar`;
+  return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar · ${pillarFace(config.face).name.toLowerCase()}`;
 }
 
 export function pillarSlug(config: PillarConfig): string {
-  return `${config.divisionId}-${config.kind}-${config.styleId}`
+  return `${config.divisionId}-${config.kind}-${config.face ?? "dark"}-${config.styleId}`
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");

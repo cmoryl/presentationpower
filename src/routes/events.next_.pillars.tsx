@@ -9,10 +9,12 @@ import { exportPillarSign } from "@/lib/next-pillar-export";
 import {
   PILLAR_ARROWS,
   PILLAR_DIVISIONS,
+  PILLAR_FACES,
   PILLAR_KINDS,
   PILLAR_SPEC,
   PILLAR_STYLE_IDS,
   pillarDefault,
+  pillarFace,
   pillarKind,
   pillarName,
   pillarStyleLabel,
@@ -168,7 +170,28 @@ function PillarPage() {
             </div>
 
             <div className="rounded-2xl border border-black/10 bg-white p-5">
-              <div className={label}>Division area</div>
+              <div className={label}>Face</div>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {PILLAR_FACES.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => set("face", f.id)}
+                    className={`rounded-lg border px-3 py-2 text-left text-sm ${
+                      config.face === f.id
+                        ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                        : "border-black/15 text-black/70 hover:border-[#003FC7]/50"
+                    }`}
+                  >
+                    {f.name}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-black/55">
+                {pillarFace(config.face).note}
+              </p>
+
+              <div className={`${label} mt-5`}>Division area</div>
               <select
                 className={`${field} mt-2`}
                 value={config.divisionId}
@@ -229,6 +252,14 @@ function PillarPage() {
                     onChange={(e) => set("detail", e.target.value)}
                   />
                 </div>
+                <label className="flex items-center gap-2 text-xs text-black/60">
+                  <input
+                    type="checkbox"
+                    checked={config.verticalHeadline}
+                    onChange={(e) => set("verticalHeadline", e.target.checked)}
+                  />
+                  Run the headline vertically up the column
+                </label>
                 {config.kind === "directional" ? (
                   <div>
                     <div className={label}>Arrow</div>
@@ -258,6 +289,42 @@ function PillarPage() {
             </button>
           </div>
         </div>
+
+        {/* Light-face pillar set, one per NEXT division area */}
+        <section className="mt-14">
+          <h2 className="text-xl font-semibold tracking-tight text-[#03002C]">
+            Light-face pillars · every NEXT division
+          </h2>
+          <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-black/65">
+            The same approved geometry and gradient grounds tinted back for bright concourses, with
+            the colour division lockup and Blue 800 copy. Pick one to load it into the editor above.
+          </p>
+          <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
+            {PILLAR_DIVISIONS.map((d) => {
+              const preview: PillarConfig = {
+                ...config,
+                divisionId: d.id,
+                face: "light",
+              };
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => {
+                    setConfig((c) => ({ ...c, divisionId: d.id, face: "light" }));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="group rounded-xl border border-black/10 bg-white p-2 text-left transition hover:border-[#003FC7]"
+                >
+                  <div className="flex justify-center overflow-hidden rounded-lg bg-[#F2F2F2] py-2">
+                    <PillarSign config={preview} pxPerMm={0.13} />
+                  </div>
+                  <div className="mt-2 px-1 pb-1 text-xs font-medium text-[#03002C]">{d.name}</div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </AppShell>
   );
