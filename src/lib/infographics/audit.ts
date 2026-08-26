@@ -370,9 +370,10 @@ export function auditVizSpec(spec: InfographicSpec, opts: AuditOptions = {}): Vi
   const distinctCategories = labelKey
     ? new Set(rows.map((r) => String(r[labelKey] ?? ""))).size
     : rows.length;
+  const dense = DENSE_KINDS.has(spec.kind);
   const kindCap = CATEGORY_CAP[spec.kind];
   const cap = Math.min(kindCap ?? limits.categories, limits.categories);
-  if (distinctCategories > cap) {
+  if (!dense && distinctCategories > cap) {
     add({
       code: "VIZ-TOO-MANY-CATEGORIES",
       severity: distinctCategories > cap * 1.5 ? "blocker" : "warning",
@@ -381,6 +382,16 @@ export function auditVizSpec(spec: InfographicSpec, opts: AuditOptions = {}): Vi
       fix: `Keep the top ${cap - 1} and roll the rest into "Other", or move to a ranked bar chart.`,
     });
   }
+  if (dense && surface === "social" && distinctCategories > 8) {
+    add({
+      code: "VIZ-DENSE-ON-SOCIAL",
+      severity: "warning",
+      group: "scale",
+      message: `A ${spec.kind} with ${distinctCategories} marks won't read at feed size.`,
+      fix: "Publish a simplified cut for social and keep the dense version for the deck or print sheet.",
+    });
+  }
+
   if (PART_TO_WHOLE.has(spec.kind) && distinctCategories === 1) {
     add({
       code: "VIZ-SINGLE-SLICE",
