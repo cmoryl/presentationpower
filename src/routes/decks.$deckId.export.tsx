@@ -36,6 +36,8 @@ import {
 } from "@/components/export/ExportQualitySelect";
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
+import type { PptxValidationReport } from "@/lib/pptx-validate";
+
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
@@ -90,6 +92,8 @@ function ExportView() {
   const [coverageReport, setCoverageReport] = useState<ExportCoverageReport | null>(null);
   const [geometryRepair, setGeometryRepair] = useState<GeometryRepairReport | null>(null);
   const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
+  const [validationReport, setValidationReport] = useState<PptxValidationReport | null>(null);
+
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
   const [alphaImages, setAlphaImages] = useExportAlphaImages();
@@ -251,6 +255,45 @@ function ExportView() {
         console.warn("[export-image-report] audit skipped:", e);
         setImageReport(null);
       }
+      // Server-side gate: open the real package and confirm slide count, slide
+      // identities and media before the download is enabled.
+      toast.loading("Validating the PowerPoint file…", {
+        id: progressId,
+        description: "Checking slides and embedded assets.",
+      });
+      const { buildExportManifest, validateExportedPptx } = await import(
+        "@/lib/pptx-validate-client"
+      );
+      let validation: Awaited<ReturnType<typeof validateExportedPptx>> | null = null;
+      try {
+        validation = await validateExportedPptx(blob, buildExportManifest(deck));
+      } catch (e) {
+        console.warn("[deck-export-validate] validation unavailable:", e);
+      }
+      setValidationReport(validation);
+      if (validation && !validation.ok) {
+        lastBlobRef.current = null;
+        const errors = validation.issues.filter((i) => i.level === "error");
+        toast.error("Export blocked — the file did not validate", {
+          id: progressId,
+          description: errors
+            .slice(0, 3)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 16000,
+        });
+        return;
+      }
+      if (validation?.issues.some((i) => i.level === "warning")) {
+        toast.warning("Export validated with warnings", {
+          description: validation.issues
+            .filter((i) => i.level === "warning")
+            .slice(0, 2)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 9000,
+        });
+      }
       // Trigger download for the user.
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -260,6 +303,7 @@ function ExportView() {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
+
       trackNow({
         event: "deck.export",
         category: "export",
@@ -725,6 +769,48 @@ function ExportView() {
             })}
           </div>
           <ExportTelemetryPanel report={perf} className="mt-8" />
+          {validationReport && (
+            <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
+                  File validation
+                </h2>
+                <span
+                  className={
+                    validationReport.ok
+                      ? "rounded-full bg-[#03002C]/5 px-2 py-0.5 text-[11px] font-semibold text-[#03002C]"
+                      : "rounded-full bg-[#E53D2E]/10 px-2 py-0.5 text-[11px] font-semibold text-[#E53D2E]"
+                  }
+                >
+                  {validationReport.ok ? "Verified" : "Blocked"}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-[#03002C]/70">
+                Opened the generated file on the server: {validationReport.slideCount} of{" "}
+                {validationReport.expectedSlideCount} slides,{" "}
+                {validationReport.slides.filter((s) => s.probesTotal === 0 || s.probesFound > 0).length}{" "}
+                slide IDs confirmed, {validationReport.mediaCount} embedded media asset
+                {validationReport.mediaCount === 1 ? "" : "s"}.
+              </p>
+              {validationReport.issues.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {validationReport.issues.map((issue, i) => (
+                    <li
+                      key={`${issue.code}-${i}`}
+                      className={
+                        issue.level === "error"
+                          ? "text-xs text-[#E53D2E]"
+                          : "text-xs text-[#03002C]/70"
+                      }
+                    >
+                      {issue.level === "error" ? "Error" : "Warning"}: {issue.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
           {coverageReport && coverageReport.total > 0 && (
             <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">

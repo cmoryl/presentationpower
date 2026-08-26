@@ -91,6 +91,7 @@ import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiPrintAgentChatRouteImport } from './routes/api/print-agent-chat'
 import { Route as ApiKitAgentChatRouteImport } from './routes/api/kit-agent-chat'
+import { Route as ApiDeckExportValidateRouteImport } from './routes/api/deck-export-validate'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
 import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
@@ -570,6 +571,11 @@ const ApiKitAgentChatRoute = ApiKitAgentChatRouteImport.update({
   path: '/api/kit-agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDeckExportValidateRoute = ApiDeckExportValidateRouteImport.update({
+  id: '/api/deck-export-validate',
+  path: '/api/deck-export-validate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -972,6 +978,7 @@ export interface FileRoutesByFullPath {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
   '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -1119,6 +1126,7 @@ export interface FileRoutesByTo {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
   '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -1271,6 +1279,7 @@ export interface FileRoutesById {
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
+  '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
   '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -1424,6 +1433,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/deck-export-validate'
     | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
@@ -1571,6 +1581,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/deck-export-validate'
     | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
@@ -1722,6 +1733,7 @@ export interface FileRouteTypes {
     | '/agent/$threadId'
     | '/api/agent-chat'
     | '/api/chat'
+    | '/api/deck-export-validate'
     | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
@@ -1845,6 +1857,7 @@ export interface RootRouteChildren {
   AgentThreadIdRoute: typeof AgentThreadIdRoute
   ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
+  ApiDeckExportValidateRoute: typeof ApiDeckExportValidateRoute
   ApiKitAgentChatRoute: typeof ApiKitAgentChatRoute
   ApiPrintAgentChatRoute: typeof ApiPrintAgentChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
@@ -2485,6 +2498,13 @@ declare module '@tanstack/react-router' {
       path: '/api/kit-agent-chat'
       fullPath: '/api/kit-agent-chat'
       preLoaderRoute: typeof ApiKitAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/deck-export-validate': {
+      id: '/api/deck-export-validate'
+      path: '/api/deck-export-validate'
+      fullPath: '/api/deck-export-validate'
+      preLoaderRoute: typeof ApiDeckExportValidateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -3152,6 +3172,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentThreadIdRoute: AgentThreadIdRoute,
   ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
+  ApiDeckExportValidateRoute: ApiDeckExportValidateRoute,
   ApiKitAgentChatRoute: ApiKitAgentChatRoute,
   ApiPrintAgentChatRoute: ApiPrintAgentChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
