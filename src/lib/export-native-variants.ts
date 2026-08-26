@@ -158,6 +158,10 @@ const NATIVE_SET = new Set<string>(NATIVE_EMITTER_VARIANT_IDS);
  * PowerPoint objects. That is both faithful AND editable.
  */
 export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
+  // The KPI dashboard on screen is a bento mosaic (hero tile, ring gauge,
+  // sparkline, bar tiles); the hand-written renderer still draws a uniform
+  // card grid with a bottom gauge, so sizing and layout diverge on export.
+  "MV-KPI-DASHBOARD",
   "MV-CLOSE-CTA",
   "MV-CLOSE-DUAL-CTA",
   "MV-CLOSE-CONTACT",
