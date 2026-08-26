@@ -6,8 +6,7 @@
 // certified PPTX exporter, so the PowerPoint deck, the press sheet and the
 // social frame are all drawn from one spec — no re-authoring, no drift.
 
-import { VARIANTS } from "@/lib/taxonomy";
-import { BRAND_MODES } from "@/lib/taxonomy";
+import { BRAND_MODES, MODULE_VARIANTS } from "@/lib/taxonomy";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { Deck, DeckSlide } from "@/lib/deck-store";
 import { auditVizSpec, type VizSurface } from "./audit";
@@ -23,7 +22,7 @@ export function variantForKind(spec: InfographicSpec): string {
 }
 
 function layoutFor(variantId: string): string {
-  const v = VARIANTS.find((x) => x.id === variantId);
+  const v = MODULE_VARIANTS.find((x) => x.id === variantId);
   return v?.permittedLayoutIds?.[0] ?? "LF-11";
 }
 
@@ -48,13 +47,13 @@ export function specForSurface(
 ): { spec: InfographicSpec; repairs: string[]; score: number; blockers: number } {
   const themed: InfographicSpec = {
     ...spec,
-    theme: { ...spec.theme, ...vizTheme({ brandModeId, mode, surface }) },
+    theme: { ...spec.theme, ...vizTheme({ brand: brand(brandModeId), mode }) },
   };
   const repaired = repairVizSpec(themed, { surface });
   const audit = auditVizSpec(repaired.spec, { surface });
   return {
     spec: repaired.spec,
-    repairs: repaired.notes ?? [],
+    repairs: (repaired.notes ?? []).map((n) => `${n.code}: ${n.detail}`),
     score: audit.score,
     blockers: audit.findings.filter((f) => f.severity === "blocker").length,
   };

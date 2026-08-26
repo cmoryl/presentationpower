@@ -4,7 +4,13 @@
 // measured trim/bleed specs the printer works to. London 2026 is the first run;
 // further stops reuse the same kit with the stop label swapped.
 
-import { pillarDefault, type PillarConfig } from "@/lib/next-pillar-masters";
+import { pillarDefault, pillarSize, type PillarConfig } from "@/lib/next-pillar-masters";
+
+/** Resolve a pillar config onto a measured footprint from PILLAR_SIZES. */
+function onSize(config: PillarConfig, sizeId: string): PillarConfig {
+  const size = pillarSize(sizeId);
+  return { ...config, sizeId: size.id, trimW: size.trimW, trimH: size.trimH };
+}
 import { NEXT_EVENT } from "@/lib/next-event";
 
 export const NEXT_MART = {
@@ -26,8 +32,15 @@ export type MartPillarSign = {
   quantity: number;
   placement: string;
   substrate: string;
+  /** Measured pillar footprint id from PILLAR_SIZES. */
+  sizeId: string;
   config: PillarConfig;
 };
+
+/** The pillar config resolved onto its production footprint. */
+export function martPillarConfig(sign: MartPillarSign): PillarConfig {
+  return onSize({ ...sign.config, eventLabel: NEXT_MART.event }, sign.sizeId);
+}
 
 /** Live editable pillar files for the mart. All on approved grounds. */
 export const NEXT_MART_PILLARS: MartPillarSign[] = [
@@ -48,6 +61,7 @@ export const NEXT_MART_PILLARS: MartPillarSign[] = [
       qrData: NEXT_MART.shopUrl,
       qrCaption: "SHOP THE FULL RANGE",
     },
+    sizeId: "wide",
   },
   {
     id: "mart-pay-here",
@@ -63,6 +77,7 @@ export const NEXT_MART_PILLARS: MartPillarSign[] = [
       subheadlineSize: 36,
       face: "light",
     },
+    sizeId: "slim",
   },
   {
     id: "mart-wayfinding",
@@ -78,6 +93,7 @@ export const NEXT_MART_PILLARS: MartPillarSign[] = [
       arrowStyle: "solid",
       face: "dark",
     },
+    sizeId: "thin",
   },
   {
     id: "mart-logo-column",
@@ -92,6 +108,7 @@ export const NEXT_MART_PILLARS: MartPillarSign[] = [
       logoSocial: NEXT_EVENT.hashtag,
       face: "dark",
     },
+    sizeId: "standard",
   },
 ];
 
