@@ -289,6 +289,62 @@ function PillarPage() {
             </button>
           </div>
         </div>
+
+        {/* Light-face pillar set, one per NEXT division area */}
+        <section className="mt-14">
+          <h2 className="text-xl font-semibold tracking-tight text-[#03002C]">
+            Light-face pillars · every NEXT division
+          </h2>
+          <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-black/65">
+            The same approved geometry and gradient grounds tinted back for bright concourses, with
+            the colour division lockup and Blue 800 copy. Pick one to load it into the editor above.
+          </p>
+          <div className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
+            {PILLAR_DIVISIONS.map((d) => {
+              const preview: PillarConfig = {
+                ...config,
+                divisionId: d.id,
+                face: "light",
+              };
+              return (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => {
+                    setConfig((c) => ({ ...c, divisionId: d.id, face: "light" }));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="group rounded-xl border border-black/10 bg-white p-2 text-left transition hover:border-[#003FC7]"
+                >
+                  <div className="overflow-hidden rounded-lg bg-[#F2F2F2]">
+                    <div
+                      style={{
+                        width: "100%",
+                        aspectRatio: `${PILLAR_SPEC.bleedW} / ${PILLAR_SPEC.bleedH}`,
+                        position: "relative",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          transformOrigin: "top left",
+                          transform: `scale(${1 / 6})`,
+                          width: `${600}%`,
+                          height: `${600}%`,
+                        }}
+                      >
+                        <PillarSign config={preview} pxPerMm={NATIVE_PX_PER_MM / 1.0} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-2 px-1 pb-1 text-xs font-medium text-[#03002C]">{d.name}</div>
+                </button>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </AppShell>
   );
