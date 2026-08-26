@@ -12,6 +12,7 @@ import JSZip from "jszip";
 import jsPDF from "jspdf";
 
 import { captureAssetCanvas } from "./asset-export";
+import { buildPillarVectorPdf } from "./pillar-vector-pdf";
 import { buildLondonPanelAi } from "./next-london-revise";
 import type { LondonPanel } from "./next-london-signage";
 import {
@@ -78,7 +79,16 @@ async function plate(
   return canvas;
 }
 
-function readme(config: PillarConfig, ppi: number): string {
+const RASTER_NOTICE =
+  "The layered vector build was unavailable in this session, so the press file in pdf/ is a\n" +
+  "high-resolution raster plate. Re-export from the pillar studio to get the layered vector\n" +
+  "artwork (ground, lockup, headline, sub-line, arrow, QR and guides on separate layers).\n";
+
+function readme(
+  config: PillarConfig,
+  ppi: number,
+  vector: { layers: string[]; lockupVector: boolean } | null,
+): string {
   const geo = pillarGeometry(config);
   const qr = (config.qrData ?? "").trim();
   return [
@@ -100,8 +110,19 @@ function readme(config: PillarConfig, ppi: number): string {
     `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
     `Export preset:   ${PILLAR_SPEC.exportPreset}`,
     ``,
+    vector
+      ? `Artwork:         100% vector, layered (scales to any pillar size with no quality loss)`
+      : `Artwork:         raster fallback plate at ${ppi} ppi (layered vector build unavailable)`,
+    vector ? `Layers:          ${vector.layers.join(" · ")}` : `Layers:          n/a`,
+    vector
+      ? `Lockup:          ${vector.lockupVector ? "vector paths (editable, single-colour)" : "high-resolution placed bitmap"}`
+      : `Lockup:          placed bitmap`,
+    vector ? `Type:            live Geist text, font embedded and subset — editable in Illustrator` : ``,
+    vector ? `QR code:         vector modules, ECC level H — no raster upscaling` : ``,
+    vector ? `Guides layer:    trim + safe guides sit on a non-printing layer` : ``,
+    ``,
     `pdf/    press file. Art runs to the bleed edge; crop marks sit in the slug.`,
-    `ai/     the press file with an .ai extension, plus a "-ground" file holding`,
+    `ai/     the layered press artwork with an .ai extension, plus a "-ground" file holding`,
     `        the gradient as live editable vector geometry (no embedded raster).`,
     `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
     ``,
@@ -124,7 +145,15 @@ export async function exportPillarSign(opts: {
   const groundBg = pillarStops(config.styleId, config.face ?? "dark")[0]!;
   const geo = pillarGeometry(config);
 
-  opts.onProgress?.({ stage: "render", label: `Rasterising the plate at ${ppi} ppi` });
+  opts.onProgress?.({ stage: "vector", label: "Building the layered vector artwork" });
+  let vector: Awaited<ReturnType<typeof buildPillarVectorPdf>> | null = null;
+  try {
+    vector = await buildPillarVectorPdf(config);
+  } catch {
+    vector = null;
+  }
+
+  opts.onProgress?.({ stage: "render", label: `Rendering the proof plate at ${ppi} ppi` });
   const canvas = await plate(node, nativeWidth, nativeHeight, ppi, groundBg, geo.bleedW);
   const jpeg = canvas.toDataURL("image/jpeg", 0.96);
   const artW = geo.bleedW * MM_TO_IN;
@@ -142,7 +171,15 @@ export async function exportPillarSign(opts: {
   const pageH = pdf.internal.pageSize.getHeight();
   pdf.addImage(jpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
   drawCropMarks(pdf, pageW, pageH, SLUG_IN + geo.bleedEdge * MM_TO_IN);
-  const pdfBuffer = await pdf.output("blob").arrayBuffer();
+  const rasterPdf = await pdf.output("blob").arrayBuffer();
+  // Vector, layered artwork is the press/Illustrator deliverable whenever the
+  // builder succeeds; the raster plate is only the fallback.
+  const pdfBuffer: ArrayBuffer = vector
+    ? (vector.bytes.buffer.slice(
+        vector.bytes.byteOffset,
+        vector.bytes.byteOffset + vector.bytes.byteLength,
+      ) as ArrayBuffer)
+    : rasterPdf;
 
   opts.onProgress?.({ stage: "vector", label: "Building the editable vector ground" });
   const groundAi = buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel);
@@ -160,7 +197,8 @@ export async function exportPillarSign(opts: {
   zip.file(`ai/${slug}.ai`, pdfBuffer);
   zip.file(`ai/${slug}-ground.ai`, groundAi);
   zip.file(`proof/${slug}-proof.png`, proofBuffer);
-  zip.file("READ-ME.txt", readme(config, effectivePpi));
+  zip.file("READ-ME.txt", readme(config, effectivePpi, vector));
+  if (!vector) zip.file("pdf/raster-fallback-notice.txt", RASTER_NOTICE);
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
