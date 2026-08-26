@@ -522,6 +522,23 @@ function f3(n: number): string {
   return (Math.round(n * 1000) / 1000).toString();
 }
 
+/**
+ * Byte-exact bytes for a panel `.ai`.
+ *
+ * The packaged venue masters travel through JSON as *binary-safe latin-1
+ * strings* (one char = one byte). Handing such a string straight to `Blob`
+ * re-encodes it as UTF-8, which inflates every byte above 0x7F into two —
+ * corrupting the PDF's flate streams and xref offsets, so Illustrator opens a
+ * blank artboard. Always widen the string back to raw bytes before download.
+ */
+export function londonAiBytes(ai: string | Uint8Array): Uint8Array {
+  if (typeof ai !== "string") return ai;
+  const bytes = new Uint8Array(ai.length);
+  for (let i = 0; i < ai.length; i += 1) bytes[i] = ai.charCodeAt(i) & 0xff;
+  return bytes;
+}
+
+
 function pdfText(s: string): string {
   return s.replace(/[\\()]/g, (c) => `\\${c}`);
 }
