@@ -59,9 +59,11 @@ import {
 import {
   effectiveLondonPanels,
   isAddedPanel,
+  londonAiBytes,
   londonPanelSvgFor,
   resolveLondonArtwork,
 } from "@/lib/next-london-revise";
+
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 
 export const Route = createFileRoute("/events/next_/london")({
