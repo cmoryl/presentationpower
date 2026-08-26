@@ -425,7 +425,10 @@ export function auditVizSpec(spec: InfographicSpec, opts: AuditOptions = {}): Vi
   const unitIsPercent =
     /%|percent|share|rate/i.test(spec.data?.columns?.[valueKey ?? ""] ?? "") ||
     /%|percent|share/i.test(valueKey ?? "");
-  if (PART_TO_WHOLE.has(spec.kind) && unitIsPercent && values.length > 1) {
+  // Only a flat pie/donut has to total 100: funnel stages are conversion rates,
+  // radial bars are progress-to-target, and treemap/sunburst rows include
+  // parents as well as children.
+  if (spec.kind === "donut" && unitIsPercent && values.length > 1) {
     const sum = values.reduce((a, b) => a + b, 0);
     if (Math.abs(sum - 100) > 1.5) {
       add({
