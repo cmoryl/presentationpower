@@ -58,6 +58,8 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
       layoutId: "LF-05",
       mode: "dark",
       content: {
+        // Brand aqua clears WCAG AA on the dark ground.
+        accentOverride: "#A1FBF9",
         clientName: "GLOBALLINK",
         title: "Q3 business review",
         titleEmphasis: "Q3",
@@ -162,6 +164,8 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
       layoutId: "LF-24",
       mode: "dark",
       content: {
+        // Brand aqua clears WCAG AA on the dark ground.
+        accentOverride: "#A1FBF9",
         title: "Into Q4",
         subtitle: "Carry the momentum: three commitments for next quarter.",
         items: [
