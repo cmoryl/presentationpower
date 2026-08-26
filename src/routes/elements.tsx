@@ -81,7 +81,9 @@ const SURFACES: Surface[] = [
     proof: ["PDF/X-4", "300 DPI", "Layered PPTX"],
     icon: Printer,
     items: [
+      { label: "Print agent", to: "/print-agent" },
       { label: "Print templates", to: "/library/print" },
+      { label: "Solution proposals", to: "/library/print", search: { type: "solution-proposal" } },
       { label: "Case studies", to: "/library/print", search: { type: "case-study" } },
       { label: "Client spotlights", to: "/library/print", search: { type: "spotlight" } },
       { label: "E-brochures", to: "/library/print", search: { type: "ebrochure" } },
@@ -101,6 +103,7 @@ const SURFACES: Surface[] = [
     proof: ["Phased kits", "Signage + badges", "Live palette"],
     icon: CalendarDays,
     items: [
+      { label: "Events agent", to: "/events-agent" },
       { label: "Event assets", to: "/events" },
       { label: "New event asset", to: "/events/new" },
       { label: "Presets", to: "/events/presets" },
@@ -119,6 +122,7 @@ const SURFACES: Surface[] = [
     proof: ["Every channel size", "Division-scoped", "One-click kit"],
     icon: Share2,
     items: [
+      { label: "Social agent", to: "/social-agent" },
       { label: "Social assets", to: "/social" },
       { label: "New social asset", to: "/social/new" },
       { label: "Presets", to: "/social/presets" },
