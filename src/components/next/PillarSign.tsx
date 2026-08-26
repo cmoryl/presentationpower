@@ -14,6 +14,7 @@ import {
   pillarQrForeground,
   pillarQrSize,
   pillarQrStyle,
+  pillarQrPlacement,
   pillarSubSize,
   pillarInk,
   pillarStops,
@@ -67,7 +68,8 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
       : [];
 
   const qr = buildPillarQr(config.qrData ?? "");
-  const qrEdge = mm(Math.min(pillarQrSize(config), geo.trimW - geo.safeInset * 2));
+  const qrPlace = pillarQrPlacement(config);
+  const qrEdge = mm(qrPlace.edge);
   const qrStyle = pillarQrStyle(config);
   const qrFore = pillarQrForeground(config);
   const qrBack = pillarQrBackground(config);
@@ -271,7 +273,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
 
         <div style={{ flex: 1 }} />
 
-        {qr ? (
+        {qr && !qrPlace.placed ? (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div
               style={{
