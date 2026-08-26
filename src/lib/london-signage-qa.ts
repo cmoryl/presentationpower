@@ -265,10 +265,12 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
     ),
     check(
       "ai-shading",
-      "Gradient is a live axial/radial shading",
-      /\/ShadingType\s*[23]/.test(text),
-      "ShadingType 2 or 3",
-      /\/ShadingType\s*[23]/.exec(text)?.[0] ?? "vector paths, no shading dict",
+      "Gradient remains editable vector artwork",
+      /\/ShadingType\s*[23]/.test(text) || /\/TPGradientKind\s*\/VectorMesh/.test(text),
+      "live shading or Illustrator-safe vector mesh",
+      /\/TPGradientKind\s*\/VectorMesh/.test(text)
+        ? "Illustrator-safe vector mesh"
+        : /\/ShadingType\s*[23]/.exec(text)?.[0] ?? "vector paths, no gradient marker",
       {
         warnOnly: true,
         note: "Vector-path blends print correctly but are less editable than a live shading.",
