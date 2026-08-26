@@ -106,6 +106,8 @@ export function PillarStudio({
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const [customEvent, setCustomEvent] = useState("");
+
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
   const [openFileId, setOpenFileId] = useState<string | null>(null);
