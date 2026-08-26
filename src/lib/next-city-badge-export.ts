@@ -14,6 +14,7 @@
 
 import JSZip from "jszip";
 import jsPDF from "jspdf";
+import { fetchIccProfile, wrapPdfAsX4 } from "./pdf-x4";
 
 import { captureAssetCanvas } from "./asset-export";
 import { BADGE_SPEC, badgeVersionSlug, cityBadgeDivision, type CityBadgeConfig } from "./next-city-badge";
@@ -80,6 +81,8 @@ function readme(config: CityBadgeConfig, name: string, dpi: number): string {
     `Colour:         convert to ${BADGE_SPEC.colorMode} at output; body text 100K`,
     `Export preset:  ${BADGE_SPEC.exportPreset}`,
     `Source template: ${BADGE_SPEC.sourceTemplate}`,
+    `Standard:        PDF/X-4 — GTS_PDF_X output intent (GRACoL 2013 CRPC6) embedded`,
+    `Boxes:           MediaBox / BleedBox / TrimBox all set numerically for preflight`,
     ``,
     `pdf/   press file. Art runs to the bleed edge; crop marks sit in the slug.`,
     `ai/    the same file with an .ai extension — opens and edits in Illustrator.`,
@@ -122,7 +125,24 @@ export async function exportCityBadge(opts: {
   pdf.addImage(plateJpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
   drawCropMarks(pdf, pageW, pageH, SLUG_IN + BADGE_SPEC.bleed);
   const pdfBlob = pdf.output("blob");
-  const pdfBuffer = await pdfBlob.arrayBuffer();
+  let pdfBuffer = await pdfBlob.arrayBuffer();
+  try {
+    const wrapped = await wrapPdfAsX4(new Uint8Array(pdfBuffer), {
+      trimSize: { widthIn: BADGE_SPEC.trimW, heightIn: BADGE_SPEC.trimH },
+      bleedIn: BADGE_SPEC.bleed,
+      slugIn: SLUG_IN,
+      iccProfileBytes: await fetchIccProfile("GRACoL2013_CRPC6"),
+      iccProfileName: "GRACoL2013_CRPC6",
+      title: `CityNEXT badge — ${versionName}`,
+      creator: "TransPerfect Element — City Series badge studio",
+    });
+    pdfBuffer = wrapped.buffer.slice(
+      wrapped.byteOffset,
+      wrapped.byteOffset + wrapped.byteLength,
+    ) as ArrayBuffer;
+  } catch {
+    // Offline: ship the plain press PDF rather than failing the export.
+  }
 
   opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
   const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_DPI);
