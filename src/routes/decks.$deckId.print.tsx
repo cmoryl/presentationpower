@@ -184,7 +184,9 @@ function PrintView() {
                         logoOrientation={deck.context?.logoOrientation}
                         mode={slide.mode ?? "light"}
                       />
+                      </VizSurfaceProvider>
                     </DeckPackScope>
+
                   </ScaledSlide>
                 </div>
               );
