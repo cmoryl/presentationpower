@@ -316,28 +316,8 @@ function PillarPage() {
                   }}
                   className="group rounded-xl border border-black/10 bg-white p-2 text-left transition hover:border-[#003FC7]"
                 >
-                  <div className="overflow-hidden rounded-lg bg-[#F2F2F2]">
-                    <div
-                      style={{
-                        width: "100%",
-                        aspectRatio: `${PILLAR_SPEC.bleedW} / ${PILLAR_SPEC.bleedH}`,
-                        position: "relative",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          transformOrigin: "top left",
-                          transform: `scale(${1 / 6})`,
-                          width: `${600}%`,
-                          height: `${600}%`,
-                        }}
-                      >
-                        <PillarSign config={preview} pxPerMm={NATIVE_PX_PER_MM / 1.0} />
-                      </div>
-                    </div>
+                  <div className="flex justify-center overflow-hidden rounded-lg bg-[#F2F2F2] py-2">
+                    <PillarSign config={preview} pxPerMm={0.13} />
                   </div>
                   <div className="mt-2 px-1 pb-1 text-xs font-medium text-[#03002C]">{d.name}</div>
                 </button>
