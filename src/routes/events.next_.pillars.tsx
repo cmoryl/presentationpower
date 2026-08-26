@@ -9,10 +9,12 @@ import { exportPillarSign } from "@/lib/next-pillar-export";
 import {
   PILLAR_ARROWS,
   PILLAR_DIVISIONS,
+  PILLAR_FACES,
   PILLAR_KINDS,
   PILLAR_SPEC,
   PILLAR_STYLE_IDS,
   pillarDefault,
+  pillarFace,
   pillarKind,
   pillarName,
   pillarStyleLabel,
@@ -168,7 +170,28 @@ function PillarPage() {
             </div>
 
             <div className="rounded-2xl border border-black/10 bg-white p-5">
-              <div className={label}>Division area</div>
+              <div className={label}>Face</div>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {PILLAR_FACES.map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => set("face", f.id)}
+                    className={`rounded-lg border px-3 py-2 text-left text-sm ${
+                      config.face === f.id
+                        ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                        : "border-black/15 text-black/70 hover:border-[#003FC7]/50"
+                    }`}
+                  >
+                    {f.name}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-black/55">
+                {pillarFace(config.face).note}
+              </p>
+
+              <div className={`${label} mt-5`}>Division area</div>
               <select
                 className={`${field} mt-2`}
                 value={config.divisionId}
@@ -229,6 +252,14 @@ function PillarPage() {
                     onChange={(e) => set("detail", e.target.value)}
                   />
                 </div>
+                <label className="flex items-center gap-2 text-xs text-black/60">
+                  <input
+                    type="checkbox"
+                    checked={config.verticalHeadline}
+                    onChange={(e) => set("verticalHeadline", e.target.checked)}
+                  />
+                  Run the headline vertically up the column
+                </label>
                 {config.kind === "directional" ? (
                   <div>
                     <div className={label}>Arrow</div>
