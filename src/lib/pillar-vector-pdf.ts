@@ -26,7 +26,9 @@ import {
   PDFRef,
   PDFString,
   StandardFonts,
+  clip,
   closePath,
+  endPath,
   degrees,
   fill,
   lineTo,
@@ -269,7 +271,9 @@ async function ttf(doc: PDFDocument, path: string): Promise<PDFFont | null> {
   try {
     const res = await fetch(resolveAssetUrl(path));
     if (!res.ok) return null;
-    return await doc.embedFont(await res.arrayBuffer(), { subset: true });
+    // Full embedding (no subset): Illustrator re-interprets subset cmaps and
+    // shows .notdef boxes for some characters; the complete font maps cleanly.
+    return await doc.embedFont(await res.arrayBuffer(), { subset: false });
   } catch {
     return null;
   }
