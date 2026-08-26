@@ -18,6 +18,7 @@
 // -----------------------------------------------------------------------------
 
 import fontkit from "@pdf-lib/fontkit";
+import { applyPdfX4, type PdfX4Applied } from "./pdf-x4-vector";
 import {
   PDFDocument,
   PDFName,
@@ -82,6 +83,8 @@ export type PillarVectorResult = {
   /** True when the lockup came through as vector paths rather than a bitmap. */
   lockupVector: boolean;
   page: { widthPt: number; heightPt: number };
+  /** PDF/X-4 conformance result: embedded output intent + colour tagging. */
+  pdfx: PdfX4Applied;
 };
 
 // ── colour ───────────────────────────────────────────────────────────────────
