@@ -13,6 +13,7 @@
 // -----------------------------------------------------------------------------
 
 import { LONDON_STYLES } from "@/lib/next-london-signage";
+import { NEXT_DIVISIONS } from "@/lib/next-event";
 import {
   CITY_BADGE_DIVISIONS,
   cityBadgeDivision,
