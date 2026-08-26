@@ -6,6 +6,7 @@
 // subset fonts, rasterised grounds, drifting page/trim geometry) fail here
 // before they reach a printer.
 
+import { inflateSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 
 import { buildPillarVectorPdf, type PillarVectorResult } from "@/lib/pillar-vector-pdf";
@@ -17,7 +18,28 @@ const latin1 = (bytes: Uint8Array) => {
   return s;
 };
 
-const count = (hay: string, needle: string) => hay.split(needle).length - 1;
+/** Content streams are Flate-compressed; operator-level checks need them back. */
+function operators(bytes: Uint8Array): string {
+  const raw = latin1(bytes);
+  let out = "";
+  const re = /stream\r?\n/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(raw))) {
+    const start = m.index + m[0].length;
+    const end = raw.indexOf("endstream", start);
+    if (end < 0) continue;
+    const slice = bytes.subarray(start, end);
+    try {
+      out += inflateSync(slice).toString("latin1") + "\n";
+    } catch {
+      out += latin1(slice) + "\n";
+    }
+  }
+  return out;
+}
+
+const count = (hay: string, re: RegExp) => (hay.match(re) ?? []).length;
+
 
 /** Bucketed so tiny sampling changes do not churn the snapshot, while a real
  *  structural change (a lost layer, a vanished mesh) still moves the numbers. */
