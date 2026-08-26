@@ -148,9 +148,13 @@ function MyFilesPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["my-files"],
     queryFn: () => listFn(),
+    // The server fn requires an auth header; don't fire it until we know a
+    // session exists, otherwise it throws "No authorization header provided".
+    enabled: signedIn === true,
   });
 
   const rows = (data ?? []) as MyFile[];
+
 
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<"all" | MyFileKind>("all");
