@@ -420,6 +420,7 @@ function Hero({
             </Link>
             <Link
               to="/events/next/city-badges"
+              search={{ division: undefined, face: undefined }}
               className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
             >
               <span>
