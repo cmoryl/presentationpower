@@ -166,6 +166,10 @@ export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
   // glass-free type; the hand-written renderer paints a gradient band plus a
   // light glass panel, so exports came out light with low-contrast titles.
   "MV-OP-COVER-MEDIA",
+  // The dossier cover on screen is an outlined stamp + ref + metadata row; the
+  // hand-written renderer draws a filled stamp and a giant rounded frame,
+  // which also produced a white-on-aqua contrast failure on export.
+  "MV-OP-COVER-DOSSIER",
   "MV-CLOSE-CTA",
   "MV-CLOSE-DUAL-CTA",
   "MV-CLOSE-CONTACT",
