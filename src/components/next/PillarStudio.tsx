@@ -20,6 +20,8 @@ import {
 } from "@/lib/event-pillar.functions";
 import {
   PILLAR_ARROWS,
+  PILLAR_ARROW_STYLES,
+  pillarArrowPath,
   PILLAR_CUSTOM_SIZE,
   PILLAR_DIVISIONS,
   PILLAR_FACES,
@@ -512,10 +514,53 @@ export function PillarStudio({
                       </option>
                     ))}
                   </select>
+                  <div className={`${label} mt-3`}>Arrow style</div>
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {PILLAR_ARROW_STYLES.map((a) => (
+                      <button
+                        key={a.id}
+                        type="button"
+                        title={a.note}
+                        onClick={() => set("arrowStyle", a.id)}
+                        className={`rounded-xl border p-2 text-center transition ${
+                          (config.arrowStyle ?? "solid") === a.id
+                            ? "border-[#003FC7] bg-[#003FC7]/5"
+                            : "border-black/10 hover:border-black/25"
+                        }`}
+                      >
+                        <svg viewBox="0 0 100 100" className="mx-auto h-7 w-7" aria-hidden>
+                          <path d={pillarArrowPath(a.id)} fill="#03002C" />
+                        </svg>
+                        <div className="mt-1 text-[10px] leading-tight text-black/65">{a.label}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               ) : null}
             </div>
           )}
+
+          {config.kind === "logo" ? (
+            <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
+              <div className={label}>Under the logo (optional)</div>
+              <input
+                className={field}
+                placeholder="URL — e.g. transperfect.com/next"
+                value={config.logoUrl ?? ""}
+                onChange={(e) => set("logoUrl", e.target.value)}
+              />
+              <input
+                className={field}
+                placeholder="Socials — e.g. @transperfect · #TPNEXT"
+                value={config.logoSocial ?? ""}
+                onChange={(e) => set("logoSocial", e.target.value)}
+              />
+              <p className="text-[11px] leading-relaxed text-black/55">
+                The lockup sits a quarter of the column lower on a general logo pillar; these lines
+                print under it as live vector text.
+              </p>
+            </div>
+          ) : null}
 
           {/* QR */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
