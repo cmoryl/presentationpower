@@ -5,10 +5,13 @@
 import {
   PILLAR_SPEC,
   pillarDivision,
+  pillarHeadlineInk,
+  pillarHeadlineSize,
   pillarInk,
   pillarStops,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
+
 
 type Props = {
   config: PillarConfig;
