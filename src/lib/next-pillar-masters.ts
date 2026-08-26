@@ -66,6 +66,18 @@ export const PILLAR_SUB_SIZE = { min: 12, max: 120, step: 2 };
 /** Printed QR module block size range in mm (edge length of the code). */
 export const PILLAR_QR_SIZE = { min: 60, max: 500, step: 10 };
 
+/** Module rendering styles for printed QR codes. */
+export type PillarQrStyleId = "block" | "rounded" | "dot";
+export const PILLAR_QR_STYLES: { id: PillarQrStyleId; label: string; note: string }[] = [
+  { id: "block", label: "Block", note: "Classic square modules. Highest scan reliability." },
+  { id: "rounded", label: "Rounded", note: "Soft-cornered modules. Scans reliably at level H." },
+  { id: "dot", label: "Dot", note: "Circular modules. Keep the block size generous." },
+];
+
+/** Minimum luminance contrast between QR ink and its plate. Below this phone
+ * cameras struggle, so the editor flags and offers a one-click fix. */
+export const PILLAR_QR_MIN_CONTRAST = 3;
+
 export function pillarSize(id: string | undefined) {
   return PILLAR_SIZES.find((s) => s.id === id) ?? PILLAR_SIZES[2]!;
 }
@@ -288,6 +300,12 @@ export type PillarConfig = {
   qrSize: number;
   /** Optional caption printed under the QR block. */
   qrCaption: string;
+  /** QR module shape. */
+  qrStyle: PillarQrStyleId;
+  /** QR ink hex. Empty = the approved default (Blue 800). */
+  qrForeground: string;
+  /** QR plate hex. Empty = white. */
+  qrBackground: string;
   /** Event this live pillar file belongs to (free text label). */
   eventLabel: string;
 };
