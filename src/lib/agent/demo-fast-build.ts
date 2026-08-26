@@ -123,8 +123,8 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
           {
             kind: "media",
             icon: "MonitorCheck",
-            title: "Case study signal",
-            body: "A global retail launch moved from a three-week cycle to a four-day market-ready workflow.",
+            title: "Case study: retail launch",
+            body: "A global retailer's 14-market launch moved from a three-week cycle to a four-day market-ready workflow using AI-assisted routing and expert review.",
             value: "80",
             unit: "%",
             label: "Launch speed gain",
@@ -284,7 +284,7 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
         authorizedAccentOverride: true,
         title: "Approve the Q4 scale plan",
         body:
-          "Use the retail case-study playbook to expand AI-assisted workflows across the next wave of priority accounts.",
+          "Repeat the retail case-study result — three weeks to four days across 14 markets — by expanding AI-assisted workflows to the next wave of priority accounts.",
         ctaLabel: "Greenlight Q4 rollout",
         ctaDetail: "Pilot scope ready this week.",
         owner: "GlobalLink account team",
