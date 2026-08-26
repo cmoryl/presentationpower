@@ -146,7 +146,10 @@ export function PillarStudio({
     setConfig((c) => ({ ...c, [key]: value }));
 
   const geo = pillarGeometry(config);
-  const previewScale = Math.min(0.62, 560 / (geo.bleedH * NATIVE_PX_PER_MM));
+  // Fit the whole pillar into a tall viewing plate, then let the user zoom in.
+  const fitScale = Math.min(0.95, 820 / (geo.bleedH * NATIVE_PX_PER_MM));
+  const previewScale = fitScale * zoom;
+
 
   const runExport = async () => {
     const node = plateRef.current?.querySelector<HTMLElement>('[data-kit-asset-frame="true"]');
