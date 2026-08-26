@@ -474,9 +474,9 @@ function ellipsePath(cx: number, cy: number, rx: number, ry: number): string {
 
 /**
  * Rebuild a panel's `.ai` from its specification. Illustrator's native format
- * is PDF-compatible. The gradient is tessellated into ordinary vector fills
- * instead of a PDF shading object: Illustrator can edit/reinterpret these
- * paths without its "unknown shading type" warning, and no raster is embedded.
+ * is PDF-compatible. The gradient is a single Gouraud mesh (PDF Shading
+ * Type 4): Illustrator opens it as one editable gradient-mesh object instead
+ * of hundreds of tessellated sliver paths, and no raster is embedded.
  */
 export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
   const w = panel.bleedW * MM_TO_PT;
@@ -486,64 +486,34 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
   const stops = stopsFor(panel);
   const axis = styleAxis(panel.style);
 
-  const steps = 768;
-  const paints: string[] = [`q 0 0 ${f3(w)} ${f3(h)} re W n`];
-  if (panel.style.includes("halo")) {
-    const outer = gradientRgb(stops, 1);
-    paints.push(`${outer.map(f3).join(" ")} rg 0 0 ${f3(w)} ${f3(h)} re f`);
-    const cx = 0.5 * w;
-    const cy = h - 0.45 * h;
-    for (let i = steps - 1; i >= 0; i -= 1) {
-      const t = i / steps;
-      const rgb = gradientRgb(stops, t);
-      paints.push(
-        `${rgb.map(f3).join(" ")} rg ${ellipsePath(cx, cy, 0.72 * w * t, 0.72 * h * t)} f`,
-      );
+  // Colour field for the ground, mirroring the live gradient geometry.
+  const sampler = (x: number, y: number): [number, number, number] => {
+    if (panel.style.includes("halo")) {
+      const d = Math.hypot((x - 0.5 * w) / (0.72 * w), (y - (h - 0.45 * h)) / (0.72 * h));
+      return gradientRgb(stops, Math.min(d, 1));
     }
-  } else {
     const x1 = axis.x1 * w;
     const y1 = h - axis.y1 * h;
     const dx = axis.x2 * w - x1;
     const dy = h - axis.y2 * h - y1;
     const length = Math.max(Math.hypot(dx, dy), 1);
-    const ux = dx / length;
-    const uy = dy / length;
-    const vx = -uy;
-    const vy = ux;
-    const originProjection = x1 * ux + y1 * uy;
-    const corners = [[0, 0], [w, 0], [w, h], [0, h]];
-    const projections = corners.map(([x, y]) => x! * ux + y! * uy);
-    const min = Math.min(...projections);
-    const max = Math.max(...projections);
-    const breadth = Math.hypot(w, h) * 1.1;
-    const strip = (max - min) / steps;
-    for (let i = 0; i < steps; i += 1) {
-      const a = min + i * strip;
-      const b = min + (i + 1.02) * strip;
-      const t = ((a + b) / 2 - originProjection) / length;
-      const rgb = gradientRgb(stops, t);
-      const points = [
-        [ux * a - vx * breadth, uy * a - vy * breadth],
-        [ux * b - vx * breadth, uy * b - vy * breadth],
-        [ux * b + vx * breadth, uy * b + vy * breadth],
-        [ux * a + vx * breadth, uy * a + vy * breadth],
-      ];
-      paints.push(
-        `${rgb.map(f3).join(" ")} rg ${points
-          .map(([x, y], pointIndex) => `${f3(x!)} ${f3(y!)} ${pointIndex === 0 ? "m" : "l"}`)
-          .join(" ")} h f`,
-      );
-    }
+    const originProjection = x1 * (dx / length) + y1 * (dy / length);
+    return gradientRgb(stops, (x * (dx / length) + y * (dy / length) - originProjection) / length);
+  };
+  const mesh = buildGouraudMesh(w, h, sampler);
+  let meshText = "";
+  for (let i = 0; i < mesh.length; i += 8192) {
+    meshText += String.fromCharCode(...mesh.subarray(i, i + 8192));
   }
-  paints.push("Q");
-  const content = `${paints.join("\n")}\n`;
+
+  const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
 
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
       `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
-      `/TPGradientKind /VectorMesh /Resources << >> /Contents 4 0 R >>`,
+      `/TPGradientKind /VectorMesh /Resources << /Shading << /Sh0 6 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)}) >>`,
