@@ -68,6 +68,9 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
 
   const qr = buildPillarQr(config.qrData ?? "");
   const qrEdge = mm(Math.min(pillarQrSize(config), geo.trimW - geo.safeInset * 2));
+  const qrStyle = pillarQrStyle(config);
+  const qrFore = pillarQrForeground(config);
+  const qrBack = pillarQrBackground(config);
 
   const axis = config.styleId.includes("diagonal")
     ? { x1: "0%", y1: "0%", x2: "100%", y2: "100%" }
@@ -274,7 +277,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               style={{
                 width: qrEdge,
                 height: qrEdge,
-                background: "#FFFFFF",
+                background: qrBack,
                 borderRadius: mm(4),
                 padding: 0,
               }}
@@ -283,11 +286,32 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
                 width={qrEdge}
                 height={qrEdge}
                 viewBox={`0 0 ${qr.size} ${qr.size}`}
-                shapeRendering="crispEdges"
+                shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
                 aria-hidden
               >
-                <rect x={0} y={0} width={qr.size} height={qr.size} fill="#FFFFFF" />
-                <path d={qr.path} fill="#03002C" />
+                <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrBack} />
+                {qrStyle === "block" ? (
+                  <path d={qr.path} fill={qrFore} />
+                ) : (
+                  qr.modules.map((on, i) => {
+                    if (!on) return null;
+                    const cx = i % qr.size;
+                    const cy = Math.floor(i / qr.size);
+                    return qrStyle === "dot" ? (
+                      <circle key={i} cx={cx + 0.5} cy={cy + 0.5} r={0.42} fill={qrFore} />
+                    ) : (
+                      <rect
+                        key={i}
+                        x={cx + 0.06}
+                        y={cy + 0.06}
+                        width={0.88}
+                        height={0.88}
+                        rx={0.24}
+                        fill={qrFore}
+                      />
+                    );
+                  })
+                )}
               </svg>
             </div>
             {(config.qrCaption ?? "").trim() ? (
