@@ -230,11 +230,10 @@ function LondonSignagePage() {
         // .ai is PDF-compatible binary — never let Blob UTF-8 the bytes.
         const bytes = londonAiBytes(art.ai);
         download(
-          new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)], {
-            type: "application/illustrator",
-          }),
+          new Blob([bytes], { type: "application/illustrator" }),
           `${panelSlug(panel)}.ai`,
         );
+
 
       },
     );
