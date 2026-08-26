@@ -16,7 +16,7 @@ import JSZip from "jszip";
 import jsPDF from "jspdf";
 
 import { captureAssetCanvas } from "./asset-export";
-import { BADGE_SPEC, badgeVersionSlug, type CityBadgeConfig } from "./next-city-badge";
+import { BADGE_SPEC, badgeVersionSlug, cityBadgeDivision, type CityBadgeConfig } from "./next-city-badge";
 
 const SLUG_IN = 0.25;
 const PROOF_DPI = 150;
