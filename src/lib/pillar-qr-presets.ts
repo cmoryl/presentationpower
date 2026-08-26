@@ -2,7 +2,16 @@
 // dragged QR block position (and its size) against a pillar footprint + sign
 // template, so switching layouts restores the placement instead of re-dragging.
 
-import { PILLAR_SIZES, pillarKind, type PillarConfig } from "@/lib/next-pillar-masters";
+import {
+  PILLAR_SIZES,
+  pillarCaptionAlign,
+  pillarCaptionFont,
+  pillarCaptionPad,
+  pillarKind,
+  type PillarCaptionAlign,
+  type PillarCaptionFontId,
+  type PillarConfig,
+} from "@/lib/next-pillar-masters";
 
 const STORAGE_KEY = "element.pillar.qr-presets.v1";
 
@@ -16,6 +25,12 @@ export type PillarQrPreset = {
   trimW: number;
   trimH: number;
   qrSize: number;
+  /** Caption formatting saved with the placement. */
+  qrCaptionFont: PillarCaptionFontId;
+  /** Authored caption cap height in mm; 0 = follow the sub-line size. */
+  qrCaptionSize: number;
+  qrCaptionAlign: PillarCaptionAlign;
+  qrCaptionPad: number;
   qrOffsetX: number | null;
   qrOffsetY: number | null;
   /** Fractions of the trim sheet, so the preset survives a footprint change. */
@@ -74,6 +89,10 @@ export function savePillarQrPreset(name: string, config: PillarConfig): PillarQr
     trimW: trim.w,
     trimH: trim.h,
     qrSize: Number(config.qrSize),
+    qrCaptionFont: pillarCaptionFont(config).id,
+    qrCaptionSize: Number(config.qrCaptionSize) > 0 ? Number(config.qrCaptionSize) : 0,
+    qrCaptionAlign: pillarCaptionAlign(config),
+    qrCaptionPad: pillarCaptionPad(config),
     qrOffsetX: x,
     qrOffsetY: y,
     fracX: typeof x === "number" ? x / trim.w : null,
@@ -119,5 +138,19 @@ export function applyPillarQrPreset(config: PillarConfig, preset: PillarQrPreset
         ? preset.qrOffsetY
         : Math.round((preset.fracY ?? 0) * trim.h);
   const qrSize = Number.isFinite(preset.qrSize) && preset.qrSize > 0 ? preset.qrSize : config.qrSize;
-  return { ...config, qrSize, qrOffsetX: x, qrOffsetY: y };
+  // Older presets predate caption formatting — fall back to the live config.
+  return {
+    ...config,
+    qrSize,
+    qrCaptionFont: preset.qrCaptionFont ?? config.qrCaptionFont,
+    qrCaptionSize: Number.isFinite(preset.qrCaptionSize)
+      ? Number(preset.qrCaptionSize)
+      : config.qrCaptionSize,
+    qrCaptionAlign: preset.qrCaptionAlign ?? config.qrCaptionAlign,
+    qrCaptionPad: Number.isFinite(preset.qrCaptionPad)
+      ? Number(preset.qrCaptionPad)
+      : config.qrCaptionPad,
+    qrOffsetX: x,
+    qrOffsetY: y,
+  };
 }
