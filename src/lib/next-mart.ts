@@ -212,6 +212,54 @@ import artPowerUp from "@/assets/next-mart/03b_TECH_power-up-and-go.svg.asset.js
 import artHydrated from "@/assets/next-mart/04_WATER_keep-hydrated.svg.asset.json";
 import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends.svg.asset.json";
 
+/* ---------------------------------------------------------------------------
+ * NEXT MART lockup — supplied master logo (colour gradient + reversed white).
+ * EPS is the print master; SVG/PNG are the derived screen + proof files.
+ * ------------------------------------------------------------------------- */
+
+import martLogoEps from "@/assets/next-mart/NEXT_Mart_logo.eps.asset.json";
+import martLogoSvg from "@/assets/next-mart/NEXT_Mart_logo.svg.asset.json";
+import martLogoPng from "@/assets/next-mart/NEXT_Mart_logo.png.asset.json";
+import martLogoWhiteEps from "@/assets/next-mart/NEXT_Mart_White_logo.eps.asset.json";
+import martLogoWhiteSvg from "@/assets/next-mart/NEXT_Mart_White_logo.svg.asset.json";
+import martLogoWhitePng from "@/assets/next-mart/NEXT_Mart_White_logo.png.asset.json";
+
+export type MartLogo = {
+  id: string;
+  name: string;
+  usage: string;
+  face: "dark" | "light";
+  previewUrl: string;
+  epsUrl: string;
+  svgUrl: string;
+  pngUrl: string;
+};
+
+export const NEXT_MART_LOGOS: MartLogo[] = [
+  {
+    id: "mart-logo-colour",
+    name: "NEXT MART — gradient lockup",
+    usage:
+      "Primary mark. Use on white or Blue White grounds for print signage, price strips and till fronts. Never recolour the gradient.",
+    face: "light",
+    previewUrl: martLogoSvg.url,
+    epsUrl: martLogoEps.url,
+    svgUrl: martLogoSvg.url,
+    pngUrl: martLogoPng.url,
+  },
+  {
+    id: "mart-logo-white",
+    name: "NEXT MART — reversed white",
+    usage:
+      "Reversed mark for dark grounds: entrance pillars, hanging banners and wall panels on Blue 800 or the approved NEXT gradient.",
+    face: "dark",
+    previewUrl: martLogoWhiteSvg.url,
+    epsUrl: martLogoWhiteEps.url,
+    svgUrl: martLogoWhiteSvg.url,
+    pngUrl: martLogoWhitePng.url,
+  },
+];
+
 export type MartArtwork = {
   id: string;
   code: string;
