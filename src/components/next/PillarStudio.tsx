@@ -1091,7 +1091,8 @@ export function PillarStudio({
                     <div className="text-[11px] text-black/50">{pillarQrScopeLabel(config)}</div>
                   </div>
                   <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
-                    Save this placement against the current footprint and sign template. The newest
+                    Save this placement and its caption formatting (type, size, alignment and
+                    safe-area padding) against the current footprint and sign template. The newest
                     preset for a footprint is re-applied automatically when you switch back to it.
                   </p>
                   <div className="mt-2 flex gap-2">
