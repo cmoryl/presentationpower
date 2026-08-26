@@ -83,6 +83,10 @@ export const PILLAR_KINDS: PillarKind[] = [
 /** Approved headline size range in mm (cap height on the trim sheet). */
 export const PILLAR_HEADLINE_SIZE = { min: 40, max: 220, step: 2 };
 
+/** Division lockup scale range, 1 = the approved default width (58% of trim). */
+export const PILLAR_LOCKUP_SCALE = { min: 0.5, max: 1.6, step: 0.05 };
+
+
 /** Approved ink options for pillar copy. */
 export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
   { id: "white", label: "White", hex: "#FFFFFF" },
