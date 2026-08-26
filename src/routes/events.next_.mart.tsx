@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowRight, Download, Ruler, Store } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { PillarSign } from "@/components/next/PillarSign";
+import { MART_LAYOUT_PRESETS } from "@/lib/next-mart-layouts";
+import { PILLAR_SIZES, pillarKind } from "@/lib/next-pillar-masters";
 import {
   NEXT_MART,
   NEXT_MART_FLAT_SIGNS,
@@ -105,6 +107,64 @@ function MartPage() {
                     <li>{p.substrate}</li>
                   </ul>
                 </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* Reusable layout presets — QR + wayfinding geometry per template */}
+        <section className="mt-12">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-[#03002C]">
+                Mart layout presets · QR &amp; wayfinding
+              </h2>
+              <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-black/60">
+                Issued layouts for the mart signage. Each preset fixes the QR block placement and
+                caption formatting together with the wayfinding geometry — headline size, vertical
+                run, downward offset, lockup scale and arrow — as fractions of the trim sheet, so a
+                layout re-lays itself on any pillar footprint instead of being re-dragged. Apply
+                them from the “NEXT MART layouts” panel in the pillar editor.
+              </p>
+            </div>
+            <Link
+              to="/events/next/pillars"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+            >
+              Apply in the editor <ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {MART_LAYOUT_PRESETS.map((p) => (
+              <article
+                key={p.id}
+                className="rounded-2xl border border-black/10 bg-white px-4 py-3.5"
+              >
+                <div className="text-sm font-medium text-[#03002C]">{p.name}</div>
+                <p className="mt-1 text-[12px] leading-relaxed text-black/60">{p.note}</p>
+                <ul className="mt-2.5 space-y-1 text-[11px] tabular-nums text-black/55">
+                  <li>
+                    Templates: {p.kinds.map((k) => pillarKind(k).name).join(", ")}
+                  </li>
+                  <li>
+                    Footprints:{" "}
+                    {p.sizes.length === 0
+                      ? "any (rescaled)"
+                      : p.sizes
+                          .map((s) => PILLAR_SIZES.find((x) => x.id === s)?.name ?? s)
+                          .join(", ")}
+                  </li>
+                  <li>
+                    {p.qrFracX === null
+                      ? "No code — direction only"
+                      : `QR ${Math.round(p.qrFracSize * 100)}% of width${p.qrTransparent ? " · no plate" : ""}`}
+                  </li>
+                  <li>
+                    Headline {p.verticalHeadline ? "vertical" : "horizontal"} ·{" "}
+                    {Math.round(p.headlineFracSize * 1000) / 10}% of height · lockup{" "}
+                    {Math.round(p.lockupScale * 100)}%
+                  </li>
+                </ul>
               </article>
             ))}
           </div>
