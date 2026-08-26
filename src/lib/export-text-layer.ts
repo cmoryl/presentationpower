@@ -334,12 +334,15 @@ export function extractTextRuns(
       }
     }
 
+    const ws = directTextBoundaryWs(el);
     runs.push({
       x,
       y,
       w,
       h,
       text: applyTransform(text, cs.textTransform),
+      leadWs: ws.lead,
+      trailWs: ws.trail,
       fontSizePx,
       fontFamily: firstFamily(cs.fontFamily),
       bold: Number.isFinite(weight) ? weight >= 600 : /bold/i.test(cs.fontWeight),
