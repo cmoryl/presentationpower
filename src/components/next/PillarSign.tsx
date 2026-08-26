@@ -35,6 +35,9 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const h = mm(PILLAR_SPEC.bleedH);
   const face = config.face ?? "dark";
   const ink = pillarInk(face);
+  const headlineInk = pillarHeadlineInk(config);
+  const headlineSize = pillarHeadlineSize(config);
+
   const stops = pillarStops(config.styleId, face);
   const vertical = Boolean(config.verticalHeadline) && config.kind !== "logo";
   const division = pillarDivision(config.divisionId);
