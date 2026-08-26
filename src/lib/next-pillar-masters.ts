@@ -41,19 +41,18 @@ export type PillarKind = {
   note: string;
   defaultStyle: string;
   headline: string;
-  subline: string;
-  detail: string;
+  /** Default headline cap height in mm on the trim sheet. */
+  headlineSize: number;
 };
 
 export const PILLAR_KINDS: PillarKind[] = [
   {
     id: "welcome",
     name: "Welcome",
-    note: "Entrance pillar. Sets the room at arrival — lockup high, single welcome line, event detail at the foot.",
+    note: "Entrance pillar. Sets the room at arrival — lockup high, single welcome line, nothing else.",
     defaultStyle: "01-beam-violet-aqua",
     headline: "WELCOME",
-    subline: "TransPerfect NEXT 2026",
-    detail: "Doors 08:30 · Keynote 09:30",
+    headlineSize: 104,
   },
   {
     id: "registration",
@@ -61,8 +60,7 @@ export const PILLAR_KINDS: PillarKind[] = [
     note: "Check-in pillar. Reads from across the concourse and pairs with the desk fronts.",
     defaultStyle: "04-horizon",
     headline: "REGISTRATION",
-    subline: "Badge collection & check-in",
-    detail: "Have your QR ready",
+    headlineSize: 78,
   },
   {
     id: "logo",
@@ -70,8 +68,7 @@ export const PILLAR_KINDS: PillarKind[] = [
     note: "Brand-only pillar for repeats down a corridor or either side of a stage.",
     defaultStyle: "08-halo",
     headline: "",
-    subline: "",
-    detail: "",
+    headlineSize: 104,
   },
   {
     id: "directional",
@@ -79,10 +76,24 @@ export const PILLAR_KINDS: PillarKind[] = [
     note: "Wayfinding pillar. One destination, one arrow — nothing else competes with it.",
     defaultStyle: "03-wash-diagonal",
     headline: "MAIN STAGE",
-    subline: "Keynotes & plenaries",
-    detail: "Level 2",
+    headlineSize: 90,
   },
 ];
+
+/** Approved headline size range in mm (cap height on the trim sheet). */
+export const PILLAR_HEADLINE_SIZE = { min: 40, max: 220, step: 2 };
+
+/** Approved ink options for pillar copy. */
+export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
+  { id: "white", label: "White", hex: "#FFFFFF" },
+  { id: "blue-800", label: "Blue 800", hex: "#03002C" },
+  { id: "blue-500", label: "Blue 500", hex: "#003FC7" },
+  { id: "blue-white", label: "Blue White", hex: "#E0E8F5" },
+  { id: "aqua", label: "Aqua", hex: "#A1FBF9" },
+  { id: "lavender", label: "Lavender", hex: "#C2A3FF" },
+  { id: "yellow", label: "Yellow", hex: "#FFEB66" },
+];
+
 
 export function pillarKind(id: string | undefined): PillarKind {
   return PILLAR_KINDS.find((k) => k.id === id) ?? PILLAR_KINDS[0]!;
