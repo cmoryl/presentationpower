@@ -123,7 +123,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
       to: "/library",
       items: [
         { to: "/agent", label: "Deck agent" },
-        { to: "/demo/judging", label: "Judging prep" },
+        
         { to: "/library", label: "Slide modules" },
         { to: "/library/my", label: "My decks" },
         { to: "/decks", label: "All decks" },
