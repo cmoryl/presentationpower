@@ -410,7 +410,7 @@ export function AgentDeckPreview({
           </p>
         )}
 
-        {slides.length > 1 && (
+        {(slides.length > 1 || buildState?.building) && (
           <div className="mt-4 grid grid-cols-3 gap-2">
             {slides.map((s, i) => {
               const v = byId(MODULE_VARIANTS, s.variantId);
