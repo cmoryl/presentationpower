@@ -92,9 +92,7 @@ const PPI_TIERS = [
  *  below 300 ppi, while short panels reach it comfortably. */
 function ppiTiersFor(longestMm: number) {
   const ceiling = Math.floor(MAX_PLATE_EDGE_PX / Math.max(1, longestMm / 25.4));
-  return PPI_TIERS.map((t) => ({ ...t, available: t.ppi <= ceiling })).filter(
-    (t) => t.available || t.ppi === 300,
-  );
+  return PPI_TIERS.map((t) => ({ ...t, available: t.ppi <= ceiling }));
 }
 
 type PillarFileRow = {
