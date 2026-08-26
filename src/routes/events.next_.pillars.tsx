@@ -217,6 +217,29 @@ function PillarPage() {
                 Print the division lockup
               </label>
 
+              {config.showLockup ? (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between">
+                    <div className={label}>Lockup size</div>
+                    <div className="text-xs tabular-nums text-black/55">
+                      {Math.round(pillarLockupScale(config) * 100)}% ·{" "}
+                      {Math.round(PILLAR_SPEC.trimW * 0.58 * pillarLockupScale(config))} mm wide
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    className="mt-2 w-full accent-[#003FC7]"
+                    min={PILLAR_LOCKUP_SCALE.min}
+                    max={PILLAR_LOCKUP_SCALE.max}
+                    step={PILLAR_LOCKUP_SCALE.step}
+                    value={pillarLockupScale(config)}
+                    onChange={(e) => set("lockupScale", Number(e.target.value))}
+                  />
+                </div>
+              ) : null}
+
+
+
               <div className={`${label} mt-5`}>Gradient ground</div>
               <select
                 className={`${field} mt-2`}
