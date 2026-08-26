@@ -451,11 +451,32 @@ function hexToRgb(hex: string): [number, number, number] {
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
 
+function gradientRgb(stops: string[], t: number): [number, number, number] {
+  const clamped = Math.max(0, Math.min(1, t));
+  const scaled = clamped * (stops.length - 1);
+  const index = Math.min(Math.floor(scaled), stops.length - 2);
+  const mix = scaled - index;
+  const a = hexToRgb(stops[index]!);
+  const b = hexToRgb(stops[index + 1]!);
+  return a.map((channel, i) => channel + (b[i]! - channel) * mix) as [number, number, number];
+}
+
+function ellipsePath(cx: number, cy: number, rx: number, ry: number): string {
+  const k = 0.5522847498;
+  return [
+    `${f3(cx + rx)} ${f3(cy)} m`,
+    `${f3(cx + rx)} ${f3(cy + k * ry)} ${f3(cx + k * rx)} ${f3(cy + ry)} ${f3(cx)} ${f3(cy + ry)} c`,
+    `${f3(cx - k * rx)} ${f3(cy + ry)} ${f3(cx - rx)} ${f3(cy + k * ry)} ${f3(cx - rx)} ${f3(cy)} c`,
+    `${f3(cx - rx)} ${f3(cy - k * ry)} ${f3(cx - k * rx)} ${f3(cy - ry)} ${f3(cx)} ${f3(cy - ry)} c`,
+    `${f3(cx + k * rx)} ${f3(cy - ry)} ${f3(cx + rx)} ${f3(cy - k * ry)} ${f3(cx + rx)} ${f3(cy)} c h`,
+  ].join(" ");
+}
+
 /**
  * Rebuild a panel's `.ai` from its specification. Illustrator's native format
- * is PDF-compatible, so we emit a single-page PDF that carries a real axial
- * (type 2) shading — live vector gradient, editable in Illustrator, with
- * MediaBox/BleedBox at bleed and TrimBox at trim. No raster is embedded.
+ * is PDF-compatible. The gradient is tessellated into ordinary vector fills
+ * instead of a PDF shading object: Illustrator can edit/reinterpret these
+ * paths without its "unknown shading type" warning, and no raster is embedded.
  */
 export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
   const w = panel.bleedW * MM_TO_PT;
@@ -465,56 +486,64 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
   const stops = stopsFor(panel);
   const axis = styleAxis(panel.style);
 
-  // Stitching function over exponential (type 2) sub-functions: one per stop
-  // pair, giving Illustrator a normal multi-stop gradient.
-  const subs: string[] = [];
-  for (let i = 0; i < stops.length - 1; i += 1) {
-    const a = hexToRgb(stops[i]!);
-    const b = hexToRgb(stops[i + 1]!);
-    subs.push(
-      `<< /FunctionType 2 /Domain [0 1] /C0 [${a.map(f3).join(" ")}] /C1 [${b.map(f3).join(" ")}] /N 1 >>`,
-    );
+  const steps = 768;
+  const paints: string[] = [`q 0 0 ${f3(w)} ${f3(h)} re W n`];
+  if (panel.style.includes("halo")) {
+    const outer = gradientRgb(stops, 1);
+    paints.push(`${outer.map(f3).join(" ")} rg 0 0 ${f3(w)} ${f3(h)} re f`);
+    const cx = 0.5 * w;
+    const cy = h - 0.45 * h;
+    for (let i = steps - 1; i >= 0; i -= 1) {
+      const t = i / steps;
+      const rgb = gradientRgb(stops, t);
+      paints.push(
+        `${rgb.map(f3).join(" ")} rg ${ellipsePath(cx, cy, 0.72 * w * t, 0.72 * h * t)} f`,
+      );
+    }
+  } else {
+    const x1 = axis.x1 * w;
+    const y1 = h - axis.y1 * h;
+    const dx = axis.x2 * w - x1;
+    const dy = h - axis.y2 * h - y1;
+    const length = Math.max(Math.hypot(dx, dy), 1);
+    const ux = dx / length;
+    const uy = dy / length;
+    const vx = -uy;
+    const vy = ux;
+    const originProjection = x1 * ux + y1 * uy;
+    const corners = [[0, 0], [w, 0], [w, h], [0, h]];
+    const projections = corners.map(([x, y]) => x! * ux + y! * uy);
+    const min = Math.min(...projections);
+    const max = Math.max(...projections);
+    const breadth = Math.hypot(w, h) * 1.1;
+    const strip = (max - min) / steps;
+    for (let i = 0; i < steps; i += 1) {
+      const a = min + i * strip;
+      const b = min + (i + 1.02) * strip;
+      const t = ((a + b) / 2 - originProjection) / length;
+      const rgb = gradientRgb(stops, t);
+      const points = [
+        [ux * a - vx * breadth, uy * a - vy * breadth],
+        [ux * b - vx * breadth, uy * b - vy * breadth],
+        [ux * b + vx * breadth, uy * b + vy * breadth],
+        [ux * a + vx * breadth, uy * a + vy * breadth],
+      ];
+      paints.push(
+        `${rgb.map(f3).join(" ")} rg ${points
+          .map(([x, y], pointIndex) => `${f3(x!)} ${f3(y!)} ${pointIndex === 0 ? "m" : "l"}`)
+          .join(" ")} h f`,
+      );
+    }
   }
-  const bounds = stops
-    .slice(1, -1)
-    .map((_, i) => f3((i + 1) / (stops.length - 1)))
-    .join(" ");
-  const encode = subs.map(() => "0 1").join(" ");
-  const fn =
-    subs.length === 1
-      ? subs[0]!
-      : `<< /FunctionType 3 /Domain [0 1] /Functions [${subs.join(" ")}] /Bounds [${bounds}] /Encode [${encode}] >>`;
-
-  // Match the SVG master exactly: halo grounds are a centred radial (SVG
-  // cx 50% / cy 45% / r 72%), everything else is the axial beam/wash.
-  const shading = panel.style.includes("halo")
-    ? `<< /ShadingType 3 /ColorSpace /DeviceRGB /Coords [${[
-        0.5 * w,
-        h - 0.45 * h,
-        0,
-        0.5 * w,
-        h - 0.45 * h,
-        0.72 * Math.sqrt((w * w + h * h) / 2),
-      ]
-        .map(f3)
-        .join(" ")}] /Function ${fn} /Extend [true true] >>`
-    : `<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [${[
-        axis.x1 * w,
-        h - axis.y1 * h,
-        axis.x2 * w,
-        h - axis.y2 * h,
-      ]
-        .map(f3)
-        .join(" ")}] /Function ${fn} /Extend [true true] >>`;
-
-  const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
+  paints.push("Q");
+  const content = `${paints.join("\n")}\n`;
 
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
       `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
-      `/Resources << /Shading << /Sh0 ${shading} >> >> /Contents 4 0 R >>`,
+      `/TPGradientKind /VectorMesh /Resources << >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)}) >>`,
@@ -672,7 +701,13 @@ export function resolveLondonArtwork(
     issued.bleedW === panel.bleedW &&
     issued.bleedH === panel.bleedH &&
     issued.bleedEdge === panel.bleedEdge;
-  if (matchesIssue) return { svg: entry.svg, ai: entry.ai, source: "issued" };
+  if (matchesIssue) {
+    // Always rebuild the AI side with Illustrator-safe vector fills. Some of
+    // the issued PDF-compatible masters contain shading dictionaries that
+    // Illustrator reinterprets with a warning even though PDF renderers accept
+    // them. The issued SVG remains the authoritative preview/master geometry.
+    return { svg: entry.svg, ai: buildLondonPanelAi(panel), source: "rebuilt" };
+  }
   return {
     svg: buildLondonPanelSvg(panel),
     ai: buildLondonPanelAi(panel),
