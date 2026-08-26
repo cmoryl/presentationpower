@@ -200,11 +200,11 @@ export function withPillarKind(config: PillarConfig, kindId: PillarKindId): Pill
 }
 
 export function pillarName(config: PillarConfig): string {
-  return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar`;
+  return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar · ${pillarFace(config.face).name.toLowerCase()}`;
 }
 
 export function pillarSlug(config: PillarConfig): string {
-  return `${config.divisionId}-${config.kind}-${config.styleId}`
+  return `${config.divisionId}-${config.kind}-${config.face ?? "dark"}-${config.styleId}`
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
