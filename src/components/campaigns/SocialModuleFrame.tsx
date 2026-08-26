@@ -10,6 +10,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
+import { VizSurfaceProvider } from "@/components/slide/VizSurfaceContext";
 import { PrintDocModeProvider, PRINT_ICON_STYLE_DEFAULT } from "@/components/print/print-doc-mode";
 import { PrintPageProvider } from "@/components/print/print-page-context";
 import { BrandLockup } from "@/components/BrandLockup";
@@ -206,6 +207,7 @@ export function SocialModuleFrame({
   const lockupPad = safe.left * 0.55;
 
   return (
+    <VizSurfaceProvider surface="social">
     <div
       style={{ width: format.width * displayScale, height: format.height * displayScale }}
       className="relative overflow-hidden"
@@ -315,5 +317,6 @@ export function SocialModuleFrame({
         ) : null}
       </div>
     </div>
+    </VizSurfaceProvider>
   );
 }

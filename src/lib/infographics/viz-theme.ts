@@ -128,9 +128,10 @@ export function vizTheme({ brand, mode, pack }: VizThemeInput): InfographicTheme
       )
     : paletteFromTheme({ mode: effectiveMode, accent, primary, ink, surface });
 
-  const palette = Array.from(
+  const guarded = Array.from(
     new Set(seed.map((c) => ensureVizContrast(c, surface, MIN_SERIES_CONTRAST))),
   );
+  const palette = separatePalette(guarded, surface);
 
   return {
     divisionId: brand.id,
@@ -143,3 +144,75 @@ export function vizTheme({ brand, mode, pack }: VizThemeInput): InfographicTheme
     fontFamily: pack?.type?.body,
   };
 }
+
+/**
+ * Order a contrast-guarded palette so neighbouring series always read apart,
+ * then force a luminance step between neighbours that still collide.
+ *
+ * Two problems the audit sweep surfaced: hue-ramp palettes put near-identical
+ * colours next to each other (invisible series boundaries), and a palette can
+ * be hue-varied but luminance-flat, which collapses to one grey on press.
+ * Greedy nearest-farthest ordering fixes the first; a lightness nudge along the
+ * safe axis (away from the surface) fixes the second without touching hue.
+ */
+export function separatePalette(colors: string[], surface: string): string[] {
+  const pool = colors.filter((c) => parse(c));
+  if (pool.length < 3) return colors;
+
+  const dist = (a: string, b: string) => {
+    const pa = parse(a)!;
+    const pb = parse(b)!;
+    const rgb = Math.sqrt(
+      2 * (pa[0] - pb[0]) ** 2 + 4 * (pa[1] - pb[1]) ** 2 + 3 * (pa[2] - pb[2]) ** 2,
+    );
+    const lum = Math.abs(relLuminance(a) - relLuminance(b)) * 400;
+    return rgb + lum;
+  };
+
+  // Keep entry 0 (the brand accent) as the lead colour, then always take the
+  // remaining colour that sits farthest from the one just placed.
+  const out = [pool[0]!];
+  const rest = pool.slice(1);
+  while (rest.length > 0) {
+    let bestIdx = 0;
+    let bestScore = -1;
+    for (let i = 0; i < rest.length; i += 1) {
+      const score = dist(rest[i]!, out[out.length - 1]!);
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+      }
+    }
+    out.push(rest.splice(bestIdx, 1)[0]!);
+  }
+
+  const surfaceIsDark = relLuminance(surface) < 0.45;
+  const away = surfaceIsDark ? "#FFFFFF" : "#000000";
+  const toward = surfaceIsDark ? "#0A1230" : "#FFFFFF";
+  for (let i = 1; i < out.length; i += 1) {
+    const prev = out[i - 1]!;
+    const tooClose = (c: string) =>
+      contrast(c, prev) < 1.4 || Math.abs(relLuminance(c) - relLuminance(prev)) < 0.07;
+    let best = out[i]!;
+    for (let step = 1; step <= 8 && tooClose(best); step += 1) {
+      // Alternate direction so a long palette fans out instead of drifting to
+      // one end of the range — but never accept a nudge that breaks the
+      // colour's own contrast against the chart surface.
+      const candidates = [
+        mix(out[i]!, i % 2 === 0 ? away : toward, step * 0.09),
+        mix(out[i]!, away, step * 0.09),
+      ];
+      const ok = candidates.find(
+        (c) => contrast(c, surface) >= MIN_SERIES_CONTRAST && !tooClose(c),
+      );
+      if (ok) best = ok;
+    }
+    out[i] = contrast(best, surface) >= MIN_SERIES_CONTRAST ? best : out[i]!;
+  }
+  return Array.from(new Set(out));
+}
+
+function vizContrastLocal(a: string, b: string): number {
+  return contrast(a, b);
+}
+
