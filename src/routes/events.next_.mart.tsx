@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Download, Ruler, Store } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { PillarSign } from "@/components/next/PillarSign";
+import { MartBundleExport } from "@/components/next/MartBundleExport";
 import { MART_LAYOUT_PRESETS } from "@/lib/next-mart-layouts";
 import { PILLAR_SIZES, pillarKind } from "@/lib/next-pillar-masters";
 import {
@@ -11,6 +12,7 @@ import {
   NEXT_MART_ARTWORK,
   NEXT_MART_LOGOS,
   NEXT_MART_PILLARS,
+  martPillarConfig,
   martArtworkPanels,
   martTotalPanels,
 } from "@/lib/next-mart";
@@ -96,7 +98,7 @@ function MartPage() {
                 className="overflow-hidden rounded-2xl border border-black/10 bg-white"
               >
                 <div className="flex justify-center bg-[#F2F2F2] p-4">
-                  <PillarSign config={p.config} pxPerMm={0.06} />
+                  <PillarSign config={martPillarConfig(p)} pxPerMm={0.06} />
                 </div>
                 <div className="px-4 py-3">
                   <div className="text-sm font-medium text-[#03002C]">{p.name}</div>
@@ -111,6 +113,8 @@ function MartPage() {
             ))}
           </div>
         </section>
+
+        <MartBundleExport />
 
         {/* Reusable layout presets — QR + wayfinding geometry per template */}
         <section className="mt-12">
