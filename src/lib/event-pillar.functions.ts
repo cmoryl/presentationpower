@@ -29,6 +29,10 @@ const configSchema = z
     qrData: z.string().default(""),
     qrSize: z.number().default(180),
     qrCaption: z.string().default(""),
+    qrCaptionFont: z.enum(["bold-caps", "bold", "regular"]).default("bold-caps"),
+    qrCaptionSize: z.number().default(0),
+    qrCaptionAlign: z.enum(["left", "center", "right"]).default("center"),
+    qrCaptionPad: z.number().default(14),
     eventLabel: z.string().default(""),
   })
   .passthrough();
