@@ -551,8 +551,8 @@ function f3(n: number): string {
  * corrupting the PDF's flate streams and xref offsets, so Illustrator opens a
  * blank artboard. Always widen the string back to raw bytes before download.
  */
-export function londonAiBytes(ai: string | Uint8Array): Uint8Array {
-  if (typeof ai !== "string") return ai;
+export function londonAiBytes(ai: string | Uint8Array): Uint8Array<ArrayBuffer> {
+  if (typeof ai !== "string") return new Uint8Array(ai);
   const bytes = new Uint8Array(ai.length);
   for (let i = 0; i < ai.length; i += 1) bytes[i] = ai.charCodeAt(i) & 0xff;
   return bytes;
