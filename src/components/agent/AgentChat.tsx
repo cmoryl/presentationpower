@@ -169,6 +169,26 @@ export function AgentChat({
         // Create the deck up front (fast, local) so the mid-build createDeck
         // tool part can carry the real id and the preview can pop live.
         const { deckId } = useDeckStore.getState().createDeckFromSnapshot(GLOBALLINK_Q3_QBR_DECK);
+        const completeDeck = useDeckStore.getState().decks[deckId];
+        const completeSlides = completeDeck?.slides ?? [];
+        const revealSlides = (count: number) => {
+          const visibleSlides = completeSlides.slice(0, count).map((slide, index) => ({
+            ...slide,
+            position: index,
+          }));
+          useDeckStore.setState((state) => {
+            const deck = state.decks[deckId];
+            if (!deck) return state;
+            return {
+              decks: {
+                ...state.decks,
+                [deckId]: { ...deck, slides: visibleSlides },
+              },
+            };
+          });
+          onActivity();
+        };
+        revealSlides(0);
         // Local snapshot decks use short nanoids, not the UUIDs the message
         // scanner expects — hand the id to the preview directly.
         seenDeck.current = deckId;
@@ -178,11 +198,14 @@ export function AgentChat({
         for (const step of steps) {
           if (!alive()) return;
           push(render(step.text, step.tools));
+          if (typeof step.revealSlides === "number") revealSlides(step.revealSlides);
           onActivity();
           await sleep(step.holdMs);
         }
         if (!alive()) return;
-        const finalMsg = render(demoFinalAssistantText(), steps[steps.length - 1]!.tools);
+        revealSlides(completeSlides.length);
+        const lastStep = steps.at(-1);
+        const finalMsg = render(demoFinalAssistantText(), lastStep?.tools ?? []);
         push(finalMsg);
         onActivity();
         // Persist so a reload shows the same conversation and linked deck.

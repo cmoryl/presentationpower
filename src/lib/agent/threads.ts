@@ -15,6 +15,11 @@ export type AgentThread = {
 // kind = 'presentation' OR kind = null — treat both as presentation, and never
 // return print/social/event rows here.
 const PRESENTATION_KIND_FILTER = "kind.is.null,kind.eq.presentation";
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function isPersistableDeckId(deckId: string): boolean {
+  return UUID_RE.test(deckId);
+}
 
 export async function listAgentThreads(): Promise<AgentThread[]> {
   const { data, error } = await supabase
@@ -54,6 +59,9 @@ export async function deleteAgentThread(id: string) {
 }
 
 export async function setAgentThreadDeck(id: string, deckId: string) {
+  // Cloud thread.deck_id is a UUID column. Demo/local decks use short nanoids
+  // and are restored from persisted chat tool output + local deck storage.
+  if (!isPersistableDeckId(deckId)) return;
   const { error } = await supabase
     .from("agent_threads")
     .update({ deck_id: deckId } as never)
@@ -121,14 +129,14 @@ export async function appendAgentMessages(threadId: string, messages: UIMessage[
 
 /** Pull the deck id out of any tool output text the agent produced. */
 export function findDeckIdInMessages(messages: UIMessage[]): string | null {
-  const uuid = /"deck_id"\s*:\s*"([0-9a-f-]{36})"/i;
+  const deckIdPattern = /"deck_id"\s*:\s*"([A-Za-z0-9_-]{6,64})"/;
   for (let i = messages.length - 1; i >= 0; i -= 1) {
     const parts = messages[i]?.parts ?? [];
     for (let j = parts.length - 1; j >= 0; j -= 1) {
       const part = parts[j] as { output?: unknown; text?: unknown };
       for (const candidate of [part.output, part.text]) {
         if (typeof candidate !== "string") continue;
-        const m = uuid.exec(candidate);
+        const m = deckIdPattern.exec(candidate);
         if (m) return m[1] ?? null;
       }
     }

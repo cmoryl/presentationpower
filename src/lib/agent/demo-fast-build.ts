@@ -211,6 +211,8 @@ export type DemoBuildStep = {
   text: string;
   /** Tool parts visible during this step; the last one may still be running. */
   tools: DemoToolPart[];
+  /** Number of completed slides to reveal in the live preview at this step. */
+  revealSlides?: number;
 };
 
 /**
@@ -224,6 +226,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
       holdMs: 1600,
       text: "Reading your brief…",
       tools: [demoToolPart("getTaxonomy", "input-available")],
+      revealSlides: 0,
     },
     {
       holdMs: 2200,
@@ -232,6 +235,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("getTaxonomy", "output-available", "ok"),
         demoToolPart("searchKnowledge", "input-available"),
       ],
+      revealSlides: 0,
     },
     {
       holdMs: 2600,
@@ -241,6 +245,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("searchKnowledge", "output-available", "ok"),
         demoToolPart("createDeck", "input-available"),
       ],
+      revealSlides: 1,
     },
     {
       holdMs: 2600,
@@ -255,6 +260,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         ),
         demoToolPart("updateSlideContent", "input-available"),
       ],
+      revealSlides: 4,
     },
     {
       holdMs: 2200,
@@ -270,6 +276,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("updateSlideContent", "output-available", "ok"),
         demoToolPart("setSlideIcon", "input-available"),
       ],
+      revealSlides: 6,
     },
     {
       holdMs: 1800,
@@ -285,6 +292,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("updateSlideContent", "output-available", "ok"),
         demoToolPart("setSlideIcon", "output-available", "ok"),
       ],
+      revealSlides: 6,
     },
   ];
 }
