@@ -52,6 +52,8 @@ type Row = {
   layout_id: string;
   content: Record<string, unknown> | null;
   notes: string | null;
+  /** Per-slide light/dark appearance so the preview matches the editor. */
+  mode?: "light" | "dark";
 };
 
 export function AgentDeckPreview({
