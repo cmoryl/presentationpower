@@ -61,7 +61,14 @@ function CityBadgePage() {
   const saveVersion = useServerFn(saveCityBadgeVersion);
   const removeVersion = useServerFn(deleteCityBadgeVersion);
 
-  const [config, setConfig] = useState<CityBadgeConfig>(CITY_BADGE_DEFAULT);
+  const { division: divisionParam, face: faceParam } = Route.useSearch();
+  const [config, setConfig] = useState<CityBadgeConfig>(() =>
+    normalizeCityBadgeConfig({
+      ...CITY_BADGE_DEFAULT,
+      ...(divisionParam ? { divisionId: divisionParam } : {}),
+      ...(faceParam ? { face: faceParam } : {}),
+    }),
+  );
   const [versionName, setVersionName] = useState("City Series · Q4 run");
   const [notes, setNotes] = useState("");
   const [guides, setGuides] = useState(true);
