@@ -331,6 +331,8 @@ export type PillarConfig = {
   qrForeground: string;
   /** QR plate hex. Empty = white. */
   qrBackground: string;
+  /** Drop the plate entirely and print just the code modules over the gradient. */
+  qrTransparent: boolean;
   /** Placed QR block position in mm from the trim top-left. null = default flow. */
   qrOffsetX: number | null;
   qrOffsetY: number | null;
