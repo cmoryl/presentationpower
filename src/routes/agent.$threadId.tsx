@@ -48,7 +48,7 @@ const AGENT_CAPABILITIES: Array<{ label: string; icon: LucideIcon; color: string
 const STARTER_BRIEFS = [
   {
     label: "GlobalLink Q3 QBR · demo",
-    text: "Create a 6-slide GlobalLink Q3 business review with stats, a case study, AI hub, KPI dashboard, and product showcase",
+    text: "Create a 6-slide GlobalLink Q3 business review with stats and a case study",
   },
   {
     label: "Q1 board review",

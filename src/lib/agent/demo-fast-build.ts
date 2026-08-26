@@ -7,7 +7,7 @@ import type { DeckSnapshot } from "@/lib/deck-store";
 
 
 export const DEMO_FAST_BUILD_TRIGGER =
-  "Create a 6-slide GlobalLink Q3 business review with stats, a case study, AI hub, KPI dashboard, and product showcase";
+  "Create a 6-slide GlobalLink Q3 business review with stats and a case study";
 
 /** Forgiving matcher: case-insensitive, tolerant of punctuation/spacing and
  * minor wording drift, as long as the core intent tokens are present. */
