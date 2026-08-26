@@ -705,10 +705,30 @@ function ShareItem({
   onClick: () => void;
   disabled?: boolean;
 }) {
+  const runAction = () => {
+    if (disabled) return;
+    onClick();
+  };
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        runAction();
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          e.stopPropagation();
+          runAction();
+        }
+      }}
       disabled={disabled}
       className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-black/[0.03] disabled:opacity-50 dark:hover:bg-white/[0.05]"
     >
