@@ -306,6 +306,9 @@ export type PillarConfig = {
   qrForeground: string;
   /** QR plate hex. Empty = white. */
   qrBackground: string;
+  /** Placed QR block position in mm from the trim top-left. null = default flow. */
+  qrOffsetX: number | null;
+  qrOffsetY: number | null;
   /** Event this live pillar file belongs to (free text label). */
   eventLabel: string;
 };
@@ -339,6 +342,8 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     qrStyle: "block",
     qrForeground: "",
     qrBackground: "",
+    qrOffsetX: null,
+    qrOffsetY: null,
     eventLabel: "",
   };
 }
@@ -355,6 +360,52 @@ export function pillarQrSize(config: PillarConfig): number {
   const raw = Number(config.qrSize);
   const value = Number.isFinite(raw) && raw > 0 ? raw : 180;
   return Math.min(PILLAR_QR_SIZE.max, Math.max(PILLAR_QR_SIZE.min, value));
+}
+
+/**
+ * Resolved geometry of the QR block (code + caption) in mm from the trim
+ * top-left. Positions are always clamped inside the safe area so a dragged QR
+ * can never leave printable copy outside the safe margin.
+ */
+export function pillarQrPlacement(config: PillarConfig) {
+  const geo = pillarGeometry(config);
+  const edge = Math.min(pillarQrSize(config), geo.trimW - geo.safeInset * 2);
+  const caption = (config.qrCaption ?? "").trim();
+  const captionSize = Math.max(10, pillarSubSize(config) * 0.55);
+  const captionBlock = caption ? captionSize * 2.2 : 0;
+  const blockH = edge + captionBlock;
+  const minX = geo.safeInset;
+  const maxX = Math.max(minX, geo.trimW - geo.safeInset - edge);
+  const minY = geo.safeInset;
+  const maxY = Math.max(minY, geo.trimH - geo.safeInset - blockH);
+  const defaultX = (geo.trimW - edge) / 2;
+  const defaultY = maxY;
+  const rawX = Number(config.qrOffsetX);
+  const rawY = Number(config.qrOffsetY);
+  const placed =
+    config.qrOffsetX !== null &&
+    config.qrOffsetY !== null &&
+    Number.isFinite(rawX) &&
+    Number.isFinite(rawY);
+  const clamp = (v: number, a: number, b: number) => Math.min(Math.max(v, a), b);
+  return {
+    edge,
+    caption,
+    captionSize,
+    captionBlock,
+    blockH,
+    placed,
+    x: clamp(placed ? rawX : defaultX, minX, maxX),
+    y: clamp(placed ? rawY : defaultY, minY, maxY),
+    minX,
+    maxX,
+    minY,
+    maxY,
+    defaultX,
+    defaultY,
+    centerX: geo.trimW / 2,
+    centerY: geo.trimH / 2,
+  };
 }
 
 /** Resolve the QR module shape. */
