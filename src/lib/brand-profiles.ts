@@ -81,9 +81,12 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       // Corporate narrative leans on long-form case stories + testimonial proof.
       preferredVariantIds: [
         "MV-CASE-STORY",
+        "MV-CASE-SPREAD",
         "MV-PROOF-TESTIMONIAL",
         "MV-SOL-PILLARS-3",
         "MV-CTX-CARDS-3",
+        "MV-CTX-TREND",
+        "MV-NUMBERS-TRIPTYCH",
       ],
     },
   },
