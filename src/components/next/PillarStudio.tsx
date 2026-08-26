@@ -61,6 +61,17 @@ import {
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
 
+import {
+  applyPillarQrPreset,
+  deletePillarQrPreset,
+  pillarQrPresetsFor,
+  pillarQrScopeKey,
+  pillarQrScopeLabel,
+  readPillarQrPresets,
+  savePillarQrPreset,
+  type PillarQrPreset,
+} from "@/lib/pillar-qr-presets";
+
 import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
 
 const NATIVE_PX_PER_MM = 0.72;
