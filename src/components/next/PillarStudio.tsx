@@ -200,6 +200,49 @@ export function PillarStudio({
     }
   };
 
+  const batchItems: PillarBatchItem[] = Object.entries(batch)
+    .filter(([, v]) => v.on && v.qty > 0)
+    .map(([sizeId, v]) => ({
+      sizeId,
+      quantity: v.qty,
+      ...(sizeId === "custom"
+        ? { trimW: Number(config.trimW) || geo.trimW, trimH: Number(config.trimH) || geo.trimH }
+        : {}),
+    }));
+
+  const runBatchExport = async () => {
+    if (batchItems.length === 0) return;
+    setBatchBusy(true);
+    setBatchStage("");
+    const id = toast.loading("Building the pillar batch…");
+    try {
+      const result = await exportPillarBatch({
+        config,
+        items: batchItems,
+        onProgress: (p) => {
+          setBatchStage(p.label);
+          toast.loading(p.label, { id });
+        },
+      });
+      const url = URL.createObjectURL(result.blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = result.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Batch package downloaded", {
+        id,
+        description: `${result.entries.length} size${result.entries.length === 1 ? "" : "s"} · ${result.totalQuantity} panels · layered PDF + .ai per size + production manifest`,
+      });
+    } catch (e) {
+      toast.error("Batch export failed", { id, description: (e as Error).message });
+    } finally {
+      setBatchBusy(false);
+      setBatchStage("");
+    }
+  };
+
+
   const field =
     "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] outline-none focus:border-[#003FC7]";
   const label = "text-xs font-medium text-black/60";
