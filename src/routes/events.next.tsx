@@ -416,7 +416,18 @@ function Hero({
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </Link>
+            <Link
+              to="/events/next/city-badges"
+              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
+            >
+              <span>
+                <span className="font-medium">City Series badge</span> · dark + light faces,
+                print-run versions
+              </span>
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            </Link>
           </div>
+
         </div>
       </div>
 
