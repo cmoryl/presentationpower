@@ -211,6 +211,7 @@ import artTechToGo from "@/assets/next-mart/03_TECH_tech-to-go.svg.asset.json";
 import artPowerUp from "@/assets/next-mart/03b_TECH_power-up-and-go.svg.asset.json";
 import artHydrated from "@/assets/next-mart/04_WATER_keep-hydrated.svg.asset.json";
 import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends.svg.asset.json";
+import artTravelRightOutlined from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right-outlined.svg.asset.json";
 
 /* ---------------------------------------------------------------------------
  * NEXT MART lockup — supplied master logo (colour gradient + reversed white).
@@ -267,6 +268,11 @@ export type MartArtwork = {
   headline: string;
   url: string;
   filename: string;
+  /**
+   * Screen preview file. Where a master still carries live text, this points at
+   * an outlined copy so the browser renders exactly what the printer gets.
+   */
+  previewUrl: string;
   face: "dark" | "light";
   /** Die shape of the board, plain language for the printer. */
   die: string;
@@ -290,6 +296,7 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     headline: "Pack light, travel right",
     url: artTravelRight.url,
     filename: artTravelRight.original_filename,
+    previewUrl: artTravelRightOutlined.url,
     face: "light",
     die: "Rounded panel with notched corner and punched hang hole",
     trimW: MART_ART_TRIM_W,
@@ -306,6 +313,7 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     headline: "Pack like a pro",
     url: artTravelPro.url,
     filename: artTravelPro.original_filename,
+    previewUrl: artTravelPro.url,
     face: "light",
     die: "Rounded panel with notched corner and punched hang hole",
     trimW: MART_ART_TRIM_W,
@@ -322,6 +330,7 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     headline: "Tech to go",
     url: artTechToGo.url,
     filename: artTechToGo.original_filename,
+    previewUrl: artTechToGo.url,
     face: "dark",
     die: "Chamfered hex board with pinched waist",
     trimW: MART_ART_TRIM_W,
@@ -338,6 +347,7 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     headline: "Power up and go",
     url: artPowerUp.url,
     filename: artPowerUp.original_filename,
+    previewUrl: artPowerUp.url,
     face: "dark",
     die: "Chamfered hex board with pinched waist",
     trimW: MART_ART_TRIM_W,
@@ -354,6 +364,7 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     headline: "Keep hydrated",
     url: artHydrated.url,
     filename: artHydrated.original_filename,
+    previewUrl: artHydrated.url,
     face: "dark",
     die: "Rounded top with scalloped wave base",
     trimW: MART_ART_TRIM_W,
@@ -370,6 +381,7 @@ export const NEXT_MART_ARTWORK: MartArtwork[] = [
     headline: "Local legends",
     url: artLocalLegends.url,
     filename: artLocalLegends.original_filename,
+    previewUrl: artLocalLegends.url,
     face: "light",
     die: "Dome top with rounded base corners",
     trimW: MART_ART_TRIM_W,
