@@ -386,8 +386,8 @@ export type NextRegistryRow = {
   secondaryLabel?: string;
   /** In-app route for designs rendered by this build rather than in Canva. */
   internalUrl?: string;
-  /** Set on attendee badge rows so the hub renders a live badge preview. */
-  badgeSide?: "front" | "back";
+  /** Set on attendee badge rows so the hub renders a live City Series preview. */
+  badgeFace?: "dark" | "light";
 };
 
 export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {
