@@ -26,7 +26,9 @@ import {
   PDFRef,
   PDFString,
   StandardFonts,
+  clip,
   closePath,
+  endPath,
   degrees,
   fill,
   lineTo,
@@ -269,7 +271,9 @@ async function ttf(doc: PDFDocument, path: string): Promise<PDFFont | null> {
   try {
     const res = await fetch(resolveAssetUrl(path));
     if (!res.ok) return null;
-    return await doc.embedFont(await res.arrayBuffer(), { subset: true });
+    // Full embedding (no subset): Illustrator re-interprets subset cmaps and
+    // shows .notdef boxes for some characters; the complete font maps cleanly.
+    return await doc.embedFont(await res.arrayBuffer(), { subset: false });
   } catch {
     return null;
   }
@@ -360,7 +364,19 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
 
   // ── 01 Ground ──────────────────────────────────────────────────────────────
   beginLayer(page, layer("01 Ground"));
-  page.pushOperators(pushGraphicsState(), translate(round(ox), round(oy)));
+  // Clip to the bleed sheet: diagonal grounds tessellate past the page bounds,
+  // and Illustrator shows that overhang as a tilted band outside the artboard.
+  page.pushOperators(
+    pushGraphicsState(),
+    translate(round(ox), round(oy)),
+    moveTo(0, 0),
+    lineTo(bleedW, 0),
+    lineTo(bleedW, bleedH),
+    lineTo(0, bleedH),
+    closePath(),
+    clip(),
+    endPath(),
+  );
   drawGround(page, bleedW, bleedH, stops, config.styleId);
   page.pushOperators(popGraphicsState());
   endLayer(page);
