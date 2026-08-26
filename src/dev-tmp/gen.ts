@@ -1,3 +1,5 @@
+import { setAssetBaseUrl } from "@/lib/asset-base-url";
+setAssetBaseUrl("http://localhost:8080");
 import { buildPillarVectorPdf } from "@/lib/pillar-vector-pdf";
 import { pillarDefault } from "@/lib/next-pillar-masters";
 import { writeFileSync } from "node:fs";
