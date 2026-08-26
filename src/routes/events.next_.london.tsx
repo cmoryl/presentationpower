@@ -217,15 +217,23 @@ function LondonSignagePage() {
       async () => {
         const pack = await packOrNull();
         const art = resolveLondonArtwork(panel, pack);
-        const body: BlobPart =
-          fmt === "svg"
-            ? art.svg
-            : typeof art.ai === "string"
-              ? art.ai
-              : new Uint8Array(art.ai).slice();
         gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
-        const type = fmt === "svg" ? "image/svg+xml" : "application/postscript";
-        download(new Blob([body], { type }), `${panelSlug(panel)}.${fmt}`);
+        if (fmt === "svg") {
+          download(
+            new Blob([art.svg], { type: "image/svg+xml" }),
+            `${panelSlug(panel)}.svg`,
+          );
+          return;
+        }
+        // .ai is PDF-compatible binary — never let Blob UTF-8 the bytes.
+        const bytes = londonAiBytes(art.ai);
+        download(
+          new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)], {
+            type: "application/illustrator",
+          }),
+          `${panelSlug(panel)}.ai`,
+        );
+
       },
     );
 
