@@ -569,10 +569,10 @@ export function PillarStudio({
             </div>
           ) : null}
 
-          {/* QR */}
+          {/* QR stylizer */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
             <div className="flex items-center gap-2 text-xs font-medium text-black/60">
-              <QrCode size={14} /> Printed QR code
+              <QrCode size={14} /> Printed QR stylizer
             </div>
             <input
               className={field}
@@ -605,10 +605,90 @@ export function PillarStudio({
                     onChange={(e) => set("qrSize", Number(e.target.value))}
                   />
                 </div>
-                <p className="text-[11px] text-black/45">
-                  Live, scannable code at error-correction level H, drawn as vector modules with a
-                  quiet zone so it stays crisp at any output size.
-                </p>
+
+                <div>
+                  <div className={label}>Module style</div>
+                  <div className="mt-2 grid grid-cols-3 gap-2">
+                    {PILLAR_QR_STYLES.map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        title={s.note}
+                        onClick={() => set("qrStyle", s.id)}
+                        className={`rounded-lg border px-2 py-2 text-center text-xs ${
+                          pillarQrStyle(config) === s.id
+                            ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                            : "border-black/15 text-black/60 hover:border-[#003FC7]/50"
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {(
+                  [
+                    ["Ink colour", "qrForeground", pillarQrForeground(config)],
+                    ["Plate colour", "qrBackground", pillarQrBackground(config)],
+                  ] as const
+                ).map(([labelText, key, current]) => (
+                  <div key={key}>
+                    <div className={label}>{labelText}</div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {PILLAR_TEXT_COLORS.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          title={c.label}
+                          aria-label={`${labelText}: ${c.label}`}
+                          onClick={() => set(key, c.hex)}
+                          className={`h-7 w-7 rounded-full border-2 ${
+                            current.toLowerCase() === c.hex.toLowerCase()
+                              ? "border-[#003FC7]"
+                              : "border-black/15"
+                          }`}
+                          style={{ background: c.hex }}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        aria-label={`Custom ${labelText.toLowerCase()}`}
+                        className="h-7 w-9 cursor-pointer rounded border border-black/15 bg-white"
+                        value={current}
+                        onChange={(e) => set(key, e.target.value.toUpperCase())}
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                {pillarQrScanSafe(config) ? (
+                  <p className="rounded-lg bg-[#A6FA87]/30 px-3 py-2 text-[11px] font-medium text-[#03002C]">
+                    Scan-safe · contrast{" "}
+                    {pillarContrastRatio(pillarQrForeground(config), pillarQrBackground(config)).toFixed(1)}
+                    :1 · error-correction H · quiet zone included. Encoded live from the payload and
+                    drawn as vector modules, so the printed code is 100% scannable.
+                  </p>
+                ) : (
+                  <div className="rounded-lg bg-[#FFEB66]/40 px-3 py-2 text-[11px] text-[#03002C]">
+                    <p>
+                      Low contrast (
+                      {pillarContrastRatio(pillarQrForeground(config), pillarQrBackground(config)).toFixed(1)}
+                      :1 — needs {PILLAR_QR_MIN_CONTRAST}:1). This pairing may not scan in the
+                      hall.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        set("qrForeground", "");
+                        set("qrBackground", "");
+                      }}
+                      className="mt-2 rounded-lg border border-[#003FC7] px-3 py-1.5 font-medium text-[#003FC7]"
+                    >
+                      Reset to scan-safe colours
+                    </button>
+                  </div>
+                )}
               </>
             ) : (
               <p className="text-[11px] text-black/45">
