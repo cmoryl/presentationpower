@@ -90,6 +90,8 @@ function ExportView() {
   const [coverageReport, setCoverageReport] = useState<ExportCoverageReport | null>(null);
   const [geometryRepair, setGeometryRepair] = useState<GeometryRepairReport | null>(null);
   const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
+  const [validationReport, setValidationReport] = useState<PptxValidationReport | null>(null);
+
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
   const [alphaImages, setAlphaImages] = useExportAlphaImages();
