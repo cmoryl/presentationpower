@@ -83,6 +83,10 @@ export const PILLAR_KINDS: PillarKind[] = [
 /** Approved headline size range in mm (cap height on the trim sheet). */
 export const PILLAR_HEADLINE_SIZE = { min: 40, max: 220, step: 2 };
 
+/** Division lockup scale range, 1 = the approved default width (58% of trim). */
+export const PILLAR_LOCKUP_SCALE = { min: 0.5, max: 1.6, step: 0.05 };
+
+
 /** Approved ink options for pillar copy. */
 export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
   { id: "white", label: "White", hex: "#FFFFFF" },
@@ -178,6 +182,8 @@ export type PillarConfig = {
   headlineSize: number;
   /** Headline ink. Empty string = the face default ink. */
   headlineColor: string;
+  /** Division lockup scale, 1 = the approved default width. */
+  lockupScale: number;
 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
@@ -193,6 +199,7 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     verticalHeadline: false,
     headlineSize: kind.headlineSize,
     headlineColor: "",
+    lockupScale: 1,
   };
 }
 
@@ -203,6 +210,14 @@ export function pillarHeadlineSize(config: PillarConfig): number {
   const value = Number.isFinite(raw) && raw > 0 ? raw : fallback;
   return Math.min(PILLAR_HEADLINE_SIZE.max, Math.max(PILLAR_HEADLINE_SIZE.min, value));
 }
+
+/** Clamp the division lockup scale into the approved range. */
+export function pillarLockupScale(config: PillarConfig): number {
+  const raw = Number(config.lockupScale);
+  const value = Number.isFinite(raw) && raw > 0 ? raw : 1;
+  return Math.min(PILLAR_LOCKUP_SCALE.max, Math.max(PILLAR_LOCKUP_SCALE.min, value));
+}
+
 
 /** Resolve the headline ink, falling back to the face default. */
 export function pillarHeadlineInk(config: PillarConfig): string {

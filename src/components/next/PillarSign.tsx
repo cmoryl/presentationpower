@@ -7,6 +7,8 @@ import {
   pillarDivision,
   pillarHeadlineInk,
   pillarHeadlineSize,
+  pillarLockupScale,
+
   pillarInk,
   pillarStops,
   type PillarConfig,
@@ -44,7 +46,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const isHalo = config.styleId.includes("halo");
   const gradientId = `pillar-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
   const inset = mm(PILLAR_SPEC.bleedEdge + PILLAR_SPEC.safeInset);
-  const lockupW = mm(PILLAR_SPEC.trimW * 0.58);
+  const lockupW = mm(PILLAR_SPEC.trimW * 0.58 * pillarLockupScale(config));
 
   const axis = config.styleId.includes("diagonal")
     ? { x1: "0%", y1: "0%", x2: "100%", y2: "100%" }
