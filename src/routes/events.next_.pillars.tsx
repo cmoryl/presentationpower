@@ -11,9 +11,14 @@ import {
   PILLAR_DIVISIONS,
   PILLAR_FACES,
   PILLAR_KINDS,
+  PILLAR_HEADLINE_SIZE,
   PILLAR_SPEC,
   PILLAR_STYLE_IDS,
+  PILLAR_TEXT_COLORS,
   pillarDefault,
+  pillarHeadlineInk,
+  pillarHeadlineSize,
+
   pillarFace,
   pillarKind,
   pillarName,
@@ -237,21 +242,61 @@ function PillarPage() {
                   />
                 </div>
                 <div>
-                  <div className={label}>Subline</div>
+                  <div className="flex items-center justify-between">
+                    <div className={label}>Headline size</div>
+                    <div className="text-xs tabular-nums text-black/55">
+                      {pillarHeadlineSize(config)} mm
+                    </div>
+                  </div>
                   <input
-                    className={`${field} mt-1`}
-                    value={config.subline}
-                    onChange={(e) => set("subline", e.target.value)}
+                    type="range"
+                    className="mt-2 w-full accent-[#003FC7]"
+                    min={PILLAR_HEADLINE_SIZE.min}
+                    max={PILLAR_HEADLINE_SIZE.max}
+                    step={PILLAR_HEADLINE_SIZE.step}
+                    value={pillarHeadlineSize(config)}
+                    onChange={(e) => set("headlineSize", Number(e.target.value))}
                   />
                 </div>
                 <div>
-                  <div className={label}>Footer detail</div>
-                  <input
-                    className={`${field} mt-1`}
-                    value={config.detail}
-                    onChange={(e) => set("detail", e.target.value)}
-                  />
+                  <div className={label}>Headline colour</div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => set("headlineColor", "")}
+                      className={`rounded-lg border px-2.5 py-1.5 text-xs ${
+                        !config.headlineColor
+                          ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                          : "border-black/15 text-black/60 hover:border-[#003FC7]/50"
+                      }`}
+                    >
+                      Face default
+                    </button>
+                    {PILLAR_TEXT_COLORS.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        title={c.label}
+                        aria-label={c.label}
+                        onClick={() => set("headlineColor", c.hex)}
+                        className={`h-7 w-7 rounded-full border-2 ${
+                          config.headlineColor?.toLowerCase() === c.hex.toLowerCase()
+                            ? "border-[#003FC7]"
+                            : "border-black/15"
+                        }`}
+                        style={{ background: c.hex }}
+                      />
+                    ))}
+                    <input
+                      type="color"
+                      aria-label="Custom headline colour"
+                      className="h-7 w-9 cursor-pointer rounded border border-black/15 bg-white"
+                      value={pillarHeadlineInk(config)}
+                      onChange={(e) => set("headlineColor", e.target.value.toUpperCase())}
+                    />
+                  </div>
                 </div>
+
                 <label className="flex items-center gap-2 text-xs text-black/60">
                   <input
                     type="checkbox"

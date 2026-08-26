@@ -5,10 +5,13 @@
 import {
   PILLAR_SPEC,
   pillarDivision,
+  pillarHeadlineInk,
+  pillarHeadlineSize,
   pillarInk,
   pillarStops,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
+
 
 type Props = {
   config: PillarConfig;
@@ -32,6 +35,9 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const h = mm(PILLAR_SPEC.bleedH);
   const face = config.face ?? "dark";
   const ink = pillarInk(face);
+  const headlineInk = pillarHeadlineInk(config);
+  const headlineSize = pillarHeadlineSize(config);
+
   const stops = pillarStops(config.styleId, face);
   const vertical = Boolean(config.verticalHeadline) && config.kind !== "logo";
   const division = pillarDivision(config.divisionId);
@@ -126,7 +132,6 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: mm(46),
             }}
           >
             {config.headline.trim() ? (
@@ -137,28 +142,13 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
                   fontWeight: 700,
                   letterSpacing: "-0.01em",
                   lineHeight: 1,
-                  fontSize: mm(150),
+                  fontSize: mm(headlineSize * 1.45),
                   textTransform: "uppercase",
                   whiteSpace: "nowrap",
+                  color: headlineInk,
                 }}
               >
                 {config.headline}
-              </div>
-            ) : null}
-            {config.subline.trim() ? (
-              <div
-                style={{
-                  writingMode: "vertical-rl",
-                  transform: "rotate(180deg)",
-                  fontWeight: 500,
-                  fontSize: mm(44),
-                  lineHeight: 1.25,
-                  letterSpacing: "0.02em",
-                  opacity: 0.92,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {config.subline}
               </div>
             ) : null}
           </div>
@@ -170,24 +160,12 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
                   fontWeight: 700,
                   letterSpacing: "-0.02em",
                   lineHeight: 1.02,
-                  fontSize: mm(config.headline.length > 14 ? 78 : 104),
+                  fontSize: mm(headlineSize),
                   textTransform: "uppercase",
+                  color: headlineInk,
                 }}
               >
                 {config.headline}
-              </div>
-            ) : null}
-            {config.subline.trim() ? (
-              <div
-                style={{
-                  marginTop: mm(38),
-                  fontWeight: 500,
-                  fontSize: mm(40),
-                  lineHeight: 1.25,
-                  opacity: 0.92,
-                }}
-              >
-                {config.subline}
               </div>
             ) : null}
           </div>
@@ -201,26 +179,13 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
             }}
           >
             <svg width={mm(300)} height={mm(300)} viewBox="0 0 100 100" aria-hidden>
-              <path d="M8 42 H62 V22 L94 50 L62 78 V58 H8 Z" fill={ink} />
+              <path d="M8 42 H62 V22 L94 50 L62 78 V58 H8 Z" fill={headlineInk} />
             </svg>
           </div>
         ) : null}
 
         <div style={{ flex: 1 }} />
 
-        {config.detail.trim() ? (
-          <div
-            style={{
-              fontSize: mm(30),
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              fontWeight: 600,
-              opacity: 0.85,
-            }}
-          >
-            {config.detail}
-          </div>
-        ) : null}
       </div>
 
       {guides ? (

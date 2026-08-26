@@ -41,19 +41,18 @@ export type PillarKind = {
   note: string;
   defaultStyle: string;
   headline: string;
-  subline: string;
-  detail: string;
+  /** Default headline cap height in mm on the trim sheet. */
+  headlineSize: number;
 };
 
 export const PILLAR_KINDS: PillarKind[] = [
   {
     id: "welcome",
     name: "Welcome",
-    note: "Entrance pillar. Sets the room at arrival — lockup high, single welcome line, event detail at the foot.",
+    note: "Entrance pillar. Sets the room at arrival — lockup high, single welcome line, nothing else.",
     defaultStyle: "01-beam-violet-aqua",
     headline: "WELCOME",
-    subline: "TransPerfect NEXT 2026",
-    detail: "Doors 08:30 · Keynote 09:30",
+    headlineSize: 104,
   },
   {
     id: "registration",
@@ -61,8 +60,7 @@ export const PILLAR_KINDS: PillarKind[] = [
     note: "Check-in pillar. Reads from across the concourse and pairs with the desk fronts.",
     defaultStyle: "04-horizon",
     headline: "REGISTRATION",
-    subline: "Badge collection & check-in",
-    detail: "Have your QR ready",
+    headlineSize: 78,
   },
   {
     id: "logo",
@@ -70,8 +68,7 @@ export const PILLAR_KINDS: PillarKind[] = [
     note: "Brand-only pillar for repeats down a corridor or either side of a stage.",
     defaultStyle: "08-halo",
     headline: "",
-    subline: "",
-    detail: "",
+    headlineSize: 104,
   },
   {
     id: "directional",
@@ -79,10 +76,24 @@ export const PILLAR_KINDS: PillarKind[] = [
     note: "Wayfinding pillar. One destination, one arrow — nothing else competes with it.",
     defaultStyle: "03-wash-diagonal",
     headline: "MAIN STAGE",
-    subline: "Keynotes & plenaries",
-    detail: "Level 2",
+    headlineSize: 90,
   },
 ];
+
+/** Approved headline size range in mm (cap height on the trim sheet). */
+export const PILLAR_HEADLINE_SIZE = { min: 40, max: 220, step: 2 };
+
+/** Approved ink options for pillar copy. */
+export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
+  { id: "white", label: "White", hex: "#FFFFFF" },
+  { id: "blue-800", label: "Blue 800", hex: "#03002C" },
+  { id: "blue-500", label: "Blue 500", hex: "#003FC7" },
+  { id: "blue-white", label: "Blue White", hex: "#E0E8F5" },
+  { id: "aqua", label: "Aqua", hex: "#A1FBF9" },
+  { id: "lavender", label: "Lavender", hex: "#C2A3FF" },
+  { id: "yellow", label: "Yellow", hex: "#FFEB66" },
+];
+
 
 export function pillarKind(id: string | undefined): PillarKind {
   return PILLAR_KINDS.find((k) => k.id === id) ?? PILLAR_KINDS[0]!;
@@ -157,14 +168,16 @@ export type PillarConfig = {
   divisionId: string;
   styleId: string;
   headline: string;
-  subline: string;
-  detail: string;
   arrow: PillarArrow;
   showLockup: boolean;
   /** Approved gradient face: full-saturation dark, or the light tint. */
   face: PillarFaceId;
   /** Run the headline up the column so long words get the full pillar height. */
   verticalHeadline: boolean;
+  /** Headline cap height in mm on the trim sheet. */
+  headlineSize: number;
+  /** Headline ink. Empty string = the face default ink. */
+  headlineColor: string;
 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
@@ -174,13 +187,27 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     divisionId: pillarDivision(divisionId).id,
     styleId: kind.defaultStyle,
     headline: kind.headline,
-    subline: kind.subline,
-    detail: kind.detail,
     arrow: "right",
     showLockup: true,
     face: "dark",
     verticalHeadline: false,
+    headlineSize: kind.headlineSize,
+    headlineColor: "",
   };
+}
+
+/** Clamp a headline size into the approved range. */
+export function pillarHeadlineSize(config: PillarConfig): number {
+  const raw = Number(config.headlineSize);
+  const fallback = pillarKind(config.kind).headlineSize;
+  const value = Number.isFinite(raw) && raw > 0 ? raw : fallback;
+  return Math.min(PILLAR_HEADLINE_SIZE.max, Math.max(PILLAR_HEADLINE_SIZE.min, value));
+}
+
+/** Resolve the headline ink, falling back to the face default. */
+export function pillarHeadlineInk(config: PillarConfig): string {
+  const hex = (config.headlineColor || "").trim();
+  return /^#[0-9a-f]{6}$/i.test(hex) ? hex : pillarInk(config.face ?? "dark");
 }
 
 /** Swap the sign kind while keeping any copy the operator has already typed. */
@@ -194,10 +221,10 @@ export function withPillarKind(config: PillarConfig, kindId: PillarKindId): Pill
     kind: to.id,
     styleId: config.styleId === from.defaultStyle ? to.defaultStyle : config.styleId,
     headline: keep(config.headline, from.headline, to.headline),
-    subline: keep(config.subline, from.subline, to.subline),
-    detail: keep(config.detail, from.detail, to.detail),
+    headlineSize: config.headlineSize === from.headlineSize ? to.headlineSize : config.headlineSize,
   };
 }
+
 
 export function pillarName(config: PillarConfig): string {
   return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar · ${pillarFace(config.face).name.toLowerCase()}`;
