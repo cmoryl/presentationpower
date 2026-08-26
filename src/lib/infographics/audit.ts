@@ -268,18 +268,20 @@ export function auditVizSpec(spec: InfographicSpec, opts: AuditOptions = {}): Vi
   }
 
   const required = REQUIRED_ENCODING[spec.kind] ?? [];
-  const missing = required.filter((k) => !spec.encoding[k]);
-  if (missing.length > 0) {
+  const unsatisfied = required.filter((group) => !group.some((ch) => spec.encoding[ch]));
+  if (unsatisfied.length > 0) {
+    const names = unsatisfied.map((g) => g.join(" or "));
     add({
       code: "VIZ-ENCODING-MISSING",
       severity: "blocker",
       group: "encoding",
-      message: `A ${spec.kind} chart needs the ${missing.join(", ")} channel${
-        missing.length > 1 ? "s" : ""
+      message: `A ${spec.kind} chart needs the ${names.join(", ")} channel${
+        unsatisfied.length > 1 ? "s" : ""
       } mapped to a column.`,
-      fix: `Set encoding.${missing[0]} to the matching column name in data.rows.`,
+      fix: `Set encoding.${unsatisfied[0][0]} to the matching column name in data.rows.`,
     });
   }
+
 
   const presentKeys = new Set(rows.flatMap((r) => Object.keys(r)));
   for (const [channel, key] of Object.entries(spec.encoding)) {
