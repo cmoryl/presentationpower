@@ -6,12 +6,13 @@
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, QrCode, Ruler, Save, Trash2 } from "lucide-react";
+import { Download, Layers, QrCode, Ruler, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { PillarSign } from "@/components/next/PillarSign";
 import { exportPillarSign } from "@/lib/next-pillar-export";
+import { exportPillarBatch, type PillarBatchItem } from "@/lib/next-pillar-batch-export";
 import {
   deletePillarFile,
   listPillarFiles,
@@ -107,6 +108,9 @@ export function PillarStudio({
   const [busy, setBusy] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [customEvent, setCustomEvent] = useState("");
+  const [batch, setBatch] = useState<Record<string, { on: boolean; qty: number }>>({});
+  const [batchBusy, setBatchBusy] = useState(false);
+  const [batchStage, setBatchStage] = useState("");
 
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
