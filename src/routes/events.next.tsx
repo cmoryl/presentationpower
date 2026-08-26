@@ -796,7 +796,8 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
             <ArrowRight size={13} />
           </Link>
           <span className="text-xs text-muted-foreground">
-            Front + back, print-ready at 4.58″ × 6.55″ bleed.
+            Approved City Series artwork with the division lockup, dark + light faces, print-ready
+            at 4.58″ × 6.55″ bleed.
           </span>
         </div>
       </div>
