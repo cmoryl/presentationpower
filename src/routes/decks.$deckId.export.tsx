@@ -298,7 +298,57 @@ function ExportView() {
           duration: 9000,
         });
       }
+      // Second gate: prove the artwork the file carries LOOKS like the editor,
+      // in the appearance the deck asks for. Every slide is rendered twice
+      // (light + dark) so a slide that exported in the wrong mode is caught as
+      // a mode mismatch rather than a vague "drift".
+      toast.loading("Comparing exported slides with the editor…", {
+        id: progressId,
+        description: "Rendering light and dark references.",
+      });
+      let visual: VisualValidationReport | null = null;
+      try {
+        const { captureModeReferences, validateExportedPptxVisuals } = await import(
+          "@/lib/pptx-visual-validate-client"
+        );
+        const refs = await captureModeReferences(deck, {
+          onProgress: (done, total) => {
+            toast.loading("Comparing exported slides with the editor…", {
+              id: progressId,
+              description: `Rendering references ${done} of ${total}.`,
+            });
+          },
+        });
+        visual = await validateExportedPptxVisuals(blob, refs);
+      } catch (e) {
+        console.warn("[deck-export-visual-validate] visual check unavailable:", e);
+      }
+      setVisualReport(visual);
+      if (visual && !visual.ok) {
+        lastBlobRef.current = null;
+        const errors = visual.issues.filter((i) => i.level === "error");
+        toast.error("Export blocked — slides do not match the editor", {
+          id: progressId,
+          description: errors
+            .slice(0, 3)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 16000,
+        });
+        return;
+      }
+      if (visual?.issues.some((i) => i.level === "warning")) {
+        toast.warning("Visual check passed with warnings", {
+          description: visual.issues
+            .filter((i) => i.level === "warning")
+            .slice(0, 2)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 9000,
+        });
+      }
       // Trigger download for the user.
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
