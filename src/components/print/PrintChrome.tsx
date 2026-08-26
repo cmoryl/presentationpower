@@ -9,14 +9,15 @@ import { getDivisionLogos } from "@/lib/division-logos";
 //
 // Shared print chrome extracted from the Canva design so all four print
 // layouts (Adaptor Brief, Client Spotlight, EBrochure, Case Study) share
-// the exact same CTA band + dual-lockup contact footer.
+// the exact same CTA band + contact footer.
 //
 // The Canva CTA band is a diagonal navy→primary→accent gradient with a
 // tiny sub-brand mark chip on the left, "See {Sub-brand} in Action" as
 // the label, and a "Book a Demo »" outline pill on the right.
 //
-// The footer is a dual-lockup — the parent TransPerfect wordmark and the
-// division mark share a hairline divider, with a right-hand contact strip
+// The footer signs off with a single lockup — the division mark on division
+// assets, the TransPerfect wordmark on enterprise assets, or a product logo
+// where one is supplied — with a right-hand contact strip
 // (⊕ site   ✉ email) rendered as small icon+text chips.
 // -----------------------------------------------------------------------
 
