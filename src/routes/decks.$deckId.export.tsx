@@ -37,6 +37,8 @@ import {
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
 import type { PptxValidationReport } from "@/lib/pptx-validate";
+import type { VisualValidationReport } from "@/lib/pptx-visual-validate";
+
 
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
@@ -93,6 +95,8 @@ function ExportView() {
   const [geometryRepair, setGeometryRepair] = useState<GeometryRepairReport | null>(null);
   const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
   const [validationReport, setValidationReport] = useState<PptxValidationReport | null>(null);
+  const [visualReport, setVisualReport] = useState<VisualValidationReport | null>(null);
+
 
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
@@ -294,7 +298,57 @@ function ExportView() {
           duration: 9000,
         });
       }
+      // Second gate: prove the artwork the file carries LOOKS like the editor,
+      // in the appearance the deck asks for. Every slide is rendered twice
+      // (light + dark) so a slide that exported in the wrong mode is caught as
+      // a mode mismatch rather than a vague "drift".
+      toast.loading("Comparing exported slides with the editor…", {
+        id: progressId,
+        description: "Rendering light and dark references.",
+      });
+      let visual: VisualValidationReport | null = null;
+      try {
+        const { captureModeReferences, validateExportedPptxVisuals } = await import(
+          "@/lib/pptx-visual-validate-client"
+        );
+        const refs = await captureModeReferences(deck, {
+          onProgress: (done, total) => {
+            toast.loading("Comparing exported slides with the editor…", {
+              id: progressId,
+              description: `Rendering references ${done} of ${total}.`,
+            });
+          },
+        });
+        visual = await validateExportedPptxVisuals(blob, refs);
+      } catch (e) {
+        console.warn("[deck-export-visual-validate] visual check unavailable:", e);
+      }
+      setVisualReport(visual);
+      if (visual && !visual.ok) {
+        lastBlobRef.current = null;
+        const errors = visual.issues.filter((i) => i.level === "error");
+        toast.error("Export blocked — slides do not match the editor", {
+          id: progressId,
+          description: errors
+            .slice(0, 3)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 16000,
+        });
+        return;
+      }
+      if (visual?.issues.some((i) => i.level === "warning")) {
+        toast.warning("Visual check passed with warnings", {
+          description: visual.issues
+            .filter((i) => i.level === "warning")
+            .slice(0, 2)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 9000,
+        });
+      }
       // Trigger download for the user.
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -811,7 +865,59 @@ function ExportView() {
             </section>
           )}
 
+          {visualReport && (
+            <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
+                  Visual parity (light &amp; dark)
+                </h2>
+                <span
+                  className={
+                    visualReport.ok
+                      ? "rounded-full bg-[#03002C]/5 px-2 py-0.5 text-[11px] font-semibold text-[#03002C]"
+                      : "rounded-full bg-[#E53D2E]/10 px-2 py-0.5 text-[11px] font-semibold text-[#E53D2E]"
+                  }
+                >
+                  {visualReport.ok ? "Matches editor" : "Blocked"}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-[#03002C]/70">
+                Rendered every slide in both appearances and compared them with the artwork in the
+                file: {visualReport.checked} slide{visualReport.checked === 1 ? "" : "s"} checked,{" "}
+                {visualReport.skipped} skipped, {Math.round(visualReport.threshold * 100)}% similarity
+                required.
+              </p>
+              <ul className="mt-3 space-y-1.5">
+                {visualReport.slides
+                  .filter((s) => s.status !== "match")
+                  .map((s) => (
+                    <li key={s.slideId} className="text-xs text-[#03002C]/70">
+                      Slide {s.index + 1} ({s.variantId}) — expected {s.expectedMode}
+                      {s.renderedMode ? `, exported ${s.renderedMode}` : ""}: {s.detail}
+                    </li>
+                  ))}
+              </ul>
+              {visualReport.issues.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {visualReport.issues.map((issue, i) => (
+                    <li
+                      key={`${issue.code}-${i}`}
+                      className={
+                        issue.level === "error"
+                          ? "text-xs text-[#E53D2E]"
+                          : "text-xs text-[#03002C]/70"
+                      }
+                    >
+                      {issue.level === "error" ? "Error" : "Warning"}: {issue.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
           {coverageReport && coverageReport.total > 0 && (
+
             <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
