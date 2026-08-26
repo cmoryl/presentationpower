@@ -485,8 +485,28 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
       ? subs[0]!
       : `<< /FunctionType 3 /Domain [0 1] /Functions [${subs.join(" ")}] /Bounds [${bounds}] /Encode [${encode}] >>`;
 
-  const coords = [axis.x1 * w, h - axis.y1 * h, axis.x2 * w, h - axis.y2 * h].map(f3).join(" ");
-  const shading = `<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [${coords}] /Function ${fn} /Extend [true true] >>`;
+  // Match the SVG master exactly: halo grounds are a centred radial (SVG
+  // cx 50% / cy 45% / r 72%), everything else is the axial beam/wash.
+  const shading = panel.style.includes("halo")
+    ? `<< /ShadingType 3 /ColorSpace /DeviceRGB /Coords [${[
+        0.5 * w,
+        h - 0.45 * h,
+        0,
+        0.5 * w,
+        h - 0.45 * h,
+        0.72 * Math.sqrt((w * w + h * h) / 2),
+      ]
+        .map(f3)
+        .join(" ")}] /Function ${fn} /Extend [true true] >>`
+    : `<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [${[
+        axis.x1 * w,
+        h - axis.y1 * h,
+        axis.x2 * w,
+        h - axis.y2 * h,
+      ]
+        .map(f3)
+        .join(" ")}] /Function ${fn} /Extend [true true] >>`;
+
   const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
 
   const objects: string[] = [
