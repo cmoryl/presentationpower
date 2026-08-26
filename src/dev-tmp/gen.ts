@@ -7,7 +7,7 @@ setAssetBaseUrl("http://localhost:8080");
 const cfg = {
   ...pillarDefault("directional"),
   headline: "MAIN STAGE",
-  styleId: "05-diagonal-violet-aqua",
+  styleId: "03-wash-diagonal",
   arrow: "right" as const,
   arrowStyle: "chevron-double" as const,
 };
