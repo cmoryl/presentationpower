@@ -223,6 +223,16 @@ function directText(el: Element): string {
   return out.replace(/\s+/g, " ").trim();
 }
 
+/** Boundary whitespace of the untrimmed direct text (lost by `trim()`). */
+function directTextBoundaryWs(el: Element): { lead: boolean; trail: boolean } {
+  let out = "";
+  el.childNodes.forEach((n) => {
+    if (n.nodeType === Node.TEXT_NODE) out += n.textContent ?? "";
+  });
+  const collapsed = out.replace(/\s+/g, " ");
+  return { lead: /^\s/.test(collapsed), trail: /\s$/.test(collapsed) };
+}
+
 /**
  * Measure every visible text run inside a settled export stage.
  * Runs are returned in DOM order (paint order), in stage pixel space.
