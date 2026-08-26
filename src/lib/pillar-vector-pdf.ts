@@ -464,16 +464,25 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   // ── 05 Arrow ───────────────────────────────────────────────────────────────
   if (config.kind === "directional") {
     const edge = mm(Math.min(300, geo.trimW * 0.5));
-    const rotation = { right: 0, down: -90, left: 180, up: 90 }[config.arrow] ?? 0;
+    const rotation = ({ right: 0, down: -90, left: 180, up: 90 } as const)[config.arrow] ?? 0;
     const top = Math.min(headlineBottom - mm(Math.min(150, geo.trimH * 0.075)), safeTop);
-    beginLayer(page, layer("05 Arrow"));
-    page.drawSvgPath("M8 42 H62 V22 L94 50 L62 78 V58 H8 Z", {
-      x: centerX,
-      y: top,
-      scale: edge / 100,
-      rotate: degrees(rotation),
-      color: rgb(...hexRgb(headlineInk)),
+    const cy = top - edge / 2;
+    // Arrow geometry from the live sign, centred on the column and rotated about
+    // its own centre so every direction sits on the same axis as the copy.
+    const glyph: [number, number][] = [
+      [8, 42], [62, 42], [62, 22], [94, 50], [62, 78], [62, 58], [8, 58],
+    ];
+    const rad = (rotation * Math.PI) / 180;
+    const pts = glyph.map(([gx, gy]) => {
+      const lx = (gx - 50) * (edge / 100);
+      const ly = (50 - gy) * (edge / 100);
+      return [
+        centerX + lx * Math.cos(rad) - ly * Math.sin(rad),
+        cy + lx * Math.sin(rad) + ly * Math.cos(rad),
+      ] as [number, number];
     });
+    beginLayer(page, layer("05 Arrow"));
+    polygon(page, pts, hexRgb(headlineInk));
     endLayer(page);
   }
 
