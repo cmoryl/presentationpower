@@ -37,6 +37,13 @@ function SkinScope({ pack, children }: { pack: StylePack | null; children: React
   );
 }
 
+/** Short human label for a slide in the build-progress list. */
+function slideLabel(slide: DeckSlide, index: number): string {
+  const c = slide.content as { title?: unknown; heading?: unknown } | undefined;
+  const v = c?.title ?? c?.heading;
+  return typeof v === "string" && v.trim() ? v.trim() : `Slide ${index + 1}`;
+}
+
 type Row = {
   id: string;
   position: number;
