@@ -918,7 +918,6 @@ function RegistryCard({
   const isDeck = isPowerpointDeck(row);
 
   const thumb = packetPages?.[0] ?? row.exampleUrl;
-  const badgeDivision = row.badgeSide ? badgeDivisionFor(row.divisionId) : undefined;
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-border p-3">
       <button
@@ -930,12 +929,14 @@ function RegistryCard({
             : `Preview ${row.code} ${row.format}`
         }
       >
-        {badgeDivision && row.badgeSide ? (
+        {row.badgeSide ? (
           <div className="flex size-full items-center justify-center bg-[#03002C] py-2 transition group-hover:scale-[1.02]">
-            <NextBadge
-              division={badgeDivision}
-              attendee={SAMPLE_ATTENDEE}
-              side={row.badgeSide}
+            <CityBadge
+              config={{
+                ...CITY_BADGE_DEFAULT,
+                divisionId: cityBadgeDivision(row.divisionId).id,
+                face: row.badgeSide === "back" ? "light" : "dark",
+              }}
               ppi={22}
               style={{ borderRadius: 4 }}
             />
