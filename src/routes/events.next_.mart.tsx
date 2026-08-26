@@ -137,7 +137,7 @@ function MartPage() {
                   }`}
                 >
                   <img
-                    src={a.url}
+                    src={a.previewUrl}
                     alt={`NEXT MART ${a.category} sign — ${a.headline}`}
                     loading="lazy"
                     className="h-auto w-full"
