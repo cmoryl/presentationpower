@@ -266,7 +266,7 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
     check(
       "ai-shading",
       "Gradient remains editable vector artwork",
-      /\/ShadingType\s*[23]/.test(text) || /\/TPGradientKind\s*\/VectorMesh/.test(text),
+      /\/ShadingType\s*[234]/.test(text) || /\/TPGradientKind\s*\/VectorMesh/.test(text),
       "live shading or Illustrator-safe vector mesh",
       /\/TPGradientKind\s*\/VectorMesh/.test(text)
         ? "Illustrator-safe vector mesh"

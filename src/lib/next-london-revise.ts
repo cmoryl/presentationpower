@@ -26,6 +26,7 @@ import {
   recommendedPpi,
   type LondonPanel,
 } from "@/lib/next-london-signage";
+import { buildGouraudMesh, meshShadingEntries } from "@/lib/pdf-mesh-shading";
 
 /** Fields the location team is allowed to re-issue. */
 export const LONDON_EDITABLE_FIELDS = [
