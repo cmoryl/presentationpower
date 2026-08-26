@@ -122,6 +122,10 @@ export function ExportProposalButton({
     const fmt = pending;
     if (!fmt || runRef.current === fmt) return;
     runRef.current = fmt;
+    // A persistent, top-level progress toast: the inline popover can be clipped
+    // by overflow-hidden ancestors, and the save dialog appears only at the
+    // very end — this keeps the user informed for the whole capture.
+    const toastId = `print-export-${fmt}`;
     let cancelled = false;
     (async () => {
       await settle();
@@ -132,12 +136,21 @@ export function ExportProposalButton({
       const nodes = selected.size ? all.filter((_, i) => selected.has(i)) : all;
       const onProgress = (p: { stage: string; progress?: number; message?: string }) => {
         const pct = Math.max(0, Math.min(1, typeof p.progress === "number" ? p.progress : 0));
+        const message = p.message || (p.stage === "done" ? "Saving file…" : "Working…");
         setProgress({
           pct: p.stage === "done" ? 1 : pct,
-          message: p.message || (p.stage === "done" ? "Saved" : "Working…"),
+          message,
+        });
+        toast.loading(`Exporting ${fmt.toUpperCase()} — ${Math.round(pct * 100)}%`, {
+          id: toastId,
+          description: message,
         });
       };
       setProgress({ pct: 0.02, message: "Preparing pages…" });
+      toast.loading(`Exporting ${fmt.toUpperCase()} — 0%`, {
+        id: toastId,
+        description: "Preparing pages…",
+      });
       try {
         if (nodes.length === 0) throw new Error("No pages selected");
         if (fmt === "pdf") {
@@ -163,6 +176,7 @@ export function ExportProposalButton({
         }
         toast.success(
           `Exported ${nodes.length} page${nodes.length === 1 ? "" : "s"} as ${fmt.toUpperCase()}`,
+          { id: toastId, description: "Check your downloads for the saved file." },
         );
         // Aspect warnings are reported by the exporters through onAspectReport;
         // re-check the freshest state so the user hears about a distorted page.
