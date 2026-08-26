@@ -10,6 +10,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { PrintSectionRenderer } from "@/components/print/sections/PrintSectionRenderer";
+import { VizSurfaceProvider } from "@/components/slide/VizSurfaceContext";
 import { PrintDocModeProvider, PRINT_ICON_STYLE_DEFAULT } from "@/components/print/print-doc-mode";
 import { PrintPageProvider } from "@/components/print/print-page-context";
 import { BrandLockup } from "@/components/BrandLockup";
