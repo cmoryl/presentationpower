@@ -211,20 +211,45 @@ export function PillarStudio({
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
         {/* Preview */}
         <div className="rounded-2xl border border-black/10 bg-[#F2F2F2] p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-xs font-medium uppercase tracking-[0.14em] text-black/50">
               {pillarName(config)}
             </div>
-            <label className="flex items-center gap-2 text-xs text-black/60">
-              <input
-                type="checkbox"
-                checked={guides}
-                onChange={(e) => setGuides(e.target.checked)}
-              />
-              Trim &amp; safe guides
-            </label>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs text-black/60">
+                <span>Zoom</span>
+                <input
+                  type="range"
+                  min={0.6}
+                  max={2}
+                  step={0.05}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  aria-label="Preview zoom"
+                />
+                <span className="w-10 tabular-nums text-black/50">{Math.round(zoom * 100)}%</span>
+                <button
+                  type="button"
+                  onClick={() => setZoom(1)}
+                  className="rounded-md border border-black/15 px-2 py-0.5 text-[11px] text-black/60"
+                >
+                  Fit
+                </button>
+              </div>
+              <label className="flex items-center gap-2 text-xs text-black/60">
+                <input
+                  type="checkbox"
+                  checked={guides}
+                  onChange={(e) => setGuides(e.target.checked)}
+                />
+                Trim &amp; safe guides
+              </label>
+            </div>
           </div>
-          <div className="mt-6 flex justify-center overflow-hidden" ref={plateRef}>
+          <div
+            className="mt-6 flex max-h-[860px] justify-center overflow-auto"
+            ref={plateRef}
+          >
             <div
               style={{
                 width: geo.bleedW * NATIVE_PX_PER_MM * previewScale,
@@ -239,6 +264,7 @@ export function PillarStudio({
               />
             </div>
           </div>
+
           <p className="mt-6 flex items-center gap-2 text-xs text-black/55">
             <Ruler size={13} /> {geo.sizeName} · trim {geo.trimW} × {geo.trimH} mm · bleed{" "}
             {geo.bleedEdge} mm per edge · safe {Math.round(geo.safeInset)} mm · {geo.exportPreset}
