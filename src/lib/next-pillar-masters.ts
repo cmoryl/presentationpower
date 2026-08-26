@@ -178,6 +178,8 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     detail: kind.detail,
     arrow: "right",
     showLockup: true,
+    face: "dark",
+    verticalHeadline: false,
   };
 }
 
