@@ -13,6 +13,7 @@
 // -----------------------------------------------------------------------------
 
 import { LONDON_STYLES } from "@/lib/next-london-signage";
+import { NEXT_DIVISIONS } from "@/lib/next-event";
 import {
   CITY_BADGE_DIVISIONS,
   cityBadgeDivision,
@@ -93,9 +94,27 @@ function tint(hex: string, amount: number): string {
     .join("")}`.toUpperCase();
 }
 
-export function agendaStops(styleId: string, face: AgendaFaceId = "dark"): string[] {
+/** Approved division accent for the NEXT event programme, or null when the
+ *  division has none (City Series keeps the standard gradient). */
+export function agendaDivisionAccent(divisionId: string | undefined): string | null {
+  return NEXT_DIVISIONS.find((d) => d.id === divisionId)?.accent ?? null;
+}
+
+/**
+ * Gradient stops for an agenda ground. When the division carries an approved
+ * accent, it replaces the terminal stop so the gradient resolves into the
+ * division colour — every division agenda reads off the same master but lands
+ * on its own accent. Light face tints the merged ramp toward blue-white.
+ */
+export function agendaStops(
+  styleId: string,
+  face: AgendaFaceId = "dark",
+  divisionId?: string,
+): string[] {
   const stops = LONDON_STYLES[styleId]?.stops ?? LONDON_STYLES["01-beam-violet-aqua"]!.stops;
-  return face === "light" ? stops.map((s) => tint(s, LIGHT_TINT)) : stops;
+  const accent = agendaDivisionAccent(divisionId);
+  const merged = accent ? [...stops.slice(0, -1), accent] : [...stops];
+  return face === "light" ? merged.map((s) => tint(s, LIGHT_TINT)) : merged;
 }
 
 /** Copy ink for a face. */
