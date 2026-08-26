@@ -246,7 +246,7 @@ export function PrintFooterLockup({
               objectFit: "contain",
             }}
           />
-        ) : (
+        ) : isEnterprise ? (
           <BrandLockup
             unit={logoCq}
             brand={enterpriseBrand}
@@ -255,27 +255,17 @@ export function PrintFooterLockup({
             orientation="horizontal"
             monochromeOfficialLogo
           />
-        )}
-        {!isEnterprise && (
-          <>
-            <div
-              style={{
-                width: 1,
-                height: cq(20 * FOOTER_LOGO_SCALE),
-                background: dividerCol,
-                flexShrink: 0,
-              }}
-              aria-hidden
-            />
-            <BrandLockup
-              unit={logoCq}
-              brand={brand}
-              color={enterpriseLogoInk}
-              size="xs"
-              orientation="horizontal"
-              monochromeOfficialLogo
-            />
-          </>
+        ) : (
+          // Division assets sign off with the division lockup only — the parent
+          // TransPerfect wordmark never sits beside it in the footer.
+          <BrandLockup
+            unit={logoCq}
+            brand={brand}
+            color={enterpriseLogoInk}
+            size="xs"
+            orientation="horizontal"
+            monochromeOfficialLogo
+          />
         )}
 
         {clientLogo?.url && (
