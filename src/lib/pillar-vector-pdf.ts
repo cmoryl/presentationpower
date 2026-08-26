@@ -364,7 +364,19 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
 
   // ── 01 Ground ──────────────────────────────────────────────────────────────
   beginLayer(page, layer("01 Ground"));
-  page.pushOperators(pushGraphicsState(), translate(round(ox), round(oy)));
+  // Clip to the bleed sheet: diagonal grounds tessellate past the page bounds,
+  // and Illustrator shows that overhang as a tilted band outside the artboard.
+  page.pushOperators(
+    pushGraphicsState(),
+    translate(round(ox), round(oy)),
+    moveTo(0, 0),
+    lineTo(bleedW, 0),
+    lineTo(bleedW, bleedH),
+    lineTo(0, bleedH),
+    closePath(),
+    clip(),
+    endPath(),
+  );
   drawGround(page, bleedW, bleedH, stops, config.styleId);
   page.pushOperators(popGraphicsState());
   endLayer(page);
