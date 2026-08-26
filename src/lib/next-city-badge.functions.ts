@@ -68,7 +68,7 @@ export const updateCityBadgeVersion = createServerFn({ method: "POST" })
     versionInput.partial().extend({ id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
-    const patch: Record<string, unknown> = {};
+    const patch: Record<string, string | object> = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.notes !== undefined) patch.notes = data.notes;
     if (data.status !== undefined) patch.status = data.status;
@@ -82,7 +82,7 @@ export const updateCityBadgeVersion = createServerFn({ method: "POST" })
     }
     const { data: row, error } = await context.supabase
       .from("next_city_badge_versions")
-      .update(patch)
+      .update(patch as never)
       .eq("id", data.id)
       .select("*")
       .single();
