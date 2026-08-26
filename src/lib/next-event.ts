@@ -353,7 +353,7 @@ export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
     label: "Attendee credentials",
     badge: "Print",
     detail:
-      "B-series badge artwork — 4.33×6.3 in dual-slot plastic badge with BLE Klik cutout, front and back.",
+      "City Series badge artwork — 4.33×6.3 in dual-slot plastic badge with BLE Klik cutout, dark and light approved faces.",
   },
 ];
 
