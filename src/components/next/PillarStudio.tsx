@@ -958,18 +958,39 @@ export function PillarStudio({
                   <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
                     Drag the QR block in the preview to place it — it snaps to the safe edges and
                     the pillar centre lines, and can never leave the safe area. Click it and use the
-                    arrow keys to nudge 1 mm, or 10 mm with Shift.
+                    arrow keys to nudge 1 mm, or 10 mm with Shift. Undo a move with ⌘/Ctrl+Z, redo
+                    with ⇧⌘/Ctrl+Z.
                   </p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setConfig((c) => ({ ...c, qrOffsetX: null, qrOffsetY: null }))
-                    }
-                    disabled={!qrPlace.placed}
-                    className="mt-2 rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
-                  >
-                    Reset to default position
-                  </button>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={undoQr}
+                      disabled={qrPast.length === 0}
+                      className="inline-flex items-center gap-1 rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
+                    >
+                      <Undo2 size={12} /> Undo{qrPast.length ? ` (${qrPast.length})` : ""}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={redoQr}
+                      disabled={qrFuture.length === 0}
+                      className="inline-flex items-center gap-1 rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
+                    >
+                      <Redo2 size={12} /> Redo{qrFuture.length ? ` (${qrFuture.length})` : ""}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
+                        setConfig((c) => ({ ...c, qrOffsetX: null, qrOffsetY: null }));
+                      }}
+                      disabled={!qrPlace.placed}
+                      className="rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
+                    >
+                      Reset to default position
+                    </button>
+                  </div>
+
                 </div>
 
                 <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
