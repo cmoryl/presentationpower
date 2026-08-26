@@ -837,6 +837,32 @@ export function PillarStudio({
                   />
                 </div>
 
+                <div className="rounded-lg border border-black/10 bg-[#F2F2F2] px-3 py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className={label}>Placement</div>
+                    <div className="text-xs tabular-nums text-black/55">
+                      x {Math.round(qrPlace.x)} · y {Math.round(qrPlace.y)} mm
+                    </div>
+                  </div>
+                  <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
+                    Drag the QR block in the preview to place it — it snaps to the safe edges and
+                    the pillar centre lines, and can never leave the safe area. Click it and use the
+                    arrow keys to nudge 1 mm, or 10 mm with Shift.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setConfig((c) => ({ ...c, qrOffsetX: null, qrOffsetY: null }))
+                    }
+                    disabled={!qrPlace.placed}
+                    className="mt-2 rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
+                  >
+                    Reset to default position
+                  </button>
+                </div>
+
+
+
                 <div>
                   <div className={label}>Module style</div>
                   <div className="mt-2 grid grid-cols-3 gap-2">
