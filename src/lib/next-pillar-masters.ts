@@ -161,6 +161,10 @@ export type PillarConfig = {
   detail: string;
   arrow: PillarArrow;
   showLockup: boolean;
+  /** Approved gradient face: full-saturation dark, or the light tint. */
+  face: PillarFaceId;
+  /** Run the headline up the column so long words get the full pillar height. */
+  verticalHeadline: boolean;
 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
