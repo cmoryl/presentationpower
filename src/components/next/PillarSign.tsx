@@ -46,6 +46,8 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const vertical = Boolean(config.verticalHeadline) && config.kind !== "logo";
   const division = pillarDivision(config.divisionId);
   const isHalo = config.styleId.includes("halo");
+  // Light core, saturated rim: keeps the halo ground readable at pillar scale.
+  const haloStops = isHalo ? [...stops].reverse() : stops;
   const gradientId = `pillar-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
   const inset = mm(PILLAR_SPEC.bleedEdge + PILLAR_SPEC.safeInset);
   const lockupW = mm(PILLAR_SPEC.trimW * 0.58 * pillarLockupScale(config));
@@ -67,7 +69,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
         width: w,
         height: h,
         overflow: "hidden",
-        backgroundColor: stops[0],
+        backgroundColor: isHalo ? haloStops[haloStops.length - 1]! : stops[0],
         ...style,
       }}
     >
@@ -80,9 +82,22 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
       >
         <defs>
           {isHalo ? (
-            <radialGradient id={gradientId} cx="50%" cy="45%" r="72%">
-              {stops.map((hex, i) => (
-                <stop key={hex + i} offset={`${(i / (stops.length - 1)) * 100}%`} stopColor={hex} />
+            // On a tall pillar a centred halo washes out, so the glow is
+            // elongated up the column and the saturated ink is kept at the
+            // outer edge for a printable, high-contrast ground.
+            <radialGradient
+              id={gradientId}
+              cx="50%"
+              cy="42%"
+              r="78%"
+              gradientTransform="translate(0.5 0.42) scale(0.62 1) translate(-0.5 -0.42)"
+            >
+              {haloStops.map((hex, i) => (
+                <stop
+                  key={hex + i}
+                  offset={`${(i / (haloStops.length - 1)) * 100}%`}
+                  stopColor={hex}
+                />
               ))}
             </radialGradient>
           ) : (
