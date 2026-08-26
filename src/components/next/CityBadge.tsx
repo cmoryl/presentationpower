@@ -79,11 +79,11 @@ export function CityBadge({ config, ppi = 96, guides = false, style, className }
             left: 0,
             right: 0,
             top: 0,
-            height: px(2.35),
+            height: px(2.62),
             background:
               face.id === "light"
-                ? "linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 78%,rgba(255,255,255,0) 100%)"
-                : "linear-gradient(180deg,#03002C 0%,#03002C 78%,rgba(3,0,44,0) 100%)",
+                ? "linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 90%,rgba(255,255,255,0) 100%)"
+                : "linear-gradient(180deg,#03002C 0%,#03002C 90%,rgba(3,0,44,0) 100%)",
             display: "flex",
             alignItems: "flex-start",
             justifyContent: "center",
