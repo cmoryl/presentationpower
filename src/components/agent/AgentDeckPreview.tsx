@@ -190,7 +190,7 @@ export function AgentDeckPreview({
 
   const slides: DeckSlide[] = useMemo(
     () =>
-      rows.map((r) => ({
+      displayRows.map((r) => ({
         id: r.id,
         position: r.position,
         sectionId: r.section_id,
@@ -218,7 +218,7 @@ export function AgentDeckPreview({
   // Deterministic check so an unpopulated chart is visible to the user, not just
   // reported to the agent.
   const emptyVisuals = auditVisualData(
-    rows.map((r) => ({
+    displayRows.map((r) => ({
       position: r.position,
       variant_id: r.variant_id,
       content: (r.content ?? {}) as Record<string, unknown>,
