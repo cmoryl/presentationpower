@@ -19,6 +19,8 @@ import { APPROVED_STYLE_PACKS, packToneBrand, type StylePack } from "@/lib/style
 import { DESIGN_SKINS } from "@/lib/design-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
 import { auditVisualData } from "@/lib/agent/visual-data-gaps";
+import { isPersistableDeckId } from "@/lib/agent/threads";
+import { useDeckStore } from "@/lib/deck-store";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 
@@ -61,6 +63,10 @@ export function AgentDeckPreview({
   const [enlargedIndex, setEnlargedIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const localDeck = useDeckStore(
+    useCallback((state) => (deckId ? state.decks[deckId] : undefined), [deckId]),
+  );
+  const setDeckContext = useDeckStore((state) => state.setDeckContext);
 
   const openEnlarged = useCallback((i: number) => {
     setActive(i);
@@ -71,6 +77,21 @@ export function AgentDeckPreview({
     if (!deckId) {
       setRows([]);
       setTitle("");
+      setError(null);
+      setLoading(false);
+      return;
+    }
+    if (localDeck) {
+      setError(null);
+      setLoading(false);
+      setActive((prev) => Math.min(prev, Math.max(0, localDeck.slides.length - 1)));
+      return;
+    }
+    if (!isPersistableDeckId(deckId)) {
+      setRows([]);
+      setTitle("Local demo deck");
+      setError(null);
+      setLoading(false);
       return;
     }
     let live = true;
@@ -108,15 +129,40 @@ export function AgentDeckPreview({
     return () => {
       live = false;
     };
-  }, [deckId, refreshKey]);
+  }, [deckId, localDeck, refreshKey]);
 
-  const pack = useEffectiveStylePack(packId, recipeId);
+  const localRows = useMemo<Row[]>(
+    () =>
+      localDeck
+        ? localDeck.slides.map((slide) => ({
+            id: slide.id,
+            position: slide.position,
+            section_id: slide.sectionId,
+            variant_id: slide.variantId,
+            layout_id: slide.layoutId,
+            content: slide.content,
+            notes: slide.notes ?? null,
+          }))
+        : [],
+    [localDeck],
+  );
+  const displayRows = localDeck ? localRows : rows;
+  const displayTitle = localDeck ? localDeck.title : title;
+  const displayBrandModeId = localDeck ? localDeck.brandModeId : brandModeId;
+  const displayPackId = localDeck ? (localDeck.context?.stylePackId ?? "") : packId;
+  const displayRecipeId = localDeck ? (localDeck.context?.designRecipeId ?? null) : recipeId;
+
+  const pack = useEffectiveStylePack(displayPackId, displayRecipeId);
 
   /** Switching the look writes back to the deck so editor + export agree. */
   const applyPack = useCallback(
     async (next: string) => {
-      setPackId(next);
       if (!deckId) return;
+      if (localDeck) {
+        setDeckContext(deckId, { stylePackId: next || null });
+        return;
+      }
+      setPackId(next);
       const { data } = await supabase
         .from("decks")
         .select("context")
@@ -129,12 +175,12 @@ export function AgentDeckPreview({
         .update({ context: { ...ctx, stylePackId: next || null } } as never)
         .eq("id", deckId);
     },
-    [deckId],
+    [deckId, localDeck, setDeckContext],
   );
 
   const baseBrand = useMemo(
-    () => byId(BRAND_MODES, brandModeId ?? "") ?? BRAND_MODES[0]!,
-    [brandModeId],
+    () => byId(BRAND_MODES, displayBrandModeId ?? "") ?? BRAND_MODES[0]!,
+    [displayBrandModeId],
   );
   const brand = useMemo(
     () => (pack ? (packToneBrand(baseBrand as never, pack) as unknown as BrandMode) : baseBrand),
@@ -144,7 +190,7 @@ export function AgentDeckPreview({
 
   const slides: DeckSlide[] = useMemo(
     () =>
-      rows.map((r) => ({
+      displayRows.map((r) => ({
         id: r.id,
         position: r.position,
         sectionId: r.section_id,
@@ -154,7 +200,7 @@ export function AgentDeckPreview({
         notes: r.notes ?? undefined,
         changes: [],
       })) as DeckSlide[],
-    [rows],
+    [displayRows],
   );
 
   if (!deckId) {
@@ -172,7 +218,7 @@ export function AgentDeckPreview({
   // Deterministic check so an unpopulated chart is visible to the user, not just
   // reported to the agent.
   const emptyVisuals = auditVisualData(
-    rows.map((r) => ({
+    displayRows.map((r) => ({
       position: r.position,
       variant_id: r.variant_id,
       content: (r.content ?? {}) as Record<string, unknown>,
@@ -186,7 +232,7 @@ export function AgentDeckPreview({
     <div className="flex h-full min-h-0 flex-col">
       <header className="flex flex-wrap items-center gap-3 border-b border-border/60 px-4 py-3">
         <div className="min-w-0">
-          <h2 className="truncate text-sm font-semibold text-foreground">{title || "Deck"}</h2>
+          <h2 className="truncate text-sm font-semibold text-foreground">{displayTitle || "Deck"}</h2>
           <p className="text-[11px] text-foreground/45">
             {slides.length} slide{slides.length === 1 ? "" : "s"}
             {pack ? ` · ${pack.label}` : ""}
@@ -196,7 +242,7 @@ export function AgentDeckPreview({
         <label className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
           Skin
           <select
-            value={packId}
+            value={displayPackId}
             onChange={(e) => void applyPack(e.target.value)}
             aria-label="Deck design skin"
             className="rounded-lg border border-border/70 bg-background px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-foreground"

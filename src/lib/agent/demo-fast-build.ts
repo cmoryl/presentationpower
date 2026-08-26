@@ -54,19 +54,16 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
   slides: [
     {
       sectionId: "SF-01",
-      variantId: "MV-OP-COVER-MEDIA",
-      layoutId: "LF-05",
+      variantId: "MV-OP-COVER-POSTER",
+      layoutId: "LF-28",
       mode: "dark",
       content: {
         // Brand aqua clears WCAG AA on the dark ground.
         accentOverride: "#A1FBF9",
         authorizedAccentOverride: true,
-        clientName: "GLOBALLINK",
+        kicker: "GLOBALLINK · Q3 FY26",
         title: "Q3 business review",
-        titleEmphasis: "Q3",
-        subtitle: "Delivery performance, quality gains and the road to Q4.",
-        date: "Q3 FY26 · Executive review",
-        mediaSeed: "enterprise-command-room",
+        meta: "Executive review · Confidential",
       },
       notes:
         "Open with the quarter's theme: faster delivery at higher quality, with AI-assisted workflows now in production.",
@@ -211,6 +208,8 @@ export type DemoBuildStep = {
   text: string;
   /** Tool parts visible during this step; the last one may still be running. */
   tools: DemoToolPart[];
+  /** Number of completed slides to reveal in the live preview at this step. */
+  revealSlides?: number;
 };
 
 /**
@@ -224,6 +223,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
       holdMs: 1600,
       text: "Reading your brief…",
       tools: [demoToolPart("getTaxonomy", "input-available")],
+      revealSlides: 0,
     },
     {
       holdMs: 2200,
@@ -232,6 +232,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("getTaxonomy", "output-available", "ok"),
         demoToolPart("searchKnowledge", "input-available"),
       ],
+      revealSlides: 0,
     },
     {
       holdMs: 2600,
@@ -241,6 +242,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("searchKnowledge", "output-available", "ok"),
         demoToolPart("createDeck", "input-available"),
       ],
+      revealSlides: 1,
     },
     {
       holdMs: 2600,
@@ -255,6 +257,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         ),
         demoToolPart("updateSlideContent", "input-available"),
       ],
+      revealSlides: 4,
     },
     {
       holdMs: 2200,
@@ -270,6 +273,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("updateSlideContent", "output-available", "ok"),
         demoToolPart("setSlideIcon", "input-available"),
       ],
+      revealSlides: 6,
     },
     {
       holdMs: 1800,
@@ -285,6 +289,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
         demoToolPart("updateSlideContent", "output-available", "ok"),
         demoToolPart("setSlideIcon", "output-available", "ok"),
       ],
+      revealSlides: 6,
     },
   ];
 }
