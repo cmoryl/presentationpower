@@ -932,6 +932,65 @@ export function PillarStudio({
             </div>
           ) : null}
 
+              {showMartLayouts && martLayouts.exact.length + martLayouts.other.length > 0 ? (
+                <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className={label}>NEXT MART layouts</div>
+                    <div className="text-[11px] text-black/50">{pillarQrScopeLabel(config)}</div>
+                  </div>
+                  <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
+                    Issued mart layouts for this template. Each one sets the QR block placement
+                    and caption formatting together with the wayfinding geometry — headline size,
+                    vertical run, downward offset, lockup scale and arrow — as fractions of the
+                    sheet, so switching pillar size re-lays the sign instead of needing a re-drag.
+                  </p>
+                  <ul className="mt-2 space-y-1.5">
+                    {[...martLayouts.exact, ...martLayouts.other].map((p: MartLayoutPreset) => {
+                      const tuned =
+                        p.sizes.length === 0 || p.sizes.includes(config.sizeId);
+                      const active = appliedMartLayout === p.id;
+                      return (
+                        <li key={p.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
+                              setConfig((c) => applyMartLayout(c, p));
+                              setAppliedMartLayout(p.id);
+                              toast.success(`Applied “${p.name}”`, {
+                                description: martLayoutSummary(p, config),
+                              });
+                            }}
+                            className={`w-full rounded-md border px-2.5 py-2 text-left ${
+                              active
+                                ? "border-[#003FC7] bg-[#003FC7]/5"
+                                : "border-black/10 hover:border-[#003FC7]/50"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="truncate text-[11px] font-medium text-[#03002C]">
+                                {p.name}
+                              </span>
+                              {!tuned ? (
+                                <span className="shrink-0 text-[10px] text-black/45">
+                                  rescaled
+                                </span>
+                              ) : null}
+                            </div>
+                            <div className="mt-0.5 text-[11px] leading-snug text-black/55">
+                              {p.note}
+                            </div>
+                            <div className="mt-1 text-[10px] tabular-nums text-black/45">
+                              {martLayoutSummary(p, config)}
+                            </div>
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ) : null}
+
           {/* QR stylizer */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
             <div className="flex items-center gap-2 text-xs font-medium text-black/60">
@@ -1097,65 +1156,6 @@ export function PillarStudio({
                   </div>
 
                 </div>
-
-                {showMartLayouts && martLayouts.exact.length + martLayouts.other.length > 0 ? (
-                  <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
-                    <div className="flex items-center justify-between">
-                      <div className={label}>NEXT MART layouts</div>
-                      <div className="text-[11px] text-black/50">{pillarQrScopeLabel(config)}</div>
-                    </div>
-                    <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
-                      Issued mart layouts for this template. Each one sets the QR block placement
-                      and caption formatting together with the wayfinding geometry — headline size,
-                      vertical run, downward offset, lockup scale and arrow — as fractions of the
-                      sheet, so switching pillar size re-lays the sign instead of needing a re-drag.
-                    </p>
-                    <ul className="mt-2 space-y-1.5">
-                      {[...martLayouts.exact, ...martLayouts.other].map((p: MartLayoutPreset) => {
-                        const tuned =
-                          p.sizes.length === 0 || p.sizes.includes(config.sizeId);
-                        const active = appliedMartLayout === p.id;
-                        return (
-                          <li key={p.id}>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
-                                setConfig((c) => applyMartLayout(c, p));
-                                setAppliedMartLayout(p.id);
-                                toast.success(`Applied “${p.name}”`, {
-                                  description: martLayoutSummary(p, config),
-                                });
-                              }}
-                              className={`w-full rounded-md border px-2.5 py-2 text-left ${
-                                active
-                                  ? "border-[#003FC7] bg-[#003FC7]/5"
-                                  : "border-black/10 hover:border-[#003FC7]/50"
-                              }`}
-                            >
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="truncate text-[11px] font-medium text-[#03002C]">
-                                  {p.name}
-                                </span>
-                                {!tuned ? (
-                                  <span className="shrink-0 text-[10px] text-black/45">
-                                    rescaled
-                                  </span>
-                                ) : null}
-                              </div>
-                              <div className="mt-0.5 text-[11px] leading-snug text-black/55">
-                                {p.note}
-                              </div>
-                              <div className="mt-1 text-[10px] tabular-nums text-black/45">
-                                {martLayoutSummary(p, config)}
-                              </div>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                ) : null}
 
                 <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
                   <div className="flex items-center justify-between">
