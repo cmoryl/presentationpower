@@ -13,6 +13,11 @@ import { MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { isChartVariant } from "@/lib/export-chart-variants";
 import { seedContent, type Brief } from "@/lib/deck-store";
 import { vizKindForVariant } from "@/lib/infographics/variant-kinds";
+import { buildVizSpecFromContent } from "@/lib/infographics/from-content";
+import { repairVizSpec } from "@/lib/infographics/repair";
+import { auditVizSpec, summarizeVizAudit, type VizSurface } from "@/lib/infographics/audit";
+import { vizTheme } from "@/lib/infographics/viz-theme";
+import { BRAND_MODES, byId as brandById } from "@/lib/taxonomy";
 
 /* --------------------------------------------------------------- data model */
 
@@ -515,6 +520,29 @@ export function buildDataVisualToolSet(): ToolSet {
         recommendVisual({ family, shape, series_count, points_per_series, query: intent }),
     }),
 
+    audit_data_visual: tool({
+      description:
+        "Audit a chart's content JSON for visual correctness before you write it: missing/orphan encodings, non-numeric values, duplicate or overlong labels, too many categories for the surface, part-to-whole sums, unsorted time series, colour separation, print greyscale separation and accessibility. Returns a 0-100 score, blockers/warnings with a concrete fix each, and the deterministic repairs the platform will apply automatically. Run this for every chart on a print sheet or social post, where the legibility budget is tighter than a slide.",
+      inputSchema: z.object({
+        module_id: z.string().describe("Module id of the chart, e.g. MV-VIZ-SANKEY"),
+        content: z
+          .record(z.string(), z.unknown())
+          .describe("The content object you intend to write for this chart"),
+        surface: z
+          .enum(["presentation", "print", "social"])
+          .nullable()
+          .describe("Where the chart lands; null = presentation"),
+        mode: z.enum(["light", "dark"]).nullable().describe("Slide/page mode; null = light"),
+      }),
+      execute: async ({ module_id, content, surface, mode }) =>
+        auditDataVisual({
+          module_id,
+          content,
+          surface: (surface ?? "presentation") as VizSurface,
+          mode: mode ?? "light",
+        }),
+    }),
+
     validate_visual_content: tool({
       description:
         "Check the content JSON you are about to write into a chart or process slide against that module's expected shape and data-point limits. Fix any reported problems before calling update_slide_content.",
@@ -526,5 +554,49 @@ export function buildDataVisualToolSet(): ToolSet {
       }),
       execute: async ({ module_id, content }) => validateVisualContent(module_id, content),
     }),
+  };
+}
+
+
+/* ------------------------------------------------------- correctness audit */
+
+/**
+ * Audit a chart the way the renderer will actually build it: same spec
+ * construction, same surface-resolved Enterprise theme, same deterministic
+ * repair pass. The agent therefore sees the numbers the QA gates will see.
+ */
+export function auditDataVisual(args: {
+  module_id: string;
+  content: Record<string, unknown>;
+  surface: VizSurface;
+  mode: "light" | "dark";
+}) {
+  const brand =
+    brandById(BRAND_MODES, "bm-enterprise") ?? BRAND_MODES[0];
+  const theme = vizTheme({ brand, mode: args.mode });
+  const spec = buildVizSpecFromContent({
+    content: args.content,
+    variantId: args.module_id,
+    id: `${args.module_id}-audit`,
+    theme,
+  });
+  const before = auditVizSpec(spec, { surface: args.surface });
+  const { spec: fixed, notes } = repairVizSpec(spec, { surface: args.surface });
+  const after = auditVizSpec(fixed, { surface: args.surface });
+  return {
+    module_id: args.module_id,
+    surface: args.surface,
+    mode: args.mode,
+    kind: spec.kind,
+    before: summarizeVizAudit(before),
+    after: summarizeVizAudit(after),
+    auto_repairs: notes.map((n) => `${n.code}: ${n.detail}`),
+    findings: after.findings.map((f) => ({
+      code: f.code,
+      severity: f.severity,
+      message: f.message,
+      fix: f.fix,
+    })),
+    publishable: after.publishable,
   };
 }
