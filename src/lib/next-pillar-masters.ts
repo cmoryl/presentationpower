@@ -391,6 +391,33 @@ export function pillarQrSize(config: PillarConfig): number {
   return Math.min(PILLAR_QR_SIZE.max, Math.max(PILLAR_QR_SIZE.min, value));
 }
 
+/** Caption type treatment for the QR block. */
+export function pillarCaptionFont(config: PillarConfig) {
+  return (
+    PILLAR_CAPTION_FONTS.find((f) => f.id === config.qrCaptionFont) ?? PILLAR_CAPTION_FONTS[0]!
+  );
+}
+
+/** Caption cap height in mm. 0 / unset follows the sub-line size. */
+export function pillarCaptionSize(config: PillarConfig): number {
+  const raw = Number(config.qrCaptionSize);
+  if (!Number.isFinite(raw) || raw <= 0) return Math.max(10, pillarSubSize(config) * 0.55);
+  return Math.min(PILLAR_CAPTION_SIZE.max, Math.max(PILLAR_CAPTION_SIZE.min, raw));
+}
+
+export function pillarCaptionAlign(config: PillarConfig): PillarCaptionAlign {
+  return config.qrCaptionAlign === "left" || config.qrCaptionAlign === "right"
+    ? config.qrCaptionAlign
+    : "center";
+}
+
+/** Padding kept between the code, its caption and the safe edges (mm). */
+export function pillarCaptionPad(config: PillarConfig): number {
+  const raw = Number(config.qrCaptionPad);
+  const value = Number.isFinite(raw) && raw >= 0 ? raw : 14;
+  return Math.min(PILLAR_CAPTION_PAD.max, Math.max(PILLAR_CAPTION_PAD.min, value));
+}
+
 /**
  * Resolved geometry of the QR block (code + caption) in mm from the trim
  * top-left. Positions are always clamped inside the safe area so a dragged QR
@@ -400,13 +427,18 @@ export function pillarQrPlacement(config: PillarConfig) {
   const geo = pillarGeometry(config);
   const edge = Math.min(pillarQrSize(config), geo.trimW - geo.safeInset * 2);
   const caption = (config.qrCaption ?? "").trim();
-  const captionSize = Math.max(10, pillarSubSize(config) * 0.55);
-  const captionBlock = caption ? captionSize * 2.2 : 0;
+  const captionSize = pillarCaptionSize(config);
+  const captionPad = pillarCaptionPad(config);
+  const captionAlign = pillarCaptionAlign(config);
+  const captionBlock = caption ? captionPad + captionSize * 1.25 : 0;
   const blockH = edge + captionBlock;
-  const minX = geo.safeInset;
-  const maxX = Math.max(minX, geo.trimW - geo.safeInset - edge);
-  const minY = geo.safeInset;
-  const maxY = Math.max(minY, geo.trimH - geo.safeInset - blockH);
+  // The caption padding also holds the whole block off the safe edges, so a
+  // formatted caption never crowds the trim.
+  const inset = geo.safeInset + (caption ? captionPad : 0);
+  const minX = inset;
+  const maxX = Math.max(minX, geo.trimW - inset - edge);
+  const minY = inset;
+  const maxY = Math.max(minY, geo.trimH - inset - blockH);
   const defaultX = (geo.trimW - edge) / 2;
   const defaultY = maxY;
   const rawX = Number(config.qrOffsetX);
