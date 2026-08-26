@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, Layers, QrCode, Ruler, Save, Trash2 } from "lucide-react";
+import { Download, Layers, QrCode, Redo2, Ruler, Save, Trash2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
@@ -169,6 +169,63 @@ export function PillarStudio({
 
   const scopePresets = pillarQrPresetsFor(config);
 
+  // ── QR placement undo / redo ───────────────────────────────────────────────
+  type QrSpot = { x: number | null; y: number | null };
+  const [qrPast, setQrPast] = useState<QrSpot[]>([]);
+  const [qrFuture, setQrFuture] = useState<QrSpot[]>([]);
+
+  /** Record the placement about to be replaced, so it can be undone. */
+  const pushQrHistory = (spot: QrSpot) => {
+    setQrPast((p) => [...p.slice(-49), spot]);
+    setQrFuture([]);
+  };
+
+  const undoQr = () => {
+    setQrPast((past) => {
+      if (past.length === 0) return past;
+      const prev = past[past.length - 1]!;
+      setConfig((c) => {
+        setQrFuture((f) => [...f, { x: c.qrOffsetX, y: c.qrOffsetY }]);
+        return { ...c, qrOffsetX: prev.x, qrOffsetY: prev.y };
+      });
+      return past.slice(0, -1);
+    });
+  };
+
+  const redoQr = () => {
+    setQrFuture((future) => {
+      if (future.length === 0) return future;
+      const next = future[future.length - 1]!;
+      setConfig((c) => {
+        setQrPast((p) => [...p, { x: c.qrOffsetX, y: c.qrOffsetY }]);
+        return { ...c, qrOffsetX: next.x, qrOffsetY: next.y };
+      });
+      return future.slice(0, -1);
+    });
+  };
+
+  // Cmd/Ctrl+Z undoes a placement move, Shift+Cmd/Ctrl+Z (or Cmd+Y) redoes it.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      const key = e.key.toLowerCase();
+      if (key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redoQr();
+        else undoQr();
+      } else if (key === "y") {
+        e.preventDefault();
+        redoQr();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+
+
 
 
 
@@ -311,6 +368,7 @@ export function PillarStudio({
     const baseY = qrPlace.y;
     const perPx = 1 / (NATIVE_PX_PER_MM * previewScale);
     setDragging(true);
+    pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
     const move = (ev: PointerEvent) => {
       const nx = snapX(baseX + (ev.clientX - startX) * perPx);
       const ny = snapY(baseY + (ev.clientY - startY) * perPx);
@@ -343,12 +401,14 @@ export function PillarStudio({
     const d = map[e.key];
     if (!d) return;
     e.preventDefault();
+    pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
     setConfig((c) => ({
       ...c,
       qrOffsetX: Math.min(Math.max(qrPlace.x + d[0], qrPlace.minX), qrPlace.maxX),
       qrOffsetY: Math.min(Math.max(qrPlace.y + d[1], qrPlace.minY), qrPlace.maxY),
     }));
   };
+
 
   const runBatchExport = async () => {
     if (batchItems.length === 0) return;
@@ -898,18 +958,39 @@ export function PillarStudio({
                   <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
                     Drag the QR block in the preview to place it — it snaps to the safe edges and
                     the pillar centre lines, and can never leave the safe area. Click it and use the
-                    arrow keys to nudge 1 mm, or 10 mm with Shift.
+                    arrow keys to nudge 1 mm, or 10 mm with Shift. Undo a move with ⌘/Ctrl+Z, redo
+                    with ⇧⌘/Ctrl+Z.
                   </p>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setConfig((c) => ({ ...c, qrOffsetX: null, qrOffsetY: null }))
-                    }
-                    disabled={!qrPlace.placed}
-                    className="mt-2 rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
-                  >
-                    Reset to default position
-                  </button>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={undoQr}
+                      disabled={qrPast.length === 0}
+                      className="inline-flex items-center gap-1 rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
+                    >
+                      <Undo2 size={12} /> Undo{qrPast.length ? ` (${qrPast.length})` : ""}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={redoQr}
+                      disabled={qrFuture.length === 0}
+                      className="inline-flex items-center gap-1 rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
+                    >
+                      <Redo2 size={12} /> Redo{qrFuture.length ? ` (${qrFuture.length})` : ""}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
+                        setConfig((c) => ({ ...c, qrOffsetX: null, qrOffsetY: null }));
+                      }}
+                      disabled={!qrPlace.placed}
+                      className="rounded-md border border-black/15 bg-white px-2.5 py-1 text-[11px] text-black/65 disabled:opacity-45"
+                    >
+                      Reset to default position
+                    </button>
+                  </div>
+
                 </div>
 
                 <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
@@ -958,6 +1039,7 @@ export function PillarStudio({
                             <button
                               type="button"
                               onClick={() => {
+                                pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
                                 setConfig((c) => applyPillarQrPreset(c, p));
                                 toast.success(`Applied “${p.name}”`, {
                                   description: foreign
