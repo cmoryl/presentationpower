@@ -66,6 +66,18 @@ export const PILLAR_SUB_SIZE = { min: 12, max: 120, step: 2 };
 /** Printed QR module block size range in mm (edge length of the code). */
 export const PILLAR_QR_SIZE = { min: 60, max: 500, step: 10 };
 
+/** Module rendering styles for printed QR codes. */
+export type PillarQrStyleId = "block" | "rounded" | "dot";
+export const PILLAR_QR_STYLES: { id: PillarQrStyleId; label: string; note: string }[] = [
+  { id: "block", label: "Block", note: "Classic square modules. Highest scan reliability." },
+  { id: "rounded", label: "Rounded", note: "Soft-cornered modules. Scans reliably at level H." },
+  { id: "dot", label: "Dot", note: "Circular modules. Keep the block size generous." },
+];
+
+/** Minimum luminance contrast between QR ink and its plate. Below this phone
+ * cameras struggle, so the editor flags and offers a one-click fix. */
+export const PILLAR_QR_MIN_CONTRAST = 3;
+
 export function pillarSize(id: string | undefined) {
   return PILLAR_SIZES.find((s) => s.id === id) ?? PILLAR_SIZES[2]!;
 }
@@ -288,6 +300,12 @@ export type PillarConfig = {
   qrSize: number;
   /** Optional caption printed under the QR block. */
   qrCaption: string;
+  /** QR module shape. */
+  qrStyle: PillarQrStyleId;
+  /** QR ink hex. Empty = the approved default (Blue 800). */
+  qrForeground: string;
+  /** QR plate hex. Empty = white. */
+  qrBackground: string;
   /** Event this live pillar file belongs to (free text label). */
   eventLabel: string;
 };
@@ -318,6 +336,9 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     qrData: "",
     qrSize: 180,
     qrCaption: "",
+    qrStyle: "block",
+    qrForeground: "",
+    qrBackground: "",
     eventLabel: "",
   };
 }
@@ -334,6 +355,42 @@ export function pillarQrSize(config: PillarConfig): number {
   const raw = Number(config.qrSize);
   const value = Number.isFinite(raw) && raw > 0 ? raw : 180;
   return Math.min(PILLAR_QR_SIZE.max, Math.max(PILLAR_QR_SIZE.min, value));
+}
+
+/** Resolve the QR module shape. */
+export function pillarQrStyle(config: PillarConfig): PillarQrStyleId {
+  return PILLAR_QR_STYLES.some((s) => s.id === config.qrStyle) ? config.qrStyle : "block";
+}
+
+/** QR ink: the approved Blue 800 unless the user picked another ink. */
+export function pillarQrForeground(config: PillarConfig): string {
+  const v = (config.qrForeground ?? "").trim();
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#03002C";
+}
+
+/** QR plate: white unless the user picked another colour. */
+export function pillarQrBackground(config: PillarConfig): string {
+  const v = (config.qrBackground ?? "").trim();
+  return /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : "#FFFFFF";
+}
+
+/** WCAG relative-luminance contrast between two hex colours (1–21). */
+export function pillarContrastRatio(a: string, b: string): number {
+  const lum = (hex: string) => {
+    const n = parseInt(hex.replace("#", ""), 16);
+    const chan = [n >> 16, (n >> 8) & 255, n & 255].map((v) => {
+      const c = v / 255;
+      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * chan[0]! + 0.7152 * chan[1]! + 0.0722 * chan[2]!;
+  };
+  const [l1, l2] = [lum(a), lum(b)].sort((x, y) => y - x);
+  return (l1 + 0.05) / (l2 + 0.05);
+}
+
+/** True when the QR pairing is dark-enough-on-light to scan reliably. */
+export function pillarQrScanSafe(config: PillarConfig): boolean {
+  return pillarContrastRatio(pillarQrForeground(config), pillarQrBackground(config)) >= PILLAR_QR_MIN_CONTRAST;
 }
 
 

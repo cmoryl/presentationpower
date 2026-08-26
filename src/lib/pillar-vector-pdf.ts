@@ -51,7 +51,10 @@ import {
   pillarHeadlineSize,
   pillarInk,
   pillarLockupScale,
+  pillarQrBackground,
+  pillarQrForeground,
   pillarQrSize,
+  pillarQrStyle,
   pillarStops,
   pillarSubSize,
   type PillarConfig,
@@ -525,15 +528,45 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       y: qrY,
       width: edge,
       height: edge,
-      color: rgb(1, 1, 1),
+      color: rgb(...hexRgb(pillarQrBackground(config))),
     });
-    const dark: [number, number, number] = hexRgb("#03002C");
+    const qrStyle = pillarQrStyle(config);
+    const dark: [number, number, number] = hexRgb(pillarQrForeground(config));
+    // Rounded modules are approximated as 4-arc polygons; dots are ellipses.
+    const rounded = (x: number, y: number, s: number, r: number) => {
+      const pts: [number, number][] = [];
+      const corners: [number, number, number][] = [
+        [x + s - r, y + s - r, 0],
+        [x + r, y + s - r, 90],
+        [x + r, y + r, 180],
+        [x + s - r, y + r, 270],
+      ];
+      for (const [ccx, ccy, start] of corners) {
+        for (let i = 0; i <= 4; i += 1) {
+          const a = ((start + i * 22.5) * Math.PI) / 180;
+          pts.push([ccx + r * Math.cos(a), ccy + r * Math.sin(a)]);
+        }
+      }
+      return pts;
+    };
     for (let row = 0; row < qr.size; row += 1) {
       for (let col = 0; col < qr.size; col += 1) {
         if (!qr.modules[row * qr.size + col]) continue;
         const x = centerX - edge / 2 + col * unit;
         const y = qrY + edge - (row + 1) * unit;
-        polygon(page, [[x, y], [x + unit, y], [x + unit, y + unit], [x, y + unit]], dark);
+        if (qrStyle === "dot") {
+          page.drawEllipse({
+            x: x + unit / 2,
+            y: y + unit / 2,
+            xScale: unit * 0.5,
+            yScale: unit * 0.5,
+            color: rgb(...dark),
+          });
+        } else if (qrStyle === "rounded") {
+          polygon(page, rounded(x + unit * 0.06, y + unit * 0.06, unit * 0.88, unit * 0.24), dark);
+        } else {
+          polygon(page, [[x, y], [x + unit, y], [x + unit, y + unit], [x, y + unit]], dark);
+        }
       }
     }
     if (caption) {
