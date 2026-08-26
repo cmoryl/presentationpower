@@ -167,6 +167,10 @@ export function AgentChat({
         });
 
       let deckId: string | null = null;
+      // Restores every authored slide; runs if the staged build is interrupted
+      // (thread switch, unmount, navigating straight to the editor) so the deck
+      // is never left truncated mid-reveal.
+      let restoreFullDeck: (() => void) | null = null;
       try {
         // Create the deck up front (fast, local) so the mid-build createDeck
         // tool part can carry the real id and the preview can pop live.
@@ -174,6 +178,7 @@ export function AgentChat({
         const completeDeck = useDeckStore.getState().decks[deckId];
         const completeSlides = completeDeck?.slides ?? [];
         const totalSlides = completeSlides.length;
+
         const slideLabel = (index: number) => {
           const content = completeSlides[index]?.content as
             | { title?: unknown; heading?: unknown }
@@ -205,8 +210,10 @@ export function AgentChat({
           });
           onActivity();
         };
+        restoreFullDeck = () => revealSlides(totalSlides);
         setDeckBuildState(deckId, {
           total: totalSlides,
+
           done: 0,
           currentLabel: slideLabel(0),
           building: true,
@@ -237,9 +244,12 @@ export function AgentChat({
         void setAgentThreadDeck(threadId, deckId).catch(() => {});
         toast.success("Deck ready — open it in the editor or export to PowerPoint.");
       } finally {
+        // An interrupted reveal must still leave a complete, editable deck.
+        if (!alive()) restoreFullDeck?.();
         if (deckId) setDeckBuildState(deckId, null);
         if (alive()) setDemoBusy(false);
       }
+
     },
     [onActivity, onDeckDetected, onFirstUserMessage, setMessages, threadId],
   );
