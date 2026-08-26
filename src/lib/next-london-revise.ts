@@ -517,6 +517,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)}) >>`,
+    `<< ${meshShadingEntries(w, h)} /Length ${mesh.length} >>\nstream\n${meshText}\nendstream`,
   ];
 
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
