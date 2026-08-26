@@ -196,6 +196,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
         { to: "/analytics", label: "Deck engagement" },
         { to: "/admin/ai", label: "AI usage & cost" },
         { to: "/admin/imagery-analytics", label: "Imagery analytics" },
+        { to: "/admin/viz-lab", label: "Viz Lab" },
       ],
     },
     {
