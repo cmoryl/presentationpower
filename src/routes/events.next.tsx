@@ -808,10 +808,20 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
             <IdCard size={13} /> {division.eventName} attendee badge
             <ArrowRight size={13} />
           </Link>
+          <Link
+            to="/events/next/agendas"
+            search={{ division: division.id }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+          >
+            <CalendarDays size={13} /> {division.eventName} agenda board
+            <ArrowRight size={13} />
+          </Link>
           <span className="text-xs text-muted-foreground">
             Approved City Series artwork with the division lockup, dark + light faces, print-ready
-            at 4.58″ × 6.55″ bleed.
+            at 4.58″ × 6.55″ bleed. The agenda board is fully editable per division and exports as
+            layered vector art.
           </span>
+
         </div>
       </div>
     </section>
