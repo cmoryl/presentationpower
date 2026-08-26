@@ -204,13 +204,13 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
       });
     }
     if (!annotations.headline?.trim() && labelKey && valueKey && rows.length > 0) {
-      const ranked = [...rows].sort((a, b) => num(b[valueKey]) - num(a[valueKey]));
+      const ranked = [...rows].sort((a, b) => (coerceNumber(b[valueKey]) ?? 0) - (coerceNumber(a[valueKey]) ?? 0));
       const top = ranked[0];
       if (top) {
         const unit = /%|percent|share|rate/i.test(String(spec.data?.columns?.[valueKey] ?? valueKey))
           ? "%"
           : "";
-        annotations.headline = `${String(top[labelKey])} leads at ${num(top[valueKey])}${unit}`;
+        annotations.headline = `${String(top[labelKey])} leads at ${coerceNumber(top[valueKey]) ?? 0}${unit}`;
         notes.push({
           code: "VIZ-SOCIAL-NO-HEADLINE",
           detail: "Derived a social headline from the leading data point.",
