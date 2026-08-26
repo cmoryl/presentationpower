@@ -865,7 +865,59 @@ function ExportView() {
             </section>
           )}
 
+          {visualReport && (
+            <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
+                  Visual parity (light &amp; dark)
+                </h2>
+                <span
+                  className={
+                    visualReport.ok
+                      ? "rounded-full bg-[#03002C]/5 px-2 py-0.5 text-[11px] font-semibold text-[#03002C]"
+                      : "rounded-full bg-[#E53D2E]/10 px-2 py-0.5 text-[11px] font-semibold text-[#E53D2E]"
+                  }
+                >
+                  {visualReport.ok ? "Matches editor" : "Blocked"}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-[#03002C]/70">
+                Rendered every slide in both appearances and compared them with the artwork in the
+                file: {visualReport.checked} slide{visualReport.checked === 1 ? "" : "s"} checked,{" "}
+                {visualReport.skipped} skipped, {Math.round(visualReport.threshold * 100)}% similarity
+                required.
+              </p>
+              <ul className="mt-3 space-y-1.5">
+                {visualReport.slides
+                  .filter((s) => s.status !== "match")
+                  .map((s) => (
+                    <li key={s.slideId} className="text-xs text-[#03002C]/70">
+                      Slide {s.index + 1} ({s.variantId}) — expected {s.expectedMode}
+                      {s.renderedMode ? `, exported ${s.renderedMode}` : ""}: {s.detail}
+                    </li>
+                  ))}
+              </ul>
+              {visualReport.issues.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {visualReport.issues.map((issue, i) => (
+                    <li
+                      key={`${issue.code}-${i}`}
+                      className={
+                        issue.level === "error"
+                          ? "text-xs text-[#E53D2E]"
+                          : "text-xs text-[#03002C]/70"
+                      }
+                    >
+                      {issue.level === "error" ? "Error" : "Warning"}: {issue.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
           {coverageReport && coverageReport.total > 0 && (
+
             <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
