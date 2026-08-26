@@ -7,6 +7,8 @@ import {
   pillarDivision,
   pillarHeadlineInk,
   pillarHeadlineSize,
+  pillarLockupScale,
+
   pillarInk,
   pillarStops,
   type PillarConfig,
