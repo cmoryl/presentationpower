@@ -86,6 +86,10 @@ export const PILLAR_HEADLINE_SIZE = { min: 40, max: 220, step: 2 };
 /** Division lockup scale range, 1 = the approved default width (58% of trim). */
 export const PILLAR_LOCKUP_SCALE = { min: 0.5, max: 1.6, step: 0.05 };
 
+/** Extra downward nudge for the headline block, in mm. Never negative, so the
+ * copy can drop lower down the column but can never ride up into the lockup. */
+export const PILLAR_HEADLINE_OFFSET = { min: 0, max: 900, step: 10 };
+
 
 /** Approved ink options for pillar copy. */
 export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
@@ -184,6 +188,8 @@ export type PillarConfig = {
   headlineColor: string;
   /** Division lockup scale, 1 = the approved default width. */
   lockupScale: number;
+  /** Extra downward offset for the headline block in mm (never negative). */
+  headlineOffset: number;
 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
@@ -200,6 +206,7 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     headlineSize: kind.headlineSize,
     headlineColor: "",
     lockupScale: 1,
+    headlineOffset: 0,
   };
 }
 
@@ -218,6 +225,13 @@ export function pillarLockupScale(config: PillarConfig): number {
   return Math.min(PILLAR_LOCKUP_SCALE.max, Math.max(PILLAR_LOCKUP_SCALE.min, value));
 }
 
+
+/** Clamp the headline downward offset into the approved range. */
+export function pillarHeadlineOffset(config: PillarConfig): number {
+  const raw = Number(config.headlineOffset);
+  const value = Number.isFinite(raw) ? raw : 0;
+  return Math.min(PILLAR_HEADLINE_OFFSET.max, Math.max(PILLAR_HEADLINE_OFFSET.min, value));
+}
 
 /** Resolve the headline ink, falling back to the face default. */
 export function pillarHeadlineInk(config: PillarConfig): string {

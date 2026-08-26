@@ -7,6 +7,7 @@ import {
   pillarDivision,
   pillarHeadlineInk,
   pillarHeadlineSize,
+  pillarHeadlineOffset,
   pillarLockupScale,
 
   pillarInk,
@@ -39,6 +40,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const ink = pillarInk(face);
   const headlineInk = pillarHeadlineInk(config);
   const headlineSize = pillarHeadlineSize(config);
+  const headlineOffset = pillarHeadlineOffset(config);
 
   const stops = pillarStops(config.styleId, face);
   const vertical = Boolean(config.verticalHeadline) && config.kind !== "logo";
@@ -127,7 +129,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
         {config.kind === "logo" ? null : vertical ? (
           <div
             style={{
-              marginTop: mm(120),
+              marginTop: mm(120 + headlineOffset),
               flex: 1,
               minHeight: 0,
               width: "100%",
@@ -155,7 +157,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
             ) : null}
           </div>
         ) : (
-          <div style={{ marginTop: mm(140), width: "100%" }}>
+          <div style={{ marginTop: mm(140 + headlineOffset), width: "100%" }}>
             {config.headline.trim() ? (
               <div
                 style={{
