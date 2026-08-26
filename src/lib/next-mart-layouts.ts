@@ -194,7 +194,7 @@ export const MART_LAYOUT_PRESETS: MartLayoutPreset[] = [
     headlineFracSize: 0.036,
     headlineFracOffset: 0.08,
     lockupScale: 0.46,
-    arrowStyle: "outline",
+    arrowStyle: "slim",
   },
   {
     id: "mart-logo-shop-scan",
