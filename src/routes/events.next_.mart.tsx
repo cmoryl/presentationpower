@@ -173,6 +173,58 @@ function MartPage() {
           </div>
         </section>
 
+        {/* Mart lockup pack */}
+        <section className="mt-12">
+          <h2 className="text-lg font-semibold tracking-tight text-[#03002C]">
+            NEXT MART lockup · master files
+          </h2>
+          <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-black/60">
+            The supplied mart mark in both approved faces. EPS is the print master used on all
+            signage; SVG and PNG are the derived screen and proof files. Do not rebuild, recolour or
+            stretch the lockup.
+          </p>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            {NEXT_MART_LOGOS.map((logo) => (
+              <article
+                key={logo.id}
+                className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+              >
+                <div
+                  className="flex items-center justify-center p-8"
+                  style={{ background: logo.face === "dark" ? "#03002C" : "#E0E8F5" }}
+                >
+                  <img
+                    src={logo.previewUrl}
+                    alt={`${logo.name} artwork`}
+                    className="h-28 w-auto max-w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-4">
+                  <div className="text-sm font-medium text-[#03002C]">{logo.name}</div>
+                  <p className="mt-1.5 text-[12px] leading-relaxed text-black/60">{logo.usage}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {[
+                      { label: "EPS master", url: logo.epsUrl },
+                      { label: "SVG", url: logo.svgUrl },
+                      { label: "PNG proof", url: logo.pngUrl },
+                    ].map((f) => (
+                      <a
+                        key={f.label}
+                        href={f.url}
+                        download
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-2.5 py-1.5 text-[11px] font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+                      >
+                        <Download size={12} /> {f.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
 
         {/* Flat signage specs */}
         <section className="mt-12">
