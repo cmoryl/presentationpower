@@ -66,7 +66,7 @@ export const PILLAR_KINDS: PillarKind[] = [
     id: "logo",
     name: "General logo",
     note: "Brand-only pillar for repeats down a corridor or either side of a stage.",
-    defaultStyle: "08-halo",
+    defaultStyle: "01-beam-violet-aqua",
     headline: "",
     headlineSize: 104,
   },
