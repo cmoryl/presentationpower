@@ -20,6 +20,8 @@ import {
   pillarDefault,
   pillarHeadlineInk,
   pillarHeadlineSize,
+  pillarHeadlineOffset,
+  PILLAR_HEADLINE_OFFSET,
   pillarLockupScale,
 
 
@@ -284,6 +286,27 @@ function PillarPage() {
                     value={pillarHeadlineSize(config)}
                     onChange={(e) => set("headlineSize", Number(e.target.value))}
                   />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className={label}>Headline drop</div>
+                    <div className="text-xs tabular-nums text-black/55">
+                      +{pillarHeadlineOffset(config)} mm
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    className="mt-2 w-full accent-[#003FC7]"
+                    min={PILLAR_HEADLINE_OFFSET.min}
+                    max={PILLAR_HEADLINE_OFFSET.max}
+                    step={PILLAR_HEADLINE_OFFSET.step}
+                    value={pillarHeadlineOffset(config)}
+                    onChange={(e) => set("headlineOffset", Number(e.target.value))}
+                  />
+                  <p className="mt-1 text-[11px] text-black/45">
+                    Pushes the headline block further down the column. It can never move up into the
+                    lockup zone.
+                  </p>
                 </div>
                 <div>
                   <div className={label}>Headline colour</div>
