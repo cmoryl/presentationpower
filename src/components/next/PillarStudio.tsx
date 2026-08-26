@@ -82,7 +82,19 @@ const PPI_TIERS = [
   { ppi: PILLAR_SPEC.rasterPpi, label: `${PILLAR_SPEC.rasterPpi} ppi · issued large-format` },
   { ppi: 72, label: "72 ppi · close-read pillar" },
   { ppi: 150, label: "150 ppi · hand-height panel" },
+  { ppi: 300, label: "300 ppi · press-grade detail" },
 ];
+
+/** The press PDF is vector, so resolution only sizes the raster plate used for
+ *  proofs and the fallback build. A plate edge is capped, so the tiers a sheet
+ *  can actually carry depend on its footprint: full-height pillars top out well
+ *  below 300 ppi, while short panels reach it comfortably. */
+function ppiTiersFor(longestMm: number) {
+  const ceiling = Math.floor(MAX_PLATE_EDGE_PX / Math.max(1, longestMm / 25.4));
+  return PPI_TIERS.map((t) => ({ ...t, available: t.ppi <= ceiling })).filter(
+    (t) => t.available || t.ppi === 300,
+  );
+}
 
 type PillarFileRow = {
   id: string;
@@ -174,6 +186,9 @@ export function PillarStudio({
     setConfig((c) => ({ ...c, [key]: value }));
 
   const geo = pillarGeometry(config);
+  const ppiTiers = ppiTiersFor(Math.max(geo.bleedW, geo.bleedH));
+  const ppiCeiling = Math.max(...ppiTiers.filter((t) => t.available).map((t) => t.ppi));
+  const effectivePpi = Math.min(ppi, ppiCeiling);
   // Fit the whole pillar into a tall viewing plate, then let the user zoom in.
   const fitScale = Math.min(0.95, 820 / (geo.bleedH * NATIVE_PX_PER_MM));
   const previewScale = fitScale * zoom;
@@ -959,15 +974,22 @@ export function PillarStudio({
             <div className={label}>Print resolution</div>
             <select
               className={field}
-              value={ppi}
+              value={effectivePpi}
               onChange={(e) => setPpi(Number(e.target.value))}
             >
-              {PPI_TIERS.map((t) => (
-                <option key={t.ppi} value={t.ppi}>
+              {ppiTiers.map((t) => (
+                <option key={t.ppi} value={t.ppi} disabled={!t.available}>
                   {t.label}
+                  {t.available ? "" : ` — too large for ${geo.sizeName}`}
                 </option>
               ))}
             </select>
+            <p className="mt-2 text-xs text-muted-foreground">
+              The press PDF/.ai is 100% vector, so it prints sharp at any size. This
+              setting only sizes the raster proof plate — up to {ppiCeiling} ppi for{" "}
+              {geo.sizeName}
+              {ppiCeiling < 300 ? "; 300 ppi needs a shorter panel footprint." : "."}
+            </p>
             <button
               type="button"
               onClick={runExport}
