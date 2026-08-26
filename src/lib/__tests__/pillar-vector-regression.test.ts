@@ -63,6 +63,8 @@ type Fingerprint = {
 
 function fingerprint(result: PillarVectorResult): Fingerprint {
   const raw = latin1(result.bytes);
+  const ops = operators(result.bytes);
+  const both = raw + "\n" + ops;
   return {
     page: `${Math.round(result.page.widthPt)}x${Math.round(result.page.heightPt)}pt`,
     layers: result.layers,
@@ -71,14 +73,14 @@ function fingerprint(result: PillarVectorResult): Fingerprint {
       trim: raw.includes("/TrimBox"),
       bleed: raw.includes("/BleedBox"),
     },
-    meshShading: count(raw, "/ShadingType 4"),
-    legacyShading: count(raw, "/ShadingType 2") + count(raw, "/ShadingType 3"),
-    rasterImages: count(raw, "/Subtype /Image"),
-    fontsEmbedded: count(raw, "/FontFile2") + count(raw, "/FontFile3"),
-    subsetFont: /\/BaseFont \/[A-Z]{6}\+/.test(raw),
-    textShowOps: bucket(count(raw, " Tj")),
-    fillOps: bucket(count(raw, "\nf\n") + count(raw, "\nf*\n")),
-    clips: bucket(count(raw, "\nW n\n") + count(raw, " W n")),
+    meshShading: count(both, /\/ShadingType 4/g),
+    legacyShading: count(both, /\/ShadingType [23]/g),
+    rasterImages: count(both, /\/Subtype ?\/Image/g),
+    fontsEmbedded: count(raw, /\/FontFile[23]?/g),
+    subsetFont: /\/BaseFont ?\/[A-Z]{6}\+/.test(raw),
+    textShowOps: bucket(count(ops, /\bTj\b/g)),
+    fillOps: bucket(count(ops, /(^|[\s\n])f\*?[\s\n]/g)),
+    clips: bucket(count(ops, /\bW\s+n\b/g)),
     pdfVersion: raw.slice(0, 8),
     pdfx: {
       conformance: result.pdfx.conformance,
@@ -87,6 +89,7 @@ function fingerprint(result: PillarVectorResult): Fingerprint {
     },
   };
 }
+
 
 const samples: { name: string; config: PillarConfig }[] = [
   {
