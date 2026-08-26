@@ -192,7 +192,7 @@ export function ExportProposalButton({
       } catch (err) {
         console.error("Proposal export failed", err);
         const { describeCaptureFailure } = await import("@/lib/slide-image-export");
-        toast.error(`Export failed: ${describeCaptureFailure(err)}`);
+        toast.error(`Export failed: ${describeCaptureFailure(err)}`, { id: toastId });
       } finally {
         if (!cancelled) {
           runRef.current = null;
