@@ -31,7 +31,7 @@ export function pillarQrScopeKey(config: PillarConfig): string {
 
 export function pillarQrScopeLabel(config: PillarConfig): string {
   const size = PILLAR_SIZES.find((s) => s.id === config.sizeId);
-  return `${size?.label ?? "Custom footprint"} · ${pillarKind(config.kind).label}`;
+  return `${size?.name ?? "Custom footprint"} · ${pillarKind(config.kind).name}`;
 }
 
 function trimSize(config: PillarConfig): { w: number; h: number } {
