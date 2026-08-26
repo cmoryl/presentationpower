@@ -20,9 +20,9 @@ import type { DeckSlide } from "@/lib/deck-store";
 import type { InfographicKind, InfographicSpec, RenderContext } from "@/lib/infographics/spec";
 import { useOpenSpaceFill } from "@/components/slide/OpenSpaceFill";
 import { renderInfographic } from "@/lib/infographics/registry";
-import { ensureA11y } from "@/lib/infographics/a11y";
-import { vizKindForVariant } from "@/lib/infographics/variant-kinds";
-import { sampleDatasetFor } from "@/lib/infographics/sample-data";
+import { buildVizSpecFromContent } from "@/lib/infographics/from-content";
+import { repairVizSpec } from "@/lib/infographics/repair";
+import { useVizSurface } from "./VizSurfaceContext";
 import { ChartDataDrawer } from "./ChartDataDrawer";
 import { useStylePack } from "./StylePackContext";
 import { vizTheme } from "@/lib/infographics/viz-theme";
@@ -46,39 +46,22 @@ export function InfographicSlideModule({ slide, variant, brand, pageNumber, mode
   const pack = useStylePack();
   const theme = React.useMemo(() => vizTheme({ brand, mode, pack }), [brand, mode, pack]);
 
-  const spec: InfographicSpec = React.useMemo(() => {
-    const declared = content.spec as Partial<InfographicSpec> | undefined;
-    const kind = (declared?.kind ?? vizKindForVariant(variant.id)) as InfographicKind;
-    const declaredEncoding =
-      declared?.encoding ?? (content.encoding as InfographicSpec["encoding"]) ?? {};
-    const authoredRows = (declared?.data?.rows ??
-      (content.rows as InfographicSpec["data"]["rows"]) ??
-      []) as InfographicSpec["data"]["rows"];
-    // A viz variant with no data yet (library preview, blank slide, fresh
-    // insert) must still draw a real chart — otherwise the card reads broken.
-    const demo = authoredRows.length === 0 ? sampleDatasetFor(kind) : null;
-    const rows = demo ? demo.rows : authoredRows;
-    const encoding =
-      Object.keys(declaredEncoding).length > 0
-        ? declaredEncoding
-        : (demo?.encoding ?? declaredEncoding);
-    const source = declared?.data?.source ?? (s(content.source) || demo?.source || undefined);
-    const columns =
-      declared?.data?.columns ??
-      (content.columns as Record<string, string> | undefined) ??
-      demo?.columns;
-    return ensureA11y({
-      id: `${slide.id}-viz`,
-      kind,
-      title: s(content.title),
-      subtitle: s(content.subtitle),
-      data: { rows, source, columns },
-      encoding,
-      theme: declared?.theme ? { ...theme, ...declared.theme } : theme,
-      accessibility: declared?.accessibility ?? { shortAlt: "", longDesc: "" },
-      export: { preferredFormat: "svg", rasterFallback: true },
-    });
-  }, [slide.id, variant.id, content, brand, theme]);
+  // Charts are audited/repaired for the surface they actually land on: a press
+  // sheet and a feed post carry different legibility budgets than a slide.
+  const surface = useVizSurface();
+  const spec: InfographicSpec = React.useMemo(
+    () =>
+      repairVizSpec(
+        buildVizSpecFromContent({
+          content,
+          variantId: variant.id,
+          id: `${slide.id}-viz`,
+          theme,
+        }),
+        { surface },
+      ).spec,
+    [slide.id, variant.id, content, theme, surface],
+  );
 
   // Charts grow with the slide's open space (block axis), so a two-series bar
   // chart on an otherwise empty page fills the sheet instead of floating.
