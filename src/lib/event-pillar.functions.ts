@@ -63,7 +63,7 @@ export const savePillarFile = createServerFn({ method: "POST" })
         event_label: data.eventLabel,
         scope: data.scope,
         notes: data.notes,
-        config: data.config,
+        config: data.config as never,
         user_id: context.userId,
       })
       .select("*")

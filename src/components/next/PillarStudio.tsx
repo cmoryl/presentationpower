@@ -82,7 +82,7 @@ export function PillarStudio({
   const [config, setConfig] = useState<PillarConfig>(pillarDefault());
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [ppi, setPpi] = useState(PILLAR_SPEC.rasterPpi);
+  const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
   const [openFileId, setOpenFileId] = useState<string | null>(null);
   const plateRef = useRef<HTMLDivElement | null>(null);
@@ -96,7 +96,7 @@ export function PillarStudio({
 
   const files = useQuery({
     queryKey: ["event-pillar-files"],
-    queryFn: () => list() as Promise<PillarFileRow[]>,
+    queryFn: async () => (await list()) as unknown as PillarFileRow[],
     enabled: signedIn === true,
   });
 
