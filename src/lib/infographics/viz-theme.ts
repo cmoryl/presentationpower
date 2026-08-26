@@ -191,7 +191,10 @@ export function separatePalette(colors: string[], surface: string): string[] {
   const toward = surfaceIsDark ? "#0A1230" : "#FFFFFF";
   for (let i = 1; i < out.length; i += 1) {
     let c = out[i]!;
-    for (let step = 1; step <= 6 && vizContrastLocal(c, out[i - 1]!) < 1.4; step += 1) {
+    const tooClose = () =>
+      vizContrastLocal(c, out[i - 1]!) < 1.4 ||
+      Math.abs(relLuminance(c) - relLuminance(out[i - 1]!)) < 0.07;
+    for (let step = 1; step <= 8 && tooClose(); step += 1) {
       // Alternate the direction so a long palette fans out instead of drifting
       // to one end of the lightness range.
       const candidate = mix(out[i]!, i % 2 === 0 ? away : toward, step * 0.1);

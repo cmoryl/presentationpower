@@ -7,7 +7,7 @@
 // never spends tokens on mechanical work.
 
 import { ensureA11y } from "./a11y";
-import { ensureVizContrast } from "./viz-theme";
+import { ensureVizContrast, separatePalette } from "./viz-theme";
 import type { InfographicRow, InfographicSpec } from "./spec";
 import type { VizSurface } from "./audit";
 
@@ -51,6 +51,13 @@ const SURFACE_CATEGORY_CAP: Record<VizSurface, number> = {
   presentation: 12,
   print: 14,
   social: 5,
+};
+
+/** Label budgets mirror SURFACE_LIMITS in audit.ts so a repair clears the rule. */
+const SURFACE_LABEL_CHARS: Record<VizSurface, number> = {
+  presentation: 24,
+  print: 28,
+  social: 14,
 };
 
 export type RepairOptions = {
@@ -162,7 +169,7 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
     if (fixed.toLowerCase() !== c.toLowerCase()) recolored += 1;
     return fixed;
   });
-  if (nextPalette.length) theme.palette = Array.from(new Set(nextPalette));
+  if (nextPalette.length) theme.palette = separatePalette(Array.from(new Set(nextPalette)), surfaceHex);
   const accent = guard(theme.accent ?? "#003FC7", 3);
   const primary = guard(theme.primary ?? "#003FC7", 3);
   const ink = guard(theme.ink ?? "#03002C", 4.5);
@@ -190,7 +197,7 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
   const annotations = { ...(spec.annotations ?? {}) };
   if (surface === "social") {
     const labels = labelKey ? rows.map((r) => String(r[labelKey] ?? "").trim()) : [];
-    const shortened = 24;
+    const shortened = SURFACE_LABEL_CHARS[surface];
     if (labelKey && labels.some((l) => l.length > shortened)) {
       rows = rows.map((r) => {
         const raw = String(r[labelKey] ?? "");
@@ -202,6 +209,17 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
         code: "VIZ-LABEL-OVERFLOW",
         detail: `Shortened long category labels to ${shortened} characters for social.`,
       });
+    }
+    if (!annotations.headline?.trim() && (!labelKey || !valueKey) ) {
+      const alt = spec.accessibility?.shortAlt?.trim();
+      const fallback = (alt || spec.title || "").split(/(?<=[.!?])\s/)[0]?.trim();
+      if (fallback) {
+        annotations.headline = fallback.length > 70 ? `${fallback.slice(0, 69)}…` : fallback;
+        notes.push({
+          code: "VIZ-SOCIAL-NO-HEADLINE",
+          detail: "Used the chart's alt text as the social headline.",
+        });
+      }
     }
     if (!annotations.headline?.trim() && labelKey && valueKey && rows.length > 0) {
       const ranked = [...rows].sort((a, b) => (coerceNumber(b[valueKey]) ?? 0) - (coerceNumber(a[valueKey]) ?? 0));
