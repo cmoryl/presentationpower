@@ -100,7 +100,18 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   ) : null;
 
   const qrBlock = qr ? (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems:
+          qrPlace.captionAlign === "left"
+            ? "flex-start"
+            : qrPlace.captionAlign === "right"
+              ? "flex-end"
+              : "center",
+      }}
+    >
               <div
                 style={{
                   width: qrEdge,
