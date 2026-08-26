@@ -50,6 +50,7 @@ import {
   pillarQrForeground,
   pillarQrScanSafe,
   pillarQrSize,
+  pillarQrPlacement,
   pillarQrStyle,
   PILLAR_QR_MIN_CONTRAST,
   PILLAR_QR_STYLES,
@@ -111,6 +112,11 @@ export function PillarStudio({
   const [batch, setBatch] = useState<Record<string, { on: boolean; qty: number }>>({});
   const [batchBusy, setBatchBusy] = useState(false);
   const [batchStage, setBatchStage] = useState("");
+  const [dragging, setDragging] = useState(false);
+  const [snapLines, setSnapLines] = useState<{ x: number | null; y: number | null }>({
+    x: null,
+    y: null,
+  });
 
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
@@ -214,6 +220,85 @@ export function PillarStudio({
         : {}),
     }));
 
+
+  // ── QR drag placement ──────────────────────────────────────────────────────
+  const qrPlace = pillarQrPlacement(config);
+  const hasQr = Boolean((config.qrData ?? "").trim());
+  const px = (v: number) => v * NATIVE_PX_PER_MM * previewScale;
+  const SNAP_MM = 8;
+
+  /** Snap targets in mm from the trim origin, with the guide line to show. */
+  const snapX = (x: number) => {
+    const targets = [
+      { at: qrPlace.minX, guide: qrPlace.minX },
+      { at: qrPlace.maxX, guide: qrPlace.maxX + qrPlace.edge },
+      { at: qrPlace.centerX - qrPlace.edge / 2, guide: qrPlace.centerX },
+    ];
+    for (const t of targets) {
+      if (Math.abs(x - t.at) <= SNAP_MM) return { value: t.at, guide: t.guide };
+    }
+    return { value: x, guide: null as number | null };
+  };
+  const snapY = (y: number) => {
+    const targets = [
+      { at: qrPlace.minY, guide: qrPlace.minY },
+      { at: qrPlace.maxY, guide: qrPlace.maxY + qrPlace.blockH },
+      { at: qrPlace.centerY - qrPlace.blockH / 2, guide: qrPlace.centerY },
+    ];
+    for (const t of targets) {
+      if (Math.abs(y - t.at) <= SNAP_MM) return { value: t.at, guide: t.guide };
+    }
+    return { value: y, guide: null as number | null };
+  };
+
+  const beginQrDrag = (e: React.PointerEvent) => {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const baseX = qrPlace.x;
+    const baseY = qrPlace.y;
+    const perPx = 1 / (NATIVE_PX_PER_MM * previewScale);
+    setDragging(true);
+    const move = (ev: PointerEvent) => {
+      const nx = snapX(baseX + (ev.clientX - startX) * perPx);
+      const ny = snapY(baseY + (ev.clientY - startY) * perPx);
+      setSnapLines({ x: nx.guide, y: ny.guide });
+      setConfig((c) => ({
+        ...c,
+        qrOffsetX: Math.min(Math.max(nx.value, qrPlace.minX), qrPlace.maxX),
+        qrOffsetY: Math.min(Math.max(ny.value, qrPlace.minY), qrPlace.maxY),
+      }));
+    };
+    const up = () => {
+      setDragging(false);
+      setSnapLines({ x: null, y: null });
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  };
+
+  /** Arrow-key nudging: 1 mm, or 10 mm with shift. */
+  const nudgeQr = (e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? 10 : 1;
+    const map: Record<string, [number, number]> = {
+      ArrowLeft: [-step, 0],
+      ArrowRight: [step, 0],
+      ArrowUp: [0, -step],
+      ArrowDown: [0, step],
+    };
+    const d = map[e.key];
+    if (!d) return;
+    e.preventDefault();
+    setConfig((c) => ({
+      ...c,
+      qrOffsetX: Math.min(Math.max(qrPlace.x + d[0], qrPlace.minX), qrPlace.maxX),
+      qrOffsetY: Math.min(Math.max(qrPlace.y + d[1], qrPlace.minY), qrPlace.maxY),
+    }));
+  };
+
   const runBatchExport = async () => {
     if (batchItems.length === 0) return;
     setBatchBusy(true);
@@ -301,6 +386,7 @@ export function PillarStudio({
           >
             <div
               style={{
+                position: "relative",
                 width: geo.bleedW * NATIVE_PX_PER_MM * previewScale,
                 height: geo.bleedH * NATIVE_PX_PER_MM * previewScale,
               }}
@@ -311,6 +397,57 @@ export function PillarStudio({
                 guides={guides}
                 style={{ transform: `scale(${previewScale})`, transformOrigin: "top left" }}
               />
+              {hasQr ? (
+                <>
+                  {/* Snap guides, shown only while dragging */}
+                  {snapLines.x !== null ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: px(geo.bleedEdge + snapLines.x),
+                        top: 0,
+                        bottom: 0,
+                        width: 1,
+                        background: "#EC388A",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  ) : null}
+                  {snapLines.y !== null ? (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: px(geo.bleedEdge + snapLines.y),
+                        left: 0,
+                        right: 0,
+                        height: 1,
+                        background: "#EC388A",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-label="QR block position — drag or use the arrow keys"
+                    onPointerDown={beginQrDrag}
+                    onKeyDown={nudgeQr}
+                    title="Drag to place the QR and its caption"
+                    style={{
+                      position: "absolute",
+                      left: px(geo.bleedEdge + qrPlace.x),
+                      top: px(geo.bleedEdge + qrPlace.y),
+                      width: px(qrPlace.edge),
+                      height: px(qrPlace.blockH),
+                      cursor: dragging ? "grabbing" : "grab",
+                      border: `1px solid ${dragging ? "#EC388A" : "rgba(0,63,199,0.7)"}`,
+                      borderRadius: 4,
+                      background: dragging ? "rgba(236,56,138,0.08)" : "transparent",
+                      touchAction: "none",
+                    }}
+                  />
+                </>
+              ) : null}
             </div>
           </div>
 
