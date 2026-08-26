@@ -40,8 +40,8 @@ import {
   LONDON_VENUE,
   londonPanelsByFloor,
 } from "@/lib/next-london-signage";
-import { NextBadge } from "@/components/next/NextBadge";
-import { badgeDivisionFor, SAMPLE_ATTENDEE } from "@/lib/next-badge";
+import { CityBadge } from "@/components/next/CityBadge";
+import { CITY_BADGE_DEFAULT, cityBadgeDivision } from "@/lib/next-city-badge";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export const Route = createFileRoute("/events/next")({
