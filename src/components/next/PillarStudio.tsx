@@ -368,6 +368,7 @@ export function PillarStudio({
     const baseY = qrPlace.y;
     const perPx = 1 / (NATIVE_PX_PER_MM * previewScale);
     setDragging(true);
+    pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
     const move = (ev: PointerEvent) => {
       const nx = snapX(baseX + (ev.clientX - startX) * perPx);
       const ny = snapY(baseY + (ev.clientY - startY) * perPx);
@@ -400,12 +401,14 @@ export function PillarStudio({
     const d = map[e.key];
     if (!d) return;
     e.preventDefault();
+    pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
     setConfig((c) => ({
       ...c,
       qrOffsetX: Math.min(Math.max(qrPlace.x + d[0], qrPlace.minX), qrPlace.maxX),
       qrOffsetY: Math.min(Math.max(qrPlace.y + d[1], qrPlace.minY), qrPlace.maxY),
     }));
   };
+
 
   const runBatchExport = async () => {
     if (batchItems.length === 0) return;
