@@ -80,6 +80,7 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       preferredArchetypes: ["arch-value-story", "arch-decision-drive", "arch-market-fit"],
       // Corporate narrative leans on long-form case stories + testimonial proof.
       preferredVariantIds: [
+        "MV-OP-COVER-POSTER",
         "MV-CASE-STORY",
         "MV-CASE-SPREAD",
         "MV-PROOF-TESTIMONIAL",
