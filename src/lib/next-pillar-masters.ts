@@ -317,6 +317,14 @@ export type PillarConfig = {
   qrSize: number;
   /** Optional caption printed under the QR block. */
   qrCaption: string;
+  /** Caption type treatment. */
+  qrCaptionFont: PillarCaptionFontId;
+  /** Caption cap height in mm. 0 = derive from the sub-line size. */
+  qrCaptionSize: number;
+  /** Caption alignment relative to the QR block. */
+  qrCaptionAlign: PillarCaptionAlign;
+  /** Padding between the code, its caption and the safe edges (mm). */
+  qrCaptionPad: number;
   /** QR module shape. */
   qrStyle: PillarQrStyleId;
   /** QR ink hex. Empty = the approved default (Blue 800). */
