@@ -57,6 +57,7 @@ import {
   type PillarConfig,
 } from "./next-pillar-masters";
 import { PILLAR_LOGO_DROP } from "./next-pillar-masters";
+import { registerMeshShading, type MeshSampler } from "./pdf-mesh-shading";
 import { pillarArrowStyle } from "./pillar-arrows";
 import { buildPillarQr } from "./pillar-qr";
 
@@ -360,7 +361,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     clip(),
     endPath(),
   );
-  drawGround(page, bleedW, bleedH, stops, config.styleId);
+  drawGround(doc, page, bleedW, bleedH, stops, config.styleId);
   page.pushOperators(popGraphicsState());
   endLayer(page);
 
