@@ -485,8 +485,28 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
       ? subs[0]!
       : `<< /FunctionType 3 /Domain [0 1] /Functions [${subs.join(" ")}] /Bounds [${bounds}] /Encode [${encode}] >>`;
 
-  const coords = [axis.x1 * w, h - axis.y1 * h, axis.x2 * w, h - axis.y2 * h].map(f3).join(" ");
-  const shading = `<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [${coords}] /Function ${fn} /Extend [true true] >>`;
+  // Match the SVG master exactly: halo grounds are a centred radial (SVG
+  // cx 50% / cy 45% / r 72%), everything else is the axial beam/wash.
+  const shading = panel.style.includes("halo")
+    ? `<< /ShadingType 3 /ColorSpace /DeviceRGB /Coords [${[
+        0.5 * w,
+        h - 0.45 * h,
+        0,
+        0.5 * w,
+        h - 0.45 * h,
+        0.72 * Math.sqrt((w * w + h * h) / 2),
+      ]
+        .map(f3)
+        .join(" ")}] /Function ${fn} /Extend [true true] >>`
+    : `<< /ShadingType 2 /ColorSpace /DeviceRGB /Coords [${[
+        axis.x1 * w,
+        h - axis.y1 * h,
+        axis.x2 * w,
+        h - axis.y2 * h,
+      ]
+        .map(f3)
+        .join(" ")}] /Function ${fn} /Extend [true true] >>`;
+
   const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
 
   const objects: string[] = [
@@ -521,6 +541,23 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
 function f3(n: number): string {
   return (Math.round(n * 1000) / 1000).toString();
 }
+
+/**
+ * Byte-exact bytes for a panel `.ai`.
+ *
+ * The packaged venue masters travel through JSON as *binary-safe latin-1
+ * strings* (one char = one byte). Handing such a string straight to `Blob`
+ * re-encodes it as UTF-8, which inflates every byte above 0x7F into two —
+ * corrupting the PDF's flate streams and xref offsets, so Illustrator opens a
+ * blank artboard. Always widen the string back to raw bytes before download.
+ */
+export function londonAiBytes(ai: string | Uint8Array): Uint8Array<ArrayBuffer> {
+  if (typeof ai !== "string") return new Uint8Array(ai);
+  const bytes = new Uint8Array(ai.length);
+  for (let i = 0; i < ai.length; i += 1) bytes[i] = ai.charCodeAt(i) & 0xff;
+  return bytes;
+}
+
 
 function pdfText(s: string): string {
   return s.replace(/[\\()]/g, (c) => `\\${c}`);
