@@ -169,6 +169,63 @@ export function PillarStudio({
 
   const scopePresets = pillarQrPresetsFor(config);
 
+  // ── QR placement undo / redo ───────────────────────────────────────────────
+  type QrSpot = { x: number | null; y: number | null };
+  const [qrPast, setQrPast] = useState<QrSpot[]>([]);
+  const [qrFuture, setQrFuture] = useState<QrSpot[]>([]);
+
+  /** Record the placement about to be replaced, so it can be undone. */
+  const pushQrHistory = (spot: QrSpot) => {
+    setQrPast((p) => [...p.slice(-49), spot]);
+    setQrFuture([]);
+  };
+
+  const undoQr = () => {
+    setQrPast((past) => {
+      if (past.length === 0) return past;
+      const prev = past[past.length - 1]!;
+      setConfig((c) => {
+        setQrFuture((f) => [...f, { x: c.qrOffsetX, y: c.qrOffsetY }]);
+        return { ...c, qrOffsetX: prev.x, qrOffsetY: prev.y };
+      });
+      return past.slice(0, -1);
+    });
+  };
+
+  const redoQr = () => {
+    setQrFuture((future) => {
+      if (future.length === 0) return future;
+      const next = future[future.length - 1]!;
+      setConfig((c) => {
+        setQrPast((p) => [...p, { x: c.qrOffsetX, y: c.qrOffsetY }]);
+        return { ...c, qrOffsetX: next.x, qrOffsetY: next.y };
+      });
+      return future.slice(0, -1);
+    });
+  };
+
+  // Cmd/Ctrl+Z undoes a placement move, Shift+Cmd/Ctrl+Z (or Cmd+Y) redoes it.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey)) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      const key = e.key.toLowerCase();
+      if (key === "z") {
+        e.preventDefault();
+        if (e.shiftKey) redoQr();
+        else undoQr();
+      } else if (key === "y") {
+        e.preventDefault();
+        redoQr();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+
+
 
 
 
