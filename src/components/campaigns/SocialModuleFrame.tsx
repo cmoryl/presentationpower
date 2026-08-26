@@ -206,6 +206,7 @@ export function SocialModuleFrame({
   const lockupPad = safe.left * 0.55;
 
   return (
+    <VizSurfaceProvider surface="social">
     <div
       style={{ width: format.width * displayScale, height: format.height * displayScale }}
       className="relative overflow-hidden"
@@ -315,5 +316,6 @@ export function SocialModuleFrame({
         ) : null}
       </div>
     </div>
+    </VizSurfaceProvider>
   );
 }
