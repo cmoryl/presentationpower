@@ -6,12 +6,13 @@
 import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Download, QrCode, Ruler, Save, Trash2 } from "lucide-react";
+import { Download, Layers, QrCode, Ruler, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { PillarSign } from "@/components/next/PillarSign";
 import { exportPillarSign } from "@/lib/next-pillar-export";
+import { exportPillarBatch, type PillarBatchItem } from "@/lib/next-pillar-batch-export";
 import {
   deletePillarFile,
   listPillarFiles,
@@ -107,6 +108,9 @@ export function PillarStudio({
   const [busy, setBusy] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [customEvent, setCustomEvent] = useState("");
+  const [batch, setBatch] = useState<Record<string, { on: boolean; qty: number }>>({});
+  const [batchBusy, setBatchBusy] = useState(false);
+  const [batchStage, setBatchStage] = useState("");
 
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
@@ -199,6 +203,49 @@ export function PillarStudio({
       setBusy(false);
     }
   };
+
+  const batchItems: PillarBatchItem[] = Object.entries(batch)
+    .filter(([, v]) => v.on && v.qty > 0)
+    .map(([sizeId, v]) => ({
+      sizeId,
+      quantity: v.qty,
+      ...(sizeId === "custom"
+        ? { trimW: Number(config.trimW) || geo.trimW, trimH: Number(config.trimH) || geo.trimH }
+        : {}),
+    }));
+
+  const runBatchExport = async () => {
+    if (batchItems.length === 0) return;
+    setBatchBusy(true);
+    setBatchStage("");
+    const id = toast.loading("Building the pillar batch…");
+    try {
+      const result = await exportPillarBatch({
+        config,
+        items: batchItems,
+        onProgress: (p) => {
+          setBatchStage(p.label);
+          toast.loading(p.label, { id });
+        },
+      });
+      const url = URL.createObjectURL(result.blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = result.filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Batch package downloaded", {
+        id,
+        description: `${result.entries.length} size${result.entries.length === 1 ? "" : "s"} · ${result.totalQuantity} panels · layered PDF + .ai per size + production manifest`,
+      });
+    } catch (e) {
+      toast.error("Batch export failed", { id, description: (e as Error).message });
+    } finally {
+      setBatchBusy(false);
+      setBatchStage("");
+    }
+  };
+
 
   const field =
     "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] outline-none focus:border-[#003FC7]";
@@ -767,6 +814,120 @@ export function PillarStudio({
               <Download size={15} /> {busy ? "Exporting…" : "Export print package"}
             </button>
           </div>
+
+          {/* Batch export */}
+          <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-[#03002C]">
+              <Layers size={15} /> Batch export
+            </div>
+            <p className="text-xs leading-relaxed text-black/55">
+              Same copy, lockup and gradient across several pillar footprints. Tick the sizes you
+              need, set the print quantity for each, and get one zip with a layered PDF/.ai package
+              per size plus a production manifest.
+            </p>
+            <ul className="space-y-1.5">
+              {PILLAR_SIZES.filter((s) => s.id !== "custom").map((s) => {
+                const row = batch[s.id];
+                return (
+                  <li
+                    key={s.id}
+                    className="flex items-center gap-3 rounded-lg border border-black/10 px-3 py-2"
+                  >
+                    <input
+                      type="checkbox"
+                      id={`batch-${s.id}`}
+                      checked={Boolean(row?.on)}
+                      onChange={(e) =>
+                        setBatch((b) => ({
+                          ...b,
+                          [s.id]: { on: e.target.checked, qty: row?.qty ?? 1 },
+                        }))
+                      }
+                    />
+                    <label htmlFor={`batch-${s.id}`} className="flex-1 text-xs text-[#03002C]">
+                      <span className="font-medium">{s.name}</span>
+                      <span className="text-black/50">
+                        {" "}
+                        · {s.trimW}×{s.trimH} mm
+                      </span>
+                    </label>
+                    <input
+                      type="number"
+                      min={1}
+                      max={200}
+                      aria-label={`${s.name} quantity`}
+                      value={row?.qty ?? 1}
+                      onChange={(e) =>
+                        setBatch((b) => ({
+                          ...b,
+                          [s.id]: {
+                            on: b[s.id]?.on ?? false,
+                            qty: Math.max(1, Math.min(200, Number(e.target.value) || 1)),
+                          },
+                        }))
+                      }
+                      className="w-16 rounded-md border border-black/15 px-2 py-1 text-xs tabular-nums text-[#03002C]"
+                    />
+                  </li>
+                );
+              })}
+              <li className="flex items-center gap-3 rounded-lg border border-black/10 px-3 py-2">
+                <input
+                  type="checkbox"
+                  id="batch-current-custom"
+                  checked={Boolean(batch["custom"]?.on)}
+                  onChange={(e) =>
+                    setBatch((b) => ({
+                      ...b,
+                      custom: { on: e.target.checked, qty: b["custom"]?.qty ?? 1 },
+                    }))
+                  }
+                />
+                <label htmlFor="batch-current-custom" className="flex-1 text-xs text-[#03002C]">
+                  <span className="font-medium">Custom size</span>
+                  <span className="text-black/50">
+                    {" "}
+                    · {Math.round(Number(config.trimW) || geo.trimW)}×
+                    {Math.round(Number(config.trimH) || geo.trimH)} mm
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={200}
+                  aria-label="Custom size quantity"
+                  value={batch["custom"]?.qty ?? 1}
+                  onChange={(e) =>
+                    setBatch((b) => ({
+                      ...b,
+                      custom: {
+                        on: b["custom"]?.on ?? false,
+                        qty: Math.max(1, Math.min(200, Number(e.target.value) || 1)),
+                      },
+                    }))
+                  }
+                  className="w-16 rounded-md border border-black/15 px-2 py-1 text-xs tabular-nums text-[#03002C]"
+                />
+              </li>
+            </ul>
+            <div className="flex items-center justify-between text-xs text-black/55">
+              <span>
+                {batchItems.length} size{batchItems.length === 1 ? "" : "s"} ·{" "}
+                {batchItems.reduce((n, i) => n + i.quantity, 0)} panels
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={runBatchExport}
+              disabled={batchBusy || busy || batchItems.length === 0}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#003FC7] px-4 py-2.5 text-sm font-medium text-[#003FC7] disabled:opacity-50"
+            >
+              <Download size={14} />
+              {batchBusy ? batchStage || "Building batch…" : "Export batch package"}
+            </button>
+          </div>
+
+
 
           {/* Live files */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
