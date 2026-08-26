@@ -5,6 +5,7 @@
 import {
   PILLAR_SPEC,
   pillarDivision,
+  pillarInk,
   pillarStops,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
@@ -29,10 +30,12 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const mm = (v: number) => v * pxPerMm;
   const w = mm(PILLAR_SPEC.bleedW);
   const h = mm(PILLAR_SPEC.bleedH);
-  const stops = pillarStops(config.styleId);
+  const face = config.face ?? "dark";
+  const ink = pillarInk(face);
+  const stops = pillarStops(config.styleId, face);
   const division = pillarDivision(config.divisionId);
   const isHalo = config.styleId.includes("halo");
-  const gradientId = `pillar-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
+  const gradientId = `pillar-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
   const inset = mm(PILLAR_SPEC.bleedEdge + PILLAR_SPEC.safeInset);
   const lockupW = mm(PILLAR_SPEC.trimW * 0.58);
 
@@ -95,12 +98,12 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
           alignItems: "center",
           justifyContent: config.kind === "logo" ? "center" : "flex-start",
           textAlign: "center",
-          color: "#FFFFFF",
+          color: ink,
         }}
       >
         {config.showLockup && (division.whiteUrl || division.colorUrl) ? (
           <img
-            src={division.whiteUrl || division.colorUrl}
+            src={face === "light" ? division.colorUrl || division.whiteUrl : division.whiteUrl || division.colorUrl}
             alt=""
             aria-hidden
             style={{
@@ -151,7 +154,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
             }}
           >
             <svg width={mm(300)} height={mm(300)} viewBox="0 0 100 100" aria-hidden>
-              <path d="M8 42 H62 V22 L94 50 L62 78 V58 H8 Z" fill="#FFFFFF" />
+              <path d="M8 42 H62 V22 L94 50 L62 78 V58 H8 Z" fill={ink} />
             </svg>
           </div>
         ) : null}
@@ -182,7 +185,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               top: mm(PILLAR_SPEC.bleedEdge),
               width: mm(PILLAR_SPEC.trimW),
               height: mm(PILLAR_SPEC.trimH),
-              border: "1px dashed rgba(255,255,255,0.75)",
+              border: `1px dashed ${face === "light" ? "rgba(3,0,44,0.55)" : "rgba(255,255,255,0.75)"}`,
               pointerEvents: "none",
             }}
           />
@@ -193,7 +196,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               top: inset,
               right: inset,
               bottom: inset,
-              border: "1px dashed rgba(255,255,255,0.4)",
+              border: `1px dashed ${face === "light" ? "rgba(3,0,44,0.3)" : "rgba(255,255,255,0.4)"}`,
               pointerEvents: "none",
             }}
           />
