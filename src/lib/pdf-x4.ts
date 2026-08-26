@@ -129,19 +129,24 @@ export async function wrapPdfAsX4(
 
   // ── Page boxes ─────────────────────────────────────────────────────────
   const bleedPt = opts.bleedIn * IN_TO_PT;
+  const slugPt = (opts.slugIn ?? 0) * IN_TO_PT;
   const trimWpt = opts.trimSize.widthIn * IN_TO_PT;
   const trimHpt = opts.trimSize.heightIn * IN_TO_PT;
-  const mediaWpt = trimWpt + bleedPt * 2;
-  const mediaHpt = trimHpt + bleedPt * 2;
+  const mediaWpt = trimWpt + bleedPt * 2 + slugPt * 2;
+  const mediaHpt = trimHpt + bleedPt * 2 + slugPt * 2;
 
   const pages = pdfDoc.getPages();
   for (const page of pages) {
     // Ensure MediaBox is authoritative (matches what jsPDF produced).
     page.node.set(PDFName.of("MediaBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
-    page.node.set(PDFName.of("BleedBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
+    page.node.set(
+      PDFName.of("BleedBox"),
+      pdfDoc.context.obj([slugPt, slugPt, mediaWpt - slugPt, mediaHpt - slugPt]),
+    );
+    const trimInset = slugPt + bleedPt;
     page.node.set(
       PDFName.of("TrimBox"),
-      pdfDoc.context.obj([bleedPt, bleedPt, bleedPt + trimWpt, bleedPt + trimHpt]),
+      pdfDoc.context.obj([trimInset, trimInset, trimInset + trimWpt, trimInset + trimHpt]),
     );
   }
 
