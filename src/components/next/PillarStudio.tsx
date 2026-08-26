@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { PillarSign } from "@/components/next/PillarSign";
+import { MAX_PLATE_EDGE_PX } from "@/lib/event-print-pipeline";
 import { exportPillarSign } from "@/lib/next-pillar-export";
 import { exportPillarBatch, type PillarBatchItem } from "@/lib/next-pillar-batch-export";
 import {
@@ -205,7 +206,7 @@ export function PillarStudio({
         nativeWidth: geo.bleedW * NATIVE_PX_PER_MM,
         nativeHeight: geo.bleedH * NATIVE_PX_PER_MM,
         config,
-        ppi,
+        ppi: effectivePpi,
         onProgress: (p) => toast.loading(p.label, { id }),
       });
       const url = URL.createObjectURL(result.blob);
