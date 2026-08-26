@@ -37,6 +37,8 @@ import {
 import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
 import type { PptxValidationReport } from "@/lib/pptx-validate";
+import type { VisualValidationReport } from "@/lib/pptx-visual-validate";
+
 
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
