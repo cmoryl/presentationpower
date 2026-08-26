@@ -272,6 +272,7 @@ function ExportView() {
       }
       setValidationReport(validation);
       if (validation && !validation.ok) {
+        lastBlobRef.current = null;
         const errors = validation.issues.filter((i) => i.level === "error");
         toast.error("Export blocked — the file did not validate", {
           id: progressId,
