@@ -22,7 +22,7 @@
 // for CMYK-native files, so confirm with the printer.
 // -----------------------------------------------------------------------------
 
-import { PDFArray, PDFDocument, PDFHeader, PDFName, PDFRawStream, PDFRef } from "pdf-lib";
+import { PDFArray, PDFDict, PDFDocument, PDFHeader, PDFName, PDFRawStream, type PDFRef } from "pdf-lib";
 import { sRgbIccBytes } from "./icc-srgb";
 import { fetchIccProfile, type IccProfileKey } from "./pdf-x4";
 
@@ -112,15 +112,10 @@ export async function applyPdfX4(
   for (const page of doc.getPages()) {
     const resources = page.node.Resources();
     if (!resources) continue;
-    let colorSpaces = resources.lookupMaybe(PDFName.of("ColorSpace"), PDFArray.name === "" ? undefined as never : undefined as never);
-    void colorSpaces;
-    const existing = resources.get(PDFName.of("ColorSpace"));
-    const dict = existing && "set" in (existing as object) ? (existing as ReturnType<typeof doc.context.obj>) : doc.context.obj({});
-    resources.set(PDFName.of("ColorSpace"), dict);
-    (dict as unknown as { set: (k: PDFName, v: unknown) => void }).set(
-      PDFName.of("DefaultRGB"),
-      srgbSpace,
-    );
+    const existing = resources.lookupMaybe(PDFName.of("ColorSpace"), PDFDict);
+    const dict = existing ?? doc.context.obj({});
+    if (!existing) resources.set(PDFName.of("ColorSpace"), dict);
+    dict.set(PDFName.of("DefaultRGB"), srgbSpace);
   }
 
   // ── XMP identification ─────────────────────────────────────────────────────
