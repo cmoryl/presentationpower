@@ -3,7 +3,7 @@
 // sub-line copy, real printable QR codes, saved versions and high-resolution
 // print export.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, Layers, QrCode, Ruler, Save, Trash2 } from "lucide-react";
