@@ -58,7 +58,7 @@ function VizLabPage() {
   const interpret = useServerFn(interpretVizData);
 
   const rows = useMemo(
-    () => sweep.results.filter((r) => r.surface === surface && r.mode === mode),
+    () => sweep.rows.filter((r) => r.surface === surface && r.mode === mode),
     [sweep, surface, mode],
   );
 
@@ -197,7 +197,8 @@ function VizLabPage() {
                     {g.severity} ×{g.count}
                   </Badge>
                 </div>
-                <p className="mt-1 text-black/60 dark:text-white/60">{g.example}</p>
+                <p className="mt-1 text-black/60 dark:text-white/60">{g.message}</p>
+                <p className="mt-1 text-black/50 dark:text-white/50">{g.fix}</p>
                 <p className="mt-1 text-black/45 dark:text-white/45">
                   {g.surfaces.join(" · ")} · {g.kinds.slice(0, 6).join(", ")}
                 </p>
