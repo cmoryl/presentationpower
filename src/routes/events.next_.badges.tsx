@@ -1,18 +1,19 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, FileDown, Printer, Ruler } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileDown, Ruler } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
-import { notifyPrintToPdf } from "@/lib/deck-feedback";
-import { NextBadge } from "@/components/next/NextBadge";
+import { CityBadge } from "@/components/next/CityBadge";
 import {
   BADGE_SPEC,
-  BADGE_ROLES,
-  SAMPLE_ATTENDEE,
-  badgeDivisions,
-  badgeDivisionFor,
-  type BadgeAttendee,
-} from "@/lib/next-badge";
+  CITY_BADGE_DEFAULT,
+  CITY_BADGE_DIVISIONS,
+  CITY_BADGE_FACES,
+  CITY_BADGE_ROLES,
+  CITY_BADGE_SOURCE,
+  cityBadgeDivision,
+  type CityBadgeFaceId,
+} from "@/lib/next-city-badge";
 
 export const Route = createFileRoute("/events/next_/badges")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -20,16 +21,17 @@ export const Route = createFileRoute("/events/next_/badges")({
   }),
   head: () => ({
     meta: [
-      { title: "NEXT 2026 attendee badges · Division templates" },
+      { title: "NEXT 2026 attendee badges · Division variations" },
       {
         name: "description",
         content:
-          "Print-ready TransPerfect NEXT 2026 attendee badge templates — 4.33″ × 6.3″ dual-slot plastic badge with BLE Klik cutout, in every division colourway.",
+          "Every TransPerfect NEXT 2026 division attendee badge on the approved City Series artwork — 4.33″ × 6.3″ dual-slot plastic template with the BLE Klik cutout, dark and light faces.",
       },
       { property: "og:title", content: "NEXT 2026 attendee badges" },
       {
         property: "og:description",
-        content: "Every NEXT 2026 division badge on the approved 4.33″ × 6.3″ dual-slot template.",
+        content:
+          "Approved City Series badge artwork with a division lockup swap for every NEXT area, print-ready with PDF, .ai and proof export.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -38,210 +40,137 @@ export const Route = createFileRoute("/events/next_/badges")({
   component: BadgesPage,
 });
 
+const PREVIEW_PPI = 34;
+
 function BadgesPage() {
   const { division: divisionParam } = Route.useSearch();
   const divisions = useMemo(() => {
-    const all = badgeDivisions();
-    if (!divisionParam) return all;
-    const one = badgeDivisionFor(divisionParam);
-    return one ? [one] : all;
+    if (!divisionParam) return CITY_BADGE_DIVISIONS;
+    const one = CITY_BADGE_DIVISIONS.find((d) => d.id === divisionParam);
+    return one ? [one] : CITY_BADGE_DIVISIONS;
   }, [divisionParam]);
-  const [guides, setGuides] = useState(true);
-  const [side, setSide] = useState<"front" | "back" | "both">("front");
-  const [roleId, setRoleId] = useState(SAMPLE_ATTENDEE.roleId);
-  const [attendee, setAttendee] = useState<BadgeAttendee>(SAMPLE_ATTENDEE);
-  const [pdfDivisionId, setPdfDivisionId] = useState(divisions[0]?.id ?? "");
-  const [pdfExport, setPdfExport] = useState(false);
 
-  const pdfTargetId = divisions.some((d) => d.id === pdfDivisionId)
-    ? pdfDivisionId
-    : (divisions[0]?.id ?? "");
-
-  const printPdf = () => {
-    setPdfExport(true);
-    const done = () => {
-      setPdfExport(false);
-      window.removeEventListener("afterprint", done);
-    };
-    window.addEventListener("afterprint", done);
-    // let the isolate/no-guides render commit before the print dialog opens
-    requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
-  };
-
-  const person: BadgeAttendee = { ...attendee, roleId };
-  const sides: ("front" | "back")[] = side === "both" ? ["front", "back"] : [side];
-
-  const field =
-    "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] outline-none focus:border-[#003FC7]";
+  const [face, setFace] = useState<CityBadgeFaceId>("dark");
+  const [guides, setGuides] = useState(false);
+  const [roleLabel, setRoleLabel] = useState(CITY_BADGE_DEFAULT.roleLabel);
 
   return (
     <AppShell>
-      <style>{`
-        @media print {
-          @page { size: ${BADGE_SPEC.bleedW}in ${BADGE_SPEC.bleedH}in; margin: 0; }
-          body { background: #fff; }
-          .badge-noprint { display: none !important; }
-          .badge-sheet { display: block !important; }
-          .badge-card { break-inside: avoid; page-break-after: always; margin: 0 !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
-          .badge-card > figcaption { display: none; }
-          .badge-sheet.is-pdf-export { gap: 0 !important; }
-          .badge-sheet.is-pdf-export .badge-card:not(.is-pdf-target) { display: none !important; }
-          .badge-sheet.is-pdf-export .badge-card:last-of-type { page-break-after: auto; }
+      <div className="mx-auto max-w-7xl px-6 py-10">
+        <Link
+          to="/events/next"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+        >
+          <ArrowLeft size={14} /> NEXT 2026 kit
+        </Link>
 
-        }
-      `}</style>
+        <h1 className="mt-4 text-3xl font-semibold tracking-[-0.02em]">
+          NEXT 2026 attendee badges
+        </h1>
+        <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          Every division area now runs on the approved City Series badge artwork — full bleed on the{" "}
+          {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ dual-slot plastic template with the BLE Klik
+          cutout. Palette and geometry are fixed; only the division lockup and the typeset copy
+          change. Open any card to edit copy, save the print run and export PDF, an Illustrator twin
+          and a proof PNG.
+        </p>
 
-      <div className="mx-auto max-w-[1400px] px-6 py-10">
-        <div className="badge-noprint">
-          <Link
-            to="/events/next"
-            className="inline-flex items-center gap-1.5 text-xs text-black/55 hover:text-[#003FC7]"
-          >
-            <ArrowLeft size={13} /> NEXT 2026 hub
-          </Link>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
-            Attendee badge · division templates
-          </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-black/60">
-            Built on the supplied print template — {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ plastic
-            badge, dual top slots, BLE Klik cutout. Bleed {BADGE_SPEC.bleedW}″ × {BADGE_SPEC.bleedH}
-            ″, safe area {BADGE_SPEC.safeW}″ × {BADGE_SPEC.safeH}″. Artwork is CMYK, 300 ppi
-            minimum, and exports as {BADGE_SPEC.exportPreset}.
-          </p>
-
-          <div className="mt-6 grid gap-4 rounded-2xl border border-black/10 bg-white p-5 md:grid-cols-[repeat(4,minmax(0,1fr))]">
-            <label className="text-xs font-medium text-black/60">
-              First name
-              <input
-                className={`mt-1 ${field}`}
-                value={attendee.firstName}
-                onChange={(e) => setAttendee({ ...attendee, firstName: e.target.value })}
-              />
-            </label>
-            <label className="text-xs font-medium text-black/60">
-              Last name
-              <input
-                className={`mt-1 ${field}`}
-                value={attendee.lastName}
-                onChange={(e) => setAttendee({ ...attendee, lastName: e.target.value })}
-              />
-            </label>
-            <label className="text-xs font-medium text-black/60">
-              Job title
-              <input
-                className={`mt-1 ${field}`}
-                value={attendee.jobTitle}
-                onChange={(e) => setAttendee({ ...attendee, jobTitle: e.target.value })}
-              />
-            </label>
-            <label className="text-xs font-medium text-black/60">
-              Company
-              <input
-                className={`mt-1 ${field}`}
-                value={attendee.company}
-                onChange={(e) => setAttendee({ ...attendee, company: e.target.value })}
-              />
-            </label>
-            <label className="text-xs font-medium text-black/60">
-              Role band
-              <select
-                className={`mt-1 ${field}`}
-                value={roleId}
-                onChange={(e) => setRoleId(e.target.value)}
-              >
-                {BADGE_ROLES.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-xs font-medium text-black/60">
-              Side
-              <select
-                className={`mt-1 ${field}`}
-                value={side}
-                onChange={(e) => setSide(e.target.value as typeof side)}
-              >
-                <option value="front">Front</option>
-                <option value="back">Back</option>
-                <option value="both">Front + back</option>
-              </select>
-            </label>
-            <div className="flex items-end gap-2">
+        <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
+          <div className="flex items-center gap-1 rounded-full border border-border p-1">
+            {CITY_BADGE_FACES.map((f) => (
               <button
-                type="button"
-                onClick={() => setGuides((g) => !g)}
-                aria-pressed={guides}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium ${
-                  guides
-                    ? "border-[#003FC7] bg-[#003FC7]/10 text-[#003FC7]"
-                    : "border-black/15 bg-white text-[#03002C]"
+                key={f.id}
+                onClick={() => setFace(f.id)}
+                className={`rounded-full px-3 py-1 font-medium transition ${
+                  face === f.id
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Ruler size={13} /> Print guides
+                {f.label}
               </button>
-              <button
-                type="button"
-                onClick={() => notifyPrintToPdf("badge sheet")}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#003FC7] px-3 py-2 text-xs font-medium text-white hover:bg-[#003FC7]/85"
-              >
-                <Printer size={13} /> Print sheet
-              </button>
-            </div>
-            <label className="text-xs font-medium text-black/60">
-              PDF export division
-              <select
-                className={`mt-1 ${field}`}
-                value={pdfTargetId}
-                onChange={(e) => setPdfDivisionId(e.target.value)}
-              >
-                {divisions.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="flex items-end">
-              <button
-                type="button"
-                onClick={printPdf}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#003FC7] bg-white px-3 py-2 text-xs font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
-                title={`Exports at ${BADGE_SPEC.bleedW}″ × ${BADGE_SPEC.bleedH}″ bleed, no guides`}
-              >
-                <FileDown size={13} /> Print PDF ({BADGE_SPEC.bleedW}″ × {BADGE_SPEC.bleedH}″)
-              </button>
-            </div>
+            ))}
           </div>
+          <label className="inline-flex items-center gap-2 text-muted-foreground">
+            Role
+            <select
+              value={roleLabel}
+              onChange={(e) => setRoleLabel(e.target.value)}
+              className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
+            >
+              {CITY_BADGE_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="inline-flex items-center gap-2 text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={guides}
+              onChange={(e) => setGuides(e.target.checked)}
+            />
+            Bleed / trim / safe-area guides
+          </label>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-muted-foreground">
+            <Ruler size={12} /> {BADGE_SPEC.colorMode} · {BADGE_SPEC.minImageDpi} ppi ·{" "}
+            {BADGE_SPEC.exportPreset}
+          </span>
+          <a
+            href={CITY_BADGE_SOURCE.ai}
+            download
+            className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
+          >
+            <FileDown size={12} /> Source .ai
+          </a>
+          <a
+            href={CITY_BADGE_SOURCE.pdf}
+            download
+            className="inline-flex items-center gap-1.5 font-medium text-primary hover:underline"
+          >
+            <FileDown size={12} /> Source PDF
+          </a>
         </div>
 
-        <div
-          className={`badge-sheet mt-8 flex flex-wrap gap-8 ${pdfExport ? "is-pdf-export" : ""}`}
-        >
-          {divisions.map((div) =>
-            sides.map((s) => (
-              <figure
-                key={`${div.id}-${s}`}
-                className={`badge-card m-0 rounded-xl border border-black/10 bg-white p-3 shadow-sm ${
-                  div.id === pdfTargetId ? "is-pdf-target" : ""
-                }`}
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {divisions.map((div) => {
+            const resolved = cityBadgeDivision(div.id);
+            return (
+              <article
+                key={div.id}
+                className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4"
               >
-                <NextBadge
-                  division={div}
-                  attendee={person}
-                  side={s}
-                  ppi={72}
-                  guides={guides && !pdfExport}
-                  style={{ borderRadius: 6 }}
-                />
-                <figcaption className="mt-2 flex items-center justify-between gap-3 text-[11px] text-black/55">
-                  <span className="font-medium text-[#03002C]">{div.name}</span>
-                  <span className="uppercase tracking-wide">{s}</span>
-                </figcaption>
-              </figure>
-            )),
-          )}
+                <div className="flex justify-center overflow-hidden rounded-xl bg-[#03002C] p-3">
+                  <CityBadge
+                    config={{
+                      ...CITY_BADGE_DEFAULT,
+                      face,
+                      divisionId: div.id,
+                      roleLabel,
+                    }}
+                    ppi={PREVIEW_PPI}
+                    guides={guides}
+                    style={{ borderRadius: 4 }}
+                  />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{resolved.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ trim · bleed {BADGE_SPEC.bleedW}″ ×{" "}
+                    {BADGE_SPEC.bleedH}″
+                  </p>
+                </div>
+                <Link
+                  to="/events/next/city-badges"
+                  search={{ division: div.id, face }}
+                  className="mt-auto inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+                >
+                  Edit + export this badge <ArrowRight size={12} />
+                </Link>
+              </article>
+            );
+          })}
         </div>
       </div>
     </AppShell>

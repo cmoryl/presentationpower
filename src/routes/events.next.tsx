@@ -40,8 +40,8 @@ import {
   LONDON_VENUE,
   londonPanelsByFloor,
 } from "@/lib/next-london-signage";
-import { NextBadge } from "@/components/next/NextBadge";
-import { badgeDivisionFor, SAMPLE_ATTENDEE } from "@/lib/next-badge";
+import { CityBadge } from "@/components/next/CityBadge";
+import { CITY_BADGE_DEFAULT, cityBadgeDivision } from "@/lib/next-city-badge";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
 export const Route = createFileRoute("/events/next")({
@@ -216,12 +216,14 @@ function NextHub() {
           </DialogTitle>
           {preview && deckPagesFor(preview) ? (
             <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
-          ) : preview?.badgeSide && badgeDivisionFor(preview.divisionId) ? (
+          ) : preview?.badgeSide ? (
             <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
-              <NextBadge
-                division={badgeDivisionFor(preview.divisionId)!}
-                attendee={SAMPLE_ATTENDEE}
-                side={preview.badgeSide}
+              <CityBadge
+                config={{
+                  ...CITY_BADGE_DEFAULT,
+                  divisionId: cityBadgeDivision(preview.divisionId).id,
+                  face: preview.badgeSide === "back" ? "light" : "dark",
+                }}
                 ppi={72}
                 guides
                 style={{ borderRadius: 6 }}
@@ -418,6 +420,7 @@ function Hero({
             </Link>
             <Link
               to="/events/next/city-badges"
+              search={{ division: undefined, face: undefined }}
               className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
             >
               <span>
@@ -794,7 +797,8 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
             <ArrowRight size={13} />
           </Link>
           <span className="text-xs text-muted-foreground">
-            Front + back, print-ready at 4.58″ × 6.55″ bleed.
+            Approved City Series artwork with the division lockup, dark + light faces, print-ready
+            at 4.58″ × 6.55″ bleed.
           </span>
         </div>
       </div>
@@ -916,7 +920,6 @@ function RegistryCard({
   const isDeck = isPowerpointDeck(row);
 
   const thumb = packetPages?.[0] ?? row.exampleUrl;
-  const badgeDivision = row.badgeSide ? badgeDivisionFor(row.divisionId) : undefined;
   return (
     <article className="flex flex-col gap-3 rounded-xl border border-border p-3">
       <button
@@ -928,12 +931,14 @@ function RegistryCard({
             : `Preview ${row.code} ${row.format}`
         }
       >
-        {badgeDivision && row.badgeSide ? (
+        {row.badgeSide ? (
           <div className="flex size-full items-center justify-center bg-[#03002C] py-2 transition group-hover:scale-[1.02]">
-            <NextBadge
-              division={badgeDivision}
-              attendee={SAMPLE_ATTENDEE}
-              side={row.badgeSide}
+            <CityBadge
+              config={{
+                ...CITY_BADGE_DEFAULT,
+                divisionId: cityBadgeDivision(row.divisionId).id,
+                face: row.badgeSide === "back" ? "light" : "dark",
+              }}
               ppi={22}
               style={{ borderRadius: 4 }}
             />

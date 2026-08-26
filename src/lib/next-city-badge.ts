@@ -14,7 +14,6 @@
 // over the artwork inside the template safe area.
 // -----------------------------------------------------------------------------
 
-import { BADGE_SPEC, SAFE_INSET_X, SAFE_INSET_Y } from "@/lib/next-badge";
 import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
 import { nextLockupSuite } from "@/lib/next-event-logos";
 import faceDark from "@/assets/next-city-badge/citynext-badge-face-dark.png.asset.json";
@@ -23,7 +22,28 @@ import sourceAi from "@/assets/next-city-badge/citynext-badge.ai.asset.json";
 import sourcePdf from "@/assets/next-city-badge/citynext-badge.pdf.asset.json";
 import templateJpg from "@/assets/next-city-badge/citynext-badge-template.jpg.asset.json";
 
-export { BADGE_SPEC, SAFE_INSET_X, SAFE_INSET_Y };
+/** Approved plastic-badge production geometry (inches). */
+export const BADGE_SPEC = {
+  bleedW: 4.58,
+  bleedH: 6.55,
+  trimW: 4.33,
+  trimH: 6.3,
+  safeW: 4.08,
+  safeH: 5.69,
+  bleed: 0.125,
+  /** Dual hanging slots along the top edge. */
+  slot: { w: 0.55, h: 0.14, radius: 0.07, fromTop: 0.19, fromSide: 0.55 },
+  /** BLE "Klik" beacon cutout near the bottom edge. */
+  klik: { w: 0.86, h: 0.44, radius: 0.12, fromBottom: 0.2 },
+  colorMode: "CMYK",
+  minImageDpi: 300,
+  exportPreset: "PDF/X-1a",
+  sourceTemplate: "2025_Plastic-Badge-4.33x6.3-dual-slot + BLE Klik cutout",
+} as const;
+
+/** Inset of the safe area from the bleed edge (per axis, in inches). */
+export const SAFE_INSET_X = (BADGE_SPEC.bleedW - BADGE_SPEC.safeW) / 2;
+export const SAFE_INSET_Y = (BADGE_SPEC.bleedH - BADGE_SPEC.safeH) / 2;
 
 export type CityBadgeFaceId = "dark" | "light";
 
