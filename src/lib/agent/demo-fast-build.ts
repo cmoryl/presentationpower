@@ -123,8 +123,8 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
           {
             kind: "media",
             icon: "MonitorCheck",
-            title: "Case study signal",
-            body: "A global retail launch moved from a three-week cycle to a four-day market-ready workflow.",
+            title: "Case study: retail launch",
+            body: "A global retailer's 14-market launch moved from a three-week cycle to a four-day market-ready workflow using AI-assisted routing and expert review.",
             value: "80",
             unit: "%",
             label: "Launch speed gain",
