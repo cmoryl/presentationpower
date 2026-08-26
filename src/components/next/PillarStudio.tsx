@@ -145,6 +145,32 @@ export function PillarStudio({
   const [openFileId, setOpenFileId] = useState<string | null>(null);
   const plateRef = useRef<HTMLDivElement | null>(null);
 
+  // ── QR placement presets (per pillar footprint + sign template) ────────────
+  const [presets, setPresets] = useState<PillarQrPreset[]>([]);
+  const [presetName, setPresetName] = useState("");
+  const scopeKey = pillarQrScopeKey(config);
+  const lastScope = useRef<string | null>(null);
+
+  useEffect(() => {
+    setPresets(readPillarQrPresets());
+  }, []);
+
+  // Switching footprint or template re-applies that scope's newest preset.
+  useEffect(() => {
+    if (lastScope.current === null) {
+      lastScope.current = scopeKey;
+      return;
+    }
+    if (lastScope.current === scopeKey) return;
+    lastScope.current = scopeKey;
+    const match = presets.find((p) => `${p.sizeId}|${p.kind}` === scopeKey);
+    if (match) setConfig((c) => applyPillarQrPreset(c, match));
+  }, [scopeKey, presets]);
+
+  const scopePresets = pillarQrPresetsFor(config);
+
+
+
 
   const signedIn = useSignedIn();
   const qc = useQueryClient();
