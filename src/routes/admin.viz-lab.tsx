@@ -10,12 +10,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
-import { Activity, Sparkles, ShieldCheck, AlertTriangle, Wand2 } from "lucide-react";
+import { Activity, Sparkles, ShieldCheck, AlertTriangle, Wand2, Presentation } from "lucide-react";
 import { toast } from "sonner";
 
 import { sweepVizModules, groupSweepByCode } from "@/lib/infographics/audit-sweep";
 import type { VizSurface } from "@/lib/infographics/audit";
 import { interpretVizData } from "@/lib/viz-ai.functions";
+import { exportSpecsToPptx } from "@/lib/infographics/spec-to-pptx";
 import type { InterpretVizResult } from "@/lib/viz-ai.schema";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,6 +57,26 @@ function VizLabPage() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<InterpretVizResult | null>(null);
   const interpret = useServerFn(interpretVizData);
+  const [exporting, setExporting] = useState(false);
+
+  // The drafted spec is the single source of truth across surfaces: the same
+  // rows/encoding drive the press sheet, the social frame and this .pptx.
+  async function exportPptx() {
+    if (!result?.spec) return;
+    setExporting(true);
+    const toastId = toast.loading("Building the PowerPoint slide from this spec…");
+    try {
+      await exportSpecsToPptx(
+        [{ spec: result.spec, insight: result.insight, mode }],
+        { title: result.spec.title || "Campaign data view" },
+      );
+      toast.success("PPTX exported from the same chart spec.", { id: toastId });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "PPTX export failed.", { id: toastId });
+    } finally {
+      setExporting(false);
+    }
+  }
 
   const rows = useMemo(
     () => sweep.rows.filter((r) => r.surface === surface && r.mode === mode),
@@ -293,6 +314,10 @@ function VizLabPage() {
                     {result.alternates!.map((a) => `${a.kind} (${a.why})`).join(" · ")}
                   </p>
                 ) : null}
+                <Button size="sm" variant="outline" onClick={exportPptx} disabled={exporting}>
+                  <Presentation className="mr-2 h-3.5 w-3.5" />
+                  {exporting ? "Exporting…" : "Export this spec as PPTX"}
+                </Button>
                 <pre className="max-h-64 overflow-auto rounded-lg bg-black/5 p-3 text-[10px] dark:bg-white/10">
                   {JSON.stringify(
                     { encoding: result.spec.encoding, rows: result.spec.data.rows.slice(0, 12) },
