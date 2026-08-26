@@ -3,7 +3,7 @@
 // sub-line copy, real printable QR codes, saved versions and high-resolution
 // print export.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, Layers, QrCode, Ruler, Save, Trash2 } from "lucide-react";
@@ -60,6 +60,17 @@ import {
   withPillarKind,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
+
+import {
+  applyPillarQrPreset,
+  deletePillarQrPreset,
+  pillarQrPresetsFor,
+  pillarQrScopeKey,
+  pillarQrScopeLabel,
+  readPillarQrPresets,
+  savePillarQrPreset,
+  type PillarQrPreset,
+} from "@/lib/pillar-qr-presets";
 
 import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
 
@@ -133,6 +144,32 @@ export function PillarStudio({
   const [fileName, setFileName] = useState("");
   const [openFileId, setOpenFileId] = useState<string | null>(null);
   const plateRef = useRef<HTMLDivElement | null>(null);
+
+  // ── QR placement presets (per pillar footprint + sign template) ────────────
+  const [presets, setPresets] = useState<PillarQrPreset[]>([]);
+  const [presetName, setPresetName] = useState("");
+  const scopeKey = pillarQrScopeKey(config);
+  const lastScope = useRef<string | null>(null);
+
+  useEffect(() => {
+    setPresets(readPillarQrPresets());
+  }, []);
+
+  // Switching footprint or template re-applies that scope's newest preset.
+  useEffect(() => {
+    if (lastScope.current === null) {
+      lastScope.current = scopeKey;
+      return;
+    }
+    if (lastScope.current === scopeKey) return;
+    lastScope.current = scopeKey;
+    const match = presets.find((p) => `${p.sizeId}|${p.kind}` === scopeKey);
+    if (match) setConfig((c) => applyPillarQrPreset(c, match));
+  }, [scopeKey, presets]);
+
+  const scopePresets = pillarQrPresetsFor(config);
+
+
 
 
   const signedIn = useSignedIn();
@@ -874,6 +911,85 @@ export function PillarStudio({
                     Reset to default position
                   </button>
                 </div>
+
+                <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className={label}>Placement presets</div>
+                    <div className="text-[11px] text-black/50">{pillarQrScopeLabel(config)}</div>
+                  </div>
+                  <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
+                    Save this placement against the current footprint and sign template. The newest
+                    preset for a footprint is re-applied automatically when you switch back to it.
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      className={field}
+                      placeholder="Preset name (e.g. Lower right)"
+                      value={presetName}
+                      onChange={(e) => setPresetName(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const name = presetName.trim() || "Placement";
+                        setPresets(savePillarQrPreset(name, config));
+                        setPresetName("");
+                        toast.success("QR placement preset saved", {
+                          description: `${name} · ${pillarQrScopeLabel(config)}`,
+                        });
+                      }}
+                      className="shrink-0 rounded-lg border border-[#003FC7] bg-[#003FC7] px-3 py-2 text-xs font-medium text-white"
+                    >
+                      Save
+                    </button>
+                  </div>
+
+                  {scopePresets.exact.length + scopePresets.other.length === 0 ? (
+                    <p className="mt-2 text-[11px] text-black/45">No presets saved yet.</p>
+                  ) : (
+                    <ul className="mt-2 space-y-1.5">
+                      {[...scopePresets.exact, ...scopePresets.other].map((p) => {
+                        const foreign = p.sizeId !== config.sizeId;
+                        return (
+                          <li
+                            key={p.id}
+                            className="flex items-center gap-2 rounded-md border border-black/10 px-2 py-1.5"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setConfig((c) => applyPillarQrPreset(c, p));
+                                toast.success(`Applied “${p.name}”`, {
+                                  description: foreign
+                                    ? "Scaled from another footprint to this sheet"
+                                    : undefined,
+                                });
+                              }}
+                              className="min-w-0 flex-1 truncate text-left text-[11px] text-[#03002C] hover:text-[#003FC7]"
+                            >
+                              {p.name}
+                              <span className="ml-1 text-black/45">
+                                {p.qrOffsetX === null
+                                  ? "· default flow"
+                                  : `· x ${Math.round(p.qrOffsetX)} · y ${Math.round(p.qrOffsetY ?? 0)} mm`}
+                                {foreign ? " · other footprint" : ""}
+                              </span>
+                            </button>
+                            <button
+                              type="button"
+                              aria-label={`Delete preset ${p.name}`}
+                              onClick={() => setPresets(deletePillarQrPreset(p.id))}
+                              className="shrink-0 rounded p-1 text-black/45 hover:text-[#E53D2E]"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+
 
 
 
