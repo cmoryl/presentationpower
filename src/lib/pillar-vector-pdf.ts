@@ -18,6 +18,7 @@
 // -----------------------------------------------------------------------------
 
 import fontkit from "@pdf-lib/fontkit";
+import { applyPdfX4, type PdfX4Applied } from "./pdf-x4-vector";
 import {
   PDFDocument,
   PDFName,
@@ -82,6 +83,8 @@ export type PillarVectorResult = {
   /** True when the lockup came through as vector paths rather than a bitmap. */
   lockupVector: boolean;
   page: { widthPt: number; heightPt: number };
+  /** PDF/X-4 conformance result: embedded output intent + colour tagging. */
+  pdfx: PdfX4Applied;
 };
 
 // ── colour ───────────────────────────────────────────────────────────────────
@@ -635,11 +638,19 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   }
   endLayer(page);
 
+  // PDF/X-4 identification: output intent, tagged colour, XMP. Runs last so it
+  // sees every page resource we created above.
+  const x4 = await applyPdfX4(doc, {
+    title: `NEXT pillar — ${config.kind} — ${pillarDivision(config.divisionId).name}`,
+    creator: "TransPerfect Element — NEXT pillar studio",
+  });
+
   const bytes = await doc.save({ useObjectStreams: false });
   return {
     bytes: bytes as Uint8Array<ArrayBuffer>,
     layers: names,
     lockupVector,
     page: { widthPt: pageW, heightPt: pageH },
+    pdfx: x4,
   };
 }

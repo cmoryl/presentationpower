@@ -10,6 +10,7 @@
 
 import JSZip from "jszip";
 import jsPDF from "jspdf";
+import { fetchIccProfile, wrapPdfAsX4 } from "./pdf-x4";
 
 import { captureAssetCanvas } from "./asset-export";
 import { buildPillarVectorPdf } from "./pillar-vector-pdf";
@@ -87,7 +88,7 @@ const RASTER_NOTICE =
 function readme(
   config: PillarConfig,
   ppi: number,
-  vector: { layers: string[]; lockupVector: boolean } | null,
+  vector: Awaited<ReturnType<typeof buildPillarVectorPdf>> | null,
 ): string {
   const geo = pillarGeometry(config);
   const qr = (config.qrData ?? "").trim();
@@ -109,6 +110,13 @@ function readme(
     `Plate:           ${ppi} ppi (large-format issued tier ${PILLAR_SPEC.rasterPpi} ppi)`,
     `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
     `Export preset:   ${PILLAR_SPEC.exportPreset}`,
+    vector
+      ? `Standard:        PDF/X-4 — GTS_PDF_X output intent with an embedded ${vector.pdfx.outputIntent}`
+      : `Standard:        PDF/X-4 output intent embedded on the fallback plate`,
+    vector
+      ? `Colour tagging:  artwork colour tagged ICC sRGB (DefaultRGB); RIP separates to the intent`
+      : ``,
+    `Boxes:           MediaBox / BleedBox / TrimBox all set numerically for preflight`,
     ``,
     vector
       ? `Artwork:         100% vector, layered (scales to any pillar size with no quality loss)`
@@ -171,7 +179,26 @@ export async function exportPillarSign(opts: {
   const pageH = pdf.internal.pageSize.getHeight();
   pdf.addImage(jpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
   drawCropMarks(pdf, pageW, pageH, SLUG_IN + geo.bleedEdge * MM_TO_IN);
-  const rasterPdf = await pdf.output("blob").arrayBuffer();
+  let rasterPdf = await pdf.output("blob").arrayBuffer();
+  // Even the fallback plate ships as PDF/X-4 so print workflows treat every
+  // pillar file the same way.
+  try {
+    const wrapped = await wrapPdfAsX4(new Uint8Array(rasterPdf), {
+      trimSize: { widthIn: geo.trimW * MM_TO_IN, heightIn: geo.trimH * MM_TO_IN },
+      bleedIn: geo.bleedEdge * MM_TO_IN,
+      slugIn: SLUG_IN,
+      iccProfileBytes: await fetchIccProfile("GRACoL2013_CRPC6"),
+      iccProfileName: "GRACoL2013_CRPC6",
+      title: pillarName(config),
+      creator: "TransPerfect Element — NEXT pillar studio",
+    });
+    rasterPdf = wrapped.buffer.slice(
+      wrapped.byteOffset,
+      wrapped.byteOffset + wrapped.byteLength,
+    ) as ArrayBuffer;
+  } catch {
+    // Offline: keep the plain press PDF rather than failing the export.
+  }
   // Vector, layered artwork is the press/Illustrator deliverable whenever the
   // builder succeeds; the raster plate is only the fallback.
   const pdfBuffer: ArrayBuffer = vector

@@ -87,6 +87,12 @@ export interface WrapPdfAsX4Options {
   iccProfileBytes: Uint8Array;
   /** Human-readable identifier written into the OutputIntent dict. */
   iccProfileName: IccProfileKey;
+  /**
+   * Slug (marks area) in inches outside the bleed sheet, when the incoming page
+   * is larger than trim + 2×bleed because crop marks live in the slug.
+   * Default 0 — the page is exactly the bleed sheet.
+   */
+  slugIn?: number;
   /** Optional document title for XMP dc:title. */
   title?: string;
   /** Optional creator for XMP xmp:CreatorTool. */
@@ -123,19 +129,24 @@ export async function wrapPdfAsX4(
 
   // ── Page boxes ─────────────────────────────────────────────────────────
   const bleedPt = opts.bleedIn * IN_TO_PT;
+  const slugPt = (opts.slugIn ?? 0) * IN_TO_PT;
   const trimWpt = opts.trimSize.widthIn * IN_TO_PT;
   const trimHpt = opts.trimSize.heightIn * IN_TO_PT;
-  const mediaWpt = trimWpt + bleedPt * 2;
-  const mediaHpt = trimHpt + bleedPt * 2;
+  const mediaWpt = trimWpt + bleedPt * 2 + slugPt * 2;
+  const mediaHpt = trimHpt + bleedPt * 2 + slugPt * 2;
 
   const pages = pdfDoc.getPages();
   for (const page of pages) {
     // Ensure MediaBox is authoritative (matches what jsPDF produced).
     page.node.set(PDFName.of("MediaBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
-    page.node.set(PDFName.of("BleedBox"), pdfDoc.context.obj([0, 0, mediaWpt, mediaHpt]));
+    page.node.set(
+      PDFName.of("BleedBox"),
+      pdfDoc.context.obj([slugPt, slugPt, mediaWpt - slugPt, mediaHpt - slugPt]),
+    );
+    const trimInset = slugPt + bleedPt;
     page.node.set(
       PDFName.of("TrimBox"),
-      pdfDoc.context.obj([bleedPt, bleedPt, bleedPt + trimWpt, bleedPt + trimHpt]),
+      pdfDoc.context.obj([trimInset, trimInset, trimInset + trimWpt, trimInset + trimHpt]),
     );
   }
 
