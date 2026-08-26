@@ -64,6 +64,7 @@ import { Route as ForMarketingRouteImport } from './routes/for.marketing'
 import { Route as ForAdminRouteImport } from './routes/for.admin'
 import { Route as EventsProductionRouteImport } from './routes/events.production'
 import { Route as EventsPresetsRouteImport } from './routes/events.presets'
+import { Route as EventsPillarsRouteImport } from './routes/events.pillars'
 import { Route as EventsNextRouteImport } from './routes/events.next'
 import { Route as EventsNewRouteImport } from './routes/events.new'
 import { Route as EventsAgentThreadIdRouteImport } from './routes/events-agent.$threadId'
@@ -437,6 +438,11 @@ const EventsProductionRoute = EventsProductionRouteImport.update({
 const EventsPresetsRoute = EventsPresetsRouteImport.update({
   id: '/presets',
   path: '/presets',
+  getParentRoute: () => EventsRoute,
+} as any)
+const EventsPillarsRoute = EventsPillarsRouteImport.update({
+  id: '/pillars',
+  path: '/pillars',
   getParentRoute: () => EventsRoute,
 } as any)
 const EventsNextRoute = EventsNextRouteImport.update({
@@ -1026,6 +1032,7 @@ export interface FileRoutesByFullPath {
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
+  '/events/pillars': typeof EventsPillarsRoute
   '/events/presets': typeof EventsPresetsRoute
   '/events/production': typeof EventsProductionRoute
   '/for/admin': typeof ForAdminRoute
@@ -1177,6 +1184,7 @@ export interface FileRoutesByTo {
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
+  '/events/pillars': typeof EventsPillarsRoute
   '/events/presets': typeof EventsPresetsRoute
   '/events/production': typeof EventsProductionRoute
   '/for/admin': typeof ForAdminRoute
@@ -1333,6 +1341,7 @@ export interface FileRoutesById {
   '/events-agent/$threadId': typeof EventsAgentThreadIdRoute
   '/events/new': typeof EventsNewRoute
   '/events/next': typeof EventsNextRoute
+  '/events/pillars': typeof EventsPillarsRoute
   '/events/presets': typeof EventsPresetsRoute
   '/events/production': typeof EventsProductionRoute
   '/for/admin': typeof ForAdminRoute
@@ -1490,6 +1499,7 @@ export interface FileRouteTypes {
     | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
+    | '/events/pillars'
     | '/events/presets'
     | '/events/production'
     | '/for/admin'
@@ -1641,6 +1651,7 @@ export interface FileRouteTypes {
     | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
+    | '/events/pillars'
     | '/events/presets'
     | '/events/production'
     | '/for/admin'
@@ -1796,6 +1807,7 @@ export interface FileRouteTypes {
     | '/events-agent/$threadId'
     | '/events/new'
     | '/events/next'
+    | '/events/pillars'
     | '/events/presets'
     | '/events/production'
     | '/for/admin'
@@ -2347,6 +2359,13 @@ declare module '@tanstack/react-router' {
       path: '/presets'
       fullPath: '/events/presets'
       preLoaderRoute: typeof EventsPresetsRouteImport
+      parentRoute: typeof EventsRoute
+    }
+    '/events/pillars': {
+      id: '/events/pillars'
+      path: '/pillars'
+      fullPath: '/events/pillars'
+      preLoaderRoute: typeof EventsPillarsRouteImport
       parentRoute: typeof EventsRoute
     }
     '/events/next': {
@@ -3125,6 +3144,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface EventsRouteChildren {
   EventsNewRoute: typeof EventsNewRoute
   EventsNextRoute: typeof EventsNextRoute
+  EventsPillarsRoute: typeof EventsPillarsRoute
   EventsPresetsRoute: typeof EventsPresetsRoute
   EventsProductionRoute: typeof EventsProductionRoute
   EventsIndexRoute: typeof EventsIndexRoute
@@ -3139,6 +3159,7 @@ interface EventsRouteChildren {
 const EventsRouteChildren: EventsRouteChildren = {
   EventsNewRoute: EventsNewRoute,
   EventsNextRoute: EventsNextRoute,
+  EventsPillarsRoute: EventsPillarsRoute,
   EventsPresetsRoute: EventsPresetsRoute,
   EventsProductionRoute: EventsProductionRoute,
   EventsIndexRoute: EventsIndexRoute,

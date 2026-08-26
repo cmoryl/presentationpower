@@ -30,8 +30,76 @@ export const PILLAR_SPEC = {
   exportPreset: "PDF/X-4",
 } as const;
 
+/** Real-world pillar footprints. Venues ship a mix of thin columns, standard
+ * pillars and broad wrap faces, so the sheet geometry is selectable. */
+export type PillarSizeId = "thin" | "slim" | "standard" | "wide" | "wrap" | "custom";
+
+export const PILLAR_SIZES: {
+  id: PillarSizeId;
+  name: string;
+  note: string;
+  trimW: number;
+  trimH: number;
+}[] = [
+  { id: "thin", name: "Thin column", note: "Narrow structural column or lamp post wrap.", trimW: 300, trimH: 2000 },
+  { id: "slim", name: "Slim pillar", note: "Concourse column, single-face graphic.", trimW: 450, trimH: 2000 },
+  {
+    id: "standard",
+    name: "Standard pillar",
+    note: "The issued NEXT pillar sheet — matches the City Series artwork.",
+    trimW: PILLAR_SPEC.trimW,
+    trimH: PILLAR_SPEC.trimH,
+  },
+  { id: "wide", name: "Wide pillar", note: "Broad column or double-width entrance face.", trimW: 900, trimH: 2200 },
+  { id: "wrap", name: "Wrap face", note: "Full column wrap panel, floor to ceiling.", trimW: 1200, trimH: 2600 },
+  { id: "custom", name: "Custom size", note: "Type the measured trim of the pillar face.", trimW: 600, trimH: 2000 },
+];
+
+export const PILLAR_CUSTOM_SIZE = {
+  w: { min: 150, max: 2400, step: 5 },
+  h: { min: 500, max: 4000, step: 10 },
+};
+
+/** Sub-headline cap height range in mm. */
+export const PILLAR_SUB_SIZE = { min: 12, max: 120, step: 2 };
+
+/** Printed QR module block size range in mm (edge length of the code). */
+export const PILLAR_QR_SIZE = { min: 60, max: 500, step: 10 };
+
+export function pillarSize(id: string | undefined) {
+  return PILLAR_SIZES.find((s) => s.id === id) ?? PILLAR_SIZES[2]!;
+}
+
+/** Resolved sheet geometry for a pillar config, in mm. */
+export function pillarGeometry(config: { sizeId?: string; trimW?: number; trimH?: number }) {
+  const preset = pillarSize(config.sizeId);
+  const custom = preset.id === "custom";
+  const clamp = (v: number | undefined, fb: number, r: { min: number; max: number }) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? Math.min(r.max, Math.max(r.min, n)) : fb;
+  };
+  const trimW = custom ? clamp(config.trimW, preset.trimW, PILLAR_CUSTOM_SIZE.w) : preset.trimW;
+  const trimH = custom ? clamp(config.trimH, preset.trimH, PILLAR_CUSTOM_SIZE.h) : preset.trimH;
+  const bleedEdge = PILLAR_SPEC.bleedEdge;
+  // Narrow columns cannot carry the full 60 mm inset and still hold copy.
+  const safeInset = Math.max(18, Math.min(PILLAR_SPEC.safeInset, trimW * 0.1));
+  return {
+    trimW,
+    trimH,
+    bleedEdge,
+    bleedW: trimW + bleedEdge * 2,
+    bleedH: trimH + bleedEdge * 2,
+    safeInset,
+    rasterPpi: PILLAR_SPEC.rasterPpi,
+    colorMode: PILLAR_SPEC.colorMode,
+    exportPreset: PILLAR_SPEC.exportPreset,
+    sizeName: preset.name,
+  };
+}
+
 export const PILLAR_DIVISIONS = CITY_BADGE_DIVISIONS;
 export const pillarDivision = cityBadgeDivision;
+
 
 export type PillarKindId = "welcome" | "registration" | "logo" | "directional";
 
@@ -190,6 +258,23 @@ export type PillarConfig = {
   lockupScale: number;
   /** Extra downward offset for the headline block in mm (never negative). */
   headlineOffset: number;
+  /** Pillar footprint preset. */
+  sizeId: PillarSizeId;
+  /** Measured trim width/height in mm, used when sizeId is "custom". */
+  trimW: number;
+  trimH: number;
+  /** Optional supporting line under the headline. */
+  subheadline: string;
+  /** Sub-headline cap height in mm. */
+  subheadlineSize: number;
+  /** Printed QR payload (URL or text). Empty = no QR on the sign. */
+  qrData: string;
+  /** QR block edge length in mm on the trim sheet. */
+  qrSize: number;
+  /** Optional caption printed under the QR block. */
+  qrCaption: string;
+  /** Event this live pillar file belongs to (free text label). */
+  eventLabel: string;
 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
@@ -207,8 +292,32 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     headlineColor: "",
     lockupScale: 1,
     headlineOffset: 0,
+    sizeId: "standard",
+    trimW: PILLAR_SPEC.trimW,
+    trimH: PILLAR_SPEC.trimH,
+    subheadline: "",
+    subheadlineSize: 34,
+    qrData: "",
+    qrSize: 180,
+    qrCaption: "",
+    eventLabel: "",
   };
 }
+
+/** Clamp the sub-headline size into the approved range. */
+export function pillarSubSize(config: PillarConfig): number {
+  const raw = Number(config.subheadlineSize);
+  const value = Number.isFinite(raw) && raw > 0 ? raw : 34;
+  return Math.min(PILLAR_SUB_SIZE.max, Math.max(PILLAR_SUB_SIZE.min, value));
+}
+
+/** Clamp the printed QR size into the approved range. */
+export function pillarQrSize(config: PillarConfig): number {
+  const raw = Number(config.qrSize);
+  const value = Number.isFinite(raw) && raw > 0 ? raw : 180;
+  return Math.min(PILLAR_QR_SIZE.max, Math.max(PILLAR_QR_SIZE.min, value));
+}
+
 
 /** Clamp a headline size into the approved range. */
 export function pillarHeadlineSize(config: PillarConfig): number {
@@ -256,11 +365,13 @@ export function withPillarKind(config: PillarConfig, kindId: PillarKindId): Pill
 
 
 export function pillarName(config: PillarConfig): string {
-  return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar · ${pillarFace(config.face).name.toLowerCase()}`;
+  const g = pillarGeometry(config);
+  return `${pillarDivision(config.divisionId).name} · ${pillarKind(config.kind).name} pillar · ${pillarFace(config.face).name.toLowerCase()} · ${Math.round(g.trimW)}×${Math.round(g.trimH)} mm`;
 }
 
 export function pillarSlug(config: PillarConfig): string {
-  return `${config.divisionId}-${config.kind}-${config.face ?? "dark"}-${config.styleId}`
+  const g = pillarGeometry(config);
+  return `${config.divisionId}-${config.kind}-${config.face ?? "dark"}-${Math.round(g.trimW)}x${Math.round(g.trimH)}-${config.styleId}`
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
@@ -268,6 +379,7 @@ export function pillarSlug(config: PillarConfig): string {
 
 /** A LondonPanel-shaped record so the pillar can reuse the venue vector/AI generators. */
 export function pillarPanelSpec(config: PillarConfig) {
+  const g = pillarGeometry(config);
   return {
     id: `pillar-${pillarSlug(config)}`,
     floor: "GF" as const,
@@ -277,14 +389,15 @@ export function pillarPanelSpec(config: PillarConfig) {
     name: pillarName(config),
     ground: "Pillar column",
     style: config.styleId,
-    trimW: PILLAR_SPEC.trimW,
-    trimH: PILLAR_SPEC.trimH,
-    bleedW: PILLAR_SPEC.bleedW,
-    bleedH: PILLAR_SPEC.bleedH,
-    bleedEdge: PILLAR_SPEC.bleedEdge,
-    rasterPx: "846x2812",
-    rasterPpi: PILLAR_SPEC.rasterPpi,
+    trimW: g.trimW,
+    trimH: g.trimH,
+    bleedW: g.bleedW,
+    bleedH: g.bleedH,
+    bleedEdge: g.bleedEdge,
+    rasterPx: `${Math.round((g.bleedW / 25.4) * g.rasterPpi)}x${Math.round((g.bleedH / 25.4) * g.rasterPpi)}`,
+    rasterPpi: g.rasterPpi,
     bandMm: 2.12,
     rasterMb: 4.2,
   };
+
 }
