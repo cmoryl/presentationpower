@@ -134,7 +134,19 @@ export function AgentDeckPreview({
       setBrandModeId(d?.brand_mode_id ?? null);
       setPackId(d?.context?.stylePackId ?? "");
       setRecipeId(d?.context?.designRecipeId ?? null);
-      setRows((slides ?? []) as Row[]);
+      // Per-slide appearance rides in the content blob under `__extras`, so it
+      // has to be unpacked here or every cloud slide previews as light.
+      setRows(
+        ((slides ?? []) as Row[]).map((r) => {
+          const split = splitSlideContent(r.content);
+          const mode = split.extras["mode"];
+          return {
+            ...r,
+            content: split.content,
+            mode: mode === "dark" || mode === "light" ? mode : undefined,
+          };
+        }),
+      );
       setActive((prev) => Math.min(prev, Math.max(0, (slides ?? []).length - 1)));
     })();
     return () => {
