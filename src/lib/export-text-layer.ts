@@ -34,6 +34,14 @@ export interface TextRun {
   w: number;
   h: number;
   text: string;
+  /**
+   * True when the element's untrimmed direct text began/ended with whitespace.
+   * `text` itself is trimmed, so without these flags a real word gap between
+   * two sibling fragments ("business " + "review") is lost on export and
+   * PowerPoint renders "businessreview".
+   */
+  leadWs: boolean;
+  trailWs: boolean;
   /** Rendered pixel font size at stage scale. */
   fontSizePx: number;
   fontFamily: string;
