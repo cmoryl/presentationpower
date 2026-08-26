@@ -251,6 +251,44 @@ function ExportView() {
         console.warn("[export-image-report] audit skipped:", e);
         setImageReport(null);
       }
+      // Server-side gate: open the real package and confirm slide count, slide
+      // identities and media before the download is enabled.
+      toast.loading("Validating the PowerPoint file…", {
+        id: progressId,
+        description: "Checking slides and embedded assets.",
+      });
+      const { buildExportManifest, validateExportedPptx } = await import(
+        "@/lib/pptx-validate-client"
+      );
+      let validation: Awaited<ReturnType<typeof validateExportedPptx>> | null = null;
+      try {
+        validation = await validateExportedPptx(blob, buildExportManifest(deck));
+      } catch (e) {
+        console.warn("[deck-export-validate] validation unavailable:", e);
+      }
+      setValidationReport(validation);
+      if (validation && !validation.ok) {
+        const errors = validation.issues.filter((i) => i.level === "error");
+        toast.error("Export blocked — the file did not validate", {
+          id: progressId,
+          description: errors
+            .slice(0, 3)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 16000,
+        });
+        return;
+      }
+      if (validation?.issues.some((i) => i.level === "warning")) {
+        toast.warning("Export validated with warnings", {
+          description: validation.issues
+            .filter((i) => i.level === "warning")
+            .slice(0, 2)
+            .map((i) => i.message)
+            .join(" "),
+          duration: 9000,
+        });
+      }
       // Trigger download for the user.
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -260,6 +298,7 @@ function ExportView() {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
+
       trackNow({
         event: "deck.export",
         category: "export",
