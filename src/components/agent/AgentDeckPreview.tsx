@@ -20,6 +20,7 @@ import { DESIGN_SKINS } from "@/lib/design-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
 import { auditVisualData } from "@/lib/agent/visual-data-gaps";
 import { isPersistableDeckId } from "@/lib/agent/threads";
+import { splitSlideContent } from "@/lib/cloud-slide-extras";
 import { useDeckBuildState } from "@/lib/agent/build-progress";
 import { useDeckStore } from "@/lib/deck-store";
 import type { DeckSlide } from "@/lib/deck-store";
@@ -52,6 +53,8 @@ type Row = {
   layout_id: string;
   content: Record<string, unknown> | null;
   notes: string | null;
+  /** Per-slide light/dark appearance so the preview matches the editor. */
+  mode?: "light" | "dark";
 };
 
 export function AgentDeckPreview({
@@ -132,7 +135,19 @@ export function AgentDeckPreview({
       setBrandModeId(d?.brand_mode_id ?? null);
       setPackId(d?.context?.stylePackId ?? "");
       setRecipeId(d?.context?.designRecipeId ?? null);
-      setRows((slides ?? []) as Row[]);
+      // Per-slide appearance rides in the content blob under `__extras`, so it
+      // has to be unpacked here or every cloud slide previews as light.
+      setRows(
+        ((slides ?? []) as Row[]).map((r) => {
+          const split = splitSlideContent(r.content);
+          const mode = split.extras["mode"];
+          return {
+            ...r,
+            content: split.content,
+            mode: mode === "dark" || mode === "light" ? mode : undefined,
+          };
+        }),
+      );
       setActive((prev) => Math.min(prev, Math.max(0, (slides ?? []).length - 1)));
     })();
     return () => {
@@ -151,6 +166,7 @@ export function AgentDeckPreview({
             layout_id: slide.layoutId,
             content: slide.content,
             notes: slide.notes ?? null,
+            mode: slide.mode,
           }))
         : [],
     [localDeck],
@@ -207,6 +223,7 @@ export function AgentDeckPreview({
         layoutId: r.layout_id,
         content: (r.content ?? {}) as DeckSlide["content"],
         notes: r.notes ?? undefined,
+        mode: r.mode,
         changes: [],
       })) as DeckSlide[],
     [displayRows],
@@ -389,6 +406,7 @@ export function AgentDeckPreview({
                   slide={current}
                   variant={currentVariant}
                   brand={brand}
+                  mode={current.mode ?? "light"}
                   pageNumber={active + 1}
                 />
               </SkinScope>
@@ -441,6 +459,7 @@ export function AgentDeckPreview({
                               slide={s}
                               variant={v}
                               brand={brand}
+                              mode={s.mode ?? "light"}
                               pageNumber={i + 1}
                             />
                           </SkinScope>
@@ -621,6 +640,7 @@ function EnlargedSlideModal({
                 slide={slide}
                 variant={variant}
                 brand={brand}
+                mode={slide.mode ?? "light"}
                 pageNumber={index + 1}
               />
             </SkinScope>
