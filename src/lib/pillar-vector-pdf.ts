@@ -527,7 +527,8 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     const edge = Math.min(mm(place.edge), safeW);
     const unit = edge / qr.size;
     const caption = place.caption;
-    const captionSize = Math.max(mm(10), subSize * 0.55);
+    const captionSize = mm(place.captionSize);
+    const captionFont = place.captionFont;
     const qrLeft = trimX + mm(place.x);
     const qrY = trimY + trimH - mm(place.y) - edge;
     beginLayer(page, layer("06 QR code"));
@@ -578,12 +579,20 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       }
     }
     if (caption) {
-      const width = bold.widthOfTextAtSize(caption, captionSize);
-      page.drawText(caption, {
-        x: qrLeft + edge / 2 - width / 2,
-        y: qrY - captionSize * 1.4,
+      const text = captionFont.uppercase ? caption.toUpperCase() : caption;
+      const font = captionFont.id === "regular" ? regular : bold;
+      const width = font.widthOfTextAtSize(text, captionSize);
+      const x =
+        place.captionAlign === "left"
+          ? qrLeft
+          : place.captionAlign === "right"
+            ? qrLeft + edge - width
+            : qrLeft + edge / 2 - width / 2;
+      page.drawText(text, {
+        x,
+        y: qrY - mm(place.captionPad) - captionSize,
         size: captionSize,
-        font: bold,
+        font,
         color: rgb(...hexRgb(headlineInk)),
       });
     }
