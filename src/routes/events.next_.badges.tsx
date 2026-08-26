@@ -99,8 +99,8 @@ function BadgesPage() {
               className="rounded-lg border border-border bg-background px-2 py-1 text-xs"
             >
               {CITY_BADGE_ROLES.map((r) => (
-                <option key={r.label} value={r.label}>
-                  {r.label}
+                <option key={r} value={r}>
+                  {r}
                 </option>
               ))}
             </select>
