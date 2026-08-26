@@ -1,12 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Ruler, Store } from "lucide-react";
+import { ArrowLeft, ArrowRight, Download, Ruler, Store } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { PillarSign } from "@/components/next/PillarSign";
 import {
   NEXT_MART,
   NEXT_MART_FLAT_SIGNS,
+  NEXT_MART_ARTWORK,
   NEXT_MART_PILLARS,
+  martArtworkPanels,
   martTotalPanels,
 } from "@/lib/next-mart";
 
@@ -106,6 +108,71 @@ function MartPage() {
             ))}
           </div>
         </section>
+
+        {/* Supplied London artwork pack */}
+        <section className="mt-12">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-[#03002C]">
+                London artwork pack · supplied working files
+              </h2>
+              <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-black/60">
+                Die-cut merch boards for the London mart, straight from the Illustrator masters.
+                Layers stay intact: bleed, board, icon, type and the magenta CutContour path the
+                cutter reads. {NEXT_MART_ARTWORK.length} designs · {martArtworkPanels()} panels ·{" "}
+                {NEXT_MART_ARTWORK[0]!.trimW} × {NEXT_MART_ARTWORK[0]!.trimH} mm trim.
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {NEXT_MART_ARTWORK.map((a) => (
+              <article
+                key={a.id}
+                className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+              >
+                <div
+                  className={`flex items-center justify-center p-4 ${
+                    a.face === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"
+                  }`}
+                >
+                  <img
+                    src={a.url}
+                    alt={`NEXT MART ${a.category} sign — ${a.headline}`}
+                    loading="lazy"
+                    className="h-auto w-full"
+                  />
+                </div>
+                <div className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded bg-[#E0E8F5] px-1.5 py-0.5 text-[10px] font-semibold text-[#003FC7]">
+                      {a.code}
+                    </span>
+                    <span className="text-[11px] uppercase tracking-wide text-black/45">
+                      {a.category}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 text-sm font-medium text-[#03002C]">{a.headline}</div>
+                  <ul className="mt-2 space-y-1 text-[11px] text-black/55">
+                    <li>
+                      Qty {a.quantity} · {a.trimW} × {a.trimH} mm · {a.bleed} mm bleed
+                    </li>
+                    <li>{a.die}</li>
+                    <li>{a.substrate}</li>
+                    <li>{a.finishing}</li>
+                  </ul>
+                  <a
+                    href={a.url}
+                    download={a.filename}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-2.5 py-1.5 text-[11px] font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+                  >
+                    <Download size={12} /> Download vector master
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
 
         {/* Flat signage specs */}
         <section className="mt-12">
