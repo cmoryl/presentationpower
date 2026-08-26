@@ -82,6 +82,8 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
       preferredVariantIds: [
         "MV-OP-COVER-MEDIA",
         "MV-OP-COVER-POSTER",
+        // Dossier cover is the approved demo cover — never flag/swap it.
+        "MV-OP-COVER-DOSSIER",
         "MV-BENTO-6",
         "MV-INFO-HUB-SATELLITES",
         "MV-KPI-DASHBOARD",
