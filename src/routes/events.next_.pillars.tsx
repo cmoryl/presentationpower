@@ -20,6 +20,8 @@ import {
   pillarDefault,
   pillarHeadlineInk,
   pillarHeadlineSize,
+  pillarLockupScale,
+
 
   pillarFace,
   pillarKind,
