@@ -27,6 +27,10 @@ import {
 } from "@/lib/next-city-badge.functions";
 
 export const Route = createFileRoute("/events/next_/city-badges")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    division: typeof search.division === "string" ? search.division : undefined,
+    face: search.face === "light" || search.face === "dark" ? (search.face as CityBadgeFaceId) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "NEXT City Series badge · Print-ready templates" },
