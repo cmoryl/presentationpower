@@ -94,6 +94,31 @@ export async function loadAgentThread(
   return { thread: thread as AgentThread, messages };
 }
 
+/**
+ * Append locally-produced messages (e.g. the demo fast-path build) to a
+ * thread, mirroring the shape the /api/agent-chat route persists. Sequenced
+ * so created_at ordering matches the conversation order.
+ */
+export async function appendAgentMessages(threadId: string, messages: UIMessage[]) {
+  const { data: session } = await supabase.auth.getSession();
+  const ownerId = session.session?.user.id;
+  if (!ownerId) return;
+  for (const m of messages) {
+    const { error } = await supabase.from("agent_messages").insert({
+      thread_id: threadId,
+      owner_id: ownerId,
+      client_message_id: m.id ?? null,
+      role: m.role === "assistant" ? "assistant" : "user",
+      parts: m.parts as never,
+    } as never);
+    if (error) console.error("agent_messages insert failed:", error.message);
+  }
+  await supabase
+    .from("agent_threads")
+    .update({ updated_at: new Date().toISOString() } as never)
+    .eq("id", threadId);
+}
+
 /** Pull the deck id out of any tool output text the agent produced. */
 export function findDeckIdInMessages(messages: UIMessage[]): string | null {
   const uuid = /"deck_id"\s*:\s*"([0-9a-f-]{36})"/i;
