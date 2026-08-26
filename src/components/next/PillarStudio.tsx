@@ -58,7 +58,21 @@ import {
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
 
+import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
+
 const NATIVE_PX_PER_MM = 0.72;
+
+/** Events a pillar file can be filed against. Anything else is free text. */
+const EVENT_OPTIONS: { label: string; value: string }[] = [
+  { label: `${NEXT_EVENT.name} — ${NEXT_EVENT.city} (flagship)`, value: `${NEXT_EVENT.name} — ${NEXT_EVENT.city}` },
+  ...NEXT_CITY_SERIES.stops
+    .filter((s) => s.id !== "london")
+    .map((s) => ({
+      label: `${NEXT_CITY_SERIES.name} — ${s.city}${s.status === "confirmed" ? "" : " (tbc)"}`,
+      value: `${NEXT_CITY_SERIES.name} — ${s.city}`,
+    })),
+];
+
 
 /** Output tiers. Large-format grounds are viewed at distance, so the issued
  * 36 ppi tier stays the default; the higher tiers are for close-read pillars. */
@@ -91,10 +105,14 @@ export function PillarStudio({
   const [config, setConfig] = useState<PillarConfig>(pillarDefault());
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [customEvent, setCustomEvent] = useState("");
+
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
   const [openFileId, setOpenFileId] = useState<string | null>(null);
   const plateRef = useRef<HTMLDivElement | null>(null);
+
 
   const signedIn = useSignedIn();
   const qc = useQueryClient();
@@ -146,7 +164,10 @@ export function PillarStudio({
     setConfig((c) => ({ ...c, [key]: value }));
 
   const geo = pillarGeometry(config);
-  const previewScale = Math.min(0.62, 560 / (geo.bleedH * NATIVE_PX_PER_MM));
+  // Fit the whole pillar into a tall viewing plate, then let the user zoom in.
+  const fitScale = Math.min(0.95, 820 / (geo.bleedH * NATIVE_PX_PER_MM));
+  const previewScale = fitScale * zoom;
+
 
   const runExport = async () => {
     const node = plateRef.current?.querySelector<HTMLElement>('[data-kit-asset-frame="true"]');
@@ -192,20 +213,45 @@ export function PillarStudio({
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
         {/* Preview */}
         <div className="rounded-2xl border border-black/10 bg-[#F2F2F2] p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-xs font-medium uppercase tracking-[0.14em] text-black/50">
               {pillarName(config)}
             </div>
-            <label className="flex items-center gap-2 text-xs text-black/60">
-              <input
-                type="checkbox"
-                checked={guides}
-                onChange={(e) => setGuides(e.target.checked)}
-              />
-              Trim &amp; safe guides
-            </label>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-xs text-black/60">
+                <span>Zoom</span>
+                <input
+                  type="range"
+                  min={0.6}
+                  max={2}
+                  step={0.05}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  aria-label="Preview zoom"
+                />
+                <span className="w-10 tabular-nums text-black/50">{Math.round(zoom * 100)}%</span>
+                <button
+                  type="button"
+                  onClick={() => setZoom(1)}
+                  className="rounded-md border border-black/15 px-2 py-0.5 text-[11px] text-black/60"
+                >
+                  Fit
+                </button>
+              </div>
+              <label className="flex items-center gap-2 text-xs text-black/60">
+                <input
+                  type="checkbox"
+                  checked={guides}
+                  onChange={(e) => setGuides(e.target.checked)}
+                />
+                Trim &amp; safe guides
+              </label>
+            </div>
           </div>
-          <div className="mt-6 flex justify-center overflow-hidden" ref={plateRef}>
+          <div
+            className="mt-6 flex max-h-[860px] justify-center overflow-auto"
+            ref={plateRef}
+          >
             <div
               style={{
                 width: geo.bleedW * NATIVE_PX_PER_MM * previewScale,
@@ -220,6 +266,7 @@ export function PillarStudio({
               />
             </div>
           </div>
+
           <p className="mt-6 flex items-center gap-2 text-xs text-black/55">
             <Ruler size={13} /> {geo.sizeName} · trim {geo.trimW} × {geo.trimH} mm · bleed{" "}
             {geo.bleedEdge} mm per edge · safe {Math.round(geo.safeInset)} mm · {geo.exportPreset}
@@ -723,13 +770,47 @@ export function PillarStudio({
 
           {/* Live files */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
-            <div className={label}>Live event file</div>
-            <input
+            <div className={label}>Event</div>
+            <select
               className={field}
-              placeholder="Event (e.g. NEXT 2026 London)"
-              value={config.eventLabel}
-              onChange={(e) => set("eventLabel", e.target.value)}
-            />
+              value={
+                EVENT_OPTIONS.some((o) => o.value === config.eventLabel)
+                  ? config.eventLabel
+                  : config.eventLabel
+                    ? "__custom"
+                    : ""
+              }
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === "__custom") set("eventLabel", customEvent || " ");
+                else set("eventLabel", v);
+              }}
+            >
+              <option value="">Unassigned — no event</option>
+              {EVENT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+              <option value="__custom">Other event…</option>
+            </select>
+            {config.eventLabel && !EVENT_OPTIONS.some((o) => o.value === config.eventLabel) ? (
+              <input
+                className={field}
+                placeholder="Event name"
+                value={config.eventLabel.trim()}
+                onChange={(e) => {
+                  setCustomEvent(e.target.value);
+                  set("eventLabel", e.target.value || " ");
+                }}
+              />
+            ) : null}
+            <p className="text-xs leading-relaxed text-black/55">
+              Saved files are filed against this event, so its pillar art shows up with the rest of
+              that event&apos;s production kit.
+            </p>
+            <div className={label}>File name</div>
+
             <input
               className={field}
               placeholder={pillarName(config)}
