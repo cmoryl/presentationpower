@@ -59,19 +59,18 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
   slides: [
     {
       sectionId: "SF-01",
-      variantId: "MV-OP-COVER-MEDIA",
-      layoutId: "LF-05",
+      variantId: "MV-OP-COVER-DOSSIER",
+      layoutId: "LF-01",
       mode: "dark",
       content: {
         // Brand aqua clears WCAG AA on the dark ground.
         accentOverride: "#A1FBF9",
         authorizedAccentOverride: true,
+        reference: "GLOBALLINK · Q3 FY26",
         title: "GlobalLink Q3 business review",
-        subtitle: "AI-assisted delivery, proof and Q4 scale plan",
-        clientName: "GlobalLink enterprise programs",
+        clientName: "GlobalLink enterprise programs · AI-assisted delivery, proof and Q4 scale plan",
+        prepared: "TransPerfect Digital",
         date: "Q3 FY26",
-        mediaUrl: MASTER_BRAND_DARK_COVER,
-        mediaSeed: "TransPerfect master brand dark cover full bleed",
       },
       notes:
         "Open with the quarter's theme: faster delivery at higher quality, with AI-assisted workflows now in production.",
