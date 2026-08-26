@@ -9,7 +9,7 @@ const cfg = {
   headline: "MAIN STAGE",
   styleId: "03-wash-diagonal",
   arrow: "right" as const,
-  arrowStyle: "chevron-double" as const,
+  arrowStyle: "double-chevron" as const,
 };
 const out = await buildPillarVectorPdf(cfg as any);
 writeFileSync("/tmp/pv/diag.pdf", out.bytes);
