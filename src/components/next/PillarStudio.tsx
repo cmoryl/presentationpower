@@ -91,10 +91,12 @@ export function PillarStudio({
   const [config, setConfig] = useState<PillarConfig>(pillarDefault());
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [zoom, setZoom] = useState(1);
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
   const [openFileId, setOpenFileId] = useState<string | null>(null);
   const plateRef = useRef<HTMLDivElement | null>(null);
+
 
   const signedIn = useSignedIn();
   const qc = useQueryClient();
