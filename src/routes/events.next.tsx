@@ -216,12 +216,14 @@ function NextHub() {
           </DialogTitle>
           {preview && deckPagesFor(preview) ? (
             <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
-          ) : preview?.badgeSide && badgeDivisionFor(preview.divisionId) ? (
+          ) : preview?.badgeSide ? (
             <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
-              <NextBadge
-                division={badgeDivisionFor(preview.divisionId)!}
-                attendee={SAMPLE_ATTENDEE}
-                side={preview.badgeSide}
+              <CityBadge
+                config={{
+                  ...CITY_BADGE_DEFAULT,
+                  divisionId: cityBadgeDivision(preview.divisionId).id,
+                  face: preview.badgeSide === "back" ? "light" : "dark",
+                }}
                 ppi={72}
                 guides
                 style={{ borderRadius: 6 }}
