@@ -12,6 +12,7 @@ import {
   GLOBALLINK_Q3_QBR_DECK,
   demoBuildSteps,
   demoFinalAssistantText,
+
   isDemoFastBuildPrompt,
   type DemoToolPart,
 } from "@/lib/agent/demo-fast-build";
@@ -165,29 +166,51 @@ export function AgentChat({
           return next;
         });
 
+      let deckId: string | null = null;
       try {
         // Create the deck up front (fast, local) so the mid-build createDeck
         // tool part can carry the real id and the preview can pop live.
-        const { deckId } = useDeckStore.getState().createDeckFromSnapshot(GLOBALLINK_Q3_QBR_DECK);
+        deckId = useDeckStore.getState().createDeckFromSnapshot(GLOBALLINK_Q3_QBR_DECK).deckId;
         const completeDeck = useDeckStore.getState().decks[deckId];
         const completeSlides = completeDeck?.slides ?? [];
+        const totalSlides = completeSlides.length;
+        const slideLabel = (index: number) => {
+          const content = completeSlides[index]?.content as
+            | { title?: unknown; heading?: unknown }
+            | undefined;
+          const label = content?.title ?? content?.heading;
+          return typeof label === "string" && label.trim() ? label.trim() : `Slide ${index + 1}`;
+        };
         const revealSlides = (count: number) => {
           const visibleSlides = completeSlides.slice(0, count).map((slide, index) => ({
             ...slide,
             position: index,
           }));
           useDeckStore.setState((state) => {
-            const deck = state.decks[deckId];
+            const deck = state.decks[deckId!];
             if (!deck) return state;
             return {
               decks: {
                 ...state.decks,
-                [deckId]: { ...deck, slides: visibleSlides },
+                [deckId!]: { ...deck, slides: visibleSlides },
               },
             };
           });
+          // Publish slide-by-slide progress for the live preview indicator.
+          setDeckBuildState(deckId!, {
+            total: totalSlides,
+            done: count,
+            currentLabel: count < totalSlides ? slideLabel(count) : null,
+            building: count < totalSlides,
+          });
           onActivity();
         };
+        setDeckBuildState(deckId, {
+          total: totalSlides,
+          done: 0,
+          currentLabel: slideLabel(0),
+          building: true,
+        });
         revealSlides(0);
         // Local snapshot decks use short nanoids, not the UUIDs the message
         // scanner expects — hand the id to the preview directly.
@@ -204,6 +227,7 @@ export function AgentChat({
         }
         if (!alive()) return;
         revealSlides(completeSlides.length);
+        setDeckBuildState(deckId, null);
         const lastStep = steps.at(-1);
         const finalMsg = render(demoFinalAssistantText(), lastStep?.tools ?? []);
         push(finalMsg);
@@ -213,6 +237,7 @@ export function AgentChat({
         void setAgentThreadDeck(threadId, deckId).catch(() => {});
         toast.success("Deck ready — open it in the editor or export to PowerPoint.");
       } finally {
+        if (deckId) setDeckBuildState(deckId, null);
         if (alive()) setDemoBusy(false);
       }
     },
