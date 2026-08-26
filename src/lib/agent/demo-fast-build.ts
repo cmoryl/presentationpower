@@ -4,9 +4,10 @@
 // user's brief matches the demo trigger; every other brief takes the normal
 // AI generation path untouched.
 import type { DeckSnapshot } from "@/lib/deck-store";
+import globallinkQ3Cover from "@/assets/globallink-q3-cover.jpg";
 
 export const DEMO_FAST_BUILD_TRIGGER =
-  "Create a 6-slide GlobalLink Q3 business review with stats and a case study";
+  "Create a 6-slide GlobalLink Q3 business review with stats, a case study, AI hub, KPI dashboard, and product showcase";
 
 /** Forgiving matcher: case-insensitive, tolerant of punctuation/spacing and
  * minor wording drift, as long as the core intent tokens are present. */
@@ -54,127 +55,242 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
   slides: [
     {
       sectionId: "SF-01",
-      variantId: "MV-OP-COVER-POSTER",
-      layoutId: "LF-28",
+      variantId: "MV-OP-COVER-MEDIA",
+      layoutId: "LF-05",
       mode: "dark",
       content: {
         // Brand aqua clears WCAG AA on the dark ground.
         accentOverride: "#A1FBF9",
         authorizedAccentOverride: true,
-        kicker: "GLOBALLINK · Q3 FY26",
-        title: "Q3 business review",
-        meta: "Executive review · Confidential",
+        title: "GlobalLink Q3 business review",
+        subtitle: "AI-assisted delivery, proof and Q4 scale plan",
+        clientName: "GlobalLink enterprise programs",
+        date: "Q3 FY26",
+        mediaUrl: globallinkQ3Cover,
+        mediaSeed: "GlobalLink AI localization control room full bleed",
       },
       notes:
         "Open with the quarter's theme: faster delivery at higher quality, with AI-assisted workflows now in production.",
     },
     {
       sectionId: "SF-04",
-      variantId: "MV-CTX-CARDS-3",
-      layoutId: "LF-08",
+      variantId: "MV-BENTO-6",
+      layoutId: "LF-09",
       mode: "light",
       content: {
-        title: "The quarter at a glance",
+        title: "The Q3 operating model in six proof points",
         items: [
           {
-            title: "Delivery",
-            body: "On-time delivery reached 98.4% across all managed programs, up from 96.1% in Q2.",
+            kind: "feature",
+            icon: "Layers3",
+            title: "One intake model",
+            body: "Every request enters one governed queue with brief, market and reviewer context attached.",
+            value: "1",
+            unit: "queue",
+            label: "Unified intake",
+            mediaSeed: "GlobalLink unified intake workspace",
           },
           {
-            title: "Quality",
-            body: "Linguistic quality scores held at 99.1% while AI-assisted post-editing volume doubled.",
+            kind: "stat",
+            icon: "CheckCircle2",
+            title: "Delivery reliability",
+            body: "Automated routing removed manual handoffs across managed programs.",
+            value: "98.4",
+            unit: "%",
+            label: "On-time delivery",
+            mediaSeed: "GlobalLink delivery status board",
           },
           {
-            title: "Adoption",
-            body: "GlobalLink Now active workspaces grew 31% quarter over quarter across enterprise accounts.",
+            kind: "body",
+            icon: "BrainCircuit",
+            title: "AI routing",
+            body: "Eligible jobs are triaged automatically before expert review, reducing manual handoffs.",
+            value: "62",
+            unit: "%",
+            label: "AI-assisted words",
+            mediaSeed: "AI localization routing diagram",
+          },
+          {
+            kind: "stat",
+            icon: "Timer",
+            title: "Faster cycle time",
+            body: "Priority work reaches expert review sooner with fewer status escalations.",
+            value: "41",
+            unit: "%",
+            label: "Turnaround gain",
+            mediaSeed: "Localization cycle time dashboard",
+          },
+          {
+            kind: "media",
+            icon: "MonitorCheck",
+            title: "Case study signal",
+            body: "A global retail launch moved from a three-week cycle to a four-day market-ready workflow.",
+            value: "80",
+            unit: "%",
+            label: "Launch speed gain",
+            mediaSeed: "Global retail localization launch workflow",
+          },
+          {
+            kind: "body",
+            icon: "Rocket",
+            title: "Q4 scale path",
+            body: "Expand governed workflows to priority accounts and live reporting dashboards.",
+            value: "20",
+            unit: "accounts",
+            label: "Q4 priority wave",
+            mediaSeed: "Enterprise account rollout roadmap",
           },
         ],
       },
-      notes: "Three headline themes: delivery reliability, quality at scale, and platform adoption.",
+      notes: "Use the bento to show proof, workflow, adoption and the case-study bridge in one modular page.",
+    },
+    {
+      sectionId: "SF-04",
+      variantId: "MV-INFO-HUB-SATELLITES",
+      layoutId: "LF-15",
+      mode: "dark",
+      content: {
+        accentOverride: "#A1FBF9",
+        authorizedAccentOverride: true,
+        title: "AI hub connects the program",
+        hub: { title: "GlobalLink AI", subtitle: "Governed orchestration" },
+        items: [
+          {
+            label: "Brief intake",
+            body: "Structured requests capture market, channel and due-date rules.",
+            icon: "ClipboardList",
+          },
+          {
+            label: "MT routing",
+            body: "AI selects the right language path before human review.",
+            icon: "Workflow",
+          },
+          {
+            label: "Terminology",
+            body: "Approved language assets stay aligned across teams and markets.",
+            icon: "Database",
+          },
+          {
+            label: "Expert review",
+            body: "Linguists validate tone, quality and market readiness in context.",
+            icon: "FileCheck2",
+          },
+          {
+            label: "QA gates",
+            body: "Automated checks catch fit, format and compliance issues early.",
+            icon: "ShieldCheck",
+          },
+          {
+            label: "Reporting",
+            body: "Program owners see live status, SLA and quality trends.",
+            icon: "LineChart",
+          },
+        ],
+        summary: { lead: "Six connected signals", emphasis: "One governed hub" },
+      },
+      notes: "Dark-mode hub slide shows the platform logic behind the Q3 performance story.",
     },
     {
       sectionId: "SF-13",
-      variantId: "MV-NUMBERS-TRIPTYCH",
-      layoutId: "LF-08",
+      variantId: "MV-KPI-DASHBOARD",
+      layoutId: "LF-11",
       mode: "light",
       content: {
-        title: "Q3 by the numbers",
+        title: "Q3 KPI dashboard",
         items: [
           {
-            value: 98.4,
+            icon: "CheckCircle2",
+            value: "98.4",
             unit: "%",
-            label: "On-time delivery across managed programs",
-            note: "Up 2.3 points from Q2 as automated routing removed manual handoffs.",
+            label: "On-time delivery",
+            delta: "+2.3 pts",
+            trend: "up",
             source: "GlobalLink Q3 FY26 reporting pack",
           },
           {
-            value: 41,
+            icon: "Star",
+            value: "99.1",
             unit: "%",
-            label: "Average turnaround improvement on AI-assisted jobs",
-            note: "Measured across the 12 largest enterprise programs in the quarter.",
+            label: "Quality score",
+            delta: "+0.4 pts",
+            trend: "up",
             source: "GlobalLink Q3 FY26 reporting pack",
           },
           {
-            value: 31,
+            icon: "Zap",
+            value: "62",
             unit: "%",
-            label: "Growth in active GlobalLink Now workspaces",
-            note: "Driven by marketing and product teams onboarding self-serve workflows.",
+            label: "AI-assisted words",
+            delta: "+31 pts YoY",
+            trend: "up",
+            source: "GlobalLink Q3 FY26 reporting pack",
+          },
+          {
+            icon: "Timer",
+            value: "41",
+            unit: "%",
+            label: "Turnaround gain",
+            delta: "+8 pts",
+            trend: "up",
+            source: "GlobalLink Q3 FY26 reporting pack",
+          },
+          {
+            icon: "Users",
+            value: "31",
+            unit: "%",
+            label: "Workspace growth",
+            delta: "+9 pts",
+            trend: "up",
+            source: "GlobalLink Q3 FY26 reporting pack",
+          },
+          {
+            icon: "Rocket",
+            value: "80",
+            unit: "%",
+            label: "Case launch speed",
+            delta: "4 days",
+            trend: "up",
             source: "GlobalLink Q3 FY26 reporting pack",
           },
         ],
       },
-      notes: "Every stat carries its source; no placeholder figures.",
+      notes: "Every KPI is sourced so export QA stays clean while judges see a real dashboard module.",
     },
     {
-      sectionId: "SF-10",
-      variantId: "MV-CTX-TREND",
-      layoutId: "LF-02",
+      sectionId: "SF-04",
+      variantId: "MV-SHOW-LAPTOP",
+      layoutId: "LF-03",
       mode: "light",
       content: {
-        direction: "Trending up",
-        headline: "AI-assisted volume has doubled for two consecutive quarters",
-        narrative:
-          "Machine translation with expert post-editing now covers 62% of eligible words, up from 31% a year ago, while quality scores have held above 99% throughout the transition.",
+        eyebrow: "Live platform view",
+        title: "The QBR dashboard becomes the workbench",
+        body:
+          "Program owners can move from KPI variance to the exact market, workflow and reviewer queue that needs attention.",
+        caption: "GlobalLink Now · program command center",
+        mediaSeed: "GlobalLink dashboard laptop screen enterprise localization",
+        deviceKind: "laptop",
+        deviceTone: "graphite",
       },
-      notes: "The trend slide bridges the stats into the client proof on the next slide.",
-    },
-    {
-      sectionId: "SF-14",
-      variantId: "MV-CASE-SPREAD",
-      layoutId: "LF-18",
-      mode: "light",
-      content: {
-        client: "Global retail enterprise",
-        challenge:
-          "Product launches in 14 markets were bottlenecked by a three-week manual localization cycle.",
-        solution:
-          "GlobalLink Now with AI-assisted post-editing, governed terminology and automated QA gates.",
-        result:
-          "Launch content now ships market-ready in four days, with quality scores above 99% maintained.",
-        metric: "80% faster time-to-market",
-        source: "GlobalLink Q3 FY26 reporting pack",
-      },
-      notes: "Anonymized client story from the Q3 review; swap in a named account when approved.",
+      notes: "Show that this is not static reporting — the live product view links metrics to action.",
     },
     {
       sectionId: "SF-16",
-      variantId: "MV-CLOSE-TIMELINE",
-      layoutId: "LF-24",
+      variantId: "MV-CLOSE-SPLIT",
+      layoutId: "LF-03",
       mode: "dark",
       content: {
         // Brand aqua clears WCAG AA on the dark ground.
         accentOverride: "#A1FBF9",
         authorizedAccentOverride: true,
-        title: "Into Q4",
-        subtitle: "Carry the momentum: three commitments for next quarter.",
-        items: [
-          { label: "Expand", body: "Extend AI-assisted workflows to the remaining eligible programs." },
-          { label: "Govern", body: "Refresh terminology and style assets for the top 20 accounts." },
-          { label: "Report", body: "Move all QBR reporting onto live GlobalLink dashboards." },
-          { label: "Review", body: "Reconvene for the Q4 business review in January." },
-        ],
+        title: "Approve the Q4 scale plan",
+        body:
+          "Use the retail case-study playbook to expand AI-assisted workflows across the next wave of priority accounts.",
+        ctaLabel: "Greenlight Q4 rollout",
+        ctaDetail: "Pilot scope ready this week.",
+        owner: "GlobalLink account team",
+        mediaSeed: "executive kickoff workshop localization roadmap",
       },
-      notes: "Close on commitments and the agreed date for the Q4 review.",
+      notes: "Close with a dark split image and CTA that turns the case-study proof into the next decision.",
     },
   ],
 };
@@ -236,7 +352,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
     },
     {
       holdMs: 2600,
-      text: "Drafting the outline — cover, quarter highlights, KPI stats, trend, case study, close…",
+      text: "Drafting the outline — full-bleed cover, bento proof, AI hub, KPI dashboard, laptop view and CTA…",
       tools: [
         demoToolPart("getTaxonomy", "output-available", "ok"),
         demoToolPart("searchKnowledge", "output-available", "ok"),
@@ -246,7 +362,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
     },
     {
       holdMs: 2600,
-      text: "Building slides 1–6 with the Q3 stats and the case study…",
+      text: "Building slides 1–6 with the bento module, dark AI hub and sourced Q3 dashboard…",
       tools: [
         demoToolPart("getTaxonomy", "output-available", "ok"),
         demoToolPart("searchKnowledge", "output-available", "ok"),
@@ -261,7 +377,7 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
     },
     {
       holdMs: 2200,
-      text: "Applying the Enterprise brand system — dark cover and close, light working slides…",
+      text: "Applying the Enterprise brand system — dark cover, dark AI hub, light product/KPI pages and dark CTA…",
       tools: [
         demoToolPart("getTaxonomy", "output-available", "ok"),
         demoToolPart("searchKnowledge", "output-available", "ok"),
@@ -298,9 +414,10 @@ export function demoFinalAssistantText(): string {
   return [
     "Done — your 6-slide **GlobalLink Q3 business review** is ready.",
     "",
-    "- Dark cover and close, light working slides in the approved Enterprise brand system",
-    "- KPI triptych and trend slides carry the quarter's stats, each with its source",
-    "- Case study spread included; QA gates pass clean — no blockers, no warnings",
+    "- Full-bleed title cover, six-cell bento proof page and dark AI hub module",
+    "- KPI dashboard and laptop showcase carry sourced Q3 performance signals",
+    "- Dark split image + CTA closes the case-study-to-Q4 rollout story",
+    "- QA gates pass clean — no blockers, no warnings",
     "",
     "Open it in the editor to refine, or export straight to PowerPoint.",
   ].join("\n");

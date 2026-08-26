@@ -31,9 +31,11 @@ export function demoOverrideKey(kind: DemoKind, demoId: string) {
 
 export function useDemoOverrides(kind: DemoKind, demoId: string) {
   const fetchFn = useServerFn(listDemoOverrides);
+  const safeDemoId = demoId.trim();
   return useQuery({
-    queryKey: demoOverrideKey(kind, demoId),
-    queryFn: () => fetchFn({ data: { demoKind: kind, demoId } }),
+    queryKey: demoOverrideKey(kind, safeDemoId),
+    queryFn: () => fetchFn({ data: { demoKind: kind, demoId: safeDemoId } }),
+    enabled: safeDemoId.length > 0,
     staleTime: 30_000,
   });
 }
