@@ -226,10 +226,10 @@ export function AgentQuickStart({
   const [recipeId, setRecipeId] = useState(stored.current.recipeId ?? "");
   const [industries, setIndustries] = useState<string[]>(stored.current.industries ?? []);
   const [tones, setTones] = useState<string[]>(stored.current.tones ?? []);
-  // Default OPEN so the design skin catalog (28 visual languages) is visible
-  // without hunting for a collapsed panel; a stored preference still wins.
+  // Default CLOSED so the quick-start form stays compact on first arrival;
+  // a stored preference still wins if the user has previously opened it.
   const [showFilters, setShowFilters] = useState(
-    stored.current.showFilters === undefined ? true : Boolean(stored.current.showFilters),
+    stored.current.showFilters === undefined ? false : Boolean(stored.current.showFilters),
   );
 
   // Inject an externally selected starter brief.
