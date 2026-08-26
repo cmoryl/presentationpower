@@ -12,10 +12,10 @@ import {
   GLOBALLINK_Q3_QBR_DECK,
   demoBuildSteps,
   demoFinalAssistantText,
-
   isDemoFastBuildPrompt,
   type DemoToolPart,
 } from "@/lib/agent/demo-fast-build";
+import { setDeckBuildState } from "@/lib/agent/build-progress";
 import { useDeckStore } from "@/lib/deck-store";
 import { sanitizeAgentReply } from "@/lib/agent/sanitize-reply";
 import { readStoredDesignDna } from "@/lib/agent/design-dna";
