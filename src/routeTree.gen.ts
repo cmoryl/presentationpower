@@ -98,6 +98,7 @@ import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
 import { Route as AgentThreadIdRouteImport } from './routes/agent.$threadId'
 import { Route as AdminCanvasRouteImport } from './routes/admin_.canvas'
+import { Route as AdminVizLabRouteImport } from './routes/admin.viz-lab'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTranslationRouteImport } from './routes/admin.translation'
 import { Route as AdminTemplatesRouteImport } from './routes/admin.templates'
@@ -613,6 +614,11 @@ const AdminCanvasRoute = AdminCanvasRouteImport.update({
   path: '/admin/canvas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminVizLabRoute = AdminVizLabRouteImport.update({
+  id: '/viz-lab',
+  path: '/viz-lab',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -1011,6 +1017,7 @@ export interface FileRoutesByFullPath {
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/viz-lab': typeof AdminVizLabRoute
   '/admin/canvas': typeof AdminCanvasRoute
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
@@ -1165,6 +1172,7 @@ export interface FileRoutesByTo {
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/viz-lab': typeof AdminVizLabRoute
   '/admin/canvas': typeof AdminCanvasRoute
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
@@ -1324,6 +1332,7 @@ export interface FileRoutesById {
   '/admin/templates': typeof AdminTemplatesRoute
   '/admin/translation': typeof AdminTranslationRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/viz-lab': typeof AdminVizLabRoute
   '/admin_/canvas': typeof AdminCanvasRoute
   '/agent/$threadId': typeof AgentThreadIdRoute
   '/api/agent-chat': typeof ApiAgentChatRoute
@@ -1484,6 +1493,7 @@ export interface FileRouteTypes {
     | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
+    | '/admin/viz-lab'
     | '/admin/canvas'
     | '/agent/$threadId'
     | '/api/agent-chat'
@@ -1638,6 +1648,7 @@ export interface FileRouteTypes {
     | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
+    | '/admin/viz-lab'
     | '/admin/canvas'
     | '/agent/$threadId'
     | '/api/agent-chat'
@@ -1796,6 +1807,7 @@ export interface FileRouteTypes {
     | '/admin/templates'
     | '/admin/translation'
     | '/admin/users'
+    | '/admin/viz-lab'
     | '/admin_/canvas'
     | '/agent/$threadId'
     | '/api/agent-chat'
@@ -2623,6 +2635,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCanvasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/viz-lab': {
+      id: '/admin/viz-lab'
+      path: '/viz-lab'
+      fullPath: '/admin/viz-lab'
+      preLoaderRoute: typeof AdminVizLabRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -3137,6 +3156,7 @@ interface AdminRouteChildren {
   AdminTemplatesRoute: typeof AdminTemplatesRoute
   AdminTranslationRoute: typeof AdminTranslationRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminVizLabRoute: typeof AdminVizLabRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminPrintLibraryItemIdRoute: typeof AdminPrintLibraryItemIdRoute
   AdminModulesPrintModuleIdRoute: typeof AdminModulesPrintModuleIdRoute
@@ -3172,6 +3192,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminTemplatesRoute: AdminTemplatesRoute,
   AdminTranslationRoute: AdminTranslationRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminVizLabRoute: AdminVizLabRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminPrintLibraryItemIdRoute: AdminPrintLibraryItemIdRoute,
   AdminModulesPrintModuleIdRoute: AdminModulesPrintModuleIdRoute,
