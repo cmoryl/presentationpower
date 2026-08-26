@@ -58,7 +58,21 @@ import {
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
 
+import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
+
 const NATIVE_PX_PER_MM = 0.72;
+
+/** Events a pillar file can be filed against. Anything else is free text. */
+const EVENT_OPTIONS: { label: string; value: string }[] = [
+  { label: `${NEXT_EVENT.name} — ${NEXT_EVENT.city} (flagship)`, value: `${NEXT_EVENT.name} — ${NEXT_EVENT.city}` },
+  ...NEXT_CITY_SERIES.stops
+    .filter((s) => s.id !== "london")
+    .map((s) => ({
+      label: `${NEXT_CITY_SERIES.name} — ${s.city}${s.status === "confirmed" ? "" : " (tbc)"}`,
+      value: `${NEXT_CITY_SERIES.name} — ${s.city}`,
+    })),
+];
+
 
 /** Output tiers. Large-format grounds are viewed at distance, so the issued
  * 36 ppi tier stays the default; the higher tiers are for close-read pillars. */
