@@ -11,6 +11,7 @@ import {
   pillarHeadlineOffset,
   pillarLockupScale,
   pillarQrBackground,
+  pillarQrTransparent,
   pillarQrForeground,
   pillarQrSize,
   pillarQrStyle,
@@ -72,7 +73,8 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const qrEdge = mm(qrPlace.edge);
   const qrStyle = pillarQrStyle(config);
   const qrFore = pillarQrForeground(config);
-  const qrBack = pillarQrBackground(config);
+  const qrClear = pillarQrTransparent(config);
+  const qrBack = qrClear ? "transparent" : pillarQrBackground(config);
 
   const axis = config.styleId.includes("diagonal")
     ? { x1: "0%", y1: "0%", x2: "100%", y2: "100%" }
@@ -117,7 +119,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
                   width: qrEdge,
                   height: qrEdge,
                   background: qrBack,
-                  borderRadius: mm(4),
+                  borderRadius: qrClear ? 0 : mm(4),
                   padding: 0,
                 }}
               >
@@ -128,7 +130,9 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
                   shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
                   aria-hidden
                 >
-                  <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrBack} />
+                  {qrClear ? null : (
+                    <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrBack} />
+                  )}
                   {qrStyle === "block" ? (
                     <path d={qr.path} fill={qrFore} />
                   ) : (

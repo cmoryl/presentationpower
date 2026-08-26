@@ -53,6 +53,7 @@ import {
   pillarInk,
   pillarLockupScale,
   pillarQrBackground,
+  pillarQrTransparent,
   pillarQrForeground,
   pillarQrSize,
   pillarQrPlacement,
@@ -532,13 +533,17 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     const qrLeft = trimX + mm(place.x);
     const qrY = trimY + trimH - mm(place.y) - edge;
     beginLayer(page, layer("06 QR code"));
-    page.drawRectangle({
-      x: qrLeft,
-      y: qrY,
-      width: edge,
-      height: edge,
-      color: rgb(...hexRgb(pillarQrBackground(config))),
-    });
+    // A transparent code drops the plate so the gradient ground shows through
+    // and only the modules print.
+    if (!pillarQrTransparent(config)) {
+      page.drawRectangle({
+        x: qrLeft,
+        y: qrY,
+        width: edge,
+        height: edge,
+        color: rgb(...hexRgb(pillarQrBackground(config))),
+      });
+    }
     const qrStyle = pillarQrStyle(config);
     const dark: [number, number, number] = hexRgb(pillarQrForeground(config));
     // Rounded modules are approximated as 4-arc polygons; dots are ellipses.

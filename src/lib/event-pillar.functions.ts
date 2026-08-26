@@ -33,6 +33,7 @@ const configSchema = z
     qrCaptionSize: z.number().default(0),
     qrCaptionAlign: z.enum(["left", "center", "right"]).default("center"),
     qrCaptionPad: z.number().default(14),
+    qrTransparent: z.boolean().default(false),
     eventLabel: z.string().default(""),
   })
   .passthrough();
