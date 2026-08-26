@@ -6,7 +6,7 @@
 // real vector geometry sitting on its own named PDF layer (optional content
 // group), so Illustrator opens it as an editable, infinitely scalable file:
 //
-//   01 Ground        tessellated vector gradient (no shading dictionaries)
+//   01 Ground        Gouraud mesh gradient (Type 4 shading — one editable mesh)
 //   02 Lockup        approved division lockup as vector paths (raster fallback)
 //   03 Headline      live Geist text (embedded font, selectable + editable)
 //   04 Sub-line      live Geist text
@@ -129,7 +129,7 @@ function round(n: number): number {
   return Math.round(n * 1000) / 1000;
 }
 
-// ── vector gradient ground ───────────────────────────────────────────────────
+// ── mesh gradient ground ─────────────────────────────────────────────────────
 
 type Axis = { x1: number; y1: number; x2: number; y2: number };
 
@@ -140,28 +140,19 @@ function styleAxis(styleId: string): Axis {
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
 
-function ellipse(cx: number, cy: number, rx: number, ry: number, steps = 96): [number, number][] {
-  const pts: [number, number][] = [];
-  for (let i = 0; i < steps; i += 1) {
-    const a = (i / steps) * Math.PI * 2;
-    pts.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]);
-  }
-  return pts;
-}
-
-function drawGround(page: PDFPage, w: number, h: number, stops: string[], styleId: string): void {
-  const steps = 512;
+/** Colour field for the ground, mirroring the live PillarSign gradient. */
+function groundSampler(w: number, h: number, stops: string[], styleId: string): MeshSampler {
   if (styleId.includes("halo")) {
     // Live preview reverses the ramp for halo grounds: light core, saturated rim.
     const ramp = [...stops].reverse();
-    polygon(page, [[0, 0], [w, 0], [w, h], [0, h]], mixRgb(ramp, 1));
     const cx = w / 2;
     const cy = h - 0.42 * h;
-    for (let i = steps; i >= 1; i -= 1) {
-      const t = i / steps;
-      polygon(page, ellipse(cx, cy, 0.78 * w * 0.62 * t * 1.6, 0.78 * h * t), mixRgb(ramp, t));
-    }
-    return;
+    const rx = 0.78 * w * 0.62 * 1.6;
+    const ry = 0.78 * h;
+    return (x, y) => {
+      const d = Math.hypot((x - cx) / rx, (y - cy) / ry);
+      return mixRgb(ramp, Math.min(d, 1));
+    };
   }
   const axis = styleAxis(styleId);
   const x1 = axis.x1 * w;
@@ -171,29 +162,21 @@ function drawGround(page: PDFPage, w: number, h: number, stops: string[], styleI
   const len = Math.max(Math.hypot(dx, dy), 1);
   const ux = dx / len;
   const uy = dy / len;
-  const vx = -uy;
-  const vy = ux;
   const origin = x1 * ux + y1 * uy;
-  const projections = [[0, 0], [w, 0], [w, h], [0, h]].map(([x, y]) => x! * ux + y! * uy);
-  const min = Math.min(...projections);
-  const max = Math.max(...projections);
-  const breadth = Math.hypot(w, h) * 1.1;
-  const strip = (max - min) / steps;
-  for (let i = 0; i < steps; i += 1) {
-    const a = min + i * strip;
-    const b = min + (i + 1.04) * strip;
-    const t = ((a + b) / 2 - origin) / len;
-    polygon(
-      page,
-      [
-        [ux * a - vx * breadth, uy * a - vy * breadth],
-        [ux * b - vx * breadth, uy * b - vy * breadth],
-        [ux * b + vx * breadth, uy * b + vy * breadth],
-        [ux * a + vx * breadth, uy * a + vy * breadth],
-      ],
-      mixRgb(stops, t),
-    );
-  }
+  return (x, y) => mixRgb(stops, (x * ux + y * uy - origin) / len);
+}
+
+function drawGround(
+  doc: PDFDocument,
+  page: PDFPage,
+  w: number,
+  h: number,
+  stops: string[],
+  styleId: string,
+): void {
+  const { name } = registerMeshShading(doc, page, w, h, groundSampler(w, h, stops, styleId));
+  // pdf-lib has no `sh` helper; emit the shading-fill operator directly.
+  page.pushOperators(PDFOperator.of("sh" as never, [name]));
 }
 
 // ── lockup as vector paths ───────────────────────────────────────────────────
