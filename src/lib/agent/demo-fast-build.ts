@@ -334,15 +334,26 @@ export type DemoBuildStep = {
  * uses drives the simulated build.
  */
 export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
+  const createDeckOutput = demoToolPart(
+    "createDeck",
+    "output-available",
+    deckId ? `{"deck_id":"${deckId}"}` : "ok",
+  );
+  const baseTools = (extra: DemoToolPart[]): DemoToolPart[] => [
+    demoToolPart("getTaxonomy", "output-available", "ok"),
+    demoToolPart("searchKnowledge", "output-available", "ok"),
+    createDeckOutput,
+    ...extra,
+  ];
   return [
     {
-      holdMs: 1600,
+      holdMs: 1400,
       text: "Reading your brief…",
       tools: [demoToolPart("getTaxonomy", "input-available")],
       revealSlides: 0,
     },
     {
-      holdMs: 2200,
+      holdMs: 1600,
       text: "Reviewing GlobalLink knowledge and the approved module library…",
       tools: [
         demoToolPart("getTaxonomy", "output-available", "ok"),
@@ -351,60 +362,61 @@ export function demoBuildSteps(deckId: string | null): DemoBuildStep[] {
       revealSlides: 0,
     },
     {
-      holdMs: 2600,
+      holdMs: 1800,
       text: "Drafting the outline — full-bleed cover, bento proof, AI hub, KPI dashboard, laptop view and CTA…",
       tools: [
         demoToolPart("getTaxonomy", "output-available", "ok"),
         demoToolPart("searchKnowledge", "output-available", "ok"),
         demoToolPart("createDeck", "input-available"),
       ],
+      revealSlides: 0,
+    },
+    {
+      holdMs: 1300,
+      text: "Slide 1 — full-bleed title cover…",
+      tools: baseTools([demoToolPart("updateSlideContent", "input-available")]),
       revealSlides: 1,
     },
     {
-      holdMs: 2600,
-      text: "Building slides 1–6 with the bento module, dark AI hub and sourced Q3 dashboard…",
-      tools: [
-        demoToolPart("getTaxonomy", "output-available", "ok"),
-        demoToolPart("searchKnowledge", "output-available", "ok"),
-        demoToolPart(
-          "createDeck",
-          "output-available",
-          deckId ? `{"deck_id":"${deckId}"}` : "ok",
-        ),
-        demoToolPart("updateSlideContent", "input-available"),
-      ],
+      holdMs: 1300,
+      text: "Slide 2 — six-cell bento proof page…",
+      tools: baseTools([demoToolPart("updateSlideContent", "input-available")]),
+      revealSlides: 2,
+    },
+    {
+      holdMs: 1300,
+      text: "Slide 3 — dark AI hub & satellites…",
+      tools: baseTools([demoToolPart("updateSlideContent", "input-available")]),
+      revealSlides: 3,
+    },
+    {
+      holdMs: 1300,
+      text: "Slide 4 — sourced Q3 KPI dashboard…",
+      tools: baseTools([demoToolPart("updateSlideContent", "input-available")]),
       revealSlides: 4,
     },
     {
-      holdMs: 2200,
-      text: "Applying the Enterprise brand system — dark cover, dark AI hub, light product/KPI pages and dark CTA…",
-      tools: [
-        demoToolPart("getTaxonomy", "output-available", "ok"),
-        demoToolPart("searchKnowledge", "output-available", "ok"),
-        demoToolPart(
-          "createDeck",
-          "output-available",
-          deckId ? `{"deck_id":"${deckId}"}` : "ok",
-        ),
+      holdMs: 1300,
+      text: "Slide 5 — laptop product showcase…",
+      tools: baseTools([demoToolPart("updateSlideContent", "input-available")]),
+      revealSlides: 5,
+    },
+    {
+      holdMs: 1300,
+      text: "Slide 6 — dark split image + CTA…",
+      tools: baseTools([
         demoToolPart("updateSlideContent", "output-available", "ok"),
         demoToolPart("setSlideIcon", "input-available"),
-      ],
+      ]),
       revealSlides: 6,
     },
     {
-      holdMs: 1800,
+      holdMs: 1600,
       text: "Running QA gates — layout, fit, brand and export checks…",
-      tools: [
-        demoToolPart("getTaxonomy", "output-available", "ok"),
-        demoToolPart("searchKnowledge", "output-available", "ok"),
-        demoToolPart(
-          "createDeck",
-          "output-available",
-          deckId ? `{"deck_id":"${deckId}"}` : "ok",
-        ),
+      tools: baseTools([
         demoToolPart("updateSlideContent", "output-available", "ok"),
         demoToolPart("setSlideIcon", "output-available", "ok"),
-      ],
+      ]),
       revealSlides: 6,
     },
   ];
