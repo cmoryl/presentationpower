@@ -216,13 +216,13 @@ function NextHub() {
           </DialogTitle>
           {preview && deckPagesFor(preview) ? (
             <DeckPages pages={deckPagesFor(preview)!} label={preview.format} />
-          ) : preview?.badgeSide ? (
+          ) : preview?.badgeFace ? (
             <div className="flex justify-center rounded-lg border border-border bg-[#03002C] p-4">
               <CityBadge
                 config={{
                   ...CITY_BADGE_DEFAULT,
                   divisionId: cityBadgeDivision(preview.divisionId).id,
-                  face: preview.badgeSide === "back" ? "light" : "dark",
+                  face: preview.badgeFace,
                 }}
                 ppi={72}
                 guides
@@ -931,13 +931,13 @@ function RegistryCard({
             : `Preview ${row.code} ${row.format}`
         }
       >
-        {row.badgeSide ? (
+        {row.badgeFace ? (
           <div className="flex size-full items-center justify-center bg-[#03002C] py-2 transition group-hover:scale-[1.02]">
             <CityBadge
               config={{
                 ...CITY_BADGE_DEFAULT,
                 divisionId: cityBadgeDivision(row.divisionId).id,
-                face: row.badgeSide === "back" ? "light" : "dark",
+                face: row.badgeFace,
               }}
               ppi={22}
               style={{ borderRadius: 4 }}

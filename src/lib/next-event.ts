@@ -353,7 +353,7 @@ export const NEXT_FORMAT_GROUPS: NextFormatGroup[] = [
     label: "Attendee credentials",
     badge: "Print",
     detail:
-      "B-series badge artwork — 4.33×6.3 in dual-slot plastic badge with BLE Klik cutout, front and back.",
+      "City Series badge artwork — 4.33×6.3 in dual-slot plastic badge with BLE Klik cutout, dark and light approved faces.",
   },
 ];
 
@@ -386,8 +386,8 @@ export type NextRegistryRow = {
   secondaryLabel?: string;
   /** In-app route for designs rendered by this build rather than in Canva. */
   internalUrl?: string;
-  /** Set on attendee badge rows so the hub renders a live badge preview. */
-  badgeSide?: "front" | "back";
+  /** Set on attendee badge rows so the hub renders a live City Series preview. */
+  badgeFace?: "dark" | "light";
 };
 
 export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {
@@ -406,24 +406,25 @@ export function normalizeNextRow(r: NextRegistryRowRaw): NextRegistryRow {
 }
 
 /**
- * Attendee badge artwork lives in this build (not Canva), so each division's
- * badge variants are synthesised into that division's directory.
+ * Attendee badge artwork lives in this build (not Canva). Every division runs
+ * the approved City Series template — only the division lockup changes — in
+ * the two approved faces.
  */
 export function nextBadgeRows(): NextRegistryRow[] {
-  const sides: { side: "front" | "back"; code: string; label: string }[] = [
-    { side: "front", code: "B1", label: "Attendee badge — front" },
-    { side: "back", code: "B2", label: "Attendee badge — back" },
+  const faces: { face: "dark" | "light"; code: string; label: string }[] = [
+    { face: "dark", code: "B1", label: "Attendee badge — dark face" },
+    { face: "light", code: "B2", label: "Attendee badge — light face" },
   ];
   return NEXT_DIVISIONS.flatMap((d) =>
-    sides.map(({ side, code, label }) => ({
+    faces.map(({ face, code, label }) => ({
       divisionId: d.id,
       group: "attendee-credentials" as const,
       code,
       format: label,
       size: "4.33×6.3 in · bleed 4.58×6.55 in",
       category: "Attendee credentials",
-      internalUrl: `/events/next/badges?division=${d.id}`,
-      badgeSide: side,
+      internalUrl: `/events/next/city-badges?division=${d.id}&face=${face}`,
+      badgeFace: face,
     })),
   );
 }
