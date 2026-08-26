@@ -91,6 +91,7 @@ import { Route as AssetNewRouteImport } from './routes/asset.new'
 import { Route as AssetAssetIdRouteImport } from './routes/asset.$assetId'
 import { Route as ApiPrintAgentChatRouteImport } from './routes/api/print-agent-chat'
 import { Route as ApiKitAgentChatRouteImport } from './routes/api/kit-agent-chat'
+import { Route as ApiDeckExportVisualValidateRouteImport } from './routes/api/deck-export-visual-validate'
 import { Route as ApiDeckExportValidateRouteImport } from './routes/api/deck-export-validate'
 import { Route as ApiChatRouteImport } from './routes/api.chat'
 import { Route as ApiAgentChatRouteImport } from './routes/api/agent-chat'
@@ -571,6 +572,12 @@ const ApiKitAgentChatRoute = ApiKitAgentChatRouteImport.update({
   path: '/api/kit-agent-chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDeckExportVisualValidateRoute =
+  ApiDeckExportVisualValidateRouteImport.update({
+    id: '/api/deck-export-visual-validate',
+    path: '/api/deck-export-visual-validate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiDeckExportValidateRoute = ApiDeckExportValidateRouteImport.update({
   id: '/api/deck-export-validate',
   path: '/api/deck-export-validate',
@@ -979,6 +986,7 @@ export interface FileRoutesByFullPath {
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
+  '/api/deck-export-visual-validate': typeof ApiDeckExportVisualValidateRoute
   '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -1127,6 +1135,7 @@ export interface FileRoutesByTo {
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
+  '/api/deck-export-visual-validate': typeof ApiDeckExportVisualValidateRoute
   '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -1280,6 +1289,7 @@ export interface FileRoutesById {
   '/api/agent-chat': typeof ApiAgentChatRoute
   '/api/chat': typeof ApiChatRoute
   '/api/deck-export-validate': typeof ApiDeckExportValidateRoute
+  '/api/deck-export-visual-validate': typeof ApiDeckExportVisualValidateRoute
   '/api/kit-agent-chat': typeof ApiKitAgentChatRoute
   '/api/print-agent-chat': typeof ApiPrintAgentChatRoute
   '/asset/$assetId': typeof AssetAssetIdRoute
@@ -1434,6 +1444,7 @@ export interface FileRouteTypes {
     | '/api/agent-chat'
     | '/api/chat'
     | '/api/deck-export-validate'
+    | '/api/deck-export-visual-validate'
     | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
@@ -1582,6 +1593,7 @@ export interface FileRouteTypes {
     | '/api/agent-chat'
     | '/api/chat'
     | '/api/deck-export-validate'
+    | '/api/deck-export-visual-validate'
     | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
@@ -1734,6 +1746,7 @@ export interface FileRouteTypes {
     | '/api/agent-chat'
     | '/api/chat'
     | '/api/deck-export-validate'
+    | '/api/deck-export-visual-validate'
     | '/api/kit-agent-chat'
     | '/api/print-agent-chat'
     | '/asset/$assetId'
@@ -1858,6 +1871,7 @@ export interface RootRouteChildren {
   ApiAgentChatRoute: typeof ApiAgentChatRoute
   ApiChatRoute: typeof ApiChatRoute
   ApiDeckExportValidateRoute: typeof ApiDeckExportValidateRoute
+  ApiDeckExportVisualValidateRoute: typeof ApiDeckExportVisualValidateRoute
   ApiKitAgentChatRoute: typeof ApiKitAgentChatRoute
   ApiPrintAgentChatRoute: typeof ApiPrintAgentChatRoute
   AssetAssetIdRoute: typeof AssetAssetIdRoute
@@ -2498,6 +2512,13 @@ declare module '@tanstack/react-router' {
       path: '/api/kit-agent-chat'
       fullPath: '/api/kit-agent-chat'
       preLoaderRoute: typeof ApiKitAgentChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/deck-export-visual-validate': {
+      id: '/api/deck-export-visual-validate'
+      path: '/api/deck-export-visual-validate'
+      fullPath: '/api/deck-export-visual-validate'
+      preLoaderRoute: typeof ApiDeckExportVisualValidateRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/deck-export-validate': {
@@ -3173,6 +3194,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAgentChatRoute: ApiAgentChatRoute,
   ApiChatRoute: ApiChatRoute,
   ApiDeckExportValidateRoute: ApiDeckExportValidateRoute,
+  ApiDeckExportVisualValidateRoute: ApiDeckExportVisualValidateRoute,
   ApiKitAgentChatRoute: ApiKitAgentChatRoute,
   ApiPrintAgentChatRoute: ApiPrintAgentChatRoute,
   AssetAssetIdRoute: AssetAssetIdRoute,
