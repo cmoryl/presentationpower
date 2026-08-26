@@ -156,8 +156,11 @@ export function AgendaStudio({
     });
 
   const geo = agendaGeometry(config);
-  const fitScale = Math.min(1, 760 / (geo.bleedH * NATIVE_PX_PER_MM));
+  // Fit the tallest edge to the viewer, scaling small formats (A4) up as well as
+  // large boards down, so every format fills the same review area.
+  const fitScale = Math.min(2.4, 760 / (geo.bleedH * NATIVE_PX_PER_MM));
   const previewScale = fitScale * zoom;
+
   const division = agendaDivision(config.divisionId);
 
   const runExport = async () => {
@@ -233,11 +236,13 @@ export function AgendaStudio({
           </div>
           <div ref={plateRef} className="max-h-[780px] overflow-auto">
             <div
+              className="mx-auto"
               style={{
                 width: geo.bleedW * NATIVE_PX_PER_MM * previewScale,
                 height: geo.bleedH * NATIVE_PX_PER_MM * previewScale,
               }}
             >
+
               <div style={{ transform: `scale(${previewScale})`, transformOrigin: "top left" }}>
                 <AgendaSheet config={config} pxPerMm={NATIVE_PX_PER_MM} guides={guides} />
               </div>
