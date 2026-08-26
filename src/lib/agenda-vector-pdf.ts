@@ -184,6 +184,33 @@ async function ttf(doc: PDFDocument, path: string): Promise<PDFFont | null> {
   }
 }
 
+/** Letter-spaced label: pdf-lib has no character-spacing option, so each glyph
+ *  is placed individually — matching the tracked labels in the live sheet. */
+function drawTracked(
+  page: PDFPage,
+  text: string,
+  opts: { x: number; y: number; size: number; font: PDFFont; color: [number, number, number]; opacity?: number; spacing: number },
+): number {
+  let x = opts.x;
+  for (const ch of text) {
+    page.drawText(ch, {
+      x,
+      y: opts.y,
+      size: opts.size,
+      font: opts.font,
+      color: rgb(...opts.color),
+      opacity: opts.opacity ?? 1,
+    });
+    x += opts.font.widthOfTextAtSize(ch, opts.size) + opts.spacing;
+  }
+  return x - opts.x;
+}
+
+/** Width a tracked label occupies. */
+function trackedWidth(font: PDFFont, text: string, size: number, spacing: number): number {
+  return font.widthOfTextAtSize(text, size) + spacing * Math.max(0, [...text].length - 1);
+}
+
 /** Trim a line to the available width so nothing overruns the safe area. */
 function fit(font: PDFFont, text: string, size: number, maxWidth: number): string {
   if (!text) return "";
@@ -343,14 +370,14 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   const eyebrow = config.eyebrow.trim();
   if (eyebrow) {
     const size = mm(L.eyebrowSize);
-    page.drawText(eyebrow.toUpperCase(), {
+    drawTracked(page, eyebrow.toUpperCase(), {
       x: px(blocks.x),
       y: py(blocks.eyebrowY) - size,
       size,
       font: bold,
-      color: rgb(...hexRgb(ink)),
+      color: hexRgb(ink),
       opacity: 0.82,
-      characterSpacing: size * 0.22,
+      spacing: size * 0.22,
     });
   }
   if (config.title.trim()) {
@@ -433,15 +460,15 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       const size = mm(L.trackSize);
       const label = row.session.track.toUpperCase();
       const spacing = size * 0.16;
-      const width = bold.widthOfTextAtSize(label, size) + spacing * label.length;
-      page.drawText(label, {
+      const width = trackedWidth(bold, label, size, spacing);
+      drawTracked(page, label, {
         x: px(blocks.x + blocks.contentW) - width,
         y: top - pad - size * 0.9,
         size,
         font: bold,
-        color: rgb(...hexRgb(ink)),
+        color: hexRgb(ink),
         opacity: 0.8 * alpha,
-        characterSpacing: spacing,
+        spacing,
       });
     }
   }
@@ -493,14 +520,14 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       const size = mm(L.footSize);
       const label = config.qrCaption.toUpperCase();
       const spacing = size * 0.16;
-      const width = bold.widthOfTextAtSize(label, size) + spacing * label.length;
-      page.drawText(label, {
+      const width = trackedWidth(bold, label, size, spacing);
+      drawTracked(page, label, {
         x: left + edge / 2 - width / 2,
         y: py(blocks.qr.capY) - size,
         size,
         font: bold,
-        color: rgb(...hexRgb(ink)),
-        characterSpacing: spacing,
+        color: hexRgb(ink),
+        spacing,
       });
     }
     endLayer(page);
