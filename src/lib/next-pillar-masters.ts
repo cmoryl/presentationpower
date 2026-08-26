@@ -202,7 +202,7 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     arrow: "right",
     showLockup: true,
     face: "dark",
-    verticalHeadline: false,
+    verticalHeadline: true,
     headlineSize: kind.headlineSize,
     headlineColor: "",
     lockupScale: 1,
