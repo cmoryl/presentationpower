@@ -5,10 +5,6 @@
 // AI generation path untouched.
 import type { DeckSnapshot } from "@/lib/deck-store";
 
-// Master brand dark cover background (authored Element plate, CDN-hosted).
-// JPEG rendition — the 1.3MB PNG exhausted capture resources during export.
-const MASTER_BRAND_DARK_COVER =
-  "/__l5e/assets-v1/f42429f5-9543-4b14-b281-e7167420a00f/element-dark-cover.jpg";
 
 export const DEMO_FAST_BUILD_TRIGGER =
   "Create a 6-slide GlobalLink Q3 business review with stats, a case study, AI hub, KPI dashboard, and product showcase";
