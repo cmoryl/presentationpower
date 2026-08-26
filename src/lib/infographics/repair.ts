@@ -186,12 +186,46 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
     notes.push({ code: "VIZ-PRINT-RASTER", detail: "Switched print export to vector SVG." });
   }
 
-  // 7 — alt text + long description, regenerated from the repaired data.
+  // 7 — social needs a headline and feed-legible labels.
+  const annotations = { ...(spec.annotations ?? {}) };
+  if (surface === "social") {
+    const labels = labelKey ? rows.map((r) => String(r[labelKey] ?? "").trim()) : [];
+    const shortened = 24;
+    if (labelKey && labels.some((l) => l.length > shortened)) {
+      rows = rows.map((r) => {
+        const raw = String(r[labelKey] ?? "");
+        if (raw.length <= shortened) return r;
+        const cut = raw.slice(0, shortened - 1).replace(/[\s,;:–-]+$/, "");
+        return { ...r, [labelKey]: `${cut}…` };
+      });
+      notes.push({
+        code: "VIZ-LABEL-OVERFLOW",
+        detail: `Shortened long category labels to ${shortened} characters for social.`,
+      });
+    }
+    if (!annotations.headline?.trim() && labelKey && valueKey && rows.length > 0) {
+      const ranked = [...rows].sort((a, b) => num(b[valueKey]) - num(a[valueKey]));
+      const top = ranked[0];
+      if (top) {
+        const unit = /%|percent|share|rate/i.test(String(spec.data?.columns?.[valueKey] ?? valueKey))
+          ? "%"
+          : "";
+        annotations.headline = `${String(top[labelKey])} leads at ${num(top[valueKey])}${unit}`;
+        notes.push({
+          code: "VIZ-SOCIAL-NO-HEADLINE",
+          detail: "Derived a social headline from the leading data point.",
+        });
+      }
+    }
+  }
+
+  // 8 — alt text + long description, regenerated from the repaired data.
   const hadAlt = !!spec.accessibility?.shortAlt?.trim();
   const repaired = ensureA11y({
     ...spec,
     data: { ...spec.data, rows },
     theme,
+    annotations,
     export: exportPolicy,
     accessibility: hadAlt
       ? spec.accessibility
@@ -203,3 +237,4 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
 
   return { spec: repaired, notes };
 }
+
