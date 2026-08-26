@@ -198,3 +198,141 @@ export function martTotalPanels(): number {
     NEXT_MART_FLAT_SIGNS.reduce((n, s) => n + s.quantity, 0)
   );
 }
+
+/* ---------------------------------------------------------------------------
+ * London working artwork — supplied production files (Illustrator SVG masters)
+ * Each sign is a die-cut board with layered groups: 01_BLEED, 02_BOARD,
+ * 04_ICON, 05_TYPE, 07_CUT-CONTOUR (magenta spot path for the cutter).
+ * ------------------------------------------------------------------------- */
+
+import artTravelRight from "@/assets/next-mart/02_TRAVEL_pack-light-travel-right.svg.asset.json";
+import artTravelPro from "@/assets/next-mart/02b_TRAVEL_pack-like-a-pro.svg.asset.json";
+import artTechToGo from "@/assets/next-mart/03_TECH_tech-to-go.svg.asset.json";
+import artPowerUp from "@/assets/next-mart/03b_TECH_power-up-and-go.svg.asset.json";
+import artHydrated from "@/assets/next-mart/04_WATER_keep-hydrated.svg.asset.json";
+import artLocalLegends from "@/assets/next-mart/06_LOCAL_local-legends.svg.asset.json";
+
+export type MartArtwork = {
+  id: string;
+  code: string;
+  category: string;
+  headline: string;
+  url: string;
+  filename: string;
+  face: "dark" | "light";
+  /** Die shape of the board, plain language for the printer. */
+  die: string;
+  trimW: number;
+  trimH: number;
+  bleed: number;
+  quantity: number;
+  substrate: string;
+  finishing: string;
+};
+
+/** Supplied board dimensions: artwork is 1620 × 972 units at 1 unit = 0.5 mm. */
+export const MART_ART_TRIM_W = 810;
+export const MART_ART_TRIM_H = 486;
+
+export const NEXT_MART_ARTWORK: MartArtwork[] = [
+  {
+    id: "mart-art-02",
+    code: "02",
+    category: "Travel",
+    headline: "Pack light, travel right",
+    url: artTravelRight.url,
+    filename: artTravelRight.original_filename,
+    face: "light",
+    die: "Rounded panel with notched corner and punched hang hole",
+    trimW: MART_ART_TRIM_W,
+    trimH: MART_ART_TRIM_H,
+    bleed: 6,
+    quantity: 2,
+    substrate: "5 mm Foamex, matte laminate",
+    finishing: "Cut to CutContour path, hang hole reinforced",
+  },
+  {
+    id: "mart-art-02b",
+    code: "02b",
+    category: "Travel",
+    headline: "Pack like a pro",
+    url: artTravelPro.url,
+    filename: artTravelPro.original_filename,
+    face: "light",
+    die: "Rounded panel with notched corner and punched hang hole",
+    trimW: MART_ART_TRIM_W,
+    trimH: MART_ART_TRIM_H,
+    bleed: 6,
+    quantity: 2,
+    substrate: "5 mm Foamex, matte laminate",
+    finishing: "Cut to CutContour path, hang hole reinforced",
+  },
+  {
+    id: "mart-art-03",
+    code: "03",
+    category: "Tech",
+    headline: "Tech to go",
+    url: artTechToGo.url,
+    filename: artTechToGo.original_filename,
+    face: "dark",
+    die: "Chamfered hex board with pinched waist",
+    trimW: MART_ART_TRIM_W,
+    trimH: MART_ART_TRIM_H,
+    bleed: 6,
+    quantity: 2,
+    substrate: "5 mm Foamex, matte laminate",
+    finishing: "Cut to CutContour path",
+  },
+  {
+    id: "mart-art-03b",
+    code: "03b",
+    category: "Tech",
+    headline: "Power up and go",
+    url: artPowerUp.url,
+    filename: artPowerUp.original_filename,
+    face: "dark",
+    die: "Chamfered hex board with pinched waist",
+    trimW: MART_ART_TRIM_W,
+    trimH: MART_ART_TRIM_H,
+    bleed: 6,
+    quantity: 2,
+    substrate: "5 mm Foamex, matte laminate",
+    finishing: "Cut to CutContour path",
+  },
+  {
+    id: "mart-art-04",
+    code: "04",
+    category: "Water",
+    headline: "Keep hydrated",
+    url: artHydrated.url,
+    filename: artHydrated.original_filename,
+    face: "dark",
+    die: "Rounded top with scalloped wave base",
+    trimW: MART_ART_TRIM_W,
+    trimH: MART_ART_TRIM_H,
+    bleed: 6,
+    quantity: 2,
+    substrate: "5 mm Foamex, matte laminate",
+    finishing: "Cut to CutContour path",
+  },
+  {
+    id: "mart-art-06",
+    code: "06",
+    category: "Local",
+    headline: "Local legends",
+    url: artLocalLegends.url,
+    filename: artLocalLegends.original_filename,
+    face: "light",
+    die: "Dome top with rounded base corners",
+    trimW: MART_ART_TRIM_W,
+    trimH: MART_ART_TRIM_H,
+    bleed: 6,
+    quantity: 2,
+    substrate: "5 mm Foamex, matte laminate",
+    finishing: "Cut to CutContour path",
+  },
+];
+
+export function martArtworkPanels(): number {
+  return NEXT_MART_ARTWORK.reduce((n, a) => n + a.quantity, 0);
+}
