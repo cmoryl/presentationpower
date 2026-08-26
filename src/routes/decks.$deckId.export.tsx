@@ -769,6 +769,48 @@ function ExportView() {
             })}
           </div>
           <ExportTelemetryPanel report={perf} className="mt-8" />
+          {validationReport && (
+            <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">
+                  File validation
+                </h2>
+                <span
+                  className={
+                    validationReport.ok
+                      ? "rounded-full bg-[#03002C]/5 px-2 py-0.5 text-[11px] font-semibold text-[#03002C]"
+                      : "rounded-full bg-[#E53D2E]/10 px-2 py-0.5 text-[11px] font-semibold text-[#E53D2E]"
+                  }
+                >
+                  {validationReport.ok ? "Verified" : "Blocked"}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-[#03002C]/70">
+                Opened the generated file on the server: {validationReport.slideCount} of{" "}
+                {validationReport.expectedSlideCount} slides,{" "}
+                {validationReport.slides.filter((s) => s.probesTotal === 0 || s.probesFound > 0).length}{" "}
+                slide IDs confirmed, {validationReport.mediaCount} embedded media asset
+                {validationReport.mediaCount === 1 ? "" : "s"}.
+              </p>
+              {validationReport.issues.length > 0 && (
+                <ul className="mt-3 space-y-1.5">
+                  {validationReport.issues.map((issue, i) => (
+                    <li
+                      key={`${issue.code}-${i}`}
+                      className={
+                        issue.level === "error"
+                          ? "text-xs text-[#E53D2E]"
+                          : "text-xs text-[#03002C]/70"
+                      }
+                    >
+                      {issue.level === "error" ? "Error" : "Warning"}: {issue.message}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
           {coverageReport && coverageReport.total > 0 && (
             <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
