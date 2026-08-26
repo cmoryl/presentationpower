@@ -80,34 +80,40 @@ export function vizContrast(a: string, b: string): number {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
 
-/** Required encoding channels per chart kind. */
-const REQUIRED_ENCODING: Partial<Record<InfographicKind, Array<keyof InfographicSpec["encoding"]>>> =
-  {
-    bar: ["x", "y"],
-    column: ["x", "y"],
-    line: ["x", "y"],
-    area: ["x", "y"],
-    "stacked-area": ["x", "y"],
-    donut: ["label", "value"],
-    treemap: ["label", "value"],
-    sunburst: ["label", "value"],
-    funnel: ["label", "value"],
-    waterfall: ["label", "value"],
-    "radial-bar": ["label", "value"],
-    gauge: ["value"],
-    "gauge-grid": ["label", "value"],
-    sankey: ["source", "target", "value"],
-    chord: ["source", "target", "value"],
-    heatmap: ["x", "value"],
-    "calendar-heatmap": ["value"],
-    "market-map": ["x", "y2"],
-    dumbbell: ["label"],
-    slope: ["label"],
-    radar: ["label", "value"],
-    bump: ["x", "y"],
-    beeswarm: ["value"],
-    boxplot: ["label"],
-  };
+/**
+ * Required encoding channels per chart kind, as *one-of* groups: each group is
+ * satisfied when any channel in it is mapped. This mirrors what the ECharts
+ * option builders actually read (a category axis may arrive as `x` or `label`,
+ * a measure as `value` or `y`).
+ */
+type Channel = keyof InfographicSpec["encoding"];
+const REQUIRED_ENCODING: Partial<Record<InfographicKind, Channel[][]>> = {
+  bar: [["x", "label"], ["y", "value"]],
+  column: [["x", "label"], ["y", "value"]],
+  line: [["x", "label"], ["y", "value"]],
+  area: [["x", "label"], ["y", "value"]],
+  "stacked-area": [["x"], ["value", "y"], ["series"]],
+  bump: [["x"], ["value", "y"], ["series"]],
+  radar: [["x", "label"], ["value", "y"]],
+  donut: [["label", "x"], ["value", "y"]],
+  treemap: [["label"], ["value"]],
+  sunburst: [["label"], ["value"]],
+  funnel: [["label", "x"], ["value", "y"]],
+  waterfall: [["x", "label"], ["value", "y"]],
+  "radial-bar": [["label"], ["value"]],
+  gauge: [["value", "y"]],
+  "gauge-grid": [["label"], ["value"]],
+  sankey: [["source"], ["target"], ["value"]],
+  chord: [["source"], ["target"], ["value"]],
+  heatmap: [["x"], ["value"]],
+  "calendar-heatmap": [["value"]],
+  "market-map": [["x"], ["y", "y2"], ["label"]],
+  dumbbell: [["label", "series"], ["value"], ["y2"]],
+  slope: [["label", "series"], ["value"], ["y2"]],
+  gantt: [["label"], ["value"], ["y2"]],
+  beeswarm: [["value"]],
+  boxplot: [["x", "label"]],
+};
 
 /** Categorical cap per kind — above this the chart stops being readable. */
 const CATEGORY_CAP: Partial<Record<InfographicKind, number>> = {
@@ -125,6 +131,27 @@ const CATEGORY_CAP: Partial<Record<InfographicKind, number>> = {
   slope: 12,
   boxplot: 10,
 };
+
+/**
+ * Kinds that are legitimately dense — a calendar heatmap *is* 364 marks, a
+ * sankey *is* many nodes. Category caps don't apply; instead we note when such
+ * a chart is aimed at a feed-sized surface.
+ */
+const DENSE_KINDS = new Set<InfographicKind>([
+  "calendar-heatmap",
+  "heatmap",
+  "beeswarm",
+  "sankey",
+  "chord",
+  "bump",
+  "gantt",
+  "market-map",
+  "boxplot",
+  "stacked-area",
+  "line",
+  "area",
+]);
+
 
 /** Chart kinds where every value must be a non-negative share of a whole. */
 const PART_TO_WHOLE = new Set<InfographicKind>([
