@@ -55,6 +55,7 @@ import {
   pillarQrBackground,
   pillarQrForeground,
   pillarQrSize,
+  pillarQrPlacement,
   pillarQrStyle,
   pillarStops,
   pillarSubSize,
@@ -520,14 +521,18 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   const qr = buildPillarQr(config.qrData ?? "");
   let qrBottom = safeBottom;
   if (qr) {
-    const edge = Math.min(mm(pillarQrSize(config)), safeW);
+    // Placement is authored in mm from the trim top-left (drag-and-drop in the
+    // studio) and already clamped into the safe area.
+    const place = pillarQrPlacement(config);
+    const edge = Math.min(mm(place.edge), safeW);
     const unit = edge / qr.size;
-    const caption = (config.qrCaption || "").trim();
+    const caption = place.caption;
     const captionSize = Math.max(mm(10), subSize * 0.55);
-    const qrY = safeBottom + (caption ? captionSize * 2.2 : 0);
+    const qrLeft = trimX + mm(place.x);
+    const qrY = trimY + trimH - mm(place.y) - edge;
     beginLayer(page, layer("06 QR code"));
     page.drawRectangle({
-      x: centerX - edge / 2,
+      x: qrLeft,
       y: qrY,
       width: edge,
       height: edge,
@@ -555,7 +560,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     for (let row = 0; row < qr.size; row += 1) {
       for (let col = 0; col < qr.size; col += 1) {
         if (!qr.modules[row * qr.size + col]) continue;
-        const x = centerX - edge / 2 + col * unit;
+        const x = qrLeft + col * unit;
         const y = qrY + edge - (row + 1) * unit;
         if (qrStyle === "dot") {
           page.drawEllipse({
@@ -575,8 +580,8 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     if (caption) {
       const width = bold.widthOfTextAtSize(caption, captionSize);
       page.drawText(caption, {
-        x: centerX - width / 2,
-        y: safeBottom + captionSize * 0.4,
+        x: qrLeft + edge / 2 - width / 2,
+        y: qrY - captionSize * 1.4,
         size: captionSize,
         font: bold,
         color: rgb(...hexRgb(headlineInk)),

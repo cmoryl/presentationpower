@@ -14,6 +14,7 @@ import {
   pillarQrForeground,
   pillarQrSize,
   pillarQrStyle,
+  pillarQrPlacement,
   pillarSubSize,
   pillarInk,
   pillarStops,
@@ -67,7 +68,8 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
       : [];
 
   const qr = buildPillarQr(config.qrData ?? "");
-  const qrEdge = mm(Math.min(pillarQrSize(config), geo.trimW - geo.safeInset * 2));
+  const qrPlace = pillarQrPlacement(config);
+  const qrEdge = mm(qrPlace.edge);
   const qrStyle = pillarQrStyle(config);
   const qrFore = pillarQrForeground(config);
   const qrBack = pillarQrBackground(config);
@@ -95,6 +97,66 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
     >
       {config.subheadline}
     </div>
+  ) : null;
+
+  const qrBlock = qr ? (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div
+                style={{
+                  width: qrEdge,
+                  height: qrEdge,
+                  background: qrBack,
+                  borderRadius: mm(4),
+                  padding: 0,
+                }}
+              >
+                <svg
+                  width={qrEdge}
+                  height={qrEdge}
+                  viewBox={`0 0 ${qr.size} ${qr.size}`}
+                  shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
+                  aria-hidden
+                >
+                  <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrBack} />
+                  {qrStyle === "block" ? (
+                    <path d={qr.path} fill={qrFore} />
+                  ) : (
+                    qr.modules.map((on, i) => {
+                      if (!on) return null;
+                      const cx = i % qr.size;
+                      const cy = Math.floor(i / qr.size);
+                      return qrStyle === "dot" ? (
+                        <circle key={i} cx={cx + 0.5} cy={cy + 0.5} r={0.5} fill={qrFore} />
+                      ) : (
+                        <rect
+                          key={i}
+                          x={cx + 0.06}
+                          y={cy + 0.06}
+                          width={0.88}
+                          height={0.88}
+                          rx={0.24}
+                          fill={qrFore}
+                        />
+                      );
+                    })
+                  )}
+                </svg>
+              </div>
+              {(config.qrCaption ?? "").trim() ? (
+                <div
+                  style={{
+                    marginTop: mm(14),
+                    fontSize: mm(Math.max(10, subSize * 0.55)),
+                    fontWeight: 600,
+                    letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                    color: headlineInk,
+                  }}
+                >
+                  {config.qrCaption}
+                </div>
+              ) : null}
+  </div>
   ) : null;
 
   return (
@@ -271,66 +333,21 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
 
         <div style={{ flex: 1 }} />
 
-        {qr ? (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div
-              style={{
-                width: qrEdge,
-                height: qrEdge,
-                background: qrBack,
-                borderRadius: mm(4),
-                padding: 0,
-              }}
-            >
-              <svg
-                width={qrEdge}
-                height={qrEdge}
-                viewBox={`0 0 ${qr.size} ${qr.size}`}
-                shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
-                aria-hidden
-              >
-                <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrBack} />
-                {qrStyle === "block" ? (
-                  <path d={qr.path} fill={qrFore} />
-                ) : (
-                  qr.modules.map((on, i) => {
-                    if (!on) return null;
-                    const cx = i % qr.size;
-                    const cy = Math.floor(i / qr.size);
-                    return qrStyle === "dot" ? (
-                      <circle key={i} cx={cx + 0.5} cy={cy + 0.5} r={0.5} fill={qrFore} />
-                    ) : (
-                      <rect
-                        key={i}
-                        x={cx + 0.06}
-                        y={cy + 0.06}
-                        width={0.88}
-                        height={0.88}
-                        rx={0.24}
-                        fill={qrFore}
-                      />
-                    );
-                  })
-                )}
-              </svg>
-            </div>
-            {(config.qrCaption ?? "").trim() ? (
-              <div
-                style={{
-                  marginTop: mm(14),
-                  fontSize: mm(Math.max(10, subSize * 0.55)),
-                  fontWeight: 600,
-                  letterSpacing: "0.06em",
-                  textTransform: "uppercase",
-                  color: headlineInk,
-                }}
-              >
-                {config.qrCaption}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+        {qr && !qrPlace.placed ? qrBlock : null}
       </div>
+
+      {qr && qrPlace.placed ? (
+        <div
+          style={{
+            position: "absolute",
+            left: mm(geo.bleedEdge + qrPlace.x),
+            top: mm(geo.bleedEdge + qrPlace.y),
+            width: qrEdge,
+          }}
+        >
+          {qrBlock}
+        </div>
+      ) : null}
 
       {guides ? (
         <>
