@@ -16,6 +16,8 @@ import {
   pillarStops,
   type PillarConfig,
 } from "@/lib/next-pillar-masters";
+import { pillarArrowPath } from "@/lib/pillar-arrows";
+import { PILLAR_LOGO_DROP } from "@/lib/next-pillar-masters";
 import { buildPillarQr } from "@/lib/pillar-qr";
 
 type Props = {
@@ -55,6 +57,11 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const gradientId = `pillar-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
   const inset = mm(geo.bleedEdge + geo.safeInset);
   const lockupW = mm(geo.trimW * 0.58 * pillarLockupScale(config));
+
+  const linkLines =
+    config.kind === "logo"
+      ? [config.logoUrl ?? "", config.logoSocial ?? ""].map((v) => v.trim()).filter(Boolean)
+      : [];
 
   const qr = buildPillarQr(config.qrData ?? "");
   const qrEdge = mm(Math.min(pillarQrSize(config), geo.trimW - geo.safeInset * 2));
@@ -143,7 +150,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          justifyContent: config.kind === "logo" ? "center" : "flex-start",
+          justifyContent: "flex-start",
           textAlign: "center",
           color: ink,
         }}
@@ -158,8 +165,32 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               height: lockupW / (division.ratio || 1.7),
               objectFit: "contain",
               display: "block",
+              // Logo-only pillars sit a quarter of the column lower than the
+              // headline pillars, leaving the space under the mark for a URL.
+              marginTop: config.kind === "logo" ? mm(geo.trimH * PILLAR_LOGO_DROP) : 0,
             }}
           />
+        ) : null}
+
+        {config.kind === "logo" && (linkLines.length || subLine) ? (
+          <div style={{ marginTop: mm(Math.max(30, subSize * 1.2)), width: "100%" }}>
+            {config.subheadline?.trim() ? subLine : null}
+            {linkLines.map((line, i) => (
+              <div
+                key={`${line}-${i}`}
+                style={{
+                  marginTop: mm(i === 0 ? 18 : 10),
+                  fontWeight: 600,
+                  letterSpacing: "0.04em",
+                  lineHeight: 1.2,
+                  fontSize: mm(subSize * (i === 0 ? 1 : 0.82)),
+                  color: headlineInk,
+                }}
+              >
+                {line}
+              </div>
+            ))}
+          </div>
         ) : null}
 
         {config.kind === "logo" ? null : vertical ? (
@@ -227,7 +258,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               viewBox="0 0 100 100"
               aria-hidden
             >
-              <path d="M8 42 H62 V22 L94 50 L62 78 V58 H8 Z" fill={headlineInk} />
+              <path d={pillarArrowPath(config.arrowStyle)} fill={headlineInk} />
             </svg>
           </div>
         ) : null}

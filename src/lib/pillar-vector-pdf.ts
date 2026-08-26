@@ -54,6 +54,8 @@ import {
   pillarSubSize,
   type PillarConfig,
 } from "./next-pillar-masters";
+import { PILLAR_LOGO_DROP } from "./next-pillar-masters";
+import { pillarArrowStyle } from "./pillar-arrows";
 import { buildPillarQr } from "./pillar-qr";
 
 const MM_TO_PT = 72 / 25.4;
@@ -368,7 +370,8 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   const lockupW = trimW * 0.58 * pillarLockupScale(config);
   const lockupH = lockupW / (division.ratio || 1.7);
   const isLogoOnly = config.kind === "logo";
-  const lockupTop = isLogoOnly ? trimY + trimH / 2 + lockupH / 2 : safeTop;
+  // Logo-only pillars drop a quarter of the column, mirroring the live sign.
+  const lockupTop = isLogoOnly ? safeTop - trimH * PILLAR_LOGO_DROP : safeTop;
   let lockupVector = false;
 
   if (config.showLockup) {
@@ -461,6 +464,27 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     endLayer(page);
   }
 
+  if (isLogoOnly) {
+    const lines = [subline, (config.logoUrl || "").trim(), (config.logoSocial || "").trim()].filter(Boolean);
+    if (lines.length) {
+      beginLayer(page, layer("04 Sub-line"));
+      let y = lockupTop - lockupH - Math.max(mm(30), subSize * 1.2) - subSize;
+      lines.forEach((line, i) => {
+        const size = i === 0 ? subSize : subSize * 0.9;
+        const width = regular.widthOfTextAtSize(line, size);
+        page.drawText(line, {
+          x: centerX - width / 2,
+          y,
+          size,
+          font: regular,
+          color: rgb(...hexRgb(headlineInk)),
+        });
+        y -= size * 1.7;
+      });
+      endLayer(page);
+    }
+  }
+
   // ── 05 Arrow ───────────────────────────────────────────────────────────────
   if (config.kind === "directional") {
     const edge = mm(Math.min(300, geo.trimW * 0.5));
@@ -469,20 +493,20 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     const cy = top - edge / 2;
     // Arrow geometry from the live sign, centred on the column and rotated about
     // its own centre so every direction sits on the same axis as the copy.
-    const glyph: [number, number][] = [
-      [8, 42], [62, 42], [62, 22], [94, 50], [62, 78], [62, 58], [8, 58],
-    ];
     const rad = (rotation * Math.PI) / 180;
-    const pts = glyph.map(([gx, gy]) => {
-      const lx = (gx - 50) * (edge / 100);
-      const ly = (50 - gy) * (edge / 100);
-      return [
-        centerX + lx * Math.cos(rad) - ly * Math.sin(rad),
-        cy + lx * Math.sin(rad) + ly * Math.cos(rad),
-      ] as [number, number];
-    });
+    const draw = (glyph: [number, number][]) =>
+      glyph.map(([gx, gy]) => {
+        const lx = (gx - 50) * (edge / 100);
+        const ly = (50 - gy) * (edge / 100);
+        return [
+          centerX + lx * Math.cos(rad) - ly * Math.sin(rad),
+          cy + lx * Math.sin(rad) + ly * Math.cos(rad),
+        ] as [number, number];
+      });
     beginLayer(page, layer("05 Arrow"));
-    polygon(page, pts, hexRgb(headlineInk));
+    for (const poly of pillarArrowStyle(config.arrowStyle).polys) {
+      polygon(page, draw(poly), hexRgb(headlineInk));
+    }
     endLayer(page);
   }
 

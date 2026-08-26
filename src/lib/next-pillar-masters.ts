@@ -101,6 +101,8 @@ export const PILLAR_DIVISIONS = CITY_BADGE_DIVISIONS;
 export const pillarDivision = cityBadgeDivision;
 
 
+import type { PillarArrowStyleId } from "./pillar-arrows";
+
 export type PillarKindId = "welcome" | "registration" | "logo" | "directional";
 
 export type PillarKind = {
@@ -175,6 +177,13 @@ export function pillarKind(id: string | undefined): PillarKind {
   return PILLAR_KINDS.find((k) => k.id === id) ?? PILLAR_KINDS[0]!;
 }
 
+export { PILLAR_ARROW_STYLES, pillarArrowStyle, pillarArrowPath } from "./pillar-arrows";
+export type { PillarArrowStyleId } from "./pillar-arrows";
+
+/** General logo pillars drop the lockup a quarter of the way down the column so
+ * the mark sits below eye-line clutter and leaves room for a URL / socials. */
+export const PILLAR_LOGO_DROP = 0.25;
+
 export type PillarArrow = "left" | "right" | "up" | "down";
 
 export const PILLAR_ARROWS: { id: PillarArrow; label: string }[] = [
@@ -245,6 +254,12 @@ export type PillarConfig = {
   styleId: string;
   headline: string;
   arrow: PillarArrow;
+  /** Arrow silhouette for directional pillars. */
+  arrowStyle: PillarArrowStyleId;
+  /** Optional URL printed under the lockup on a general logo pillar. */
+  logoUrl: string;
+  /** Optional social handles / hashtag line under the logo pillar URL. */
+  logoSocial: string;
   showLockup: boolean;
   /** Approved gradient face: full-saturation dark, or the light tint. */
   face: PillarFaceId;
@@ -285,6 +300,9 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     styleId: kind.defaultStyle,
     headline: kind.headline,
     arrow: "right",
+    arrowStyle: "solid",
+    logoUrl: "",
+    logoSocial: "",
     showLockup: true,
     face: "dark",
     verticalHeadline: true,
