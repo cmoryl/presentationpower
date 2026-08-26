@@ -481,6 +481,25 @@ export function AgentDeckPreview({
                 </div>
               );
             })}
+            {buildState?.building &&
+              Array.from({ length: Math.max(0, buildState.total - slides.length) }, (_, k) => (
+                <div
+                  key={`pending-${k}`}
+                  aria-hidden="true"
+                  className="overflow-hidden rounded-lg border border-dashed border-[#003FC7]/30"
+                >
+                  <div
+                    className="flex w-full animate-pulse flex-col items-center justify-center gap-1.5 bg-[#003FC7]/[0.05]"
+                    style={{ aspectRatio: "16 / 9", minHeight: 60 }}
+                  >
+                    <span className="h-2 w-2 animate-ping rounded-full bg-[#003FC7]/60" />
+                    <span className="text-[9px] font-semibold uppercase tracking-widest text-[#003FC7]/60">
+                      Slide {slides.length + k + 1}
+                    </span>
+                  </div>
+                  <div className="px-2 py-1 font-mono text-[9px] text-foreground/30">building…</div>
+                </div>
+              ))}
           </div>
         )}
       </div>
