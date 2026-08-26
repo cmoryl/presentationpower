@@ -34,6 +34,14 @@ export interface TextRun {
   w: number;
   h: number;
   text: string;
+  /**
+   * True when the element's untrimmed direct text began/ended with whitespace.
+   * `text` itself is trimmed, so without these flags a real word gap between
+   * two sibling fragments ("business " + "review") is lost on export and
+   * PowerPoint renders "businessreview".
+   */
+  leadWs: boolean;
+  trailWs: boolean;
   /** Rendered pixel font size at stage scale. */
   fontSizePx: number;
   fontFamily: string;
@@ -223,6 +231,16 @@ function directText(el: Element): string {
   return out.replace(/\s+/g, " ").trim();
 }
 
+/** Boundary whitespace of the untrimmed direct text (lost by `trim()`). */
+function directTextBoundaryWs(el: Element): { lead: boolean; trail: boolean } {
+  let out = "";
+  el.childNodes.forEach((n) => {
+    if (n.nodeType === Node.TEXT_NODE) out += n.textContent ?? "";
+  });
+  const collapsed = out.replace(/\s+/g, " ");
+  return { lead: /^\s/.test(collapsed), trail: /\s$/.test(collapsed) };
+}
+
 /**
  * Measure every visible text run inside a settled export stage.
  * Runs are returned in DOM order (paint order), in stage pixel space.
@@ -316,12 +334,15 @@ export function extractTextRuns(
       }
     }
 
+    const ws = directTextBoundaryWs(el);
     runs.push({
       x,
       y,
       w,
       h,
       text: applyTransform(text, cs.textTransform),
+      leadWs: ws.lead,
+      trailWs: ws.trail,
       fontSizePx,
       fontFamily: firstFamily(cs.fontFamily),
       bold: Number.isFinite(weight) ? weight >= 600 : /bold/i.test(cs.fontWeight),

@@ -158,6 +158,14 @@ const NATIVE_SET = new Set<string>(NATIVE_EMITTER_VARIANT_IDS);
  * PowerPoint objects. That is both faithful AND editable.
  */
 export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
+  // The KPI dashboard on screen is a bento mosaic (hero tile, ring gauge,
+  // sparkline, bar tiles); the hand-written renderer still draws a uniform
+  // card grid with a bottom gauge, so sizing and layout diverge on export.
+  "MV-KPI-DASHBOARD",
+  // The media cover on screen is a full-bleed photo/plate with a scrim and
+  // glass-free type; the hand-written renderer paints a gradient band plus a
+  // light glass panel, so exports came out light with low-contrast titles.
+  "MV-OP-COVER-MEDIA",
   "MV-CLOSE-CTA",
   "MV-CLOSE-DUAL-CTA",
   "MV-CLOSE-CONTACT",

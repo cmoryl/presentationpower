@@ -136,6 +136,15 @@ function continuation(a: MergedTextBlock, b: MergedTextBlock): boolean {
  */
 export function mergeTextRuns(runs: TextRun[]): MergedTextBlock[] {
   const usable = runs.filter((r) => r.text.trim());
+  // A whitespace-only run sitting between two fragments is a real word gap
+  // ("business" + " " + "review"): mark the following run so placement
+  // re-inserts the space that `trim()` would otherwise erase.
+  runs.forEach((r, i) => {
+    if (r.text.trim() || i === 0) return;
+    const next = runs.slice(i + 1).find((n) => n.text.trim());
+    const prev = [...runs.slice(0, i)].reverse().find((n) => n.text.trim());
+    if (next && prev && sameLine(prev, next)) next.leadWs = true;
+  });
   // Pass 1 — same-line runs.
   const lines: MergedTextBlock[] = [];
   let current: TextRun[] = [];
