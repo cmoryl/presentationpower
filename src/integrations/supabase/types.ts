@@ -2542,6 +2542,42 @@ export type Database = {
         }
         Relationships: []
       }
+      next_agenda_versions: {
+        Row: {
+          config: Json
+          created_at: string
+          division_id: string
+          event_label: string
+          id: string
+          name: string
+          notes: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          config: Json
+          created_at?: string
+          division_id?: string
+          event_label?: string
+          id?: string
+          name: string
+          notes?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          division_id?: string
+          event_label?: string
+          id?: string
+          name?: string
+          notes?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       next_city_badge_versions: {
         Row: {
           city_label: string

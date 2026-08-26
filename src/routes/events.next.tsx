@@ -439,7 +439,19 @@ function Hero({
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </Link>
+            <Link
+              to="/events/next/agendas"
+              search={{ division: undefined }}
+              className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
+            >
+              <span>
+                <span className="font-medium">Division agendas</span> · editable agenda boards, A4 to
+                A1, every division
+              </span>
+              <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+            </Link>
           </div>
+
 
         </div>
       </div>
@@ -796,10 +808,20 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
             <IdCard size={13} /> {division.eventName} attendee badge
             <ArrowRight size={13} />
           </Link>
+          <Link
+            to="/events/next/agendas"
+            search={{ division: division.id }}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+          >
+            <CalendarDays size={13} /> {division.eventName} agenda board
+            <ArrowRight size={13} />
+          </Link>
           <span className="text-xs text-muted-foreground">
             Approved City Series artwork with the division lockup, dark + light faces, print-ready
-            at 4.58″ × 6.55″ bleed.
+            at 4.58″ × 6.55″ bleed. The agenda board is fully editable per division and exports as
+            layered vector art.
           </span>
+
         </div>
       </div>
     </section>
