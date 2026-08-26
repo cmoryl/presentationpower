@@ -33,6 +33,7 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const face = config.face ?? "dark";
   const ink = pillarInk(face);
   const stops = pillarStops(config.styleId, face);
+  const vertical = Boolean(config.verticalHeadline) && config.kind !== "logo";
   const division = pillarDivision(config.divisionId);
   const isHalo = config.styleId.includes("halo");
   const gradientId = `pillar-${face}-${config.styleId.replace(/[^a-z0-9]/gi, "")}`;
