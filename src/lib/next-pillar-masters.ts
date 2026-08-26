@@ -520,10 +520,10 @@ export function pillarQrPlateColor(config: PillarConfig): string {
   if (!pillarQrTransparent(config)) return pillarQrBackground(config);
   const stops = pillarStops(config.styleId, pillarFace(config.face).id);
   let best = stops[0] ?? "#003FC7";
-  let bestRatio = -1;
+  let bestRatio = Number.POSITIVE_INFINITY;
   for (const s of stops) {
     const r = pillarContrastRatio(pillarQrForeground(config), s);
-    if (r > bestRatio) continue;
+    if (r >= bestRatio) continue;
     bestRatio = r;
     best = s;
   }
