@@ -199,6 +199,44 @@ type LockupArt =
   | { kind: "raster"; bytes: Uint8Array; png: boolean }
   | null;
 
+/** Every drawable shape in a mono lockup SVG, normalised to path data.
+ * Illustrator exports mix <path>, <polygon>, <polyline> and <rect>; taking only
+ * <path> silently dropped whole letters from the wordmark. */
+export function extractSvgPaths(svg: string): string[] {
+  const out: string[] = [];
+  for (const m of svg.matchAll(/<path[^>]*\sd\s*=\s*["']([^"']+)["']/gi)) out.push(m[1]!);
+  for (const m of svg.matchAll(/<(polygon|polyline)[^>]*\spoints\s*=\s*["']([^"']+)["']/gi)) {
+    const nums = m[2]!.trim().split(/[\s,]+/).map(Number).filter((n) => Number.isFinite(n));
+    if (nums.length < 6) continue;
+    const parts: string[] = [];
+    for (let i = 0; i + 1 < nums.length; i += 2) {
+      parts.push(`${i === 0 ? "M" : "L"}${nums[i]} ${nums[i + 1]}`);
+    }
+    out.push(`${parts.join(" ")} Z`);
+  }
+  for (const m of svg.matchAll(/<rect\b[^>]*>/gi)) {
+    const attr = (name: string) => Number(new RegExp(`\\s${name}\\s*=\\s*["']([-0-9.]+)`, "i").exec(m[0]!)?.[1]);
+    const x = attr("x") || 0;
+    const y = attr("y") || 0;
+    const w = attr("width");
+    const h = attr("height");
+    if (!Number.isFinite(w) || !Number.isFinite(h)) continue;
+    out.push(`M${x} ${y} H${x + w} V${y + h} H${x} Z`);
+  }
+  for (const m of svg.matchAll(/<(circle|ellipse)\b[^>]*>/gi)) {
+    const attr = (name: string) => Number(new RegExp(`\\s${name}\\s*=\\s*["']([-0-9.]+)`, "i").exec(m[0]!)?.[1]);
+    const cx = attr("cx") || 0;
+    const cy = attr("cy") || 0;
+    const rx = Number.isFinite(attr("r")) ? attr("r") : attr("rx");
+    const ry = Number.isFinite(attr("r")) ? attr("r") : attr("ry");
+    if (!Number.isFinite(rx) || !Number.isFinite(ry)) continue;
+    out.push(
+      `M${cx - rx} ${cy} A${rx} ${ry} 0 1 0 ${cx + rx} ${cy} A${rx} ${ry} 0 1 0 ${cx - rx} ${cy} Z`,
+    );
+  }
+  return out;
+}
+
 async function loadLockup(url: string): Promise<LockupArt> {
   if (!url) return null;
   try {
@@ -210,7 +248,7 @@ async function loadLockup(url: string): Promise<LockupArt> {
       const svg = new TextDecoder().decode(buf);
       const box = /viewBox\s*=\s*["']([^"']+)["']/i.exec(svg)?.[1] ?? "";
       const nums = box.split(/[\s,]+/).map(Number).filter((n) => Number.isFinite(n));
-      const paths = [...svg.matchAll(/<path[^>]*\sd\s*=\s*["']([^"']+)["']/gi)].map((m) => m[1]!);
+      const paths = extractSvgPaths(svg);
       if (paths.length && nums.length === 4) {
         return { kind: "svg", paths, viewBox: nums as [number, number, number, number] };
       }
