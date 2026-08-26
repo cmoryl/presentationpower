@@ -31,7 +31,7 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
   const ink = agendaInk(face);
   const titleInk = agendaTitleInk(config);
   const division = agendaDivision(config.divisionId);
-  const stops = agendaStops(config.styleId, face);
+  const stops = agendaStops(config.styleId, face, config.divisionId);
   const isHalo = config.styleId.includes("halo");
   const ramp = isHalo ? [...stops].reverse() : stops;
   const qr = buildPillarQr(config.qrData ?? "");

@@ -94,7 +94,7 @@ export async function exportAgendaSheet(opts: {
   const wantPx = geo.bleedW * MM_TO_IN * PROOF_PPI;
   const canvas = await captureAssetCanvas(
     { node, width: nativeWidth, height: nativeHeight, label: "NEXT division agenda" },
-    { scale: Math.max(0.4, wantPx / nativeWidth), background: agendaStops(config.styleId, config.face)[0]! },
+    { scale: Math.max(0.4, wantPx / nativeWidth), background: agendaStops(config.styleId, config.face, config.divisionId)[0]! },
   );
   const proofBlob: Blob = await new Promise((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");

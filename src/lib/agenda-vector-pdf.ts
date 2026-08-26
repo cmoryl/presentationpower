@@ -227,7 +227,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   const face = config.face ?? "dark";
   const ink = agendaInk(face);
   const titleInk = agendaTitleInk(config);
-  const stops = agendaStops(config.styleId, face);
+  const stops = agendaStops(config.styleId, face, config.divisionId);
 
   const bleedW = geo.bleedW * MM_TO_PT;
   const bleedH = geo.bleedH * MM_TO_PT;
