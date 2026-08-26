@@ -462,17 +462,6 @@ function gradientRgb(stops: string[], t: number): [number, number, number] {
   return a.map((channel, i) => channel + (b[i]! - channel) * mix) as [number, number, number];
 }
 
-function ellipsePath(cx: number, cy: number, rx: number, ry: number): string {
-  const k = 0.5522847498;
-  return [
-    `${f3(cx + rx)} ${f3(cy)} m`,
-    `${f3(cx + rx)} ${f3(cy + k * ry)} ${f3(cx + k * rx)} ${f3(cy + ry)} ${f3(cx)} ${f3(cy + ry)} c`,
-    `${f3(cx - k * rx)} ${f3(cy + ry)} ${f3(cx - rx)} ${f3(cy + k * ry)} ${f3(cx - rx)} ${f3(cy)} c`,
-    `${f3(cx - rx)} ${f3(cy - k * ry)} ${f3(cx - k * rx)} ${f3(cy - ry)} ${f3(cx)} ${f3(cy - ry)} c`,
-    `${f3(cx + k * rx)} ${f3(cy - ry)} ${f3(cx + rx)} ${f3(cy - k * ry)} ${f3(cx + rx)} ${f3(cy)} c h`,
-  ].join(" ");
-}
-
 /**
  * Rebuild a panel's `.ai` from its specification. Illustrator's native format
  * is PDF-compatible. The gradient is a single Gouraud mesh (PDF Shading
