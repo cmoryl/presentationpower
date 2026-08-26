@@ -115,7 +115,53 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
           />
         ) : null}
 
-        {config.kind === "logo" ? null : (
+        {config.kind === "logo" ? null : vertical ? (
+          <div
+            style={{
+              marginTop: mm(120),
+              flex: 1,
+              minHeight: 0,
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: mm(46),
+            }}
+          >
+            {config.headline.trim() ? (
+              <div
+                style={{
+                  writingMode: "vertical-rl",
+                  transform: "rotate(180deg)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.01em",
+                  lineHeight: 1,
+                  fontSize: mm(150),
+                  textTransform: "uppercase",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {config.headline}
+              </div>
+            ) : null}
+            {config.subline.trim() ? (
+              <div
+                style={{
+                  writingMode: "vertical-rl",
+                  transform: "rotate(180deg)",
+                  fontWeight: 500,
+                  fontSize: mm(44),
+                  lineHeight: 1.25,
+                  letterSpacing: "0.02em",
+                  opacity: 0.92,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {config.subline}
+              </div>
+            ) : null}
+          </div>
+        ) : (
           <div style={{ marginTop: mm(140), width: "100%" }}>
             {config.headline.trim() ? (
               <div
