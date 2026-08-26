@@ -284,7 +284,7 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
         authorizedAccentOverride: true,
         title: "Approve the Q4 scale plan",
         body:
-          "Use the retail case-study playbook to expand AI-assisted workflows across the next wave of priority accounts.",
+          "Repeat the retail case-study result — three weeks to four days across 14 markets — by expanding AI-assisted workflows to the next wave of priority accounts.",
         ctaLabel: "Greenlight Q4 rollout",
         ctaDetail: "Pilot scope ready this week.",
         owner: "GlobalLink account team",
