@@ -288,6 +288,85 @@ export function AgentDeckPreview({
         </p>
       )}
 
+      {buildState?.building && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="border-b border-[#003FC7]/25 bg-[#003FC7]/[0.06] px-4 py-3"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-[#003FC7]">
+              Building deck — {buildState.done} of {buildState.total} slides
+            </p>
+            <span className="flex items-center gap-1.5 text-[10px] font-medium text-foreground/50">
+              <span
+                className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#003FC7]"
+                aria-hidden="true"
+              />
+              {buildState.currentLabel ? `Now: ${buildState.currentLabel}` : "Finishing up…"}
+            </span>
+          </div>
+          <div
+            className="mt-2 h-1.5 overflow-hidden rounded-full bg-foreground/10"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={buildState.total}
+            aria-valuenow={buildState.done}
+            aria-label="Deck build progress"
+          >
+            <div
+              className="h-full rounded-full bg-[#003FC7] transition-all duration-500 ease-out"
+              style={{ width: `${Math.round((buildState.done / buildState.total) * 100)}%` }}
+            />
+          </div>
+          <ol className="mt-2.5 space-y-1">
+            {Array.from({ length: buildState.total }, (_, i) => {
+              const revealed = slides[i];
+              const state = revealed ? "done" : i === buildState.done ? "active" : "pending";
+              const label = revealed ? slideLabel(revealed, i) : `Slide ${i + 1}`;
+              return (
+                <li key={i} className="flex items-center gap-2 text-[11px]">
+                  {state === "done" ? (
+                    <span
+                      aria-hidden="true"
+                      className="flex h-4 w-4 items-center justify-center rounded-full bg-[#003FC7] text-[9px] font-bold text-white"
+                    >
+                      ✓
+                    </span>
+                  ) : state === "active" ? (
+                    <span
+                      aria-hidden="true"
+                      className="h-4 w-4 animate-spin rounded-full border-2 border-[#003FC7]/30 border-t-[#003FC7]"
+                    />
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className="h-4 w-4 rounded-full border border-foreground/20"
+                    />
+                  )}
+                  <span
+                    className={
+                      state === "done"
+                        ? "truncate font-medium text-foreground/80"
+                        : state === "active"
+                          ? "truncate font-medium text-[#003FC7]"
+                          : "truncate text-foreground/35"
+                    }
+                  >
+                    {state === "pending" ? label : `${i + 1}. ${label}`}
+                  </span>
+                  {revealed && (
+                    <span className="ml-auto shrink-0 font-mono text-[9px] text-foreground/35">
+                      {revealed.variantId}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      )}
+
       <div className="min-h-0 flex-1 overflow-auto p-4">
         {current && currentVariant ? (
           <button
