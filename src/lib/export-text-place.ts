@@ -121,9 +121,10 @@ export function placeTextRuns(
         if (prev) {
           const gap = run.x - (prev.x + prev.w);
           const em = Math.max(prev.fontSizePx, run.fontSizePx);
-          // Either the DOM kept the whitespace (trimmed away by `describeTextRun`)
-          // or the fragments simply sit apart on the measured line.
-          const rawSpace = /\s$/.test(prev.text) || /^\s/.test(run.text);
+          // The DOM kept the whitespace (recorded as flags at extraction, since
+          // run text is trimmed) or the fragments simply sit apart on the line.
+          const rawSpace =
+            prev.trailWs || run.leadWs || /\s$/.test(prev.text) || /^\s/.test(run.text);
           if (rawSpace || gap > em * 0.06) return { ...p, text: ` ${p.text}` };
         }
         return p;
