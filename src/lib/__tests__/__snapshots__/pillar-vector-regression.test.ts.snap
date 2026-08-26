@@ -1,0 +1,137 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`pillar vector export regression > keeps the Illustrator-safe vector structure for directional-chevron 1`] = `
+{
+  "boxes": {
+    "bleed": true,
+    "media": true,
+    "trim": true,
+  },
+  "clips": 1,
+  "fillOps": 1,
+  "fontsEmbedded": 0,
+  "layers": [
+    "01 Ground",
+    "02 Lockup",
+    "03 Headline",
+    "04 Sub-line",
+    "05 Arrow",
+    "06 QR code",
+    "07 Guides + marks",
+  ],
+  "legacyShading": 0,
+  "meshShading": 2,
+  "page": "1891x5815pt",
+  "pdfVersion": "%PDF-1.7",
+  "pdfx": {
+    "conformance": undefined,
+    "defaultRgb": undefined,
+    "outputIntent": "sRGB IEC61966-2.1",
+  },
+  "rasterImages": 0,
+  "subsetFont": false,
+  "textShowOps": 1,
+}
+`;
+
+exports[`pillar vector export regression > keeps the Illustrator-safe vector structure for logo-with-qr 1`] = `
+{
+  "boxes": {
+    "bleed": true,
+    "media": true,
+    "trim": true,
+  },
+  "clips": 1,
+  "fillOps": 560,
+  "fontsEmbedded": 0,
+  "layers": [
+    "01 Ground",
+    "02 Lockup",
+    "03 Headline",
+    "04 Sub-line",
+    "05 Arrow",
+    "06 QR code",
+    "07 Guides + marks",
+  ],
+  "legacyShading": 0,
+  "meshShading": 2,
+  "page": "1891x5815pt",
+  "pdfVersion": "%PDF-1.7",
+  "pdfx": {
+    "conformance": undefined,
+    "defaultRgb": undefined,
+    "outputIntent": "sRGB IEC61966-2.1",
+  },
+  "rasterImages": 0,
+  "subsetFont": false,
+  "textShowOps": 1,
+}
+`;
+
+exports[`pillar vector export regression > keeps the Illustrator-safe vector structure for registration-light 1`] = `
+{
+  "boxes": {
+    "bleed": true,
+    "media": true,
+    "trim": true,
+  },
+  "clips": 1,
+  "fillOps": 0,
+  "fontsEmbedded": 0,
+  "layers": [
+    "01 Ground",
+    "02 Lockup",
+    "03 Headline",
+    "04 Sub-line",
+    "05 Arrow",
+    "06 QR code",
+    "07 Guides + marks",
+  ],
+  "legacyShading": 0,
+  "meshShading": 2,
+  "page": "1891x5815pt",
+  "pdfVersion": "%PDF-1.7",
+  "pdfx": {
+    "conformance": undefined,
+    "defaultRgb": undefined,
+    "outputIntent": "sRGB IEC61966-2.1",
+  },
+  "rasterImages": 0,
+  "subsetFont": false,
+  "textShowOps": 1,
+}
+`;
+
+exports[`pillar vector export regression > keeps the Illustrator-safe vector structure for welcome-dark-vertical 1`] = `
+{
+  "boxes": {
+    "bleed": true,
+    "media": true,
+    "trim": true,
+  },
+  "clips": 1,
+  "fillOps": 0,
+  "fontsEmbedded": 0,
+  "layers": [
+    "01 Ground",
+    "02 Lockup",
+    "03 Headline",
+    "04 Sub-line",
+    "05 Arrow",
+    "06 QR code",
+    "07 Guides + marks",
+  ],
+  "legacyShading": 0,
+  "meshShading": 2,
+  "page": "1891x5815pt",
+  "pdfVersion": "%PDF-1.7",
+  "pdfx": {
+    "conformance": undefined,
+    "defaultRgb": undefined,
+    "outputIntent": "sRGB IEC61966-2.1",
+  },
+  "rasterImages": 0,
+  "subsetFont": false,
+  "textShowOps": 1,
+}
+`;
