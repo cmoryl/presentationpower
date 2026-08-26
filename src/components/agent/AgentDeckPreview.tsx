@@ -20,6 +20,7 @@ import { DESIGN_SKINS } from "@/lib/design-skins";
 import { skinPackId } from "@/lib/design-skin-pack";
 import { auditVisualData } from "@/lib/agent/visual-data-gaps";
 import { isPersistableDeckId } from "@/lib/agent/threads";
+import { useDeckBuildState } from "@/lib/agent/build-progress";
 import { useDeckStore } from "@/lib/deck-store";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -66,6 +67,7 @@ export function AgentDeckPreview({
   const localDeck = useDeckStore(
     useCallback((state) => (deckId ? state.decks[deckId] : undefined), [deckId]),
   );
+  const buildState = useDeckBuildState(deckId);
   const setDeckContext = useDeckStore((state) => state.setDeckContext);
 
   const openEnlarged = useCallback((i: number) => {
