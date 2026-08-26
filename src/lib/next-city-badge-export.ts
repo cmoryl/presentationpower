@@ -69,6 +69,7 @@ function readme(config: CityBadgeConfig, name: string, dpi: number): string {
     `TransPerfect NEXT — City Series attendee badge`,
     `Version: ${name}`,
     ``,
+    `Division track: ${cityBadgeDivision(config.divisionId).name}`,
     `Artwork face:   ${config.face === "light" ? "LIGHT (diagonal aqua)" : "DARK (chevron ascent)"}`,
     `Trim:           ${BADGE_SPEC.trimW}in x ${BADGE_SPEC.trimH}in`,
     `Bleed:          ${BADGE_SPEC.bleedW}in x ${BADGE_SPEC.bleedH}in (${BADGE_SPEC.bleed}in per edge)`,

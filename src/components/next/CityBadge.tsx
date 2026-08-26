@@ -5,6 +5,7 @@ import {
   SAFE_INSET_X,
   SAFE_INSET_Y,
   cityBadgeFace,
+  cityBadgeLockup,
   type CityBadgeConfig,
 } from "@/lib/next-city-badge";
 
@@ -25,6 +26,7 @@ type Props = {
  */
 export function CityBadge({ config, ppi = 96, guides = false, style, className }: Props) {
   const face = cityBadgeFace(config.face);
+  const lockup = cityBadgeLockup(config.divisionId);
   const px = (inches: number) => inches * ppi;
   const w = px(BADGE_SPEC.bleedW);
   const h = px(BADGE_SPEC.bleedH);
@@ -79,6 +81,22 @@ export function CityBadge({ config, ppi = 96, guides = false, style, className }
           gap: 10 * scale,
         }}
       >
+        {config.showLockup && lockup.url ? (
+          <img
+            src={lockup.url}
+            alt=""
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: px(1.5),
+              height: px(1.5) / lockup.ratio,
+              objectFit: "contain",
+              display: "block",
+            }}
+          />
+        ) : null}
         {eventLine ? (
           <div
             style={{
