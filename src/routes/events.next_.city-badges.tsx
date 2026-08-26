@@ -230,7 +230,7 @@ function CityBadgePage() {
                       <img
                         src={face.artwork}
                         alt={face.label}
-                        className="h-28 w-full rounded-lg object-cover"
+                        className="h-32 w-full rounded-lg bg-[#03002C] object-contain"
                         loading="lazy"
                       />
                       <div className="mt-2 text-xs font-semibold text-[#03002C]">{face.label}</div>
