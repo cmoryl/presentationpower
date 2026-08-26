@@ -24,9 +24,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
-    "conformance": undefined,
-    "defaultRgb": undefined,
     "outputIntent": "sRGB IEC61966-2.1",
+    "outputIntentSpace": "RGB",
   },
   "rasterImages": 0,
   "subsetFont": false,
@@ -58,9 +57,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
-    "conformance": undefined,
-    "defaultRgb": undefined,
     "outputIntent": "sRGB IEC61966-2.1",
+    "outputIntentSpace": "RGB",
   },
   "rasterImages": 0,
   "subsetFont": false,
@@ -92,9 +90,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
-    "conformance": undefined,
-    "defaultRgb": undefined,
     "outputIntent": "sRGB IEC61966-2.1",
+    "outputIntentSpace": "RGB",
   },
   "rasterImages": 0,
   "subsetFont": false,
@@ -126,9 +123,8 @@ exports[`pillar vector export regression > keeps the Illustrator-safe vector str
   "page": "1891x5815pt",
   "pdfVersion": "%PDF-1.7",
   "pdfx": {
-    "conformance": undefined,
-    "defaultRgb": undefined,
     "outputIntent": "sRGB IEC61966-2.1",
+    "outputIntentSpace": "RGB",
   },
   "rasterImages": 0,
   "subsetFont": false,

@@ -58,7 +58,7 @@ type Fingerprint = {
   fillOps: number;
   clips: number;
   pdfVersion: string;
-  pdfx: { conformance: string; outputIntent: boolean; defaultRgb: boolean };
+  pdfx: { outputIntent: string; outputIntentSpace: string };
 };
 
 function fingerprint(result: PillarVectorResult): Fingerprint {
@@ -83,9 +83,8 @@ function fingerprint(result: PillarVectorResult): Fingerprint {
     clips: bucket(count(ops, /\bW\s+n\b/g)),
     pdfVersion: raw.slice(0, 8),
     pdfx: {
-      conformance: result.pdfx.conformance,
       outputIntent: result.pdfx.outputIntent,
-      defaultRgb: result.pdfx.defaultRgb,
+      outputIntentSpace: result.pdfx.outputIntentSpace,
     },
   };
 }
