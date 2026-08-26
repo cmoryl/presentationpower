@@ -579,22 +579,31 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       }
     }
     if (caption) {
+      // Match the live preview exactly: case, weight, tracking and alignment.
       const text = captionFont.uppercase ? caption.toUpperCase() : caption;
       const font = captionFont.id === "regular" ? regular : bold;
-      const width = font.widthOfTextAtSize(text, captionSize);
-      const x =
+      const track = captionFont.tracking * captionSize;
+      const chars = [...text];
+      const width =
+        chars.reduce((sum, ch) => sum + font.widthOfTextAtSize(ch, captionSize) + track, 0) - track;
+      const startX =
         place.captionAlign === "left"
           ? qrLeft
           : place.captionAlign === "right"
             ? qrLeft + edge - width
             : qrLeft + edge / 2 - width / 2;
-      page.drawText(text, {
-        x,
-        y: qrY - mm(place.captionPad) - captionSize,
-        size: captionSize,
-        font,
-        color: rgb(...hexRgb(headlineInk)),
-      });
+      const captionY = qrY - mm(place.captionPad) - captionSize;
+      let cursor = startX;
+      for (const ch of chars) {
+        page.drawText(ch, {
+          x: cursor,
+          y: captionY,
+          size: captionSize,
+          font,
+          color: rgb(...hexRgb(headlineInk)),
+        });
+        cursor += font.widthOfTextAtSize(ch, captionSize) + track;
+      }
     }
     endLayer(page);
     qrBottom = qrY + edge;
