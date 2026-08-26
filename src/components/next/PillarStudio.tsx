@@ -48,6 +48,8 @@ import {
   pillarLockupScale,
   pillarName,
   pillarQrBackground,
+  pillarQrPlateColor,
+  pillarQrTransparent,
   pillarQrForeground,
   pillarQrScanSafe,
   pillarQrSize,
@@ -1189,10 +1191,26 @@ export function PillarStudio({
                   </div>
                 </div>
 
+                <label className="flex items-start gap-2 rounded-lg border border-black/10 px-3 py-2">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5"
+                    checked={pillarQrTransparent(config)}
+                    onChange={(e) => set("qrTransparent", e.target.checked)}
+                  />
+                  <span className="text-[11px] leading-snug text-black/70">
+                    <span className="font-semibold text-[#03002C]">Transparent background</span> —
+                    drop the plate and print just the code modules over the gradient. Keep the ink
+                    contrasty against the ground so it still scans.
+                  </span>
+                </label>
+
                 {(
                   [
                     ["Ink colour", "qrForeground", pillarQrForeground(config)],
-                    ["Plate colour", "qrBackground", pillarQrBackground(config)],
+                    ...(pillarQrTransparent(config)
+                      ? []
+                      : ([["Plate colour", "qrBackground", pillarQrBackground(config)]] as const)),
                   ] as const
                 ).map(([labelText, key, current]) => (
                   <div key={key}>
@@ -1227,7 +1245,7 @@ export function PillarStudio({
                 {pillarQrScanSafe(config) ? (
                   <p className="rounded-lg bg-[#A6FA87]/30 px-3 py-2 text-[11px] font-medium text-[#03002C]">
                     Scan-safe · contrast{" "}
-                    {pillarContrastRatio(pillarQrForeground(config), pillarQrBackground(config)).toFixed(1)}
+                    {pillarContrastRatio(pillarQrForeground(config), pillarQrPlateColor(config)).toFixed(1)}
                     :1 · error-correction H · quiet zone included. Encoded live from the payload and
                     drawn as vector modules, so the printed code is 100% scannable.
                   </p>
@@ -1235,7 +1253,7 @@ export function PillarStudio({
                   <div className="rounded-lg bg-[#FFEB66]/40 px-3 py-2 text-[11px] text-[#03002C]">
                     <p>
                       Low contrast (
-                      {pillarContrastRatio(pillarQrForeground(config), pillarQrBackground(config)).toFixed(1)}
+                      {pillarContrastRatio(pillarQrForeground(config), pillarQrPlateColor(config)).toFixed(1)}
                       :1 — needs {PILLAR_QR_MIN_CONTRAST}:1). This pairing may not scan in the
                       hall.
                     </p>
@@ -1244,6 +1262,7 @@ export function PillarStudio({
                       onClick={() => {
                         set("qrForeground", "");
                         set("qrBackground", "");
+                        set("qrTransparent", false);
                       }}
                       className="mt-2 rounded-lg border border-[#003FC7] px-3 py-1.5 font-medium text-[#003FC7]"
                     >

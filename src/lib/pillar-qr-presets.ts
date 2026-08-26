@@ -31,6 +31,8 @@ export type PillarQrPreset = {
   qrCaptionSize: number;
   qrCaptionAlign: PillarCaptionAlign;
   qrCaptionPad: number;
+  /** Plate dropped so only the code modules print. */
+  qrTransparent?: boolean;
   qrOffsetX: number | null;
   qrOffsetY: number | null;
   /** Fractions of the trim sheet, so the preset survives a footprint change. */
@@ -93,6 +95,7 @@ export function savePillarQrPreset(name: string, config: PillarConfig): PillarQr
     qrCaptionSize: Number(config.qrCaptionSize) > 0 ? Number(config.qrCaptionSize) : 0,
     qrCaptionAlign: pillarCaptionAlign(config),
     qrCaptionPad: pillarCaptionPad(config),
+    qrTransparent: config.qrTransparent === true,
     qrOffsetX: x,
     qrOffsetY: y,
     fracX: typeof x === "number" ? x / trim.w : null,
@@ -150,6 +153,8 @@ export function applyPillarQrPreset(config: PillarConfig, preset: PillarQrPreset
     qrCaptionPad: Number.isFinite(preset.qrCaptionPad)
       ? Number(preset.qrCaptionPad)
       : config.qrCaptionPad,
+    qrTransparent:
+      typeof preset.qrTransparent === "boolean" ? preset.qrTransparent : config.qrTransparent,
     qrOffsetX: x,
     qrOffsetY: y,
   };
