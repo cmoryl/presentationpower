@@ -15,6 +15,8 @@
 // -----------------------------------------------------------------------------
 
 import { BADGE_SPEC, SAFE_INSET_X, SAFE_INSET_Y } from "@/lib/next-badge";
+import { NEXT_DIVISIONS } from "@/lib/next-brand-guide";
+import { nextLockupSuite } from "@/lib/next-event-logos";
 import faceDark from "@/assets/next-city-badge/citynext-badge-face-dark.png.asset.json";
 import faceLight from "@/assets/next-city-badge/citynext-badge-face-light.png.asset.json";
 import sourceAi from "@/assets/next-city-badge/citynext-badge.ai.asset.json";
@@ -72,6 +74,48 @@ export function cityBadgeFace(id: string | undefined): CityBadgeFace {
   return CITY_BADGE_FACES.find((f) => f.id === id) ?? CITY_BADGE_FACES[0]!;
 }
 
+// ---------------------------------------------------------------------------
+// NEXT division tracks. The badge artwork, geometry and typesetting stay
+// identical across the programme — only the NEXT lockup changes, so every
+// division area (GlobalLink NEXT, Legal NEXT, Games NEXT …) gets its own live
+// file off the same approved template.
+// ---------------------------------------------------------------------------
+
+export type CityBadgeDivision = {
+  id: string;
+  name: string;
+  /** Stacked lockup URLs + aspect ratio, per colourway. */
+  colorUrl: string;
+  whiteUrl: string;
+  ratio: number;
+};
+
+export const CITY_BADGE_DIVISIONS: CityBadgeDivision[] = NEXT_DIVISIONS.map((div) => {
+  const suite = nextLockupSuite(div.id);
+  return {
+    id: div.id,
+    name: div.name,
+    colorUrl: suite?.stacked.url ?? "",
+    whiteUrl: suite?.stackedWhite.url ?? suite?.stacked.url ?? "",
+    ratio: suite?.stacked.ratio ?? 1.7,
+  };
+}).filter((d) => d.colorUrl || d.whiteUrl);
+
+export function cityBadgeDivision(id: string | undefined): CityBadgeDivision {
+  return (
+    CITY_BADGE_DIVISIONS.find((d) => d.id === id) ??
+    CITY_BADGE_DIVISIONS.find((d) => d.id === "city-series") ??
+    CITY_BADGE_DIVISIONS[0]!
+  );
+}
+
+/** Lockup artwork for a division on a given face — white on the dark and
+ *  aqua-blue fields, full colour only where the ground is near-white. */
+export function cityBadgeLockup(divisionId: string | undefined): { url: string; ratio: number } {
+  const div = cityBadgeDivision(divisionId);
+  return { url: div.whiteUrl || div.colorUrl, ratio: div.ratio };
+}
+
 /** The originals, kept downloadable so production can work from source. */
 export const CITY_BADGE_SOURCE = {
   ai: sourceAi.url,
@@ -94,6 +138,10 @@ export const CITY_BADGE_ROLES = [
  */
 export type CityBadgeConfig = {
   face: CityBadgeFaceId;
+  /** NEXT division track whose lockup prints on the badge. */
+  divisionId: string;
+  /** Print the division lockup at the head of the badge. */
+  showLockup: boolean;
   cityLabel: string;
   datesLabel: string;
   venueLabel: string;
@@ -109,6 +157,8 @@ export type CityBadgeConfig = {
 
 export const CITY_BADGE_DEFAULT: CityBadgeConfig = {
   face: "dark",
+  divisionId: "city-series",
+  showLockup: true,
   cityLabel: "City Series",
   datesLabel: "2026 season",
   venueLabel: "",
@@ -126,6 +176,8 @@ export function normalizeCityBadgeConfig(input: unknown): CityBadgeConfig {
   const str = (v: unknown, fallback: string) => (typeof v === "string" ? v : fallback);
   return {
     face: raw.face === "light" ? "light" : "dark",
+    divisionId: cityBadgeDivision(typeof raw.divisionId === "string" ? raw.divisionId : undefined).id,
+    showLockup: raw.showLockup !== false,
     cityLabel: str(raw.cityLabel, CITY_BADGE_DEFAULT.cityLabel),
     datesLabel: str(raw.datesLabel, CITY_BADGE_DEFAULT.datesLabel),
     venueLabel: str(raw.venueLabel, ""),
