@@ -635,11 +635,19 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   }
   endLayer(page);
 
+  // PDF/X-4 identification: output intent, tagged colour, XMP. Runs last so it
+  // sees every page resource we created above.
+  const x4 = await applyPdfX4(doc, {
+    title: `NEXT pillar — ${config.kind} — ${pillarDivision(config.divisionId).name}`,
+    creator: "TransPerfect Element — NEXT pillar studio",
+  });
+
   const bytes = await doc.save({ useObjectStreams: false });
   return {
     bytes: bytes as Uint8Array<ArrayBuffer>,
     layers: names,
     lockupVector,
     page: { widthPt: pageW, heightPt: pageH },
+    pdfx: x4,
   };
 }
