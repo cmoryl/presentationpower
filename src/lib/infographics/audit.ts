@@ -333,7 +333,7 @@ export function auditVizSpec(spec: InfographicSpec, opts: AuditOptions = {}): Vi
         fix: "Give every category a short, human label — never leave one blank.",
       });
     }
-    if (!seriesKey) {
+    if (!seriesKey && !DENSE_KINDS.has(spec.kind)) {
       const seen = new Set<string>();
       const dupes = new Set<string>();
       for (const l of labels) {
@@ -351,6 +351,7 @@ export function auditVizSpec(spec: InfographicSpec, opts: AuditOptions = {}): Vi
         });
       }
     }
+
     const longest = labels.reduce((a, b) => (b.length > a.length ? b : a), "");
     if (longest.length > limits.labelChars) {
       add({
