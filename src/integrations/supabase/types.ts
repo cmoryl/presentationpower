@@ -2506,6 +2506,54 @@ export type Database = {
         }
         Relationships: []
       }
+      next_city_badge_versions: {
+        Row: {
+          city_label: string
+          config: Json
+          created_at: string
+          created_by: string
+          dates_label: string
+          face: string
+          id: string
+          name: string
+          notes: string
+          role_label: string
+          status: string
+          updated_at: string
+          venue_label: string
+        }
+        Insert: {
+          city_label?: string
+          config?: Json
+          created_at?: string
+          created_by?: string
+          dates_label?: string
+          face?: string
+          id?: string
+          name: string
+          notes?: string
+          role_label?: string
+          status?: string
+          updated_at?: string
+          venue_label?: string
+        }
+        Update: {
+          city_label?: string
+          config?: Json
+          created_at?: string
+          created_by?: string
+          dates_label?: string
+          face?: string
+          id?: string
+          name?: string
+          notes?: string
+          role_label?: string
+          status?: string
+          updated_at?: string
+          venue_label?: string
+        }
+        Relationships: []
+      }
       notification_prefs: {
         Row: {
           created_at: string
