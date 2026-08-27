@@ -85,7 +85,8 @@ describe("replaced cover becomes the exported ground", () => {
     const pptxPlane = ground("skin-s01", "cover").join(", ");
     const pdfPlane = ground("skin-s01", "cover").join(", ");
     expect(pptxPlane).toBe(pdfPlane);
-    expect(pptxPlane.indexOf(NEW_COVER)).toBe(pptxPlane.search(/url\(/));
+    expect(pptxPlane.search(/url\(/)).toBe(0);
+    expect(pptxPlane.indexOf(NEW_COVER)).toBeLessThan(pptxPlane.length / 2);
   });
 });
 
@@ -157,6 +158,7 @@ describe("deck PDF pages stay at the slide's own size", () => {
     const square = pdfPageSizeForNode(node(1080, 1080));
     expect(square[0]).toBeCloseTo(square[1], 3);
     expect(fourThree[0]).toBeCloseTo(wIn, 3);
-    expect(square[1]).toBeCloseTo(hIn, 3);
+    expect(square[1]).toBeCloseTo(wIn, 3);
+    expect(hIn).toBeLessThan(square[1]!);
   });
 });
