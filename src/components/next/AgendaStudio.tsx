@@ -95,6 +95,7 @@ export function AgendaStudio({
   const plateRef = useRef<HTMLDivElement | null>(null);
 
   const signedIn = useSignedIn();
+  const { canEdit: canEditDivision, isLoading: canEditLoading } = useCanEditNextDivision(config.divisionId);
   const qc = useQueryClient();
   const list = useServerFn(listAgendaFiles);
   const create = useServerFn(saveAgendaFile);
