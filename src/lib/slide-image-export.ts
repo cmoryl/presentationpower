@@ -186,7 +186,7 @@ export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> 
     // stall a capture. Collect only what the node actually uses instead.
     fontEmbedCssPromise = (async () => {
       const local = localFontFaceCSS();
-      const remote = ""; void remoteFontEmbedCSS; void node;
+      const remote = await withFallbackTimeout(remoteFontEmbedCSS(node), 10_000, "");
       const css = [local, remote].filter(Boolean).join("\n");
       // A non-null string is what stops html-to-image re-embedding on every
       // capture; the marker keeps that true even with no embeddable webfont.
