@@ -350,7 +350,7 @@ function CityBadgePage() {
                   />
                 </label>
                 <label className={label}>
-                  Role band
+                  Attendee tier
                   <select
                     className={`mt-1 ${field}`}
                     value={config.roleLabel}
