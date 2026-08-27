@@ -151,14 +151,15 @@ function CityBadgePage() {
           <ArrowLeft size={13} /> NEXT 2026 hub
         </Link>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#03002C]">
-          City Series attendee badge
+          NEXT attendee badge
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-relaxed text-black/60">
-          Both supplied faces are approved artwork, run full bleed on the{" "}
-          {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ dual-slot plastic template with the BLE Klik
-          cutout. Choose the face per print run, typeset the event and attendee copy inside the safe
-          area, then save the run and export PDF, an Illustrator twin and a proof PNG.
+          One general NEXT badge for every area. Both supplied faces are approved artwork, run full
+          bleed on the {BADGE_SPEC.trimW}″ × {BADGE_SPEC.trimH}″ dual-slot plastic template with the
+          BLE Klik cutout. Swap the head mark for any division logo — front and back — pick the
+          attendee tier, then export PDF, an Illustrator twin and a proof PNG.
         </p>
+
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
           {/* Live plate */}
