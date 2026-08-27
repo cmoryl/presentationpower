@@ -101,7 +101,11 @@ async function remoteFontEmbedCSS(node: HTMLElement): Promise<string> {
       }
     });
 
-  const blocks: string[] = [];
+  // Hard caps: Google's CJK sheets carry hundreds of unicode-range subsets per
+  // family, and inlining all of them would take minutes and megabytes. Latin
+  // subsets are what the plates actually need.
+  const MAX_BLOCKS = 24;
+  const candidates: string[] = [];
   for (const href of hrefs) {
     let text = "";
     try {
@@ -115,16 +119,43 @@ async function remoteFontEmbedCSS(node: HTMLElement): Promise<string> {
       const block = match[0];
       const family = /font-family:\s*['"]?([^;'"]+)['"]?/.exec(block)?.[1]?.trim();
       if (!family || !families.has(family)) continue;
+      const range = /unicode-range:\s*([^;]+)/.exec(block)?.[1] ?? "";
+      // Keep the latin subset only (no range declared = single-subset font).
+      if (range && !/U\+0000-00FF|U\+0-00?FF/i.test(range)) continue;
+      candidates.push(block);
+      if (candidates.length >= MAX_BLOCKS) break;
+    }
+    if (candidates.length >= MAX_BLOCKS) break;
+  }
+
+  const resolvedBlocks = await Promise.all(
+    candidates.map(async (block) => {
       const urls = Array.from(block.matchAll(/url\((https?:\/\/[^)]+)\)/g)).map((m) => m[1]!);
       let resolved = block;
       for (const url of urls) {
         const data = await fontAsDataUrl(url);
         if (data) resolved = resolved.split(url).join(data);
       }
-      if (resolved.includes("data:font")) blocks.push(resolved);
-    }
-  }
-  return blocks.join("\n");
+      return resolved.includes("data:font") ? resolved : "";
+    }),
+  );
+  return resolvedBlocks.filter(Boolean).join("\n");
+}
+
+function withTimeout<T>(work: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise<T>((resolve) => {
+    const timer = setTimeout(() => resolve(fallback), ms);
+    work.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      () => {
+        clearTimeout(timer);
+        resolve(fallback);
+      },
+    );
+  });
 }
 
 export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> {
@@ -137,7 +168,8 @@ export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> 
       })
       .then(async (css) => {
         if (css.includes("@font-face")) return css;
-        const remote = await remoteFontEmbedCSS(node).catch(() => "");
+        // Never let webfont inlining hold an export hostage.
+        const remote = await withTimeout(remoteFontEmbedCSS(node), 10_000, "");
         // A non-empty string is what stops html-to-image re-embedding on every
         // capture; the marker keeps that true even with no embeddable webfont.
         return remote ? `${css}\n${remote}` : `${css}\n/* no embeddable webfonts */`;
