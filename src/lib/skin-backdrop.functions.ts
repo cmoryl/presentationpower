@@ -33,9 +33,26 @@ export interface SkinBackdropRow {
   prompt: string;
 }
 
-function publicUrlFor(path: string): string {
-  return `/api/public/skin-backdrop?path=${encodeURIComponent(path)}`;
+/**
+ * Public proxy URL for a stored backdrop.
+ *
+ * Replacements upsert to the SAME storage path, so the URL alone is stable and
+ * every browser, thumbnail and CDN edge happily keeps serving the OLD artwork
+ * after an admin replaces a cover. The `v` stamp is the content version: it
+ * changes on every upload/re-render, which is what actually retires the old
+ * bytes everywhere they were cached.
+ */
+function publicUrlFor(path: string, version: number = Date.now()): string {
+  return `/api/public/skin-backdrop?path=${encodeURIComponent(path)}&v=${version}`;
 }
+
+/** Guarantee a version stamp on rows written before versioning existed. */
+function versionedUrl(url: string, createdAt?: string | null): string {
+  if (/[?&]v=/.test(url)) return url;
+  const stamp = createdAt ? Date.parse(createdAt) || 0 : 0;
+  return `${url}${url.includes("?") ? "&" : "?"}v=${stamp}`;
+}
+
 
 export const generateSkinBackdrop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -120,7 +137,7 @@ export const listSkinBackdrops = createServerFn({ method: "GET" }).handler(
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
       .from("skin_backdrops")
-      .select("skin_code, scene, take, image_url, prompt")
+      .select("skin_code, scene, take, image_url, prompt, created_at")
       .order("created_at", { ascending: false })
       .limit(1000);
     if (error) return [];
@@ -128,7 +145,7 @@ export const listSkinBackdrops = createServerFn({ method: "GET" }).handler(
       skinCode: r.skin_code,
       scene: r.scene,
       take: r.take,
-      imageUrl: r.image_url,
+      imageUrl: versionedUrl(r.image_url, r.created_at),
       prompt: r.prompt,
     }));
   },

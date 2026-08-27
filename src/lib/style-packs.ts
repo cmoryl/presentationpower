@@ -2483,10 +2483,15 @@ export function packGroundPaint(pack: StylePack, seed: string): string[] {
   const layers = pack.ground(seed);
   const base = isCuratedGroundPack(pack) ? layers : minimalPackLayers(layers);
   // A REPLACED background (background directory → "Edit / replace backgrounds")
-  // is the skin's ground from that moment on: it paints in front of the
-  // procedural scene on every surface that renders through this function —
-  // slide stage, library cards, pack thumbnails, raster and PPTX/PDF exports.
-  // Without this, a replaced S01 cover only showed inside the editor.
+  // REPLACES the skin's ground from that moment on: it is the only artwork that
+  // paints on every surface rendering through this function — slide stage,
+  // library cards, pack thumbnails, raster and PPTX/PDF exports.
+  //
+  // It replaces rather than overlays on purpose. Keeping the authored
+  // procedural scene beneath let its translucent gradients and grids read
+  // through the new photo, so one look appeared to be "three templates in one".
+  // Only a flat base colour is kept underneath, so any transparent PNG still
+  // lands on the skin's own paper instead of nothing.
   const id = String(pack.id ?? "");
   if (/^skin-[sr]\d{2}$/i.test(id)) {
     const url = skinBackdropOverride(
@@ -2494,8 +2499,15 @@ export function packGroundPaint(pack: StylePack, seed: string): string[] {
       sceneFromSeed(seed),
       sceneTakeFromSeed(seed).take,
     );
-    if (url) return [`url("${url}") center center / cover no-repeat`, ...base];
+    if (url) {
+      const flatBase = base.filter((l) => /^(#|rgb|hsl)/i.test(l.trim()));
+      return [
+        `url("${url}") center center / cover no-repeat`,
+        ...(flatBase.length ? flatBase : [pack.tokens.surface]),
+      ];
+    }
   }
+
   return base;
 }
 

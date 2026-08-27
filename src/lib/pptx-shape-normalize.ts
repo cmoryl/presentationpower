@@ -24,7 +24,7 @@
 import type PptxGenJS from "pptxgenjs";
 import { EXPORT_RADIUS_IN, pillRadiusIn, rectRadiusAdj } from "@/lib/export-radius";
 import type { BackdropSampler } from "@/lib/export-glass-crop";
-import { chartTheme } from "@/lib/export-chart-theme";
+import { chartTheme, sparklineTheme, isSparklineBox } from "@/lib/export-chart-theme";
 
 import { GLASS_CROP_MAX_PER_SLIDE, GLASS_CROP_MIN_IN, glassBlurPx } from "@/lib/export-glass-crop";
 import {
@@ -357,7 +357,14 @@ export function withDesignSurfaces(
       // data slide exports looking like its on-screen counterpart.
       if (key === "addChart") {
         return (type: unknown, data: unknown, opts2?: Record<string, unknown>) => {
-          const merged = { ...chartTheme({ dark }), ...(opts2 ?? {}) };
+          const o = (opts2 ?? {}) as Record<string, unknown>;
+          // Sparkline-scale charts get the chrome-free grammar LAST: call sites
+          // that only hid the axes would still export Office's default
+          // gridlines and markers over a graphic that has neither on screen.
+          const spark = isSparklineBox(num(o.w), num(o.h));
+          const merged = spark
+            ? { ...chartTheme({ dark }), ...o, ...sparklineTheme({ dark }) }
+            : { ...chartTheme({ dark }), ...o };
           return (value as (t: unknown, d: unknown, p: unknown) => unknown).call(
             target,
             type,

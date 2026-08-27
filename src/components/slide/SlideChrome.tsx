@@ -37,7 +37,11 @@ import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 import { SceneDebugOverlay } from "@/components/slide/SceneDebugOverlay";
 import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
-import { sceneTakeFromSeed, useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
+import {
+  sceneTakeFromSeed,
+  skinBackdropOverride,
+  useSkinBackdropVersion,
+} from "@/lib/skin-backdrop-overrides";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
@@ -455,11 +459,26 @@ export function SlideFrame({
     : `scene:${packScene} ${moduleSeed ?? ""} ${layoutId ?? variant}`;
   // Same take the ground plane paints, so a replacement saved for an alternate
   // composition (Take B/C/D) is the one that shows here.
-  const aiBackdrop = useSkinBackdropImage(
+  const aiBackdropRendered = useSkinBackdropImage(
     pack?.id ?? null,
     packScene,
     sceneTakeFromSeed(groundSeed).take,
   );
+  // REPLACED BACKGROUND WINS OUTRIGHT.
+  // When an admin replaces this skin/scene's artwork, that image IS the page:
+  // the AI backdrop, the procedural scaffold, the signature motif, the calm
+  // veil and the grain are all suppressed, and the plate paints unmasked at
+  // full strength. Layering the authored scene under/over the replacement is
+  // what made one updated look read as "three templates in one".
+  const replacedGround =
+    !!pack &&
+    /^skin-[sr]\d{2}$/i.test(String(pack.id)) &&
+    !!skinBackdropOverride(
+      String(pack.id).replace(/^skin-/i, "").toUpperCase(),
+      packScene,
+      sceneTakeFromSeed(groundSeed).take,
+    );
+  const aiBackdrop = replacedGround ? null : aiBackdropRendered;
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
   // mode. That override predates mode-aware ink tokens and breaks light-mode
@@ -897,10 +916,12 @@ export function SlideFrame({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background: packGroundPaint(pack, groundSeed).join(", "),
-                  opacity: authoredPlateGround ? 1 : packGroundDamp(pack, groundSeed),
-                  maskImage: groundMask,
-                  WebkitMaskImage: groundMask,
-                  ...(authoredPlateGround && calm.filter
+                  opacity: replacedGround || authoredPlateGround
+                    ? 1
+                    : packGroundDamp(pack, groundSeed),
+                  maskImage: replacedGround ? undefined : groundMask,
+                  WebkitMaskImage: replacedGround ? undefined : groundMask,
+                  ...(!replacedGround && authoredPlateGround && calm.filter
                     ? {
                         filter: calm.filter,
                         // Scale past the frame so the blur doesn't feather in
@@ -913,7 +934,7 @@ export function SlideFrame({
               />
               {/* 2b — calm veil: field-coloured wash concentrated over the
                   reading zone; the outer frame keeps the plate's texture. */}
-              {authoredPlateGround && calm.veilAlpha > 0 && (
+              {!replacedGround && authoredPlateGround && calm.veilAlpha > 0 && (
                 <div
                   aria-hidden
                   data-decorative="true"
@@ -928,7 +949,9 @@ export function SlideFrame({
                 />
               )}
 
-              {/* 3 — scaffold: page structure for this composition. */}
+              {/* 3 — scaffold: page structure for this composition. Suppressed
+                  under a replaced background so no old template lines survive. */}
+              {!replacedGround && (
               <div
                 aria-hidden
                 data-decorative="true"
@@ -939,6 +962,7 @@ export function SlideFrame({
                   ),
                 }}
               />
+              )}
             </>
           );
         })()}
@@ -949,7 +973,7 @@ export function SlideFrame({
         (() => {
           // Tiled signature motifs are wallpaper; the minimal direction keeps
           // only non-repeating gestures.
-          if (authoredPlateGround) return null;
+          if (replacedGround || authoredPlateGround) return null;
           const sig = packSignature(pack);
           if (!sig) return null;
           const tiled =
@@ -973,7 +997,7 @@ export function SlideFrame({
           );
         })()}
 
-      {packOwnsGround && pack && pack.grain > 0 && (
+      {packOwnsGround && pack && !replacedGround && pack.grain > 0 && (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
