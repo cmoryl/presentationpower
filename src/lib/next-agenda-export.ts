@@ -11,6 +11,8 @@ import JSZip from "jszip";
 
 import { captureAssetCanvas } from "./asset-export";
 import { buildAgendaVectorPdf } from "./agenda-vector-pdf";
+import { buildAgendaDocx } from "./next-agenda-docx";
+
 import {
   AGENDA_SPEC,
   agendaDivision,
@@ -35,9 +37,14 @@ export type AgendaExportResult = {
   layers: string[];
 };
 
-function readme(config: AgendaConfig, vector: Awaited<ReturnType<typeof buildAgendaVectorPdf>>): string {
+function readme(
+  config: AgendaConfig,
+  vector: Awaited<ReturnType<typeof buildAgendaVectorPdf>>,
+  wordNotes: string[] = [],
+): string {
   const geo = agendaGeometry(config);
   const qr = (config.qrData ?? "").trim();
+
   return [
     `TransPerfect NEXT — division agenda`,
     `Asset:           ${agendaName(config)}`,
@@ -70,10 +77,15 @@ function readme(config: AgendaConfig, vector: Awaited<ReturnType<typeof buildAge
     ``,
     `pdf/    press file. Art runs to the bleed edge; crop marks sit in the slug.`,
     `ai/     the same layered artwork with an .ai extension for Illustrator.`,
+    wordNotes.length
+      ? `word/   editable Microsoft Word version — flattened approved ground behind live text.`
+      : `word/   not included (Word build unavailable in this browser).`,
     geo.isScreen
       ? `screen/ ${geo.pxW} x ${geo.pxH} px sRGB PNG, ready to load on the display.`
       : `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
     ``,
+    ...(wordNotes.length ? ["Word file:", ...wordNotes.map((n) => `  - ${n}`), ``] : []),
+
     `Palette and geometry are fixed across every NEXT division area — only the`,
     `approved division lockup and the programme copy change.`,
   ].join("\n");
@@ -111,16 +123,23 @@ export async function exportAgendaSheet(opts: {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");
   });
 
+  opts.onProgress?.({ stage: "package", label: "Building the editable Word file" });
+  const word = await buildAgendaDocx(config).catch(() => null);
+
   opts.onProgress?.({ stage: "package", label: "Packaging the zip" });
   const zip = new JSZip();
   zip.file(`pdf/${slug}.pdf`, pdfBuffer);
   zip.file(`ai/${slug}.ai`, pdfBuffer);
+  if (word) {
+    zip.file(`word/${slug}.docx`, await word.blob.arrayBuffer());
+  }
   if (screen) {
     zip.file(`screen/${slug}-${geo.pxW}x${geo.pxH}.png`, await proofBlob.arrayBuffer());
   } else {
     zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
   }
-  zip.file("READ-ME.txt", readme(config, vector));
+  zip.file("READ-ME.txt", readme(config, vector, word?.notes ?? []));
+
 
   const blob = await zip.generateAsync({ type: "blob" });
 

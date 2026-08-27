@@ -2,10 +2,10 @@
 // division: programme rows, formats, dark / light faces, real QR codes, saved
 // live files and layered vector press export for Illustrator.
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowDown, ArrowUp, Download, Plus, Save, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Download, FileText, Plus, Save, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
@@ -15,7 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCanEditNextDivision } from "@/hooks/use-next-edit-permission";
+import { announceNextMasterSaved } from "@/hooks/use-next-live-masters";
+
 import { exportAgendaSheet } from "@/lib/next-agenda-export";
+import { agendaFit } from "@/lib/next-agenda-fit";
+import { buildAgendaDocx } from "@/lib/next-agenda-docx";
+
+
 import {
   deleteAgendaFile,
   listAgendaFiles,
@@ -37,7 +43,9 @@ import {
   agendaGeometry,
   agendaName,
   agendaProgramme,
+  agendaSlug,
   agendaStyleLabel,
+
   normalizeAgendaConfig,
   withAgendaDivision,
   type AgendaConfig,
@@ -75,12 +83,15 @@ export function AgendaStudio({
   heading = "NEXT division agenda",
   intro = "The approved NEXT agenda master, live for every division area. Edit the programme, pick the format and face, add a scannable QR code, save the live file and export layered vector art for print and Illustrator.",
   initialConfig,
+  initialFileId,
 }: {
   divisionId?: string;
   heading?: string;
   intro?: string;
   /** Seed the editor with a prepared board (demo asset, saved master, etc.). */
   initialConfig?: AgendaConfig;
+  /** Open directly onto a saved live file so Save becomes Update. */
+  initialFileId?: string | null;
 }) {
   const [config, setConfig] = useState<AgendaConfig>(
     () => initialConfig ?? agendaDefault(divisionId),
@@ -91,8 +102,23 @@ export function AgendaStudio({
   const [busy, setBusy] = useState(false);
   const [customEvent, setCustomEvent] = useState("");
   const [fileName, setFileName] = useState("");
-  const [openFileId, setOpenFileId] = useState<string | null>(null);
+  const [openFileId, setOpenFileId] = useState<string | null>(initialFileId ?? null);
   const plateRef = useRef<HTMLDivElement | null>(null);
+
+  // Follow the host when it points the studio at a different saved live file.
+  useEffect(() => {
+    if (initialFileId === undefined) return;
+    setOpenFileId(initialFileId ?? null);
+  }, [initialFileId]);
+
+  // Re-seed the board when the host swaps in a different prepared config.
+  const seededRef = useRef<AgendaConfig | undefined>(initialConfig);
+  useEffect(() => {
+    if (!initialConfig || seededRef.current === initialConfig) return;
+    seededRef.current = initialConfig;
+    setConfig(initialConfig);
+  }, [initialConfig]);
+
 
   const signedIn = useSignedIn();
   const { canEdit: canEditDivision, isLoading: canEditLoading } = useCanEditNextDivision(config.divisionId);
@@ -126,6 +152,7 @@ export function AgendaStudio({
       if (saved?.id) setOpenFileId(saved.id);
       if (saved?.name) setFileName(saved.name);
       void qc.invalidateQueries({ queryKey: ["next-agenda-files"] });
+      announceNextMasterSaved("agenda");
       toast.success(openFileId ? "Agenda file updated" : "Agenda file saved");
     },
     onError: (e: Error) => toast.error("Could not save", { description: e.message }),
@@ -139,6 +166,8 @@ export function AgendaStudio({
         setFileName("");
       }
       void qc.invalidateQueries({ queryKey: ["next-agenda-files"] });
+      announceNextMasterSaved("agenda");
+
       toast.success("Agenda file deleted");
     },
     onError: (e: Error) => toast.error("Could not delete", { description: e.message }),
@@ -164,6 +193,12 @@ export function AgendaStudio({
     });
 
   const geo = agendaGeometry(config);
+
+  // Live page-size + overflow read, recomputed on every keystroke so the editor
+  // behaves like the other print areas.
+  const fit = useMemo(() => agendaFit(config), [config]);
+  const overRows = useMemo(() => new Set(fit.lines.map((l) => l.index)), [fit.lines]);
+
   // Fit the sheet to the viewer on both edges, scaling small formats (A4) up and
   // wide screen formats (16:9, 21:9) down, so every format fills the review area.
   const fitScale = Math.min(
@@ -201,6 +236,25 @@ export function AgendaStudio({
       });
     } catch (e) {
       toast.error("Export failed", { id, description: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const runWordExport = async () => {
+    setBusy(true);
+    const id = toast.loading("Building the editable Word file…");
+    try {
+      const { blob, notes } = await buildAgendaDocx(config);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `next-agenda-${agendaSlug(config)}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Word file downloaded", { id, description: notes[0] });
+    } catch (e) {
+      toast.error("Word export failed", { id, description: (e as Error).message });
     } finally {
       setBusy(false);
     }
@@ -521,6 +575,11 @@ export function AgendaStudio({
               <Download className="mr-2 h-4 w-4" />
               {busy ? "Exporting…" : "Export print package"}
             </Button>
+            <Button variant="outline" onClick={runWordExport} disabled={busy}>
+              <FileText className="mr-2 h-4 w-4" />
+              Export editable Word
+            </Button>
+
             <Button
               variant="secondary"
               disabled={signedIn !== true || saveMutation.isPending || !canEditDivision || canEditLoading}
@@ -542,10 +601,64 @@ export function AgendaStudio({
         </div>
       </div>
 
+      {/* live page fit — same page-size + overflow awareness as the other print areas */}
+      <section
+        aria-labelledby="agenda-fit"
+        className={`rounded-xl border p-4 ${
+          fit.status === "over"
+            ? "border-destructive/50 bg-destructive/5"
+            : fit.status === "tight"
+              ? "border-amber-500/50 bg-amber-500/5"
+              : "border-border bg-muted/30"
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 id="agenda-fit" className="text-sm font-semibold tracking-tight">
+              Page fit · {geo.sizeName} · {geo.trimW}×{geo.trimH} mm
+            </h2>
+            <p className="mt-1 text-xs text-muted-foreground">{fit.summary}</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium">
+              {Math.round(fit.usedFraction * 100)}% of band · {fit.rowH.toFixed(1)} mm rows
+            </span>
+            <span className="rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-medium">
+              capacity {fit.maxRows} rows
+            </span>
+            {fit.suggestSizeId && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => set("sizeId", fit.suggestSizeId as AgendaConfig["sizeId"])}
+              >
+                Use {fit.suggestSizeName}
+              </Button>
+            )}
+          </div>
+        </div>
+        {fit.lines.length > 0 && (
+          <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
+            {fit.lines.slice(0, 6).map((line, i) => (
+              <li key={`${line.index}-${line.field}-${i}`}>
+                Row {line.index + 1} {line.field} runs {line.overMm} mm past its column — trim about{" "}
+                {line.trimChars} character{line.trimChars === 1 ? "" : "s"}.
+              </li>
+            ))}
+            {fit.lines.length > 6 && <li>+{fit.lines.length - 6} more lines past their column.</li>}
+          </ul>
+        )}
+      </section>
+
       {/* programme rows */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Programme — {config.sessions.length} rows</h2>
+          <h2 className="text-lg font-semibold">
+            Programme — {config.sessions.length} rows
+            <span className="ml-2 text-xs font-normal text-muted-foreground">
+              of {fit.maxRows} that fit {geo.sizeName}
+            </span>
+          </h2>
           <Button
             variant="secondary"
             size="sm"
@@ -561,7 +674,13 @@ export function AgendaStudio({
         </div>
         <div className="space-y-2">
           {config.sessions.map((session, i) => (
-            <div key={i} className="grid gap-2 rounded-lg border border-border p-3 md:grid-cols-[90px_1fr_1fr_120px_auto]">
+            <div
+              key={i}
+              className={`grid gap-2 rounded-lg border p-3 md:grid-cols-[90px_1fr_1fr_120px_auto] ${
+                overRows.has(i) ? "border-destructive/60 bg-destructive/5" : "border-border"
+              } ${i >= fit.maxRows ? "opacity-70" : ""}`}
+            >
+
               <Input
                 aria-label={`Row ${i + 1} time`}
                 value={session.time}
