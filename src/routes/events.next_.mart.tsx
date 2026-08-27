@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { PillarSign } from "@/components/next/PillarSign";
 import { MartBundleExport } from "@/components/next/MartBundleExport";
 import { MART_LAYOUT_PRESETS } from "@/lib/next-mart-layouts";
+import { martArtwork, martFlatArtworkId, martFlatMasters } from "@/lib/next-mart-placement";
 import { PILLAR_SIZES, pillarKind } from "@/lib/next-pillar-masters";
 import {
   NEXT_MART,
@@ -335,9 +336,57 @@ function MartPage() {
             </table>
           </div>
           <p className="mt-3 inline-flex items-center gap-1.5 text-[12px] text-black/50">
-            <Ruler size={13} /> Send us the mart working files and we will place your artwork on
-            these masters and add batch print export per size.
+            <Ruler size={13} /> Every flat panel below is a live master: the supplied artwork is
+            placed on its own vector layer and everything else stays editable.
           </p>
+        </section>
+
+        {/* Editable flat masters with the supplied artwork placed */}
+        <section className="mt-12">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-[#03002C]">
+                Editable flat masters · artwork placed
+              </h2>
+              <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-black/60">
+                The London category masters dropped onto the measured flat panels. The gradient
+                ground, lockup, headline, sub-line and QR all remain live, and the placed artwork
+                exports as vector on its own <code>08 Placed artwork</code> layer.
+              </p>
+            </div>
+            <Link
+              to="/events/pillars"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#003FC7] px-3 py-1.5 text-xs font-medium text-[#003FC7] hover:bg-[#E0E8F5]"
+            >
+              Open the editor <ArrowRight size={13} />
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {martFlatMasters().map(({ sign, config }) => {
+              const art = martArtwork(martFlatArtworkId(sign));
+              return (
+                <article
+                  key={sign.id}
+                  className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+                >
+                  <div className="flex items-center justify-center bg-[#F2F2F2] p-4">
+                    <PillarSign config={config} pxPerMm={0.16} />
+                  </div>
+                  <div className="border-t border-black/10 px-4 py-3">
+                    <div className="text-sm font-medium text-[#03002C]">{sign.name}</div>
+                    <div className="mt-0.5 text-[12px] text-black/55">{sign.role}</div>
+                    <ul className="mt-2 space-y-0.5 text-[11px] tabular-nums text-black/55">
+                      <li>
+                        {sign.trimW} × {sign.trimH} mm · {sign.bleed} mm bleed · qty{" "}
+                        {sign.quantity}
+                      </li>
+                      <li>{art ? `Placed art: ${art.headline}` : "No placed artwork"}</li>
+                    </ul>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </section>
       </div>
     </AppShell>
