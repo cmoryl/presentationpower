@@ -2,13 +2,14 @@
 // link, and register new slots for artwork that lands after the shipped pack.
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, Link2, Pencil, Plus, RotateCcw, Trash2, Upload } from "lucide-react";
+import { Download, Layers, Link2, Pencil, Plus, RotateCcw, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { martArtworkPanels, type MartArtwork } from "@/lib/next-mart";
 import {
   MART_ART_ACCEPT,
   addMartArtwork,
+  bulkReplaceMartArt,
   deleteMartArtwork,
   listMartArtwork,
   martArtDraft,
