@@ -1076,7 +1076,7 @@ function LivePillars({ division }: { division: NextDivision }) {
           ...pillarDefault(kind.id as PillarKindId, division.id),
           face,
         };
-        return { id: kind.id as PillarKindId, label: kind.label, config };
+        return { id: kind.id as PillarKindId, label: kind.name, config };
       }),
     [division.id, face],
   );

@@ -57,7 +57,7 @@ function PillarPage() {
   }, [division, kind, face]);
 
   const seedNote = seeded
-    ? ` Opened on the ${pillarKind(seeded.kind).label} master for ${pillarDivision(seeded.divisionId).name} in the ${seeded.face === "light" ? "light" : "dark"} face — everything stays fully editable.`
+    ? ` Opened on the ${pillarKind(seeded.kind).name} master for ${pillarDivision(seeded.divisionId).name} in the ${seeded.face === "light" ? "light" : "dark"} face — everything stays fully editable.`
     : "";
 
   return (
