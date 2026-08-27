@@ -26,7 +26,12 @@ import {
   recommendedPpi,
   type LondonPanel,
 } from "@/lib/next-london-signage";
-import { axialShadingDict, evenStops, radialShadingDict } from "@/lib/pdf-gradient-shading";
+import {
+  axialShadingDict,
+  parseColor,
+  radialShadingDict,
+  stopsFromColors,
+} from "@/lib/pdf-gradient-shading";
 
 /** Fields the location team is allowed to re-issue. */
 export const LONDON_EDITABLE_FIELDS = [
@@ -394,7 +399,16 @@ function styleAxis(styleId: string): Vec {
 }
 
 function stopsFor(panel: LondonPanel): string[] {
-  return LONDON_STYLES[panel.style]?.stops ?? ["#7C4EF4", "#7FE3E8"];
+  return londonPanelStops(panel);
+}
+
+/**
+ * The approved colour ramp for a panel, in ramp order. Exported so QA can
+ * assert an exported `.ai` still carries these exact stops.
+ */
+export function londonPanelStops(panel: LondonPanel): string[] {
+  const stops = LONDON_STYLES[panel.style]?.stops;
+  return stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
 }
 
 /**
@@ -439,21 +453,13 @@ function escapeXml(s: string): string {
   );
 }
 
-function hexToRgb(hex: string): [number, number, number] {
-  const h = hex.replace("#", "");
-  const full =
-    h.length === 3
-      ? h
-          .split("")
-          .map((c) => c + c)
-          .join("")
-      : h;
-  const n = parseInt(full, 16);
-  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
-}
+/** Single colour-notation parser shared with the PDF shading writer. */
+const hexToRgb = parseColor;
 
 function gradientRgb(stops: string[], t: number): [number, number, number] {
-  const clamped = Math.max(0, Math.min(1, t));
+  if (stops.length === 0) return [0, 0, 0];
+  if (stops.length === 1) return hexToRgb(stops[0]!);
+  const clamped = Math.max(0, Math.min(1, Number.isFinite(t) ? t : 0));
   const scaled = clamped * (stops.length - 1);
   const index = Math.min(Math.floor(scaled), stops.length - 2);
   const mix = scaled - index;
@@ -475,7 +481,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
   const h = panel.bleedH * MM_TO_PT;
   const trimX = ((panel.bleedW - panel.trimW) / 2) * MM_TO_PT;
   const trimY = ((panel.bleedH - panel.trimH) / 2) * MM_TO_PT;
-  const stops = evenStops(stopsFor(panel).map((hex) => hexToRgb(hex)));
+  const stops = stopsFromColors(stopsFor(panel));
   const axis = styleAxis(panel.style);
   const isHalo = panel.style.includes("halo");
 

@@ -7816,25 +7816,32 @@ function renderVariantBody({
                       <Kicker brand={brand} color="var(--slide-accent-text)" size={16}>
                         Client · {String(i + 1).padStart(2, "0")}
                       </Kicker>
+                      {/* The logo IS the client name — showing both duplicates the
+                          brand. When a logo is present the wordmark carries the
+                          identity and the text drops to an accessible label. */}
                       <div className="mt-4 flex items-center gap-4">
-                        {(logoUrl || logoPath) && (
-                          <ClientLogoImg
-                            path={logoPath}
-                            url={logoUrl}
-                            alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
-                            style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }}
-                          />
+                        {logoUrl || logoPath ? (
+                          <>
+                            <ClientLogoImg
+                              path={logoPath}
+                              url={logoUrl}
+                              alt={s(it.client) ? `${s(it.client)} logo` : "Client logo"}
+                              style={{ maxHeight: 44, maxWidth: 190, objectFit: "contain" }}
+                            />
+                            <span className="sr-only">{s(it.client)}</span>
+                          </>
+                        ) : (
+                          <div
+                            style={{
+                              fontSize: fillPx(28, "body"),
+                              fontWeight: 600,
+                              letterSpacing: "-0.015em",
+                              color: ink.strong,
+                            }}
+                          >
+                            {s(it.client)}
+                          </div>
                         )}
-                        <div
-                          style={{
-                            fontSize: fillPx(28, "body"),
-                            fontWeight: 600,
-                            letterSpacing: "-0.015em",
-                            color: ink.strong,
-                          }}
-                        >
-                          {s(it.client)}
-                        </div>
                       </div>
                       <div className="mt-8">
                         <Kicker brand={brand} size={16}>
