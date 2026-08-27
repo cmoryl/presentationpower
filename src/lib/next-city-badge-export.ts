@@ -95,6 +95,8 @@ function readme(config: CityBadgeConfig, name: string, dpi: number): string {
  */
 export async function exportCityBadge(opts: {
   node: HTMLElement;
+  /** Optional badge back — exported as page 2 of the same press file. */
+  backNode?: HTMLElement | null;
   nativeWidth: number;
   nativeHeight: number;
   config: CityBadgeConfig;
@@ -110,6 +112,12 @@ export async function exportCityBadge(opts: {
   const canvas = await plate(node, nativeWidth, nativeHeight, dpi);
   const plateJpeg = canvas.toDataURL("image/jpeg", 0.96);
   const effectiveDpi = Math.round(canvas.width / BADGE_SPEC.bleedW);
+  let backJpeg: string | null = null;
+  if (opts.backNode) {
+    opts.onProgress?.({ stage: "render", label: "Rasterising the badge back" });
+    const backCanvas = await plate(opts.backNode, nativeWidth, nativeHeight, dpi);
+    backJpeg = backCanvas.toDataURL("image/jpeg", 0.96);
+  }
 
   opts.onProgress?.({ stage: "pdf", label: "Writing the press PDF" });
   const artW = BADGE_SPEC.bleedW;
@@ -124,6 +132,12 @@ export async function exportCityBadge(opts: {
   const pageH = pdf.internal.pageSize.getHeight();
   pdf.addImage(plateJpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
   drawCropMarks(pdf, pageW, pageH, SLUG_IN + BADGE_SPEC.bleed);
+  if (backJpeg) {
+    pdf.addPage([pageW, pageH], "portrait");
+    pdf.addImage(backJpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
+    drawCropMarks(pdf, pageW, pageH, SLUG_IN + BADGE_SPEC.bleed);
+  }
+
   const pdfBlob = pdf.output("blob");
   let pdfBuffer = await pdfBlob.arrayBuffer();
   try {
