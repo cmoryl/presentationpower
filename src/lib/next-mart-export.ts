@@ -337,8 +337,41 @@ export async function exportMartBundle(opts?: {
     });
   }
 
+  // ─────────────────────────────────────────── approved NEXT MART logo pack
+  if (opts?.includeLogos !== false) {
+    for (const logo of NEXT_MART_LOGOS) {
+      const folder = `logos/${logo.id}`;
+      for (const [ext, url] of [
+        ["eps", logo.epsUrl],
+        ["svg", logo.svgUrl],
+        ["png", logo.pngUrl],
+      ] as const) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) zip.file(`${folder}/${logo.id}.${ext}`, await res.arrayBuffer());
+        } catch {
+          /* keep packing the rest of the pack */
+        }
+      }
+      zip.file(
+        `${folder}/USAGE.txt`,
+        [
+          logo.name,
+          "",
+          `Face:  ${logo.face}`,
+          `Usage: ${logo.usage}`,
+          "",
+          "Never recolour, distort, keyline or rebuild the lockup.",
+          "",
+        ].join("\n"),
+      );
+    }
+  }
+
   tick("Packaging the bundle");
   zip.file("PRODUCTION-MANIFEST.txt", manifest(entries, stop));
+  zip.file("READ-ME-FIRST.txt", readme(entries, stop));
+
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
