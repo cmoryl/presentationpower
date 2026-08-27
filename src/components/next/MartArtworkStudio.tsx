@@ -209,7 +209,8 @@ function ImportRow({
         </button>
       </div>
       <p className="mt-2 text-[11px] text-black/50">
-        SVG or PDF/AI keeps the vector layers the cutter reads. {filename ? `Current file: ${filename}` : null}
+        Drag a file or link straight onto this panel, or use the buttons. SVG or PDF/AI keeps the vector
+        layers the cutter reads. {filename ? `Current file: ${filename}` : null}
       </p>
     </div>
   );
