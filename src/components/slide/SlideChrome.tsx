@@ -1147,7 +1147,21 @@ export function SlideFrame({
             <div
               ref={logoRef}
               data-slide-logo-plane=""
-              style={{ ...containerStyle, zIndex: 60, pointerEvents: "none" }}
+              style={{
+                ...containerStyle,
+                zIndex: 60,
+                pointerEvents: "none",
+                // Spatial Clarity keeps the wordmark 20% smaller — the mark is
+                // one quiet signature, not a competing element in the module.
+                ...(String(pack?.id ?? "").toLowerCase() === "skin-s01"
+                  ? {
+                      transform: `${containerStyle.transform ? `${containerStyle.transform} ` : ""}scale(0.8)`,
+                      transformOrigin: placement.position.includes("right")
+                        ? "top right"
+                        : "top left",
+                    }
+                  : null),
+              }}
             >
               <BrandLockup
                 brand={brand}

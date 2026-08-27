@@ -1323,7 +1323,22 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
   const tr = traitsFor(skin);
   const geo = GEOMETRY_SHEET[(skin.code ?? "").toUpperCase()];
   const dense = tr ? tr.topBar : /high/i.test(skin.density);
-  const card = { ...cardFor(skin, r), shape: geo?.shape };
+  let card = { ...cardFor(skin, r), shape: geo?.shape };
+  // SPATIAL CLARITY (S01) — module plates are a gradient that fades to zero
+  // opacity, exactly like the master templates: no keyline, no drop shadow, no
+  // hard box edge. The old flat white plate with a hairline border was what
+  // drew the stray "box lines" through the composition.
+  if ((skin.code ?? "").toUpperCase() === "S01") {
+    card = {
+      ...card,
+      bg: r.dark
+        ? `linear-gradient(180deg, ${rgba(r.ink, 0.16)} 0%, ${rgba(r.ink, 0.06)} 55%, ${rgba(r.ink, 0)} 100%)`
+        : `linear-gradient(180deg, ${rgba("#FFFFFF", 0.86)} 0%, ${rgba("#FFFFFF", 0.4)} 55%, ${rgba("#FFFFFF", 0)} 100%)`,
+      border: "1px solid transparent",
+      shadow: "none",
+      blur: "none",
+    };
+  }
 
   const pack: StylePack = {
     id: skinPackId(skin.code) as StylePack["id"],
