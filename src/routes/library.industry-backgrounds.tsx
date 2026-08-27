@@ -25,7 +25,16 @@ import {
   INDUSTRY_BG_COMBOS,
   coreBackgroundSets,
   industryBackgroundSets,
+  type IndustryBackgroundSet,
 } from "@/lib/industry-backgrounds";
+import { BackgroundSetEditor } from "@/components/library/BackgroundSetEditor";
+import {
+  SkinBackdropProvider,
+  toBackdropMap,
+  type SkinBackdropMap,
+} from "@/components/slide/SkinBackdropContext";
+import { listSkinBackdrops, type SkinBackdropRow } from "@/lib/skin-backdrop.functions";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 
 /** Sub-directories of the one master background directory. */
 const DIRS = [
@@ -63,6 +72,33 @@ function IndustryBackgroundGalleryPage() {
   const [filters, setFilters] = React.useState<GalleryFilters>(DEFAULT_FILTERS);
   const [mode, setMode] = React.useState<"overview" | "all">("overview");
   const [open, setOpen] = React.useState<string | null>(null);
+  const [editing, setEditing] = React.useState<IndustryBackgroundSet | null>(null);
+  const [rows, setRows] = React.useState<SkinBackdropRow[]>([]);
+  const canEdit = useIsAdmin();
+
+  React.useEffect(() => {
+    let live = true;
+    listSkinBackdrops()
+      .then((all) => {
+        if (live) setRows(all);
+      })
+      .catch(() => {
+        /* replacements are additive — never block the directory */
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const backdropMap: SkinBackdropMap = React.useMemo(() => toBackdropMap(rows), [rows]);
+  const replacedBySet = React.useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of rows) {
+      const code = r.skinCode.toUpperCase();
+      counts.set(code, (counts.get(code) ?? 0) + 1);
+    }
+    return counts;
+  }, [rows]);
 
   const shownSets = React.useMemo(
     () => sets.filter((s) => matchesIndustry(s, filters.q)),
@@ -72,6 +108,7 @@ function IndustryBackgroundGalleryPage() {
   const total = shownSets.length * perSet;
 
   return (
+    <SkinBackdropProvider value={backdropMap}>
     <AppShell>
       <LibrarySubnav active="/library/industry-backgrounds" />
 
@@ -175,6 +212,8 @@ function IndustryBackgroundGalleryPage() {
                   filters={filters}
                   open={open === set.recipeId}
                   onToggle={() => setOpen((cur) => (cur === set.recipeId ? null : set.recipeId))}
+                  onEdit={() => setEditing(set)}
+                  replacedCount={replacedBySet.get(set.recipeId.toUpperCase()) ?? 0}
                 />
               ))}
             </div>
@@ -184,7 +223,18 @@ function IndustryBackgroundGalleryPage() {
         )}
       </div>
 
+      {editing && (
+        <BackgroundSetEditor
+          set={editing}
+          open
+          canEdit={canEdit}
+          onClose={() => setEditing(null)}
+          onChanged={setRows}
+        />
+      )}
+
       <BackToTop />
     </AppShell>
+    </SkinBackdropProvider>
   );
 }

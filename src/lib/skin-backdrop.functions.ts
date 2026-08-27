@@ -134,6 +134,75 @@ export const listSkinBackdrops = createServerFn({ method: "GET" }).handler(
   },
 );
 
+/* --------------------------------------------------------------- upload path */
+
+const UploadInput = z.object({
+  skinCode: z.string().min(2).max(8),
+  scene: z.string().min(2).max(24),
+  take: z.number().int().min(0).max(3).default(0),
+  /** Base64 payload WITHOUT the data: prefix. */
+  base64: z.string().min(32),
+  contentType: z.enum(["image/png", "image/jpeg", "image/webp", "image/avif"]),
+  filename: z.string().max(160).optional().nullable(),
+});
+
+const EXT: Record<string, string> = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "image/avif": "avif",
+};
+
+/**
+ * Replace one skin × scene × take backdrop with an uploaded image. Same table
+ * and same public proxy as the AI path, so the template editor, the stage and
+ * every exporter pick the new art up with no further wiring.
+ */
+export const uploadSkinBackdrop = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => UploadInput.parse(input))
+  .handler(async ({ data, context }): Promise<SkinBackdropRow> => {
+    const scene = (SKIN_SCENES as string[]).includes(data.scene) ? data.scene : "cover";
+    const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
+    if (bytes.byteLength > 12 * 1024 * 1024) throw new Error("Image is larger than 12 MB.");
+
+    const code = data.skinCode.toUpperCase();
+    const ext = EXT[data.contentType] ?? "png";
+    const path = `${code}/${scene}-${data.take}-upload-${Date.now()}.${ext}`;
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const up = await supabaseAdmin.storage
+      .from("skin-backdrops")
+      .upload(path, bytes, { contentType: data.contentType, upsert: true });
+    if (up.error) throw new Error(`Storing the background failed: ${up.error.message}`);
+
+    const saved = await context.supabase
+      .from("skin_backdrops")
+      .upsert(
+        {
+          skin_code: code,
+          scene,
+          take: data.take,
+          prompt: `Uploaded replacement${data.filename ? ` · ${data.filename}` : ""}`,
+          storage_path: path,
+          image_url: publicUrlFor(path),
+          created_by: context.userId,
+        },
+        { onConflict: "skin_code,scene,take" },
+      )
+      .select("skin_code, scene, take, image_url, prompt")
+      .single();
+    if (saved.error) throw new Error(`Saving the background failed: ${saved.error.message}`);
+
+    return {
+      skinCode: saved.data.skin_code,
+      scene: saved.data.scene,
+      take: saved.data.take,
+      imageUrl: saved.data.image_url,
+      prompt: saved.data.prompt,
+    };
+  });
+
 const DeleteInput = z.object({ skinCode: z.string(), scene: z.string(), take: z.number().int() });
 
 export const deleteSkinBackdrop = createServerFn({ method: "POST" })

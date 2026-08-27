@@ -81,6 +81,7 @@ export function ApprovedStyleThumb({
   take = 0,
   className,
   radius,
+  overrideUrl,
 }: {
   pack: StylePack;
   /** Which section scene to preview. Hero scenes read best at card size. */
@@ -88,6 +89,8 @@ export function ApprovedStyleThumb({
   take?: number;
   className?: string;
   radius?: number;
+  /** Replacement art recorded for this scene × take; wins over `ground()`. */
+  overrideUrl?: string | null;
 }) {
   // The seed is the documented `ground()` contract: an explicit section scene
   // plus the alternate take index. Same call the slide stage makes.
@@ -106,7 +109,16 @@ export function ApprovedStyleThumb({
       }}
       aria-hidden
     >
-      <GroundPlane pack={pack} seed={seed} />
+      {overrideUrl ? (
+        <img
+          src={overrideUrl}
+          alt=""
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          loading="lazy"
+        />
+      ) : (
+        <GroundPlane pack={pack} seed={seed} />
+      )}
     </div>
   );
 }
