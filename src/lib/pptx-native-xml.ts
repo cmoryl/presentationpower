@@ -537,9 +537,9 @@ export async function applyNativePptxFeatures(
         console.warn("[pptx-native-xml] vector flattening skipped", err);
       }
     }
-    // <p:presentation> child order — any pass that rewrote presentation.xml
-    // (font embedding, etc.) can reshuffle notesMasterIdLst; PowerPoint only
-    // opens the package when it sits after sldIdLst.
+    // <p:presentation> child order — pptxgenjs and the font-embed pass both
+    // emit children out of the ECMA-376 sequence, which desktop PowerPoint
+    // rejects with the "found a problem with content" repair prompt.
     try {
       const { repairPresentationOrder } = await import("./pptx-presentation-order");
       touched += await repairPresentationOrder(zip);

@@ -228,8 +228,8 @@ export async function exportPrintPagesAsPptx(
   }
 
   // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
-  // PresentationML sequence (masters -> notes master -> slides -> sizes). Repair
-  // the order before writing so the file passes strict OOXML validation.
+  // PresentationML sequence (masters -> notes master -> slides -> sizes) and
+  // makes PowerPoint offer to "repair" the deck. Fixed before writing.
   opts.onProgress?.({
     stage: "encode",
     progress: 0.88,
@@ -259,13 +259,9 @@ async function reorderPresentationXml(blob: Blob): Promise<Blob> {
     const entry = zip.file("ppt/presentation.xml");
     if (entry) {
       const xml = await entry.async("string");
-      const notes = xml.match(/<p:notesMasterIdLst>[\s\S]*?<\/p:notesMasterIdLst>/);
-      if (notes && xml.indexOf(notes[0]) > xml.indexOf("<p:sldIdLst>")) {
-        zip.file(
-          "ppt/presentation.xml",
-          xml.replace(notes[0], "").replace("<p:sldIdLst>", `${notes[0]}<p:sldIdLst>`),
-        );
-      }
+      const { orderPresentationLists } = await import("./pptx-presentation-order");
+      const next = orderPresentationLists(xml);
+      if (next !== xml) zip.file("ppt/presentation.xml", next);
     }
     // Always repack: PowerPoint requires [Content_Types].xml first and no
     // directory entries, which JSZip's default output does not guarantee.

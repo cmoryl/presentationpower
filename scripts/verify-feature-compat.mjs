@@ -565,14 +565,16 @@ function sniffImageFormat(u8, name) {
   return "unknown";
 }
 
+// ECMA-376 Part 1, 19.2.1.26 — desktop PowerPoint validates this sequence.
 const PRES_ORDER = [
   "sldMasterIdLst",
-  "sldIdLst",
   "notesMasterIdLst",
   "handoutMasterIdLst",
+  "sldIdLst",
   "sldSz",
   "notesSz",
   "smartTags",
+  "embeddedFontLst",
   "custShowLst",
   "photoAlbum",
   "custDataLst",
@@ -580,7 +582,6 @@ const PRES_ORDER = [
   "defaultTextStyle",
   "modifyVerifier",
   "extLst",
-  "embeddedFontLst",
 ];
 
 async function loadPackage(buf) {
