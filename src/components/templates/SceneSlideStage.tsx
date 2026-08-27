@@ -57,7 +57,14 @@ export function SceneSlideStage({
   pageNumber?: number;
   className?: string;
 }) {
-  const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
+  // Looks owned by a named product brand (DataForce's AI · Data signature)
+  // preview with that lockup; every other look stays on the master brand.
+  const brandModeId = lookBrandModeId(pack.id);
+  const brand =
+    BRAND_MODES.find((b) => b.id === brandModeId) ??
+    BRAND_MODES.find((b) => b.id === "bm-enterprise") ??
+    BRAND_MODES[0]!;
+
   const variantId = SCENE_VARIANT[scene as SkinScene] ?? SCENE_VARIANT.cover;
   const variant = byId(MODULE_VARIANTS, variantId) as ModuleVariant | undefined;
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
