@@ -37,7 +37,7 @@ export const Route = createFileRoute("/events/next_/mart_/$stopId")({
 });
 
 function MartStopPage() {
-  const { stopId } = useParams({ from: "/events/next/mart/$stopId" });
+  const { stopId } = useParams({ from: "/events/next_/mart_/$stopId" });
   const stop = martStopById(stopId);
 
   if (!stop) {
