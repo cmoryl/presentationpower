@@ -90,8 +90,12 @@ export async function exportAgendaSheet(opts: {
     vector.bytes.byteOffset + vector.bytes.byteLength,
   ) as ArrayBuffer;
 
-  opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
-  const wantPx = geo.bleedW * MM_TO_IN * PROOF_PPI;
+  const screen = geo.isScreen;
+  opts.onProgress?.({
+    stage: "proof",
+    label: screen ? `Rendering ${geo.pxW} × ${geo.pxH} px screen artwork` : "Rendering the proof PNG",
+  });
+  const wantPx = screen ? geo.pxW : geo.bleedW * MM_TO_IN * PROOF_PPI;
   const canvas = await captureAssetCanvas(
     { node, width: nativeWidth, height: nativeHeight, label: "NEXT division agenda" },
     { scale: Math.max(0.4, wantPx / nativeWidth), background: agendaStops(config.styleId, config.face, config.divisionId)[0]! },
@@ -104,8 +108,13 @@ export async function exportAgendaSheet(opts: {
   const zip = new JSZip();
   zip.file(`pdf/${slug}.pdf`, pdfBuffer);
   zip.file(`ai/${slug}.ai`, pdfBuffer);
-  zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
+  if (screen) {
+    zip.file(`screen/${slug}-${geo.pxW}x${geo.pxH}.png`, await proofBlob.arrayBuffer());
+  } else {
+    zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
+  }
   zip.file("READ-ME.txt", readme(config, vector));
+
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
