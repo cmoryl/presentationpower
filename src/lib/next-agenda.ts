@@ -482,11 +482,19 @@ export function agendaTitleInk(config: AgendaConfig): string {
  */
 export function agendaLayout(config: AgendaConfig) {
   const geo = agendaGeometry(config);
-  const k = geo.trimW / 420; // A2 board is the reference sheet
+  // A2 board is the reference sheet. Landscape and screen formats have far less
+  // height per unit of width, so the scale reads off whichever edge is tighter —
+  // that keeps a 16:9 holding screen legible instead of crushing the row list.
+  const k = Math.min(geo.trimW / 420, geo.trimH / 594) * (geo.trimH < geo.trimW ? 1.35 : 1);
   const rows = config.sessions.length || 1;
   const contentW = geo.trimW - geo.safeInset * 2;
-  const lockupW = contentW * 0.44 * agendaLockupScale(config);
-  const lockupH = lockupW / (agendaDivision(config.divisionId).ratio || 1.7);
+  const ratio = agendaDivision(config.divisionId).ratio || 1.7;
+  // Cap the lockup against the sheet height so wide formats keep room for the
+  // programme; portrait boards stay on the established 44% content width.
+  const lockupW =
+    Math.min(contentW * 0.44, geo.trimH * 0.2 * ratio) * agendaLockupScale(config);
+  const lockupH = lockupW / ratio;
+
   const eyebrowSize = 5.4 * k;
   const titleSize = 22 * k;
   const metaSize = 6.4 * k;
