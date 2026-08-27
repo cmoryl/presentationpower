@@ -47,8 +47,13 @@ function readme(config: AgendaConfig, vector: Awaited<ReturnType<typeof buildAge
     `Face:            ${agendaFace(config.face).name}`,
     ``,
     `Format:          ${geo.sizeName}`,
-    `Trim:            ${geo.trimW} x ${geo.trimH} mm`,
-    `Bleed:           ${geo.bleedW} x ${geo.bleedH} mm (${geo.bleedEdge} mm per edge)`,
+    `Medium:          ${geo.isScreen ? "screen (sRGB)" : "print"}`,
+    geo.isScreen
+      ? `Pixels:          ${geo.pxW} x ${geo.pxH} px — exported at 1:1, no bleed`
+      : `Trim:            ${geo.trimW} x ${geo.trimH} mm`,
+    geo.isScreen
+      ? `Reference:       ${geo.trimW} x ${geo.trimH} mm at 96 ppi (layout reference only)`
+      : `Bleed:           ${geo.bleedW} x ${geo.bleedH} mm (${geo.bleedEdge} mm per edge)`,
     `Safe area:       ${Math.round(geo.safeInset)} mm inside trim`,
     `Sessions:        ${config.sessions.length} rows`,
     `QR payload:      ${qr || "none"}`,
@@ -65,7 +70,9 @@ function readme(config: AgendaConfig, vector: Awaited<ReturnType<typeof buildAge
     ``,
     `pdf/    press file. Art runs to the bleed edge; crop marks sit in the slug.`,
     `ai/     the same layered artwork with an .ai extension for Illustrator.`,
-    `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
+    geo.isScreen
+      ? `screen/ ${geo.pxW} x ${geo.pxH} px sRGB PNG, ready to load on the display.`
+      : `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
     ``,
     `Palette and geometry are fixed across every NEXT division area — only the`,
     `approved division lockup and the programme copy change.`,
