@@ -164,6 +164,7 @@ import { Route as AdminPrintLibraryItemIdRouteImport } from './routes/admin.prin
 import { Route as AdminCampaignsKitRouteImport } from './routes/admin.campaigns.kit'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as EventsNextMartStopIdRouteImport } from './routes/events.next_.mart_.$stopId'
 import { Route as EventsNextLondonReviseRouteImport } from './routes/events.next_.london_.revise'
 import { Route as AdminModulesPrintModuleIdRouteImport } from './routes/admin.modules_.print.$moduleId'
 
@@ -953,6 +954,11 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsNextMartStopIdRoute = EventsNextMartStopIdRouteImport.update({
+  id: '/next_/mart_/$stopId',
+  path: '/next/mart/$stopId',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextLondonReviseRoute = EventsNextLondonReviseRouteImport.update({
   id: '/next_/london_/revise',
   path: '/next/london/revise',
@@ -1123,6 +1129,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
+  '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -1278,6 +1285,7 @@ export interface FileRoutesByTo {
   '/knowledge/brand-guides': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/events/next/london/revise': typeof EventsNextLondonReviseRoute
+  '/events/next/mart/$stopId': typeof EventsNextMartStopIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1438,6 +1446,7 @@ export interface FileRoutesById {
   '/knowledge/brand-guides/': typeof KnowledgeBrandGuidesIndexRoute
   '/admin/modules_/print/$moduleId': typeof AdminModulesPrintModuleIdRoute
   '/events/next_/london_/revise': typeof EventsNextLondonReviseRoute
+  '/events/next_/mart_/$stopId': typeof EventsNextMartStopIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1599,6 +1608,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/'
     | '/admin/modules/print/$moduleId'
     | '/events/next/london/revise'
+    | '/events/next/mart/$stopId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1754,6 +1764,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides'
     | '/admin/modules/print/$moduleId'
     | '/events/next/london/revise'
+    | '/events/next/mart/$stopId'
   id:
     | '__root__'
     | '/'
@@ -1913,6 +1924,7 @@ export interface FileRouteTypes {
     | '/knowledge/brand-guides/'
     | '/admin/modules_/print/$moduleId'
     | '/events/next_/london_/revise'
+    | '/events/next_/mart_/$stopId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -3097,6 +3109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/next_/mart_/$stopId': {
+      id: '/events/next_/mart_/$stopId'
+      path: '/next/mart/$stopId'
+      fullPath: '/events/next/mart/$stopId'
+      preLoaderRoute: typeof EventsNextMartStopIdRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/london_/revise': {
       id: '/events/next_/london_/revise'
       path: '/next/london/revise'
@@ -3215,6 +3234,7 @@ interface EventsRouteChildren {
   EventsNextMartRoute: typeof EventsNextMartRoute
   EventsNextPillarsRoute: typeof EventsNextPillarsRoute
   EventsNextLondonReviseRoute: typeof EventsNextLondonReviseRoute
+  EventsNextMartStopIdRoute: typeof EventsNextMartStopIdRoute
 }
 
 const EventsRouteChildren: EventsRouteChildren = {
@@ -3232,6 +3252,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextMartRoute: EventsNextMartRoute,
   EventsNextPillarsRoute: EventsNextPillarsRoute,
   EventsNextLondonReviseRoute: EventsNextLondonReviseRoute,
+  EventsNextMartStopIdRoute: EventsNextMartStopIdRoute,
 }
 
 const EventsRouteWithChildren =

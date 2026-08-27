@@ -39,6 +39,15 @@ import {
   type MartPillarSign,
 } from "./next-mart";
 import { martFlatConfig, martFlatArtworkId, martArtwork } from "./next-mart-placement";
+import {
+  LONDON_STOP,
+  martStopEventLabel,
+  martStopFlats,
+  martStopPillarConfig,
+  martStopPillars,
+  martStopSlug,
+  type MartStop,
+} from "./next-mart-stops";
 
 export type MartExportProgress = { index: number; total: number; label: string };
 
@@ -66,14 +75,14 @@ function slugify(v: string): string {
     .replace(/^-|-$/g, "");
 }
 
-function pillarSpecSheet(sign: MartPillarSign): string {
-  const config = martPillarConfig(sign);
+function pillarSpecSheet(sign: MartPillarSign, stop: MartStop): string {
+  const config = martStopPillarConfig(stop, sign);
   const geo = pillarGeometry(config);
   return [
     `NEXT MART — ${sign.name}`,
     "",
-    `Event:        ${NEXT_MART.event}`,
-    `Venue:        ${NEXT_MART.venue} · ${NEXT_MART.dates}`,
+    `Event:        ${martStopEventLabel(stop)}`,
+    `Venue:        ${stop.venue} · ${stop.dates}`,
     `Role:         ${sign.role}`,
     `Placement:    ${sign.placement}`,
     `Sign kind:    ${pillarKind(config.kind).name}`,
@@ -137,13 +146,13 @@ function flatSpecSheet(sign: MartFlatSign): string {
   ].join("\n");
 }
 
-function manifest(entries: MartExportEntry[]): string {
+function manifest(entries: MartExportEntry[], stop: MartStop): string {
   const total = entries.reduce((n, e) => n + e.quantity, 0);
   const lines = [
     "TransPerfect NEXT MART — signage production manifest",
     "",
-    `Event:   ${NEXT_MART.event}`,
-    `Venue:   ${NEXT_MART.venue} · ${NEXT_MART.dates}`,
+    `Event:   ${martStopEventLabel(stop)}`,
+    `Venue:   ${stop.venue} · ${stop.dates}`,
     `Sets:    ${entries.length}`,
     `Panels:  ${total}`,
     "",
@@ -183,12 +192,16 @@ export async function exportMartBundle(opts?: {
   includeArtwork?: boolean;
   /** Include measured flat-signage print specs. Default true. */
   includeFlat?: boolean;
+  /** City/stop template to build. Defaults to the London reference kit. */
+  stop?: MartStop;
 }): Promise<MartExportResult> {
+  const stop = opts?.stop ?? LONDON_STOP;
+  const allPillars = martStopPillars(stop);
   const pillars = opts?.pillarIds?.length
-    ? NEXT_MART_PILLARS.filter((p) => opts.pillarIds!.includes(p.id))
-    : NEXT_MART_PILLARS;
+    ? allPillars.filter((p) => opts.pillarIds!.includes(p.id))
+    : allPillars;
   const artwork = opts?.includeArtwork === false ? [] : NEXT_MART_ARTWORK;
-  const flat = opts?.includeFlat === false ? [] : NEXT_MART_FLAT_SIGNS;
+  const flat = opts?.includeFlat === false ? [] : martStopFlats(stop);
 
   const total = pillars.length + artwork.length + flat.length + 1;
   let step = 0;
@@ -203,7 +216,7 @@ export async function exportMartBundle(opts?: {
   // ─────────────────────────────────────────────── pillar sets (vector build)
   for (const sign of pillars) {
     tick(`Building ${sign.name}`);
-    const config = martPillarConfig(sign);
+    const config = martStopPillarConfig(stop, sign);
     const geo = pillarGeometry(config);
     const folder = `pillars/${slugify(sign.name)}`;
     const slug = pillarSlug(config);
@@ -236,7 +249,7 @@ export async function exportMartBundle(opts?: {
     } catch {
       /* ground art is a convenience layer */
     }
-    zip.file(`${folder}/PRINT-SPEC.txt`, pillarSpecSheet(sign));
+    zip.file(`${folder}/PRINT-SPEC.txt`, pillarSpecSheet(sign, stop));
 
     entries.push({
       id: sign.id,
@@ -293,7 +306,7 @@ export async function exportMartBundle(opts?: {
     const folder = `flat-signage/${slugify(sign.name)}`;
     zip.file(`${folder}/PRINT-SPEC.txt`, flatSpecSheet(sign));
 
-    const config = martFlatConfig(sign);
+    const config = { ...martFlatConfig(sign), eventLabel: martStopEventLabel(stop) };
     const artId = martFlatArtworkId(sign);
     const art = martArtwork(artId);
     let bytes: Uint8Array | null = null;
@@ -325,12 +338,12 @@ export async function exportMartBundle(opts?: {
   }
 
   tick("Packaging the bundle");
-  zip.file("PRODUCTION-MANIFEST.txt", manifest(entries));
+  zip.file("PRODUCTION-MANIFEST.txt", manifest(entries, stop));
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
     blob,
-    filename: `next-mart-signage-${slugify(NEXT_MART.event)}.zip`,
+    filename: `next-mart-signage-${martStopSlug(stop)}.zip`,
     entries,
     totalPanels: entries.reduce((n, e) => n + e.quantity, 0),
   };
