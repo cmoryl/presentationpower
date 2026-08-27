@@ -812,9 +812,18 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       // itself unexpressible (radial/conic/stacked wash) falls back to the
       // pixel-exact plate, further down.
       if (hasUnexpressibleSurface(cs) && hasUnexpressibleBackground(cs)) {
+        // A bounded content panel ships as an editable rounded rectangle with
+        // the app's tint → transparent-at-the-bottom recipe instead of being
+        // baked into the background picture.
+        const panel = panelFadeShape(el, cs, root, sx, sy, spaceW, spaceH);
+        if (panel) {
+          shapes.push(panel);
+          continue;
+        }
         surfaceRoots.push(el);
         continue;
       }
+
 
       const r = el.getBoundingClientRect();
       const w = r.width * sx;
