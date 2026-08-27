@@ -13,7 +13,13 @@ const r=await p.evaluate(async(url)=>{
   const sp=await import("/src/lib/style-packs.ts");
   const pack=sp.stylePackById("skin-s01");
   const out=await raster.rasterizePackBackground(pack,"MV-OP-COVER","LO-01");
-  return {version:ov.skinBackdropOverrideVersion(), lookup:!!ov.skinBackdropOverride("S01","cover",0),
+  return {plate:out.data, version:ov.skinBackdropOverrideVersion(), lookup:!!ov.skinBackdropOverride("S01","cover",0),
    ground:sp.packGroundPaint(pack,"LO-01")[0].slice(0,30), data:(out.data||"").slice(0,40), len:(out.data||"").length};
 },magenta());
-console.log(r); await b.close();
+const buf=Buffer.from(String(r.plate).split(",")[1],"base64");
+const png=PNG.sync.read(buf);
+let mag=0,tot=0;
+for(let i=0;i<png.data.length;i+=4){const R=png.data[i],G=png.data[i+1],B=png.data[i+2];tot++;if(R>200&&G<90&&B>120&&B<220)mag++;}
+delete r.plate;
+console.log(r,{size:[png.width,png.height],magentaPct:(mag/tot*100).toFixed(1)});
+await b.close();
