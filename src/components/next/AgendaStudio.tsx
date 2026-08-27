@@ -30,6 +30,7 @@ import {
 } from "@/lib/next-agenda.functions";
 import {
   AGENDA_CUSTOM_SIZE,
+  AGENDA_ROWS_PER_PAGE,
   AGENDA_DIVISIONS,
   AGENDA_FACES,
   AGENDA_LOCKUP_SCALE,
@@ -38,8 +39,14 @@ import {
   AGENDA_SPEC,
   AGENDA_STYLE_IDS,
   AGENDA_TEXT_COLORS,
+  addAgendaDay,
+  agendaCapacity,
+  agendaDays,
   agendaDefault,
   agendaDivision,
+  agendaPages,
+  removeAgendaDay,
+  writeAgendaDay,
   agendaGeometry,
   agendaName,
   agendaProgramme,
@@ -103,6 +110,8 @@ export function AgendaStudio({
   const [customEvent, setCustomEvent] = useState("");
   const [fileName, setFileName] = useState("");
   const [openFileId, setOpenFileId] = useState<string | null>(initialFileId ?? null);
+  const [activeDay, setActiveDay] = useState(0);
+  const [activePage, setActivePage] = useState(0);
   const plateRef = useRef<HTMLDivElement | null>(null);
 
   // Follow the host when it points the studio at a different saved live file.
@@ -176,27 +185,40 @@ export function AgendaStudio({
   const set = <K extends keyof AgendaConfig>(key: K, value: AgendaConfig[K]) =>
     setConfig((c) => ({ ...c, [key]: value }));
 
-  const setSession = (index: number, patch: Partial<AgendaSession>) =>
-    setConfig((c) => ({
-      ...c,
-      sessions: c.sessions.map((s, i) => (i === index ? { ...s, ...patch } : s)),
-    }));
+  // Everything below edits the active programme day. A single-day file keeps the
+  // top-level fields, so nothing changes for existing agendas.
+  const days = agendaDays(config);
+  const dayIndex = Math.min(activeDay, days.length - 1);
+  const day = days[dayIndex]!;
+  const patchDay = (patch: Parameters<typeof writeAgendaDay>[2]) =>
+    setConfig((c) => writeAgendaDay(c, dayIndex, patch));
 
-  const moveSession = (index: number, delta: number) =>
-    setConfig((c) => {
-      const next = [...c.sessions];
-      const target = index + delta;
-      if (target < 0 || target >= next.length) return c;
-      const [row] = next.splice(index, 1);
-      next.splice(target, 0, row!);
-      return { ...c, sessions: next };
-    });
+  const setSession = (index: number, patch: Partial<AgendaSession>) =>
+    patchDay({ sessions: day.sessions.map((s, i) => (i === index ? { ...s, ...patch } : s)) });
+
+  const moveSession = (index: number, delta: number) => {
+    const next = [...day.sessions];
+    const target = index + delta;
+    if (target < 0 || target >= next.length) return;
+    const [row] = next.splice(index, 1);
+    next.splice(target, 0, row!);
+    patchDay({ sessions: next });
+  };
 
   const geo = agendaGeometry(config);
 
+  // Resolved printed pages: one per programme day, split again whenever a day
+  // runs past the rows that fit the chosen format.
+  const pages = useMemo(() => agendaPages(config), [config]);
+  const pageIndex = Math.min(activePage, pages.length - 1);
+  const page = pages[pageIndex]!;
+  const pageConfig = page.config;
+  const autoCapacity = useMemo(() => agendaCapacity(config), [config]);
+  const rowsPerPage = Math.round(Number(config.rowsPerPage) || 0);
+
   // Live page-size + overflow read, recomputed on every keystroke so the editor
   // behaves like the other print areas.
-  const fit = useMemo(() => agendaFit(config), [config]);
+  const fit = useMemo(() => agendaFit(pageConfig), [pageConfig]);
   const overRows = useMemo(() => new Set(fit.lines.map((l) => l.index)), [fit.lines]);
 
   // Fit the sheet to the viewer on both edges, scaling small formats (A4) up and
@@ -232,7 +254,7 @@ export function AgendaStudio({
       URL.revokeObjectURL(url);
       toast.success("Agenda package downloaded", {
         id,
-        description: `Layered ${AGENDA_SPEC.exportPreset} · ${result.layers.length} layers · ${(result.pdfBytes / 1024).toFixed(0)} KB PDF`,
+        description: `Layered ${AGENDA_SPEC.exportPreset} · ${result.pageCount} page${result.pageCount === 1 ? "" : "s"} · ${result.layers.length} layers · ${(result.pdfBytes / 1024).toFixed(0)} KB PDF`,
       });
     } catch (e) {
       toast.error("Export failed", { id, description: (e as Error).message });
@@ -261,8 +283,10 @@ export function AgendaStudio({
   };
 
   const programmeIsStock = useMemo(
-    () => JSON.stringify(config.sessions) === JSON.stringify(agendaProgramme(config.divisionId).sessions),
-    [config.sessions, config.divisionId],
+    () =>
+      !config.days &&
+      JSON.stringify(config.sessions) === JSON.stringify(agendaProgramme(config.divisionId).sessions),
+    [config.days, config.sessions, config.divisionId],
   );
 
   return (
@@ -271,6 +295,118 @@ export function AgendaStudio({
         <h1 className="text-3xl font-semibold tracking-tight">{heading}</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">{intro}</p>
       </header>
+
+      {/* programme days + printed pages */}
+      <section aria-labelledby="agenda-days" className="rounded-xl border border-border bg-muted/30 p-4">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="min-w-0 space-y-2">
+            <h2 id="agenda-days" className="text-sm font-semibold tracking-tight">
+              Programme days
+            </h2>
+            <div className="flex flex-wrap items-center gap-2">
+              {days.map((d, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center gap-1 rounded-full border px-1 py-0.5 text-xs ${
+                    i === dayIndex ? "border-[#003FC7] bg-background font-medium" : "border-border bg-background/60"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    className="px-2 py-1"
+                    aria-pressed={i === dayIndex}
+                    onClick={() => {
+                      setActiveDay(i);
+                      const first = pages.findIndex((p) => p.dayIndex === i);
+                      if (first >= 0) setActivePage(first);
+                    }}
+                  >
+                    {d.label || `Day ${i + 1}`}
+                    <span className="ml-1.5 text-muted-foreground">{d.sessions.length}</span>
+                  </button>
+                  {days.length > 1 ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      aria-label={`Remove ${d.label || `day ${i + 1}`}`}
+                      onClick={() => {
+                        setConfig((c) => removeAgendaDay(c, i));
+                        setActiveDay(0);
+                        setActivePage(0);
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  ) : null}
+                </div>
+              ))}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  setConfig((c) => addAgendaDay(c));
+                  setActiveDay(days.length);
+                }}
+              >
+                <Plus className="mr-1.5 h-3.5 w-3.5" /> Add day
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="agenda-rows-per-page" className="text-xs">
+              Rows per page
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="agenda-rows-per-page"
+                type="number"
+                className="w-28"
+                min={0}
+                max={AGENDA_ROWS_PER_PAGE.max}
+                value={rowsPerPage || ""}
+                placeholder={`Auto (${autoCapacity})`}
+                onChange={(e) => set("rowsPerPage", Math.max(0, Number(e.target.value) || 0))}
+              />
+              {rowsPerPage ? (
+                <Button variant="ghost" size="sm" onClick={() => set("rowsPerPage", 0)}>
+                  Auto
+                </Button>
+              ) : null}
+            </div>
+            <p className="max-w-xs text-xs text-muted-foreground">
+              {rowsPerPage
+                ? `Each page carries ${rowsPerPage} rows, then the day continues on a new page.`
+                : `Filling each ${geo.sizeName} automatically — about ${autoCapacity} rows per page.`}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-3">
+          <span className="text-xs text-muted-foreground">
+            {pages.length} printed page{pages.length === 1 ? "" : "s"} · previewing {page.label}
+          </span>
+          {pages.length > 1
+            ? pages.map((p, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  aria-pressed={i === pageIndex}
+                  className={`rounded-md border px-2 py-1 text-xs ${
+                    i === pageIndex ? "border-[#003FC7] bg-background font-medium" : "border-border bg-background/60"
+                  }`}
+                  onClick={() => {
+                    setActivePage(i);
+                    setActiveDay(p.dayIndex);
+                  }}
+                >
+                  {i + 1}
+                </button>
+              ))
+            : null}
+        </div>
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         {/* live sheet */}
@@ -281,6 +417,7 @@ export function AgendaStudio({
               {geo.isScreen
                 ? `${geo.pxW} × ${geo.pxH} px · sRGB screen`
                 : `${geo.trimW} × ${geo.trimH} mm trim · ${geo.bleedEdge} mm bleed`}
+              {pages.length > 1 ? ` · page ${pageIndex + 1} of ${pages.length}` : ""}
             </span>
             <span className="flex items-center gap-3">
               <label className="flex items-center gap-2">
@@ -314,11 +451,12 @@ export function AgendaStudio({
             >
 
               <div style={{ transform: `scale(${previewScale})`, transformOrigin: "top left" }}>
-                <AgendaSheet config={config} pxPerMm={NATIVE_PX_PER_MM} guides={guides} />
+                <AgendaSheet config={pageConfig} pxPerMm={NATIVE_PX_PER_MM} guides={guides} />
               </div>
             </div>
           </div>
         </div>
+
 
         {/* controls */}
         <div className="space-y-5">
@@ -442,12 +580,12 @@ export function AgendaStudio({
 
           <div className="space-y-2">
             <Label htmlFor="agenda-title">Day title</Label>
-            <Input id="agenda-title" value={config.title} onChange={(e) => set("title", e.target.value)} />
+            <Input id="agenda-title" value={day.label} onChange={(e) => patchDay({ label: e.target.value })} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="agenda-meta">Date · venue line</Label>
-            <Input id="agenda-meta" value={config.meta} onChange={(e) => set("meta", e.target.value)} />
+            <Input id="agenda-meta" value={day.meta} onChange={(e) => patchDay({ meta: e.target.value })} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -654,7 +792,7 @@ export function AgendaStudio({
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">
-            Programme — {config.sessions.length} rows
+            {days.length > 1 ? `${day.label || `Day ${dayIndex + 1}`} programme` : "Programme"} — {day.sessions.length} rows
             <span className="ml-2 text-xs font-normal text-muted-foreground">
               of {fit.maxRows} that fit {geo.sizeName}
             </span>
@@ -663,17 +801,16 @@ export function AgendaStudio({
             variant="secondary"
             size="sm"
             onClick={() =>
-              setConfig((c) => ({
-                ...c,
-                sessions: [...c.sessions, { time: "", title: "New session", detail: "", track: "", muted: false }],
-              }))
+              patchDay({
+                sessions: [...day.sessions, { time: "", title: "New session", detail: "", track: "", muted: false }],
+              })
             }
           >
             <Plus className="mr-2 h-4 w-4" /> Add row
           </Button>
         </div>
         <div className="space-y-2">
-          {config.sessions.map((session, i) => (
+          {day.sessions.map((session, i) => (
             <div
               key={i}
               className={`grid gap-2 rounded-lg border p-3 md:grid-cols-[90px_1fr_1fr_120px_auto] ${
@@ -725,7 +862,7 @@ export function AgendaStudio({
                   variant="ghost"
                   size="icon"
                   aria-label={`Delete row ${i + 1}`}
-                  onClick={() => setConfig((c) => ({ ...c, sessions: c.sessions.filter((_, j) => j !== i) }))}
+                  onClick={() => patchDay({ sessions: day.sessions.filter((_, j) => j !== i) })}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

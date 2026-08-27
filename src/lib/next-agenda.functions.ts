@@ -31,7 +31,19 @@ const configSchema = z
     title: z.string().default(""),
     meta: z.string().default(""),
     titleColor: z.string().default(""),
-    sessions: z.array(sessionSchema).max(24).default([]),
+    sessions: z.array(sessionSchema).max(60).default([]),
+    days: z
+      .array(
+        z.object({
+          label: z.string().default(""),
+          meta: z.string().default(""),
+          sessions: z.array(sessionSchema).max(60).default([]),
+        }),
+      )
+      .max(14)
+      .optional(),
+    rowsPerPage: z.number().min(0).max(40).optional(),
+
     footnote: z.string().default(""),
     qrData: z.string().default(""),
     qrSize: z.number().default(48),

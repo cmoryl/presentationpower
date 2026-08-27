@@ -234,6 +234,24 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
         </div>
       ) : null}
 
+      {(config.pageLabel ?? "").trim() ? (
+        <div
+          style={{
+            ...at(blocks.x, blocks.footY),
+            width: mm(blocks.contentW),
+            textAlign: "right",
+            fontSize: mm(L.footSize),
+            fontWeight: 700,
+            letterSpacing: "0.16em",
+            opacity: 0.72,
+            textTransform: "uppercase",
+          }}
+        >
+          {config.pageLabel}
+        </div>
+      ) : null}
+
+
       {guides ? (
         <>
           <div

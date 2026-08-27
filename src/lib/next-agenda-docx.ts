@@ -22,6 +22,7 @@ import {
   agendaInk,
   agendaLayout,
   agendaName,
+  agendaPages,
   agendaStops,
   agendaTitleInk,
   type AgendaConfig,
@@ -130,8 +131,9 @@ function cell(widthTwips: number, content: string): string {
  * inks; the approved gradient ground is a flattened full-page picture behind it.
  */
 export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blob; notes: string[] }> {
+  const pages = agendaPages(config);
   const geo = agendaGeometry(config);
-  const L = agendaLayout(config);
+  const L = agendaLayout(pages[0]!.config);
   const blocks = agendaBlocks(config);
   const ink = agendaInk(config.face ?? "dark");
   const inkHex = hex(ink, config.face === "light" ? "03002C" : "FFFFFF");
@@ -149,7 +151,7 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
   const ground = await flattenedGroundPng(config, groundPx);
   const groundBytes = await ground.arrayBuffer();
 
-  const backgroundDrawing = [
+  const backgroundDrawing = (rel: string) => [
     "<w:r><w:drawing>",
     `<wp:anchor behindDoc="1" distT="0" distB="0" distL="0" distR="0" simplePos="0" locked="0" layoutInCell="1" allowOverlap="1" relativeHeight="0">`,
     '<wp:simplePos x="0" y="0"/>',
@@ -162,7 +164,7 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
     "<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\"><a:graphicData uri=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">",
     '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
     '<pic:nvPicPr><pic:cNvPr id="1" name="ground.png"/><pic:cNvPicPr/></pic:nvPicPr>',
-    '<pic:blipFill><a:blip r:embed="rIdGround"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>',
+    `<pic:blipFill><a:blip r:embed="${rel}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>`,
     `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${Math.round(geo.trimW * EMU_PER_MM)}" cy="${Math.round(geo.trimH * EMU_PER_MM)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>`,
     "</pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>",
   ].join("");
@@ -171,100 +173,125 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
   const trackW = contentTwips * 0.2;
   const bodyW = contentTwips - timeW - trackW;
 
-  const rows = config.sessions
-    .map((session) => {
-      const muted = session.muted;
-      const rowInk = muted ? hex(ink, "8A93A6") : inkHex;
-      const body = [
-        para(
-          run(session.title ?? "", {
-            size: halfPt(L.titleRowSize),
-            color: rowInk,
-            bold: !muted,
-          }),
-          { afterTwips: 20 },
-        ),
-        (session.detail ?? "").trim()
-          ? para(
-              run(session.detail, { size: halfPt(L.detailSize), color: rowInk }),
-              { afterTwips: 0 },
-            )
-          : "",
-      ].join("");
-      return [
-        "<w:tr>",
-        cell(
-          timeW,
-          para(run(session.time ?? "", { size: halfPt(L.timeSize), color: rowInk, bold: true }), {
-            afterTwips: 0,
-          }),
-        ),
-        cell(bodyW, body),
-        cell(
-          trackW,
+  /** One programme page: header block, row table, footer and page stamp. */
+  const buildPage = (cfg: AgendaConfig, groundRel: string): string => {
+    const PL = agendaLayout(cfg);
+    const pageTitleHex = hex(agendaTitleInk(cfg));
+
+    const rows = (cfg.sessions ?? [])
+      .map((session) => {
+        const muted = session.muted;
+        const rowInk = muted ? hex(ink, "8A93A6") : inkHex;
+        const body = [
           para(
-            run(session.track ?? "", {
-              size: halfPt(L.trackSize),
+            run(session.title ?? "", {
+              size: halfPt(PL.titleRowSize),
               color: rowInk,
-              caps: true,
-              spacing: 20,
+              bold: !muted,
             }),
-            { afterTwips: 0, align: "right" },
+            { afterTwips: 20 },
           ),
-        ),
-        "</w:tr>",
-      ].join("");
-    })
-    .join("");
+          (session.detail ?? "").trim()
+            ? para(run(session.detail, { size: halfPt(PL.detailSize), color: rowInk }), { afterTwips: 0 })
+            : "",
+        ].join("");
+        return [
+          "<w:tr>",
+          cell(
+            timeW,
+            para(run(session.time ?? "", { size: halfPt(PL.timeSize), color: rowInk, bold: true }), {
+              afterTwips: 0,
+            }),
+          ),
+          cell(bodyW, body),
+          cell(
+            trackW,
+            para(
+              run(session.track ?? "", {
+                size: halfPt(PL.trackSize),
+                color: rowInk,
+                caps: true,
+                spacing: 20,
+              }),
+              { afterTwips: 0, align: "right" },
+            ),
+          ),
+          "</w:tr>",
+        ].join("");
+      })
+      .join("");
 
-  const table = [
-    "<w:tbl><w:tblPr>",
-    `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
-    '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
-    "<w:tblLayout w:type=\"fixed\"/></w:tblPr>",
-    "<w:tblGrid>",
-    `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
-    "</w:tblGrid>",
-    rows,
-    "</w:tbl>",
-  ].join("");
+    const table = [
+      "<w:tbl><w:tblPr>",
+      `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
+      '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
+      "<w:tblLayout w:type=\"fixed\"/></w:tblPr>",
+      "<w:tblGrid>",
+      `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
+      "</w:tblGrid>",
+      rows,
+      "</w:tbl>",
+    ].join("");
 
-  const header = [
-    (config.eyebrow ?? "").trim()
-      ? para(
-          run(config.eyebrow, {
-            size: halfPt(L.eyebrowSize),
-            color: inkHex,
-            caps: true,
-            bold: true,
-            spacing: 40,
-          }),
-          { afterTwips: 60 },
-        )
-      : "",
-    para(
-      run(config.title ?? "", { size: halfPt(L.titleSize), color: titleHex, bold: true, spacing: -20 }),
-      { afterTwips: 80 },
-    ),
-    (config.meta ?? "").trim()
-      ? para(run(config.meta, { size: halfPt(L.metaSize), color: inkHex }), { afterTwips: 200 })
-      : "",
-  ].join("");
+    const header = [
+      (cfg.eyebrow ?? "").trim()
+        ? para(
+            run(cfg.eyebrow, {
+              size: halfPt(PL.eyebrowSize),
+              color: inkHex,
+              caps: true,
+              bold: true,
+              spacing: 40,
+            }),
+            { afterTwips: 60 },
+          )
+        : "",
+      para(
+        run(cfg.title ?? "", { size: halfPt(PL.titleSize), color: pageTitleHex, bold: true, spacing: -20 }),
+        { afterTwips: 80 },
+      ),
+      (cfg.meta ?? "").trim()
+        ? para(run(cfg.meta, { size: halfPt(PL.metaSize), color: inkHex }), { afterTwips: 200 })
+        : "",
+    ].join("");
 
-  const footer = [
-    (config.qrData ?? "").trim()
-      ? para(
-          run(`${(config.qrCaption ?? "").trim() || "Scan for the live agenda"}: ${config.qrData}`, {
-            size: halfPt(L.footSize),
-            color: inkHex,
-          }),
-          { afterTwips: 40 },
-        )
-      : "",
-    (config.footnote ?? "").trim()
-      ? para(run(config.footnote, { size: halfPt(L.footSize), color: inkHex }), { afterTwips: 0 })
-      : "",
-  ].join("");
+    const footer = [
+      (cfg.qrData ?? "").trim()
+        ? para(
+            run(`${(cfg.qrCaption ?? "").trim() || "Scan for the live agenda"}: ${cfg.qrData}`, {
+              size: halfPt(PL.footSize),
+              color: inkHex,
+            }),
+            { afterTwips: 40 },
+          )
+        : "",
+      (cfg.footnote ?? "").trim()
+        ? para(run(cfg.footnote, { size: halfPt(PL.footSize), color: inkHex }), { afterTwips: 0 })
+        : "",
+      (cfg.pageLabel ?? "").trim()
+        ? para(
+            run(cfg.pageLabel ?? "", { size: halfPt(PL.footSize), color: inkHex, caps: true, bold: true, spacing: 30 }),
+            { afterTwips: 0, align: "right" },
+          )
+        : "",
+    ].join("");
+
+    return [
+      `<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${backgroundDrawing(groundRel)}</w:p>`,
+      `<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${run(division.name, { size: halfPt(L.metaSize), color: inkHex, caps: true, bold: true, spacing: 40 })}</w:p>`,
+      header,
+      table,
+      '<w:p><w:pPr><w:spacing w:after="120"/></w:pPr></w:p>',
+      footer,
+    ].join("");
+  };
+
+  const pageBreak =
+    '<w:p><w:pPr><w:spacing w:after="0"/></w:pPr><w:r><w:br w:type="page"/></w:r></w:p>';
+
+  const body = pages
+    .map((pageDef, i) => buildPage(pageDef.config, `rIdGround${i === 0 ? "" : i + 1}`))
+    .join(pageBreak);
 
   const document = [
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
@@ -274,12 +301,7 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
     ' xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"',
     ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">',
     "<w:body>",
-    `<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${backgroundDrawing}</w:p>`,
-    `<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${run(division.name, { size: halfPt(L.metaSize), color: inkHex, caps: true, bold: true, spacing: 40 })}</w:p>`,
-    header,
-    table,
-    "<w:p><w:pPr><w:spacing w:after=\"120\"/></w:pPr></w:p>",
-    footer,
+    body,
     "<w:sectPr>",
     `<w:pgSz w:w="${pageW}" w:h="${pageH}" w:orient="${geo.trimW > geo.trimH ? "landscape" : "portrait"}"/>`,
     `<w:pgMar w:top="${margin}" w:right="${margin}" w:bottom="${margin}" w:left="${margin}" w:header="0" w:footer="0" w:gutter="0"/>`,
@@ -315,7 +337,10 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
     [
       '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
       '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">',
-      '<Relationship Id="rIdGround" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>',
+      ...pages.map(
+        (_p, i) =>
+          `<Relationship Id="rIdGround${i === 0 ? "" : i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/ground.png"/>`,
+      ),
       '<Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>',
       "</Relationships>",
     ].join(""),
@@ -345,7 +370,8 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
     notes: [
       `Page set to ${geo.sizeName} (${geo.trimW} × ${geo.trimH} mm) with ${Math.round(geo.safeInset)} mm safe margins`,
       "Approved gradient ground flattened to a full-page picture behind the text",
-      `Live editable Geist text at the printed sizes · ${config.sessions.length} programme rows in a Word table`,
+      `${pages.length} page${pages.length === 1 ? "" : "s"} across ${pages[pages.length - 1]!.dayCount} programme day${pages[pages.length - 1]!.dayCount === 1 ? "" : "s"}, each with the flattened ground behind it`,
+      `Live editable Geist text at the printed sizes · programme rows in Word tables`,
       `Row band reference: ${blocks.rowH.toFixed(1)} mm per row on the printed board`,
       `Asset: ${agendaName(config)}`,
     ],
