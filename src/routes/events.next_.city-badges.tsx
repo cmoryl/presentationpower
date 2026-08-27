@@ -112,7 +112,9 @@ function CityBadgePage() {
     try {
       const result = await exportCityBadge({
         node,
+        backNode: backRef.current,
         nativeWidth: BADGE_SPEC.bleedW * PREVIEW_PPI,
+
         nativeHeight: BADGE_SPEC.bleedH * PREVIEW_PPI,
         config: cfg,
         versionName: name,
