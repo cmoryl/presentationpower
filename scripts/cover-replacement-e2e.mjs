@@ -174,11 +174,12 @@ try {
     }
   });
   if (pdfSize) {
-    const ratio = pdfSize.width / pdfSize.height;
+    const [wIn, hIn] = pdfSize;
+    const ratio = wIn / hIn;
     check(
       "deck PDF page is the presentation aspect ratio",
       Math.abs(ratio - 16 / 9) < 0.05,
-      `${pdfSize.width.toFixed(2)}×${pdfSize.height.toFixed(2)}in (${ratio.toFixed(3)})`,
+      `${wIn.toFixed(2)}×${hIn.toFixed(2)}in (${ratio.toFixed(3)})`,
     );
   } else {
     check("deck PDF page measurable", false, "no export stage on the harness page");
