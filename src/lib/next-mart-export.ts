@@ -38,6 +38,7 @@ import {
   type MartFlatSign,
   type MartPillarSign,
 } from "./next-mart";
+import { martFlatConfig, martFlatArtworkId, martArtwork } from "./next-mart-placement";
 
 export type MartExportProgress = { index: number; total: number; label: string };
 
@@ -283,18 +284,43 @@ export async function exportMartBundle(opts?: {
     });
   }
 
-  // ──────────────────────────────────────────────── flat signage print specs
+  // ──────────────────────── flat signage: editable master + measured spec
+  // Flat panels run through the same layered vector engine as the pillars, at
+  // their own measured footprint, with the supplied category artwork placed on
+  // its own layer where the set carries one.
   for (const sign of flat) {
-    tick(`Filing ${sign.name} spec`);
-    zip.file(`flat-signage/${slugify(sign.name)}/PRINT-SPEC.txt`, flatSpecSheet(sign));
+    tick(`Building ${sign.name}`);
+    const folder = `flat-signage/${slugify(sign.name)}`;
+    zip.file(`${folder}/PRINT-SPEC.txt`, flatSpecSheet(sign));
+
+    const config = martFlatConfig(sign);
+    const artId = martFlatArtworkId(sign);
+    const art = martArtwork(artId);
+    let bytes: Uint8Array | null = null;
+    try {
+      bytes = (await buildPillarVectorPdf(config)).bytes;
+    } catch {
+      bytes = null;
+    }
+    if (bytes) {
+      const buf = bytes.buffer.slice(
+        bytes.byteOffset,
+        bytes.byteOffset + bytes.byteLength,
+      ) as ArrayBuffer;
+      zip.file(`${folder}/pdf/${slugify(sign.name)}.pdf`, buf);
+      zip.file(`${folder}/ai/${slugify(sign.name)}.ai`, buf);
+    }
+
     entries.push({
       id: sign.id,
       name: sign.name,
       kind: "flat",
-      spec: `trim ${sign.trimW} x ${sign.trimH} mm · bleed ${sign.bleed} mm · ${sign.substrate}`,
+      spec:
+        `trim ${sign.trimW} x ${sign.trimH} mm · bleed ${sign.bleed} mm · ${sign.substrate}` +
+        (art ? ` · placed art: ${art.headline}` : ""),
       quantity: sign.quantity,
-      bytes: 0,
-      vector: false,
+      bytes: bytes?.byteLength ?? 0,
+      vector: Boolean(bytes),
     });
   }
 
