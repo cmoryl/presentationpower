@@ -149,7 +149,9 @@ async function auditBlob(
 const packCache = new Map<string, { data: string | null; surface: string }>();
 
 async function packSheet(pack: StylePack, variantId: string, layoutId: string) {
-  const key = `${pack.id}:${layoutId}`;
+  // Version the cache key on the backdrop registry: a replaced background
+  // must never be served from a plate rasterized before the replacement.
+  const key = `${pack.id}:${layoutId}:${skinBackdropOverrideVersion()}`;
   const hit = packCache.get(key);
   if (hit) return hit;
   const { rasterizePackBackground } = await import("@/lib/pack-background-raster");

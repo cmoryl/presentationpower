@@ -13,6 +13,7 @@
 // look AND stays editable.
 // -----------------------------------------------------------------------------
 
+import { sceneFromSeed } from "./skin-backgrounds";
 import { skinBackdropOverride, sceneTakeFromSeed } from "./skin-backdrop-overrides";
 import {
   GRAIN_PLATE,
