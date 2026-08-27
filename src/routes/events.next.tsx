@@ -43,6 +43,7 @@ import {
 import { CityBadge } from "@/components/next/CityBadge";
 import { PillarSign } from "@/components/next/PillarSign";
 import { AgendaSheet } from "@/components/next/AgendaSheet";
+import { agendaDefault } from "@/lib/next-agenda";
 import {
   pickAgendaFile,
   pickPillarFile,
@@ -1109,6 +1110,17 @@ function LivePillars({ division }: { division: NextDivision }) {
     [savedAgendas.data, division.id],
   );
 
+  // Every division gets an agenda preview card: the saved live file when there
+  // is one, otherwise the editable division default on the selected face.
+  const agendaCard = useMemo(() => {
+    const config = savedAgenda
+      ? savedAgenda.config
+      : { ...agendaDefault(division.id), face };
+    return { config };
+  }, [savedAgenda, division.id, face]);
+
+
+
 
   return (
     <section className="mt-4 scroll-mt-24" aria-labelledby="next-live-pillars">
@@ -1188,29 +1200,35 @@ function LivePillars({ division }: { division: NextDivision }) {
         ))}
       </div>
 
-      {savedAgenda && (
-        <article className="mt-4 flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row sm:items-center">
-          <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
-            <AgendaSheet config={savedAgenda.config} pxPerMm={0.22} />
-          </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-semibold tracking-tight">
-              Live agenda board · {division.name}
-            </h3>
-            <p className="mt-1 truncate text-xs text-muted-foreground">
-              {savedAgenda.name} · updated {new Date(savedAgenda.updated_at).toLocaleString()}
-            </p>
-            <Link
-              to="/events/next/agendas"
-              search={{ division: division.id, file: savedAgenda.id }}
-              className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-            >
-              Edit this agenda
-              <ArrowRight size={12} />
-            </Link>
-          </div>
-        </article>
-      )}
+      {/* Division agenda board — always listed, saved live file or the editable
+          division default, so every division shows an agenda preview card. */}
+      <article className="mt-4 flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row sm:items-center">
+        <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
+          <AgendaSheet config={agendaCard.config} pxPerMm={0.22} />
+        </div>
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold tracking-tight">
+            {savedAgenda ? "Live agenda board" : "Agenda board master"} · {division.name}
+          </h3>
+          <p className="mt-1 truncate text-xs text-muted-foreground">
+            {savedAgenda
+              ? `${savedAgenda.name} · updated ${new Date(savedAgenda.updated_at).toLocaleString()}`
+              : `${agendaCard.config.trimW}×${agendaCard.config.trimH} mm · ${agendaCard.config.face} face · editable default`}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Multi-day, multi-page programmes · layered PDF/X-4, Illustrator and editable Word export.
+          </p>
+          <Link
+            to="/events/next/agendas"
+            search={{ division: division.id, file: savedAgenda?.id }}
+            className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            {savedAgenda ? "Edit this agenda" : "Create this agenda"}
+            <ArrowRight size={12} />
+          </Link>
+        </div>
+      </article>
+
     </section>
   );
 }

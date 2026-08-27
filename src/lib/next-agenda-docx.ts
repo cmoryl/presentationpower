@@ -56,8 +56,10 @@ function hex(color: string, fallback = "000000"): string {
 }
 
 /**
- * Flatten the approved gradient ground to a PNG at the trim size. Word gets a
- * picture, but it is the same gradient and the same stops as the press file.
+ * Flatten the approved gradient ground to a PNG at the trim size, with the
+ * approved division lockup burned in at its exact printed position so Word
+ * carries the real mark instead of a text substitute. Word gets a picture, but
+ * it is the same gradient, the same stops and the same lockup as the press file.
  */
 async function flattenedGroundPng(config: AgendaConfig, px: { w: number; h: number }): Promise<Blob> {
   const canvas = document.createElement("canvas");
@@ -75,6 +77,8 @@ async function flattenedGroundPng(config: AgendaConfig, px: { w: number; h: numb
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  await drawLockup(ctx, config, canvas.width);
+
   return await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
       (b) => (b ? resolve(b) : reject(new Error("Could not rasterize the agenda background"))),
@@ -82,6 +86,51 @@ async function flattenedGroundPng(config: AgendaConfig, px: { w: number; h: numb
     );
   });
 }
+
+/** Paint the approved division lockup onto the flattened Word ground. */
+async function drawLockup(
+  ctx: CanvasRenderingContext2D,
+  config: AgendaConfig,
+  canvasWidth: number,
+): Promise<void> {
+  const blocks = agendaBlocks(config);
+  const division = agendaDivision(config.divisionId);
+  const face = config.face ?? "dark";
+  const src =
+    face === "light"
+      ? division.colorUrl || division.whiteUrl
+      : division.whiteUrl || division.colorUrl;
+  if (!blocks.lockup || !src) return;
+
+  const geo = agendaGeometry(config);
+  // The ground picture is the trim area, and blocks are measured from the trim
+  // origin, so one millimetre maps straight onto the canvas at this scale.
+  const scale = canvasWidth / geo.trimW;
+
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.crossOrigin = "anonymous";
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error("lockup unavailable"));
+      el.src = src;
+    });
+    const boxW = blocks.lockup.w * scale;
+    const boxH = blocks.lockup.h * scale;
+    const ratio = img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1;
+    // Match the sheet's contain / left-top placement.
+    let drawW = boxW;
+    let drawH = boxW / ratio;
+    if (drawH > boxH) {
+      drawH = boxH;
+      drawW = boxH * ratio;
+    }
+    ctx.drawImage(img, blocks.lockup.x * scale, blocks.lockup.y * scale, drawW, drawH);
+  } catch {
+    /* lockup unavailable — the Word ground still carries the approved gradient */
+  }
+}
+
 
 function agendaFaceGround(config: AgendaConfig): string {
   return (config.face ?? "dark") === "light" ? "#EEF1F7" : "#03002C";
@@ -278,7 +327,13 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
 
     return [
       `<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${backgroundDrawing(groundRel)}</w:p>`,
-      `<w:p><w:pPr><w:spacing w:after="0"/></w:pPr>${run(division.name, { size: halfPt(L.metaSize), color: inkHex, caps: true, bold: true, spacing: 40 })}</w:p>`,
+      // The approved lockup is burned into the ground picture at its printed
+      // position, so the text block just reserves the same vertical space.
+      `<w:p><w:pPr><w:spacing w:after="0" w:line="${Math.max(
+        120,
+        Math.round(((blocks.lockup?.h ?? 0) + 4) * TWIPS_PER_MM),
+      )}" w:lineRule="exact"/></w:pPr></w:p>`,
+
       header,
       table,
       '<w:p><w:pPr><w:spacing w:after="120"/></w:pPr></w:p>',
@@ -369,7 +424,7 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
     blob,
     notes: [
       `Page set to ${geo.sizeName} (${geo.trimW} × ${geo.trimH} mm) with ${Math.round(geo.safeInset)} mm safe margins`,
-      "Approved gradient ground flattened to a full-page picture behind the text",
+      "Approved gradient ground plus the division lockup flattened to a full-page picture behind the editable text",
       `${pages.length} page${pages.length === 1 ? "" : "s"} across ${pages[pages.length - 1]!.dayCount} programme day${pages[pages.length - 1]!.dayCount === 1 ? "" : "s"}, each with the flattened ground behind it`,
       `Live editable Geist text at the printed sizes · programme rows in Word tables`,
       `Row band reference: ${blocks.rowH.toFixed(1)} mm per row on the printed board`,
