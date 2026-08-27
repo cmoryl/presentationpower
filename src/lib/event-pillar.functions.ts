@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { canEditNextDivision } from "./next-permissions.functions";
+
 
 // Saved event pillar sign files. Each row is a live, re-editable pillar setup
 // that can be re-opened and re-exported for print at any time. RLS scopes
@@ -61,6 +63,9 @@ export const savePillarFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => versionInput.parse(data))
   .handler(async ({ data, context }) => {
+    const divisionId = data.config.divisionId;
+    const allowed = await canEditNextDivision(context.userId, divisionId, context.supabase as never);
+    if (!allowed) throw new Error("You are not authorized to edit pillars for this division");
     const { data: row, error } = await context.supabase
       .from("event_pillar_versions")
       .insert({
@@ -69,8 +74,9 @@ export const savePillarFile = createServerFn({ method: "POST" })
         scope: data.scope,
         notes: data.notes,
         config: data.config as never,
+        division_id: divisionId,
         user_id: context.userId,
-      })
+      } as never)
       .select("*")
       .single();
     if (error) throw error;
@@ -83,12 +89,27 @@ export const updatePillarFile = createServerFn({ method: "POST" })
     versionInput.partial().extend({ id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
+    const { data: existing, error: findError } = await context.supabase
+      .from("event_pillar_versions")
+      .select("user_id, division_id, config")
+      .eq("id", data.id)
+      .single();
+    if (findError) throw findError;
+    const isOwner = existing.user_id === context.userId;
+    const existingConfig = (existing.config ?? {}) as { divisionId?: string };
+    const divisionId = data.config?.divisionId ?? existingConfig.divisionId ?? existing.division_id;
+    const allowed =
+      isOwner || (await canEditNextDivision(context.userId, divisionId, context.supabase as never));
+    if (!allowed) throw new Error("You are not authorized to edit pillars for this division");
     const patch: Record<string, unknown> = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.eventLabel !== undefined) patch.event_label = data.eventLabel;
     if (data.scope !== undefined) patch.scope = data.scope;
     if (data.notes !== undefined) patch.notes = data.notes;
-    if (data.config !== undefined) patch.config = data.config;
+    if (data.config !== undefined) {
+      patch.config = data.config;
+      patch.division_id = data.config.divisionId;
+    }
     const { data: row, error } = await context.supabase
       .from("event_pillar_versions")
       .update(patch as never)
@@ -103,6 +124,16 @@ export const deletePillarFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
+    const { data: existing, error: findError } = await context.supabase
+      .from("event_pillar_versions")
+      .select("user_id, division_id")
+      .eq("id", data.id)
+      .single();
+    if (findError) throw findError;
+    const isOwner = existing.user_id === context.userId;
+    const allowed =
+      isOwner || (await canEditNextDivision(context.userId, existing.division_id, context.supabase as never));
+    if (!allowed) throw new Error("You are not authorized to delete this pillar file");
     const { error } = await context.supabase
       .from("event_pillar_versions")
       .delete()
