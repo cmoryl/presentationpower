@@ -792,6 +792,7 @@ export async function exportDeckToPptx(
   // below resolves through `export-chart-grammar`, so a pack that draws thick
   // segmented dials on screen exports thick segmented dials.
   setExportChartStyle(activePack);
+  exportGlyphColor = lookGlyphColor(activePack?.id ?? null);
 
   // Fresh transcode ledger per run so the post-export compatibility report only
   // describes the file we are about to produce.
@@ -2201,6 +2202,7 @@ export async function exportDeckToPptx(
   activeIntegrity = null;
   // Chart grammar is per-run state; release it so the next export re-resolves.
   resetExportChartStyle();
+  exportGlyphColor = null;
 
   // End-of-export validation: did canvas-block self-healing change anything on
   // the way out? If so the delivered file differs from the stored deck geometry,
@@ -3934,12 +3936,20 @@ function guardedInk(s: PptxGenJS.Slide, color: string): string {
   return c === "FFFFFF" || c === "FFF" ? ink : color;
 }
 
+/**
+ * Look-forced glyph colour for the run in flight. A look may lead its structure
+ * in one colour and its icons in another (DataForce's AI · Data Signature paints
+ * rules and ticks in DataForce Green, icons in DataForce Blue), so every icon
+ * emitter routes its colour through here rather than the accent it was handed.
+ */
+let exportGlyphColor: string | null = null;
+
 function addIconGlyph(
   s: PptxGenJS.Slide,
   label: string,
   opts: { x: number; y: number; size: number; color: string; index?: number; icon?: unknown },
 ): boolean {
-  const color = guardedInk(s, opts.color);
+  const color = guardedInk(s, exportGlyphColor ?? opts.color);
   const override = typeof opts.icon === "string" && opts.icon.length > 0 ? opts.icon : null;
   const glyph = (ovr: string | null) =>
     iconGlyphDataUrl(label, {
