@@ -24,6 +24,7 @@
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import { beginExportChrome, exportNodeFilter } from "./export-chrome-suppress";
+import { exportSlideBounds } from "./export-space";
 
 /**
  * FONT EMBED CACHE
@@ -777,9 +778,29 @@ export function pdfPageTargetWidth(requested?: number): number {
 }
 
 /**
- * Rasterize one or many slide nodes into a 16:9 landscape PDF (one node per
- * page). Uses a fixed 13.333 × 7.5 inch page — the standard PPTX widescreen
- * size — so the output matches PowerPoint's aspect ratio.
+ * Page size for one slide node, in inches.
+ *
+ * A deck PDF is a deck, not a document: the page must be the slide itself, so
+ * there is never a letter/A4 margin band or a crop. The measured node aspect
+ * wins; the export slide bounds (13.333 × 7.5 for widescreen decks, or whatever
+ * trim a print flow set through `withExportSlideBounds`) only supply the scale,
+ * so a 4:3, square or custom-trim slide exports at its OWN aspect ratio.
+ */
+export function pdfPageSizeForNode(node: HTMLElement): [number, number] {
+  const base = exportSlideBounds();
+  const w = node.offsetWidth || node.getBoundingClientRect().width;
+  const h = node.offsetHeight || node.getBoundingClientRect().height;
+  const ratio = w > 0 && h > 0 ? w / h : base.wIn / base.hIn;
+  if (Math.abs(ratio - base.wIn / base.hIn) < 0.005) return [base.wIn, base.hIn];
+  return ratio >= 1
+    ? [base.wIn, Number((base.wIn / ratio).toFixed(4))]
+    : [Number((base.hIn * ratio).toFixed(4)), base.hIn];
+}
+
+/**
+ * Rasterize one or many slide nodes into a PDF, one node per page, where every
+ * page is exactly the slide's own size and aspect ratio (never letter/A4).
+ * Callers that need a specific trim pass `pageSizeIn`.
  */
 export async function exportSlidesAsImagePdf(
   nodes: Array<{ node: HTMLElement; mode: SlideExportMode }>,
@@ -788,6 +809,8 @@ export async function exportSlidesAsImagePdf(
     pixelRatio?: number;
     /** Absolute output width in pixels; overrides `pixelRatio` when set. */
     targetWidth?: number;
+    /** Explicit page size in inches; defaults to each slide's own size. */
+    pageSizeIn?: [number, number];
     onProgress?: ExportProgressCallback;
     returnBlob?: boolean;
   } = {},
@@ -796,10 +819,13 @@ export async function exportSlidesAsImagePdf(
   // Never rasterize a PDF page below print resolution, whatever the caller asked
   // for; a larger request (e.g. 4K) is honoured as-is.
   const pageTargetWidth = pdfPageTargetWidth(opts.targetWidth);
+  const sizeOf = (node: HTMLElement): [number, number] =>
+    opts.pageSizeIn ?? pdfPageSizeForNode(node);
+  const first = sizeOf(nodes[0]!.node);
   const pdf = new jsPDF({
-    orientation: "landscape",
+    orientation: first[0] >= first[1] ? "landscape" : "portrait",
     unit: "in",
-    format: [13.333, 7.5],
+    format: first,
     compress: true,
   });
   for (let i = 0; i < nodes.length; i++) {
@@ -819,10 +845,13 @@ export async function exportSlidesAsImagePdf(
       onProgress: perSlide,
     });
 
-    if (i > 0) pdf.addPage([13.333, 7.5], "landscape");
+    // Each page carries its own slide size, so a mixed-size deck stays true to
+    // every slide instead of cropping to the first page's trim.
+    const [pw, ph] = i === 0 ? first : sizeOf(node);
+    if (i > 0) pdf.addPage([pw, ph], pw >= ph ? "landscape" : "portrait");
     // Use "SLOW" (loss-less DEFLATE) so the embedded PNG keeps every pixel
     // of the true high-res raster — "FAST" re-encodes as lossy JPEG.
-    pdf.addImage(dataUrl, "PNG", 0, 0, 13.333, 7.5, undefined, "SLOW");
+    pdf.addImage(dataUrl, "PNG", 0, 0, pw, ph, undefined, "SLOW");
   }
 
   report(opts.onProgress, { stage: "encode", progress: 1, message: "Assembling PDF…" });

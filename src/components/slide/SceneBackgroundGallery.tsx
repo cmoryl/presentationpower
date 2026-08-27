@@ -3,6 +3,10 @@
 // current slide. Selection commits as a standard `library` background, so the
 // pick renders on screen and exports natively to PowerPoint.
 import { useMemo, useState } from "react";
+import {
+  skinBackdropOverride,
+  useSkinBackdropVersion,
+} from "@/lib/skin-backdrop-overrides";
 import { Check, Columns2, Search, X } from "lucide-react";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 import type { MotifFamily } from "@/lib/skin-backgrounds";
@@ -62,6 +66,14 @@ export function SceneBackgroundGallery({
     () => filterSceneBackgrounds({ scene, family, mode, take, query }),
     [scene, family, mode, take, query],
   );
+
+  // A replaced background is the composition from then on, here too.
+  const bgVersion = useSkinBackdropVersion();
+  const paint = (b: { skinCode: string; scene: string; take: number; css: string }) => {
+    void bgVersion;
+    const url = skinBackdropOverride(b.skinCode, b.scene, b.take);
+    return url ? `url("${url}") center center / cover no-repeat, ${b.css}` : b.css;
+  };
 
   const compareTakes = useMemo(
     () => (compare ? sceneTakes(compare.code, compare.scene) : []),
@@ -160,7 +172,7 @@ export function SceneBackgroundGallery({
                       : "border-border hover:border-foreground/40"
                   }`}
                 >
-                  <div className="absolute inset-0" style={{ background: t.css }} />
+                  <div className="absolute inset-0" style={{ background: paint(t) }} />
                   {selected && (
                     <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-foreground text-background">
                       <Check className="h-3 w-3" />
@@ -201,7 +213,7 @@ export function SceneBackgroundGallery({
                 title={`${p.skinCode} · ${p.skinName} — ${SCENE_LABEL[p.scene]} · ${p.familyLabel}`}
                 className="absolute inset-0 text-left"
               >
-                <div className="absolute inset-0" style={{ background: p.css }} />
+                <div className="absolute inset-0" style={{ background: paint(p) }} />
                 {selected && (
                   <span className="absolute right-1.5 top-1.5 grid h-5 w-5 place-items-center rounded-full bg-foreground text-background">
                     <Check className="h-3 w-3" />

@@ -37,6 +37,7 @@ import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 import { SceneDebugOverlay } from "@/components/slide/SceneDebugOverlay";
 import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
+import { sceneTakeFromSeed, useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
@@ -295,6 +296,13 @@ export const SlideBackdropContext = createContext<SlideBackdrop | null>(null);
  */
 export const SlideSceneSeedContext = createContext<string | null>(null);
 
+/**
+ * True when the module itself paints photography/video (a MediaTile), so an
+ * authored background image must NOT suppress the module's own scrims — those
+ * scrims are what keeps text legible on the module's picture.
+ */
+export const SlideOwnsMediaContext = createContext<boolean>(false);
+
 export function useSlideSceneSeed(): string | null {
   return useContext(SlideSceneSeedContext);
 }
@@ -416,6 +424,9 @@ export function SlideFrame({
   const enterprise = isEnterpriseWhite(skin);
 
   const backdrop = useContext(SlideBackdropContext);
+  const ownsMedia = useContext(SlideOwnsMediaContext);
+  // Repaint the ground the moment an admin saves a replacement background.
+  useSkinBackdropVersion();
   // AI-generated backdrop for the active skin, if the studio has rendered one
   // for this scene. Painted between the pack's flat field and its ground planes
   // so the skin's own scaffold and motif still read on top.
@@ -442,7 +453,13 @@ export function SlideFrame({
   const groundSeed = templateScene
     ? `scene:${templateScene} accentlock ${moduleSeed ?? ""} ${layoutId ?? variant}`
     : `scene:${packScene} ${moduleSeed ?? ""} ${layoutId ?? variant}`;
-  const aiBackdrop = useSkinBackdropImage(pack?.id ?? null, packScene);
+  // Same take the ground plane paints, so a replacement saved for an alternate
+  // composition (Take B/C/D) is the one that shows here.
+  const aiBackdrop = useSkinBackdropImage(
+    pack?.id ?? null,
+    packScene,
+    sceneTakeFromSeed(groundSeed).take,
+  );
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
   // mode. That override predates mode-aware ink tokens and breaks light-mode
@@ -1179,6 +1196,17 @@ export function SlideFrame({
         return (
           <div
             data-slide-content-plane=""
+            /* An authored background photo/aurora replaces the module's legacy
+               vector decoration (rings, orbs, grids, gradient washes). Without
+               this, swapping a cover image left the old template vectors
+               painting on top of the new picture. Modules that own their own
+               media keep their decoration — those layers are scrims for their
+               own photography, not leftover template art. */
+            data-authored-media={
+              (hasBackdropImage || hasBackdropAurora) && backdrop?.authored && !ownsMedia
+                ? "1"
+                : undefined
+            }
             data-pack-compose={compose ? compose.plate : undefined}
             className="absolute inset-0 px-24"
             style={{

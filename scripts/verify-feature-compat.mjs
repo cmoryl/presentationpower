@@ -130,6 +130,77 @@ const FEATURES = [
     support: () => ok(),
     note: "Modules group so users can move a whole block; ungroup restores parts.",
   },
+  // ── grouping / z-order integrity (timeline + rail modules) ────────────────
+  {
+    id: "group-child-transform",
+    detect: (p) => groupAudit(p).groups,
+    support: (p) =>
+      groupAudit(p).missingChild === 0
+        ? ok()
+        : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"])),
+    note: "Every p:grpSp needs chOff/chExt; without them 2007-2016 collapse the group to zero size and the parts vanish.",
+  },
+  {
+    id: "group-child-bounds",
+    detect: (p) => groupAudit(p).groups,
+    support: (p) =>
+      groupAudit(p).outOfBounds === 0
+        ? ok()
+        : {
+            "win-2007": "WARN",
+            "win-2010-2016": "WARN",
+            "win-2019-365": "PASS",
+            "mac-2016-365": "WARN",
+            "web-365": "WARN",
+          },
+    note: "Child boxes outside the group's chOff/chExt window render offset/clipped in older builds.",
+  },
+  {
+    id: "group-nesting-depth",
+    detect: (p) => groupAudit(p).groups,
+    support: (p) =>
+      groupAudit(p).maxDepth <= 3
+        ? ok()
+        : {
+            "win-2007": "WARN",
+            "win-2010-2016": "PASS",
+            "win-2019-365": "PASS",
+            "mac-2016-365": "WARN",
+            "web-365": "WARN",
+          },
+    note: "Deep group nesting (>3) makes selecting a single connector/tick painful and is slow to render in 2007/Web.",
+  },
+  {
+    id: "group-singleton",
+    detect: (p) => groupAudit(p).singletons,
+    support: () => ({
+      "win-2007": "WARN",
+      "win-2010-2016": "WARN",
+      "win-2019-365": "WARN",
+      "mac-2016-365": "WARN",
+      "web-365": "WARN",
+    }),
+    note: "A group wrapping one shape adds a pointless click-through when editing a spine or milestone.",
+  },
+  {
+    id: "unique-shape-ids",
+    detect: () => 1,
+    support: (p) =>
+      groupAudit(p).dupIds === 0 ? ok() : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"])),
+    note: "Duplicate p:cNvPr id values within one slide trigger the repair prompt in every desktop build.",
+  },
+  {
+    id: "internal-tag-leak",
+    detect: (p) => groupAudit(p).leakedTags,
+    support: () => ({
+      "win-2007": "WARN",
+      "win-2010-2016": "WARN",
+      "win-2019-365": "WARN",
+      "mac-2016-365": "WARN",
+      "web-365": "WARN",
+    }),
+    note: "Exporter tags ([g:…], [gf:…], [sh:…]) must be stripped from object names before shipping.",
+  },
   {
     id: "alt-text",
     detect: (p) => p.count(/descr="[^"]+"/g),
@@ -383,6 +454,98 @@ function formatSupport({ media }) {
     : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"]));
 }
 
+/**
+ * GROUPING / Z-ORDER AUDIT
+ *
+ * Walks every `ppt/slides/slideN.xml` and checks the invariants PowerPoint
+ * actually enforces on groups: a child transform window on every `p:grpSp`,
+ * children that live inside that window, sane nesting depth, no singleton
+ * groups, unique shape ids per slide, and no leaked exporter tags.
+ * Memoised per package so the feature rows above stay cheap.
+ */
+const GROUP_AUDIT = new WeakMap();
+function groupAudit(pkg) {
+  const cached = GROUP_AUDIT.get(pkg);
+  if (cached) return cached;
+  const out = {
+    groups: 0,
+    singletons: 0,
+    missingChild: 0,
+    outOfBounds: 0,
+    maxDepth: 0,
+    dupIds: 0,
+    leakedTags: 0,
+    details: [],
+  };
+  const num = (s) => (s ? Number(s) : 0);
+  for (const xml of pkg.slides ?? []) {
+    const ids = [...xml.matchAll(/<p:cNvPr id="(\d+)"/g)].map((m) => m[1]);
+    const dup = ids.length - new Set(ids).size;
+    if (dup > 0) {
+      out.dupIds += dup;
+      out.details.push(`${dup} duplicate shape id(s)`);
+    }
+    for (const m of xml.matchAll(/name="([^"]*)"/g))
+      if (/\[(?:g|gf|sh|rp|cc):/.test(m[1])) out.leakedTags += 1;
+
+    // Depth: track nesting by scanning group open/close tokens in order.
+    let depth = 0;
+    for (const t of xml.matchAll(/<p:grpSp>|<\/p:grpSp>/g)) {
+      if (t[0] === "<p:grpSp>") {
+        depth += 1;
+        out.maxDepth = Math.max(out.maxDepth, depth);
+      } else depth = Math.max(0, depth - 1);
+    }
+
+    // Per-group checks on the group's own grpSpPr block (non-nested slice is
+    // enough: the xfrm always precedes the children).
+    for (const g of xml.matchAll(/<p:grpSp>([\s\S]*?)<\/p:grpSp>/g)) {
+      out.groups += 1;
+      const body = g[1];
+      const nameMatch = /name="([^"]*)"/.exec(body);
+      const label = nameMatch ? nameMatch[1] : "group";
+      const children =
+        (body.match(/<p:sp>/g) ?? []).length +
+        (body.match(/<p:pic>/g) ?? []).length +
+        (body.match(/<p:graphicFrame>/g) ?? []).length +
+        (body.match(/<p:grpSp>/g) ?? []).length;
+      if (children <= 1) {
+        out.singletons += 1;
+        out.details.push(`singleton group "${label}"`);
+      }
+      const xf = /<a:xfrm[^>]*>([\s\S]*?)<\/a:xfrm>/.exec(body);
+      const chOff = xf && /<a:chOff x="(-?\d+)" y="(-?\d+)"\/>/.exec(xf[1]);
+      const chExt = xf && /<a:chExt cx="(\d+)" cy="(\d+)"\/>/.exec(xf[1]);
+      if (!chOff || !chExt || num(chExt[1]) <= 0 || num(chExt[2]) <= 0) {
+        out.missingChild += 1;
+        out.details.push(`group "${label}" has no usable chOff/chExt`);
+        continue;
+      }
+      const x0 = num(chOff[1]);
+      const y0 = num(chOff[2]);
+      const x1 = x0 + num(chExt[1]);
+      const y1 = y0 + num(chExt[2]);
+      const inner = body.slice(xf.index + xf[0].length);
+      for (const c of inner.matchAll(
+        /<a:off x="(-?\d+)" y="(-?\d+)"\/><a:ext cx="(\d+)" cy="(\d+)"\/>/g,
+      )) {
+        const cx0 = num(c[1]);
+        const cy0 = num(c[2]);
+        const cx1 = cx0 + num(c[3]);
+        const cy1 = cy0 + num(c[4]);
+        // 1pt slack: rounding in EMU conversion is not a real defect.
+        const slack = 12700;
+        if (cx0 < x0 - slack || cy0 < y0 - slack || cx1 > x1 + slack || cy1 > y1 + slack) {
+          out.outOfBounds += 1;
+          out.details.push(`group "${label}" child outside child window`);
+        }
+      }
+    }
+  }
+  GROUP_AUDIT.set(pkg, out);
+  return out;
+}
+
 /** Magic-byte sniff — filenames in ppt/media are not trustworthy. */
 function sniffImageFormat(u8, name) {
   const b = u8;
@@ -494,6 +657,7 @@ async function loadPackage(buf) {
 
   return {
     names,
+    slides: slideParts.filter(([n]) => /^ppt\/slides\//.test(n)).map(([, x]) => x),
     pres,
     ct,
     themes,
@@ -568,10 +732,17 @@ async function main() {
   await page.goto(`${BASE_URL}/dev/export-verify`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction("!!window.__tpExportVerify", null, { timeout: 180_000 });
   const variants = await page.evaluate(() => window.__tpExportVerify.variants);
-  const step = variants.length / COUNT;
-  const picked = Array.from({ length: COUNT }, (_, i) => variants[Math.floor(i * step)]).filter(
-    Boolean,
-  );
+  // `--only` accepts an explicit comma-separated list, or `--match <regex>` to
+  // sweep a family (e.g. all timeline/rail modules) instead of an even sample.
+  const only = String(value("only", "")).split(",").filter(Boolean);
+  const match = value("match", "");
+  let picked;
+  if (only.length) picked = only;
+  else if (match) picked = variants.filter((v) => new RegExp(match, "i").test(v));
+  else {
+    const step = variants.length / COUNT;
+    picked = Array.from({ length: COUNT }, (_, i) => variants[Math.floor(i * step)]).filter(Boolean);
+  }
 
   const results = [];
   for (const variantId of picked) {
@@ -602,19 +773,23 @@ async function main() {
             ? "WARN"
             : "PASS";
         const offenders = imageOffenders(pkg);
+        const grp = groupAudit(pkg);
         results.push({
           variantId,
           mode,
           fidelity,
           worst,
           rows,
+          groups: grp,
           media: pkg.media.map((m) => ({ name: m.name, format: m.format, bytes: m.bytes })),
           backdrops: pkg.backdrops.map((m) => ({ name: m.name, format: m.format })),
           imageOffenders: offenders,
         });
         console.log(
-          `${worst.padEnd(4)} ${variantId} ${mode}/${fidelity} features=${rows.filter((r) => r.uses).length} media=${pkg.media.length} backdrops=${pkg.backdrops.length} ${(buf.length / 1024).toFixed(0)}KB`,
+          `${worst.padEnd(4)} ${variantId} ${mode}/${fidelity} features=${rows.filter((r) => r.uses).length} groups=${grp.groups} depth=${grp.maxDepth} singleton=${grp.singletons} oob=${grp.outOfBounds} dupIds=${grp.dupIds} tagLeak=${grp.leakedTags} media=${pkg.media.length} ${(buf.length / 1024).toFixed(0)}KB`,
         );
+        for (const d of [...new Set(grp.details)].slice(0, 6))
+          console.log(`     group· ${d}`);
         for (const r of rows.filter((r) => r.status === "FAIL"))
           console.log(`     FAIL ${r.id} (x${r.uses}) ${r.note}`);
         for (const o of offenders)
