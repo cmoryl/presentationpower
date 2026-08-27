@@ -26,7 +26,7 @@ import {
   recommendedPpi,
   type LondonPanel,
 } from "@/lib/next-london-signage";
-import { buildGouraudMesh, meshShadingEntries } from "@/lib/pdf-mesh-shading";
+import { axialShadingDict, evenStops, radialShadingDict } from "@/lib/pdf-gradient-shading";
 
 /** Fields the location team is allowed to re-issue. */
 export const LONDON_EDITABLE_FIELDS = [
@@ -464,37 +464,29 @@ function gradientRgb(stops: string[], t: number): [number, number, number] {
 
 /**
  * Rebuild a panel's `.ai` from its specification. Illustrator's native format
- * is PDF-compatible. The gradient is a single Gouraud mesh (PDF Shading
- * Type 4): Illustrator opens it as one editable gradient-mesh object instead
- * of hundreds of tessellated sliver paths, and no raster is embedded.
+ * is PDF-compatible. The ground is a LIVE gradient — PDF Shading Type 2
+ * (axial) or Type 3 (radial), the same construct Illustrator writes itself —
+ * so it opens as one editable gradient object with the exact stop ramp, and no
+ * raster is embedded. Gouraud meshes were rejected here: RIPs read them fine
+ * but Illustrator re-interprets them and the colours come in wrong.
  */
 export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
   const w = panel.bleedW * MM_TO_PT;
   const h = panel.bleedH * MM_TO_PT;
   const trimX = ((panel.bleedW - panel.trimW) / 2) * MM_TO_PT;
   const trimY = ((panel.bleedH - panel.trimH) / 2) * MM_TO_PT;
-  const stops = stopsFor(panel);
+  const stops = evenStops(stopsFor(panel).map((hex) => hexToRgb(hex)));
   const axis = styleAxis(panel.style);
+  const isHalo = panel.style.includes("halo");
 
-  // Colour field for the ground, mirroring the live gradient geometry.
-  const sampler = (x: number, y: number): [number, number, number] => {
-    if (panel.style.includes("halo")) {
-      const d = Math.hypot((x - 0.5 * w) / (0.72 * w), (y - (h - 0.45 * h)) / (0.72 * h));
-      return gradientRgb(stops, Math.min(d, 1));
-    }
-    const x1 = axis.x1 * w;
-    const y1 = h - axis.y1 * h;
-    const dx = axis.x2 * w - x1;
-    const dy = h - axis.y2 * h - y1;
-    const length = Math.max(Math.hypot(dx, dy), 1);
-    const originProjection = x1 * (dx / length) + y1 * (dy / length);
-    return gradientRgb(stops, (x * (dx / length) + y * (dy / length) - originProjection) / length);
-  };
-  const mesh = buildGouraudMesh(w, h, sampler);
-  let meshText = "";
-  for (let i = 0; i < mesh.length; i += 8192) {
-    meshText += String.fromCharCode(...mesh.subarray(i, i + 8192));
-  }
+  // Unit-space axis/centre mirror the SVG master (y down); PDF space is y up.
+  const shadingDict = isHalo
+    ? radialShadingDict({ x: 0.5 * w, y: h - 0.45 * h }, 0.72 * Math.max(w, h), stops)
+    : axialShadingDict(
+        { x: axis.x1 * w, y: h - axis.y1 * h },
+        { x: axis.x2 * w, y: h - axis.y2 * h },
+        stops,
+      );
 
   const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
 
@@ -503,12 +495,13 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
       `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
-      `/TPGradientKind /VectorMesh /Resources << /Shading << /Sh0 6 0 R >> >> /Contents 4 0 R >>`,
+      `/TPGradientKind /LiveShading /Resources << /Shading << /Sh0 6 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
       `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)}) >>`,
-    `<< ${meshShadingEntries(w, h)} /Length ${mesh.length} >>\nstream\n${meshText}\nendstream`,
+    shadingDict,
   ];
+
 
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
   const offsets: number[] = [];
