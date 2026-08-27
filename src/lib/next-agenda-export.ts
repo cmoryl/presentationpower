@@ -11,6 +11,8 @@ import JSZip from "jszip";
 
 import { captureAssetCanvas } from "./asset-export";
 import { buildAgendaVectorPdf } from "./agenda-vector-pdf";
+import { buildAgendaDocx } from "./next-agenda-docx";
+
 import {
   AGENDA_SPEC,
   agendaDivision,
