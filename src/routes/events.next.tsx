@@ -43,6 +43,7 @@ import {
 import { CityBadge } from "@/components/next/CityBadge";
 import { PillarSign } from "@/components/next/PillarSign";
 import { AgendaSheet } from "@/components/next/AgendaSheet";
+import { agendaDefault } from "@/lib/next-agenda";
 import {
   pickAgendaFile,
   pickPillarFile,
