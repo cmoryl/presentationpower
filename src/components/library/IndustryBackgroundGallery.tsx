@@ -21,6 +21,7 @@ import {
   type IndustryBgFamilyKey,
 } from "@/lib/industry-backgrounds";
 import { SKIN_BG_TAKES, SKIN_SCENES, TAKE_LABEL, type SkinScene } from "@/lib/skin-backgrounds";
+import { useExactSkinBackdrop } from "@/components/slide/SkinBackdropContext";
 
 /* ------------------------------------------------------------------ lazy tile */
 
@@ -65,6 +66,7 @@ export function BackgroundTile({
   compact?: boolean;
 }) {
   const { ref, seen } = useOnScreen<HTMLElement>();
+  const override = useExactSkinBackdrop(set.recipeId, scene, take);
   return (
     <figure ref={ref} className="min-w-0" data-testid="bg-tile">
       <BackgroundZoom
@@ -81,7 +83,13 @@ export function BackgroundTile({
       >
         <span className="block" style={{ ["--tile-r" as string]: `${radius}px` }}>
           {seen ? (
-            <ApprovedStyleThumb pack={set.pack} scene={scene} take={take} radius={radius} />
+            <ApprovedStyleThumb
+              pack={set.pack}
+              scene={scene}
+              take={take}
+              radius={radius}
+              overrideUrl={override}
+            />
           ) : (
             <span
               aria-hidden
@@ -270,11 +278,16 @@ export function IndustryOverviewCard({
   filters,
   open,
   onToggle,
+  onEdit,
+  replacedCount = 0,
 }: {
   set: IndustryBackgroundSet;
   filters: GalleryFilters;
   open: boolean;
   onToggle: () => void;
+  /** Open the background set editor (upload / re-render / revert). */
+  onEdit?: () => void;
+  replacedCount?: number;
 }) {
   const scenes = activeScenes(filters);
   const takes = activeTakes(filters);
@@ -304,14 +317,30 @@ export function IndustryOverviewCard({
             ))}
           </span>
         </div>
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-expanded={open}
-          className="mt-2 text-[11px] font-semibold text-[#003FC7] hover:underline"
-        >
-          {open ? "Hide" : `View all ${count}`} scene × take backgrounds
-        </button>
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={open}
+            className="text-[11px] font-semibold text-[#003FC7] hover:underline"
+          >
+            {open ? "Hide" : `View all ${count}`} scene × take backgrounds
+          </button>
+          {onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="rounded-full border border-[#003FC7]/40 px-2.5 py-1 text-[11px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10"
+            >
+              Edit / replace backgrounds
+            </button>
+          )}
+          {replacedCount > 0 && (
+            <span className="rounded-full bg-[#003FC7]/10 px-2 py-0.5 text-[10px] font-semibold text-[#003FC7]">
+              {replacedCount} replaced
+            </span>
+          )}
+        </div>
       </div>
 
       {open && (
