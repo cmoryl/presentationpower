@@ -237,6 +237,25 @@ export function AgendaStudio({
     }
   };
 
+  const runWordExport = async () => {
+    setBusy(true);
+    const id = toast.loading("Building the editable Word file…");
+    try {
+      const { blob, notes } = await buildAgendaDocx(config);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `next-agenda-${agendaSlug(config)}.docx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("Word file downloaded", { id, description: notes[0] });
+    } catch (e) {
+      toast.error("Word export failed", { id, description: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const programmeIsStock = useMemo(
     () => JSON.stringify(config.sessions) === JSON.stringify(agendaProgramme(config.divisionId).sessions),
     [config.sessions, config.divisionId],
