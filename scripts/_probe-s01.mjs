@@ -18,13 +18,13 @@ await p.goto("http://localhost:8080/public/modules?style=skin-s01",{waitUntil:"d
 await p.waitForTimeout(9000);
 const res = await p.evaluate(() => {
   const out = { borders: [], overflow: [], stages: 0 };
-  const stages = [...document.querySelectorAll('[data-variant-id.,id]')];
+  const stages = [...document.querySelectorAll('[data-variant-id]')];
   out.stages = stages.length;
   const seen = new Set();
   for (const st of stages.slice(0, 400)) {
     const sr = st.getBoundingClientRect();
     if (sr.width < 200) continue;
-    const key = st.getAttribute('data-variant-id.,) || st.className?.slice?.(0,40);
+    const key = st.getAttribute('data-variant-id') || '?';
     for (const el of st.querySelectorAll('*')) {
       const cs = getComputedStyle(el);
       const bw = ['Top','Right','Bottom','Left'].map(s=>parseFloat(cs['border'+s+'Width'])||0);
