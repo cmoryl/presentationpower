@@ -245,11 +245,12 @@ function CityBadgePage() {
           {/* Controls */}
           <div className="space-y-6">
             <section className="rounded-2xl border border-black/10 bg-white p-5">
-              <h2 className="text-sm font-semibold text-[#03002C]">Division area</h2>
+              <h2 className="text-sm font-semibold text-[#03002C]">Badge logo</h2>
               <p className="mt-1 text-xs text-black/55">
-                Same approved template and geometry — only the NEXT lockup changes, so every
-                division area gets its own live badge file.
+                One general NEXT badge. Picking a division swaps the mark at the head of the artwork
+                on both the front and the back — nothing else is added or changed.
               </p>
+
               <div className="mt-3 grid grid-cols-2 gap-2">
                 {CITY_BADGE_DIVISIONS.map((div) => {
                   const active = config.divisionId === div.id;
