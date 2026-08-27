@@ -14,6 +14,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import JSZip from "jszip";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS } from "@/lib/taxonomy";
+import { lookBrandModeId } from "@/lib/look-brand";
+
+/**
+ * A look that a product brand owns (DataForce owns AI · Data Signature) is
+ * previewed and exported under that brand in the library, so the harness must
+ * do the same or it audits colours no user ever sees.
+ */
+function brandForPack(packId: string | null) {
+  const owner = packId ? lookBrandModeId(packId) : null;
+  return BRAND_MODES.find((b) => b.id === owner) ?? BRAND_MODES[0];
+}
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { buildLayerReport, type LayerReport } from "@/lib/layer-report";
@@ -173,7 +184,7 @@ async function verifyOne(
   modeIn: "light" | "dark",
 ): Promise<Audit> {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
-  const baseBrand = BRAND_MODES[0];
+  const baseBrand = brandForPack(packId);
   const pack = packId ? stylePackById(packId) : null;
   const mode = pack ? pack.mode : modeIn;
   const base: Audit = {
@@ -298,7 +309,7 @@ async function textFitOne(
   fidelity: "editable" | "layered" | "exact" = "editable",
 ): Promise<TextFitCapture> {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
-  const baseBrand = BRAND_MODES[0];
+  const baseBrand = brandForPack(packId);
   const pack = packId ? stylePackById(packId) : null;
   const mode = pack ? pack.mode : modeIn;
   const out: TextFitCapture = {
@@ -401,7 +412,7 @@ async function pairOne(
   fidelity: "editable" | "layered" | "exact",
 ): Promise<PathPair> {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
-  const baseBrand = BRAND_MODES[0];
+  const baseBrand = brandForPack(packId);
   const pack = packId ? stylePackById(packId) : null;
   const mode = pack ? pack.mode : modeIn;
   const out: PathPair = { variantId, packId, mode, fidelity, deck: null, single: null };
@@ -595,7 +606,7 @@ async function pixelOne(
   fidelity: "editable" | "layered" | "exact" = "layered",
 ): Promise<PixelCapture> {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
-  const baseBrand = BRAND_MODES[0];
+  const baseBrand = brandForPack(packId);
   const pack = packId ? stylePackById(packId) : null;
   const mode = pack ? pack.mode : modeIn;
   const out: PixelCapture = {
@@ -707,7 +718,7 @@ async function certifiedOne(
   modeIn: "light" | "dark",
 ): Promise<CertifiedAudit> {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
-  const baseBrand = BRAND_MODES[0];
+  const baseBrand = brandForPack(packId);
   const pack = packId ? stylePackById(packId) : null;
   const mode = pack ? pack.mode : modeIn;
   const out: CertifiedAudit = {
