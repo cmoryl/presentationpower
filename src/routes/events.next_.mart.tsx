@@ -6,15 +6,19 @@ import { PillarSign } from "@/components/next/PillarSign";
 import { MartBundleExport } from "@/components/next/MartBundleExport";
 import { MartStopManager } from "@/components/next/MartStopManager";
 import { MartArtworkStudio } from "@/components/next/MartArtworkStudio";
+import { MartSignEditor } from "@/components/next/MartSignEditor";
+import {
+  listMartFlatMasters,
+  listMartFlatSigns,
+  listMartPillarSigns,
+  resolvedMartPillarConfig,
+} from "@/lib/next-mart-signs";
 import { MART_LAYOUT_PRESETS } from "@/lib/next-mart-layouts";
-import { martArtwork, martFlatArtworkId, martFlatMasters } from "@/lib/next-mart-placement";
+import { martArtwork, martFlatArtworkId } from "@/lib/next-mart-placement";
 import { PILLAR_SIZES, pillarKind } from "@/lib/next-pillar-masters";
 import {
   NEXT_MART,
-  NEXT_MART_FLAT_SIGNS,
   NEXT_MART_LOGOS,
-  NEXT_MART_PILLARS,
-  martPillarConfig,
   martTotalPanels,
 } from "@/lib/next-mart";
 
@@ -93,13 +97,13 @@ function MartPage() {
             </Link>
           </div>
           <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {NEXT_MART_PILLARS.map((p) => (
+            {listMartPillarSigns().map((p) => (
               <article
                 key={p.id}
                 className="overflow-hidden rounded-2xl border border-black/10 bg-white"
               >
                 <div className="flex justify-center bg-[#F2F2F2] p-4">
-                  <PillarSign config={martPillarConfig(p)} pxPerMm={0.06} />
+                  <PillarSign config={resolvedMartPillarConfig(p)} pxPerMm={0.06} />
                 </div>
                 <div className="px-4 py-3">
                   <div className="text-sm font-medium text-[#03002C]">{p.name}</div>
@@ -179,6 +183,8 @@ function MartPage() {
 
         <MartArtworkStudio />
 
+        <MartSignEditor />
+
         {/* Mart lockup pack */}
         <section className="mt-12">
           <h2 className="text-lg font-semibold tracking-tight text-[#03002C]">
@@ -254,7 +260,7 @@ function MartPage() {
                 </tr>
               </thead>
               <tbody>
-                {NEXT_MART_FLAT_SIGNS.map((s) => (
+                {listMartFlatSigns().map((s) => (
                   <tr key={s.id} className="border-t border-black/10 align-top">
                     <td className="px-4 py-3">
                       <div className="font-medium text-[#03002C]">{s.name}</div>
@@ -302,7 +308,7 @@ function MartPage() {
             </Link>
           </div>
           <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {martFlatMasters().map(({ sign, config }) => {
+            {listMartFlatMasters().map(({ sign, config }) => {
               const art = martArtwork(martFlatArtworkId(sign));
               return (
                 <article

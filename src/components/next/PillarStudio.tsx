@@ -142,6 +142,8 @@ export function PillarStudio({
   showDivisionGallery = true,
   showMartLayouts = true,
   initialConfig,
+  configKey,
+  onConfigChange,
 }: {
   scope?: string;
   heading?: string;
@@ -151,8 +153,25 @@ export function PillarStudio({
   showMartLayouts?: boolean;
   /** Seed the editor with a prepared pillar (demo asset, saved master, etc.). */
   initialConfig?: PillarConfig;
+  /** Change this to re-seed the editor from a different prepared pillar. */
+  configKey?: string;
+  /** Surface every plate change so a host can save it back onto a sign. */
+  onConfigChange?: (config: PillarConfig) => void;
 }) {
   const [config, setConfig] = useState<PillarConfig>(() => initialConfig ?? pillarDefault());
+
+  // Re-seed when the host switches which prepared sign is being edited.
+  const seeded = useRef<string | undefined>(configKey);
+  useEffect(() => {
+    if (configKey === undefined || seeded.current === configKey) return;
+    seeded.current = configKey;
+    if (initialConfig) setConfig(initialConfig);
+  }, [configKey, initialConfig]);
+
+  useEffect(() => {
+    onConfigChange?.(config);
+  }, [config, onConfigChange]);
+
 
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
