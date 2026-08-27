@@ -36,6 +36,7 @@ import { photoFramesForVariant, type PhotoFrame } from "./export-photo-frame";
 import {
   readExportFidelity,
   readExportEmbedFonts,
+  DEFAULT_EXPORT_EMBED_FONTS,
   STAGE_W,
   type ExportFidelityId,
   type ExportQualityId,
