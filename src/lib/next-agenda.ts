@@ -30,8 +30,40 @@ export const AGENDA_SPEC = {
   exportPreset: "PDF/X-4",
 } as const;
 
-/** Printed agenda formats. Boards hang in the concourse; handouts print in-house. */
-export type AgendaSizeId = "a4" | "a3" | "a2" | "a1" | "custom";
+/** Printed agenda formats. Boards hang in the concourse; handouts print in-house.
+ *  Screen formats resolve the same artwork at exact pixel dimensions for holding
+ *  screens, room panels, lobby verticals and social frames. */
+export type AgendaSizeId =
+  | "a4"
+  | "a3"
+  | "a2"
+  | "a1"
+  | "screen-16x9"
+  | "screen-9x16"
+  | "screen-1x1"
+  | "screen-4x5"
+  | "screen-ultrawide"
+  | "custom";
+
+/** Screen presets are authored in px and converted at 96 ppi CSS reference. */
+export const PX_TO_MM = 25.4 / 96;
+
+const screen = (
+  id: AgendaSizeId,
+  name: string,
+  note: string,
+  pxW: number,
+  pxH: number,
+) => ({
+  id,
+  name,
+  note,
+  medium: "screen" as const,
+  pxW,
+  pxH,
+  trimW: Math.round(pxW * PX_TO_MM),
+  trimH: Math.round(pxH * PX_TO_MM),
+});
 
 export const AGENDA_SIZES: {
   id: AgendaSizeId;
@@ -39,13 +71,22 @@ export const AGENDA_SIZES: {
   note: string;
   trimW: number;
   trimH: number;
+  medium?: "print" | "screen";
+  pxW?: number;
+  pxH?: number;
 }[] = [
-  { id: "a4", name: "A4 handout", note: "Desk / delegate-bag programme, digital print.", trimW: 210, trimH: 297 },
-  { id: "a3", name: "A3 room card", note: "Breakout-room door and stage-wing card.", trimW: 297, trimH: 420 },
-  { id: "a2", name: "A2 board", note: "Registration and concourse agenda board.", trimW: 420, trimH: 594 },
-  { id: "a1", name: "A1 board", note: "Main entrance agenda board, reads at distance.", trimW: 594, trimH: 841 },
-  { id: "custom", name: "Custom size", note: "Type the measured trim of the board.", trimW: 500, trimH: 700 },
+  { id: "a4", name: "A4 handout", note: "Desk / delegate-bag programme, digital print.", trimW: 210, trimH: 297, medium: "print" },
+  { id: "a3", name: "A3 room card", note: "Breakout-room door and stage-wing card.", trimW: 297, trimH: 420, medium: "print" },
+  { id: "a2", name: "A2 board", note: "Registration and concourse agenda board.", trimW: 420, trimH: 594, medium: "print" },
+  { id: "a1", name: "A1 board", note: "Main entrance agenda board, reads at distance.", trimW: 594, trimH: 841, medium: "print" },
+  screen("screen-16x9", "Screen · 16:9 HD", "Holding screens, stage LED and room displays.", 1920, 1080),
+  screen("screen-9x16", "Screen · 9:16 vertical", "Lobby verticals, totems and story frames.", 1080, 1920),
+  screen("screen-1x1", "Screen · 1:1 square", "Social agenda tile and lift-lobby panels.", 1080, 1080),
+  screen("screen-4x5", "Screen · 4:5 portrait", "In-feed social programme post.", 1080, 1350),
+  screen("screen-ultrawide", "Screen · 21:9 ultrawide", "Concourse ribbon and wide LED band.", 2560, 1080),
+  { id: "custom", name: "Custom size", note: "Type the measured trim of the board.", trimW: 500, trimH: 700, medium: "print" },
 ];
+
 
 export const AGENDA_CUSTOM_SIZE = {
   w: { min: 120, max: 1600, step: 5 },
