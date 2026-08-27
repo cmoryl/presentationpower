@@ -14,7 +14,7 @@ import {
   resolvedMartPillarConfig,
 } from "@/lib/next-mart-signs";
 import { MART_LAYOUT_PRESETS } from "@/lib/next-mart-layouts";
-import { martArtwork, martFlatArtworkId, martFlatMasters } from "@/lib/next-mart-placement";
+import { martArtwork, martFlatArtworkId } from "@/lib/next-mart-placement";
 import { PILLAR_SIZES, pillarKind } from "@/lib/next-pillar-masters";
 import {
   NEXT_MART,
