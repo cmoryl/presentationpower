@@ -37,7 +37,7 @@ import { packGroundDamp, packReadability } from "@/lib/pack-readability";
 import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 import { SceneDebugOverlay } from "@/components/slide/SceneDebugOverlay";
 import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
-import { sceneTakeFromSeed } from "@/lib/skin-backdrop-overrides";
+import { sceneTakeFromSeed, useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
@@ -425,6 +425,8 @@ export function SlideFrame({
 
   const backdrop = useContext(SlideBackdropContext);
   const ownsMedia = useContext(SlideOwnsMediaContext);
+  // Repaint the ground the moment an admin saves a replacement background.
+  useSkinBackdropVersion();
   // AI-generated backdrop for the active skin, if the studio has rendered one
   // for this scene. Painted between the pack's flat field and its ground planes
   // so the skin's own scaffold and motif still read on top.
