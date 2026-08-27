@@ -32,6 +32,9 @@ const COLOR_SWATCHES: { label: string; hex: string }[] = [
   { label: "Peach", hex: "#FF9B70" },
   { label: "Pink", hex: "#EC388A" },
   { label: "Red", hex: "#E53D2E" },
+  // DataForce product accents.
+  { label: "DataForce Green", hex: "#7BCD3A" },
+  { label: "DataForce Blue", hex: "#139DD8" },
 ];
 
 /**

@@ -149,8 +149,9 @@ export const BRAND_MODES: BrandMode[] = [
     id: "bm-product",
     name: "Product",
     description: "Named product brand mode",
-    // Approved brand system — enterprise palette.
-    tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },
+    // DataForce product identity: TP ink field with DataForce Green lead and
+    // DataForce Blue support accent.
+    tokens: { primary: "#7BCD3A", accent: "#139DD8", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-tp-media",

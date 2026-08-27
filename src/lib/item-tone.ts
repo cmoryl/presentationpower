@@ -19,6 +19,9 @@ export const TONE_SWATCHES: Array<{ label: string; hex: string }> = [
   { label: "Peach", hex: "#FF9B70" },
   { label: "Red", hex: "#E53D2E" },
   { label: "Teal", hex: "#0E7A86" },
+  // DataForce product accents (approved DataForce identity).
+  { label: "DataForce Green", hex: "#7BCD3A" },
+  { label: "DataForce Blue", hex: "#139DD8" },
   { label: "Gray", hex: "#666666" },
 ];
 
