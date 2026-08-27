@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 
 import {
   BADGE_SPEC,
+  BADGE_LOCKUP_WINDOW,
   SAFE_INSET_X,
   SAFE_INSET_Y,
   cityBadgeFace,
@@ -16,21 +17,30 @@ type Props = {
   ppi?: number;
   /** Bleed / trim / safe-area / cutout guides over the artwork. */
   guides?: boolean;
+  /** Front carries the attendee copy; the back is the same artwork, logo only. */
+  side?: "front" | "back";
   style?: CSSProperties;
   className?: string;
 };
 
 /**
- * City Series attendee badge — the approved artwork face run full bleed, with
- * event and attendee copy typeset inside the template safe area. Rendered at
- * native inches so the same node rasterises cleanly for press output.
+ * General NEXT badge — the approved artwork face run full bleed. The only thing
+ * a division changes is the mark at the head: its window is repainted from the
+ * same artwork and the division lockup is dropped straight in, so no plate,
+ * panel or extra copy is ever added.
  */
-export function CityBadge({ config, ppi = 96, guides = false, style, className }: Props) {
+export function CityBadge({
+  config,
+  ppi = 96,
+  guides = false,
+  side = "front",
+  style,
+  className,
+}: Props) {
   const face = cityBadgeFace(config.face);
   const lockup = cityBadgeLockup(config.divisionId);
-  // The supplied artwork carries the City Series mark in its head. For any
-  // other division area we cover that head with a clean brand plate and set
-  // the division lockup in it, so the badge stays on-brand per area.
+  const division = cityBadgeDivision(config.divisionId);
+  // City Series is already the baked mark, so its artwork stays untouched.
   const swapLockup = config.showLockup && !!lockup.url && config.divisionId !== "city-series";
   const px = (inches: number) => inches * ppi;
   const w = px(BADGE_SPEC.bleedW);
@@ -39,6 +49,7 @@ export function CityBadge({ config, ppi = 96, guides = false, style, className }
   const safeY = px(SAFE_INSET_Y);
   const klikTop = h - px(BADGE_SPEC.klik.fromBottom + BADGE_SPEC.klik.h);
   const scale = ppi / 96;
+  const markUrl = face.id === "light" ? division.colorUrl || lockup.url : lockup.url;
 
   const eventLine = [config.cityLabel, config.datesLabel, config.venueLabel]
     .map((s) => s.trim())
@@ -78,25 +89,26 @@ export function CityBadge({ config, ppi = 96, guides = false, style, className }
             position: "absolute",
             left: 0,
             right: 0,
-            top: 0,
-            height: px(2.62),
-            background:
-              face.id === "light"
-                ? "linear-gradient(180deg,#FFFFFF 0%,#FFFFFF 90%,rgba(255,255,255,0) 100%)"
-                : "linear-gradient(180deg,#03002C 0%,#03002C 90%,rgba(3,0,44,0) 100%)",
+            top: px(BADGE_LOCKUP_WINDOW.top),
+            height: px(BADGE_LOCKUP_WINDOW.height),
+            // Same artwork, sampled from a mark-free band, so the field reads
+            // continuous where the original lockup used to sit.
+            backgroundImage: `url(${face.artwork})`,
+            backgroundSize: `${w}px ${h}px`,
+            backgroundPosition: `0px ${-px(BADGE_LOCKUP_WINDOW.sampleFrom)}px`,
+            backgroundRepeat: "no-repeat",
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "center",
             justifyContent: "center",
-            paddingTop: px(0.42),
           }}
         >
           <img
-            src={face.id === "light" ? cityBadgeDivision(config.divisionId).colorUrl || lockup.url : lockup.url}
+            src={markUrl}
             alt=""
             aria-hidden
             style={{
-              width: px(2.5),
-              height: px(2.5) / lockup.ratio,
+              width: px(BADGE_LOCKUP_WINDOW.markW),
+              height: px(BADGE_LOCKUP_WINDOW.markW) / lockup.ratio,
               objectFit: "contain",
               display: "block",
             }}
@@ -104,8 +116,10 @@ export function CityBadge({ config, ppi = 96, guides = false, style, className }
         </div>
       ) : null}
 
-      {/* Safe-area copy */}
+      {/* Safe-area copy — front only; the back is artwork and mark alone. */}
+      {side === "front" ? (
       <div
+
         style={{
           position: "absolute",
           left: safeX,
@@ -198,6 +212,8 @@ export function CityBadge({ config, ppi = 96, guides = false, style, className }
           </div>
         ) : null}
       </div>
+      ) : null}
+
 
       {guides ? <BadgeGuides ppi={ppi} /> : null}
     </div>

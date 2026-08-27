@@ -143,14 +143,30 @@ export const CITY_BADGE_SOURCE = {
   template: templateJpg.url,
 } as const;
 
+/** Attendee tiers printed on the role band of the general NEXT badge. */
 export const CITY_BADGE_ROLES = [
   "ATTENDEE",
-  "SPEAKER",
-  "SPONSOR",
-  "PRESS",
-  "TRANSPERFECT TEAM",
-  "VIP / EXECUTIVE",
+  "EMPLOYEE",
+  "CLIENT",
+  "SPECIAL GUEST",
+  "VIP",
 ] as const;
+
+/**
+ * Where the supplied artwork carries its baked NEXT lockup. Swapping a division
+ * mark replaces exactly this window — the field around it is resampled from the
+ * same artwork, so nothing is added to the badge and no plate appears.
+ */
+export const BADGE_LOCKUP_WINDOW = {
+  /** Window covered on the plate (inches from the top of the bleed sheet). */
+  top: 0.28,
+  height: 1.95,
+  /** Mark-free band of the same artwork used to repaint that window. */
+  sampleFrom: 3.5,
+  /** Replacement lockup width on the plate. */
+  markW: 2.62,
+} as const;
+
 
 /**
  * A saved, print-ready configuration of the City Series badge. Persisted in the
