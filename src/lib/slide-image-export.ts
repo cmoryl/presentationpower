@@ -38,6 +38,95 @@ import { beginExportChrome, exportNodeFilter } from "./export-chrome-suppress";
  */
 let fontEmbedCssPromise: Promise<string> | null = null;
 
+/** Families actually used inside the captured node (deduped, quotes stripped). */
+function usedFontFamilies(node: HTMLElement): Set<string> {
+  const families = new Set<string>();
+  const push = (value: string) => {
+    for (const part of value.split(",")) {
+      const name = part.trim().replace(/^["']|["']$/g, "");
+      if (
+        name &&
+        !/^(inherit|initial|unset|sans-serif|serif|monospace|cursive|fantasy|system-ui|ui-[\w-]+)$/i.test(
+          name,
+        )
+      ) {
+        families.add(name);
+      }
+    }
+  };
+  push(getComputedStyle(node).fontFamily || "");
+  for (const el of Array.from(node.querySelectorAll<HTMLElement>("*")).slice(0, 4000)) {
+    push(getComputedStyle(el).fontFamily || "");
+  }
+  return families;
+}
+
+async function fontAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) return null;
+    const buf = new Uint8Array(await res.arrayBuffer());
+    let binary = "";
+    for (let i = 0; i < buf.length; i += 0x8000) {
+      binary += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+    }
+    return `data:font/woff2;base64,${btoa(binary)}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Cross-origin webfont fallback. `getFontEmbedCSS` can only read same-origin
+ * stylesheets, so a project whose @font-face rules all live on
+ * fonts.googleapis.com gets back an EMPTY string — and html-to-image then
+ * silently re-collects and refetches every font on EVERY capture, which floods
+ * the network stack (`net::ERR_INSUFFICIENT_RESOURCES`) on multi-plate export
+ * runs and can drop the real typeface from the raster. Fetch those sheets over
+ * CORS ourselves, keep only the @font-face blocks for families the node
+ * actually uses, and inline their woff2 as data URLs. Cached with the rest.
+ */
+async function remoteFontEmbedCSS(node: HTMLElement): Promise<string> {
+  const families = usedFontFamilies(node);
+  if (families.size === 0) return "";
+  const hrefs = Array.from(
+    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"][href]'),
+  )
+    .map((l) => l.href)
+    .filter((href) => {
+      try {
+        return new URL(href).origin !== window.location.origin;
+      } catch {
+        return false;
+      }
+    });
+
+  const blocks: string[] = [];
+  for (const href of hrefs) {
+    let text = "";
+    try {
+      const res = await fetch(href, { mode: "cors" });
+      if (!res.ok) continue;
+      text = await res.text();
+    } catch {
+      continue;
+    }
+    for (const match of text.matchAll(/@font-face\s*{[^}]*}/g)) {
+      const block = match[0];
+      const family = /font-family:\s*['"]?([^;'"]+)['"]?/.exec(block)?.[1]?.trim();
+      if (!family || !families.has(family)) continue;
+      const urls = Array.from(block.matchAll(/url\((https?:\/\/[^)]+)\)/g)).map((m) => m[1]!);
+      let resolved = block;
+      for (const url of urls) {
+        const data = await fontAsDataUrl(url);
+        if (data) resolved = resolved.split(url).join(data);
+      }
+      if (resolved.includes("data:font")) blocks.push(resolved);
+    }
+  }
+  return blocks.join("\n");
+}
+
 export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> {
   if (!fontEmbedCssPromise) {
     fontEmbedCssPromise = getFontEmbedCSS(node)
@@ -45,6 +134,13 @@ export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> 
       .catch((err) => {
         console.warn("[slide-image-export] font embed CSS unavailable; capturing without it", err);
         return "";
+      })
+      .then(async (css) => {
+        if (css.includes("@font-face")) return css;
+        const remote = await remoteFontEmbedCSS(node).catch(() => "");
+        // A non-empty string is what stops html-to-image re-embedding on every
+        // capture; the marker keeps that true even with no embeddable webfont.
+        return remote ? `${css}\n${remote}` : `${css}\n/* no embeddable webfonts */`;
       });
   }
   return fontEmbedCssPromise;
