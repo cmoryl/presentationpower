@@ -410,12 +410,88 @@ export function MartArtworkStudio() {
         </div>
       ) : null}
 
+      <div className="mt-5 rounded-2xl border border-[#003FC7]/25 bg-[#F7F9FE] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-sm font-medium text-[#03002C]">Bulk replace placed artwork</div>
+            <p className="mt-1 max-w-2xl text-[12px] text-black/55">
+              Select slots below, attach one file or link, and replace them in a single action.
+              Every placed pillar, flat master and export bundle resolves through these slots, so
+              the swap publishes everywhere at once. {selected.length} selected.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setSelected(list.map((a) => a.id))}
+              className="rounded-lg border border-black/15 px-2.5 py-1.5 text-[11px] font-medium text-black/65 hover:bg-black/5"
+            >
+              Select all
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelected([])}
+              className="rounded-lg border border-black/15 px-2.5 py-1.5 text-[11px] font-medium text-black/65 hover:bg-black/5"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={() => setBulkOpen((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3 py-1.5 text-[11px] font-medium text-white hover:bg-[#0033a3]"
+            >
+              <Layers size={12} /> {bulkOpen ? "Close bulk replace" : "Bulk replace"}
+            </button>
+          </div>
+        </div>
+        {bulkOpen ? (
+          <>
+            <ImportRow
+              filename={bulkSource.filename}
+              onFile={(f) =>
+                readMartArtFile(f)
+                  .then(({ url, filename }) => {
+                    setBulkSource({ url, filename });
+                    toast.success(`${filename} attached`, {
+                      description: "Choose slots and apply to replace them all.",
+                    });
+                  })
+                  .catch((err: Error) => toast.error(err.message))
+              }
+              onLink={(raw) => {
+                try {
+                  const { url, filename } = normalizeMartArtLink(raw);
+                  setBulkSource({ url, filename });
+                  toast.success("Link attached for bulk replace");
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : "That link could not be read.");
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={applyBulk}
+              disabled={!bulkSource.url || selected.length === 0}
+              className="mt-3 rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0033a3] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              Replace {selected.length || "selected"} slot{selected.length === 1 ? "" : "s"}
+            </button>
+          </>
+        ) : null}
+      </div>
+
       <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {list.map((a) => {
           const draft = draftFor(a);
           const open = openId === a.id;
+          const picked = selected.includes(a.id);
           return (
-            <article key={a.id} className="overflow-hidden rounded-2xl border border-black/10 bg-white">
+            <article
+              key={a.id}
+              className={`overflow-hidden rounded-2xl border bg-white ${
+                picked ? "border-[#003FC7] ring-2 ring-[#003FC7]/25" : "border-black/10"
+              }`}
+            >
               <div
                 className={`flex items-center justify-center p-4 ${
                   draft.face === "dark" ? "bg-[#03002C]" : "bg-[#F2F2F2]"
@@ -429,6 +505,15 @@ export function MartArtworkStudio() {
                 />
               </div>
               <div className="px-4 py-3">
+                <label className="mb-2 flex items-center gap-2 text-[11px] font-medium text-black/60">
+                  <input
+                    type="checkbox"
+                    checked={picked}
+                    onChange={() => toggleSelected(a.id)}
+                    className="h-3.5 w-3.5 accent-[#003FC7]"
+                  />
+                  Select for bulk replace
+                </label>
                 <div className="flex items-center gap-2">
                   <span className="rounded bg-[#E0E8F5] px-1.5 py-0.5 text-[10px] font-semibold text-[#003FC7]">
                     {draft.code || "—"}
