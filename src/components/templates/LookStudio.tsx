@@ -91,10 +91,18 @@ export const BLANK_DRAFT: CustomTemplate = {
   notes: "",
 };
 
-/** First free `<CODE>-V<n>` fork code, so a forked look is saveable as-is. */
+/**
+ * Saveable code for an edited catalog look. Editing a catalog look in place
+ * keeps its own code (so the saved row overrides that look everywhere); only
+ * when that code is already taken do we fall back to `<CODE>-V<n>`.
+ */
 function nextForkCode(base: string, taken: string[]): string {
-  const root = (base || "S01").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 9);
+  const root = (base || "S01")
+    .toUpperCase()
+    .replace(/[^A-Z0-9-]/g, "")
+    .slice(0, 9);
   const used = new Set(taken.map((c) => c.toUpperCase()));
+  if (root.length >= 2 && !used.has(root)) return root.slice(0, 12);
   for (let n = 1; n < 100; n += 1) {
     const candidate = `${root}-V${n}`.slice(0, 12);
     if (!used.has(candidate)) return candidate;
@@ -110,7 +118,7 @@ function forkFromPack(pack: StylePack, takenCodes: string[] = []): CustomTemplat
   return {
     ...BLANK_DRAFT,
     code: nextForkCode(code, takenCodes),
-    name: `${pack.label} — variant`,
+    name: pack.label,
     reference: pack.reference ?? skin?.reference ?? "",
     description: skin?.description ?? pack.tagline ?? "",
     bestFit: skin?.bestFit ?? "",
