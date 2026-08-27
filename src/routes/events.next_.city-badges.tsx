@@ -164,11 +164,29 @@ function CityBadgePage() {
           {/* Live plate */}
           <div>
             <div className="rounded-2xl border border-black/10 bg-[#F2F2F2] p-5">
-              <div className="mx-auto w-fit overflow-hidden rounded-xl shadow-lg">
-                <div ref={plateRef}>
-                  <CityBadge config={config} ppi={PREVIEW_PPI} guides={guides} />
+              <div className="flex flex-wrap items-start justify-center gap-5">
+                <div>
+                  <div className="overflow-hidden rounded-xl shadow-lg">
+                    <div ref={plateRef}>
+                      <CityBadge config={config} ppi={PREVIEW_PPI} guides={guides} />
+                    </div>
+                  </div>
+                  <div className="mt-2 text-center text-[11px] font-medium uppercase tracking-wide text-black/50">
+                    Front
+                  </div>
+                </div>
+                <div>
+                  <div className="overflow-hidden rounded-xl shadow-lg">
+                    <div ref={backRef}>
+                      <CityBadge config={config} ppi={PREVIEW_PPI} guides={guides} side="back" />
+                    </div>
+                  </div>
+                  <div className="mt-2 text-center text-[11px] font-medium uppercase tracking-wide text-black/50">
+                    Back — same logo swap, no copy
+                  </div>
                 </div>
               </div>
+
               <label className="mt-4 flex items-center justify-center gap-2 text-xs text-black/60">
                 <input
                   type="checkbox"
