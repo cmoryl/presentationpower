@@ -75,10 +75,15 @@ function readme(
     ``,
     `pdf/    press file. Art runs to the bleed edge; crop marks sit in the slug.`,
     `ai/     the same layered artwork with an .ai extension for Illustrator.`,
+    wordNotes.length
+      ? `word/   editable Microsoft Word version — flattened approved ground behind live text.`
+      : `word/   not included (Word build unavailable in this browser).`,
     geo.isScreen
       ? `screen/ ${geo.pxW} x ${geo.pxH} px sRGB PNG, ready to load on the display.`
       : `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
     ``,
+    ...(wordNotes.length ? ["Word file:", ...wordNotes.map((n) => `  - ${n}`), ``] : []),
+
     `Palette and geometry are fixed across every NEXT division area — only the`,
     `approved division lockup and the programme copy change.`,
   ].join("\n");
