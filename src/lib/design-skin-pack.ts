@@ -1334,7 +1334,7 @@ export function stylePackFromSkin(skin: DesignSkin, opts?: SkinRenderOptions): S
       bg: r.dark
         ? `linear-gradient(180deg, ${rgba(r.ink, 0.16)} 0%, ${rgba(r.ink, 0.06)} 55%, ${rgba(r.ink, 0)} 100%)`
         : `linear-gradient(180deg, ${rgba("#FFFFFF", 0.86)} 0%, ${rgba("#FFFFFF", 0.4)} 55%, ${rgba("#FFFFFF", 0)} 100%)`,
-      border: "1px solid transparent",
+      border: "none",
       shadow: "none",
       blur: "none",
     };
