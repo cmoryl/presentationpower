@@ -1,40 +1,29 @@
 /**
- * Enforce the child ordering of `<p:presentation>` that PowerPoint (and
- * Microsoft's own Office conversion service) actually accepts.
+ * Enforce the ECMA-376 child ordering of `<p:presentation>`.
  *
- * Two orderings were established empirically, by bisecting real PowerPoint
- * renders (Graph `format=pdf`, which is Office's own converter):
- *
- *  1. `notesMasterIdLst` must follow `sldIdLst`. Hoisting it to the position the
- *     schema lists (ahead of `sldIdLst`, where pptxgenjs never puts it) makes
- *     Office refuse the package outright — `cannotOpenFile` /
- *     UnsupportedMediaType / `invalidFileFormat`.
- *  2. `embeddedFontLst` must be the LAST child of `<p:presentation>` — after
- *     `defaultTextStyle`, not in its schema slot between `notesSz` and
- *     `custShowLst`. With the list in the schema slot every font-embedded
- *     export was refused with `invalidFileFormat`; the byte-identical package
- *     with the list moved to the end converts and opens fine. (Verified by
- *     uploading both variants and asking Office to render them.)
- *
- * Any pass that rewrites `ppt/presentation.xml` (font embedding, master
- * background, future work) can reshuffle these, so this post-pass re-asserts
- * the accepted sequence instead of trusting the generator. Every element below
- * is position-independent in meaning, so re-sequencing is content-preserving.
+ * pptxgenjs emits `notesMasterIdLst` AFTER `sldIdLst` and font embedding used to
+ * append `embeddedFontLst` last. Desktop PowerPoint validates this part
+ * strictly: either deviation makes it refuse the deck with "PowerPoint found a
+ * problem with content… can attempt to repair". The schema sequence below is
+ * what real PowerPoint files carry, so we re-assert it after every pass that
+ * rewrites presentation.xml. Re-sequencing is content-preserving: each element
+ * is position-independent in meaning.
  */
 
 import type JSZip from "jszip";
 
 const PRES_PATH = "ppt/presentation.xml";
 
-/** Accepted order: schema sequence, with the two Office quirks above applied. */
+/** ECMA-376 CT_Presentation child sequence. */
 const PRES_ORDER = [
   "p:sldMasterIdLst",
-  "p:sldIdLst",
   "p:notesMasterIdLst",
   "p:handoutMasterIdLst",
+  "p:sldIdLst",
   "p:sldSz",
   "p:notesSz",
   "p:smartTags",
+  "p:embeddedFontLst",
   "p:custShowLst",
   "p:photoAlbum",
   "p:custDataLst",
@@ -42,7 +31,6 @@ const PRES_ORDER = [
   "p:defaultTextStyle",
   "p:modifyVerifier",
   "p:extLst",
-  "p:embeddedFontLst",
 ];
 
 function block(xml: string, tag: string): { start: number; end: number; text: string } | null {

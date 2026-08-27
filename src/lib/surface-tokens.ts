@@ -53,9 +53,12 @@ export function openBottomMaskStyle(): CSSProperties {
  */
 export function openBottomFrame(line: string, radius: number | string): CSSProperties {
   return {
-    borderRadius: typeof radius === "number" ? `${radius}px` : radius,
-    border: `1px solid color-mix(in oklab, ${line} 26%, transparent)`,
-    borderBottomColor: "transparent",
+    // Pack-aware: an edgeless look (e.g. Spatial Clarity, which sets
+    // `--pack-card-border: none`) removes the module frame everywhere at once,
+    // so hand-rolled pills/panels stay cohesive with `moduleCardSurface`.
+    borderRadius: `var(--pack-card-radius, ${typeof radius === "number" ? `${radius}px` : radius})`,
+    border: `var(--pack-card-border, 1px solid color-mix(in oklab, ${line} 26%, transparent))`,
+    borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
     ...openBottomMaskStyle(),
   };
 }

@@ -189,18 +189,12 @@ export async function embedFontsInPptx(
         `</p:embeddedFont>` +
         `</p:embeddedFontLst>`;
 
-      // Insert as the LAST child of <p:presentation>. Office refuses the
-      // package (`invalidFileFormat`) when the list sits in its schema slot
-      // (before defaultTextStyle) and accepts it when it trails everything.
+      // Append for now; `repairPresentationOrder` moves it into its schema slot
+      // (after notesSz/smartTags) — desktop PowerPoint rejects any other slot.
       pres = pres.replace("</p:presentation>", `${embedBlock}</p:presentation>`);
     }
-    // NOTE: do NOT hoist notesMasterIdLst. pptxgenjs emits it after sldIdLst,
-    // and although ECMA-376 lists it before, Microsoft's own Office conversion
-    // service refuses the package outright (cannotOpenFile /
-    // UnsupportedMediaType) when it is moved to the schema-listed position,
-    // while accepting pptxgenjs's order. Verified by bisecting a real
-    // PowerPoint render. The embed block above trails defaultTextStyle for the
-    // same empirical reason, so no further reordering is required.
+    // Child order is normalised centrally by `repairPresentationOrder`
+    // (ECMA-376 sequence) — PowerPoint repairs the file otherwise.
     if (parts.length) zip.file(presPath, pres);
 
     const { repackPptx } = await import("./pptx-repack");

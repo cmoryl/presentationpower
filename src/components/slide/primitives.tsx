@@ -517,7 +517,10 @@ export function StatFigure({
                 fontSize: `min(${pxCeiling}px, ${cqwCeiling.toFixed(2)}cqw)`,
                 lineHeight: 0.74,
                 letterSpacing: "-0.05em",
-                top: `-${Math.round(spec.valuePx * (mode === "dark" ? 0.3 : 0.2))}px`,
+                // Stay inside the card: a negative offset pushed the counterform
+                // under the card's `overflow:hidden` top edge, so it read as a
+                // clipped second figure behind the stat.
+                top: 0,
                 left: centeredShape ? "50%" : 0,
                 transform: centeredShape ? "translateX(-50%)" : undefined,
                 color: "transparent",
