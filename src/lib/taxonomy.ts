@@ -147,11 +147,13 @@ export const BRAND_MODES: BrandMode[] = [
   },
   {
     id: "bm-product",
-    name: "Product",
-    description: "Named product brand mode",
-    // DataForce product identity: TP ink field with DataForce Green lead and
-    // DataForce Blue support accent.
-    tokens: { primary: "#7BCD3A", accent: "#139DD8", surface: "#EEF1F7", ink: "#03002C" },
+    name: "DataForce",
+    description:
+      "DataForce by TransPerfect — AI training data: collection, annotation, model evaluation and human-in-the-loop programs",
+    // DataForce product identity: DataForce Green leads the structure (card top
+    // rules, edges, emphasis bands); DataForce Blue stays on the iconography
+    // (see ICON_BRAND_COLOR in iconography.ts).
+    tokens: { primary: "#7BCD3A", accent: "#7BCD3A", surface: "#EEF1F7", ink: "#03002C" },
   },
   {
     id: "bm-tp-media",

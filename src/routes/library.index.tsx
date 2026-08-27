@@ -89,6 +89,7 @@ import {
 } from "@/lib/library-preview";
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
+import { lookBrandModeId, packIdForBrandMode } from "@/lib/look-brand";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
 import { formatKitValidationError } from "@/lib/kit-validation";
 import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-examples";
@@ -425,6 +426,10 @@ function Library() {
     if (!scopeBrand) return;
     const i = brandModes.findIndex((b) => b.id === scopeBrand.id);
     if (i >= 0) setBrandIdx(i);
+    // A brand that owns its own look (DataForce → AI · Data Signature) activates
+    // that template with the scope, unless the visitor is already holding it.
+    const ownLook = packIdForBrandMode(scopeBrand.id);
+    if (ownLook && lookBrandModeId(packId) !== scopeBrand.id) setPackId(ownLook);
   }, [scopeBrand?.id, brandModes]);
 
   const toggle = (set: Set<string>, id: string) => {
@@ -1568,7 +1573,7 @@ const VariantCard = memo(function VariantCard({
       );
   const previewContent = useMemo(() => {
     if (videoExample) return rawContent;
-    if (preset) return applyBentoPreset(preset, rawContent, brief.prospect);
+    if (preset) return applyBentoPreset(preset, rawContent, brief.prospect, brand.id);
     if (!logoHubPool || logoHubPool.length === 0) return rawContent;
     if (!/^MV-(PROOF-LOGOS|CASE-LOGO-GRID|LOGO-WALL)/.test(variant.id)) return rawContent;
     return overlayLogoHubFillers(rawContent, variant.id, logoHubPool);

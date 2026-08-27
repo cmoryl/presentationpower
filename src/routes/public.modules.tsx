@@ -100,7 +100,7 @@ function useSlide(variant: ModuleVariant, brand: BrandMode, preset?: BentoPreset
       brand.id,
       seedDivisionContent(variant.id, brief, "Preview section", brand) as Record<string, unknown>,
     );
-    const withPreset = preset ? applyBentoPreset(preset, seeded, brief.prospect) : seeded;
+    const withPreset = preset ? applyBentoPreset(preset, seeded, brief.prospect, brand.id) : seeded;
     const content =
       wallPool.length > 0 && WALL_VARIANTS.test(variant.id)
         ? overlayLogoHubFillers(withPreset, variant.id, wallPool)

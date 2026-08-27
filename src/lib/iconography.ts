@@ -105,6 +105,12 @@ export const PLACEMENT_DEFAULTS: Record<IconPlacement, Omit<IconSpec, "placement
 // sink into the background. On dark we lift the role colour through the shared
 // accentInk ramp (hue preserved, luminance raised until it clears AA-large)
 // and strengthen the container fill/ring so the badge still reads as a shape.
+// A brand may hold its structural colour (rules, edges, bands) apart from its
+// glyph colour. DataForce leads structure in green and keeps its icons blue.
+const ICON_BRAND_COLOR: Record<string, string> = {
+  "bm-product": "#139DD8",
+};
+
 export function resolveEmphasisColors(
   brand: BrandMode,
   treatment: IconTreatment,
@@ -113,8 +119,9 @@ export function resolveEmphasisColors(
 ): { bg: string; fg: string; border?: string } {
   const dark = mode === "dark";
   const lift = (hex: string) => (dark ? accentInk(hex, "dark", 4.5) : hex);
-  const primary = lift(brand.tokens.primary);
-  const accent = lift(brand.tokens.accent);
+  const glyphBrand = ICON_BRAND_COLOR[brand.id];
+  const primary = lift(glyphBrand ?? brand.tokens.primary);
+  const accent = lift(glyphBrand ?? brand.tokens.accent);
   // Success / warning fall back to accent/primary if not on the brand.
   const roleColor =
     emphasis === "primary"

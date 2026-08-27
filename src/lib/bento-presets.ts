@@ -288,13 +288,54 @@ export function bentoPresetByKey(key: string): BentoPreset | undefined {
   return BENTO_PRESETS.find((p) => p.key === key);
 }
 
+// The presets are written in the master brand's localization vocabulary. A
+// product brand (DataForce) sells a different thing, so its preview copy is
+// re-voiced here rather than duplicating every preset.
+const BRAND_VOICE: Record<string, { wordmark: string; swaps: [RegExp, string][] }> = {
+  "bm-product": {
+    wordmark: "DataForce",
+    swaps: [
+      [/Faster launch cycles/gi, "Faster dataset delivery"],
+      [/Lower cost per word/gi, "Lower cost per labeled unit"],
+      [/Languages in scope/gi, "Languages collected"],
+      [/adaptive MT/gi, "model-assisted labeling"],
+      [/translation, review and publish/gi, "collection, annotation and evaluation"],
+      [/terminology, brand voice and regulatory guardrails/gi,
+        "consent, provenance and bias guardrails"],
+      [/Terminology, brand voice and regulatory guardrails/g,
+        "Consent, provenance and bias guardrails"],
+      [/localization/gi, "training data"],
+      [/content type, and channel/gi, "modality, and task type"],
+      [/content type and channel/gi, "modality and task type"],
+      [/Reviewer network/gi, "Specialist contributor network"],
+      [/per word/gi, "per labeled unit"],
+    ],
+  },
+};
+
+function revoice(value: string, brandModeId: string | undefined): string {
+  const voice = brandModeId ? BRAND_VOICE[brandModeId] : undefined;
+  if (!voice) return value;
+  let out = value.replace(/TransPerfect/g, voice.wordmark);
+  for (const [re, to] of voice.swaps) out = out.replace(re, to);
+  return out;
+}
+
 /** Preview content for a preset, merged over the module's seeded content so
  *  locked fields (footer, logo) survive. */
 export function applyBentoPreset(
   preset: BentoPreset,
   seeded: Record<string, unknown>,
   clientName: string,
+  brandModeId?: string,
 ): Record<string, unknown> {
   const built = preset.build(clientName);
-  return { ...seeded, title: built.title, items: built.items };
+  const items = built.items.map((cell) => {
+    const next: BentoCell = { ...cell };
+    if (next.title) next.title = revoice(next.title, brandModeId);
+    if (next.body) next.body = revoice(next.body, brandModeId);
+    if (next.label) next.label = revoice(next.label, brandModeId);
+    return next;
+  });
+  return { ...seeded, title: revoice(built.title, brandModeId), items };
 }

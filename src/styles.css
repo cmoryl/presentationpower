@@ -197,23 +197,24 @@
  * Thumbnail-scale icon legibility
  * Slide stages scaled below ~0.45 (module library cards, contact sheets,
  * pickers) render icon strokes at sub-pixel widths, so glyphs read as blank
- * wells. Thicken strokes, firm up the well fill/border, and drop the muted
- * translucency so every icon survives the downscale.
+ * wells. Strokes are nudged up just enough to survive the downscale — the
+ * earlier 3.5/4.25 pair read as fat, blobby marks on the preview cards, where
+ * the stage sits closer to 0.5 scale than to 0.3.
  * ---------------------------------------------------------------------------*/
 [data-slide-stage][data-thumb="1"] svg.lucide {
-  stroke-width: 3.5;
+  stroke-width: 2.25;
   stroke-linecap: round;
   stroke-linejoin: round;
   shape-rendering: geometricPrecision;
 }
 
 [data-slide-stage][data-thumb="1"] svg.lucide.icon-strong {
-  stroke-width: 4.25;
+  stroke-width: 2.75;
 }
 
 [data-slide-stage][data-thumb="1"] [data-icon-well] svg.lucide {
   /* A touch larger inside its well so the mark, not the well, reads first. */
-  transform: scale(1.18);
+  transform: scale(1.08);
 }
 
 [data-slide-stage][data-thumb="1"] [data-icon-well] {
