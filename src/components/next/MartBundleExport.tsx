@@ -15,8 +15,9 @@ import {
   type MartExportProgress,
 } from "@/lib/next-mart-export";
 import { NEXT_MART_ARTWORK, NEXT_MART_FLAT_SIGNS, NEXT_MART_PILLARS } from "@/lib/next-mart";
+import type { MartStop } from "@/lib/next-mart-stops";
 
-export function MartBundleExport() {
+export function MartBundleExport({ stop }: { stop?: MartStop }) {
   const [busy, setBusy] = useState(false);
   const [entries, setEntries] = useState<MartExportEntry[] | null>(null);
 
@@ -25,6 +26,7 @@ export function MartBundleExport() {
     const id = toast.loading("Building the NEXT MART press bundle…");
     try {
       const res = await exportMartBundle({
+        stop,
         onProgress: (p: MartExportProgress) =>
           toast.loading(`${p.label} (${p.index}/${p.total})`, { id }),
       });
