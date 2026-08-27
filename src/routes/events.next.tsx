@@ -1061,6 +1061,89 @@ function RegistryCard({
   );
 }
 
+/**
+ * Live editable pillar masters for the selected division — both approved faces.
+ * These are studio configs, not flat Canva artwork, so every card opens the
+ * pillar editor seeded on that exact master with full editing + press export.
+ */
+function LivePillars({ division }: { division: NextDivision }) {
+  const [face, setFace] = useState<"light" | "dark">("light");
+
+  const cards = useMemo(
+    () =>
+      PILLAR_KINDS.map((kind) => {
+        const config: PillarConfig = {
+          ...pillarDefault(kind.id as PillarKindId, division.id),
+          face,
+        };
+        return { id: kind.id as PillarKindId, label: kind.label, config };
+      }),
+    [division.id, face],
+  );
+
+  return (
+    <section className="mt-10 scroll-mt-24" aria-labelledby="next-live-pillars">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <div>
+          <h2 id="next-live-pillars" className="text-xl font-semibold tracking-tight">
+            Live pillar masters · {division.name}
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Welcome, registration, general logo and directional pillars on the approved NEXT
+            grounds, carrying the {division.name} lockup. Every one is a live studio file — open it
+            to edit copy, footprint, QR codes and lockup scale, then export layered PDF/X-4 and
+            Illustrator art.
+          </p>
+        </div>
+        <div
+          role="group"
+          aria-label="Pillar face"
+          className="inline-flex rounded-full border border-border p-0.5"
+        >
+          {(["light", "dark"] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFace(f)}
+              aria-pressed={face === f}
+              className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
+                face === f ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+              }`}
+            >
+              {f} face
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => (
+          <article
+            key={card.id}
+            className="group overflow-hidden rounded-2xl border border-border p-3 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
+              <PillarSign config={card.config} pxPerMm={0.1} />
+            </div>
+            <h3 className="mt-3 text-sm font-semibold tracking-tight">{card.label} pillar</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {card.config.trimW}×{card.config.trimH} mm · {face} face · editable master
+            </p>
+            <Link
+              to="/events/next/pillars"
+              search={{ division: division.id, kind: card.id, face }}
+              className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              Edit this pillar
+              <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+            </Link>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 /** London location signage — the QEII Centre scenic panel kit, part of the program. */
 function LondonKit() {
   const floors = londonPanelsByFloor();
