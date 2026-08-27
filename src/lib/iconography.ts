@@ -116,10 +116,12 @@ export function resolveEmphasisColors(
   treatment: IconTreatment,
   emphasis: IconEmphasis,
   mode?: "light" | "dark" | string,
+  /** Look-forced glyph colour (e.g. DataForce's AI look: green rules, blue icons). */
+  glyphOverride?: string | null,
 ): { bg: string; fg: string; border?: string } {
   const dark = mode === "dark";
   const lift = (hex: string) => (dark ? accentInk(hex, "dark", 4.5) : hex);
-  const glyphBrand = ICON_BRAND_COLOR[brand.id];
+  const glyphBrand = glyphOverride ?? ICON_BRAND_COLOR[brand.id];
   const primary = lift(glyphBrand ?? brand.tokens.primary);
   const accent = lift(glyphBrand ?? brand.tokens.accent);
   // Success / warning fall back to accent/primary if not on the brand.
