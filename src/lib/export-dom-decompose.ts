@@ -327,6 +327,105 @@ function partialEdgesOf(
   return out;
 }
 
+/**
+ * CONTENT PANELS STAY EDITABLE.
+ *
+ * The module "area boxes" (glass cards, stat panels, quote plates) are painted
+ * with frosted blur and stacked / radial gradient washes, which OOXML cannot
+ * describe verbatim. They used to be parked on the raster plate — so in
+ * PowerPoint the boxes were baked into the background picture and could not be
+ * moved, resized or restyled.
+ *
+ * A bounded, content-bearing panel is instead re-emitted as a real rounded
+ * rectangle carrying the app's own surface recipe: the measured tint at the top
+ * fading down to ZERO opacity at the bottom edge, plus the panel's hairline
+ * border, corner radius and elevation. Full-bleed washes, orbs and decor planes
+ * are untouched — those still belong to the flat backdrop.
+ */
+function dominantTint(cs: CSSStyleDeclaration): DomColor | null {
+  const bg = cs.backgroundImage || "";
+  const lin = parseLinearGradient(bg);
+  if (lin) {
+    const strongest = lin.stops.reduce((a, b) => (b.color.alpha > a.color.alpha ? b : a));
+    if (strongest.color.alpha >= MIN_ALPHA) return strongest.color;
+  }
+  const found = bg.match(/(rgba?\([^)]*\)|oklch\([^)]*\)|#[0-9a-f]{3,8})/gi) ?? [];
+  for (const raw of found) {
+    const c = resolveCssColor(raw);
+    if (c && c.alpha >= MIN_ALPHA) return c;
+  }
+  const solid = resolveCssColor(cs.backgroundColor);
+  return solid && solid.alpha >= MIN_ALPHA ? solid : null;
+}
+
+function panelFadeShape(
+  el: Element,
+  cs: CSSStyleDeclaration,
+  root: DOMRect,
+  sx: number,
+  sy: number,
+  spaceW: number,
+  spaceH: number,
+): DomShape | null {
+  let r: DOMRect;
+  try {
+    r = el.getBoundingClientRect() as DOMRect;
+  } catch {
+    return null;
+  }
+  const w = r.width * sx;
+  const h = r.height * sy;
+  // Bounded panel: not a full-bleed plane, not a hairline sliver.
+  if (w < 48 || h < 32) return null;
+  if (w > spaceW * 0.94 && h > spaceH * 0.94) return null;
+  const min = Math.min(w, h);
+  const max = Math.max(w, h);
+  if (max > 0 && min / max <= 0.12) return null;
+  // It has to actually hold content — decor washes keep the plate.
+  const holdsContent =
+    (el.textContent ?? "").trim().length > 0 || el.querySelectorAll("*").length > 0;
+  if (!holdsContent) return null;
+  if (isDiffuseDecor(el, cs, w, h)) return null;
+
+  const tint = dominantTint(cs);
+  if (!tint) return null;
+
+  const x = (r.left - root.left) * sx;
+  const y = (r.top - root.top) * sy;
+  if (x > spaceW || y > spaceH || x + w < 0 || y + h < 0) return null;
+
+  const opacity = parseFloat(cs.opacity);
+  const mul = Number.isFinite(opacity) ? opacity : 1;
+  const frosted = hasUnexpressibleSurface(cs);
+  // Glass surfaces read as a translucent veil on screen; opaque solids keep
+  // their weight. Either way the panel fades OUT toward the bottom edge, the
+  // same recipe the on-screen card uses.
+  const top = Math.max(0.06, Math.min(1, (frosted ? Math.min(tint.alpha, 0.32) : tint.alpha) * mul));
+  const stops = [
+    { pos: 0, color: { hex: tint.hex, alpha: top } },
+    { pos: 0.55, color: { hex: tint.hex, alpha: top * 0.42 } },
+    { pos: 1, color: { hex: tint.hex, alpha: 0 } },
+  ];
+
+  return {
+    // 180deg in this module's convention = paint runs top → bottom.
+    kind: "roundRect",
+    x,
+    y,
+    w,
+    h,
+    radiusPx: radiusOf(cs, w, h),
+    fill: { hex: tint.hex, alpha: top },
+    gradient: { angleDeg: 180, stops },
+    line: borderOf(cs),
+    shadow: parseBoxShadow(cs.boxShadow),
+    rotationDeg: rotationOf(cs.transform),
+    name: nameFor(el, frosted ? "TP Glass card" : "TP Panel"),
+    node: el,
+  };
+}
+
+
 /** The paint of an element's own background box, if any. */
 function paintOf(cs: CSSStyleDeclaration): { fill: DomColor | null; gradient: DomGradient | null } {
   const bgImage = cs.backgroundImage || "";
