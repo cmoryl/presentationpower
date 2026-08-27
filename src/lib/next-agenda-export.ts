@@ -111,16 +111,23 @@ export async function exportAgendaSheet(opts: {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");
   });
 
+  opts.onProgress?.({ stage: "package", label: "Building the editable Word file" });
+  const word = await buildAgendaDocx(config).catch(() => null);
+
   opts.onProgress?.({ stage: "package", label: "Packaging the zip" });
   const zip = new JSZip();
   zip.file(`pdf/${slug}.pdf`, pdfBuffer);
   zip.file(`ai/${slug}.ai`, pdfBuffer);
+  if (word) {
+    zip.file(`word/${slug}.docx`, await word.blob.arrayBuffer());
+  }
   if (screen) {
     zip.file(`screen/${slug}-${geo.pxW}x${geo.pxH}.png`, await proofBlob.arrayBuffer());
   } else {
     zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
   }
-  zip.file("READ-ME.txt", readme(config, vector));
+  zip.file("READ-ME.txt", readme(config, vector, word?.notes ?? []));
+
 
   const blob = await zip.generateAsync({ type: "blob" });
 

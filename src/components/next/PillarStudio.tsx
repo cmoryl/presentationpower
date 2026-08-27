@@ -13,6 +13,8 @@ import { NEXT_MART_ARTWORK } from "@/lib/next-mart";
 import { martArtRatio, martArtwork } from "@/lib/next-mart-placement";
 
 import { useSignedIn } from "@/components/CloudDeckControls";
+import { announceNextMasterSaved } from "@/hooks/use-next-live-masters";
+
 import { PillarSign } from "@/components/next/PillarSign";
 import { MAX_PLATE_EDGE_PX } from "@/lib/event-print-pipeline";
 import { exportPillarSign } from "@/lib/next-pillar-export";
@@ -143,6 +145,7 @@ export function PillarStudio({
   showMartLayouts = true,
   initialConfig,
   configKey,
+  initialFileId,
   onConfigChange,
 }: {
   scope?: string;
@@ -155,9 +158,12 @@ export function PillarStudio({
   initialConfig?: PillarConfig;
   /** Change this to re-seed the editor from a different prepared pillar. */
   configKey?: string;
+  /** Open directly onto an existing saved live file so Save becomes Update. */
+  initialFileId?: string | null;
   /** Surface every plate change so a host can save it back onto a sign. */
   onConfigChange?: (config: PillarConfig) => void;
 }) {
+
   const [config, setConfig] = useState<PillarConfig>(() => initialConfig ?? pillarDefault());
 
   // Re-seed when the host switches which prepared sign is being edited.
@@ -188,7 +194,14 @@ export function PillarStudio({
 
   const [ppi, setPpi] = useState<number>(PILLAR_SPEC.rasterPpi);
   const [fileName, setFileName] = useState("");
-  const [openFileId, setOpenFileId] = useState<string | null>(null);
+  const [openFileId, setOpenFileId] = useState<string | null>(initialFileId ?? null);
+
+  // Follow the host when it points the studio at a different saved live file.
+  useEffect(() => {
+    if (initialFileId === undefined) return;
+    setOpenFileId(initialFileId ?? null);
+  }, [initialFileId]);
+
   const plateRef = useRef<HTMLDivElement | null>(null);
 
   // ── QR placement presets (per pillar footprint + sign template) ────────────
@@ -306,6 +319,7 @@ export function PillarStudio({
       if (saved?.id) setOpenFileId(saved.id);
       if (saved?.name) setFileName(saved.name);
       void qc.invalidateQueries({ queryKey: ["event-pillar-files"] });
+      announceNextMasterSaved("pillar");
       toast.success(openFileId ? "Pillar file updated" : "Pillar file saved");
     },
     onError: (e: Error) => toast.error("Could not save", { description: e.message }),
@@ -319,6 +333,8 @@ export function PillarStudio({
         setFileName("");
       }
       void qc.invalidateQueries({ queryKey: ["event-pillar-files"] });
+      announceNextMasterSaved("pillar");
+
       toast.success("Pillar file deleted");
     },
     onError: (e: Error) => toast.error("Could not delete", { description: e.message }),

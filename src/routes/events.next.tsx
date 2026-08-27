@@ -42,6 +42,14 @@ import {
 } from "@/lib/next-london-signage";
 import { CityBadge } from "@/components/next/CityBadge";
 import { PillarSign } from "@/components/next/PillarSign";
+import { AgendaSheet } from "@/components/next/AgendaSheet";
+import {
+  pickAgendaFile,
+  pickPillarFile,
+  useSavedAgendaFiles,
+  useSavedPillarFiles,
+} from "@/hooks/use-next-live-masters";
+
 import {
   PILLAR_KINDS,
   pillarDefault,
@@ -1071,18 +1079,36 @@ function RegistryCard({
  */
 function LivePillars({ division }: { division: NextDivision }) {
   const [face, setFace] = useState<"light" | "dark">("light");
+  const savedPillars = useSavedPillarFiles();
+  const savedAgendas = useSavedAgendaFiles();
 
+  // Saved live files win over the shipped defaults, so an update made in the
+  // studio shows on these large-format cards as soon as it is saved.
   const cards = useMemo(
     () =>
       PILLAR_KINDS.map((kind) => {
-        const config: PillarConfig = {
-          ...pillarDefault(kind.id as PillarKindId, division.id),
-          face,
+        const kindId = kind.id as PillarKindId;
+        const saved = pickPillarFile(savedPillars.data, division.id, kindId, face);
+        const config: PillarConfig = saved
+          ? { ...saved.config, face }
+          : { ...pillarDefault(kindId, division.id), face };
+        return {
+          id: kindId,
+          label: kind.name,
+          config,
+          fileId: saved?.id,
+          fileName: saved?.name,
+          updatedAt: saved?.updated_at,
         };
-        return { id: kind.id as PillarKindId, label: kind.name, config };
       }),
-    [division.id, face],
+    [division.id, face, savedPillars.data],
   );
+
+  const savedAgenda = useMemo(
+    () => pickAgendaFile(savedAgendas.data, division.id),
+    [savedAgendas.data, division.id],
+  );
+
 
   return (
     <section className="mt-4 scroll-mt-24" aria-labelledby="next-live-pillars">
@@ -1101,7 +1127,7 @@ function LivePillars({ division }: { division: NextDivision }) {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             to="/events/next/agendas"
-            search={{ division: division.id }}
+            search={{ division: division.id, file: savedAgenda?.id }}
             className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
           >
             <CalendarDays size={13} /> {division.name} agenda
@@ -1139,11 +1165,20 @@ function LivePillars({ division }: { division: NextDivision }) {
             </div>
             <h3 className="mt-3 text-sm font-semibold tracking-tight">{card.label} pillar</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              {card.config.trimW}×{card.config.trimH} mm · {face} face · editable master
+              {card.config.trimW}×{card.config.trimH} mm · {face} face ·{" "}
+              {card.fileId ? "saved live file" : "editable master"}
             </p>
+            {card.fileId && (
+              <p className="mt-0.5 truncate text-[11px] text-primary/80">
+                {card.fileName}
+                {card.updatedAt
+                  ? ` · updated ${new Date(card.updatedAt).toLocaleString()}`
+                  : ""}
+              </p>
+            )}
             <Link
               to="/events/next/pillars"
-              search={{ division: division.id, kind: card.id, face }}
+              search={{ division: division.id, kind: card.id, face, file: card.fileId }}
               className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
               Edit this pillar
@@ -1152,9 +1187,34 @@ function LivePillars({ division }: { division: NextDivision }) {
           </article>
         ))}
       </div>
+
+      {savedAgenda && (
+        <article className="mt-4 flex flex-col gap-4 rounded-2xl border border-border p-4 sm:flex-row sm:items-center">
+          <div className="flex justify-center overflow-hidden rounded-xl bg-muted/40 p-2">
+            <AgendaSheet config={savedAgenda.config} pxPerMm={0.22} />
+          </div>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold tracking-tight">
+              Live agenda board · {division.name}
+            </h3>
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              {savedAgenda.name} · updated {new Date(savedAgenda.updated_at).toLocaleString()}
+            </p>
+            <Link
+              to="/events/next/agendas"
+              search={{ division: division.id, file: savedAgenda.id }}
+              className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              Edit this agenda
+              <ArrowRight size={12} />
+            </Link>
+          </div>
+        </article>
+      )}
     </section>
   );
 }
+
 
 /** London location signage — the QEII Centre scenic panel kit, part of the program. */
 function LondonKit() {
