@@ -18,7 +18,10 @@ import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview
 import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { buildLayerReport, type LayerReport } from "@/lib/layer-report";
 import { chartParityVariantIds } from "@/lib/export-chart-variants";
-import { setSkinBackdropOverrides } from "@/lib/skin-backdrop-overrides";
+import {
+  setSkinBackdropOverrides,
+  skinBackdropOverrideVersion,
+} from "@/lib/skin-backdrop-overrides";
 import {
   diffLayerTrees,
   snapshotFromReports,
