@@ -91,15 +91,34 @@ export const BLANK_DRAFT: CustomTemplate = {
   notes: "",
 };
 
+/**
+ * Saveable code for an edited catalog look. Editing a catalog look in place
+ * keeps its own code (so the saved row overrides that look everywhere); only
+ * when that code is already taken do we fall back to `<CODE>-V<n>`.
+ */
+function nextForkCode(base: string, taken: string[]): string {
+  const root = (base || "S01")
+    .toUpperCase()
+    .replace(/[^A-Z0-9-]/g, "")
+    .slice(0, 9);
+  const used = new Set(taken.map((c) => c.toUpperCase()));
+  if (root.length >= 2 && !used.has(root)) return root.slice(0, 12);
+  for (let n = 1; n < 100; n += 1) {
+    const candidate = `${root}-V${n}`.slice(0, 12);
+    if (!used.has(candidate)) return candidate;
+  }
+  return `${root}-V1`.slice(0, 12);
+}
+
 /** Seed an editable custom look from a catalog pack. */
-function forkFromPack(pack: StylePack): CustomTemplate {
+function forkFromPack(pack: StylePack, takenCodes: string[] = []): CustomTemplate {
   const code = codeForPack(pack);
   const skin = designSkinByCode(code) ?? industrySkinByCode(code);
   const t = pack.tokens;
   return {
     ...BLANK_DRAFT,
-    code: "",
-    name: `${pack.label} — variant`,
+    code: nextForkCode(code, takenCodes),
+    name: pack.label,
     reference: pack.reference ?? skin?.reference ?? "",
     description: skin?.description ?? pack.tagline ?? "",
     bestFit: skin?.bestFit ?? "",
@@ -334,7 +353,13 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
   useEffect(() => {
     if (panel !== "fields") return;
     if (selected?.template) setDraft(selected.template);
-    else if (selectedPack) setDraft(forkFromPack(selectedPack));
+    else if (selectedPack)
+      setDraft(
+        forkFromPack(
+          selectedPack,
+          templates.map((t) => t.code),
+        ),
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel, selected?.id]);
 
@@ -658,7 +683,12 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                   <button
                     type="button"
                     onClick={() => {
-                      setDraft(forkFromPack(selectedPack));
+                      setDraft(
+                        forkFromPack(
+                          selectedPack,
+                          templates.map((t) => t.code),
+                        ),
+                      );
                       setPanel("fields");
                     }}
                     className="inline-flex items-center gap-2 rounded-xl border border-black/15 px-3 py-2 text-xs hover:border-[#003FC7] dark:border-white/20"
@@ -715,7 +745,14 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                   siblings={templates}
                   onSaved={(saved) => {
                     setDraft(saved);
-                    setSelectedId(`tpl-${saved.code.toLowerCase()}`);
+                    // Stay on the row the edit belongs to — pointing at a
+                    // non-existent id made the selection fall back to the first
+                    // row, which reset the fields editor and lost the edit.
+                    const code = saved.code.toUpperCase();
+                    const match =
+                      rows.find((r) => r.template?.code.toUpperCase() === code) ??
+                      rows.find((r) => (r.pack ? codeForPack(r.pack) === code : false));
+                    setSelectedId(match?.id ?? selected?.id ?? null);
                     refresh();
                   }}
                   onDeleted={() => {

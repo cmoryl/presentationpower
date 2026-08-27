@@ -18,6 +18,19 @@ import { DESIGN_SKINS } from "@/lib/design-skins";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import { Field, inputCls, PALETTE_LABELS, DENSITIES } from "./fields";
 
+/** Loose hex input → canonical `#RRGGBB`, or "" when it isn't a hex at all. */
+function normalizeHex(raw: string): string {
+  const v = raw.trim().replace(/^#/, "");
+  if (/^[0-9a-f]{3}$/i.test(v)) {
+    return `#${v
+      .split("")
+      .map((ch) => ch + ch)
+      .join("")}`.toUpperCase();
+  }
+  if (/^[0-9a-f]{6}$/i.test(v)) return `#${v}`.toUpperCase();
+  return "";
+}
+
 export function TestPanel({ tests }: { tests: TemplateTest[] }) {
   const dot: Record<string, string> = {
     pass: "bg-emerald-500",
@@ -92,6 +105,7 @@ export function LookFieldsEditor({
       toast.error("Fix every failing check before publishing.");
       return;
     }
+    const palette = draft.palette.map((c) => normalizeHex(c) || c.trim());
     setBusy(true);
     try {
       const saved = await save({
@@ -103,7 +117,7 @@ export function LookFieldsEditor({
           description: draft.description,
           bestFit: draft.bestFit,
           mode: draft.mode,
-          palette: draft.palette,
+          palette,
           typography: draft.typography,
           surfaceNote: draft.surfaceNote,
           imagery: draft.imagery,
@@ -201,7 +215,16 @@ export function LookFieldsEditor({
                   next[i] = e.target.value;
                   set("palette", next);
                 }}
+                onBlur={(e) => {
+                  // Accept 7bcd3a / #7bc / #7BCD3A and store a canonical hex.
+                  const normal = normalizeHex(e.target.value);
+                  if (!normal || normal === draft.palette[i]) return;
+                  const next = [...draft.palette];
+                  next[i] = normal;
+                  set("palette", next);
+                }}
               />
+
             </label>
           ))}
         </div>
