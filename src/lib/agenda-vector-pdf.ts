@@ -45,8 +45,10 @@ import { buildPillarQr } from "./pillar-qr";
 import {
   agendaBlocks,
   agendaDivision,
+  agendaGeometry,
   agendaInk,
   agendaName,
+  agendaPages,
   agendaStops,
   agendaTitleInk,
   type AgendaConfig,
@@ -68,6 +70,8 @@ export type AgendaVectorResult = {
   bytes: Uint8Array<ArrayBuffer>;
   layers: AgendaLayerName[];
   lockupVector: boolean;
+  /** Pages in the press file — one per programme day / overflow page. */
+  pageCount: number;
   page: { widthPt: number; heightPt: number };
   pdfx: PdfX4Applied;
 };
@@ -221,12 +225,10 @@ function fit(font: PDFFont, text: string, size: number, maxWidth: number): strin
 }
 
 export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<AgendaVectorResult> {
-  const blocks = agendaBlocks(config);
-  const geo = blocks.geo;
-  const L = blocks.layout;
+  const pages = agendaPages(config);
+  const geo = agendaGeometry(config);
   const face = config.face ?? "dark";
   const ink = agendaInk(face);
-  const titleInk = agendaTitleInk(config);
   const stops = agendaStops(config.styleId, face, config.divisionId);
 
   const bleedW = geo.bleedW * MM_TO_PT;
@@ -246,8 +248,6 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
 
   const bold = (await ttf(doc, "/fonts/Geist-Bold.ttf")) ?? doc.embedStandardFont(StandardFonts.HelveticaBold);
   const regular = (await ttf(doc, "/fonts/Geist-Regular.ttf")) ?? doc.embedStandardFont(StandardFonts.Helvetica);
-
-  const page = doc.addPage([pageW, pageH]);
 
   const names: AgendaLayerName[] = [
     "01 Ground",
@@ -269,9 +269,6 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     });
     return { name, ref: doc.context.register(dict), tag: `OC${i + 1}` };
   });
-  const props = doc.context.obj({});
-  for (const l of layers) props.set(PDFName.of(l.tag), l.ref);
-  page.node.Resources()!.set(PDFName.of("Properties"), props);
   doc.catalog.set(
     PDFName.of("OCProperties"),
     doc.context.obj({
@@ -286,303 +283,334 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   );
   const layer = (name: AgendaLayerName) => layers.find((l) => l.name === name)!;
 
-  const trimX = ox + mm(geo.bleedEdge);
-  const trimY = oy + mm(geo.bleedEdge);
-  const trimW = mm(geo.trimW);
-  const trimH = mm(geo.trimH);
-  page.node.set(
-    PDFName.of("TrimBox"),
-    doc.context.obj([round(trimX), round(trimY), round(trimX + trimW), round(trimY + trimH)]),
-  );
-  page.node.set(
-    PDFName.of("BleedBox"),
-    doc.context.obj([round(ox), round(oy), round(ox + bleedW), round(oy + bleedH)]),
-  );
-
-  /** mm from the trim top-left → PDF point coordinates. */
-  const px = (x: number) => trimX + mm(x);
-  const py = (y: number) => trimY + trimH - mm(y);
-
-  // ── 01 Ground ──────────────────────────────────────────────────────────────
-  beginLayer(page, layer("01 Ground"));
-  page.pushOperators(
-    pushGraphicsState(),
-    translate(round(ox), round(oy)),
-    moveTo(0, 0),
-    lineTo(bleedW, 0),
-    lineTo(bleedW, bleedH),
-    lineTo(0, bleedH),
-    closePath(),
-    clip(),
-    endPath(),
-  );
-  const { name: shading } = registerMeshShading(
-    doc,
-    page,
-    bleedW,
-    bleedH,
-    groundSampler(bleedW, bleedH, stops, config.styleId),
-  );
-  page.pushOperators(PDFOperator.of("sh" as never, [shading]));
-  page.pushOperators(popGraphicsState());
-  endLayer(page);
-
-  // ── 02 Lockup ──────────────────────────────────────────────────────────────
+  // Approved division lockup is fetched once and reused on every page.
   const division = agendaDivision(config.divisionId);
+  const art = config.showLockup
+    ? await loadLockup(face === "light" ? division.colorUrl || division.whiteUrl : division.whiteUrl || division.colorUrl)
+    : null;
   let lockupVector = false;
-  if (blocks.lockup) {
-    const art = await loadLockup(
-      face === "light" ? division.colorUrl || division.whiteUrl : division.whiteUrl || division.colorUrl,
+
+  // Every programme day / page of the live file becomes one press page.
+  for (const pageDef of pages) {
+    const cfg = pageDef.config;
+    const blocks = agendaBlocks(cfg);
+    const L = blocks.layout;
+    const titleInk = agendaTitleInk(cfg);
+
+    const page = doc.addPage([pageW, pageH]);
+    const props = doc.context.obj({});
+    for (const l of layers) props.set(PDFName.of(l.tag), l.ref);
+    page.node.Resources()!.set(PDFName.of("Properties"), props);
+
+    const trimX = ox + mm(geo.bleedEdge);
+    const trimY = oy + mm(geo.bleedEdge);
+    const trimW = mm(geo.trimW);
+    const trimH = mm(geo.trimH);
+    page.node.set(
+      PDFName.of("TrimBox"),
+      doc.context.obj([round(trimX), round(trimY), round(trimX + trimW), round(trimY + trimH)]),
     );
-    const lw = mm(blocks.lockup.w);
-    const lh = mm(blocks.lockup.h);
-    beginLayer(page, layer("02 Lockup"));
-    if (art?.kind === "svg") {
-      lockupVector = true;
-      const [vx, vy, vw] = art.viewBox;
-      const scale = lw / vw;
-      for (const d of art.paths) {
-        page.drawSvgPath(d, {
-          x: px(blocks.lockup.x) - vx * scale,
-          y: py(blocks.lockup.y) + vy * scale,
-          scale,
-          color: rgb(...hexRgb(ink)),
-        });
+    page.node.set(
+      PDFName.of("BleedBox"),
+      doc.context.obj([round(ox), round(oy), round(ox + bleedW), round(oy + bleedH)]),
+    );
+
+    /** mm from the trim top-left → PDF point coordinates. */
+    const px = (x: number) => trimX + mm(x);
+    const py = (y: number) => trimY + trimH - mm(y);
+
+    // ── 01 Ground ────────────────────────────────────────────────────────────
+    beginLayer(page, layer("01 Ground"));
+    page.pushOperators(
+      pushGraphicsState(),
+      translate(round(ox), round(oy)),
+      moveTo(0, 0),
+      lineTo(bleedW, 0),
+      lineTo(bleedW, bleedH),
+      lineTo(0, bleedH),
+      closePath(),
+      clip(),
+      endPath(),
+    );
+    const { name: shading } = registerMeshShading(
+      doc,
+      page,
+      bleedW,
+      bleedH,
+      groundSampler(bleedW, bleedH, stops, config.styleId),
+    );
+    page.pushOperators(PDFOperator.of("sh" as never, [shading]));
+    page.pushOperators(popGraphicsState());
+    endLayer(page);
+
+    // ── 02 Lockup ────────────────────────────────────────────────────────────
+    if (blocks.lockup && art) {
+      const lw = mm(blocks.lockup.w);
+      const lh = mm(blocks.lockup.h);
+      beginLayer(page, layer("02 Lockup"));
+      if (art.kind === "svg") {
+        lockupVector = true;
+        const [vx, vy, vw] = art.viewBox;
+        const scale = lw / vw;
+        for (const d of art.paths) {
+          page.drawSvgPath(d, {
+            x: px(blocks.lockup.x) - vx * scale,
+            y: py(blocks.lockup.y) + vy * scale,
+            scale,
+            color: rgb(...hexRgb(ink)),
+          });
+        }
+      } else if (art.kind === "raster") {
+        try {
+          const image = art.png ? await doc.embedPng(art.bytes) : await doc.embedJpg(art.bytes);
+          page.drawImage(image, {
+            x: px(blocks.lockup.x),
+            y: py(blocks.lockup.y) - lh,
+            width: lw,
+            height: lh,
+          });
+        } catch {
+          /* lockup unavailable — the board still prints */
+        }
       }
-    } else if (art?.kind === "raster") {
-      try {
-        const image = art.png ? await doc.embedPng(art.bytes) : await doc.embedJpg(art.bytes);
-        page.drawImage(image, {
-          x: px(blocks.lockup.x),
-          y: py(blocks.lockup.y) - lh,
-          width: lw,
-          height: lh,
-        });
-      } catch {
-        /* lockup unavailable — the board still prints */
-      }
+      endLayer(page);
+    }
+
+    // ── 03 Title block ───────────────────────────────────────────────────────
+    beginLayer(page, layer("03 Title block"));
+    const eyebrow = (cfg.eyebrow ?? "").trim();
+    if (eyebrow) {
+      const size = mm(L.eyebrowSize);
+      drawTracked(page, eyebrow.toUpperCase(), {
+        x: px(blocks.x),
+        y: py(blocks.eyebrowY) - size,
+        size,
+        font: bold,
+        color: hexRgb(ink),
+        opacity: 0.82,
+        spacing: size * 0.22,
+      });
+    }
+    if ((cfg.title ?? "").trim()) {
+      const size = mm(L.titleSize);
+      page.drawText(fit(bold, cfg.title, size, mm(blocks.contentW)), {
+        x: px(blocks.x),
+        y: py(blocks.titleY) - size * 0.86,
+        size,
+        font: bold,
+        color: rgb(...hexRgb(titleInk)),
+      });
+    }
+    if ((cfg.meta ?? "").trim()) {
+      const size = mm(L.metaSize);
+      page.drawText(fit(regular, cfg.meta, size, mm(blocks.contentW)), {
+        x: px(blocks.x),
+        y: py(blocks.metaY) - size,
+        size,
+        font: regular,
+        color: rgb(...hexRgb(ink)),
+        opacity: 0.86,
+      });
     }
     endLayer(page);
-  }
 
-  // ── 03 Title block ─────────────────────────────────────────────────────────
-  beginLayer(page, layer("03 Title block"));
-  const eyebrow = config.eyebrow.trim();
-  if (eyebrow) {
-    const size = mm(L.eyebrowSize);
-    drawTracked(page, eyebrow.toUpperCase(), {
-      x: px(blocks.x),
-      y: py(blocks.eyebrowY) - size,
-      size,
-      font: bold,
-      color: hexRgb(ink),
-      opacity: 0.82,
-      spacing: size * 0.22,
-    });
-  }
-  if (config.title.trim()) {
-    const size = mm(L.titleSize);
-    page.drawText(fit(bold, config.title, size, mm(blocks.contentW)), {
-      x: px(blocks.x),
-      y: py(blocks.titleY) - size * 0.86,
-      size,
-      font: bold,
-      color: rgb(...hexRgb(titleInk)),
-    });
-  }
-  if (config.meta.trim()) {
-    const size = mm(L.metaSize);
-    page.drawText(fit(regular, config.meta, size, mm(blocks.contentW)), {
-      x: px(blocks.x),
-      y: py(blocks.metaY) - size,
-      size,
-      font: regular,
-      color: rgb(...hexRgb(ink)),
-      opacity: 0.86,
-    });
-  }
-  endLayer(page);
-
-  // ── 04 Sessions ────────────────────────────────────────────────────────────
-  beginLayer(page, layer("04 Sessions"));
-  const ruleColor = rgb(...hexRgb(ink));
-  const timeW = mm(L.timeColW);
-  const trackW = mm(L.trackColW);
-  const bodyW = mm(blocks.contentW) - timeW - trackW - mm(4);
-  for (const row of blocks.rows) {
-    const top = py(row.y);
+    // ── 04 Sessions ──────────────────────────────────────────────────────────
+    beginLayer(page, layer("04 Sessions"));
+    const ruleColor = rgb(...hexRgb(ink));
+    const timeW = mm(L.timeColW);
+    const trackW = mm(L.trackColW);
+    const bodyW = mm(blocks.contentW) - timeW - trackW - mm(4);
+    for (const row of blocks.rows) {
+      const top = py(row.y);
+      page.drawLine({
+        start: { x: px(blocks.x), y: top },
+        end: { x: px(blocks.x + blocks.contentW), y: top },
+        color: ruleColor,
+        thickness: 0.6,
+        opacity: face === "light" ? 0.22 : 0.28,
+      });
+      const pad = mm(row.h * 0.16);
+      const alpha = row.session.muted ? 0.72 : 1;
+      if (row.session.time.trim()) {
+        const size = mm(L.timeSize);
+        page.drawText(fit(bold, row.session.time, size, timeW), {
+          x: px(blocks.x),
+          y: top - pad - size * 0.86,
+          size,
+          font: bold,
+          color: rgb(...hexRgb(row.session.muted ? ink : titleInk)),
+          opacity: alpha,
+        });
+      }
+      let y = top - pad;
+      if (row.session.title.trim()) {
+        const size = mm(L.titleRowSize);
+        const font = row.session.muted ? regular : bold;
+        page.drawText(fit(font, row.session.title, size, bodyW), {
+          x: px(blocks.x) + timeW,
+          y: y - size * 0.86,
+          size,
+          font,
+          color: rgb(...hexRgb(ink)),
+          opacity: alpha,
+        });
+        y -= size * 1.12;
+      }
+      if (row.session.detail.trim()) {
+        const size = mm(L.detailSize);
+        page.drawText(fit(regular, row.session.detail, size, bodyW), {
+          x: px(blocks.x) + timeW,
+          y: y - size * 0.9,
+          size,
+          font: regular,
+          color: rgb(...hexRgb(ink)),
+          opacity: 0.78 * alpha,
+        });
+      }
+      if (row.session.track.trim()) {
+        const size = mm(L.trackSize);
+        const label = row.session.track.toUpperCase();
+        const spacing = size * 0.16;
+        const width = trackedWidth(bold, label, size, spacing);
+        drawTracked(page, label, {
+          x: px(blocks.x + blocks.contentW) - width,
+          y: top - pad - size * 0.9,
+          size,
+          font: bold,
+          color: hexRgb(ink),
+          opacity: 0.8 * alpha,
+          spacing,
+        });
+      }
+    }
+    // closing rule
+    const lastY = py(blocks.rowsTop + blocks.rowH * blocks.rows.length);
     page.drawLine({
-      start: { x: px(blocks.x), y: top },
-      end: { x: px(blocks.x + blocks.contentW), y: top },
+      start: { x: px(blocks.x), y: lastY },
+      end: { x: px(blocks.x + blocks.contentW), y: lastY },
       color: ruleColor,
       thickness: 0.6,
       opacity: face === "light" ? 0.22 : 0.28,
     });
-    const pad = mm(row.h * 0.16);
-    const alpha = row.session.muted ? 0.72 : 1;
-    if (row.session.time.trim()) {
-      const size = mm(L.timeSize);
-      page.drawText(fit(bold, row.session.time, size, timeW), {
-        x: px(blocks.x),
-        y: top - pad - size * 0.86,
-        size,
-        font: bold,
-        color: rgb(...hexRgb(row.session.muted ? ink : titleInk)),
-        opacity: alpha,
-      });
-    }
-    let y = top - pad;
-    if (row.session.title.trim()) {
-      const size = mm(L.titleRowSize);
-      const font = row.session.muted ? regular : bold;
-      page.drawText(fit(font, row.session.title, size, bodyW), {
-        x: px(blocks.x) + timeW,
-        y: y - size * 0.86,
-        size,
-        font,
-        color: rgb(...hexRgb(ink)),
-        opacity: alpha,
-      });
-      y -= size * 1.12;
-    }
-    if (row.session.detail.trim()) {
-      const size = mm(L.detailSize);
-      page.drawText(fit(regular, row.session.detail, size, bodyW), {
-        x: px(blocks.x) + timeW,
-        y: y - size * 0.9,
-        size,
-        font: regular,
-        color: rgb(...hexRgb(ink)),
-        opacity: 0.78 * alpha,
-      });
-    }
-    if (row.session.track.trim()) {
-      const size = mm(L.trackSize);
-      const label = row.session.track.toUpperCase();
-      const spacing = size * 0.16;
-      const width = trackedWidth(bold, label, size, spacing);
-      drawTracked(page, label, {
-        x: px(blocks.x + blocks.contentW) - width,
-        y: top - pad - size * 0.9,
-        size,
-        font: bold,
-        color: hexRgb(ink),
-        opacity: 0.8 * alpha,
-        spacing,
-      });
-    }
-  }
-  // closing rule
-  const lastY = py(blocks.rowsTop + blocks.rowH * blocks.rows.length);
-  page.drawLine({
-    start: { x: px(blocks.x), y: lastY },
-    end: { x: px(blocks.x + blocks.contentW), y: lastY },
-    color: ruleColor,
-    thickness: 0.6,
-    opacity: face === "light" ? 0.22 : 0.28,
-  });
-  endLayer(page);
-
-  // ── 05 Footer ──────────────────────────────────────────────────────────────
-  if (config.footnote.trim()) {
-    beginLayer(page, layer("05 Footer"));
-    const size = mm(L.footSize);
-    page.drawText(fit(regular, config.footnote, size, mm(blocks.contentW * 0.72)), {
-      x: px(blocks.x),
-      y: py(blocks.footY) - size,
-      size,
-      font: regular,
-      color: rgb(...hexRgb(ink)),
-      opacity: 0.74,
-    });
     endLayer(page);
-  }
 
-  // ── 06 QR code ─────────────────────────────────────────────────────────────
-  const qr = buildPillarQr(config.qrData ?? "");
-  if (qr && blocks.qr) {
-    const edge = mm(blocks.qr.edge);
-    const unit = edge / qr.size;
-    const left = px(blocks.qr.x);
-    const bottom = py(blocks.qr.y) - edge;
-    beginLayer(page, layer("06 QR code"));
-    page.drawRectangle({ x: left, y: bottom, width: edge, height: edge, color: rgb(1, 1, 1) });
-    const dark = hexRgb("#03002C");
-    for (let r = 0; r < qr.size; r += 1) {
-      for (let c = 0; c < qr.size; c += 1) {
-        if (!qr.modules[r * qr.size + c]) continue;
-        const x = left + c * unit;
-        const y = bottom + edge - (r + 1) * unit;
-        polygon(page, [[x, y], [x + unit, y], [x + unit, y + unit], [x, y + unit]], dark);
-      }
-    }
-    if (config.qrCaption.trim()) {
+    // ── 05 Footer ────────────────────────────────────────────────────────────
+    const stamp = (cfg.pageLabel ?? "").trim();
+    if ((cfg.footnote ?? "").trim() || stamp) {
+      beginLayer(page, layer("05 Footer"));
       const size = mm(L.footSize);
-      const label = config.qrCaption.toUpperCase();
-      const spacing = size * 0.16;
-      const width = trackedWidth(bold, label, size, spacing);
-      drawTracked(page, label, {
-        x: left + edge / 2 - width / 2,
-        y: py(blocks.qr.capY) - size,
-        size,
-        font: bold,
-        color: hexRgb(ink),
-        spacing,
+      if ((cfg.footnote ?? "").trim()) {
+        page.drawText(fit(regular, cfg.footnote, size, mm(blocks.contentW * 0.72)), {
+          x: px(blocks.x),
+          y: py(blocks.footY) - size,
+          size,
+          font: regular,
+          color: rgb(...hexRgb(ink)),
+          opacity: 0.74,
+        });
+      }
+      if (stamp) {
+        const spacing = size * 0.16;
+        const width = trackedWidth(bold, stamp.toUpperCase(), size, spacing);
+        drawTracked(page, stamp.toUpperCase(), {
+          x: px(blocks.x + blocks.contentW) - width,
+          y: py(blocks.footY) - size,
+          size,
+          font: bold,
+          color: hexRgb(ink),
+          opacity: 0.72,
+          spacing,
+        });
+      }
+      endLayer(page);
+    }
+
+    // ── 06 QR code ───────────────────────────────────────────────────────────
+    const qr = buildPillarQr(cfg.qrData ?? "");
+    if (qr && blocks.qr) {
+      const edge = mm(blocks.qr.edge);
+      const unit = edge / qr.size;
+      const left = px(blocks.qr.x);
+      const bottom = py(blocks.qr.y) - edge;
+      beginLayer(page, layer("06 QR code"));
+      page.drawRectangle({ x: left, y: bottom, width: edge, height: edge, color: rgb(1, 1, 1) });
+      const dark = hexRgb("#03002C");
+      for (let r = 0; r < qr.size; r += 1) {
+        for (let c = 0; c < qr.size; c += 1) {
+          if (!qr.modules[r * qr.size + c]) continue;
+          const x = left + c * unit;
+          const y = bottom + edge - (r + 1) * unit;
+          polygon(page, [[x, y], [x + unit, y], [x + unit, y + unit], [x, y + unit]], dark);
+        }
+      }
+      if ((cfg.qrCaption ?? "").trim()) {
+        const size = mm(L.footSize);
+        const label = cfg.qrCaption.toUpperCase();
+        const spacing = size * 0.16;
+        const width = trackedWidth(bold, label, size, spacing);
+        drawTracked(page, label, {
+          x: left + edge / 2 - width / 2,
+          y: py(blocks.qr.capY) - size,
+          size,
+          font: bold,
+          color: hexRgb(ink),
+          spacing,
+        });
+      }
+      endLayer(page);
+    }
+
+    // ── 07 Guides + marks ────────────────────────────────────────────────────
+    beginLayer(page, layer("07 Guides + marks"));
+    const guideInk = rgb(...hexRgb(face === "light" ? "#03002C" : "#FFFFFF"));
+    page.drawRectangle({
+      x: trimX,
+      y: trimY,
+      width: trimW,
+      height: trimH,
+      borderColor: guideInk,
+      borderWidth: 0.75,
+      borderDashArray: [6, 6],
+      opacity: 0,
+      borderOpacity: 0.6,
+    });
+    page.drawRectangle({
+      x: px(geo.safeInset),
+      y: py(geo.trimH - geo.safeInset),
+      width: trimW - mm(geo.safeInset) * 2,
+      height: trimH - mm(geo.safeInset) * 2,
+      borderColor: guideInk,
+      borderWidth: 0.75,
+      borderDashArray: [4, 8],
+      opacity: 0,
+      borderOpacity: 0.35,
+    });
+    const markLen = 0.3 * 72;
+    const gap = 0.08 * 72;
+    const corners: [number, number][] = [
+      [trimX, trimY],
+      [trimX + trimW, trimY],
+      [trimX, trimY + trimH],
+      [trimX + trimW, trimY + trimH],
+    ];
+    for (const [cx, cy] of corners) {
+      const left = cx < pageW / 2;
+      const bottom = cy < pageH / 2;
+      page.drawLine({
+        start: { x: left ? cx - gap - markLen : cx + gap, y: cy },
+        end: { x: left ? cx - gap : cx + gap + markLen, y: cy },
+        color: rgb(0, 0, 0),
+        thickness: 0.5,
+      });
+      page.drawLine({
+        start: { x: cx, y: bottom ? cy - gap - markLen : cy + gap },
+        end: { x: cx, y: bottom ? cy - gap : cy + gap + markLen },
+        color: rgb(0, 0, 0),
+        thickness: 0.5,
       });
     }
     endLayer(page);
   }
-
-  // ── 07 Guides + marks ──────────────────────────────────────────────────────
-  beginLayer(page, layer("07 Guides + marks"));
-  const guideInk = rgb(...hexRgb(face === "light" ? "#03002C" : "#FFFFFF"));
-  page.drawRectangle({
-    x: trimX,
-    y: trimY,
-    width: trimW,
-    height: trimH,
-    borderColor: guideInk,
-    borderWidth: 0.75,
-    borderDashArray: [6, 6],
-    opacity: 0,
-    borderOpacity: 0.6,
-  });
-  page.drawRectangle({
-    x: px(geo.safeInset),
-    y: py(geo.trimH - geo.safeInset),
-    width: trimW - mm(geo.safeInset) * 2,
-    height: trimH - mm(geo.safeInset) * 2,
-    borderColor: guideInk,
-    borderWidth: 0.75,
-    borderDashArray: [4, 8],
-    opacity: 0,
-    borderOpacity: 0.35,
-  });
-  const markLen = 0.3 * 72;
-  const gap = 0.08 * 72;
-  const corners: [number, number][] = [
-    [trimX, trimY],
-    [trimX + trimW, trimY],
-    [trimX, trimY + trimH],
-    [trimX + trimW, trimY + trimH],
-  ];
-  for (const [cx, cy] of corners) {
-    const left = cx < pageW / 2;
-    const bottom = cy < pageH / 2;
-    page.drawLine({
-      start: { x: left ? cx - gap - markLen : cx + gap, y: cy },
-      end: { x: left ? cx - gap : cx + gap + markLen, y: cy },
-      color: rgb(0, 0, 0),
-      thickness: 0.5,
-    });
-    page.drawLine({
-      start: { x: cx, y: bottom ? cy - gap - markLen : cy + gap },
-      end: { x: cx, y: bottom ? cy - gap : cy + gap + markLen },
-      color: rgb(0, 0, 0),
-      thickness: 0.5,
-    });
-  }
-  endLayer(page);
 
   const x4 = await applyPdfX4(doc, {
     title,
@@ -594,6 +622,7 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
     bytes: bytes as Uint8Array<ArrayBuffer>,
     layers: names,
     lockupVector,
+    pageCount: pages.length,
     page: { widthPt: pageW, heightPt: pageH },
     pdfx: x4,
   };

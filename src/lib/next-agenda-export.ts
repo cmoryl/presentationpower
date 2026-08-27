@@ -22,6 +22,7 @@ import {
   agendaSlug,
   agendaStops,
   agendaStyleLabel,
+  agendaPages,
   type AgendaConfig,
 } from "./next-agenda";
 
@@ -35,6 +36,8 @@ export type AgendaExportResult = {
   filename: string;
   pdfBytes: number;
   layers: string[];
+  /** Pages in the press file — one per programme day / overflow page. */
+  pageCount: number;
 };
 
 function readme(
@@ -62,7 +65,9 @@ function readme(
       ? `Reference:       ${geo.trimW} x ${geo.trimH} mm at 96 ppi (layout reference only)`
       : `Bleed:           ${geo.bleedW} x ${geo.bleedH} mm (${geo.bleedEdge} mm per edge)`,
     `Safe area:       ${Math.round(geo.safeInset)} mm inside trim`,
-    `Sessions:        ${config.sessions.length} rows`,
+    `Days:            ${agendaPages(config)[0]?.dayCount ?? 1}`,
+    `Pages:           ${vector.pageCount} (one press page per programme day / overflow page)`,
+    `Sessions:        ${agendaPages(config).reduce((n, p) => n + p.config.sessions.length, 0)} rows in total`,
     `QR payload:      ${qr || "none"}`,
     `Colour:          convert to ${AGENDA_SPEC.colorMode} at output; body text 100K`,
     `Standard:        PDF/X-4 — GTS_PDF_X output intent with an embedded ${vector.pdfx.outputIntent}`,
@@ -148,5 +153,6 @@ export async function exportAgendaSheet(opts: {
     filename: `next-agenda-${slug}.zip`,
     pdfBytes: pdfBuffer.byteLength,
     layers: vector.layers,
+    pageCount: vector.pageCount,
   };
 }

@@ -185,6 +185,15 @@ export type AgendaSession = {
   muted: boolean;
 };
 
+/** One programme day. Multi-day agendas hold an ordered list of these. */
+export type AgendaDay = {
+  /** Day title printed as the headline, e.g. "DAY ONE". */
+  label: string;
+  /** Date · venue line for that day. */
+  meta: string;
+  sessions: AgendaSession[];
+};
+
 export type AgendaConfig = {
   divisionId: string;
   face: AgendaFaceId;
@@ -210,7 +219,17 @@ export type AgendaConfig = {
   qrCaption: string;
   /** Event this live agenda file belongs to (free-text label). */
   eventLabel: string;
+  /**
+   * Multi-day programme. When present it is authoritative; day one is mirrored
+   * into `title` / `meta` / `sessions` so single-page consumers keep working.
+   */
+  days?: AgendaDay[];
+  /** Rows per printed page. 0 / undefined = fill each page automatically. */
+  rowsPerPage?: number;
+  /** Derived page stamp, e.g. "DAY ONE · PAGE 2 OF 3". Set by `agendaPages`. */
+  pageLabel?: string;
 };
+
 
 /**
  * Division-specific default programmes. Every NEXT area opens on its own
@@ -558,7 +577,7 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
   const str = (v: unknown, fb: string) => (typeof v === "string" ? v : fb);
   const num = (v: unknown, fb: number) => (Number.isFinite(Number(v)) ? Number(v) : fb);
   const sessions = Array.isArray(raw.sessions)
-    ? raw.sessions.slice(0, 24).map((s) => ({
+    ? raw.sessions.slice(0, 60).map((s) => ({
         time: str((s as AgendaSession)?.time, ""),
         title: str((s as AgendaSession)?.title, ""),
         detail: str((s as AgendaSession)?.detail, ""),
@@ -586,8 +605,30 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     qrSize: num(raw.qrSize, base.qrSize),
     qrCaption: str(raw.qrCaption, base.qrCaption),
     eventLabel: str(raw.eventLabel, ""),
+    days: Array.isArray(raw.days) && raw.days.length
+      ? raw.days.slice(0, 14).map((d, i) => {
+          const day = (d ?? {}) as Partial<AgendaDay>;
+          const rows = Array.isArray(day.sessions)
+            ? day.sessions.slice(0, 60).map((s) => ({
+                time: str((s as AgendaSession)?.time, ""),
+                title: str((s as AgendaSession)?.title, ""),
+                detail: str((s as AgendaSession)?.detail, ""),
+                track: str((s as AgendaSession)?.track, ""),
+                muted: Boolean((s as AgendaSession)?.muted),
+              }))
+            : [];
+          return {
+            label: str(day.label, `DAY ${i + 1}`),
+            meta: str(day.meta, ""),
+            sessions: rows,
+          };
+        })
+      : undefined,
+    rowsPerPage: Math.max(0, Math.min(40, Math.round(num(raw.rowsPerPage, 0)))),
   };
 }
+
+
 
 /** Saved live agenda file row as the UI consumes it. */
 export type AgendaVersion = {
@@ -662,4 +703,168 @@ export function agendaBlocks(config: AgendaConfig) {
     footY,
     qr,
   };
+}
+
+// ── multi-day + multi-page ───────────────────────────────────────────────────
+//
+// A live agenda file can hold several programme days, and each day can run over
+// as many printed pages as it needs. `agendaPages` resolves the whole file into
+// an ordered list of single-page boards — every one a plain `AgendaConfig`, so
+// the live sheet, the layered press PDF and the Word export all read the same
+// pages from the same geometry.
+
+/** Smallest row band we will sign off for reading distance, in mm. */
+export const AGENDA_MIN_ROW_MM = 10;
+
+export const AGENDA_ROWS_PER_PAGE = { min: 3, max: 40 };
+
+/** Every day in the file, always at least one. */
+export function agendaDays(config: AgendaConfig): AgendaDay[] {
+  const days = (config.days ?? []).filter(Boolean);
+  if (days.length) return days;
+  return [{ label: config.title ?? "", meta: config.meta ?? "", sessions: config.sessions ?? [] }];
+}
+
+/** Rows that hold the legible floor on one page of the chosen format. */
+export function agendaCapacity(config: AgendaConfig): number {
+  const probe = agendaBlocks({ ...config, sessions: config.sessions.slice(0, 1) });
+  const band = Math.max(AGENDA_MIN_ROW_MM, probe.listBottom - probe.rowsTop);
+  return Math.max(1, Math.floor(band / AGENDA_MIN_ROW_MM));
+}
+
+/** Rows placed on each page: the operator's setting, or an automatic fill. */
+export function agendaRowsPerPage(config: AgendaConfig): number {
+  const manual = Math.round(Number(config.rowsPerPage) || 0);
+  if (manual >= AGENDA_ROWS_PER_PAGE.min) {
+    return Math.min(AGENDA_ROWS_PER_PAGE.max, manual);
+  }
+  return agendaCapacity(config);
+}
+
+export type AgendaPage = {
+  /** A single-page board, ready for the sheet or the export. */
+  config: AgendaConfig;
+  dayIndex: number;
+  dayCount: number;
+  dayLabel: string;
+  /** Page number inside its day, 0-based. */
+  pageInDay: number;
+  pagesInDay: number;
+  /** Page number across the whole file, 0-based. */
+  index: number;
+  total: number;
+  label: string;
+};
+
+/** Resolve a live agenda file into its printed pages. */
+export function agendaPages(config: AgendaConfig): AgendaPage[] {
+  const days = agendaDays(config);
+  const perPage = agendaRowsPerPage(config);
+  const multiDay = days.length > 1;
+
+  const chunks: { dayIndex: number; day: AgendaDay; rows: AgendaSession[]; pageInDay: number; pagesInDay: number }[] =
+    [];
+  days.forEach((day, dayIndex) => {
+    const rows = day.sessions ?? [];
+    const pagesInDay = Math.max(1, Math.ceil(rows.length / perPage));
+    for (let p = 0; p < pagesInDay; p += 1) {
+      chunks.push({
+        dayIndex,
+        day,
+        rows: rows.slice(p * perPage, (p + 1) * perPage),
+        pageInDay: p,
+        pagesInDay,
+      });
+    }
+  });
+
+  const total = chunks.length;
+  return chunks.map((chunk, index) => {
+    const continued = chunk.pageInDay > 0;
+    const dayLabel = chunk.day.label || `Day ${chunk.dayIndex + 1}`;
+    const stamp =
+      total === 1
+        ? ""
+        : [
+            multiDay ? dayLabel.toUpperCase() : "",
+            chunk.pagesInDay > 1 ? `PAGE ${chunk.pageInDay + 1} OF ${chunk.pagesInDay}` : "",
+            !multiDay && chunk.pagesInDay === 1 ? `PAGE ${index + 1} OF ${total}` : "",
+          ]
+            .filter(Boolean)
+            .join(" · ");
+    return {
+      config: {
+        ...config,
+        days: undefined,
+        rowsPerPage: 0,
+        title: continued ? `${dayLabel} (CONT.)` : dayLabel,
+        meta: chunk.day.meta ?? "",
+        sessions: chunk.rows,
+        pageLabel: stamp,
+      },
+      dayIndex: chunk.dayIndex,
+      dayCount: days.length,
+      dayLabel,
+      pageInDay: chunk.pageInDay,
+      pagesInDay: chunk.pagesInDay,
+      index,
+      total,
+      label: `${dayLabel}${chunk.pagesInDay > 1 ? ` · page ${chunk.pageInDay + 1}/${chunk.pagesInDay}` : ""}`,
+    };
+  });
+}
+
+/**
+ * Write a patch into one day of the file, keeping day one mirrored onto the
+ * top-level fields so single-day files and older consumers stay valid.
+ */
+export function writeAgendaDay(
+  config: AgendaConfig,
+  index: number,
+  patch: Partial<AgendaDay>,
+): AgendaConfig {
+  const days = agendaDays(config).map((d, i) => (i === index ? { ...d, ...patch } : d));
+  const first = days[0]!;
+  return {
+    ...config,
+    days: days.length > 1 ? days : undefined,
+    title: first.label,
+    meta: first.meta,
+    sessions: first.sessions,
+  };
+}
+
+
+
+/** Add a programme day, seeded from the day it follows. */
+export function addAgendaDay(config: AgendaConfig): AgendaConfig {
+  const days = agendaDays(config);
+  const last = days[days.length - 1]!;
+  const next: AgendaDay = {
+    label: `DAY ${["ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN"][days.length] ?? days.length + 1}`,
+    meta: last.meta,
+    sessions: [{ time: "09:00", title: "New session", detail: "", track: "", muted: false }],
+  };
+  const all = [...days, next];
+  return { ...config, days: all, title: all[0]!.label, meta: all[0]!.meta, sessions: all[0]!.sessions };
+}
+
+/** Remove a programme day. The file always keeps at least one. */
+export function removeAgendaDay(config: AgendaConfig, index: number): AgendaConfig {
+  const days = agendaDays(config).filter((_, i) => i !== index);
+  if (!days.length) return config;
+  const first = days[0]!;
+  return {
+    ...config,
+    days: days.length > 1 ? days : undefined,
+    title: first.label,
+    meta: first.meta,
+    sessions: first.sessions,
+  };
+}
+
+/** Filename fragment for one page of a multi-page file. */
+export function agendaPageSlug(page: AgendaPage): string {
+  const base = agendaSlug(page.config);
+  return page.total > 1 ? `${base}-p${String(page.index + 1).padStart(2, "0")}` : base;
 }
