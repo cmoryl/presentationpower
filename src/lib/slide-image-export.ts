@@ -158,22 +158,43 @@ function withFallbackTimeout<T>(work: Promise<T>, ms: number, fallback: T): Prom
   });
 }
 
+/** Same-origin @font-face rules, read straight off the CSSOM. */
+function localFontFaceCSS(): string {
+  const out: string[] = [];
+  for (const sheet of Array.from(document.styleSheets)) {
+    let rules: CSSRuleList | null = null;
+    try {
+      rules = sheet.cssRules;
+    } catch {
+      continue; // cross-origin — handled by remoteFontEmbedCSS
+    }
+    for (const rule of Array.from(rules ?? [])) {
+      if (rule.constructor?.name === "CSSFontFaceRule" || /^@font-face/.test(rule.cssText)) {
+        out.push(rule.cssText);
+      }
+    }
+  }
+  return out.join("\n");
+}
+
 export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> {
   if (!fontEmbedCssPromise) {
-    fontEmbedCssPromise = getFontEmbedCSS(node)
-      .then((css) => css ?? "")
-      .catch((err) => {
-        console.warn("[slide-image-export] font embed CSS unavailable; capturing without it", err);
-        return "";
-      })
-      .then(async (css) => {
-        if (css.includes("@font-face")) return css;
-        // Never let webfont inlining hold an export hostage.
-        const remote = await withFallbackTimeout(remoteFontEmbedCSS(node), 10_000, "");
-        // A non-empty string is what stops html-to-image re-embedding on every
-        // capture; the marker keeps that true even with no embeddable webfont.
-        return remote ? `${css}\n${remote}` : `${css}\n/* no embeddable webfonts */`;
-      });
+    // NOTE: html-to-image's own `getFontEmbedCSS` walks every stylesheet and
+    // downloads EVERY @font-face it finds — with the project's Google Fonts
+    // stack that is hundreds of Noto CJK subsets per export run, which floods
+    // the network stack (`net::ERR_INSUFFICIENT_RESOURCES`) and can abort or
+    // stall a capture. Collect only what the node actually uses instead.
+    fontEmbedCssPromise = (async () => {
+      const local = localFontFaceCSS();
+      const remote = await withFallbackTimeout(remoteFontEmbedCSS(node), 10_000, "");
+      const css = [local, remote].filter(Boolean).join("\n");
+      // A non-null string is what stops html-to-image re-embedding on every
+      // capture; the marker keeps that true even with no embeddable webfont.
+      return css || "/* no embeddable webfonts */";
+    })().catch((err) => {
+      console.warn("[slide-image-export] font embed CSS unavailable; capturing without it", err);
+      return "/* no embeddable webfonts */";
+    });
   }
   return fontEmbedCssPromise;
 }
