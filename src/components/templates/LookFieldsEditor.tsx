@@ -201,7 +201,16 @@ export function LookFieldsEditor({
                   next[i] = e.target.value;
                   set("palette", next);
                 }}
+                onBlur={(e) => {
+                  // Accept 7bcd3a / #7bc / #7BCD3A and store a canonical hex.
+                  const normal = normalizeHex(e.target.value);
+                  if (!normal || normal === draft.palette[i]) return;
+                  const next = [...draft.palette];
+                  next[i] = normal;
+                  set("palette", next);
+                }}
               />
+
             </label>
           ))}
         </div>
