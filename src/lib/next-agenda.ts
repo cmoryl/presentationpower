@@ -30,8 +30,40 @@ export const AGENDA_SPEC = {
   exportPreset: "PDF/X-4",
 } as const;
 
-/** Printed agenda formats. Boards hang in the concourse; handouts print in-house. */
-export type AgendaSizeId = "a4" | "a3" | "a2" | "a1" | "custom";
+/** Printed agenda formats. Boards hang in the concourse; handouts print in-house.
+ *  Screen formats resolve the same artwork at exact pixel dimensions for holding
+ *  screens, room panels, lobby verticals and social frames. */
+export type AgendaSizeId =
+  | "a4"
+  | "a3"
+  | "a2"
+  | "a1"
+  | "screen-16x9"
+  | "screen-9x16"
+  | "screen-1x1"
+  | "screen-4x5"
+  | "screen-ultrawide"
+  | "custom";
+
+/** Screen presets are authored in px and converted at 96 ppi CSS reference. */
+export const PX_TO_MM = 25.4 / 96;
+
+const screen = (
+  id: AgendaSizeId,
+  name: string,
+  note: string,
+  pxW: number,
+  pxH: number,
+) => ({
+  id,
+  name,
+  note,
+  medium: "screen" as const,
+  pxW,
+  pxH,
+  trimW: Math.round(pxW * PX_TO_MM),
+  trimH: Math.round(pxH * PX_TO_MM),
+});
 
 export const AGENDA_SIZES: {
   id: AgendaSizeId;
@@ -39,13 +71,22 @@ export const AGENDA_SIZES: {
   note: string;
   trimW: number;
   trimH: number;
+  medium?: "print" | "screen";
+  pxW?: number;
+  pxH?: number;
 }[] = [
-  { id: "a4", name: "A4 handout", note: "Desk / delegate-bag programme, digital print.", trimW: 210, trimH: 297 },
-  { id: "a3", name: "A3 room card", note: "Breakout-room door and stage-wing card.", trimW: 297, trimH: 420 },
-  { id: "a2", name: "A2 board", note: "Registration and concourse agenda board.", trimW: 420, trimH: 594 },
-  { id: "a1", name: "A1 board", note: "Main entrance agenda board, reads at distance.", trimW: 594, trimH: 841 },
-  { id: "custom", name: "Custom size", note: "Type the measured trim of the board.", trimW: 500, trimH: 700 },
+  { id: "a4", name: "A4 handout", note: "Desk / delegate-bag programme, digital print.", trimW: 210, trimH: 297, medium: "print" },
+  { id: "a3", name: "A3 room card", note: "Breakout-room door and stage-wing card.", trimW: 297, trimH: 420, medium: "print" },
+  { id: "a2", name: "A2 board", note: "Registration and concourse agenda board.", trimW: 420, trimH: 594, medium: "print" },
+  { id: "a1", name: "A1 board", note: "Main entrance agenda board, reads at distance.", trimW: 594, trimH: 841, medium: "print" },
+  screen("screen-16x9", "Screen · 16:9 HD", "Holding screens, stage LED and room displays.", 1920, 1080),
+  screen("screen-9x16", "Screen · 9:16 vertical", "Lobby verticals, totems and story frames.", 1080, 1920),
+  screen("screen-1x1", "Screen · 1:1 square", "Social agenda tile and lift-lobby panels.", 1080, 1080),
+  screen("screen-4x5", "Screen · 4:5 portrait", "In-feed social programme post.", 1080, 1350),
+  screen("screen-ultrawide", "Screen · 21:9 ultrawide", "Concourse ribbon and wide LED band.", 2560, 1080),
+  { id: "custom", name: "Custom size", note: "Type the measured trim of the board.", trimW: 500, trimH: 700, medium: "print" },
 ];
+
 
 export const AGENDA_CUSTOM_SIZE = {
   w: { min: 120, max: 1600, step: 5 },
@@ -383,18 +424,20 @@ export function agendaSizePreset(id: string | undefined) {
   return AGENDA_SIZES.find((s) => s.id === id) ?? AGENDA_SIZES[2]!;
 }
 
-/** Resolved sheet geometry in mm. */
+/** Resolved sheet geometry in mm. Screen formats carry exact pixel dimensions
+ *  and no bleed — nothing is trimmed on a display. */
 export function agendaGeometry(config: { sizeId?: string; trimW?: number; trimH?: number }) {
   const preset = agendaSizePreset(config.sizeId);
   const custom = preset.id === "custom";
+  const isScreen = preset.medium === "screen";
   const clampTo = (v: number | undefined, fb: number, r: { min: number; max: number }) => {
     const n = Number(v);
     return Number.isFinite(n) && n > 0 ? Math.min(r.max, Math.max(r.min, n)) : fb;
   };
   const trimW = custom ? clampTo(config.trimW, preset.trimW, AGENDA_CUSTOM_SIZE.w) : preset.trimW;
   const trimH = custom ? clampTo(config.trimH, preset.trimH, AGENDA_CUSTOM_SIZE.h) : preset.trimH;
-  const bleedEdge = AGENDA_SPEC.bleedEdge;
-  const safeInset = Math.max(10, Math.min(30, trimW * 0.07));
+  const bleedEdge = isScreen ? 0 : AGENDA_SPEC.bleedEdge;
+  const safeInset = Math.max(10, Math.min(isScreen ? 34 : 30, trimW * (isScreen ? 0.05 : 0.07)));
   return {
     trimW,
     trimH,
@@ -403,10 +446,15 @@ export function agendaGeometry(config: { sizeId?: string; trimW?: number; trimH?
     bleedH: trimH + bleedEdge * 2,
     safeInset,
     sizeName: preset.name,
-    colorMode: AGENDA_SPEC.colorMode,
-    exportPreset: AGENDA_SPEC.exportPreset,
+    medium: (preset.medium ?? "print") as "print" | "screen",
+    isScreen,
+    pxW: preset.pxW ?? Math.round(trimW / PX_TO_MM),
+    pxH: preset.pxH ?? Math.round(trimH / PX_TO_MM),
+    colorMode: isScreen ? "sRGB (screen)" : AGENDA_SPEC.colorMode,
+    exportPreset: isScreen ? "PNG (sRGB) + vector PDF" : AGENDA_SPEC.exportPreset,
   };
 }
+
 
 export function agendaQrSize(config: AgendaConfig): number {
   const raw = Number(config.qrSize);
@@ -434,11 +482,19 @@ export function agendaTitleInk(config: AgendaConfig): string {
  */
 export function agendaLayout(config: AgendaConfig) {
   const geo = agendaGeometry(config);
-  const k = geo.trimW / 420; // A2 board is the reference sheet
+  // A2 board is the reference sheet. Landscape and screen formats have far less
+  // height per unit of width, so the scale reads off whichever edge is tighter —
+  // that keeps a 16:9 holding screen legible instead of crushing the row list.
+  const k = Math.min(geo.trimW / 420, geo.trimH / 594) * (geo.trimH < geo.trimW ? 1.35 : 1);
   const rows = config.sessions.length || 1;
   const contentW = geo.trimW - geo.safeInset * 2;
-  const lockupW = contentW * 0.44 * agendaLockupScale(config);
-  const lockupH = lockupW / (agendaDivision(config.divisionId).ratio || 1.7);
+  const ratio = agendaDivision(config.divisionId).ratio || 1.7;
+  // Cap the lockup against the sheet height so wide formats keep room for the
+  // programme; portrait boards stay on the established 44% content width.
+  const lockupW =
+    Math.min(contentW * 0.44, geo.trimH * 0.2 * ratio) * agendaLockupScale(config);
+  const lockupH = lockupW / ratio;
+
   const eyebrowSize = 5.4 * k;
   const titleSize = 22 * k;
   const metaSize = 6.4 * k;

@@ -156,9 +156,14 @@ export function AgendaStudio({
     });
 
   const geo = agendaGeometry(config);
-  // Fit the tallest edge to the viewer, scaling small formats (A4) up as well as
-  // large boards down, so every format fills the same review area.
-  const fitScale = Math.min(2.4, 760 / (geo.bleedH * NATIVE_PX_PER_MM));
+  // Fit the sheet to the viewer on both edges, scaling small formats (A4) up and
+  // wide screen formats (16:9, 21:9) down, so every format fills the review area.
+  const fitScale = Math.min(
+    2.4,
+    760 / (geo.bleedH * NATIVE_PX_PER_MM),
+    620 / (geo.bleedW * NATIVE_PX_PER_MM),
+  );
+
   const previewScale = fitScale * zoom;
 
   const division = agendaDivision(config.divisionId);
@@ -210,7 +215,10 @@ export function AgendaStudio({
         <div className="rounded-xl border border-border bg-muted/30 p-4">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
             <span>
-              {division.name} · {geo.sizeName} · {geo.trimW} × {geo.trimH} mm trim · {geo.bleedEdge} mm bleed
+              {division.name} · {geo.sizeName} ·{" "}
+              {geo.isScreen
+                ? `${geo.pxW} × ${geo.pxH} px · sRGB screen`
+                : `${geo.trimW} × ${geo.trimH} mm trim · ${geo.bleedEdge} mm bleed`}
             </span>
             <span className="flex items-center gap-3">
               <label className="flex items-center gap-2">
@@ -282,12 +290,26 @@ export function AgendaStudio({
                 value={config.sizeId}
                 onChange={(e) => set("sizeId", e.target.value as AgendaConfig["sizeId"])}
               >
-                {AGENDA_SIZES.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
+                <optgroup label="Print">
+                  {AGENDA_SIZES.filter((s) => s.medium !== "screen").map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} · {s.trimW} × {s.trimH} mm
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Screen">
+                  {AGENDA_SIZES.filter((s) => s.medium === "screen").map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} · {s.pxW} × {s.pxH} px
+                    </option>
+                  ))}
+                </optgroup>
               </select>
+              <p className="text-xs text-muted-foreground">
+                {geo.isScreen
+                  ? `Screen artwork · exports as a ${geo.pxW} × ${geo.pxH} px sRGB PNG at 1:1, plus the vector PDF. No bleed on a display.`
+                  : AGENDA_SIZES.find((s) => s.id === config.sizeId)?.note}
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="agenda-face">Face</Label>

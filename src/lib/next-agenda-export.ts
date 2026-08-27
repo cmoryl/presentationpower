@@ -47,8 +47,13 @@ function readme(config: AgendaConfig, vector: Awaited<ReturnType<typeof buildAge
     `Face:            ${agendaFace(config.face).name}`,
     ``,
     `Format:          ${geo.sizeName}`,
-    `Trim:            ${geo.trimW} x ${geo.trimH} mm`,
-    `Bleed:           ${geo.bleedW} x ${geo.bleedH} mm (${geo.bleedEdge} mm per edge)`,
+    `Medium:          ${geo.isScreen ? "screen (sRGB)" : "print"}`,
+    geo.isScreen
+      ? `Pixels:          ${geo.pxW} x ${geo.pxH} px — exported at 1:1, no bleed`
+      : `Trim:            ${geo.trimW} x ${geo.trimH} mm`,
+    geo.isScreen
+      ? `Reference:       ${geo.trimW} x ${geo.trimH} mm at 96 ppi (layout reference only)`
+      : `Bleed:           ${geo.bleedW} x ${geo.bleedH} mm (${geo.bleedEdge} mm per edge)`,
     `Safe area:       ${Math.round(geo.safeInset)} mm inside trim`,
     `Sessions:        ${config.sessions.length} rows`,
     `QR payload:      ${qr || "none"}`,
@@ -65,7 +70,9 @@ function readme(config: AgendaConfig, vector: Awaited<ReturnType<typeof buildAge
     ``,
     `pdf/    press file. Art runs to the bleed edge; crop marks sit in the slug.`,
     `ai/     the same layered artwork with an .ai extension for Illustrator.`,
-    `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
+    geo.isScreen
+      ? `screen/ ${geo.pxW} x ${geo.pxH} px sRGB PNG, ready to load on the display.`
+      : `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
     ``,
     `Palette and geometry are fixed across every NEXT division area — only the`,
     `approved division lockup and the programme copy change.`,
@@ -90,8 +97,12 @@ export async function exportAgendaSheet(opts: {
     vector.bytes.byteOffset + vector.bytes.byteLength,
   ) as ArrayBuffer;
 
-  opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
-  const wantPx = geo.bleedW * MM_TO_IN * PROOF_PPI;
+  const screen = geo.isScreen;
+  opts.onProgress?.({
+    stage: "proof",
+    label: screen ? `Rendering ${geo.pxW} × ${geo.pxH} px screen artwork` : "Rendering the proof PNG",
+  });
+  const wantPx = screen ? geo.pxW : geo.bleedW * MM_TO_IN * PROOF_PPI;
   const canvas = await captureAssetCanvas(
     { node, width: nativeWidth, height: nativeHeight, label: "NEXT division agenda" },
     { scale: Math.max(0.4, wantPx / nativeWidth), background: agendaStops(config.styleId, config.face, config.divisionId)[0]! },
@@ -104,8 +115,13 @@ export async function exportAgendaSheet(opts: {
   const zip = new JSZip();
   zip.file(`pdf/${slug}.pdf`, pdfBuffer);
   zip.file(`ai/${slug}.ai`, pdfBuffer);
-  zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
+  if (screen) {
+    zip.file(`screen/${slug}-${geo.pxW}x${geo.pxH}.png`, await proofBlob.arrayBuffer());
+  } else {
+    zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
+  }
   zip.file("READ-ME.txt", readme(config, vector));
+
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
