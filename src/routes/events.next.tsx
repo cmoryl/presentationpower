@@ -1109,6 +1109,17 @@ function LivePillars({ division }: { division: NextDivision }) {
     [savedAgendas.data, division.id],
   );
 
+  // Every division gets an agenda preview card: the saved live file when there
+  // is one, otherwise the editable division default on the selected face.
+  const agendaCard = useMemo(() => {
+    const config = savedAgenda
+      ? savedAgenda.config
+      : { ...agendaDefault(division.id), face };
+    return { config };
+  }, [savedAgenda, division.id, face]);
+
+
+
 
   return (
     <section className="mt-4 scroll-mt-24" aria-labelledby="next-live-pillars">
