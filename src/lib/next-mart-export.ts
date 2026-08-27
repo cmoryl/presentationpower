@@ -75,14 +75,14 @@ function slugify(v: string): string {
     .replace(/^-|-$/g, "");
 }
 
-function pillarSpecSheet(sign: MartPillarSign): string {
-  const config = martPillarConfig(sign);
+function pillarSpecSheet(sign: MartPillarSign, stop: MartStop): string {
+  const config = martStopPillarConfig(stop, sign);
   const geo = pillarGeometry(config);
   return [
     `NEXT MART — ${sign.name}`,
     "",
-    `Event:        ${NEXT_MART.event}`,
-    `Venue:        ${NEXT_MART.venue} · ${NEXT_MART.dates}`,
+    `Event:        ${martStopEventLabel(stop)}`,
+    `Venue:        ${stop.venue} · ${stop.dates}`,
     `Role:         ${sign.role}`,
     `Placement:    ${sign.placement}`,
     `Sign kind:    ${pillarKind(config.kind).name}`,
@@ -146,13 +146,13 @@ function flatSpecSheet(sign: MartFlatSign): string {
   ].join("\n");
 }
 
-function manifest(entries: MartExportEntry[]): string {
+function manifest(entries: MartExportEntry[], stop: MartStop): string {
   const total = entries.reduce((n, e) => n + e.quantity, 0);
   const lines = [
     "TransPerfect NEXT MART — signage production manifest",
     "",
-    `Event:   ${NEXT_MART.event}`,
-    `Venue:   ${NEXT_MART.venue} · ${NEXT_MART.dates}`,
+    `Event:   ${martStopEventLabel(stop)}`,
+    `Venue:   ${stop.venue} · ${stop.dates}`,
     `Sets:    ${entries.length}`,
     `Panels:  ${total}`,
     "",
@@ -249,7 +249,7 @@ export async function exportMartBundle(opts?: {
     } catch {
       /* ground art is a convenience layer */
     }
-    zip.file(`${folder}/PRINT-SPEC.txt`, pillarSpecSheet(sign));
+    zip.file(`${folder}/PRINT-SPEC.txt`, pillarSpecSheet(sign, stop));
 
     entries.push({
       id: sign.id,
@@ -338,7 +338,7 @@ export async function exportMartBundle(opts?: {
   }
 
   tick("Packaging the bundle");
-  zip.file("PRODUCTION-MANIFEST.txt", manifest(entries));
+  zip.file("PRODUCTION-MANIFEST.txt", manifest(entries, stop));
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {
