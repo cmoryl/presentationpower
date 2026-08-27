@@ -473,7 +473,14 @@ function IconBadge({
   });
   const dims = ICON_SIZES[spec.size];
   const badgeMode = useContext(SlideModeContext);
-  const colors = resolveEmphasisColors(brand, spec.treatment, spec.emphasis, badgeMode);
+  const badgePack = useStylePack();
+  const colors = resolveEmphasisColors(
+    brand,
+    spec.treatment,
+    spec.emphasis,
+    badgeMode,
+    lookGlyphColor(badgePack?.id),
+  );
   const Icon = pickIcon(label, index, override, brand?.id ?? null);
   const isCircle = spec.treatment === "soft-circle";
   const a11y =
