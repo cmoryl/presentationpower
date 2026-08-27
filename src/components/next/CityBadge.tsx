@@ -212,6 +212,8 @@ export function CityBadge({
           </div>
         ) : null}
       </div>
+      ) : null}
+
 
       {guides ? <BadgeGuides ppi={ppi} /> : null}
     </div>
