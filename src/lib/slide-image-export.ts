@@ -169,7 +169,7 @@ export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> 
       .then(async (css) => {
         if (css.includes("@font-face")) return css;
         // Never let webfont inlining hold an export hostage.
-        const remote = await withTimeout(remoteFontEmbedCSS(node), 10_000, "");
+        const remote = await withFallbackTimeout(remoteFontEmbedCSS(node), 10_000, "");
         // A non-empty string is what stops html-to-image re-embedding on every
         // capture; the marker keeps that true even with no embeddable webfont.
         return remote ? `${css}\n${remote}` : `${css}\n/* no embeddable webfonts */`;
