@@ -341,12 +341,15 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
 
   // Drafts aren't in the pack registry yet — derive a live preview pack from
   // the saved fields so backgrounds and previews work before publishing.
-  const selectedPack =
-    selected?.pack ??
-    (selected?.template
-      ? (stylePackById(`tpl-${selected.template.code.toLowerCase()}`) ??
-        templateToPack(selected.template))
-      : null);
+  // A saved template row is the authority for its look — editing a catalog
+  // look's palette must show up here immediately, so the saved row's pack wins
+  // over the built-in catalog pack of the same code.
+  const savedPack = selected?.template
+    ? (stylePackById(`tpl-${selected.template.code.toLowerCase()}`) ??
+      templateToPack(selected.template))
+    : null;
+  const selectedPack = savedPack ?? selected?.pack ?? null;
+
   const selectedCode = selectedPack ? codeForPack(selectedPack) : (selected?.template?.code ?? "");
 
   // Keep the fields editor in step with the selection.
