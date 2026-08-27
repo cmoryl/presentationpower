@@ -899,8 +899,14 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       // whatever is painted BEHIND it stays plated too (or a native copy would
       // land on top of the wash), while its children keep exporting natively.
       if (hasUnexpressibleBackground(cs)) {
+        const panel = panelFadeShape(el, cs, root, sx, sy, spaceW, spaceH);
+        if (panel) {
+          shapes.push(panel);
+          continue;
+        }
         surfaceRoots.push(el);
         continue;
+
       }
 
       // ---- painted boxes -------------------------------------------------
