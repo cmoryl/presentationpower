@@ -56,3 +56,26 @@ export function lookGlyphColor(packIdOrCode: string | null | undefined): string 
   const code = lookCodeFromPackId(packIdOrCode);
   return LOOK_GLYPH_COLOR[code] ?? LOOK_GLYPH_COLOR[code.replace(/-V\d+$/i, "")] ?? null;
 }
+
+/**
+ * Lead / accent colours a look's OWNING brand forces on its structure.
+ *
+ * The single-slide PPTX export path resolves a product-owned look under that
+ * product's brand mode; the module preview renderer used to keep whatever brand
+ * scope was selected, so a DataForce-owned look previewed in the catalog
+ * palette and exported in DataForce green. Both paths now read this table
+ * through `packToneBrand`, so preview and export are one pipeline.
+ */
+export const LOOK_OWNER_ACCENT: Record<string, { primary: string; accent: string }> = {
+  // DataForce Green leads the structure on AI · Data Signature.
+  R03: { primary: "#7BCD3A", accent: "#7BCD3A" },
+};
+
+/** Owning-brand lead/accent for a look, or null when the look is enterprise. */
+export function lookOwnerAccent(
+  packIdOrCode: string | null | undefined,
+): { primary: string; accent: string } | null {
+  if (!packIdOrCode) return null;
+  const code = lookCodeFromPackId(packIdOrCode);
+  return LOOK_OWNER_ACCENT[code] ?? LOOK_OWNER_ACCENT[code.replace(/-V\d+$/i, "")] ?? null;
+}

@@ -40,7 +40,7 @@ import { withGamesSceneArt } from "./games-scene-art";
 import { withIndustryPhotoArt } from "./industry-photo-art";
 
 import { templateCodeFromPackId } from "./custom-templates";
-import { lookBrandModeId } from "./look-brand";
+import { lookBrandModeId, lookOwnerAccent } from "./look-brand";
 
 export type StylePackId =
   | "swiss-noir"
@@ -2696,11 +2696,17 @@ export function packToneBrand<
 >(brand: T, pack: StylePack | null | undefined): T {
   if (!pack) return brand;
   const ownsLook = Boolean(brand.id) && lookBrandModeId(pack.id) === brand.id;
+  // A product-owned look keeps its owner's lead/accent no matter which brand
+  // scope is active, so the on-screen module preview and the single-slide PPTX
+  // export resolve the identical accent.
+  const owner = lookOwnerAccent(pack.id);
+  const lead = ownsLook ? brand.tokens.primary : (owner?.primary ?? pack.tokens.primary);
+  const accent = ownsLook ? brand.tokens.accent : (owner?.accent ?? pack.tokens.accentText);
   return {
     ...brand,
     tokens: {
-      primary: ownsLook ? brand.tokens.primary : pack.tokens.primary,
-      accent: ownsLook ? brand.tokens.accent : pack.tokens.accentText,
+      primary: lead,
+      accent,
       surface: pack.tokens.surface,
       ink: pack.tokens.ink,
     },
