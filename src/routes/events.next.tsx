@@ -41,6 +41,13 @@ import {
   londonPanelsByFloor,
 } from "@/lib/next-london-signage";
 import { CityBadge } from "@/components/next/CityBadge";
+import { PillarSign } from "@/components/next/PillarSign";
+import {
+  PILLAR_KINDS,
+  pillarDefault,
+  type PillarConfig,
+  type PillarKindId,
+} from "@/lib/next-pillar-masters";
 import { CITY_BADGE_DEFAULT, cityBadgeDivision } from "@/lib/next-city-badge";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 
