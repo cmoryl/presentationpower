@@ -9,6 +9,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { Download, Layers, QrCode, Redo2, Ruler, Save, Trash2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { NEXT_MART_ARTWORK } from "@/lib/next-mart";
+import { martArtRatio, martArtwork } from "@/lib/next-mart-placement";
+
 import { useSignedIn } from "@/components/CloudDeckControls";
 import { PillarSign } from "@/components/next/PillarSign";
 import { MAX_PLATE_EDGE_PX } from "@/lib/event-print-pipeline";
@@ -65,6 +68,8 @@ import {
   PILLAR_QR_MIN_CONTRAST,
   PILLAR_QR_STYLES,
   pillarStyleLabel,
+  pillarArtworkBox,
+  PILLAR_ART_WIDTH,
   pillarSubSize,
   withPillarKind,
   type PillarConfig,
@@ -931,6 +936,93 @@ export function PillarStudio({
               </p>
             </div>
           ) : null}
+
+              {/* Placed NEXT MART artwork — modular: the supplied die-cut master
+                  drops onto this live sheet, everything else stays editable. */}
+              <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
+                <div className="flex items-center justify-between">
+                  <div className={label}>Placed MART artwork</div>
+                  <div className="text-[11px] text-black/50">
+                    {config.artworkId ? "vector placed" : "none"}
+                  </div>
+                </div>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
+                  Place a supplied category master on this sheet. It exports as vector shapes on
+                  its own <code>08 Placed artwork</code> layer, so the ground, lockup, headline and
+                  QR all stay live and separable in Illustrator.
+                </p>
+                <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={() => set("artworkId", "")}
+                    className={`rounded-md border px-2 py-1.5 text-[11px] ${
+                      config.artworkId
+                        ? "border-black/10 hover:border-[#003FC7]/50"
+                        : "border-[#003FC7] bg-[#003FC7]/5 font-medium"
+                    }`}
+                  >
+                    No artwork
+                  </button>
+                  {NEXT_MART_ARTWORK.map((a) => (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => set("artworkId", a.id)}
+                      className={`rounded-md border px-2 py-1.5 text-left text-[11px] ${
+                        config.artworkId === a.id
+                          ? "border-[#003FC7] bg-[#003FC7]/5 font-medium"
+                          : "border-black/10 hover:border-[#003FC7]/50"
+                      }`}
+                    >
+                      <span className="block truncate text-[#03002C]">{a.headline}</span>
+                      <span className="block truncate text-[10px] text-black/45">{a.category}</span>
+                    </button>
+                  ))}
+                </div>
+                {config.artworkId ? (
+                  <div className="mt-2.5 space-y-2">
+                    <label className="block">
+                      <span className={label}>
+                        Artwork width · {Math.round((config.artworkWidth ?? 0.78) * 100)}% of trim
+                      </span>
+                      <input
+                        type="range"
+                        className="mt-1 w-full"
+                        min={PILLAR_ART_WIDTH.min}
+                        max={PILLAR_ART_WIDTH.max}
+                        step={PILLAR_ART_WIDTH.step}
+                        value={config.artworkWidth ?? 0.78}
+                        onChange={(e) => set("artworkWidth", Number(e.target.value))}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className={label}>
+                        Artwork top ·{' '}
+                        {Math.round(pillarArtworkBox(config, martArtRatio(martArtwork(config.artworkId))).y)}{' '}
+                        mm from trim top
+                      </span>
+                      <input
+                        type="range"
+                        className="mt-1 w-full"
+                        min={0}
+                        max={Math.round(pillarGeometry(config).trimH)}
+                        step={10}
+                        value={Math.round(
+                          pillarArtworkBox(config, martArtRatio(martArtwork(config.artworkId))).y,
+                        )}
+                        onChange={(e) => set("artworkOffsetY", Number(e.target.value))}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="text-[11px] font-medium text-[#003FC7] underline"
+                      onClick={() => set("artworkOffsetY", null)}
+                    >
+                      Reset to default flow
+                    </button>
+                  </div>
+                ) : null}
+              </div>
 
               {showMartLayouts && martLayouts.exact.length + martLayouts.other.length > 0 ? (
                 <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">

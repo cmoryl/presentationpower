@@ -336,9 +336,18 @@ export type PillarConfig = {
   /** Placed QR block position in mm from the trim top-left. null = default flow. */
   qrOffsetX: number | null;
   qrOffsetY: number | null;
+  /** Placed NEXT MART artwork master id. Empty = no placed artwork. */
+  artworkId: string;
+  /** Placed artwork width as a fraction of trim width (0.3–1). */
+  artworkWidth: number;
+  /** Placed artwork top edge in mm from the trim top. null = default flow. */
+  artworkOffsetY: number | null;
   /** Event this live pillar file belongs to (free text label). */
   eventLabel: string;
 };
+
+/** Approved range for placed artwork width, as a fraction of the trim width. */
+export const PILLAR_ART_WIDTH = { min: 0.3, max: 1, step: 0.02 };
 
 export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
   const kind = pillarKind(kindId);
@@ -376,8 +385,32 @@ export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "ci
     qrTransparent: false,
     qrOffsetX: null,
     qrOffsetY: null,
+    artworkId: "",
+    artworkWidth: 0.78,
+    artworkOffsetY: null,
     eventLabel: "",
   };
+}
+
+/** Placed artwork geometry in mm from the trim top-left, clamped to safe area.
+ * `ratio` is the artwork's own trim width / height. */
+export function pillarArtworkBox(
+  config: PillarConfig,
+  ratio: number,
+): { x: number; y: number; w: number; h: number } {
+  const geo = pillarGeometry(config);
+  const safeW = geo.trimW - geo.safeInset * 2;
+  const raw = Number(config.artworkWidth);
+  const frac = Number.isFinite(raw) && raw > 0 ? Math.min(PILLAR_ART_WIDTH.max, Math.max(PILLAR_ART_WIDTH.min, raw)) : 0.78;
+  const w = Math.min(safeW, geo.trimW * frac);
+  const h = w / (ratio || 1.667);
+  const x = (geo.trimW - w) / 2;
+  // Default flow parks the artwork in the lower third, above the QR band.
+  const fallback = geo.trimH * 0.58;
+  const wanted = Number(config.artworkOffsetY);
+  const y = Number.isFinite(wanted) && config.artworkOffsetY !== null ? wanted : fallback;
+  const maxY = geo.trimH - geo.safeInset - h;
+  return { x, y: Math.min(Math.max(geo.safeInset, y), Math.max(geo.safeInset, maxY)), w, h };
 }
 
 /** Clamp the sub-headline size into the approved range. */

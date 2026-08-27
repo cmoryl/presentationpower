@@ -24,6 +24,7 @@ import {
 import { pillarArrowPath } from "@/lib/pillar-arrows";
 import { PILLAR_LOGO_DROP } from "@/lib/next-pillar-masters";
 import { buildPillarQr } from "@/lib/pillar-qr";
+import { martPlacement } from "@/lib/next-mart-placement";
 
 type Props = {
   config: PillarConfig;
@@ -75,6 +76,10 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
   const qrFore = pillarQrForeground(config);
   const qrClear = pillarQrTransparent(config);
   const qrBack = qrClear ? "transparent" : pillarQrBackground(config);
+
+  // Placed NEXT MART artwork: the supplied master sits on the live ground while
+  // every other element stays editable.
+  const placed = martPlacement(config);
 
   const axis = config.styleId.includes("diagonal")
     ? { x1: "0%", y1: "0%", x2: "100%", y2: "100%" }
@@ -224,6 +229,23 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
         </defs>
         <rect x={0} y={0} width={w} height={h} fill={`url(#${gradientId})`} />
       </svg>
+
+      {placed ? (
+        <img
+          src={placed.art.previewUrl || placed.art.url}
+          alt=""
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: mm(geo.bleedEdge + placed.x),
+            top: mm(geo.bleedEdge + placed.y),
+            width: mm(placed.w),
+            height: mm(placed.h),
+            objectFit: "contain",
+            display: "block",
+          }}
+        />
+      ) : null}
 
       {/* Content stack inside the safe area */}
       <div
