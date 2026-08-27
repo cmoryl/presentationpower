@@ -105,6 +105,7 @@ export function LookFieldsEditor({
       toast.error("Fix every failing check before publishing.");
       return;
     }
+    const palette = draft.palette.map((c) => normalizeHex(c) || c.trim());
     setBusy(true);
     try {
       const saved = await save({
@@ -116,7 +117,7 @@ export function LookFieldsEditor({
           description: draft.description,
           bestFit: draft.bestFit,
           mode: draft.mode,
-          palette: draft.palette,
+          palette,
           typography: draft.typography,
           surfaceNote: draft.surfaceNote,
           imagery: draft.imagery,
