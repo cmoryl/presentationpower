@@ -842,23 +842,29 @@ export function GlassTile({
     <div
       className={`relative ${padding} ${className}`}
       style={{
-        background: bg,
-        borderRadius: radius,
-        backdropFilter: "blur(20px) saturate(150%)",
-        boxShadow: `${highlight}${accentGlow}`,
+        // Pack-aware: an alternate look (e.g. Spatial Clarity) redresses every
+        // glass tile through the same `--pack-card-*` vars the hand-rolled
+        // module cards use, so one look never mixes two card treatments.
+        background: `var(--pack-card-bg, ${bg})`,
+        backgroundImage: "var(--pack-card-bg-image, none)",
+        borderRadius: `var(--pack-card-radius, ${radius}px)`,
+        backdropFilter: "var(--pack-card-blur, blur(20px) saturate(150%))",
+        boxShadow: `var(--pack-card-shadow, ${highlight}${accentGlow})`,
+        clipPath: "var(--pack-card-clip, none)",
         ...style,
       }}
     >
       {/* Hairline ring drawn as its own layer so the shared open-bottom mask
-          fades the frame out along the bottom without masking the content. */}
+          fades the frame out along the bottom without masking the content.
+          Edgeless packs set `--pack-card-border: none`, which removes it. */}
       <div
         aria-hidden
         data-decorative
         className="pointer-events-none absolute inset-0"
         style={{
-          borderRadius: radius,
-          border: `1px solid ${ring}`,
-          borderBottomColor: "transparent",
+          borderRadius: `var(--pack-card-radius, ${radius}px)`,
+          border: `var(--pack-card-border, 1px solid ${ring})`,
+          borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
           ...openBottomMaskStyle(),
         }}
       />

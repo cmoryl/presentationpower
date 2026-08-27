@@ -1230,6 +1230,17 @@ export function keepBackgroundPaintOnPlate(
       s.w >= space.w * 0.6 &&
       s.h >= space.h * 0.5;
     if (decorativeWash) return false;
+    // Tall translucent strips that do NOT reach both stage edges (gradient
+    // column scrims, fade panels beside media) still arrive in PowerPoint as
+    // selectable "invisible bars" a user drags by accident. Anything that is
+    // narrow, tall and see-through — and is not module furniture (timeline
+    // spines, rails, connectors, ticks) — belongs on the flat plate.
+    const ghostBar =
+      alpha <= 0.5 &&
+      s.w <= space.w * 0.1 &&
+      s.h >= space.h * 0.5 &&
+      !isModuleFurniture(s);
+    if (ghostBar) return false;
     return true;
   });
 }
