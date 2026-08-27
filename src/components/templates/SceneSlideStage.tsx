@@ -25,7 +25,9 @@ import {
   type ModuleVariant,
 } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+import { lookBrandModeId } from "@/lib/look-brand";
 import type { SkinScene } from "@/lib/skin-backgrounds";
+
 
 /** The module each section of a look is judged on, in scene order. */
 export const SCENE_VARIANT: Record<SkinScene, string> = {
@@ -57,7 +59,14 @@ export function SceneSlideStage({
   pageNumber?: number;
   className?: string;
 }) {
-  const brand = BRAND_MODES.find((b) => b.id === "bm-enterprise") ?? BRAND_MODES[0]!;
+  // Looks owned by a named product brand (DataForce's AI · Data signature)
+  // preview with that lockup; every other look stays on the master brand.
+  const brandModeId = lookBrandModeId(pack.id);
+  const brand =
+    BRAND_MODES.find((b) => b.id === brandModeId) ??
+    BRAND_MODES.find((b) => b.id === "bm-enterprise") ??
+    BRAND_MODES[0]!;
+
   const variantId = SCENE_VARIANT[scene as SkinScene] ?? SCENE_VARIANT.cover;
   const variant = byId(MODULE_VARIANTS, variantId) as ModuleVariant | undefined;
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
