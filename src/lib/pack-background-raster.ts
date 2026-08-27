@@ -143,24 +143,37 @@ export async function rasterizePackBackground(
   // the bleed exists only to keep the capture viewport off the slide edge.
   host.style.overflow = "hidden";
 
+  // A REPLACED background is the whole plate: no scaffold, motif, grain, mask
+  // or damping, exactly as SlideChrome now paints it on screen. Otherwise the
+  // export carried the look's old procedural template under the new artwork.
+  const replaced =
+    /^skin-[sr]\d{2}$/i.test(String(pack.id)) &&
+    !!skinBackdropOverride(
+      String(pack.id).replace(/^skin-/i, "").toUpperCase(),
+      sceneFromSeed(seed),
+      sceneTakeFromSeed(seed).take,
+    );
+
   // 1 — field
   host.appendChild(plane({ backgroundColor: surface }));
   // 2 — ground (damped + centre-cleared, exactly as SlideChrome paints it)
-  const mask = packGroundMask(comp);
+  const mask = replaced ? undefined : packGroundMask(comp);
   host.appendChild(
     plane({
       background: packGroundPaint(pack, seed).join(", "),
-      opacity: String(packGroundDamp(pack, seed)),
+      opacity: String(replaced ? 1 : packGroundDamp(pack, seed)),
       maskImage: mask,
       webkitMaskImage: mask,
     } as Partial<CSSStyleDeclaration>),
   );
   // 3 — scaffold
-  host.appendChild(
-    plane({ background: minimalPackLayers(packLayoutLayers(pack, comp, seed)).join(", ") }),
-  );
+  if (!replaced) {
+    host.appendChild(
+      plane({ background: minimalPackLayers(packLayoutLayers(pack, comp, seed)).join(", ") }),
+    );
+  }
   // 4 — signature motif (non-tiling only, matching the on-screen rule)
-  const sig = packSignature(pack);
+  const sig = replaced ? null : packSignature(pack);
   if (sig) {
     const tiled =
       /repeating-(linear|radial)-gradient/.test(sig.background) ||
@@ -179,7 +192,7 @@ export async function rasterizePackBackground(
     }
   }
   // grain
-  if (pack.grain > 0) {
+  if (!replaced && pack.grain > 0) {
     host.appendChild(
       plane({
         backgroundImage: GRAIN_PLATE,
