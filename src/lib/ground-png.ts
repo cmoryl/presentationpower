@@ -14,7 +14,7 @@
 // the exact 16:9 stage rect back out.
 // -----------------------------------------------------------------------------
 
-import type { StylePack } from "./style-packs";
+import { packGroundPaint, type StylePack } from "./style-packs";
 
 const W = 1280;
 const H = 720;
@@ -31,9 +31,7 @@ export type GroundPngSizeId = (typeof GROUND_PNG_SIZES)[number]["id"];
 
 /** The CSS layer list behind a composition — handy to copy into other tooling. */
 export function groundCss(pack: StylePack, seed: string): string {
-  return `background-color: ${pack.tokens.surface};\nbackground: ${pack
-    .ground(seed)
-    .join(",\n  ")};`;
+  return `background-color: ${pack.tokens.surface};\nbackground: ${packGroundPaint(pack, seed).join(",\n  ")};`;
 }
 
 export type GroundCssLayer = {
@@ -63,7 +61,7 @@ const layerKind = (value: string): string => {
  * order (CSS paints the first entry on top).
  */
 export function groundCssLayers(pack: StylePack, seed: string): GroundCssLayer[] {
-  const layers = pack.ground(seed);
+  const layers = packGroundPaint(pack, seed);
   return [
     {
       index: 0,
@@ -137,7 +135,7 @@ export async function rasterizeGroundPng(
   host.style.height = `${H}px`;
   host.style.overflow = "hidden";
   host.style.backgroundColor = pack.tokens.surface;
-  host.style.background = pack.ground(seed).join(", ");
+  host.style.background = packGroundPaint(pack, seed).join(", ");
 
   frame.appendChild(host);
   shell.appendChild(frame);
