@@ -6,7 +6,7 @@
 // the whole colourway. This parser resolves the class rules first, then walks
 // the drawable elements in document order.
 
-import { resolveAssetUrl } from "@/lib/asset-url";
+import { resolveAssetUrl } from "./asset-base-url";
 
 export type MartArtShape = {
   d: string;
