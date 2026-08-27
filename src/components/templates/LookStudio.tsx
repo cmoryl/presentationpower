@@ -745,7 +745,14 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                   siblings={templates}
                   onSaved={(saved) => {
                     setDraft(saved);
-                    setSelectedId(`tpl-${saved.code.toLowerCase()}`);
+                    // Stay on the row the edit belongs to — pointing at a
+                    // non-existent id made the selection fall back to the first
+                    // row, which reset the fields editor and lost the edit.
+                    const code = saved.code.toUpperCase();
+                    const match =
+                      rows.find((r) => r.template?.code.toUpperCase() === code) ??
+                      rows.find((r) => (r.pack ? codeForPack(r.pack) === code : false));
+                    setSelectedId(match?.id ?? selected?.id ?? null);
                     refresh();
                   }}
                   onDeleted={() => {
