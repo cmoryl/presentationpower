@@ -18,6 +18,19 @@ import { DESIGN_SKINS } from "@/lib/design-skins";
 import { INDUSTRY_SKINS } from "@/lib/industry-skins";
 import { Field, inputCls, PALETTE_LABELS, DENSITIES } from "./fields";
 
+/** Loose hex input → canonical `#RRGGBB`, or "" when it isn't a hex at all. */
+function normalizeHex(raw: string): string {
+  const v = raw.trim().replace(/^#/, "");
+  if (/^[0-9a-f]{3}$/i.test(v)) {
+    return `#${v
+      .split("")
+      .map((ch) => ch + ch)
+      .join("")}`.toUpperCase();
+  }
+  if (/^[0-9a-f]{6}$/i.test(v)) return `#${v}`.toUpperCase();
+  return "";
+}
+
 export function TestPanel({ tests }: { tests: TemplateTest[] }) {
   const dot: Record<string, string> = {
     pass: "bg-emerald-500",
