@@ -73,12 +73,18 @@ export function AgendaStudio({
   divisionId = "city-series",
   heading = "NEXT division agenda",
   intro = "The approved NEXT agenda master, live for every division area. Edit the programme, pick the format and face, add a scannable QR code, save the live file and export layered vector art for print and Illustrator.",
+  initialConfig,
 }: {
   divisionId?: string;
   heading?: string;
   intro?: string;
+  /** Seed the editor with a prepared board (demo asset, saved master, etc.). */
+  initialConfig?: AgendaConfig;
 }) {
-  const [config, setConfig] = useState<AgendaConfig>(() => agendaDefault(divisionId));
+  const [config, setConfig] = useState<AgendaConfig>(
+    () => initialConfig ?? agendaDefault(divisionId),
+  );
+
   const [guides, setGuides] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [busy, setBusy] = useState(false);
