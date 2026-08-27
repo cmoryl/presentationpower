@@ -44,20 +44,63 @@ export function hasSkinBackdropOverrides(): boolean {
   return Object.keys(OVERRIDES).length > 0;
 }
 
+/* ── module-scoped replacements ────────────────────────────────────────────
+ * An admin looking at ONE module inside a look ("Spatial Clarity → Bento 5")
+ * can replace the background for that module alone. Those records live in the
+ * same table, keyed by a synthetic scene `mod:<variant-id>`, so persistence,
+ * the public proxy, cache-busting and every consumer of this registry work
+ * unchanged. A module key always outranks the skin's scene key.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/** Synthetic scene name that scopes a replacement to one module variant. */
+export function moduleScene(variantId: string): string {
+  return `mod:${String(variantId).trim().toUpperCase()}`;
+}
+
+/** True for a module-scoped scene name. */
+export function isModuleScene(scene: string | null | undefined): boolean {
+  return !!scene && /^mod:[A-Za-z0-9_-]{2,64}$/.test(scene);
+}
+
+/**
+ * Module variant id carried in a ground seed.
+ *
+ * `VariantRenderer` publishes `mod:<variant-id>` into the scene seed, which is
+ * the only channel that reaches the ground engine, the slide chrome and the
+ * rasterisers alike.
+ */
+export function moduleIdFromSeed(seed: string | null | undefined): string | null {
+  if (!seed) return null;
+  const m = /\bmod:([A-Za-z0-9_-]{2,64})/.exec(seed);
+  return m ? m[1]!.toUpperCase() : null;
+}
+
 /**
  * Resolve the replacement image for a skin × scene × take.
  *
- * Fallback order: the exact composition, then take 0 of the same scene, then any
- * replaced take of that scene (an admin who replaced only "Take C" still expects
- * to see their artwork), then the skin's cover. Never crosses skins.
+ * A module-scoped replacement (when `moduleId` is known) wins outright. Then:
+ * the exact composition, then take 0 of the same scene, then any replaced take
+ * of that scene (an admin who replaced only "Take C" still expects to see their
+ * artwork), then the skin's cover. Never crosses skins.
  */
 export function skinBackdropOverride(
   skinCode: string | null | undefined,
   scene: string | null | undefined,
   take = 0,
+  moduleId?: string | null,
 ): string | null {
-  if (!skinCode || !scene) return null;
+  if (!skinCode) return null;
   const code = skinCode.toUpperCase();
+  if (moduleId) {
+    const ms = moduleScene(moduleId);
+    const exactMod = OVERRIDES[key(code, ms, take)] ?? OVERRIDES[key(code, ms, 0)];
+    if (exactMod) return exactMod;
+    const modPrefix = `${code}:${ms}:`;
+    for (const k of Object.keys(OVERRIDES)) {
+      if (k.startsWith(modPrefix)) return OVERRIDES[k]!;
+    }
+  }
+  if (!scene) return null;
   const exact = OVERRIDES[key(code, scene, take)];
   if (exact) return exact;
   const zero = OVERRIDES[key(code, scene, 0)];
@@ -66,7 +109,8 @@ export function skinBackdropOverride(
   for (const k of Object.keys(OVERRIDES)) {
     if (k.startsWith(prefix)) return OVERRIDES[k]!;
   }
-  return OVERRIDES[key(code, "cover", 0)] ?? null;
+  const cover = OVERRIDES[key(code, "cover", 0)];
+  return cover ?? null;
 }
 
 /** Scene + take parsed out of a `ground()` seed, matching the ground engine. */
@@ -74,6 +118,7 @@ export function sceneTakeFromSeed(seed: string): { take: number } {
   const m = /take:(\d+)/i.exec(seed);
   return { take: m ? parseInt(m[1]!, 10) : 0 };
 }
+
 
 /**
  * Re-render on replacement.

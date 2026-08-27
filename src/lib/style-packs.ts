@@ -32,7 +32,7 @@
 import { skinPackById, ALL_SKIN_PACKS, skinCodeFromPackId } from "./design-skin-pack";
 import { packGeometry, shapeCss } from "./pack-geometry";
 import { sceneFromSeed } from "./skin-backgrounds";
-import { skinBackdropOverride, sceneTakeFromSeed } from "./skin-backdrop-overrides";
+import { skinBackdropOverride, sceneTakeFromSeed, moduleIdFromSeed } from "./skin-backdrop-overrides";
 import { backgroundOverrides, customPackById, customTemplatePacks } from "./template-registry";
 import { withBackgroundOverrides } from "./template-background";
 import { withElementSceneArt } from "./element-scene-art";
@@ -2501,6 +2501,9 @@ export function packGroundPaint(pack: StylePack, seed: string): string[] {
       skinCodeFromPackId(id),
       sceneFromSeed(seed),
       sceneTakeFromSeed(seed).take,
+      // A per-module replacement (saved from the module view) outranks the
+      // skin-wide scene artwork for that one module.
+      moduleIdFromSeed(seed),
     );
     if (url) {
       const flatBase = base.filter((l) => /^(#|rgb|hsl)/i.test(l.trim()));

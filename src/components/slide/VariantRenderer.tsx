@@ -748,7 +748,7 @@ function VariantRendererInner(props: Props) {
                 active style pack grounds each module with the scene its
                 composition wants (stats, chart, bento, timeline, split, quote). */}
               <SlideSceneSeedContext.Provider
-                value={`${variant.id} ${variant.name} ${variant.familyId}`}
+                value={`mod:${variant.id} ${variant.id} ${variant.name} ${variant.familyId}`}
               >
                 <SlideFrameCtx.Provider
                   value={{

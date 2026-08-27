@@ -38,6 +38,7 @@ import { GutterDebugOverlay } from "@/components/slide/GutterDebugOverlay";
 import { SceneDebugOverlay } from "@/components/slide/SceneDebugOverlay";
 import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
 import {
+  moduleIdFromSeed,
   sceneTakeFromSeed,
   skinBackdropOverride,
   useSkinBackdropVersion,
@@ -477,6 +478,7 @@ export function SlideFrame({
       String(pack.id).replace(/^skin-/i, "").toUpperCase(),
       packScene,
       sceneTakeFromSeed(groundSeed).take,
+      moduleIdFromSeed(groundSeed),
     );
   const aiBackdrop = replacedGround ? null : aiBackdropRendered;
   // Cover / divider / close chrome historically forced a dark navy surface so
