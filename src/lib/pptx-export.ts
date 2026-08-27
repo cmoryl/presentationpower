@@ -2138,8 +2138,11 @@ export async function exportDeckToPptx(
   // machine without the brand font. Optional (it costs ~1 MB); typeface naming
   // and the theme font scheme are normalized either way. Falls back to the raw
   // blob if the pass fails so exports are never blocked.
+  // Default OFF everywhere (server included): Mac/web PowerPoint reject
+  // `application/x-fontdata` parts and answer with the repair prompt.
   const embedFonts =
-    opts?.embedFonts ?? (typeof document === "undefined" ? true : readExportEmbedFonts());
+    opts?.embedFonts ??
+    (typeof document === "undefined" ? DEFAULT_EXPORT_EMBED_FONTS : readExportEmbedFonts());
   const endFonts = telemetry.phase("fonts");
   const rawBlob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
   const fontBlob = await embedFontsInPptx(rawBlob, { embedFontData: embedFonts });
