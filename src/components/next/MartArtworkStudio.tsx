@@ -223,9 +223,39 @@ export function MartArtworkStudio() {
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [adding, setAdding] = useState(false);
   const [newDraft, setNewDraft] = useState<Draft>(() => martArtDraft());
+  const [selected, setSelected] = useState<string[]>([]);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkSource, setBulkSource] = useState<{ url: string; filename: string }>({
+    url: "",
+    filename: "",
+  });
 
   const refresh = () => setList(listMartArtwork());
   useEffect(refresh, []);
+
+  const toggleSelected = (id: string) =>
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+
+  const applyBulk = () => {
+    try {
+      const updated = bulkReplaceMartArt(selected, bulkSource);
+      setDrafts((d) => {
+        const next = { ...d };
+        for (const art of updated) delete next[art.id];
+        return next;
+      });
+      setBulkSource({ url: "", filename: "" });
+      setSelected([]);
+      setBulkOpen(false);
+      refresh();
+      toast.success(`${updated.length} artwork slots replaced`, {
+        description:
+          "Every placed pillar and flat master, and all export bundles, now use this file.",
+      });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Bulk replace failed.");
+    }
+  };
 
   const panels = useMemo(
     () => (list.length ? list.reduce((n, a) => n + a.quantity, 0) : martArtworkPanels()),
