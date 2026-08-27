@@ -660,6 +660,7 @@ async function pixelOne(
     const res = await exportDeckToPptx(deck, brand, {
       output: "blob",
       forceMode: mode,
+      pack,
       packBackground,
       fidelity,
     });
