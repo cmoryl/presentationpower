@@ -1131,6 +1131,33 @@ body.export-mode [data-print-surface] {
   letter-spacing: var(--pack-kicker-tracking) !important;
 }
 
+/* SPATIAL CLARITY (S01) — Geist is the default face, full stop. Modules that
+   hand-roll an inline editorial/emphasis family are pulled back onto the brand
+   sans so one look never mixes typefaces. Code/data annotations keep Geist Mono. */
+[data-style-pack="skin-s01"],
+[data-style-pack="skin-s01"] *:not(code):not(pre):not(kbd):not(samp):not([data-mono]):not(.font-mono) {
+  font-family: var(--pack-body, "Geist Variable", Geist, ui-sans-serif, system-ui, sans-serif) !important;
+  font-style: normal;
+}
+[data-style-pack="skin-s01"] h1,
+[data-style-pack="skin-s01"] h2,
+[data-style-pack="skin-s01"] h3,
+[data-style-pack="skin-s01"] .slide-title,
+[data-style-pack="skin-s01"] .slide-title-lg,
+[data-style-pack="skin-s01"] .slide-subtitle,
+[data-style-pack="skin-s01"] [data-stat-figure],
+[data-style-pack="skin-s01"] [data-stat-value] {
+  font-family: var(--pack-display, "Geist Variable", Geist, ui-sans-serif, system-ui, sans-serif) !important;
+}
+[data-style-pack="skin-s01"] code,
+[data-style-pack="skin-s01"] pre,
+[data-style-pack="skin-s01"] kbd,
+[data-style-pack="skin-s01"] samp,
+[data-style-pack="skin-s01"] [data-mono],
+[data-style-pack="skin-s01"] .font-mono {
+  font-family: var(--pack-mono, "Geist Mono Variable", "Geist Mono", ui-monospace, monospace) !important;
+}
+
 /* Corner language. Packs with radius 0 (Swiss, Bauhaus, Blueprint) must read
    as hard-edged everywhere, including on rounded utility classes. */
 [data-style-pack="swiss-noir"] [class*="rounded"],
