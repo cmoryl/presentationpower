@@ -135,7 +135,14 @@ export const listAllTemplates = createServerFn({ method: "GET" })
 
 export const saveTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => TemplateInput.parse(input))
+  .inputValidator((input: unknown) => {
+    const parsed = TemplateInput.safeParse(input);
+    if (parsed.success) return parsed.data;
+    const msg = parsed.error.issues
+      .map((i) => `${i.path.join(".") || "field"}: ${i.message}`)
+      .join("; ");
+    throw new Error(`Look details need attention — ${msg}`);
+  })
   .handler(async ({ data, context }): Promise<CustomTemplate> => {
     await assertAdmin(context.supabase as never, context.userId);
     const payload = {
