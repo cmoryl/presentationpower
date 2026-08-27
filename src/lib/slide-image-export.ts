@@ -21,7 +21,7 @@
  *  4. Progress: every phase reports through an optional callback so the UI
  *     can show meaningful status ("Fonts…", "Images…", "Rendering…").
  */
-import { getFontEmbedCSS, toPng } from "html-to-image";
+import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import { beginExportChrome, exportNodeFilter } from "./export-chrome-suppress";
 
