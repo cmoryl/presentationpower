@@ -148,8 +148,29 @@ function ImportRow({
 }) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [link, setLink] = useState("");
+  const [over, setOver] = useState(false);
   return (
-    <div className="mt-3 rounded-xl border border-dashed border-[#003FC7]/40 bg-[#F7F9FE] p-3">
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setOver(true);
+      }}
+      onDragLeave={() => setOver(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setOver(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) {
+          onFile(file);
+          return;
+        }
+        const url = e.dataTransfer.getData("text/uri-list") || e.dataTransfer.getData("text/plain");
+        if (url) onLink(url.trim());
+      }}
+      className={`mt-3 rounded-xl border border-dashed p-3 transition-colors ${
+        over ? "border-[#003FC7] bg-[#E0E8F5]" : "border-[#003FC7]/40 bg-[#F7F9FE]"
+      }`}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
@@ -188,7 +209,8 @@ function ImportRow({
         </button>
       </div>
       <p className="mt-2 text-[11px] text-black/50">
-        SVG or PDF/AI keeps the vector layers the cutter reads. {filename ? `Current file: ${filename}` : null}
+        Drag a file or link straight onto this panel, or use the buttons. SVG or PDF/AI keeps the vector
+        layers the cutter reads. {filename ? `Current file: ${filename}` : null}
       </p>
     </div>
   );
