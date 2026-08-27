@@ -110,6 +110,12 @@ try {
   );
 
   // 3 ── export the same cover slide and inspect the package.
+  // The saved-library loader republishes the whole registry when its query
+  // settles, so publish again immediately before exporting.
+  await page.evaluate(
+    ([code, url]) => window.__tpBackdropOverrides({ [`${code}:cover:0`]: url }),
+    [CODE, REPLACEMENT],
+  );
   const [capture] = await page.evaluate(
     async ([variant, packId]) =>
       (await window.__tpExportVerify.pixel([[variant, packId, "light", "editable"]])).map((c) => ({
