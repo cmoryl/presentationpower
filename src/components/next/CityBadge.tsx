@@ -116,11 +116,10 @@ export function CityBadge({
         </div>
       ) : null}
 
-      {side === "back" ? (guides ? <BadgeGuides ppi={ppi} /> : null) : null}
-
-
-      {/* Safe-area copy */}
+      {/* Safe-area copy — front only; the back is artwork and mark alone. */}
+      {side === "front" ? (
       <div
+
         style={{
           position: "absolute",
           left: safeX,
