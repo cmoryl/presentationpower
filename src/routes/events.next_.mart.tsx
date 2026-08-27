@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Download, Ruler, Store } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { PillarSign } from "@/components/next/PillarSign";
 import { MartBundleExport } from "@/components/next/MartBundleExport";
+import { MartStopManager } from "@/components/next/MartStopManager";
 import { MART_LAYOUT_PRESETS } from "@/lib/next-mart-layouts";
 import { martArtwork, martFlatArtworkId, martFlatMasters } from "@/lib/next-mart-placement";
 import { PILLAR_SIZES, pillarKind } from "@/lib/next-pillar-masters";
@@ -116,6 +117,8 @@ function MartPage() {
         </section>
 
         <MartBundleExport />
+
+        <MartStopManager />
 
         {/* Reusable layout presets — QR + wayfinding geometry per template */}
         <section className="mt-12">
