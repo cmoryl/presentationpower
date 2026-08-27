@@ -15,11 +15,14 @@ import {
   type MartArtwork,
   type MartFlatSign,
 } from "@/lib/next-mart";
+import { listMartArtwork } from "@/lib/next-mart-art-store";
 import { pillarArtworkBox, pillarDefault, type PillarConfig } from "@/lib/next-pillar-masters";
 
 /** Supplied artwork by id. */
 export function martArtwork(id: string): MartArtwork | null {
-  return NEXT_MART_ARTWORK.find((a) => a.id === id) ?? null;
+  // Locally edited or imported slots win over the shipped record, so placed
+  // artwork and the vector exports always use the current production file.
+  return listMartArtwork().find((a) => a.id === id) ?? NEXT_MART_ARTWORK.find((a) => a.id === id) ?? null;
 }
 
 /** Artwork aspect ratio (width / height) on the supplied board. */
