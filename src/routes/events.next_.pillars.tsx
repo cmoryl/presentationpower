@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { PillarSign } from "@/components/next/PillarSign";
 import { PillarStudio } from "@/components/next/PillarStudio";
 import { pickPillarFile, useSavedPillarFiles } from "@/hooks/use-next-live-masters";
 import {
