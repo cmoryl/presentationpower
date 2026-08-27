@@ -78,6 +78,7 @@ import { placeCanvasBlocks } from "./export-canvas-blocks";
 import { groupTag, stripGroupTag } from "./pptx-group-xml";
 import { resolveSlideTransition } from "./deck-store";
 import { resolveSlideAccent } from "@/lib/slide-accent";
+import { lookGlyphColor } from "./look-brand";
 import { iconGlyphDataUrl, warmIconPacks } from "./pptx-icons";
 import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
