@@ -31,6 +31,9 @@ import {
 import {
   NEXT_MART,
   NEXT_MART_ARTWORK,
+  NEXT_MART_LOGOS,
+
+
   NEXT_MART_FLAT_SIGNS,
   NEXT_MART_PILLARS,
   martPillarConfig,
@@ -183,6 +186,24 @@ function manifest(entries: MartExportEntry[], stop: MartStop): string {
   return lines.join("\n");
 }
 
+function readme(entries: MartExportEntry[], stop: MartStop): string {
+  return [
+    `TransPerfect NEXT MART — ${martStopEventLabel(stop)} · complete signage pack`,
+    "",
+    "Folders",
+    "  pillars/        layered PDF/X-4 press files + Illustrator .ai twins + editable grounds",
+    "  artwork/        supplied die-cut Illustrator masters, cut contour preserved",
+    "  flat-signage/   measured trim/bleed print specs (and placed masters where supplied)",
+    "  logos/          approved NEXT MART lockups (EPS, SVG, PNG) + usage notes",
+    "  PRODUCTION-MANIFEST.txt   every set, quantity and print spec",
+    "",
+    `Sets: ${entries.length} · Panels: ${entries.reduce((n, e) => n + e.quantity, 0)}`,
+    `Colour: convert to ${PILLAR_SPEC.colorMode} at output; body text 100K.`,
+    `Preset: ${PILLAR_SPEC.exportPreset}`,
+    "",
+  ].join("\n");
+}
+
 /** Build the full NEXT MART press bundle: every signage set, correct sizes. */
 export async function exportMartBundle(opts?: {
   onProgress?: (p: MartExportProgress) => void;
@@ -192,9 +213,12 @@ export async function exportMartBundle(opts?: {
   includeArtwork?: boolean;
   /** Include measured flat-signage print specs. Default true. */
   includeFlat?: boolean;
+  /** Include the approved NEXT MART logo pack. Default true. */
+  includeLogos?: boolean;
   /** City/stop template to build. Defaults to the London reference kit. */
   stop?: MartStop;
 }): Promise<MartExportResult> {
+
   const stop = opts?.stop ?? LONDON_STOP;
   const allPillars = martStopPillars(stop);
   const pillars = opts?.pillarIds?.length
@@ -337,8 +361,41 @@ export async function exportMartBundle(opts?: {
     });
   }
 
+  // ─────────────────────────────────────────── approved NEXT MART logo pack
+  if (opts?.includeLogos !== false) {
+    for (const logo of NEXT_MART_LOGOS) {
+      const folder = `logos/${logo.id}`;
+      for (const [ext, url] of [
+        ["eps", logo.epsUrl],
+        ["svg", logo.svgUrl],
+        ["png", logo.pngUrl],
+      ] as const) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) zip.file(`${folder}/${logo.id}.${ext}`, await res.arrayBuffer());
+        } catch {
+          /* keep packing the rest of the pack */
+        }
+      }
+      zip.file(
+        `${folder}/USAGE.txt`,
+        [
+          logo.name,
+          "",
+          `Face:  ${logo.face}`,
+          `Usage: ${logo.usage}`,
+          "",
+          "Never recolour, distort, keyline or rebuild the lockup.",
+          "",
+        ].join("\n"),
+      );
+    }
+  }
+
   tick("Packaging the bundle");
   zip.file("PRODUCTION-MANIFEST.txt", manifest(entries, stop));
+  zip.file("READ-ME-FIRST.txt", readme(entries, stop));
+
   const blob = await zip.generateAsync({ type: "blob" });
 
   return {

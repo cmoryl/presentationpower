@@ -14,7 +14,12 @@ import {
   type MartExportEntry,
   type MartExportProgress,
 } from "@/lib/next-mart-export";
-import { NEXT_MART_ARTWORK, NEXT_MART_FLAT_SIGNS, NEXT_MART_PILLARS } from "@/lib/next-mart";
+import {
+  NEXT_MART_ARTWORK,
+  NEXT_MART_FLAT_SIGNS,
+  NEXT_MART_LOGOS,
+  NEXT_MART_PILLARS,
+} from "@/lib/next-mart";
 import type { MartStop } from "@/lib/next-mart-stops";
 
 export function MartBundleExport({ stop }: { stop?: MartStop }) {
@@ -60,16 +65,16 @@ export function MartBundleExport({ stop }: { stop?: MartStop }) {
             its own measured footprint — entrance tower, till, wayfinding and logo column — as a
             PDF/X-4 press file with an Illustrator-openable <code>.ai</code> twin and an editable
             vector gradient ground. The supplied die-cut artwork ships as its layered Illustrator
-            master, flat signage as measured print specs, plus a production manifest.
+            master, flat signage as measured print specs, plus the approved logo pack, a production manifest and a read-me.
           </p>
         </div>
-        <Button onClick={run} disabled={busy}>
+        <Button size="lg" onClick={run} disabled={busy}>
           {busy ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           ) : (
             <Download className="mr-2 h-4 w-4" />
           )}
-          {busy ? "Building…" : "Export mart bundle"}
+          {busy ? "Building…" : "Download all"}
         </Button>
       </div>
 
@@ -77,6 +82,8 @@ export function MartBundleExport({ stop }: { stop?: MartStop }) {
         <li>{NEXT_MART_PILLARS.length} pillar sets · layered vector press files</li>
         <li>{NEXT_MART_ARTWORK.length} die-cut artwork masters · cut contour preserved</li>
         <li>{NEXT_MART_FLAT_SIGNS.length} flat signage sets · measured trim + bleed</li>
+        <li>{NEXT_MART_LOGOS.length} approved lockups · EPS + SVG + PNG</li>
+        <li>Production manifest + read-me · one zipped folder</li>
       </ul>
 
       {entries ? (
