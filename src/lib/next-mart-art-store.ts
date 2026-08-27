@@ -208,3 +208,37 @@ export function normalizeMartArtLink(raw: string): { url: string; filename: stri
   const name = decodeURIComponent(url.split("?")[0]!.split("/").pop() || "artwork");
   return { url, filename: name };
 }
+
+/* ── bulk replace ─────────────────────────────────────────────────────────── */
+
+/**
+ * Map one incoming file/link onto several slots in a single action. Every live
+ * pillar/flat master and every export bundle resolves through
+ * `listMartArtwork()`, so one call republishes the artwork everywhere it is
+ * placed. Returns the slots that were updated.
+ */
+export function bulkReplaceMartArt(
+  ids: string[],
+  source: { url: string; filename: string; previewUrl?: string },
+): MartArtwork[] {
+  const url = source.url?.trim();
+  if (!url) throw new Error("Attach a file or link before replacing.");
+  const unique = Array.from(new Set(ids.filter(Boolean)));
+  if (!unique.length) throw new Error("Select at least one artwork slot to replace.");
+  const known = new Set(listMartArtwork().map((a) => a.id));
+  const targets = unique.filter((id) => known.has(id));
+  if (!targets.length) throw new Error("None of the selected slots exist any more.");
+  const store = read();
+  const edits = { ...store.edits };
+  for (const id of targets) {
+    edits[id] = {
+      ...(edits[id] ?? {}),
+      url,
+      previewUrl: source.previewUrl || url,
+      filename: source.filename,
+    };
+  }
+  write({ ...store, edits });
+  const resolved = listMartArtwork();
+  return targets.map((id) => resolved.find((a) => a.id === id)!).filter(Boolean);
+}
