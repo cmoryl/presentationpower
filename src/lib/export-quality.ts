@@ -228,16 +228,21 @@ export function writeExportFidelity(id: ExportFidelityId) {
 // file is smaller and the text is still fully editable, but typography falls
 // back to whatever the viewer has installed.
 //
-// ON by default: brand-accurate typography matters more than a megabyte.
+// OFF by default since Aug 2026: PowerPoint for Mac (and PowerPoint for the
+// web) do not support the `application/x-fontdata` embedded-font parts this
+// writes, and Mac PowerPoint answers such a package with the "PowerPoint found
+// a problem with content … Repair" prompt. Typeface naming and the theme font
+// scheme are still normalized, so the deck always ASKS for Geist. The storage
+// key is versioned so a previously stored "on" no longer re-enables it.
 // -----------------------------------------------------------------------------
 
-const FONT_EMBED_KEY = "tp:export-embed-fonts:v1";
+const FONT_EMBED_KEY = "tp:export-embed-fonts:v2";
 
-export const DEFAULT_EXPORT_EMBED_FONTS = true;
+export const DEFAULT_EXPORT_EMBED_FONTS = false;
 
 /** User-facing explanation shown next to the toggle. */
 export const EXPORT_FONT_EMBED_EXPLAINER =
-  "Packs the brand font (Geist) inside the .pptx so the deck looks exactly the same on any computer, even without the font installed. Adds about 1 MB. Turn it off for a smaller file — PowerPoint will then substitute a system font and text may rewrap.";
+  "Packs the brand font (Geist) inside the .pptx so the deck looks the same on any Windows computer, even without the font installed. Adds about 1 MB — and PowerPoint for Mac and PowerPoint for the web reject embedded fonts, so they ask to repair the file. Leave this off unless you know the deck opens on Windows PowerPoint only.";
 
 export function readExportEmbedFonts(): boolean {
   if (typeof window === "undefined") return DEFAULT_EXPORT_EMBED_FONTS;
