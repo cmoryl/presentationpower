@@ -676,7 +676,13 @@ function VariantRendererInner(props: Props) {
   // Admin-authored one-off overrides still work, but brand/division selection
   // itself no longer changes the TransPerfect module palette.
   const rawBrand: BrandMode = applySlideAccent(slide, brand);
-  const baseBrand: BrandMode = enterprise ? enterpriseWhiteBrand(rawBrand, mode) : rawBrand;
+  // The Enterprise skin re-tokens the palette to the approved light/dark
+  // template. An authorized per-slide accent override must survive that, so
+  // re-apply it afterwards (division scope still never changes the palette).
+  const baseBrand: BrandMode = enterprise
+    ? applySlideAccent(slide, enterpriseWhiteBrand(rawBrand, mode))
+    : rawBrand;
+
 
   const themedBrand = themeBrandForMode(baseBrand, mode);
   const semanticInk = makeSlideInk(
