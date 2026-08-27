@@ -804,6 +804,31 @@ function Pathways({ accent, onPick }: { accent: string; onPick: (g: NextFormatGr
             </span>
           </button>
         ))}
+
+        {/* Agendas are their own deliverable — a paper/large-format schedule
+            sheet, not a pillar wrap — so they get their own entry point. */}
+        <Link
+          to="/events/next/agendas"
+          className="group relative overflow-hidden rounded-2xl border border-border p-4 text-left transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <span
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-1"
+            style={{ background: accent }}
+          />
+          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Programme / content
+          </p>
+          <h3 className="mt-1 text-sm font-semibold tracking-tight">Agendas &amp; schedules</h3>
+          <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+            Multi-day, multi-page agenda sheets on the approved grounds — editable
+            Word, layered PDF and press-ready art.
+          </p>
+          <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary">
+            Open agenda set
+            <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+          </span>
+        </Link>
       </div>
     </section>
   );

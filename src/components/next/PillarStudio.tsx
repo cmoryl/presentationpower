@@ -292,6 +292,8 @@ export function PillarStudio({
 
 
   const signedIn = useSignedIn();
+  /** Light and dark are two faces of ONE master; edits travel to both by default. */
+  const [mirrorFaces, setMirrorFaces] = useState(true);
   const qc = useQueryClient();
   const list = useServerFn(listPillarFiles);
   const create = useServerFn(savePillarFile);
@@ -307,12 +309,54 @@ export function PillarStudio({
   const saveMutation = useMutation({
     mutationFn: async () => {
       const name = fileName.trim() || pillarName(config);
-      if (openFileId) {
-        return update({
-          data: { id: openFileId, name, eventLabel: config.eventLabel ?? "", scope, config },
-        });
+      const saved = openFileId
+        ? await update({
+            data: { id: openFileId, name, eventLabel: config.eventLabel ?? "", scope, config },
+          })
+        : await create({
+            data: { name, eventLabel: config.eventLabel ?? "", scope, notes: "", config },
+          });
+
+      // ── Face pairing ────────────────────────────────────────────────────────
+      // A pillar master exists in both approved faces. The copy, sizing, QR and
+      // geometry are the SAME sign — only the face palette differs — so an edit
+      // made on the light face is written onto its dark twin as well (and the
+      // other way round). Only `face` is left alone.
+      if (mirrorFaces) {
+        const otherFace: PillarConfig["face"] = config.face === "dark" ? "light" : "dark";
+        const twin: PillarConfig = { ...config, face: otherFace };
+        const rows = (files.data ?? []) as PillarFileRow[];
+        const sibling = rows.find(
+          (r) =>
+            r.id !== openFileId &&
+            r.config?.face === otherFace &&
+            r.config?.divisionId === config.divisionId &&
+            r.config?.kind === config.kind,
+        );
+        const twinName = pillarName(twin);
+        if (sibling) {
+          await update({
+            data: {
+              id: sibling.id,
+              name: twinName,
+              eventLabel: config.eventLabel ?? "",
+              scope,
+              config: twin,
+            },
+          });
+        } else {
+          await create({
+            data: {
+              name: twinName,
+              eventLabel: config.eventLabel ?? "",
+              scope,
+              notes: "",
+              config: twin,
+            },
+          });
+        }
       }
-      return create({ data: { name, eventLabel: config.eventLabel ?? "", scope, notes: "", config } });
+      return saved;
     },
     onSuccess: (row: unknown) => {
       const saved = row as PillarFileRow | null;
@@ -320,7 +364,11 @@ export function PillarStudio({
       if (saved?.name) setFileName(saved.name);
       void qc.invalidateQueries({ queryKey: ["event-pillar-files"] });
       announceNextMasterSaved("pillar");
-      toast.success(openFileId ? "Pillar file updated" : "Pillar file saved");
+      toast.success(openFileId ? "Pillar file updated" : "Pillar file saved", {
+        description: mirrorFaces
+          ? `Same edits written to the ${config.face === "dark" ? "light" : "dark"} face master`
+          : undefined,
+      });
     },
     onError: (e: Error) => toast.error("Could not save", { description: e.message }),
   });
@@ -734,6 +782,18 @@ export function PillarStudio({
             <p className="mt-2 text-xs leading-relaxed text-black/55">
               {pillarFace(config.face).note}
             </p>
+            <label className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-black/70">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={mirrorFaces}
+                onChange={(e) => setMirrorFaces(e.target.checked)}
+              />
+              <span>
+                Keep both faces in step — saving writes the same copy, size, QR and
+                geometry onto the {config.face === "dark" ? "light" : "dark"} face master too.
+              </span>
+            </label>
 
             <div className={`${label} mt-5`}>Division area</div>
             <select

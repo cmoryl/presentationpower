@@ -18,6 +18,7 @@ import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview
 import { STYLE_PACKS, packToneBrand, stylePackById, type StylePack } from "@/lib/style-packs";
 import { buildLayerReport, type LayerReport } from "@/lib/layer-report";
 import { chartParityVariantIds } from "@/lib/export-chart-variants";
+import { setSkinBackdropOverrides } from "@/lib/skin-backdrop-overrides";
 import {
   diffLayerTrees,
   snapshotFromReports,
@@ -1089,6 +1090,10 @@ function ExportVerifyHarness() {
   const [treeDiff, setTreeDiff] = useState<TreeDiffResult | null>(null);
   const [baselineNote, setBaselineNote] = useState<string>("");
   useEffect(() => {
+    // Cover-replacement e2e hook: lets a headless run install a replacement
+    // backdrop exactly as an admin upload would publish it, then export.
+    (window as unknown as { __tpBackdropOverrides?: unknown }).__tpBackdropOverrides =
+      setSkinBackdropOverrides;
     window.__tpExportVerify = {
       variants: MODULE_VARIANTS.map((v) => v.id),
       chartVariants: chartParityVariantIds(),

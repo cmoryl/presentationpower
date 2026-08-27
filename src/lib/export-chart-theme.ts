@@ -72,6 +72,17 @@ export function chartTheme(opts: ChartThemeOpts = {}): Record<string, unknown> {
     // ---- gridlines: horizontal only, ruled the way the pack rules its field ----
     valGridLine: gridLineSpec(c.grid),
     catGridLine: { style: "none" },
+    // Office draws tick marks and series markers by default; the app draws
+    // neither, so a themed chart must switch them off explicitly or every
+    // exported line picks up diamond markers the preview never had.
+    catAxisMajorTickMark: "none",
+    catAxisMinorTickMark: "none",
+    valAxisMajorTickMark: "none",
+    valAxisMinorTickMark: "none",
+    lineDataSymbol: "none",
+    lineDataSymbolSize: 1,
+    showLegend: false,
+    showValue: false,
     catAxisLineColor: c.axis,
     valAxisLineShow: false,
     // ---- column width + series weight straight from the pack's grammar ----
@@ -80,6 +91,37 @@ export function chartTheme(opts: ChartThemeOpts = {}): Record<string, unknown> {
     lineDash: lineDash(),
     lineSmooth: exportChartStyle().line === "smooth",
   };
+}
+
+/**
+ * SPARKLINE THEME — the tiny trend graphics inside dashboard/KPI modules.
+ *
+ * On screen a sparkline is a bare smoothed trend: no axes, no ticks, no
+ * gridlines, no markers, no legend. Exported without those suppressions the
+ * same graphic came out of Office as a boxed line chart ruled with default
+ * gridlines and diamond markers — the single loudest "the graph doesn't match
+ * the build" defect. Every chart under ~1in tall goes through here.
+ */
+export function sparklineTheme(opts: ChartThemeOpts = {}): Record<string, unknown> {
+  return {
+    ...chartTheme(opts),
+    catAxisHidden: true,
+    valAxisHidden: true,
+    catAxisLineShow: false,
+    valAxisLineShow: false,
+    catGridLine: { style: "none" },
+    valGridLine: { style: "none" },
+    showLegend: false,
+    showValue: false,
+    showLabel: false,
+    lineDataSymbol: "none",
+    lineSmooth: true,
+  };
+}
+
+/** A chart this small is a sparkline, whatever the call site called it. */
+export function isSparklineBox(w: number, h: number): boolean {
+  return h > 0 && h <= 1.05 && w <= 6.5;
 }
 
 /**
