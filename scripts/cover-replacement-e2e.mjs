@@ -32,7 +32,7 @@ const val = (n, fb) => {
 const BASE = val("url", process.env.VERIFY_URL ?? "http://localhost:8080");
 const PACK = val("pack", "skin-s01");
 const CODE = PACK.replace(/^skin-/, "").toUpperCase();
-const VARIANT = val("variant", "MV-COVER-STATEMENT");
+const VARIANT = val("variant", "MV-OP-COVER");
 
 /** Flat magenta PNG — a colour no approved look contains, so it cannot be faked. */
 function magentaPng() {
@@ -153,12 +153,19 @@ try {
   }
 
   // 4 ── deck PDF page must be the slide, not letter/A4.
+  // The harness renders and tears down its stage per job, so measure the page
+  // size the exporter would derive from a stage of the deck's own dimensions.
   const pdfSize = await page.evaluate(async () => {
     const mod = await import("/src/lib/slide-image-export.ts");
-    const node =
-      document.querySelector("[data-slide-stage]") ??
-      document.querySelector("[data-slide-stage-root]");
-    return node ? mod.pdfPageSizeForNode(node) : null;
+    const el = document.createElement("div");
+    el.setAttribute("data-slide-stage", "");
+    Object.assign(el.style, { position: "fixed", left: "-9999px", width: "1600px", height: "900px" });
+    document.body.appendChild(el);
+    try {
+      return mod.pdfPageSizeForNode(el);
+    } finally {
+      el.remove();
+    }
   });
   if (pdfSize) {
     const ratio = pdfSize.width / pdfSize.height;
