@@ -35,9 +35,14 @@ export type AgendaExportResult = {
   layers: string[];
 };
 
-function readme(config: AgendaConfig, vector: Awaited<ReturnType<typeof buildAgendaVectorPdf>>): string {
+function readme(
+  config: AgendaConfig,
+  vector: Awaited<ReturnType<typeof buildAgendaVectorPdf>>,
+  wordNotes: string[] = [],
+): string {
   const geo = agendaGeometry(config);
   const qr = (config.qrData ?? "").trim();
+
   return [
     `TransPerfect NEXT — division agenda`,
     `Asset:           ${agendaName(config)}`,
