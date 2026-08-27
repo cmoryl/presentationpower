@@ -683,7 +683,12 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                   <button
                     type="button"
                     onClick={() => {
-                      setDraft(forkFromPack(selectedPack));
+                      setDraft(
+                        forkFromPack(
+                          selectedPack,
+                          templates.map((t) => t.code),
+                        ),
+                      );
                       setPanel("fields");
                     }}
                     className="inline-flex items-center gap-2 rounded-xl border border-black/15 px-3 py-2 text-xs hover:border-[#003FC7] dark:border-white/20"
