@@ -142,7 +142,7 @@ async function remoteFontEmbedCSS(node: HTMLElement): Promise<string> {
   return resolvedBlocks.filter(Boolean).join("\n");
 }
 
-function withTimeout<T>(work: Promise<T>, ms: number, fallback: T): Promise<T> {
+function withFallbackTimeout<T>(work: Promise<T>, ms: number, fallback: T): Promise<T> {
   return new Promise<T>((resolve) => {
     const timer = setTimeout(() => resolve(fallback), ms);
     work.then(
