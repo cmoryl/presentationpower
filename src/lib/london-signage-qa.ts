@@ -9,13 +9,25 @@
 
 import { LONDON_MAX_PX } from "@/lib/london-panel-raster";
 import {
+  LONDON_STYLES,
   panelSlug,
   rasterSizeFor,
   recommendedPpi,
   type LondonPanel,
 } from "@/lib/next-london-signage";
+import { parseColor, readShadingStops } from "@/lib/pdf-gradient-shading";
 
 const MM_TO_PT = 72 / 25.4;
+
+/** Approved ramp for a panel — the colours an exported `.ai` must still carry. */
+function expectedRamp(panel: LondonPanel): string[] {
+  const stops = LONDON_STYLES[panel.style]?.stops;
+  return stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+}
+
+function hex(c: [number, number, number]): string {
+  return `#${c.map((v) => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+}
 
 /** Worst measured flat-tone run in the issued pack — the pass tolerance. */
 export const LONDON_BAND_TOLERANCE_MM = 2.9;
@@ -276,6 +288,7 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
         note: "Vector-path blends print correctly but are less editable than a live shading.",
       },
     ),
+    ...auditAiGradient(panel, text),
   ];
 
   return {
@@ -287,6 +300,74 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
     checks,
   };
 }
+
+/**
+ * Illustrator-specific gradient integrity. These are the failure modes that
+ * made an exported `.ai` open with the wrong colours even though the file was
+ * a valid PDF:
+ *   * a Gouraud / coons mesh (Shading 4–7) that Illustrator re-interprets,
+ *   * a colour space other than DeviceRGB — an implicit CMYK conversion,
+ *   * a stop ramp that no longer matches the approved brand colours,
+ *   * a /Bounds array that is not strictly increasing (Illustrator drops the
+ *     stops after the first bad bound, so the ramp collapses).
+ */
+export function auditAiGradient(panel: LondonPanel, text: string): QaCheck[] {
+  const ramp = expectedRamp(panel);
+  const shadings = text.match(/\/Type\s*\/Shading[\s\S]*?>>\s*(?=endobj|\n\d+ 0 obj|$)/g) ?? [];
+  const dict = shadings[0] ?? "";
+  const spaces = Array.from(text.matchAll(/\/ShadingType\s*\d[\s\S]{0,120}?\/ColorSpace\s*\/(\w+)/g)).map(
+    (m) => m[1]!,
+  );
+  const meshTypes = Array.from(text.matchAll(/\/ShadingType\s*([4-7])/g)).map((m) => m[1]!);
+
+  const found = readShadingStops(dict);
+  const want = ramp.map((c) => parseColor(c));
+  const rampMatches =
+    found.length === want.length &&
+    want.every((c, i) => c.every((v, k) => Math.abs(v - found[i]![k]!) < 4 / 255));
+
+  const bounds = /\/Bounds\s*\[([^\]]*)\]/.exec(dict)?.[1]?.trim() ?? "";
+  const boundNums = bounds ? bounds.split(/\s+/).map(Number) : [];
+  const boundsOk =
+    boundNums.every((n) => Number.isFinite(n) && n > 0 && n < 1) &&
+    boundNums.every((n, i) => i === 0 || n > boundNums[i - 1]!);
+  const segments = (dict.match(/\/FunctionType\s*2/g) ?? []).length;
+  const stitched = /\/FunctionType\s*3/.test(dict);
+
+  return [
+    check(
+      "ai-gradient-mesh-free",
+      "No mesh shading Illustrator would misread",
+      meshTypes.length === 0,
+      "shading type 2 or 3 only",
+      meshTypes.length ? `mesh shading type ${meshTypes.join(", ")}` : "analytic shading",
+    ),
+    check(
+      "ai-gradient-colorspace",
+      "Gradient stays DeviceRGB (no silent CMYK conversion)",
+      spaces.length > 0 && spaces.every((s) => s === "DeviceRGB"),
+      "DeviceRGB",
+      spaces.length ? Array.from(new Set(spaces)).join(", ") : "absent",
+    ),
+    check(
+      "ai-gradient-stops",
+      "Panel gradient keeps the approved colours",
+      rampMatches,
+      ramp.map((c) => c.toUpperCase()).join(" → "),
+      found.length ? found.map((c) => hex(c)).join(" → ") : "no stop colours found",
+    ),
+    check(
+      "ai-gradient-bounds",
+      "Stop ramp is strictly increasing across the full domain",
+      // 1–2 stop ramps are a bare Type 2 with no /Bounds; that is correct.
+      stitched ? boundNums.length === Math.max(segments - 1, 0) && boundsOk : segments >= 1,
+      stitched ? `${Math.max(segments - 1, 0)} increasing bounds in (0,1)` : "single Type 2 ramp",
+      stitched ? `[${bounds}]` : segments >= 1 ? "single Type 2 ramp" : "no ramp function",
+    ),
+  ];
+}
+
+
 
 // ---------------------------------------------------------------------------
 // Raster: PNG

@@ -467,11 +467,15 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
     // Background artwork is delivered FLAT: full-bleed washes and full-bleed
     // slivers (rails, hairline rules, edge bands) stay painted on the plate
     // rather than shipping as selectable strips stacked over it.
-    const shapes = dom.keepBackgroundPaintOnPlate(
-      dom.pruneOccludingPaint(
-        resolved,
-        [...droppedNodes, ...dom.platedPaintRoots(stage)],
-        dom.surfacePaintRoots(stage),
+    // Media modules keep ONE alpha overlay per picture instead of the scrim
+    // stack that used to export as several selectable blocks on the photograph.
+    const shapes = dom.collapseMediaOverlays(
+      dom.keepBackgroundPaintOnPlate(
+        dom.pruneOccludingPaint(
+          resolved,
+          [...droppedNodes, ...dom.platedPaintRoots(stage)],
+          dom.surfacePaintRoots(stage),
+        ),
       ),
     );
 
@@ -487,7 +491,7 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
       readyTimeoutMs: 9000,
     });
     if (!data) return null;
-    return { plate: data, runs, shapes: shapes.map(({ node: _node, ...rest }) => rest) };
+    return { plate: data, runs, shapes: shapes.map(({ node: _node, nodes: _nodes, ...rest }) => rest) };
   });
 }
 

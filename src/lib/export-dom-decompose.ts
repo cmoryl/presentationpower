@@ -76,6 +76,12 @@ export interface DomShape {
   name: string;
   /** The element this record was measured from (not serializable). */
   node?: Element;
+  /**
+   * Extra elements this record represents (not serializable). Set when several
+   * measured layers were merged into ONE exported object — every one of them
+   * still has to be neutralised on the raster plate or the merge double-paints.
+   */
+  nodes?: Element[];
 }
 
 const CONTENT_PLANES = [
@@ -1100,7 +1106,6 @@ export function keepBackgroundPaintOnPlate(
   space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
 ): DomShape[] {
   const nearFull = (v: number, total: number) => v >= total * 0.94;
-  const spans = (v: number, total: number) => v >= total * 0.72;
   const thin = (v: number, total: number) => v <= total * 0.07;
   return shapes.filter((s) => {
     // Pictures with real content (photographs, logos, icons, effect artwork)
@@ -1108,19 +1113,23 @@ export function keepBackgroundPaintOnPlate(
     const fullBleed = nearFull(s.w, space.w) && nearFull(s.h, space.h);
     if (s.kind === "image") return !fullBleed;
     if (fullBleed) return false;
-    const sliver =
-      (spans(s.h, space.h) && thin(s.w, space.w)) || (spans(s.w, space.w) && thin(s.h, space.h));
-    if (sliver) return false;
-    // Decorative bands: extreme-aspect, text-free boxes (column rails, scanline
-    // rows, hairline stacks). These are the translucent "opacity bars" that
-    // PowerPoint shows as selectable strips chopping up the artwork.
-    const el = s.node as HTMLElement | undefined;
-    const hasText = !!el && (el.textContent ?? "").trim().length > 0;
-    const min = Math.min(s.w, s.h);
-    const max = Math.max(s.w, s.h);
-    const extreme = max > 0 && min / max <= 0.14;
-    const translucent = (s.fill?.alpha ?? 1) < 0.9;
-    if (!hasText && extreme && (translucent || min <= 6)) return false;
+    // Edge furniture ONLY: a hairline that runs the full length of one axis AND
+    // hugs a stage edge is background artwork (frames, edge bands, scanline
+    // rows) and belongs in the flat plate.
+    //
+    // Everything INSIDE the layout stays native, even when it is a hairline:
+    // timeline spines, connector rules, milestone ticks, stat underlines and
+    // divider rules are module furniture. Parking those on the plate is exactly
+    // what made timeline / rail modules arrive in PowerPoint as one flat picture
+    // with nothing selectable.
+    const vertical = nearFull(s.h, space.h) && thin(s.w, space.w);
+    const horizontal = nearFull(s.w, space.w) && thin(s.h, space.h);
+    if (vertical || horizontal) {
+      const atEdge = vertical
+        ? s.x <= space.w * 0.02 || s.x + s.w >= space.w * 0.98
+        : s.y <= space.h * 0.02 || s.y + s.h >= space.h * 0.98;
+      if (atEdge) return false;
+    }
     return true;
   });
 }
@@ -1138,24 +1147,150 @@ export function keepBackgroundPaintOnPlate(
  */
 export function neutralizeCapturedPaint(shapes: DomShape[]): void {
   for (const s of shapes) {
-    const el = s.node as HTMLElement | undefined;
-    if (!el || !el.style) continue;
-    if (s.kind === "image") {
-      el.style.setProperty("opacity", "0", "important");
+    // A merged record (e.g. one image overlay standing in for a whole scrim
+    // stack) owns several elements — every one of them has to come off the plate.
+    for (const node of [s.node, ...(s.nodes ?? [])]) {
+      const el = node as HTMLElement | undefined;
+      if (!el || !el.style) continue;
+      if (s.kind === "image" && node === s.node) {
+        el.style.setProperty("opacity", "0", "important");
+        el.style.setProperty("background-image", "none", "important");
+        continue;
+      }
+      // The native copy carries this box's tint, so the plate must not keep the
+      // frosted panel underneath it (that duplicate is what darkened glass cards).
+      el.style.setProperty("backdrop-filter", "none", "important");
+      el.style.setProperty("-webkit-backdrop-filter", "none", "important");
+      el.style.setProperty("background", "none", "important");
+      el.style.setProperty("background-color", "transparent", "important");
       el.style.setProperty("background-image", "none", "important");
-      continue;
+      el.style.setProperty("border-color", "transparent", "important");
+      el.style.setProperty("box-shadow", "none", "important");
     }
-    // The native copy carries this box's tint, so the plate must not keep the
-    // frosted panel underneath it (that duplicate is what darkened glass cards).
-    el.style.setProperty("backdrop-filter", "none", "important");
-    el.style.setProperty("-webkit-backdrop-filter", "none", "important");
-    el.style.setProperty("background", "none", "important");
-    el.style.setProperty("background-color", "transparent", "important");
-    el.style.setProperty("background-image", "none", "important");
-    el.style.setProperty("border-color", "transparent", "important");
-    el.style.setProperty("box-shadow", "none", "important");
   }
 }
+
+/**
+ * ONE overlay per picture — not a stack of blocks.
+ *
+ * Bento / media modules legibly float copy over a photograph by stacking several
+ * CSS layers inside the same tile: a colour wash, a top scrim, a bottom scrim,
+ * a hairline vignette, sometimes a translucent caption pad. Measured
+ * individually, each of those becomes its OWN native rectangle sitting on the
+ * picture, which is why the exported slide shows several selectable blocks over
+ * the image instead of a single alpha overlay — and why moving the picture in
+ * PowerPoint leaves a pile of tinted panels behind.
+ *
+ * This pass merges every text-free translucent layer bounded by a picture into a
+ * SINGLE overlay object: the union of their boxes clipped to the picture, with
+ * the strongest measured recipe (a real gradient wins over a flat tint, and the
+ * accumulated tints are alpha-composited so the merged overlay reads with the
+ * same weight as the stack it replaces). Text, icons, logos and any opaque chip
+ * are never merged — they stay their own editable objects.
+ */
+export function collapseMediaOverlays(
+  shapes: DomShape[],
+  space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
+): DomShape[] {
+  const TOL = 2; // px slack: scrims are often 1px outside the picture box
+  const MIN_MEDIA = space.w * space.h * 0.012; // ignore icon-sized pictures
+  const drop = new Set<DomShape>();
+  const out: DomShape[] = [];
+
+  const inside = (s: DomShape, m: DomShape) =>
+    s.x >= m.x - TOL &&
+    s.y >= m.y - TOL &&
+    s.x + s.w <= m.x + m.w + TOL &&
+    s.y + s.h <= m.y + m.h + TOL;
+
+  const alphaOf = (s: DomShape): number => {
+    if (s.gradient) return Math.max(...s.gradient.stops.map((st) => st.color.alpha), 0);
+    return s.fill?.alpha ?? 0;
+  };
+
+  for (let i = 0; i < shapes.length; i += 1) {
+    const media = shapes[i]!;
+    if (drop.has(media)) continue;
+    if (media.kind !== "image" || media.w * media.h < MIN_MEDIA) {
+      out.push(media);
+      continue;
+    }
+
+    // Only layers ABOVE the picture in z-order can be its overlay.
+    const layers: DomShape[] = [];
+    for (let j = i + 1; j < shapes.length; j += 1) {
+      const s = shapes[j]!;
+      if (drop.has(s) || s.kind === "image") continue;
+      if (!inside(s, media)) continue;
+      const el = s.node as HTMLElement | undefined;
+      if (el && (el.textContent ?? "").trim().length > 0) continue; // caption pads stay
+      if (s.line) continue; // a bordered chip is a designed object, not a scrim
+      const a = alphaOf(s);
+      if (a <= 0 || a >= 0.96) continue; // opaque blocks are content
+      layers.push(s);
+    }
+    out.push(media);
+    if (layers.length === 0) continue;
+
+    for (const l of layers) drop.add(l);
+
+    const x = Math.max(media.x, Math.min(...layers.map((l) => l.x)));
+    const y = Math.max(media.y, Math.min(...layers.map((l) => l.y)));
+    const right = Math.min(media.x + media.w, Math.max(...layers.map((l) => l.x + l.w)));
+    const bottom = Math.min(media.y + media.h, Math.max(...layers.map((l) => l.y + l.h)));
+
+    // Recipe: prefer the largest gradient layer (that is the designed fade);
+    // otherwise composite the flat tints into one alpha.
+    const gradients = layers.filter((l) => l.gradient).sort((a, b) => b.w * b.h - a.w * a.h);
+    const lead = gradients[0];
+    let gradient: DomGradient | null = null;
+    let fill: DomColor | null = null;
+    if (lead?.gradient) {
+      // Any additional flat tints ride along as extra alpha on the ramp so the
+      // merged overlay is as dense as the stack it replaces.
+      const extra = layers
+        .filter((l) => !l.gradient && l.fill)
+        .reduce((acc, l) => acc + (l.fill?.alpha ?? 0), 0);
+      gradient = {
+        angleDeg: lead.gradient.angleDeg,
+        stops: lead.gradient.stops.map((st) => ({
+          pos: st.pos,
+          color: {
+            hex: st.color.hex,
+            alpha: Math.max(0, Math.min(1, st.color.alpha + extra * (1 - st.color.alpha))),
+          },
+        })),
+      };
+    } else {
+      const tints = layers.filter((l) => l.fill);
+      const composite = tints.reduce((acc, l) => acc + (l.fill!.alpha ?? 0) * (1 - acc), 0);
+      const densest = [...tints].sort((a, b) => (b.fill!.alpha ?? 0) - (a.fill!.alpha ?? 0))[0];
+      if (!densest) continue;
+      fill = { hex: densest.fill!.hex, alpha: Math.max(0, Math.min(1, composite)) };
+    }
+
+    out.push({
+      kind: media.radiusPx >= 1 ? "roundRect" : "rect",
+      x,
+      y,
+      w: Math.max(1, right - x),
+      h: Math.max(1, bottom - y),
+      radiusPx: media.radiusPx,
+      fill,
+      gradient,
+      line: null,
+      shadow: null,
+      rotationDeg: media.rotationDeg,
+      name: `${media.name} overlay`,
+      node: (lead ?? layers[0])!.node,
+      nodes: layers.filter((l) => l.node !== (lead ?? layers[0])!.node).map((l) => l.node!),
+    });
+  }
+
+  return out.filter((s) => !drop.has(s));
+}
+
+
 
 /**
  * Resolve every picture record to an inline data URL, and DROP the records that
