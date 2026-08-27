@@ -132,7 +132,7 @@ export const deletePillarFile = createServerFn({ method: "POST" })
     if (findError) throw findError;
     const isOwner = existing.user_id === context.userId;
     const allowed =
-      isOwner || (await canEditNextDivision(context.userId, existing.division_id, context.supabase as never));
+      isOwner || (await canEditNextDivision(context.userId, existing.division_id ?? "", context.supabase as never));
     if (!allowed) throw new Error("You are not authorized to delete this pillar file");
     const { error } = await context.supabase
       .from("event_pillar_versions")
