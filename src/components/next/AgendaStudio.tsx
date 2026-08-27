@@ -19,6 +19,8 @@ import { announceNextMasterSaved } from "@/hooks/use-next-live-masters";
 
 import { exportAgendaSheet } from "@/lib/next-agenda-export";
 import { agendaFit } from "@/lib/next-agenda-fit";
+import { buildAgendaDocx } from "@/lib/next-agenda-docx";
+
 
 import {
   deleteAgendaFile,
