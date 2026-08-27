@@ -571,7 +571,9 @@ export const INDUSTRY_RECIPES: IndustryRecipe[] = [
     ],
     profile: "L10 DATA OBSERVATORY  \u00b7  G02  \u00b7  O16\u201380  \u00b7  IP03/I03",
     tone: "INTELLIGENT / CREDIBLE",
-    palette: ["#07101F", "#49A8FF", "#A78BFA", "#E7F0FF"],
+    // DataForce owns this look (see LOOK_BRAND_MODE): DataForce Green leads the
+    // accents, DataForce Blue is the secondary accent and the icon colour.
+    palette: ["#07101F", "#7BCD3A", "#139DD8", "#E7F0FF"],
     keywords: ["DATA", "MODEL", "INSIGHT", "AI / DATA"],
   },
   {
