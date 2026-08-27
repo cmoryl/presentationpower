@@ -40,3 +40,19 @@ export function packIdForBrandMode(brandModeId: string | null | undefined): stri
   const code = Object.keys(LOOK_BRAND_MODE).find((c) => LOOK_BRAND_MODE[c] === brandModeId);
   return code ? `skin-${code.toLowerCase()}` : null;
 }
+
+/**
+ * Look code → glyph colour, when a look leads its structure in one colour and
+ * its icons in another. DataForce's AI · Data Signature paints rules, ticks and
+ * accent bands in DataForce Green and keeps every icon in DataForce Blue.
+ */
+export const LOOK_GLYPH_COLOR: Record<string, string> = {
+  R03: "#139DD8",
+};
+
+/** Glyph colour a look forces on its icons, or null to follow the accent. */
+export function lookGlyphColor(packIdOrCode: string | null | undefined): string | null {
+  if (!packIdOrCode) return null;
+  const code = lookCodeFromPackId(packIdOrCode);
+  return LOOK_GLYPH_COLOR[code] ?? LOOK_GLYPH_COLOR[code.replace(/-V\d+$/i, "")] ?? null;
+}

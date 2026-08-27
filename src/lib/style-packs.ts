@@ -40,6 +40,7 @@ import { withGamesSceneArt } from "./games-scene-art";
 import { withIndustryPhotoArt } from "./industry-photo-art";
 
 import { templateCodeFromPackId } from "./custom-templates";
+import { lookBrandModeId } from "./look-brand";
 
 export type StylePackId =
   | "swiss-noir"
@@ -2683,16 +2684,23 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
  * at the source fixes all of them at once, and keeps the pack coherent.
  *
  * Content, division knowledge and copy are untouched: only colour moves.
+ *
+ * EXCEPTION — a look that a product brand OWNS (DataForce owns AI · Data
+ * Signature) must keep that brand's own lead/accent colours: the look IS the
+ * brand's template, so re-toning it to the catalog palette would repaint
+ * DataForce green as generic AI blue. Surface and ink still follow the pack so
+ * the sheet stays coherent.
  */
 export function packToneBrand<
-  T extends { tokens: { primary: string; accent: string; surface: string; ink: string } },
+  T extends { id?: string; tokens: { primary: string; accent: string; surface: string; ink: string } },
 >(brand: T, pack: StylePack | null | undefined): T {
   if (!pack) return brand;
+  const ownsLook = Boolean(brand.id) && lookBrandModeId(pack.id) === brand.id;
   return {
     ...brand,
     tokens: {
-      primary: pack.tokens.primary,
-      accent: pack.tokens.accentText,
+      primary: ownsLook ? brand.tokens.primary : pack.tokens.primary,
+      accent: ownsLook ? brand.tokens.accent : pack.tokens.accentText,
       surface: pack.tokens.surface,
       ink: pack.tokens.ink,
     },
