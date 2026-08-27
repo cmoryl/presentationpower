@@ -17,7 +17,8 @@
  */
 
 import * as React from "react";
-import type { StylePack } from "@/lib/style-packs";
+import { packGroundPaint, type StylePack } from "@/lib/style-packs";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 
 const SLIDE_W = 1280;
@@ -30,7 +31,12 @@ const SLIDE_H = 720;
  * appears cropped at preview size.
  */
 export function GroundPlane({ pack, seed }: { pack: StylePack; seed: string }) {
-  const background = React.useMemo(() => pack.ground(seed).join(", "), [pack, seed]);
+  // Repaint when an admin replaces this look's background artwork.
+  const bdVersion = useSkinBackdropVersion();
+  const background = React.useMemo(
+    () => packGroundPaint(pack, seed).join(", "),
+    [pack, seed, bdVersion],
+  );
   const hostRef = React.useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = React.useState(0);
 

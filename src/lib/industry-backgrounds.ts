@@ -29,7 +29,7 @@ import {
 import { INDUSTRY_SKINS, industrySkinByCode } from "./industry-skins";
 import { skinPackById, skinPackId, stylePackFromSkin } from "./design-skin-pack";
 import { tonedIndustrySceneLayers } from "./industry-scene-art";
-import type { StylePack } from "./style-packs";
+import { packGroundPaint, type StylePack } from "./style-packs";
 import {
   MOTIF_LABEL,
   SKIN_BG_TAKES,
@@ -169,7 +169,7 @@ function buildSet(skin: DesignSkin): IndustryBackgroundSet {
     families: INDUSTRY_BG_FAMILIES,
     compositions,
     pack,
-    layers: (scene, take = 0) => pack.ground(industryBgSeed(scene, take)),
+    layers: (scene, take = 0) => packGroundPaint(pack, industryBgSeed(scene, take)),
   };
 }
 
@@ -261,7 +261,7 @@ export function withIndustryGround(
           // along, or the wrong sector's artwork wins over the chosen recipe.
           ...basePack.ground(seed).filter((layer) => !layer.includes("url(")),
         ]
-      : (seed) => set.pack.ground(seed),
+      : (seed) => packGroundPaint(set.pack, seed),
     swatch: basePack.swatch,
   };
 }
