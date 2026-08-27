@@ -353,7 +353,13 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
   useEffect(() => {
     if (panel !== "fields") return;
     if (selected?.template) setDraft(selected.template);
-    else if (selectedPack) setDraft(forkFromPack(selectedPack));
+    else if (selectedPack)
+      setDraft(
+        forkFromPack(
+          selectedPack,
+          templates.map((t) => t.code),
+        ),
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [panel, selected?.id]);
 
