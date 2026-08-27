@@ -82,6 +82,13 @@ export interface DomShape {
    * still has to be neutralised on the raster plate or the merge double-paints.
    */
   nodes?: Element[];
+  /**
+   * Sibling objects sharing this id are wrapped in a native PowerPoint group
+   * (see `assignExportGroups`), so a milestone / card / step moves as one unit
+   * while each shape inside it stays individually selectable.
+   */
+  groupId?: string;
+  groupLabel?: string;
 }
 
 const CONTENT_PLANES = [
@@ -1005,7 +1012,85 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
   }
   PLATED_ROOTS.set(stage, platedRoots);
   SURFACE_ROOTS.set(stage, surfaceRoots);
+  assignExportGroups(shapes, root, stage);
   return shapes;
+}
+
+/**
+ * GROUPING — one selectable unit per designed sub-object.
+ *
+ * A timeline milestone is a node ring + its tick + its card plate + its accent
+ * rule. Emitted flat, PowerPoint shows a dozen loose rectangles per module, so
+ * moving a milestone means rubber-banding by eye. Each measured box therefore
+ * inherits the id of its nearest grouping host (`data-export-group`, else the
+ * per-item animation wrapper the renderers already emit), which the zip pass
+ * turns into a real `p:grpSp`.
+ *
+ * Every shape stays its OWN object inside that group: the spine, the connector
+ * and the tick remain individually editable — they are simply easy to select.
+ * Hosts that span most of the stage are skipped, so a module never collapses
+ * into a single backdrop-sized group.
+ */
+const GROUP_HOST_SELECTOR = "[data-export-group],[data-intro-item]";
+
+function assignExportGroups(shapes: DomShape[], root: DOMRect, stage: Element): void {
+  const stageArea = Math.max(1, root.width * root.height);
+  const emitted = shapes.filter((s) => s.node instanceof Element);
+  if (emitted.length < 2) return;
+
+  // How many emitted objects live inside each ancestor. A container holding two
+  // or more of them is a composite sub-object (a milestone, a step card, a KPI
+  // block); a container holding one is just that object's own wrapper.
+  const count = new Map<Element, number>();
+  const chainOf = (el: Element): Element[] => {
+    const chain: Element[] = [];
+    let p: Element | null = el.parentElement;
+    while (p && p !== stage) {
+      chain.push(p);
+      p = p.parentElement;
+    }
+    return chain;
+  };
+  for (const s of emitted) {
+    for (const a of chainOf(s.node as Element)) count.set(a, (count.get(a) ?? 0) + 1);
+  }
+
+  const area = (el: Element): number => {
+    try {
+      const r = el.getBoundingClientRect();
+      return r.width >= 2 && r.height >= 2 ? r.width * r.height : 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const ids = new Map<Element, { id: string; label: string }>();
+  let n = 0;
+  for (const s of emitted) {
+    const el = s.node as Element;
+    const chain = chainOf(el);
+    // Explicit hosts win; otherwise the LOWEST bounded ancestor that owns more
+    // than one object. Anything the size of the stage is a layout wrapper and is
+    // never a group, so a module can never collapse into one backdrop-sized box.
+    const host =
+      chain.find(
+        (a) =>
+          (a.hasAttribute("data-export-group") || a.hasAttribute("data-intro-item")) &&
+          area(a) > 0 &&
+          area(a) <= stageArea * 0.5,
+      ) ??
+      chain.find((a) => (count.get(a) ?? 0) >= 2 && area(a) > 0 && area(a) <= stageArea * 0.35);
+    if (!host) continue;
+    let g = ids.get(host);
+    if (!g) {
+      n += 1;
+      const explicit = (host.getAttribute("data-export-group") ?? "").replace(/\s+/g, " ").trim();
+      g = { id: `dom-g${n}`, label: explicit ? `TP ${explicit.slice(0, 48)}` : `TP Group ${n}` };
+      ids.set(host, g);
+    }
+    s.groupId = g.id;
+    s.groupLabel = g.label;
+  }
 }
 
 /**
@@ -1188,6 +1273,19 @@ export function neutralizeCapturedPaint(shapes: DomShape[]): void {
  * same weight as the stack it replaces). Text, icons, logos and any opaque chip
  * are never merged — they stay their own editable objects.
  */
+/**
+ * Hairline / tick geometry: a spine, connector, rail, tick or underline. These
+ * are designed, editable module parts and must never be folded into another
+ * object (a media overlay) or parked on the backdrop plate.
+ */
+export function isModuleFurniture(s: DomShape): boolean {
+  if (s.kind === "image") return false;
+  const min = Math.min(s.w, s.h);
+  const max = Math.max(s.w, s.h);
+  if (min <= 6) return true;
+  return min <= 14 && max / Math.max(1, min) >= 8;
+}
+
 export function collapseMediaOverlays(
   shapes: DomShape[],
   space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
@@ -1225,6 +1323,10 @@ export function collapseMediaOverlays(
       const el = s.node as HTMLElement | undefined;
       if (el && (el.textContent ?? "").trim().length > 0) continue; // caption pads stay
       if (s.line) continue; // a bordered chip is a designed object, not a scrim
+      // Module furniture crossing a photograph (a timeline spine, a connector,
+      // a milestone tick, an underline) is NOT a scrim: merging it into the
+      // picture's overlay is exactly how those parts stopped being editable.
+      if (isModuleFurniture(s)) continue;
       const a = alphaOf(s);
       if (a <= 0 || a >= 0.96) continue; // opaque blocks are content
       layers.push(s);

@@ -18,11 +18,21 @@ import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
 import { gradientTag, pxToPt } from "./export-surface";
 import { coverCropTag, roundPicTag } from "./pptx-shape-normalize";
+import { groupTag } from "./pptx-group-xml";
 import { exportSlideBounds } from "./export-space";
 
 /** Stage px → inches. */
 function inOf(px: number): number {
   return px / PX_PER_IN;
+}
+
+/**
+ * Group prefix for a decomposed object. Sibling objects carrying the same id are
+ * wrapped in a real `p:grpSp` by the zip pass, so a milestone / card moves as one
+ * unit in PowerPoint while every shape inside it stays selectable on its own.
+ */
+function groupPrefix(s: DomShape): string {
+  return s.groupId ? `${groupTag(s.groupId, s.groupLabel)} ` : "";
 }
 
 function transparencyOf(c: DomColor): number {
@@ -105,7 +115,7 @@ export function placeDomShapes(
         w: frame.w,
         h: frame.h,
         rotate: s.rotationDeg || undefined,
-        objectName: `${tag}${s.name}`.trim(),
+        objectName: `${groupPrefix(s)}${tag}${s.name}`.trim(),
         sizing:
           frame.exact || s.fit === "fill" || crop
             ? undefined
@@ -169,7 +179,7 @@ export function placeDomShapes(
               transparency: transparencyOf(s.line),
             }
           : { type: "none" },
-      objectName: `${nameParts.join("")} ${s.name}`.trim(),
+      objectName: `${groupPrefix(s)}${nameParts.join("")} ${s.name}`.trim(),
     };
     if (type === "roundRect") props.rectRadius = radiusIn;
     if (shadow) props.shadow = { ...shadow };
