@@ -147,8 +147,6 @@ function NextHub() {
         }}
       />
 
-      <LivePillars division={division} />
-
 
 
       {/* Registry controls */}
@@ -198,6 +196,11 @@ function NextHub() {
                   </span>
                   <span className="text-xs text-muted-foreground">{list.length} designs</span>
                 </div>
+
+                {gid === "pillar-signage" && (
+                  <LivePillars division={division} />
+                )}
+
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {list.map((r) => (
                     <RegistryCard
@@ -1082,7 +1085,7 @@ function LivePillars({ division }: { division: NextDivision }) {
   );
 
   return (
-    <section className="mt-10 scroll-mt-24" aria-labelledby="next-live-pillars">
+    <section className="mt-4 scroll-mt-24" aria-labelledby="next-live-pillars">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
           <h2 id="next-live-pillars" className="text-xl font-semibold tracking-tight">
@@ -1095,24 +1098,33 @@ function LivePillars({ division }: { division: NextDivision }) {
             Illustrator art.
           </p>
         </div>
-        <div
-          role="group"
-          aria-label="Pillar face"
-          className="inline-flex rounded-full border border-border p-0.5"
-        >
-          {(["light", "dark"] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFace(f)}
-              aria-pressed={face === f}
-              className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
-                face === f ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-              }`}
-            >
-              {f} face
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to="/events/next/agendas"
+            search={{ division: division.id }}
+            className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+          >
+            <CalendarDays size={13} /> {division.name} agenda
+          </Link>
+          <div
+            role="group"
+            aria-label="Pillar face"
+            className="inline-flex rounded-full border border-border p-0.5"
+          >
+            {(["light", "dark"] as const).map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFace(f)}
+                aria-pressed={face === f}
+                className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
+                  face === f ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                }`}
+              >
+                {f} face
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
