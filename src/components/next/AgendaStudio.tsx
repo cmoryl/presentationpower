@@ -571,6 +571,11 @@ export function AgendaStudio({
               <Download className="mr-2 h-4 w-4" />
               {busy ? "Exporting…" : "Export print package"}
             </Button>
+            <Button variant="outline" onClick={runWordExport} disabled={busy}>
+              <FileText className="mr-2 h-4 w-4" />
+              Export editable Word
+            </Button>
+
             <Button
               variant="secondary"
               disabled={signedIn !== true || saveMutation.isPending || !canEditDivision || canEditLoading}
