@@ -440,25 +440,33 @@ export async function ensureFontsReady(
       cs.fontFamily
         .split(",")
         .map((f) => f.trim().replace(/^["']|["']$/g, ""))
+        // Primary family only. Loading fallback stacks pulls in the CJK Noto
+        // families, and each of those is hundreds of unicode-range subsets.
+        .slice(0, 1)
         .filter(Boolean)
-        .slice(0, 2) // primary + first fallback is enough
         .forEach((f) => families.add(f));
     }
     el = walker.nextNode() as Element | null;
   }
+
+  // `fonts.load(font, text)` fetches only the subsets covering that text. Without
+  // it, a single CJK family request downloads every subset it ships (hundreds of
+  // files), which exhausts the browser's socket pool (ERR_INSUFFICIENT_RESOURCES)
+  // and can stall or abort the capture that follows.
+  const sample = (node.textContent ?? "").replace(/\s+/g, " ").slice(0, 2000) || "Ag";
 
   const start = performance.now();
   for (const family of families) {
     if (performance.now() - start > timeoutMs) break;
     try {
       // Probe two common weights at body size.
-      const ok400 = document.fonts.check(`400 16px "${family}"`);
-      const ok700 = document.fonts.check(`700 16px "${family}"`);
+      const ok400 = document.fonts.check(`400 16px "${family}"`, sample);
+      const ok700 = document.fonts.check(`700 16px "${family}"`, sample);
       if (!ok400 || !ok700) {
         await withTimeout(
           Promise.all([
-            document.fonts.load(`400 16px "${family}"`),
-            document.fonts.load(`700 16px "${family}"`),
+            document.fonts.load(`400 16px "${family}"`, sample),
+            document.fonts.load(`700 16px "${family}"`, sample),
           ]).then(() => undefined as unknown as void),
           Math.max(400, timeoutMs - (performance.now() - start)),
           `font ${family}`,
