@@ -97,7 +97,7 @@ export function LookFieldsEditor({
       const saved = await save({
         data: {
           id: draft.id || null,
-          code: draft.code,
+          code,
           name: draft.name,
           reference: draft.reference,
           description: draft.description,
