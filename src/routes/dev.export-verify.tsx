@@ -240,6 +240,7 @@ async function verifyOne(
     const res = await exportDeckToPptx(deck, brand, {
       output: "blob",
       forceMode: mode,
+      pack,
       packBackground,
       // Audit the product default itself: one decor-only image plate plus native
       // shapes, pictures, icons, logos and text. Using "editable" here previously
