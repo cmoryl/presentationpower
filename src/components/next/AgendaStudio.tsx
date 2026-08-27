@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useCanEditNextDivision } from "@/hooks/use-next-edit-permission";
 import { exportAgendaSheet } from "@/lib/next-agenda-export";
 import {
   deleteAgendaFile,
@@ -94,6 +95,7 @@ export function AgendaStudio({
   const plateRef = useRef<HTMLDivElement | null>(null);
 
   const signedIn = useSignedIn();
+  const { canEdit: canEditDivision, isLoading: canEditLoading } = useCanEditNextDivision(config.divisionId);
   const qc = useQueryClient();
   const list = useServerFn(listAgendaFiles);
   const create = useServerFn(saveAgendaFile);
@@ -521,7 +523,7 @@ export function AgendaStudio({
             </Button>
             <Button
               variant="secondary"
-              disabled={signedIn !== true || saveMutation.isPending}
+              disabled={signedIn !== true || saveMutation.isPending || !canEditDivision || canEditLoading}
               onClick={() => saveMutation.mutate()}
             >
               <Save className="mr-2 h-4 w-4" />
@@ -530,6 +532,12 @@ export function AgendaStudio({
           </div>
           {signedIn !== true ? (
             <p className="text-xs text-muted-foreground">Sign in to save live agenda files.</p>
+          ) : canEditLoading ? (
+            <p className="text-xs text-muted-foreground">Checking division editing permissions…</p>
+          ) : !canEditDivision ? (
+            <p className="text-xs text-muted-foreground">
+              You are not assigned as an editor for this division. Ask an admin or brand reviewer to add you.
+            </p>
           ) : null}
         </div>
       </div>

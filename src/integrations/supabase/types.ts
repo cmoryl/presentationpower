@@ -1846,6 +1846,7 @@ export type Database = {
         Row: {
           config: Json
           created_at: string
+          division_id: string | null
           event_label: string
           id: string
           name: string
@@ -1857,6 +1858,7 @@ export type Database = {
         Insert: {
           config: Json
           created_at?: string
+          division_id?: string | null
           event_label?: string
           id?: string
           name: string
@@ -1868,6 +1870,7 @@ export type Database = {
         Update: {
           config?: Json
           created_at?: string
+          division_id?: string | null
           event_label?: string
           id?: string
           name?: string
@@ -2623,6 +2626,27 @@ export type Database = {
           status?: string
           updated_at?: string
           venue_label?: string
+        }
+        Relationships: []
+      }
+      next_division_editors: {
+        Row: {
+          created_at: string
+          division_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          division_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          division_id?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { canEditNextDivision } from "./next-permissions.functions";
+
 
 // Saved NEXT division agenda files. Each row is a live, re-editable agenda that
 // can be re-opened and re-exported for print at any time. RLS scopes every row
@@ -61,6 +63,8 @@ export const saveAgendaFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => versionInput.parse(data))
   .handler(async ({ data, context }) => {
+    const allowed = await canEditNextDivision(context.userId, data.divisionId, context.supabase as never);
+    if (!allowed) throw new Error("You are not authorized to edit agendas for this division");
     const { data: row, error } = await context.supabase
       .from("next_agenda_versions")
       .insert({
@@ -83,6 +87,17 @@ export const updateAgendaFile = createServerFn({ method: "POST" })
     versionInput.partial().extend({ id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
+    const { data: existing, error: findError } = await context.supabase
+      .from("next_agenda_versions")
+      .select("user_id, division_id")
+      .eq("id", data.id)
+      .single();
+    if (findError) throw findError;
+    const isOwner = existing.user_id === context.userId;
+    const divisionId = data.divisionId ?? existing.division_id;
+    const allowed =
+      isOwner || (await canEditNextDivision(context.userId, divisionId, context.supabase as never));
+    if (!allowed) throw new Error("You are not authorized to edit agendas for this division");
     const patch: Record<string, unknown> = {};
     if (data.name !== undefined) patch.name = data.name;
     if (data.eventLabel !== undefined) patch.event_label = data.eventLabel;
@@ -103,6 +118,16 @@ export const deleteAgendaFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
+    const { data: existing, error: findError } = await context.supabase
+      .from("next_agenda_versions")
+      .select("user_id, division_id")
+      .eq("id", data.id)
+      .single();
+    if (findError) throw findError;
+    const isOwner = existing.user_id === context.userId;
+    const allowed =
+      isOwner || (await canEditNextDivision(context.userId, existing.division_id, context.supabase as never));
+    if (!allowed) throw new Error("You are not authorized to delete this agenda file");
     const { error } = await context.supabase.from("next_agenda_versions").delete().eq("id", data.id);
     if (error) throw error;
     return { ok: true };
