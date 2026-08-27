@@ -97,7 +97,7 @@ export const updatePillarFile = createServerFn({ method: "POST" })
     if (findError) throw findError;
     const isOwner = existing.user_id === context.userId;
     const existingConfig = (existing.config ?? {}) as { divisionId?: string };
-    const divisionId = data.config?.divisionId ?? existingConfig.divisionId ?? existing.division_id;
+    const divisionId = data.config?.divisionId ?? existingConfig.divisionId ?? existing.division_id ?? "";
     const allowed =
       isOwner || (await canEditNextDivision(context.userId, divisionId, context.supabase as never));
     if (!allowed) throw new Error("You are not authorized to edit pillars for this division");
