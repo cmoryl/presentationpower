@@ -285,7 +285,7 @@ function CityBadgePage() {
                   checked={config.showLockup}
                   onChange={(e) => set("showLockup", e.target.checked)}
                 />
-                Print the division lockup on the badge
+                Swap the head mark for this logo
               </label>
             </section>
 
