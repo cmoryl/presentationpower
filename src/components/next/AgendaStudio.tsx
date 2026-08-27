@@ -41,7 +41,9 @@ import {
   agendaGeometry,
   agendaName,
   agendaProgramme,
+  agendaSlug,
   agendaStyleLabel,
+
   normalizeAgendaConfig,
   withAgendaDivision,
   type AgendaConfig,
