@@ -79,6 +79,15 @@ export function LookFieldsEditor({
   const summary = testSummary(tests);
 
   async function persist(status: "draft" | "published") {
+    const code = (draft.code ?? "").trim().toUpperCase();
+    if (!/^[A-Z0-9-]{2,12}$/.test(code)) {
+      toast.error("Add a code first — 2–12 letters, numbers or dashes (e.g. C01).");
+      return;
+    }
+    if ((draft.name ?? "").trim().length < 2) {
+      toast.error("Add a name first — at least 2 characters.");
+      return;
+    }
     if (status === "published" && !summary.ready) {
       toast.error("Fix every failing check before publishing.");
       return;
@@ -88,7 +97,7 @@ export function LookFieldsEditor({
       const saved = await save({
         data: {
           id: draft.id || null,
-          code: draft.code,
+          code,
           name: draft.name,
           reference: draft.reference,
           description: draft.description,
