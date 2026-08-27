@@ -25,7 +25,9 @@ import {
   type ModuleVariant,
 } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
+import { lookBrandModeId } from "@/lib/look-brand";
 import type { SkinScene } from "@/lib/skin-backgrounds";
+
 
 /** The module each section of a look is judged on, in scene order. */
 export const SCENE_VARIANT: Record<SkinScene, string> = {
