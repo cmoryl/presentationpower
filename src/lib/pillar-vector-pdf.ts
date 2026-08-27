@@ -44,6 +44,8 @@ import {
 } from "pdf-lib";
 
 import { resolveAssetUrl } from "./asset-base-url";
+import { loadMartArtVector } from "./mart-svg-art";
+import { martPlacement } from "./next-mart-placement";
 import {
   pillarDivision,
   pillarGeometry,
@@ -77,7 +79,8 @@ export type PillarLayerName =
   | "04 Sub-line"
   | "05 Arrow"
   | "06 QR code"
-  | "07 Guides + marks";
+  | "07 Guides + marks"
+  | "08 Placed artwork";
 
 export type PillarVectorResult = {
   bytes: Uint8Array<ArrayBuffer>;
@@ -307,6 +310,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     "05 Arrow",
     "06 QR code",
     "07 Guides + marks",
+    "08 Placed artwork",
   ];
   const layers: Layer[] = names.map((name, i) => {
     const nonPrinting = name === "07 Guides + marks";
@@ -372,6 +376,38 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   drawGround(doc, page, bleedW, bleedH, stops, config.styleId);
   page.pushOperators(popGraphicsState());
   endLayer(page);
+
+  // ── 08 Placed artwork ──────────────────────────────────────────────────────
+  // Supplied NEXT MART masters re-placed as vector shapes, so the panel scales
+  // and separates like the die-cut original rather than a flattened bitmap.
+  const placed = martPlacement(config);
+  let placedVector = false;
+  if (placed) {
+    const art = await loadMartArtVector(placed.art.url || placed.art.previewUrl);
+    if (art) {
+      const [vx, vy, vw, vh] = art.viewBox;
+      const boxW = mm(placed.w);
+      const boxH = mm(placed.h);
+      const scale = Math.min(boxW / (vw || 1), boxH / (vh || 1));
+      const left = ox + mm(geo.bleedEdge + placed.x) + (boxW - (vw || 1) * scale) / 2;
+      const top =
+        oy + bleedH - mm(geo.bleedEdge + placed.y) - (boxH - (vh || 1) * scale) / 2;
+      beginLayer(page, layer("08 Placed artwork"));
+      for (const shape of art.shapes) {
+        page.drawSvgPath(shape.d, {
+          x: left - vx * scale,
+          y: top + vy * scale,
+          scale,
+          color: shape.fill ? rgb(...shape.fill) : undefined,
+          borderColor: shape.stroke ? rgb(...shape.stroke) : undefined,
+          borderWidth: shape.stroke ? Math.max(0.15, shape.strokeWidth * scale) : undefined,
+        });
+      }
+      endLayer(page);
+      placedVector = true;
+    }
+  }
+  void placedVector;
 
   // ── 02 Lockup ──────────────────────────────────────────────────────────────
   const division = pillarDivision(config.divisionId);
