@@ -1239,7 +1239,7 @@ export function keepBackgroundPaintOnPlate(
       alpha <= 0.5 &&
       s.w <= space.w * 0.1 &&
       s.h >= space.h * 0.5 &&
-      !isModuleFurniture(s.node as Element | undefined);
+      !isModuleFurniture(s);
     if (ghostBar) return false;
     return true;
   });
