@@ -141,6 +141,7 @@ export function PillarStudio({
   intro = "Welcome, registration, logo and directional pillars on the approved NEXT gradient grounds. Set the measured pillar footprint, add a sub-line and a real scannable QR code, save the live file and export press-ready art.",
   showDivisionGallery = true,
   showMartLayouts = true,
+  initialConfig,
 }: {
   scope?: string;
   heading?: string;
@@ -148,8 +149,11 @@ export function PillarStudio({
   showDivisionGallery?: boolean;
   /** Show the issued NEXT MART layout library (QR + wayfinding geometry). */
   showMartLayouts?: boolean;
+  /** Seed the editor with a prepared pillar (demo asset, saved master, etc.). */
+  initialConfig?: PillarConfig;
 }) {
-  const [config, setConfig] = useState<PillarConfig>(pillarDefault());
+  const [config, setConfig] = useState<PillarConfig>(() => initialConfig ?? pillarDefault());
+
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
   const [zoom, setZoom] = useState(1);
