@@ -10,8 +10,6 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const MANAGING_ROLES = ["admin", "brand_reviewer", "brand_lead"] as const;
-
 export async function canEditNextDivision(
   userId: string,
   divisionId: string,
@@ -93,6 +91,7 @@ export const grantNextDivisionEditor = createServerFn({ method: "POST" })
 const revokeInput = z.object({ id: z.string().uuid() });
 export const revokeNextDivisionEditor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => revokeInput.parse(data))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     const { data: isReviewer } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_reviewer" });
