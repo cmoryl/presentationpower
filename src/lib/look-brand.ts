@@ -29,3 +29,14 @@ export function lookBrandModeId(packIdOrCode: string | null | undefined): string
   const code = lookCodeFromPackId(packIdOrCode);
   return LOOK_BRAND_MODE[code] ?? LOOK_BRAND_MODE[code.replace(/-V\d+$/i, "")] ?? "bm-enterprise";
 }
+
+/**
+ * Reverse lookup: the catalog pack id a brand mode's own look lives at, so
+ * picking that brand scope in the library activates its template (e.g.
+ * DataForce → the AI · Data Signature look).
+ */
+export function packIdForBrandMode(brandModeId: string | null | undefined): string | null {
+  if (!brandModeId) return null;
+  const code = Object.keys(LOOK_BRAND_MODE).find((c) => LOOK_BRAND_MODE[c] === brandModeId);
+  return code ? `skin-${code.toLowerCase()}` : null;
+}

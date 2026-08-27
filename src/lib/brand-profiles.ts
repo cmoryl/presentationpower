@@ -14,11 +14,12 @@ export const ENTERPRISE_BRAND_TOKENS: BrandMode["tokens"] = {
   ink: "#03002C",
 };
 
+// DataForce (`bm-product`) is a product brand, not a TransPerfect division, so
+// it keeps its own green/blue accents instead of the enterprise palette.
 const TRANSPERFECT_BRAND_SCOPE_IDS = new Set([
   "bm-enterprise",
   "bm-subcompany",
   "bm-division",
-  "bm-product",
   "bm-tp-media",
   "bm-tp-legal",
   "bm-tp-games",
@@ -235,14 +236,34 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
     parentId: "bm-enterprise",
     logo: { mark: "DF", wordmark: "DataForce", divisionLine: "by TransPerfect" },
     contentScope: {
-      industries: ["Technology", "AI / ML", "Automotive", "Consumer Tech"],
-      serviceLines: [
-        "Data collection",
-        "Data annotation",
-        "Model evaluation",
-        "Human-in-the-loop AI",
+      industries: [
+        "AI / ML",
+        "Frontier AI labs",
+        "Technology",
+        "Automotive & mobility",
+        "Consumer devices",
+        "Voice & conversational AI",
+        "Search & recommendation",
+        "Healthcare AI",
       ],
-      caseStudyTags: ["ai-training", "annotation", "llm", "computer-vision", "speech"],
+      serviceLines: [
+        "Data collection (speech, image, video, text)",
+        "Data annotation & labeling",
+        "Human preference ranking & RLHF",
+        "Model evaluation & red teaming",
+        "Human-in-the-loop AI operations",
+        "Dataset governance, ethics & consent",
+        "Multilingual data across 250+ languages",
+        "Contributor community of 1M+ specialists",
+      ],
+      caseStudyTags: [
+        "ai-training",
+        "annotation",
+        "llm",
+        "computer-vision",
+        "speech",
+        "platform",
+      ],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
       restrictedFamilyIds: ["MF-06"],
       preferredVariantIds: [
