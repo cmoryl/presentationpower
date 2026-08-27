@@ -74,6 +74,8 @@ function CityBadgePage() {
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
   const plateRef = useRef<HTMLDivElement | null>(null);
+  const backRef = useRef<HTMLDivElement | null>(null);
+
 
   const versions = useQuery({
     queryKey: ["city-badge-versions"],
