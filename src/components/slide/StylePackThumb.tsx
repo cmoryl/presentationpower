@@ -21,6 +21,7 @@ import {
   type PackComposition,
   type StylePack,
 } from "@/lib/style-packs";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 
 /** Seed keeps each pack's ground deterministic and comparable across thumbs. */
 const THUMB_SEED = "thumb-cover";
@@ -69,6 +70,8 @@ export function StylePackThumb({
   composition?: PackComposition;
 }) {
   const t = pack.tokens;
+  // Repaint when an admin replaces one of this skin's backgrounds.
+  useSkinBackdropVersion();
   return (
     <div
       aria-hidden
