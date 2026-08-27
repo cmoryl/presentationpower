@@ -147,6 +147,10 @@ function NextHub() {
         }}
       />
 
+      <LivePillars division={division} />
+
+
+
       {/* Registry controls */}
       <div id="registry" className="mt-8 flex scroll-mt-24 flex-wrap items-center gap-2">
         <FilterChip active={group === "all"} onClick={() => setGroup("all")}>
