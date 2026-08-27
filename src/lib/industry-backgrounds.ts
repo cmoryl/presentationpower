@@ -29,7 +29,7 @@ import {
 import { INDUSTRY_SKINS, industrySkinByCode } from "./industry-skins";
 import { skinPackById, skinPackId, stylePackFromSkin } from "./design-skin-pack";
 import { tonedIndustrySceneLayers } from "./industry-scene-art";
-import type { StylePack } from "./style-packs";
+import { packGroundPaint, type StylePack } from "./style-packs";
 import {
   MOTIF_LABEL,
   SKIN_BG_TAKES,
