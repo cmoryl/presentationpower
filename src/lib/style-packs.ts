@@ -31,6 +31,8 @@
 // stays a one-way dependency.
 import { skinPackById, ALL_SKIN_PACKS, skinCodeFromPackId } from "./design-skin-pack";
 import { packGeometry, shapeCss } from "./pack-geometry";
+import { sceneFromSeed } from "./skin-backgrounds";
+import { skinBackdropOverride, sceneTakeFromSeed } from "./skin-backdrop-overrides";
 import { backgroundOverrides, customPackById, customTemplatePacks } from "./template-registry";
 import { withBackgroundOverrides } from "./template-background";
 import { withElementSceneArt } from "./element-scene-art";
@@ -2479,7 +2481,22 @@ export function isCuratedGroundPack(pack: Pick<StylePack, "id">): boolean {
 /** Plane-2 layers a pack actually paints — curated scenes survive intact. */
 export function packGroundPaint(pack: StylePack, seed: string): string[] {
   const layers = pack.ground(seed);
-  return isCuratedGroundPack(pack) ? layers : minimalPackLayers(layers);
+  const base = isCuratedGroundPack(pack) ? layers : minimalPackLayers(layers);
+  // A REPLACED background (background directory → "Edit / replace backgrounds")
+  // is the skin's ground from that moment on: it paints in front of the
+  // procedural scene on every surface that renders through this function —
+  // slide stage, library cards, pack thumbnails, raster and PPTX/PDF exports.
+  // Without this, a replaced S01 cover only showed inside the editor.
+  const id = String(pack.id ?? "");
+  if (/^skin-[sr]\d{2}$/i.test(id)) {
+    const url = skinBackdropOverride(
+      skinCodeFromPackId(id),
+      sceneFromSeed(seed),
+      sceneTakeFromSeed(seed).take,
+    );
+    if (url) return [`url("${url}") center center / cover no-repeat`, ...base];
+  }
+  return base;
 }
 
 export function minimalPackLayers(layers: string[]): string[] {

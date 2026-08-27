@@ -43,9 +43,25 @@ describe("keepBackgroundPaintOnPlate", () => {
     const tick = box({ x: 480, y: 500, w: 4, h: 44, name: "TP Milestone tick" });
     const dot = box({ x: 476, y: 512, w: 18, h: 18, radiusPx: 9, name: "TP Node" });
     const underline = box({ x: 130, y: 900, w: 320, h: 3, fill: { hex: "003FC7", alpha: 0.4 } });
-    const columnRail = box({ x: 400, w: 6, h: 1080, name: "TP Column rule" });
-    const kept = keepBackgroundPaintOnPlate([spine, tick, dot, underline, columnRail], SPACE);
-    expect(kept).toHaveLength(5);
+    const kept = keepBackgroundPaintOnPlate([spine, tick, dot, underline], SPACE);
+    expect(kept).toHaveLength(4);
+  });
+
+  it("parks stage-spanning ground rails on the plate — never as translucent objects", () => {
+    // The comb of full-height translucent strips users kept finding stacked over
+    // dark exports: ground column rails, not module furniture.
+    const rails = [200, 400, 600, 800].map((x) =>
+      box({ x, y: 0, w: 6, h: 1080, fill: { hex: "FFFFFF", alpha: 0.12 }, name: "TP Column rule" }),
+    );
+    const wash = box({
+      x: 0,
+      y: 0,
+      w: 1920,
+      h: 900,
+      fill: { hex: "003FC7", alpha: 0.18 },
+      name: "TP Wash",
+    });
+    expect(keepBackgroundPaintOnPlate([...rails, wash], SPACE)).toEqual([]);
   });
 
   it("keeps pictures unless they cover the whole stage", () => {

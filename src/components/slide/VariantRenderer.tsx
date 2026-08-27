@@ -20,6 +20,7 @@ import {
   SlideModeContext,
   SlideBackdropContext,
   SlideSceneSeedContext,
+  SlideOwnsMediaContext,
   SlideAccentContext,
   SlideInkContext,
   makeSlideInk,
@@ -730,6 +731,17 @@ function VariantRendererInner(props: Props) {
         <SlideAccentContext.Provider value={themedBrand?.tokens?.accent ?? null}>
           <SlideInkContext.Provider value={semanticInk}>
             <SlideBackdropContext.Provider value={backdrop}>
+              {/* Modules that paint their own photography/video keep their own
+                  scrims; every other module lets an authored background image
+                  replace its built-in vector decoration. */}
+              <SlideOwnsMediaContext.Provider
+                value={Boolean(
+                  s((c as Record<string, unknown>).mediaUrl) ||
+                    s((c as Record<string, unknown>).mediaPath) ||
+                    s((c as Record<string, unknown>).videoUrl) ||
+                    s((c as Record<string, unknown>).videoPath),
+                )}
+              >
               {/* Module vocabulary for background selection. The chrome only
                 knows "cover | content | divider | close", which is far too
                 coarse to pick a plate — publish the real module identity so the
@@ -773,6 +785,7 @@ function VariantRendererInner(props: Props) {
                   </div>
                 </SlideFrameCtx.Provider>
               </SlideSceneSeedContext.Provider>
+              </SlideOwnsMediaContext.Provider>
             </SlideBackdropContext.Provider>
           </SlideInkContext.Provider>
         </SlideAccentContext.Provider>

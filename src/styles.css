@@ -1543,3 +1543,18 @@ body.export-mode [data-print-surface] {
     display: none;
   }
 }
+
+/* -----------------------------------------------------------------------------
+   AUTHORED BACKGROUND IMAGERY OUTRANKS LEGACY MODULE VECTOR DECORATION
+   When an author replaces a slide/look background with their own photo (or an
+   AI plate), the module's built-in decoration — accent orbs, ringed spheres,
+   grid washes, gradient sheets — used to keep painting on top of the new
+   picture, so the old template style showed through the replacement. Those
+   layers are pure decoration (aria-hidden, non-interactive), so we retire them
+   for the slides that carry an authored ground. Modules that paint their own
+   photography never get the flag (their scrims are legibility, not leftovers).
+----------------------------------------------------------------------------- */
+[data-slide-content-plane][data-authored-media="1"] > [aria-hidden].pointer-events-none.absolute,
+[data-slide-content-plane][data-authored-media="1"] > * > [aria-hidden].pointer-events-none.absolute.inset-0 {
+  display: none !important;
+}

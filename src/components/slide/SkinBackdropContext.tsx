@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { listSkinBackdrops, type SkinBackdropRow } from "@/lib/skin-backdrop.functions";
+import { setSkinBackdropOverrides } from "@/lib/skin-backdrop-overrides";
 import { skinCodeFromPackId, isSkinPackId } from "@/lib/design-skin-pack";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 
@@ -31,9 +32,13 @@ export function useSkinBackdropImage(
   const map = useSkinBackdropMap();
   if (!packId || !isSkinPackId(packId) || !scene) return null;
   const code = skinCodeFromPackId(packId).toUpperCase();
+  // Any replaced take of this scene counts: an admin who replaced only "Take C"
+  // still expects that artwork on the slides that render this scene.
+  const anyTake = Object.keys(map).find((k) => k.startsWith(`${code}:${String(scene)}:`));
   return (
     map[backdropKey(code, String(scene), take)] ??
     map[backdropKey(code, String(scene), 0)] ??
+    (anyTake ? map[anyTake]! : undefined) ??
     map[backdropKey(code, "cover", 0)] ??
     null
   );
@@ -67,6 +72,12 @@ export function SkinBackdropProvider({
   value: SkinBackdropMap;
   children: ReactNode;
 }) {
+  // Publish into the module-global registry too, so the ground engine itself
+  // (thumbnails, library cards, exporters — anything outside this tree) paints
+  // the replaced artwork instead of the procedural scene.
+  useEffect(() => {
+    setSkinBackdropOverrides(value);
+  }, [value]);
   return <SkinBackdropContext.Provider value={value}>{children}</SkinBackdropContext.Provider>;
 }
 

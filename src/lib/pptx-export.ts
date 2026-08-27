@@ -2338,6 +2338,10 @@ function classifyVariant(id: string, index: number): SlideKind {
     return "cards";
   if (
     v === "MV-PROC-TIMELINE" ||
+    // The rail variant is the same milestone chain with a heavier spine; the
+    // timeline emitter gives it native, grouped milestones instead of a generic
+    // content block.
+    v === "MV-PROC-TIMELINE-RAIL" ||
     v === "MV-PROC-PHASES" ||
     v === "MV-PROC-STEP-CHAIN" ||
     v === "MV-PROC-STEP-SPOTLIGHT" ||
@@ -2505,13 +2509,16 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   const colW = (SLIDE_W - 1.2 - (cols - 1) * 0.3) / cols;
   const y = 2.3;
   items.slice(0, cols).forEach((it, k) => {
+    // Group each stat block (figure + gauge + label) so a KPI rail moves as
+    // units in PowerPoint while every piece stays individually editable.
+    const g = groupScope(s, `stat-${k}`, `Stat ${k + 1}`);
     const x = 0.6 + k * (colW + 0.3);
     const rawValue = str(it.value ?? it.stat ?? it.amount);
     // A meter asserts proportion toward a target, so it is only drawn for a
     // true percentage. Currency, counts, durations and word volumes get NO
     // track and NO fill, and the label reclaims the gauge band.
     const frac = percentGaugeFraction(rawValue, str(it.unit ?? ""));
-    s.addText(
+    g.addText(
       statRuns(rawValue, str(it.unit ?? ""), {
         size: 56,
         color: p.accent,
@@ -2521,13 +2528,14 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
         y,
         w: colW,
         h: 2.0,
+        objectName: `Stat ${k + 1} figure`,
       },
     );
     if (frac !== null) {
-      addGaugeMeter(s as never, { x, y: y + 1.5, w: colW }, p.accent, frac, `Stat gauge ${k + 1}`);
+      addGaugeMeter(g as never, { x, y: y + 1.5, w: colW }, p.accent, frac, `Stat gauge ${k + 1}`);
     }
 
-    s.addText(str(it.label ?? it.narrative ?? ""), {
+    g.addText(str(it.label ?? it.narrative ?? ""), {
       x,
       y: y + (frac === null ? 1.7 : 2.1),
       w: colW,
@@ -2536,6 +2544,7 @@ function renderStats(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       color: p.ink,
       fontFace: "Geist",
       valign: "top",
+      objectName: `Stat ${k + 1} label`,
     });
   });
 }
@@ -2766,16 +2775,20 @@ function renderTimeline(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
   });
 
   items.slice(0, n).forEach((it, k) => {
+    // One group per milestone: node + number + label + body move together while
+    // each stays selectable. The shared spine above stays ungrouped on purpose.
+    const g = groupScope(s, `milestone-${k}`, `Milestone ${k + 1}`);
     const cx = marginX + step * k;
-    s.addShape("ellipse", {
+    g.addShape("ellipse", {
       x: cx,
       y: trackY,
       w: dot,
       h: dot,
       fill: { color: p.primary },
       line: { color: p.primary },
+      objectName: `Milestone ${k + 1} node`,
     });
-    s.addText(String(k + 1), {
+    g.addText(String(k + 1), {
       x: cx,
       y: trackY,
       w: dot,
@@ -2786,9 +2799,10 @@ function renderTimeline(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       fontFace: "Geist",
       align: "center",
       valign: "middle",
+      objectName: `Milestone ${k + 1} number`,
     });
     const boxX = cx + dot / 2 - 1.3;
-    s.addText(str(it.label || it.title || it.name), {
+    g.addText(str(it.label || it.title || it.name), {
       x: boxX,
       y: trackY + dot + 0.15,
       w: 2.6,
@@ -2798,8 +2812,9 @@ function renderTimeline(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       color: p.primary,
       fontFace: "Geist",
       align: "center",
+      objectName: `Milestone ${k + 1} label`,
     });
-    s.addText(str(it.body || it.description || it.detail), {
+    g.addText(str(it.body || it.description || it.detail), {
       x: boxX,
       y: trackY + dot + 0.7,
       w: 2.6,
@@ -2809,6 +2824,7 @@ function renderTimeline(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
       fontFace: "Geist",
       align: "center",
       valign: "top",
+      objectName: `Milestone ${k + 1} body`,
     });
   });
 }
@@ -5271,16 +5287,19 @@ function renderTimelineVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, 
   const n = items.length || 1;
   const rowH = (bottomY - topY) / n;
   items.forEach((it, k) => {
+    // Per-row group: tick + date + label + body. Spine stays ungrouped.
+    const g = groupScope(s, `milestone-${k}`, `Milestone ${k + 1}`);
     const y = topY + k * rowH;
-    s.addShape("ellipse", {
+    g.addShape("ellipse", {
       x: spineX - 0.09,
       y: y + 0.15,
       w: 0.21,
       h: 0.21,
       fill: { color: p.primary },
       line: { color: p.primary },
+      objectName: `Milestone ${k + 1} node`,
     });
-    s.addText(str(it.date).toUpperCase(), {
+    g.addText(str(it.date).toUpperCase(), {
       x: 0.4,
       y: y + 0.05,
       w: 0.95,
@@ -5291,8 +5310,9 @@ function renderTimelineVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, 
       fontFace: "Geist",
       charSpacing: 3,
       align: "right",
+      objectName: `Milestone ${k + 1} date`,
     });
-    s.addText(str(it.label), {
+    g.addText(str(it.label), {
       x: spineX + 0.35,
       y: y + 0.05,
       w: SLIDE_W - spineX - 1.0,
@@ -5301,8 +5321,9 @@ function renderTimelineVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, 
       bold: true,
       color: p.primary,
       fontFace: "Geist",
+      objectName: `Milestone ${k + 1} label`,
     });
-    s.addText(str(it.body), {
+    g.addText(str(it.body), {
       x: spineX + 0.35,
       y: y + 0.5,
       w: SLIDE_W - spineX - 1.0,
@@ -5311,6 +5332,7 @@ function renderTimelineVertical(s: PptxGenJS.Slide, c: Record<string, unknown>, 
       color: p.ink,
       fontFace: "Geist",
       valign: "top",
+      objectName: `Milestone ${k + 1} body`,
     });
   });
 }
@@ -12625,16 +12647,19 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     line: { color: p.accent },
   });
   items.forEach((it, k) => {
+    // Per-step group: node + number + date + label + body. Rail stays ungrouped.
+    const g = groupScope(s, `step-${k}`, `Step ${k + 1}`);
     const y = startY + k * rowH;
-    s.addShape("ellipse", {
+    g.addShape("ellipse", {
       x: trackX - 0.28,
       y: y + 0.15,
       w: 0.56,
       h: 0.56,
       fill: { color: p.primary },
       line: { color: p.primary },
+      objectName: `Step ${k + 1} node`,
     });
-    s.addText(String(k + 1), {
+    g.addText(String(k + 1), {
       x: trackX - 0.28,
       y: y + 0.15,
       w: 0.56,
@@ -12645,8 +12670,9 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       fontFace: "Geist",
       align: "center",
       valign: "middle",
+      objectName: `Step ${k + 1} number`,
     });
-    s.addText(str(it.date || it.when || "").toUpperCase(), {
+    g.addText(str(it.date || it.when || "").toUpperCase(), {
       x: 2.4,
       y: y + 0.1,
       w: 2.2,
@@ -12656,8 +12682,9 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       color: p.accent,
       fontFace: "Geist",
       charSpacing: 4,
+      objectName: `Step ${k + 1} date`,
     });
-    s.addText(str(it.label || it.title || it.name), {
+    g.addText(str(it.label || it.title || it.name), {
       x: 4.7,
       y: y + 0.05,
       w: SLIDE_W - 5.3,
@@ -12666,8 +12693,9 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       bold: true,
       color: p.primary,
       fontFace: "Geist",
+      objectName: `Step ${k + 1} label`,
     });
-    s.addText(str(it.body || it.description), {
+    g.addText(str(it.body || it.description), {
       x: 4.7,
       y: y + 0.55,
       w: SLIDE_W - 5.3,
@@ -12676,6 +12704,7 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       color: p.ink,
       fontFace: "Geist",
       valign: "top",
+      objectName: `Step ${k + 1} body`,
     });
   });
 }

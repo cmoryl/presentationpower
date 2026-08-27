@@ -1209,12 +1209,27 @@ export function keepBackgroundPaintOnPlate(
     // with nothing selectable.
     const vertical = nearFull(s.h, space.h) && thin(s.w, space.w);
     const horizontal = nearFull(s.w, space.w) && thin(s.h, space.h);
-    if (vertical || horizontal) {
-      const atEdge = vertical
-        ? s.x <= space.w * 0.02 || s.x + s.w >= space.w * 0.98
-        : s.y <= space.h * 0.02 || s.y + s.h >= space.h * 0.98;
-      if (atEdge) return false;
-    }
+    // A sliver that runs the FULL stage — top edge to bottom edge, or wall to
+    // wall — is never module furniture: no timeline spine, stat rule or divider
+    // reaches past the layout padding. Those stage-spanning rules are the
+    // ground's column rails / grid lines, and shipping them natively is what
+    // filled dark exports with a comb of translucent vertical strips. They go
+    // back on the flat plate (still visible, just not selectable).
+    if (vertical || horizontal) return false;
+    // Large, text-free, translucent decorative washes (the accent orbs and
+    // gradient sheets behind a dark module) also belong on the plate: as native
+    // objects they are the invisible "transparency objects" users kept finding
+    // stacked over dark slides.
+    const alpha = s.gradient
+      ? Math.max(...s.gradient.stops.map((st) => st.color.alpha), 0)
+      : (s.fill?.alpha ?? 1);
+    const area = s.w * s.h;
+    const decorativeWash =
+      alpha <= 0.34 &&
+      area >= space.w * space.h * 0.35 &&
+      s.w >= space.w * 0.6 &&
+      s.h >= space.h * 0.5;
+    if (decorativeWash) return false;
     return true;
   });
 }
