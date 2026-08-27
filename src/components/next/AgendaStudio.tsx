@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useCanEditNextDivision } from "@/hooks/use-next-edit-permission";
 import { exportAgendaSheet } from "@/lib/next-agenda-export";
 import {
   deleteAgendaFile,
