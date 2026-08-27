@@ -4195,8 +4195,15 @@ function renderVariantBody({
       const after = obj(c.after);
       const rows = arr(c.items).slice(0, 6);
       const rowCount = Math.max(rows.length, 1);
-      const rowH = rowCount > 5 ? 108 : rowCount > 4 ? 122 : 138;
-      const rowFont = rowCount > 5 ? 24 : rowCount > 4 ? 26 : 28;
+      // Fit the stack inside the stage: title + label row + summary band leave
+      // roughly 560px for the pairs, so the row height (and the glyph disc that
+      // rides inside it) steps down as rows are added instead of running off
+      // the bottom of the page.
+      const rowGap = rowCount > 4 ? 10 : 14;
+      const rowH =
+        rowCount > 5 ? 84 : rowCount > 4 ? 96 : rowCount > 3 ? 112 : rowCount > 2 ? 126 : 138;
+      const rowFont = rowCount > 5 ? 20 : rowCount > 4 ? 22 : rowCount > 3 ? 24 : 28;
+      const discSize = Math.min(88, rowH - 24);
       const XIcon = XMark;
       const CheckIcon = Check;
 
@@ -4234,14 +4241,14 @@ function renderVariantBody({
           <div
             className="relative z-10 flex shrink-0 items-center justify-center rounded-full"
             style={{
-              width: 88,
-              height: 88,
+              width: discSize,
+              height: discSize,
               backgroundColor: emphasis ? tone : "transparent",
               border: `2px solid ${tone}`,
               color: emphasis ? fillInk(tone, brand.tokens.primary) : tone,
             }}
           >
-            <Glyph size={40} strokeWidth={2.4} aria-hidden />
+            <Glyph size={Math.round(discSize * 0.45)} strokeWidth={2.4} aria-hidden />
           </div>
           <div
             className="relative min-w-0 pr-8"
@@ -4312,7 +4319,7 @@ function renderVariantBody({
                 </div>
               </div>
             )}
-            <div className="mt-5 flex flex-col" style={{ gap: 14 }}>
+            <div className="mt-5 flex flex-col" style={{ gap: rowGap }}>
               {rows.map((rowRaw, i) => {
                 const row = obj(rowRaw);
                 return (
@@ -12823,7 +12830,7 @@ function renderVariantBody({
           <div className="mt-10 grid gap-12" style={{ gridTemplateColumns: "1.15fr 1fr" }}>
             <div
               className="min-w-0 p-12"
-              style={{ ...moduleCardSurface(brand.tokens.accent, mode), borderRadius: 4 }}
+              style={moduleCardSurface(brand.tokens.accent, mode)}
             >
               <AccentTick accent={brand.tokens.accent} />
               <StatFigure
@@ -12851,7 +12858,6 @@ function renderVariantBody({
                   className="relative min-w-0 overflow-hidden p-8"
                   style={{
                     ...moduleCardSurface(brand.tokens.accent, mode),
-                    borderRadius: 4,
                     gridColumn: spans[i % spans.length],
                   }}
                 >
