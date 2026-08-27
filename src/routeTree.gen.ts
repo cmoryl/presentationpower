@@ -146,6 +146,7 @@ import { Route as KnowledgeBrandGuidesSlugRouteImport } from './routes/knowledge
 import { Route as EventsNextPillarsRouteImport } from './routes/events.next_.pillars'
 import { Route as EventsNextMartRouteImport } from './routes/events.next_.mart'
 import { Route as EventsNextLondonRouteImport } from './routes/events.next_.london'
+import { Route as EventsNextCitySeriesRouteImport } from './routes/events.next_.city-series'
 import { Route as EventsNextCityBadgesRouteImport } from './routes/events.next_.city-badges'
 import { Route as EventsNextBadgesRouteImport } from './routes/events.next_.badges'
 import { Route as EventsNextAgendasRouteImport } from './routes/events.next_.agendas'
@@ -862,6 +863,11 @@ const EventsNextLondonRoute = EventsNextLondonRouteImport.update({
   path: '/next/london',
   getParentRoute: () => EventsRoute,
 } as any)
+const EventsNextCitySeriesRoute = EventsNextCitySeriesRouteImport.update({
+  id: '/next_/city-series',
+  path: '/next/city-series',
+  getParentRoute: () => EventsRoute,
+} as any)
 const EventsNextCityBadgesRoute = EventsNextCityBadgesRouteImport.update({
   id: '/next_/city-badges',
   path: '/next/city-badges',
@@ -1111,6 +1117,7 @@ export interface FileRoutesByFullPath {
   '/events/next/agendas': typeof EventsNextAgendasRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
   '/events/next/city-badges': typeof EventsNextCityBadgesRoute
+  '/events/next/city-series': typeof EventsNextCitySeriesRoute
   '/events/next/london': typeof EventsNextLondonRoute
   '/events/next/mart': typeof EventsNextMartRoute
   '/events/next/pillars': typeof EventsNextPillarsRoute
@@ -1267,6 +1274,7 @@ export interface FileRoutesByTo {
   '/events/next/agendas': typeof EventsNextAgendasRoute
   '/events/next/badges': typeof EventsNextBadgesRoute
   '/events/next/city-badges': typeof EventsNextCityBadgesRoute
+  '/events/next/city-series': typeof EventsNextCitySeriesRoute
   '/events/next/london': typeof EventsNextLondonRoute
   '/events/next/mart': typeof EventsNextMartRoute
   '/events/next/pillars': typeof EventsNextPillarsRoute
@@ -1428,6 +1436,7 @@ export interface FileRoutesById {
   '/events/next_/agendas': typeof EventsNextAgendasRoute
   '/events/next_/badges': typeof EventsNextBadgesRoute
   '/events/next_/city-badges': typeof EventsNextCityBadgesRoute
+  '/events/next_/city-series': typeof EventsNextCitySeriesRoute
   '/events/next_/london': typeof EventsNextLondonRoute
   '/events/next_/mart': typeof EventsNextMartRoute
   '/events/next_/pillars': typeof EventsNextPillarsRoute
@@ -1590,6 +1599,7 @@ export interface FileRouteTypes {
     | '/events/next/agendas'
     | '/events/next/badges'
     | '/events/next/city-badges'
+    | '/events/next/city-series'
     | '/events/next/london'
     | '/events/next/mart'
     | '/events/next/pillars'
@@ -1746,6 +1756,7 @@ export interface FileRouteTypes {
     | '/events/next/agendas'
     | '/events/next/badges'
     | '/events/next/city-badges'
+    | '/events/next/city-series'
     | '/events/next/london'
     | '/events/next/mart'
     | '/events/next/pillars'
@@ -1906,6 +1917,7 @@ export interface FileRouteTypes {
     | '/events/next_/agendas'
     | '/events/next_/badges'
     | '/events/next_/city-badges'
+    | '/events/next_/city-series'
     | '/events/next_/london'
     | '/events/next_/mart'
     | '/events/next_/pillars'
@@ -2983,6 +2995,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsNextLondonRouteImport
       parentRoute: typeof EventsRoute
     }
+    '/events/next_/city-series': {
+      id: '/events/next_/city-series'
+      path: '/next/city-series'
+      fullPath: '/events/next/city-series'
+      preLoaderRoute: typeof EventsNextCitySeriesRouteImport
+      parentRoute: typeof EventsRoute
+    }
     '/events/next_/city-badges': {
       id: '/events/next_/city-badges'
       path: '/next/city-badges'
@@ -3230,6 +3249,7 @@ interface EventsRouteChildren {
   EventsNextAgendasRoute: typeof EventsNextAgendasRoute
   EventsNextBadgesRoute: typeof EventsNextBadgesRoute
   EventsNextCityBadgesRoute: typeof EventsNextCityBadgesRoute
+  EventsNextCitySeriesRoute: typeof EventsNextCitySeriesRoute
   EventsNextLondonRoute: typeof EventsNextLondonRoute
   EventsNextMartRoute: typeof EventsNextMartRoute
   EventsNextPillarsRoute: typeof EventsNextPillarsRoute
@@ -3248,6 +3268,7 @@ const EventsRouteChildren: EventsRouteChildren = {
   EventsNextAgendasRoute: EventsNextAgendasRoute,
   EventsNextBadgesRoute: EventsNextBadgesRoute,
   EventsNextCityBadgesRoute: EventsNextCityBadgesRoute,
+  EventsNextCitySeriesRoute: EventsNextCitySeriesRoute,
   EventsNextLondonRoute: EventsNextLondonRoute,
   EventsNextMartRoute: EventsNextMartRoute,
   EventsNextPillarsRoute: EventsNextPillarsRoute,
