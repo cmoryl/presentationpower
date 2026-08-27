@@ -2374,6 +2374,9 @@ export function packLayoutLayers(pack: StylePack, comp: PackComposition, seed: s
  */
 function curatedScaffoldLayers(pack: StylePack, comp: PackComposition): string[] {
   const t = pack.tokens;
+  // Spatial Clarity is a quiet, edge-free language: even one accent seam reads
+  // as a stray line across the sheet, so it carries no scaffold at all.
+  if (String(pack.id).toLowerCase() === "skin-s01") return [];
   switch (comp) {
     case "cover":
       return [block("left bottom", "34%", "10px", t.accent, 0.9)];
