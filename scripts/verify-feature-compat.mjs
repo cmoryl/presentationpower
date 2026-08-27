@@ -766,7 +766,6 @@ async function main() {
           continue;
         }
         const buf = Buffer.from(cap.pptx.replace(/^data:[^,]+,/, ""), "base64");
-        await writeFile(path.join(OUT_DIR, `${variantId}_${mode}_${fidelity}.pptx`), buf); // SAVE_PPTX
         const pkg = await loadPackage(buf);
         const rows = scorePackage(pkg);
         const worst = rows.some((r) => r.status === "FAIL")
