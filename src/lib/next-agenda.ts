@@ -424,18 +424,20 @@ export function agendaSizePreset(id: string | undefined) {
   return AGENDA_SIZES.find((s) => s.id === id) ?? AGENDA_SIZES[2]!;
 }
 
-/** Resolved sheet geometry in mm. */
+/** Resolved sheet geometry in mm. Screen formats carry exact pixel dimensions
+ *  and no bleed — nothing is trimmed on a display. */
 export function agendaGeometry(config: { sizeId?: string; trimW?: number; trimH?: number }) {
   const preset = agendaSizePreset(config.sizeId);
   const custom = preset.id === "custom";
+  const isScreen = preset.medium === "screen";
   const clampTo = (v: number | undefined, fb: number, r: { min: number; max: number }) => {
     const n = Number(v);
     return Number.isFinite(n) && n > 0 ? Math.min(r.max, Math.max(r.min, n)) : fb;
   };
   const trimW = custom ? clampTo(config.trimW, preset.trimW, AGENDA_CUSTOM_SIZE.w) : preset.trimW;
   const trimH = custom ? clampTo(config.trimH, preset.trimH, AGENDA_CUSTOM_SIZE.h) : preset.trimH;
-  const bleedEdge = AGENDA_SPEC.bleedEdge;
-  const safeInset = Math.max(10, Math.min(30, trimW * 0.07));
+  const bleedEdge = isScreen ? 0 : AGENDA_SPEC.bleedEdge;
+  const safeInset = Math.max(10, Math.min(isScreen ? 34 : 30, trimW * (isScreen ? 0.05 : 0.07)));
   return {
     trimW,
     trimH,
@@ -444,10 +446,15 @@ export function agendaGeometry(config: { sizeId?: string; trimW?: number; trimH?
     bleedH: trimH + bleedEdge * 2,
     safeInset,
     sizeName: preset.name,
-    colorMode: AGENDA_SPEC.colorMode,
-    exportPreset: AGENDA_SPEC.exportPreset,
+    medium: (preset.medium ?? "print") as "print" | "screen",
+    isScreen,
+    pxW: preset.pxW ?? Math.round(trimW / PX_TO_MM),
+    pxH: preset.pxH ?? Math.round(trimH / PX_TO_MM),
+    colorMode: isScreen ? "sRGB (screen)" : AGENDA_SPEC.colorMode,
+    exportPreset: isScreen ? "PNG (sRGB) + vector PDF" : AGENDA_SPEC.exportPreset,
   };
 }
+
 
 export function agendaQrSize(config: AgendaConfig): number {
   const raw = Number(config.qrSize);
