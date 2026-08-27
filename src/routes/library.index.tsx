@@ -95,6 +95,7 @@ import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-
 import { applyBentoPreset, bentoPresetsFor, type BentoPreset } from "@/lib/bento-presets";
 import { listClientLogos } from "@/lib/client-logos.functions";
 import { toLogoFillers, overlayLogoHubFillers, type LogoFiller } from "@/lib/logohub-fillers";
+import { ModuleBackgroundEditor } from "@/components/library/ModuleBackgroundEditor";
 import { SaveModuleDialog } from "@/components/SaveModuleDialog";
 import type { exportDeckToPptx as ExportDeckToPptxFn } from "@/lib/pptx-export";
 // Loaded on demand — pptxgenjs is large and only needed when a user exports.
@@ -3503,7 +3504,19 @@ function VariantDetailModal({
                   <div className="text-black/50">No fallback declared.</div>
                 )}
               </Spec>
+
+              {/* Per-module background replacement. Scoped to this module in the
+                  active look, so the card, this view and every export repaint
+                  while the rest of the look keeps its authored scene. */}
+              <ModuleBackgroundEditor
+                packId={modalPack?.id ?? null}
+                packName={modalPack?.label ?? null}
+                variantId={variant.id}
+                variantName={variant.name}
+                canEdit={isModuleAdmin}
+              />
             </div>
+
           </div>
         </div>
       </div>
@@ -3888,6 +3901,7 @@ function LightboxPortal({
   const effMode: "light" | "dark" = activePack ? activePack.mode : mode;
   const modeLocked = Boolean(activePack);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  const isModuleAdmin = useIsModuleAdmin();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -4049,7 +4063,26 @@ function LightboxPortal({
         </div>
       </div>
 
+      {/* Per-module background replacement — scoped to this module inside the
+          active look, so the card, this view and every export repaint while the
+          rest of the look keeps its authored scene. */}
+      {activePack && (
+        <div
+          className="max-h-[42vh] shrink-0 overflow-y-auto border-t border-white/10 bg-white px-6 py-4"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ModuleBackgroundEditor
+            packId={activePack.id}
+            packName={activePack.label}
+            variantId={variant.id}
+            variantName={variant.name}
+            canEdit={isModuleAdmin}
+          />
+        </div>
+      )}
+
       {/* Bottom hint */}
+
       <div
         className="shrink-0 border-t border-white/10 py-3 text-center text-[11px] text-white/40"
         onClick={(e) => e.stopPropagation()}

@@ -16,13 +16,39 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import { backdropPromptForCode } from "@/lib/skin-backdrop-prompt";
 
+/**
+ * A scene is either one of the authored skin scenes or a MODULE-SCOPED scene
+ * `mod:<VARIANT-ID>` written when an admin replaces the background for a single
+ * module inside a look. Both live in the same table/bucket, so nothing else
+ * about persistence, the public proxy or cache-busting changes.
+ */
+function normalizeScene(scene: string): string {
+  if ((SKIN_SCENES as string[]).includes(scene)) return scene;
+  if (/^mod:[A-Za-z0-9_-]{2,64}$/.test(scene)) return `mod:${scene.slice(4).toUpperCase()}`;
+  return "cover";
+}
+
+/** Storage keys can't carry the `mod:` colon. */
+function scenePathSegment(scene: string): string {
+  return scene.replace(/[^A-Za-z0-9_-]+/g, "_");
+}
+
+/** Authored scene the AI prompt is written from (module scenes have none). */
+function promptSceneFor(scene: string, basis?: string | null): SkinScene {
+  if ((SKIN_SCENES as string[]).includes(scene)) return scene as SkinScene;
+  if (basis && (SKIN_SCENES as string[]).includes(basis)) return basis as SkinScene;
+  return "cover";
+}
+
 const GenerateInput = z.object({
   skinCode: z.string().min(2).max(8),
-  scene: z.string().min(2).max(24),
+  scene: z.string().min(2).max(72),
   /** 0–3: alternate takes of the same skin × scene. */
   take: z.number().int().min(0).max(3).default(0),
   /** Optional extra art direction from the user. */
   note: z.string().max(400).optional().nullable(),
+  /** Authored scene to base the prompt on when `scene` is module-scoped. */
+  basisScene: z.string().max(24).optional().nullable(),
 });
 
 export interface SkinBackdropRow {
@@ -61,10 +87,8 @@ export const generateSkinBackdrop = createServerFn({ method: "POST" })
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY on the server.");
 
-    const scene = (SKIN_SCENES as string[]).includes(data.scene)
-      ? (data.scene as SkinScene)
-      : "cover";
-    const spec = backdropPromptForCode(data.skinCode, scene);
+    const scene = normalizeScene(data.scene);
+    const spec = backdropPromptForCode(data.skinCode, promptSceneFor(scene, data.basisScene));
     if (!spec) throw new Error(`Unknown skin ${data.skinCode}`);
 
     const takeNote = [
@@ -99,7 +123,7 @@ export const generateSkinBackdrop = createServerFn({ method: "POST" })
     if (!b64) throw new Error(json.error?.message ?? "Backdrop generation returned no image.");
 
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    const path = `${data.skinCode}/${scene}-${data.take}-${Date.now()}.png`;
+    const path = `${data.skinCode}/${scenePathSegment(scene)}-${data.take}-${Date.now()}.png`;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const up = await supabaseAdmin.storage
@@ -155,7 +179,7 @@ export const listSkinBackdrops = createServerFn({ method: "GET" }).handler(
 
 const UploadInput = z.object({
   skinCode: z.string().min(2).max(8),
-  scene: z.string().min(2).max(24),
+  scene: z.string().min(2).max(72),
   take: z.number().int().min(0).max(3).default(0),
   /** Base64 payload WITHOUT the data: prefix. */
   base64: z.string().min(32),
@@ -179,13 +203,13 @@ export const uploadSkinBackdrop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => UploadInput.parse(input))
   .handler(async ({ data, context }): Promise<SkinBackdropRow> => {
-    const scene = (SKIN_SCENES as string[]).includes(data.scene) ? data.scene : "cover";
+    const scene = normalizeScene(data.scene);
     const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
     if (bytes.byteLength > 12 * 1024 * 1024) throw new Error("Image is larger than 12 MB.");
 
     const code = data.skinCode.toUpperCase();
     const ext = EXT[data.contentType] ?? "png";
-    const path = `${code}/${scene}-${data.take}-upload-${Date.now()}.${ext}`;
+    const path = `${code}/${scenePathSegment(scene)}-${data.take}-upload-${Date.now()}.${ext}`;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const up = await supabaseAdmin.storage
