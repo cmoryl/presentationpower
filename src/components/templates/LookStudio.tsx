@@ -91,14 +91,25 @@ export const BLANK_DRAFT: CustomTemplate = {
   notes: "",
 };
 
+/** First free `<CODE>-V<n>` fork code, so a forked look is saveable as-is. */
+function nextForkCode(base: string, taken: string[]): string {
+  const root = (base || "S01").toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 9);
+  const used = new Set(taken.map((c) => c.toUpperCase()));
+  for (let n = 1; n < 100; n += 1) {
+    const candidate = `${root}-V${n}`.slice(0, 12);
+    if (!used.has(candidate)) return candidate;
+  }
+  return `${root}-V1`.slice(0, 12);
+}
+
 /** Seed an editable custom look from a catalog pack. */
-function forkFromPack(pack: StylePack): CustomTemplate {
+function forkFromPack(pack: StylePack, takenCodes: string[] = []): CustomTemplate {
   const code = codeForPack(pack);
   const skin = designSkinByCode(code) ?? industrySkinByCode(code);
   const t = pack.tokens;
   return {
     ...BLANK_DRAFT,
-    code: "",
+    code: nextForkCode(code, takenCodes),
     name: `${pack.label} — variant`,
     reference: pack.reference ?? skin?.reference ?? "",
     description: skin?.description ?? pack.tagline ?? "",
