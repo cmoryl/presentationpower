@@ -21,7 +21,7 @@
  *  4. Progress: every phase reports through an optional callback so the UI
  *     can show meaningful status ("Fonts…", "Images…", "Rendering…").
  */
-import { getFontEmbedCSS, toPng } from "html-to-image";
+import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import { beginExportChrome, exportNodeFilter } from "./export-chrome-suppress";
 
@@ -38,14 +38,163 @@ import { beginExportChrome, exportNodeFilter } from "./export-chrome-suppress";
  */
 let fontEmbedCssPromise: Promise<string> | null = null;
 
+/** Families actually used inside the captured node (deduped, quotes stripped). */
+function usedFontFamilies(node: HTMLElement): Set<string> {
+  const families = new Set<string>();
+  const push = (value: string) => {
+    for (const part of value.split(",")) {
+      const name = part.trim().replace(/^["']|["']$/g, "");
+      if (
+        name &&
+        !/^(inherit|initial|unset|sans-serif|serif|monospace|cursive|fantasy|system-ui|ui-[\w-]+)$/i.test(
+          name,
+        )
+      ) {
+        families.add(name);
+      }
+    }
+  };
+  push(getComputedStyle(node).fontFamily || "");
+  for (const el of Array.from(node.querySelectorAll<HTMLElement>("*")).slice(0, 4000)) {
+    push(getComputedStyle(el).fontFamily || "");
+  }
+  return families;
+}
+
+async function fontAsDataUrl(url: string): Promise<string | null> {
+  try {
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) return null;
+    const buf = new Uint8Array(await res.arrayBuffer());
+    let binary = "";
+    for (let i = 0; i < buf.length; i += 0x8000) {
+      binary += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+    }
+    return `data:font/woff2;base64,${btoa(binary)}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Cross-origin webfont fallback. `getFontEmbedCSS` can only read same-origin
+ * stylesheets, so a project whose @font-face rules all live on
+ * fonts.googleapis.com gets back an EMPTY string — and html-to-image then
+ * silently re-collects and refetches every font on EVERY capture, which floods
+ * the network stack (`net::ERR_INSUFFICIENT_RESOURCES`) on multi-plate export
+ * runs and can drop the real typeface from the raster. Fetch those sheets over
+ * CORS ourselves, keep only the @font-face blocks for families the node
+ * actually uses, and inline their woff2 as data URLs. Cached with the rest.
+ */
+async function remoteFontEmbedCSS(node: HTMLElement): Promise<string> {
+  const families = usedFontFamilies(node);
+  if (families.size === 0) return "";
+  const hrefs = Array.from(
+    document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"][href]'),
+  )
+    .map((l) => l.href)
+    .filter((href) => {
+      try {
+        return new URL(href).origin !== window.location.origin;
+      } catch {
+        return false;
+      }
+    });
+
+  // Hard caps: Google's CJK sheets carry hundreds of unicode-range subsets per
+  // family, and inlining all of them would take minutes and megabytes. Latin
+  // subsets are what the plates actually need.
+  const MAX_BLOCKS = 24;
+  const candidates: string[] = [];
+  for (const href of hrefs) {
+    let text = "";
+    try {
+      const res = await fetch(href, { mode: "cors" });
+      if (!res.ok) continue;
+      text = await res.text();
+    } catch {
+      continue;
+    }
+    for (const match of text.matchAll(/@font-face\s*{[^}]*}/g)) {
+      const block = match[0];
+      const family = /font-family:\s*['"]?([^;'"]+)['"]?/.exec(block)?.[1]?.trim();
+      if (!family || !families.has(family)) continue;
+      const range = /unicode-range:\s*([^;]+)/.exec(block)?.[1] ?? "";
+      // Keep the latin subset only (no range declared = single-subset font).
+      if (range && !/U\+0000-00FF|U\+0-00?FF/i.test(range)) continue;
+      candidates.push(block);
+      if (candidates.length >= MAX_BLOCKS) break;
+    }
+    if (candidates.length >= MAX_BLOCKS) break;
+  }
+
+  const resolvedBlocks = await Promise.all(
+    candidates.map(async (block) => {
+      const urls = Array.from(block.matchAll(/url\((https?:\/\/[^)]+)\)/g)).map((m) => m[1]!);
+      let resolved = block;
+      for (const url of urls) {
+        const data = await fontAsDataUrl(url);
+        if (data) resolved = resolved.split(url).join(data);
+      }
+      return resolved.includes("data:font") ? resolved : "";
+    }),
+  );
+  return resolvedBlocks.filter(Boolean).join("\n");
+}
+
+function withFallbackTimeout<T>(work: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise<T>((resolve) => {
+    const timer = setTimeout(() => resolve(fallback), ms);
+    work.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      () => {
+        clearTimeout(timer);
+        resolve(fallback);
+      },
+    );
+  });
+}
+
+/** Same-origin @font-face rules, read straight off the CSSOM. */
+function localFontFaceCSS(): string {
+  const out: string[] = [];
+  for (const sheet of Array.from(document.styleSheets)) {
+    let rules: CSSRuleList | null = null;
+    try {
+      rules = sheet.cssRules;
+    } catch {
+      continue; // cross-origin — handled by remoteFontEmbedCSS
+    }
+    for (const rule of Array.from(rules ?? [])) {
+      if (rule.constructor?.name === "CSSFontFaceRule" || /^@font-face/.test(rule.cssText)) {
+        out.push(rule.cssText);
+      }
+    }
+  }
+  return out.join("\n");
+}
+
 export async function getCachedFontEmbedCSS(node: HTMLElement): Promise<string> {
   if (!fontEmbedCssPromise) {
-    fontEmbedCssPromise = getFontEmbedCSS(node)
-      .then((css) => css ?? "")
-      .catch((err) => {
-        console.warn("[slide-image-export] font embed CSS unavailable; capturing without it", err);
-        return "";
-      });
+    // NOTE: html-to-image's own `getFontEmbedCSS` walks every stylesheet and
+    // downloads EVERY @font-face it finds — with the project's Google Fonts
+    // stack that is hundreds of Noto CJK subsets per export run, which floods
+    // the network stack (`net::ERR_INSUFFICIENT_RESOURCES`) and can abort or
+    // stall a capture. Collect only what the node actually uses instead.
+    fontEmbedCssPromise = (async () => {
+      const local = localFontFaceCSS();
+      const remote = await withFallbackTimeout(remoteFontEmbedCSS(node), 10_000, "");
+      const css = [local, remote].filter(Boolean).join("\n");
+      // A non-null string is what stops html-to-image re-embedding on every
+      // capture; the marker keeps that true even with no embeddable webfont.
+      return css || "/* no embeddable webfonts */";
+    })().catch((err) => {
+      console.warn("[slide-image-export] font embed CSS unavailable; capturing without it", err);
+      return "/* no embeddable webfonts */";
+    });
   }
   return fontEmbedCssPromise;
 }
@@ -291,25 +440,33 @@ export async function ensureFontsReady(
       cs.fontFamily
         .split(",")
         .map((f) => f.trim().replace(/^["']|["']$/g, ""))
+        // Primary family only. Loading fallback stacks pulls in the CJK Noto
+        // families, and each of those is hundreds of unicode-range subsets.
+        .slice(0, 1)
         .filter(Boolean)
-        .slice(0, 2) // primary + first fallback is enough
         .forEach((f) => families.add(f));
     }
     el = walker.nextNode() as Element | null;
   }
+
+  // `fonts.load(font, text)` fetches only the subsets covering that text. Without
+  // it, a single CJK family request downloads every subset it ships (hundreds of
+  // files), which exhausts the browser's socket pool (ERR_INSUFFICIENT_RESOURCES)
+  // and can stall or abort the capture that follows.
+  const sample = (node.textContent ?? "").replace(/\s+/g, " ").slice(0, 2000) || "Ag";
 
   const start = performance.now();
   for (const family of families) {
     if (performance.now() - start > timeoutMs) break;
     try {
       // Probe two common weights at body size.
-      const ok400 = document.fonts.check(`400 16px "${family}"`);
-      const ok700 = document.fonts.check(`700 16px "${family}"`);
+      const ok400 = document.fonts.check(`400 16px "${family}"`, sample);
+      const ok700 = document.fonts.check(`700 16px "${family}"`, sample);
       if (!ok400 || !ok700) {
         await withTimeout(
           Promise.all([
-            document.fonts.load(`400 16px "${family}"`),
-            document.fonts.load(`700 16px "${family}"`),
+            document.fonts.load(`400 16px "${family}"`, sample),
+            document.fonts.load(`700 16px "${family}"`, sample),
           ]).then(() => undefined as unknown as void),
           Math.max(400, timeoutMs - (performance.now() - start)),
           `font ${family}`,
