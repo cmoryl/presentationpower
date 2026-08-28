@@ -17,3 +17,4 @@ export {
 export { Input, type InputProps } from "./components/input";
 export { Textarea, type TextareaProps } from "./components/textarea";
 export { cn } from "./lib/utils";
+export { ELEMENT_DARK, ELEMENT_LIGHT, type ElementThemeTokens } from "./theme";
