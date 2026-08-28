@@ -133,7 +133,12 @@ export function packCompose(pack: StylePack, moduleId?: string | null): PackComp
   const trail = base.bias === "left" ? swing : base.bias === "right" ? 0 : Math.round(swing / 2);
 
   const code = lookCodeFromPackId(pack.id);
-  const override = COMPOSE_OVERRIDE[code] ?? COMPOSE_OVERRIDE[code.replace(/-V\d+$/i, "")];
+  const baseCode = code.replace(/-V\d+$/i, "");
+  const override = COMPOSE_OVERRIDE[code] ?? COMPOSE_OVERRIDE[baseCode];
+  const id = (moduleId ?? "").trim().toUpperCase();
+  const modOverride = id
+    ? (MODULE_COMPOSE_OVERRIDE[`${code}:${id}`] ?? MODULE_COMPOSE_OVERRIDE[`${baseCode}:${id}`])
+    : undefined;
 
   return {
     anchor: base.anchor,
