@@ -109,12 +109,20 @@ function titleText(node: ReactNode): string {
  * untouched, so a trimmed headline keeps the same visual voice.
  */
 const FIT_FLOOR: Record<DisplaySize, number> = {
-  hero: 0.66,
-  cover: 0.7,
-  divider: 0.76,
-  section: 0.8,
-  title: 0.84,
+  hero: 0.78,
+  cover: 0.8,
+  divider: 0.84,
+  section: 0.86,
+  title: 0.9,
 };
+
+/**
+ * Slack before the fit engages: copy up to this multiple of the line budget
+ * keeps the authored size, so a short statement is never trimmed and only genuine
+ * overruns move. Past the knee the curve eases in (cubic) rather than snapping,
+ * so one extra word never produces a visible step.
+ */
+const FIT_KNEE = 1.08;
 
 export function copyFitScale(
   text: string,
@@ -127,12 +135,18 @@ export function copyFitScale(
   const spec = DISPLAY_SPECS[size];
   // Geist at display sizes averages ~0.5em per character.
   const perLine = Math.max(6, Math.floor(maxWidthPx / (spec.fontSize * 0.5)));
-  const budget = perLine * lineBudget;
+  const budget = perLine * lineBudget * FIT_KNEE;
   if (chars <= budget) return 1;
-  // Area scales with the square of the type size, so the fit follows sqrt.
-  const fit = Math.sqrt(budget / chars);
-  return Number(Math.max(FIT_FLOOR[size], Math.min(1, fit)).toFixed(3));
+  const floor = FIT_FLOOR[size];
+  // Area scales with the square of the type size, so the raw fit follows sqrt.
+  const raw = Math.sqrt(budget / chars);
+  // Ease the first stop of shrink in smoothly: `t` is 0 at the knee and 1 once
+  // the copy is far past it, and the floor is approached, never overshot.
+  const t = Math.min(1, (chars / budget - 1) / 0.75);
+  const eased = 1 - (1 - raw) * (t * t * (3 - 2 * t));
+  return Number(Math.max(floor, Math.min(1, eased)).toFixed(3));
 }
+
 
 export function DisplayTitle({
   children,
