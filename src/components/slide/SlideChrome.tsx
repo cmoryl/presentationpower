@@ -1307,30 +1307,42 @@ export function SlideFrame({
                 : undefined
             }
             data-pack-compose={compose ? compose.plate : undefined}
-            className="absolute inset-0 px-24"
+            className="absolute inset-0"
             style={{
               // Cover-mode top-center logo is xl; add breathing room so titles
-              // don't kiss the wordmark.
-              paddingTop: topCenterLogo && variant === "cover" ? 224 : 128,
+              // don't kiss the wordmark. Otherwise the module's own spacing
+              // token decides the top reserve.
+              paddingTop: topCenterLogo && variant === "cover" ? 224 : spacing.padTop,
               // Bottom logos: reserve enough room for the lockup (≈ 72px) plus
-              // the 96px inset above the footer. Also pushes clear of the footer
+              // the inset above the footer. Also pushes clear of the footer
               // (~62px band) even without a logo.
-              paddingBottom: bottomLogo ? 208 : 96,
+              paddingBottom: bottomLogo ? spacing.padBottom + 112 : spacing.padBottom,
+              paddingLeft: spacing.padX,
+              paddingRight: spacing.padX,
               // Always a column: a module's main block can then claim the height
               // it needs with `slide-fill-stretch` instead of leaving the lower
               // half of the sheet as a dead band under a single row of content.
               display: "flex",
               flexDirection: "column" as const,
+              ...spacingVars(spacing),
               ...(compose
                 ? {
-                    paddingLeft: 96 + compose.lead,
-                    paddingRight: 96 + compose.trail,
+                    paddingLeft: spacing.padX + compose.lead,
+                    paddingRight: spacing.padX + compose.trail,
                     alignItems: align,
                     justifyContent: justify,
                     ...composeVars(compose),
                   }
                 : null),
+              // Opt-in section separator, owned by the module (never sheet-wide).
+              ...(spacing.ruleTop > 0
+                ? {
+                    borderTop: `${spacing.ruleTop}px solid ${brand.tokens.accent}`,
+                    backgroundImage: "none",
+                  }
+                : null),
             }}
+
           >
             {compose && plate ? (
               <HeroPlate
