@@ -349,6 +349,15 @@ const OWNED_LOOK_IDENTITY: Record<string, { name: string; reference: string }> =
   },
 };
 
+/**
+ * The product-brand identity for a look, when one owns it. Listings that build
+ * their own label from the raw recipe (the approved background directory) read
+ * this so an owned look never appears under its generic sector name.
+ */
+export function ownedLookIdentity(code: string | null | undefined) {
+  return OWNED_LOOK_IDENTITY[(code ?? "").trim().toUpperCase()] ?? null;
+}
+
 /** One industry recipe → one fully specified design language. */
 export function industrySkinFromRecipe(recipe: IndustryRecipe): DesignSkin {
   const detail = INDUSTRY_DETAIL[recipe.id]!;

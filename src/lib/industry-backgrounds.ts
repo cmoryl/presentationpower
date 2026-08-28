@@ -26,7 +26,7 @@ import {
   type DesignSkin,
   type IndustryRecipe,
 } from "./design-skins";
-import { INDUSTRY_SKINS, industrySkinByCode } from "./industry-skins";
+import { INDUSTRY_SKINS, industrySkinByCode, ownedLookIdentity } from "./industry-skins";
 import { skinPackById, skinPackId, stylePackFromSkin } from "./design-skin-pack";
 import { tonedIndustrySceneLayers } from "./industry-scene-art";
 import { packGroundPaint, type StylePack } from "./style-packs";
@@ -158,7 +158,9 @@ function buildSet(skin: DesignSkin): IndustryBackgroundSet {
   return {
     recipeId: skin.code,
     packId: pack.id,
-    name: recipe.name,
+    // A look a product brand owns (DataForce · AI & Data Signature) lists under
+    // the brand name here too, not the generic sector name on its recipe.
+    name: ownedLookIdentity(skin.code)?.name ?? recipe.name,
     recipe,
     skin,
     motif: motifFamilyFor(skin),
