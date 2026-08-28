@@ -15,7 +15,19 @@ import { repackPptxBlob } from "./pptx-repack";
 export interface TerminalHygieneReport {
   duplicateShapeIdsFixed: number;
   chartsFixed: number;
+  textRunsFixed: number;
   packageEntriesFixed: number;
+}
+
+/** Preserve intentional leading/trailing spaces per DrawingML's XML contract. */
+export function preserveDrawingTextWhitespace(xml: string): { xml: string; fixed: number } {
+  let fixed = 0;
+  const next = xml.replace(/<a:t>([\s\S]*?)<\/a:t>/g, (all, text: string) => {
+    if (!/^\s|\s$/.test(text)) return all;
+    fixed += 1;
+    return `<a:t xml:space="preserve">${text}</a:t>`;
+  });
+  return { xml: next, fixed };
 }
 
 /** Re-assert invariants on the exact final package that will be downloaded. */
@@ -26,6 +38,7 @@ export async function applyTerminalPptxHygiene(
   const report: TerminalHygieneReport = {
     duplicateShapeIdsFixed: 0,
     chartsFixed: 0,
+    textRunsFixed: 0,
     packageEntriesFixed: 0,
   };
 
@@ -37,9 +50,11 @@ export async function applyTerminalPptxHygiene(
           if (!file) continue;
           const xml = await file.async("string");
           const fixed = dedupeShapeIds(xml);
-          if (fixed.renumbered > 0) {
-            zip.file(name, fixed.xml);
+          const spaced = preserveDrawingTextWhitespace(fixed.xml);
+          if (fixed.renumbered > 0 || spaced.fixed > 0) {
+            zip.file(name, spaced.xml);
             report.duplicateShapeIdsFixed += fixed.renumbered;
+            report.textRunsFixed += spaced.fixed;
           }
           continue;
         }
@@ -63,6 +78,7 @@ export async function applyTerminalPptxHygiene(
     if (
       report.duplicateShapeIdsFixed > 0 ||
       report.chartsFixed > 0 ||
+      report.textRunsFixed > 0 ||
       report.packageEntriesFixed > 0
     ) {
       console.info("[pptx-terminal-hygiene]", report);

@@ -1,8 +1,21 @@
 import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
-import { applyTerminalPptxHygiene } from "../pptx-terminal-hygiene";
+import {
+  applyTerminalPptxHygiene,
+  preserveDrawingTextWhitespace,
+} from "../pptx-terminal-hygiene";
 
 describe("terminal PowerPoint hygiene", () => {
+  it("marks DrawingML runs whose intentional edge whitespace must be preserved", () => {
+    const result = preserveDrawingTextWhitespace(
+      '<a:t>plain</a:t><a:t> leading</a:t><a:t>trailing </a:t><a:t xml:space="preserve"> kept </a:t>',
+    );
+    expect(result.fixed).toBe(2);
+    expect(result.xml).toContain('<a:t xml:space="preserve"> leading</a:t>');
+    expect(result.xml).toContain('<a:t xml:space="preserve">trailing </a:t>');
+    expect(result.xml).toContain('<a:t xml:space="preserve"> kept </a:t>');
+  });
+
   it("deduplicates shape ids even when a deck contains no video", async () => {
     const zip = new JSZip();
     zip.file(
