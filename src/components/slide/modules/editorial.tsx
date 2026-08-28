@@ -39,7 +39,6 @@ import { fillPx, statPx, clampLines } from "@/lib/open-space-fill";
 import { useSlideInk } from "../SlideChrome";
 import type { CSSProperties } from "react";
 
-export type { CSSProperties as _KitCss, Item as _KitItem };
 
 registerSlideModule({
   id: "family:editorial",
