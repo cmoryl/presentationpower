@@ -50,9 +50,19 @@ export const LOOK_GLYPH_COLOR: Record<string, string> = {
   R03: "#139DD8",
 };
 
+/**
+ * A saved/edited look (`tpl-…`) is authored by an admin in Template Studio, so
+ * its own palette is the authority — the owning brand's hard lock only applies
+ * to the shipped catalog pack. Without this, editing the DataForce look's
+ * accents in the studio appeared to revert on every render surface.
+ */
+function isAuthoredPack(id: string): boolean {
+  return /^tpl-/i.test(id);
+}
+
 /** Glyph colour a look forces on its icons, or null to follow the accent. */
 export function lookGlyphColor(packIdOrCode: string | null | undefined): string | null {
-  if (!packIdOrCode) return null;
+  if (!packIdOrCode || isAuthoredPack(packIdOrCode)) return null;
   const code = lookCodeFromPackId(packIdOrCode);
   return LOOK_GLYPH_COLOR[code] ?? LOOK_GLYPH_COLOR[code.replace(/-V\d+$/i, "")] ?? null;
 }
