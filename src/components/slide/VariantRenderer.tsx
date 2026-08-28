@@ -104,6 +104,9 @@ import {
   orbitSegmentAlpha,
 } from "@/lib/orbit-label-layout";
 
+import { findSlideModule } from "./module-registry";
+import "./modules/viz";
+
 import { HouseArrow } from "./HouseArrow";
 import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
