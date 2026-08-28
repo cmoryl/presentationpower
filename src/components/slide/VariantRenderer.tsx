@@ -104,6 +104,9 @@ import {
   orbitSegmentAlpha,
 } from "@/lib/orbit-label-layout";
 
+import { findSlideModule } from "./module-registry";
+import "./modules/viz";
+
 import { HouseArrow } from "./HouseArrow";
 import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
@@ -158,7 +161,6 @@ import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { useClientLogoMark, useClientLogoPool } from "@/lib/client-logo-pool";
 import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 
-import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
 
 // CLIENT logo chip for case-study modules. Resolution order:
@@ -898,19 +900,25 @@ function renderVariantBody({
     );
   }
 
-  // Spec-driven MV-VIZ-* family renders through the InfographicSpec pipeline.
-
-  if (variant.id.startsWith("MV-VIZ-")) {
-    return (
-      <InfographicSlideModule
-        slide={slide}
-        variant={variant}
-        brand={brand}
-        pageNumber={pageNumber}
-        mode={mode}
-      />
-    );
+  // Module registry first: families that have been extracted out of the legacy
+  // switch below claim their variants here (see module-registry.ts). Anything
+  // unclaimed falls through to the switch, so extraction is incremental.
+  const registered = findSlideModule(variant.id);
+  if (registered) {
+    return registered.render({
+      slide,
+      variant,
+      brand,
+      pageNumber,
+      c,
+      mode,
+      clientName,
+      clientLogoUrl,
+      dash,
+      bareSurfaces,
+    });
   }
+
 
   switch (variant.id) {
     // ── Opening ────────────────────────────────────────────────────────
