@@ -150,11 +150,41 @@ export type KitNumberedListProps = {
   items: Item[];
 };
 
+export type KitDashMetricVizProps = {
+  brand: BrandMode;
+  kind: DashChart;
+  percent: number;
+  size?: number;
+  bloom?: boolean;
+  series?: number[];
+  value?: string;
+  unit?: string;
+};
+
+export type KitDashSeriesVizProps = {
+  brand: BrandMode;
+  kind: DashChart;
+  series: { label: string; value: number }[];
+  height?: number;
+  highlight?: string;
+};
+
+export type KitSummaryStatCardProps = {
+  brand: BrandMode;
+  label: string;
+  value: string;
+  unit: string;
+  series: number[];
+};
+
 type KitPrimitives = {
   IconBadge: (p: KitIconBadgeProps) => ReactElement | null;
   NumberedList: (p: KitNumberedListProps) => ReactElement | null;
   MediaTile: (p: KitMediaTileProps) => ReactElement | null;
   Sparkline: (p: KitSparklineProps) => ReactElement | null;
+  DashMetricViz: (p: KitDashMetricVizProps) => ReactElement | null;
+  DashSeriesViz: (p: KitDashSeriesVizProps) => ReactElement | null;
+  SummaryStatCard: (p: KitSummaryStatCardProps) => ReactElement | null;
 };
 
 let primitives: KitPrimitives | null = null;
