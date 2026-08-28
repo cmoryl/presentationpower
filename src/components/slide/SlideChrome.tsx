@@ -934,6 +934,36 @@ export function SlideFrame({
                     : null),
                 }}
               />
+              {/* 2m — motion ground: when an admin has put an approved brand
+                  clip behind this section, the clip itself plays here (over the
+                  poster frame that the ground stack paints for static surfaces)
+                  with the treatment's scrim on top, so present/share matches
+                  the Background Tuner instead of showing only the still. */}
+              {sectionMotion && !reducedMotion && (
+                <video
+                  key={sectionMotion.url}
+                  aria-hidden
+                  data-decorative="true"
+                  data-section-motion={sectionMotion.variant}
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+                  src={sectionMotion.url}
+                  poster={sectionMotion.poster ?? undefined}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                />
+              )}
+              {sectionMotion && (
+                <div
+                  aria-hidden
+                  data-decorative="true"
+                  data-section-motion-scrim="true"
+                  className="pointer-events-none absolute inset-0"
+                  style={{ background: sectionMotion.scrim }}
+                />
+              )}
               {/* 2b — calm veil: field-coloured wash concentrated over the
                   reading zone; the outer frame keeps the plate's texture. */}
               {!replacedGround && authoredPlateGround && calm.veilAlpha > 0 && (
