@@ -23,4 +23,13 @@ describe("pack composition", () => {
       expect(composeSummary(c).length).toBeGreaterThan(10);
     }
   });
+
+  it("keeps Spatial Clarity free of outer composition frames", () => {
+    const spatialClarity = ALL_SKIN_PACKS.find((pack) => String(pack.id) === "skin-s01");
+    expect(spatialClarity).toBeDefined();
+    if (!spatialClarity) return;
+
+    expect(packCompose(spatialClarity).plate).toBe("none");
+    expect(packCompose(spatialClarity, "MV-CLOSE-CONTACT").plate).toBe("none");
+  });
 });
