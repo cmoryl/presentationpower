@@ -84,6 +84,19 @@ describe("module conformance matrix", () => {
     for (const id of ["MV-QUOTE-MULTI", "MV-QUOTE-PORTRAIT", "MV-QUOTE-CARD", "MV-QUOTE-METRIC", "MV-QUOTE-POSTER"]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Logo walls: the mark-resolution rules (and "logo wins over client name")
+    // stay under `modules/logos.tsx`.
+    for (const id of [
+      "MV-PROOF-LOGOS",
+      "MV-CASE-LOGO-GRID",
+      "MV-PROOF-LOGOS-STRIP",
+      "MV-PROOF-LOGOS-MARQUEE",
+      "MV-PROOF-LOGOS-FEATURED",
+      "MV-PROOF-LOGOS-CATEGORIZED",
+      "MV-PROOF-LOGOS-MOSAIC",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
     for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
       expect(registeredModuleIds()).toContain(id);
