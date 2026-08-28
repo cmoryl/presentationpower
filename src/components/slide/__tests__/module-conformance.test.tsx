@@ -146,6 +146,33 @@ describe("module conformance matrix", () => {
     ]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Narrative family: context cards, pillars, insights and proof stats.
+    for (const id of [
+      "MV-CTX-CARDS-2",
+      "MV-CTX-CARDS-3",
+      "MV-CTX-CARDS-4",
+      "MV-CTX-COST",
+      "MV-CTX-STAT-GRID",
+      "MV-CTX-TREND",
+      "MV-CTX-CHALLENGE-STACK",
+      "MV-SOL-PILLARS-2",
+      "MV-SOL-PILLARS-3",
+      "MV-SOL-PILLARS-4",
+      "MV-SOL-PILLARS-5",
+      "MV-SOL-ARCHITECTURE",
+      "MV-SOL-FEATURE-LIST",
+      "MV-INS-CALLOUT",
+      "MV-INS-BIG-IDEA",
+      "MV-INS-SO-WHAT",
+      "MV-INS-QUOTE",
+      "MV-INS-OPPORTUNITY-SIZE",
+      "MV-PROOF-STATS-2",
+      "MV-PROOF-STATS-3",
+      "MV-PROOF-STATS-4",
+      "MV-PROOF-TESTIMONIAL",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Info-graphic family: orbits, donuts, funnels and diagrams.
     for (const id of [
       "MV-INFO-HUB-SATELLITES",
