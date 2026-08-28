@@ -17,6 +17,8 @@ import { SceneSlideStage } from "@/components/templates/SceneSlideStage";
 import { saveTemplate } from "@/lib/templates.functions";
 import { loadTemplateRegistry } from "@/lib/template-loader";
 import { templateToPack, type CustomTemplate } from "@/lib/custom-templates";
+import { withOverrides } from "@/lib/style-packs";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 import { Field, inputCls, PALETTE_LABELS, DENSITIES } from "./fields";
 
 const TYPE_CHARACTER = [
@@ -96,17 +98,23 @@ export function LookThemeEditor({
       return { ...d, palette };
     });
 
-  // Live pack: the same adapter the catalog and deck renderers use.
+  // Live pack: the same adapter the catalog and deck renderers use — and then
+  // the SAME background treatment (authored plates + admin replacement art +
+  // tuning) every other surface applies, so the cover/stats slides below match
+  // what the Backgrounds tuner saved instead of showing the untouched ground.
+  const bdVersion = useSkinBackdropVersion();
   const livePack = useMemo(() => {
     try {
-      return templateToPack({
+      const pack = templateToPack({
         ...draft,
         palette: draft.palette.map((c) => normalizeHex(c) || c),
       });
+      return withOverrides(pack, (draft.code || code).trim().toUpperCase());
     } catch {
       return null;
     }
-  }, [draft]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draft, code, bdVersion]);
 
   async function persist() {
     setBusy(true);
