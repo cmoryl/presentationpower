@@ -44,6 +44,8 @@ import {
   useSkinBackdropVersion,
 } from "@/lib/skin-backdrop-overrides";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
+import { moduleSpacing, spacingVars } from "@/lib/module-spacing";
+
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
 import { overrideFor } from "@/lib/template-registry";
@@ -1264,6 +1266,12 @@ export function SlideFrame({
           genuinely different layout from look to look. */}
       {(() => {
         const compose = pack ? packCompose(pack) : null;
+        // Section separation is a per-MODULE decision, not a look-wide one:
+        // each module resolves its own top rule / padding / gutters from the
+        // spacing tokens (see module-spacing.ts) so no global plate reaches
+        // across the catalogue.
+        const spacing = moduleSpacing(pack, moduleIdFromSeed(moduleSeed) ?? layoutId ?? variant);
+
         // Horizontal bias also only shapes the hero chrome. On a content module
         // `flex-end` / `center` collapses the child to its intrinsic width,
         // which is what left half-empty sheets behind — content stretches.
@@ -1301,24 +1309,28 @@ export function SlideFrame({
                 : undefined
             }
             data-pack-compose={compose ? compose.plate : undefined}
-            className="absolute inset-0 px-24"
+            className="absolute inset-0"
             style={{
               // Cover-mode top-center logo is xl; add breathing room so titles
-              // don't kiss the wordmark.
-              paddingTop: topCenterLogo && variant === "cover" ? 224 : 128,
+              // don't kiss the wordmark. Otherwise the module's own spacing
+              // token decides the top reserve.
+              paddingTop: topCenterLogo && variant === "cover" ? 224 : spacing.padTop,
               // Bottom logos: reserve enough room for the lockup (≈ 72px) plus
-              // the 96px inset above the footer. Also pushes clear of the footer
+              // the inset above the footer. Also pushes clear of the footer
               // (~62px band) even without a logo.
-              paddingBottom: bottomLogo ? 208 : 96,
+              paddingBottom: bottomLogo ? spacing.padBottom + 112 : spacing.padBottom,
+              paddingLeft: spacing.padX,
+              paddingRight: spacing.padX,
               // Always a column: a module's main block can then claim the height
               // it needs with `slide-fill-stretch` instead of leaving the lower
               // half of the sheet as a dead band under a single row of content.
               display: "flex",
               flexDirection: "column" as const,
+              ...spacingVars(spacing),
               ...(compose
                 ? {
-                    paddingLeft: 96 + compose.lead,
-                    paddingRight: 96 + compose.trail,
+                    paddingLeft: spacing.padX + compose.lead,
+                    paddingRight: spacing.padX + compose.trail,
                     alignItems: align,
                     justifyContent: justify,
                     ...composeVars(compose),
@@ -1326,6 +1338,23 @@ export function SlideFrame({
                 : null),
             }}
           >
+            {/* Opt-in section separator, owned by the module: a short accent
+                rule spanning `ruleSpan` of the column — never a sheet-wide
+                hairline inherited from the look. */}
+            {spacing.ruleTop > 0 && (
+              <span
+                aria-hidden
+                style={{
+                  display: "block",
+                  height: spacing.ruleTop,
+                  width: `${Math.round(spacing.ruleSpan * 100)}%`,
+                  background: brand.tokens.accent,
+                  marginBottom: 28,
+                  flex: "0 0 auto",
+                }}
+              />
+            )}
+
             {compose && plate ? (
               <HeroPlate
                 className={heroChrome ? "w-full" : "flex min-h-0 w-full flex-1 flex-col"}
