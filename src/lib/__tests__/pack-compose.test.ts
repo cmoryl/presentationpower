@@ -25,7 +25,7 @@ describe("pack composition", () => {
   });
 
   it("keeps Spatial Clarity free of outer composition frames", () => {
-    const spatialClarity = ALL_SKIN_PACKS.find((pack) => pack.id === "skin-s01");
+    const spatialClarity = ALL_SKIN_PACKS.find((pack) => String(pack.id) === "skin-s01");
     expect(spatialClarity).toBeDefined();
     if (!spatialClarity) return;
 
