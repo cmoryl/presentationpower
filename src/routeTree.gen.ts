@@ -51,6 +51,7 @@ import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetI
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
+import { Route as PublicIconsRouteImport } from './routes/public.icons'
 import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
@@ -79,6 +80,7 @@ import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-v
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
 import { Route as DevModuleCatalogRouteImport } from './routes/dev.module-catalog'
 import { Route as DevMapExportParityRouteImport } from './routes/dev.map-export-parity'
+import { Route as DevLibraryShowcaseRouteImport } from './routes/dev.library-showcase'
 import { Route as DevLayerDiffRouteImport } from './routes/dev.layer-diff'
 import { Route as DevImageFormatVerifyRouteImport } from './routes/dev.image-format-verify'
 import { Route as DevImageBenchRouteImport } from './routes/dev.image-bench'
@@ -381,6 +383,11 @@ const PublicModulesRoute = PublicModulesRouteImport.update({
   path: '/public/modules',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicIconsRoute = PublicIconsRouteImport.update({
+  id: '/public/icons',
+  path: '/public/icons',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrintAgentThreadIdRoute = PrintAgentThreadIdRouteImport.update({
   id: '/print-agent/$threadId',
   path: '/print-agent/$threadId',
@@ -520,6 +527,11 @@ const DevModuleCatalogRoute = DevModuleCatalogRouteImport.update({
 const DevMapExportParityRoute = DevMapExportParityRouteImport.update({
   id: '/dev/map-export-parity',
   path: '/dev/map-export-parity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevLibraryShowcaseRoute = DevLibraryShowcaseRouteImport.update({
+  id: '/dev/library-showcase',
+  path: '/dev/library-showcase',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevLayerDiffRoute = DevLayerDiffRouteImport.update({
@@ -1063,6 +1075,7 @@ export interface FileRoutesByFullPath {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/library-showcase': typeof DevLibraryShowcaseRoute
   '/dev/map-export-parity': typeof DevMapExportParityRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
@@ -1091,6 +1104,7 @@ export interface FileRoutesByFullPath {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
+  '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1222,6 +1236,7 @@ export interface FileRoutesByTo {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/library-showcase': typeof DevLibraryShowcaseRoute
   '/dev/map-export-parity': typeof DevMapExportParityRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
@@ -1250,6 +1265,7 @@ export interface FileRoutesByTo {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
+  '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1386,6 +1402,7 @@ export interface FileRoutesById {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/library-showcase': typeof DevLibraryShowcaseRoute
   '/dev/map-export-parity': typeof DevMapExportParityRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
@@ -1414,6 +1431,7 @@ export interface FileRoutesById {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
+  '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1551,6 +1569,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/library-showcase'
     | '/dev/map-export-parity'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
@@ -1579,6 +1598,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/print-agent/$threadId'
+    | '/public/icons'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1710,6 +1730,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/library-showcase'
     | '/dev/map-export-parity'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
@@ -1738,6 +1759,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/print-agent/$threadId'
+    | '/public/icons'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1873,6 +1895,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/library-showcase'
     | '/dev/map-export-parity'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
@@ -1901,6 +1924,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/print-agent/$threadId'
+    | '/public/icons'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -2007,6 +2031,7 @@ export interface RootRouteChildren {
   DevImageBenchRoute: typeof DevImageBenchRoute
   DevImageFormatVerifyRoute: typeof DevImageFormatVerifyRoute
   DevLayerDiffRoute: typeof DevLayerDiffRoute
+  DevLibraryShowcaseRoute: typeof DevLibraryShowcaseRoute
   DevMapExportParityRoute: typeof DevMapExportParityRoute
   DevModuleCatalogRoute: typeof DevModuleCatalogRoute
   DevModuleSheetRoute: typeof DevModuleSheetRoute
@@ -2025,6 +2050,7 @@ export interface RootRouteChildren {
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
   PrintAgentThreadIdRoute: typeof PrintAgentThreadIdRoute
+  PublicIconsRoute: typeof PublicIconsRoute
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -2356,6 +2382,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicModulesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/public/icons': {
+      id: '/public/icons'
+      path: '/public/icons'
+      fullPath: '/public/icons'
+      preLoaderRoute: typeof PublicIconsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/print-agent/$threadId': {
       id: '/print-agent/$threadId'
       path: '/print-agent/$threadId'
@@ -2550,6 +2583,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/map-export-parity'
       fullPath: '/dev/map-export-parity'
       preLoaderRoute: typeof DevMapExportParityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/library-showcase': {
+      id: '/dev/library-showcase'
+      path: '/dev/library-showcase'
+      fullPath: '/dev/library-showcase'
+      preLoaderRoute: typeof DevLibraryShowcaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/layer-diff': {
@@ -3418,6 +3458,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevImageBenchRoute: DevImageBenchRoute,
   DevImageFormatVerifyRoute: DevImageFormatVerifyRoute,
   DevLayerDiffRoute: DevLayerDiffRoute,
+  DevLibraryShowcaseRoute: DevLibraryShowcaseRoute,
   DevMapExportParityRoute: DevMapExportParityRoute,
   DevModuleCatalogRoute: DevModuleCatalogRoute,
   DevModuleSheetRoute: DevModuleSheetRoute,
@@ -3436,6 +3477,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
   PrintAgentThreadIdRoute: PrintAgentThreadIdRoute,
+  PublicIconsRoute: PublicIconsRoute,
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,

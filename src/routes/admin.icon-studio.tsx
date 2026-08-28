@@ -407,10 +407,15 @@ function ApprovedSetsTab() {
       <p className="text-[11px] text-black/55 dark:text-white/55">
         Same source as{" "}
         <Link to="/knowledge/icon-library" className="underline">
-          the public approved icon library
+          the internal approved icon library
         </Link>{" "}
+        and the shareable{" "}
+        <a href="/public/icons" target="_blank" rel="noreferrer" className="underline">
+          public download page (/public/icons)
+        </a>{" "}
         — governance edits here stay in sync everywhere icons are drawn.
       </p>
+
     </section>
   );
 }
