@@ -17,6 +17,8 @@ import { SceneSlideStage } from "@/components/templates/SceneSlideStage";
 import { saveTemplate } from "@/lib/templates.functions";
 import { loadTemplateRegistry } from "@/lib/template-loader";
 import { templateToPack, type CustomTemplate } from "@/lib/custom-templates";
+import { withOverrides } from "@/lib/style-packs";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 import { Field, inputCls, PALETTE_LABELS, DENSITIES } from "./fields";
 
 const TYPE_CHARACTER = [
