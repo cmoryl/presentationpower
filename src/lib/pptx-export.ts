@@ -1489,7 +1489,7 @@ export async function exportDeckToPptx(
               theme: {
                 divisionId: brand.id,
                 mode: slideMode,
-                accent: resolveSlideAccent(sl, brand),
+                accent: resolveSlideAccent(sl, renderBrand),
                 primary: `#${palette.primary}`,
                 ink: slideMode === "dark" ? "#FFFFFF" : `#${palette.ink}`,
                 surface: slideMode === "dark" ? `#${palette.primary}` : "#FFFFFF",
@@ -1699,7 +1699,7 @@ export async function exportDeckToPptx(
       const isDark = resolveSlideDark(i);
       // Per-slide accent override (`content.accentOverride`) — resolved with
       // the shared helper so PPTX matches the on-screen renderer exactly.
-      const slideAccent = resolveSlideAccent(slide, brand).replace("#", "");
+      const slideAccent = resolveSlideAccent(slide, renderBrand).replace("#", "");
       const slidePalette = adaptPaletteForMode({ ...palette, accent: slideAccent }, isDark);
       const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
       const hideFooter = useWhiteLogo;
