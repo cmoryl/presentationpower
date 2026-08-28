@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STYLE_PACKS } from "@/lib/style-packs";
+import { APPROVED_STYLE_PACKS } from "@/lib/style-packs";
 
 /**
  * Bare-surface guard.
