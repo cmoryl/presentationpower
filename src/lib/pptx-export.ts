@@ -84,6 +84,7 @@ import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
 import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
+import { fetchPptxVideo, placeSlideVideo, type PptxVideoAsset } from "./pptx-video";
 import { effectivePack } from "./effective-pack";
 import { packField, packToneBrand, stylePackById, type StylePack } from "./style-packs";
 
