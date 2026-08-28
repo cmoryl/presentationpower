@@ -18,6 +18,7 @@ import {
   SlideFrame,
   SlideTitle,
   arr,
+  lastWord,
   obj,
   s,
   strs,
@@ -25,16 +26,26 @@ import {
 } from "../module-kit";
 import {
   Attribution,
+  DisplayTitle,
   Hairline,
+  SlideNumeral,
+  SoftDivider,
   Kicker,
   MetaRow,
   QuoteMark,
   StatFigure,
   SupportingText,
 } from "../primitives";
-import { AuroraOrb, GlassTile, moduleCardSurface } from "../flagship";
+import {
+  AuroraOrb,
+  EditorialTitle,
+  GlassTile,
+  PullQuote,
+  StatRail,
+  moduleCardSurface,
+} from "../flagship";
 import { SummaryBand, readSummary } from "../SummaryBand";
-import { accentInk } from "@/lib/accent-tokens";
+import { accentInk, hexA } from "@/lib/accent-tokens";
 import { iconByName } from "@/lib/icon-library";
 import { fillPx } from "@/lib/open-space-fill";
 import { statGradient } from "@/lib/stat-contrast";
