@@ -1313,7 +1313,25 @@ export function VariantSampleStudio({
             )}
           </div>
 
-          {tab === "bulk" ? (
+          {tab === "background" ? (
+            <div className="dark mt-3 text-white">
+              {pack ? (
+                <ModuleBackgroundEditor
+                  packId={pack.id}
+                  packName={pack.label ?? pack.id}
+                  variantId={variant.id}
+                  variantName={variant.name}
+                  canEdit
+                />
+              ) : (
+                <p className="rounded-lg border border-white/12 bg-[#03002C]/45 p-3 text-[11px] text-white/60">
+                  Pick an approved look in the library first — module backgrounds are stored per
+                  look, so the studio needs to know which template you are editing.
+                </p>
+              )}
+            </div>
+          ) : tab === "bulk" ? (
+
             <BulkStylePanel
               variant={variant}
               brand={brand}
