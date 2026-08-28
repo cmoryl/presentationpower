@@ -3656,6 +3656,9 @@ export type Database = {
           tint: string | null
           tint_strength: number
           updated_at: string
+          video_poster_url: string | null
+          video_url: string | null
+          video_variant: string | null
         }
         Insert: {
           created_at?: string
@@ -3671,6 +3674,9 @@ export type Database = {
           tint?: string | null
           tint_strength?: number
           updated_at?: string
+          video_poster_url?: string | null
+          video_url?: string | null
+          video_variant?: string | null
         }
         Update: {
           created_at?: string
@@ -3686,6 +3692,9 @@ export type Database = {
           tint?: string | null
           tint_strength?: number
           updated_at?: string
+          video_poster_url?: string | null
+          video_url?: string | null
+          video_variant?: string | null
         }
         Relationships: []
       }

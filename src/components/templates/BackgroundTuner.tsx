@@ -26,6 +26,12 @@ import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { BackdropSourcePicker, divisionImageUrl } from "./BackdropSourcePicker";
 import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { SceneSlideStage } from "./SceneSlideStage";
+import {
+  MOTION_TREATMENTS,
+  hasMotionGround,
+  motionTreatment,
+  selectableMotionClips,
+} from "@/lib/template-motion";
 
 import type { BackdropShot } from "./BackdropLightbox";
 
@@ -199,6 +205,9 @@ export function BackgroundTuner({
           sceneSwap: from.sceneSwap ?? null,
           imageUrl: from.imageUrl ?? null,
           imagePriority: from.imagePriority ?? "front",
+          videoUrl: from.videoUrl ?? null,
+          videoPosterUrl: from.videoPosterUrl ?? null,
+          videoVariant: from.videoVariant ?? null,
 
           note: from.note ?? "",
         },
@@ -526,6 +535,7 @@ export function BackgroundTuner({
                 s === scene ? previewLayers : layersFor(o ?? defaultOverride(code, s), s);
               const on = s === scene;
               const custom = s === scene ? !!edit.imageUrl : !!o?.imageUrl;
+              const motion = hasMotionGround(s === scene ? edit : o);
               const uploading = uploadingScene === s;
               return (
                 <div
@@ -563,7 +573,12 @@ export function BackgroundTuner({
                     >
                       {SCENE_LABEL[s] ?? s}
                     </span>
-                    {o && (
+                    {motion && (
+                      <span className="shrink-0 rounded-full bg-black/80 px-1.5 py-0.5 text-[9px] font-semibold text-white dark:bg-white/20">
+                        ▶ motion
+                      </span>
+                    )}
+                    {o && !motion && (
                       <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-semibold text-[#003FC7]">
                         edited
                       </span>
@@ -858,6 +873,129 @@ export function BackgroundTuner({
                 >
                   Use on all sections
                 </button>
+              </div>
+            )}
+          </div>
+        </details>
+
+        {/* motion ground — approved brand clips, per section */}
+        <details
+          open={hasMotionGround(edit)}
+          className="rounded-2xl border border-black/10 bg-white/70 p-4 dark:border-white/15 dark:bg-white/[0.03]"
+        >
+          <summary className="cursor-pointer text-[11px] font-semibold">
+            Run a video behind this section
+            {hasMotionGround(edit) && (
+              <span className="ml-2 rounded-full bg-black/80 px-2 py-0.5 text-[10px] font-semibold text-white dark:bg-white/20">
+                {motionTreatment(edit.videoVariant)?.label ?? "on"}
+              </span>
+            )}
+          </summary>
+          <div className="mt-3 space-y-3">
+            <p className="text-[11px] opacity-60">
+              Pick an approved brand clip, then choose how it is treated on this section. Stills and
+              tinting still apply — motion sits in front of the artwork.
+            </p>
+
+            <div>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.14em] opacity-60">
+                Clip
+              </span>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  aria-pressed={!edit.videoUrl}
+                  onClick={() => {
+                    upd("videoUrl", null);
+                    upd("videoPosterUrl", null);
+                    upd("videoVariant", null);
+                  }}
+                  className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${
+                    !edit.videoUrl
+                      ? "border-[#003FC7] bg-[#003FC7] text-white"
+                      : "border-black/12 dark:border-white/15"
+                  }`}
+                >
+                  No video
+                </button>
+                {selectableMotionClips().map((v) => {
+                  const on = edit.videoUrl === v.url;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      aria-pressed={on}
+                      title={v.description}
+                      onClick={() => {
+                        upd("videoUrl", v.url);
+                        upd("videoPosterUrl", v.posterUrl ?? null);
+                        if (!edit.videoVariant) upd("videoVariant", "cover");
+                      }}
+                      className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${
+                        on
+                          ? "border-[#003FC7] bg-[#003FC7]/[0.08] text-[#003FC7]"
+                          : "border-black/12 dark:border-white/15"
+                      }`}
+                    >
+                      {v.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {edit.videoUrl && (
+              <div>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] opacity-60">
+                  Treatment
+                </span>
+                <div className="mt-1.5 grid grid-cols-3 gap-2">
+                  {MOTION_TREATMENTS.map((t) => {
+                    const on = edit.videoVariant === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        aria-pressed={on}
+                        title={`${t.hint} · ${t.variantId}`}
+                        onClick={() => upd("videoVariant", t.id)}
+                        className="text-left"
+                      >
+                        <span
+                          className={`relative block aspect-[16/9] w-full overflow-hidden rounded-lg border ${
+                            on
+                              ? "border-[#003FC7] ring-2 ring-[#003FC7]/30"
+                              : "border-black/10 dark:border-white/15"
+                          }`}
+                        >
+                          <video
+                            src={edit.videoUrl ?? undefined}
+                            poster={edit.videoPosterUrl ?? undefined}
+                            muted
+                            loop
+                            playsInline
+                            autoPlay
+                            aria-hidden="true"
+                            className="absolute inset-0 h-full w-full object-cover"
+                          />
+                          <span
+                            className="absolute inset-0"
+                            style={{ background: t.scrim }}
+                            aria-hidden="true"
+                          />
+                        </span>
+                        <span className="mt-1 block text-[10px] font-semibold">{t.label}</span>
+                        <span className="block text-[9px] leading-tight opacity-55">{t.hint}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {hasMotionGround(edit) && (
+                  <p className="mt-2 text-[10px] opacity-55">
+                    Renders as {motionTreatment(edit.videoVariant)?.variantId} on the{" "}
+                    {SCENE_LABEL[scene] ?? scene} section. Exports fall back to the poster still.
+                  </p>
+                )}
               </div>
             )}
           </div>

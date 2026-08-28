@@ -34,6 +34,13 @@ export interface TemplateBackgroundOverride {
    */
   imagePriority?: "front" | "behind";
 
+  /** Approved brand clip played as this section's motion ground. */
+  videoUrl?: string | null;
+  /** Poster still shown before/behind the clip (and used by exports). */
+  videoPosterUrl?: string | null;
+  /** How the clip is treated on the section. */
+  videoVariant?: "cover" | "full-bleed" | "quote-motion" | null;
+
   note?: string;
 }
 
