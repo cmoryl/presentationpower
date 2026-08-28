@@ -1,169 +1,31 @@
-@import "tailwindcss" source(none);
-@source "../src";
+@import "./design-system/element/styles/theme.css";
 @import "tw-animate-css";
-@import "@fontsource-variable/geist";
-@import "@fontsource-variable/geist-mono";
-
-@custom-variant dark (&:is(.dark *));
+@source "../src";
 
 /*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * The Element library owns shared tokens, Tailwind mappings, Geist font files,
+ * and light/dark values. This app stylesheet only extends that theme with
+ * app-specific roles and scales.
  */
 
 @theme inline {
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
-  --radius-sm: calc(var(--radius) - 4px);
-
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-
-  /* Icon ink scale — semantic, theme-aware replacements for the old
-     opacity-based `text-black/NN` / `text-white/NN` icon styles.
-     `icon-inverse*` is for icons locked to dark surfaces (overlays, drawers). */
-  --color-icon: var(--icon);
-  --color-icon-muted: var(--icon-muted);
-  --color-icon-subtle: var(--icon-subtle);
-  --color-icon-inverse: var(--icon-inverse);
-  --color-icon-inverse-muted: var(--icon-inverse-muted);
-  --color-icon-inverse-subtle: var(--icon-inverse-subtle);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  /* Light values are kept identical to the Element library theme
-   * (src/design-system/element/styles/theme.css) so the app and the published
-   * library never render the same token differently. Only app-only tokens
-   * (popover, brief-*, tp-accent-*) live here without a library counterpart. */
-  --foreground: oklch(0.1371 0.0889 271.22); /* Blue 800 #03002C */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.1371 0.0889 271.22);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.1371 0.0889 271.22);
-  --primary: oklch(0.42 0.24 265); /* TP Blue 500 #003FC7 */
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.1371 0.0889 271.22);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.9311 0.0863 193.97); /* TP Aqua #A1FBF9 */
-  --accent-foreground: oklch(0.1371 0.0889 271.22); /* TP Blue 800 #03002C */
-  --destructive: oklch(0.611 0.2068 29.48); /* TP Red #E53D2E */
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.42 0.24 265);
-  --chart-1: oklch(0.42 0.24 265); /* Blue 500 */
-  --chart-2: oklch(0.9311 0.0863 193.97); /* Aqua */
-  --chart-3: oklch(0.7774 0.1318 298.81); /* Lavender */
-  --chart-4: oklch(0.9316 0.1527 100.8); /* Yellow */
-  --chart-5: oklch(0.7837 0.1331 43.69); /* Peach */
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.1371 0.0889 271.22);
-  --sidebar-primary: oklch(0.42 0.24 265);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.1371 0.0889 271.22);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.42 0.24 265);
-
-  --icon: color-mix(in oklab, var(--foreground) 80%, transparent);
-  --icon-muted: color-mix(in oklab, var(--foreground) 58%, transparent);
-  /* 46% keeps subtle icons at 3.3:1 on white — AA for non-text graphics. */
-  --icon-subtle: color-mix(in oklab, var(--foreground) 46%, transparent);
-  --icon-inverse: rgba(255, 255, 255, 0.88);
-  --icon-inverse-muted: rgba(255, 255, 255, 0.62);
-  --icon-inverse-subtle: rgba(255, 255, 255, 0.45);
 }
 
-/* ELEMENT dark theme.
- * Surfaces walk the Blue 800 ink ramp (#03002C -> #1A1A55); text is Blue White
- * (#E0E8F5); primary lifts Blue 500 (#003FC7) to #4C7DF0 so it clears AA on
- * deep navy. Charts use the tertiary pops + Aqua / Lavender secondaries. */
 .dark {
-  --background: oklch(0.1371 0.0889 271.22); /* Blue 800 #03002C */
-  --foreground: oklch(0.9288 0.0196 260.17); /* Blue White #E0E8F5 */
-  --card: oklch(0.1744 0.0701 276.31); /* #0A0A2E */
-  --card-foreground: oklch(0.9288 0.0196 260.17);
-  --popover: oklch(0.2136 0.0898 276.53); /* #111041 */
+  --popover: oklch(0.2136 0.0898 276.53);
   --popover-foreground: oklch(0.9288 0.0196 260.17);
-  --primary: oklch(0.6153 0.181 264.37); /* Blue 500 lifted #4C7DF0 */
-  --primary-foreground: oklch(0.1371 0.0889 271.22);
-  --secondary: oklch(0.2136 0.0898 276.53);
-  --secondary-foreground: oklch(0.9288 0.0196 260.17);
-  --muted: oklch(0.2136 0.0898 276.53);
-  --muted-foreground: oklch(0.7511 0.0316 260.17);
-  --accent: oklch(0.2614 0.104 276.44); /* #1A1A55 */
-  --accent-foreground: oklch(0.9311 0.0863 193.97); /* Aqua #A1FBF9 */
-  --destructive: oklch(0.611 0.2068 29.48); /* Red #E53D2E */
-  --destructive-foreground: oklch(0.9612 0 89.88);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.6153 0.181 264.37);
-  --chart-1: oklch(0.6153 0.181 264.37); /* Blue 500 lifted */
-  --chart-2: oklch(0.9311 0.0863 193.97); /* Aqua */
-  --chart-3: oklch(0.7774 0.1318 298.81); /* Lavender */
-  --chart-4: oklch(0.9316 0.1527 100.8); /* Yellow */
-  --chart-5: oklch(0.7837 0.1331 43.69); /* Peach */
-  --sidebar: oklch(0.1744 0.0701 276.31);
-  --sidebar-foreground: oklch(0.9288 0.0196 260.17);
-  --sidebar-primary: oklch(0.6153 0.181 264.37);
-  --sidebar-primary-foreground: oklch(0.1371 0.0889 271.22);
-  --sidebar-accent: oklch(0.2614 0.104 276.44);
-  --sidebar-accent-foreground: oklch(0.9311 0.0863 193.97);
-  --sidebar-border: oklch(1 0 0 / 12%);
-  --sidebar-ring: oklch(0.6153 0.181 264.37);
-  --icon: color-mix(in oklab, var(--foreground) 82%, transparent);
-  --icon-muted: color-mix(in oklab, var(--foreground) 62%, transparent);
-  --icon-subtle: color-mix(in oklab, var(--foreground) 46%, transparent);
 }
 
 @layer base {
