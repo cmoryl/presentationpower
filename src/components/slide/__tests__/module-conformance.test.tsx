@@ -115,7 +115,10 @@ describe("module conformance matrix", () => {
       "MV-PROC-STEP-CHAIN",
       "MV-PROC-PHASES",
       "MV-PROC-STEP-SPOTLIGHT",
+      "MV-PROC-STAGE-ORBITS",
+      "MV-PROC-BEFORE-AFTER",
     ]) {
+
       expect(registeredModuleIds()).toContain(id);
     }
     // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
