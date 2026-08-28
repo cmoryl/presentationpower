@@ -13,7 +13,7 @@ import { APPROVED_STYLE_PACKS } from "@/lib/style-packs";
  *   - a bare card carries no border, no shadow, no blur
  */
 describe("bare surface style", () => {
-  const s21 = STYLE_PACKS.find((p) => p.id === "skin-s21");
+  const s21 = APPROVED_STYLE_PACKS.find((p) => p.id === "skin-s21");
 
   it("S21 (Organic Systems) resolves to a fully transparent card", () => {
     expect(s21, "skin-s21 must exist").toBeTruthy();
@@ -24,7 +24,7 @@ describe("bare surface style", () => {
   });
 
   it("no other pack accidentally resolves to a transparent card", () => {
-    const transparentPacks = STYLE_PACKS.filter((p) => p.card.bg === "transparent").map(
+    const transparentPacks = APPROVED_STYLE_PACKS.filter((p) => p.card.bg === "transparent").map(
       (p) => p.id,
     );
     expect(transparentPacks).toEqual(["skin-s21"]);
