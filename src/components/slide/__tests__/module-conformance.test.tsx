@@ -117,6 +117,14 @@ describe("module conformance matrix", () => {
       "MV-PROC-STEP-SPOTLIGHT",
       "MV-PROC-STAGE-ORBITS",
       "MV-PROC-BEFORE-AFTER",
+      "MV-PROC-ARC-FLOW",
+      "MV-PROC-TIMELINE-RAIL",
+      "MV-PROC-JOURNEY-VERTICAL",
+      "MV-PROC-SWIMLANE-FLOW",
+      "MV-PROC-LAYER-STACK",
+      "MV-PROC-PROOF-PAIRS",
+      "MV-PROC-PLATFORM-LOOP",
+      "MV-PROC-BEFORE-AFTER-SPLIT",
     ]) {
 
       expect(registeredModuleIds()).toContain(id);
