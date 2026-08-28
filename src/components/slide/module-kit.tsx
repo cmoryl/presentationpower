@@ -19,6 +19,7 @@ import type {
   IconSizeToken,
   IconTreatment,
 } from "@/lib/iconography";
+import type { DashChart } from "@/lib/dash-look";
 
 export type Item = Record<string, unknown>;
 
