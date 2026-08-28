@@ -3833,19 +3833,21 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
     // like the screen's `mt-auto` block.
     const titlePt = px(isAnchor ? 46 : 28);
     const bodyPt = px(isAnchor ? 24 : 20);
-    // Title box hugs its copy: a tall fixed box left a dead gap between the
-    // title and the body paragraph that the on-screen card does not have.
-    const titleH = isAnchor ? 0.82 : 0.46;
-    // Dense mosaics (7–8 cells) leave short tiles, and the old fixed reserve
+    // Dense mosaics (7–8 cells) leave short tiles. The old fixed reserve
     // (`cell.h - pad*2 - 1.1`) went NEGATIVE there — a negative <a:ext cy> is
     // invalid OOXML, so PowerPoint threw "found a problem with content" and
-    // repaired the deck by collapsing those boxes on top of each other.
-    // Derive the copy block from the space that actually remains and never let
-    // it fall below a single line.
+    // repaired the deck, stacking the title and copy on the same spot. Both
+    // boxes are now derived from the space the tile actually has, and the copy
+    // is dropped rather than overlapped when a tile cannot hold two blocks.
     const ruleGap = 0.2;
-    const avail = cell.h - pad * 2 - titleH - ruleGap;
-    const bodyH = Math.max(0.3, Math.min(avail, (isAnchor ? 3 : 2) * 0.44));
-    const blockY = Math.max(cell.y + pad + ruleGap, cell.y + cell.h - pad - bodyH - titleH);
+    const inner = Math.max(0.3, cell.h - pad * 2 - ruleGap);
+    // Title box hugs its copy: a tall fixed box left a dead gap between the
+    // title and the body paragraph that the on-screen card does not have.
+    const titleH = Math.min(isAnchor ? 0.82 : 0.46, inner * 0.55);
+    const bodyH = Math.min(inner - titleH, (isAnchor ? 3 : 2) * 0.44);
+    const showBody = bodyH >= 0.24 && str(it.body).length > 0;
+    const blockH = titleH + (showBody ? bodyH : 0);
+    const blockY = Math.max(cell.y + pad + ruleGap, cell.y + cell.h - pad - blockH);
 
     g.addShape("rect", {
       x: cell.x + pad,
@@ -3868,18 +3870,21 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       valign: "top",
       lineSpacingMultiple: 1.08,
     });
-    g.addText(str(it.body), {
-      x: cell.x + pad,
-      y: blockY + titleH,
-      w: cell.w - pad * 2,
-      h: bodyH,
-      fontSize: bodyPt,
-      color: p.ink,
-      fontFace: "Geist",
-      valign: "top",
-      lineSpacingMultiple: 1.4,
-    });
+    if (showBody) {
+      g.addText(str(it.body), {
+        x: cell.x + pad,
+        y: blockY + titleH,
+        w: cell.w - pad * 2,
+        h: bodyH,
+        fontSize: bodyPt,
+        color: p.ink,
+        fontFace: "Geist",
+        valign: "top",
+        lineSpacingMultiple: 1.4,
+      });
+    }
   });
+
 }
 
 // 1b. MV-BENTO-VALUE-CLOSE — promise band, value grid, close band.
