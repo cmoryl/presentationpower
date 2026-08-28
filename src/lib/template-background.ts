@@ -16,6 +16,7 @@
 
 import { sceneFromSeed, SKIN_SCENES } from "./skin-backgrounds";
 import { overrideFor, type TemplateBackgroundOverride } from "./template-registry";
+import { motionTreatment } from "./template-motion";
 import type { StylePack } from "./style-packs";
 
 const HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
@@ -55,6 +56,9 @@ export function defaultOverride(skinCode: string, scene: string): TemplateBackgr
     sceneSwap: null,
     imageUrl: null,
     imagePriority: "front",
+    videoUrl: null,
+    videoPosterUrl: null,
+    videoVariant: null,
     note: "",
   };
 }
@@ -65,7 +69,10 @@ export function isNeutralOverride(o: TemplateBackgroundOverride): boolean {
     Math.abs(o.intensity - 1) < 0.01 &&
     (!o.tint || o.tintStrength <= 0.01) &&
     !o.sceneSwap &&
-    !o.imageUrl
+    !o.imageUrl &&
+    // A motion ground is a real override: static surfaces (thumbnails, PDF and
+    // PPTX) paint its poster frame + treatment scrim instead of the clip.
+    !(o.videoUrl && o.videoVariant)
   );
 }
 
@@ -86,7 +93,16 @@ export function composeOverrideLayers(
   const intensity = Math.max(0, Math.min(2, Number(o.intensity ?? 1)));
   const out: string[] = [];
   const priority = imagePriorityOf(o);
-  const image = o.imageUrl ? `url("${o.imageUrl}") center center / cover no-repeat` : null;
+  const motion = o.videoUrl && o.videoVariant ? motionTreatment(o.videoVariant) : null;
+  const motionStill = motion && o.videoPosterUrl ? o.videoPosterUrl : null;
+  // The poster frame stands in for the clip wherever video cannot play, so the
+  // section reads the same in previews, thumbnails and exports.
+  const image = motionStill
+    ? `url("${motionStill}") center center / cover no-repeat`
+    : o.imageUrl
+      ? `url("${o.imageUrl}") center center / cover no-repeat`
+      : null;
+  if (motion) out.push(motion.scrim);
 
   if (o.tint && o.tintStrength > 0) {
     out.push(flat(withAlpha(o.tint, Math.min(0.85, o.tintStrength))));
