@@ -27,7 +27,7 @@ const CLIPS = [
 const clip = (i: number) => CLIPS[i % CLIPS.length];
 
 // Approved DataForce brand motion (asset CDN, no expiry).
-import { DATAFORCE_HERO_VIDEO_URL } from "./brand-videos";
+import { DATAFORCE_HERO_POSTER_URL, DATAFORCE_HERO_VIDEO_URL } from "./brand-videos";
 
 export type VideoSlideExample = {
   key: string;
@@ -95,7 +95,7 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       "Edge-to-edge motion with a small overlay caption — for vision statements and section dividers.",
     content: {
       title: "Everywhere your customer is.",
-      caption: "24 offices · 90 countries · one operating model.",
+      body: "24 offices · 90 countries · one operating model.",
       videoUrl: clip(3).v,
       videoPosterUrl: clip(3).p,
     },
