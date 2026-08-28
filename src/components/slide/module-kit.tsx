@@ -215,6 +215,27 @@ export function Sparkline(props: KitSparklineProps) {
   return Impl ? <Impl {...props} /> : null;
 }
 
+export function DashMetricViz(props: KitDashMetricVizProps) {
+  const Impl = primitives?.DashMetricViz;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function DashSeriesViz(props: KitDashSeriesVizProps) {
+  const Impl = primitives?.DashSeriesViz;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function SummaryStatCard(props: KitSummaryStatCardProps) {
+  const Impl = primitives?.SummaryStatCard;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+/** Coerce a content-bag series into finite numbers. */
+export function toNums(v: unknown): number[] {
+  if (!Array.isArray(v)) return [];
+  return v.map((x) => (typeof x === "number" ? x : Number(x))).filter((n) => Number.isFinite(n));
+}
+
 
 /**
  * Ink that reads on a SOLID accent fill. `ink.onSurface` tints a colour for the
