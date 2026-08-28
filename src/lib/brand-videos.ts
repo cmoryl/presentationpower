@@ -11,6 +11,7 @@
 // -----------------------------------------------------------------------------
 
 import dataforceHero from "@/assets/dataforce-hero-2025.mp4.asset.json";
+import dataforceHeroPoster from "@/assets/dataforce-hero-2025-poster.jpg";
 
 export type BrandVideo = {
   id: string;
@@ -33,6 +34,7 @@ export const BRAND_VIDEOS: BrandVideo[] = [
     description:
       "The approved DataForce brand film loop: AI data capture and annotation motion in DataForce Green and Blue. Cleared as a full-bleed background for covers, statements and image-led modules.",
     url: dataforceHero.url,
+    posterUrl: dataforceHeroPoster,
     usage: ["Cover backgrounds", "Full-bleed module backgrounds", "Quote / statement grounds"],
   },
 ];
@@ -54,3 +56,6 @@ export function brandVideoById(id: string): BrandVideo | null {
 
 /** Convenience: the DataForce brand loop used across DataForce surfaces. */
 export const DATAFORCE_HERO_VIDEO_URL = dataforceHero.url;
+
+/** Poster still for the DataForce loop — the frame static surfaces paint. */
+export const DATAFORCE_HERO_POSTER_URL = dataforceHeroPoster;
