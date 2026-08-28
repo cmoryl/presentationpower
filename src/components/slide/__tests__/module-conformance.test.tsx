@@ -87,7 +87,9 @@ describe("module conformance matrix", () => {
     // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
     for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
       expect(registeredModuleIds()).toContain(id);
+    }
     // Graph family: charts must keep drawing through `charts.tsx` +
+
     // `chart-primitives.tsx` so the build and the PPTX export share geometry.
     for (const id of [
       "MV-GRAPH-YEAR-SERIES",
