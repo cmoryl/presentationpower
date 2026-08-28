@@ -176,6 +176,10 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       prospect: "DataForce",
       date: "2026",
       videoUrl: DATAFORCE_HERO_VIDEO_URL,
+      // Every example ships the poster still: it is what thumbnails, PDF and
+      // PPTX render, and it is the first frame on screen before the clip
+      // decodes — without it the card is a black rectangle.
+      videoPosterUrl: DATAFORCE_HERO_POSTER_URL,
     },
   },
   {
@@ -185,10 +189,14 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     title: "DataForce · Full-bleed motion",
     blurb:
       "DataForce brand loop behind a single statement — the default motion background for DataForce full-bleed modules.",
+    // MV-IMG-FULL-BLEED reads `title` + `body` (not headline/caption), so those
+    // keys are what actually render.
     content: {
-      headline: "Training data that holds up under audit.",
-      caption: "Contributor networks in 170+ languages, annotated to spec and measured every batch.",
+      kicker: "Training data",
+      title: "Training data that holds up under audit.",
+      body: "Contributor networks in 170+ languages, annotated to spec and measured every batch.",
       videoUrl: DATAFORCE_HERO_VIDEO_URL,
+      videoPosterUrl: DATAFORCE_HERO_POSTER_URL,
     },
   },
   {
@@ -201,10 +209,13 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     content: {
       quote:
         "DataForce gave us evaluation data we could defend to our own model-risk committee.",
-      attribution: "Head of Applied AI · Global Technology Platform",
+      attribution: "Head of Applied AI",
+      role: "Global Technology Platform",
       videoUrl: DATAFORCE_HERO_VIDEO_URL,
+      videoPosterUrl: DATAFORCE_HERO_POSTER_URL,
     },
   },
+
 ];
 
 export const VIDEO_EXAMPLE_VARIANT_IDS: ReadonlySet<string> = new Set(
