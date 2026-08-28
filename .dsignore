@@ -1,0 +1,7 @@
+# Preview-only product implementation. The reusable surface is exported by src/index.ts.
+src/components/**
+src/hooks/**
+src/integrations/**
+src/lib/**
+src/server.ts
+src/start.ts
