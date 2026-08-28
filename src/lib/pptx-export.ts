@@ -1818,11 +1818,21 @@ export async function exportDeckToPptx(
         imgData &&
         variantSupportsImagery(slide.variantId)
       ) {
-        s.addImage({
-          data: imgData,
-          ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H),
-          objectName: "TP Photo",
-        });
+        // A motion slide ships the CLIP as the full-bleed plane (its poster is
+        // the media cover, so nothing regresses in print/PDF); a still slide
+        // ships the photograph. Either way the brand scrim below goes on top,
+        // keeping copy legible in PowerPoint's own playback.
+        const nativeVideo = slideVideos[i];
+        if (nativeVideo) {
+          placeSlideVideo(s, nativeVideo, { x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+        } else {
+          s.addImage({
+            data: imgData,
+            ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H),
+            objectName: "TP Photo",
+          });
+        }
+
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
         // through while remaining legible under the renderer's text.
