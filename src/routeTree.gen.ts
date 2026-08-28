@@ -51,6 +51,7 @@ import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetI
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
+import { Route as PublicIconsRouteImport } from './routes/public.icons'
 import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
@@ -379,6 +380,11 @@ const PublicStylesRoute = PublicStylesRouteImport.update({
 const PublicModulesRoute = PublicModulesRouteImport.update({
   id: '/public/modules',
   path: '/public/modules',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicIconsRoute = PublicIconsRouteImport.update({
+  id: '/public/icons',
+  path: '/public/icons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrintAgentThreadIdRoute = PrintAgentThreadIdRouteImport.update({
@@ -1091,6 +1097,7 @@ export interface FileRoutesByFullPath {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
+  '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1250,6 +1257,7 @@ export interface FileRoutesByTo {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
+  '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1414,6 +1422,7 @@ export interface FileRoutesById {
   '/library/my': typeof LibraryMyRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
+  '/public/icons': typeof PublicIconsRoute
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
@@ -1579,6 +1588,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/print-agent/$threadId'
+    | '/public/icons'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1738,6 +1748,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/print-agent/$threadId'
+    | '/public/icons'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -1901,6 +1912,7 @@ export interface FileRouteTypes {
     | '/library/my'
     | '/library/print'
     | '/print-agent/$threadId'
+    | '/public/icons'
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
@@ -2025,6 +2037,7 @@ export interface RootRouteChildren {
   LibraryMyRoute: typeof LibraryMyRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
   PrintAgentThreadIdRoute: typeof PrintAgentThreadIdRoute
+  PublicIconsRoute: typeof PublicIconsRoute
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -2354,6 +2367,13 @@ declare module '@tanstack/react-router' {
       path: '/public/modules'
       fullPath: '/public/modules'
       preLoaderRoute: typeof PublicModulesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/icons': {
+      id: '/public/icons'
+      path: '/public/icons'
+      fullPath: '/public/icons'
+      preLoaderRoute: typeof PublicIconsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/print-agent/$threadId': {
@@ -3436,6 +3456,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryMyRoute: LibraryMyRoute,
   LibraryPrintRoute: LibraryPrintRoute,
   PrintAgentThreadIdRoute: PrintAgentThreadIdRoute,
+  PublicIconsRoute: PublicIconsRoute,
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,
