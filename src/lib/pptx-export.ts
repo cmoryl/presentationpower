@@ -2231,6 +2231,14 @@ export async function exportDeckToPptx(
     const { backgroundsToMaster } = await import("./pptx-bg-to-master");
     flatBlob = await backgroundsToMaster(flatBlob);
   }
+  // Embedded movies: give each one PowerPoint's timing node and repair the
+  // duplicate shape ids pptxgenjs leaves behind, so the clip plays natively
+  // instead of opening with a repair prompt (see pptx-media-repair.ts).
+  if (slideVideos.some(Boolean)) {
+    const { repairPptxMedia } = await import("./pptx-media-repair");
+    flatBlob = await repairPptxMedia(flatBlob);
+  }
+
 
   endFonts();
   activeIntegrity = null;
