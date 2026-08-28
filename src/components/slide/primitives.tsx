@@ -157,6 +157,9 @@ export function DisplayTitle({
 }) {
   const spec = DISPLAY_SPECS[size];
   const enterprise = isEnterpriseWhite(useSlideSkin());
+  // Overflow guard: long copy steps the hero back proportionally (see
+  // `copyFitScale`) instead of spilling past the plate.
+  const fit = copyFitScale(titleText(children), size, maxWidthPx ?? 1100, fitLines);
   const style: CSSProperties = {
     // Style packs scale display type optically — a condensed Bebas headline and
     // a Cormorant headline want different heights at the same "cover" size.
