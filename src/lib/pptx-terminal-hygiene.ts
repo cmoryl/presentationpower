@@ -7,6 +7,7 @@
  * unconditional schema and identifier check.
  */
 import { repairChartXml } from "./pptx-chart-repair";
+import { applyRelHygiene } from "./pptx-rel-hygiene";
 import { repairContentTypes } from "./pptx-content-types";
 import { dedupeShapeIds } from "./pptx-media-repair";
 import { repairPresentationOrder } from "./pptx-presentation-order";
@@ -17,6 +18,8 @@ export interface TerminalHygieneReport {
   chartsFixed: number;
   textRunsFixed: number;
   packageEntriesFixed: number;
+  /** Dangling refs, orphan relationships and duplicate ids repaired. */
+  relationshipsRepaired: number;
 }
 
 /** Preserve intentional leading/trailing spaces per DrawingML's XML contract. */
@@ -40,6 +43,7 @@ export async function applyTerminalPptxHygiene(
     chartsFixed: 0,
     textRunsFixed: 0,
     packageEntriesFixed: 0,
+    relationshipsRepaired: 0,
   };
 
   try {
@@ -71,6 +75,17 @@ export async function applyTerminalPptxHygiene(
         }
       }
 
+      // Relationship graph: dangling r:embed / orphan rels / duplicate ids in
+      // layouts and masters are the remaining causes of PowerPoint's
+      // "found a problem with content" prompt on open.
+      const rel = await applyRelHygiene(zip);
+      report.relationshipsRepaired =
+        rel.danglingShapesRemoved +
+        rel.danglingRefsStripped +
+        rel.orphanRelsRemoved +
+        rel.duplicateIdsFixed;
+      if (report.relationshipsRepaired > 0) console.info("[pptx-rel-hygiene]", rel);
+
       report.packageEntriesFixed += await repairPresentationOrder(zip);
       report.packageEntriesFixed += await repairContentTypes(zip);
     });
@@ -79,7 +94,8 @@ export async function applyTerminalPptxHygiene(
       report.duplicateShapeIdsFixed > 0 ||
       report.chartsFixed > 0 ||
       report.textRunsFixed > 0 ||
-      report.packageEntriesFixed > 0
+      report.packageEntriesFixed > 0 ||
+      report.relationshipsRepaired > 0
     ) {
       console.info("[pptx-terminal-hygiene]", report);
     }

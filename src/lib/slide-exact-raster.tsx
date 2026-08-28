@@ -469,12 +469,18 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
     // rather than shipping as selectable strips stacked over it.
     // Media modules keep ONE alpha overlay per picture instead of the scrim
     // stack that used to export as several selectable blocks on the photograph.
-    const shapes = dom.collapseMediaOverlays(
-      dom.keepBackgroundPaintOnPlate(
-        dom.pruneOccludingPaint(
-          resolved,
-          [...droppedNodes, ...dom.platedPaintRoots(stage)],
-          dom.surfacePaintRoots(stage),
+    // Finally the clear-box guard: any remaining record that paints (almost)
+    // nothing and is not a designed part is dropped. It is still on the flat
+    // plate, so the slide looks identical — it just no longer ships as an
+    // invisible selectable rectangle.
+    const shapes = dom.dropGhostPaint(
+      dom.collapseMediaOverlays(
+        dom.keepBackgroundPaintOnPlate(
+          dom.pruneOccludingPaint(
+            resolved,
+            [...droppedNodes, ...dom.platedPaintRoots(stage)],
+            dom.surfacePaintRoots(stage),
+          ),
         ),
       ),
     );

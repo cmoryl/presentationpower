@@ -79,12 +79,15 @@ export async function capturePrintPageLayers(
     // stay on the plate rather than vanish from both layers.
     const droppedNodes: Element[] = [];
     const resolved = await dom.resolveShapeImages(measured, droppedNodes);
-    const shapes = dom.collapseMediaOverlays(
-      dom.keepBackgroundPaintOnPlate(
-        dom.pruneOccludingPaint(
-          resolved,
-          [...droppedNodes, ...dom.platedPaintRoots(node)],
-          dom.surfacePaintRoots(node),
+    const shapes = dom.dropGhostPaint(
+      dom.collapseMediaOverlays(
+        dom.keepBackgroundPaintOnPlate(
+          dom.pruneOccludingPaint(
+            resolved,
+            [...droppedNodes, ...dom.platedPaintRoots(node)],
+            dom.surfacePaintRoots(node),
+          ),
+          opts.space,
         ),
         opts.space,
       ),
