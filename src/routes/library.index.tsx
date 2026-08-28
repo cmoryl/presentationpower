@@ -90,6 +90,7 @@ import {
 import { byId, MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import { taxonomyQueryOptions, useTaxonomy } from "@/hooks/use-taxonomy";
 import { lookBrandModeId, packIdForBrandMode } from "@/lib/look-brand";
+import { libraryPresetBySlug, type LibrarySearch } from "@/lib/library-presets";
 import { MODULE_PRESET_KITS, validateKit } from "@/lib/module-preset-kits";
 import { formatKitValidationError } from "@/lib/kit-validation";
 import { VIDEO_SLIDE_EXAMPLES, type VideoSlideExample } from "@/lib/video-slide-examples";
@@ -274,7 +275,29 @@ function usePins() {
   return { pins, toggle } as const;
 }
 
+/**
+ * The library's view state lives in the URL so any scope + template + filter
+ * combination is a shareable link (see `/showcase/<slug>` presets).
+ */
+function validateLibrarySearch(raw: Record<string, unknown>): LibrarySearch {
+  const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
+  const mode = str(raw.mode);
+  return {
+    scope: str(raw.scope),
+    look: str(raw.look) ?? null,
+    recipe: str(raw.recipe) ?? null,
+    tags: str(raw.tags)
+      ?.split(",")
+      .map((t) => t.trim())
+      .filter(Boolean),
+    q: str(raw.q),
+    mode: mode === "dark" || mode === "ab" || mode === "light" ? mode : undefined,
+    preset: str(raw.preset),
+  };
+}
+
 export const Route = createFileRoute("/library/")({
+  validateSearch: validateLibrarySearch,
   head: () => ({
     meta: [
       { title: "Library · TransPerfect Element" },
@@ -330,17 +353,23 @@ const STRUCTURAL_TAGS: StructuralTag[] = [
 function Library() {
   const { brandModes, moduleFamilies, moduleVariants, layoutFrameworks, sectionFrameworks } =
     useTaxonomy();
-  const [q, setQ] = useState("");
+  // URL is the source of truth for the shareable slice of view state, so
+  // /showcase presets and hand-built links land on the exact same view.
+  const search = Route.useSearch();
+  const activePreset = libraryPresetBySlug(search.preset);
+  const [q, setQ] = useState(search.q ?? "");
   const [familyIds, setFamilyIds] = useState<Set<string>>(new Set());
-  const [tagIds, setTagIds] = useState<Set<string>>(new Set());
-  const [scopeBrandId, setScopeBrandId] = useState<string>("all");
+  const [tagIds, setTagIds] = useState<Set<string>>(() => new Set(search.tags ?? []));
+  const [scopeBrandId, setScopeBrandId] = useState<string>(search.scope ?? "all");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
+  const [mode, setMode] = useState<"light" | "dark" | "ab">(search.mode ?? "light");
   // Alternate design-test look under review; null = the approved brand system.
-  const [packId, setPackIdState] = useState<string | null>(null);
+  const [packId, setPackIdState] = useState<string | null>(search.look ?? null);
   // Industry recipe (R01–R30) is tracked INDEPENDENTLY of the style pack: it
   // only grounds the selected approved language, never replaces it.
-  const [recipeId, setRecipeIdState] = useState<string | null>(null);
+  const [recipeId, setRecipeIdState] = useState<string | null>(
+    search.look ? (search.recipe ?? null) : null,
+  );
   // An industry ground has no base pack under the approved brand system, so an
   // R-only look can never be held (or later persisted onto a deck).
   const setRecipeId = (next: string | null) => setRecipeIdState(packId ? next : null);
@@ -695,6 +724,23 @@ function Library() {
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
   const navigate = useNavigate();
 
+  // Mirror the shareable slice of state back into the URL (replace, so the
+  // back button still walks pages rather than every filter keystroke). A view
+  // built by hand in the UI is therefore always copy-pasteable as a link.
+  useEffect(() => {
+    const next: LibrarySearch = {};
+    if (scopeBrandId !== "all") next.scope = scopeBrandId;
+    if (packId) next.look = packId;
+    if (packId && recipeId) next.recipe = recipeId;
+    if (tagIds.size > 0) next.tags = [...tagIds];
+    if (q.trim()) next.q = q.trim();
+    if (mode !== "light") next.mode = mode;
+    if (search.preset) next.preset = search.preset;
+    navigate({ to: "/library", search: next, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scopeBrandId, packId, recipeId, tagIds, q, mode, search.preset]);
+
+
   function sectionForVariant(variantId: string): string {
     const v = byId(MODULE_VARIANTS, variantId);
     if (!v) return "SF-01";
@@ -804,8 +850,25 @@ function Library() {
             <div className="mt-5">
               <LibrarySubnav active="/library" />
             </div>
+
+            {activePreset && (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/5 px-4 py-3 text-sm dark:border-white/15 dark:bg-white/5">
+                <span className="rounded-full bg-[#003FC7] px-2 py-0.5 text-[11px] font-semibold tracking-wide text-white uppercase">
+                  Preset view
+                </span>
+                <span className="font-semibold">{activePreset.title}</span>
+                <span className="text-black/60 dark:text-white/60">{activePreset.blurb}</span>
+                <Link
+                  to="/showcase"
+                  className="ml-auto rounded-lg border border-black/15 px-2.5 py-1 text-xs font-medium hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+                >
+                  All preset links
+                </Link>
+              </div>
+            )}
           </div>
         </header>
+
 
         <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
           <div className="flex flex-wrap items-center gap-2">

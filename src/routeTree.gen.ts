@@ -31,6 +31,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as SocialAgentIndexRouteImport } from './routes/social-agent.index'
+import { Route as ShowcaseIndexRouteImport } from './routes/showcase.index'
 import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
@@ -46,6 +47,7 @@ import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as SocialModulesRouteImport } from './routes/social.modules'
 import { Route as SocialBannersRouteImport } from './routes/social.banners'
 import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
+import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetId'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
@@ -279,6 +281,11 @@ const SocialAgentIndexRoute = SocialAgentIndexRouteImport.update({
   path: '/social-agent/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShowcaseIndexRoute = ShowcaseIndexRouteImport.update({
+  id: '/showcase/',
+  path: '/showcase/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
   id: '/print-agent/',
   path: '/print-agent/',
@@ -352,6 +359,11 @@ const SocialBannersRoute = SocialBannersRouteImport.update({
 const SocialAgentThreadIdRoute = SocialAgentThreadIdRouteImport.update({
   id: '/social-agent/$threadId',
   path: '/social-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowcasePresetIdRoute = ShowcasePresetIdRouteImport.update({
+  id: '/showcase/$presetId',
+  path: '/showcase/$presetId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
@@ -1082,6 +1094,7 @@ export interface FileRoutesByFullPath {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
@@ -1097,6 +1110,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/showcase/': typeof ShowcaseIndexRoute
   '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1239,6 +1253,7 @@ export interface FileRoutesByTo {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
@@ -1254,6 +1269,7 @@ export interface FileRoutesByTo {
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
   '/print-agent': typeof PrintAgentIndexRoute
+  '/showcase': typeof ShowcaseIndexRoute
   '/social-agent': typeof SocialAgentIndexRoute
   '/social': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1401,6 +1417,7 @@ export interface FileRoutesById {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
@@ -1416,6 +1433,7 @@ export interface FileRoutesById {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/showcase/': typeof ShowcaseIndexRoute
   '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1564,6 +1582,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
@@ -1579,6 +1598,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/showcase/'
     | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
@@ -1721,6 +1741,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
@@ -1736,6 +1757,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/library'
     | '/print-agent'
+    | '/showcase'
     | '/social-agent'
     | '/social'
     | '/.lovable/oauth/consent'
@@ -1882,6 +1904,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
@@ -1897,6 +1920,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/showcase/'
     | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
@@ -2004,6 +2028,7 @@ export interface RootRouteChildren {
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  ShowcasePresetIdRoute: typeof ShowcasePresetIdRoute
   SocialAgentThreadIdRoute: typeof SocialAgentThreadIdRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
@@ -2012,6 +2037,7 @@ export interface RootRouteChildren {
   EventsAgentIndexRoute: typeof EventsAgentIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   PrintAgentIndexRoute: typeof PrintAgentIndexRoute
+  ShowcaseIndexRoute: typeof ShowcaseIndexRoute
   SocialAgentIndexRoute: typeof SocialAgentIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -2190,6 +2216,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SocialAgentIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/showcase/': {
+      id: '/showcase/'
+      path: '/showcase'
+      fullPath: '/showcase/'
+      preLoaderRoute: typeof ShowcaseIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/print-agent/': {
       id: '/print-agent/'
       path: '/print-agent'
@@ -2293,6 +2326,13 @@ declare module '@tanstack/react-router' {
       path: '/social-agent/$threadId'
       fullPath: '/social-agent/$threadId'
       preLoaderRoute: typeof SocialAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showcase/$presetId': {
+      id: '/showcase/$presetId'
+      path: '/showcase/$presetId'
+      fullPath: '/showcase/$presetId'
+      preLoaderRoute: typeof ShowcasePresetIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/share/$token': {
@@ -3399,6 +3439,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,
+  ShowcasePresetIdRoute: ShowcasePresetIdRoute,
   SocialAgentThreadIdRoute: SocialAgentThreadIdRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
@@ -3407,6 +3448,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsAgentIndexRoute: EventsAgentIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   PrintAgentIndexRoute: PrintAgentIndexRoute,
+  ShowcaseIndexRoute: ShowcaseIndexRoute,
   SocialAgentIndexRoute: SocialAgentIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
