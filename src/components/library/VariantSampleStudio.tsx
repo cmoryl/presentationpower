@@ -1048,7 +1048,45 @@ export function VariantSampleStudio({
         >
           ▤ Imagery
         </button>
+        {/* Save-scope switcher: division-only vs every brand mode. */}
+        <div
+          role="group"
+          aria-label="Save scope"
+          className="flex overflow-hidden rounded-full border border-white/25"
+        >
+          <button
+            type="button"
+            onClick={() => setScopeToBrand(true)}
+            aria-pressed={scopeToBrand}
+            title={`Save this module look for ${brandName} only`}
+            className={`px-3 py-1 text-[11px] ${scopeToBrand ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"}`}
+          >
+            ◈ {brandName} only
+          </button>
+          <button
+            type="button"
+            onClick={() => setScopeToBrand(false)}
+            aria-pressed={!scopeToBrand}
+            title="Save this module look for every brand mode"
+            className={`px-3 py-1 text-[11px] ${!scopeToBrand ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"}`}
+          >
+            All brands
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setBgOpen(true);
+            setTab("background");
+          }}
+          aria-pressed={tab === "background"}
+          title="Replace the background for this module in the active look"
+          className={pill(tab === "background")}
+        >
+          ▨ Background
+        </button>
         <span className="mx-1 h-5 w-px bg-white/15" aria-hidden="true" />
+
         <button
           type="button"
           onClick={handleSave}
