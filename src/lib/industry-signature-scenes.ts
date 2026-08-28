@@ -1396,7 +1396,6 @@ function signalVolume(c: Ctx): string {
   // hard vector circle floating over DataForce's own photographic plate, so
   // the scene ends on its waveform terrain and particle depth only.
   return out.join("");
-  return out.join("");
 }
 
 /** R05 BANKING — vault ledger: institutional bands, gold rules, column stacks. */
