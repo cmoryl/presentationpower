@@ -157,6 +157,7 @@ import "./modules/close";
 import "./modules/stat";
 import { HeroScrim } from "./HeroScrim";
 import "./modules/opening";
+import "./modules/image";
 
 
 import { HouseArrow } from "./HouseArrow";
