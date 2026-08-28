@@ -1861,7 +1861,7 @@ export function stylePackById(id: string | null | undefined): StylePack | null {
  * Apply the authored Element scene plates (S29/S30) and then any admin
  * background overrides — tuning always composes on top of the artwork.
  */
-function withOverrides(pack: StylePack, code: string): StylePack {
+export function withOverrides(pack: StylePack, code: string): StylePack {
   const art = withGamesSceneArt(withIndustryPhotoArt(withElementSceneArt(pack, code), code), code);
   // Always wrap: the wrapper resolves BOTH replacement artwork and tuning, and
   // both can appear (or be cleared) at runtime without the pack being rebuilt.
