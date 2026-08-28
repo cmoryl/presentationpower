@@ -16,3 +16,7 @@ src/router.tsx
 src/routeTree.gen.ts
 src/routes/**
 src/styles.css
+
+# Local verification files never belong in the attached consumer snapshot.
+src/design-system/**/*.test.*
+src/design-system/**/*.spec.*
