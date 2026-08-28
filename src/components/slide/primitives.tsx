@@ -112,7 +112,9 @@ export function DisplayTitle({
     // Readability guard: the pack scale and the fill multiplier compound, so the
     // result is clamped to this size's legible band (see `typeBounds`) — a
     // two-word cover can grow, but never into a billboard.
-    fontSize: `clamp(${typeBounds(spec.fontSize, "display").min}px, calc(${spec.fontSize}px * var(--pack-display-scale, 1) * var(--fill-display, 1)), ${typeBounds(spec.fontSize, "display").max}px)`,
+    // `--mod-display-scale` is the per-module optical trim (module-spacing.ts):
+    // a module can ease its headline back without touching the look's scale.
+    fontSize: `clamp(${typeBounds(spec.fontSize, "display").min}px, calc(${spec.fontSize}px * var(--pack-display-scale, 1) * var(--mod-display-scale, 1) * var(--fill-display, 1)), ${typeBounds(spec.fontSize, "display").max}px)`,
     // Leading moves against the growth so a grown headline block keeps its shape.
     lineHeight: fillLeading("display", enterprise ? spec.lineHeight + 0.04 : spec.lineHeight),
     letterSpacing: `var(--pack-display-tracking, ${enterprise ? "-0.015em" : spec.letterSpacing})`,

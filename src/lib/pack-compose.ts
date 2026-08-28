@@ -106,8 +106,19 @@ const COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
   R03: { anchor: "center", plate: "none" },
 };
 
-/** Deterministic composition profile for a pack. */
-export function packCompose(pack: StylePack): PackCompose {
+/**
+ * Per-module composition overrides, keyed `LOOK:MODULE_ID`.
+ *
+ * Symmetric marks (Q&A, thanks) must sit on the optical centre of the sheet, so
+ * they zero the margin swing that would otherwise pull their centred block off
+ * to one side.
+ */
+const MODULE_COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
+  "R03:MV-CLOSE-QNA": { bias: "center", lead: 0, trail: 0, column: 0.94 },
+};
+
+/** Deterministic composition profile for a pack (optionally one module of it). */
+export function packCompose(pack: StylePack, moduleId?: string | null): PackCompose {
   const g = packGeometry(pack);
   const base = SCAFFOLD_COMPOSE[g.scaffold] ?? SCAFFOLD_COMPOSE.margin;
   const plate = DEVICE_PLATE[g.device] ?? "none";
@@ -122,7 +133,12 @@ export function packCompose(pack: StylePack): PackCompose {
   const trail = base.bias === "left" ? swing : base.bias === "right" ? 0 : Math.round(swing / 2);
 
   const code = lookCodeFromPackId(pack.id);
-  const override = COMPOSE_OVERRIDE[code] ?? COMPOSE_OVERRIDE[code.replace(/-V\d+$/i, "")];
+  const baseCode = code.replace(/-V\d+$/i, "");
+  const override = COMPOSE_OVERRIDE[code] ?? COMPOSE_OVERRIDE[baseCode];
+  const id = (moduleId ?? "").trim().toUpperCase();
+  const modOverride = id
+    ? (MODULE_COMPOSE_OVERRIDE[`${code}:${id}`] ?? MODULE_COMPOSE_OVERRIDE[`${baseCode}:${id}`])
+    : undefined;
 
   return {
     anchor: base.anchor,
@@ -134,6 +150,7 @@ export function packCompose(pack: StylePack): PackCompose {
     trail,
     rhythm: Number((0.86 + dense * 0.34).toFixed(3)),
     ...override,
+    ...modOverride,
   };
 
 }

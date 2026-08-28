@@ -36,6 +36,8 @@ export interface ModuleSpacing {
   rhythm: number;
   /** Extra room reserved below the last text line so descenders never clip. */
   descender: number;
+  /** Optical multiplier on the module's display headline (1 = library size). */
+  displayScale: number;
 }
 
 /** Stack default — matches the historical SlideChrome reserves. */
@@ -48,6 +50,7 @@ export const DEFAULT_MODULE_SPACING: ModuleSpacing = {
   gutter: 32,
   rhythm: 1,
   descender: 0.16,
+  displayScale: 1,
 };
 
 /** Per-look defaults, keyed by look code. */
@@ -79,6 +82,13 @@ const MODULE_SPACING: Record<string, Partial<ModuleSpacing>> = {
   // Text-led closers stay quiet and sit centred.
   "R03:MV-OP-QUESTIONS": { ruleTop: 0, padTop: 112, padBottom: 112 },
   "R03:MV-OP-CONTACT": { ruleTop: 0, padTop: 112, padBottom: 112 },
+  // Q&A is a symmetric, page-centred mark: equal top/bottom reserve so the
+  // block sits on the optical centre of the sheet (the compose override below
+  // zeroes the horizontal swing so it centres left-to-right too).
+  "R03:MV-CLOSE-QNA": { ruleTop: 0, padTop: 112, padBottom: 112 },
+  // Statement close carries a very long headline; ease the hero size back so it
+  // never crowds the plate.
+  "R03:MV-CLOSE-STATEMENT": { ruleTop: 0, displayScale: 0.84 },
 };
 
 /** Resolve the spacing tokens for one module under one style pack. */
@@ -106,6 +116,7 @@ export function spacingVars(s: ModuleSpacing): Record<string, string> {
     "--mod-gutter": `${s.gutter}px`,
     "--mod-rhythm": String(s.rhythm),
     "--mod-descender": `${s.descender}em`,
+    "--mod-display-scale": String(s.displayScale),
   };
 }
 
