@@ -90,7 +90,7 @@ describe("DataForce accent pipeline — exported .pptx bytes", () => {
         id: `s-${i}`,
         sectionId: "sec-overview",
         variantId: v.id,
-        layoutId: v.layoutId ?? "",
+        layoutId: "",
         content: seedContent(v.id, {} as never, "Overview"),
         notes: "",
       })) as DeckSlide[],
