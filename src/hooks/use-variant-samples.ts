@@ -198,8 +198,12 @@ export function useVariantSamples(): SampleLookup {
 
 /** True when the signed-in user holds the admin role. */
 export function useIsModuleAdmin(): boolean {
+  const userId = useSessionUser();
   const { data } = useQuery({
-    queryKey: ["module-variant-admin"],
+    queryKey: ["module-variant-admin", userId ?? null],
+    // Only probe once a session exists: calling the auth-gated server fn
+    // during SSR / while signed out throws "No authorization header".
+    enabled: !!userId,
     queryFn: async () => {
       try {
         return await amIModuleAdmin();
@@ -208,6 +212,7 @@ export function useIsModuleAdmin(): boolean {
       }
     },
     staleTime: 5 * 60_000,
+    retry: false,
   });
   return data === true;
 }
