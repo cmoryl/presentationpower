@@ -20,6 +20,7 @@
 
 import { sceneFromSeed, type SkinScene } from "./skin-backgrounds";
 import { overrideFor } from "./template-registry";
+import { groundIsReplaced } from "./template-background";
 import type { StylePack } from "./style-packs";
 
 export type ElementArtMode = "light" | "dark";
@@ -112,7 +113,9 @@ export function withElementSceneArt(pack: StylePack, code: string): StylePack {
     ground: (seed: string) => {
       const scene = sceneFromSeed(seed);
       const custom = overrideFor(code, scene);
-      if (custom?.imageUrl) return base(seed);
+      // A replaced/uploaded picture owns this ground — do not compute or stack
+      // the authored plate underneath it.
+      if (custom?.imageUrl || groundIsReplaced(code, seed)) return base(seed);
       const url = elementSceneArtUrl(code, scene);
       if (!url) return base(seed);
       return [scrim, veil, `url("${url}") center center / cover no-repeat`];

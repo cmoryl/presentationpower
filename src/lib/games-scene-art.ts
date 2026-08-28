@@ -18,6 +18,7 @@
 
 import { sceneFromSeed, type SkinScene } from "./skin-backgrounds";
 import { overrideFor } from "./template-registry";
+import { groundIsReplaced } from "./template-background";
 import type { StylePack } from "./style-packs";
 
 const CDN = "/__l5e/assets-v1";
@@ -1177,7 +1178,9 @@ export function withGamesSceneArt(pack: StylePack, code: string): StylePack {
     ground: (seed: string) => {
       const scene = sceneFromSeed(seed);
       const custom = overrideFor(code, scene);
-      if (custom?.imageUrl) return base(seed);
+      // A replaced/uploaded picture owns this ground — do not compute or stack
+      // the authored plate underneath it.
+      if (custom?.imageUrl || groundIsReplaced(code, seed)) return base(seed);
       const takeMatch = /take:(\d+)/i.exec(seed);
       // Without an explicit take, rotate on the rest of the seed (module scene
       // + layout id) so two slides sharing a scene don't wear the same plate.

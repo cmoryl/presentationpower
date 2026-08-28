@@ -44,8 +44,9 @@ const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
 
 // ---- factories -------------------------------------------------------------
 
-const HERO_STOCK =
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=70";
+// No third-party hotlinks in seeded content: a new photo hero starts empty so
+// the author picks owned division imagery.
+const HERO_STOCK = "";
 
 export function makePrintHeroSection(variantId: PrintHeroModuleVariant): PrintSection {
   const base = {

@@ -17,6 +17,7 @@
 
 import { sceneFromSeed, type SkinScene } from "./skin-backgrounds";
 import { overrideFor } from "./template-registry";
+import { groundIsReplaced } from "./template-background";
 import type { StylePack } from "./style-packs";
 
 export type PhotoFamily = "hero" | "content" | "data" | "flow";
@@ -321,7 +322,9 @@ export function withIndustryPhotoArt(pack: StylePack, code: string): StylePack {
     ground: (seed: string) => {
       const scene = sceneFromSeed(seed);
       const custom = overrideFor(code, scene);
-      if (custom?.imageUrl) return base(seed);
+      // A replaced/uploaded picture owns this ground — do not compute or stack
+      // the authored plate underneath it.
+      if (custom?.imageUrl || groundIsReplaced(code, seed)) return base(seed);
       // FIT BEFORE VARIETY. Each scene names its plate families in preference
       // order, and the FIRST one is the fitted plate for that content type
       // (hero for covers, data for stats/charts, flow for process/timeline,
