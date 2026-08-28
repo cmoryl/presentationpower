@@ -659,6 +659,7 @@ function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
     subBrands: [seed.subBrandGroup],
     photography: seed.photography,
     brandVisuals: seed.brandVisuals,
+    motion: seed.motion,
     iconography: MASTER_TRANSPERFECT_GUIDE.iconography,
     socialMedia: MASTER_TRANSPERFECT_GUIDE.socialMedia,
     sourceUrl: seed.sourceUrl ?? MASTER_TRANSPERFECT_GUIDE.sourceUrl,
