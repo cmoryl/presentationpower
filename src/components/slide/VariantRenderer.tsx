@@ -1313,19 +1313,23 @@ function renderVariantBody({
                 <div
                   key={i}
                   className="relative overflow-hidden rounded-3xl p-10"
-                  style={{
-                    background: cardBg,
-                    border: `1px solid ${cardRing}`,
-                    backgroundImage: `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
-                  }}
-                >
-                  <div
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-[3px]"
-                    style={{
-                      background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 85%)`,
-                    }}
-                  />
+                   style={{
+                     background: cardBg,
+                     border: bareSurfaces ? "none" : `1px solid ${cardRing}`,
+                     backgroundImage: bareSurfaces
+                       ? undefined
+                       : `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
+                   }}
+                 >
+                   {!bareSurfaces && (
+                     <div
+                       aria-hidden
+                       className="absolute inset-x-0 top-0 h-[3px]"
+                       style={{
+                         background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 85%)`,
+                       }}
+                     />
+                   )}
                   <div className="flex flex-col items-start">
                     <div
                       className="relative mb-8 grid place-items-center rounded-full"
