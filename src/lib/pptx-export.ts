@@ -924,6 +924,26 @@ export async function exportDeckToPptx(
     }),
   );
 
+  // NATIVE MOTION. A slide that carries `content.videoUrl` (module video
+  // variants, and sections an admin put an approved brand clip behind) exports
+  // as a real embedded PowerPoint movie, placed edge-to-edge behind the copy,
+  // with the poster still as its cover so print/PDF/thumbnails are unchanged.
+  // If the clip cannot be embedded (missing, wrong container, over the size
+  // cap) the slide simply keeps the poster image and the notes link.
+  const slideVideos: Array<PptxVideoAsset | null> = await Promise.all(
+    deck.slides.map((slide, idx) => {
+      const c = slide.content as Record<string, unknown>;
+      const url = typeof c.videoUrl === "string" ? c.videoUrl.trim() : "";
+      if (!url) return Promise.resolve(null);
+      return fetchPptxVideo(resolveAssetUrl(url), {
+        cover: slideImages[idx],
+        label: `slide ${idx + 1} video`,
+      });
+    }),
+  );
+
+
+
   // Rasterize each slide's Backgrounds & Imagery selection in parallel. This
   // covers library presets, solid/gradient/pattern, and image (upload/ai)
   // choices — everything set through the Background & Imagery panel.
