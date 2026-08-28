@@ -49,6 +49,7 @@ export function Kicker({
   const ink = useSlideInk();
   const kickerMode = useSlideMode();
   const enterprise = isEnterpriseWhite(useSlideSkin());
+  
   // Enterprise dark pages need the light ink, not the navy page ink.
   const enterpriseInk = kickerMode === "dark" ? "#FFFFFF" : ENTERPRISE_WHITE.ink;
   return (
@@ -84,11 +85,61 @@ const DISPLAY_SPECS: Record<
   title: { fontSize: 56, lineHeight: 1.08, letterSpacing: "-0.015em", weight: 600 },
 };
 
+/** Plain text of a title node, for deterministic copy-length measurement. */
+function titleText(node: ReactNode): string {
+  if (node === null || node === undefined || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(titleText).join("");
+  if (typeof node === "object" && "props" in (node as { props?: unknown })) {
+    return titleText((node as { props?: { children?: ReactNode } }).props?.children);
+  }
+  return "";
+}
+
+/**
+ * COPY-LENGTH FIT — the headline's own overflow guard.
+ *
+ * A hero size is authored for a short, punchy line. When the copy runs long the
+ * block would either spill past the plate or eat the modules below it, so the
+ * type steps back in proportion to how far the copy overruns the size's budget.
+ *
+ * It is a pure function of (text length, size, column width): screen cards,
+ * present, PDF and the PPTX rasteriser all compute the same number, so an
+ * export can never disagree with the build. Weight, tracking and leading are
+ * untouched, so a trimmed headline keeps the same visual voice.
+ */
+const FIT_FLOOR: Record<DisplaySize, number> = {
+  hero: 0.66,
+  cover: 0.7,
+  divider: 0.76,
+  section: 0.8,
+  title: 0.84,
+};
+
+export function copyFitScale(
+  text: string,
+  size: DisplaySize,
+  maxWidthPx = 1100,
+  lineBudget = 3,
+): number {
+  const chars = text.trim().length;
+  if (chars === 0) return 1;
+  const spec = DISPLAY_SPECS[size];
+  // Geist at display sizes averages ~0.5em per character.
+  const perLine = Math.max(6, Math.floor(maxWidthPx / (spec.fontSize * 0.5)));
+  const budget = perLine * lineBudget;
+  if (chars <= budget) return 1;
+  // Area scales with the square of the type size, so the fit follows sqrt.
+  const fit = Math.sqrt(budget / chars);
+  return Number(Math.max(FIT_FLOOR[size], Math.min(1, fit)).toFixed(3));
+}
+
 export function DisplayTitle({
   children,
   size = "cover",
   color,
   maxWidthPx,
+  fitLines = 3,
   // Slide titles are canvas artwork rendered many times per page (thumbnails,
   // previews, editors). Defaulting to <h1> put several top-level headings in
   // the document outline; callers that need real semantics can pass `as`.
@@ -99,11 +150,16 @@ export function DisplayTitle({
   size?: DisplaySize;
   color?: string;
   maxWidthPx?: number;
+  /** Lines the headline is authored to occupy before the copy-fit steps in. */
+  fitLines?: number;
   as?: keyof React.JSX.IntrinsicElements;
   className?: string;
 }) {
   const spec = DISPLAY_SPECS[size];
   const enterprise = isEnterpriseWhite(useSlideSkin());
+  // Overflow guard: long copy steps the hero back proportionally (see
+  // `copyFitScale`) instead of spilling past the plate.
+  const fit = copyFitScale(titleText(children), size, maxWidthPx ?? 1100, fitLines);
   const style: CSSProperties = {
     // Style packs scale display type optically — a condensed Bebas headline and
     // a Cormorant headline want different heights at the same "cover" size.
@@ -114,7 +170,7 @@ export function DisplayTitle({
     // two-word cover can grow, but never into a billboard.
     // `--mod-display-scale` is the per-module optical trim (module-spacing.ts):
     // a module can ease its headline back without touching the look's scale.
-    fontSize: `clamp(${typeBounds(spec.fontSize, "display").min}px, calc(${spec.fontSize}px * var(--pack-display-scale, 1) * var(--mod-display-scale, 1) * var(--fill-display, 1)), ${typeBounds(spec.fontSize, "display").max}px)`,
+    fontSize: `clamp(${typeBounds(spec.fontSize, "display").min}px, calc(${spec.fontSize}px * ${fit} * var(--pack-display-scale, 1) * var(--mod-display-scale, 1) * var(--fill-display, 1)), ${typeBounds(spec.fontSize, "display").max}px)`,
     // Leading moves against the growth so a grown headline block keeps its shape.
     lineHeight: fillLeading("display", enterprise ? spec.lineHeight + 0.04 : spec.lineHeight),
     letterSpacing: `var(--pack-display-tracking, ${enterprise ? "-0.015em" : spec.letterSpacing})`,
