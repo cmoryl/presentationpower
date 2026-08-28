@@ -75,24 +75,31 @@ export async function applyTerminalPptxHygiene(
     textRunsFixed: 0,
     packageEntriesFixed: 0,
     relationshipsRepaired: 0,
+    invalidExtentsFixed: 0,
   };
 
   try {
     const out = await repackPptxBlob(blob, async (zip) => {
       for (const name of Object.keys(zip.files)) {
-        if (/^ppt\/slides\/slide\d+\.xml$/.test(name)) {
+        if (/^ppt\/(slides|slideLayouts|slideMasters|notesSlides)\/[^/]+\.xml$/.test(name)) {
           const file = zip.file(name);
           if (!file) continue;
           const xml = await file.async("string");
-          const fixed = dedupeShapeIds(xml);
-          const spaced = preserveDrawingTextWhitespace(fixed.xml);
-          if (fixed.renumbered > 0 || spaced.fixed > 0) {
-            zip.file(name, spaced.xml);
+          const isSlide = /^ppt\/slides\/slide\d+\.xml$/.test(name);
+          const fixed = isSlide ? dedupeShapeIds(xml) : { xml, renumbered: 0 };
+          const spaced = isSlide
+            ? preserveDrawingTextWhitespace(fixed.xml)
+            : { xml: fixed.xml, fixed: 0 };
+          const clamped = clampShapeExtents(spaced.xml);
+          if (fixed.renumbered > 0 || spaced.fixed > 0 || clamped.fixed > 0) {
+            zip.file(name, clamped.xml);
             report.duplicateShapeIdsFixed += fixed.renumbered;
             report.textRunsFixed += spaced.fixed;
+            report.invalidExtentsFixed += clamped.fixed;
           }
           continue;
         }
+
 
         if (/^ppt\/charts\/chart\d+\.xml$/.test(name)) {
           const file = zip.file(name);
