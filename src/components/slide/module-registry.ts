@@ -60,7 +60,7 @@ export type SlideInkRamp = {
   surface: string;
   surfaceRing: string;
   ringOnDark: string;
-  onSurface: string;
+  onSurface: (hex: string) => string;
   accentText: string;
 };
 
