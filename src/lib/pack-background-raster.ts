@@ -13,9 +13,9 @@
 // look AND stays editable.
 // -----------------------------------------------------------------------------
 
-import { sceneFromSeed } from "./skin-backgrounds";
-import { skinBackdropOverride, sceneTakeFromSeed } from "./skin-backdrop-overrides";
+import { groundIsReplaced } from "./template-background";
 import {
+  backgroundCodeForPackId,
   GRAIN_PLATE,
   minimalPackLayers,
   packGroundPaint,
@@ -148,13 +148,7 @@ export async function rasterizePackBackground(
   // A REPLACED background is the whole plate: no scaffold, motif, grain, mask
   // or damping, exactly as SlideChrome now paints it on screen. Otherwise the
   // export carried the look's old procedural template under the new artwork.
-  const replaced =
-    /^skin-[sr]\d{2}$/i.test(String(pack.id)) &&
-    !!skinBackdropOverride(
-      String(pack.id).replace(/^skin-/i, "").toUpperCase(),
-      sceneFromSeed(seed),
-      sceneTakeFromSeed(seed).take,
-    );
+  const replaced = groundIsReplaced(backgroundCodeForPackId(String(pack.id)), seed);
 
   // 1 — field
   host.appendChild(plane({ backgroundColor: surface }));

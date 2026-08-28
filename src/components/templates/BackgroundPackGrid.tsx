@@ -18,7 +18,8 @@ import { saveBackgroundOverride, deleteBackgroundOverride } from "@/lib/template
 import { loadTemplateRegistry } from "@/lib/template-loader";
 import type { TemplateBackgroundOverride } from "@/lib/template-registry";
 import {
-  composeOverrideLayers,
+  authoredGround,
+  previewGroundLayers,
   defaultOverride,
   isNeutralOverride,
 } from "@/lib/template-background";
@@ -115,12 +116,11 @@ export function BackgroundPackGrid({
       ALL.map((scene) => {
         const saved = savedFor(scene);
         const eff = saved ?? defaultOverride(code, scene);
-        const swap = eff.sceneSwap && ALL.includes(eff.sceneSwap) ? eff.sceneSwap : scene;
         return {
           scene,
           saved,
-          authored: pack.ground(scene).join(", "),
-          current: composeOverrideLayers(pack.ground(swap), eff, pack.tokens.surface).join(", "),
+          authored: authoredGround(pack)(scene).join(", "),
+          current: previewGroundLayers(pack, code, scene, eff).join(", "),
           eff,
         };
       }),

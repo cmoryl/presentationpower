@@ -31,10 +31,12 @@
 // stays a one-way dependency.
 import { skinPackById, ALL_SKIN_PACKS, skinCodeFromPackId } from "./design-skin-pack";
 import { packGeometry, shapeCss } from "./pack-geometry";
-import { sceneFromSeed } from "./skin-backgrounds";
-import { skinBackdropOverride, sceneTakeFromSeed, moduleIdFromSeed } from "./skin-backdrop-overrides";
-import { backgroundOverrides, customPackById, customTemplatePacks } from "./template-registry";
-import { withBackgroundOverrides } from "./template-background";
+import { customPackById, customTemplatePacks } from "./template-registry";
+import {
+  withBackgroundOverrides,
+  groundOverridesApplied,
+  resolveGroundLayers,
+} from "./template-background";
 import { withElementSceneArt } from "./element-scene-art";
 import { withGamesSceneArt } from "./games-scene-art";
 import { withIndustryPhotoArt } from "./industry-photo-art";
@@ -1861,9 +1863,8 @@ export function stylePackById(id: string | null | undefined): StylePack | null {
  */
 function withOverrides(pack: StylePack, code: string): StylePack {
   const art = withGamesSceneArt(withIndustryPhotoArt(withElementSceneArt(pack, code), code), code);
-  if (!backgroundOverrides().some((o) => o.skinCode.toUpperCase() === code.toUpperCase())) {
-    return art;
-  }
+  // Always wrap: the wrapper resolves BOTH replacement artwork and tuning, and
+  // both can appear (or be cleared) at runtime without the pack being rebuilt.
   return withBackgroundOverrides(art, code);
 }
 
@@ -1897,12 +1898,7 @@ export function reapplyBackgroundOverrides(
 ): StylePack {
   const code = backgroundCodeForPackId(packId);
   if (!code) return pack;
-  if (opts?.authoredArt === false) {
-    const tuned = backgroundOverrides().some(
-      (o) => o.skinCode.toUpperCase() === code.toUpperCase(),
-    );
-    return tuned ? withBackgroundOverrides(pack, code) : pack;
-  }
+  if (opts?.authoredArt === false) return withBackgroundOverrides(pack, code);
   return withOverrides(pack, code);
 }
 
@@ -2484,38 +2480,17 @@ export function isCuratedGroundPack(pack: Pick<StylePack, "id">): boolean {
 
 /** Plane-2 layers a pack actually paints — curated scenes survive intact. */
 export function packGroundPaint(pack: StylePack, seed: string): string[] {
-  const layers = pack.ground(seed);
-  const base = isCuratedGroundPack(pack) ? layers : minimalPackLayers(layers);
-  // A REPLACED background (background directory → "Edit / replace backgrounds")
-  // REPLACES the skin's ground from that moment on: it is the only artwork that
-  // paints on every surface rendering through this function — slide stage,
-  // library cards, pack thumbnails, raster and PPTX/PDF exports.
-  //
-  // It replaces rather than overlays on purpose. Keeping the authored
-  // procedural scene beneath let its translucent gradients and grids read
-  // through the new photo, so one look appeared to be "three templates in one".
-  // Only a flat base colour is kept underneath, so any transparent PNG still
-  // lands on the skin's own paper instead of nothing.
-  const id = String(pack.id ?? "");
-  if (/^skin-[sr]\d{2}$/i.test(id)) {
-    const url = skinBackdropOverride(
-      skinCodeFromPackId(id),
-      sceneFromSeed(seed),
-      sceneTakeFromSeed(seed).take,
-      // A per-module replacement (saved from the module view) outranks the
-      // skin-wide scene artwork for that one module.
-      moduleIdFromSeed(seed),
-    );
-    if (url) {
-      const flatBase = base.filter((l) => /^(#|rgb|hsl)/i.test(l.trim()));
-      return [
-        `url("${url}") center center / cover no-repeat`,
-        ...(flatBase.length ? flatBase : [pack.tokens.surface]),
-      ];
-    }
-  }
-
-  return base;
+  // Replacement artwork + admin tuning are resolved ONCE, in
+  // `resolveGroundLayers`. A pack resolved through `stylePackById` already ran
+  // it inside `ground()`; a raw registry pack has not, so it runs here. Doing
+  // it in exactly one place is what keeps the Backgrounds tuner, module cards,
+  // stages, thumbnails and exports painting the same ground.
+  const resolvedAlready = groundOverridesApplied(pack);
+  const code = resolvedAlready ? null : backgroundCodeForPackId(String(pack.id ?? ""));
+  const layers = resolvedAlready
+    ? pack.ground(seed)
+    : resolveGroundLayers(pack.ground, code, seed, pack.tokens.surface);
+  return isCuratedGroundPack(pack) ? layers : minimalPackLayers(layers);
 }
 
 export function minimalPackLayers(layers: string[]): string[] {

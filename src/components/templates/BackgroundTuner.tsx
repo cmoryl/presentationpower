@@ -16,7 +16,8 @@ import { saveBackgroundOverride, deleteBackgroundOverride } from "@/lib/template
 import { loadTemplateRegistry } from "@/lib/template-loader";
 import type { TemplateBackgroundOverride } from "@/lib/template-registry";
 import {
-  composeOverrideLayers,
+  authoredGround,
+  previewGroundLayers,
   defaultOverride,
   isNeutralOverride,
 } from "@/lib/template-background";
@@ -180,17 +181,16 @@ export function BackgroundTuner({
 
   const accent = pack.tokens.accent;
 
+  // Same resolver the stage, module cards and exporters use — the tuner must
+  // never compose the ground its own way, or a section reads one way here and
+  // another way on the modules.
   const layersFor = useCallback(
-    (o: TemplateBackgroundOverride, s: string) => {
-      const swap =
-        o.sceneSwap && (SKIN_SCENES as readonly string[]).includes(o.sceneSwap) ? o.sceneSwap : s;
-      return composeOverrideLayers(pack.ground(swap), o, pack.tokens.surface);
-    },
-    [pack],
+    (o: TemplateBackgroundOverride, s: string) => previewGroundLayers(pack, code, s, o),
+    [pack, code],
   );
 
   const previewLayers = useMemo(() => layersFor(edit, scene), [layersFor, edit, scene]);
-  const authoredLayers = useMemo(() => pack.ground(scene), [pack, scene]);
+  const authoredLayers = useMemo(() => authoredGround(pack)(scene), [pack, scene]);
   const shownLayers = compare ? authoredLayers : previewLayers;
 
   const persist = useCallback(
