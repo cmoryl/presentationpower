@@ -30,6 +30,9 @@ import { CropFrameOverlay, type CropRect } from "@/components/library/CropFrameO
 
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
+import { ModuleBackgroundEditor } from "@/components/library/ModuleBackgroundEditor";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
+
 
 import {
   ALL_BRANDS,
