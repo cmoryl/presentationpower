@@ -20,7 +20,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { VariantRenderer } from "../VariantRenderer";
-import { registeredModuleFamilies } from "../module-registry";
+import { registeredModuleFamilies, registeredModuleIds } from "../module-registry";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
@@ -71,6 +71,10 @@ describe("module conformance matrix", () => {
 
   it("keeps the extracted families registered", () => {
     expect(registeredModuleFamilies()).toContain("family:viz");
+    // Timeline modules own the spine/tick furniture that kept regressing on
+    // export — the registry must keep claiming them so the legacy switch can
+    // never quietly take them back.
+    expect(registeredModuleIds()).toContain("MV-TIMELINE-VERTICAL");
   });
 
   for (const mode of ["light", "dark"] as const) {
