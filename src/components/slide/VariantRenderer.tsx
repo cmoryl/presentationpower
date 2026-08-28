@@ -842,6 +842,7 @@ function renderVariantBody({
   clientName,
   clientLogoUrl,
   dash,
+  bareSurfaces = false,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -853,6 +854,8 @@ function renderVariantBody({
   clientLogoUrl?: string | null;
   /** Alternate-look dashboard treatment for this module (lib/dash-look.ts). */
   dash: DashLook;
+  /** Bare-surface skins (e.g. Organic Systems S21): no translucent content boxes. */
+  bareSurfaces?: boolean;
 }): ReactNode {
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
