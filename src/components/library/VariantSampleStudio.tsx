@@ -30,6 +30,9 @@ import { CropFrameOverlay, type CropRect } from "@/components/library/CropFrameO
 
 import { SlideBackdropContext } from "@/components/slide/SlideChrome";
 import { backdropForVariant } from "@/components/slide/variantBackdrop";
+import { ModuleBackgroundEditor } from "@/components/library/ModuleBackgroundEditor";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
+
 
 import {
   ALL_BRANDS,
@@ -178,10 +181,15 @@ export function VariantSampleStudio({
     if (pack) setMode(pack.mode as SlideMode);
   }, [pack]);
   const [showImagery, setShowImagery] = useState(true);
-  const [scopeToBrand, setScopeToBrand] = useState(false);
+  // Default to the division the curator opened: an edit made while viewing
+  // e.g. DataForce should land on DataForce, not silently on every brand.
+  const [scopeToBrand, setScopeToBrand] = useState(true);
+  /** Bumps whenever a module/skin backdrop is replaced, so the stage repaints. */
+  const bdVersion = useSkinBackdropVersion();
+
   const [modeOnly, setModeOnly] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const [tab, setTab] = useState<"copy" | "structure" | "bulk" | "history">("copy");
+  const [tab, setTab] = useState<"copy" | "structure" | "background" | "bulk" | "history">("copy");
   const [newKind, setNewKind] = useState<string>("body");
   /** Cell selected by clicking its photo / icon on the rendered slide. */
   const [sel, setSel] = useState<{ index: number; kind: "media" | "icon" } | null>(null);
@@ -907,9 +915,24 @@ export function VariantSampleStudio({
                     : "Unsaved changes — press ⌘S to save"
                   : savedAt
                     ? `Saved ${new Date(savedAt).toLocaleTimeString()} · safe to leave`
-                    : "All changes published"}
+                    : hasSavedSample
+                      ? "Published sample loaded"
+                      : "No saved sample yet"}
+            </span>
+            <span aria-hidden="true" className="text-white/25">
+              ·
+            </span>
+            {/* The save target, always visible: curators kept losing division
+                edits to the global scope because it was buried in a panel. */}
+            <span className="text-white/45">
+              saves to{" "}
+              <span className="font-semibold text-[#A1FBF9]">
+                {scopeToBrand ? brandName : "all brands"}
+              </span>
+              {pack ? ` · ${pack.label ?? pack.id}` : ""}
             </span>
           </div>
+
         </div>
 
         <div className="flex overflow-hidden rounded-full border border-white/25">
@@ -1023,7 +1046,44 @@ export function VariantSampleStudio({
         >
           ▤ Imagery
         </button>
+        {/* Save-scope switcher: division-only vs every brand mode. */}
+        <div
+          role="group"
+          aria-label="Save scope"
+          className="flex overflow-hidden rounded-full border border-white/25"
+        >
+          <button
+            type="button"
+            onClick={() => setScopeToBrand(true)}
+            aria-pressed={scopeToBrand}
+            title={`Save this module look for ${brandName} only`}
+            className={`px-3 py-1 text-[11px] ${scopeToBrand ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"}`}
+          >
+            ◈ {brandName} only
+          </button>
+          <button
+            type="button"
+            onClick={() => setScopeToBrand(false)}
+            aria-pressed={!scopeToBrand}
+            title="Save this module look for every brand mode"
+            className={`px-3 py-1 text-[11px] ${!scopeToBrand ? "bg-white font-semibold text-[#03002C]" : "text-white/65 hover:text-white"}`}
+          >
+            All brands
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setTab("background");
+          }}
+          aria-pressed={tab === "background"}
+          title="Replace the background for this module in the active look"
+          className={pill(tab === "background")}
+        >
+          ▨ Background
+        </button>
         <span className="mx-1 h-5 w-px bg-white/15" aria-hidden="true" />
+
         <button
           type="button"
           onClick={handleSave}
@@ -1146,7 +1206,9 @@ export function VariantSampleStudio({
             >
               <ScaledSlide className={mode === "dark" ? "bg-[#03002C]" : "bg-white"}>
                 <SlideBackdropContext.Provider value={backdrop}>
-                  <PackShell>
+                  {/* Keyed on the backdrop version so replacing this module's
+                      background repaints the stage without a reload. */}
+                  <PackShell key={`bd-${bdVersion}`}>
                     <VariantRenderer
                       slide={previewSlide}
                       variant={variant}
@@ -1155,6 +1217,7 @@ export function VariantSampleStudio({
                       mode={mode}
                     />
                   </PackShell>
+
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
             </LiveEditOverlay>
@@ -1189,13 +1252,13 @@ export function VariantSampleStudio({
         {/* Inspector */}
         <aside className="min-h-0 w-full shrink-0 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.04] p-4 lg:w-[360px]">
           <div className="flex gap-1 rounded-full border border-white/15 bg-[#03002C]/50 p-1 text-[11px]">
-            {(["copy", "structure", "bulk", "history"] as const).map((t) => (
+            {(["copy", "structure", "background", "bulk", "history"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setTab(t)}
                 aria-pressed={tab === t}
-                className={`flex-1 rounded-full px-3 py-1 capitalize transition ${
+                className={`flex-1 rounded-full px-2.5 py-1 capitalize transition ${
                   tab === t
                     ? "bg-white font-semibold text-[#03002C]"
                     : "text-white/65 hover:text-white"
@@ -1205,12 +1268,15 @@ export function VariantSampleStudio({
                   ? "Copy"
                   : t === "structure"
                     ? "Sections"
-                    : t === "bulk"
-                      ? "Bulk"
-                      : "History"}
+                    : t === "background"
+                      ? "Backdrop"
+                      : t === "bulk"
+                        ? "Bulk"
+                        : "History"}
               </button>
             ))}
           </div>
+
 
           <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60">
             <div className="font-semibold uppercase tracking-widest text-white/45">Save scope</div>
@@ -1247,7 +1313,25 @@ export function VariantSampleStudio({
             )}
           </div>
 
-          {tab === "bulk" ? (
+          {tab === "background" ? (
+            <div className="dark mt-3 text-white">
+              {pack ? (
+                <ModuleBackgroundEditor
+                  packId={pack.id}
+                  packName={pack.label ?? pack.id}
+                  variantId={variant.id}
+                  variantName={variant.name}
+                  canEdit
+                />
+              ) : (
+                <p className="rounded-lg border border-white/12 bg-[#03002C]/45 p-3 text-[11px] text-white/60">
+                  Pick an approved look in the library first — module backgrounds are stored per
+                  look, so the studio needs to know which template you are editing.
+                </p>
+              )}
+            </div>
+          ) : tab === "bulk" ? (
+
             <BulkStylePanel
               variant={variant}
               brand={brand}
