@@ -71,11 +71,14 @@ describe("DataForce accent pipeline — preview side", () => {
     // must step aside — otherwise palette edits appear to revert.
     expect(lookGlyphColor("tpl-r03")).toBeNull();
     const saved = stylePackById("skin-r03")!;
-    const toned = packToneBrand(byId(BRAND_MODES, "bm-enterprise")!, {
+    const edited = {
       ...saved,
       id: "tpl-r03" as typeof saved.id,
-    });
-    expect(hex(toned.tokens.primary)).not.toBe(DF_GREEN);
+      tokens: { ...saved.tokens, primary: "#FF9B70", accentText: "#FF9B70" },
+    };
+    const toned = packToneBrand(byId(BRAND_MODES, "bm-enterprise")!, edited);
+    expect(hex(toned.tokens.primary)).toBe("FF9B70");
+    expect(hex(toned.tokens.accent)).toBe("FF9B70");
   });
 
   it("does not repaint any other look's accent", () => {
