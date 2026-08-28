@@ -161,7 +161,6 @@ import { APPROVED_LOGOS } from "@/lib/approved-logos";
 import { useClientLogoMark, useClientLogoPool } from "@/lib/client-logo-pool";
 import { overlayLogoHubFillers } from "@/lib/logohub-fillers";
 
-import { InfographicSlideModule } from "./InfographicSlideModule";
 import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide";
 
 // CLIENT logo chip for case-study modules. Resolution order:
