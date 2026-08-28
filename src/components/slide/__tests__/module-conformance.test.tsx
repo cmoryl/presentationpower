@@ -239,6 +239,78 @@ describe("module conformance matrix", () => {
     ]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Team bios: portrait sizing + bare-surface behaviour stay in one owner.
+    for (const id of ["MV-OP-INTRO-TEAM", "MV-TEAM-BIOS-3", "MV-TEAM-BIOS-4"]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
+    // Business family: decisions, commercials, cases, governance, showcases and
+    // the client spreads (client logo wins over the client name).
+    for (const id of [
+      "MV-DEC-MATRIX",
+      "MV-DEC-COMPARE-TABLE",
+      "MV-DEC-CHECKLIST",
+      "MV-COMM-PRICING",
+      "MV-COMM-INVESTMENT",
+      "MV-RISK-MITIGATION",
+      "MV-CASE-SPREAD",
+      "MV-CASE-METRICS",
+      "MV-CASE-STORY",
+      "MV-GOV-RACI",
+      "MV-REC-NEXT",
+      "MV-SHOW-LAPTOP",
+      "MV-SHOW-MONITOR",
+      "MV-CLIENT-MATRIX",
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-COMPARE",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
+    // Advanced diagram family: the heavier geometry (funnel, flywheel, curve,
+    // journey, iceberg) must keep exporting as native editable furniture.
+    for (const id of [
+      "MV-BENTO-VALUE-CLOSE",
+      "MV-KPI-DASHBOARD",
+      "MV-ROADMAP-QUARTERS",
+      "MV-FUNNEL",
+      "MV-FLYWHEEL",
+      "MV-MATURITY-CURVE",
+      "MV-JOURNEY-MAP",
+      "MV-LOGO-WALL",
+      "MV-MATRIX-2X2",
+      "MV-ICEBERG",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
+    // Editorial family: typographic spreads and MV-ED-* posters.
+    for (const id of [
+      "MV-EDITORIAL-SPREAD",
+      "MV-SPLIT-MANIFESTO",
+      "MV-NUMBERS-TRIPTYCH",
+      "MV-COMPARE-VS-LISTS",
+      "MV-COMPARE-SLIDER",
+      "MV-PULL-QUOTE-STACK",
+      "MV-DEFINITION",
+      "MV-PRINCIPLES",
+      "MV-COUNTDOWN",
+      "MV-HORIZON",
+      "MV-ED-HERO-BLEED",
+      "MV-ED-HERO-ORB",
+      "MV-ED-DIVIDER-XL",
+      "MV-ED-KICKER-POSTER",
+      "MV-ED-STAT-PHOTO",
+      "MV-ED-QUOTE-BLEED",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
+    // Locations family: pin coercion, region rails and role legends.
+    for (const id of [
+      "MV-LOC-WORLD-PINS",
+      "MV-LOC-WORLD-STATS",
+      "MV-LOC-REGION-FOCUS",
+      "MV-LOC-HUB-SPOKE",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
   });
 
 
