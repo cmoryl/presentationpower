@@ -305,7 +305,14 @@ export function EditorialTitle({
         color,
         maxWidth: maxWidthPx,
         textWrap: "balance" as CSSProperties["textWrap"],
+        // A 0.94 line box is shorter than the font's descent, so `g`/`y` tails on
+        // the LAST line were sliced off wherever the parent clips its overflow
+        // (cover media plates, capped hero plates). Reserve descender room and
+        // pull it back out of the layout rhythm so nothing else shifts.
+        paddingBottom: `var(--mod-descender, 0.16em)`,
+        marginBottom: `calc(-1 * var(--mod-descender, 0.16em) + 0.02em)`,
       }}
+
     >
       {parts.map((p, i) =>
         p.italic ? (
