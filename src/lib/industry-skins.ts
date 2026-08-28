@@ -338,14 +338,26 @@ function paletteFor(recipe: IndustryRecipe): string[] {
   return [field, ...pal.slice(1), support];
 }
 
+/**
+ * Looks a product brand owns, named for that brand in every listing so it reads
+ * as the brand's own industry template (and can be tuned like any other one).
+ */
+const OWNED_LOOK_IDENTITY: Record<string, { name: string; reference: string }> = {
+  R03: {
+    name: "DataForce · AI & Data Signature",
+    reference: "DATAFORCE PRODUCT PACK · AI LUMINOUS · DATA OBSERVATORY",
+  },
+};
+
 /** One industry recipe → one fully specified design language. */
 export function industrySkinFromRecipe(recipe: IndustryRecipe): DesignSkin {
   const detail = INDUSTRY_DETAIL[recipe.id]!;
   const palette = paletteFor(recipe);
+  const owned = OWNED_LOOK_IDENTITY[recipe.id];
   return {
     code: recipe.id,
-    name: `${recipe.name.replace(/\s*\/\s*/g, " · ")} Signature`,
-    reference: `ONDECK INDUSTRY PACK · ${recipe.dna.join(" · ")}`,
+    name: owned?.name ?? `${recipe.name.replace(/\s*\/\s*/g, " · ")} Signature`,
+    reference: owned?.reference ?? `ONDECK INDUSTRY PACK · ${recipe.dna.join(" · ")}`,
     description: detail.description,
     bestFit: `${recipe.summary} · ${recipe.keywords.join(" · ").toLowerCase()}`,
     mode: luminance(palette[0]!) < 0.42 ? "dark" : "light",

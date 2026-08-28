@@ -60,11 +60,25 @@ describe("DataForce accent pipeline — preview side", () => {
     expect(offenders, offenders.join("\n")).toEqual([]);
   });
 
-  it("keeps glyphs in DataForce Blue", () => {
+  it("keeps glyphs in DataForce Blue on the shipped look", () => {
     expect(hex(lookGlyphColor(PACK_ID)!)).toBe(DF_BLUE);
-    expect(hex(lookGlyphColor("tpl-r03")!)).toBe(DF_BLUE);
     // Other looks follow their own accent — no global blue override.
     expect(lookGlyphColor("skin-s01")).toBeNull();
+  });
+
+  it("lets an admin-saved version of the look own its own colours", () => {
+    // A saved look (tpl-…) is authored in Template Studio, so the brand lock
+    // must step aside — otherwise palette edits appear to revert.
+    expect(lookGlyphColor("tpl-r03")).toBeNull();
+    const saved = stylePackById("skin-r03")!;
+    const edited = {
+      ...saved,
+      id: "tpl-r03" as typeof saved.id,
+      tokens: { ...saved.tokens, primary: "#FF9B70", accentText: "#FF9B70" },
+    };
+    const toned = packToneBrand(byId(BRAND_MODES, "bm-enterprise")!, edited);
+    expect(hex(toned.tokens.primary)).toBe("FF9B70");
+    expect(hex(toned.tokens.accent)).toBe("FF9B70");
   });
 
   it("does not repaint any other look's accent", () => {

@@ -50,9 +50,19 @@ export const LOOK_GLYPH_COLOR: Record<string, string> = {
   R03: "#139DD8",
 };
 
+/**
+ * A saved/edited look (`tpl-…`) is authored by an admin in Template Studio, so
+ * its own palette is the authority — the owning brand's hard lock only applies
+ * to the shipped catalog pack. Without this, editing the DataForce look's
+ * accents in the studio appeared to revert on every render surface.
+ */
+function isAuthoredPack(id: string): boolean {
+  return /^tpl-/i.test(id);
+}
+
 /** Glyph colour a look forces on its icons, or null to follow the accent. */
 export function lookGlyphColor(packIdOrCode: string | null | undefined): string | null {
-  if (!packIdOrCode) return null;
+  if (!packIdOrCode || isAuthoredPack(packIdOrCode)) return null;
   const code = lookCodeFromPackId(packIdOrCode);
   return LOOK_GLYPH_COLOR[code] ?? LOOK_GLYPH_COLOR[code.replace(/-V\d+$/i, "")] ?? null;
 }
@@ -71,11 +81,14 @@ export const LOOK_OWNER_ACCENT: Record<string, { primary: string; accent: string
   R03: { primary: "#7BCD3A", accent: "#7BCD3A" },
 };
 
-/** Owning-brand lead/accent for a look, or null when the look is enterprise. */
+/**
+ * Owning-brand lead/accent for a look, or null when the look is enterprise or
+ * when an admin has saved their own version of it in Template Studio.
+ */
 export function lookOwnerAccent(
   packIdOrCode: string | null | undefined,
 ): { primary: string; accent: string } | null {
-  if (!packIdOrCode) return null;
+  if (!packIdOrCode || isAuthoredPack(packIdOrCode)) return null;
   const code = lookCodeFromPackId(packIdOrCode);
   return LOOK_OWNER_ACCENT[code] ?? LOOK_OWNER_ACCENT[code.replace(/-V\d+$/i, "")] ?? null;
 }
