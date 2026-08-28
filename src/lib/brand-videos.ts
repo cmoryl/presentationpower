@@ -10,8 +10,13 @@
 // stable, cacheable and safe to embed in decks and exports.
 // -----------------------------------------------------------------------------
 
-import dataforceHero from "@/assets/dataforce-hero-2025.mp4.asset.json";
-import dataforceHeroPoster from "@/assets/dataforce-hero-2025-poster.jpg";
+// Plain URL constants (not bundler imports): this module is reachable from
+// vite.config.ts's build gates, which evaluate it in plain Node where the "@/"
+// alias and binary/JSON imports do not resolve.
+const DATAFORCE_HERO_URL =
+  "/__l5e/assets-v1/33d2ac38-f172-4289-80da-9eaab3504d71/dataforce-hero-2025.mp4";
+const DATAFORCE_HERO_POSTER = "/brand-motion/dataforce-hero-2025-poster.jpg";
+
 
 export type BrandVideo = {
   id: string;
