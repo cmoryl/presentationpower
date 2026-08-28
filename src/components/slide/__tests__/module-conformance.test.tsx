@@ -302,6 +302,15 @@ describe("module conformance matrix", () => {
     ]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Locations family: pin coercion, region rails and role legends.
+    for (const id of [
+      "MV-LOC-WORLD-PINS",
+      "MV-LOC-WORLD-STATS",
+      "MV-LOC-REGION-FOCUS",
+      "MV-LOC-HUB-SPOKE",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
   });
 
 
