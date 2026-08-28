@@ -36,6 +36,32 @@ export type ModuleRenderArgs = {
   dash: DashLook;
   /** Bare-surface skins (Organic Systems S21): no translucent content boxes. */
   bareSurfaces?: boolean;
+  /** `mode === "dark"`, precomputed so families don't re-derive it. */
+  isDark: boolean;
+  /**
+   * Mode-aware ink ramp for copy, hairlines and chart furniture. Families MUST
+   * use these tokens instead of hardcoded rgba so text stays readable when a
+   * dark backdrop is applied.
+   */
+  ink: SlideInkRamp;
+  /** Division accent lifted onto the readable ramp for the current mode. */
+  accentTone: string;
+};
+
+export type SlideInkRamp = {
+  strong: string;
+  body: string;
+  muted: string;
+  faint: string;
+  axis: string;
+  divider: string;
+  hairline: string;
+  hairlineStrong: string;
+  surface: string;
+  surfaceRing: string;
+  ringOnDark: string;
+  onSurface: (hex: string) => string;
+  accentText: string;
 };
 
 export type ModuleRenderer = (args: ModuleRenderArgs) => ReactNode;

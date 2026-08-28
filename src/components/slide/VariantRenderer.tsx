@@ -105,7 +105,20 @@ import {
 } from "@/lib/orbit-label-layout";
 
 import { findSlideModule } from "./module-registry";
+import {
+  SlideFrame,
+  SlideFrameCtx,
+  SlideTitle,
+  arr,
+  lastWord,
+  obj,
+  s,
+  strs,
+  truthy,
+  type Item,
+} from "./module-kit";
 import "./modules/viz";
+import "./modules/timeline";
 
 import { HouseArrow } from "./HouseArrow";
 import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
@@ -235,29 +248,6 @@ function ClientLogoChip({
 // per render.
 import type { LogoPosition, LogoOrientation } from "@/lib/logo-placement";
 
-const SlideFrameCtx = createContext<{
-  clientName?: string;
-  layoutId?: string;
-  clientLogoUrl?: string | null;
-  subCompany?: string;
-  logoOrientation?: LogoOrientation;
-  logoPosition?: LogoPosition;
-}>({});
-
-function SlideFrame(props: ComponentProps<typeof BaseSlideFrame>) {
-  const ctx = useContext(SlideFrameCtx);
-  return (
-    <BaseSlideFrame
-      {...props}
-      clientName={props.clientName ?? ctx.clientName}
-      layoutId={props.layoutId ?? ctx.layoutId}
-      clientLogoUrl={props.clientLogoUrl ?? ctx.clientLogoUrl ?? null}
-      subCompany={props.subCompany ?? ctx.subCompany}
-      logoOrientation={props.logoOrientation ?? ctx.logoOrientation}
-      logoPosition={props.logoPosition ?? ctx.logoPosition}
-    />
-  );
-}
 
 import {
   ICON_SIZES,
@@ -536,23 +526,6 @@ type Props = {
   industryId?: string | null;
 };
 
-type Item = Record<string, unknown>;
-const s = (v: unknown, fb = ""): string =>
-  typeof v === "string" ? v : typeof v === "number" ? String(v) : fb;
-/** Loose truth test for authored flags — `true`, "true" and "yes" all count. */
-const truthy = (v: unknown): boolean =>
-  v === true || v === 1 || (typeof v === "string" && /^(true|yes|1)$/i.test(v.trim()));
-const arr = (v: unknown): Item[] => (Array.isArray(v) ? (v as Item[]) : []);
-const obj = (v: unknown): Record<string, unknown> =>
-  v && typeof v === "object" ? (v as Record<string, unknown>) : {};
-const strs = (v: unknown): string[] => (Array.isArray(v) ? (v as unknown[]).map((x) => s(x)) : []);
-function lastWord(t: string): string {
-  const words = String(t || "")
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-  return words[words.length - 1] ?? "";
-}
 
 // In dark mode, swap the token surfaces + text so any `brand.tokens.*` usage in
 // module bodies renders correctly on a dark slide. Primary becomes a lighter
@@ -916,6 +889,9 @@ function renderVariantBody({
       clientLogoUrl,
       dash,
       bareSurfaces,
+      isDark,
+      ink,
+      accentTone,
     });
   }
 
@@ -10696,66 +10672,6 @@ function renderVariantBody({
       );
     }
 
-    case "MV-TIMELINE-VERTICAL": {
-      const items = arr(c.items);
-      return (
-        <SlideFrame brand={brand} pageNumber={pageNumber}>
-          <SlideTitle brand={brand} title={s(c.title, variant.name)} />
-          <div className="relative mt-12 pl-32">
-            <div
-              className="absolute bottom-2 left-24 top-2 w-[2px]"
-              style={{ background: brand.tokens.accent }}
-            />
-            <div className="flex flex-col gap-10">
-              {items.map((it, i) => (
-                <div key={i} className="relative">
-                  <div
-                    className="absolute -left-[38px] top-3 h-4 w-4 rounded-full"
-                    style={{ background: "#fff", border: `3px solid ${brand.tokens.accent}` }}
-                  />
-                  <div
-                    className="absolute -left-32 top-1 w-24 pr-4 text-right tabular-nums uppercase"
-                    style={{
-                      fontSize: fillPx(18, "body"),
-                      letterSpacing: "0.24em",
-                      color: "var(--slide-accent-text)",
-                      fontWeight: 600,
-                    }}
-                  >
-                    {s(it.date)}
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: fillPx(30, "figure"),
-                        fontWeight: 600,
-                        color: ink.strong,
-                        letterSpacing: "-0.015em",
-                        lineHeight: 1.15,
-                      }}
-                    >
-                      {s(it.label)}
-                    </div>
-                    <div
-                      className="mt-2"
-                      style={{
-                        fontSize: fillPx(22, "body"),
-                        lineHeight: 1.42,
-                        color: ink.muted,
-                        maxWidth: 1080,
-                      }}
-                    >
-                      {s(it.body)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </SlideFrame>
-      );
-    }
-
     case "MV-COMPARE-VS-LISTS": {
       // Two label lists set head-to-head with a centre VS disc. Panels use the
       // house open-bottom frame + accent seam head; the close line rides in a
@@ -16942,17 +16858,6 @@ function NumberedList({
   );
 }
 
-function SlideTitle({
-  brand,
-  title,
-  kicker,
-}: {
-  brand: BrandMode;
-  title: string;
-  kicker?: string;
-}) {
-  return <TitleBlock brand={brand} title={title} kicker={kicker} size="title" />;
-}
 
 function Card({
   brand,
