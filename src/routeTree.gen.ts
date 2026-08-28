@@ -46,6 +46,7 @@ import { Route as SocialNewRouteImport } from './routes/social.new'
 import { Route as SocialModulesRouteImport } from './routes/social.modules'
 import { Route as SocialBannersRouteImport } from './routes/social.banners'
 import { Route as SocialAgentThreadIdRouteImport } from './routes/social-agent.$threadId'
+import { Route as ShowcasePresetIdRouteImport } from './routes/showcase.$presetId'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as PublicStylesRouteImport } from './routes/public.styles'
 import { Route as PublicModulesRouteImport } from './routes/public.modules'
@@ -352,6 +353,11 @@ const SocialBannersRoute = SocialBannersRouteImport.update({
 const SocialAgentThreadIdRoute = SocialAgentThreadIdRouteImport.update({
   id: '/social-agent/$threadId',
   path: '/social-agent/$threadId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowcasePresetIdRoute = ShowcasePresetIdRouteImport.update({
+  id: '/showcase/$presetId',
+  path: '/showcase/$presetId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
@@ -1082,6 +1088,7 @@ export interface FileRoutesByFullPath {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
@@ -1239,6 +1246,7 @@ export interface FileRoutesByTo {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
@@ -1401,6 +1409,7 @@ export interface FileRoutesById {
   '/public/modules': typeof PublicModulesRoute
   '/public/styles': typeof PublicStylesRoute
   '/share/$token': typeof ShareTokenRoute
+  '/showcase/$presetId': typeof ShowcasePresetIdRoute
   '/social-agent/$threadId': typeof SocialAgentThreadIdRoute
   '/social/banners': typeof SocialBannersRoute
   '/social/modules': typeof SocialModulesRoute
@@ -1564,6 +1573,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
@@ -1721,6 +1731,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
@@ -1882,6 +1893,7 @@ export interface FileRouteTypes {
     | '/public/modules'
     | '/public/styles'
     | '/share/$token'
+    | '/showcase/$presetId'
     | '/social-agent/$threadId'
     | '/social/banners'
     | '/social/modules'
@@ -2004,6 +2016,7 @@ export interface RootRouteChildren {
   PublicModulesRoute: typeof PublicModulesRoute
   PublicStylesRoute: typeof PublicStylesRoute
   ShareTokenRoute: typeof ShareTokenRoute
+  ShowcasePresetIdRoute: typeof ShowcasePresetIdRoute
   SocialAgentThreadIdRoute: typeof SocialAgentThreadIdRoute
   TestPrintDndRoute: typeof TestPrintDndRoute
   TestPrintHeroRoute: typeof TestPrintHeroRoute
@@ -2293,6 +2306,13 @@ declare module '@tanstack/react-router' {
       path: '/social-agent/$threadId'
       fullPath: '/social-agent/$threadId'
       preLoaderRoute: typeof SocialAgentThreadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showcase/$presetId': {
+      id: '/showcase/$presetId'
+      path: '/showcase/$presetId'
+      fullPath: '/showcase/$presetId'
+      preLoaderRoute: typeof ShowcasePresetIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/share/$token': {
@@ -3399,6 +3419,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicModulesRoute: PublicModulesRoute,
   PublicStylesRoute: PublicStylesRoute,
   ShareTokenRoute: ShareTokenRoute,
+  ShowcasePresetIdRoute: ShowcasePresetIdRoute,
   SocialAgentThreadIdRoute: SocialAgentThreadIdRoute,
   TestPrintDndRoute: TestPrintDndRoute,
   TestPrintHeroRoute: TestPrintHeroRoute,
