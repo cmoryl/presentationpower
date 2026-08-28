@@ -3794,12 +3794,15 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       const figureH = 0.66;
       // Short tiles in a dense mosaic (7–8 cells) do not have room for the full
       // lift: the figure used to start ABOVE the card, colliding with the index
-      // numeral and the badge. Keep it under the header row and shrink the type
-      // instead of letting the block escape the tile.
+      // numeral and the badge, and its box ran straight through the stat label.
+      // Fit it into the band between the header row and the gauge/label instead,
+      // shrinking the type rather than letting the block escape the tile.
       const headerBottom = cell.y + pad + badgeSize + 0.06;
-      const wantedY = cell.y + cell.h - pad - figureLift;
-      const figureY = Math.max(headerBottom, wantedY);
-      const figureScale = Math.min(1, Math.max(0.62, (cell.y + cell.h - pad - 0.42 - figureY) / figureH));
+      const labelTop = cell.y + cell.h - pad - 0.34;
+      const bandBottom = (frac !== null ? cell.y + cell.h - pad - 0.5 : labelTop) - 0.04;
+      const figureY = Math.max(headerBottom, cell.y + cell.h - pad - figureLift);
+      const band = Math.max(0.26, bandBottom - figureY);
+      const figureScale = Math.min(1, Math.max(0.6, band / figureH));
       g.addText(
         statRuns(str(it.value), unit, {
           size: px((isAnchor ? 96 : 72) * figureScale),
@@ -3810,10 +3813,11 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
           x: cell.x + pad,
           y: figureY,
           w: cell.w - pad * 2,
-          h: Math.max(0.3, figureH * figureScale),
+          h: Math.min(figureH, band),
           valign: "bottom",
         },
       );
+
       if (frac !== null) {
         addGaugeMeter(
           g as never,
