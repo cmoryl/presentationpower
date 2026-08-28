@@ -6,15 +6,18 @@ import React from "react";
 import { registerSlideModule } from "../module-registry";
 import { MediaTile, SlideFrame, SlideTitle, arr, lastWord, obj, s, strs, truthy } from "../module-kit";
 import {
+  Attribution,
   DisplayTitle,
   Hairline,
   Kicker,
   MetaRow,
+  QuoteMark,
   SlideNumeral,
+  StatFigure,
   SupportingText,
 } from "../primitives";
 import { HeroScrim } from "../HeroScrim";
-import { CinematicScrim, EditorialTitle, GrainOverlay, StatRail } from "../flagship";
+import { CinematicScrim, EditorialTitle, GlassTile, GrainOverlay, StatRail } from "../flagship";
 import { AccentRule } from "../Connectors";
 import { hexA } from "@/lib/accent-tokens";
 import { foregroundOn } from "@/lib/export-foreground";
