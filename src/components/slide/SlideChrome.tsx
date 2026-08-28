@@ -1334,16 +1334,25 @@ export function SlideFrame({
                     ...composeVars(compose),
                   }
                 : null),
-              // Opt-in section separator, owned by the module (never sheet-wide).
-              ...(spacing.ruleTop > 0
-                ? {
-                    borderTop: `${spacing.ruleTop}px solid ${brand.tokens.accent}`,
-                    backgroundImage: "none",
-                  }
-                : null),
             }}
-
           >
+            {/* Opt-in section separator, owned by the module: a short accent
+                rule spanning `ruleSpan` of the column — never a sheet-wide
+                hairline inherited from the look. */}
+            {spacing.ruleTop > 0 && (
+              <span
+                aria-hidden
+                style={{
+                  display: "block",
+                  height: spacing.ruleTop,
+                  width: `${Math.round(spacing.ruleSpan * 100)}%`,
+                  background: brand.tokens.accent,
+                  marginBottom: 28,
+                  flex: "0 0 auto",
+                }}
+              />
+            )}
+
             {compose && plate ? (
               <HeroPlate
                 className={heroChrome ? "w-full" : "flex min-h-0 w-full flex-1 flex-col"}
