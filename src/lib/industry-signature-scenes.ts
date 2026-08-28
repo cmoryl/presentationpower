@@ -1392,7 +1392,9 @@ function signalVolume(c: Ctx): string {
       `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.8 + c.r() * 2.6).toFixed(1)}" fill="${a(c.r() > 0.84 ? s.signal : s.a2, (0.12 + c.r() * 0.45) * k * L)}"/>`,
     );
   }
-  out.push(bloom(c, c.dir > 0 ? W * 0.26 : W * 0.74, H * 0.5, 300, s.a1, 0.24));
+  // NO CIRCULAR GESTURE on R03 (DataForce). The 300px bloom disc read as a
+  // hard vector circle floating over DataForce's own photographic plate, so
+  // the scene ends on its waveform terrain and particle depth only.
   return out.join("");
 }
 
