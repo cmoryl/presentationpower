@@ -498,6 +498,26 @@ export function SlideFrame({
   const enterpriseDark = enterprise && mode === "dark";
   const slideDark = mode === "dark";
 
+  // SECTION MOTION GROUND. An admin can run an approved brand clip behind this
+  // skin/scene in the Background Tuner. Static surfaces get the poster frame via
+  // the ground layer stack; on screen (editor, present, share) the clip itself
+  // plays, so what the tuner previewed is what the audience sees.
+  const reducedMotion = useReducedMotion();
+  const sectionMotion = (() => {
+    if (!pack || !/^skin-[sr]\d{2}$/i.test(String(pack.id))) return null;
+    const o = overrideFor(String(pack.id).replace(/^skin-/i, "").toUpperCase(), packScene);
+    if (!o || !hasMotionGround(o)) return null;
+    const treatment = motionTreatment(o.videoVariant);
+    if (!treatment) return null;
+    return {
+      url: o.videoUrl as string,
+      poster: o.videoPosterUrl,
+      variant: treatment.id,
+      scrim: treatment.scrim,
+    };
+  })();
+
+
   // A style pack is a complete master design, so it owns the page ground
   // outright: brand mesh/aurora backdrops are suppressed while one is active.
   // Without this, every dark pack rendered the corporate navy backdrop and the
