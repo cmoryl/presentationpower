@@ -5,6 +5,7 @@
 // Lives under src/routes/** so it never travels to consumers.
 
 import { createFileRoute } from "@tanstack/react-router";
+import type * as React from "react";
 import { useMemo, useState } from "react";
 import { Check, Moon, Search, Sun } from "lucide-react";
 
