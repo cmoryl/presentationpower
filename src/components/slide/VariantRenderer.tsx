@@ -4790,8 +4790,16 @@ function renderVariantBody({
       // is too deep to read as text or as a hairline, so lift it onto the
       // shared accentInk ramp. Light mode is unchanged.
       const accent = accentInk(brand.tokens.accent, mode, 4.5);
-      const tileBg = isDark ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.02)";
-      const tileRing = isDark ? "rgba(255,255,255,0.08)" : "rgba(10,15,28,0.06)";
+      const tileBg = bareSurfaces
+        ? "transparent"
+        : isDark
+          ? "rgba(255,255,255,0.04)"
+          : "rgba(10,15,28,0.02)";
+      const tileRing = bareSurfaces
+        ? "transparent"
+        : isDark
+          ? "rgba(255,255,255,0.08)"
+          : "rgba(10,15,28,0.06)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
