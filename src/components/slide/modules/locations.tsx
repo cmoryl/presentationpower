@@ -12,8 +12,6 @@ import type { SlideMode } from "../SlideChrome";
 import type { BrandMode } from "@/lib/taxonomy";
 import { exportMapNodeAsPng } from "@/lib/map-png-export";
 
-
-
 // ────────────────────────────────────────────────────────────────────────────
 // Locations family — MV-LOC-* renderer
 // ────────────────────────────────────────────────────────────────────────────
