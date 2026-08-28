@@ -143,8 +143,16 @@ export type KitSparklineProps = {
   peakLabel?: string;
 };
 
+export type KitNumberedListProps = {
+  brand: BrandMode;
+  pageNumber: number;
+  title: string;
+  items: Item[];
+};
+
 type KitPrimitives = {
   IconBadge: (p: KitIconBadgeProps) => ReactElement | null;
+  NumberedList: (p: KitNumberedListProps) => ReactElement | null;
   MediaTile: (p: KitMediaTileProps) => ReactElement | null;
   Sparkline: (p: KitSparklineProps) => ReactElement | null;
 };
@@ -163,6 +171,11 @@ export function IconBadge(props: KitIconBadgeProps) {
 
 export function MediaTile(props: KitMediaTileProps) {
   const Impl = primitives?.MediaTile;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function NumberedList(props: KitNumberedListProps) {
+  const Impl = primitives?.NumberedList;
   return Impl ? <Impl {...props} /> : null;
 }
 
