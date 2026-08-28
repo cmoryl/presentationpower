@@ -88,8 +88,23 @@ describe("module conformance matrix", () => {
     for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Graph family: charts must keep drawing through `charts.tsx` +
 
+    // `chart-primitives.tsx` so the build and the PPTX export share geometry.
+    for (const id of [
+      "MV-GRAPH-YEAR-SERIES",
+      "MV-GRAPH-AXIS-BARS",
+      "MV-GRAPH-CATEGORY-BARS",
+      "MV-GRAPH-RINGS",
+      "MV-GRAPH-LINE-MULTI",
+      "MV-GRAPH-STACKED-BAR",
+      "MV-GRAPH-WATERFALL",
+      "MV-GRAPH-COMBO",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
   });
+
 
 
 
