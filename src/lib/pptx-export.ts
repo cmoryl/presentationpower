@@ -3791,20 +3791,33 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       // the figure reclaims the vertical space the gauge would have used.
       const frac = percentGaugeFraction(str(it.value), unit);
       const figureLift = frac === null ? 1.02 : 1.18;
+      const figureH = 0.66;
+      // Short tiles in a dense mosaic (7–8 cells) do not have room for the full
+      // lift: the figure used to start ABOVE the card, colliding with the index
+      // numeral and the badge, and its box ran straight through the stat label.
+      // Fit it into the band between the header row and the gauge/label instead,
+      // shrinking the type rather than letting the block escape the tile.
+      const headerBottom = cell.y + pad + badgeSize + 0.06;
+      const labelTop = cell.y + cell.h - pad - 0.34;
+      const bandBottom = (frac !== null ? cell.y + cell.h - pad - 0.5 : labelTop) - 0.04;
+      const figureY = Math.max(headerBottom, cell.y + cell.h - pad - figureLift);
+      const band = Math.max(0.26, bandBottom - figureY);
+      const figureScale = Math.min(1, Math.max(0.6, band / figureH));
       g.addText(
         statRuns(str(it.value), unit, {
-          size: px(isAnchor ? 96 : 72),
-          unitSize: px(isAnchor ? 40 : 30),
+          size: px((isAnchor ? 96 : 72) * figureScale),
+          unitSize: px((isAnchor ? 40 : 30) * figureScale),
           color: p.accent,
         }),
         {
           x: cell.x + pad,
-          y: cell.y + cell.h - pad - figureLift,
+          y: figureY,
           w: cell.w - pad * 2,
-          h: 0.66,
+          h: Math.min(figureH, band),
           valign: "bottom",
         },
       );
+
       if (frac !== null) {
         addGaugeMeter(
           g as never,
@@ -3814,6 +3827,7 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
           `Bento gauge ${i + 1}`,
         );
       }
+
 
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
@@ -3833,11 +3847,22 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
     // like the screen's `mt-auto` block.
     const titlePt = px(isAnchor ? 46 : 28);
     const bodyPt = px(isAnchor ? 24 : 20);
-    const bodyH = Math.min(cell.h - pad * 2 - 1.1, (isAnchor ? 3 : 2) * 0.44);
+    // Dense mosaics (7–8 cells) leave short tiles. The old fixed reserve
+    // (`cell.h - pad*2 - 1.1`) went NEGATIVE there — a negative <a:ext cy> is
+    // invalid OOXML, so PowerPoint threw "found a problem with content" and
+    // repaired the deck, stacking the title and copy on the same spot. Both
+    // boxes are now derived from the space the tile actually has, and the copy
+    // is dropped rather than overlapped when a tile cannot hold two blocks.
+    const ruleGap = 0.2;
+    const inner = Math.max(0.3, cell.h - pad * 2 - ruleGap);
     // Title box hugs its copy: a tall fixed box left a dead gap between the
     // title and the body paragraph that the on-screen card does not have.
-    const titleH = isAnchor ? 0.82 : 0.46;
-    const blockY = cell.y + cell.h - pad - bodyH - titleH;
+    const titleH = Math.min(isAnchor ? 0.82 : 0.46, inner * 0.55);
+    const bodyH = Math.min(inner - titleH, (isAnchor ? 3 : 2) * 0.44);
+    const showBody = bodyH >= 0.24 && str(it.body).length > 0;
+    const blockH = titleH + (showBody ? bodyH : 0);
+    const blockY = Math.max(cell.y + pad + ruleGap, cell.y + cell.h - pad - blockH);
+
     g.addShape("rect", {
       x: cell.x + pad,
       y: blockY - 0.2,
@@ -3859,18 +3884,21 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       valign: "top",
       lineSpacingMultiple: 1.08,
     });
-    g.addText(str(it.body), {
-      x: cell.x + pad,
-      y: blockY + titleH,
-      w: cell.w - pad * 2,
-      h: bodyH,
-      fontSize: bodyPt,
-      color: p.ink,
-      fontFace: "Geist",
-      valign: "top",
-      lineSpacingMultiple: 1.4,
-    });
+    if (showBody) {
+      g.addText(str(it.body), {
+        x: cell.x + pad,
+        y: blockY + titleH,
+        w: cell.w - pad * 2,
+        h: bodyH,
+        fontSize: bodyPt,
+        color: p.ink,
+        fontFace: "Geist",
+        valign: "top",
+        lineSpacingMultiple: 1.4,
+      });
+    }
   });
+
 }
 
 // 1b. MV-BENTO-VALUE-CLOSE — promise band, value grid, close band.
