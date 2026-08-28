@@ -6,7 +6,7 @@
 import { registerSlideModule } from "../module-registry";
 import { SlideFrame, SlideTitle, arr, obj, s } from "../module-kit";
 import { fillPx } from "@/lib/open-space-fill";
-import { Kicker } from "../primitives";
+import { Kicker, StatFigure } from "../primitives";
 import {
   AxisBarChart,
   BubbleChart,
