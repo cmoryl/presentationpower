@@ -17,6 +17,11 @@
 import { sceneFromSeed, SKIN_SCENES } from "./skin-backgrounds";
 import { overrideFor, type TemplateBackgroundOverride } from "./template-registry";
 import { motionTreatment } from "./template-motion";
+import {
+  moduleIdFromSeed,
+  sceneTakeFromSeed,
+  skinBackdropOverride,
+} from "./skin-backdrop-overrides";
 import type { StylePack } from "./style-packs";
 
 const HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
@@ -130,18 +135,120 @@ export function composeOverrideLayers(
   return out;
 }
 
-/** Wrap a pack so its ground honours the admin overrides for `code`. */
+/* ── ONE ground resolver ───────────────────────────────────────────────────
+ * Two admin systems can change a look's ground:
+ *
+ *   1. REPLACEMENT artwork — background directory / "Replace the picture on
+ *      this section" / per-module replace. Lives in the skin-backdrop registry.
+ *   2. TUNING — intensity, tint, scene swap, motion, tuner uploads. Lives in
+ *      `template_background_overrides`.
+ *
+ * They used to be applied in different places (the registry inside
+ * `packGroundPaint`, the tuning inside this wrapper), and the registry branch
+ * returned early — so a tuned section looked one way in the Backgrounds tuner
+ * and another way on module cards, stages and exports. Everything now goes
+ * through `resolveGroundLayers` exactly once.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/** Packs whose `ground()` already ran the resolver — never apply it twice. */
+const RESOLVED = new WeakSet<object>();
+/** Pre-override ground of a wrapped pack, for authored/compare previews. */
+const AUTHORED = new WeakMap<object, (seed: string) => string[]>();
+
+export function groundOverridesApplied(pack: StylePack): boolean {
+  return RESOLVED.has(pack as object);
+}
+
+/** The pack's own artwork, before any admin replacement or tuning. */
+export function authoredGround(pack: StylePack): (seed: string) => string[] {
+  return AUTHORED.get(pack as object) ?? pack.ground;
+}
+
+/** Replacement artwork registered for this code × seed, if any. */
+export function replacedGroundUrl(
+  code: string | null | undefined,
+  seed: string,
+): string | null {
+  if (!code) return null;
+  return skinBackdropOverride(
+    code.toUpperCase(),
+    sceneFromSeed(seed),
+    sceneTakeFromSeed(seed).take,
+    moduleIdFromSeed(seed),
+  );
+}
+
+/**
+ * True when the ground of this code × seed is a replaced/uploaded picture —
+ * from the registry OR from a tuner upload. Callers use it to suppress the
+ * procedural scaffold, motif, mask and damping so the picture reads clean.
+ */
+export function groundIsReplaced(code: string | null | undefined, seed: string): boolean {
+  if (!code) return false;
+  if (replacedGroundUrl(code, seed)) return true;
+  const o = overrideFor(code, sceneFromSeed(seed));
+  return !!(o && (o.imageUrl || (o.videoUrl && o.videoVariant)));
+}
+
+/** Replacement artwork substituted for the authored layers, flat base kept. */
+function withReplacement(
+  layers: string[],
+  code: string | null | undefined,
+  seed: string,
+  surface: string,
+): string[] {
+  const url = replacedGroundUrl(code, seed);
+  if (!url) return layers;
+  const flatBase = layers.filter((l) => /^(#|rgb|hsl)/i.test(l.trim()));
+  return [
+    `url("${url}") center center / cover no-repeat`,
+    ...(flatBase.length ? flatBase : [surface]),
+  ];
+}
+
+/** Scene the tuning is authored from, honouring an explicit scene swap. */
+function swapSeed(o: TemplateBackgroundOverride | null, seed: string): string {
+  return o?.sceneSwap && (SKIN_SCENES as string[]).includes(o.sceneSwap) ? o.sceneSwap : seed;
+}
+
+/**
+ * Final ground layers for one code × seed: replacement artwork first, then the
+ * admin tuning composed on top. `authored` must be the pack's own layers.
+ */
+export function resolveGroundLayers(
+  authored: (seed: string) => string[],
+  code: string | null | undefined,
+  seed: string,
+  surface: string,
+  override?: TemplateBackgroundOverride | null,
+): string[] {
+  const o = override ?? (code ? overrideFor(code, sceneFromSeed(seed)) : null);
+  const base = withReplacement(authored(swapSeed(o, seed)), code, seed, surface);
+  if (!o || isNeutralOverride(o)) return base;
+  return composeOverrideLayers(base, o, surface);
+}
+
+/**
+ * Preview layers for an in-progress tuner edit — same resolver the stage,
+ * library cards and exporters use, so the tuner cannot disagree with them.
+ */
+export function previewGroundLayers(
+  pack: StylePack,
+  code: string,
+  seed: string,
+  edit: TemplateBackgroundOverride,
+): string[] {
+  return resolveGroundLayers(authoredGround(pack), code, seed, pack.tokens.surface, edit);
+}
+
+/** Wrap a pack so its ground honours the replacement + tuning for `code`. */
 export function withBackgroundOverrides(pack: StylePack, code: string): StylePack {
-  const base = pack.ground;
-  return {
+  const base = authoredGround(pack);
+  const wrapped: StylePack = {
     ...pack,
-    ground: (seed: string) => {
-      const scene = sceneFromSeed(seed);
-      const o = overrideFor(code, scene);
-      if (!o || isNeutralOverride(o)) return base(seed);
-      const swap =
-        o.sceneSwap && (SKIN_SCENES as string[]).includes(o.sceneSwap) ? o.sceneSwap : seed;
-      return composeOverrideLayers(base(swap), o, pack.tokens.surface);
-    },
+    ground: (seed: string) => resolveGroundLayers(base, code, seed, pack.tokens.surface),
   };
+  RESOLVED.add(wrapped as object);
+  AUTHORED.set(wrapped as object, base);
+  return wrapped;
 }

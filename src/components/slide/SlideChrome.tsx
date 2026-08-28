@@ -29,8 +29,10 @@ import {
   minimalPackLayers,
   packGroundPaint,
   isCuratedGroundPack,
+  backgroundCodeForPackId,
 } from "@/lib/style-packs";
 import { plateCalmFor, plateIsGraphicKit } from "@/lib/plate-calm";
+import { groundIsReplaced } from "@/lib/template-background";
 
 import { packSignature } from "@/lib/style-pack-motifs";
 import { packGroundDamp, packReadability } from "@/lib/pack-readability";
@@ -40,7 +42,6 @@ import { useSkinBackdropImage } from "@/components/slide/SkinBackdropContext";
 import {
   moduleIdFromSeed,
   sceneTakeFromSeed,
-  skinBackdropOverride,
   useSkinBackdropVersion,
 } from "@/lib/skin-backdrop-overrides";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
@@ -477,14 +478,7 @@ export function SlideFrame({
   // full strength. Layering the authored scene under/over the replacement is
   // what made one updated look read as "three templates in one".
   const replacedGround =
-    !!pack &&
-    /^skin-[sr]\d{2}$/i.test(String(pack.id)) &&
-    !!skinBackdropOverride(
-      String(pack.id).replace(/^skin-/i, "").toUpperCase(),
-      packScene,
-      sceneTakeFromSeed(groundSeed).take,
-      moduleIdFromSeed(groundSeed),
-    );
+    !!pack && groundIsReplaced(backgroundCodeForPackId(String(pack.id)), groundSeed);
   const aiBackdrop = replacedGround ? null : aiBackdropRendered;
   // Cover / divider / close chrome historically forced a dark navy surface so
   // hero titles kept dramatic contrast even when the deck ran in default light
