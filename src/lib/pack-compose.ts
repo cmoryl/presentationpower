@@ -150,6 +150,7 @@ export function packCompose(pack: StylePack, moduleId?: string | null): PackComp
     trail,
     rhythm: Number((0.86 + dense * 0.34).toFixed(3)),
     ...override,
+    ...modOverride,
   };
 
 }

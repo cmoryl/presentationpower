@@ -1265,12 +1265,13 @@ export function SlideFrame({
           differently (see pack-compose.ts), so the same module reads as a
           genuinely different layout from look to look. */}
       {(() => {
-        const compose = pack ? packCompose(pack) : null;
+        const composeModuleId = moduleIdFromSeed(moduleSeed) ?? layoutId ?? variant;
+        const compose = pack ? packCompose(pack, composeModuleId) : null;
         // Section separation is a per-MODULE decision, not a look-wide one:
         // each module resolves its own top rule / padding / gutters from the
         // spacing tokens (see module-spacing.ts) so no global plate reaches
         // across the catalogue.
-        const spacing = moduleSpacing(pack, moduleIdFromSeed(moduleSeed) ?? layoutId ?? variant);
+        const spacing = moduleSpacing(pack, composeModuleId);
 
         // Horizontal bias also only shapes the hero chrome. On a content module
         // `flex-end` / `center` collapses the child to its intrinsic width,
