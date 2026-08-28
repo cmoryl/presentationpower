@@ -1264,6 +1264,12 @@ export function SlideFrame({
           genuinely different layout from look to look. */}
       {(() => {
         const compose = pack ? packCompose(pack) : null;
+        // Section separation is a per-MODULE decision, not a look-wide one:
+        // each module resolves its own top rule / padding / gutters from the
+        // spacing tokens (see module-spacing.ts) so no global plate reaches
+        // across the catalogue.
+        const spacing = moduleSpacing(pack, moduleIdFromSeed(moduleSeed) ?? layoutId ?? variant);
+
         // Horizontal bias also only shapes the hero chrome. On a content module
         // `flex-end` / `center` collapses the child to its intrinsic width,
         // which is what left half-empty sheets behind — content stretches.
