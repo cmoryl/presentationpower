@@ -10,3 +10,9 @@ src/start.ts
 src/assets/**
 # ...but official brand marks ship with the design system.
 !src/assets/logos/**
+
+# App shell files that import excluded product code — must not ship to consumers.
+src/router.tsx
+src/routeTree.gen.ts
+src/routes/**
+src/styles.css
