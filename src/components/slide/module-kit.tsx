@@ -8,7 +8,7 @@
 // that makes extraction possible (see `module-registry.ts`).
 // ---------------------------------------------------------------------------
 
-import { createContext, useContext, type ComponentProps, type ReactElement } from "react";
+import React, { createContext, useContext, type ComponentProps, type ReactElement } from "react";
 import type { LogoOrientation, LogoPosition } from "@/lib/logo-placement";
 import { SlideFrame as BaseSlideFrame } from "./SlideChrome";
 import { TitleBlock } from "./primitives";
@@ -178,7 +178,39 @@ export type KitSummaryStatCardProps = {
   series: number[];
 };
 
+export type KitPickIcon = (
+  label: string,
+  fallbackIndex?: number,
+  override?: string | null,
+  divisionId?: string | null,
+) => React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
+
+export type KitCardProps = {
+  brand: BrandMode;
+  title: string;
+  body: string;
+  index: number;
+  icon?: string;
+};
+
+export type KitCardGridProps = {
+  brand: BrandMode;
+  pageNumber: number;
+  title: string;
+  items: Item[];
+  cols: number;
+  rows?: number;
+};
+
+export type KitAuroraStatGridProps = KitCardGridProps & {
+  align?: "left" | "center";
+};
+
 type KitPrimitives = {
+  Card: (p: KitCardProps) => ReactElement | null;
+  CardGrid: (p: KitCardGridProps) => ReactElement | null;
+  AuroraStatGrid: (p: KitAuroraStatGridProps) => ReactElement | null;
+  pickIcon: KitPickIcon;
   IconBadge: (p: KitIconBadgeProps) => ReactElement | null;
   NumberedList: (p: KitNumberedListProps) => ReactElement | null;
   MediaTile: (p: KitMediaTileProps) => ReactElement | null;
@@ -193,6 +225,28 @@ let primitives: KitPrimitives | null = null;
 /** Called once by `VariantRenderer` so extracted families can draw badges/tiles. */
 export function registerKitPrimitives(next: KitPrimitives): void {
   primitives = next;
+}
+
+/** Keyword/division icon resolver owned by `VariantRenderer`. */
+export const pickKitIcon: KitPickIcon = (label, fallbackIndex, override, divisionId) => {
+  const impl = primitives?.pickIcon;
+  if (!impl) return () => null;
+  return impl(label, fallbackIndex, override, divisionId);
+};
+
+export function Card(props: KitCardProps) {
+  const Impl = primitives?.Card;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function CardGrid(props: KitCardGridProps) {
+  const Impl = primitives?.CardGrid;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function AuroraStatGrid(props: KitAuroraStatGridProps) {
+  const Impl = primitives?.AuroraStatGrid;
+  return Impl ? <Impl {...props} /> : null;
 }
 
 export function IconBadge(props: KitIconBadgeProps) {

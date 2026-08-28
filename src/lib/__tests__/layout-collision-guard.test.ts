@@ -20,7 +20,7 @@
  */
 
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 const REPO = resolve(__dirname, "../../..");
@@ -28,6 +28,14 @@ const VARIANT_RENDERER = readFileSync(
   resolve(REPO, "src/components/slide/VariantRenderer.tsx"),
   "utf8",
 );
+// Families are being extracted out of the legacy switch into
+// `src/components/slide/modules/*`. The clearance contract follows the JSX, so
+// the audit reads the renderer PLUS every extracted module.
+const MODULES_DIR = resolve(REPO, "src/components/slide/modules");
+const MODULE_SOURCES = readdirSync(MODULES_DIR)
+  .filter((f) => f.endsWith(".tsx"))
+  .map((f) => readFileSync(resolve(MODULES_DIR, f), "utf8"));
+const VARIANT_SOURCES = [VARIANT_RENDERER, ...MODULE_SOURCES].join("\n");
 const PRIMITIVES = readFileSync(resolve(REPO, "src/components/slide/primitives.tsx"), "utf8");
 
 // Minimum Tailwind mt-* / mb-* number required as breathing room.
@@ -90,7 +98,7 @@ describe("Variant bodies keep clearance below the hero title", () => {
   const caseBlocks: { id: string; body: string }[] = [];
   const caseRe = /case\s+"(MV-[A-Z0-9_-]+)":\s*{([\s\S]*?)^\s*}\s*$/gm;
   let m: RegExpExecArray | null;
-  while ((m = caseRe.exec(VARIANT_RENDERER)) !== null) {
+  while ((m = caseRe.exec(VARIANT_SOURCES)) !== null) {
     caseBlocks.push({ id: m[1], body: m[2] });
   }
 
