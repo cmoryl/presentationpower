@@ -129,6 +129,23 @@ describe("module conformance matrix", () => {
 
       expect(registeredModuleIds()).toContain(id);
     }
+    // Image-forward family: media framing, scrims and captions.
+    for (const id of [
+      "MV-IMG-FULL-BLEED",
+      "MV-IMG-SPLIT",
+      "MV-IMG-CAPTION",
+      "MV-IMG-GRID-3",
+      "MV-IMG-GRID-6",
+      "MV-IMG-PORTRAIT",
+      "MV-IMG-QUOTE-BG",
+      "MV-IMG-BEFORE-AFTER",
+      "MV-IMG-STAT-CALLOUT",
+      "MV-IMG-STRIP",
+      "MV-IMG-MATRIX-4",
+      "MV-IMG-MATRIX-6",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Opening family: covers, dividers and agendas own the cover chrome.
     for (const id of [
       "MV-OP-COVER",
