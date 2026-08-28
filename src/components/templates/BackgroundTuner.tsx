@@ -26,6 +26,12 @@ import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
 import { BackdropSourcePicker, divisionImageUrl } from "./BackdropSourcePicker";
 import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { SceneSlideStage } from "./SceneSlideStage";
+import {
+  MOTION_TREATMENTS,
+  hasMotionGround,
+  motionTreatment,
+  selectableMotionClips,
+} from "@/lib/template-motion";
 
 import type { BackdropShot } from "./BackdropLightbox";
 
@@ -199,6 +205,9 @@ export function BackgroundTuner({
           sceneSwap: from.sceneSwap ?? null,
           imageUrl: from.imageUrl ?? null,
           imagePriority: from.imagePriority ?? "front",
+          videoUrl: from.videoUrl ?? null,
+          videoPosterUrl: from.videoPosterUrl ?? null,
+          videoVariant: from.videoVariant ?? null,
 
           note: from.note ?? "",
         },
@@ -526,6 +535,7 @@ export function BackgroundTuner({
                 s === scene ? previewLayers : layersFor(o ?? defaultOverride(code, s), s);
               const on = s === scene;
               const custom = s === scene ? !!edit.imageUrl : !!o?.imageUrl;
+              const motion = hasMotionGround(s === scene ? edit : o);
               const uploading = uploadingScene === s;
               return (
                 <div
@@ -563,7 +573,12 @@ export function BackgroundTuner({
                     >
                       {SCENE_LABEL[s] ?? s}
                     </span>
-                    {o && (
+                    {motion && (
+                      <span className="shrink-0 rounded-full bg-black/80 px-1.5 py-0.5 text-[9px] font-semibold text-white dark:bg-white/20">
+                        ▶ motion
+                      </span>
+                    )}
+                    {o && !motion && (
                       <span className="shrink-0 rounded-full bg-[#003FC7]/10 px-1.5 py-0.5 text-[9px] font-semibold text-[#003FC7]">
                         edited
                       </span>
