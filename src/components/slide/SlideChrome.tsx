@@ -44,6 +44,8 @@ import {
   useSkinBackdropVersion,
 } from "@/lib/skin-backdrop-overrides";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
+import { moduleSpacing, spacingVars, moduleIdFromSeed } from "@/lib/module-spacing";
+
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
 import { overrideFor } from "@/lib/template-registry";
