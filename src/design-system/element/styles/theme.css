@@ -1,5 +1,6 @@
 @import "tailwindcss" source(none);
-@source "../**/*.tsx";
+/* No @source here: a project-relative glob only resolves in this repo. The
+ * consuming app scans its own tree (this file is copied under its src/). */
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 

@@ -5,3 +5,8 @@ source_type: local
 upstream_package: ""
 starter_template: custom_design_system
 stack_packages: []
+upstream_versions:
+  react: 19.2.5
+  react-dom: 19.2.5
+  lucide-react: 0.575.0
+  "@radix-ui/react-slot": 1.2.4
