@@ -80,6 +80,7 @@ import { Route as DevPlacementVerifyRouteImport } from './routes/dev.placement-v
 import { Route as DevModuleSheetRouteImport } from './routes/dev.module-sheet'
 import { Route as DevModuleCatalogRouteImport } from './routes/dev.module-catalog'
 import { Route as DevMapExportParityRouteImport } from './routes/dev.map-export-parity'
+import { Route as DevLibraryShowcaseRouteImport } from './routes/dev.library-showcase'
 import { Route as DevLayerDiffRouteImport } from './routes/dev.layer-diff'
 import { Route as DevImageFormatVerifyRouteImport } from './routes/dev.image-format-verify'
 import { Route as DevImageBenchRouteImport } from './routes/dev.image-bench'
@@ -526,6 +527,11 @@ const DevModuleCatalogRoute = DevModuleCatalogRouteImport.update({
 const DevMapExportParityRoute = DevMapExportParityRouteImport.update({
   id: '/dev/map-export-parity',
   path: '/dev/map-export-parity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevLibraryShowcaseRoute = DevLibraryShowcaseRouteImport.update({
+  id: '/dev/library-showcase',
+  path: '/dev/library-showcase',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevLayerDiffRoute = DevLayerDiffRouteImport.update({
@@ -1069,6 +1075,7 @@ export interface FileRoutesByFullPath {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/library-showcase': typeof DevLibraryShowcaseRoute
   '/dev/map-export-parity': typeof DevMapExportParityRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
@@ -1229,6 +1236,7 @@ export interface FileRoutesByTo {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/library-showcase': typeof DevLibraryShowcaseRoute
   '/dev/map-export-parity': typeof DevMapExportParityRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
@@ -1394,6 +1402,7 @@ export interface FileRoutesById {
   '/dev/image-bench': typeof DevImageBenchRoute
   '/dev/image-format-verify': typeof DevImageFormatVerifyRoute
   '/dev/layer-diff': typeof DevLayerDiffRoute
+  '/dev/library-showcase': typeof DevLibraryShowcaseRoute
   '/dev/map-export-parity': typeof DevMapExportParityRoute
   '/dev/module-catalog': typeof DevModuleCatalogRoute
   '/dev/module-sheet': typeof DevModuleSheetRoute
@@ -1560,6 +1569,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/library-showcase'
     | '/dev/map-export-parity'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
@@ -1720,6 +1730,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/library-showcase'
     | '/dev/map-export-parity'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
@@ -1884,6 +1895,7 @@ export interface FileRouteTypes {
     | '/dev/image-bench'
     | '/dev/image-format-verify'
     | '/dev/layer-diff'
+    | '/dev/library-showcase'
     | '/dev/map-export-parity'
     | '/dev/module-catalog'
     | '/dev/module-sheet'
@@ -2019,6 +2031,7 @@ export interface RootRouteChildren {
   DevImageBenchRoute: typeof DevImageBenchRoute
   DevImageFormatVerifyRoute: typeof DevImageFormatVerifyRoute
   DevLayerDiffRoute: typeof DevLayerDiffRoute
+  DevLibraryShowcaseRoute: typeof DevLibraryShowcaseRoute
   DevMapExportParityRoute: typeof DevMapExportParityRoute
   DevModuleCatalogRoute: typeof DevModuleCatalogRoute
   DevModuleSheetRoute: typeof DevModuleSheetRoute
@@ -2570,6 +2583,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/map-export-parity'
       fullPath: '/dev/map-export-parity'
       preLoaderRoute: typeof DevMapExportParityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dev/library-showcase': {
+      id: '/dev/library-showcase'
+      path: '/dev/library-showcase'
+      fullPath: '/dev/library-showcase'
+      preLoaderRoute: typeof DevLibraryShowcaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/layer-diff': {
@@ -3438,6 +3458,7 @@ const rootRouteChildren: RootRouteChildren = {
   DevImageBenchRoute: DevImageBenchRoute,
   DevImageFormatVerifyRoute: DevImageFormatVerifyRoute,
   DevLayerDiffRoute: DevLayerDiffRoute,
+  DevLibraryShowcaseRoute: DevLibraryShowcaseRoute,
   DevMapExportParityRoute: DevMapExportParityRoute,
   DevModuleCatalogRoute: DevModuleCatalogRoute,
   DevModuleSheetRoute: DevModuleSheetRoute,
