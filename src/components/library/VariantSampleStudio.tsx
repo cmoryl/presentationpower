@@ -917,9 +917,24 @@ export function VariantSampleStudio({
                     : "Unsaved changes — press ⌘S to save"
                   : savedAt
                     ? `Saved ${new Date(savedAt).toLocaleTimeString()} · safe to leave`
-                    : "All changes published"}
+                    : hasSavedSample
+                      ? "Published sample loaded"
+                      : "No saved sample yet"}
+            </span>
+            <span aria-hidden="true" className="text-white/25">
+              ·
+            </span>
+            {/* The save target, always visible: curators kept losing division
+                edits to the global scope because it was buried in a panel. */}
+            <span className="text-white/45">
+              saves to{" "}
+              <span className="font-semibold text-[#A1FBF9]">
+                {scopeToBrand ? brandName : "all brands"}
+              </span>
+              {pack ? ` · ${pack.label ?? pack.id}` : ""}
             </span>
           </div>
+
         </div>
 
         <div className="flex overflow-hidden rounded-full border border-white/25">
