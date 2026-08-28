@@ -958,7 +958,9 @@ registerSlideModule({
               ))}
             </div>
           </div>
-        </SlideFrame>
+        </SlideFrame>      );
+    }
+
     default:
       return null;
     }

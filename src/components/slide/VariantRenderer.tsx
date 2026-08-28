@@ -2222,8 +2222,6 @@ function renderVariantBody({
     }
 
     // The MV-INFO-* diagram family now lives in `modules/info.tsx`.
-      );
-    }
 
     // ── Client & image matrix layouts ─────────────────────────────────
     case "MV-CLIENT-MATRIX": {
