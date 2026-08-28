@@ -8,7 +8,9 @@
  * src/lib/pptx-presentation-order.ts.
  *
  *  1. <p:embeddedFontLst> must be the LAST child of <p:presentation>.
- *  2. <p:notesMasterIdLst> must appear AFTER <p:sldIdLst>.
+ *  2. <p:notesMasterIdLst> must appear BEFORE <p:sldIdLst> (CT_Presentation
+ *     sequence: sldMasterIdLst, notesMasterIdLst, handoutMasterIdLst, sldIdLst),
+ *     which is what pptx-presentation-order.ts re-asserts after every pass.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import JSZip from "jszip";
@@ -76,7 +78,7 @@ describe("exported package ordering (PowerPoint open gate)", () => {
     expect(tail.trim(), `unexpected siblings after embeddedFontLst: ${tail.trim()}`).toBe("");
   });
 
-  it("emits notesMasterIdLst for a deck with speaker notes, after sldIdLst", async () => {
+  it("emits notesMasterIdLst for a deck with speaker notes, before sldIdLst", async () => {
     const xml = await presentationXml(false);
     const slides = xml.indexOf("<p:sldIdLst");
     expect(slides, "no sldIdLst in presentation.xml").toBeGreaterThan(-1);
@@ -89,6 +91,6 @@ describe("exported package ordering (PowerPoint open gate)", () => {
       notes,
       "deck has speaker notes but presentation.xml declares no notesMasterIdLst",
     ).toBeGreaterThan(-1);
-    expect(notes).toBeGreaterThan(slides);
+    expect(notes).toBeLessThan(slides);
   });
 });

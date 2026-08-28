@@ -30,7 +30,10 @@ const PARITY_SRC = read("src/lib/pptx-parity.ts");
 
 const EXPORTER_SRC = read("src/lib/pptx-export.ts");
 const EMBED_SRC = read("src/lib/pptx-font-embed.ts");
-const STYLES_SRC = read("src/styles.css");
+// Tokens live in the Element library theme, which `src/styles.css` @imports —
+// read both so the guard follows the token wherever it is declared.
+const STYLES_SRC =
+  read("src/styles.css") + "\n" + read("src/design-system/element/styles/theme.css");
 
 const ALLOWED_FONT_FACES = new Set(["Geist"]);
 const MIN_FONT_SIZE = 8;
@@ -40,7 +43,7 @@ const MAX_CHAR_SPACING = 8;
 describe("PPTX typography parity guard", () => {
   it("preview --font-sans is the Geist family", () => {
     const match = STYLES_SRC.match(/--font-sans:\s*"([^"]+)"/);
-    expect(match, "expected --font-sans declaration in src/styles.css").toBeTruthy();
+    expect(match, "expected a --font-sans declaration in the app or library stylesheet").toBeTruthy();
     expect(match![1]).toMatch(/^Geist/);
   });
 
