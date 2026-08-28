@@ -146,6 +146,20 @@ describe("module conformance matrix", () => {
     ]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Dashboard family: aurora metric decks, gauges and breakdowns.
+    for (const id of [
+      "MV-DASH-SUMMARY",
+      "MV-DASH-DONUT-TRIO",
+      "MV-DASH-SALES-CHART",
+      "MV-DASH-GAUGE-ROW",
+      "MV-DASH-PERFORMANCE",
+      "MV-DASH-REPORT-CARDS",
+      "MV-DASH-GROWTH-COLUMNS",
+      "MV-DASH-BREAKDOWN",
+      "MV-DASH-REGION-STATS",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Opening family: covers, dividers and agendas own the cover chrome.
     for (const id of [
       "MV-OP-COVER",
