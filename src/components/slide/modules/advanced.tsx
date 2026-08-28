@@ -13,7 +13,7 @@ import {
   Sparkline,
   arr,
   obj,
-  pickKitIcon as pickIcon,
+  pickKitIcon,
   s,
   strs,
   truthy,
@@ -31,7 +31,7 @@ import {
 import { FunnelFigure, type FunnelStage } from "../FunnelFigure";
 import { resolveFunnelStyle } from "@/lib/funnel-style";
 import { SummaryBand } from "../SummaryBand";
-import { ClientLogoImg } from "../client-logo";
+import { ClientLogoImg, pickLogoForMode } from "../client-logo";
 import { SEAM_HEIGHT_PX, SUMMARY_BAND } from "@/lib/surface-tokens";
 import { accentInk, hexA } from "@/lib/accent-tokens";
 import { statGradient } from "@/lib/stat-contrast";
@@ -50,6 +50,15 @@ import {
 import type { CSSProperties } from "react";
 
 type IconType = typeof Sparkles;
+
+// The kit's icon resolver is typed against the shared kit icon shape; this
+// family renders lucide components directly, so narrow the return type once.
+const pickIcon = pickKitIcon as unknown as (
+  label: string,
+  fallbackIndex?: number,
+  override?: string | null,
+  divisionId?: string | null,
+) => IconType;
 
 void React;
 void useSlideInk;
@@ -88,6 +97,7 @@ void StatFigure;
 void Sparkline;
 void SlideTitle;
 void pickIcon;
+void pickLogoForMode;
 void resolveFunnelStyle;
 void FunnelFigure;
 void fillPx;
