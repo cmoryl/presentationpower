@@ -3833,11 +3833,20 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
     // like the screen's `mt-auto` block.
     const titlePt = px(isAnchor ? 46 : 28);
     const bodyPt = px(isAnchor ? 24 : 20);
-    const bodyH = Math.min(cell.h - pad * 2 - 1.1, (isAnchor ? 3 : 2) * 0.44);
     // Title box hugs its copy: a tall fixed box left a dead gap between the
     // title and the body paragraph that the on-screen card does not have.
     const titleH = isAnchor ? 0.82 : 0.46;
-    const blockY = cell.y + cell.h - pad - bodyH - titleH;
+    // Dense mosaics (7–8 cells) leave short tiles, and the old fixed reserve
+    // (`cell.h - pad*2 - 1.1`) went NEGATIVE there — a negative <a:ext cy> is
+    // invalid OOXML, so PowerPoint threw "found a problem with content" and
+    // repaired the deck by collapsing those boxes on top of each other.
+    // Derive the copy block from the space that actually remains and never let
+    // it fall below a single line.
+    const ruleGap = 0.2;
+    const avail = cell.h - pad * 2 - titleH - ruleGap;
+    const bodyH = Math.max(0.3, Math.min(avail, (isAnchor ? 3 : 2) * 0.44));
+    const blockY = Math.max(cell.y + pad + ruleGap, cell.y + cell.h - pad - bodyH - titleH);
+
     g.addShape("rect", {
       x: cell.x + pad,
       y: blockY - 0.2,
