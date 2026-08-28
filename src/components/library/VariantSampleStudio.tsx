@@ -181,7 +181,14 @@ export function VariantSampleStudio({
     if (pack) setMode(pack.mode as SlideMode);
   }, [pack]);
   const [showImagery, setShowImagery] = useState(true);
-  const [scopeToBrand, setScopeToBrand] = useState(false);
+  // Default to the division the curator opened: an edit made while viewing
+  // e.g. DataForce should land on DataForce, not silently on every brand.
+  const [scopeToBrand, setScopeToBrand] = useState(true);
+  /** Background panel (per-module replacement art) open in the inspector. */
+  const [bgOpen, setBgOpen] = useState(false);
+  /** Bumps whenever a module/skin backdrop is replaced, so the stage repaints. */
+  const bdVersion = useSkinBackdropVersion();
+
   const [modeOnly, setModeOnly] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [tab, setTab] = useState<"copy" | "structure" | "bulk" | "history">("copy");
