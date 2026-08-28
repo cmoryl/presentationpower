@@ -1252,13 +1252,13 @@ export function VariantSampleStudio({
         {/* Inspector */}
         <aside className="min-h-0 w-full shrink-0 overflow-y-auto rounded-xl border border-white/10 bg-white/[0.04] p-4 lg:w-[360px]">
           <div className="flex gap-1 rounded-full border border-white/15 bg-[#03002C]/50 p-1 text-[11px]">
-            {(["copy", "structure", "bulk", "history"] as const).map((t) => (
+            {(["copy", "structure", "background", "bulk", "history"] as const).map((t) => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setTab(t)}
                 aria-pressed={tab === t}
-                className={`flex-1 rounded-full px-3 py-1 capitalize transition ${
+                className={`flex-1 rounded-full px-2.5 py-1 capitalize transition ${
                   tab === t
                     ? "bg-white font-semibold text-[#03002C]"
                     : "text-white/65 hover:text-white"
@@ -1268,12 +1268,15 @@ export function VariantSampleStudio({
                   ? "Copy"
                   : t === "structure"
                     ? "Sections"
-                    : t === "bulk"
-                      ? "Bulk"
-                      : "History"}
+                    : t === "background"
+                      ? "Backdrop"
+                      : t === "bulk"
+                        ? "Bulk"
+                        : "History"}
               </button>
             ))}
           </div>
+
 
           <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60">
             <div className="font-semibold uppercase tracking-widest text-white/45">Save scope</div>
