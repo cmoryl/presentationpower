@@ -13,7 +13,7 @@
 
 import type PptxGenJS from "pptxgenjs";
 
-import type { DomColor, DomShape } from "./export-dom-decompose";
+import { isGhostPaint, type DomColor, type DomShape } from "./export-dom-decompose";
 import { aspectFrame, getImageAspect } from "./export-image-aspect";
 import { PX_PER_IN, pxToRadiusIn, rectRadiusAdj } from "./export-radius";
 import { gradientTag, pxToPt } from "./export-surface";
@@ -68,6 +68,10 @@ export function placeDomShapes(
 
   for (const s of shapes) {
     if (placed >= maxObjects) break;
+    // Clear-box guard, enforced at the emitter so no caller can bypass it: a
+    // record that paints (almost) nothing and is not designed furniture never
+    // becomes an object. The paint is already on the flat plate.
+    if (isGhostPaint(s)) continue;
     const x = inOf(s.x);
     const y = inOf(s.y);
     const w = inOf(s.w);

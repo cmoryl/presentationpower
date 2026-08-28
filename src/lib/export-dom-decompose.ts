@@ -1312,6 +1312,65 @@ export function isModuleFurniture(s: DomShape): boolean {
   return min <= 14 && max / Math.max(1, min) >= 8;
 }
 
+/** Strongest alpha the record paints with (gradient stops or flat fill). */
+export function paintAlpha(s: DomShape): number {
+  if (s.gradient && s.gradient.stops.length > 0) {
+    return Math.max(...s.gradient.stops.map((st) => st.color.alpha), 0);
+  }
+  return s.fill?.alpha ?? 0;
+}
+
+/**
+ * THE CLEAR-BOX GUARD — last line of defence, independent of capture path.
+ *
+ * Dark modules stack scrims, column rails and fade panels that read as *nothing*
+ * on screen (they only bend the ground a few percent) but arrive in PowerPoint
+ * as full-size selectable rectangles with no visible fill: the "clear boxes" a
+ * user drags by accident and cannot delete confidently. They are already painted
+ * pixel-exact on the flat backdrop, so dropping the native copy changes no
+ * pixel — it only removes the invisible object.
+ *
+ * A record is a ghost when it paints (almost) nothing AND carries no other
+ * evidence of being a designed part:
+ *
+ *   • no visible stroke, no elevation — a glass card always has one or both;
+ *   • not module furniture (spines, ticks, connectors, underlines);
+ *   • either barely-there paint at any size, or see-through paint over a large
+ *     area / a stage-spanning strip.
+ *
+ * Deliberate gradient-to-zero module boxes survive: their top stop is well above
+ * the ghost threshold, and they carry a hairline or shadow.
+ */
+export function isGhostPaint(
+  s: DomShape,
+  space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
+): boolean {
+  if (s.kind === "image") return false;
+  if (isModuleFurniture(s)) return false;
+  const stroked = !!s.line && s.line.alpha >= 0.06 && s.line.widthPx >= 0.5;
+  if (stroked) return false;
+  if (s.shadow && s.shadow.color.alpha >= 0.06) return false;
+
+  const alpha = paintAlpha(s);
+  // Effectively unpainted: nothing to lose, everything to gain.
+  if (alpha <= 0.035) return true;
+
+  const wideStrip = s.h >= space.h * 0.55 && s.w <= space.w * 0.16;
+  const tallStrip = s.w >= space.w * 0.55 && s.h <= space.h * 0.16;
+  const bigArea = s.w * s.h >= space.w * space.h * 0.22;
+  // See-through and either large or a stage-crossing band — background paint,
+  // never a card.
+  return alpha <= 0.16 && (bigArea || wideStrip || tallStrip);
+}
+
+/** Drop ghost paint from a measured shape list. */
+export function dropGhostPaint(
+  shapes: DomShape[],
+  space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
+): DomShape[] {
+  return shapes.filter((s) => !isGhostPaint(s, space));
+}
+
 export function collapseMediaOverlays(
   shapes: DomShape[],
   space: { w: number; h: number } = { w: STAGE_W, h: STAGE_H },
