@@ -5,4 +5,8 @@ src/integrations/**
 src/lib/**
 src/server.ts
 src/start.ts
+
+# App media library stays out of the published library...
 src/assets/**
+# ...but official brand marks ship with the design system.
+!src/assets/logos/**
