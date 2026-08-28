@@ -80,7 +80,11 @@ describe("module conformance matrix", () => {
     for (const id of ["MV-BENTO-5", "MV-BENTO-6", "MV-BENTO-7", "MV-BENTO-8"]) {
       expect(registeredModuleIds()).toContain(id);
     }
-  });
+    // Quote family: one owner for the oversized mark + accent rule furniture.
+    for (const id of ["MV-QUOTE-MULTI", "MV-QUOTE-PORTRAIT", "MV-QUOTE-CARD", "MV-QUOTE-METRIC", "MV-QUOTE-POSTER"]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
+
 
   for (const mode of ["light", "dark"] as const) {
     describe(`${mode} face`, () => {
