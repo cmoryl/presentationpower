@@ -84,6 +84,9 @@ describe("module conformance matrix", () => {
     for (const id of ["MV-QUOTE-MULTI", "MV-QUOTE-PORTRAIT", "MV-QUOTE-CARD", "MV-QUOTE-METRIC", "MV-QUOTE-POSTER"]) {
       expect(registeredModuleIds()).toContain(id);
     }
+  });
+
+
 
 
   for (const mode of ["light", "dark"] as const) {
