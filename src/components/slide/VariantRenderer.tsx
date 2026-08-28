@@ -159,6 +159,7 @@ import { HeroScrim } from "./HeroScrim";
 import "./modules/opening";
 import "./modules/dashboard";
 import "./modules/image";
+import "./modules/info";
 
 
 import { HouseArrow } from "./HouseArrow";
@@ -9770,6 +9771,7 @@ function Detail({ label, value, inkStrong }: { label: string; value: string; ink
 // (`modules/bento.tsx`, …) render the exact same badge and media tile the legacy
 // switch draws. Function declarations hoist, so this runs safely at module eval.
 registerKitPrimitives({
+  pickIcon,
   IconBadge,
   MediaTile,
   NumberedList,

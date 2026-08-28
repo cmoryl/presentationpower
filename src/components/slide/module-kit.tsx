@@ -8,7 +8,7 @@
 // that makes extraction possible (see `module-registry.ts`).
 // ---------------------------------------------------------------------------
 
-import { createContext, useContext, type ComponentProps, type ReactElement } from "react";
+import React, { createContext, useContext, type ComponentProps, type ReactElement } from "react";
 import type { LogoOrientation, LogoPosition } from "@/lib/logo-placement";
 import { SlideFrame as BaseSlideFrame } from "./SlideChrome";
 import { TitleBlock } from "./primitives";
@@ -178,7 +178,15 @@ export type KitSummaryStatCardProps = {
   series: number[];
 };
 
+export type KitPickIcon = (
+  label: string,
+  fallbackIndex?: number,
+  override?: string | null,
+  divisionId?: string | null,
+) => React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
+
 type KitPrimitives = {
+  pickIcon: KitPickIcon;
   IconBadge: (p: KitIconBadgeProps) => ReactElement | null;
   NumberedList: (p: KitNumberedListProps) => ReactElement | null;
   MediaTile: (p: KitMediaTileProps) => ReactElement | null;
@@ -194,6 +202,13 @@ let primitives: KitPrimitives | null = null;
 export function registerKitPrimitives(next: KitPrimitives): void {
   primitives = next;
 }
+
+/** Keyword/division icon resolver owned by `VariantRenderer`. */
+export const pickKitIcon: KitPickIcon = (label, fallbackIndex, override, divisionId) => {
+  const impl = primitives?.pickIcon;
+  if (!impl) return () => null;
+  return impl(label, fallbackIndex, override, divisionId);
+};
 
 export function IconBadge(props: KitIconBadgeProps) {
   const Impl = primitives?.IconBadge;
