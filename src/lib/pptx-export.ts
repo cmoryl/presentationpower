@@ -3791,17 +3791,26 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       // the figure reclaims the vertical space the gauge would have used.
       const frac = percentGaugeFraction(str(it.value), unit);
       const figureLift = frac === null ? 1.02 : 1.18;
+      const figureH = 0.66;
+      // Short tiles in a dense mosaic (7–8 cells) do not have room for the full
+      // lift: the figure used to start ABOVE the card, colliding with the index
+      // numeral and the badge. Keep it under the header row and shrink the type
+      // instead of letting the block escape the tile.
+      const headerBottom = cell.y + pad + badgeSize + 0.06;
+      const wantedY = cell.y + cell.h - pad - figureLift;
+      const figureY = Math.max(headerBottom, wantedY);
+      const figureScale = Math.min(1, Math.max(0.62, (cell.y + cell.h - pad - 0.42 - figureY) / figureH));
       g.addText(
         statRuns(str(it.value), unit, {
-          size: px(isAnchor ? 96 : 72),
-          unitSize: px(isAnchor ? 40 : 30),
+          size: px((isAnchor ? 96 : 72) * figureScale),
+          unitSize: px((isAnchor ? 40 : 30) * figureScale),
           color: p.accent,
         }),
         {
           x: cell.x + pad,
-          y: cell.y + cell.h - pad - figureLift,
+          y: figureY,
           w: cell.w - pad * 2,
-          h: 0.66,
+          h: Math.max(0.3, figureH * figureScale),
           valign: "bottom",
         },
       );
@@ -3814,6 +3823,7 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
           `Bento gauge ${i + 1}`,
         );
       }
+
 
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
