@@ -31,6 +31,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SocialIndexRouteImport } from './routes/social.index'
 import { Route as SocialAgentIndexRouteImport } from './routes/social-agent.index'
+import { Route as ShowcaseIndexRouteImport } from './routes/showcase.index'
 import { Route as PrintAgentIndexRouteImport } from './routes/print-agent.index'
 import { Route as LibraryIndexRouteImport } from './routes/library.index'
 import { Route as KnowledgeIndexRouteImport } from './routes/knowledge.index'
@@ -278,6 +279,11 @@ const SocialIndexRoute = SocialIndexRouteImport.update({
 const SocialAgentIndexRoute = SocialAgentIndexRouteImport.update({
   id: '/social-agent/',
   path: '/social-agent/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShowcaseIndexRoute = ShowcaseIndexRouteImport.update({
+  id: '/showcase/',
+  path: '/showcase/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrintAgentIndexRoute = PrintAgentIndexRouteImport.update({
@@ -1104,6 +1110,7 @@ export interface FileRoutesByFullPath {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/showcase/': typeof ShowcaseIndexRoute
   '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1262,6 +1269,7 @@ export interface FileRoutesByTo {
   '/knowledge': typeof KnowledgeIndexRoute
   '/library': typeof LibraryIndexRoute
   '/print-agent': typeof PrintAgentIndexRoute
+  '/showcase': typeof ShowcaseIndexRoute
   '/social-agent': typeof SocialAgentIndexRoute
   '/social': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1425,6 +1433,7 @@ export interface FileRoutesById {
   '/knowledge/': typeof KnowledgeIndexRoute
   '/library/': typeof LibraryIndexRoute
   '/print-agent/': typeof PrintAgentIndexRoute
+  '/showcase/': typeof ShowcaseIndexRoute
   '/social-agent/': typeof SocialAgentIndexRoute
   '/social/': typeof SocialIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1589,6 +1598,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/showcase/'
     | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
@@ -1747,6 +1757,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/library'
     | '/print-agent'
+    | '/showcase'
     | '/social-agent'
     | '/social'
     | '/.lovable/oauth/consent'
@@ -1909,6 +1920,7 @@ export interface FileRouteTypes {
     | '/knowledge/'
     | '/library/'
     | '/print-agent/'
+    | '/showcase/'
     | '/social-agent/'
     | '/social/'
     | '/.lovable/oauth/consent'
@@ -2025,6 +2037,7 @@ export interface RootRouteChildren {
   EventsAgentIndexRoute: typeof EventsAgentIndexRoute
   LibraryIndexRoute: typeof LibraryIndexRoute
   PrintAgentIndexRoute: typeof PrintAgentIndexRoute
+  ShowcaseIndexRoute: typeof ShowcaseIndexRoute
   SocialAgentIndexRoute: typeof SocialAgentIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -2201,6 +2214,13 @@ declare module '@tanstack/react-router' {
       path: '/social-agent'
       fullPath: '/social-agent/'
       preLoaderRoute: typeof SocialAgentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/showcase/': {
+      id: '/showcase/'
+      path: '/showcase'
+      fullPath: '/showcase/'
+      preLoaderRoute: typeof ShowcaseIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/print-agent/': {
@@ -3428,6 +3448,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsAgentIndexRoute: EventsAgentIndexRoute,
   LibraryIndexRoute: LibraryIndexRoute,
   PrintAgentIndexRoute: PrintAgentIndexRoute,
+  ShowcaseIndexRoute: ShowcaseIndexRoute,
   SocialAgentIndexRoute: SocialAgentIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
