@@ -97,6 +97,18 @@ describe("module conformance matrix", () => {
     ]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Closing family: the shared `variant="close"` frame + aurora furniture.
+    for (const id of [
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-TIMELINE",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
     for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
       expect(registeredModuleIds()).toContain(id);
