@@ -105,9 +105,13 @@ function bytesToBase64(bytes: Uint8Array): string {
   return Buffer.from(bytes).toString("base64");
 }
 
+// Structurally compatible with pptxgenjs `Slide` without importing its types
+// (the exporter passes a real Slide; the tests pass a spy).
 type MediaSlide = {
-  addMedia: (opts: Record<string, unknown>) => unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  addMedia: (opts: any) => unknown;
 };
+
 
 /**
  * Place an embedded clip edge-to-edge behind the slide's copy. Called right
