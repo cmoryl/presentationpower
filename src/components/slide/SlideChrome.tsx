@@ -46,6 +46,9 @@ import {
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { sceneFromSeed } from "@/lib/skin-backgrounds";
 import { useSlideTemplateScene } from "./SlideTemplateContext";
+import { overrideFor } from "@/lib/template-registry";
+import { hasMotionGround, motionTreatment } from "@/lib/template-motion";
+import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { ElementBrickRail } from "@/components/brand/ElementBrickMotif";
 
 // Every slide can render in light or dark mode. VariantRenderer sets this
