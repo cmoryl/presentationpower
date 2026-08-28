@@ -193,6 +193,29 @@ function fixLineWidths(xml: string): string {
   );
 }
 
+/** Marker size is restricted to 2–72 by ST_MarkerSize. */
+function fixMarkerSizes(xml: string): string {
+  return xml.replace(/<c:size\s+val="([^"]+)"\s*\/>/g, (all, raw: string) => {
+    const value = Number(raw);
+    if (Number.isInteger(value) && value >= 2 && value <= 72) return all;
+    const safe = Number.isFinite(value) ? Math.max(2, Math.min(72, Math.round(value))) : 2;
+    return `<c:size val="${safe}"/>`;
+  });
+}
+
+/**
+ * pptxgenjs duplicates `showLeaderLines=0` inside a c15 extension whose payload
+ * fails strict Office validation on bubble labels. The standard c:showLeaderLines
+ * sibling already carries the same setting, so dropping this redundant block is
+ * lossless and avoids the repair dialog.
+ */
+function stripRedundantLeaderLineExtension(xml: string): string {
+  return xml.replace(
+    /<c:extLst>\s*<c:ext\b[^>]*>\s*<c15:showLeaderLines\s+val="0"\s*\/>\s*<\/c:ext>\s*<\/c:extLst>/g,
+    "",
+  );
+}
+
 /** Strip elements that are invalid on a value axis. */
 function fixValAx(xml: string): string {
   return xml.replace(/<c:valAx>([\s\S]*?)<\/c:valAx>/g, (all, inner: string) => {
@@ -223,5 +246,7 @@ export function repairChartXml(xml: string): string {
 
   out = fixValAx(out);
   out = fixLineWidths(out);
+  out = fixMarkerSizes(out);
+  out = stripRedundantLeaderLineExtension(out);
   return out;
 }

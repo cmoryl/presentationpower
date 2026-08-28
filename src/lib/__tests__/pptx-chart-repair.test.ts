@@ -90,6 +90,18 @@ describe("repairChartXml", () => {
     expect(repairChartXml(xml)).toContain('<a:ln w="25400"/>');
   });
 
+  it("clamps invalid marker sizes and removes redundant leader-line extensions", () => {
+    const out = repairChartXml(
+      space(
+        '<c:bubbleChart><c:ser><c:idx val="0"/><c:marker><c:symbol val="none"/><c:size val="1"/></c:marker></c:ser><c:dLbls><c:showLeaderLines val="0"/><c:extLst><c:ext uri="x" xmlns:c15="c15"><c15:showLeaderLines val="0"/></c:ext></c:extLst></c:dLbls><c:axId val="1"/><c:axId val="2"/></c:bubbleChart>' +
+          CAT_VAL,
+      ),
+    );
+    expect(out).toContain('<c:size val="2"/>');
+    expect(out).not.toContain("c15:showLeaderLines");
+    expect(out).toContain('<c:showLeaderLines val="0"/>');
+  });
+
   it("is idempotent", () => {
     const xml = space(
       '<c:lineChart><c:ser><c:idx val="0"/><c:val><c:numRef><c:f>B</c:f></c:numRef></c:val><c:dLbls/></c:ser><c:axId val="1"/><c:axId val="2"/><c:axId val="3"/></c:lineChart>' +
