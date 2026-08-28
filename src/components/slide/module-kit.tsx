@@ -184,3 +184,20 @@ export function Sparkline(props: KitSparklineProps) {
   return Impl ? <Impl {...props} /> : null;
 }
 
+
+/**
+ * Ink that reads on a SOLID accent fill. `ink.onSurface` tints a colour for the
+ * slide surface — it is not an "on this fill" contrast pick — so filled lane
+ * heads, pillars and status discs use this luminance test instead.
+ */
+export function fillInk(hex: string, darkInk: string): string {
+  const m = /^#?([a-f\d]{6})$/i.exec(hex);
+  if (!m) return "#FFFFFF";
+  const n = parseInt(m[1], 16);
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+    const c = v / 255;
+    return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  }) as [number, number, number];
+  const lum = 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2];
+  return lum > 0.45 ? darkInk : "#FFFFFF";
+}
