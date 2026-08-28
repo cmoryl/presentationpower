@@ -663,6 +663,9 @@ function VariantRendererInner(props: Props) {
   // deck) is switched to dark. Forcing "light" here is what made the editor's
   // per-slide Appearance → Dark toggle look broken on Enterprise decks.
   const mode: SlideMode = activePack ? activePack.mode : modeProp;
+  // Bare-surface skins (e.g. Organic Systems S21) draw NO translucent boxes,
+  // rings, or glow plates around content — copy sits directly on the ground.
+  const bareSurfaces = activePack?.card.bg === "transparent";
 
   // CLIENT-facing logo modules (logo walls, client matrices, case logo grids)
   // must show real client marks. Any seeded/legacy content that still points at
