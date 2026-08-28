@@ -17,7 +17,7 @@ import { packIdForBrandMode } from "./look-brand";
 export type LibrarySearch = {
   /** Brand mode id (bm-*) or "all". */
   scope?: string;
-  /** Approved style pack id (skin-s*/skin-r*/tpl-*), or null for brand default. */
+  /** Approved style pack id (skin-sNN, skin-rNN, tpl-…), or null for brand default. */
   look?: string | null;
   /** Industry ground recipe (R01–R30). */
   recipe?: string | null;
