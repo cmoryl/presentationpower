@@ -663,6 +663,9 @@ function VariantRendererInner(props: Props) {
   // deck) is switched to dark. Forcing "light" here is what made the editor's
   // per-slide Appearance → Dark toggle look broken on Enterprise decks.
   const mode: SlideMode = activePack ? activePack.mode : modeProp;
+  // Bare-surface skins (e.g. Organic Systems S21) draw NO translucent boxes,
+  // rings, or glow plates around content — copy sits directly on the ground.
+  const bareSurfaces = activePack?.card.bg === "transparent";
 
   // CLIENT-facing logo modules (logo walls, client matrices, case logo grids)
   // must show real client marks. Any seeded/legacy content that still points at
@@ -784,17 +787,18 @@ function VariantRendererInner(props: Props) {
                   slide mode to CSS (light mode kills text/content shadows). */}
                   <div data-slide-mode={mode} style={{ display: "contents" }}>
                     <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
-                      {renderVariantBody({
-                        slide,
-                        variant,
-                        brand: themedBrand,
-                        pageNumber,
-                        c,
-                        mode,
-                        clientName: resolvedClient,
-                        clientLogoUrl: clientLogoUrl ?? null,
-                        dash,
-                      })}
+                       {renderVariantBody({
+                         slide,
+                         variant,
+                         brand: themedBrand,
+                         pageNumber,
+                         c,
+                         mode,
+                         clientName: resolvedClient,
+                         clientLogoUrl: clientLogoUrl ?? null,
+                         dash,
+                         bareSurfaces,
+                       })}
                     </StatLayoutProvider>
                   </div>
                 </SlideFrameCtx.Provider>
@@ -838,6 +842,7 @@ function renderVariantBody({
   clientName,
   clientLogoUrl,
   dash,
+  bareSurfaces = false,
 }: {
   slide: DeckSlide;
   variant: ModuleVariant;
@@ -849,6 +854,8 @@ function renderVariantBody({
   clientLogoUrl?: string | null;
   /** Alternate-look dashboard treatment for this module (lib/dash-look.ts). */
   dash: DashLook;
+  /** Bare-surface skins (e.g. Organic Systems S21): no translucent content boxes. */
+  bareSurfaces?: boolean;
 }): ReactNode {
   // Mode-aware ink palette for charts and data viz. Every chart/graph variant
   // MUST use these tokens (never hardcoded `rgba(10,15,28,X)`) so text stays
@@ -1277,8 +1284,16 @@ function renderVariantBody({
       const cols = people.length === 4 ? 4 : people.length === 2 ? 2 : 3;
       const portraitPx = cols === 4 ? 168 : 200;
       const roleColor = isDark ? "rgba(255,255,255,0.62)" : "rgba(10,15,28,0.58)";
-      const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
-      const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
+      const cardBg = bareSurfaces
+        ? "transparent"
+        : isDark
+          ? "rgba(255,255,255,0.03)"
+          : "rgba(10,15,28,0.02)";
+      const cardRing = bareSurfaces
+        ? "transparent"
+        : isDark
+          ? "rgba(255,255,255,0.10)"
+          : "rgba(10,15,28,0.08)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title, "Team")} />
@@ -1302,19 +1317,23 @@ function renderVariantBody({
                 <div
                   key={i}
                   className="relative overflow-hidden rounded-3xl p-10"
-                  style={{
-                    background: cardBg,
-                    border: `1px solid ${cardRing}`,
-                    backgroundImage: `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
-                  }}
-                >
-                  <div
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-[3px]"
-                    style={{
-                      background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 85%)`,
-                    }}
-                  />
+                   style={{
+                     background: cardBg,
+                     border: bareSurfaces ? "none" : `1px solid ${cardRing}`,
+                     backgroundImage: bareSurfaces
+                       ? undefined
+                       : `radial-gradient(120% 60% at 50% -20%, ${brand.tokens.accent}${isDark ? "1F" : "14"} 0%, transparent 60%)`,
+                   }}
+                 >
+                   {!bareSurfaces && (
+                     <div
+                       aria-hidden
+                       className="absolute inset-x-0 top-0 h-[3px]"
+                       style={{
+                         background: `linear-gradient(90deg, ${brand.tokens.accent} 0%, ${hexA(brand.tokens.accent, 0.0)} 85%)`,
+                       }}
+                     />
+                   )}
                   <div className="flex flex-col items-start">
                     <div
                       className="relative mb-8 grid place-items-center rounded-full"
@@ -4775,8 +4794,16 @@ function renderVariantBody({
       // is too deep to read as text or as a hairline, so lift it onto the
       // shared accentInk ramp. Light mode is unchanged.
       const accent = accentInk(brand.tokens.accent, mode, 4.5);
-      const tileBg = isDark ? "rgba(255,255,255,0.04)" : "rgba(10,15,28,0.02)";
-      const tileRing = isDark ? "rgba(255,255,255,0.08)" : "rgba(10,15,28,0.06)";
+      const tileBg = bareSurfaces
+        ? "transparent"
+        : isDark
+          ? "rgba(255,255,255,0.04)"
+          : "rgba(10,15,28,0.02)";
+      const tileRing = bareSurfaces
+        ? "transparent"
+        : isDark
+          ? "rgba(255,255,255,0.08)"
+          : "rgba(10,15,28,0.06)";
       return (
         <SlideFrame brand={brand} pageNumber={pageNumber}>
           <SlideTitle brand={brand} title={s(c.title)} />
@@ -4790,20 +4817,24 @@ function renderVariantBody({
                 <div
                   key={i}
                   className="relative flex aspect-[3/2] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl px-6 py-8 text-center"
-                  style={{
-                    color: tileText,
-                    background: tileBg,
-                    border: `1px solid ${tileRing}`,
-                    backgroundImage: `radial-gradient(120% 80% at 50% 0%, ${accent}${isDark ? "18" : "0C"} 0%, transparent 65%)`,
-                  }}
-                >
-                  <div
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-[2px]"
-                    style={{
-                      background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)`,
-                    }}
-                  />
+                   style={{
+                     color: tileText,
+                     background: tileBg,
+                     border: bareSurfaces ? "none" : `1px solid ${tileRing}`,
+                     backgroundImage: bareSurfaces
+                       ? undefined
+                       : `radial-gradient(120% 80% at 50% 0%, ${accent}${isDark ? "18" : "0C"} 0%, transparent 65%)`,
+                   }}
+                 >
+                   {!bareSurfaces && (
+                     <div
+                       aria-hidden
+                       className="absolute inset-x-0 top-0 h-[2px]"
+                       style={{
+                         background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)`,
+                       }}
+                     />
+                   )}
                   <div className="flex w-full flex-1 items-center justify-center">
                     {logoUrl || logoPath ? (
                       <ClientLogoImg
@@ -16931,32 +16962,41 @@ function Card({
   const mode = useContext(SlideModeContext);
   const ink = useSlideInk();
   const isDark = mode === "dark";
-  const cardBg = isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
+  // Bare-surface skins (e.g. Organic Systems S21) render copy directly on the
+  // ground — no translucent fill, ring, glow, or seam around the content.
+  const bare = useStylePack()?.card.bg === "transparent";
+  const cardBg = bare ? "transparent" : isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
   const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
   const bodyColor = isDark ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.68)";
   const titleColor = ink.strong;
   return (
     <div
       className="relative flex flex-col overflow-hidden rounded-3xl p-10"
-      style={{
-        background: cardBg,
-        // Open-bottom frame: the hairline wraps the top and sides only, so the
-        // card's gradient fades out into the ground instead of being boxed in.
-        borderTop: `1px solid ${cardRing}`,
-        borderLeft: `1px solid ${cardRing}`,
-        borderRight: `1px solid ${cardRing}`,
-        borderBottom: "1px solid transparent",
-        backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${brand.tokens.accent}${isDark ? "18" : "0C"} 0%, transparent 62%)`,
-      }}
+      style={
+        bare
+          ? { background: "transparent" }
+          : {
+              background: cardBg,
+              // Open-bottom frame: the hairline wraps the top and sides only, so the
+              // card's gradient fades out into the ground instead of being boxed in.
+              borderTop: `1px solid ${cardRing}`,
+              borderLeft: `1px solid ${cardRing}`,
+              borderRight: `1px solid ${cardRing}`,
+              borderBottom: "1px solid transparent",
+              backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${brand.tokens.accent}${isDark ? "18" : "0C"} 0%, transparent 62%)`,
+            }
+      }
     >
       {/* Top accent bar — the signature seam of a keynote card. */}
-      <div
-        aria-hidden
-        className="absolute inset-x-0 top-0 h-[3px]"
-        style={{
-          background: `linear-gradient(90deg, ${accentInk(brand.tokens.accent, mode, 3)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 3), 0.0)} 80%)`,
-        }}
-      />
+      {!bare && (
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-[3px]"
+          style={{
+            background: `linear-gradient(90deg, ${accentInk(brand.tokens.accent, mode, 3)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 3), 0.0)} 80%)`,
+          }}
+        />
+      )}
       <div className="flex items-start justify-between">
         <SlideNumeral value={index} sizePx={44} color={accentInk(brand.tokens.accent, mode, 4.5)} />
         <IconBadge

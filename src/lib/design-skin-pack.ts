@@ -74,7 +74,7 @@ const F = {
   karla: `'Karla', ${SANS}`,
 } as const;
 
-type SurfaceStyle = "glass" | "flat" | "paper" | "outline" | "raised" | "slab";
+type SurfaceStyle = "glass" | "flat" | "paper" | "outline" | "raised" | "slab" | "bare";
 
 interface SkinTraits {
   display: string;
@@ -437,7 +437,9 @@ const SKIN_TRAITS: Record<string, SkinTraits> = {
     kickerWeight: 600,
     kickerTracking: "0.11em",
     radius: 28,
-    surfaceStyle: "raised",
+    // Bare: content sits directly on the biomorphic field — no translucent
+    // boxes, borders, or shadows framing the content on this template.
+    surfaceStyle: "bare",
     topBar: false,
     grain: 0.03,
   },
@@ -1182,6 +1184,14 @@ function cardFor(skin: DesignSkin, r: ReturnType<typeof roles>) {
         border: `1px solid ${rgba(r.ink, r.dark ? 0.14 : 0.06)}`,
         radius,
         shadow: r.dark ? `0 22px 44px ${rgba("#000000", 0.5)}` : `0 18px 38px ${rgba(r.ink, 0.14)}`,
+        blur: "none",
+      };
+    case "bare":
+      return {
+        bg: "transparent",
+        border: "none",
+        radius,
+        shadow: "none",
         blur: "none",
       };
     case "slab":
