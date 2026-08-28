@@ -274,7 +274,29 @@ function usePins() {
   return { pins, toggle } as const;
 }
 
+/**
+ * The library's view state lives in the URL so any scope + template + filter
+ * combination is a shareable link (see `/showcase/<slug>` presets).
+ */
+function validateLibrarySearch(raw: Record<string, unknown>): LibrarySearch {
+  const str = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim() : undefined);
+  const mode = str(raw.mode);
+  return {
+    scope: str(raw.scope),
+    look: str(raw.look) ?? null,
+    recipe: str(raw.recipe) ?? null,
+    tags: str(raw.tags)
+      ?.split(",")
+      .map((t) => t.trim())
+      .filter(Boolean),
+    q: str(raw.q),
+    mode: mode === "dark" || mode === "ab" || mode === "light" ? mode : undefined,
+    preset: str(raw.preset),
+  };
+}
+
 export const Route = createFileRoute("/library/")({
+  validateSearch: validateLibrarySearch,
   head: () => ({
     meta: [
       { title: "Library · TransPerfect Element" },
@@ -330,17 +352,23 @@ const STRUCTURAL_TAGS: StructuralTag[] = [
 function Library() {
   const { brandModes, moduleFamilies, moduleVariants, layoutFrameworks, sectionFrameworks } =
     useTaxonomy();
-  const [q, setQ] = useState("");
+  // URL is the source of truth for the shareable slice of view state, so
+  // /showcase presets and hand-built links land on the exact same view.
+  const search = Route.useSearch();
+  const activePreset = libraryPresetBySlug(search.preset);
+  const [q, setQ] = useState(search.q ?? "");
   const [familyIds, setFamilyIds] = useState<Set<string>>(new Set());
-  const [tagIds, setTagIds] = useState<Set<string>>(new Set());
-  const [scopeBrandId, setScopeBrandId] = useState<string>("all");
+  const [tagIds, setTagIds] = useState<Set<string>>(() => new Set(search.tags ?? []));
+  const [scopeBrandId, setScopeBrandId] = useState<string>(search.scope ?? "all");
   const [openId, setOpenId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"light" | "dark" | "ab">("light");
+  const [mode, setMode] = useState<"light" | "dark" | "ab">(search.mode ?? "light");
   // Alternate design-test look under review; null = the approved brand system.
-  const [packId, setPackIdState] = useState<string | null>(null);
+  const [packId, setPackIdState] = useState<string | null>(search.look ?? null);
   // Industry recipe (R01–R30) is tracked INDEPENDENTLY of the style pack: it
   // only grounds the selected approved language, never replaces it.
-  const [recipeId, setRecipeIdState] = useState<string | null>(null);
+  const [recipeId, setRecipeIdState] = useState<string | null>(
+    search.look ? (search.recipe ?? null) : null,
+  );
   // An industry ground has no base pack under the approved brand system, so an
   // R-only look can never be held (or later persisted onto a deck).
   const setRecipeId = (next: string | null) => setRecipeIdState(packId ? next : null);
