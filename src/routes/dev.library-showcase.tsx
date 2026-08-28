@@ -136,8 +136,9 @@ function LibraryShowcase() {
   }, [query]);
 
   return (
-    <div className={cn(dark && "dark")}>
+    <div className={cn(dark && "dark")} style={dark ? ELEMENT_DARK : ELEMENT_LIGHT}>
       <div className="min-h-screen bg-background font-sans text-foreground">
+
         <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
           <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-4 px-6 py-4">
             <div>
