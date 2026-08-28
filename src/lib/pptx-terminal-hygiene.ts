@@ -133,8 +133,10 @@ export async function applyTerminalPptxHygiene(
       report.chartsFixed > 0 ||
       report.textRunsFixed > 0 ||
       report.packageEntriesFixed > 0 ||
-      report.relationshipsRepaired > 0
+      report.relationshipsRepaired > 0 ||
+      report.invalidExtentsFixed > 0
     ) {
+
       console.info("[pptx-terminal-hygiene]", report);
     }
     return out;
