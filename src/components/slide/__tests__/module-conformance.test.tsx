@@ -129,6 +129,26 @@ describe("module conformance matrix", () => {
 
       expect(registeredModuleIds()).toContain(id);
     }
+    // Opening family: covers, dividers and agendas own the cover chrome.
+    for (const id of [
+      "MV-OP-COVER",
+      "MV-OP-COVER-MEDIA",
+      "MV-OP-COVER-MINIMAL",
+      "MV-OP-DIVIDER",
+      "MV-OP-DIVIDER-NUMBERED",
+      "MV-OP-AGENDA",
+      "MV-OP-AGENDA-VERTICAL",
+      "MV-OP-COVER-EDITORIAL",
+      "MV-OP-COVER-SPLIT",
+      "MV-OP-COVER-POSTER",
+      "MV-OP-COVER-GRID",
+      "MV-OP-COVER-DOSSIER",
+      "MV-OP-COVER-GRADIENT",
+      "MV-OP-COVER-MONOGRAM",
+      "MV-OP-COVER-STACKED",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
     for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
       expect(registeredModuleIds()).toContain(id);
