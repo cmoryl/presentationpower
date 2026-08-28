@@ -8,11 +8,17 @@
 // that makes extraction possible (see `module-registry.ts`).
 // ---------------------------------------------------------------------------
 
-import { createContext, useContext, type ComponentProps } from "react";
+import { createContext, useContext, type ComponentProps, type ReactElement } from "react";
 import type { LogoOrientation, LogoPosition } from "@/lib/logo-placement";
 import { SlideFrame as BaseSlideFrame } from "./SlideChrome";
 import { TitleBlock } from "./primitives";
 import type { BrandMode } from "@/lib/taxonomy";
+import type {
+  IconEmphasis,
+  IconPlacement,
+  IconSizeToken,
+  IconTreatment,
+} from "@/lib/iconography";
 
 export type Item = Record<string, unknown>;
 
@@ -79,4 +85,72 @@ export function SlideTitle({
   kicker?: string;
 }) {
   return <TitleBlock brand={brand} title={title} kicker={kicker} size="title" />;
+}
+
+// ---------------------------------------------------------------------------
+// Shared primitive slots.
+//
+// `IconBadge` and `MediaTile` are defined INSIDE `VariantRenderer.tsx` (they
+// depend on a large amount of that file's local media/icon plumbing). An
+// extracted family cannot import them from there without creating a cycle
+// (VariantRenderer → modules/* → VariantRenderer), so VariantRenderer registers
+// them into the kit once at module load and families render the kit proxies.
+// Behaviour is identical: the proxy renders the exact same component instance.
+// ---------------------------------------------------------------------------
+
+export type KitIconBadgeProps = {
+  brand: BrandMode;
+  label: string;
+  index: number;
+  size?: IconSizeToken;
+  tone?: "onDark" | IconEmphasis;
+  placement?: IconPlacement;
+  treatment?: IconTreatment;
+  ariaLabel?: string;
+  override?: string | null;
+  sizeToken?: string | null;
+};
+
+export type KitMediaTileProps = {
+  brand: BrandMode;
+  seed: string;
+  className?: string;
+  portrait?: boolean;
+  pool?: "portrait";
+  muted?: boolean;
+  overrideUrl?: string;
+  zoom?: number;
+  fit?: string;
+  focus?: string;
+  mediaPath?: string;
+  videoUrl?: string;
+  videoPosterUrl?: string;
+  videoPath?: string;
+  videoPosterPath?: string;
+  videoAutoplay?: boolean;
+  videoLoop?: boolean;
+  videoMuted?: boolean;
+  videoControls?: boolean;
+};
+
+type KitPrimitives = {
+  IconBadge: (p: KitIconBadgeProps) => ReactElement | null;
+  MediaTile: (p: KitMediaTileProps) => ReactElement | null;
+};
+
+let primitives: KitPrimitives | null = null;
+
+/** Called once by `VariantRenderer` so extracted families can draw badges/tiles. */
+export function registerKitPrimitives(next: KitPrimitives): void {
+  primitives = next;
+}
+
+export function IconBadge(props: KitIconBadgeProps) {
+  const Impl = primitives?.IconBadge;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function MediaTile(props: KitMediaTileProps) {
+  const Impl = primitives?.MediaTile;
+  return Impl ? <Impl {...props} /> : null;
 }

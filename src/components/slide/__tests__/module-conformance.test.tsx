@@ -75,6 +75,11 @@ describe("module conformance matrix", () => {
     // export — the registry must keep claiming them so the legacy switch can
     // never quietly take them back.
     expect(registeredModuleIds()).toContain("MV-TIMELINE-VERTICAL");
+    // Bento mosaics: the media cells must keep a single alpha scrim, so all four
+    // densities stay under one owner in `modules/bento.tsx`.
+    for (const id of ["MV-BENTO-5", "MV-BENTO-6", "MV-BENTO-7", "MV-BENTO-8"]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
   });
 
   for (const mode of ["light", "dark"] as const) {
