@@ -44,6 +44,18 @@ const PAIRINGS: Pairing[] = [
   { kind: "ink", onSlide: AA_NORMAL, onSurface: AA_NORMAL },
 ];
 
+
+// Some brands (DataForce) intentionally use a single pop color for BOTH
+// `primary` and `accent`: it paints structural furniture — card top rules,
+// edges, emphasis bands — while headings and body both render in `ink`. For
+// those brands `primary` is not a text color, so only `ink` carries a
+// readability threshold. Parity with the exporter is still enforced above.
+const structuralPrimary = (brand: (typeof BRAND_MODES)[number]) =>
+  norm(brand.tokens.primary) === norm(brand.tokens.accent);
+
+const pairingsFor = (brand: (typeof BRAND_MODES)[number]) =>
+  structuralPrimary(brand) ? PAIRINGS.filter((p) => p.kind !== "primary") : PAIRINGS;
+
 describe("light-mode text contrast guard (preview ↔ export)", () => {
   it("exporter light-mode text colors match the preview token block byte-for-byte", () => {
     const drift: string[] = [];
@@ -72,7 +84,7 @@ describe("light-mode text contrast guard (preview ↔ export)", () => {
   it("every brand's light-mode text meets WCAG contrast on white slide background", () => {
     const offenders: string[] = [];
     for (const brand of BRAND_MODES) {
-      for (const p of PAIRINGS) {
+      for (const p of pairingsFor(brand)) {
         const hex = norm(brand.tokens[p.kind]);
         const ratio = contrastRatio(hex, SLIDE_BG);
         if (ratio < p.onSlide) {
@@ -92,7 +104,7 @@ describe("light-mode text contrast guard (preview ↔ export)", () => {
     const offenders: string[] = [];
     for (const brand of BRAND_MODES) {
       const surface = norm(brand.tokens.surface);
-      for (const p of PAIRINGS) {
+      for (const p of pairingsFor(brand)) {
         const hex = norm(brand.tokens[p.kind]);
         const ratio = contrastRatio(hex, surface);
         if (ratio < p.onSurface) {

@@ -31,7 +31,14 @@ const GLASS_TOKENS = {
   lightInk: "03002C",
 } as const;
 
-const CSS = fs.readFileSync(path.join(process.cwd(), "src/styles.css"), "utf8");
+// The glass utilities now live in the Element library theme that
+// `src/styles.css` @imports — parse both so parity follows the tokens.
+const CSS = [
+  "src/styles.css",
+  "src/design-system/element/styles/theme.css",
+]
+  .map((f) => fs.readFileSync(path.join(process.cwd(), f), "utf8"))
+  .join("\n");
 
 // Extract a specific rule/utility block by header pattern.
 function extractBlock(headerPattern: RegExp): string {

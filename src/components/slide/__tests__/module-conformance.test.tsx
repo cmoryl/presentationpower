@@ -84,6 +84,11 @@ describe("module conformance matrix", () => {
     for (const id of ["MV-QUOTE-MULTI", "MV-QUOTE-PORTRAIT", "MV-QUOTE-CARD", "MV-QUOTE-METRIC", "MV-QUOTE-POSTER"]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
+    for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
+
   });
 
 

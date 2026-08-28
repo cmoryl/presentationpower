@@ -34,7 +34,14 @@ import {
 import { withDesignSurfaces } from "@/lib/pptx-shape-normalize";
 import { rasterTargetPx } from "@/lib/pptx-vector-flatten";
 
-const CSS = fs.readFileSync(path.join(process.cwd(), "src/styles.css"), "utf8");
+// `.glass` / `.glass-dark` now live in the Element library theme that
+// `src/styles.css` @imports; parse both so the parity check keeps finding them.
+const CSS = [
+  "src/styles.css",
+  "src/design-system/element/styles/theme.css",
+]
+  .map((f) => fs.readFileSync(path.join(process.cwd(), f), "utf8"))
+  .join("\n");
 
 function block(header: RegExp): string {
   const m = CSS.match(header);

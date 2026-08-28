@@ -133,9 +133,20 @@ export type KitMediaTileProps = {
   videoControls?: boolean;
 };
 
+export type KitSparklineProps = {
+  brand: BrandMode;
+  values: number[];
+  w?: number;
+  h?: number;
+  filled?: boolean;
+  peakPin?: boolean;
+  peakLabel?: string;
+};
+
 type KitPrimitives = {
   IconBadge: (p: KitIconBadgeProps) => ReactElement | null;
   MediaTile: (p: KitMediaTileProps) => ReactElement | null;
+  Sparkline: (p: KitSparklineProps) => ReactElement | null;
 };
 
 let primitives: KitPrimitives | null = null;
@@ -154,3 +165,9 @@ export function MediaTile(props: KitMediaTileProps) {
   const Impl = primitives?.MediaTile;
   return Impl ? <Impl {...props} /> : null;
 }
+
+export function Sparkline(props: KitSparklineProps) {
+  const Impl = primitives?.Sparkline;
+  return Impl ? <Impl {...props} /> : null;
+}
+

@@ -47,7 +47,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#003FC7",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -55,7 +55,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#A1FBF9",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -63,7 +63,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#C8E5FD",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -82,7 +82,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#91CEFF",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -90,7 +90,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#7DA7FF",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -98,7 +98,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#B3A6FF",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -152,7 +152,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#6EE9D0",
+        "color": "#A5D14A",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -160,7 +160,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#5CE1E6",
+        "color": "#7BCD3A",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -168,7 +168,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#7FB5EB",
+        "color": "#5BD55E",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -187,7 +187,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#EE4BBB",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -195,7 +195,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#EC388A",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -203,7 +203,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#F05F5D",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -222,7 +222,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#47C6A1",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -230,7 +230,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#3BBEB6",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -238,7 +238,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#579CCB",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -257,7 +257,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#5BE16D",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -265,7 +265,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#4ADE80",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -273,7 +273,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#6DE4D0",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -292,7 +292,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#003FC7",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -300,7 +300,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#C2A3FF",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -308,7 +308,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#F5CCFF",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -327,7 +327,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#003FC7",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -335,7 +335,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#58ED21",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -343,7 +343,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#47F068",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,
@@ -362,7 +362,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
     "orbs": [
       {
         "alpha": 0.925,
-        "color": "#003FC7",
+        "color": "#0079DB",
         "rx": 702,
         "ry": 613,
         "x": -25,
@@ -370,7 +370,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.833,
-        "color": "#5CE1E6",
+        "color": "#003FC7",
         "rx": 813,
         "ry": 553,
         "x": -48,
@@ -378,7 +378,7 @@ exports[`aurora dark-mode visual regression (preview ↔ exported PPTX, free-for
       },
       {
         "alpha": 0.852,
-        "color": "#7FB5EB",
+        "color": "#2400F0",
         "rx": 580,
         "ry": 583,
         "x": 562,

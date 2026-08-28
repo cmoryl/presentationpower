@@ -41,7 +41,10 @@ describe("brand swap backdrop integrity", () => {
 
   it("gives every pool-less brand a token-derived aurora backdrop", () => {
     const poolLess = BRAND_MODES.filter((b) => !hasOwnBackdropPool(b.id));
-    expect(poolLess.map((b) => b.id)).toContain("bm-tp-lifesci");
+    // Canary: at least one brand must still fall back to the token-derived
+    // aurora. Which brand that is changes as artwork pools are authored, so we
+    // assert the fallback path exists rather than pinning a single brand id.
+    expect(poolLess.length).toBeGreaterThan(0);
     for (const brand of poolLess) {
       for (const variant of MODULE_VARIANTS) {
         for (const mode of modes) {
