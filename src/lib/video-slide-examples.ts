@@ -32,6 +32,9 @@ import { DATAFORCE_HERO_VIDEO_URL } from "./brand-videos";
 export type VideoSlideExample = {
   key: string;
   variantId: string;
+  /** Brand mode that owns the clip (e.g. "bm-product" = DataForce). Unset =
+   *  the generic enterprise example shown under every other scope. */
+  brandModeId?: string;
   title: string;
   blurb: string;
   content: Record<string, unknown>;
@@ -161,6 +164,7 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
   // brand assets rather than sample footage.
   {
     key: "df-cover-hero-motion",
+    brandModeId: "bm-product",
     variantId: "MV-OP-COVER-MEDIA",
     title: "DataForce · Cover motion",
     blurb:
@@ -176,6 +180,7 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
   },
   {
     key: "df-full-bleed-motion",
+    brandModeId: "bm-product",
     variantId: "MV-IMG-FULL-BLEED",
     title: "DataForce · Full-bleed motion",
     blurb:
@@ -188,6 +193,7 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
   },
   {
     key: "df-quote-bg-motion",
+    brandModeId: "bm-product",
     variantId: "MV-IMG-QUOTE-BG",
     title: "DataForce · Quote over motion",
     blurb:
