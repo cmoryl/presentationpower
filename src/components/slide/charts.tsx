@@ -5,7 +5,7 @@
 // build and the PPTX export read the same geometry. Extracted from the legacy
 // VariantRenderer switch.
 
-import { useId } from "react";
+import { Fragment, useId } from "react";
 
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk } from "./SlideChrome";
@@ -18,6 +18,7 @@ import {
   labelType,
   lineDash,
   lineWeight,
+  ringBand,
   seriesPath,
 } from "@/lib/chart-styles";
 import {
