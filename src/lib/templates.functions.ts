@@ -215,6 +215,10 @@ export const saveBackgroundOverride = createServerFn({ method: "POST" })
           scene_swap: data.sceneSwap || null,
           image_url: data.imageUrl || null,
           image_priority: data.imagePriority,
+          video_url: data.videoUrl || null,
+          video_poster_url: data.videoPosterUrl || null,
+          video_variant: data.videoVariant || null,
+
 
           note: data.note,
           created_by: context.userId,
