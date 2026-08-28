@@ -81,11 +81,14 @@ export const LOOK_OWNER_ACCENT: Record<string, { primary: string; accent: string
   R03: { primary: "#7BCD3A", accent: "#7BCD3A" },
 };
 
-/** Owning-brand lead/accent for a look, or null when the look is enterprise. */
+/**
+ * Owning-brand lead/accent for a look, or null when the look is enterprise or
+ * when an admin has saved their own version of it in Template Studio.
+ */
 export function lookOwnerAccent(
   packIdOrCode: string | null | undefined,
 ): { primary: string; accent: string } | null {
-  if (!packIdOrCode) return null;
+  if (!packIdOrCode || isAuthoredPack(packIdOrCode)) return null;
   const code = lookCodeFromPackId(packIdOrCode);
   return LOOK_OWNER_ACCENT[code] ?? LOOK_OWNER_ACCENT[code.replace(/-V\d+$/i, "")] ?? null;
 }
