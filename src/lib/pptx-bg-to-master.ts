@@ -132,6 +132,10 @@ export function planSlideScrub(slideXml: string): {
 
   for (const s of shapes) {
     if (s.hasText) continue;
+    // A media object (embedded movie) is never background and must never be
+    // locked: PowerPoint needs the picture selectable for the play controls to
+    // work, and a `noSelect` movie is a dead poster frame.
+    if (isMediaPic(s)) continue;
     const isGround =
       s.tag === "pic" && !!s.embed && BACKDROP_NAMES.test(s.name) && coversCanvas(s.frame);
     if (isGround) {
@@ -151,6 +155,12 @@ export function planSlideScrub(slideXml: string): {
   }
   return { bgEmbed, drop, lock };
 }
+
+/** An embedded movie: `<a:videoFile>` / `<p14:media>` inside a `<p:pic>`. */
+function isMediaPic(s: Shape): boolean {
+  return s.tag === "pic" && /<a:videoFile|p14:media|ppaction:\/\/media/.test(s.xml);
+}
+
 
 /** Remove planned shapes from the slide XML (right-to-left, offsets stay valid). */
 export function stripShapes(slideXml: string, drop: Shape[]): string {

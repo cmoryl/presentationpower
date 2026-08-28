@@ -84,6 +84,7 @@ import { ExportIntegrity, retryAsset } from "./pptx-integrity";
 import type { DebugManifest } from "./export-debug";
 import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry";
 import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
+import { fetchPptxVideo, placeSlideVideo, type PptxVideoAsset } from "./pptx-video";
 import { effectivePack } from "./effective-pack";
 import { packField, packToneBrand, stylePackById, type StylePack } from "./style-packs";
 
@@ -923,6 +924,26 @@ export async function exportDeckToPptx(
       );
     }),
   );
+
+  // NATIVE MOTION. A slide that carries `content.videoUrl` (module video
+  // variants, and sections an admin put an approved brand clip behind) exports
+  // as a real embedded PowerPoint movie, placed edge-to-edge behind the copy,
+  // with the poster still as its cover so print/PDF/thumbnails are unchanged.
+  // If the clip cannot be embedded (missing, wrong container, over the size
+  // cap) the slide simply keeps the poster image and the notes link.
+  const slideVideos: Array<PptxVideoAsset | null> = await Promise.all(
+    deck.slides.map((slide, idx) => {
+      const c = slide.content as Record<string, unknown>;
+      const url = typeof c.videoUrl === "string" ? c.videoUrl.trim() : "";
+      if (!url) return Promise.resolve(null);
+      return fetchPptxVideo(resolveAssetUrl(url), {
+        cover: slideImages[idx],
+        label: `slide ${idx + 1} video`,
+      });
+    }),
+  );
+
+
 
   // Rasterize each slide's Backgrounds & Imagery selection in parallel. This
   // covers library presets, solid/gradient/pattern, and image (upload/ai)
@@ -1797,11 +1818,21 @@ export async function exportDeckToPptx(
         imgData &&
         variantSupportsImagery(slide.variantId)
       ) {
-        s.addImage({
-          data: imgData,
-          ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H),
-          objectName: "TP Photo",
-        });
+        // A motion slide ships the CLIP as the full-bleed plane (its poster is
+        // the media cover, so nothing regresses in print/PDF); a still slide
+        // ships the photograph. Either way the brand scrim below goes on top,
+        // keeping copy legible in PowerPoint's own playback.
+        const nativeVideo = slideVideos[i];
+        if (nativeVideo) {
+          placeSlideVideo(s, nativeVideo, { x: 0, y: 0, w: SLIDE_W, h: SLIDE_H });
+        } else {
+          s.addImage({
+            data: imgData,
+            ...coverFrame(imgData, 0, 0, SLIDE_W, SLIDE_H),
+            objectName: "TP Photo",
+          });
+        }
+
         // Cover/divider get the strong brand wash they historically had;
         // other image variants use a lighter scrim so the picture reads
         // through while remaining legible under the renderer's text.
@@ -2094,15 +2125,17 @@ export async function exportDeckToPptx(
 
       const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
       let noteText = slide.notes && slide.notes.trim() ? slide.notes.trim() : (km ?? "");
-      // Video fallback path: PPTX embeds the poster (see resolveSlideImageUrl)
-      // and links the source video in speaker notes so the presenter can open
-      // it out-of-band. pptxgenjs's addMedia has spotty PowerPoint fidelity for
-      // large/hosted files, so we ship reliable poster + link instead.
+      // Motion slides embed the clip natively (see placeSlideVideo above) with
+      // the poster as its cover. The source URL still goes in the notes: it is
+      // the presenter's fallback when the clip could not be embedded (missing,
+      // non-MP4, or over the size cap) and a provenance record either way.
       const videoUrl = (slide.content as Record<string, unknown>).videoUrl;
       if (typeof videoUrl === "string" && videoUrl.trim()) {
-        const line = `▶ Video: ${videoUrl.trim()}`;
+        const embedded = slideVideos[i] ? "embedded" : "not embedded — open the link to play";
+        const line = `▶ Video (${embedded}): ${videoUrl.trim()}`;
         noteText = noteText ? `${noteText}\n\n${line}` : line;
       }
+
       if (noteText) s.addNotes(noteText);
 
       // Colour pairing and text-layout assertions over everything this slide
@@ -2198,6 +2231,14 @@ export async function exportDeckToPptx(
     const { backgroundsToMaster } = await import("./pptx-bg-to-master");
     flatBlob = await backgroundsToMaster(flatBlob);
   }
+  // Embedded movies: give each one PowerPoint's timing node and repair the
+  // duplicate shape ids pptxgenjs leaves behind, so the clip plays natively
+  // instead of opening with a repair prompt (see pptx-media-repair.ts).
+  if (slideVideos.some(Boolean)) {
+    const { repairPptxMedia } = await import("./pptx-media-repair");
+    flatBlob = await repairPptxMedia(flatBlob);
+  }
+
 
   endFonts();
   activeIntegrity = null;
