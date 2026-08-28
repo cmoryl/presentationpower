@@ -146,6 +146,19 @@ describe("module conformance matrix", () => {
     ]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Info-graphic family: orbits, donuts, funnels and diagrams.
+    for (const id of [
+      "MV-INFO-HUB-SATELLITES",
+      "MV-INFO-HUB-PILL-ORBIT",
+      "MV-INFO-DONUT",
+      "MV-INFO-FUNNEL",
+      "MV-INFO-BAR-COMPARE",
+      "MV-INFO-CIRCULAR-FLOW",
+      "MV-INFO-PYRAMID",
+      "MV-INFO-VENN",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Dashboard family: aurora metric decks, gauges and breakdowns.
     for (const id of [
       "MV-DASH-SUMMARY",
