@@ -2125,15 +2125,17 @@ export async function exportDeckToPptx(
 
       const km = slide.sectionId ? keyMessageBySection.get(slide.sectionId) : undefined;
       let noteText = slide.notes && slide.notes.trim() ? slide.notes.trim() : (km ?? "");
-      // Video fallback path: PPTX embeds the poster (see resolveSlideImageUrl)
-      // and links the source video in speaker notes so the presenter can open
-      // it out-of-band. pptxgenjs's addMedia has spotty PowerPoint fidelity for
-      // large/hosted files, so we ship reliable poster + link instead.
+      // Motion slides embed the clip natively (see placeSlideVideo above) with
+      // the poster as its cover. The source URL still goes in the notes: it is
+      // the presenter's fallback when the clip could not be embedded (missing,
+      // non-MP4, or over the size cap) and a provenance record either way.
       const videoUrl = (slide.content as Record<string, unknown>).videoUrl;
       if (typeof videoUrl === "string" && videoUrl.trim()) {
-        const line = `▶ Video: ${videoUrl.trim()}`;
+        const embedded = slideVideos[i] ? "embedded" : "not embedded — open the link to play";
+        const line = `▶ Video (${embedded}): ${videoUrl.trim()}`;
         noteText = noteText ? `${noteText}\n\n${line}` : line;
       }
+
       if (noteText) s.addNotes(noteText);
 
       // Colour pairing and text-layout assertions over everything this slide
