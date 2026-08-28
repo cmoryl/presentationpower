@@ -2,7 +2,7 @@
   "meta": {
     "name": "TransPerfect I Element",
     "package": "@ws-j1cbjbusjjn6dms0imd9/c88f7719-c0c5-420f-915f-a154f8270b06",
-    "version": "1.0.1",
+    "version": "1.0.0",
     "framework": "react",
     "css_framework": "tailwind",
     "starter_template": "custom_design_system",

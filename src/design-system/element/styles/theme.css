@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 /* No @source override: content detection stays on so a consuming app that
  * imports this theme still gets every utility it uses. */
 
@@ -17,6 +18,8 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
@@ -86,6 +89,8 @@
   --foreground: oklch(0.1371 0.0889 271.22);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.1371 0.0889 271.22);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.1371 0.0889 271.22);
   --primary: oklch(0.42 0.24 265);
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.968 0.007 247.896);
@@ -126,6 +131,8 @@
   --foreground: oklch(0.9288 0.0196 260.17);
   --card: oklch(0.1744 0.0701 276.31);
   --card-foreground: oklch(0.9288 0.0196 260.17);
+  --popover: oklch(0.2136 0.0898 276.53);
+  --popover-foreground: oklch(0.9288 0.0196 260.17);
   --primary: oklch(0.6153 0.181 264.37);
   --primary-foreground: oklch(0.1371 0.0889 271.22);
   --secondary: oklch(0.2136 0.0898 276.53);
@@ -185,6 +192,29 @@
   stroke-width: 2.5;
 }
 
+/* Brand layout utilities ship with the library rather than the preview shell. */
+@utility full-bleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  max-width: 100vw;
+  padding-left: max(clamp(1rem, 4vw, 3.5rem), calc((100vw - 1400px) / 2));
+  padding-right: max(clamp(1rem, 4vw, 3.5rem), calc((100vw - 1400px) / 2));
+}
+
+@utility hero-flush {
+  margin-top: calc(-1 * var(--shell-pad-top, 1rem));
+}
+
+@utility hero-band {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  max-width: 100vw;
+  padding-left: max(clamp(1rem, 4vw, 3.5rem), calc((100vw - 1400px) / 2));
+  padding-right: max(clamp(1rem, 4vw, 3.5rem), calc((100vw - 1400px) / 2));
+}
+
 /* Liquid glass surfaces - frosted panel on light and deep-navy grounds. */
 @utility glass {
   background: linear-gradient(
@@ -219,4 +249,67 @@
     0 -1px 0 0 rgba(0, 0, 0, 0.4) inset,
     0 30px 60px -25px rgba(0, 0, 0, 0.6),
     0 2px 12px -2px rgba(0, 0, 0, 0.35);
+}
+
+/* Accessibility mode for glass surfaces. */
+.contrast-boost .glass,
+.contrast-boost.glass {
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklab, white 98%, transparent) 0%,
+    color-mix(in oklab, white 92%, transparent) 100%
+  );
+  backdrop-filter: blur(8px) saturate(120%);
+  border-color: color-mix(in oklab, #03002c 22%, transparent);
+  color: #03002c;
+  box-shadow:
+    0 1px 0 0 white inset,
+    0 -1px 0 0 color-mix(in oklab, #03002c 10%, transparent) inset,
+    0 20px 40px -20px color-mix(in oklab, #03002c 35%, transparent),
+    0 2px 8px -2px color-mix(in oklab, #03002c 18%, transparent);
+}
+
+.contrast-boost .glass-dark,
+.contrast-boost.glass-dark {
+  background: linear-gradient(180deg, #0a0929 0%, #03002c 100%);
+  backdrop-filter: none;
+  border-color: color-mix(in oklab, white 40%, transparent);
+  color: #fff;
+}
+
+@utility ambient-field {
+  position: relative;
+  isolation: isolate;
+  &::before,
+  &::after {
+    content: "";
+    display: none;
+    pointer-events: none;
+  }
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@utility ambient-field-dark {
+  position: relative;
+  isolation: isolate;
+  &::before,
+  &::after {
+    content: "";
+    display: none;
+    pointer-events: none;
+  }
+  & > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+.contrast-boost.ambient-field::before,
+.contrast-boost.ambient-field::after,
+.contrast-boost .ambient-field::before,
+.contrast-boost .ambient-field::after {
+  opacity: 0.15;
 }
