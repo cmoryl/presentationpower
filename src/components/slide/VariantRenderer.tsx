@@ -787,17 +787,18 @@ function VariantRendererInner(props: Props) {
                   slide mode to CSS (light mode kills text/content shadows). */}
                   <div data-slide-mode={mode} style={{ display: "contents" }}>
                     <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
-                      {renderVariantBody({
-                        slide,
-                        variant,
-                        brand: themedBrand,
-                        pageNumber,
-                        c,
-                        mode,
-                        clientName: resolvedClient,
-                        clientLogoUrl: clientLogoUrl ?? null,
-                        dash,
-                      })}
+                       {renderVariantBody({
+                         slide,
+                         variant,
+                         brand: themedBrand,
+                         pageNumber,
+                         c,
+                         mode,
+                         clientName: resolvedClient,
+                         clientLogoUrl: clientLogoUrl ?? null,
+                         dash,
+                         bareSurfaces,
+                       })}
                     </StatLayoutProvider>
                   </div>
                 </SlideFrameCtx.Provider>
