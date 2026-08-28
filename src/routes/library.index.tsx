@@ -849,8 +849,25 @@ function Library() {
             <div className="mt-5">
               <LibrarySubnav active="/library" />
             </div>
+
+            {activePreset && (
+              <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-[#003FC7]/25 bg-[#003FC7]/5 px-4 py-3 text-sm dark:border-white/15 dark:bg-white/5">
+                <span className="rounded-full bg-[#003FC7] px-2 py-0.5 text-[11px] font-semibold tracking-wide text-white uppercase">
+                  Preset view
+                </span>
+                <span className="font-semibold">{activePreset.title}</span>
+                <span className="text-black/60 dark:text-white/60">{activePreset.blurb}</span>
+                <Link
+                  to="/showcase"
+                  className="ml-auto rounded-lg border border-black/15 px-2.5 py-1 text-xs font-medium hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+                >
+                  All preset links
+                </Link>
+              </div>
+            )}
           </div>
         </header>
+
 
         <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
           <div className="flex flex-wrap items-center gap-2">
