@@ -84,6 +84,55 @@ const DISPLAY_SPECS: Record<
   title: { fontSize: 56, lineHeight: 1.08, letterSpacing: "-0.015em", weight: 600 },
 };
 
+/** Plain text of a title node, for deterministic copy-length measurement. */
+function titleText(node: ReactNode): string {
+  if (node === null || node === undefined || typeof node === "boolean") return "";
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(titleText).join("");
+  if (typeof node === "object" && "props" in (node as { props?: unknown })) {
+    return titleText((node as { props?: { children?: ReactNode } }).props?.children);
+  }
+  return "";
+}
+
+/**
+ * COPY-LENGTH FIT — the headline's own overflow guard.
+ *
+ * A hero size is authored for a short, punchy line. When the copy runs long the
+ * block would either spill past the plate or eat the modules below it, so the
+ * type steps back in proportion to how far the copy overruns the size's budget.
+ *
+ * It is a pure function of (text length, size, column width): screen cards,
+ * present, PDF and the PPTX rasteriser all compute the same number, so an
+ * export can never disagree with the build. Weight, tracking and leading are
+ * untouched, so a trimmed headline keeps the same visual voice.
+ */
+const FIT_FLOOR: Record<DisplaySize, number> = {
+  hero: 0.66,
+  cover: 0.7,
+  divider: 0.76,
+  section: 0.8,
+  title: 0.84,
+};
+
+export function copyFitScale(
+  text: string,
+  size: DisplaySize,
+  maxWidthPx = 1100,
+  lineBudget = 3,
+): number {
+  const chars = text.trim().length;
+  if (chars === 0) return 1;
+  const spec = DISPLAY_SPECS[size];
+  // Geist at display sizes averages ~0.5em per character.
+  const perLine = Math.max(6, Math.floor(maxWidthPx / (spec.fontSize * 0.5)));
+  const budget = perLine * lineBudget;
+  if (chars <= budget) return 1;
+  // Area scales with the square of the type size, so the fit follows sqrt.
+  const fit = Math.sqrt(budget / chars);
+  return Number(Math.max(FIT_FLOOR[size], Math.min(1, fit)).toFixed(3));
+}
+
 export function DisplayTitle({
   children,
   size = "cover",
