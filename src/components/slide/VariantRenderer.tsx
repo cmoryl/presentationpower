@@ -160,6 +160,7 @@ import "./modules/opening";
 import "./modules/dashboard";
 import "./modules/image";
 import "./modules/info";
+import "./modules/narrative";
 
 
 import { HouseArrow } from "./HouseArrow";
@@ -9285,6 +9286,9 @@ function Detail({ label, value, inkStrong }: { label: string; value: string; ink
 // switch draws. Function declarations hoist, so this runs safely at module eval.
 registerKitPrimitives({
   pickIcon,
+  Card,
+  CardGrid,
+  AuroraStatGrid,
   IconBadge,
   MediaTile,
   NumberedList,

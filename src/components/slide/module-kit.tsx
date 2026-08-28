@@ -185,7 +185,31 @@ export type KitPickIcon = (
   divisionId?: string | null,
 ) => React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
 
+export type KitCardProps = {
+  brand: BrandMode;
+  title: string;
+  body: string;
+  index: number;
+  icon?: string;
+};
+
+export type KitCardGridProps = {
+  brand: BrandMode;
+  pageNumber: number;
+  title: string;
+  items: Item[];
+  cols: number;
+  rows?: number;
+};
+
+export type KitAuroraStatGridProps = KitCardGridProps & {
+  align?: "left" | "center";
+};
+
 type KitPrimitives = {
+  Card: (p: KitCardProps) => ReactElement | null;
+  CardGrid: (p: KitCardGridProps) => ReactElement | null;
+  AuroraStatGrid: (p: KitAuroraStatGridProps) => ReactElement | null;
   pickIcon: KitPickIcon;
   IconBadge: (p: KitIconBadgeProps) => ReactElement | null;
   NumberedList: (p: KitNumberedListProps) => ReactElement | null;
@@ -209,6 +233,21 @@ export const pickKitIcon: KitPickIcon = (label, fallbackIndex, override, divisio
   if (!impl) return () => null;
   return impl(label, fallbackIndex, override, divisionId);
 };
+
+export function Card(props: KitCardProps) {
+  const Impl = primitives?.Card;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function CardGrid(props: KitCardGridProps) {
+  const Impl = primitives?.CardGrid;
+  return Impl ? <Impl {...props} /> : null;
+}
+
+export function AuroraStatGrid(props: KitAuroraStatGridProps) {
+  const Impl = primitives?.AuroraStatGrid;
+  return Impl ? <Impl {...props} /> : null;
+}
 
 export function IconBadge(props: KitIconBadgeProps) {
   const Impl = primitives?.IconBadge;
