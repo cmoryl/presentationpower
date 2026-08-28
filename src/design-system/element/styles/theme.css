@@ -50,16 +50,11 @@
   --color-icon-inverse-subtle: var(--icon-inverse-subtle);
   --color-ring: var(--ring);
 
-  /* Spacing scale - Element uses a 4px base rhythm. */
-  --spacing-2xs: 0.25rem;
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 0.75rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
-  --spacing-3xl: 4rem;
-  --spacing-section: 6rem;
+  /* Spacing scale - Element uses a 4px base rhythm.
+     Exposed as --element-space-* below (outside @theme): Tailwind's
+     --spacing-<key> namespace also feeds width/max-width utilities, so named
+     keys there would hijack max-w-xl, max-w-2xl, etc. */
+
 
   /* Elevation - navy-tinted shadows, never neutral black. */
   --shadow-xs: 0 1px 2px -1px color-mix(in oklab, #03002c 14%, transparent);
@@ -75,6 +70,17 @@
 
 
 :root {
+  /* Element spacing rhythm (plain custom properties, see note above). */
+  --element-space-2xs: 0.25rem;
+  --element-space-xs: 0.5rem;
+  --element-space-sm: 0.75rem;
+  --element-space-md: 1rem;
+  --element-space-lg: 1.5rem;
+  --element-space-xl: 2rem;
+  --element-space-2xl: 3rem;
+  --element-space-3xl: 4rem;
+  --element-space-section: 6rem;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.1371 0.0889 271.22);
