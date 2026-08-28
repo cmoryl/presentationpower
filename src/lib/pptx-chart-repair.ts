@@ -45,6 +45,11 @@ function plotBlockRe(type: string): RegExp {
   return new RegExp(`<c:${type}>([\\s\\S]*?)</c:${type}>`, "g");
 }
 
+/** Axis references allowed by each plot schema (independent of combo-chart axes). */
+function plotAxisLimit(type: string): number {
+  return type === "bar3DChart" || type === "line3DChart" || type === "area3DChart" ? 3 : 2;
+}
+
 /** Trim the axId list of one plot block to the axes the chart really declares. */
 function fixAxIds(block: string, allowed: number): string {
   const ids = block.match(/<c:axId val="\d+"\s*\/>/g);
@@ -152,6 +157,20 @@ function fixSerOrder(xml: string): string {
 }
 
 /**
+ * `invertIfNegative` belongs to bar-series only. pptxgenjs also emits it on
+ * line/area/radar/scatter/bubble series, where desktop PowerPoint rejects the
+ * chart part and offers to repair the presentation.
+ */
+function fixPlotSeries(xml: string, type: string): string {
+  if (type === "barChart" || type === "bar3DChart") return fixSerOrder(xml);
+  return fixSerOrder(
+    xml.replace(/<c:ser>([\s\S]*?)<c:invertIfNegative\b[^>]*\/>[\s\S]*?<\/c:ser>/g, (all) =>
+      all.replace(/<c:invertIfNegative\b[^>]*\/>/g, ""),
+    ),
+  );
+}
+
+/**
  * ST_LineWidth is an integer EMU in [0, 20116800]. pptxgenjs's multi-type chart
  * path has been observed emitting `w="3.99e+28"` on a series marker outline —
  * scientific notation is not even lexically valid for the type, so PowerPoint
@@ -193,24 +212,16 @@ export function repairChartXml(xml: string): string {
   if (!xml.includes("c:chartSpace")) return xml;
   let out = xml;
 
-  // How many axes does this chart actually declare?
-  const axes =
-    (out.match(/<c:catAx>/g)?.length ?? 0) +
-    (out.match(/<c:dateAx>/g)?.length ?? 0) +
-    (out.match(/<c:valAx>/g)?.length ?? 0) +
-    (out.match(/<c:serAx>/g)?.length ?? 0);
-  const allowed = Math.max(1, Math.min(3, axes));
-
   for (const type of PLOT_TYPES) {
     out = out.replace(plotBlockRe(type), (_all, inner: string) => {
       let block = fixGrouping(inner, type);
-      block = fixAxIds(block, allowed);
+      block = fixAxIds(block, plotAxisLimit(type));
+      block = fixPlotSeries(block, type);
       return `<c:${type}>${block}</c:${type}>`;
     });
   }
 
   out = fixValAx(out);
-  out = fixSerOrder(out);
   out = fixLineWidths(out);
   return out;
 }

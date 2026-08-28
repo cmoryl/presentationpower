@@ -2239,6 +2239,11 @@ export async function exportDeckToPptx(
     flatBlob = await repairPptxMedia(flatBlob);
   }
 
+  // Every transformation above can rewrite package parts. Re-assert chart
+  // schema, unique shape ids, presentation order, content types, and OPC-safe
+  // archive ordering on the exact bytes that will be delivered.
+  const { applyTerminalPptxHygiene } = await import("./pptx-terminal-hygiene");
+  flatBlob = await applyTerminalPptxHygiene(flatBlob);
 
   endFonts();
   activeIntegrity = null;

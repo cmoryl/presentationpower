@@ -54,6 +54,28 @@ describe("repairChartXml", () => {
     expect(body).toContain("<c:f>B</c:f>");
   });
 
+  it("removes bar-only invertIfNegative from line series", () => {
+    const out = repairChartXml(
+      space(
+        '<c:lineChart><c:ser><c:idx val="0"/><c:invertIfNegative val="0"/><c:val><c:numRef><c:f>B</c:f></c:numRef></c:val></c:ser><c:axId val="1"/><c:axId val="2"/></c:lineChart>' +
+          CAT_VAL,
+      ),
+    );
+    expect(out).not.toContain("c:invertIfNegative");
+  });
+
+  it("keeps invertIfNegative on bar series and caps 2D plots at two axes", () => {
+    const out = repairChartXml(
+      space(
+        '<c:barChart><c:barDir val="col"/><c:ser><c:idx val="0"/><c:invertIfNegative val="0"/></c:ser><c:axId val="1"/><c:axId val="2"/><c:axId val="3"/></c:barChart>' +
+          '<c:catAx><c:axId val="1"/></c:catAx><c:valAx><c:axId val="2"/></c:valAx><c:valAx><c:axId val="3"/></c:valAx>',
+      ),
+    );
+    const bar = /<c:barChart>([\s\S]*?)<\/c:barChart>/.exec(out)?.[1] ?? "";
+    expect(bar).toContain("c:invertIfNegative");
+    expect((bar.match(/<c:axId/g) ?? []).length).toBe(2);
+  });
+
   it("replaces an illegal line width with a 1pt hairline", () => {
     const out = repairChartXml(
       space(
