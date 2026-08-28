@@ -49,6 +49,7 @@ export function Kicker({
   const ink = useSlideInk();
   const kickerMode = useSlideMode();
   const enterprise = isEnterpriseWhite(useSlideSkin());
+  const fit = copyFitScale(titleText(children), size, maxWidthPx ?? 1100, fitLines);
   // Enterprise dark pages need the light ink, not the navy page ink.
   const enterpriseInk = kickerMode === "dark" ? "#FFFFFF" : ENTERPRISE_WHITE.ink;
   return (
@@ -138,6 +139,7 @@ export function DisplayTitle({
   size = "cover",
   color,
   maxWidthPx,
+  fitLines = 3,
   // Slide titles are canvas artwork rendered many times per page (thumbnails,
   // previews, editors). Defaulting to <h1> put several top-level headings in
   // the document outline; callers that need real semantics can pass `as`.
@@ -148,6 +150,8 @@ export function DisplayTitle({
   size?: DisplaySize;
   color?: string;
   maxWidthPx?: number;
+  /** Lines the headline is authored to occupy before the copy-fit steps in. */
+  fitLines?: number;
   as?: keyof React.JSX.IntrinsicElements;
   className?: string;
 }) {
@@ -163,7 +167,7 @@ export function DisplayTitle({
     // two-word cover can grow, but never into a billboard.
     // `--mod-display-scale` is the per-module optical trim (module-spacing.ts):
     // a module can ease its headline back without touching the look's scale.
-    fontSize: `clamp(${typeBounds(spec.fontSize, "display").min}px, calc(${spec.fontSize}px * var(--pack-display-scale, 1) * var(--mod-display-scale, 1) * var(--fill-display, 1)), ${typeBounds(spec.fontSize, "display").max}px)`,
+    fontSize: `clamp(${typeBounds(spec.fontSize, "display").min}px, calc(${spec.fontSize}px * ${fit} * var(--pack-display-scale, 1) * var(--mod-display-scale, 1) * var(--fill-display, 1)), ${typeBounds(spec.fontSize, "display").max}px)`,
     // Leading moves against the growth so a grown headline block keeps its shape.
     lineHeight: fillLeading("display", enterprise ? spec.lineHeight + 0.04 : spec.lineHeight),
     letterSpacing: `var(--pack-display-tracking, ${enterprise ? "-0.015em" : spec.letterSpacing})`,
