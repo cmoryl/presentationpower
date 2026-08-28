@@ -44,9 +44,6 @@ import { statGradient } from "@/lib/stat-contrast";
 import type { BrandMode } from "@/lib/taxonomy";
 import { fillPx } from "@/lib/open-space-fill";
 
-void React;
-void truthy;
-void obj;
 
 // 2x2 quadrant cell for the decision matrix. Moved here with the family.
 function Quadrant({

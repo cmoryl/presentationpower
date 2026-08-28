@@ -60,49 +60,6 @@ const pickIcon = pickKitIcon as unknown as (
   divisionId?: string | null,
 ) => IconType;
 
-void React;
-void useSlideInk;
-void obj;
-void truthy;
-void strs;
-void Hairline;
-void DisplayTitle;
-void GlassTile;
-void IconWell;
-void accentInk;
-void hexA;
-void statGradient;
-void statPx;
-void clampLines;
-void MediaTile;
-void IconBadge;
-void BarChart3;
-void LineChart;
-void Rocket;
-void Target;
-void TrendingUp;
-void Trophy;
-void Zap;
-void moduleCardSurface;
-void moduleCardTint;
-void AccentTick;
-void AuroraOrb;
-void SummaryBand;
-void SEAM_HEIGHT_PX;
-void SUMMARY_BAND;
-void ClientLogoImg;
-void SlideNumeral;
-void Kicker;
-void StatFigure;
-void Sparkline;
-void SlideTitle;
-void pickIcon;
-void pickLogoForMode;
-void resolveFunnelStyle;
-void FunnelFigure;
-void fillPx;
-void arr;
-void s;
 export type { CSSProperties as _KitCss, FunnelStage as _KitFunnelStage, Item as _KitItem, IconType as _KitIconType };
 
 registerSlideModule({

@@ -10,7 +10,6 @@ import { hexA } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { pickHeadshot } from "@/assets/backdrops/portraits";
 
-void React;
 
 registerSlideModule({
   id: "family:team",
