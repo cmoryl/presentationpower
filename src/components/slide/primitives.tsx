@@ -49,7 +49,7 @@ export function Kicker({
   const ink = useSlideInk();
   const kickerMode = useSlideMode();
   const enterprise = isEnterpriseWhite(useSlideSkin());
-  const fit = copyFitScale(titleText(children), size, maxWidthPx ?? 1100, fitLines);
+  
   // Enterprise dark pages need the light ink, not the navy page ink.
   const enterpriseInk = kickerMode === "dark" ? "#FFFFFF" : ENTERPRISE_WHITE.ink;
   return (
