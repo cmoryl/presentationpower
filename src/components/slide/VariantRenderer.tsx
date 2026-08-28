@@ -121,6 +121,8 @@ import {
 import "./modules/viz";
 import "./modules/timeline";
 import "./modules/bento";
+import "./modules/quote";
+
 
 import { HouseArrow } from "./HouseArrow";
 import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
