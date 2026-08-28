@@ -45,6 +45,11 @@ function plotBlockRe(type: string): RegExp {
   return new RegExp(`<c:${type}>([\\s\\S]*?)</c:${type}>`, "g");
 }
 
+/** Axis references allowed by each plot schema (independent of combo-chart axes). */
+function plotAxisLimit(type: string): number {
+  return type === "bar3DChart" || type === "line3DChart" || type === "area3DChart" ? 3 : 2;
+}
+
 /** Trim the axId list of one plot block to the axes the chart really declares. */
 function fixAxIds(block: string, allowed: number): string {
   const ids = block.match(/<c:axId val="\d+"\s*\/>/g);
@@ -152,6 +157,20 @@ function fixSerOrder(xml: string): string {
 }
 
 /**
+ * `invertIfNegative` belongs to bar-series only. pptxgenjs also emits it on
+ * line/area/radar/scatter/bubble series, where desktop PowerPoint rejects the
+ * chart part and offers to repair the presentation.
+ */
+function fixPlotSeries(xml: string, type: string): string {
+  if (type === "barChart" || type === "bar3DChart") return fixSerOrder(xml);
+  return fixSerOrder(
+    xml.replace(/<c:ser>([\s\S]*?)<c:invertIfNegative\b[^>]*\/>[\s\S]*?<\/c:ser>/g, (all) =>
+      all.replace(/<c:invertIfNegative\b[^>]*\/>/g, ""),
+    ),
+  );
+}
+
+/**
  * ST_LineWidth is an integer EMU in [0, 20116800]. pptxgenjs's multi-type chart
  * path has been observed emitting `w="3.99e+28"` on a series marker outline —
  * scientific notation is not even lexically valid for the type, so PowerPoint
@@ -174,6 +193,29 @@ function fixLineWidths(xml: string): string {
   );
 }
 
+/** Marker size is restricted to 2–72 by ST_MarkerSize. */
+function fixMarkerSizes(xml: string): string {
+  return xml.replace(/<c:size\s+val="([^"]+)"\s*\/>/g, (all, raw: string) => {
+    const value = Number(raw);
+    if (Number.isInteger(value) && value >= 2 && value <= 72) return all;
+    const safe = Number.isFinite(value) ? Math.max(2, Math.min(72, Math.round(value))) : 2;
+    return `<c:size val="${safe}"/>`;
+  });
+}
+
+/**
+ * pptxgenjs duplicates `showLeaderLines=0` inside a c15 extension whose payload
+ * fails strict Office validation on bubble labels. The standard c:showLeaderLines
+ * sibling already carries the same setting, so dropping this redundant block is
+ * lossless and avoids the repair dialog.
+ */
+function stripRedundantLeaderLineExtension(xml: string): string {
+  return xml.replace(
+    /<c:extLst>\s*<c:ext\b[^>]*>\s*<c15:showLeaderLines\s+val="0"\s*\/>\s*<\/c:ext>\s*<\/c:extLst>/g,
+    "",
+  );
+}
+
 /** Strip elements that are invalid on a value axis. */
 function fixValAx(xml: string): string {
   return xml.replace(/<c:valAx>([\s\S]*?)<\/c:valAx>/g, (all, inner: string) => {
@@ -193,24 +235,18 @@ export function repairChartXml(xml: string): string {
   if (!xml.includes("c:chartSpace")) return xml;
   let out = xml;
 
-  // How many axes does this chart actually declare?
-  const axes =
-    (out.match(/<c:catAx>/g)?.length ?? 0) +
-    (out.match(/<c:dateAx>/g)?.length ?? 0) +
-    (out.match(/<c:valAx>/g)?.length ?? 0) +
-    (out.match(/<c:serAx>/g)?.length ?? 0);
-  const allowed = Math.max(1, Math.min(3, axes));
-
   for (const type of PLOT_TYPES) {
     out = out.replace(plotBlockRe(type), (_all, inner: string) => {
       let block = fixGrouping(inner, type);
-      block = fixAxIds(block, allowed);
+      block = fixAxIds(block, plotAxisLimit(type));
+      block = fixPlotSeries(block, type);
       return `<c:${type}>${block}</c:${type}>`;
     });
   }
 
   out = fixValAx(out);
-  out = fixSerOrder(out);
   out = fixLineWidths(out);
+  out = fixMarkerSizes(out);
+  out = stripRedundantLeaderLineExtension(out);
   return out;
 }
