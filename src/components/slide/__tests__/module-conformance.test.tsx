@@ -109,6 +109,15 @@ describe("module conformance matrix", () => {
     ]) {
       expect(registeredModuleIds()).toContain(id);
     }
+    // Process family: step rails, chains and spotlights.
+    for (const id of [
+      "MV-PROC-TIMELINE",
+      "MV-PROC-STEP-CHAIN",
+      "MV-PROC-PHASES",
+      "MV-PROC-STEP-SPOTLIGHT",
+    ]) {
+      expect(registeredModuleIds()).toContain(id);
+    }
     // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
     for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
       expect(registeredModuleIds()).toContain(id);
