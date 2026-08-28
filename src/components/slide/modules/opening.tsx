@@ -4,8 +4,9 @@
 
 import React from "react";
 import { registerSlideModule } from "../module-registry";
-import { MediaTile, SlideFrame, arr, lastWord, obj, s, strs, truthy } from "../module-kit";
-import { Kicker, MetaRow, SupportingText } from "../primitives";
+import { MediaTile, SlideFrame, SlideTitle, arr, lastWord, obj, s, strs, truthy } from "../module-kit";
+import { DisplayTitle, Hairline, Kicker, MetaRow, SlideNumeral, SupportingText } from "../primitives";
+import { HeroScrim } from "../HeroScrim";
 import { CinematicScrim, EditorialTitle, GrainOverlay, StatRail } from "../flagship";
 import { AccentRule } from "../Connectors";
 import { hexA } from "@/lib/accent-tokens";
