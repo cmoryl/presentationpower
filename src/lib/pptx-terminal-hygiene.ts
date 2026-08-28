@@ -20,6 +20,8 @@ export interface TerminalHygieneReport {
   packageEntriesFixed: number;
   /** Dangling refs, orphan relationships and duplicate ids repaired. */
   relationshipsRepaired: number;
+  /** Non-positive <a:ext> extents clamped to a legal size. */
+  invalidExtentsFixed: number;
 }
 
 /** Preserve intentional leading/trailing spaces per DrawingML's XML contract. */
@@ -32,6 +34,35 @@ export function preserveDrawingTextWhitespace(xml: string): { xml: string; fixed
   });
   return { xml: next, fixed };
 }
+
+/**
+ * Clamp illegal shape extents.
+ *
+ * `<a:ext>` is unsigned in the schema: a negative (or zero) cx/cy makes
+ * PowerPoint refuse the slide and "repair" the file, which collapses the
+ * offending boxes on top of each other. A layout bug upstream must never cost
+ * the user a repaired deck, so the final package is clamped unconditionally.
+ * Group child extents (`chExt`) are clamped the same way.
+ */
+const MIN_EXT_EMU = 9525; // 1px at 96dpi
+
+export function clampShapeExtents(xml: string): { xml: string; fixed: number } {
+  let fixed = 0;
+  const next = xml.replace(
+    /<a:(ext|chExt) cx="(-?\d+)" cy="(-?\d+)"/g,
+    (all, tag: string, cxRaw: string, cyRaw: string) => {
+      const cx = Number(cxRaw);
+      const cy = Number(cyRaw);
+      if (cx > 0 && cy > 0) return all;
+      // A legitimately empty group placeholder (0x0) is left alone.
+      if (cx === 0 && cy === 0) return all;
+      fixed += 1;
+      return `<a:${tag} cx="${Math.max(cx, MIN_EXT_EMU)}" cy="${Math.max(cy, MIN_EXT_EMU)}"`;
+    },
+  );
+  return { xml: next, fixed };
+}
+
 
 /** Re-assert invariants on the exact final package that will be downloaded. */
 export async function applyTerminalPptxHygiene(
