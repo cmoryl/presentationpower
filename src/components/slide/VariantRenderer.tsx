@@ -155,6 +155,7 @@ import "./modules/quote";
 import "./modules/logos";
 import "./modules/close";
 import "./modules/stat";
+import "./modules/opening";
 
 
 import { HouseArrow } from "./HouseArrow";
