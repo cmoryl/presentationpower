@@ -12,6 +12,7 @@
 // same way. `fill` then tunes how much of the open space the module occupies.
 // -----------------------------------------------------------------------------
 
+import { lookCodeFromPackId } from "./look-brand";
 import { packGeometry, type MarginDevice, type ScaffoldFamily } from "./pack-geometry";
 import type { StylePack } from "./style-packs";
 
@@ -91,6 +92,20 @@ const DEVICE_PLATE: Record<MarginDevice, ComposePlate> = {
   index: "ruleTop",
 };
 
+/**
+ * Hand-tuned exceptions to the derived profile.
+ *
+ * R03 (DataForce · AI & Data Signature) is authored art-directed: the derived
+ * `plinth` scaffold bottom-anchored every module — leaving a dead band across
+ * the top of covers, question slides and bar comparisons — and the `index`
+ * device painted a full-width green rule above the content, which read as a
+ * stray hairline through the middle of the sheet. DataForce centres its mass
+ * and carries no plate; modules supply their own short accent rules.
+ */
+const COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
+  R03: { anchor: "center", plate: "none" },
+};
+
 /** Deterministic composition profile for a pack. */
 export function packCompose(pack: StylePack): PackCompose {
   const g = packGeometry(pack);
@@ -106,6 +121,9 @@ export function packCompose(pack: StylePack): PackCompose {
   const lead = base.bias === "right" ? swing : base.bias === "left" ? 0 : Math.round(swing / 2);
   const trail = base.bias === "left" ? swing : base.bias === "right" ? 0 : Math.round(swing / 2);
 
+  const code = lookCodeFromPackId(pack.id);
+  const override = COMPOSE_OVERRIDE[code] ?? COMPOSE_OVERRIDE[code.replace(/-V\d+$/i, "")];
+
   return {
     anchor: base.anchor,
     bias: base.bias,
@@ -115,7 +133,9 @@ export function packCompose(pack: StylePack): PackCompose {
     lead,
     trail,
     rhythm: Number((0.86 + dense * 0.34).toFixed(3)),
+    ...override,
   };
+
 }
 
 /** CSS custom properties + layout style for the module content plane. */
