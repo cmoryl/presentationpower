@@ -10,6 +10,7 @@ import { Kicker } from "../primitives";
 import { fillPx } from "@/lib/open-space-fill";
 import type { SlideMode } from "../SlideChrome";
 import type { BrandMode } from "@/lib/taxonomy";
+import { exportMapNodeAsPng } from "@/lib/map-png-export";
 
 void React;
 
