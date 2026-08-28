@@ -1,13 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 import JSZip from "jszip";
-import { byId, BRAND_MODES, MODULE_VARIANTS } from "@/lib/taxonomy";
+import { byId, BRAND_MODES } from "@/lib/taxonomy";
 import { seedContent, type Deck, type DeckSlide } from "@/lib/deck-store";
 import { exportDeckToPptx } from "@/lib/pptx-export";
 
-const BENTO = MODULE_VARIANTS.filter((v) => /BENTO/.test(v.id)).map((v) => v.id);
-
-describe("tmp: dataforce bento export", () => {
-  it("emits no invalid extents", async () => {
+describe("tmp: bento-8 text boxes", () => {
+  it("dumps", async () => {
     const deck = {
       id: "tmp-df",
       createdAt: new Date(0).toISOString(),
@@ -16,15 +14,17 @@ describe("tmp: dataforce bento export", () => {
       brandModeId: "bm-product",
       archetypeId: "ar-overview",
       context: { stylePackId: "skin-r03" },
-      slides: BENTO.map((id, i) => ({
-        id: `s-${i}`,
-        sectionId: "sec-overview",
-        variantId: id,
-        layoutId: "",
-        mode: "dark",
-        content: seedContent(id, {} as never, "Overview"),
-        notes: "",
-      })) as DeckSlide[],
+      slides: [
+        {
+          id: "s-1",
+          sectionId: "sec-overview",
+          variantId: "MV-BENTO-8",
+          layoutId: "",
+          mode: "dark",
+          content: seedContent("MV-BENTO-8", {} as never, "Overview"),
+          notes: "",
+        },
+      ] as DeckSlide[],
     } as Deck;
     const res = await exportDeckToPptx(deck, byId(BRAND_MODES, "bm-product")!, {
       output: "blob",
@@ -34,22 +34,14 @@ describe("tmp: dataforce bento export", () => {
       forceMode: "dark",
     });
     const zip = await JSZip.loadAsync(await res.blob!.arrayBuffer());
-    const bad: string[] = [];
-    for (const name of Object.keys(zip.files)) {
-      if (!/\.xml$/.test(name)) continue;
-      const xml = await zip.files[name]!.async("string");
-      for (const m of xml.matchAll(/<a:(?:ch)?Ext? cx="(-?\d+)" cy="(-?\d+)"/g)) {
-        const cx = Number(m[1]);
-        const cy = Number(m[2]);
-        if ((cx < 0 || cy < 0) && !(cx === 0 && cy === 0)) bad.push(`${name} ${m[0]}`);
-      }
-      for (const m of xml.matchAll(/<a:(ext|chExt) cx="(-?\d+)" cy="(-?\d+)"/g)) {
-        const cx = Number(m[2]);
-        const cy = Number(m[3]);
-        if ((cx <= 0 || cy <= 0) && !(cx === 0 && cy === 0)) bad.push(`${name} ${m[0]}`);
-      }
+    const xml = await zip.files["ppt/slides/slide1.xml"]!.async("string");
+    for (const m of xml.matchAll(/<p:sp>[\s\S]*?<\/p:sp>/g)) {
+      const s = m[0];
+      if (!s.includes("<a:t>")) continue;
+      const name = /name="([^"]*)"/.exec(s)?.[1];
+      const off = /<a:off x="(\d+)" y="(\d+)"\/><a:ext cx="(\d+)" cy="(\d+)"/.exec(s);
+      const text = [...s.matchAll(/<a:t>([^<]*)<\/a:t>/g)].map((t) => t[1]).join("|");
+      console.log(name, off?.slice(1).join(","), JSON.stringify(text).slice(0, 60));
     }
-    console.log("variants", BENTO.length, "warnings", res.warnings);
-    expect(bad, bad.join("\n")).toEqual([]);
-  }, 300_000);
+  }, 180_000);
 });
