@@ -26,9 +26,15 @@ const CLIPS = [
 ] as const;
 const clip = (i: number) => CLIPS[i % CLIPS.length];
 
+// Approved DataForce brand motion (asset CDN, no expiry).
+import { DATAFORCE_HERO_VIDEO_URL } from "./brand-videos";
+
 export type VideoSlideExample = {
   key: string;
   variantId: string;
+  /** Brand mode that owns the clip (e.g. "bm-product" = DataForce). Unset =
+   *  the generic enterprise example shown under every other scope. */
+  brandModeId?: string;
   title: string;
   blurb: string;
   content: Record<string, unknown>;
@@ -150,6 +156,53 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
       attribution: "VP, Global Marketing · Fortune 100 Life Sciences",
       videoUrl: clip(7).v,
       videoPosterUrl: clip(7).p,
+    },
+  },
+  // ── DataForce brand motion ─────────────────────────────────────────
+  // These use the approved DataForce hero loop from the brand motion
+  // library, so the DataForce video backgrounds in the module areas are
+  // brand assets rather than sample footage.
+  {
+    key: "df-cover-hero-motion",
+    brandModeId: "bm-product",
+    variantId: "MV-OP-COVER-MEDIA",
+    title: "DataForce · Cover motion",
+    blurb:
+      "The approved DataForce brand loop as a full-bleed cover background — for AI data pitches and model-evaluation openers.",
+    content: {
+      kicker: "DataForce by TransPerfect · AI Data Services",
+      title: "Human intelligence for machine learning.",
+      subtitle: "Collection, annotation, evaluation and human-in-the-loop at model scale.",
+      prospect: "DataForce",
+      date: "2026",
+      videoUrl: DATAFORCE_HERO_VIDEO_URL,
+    },
+  },
+  {
+    key: "df-full-bleed-motion",
+    brandModeId: "bm-product",
+    variantId: "MV-IMG-FULL-BLEED",
+    title: "DataForce · Full-bleed motion",
+    blurb:
+      "DataForce brand loop behind a single statement — the default motion background for DataForce full-bleed modules.",
+    content: {
+      headline: "Training data that holds up under audit.",
+      caption: "Contributor networks in 170+ languages, annotated to spec and measured every batch.",
+      videoUrl: DATAFORCE_HERO_VIDEO_URL,
+    },
+  },
+  {
+    key: "df-quote-bg-motion",
+    brandModeId: "bm-product",
+    variantId: "MV-IMG-QUOTE-BG",
+    title: "DataForce · Quote over motion",
+    blurb:
+      "Client proof layered over the DataForce loop — keep the scrim on so the quote stays legible.",
+    content: {
+      quote:
+        "DataForce gave us evaluation data we could defend to our own model-risk committee.",
+      attribution: "Head of Applied AI · Global Technology Platform",
+      videoUrl: DATAFORCE_HERO_VIDEO_URL,
     },
   },
 ];

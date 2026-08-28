@@ -58,6 +58,8 @@ export type BrandGuide = {
   subBrands?: { group: string; items: string[] }[];
   photography?: string;
   brandVisuals?: string;
+  /** Approved motion assets — ids from `brand-videos.ts` plus usage notes. */
+  motion?: { headline: string; body: string; videoIds: string[] };
   iconography?: { headline: string; body: string; sourceUrl?: string };
   socialMedia?: { platform: string; rules: string[] }[];
   sourceUrl?: string;
@@ -377,6 +379,7 @@ type DivisionSeed = {
   subBrandGroup: { group: string; items: string[] };
   photography: string;
   brandVisuals: string;
+  motion?: BrandGuide["motion"];
   sourceUrl?: string;
 };
 
@@ -557,6 +560,11 @@ const DIVISION_SEEDS: DivisionSeed[] = [
       "Contributor networks, annotators at work, capture rigs, model dashboards. Prefer authentic scenes over stylized AI stock.",
     brandVisuals:
       "Stat grids, distribution charts, dense number blocks. Green signals accuracy; Aqua and Lavender frame model callouts.",
+    motion: {
+      headline: "DataForce hero motion",
+      body: "The DataForce brand loop is the approved motion background for DataForce covers, statements and full-bleed modules. Play it muted and looping, keep type on a solid or gradient scrim so contrast holds, and never recolour or crop the loop below a 16:9 frame.",
+      videoIds: ["df-hero-2025"],
+    },
   },
   {
     slug: "transperfect-cobrand",
@@ -651,6 +659,7 @@ function buildDivisionGuide(seed: DivisionSeed): BrandGuide {
     subBrands: [seed.subBrandGroup],
     photography: seed.photography,
     brandVisuals: seed.brandVisuals,
+    motion: seed.motion,
     iconography: MASTER_TRANSPERFECT_GUIDE.iconography,
     socialMedia: MASTER_TRANSPERFECT_GUIDE.socialMedia,
     sourceUrl: seed.sourceUrl ?? MASTER_TRANSPERFECT_GUIDE.sourceUrl,

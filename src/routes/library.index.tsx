@@ -456,14 +456,19 @@ function Library() {
     const out: LibraryEntry[] = [];
     for (const v of moduleVariants) {
       out.push({ kind: "variant", variant: v });
-      const ex = VIDEO_SLIDE_EXAMPLES.find((e) => e.variantId === v.id);
+      // A brand that owns approved motion (DataForce) shows its own clip in
+      // the module video slot; every other scope keeps the generic example.
+      const ex =
+        VIDEO_SLIDE_EXAMPLES.find(
+          (e) => e.variantId === v.id && e.brandModeId && e.brandModeId === scopeBrandId,
+        ) ?? VIDEO_SLIDE_EXAMPLES.find((e) => e.variantId === v.id && !e.brandModeId);
       if (ex) out.push({ kind: "video", variant: v, example: ex });
       for (const preset of bentoPresetsFor(v.id)) {
         out.push({ kind: "preset", variant: v, preset });
       }
     }
     return out;
-  }, [moduleVariants]);
+  }, [moduleVariants, scopeBrandId]);
 
   type MatchFilters = {
     q: string;

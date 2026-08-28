@@ -26,6 +26,7 @@ import {
 import { SceneSlideStage } from "@/components/templates/SceneSlideStage";
 import { LookFieldsEditor } from "@/components/templates/LookFieldsEditor";
 import { BackgroundOverrideEditor } from "@/components/templates/BackgroundOverrideEditor";
+import { LookThemeEditor } from "@/components/templates/LookThemeEditor";
 import { AlternateLookWizard } from "@/components/templates/AlternateLookWizard";
 import { TemplateDocs } from "@/components/templates/TemplateDocs";
 import { useSelectablePacks } from "@/hooks/use-selectable-packs";
@@ -136,10 +137,11 @@ function forkFromPack(pack: StylePack, takenCodes: string[] = []): CustomTemplat
   };
 }
 
-type PanelId = "preview" | "fields" | "backgrounds" | "intake" | "docs";
+type PanelId = "preview" | "theme" | "fields" | "backgrounds" | "intake" | "docs";
 
 const PANELS: Array<{ id: PanelId; label: string; sub: string; admin?: boolean }> = [
   { id: "preview", label: "Preview", sub: "Every section, live" },
+  { id: "theme", label: "Theme", sub: "Colour · surface · type", admin: true },
   { id: "fields", label: "Edit look", sub: "Palette · type · geometry", admin: true },
   { id: "backgrounds", label: "Backgrounds", sub: "Retune each section", admin: true },
   { id: "intake", label: "New from uploads", sub: "Brand files → look", admin: true },
@@ -740,6 +742,36 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
                   from <strong>Edit look</strong> to preview it here.
                 </p>
               )}
+
+              {panel === "theme" &&
+                isAdmin &&
+                (selectedPack || selected?.template ? (
+                  <LookThemeEditor
+                    key={selectedCode}
+                    code={selectedCode}
+                    template={selected?.template ?? null}
+                    seed={
+                      selectedPack
+                        ? forkFromPack(
+                            selectedPack,
+                            templates.map((t) => t.code),
+                          )
+                        : BLANK_DRAFT
+                    }
+                    onSaved={(saved) => {
+                      setDraft(saved);
+                      const code = saved.code.toUpperCase();
+                      const match =
+                        rows.find((r) => r.template?.code.toUpperCase() === code) ??
+                        rows.find((r) => (r.pack ? codeForPack(r.pack) === code : false));
+                      setSelectedId(match?.id ?? selected?.id ?? null);
+                      refresh();
+                    }}
+                    onOpenBackgrounds={() => setPanel("backgrounds")}
+                  />
+                ) : (
+                  <p className="text-sm opacity-65">Pick a look from the list to theme it.</p>
+                ))}
 
               {panel === "fields" && isAdmin && (
                 <LookFieldsEditor

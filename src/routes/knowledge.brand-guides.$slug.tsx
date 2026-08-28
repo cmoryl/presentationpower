@@ -10,6 +10,7 @@ import {
 import { BRAND_MODES } from "@/lib/taxonomy";
 import { getDivisionLogos } from "@/lib/division-logos";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
+import { brandVideoById } from "@/lib/brand-videos";
 import {
   getBrandhubIntel,
   normalizeVoiceValue,
@@ -350,6 +351,51 @@ function BrandGuideView() {
           </div>
         </Section>
       )}
+
+      {/* Motion — approved brand video */}
+      {(() => {
+        const clips = (guide.motion?.videoIds ?? [])
+          .map((id) => brandVideoById(id))
+          .filter((v): v is NonNullable<typeof v> => Boolean(v));
+        if (!guide.motion || clips.length === 0) return null;
+        return (
+          <Section title="Motion" eyebrow="05A">
+            <p className="max-w-3xl text-sm text-foreground/75">{guide.motion.body}</p>
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {clips.map((clip) => (
+                <figure key={clip.id} className="rounded-2xl border border-border bg-card p-4">
+                  <video
+                    src={clip.url}
+                    poster={clip.posterUrl}
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    controls
+                    preload="metadata"
+                    aria-label={clip.label}
+                    className="aspect-video w-full rounded-xl bg-black object-cover"
+                  />
+                  <figcaption className="mt-3">
+                    <div className="text-sm font-semibold">{clip.label}</div>
+                    <p className="mt-1 text-sm text-foreground/75">{clip.description}</p>
+                    <ul className="mt-2 flex flex-wrap gap-1.5">
+                      {clip.usage.map((u) => (
+                        <li
+                          key={u}
+                          className="rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground"
+                        >
+                          {u}
+                        </li>
+                      ))}
+                    </ul>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </Section>
+        );
+      })()}
 
       {/* Imagery library — division backdrop pool */}
       {(() => {
