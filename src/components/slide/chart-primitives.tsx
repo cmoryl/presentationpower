@@ -6,6 +6,8 @@
 // together. Extracted from the legacy VariantRenderer so the graph family and
 // the renderer share one implementation instead of two.
 
+import { useId } from "react";
+
 import type { BrandMode } from "@/lib/taxonomy";
 import { useSlideInk } from "./SlideChrome";
 import { chartLabelSize, fillPx } from "@/lib/open-space-fill";
@@ -16,8 +18,10 @@ import {
   gridLines,
   markerPath,
   markerSize,
+  ringBand,
   type ChartStyle,
 } from "@/lib/chart-styles";
+import { useChartStyle } from "./ChartStyleContext";
 
 
 
