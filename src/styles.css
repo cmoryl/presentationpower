@@ -467,17 +467,6 @@
   --brief-field: #0f0f30;
 }
 
-/* Body base color per theme so anything relying on inherited text color
- * (e.g. plain <p> without a text- class) still meets contrast. */
-[data-theme="light"] body {
-  background-color: #ffffff;
-  color: #03002c;
-}
-[data-theme="dark"] body {
-  background-color: #0a0929;
-  color: #e0e8f5;
-}
-
 /* Live edit overlay — click-to-edit fields on the deck preview. */
 .live-edit-active [data-live-path] {
   outline: 1.5px dashed rgba(0, 63, 199, 0.55);
