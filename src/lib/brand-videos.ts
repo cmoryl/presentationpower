@@ -10,8 +10,13 @@
 // stable, cacheable and safe to embed in decks and exports.
 // -----------------------------------------------------------------------------
 
-import dataforceHero from "@/assets/dataforce-hero-2025.mp4.asset.json";
-import dataforceHeroPoster from "@/assets/dataforce-hero-2025-poster.jpg";
+// Plain URL constants (not bundler imports): this module is reachable from
+// vite.config.ts's build gates, which evaluate it in plain Node where the "@/"
+// alias and binary/JSON imports do not resolve.
+const DATAFORCE_HERO_URL =
+  "/__l5e/assets-v1/33d2ac38-f172-4289-80da-9eaab3504d71/dataforce-hero-2025.mp4";
+const DATAFORCE_HERO_POSTER = "/brand-motion/dataforce-hero-2025-poster.jpg";
+
 
 export type BrandVideo = {
   id: string;
@@ -33,8 +38,8 @@ export const BRAND_VIDEOS: BrandVideo[] = [
     label: "DataForce hero motion (2025)",
     description:
       "The approved DataForce brand film loop: AI data capture and annotation motion in DataForce Green and Blue. Cleared as a full-bleed background for covers, statements and image-led modules.",
-    url: dataforceHero.url,
-    posterUrl: dataforceHeroPoster,
+    url: DATAFORCE_HERO_URL,
+    posterUrl: DATAFORCE_HERO_POSTER,
     usage: ["Cover backgrounds", "Full-bleed module backgrounds", "Quote / statement grounds"],
   },
 ];
@@ -55,7 +60,7 @@ export function brandVideoById(id: string): BrandVideo | null {
 }
 
 /** Convenience: the DataForce brand loop used across DataForce surfaces. */
-export const DATAFORCE_HERO_VIDEO_URL = dataforceHero.url;
+export const DATAFORCE_HERO_VIDEO_URL = DATAFORCE_HERO_URL;
 
 /** Poster still for the DataForce loop — the frame static surfaces paint. */
-export const DATAFORCE_HERO_POSTER_URL = dataforceHeroPoster;
+export const DATAFORCE_HERO_POSTER_URL = DATAFORCE_HERO_POSTER;
