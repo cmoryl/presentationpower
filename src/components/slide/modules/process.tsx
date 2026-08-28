@@ -54,7 +54,7 @@ registerSlideModule({
     "MV-PROC-PLATFORM-LOOP",
     "MV-PROC-BEFORE-AFTER-SPLIT",
   ],
-  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark, dash, bareSurfaces }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark }) => {
     switch (variant.id) {
     case "MV-PROC-TIMELINE":
       return (
