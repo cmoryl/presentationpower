@@ -47,6 +47,9 @@ const OverrideInput = z.object({
   sceneSwap: z.string().trim().max(24).optional().nullable(),
   imageUrl: z.string().trim().max(2000).optional().nullable(),
   imagePriority: z.enum(["front", "behind"]).default("front"),
+  videoUrl: z.string().trim().max(2000).optional().nullable(),
+  videoPosterUrl: z.string().trim().max(2000).optional().nullable(),
+  videoVariant: z.enum(["cover", "full-bleed", "quote-motion"]).optional().nullable(),
 
   note: z.string().trim().max(400).default(""),
 });
@@ -86,6 +89,9 @@ function toOverride(r: Row): TemplateBackgroundOverride {
     sceneSwap: (r.scene_swap as string | null) ?? null,
     imageUrl: (r.image_url as string | null) ?? null,
     imagePriority: r.image_priority === "behind" ? "behind" : "front",
+    videoUrl: (r.video_url as string | null) ?? null,
+    videoPosterUrl: (r.video_poster_url as string | null) ?? null,
+    videoVariant: (r.video_variant as TemplateBackgroundOverride["videoVariant"]) ?? null,
 
     note: String(r.note ?? ""),
   };
