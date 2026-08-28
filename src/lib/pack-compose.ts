@@ -95,6 +95,10 @@ const DEVICE_PLATE: Record<MarginDevice, ComposePlate> = {
 /**
  * Hand-tuned exceptions to the derived profile.
  *
+ * S01 (Spatial Clarity) is intentionally edgeless. Its cards already fade to
+ * zero opacity, so the derived register/frame plate reads as a stray perimeter
+ * box around hero and closing modules.
+ *
  * R03 (DataForce · AI & Data Signature) is authored art-directed: the derived
  * `plinth` scaffold bottom-anchored every module — leaving a dead band across
  * the top of covers, question slides and bar comparisons — and the `index`
@@ -103,6 +107,7 @@ const DEVICE_PLATE: Record<MarginDevice, ComposePlate> = {
  * and carries no plate; modules supply their own short accent rules.
  */
 const COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
+  S01: { plate: "none" },
   R03: { anchor: "center", plate: "none" },
 };
 
