@@ -898,19 +898,25 @@ function renderVariantBody({
     );
   }
 
-  // Spec-driven MV-VIZ-* family renders through the InfographicSpec pipeline.
-
-  if (variant.id.startsWith("MV-VIZ-")) {
-    return (
-      <InfographicSlideModule
-        slide={slide}
-        variant={variant}
-        brand={brand}
-        pageNumber={pageNumber}
-        mode={mode}
-      />
-    );
+  // Module registry first: families that have been extracted out of the legacy
+  // switch below claim their variants here (see module-registry.ts). Anything
+  // unclaimed falls through to the switch, so extraction is incremental.
+  const registered = findSlideModule(variant.id);
+  if (registered) {
+    return registered.render({
+      slide,
+      variant,
+      brand,
+      pageNumber,
+      c,
+      mode,
+      clientName,
+      clientLogoUrl,
+      dash,
+      bareSurfaces,
+    });
   }
+
 
   switch (variant.id) {
     // ── Opening ────────────────────────────────────────────────────────
