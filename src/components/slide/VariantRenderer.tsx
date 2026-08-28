@@ -4813,20 +4813,24 @@ function renderVariantBody({
                 <div
                   key={i}
                   className="relative flex aspect-[3/2] flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl px-6 py-8 text-center"
-                  style={{
-                    color: tileText,
-                    background: tileBg,
-                    border: `1px solid ${tileRing}`,
-                    backgroundImage: `radial-gradient(120% 80% at 50% 0%, ${accent}${isDark ? "18" : "0C"} 0%, transparent 65%)`,
-                  }}
-                >
-                  <div
-                    aria-hidden
-                    className="absolute inset-x-0 top-0 h-[2px]"
-                    style={{
-                      background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)`,
-                    }}
-                  />
+                   style={{
+                     color: tileText,
+                     background: tileBg,
+                     border: bareSurfaces ? "none" : `1px solid ${tileRing}`,
+                     backgroundImage: bareSurfaces
+                       ? undefined
+                       : `radial-gradient(120% 80% at 50% 0%, ${accent}${isDark ? "18" : "0C"} 0%, transparent 65%)`,
+                   }}
+                 >
+                   {!bareSurfaces && (
+                     <div
+                       aria-hidden
+                       className="absolute inset-x-0 top-0 h-[2px]"
+                       style={{
+                         background: `linear-gradient(90deg, ${accent}00, ${accent}, ${accent}00)`,
+                       }}
+                     />
+                   )}
                   <div className="flex w-full flex-1 items-center justify-center">
                     {logoUrl || logoPath ? (
                       <ClientLogoImg
