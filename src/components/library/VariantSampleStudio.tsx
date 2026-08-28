@@ -1206,7 +1206,9 @@ export function VariantSampleStudio({
             >
               <ScaledSlide className={mode === "dark" ? "bg-[#03002C]" : "bg-white"}>
                 <SlideBackdropContext.Provider value={backdrop}>
-                  <PackShell>
+                  {/* Keyed on the backdrop version so replacing this module's
+                      background repaints the stage without a reload. */}
+                  <PackShell key={`bd-${bdVersion}`}>
                     <VariantRenderer
                       slide={previewSlide}
                       variant={variant}
@@ -1215,6 +1217,7 @@ export function VariantSampleStudio({
                       mode={mode}
                     />
                   </PackShell>
+
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
             </LiveEditOverlay>
