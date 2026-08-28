@@ -5,3 +5,4 @@ src/integrations/**
 src/lib/**
 src/server.ts
 src/start.ts
+src/assets/**
