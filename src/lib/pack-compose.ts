@@ -106,8 +106,19 @@ const COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
   R03: { anchor: "center", plate: "none" },
 };
 
-/** Deterministic composition profile for a pack. */
-export function packCompose(pack: StylePack): PackCompose {
+/**
+ * Per-module composition overrides, keyed `LOOK:MODULE_ID`.
+ *
+ * Symmetric marks (Q&A, thanks) must sit on the optical centre of the sheet, so
+ * they zero the margin swing that would otherwise pull their centred block off
+ * to one side.
+ */
+const MODULE_COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
+  "R03:MV-CLOSE-QNA": { bias: "center", lead: 0, trail: 0, column: 0.94 },
+};
+
+/** Deterministic composition profile for a pack (optionally one module of it). */
+export function packCompose(pack: StylePack, moduleId?: string | null): PackCompose {
   const g = packGeometry(pack);
   const base = SCAFFOLD_COMPOSE[g.scaffold] ?? SCAFFOLD_COMPOSE.margin;
   const plate = DEVICE_PLATE[g.device] ?? "none";
