@@ -46,6 +46,7 @@ import {
   type TemplateIntake,
 } from "@/lib/template-intake";
 import { sampleUpload } from "@/lib/swatch-sample";
+import { withOverrides } from "@/lib/style-packs";
 import { templateToPack, type CustomTemplate } from "@/lib/custom-templates";
 import { runTemplateTests, testSummary, BASE_CODES } from "@/lib/template-tests";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
