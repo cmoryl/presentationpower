@@ -781,7 +781,7 @@ export function SkinLookbook({
 }) {
   return (
     <LookLookbook
-      pack={stylePackFromSkin(skin)}
+      pack={withOverrides(stylePackFromSkin(skin), skin.code)}
       meta={{
         code: `${skin.code} · ${skin.reference}`,
         name: skin.name,

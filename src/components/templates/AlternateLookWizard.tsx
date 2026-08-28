@@ -353,7 +353,7 @@ function IntakePanel({
   const derived = useMemo(() => deriveTemplateFromIntake(intake), [intake]);
   const pack = useMemo(() => {
     try {
-      return templateToPack(derived.template);
+      return withOverrides(templateToPack(derived.template), derived.template.code.toUpperCase());
     } catch {
       return null;
     }
