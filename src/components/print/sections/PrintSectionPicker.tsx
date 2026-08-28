@@ -44,10 +44,6 @@ const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
 
 // ---- factories -------------------------------------------------------------
 
-// No third-party hotlinks in seeded content: a new photo hero starts empty so
-// the author picks owned division imagery.
-const HERO_STOCK = "";
-
 export function makePrintHeroSection(variantId: PrintHeroModuleVariant): PrintSection {
   const base = {
     id: rid(),
@@ -69,7 +65,9 @@ export function makePrintHeroSection(variantId: PrintHeroModuleVariant): PrintSe
     variantId === "hero-split-photo" ||
     variantId === "hero-photo-fade"
   ) {
-    return { ...base, imageUrl: HERO_STOCK, focalX: 50, focalY: 45 };
+    // No third-party hotlink in seeded content: a photo hero starts imageless
+    // so the author drops in owned division imagery.
+    return { ...base, focalX: 50, focalY: 45 };
   }
   if (variantId === "hero-quote-split") {
     return {
