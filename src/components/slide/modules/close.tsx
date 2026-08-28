@@ -5,15 +5,18 @@
 // step with each other.
 
 import { registerSlideModule } from "../module-registry";
-import { SlideFrame, arr, s, type Item } from "../module-kit";
+import { MediaTile, SlideFrame, SlideTitle, arr, s, type Item } from "../module-kit";
 import {
   DisplayTitle,
   Hairline,
   Kicker,
   MetaRow,
+  SoftDivider,
   StatFigure,
   SupportingText,
 } from "../primitives";
+import { FlowArrow } from "../Connectors";
+import { Trophy } from "lucide-react";
 import { AuroraOrb, AuroraSidePanel, GlassTile } from "../flagship";
 import { hexA } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
