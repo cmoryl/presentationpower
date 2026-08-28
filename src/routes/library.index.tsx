@@ -468,7 +468,7 @@ function Library() {
       }
     }
     return out;
-  }, [moduleVariants]);
+  }, [moduleVariants, scopeBrandId]);
 
   type MatchFilters = {
     q: string;
