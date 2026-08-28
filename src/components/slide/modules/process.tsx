@@ -3,9 +3,10 @@
 // connector or seam change lands across every process module at once.
 
 import React from "react";
-import { AlertTriangle, ChevronsDown, ChevronsRight } from "lucide-react";
+import { AlertTriangle, Check, ChevronsDown, ChevronsRight, X as XMark } from "lucide-react";
 import { registerSlideModule } from "../module-registry";
 import {
+  fillInk,
   MediaTile,
   NumberedList,
   SlideFrame,
@@ -17,10 +18,15 @@ import {
 } from "../module-kit";
 import { ProcessRail } from "../Connectors";
 import { Kicker } from "../primitives";
+import { EchoArrow, coerceEchoArrowVariant } from "../EchoArrow";
+import { HouseArrow } from "../HouseArrow";
+import { OrbitDisc } from "../OrbitDisc";
+import { itemTone, itemToneEnd, toneWashGradient, tonePlateGradient } from "@/lib/item-tone";
+import { laneCornerRadiusPx, laneLadderPx, railBoxPx } from "@/lib/layer-stack-geometry";
 import { SummaryBand, readSummary } from "../SummaryBand";
 import { accentInk } from "@/lib/accent-tokens";
 import { iconByName } from "@/lib/icon-library";
-import { fillPx } from "@/lib/open-space-fill";
+import { clampLines, fillPx } from "@/lib/open-space-fill";
 import {
   cardWashGradient,
   openBottomFrame,
@@ -48,7 +54,7 @@ registerSlideModule({
     "MV-PROC-PLATFORM-LOOP",
     "MV-PROC-BEFORE-AFTER-SPLIT",
   ],
-  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone }) => {
+  render: ({ variant, brand, pageNumber, c, mode, ink, accentTone, isDark, dash, bareSurfaces }) => {
     switch (variant.id) {
     case "MV-PROC-TIMELINE":
       return (
