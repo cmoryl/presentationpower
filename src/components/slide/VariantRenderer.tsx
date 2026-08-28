@@ -38,7 +38,6 @@ import {
   useResolvedVideoUrl,
   useResolvedPosterUrl,
   useResolvedImageUrl,
-  useResolvedLogoUrl,
 } from "@/lib/slide-media-refresh";
 import { resolveSlideBackground } from "@/lib/background-library";
 import { statGradient } from "@/lib/stat-contrast";
