@@ -44,9 +44,6 @@ const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
 
 // ---- factories -------------------------------------------------------------
 
-const HERO_STOCK =
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=70";
-
 export function makePrintHeroSection(variantId: PrintHeroModuleVariant): PrintSection {
   const base = {
     id: rid(),
@@ -68,7 +65,9 @@ export function makePrintHeroSection(variantId: PrintHeroModuleVariant): PrintSe
     variantId === "hero-split-photo" ||
     variantId === "hero-photo-fade"
   ) {
-    return { ...base, imageUrl: HERO_STOCK, focalX: 50, focalY: 45 };
+    // No third-party hotlink in seeded content: a photo hero starts imageless
+    // so the author drops in owned division imagery.
+    return { ...base, focalX: 50, focalY: 45 };
   }
   if (variantId === "hero-quote-split") {
     return {

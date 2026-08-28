@@ -7,7 +7,7 @@
 // of the same slide eleven times.
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
 import type { DesignSkin } from "@/lib/design-skins";
-import type { StylePack } from "@/lib/style-packs";
+import { withOverrides, type StylePack } from "@/lib/style-packs";
 import { packGeometry, shapeCss } from "@/lib/pack-geometry";
 import { GroundPlane } from "@/components/skins/ApprovedStyleThumb";
 import { SKIN_SCENES, sceneFromSeed, type SkinScene } from "@/lib/skin-backgrounds";
@@ -24,7 +24,9 @@ export function SkinPreviewTile({
 }) {
   return (
     <LookPreviewTile
-      pack={stylePackFromSkin(skin)}
+      // Resolve through the shared override pipeline so replaced/tuned
+      // backgrounds show here, not the stale authored artwork.
+      pack={withOverrides(stylePackFromSkin(skin), skin.code)}
       kicker={`${skin.code} · ${skin.density}`}
       seed={seed}
       className={className}

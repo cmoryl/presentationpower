@@ -6,7 +6,7 @@
 import { useEffect } from "react";
 import { Check, X } from "lucide-react";
 import { stylePackFromSkin } from "@/lib/design-skin-pack";
-import type { StylePack } from "@/lib/style-packs";
+import { withOverrides, type StylePack } from "@/lib/style-packs";
 import type { DesignSkin } from "@/lib/design-skins";
 import { SkinBackdropStudio } from "@/components/skins/SkinBackdropStudio";
 import { skinBackgroundSummary } from "@/lib/skin-backgrounds";
@@ -781,7 +781,7 @@ export function SkinLookbook({
 }) {
   return (
     <LookLookbook
-      pack={stylePackFromSkin(skin)}
+      pack={withOverrides(stylePackFromSkin(skin), skin.code)}
       meta={{
         code: `${skin.code} · ${skin.reference}`,
         name: skin.name,

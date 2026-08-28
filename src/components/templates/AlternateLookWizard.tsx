@@ -46,6 +46,7 @@ import {
   type TemplateIntake,
 } from "@/lib/template-intake";
 import { sampleUpload } from "@/lib/swatch-sample";
+import { withOverrides } from "@/lib/style-packs";
 import { templateToPack, type CustomTemplate } from "@/lib/custom-templates";
 import { runTemplateTests, testSummary, BASE_CODES } from "@/lib/template-tests";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
@@ -353,7 +354,7 @@ function IntakePanel({
   const derived = useMemo(() => deriveTemplateFromIntake(intake), [intake]);
   const pack = useMemo(() => {
     try {
-      return templateToPack(derived.template);
+      return withOverrides(templateToPack(derived.template), derived.template.code.toUpperCase());
     } catch {
       return null;
     }
