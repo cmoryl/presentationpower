@@ -723,6 +723,23 @@ function Library() {
   const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
   const navigate = useNavigate();
 
+  // Mirror the shareable slice of state back into the URL (replace, so the
+  // back button still walks pages rather than every filter keystroke). A view
+  // built by hand in the UI is therefore always copy-pasteable as a link.
+  useEffect(() => {
+    const next: LibrarySearch = {};
+    if (scopeBrandId !== "all") next.scope = scopeBrandId;
+    if (packId) next.look = packId;
+    if (packId && recipeId) next.recipe = recipeId;
+    if (tagIds.size > 0) next.tags = [...tagIds];
+    if (q.trim()) next.q = q.trim();
+    if (mode !== "light") next.mode = mode;
+    if (search.preset) next.preset = search.preset;
+    navigate({ to: "/library", search: next, replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scopeBrandId, packId, recipeId, tagIds, q, mode, search.preset]);
+
+
   function sectionForVariant(variantId: string): string {
     const v = byId(MODULE_VARIANTS, variantId);
     if (!v) return "SF-01";
