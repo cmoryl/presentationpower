@@ -149,6 +149,7 @@ import {
 } from "./module-kit";
 import "./modules/viz";
 import "./modules/timeline";
+import "./modules/process";
 import "./modules/bento";
 import "./modules/quote";
 import "./modules/logos";
