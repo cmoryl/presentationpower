@@ -2,7 +2,7 @@
   "meta": {
     "name": "TransPerfect I Element",
     "package": "@ws-j1cbjbusjjn6dms0imd9/c88f7719-c0c5-420f-915f-a154f8270b06",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "framework": "react",
     "css_framework": "tailwind",
     "starter_template": "custom_design_system",
@@ -5873,6 +5873,17 @@
           ],
           "default": "default"
         }
+      ],
+      "usage": "Label a status, category, or count inline next to a title or row. Never use it as a button.",
+      "examples": [
+        {
+          "label": "Status",
+          "code": "<Badge variant=\"secondary\">Approved</Badge>"
+        }
+      ],
+      "antipatterns": [
+        "Wrapping a Badge in an onClick handler instead of using Button.",
+        "Overriding the background with a raw hex value rather than a variant."
       ]
     },
     {
@@ -5909,47 +5920,145 @@
           "type": "boolean",
           "default": "false"
         }
+      ],
+      "usage": "Primary interaction control. Use variant for emphasis and size for scale; use asChild to render a link that looks like a button.",
+      "examples": [
+        {
+          "label": "Primary action",
+          "code": "<Button>Create deck</Button>"
+        },
+        {
+          "label": "Link as button",
+          "code": "<Button asChild variant=\"outline\"><a href=\"/looks\">Browse looks</a></Button>"
+        }
+      ],
+      "antipatterns": [
+        "Adding a `primary` boolean prop instead of variant=\"default\".",
+        "Styling a div with buttonVariants and a click handler instead of using Button."
       ]
     },
     {
       "name": "Card",
       "file": "src/design-system/element/components/card",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Surface container for grouped content. Compose with CardHeader, CardTitle, CardDescription, CardContent and CardFooter.",
+      "examples": [
+        {
+          "label": "Content card",
+          "code": "<Card>\n  <CardHeader>\n    <CardTitle>Spatial Clarity</CardTitle>\n    <CardDescription>Enterprise look</CardDescription>\n  </CardHeader>\n  <CardContent>12 modules</CardContent>\n</Card>"
+        }
+      ],
+      "antipatterns": [
+        "Hand-rolling a bordered div with p-6 instead of Card.",
+        "Putting the title in CardContent instead of CardTitle."
+      ]
     },
     {
       "name": "CardContent",
       "file": "src/design-system/element/components/card",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Main body region of a Card.",
+      "examples": [
+        {
+          "label": "Body",
+          "code": "<CardContent>Deck summary</CardContent>"
+        }
+      ],
+      "antipatterns": [
+        "Adding your own outer padding that fights the card rhythm."
+      ]
     },
     {
       "name": "CardDescription",
       "file": "src/design-system/element/components/card",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Secondary supporting line under a CardTitle.",
+      "examples": [
+        {
+          "label": "Description",
+          "code": "<CardDescription>Updated 2 days ago</CardDescription>"
+        }
+      ],
+      "antipatterns": [
+        "Using it for body content \u2014 use CardContent."
+      ]
     },
     {
       "name": "CardFooter",
       "file": "src/design-system/element/components/card",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Action row at the bottom of a Card.",
+      "examples": [
+        {
+          "label": "Footer",
+          "code": "<CardFooter><Button size=\"sm\">Open</Button></CardFooter>"
+        }
+      ],
+      "antipatterns": [
+        "Placing actions loose after the Card element."
+      ]
     },
     {
       "name": "CardHeader",
       "file": "src/design-system/element/components/card",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Top region of a Card; holds CardTitle and CardDescription.",
+      "examples": [
+        {
+          "label": "Header",
+          "code": "<CardHeader><CardTitle>Agenda</CardTitle></CardHeader>"
+        }
+      ],
+      "antipatterns": [
+        "Using it outside a Card."
+      ]
     },
     {
       "name": "CardTitle",
       "file": "src/design-system/element/components/card",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Card heading. Renders semantic heading text, not a paragraph.",
+      "examples": [
+        {
+          "label": "Title",
+          "code": "<CardTitle>Q3 review</CardTitle>"
+        }
+      ],
+      "antipatterns": [
+        "Applying custom font sizes with raw px values."
+      ]
     },
     {
       "name": "Input",
       "file": "src/design-system/element/components/input",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Single-line text field. Always pair with a visible label wired via htmlFor/id.",
+      "examples": [
+        {
+          "label": "Labelled field",
+          "code": "<label htmlFor=\"deck\">Deck name</label>\n<Input id=\"deck\" placeholder=\"Q3 review\" />"
+        }
+      ],
+      "antipatterns": [
+        "Using placeholder text as the only label.",
+        "Setting inline height/border styles instead of relying on tokens."
+      ]
     },
     {
       "name": "Textarea",
       "file": "src/design-system/element/components/textarea",
-      "import_path": ""
+      "import_path": "",
+      "usage": "Multi-line text field for notes and long copy.",
+      "examples": [
+        {
+          "label": "Notes",
+          "code": "<label htmlFor=\"notes\">Speaker notes</label>\n<Textarea id=\"notes\" rows={4} />"
+        }
+      ],
+      "antipatterns": [
+        "Using a contentEditable div instead.",
+        "Removing the focus ring."
+      ]
     }
   ],
   "assets": [
@@ -8528,5 +8637,20 @@
       "kind": "image",
       "format": "jpg"
     }
+  ],
+  "constraints": [
+    "Use theme tokens for color, spacing, radius, shadow and typography \u2014 never raw hex, rgb or px values for anything the token set covers.",
+    "Import components from the design-system barrel; do not fork or duplicate a component to change its look.",
+    "Express visual variation through the `variant` and `size` props; never add one-off boolean styling props.",
+    "Build on semantic elements (button, a, label) and keep every interactive state keyboard reachable with a visible focus ring.",
+    "Typography is Geist Sans / Geist Mono via --font-sans and --font-mono. Never introduce another family.",
+    "Dark mode is class-based (`.dark`); read colors through semantic tokens so both faces resolve automatically."
+  ],
+  "patterns": [
+    "Compose Card + CardHeader/CardTitle/CardDescription/CardContent/CardFooter for any grouped content surface instead of custom bordered divs.",
+    "Merge incoming className with cn() and forward refs so consumers can extend a component without wrapping it.",
+    "Use the `glass` / `glass-dark` utilities for frosted panels over brand grounds rather than hand-mixed rgba backgrounds.",
+    "Pair form controls with an explicit <label htmlFor> and use Textarea for multi-line copy.",
+    "Reach for --shadow-* elevation tokens (navy-tinted) instead of Tailwind's neutral shadow scale."
   ]
 }
