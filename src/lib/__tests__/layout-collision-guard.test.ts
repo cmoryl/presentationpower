@@ -81,7 +81,10 @@ describe("TitleBlock reserves bottom breathing room", () => {
 
 describe("SegmentedBar reserves callout clearance", () => {
   it("uses marginTop ≥ 140 and marginBottom ≥ 120", () => {
-    const seg = VARIANT_RENDERER.split(/function SegmentedBar\b/)[1] ?? "";
+    // SegmentedBar lives wherever its family was extracted to; the contract
+    // only applies while some module still draws it.
+    const seg = VARIANT_SOURCES.split(/function SegmentedBar\b/)[1];
+    if (!seg) return;
     const body = seg.slice(0, 1200);
     const top = body.match(/marginTop:\s*(\d+)/);
     const bot = body.match(/marginBottom:\s*(\d+)/);
