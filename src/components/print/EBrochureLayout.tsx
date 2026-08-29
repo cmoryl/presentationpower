@@ -106,8 +106,9 @@ export function EBrochureLayout({
     containerWidth: PAGE_W,
   });
 
-  const sections = content.sections.slice(0, 3);
-  const stats = content.stats.slice(0, 5);
+  const sections = (Array.isArray(content.sections) ? content.sections : []).slice(0, 3);
+  const stats = (Array.isArray(content.stats) ? content.stats : []).slice(0, 5);
+
 
   return (
     <SlideModeContext.Provider value={mode}>
