@@ -529,7 +529,7 @@ registerSlideModule({
                         <div className="flex items-center" style={{ gap: 34 }}>
                           <div
                             className="relative flex shrink-0 items-center justify-center"
-                            style={{ width: iconBox, height: iconBox }}
+                            style={{ width: iconBox, height: iconBox, ...iconWellStyle(it) }}
                           >
                             <div
                               aria-hidden
@@ -544,11 +544,17 @@ registerSlideModule({
                               aria-hidden
                               data-decorative
                               className="absolute inset-0"
-                              style={openBottomFrame(accent, 20)}
+                              style={openBottomFrame(cellAccent(it, accent, mode), 20)}
                             />
-                            <span className="relative" style={{ color: accent }}>
+                            <span
+                              className="relative"
+                              style={{ color: cellAccent(it, accent, mode) }}
+                            >
                               {RowIcon ? (
-                                <RowIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
+                                <RowIcon
+                                  size={Math.round(iconBox * 0.46 * cellIconScale(it))}
+                                  strokeWidth={1.7}
+                                />
                               ) : (
                                 <span style={{ fontSize: fillPx(30, "figure"), fontWeight: 700 }}>
                                   {i + 1}
@@ -765,7 +771,7 @@ registerSlideModule({
                                 <div className="flex items-center" style={{ gap: wide ? 24 : 18 }}>
                                   <div
                                     className="relative flex shrink-0 items-center justify-center"
-                                    style={{ width: iconBox, height: iconBox }}
+                                    style={{ width: iconBox, height: iconBox, ...iconWellStyle(t) }}
                                   >
                                     <div
                                       aria-hidden
@@ -780,12 +786,15 @@ registerSlideModule({
                                       aria-hidden
                                       data-decorative
                                       className="absolute inset-0"
-                                      style={openBottomFrame(accent, 18)}
+                                      style={openBottomFrame(cellAccent(t, accent, mode), 18)}
                                     />
-                                    <span className="relative" style={{ color: accent }}>
+                                    <span
+                                      className="relative"
+                                      style={{ color: cellAccent(t, accent, mode) }}
+                                    >
                                       {TaskIcon ? (
                                         <TaskIcon
-                                          size={Math.round(iconBox * 0.46)}
+                                          size={Math.round(iconBox * 0.46 * cellIconScale(t))}
                                           strokeWidth={1.7}
                                         />
                                       ) : (
@@ -863,7 +872,9 @@ registerSlideModule({
               </div>
               <div
                 className="flex flex-col pt-8"
-                style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+                style={{
+                  borderTop: `2px solid ${itemTone(after) ?? brand.tokens.accent}`,
+                }}
               >
                 <Kicker brand={brand}>After</Kicker>
                 <div
