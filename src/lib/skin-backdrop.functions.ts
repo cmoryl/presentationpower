@@ -258,3 +258,81 @@ export const deleteSkinBackdrop = createServerFn({ method: "POST" })
       .eq("take", data.take);
     return { ok: true };
   });
+
+/* --------------------------------------------------------- reuse-existing path */
+
+const AdoptInput = z.object({
+  /** Destination (usually a module scene `mod:<VARIANT-ID>`). */
+  skinCode: z.string().min(2).max(8),
+  scene: z.string().min(2).max(72),
+  take: z.number().int().min(0).max(3).default(0),
+  /** Source backdrop already in the library. */
+  fromSkinCode: z.string().min(2).max(8),
+  fromScene: z.string().min(2).max(72),
+  fromTake: z.number().int().min(0).max(3).default(0),
+});
+
+/**
+ * Reuse a background that already exists in the library for a different
+ * skin × scene × take. The source BYTES are copied to a fresh storage path
+ * rather than the URL being pointed at: sharing one object would make a later
+ * edit of the source silently rewrite every scene that borrowed it.
+ */
+export const adoptSkinBackdrop = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => AdoptInput.parse(input))
+  .handler(async ({ data, context }): Promise<SkinBackdropRow> => {
+    const scene = normalizeScene(data.scene);
+    const fromScene = normalizeScene(data.fromScene);
+    const code = data.skinCode.toUpperCase();
+    const fromCode = data.fromSkinCode.toUpperCase();
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const src = await supabaseAdmin
+      .from("skin_backdrops")
+      .select("storage_path, prompt")
+      .eq("skin_code", fromCode)
+      .eq("scene", fromScene)
+      .eq("take", data.fromTake)
+      .maybeSingle();
+    if (src.error) throw new Error(`Reading the source background failed: ${src.error.message}`);
+    if (!src.data?.storage_path) throw new Error("That background is no longer in the library.");
+
+    const dl = await supabaseAdmin.storage.from("skin-backdrops").download(src.data.storage_path);
+    if (dl.error || !dl.data) throw new Error("Downloading the source background failed.");
+    const bytes = new Uint8Array(await dl.data.arrayBuffer());
+    const contentType = dl.data.type || "image/png";
+    const ext = EXT[contentType] ?? src.data.storage_path.split(".").pop() ?? "png";
+    const path = `${code}/${scenePathSegment(scene)}-${data.take}-reuse-${Date.now()}.${ext}`;
+
+    const up = await supabaseAdmin.storage
+      .from("skin-backdrops")
+      .upload(path, bytes, { contentType, upsert: true });
+    if (up.error) throw new Error(`Storing the background failed: ${up.error.message}`);
+
+    const saved = await context.supabase
+      .from("skin_backdrops")
+      .upsert(
+        {
+          skin_code: code,
+          scene,
+          take: data.take,
+          prompt: `Reused from ${fromCode} · ${fromScene} · take ${data.fromTake + 1}`,
+          storage_path: path,
+          image_url: publicUrlFor(path),
+          created_by: context.userId,
+        },
+        { onConflict: "skin_code,scene,take" },
+      )
+      .select("skin_code, scene, take, image_url, prompt")
+      .single();
+    if (saved.error) throw new Error(`Saving the background failed: ${saved.error.message}`);
+
+    return {
+      skinCode: saved.data.skin_code,
+      scene: saved.data.scene,
+      take: saved.data.take,
+      imageUrl: saved.data.image_url,
+      prompt: saved.data.prompt,
+    };
+  });

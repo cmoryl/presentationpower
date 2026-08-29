@@ -14,9 +14,10 @@
 
 import * as React from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ImageOff, Loader2, RotateCcw, Upload, Wand2 } from "lucide-react";
+import { Check, ImageOff, Images, Loader2, RotateCcw, Upload, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import {
+  adoptSkinBackdrop,
   deleteSkinBackdrop,
   generateSkinBackdrop,
   listSkinBackdrops,
@@ -42,6 +43,13 @@ export function skinCodeForPackId(packId: string | null | undefined): string | n
   if (!packId) return null;
   const m = /^skin-([sr]\d{2})$/i.exec(String(packId));
   return m ? m[1]!.toUpperCase() : null;
+}
+
+/** Human label for a stored backdrop: authored scene name, or the module it belongs to. */
+function sceneLabel(r: { skinCode: string; scene: string; take: number }): string {
+  const base = r.scene.startsWith("mod:") ? `Module ${r.scene.slice(4)}` : r.scene;
+  const take = r.take > 0 ? ` · ${TAKE_LABEL[r.take] ?? `Take ${r.take + 1}`}` : "";
+  return `${r.skinCode} · ${base}${take}`;
 }
 
 const btn =
@@ -71,9 +79,15 @@ export function ModuleBackgroundEditor({
   const upload = useServerFn(uploadSkinBackdrop);
   const generate = useServerFn(generateSkinBackdrop);
   const remove = useServerFn(deleteSkinBackdrop);
+  const adopt = useServerFn(adoptSkinBackdrop);
 
   const [row, setRow] = React.useState<SkinBackdropRow | null>(null);
-  const [busy, setBusy] = React.useState<null | "upload" | "ai" | "clear">(null);
+  // Everything already stored for this look (and, on request, every look) so an
+  // admin can point this module at artwork that exists instead of re-uploading.
+  const [library, setLibrary] = React.useState<SkinBackdropRow[]>([]);
+  const [scope, setScope] = React.useState<"look" | "all">("look");
+  const [picking, setPicking] = React.useState(false);
+  const [busy, setBusy] = React.useState<null | "upload" | "ai" | "clear" | "reuse">(null);
   const [note, setNote] = React.useState("");
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -81,6 +95,8 @@ export function ModuleBackgroundEditor({
     if (!code) return;
     list()
       .then((all) => {
+        // The library excludes THIS module's own record — reusing itself is a no-op.
+        setLibrary(all.filter((r) => !(r.scene === scene && r.skinCode.toUpperCase() === code)));
         setRow(
           all.find(
             (r) => r.skinCode.toUpperCase() === code && r.scene === scene && r.take === take,
@@ -94,6 +110,14 @@ export function ModuleBackgroundEditor({
   React.useEffect(() => {
     refresh();
   }, [refresh]);
+
+  // Same look first: reusing artwork from a DIFFERENT skin is legal but rarely
+  // right, so it lives behind the "Every look" scope.
+  const choices = React.useMemo(() => {
+    const mine = library.filter((r) => r.skinCode.toUpperCase() === code);
+    const rows = scope === "look" ? mine : [...mine, ...library.filter((r) => r.skinCode.toUpperCase() !== code)];
+    return rows.slice(0, 60);
+  }, [library, scope, code]);
 
   if (!code) return null;
 
@@ -135,6 +159,30 @@ export function ModuleBackgroundEditor({
       toast.success("Module background re-rendered");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Rendering the background failed");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function reuse(src: SkinBackdropRow) {
+    setBusy("reuse");
+    try {
+      const saved = await adopt({
+        data: {
+          skinCode: code!,
+          scene,
+          take,
+          fromSkinCode: src.skinCode,
+          fromScene: src.scene,
+          fromTake: src.take,
+        },
+      });
+      setRow(saved);
+      setPicking(false);
+      refresh();
+      toast.success(`Now using the ${sceneLabel(src)} background for ${variantId}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Reusing that background failed");
     } finally {
       setBusy(null);
     }
@@ -249,10 +297,85 @@ export function ModuleBackgroundEditor({
                 Revert
               </button>
             )}
+            <button
+              type="button"
+              disabled={!!busy}
+              onClick={() => setPicking((v) => !v)}
+              className={btn}
+              aria-expanded={picking}
+            >
+              {busy === "reuse" ? (
+                <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+              ) : (
+                <Images className="h-3 w-3" aria-hidden />
+              )}
+              Use existing
+            </button>
             <span className="ml-1 text-[10px] text-black/35 dark:text-white/35">
               {TAKE_LABEL[take] ?? `Take ${take + 1}`} of {SKIN_BG_TAKES}
             </span>
           </div>
+
+          {picking && (
+            <div className="mt-3 rounded-lg border border-black/10 p-2.5 dark:border-white/10">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-black/40 dark:text-white/40">
+                  Backgrounds already in the library
+                </span>
+                <div className="flex items-center gap-1">
+                  {(["look", "all"] as const).map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setScope(s)}
+                      className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${
+                        scope === s
+                          ? "bg-[#003FC7] text-white"
+                          : "text-black/50 hover:text-[#003FC7] dark:text-white/50"
+                      }`}
+                    >
+                      {s === "look" ? `${packName ?? code} only` : "Every look"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {choices.length === 0 ? (
+                <p className="mt-2 text-[11px] text-black/50 dark:text-white/50">
+                  Nothing saved{scope === "look" ? ` for ${packName ?? code}` : ""} yet — upload or
+                  render one and it becomes reusable here.
+                </p>
+              ) : (
+                <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {choices.map((c) => {
+                    const active = row?.imageUrl === c.imageUrl;
+                    return (
+                      <li key={`${c.skinCode}-${c.scene}-${c.take}`}>
+                        <button
+                          type="button"
+                          disabled={!!busy}
+                          onClick={() => void reuse(c)}
+                          title={c.prompt}
+                          className="group block w-full overflow-hidden rounded-lg border border-black/10 text-left transition hover:border-[#003FC7] disabled:opacity-50 dark:border-white/10"
+                        >
+                          <img
+                            src={c.imageUrl}
+                            alt={`${c.skinCode} ${c.scene} take ${c.take + 1}`}
+                            loading="lazy"
+                            className="block aspect-video w-full object-cover"
+                          />
+                          <span className="flex items-center justify-between gap-1 px-1.5 py-1 text-[10px] text-black/60 dark:text-white/60">
+                            <span className="truncate">{sceneLabel(c)}</span>
+                            {active && <Check className="h-3 w-3 shrink-0 text-[#003FC7]" aria-hidden />}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
         </>
       ) : (
         <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] text-black/50 dark:text-white/50">
