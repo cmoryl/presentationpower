@@ -2083,7 +2083,11 @@ const VariantCard = memo(function VariantCard({
           aria-label={pinned ? "Unpin variant" : "Pin variant"}
           title={pinned ? "Pinned — click to unpin" : "Pin to Favorites"}
           data-variant-pin=""
-          className={`absolute right-2 top-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-md backdrop-blur transition sm:h-6 sm:w-6 ${
+          className={`absolute right-2 top-2 z-10 inline-flex h-9 w-9 items-center justify-center rounded-md opacity-0 backdrop-blur transition focus-visible:opacity-100 group-hover/card:opacity-100 sm:h-6 sm:w-6 ${
+            pinned
+              ? "bg-amber-400 text-[#03002C] opacity-100 shadow ring-1 ring-amber-500/40"
+              : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
+          }`}
             pinned
               ? "bg-amber-400 text-[#03002C] shadow ring-1 ring-amber-500/40"
               : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
