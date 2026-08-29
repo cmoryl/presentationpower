@@ -116,6 +116,33 @@ export async function waitForPrintPageReady(
   });
 }
 
+/**
+ * Full staging gate for an off-screen export: wait for the page node to mount
+ * and take real layout size, wait for fonts/images, then assert it carries
+ * renderable content. Returns the node to capture.
+ */
+export async function stagePrintPageForExport(
+  container: HTMLElement | null | undefined,
+  opts: { timeoutMs?: number; onProgress?: (message: string) => void } = {},
+): Promise<HTMLElement> {
+  const timeoutMs = opts.timeoutMs ?? 8000;
+  const deadline = Date.now() + timeoutMs;
+  if (!container) throw new Error("The page could not be rendered for export.");
+
+  let node: HTMLElement | null = null;
+  while (Date.now() < deadline) {
+    node = container.querySelector<HTMLElement>("[data-print-page]") ?? null;
+    const rect = node?.getBoundingClientRect();
+    if (rect && rect.width >= 8 && rect.height >= 8) break;
+    await new Promise<void>((r) => requestAnimationFrame(() => setTimeout(r, 16)));
+  }
+  opts.onProgress?.("Preparing the page at trim size…");
+  const ready = assertPrintPageReady(node);
+  await waitForPrintPageReady(ready, Math.max(1000, deadline - Date.now()));
+  return assertPrintPageReady(ready);
+}
+
+
 
 /** Rasterize the page at print resolution and return a PNG data URL. */
 async function rasterizePage(
