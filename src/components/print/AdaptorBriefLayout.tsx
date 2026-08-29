@@ -114,8 +114,9 @@ export function AdaptorBriefLayout({
     containerWidth: PAGE_W,
   });
 
-  const features = content.features.slice(0, 6);
-  const knowHow = content.knowHow.slice(0, 5);
+  const features = (Array.isArray(content.features) ? content.features : []).slice(0, 6);
+  const knowHow = (Array.isArray(content.knowHow) ? content.knowHow : []).slice(0, 5);
+
 
   return (
     <SlideModeContext.Provider value={mode}>
