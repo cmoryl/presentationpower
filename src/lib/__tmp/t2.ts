@@ -1,0 +1,10 @@
+import { seedDivisionContent, resolveDivisionBrief } from "@/lib/library-preview";
+import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+import { runQa } from "@/lib/qa";
+const brand = BRAND_MODES.find(b=>b.id==="bm-enterprise")!;
+const brief = resolveDivisionBrief(brand);
+const v = byId(MODULE_VARIANTS, "MV-INFO-HUB-SATELLITES")!;
+console.log("editable", v.editableFields);
+const c = seedDivisionContent(v.id, brief, "Solution", brand);
+console.log(JSON.stringify(c).slice(0,600));
+console.log(runQa([{id:"s",position:0,mode:"light",variantId:v.id,layoutId:v.permittedLayoutIds[0],content:c} as any],"bm-enterprise"));
