@@ -286,6 +286,77 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
         )}
       </div>
 
+      {walk && (
+        <div className="rounded-3xl border border-black/10 bg-white p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h3 className="text-base font-semibold" style={{ color: ink }}>
+              Saved deck walk — {walk.title}
+            </h3>
+            <div className="flex items-center gap-3 text-sm text-black/60">
+              <span>
+                {walk.passCount}/{walk.slides.length} deck slides match spec
+              </span>
+              <Link
+                to="/decks/$deckId"
+                params={{ deckId: walk.deckId }}
+                className="rounded-lg border px-3 py-1.5 text-sm font-medium"
+                style={{ borderColor: `${ink}33`, color: ink }}
+              >
+                Open the deck
+              </Link>
+            </div>
+          </div>
+          <ul className="mt-3 space-y-1 text-sm text-black/65">
+            {walk.findings.map((f) => (
+              <li key={f}>• {f}</li>
+            ))}
+          </ul>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-xs">
+              <thead className="text-black/45 uppercase tracking-widest">
+                <tr>
+                  <th className="py-1.5 pr-3">#</th>
+                  <th className="py-1.5 pr-3">Section</th>
+                  <th className="py-1.5 pr-3">Module on the sheet</th>
+                  <th className="py-1.5 pr-3">Face · pack</th>
+                  <th className="py-1.5 pr-3">Origin</th>
+                  <th className="py-1.5">Stage vs spec</th>
+                </tr>
+              </thead>
+              <tbody className="text-black/65">
+                {walk.slides.map((s) => (
+                  <tr key={s.slideId} className="border-t border-black/10 align-top">
+                    <td className="py-2 pr-3 font-mono">{s.position + 1}</td>
+                    <td className="py-2 pr-3">{s.sectionId}</td>
+                    <td className="py-2 pr-3 font-mono">{s.variantId}</td>
+                    <td className="py-2 pr-3 font-mono">
+                      {s.face} · {s.packId}
+                    </td>
+                    <td className="py-2 pr-3">
+                      {s.planned ? (
+                        <Chip tone="ok">planned</Chip>
+                      ) : (
+                        <Chip tone="warn">
+                          {s.plannedVariantId ? `swapped from ${s.plannedVariantId}` : "added by QA"}
+                        </Chip>
+                      )}
+                    </td>
+                    <td className="py-2">
+                      {s.ok ? (
+                        <Chip tone="ok">{s.entries} elements measured</Chip>
+                      ) : (
+                        <span className="text-[#A33B12]">{s.problems.join("; ")}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+
       {previews && built.length > 0 && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {built.map((item) => (
