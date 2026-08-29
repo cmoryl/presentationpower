@@ -755,36 +755,38 @@ registerSlideModule({
       case "MV-INFO-CIRCULAR-FLOW": {
         const items = arr(c.items).slice(0, 6);
         const n = Math.max(items.length, 1);
-        // Stage geometry: the hub disc is 300px wide, so nodes ride an orbit well
-        // clear of it and every label block is anchored *outward* from the ring so
-        // copy can never overlap the hub or its rings.
+        // Stage geometry: the whole cycle must live inside the 1080 stage under the
+        // title, so the orbit is sized from the remaining height rather than a
+        // fixed tall box. Radii stay clear of the hub disc at every count.
         const STAGE_W = 1180;
-        const STAGE_H = 820;
-        const RX = 430;
-        const RY = 300;
+        const STAGE_H = 620;
+        const HUB = 232;
+        const RX = 420;
+        const RY = 214;
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
             <div
-              className="relative mx-auto mt-10"
+              className="relative mx-auto mt-4"
               style={{ height: STAGE_H, width: STAGE_W, maxWidth: "100%" }}
             >
               {/* Hub uses the house circle so the cycle reads like the rest of the system. */}
               <div className="absolute inset-0 grid place-items-center">
                 <OrbitDisc
-                  size={300}
+                  size={HUB}
                   accent={brand.tokens.accent}
                   cool={brand.tokens.primary}
                   isDark={isDark}
                 >
                   <div
-                    className="px-2 text-3xl font-semibold leading-tight"
+                    className="px-2 text-2xl font-semibold leading-tight"
                     style={{ color: ink.strong }}
                   >
                     {s(c.hub, "Program")}
                   </div>
                 </OrbitDisc>
               </div>
+
               {items.map((it, i) => {
                 const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
                 const cos = Math.cos(angle);
