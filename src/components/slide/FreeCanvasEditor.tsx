@@ -184,6 +184,10 @@ export function FreeCanvasEditor({
   const [snapOn, setSnapOn] = useState(true);
   /** Visible 20-unit grid — off by default so the slide reads clean. */
   const [gridOn, setGridOn] = useState(false);
+  /** Static layout guides: safe-area margins, thirds and centre crosshair. */
+  const [guidesOn, setGuidesOn] = useState(false);
+  /** Image block currently in crop mode (Adobe-style framing gesture). */
+  const [cropId, setCropId] = useState<string | null>(null);
   /** Selection-pane style layers list (reorder / lock / hide / group). */
   const [layersOn, setLayersOn] = useState(false);
   /** Browsable shape inventory + icon set (Figma/Canva-style insert library). */
