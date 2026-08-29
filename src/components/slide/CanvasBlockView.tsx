@@ -129,18 +129,30 @@ export const CanvasBlockContent = memo(function CanvasBlockContent({
         </div>
       );
     }
+    const zoom = block.mediaZoom && block.mediaZoom > 0 ? block.mediaZoom : 1;
     return (
-      <img
-        src={block.src}
-        alt={block.alt ?? ""}
+      <div
         style={{
           width: "100%",
           height: "100%",
-          objectFit: block.fit ?? "cover",
+          overflow: "hidden",
           borderRadius: block.radius ?? 24,
-          display: "block",
         }}
-      />
+      >
+        <img
+          src={block.src}
+          alt={block.alt ?? ""}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: block.fit ?? "cover",
+            objectPosition: block.mediaFocus ?? "50% 50%",
+            transform: zoom === 1 ? undefined : `scale(${zoom})`,
+            transformOrigin: block.mediaFocus ?? "50% 50%",
+            display: "block",
+          }}
+        />
+      </div>
     );
   }
   if (block.kind === "shape") {
