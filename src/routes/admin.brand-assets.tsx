@@ -210,7 +210,7 @@ function BrandAssetsAdminView() {
   return (
     <div className="space-y-10">
       <section>
-        <h2 className="text-lg font-semibold">Upload a brand PDF or brochure</h2>
+        <h1 className="text-lg font-semibold">Upload a brand PDF or brochure</h1>
         <p className="mt-1 text-sm text-black/60">
           PDFs are stored privately, text is extracted with Gemini, chunked, and embedded for
           retrieval.

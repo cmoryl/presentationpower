@@ -896,7 +896,11 @@ export function AgendaStudio({
                     <p className="text-xs text-muted-foreground">
                       {agendaDivision(row.division_id).name}
                       {row.event_label ? ` · ${row.event_label}` : ""} · updated{" "}
-                      {new Date(row.updated_at).toLocaleDateString()}
+                      {/* Fixed UTC format: toLocaleDateString() resolves against
+                          the host locale/timezone, so SSR and the browser
+                          produced different text and hydration failed. */}
+                      {new Date(row.updated_at).toISOString().slice(0, 10)}
+
                     </p>
                   </div>
                   <div className="flex gap-2">

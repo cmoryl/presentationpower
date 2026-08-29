@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import {
   ICON_SIZES,
   ICON_PLACEMENTS_META,
@@ -79,7 +80,7 @@ function IconStudio() {
         <div className="text-xs uppercase tracking-[0.25em] text-[#003FC7]">
           Design system · Iconography
         </div>
-        <h2 className="mt-2 text-3xl font-semibold">Icon Studio</h2>
+        <h1 className="mt-2 text-3xl font-semibold">Icon Studio</h1>
         <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
           The single source of truth for icons in TransPerfect decks. Placement, treatment, emphasis
           and sizing live here — as does the full local library of 111,000+ icons ported from
@@ -509,7 +510,10 @@ function PacksTab() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
-    listPacks().then((p) => setPacks(p));
+    // Surface loader failures instead of leaving an unexplained empty grid.
+    listPacks()
+      .then((p) => setPacks(p))
+      .catch(() => toast.error("Could not load the icon pack manifest. Retry in a moment."));
   }, []);
 
   if (activeId) {
@@ -587,6 +591,7 @@ function PackDetail({
     setLoading(true);
     loadPack(packId)
       .then(setPack)
+      .catch(() => toast.error(`Could not load the "${packId}" pack. Retry in a moment.`))
       .finally(() => setLoading(false));
   }, [packId, pack]);
 
@@ -689,7 +694,9 @@ function SearchTab() {
   const [selected, setSelected] = useState<SearchHit | null>(null);
 
   useEffect(() => {
-    listPacks().then(setPacks);
+    listPacks()
+      .then(setPacks)
+      .catch(() => toast.error("Could not load the icon pack manifest. Retry in a moment."));
   }, []);
 
   const runSearch = async () => {
