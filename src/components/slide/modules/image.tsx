@@ -25,6 +25,7 @@ import { foregroundOn } from "@/lib/export-foreground";
 import { clampLines, fillPx } from "@/lib/open-space-fill";
 import { iconByName } from "@/lib/icon-library";
 import { itemTone } from "@/lib/item-tone";
+import { cellAccent } from "./cell-controls";
 
 registerSlideModule({
   id: "family:image",
@@ -384,10 +385,23 @@ registerSlideModule({
                   <div
                     className="mt-8 pt-6"
                     style={{
-                      borderTop: `${i === 1 ? 2 : 1}px solid ${i === 1 ? brand.tokens.accent : `${ink.hairline}`}`,
+                      borderTop: `${i === 1 ? 2 : 1}px solid ${
+                        i === 1
+                          ? (itemTone(p.panel) ?? brand.tokens.accent)
+                          : `${ink.hairline}`
+                      }`,
                     }}
                   >
-                    <Kicker brand={brand} color={i === 1 ? "var(--slide-accent-text)" : ink.faint}>
+                    <Kicker
+                      brand={brand}
+                      color={
+                        i === 1
+                          ? itemTone(p.panel)
+                            ? cellAccent(p.panel, brand.tokens.accent, mode)
+                            : "var(--slide-accent-text)"
+                          : ink.faint
+                      }
+                    >
                       {p.label}
                     </Kicker>
                     <div
@@ -488,7 +502,12 @@ registerSlideModule({
             >
               {arr(c.items)
                 .slice(0, 4)
-                .map((it, i) => (
+                .map((it, i) => {
+                  // Studio `tone` override recolours this cell's chip + rule.
+                  const cellInk = itemTone(it)
+                    ? cellAccent(it, brand.tokens.accent, mode)
+                    : "var(--slide-accent-text)";
+                  return (
                   <div key={i} data-intro-item="" data-intro-step={i} className="min-w-0">
                     <GlassTile radius={26} padding="p-6" className="flex h-full min-w-0 gap-7">
                       <MediaTile
@@ -506,9 +525,8 @@ registerSlideModule({
                               width: 40,
                               height: 40,
                               borderRadius: 12,
-                              background:
-                                "color-mix(in oklab, var(--slide-accent-text) 14%, transparent)",
-                              color: "var(--slide-accent-text)",
+                              background: `color-mix(in oklab, ${cellInk} 14%, transparent)`,
+                              color: cellInk,
                               fontSize: fillPx(18, "body"),
                               fontWeight: 700,
                             }}
@@ -520,8 +538,7 @@ registerSlideModule({
                             style={{
                               height: 2,
                               flex: 1,
-                              background:
-                                "linear-gradient(90deg, color-mix(in oklab, var(--slide-accent-text) 34%, transparent), transparent)",
+                              background: `linear-gradient(90deg, color-mix(in oklab, ${cellInk} 34%, transparent), transparent)`,
                             }}
                           />
                         </div>
@@ -542,7 +559,8 @@ registerSlideModule({
                       </div>
                     </GlassTile>
                   </div>
-                ))}
+                  );
+                })}
             </div>
           </SlideFrame>
         );
@@ -572,8 +590,11 @@ registerSlideModule({
                             width: 34,
                             height: 34,
                             borderRadius: 10,
-                            background:
-                              "color-mix(in oklab, var(--slide-accent-text) 82%, transparent)",
+                            background: `color-mix(in oklab, ${
+                              itemTone(it)
+                                ? cellAccent(it, brand.tokens.accent, mode)
+                                : "var(--slide-accent-text)"
+                            } 82%, transparent)`,
                             color: "#ffffff",
                             fontSize: fillPx(15, "body"),
                             fontWeight: 700,

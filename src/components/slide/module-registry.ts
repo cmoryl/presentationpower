@@ -85,6 +85,10 @@ export type ModuleRegistration = {
 export type ModuleCellControls = {
   /** Honours `item.tone` / `item.toneEnd` (per-cell gradient). */
   tone?: boolean;
+  /** Renders a per-item icon at all (`item.icon`). */
+  icons?: boolean;
+  /** Honours `item.iconSize` (xs…display scale on the rendered glyph). */
+  iconSize?: boolean;
   /** Honours `item.iconAlign` / `item.iconOffsetPct`. */
   iconNudge?: boolean;
 };

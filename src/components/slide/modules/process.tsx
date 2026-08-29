@@ -26,10 +26,11 @@ import {
   SEAM_TICK_INSET_PCT,
   SUMMARY_BAND,
 } from "@/lib/surface-tokens";
+import { cellAccent, cellWash, iconWellStyle, cellIconScale } from "./cell-controls";
 
 registerSlideModule({
   id: "family:process",
-  cellControls: { tone: true, iconNudge: true },
+  cellControls: { tone: true, icons: true, iconSize: true, iconNudge: true },
   variantIds: [
     "MV-PROC-TIMELINE",
     "MV-PROC-STEP-CHAIN",
@@ -187,7 +188,12 @@ registerSlideModule({
                   // pink pop so the risk point reads instantly.
                   // Mode-aware tone: raw pink/blue is unreadable as ink or hairline on
                   // the dark ground, so both flavours ride the accentInk ramp.
-                  const line = flagged ? accentInk("#EC388A", mode, 3) : accentTone;
+                  // A Studio `tone` override on the cell wins over both.
+                  const line = itemTone(it)
+                    ? cellAccent(it, accentTone, mode)
+                    : flagged
+                      ? accentInk("#EC388A", mode, 3)
+                      : accentTone;
                   return (
                     <div
                       key={i}
@@ -227,7 +233,7 @@ registerSlideModule({
                           className="absolute inset-0"
                           style={{
                             borderRadius: `min(22px, 13%)`,
-                            backgroundImage: cardWashGradient(line),
+                            backgroundImage: cellWash(it, line),
                           }}
                         />
                         {/* Hairline frame, masked so BOTH the bottom edge and the
@@ -523,7 +529,7 @@ registerSlideModule({
                         <div className="flex items-center" style={{ gap: 34 }}>
                           <div
                             className="relative flex shrink-0 items-center justify-center"
-                            style={{ width: iconBox, height: iconBox }}
+                            style={{ width: iconBox, height: iconBox, ...iconWellStyle(it) }}
                           >
                             <div
                               aria-hidden
@@ -531,18 +537,24 @@ registerSlideModule({
                               className="absolute inset-0"
                               style={{
                                 borderRadius: 20,
-                                backgroundImage: cardWashGradient(accent),
+                                backgroundImage: cellWash(it, cellAccent(it, accent, mode)),
                               }}
                             />
                             <div
                               aria-hidden
                               data-decorative
                               className="absolute inset-0"
-                              style={openBottomFrame(accent, 20)}
+                              style={openBottomFrame(cellAccent(it, accent, mode), 20)}
                             />
-                            <span className="relative" style={{ color: accent }}>
+                            <span
+                              className="relative"
+                              style={{ color: cellAccent(it, accent, mode) }}
+                            >
                               {RowIcon ? (
-                                <RowIcon size={Math.round(iconBox * 0.46)} strokeWidth={1.7} />
+                                <RowIcon
+                                  size={Math.round(iconBox * 0.46 * cellIconScale(it))}
+                                  strokeWidth={1.7}
+                                />
                               ) : (
                                 <span style={{ fontSize: fillPx(30, "figure"), fontWeight: 700 }}>
                                   {i + 1}
@@ -759,7 +771,7 @@ registerSlideModule({
                                 <div className="flex items-center" style={{ gap: wide ? 24 : 18 }}>
                                   <div
                                     className="relative flex shrink-0 items-center justify-center"
-                                    style={{ width: iconBox, height: iconBox }}
+                                    style={{ width: iconBox, height: iconBox, ...iconWellStyle(t) }}
                                   >
                                     <div
                                       aria-hidden
@@ -767,19 +779,22 @@ registerSlideModule({
                                       className="absolute inset-0"
                                       style={{
                                         borderRadius: 18,
-                                        backgroundImage: cardWashGradient(accent),
+                                        backgroundImage: cellWash(t, cellAccent(t, accent, mode)),
                                       }}
                                     />
                                     <div
                                       aria-hidden
                                       data-decorative
                                       className="absolute inset-0"
-                                      style={openBottomFrame(accent, 18)}
+                                      style={openBottomFrame(cellAccent(t, accent, mode), 18)}
                                     />
-                                    <span className="relative" style={{ color: accent }}>
+                                    <span
+                                      className="relative"
+                                      style={{ color: cellAccent(t, accent, mode) }}
+                                    >
                                       {TaskIcon ? (
                                         <TaskIcon
-                                          size={Math.round(iconBox * 0.46)}
+                                          size={Math.round(iconBox * 0.46 * cellIconScale(t))}
                                           strokeWidth={1.7}
                                         />
                                       ) : (
@@ -857,7 +872,9 @@ registerSlideModule({
               </div>
               <div
                 className="flex flex-col pt-8"
-                style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+                style={{
+                  borderTop: `2px solid ${itemTone(after) ?? brand.tokens.accent}`,
+                }}
               >
                 <Kicker brand={brand}>After</Kicker>
                 <div
@@ -1025,6 +1042,7 @@ registerSlideModule({
               {stages.map((it, i) => {
                 const { x, y } = centreOf(i);
                 const StageIcon = it.icon ? iconByName(s(it.icon)) : null;
+                const nodeAccent = cellAccent(it, accent, mode);
                 const above = i % 2 === 0;
                 return (
                   <React.Fragment key={i}>
@@ -1039,16 +1057,16 @@ registerSlideModule({
                         height: nodeD,
                         left: x - nodeD / 2,
                         top: y - nodeD / 2,
-                        border: `1px solid color-mix(in oklab, ${accent} 48%, transparent)`,
-                        backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 10 : 5}%, transparent))`,
+                        border: `1px solid color-mix(in oklab, ${nodeAccent} 48%, transparent)`,
+                        backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${nodeAccent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${nodeAccent} ${isDark ? 10 : 5}%, transparent))`,
                         zIndex: 3,
                       }}
                     >
                       {StageIcon ? (
                         <StageIcon
-                          size={Math.round(nodeD * 0.4)}
+                          size={Math.round(nodeD * 0.4 * cellIconScale(it))}
                           strokeWidth={1.8}
-                          color={accent}
+                          color={nodeAccent}
                           aria-hidden
                         />
                       ) : (
@@ -1056,7 +1074,7 @@ registerSlideModule({
                           style={{
                             fontSize: Math.round(nodeD * 0.36),
                             fontWeight: 800,
-                            color: accent,
+                            color: nodeAccent,
                             fontVariantNumeric: "tabular-nums",
                           }}
                         >
@@ -1182,7 +1200,7 @@ registerSlideModule({
                 const x = colW * (i + 0.5);
                 const above = i % 2 === 0;
                 const flagged = truthy(it.highlight);
-                const line = flagged ? "#EC388A" : accent;
+                const line = itemTone(it) ?? (flagged ? "#EC388A" : accent);
                 const StopIcon = it.icon ? iconByName(s(it.icon)) : null;
                 return (
                   <React.Fragment key={i}>
@@ -1256,7 +1274,7 @@ registerSlideModule({
                         className="relative px-5 pb-7 pt-5"
                         style={{
                           borderRadius: 20,
-                          backgroundImage: cardWashGradient(line),
+                          backgroundImage: cellWash(it, line),
                           maxHeight: cardHalf,
                           overflow: "hidden",
                         }}
@@ -1374,7 +1392,7 @@ registerSlideModule({
               <div className="flex flex-col" style={{ gap: count >= 5 ? 22 : 30 }}>
                 {stages.map((it, i) => {
                   const flagged = truthy(it.highlight);
-                  const line = flagged ? "#EC388A" : accent;
+                  const line = itemTone(it) ?? (flagged ? "#EC388A" : accent);
                   const StageIcon = it.icon ? iconByName(s(it.icon)) : null;
                   return (
                     <div
@@ -1417,7 +1435,7 @@ registerSlideModule({
                       </div>
                       <div
                         className="relative min-w-0 flex-1 px-7 pb-8 pt-6"
-                        style={{ borderRadius: 22, backgroundImage: cardWashGradient(line) }}
+                        style={{ borderRadius: 22, backgroundImage: cellWash(it, line) }}
                       >
                         <div
                           aria-hidden
@@ -1622,7 +1640,7 @@ registerSlideModule({
                       const cell = obj(cells[ci]);
                       const text = s(cell.label);
                       const flagged = truthy(cell.highlight);
-                      const line = flagged ? "#EC388A" : accent;
+                      const line = itemTone(cell) ?? (flagged ? "#EC388A" : accent);
                       const CellIcon = cell.icon ? iconByName(s(cell.icon)) : null;
                       if (!text && !CellIcon) {
                         return (
@@ -1651,7 +1669,7 @@ registerSlideModule({
                             minHeight: 108,
                             gap: 12,
                             borderRadius: 18,
-                            backgroundImage: cardWashGradient(line),
+                            backgroundImage: cellWash(cell, line),
                           }}
                         >
                           <div
@@ -2078,6 +2096,7 @@ registerSlideModule({
               <div className="mt-5 flex flex-col" style={{ gap: rowGap }}>
                 {rows.map((rowRaw, i) => {
                   const row = obj(rowRaw);
+                  const rowAccent = cellAccent(row, accent, mode);
                   return (
                     <div
                       key={i}
@@ -2088,9 +2107,9 @@ registerSlideModule({
                     >
                       <Pill text={s(row.before)} tone={cool} emphasis={false} Glyph={XIcon} />
                       <div className="flex items-center justify-center">
-                        <HouseArrow tone={accent} length={92} thickness={2} headScale={0.9} />
+                        <HouseArrow tone={rowAccent} length={92} thickness={2} headScale={0.9} />
                       </div>
-                      <Pill text={s(row.after)} tone={accent} emphasis Glyph={CheckIcon} />
+                      <Pill text={s(row.after)} tone={rowAccent} emphasis Glyph={CheckIcon} />
                     </div>
                   );
                 })}

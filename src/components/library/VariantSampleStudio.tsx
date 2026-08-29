@@ -1943,8 +1943,10 @@ export function VariantSampleStudio({
                             />
                           )}
 
-                          {/* Icon swap + size for any non-imagery cell. */}
-                          {!isMedia && (
+                          {/* Icon swap + size for any non-imagery cell. Only
+                              shown for families that render per-item icons, so
+                              the picker never looks broken. */}
+                          {!isMedia && cellControls.icons ? (
                             <div className="mt-2 rounded border border-white/10 bg-[#03002C]/50 p-2">
                               <div className="text-[10px] uppercase tracking-widest text-white/40">
                                 Icon
@@ -1964,6 +1966,7 @@ export function VariantSampleStudio({
                                 </button>
                               </div>
 
+                              {cellControls.iconSize ? (
                               <div className="mt-2 flex flex-wrap items-center gap-1">
                                 <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
                                   Size
@@ -1986,6 +1989,7 @@ export function VariantSampleStudio({
                                   );
                                 })}
                               </div>
+                              ) : null}
 
                               {/* Alignment + fine offset inside the tile's glyph
                                   well. Tile styling is untouched. Only shown for
@@ -2037,7 +2041,7 @@ export function VariantSampleStudio({
                               </>
                               ) : null}
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       );
                     })}
