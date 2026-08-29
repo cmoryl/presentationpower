@@ -15,9 +15,11 @@ import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, enterprisePalette, isEnterpriseWhite } from "@/lib/slide-skin";
 import {
+  brandSystemDarkGround,
   brandSystemGroundIsReplaced,
   brandSystemLightGround,
 } from "@/lib/brand-system-template";
+
 
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { resolveBrandMode } from "@/lib/brand-profiles";
