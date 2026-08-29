@@ -1321,19 +1321,7 @@ const FIT_ENGINES: Array<{ name: string; module: string; does: string }> = [
 function SystemsSegment({ ink }: { ink: string }) {
   const specs = Object.entries(DIVISION_DESIGN_SPECS);
 
-  // A live arbitration, computed on render — proof the engine is wired, and a
-  // worked example of "best" beating "convenient".
-  const demo = arbitrateLayout({
-    sectionId: "SF-08",
-    industryId: "R05",
-    content: {
-      title: "Proof the programme paid back inside two quarters",
-      body: "Measured against the FY baseline across four markets.",
-      items: [1, 2, 3, 4],
-      hasChart: true,
-    },
-    canvas: { width: 16, height: 9 },
-  });
+
 
   return (
     <>
