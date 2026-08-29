@@ -1823,6 +1823,12 @@ export function FreeCanvasEditor({
                   onClick={() => setGridOn((v) => !v)}
                 />
                 <TBtn
+                  label="guides"
+                  title="Show safe-area margins, thirds and centre guides"
+                  pressed={guidesOn}
+                  onClick={() => setGuidesOn((v) => !v)}
+                />
+                <TBtn
                   label="☰ layers"
                   title="Layers: reorder, lock, hide and group objects and adopted module sections"
                   pressed={layersOn}
