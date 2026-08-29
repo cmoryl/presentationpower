@@ -233,7 +233,7 @@ registerSlideModule({
                           className="absolute inset-0"
                           style={{
                             borderRadius: `min(22px, 13%)`,
-                            backgroundImage: cardWashGradient(line),
+                            backgroundImage: cellWash(it, line),
                           }}
                         />
                         {/* Hairline frame, masked so BOTH the bottom edge and the
@@ -537,7 +537,7 @@ registerSlideModule({
                               className="absolute inset-0"
                               style={{
                                 borderRadius: 20,
-                                backgroundImage: cardWashGradient(accent),
+                                backgroundImage: cellWash(it, cellAccent(it, accent, mode)),
                               }}
                             />
                             <div
@@ -773,7 +773,7 @@ registerSlideModule({
                                       className="absolute inset-0"
                                       style={{
                                         borderRadius: 18,
-                                        backgroundImage: cardWashGradient(accent),
+                                        backgroundImage: cellWash(t, cellAccent(t, accent, mode)),
                                       }}
                                     />
                                     <div
@@ -1188,7 +1188,7 @@ registerSlideModule({
                 const x = colW * (i + 0.5);
                 const above = i % 2 === 0;
                 const flagged = truthy(it.highlight);
-                const line = flagged ? "#EC388A" : accent;
+                const line = itemTone(it) ?? (flagged ? "#EC388A" : accent);
                 const StopIcon = it.icon ? iconByName(s(it.icon)) : null;
                 return (
                   <React.Fragment key={i}>
@@ -1262,7 +1262,7 @@ registerSlideModule({
                         className="relative px-5 pb-7 pt-5"
                         style={{
                           borderRadius: 20,
-                          backgroundImage: cardWashGradient(line),
+                          backgroundImage: cellWash(it, line),
                           maxHeight: cardHalf,
                           overflow: "hidden",
                         }}
@@ -1380,7 +1380,7 @@ registerSlideModule({
               <div className="flex flex-col" style={{ gap: count >= 5 ? 22 : 30 }}>
                 {stages.map((it, i) => {
                   const flagged = truthy(it.highlight);
-                  const line = flagged ? "#EC388A" : accent;
+                  const line = itemTone(it) ?? (flagged ? "#EC388A" : accent);
                   const StageIcon = it.icon ? iconByName(s(it.icon)) : null;
                   return (
                     <div
@@ -1423,7 +1423,7 @@ registerSlideModule({
                       </div>
                       <div
                         className="relative min-w-0 flex-1 px-7 pb-8 pt-6"
-                        style={{ borderRadius: 22, backgroundImage: cardWashGradient(line) }}
+                        style={{ borderRadius: 22, backgroundImage: cellWash(it, line) }}
                       >
                         <div
                           aria-hidden
@@ -1628,7 +1628,7 @@ registerSlideModule({
                       const cell = obj(cells[ci]);
                       const text = s(cell.label);
                       const flagged = truthy(cell.highlight);
-                      const line = flagged ? "#EC388A" : accent;
+                      const line = itemTone(cell) ?? (flagged ? "#EC388A" : accent);
                       const CellIcon = cell.icon ? iconByName(s(cell.icon)) : null;
                       if (!text && !CellIcon) {
                         return (
@@ -1657,7 +1657,7 @@ registerSlideModule({
                             minHeight: 108,
                             gap: 12,
                             borderRadius: 18,
-                            backgroundImage: cardWashGradient(line),
+                            backgroundImage: cellWash(cell, line),
                           }}
                         >
                           <div
