@@ -22,6 +22,7 @@ import { seedContent } from "@/lib/deck-store";
 import { BRAND_PROFILES } from "@/lib/brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "@/lib/case-studies";
 import { BRAND_MODES, MODULE_VARIANTS, byId, type BrandMode } from "@/lib/taxonomy";
+import { expandPath, readPath } from "@/lib/qa";
 
 export function resolveDivisionBrief(brand: BrandMode): Brief {
   const profile = BRAND_PROFILES[brand.id];
@@ -516,6 +517,18 @@ export function seedDivisionContent(
  * Each is filled from the division context already resolved above — no invented
  * claims, no numbers that weren't there.
  */
+/** Write a dotted/indexed path into a seeded content object. */
+function writeSeedPath(root: Obj, path: string, value: string): void {
+  const parts = path.replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
+  let node: any = root;
+  for (let i = 0; i < parts.length - 1; i += 1) {
+    const key = parts[i]!;
+    if (node[key] == null || typeof node[key] !== "object") node[key] = {};
+    node = node[key];
+  }
+  node[parts[parts.length - 1]!] = value;
+}
+
 function completeSeededContent(variantId: string, content: Obj, ctx: DivisionCtx): Obj {
   const variant = byId(MODULE_VARIANTS, variantId);
   const out: Obj = { ...content };
@@ -539,6 +552,32 @@ function completeSeededContent(variantId: string, content: Obj, ctx: DivisionCtx
       }
       return item;
     });
+  }
+
+  // Anything the module declares editable must actually be on the slide: the
+  // generic seed can miss keys entirely (not just leave them blank), which
+  // reads as a blocking "empty field" gate on a run.
+  for (const pattern of variant?.editableFields ?? []) {
+    for (const path of expandPath(pattern, out)) {
+      if (String(readPath(out, path) ?? "").trim() !== "") continue;
+      const leaf = path.split(".").pop() ?? "";
+      const parentPath = path.slice(0, path.length - leaf.length - 1);
+      const parent = parentPath ? readPath(out, parentPath) : out;
+      const label =
+        parent && typeof parent === "object"
+          ? String(
+              (parent as Obj).label ?? (parent as Obj).title ?? (parent as Obj).name ?? "",
+            ).trim()
+          : "";
+      const subject = label || String(out.title ?? ctx.divisionName);
+      writeSeedPath(
+        out,
+        path,
+        /^(body|description|copy|detail|summary|narrative)$/i.test(leaf)
+          ? `How ${ctx.divisionName} runs ${subject.toLowerCase()} for ${ctx.industry.toLowerCase()} programs.`
+          : subject,
+      );
+    }
   }
 
   // Case-study slides state the in-scope industry on the sheet.
