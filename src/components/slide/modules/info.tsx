@@ -851,18 +851,18 @@ registerSlideModule({
                       transform: `translate(${tx}, ${ty})`,
                     }}
                   >
-
                     {iconFirst ? (
                       <>
                         {icon}
-                        <div className="mt-4">{copy}</div>
+                        <div className="mt-3">{copy}</div>
                       </>
                     ) : (
                       <>
-                        <div className="mb-4">{copy}</div>
+                        <div className="mb-3">{copy}</div>
                         {icon}
                       </>
                     )}
+
                   </div>
                 );
               })}
