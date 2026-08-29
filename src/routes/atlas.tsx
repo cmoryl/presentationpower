@@ -1405,7 +1405,9 @@ function SystemsSegment({ ink }: { ink: string }) {
       </Section>
 
 
-      {/* BISECT */}
+      <Section title="Division fit engine" count={specs.length}>
+        <DivisionFitPanel ink={ink} />
+      </Section>
 
       <Section title="Fit engines" count={FIT_ENGINES.length}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
