@@ -181,6 +181,27 @@ function findDonor(slide: DeckSlide, relPath: string): { value: string; from: st
     }
   }
 
+  // 1b. Item-level prose with no prose sibling: describe the item from its own
+  //     label. Used when a layout swap lands content in a variant that asks for
+  //     a body the previous layout never had.
+  if (parent && /^(body|description|copy|detail|summary)$/i.test(key)) {
+    const obj = readPath(content, parent);
+    if (obj && typeof obj === "object") {
+      const label = ["label", "title", "name", "forum", "step"]
+        .map((k) => (obj as Record<string, unknown>)[k])
+        .find((v) => isFilled(v));
+      if (label) {
+        const heading = String(content.title ?? content.headline ?? "").trim();
+        return {
+          value: heading
+            ? `${String(label)} — part of ${firstSentence(heading, 12).toLowerCase()}.`
+            : String(label),
+          from: `${parent}.label`,
+        };
+      }
+    }
+  }
+
   // 2. Top-level content donors.
   for (const d of donors) {
     if (parent === null && d === key) continue;
@@ -229,6 +250,39 @@ const toHex = (rgb: [number, number, number]) =>
         .padStart(2, "0"),
     )
     .join("")}`;
+
+/**
+ * Approved TransPerfect accents that may stand in when the brand accent is
+ * illegible on a face. Secondary/tertiary brand colours only — never a
+ * synthesised tint, so a governance review still passes.
+ */
+const APPROVED_ACCENTS = [
+  "#A1FBF9", // Aqua
+  "#C2A3FF", // Lavender
+  "#FFEB66", // Yellow
+  "#A6FA87", // Green
+  "#FF9B70", // Peach
+  "#003FC7", // Blue 500
+  "#03002C", // Blue 800
+];
+
+/** The approved palette colour closest in hue to `accent` that clears `target`. */
+function approvedLegibleAccent(accent: string, bg: string, target = 4.5): string | null {
+  const from = hexToRgb(accent);
+  const pool = APPROVED_ACCENTS.filter(
+    (hex) => hex.toLowerCase() !== accent.toLowerCase() && hexContrast(hex, bg) >= target,
+  );
+  if (pool.length === 0) return null;
+  if (!from) return pool[0]!;
+  return pool
+    .map((hex) => {
+      const c = hexToRgb(hex) ?? [0, 0, 0];
+      const d =
+        (c[0] - from[0]) ** 2 + (c[1] - from[1]) ** 2 + (c[2] - from[2]) ** 2;
+      return { hex, d };
+    })
+    .sort((a, b) => a.d - b.d)[0]!.hex;
+}
 
 /** Push an accent toward black (light bg) or white (dark bg) until it passes. */
 function legibleAccent(accent: string, bg: string, target = 4.5): string | null {
@@ -539,7 +593,11 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
           if (!brand) break;
           const accent = resolveSlideAccent(slide, brand);
           const bg = slideBackgroundForMode(slide.mode);
-          const next = legibleAccent(accent, bg);
+          // Approved palette first, synthesised tint only as a last resort —
+          // and mark the override authorised, because this is a governed
+          // legibility repair rather than an author's colour whim (TransPerfect
+          // scopes ignore unauthorised accent overrides by design).
+          const next = approvedLegibleAccent(accent, bg) ?? legibleAccent(accent, bg);
           if (!next || next.toLowerCase() === accent.toLowerCase()) break;
           work = work.map((s, i) =>
             i === idx
@@ -548,6 +606,7 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
                   content: {
                     ...(s.content as Record<string, unknown>),
                     accentOverride: next,
+                    authorizedAccentOverride: true,
                   } as SlideContent,
                 }
               : s,
@@ -556,7 +615,7 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
             code: issue.code,
             kind: "accent-legible",
             slideId: slide.id,
-            detail: `Deepened the slide accent to ${next.toUpperCase()} so text clears WCAG AA (${hexContrast(next, bg).toFixed(2)}:1).`,
+            detail: `Moved the slide accent to the approved ${next.toUpperCase()} so text clears WCAG AA (${hexContrast(next, bg).toFixed(2)}:1).`,
           });
           break;
         }

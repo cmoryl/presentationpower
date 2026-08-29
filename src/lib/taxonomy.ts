@@ -117,7 +117,7 @@ export type NarrativeArchetype = {
 export const BRAND_MODES: BrandMode[] = [
   {
     id: "bm-enterprise",
-    name: "Enterprise",
+    name: "TransPerfect",
     description: "TransPerfect master brand",
     // Master brand — TP Blue 800 ink field, Blue 500 accent, neutral cool surface.
     tokens: { primary: "#03002C", accent: "#003FC7", surface: "#EEF1F7", ink: "#03002C" },

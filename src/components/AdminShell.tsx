@@ -176,7 +176,7 @@ export function AdminSidebar() {
     <aside className="w-full shrink-0 md:w-64">
       <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl border border-black/10 bg-white/70 p-3 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]">
         <div className="px-2 pb-2 pt-1 text-[10px] uppercase tracking-[0.3em] text-black/50 dark:text-white/50">
-          Enterprise console
+          TransPerfect console
         </div>
         <nav className="space-y-4">
           {navGroups.map((g) => (
