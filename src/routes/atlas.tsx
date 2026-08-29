@@ -1391,43 +1391,10 @@ function SystemsSegment({ ink }: { ink: string }) {
         </div>
       </Section>
 
-      <Section title="Layout arbiter" count={demo.consideredCount}>
-        <p className="mb-4 max-w-3xl text-sm text-black/60">
-          The assembler no longer takes the first permitted layout. For each slide it enumerates
-          every legal module × layout × level combination, prunes anything the authored content
-          cannot fit, and ranks the survivors. Below is a live arbitration of a four-stat proof slide
-          with a chart on a 16:9 canvas.
-        </p>
-        <div className="rounded-2xl border border-black/10 bg-white p-5">
-          <div className="text-xs uppercase tracking-widest" style={{ color: ink }}>
-            Winner
-          </div>
-          <div className="mt-1 text-lg font-medium">
-            {demo.best?.variantId} · {demo.best?.name}
-          </div>
-          <p className="mt-2 text-sm text-black/65">{demo.rationale}</p>
-          <p className="mt-2 text-xs text-black/50">{demo.canvas.note}</p>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-xs md:grid-cols-3">
-            {demo.best &&
-              Object.entries(demo.best.breakdown).map(([axis, value]) => (
-                <div key={axis} className="rounded-lg border border-black/10 px-3 py-2">
-                  <div className="uppercase tracking-wider text-black/45">{axis}</div>
-                  <div className="mt-1 font-mono">{value.toFixed(2)}</div>
-                </div>
-              ))}
-          </div>
-          <div className="mt-5 text-xs uppercase tracking-widest text-black/45">Runners-up</div>
-          <ul className="mt-2 space-y-1 text-sm text-black/65">
-            {demo.candidates.slice(1, 5).map((c) => (
-              <li key={`${c.variantId}-${c.layoutId}-${c.level}`}>
-                <span className="font-mono text-xs">{c.variantId}</span> · {c.level} ·{" "}
-                {c.score.toFixed(3)}
-                {c.feasible ? "" : " · does not fit"}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <Section title="Layout arbiter" count={SECTION_FRAMEWORKS_COUNT}>
+        <ArbiterLab ink={ink} />
       </Section>
+
 
       <Section title="Fit engines" count={FIT_ENGINES.length}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
