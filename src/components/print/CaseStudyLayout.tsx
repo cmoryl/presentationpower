@@ -143,8 +143,8 @@ export function CaseStudyLayout({
       ? []
       : Array.isArray(engagementSource?.bullets)
         ? engagementSource.bullets
-        : content.expert?.name
-        ? [content.expert.name, ...(content.expert.role ? [content.expert.role] : [])]
+        : content.expert?.name && !hidden.has("expert")
+          ? [content.expert.name, ...(content.expert.role ? [content.expert.role] : [])]
           : [],
   };
 
