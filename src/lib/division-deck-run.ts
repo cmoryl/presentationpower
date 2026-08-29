@@ -19,7 +19,7 @@ import { useDeckStore, type Deck, type DeckSlide, type DeckSnapshot } from "./de
 import { resolveBrandMode } from "./brand-profiles";
 import { STAGE_H, STAGE_W } from "./export-quality";
 import { divisionConformancePreset } from "./division-conformance";
-import { buildDivisionRun, type StageCheck } from "./division-run";
+import { buildDivisionRun, type BuiltDivisionSlide, type StageCheck } from "./division-run";
 import type { DivisionFitPlan } from "./division-fit-engine";
 import type { StylePack } from "./style-packs";
 
