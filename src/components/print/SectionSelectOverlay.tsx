@@ -25,11 +25,21 @@ type Props = {
   /** Called when the user hits edit on a stacked module (module:<id>) — the
    *  route deep-links to that module's inline editor. */
   onEditModule?: (sectionKey: string) => void;
+  /** Swap only the section's photography, leaving the layout alone. Offered on
+   *  sections that carry an image (hero, photo modules). */
+  onReplaceMedia?: (sectionKey: string) => void;
   /** Optional dependency list — re-scan when any of these change. */
   scanKey?: unknown;
 };
 
-export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, onEditModule, scanKey }: Props) {
+export function SectionSelectOverlay({
+  canvasRef,
+  onDelete,
+  onReplace,
+  onEditModule,
+  onReplaceMedia,
+  scanKey,
+}: Props) {
   const [sections, setSections] = useState<Section[]>([]);
   const [hoverKey, setHoverKey] = useState<string | null>(null);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
