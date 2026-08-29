@@ -113,13 +113,19 @@ const COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
 
 /**
  * Per-module composition overrides, keyed `LOOK:MODULE_ID`.
- *
- * Symmetric marks (Q&A, thanks) must sit on the optical centre of the sheet, so
- * they zero the margin swing that would otherwise pull their centred block off
- * to one side.
  */
 const MODULE_COMPOSE_OVERRIDE: Record<string, Partial<PackCompose>> = {
   "R03:MV-CLOSE-QNA": { bias: "center", lead: 0, trail: 0, column: 0.94 },
+};
+
+/**
+ * Symmetric marks (Q&A, thanks) must sit on the optical centre of the sheet in
+ * EVERY look, so they zero the margin swing that would otherwise pull their
+ * centred block off to one side. These apply for any look code.
+ */
+const MODULE_COMPOSE_GLOBAL: Record<string, Partial<PackCompose>> = {
+  "MV-CLOSE-QNA": { bias: "center", lead: 0, trail: 0 },
+  "MV-CLOSE-THANKS": { bias: "center", lead: 0, trail: 0 },
 };
 
 /** Deterministic composition profile for a pack (optionally one module of it). */
