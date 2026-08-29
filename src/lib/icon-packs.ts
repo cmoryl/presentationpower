@@ -103,10 +103,18 @@ const packMem = new Map<string, IconPack>();
 
 export function loadManifest(): Promise<IconManifest> {
   if (!manifestPromise) {
-    manifestPromise = fetch("/icon-library/manifest.json").then((r) => {
-      if (!r.ok) throw new Error(`manifest ${r.status}`);
-      return r.json() as Promise<IconManifest>;
-    });
+    manifestPromise = fetch("/icon-library/manifest.json")
+      .then((r) => {
+        if (!r.ok) throw new Error(`manifest ${r.status}`);
+        return r.json() as Promise<IconManifest>;
+      })
+      // Never cache a rejection: a single offline blip used to poison this
+      // module for the rest of the session, so the Icon Studio stayed empty
+      // until a full page reload.
+      .catch((err) => {
+        manifestPromise = null;
+        throw err;
+      });
   }
   return manifestPromise;
 }
@@ -129,11 +137,17 @@ export function loadPack(id: string): Promise<IconPack> {
       .then((data) => {
         packMem.set(id, data);
         return data;
+      })
+      // Same rule for packs — drop the failed attempt so the next open retries.
+      .catch((err) => {
+        packPromises.delete(id);
+        throw err;
       });
     packPromises.set(id, p);
   }
   return p;
 }
+
 
 export function getLoadedPack(id: string): IconPack | undefined {
   return packMem.get(id);

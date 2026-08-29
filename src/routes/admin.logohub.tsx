@@ -185,7 +185,7 @@ function LogoHubAdmin() {
       <section>
         <div className="flex items-baseline justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold">LogoHub</h2>
+            <h1 className="text-lg font-semibold">LogoHub</h1>
             <p className="mt-1 text-sm text-black/60">
               Client logo repository. Upload primary, dark, light and mono variants per client for
               reuse across decks, case studies and briefs.
