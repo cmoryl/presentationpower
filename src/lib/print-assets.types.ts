@@ -42,6 +42,10 @@ export type PrintHeroMedia = {
   blendMode?: "normal" | "multiply" | "overlay" | "soft-light" | "screen";
   // Show the photo untreated: no accent wash, veil, scrim or bottom fade.
   rawImage?: boolean;
+  /** Feathered soft-focus field behind the hero copy (rule-of-thirds anchored).
+   *  Defocuses the photo under the words instead of plating a box over it.
+   *  Default "medium"; "off" restores the flat scrim only. */
+  copyFocus?: "off" | "soft" | "medium" | "strong";
   autoScrim?: boolean; // sample image brightness and boost scrim on bright photos
   autoScrimThreshold?: number; // 0..1 luminance above which the boost kicks in (default 0.6)
   heightPct?: number; // share of page height, default 46 (used when aspect="fill")
@@ -194,6 +198,8 @@ export type PrintHeroSection = {
   titleType?: PrintHeroTitleType;
   /** Non-destructive crop + tone controls for the section photo. */
   adjust?: PrintHeroAdjust;
+  /** Feathered soft-focus field behind the hero copy. Default "medium". */
+  copyFocus?: "off" | "soft" | "medium" | "strong";
 };
 
 // ---- Quote family ---------------------------------------------------------

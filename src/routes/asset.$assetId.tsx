@@ -2523,6 +2523,12 @@ function AssetEditor() {
                   rule={(content as { heroRule?: PrintHeroRule }).heroRule}
                   surfaceLabel="Page masthead"
                   accent={brand.tokens.accent || brand.tokens.primary}
+                  copyFocus={content.heroMedia?.copyFocus}
+                  onCopyFocus={(copyFocus) =>
+                    content.heroMedia
+                      ? patchContent({ heroMedia: { ...content.heroMedia, copyFocus } })
+                      : undefined
+                  }
                   onChange={(next) =>
                     patchContent({
                       ...("rule" in next ? { heroRule: next.rule } : null),
@@ -4403,6 +4409,8 @@ function HeroInlineEditor({
         onHeroVariant={(id) => onPatch({ variantId: id })}
         titleType={section.titleType}
         rule={section.rule}
+        copyFocus={section.copyFocus}
+        onCopyFocus={(copyFocus) => onPatch({ copyFocus })}
         surfaceLabel="Hero surface"
         onChange={(next) => onPatch(next)}
       />

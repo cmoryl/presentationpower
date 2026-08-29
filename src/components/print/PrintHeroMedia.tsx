@@ -5,6 +5,7 @@
 // existing accent-halo hero and read exactly as before.
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { heroImageStyle, type PrintHeroAdjust } from "@/lib/print-hero-transform";
+import { HeroCopyFocus, heroFocusZone } from "@/components/print/sections/hero/HeroCopyFocus";
 
 export type PrintHeroScrim = "top" | "bottom" | "both" | "radial" | "none";
 export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
@@ -20,6 +21,10 @@ export type PrintHeroMedia = {
   washStrength?: number; // 0..1, default 1 — feather-into-page intensity
   scrimOpacity?: number; // 0..1 — scrim gradient opacity; falls back to washStrength
   scrim?: PrintHeroScrim; // legibility gradient, default "bottom"
+  // Feathered soft-focus field behind the hero copy, anchored on the rule of
+  // thirds. Defocuses the photograph under the words rather than plating a box
+  // over it. Default "medium"; "off" keeps the flat scrim behaviour only.
+  copyFocus?: "off" | "soft" | "medium" | "strong";
   autoScrim?: boolean; // when true, sample image luminance and boost scrim on bright photos
   autoScrimThreshold?: number; // 0..1 luminance above which the boost kicks in (default 0.6)
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
@@ -271,6 +276,10 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
   // authors can still opt out with autoScrim: false.
   const rawImage = media.rawImage === true;
   const autoScrimOn = !rawImage && media.autoScrim !== false;
+  // Soft focus carries most of the legibility load, so the flat page-coloured
+  // plate below is damped when it is on — that plate is what used to wash the
+  // whole photograph out.
+  const focusStrength = rawImage ? "off" : (media.copyFocus ?? "medium");
   useEffect(() => {
     if (!autoScrimOn || !media.imageUrl) {
       setAutoBoost(0);
@@ -384,6 +393,20 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
         }}
       />
 
+      {/* Soft-focus copy field: defocuses the photo under the hero copy on the
+          rule-of-thirds anchor, feathered to nothing so no box appears. */}
+      {!rawImage && focusStrength !== "off" && (
+        <HeroCopyFocus
+          imageUrl={media.imageUrl}
+          adjust={media.adjust}
+          objectPosition={objectPosition}
+          zone={heroFocusZone(media.copyZone === "center" ? "center" : media.copyZone === "right" ? "right" : "left")}
+          strength={focusStrength}
+          mode={mode}
+          cq={cq}
+        />
+      )}
+
       {/* Accent color wash over the photo — skipped entirely in raw mode */}
       {!rawImage && (
         <div
@@ -406,7 +429,11 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
             position: "absolute",
             inset: 0,
             backgroundColor: pageBg,
-            opacity: clamp01((isDark ? 0.18 : 0.2) + autoBoost * 0.5),
+            opacity: clamp01(
+              focusStrength === "off"
+                ? (isDark ? 0.18 : 0.2) + autoBoost * 0.5
+                : (isDark ? 0.07 : 0.09) + autoBoost * 0.24,
+            ),
           }}
         />
       )}
