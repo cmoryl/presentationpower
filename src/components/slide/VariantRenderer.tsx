@@ -134,6 +134,8 @@ import {
 } from "@/lib/orbit-label-layout";
 
 import { findSlideModule } from "./module-registry";
+import { IconBadge, Sparkline, pickIcon } from "./module-primitives";
+export { pickIcon } from "./module-primitives";
 import {
   SlideFrame,
   SlideFrameCtx,
@@ -144,7 +146,6 @@ import {
   s,
   strs,
   truthy,
-  registerKitPrimitives,
   type Item,
 } from "./module-kit";
 import "./modules/viz";
