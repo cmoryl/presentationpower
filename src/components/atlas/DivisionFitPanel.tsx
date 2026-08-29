@@ -293,6 +293,15 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
               ? `Walking deck ${walking.done}/${walking.total}…`
               : "Build into a deck & walk each slide"}
           </button>
+          <button
+            type="button"
+            onClick={() => materialiseStages()}
+            disabled={Boolean(walking)}
+            className="rounded-lg border px-3 py-2 text-sm font-medium disabled:opacity-60"
+            style={{ borderColor: `${ink}33`, color: ink }}
+          >
+            Materialise these stages into a deck
+          </button>
           <label className="flex items-center gap-2 text-sm text-black/65">
             <input
               type="checkbox"
@@ -307,6 +316,32 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
             </span>
           )}
         </div>
+        {staged && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-black/[0.02] px-4 py-3 text-sm">
+            <span className="text-black/70">
+              Saved <span className="font-medium">{staged.title}</span> — {staged.slides} sheet
+              {staged.slides === 1 ? "" : "s"} straight from the stage graph.
+            </span>
+            <Link
+              to="/decks/$deckId"
+              params={{ deckId: staged.deckId }}
+              className="rounded-lg border px-3 py-1.5 text-xs font-medium"
+              style={{ borderColor: `${ink}33`, color: ink }}
+            >
+              Open the deck
+            </Link>
+            <button
+              type="button"
+              onClick={() => void walkStagedDeck()}
+              disabled={Boolean(walking)}
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
+              style={{ backgroundColor: ink }}
+            >
+              {walking ? `Reviewing ${walking.done}/${walking.total}…` : "Review it against spec"}
+            </button>
+          </div>
+        )}
+
         <p className="mt-2 max-w-3xl text-xs text-black/50">
           Each winner is seeded with real division content and mounted on the canonical 1920×1080
           export stage, then measured: rendered module, approved pack, planned face, pack surface
