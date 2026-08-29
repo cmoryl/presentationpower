@@ -1861,6 +1861,37 @@ function AssetEditor() {
                         }}
                       />
 
+                      {/* Removed sections — one-click restore, so a delete is
+                          never a dead end and the copy is never lost. */}
+                      {hiddenSectionSet(rawContent).size > 0 && (
+                        <div
+                          data-export-ignore="true"
+                          className="absolute -bottom-11 left-0 z-30 flex flex-wrap items-center gap-1.5 text-[11px]"
+                        >
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+                            Removed
+                          </span>
+                          {[...hiddenSectionSet(rawContent)].map((key) => (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={() =>
+                                patchContent({
+                                  hiddenSections: withSectionShown(rawContent, key),
+                                } as never)
+                              }
+                              className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-2.5 py-1 font-medium text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+                              title={`Restore ${SECTION_DELETE_LABELS[key] ?? key}`}
+                            >
+                              <RotateCcw size={11} />
+                              {SECTION_DELETE_LABELS[key] ?? key}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+
+
                       {/* Hero affordance — click straight into the hero editor from
                   the canvas instead of hunting for the sidebar panel. */}
                       <button
