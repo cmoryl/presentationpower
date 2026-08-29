@@ -152,6 +152,12 @@ import {
   resolveContentFit,
   type PrintFitKnobs,
 } from "@/lib/print-content-fit";
+import {
+  hiddenSectionSet,
+  isSectionHidden,
+  withSectionHidden,
+  withSectionShown,
+} from "@/lib/print-hidden-sections";
 import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import {
