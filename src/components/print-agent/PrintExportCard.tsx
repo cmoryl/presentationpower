@@ -134,14 +134,11 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
           },
           async () => {
             setStatus("Rendering the page at trim size…");
-            // One frame for the stage to mount, then the real readiness gate.
-            await new Promise<void>((r) => requestAnimationFrame(() => r()));
+            const node = await stagePrintPageForExport(stageRef.current, {
+              onProgress: setStatus,
+            });
             if (stageErrorRef.current) throw new Error(stageErrorRef.current);
-            const node = assertPrintPageReady(
-              stageRef.current?.querySelector<HTMLElement>("[data-print-page]"),
-            );
-            await waitForPrintPageReady(node);
-            if (stageErrorRef.current) throw new Error(stageErrorRef.current);
+
             for (const format of list) {
               setStatus(`Writing ${format.toUpperCase()}…`);
               await downloadPrintPageAsset(format, node, {
