@@ -11,19 +11,8 @@
 
 import React from "react";
 import { registerSlideModule } from "../module-registry";
-import {
-  DashMetricViz,
-  DashSeriesViz,
-  SlideFrame,
-  SlideTitle,
-  Sparkline,
-  SummaryStatCard,
-  arr,
-  obj,
-  s,
-  toNums,
-  type Item,
-} from "../module-kit";
+import { SlideFrame, SlideTitle, arr, obj, s, toNums, type Item } from "../module-kit";
+import { DashMetricViz, DashSeriesViz, Sparkline, SummaryStatCard } from "../module-primitives";
 import { Kicker, StatFigure } from "../primitives";
 import { ProgressBar } from "../charts";
 import { useSlideInk } from "../SlideChrome";

@@ -5,20 +5,8 @@
 
 import React from "react";
 import { registerSlideModule } from "../module-registry";
-import {
-  IconBadge,
-  MediaTile,
-  SlideFrame,
-  SlideTitle,
-  Sparkline,
-  arr,
-  obj,
-  pickKitIcon,
-  s,
-  strs,
-  truthy,
-  type Item,
-} from "../module-kit";
+import { SlideFrame, SlideTitle, arr, obj, s, strs, truthy, type Item } from "../module-kit";
+import { IconBadge, MediaTile, Sparkline, pickKitIcon } from "../module-primitives";
 import { Kicker, SlideNumeral, StatFigure, Hairline, DisplayTitle } from "../primitives";
 import {
   AccentTick,

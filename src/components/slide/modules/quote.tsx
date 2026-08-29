@@ -5,7 +5,8 @@
 // moves with it.
 
 import { registerSlideModule } from "../module-registry";
-import { MediaTile, SlideFrame, SlideTitle, arr, s } from "../module-kit";
+import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
+import { MediaTile } from "../module-primitives";
 import {
   Attribution,
   DisplayTitle,

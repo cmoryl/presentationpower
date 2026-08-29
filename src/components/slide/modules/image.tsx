@@ -4,7 +4,8 @@
 
 import React from "react";
 import { registerSlideModule } from "../module-registry";
-import { MediaTile, SlideFrame, SlideTitle, arr, lastWord, obj, s, strs, truthy } from "../module-kit";
+import { SlideFrame, SlideTitle, arr, lastWord, obj, s, strs, truthy } from "../module-kit";
+import { MediaTile } from "../module-primitives";
 import {
   Attribution,
   DisplayTitle,

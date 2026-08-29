@@ -9,21 +9,8 @@
 
 import React from "react";
 import { registerSlideModule } from "../module-registry";
-import {
-  AuroraStatGrid,
-  Card,
-  CardGrid,
-  IconBadge,
-  NumberedList,
-  SlideFrame,
-  SlideTitle,
-  arr,
-  lastWord,
-  obj,
-  s,
-  strs,
-  truthy,
-} from "../module-kit";
+import { SlideFrame, SlideTitle, arr, lastWord, obj, s, strs, truthy } from "../module-kit";
+import { AuroraStatGrid, Card, CardGrid, IconBadge, NumberedList } from "../module-primitives";
 import {
   Attribution,
   DisplayTitle,

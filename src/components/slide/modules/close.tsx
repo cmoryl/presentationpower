@@ -5,7 +5,8 @@
 // step with each other.
 
 import { registerSlideModule } from "../module-registry";
-import { MediaTile, SlideFrame, SlideTitle, arr, s, type Item } from "../module-kit";
+import { SlideFrame, SlideTitle, arr, s, type Item } from "../module-kit";
+import { MediaTile } from "../module-primitives";
 import {
   DisplayTitle,
   Hairline,

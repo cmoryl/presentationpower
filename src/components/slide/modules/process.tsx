@@ -5,17 +5,8 @@
 import React from "react";
 import { AlertTriangle, Check, ChevronsDown, ChevronsRight, X as XMark } from "lucide-react";
 import { registerSlideModule } from "../module-registry";
-import {
-  fillInk,
-  MediaTile,
-  NumberedList,
-  SlideFrame,
-  SlideTitle,
-  arr,
-  obj,
-  s,
-  truthy,
-} from "../module-kit";
+import { fillInk, SlideFrame, SlideTitle, arr, obj, s, truthy } from "../module-kit";
+import { MediaTile, NumberedList } from "../module-primitives";
 import { ProcessRail } from "../Connectors";
 import { Kicker } from "../primitives";
 import { EchoArrow, coerceEchoArrowVariant } from "../EchoArrow";

@@ -6,15 +6,8 @@
 import { Fragment } from "react";
 
 import { registerSlideModule } from "../module-registry";
-import {
-  MediaTile,
-  Sparkline,
-  SlideFrame,
-  SlideTitle,
-  arr,
-  obj,
-  s,
-} from "../module-kit";
+import { SlideFrame, SlideTitle, arr, obj, s } from "../module-kit";
+import { MediaTile, Sparkline } from "../module-primitives";
 import { AccentRule } from "../Connectors";
 import { OrbitDisc } from "../OrbitDisc";
 import { AccentTick, EDITORIAL_SERIF, moduleCardSurface } from "../flagship";

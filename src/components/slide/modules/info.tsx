@@ -9,7 +9,8 @@
 
 import React from "react";
 import { registerSlideModule } from "../module-registry";
-import { SlideFrame, SlideTitle, arr, obj, s, pickKitIcon } from "../module-kit";
+import { SlideFrame, SlideTitle, arr, obj, s } from "../module-kit";
+import { pickKitIcon } from "../module-primitives";
 import { SupportingText } from "../primitives";
 import { AccentTick, AuroraOrb, GlassTile, moduleCardSurface } from "../flagship";
 import { SummaryBand, readSummary } from "../SummaryBand";
