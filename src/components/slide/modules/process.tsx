@@ -1057,16 +1057,16 @@ registerSlideModule({
                         height: nodeD,
                         left: x - nodeD / 2,
                         top: y - nodeD / 2,
-                        border: `1px solid color-mix(in oklab, ${accent} 48%, transparent)`,
-                        backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 10 : 5}%, transparent))`,
+                        border: `1px solid color-mix(in oklab, ${nodeAccent} 48%, transparent)`,
+                        backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${nodeAccent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${nodeAccent} ${isDark ? 10 : 5}%, transparent))`,
                         zIndex: 3,
                       }}
                     >
                       {StageIcon ? (
                         <StageIcon
-                          size={Math.round(nodeD * 0.4)}
+                          size={Math.round(nodeD * 0.4 * cellIconScale(it))}
                           strokeWidth={1.8}
-                          color={accent}
+                          color={nodeAccent}
                           aria-hidden
                         />
                       ) : (
@@ -1074,7 +1074,7 @@ registerSlideModule({
                           style={{
                             fontSize: Math.round(nodeD * 0.36),
                             fontWeight: 800,
-                            color: accent,
+                            color: nodeAccent,
                             fontVariantNumeric: "tabular-nums",
                           }}
                         >
@@ -2096,6 +2096,7 @@ registerSlideModule({
               <div className="mt-5 flex flex-col" style={{ gap: rowGap }}>
                 {rows.map((rowRaw, i) => {
                   const row = obj(rowRaw);
+                  const rowAccent = cellAccent(row, accent, mode);
                   return (
                     <div
                       key={i}
@@ -2106,9 +2107,9 @@ registerSlideModule({
                     >
                       <Pill text={s(row.before)} tone={cool} emphasis={false} Glyph={XIcon} />
                       <div className="flex items-center justify-center">
-                        <HouseArrow tone={accent} length={92} thickness={2} headScale={0.9} />
+                        <HouseArrow tone={rowAccent} length={92} thickness={2} headScale={0.9} />
                       </div>
-                      <Pill text={s(row.after)} tone={accent} emphasis Glyph={CheckIcon} />
+                      <Pill text={s(row.after)} tone={rowAccent} emphasis Glyph={CheckIcon} />
                     </div>
                   );
                 })}
