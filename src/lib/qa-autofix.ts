@@ -572,7 +572,11 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
           if (!brand) break;
           const accent = resolveSlideAccent(slide, brand);
           const bg = slideBackgroundForMode(slide.mode);
-          const next = legibleAccent(accent, bg);
+          // Approved palette first, synthesised tint only as a last resort —
+          // and mark the override authorised, because this is a governed
+          // legibility repair rather than an author's colour whim (TransPerfect
+          // scopes ignore unauthorised accent overrides by design).
+          const next = approvedLegibleAccent(accent, bg) ?? legibleAccent(accent, bg);
           if (!next || next.toLowerCase() === accent.toLowerCase()) break;
           work = work.map((s, i) =>
             i === idx
@@ -581,6 +585,7 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
                   content: {
                     ...(s.content as Record<string, unknown>),
                     accentOverride: next,
+                    authorizedAccentOverride: true,
                   } as SlideContent,
                 }
               : s,
@@ -589,7 +594,7 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
             code: issue.code,
             kind: "accent-legible",
             slideId: slide.id,
-            detail: `Deepened the slide accent to ${next.toUpperCase()} so text clears WCAG AA (${hexContrast(next, bg).toFixed(2)}:1).`,
+            detail: `Moved the slide accent to the approved ${next.toUpperCase()} so text clears WCAG AA (${hexContrast(next, bg).toFixed(2)}:1).`,
           });
           break;
         }
