@@ -1241,12 +1241,21 @@ function Library() {
                 One master background directory — 28 core languages (S01–S28) + 30 industry systems
                 (R01–R30), 2,552 authored compositions.
               </p>
-              <Link
-                to="/library/industry-backgrounds"
-                className="shrink-0 rounded-full bg-[#003FC7] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#003FC7]/90"
-              >
-                Open background directory
-              </Link>
+              <div className="flex shrink-0 items-center gap-2">
+                <Link
+                  to="/library/overrides"
+                  className="rounded-full border border-[#003FC7]/30 px-3 py-1.5 text-[12px] font-semibold text-[#003FC7] transition hover:bg-[#003FC7]/10"
+                >
+                  Override inspector
+                </Link>
+                <Link
+                  to="/library/industry-backgrounds"
+                  className="rounded-full bg-[#003FC7] px-3 py-1.5 text-[12px] font-semibold text-white transition hover:bg-[#003FC7]/90"
+                >
+                  Open background directory
+                </Link>
+              </div>
+
             </div>
             <StyleLookPicker
               value={packId}
