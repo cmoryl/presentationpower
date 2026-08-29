@@ -29,7 +29,7 @@ describe("donut trio — build ↔ PowerPoint parity", () => {
   it("keeps the three gauges on a single row", () => {
     const body = donutTrioExport();
     expect(body).toMatch(/const colW = \(SLIDE_W - 1\.2\) \/ n;/);
-    expect(body).toMatch(/items\.slice\(0, 3\)/);
+    expect(body).toMatch(/arr\(c\.items\)\.slice\(0, 3\)/);
   });
 
   it("draws a 1pt hairline track and a thin accent arc", () => {
