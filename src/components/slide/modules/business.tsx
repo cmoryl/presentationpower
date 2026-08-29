@@ -6,17 +6,8 @@
 
 import React, { useContext } from "react";
 import { registerSlideModule } from "../module-registry";
-import {
-  MediaTile,
-  SlideFrame,
-  SlideTitle,
-  arr,
-  obj,
-  s,
-  strs,
-  truthy,
-  type Item,
-} from "../module-kit";
+import { SlideFrame, SlideTitle, arr, obj, s, strs, truthy, type Item } from "../module-kit";
+import { MediaTile } from "../module-primitives";
 import {
   DisplayTitle,
   Hairline,

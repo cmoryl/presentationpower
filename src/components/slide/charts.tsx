@@ -31,7 +31,8 @@ import {
   barValueLabel,
 } from "./chart-primitives";
 import { Kicker } from "./primitives";
-import { Sparkline, type Item, s } from "./module-kit";
+import { type Item, s } from "./module-kit";
+import { Sparkline } from "./module-primitives";
 
 export function ProgressBar({ brand: _brand, percent }: { brand: BrandMode; percent: number }) {
   const ink = useSlideInk();

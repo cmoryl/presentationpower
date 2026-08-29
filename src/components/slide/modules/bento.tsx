@@ -8,7 +8,8 @@
 // exporter emits one alpha overlay object per tile.
 
 import { registerSlideModule } from "../module-registry";
-import { IconBadge, MediaTile, SlideFrame, SlideTitle, arr, s } from "../module-kit";
+import { SlideFrame, SlideTitle, arr, s } from "../module-kit";
+import { IconBadge, MediaTile } from "../module-primitives";
 import { Kicker, StatFigure } from "../primitives";
 import { ICON_SIZES, type IconSizeToken } from "@/lib/iconography";
 import { moduleCardSurface, AccentTick } from "../flagship";
