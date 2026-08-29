@@ -37,6 +37,7 @@ import { useHideAdoptedSources } from "./AdoptedSourceHider";
 import { CanvasAssetPanel } from "./CanvasAssetPanel";
 import { CanvasInsertLibrary, type InsertPayload } from "./CanvasInsertLibrary";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
+import { CanvasCropOverlay } from "./CanvasCropOverlay";
 import { useCanvasEmphasis } from "@/lib/canvas-emphasis";
 import {
   blockFontSize,
