@@ -25,6 +25,7 @@ import { foregroundOn } from "@/lib/export-foreground";
 import { clampLines, fillPx } from "@/lib/open-space-fill";
 import { iconByName } from "@/lib/icon-library";
 import { itemTone } from "@/lib/item-tone";
+import { cellAccent } from "./cell-controls";
 
 registerSlideModule({
   id: "family:image",
@@ -384,10 +385,23 @@ registerSlideModule({
                   <div
                     className="mt-8 pt-6"
                     style={{
-                      borderTop: `${i === 1 ? 2 : 1}px solid ${i === 1 ? brand.tokens.accent : `${ink.hairline}`}`,
+                      borderTop: `${i === 1 ? 2 : 1}px solid ${
+                        i === 1
+                          ? (itemTone(p.panel) ?? brand.tokens.accent)
+                          : `${ink.hairline}`
+                      }`,
                     }}
                   >
-                    <Kicker brand={brand} color={i === 1 ? "var(--slide-accent-text)" : ink.faint}>
+                    <Kicker
+                      brand={brand}
+                      color={
+                        i === 1
+                          ? itemTone(p.panel)
+                            ? cellAccent(p.panel, brand.tokens.accent, mode)
+                            : "var(--slide-accent-text)"
+                          : ink.faint
+                      }
+                    >
                       {p.label}
                     </Kicker>
                     <div
@@ -576,8 +590,11 @@ registerSlideModule({
                             width: 34,
                             height: 34,
                             borderRadius: 10,
-                            background:
-                              "color-mix(in oklab, var(--slide-accent-text) 82%, transparent)",
+                            background: `color-mix(in oklab, ${
+                              itemTone(it)
+                                ? cellAccent(it, brand.tokens.accent, mode)
+                                : "var(--slide-accent-text)"
+                            } 82%, transparent)`,
                             color: "#ffffff",
                             fontSize: fillPx(15, "body"),
                             fontWeight: 700,
