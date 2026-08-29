@@ -141,7 +141,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
   const bandH = useBandHeight(section.heightPct, 0.62);
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(20) }}>
-      <div style={{ position: "relative", overflow: "hidden", height: bandH, ...bg(section) }}>
+      <div style={{ position: "relative", height: bandH, ...bg(section) }}>
         <HeroPhoto section={section} />
         <div
           style={{
