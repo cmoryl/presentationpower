@@ -39,7 +39,7 @@ export const DEMO_DIVISIONS: DemoDivision[] = [
   {
     id: "bm-enterprise",
     name: "TransPerfect",
-    label: "Enterprise",
+    label: "TransPerfect",
     slug: "enterprise",
     accent: "#003FC7",
     industry: "Enterprise",

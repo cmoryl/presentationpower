@@ -14,6 +14,7 @@ import {
   type DeckWalkReport,
 } from "@/lib/division-deck-run";
 import { DeckApprovalPanel } from "@/components/atlas/DeckApprovalPanel";
+import { QaFitPanel } from "@/components/atlas/QaFitPanel";
 import { useDeckStore } from "@/lib/deck-store";
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
