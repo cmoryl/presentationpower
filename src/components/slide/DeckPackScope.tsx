@@ -24,7 +24,14 @@ import { useEffectiveStylePack } from "@/hooks/use-template-registry";
 
 type PackSource =
   | {
-      context?: { stylePackId?: string | null; designRecipeId?: string | null } | null | undefined;
+      context?:
+        | {
+            stylePackId?: string | null;
+            darkStylePackId?: string | null;
+            designRecipeId?: string | null;
+          }
+        | null
+        | undefined;
     }
   | null
   | undefined;
@@ -48,6 +55,32 @@ export function deckPack(deck: PackSource): StylePack | null {
     stylePackId: deck?.context?.stylePackId ?? null,
     designRecipeId: deck?.context?.designRecipeId ?? null,
   });
+}
+
+/**
+ * Per-slide look resolver.
+ *
+ * Divisions publish a light/dark pack PAIR, so one deck-level pack cannot
+ * dress a run that mixes faces. When the deck records
+ * `context.darkStylePackId`, slides carrying `mode: "dark"` resolve to that
+ * pack and everything else to the deck pack. Decks without the field get the
+ * deck pack for every slide, exactly as before.
+ *
+ * Non-hook by design: call it once per render and apply it inside slide loops
+ * (hooks cannot run per iteration).
+ */
+export function deckPackResolver(
+  deck: PackSource,
+): (slide?: { mode?: "light" | "dark" | null } | null) => StylePack | null {
+  const light = deckPack(deck);
+  const darkId = deck?.context?.darkStylePackId ?? null;
+  const dark = darkId
+    ? effectivePack({
+        stylePackId: darkId,
+        designRecipeId: deck?.context?.designRecipeId ?? null,
+      })
+    : null;
+  return (slide) => (slide?.mode === "dark" && dark ? dark : light);
 }
 
 /**

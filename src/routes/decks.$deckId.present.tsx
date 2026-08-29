@@ -8,7 +8,7 @@ import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
@@ -59,6 +59,7 @@ function PresenterView() {
   if (!deck) throw notFound();
   // The deck's recorded alternate look must survive into this surface too.
   const pack = deckPack(deck);
+  const packFor = deckPackResolver(deck);
   const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
   // PowerPoint parity: hidden slides stay in the deck but are skipped during
   // playback, so presenter navigation and the thumbnail strip both use this list.
@@ -161,7 +162,7 @@ function PresenterView() {
                 />
                 {slide && variant && (
                   <SlideStage slideKey={slide.id} direction={direction} transition={transition}>
-                    <DeckPackScope pack={pack}>
+                    <DeckPackScope pack={packFor(slide)}>
                       <VariantRenderer
                         slide={slide}
                         variant={variant}
@@ -236,7 +237,7 @@ function PresenterView() {
                         }}
                       >
                         {v && (
-                          <DeckPackScope pack={pack}>
+                          <DeckPackScope pack={packFor(s)}>
                             <VariantRenderer
                               slide={s}
                               variant={v}
@@ -333,7 +334,7 @@ function PresenterView() {
                           }}
                         >
                           <SlideThumbnailContext.Provider value={true}>
-                            <DeckPackScope pack={pack}>
+                            <DeckPackScope pack={packFor(nextSlide)}>
                               <VariantRenderer
                                 slide={nextSlide}
                                 variant={nextVariant}

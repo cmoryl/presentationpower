@@ -9,7 +9,7 @@ import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrate
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { VizSurfaceProvider } from "@/components/slide/VizSurfaceContext";
-import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -121,6 +121,7 @@ function PrintView() {
   if (!deck) throw notFound();
   // The deck's recorded alternate look must survive into this surface too.
   const pack = deckPack(deck);
+  const packFor = deckPackResolver(deck);
   const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
   const clientLogoUrl = resolvedLogo.url;
 
@@ -171,7 +172,7 @@ function PrintView() {
                   style={{ width: 1280, height: 720 }}
                 >
                   <ScaledSlide>
-                    <DeckPackScope pack={pack}>
+                    <DeckPackScope pack={packFor(slide)}>
                       <VizSurfaceProvider surface="print">
                       <VariantRenderer
                         slide={slide}

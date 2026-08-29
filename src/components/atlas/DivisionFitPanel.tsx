@@ -7,6 +7,12 @@ import {
 import { NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
 import { buildDivisionRun, runDivisionStages, type DivisionRunReport } from "@/lib/division-run";
+import {
+  createDeckFromDivisionRun,
+  walkDeckAgainstSpec,
+  type DeckWalkReport,
+} from "@/lib/division-deck-run";
+import { Link } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
 // The stage graph (VariantRenderer + every module family) is large and only
@@ -23,6 +29,10 @@ declare global {
   interface Window {
     __tpDivisionRun?: {
       run: (opts?: { brandModeId?: string; archetypeId?: string }) => Promise<DivisionRunReport>;
+      buildDeck: (opts?: {
+        brandModeId?: string;
+        archetypeId?: string;
+      }) => Promise<DeckWalkReport>;
     };
   }
 }
@@ -50,12 +60,33 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
   const [report, setReport] = useState<DivisionRunReport | null>(null);
   const [busy, setBusy] = useState<{ done: number; total: number } | null>(null);
   const [previews, setPreviews] = useState(false);
+  // Materialised deck + the walk taken from that saved deck.
+  const [walk, setWalk] = useState<DeckWalkReport | null>(null);
+  const [walking, setWalking] = useState<{ done: number; total: number } | null>(null);
 
   const built = useMemo(() => (previews ? buildDivisionRun(plan) : []), [plan, previews]);
 
   useEffect(() => {
     setReport(null);
+    setWalk(null);
   }, [plan]);
+
+  // Build the run into a real deck, then walk the SAVED deck back against the
+  // spec — deck creation runs the QA auto-fixer, so the deck is not always the
+  // plan and only a deck-side walk can prove it.
+  async function buildDeckAndWalk() {
+    const { deck } = createDeckFromDivisionRun(plan, { archetypeId });
+    setWalking({ done: 0, total: deck.slides.length });
+    try {
+      const out = await walkDeckAgainstSpec(deck, plan, {
+        onProgress: (done, total) => setWalking({ done, total }),
+      });
+      setWalk(out);
+      return out;
+    } finally {
+      setWalking(null);
+    }
+  }
 
   async function build() {
     setBusy({ done: 0, total: plan.slides.length });
@@ -81,6 +112,18 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
         });
         const out = await runDivisionStages(p);
         setReport(out);
+        return out;
+      },
+      buildDeck: async (opts) => {
+        const sections = sectionSequence(opts?.archetypeId ?? archetypeId);
+        const p = planDivisionFit({
+          brandModeId: opts?.brandModeId ?? brandModeId,
+          rhythmWindow,
+          slides: demoSlideBriefs(sections, { blocks, copy, media }),
+        });
+        const { deck } = createDeckFromDivisionRun(p, { archetypeId: opts?.archetypeId ?? archetypeId });
+        const out = await walkDeckAgainstSpec(deck, p);
+        setWalk(out);
         return out;
       },
     };
@@ -203,6 +246,17 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
             style={{ backgroundColor: ink }}
           >
             {busy ? `Building ${busy.done}/${busy.total}…` : "Build the slides & compare to spec"}
+          </button>
+          <button
+            type="button"
+            onClick={() => void buildDeckAndWalk()}
+            disabled={Boolean(busy || walking)}
+            className="rounded-lg border px-3 py-2 text-sm font-medium disabled:opacity-60"
+            style={{ borderColor: `${ink}33`, color: ink }}
+          >
+            {walking
+              ? `Walking deck ${walking.done}/${walking.total}…`
+              : "Build into a deck & walk each slide"}
           </button>
           <label className="flex items-center gap-2 text-sm text-black/65">
             <input

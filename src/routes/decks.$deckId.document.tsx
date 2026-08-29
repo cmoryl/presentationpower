@@ -5,7 +5,7 @@ import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BrandLockup } from "@/components/BrandLockup";
 import { notifyPrintToPdf } from "@/lib/deck-feedback";
@@ -58,6 +58,7 @@ function DocumentView() {
   if (!deck) throw notFound();
   // The deck's recorded alternate look must survive into this surface too.
   const pack = deckPack(deck);
+  const packFor = deckPackResolver(deck);
   const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
   const slides = useMemo(() => projectDeckToDocument(deck, family), [deck, family]);
   const dims = pageDims(size, orientation);
@@ -219,7 +220,7 @@ function DocumentView() {
                         </div>
                         <div className="flex-1 overflow-hidden rounded-lg border border-black/10">
                           <ScaledSlide>
-                            <DeckPackScope pack={pack}>
+                            <DeckPackScope pack={packFor(slide)}>
                               <VariantRenderer
                                 slide={slide}
                                 variant={variant}
