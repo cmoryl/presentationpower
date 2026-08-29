@@ -442,13 +442,14 @@ export function AdaptorBriefLayout({
 
               {/* FOOTER */}
               {!hidden.has("footer") && (
-              <PrintFooterLockup
-                brand={brand}
-                mode={mode}
-                cq={cq}
-                links={["transperfect.com"]}
-                productLogoKey="globallink"
-              />
+                <PrintFooterLockup
+                  brand={brand}
+                  mode={mode}
+                  cq={cq}
+                  links={["transperfect.com"]}
+                  productLogoKey="globallink"
+                />
+              )}
             </div>
           </div>
         </PrintSurfaceProvider>
