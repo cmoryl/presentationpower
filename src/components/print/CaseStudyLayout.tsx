@@ -110,31 +110,40 @@ export function CaseStudyLayout({
     containerWidth: PAGE_W,
   });
 
-  const stats = content.stats.slice(0, 3);
+  // Agent-authored content can arrive partial (no stats array yet, a section
+  // without a heading, an engagement block with no bullets). Render
+  // defensively: a crash here also kills off-screen export staging, which
+  // reads to the user as "the export button did nothing".
+  const emptyBlock = { heading: "", body: "" } as typeof content.challenge;
+  const stats = Array.isArray(content.stats) ? content.stats.slice(0, 3) : [];
   const blocks: Array<{ label: string; block: typeof content.challenge; icon: string }> = [
     {
-      label: content.challenge.heading || "The Challenge",
-      block: content.challenge,
+      label: content.challenge?.heading || "The Challenge",
+      block: content.challenge ?? emptyBlock,
       icon: ICON_PATHS["globe-alt"],
     },
     {
-      label: content.solution.heading || "The Solution",
-      block: content.solution,
+      label: content.solution?.heading || "The Solution",
+      block: content.solution ?? emptyBlock,
       icon: ICON_PATHS.sparkles,
     },
     {
-      label: content.result.heading || "The Result",
-      block: content.result,
+      label: content.result?.heading || "The Result",
+      block: content.result ?? emptyBlock,
       icon: ICON_PATHS.trending,
     },
   ];
 
-  const engagement = content.engagement ?? {
-    title: "Engagement Snapshot",
-    bullets: content.expert?.name
-      ? [content.expert.name, ...(content.expert.role ? [content.expert.role] : [])]
-      : [],
+  const engagementSource = content.engagement;
+  const engagement = {
+    title: engagementSource?.title ?? "Engagement Snapshot",
+    bullets: Array.isArray(engagementSource?.bullets)
+      ? engagementSource.bullets
+      : content.expert?.name
+        ? [content.expert.name, ...(content.expert.role ? [content.expert.role] : [])]
+        : [],
   };
+
 
   return (
     <SlideModeContext.Provider value={mode}>
