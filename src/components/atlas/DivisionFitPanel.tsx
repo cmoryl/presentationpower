@@ -12,10 +12,11 @@ import {
   createDeckFromBuiltStages,
   walkDeckAgainstSpec,
   type DeckWalkReport,
-
 } from "@/lib/division-deck-run";
+import { DeckApprovalPanel } from "@/components/atlas/DeckApprovalPanel";
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
+
 
 // The stage graph (VariantRenderer + every module family) is large and only
 // needed once the reviewer asks to see the built slides, so it is code-split
