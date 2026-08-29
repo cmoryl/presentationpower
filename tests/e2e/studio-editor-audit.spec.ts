@@ -85,6 +85,14 @@ test.describe("studio + editor audit", () => {
       const ok = await gotoAsAdmin(page, context, surface.path);
       expect(ok, "admin session install failed").toBe(true);
       await page.waitForLoadState("networkidle").catch(() => {});
+      // Legacy aliases navigate on mount; settle on the destination before
+      // evaluating, otherwise the probe races the redirect and the execution
+      // context is destroyed mid-call.
+      if (surface.redirectsTo) {
+        await page
+          .waitForURL((u) => u.pathname.startsWith(surface.redirectsTo!), { timeout: 15_000 })
+          .catch(() => {});
+      }
       await page.waitForTimeout(1500);
 
       const probe = await page.evaluate(() => {
