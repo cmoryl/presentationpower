@@ -230,6 +230,39 @@ const toHex = (rgb: [number, number, number]) =>
     )
     .join("")}`;
 
+/**
+ * Approved TransPerfect accents that may stand in when the brand accent is
+ * illegible on a face. Secondary/tertiary brand colours only — never a
+ * synthesised tint, so a governance review still passes.
+ */
+const APPROVED_ACCENTS = [
+  "#A1FBF9", // Aqua
+  "#C2A3FF", // Lavender
+  "#FFEB66", // Yellow
+  "#A6FA87", // Green
+  "#FF9B70", // Peach
+  "#003FC7", // Blue 500
+  "#03002C", // Blue 800
+];
+
+/** The approved palette colour closest in hue to `accent` that clears `target`. */
+function approvedLegibleAccent(accent: string, bg: string, target = 4.5): string | null {
+  const from = hexToRgb(accent);
+  const pool = APPROVED_ACCENTS.filter(
+    (hex) => hex.toLowerCase() !== accent.toLowerCase() && hexContrast(hex, bg) >= target,
+  );
+  if (pool.length === 0) return null;
+  if (!from) return pool[0]!;
+  return pool
+    .map((hex) => {
+      const c = hexToRgb(hex) ?? [0, 0, 0];
+      const d =
+        (c[0] - from[0]) ** 2 + (c[1] - from[1]) ** 2 + (c[2] - from[2]) ** 2;
+      return { hex, d };
+    })
+    .sort((a, b) => a.d - b.d)[0]!.hex;
+}
+
 /** Push an accent toward black (light bg) or white (dark bg) until it passes. */
 function legibleAccent(accent: string, bg: string, target = 4.5): string | null {
   const rgb = hexToRgb(accent);
