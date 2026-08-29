@@ -1,63 +1,31 @@
-# BoothHUB in the Element events area: federate first, absorb later
+# Fix: print agent PDF export fails to save
 
-## Recommendation
+## What's happening
 
-Yes — keeping BoothHUB self-contained and linking to it from the events area is the better first move. A full port is a multi-month project; federation gets booths visible inside Element in days, and it keeps the option to absorb later.
+Reproduced the failure. The export engine itself is healthy — exporting the same case study from the asset editor produced a correct 1.6 MB press PDF (single 8.5×11 page, selectable vector text, ICC tagged).
 
-## Why federation wins here
+The print agent is different: its export card renders a second, off-screen copy of the page and rasterizes that. When I ran exactly that staged render, the case study layout threw mid-render:
 
-What I found in the BoothHUB project:
+```text
+TypeError: Cannot read properties of undefined (reading 'length')
+  at CaseStudyLayout  (engagement.bullets.length)
+```
 
-- 34 screens, 96 booth/event/expo components, 45 files using 3D rendering.
-- ~130 database tables in its own backend, and ~100 backend functions.
-- It is built on the older stack (React Router + `src/pages`), not Element's file-based routes.
+The layout reads `content.stats`, `content.challenge/solution/result.heading` and `content.engagement.bullets` as if they are always present. Agent-authored case studies frequently arrive partial (an engagement block with no bullets, no stats array yet), so the off-screen page crashes, the staged node never paints, and nothing saves. The same crash also takes the surrounding route down, which is why it reads as "the button did nothing".
 
-Porting all of that means rebuilding routing, re-homing 100 backend functions, importing 130 tables, and reconciling the concepts both apps already have (events, brands, organizations, profiles, roles, knowledge, oracle). Federation avoids all of it up front, and BoothHUB keeps shipping independently while it happens.
+## The fix
 
-## The federated design
+1. **Harden the case study layout** so partial content renders instead of throwing: default the stats array, the three narrative blocks, and the engagement title/bullets. Audit the sibling print layouts (spotlight, e-brochure, adaptor brief, MSA, solution proposal, multi-proposal) for the same unguarded array/object reads and give them the same treatment.
+2. **Contain render failures in the export card**: wrap the off-screen staged page in an error boundary so a layout crash surfaces as a clear "this page can't be rendered yet" export error toast instead of a silent no-op plus a broken route.
+3. **Fail loudly on an empty stage**: before capture, assert the staged node has non-zero size and painted content; if not, throw a named error the export toast can show, instead of writing a blank or dying inside the rasterizer.
+4. **Give the stage enough time**: raise the fixed 120 ms pre-capture wait to a font/image-ready wait (the same readiness gate the editor path uses) so heavy case studies with hero imagery capture fully.
 
-**1. Booths become a first-class card in the events hub.**
-Add a Booths entry alongside signage, badges, screens and agendas at `/events/booths`. It looks native to Element — Element chrome, tokens, typography — but the content comes from BoothHUB.
+## Verification
 
-**2. A read-only catalog view inside Element.**
-BoothHUB exposes a small public read API (booth systems, variants, cover images, division tag, deep link). Element fetches it server-side, caches it, and renders the results as Element cards. Users browse booths without leaving Element.
+- Re-run the staged-render probe against real print assets (case study plus one of each other kind) and confirm every one saves a PDF at trim aspect with selectable text.
+- Drive a live print agent thread end to end: generate a case study, export PDF, PNG, and SVG from the chat card, and confirm all three land with no console errors.
+- Deliberately export a stripped/partial case study to confirm it now renders and exports instead of crashing.
 
-**3. Deep links hand off for the real work.**
-Building, editing, the floor planner and the 3D hall viewer stay in BoothHUB. Clicking a booth opens it there, in a new tab, on the exact record. No 3D, no Leaflet, no expo tooling enters the Element bundle.
+## Technical notes
 
-**4. Single sign-on so the handoff feels like one product.**
-Both apps run on the same Lovable account system. Sign-in is shared so the jump does not prompt for a second login. Roles map across: Element admins are BoothHUB admins, sales/viewer stay read-only.
-
-**5. Shared brand truth, one direction.**
-Element stays the source of brand rules — palette, logos, approved lockups, division taxonomy. BoothHUB reads them rather than keeping its own copy, so booth output cannot drift from the approved TransPerfect system.
-
-**6. Finished booth assets flow back.**
-When a booth kit is approved in BoothHUB, its renders and specs land in Element's events library so they appear next to the rest of the event kit and go through Element's existing approvals and export paths.
-
-## Trade-offs, stated plainly
-
-- Two apps to maintain and publish, and a visible tab switch at the handoff.
-- Deep-linked booth pages carry BoothHUB's look unless it is restyled to Element tokens (worth doing on the screens users land on).
-- Search and reporting stay split until a later absorb phase.
-- If BoothHUB's API is down, the Element booths tab shows a cached or empty state rather than failing the page.
-
-## Build order
-
-1. Booths card and `/events/booths` shell in Element, with placeholder data.
-2. Read API on the BoothHUB side (catalog list + single booth).
-3. Element fetches, caches and renders real booth cards; deep links out.
-4. Shared sign-in and role mapping so the handoff is seamless.
-5. Element brand tokens consumed by BoothHUB; restyle the landing screens.
-6. Approved booth assets published back into the Element events library.
-
-Steps 1–3 are the useful milestone: booths visible and browsable inside Element. Steps 4–6 make it feel like one product.
-
-## Later, if you still want to absorb it
-
-Federation does not close that door. The natural absorb order is booth catalog and variants first (contained, no 3D), then event↔booth links, and only then the expo floor planner and 3D viewer — the expensive parts. Nothing built here gets thrown away.
-
-## What I need from you
-
-- Confirm federate-first rather than full port.
-- Confirm BoothHUB stays independently published at its own URL.
-- Confirm the handoff style: new tab (recommended) or embedded inside the Element page frame.
+Files in scope: `src/components/print/CaseStudyLayout.tsx` (and sibling layouts under `src/components/print/`), `src/components/print-agent/PrintExportCard.tsx`, `src/lib/print-agent/page-export.ts`. No schema or export-engine changes — `src/lib/print-asset-export.ts` is verified working and stays as is.
