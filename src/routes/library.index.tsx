@@ -2088,10 +2088,6 @@ const VariantCard = memo(function VariantCard({
               ? "bg-amber-400 text-[#03002C] opacity-100 shadow ring-1 ring-amber-500/40"
               : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
           }`}
-            pinned
-              ? "bg-amber-400 text-[#03002C] shadow ring-1 ring-amber-500/40"
-              : "bg-white/85 text-black/60 shadow-sm ring-1 ring-black/10 hover:bg-white hover:text-amber-600"
-          }`}
         >
           <Star size={11} className={pinned ? "fill-current" : ""} />
         </button>
