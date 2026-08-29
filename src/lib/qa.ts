@@ -127,11 +127,24 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
       // In-scope but non-preferred variant → soft warn, but ONLY when the
       // brand has curated variants inside this variant's family. Cover /
       // context / other families with no preferred entries stay silent.
+      // …and only when one of those curated alternatives could actually hold
+      // this slide's content. Warning about a "stronger option" that cannot
+      // take the items on the sheet is noise, not a finding.
+      const itemCount = Array.isArray(slide.content.items)
+        ? (slide.content.items as unknown[]).length
+        : 0;
+      const curatedAlternativeFits = [...preferred].some((vid) => {
+        const alt = byId(MODULE_VARIANTS, vid);
+        if (!alt || alt.id === variant.id || alt.familyId !== variant.familyId) return false;
+        const cap = alt.capacity.items;
+        return cap ? itemCount >= cap.min && itemCount <= cap.max : itemCount === 0;
+      });
       if (
         preferred.size > 0 &&
         preferredFamilies.has(variant.familyId) &&
         !preferred.has(variant.id) &&
-        !restricted.has(variant.familyId)
+        !restricted.has(variant.familyId) &&
+        curatedAlternativeFits
       ) {
         issues.push({
           slideId: slide.id,

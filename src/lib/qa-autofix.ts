@@ -181,6 +181,27 @@ function findDonor(slide: DeckSlide, relPath: string): { value: string; from: st
     }
   }
 
+  // 1b. Item-level prose with no prose sibling: describe the item from its own
+  //     label. Used when a layout swap lands content in a variant that asks for
+  //     a body the previous layout never had.
+  if (parent && /^(body|description|copy|detail|summary)$/i.test(key)) {
+    const obj = readPath(content, parent);
+    if (obj && typeof obj === "object") {
+      const label = ["label", "title", "name", "forum", "step"]
+        .map((k) => (obj as Record<string, unknown>)[k])
+        .find((v) => isFilled(v));
+      if (label) {
+        const heading = String(content.title ?? content.headline ?? "").trim();
+        return {
+          value: heading
+            ? `${String(label)} — part of ${firstSentence(heading, 12).toLowerCase()}.`
+            : String(label),
+          from: `${parent}.label`,
+        };
+      }
+    }
+  }
+
   // 2. Top-level content donors.
   for (const d of donors) {
     if (parent === null && d === key) continue;
