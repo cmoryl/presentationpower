@@ -1042,6 +1042,7 @@ registerSlideModule({
               {stages.map((it, i) => {
                 const { x, y } = centreOf(i);
                 const StageIcon = it.icon ? iconByName(s(it.icon)) : null;
+                const nodeAccent = cellAccent(it, accent, mode);
                 const above = i % 2 === 0;
                 return (
                   <React.Fragment key={i}>
