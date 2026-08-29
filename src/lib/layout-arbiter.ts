@@ -20,7 +20,6 @@
 import { divisionConformancePreset } from "./division-conformance";
 import { divisionDesignSpec } from "./division-design-specs";
 import {
-  TYPE_FLOOR_PX,
   computeFill,
   fillFamilyFor,
   measureLoad,
@@ -364,17 +363,15 @@ export function arbitrateLayout(brief: LayoutBrief): LayoutDecision {
   const curated = brief.industryId && sectionId
     ? sectionTemplate({ industryId: brief.industryId, sectionId, level })
     : null;
-  const curatedVariantId =
-    (curated as { variantId?: string } | null)?.variantId ??
-    (curated as { moduleVariantId?: string } | null)?.moduleVariantId ??
-    null;
+  const curatedVariantId = curated?.variantId ?? null;
+  const curatedAlternates = new Set(curated?.alternates ?? []);
 
   let ownedIds: Set<string> | null = null;
   let specPackNote: string | null = null;
   if (brief.brandModeId) {
     try {
       const preset = divisionConformancePreset(brief.brandModeId);
-      ownedIds = new Set(preset.variantIds ?? []);
+      ownedIds = new Set(preset.moduleIds ?? []);
       const spec = divisionDesignSpec(brief.brandModeId);
       specPackNote = spec ? `${spec.packId} / ${spec.darkPackId}` : null;
     } catch {
@@ -411,6 +408,10 @@ export function arbitrateLayout(brief: LayoutBrief): LayoutDecision {
         rhythm += 0.35;
         reasons.push("curated treatment for this industry + section");
       }
+      if (curatedAlternates.has(variant.id)) {
+        rhythm += 0.15;
+        reasons.push("ranked alternate for this industry + section");
+      }
       if (avoid.has(variant.id)) {
         rhythm -= 0.4;
         reasons.push("used on a neighbouring slide — repeating it flattens the rhythm");
@@ -441,7 +442,7 @@ export function arbitrateLayout(brief: LayoutBrief): LayoutDecision {
           fillFamily: family,
           score: Math.round(score * 1000) / 1000,
           breakdown,
-          feasible: cap.violations.length === 0 && fill.display >= TYPE_FLOOR_PX.display / 1000,
+          feasible: cap.violations.length === 0,
           reasons: reasons.filter(Boolean),
           violations: cap.violations,
           fill,
