@@ -11,6 +11,7 @@ import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { AutoFitText } from "./HeroAutoFit";
+import { HeroCopyFocus, heroFocusZone } from "./HeroCopyFocus";
 import { ElementBrickRail, ElementBrickRow } from "@/components/brand/ElementBrickMotif";
 import { usePrintPage } from "@/components/print/print-page-context";
 import {
@@ -143,14 +144,28 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(20) }}>
       <div style={{ position: "relative", height: bandH, ...bg(section) }}>
         <HeroPhoto section={section} />
+        {/* Photographic grade only — a shallow global grade keeps the picture
+            intact; legibility comes from the feathered soft-focus field below,
+            not from washing the whole band down. */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(180deg, rgba(3,0,44,0.14) 0%, rgba(3,0,44,0.30) 44%, rgba(3,0,44,0.88) 100%)",
+              "linear-gradient(180deg, rgba(3,0,44,0.10) 0%, rgba(3,0,44,0.14) 46%, rgba(3,0,44,0.34) 100%)",
           }}
         />
+        <HeroCopyFocus
+          imageUrl={section.imageUrl}
+          adjust={section.adjust}
+          objectPosition={`${section.focalX ?? 50}% ${section.focalY ?? 50}%`}
+          zone={heroFocusZone(section.align)}
+          strength={section.copyFocus ?? "medium"}
+          mode="dark"
+          cq={cq}
+        />
+        {/* Copy block sits on the lower third line with a two-thirds measure,
+            so the title, the focus pool and the picture share one grid. */}
         <div
           style={{
             position: "absolute",
@@ -159,6 +174,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
             bottom: cq(26),
             ...pageGutter(),
             textAlign: section.align === "center" ? "center" : "left",
+            maxWidth: section.align === "center" ? undefined : "72%",
           }}
         >
           {section.eyebrow && (
@@ -635,6 +651,15 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
           }}
         >
           <HeroPhoto section={section} />
+          <HeroCopyFocus
+            imageUrl={section.imageUrl}
+            adjust={section.adjust}
+            objectPosition={`${section.focalX ?? 50}% ${section.focalY ?? 50}%`}
+            zone={heroFocusZone(section.align, "lower")}
+            strength={section.copyFocus ?? "soft"}
+            mode={mode}
+            cq={cq}
+          />
         </div>
         {/* Page-coloured fade so the seam resolves into the paper. */}
         <div

@@ -8,7 +8,14 @@
  * chips behave the same way wherever a surface is edited.
  */
 
-import type { PrintHeroModuleVariant, PrintHeroRule, PrintHeroTitleType } from "@/lib/print-assets.types";
+import type {
+  PrintHeroModuleVariant,
+  PrintHeroRule,
+  PrintHeroSection,
+  PrintHeroTitleType,
+} from "@/lib/print-assets.types";
+
+type PrintHeroCopyFocus = NonNullable<PrintHeroSection["copyFocus"]>;
 import { PRINT_HERO_VARIANTS } from "./sections/PrintSectionRenderer";
 import {
   PRINT_BODY_STYLE_PRESETS,
@@ -33,7 +40,18 @@ type Props = {
   /** Label for the surface being styled, shown in the header. */
   surfaceLabel?: string;
   accent?: string;
+  /** Soft-focus field behind hero copy. Omit to hide the row. */
+  copyFocus?: PrintHeroCopyFocus;
+  onCopyFocus?: (next: PrintHeroCopyFocus) => void;
 };
+
+/** Feathered soft-focus strengths, in the order they read as a ramp. */
+const COPY_FOCUS_OPTIONS: { id: PrintHeroCopyFocus; label: string; desc: string }[] = [
+  { id: "off", label: "None", desc: "No soft focus — flat scrim only" },
+  { id: "soft", label: "Soft", desc: "Barely-there defocus; keeps the photo crisp" },
+  { id: "medium", label: "Balanced", desc: "Recommended — defocused pool under the copy" },
+  { id: "strong", label: "Deep", desc: "Heavy defocus for busy or bright photography" },
+];
 
 function Row({
   label,
@@ -101,6 +119,8 @@ export function PrintVariantPicker({
   onChange,
   surfaceLabel = "This surface",
   accent = "#003FC7",
+  copyFocus,
+  onCopyFocus,
 }: Props) {
   const titleId = matchTitleStylePreset(titleType);
   const bodyId = matchBodyStylePreset(titleType);
@@ -159,6 +179,21 @@ export function PrintVariantPicker({
           />
         ))}
       </Row>
+
+      {onCopyFocus ? (
+        <Row label="Copy focus" hint="over photography">
+          {COPY_FOCUS_OPTIONS.map((o) => (
+            <Chip
+              key={o.id}
+              on={(copyFocus ?? "medium") === o.id}
+              label={o.label}
+              title={o.desc}
+              accent={accent}
+              onClick={() => onCopyFocus(o.id)}
+            />
+          ))}
+        </Row>
+      ) : null}
 
       <Row label="Masthead rule" hint={ruleId ? undefined : "custom"}>
         {PRINT_RULE_STYLE_PRESETS.map((p) => (
