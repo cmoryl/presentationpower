@@ -1547,11 +1547,12 @@ export function FreeCanvasEditor({
           aria-label="Slide studio tools"
           className={
             docked
-              ? `pointer-events-auto flex w-full flex-col gap-2 rounded-2xl border border-border bg-card p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground shadow-sm ${
+              ? `pointer-events-auto flex w-full flex-col overflow-hidden rounded-2xl border border-border bg-card text-[14px] font-medium normal-case leading-none tracking-normal text-foreground shadow-sm ${
                   toolbarVariant === "sticky" ? "sticky top-0 z-[60]" : ""
                 }`
-              : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col gap-2 rounded-2xl bg-card/95 p-2.5 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground ring-1 ring-border shadow-md backdrop-blur-md"
+              : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col overflow-hidden rounded-2xl bg-card/95 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground ring-1 ring-border shadow-lg backdrop-blur-md"
           }
+
           style={{
             // Scaling the shell (not just the font) grows labels, glyphs, padding
             // and hit areas together. Origin keeps it pinned to its corner.
@@ -1564,10 +1565,14 @@ export function FreeCanvasEditor({
           }}
           onPointerDown={(e) => e.stopPropagation()}
         >
-          {/* ---------- row 1: tools ---------- */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* ---------- rail 1: mode + insert + primary action ---------- */}
+          <div className="flex flex-wrap items-center gap-3 border-b border-border/70 px-2.5 py-2">
             {onToolChange && (
-              <div className="flex items-center gap-1 rounded-xl bg-muted p-1">
+              <div
+                className="flex items-center gap-0.5 rounded-lg bg-muted p-0.5"
+                role="group"
+                aria-label="Editing mode"
+              >
                 {(
                   [
                     ["text", "✎", "Text"],
@@ -1584,7 +1589,11 @@ export function FreeCanvasEditor({
                         ? "Edit the module's own copy in place"
                         : "Move, resize and add objects on the slide"
                     }
-                    className={`flex min-h-8 items-center gap-1.5 rounded-lg px-3 transition-colors ${tool === t ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-background hover:text-foreground"}`}
+                    className={`flex min-h-8 items-center gap-1.5 rounded-md px-3 text-[13px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+                      tool === t
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-background hover:text-foreground"
+                    }`}
                   >
                     <span aria-hidden>{glyph}</span>
                     {label}
@@ -1594,7 +1603,7 @@ export function FreeCanvasEditor({
             )}
 
             {textTool ? (
-              <span className="px-1 text-muted-foreground">
+              <span className="px-1 text-[13px] text-muted-foreground">
                 Click any highlighted text to edit · Enter saves · Esc cancels
               </span>
             ) : (
@@ -1636,116 +1645,129 @@ export function FreeCanvasEditor({
                   />
                 </ToolGroup>
 
-                <ToolGroup label="Module">
-                  <TBtn
-                    label="≡ load layers"
-                    title="Load every section this slide already has as editable layers (cards grouped, text and images separate)"
-                    onClick={() => {
-                      setLayersOn(true);
-                      adoptAllSections();
-                    }}
-                  />
-
-                  <TBtn
-                    label={pickMode === "adopt" ? "● picking" : "✥ pick section"}
-                    title="Pick a section or asset the module drew and make it movable"
-                    pressed={pickMode === "adopt"}
-                    activeColor="#EC388A"
-                    onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
-                  />
-                  <TBtn
-                    label={pickMode === "card" ? "● picking box" : "▣ pick box"}
-                    title="Click any card the module drew to make the whole box (plate, icon, title, copy) movable and duplicable"
-                    pressed={pickMode === "card"}
-                    activeColor="#A6FA87"
-                    onClick={() => setPickMode((v) => (v === "card" ? "off" : "card"))}
-                  />
-                  <TBtn
-                    label={pickMode === "remove" ? "● removing" : "⌫ delete section"}
-                    title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
-                    pressed={pickMode === "remove"}
-                    activeColor="#E53D2E"
-                    onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
-                  />
-                  {removedCount > 0 && (
-                    <TBtn
-                      label={`↺ restore (${removedCount})`}
-                      title="Bring back every module section deleted on this slide"
-                      onClick={restoreRemoved}
-                    />
-                  )}
-                </ToolGroup>
-
-                {(onUndo || onRedo) && (
-                  <ToolGroup label="History">
-                    {onUndo && (
-                      <TBtn
-                        label="↶ undo"
-                        title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
-                        ariaLabel={undoLabel ? `Undo ${undoLabel}` : "Undo"}
-                        disabled={canUndo === false}
-                        onClick={onUndo}
-                      />
-                    )}
-                    {onRedo && (
-                      <TBtn
-                        label="↷ redo"
-                        title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
-                        ariaLabel={redoLabel ? `Redo ${redoLabel}` : "Redo"}
-                        disabled={canRedo === false}
-                        onClick={onRedo}
-                      />
-                    )}
-                  </ToolGroup>
-                )}
-
-                <ToolGroup label="View">
-                  <TBtn
-                    label="snap"
-                    title="Toggle snapping (hold Alt to bypass)"
-                    pressed={snapOn}
-                    onClick={() => setSnapOn((v) => !v)}
-                  />
-                  <TBtn
-                    label="grid"
-                    title="Show the 20-unit snap grid"
-                    pressed={gridOn}
-                    onClick={() => setGridOn((v) => !v)}
-                  />
-                  <TBtn
-                    label="☰ layers"
-                    title="Layers: reorder, lock, hide and group objects and adopted module sections"
-                    pressed={layersOn}
-                    onClick={() => setLayersOn((v) => !v)}
-                  />
-                  <TBtn
-                    label={`A⁺ ${toolbarScale.label}`}
-                    title="Toolbar size — cycle 100% / 115% / 130% / 150% for easier reading (saved for you)"
-                    ariaLabel={`Toolbar size ${toolbarScale.label}. Click to increase.`}
-                    onClick={toolbarScale.cycle}
-                  />
-                </ToolGroup>
-
                 {onSaveAsModule && (
                   <button
                     type="button"
                     onClick={onSaveAsModule}
-                    className="ml-auto flex min-h-8 items-center rounded-xl bg-primary px-3.5 font-semibold text-primary-foreground transition-colors hover:opacity-90"
+                    className="ml-auto flex min-h-9 items-center gap-1.5 rounded-lg bg-primary px-4 text-[13px] font-semibold text-primary-foreground transition-colors duration-150 hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                   >
-                    ⤓ Save to My Files
+                    <span aria-hidden>⤓</span> Save to My Files
                   </button>
                 )}
               </>
             )}
           </div>
 
-          {/* ---------- row 2: contextual selection controls ---------- */}
+          {/* ---------- rail 2: module, history and view controls ---------- */}
+          {!textTool && (
+            <div className="flex flex-wrap items-center gap-3 bg-muted/40 px-2.5 py-2">
+              <ToolGroup label="Module" divider={false}>
+                <TBtn
+                  label="≡ load layers"
+                  title="Load every section this slide already has as editable layers (cards grouped, text and images separate)"
+                  onClick={() => {
+                    setLayersOn(true);
+                    adoptAllSections();
+                  }}
+                />
+
+                <TBtn
+                  label={pickMode === "adopt" ? "● picking" : "✥ pick section"}
+                  title="Pick a section or asset the module drew and make it movable"
+                  pressed={pickMode === "adopt"}
+                  activeColor="#EC388A"
+                  onClick={() => setPickMode((v) => (v === "adopt" ? "off" : "adopt"))}
+                />
+                <TBtn
+                  label={pickMode === "card" ? "● picking box" : "▣ pick box"}
+                  title="Click any card the module drew to make the whole box (plate, icon, title, copy) movable and duplicable"
+                  pressed={pickMode === "card"}
+                  activeColor="#A6FA87"
+                  onClick={() => setPickMode((v) => (v === "card" ? "off" : "card"))}
+                />
+                <TBtn
+                  label={pickMode === "remove" ? "● removing" : "⌫ delete section"}
+                  title="Click a module section to delete it from this slide (your copy only — the shared module is unchanged)"
+                  pressed={pickMode === "remove"}
+                  activeColor="#E53D2E"
+                  onClick={() => setPickMode((v) => (v === "remove" ? "off" : "remove"))}
+                />
+                {removedCount > 0 && (
+                  <TBtn
+                    label={`↺ restore (${removedCount})`}
+                    title="Bring back every module section deleted on this slide"
+                    onClick={restoreRemoved}
+                  />
+                )}
+              </ToolGroup>
+
+              {(onUndo || onRedo) && (
+                <ToolGroup label="History">
+                  {onUndo && (
+                    <TBtn
+                      label="↶ undo"
+                      title={undoLabel ? `Undo ${undoLabel} (⌘Z)` : "Undo (⌘Z)"}
+                      ariaLabel={undoLabel ? `Undo ${undoLabel}` : "Undo"}
+                      disabled={canUndo === false}
+                      onClick={onUndo}
+                    />
+                  )}
+                  {onRedo && (
+                    <TBtn
+                      label="↷ redo"
+                      title={redoLabel ? `Redo ${redoLabel} (⇧⌘Z)` : "Redo (⇧⌘Z)"}
+                      ariaLabel={redoLabel ? `Redo ${redoLabel}` : "Redo"}
+                      disabled={canRedo === false}
+                      onClick={onRedo}
+                    />
+                  )}
+                </ToolGroup>
+              )}
+
+              <ToolGroup label="View">
+                <TBtn
+                  label="snap"
+                  title="Toggle snapping (hold Alt to bypass)"
+                  pressed={snapOn}
+                  onClick={() => setSnapOn((v) => !v)}
+                />
+                <TBtn
+                  label="grid"
+                  title="Show the 20-unit snap grid"
+                  pressed={gridOn}
+                  onClick={() => setGridOn((v) => !v)}
+                />
+                <TBtn
+                  label="☰ layers"
+                  title="Layers: reorder, lock, hide and group objects and adopted module sections"
+                  pressed={layersOn}
+                  onClick={() => setLayersOn((v) => !v)}
+                />
+              </ToolGroup>
+
+              {/* Zoom-style readout, right-aligned like a pro app's status field. */}
+              <button
+                type="button"
+                onClick={toolbarScale.cycle}
+                title="Toolbar size — cycle 100% / 115% / 130% / 150% for easier reading (saved for you)"
+                aria-label={`Toolbar size ${toolbarScale.label}. Click to increase.`}
+                className="ml-auto flex min-h-8 items-center gap-1.5 rounded-md border border-border/80 bg-card px-2.5 text-[12px] font-semibold tabular-nums text-foreground transition-colors duration-150 hover:border-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
+                <span className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground/70">
+                  Size
+                </span>
+                {toolbarScale.label}
+              </button>
+            </div>
+          )}
+          {/* ---------- rail 3: contextual selection controls ---------- */}
           {selectedBlocks.length > 0 && !textTool && (
             <div
-              className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted/60 p-2"
+              className="flex flex-wrap items-center gap-3 border-t border-border/70 bg-muted/60 px-2.5 py-2"
               role="group"
               aria-label="Canvas object controls"
             >
+
               <span
                 className="flex min-h-7 items-center rounded-lg px-2.5 text-[13px] font-semibold text-[#03002C]"
                 style={{ background: accent }}
@@ -1879,13 +1901,33 @@ function handleOffset(h: ResizeHandle): React.CSSProperties {
  * Labelled cluster of related tools. The tiny caption is what makes the single
  * unified toolbar scannable instead of a wall of glyphs.
  */
-function ToolGroup({ label, children }: { label: string; children: React.ReactNode }) {
+/**
+ * Tool cluster — a named segment of the studio rail.
+ *
+ * Professional design apps group controls into segments separated by hairlines
+ * rather than stacking equally-weighted pills, so the eye finds "the insert
+ * tools" or "history" instantly. The name sits as a quiet micro-label; the
+ * controls carry the visual weight.
+ */
+function ToolGroup({
+  label,
+  children,
+  divider = true,
+}: {
+  label: string;
+  children: React.ReactNode;
+  divider?: boolean;
+}) {
   return (
-    <div className="flex items-center gap-1.5 rounded-xl bg-muted px-2 py-1">
-      <span className="select-none pr-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+    <div
+      className={`flex items-center gap-2 ${divider ? "border-l border-border/70 pl-3" : ""}`}
+      role="group"
+      aria-label={label}
+    >
+      <span className="select-none text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground/70">
         {label}
       </span>
-      <div className="flex flex-wrap items-center gap-1">{children}</div>
+      <div className="flex flex-wrap items-center gap-0.5">{children}</div>
     </div>
   );
 }
@@ -1918,14 +1960,14 @@ function TBtn({
       aria-pressed={pressed === undefined ? undefined : pressed}
       disabled={disabled}
       onClick={onClick}
-      className={`flex min-h-8 min-w-8 items-center justify-center rounded-lg px-2.5 text-[13px] transition-colors disabled:opacity-30 ${
+      className={`flex min-h-8 min-w-8 items-center justify-center rounded-md px-2.5 text-[13px] capitalize transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-30 ${
         pressed
           ? activeColor
             ? "text-foreground"
-            : "bg-primary text-primary-foreground"
+            : "bg-primary text-primary-foreground shadow-sm"
           : danger
             ? "text-foreground hover:bg-[#E53D2E] hover:text-white"
-            : "text-foreground hover:bg-background"
+            : "text-foreground hover:bg-muted"
       }`}
       style={pressed && activeColor ? { background: activeColor, color: "#03002C" } : undefined}
     >
@@ -1933,3 +1975,4 @@ function TBtn({
     </button>
   );
 }
+
