@@ -3,7 +3,7 @@
 // inspector panel. Rendered ABOVE LiveEditOverlay's text-editing overlays,
 // but stops propagation on its own controls so text editing still works.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Trash2, Replace, X, PencilLine } from "lucide-react";
+import { Trash2, Replace, X, PencilLine, Image as ImageIcon } from "lucide-react";
 import { isExportingChrome } from "@/lib/export-chrome-suppress";
 
 export type SectionAction = "delete" | "replace";
@@ -13,6 +13,8 @@ type Rect = { top: number; left: number; width: number; height: number };
 type Section = {
   key: string;
   label: string;
+  /** Section carries photography, so "Photo" (swap image only) is offered. */
+  hasMedia: boolean;
   rect: Rect;
 };
 
@@ -52,9 +54,14 @@ export function SectionSelectOverlay({
     const nodes = Array.from(canvas.querySelectorAll<HTMLElement>("[data-section]"));
     const next: Section[] = nodes.map((el) => {
       const r = el.getBoundingClientRect();
+      const key = el.dataset.section ?? "";
       return {
-        key: el.dataset.section ?? "",
+        key,
         label: el.dataset.sectionLabel ?? el.dataset.section ?? "Section",
+        hasMedia:
+          el.dataset.sectionMedia === "true" ||
+          key === "hero" ||
+          !!el.querySelector("img"),
         rect: {
           top: r.top - canvasRect.top,
           left: r.left - canvasRect.left,
@@ -179,7 +186,7 @@ export function SectionSelectOverlay({
           className="pointer-events-auto absolute flex items-center gap-1 rounded-xl border border-black/10 bg-white px-1.5 py-1 shadow-lg dark:border-white/10 dark:bg-[#0B0A2A]"
           style={{
             top: Math.max(4, active.rect.top - 40),
-            left: active.rect.left + active.rect.width - 240,
+            left: Math.max(4, active.rect.left + active.rect.width - 320),
           }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -195,6 +202,18 @@ export function SectionSelectOverlay({
               }}
             >
               <PencilLine size={12} /> Edit
+            </button>
+          )}
+          {onReplaceMedia && active.hasMedia && (
+            <button
+              type="button"
+              className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/10"
+              onClick={() => {
+                onReplaceMedia(active.key);
+              }}
+              title="Swap the photo only — layout and copy stay as they are"
+            >
+              <ImageIcon size={12} /> Photo
             </button>
           )}
           {onReplace && (
