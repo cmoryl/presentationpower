@@ -148,7 +148,9 @@ export function packCompose(pack: StylePack, moduleId?: string | null): PackComp
   const override = COMPOSE_OVERRIDE[code] ?? COMPOSE_OVERRIDE[baseCode];
   const id = (moduleId ?? "").trim().toUpperCase();
   const modOverride = id
-    ? (MODULE_COMPOSE_OVERRIDE[`${code}:${id}`] ?? MODULE_COMPOSE_OVERRIDE[`${baseCode}:${id}`])
+    ? (MODULE_COMPOSE_OVERRIDE[`${code}:${id}`] ??
+      MODULE_COMPOSE_OVERRIDE[`${baseCode}:${id}`] ??
+      MODULE_COMPOSE_GLOBAL[id])
     : undefined;
 
   return {
