@@ -128,6 +128,7 @@ import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { ClientLogoHubPicker, ClientLogoHubTrigger } from "@/components/print/ClientLogoHubPicker";
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
+import { HeroCropStudio } from "@/components/print/HeroCropStudio";
 import { withAutoHeroVariants } from "@/lib/hero-variants";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
 import { HeroDiffTile } from "@/components/print/HeroDiffTile";
@@ -3977,35 +3978,21 @@ function HeroMediaPanel({
         onChange={(v) => patch({ focalY: v, focalPoint: undefined })}
         display={`${Math.round(focalY)}%`}
       />
-      {/* Interactive focal picker: click the preview to set X/Y */}
+      {/* Full crop studio: drag to pan, scroll to zoom, click to set the focal
+          point, straighten / flip, plus non-destructive tone controls. */}
       {media.imageUrl && (
-        <button
-          type="button"
-          onClick={(e) => {
-            const el = e.currentTarget;
-            const rect = el.getBoundingClientRect();
-            // no-op — actual clicks are handled by the inner div below
-            void rect;
-          }}
-          className="relative block h-24 w-full overflow-hidden rounded-md border border-black/10 dark:border-white/10"
-          style={{
-            backgroundImage: `url(${media.imageUrl})`,
-            backgroundSize: "cover",
-            backgroundPosition: `${focalX}% ${focalY}%`,
-          }}
-          onPointerDown={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            patch({ focalX: Math.round(x), focalY: Math.round(y), focalPoint: undefined });
-          }}
-          aria-label="Set focal point"
-        >
-          <span
-            className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow"
-            style={{ left: `${focalX}%`, top: `${focalY}%`, background: "#003FC7" }}
-          />
-        </button>
+        <HeroCropStudio
+          imageUrl={media.imageUrl}
+          adjust={media.adjust}
+          onChange={(adjust) => patch({ adjust })}
+          focalX={focalX}
+          focalY={focalY}
+          onFocalChange={({ focalX: nx, focalY: ny }) =>
+            patch({ focalX: nx, focalY: ny, focalPoint: undefined })
+          }
+          aspectRatio={aspect === "fill" ? 816 / (1056 * (heightPct / 100)) : undefined}
+          dense
+        />
       )}
       {/* Full-bleed raw photo: kills every tint layer so the image shows at 100%. */}
       <Row label="Raw photo (no wash)">
@@ -4472,6 +4459,15 @@ function HeroInlineEditor({
               />
             </label>
           </div>
+          <HeroCropStudio
+            imageUrl={section.imageUrl}
+            adjust={section.adjust}
+            onChange={(adjust) => onPatch({ adjust })}
+            focalX={section.focalX ?? 50}
+            focalY={section.focalY ?? 50}
+            onFocalChange={({ focalX, focalY }) => onPatch({ focalX, focalY })}
+            dense
+          />
         </>
       )}
       <div className="flex items-center gap-3 text-[10px] text-black/60 dark:text-white/60">
