@@ -245,7 +245,10 @@ export function VariantSampleStudio({
   const fields = useMemo(() => collectStringPaths(copy), [copy]);
   const items = Array.isArray(copy.items) ? (copy.items as Record<string, unknown>[]) : null;
   const isLogoModule = /LOGO/i.test(variant.id);
+  /** Per-cell knobs this module's renderer actually reads (see the registry). */
+  const cellControls = useMemo(() => slideModuleCellControls(variant.id), [variant.id]);
   const isStepChain = variant.id === "MV-PROC-STEP-CHAIN";
+
   /** Steps actually rendered by the chain (the renderer caps at nine). */
   const stepCount = isStepChain ? Math.min(items?.length ?? 0, 9) : 0;
   /** Focused step, clamped to what is on the slide right now. */
