@@ -1135,14 +1135,13 @@ export function SlideFrame({
           data-decorative="true"
           className="pointer-events-none absolute inset-0"
           style={{
-            background: [
-              `radial-gradient(120% 90% at 100% 0%, ${brand.tokens.accent}26 0%, transparent 55%)`,
-              `radial-gradient(90% 80% at 0% 100%, ${ENTERPRISE_WHITE.accentAlt}1F 0%, transparent 55%)`,
-              `linear-gradient(180deg, #050538 0%, #03002C 100%)`,
-            ].join(", "),
+            background: brandSystemDarkGround(groundSeed, brand.tokens.accent),
+            backgroundSize: "cover",
+            backgroundPosition: "center",
           }}
         />
       )}
+
 
       {/* Brand bar (locked) — hairline accent rule, editorial not decorative.
           Enterprise White replaces the full-bleed bar with nothing at the top
