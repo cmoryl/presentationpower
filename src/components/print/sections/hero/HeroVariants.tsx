@@ -6,6 +6,7 @@
 // case-study client lockup.
 
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { heroImageStyle } from "@/lib/print-hero-transform";
 import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
@@ -95,13 +96,39 @@ function MetaRail({ section, mode, accent, onDark }: Props & { onDark?: boolean 
   );
 }
 
-function bg(section: PrintHeroSection) {
+/**
+ * Photo frame styling for the picture-bearing hero variants. The photograph
+ * itself is painted by `<HeroPhoto>` as a real <img> child so the shared
+ * non-destructive crop (zoom, pan, straighten, flip) and tone adjustments
+ * apply — a CSS background can't carry a transform of its own.
+ */
+function bg(_section: PrintHeroSection) {
   return {
-    backgroundImage: section.imageUrl ? `url(${section.imageUrl})` : undefined,
-    backgroundSize: "cover",
-    backgroundPosition: `${section.focalX ?? 50}% ${section.focalY ?? 50}%`,
+    overflow: "hidden",
     backgroundColor: "#03002C",
   } as const;
+}
+
+/** Cover-fitted hero photo honouring the section's crop + tone adjustments. */
+function HeroPhoto({ section }: { section: PrintHeroSection }) {
+  if (!section.imageUrl) return null;
+  const focal = `${section.focalX ?? 50}% ${section.focalY ?? 50}%`;
+  return (
+    <img
+      aria-hidden
+      alt=""
+      src={section.imageUrl}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        objectPosition: focal,
+        ...heroImageStyle(section.adjust, focal),
+      }}
+    />
+  );
 }
 
 /**
@@ -115,6 +142,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
   return (
     <section aria-label="Hero" style={{ ...pageBleed(), marginBottom: cq(20) }}>
       <div style={{ position: "relative", overflow: "hidden", height: bandH, ...bg(section) }}>
+        <HeroPhoto section={section} />
         <div
           style={{
             position: "absolute",
@@ -193,12 +221,15 @@ export function HeroSplitPhoto({ section, mode, accent }: Props) {
   const photo = (
     <div
       style={{
+        position: "relative",
         minHeight: bandH,
         ...bg(section),
         marginLeft: reverse ? 0 : `calc(-1 * var(--print-page-pad, 0px))`,
         marginRight: reverse ? `calc(-1 * var(--print-page-pad, 0px))` : 0,
       }}
-    />
+    >
+      <HeroPhoto section={section} />
+    </div>
   );
   const copy = (
     <div
@@ -602,7 +633,9 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
             maskImage:
               "linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 44%, rgba(0,0,0,0.78) 62%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0) 96%)",
           }}
-        />
+        >
+          <HeroPhoto section={section} />
+        </div>
         {/* Page-coloured fade so the seam resolves into the paper. */}
         <div
           aria-hidden
