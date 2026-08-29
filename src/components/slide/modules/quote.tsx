@@ -81,12 +81,7 @@ registerSlideModule({
                 <QuoteMark color={ACCENT} size={520} className="absolute -top-4 -left-2" />
                 <div className="relative">
                   <Kicker brand={brand}>In their words</Kicker>
-                  <Hairline
-                    color={ACCENT}
-                    widthPx={72}
-                    thicknessPx={2}
-                    className="mt-6 mb-10"
-                  />
+                  <Hairline color={ACCENT} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
                   <div
                     style={{
                       fontSize: fillPx(60, "display"),
@@ -121,12 +116,7 @@ registerSlideModule({
                 <QuoteMark color={ACCENT} size={560} className="absolute -top-10 -left-6" />
                 <div className="relative">
                   <Kicker brand={brand}>Testimonial</Kicker>
-                  <Hairline
-                    color={ACCENT}
-                    widthPx={72}
-                    thicknessPx={2}
-                    className="mt-6 mb-10"
-                  />
+                  <Hairline color={ACCENT} widthPx={72} thicknessPx={2} className="mt-6 mb-10" />
                   <div
                     style={{
                       fontSize: fillPx(56, "display"),

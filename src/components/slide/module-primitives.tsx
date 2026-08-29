@@ -150,7 +150,6 @@ import {
 } from "./module-kit";
 import { HeroScrim } from "./HeroScrim";
 
-
 import { HouseArrow } from "./HouseArrow";
 import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
@@ -219,7 +218,6 @@ import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide"
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
 import type { LogoPosition, LogoOrientation } from "@/lib/logo-placement";
-
 
 import {
   ICON_SIZES,
@@ -1858,7 +1856,6 @@ export function Sparkline({
   );
 }
 
-
 // ── Editorial data primitives ─────────────────────────────────────────
 // DotGridBackdrop retired as decorative chartjunk. Kept as no-op for callers.
 
@@ -1922,7 +1919,6 @@ export function SummaryStatCard({
     </div>
   );
 }
-
 
 // Free-form area chart for Aurora v2 rebuild. No axes, no ticks, no plate.
 // Feathered accent gradient sits directly on the aurora backdrop. The line

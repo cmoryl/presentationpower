@@ -168,7 +168,6 @@ import "./modules/advanced";
 import "./modules/editorial";
 import "./modules/locations";
 
-
 import { HouseArrow } from "./HouseArrow";
 import { EchoArrow, coerceEchoArrowVariant } from "./EchoArrow";
 import { SummaryBand, readSummary } from "./SummaryBand";
@@ -237,7 +236,6 @@ import { ImportedFaithfulSlide, readImportedRef } from "./ImportedFaithfulSlide"
 // they wrap themselves in <SlideFrame>. VariantRenderer sets the value once
 // per render.
 import type { LogoPosition, LogoOrientation } from "@/lib/logo-placement";
-
 
 import {
   ICON_SIZES,
@@ -334,7 +332,6 @@ type Props = {
    */
   industryId?: string | null;
 };
-
 
 // In dark mode, swap the token surfaces + text so any `brand.tokens.*` usage in
 // module bodies renders correctly on a dark slide. Primary becomes a lighter
@@ -463,7 +460,6 @@ function VariantRendererInner(props: Props) {
     ? applySlideAccent(slide, enterpriseWhiteBrand(rawBrand, mode))
     : rawBrand;
 
-
   const themedBrand = themeBrandForMode(baseBrand, mode);
   const semanticInk = makeSlideInk(
     mode,
@@ -523,55 +519,55 @@ function VariantRendererInner(props: Props) {
               <SlideOwnsMediaContext.Provider
                 value={Boolean(
                   s((c as Record<string, unknown>).mediaUrl) ||
-                    s((c as Record<string, unknown>).mediaPath) ||
-                    s((c as Record<string, unknown>).videoUrl) ||
-                    s((c as Record<string, unknown>).videoPath),
+                  s((c as Record<string, unknown>).mediaPath) ||
+                  s((c as Record<string, unknown>).videoUrl) ||
+                  s((c as Record<string, unknown>).videoPath),
                 )}
               >
-              {/* Module vocabulary for background selection. The chrome only
+                {/* Module vocabulary for background selection. The chrome only
                 knows "cover | content | divider | close", which is far too
                 coarse to pick a plate — publish the real module identity so the
                 active style pack grounds each module with the scene its
                 composition wants (stats, chart, bento, timeline, split, quote). */}
-              <SlideSceneSeedContext.Provider
-                value={`mod:${variant.id} ${variant.id} ${variant.name} ${variant.familyId}`}
-              >
-                <SlideFrameCtx.Provider
-                  value={{
-                    clientName: resolvedClient,
-                    layoutId: slide.layoutId,
-                    clientLogoUrl: clientLogoUrl ?? null,
-                    subCompany,
-                    logoOrientation:
-                      slide.logoOrientation && slide.logoOrientation !== "auto"
-                        ? slide.logoOrientation
-                        : logoOrientation,
-                    logoPosition:
-                      slide.logoPosition && slide.logoPosition !== "auto"
-                        ? slide.logoPosition
-                        : undefined,
-                  }}
+                <SlideSceneSeedContext.Provider
+                  value={`mod:${variant.id} ${variant.id} ${variant.name} ${variant.familyId}`}
                 >
-                  {/* display:contents keeps layout untouched while exposing the
+                  <SlideFrameCtx.Provider
+                    value={{
+                      clientName: resolvedClient,
+                      layoutId: slide.layoutId,
+                      clientLogoUrl: clientLogoUrl ?? null,
+                      subCompany,
+                      logoOrientation:
+                        slide.logoOrientation && slide.logoOrientation !== "auto"
+                          ? slide.logoOrientation
+                          : logoOrientation,
+                      logoPosition:
+                        slide.logoPosition && slide.logoPosition !== "auto"
+                          ? slide.logoPosition
+                          : undefined,
+                    }}
+                  >
+                    {/* display:contents keeps layout untouched while exposing the
                   slide mode to CSS (light mode kills text/content shadows). */}
-                  <div data-slide-mode={mode} style={{ display: "contents" }}>
-                    <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
-                       {renderVariantBody({
-                         slide,
-                         variant,
-                         brand: themedBrand,
-                         pageNumber,
-                         c,
-                         mode,
-                         clientName: resolvedClient,
-                         clientLogoUrl: clientLogoUrl ?? null,
-                         dash,
-                         bareSurfaces,
-                       })}
-                    </StatLayoutProvider>
-                  </div>
-                </SlideFrameCtx.Provider>
-              </SlideSceneSeedContext.Provider>
+                    <div data-slide-mode={mode} style={{ display: "contents" }}>
+                      <StatLayoutProvider layout={resolveStatLayout(variant.id, c)}>
+                        {renderVariantBody({
+                          slide,
+                          variant,
+                          brand: themedBrand,
+                          pageNumber,
+                          c,
+                          mode,
+                          clientName: resolvedClient,
+                          clientLogoUrl: clientLogoUrl ?? null,
+                          dash,
+                          bareSurfaces,
+                        })}
+                      </StatLayoutProvider>
+                    </div>
+                  </SlideFrameCtx.Provider>
+                </SlideSceneSeedContext.Provider>
               </SlideOwnsMediaContext.Provider>
             </SlideBackdropContext.Provider>
           </SlideInkContext.Provider>
@@ -669,7 +665,6 @@ function renderVariantBody({
     });
   }
 
-
   switch (variant.id) {
     // ── Opening ────────────────────────────────────────────────────────
     // The team family (MV-OP-INTRO-TEAM, MV-TEAM-BIOS-*) now lives in `modules/team.tsx`.
@@ -681,9 +676,7 @@ function renderVariantBody({
     // The process family (MV-PROC-TIMELINE/STEP-CHAIN/PHASES/STEP-SPOTLIGHT)
     // now lives in `modules/process.tsx`.
 
-
     // MV-PROC-STAGE-ORBITS and MV-PROC-BEFORE-AFTER now live in `modules/process.tsx`.
-
 
     // The MV-INFO-* diagram family now lives in `modules/info.tsx`.
 
@@ -937,8 +930,6 @@ function LiveMetaFooter({
  * three primitives are the only place charts read that grammar, so all
  * dashboards, graphs and gauges re-skin together.
  */
-
-
 
 type SegBar = { label: string; value: number; note?: string };
 function SegmentedBar({
@@ -1335,7 +1326,6 @@ function ReportCard({ brand, item }: { brand: BrandMode; item: Item }) {
     </div>
   );
 }
-
 
 // ─── MV-FUNNEL interactive stage ──────────────────────────────────────────
 // Each band is a button: hover/focus reveals a compact tooltip and a click
