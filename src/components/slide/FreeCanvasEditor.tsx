@@ -1866,6 +1866,49 @@ export function FreeCanvasEditor({
                 {selectedBlocks.length} selected
               </span>
 
+              {cropCandidate && (
+                <ToolGroup label="Image">
+                  <TBtn
+                    label={cropId ? "✓ crop" : "crop"}
+                    title="Crop: drag the photo to reframe it, drag a corner to zoom"
+                    pressed={Boolean(cropId)}
+                    onClick={() => setCropId((v) => (v ? null : cropCandidate.id))}
+                  />
+                  <TBtn
+                    label={(cropCandidate.fit ?? "cover") === "cover" ? "fill" : "fit"}
+                    title="Toggle between filling the frame and fitting the whole photo"
+                    onClick={() =>
+                      patchMany(
+                        new Map([
+                          [
+                            cropCandidate.id,
+                            {
+                              fit:
+                                (cropCandidate.fit ?? "cover") === "cover"
+                                  ? ("contain" as const)
+                                  : ("cover" as const),
+                            },
+                          ],
+                        ]),
+                        "Image fit",
+                      )
+                    }
+                  />
+                  <TBtn
+                    label="reset"
+                    title="Reset the crop framing and zoom"
+                    onClick={() =>
+                      patchMany(
+                        new Map([
+                          [cropCandidate.id, { mediaFocus: "50% 50%", mediaZoom: 1 }],
+                        ]),
+                        "Reset crop",
+                      )
+                    }
+                  />
+                </ToolGroup>
+              )}
+
               <ToolGroup label="Align">
                 {(
                   [
