@@ -21,6 +21,7 @@ import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { IconPicker } from "@/components/IconPicker";
 import { ItemToneRow } from "@/components/slide/ItemTonePicker";
 import { itemTone, itemToneEnd } from "@/lib/item-tone";
+import { slideModuleCellControls } from "@/components/slide/module-registry";
 
 import { uploadSlideMedia } from "@/lib/slide-media";
 import { SlideMediaPicker } from "@/components/library/SlideMediaPicker";
@@ -244,7 +245,10 @@ export function VariantSampleStudio({
   const fields = useMemo(() => collectStringPaths(copy), [copy]);
   const items = Array.isArray(copy.items) ? (copy.items as Record<string, unknown>[]) : null;
   const isLogoModule = /LOGO/i.test(variant.id);
+  /** Per-cell knobs this module's renderer actually reads (see the registry). */
+  const cellControls = useMemo(() => slideModuleCellControls(variant.id), [variant.id]);
   const isStepChain = variant.id === "MV-PROC-STEP-CHAIN";
+
   /** Steps actually rendered by the chain (the renderer caps at nine). */
   const stepCount = isStepChain ? Math.min(items?.length ?? 0, 9) : 0;
   /** Focused step, clamped to what is on the slide right now. */
@@ -1683,7 +1687,10 @@ export function VariantSampleStudio({
                           />
 
                           {/* Per-row gradient colour — drives this lane / cell's
-                              wash, rail and hairline in both appearances. */}
+                              wash, rail and hairline in both appearances. Hidden
+                              on families that do not read it, so a control never
+                              looks broken. */}
+                          {cellControls.tone ? (
                           <div className="mt-2">
                             <ItemToneRow
                               dark
@@ -1698,6 +1705,7 @@ export function VariantSampleStudio({
                               onChange={(hex) => setItemField(i, "toneEnd", hex ?? undefined)}
                             />
                           </div>
+                          ) : null}
 
                           {isMedia ? (
                             <>
@@ -1980,7 +1988,10 @@ export function VariantSampleStudio({
                               </div>
 
                               {/* Alignment + fine offset inside the tile's glyph
-                                  well. Tile styling is untouched. */}
+                                  well. Tile styling is untouched. Only shown for
+                                  families that honour the nudge. */}
+                              {cellControls.iconNudge ? (
+                              <>
                               <div className="mt-2 flex flex-wrap items-center gap-1">
                                 <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
                                   Align
@@ -2023,6 +2034,8 @@ export function VariantSampleStudio({
                                   {Number(it.iconOffsetPct ?? 0) || 0}%
                                 </span>
                               </label>
+                              </>
+                              ) : null}
                             </div>
                           )}
                         </div>

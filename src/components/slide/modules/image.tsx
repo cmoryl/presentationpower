@@ -28,6 +28,7 @@ import { itemTone } from "@/lib/item-tone";
 
 registerSlideModule({
   id: "family:image",
+  cellControls: { tone: true },
   variantIds: [
     "MV-IMG-FULL-BLEED",
     "MV-IMG-SPLIT",
