@@ -26,31 +26,7 @@ import {
   SEAM_TICK_INSET_PCT,
   SUMMARY_BAND,
 } from "@/lib/surface-tokens";
-
-/**
- * Studio per-cell controls (see VariantSampleStudio Sections panel):
- * - `tone` / `toneEnd` recolour this cell's accent ink, wash, seam and rails;
- * - `iconAlign` / `iconOffsetPct` nudge the glyph inside its well.
- * Unset cells render exactly as before, so saved samples are untouched.
- */
-function cellAccent(it: Record<string, unknown>, fallback: string, mode: AccentMode): string {
-  const t = itemTone(it);
-  return t ? accentInk(t, mode, 4.5) : fallback;
-}
-
-function cellWash(it: Record<string, unknown>, fallback: string): string {
-  const t = itemTone(it);
-  return t ? toneWashGradient(t, itemToneEnd(it)) : cardWashGradient(fallback);
-}
-
-function iconWellStyle(it: Record<string, unknown>) {
-  const align = String(it.iconAlign ?? "center");
-  const offset = Math.max(-40, Math.min(40, Number(it.iconOffsetPct ?? 0) || 0));
-  return {
-    alignItems: align === "top" ? "flex-start" : align === "bottom" ? "flex-end" : "center",
-    transform: offset ? `translateY(${offset}%)` : undefined,
-  } as const;
-}
+import { cellAccent, cellWash, iconWellStyle, cellIconScale } from "./cell-controls";
 
 registerSlideModule({
   id: "family:process",
