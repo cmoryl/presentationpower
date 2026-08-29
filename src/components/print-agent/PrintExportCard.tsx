@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import type { PrintPageSizeKey } from "@/lib/print-asset-export";
 import {
-  assertPrintPageReady,
   downloadPrintPageAsset,
   printPageTrim,
-  waitForPrintPageReady,
+  stagePrintPageForExport,
   type PrintPageExportFormat,
 } from "@/lib/print-agent/page-export";
+
 import type {
   PrintAssetKind,
   PrintDensity,
