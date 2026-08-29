@@ -1,4 +1,5 @@
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { hiddenSectionSet } from "@/lib/print-hidden-sections";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { SpotlightContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
@@ -119,7 +120,10 @@ export function SpotlightLayout({
   });
 
   // Content slices
-  const stats = (Array.isArray(content.stats) ? content.stats : []).slice(0, 4);
+  const hidden = hiddenSectionSet(content);
+  const stats = hidden.has("stats")
+    ? []
+    : (Array.isArray(content.stats) ? content.stats : []).slice(0, 4);
   const columns = content.capabilities.slice(0, 3);
   const proofBullets = content.capabilities.slice(3, 6).map((c) => c.heading);
   const expertBullets =
@@ -156,7 +160,7 @@ export function SpotlightLayout({
                 style={{ background: "#FFFFFF", zIndex: 0 }}
               />
             )}
-            {content.heroMedia ? (
+            {content.heroMedia && !hidden.has("hero") ? (
               <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
             ) : null}
 
@@ -276,7 +280,7 @@ export function SpotlightLayout({
                   </div>
                 </div>
 
-                {content.quote && (
+                {content.quote && !hidden.has("quote") && (
                   <div
                     data-section="quote"
                     data-section-label="Quote"
@@ -617,7 +621,7 @@ export function SpotlightLayout({
               {/* ============================================================ */}
               {/* CTA BAND — division-tokenized gradient                        */}
               {/* ============================================================ */}
-              {content.cta && (
+              {content.cta && !hidden.has("cta") && (
                 <div data-section="cta" data-section-label="Call to action">
                   <PrintCTABand
                     brand={brand}
@@ -636,6 +640,7 @@ export function SpotlightLayout({
               {/* ============================================================ */}
               {/* FOOTER — TP + division lockup + contact strip                 */}
               {/* ============================================================ */}
+              {!hidden.has("footer") && (
               <PrintFooterLockup
                 brand={brand}
                 mode={mode}
@@ -643,6 +648,7 @@ export function SpotlightLayout({
                 links={["transperfect.com"]}
                 email={content.expert?.email}
               />
+              )}
 
               {showSafeArea && (
                 <div

@@ -152,6 +152,12 @@ import {
   resolveContentFit,
   type PrintFitKnobs,
 } from "@/lib/print-content-fit";
+import {
+  hiddenSectionSet,
+  isSectionHidden,
+  withSectionHidden,
+  withSectionShown,
+} from "@/lib/print-hidden-sections";
 import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import {
@@ -196,6 +202,7 @@ import {
   EyeOff,
   Upload,
   BookmarkPlus,
+  RotateCcw,
 } from "lucide-react";
 import { SavePageTemplateDialog } from "@/components/print/SavePageTemplateDialog";
 import { captureTemplateContentShell, captureTemplateLayout } from "@/lib/print-page-templates";
@@ -789,11 +796,9 @@ function AssetEditor() {
       next.splice(at, 0, fit.section);
       if (replaceTarget) {
         // Built-in section (e.g. "features") being replaced by a module:
-        // clear its content field so it actually comes off the page.
-        const field = SECTION_CLEARABLE_FIELDS[replaceTarget];
-        if (field) {
-          const prev = (content as unknown as Record<string, unknown>)[field];
-          patch[field] = Array.isArray(prev) ? [] : undefined;
+        // hide it so the layout can't synthesise it back, and keep its copy.
+        if (SECTION_CLEARABLE_FIELDS[replaceTarget]) {
+          patch.hiddenSections = withSectionHidden(content, replaceTarget);
           replacedLabel =
             SECTION_DELETE_LABELS[replaceTarget] ??
             replaceTarget.replace(/([A-Z])/g, " $1");
@@ -1805,26 +1810,35 @@ function AssetEditor() {
                             });
                             return;
                           }
-                          // Optional sections map to the content field they own.
-                          // Every removal is undoable: we snapshot the previous
-                          // value and restore it from the toast action.
-                          const field = SECTION_CLEARABLE_FIELDS[key];
-                          if (!field) {
+                          // Built-in sections are *hidden*, not cleared. Clearing
+                          // the field let the layout synthesise a replacement
+                          // (footer default links, engagement bullets from the
+                          // expert block, hero fallback plates) — which read as
+                          // "the section keeps coming back". Hiding keeps the
+                          // authored data intact and nothing can repopulate it.
+                          if (!SECTION_CLEARABLE_FIELDS[key]) {
                             toast.info(
                               `"${key}" is a core part of this layout — edit it in the inspector instead.`,
                             );
                             return;
                           }
-                          const bag = rawContent as unknown as Record<string, unknown>;
-                          const prevValue = bag[field];
-                          const emptied = Array.isArray(prevValue) ? [] : undefined;
-                          patchContent({ [field]: emptied } as never);
                           const label =
                             SECTION_DELETE_LABELS[key] ?? key.replace(/([A-Z])/g, " $1");
+                          if (isSectionHidden(rawContent, key)) {
+                            toast.info(`${label} is already removed from this page`);
+                            return;
+                          }
+                          patchContent({
+                            hiddenSections: withSectionHidden(rawContent, key),
+                          } as never);
                           toast.success(`${label} removed`, {
+                            description: "Copy is kept — restore it any time.",
                             action: {
                               label: "Undo",
-                              onClick: () => patchContent({ [field]: prevValue } as never),
+                              onClick: () =>
+                                patchContent({
+                                  hiddenSections: withSectionShown(rawContent, key),
+                                } as never),
                             },
                           });
                         }}
@@ -1847,6 +1861,37 @@ function AssetEditor() {
                           window.setTimeout(() => setModuleFocus(null), 4000);
                         }}
                       />
+
+                      {/* Removed sections — one-click restore, so a delete is
+                          never a dead end and the copy is never lost. */}
+                      {hiddenSectionSet(rawContent).size > 0 && (
+                        <div
+                          data-export-ignore="true"
+                          className="absolute -bottom-11 left-0 z-30 flex flex-wrap items-center gap-1.5 text-[11px]"
+                        >
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
+                            Removed
+                          </span>
+                          {[...hiddenSectionSet(rawContent)].map((key) => (
+                            <button
+                              key={key}
+                              type="button"
+                              onClick={() =>
+                                patchContent({
+                                  hiddenSections: withSectionShown(rawContent, key),
+                                } as never)
+                              }
+                              className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-white px-2.5 py-1 font-medium text-black/60 hover:border-[#003FC7] hover:text-[#003FC7] dark:border-white/10 dark:bg-white/[0.04] dark:text-white/60"
+                              title={`Restore ${SECTION_DELETE_LABELS[key] ?? key}`}
+                            >
+                              <RotateCcw size={11} />
+                              {SECTION_DELETE_LABELS[key] ?? key}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+
 
                       {/* Hero affordance — click straight into the hero editor from
                   the canvas instead of hunting for the sidebar panel. */}
