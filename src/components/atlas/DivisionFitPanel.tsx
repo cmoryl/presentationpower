@@ -66,12 +66,17 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
   // Materialised deck + the walk taken from that saved deck.
   const [walk, setWalk] = useState<DeckWalkReport | null>(null);
   const [walking, setWalking] = useState<{ done: number; total: number } | null>(null);
+  // Deck materialised straight from the live stage graph on screen.
+  const [staged, setStaged] = useState<{ deckId: string; title: string; slides: number } | null>(
+    null,
+  );
 
   const built = useMemo(() => (previews ? buildDivisionRun(plan) : []), [plan, previews]);
 
   useEffect(() => {
     setReport(null);
     setWalk(null);
+    setStaged(null);
   }, [plan]);
 
   // Build the run into a real deck, then walk the SAVED deck back against the
@@ -90,6 +95,32 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
       setWalking(null);
     }
   }
+
+  // LIVE STAGE → DECK: save exactly the stages already mounted on screen. No
+  // second arbitration or build pass, so the deck cannot drift from what the
+  // reviewer is looking at.
+  function materialiseStages() {
+    const stages = built.length > 0 ? built : buildDivisionRun(plan);
+    const { deck } = createDeckFromBuiltStages(plan, stages, { archetypeId });
+    setStaged({ deckId: deck.id, title: deck.title, slides: deck.slides.length });
+    return deck;
+  }
+
+  async function walkStagedDeck() {
+    const deck = staged ? useDeckStoreDeck(staged.deckId) : null;
+    const target = deck ?? materialiseStages();
+    setWalking({ done: 0, total: target.slides.length });
+    try {
+      const out = await walkDeckAgainstSpec(target, plan, {
+        onProgress: (done, total) => setWalking({ done, total }),
+      });
+      setWalk(out);
+      return out;
+    } finally {
+      setWalking(null);
+    }
+  }
+
 
   async function build() {
     setBusy({ done: 0, total: plan.slides.length });
