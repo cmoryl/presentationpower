@@ -9,6 +9,8 @@ import {
   clampToStage,
   rectsIntersect,
   GRID,
+  MARGIN_X,
+  MARGIN_Y,
   snapMove,
   snapResize,
   stageScaleFromRect,
@@ -35,6 +37,7 @@ import { useHideAdoptedSources } from "./AdoptedSourceHider";
 import { CanvasAssetPanel } from "./CanvasAssetPanel";
 import { CanvasInsertLibrary, type InsertPayload } from "./CanvasInsertLibrary";
 import { CanvasLayersPanel } from "./CanvasLayersPanel";
+import { CanvasCropOverlay } from "./CanvasCropOverlay";
 import { useCanvasEmphasis } from "@/lib/canvas-emphasis";
 import {
   blockFontSize,
@@ -181,6 +184,10 @@ export function FreeCanvasEditor({
   const [snapOn, setSnapOn] = useState(true);
   /** Visible 20-unit grid — off by default so the slide reads clean. */
   const [gridOn, setGridOn] = useState(false);
+  /** Static layout guides: safe-area margins, thirds and centre crosshair. */
+  const [guidesOn, setGuidesOn] = useState(false);
+  /** Image block currently in crop mode (Adobe-style framing gesture). */
+  const [cropId, setCropId] = useState<string | null>(null);
   /** Selection-pane style layers list (reorder / lock / hide / group). */
   const [layersOn, setLayersOn] = useState(false);
   /** Browsable shape inventory + icon set (Figma/Canva-style insert library). */
@@ -245,6 +252,26 @@ export function FreeCanvasEditor({
     [list, selectedSet],
   );
   const selectionBounds = selectedBlocks.length ? boundsOf(selectedBlocks) : null;
+
+  /** The single image block the crop tool is framing, if any. */
+  const cropBlock = useMemo(() => {
+    if (!cropId) return null;
+    const b = index.get(cropId);
+    return b && b.kind === "image" && b.src ? b : null;
+  }, [cropId, index]);
+  /** One image selected → the crop tool is available. */
+  const cropCandidate =
+    selectedBlocks.length === 1 &&
+    selectedBlocks[0].kind === "image" &&
+    !selectedBlocks[0].locked &&
+    selectedBlocks[0].src
+      ? selectedBlocks[0]
+      : null;
+  // Leaving the image (or the objects tool) must not leave crop mode armed.
+  useEffect(() => {
+    if (!cropId) return;
+    if (!cropCandidate || cropCandidate.id !== cropId || textTool) setCropId(null);
+  }, [cropId, cropCandidate, textTool]);
 
   /** The visible 16:9 surface is the coordinate authority, never editor chrome. */
   const stageSurface = useCallback(
@@ -1289,6 +1316,8 @@ export function FreeCanvasEditor({
               onDoubleClick={(e) => {
                 e.stopPropagation();
                 if (isText) setEditingId(b.id);
+                // Double-click an image to crop it, the way Figma/Keynote do.
+                else if (b.kind === "image" && b.src && !b.locked) setCropId(b.id);
               }}
             >
               {editing && isText ? (
@@ -1502,6 +1531,64 @@ export function FreeCanvasEditor({
           }}
         />
       )}
+
+      {/* static layout guides: safe-area margins, thirds and centre crosshair */}
+      {guidesOn && (
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          className="pointer-events-none absolute inset-0 z-30"
+        >
+          <div
+            className="absolute border border-dashed"
+            style={{
+              left: `${(MARGIN_X / STAGE_W) * 100}%`,
+              right: `${(MARGIN_X / STAGE_W) * 100}%`,
+              top: `${(MARGIN_Y / STAGE_H) * 100}%`,
+              bottom: `${(MARGIN_Y / STAGE_H) * 100}%`,
+              borderColor: "rgba(0,63,199,0.5)",
+            }}
+          />
+          {[33.333, 50, 66.666].map((p) => (
+            <div
+              key={`gx${p}`}
+              className="absolute inset-y-0 w-px"
+              style={{
+                left: `${p}%`,
+                background: p === 50 ? "rgba(236,56,138,0.55)" : "rgba(0,63,199,0.22)",
+              }}
+            />
+          ))}
+          {[33.333, 50, 66.666].map((p) => (
+            <div
+              key={`gy${p}`}
+              className="absolute inset-x-0 h-px"
+              style={{
+                top: `${p}%`,
+                background: p === 50 ? "rgba(236,56,138,0.55)" : "rgba(0,63,199,0.22)",
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* crop frame — pans / zooms the photo inside the selected image block */}
+      {cropBlock && !textTool && (
+        <div {...{ [CANVAS_UI_ATTR]: "" }} className="pointer-events-none absolute inset-0 z-[60]">
+          <CanvasCropOverlay
+            target={cropBlock}
+            accent={accent}
+            onChange={(next) =>
+              patchMany(
+                new Map([[cropBlock.id, next]]),
+                "Crop image",
+                `crop:${cropBlock.id}`,
+              )
+            }
+          />
+        </div>
+      )}
+
+
 
       {/* alignment guides + marquee — persistent nodes, painted imperatively */}
       <div
@@ -1738,6 +1825,12 @@ export function FreeCanvasEditor({
                   onClick={() => setGridOn((v) => !v)}
                 />
                 <TBtn
+                  label="guides"
+                  title="Show safe-area margins, thirds and centre guides"
+                  pressed={guidesOn}
+                  onClick={() => setGuidesOn((v) => !v)}
+                />
+                <TBtn
                   label="☰ layers"
                   title="Layers: reorder, lock, hide and group objects and adopted module sections"
                   pressed={layersOn}
@@ -1774,6 +1867,49 @@ export function FreeCanvasEditor({
               >
                 {selectedBlocks.length} selected
               </span>
+
+              {cropCandidate && (
+                <ToolGroup label="Image">
+                  <TBtn
+                    label={cropId ? "✓ crop" : "crop"}
+                    title="Crop: drag the photo to reframe it, drag a corner to zoom"
+                    pressed={Boolean(cropId)}
+                    onClick={() => setCropId((v) => (v ? null : cropCandidate.id))}
+                  />
+                  <TBtn
+                    label={(cropCandidate.fit ?? "cover") === "cover" ? "fill" : "fit"}
+                    title="Toggle between filling the frame and fitting the whole photo"
+                    onClick={() =>
+                      patchMany(
+                        new Map([
+                          [
+                            cropCandidate.id,
+                            {
+                              fit:
+                                (cropCandidate.fit ?? "cover") === "cover"
+                                  ? ("contain" as const)
+                                  : ("cover" as const),
+                            },
+                          ],
+                        ]),
+                        "Image fit",
+                      )
+                    }
+                  />
+                  <TBtn
+                    label="reset"
+                    title="Reset the crop framing and zoom"
+                    onClick={() =>
+                      patchMany(
+                        new Map([
+                          [cropCandidate.id, { mediaFocus: "50% 50%", mediaZoom: 1 }],
+                        ]),
+                        "Reset crop",
+                      )
+                    }
+                  />
+                </ToolGroup>
+              )}
 
               <ToolGroup label="Align">
                 {(

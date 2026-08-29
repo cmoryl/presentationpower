@@ -152,6 +152,13 @@ export type CanvasBlock = {
   src?: string;
   fit?: "cover" | "contain";
   alt?: string;
+  /**
+   * Crop framing for image blocks, authored with the Studio crop tool.
+   * `mediaFocus` is a CSS object-position ("50% 50%") and `mediaZoom` scales the
+   * photo inside its frame (1 = fill the frame exactly).
+   */
+  mediaFocus?: string;
+  mediaZoom?: number;
   // ---- shape blocks ----
   fill?: string;
   radius?: number;
