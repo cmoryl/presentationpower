@@ -142,7 +142,17 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
       }
 
       // Case study content should reference an in-scope industry — warn if it doesn't.
-      const clientStr = String(slide.content.client ?? "").toLowerCase();
+      // The in-scope industry can be stated on the client line OR in the
+      // slide's own industry/sector field — either proves the case is in scope.
+      const clientStr = [
+        slide.content.client,
+        (slide.content as Record<string, unknown>).industry,
+        (slide.content as Record<string, unknown>).sector,
+        (slide.content as Record<string, unknown>).vertical,
+      ]
+        .map((v) => String(v ?? ""))
+        .join(" ")
+        .toLowerCase();
       const industries = profile?.contentScope.industries ?? [];
       if (
         variant.familyId === "MF-06" &&
