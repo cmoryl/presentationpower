@@ -338,7 +338,40 @@ async function auditPptx(
       break;
     }
   }
+  // EXPORT SPEC #4: a pure full-bleed ground is promoted OFF the slide into its
+  // layout's `<p:bg>` so it cannot be selected. When the slide shape tree has no
+  // background picture, follow the layout relationship and read it from there.
+  if (!bgPart) {
+    const layoutPart = [...relTarget.values()].find((t) => /slideLayouts\/slideLayout\d+\.xml$/.test(t));
+    if (layoutPart && zip.file(layoutPart)) {
+      const layoutXml = await zip.file(layoutPart)!.async("string");
+      const bgRid = /<p:bg>[\s\S]*?r:embed="([^"]+)"[\s\S]*?<\/p:bg>/.exec(layoutXml)?.[1];
+      const layoutRelsPart = layoutPart.replace(
+        /slideLayouts\/(slideLayout\d+\.xml)$/,
+        "slideLayouts/_rels/$1.rels",
+      );
+      if (bgRid && zip.file(layoutRelsPart)) {
+        const layoutRels = await zip.file(layoutRelsPart)!.async("string");
+        for (const m of layoutRels.matchAll(/Id="([^"]+)"[^>]*Target="([^"]+)"/g)) {
+          // Layout rel targets are relative to ppt/slideLayouts/, so "../media/x"
+          // resolves to ppt/media/x.
+          if (m[1] === bgRid) {
+            bgPart = m[2].startsWith("../")
+              ? `ppt/${m[2].replace(/^(\.\.\/)+/, "")}`
+              : `ppt/slideLayouts/${m[2]}`;
+          }
+
+        }
+      }
+    }
+  }
   const bgBytes = bgPart && zip.file(bgPart) ? await zip.file(bgPart)!.async("uint8array") : null;
+  artifact.detail.picNames = [...slideXml.matchAll(/<p:pic>[\s\S]*?<\/p:pic>/g)]
+    .map((m) => /name="([^"]*)"/.exec(m[0])?.[1] ?? "?")
+    .join(" | ");
+  artifact.detail.layoutParts = names.filter((n) => /slideLayout\d+\.xml$/.test(n)).join(",");
+  artifact.detail.bgPart = bgPart ?? "";
+
   if (!bgBytes || !sniffImageMime(bgBytes)) {
     problems.push("no full-bleed background picture embedded in package");
   } else {

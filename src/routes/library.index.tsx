@@ -284,8 +284,11 @@ function validateLibrarySearch(raw: Record<string, unknown>): LibrarySearch {
   const mode = str(raw.mode);
   return {
     scope: str(raw.scope),
-    look: str(raw.look) ?? null,
-    recipe: str(raw.recipe) ?? null,
+    // Leave these undefined (not null) when absent so the router never
+    // serialises literal `?look=null&recipe=null` into shareable links.
+    look: str(raw.look),
+    recipe: str(raw.recipe),
+
     tags: str(raw.tags)
       ?.split(",")
       .map((t) => t.trim())
