@@ -22,6 +22,7 @@ import {
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
+import { hiddenSectionSet } from "@/lib/print-hidden-sections";
   PAGE_W,
   cq,
   padCq,
@@ -114,8 +115,9 @@ export function CaseStudyLayout({
   // without a heading, an engagement block with no bullets). Render
   // defensively: a crash here also kills off-screen export staging, which
   // reads to the user as "the export button did nothing".
+  const hidden = hiddenSectionSet(content);
   const emptyBlock = { heading: "", body: "" } as typeof content.challenge;
-  const stats = Array.isArray(content.stats) ? content.stats.slice(0, 3) : [];
+  const stats = hidden.has("stats") || !Array.isArray(content.stats) ? [] : content.stats.slice(0, 3);
   const blocks: Array<{ label: string; block: typeof content.challenge; icon: string }> = [
     {
       label: content.challenge?.heading || "The Challenge",
@@ -134,14 +136,16 @@ export function CaseStudyLayout({
     },
   ];
 
-  const engagementSource = content.engagement;
+  const engagementSource = hidden.has("engagement") ? undefined : content.engagement;
   const engagement = {
     title: engagementSource?.title ?? "Engagement Snapshot",
-    bullets: Array.isArray(engagementSource?.bullets)
-      ? engagementSource.bullets
-      : content.expert?.name
+    bullets: hidden.has("engagement")
+      ? []
+      : Array.isArray(engagementSource?.bullets)
+        ? engagementSource.bullets
+        : content.expert?.name
         ? [content.expert.name, ...(content.expert.role ? [content.expert.role] : [])]
-        : [],
+          : [],
   };
 
 
@@ -170,7 +174,7 @@ export function CaseStudyLayout({
                 style={{ background: "#FFFFFF", zIndex: 0 }}
               />
             )}
-            {content.heroMedia ? (
+            {content.heroMedia && !hidden.has("hero") ? (
               <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
             ) : null}
 
@@ -417,9 +421,9 @@ export function CaseStudyLayout({
               ))}
 
               {/* QUOTE + ENGAGEMENT SNAPSHOT */}
-              {(content.quote || engagement.bullets.length > 0) && (
+              {((content.quote && !hidden.has("quote")) || engagement.bullets.length > 0) && (
                 <div className="flex" style={{ gap: cq(16), paddingTop: cq(14) }}>
-                  {content.quote && (
+                  {content.quote && !hidden.has("quote") && (
                     <div
                       data-section="quote"
                       data-section-label="Quote"
@@ -544,7 +548,7 @@ export function CaseStudyLayout({
               />
 
               {/* CTA BAND */}
-              {content.cta && (
+              {content.cta && !hidden.has("cta") && (
                 <div data-section="cta" data-section-label="Call to action">
                   <PrintCTABand
                     brand={brand}
@@ -558,13 +562,15 @@ export function CaseStudyLayout({
               )}
 
               {/* FOOTER LOCKUP */}
+              {!hidden.has("footer") && (
               <PrintFooterLockup
                 brand={brand}
                 mode={mode}
                 cq={cq}
                 links={content.footer?.links ?? ["transperfect.com"]}
-                email={content.expert?.email}
+                email={hidden.has("expert") ? undefined : content.expert?.email}
               />
+              )}
             </div>
           </div>
         </PrintSurfaceProvider>
