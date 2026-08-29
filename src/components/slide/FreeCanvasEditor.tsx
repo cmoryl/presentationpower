@@ -1530,6 +1530,64 @@ export function FreeCanvasEditor({
         />
       )}
 
+      {/* static layout guides: safe-area margins, thirds and centre crosshair */}
+      {guidesOn && (
+        <div
+          {...{ [CANVAS_UI_ATTR]: "" }}
+          className="pointer-events-none absolute inset-0 z-30"
+        >
+          <div
+            className="absolute border border-dashed"
+            style={{
+              left: `${(MARGIN_X / STAGE_W) * 100}%`,
+              right: `${(MARGIN_X / STAGE_W) * 100}%`,
+              top: `${(MARGIN_Y / STAGE_H) * 100}%`,
+              bottom: `${(MARGIN_Y / STAGE_H) * 100}%`,
+              borderColor: "rgba(0,63,199,0.5)",
+            }}
+          />
+          {[33.333, 50, 66.666].map((p) => (
+            <div
+              key={`gx${p}`}
+              className="absolute inset-y-0 w-px"
+              style={{
+                left: `${p}%`,
+                background: p === 50 ? "rgba(236,56,138,0.55)" : "rgba(0,63,199,0.22)",
+              }}
+            />
+          ))}
+          {[33.333, 50, 66.666].map((p) => (
+            <div
+              key={`gy${p}`}
+              className="absolute inset-x-0 h-px"
+              style={{
+                top: `${p}%`,
+                background: p === 50 ? "rgba(236,56,138,0.55)" : "rgba(0,63,199,0.22)",
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* crop frame — pans / zooms the photo inside the selected image block */}
+      {cropBlock && !textTool && (
+        <div {...{ [CANVAS_UI_ATTR]: "" }} className="pointer-events-none absolute inset-0 z-[60]">
+          <CanvasCropOverlay
+            target={cropBlock}
+            accent={accent}
+            onChange={(next) =>
+              patchMany(
+                new Map([[cropBlock.id, next]]),
+                "Crop image",
+                `crop:${cropBlock.id}`,
+              )
+            }
+          />
+        </div>
+      )}
+
+
+
       {/* alignment guides + marquee — persistent nodes, painted imperatively */}
       <div
         ref={guideXRef}
