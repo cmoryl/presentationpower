@@ -188,7 +188,12 @@ registerSlideModule({
                   // pink pop so the risk point reads instantly.
                   // Mode-aware tone: raw pink/blue is unreadable as ink or hairline on
                   // the dark ground, so both flavours ride the accentInk ramp.
-                  const line = flagged ? accentInk("#EC388A", mode, 3) : accentTone;
+                  // A Studio `tone` override on the cell wins over both.
+                  const line = itemTone(it)
+                    ? cellAccent(it, accentTone, mode)
+                    : flagged
+                      ? accentInk("#EC388A", mode, 3)
+                      : accentTone;
                   return (
                     <div
                       key={i}
