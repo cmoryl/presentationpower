@@ -230,17 +230,24 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
           style={{ width: `${trim.widthIn * 96}px` }}
         >
           <div data-print-page style={{ width: "100%" }}>
-            <PrintPagePreview
-              kind={row.kind as PrintAssetKind}
-              content={row.content}
-              divisionId={row.brand_mode_id ?? request.divisionId ?? null}
-              mode={mode}
-              pageSize={pageSize}
-              density={(ctx?.density ?? "standard") as PrintDensity}
-              pageIndex={pageIndex}
-              className="!rounded-none !border-0"
-            />
+            <StageBoundary
+              onError={(message) => {
+                stageErrorRef.current = message;
+              }}
+            >
+              <PrintPagePreview
+                kind={row.kind as PrintAssetKind}
+                content={row.content}
+                divisionId={row.brand_mode_id ?? request.divisionId ?? null}
+                mode={mode}
+                pageSize={pageSize}
+                density={(ctx?.density ?? "standard") as PrintDensity}
+                pageIndex={pageIndex}
+                className="!rounded-none !border-0"
+              />
+            </StageBoundary>
           </div>
+
         </div>
       ) : null}
     </div>
