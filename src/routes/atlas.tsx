@@ -46,7 +46,14 @@ import { SECTION_FRAMEWORKS as ALL_SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
 const SECTION_FRAMEWORKS_COUNT = ALL_SECTION_FRAMEWORKS.length;
 
+const SEGMENT_IDS = ["presentation", "print", "social", "events", "systems", "style"] as const;
+
 export const Route = createFileRoute("/atlas")({
+  validateSearch: (search: Record<string, unknown>) => {
+    const raw = typeof search.segment === "string" ? search.segment : undefined;
+    const segment = SEGMENT_IDS.find((id) => id === raw);
+    return segment ? { segment } : {};
+  },
   head: () => ({
     meta: [
       { title: "Atlas · TransPerfect Element" },
@@ -126,7 +133,18 @@ const SEGMENTS: Array<{
 ];
 
 function Atlas() {
-  const [segment, setSegment] = useState<SegmentId>("presentation");
+  // The segment lives in the URL so a reviewer can deep-link (or reload) into
+  // Systems without losing the view.
+  const navigate = Route.useNavigate();
+  const { segment: searchSegment } = Route.useSearch();
+  const segment: SegmentId = searchSegment ?? "presentation";
+  const setSegment = (next: SegmentId) => {
+    void navigate({
+      search: next === "presentation" ? {} : { segment: next },
+      replace: true,
+      resetScroll: false,
+    });
+  };
   const active = SEGMENTS.find((s) => s.id === segment)!;
 
   return (
