@@ -7,6 +7,12 @@ import {
 import { NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
 import { buildDivisionRun, runDivisionStages, type DivisionRunReport } from "@/lib/division-run";
+import {
+  createDeckFromDivisionRun,
+  walkDeckAgainstSpec,
+  type DeckWalkReport,
+} from "@/lib/division-deck-run";
+import { Link } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
 // The stage graph (VariantRenderer + every module family) is large and only
@@ -23,6 +29,10 @@ declare global {
   interface Window {
     __tpDivisionRun?: {
       run: (opts?: { brandModeId?: string; archetypeId?: string }) => Promise<DivisionRunReport>;
+      buildDeck: (opts?: {
+        brandModeId?: string;
+        archetypeId?: string;
+      }) => Promise<DeckWalkReport>;
     };
   }
 }
@@ -50,12 +60,33 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
   const [report, setReport] = useState<DivisionRunReport | null>(null);
   const [busy, setBusy] = useState<{ done: number; total: number } | null>(null);
   const [previews, setPreviews] = useState(false);
+  // Materialised deck + the walk taken from that saved deck.
+  const [walk, setWalk] = useState<DeckWalkReport | null>(null);
+  const [walking, setWalking] = useState<{ done: number; total: number } | null>(null);
 
   const built = useMemo(() => (previews ? buildDivisionRun(plan) : []), [plan, previews]);
 
   useEffect(() => {
     setReport(null);
+    setWalk(null);
   }, [plan]);
+
+  // Build the run into a real deck, then walk the SAVED deck back against the
+  // spec — deck creation runs the QA auto-fixer, so the deck is not always the
+  // plan and only a deck-side walk can prove it.
+  async function buildDeckAndWalk() {
+    const { deck } = createDeckFromDivisionRun(plan, { archetypeId });
+    setWalking({ done: 0, total: deck.slides.length });
+    try {
+      const out = await walkDeckAgainstSpec(deck, plan, {
+        onProgress: (done, total) => setWalking({ done, total }),
+      });
+      setWalk(out);
+      return out;
+    } finally {
+      setWalking(null);
+    }
+  }
 
   async function build() {
     setBusy({ done: 0, total: plan.slides.length });
@@ -81,6 +112,18 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
         });
         const out = await runDivisionStages(p);
         setReport(out);
+        return out;
+      },
+      buildDeck: async (opts) => {
+        const sections = sectionSequence(opts?.archetypeId ?? archetypeId);
+        const p = planDivisionFit({
+          brandModeId: opts?.brandModeId ?? brandModeId,
+          rhythmWindow,
+          slides: demoSlideBriefs(sections, { blocks, copy, media }),
+        });
+        const { deck } = createDeckFromDivisionRun(p, { archetypeId: opts?.archetypeId ?? archetypeId });
+        const out = await walkDeckAgainstSpec(deck, p);
+        setWalk(out);
         return out;
       },
     };
@@ -204,6 +247,17 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
           >
             {busy ? `Building ${busy.done}/${busy.total}…` : "Build the slides & compare to spec"}
           </button>
+          <button
+            type="button"
+            onClick={() => void buildDeckAndWalk()}
+            disabled={Boolean(busy || walking)}
+            className="rounded-lg border px-3 py-2 text-sm font-medium disabled:opacity-60"
+            style={{ borderColor: `${ink}33`, color: ink }}
+          >
+            {walking
+              ? `Walking deck ${walking.done}/${walking.total}…`
+              : "Build into a deck & walk each slide"}
+          </button>
           <label className="flex items-center gap-2 text-sm text-black/65">
             <input
               type="checkbox"
@@ -231,6 +285,77 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
           </ul>
         )}
       </div>
+
+      {walk && (
+        <div className="rounded-3xl border border-black/10 bg-white p-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h3 className="text-base font-semibold" style={{ color: ink }}>
+              Saved deck walk — {walk.title}
+            </h3>
+            <div className="flex items-center gap-3 text-sm text-black/60">
+              <span>
+                {walk.passCount}/{walk.slides.length} deck slides match spec
+              </span>
+              <Link
+                to="/decks/$deckId"
+                params={{ deckId: walk.deckId }}
+                className="rounded-lg border px-3 py-1.5 text-sm font-medium"
+                style={{ borderColor: `${ink}33`, color: ink }}
+              >
+                Open the deck
+              </Link>
+            </div>
+          </div>
+          <ul className="mt-3 space-y-1 text-sm text-black/65">
+            {walk.findings.map((f) => (
+              <li key={f}>• {f}</li>
+            ))}
+          </ul>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-xs">
+              <thead className="text-black/45 uppercase tracking-widest">
+                <tr>
+                  <th className="py-1.5 pr-3">#</th>
+                  <th className="py-1.5 pr-3">Section</th>
+                  <th className="py-1.5 pr-3">Module on the sheet</th>
+                  <th className="py-1.5 pr-3">Face · pack</th>
+                  <th className="py-1.5 pr-3">Origin</th>
+                  <th className="py-1.5">Stage vs spec</th>
+                </tr>
+              </thead>
+              <tbody className="text-black/65">
+                {walk.slides.map((s) => (
+                  <tr key={s.slideId} className="border-t border-black/10 align-top">
+                    <td className="py-2 pr-3 font-mono">{s.position + 1}</td>
+                    <td className="py-2 pr-3">{s.sectionId}</td>
+                    <td className="py-2 pr-3 font-mono">{s.variantId}</td>
+                    <td className="py-2 pr-3 font-mono">
+                      {s.face} · {s.packId}
+                    </td>
+                    <td className="py-2 pr-3">
+                      {s.planned ? (
+                        <Chip tone="ok">planned</Chip>
+                      ) : (
+                        <Chip tone="warn">
+                          {s.plannedVariantId ? `swapped from ${s.plannedVariantId}` : "added by QA"}
+                        </Chip>
+                      )}
+                    </td>
+                    <td className="py-2">
+                      {s.ok ? (
+                        <Chip tone="ok">{s.entries} elements measured</Chip>
+                      ) : (
+                        <span className="text-[#A33B12]">{s.problems.join("; ")}</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
 
       {previews && built.length > 0 && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">

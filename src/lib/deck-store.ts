@@ -379,6 +379,13 @@ export type DeckContext = {
    */
   stylePackId?: string | null;
   /**
+   * Approved pack for this deck's DARK-face slides. Divisions publish a
+   * light/dark pack pair, so a deck that mixes faces needs both: slides with
+   * `mode: "dark"` resolve to this pack, everything else to `stylePackId`.
+   * Undefined = dark slides keep the deck pack (previous behaviour).
+   */
+  darkStylePackId?: string | null;
+  /**
    * Industry recipe id from the design skin catalog ("R01"–"R30"). This is an
    * INDEPENDENT selection from `stylePackId`: it contributes only the ground /
    * background system, never the typography, cards or layout language.

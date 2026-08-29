@@ -105,7 +105,7 @@ import {
   useSafeAreaGuides,
 } from "@/components/slide/SafeAreaGuides";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
 import type { StylePack } from "@/lib/style-packs";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
@@ -514,6 +514,7 @@ function DeckEditor() {
   // surface here, so a deck authored in an alternate look keeps it in the
   // editor instead of snapping back to the default brand system.
   const pack = deckPack(deck);
+  const packFor = deckPackResolver(deck);
   const brand = packBrand(resolveBrandMode(deck.brandModeId, deck.subCompany), pack);
 
   const clamped = Math.min(activeIdx, deck.slides.length - 1);
@@ -1100,7 +1101,7 @@ function DeckEditor() {
                           <SlideThumbnailContext.Provider value={true}>
                             <ScaledSlide>
                               {variant && (
-                                <DeckPackScope pack={pack}>
+                                <DeckPackScope pack={packFor(slide)}>
                                   <VariantRenderer
                                     slide={applyOverlay(slide)}
                                     variant={variant}
@@ -1381,7 +1382,7 @@ function DeckEditor() {
                         >
                           <SafeAreaGuides enabled={guides.on}>
                             <ScaledSlide>
-                              <DeckPackScope pack={pack}>
+                              <DeckPackScope pack={packFor(active)}>
                                 <VariantRenderer
                                   slide={applyOverlay(active)}
                                   variant={mv}
@@ -1431,7 +1432,7 @@ function DeckEditor() {
                       >
                         <SafeAreaGuides enabled={guides.on}>
                           <ScaledSlide>
-                            <DeckPackScope pack={pack}>
+                            <DeckPackScope pack={packFor(active)}>
                               <VariantRenderer
                                 slide={applyOverlay(active)}
                                 variant={mv}
@@ -2447,7 +2448,7 @@ function DeckEditor() {
                       3× coordinates that then corrupted the inline preview. */}
                     <SafeAreaGuides enabled={guides.on}>
                       <ScaledSlide>
-                        <DeckPackScope pack={pack}>
+                        <DeckPackScope pack={packFor(active)}>
                           <VariantRenderer
                             slide={applyOverlay(active)}
                             variant={mv}

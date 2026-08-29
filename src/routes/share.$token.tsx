@@ -11,7 +11,7 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, packBrand } from "@/components/slide/DeckPackScope";
+import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
@@ -30,6 +30,8 @@ type SharedDeck = {
   client_logo_url: string | null;
   /** Deck's recorded alternate look (design skin), so shares match the editor. */
   style_pack_id?: string | null;
+  /** Approved pack for dark-face slides, when the deck mixes faces. */
+  dark_style_pack_id?: string | null;
   /** Industry ground recipe (R01–R30) composed under that style, if any. */
   design_recipe_id?: string | null;
   shared_at: string | null;
@@ -134,12 +136,15 @@ function LinkGate({ variant, message }: { variant: "expired" | "disabled"; messa
 
 function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
   // Keep the shared view on the same alternate look the deck was authored in.
-  const pack = deckPack({
+  const packSource = {
     context: {
       stylePackId: deck.style_pack_id ?? null,
+      darkStylePackId: deck.dark_style_pack_id ?? null,
       designRecipeId: deck.design_recipe_id ?? null,
     },
-  });
+  };
+  const pack = deckPack(packSource);
+  const packFor = deckPackResolver(packSource);
   const brand = packBrand(resolveBrandMode(deck.brand_mode_id ?? "", deck.sub_company), pack);
   const slides: DeckSlide[] = useMemo(
     () =>
@@ -455,7 +460,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                 style={{ maxWidth: 1280 }}
               >
                 <ScaledSlide>
-                  <DeckPackScope pack={pack}>
+                  <DeckPackScope pack={packFor(slide)}>
                     <VariantRenderer
                       slide={viewSlide(slide)}
                       variant={variant}
@@ -519,7 +524,7 @@ function SharedDeckView({ deck, token }: { deck: SharedDeck; token: string }) {
                           direction={presentDirection}
                           transition={resolveSlideTransition(s, undefined)}
                         >
-                          <DeckPackScope pack={pack}>
+                          <DeckPackScope pack={packFor(s)}>
                             <VariantRenderer
                               slide={viewSlide(s)}
                               variant={v}

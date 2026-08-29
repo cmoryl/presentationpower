@@ -114,9 +114,34 @@ function norm(color: string): string {
  * Compare a mounted stage against the plan that asked for it. Pure DOM reads —
  * nothing here mutates the tree, so it is safe to run before a rasterisation.
  */
+export type StageExpectation = {
+  variantId: string;
+  packId: string;
+  pack: StylePack | null;
+  mode: "light" | "dark";
+  /** Winner sits inside the division's conformance set. */
+  inSpec: boolean;
+};
+
 export function auditStageAgainstSpec(stage: HTMLElement, built: BuiltDivisionSlide): StageCheck[] {
+  return auditStageAgainstExpectation(stage, {
+    variantId: built.variant.id,
+    packId: built.plan.packId,
+    pack: built.pack,
+    mode: built.mode,
+    inSpec: built.plan.inSpec,
+  });
+}
+
+/** The same seven checks, against any expectation — plan-built or deck-built. */
+export function auditStageAgainstExpectation(
+  stage: HTMLElement,
+  expect: StageExpectation,
+): StageCheck[] {
   const checks: StageCheck[] = [];
-  const { plan, pack, mode, variant } = built;
+  const { pack, mode } = expect;
+  const plan = { packId: expect.packId, inSpec: expect.inSpec };
+  const variant = { id: expect.variantId };
 
   const stageVariant = stage.getAttribute("data-variant-id");
   checks.push({
