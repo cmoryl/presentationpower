@@ -54,6 +54,7 @@ import { Route as PublicModulesRouteImport } from './routes/public.modules'
 import { Route as PublicIconsRouteImport } from './routes/public.icons'
 import { Route as PrintAgentThreadIdRouteImport } from './routes/print-agent.$threadId'
 import { Route as LibraryPrintRouteImport } from './routes/library.print'
+import { Route as LibraryOverridesRouteImport } from './routes/library.overrides'
 import { Route as LibraryMyRouteImport } from './routes/library.my'
 import { Route as LibraryIndustryBackgroundsRouteImport } from './routes/library.industry-backgrounds'
 import { Route as LibraryImportedRouteImport } from './routes/library.imported'
@@ -396,6 +397,11 @@ const PrintAgentThreadIdRoute = PrintAgentThreadIdRouteImport.update({
 const LibraryPrintRoute = LibraryPrintRouteImport.update({
   id: '/library/print',
   path: '/library/print',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryOverridesRoute = LibraryOverridesRouteImport.update({
+  id: '/library/overrides',
+  path: '/library/overrides',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LibraryMyRoute = LibraryMyRouteImport.update({
@@ -1102,6 +1108,7 @@ export interface FileRoutesByFullPath {
   '/library/imported': typeof LibraryImportedRoute
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
+  '/library/overrides': typeof LibraryOverridesRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/icons': typeof PublicIconsRoute
@@ -1263,6 +1270,7 @@ export interface FileRoutesByTo {
   '/library/imported': typeof LibraryImportedRoute
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
+  '/library/overrides': typeof LibraryOverridesRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/icons': typeof PublicIconsRoute
@@ -1429,6 +1437,7 @@ export interface FileRoutesById {
   '/library/imported': typeof LibraryImportedRoute
   '/library/industry-backgrounds': typeof LibraryIndustryBackgroundsRoute
   '/library/my': typeof LibraryMyRoute
+  '/library/overrides': typeof LibraryOverridesRoute
   '/library/print': typeof LibraryPrintRoute
   '/print-agent/$threadId': typeof PrintAgentThreadIdRoute
   '/public/icons': typeof PublicIconsRoute
@@ -1596,6 +1605,7 @@ export interface FileRouteTypes {
     | '/library/imported'
     | '/library/industry-backgrounds'
     | '/library/my'
+    | '/library/overrides'
     | '/library/print'
     | '/print-agent/$threadId'
     | '/public/icons'
@@ -1757,6 +1767,7 @@ export interface FileRouteTypes {
     | '/library/imported'
     | '/library/industry-backgrounds'
     | '/library/my'
+    | '/library/overrides'
     | '/library/print'
     | '/print-agent/$threadId'
     | '/public/icons'
@@ -1922,6 +1933,7 @@ export interface FileRouteTypes {
     | '/library/imported'
     | '/library/industry-backgrounds'
     | '/library/my'
+    | '/library/overrides'
     | '/library/print'
     | '/print-agent/$threadId'
     | '/public/icons'
@@ -2048,6 +2060,7 @@ export interface RootRouteChildren {
   LibraryImportedRoute: typeof LibraryImportedRoute
   LibraryIndustryBackgroundsRoute: typeof LibraryIndustryBackgroundsRoute
   LibraryMyRoute: typeof LibraryMyRoute
+  LibraryOverridesRoute: typeof LibraryOverridesRoute
   LibraryPrintRoute: typeof LibraryPrintRoute
   PrintAgentThreadIdRoute: typeof PrintAgentThreadIdRoute
   PublicIconsRoute: typeof PublicIconsRoute
@@ -2401,6 +2414,13 @@ declare module '@tanstack/react-router' {
       path: '/library/print'
       fullPath: '/library/print'
       preLoaderRoute: typeof LibraryPrintRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library/overrides': {
+      id: '/library/overrides'
+      path: '/library/overrides'
+      fullPath: '/library/overrides'
+      preLoaderRoute: typeof LibraryOverridesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/library/my': {
@@ -3475,6 +3495,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryImportedRoute: LibraryImportedRoute,
   LibraryIndustryBackgroundsRoute: LibraryIndustryBackgroundsRoute,
   LibraryMyRoute: LibraryMyRoute,
+  LibraryOverridesRoute: LibraryOverridesRoute,
   LibraryPrintRoute: LibraryPrintRoute,
   PrintAgentThreadIdRoute: PrintAgentThreadIdRoute,
   PublicIconsRoute: PublicIconsRoute,
