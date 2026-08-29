@@ -43,6 +43,14 @@ import {
 } from "@/hooks/use-variant-samples";
 import { backgroundOverrides } from "@/lib/template-registry";
 import { useTemplateRegistryVersion } from "@/hooks/use-template-registry";
+import {
+  conformanceSpecIssues,
+  divisionConformancePresets,
+} from "@/lib/division-conformance";
+
+/** Derived once — presets are pure data from the registry + brand taxonomy. */
+const CONFORMANCE_PRESETS = divisionConformancePresets();
+
 
 export const Route = createFileRoute("/library/overrides")({
   head: () => ({
@@ -433,6 +441,57 @@ function OverrideInspector() {
             ))
         )}
       </Section>
+
+      <Section
+        title="Division conformance presets"
+        count={CONFORMANCE_PRESETS.length}
+        note="Derived from the module registry: each brand scope's module set, the look it wears, both faces, and the palette rule its slides must satisfy. Issues mean a division's slides no longer match its own design spec."
+      >
+        {CONFORMANCE_PRESETS.filter((p) => match(p.name, p.brandModeId, p.packId)).map((p) => {
+          const issues = conformanceSpecIssues(p);
+          return (
+            <div key={p.brandModeId} className={`${card} flex gap-4`}>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-[#03002C] dark:text-white">
+                  {p.name}
+                </p>
+                <p className="mt-0.5 text-xs text-[#03002C]/60 dark:text-white/60">
+                  {p.brandModeId}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  <span className={chip}>{p.moduleIds.length} modules</span>
+                  <span className={chip}>{p.packId ? skinLabel(p.packId) : "brand default"}</span>
+                  {p.recipe ? <span className={chip}>recipe {p.recipe}</span> : null}
+                  <span className={chip}>light + dark</span>
+                  <span className={chip}>
+                    {p.enterprisePalette ? "enterprise palette" : `own accent ${p.tokens.accent}`}
+                  </span>
+                  <span className={chip}>
+                    {issues.length === 0 ? "conformant" : `${issues.length} issue(s)`}
+                  </span>
+                </div>
+                {issues.length > 0 ? (
+                  <ul className="mt-1 space-y-0.5 text-[11px] text-[#EC388A]">
+                    {issues.map((i) => (
+                      <li key={i}>{i}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+              {p.slug ? (
+                <Link
+                  to="/showcase/$presetId"
+                  params={{ presetId: p.slug }}
+                  className={`${btn} self-start`}
+                >
+                  <ExternalLink className="h-3 w-3" /> Open set
+                </Link>
+              ) : null}
+            </div>
+          );
+        })}
+      </Section>
     </main>
   );
 }
+

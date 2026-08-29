@@ -759,15 +759,15 @@ registerSlideModule({
         // title, so the orbit is sized from the remaining height rather than a
         // fixed tall box. Radii stay clear of the hub disc at every count.
         const STAGE_W = 1180;
-        const STAGE_H = 620;
+        const STAGE_H = 580;
         const HUB = 232;
         const RX = 420;
-        const RY = 214;
+        const RY = 200;
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
             <div
-              className="relative mx-auto mt-4"
+              className="relative mx-auto mt-8"
               style={{ height: STAGE_H, width: STAGE_W, maxWidth: "100%" }}
             >
               {/* Hub uses the house circle so the cycle reads like the rest of the system. */}
