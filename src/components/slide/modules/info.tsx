@@ -18,6 +18,7 @@ import { OrbitDisc } from "../OrbitDisc";
 import { SEAM_HEIGHT_PX } from "@/lib/surface-tokens";
 import { accentInk } from "@/lib/accent-tokens";
 import { iconByName } from "@/lib/icon-library";
+import { cellAccent, cellIconScale } from "./cell-controls";
 import { fillPx } from "@/lib/open-space-fill";
 
 registerSlideModule({
@@ -81,6 +82,7 @@ registerSlideModule({
           side: "left" | "right";
         }) => {
           const NodeIcon = it.icon ? iconByName(s(it.icon)) : null;
+          const nodeAccent = cellAccent(it, accent, mode);
           const a = angleFor(i, total, side);
           const x = Math.cos(a) * ring;
           const y = Math.sin(a) * ring;
@@ -92,20 +94,20 @@ registerSlideModule({
                 height: node,
                 left: `calc(50% + ${x}px - ${node / 2}px)`,
                 top: `calc(50% + ${y}px - ${node / 2}px)`,
-                border: `1px solid color-mix(in oklab, ${accent} 46%, transparent)`,
+                border: `1px solid color-mix(in oklab, ${nodeAccent} 46%, transparent)`,
                 // Neutral base under the accent wash so the connector ring (and
                 // any ground pattern) is occluded rather than showing through the
                 // icon — same treatment as the pill-orbit chips.
                 backgroundColor: `color-mix(in oklab, ${isDark ? "#03002C" : "#FFFFFF"} ${isDark ? 72 : 82}%, transparent)`,
-                backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 10 : 5}%, transparent))`,
+                backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${nodeAccent} ${isDark ? 30 : 18}%, transparent), color-mix(in oklab, ${nodeAccent} ${isDark ? 10 : 5}%, transparent))`,
                 zIndex: 4,
               }}
             >
               {NodeIcon ? (
                 <NodeIcon
-                  size={Math.round(node * 0.42)}
+                  size={Math.round(node * 0.42 * cellIconScale(it))}
                   strokeWidth={1.8}
-                  color={accent}
+                  color={nodeAccent}
                   aria-hidden
                 />
               ) : (
@@ -351,6 +353,7 @@ registerSlideModule({
           const dy = rowOffset(i, total);
           const edge = innerEdge(dy);
           const PillIcon = it.icon ? iconByName(s(it.icon)) : null;
+          const pillAccent = cellAccent(it, accent, mode);
           const inner = side === "left" ? "right" : "left";
           return (
             <div
@@ -375,18 +378,18 @@ registerSlideModule({
                   height: 1,
                   [inner]: -(LEAD - 8),
                   transform: "translateY(-0.5px)",
-                  backgroundImage: `linear-gradient(${side === "left" ? "90deg" : "270deg"}, color-mix(in oklab, ${accent} 62%, transparent), transparent)`,
+                  backgroundImage: `linear-gradient(${side === "left" ? "90deg" : "270deg"}, color-mix(in oklab, ${pillAccent} 62%, transparent), transparent)`,
                 }}
               />
               <div
                 className="flex h-full items-center gap-3 px-5"
                 style={{
                   borderRadius: pillH / 2,
-                  border: `1px solid color-mix(in oklab, ${accent} ${isDark ? 46 : 34}%, transparent)`,
+                  border: `1px solid color-mix(in oklab, ${pillAccent} ${isDark ? 46 : 34}%, transparent)`,
                   // Neutral base under the accent wash so the chip holds its own
                   // against bright or busy patches of the ground.
                   backgroundColor: `color-mix(in oklab, ${isDark ? "#03002C" : "#FFFFFF"} ${isDark ? 62 : 58}%, transparent)`,
-                  backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 26 : 12}%, transparent), color-mix(in oklab, ${accent} ${isDark ? 8 : 3}%, transparent))`,
+                  backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${pillAccent} ${isDark ? 26 : 12}%, transparent), color-mix(in oklab, ${pillAccent} ${isDark ? 8 : 3}%, transparent))`,
                   flexDirection: side === "left" ? "row-reverse" : "row",
                 }}
               >
@@ -397,15 +400,15 @@ registerSlideModule({
                   style={{
                     width: Math.round(pillH * 0.56),
                     height: Math.round(pillH * 0.56),
-                    border: `1px solid color-mix(in oklab, ${accent} 48%, transparent)`,
-                    backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${accent} ${isDark ? 34 : 20}%, transparent), transparent)`,
+                    border: `1px solid color-mix(in oklab, ${pillAccent} 48%, transparent)`,
+                    backgroundImage: `linear-gradient(180deg, color-mix(in oklab, ${pillAccent} ${isDark ? 34 : 20}%, transparent), transparent)`,
                   }}
                 >
                   {PillIcon ? (
                     <PillIcon
-                      size={Math.round(pillH * 0.3)}
+                      size={Math.round(pillH * 0.3 * cellIconScale(it))}
                       strokeWidth={1.8}
-                      color={accent}
+                      color={pillAccent}
                       aria-hidden
                     />
                   ) : (
@@ -413,7 +416,7 @@ registerSlideModule({
                       style={{
                         fontSize: Math.round(pillH * 0.26),
                         fontWeight: 800,
-                        color: accent,
+                        color: pillAccent,
                         fontVariantNumeric: "tabular-nums",
                       }}
                     >
