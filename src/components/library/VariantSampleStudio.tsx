@@ -1989,6 +1989,7 @@ export function VariantSampleStudio({
                                   );
                                 })}
                               </div>
+                              ) : null}
 
                               {/* Alignment + fine offset inside the tile's glyph
                                   well. Tile styling is untouched. Only shown for
@@ -2040,7 +2041,7 @@ export function VariantSampleStudio({
                               </>
                               ) : null}
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       );
                     })}

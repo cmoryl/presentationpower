@@ -30,7 +30,7 @@ import { cellAccent, cellWash, iconWellStyle, cellIconScale } from "./cell-contr
 
 registerSlideModule({
   id: "family:process",
-  cellControls: { tone: true, iconNudge: true },
+  cellControls: { tone: true, icons: true, iconSize: true, iconNudge: true },
   variantIds: [
     "MV-PROC-TIMELINE",
     "MV-PROC-STEP-CHAIN",

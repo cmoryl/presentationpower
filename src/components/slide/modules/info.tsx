@@ -23,6 +23,7 @@ import { fillPx } from "@/lib/open-space-fill";
 
 registerSlideModule({
   id: "family:info",
+  cellControls: { tone: true, icons: true, iconSize: true },
   variantIds: [
     "MV-INFO-HUB-SATELLITES",
     "MV-INFO-HUB-PILL-ORBIT",
