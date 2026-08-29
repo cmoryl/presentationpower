@@ -45,6 +45,7 @@ export type PrintHeroMedia = {
   // headline at every breakpoint.
   autoFocal?: boolean;
   copyZone?: "left" | "right" | "center"; // where hero copy sits, default "left"
+  copyOffsetPct?: number; // -50..50 — vertical nudge of hero copy from centred baseline
   // Auto-generated per-mode treatments, merged over the base settings below.
   variants?: { light?: PrintHeroVariantOverrides; dark?: PrintHeroVariantOverrides };
   // Non-destructive crop + tone controls (zoom, pan, rotate, flip, tone).
