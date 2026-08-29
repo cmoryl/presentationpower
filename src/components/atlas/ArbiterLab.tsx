@@ -214,9 +214,9 @@ export function ArbiterLab({ ink }: { ink: string }) {
                       {decision.canvas.suggestedSlides === 1 ? "" : "s"}
                     </div>
                     <div>
-                      Type scale ×
-                      <span className="font-mono">{best.fill.type?.toFixed?.(2) ?? "1.00"}</span> ·
-                      load <span className="font-mono">{best.fill.load.toFixed(2)}</span>
+                      Display ×<span className="font-mono">{best.fill.display.toFixed(2)}</span> ·
+                      body ×<span className="font-mono">{best.fill.body.toFixed(2)}</span> · load{" "}
+                      <span className="font-mono">{best.fill.load.toFixed(2)}</span>
                     </div>
                   </dl>
 
