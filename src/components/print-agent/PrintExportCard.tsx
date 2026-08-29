@@ -1,14 +1,16 @@
 // Export step for the Print Agent chat: renders the selected page at full trim
 // size off-screen and downloads real print-ready deliverables (PDF, PNG, SVG).
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Download, FileImage, FileText, Shapes } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import type { PrintPageSizeKey } from "@/lib/print-asset-export";
 import {
+  assertPrintPageReady,
   downloadPrintPageAsset,
   printPageTrim,
+  waitForPrintPageReady,
   type PrintPageExportFormat,
 } from "@/lib/print-agent/page-export";
 import type {
@@ -18,6 +20,32 @@ import type {
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { PrintPagePreview } from "./PrintPagePreview";
+
+/**
+ * The staged page renders live layout code with agent-authored content. A crash
+ * in there used to take the whole chat route down and leave the export as a
+ * silent no-op; contain it and report it through the export toast instead.
+ */
+class StageBoundary extends Component<
+  { onError: (message: string) => void; children: ReactNode },
+  { failed: boolean }
+> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override componentDidCatch(err: unknown) {
+    this.props.onError(
+      err instanceof Error && err.message
+        ? `This page could not be rendered: ${err.message}`
+        : "This page could not be rendered for export.",
+    );
+  }
+  override render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
 
 export type PrintExportRequest = {
   assetId: string;
