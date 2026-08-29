@@ -1316,6 +1316,8 @@ export function FreeCanvasEditor({
               onDoubleClick={(e) => {
                 e.stopPropagation();
                 if (isText) setEditingId(b.id);
+                // Double-click an image to crop it, the way Figma/Keynote do.
+                else if (b.kind === "image" && b.src && !b.locked) setCropId(b.id);
               }}
             >
               {editing && isText ? (
