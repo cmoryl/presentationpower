@@ -460,9 +460,11 @@ function OverrideInspector() {
                 </p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   <span className={chip}>{p.moduleIds.length} modules</span>
-                  <span className={chip}>{p.packId ? skinLabel(p.packId) : "brand default"}</span>
+                  <span className={chip}>
+                    light {p.packId ? skinLabel(p.packId) : "brand default"}
+                  </span>
+                  <span className={chip}>dark {skinLabel(p.darkPackId)}</span>
                   {p.recipe ? <span className={chip}>recipe {p.recipe}</span> : null}
-                  <span className={chip}>light + dark</span>
                   <span className={chip}>
                     {p.enterprisePalette ? "enterprise palette" : `own accent ${p.tokens.accent}`}
                   </span>
@@ -470,6 +472,9 @@ function OverrideInspector() {
                     {issues.length === 0 ? "conformant" : `${issues.length} issue(s)`}
                   </span>
                 </div>
+                <p className="mt-1.5 text-[11px] text-[#03002C]/60 dark:text-white/60">
+                  {p.rationale}
+                </p>
                 {issues.length > 0 ? (
                   <ul className="mt-1 space-y-0.5 text-[11px] text-[#EC388A]">
                     {issues.map((i) => (

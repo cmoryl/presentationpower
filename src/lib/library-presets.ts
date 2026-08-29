@@ -12,6 +12,7 @@
 // and redirects to `/library` with those search params.
 // ---------------------------------------------------------------------------
 
+import { divisionDesignSpec } from "./division-design-specs";
 import { packIdForBrandMode } from "./look-brand";
 
 export type LibrarySearch = {
@@ -54,70 +55,70 @@ export const LIBRARY_PRESETS: LibraryPreset[] = [
     title: "TransPerfect Element",
     blurb: "The Element product identity on the S29 Element System skin.",
     kind: "product",
-    search: { scope: "bm-element", look: "skin-s29" },
+    search: { scope: "bm-element", look: divisionDesignSpec("bm-element").packId, recipe: divisionDesignSpec("bm-element").recipe },
   },
   {
     slug: "enterprise",
     title: "TransPerfect Enterprise",
     blurb: "The master brand set on the approved TransPerfect brand system.",
     kind: "company",
-    search: { scope: "bm-enterprise", look: null },
+    search: { scope: "bm-enterprise", look: divisionDesignSpec("bm-enterprise").packId, recipe: divisionDesignSpec("bm-enterprise").recipe },
   },
   {
     slug: "globallink",
     title: "GlobalLink",
     blurb: "Division module set with GlobalLink lockups and copy.",
     kind: "division",
-    search: { scope: "bm-division", look: null },
+    search: { scope: "bm-division", look: divisionDesignSpec("bm-division").packId, recipe: divisionDesignSpec("bm-division").recipe },
   },
   {
     slug: "life-sciences",
     title: "TransPerfect Life Sciences",
     blurb: "Regulatory, clinical and medical modules in the approved brand system.",
     kind: "division",
-    search: { scope: "bm-tp-lifesci", look: null },
+    search: { scope: "bm-tp-lifesci", look: divisionDesignSpec("bm-tp-lifesci").packId, recipe: divisionDesignSpec("bm-tp-lifesci").recipe },
   },
   {
     slug: "legal",
     title: "TransPerfect Legal",
     blurb: "eDiscovery, litigation and IP modules in the approved brand system.",
     kind: "division",
-    search: { scope: "bm-tp-legal", look: null },
+    search: { scope: "bm-tp-legal", look: divisionDesignSpec("bm-tp-legal").packId, recipe: divisionDesignSpec("bm-tp-legal").recipe },
   },
   {
     slug: "media",
     title: "TransPerfect Media",
     blurb: "Dubbing, subtitling and access-services modules.",
     kind: "division",
-    search: { scope: "bm-tp-media", look: null },
+    search: { scope: "bm-tp-media", look: divisionDesignSpec("bm-tp-media").packId, recipe: divisionDesignSpec("bm-tp-media").recipe },
   },
   {
     slug: "gaming",
     title: "TransPerfect Gaming",
     blurb: "Game localization, LQA and audio modules.",
     kind: "division",
-    search: { scope: "bm-tp-games", look: null },
+    search: { scope: "bm-tp-games", look: divisionDesignSpec("bm-tp-games").packId, recipe: divisionDesignSpec("bm-tp-games").recipe },
   },
   {
     slug: "digital",
     title: "TransPerfect Digital",
     blurb: "Digital marketing, web localization and experience modules.",
     kind: "division",
-    search: { scope: "bm-tp-digital", look: null },
+    search: { scope: "bm-tp-digital", look: divisionDesignSpec("bm-tp-digital").packId, recipe: divisionDesignSpec("bm-tp-digital").recipe },
   },
   {
     slug: "trial-interactive",
     title: "Trial Interactive",
     blurb: "eClinical module set with the Trial Interactive lockup.",
     kind: "company",
-    search: { scope: "bm-trial-interactive", look: null },
+    search: { scope: "bm-trial-interactive", look: divisionDesignSpec("bm-trial-interactive").packId, recipe: divisionDesignSpec("bm-trial-interactive").recipe },
   },
   {
     slug: "co-brand",
     title: "Co-brand",
     blurb: "Client / partner co-branded modules.",
     kind: "company",
-    search: { scope: "bm-cobrand", look: null },
+    search: { scope: "bm-cobrand", look: divisionDesignSpec("bm-cobrand").packId, recipe: divisionDesignSpec("bm-cobrand").recipe },
   },
   // Cross-brand cuts — same library, filtered to one kind of module.
   {
@@ -139,7 +140,7 @@ export const LIBRARY_PRESETS: LibraryPreset[] = [
     title: "Enterprise · Timelines & journeys",
     blurb: "Approved brand system, filtered to timeline, roadmap and process modules.",
     kind: "theme",
-    search: { scope: "bm-enterprise", look: null, tags: ["timeline"] },
+    search: { scope: "bm-enterprise", look: divisionDesignSpec("bm-enterprise").packId, recipe: divisionDesignSpec("bm-enterprise").recipe, tags: ["timeline"] },
   },
 ];
 
