@@ -45,7 +45,9 @@ import { designSkinByCode } from "@/lib/design-skins";
 import { industrySkinByCode } from "@/lib/industry-skins";
 import {
   BRAND_SYSTEM_CODE,
+  BRAND_SYSTEM_DARK_CODE,
   brandSystemPack,
+  isBrandSystemDarkPackId,
   isBrandSystemPackId,
 } from "@/lib/brand-system-template";
 
@@ -68,6 +70,7 @@ const LEGACY_FAMILY_TAB: { id: Family; label: string } = {
 function codeForPack(pack: StylePack): string {
   // The default brand system is a real, editable look with its own code, so its
   // theme + background edits never collide with Spatial Clarity's.
+  if (isBrandSystemDarkPackId(pack.id)) return BRAND_SYSTEM_DARK_CODE;
   if (isBrandSystemPackId(pack.id)) return BRAND_SYSTEM_CODE;
   if (isTemplatePackId(pack.id)) return templateCodeFromPackId(pack.id);
   if (pack.id.startsWith("skin-")) return pack.id.replace(/^skin-/, "").toUpperCase();
@@ -306,9 +309,14 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
   const rows = useMemo(() => {
     // The default brand system template is editable like any other look: it is
     // listed first so admins can retune its theme and section backgrounds.
-    const system = brandSystemPack();
+    // The master is a light/dark PAIR — both faces are listed so the navy dark
+    // look stays intact and separately editable.
+    const system = brandSystemPack("light");
+    const systemDark = brandSystemPack("dark");
     const listed =
-      system && !packs.some((p) => isBrandSystemPackId(p.id)) ? [system, ...packs] : packs;
+      system && !packs.some((p) => isBrandSystemPackId(p.id))
+        ? [system, ...(systemDark ? [systemDark] : []), ...packs]
+        : packs;
 
     const published = new Set(listed.map((p) => codeForPack(p).toUpperCase()));
     const drafts = templates
