@@ -9,11 +9,15 @@ import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
 import { buildDivisionRun, runDivisionStages, type DivisionRunReport } from "@/lib/division-run";
 import {
   createDeckFromDivisionRun,
+  createDeckFromBuiltStages,
   walkDeckAgainstSpec,
   type DeckWalkReport,
 } from "@/lib/division-deck-run";
+import { DeckApprovalPanel } from "@/components/atlas/DeckApprovalPanel";
+import { useDeckStore } from "@/lib/deck-store";
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
+
 
 // The stage graph (VariantRenderer + every module family) is large and only
 // needed once the reviewer asks to see the built slides, so it is code-split
@@ -63,12 +67,17 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
   // Materialised deck + the walk taken from that saved deck.
   const [walk, setWalk] = useState<DeckWalkReport | null>(null);
   const [walking, setWalking] = useState<{ done: number; total: number } | null>(null);
+  // Deck materialised straight from the live stage graph on screen.
+  const [staged, setStaged] = useState<{ deckId: string; title: string; slides: number } | null>(
+    null,
+  );
 
   const built = useMemo(() => (previews ? buildDivisionRun(plan) : []), [plan, previews]);
 
   useEffect(() => {
     setReport(null);
     setWalk(null);
+    setStaged(null);
   }, [plan]);
 
   // Build the run into a real deck, then walk the SAVED deck back against the
@@ -87,6 +96,32 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
       setWalking(null);
     }
   }
+
+  // LIVE STAGE → DECK: save exactly the stages already mounted on screen. No
+  // second arbitration or build pass, so the deck cannot drift from what the
+  // reviewer is looking at.
+  function materialiseStages() {
+    const stages = built.length > 0 ? built : buildDivisionRun(plan);
+    const { deck } = createDeckFromBuiltStages(plan, stages, { archetypeId });
+    setStaged({ deckId: deck.id, title: deck.title, slides: deck.slides.length });
+    return deck;
+  }
+
+  async function walkStagedDeck() {
+    const deck = staged ? (useDeckStore.getState().decks[staged.deckId] ?? null) : null;
+    const target = deck ?? materialiseStages();
+    setWalking({ done: 0, total: target.slides.length });
+    try {
+      const out = await walkDeckAgainstSpec(target, plan, {
+        onProgress: (done, total) => setWalking({ done, total }),
+      });
+      setWalk(out);
+      return out;
+    } finally {
+      setWalking(null);
+    }
+  }
+
 
   async function build() {
     setBusy({ done: 0, total: plan.slides.length });
@@ -258,6 +293,15 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
               ? `Walking deck ${walking.done}/${walking.total}…`
               : "Build into a deck & walk each slide"}
           </button>
+          <button
+            type="button"
+            onClick={() => materialiseStages()}
+            disabled={Boolean(walking)}
+            className="rounded-lg border px-3 py-2 text-sm font-medium disabled:opacity-60"
+            style={{ borderColor: `${ink}33`, color: ink }}
+          >
+            Materialise these stages into a deck
+          </button>
           <label className="flex items-center gap-2 text-sm text-black/65">
             <input
               type="checkbox"
@@ -272,6 +316,32 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
             </span>
           )}
         </div>
+        {staged && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-black/10 bg-black/[0.02] px-4 py-3 text-sm">
+            <span className="text-black/70">
+              Saved <span className="font-medium">{staged.title}</span> — {staged.slides} sheet
+              {staged.slides === 1 ? "" : "s"} straight from the stage graph.
+            </span>
+            <Link
+              to="/decks/$deckId"
+              params={{ deckId: staged.deckId }}
+              className="rounded-lg border px-3 py-1.5 text-xs font-medium"
+              style={{ borderColor: `${ink}33`, color: ink }}
+            >
+              Open the deck
+            </Link>
+            <button
+              type="button"
+              onClick={() => void walkStagedDeck()}
+              disabled={Boolean(walking)}
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-white disabled:opacity-60"
+              style={{ backgroundColor: ink }}
+            >
+              {walking ? `Reviewing ${walking.done}/${walking.total}…` : "Review it against spec"}
+            </button>
+          </div>
+        )}
+
         <p className="mt-2 max-w-3xl text-xs text-black/50">
           Each winner is seeded with real division content and mounted on the canonical 1920×1080
           export stage, then measured: rendered module, approved pack, planned face, pack surface
@@ -355,6 +425,10 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
           </div>
         </div>
       )}
+
+      {walk && <DeckApprovalPanel walk={walk} ink={ink} />}
+
+
 
 
       {previews && built.length > 0 && (
