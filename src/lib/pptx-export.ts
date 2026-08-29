@@ -6999,18 +6999,103 @@ function drawRingGauge(
 }
 
 // ── MV-DASH-DONUT-TRIO ──
+/**
+ * Native twin of `FreeformDonut` (module-primitives). The web donut is a
+ * 1px hairline track ring plus a 6px accent stroke arc on a 280px stage,
+ * with the numeral at 0.34x and a small tracked "%" beneath it. Everything
+ * below is that spec converted to inches/points so the exported shape is
+ * dimensionally identical to the build — no pack-driven ring band.
+ */
+function drawFreeformDonut(
+  s: PptxGenJS.Slide,
+  o: {
+    x: number;
+    y: number;
+    size: number;
+    pct: number;
+    accent: string;
+    track: string;
+    ink: string;
+  },
+) {
+  const { x, y, size } = o;
+  const pct = Math.max(0, Math.min(100, o.pct));
+  const PX = SLIDE_W / 1920; // stage pixel → inch
+  const sizePx = size / PX;
+  // Ring geometry: r = (size - stroke)/2 - 8 on the web → outer Ø 0.943×size.
+  const strokePx = 6;
+  const rPx = (sizePx - strokePx) / 2 - 8;
+  const ringD = (2 * rPx + strokePx) * PX;
+  const rx = x + (size - ringD) / 2;
+  const ry = y + (size - ringD) / 2;
+  const strokeIn = strokePx * PX;
+  const thickness = strokeIn / (ringD / 2);
+  const norm = (a: number) => ((Math.round(a) % 360) + 360) % 360;
+  // Hairline track — a 1pt stroked ellipse, exactly like the SVG track.
+  s.addShape("ellipse", {
+    x: rx + strokeIn / 2,
+    y: ry + strokeIn / 2,
+    w: ringD - strokeIn,
+    h: ringD - strokeIn,
+    fill: { color: "FFFFFF", transparency: 100 },
+    line: { color: o.track, width: 1 },
+  });
+  // Accent value arc, drawn from 12 o'clock clockwise.
+  if (pct > 0.5) {
+    s.addShape("blockArc", {
+      x: rx,
+      y: ry,
+      w: ringD,
+      h: ringD,
+      angleRange: [norm(-90), norm(-90 + Math.min(359.5, (360 * pct) / 100))],
+      arcThicknessRatio: thickness,
+      fill: { color: o.accent },
+      line: { color: o.accent, width: 0 },
+    } as unknown as PptxGenJS.ShapeProps);
+  }
+  // Centred numeral (0.34× stage) — px→pt is ×0.5 at a 13.333in stage.
+  const numeral = Math.max(12, Math.round(sizePx * 0.34 * 0.5));
+  s.addText(`${Math.round(pct)}`, {
+    x,
+    y: y + size * 0.5 - size * 0.28,
+    w: size,
+    h: size * 0.56,
+    fontSize: numeral,
+    bold: true,
+    color: o.ink,
+    fontFace: "Geist",
+    align: "center",
+    valign: "middle",
+  });
+  s.addText("%", {
+    x,
+    y: y + size * 0.5 + size * 0.13,
+    w: size,
+    h: size * 0.14,
+    fontSize: Math.max(7, Math.round(sizePx * 0.07 * 0.5)),
+    bold: true,
+    color: o.track,
+    charSpacing: 2,
+    fontFace: "Geist",
+    align: "center",
+    valign: "middle",
+  });
+}
+
 function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items).slice(0, 3);
-  const colW = (SLIDE_W - 1.2) / Math.max(items.length, 1);
+  // Always ONE row of three — never wrap to 2 + 1.
+  const n = Math.max(items.length, 1);
+  const colW = (SLIDE_W - 1.2) / n;
   // 280px gauge on a 1920px stage → 1.94in. Keeps the web proportions.
-  const size = Math.min(1.95, colW - 0.9);
+  const size = Math.max(1.35, Math.min(1.95, colW - 0.9));
   items.forEach((it, i) => {
     const cx = 0.6 + i * colW;
     const pct = Math.max(0, Math.min(100, num(it.value)));
     const gx = cx + (colW - size) / 2;
     const gy = y0 + 0.25;
-    drawRingGauge(s, {
+    drawFreeformDonut(s, {
       x: gx,
       y: gy,
       size,
@@ -7021,22 +7106,23 @@ function renderDashDonutTrio(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     });
     s.addText(str(it.label).toUpperCase(), {
       x: cx + 0.1,
-      y: gy + size + 0.45,
+      y: gy + size + 0.32,
       w: colW - 0.2,
-      h: 0.35,
-      fontSize: 11,
+      h: 0.3,
+      fontSize: 10,
       bold: true,
       color: p.primary,
       charSpacing: 3,
       fontFace: "Geist",
       align: "center",
+      valign: "middle",
     });
     s.addText(str(it.body), {
       x: cx + 0.25,
-      y: gy + size + 0.85,
+      y: gy + size + 0.68,
       w: colW - 0.5,
-      h: 1.1,
-      fontSize: 12,
+      h: 1.0,
+      fontSize: 11,
       color: bodyC(p),
       fontFace: "Geist",
       align: "center",
