@@ -6,6 +6,7 @@
 // auto content-fit switch, and module ordering / removal with a live capacity
 // readout driven by the same print-capacity engine the real editor uses.
 
+import { HeroCropStudio } from "@/components/print/HeroCropStudio";
 import { useMemo } from "react";
 import {
   ArrowDown,
@@ -207,6 +208,20 @@ export function PrintDemoStudioPanel({
                   </button>
                 );
               })}
+            </div>
+            {/* Full photo-editor crop: pan, zoom, straighten, flip and tone. */}
+            <div className="mt-3">
+              <HeroCropStudio
+                imageUrl={hero.imageUrl}
+                adjust={hero.adjust}
+                onChange={(adjust) => patchHero({ adjust })}
+                focalX={hero.focalX ?? 50}
+                focalY={hero.focalY ?? 45}
+                onFocalChange={({ focalX, focalY }) =>
+                  patchHero({ focalX, focalY, focalPoint: undefined })
+                }
+                dense
+              />
             </div>
           </>
         ) : (
