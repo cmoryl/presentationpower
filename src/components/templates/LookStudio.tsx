@@ -43,6 +43,11 @@ import type { TemplateBackgroundOverride } from "@/lib/template-registry";
 import { SKIN_SCENES } from "@/lib/skin-backgrounds";
 import { designSkinByCode } from "@/lib/design-skins";
 import { industrySkinByCode } from "@/lib/industry-skins";
+import {
+  BRAND_SYSTEM_CODE,
+  brandSystemPack,
+  isBrandSystemPackId,
+} from "@/lib/brand-system-template";
 
 type Family = "all" | "custom" | "core" | "industry" | "legacy";
 
@@ -61,12 +66,16 @@ const LEGACY_FAMILY_TAB: { id: Family; label: string } = {
 
 /** The code an override row is keyed by, for any pack id. */
 function codeForPack(pack: StylePack): string {
+  // The default brand system is a real, editable look with its own code, so its
+  // theme + background edits never collide with Spatial Clarity's.
+  if (isBrandSystemPackId(pack.id)) return BRAND_SYSTEM_CODE;
   if (isTemplatePackId(pack.id)) return templateCodeFromPackId(pack.id);
   if (pack.id.startsWith("skin-")) return pack.id.replace(/^skin-/, "").toUpperCase();
   return pack.id.toUpperCase();
 }
 
 function familyOf(pack: StylePack): Family {
+  if (isBrandSystemPackId(pack.id)) return "core";
   if (isTemplatePackId(pack.id)) return "custom";
   if (/^skin-s/i.test(pack.id)) return "core";
   if (/^skin-r/i.test(pack.id)) return "industry";
@@ -295,12 +304,18 @@ export function LookStudio({ heading }: { heading?: React.ReactNode }) {
 
   // Draft looks aren't in the pack registry, so list them alongside it.
   const rows = useMemo(() => {
-    const published = new Set(packs.map((p) => codeForPack(p).toUpperCase()));
+    // The default brand system template is editable like any other look: it is
+    // listed first so admins can retune its theme and section backgrounds.
+    const system = brandSystemPack();
+    const listed =
+      system && !packs.some((p) => isBrandSystemPackId(p.id)) ? [system, ...packs] : packs;
+
+    const published = new Set(listed.map((p) => codeForPack(p).toUpperCase()));
     const drafts = templates
       .filter((t) => t.status !== "published" && !published.has(t.code.toUpperCase()))
       .map((t) => ({ id: `draft-${t.code}`, template: t, pack: null as StylePack | null }));
     return [
-      ...packs.map((p) => ({
+      ...listed.map((p) => ({
         id: p.id,
         pack: p,
         template: templates.find((t) => t.code.toUpperCase() === codeForPack(p)) ?? null,

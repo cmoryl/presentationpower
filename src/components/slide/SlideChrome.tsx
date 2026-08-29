@@ -14,7 +14,11 @@ import { accentInk, hexA } from "@/lib/accent-tokens";
 import { AuroraLayer } from "@/components/slide/flagship";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { ENTERPRISE_WHITE, enterprisePalette, isEnterpriseWhite } from "@/lib/slide-skin";
-import { enterpriseGroundFor } from "@/lib/enterprise-grounds";
+import {
+  brandSystemGroundIsReplaced,
+  brandSystemLightGround,
+} from "@/lib/brand-system-template";
+
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { skinCodeFromPackId } from "@/lib/design-skin-pack";
@@ -1089,26 +1093,38 @@ export function SlideFrame({
           layout so colour lands away from the copy. */}
       {!hasBackdrop && !packOwnsGround && (enterprise || !slideDark) && !enterpriseDark && (
         <>
-          <div
-            aria-hidden
-            data-decorative="true"
-            className="pointer-events-none absolute inset-0"
-            style={{ background: enterpriseGroundFor(layoutId ?? variant, brand.tokens.accent) }}
-          />
-          {/* Grain — barely-there tactile finish, matches media tiles. */}
+          {/* The default brand system's white page paints the APPROVED Spatial
+              Clarity ground (plus any admin replacement or tuning saved for the
+              default system, code "BSYS"), so the master template and S01 read
+              as one white language instead of two. */}
           <div
             aria-hidden
             data-decorative="true"
             className="pointer-events-none absolute inset-0"
             style={{
-              backgroundImage: GRAIN_SVG,
-              backgroundSize: "160px 160px",
-              opacity: 0.035,
-              mixBlendMode: "multiply",
+              background: brandSystemLightGround(groundSeed, brand.tokens.accent),
+              backgroundSize: "cover",
+              backgroundPosition: "center",
             }}
           />
+          {/* Grain — barely-there tactile finish, matches media tiles. Skipped
+              when replacement artwork IS the page. */}
+          {!brandSystemGroundIsReplaced(groundSeed) && (
+            <div
+              aria-hidden
+              data-decorative="true"
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage: GRAIN_SVG,
+                backgroundSize: "160px 160px",
+                opacity: 0.035,
+                mixBlendMode: "multiply",
+              }}
+            />
+          )}
         </>
       )}
+
 
       {/* Enterprise DARK ground — same quiet master grammar as the white page,
           rendered on the brand navy floor with two soft accent washes placed in
