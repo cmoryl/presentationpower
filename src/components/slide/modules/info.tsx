@@ -792,17 +792,26 @@ registerSlideModule({
                 const cos = Math.cos(angle);
                 const sin = Math.sin(angle);
                 const x = STAGE_W / 2 + RX * cos;
-                const y = STAGE_H / 2 + RY * sin;
+                const rawY = STAGE_H / 2 + RY * sin;
                 // Anchor the block on the side of the point facing away from the hub.
                 const side =
                   Math.abs(cos) > 0.6 ? (cos > 0 ? "right" : "left") : sin < 0 ? "top" : "bottom";
                 const tx = side === "right" ? "0%" : side === "left" ? "-100%" : "-50%";
                 const ty = side === "top" ? "-100%" : side === "bottom" ? "0%" : "-50%";
+                // Keep vertical blocks inside the stage: a top block grows upward and
+                // a bottom block grows downward, so clamp their anchors by block height.
+                const BLOCK = 190;
+                const y =
+                  side === "top"
+                    ? Math.max(rawY, BLOCK)
+                    : side === "bottom"
+                      ? Math.min(rawY, STAGE_H - BLOCK)
+                      : rawY;
                 const iconFirst = side !== "top";
                 const Ic = pickKitIcon(s(it.label), i, s(it.icon));
                 const icon = (
                   <OrbitDisc
-                    size={76}
+                    size={68}
                     accent={brand.tokens.accent}
                     cool={brand.tokens.primary}
                     isDark={isDark}
@@ -812,14 +821,14 @@ registerSlideModule({
                     contentClassName="flex items-center justify-center"
                     style={{ color: "var(--slide-accent-text)" }}
                   >
-                    <Ic size={30} />
+                    <Ic size={28} />
                   </OrbitDisc>
                 );
                 const copy = (
                   <>
                     <div
                       style={{
-                        fontSize: fillPx(24, "body"),
+                        fontSize: fillPx(22, "body"),
                         fontWeight: 600,
                         letterSpacing: "-0.01em",
                         color: ink.strong,
@@ -827,7 +836,7 @@ registerSlideModule({
                     >
                       {s(it.label)}
                     </div>
-                    <SupportingText size="sm" opacity={0.72} className="mt-2">
+                    <SupportingText size="sm" opacity={0.72} className="mt-1.5">
                       {s(it.body)}
                     </SupportingText>
                   </>
@@ -835,13 +844,14 @@ registerSlideModule({
                 return (
                   <div
                     key={i}
-                    className="absolute w-[250px] text-center"
+                    className="absolute w-[240px] text-center"
                     style={{
                       left: x,
                       top: y,
                       transform: `translate(${tx}, ${ty})`,
                     }}
                   >
+
                     {iconFirst ? (
                       <>
                         {icon}
