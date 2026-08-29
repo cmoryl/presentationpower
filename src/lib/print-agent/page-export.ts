@@ -60,6 +60,63 @@ function triggerDownload(href: string, filename: string) {
   a.remove();
 }
 
+/**
+ * Off-screen export staging fails silently when the page never painted (a
+ * layout that threw mid-render, or content that hydrated after capture). Assert
+ * the node is real and carries artwork so the export toast can name the reason
+ * instead of writing a blank file or dying inside the rasterizer.
+ */
+export function assertPrintPageReady(node: HTMLElement | null | undefined): HTMLElement {
+  if (!node) throw new Error("The page could not be rendered for export.");
+  const rect = node.getBoundingClientRect();
+  if (rect.width < 8 || rect.height < 8)
+    throw new Error("The page rendered with no size — reopen the piece and try the export again.");
+  const hasText = (node.textContent ?? "").trim().length > 0;
+  const hasArt = node.querySelector("img, svg, canvas, video") !== null;
+  if (!hasText && !hasArt)
+    throw new Error(
+      "This page has no renderable content yet — add or fix its content, then export again.",
+    );
+  return node;
+}
+
+/**
+ * Wait until the staged page is actually paintable: fonts loaded, images
+ * decoded (bounded), then two frames of layout. Replaces a fixed short delay,
+ * which truncated heavy pages with hero imagery.
+ */
+export async function waitForPrintPageReady(
+  node: HTMLElement,
+  timeoutMs = 6000,
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  const remaining = () => Math.max(0, deadline - Date.now());
+  const cap = <T,>(p: Promise<T>) =>
+    Promise.race([p, new Promise<void>((r) => setTimeout(r, remaining()))]);
+
+  if (typeof document !== "undefined" && document.fonts) await cap(document.fonts.ready);
+
+  const images = Array.from(node.querySelectorAll("img"));
+  await cap(
+    Promise.all(
+      images.map((img) =>
+        img.complete && img.naturalWidth > 0
+          ? Promise.resolve()
+          : new Promise<void>((resolve) => {
+              const done = () => resolve();
+              img.addEventListener("load", done, { once: true });
+              img.addEventListener("error", done, { once: true });
+            }),
+      ),
+    ),
+  );
+
+  await new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 60)));
+  });
+}
+
+
 /** Rasterize the page at print resolution and return a PNG data URL. */
 async function rasterizePage(
   node: HTMLElement,
