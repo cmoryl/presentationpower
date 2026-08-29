@@ -23,6 +23,7 @@ import "@/components/slide/modules/register-all";
 import { findSlideModule } from "@/components/slide/module-registry";
 import { ENTERPRISE_BRAND_TOKENS, isTransPerfectBrandScope, resolveBrandMode } from "./brand-profiles";
 import { backdropSetFor } from "./division-backdrop-manifest";
+import { divisionDesignSpec, isKnownPackId } from "./division-design-specs";
 import { LIBRARY_PRESETS, type LibraryPreset } from "./library-presets";
 import { packIdForBrandMode } from "./look-brand";
 import { BRAND_MODES, MODULE_VARIANTS, type BrandMode } from "./taxonomy";
@@ -37,8 +38,12 @@ export type DivisionConformancePreset = {
   name: string;
   /** Showcase slug when a shareable library URL exists for this scope. */
   slug: string | null;
-  /** Approved style pack the division's slides must wear (null = brand default). */
+  /** Approved style pack the division's light-face slides must wear. */
   packId: string | null;
+  /** Approved style pack the division's dark-face slides must wear. */
+  darkPackId: string;
+  /** Why this look/recipe pairing belongs to this division. */
+  rationale: string;
   /** Industry ground recipe from the showcase preset, when one is pinned. */
   recipe: string | null;
   /** Faces every module in the set has to render in. */
@@ -79,12 +84,15 @@ export function divisionConformancePreset(brandModeId: string): DivisionConforma
   const brand = resolveBrandMode(brandModeId);
   const showcase = presetFor(brandModeId);
   const enterprisePalette = isTransPerfectBrandScope(brandModeId);
+  const spec = divisionDesignSpec(brandModeId);
   return {
     brandModeId,
     name: brand.name,
     slug: showcase?.slug ?? null,
-    packId: showcase?.search.look ?? packIdForBrandMode(brandModeId) ?? null,
-    recipe: showcase?.search.recipe ?? null,
+    packId: showcase?.search.look ?? packIdForBrandMode(brandModeId) ?? spec.packId,
+    darkPackId: spec.darkPackId,
+    rationale: spec.rationale,
+    recipe: showcase?.search.recipe ?? spec.recipe,
     faces: ["light", "dark"],
     tokens: enterprisePalette ? { ...ENTERPRISE_BRAND_TOKENS } : { ...brand.tokens },
     enterprisePalette,
@@ -123,6 +131,21 @@ export function conformanceSpecIssues(preset: DivisionConformancePreset): string
         );
       }
     }
+  }
+
+  for (const [key, id] of [
+    ["packId", preset.packId],
+    ["darkPackId", preset.darkPackId],
+  ] as const) {
+    if (!id) {
+      issues.push(`${preset.brandModeId}: ${key} is unset — the scope would fall back to the generic look`);
+    } else if (!isKnownPackId(id)) {
+      issues.push(`${preset.brandModeId}: ${key} "${id}" is not an approved style pack`);
+    }
+  }
+
+  if (!preset.recipe) {
+    issues.push(`${preset.brandModeId}: no industry ground recipe pinned`);
   }
 
   if (preset.faces.length !== 2) {
