@@ -14,6 +14,30 @@ import { Kicker, StatFigure } from "../primitives";
 import { ICON_SIZES, type IconSizeToken } from "@/lib/iconography";
 import { moduleCardSurface, AccentTick } from "../flagship";
 import { fillPx } from "@/lib/open-space-fill";
+import { itemTone, itemToneEnd, toneWashGradient } from "@/lib/item-tone";
+
+/**
+ * Per-cell studio controls the mosaic honours live: `tone` / `toneEnd` recolour
+ * this cell's wash and accent tick, and `iconAlign` / `iconOffsetPct` nudge the
+ * glyph inside its row without moving the copy. Unset cells render exactly as
+ * before, so saved samples are untouched.
+ */
+function cellTone(it: Record<string, unknown>, accent: string) {
+  const start = itemTone(it);
+  return {
+    accent: start ?? accent,
+    wash: start ? toneWashGradient(start, itemToneEnd(it)) : undefined,
+  };
+}
+
+function iconWellStyle(it: Record<string, unknown>) {
+  const align = String(it.iconAlign ?? "center");
+  const offset = Math.max(-40, Math.min(40, Number(it.iconOffsetPct ?? 0) || 0));
+  return {
+    alignItems: align === "top" ? "flex-start" : align === "bottom" ? "flex-end" : "center",
+    transform: offset ? `translateY(${offset}%)` : undefined,
+  } as const;
+}
 
 const MOSAIC: Record<number, { cols: string; rows: string; areas: string[] }> = {
   5: { cols: "1.5fr 1fr 1fr", rows: "1fr 1fr", areas: ['"a b c"', '"a d e"'] },
@@ -73,17 +97,31 @@ registerSlideModule({
             height: 720,
           }}
         >
-          <div className={cellClass} style={{ ...cellStyle, gridArea: "a" }}>
-            <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+          <div
+            className={cellClass}
+            style={{
+              ...cellStyle,
+              gridArea: "a",
+              backgroundImage: cellTone(anchor, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
+            }}
+          >
+            <AccentTick
+              accent={cellTone(anchor, brand.tokens.accent).accent}
+              height={3}
+              radius={22}
+            />
             <div
               className="pointer-events-none absolute"
               style={{
                 inset: "-30% -40% auto -30%",
                 height: "70%",
-                background: `radial-gradient(60% 60% at 30% 20%, color-mix(in oklab, ${brand.tokens.accent} 22%, transparent), transparent 70%)`,
+                background: `radial-gradient(60% 60% at 30% 20%, color-mix(in oklab, ${cellTone(anchor, brand.tokens.accent).accent} 22%, transparent), transparent 70%)`,
               }}
             />
-            <div className="relative flex items-center gap-4">
+            <div
+              className="relative flex items-center gap-4"
+              style={iconWellStyle(anchor)}
+            >
               <IconBadge
                 brand={brand}
                 label={s(anchor.title)}
@@ -111,7 +149,7 @@ registerSlideModule({
                   height: 3,
                   width: 96,
                   marginBottom: 24,
-                  backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, transparent)`,
+                  backgroundImage: `linear-gradient(90deg, ${cellTone(anchor, brand.tokens.accent).accent}, transparent)`,
                 }}
               />
               <div
@@ -145,7 +183,11 @@ registerSlideModule({
             if (kind === "media") {
               return (
                 <div key={i} style={{ ...cellStyle, gridArea: area }}>
-                  <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
+                  <AccentTick
+                    accent={cellTone(it, brand.tokens.accent).accent}
+                    height={3}
+                    radius={22}
+                  />
                   <MediaTile
                     brand={brand}
                     seed={s(it.mediaSeed, s(it.title, `bento-${i}`))}
@@ -172,7 +214,7 @@ registerSlideModule({
                         height: 2,
                         width: 56,
                         marginBottom: 12,
-                        backgroundImage: `linear-gradient(90deg, ${brand.tokens.accent}, transparent)`,
+                        backgroundImage: `linear-gradient(90deg, ${cellTone(it, brand.tokens.accent).accent}, transparent)`,
                       }}
                     />
                     <div
@@ -190,9 +232,21 @@ registerSlideModule({
               );
             }
             return (
-              <div key={i} className={cellClass} style={{ ...cellStyle, gridArea: area }}>
-                <AccentTick accent={brand.tokens.accent} height={3} radius={22} />
-                <div className="flex items-center gap-4">
+              <div
+                key={i}
+                className={cellClass}
+                style={{
+                  ...cellStyle,
+                  gridArea: area,
+                  backgroundImage: cellTone(it, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
+                }}
+              >
+                <AccentTick
+                  accent={cellTone(it, brand.tokens.accent).accent}
+                  height={3}
+                  radius={22}
+                />
+                <div className="flex items-center gap-4" style={iconWellStyle(it)}>
                   <IconBadge
                     brand={brand}
                     label={s(kind === "stat" ? it.label : it.title)}
