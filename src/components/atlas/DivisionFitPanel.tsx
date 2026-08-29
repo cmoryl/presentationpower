@@ -9,8 +9,10 @@ import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
 import { buildDivisionRun, runDivisionStages, type DivisionRunReport } from "@/lib/division-run";
 import {
   createDeckFromDivisionRun,
+  createDeckFromBuiltStages,
   walkDeckAgainstSpec,
   type DeckWalkReport,
+
 } from "@/lib/division-deck-run";
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
