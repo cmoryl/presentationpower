@@ -9,6 +9,8 @@ import {
   clampToStage,
   rectsIntersect,
   GRID,
+  MARGIN_X,
+  MARGIN_Y,
   snapMove,
   snapResize,
   stageScaleFromRect,
