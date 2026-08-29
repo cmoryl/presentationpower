@@ -755,52 +755,63 @@ registerSlideModule({
       case "MV-INFO-CIRCULAR-FLOW": {
         const items = arr(c.items).slice(0, 6);
         const n = Math.max(items.length, 1);
-        // Stage geometry: the hub disc is 300px wide, so nodes ride an orbit well
-        // clear of it and every label block is anchored *outward* from the ring so
-        // copy can never overlap the hub or its rings.
+        // Stage geometry: the whole cycle must live inside the 1080 stage under the
+        // title, so the orbit is sized from the remaining height rather than a
+        // fixed tall box. Radii stay clear of the hub disc at every count.
         const STAGE_W = 1180;
-        const STAGE_H = 820;
-        const RX = 430;
-        const RY = 300;
+        const STAGE_H = 620;
+        const HUB = 232;
+        const RX = 420;
+        const RY = 214;
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, "The cycle")} />
             <div
-              className="relative mx-auto mt-10"
+              className="relative mx-auto mt-4"
               style={{ height: STAGE_H, width: STAGE_W, maxWidth: "100%" }}
             >
               {/* Hub uses the house circle so the cycle reads like the rest of the system. */}
               <div className="absolute inset-0 grid place-items-center">
                 <OrbitDisc
-                  size={300}
+                  size={HUB}
                   accent={brand.tokens.accent}
                   cool={brand.tokens.primary}
                   isDark={isDark}
                 >
                   <div
-                    className="px-2 text-3xl font-semibold leading-tight"
+                    className="px-2 text-2xl font-semibold leading-tight"
                     style={{ color: ink.strong }}
                   >
                     {s(c.hub, "Program")}
                   </div>
                 </OrbitDisc>
               </div>
+
               {items.map((it, i) => {
                 const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
                 const cos = Math.cos(angle);
                 const sin = Math.sin(angle);
                 const x = STAGE_W / 2 + RX * cos;
-                const y = STAGE_H / 2 + RY * sin;
+                const rawY = STAGE_H / 2 + RY * sin;
                 // Anchor the block on the side of the point facing away from the hub.
                 const side =
                   Math.abs(cos) > 0.6 ? (cos > 0 ? "right" : "left") : sin < 0 ? "top" : "bottom";
                 const tx = side === "right" ? "0%" : side === "left" ? "-100%" : "-50%";
                 const ty = side === "top" ? "-100%" : side === "bottom" ? "0%" : "-50%";
+                // Keep vertical blocks inside the stage: a top block grows upward and
+                // a bottom block grows downward, so clamp their anchors by block height.
+                const BLOCK = 190;
+                const y =
+                  side === "top"
+                    ? Math.max(rawY, BLOCK)
+                    : side === "bottom"
+                      ? Math.min(rawY, STAGE_H - BLOCK)
+                      : rawY;
                 const iconFirst = side !== "top";
                 const Ic = pickKitIcon(s(it.label), i, s(it.icon));
                 const icon = (
                   <OrbitDisc
-                    size={76}
+                    size={68}
                     accent={brand.tokens.accent}
                     cool={brand.tokens.primary}
                     isDark={isDark}
@@ -810,14 +821,14 @@ registerSlideModule({
                     contentClassName="flex items-center justify-center"
                     style={{ color: "var(--slide-accent-text)" }}
                   >
-                    <Ic size={30} />
+                    <Ic size={28} />
                   </OrbitDisc>
                 );
                 const copy = (
                   <>
                     <div
                       style={{
-                        fontSize: fillPx(24, "body"),
+                        fontSize: fillPx(22, "body"),
                         fontWeight: 600,
                         letterSpacing: "-0.01em",
                         color: ink.strong,
@@ -825,7 +836,7 @@ registerSlideModule({
                     >
                       {s(it.label)}
                     </div>
-                    <SupportingText size="sm" opacity={0.72} className="mt-2">
+                    <SupportingText size="sm" opacity={0.72} className="mt-1.5">
                       {s(it.body)}
                     </SupportingText>
                   </>
@@ -833,7 +844,7 @@ registerSlideModule({
                 return (
                   <div
                     key={i}
-                    className="absolute w-[250px] text-center"
+                    className="absolute w-[240px] text-center"
                     style={{
                       left: x,
                       top: y,
@@ -843,14 +854,15 @@ registerSlideModule({
                     {iconFirst ? (
                       <>
                         {icon}
-                        <div className="mt-4">{copy}</div>
+                        <div className="mt-3">{copy}</div>
                       </>
                     ) : (
                       <>
-                        <div className="mb-4">{copy}</div>
+                        <div className="mb-3">{copy}</div>
                         {icon}
                       </>
                     )}
+
                   </div>
                 );
               })}
