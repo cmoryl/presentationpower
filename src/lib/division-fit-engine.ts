@@ -19,7 +19,6 @@ import {
   type CanvasRecommendation,
 } from "./layout-arbiter";
 import { divisionConformancePreset } from "./division-conformance";
-import { BRAND_PROFILES } from "./brand-profiles";
 import { divisionDesignSpec } from "./division-design-specs";
 import { NARRATIVE_ARCHETYPES, SECTION_FRAMEWORKS, byId } from "./taxonomy";
 import type { TemplateLevel } from "./section-templates";
@@ -118,31 +117,8 @@ export function planDivisionFit(brief: DivisionFitBrief): DivisionFitPlan {
       avoid: neighbours,
     };
     const decision = arbitrateLayout(layoutBrief);
-    // Brand governance tiebreak: when a variant the brand has actually curated
-    // scores within a whisker of the raw winner, the curated one wins. Keeps
-    // the run inside the brand's preferred set without overriding a materially
-    // better layout.
-    const preferredIds = new Set(
-      BRAND_PROFILES[brief.brandModeId]?.contentScope.preferredVariantIds ?? [],
-    );
-    const rawBest = decision.best;
-    const curatedClose =
-      rawBest && !preferredIds.has(rawBest.variantId)
-        ? (decision.candidates.find(
-            (c) =>
-              preferredIds.has(c.variantId) &&
-              c.feasible &&
-              rawBest.score - c.score <= 0.03 &&
-              !neighbours.includes(c.variantId),
-          ) ?? null)
-        : null;
-    const best = curatedClose ?? rawBest;
+    const best = decision.best;
     const notes: string[] = [];
-    if (curatedClose && rawBest) {
-      notes.push(
-        `brand-preferred ${curatedClose.variantId} taken over ${rawBest.variantId} (within 0.03 of the top score)`,
-      );
-    }
 
     if (best && neighbours.includes(best.variantId)) {
       notes.push("no unrepeated alternative held this content — repeat is deliberate");
