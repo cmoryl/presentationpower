@@ -355,7 +355,9 @@ registerSlideModule({
             <div
               className="slide-fill-stretch mt-12 grid"
               style={{
-                gridTemplateColumns: `repeat(${Math.min(items.length || 1, dash.metricColumns)}, 1fr)`,
+                // The donut trio is always ONE row of three — a look's
+                // quadrant flow must never wrap it to 2 + 1.
+                gridTemplateColumns: `repeat(${Math.max(1, items.length || 1)}, 1fr)`,
                 gap: 64 * dash.gap,
               }}
             >
