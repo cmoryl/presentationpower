@@ -60,14 +60,15 @@ export type DeckWalkReport = {
 };
 
 /**
- * Turn a planned run into a loss-free deck snapshot: per-slide face, the
- * division's light AND dark approved packs, and the division ground recipe.
+ * Turn ALREADY-BUILT stages into a deck snapshot. The Systems panel keeps the
+ * live stage graph it is showing on screen; this lets it materialise exactly
+ * those sheets without re-running the arbiter/build pass.
  */
-export function divisionRunToDeckSnapshot(
+export function builtStagesToDeckSnapshot(
   plan: DivisionFitPlan,
+  built: BuiltDivisionSlide[],
   opts: { title?: string; archetypeId?: string } = {},
 ): DeckSnapshot {
-  const built = buildDivisionRun(plan);
   const preset = divisionConformancePreset(plan.brandModeId);
   return {
     title: opts.title ?? `${plan.name} — division run`,
@@ -98,6 +99,32 @@ export function divisionRunToDeckSnapshot(
     })),
   };
 }
+
+/**
+ * Turn a planned run into a loss-free deck snapshot: per-slide face, the
+ * division's light AND dark approved packs, and the division ground recipe.
+ */
+export function divisionRunToDeckSnapshot(
+  plan: DivisionFitPlan,
+  opts: { title?: string; archetypeId?: string } = {},
+): DeckSnapshot {
+  return builtStagesToDeckSnapshot(plan, buildDivisionRun(plan), opts);
+}
+
+/**
+ * Live stage → deck materialiser: save the stage graph the panel already holds,
+ * with no second build pass.
+ */
+export function createDeckFromBuiltStages(
+  plan: DivisionFitPlan,
+  built: BuiltDivisionSlide[],
+  opts: { title?: string; archetypeId?: string } = {},
+): { deckId: string; briefId: string; deck: Deck } {
+  const snapshot = builtStagesToDeckSnapshot(plan, built, opts);
+  const { deckId, briefId } = useDeckStore.getState().createDeckFromSnapshot(snapshot);
+  return { deckId, briefId, deck: useDeckStore.getState().decks[deckId] };
+}
+
 
 /** Materialise the run in the deck store and return the saved deck. */
 export function createDeckFromDivisionRun(
