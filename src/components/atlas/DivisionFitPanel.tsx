@@ -426,6 +426,8 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
         </div>
       )}
 
+      {(staged || walk) && <QaFitPanel deckId={(staged?.deckId ?? walk!.deckId)} ink={ink} />}
+
       {walk && <DeckApprovalPanel walk={walk} ink={ink} />}
 
 
