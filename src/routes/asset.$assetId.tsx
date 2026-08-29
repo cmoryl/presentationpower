@@ -1805,26 +1805,35 @@ function AssetEditor() {
                             });
                             return;
                           }
-                          // Optional sections map to the content field they own.
-                          // Every removal is undoable: we snapshot the previous
-                          // value and restore it from the toast action.
-                          const field = SECTION_CLEARABLE_FIELDS[key];
-                          if (!field) {
+                          // Built-in sections are *hidden*, not cleared. Clearing
+                          // the field let the layout synthesise a replacement
+                          // (footer default links, engagement bullets from the
+                          // expert block, hero fallback plates) — which read as
+                          // "the section keeps coming back". Hiding keeps the
+                          // authored data intact and nothing can repopulate it.
+                          if (!SECTION_CLEARABLE_FIELDS[key]) {
                             toast.info(
                               `"${key}" is a core part of this layout — edit it in the inspector instead.`,
                             );
                             return;
                           }
-                          const bag = rawContent as unknown as Record<string, unknown>;
-                          const prevValue = bag[field];
-                          const emptied = Array.isArray(prevValue) ? [] : undefined;
-                          patchContent({ [field]: emptied } as never);
                           const label =
                             SECTION_DELETE_LABELS[key] ?? key.replace(/([A-Z])/g, " $1");
+                          if (isSectionHidden(rawContent, key)) {
+                            toast.info(`${label} is already removed from this page`);
+                            return;
+                          }
+                          patchContent({
+                            hiddenSections: withSectionHidden(rawContent, key),
+                          } as never);
                           toast.success(`${label} removed`, {
+                            description: "Copy is kept — restore it any time.",
                             action: {
                               label: "Undo",
-                              onClick: () => patchContent({ [field]: prevValue } as never),
+                              onClick: () =>
+                                patchContent({
+                                  hiddenSections: withSectionShown(rawContent, key),
+                                } as never),
                             },
                           });
                         }}
