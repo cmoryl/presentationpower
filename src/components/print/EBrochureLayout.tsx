@@ -22,6 +22,7 @@ import {
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
+import { hiddenSectionSet } from "@/lib/print-hidden-sections";
   PAGE_W,
   cq,
   padCq,
@@ -107,7 +108,10 @@ export function EBrochureLayout({
   });
 
   const sections = (Array.isArray(content.sections) ? content.sections : []).slice(0, 3);
-  const stats = (Array.isArray(content.stats) ? content.stats : []).slice(0, 5);
+  const hidden = hiddenSectionSet(content);
+  const stats = hidden.has("stats")
+    ? []
+    : (Array.isArray(content.stats) ? content.stats : []).slice(0, 5);
 
 
   return (
@@ -133,7 +137,7 @@ export function EBrochureLayout({
                 style={{ background: "#FFFFFF", zIndex: 0 }}
               />
             )}
-            {content.heroMedia ? (
+            {content.heroMedia && !hidden.has("hero") ? (
               <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
             ) : null}
 
@@ -354,9 +358,9 @@ export function EBrochureLayout({
               )}
 
               {/* QUOTE + DISCOVER PANEL */}
-              {(content.quote || content.discover) && (
+              {((content.quote && !hidden.has("quote")) || content.discover) && (
                 <div className="flex" style={{ gap: cq(16), paddingTop: cq(26), flex: 1 }}>
-                  {content.quote && (
+                  {content.quote && !hidden.has("quote") && (
                     <div
                       data-section="quote"
                       data-section-label="Quote"
@@ -448,7 +452,7 @@ export function EBrochureLayout({
               />
 
               {/* CTA BAND */}
-              {content.cta && (
+              {content.cta && !hidden.has("cta") && (
                 <div data-section="cta" data-section-label="Call to action">
                   <PrintCTABand
                     brand={brand}
@@ -461,7 +465,9 @@ export function EBrochureLayout({
               )}
 
               {/* FOOTER */}
-              <PrintFooterLockup brand={brand} mode={mode} cq={cq} links={["transperfect.com"]} />
+              {!hidden.has("footer") && (
+                <PrintFooterLockup brand={brand} mode={mode} cq={cq} links={["transperfect.com"]} />
+              )}
             </div>
           </div>
         </PrintSurfaceProvider>

@@ -21,6 +21,7 @@ import {
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
+import { hiddenSectionSet } from "@/lib/print-hidden-sections";
   PAGE_W,
   cq,
   padCq,
@@ -114,8 +115,13 @@ export function AdaptorBriefLayout({
     containerWidth: PAGE_W,
   });
 
-  const features = (Array.isArray(content.features) ? content.features : []).slice(0, 6);
-  const knowHow = (Array.isArray(content.knowHow) ? content.knowHow : []).slice(0, 5);
+  const hidden = hiddenSectionSet(content);
+  const features = hidden.has("features")
+    ? []
+    : (Array.isArray(content.features) ? content.features : []).slice(0, 6);
+  const knowHow = hidden.has("knowHow")
+    ? []
+    : (Array.isArray(content.knowHow) ? content.knowHow : []).slice(0, 5);
 
 
   return (
@@ -141,7 +147,7 @@ export function AdaptorBriefLayout({
                 style={{ background: "#FFFFFF", zIndex: 0 }}
               />
             )}
-            {content.heroMedia ? (
+            {content.heroMedia && !hidden.has("hero") ? (
               <PrintHeroMediaLayer media={content.heroMedia} accent={accent} mode={mode} cq={cq} />
             ) : null}
 
@@ -372,7 +378,7 @@ export function AdaptorBriefLayout({
               )}
 
               {/* QUOTE */}
-              {content.quote && (
+              {content.quote && !hidden.has("quote") && (
                 <div
                   data-section="quote"
                   data-section-label="Quote"
@@ -428,13 +434,14 @@ export function AdaptorBriefLayout({
               />
 
               {/* CTA BAND */}
-              {content.cta && (
+              {content.cta && !hidden.has("cta") && (
                 <div data-section="cta" data-section-label="Call to action">
                   <PrintCTABand brand={brand} mode={mode} label={content.cta.label} cq={cq} />
                 </div>
               )}
 
               {/* FOOTER */}
+              {!hidden.has("footer") && (
               <PrintFooterLockup
                 brand={brand}
                 mode={mode}
