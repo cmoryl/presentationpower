@@ -1,6 +1,6 @@
 // Export step for the Print Agent chat: renders the selected page at full trim
 // size off-screen and downloads real print-ready deliverables (PDF, PNG, SVG).
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Download, FileImage, FileText, Shapes } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,10 @@ import type { PrintPageSizeKey } from "@/lib/print-asset-export";
 import {
   downloadPrintPageAsset,
   printPageTrim,
+  stagePrintPageForExport,
   type PrintPageExportFormat,
 } from "@/lib/print-agent/page-export";
+
 import type {
   PrintAssetKind,
   PrintDensity,
@@ -18,6 +20,32 @@ import type {
   PrintPageSize,
 } from "@/lib/print-assets.types";
 import { PrintPagePreview } from "./PrintPagePreview";
+
+/**
+ * The staged page renders live layout code with agent-authored content. A crash
+ * in there used to take the whole chat route down and leave the export as a
+ * silent no-op; contain it and report it through the export toast instead.
+ */
+class StageBoundary extends Component<
+  { onError: (message: string) => void; children: ReactNode },
+  { failed: boolean }
+> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override componentDidCatch(err: unknown) {
+    this.props.onError(
+      err instanceof Error && err.message
+        ? `This page could not be rendered: ${err.message}`
+        : "This page could not be rendered for export.",
+    );
+  }
+  override render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
 
 export type PrintExportRequest = {
   assetId: string;
@@ -55,13 +83,6 @@ const FORMAT_META: Record<
   svg: { label: "SVG", hint: "Page-sized vector container", Icon: Shapes },
 };
 
-/** Wait for layout + paint of the freshly mounted off-screen page. */
-function nextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 120)));
-  });
-}
-
 export function PrintExportCard({ request }: { request: PrintExportRequest }) {
   const [row, setRow] = useState<Row | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +90,7 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const stageErrorRef = useRef<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -99,11 +121,9 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
     async (list: PrintPageExportFormat[], label: string) => {
       if (!row || busy) return;
       setBusy(label);
+      stageErrorRef.current = null;
       setStaged(true);
       try {
-        await nextPaint();
-        const node = stageRef.current?.querySelector<HTMLElement>("[data-print-page]");
-        if (!node) throw new Error("The page could not be rendered for export.");
         const base = `${(row.title || "print-page").slice(0, 60)}-p${pageIndex + 1}`;
         await runWithExportFeedback(
           {
@@ -113,6 +133,12 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
             successDescription: `${row.title} · page ${pageIndex + 1} · ${pageSize}`,
           },
           async () => {
+            setStatus("Rendering the page at trim size…");
+            const node = await stagePrintPageForExport(stageRef.current, {
+              onProgress: setStatus,
+            });
+            if (stageErrorRef.current) throw new Error(stageErrorRef.current);
+
             for (const format of list) {
               setStatus(`Writing ${format.toUpperCase()}…`);
               await downloadPrintPageAsset(format, node, {
@@ -126,6 +152,7 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
         );
       } catch {
         // runWithExportFeedback already surfaced the reason.
+        if (stageErrorRef.current) setError(stageErrorRef.current);
       } finally {
         setStatus(null);
         setBusy(null);
@@ -134,6 +161,8 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
     },
     [busy, mode, pageIndex, pageSize, row],
   );
+
+
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
@@ -198,17 +227,24 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
           style={{ width: `${trim.widthIn * 96}px` }}
         >
           <div data-print-page style={{ width: "100%" }}>
-            <PrintPagePreview
-              kind={row.kind as PrintAssetKind}
-              content={row.content}
-              divisionId={row.brand_mode_id ?? request.divisionId ?? null}
-              mode={mode}
-              pageSize={pageSize}
-              density={(ctx?.density ?? "standard") as PrintDensity}
-              pageIndex={pageIndex}
-              className="!rounded-none !border-0"
-            />
+            <StageBoundary
+              onError={(message) => {
+                stageErrorRef.current = message;
+              }}
+            >
+              <PrintPagePreview
+                kind={row.kind as PrintAssetKind}
+                content={row.content}
+                divisionId={row.brand_mode_id ?? request.divisionId ?? null}
+                mode={mode}
+                pageSize={pageSize}
+                density={(ctx?.density ?? "standard") as PrintDensity}
+                pageIndex={pageIndex}
+                className="!rounded-none !border-0"
+              />
+            </StageBoundary>
           </div>
+
         </div>
       ) : null}
     </div>

@@ -119,7 +119,7 @@ export function SpotlightLayout({
   });
 
   // Content slices
-  const stats = content.stats.slice(0, 4);
+  const stats = (Array.isArray(content.stats) ? content.stats : []).slice(0, 4);
   const columns = content.capabilities.slice(0, 3);
   const proofBullets = content.capabilities.slice(3, 6).map((c) => c.heading);
   const expertBullets =
