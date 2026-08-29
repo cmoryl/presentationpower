@@ -76,7 +76,7 @@ export function brandSystemDarkLayers(accentHex?: string): string[] {
 /** CSS background for the master's dark page, including any admin edit. */
 export function brandSystemDarkGround(seed: string, accentHex?: string): string {
   const layers = resolveGroundLayers(
-    brandSystemDarkLayers(accentHex),
+    () => brandSystemDarkLayers(accentHex),
     BRAND_SYSTEM_DARK_CODE,
     seed,
     BRAND_SYSTEM_DARK_SURFACE,
@@ -153,7 +153,7 @@ export function brandSystemPack(mode: "light" | "dark" = "light"): StylePack | n
       },
       ground: (seed: string) =>
         resolveGroundLayers(
-          brandSystemDarkLayers(ENTERPRISE_WHITE.accent),
+          () => brandSystemDarkLayers(ENTERPRISE_WHITE.accent),
           BRAND_SYSTEM_DARK_CODE,
           seed,
           BRAND_SYSTEM_DARK_SURFACE,
