@@ -36,6 +36,11 @@ import { SOCIAL_FORMATS, KIT_PROFILES } from "@/lib/social-formats";
 import { SOCIAL_STYLES } from "@/lib/social-styles";
 import { SOCIAL_PLAYBOOKS } from "@/lib/social-playbooks";
 import { EVENT_PLAYBOOKS } from "@/lib/event-playbooks";
+import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
+import { LEVEL_ROLE, TEMPLATE_LEVELS, templateLibrarySize } from "@/lib/section-templates";
+import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
+import { PREFLIGHT_PROFILES } from "@/lib/print-preflight";
+import { arbitrateLayout } from "@/lib/layout-arbiter";
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
@@ -68,7 +73,7 @@ export const Route = createFileRoute("/atlas")({
 const BLUE = "#003FC7";
 const NAVY = "#03002C";
 
-type SegmentId = "presentation" | "print" | "social" | "events" | "style";
+type SegmentId = "presentation" | "print" | "social" | "events" | "style" | "systems";
 
 const SEGMENTS: Array<{
   id: SegmentId;
@@ -100,6 +105,13 @@ const SEGMENTS: Array<{
     label: "Events",
     ink: "#0F5C1A",
     blurb: "Event playbooks with phases, deliverables, and the KPIs each one is judged on.",
+  },
+  {
+    id: "systems",
+    label: "Systems",
+    ink: "#6A2BD9",
+    blurb:
+      "The engines behind the blocks: per-division design specs, the reading-level template library, the layout arbiter that scores every legal combination, the fit engines, and the print preflight contract.",
   },
   {
     id: "style",
@@ -161,6 +173,7 @@ function Atlas() {
       {segment === "print" && <PrintSegment ink={active.ink} />}
       {segment === "social" && <SocialSegment ink={active.ink} />}
       {segment === "events" && <EventsSegment ink={active.ink} />}
+      {segment === "systems" && <SystemsSegment ink="#6A2BD9" />}
       {segment === "style" && <StyleLibrarySegment />}
 
       <div
@@ -1264,5 +1277,209 @@ function TypographySection() {
         </div>
       </div>
     </Section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Systems — the engines, read live from their own source of truth so this
+// segment cannot drift from the code the assembler actually runs.
+// ---------------------------------------------------------------------------
+
+const FIT_ENGINES: Array<{ name: string; module: string; does: string }> = [
+  {
+    name: "Open-space auto-fill",
+    module: "open-space-fill.ts",
+    does: "Measures authored load, then grows or tightens type, figures, gaps and plate padding per module family — with hard px floors so nothing goes unreadable.",
+  },
+  {
+    name: "Copy-fit",
+    module: "primitives.tsx · copyFitScale()",
+    does: "Deterministic headline scaling to a max width and line count, descender-aware so nothing clips at the baseline.",
+  },
+  {
+    name: "Layout arbiter",
+    module: "layout-arbiter.ts",
+    does: "Enumerates every legal module × layout × reading level for a slide brief, prunes what cannot fit, and ranks the rest on capacity, headroom, canvas aspect, division spec, intent and rhythm.",
+  },
+  {
+    name: "Print module fit",
+    module: "print-module-fit.ts · print-fit-audit.ts",
+    does: "Budgets a module against a real page size, measures the rendered boxes and reports overflow offenders with fixes.",
+  },
+  {
+    name: "Social refit",
+    module: "social-module-fit.ts",
+    does: "Re-fits a module into each social output geometry rather than letterboxing a 16:9 slide.",
+  },
+  {
+    name: "Export bounds",
+    module: "export-space.ts · export-aspect-check.ts",
+    does: "Canonical deck width/height for PDF and PPTX so exports carry the deck's own aspect, and flags any image or page that disagrees.",
+  },
+];
+
+function SystemsSegment({ ink }: { ink: string }) {
+  const specs = Object.entries(DIVISION_DESIGN_SPECS);
+
+  // A live arbitration, computed on render — proof the engine is wired, and a
+  // worked example of "best" beating "convenient".
+  const demo = arbitrateLayout({
+    sectionId: "SF-08",
+    industryId: "R05",
+    content: {
+      title: "Proof the programme paid back inside two quarters",
+      body: "Measured against the FY baseline across four markets.",
+      items: [1, 2, 3, 4],
+      hasChart: true,
+    },
+    canvas: { width: 16, height: 9 },
+  });
+
+  return (
+    <>
+      <Section title="Per-division design specs" count={specs.length}>
+        <p className="mb-4 max-w-3xl text-sm text-black/60">
+          Every brand scope carries its own approved light and dark packs plus an industry ground
+          recipe. Palette is deliberately not part of the spec — TransPerfect divisions all render in
+          the enterprise palette and differ by lockup, look, recipe and copy.
+        </p>
+        <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs uppercase tracking-wider text-black/45">
+              <tr>
+                <th className="px-4 py-3">Brand scope</th>
+                <th className="px-4 py-3">Light pack</th>
+                <th className="px-4 py-3">Dark pack</th>
+                <th className="px-4 py-3">Recipe</th>
+                <th className="px-4 py-3">Why</th>
+              </tr>
+            </thead>
+            <tbody>
+              {specs.map(([id, spec]) => (
+                <tr key={id} className="border-t border-black/5">
+                  <td className="px-4 py-3 font-mono text-xs">{id}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{spec.packId}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{spec.darkPackId}</td>
+                  <td className="px-4 py-3 font-mono text-xs">{spec.recipe}</td>
+                  <td className="px-4 py-3 text-black/60">{spec.rationale}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section title="Reading levels" count={TEMPLATE_LEVELS.length}>
+        <p className="mb-4 max-w-3xl text-sm text-black/60">
+          Every slide is assigned a register before a layout is chosen. The level sets the type
+          scale, the sheet fill bias and the content budget that decides when a slide must split
+          rather than shrink. {templateLibrarySize()} curated section × level treatments are built
+          from these five.
+        </p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {TEMPLATE_LEVELS.map((level) => {
+            const role = LEVEL_ROLE[level];
+            return (
+              <div key={level} className="rounded-2xl border border-black/10 bg-white p-5">
+                <div className="text-xs uppercase tracking-widest" style={{ color: ink }}>
+                  {role.label}
+                </div>
+                <p className="mt-2 text-sm text-black/70">{role.purpose}</p>
+                <dl className="mt-3 space-y-1 text-xs text-black/55">
+                  <div>
+                    Type: display {role.typeScale.display}px · body {role.typeScale.body}px · figure{" "}
+                    {role.typeScale.figure}px
+                  </div>
+                  <div>Fill bias: {role.fillBias}</div>
+                  <div>
+                    Budget: {role.density.blocks} blocks · {role.density.bullets} bullets ·{" "}
+                    {role.density.wordsPerBlock} words/block
+                  </div>
+                  <div>Default scene: {role.scene}</div>
+                </dl>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+
+      <Section title="Layout arbiter" count={demo.consideredCount}>
+        <p className="mb-4 max-w-3xl text-sm text-black/60">
+          The assembler no longer takes the first permitted layout. For each slide it enumerates
+          every legal module × layout × level combination, prunes anything the authored content
+          cannot fit, and ranks the survivors. Below is a live arbitration of a four-stat proof slide
+          with a chart on a 16:9 canvas.
+        </p>
+        <div className="rounded-2xl border border-black/10 bg-white p-5">
+          <div className="text-xs uppercase tracking-widest" style={{ color: ink }}>
+            Winner
+          </div>
+          <div className="mt-1 text-lg font-medium">
+            {demo.best?.variantId} · {demo.best?.name}
+          </div>
+          <p className="mt-2 text-sm text-black/65">{demo.rationale}</p>
+          <p className="mt-2 text-xs text-black/50">{demo.canvas.note}</p>
+          <div className="mt-4 grid grid-cols-2 gap-3 text-xs md:grid-cols-3">
+            {demo.best &&
+              Object.entries(demo.best.breakdown).map(([axis, value]) => (
+                <div key={axis} className="rounded-lg border border-black/10 px-3 py-2">
+                  <div className="uppercase tracking-wider text-black/45">{axis}</div>
+                  <div className="mt-1 font-mono">{value.toFixed(2)}</div>
+                </div>
+              ))}
+          </div>
+          <div className="mt-5 text-xs uppercase tracking-widest text-black/45">Runners-up</div>
+          <ul className="mt-2 space-y-1 text-sm text-black/65">
+            {demo.candidates.slice(1, 5).map((c) => (
+              <li key={`${c.variantId}-${c.layoutId}-${c.level}`}>
+                <span className="font-mono text-xs">{c.variantId}</span> · {c.level} ·{" "}
+                {c.score.toFixed(3)}
+                {c.feasible ? "" : " · does not fit"}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+
+      <Section title="Fit engines" count={FIT_ENGINES.length}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {FIT_ENGINES.map((e) => (
+            <div key={e.name} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="font-medium">{e.name}</div>
+              <div className="mt-1 font-mono text-xs text-black/45">{e.module}</div>
+              <p className="mt-2 text-sm text-black/65">{e.does}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Module preset kits" count={MODULE_PRESET_KITS.length}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {MODULE_PRESET_KITS.map((kit) => (
+            <div key={kit.key} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="text-xs uppercase tracking-widest" style={{ color: ink }}>
+                {kit.tag}
+              </div>
+              <div className="mt-1 font-medium">{kit.title}</div>
+              <p className="mt-2 text-sm text-black/65">{kit.blurb}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Print output contract" count={Object.keys(PREFLIGHT_PROFILES).length}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {Object.entries(PREFLIGHT_PROFILES).map(([intent, profile]) => (
+            <div key={intent} className="rounded-2xl border border-black/10 bg-white p-5">
+              <div className="font-medium">{profile.label}</div>
+              <div className="mt-1 font-mono text-xs text-black/45">
+                {profile.standard} · {profile.icc}
+              </div>
+              <p className="mt-2 text-sm text-black/65">{profile.note}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+    </>
   );
 }

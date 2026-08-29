@@ -13,6 +13,7 @@ import { buildDesignKnowledgeToolSet } from "@/lib/agent/design-knowledge";
 import { buildDataVisualToolSet } from "@/lib/agent/data-visuals";
 import { buildStatsMappingToolSet } from "@/lib/agent/stats-mapping";
 import { buildSectionTemplateToolSet } from "@/lib/agent/section-templates-tool";
+import { buildLayoutArbiterToolSet } from "@/lib/agent/layout-arbiter-tool";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
 import { repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
@@ -124,6 +125,7 @@ export const Route = createFileRoute("/api/agent-chat")({
             ...buildDataVisualToolSet(),
             ...buildStatsMappingToolSet(),
             ...buildSectionTemplateToolSet(),
+            ...buildLayoutArbiterToolSet(),
             ...dnaTools,
           },
           stopWhen: stepCountIs(50),
