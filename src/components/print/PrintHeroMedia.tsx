@@ -400,7 +400,12 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
           imageUrl={media.imageUrl}
           adjust={media.adjust}
           objectPosition={objectPosition}
-          zone={heroFocusZone(media.copyZone === "center" ? "center" : media.copyZone === "right" ? "right" : "left")}
+          zone={heroFocusZone(
+            media.copyZone === "center" ? "center" : media.copyZone === "right" ? "right" : "left",
+            // Follow the copy: the pool has to peak where the words actually
+            // land, not on a fixed lower third.
+            (media.copyOffsetPct ?? 0) > 12 ? "lower" : (media.copyOffsetPct ?? 0) < -12 ? "upper" : "center",
+          )}
           strength={focusStrength}
           mode={mode}
           cq={cq}

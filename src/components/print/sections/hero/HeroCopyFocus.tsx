@@ -43,9 +43,9 @@ type Preset = {
 };
 
 const PRESETS: Record<Exclude<HeroCopyFocusStrength, "off">, Preset> = {
-  soft: { blurPx: 14, alpha: 0.62, liftAlpha: 0.16, spread: 0.94 },
-  medium: { blurPx: 22, alpha: 0.82, liftAlpha: 0.26, spread: 1 },
-  strong: { blurPx: 34, alpha: 0.94, liftAlpha: 0.38, spread: 1.08 },
+  soft: { blurPx: 14, alpha: 0.62, liftAlpha: 0.18, spread: 0.94 },
+  medium: { blurPx: 22, alpha: 0.82, liftAlpha: 0.3, spread: 1 },
+  strong: { blurPx: 34, alpha: 0.94, liftAlpha: 0.44, spread: 1.08 },
 };
 
 /** Third-line intersections — the composition grid the field is built on. */
@@ -169,7 +169,7 @@ export function heroFocusZone(
   band: "lower" | "upper" | "center" = "lower",
 ): HeroCopyFocusZone {
   const side = align === "center" ? "center" : align === "right" ? "right" : "left";
-  if (band === "center") return "center-left";
+  if (band === "center") return side === "center" ? "lower-center" : "center-left";
   if (band === "upper") return side === "center" ? "upper-center" : "upper-left";
   return side === "center" ? "lower-center" : side === "right" ? "lower-right" : "lower-left";
 }
