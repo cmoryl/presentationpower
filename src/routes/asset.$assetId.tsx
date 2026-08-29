@@ -202,6 +202,7 @@ import {
   EyeOff,
   Upload,
   BookmarkPlus,
+  RotateCcw,
 } from "lucide-react";
 import { SavePageTemplateDialog } from "@/components/print/SavePageTemplateDialog";
 import { captureTemplateContentShell, captureTemplateLayout } from "@/lib/print-page-templates";
