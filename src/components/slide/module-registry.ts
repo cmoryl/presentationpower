@@ -93,8 +93,32 @@ export type ModuleCellControls = {
   iconNudge?: boolean;
 };
 
-const byVariantId = new Map<string, ModuleRegistration>();
-const matchers: ModuleRegistration[] = [];
+type ModuleRegistryStore = {
+  byVariantId: Map<string, ModuleRegistration>;
+  matchers: ModuleRegistration[];
+};
+
+/**
+ * Keep registrations stable across Vite hot updates.
+ *
+ * A module-registry-only update used to allocate fresh empty maps while the
+ * already-evaluated family modules stayed cached. Every library card then fell
+ * through to VariantRenderer's title/description placeholder until the browser
+ * was fully reloaded. Storing the registry on globalThis preserves the family
+ * registrations for the lifetime of the tab, so live edits cannot depopulate
+ * module previews.
+ */
+const REGISTRY_KEY = Symbol.for("transperfect-element.slide-module-registry");
+const registryGlobal = globalThis as typeof globalThis & {
+  [REGISTRY_KEY]?: ModuleRegistryStore;
+};
+const registry =
+  registryGlobal[REGISTRY_KEY] ??
+  (registryGlobal[REGISTRY_KEY] = {
+    byVariantId: new Map<string, ModuleRegistration>(),
+    matchers: [],
+  });
+const { byVariantId, matchers } = registry;
 
 export function registerSlideModule(reg: ModuleRegistration): void {
   for (const id of reg.variantIds ?? []) byVariantId.set(id, reg);
