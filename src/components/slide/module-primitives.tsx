@@ -88,7 +88,6 @@ import {
   WaterfallChart,
 } from "./charts";
 // Graph family (MV-GRAPH-*) is owned by the module registry.
-import "./modules/graph";
 import {
   barOrnament,
   barPath,
@@ -137,7 +136,6 @@ import {
   orbitSegmentAlpha,
 } from "@/lib/orbit-label-layout";
 
-import { findSlideModule } from "./module-registry";
 import {
   SlideFrame,
   SlideFrameCtx,
@@ -148,28 +146,9 @@ import {
   s,
   strs,
   truthy,
-  registerKitPrimitives,
   type Item,
 } from "./module-kit";
-import "./modules/viz";
-import "./modules/timeline";
-import "./modules/process";
-import "./modules/bento";
-import "./modules/quote";
-import "./modules/logos";
-import "./modules/close";
-import "./modules/stat";
 import { HeroScrim } from "./HeroScrim";
-import "./modules/opening";
-import "./modules/dashboard";
-import "./modules/image";
-import "./modules/info";
-import "./modules/narrative";
-import "./modules/team";
-import "./modules/business";
-import "./modules/advanced";
-import "./modules/editorial";
-import "./modules/locations";
 
 
 import { HouseArrow } from "./HouseArrow";
@@ -2635,3 +2614,6 @@ export function DashSeriesViz({
       return <FreeformAreaChart brand={brand} series={series} height={height} />;
   }
 }
+
+/** Keyword/division icon resolver shared by every registry module. */
+export const pickKitIcon = pickIcon;
