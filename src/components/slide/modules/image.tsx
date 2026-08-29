@@ -545,7 +545,8 @@ registerSlideModule({
                       </div>
                     </GlassTile>
                   </div>
-                ))}
+                  );
+                })}
             </div>
           </SlideFrame>
         );
