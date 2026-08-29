@@ -1,4 +1,5 @@
 import { useRef, type CSSProperties } from "react";
+import { hiddenSectionSet } from "@/lib/print-hidden-sections";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { AdaptorBriefContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import { SlideModeContext, SlideAccentContext } from "@/components/slide/SlideChrome";
@@ -21,7 +22,6 @@ import {
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
-import { hiddenSectionSet } from "@/lib/print-hidden-sections";
   PAGE_W,
   cq,
   padCq,

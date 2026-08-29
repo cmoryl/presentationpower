@@ -1,4 +1,5 @@
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { hiddenSectionSet } from "@/lib/print-hidden-sections";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type { SpotlightContent, PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
@@ -22,7 +23,6 @@ import {
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import {
-import { hiddenSectionSet } from "@/lib/print-hidden-sections";
   PAGE_W,
   cq,
   padCq,
