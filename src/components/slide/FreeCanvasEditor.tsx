@@ -253,6 +253,26 @@ export function FreeCanvasEditor({
   );
   const selectionBounds = selectedBlocks.length ? boundsOf(selectedBlocks) : null;
 
+  /** The single image block the crop tool is framing, if any. */
+  const cropBlock = useMemo(() => {
+    if (!cropId) return null;
+    const b = index.get(cropId);
+    return b && b.kind === "image" && b.src ? b : null;
+  }, [cropId, index]);
+  /** One image selected → the crop tool is available. */
+  const cropCandidate =
+    selectedBlocks.length === 1 &&
+    selectedBlocks[0].kind === "image" &&
+    !selectedBlocks[0].locked &&
+    selectedBlocks[0].src
+      ? selectedBlocks[0]
+      : null;
+  // Leaving the image (or the objects tool) must not leave crop mode armed.
+  useEffect(() => {
+    if (!cropId) return;
+    if (!cropCandidate || cropCandidate.id !== cropId || textTool) setCropId(null);
+  }, [cropId, cropCandidate, textTool]);
+
   /** The visible 16:9 surface is the coordinate authority, never editor chrome. */
   const stageSurface = useCallback(
     () => wrapRef.current?.querySelector<HTMLElement>("[data-print-surface]") ?? null,
