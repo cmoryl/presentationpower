@@ -83,6 +83,36 @@ export function SectionSelectOverlay({ canvasRef, onDelete, onReplace, onEditMod
     [sections, selectedKey],
   );
 
+  // Keyboard: Delete / Backspace removes the selected section, Escape clears
+  // the selection. Ignored while the caret is inside editable copy so text
+  // editing keeps its own backspace behaviour.
+  useEffect(() => {
+    if (!selectedKey) return;
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (
+        t &&
+        (t.isContentEditable ||
+          t.tagName === "INPUT" ||
+          t.tagName === "TEXTAREA" ||
+          t.tagName === "SELECT")
+      ) {
+        return;
+      }
+      if (e.key === "Escape") {
+        setSelectedKey(null);
+        return;
+      }
+      if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault();
+        onDelete(selectedKey);
+        setSelectedKey(null);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedKey, onDelete]);
+
   // Authoring-only: never measured, decomposed, or rasterized into a PDF /
   // PNG / PPTX export. Both markers are checked by the export suppressor.
   if (isExportingChrome()) return null;
