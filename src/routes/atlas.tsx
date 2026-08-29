@@ -41,6 +41,7 @@ import { LEVEL_ROLE, TEMPLATE_LEVELS, templateLibrarySize } from "@/lib/section-
 import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
 import { PREFLIGHT_PROFILES } from "@/lib/print-preflight";
 import { ArbiterLab } from "@/components/atlas/ArbiterLab";
+import { DivisionFitPanel } from "@/components/atlas/DivisionFitPanel";
 import { SECTION_FRAMEWORKS as ALL_SECTION_FRAMEWORKS } from "@/lib/taxonomy";
 
 const SECTION_FRAMEWORKS_COUNT = ALL_SECTION_FRAMEWORKS.length;
@@ -1305,6 +1306,11 @@ const FIT_ENGINES: Array<{ name: string; module: string; does: string }> = [
     does: "Enumerates every legal module × layout × reading level for a slide brief, prunes what cannot fit, and ranks the rest on capacity, headroom, canvas aspect, division spec, intent and rhythm.",
   },
   {
+    name: "Division fit engine",
+    module: "division-fit-engine.ts",
+    does: "Plans a whole run for one brand scope: each slide is arbitrated against the division's approved packs, ground recipe and conformance set, with the previous winners threaded in as neighbour context so rhythm is earned across the sequence.",
+  },
+  {
     name: "Print module fit",
     module: "print-module-fit.ts · print-fit-audit.ts",
     does: "Budgets a module against a real page size, measures the rendered boxes and reports overflow offenders with fixes.",
@@ -1398,6 +1404,10 @@ function SystemsSegment({ ink }: { ink: string }) {
         <ArbiterLab ink={ink} />
       </Section>
 
+
+      <Section title="Division fit engine" count={specs.length}>
+        <DivisionFitPanel ink={ink} />
+      </Section>
 
       <Section title="Fit engines" count={FIT_ENGINES.length}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
