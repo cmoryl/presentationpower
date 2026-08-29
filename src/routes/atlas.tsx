@@ -40,7 +40,10 @@ import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
 import { LEVEL_ROLE, TEMPLATE_LEVELS, templateLibrarySize } from "@/lib/section-templates";
 import { MODULE_PRESET_KITS } from "@/lib/module-preset-kits";
 import { PREFLIGHT_PROFILES } from "@/lib/print-preflight";
-import { arbitrateLayout } from "@/lib/layout-arbiter";
+import { ArbiterLab } from "@/components/atlas/ArbiterLab";
+import { SECTION_FRAMEWORKS as ALL_SECTION_FRAMEWORKS } from "@/lib/taxonomy";
+
+const SECTION_FRAMEWORKS_COUNT = ALL_SECTION_FRAMEWORKS.length;
 
 export const Route = createFileRoute("/atlas")({
   head: () => ({
