@@ -1,3 +1,4 @@
+import type { PrintHeroAdjust } from "@/lib/print-hero-transform";
 // Typed content payloads for print assets. Shared between server functions and
 // the editor UI so the shape stays honest end-to-end.
 
@@ -25,6 +26,8 @@ export function resolvePrintLogoInk(override: PrintLogoColor | undefined, autoIn
 // `src/components/print/PrintHeroMedia.tsx`.
 export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
 
+export type { PrintHeroAdjust };
+
 export type PrintHeroMedia = {
   imageUrl: string;
   focalPoint?: string; // legacy CSS object-position
@@ -47,6 +50,9 @@ export type PrintHeroMedia = {
   // upload (see src/lib/hero-variants.ts) and merged over the base settings by
   // PrintHeroMediaLayer, so one photo reads correctly on light AND dark pages.
   variants?: { light?: PrintHeroVariant; dark?: PrintHeroVariant };
+  /** Photoshop-style non-destructive crop + tone controls (zoom, pan, rotate,
+   *  flip, brightness/contrast/saturation/blur). See print-hero-transform.ts. */
+  adjust?: PrintHeroAdjust;
 };
 
 /** Per-mode overrides layered on top of PrintHeroMedia. */
@@ -186,6 +192,8 @@ export type PrintHeroSection = {
   rule?: PrintHeroRule;
   /** Title-block typography overrides. */
   titleType?: PrintHeroTitleType;
+  /** Non-destructive crop + tone controls for the section photo. */
+  adjust?: PrintHeroAdjust;
 };
 
 // ---- Quote family ---------------------------------------------------------

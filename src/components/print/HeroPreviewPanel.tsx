@@ -3,6 +3,7 @@
 // renders when heroMedia is empty.
 import { useEffect, useState } from "react";
 import type { PrintHeroMedia } from "@/lib/print-assets.types";
+import { heroImageStyle } from "@/lib/print-hero-transform";
 import type { BrandMode } from "@/lib/taxonomy";
 import { Crosshair, Image as ImageIcon, Sparkles } from "lucide-react";
 
@@ -160,7 +161,10 @@ function PhotoBand({
         src={media.imageUrl}
         alt=""
         className="h-full w-full object-cover"
-        style={{ objectPosition: `${focalX}% ${focalY}%` }}
+        style={{
+          objectPosition: `${focalX}% ${focalY}%`,
+          ...heroImageStyle(media.adjust, `${focalX}% ${focalY}%`),
+        }}
       />
       <div
         className="absolute inset-0"

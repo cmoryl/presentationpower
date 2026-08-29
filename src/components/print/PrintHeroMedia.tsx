@@ -4,6 +4,7 @@
 // Opt-in per asset via `content.heroMedia` — layouts without a value keep the
 // existing accent-halo hero and read exactly as before.
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { heroImageStyle, type PrintHeroAdjust } from "@/lib/print-hero-transform";
 
 export type PrintHeroScrim = "top" | "bottom" | "both" | "radial" | "none";
 export type PrintHeroAspect = "fill" | "21:9" | "16:9" | "3:2" | "4:3" | "1:1";
@@ -41,6 +42,8 @@ export type PrintHeroMedia = {
   copyZone?: "left" | "right" | "center"; // where hero copy sits, default "left"
   // Auto-generated per-mode treatments, merged over the base settings below.
   variants?: { light?: PrintHeroVariantOverrides; dark?: PrintHeroVariantOverrides };
+  // Non-destructive crop + tone controls (zoom, pan, rotate, flip, tone).
+  adjust?: PrintHeroAdjust;
 };
 
 export type PrintHeroVariantOverrides = Partial<
@@ -377,6 +380,7 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
           height: "100%",
           objectFit: "cover",
           objectPosition,
+          ...heroImageStyle(media.adjust, objectPosition),
         }}
       />
 

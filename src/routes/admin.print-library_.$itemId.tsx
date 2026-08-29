@@ -13,6 +13,7 @@
 // a JSON escape hatch. "Hide" removes the entry from the library for
 // non-admins; "Reset" restores the shipped definition.
 
+import { HeroCropStudio } from "@/components/print/HeroCropStudio";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -882,6 +883,21 @@ function MasterItemEditorPage() {
                       })
                     }
                   />
+                  {heroMedia?.imageUrl ? (
+                    <HeroCropStudio
+                      imageUrl={heroMedia.imageUrl}
+                      adjust={heroMedia.adjust}
+                      onChange={(adjust) => patchContent({ heroMedia: { ...heroMedia, adjust } })}
+                      focalX={heroMedia.focalX ?? 50}
+                      focalY={heroMedia.focalY ?? 45}
+                      onFocalChange={({ focalX, focalY }) =>
+                        patchContent({
+                          heroMedia: { ...heroMedia, focalX, focalY, focalPoint: undefined },
+                        })
+                      }
+                      dense
+                    />
+                  ) : null}
                   {heroMedia ? (
                     <Field label={`Hero height — ${Math.round(heroMedia.heightPct ?? 46)}%`}>
                       <input
