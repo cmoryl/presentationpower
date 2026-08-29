@@ -73,7 +73,20 @@ export type ModuleRegistration = {
   variantIds?: readonly string[];
   /** Predicate for whole families (`MV-VIZ-*`). Consulted after exact ids. */
   match?: (variantId: string) => boolean;
+  /**
+   * Which per-cell studio controls this family actually reads. The Slide Studio
+   * hides the controls a family ignores, so an author never tweaks a knob that
+   * silently does nothing. Omitted = the family reads none of them.
+   */
+  cellControls?: ModuleCellControls;
   render: ModuleRenderer;
+};
+
+export type ModuleCellControls = {
+  /** Honours `item.tone` / `item.toneEnd` (per-cell gradient). */
+  tone?: boolean;
+  /** Honours `item.iconAlign` / `item.iconOffsetPct`. */
+  iconNudge?: boolean;
 };
 
 const byVariantId = new Map<string, ModuleRegistration>();
@@ -90,6 +103,11 @@ export function registerSlideModule(reg: ModuleRegistration): void {
 
 export function findSlideModule(variantId: string): ModuleRegistration | null {
   return byVariantId.get(variantId) ?? matchers.find((m) => m.match!(variantId)) ?? null;
+}
+
+/** Per-cell controls the owning family reads; all false when unowned. */
+export function slideModuleCellControls(variantId: string): ModuleCellControls {
+  return findSlideModule(variantId)?.cellControls ?? {};
 }
 
 /** Which variant ids the registry currently owns — used by the audit tests. */

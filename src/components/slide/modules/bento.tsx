@@ -61,6 +61,7 @@ const MOSAIC: Record<number, { cols: string; rows: string; areas: string[] }> = 
 registerSlideModule({
   id: "family:bento-mosaic",
   variantIds: ["MV-BENTO-5", "MV-BENTO-6", "MV-BENTO-7", "MV-BENTO-8"],
+  cellControls: { tone: true, iconNudge: true },
   render: ({ variant, brand, pageNumber, c, ink, isDark }) => {
     const cellCount =
       variant.id === "MV-BENTO-8"
