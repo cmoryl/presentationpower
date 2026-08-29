@@ -1623,16 +1623,3 @@ function Detail({ label, value, inkStrong }: { label: string; value: string; ink
 // Hand the shared primitives to the module kit so extracted families
 // (`modules/bento.tsx`, …) render the exact same badge and media tile the legacy
 // switch draws. Function declarations hoist, so this runs safely at module eval.
-registerKitPrimitives({
-  pickIcon,
-  Card,
-  CardGrid,
-  AuroraStatGrid,
-  IconBadge,
-  MediaTile,
-  NumberedList,
-  Sparkline,
-  DashMetricViz,
-  DashSeriesViz,
-  SummaryStatCard,
-});
