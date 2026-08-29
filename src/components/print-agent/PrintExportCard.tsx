@@ -83,13 +83,6 @@ const FORMAT_META: Record<
   svg: { label: "SVG", hint: "Page-sized vector container", Icon: Shapes },
 };
 
-/** Wait for layout + paint of the freshly mounted off-screen page. */
-function nextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(resolve, 120)));
-  });
-}
-
 export function PrintExportCard({ request }: { request: PrintExportRequest }) {
   const [row, setRow] = useState<Row | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -97,6 +90,7 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const stageErrorRef = useRef<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -127,11 +121,9 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
     async (list: PrintPageExportFormat[], label: string) => {
       if (!row || busy) return;
       setBusy(label);
+      stageErrorRef.current = null;
       setStaged(true);
       try {
-        await nextPaint();
-        const node = stageRef.current?.querySelector<HTMLElement>("[data-print-page]");
-        if (!node) throw new Error("The page could not be rendered for export.");
         const base = `${(row.title || "print-page").slice(0, 60)}-p${pageIndex + 1}`;
         await runWithExportFeedback(
           {
@@ -141,6 +133,15 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
             successDescription: `${row.title} · page ${pageIndex + 1} · ${pageSize}`,
           },
           async () => {
+            setStatus("Rendering the page at trim size…");
+            // One frame for the stage to mount, then the real readiness gate.
+            await new Promise<void>((r) => requestAnimationFrame(() => r()));
+            if (stageErrorRef.current) throw new Error(stageErrorRef.current);
+            const node = assertPrintPageReady(
+              stageRef.current?.querySelector<HTMLElement>("[data-print-page]"),
+            );
+            await waitForPrintPageReady(node);
+            if (stageErrorRef.current) throw new Error(stageErrorRef.current);
             for (const format of list) {
               setStatus(`Writing ${format.toUpperCase()}…`);
               await downloadPrintPageAsset(format, node, {
@@ -154,6 +155,7 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
         );
       } catch {
         // runWithExportFeedback already surfaced the reason.
+        if (stageErrorRef.current) setError(stageErrorRef.current);
       } finally {
         setStatus(null);
         setBusy(null);
@@ -162,6 +164,8 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
     },
     [busy, mode, pageIndex, pageSize, row],
   );
+
+
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
