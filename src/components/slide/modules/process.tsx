@@ -29,6 +29,7 @@ import {
 
 registerSlideModule({
   id: "family:process",
+  cellControls: { tone: true, iconNudge: true },
   variantIds: [
     "MV-PROC-TIMELINE",
     "MV-PROC-STEP-CHAIN",
