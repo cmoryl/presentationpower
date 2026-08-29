@@ -1,22 +1,23 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import { ALL_SKIN_PACKS } from "../design-skin-pack";
 import { packCompose } from "../pack-compose";
-import { getStylePack } from "../design-skin-pack";
 
 // Symmetric closing marks (Q&A, Thanks) must sit on the optical centre of the
 // sheet in EVERY look — a skin's margin swing must never pull them off-centre.
 describe("close family centring", () => {
-  for (const id of ["skin-s01", "skin-s04", "skin-s06", "skin-s21"]) {
-    const pack = getStylePack(id);
-    if (!pack) continue;
-    it(`${id} centres MV-CLOSE-QNA`, () => {
+  it("centres MV-CLOSE-QNA in every skin", () => {
+    for (const pack of ALL_SKIN_PACKS) {
       const c = packCompose(pack, "MV-CLOSE-QNA");
-      expect(c.lead).toBe(c.trail);
-      expect(c.bias).toBe("center");
-    });
-    it(`${id} centres MV-CLOSE-THANKS`, () => {
+      expect(c.lead, `${pack.id} QNA lead/trail`).toBe(c.trail);
+      expect(c.bias, `${pack.id} QNA bias`).toBe("center");
+    }
+  });
+
+  it("centres MV-CLOSE-THANKS in every skin", () => {
+    for (const pack of ALL_SKIN_PACKS) {
       const c = packCompose(pack, "MV-CLOSE-THANKS");
-      expect(c.lead).toBe(c.trail);
-      expect(c.bias).toBe("center");
-    });
-  }
+      expect(c.lead, `${pack.id} THANKS lead/trail`).toBe(c.trail);
+      expect(c.bias, `${pack.id} THANKS bias`).toBe("center");
+    }
+  });
 });
