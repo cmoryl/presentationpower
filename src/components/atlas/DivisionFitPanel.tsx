@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   planDivisionFit,
   demoSlideBriefs,
@@ -6,6 +6,26 @@ import {
 } from "@/lib/division-fit-engine";
 import { NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
+import { buildDivisionRun, runDivisionStages, type DivisionRunReport } from "@/lib/division-run";
+import { lazy, Suspense } from "react";
+
+// The stage graph (VariantRenderer + every module family) is large and only
+// needed once the reviewer asks to see the built slides, so it is code-split
+// away from the Atlas page shell.
+const ScaledSlide = lazy(() =>
+  import("@/components/slide/ScaledSlide").then((m) => ({ default: m.ScaledSlide })),
+);
+const ExactSlideStage = lazy(() =>
+  import("@/components/slide/ExactSlideStage").then((m) => ({ default: m.ExactSlideStage })),
+);
+
+declare global {
+  interface Window {
+    __tpDivisionRun?: {
+      run: (opts?: { brandModeId?: string; archetypeId?: string }) => Promise<DivisionRunReport>;
+    };
+  }
+}
 
 export function DivisionFitPanel({ ink }: { ink: string }) {
   const [brandModeId, setBrandModeId] = useState("bm-enterprise");
@@ -23,6 +43,57 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
       slides: demoSlideBriefs(sections, { blocks, copy, media }),
     });
   }, [brandModeId, archetypeId, blocks, copy, media, rhythmWindow]);
+
+  // Building is separate from planning on purpose: mounting a full run of
+  // 1920×1080 stages is expensive, so it happens on demand and the result is
+  // held against the plan that produced it.
+  const [report, setReport] = useState<DivisionRunReport | null>(null);
+  const [busy, setBusy] = useState<{ done: number; total: number } | null>(null);
+  const [previews, setPreviews] = useState(false);
+
+  const built = useMemo(() => (previews ? buildDivisionRun(plan) : []), [plan, previews]);
+
+  useEffect(() => {
+    setReport(null);
+  }, [plan]);
+
+  async function build() {
+    setBusy({ done: 0, total: plan.slides.length });
+    try {
+      const out = await runDivisionStages(plan, {
+        onProgress: (done, total) => setBusy({ done, total }),
+      });
+      setReport(out);
+      return out;
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  useEffect(() => {
+    window.__tpDivisionRun = {
+      run: async (opts) => {
+        const sections = sectionSequence(opts?.archetypeId ?? archetypeId);
+        const p = planDivisionFit({
+          brandModeId: opts?.brandModeId ?? brandModeId,
+          rhythmWindow,
+          slides: demoSlideBriefs(sections, { blocks, copy, media }),
+        });
+        const out = await runDivisionStages(p);
+        setReport(out);
+        return out;
+      },
+    };
+    return () => {
+      delete window.__tpDivisionRun;
+    };
+  }, [archetypeId, brandModeId, rhythmWindow, blocks, copy, media]);
+
+  const auditByIndex = useMemo(() => {
+    const map = new Map<number, DivisionRunReport["slides"][number]>();
+    for (const s of report?.slides ?? []) map.set(s.index, s);
+    return map;
+  }, [report]);
 
   return (
     <div className="space-y-5">
@@ -122,6 +193,78 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
         ))}
       </ul>
 
+      <div className="rounded-2xl border border-black/10 bg-white p-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => void build()}
+            disabled={Boolean(busy)}
+            className="rounded-lg px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+            style={{ backgroundColor: ink }}
+          >
+            {busy ? `Building ${busy.done}/${busy.total}…` : "Build the slides & compare to spec"}
+          </button>
+          <label className="flex items-center gap-2 text-sm text-black/65">
+            <input
+              type="checkbox"
+              checked={previews}
+              onChange={(e) => setPreviews(e.target.checked)}
+            />
+            Show built stages
+          </label>
+          {report && (
+            <span className="text-sm text-black/60">
+              {report.passCount}/{report.builtCount} stages match the spec
+            </span>
+          )}
+        </div>
+        <p className="mt-2 max-w-3xl text-xs text-black/50">
+          Each winner is seeded with real division content and mounted on the canonical 1920×1080
+          export stage, then measured: rendered module, approved pack, planned face, pack surface
+          token, readability guard, content plane and stage overflow.
+        </p>
+        {report && report.problems.length > 0 && (
+          <ul className="mt-3 space-y-1 text-sm text-black/65">
+            {report.problems.map((p) => (
+              <li key={p}>• {p}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {previews && built.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {built.map((item) => (
+            <div
+              key={`built-${item.plan.index}`}
+              className="overflow-hidden rounded-2xl border border-black/10 bg-white"
+            >
+              <Suspense fallback={<div className="aspect-[16/9] w-full bg-black/5" />}>
+                <ScaledSlide>
+                <ExactSlideStage
+                  slide={item.slide}
+                  variant={item.variant}
+                  brand={item.brand}
+                  mode={item.mode}
+                  pack={item.pack}
+                  industryId={item.plan.recipe}
+                  pageNumber={item.plan.index + 1}
+                />
+                </ScaledSlide>
+              </Suspense>
+              <div className="flex items-baseline justify-between px-4 py-2 font-mono text-[11px] text-black/50">
+                <span>
+                  {item.plan.index + 1}. {item.variant.id}
+                </span>
+                <span>
+                  {item.plan.packId} · {item.mode}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {plan.slides.map((slide) => (
           <div
@@ -185,6 +328,32 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
                     ))}
                   </ul>
                 )}
+
+                {(() => {
+                  const audit = auditByIndex.get(slide.index);
+                  if (!audit) return null;
+                  return (
+                    <div className="mt-4 border-t border-black/10 pt-3">
+                      <div className="flex items-center justify-between text-xs uppercase tracking-widest text-black/45">
+                        <span>Built stage</span>
+                        <Chip tone={audit.ok ? "ok" : "warn"}>
+                          {audit.ok ? "matches spec" : "drift"}
+                        </Chip>
+                      </div>
+                      <ul className="mt-2 space-y-1 text-xs text-black/55">
+                        {audit.checks.map((c) => (
+                          <li key={c.id}>
+                            {c.ok ? "✓" : "✕"} {c.label} · <span className="font-mono">{c.detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-2 font-mono text-[11px] text-black/40">
+                        {audit.entries} measured elements · digest {audit.digest ?? "—"}
+                        {audit.error ? ` · ${audit.error}` : ""}
+                      </div>
+                    </div>
+                  );
+                })()}
               </>
             ) : (
               <p className="mt-3 text-sm text-black/50">
