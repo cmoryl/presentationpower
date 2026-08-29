@@ -129,6 +129,7 @@ import { ClientLogoHubPicker, ClientLogoHubTrigger } from "@/components/print/Cl
 import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { HeroCropStudio } from "@/components/print/HeroCropStudio";
+import { PrintVariantPicker } from "@/components/print/PrintVariantPicker";
 import { withAutoHeroVariants } from "@/lib/hero-variants";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
 import { HeroDiffTile } from "@/components/print/HeroDiffTile";
@@ -2517,6 +2518,18 @@ function AssetEditor() {
               {/* Page masthead — the legacy full-page openers read the exact same
                   rule + title-type contract as the modular hero sections. */}
               <Panel title="Page masthead">
+                <PrintVariantPicker
+                  titleType={(content as { heroTitleType?: PrintHeroTitleType }).heroTitleType}
+                  rule={(content as { heroRule?: PrintHeroRule }).heroRule}
+                  surfaceLabel="Page masthead"
+                  accent={brand.tokens.accent || brand.tokens.primary}
+                  onChange={(next) =>
+                    patchContent({
+                      ...("rule" in next ? { heroRule: next.rule } : null),
+                      ...("titleType" in next ? { heroTitleType: next.titleType } : null),
+                    } as never)
+                  }
+                />
                 <MastheadRuleTypeControls
                   rule={(content as { heroRule?: PrintHeroRule }).heroRule}
                   titleType={(content as { heroTitleType?: PrintHeroTitleType }).heroTitleType}
@@ -4385,18 +4398,14 @@ function HeroInlineEditor({
     section.variantId === "hero-photo-band" || section.variantId === "hero-split-photo";
   return (
     <>
-      <select
-        aria-label="Variant"
-        className={inspectorInput}
-        value={section.variantId}
-        onChange={(e) => onPatch({ variantId: e.target.value as PrintHeroModuleVariant })}
-      >
-        {PRINT_HERO_VARIANTS.map((v) => (
-          <option key={v.id} value={v.id}>
-            {v.label}
-          </option>
-        ))}
-      </select>
+      <PrintVariantPicker
+        heroVariant={section.variantId}
+        onHeroVariant={(id) => onPatch({ variantId: id })}
+        titleType={section.titleType}
+        rule={section.rule}
+        surfaceLabel="Hero surface"
+        onChange={(next) => onPatch(next)}
+      />
       <div className="grid grid-cols-2 gap-1">
         <input
           className={inspectorInput}
