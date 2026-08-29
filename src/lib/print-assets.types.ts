@@ -434,6 +434,9 @@ export type CaseStudyContent = {
   /** Title-block typography overrides for the page opener. */
   heroTitleType?: PrintHeroTitleType;
   /** Reusable shared-module blocks inserted between body content and CTA. */
+  /** Section keys deleted in the live editor. Data is kept; the layout
+   *  must not render (or synthesise) these sections. */
+  hiddenSections?: string[];
   modules?: PrintSection[];
 };
 
@@ -469,6 +472,9 @@ export type SpotlightContent = {
   heroRule?: PrintHeroRule;
   /** Title-block typography overrides for the page opener. */
   heroTitleType?: PrintHeroTitleType;
+  /** Section keys deleted in the live editor. Data is kept; the layout
+   *  must not render (or synthesise) these sections. */
+  hiddenSections?: string[];
   modules?: PrintSection[];
 };
 
@@ -500,6 +506,9 @@ export type EBrochureContent = {
   heroRule?: PrintHeroRule;
   /** Title-block typography overrides for the page opener. */
   heroTitleType?: PrintHeroTitleType;
+  /** Section keys deleted in the live editor. Data is kept; the layout
+   *  must not render (or synthesise) these sections. */
+  hiddenSections?: string[];
   modules?: PrintSection[];
 };
 
@@ -528,6 +537,9 @@ export type AdaptorBriefContent = {
   heroRule?: PrintHeroRule;
   /** Title-block typography overrides for the page opener. */
   heroTitleType?: PrintHeroTitleType;
+  /** Section keys deleted in the live editor. Data is kept; the layout
+   *  must not render (or synthesise) these sections. */
+  hiddenSections?: string[];
   modules?: PrintSection[];
 };
 
