@@ -353,7 +353,14 @@ async function auditPptx(
       if (bgRid && zip.file(layoutRelsPart)) {
         const layoutRels = await zip.file(layoutRelsPart)!.async("string");
         for (const m of layoutRels.matchAll(/Id="([^"]+)"[^>]*Target="([^"]+)"/g)) {
-          if (m[1] === bgRid) bgPart = m[2].replace(/^\.\.\/\.\.\//, "ppt/").replace(/^\.\.\//, "ppt/slideLayouts/");
+          // Layout rel targets are relative to ppt/slideLayouts/, so "../media/x"
+          // resolves to ppt/media/x.
+          if (m[1] === bgRid) {
+            bgPart = m[2].startsWith("../")
+              ? `ppt/${m[2].replace(/^(\.\.\/)+/, "")}`
+              : `ppt/slideLayouts/${m[2]}`;
+          }
+
         }
       }
     }
