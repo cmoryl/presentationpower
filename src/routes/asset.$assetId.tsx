@@ -789,11 +789,9 @@ function AssetEditor() {
       next.splice(at, 0, fit.section);
       if (replaceTarget) {
         // Built-in section (e.g. "features") being replaced by a module:
-        // clear its content field so it actually comes off the page.
-        const field = SECTION_CLEARABLE_FIELDS[replaceTarget];
-        if (field) {
-          const prev = (content as unknown as Record<string, unknown>)[field];
-          patch[field] = Array.isArray(prev) ? [] : undefined;
+        // hide it so the layout can't synthesise it back, and keep its copy.
+        if (SECTION_CLEARABLE_FIELDS[replaceTarget]) {
+          patch.hiddenSections = withSectionHidden(content, replaceTarget);
           replacedLabel =
             SECTION_DELETE_LABELS[replaceTarget] ??
             replaceTarget.replace(/([A-Z])/g, " $1");
