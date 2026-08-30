@@ -70,13 +70,19 @@ export function MobileDeckExport({
 }: MobileDeckExportProps) {
   const [busy, setBusy] = useState<null | "pdf" | "pptx">(null);
 
-  async function run(kind: "pdf" | "pptx") {
+  async function run(kind: "pdf" | "pptx", force = false) {
     if (busy) return;
-    if (blocked) {
-      onBlocked?.(kind === "pdf" ? "PDF export" : "PowerPoint export");
+    if (blocked && !force) {
+      const label = kind === "pdf" ? "PDF export" : "PowerPoint export";
+      onBlocked?.(label);
+      const { toast } = await import("sonner");
+      toast.warning(`${label} is on hold — resolve the blocking QA issues first.`, {
+        action: { label: "Export anyway", onClick: () => void run(kind, true) },
+      });
       return;
     }
     setBusy(kind);
+
     const { toast } = await import("sonner");
     const id = toast.loading(kind === "pdf" ? "Building the PDF…" : "Building the PowerPoint…", {
       description: `${deck.slides.length} slide${deck.slides.length === 1 ? "" : "s"} — stay on this screen.`,
