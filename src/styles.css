@@ -37,6 +37,13 @@
     * {
       -webkit-tap-highlight-color: transparent;
     }
+
+    /* Safari zooms the page when a focused field is under 16px. */
+    input,
+    select,
+    textarea {
+      font-size: max(16px, 1rem);
+    }
   }
 
   body {
