@@ -15,7 +15,7 @@
  */
 import { useState } from "react";
 import { FileDown, Loader2, Share2 } from "lucide-react";
-import type { Deck } from "@/lib/types";
+import type { Deck } from "@/lib/deck-store";
 import type { BrandMode } from "@/lib/taxonomy";
 
 /** Attribute the export page stamps on each rendered slide frame. */
