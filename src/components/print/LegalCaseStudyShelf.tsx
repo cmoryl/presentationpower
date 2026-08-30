@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { safeList } from "@/components/print/sections/shared";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -147,7 +148,7 @@ export function LegalCaseStudyShelf({ brandModes }: { brandModes: BrandMode[] })
               <p className="line-clamp-3 text-xs leading-relaxed text-black/60">{seed.teaser}</p>
 
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {seed.content.stats.slice(0, 3).map((s, i) => (
+                {safeList(seed.content.stats).slice(0, 3).map((s, i) => (
                   <span
                     key={`${s.label}-${i}`}
                     className="inline-flex items-baseline gap-1 rounded-full border border-black/10 bg-black/[0.02] px-2 py-0.5 text-[10px] text-black/60"

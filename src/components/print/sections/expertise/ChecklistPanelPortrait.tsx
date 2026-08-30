@@ -1,6 +1,6 @@
 // Glass checklist panel — up to 6 rows with accent check chips.
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, modulePanel } from "../shared";
+import { cq, sectionInk, MODULE, modulePanel, safeList} from "../shared";
 import { Icon, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -16,7 +16,8 @@ export function ChecklistPanelPortrait({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const items = section.items.slice(0, 6);
+  const items = safeList(section.items).slice(0, 6);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Capabilities"} style={{ margin: 0 }}>
       <div

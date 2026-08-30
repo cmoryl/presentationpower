@@ -2,7 +2,7 @@
 // glass surfaces. Great for the tail of a case study or eBrochure.
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, moduleCard } from "../shared";
+import { cq, sectionInk, MODULE, moduleCard, safeList} from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -17,7 +17,8 @@ export function StatCalloutRowPortrait({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const items = section.items.slice(0, 4);
+  const items = safeList(section.items).slice(0, 4);
+  if (items.length === 0) return null;
   const cols = Math.min(items.length || 1, 4);
 
   return (

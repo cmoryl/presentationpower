@@ -1,6 +1,6 @@
 // Client logo grid — 3-col portrait grid with glass tiles.
 import type { PrintLogoGridSection, PrintLogoItem } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE, safeList} from "../shared";
 import { useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 
 function LogoTile({
@@ -57,7 +57,8 @@ export function LogoGridPortrait({
   cols?: number;
 }) {
   const ink = sectionInk(mode);
-  const items = section.items.slice(0, cols * 3);
+  const items = safeList(section.items).slice(0, cols * 3);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Client logos"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

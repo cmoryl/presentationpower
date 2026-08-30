@@ -1,7 +1,7 @@
 // Spec rows — label → value table with a shaded header strip. Used for scope,
 // SLA, language coverage and deliverable specs across curated collateral.
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, safeList} from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -16,7 +16,8 @@ export function TableSpecRows({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const rows = section.rows.slice(0, 10);
+  const rows = safeList(section.rows).slice(0, 10);
+  if (rows.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Specification"} style={{ margin: 0 }}>
       <div

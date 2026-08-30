@@ -1,7 +1,7 @@
 // "Discover" panel — short body paragraph on the left, bullet rail on the
 // right. Ported from the e-brochure / engagement-snapshot pattern.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, modulePanel } from "../shared";
+import { cq, sectionInk, MODULE, modulePanel, safeList} from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -17,7 +17,7 @@ export function NarrativeDiscoverPanel({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const lead = section.items[0];
+  const lead = safeList(section.items)[0];
   const bullets = (lead?.bullets ?? []).slice(0, 6);
   return (
     <section aria-label={section.title ?? "Discover"} style={{ margin: 0 }}>

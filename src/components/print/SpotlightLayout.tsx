@@ -1,4 +1,5 @@
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { safeList } from "@/components/print/sections/shared";
 import { hiddenSectionSet } from "@/lib/print-hidden-sections";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -124,8 +125,9 @@ export function SpotlightLayout({
   const stats = hidden.has("stats")
     ? []
     : (Array.isArray(content.stats) ? content.stats : []).slice(0, 4);
-  const columns = content.capabilities.slice(0, 3);
-  const proofBullets = content.capabilities.slice(3, 6).map((c) => c.heading);
+  const capabilities = safeList(content.capabilities);
+  const columns = capabilities.slice(0, 3);
+  const proofBullets = capabilities.slice(3, 6).map((c) => c.heading);
   const expertBullets =
     proofBullets.length >= 3
       ? proofBullets

@@ -3,7 +3,7 @@
 // wide.
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass, MODULE } from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE, safeList} from "../shared";
 
 export function StatBentoPortrait({
   section,
@@ -15,7 +15,7 @@ export function StatBentoPortrait({
   accent: string;
 }) {
   const ink = sectionInk(mode);
-  const items = section.items.slice(0, 4);
+  const items = safeList(section.items).slice(0, 4);
   if (items.length === 0) return null;
   const [hero, ...rest] = items;
 

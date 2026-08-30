@@ -1,7 +1,7 @@
 // Feature verb cards — port of AdaptorBrief 6-card pattern. Supports 2- or
 // 3-column layouts via the `cols` prop.
 import type { PrintFeatureListSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, modulePanel } from "../shared";
+import { cq, sectionInk, MODULE, modulePanel, safeList} from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -21,7 +21,8 @@ export function VerbCardsPortrait({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const items = section.items.slice(0, cols === 3 ? 6 : 4);
+  const items = safeList(section.items).slice(0, cols === 3 ? 6 : 4);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Features"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
