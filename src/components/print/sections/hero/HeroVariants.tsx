@@ -7,6 +7,7 @@
 
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import { heroImageStyle } from "@/lib/print-hero-transform";
+import { printCardSurface } from "@/lib/print-card-surface";
 import type { PrintHeroSection } from "@/lib/print-assets.types";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
@@ -956,8 +957,9 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
               <div
                 key={i}
                 style={{
-                  border: "1px solid rgba(255,255,255,0.42)",
-                  background: "rgba(255,255,255,0.06)",
+                  // Deck dark-module grammar: white-lit seam, fade-to-transparent
+                  // wash, frame that never closes along the bottom.
+                  ...printCardSurface("dark", "#FFFFFF", { blur: false, intensity: 0.9 }),
                   padding: `${cq(14)} ${cq(8)}`,
                 }}
               >
