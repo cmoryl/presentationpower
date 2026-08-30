@@ -34,6 +34,7 @@ import {
   type AgentThread,
 } from "@/lib/agent/threads";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const AGENT_ACCENT = "#003FC7";
 const AGENT_GLOW = "#A1FBF9";
@@ -451,7 +452,15 @@ function AgentThreadPage() {
   const [liveCount, setLiveCount] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [showLeftRail, setShowLeftRail] = useState(true);
+  const isMobile = useIsMobile();
+  const [showLeftRail, setShowLeftRail] = useState(
+    () => typeof window === "undefined" || window.innerWidth >= 768,
+  );
+  // Collapse the conversations rail whenever we drop into a mobile viewport so
+  // the chat column keeps the full width instead of being squeezed to slivers.
+  useEffect(() => {
+    if (isMobile) setShowLeftRail(false);
+  }, [isMobile]);
   const [seedBrief, setSeedBrief] = useState("");
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [progressEl, setProgressEl] = useState<HTMLDivElement | null>(null);
