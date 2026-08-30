@@ -138,10 +138,10 @@ export function makePrintQuoteSection(variantId: PrintQuoteVariant): PrintSectio
     kind: "quote",
     variantId,
     eyebrow: "In their words",
-    text: "They didn't just translate our content — they rebuilt the entire pipeline so every new market ships in days, not months.",
-    author: "Elena Marquez",
-    role: "VP of Global Marketing",
-    company: "Acme Global",
+    text: `${ORG_NAME} didn't just translate our content — they rebuilt the pipeline so every new market ships in days, not months.`,
+    author: "Client sponsor",
+    role: "VP, Global Marketing",
+    company: "Add client name",
   };
 }
 
@@ -151,9 +151,9 @@ export function makePrintLogoGridSection(variantId: PrintLogoGridVariant): Print
     id: rid(),
     kind: "logo-grid",
     variantId,
-    eyebrow: "Trusted by",
+    eyebrow: `Trusted by ${ORG_NAME} clients`,
     title: "Selected clients",
-    items: Array.from({ length: count }, (_, i) => ({ name: `Client ${i + 1}` })),
+    items: clientPlaceholderItems(count).map((c) => ({ name: c.name })),
   };
 }
 
@@ -163,15 +163,9 @@ export function makePrintExpertiseSection(variantId: PrintExpertiseVariant): Pri
       id: rid(),
       kind: "expertise",
       variantId,
+      eyebrow: `${ORG_NAME} credentials`,
       title: "Certifications",
-      items: [
-        { label: "ISO 17100" },
-        { label: "ISO 27001" },
-        { label: "ISO 9001" },
-        { label: "SOC 2 Type II" },
-        { label: "HIPAA" },
-        { label: "GDPR" },
-      ],
+      items: ORG_CREDENTIALS.map((label) => ({ label })),
     };
   }
   if (variantId === "expertise-checklist") {
@@ -181,30 +175,20 @@ export function makePrintExpertiseSection(variantId: PrintExpertiseVariant): Pri
       variantId,
       eyebrow: "How we deliver",
       title: "What's included",
-      items: [
-        { label: "24/7 global program management" },
-        { label: "In-country linguists across 200+ markets" },
-        { label: "Automated QA and terminology enforcement" },
-        { label: "Enterprise-grade security & compliance" },
-      ],
+      items: ORG_INCLUDED.map((label) => ({ label })),
     };
   }
   return {
     id: rid(),
     kind: "expertise",
     variantId,
-    title: "We know how",
+    title: `How ${ORG_NAME} delivers`,
     layout: "horizontal",
     iconSize: "md",
-    items: [
-      { label: "Strategy", icon: "sparkles" },
-      { label: "Localize", icon: "globe-alt" },
-      { label: "Automate", icon: "bolt" },
-      { label: "Measure", icon: "trending" },
-      { label: "Scale", icon: "target" },
-    ],
+    items: ORG_EXPERTISE.map((e) => ({ ...e })),
   };
 }
+
 
 export function makePrintFeatureSection(variantId: PrintFeatureVariant): PrintSection {
   const items = [
