@@ -83,6 +83,12 @@ export type HeroCopyFocusProps = {
   objectPosition?: string;
   zone?: HeroCopyFocusZone;
   strength?: HeroCopyFocusStrength;
+  /**
+   * Per-hero fine tune of the soft-focus amount, as a percentage of the chosen
+   * strength preset. 100 = the preset as designed; 0 disables the field.
+   * Clamped to 0..200 so authors cannot push the plate past opaque.
+   */
+  amount?: number;
   mode?: "light" | "dark";
   /** px → container-query unit converter from the host layout. */
   cq?: (v: number) => string;
