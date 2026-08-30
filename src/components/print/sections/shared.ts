@@ -4,6 +4,11 @@
 
 import type { CSSProperties } from "react";
 
+import {
+  printCardSurface,
+  type PrintCardSurfaceOptions,
+} from "@/lib/print-card-surface";
+
 export const PRINT_PAGE_W = 816;
 
 /** Defensive read for any authored collection. Stripped/partial drafts often
@@ -28,20 +33,18 @@ export function sectionInk(mode: "light" | "dark") {
   };
 }
 
-export function sectionGlass(mode: "light" | "dark", accent: string): CSSProperties {
-  if (mode === "dark") {
-    return {
-      background: `linear-gradient(180deg, color-mix(in srgb, ${accent} 8%, rgba(10,8,36,0.6)), rgba(6,4,32,0.55))`,
-      border: `1px solid color-mix(in srgb, ${accent} 22%, rgba(255,255,255,0.08))`,
-      backdropFilter: "blur(14px) saturate(140%)",
-    };
-  }
-  return {
-    background: `linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.82))`,
-    border: `1px solid color-mix(in srgb, ${accent} 18%, rgba(255,255,255,0.75))`,
-    backdropFilter: "blur(14px) saturate(140%)",
-    boxShadow: `0 ${cq(6)} ${cq(18)} rgba(3,0,44,0.10)`,
-  };
+/**
+ * Module panel/card surface. Matches the presentation deck's module boxes: an
+ * accent seam along the top edge, a tint that fades to nothing before the
+ * bottom, and no closing hairline — see `src/lib/print-card-surface.ts`.
+ * Pass `{ seam: false }` for nested tiles that shouldn't repeat the seam.
+ */
+export function sectionGlass(
+  mode: "light" | "dark",
+  accent: string,
+  opts: PrintCardSurfaceOptions = {},
+): CSSProperties {
+  return printCardSurface(mode, accent, opts);
 }
 
 // ---------------------------------------------------------------------------
@@ -125,6 +128,7 @@ export function modulePanel(mode: "light" | "dark", accent: string): CSSProperti
   return {
     borderRadius: cq(MODULE.radius),
     padding: `${cq(MODULE.padY)} ${cq(MODULE.padX)}`,
+    overflow: "hidden",
     ...sectionGlass(mode, accent),
   };
 }
@@ -134,6 +138,7 @@ export function moduleCard(mode: "light" | "dark", accent: string): CSSPropertie
   return {
     borderRadius: cq(MODULE.radius),
     padding: cq(MODULE.cardPad),
+    overflow: "hidden",
     ...sectionGlass(mode, accent),
   };
 }
