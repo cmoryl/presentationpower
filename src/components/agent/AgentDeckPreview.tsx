@@ -265,13 +265,13 @@ export function AgentDeckPreview({
             {loading ? " · refreshing…" : ""}
           </p>
         </div>
-        <label className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/45">
+        <label className="flex min-w-0 flex-1 items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-foreground/45 sm:ml-auto sm:flex-none">
           Skin
           <select
             value={displayPackId}
             onChange={(e) => void applyPack(e.target.value)}
             aria-label="Deck design skin"
-            className="rounded-lg border border-border/70 bg-background px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-foreground"
+            className="min-w-0 flex-1 rounded-lg border border-border/70 bg-background px-2 py-1 text-[11px] font-medium normal-case tracking-normal text-foreground sm:flex-none"
           >
             <option value="">Brand system</option>
             <optgroup label="Design skin catalog">
@@ -293,10 +293,11 @@ export function AgentDeckPreview({
         <Link
           to="/decks/$deckId"
           params={{ deckId }}
-          className="rounded-lg bg-[#003FC7] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110"
+          className="inline-flex min-h-9 shrink-0 items-center rounded-lg bg-[#003FC7] px-3 text-xs font-semibold text-white transition hover:brightness-110"
         >
           Open in deck editor
         </Link>
+
       </header>
 
       {error && <p className="px-4 py-2 text-xs text-red-600">{error}</p>}
