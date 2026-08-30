@@ -908,7 +908,7 @@ function DeckEditor() {
               </button>
             </div>
             <div
-              className={`shrink-0 space-y-3 ${slidesRailOpen ? "w-[260px]" : "hidden"}`}
+              className={`min-w-0 shrink-0 space-y-3 ${slidesRailOpen ? "w-full lg:w-[260px]" : "hidden"}`}
               role="group"
               aria-label="Slide list and selection"
               aria-describedby="slide-rail-help"
