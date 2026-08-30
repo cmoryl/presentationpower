@@ -1040,10 +1040,10 @@ function DeckEditor() {
                       }`}
                     >
                       <label
-                        className={`absolute left-1.5 top-1.5 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border bg-white/95 shadow-sm transition ${
+                        className={`absolute left-1.5 top-1.5 z-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded-md border bg-white/95 shadow-sm transition sm:h-5 sm:w-5 ${
                           isPicked
                             ? "border-[#003FC7] opacity-100"
-                            : "border-black/20 opacity-0 group-hover:opacity-100 focus-within:opacity-100"
+                            : "border-black/20 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-within:opacity-100"
                         }`}
                         title="Select slide (shift-click a thumbnail to extend)"
                         onClick={(e) => e.stopPropagation()}
@@ -1069,7 +1069,7 @@ function DeckEditor() {
                           onChange={(e) =>
                             togglePick((e.nativeEvent as MouseEvent).shiftKey === true)
                           }
-                          className="h-3 w-3 accent-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/60"
+                          className="h-4 w-4 accent-[#003FC7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/60 sm:h-3 sm:w-3"
                         />
                       </label>
                       <button
