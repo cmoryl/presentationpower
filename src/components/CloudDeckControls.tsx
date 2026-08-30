@@ -504,28 +504,26 @@ export function SaveDeckButton({ deckId }: { deckId: string }) {
 /**
  * Explicit "Save deck to My Files" control.
  *
- * A locally-authored deck (agent run, open canvas, imported draft) lives in the
- * browser's store under a short local id, so its URL resolves on that device
- * only. This button stores the deck in the workspace and then moves the user
- * onto the portable `cloud-<uuid>` route, which opens from any signed-in
- * device. Once the deck is cloud-linked the autosave indicator takes over, so
- * the button steps aside rather than duplicating the header Save control.
+ * A locally-authored deck (agent run, open canvas, imported draft) is addressed
+ * by a short local id, so its URL only resolves in the browser that made it —
+ * even after autosave has pushed the content to the workspace. This button
+ * saves on demand and then moves the user onto the portable `cloud-<uuid>`
+ * route, which opens from any signed-in device and matches the link listed in
+ * My files. Decks already on a portable id don't need it.
  */
 export function SaveDeckToMyFilesButton({ deckId }: { deckId: string }) {
   const deck = useDeckStore((s) => s.decks[deckId]);
   const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
   const markCloudLinked = useDeckStore((s) => s.markCloudLinked);
-  const isCloudLinked = useDeckStore((s) => s._cloudLinked[deckId]);
   const save = useServerFn(saveDeckToCloud);
   const snapshot = useServerFn(snapshotDeckVersion);
   const signedIn = useSignedIn();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
 
-  // Already portable: cloud-loaded decks (and decks saved earlier this session)
-  // keep syncing through AutosaveIndicator.
-  const alreadyPortable = deckId.startsWith("cloud-") || !!isCloudLinked;
-  if (!deck || !brief || alreadyPortable) return null;
+  // Portable already: cloud ids and uuid-addressed decks resolve anywhere.
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(deckId);
+  if (!deck || !brief || deckId.startsWith("cloud-") || isUuid) return null;
 
   if (signedIn === null) return null;
   if (!signedIn) {
