@@ -46,9 +46,41 @@ function PresenterView() {
   useEffect(() => {
     prevIRef.current = i;
   }, [i]);
+  const isMobile = useIsMobile();
+  const thumbW = isMobile ? 104 : 160;
   const [stripOpen, setStripOpen] = useState(true);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
+
+  // Phones: the strip would cover a third of an already-small stage, so it
+  // starts collapsed and is opened deliberately from the control bar.
+  const autoCollapsed = useRef(false);
+  useEffect(() => {
+    if (isMobile && !autoCollapsed.current) {
+      autoCollapsed.current = true;
+      setStripOpen(false);
+    }
+  }, [isMobile]);
+
+  // Touch navigation: horizontal swipe advances/rewinds a slide.
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchRef.current = t ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const start = touchRef.current;
+    const t = e.changedTouches[0];
+    touchRef.current = null;
+    if (!start || !t) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0) setI((n) => Math.min(n + 1, visibleSlidesCount.current - 1));
+    else setI((n) => Math.max(n - 1, 0));
+  };
+  const visibleSlidesCount = useRef(0);
+
 
   // Fresh, mode-aware client logo (stored signed URLs expire after an hour).
   const currentMode =
