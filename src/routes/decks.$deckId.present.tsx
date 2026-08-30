@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from "react";
 import { useDeckStore, resolveSlideTransition } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 
@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 
 const focusThumb = (el: HTMLButtonElement | null) => {
   el?.focus({ preventScroll: true });
@@ -44,9 +46,41 @@ function PresenterView() {
   useEffect(() => {
     prevIRef.current = i;
   }, [i]);
+  const isMobile = useIsMobile();
+  const thumbW = isMobile ? 104 : 160;
   const [stripOpen, setStripOpen] = useState(true);
   const [notesOpen, setNotesOpen] = useState(false);
   const [focusedThumb, setFocusedThumb] = useState(0);
+
+  // Phones: the strip would cover a third of an already-small stage, so it
+  // starts collapsed and is opened deliberately from the control bar.
+  const autoCollapsed = useRef(false);
+  useEffect(() => {
+    if (isMobile && !autoCollapsed.current) {
+      autoCollapsed.current = true;
+      setStripOpen(false);
+    }
+  }, [isMobile]);
+
+  // Touch navigation: horizontal swipe advances/rewinds a slide.
+  const touchRef = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: ReactTouchEvent) => {
+    const t = e.touches[0];
+    touchRef.current = t ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const onTouchEnd = (e: ReactTouchEvent) => {
+    const start = touchRef.current;
+    const t = e.changedTouches[0];
+    touchRef.current = null;
+    if (!start || !t) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0) setI((n) => Math.min(n + 1, visibleSlidesCount.current - 1));
+    else setI((n) => Math.max(n - 1, 0));
+  };
+  const visibleSlidesCount = useRef(0);
+
 
   // Fresh, mode-aware client logo (stored signed URLs expire after an hour).
   const currentMode =
@@ -64,6 +98,7 @@ function PresenterView() {
   // PowerPoint parity: hidden slides stay in the deck but are skipped during
   // playback, so presenter navigation and the thumbnail strip both use this list.
   const visibleSlides = deck.slides.filter((sl) => !sl.hidden);
+  visibleSlidesCount.current = visibleSlides.length;
   const slide = visibleSlides[i];
   const nextSlide = visibleSlides[i + 1];
   const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;
@@ -149,7 +184,11 @@ function PresenterView() {
     <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
       <SlideSkinProvider skin={deck.context?.skin}>
         <SlideMediaRefreshProvider slides={visibleSlides}>
-          <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
+          <div
+            className="fixed inset-0 flex flex-col items-center justify-center bg-black"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
             <div className="w-full max-w-[95vw]">
               <div className="relative mx-auto aspect-[16/9] w-full">
                 <SectionCue
@@ -190,6 +229,7 @@ function PresenterView() {
               ref={stripRef}
               className={cn(
                 "absolute inset-x-0 bottom-16 mx-auto flex max-w-[95vw] gap-2 overflow-x-auto px-4 py-3 transition-all duration-300",
+
                 "scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent",
                 stripOpen
                   ? "opacity-100 translate-y-0"
@@ -223,18 +263,19 @@ function PresenterView() {
                           ? "border-white ring-2 ring-white/60 shadow-lg shadow-white/10"
                           : "border-white/15 hover:border-white/40 opacity-60 hover:opacity-100",
                       )}
-                      style={{ width: 160, height: 90 }}
+                      style={{ width: thumbW, height: thumbW * (9 / 16) }}
                       aria-label={`Go to slide ${idx + 1}`}
                       aria-current={active ? "true" : undefined}
                     >
                       <div
                         className="absolute inset-0"
                         style={{
-                          transform: "scale(0.0833)",
+                          transform: `scale(${thumbW / 1920})`,
                           transformOrigin: "top left",
                           width: 1920,
                           height: 1080,
                         }}
+
                       >
                         {v && (
                           <DeckPackScope pack={packFor(s)}>
@@ -259,44 +300,56 @@ function PresenterView() {
               </SlideThumbnailContext.Provider>
             </div>
 
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-full bg-white/10 px-5 py-2 text-xs text-white/80 backdrop-blur">
+            <div className="absolute bottom-4 left-1/2 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white/80 backdrop-blur sm:gap-4 sm:px-5 sm:py-2">
               <button
                 onClick={() => setI((n) => Math.max(0, n - 1))}
-                className="hover:text-white"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:text-white sm:h-auto sm:w-auto"
                 aria-label="Previous slide"
               >
                 ←
               </button>
-              <span className="tabular-nums">
+              <span className="shrink-0 tabular-nums">
                 {i + 1} / {visibleSlides.length}
               </span>
               <button
                 onClick={() => setI((n) => Math.min(visibleSlides.length - 1, n + 1))}
-                className="hover:text-white"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:text-white sm:h-auto sm:w-auto"
                 aria-label="Next slide"
               >
                 →
               </button>
               <button
                 onClick={() => setStripOpen((v) => !v)}
-                className="ml-2 hover:text-white"
+                className="grid h-11 min-w-11 shrink-0 place-items-center rounded-full px-2 hover:text-white sm:ml-2 sm:h-auto sm:min-w-0 sm:px-0"
                 aria-label="Toggle thumbnails"
                 title="Toggle thumbnails (T)"
               >
-                {stripOpen ? "▾ Thumbs" : "▴ Thumbs"}
+                <span className="sm:hidden">{stripOpen ? "▾" : "▴"}</span>
+                <span className="hidden sm:inline">{stripOpen ? "▾ Thumbs" : "▴ Thumbs"}</span>
               </button>
               <button
                 onClick={() => setNotesOpen((v) => !v)}
-                className={cn("hover:text-white", notesOpen && "text-white")}
+                className={cn(
+                  "grid h-11 min-w-11 shrink-0 place-items-center rounded-full px-2 hover:text-white sm:h-auto sm:min-w-0 sm:px-0",
+                  notesOpen && "text-white",
+                )}
                 aria-label="Toggle presenter notes"
                 title="Toggle notes (N)"
               >
-                {notesOpen ? "▾ Notes" : "▴ Notes"}
+                <span className="sm:hidden">N</span>
+                <span className="hidden sm:inline">{notesOpen ? "▾ Notes" : "▴ Notes"}</span>
               </button>
-              <Link to="/decks/$deckId" params={{ deckId }} className="ml-3 hover:text-white">
-                Exit (Esc)
+              <Link
+                to="/decks/$deckId"
+                params={{ deckId }}
+                aria-label="Exit presentation"
+                className="grid h-11 min-w-11 shrink-0 place-items-center rounded-full px-2 hover:text-white sm:ml-3 sm:h-auto sm:min-w-0 sm:px-0"
+              >
+                <span className="sm:hidden">✕</span>
+                <span className="hidden sm:inline">Exit (Esc)</span>
               </Link>
             </div>
+
 
             {/* Presenter notes drawer */}
             <div
@@ -308,7 +361,7 @@ function PresenterView() {
               )}
               aria-hidden={!notesOpen}
             >
-              <div className="mx-4 mb-20 grid grid-cols-[1fr_240px] gap-6 rounded-2xl border border-white/15 bg-black/85 p-6 backdrop-blur-xl">
+              <div className="mx-4 mb-24 grid grid-cols-1 gap-4 rounded-2xl border border-white/15 bg-black/85 p-4 backdrop-blur-xl sm:mb-20 sm:grid-cols-[1fr_240px] sm:gap-6 sm:p-6">
                 <div>
                   <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
                     Speaker notes · Slide {i + 1}
@@ -317,7 +370,8 @@ function PresenterView() {
                     {notesText || <span className="text-white/40">No notes</span>}
                   </div>
                 </div>
-                <div>
+                <div className="hidden sm:block">
+
                   <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
                     Up next
                   </div>
