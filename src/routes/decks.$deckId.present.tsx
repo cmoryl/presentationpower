@@ -192,6 +192,7 @@ function PresenterView() {
               ref={stripRef}
               className={cn(
                 "absolute inset-x-0 bottom-16 mx-auto flex max-w-[95vw] gap-2 overflow-x-auto px-4 py-3 transition-all duration-300",
+
                 "scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent",
                 stripOpen
                   ? "opacity-100 translate-y-0"
