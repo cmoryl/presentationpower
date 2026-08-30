@@ -571,7 +571,10 @@ export function PrintSectionPicker({
         ))}
       </div>
 
-      <div className="grid flex-1 gap-4 overflow-auto p-5">
+      {/* min-h-0 is load-bearing: without it this flex child can't shrink below
+          its content height, so the drawer grows past the viewport and the list
+          never scrolls. overscroll-contain keeps the page behind it still. */}
+      <div className="grid min-h-0 flex-1 auto-rows-min gap-4 overflow-y-auto overscroll-contain p-5">
         {variants.map((v) => {
           const preview = makeSectionFor(family, v.id);
           return (

@@ -1853,6 +1853,25 @@ function AssetEditor() {
                           }
                           toast.info(`Edit "${key}" in the inspector panel →`);
                         }}
+                        onReplaceMedia={(key) => {
+                          // "I just want a different photo" — skip the module
+                          // library entirely and go straight to the image
+                          // editor for that section.
+                          if (key === "hero") {
+                            setHeroModalOpen(true);
+                            return;
+                          }
+                          const id = key.startsWith("module:")
+                            ? key.slice("module:".length)
+                            : null;
+                          if (id) {
+                            setModuleFocus((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }));
+                            window.setTimeout(() => setModuleFocus(null), 4000);
+                            toast.info("Swap the image in this module's editor →");
+                            return;
+                          }
+                          toast.info("Edit this section's image in the inspector panel →");
+                        }}
                         onEditModule={(key) => {
                           // Deep-link from the canvas into the module's inline
                           // editor (per-item fields, e.g. each client logo).
