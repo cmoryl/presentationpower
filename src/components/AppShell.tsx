@@ -106,11 +106,15 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
     { to: "/admin", label: "Admin" },
   ] as const;
 
-  // Hide the Home link when the user is already on the homepage, and hide the
-  // Admin entry entirely from create-only (sales enablement) accounts.
+  // Hide the Home link when the user is already on the homepage. The Admin
+  // entry (and every admin-only sub-item) is only offered to confirmed admins:
+  // signed-out visitors, sales/viewer and editor accounts never see admin
+  // affordances, and nothing admin shows while roles are still resolving.
+  const canSeeAdmin = caps.isAdmin && !caps.isLoading;
   const visibleNav = nav.filter(
-    (n) => !(n.to === "/" && pathname === "/") && !(createOnly && n.to === "/admin"),
+    (n) => !(n.to === "/" && pathname === "/") && !(n.to === "/admin" && !canSeeAdmin),
   );
+
 
   // Elements mega-menu: the four output channels and their sub-options.
   const elementGroups: ReadonlyArray<{
