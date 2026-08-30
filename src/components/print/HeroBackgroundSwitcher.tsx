@@ -162,9 +162,7 @@ export function HeroBackgroundSwitcher({
         onClose={() => setBrowseOpen(false)}
         divisionId={divisionId ?? "bm-enterprise"}
         onPick={(entry) => {
-          const url = (entry as { url?: string; publicUrl?: string }).url ??
-            (entry as { publicUrl?: string }).publicUrl ??
-            "";
+          const url = entry.variantUrls?.landscape ?? entry.signedUrl;
           if (url) applyImage(url);
           setBrowseOpen(false);
         }}
