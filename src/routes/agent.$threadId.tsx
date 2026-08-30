@@ -661,17 +661,16 @@ function AgentThreadPage() {
 
         <div
           ref={workspaceRef}
-          className="flex gap-3"
-          style={{
-            // Run to the bottom of the viewport, but never collapse smaller than
-            // a comfortable working height when a tall hero sits above.
-            height: `max(60vh, calc(100dvh - ${Math.round(workspaceTop)}px - 0.75rem))`,
-          }}
-        >
-          {/* Conversations — collapsible rail */}
+          className="relative flex gap-3"
+...
+          {/* Conversations — collapsible rail (overlays the chat on mobile) */}
           <aside
-            className={`flex shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 transition-all duration-300 ease-in-out ${
-              showLeftRail ? "w-60" : "w-12"
+            className={`flex shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 transition-all duration-300 ease-in-out ${
+              showLeftRail
+                ? isMobile
+                  ? "absolute inset-y-0 left-0 z-20 w-[min(17rem,85vw)] border-border bg-background shadow-2xl"
+                  : "w-60 bg-background/60"
+                : "w-12 bg-background/60"
             }`}
           >
             <div
