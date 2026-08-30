@@ -940,7 +940,7 @@ function DeckEditor() {
               <div
                 role="group"
                 aria-label={`Slides (${deck.slides.length})`}
-                className="space-y-3"
+                className="grid grid-cols-2 gap-3 lg:grid-cols-1"
                 onKeyDown={(e) => {
                   const last = deck.slides.length - 1;
                   const next =
