@@ -20,7 +20,7 @@ import {
   usePrintImageEdit,
 } from "@/components/print/PrintImageEdit";
 import type { PrintDeviceSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, safeList} from "../shared";
 
 const TRANSPARENT_PX =
   "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
@@ -120,7 +120,7 @@ function Copy({ section, mode, accent, align = "left" }: Props & { align?: "left
       )}
       {!!section.items?.length && (
         <div style={{ marginTop: cq(10), display: "grid", gap: cq(7) }}>
-          {section.items.map((it, i) => (
+          {safeList(section.items).map((it, i) => (
             <div key={i} style={{ display: "flex", gap: cq(8), alignItems: "flex-start" }}>
               <span
                 style={{

@@ -1,6 +1,6 @@
 // Row of short credential pills. Great for accreditations / ISOs.
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, safeList} from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -15,7 +15,7 @@ export function CredentialPillsPortrait({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const items = section.items.slice(0, 8);
+  const items = safeList(section.items).slice(0, 8);
   return (
     <section aria-label={section.title ?? "Credentials"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

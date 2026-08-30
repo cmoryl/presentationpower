@@ -1,7 +1,7 @@
 // Challenge / Approach / Impact triptych — the spine of every curated
 // e-brochure in the print library. Three glass cards, optional bullet rails.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, moduleCard } from "../shared";
+import { cq, sectionInk, MODULE, moduleCard, safeList} from "../shared";
 import { clampLines, type IconName } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -19,7 +19,7 @@ export function NarrativeTriCard({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const items = section.items.slice(0, 3);
+  const items = safeList(section.items).slice(0, 3);
   const cols = Math.max(1, items.length);
   return (
     <section aria-label={section.title ?? "Narrative"} style={{ margin: 0 }}>
@@ -118,9 +118,9 @@ export function NarrativeTriCard({
                 {it.body}
               </div>
             )}
-            {it.bullets && it.bullets.length > 0 && (
+            {safeList(it.bullets).length > 0 && (
               <ul style={{ margin: `${cq(8)} 0 0`, padding: 0, listStyle: "none" }}>
-                {it.bullets.slice(0, 4).map((b, bi) => (
+                {safeList(it.bullets).slice(0, 4).map((b, bi) => (
                   <li
                     key={bi}
                     className="flex items-start"

@@ -1,6 +1,6 @@
 // Single-column feature list — verb + body rows with hairline dividers.
 import type { PrintFeatureListSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, safeList} from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -18,7 +18,7 @@ export function FeatureList1Col({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const items = section.items.slice(0, 5);
+  const items = safeList(section.items).slice(0, 5);
   return (
     <section aria-label={section.title ?? "Features"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

@@ -1,6 +1,6 @@
 // Two-column list table — the MSA "Departments supported" pattern.
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, safeList} from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -15,7 +15,7 @@ export function TableTwoColList({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const rows = section.rows.slice(0, 16);
+  const rows = safeList(section.rows).slice(0, 16);
   return (
     <section aria-label={section.title ?? "Table"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

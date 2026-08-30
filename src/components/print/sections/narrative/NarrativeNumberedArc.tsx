@@ -1,7 +1,7 @@
 // Numbered Challenge → Solution → Result arc. Mirrors the case-study spine:
 // large 01/02/03 markers, connective hairline, roomy body copy.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk } from "../shared";
+import { cq, sectionInk, safeList} from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 
 export function NarrativeNumberedArc({
@@ -14,7 +14,7 @@ export function NarrativeNumberedArc({
   accent: string;
 }) {
   const ink = sectionInk(mode);
-  const items = section.items.slice(0, 4);
+  const items = safeList(section.items).slice(0, 4);
   return (
     <section aria-label={section.title ?? "Narrative arc"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
@@ -89,9 +89,9 @@ export function NarrativeNumberedArc({
                   {it.body}
                 </div>
               )}
-              {it.bullets && it.bullets.length > 0 && (
+              {safeList(it.bullets).length > 0 && (
                 <div className="flex flex-wrap" style={{ gap: cq(6), marginTop: cq(7) }}>
-                  {it.bullets.slice(0, 4).map((b, bi) => (
+                  {safeList(it.bullets).slice(0, 4).map((b, bi) => (
                     <span
                       key={bi}
                       style={{

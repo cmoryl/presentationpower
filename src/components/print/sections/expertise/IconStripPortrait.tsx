@@ -1,6 +1,6 @@
 // Horizontal expertise icon strip — port of the AdaptorBrief "We Know How".
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE } from "../shared";
+import { cq, sectionInk, MODULE, safeList} from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -18,7 +18,7 @@ export function IconStripPortrait({
 }) {
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
-  const items = section.items.slice(0, 6);
+  const items = safeList(section.items).slice(0, 6);
   if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "We know how"} style={{ margin: 0 }}>

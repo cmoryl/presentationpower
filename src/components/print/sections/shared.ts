@@ -5,6 +5,14 @@
 import type { CSSProperties } from "react";
 
 export const PRINT_PAGE_W = 816;
+
+/** Defensive read for any authored collection. Stripped/partial drafts often
+ *  arrive with `items`/`rows`/`bullets` missing or set to a non-array, which
+ *  used to throw inside a render pass and blank the whole document. Modules
+ *  read every collection through this and simply render nothing instead. */
+export function safeList<T>(value: T[] | null | undefined): T[] {
+  return Array.isArray(value) ? value : [];
+}
 /** Same unit the page layouts use (print-primitives.cq): px against the 816pt
  *  page, multiplied by `--print-fit-scale` so modular sections shrink with the
  *  rest of the document under content-fit relief instead of overflowing. */
