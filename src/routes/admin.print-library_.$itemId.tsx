@@ -14,6 +14,7 @@
 // non-admins; "Reset" restores the shipped definition.
 
 import { HeroCropStudio } from "@/components/print/HeroCropStudio";
+import { HeroBackgroundSwitcher } from "@/components/print/HeroBackgroundSwitcher";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -882,6 +883,16 @@ function MasterItemEditorPage() {
                         ...("titleType" in next ? { heroTitleType: next.titleType } : null),
                       })
                     }
+                  />
+                  {/* Always available — masters that ship flat (the plain
+                      Client Spotlight) can switch a hero background on here. */}
+                  <HeroBackgroundSwitcher
+                    className="mt-3"
+                    value={heroMedia}
+                    onChange={(next) => patchContent({ heroMedia: next })}
+                    divisionId={shipped.divisionId ?? brand.id}
+                    mode={previewMode === "dark" ? "dark" : "light"}
+                    seed={`library-${itemId}`}
                   />
                   {heroMedia?.imageUrl ? (
                     <HeroCropStudio
