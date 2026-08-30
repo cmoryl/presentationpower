@@ -119,39 +119,18 @@ export function makePrintStatsSection(variantId: PrintStatsVariant): PrintSectio
     id: rid(),
     kind: "stats" as const,
     variantId,
-    eyebrow: "Impact at a glance",
+    eyebrow: `${ORG_NAME} at a glance`,
     title: "By the numbers",
   };
   if (variantId === "stat-bento-portrait") {
-    return {
-      ...base,
-      items: [
-        { label: "Global markets supported end-to-end", value: "200", unit: "+", caption: "Reach" },
-        { label: "Faster time to market", value: "3.4", unit: "x" },
-        { label: "Reduction in review cycles", value: "62", unit: "%" },
-      ],
-    };
+    return { ...base, items: ORG_STATS.slice(0, 3).map((s) => ({ ...s })) };
   }
   if (variantId === "stat-callout-row-portrait") {
-    return {
-      ...base,
-      items: [
-        { label: "Content refresh cycle", value: "48", unit: "hr", caption: "Down from 3 weeks" },
-        { label: "Translation cost saved", value: "$1.2", unit: "M", caption: "Annualized" },
-        { label: "Markets covered", value: "36", caption: "Live in Q1" },
-      ],
-    };
+    return { ...base, items: ORG_STATS.slice(0, 3).map((s) => ({ ...s })) };
   }
-  return {
-    ...base,
-    items: [
-      { label: "Localization cost saved", value: "$1.2", unit: "M", delta: "+18%", trend: "up" },
-      { label: "Faster time-to-market", value: "3.4", unit: "x", delta: "+12%", trend: "up" },
-      { label: "Markets supported live", value: "36", delta: "+9%", trend: "up" },
-      { label: "Review cycles removed", value: "62", unit: "%", delta: "-62%", trend: "down" },
-    ],
-  };
+  return { ...base, items: ORG_STATS.slice(0, 4).map((s) => ({ ...s })) };
 }
+
 
 export function makePrintQuoteSection(variantId: PrintQuoteVariant): PrintSection {
   return {
