@@ -58,6 +58,7 @@ export function LogoGridPortrait({
 }) {
   const ink = sectionInk(mode);
   const items = safeList(section.items).slice(0, cols * 3);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Client logos"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

@@ -18,6 +18,7 @@ export function StatCalloutRowPortrait({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 4);
+  if (items.length === 0) return null;
   const cols = Math.min(items.length || 1, 4);
 
   return (

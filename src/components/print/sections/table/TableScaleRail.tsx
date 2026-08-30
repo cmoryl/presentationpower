@@ -14,6 +14,7 @@ export function TableScaleRail({
 }) {
   const ink = sectionInk(mode);
   const rows = safeList(section.rows).slice(0, 4);
+  if (rows.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Scale"} style={{ margin: 0 }}>
       <div

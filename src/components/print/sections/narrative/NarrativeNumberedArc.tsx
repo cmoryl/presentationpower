@@ -15,6 +15,7 @@ export function NarrativeNumberedArc({
 }) {
   const ink = sectionInk(mode);
   const items = safeList(section.items).slice(0, 4);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Narrative arc"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

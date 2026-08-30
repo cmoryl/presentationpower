@@ -18,6 +18,7 @@ export function KpiDashboardPortrait({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 6);
+  if (items.length === 0) return null;
   const cols = items.length <= 2 ? items.length : items.length === 3 ? 3 : 2;
 
   return (

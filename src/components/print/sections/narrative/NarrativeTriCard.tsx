@@ -20,6 +20,7 @@ export function NarrativeTriCard({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 3);
+  if (items.length === 0) return null;
   const cols = Math.max(1, items.length);
   return (
     <section aria-label={section.title ?? "Narrative"} style={{ margin: 0 }}>

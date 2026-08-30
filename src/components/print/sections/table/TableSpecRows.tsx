@@ -17,6 +17,7 @@ export function TableSpecRows({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const rows = safeList(section.rows).slice(0, 10);
+  if (rows.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Specification"} style={{ margin: 0 }}>
       <div

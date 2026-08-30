@@ -19,6 +19,7 @@ export function FeatureList1Col({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 5);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Features"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

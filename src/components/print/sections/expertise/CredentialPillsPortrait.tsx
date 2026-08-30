@@ -16,6 +16,7 @@ export function CredentialPillsPortrait({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 8);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Credentials"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

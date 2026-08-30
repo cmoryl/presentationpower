@@ -22,6 +22,7 @@ export function VerbCardsPortrait({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, cols === 3 ? 6 : 4);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Features"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

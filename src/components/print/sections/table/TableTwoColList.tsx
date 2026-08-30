@@ -16,6 +16,7 @@ export function TableTwoColList({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const rows = safeList(section.rows).slice(0, 16);
+  if (rows.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Table"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

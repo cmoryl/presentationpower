@@ -17,6 +17,7 @@ export function ChecklistPanelPortrait({
   const ink = sectionInk(mode);
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 6);
+  if (items.length === 0) return null;
   return (
     <section aria-label={section.title ?? "Capabilities"} style={{ margin: 0 }}>
       <div
