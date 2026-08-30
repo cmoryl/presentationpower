@@ -107,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#003FC7" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
-      { name: "apple-mobile-web-app-title", content: "TP Modular" },
+      { name: "apple-mobile-web-app-title", content: "Element" },
       { name: "mobile-web-app-capable", content: "yes" },
       { property: "og:title", content: "TransPerfect Element · Command Center" },
       {
@@ -141,7 +141,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "/favicon.svg",
         type: "image/svg+xml",
       },
-      { rel: "apple-touch-icon", href: "/icon-1024.png", sizes: "180x180" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       // Fallback fonts so translated decks in CJK / Arabic / Hebrew / Devanagari render.
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
