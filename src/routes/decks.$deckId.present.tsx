@@ -310,7 +310,7 @@ function PresenterView() {
               )}
               aria-hidden={!notesOpen}
             >
-              <div className="mx-4 mb-20 grid grid-cols-[1fr_240px] gap-6 rounded-2xl border border-white/15 bg-black/85 p-6 backdrop-blur-xl">
+              <div className="mx-4 mb-24 grid grid-cols-1 gap-4 rounded-2xl border border-white/15 bg-black/85 p-4 backdrop-blur-xl sm:mb-20 sm:grid-cols-[1fr_240px] sm:gap-6 sm:p-6">
                 <div>
                   <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
                     Speaker notes · Slide {i + 1}
