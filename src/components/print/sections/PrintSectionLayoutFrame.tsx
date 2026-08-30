@@ -31,18 +31,13 @@ export function PrintSectionLayoutFrame({
   const { tokens } = resolvePrintSectionLayout(kind, layoutId);
   const ink = sectionInk(mode);
 
+  // Print rule: gradients belong to BOXES only. A section layout frame is page
+  // furniture, not a card, so it never paints an accent wash behind titles —
+  // the modules' own cards/tiles keep the fade-out grammar.
   const surface: CSSProperties =
-    tokens.surface === "card"
-      ? sectionGlass(mode, accent)
-      : tokens.surface === "band"
-        ? {
-            backgroundImage: `linear-gradient(96deg, ${mode === "dark" ? "#03002C" : "#03002C"} 0%, ${accent} 100%)`,
-            color: "#FFFFFF",
-            border: "none",
-          }
-        : tokens.surface === "open"
-          ? sectionGlass(mode, accent, { intensity: 0.7 })
-          : {};
+    tokens.surface === "band"
+      ? { background: "transparent", color: ink.strong, border: "none" }
+      : {};
 
   const style: CSSProperties = {
     ...surface,
@@ -50,6 +45,7 @@ export function PrintSectionLayoutFrame({
     ["--ps-hairline" as string]: ink.hairline,
     padding: tokens.pad > 0 ? cq(tokens.pad) : undefined,
   };
+
 
   return (
     <div
