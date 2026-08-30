@@ -265,14 +265,14 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   // app logo, navigation, breadcrumbs, or account chrome.
   if (bare) {
     return (
-      <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
+      <div className="min-h-dvh bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
         {children}
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
+    <div className="min-h-dvh bg-[#F5F1EA] text-[#03002C] dark:bg-[#05041A] dark:text-[#E0E8F5]">
       <header
         className={
           "sticky top-0 z-30 border-b border-white/30 " +
