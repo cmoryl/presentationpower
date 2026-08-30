@@ -96,9 +96,13 @@ export type PrintStatsVariant =
   | "stat-callout-row-portrait"
   | "stat-bento-portrait";
 
+import type { PrintSectionLayoutId } from "@/lib/print-section-layouts";
+
 export type PrintStatsSection = {
   id: string;
   kind: "stats";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintStatsVariant;
   title?: string;
   eyebrow?: string;
@@ -169,6 +173,8 @@ export type PrintHeroTitleType = {
 export type PrintHeroSection = {
   id: string;
   kind: "hero";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintHeroModuleVariant;
   eyebrow?: string;
   title: string;
@@ -215,6 +221,8 @@ export type PrintQuoteVariant =
 export type PrintQuoteSection = {
   id: string;
   kind: "quote";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintQuoteVariant;
   eyebrow?: string;
   text: string;
@@ -240,6 +248,8 @@ export type PrintLogoGridVariant =
 export type PrintLogoGridSection = {
   id: string;
   kind: "logo-grid";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintLogoGridVariant;
   eyebrow?: string;
   title?: string;
@@ -272,6 +282,8 @@ export type PrintExpertiseIconSize = "sm" | "md" | "lg" | "xl";
 export type PrintExpertiseSection = {
   id: string;
   kind: "expertise";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintExpertiseVariant;
   eyebrow?: string;
   title?: string;
@@ -294,6 +306,8 @@ export type PrintFeatureVariant = "feature-cards-3col" | "feature-cards-2col" | 
 export type PrintFeatureListSection = {
   id: string;
   kind: "feature-list";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintFeatureVariant;
   eyebrow?: string;
   title?: string;
@@ -319,6 +333,8 @@ export type PrintNarrativeVariant =
 export type PrintNarrativeSection = {
   id: string;
   kind: "narrative";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintNarrativeVariant;
   eyebrow?: string;
   title?: string;
@@ -340,6 +356,8 @@ export type PrintTableVariant = "table-two-col-list" | "table-scale-rail" | "tab
 export type PrintTableSection = {
   id: string;
   kind: "table";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintTableVariant;
   eyebrow?: string;
   title?: string;
@@ -357,6 +375,8 @@ export type PrintContactVariant =
 export type PrintContactSection = {
   id: string;
   kind: "contact";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintContactVariant;
   eyebrow?: string;
   title?: string;
@@ -384,6 +404,8 @@ export type PrintDeviceVariant =
 export type PrintDeviceSection = {
   id: string;
   kind: "device";
+  /** Section layout frame (five per family) — see print-section-layouts.ts. */
+  sectionLayoutId?: PrintSectionLayoutId;
   variantId: PrintDeviceVariant;
   eyebrow?: string;
   title?: string;

@@ -211,6 +211,8 @@ import { captureTemplateContentShell, captureTemplateLayout } from "@/lib/print-
 import { toast } from "sonner";
 import { validateDocument, errorSummary } from "@/lib/document-validation";
 import { uploadSlideMedia } from "@/lib/slide-media";
+import { PrintSectionLayoutControls } from "@/components/print/PrintSectionLayoutControls";
+import { printSectionLayoutId } from "@/lib/print-section-layouts";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
@@ -4310,6 +4312,27 @@ function sectionKindLabel(kind: PrintSection["kind"]): string {
 }
 
 function SectionInlineEditor({
+  section,
+  onPatch,
+}: {
+  section: PrintSection;
+  onPatch: (p: Partial<PrintSection>) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <PrintSectionLayoutControls
+        kind={section.kind}
+        layoutId={printSectionLayoutId(section)}
+        onChange={(sectionLayoutId) =>
+          onPatch({ sectionLayoutId } as unknown as Partial<PrintSection>)
+        }
+      />
+      <SectionKindEditor section={section} onPatch={onPatch} />
+    </div>
+  );
+}
+
+function SectionKindEditor({
   section,
   onPatch,
 }: {
