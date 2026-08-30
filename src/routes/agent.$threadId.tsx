@@ -788,8 +788,13 @@ function AgentThreadPage() {
             )}
           </aside>
 
-          {/* Chat */}
-          <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60">
+          {/* Chat — kept mounted when the deck view is showing so a build in
+              flight keeps streaming. */}
+          <section
+            className={`min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 xl:flex ${
+              deckId && mobilePane === "deck" ? "hidden" : "flex"
+            }`}
+          >
             {error && <p className="px-5 pt-4 text-xs text-red-600">{error}</p>}
             {messages === null ? (
               <div className="flex flex-1 items-center justify-center text-xs text-foreground/45">
@@ -816,10 +821,15 @@ function AgentThreadPage() {
             )}
           </section>
 
-          {/* Live deck preview */}
-          <aside className="hidden w-[420px] shrink-0 overflow-hidden rounded-2xl border border-border/60 bg-background/60 xl:flex xl:flex-col">
+          {/* Live deck preview — full width below xl, side rail above it. */}
+          <aside
+            className={`min-w-0 flex-1 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 xl:flex xl:w-[420px] xl:flex-none ${
+              deckId && mobilePane === "deck" ? "flex" : "hidden"
+            }`}
+          >
             <AgentDeckPreview deckId={deckId} refreshKey={refreshKey} />
           </aside>
+
         </div>
       </div>
     </AppShell>
