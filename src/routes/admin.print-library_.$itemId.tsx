@@ -883,6 +883,16 @@ function MasterItemEditorPage() {
                       })
                     }
                   />
+                  {/* Always available — masters that ship flat (the plain
+                      Client Spotlight) can switch a hero background on here. */}
+                  <HeroBackgroundSwitcher
+                    className="mt-3"
+                    value={heroMedia}
+                    onChange={(next) => patchContent({ heroMedia: next })}
+                    divisionId={shipped.divisionId ?? brand.id}
+                    mode={previewMode === "dark" ? "dark" : "light"}
+                    seed={`library-${itemId}`}
+                  />
                   {heroMedia?.imageUrl ? (
                     <HeroCropStudio
                       imageUrl={heroMedia.imageUrl}
