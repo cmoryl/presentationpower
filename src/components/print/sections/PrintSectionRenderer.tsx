@@ -2,7 +2,7 @@
 // layout can render `content.modules?` by mapping through this component.
 import type { PrintHeroModuleVariant, PrintSection } from "@/lib/print-assets.types";
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
-import { cq, MODULE } from "./shared";
+import { cq, MODULE, safeList } from "./shared";
 import {
   HeroPhotoBand,
   HeroSplitPhoto,
