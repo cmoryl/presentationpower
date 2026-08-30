@@ -464,6 +464,12 @@ function AgentThreadPage() {
   const [seedBrief, setSeedBrief] = useState("");
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [progressEl, setProgressEl] = useState<HTMLDivElement | null>(null);
+  // Below xl the live deck preview pane has no room beside the chat, so it used
+  // to be display:none — which also hid "Open in deck editor", the skin picker
+  // and the slide list, leaving phone users at a dead end after a build. The
+  // pane is now a switchable view instead of a hidden one.
+  const [mobilePane, setMobilePane] = useState<"chat" | "deck">("chat");
+
 
   // The workspace should always run from wherever it starts on the page down to
   // the bottom of the viewport, so the rails never get cut off. Measuring beats
@@ -659,7 +665,40 @@ function AgentThreadPage() {
           </div>
         )}
 
+        {/* Chat ⇄ Deck switch — only needed where the preview can't sit beside
+            the chat. Appears as soon as there is a deck to look at. */}
+        {deckId && (
+          <div
+            role="tablist"
+            aria-label="Agent workspace view"
+            className="inline-flex self-start rounded-full border border-border/60 bg-background/70 p-1 xl:hidden"
+          >
+            {(
+              [
+                ["chat", "Chat"],
+                ["deck", "Deck preview"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={mobilePane === id}
+                onClick={() => setMobilePane(id)}
+                className={`min-h-9 rounded-full px-4 text-xs font-semibold transition ${
+                  mobilePane === id
+                    ? "bg-[#003FC7] text-white shadow-sm"
+                    : "text-foreground/55 hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div
+
           ref={workspaceRef}
           className="relative flex gap-3"
           style={{
@@ -749,8 +788,13 @@ function AgentThreadPage() {
             )}
           </aside>
 
-          {/* Chat */}
-          <section className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60">
+          {/* Chat — kept mounted when the deck view is showing so a build in
+              flight keeps streaming. */}
+          <section
+            className={`min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 xl:flex ${
+              deckId && mobilePane === "deck" ? "hidden" : "flex"
+            }`}
+          >
             {error && <p className="px-5 pt-4 text-xs text-red-600">{error}</p>}
             {messages === null ? (
               <div className="flex flex-1 items-center justify-center text-xs text-foreground/45">
@@ -777,10 +821,15 @@ function AgentThreadPage() {
             )}
           </section>
 
-          {/* Live deck preview */}
-          <aside className="hidden w-[420px] shrink-0 overflow-hidden rounded-2xl border border-border/60 bg-background/60 xl:flex xl:flex-col">
+          {/* Live deck preview — full width below xl, side rail above it. */}
+          <aside
+            className={`min-w-0 flex-1 shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 xl:flex xl:w-[420px] xl:flex-none ${
+              deckId && mobilePane === "deck" ? "flex" : "hidden"
+            }`}
+          >
             <AgentDeckPreview deckId={deckId} refreshKey={refreshKey} />
           </aside>
+
         </div>
       </div>
     </AppShell>
