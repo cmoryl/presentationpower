@@ -23,7 +23,7 @@ import { LOGIN_PATH, isPublicNoLoginPath, loginUrl } from "@/lib/sign-out";
 
 function NotFoundComponent() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#03002C] px-6 text-white">
+    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#03002C] px-6 text-white">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-60"
@@ -63,7 +63,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           This page didn't load

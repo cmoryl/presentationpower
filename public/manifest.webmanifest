@@ -1,11 +1,11 @@
 {
-  "name": "TransPerfect Modular",
-  "short_name": "TP Modular",
-  "description": "Modular slide directory and AI-assembled decks for TransPerfect sales enablement.",
+  "name": "TransPerfect Element",
+  "short_name": "Element",
+  "description": "TransPerfect Element \u2014 modular design system for brand-compliant decks, print and event kits.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "theme_color": "#003FC7",
   "background_color": "#03002C",
   "icons": [
