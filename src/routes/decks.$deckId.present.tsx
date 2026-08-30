@@ -232,11 +232,12 @@ function PresenterView() {
                       <div
                         className="absolute inset-0"
                         style={{
-                          transform: "scale(0.0833)",
+                          transform: `scale(${thumbW / 1920})`,
                           transformOrigin: "top left",
                           width: 1920,
                           height: 1080,
                         }}
+
                       >
                         {v && (
                           <DeckPackScope pack={packFor(s)}>
