@@ -160,6 +160,14 @@ import {
   withSectionHidden,
   withSectionShown,
 } from "@/lib/print-hidden-sections";
+import {
+  ORG_CREDENTIALS,
+  ORG_EXPERTISE,
+  ORG_INCLUDED,
+  ORG_NAME,
+  ORG_STATS,
+} from "@/lib/print-library/org-facts";
+
 import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import {
