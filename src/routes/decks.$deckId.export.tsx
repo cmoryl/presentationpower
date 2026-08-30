@@ -803,7 +803,9 @@ function ExportView() {
                     className="aspect-[16/9] w-full"
                     data-arrow-check-slide={slide.id}
                     data-arrow-check-index={i + 1}
+                    data-mobile-export-slide={slide.id}
                   >
+
                     <ScaledSlide>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
