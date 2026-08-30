@@ -299,7 +299,32 @@ export const PRINT_DEVICE_VARIANTS: Array<{
   },
 ];
 
+/** Public entry: wraps the family renderer in its chosen section layout frame
+ *  so every module family exposes five layouts without re-authoring content. */
 export function PrintSectionRenderer({
+  section,
+  mode,
+  accent,
+}: {
+  section: PrintSection;
+  mode: "light" | "dark";
+  accent: string;
+}) {
+  const body = <PrintSectionBody section={section} mode={mode} accent={accent} />;
+  if (!body) return null;
+  return (
+    <PrintSectionLayoutFrame
+      kind={section.kind}
+      layoutId={printSectionLayoutId(section)}
+      mode={mode}
+      accent={accent}
+    >
+      {body}
+    </PrintSectionLayoutFrame>
+  );
+}
+
+function PrintSectionBody({
   section,
   mode,
   accent,
