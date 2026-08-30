@@ -258,6 +258,17 @@ export type PrintExpertiseVariant =
   | "expertise-checklist"
   | "expertise-credential-pills";
 
+/** Layout styles for the icon-strip expertise variant. */
+export type PrintExpertiseLayout =
+  | "horizontal"
+  | "vertical-list"
+  | "grid-cards"
+  | "minimal-row"
+  | "split-pairs"
+  | "large-center";
+
+export type PrintExpertiseIconSize = "sm" | "md" | "lg" | "xl";
+
 export type PrintExpertiseSection = {
   id: string;
   kind: "expertise";
@@ -265,6 +276,10 @@ export type PrintExpertiseSection = {
   eyebrow?: string;
   title?: string;
   items: PrintExpertiseItem[];
+  /** Layout style applied when variantId is `expertise-icon-strip`. */
+  layout?: PrintExpertiseLayout;
+  /** Global icon size scale for the strip. */
+  iconSize?: PrintExpertiseIconSize;
 };
 
 // ---- Feature-list family --------------------------------------------------
