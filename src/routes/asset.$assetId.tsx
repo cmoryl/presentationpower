@@ -211,6 +211,8 @@ import { captureTemplateContentShell, captureTemplateLayout } from "@/lib/print-
 import { toast } from "sonner";
 import { validateDocument, errorSummary } from "@/lib/document-validation";
 import { uploadSlideMedia } from "@/lib/slide-media";
+import { PrintSectionLayoutControls } from "@/components/print/PrintSectionLayoutControls";
+import { printSectionLayoutId } from "@/lib/print-section-layouts";
 
 export const Route = createFileRoute("/asset/$assetId")({
   head: ({ params }) => ({
