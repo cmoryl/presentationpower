@@ -8,6 +8,7 @@
 
 import type { CSSProperties } from "react";
 import { printIconInk } from "@/lib/print-icon-contrast";
+import { printCardSurface, type PrintCardSurfaceOptions } from "@/lib/print-card-surface";
 import { usePrintSurface } from "./print-doc-mode";
 import type { PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import {
@@ -181,21 +182,14 @@ export function pagePadTop(
 // accent glowing softly behind. Panel opacity tuned to keep 9–11px template
 // type legible over the 75%-opacity portrait-projected aurora.
 // ---------------------------------------------------------------------------
-export function glass(mode: "light" | "dark", accent: string): CSSProperties {
-  if (mode === "dark") {
-    return {
-      background: `linear-gradient(180deg, color-mix(in srgb, ${accent} 6%, rgba(10,8,36,0.62)), rgba(6,4,32,0.55))`,
-      border: `1px solid color-mix(in srgb, ${accent} 22%, rgba(255,255,255,0.08))`,
-      backdropFilter: "blur(14px) saturate(140%)",
-      boxShadow: `0 ${cq(10)} ${cq(28)} rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.04)`,
-    };
-  }
-  return {
-    background: `linear-gradient(180deg, rgba(255,255,255,0.90), rgba(255,255,255,0.78))`,
-    border: `1px solid color-mix(in srgb, ${accent} 18%, rgba(255,255,255,0.75))`,
-    backdropFilter: "blur(14px) saturate(140%)",
-    boxShadow: `0 ${cq(10)} ${cq(28)} rgba(3,0,44,0.10), inset 0 0 0 1px rgba(255,255,255,0.55)`,
-  };
+export function glass(
+  mode: "light" | "dark",
+  accent: string,
+  opts: PrintCardSurfaceOptions = {},
+): CSSProperties {
+  // One grammar with the presentation deck: accent seam on top, tint fading to
+  // nothing before the bottom edge, no closing hairline on light pages.
+  return { overflow: "hidden", ...printCardSurface(mode, accent, opts) };
 }
 
 // Accent chip (soft accent circle behind an outline glyph). `warm` picks the
