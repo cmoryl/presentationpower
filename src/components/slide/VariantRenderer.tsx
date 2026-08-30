@@ -51,26 +51,9 @@ import { findSlideModule } from "./module-registry";
 import { SlideFrame, SlideFrameCtx, SlideTitle, s } from "./module-kit";
 export { pickIcon } from "./module-primitives";
 
-// Module families register themselves on import (side effects).
-import "./modules/viz";
-import "./modules/timeline";
-import "./modules/process";
-import "./modules/bento";
-import "./modules/quote";
-import "./modules/logos";
-import "./modules/close";
-import "./modules/stat";
-import "./modules/graph";
-import "./modules/opening";
-import "./modules/dashboard";
-import "./modules/image";
-import "./modules/info";
-import "./modules/narrative";
-import "./modules/team";
-import "./modules/business";
-import "./modules/advanced";
-import "./modules/editorial";
-import "./modules/locations";
+// One canonical registration entry point. Keeping a second hand-maintained
+// import list here previously let the renderer and registry consumers drift.
+import "./modules/register-all";
 
 // Cache synthesized Lucide-shaped components per pack:name ref so React sees
 // stable component identity across renders.
