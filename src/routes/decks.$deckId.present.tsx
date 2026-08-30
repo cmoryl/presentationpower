@@ -14,6 +14,8 @@ import { cn } from "@/lib/utils";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
+import { useIsMobile } from "@/hooks/use-mobile";
+
 
 const focusThumb = (el: HTMLButtonElement | null) => {
   el?.focus({ preventScroll: true });
