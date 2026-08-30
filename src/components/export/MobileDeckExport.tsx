@@ -74,7 +74,6 @@ export function MobileDeckExport({
     if (busy) return;
     if (blocked && !force) {
       const label = kind === "pdf" ? "PDF export" : "PowerPoint export";
-      onBlocked?.(label);
       const { toast } = await import("sonner");
       toast.warning(`${label} is on hold — resolve the blocking QA issues first.`, {
         action: { label: "Export anyway", onClick: () => void run(kind, true) },
