@@ -64,8 +64,9 @@ export function ContactExpertCard({
             </div>
           )}
           <div style={{ marginTop: cq(3), fontSize: cq(13), fontWeight: 700, color: ink.strong }}>
-            {section.name ?? "Your program lead"}
+            {section.name ?? ORG_CONTACT.name}
           </div>
+
           {section.role && (
             <div style={{ marginTop: cq(2), fontSize: cq(9.6), color: ink.soft }}>
               {section.role}
