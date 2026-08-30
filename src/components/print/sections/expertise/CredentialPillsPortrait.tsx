@@ -1,6 +1,6 @@
-// Row of short credential pills. Great for accreditations / ISOs.
+// Row of credentials separated by hairlines — bigger icons, no pills.
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, safeList} from "../shared";
+import { cq, sectionInk, MODULE, safeList } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 
@@ -17,6 +17,9 @@ export function CredentialPillsPortrait({
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 8);
   if (items.length === 0) return null;
+  const hairline = `1px solid ${
+    mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)"
+  }`;
   return (
     <section aria-label={section.title ?? "Credentials"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (
@@ -33,39 +36,51 @@ export function CredentialPillsPortrait({
           {section.title || section.eyebrow}
         </div>
       )}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: cq(8) }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          borderTop: hairline,
+          borderBottom: hairline,
+        }}
+      >
         {items.map((it, i) => (
-          <span
+          <div
             key={i}
             style={{
-              display: "inline-flex",
+              display: "flex",
               alignItems: "center",
-              padding: `${cq(6)} ${cq(12)}`,
-              borderRadius: 999,
-              fontSize: cq(9.5),
-              fontWeight: 600,
-              letterSpacing: "0.04em",
-              color: ink.strong,
-              background:
-                mode === "dark"
-                  ? `color-mix(in srgb, ${accent} 14%, rgba(10,8,36,0.55))`
-                  : `color-mix(in srgb, ${accent} 10%, #ffffff)`,
-              border: `1px solid color-mix(in srgb, ${accent} 28%, ${mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(3,0,44,0.08)"})`,
+              gap: cq(10),
+              padding: `${cq(12)} ${cq(16)}`,
+              paddingLeft: i === 0 ? 0 : cq(16),
+              borderLeft: i === 0 ? "none" : hairline,
+              flex: "1 1 0",
+              minWidth: cq(120),
             }}
           >
             {icons ? (
-              <span style={{ display: "inline-flex", marginRight: cq(6) }}>
+              <span style={{ display: "inline-flex", flexShrink: 0 }}>
                 <EditableIcon
                   slot={`sec.${section.id}.pill.${i}`}
                   name="badge"
-                  size={cq(11)}
+                  size={cq(20)}
                   color={accent}
                   strokeWidth={1.75}
                 />
               </span>
             ) : null}
-            {it.label}
-          </span>
+            <span
+              style={{
+                fontSize: cq(10),
+                fontWeight: 600,
+                letterSpacing: "0.02em",
+                lineHeight: 1.3,
+                color: ink.strong,
+              }}
+            >
+              {it.label}
+            </span>
+          </div>
         ))}
       </div>
     </section>
