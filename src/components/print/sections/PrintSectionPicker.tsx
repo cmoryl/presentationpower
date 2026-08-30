@@ -37,6 +37,19 @@ import {
   printVariantLabel,
   type PrintModuleFamily,
 } from "@/lib/print-library/module-families";
+import {
+  ORG_CONTACT,
+  ORG_CREDENTIALS,
+  ORG_EMAIL,
+  ORG_EXPERTISE,
+  ORG_INCLUDED,
+  ORG_NAME,
+  ORG_REGIONS,
+  ORG_STATS,
+  ORG_URL,
+} from "@/lib/print-library/org-facts";
+import { clientPlaceholderItems } from "@/lib/logohub-fillers";
+
 
 export const PRINT_SECTION_DND_MIME = "application/x-print-section";
 
