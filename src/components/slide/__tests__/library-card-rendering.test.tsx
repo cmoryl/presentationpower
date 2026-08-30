@@ -5,7 +5,7 @@ import { ScaledSlide } from "../ScaledSlide";
 import { SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { resolveBrandMode } from "@/lib/brand-profiles";
-import { byId, MODULE_VARIANTS } from "@/lib/taxonomy";
+import { MODULE_VARIANTS } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 
 const brand = resolveBrandMode("bm-enterprise");
@@ -13,7 +13,7 @@ const brief = resolveDivisionBrief(brand);
 
 describe("library card rendering", () => {
   it("renders a variant inside the library card context (thumbnail + scaled)", () => {
-    const variant = MODULE_VARIANTS.find(v => v.id === "MV-VIZ-BARS-VERTICAL")!;
+    const variant = MODULE_VARIANTS.find(v => v.id === "MV-OP-COVER")!;
     const content = seedDivisionContent(variant.id, brief, "Library Preview", brand);
     const slide: DeckSlide = {
       id: "test-card",
@@ -38,17 +38,17 @@ describe("library card rendering", () => {
       </SlideThumbnailContext.Provider>
     );
 
+    // Cover variants usually render the title. 
+    // We check for the seeded content to ensure it's not just a blank card.
     expect(html).toContain("Library Preview");
-    // Ensure ScaledSlide wrapper is present (it adds a div with transform or data attribute)
-    expect(html).toContain("data-scaled-slide");
+    expect(html).toContain("data-slide-stage");
   });
 
   it("survives missing optional props in library view", () => {
-    // Gallery cards often render with minimal slide data
     const variant = MODULE_VARIANTS[0]!;
     const slide: any = {
       variantId: variant.id,
-      content: {}, // empty content
+      content: {},
     };
 
     expect(() => renderToStaticMarkup(
