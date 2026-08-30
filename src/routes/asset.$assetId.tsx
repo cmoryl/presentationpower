@@ -60,6 +60,8 @@ import type {
   PrintLogoGridVariant,
   PrintExpertiseSection,
   PrintExpertiseVariant,
+  PrintExpertiseLayout,
+  PrintExpertiseIconSize,
   PrintFeatureListSection,
   PrintFeatureVariant,
   PrintNarrativeSection,
