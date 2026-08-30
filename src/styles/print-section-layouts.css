@@ -1,0 +1,79 @@
+/*
+ * PRINT SECTION LAYOUT FRAMES
+ * ---------------------------------------------------------------------------
+ * Structural overrides for the five section layouts every print module family
+ * exposes (see src/lib/print-section-layouts.ts). Rules are deliberately
+ * scoped to the layout frame and to elements the modules already lay out
+ * inline, so a layout re-states geometry without touching module internals.
+ * `!important` is required: module geometry is authored as inline style.
+ */
+
+/* --- item grids: column count + rhythm ---------------------------------- */
+[data-ps-frame] div[style*="grid-template-columns"] {
+  grid-template-columns: repeat(var(--ps-cols), minmax(0, 1fr)) !important;
+  gap: var(--ps-gap) !important;
+}
+
+/* --- alignment ---------------------------------------------------------- */
+[data-ps-frame][data-ps-align="center"] {
+  text-align: center;
+}
+[data-ps-frame][data-ps-align="center"] header,
+[data-ps-frame][data-ps-align="center"] div[style*="grid-template-columns"] > * {
+  text-align: center !important;
+}
+
+/* --- reversed column order --------------------------------------------- */
+[data-ps-frame][data-ps-reverse="1"] div[style*="grid-template-columns"] > :first-child {
+  order: 9 !important;
+}
+
+/* --- header treatments -------------------------------------------------- */
+[data-ps-frame][data-ps-header="hidden"] > header {
+  display: none !important;
+}
+[data-ps-frame][data-ps-header="quiet"] > header {
+  opacity: 0.78;
+}
+[data-ps-frame][data-ps-header="rule"] > header {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: var(--ps-gap);
+  opacity: 0.98;
+}
+[data-ps-frame][data-ps-header="rule"] > header > * {
+  opacity: 1;
+}
+[data-ps-frame][data-ps-header="inline"] > header {
+  display: flex;
+  align-items: baseline;
+  column-gap: var(--ps-gap);
+  flex-wrap: wrap;
+}
+
+/* --- plain surface: strip nested plates so the page carries the module --- */
+[data-ps-frame][data-ps-surface="plain"] div[style*="grid-template-columns"] > * {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* --- hairline surface: separate stacked items instead of plating them ---- */
+[data-ps-frame][data-ps-surface="hairline"] div[style*="grid-template-columns"] > * {
+  background: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--ps-hairline, rgba(3, 0, 44, 0.12)) !important;
+  padding-top: var(--ps-gap) !important;
+}
+[data-ps-frame][data-ps-surface="hairline"] div[style*="grid-template-columns"] > :first-child {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+@media print {
+  [data-ps-frame] {
+    break-inside: avoid;
+  }
+}
