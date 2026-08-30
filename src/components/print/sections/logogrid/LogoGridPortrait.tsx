@@ -2,6 +2,7 @@
 import type { PrintLogoGridSection, PrintLogoItem } from "@/lib/print-assets.types";
 import { cq, sectionInk, sectionGlass, MODULE, safeList} from "../shared";
 import { useResolvedLogoUrl } from "@/lib/slide-media-refresh";
+import { ORG_NAME, orgLogoForMode } from "@/lib/print-library/org-facts";
 
 function LogoTile({
   item,
