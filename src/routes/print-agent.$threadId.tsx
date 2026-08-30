@@ -149,8 +149,8 @@ function PrintAgentThreadPage() {
           </p>
         </header>
 
-        <div className="grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <aside className="order-2 space-y-2 lg:order-1">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+          <aside className="order-2 min-w-0 space-y-2 lg:order-1">
             <Button onClick={() => void newThread()} className="h-11 w-full justify-start gap-2">
               <Plus className="size-4" aria-hidden /> New print conversation
             </Button>
@@ -160,7 +160,7 @@ function PrintAgentThreadPage() {
                   <Link
                     to="/print-agent/$threadId"
                     params={{ threadId: t.id }}
-                    className={`min-h-11 flex-1 truncate rounded-lg px-3 py-2.5 text-sm ${
+                    className={`min-h-11 min-w-0 flex-1 truncate rounded-lg px-3 py-2.5 text-sm ${
                       t.id === threadId ? "bg-muted font-medium" : "hover:bg-muted/60"
                     }`}
                   >
@@ -180,7 +180,7 @@ function PrintAgentThreadPage() {
             </ul>
           </aside>
 
-          <section className="order-1 flex min-h-[70vh] flex-col overflow-hidden rounded-2xl border border-border bg-card lg:order-2">
+          <section className="order-1 flex min-h-[70vh] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card lg:order-2">
             {error ? (
               <div className="p-8 text-sm text-destructive">{error}</div>
             ) : messages === null ? (

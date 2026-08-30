@@ -720,6 +720,9 @@ function AgentThreadPage() {
                     <Link
                       to="/agent/$threadId"
                       params={{ threadId: t.id }}
+                      onClick={() => {
+                        if (isMobile) setShowLeftRail(false);
+                      }}
                       className="min-w-0 flex-1 truncate text-left"
                     >
                       {t.title}
