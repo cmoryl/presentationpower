@@ -665,7 +665,40 @@ function AgentThreadPage() {
           </div>
         )}
 
+        {/* Chat ⇄ Deck switch — only needed where the preview can't sit beside
+            the chat. Appears as soon as there is a deck to look at. */}
+        {deckId && (
+          <div
+            role="tablist"
+            aria-label="Agent workspace view"
+            className="inline-flex self-start rounded-full border border-border/60 bg-background/70 p-1 xl:hidden"
+          >
+            {(
+              [
+                ["chat", "Chat"],
+                ["deck", "Deck preview"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={mobilePane === id}
+                onClick={() => setMobilePane(id)}
+                className={`min-h-9 rounded-full px-4 text-xs font-semibold transition ${
+                  mobilePane === id
+                    ? "bg-[#003FC7] text-white shadow-sm"
+                    : "text-foreground/55 hover:text-foreground"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div
+
           ref={workspaceRef}
           className="relative flex gap-3"
           style={{
