@@ -261,44 +261,56 @@ function PresenterView() {
               </SlideThumbnailContext.Provider>
             </div>
 
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-full bg-white/10 px-5 py-2 text-xs text-white/80 backdrop-blur">
+            <div className="absolute bottom-4 left-1/2 flex max-w-[calc(100vw-1.5rem)] -translate-x-1/2 items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white/80 backdrop-blur sm:gap-4 sm:px-5 sm:py-2">
               <button
                 onClick={() => setI((n) => Math.max(0, n - 1))}
-                className="hover:text-white"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:text-white sm:h-auto sm:w-auto"
                 aria-label="Previous slide"
               >
                 ←
               </button>
-              <span className="tabular-nums">
+              <span className="shrink-0 tabular-nums">
                 {i + 1} / {visibleSlides.length}
               </span>
               <button
                 onClick={() => setI((n) => Math.min(visibleSlides.length - 1, n + 1))}
-                className="hover:text-white"
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full hover:text-white sm:h-auto sm:w-auto"
                 aria-label="Next slide"
               >
                 →
               </button>
               <button
                 onClick={() => setStripOpen((v) => !v)}
-                className="ml-2 hover:text-white"
+                className="grid h-11 min-w-11 shrink-0 place-items-center rounded-full px-2 hover:text-white sm:ml-2 sm:h-auto sm:min-w-0 sm:px-0"
                 aria-label="Toggle thumbnails"
                 title="Toggle thumbnails (T)"
               >
-                {stripOpen ? "▾ Thumbs" : "▴ Thumbs"}
+                <span className="sm:hidden">{stripOpen ? "▾" : "▴"}</span>
+                <span className="hidden sm:inline">{stripOpen ? "▾ Thumbs" : "▴ Thumbs"}</span>
               </button>
               <button
                 onClick={() => setNotesOpen((v) => !v)}
-                className={cn("hover:text-white", notesOpen && "text-white")}
+                className={cn(
+                  "grid h-11 min-w-11 shrink-0 place-items-center rounded-full px-2 hover:text-white sm:h-auto sm:min-w-0 sm:px-0",
+                  notesOpen && "text-white",
+                )}
                 aria-label="Toggle presenter notes"
                 title="Toggle notes (N)"
               >
-                {notesOpen ? "▾ Notes" : "▴ Notes"}
+                <span className="sm:hidden">N</span>
+                <span className="hidden sm:inline">{notesOpen ? "▾ Notes" : "▴ Notes"}</span>
               </button>
-              <Link to="/decks/$deckId" params={{ deckId }} className="ml-3 hover:text-white">
-                Exit (Esc)
+              <Link
+                to="/decks/$deckId"
+                params={{ deckId }}
+                aria-label="Exit presentation"
+                className="grid h-11 min-w-11 shrink-0 place-items-center rounded-full px-2 hover:text-white sm:ml-3 sm:h-auto sm:min-w-0 sm:px-0"
+              >
+                <span className="sm:hidden">✕</span>
+                <span className="hidden sm:inline">Exit (Esc)</span>
               </Link>
             </div>
+
 
             {/* Presenter notes drawer */}
             <div
