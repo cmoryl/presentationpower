@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from "react";
 import { useDeckStore, resolveSlideTransition } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 
@@ -64,11 +64,11 @@ function PresenterView() {
 
   // Touch navigation: horizontal swipe advances/rewinds a slide.
   const touchRef = useRef<{ x: number; y: number } | null>(null);
-  const onTouchStart = (e: React.TouchEvent) => {
+  const onTouchStart = (e: ReactTouchEvent) => {
     const t = e.touches[0];
     touchRef.current = t ? { x: t.clientX, y: t.clientY } : null;
   };
-  const onTouchEnd = (e: React.TouchEvent) => {
+  const onTouchEnd = (e: ReactTouchEvent) => {
     const start = touchRef.current;
     const t = e.changedTouches[0];
     touchRef.current = null;
@@ -98,6 +98,7 @@ function PresenterView() {
   // PowerPoint parity: hidden slides stay in the deck but are skipped during
   // playback, so presenter navigation and the thumbnail strip both use this list.
   const visibleSlides = deck.slides.filter((sl) => !sl.hidden);
+  visibleSlidesCount.current = visibleSlides.length;
   const slide = visibleSlides[i];
   const nextSlide = visibleSlides[i + 1];
   const nextVariant = nextSlide ? byId(MODULE_VARIANTS, nextSlide.variantId) : undefined;
@@ -183,7 +184,11 @@ function PresenterView() {
     <SlideTemplateIndustryProvider industryId={deck.context?.designRecipeId}>
       <SlideSkinProvider skin={deck.context?.skin}>
         <SlideMediaRefreshProvider slides={visibleSlides}>
-          <div className="fixed inset-0 flex flex-col items-center justify-center bg-black">
+          <div
+            className="fixed inset-0 flex flex-col items-center justify-center bg-black"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+          >
             <div className="w-full max-w-[95vw]">
               <div className="relative mx-auto aspect-[16/9] w-full">
                 <SectionCue
