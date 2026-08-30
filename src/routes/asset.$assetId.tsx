@@ -60,6 +60,8 @@ import type {
   PrintLogoGridVariant,
   PrintExpertiseSection,
   PrintExpertiseVariant,
+  PrintExpertiseLayout,
+  PrintExpertiseIconSize,
   PrintFeatureListSection,
   PrintFeatureVariant,
   PrintNarrativeSection,
@@ -4818,6 +4820,21 @@ function ExpertiseInlineEditor({
   section: PrintExpertiseSection;
   onPatch: (p: Partial<PrintExpertiseSection>) => void;
 }) {
+  const isIconStrip = section.variantId === "expertise-icon-strip";
+  const EXPERTISE_LAYOUTS: { id: PrintExpertiseLayout; label: string }[] = [
+    { id: "horizontal", label: "Horizontal row" },
+    { id: "vertical-list", label: "Vertical list" },
+    { id: "grid-cards", label: "Grid cards" },
+    { id: "minimal-row", label: "Minimal row" },
+    { id: "split-pairs", label: "Split pairs" },
+    { id: "large-center", label: "Large center" },
+  ];
+  const ICON_SIZES: { id: PrintExpertiseIconSize; label: string }[] = [
+    { id: "sm", label: "Small" },
+    { id: "md", label: "Medium" },
+    { id: "lg", label: "Large" },
+    { id: "xl", label: "Extra large" },
+  ];
   return (
     <>
       <select
@@ -4832,6 +4849,38 @@ function ExpertiseInlineEditor({
           </option>
         ))}
       </select>
+      {isIconStrip && (
+        <div className="grid grid-cols-2 gap-2">
+          <select
+            aria-label="Layout"
+            className={inspectorInput}
+            value={section.layout ?? "horizontal"}
+            onChange={(e) =>
+              onPatch({ layout: e.target.value as PrintExpertiseLayout })
+            }
+          >
+            {EXPERTISE_LAYOUTS.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.label}
+              </option>
+            ))}
+          </select>
+          <select
+            aria-label="Icon size"
+            className={inspectorInput}
+            value={section.iconSize ?? "md"}
+            onChange={(e) =>
+              onPatch({ iconSize: e.target.value as PrintExpertiseIconSize })
+            }
+          >
+            {ICON_SIZES.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <input
         className={inspectorInput}
         placeholder="Eyebrow"

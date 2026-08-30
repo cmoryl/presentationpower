@@ -40,8 +40,6 @@ export function CredentialPillsPortrait({
         style={{
           display: "flex",
           flexWrap: "wrap",
-          borderTop: hairline,
-          borderBottom: hairline,
         }}
       >
         {items.map((it, i) => (

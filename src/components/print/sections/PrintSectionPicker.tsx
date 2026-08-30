@@ -215,6 +215,8 @@ export function makePrintExpertiseSection(variantId: PrintExpertiseVariant): Pri
     kind: "expertise",
     variantId,
     title: "We know how",
+    layout: "horizontal",
+    iconSize: "md",
     items: [
       { label: "Strategy", icon: "sparkles" },
       { label: "Localize", icon: "globe-alt" },
