@@ -69,3 +69,22 @@ export const ORG_CONTACT = {
   email: ORG_EMAIL,
   phone: ORG_REGIONS[0]!.value,
 };
+
+/**
+ * Real organisation lockups. Print modules must never draw an invented or
+ * greyed placeholder mark: every org logo slot defaults to these approved
+ * TransPerfect files, and stays overridable per section in the editor.
+ */
+export const ORG_LOGO = {
+  /** Colour horizontal lockup — light surfaces. */
+  light: "/brand-logos/tp-color.png",
+  /** White horizontal lockup — dark / accent surfaces. */
+  dark: "/brand-logos/tp-white.png",
+  /** Single-colour black lockup — bright or print-safe surfaces. */
+  black: "/brand-logos/tp-black.png",
+} as const;
+
+/** Pick the approved org lockup for a surface mode. */
+export function orgLogoForMode(mode: "light" | "dark"): string {
+  return mode === "dark" ? ORG_LOGO.dark : ORG_LOGO.light;
+}

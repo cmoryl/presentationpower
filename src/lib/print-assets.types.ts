@@ -198,6 +198,11 @@ export type PrintHeroSection = {
   /** Co-brand partner name / logo for the MSA partnership band opener. */
   partner?: string;
   partnerLogoUrl?: string;
+  /** Our own organisation lockup shown in co-brand / masthead slots. Defaults
+   *  to the approved TransPerfect mark (see org-facts ORG_LOGO). */
+  orgLogoUrl?: string;
+  /** Height of the org lockup in module px (default 30). */
+  orgLogoHeight?: number;
   /** Share of page height the photo band occupies on the fade opener (0..100). */
   heightPct?: number;
   /** Masthead rule styling (thickness, spacing, colour). */
@@ -254,6 +259,8 @@ export type PrintLogoGridSection = {
   eyebrow?: string;
   title?: string;
   items: PrintLogoItem[];
+  /** Optional org lockup rendered above the grid ("our mark, their marks"). */
+  orgLogoUrl?: string;
 };
 
 // ---- Expertise family -----------------------------------------------------

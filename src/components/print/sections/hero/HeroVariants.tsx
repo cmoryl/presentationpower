@@ -9,6 +9,7 @@ import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print
 import { heroImageStyle } from "@/lib/print-hero-transform";
 import { printCardSurface } from "@/lib/print-card-surface";
 import type { PrintHeroSection } from "@/lib/print-assets.types";
+import { ORG_LOGO, ORG_NAME } from "@/lib/print-library/org-facts";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { AutoFitText } from "./HeroAutoFit";
@@ -881,15 +882,17 @@ export function HeroCobrandBand({ section, mode, accent }: Props) {
             minHeight: cq(44),
           }}
         >
-          <span
+          <img
+            src={section.orgLogoUrl || ORG_LOGO.dark}
+            alt={`${ORG_NAME} logo`}
+            data-testid="print-hero-org-logo"
             style={{
-              fontWeight: 700,
-              letterSpacing: "-0.01em",
-              color: "#FFFFFF",
+              height: cq(section.orgLogoHeight ?? 30),
+              width: "auto",
+              maxWidth: cq(220),
+              objectFit: "contain",
             }}
-          >
-            {section.kicker ?? "TransPerfect"}
-          </span>
+          />
           <span
             aria-hidden
             style={{ width: 1, alignSelf: "stretch", background: "rgba(255,255,255,0.4)" }}
