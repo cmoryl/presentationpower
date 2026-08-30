@@ -1,7 +1,7 @@
 {
   "name": "TransPerfect Element",
   "short_name": "Element",
-  "description": "TransPerfect Element \u2014 modular design system for brand-compliant decks, print and event kits.",
+  "description": "TransPerfect Element — modular design system for brand-compliant decks, print and event kits.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
