@@ -225,7 +225,7 @@ export function Breadcrumbs() {
             // resolved to a real route above.
             <Link
               to={c.href as string}
-              className="rounded-full px-2 py-1 transition hover:bg-white/50 hover:text-black dark:hover:bg-white/[0.06] dark:hover:text-white"
+              className="shrink-0 rounded-full px-2 py-1 transition hover:bg-white/50 hover:text-black dark:hover:bg-white/[0.06] dark:hover:text-white"
             >
               {c.label}
             </Link>
