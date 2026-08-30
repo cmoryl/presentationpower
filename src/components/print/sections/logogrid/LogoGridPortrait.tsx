@@ -59,8 +59,24 @@ export function LogoGridPortrait({
   const ink = sectionInk(mode);
   const items = safeList(section.items).slice(0, cols * 3);
   if (items.length === 0) return null;
+  const orgLogo = section.orgLogoUrl || orgLogoForMode(mode);
   return (
     <section aria-label={section.title ?? "Client logos"} style={{ margin: 0 }}>
+      {orgLogo && (
+        <img
+          src={orgLogo}
+          alt={`${ORG_NAME} logo`}
+          data-testid="print-logogrid-org-logo"
+          style={{
+            display: "block",
+            height: cq(22),
+            width: "auto",
+            maxWidth: cq(180),
+            objectFit: "contain",
+            marginBottom: cq(10),
+          }}
+        />
+      )}
       {(section.eyebrow || section.title) && (
         <header style={{ marginBottom: cq(MODULE.headerGap) }}>
           {section.eyebrow && (
