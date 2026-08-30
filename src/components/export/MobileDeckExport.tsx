@@ -70,7 +70,6 @@ export function MobileDeckExport({
   const [busy, setBusy] = useState<null | "pdf" | "pptx">(null);
 
   async function run(kind: "pdf" | "pptx", force = false) {
-    console.log("[mobile-deck-export] run", kind, { force, blocked, busy });
     if (busy) return;
     if (blocked && !force) {
       const label = kind === "pdf" ? "PDF export" : "PowerPoint export";
