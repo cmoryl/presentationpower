@@ -568,16 +568,17 @@ export function PillarStudio({
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
         {/* Preview */}
-        <div className="rounded-2xl border border-black/10 bg-[#F2F2F2] p-6">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="text-xs font-medium uppercase tracking-[0.14em] text-black/50">
+        <div className="min-w-0 rounded-2xl border border-black/10 bg-[#F2F2F2] p-4 sm:p-6">
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+            <div className="min-w-0 truncate text-xs font-medium uppercase tracking-[0.14em] text-black/50">
               {pillarName(config)}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-xs text-black/60">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+              <div className="flex min-w-0 flex-1 basis-[180px] items-center gap-2 text-xs text-black/60">
                 <span>Zoom</span>
                 <input
                   type="range"
+                  className="min-w-0 flex-1"
                   min={0.6}
                   max={2}
                   step={0.05}
@@ -585,16 +586,16 @@ export function PillarStudio({
                   onChange={(e) => setZoom(Number(e.target.value))}
                   aria-label="Preview zoom"
                 />
-                <span className="w-10 tabular-nums text-black/50">{Math.round(zoom * 100)}%</span>
+                <span className="w-10 shrink-0 tabular-nums text-black/50">{Math.round(zoom * 100)}%</span>
                 <button
                   type="button"
                   onClick={() => setZoom(1)}
-                  className="rounded-md border border-black/15 px-2 py-0.5 text-[11px] text-black/60"
+                  className="shrink-0 rounded-md border border-black/15 px-2 py-0.5 text-[11px] text-black/60"
                 >
                   Fit
                 </button>
               </div>
-              <label className="flex items-center gap-2 text-xs text-black/60">
+              <label className="flex shrink-0 items-center gap-2 text-xs text-black/60">
                 <input
                   type="checkbox"
                   checked={guides}
@@ -604,6 +605,7 @@ export function PillarStudio({
               </label>
             </div>
           </div>
+
           <div
             className="mt-6 flex max-h-[860px] justify-center overflow-auto"
             ref={plateRef}

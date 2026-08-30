@@ -14,6 +14,9 @@ import {
 import { generateBrandImage } from "@/lib/imagery.functions";
 import { GroundingCitations } from "@/components/GroundingCitations";
 import type { GroundingCitation } from "@/lib/grounding-citations";
+import { useSessionUser } from "@/hooks/use-session-user";
+import { useWorkspaceCapabilities } from "@/hooks/use-workspace-capabilities";
+import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/imagery")({
   validateSearch: (s: Record<string, unknown>): { division?: string } => ({
@@ -48,6 +51,12 @@ function ImageryPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [sources, setSources] = useState<GroundingCitation[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Curation (generate / upload / mute / delete) is only for signed-in editors.
+  // Signed-out and create-only visitors get the read-only repository view.
+  const userId = useSessionUser();
+  const caps = useWorkspaceCapabilities();
+  const canCurate = !!userId && caps.canEditContent;
 
   // Recommend existing imagery from the brand's library before spending a
   // generation credit. Recomputed as the user types.
@@ -210,7 +219,26 @@ function ImageryPage() {
         </div>
       </div>
 
-      {/* Generation + Upload */}
+      {/* Generation + Upload — editors only */}
+      {!canCurate && (
+        <div className="mt-6 rounded-2xl border border-black/10 bg-white p-5">
+          <div className="text-sm font-semibold text-[#03002C]">Read-only view</div>
+          <p className="mt-1 text-xs text-black/55">
+            {userId
+              ? "Your role can browse the approved imagery pool but not generate, upload or remove images."
+              : "Sign in with an editor account to generate, upload or curate this brand's imagery."}
+          </p>
+          {!userId && (
+            <Link
+              to="/auth"
+              className="mt-3 inline-flex rounded-full bg-[#03002C] px-4 py-2 text-xs font-medium text-white"
+            >
+              Sign in
+            </Link>
+          )}
+        </div>
+      )}
+      {canCurate && (
       <div className="mt-6 grid gap-4 md:grid-cols-[1.5fr_1fr]">
         <div className="rounded-2xl border border-black/10 bg-white p-5">
           <div className="flex items-center justify-between">
@@ -338,6 +366,7 @@ function ImageryPage() {
           />
         </div>
       </div>
+      )}
 
       {/* Analytics */}
       <AnalyticsPanel
@@ -354,7 +383,7 @@ function ImageryPage() {
           <div className="mb-3 flex items-baseline justify-between">
             <div className="text-sm font-semibold text-[#03002C]">Library</div>
             <div className="text-xs text-black/50">
-              Click to inspect · toggle to include/exclude
+              {canCurate ? "Click to inspect · toggle to include/exclude" : "Click to inspect"}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -385,6 +414,7 @@ function ImageryPage() {
                   <div className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
                     {e.source === "ai" ? "AI" : e.source === "upload" ? "Upload" : e.kind}
                   </div>
+                  {canCurate && (
                   <div className="absolute right-2 top-2 flex gap-1">
                     <button
                       onClick={() => lib.toggle(e.id)}
@@ -408,11 +438,12 @@ function ImageryPage() {
                       Delete
                     </button>
                   </div>
+                  )}
                 </div>
               );
             })}
           </div>
-          {lib.removedBuiltins.length > 0 && (
+          {canCurate && lib.removedBuiltins.length > 0 && (
             <RestorePanel
               primary={primary}
               removed={lib.removedBuiltins}
