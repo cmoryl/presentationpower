@@ -37,6 +37,19 @@ import {
   printVariantLabel,
   type PrintModuleFamily,
 } from "@/lib/print-library/module-families";
+import {
+  ORG_CONTACT,
+  ORG_CREDENTIALS,
+  ORG_EMAIL,
+  ORG_EXPERTISE,
+  ORG_INCLUDED,
+  ORG_NAME,
+  ORG_REGIONS,
+  ORG_STATS,
+  ORG_URL,
+} from "@/lib/print-library/org-facts";
+import { clientPlaceholderItems } from "@/lib/logohub-fillers";
+
 
 export const PRINT_SECTION_DND_MIME = "application/x-print-section";
 
@@ -119,39 +132,18 @@ export function makePrintStatsSection(variantId: PrintStatsVariant): PrintSectio
     id: rid(),
     kind: "stats" as const,
     variantId,
-    eyebrow: "Impact at a glance",
+    eyebrow: `${ORG_NAME} at a glance`,
     title: "By the numbers",
   };
   if (variantId === "stat-bento-portrait") {
-    return {
-      ...base,
-      items: [
-        { label: "Global markets supported end-to-end", value: "200", unit: "+", caption: "Reach" },
-        { label: "Faster time to market", value: "3.4", unit: "x" },
-        { label: "Reduction in review cycles", value: "62", unit: "%" },
-      ],
-    };
+    return { ...base, items: ORG_STATS.slice(0, 3).map((s) => ({ ...s })) };
   }
   if (variantId === "stat-callout-row-portrait") {
-    return {
-      ...base,
-      items: [
-        { label: "Content refresh cycle", value: "48", unit: "hr", caption: "Down from 3 weeks" },
-        { label: "Translation cost saved", value: "$1.2", unit: "M", caption: "Annualized" },
-        { label: "Markets covered", value: "36", caption: "Live in Q1" },
-      ],
-    };
+    return { ...base, items: ORG_STATS.slice(0, 3).map((s) => ({ ...s })) };
   }
-  return {
-    ...base,
-    items: [
-      { label: "Localization cost saved", value: "$1.2", unit: "M", delta: "+18%", trend: "up" },
-      { label: "Faster time-to-market", value: "3.4", unit: "x", delta: "+12%", trend: "up" },
-      { label: "Markets supported live", value: "36", delta: "+9%", trend: "up" },
-      { label: "Review cycles removed", value: "62", unit: "%", delta: "-62%", trend: "down" },
-    ],
-  };
+  return { ...base, items: ORG_STATS.slice(0, 4).map((s) => ({ ...s })) };
 }
+
 
 export function makePrintQuoteSection(variantId: PrintQuoteVariant): PrintSection {
   return {
@@ -159,10 +151,10 @@ export function makePrintQuoteSection(variantId: PrintQuoteVariant): PrintSectio
     kind: "quote",
     variantId,
     eyebrow: "In their words",
-    text: "They didn't just translate our content — they rebuilt the entire pipeline so every new market ships in days, not months.",
-    author: "Elena Marquez",
-    role: "VP of Global Marketing",
-    company: "Acme Global",
+    text: `${ORG_NAME} didn't just translate our content — they rebuilt the pipeline so every new market ships in days, not months.`,
+    author: "Client sponsor",
+    role: "VP, Global Marketing",
+    company: "Add client name",
   };
 }
 
@@ -172,9 +164,9 @@ export function makePrintLogoGridSection(variantId: PrintLogoGridVariant): Print
     id: rid(),
     kind: "logo-grid",
     variantId,
-    eyebrow: "Trusted by",
+    eyebrow: `Trusted by ${ORG_NAME} clients`,
     title: "Selected clients",
-    items: Array.from({ length: count }, (_, i) => ({ name: `Client ${i + 1}` })),
+    items: clientPlaceholderItems(count).map((c) => ({ name: c.name })),
   };
 }
 
@@ -184,15 +176,9 @@ export function makePrintExpertiseSection(variantId: PrintExpertiseVariant): Pri
       id: rid(),
       kind: "expertise",
       variantId,
+      eyebrow: `${ORG_NAME} credentials`,
       title: "Certifications",
-      items: [
-        { label: "ISO 17100" },
-        { label: "ISO 27001" },
-        { label: "ISO 9001" },
-        { label: "SOC 2 Type II" },
-        { label: "HIPAA" },
-        { label: "GDPR" },
-      ],
+      items: ORG_CREDENTIALS.map((label) => ({ label })),
     };
   }
   if (variantId === "expertise-checklist") {
@@ -202,30 +188,20 @@ export function makePrintExpertiseSection(variantId: PrintExpertiseVariant): Pri
       variantId,
       eyebrow: "How we deliver",
       title: "What's included",
-      items: [
-        { label: "24/7 global program management" },
-        { label: "In-country linguists across 200+ markets" },
-        { label: "Automated QA and terminology enforcement" },
-        { label: "Enterprise-grade security & compliance" },
-      ],
+      items: ORG_INCLUDED.map((label) => ({ label })),
     };
   }
   return {
     id: rid(),
     kind: "expertise",
     variantId,
-    title: "We know how",
+    title: `How ${ORG_NAME} delivers`,
     layout: "horizontal",
     iconSize: "md",
-    items: [
-      { label: "Strategy", icon: "sparkles" },
-      { label: "Localize", icon: "globe-alt" },
-      { label: "Automate", icon: "bolt" },
-      { label: "Measure", icon: "trending" },
-      { label: "Scale", icon: "target" },
-    ],
+    items: ORG_EXPERTISE.map((e) => ({ ...e })),
   };
 }
+
 
 export function makePrintFeatureSection(variantId: PrintFeatureVariant): PrintSection {
   const items = [
@@ -396,16 +372,12 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
       id: rid(),
       kind: "contact",
       variantId,
-      eyebrow: "Global contacts",
+      eyebrow: `${ORG_NAME} global contacts`,
       title: "Talk to your account team",
-      body: "One team across every region, with a single point of accountability for quality and turnaround.",
-      email: "hello@transperfect.com",
-      url: "transperfect.com",
-      rows: [
-        { label: "Americas", value: "+1 212 689 5555" },
-        { label: "EMEA", value: "+44 20 7583 8690" },
-        { label: "APAC", value: "+852 2159 9799" },
-      ],
+      body: `One ${ORG_NAME} team across every region, with a single point of accountability for quality and turnaround.`,
+      email: ORG_EMAIL,
+      url: ORG_URL,
+      rows: ORG_REGIONS.map((r) => ({ ...r })),
     };
   }
   if (variantId === "contact-cta-band") {
@@ -415,22 +387,23 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
       variantId,
       eyebrow: "Next step",
       title: "Ready to launch in every market?",
-      body: "We will map your content, connectors, and review model in a 30-minute session.",
+      body: `${ORG_NAME} will map your content, connectors, and review model in a 30-minute session.`,
       ctaLabel: "Book a session",
-      url: "transperfect.com/contact",
+      url: `${ORG_URL}/contact`,
     };
   }
   return {
     id: rid(),
     kind: "contact",
     variantId,
-    eyebrow: "Speak to our expert",
-    name: "Elena Marquez",
-    role: "Director, Global Programs",
-    email: "elena.marquez@transperfect.com",
-    phone: "+1 212 689 5555",
+    eyebrow: `Speak to a ${ORG_NAME} expert`,
+    name: ORG_CONTACT.name,
+    role: ORG_CONTACT.role,
+    email: ORG_CONTACT.email,
+    phone: ORG_CONTACT.phone,
   };
 }
+
 
 export function makePrintDeviceSection(variantId: PrintDeviceVariant): PrintSection {
   const base = {

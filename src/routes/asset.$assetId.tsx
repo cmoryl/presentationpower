@@ -160,6 +160,14 @@ import {
   withSectionHidden,
   withSectionShown,
 } from "@/lib/print-hidden-sections";
+import {
+  ORG_CREDENTIALS,
+  ORG_EXPERTISE,
+  ORG_INCLUDED,
+  ORG_NAME,
+  ORG_STATS,
+} from "@/lib/print-library/org-facts";
+
 import { PrintOverflowOverlay } from "@/components/print/PrintOverflowOverlay";
 import { SwapVariantPreviewModal } from "@/components/print/SwapVariantPreviewModal";
 import {
@@ -4446,9 +4454,18 @@ function StatsInlineEditor({
           <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/55 dark:text-white/55">
             Stat items
           </span>
-          <span className="text-[10px] text-black/40 dark:text-white/40">
-            {section.items.length} · label / value / unit
-          </span>
+          <button
+            type="button"
+            onClick={() =>
+              onPatch({
+                eyebrow: `${ORG_NAME} at a glance`,
+                items: ORG_STATS.slice(0, Math.max(section.items.length, 3)).map((s) => ({ ...s })),
+              })
+            }
+            className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+          >
+            Use {ORG_NAME} numbers
+          </button>
         </div>
         <ArrayEditor
           items={section.items}
@@ -4476,10 +4493,25 @@ function StatsInlineEditor({
                   onChange={(e) => patchItem(idx, { unit: e.target.value })}
                 />
               </div>
+              <div className="grid grid-cols-[1fr_1fr] gap-1">
+                <input
+                  className={inspectorInput}
+                  placeholder="Caption (context line)"
+                  value={it.caption ?? ""}
+                  onChange={(e) => patchItem(idx, { caption: e.target.value })}
+                />
+                <input
+                  className={inspectorInput}
+                  placeholder="Delta (e.g. +18%)"
+                  value={it.delta ?? ""}
+                  onChange={(e) => patchItem(idx, { delta: e.target.value })}
+                />
+              </div>
             </div>
           )}
         />
       </div>
+
     </>
   );
 }
@@ -4916,7 +4948,48 @@ function ExpertiseInlineEditor({
         value={section.title ?? ""}
         onChange={(e) => onPatch({ title: e.target.value })}
       />
+      <div className="flex flex-wrap gap-1">
+        <button
+          type="button"
+          onClick={() =>
+            onPatch({
+              eyebrow: `${ORG_NAME} credentials`,
+              title: "Certifications",
+              items: ORG_CREDENTIALS.map((label) => ({ label })),
+            })
+          }
+          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+        >
+          Use our credentials
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            onPatch({
+              eyebrow: "How we deliver",
+              title: "What's included",
+              items: ORG_INCLUDED.map((label) => ({ label })),
+            })
+          }
+          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+        >
+          Use what's included
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            onPatch({
+              title: `How ${ORG_NAME} delivers`,
+              items: ORG_EXPERTISE.map((e) => ({ ...e })),
+            })
+          }
+          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+        >
+          Use our expertise
+        </button>
+      </div>
       <ArrayEditor
+
         items={section.items}
         onChange={(items) => onPatch({ items })}
         add={() => ({ label: "", icon: "" })}
