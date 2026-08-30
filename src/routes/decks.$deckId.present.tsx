@@ -225,7 +225,7 @@ function PresenterView() {
                           ? "border-white ring-2 ring-white/60 shadow-lg shadow-white/10"
                           : "border-white/15 hover:border-white/40 opacity-60 hover:opacity-100",
                       )}
-                      style={{ width: 160, height: 90 }}
+                      style={{ width: thumbW, height: thumbW * (9 / 16) }}
                       aria-label={`Go to slide ${idx + 1}`}
                       aria-current={active ? "true" : undefined}
                     >
