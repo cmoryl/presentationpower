@@ -359,16 +359,12 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
       id: rid(),
       kind: "contact",
       variantId,
-      eyebrow: "Global contacts",
+      eyebrow: `${ORG_NAME} global contacts`,
       title: "Talk to your account team",
-      body: "One team across every region, with a single point of accountability for quality and turnaround.",
-      email: "hello@transperfect.com",
-      url: "transperfect.com",
-      rows: [
-        { label: "Americas", value: "+1 212 689 5555" },
-        { label: "EMEA", value: "+44 20 7583 8690" },
-        { label: "APAC", value: "+852 2159 9799" },
-      ],
+      body: `One ${ORG_NAME} team across every region, with a single point of accountability for quality and turnaround.`,
+      email: ORG_EMAIL,
+      url: ORG_URL,
+      rows: ORG_REGIONS.map((r) => ({ ...r })),
     };
   }
   if (variantId === "contact-cta-band") {
@@ -378,22 +374,23 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
       variantId,
       eyebrow: "Next step",
       title: "Ready to launch in every market?",
-      body: "We will map your content, connectors, and review model in a 30-minute session.",
+      body: `${ORG_NAME} will map your content, connectors, and review model in a 30-minute session.`,
       ctaLabel: "Book a session",
-      url: "transperfect.com/contact",
+      url: `${ORG_URL}/contact`,
     };
   }
   return {
     id: rid(),
     kind: "contact",
     variantId,
-    eyebrow: "Speak to our expert",
-    name: "Elena Marquez",
-    role: "Director, Global Programs",
-    email: "elena.marquez@transperfect.com",
-    phone: "+1 212 689 5555",
+    eyebrow: `Speak to a ${ORG_NAME} expert`,
+    name: ORG_CONTACT.name,
+    role: ORG_CONTACT.role,
+    email: ORG_CONTACT.email,
+    phone: ORG_CONTACT.phone,
   };
 }
+
 
 export function makePrintDeviceSection(variantId: PrintDeviceVariant): PrintSection {
   const base = {
