@@ -2,7 +2,9 @@
   "name": "tanstack_start_ts",
   "private": true,
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "src/components/slide/modules/*.tsx",
+    "src/components/slide/modules/register-all.ts"
   ],
   "type": "module",
   "scripts": {

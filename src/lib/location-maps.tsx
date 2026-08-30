@@ -1457,7 +1457,10 @@ function regionViewBox(region: RegionKey): string {
   // fills wide slide areas instead of floating in dead space.
   if (region === "world") return `0 42 ${WORLD_VIEWBOX.w} 330`;
 
+  // Runtime deck content can predate the RegionKey contract. Keep the map
+  // renderer total even when an old/invalid value reaches this lower layer.
   const b = REGION_BOUNDS[region];
+  if (!b) return `0 42 ${WORLD_VIEWBOX.w} 330`;
   const tl = projectLatLon(b.latMax, b.lonMin);
   const br = projectLatLon(b.latMin, b.lonMax);
   const pad = 12;

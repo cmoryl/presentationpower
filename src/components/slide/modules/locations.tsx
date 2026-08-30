@@ -26,6 +26,16 @@ import {
   type RegionKey as LocRegionKey,
 } from "@/lib/location-maps";
 
+const LOCATION_REGION_KEYS = ["AMER", "EMEA", "APAC", "LATAM", "MEA"] as const;
+
+function coerceRegion(raw: unknown): LocRegionKey {
+  if (typeof raw !== "string") return "world";
+  const normalized = raw.trim().toUpperCase();
+  return (LOCATION_REGION_KEYS as readonly string[]).includes(normalized)
+    ? (normalized as LocRegionKey)
+    : "world";
+}
+
 function coercePin(raw: Record<string, unknown>, i: number): LocPin | null {
   const lat = Number(raw.lat);
   const lon = Number(raw.lon);
@@ -171,7 +181,10 @@ function renderLocationsVariant(
   const title = (c.title as string) || seeded.headline;
   const subtitle = (c.subtitle as string) || seeded.subhead || "";
   const narrative = (c.narrative as string) || "";
-  const region = ((c.region as string) || "world") as LocRegionKey;
+  // Legacy/seeded decks can contain a division name or lowercase region here.
+  // Never cast arbitrary content into the map viewport lookup: an unknown key
+  // used to throw while rendering and blank every module card on the page.
+  const region = coerceRegion(c.region);
   const accent = brand.tokens.accent;
   const primary = brand.tokens.primary;
   const isDark = mode === "dark";

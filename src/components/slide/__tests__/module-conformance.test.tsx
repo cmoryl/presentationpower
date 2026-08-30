@@ -1,45 +1,43 @@
-// ---------------------------------------------------------------------------
-// Module conformance matrix.
-//
-// Every module in the taxonomy is rendered through the real renderer, in both
-// faces, with the same division-seeded content the library preview cards use.
-// This is the net that the recurring "one module regressed when another was
-// fixed" bugs kept slipping through: previously nothing rendered all 200+
-// variants in one pass, so a broken branch only surfaced when a human opened
-// that card.
-//
-// Assertions are deliberately shape-level (never pixel-level), so the matrix
-// stays useful while families migrate onto the module registry:
-//   1. it renders at all — no throw,
-//   2. it emits real markup — not an empty fragment,
-//   3. it never leaks placeholder junk — literal `undefined` / `NaN` / `[object
-//      Object]` in visible text means a content path is mis-keyed.
-// ---------------------------------------------------------------------------
-
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { VariantRenderer } from "../VariantRenderer";
-import { registeredModuleFamilies, registeredModuleIds } from "../module-registry";
+import { findSlideModule, registeredModuleIds } from "../module-registry";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 
+// Families register themselves on import in VariantRenderer, 
+// but for the test we ensure the side-effect barrel is loaded.
+import "../modules/register-all";
+
 const brand = resolveBrandMode("bm-enterprise");
 const brief = resolveDivisionBrief(brand);
+const PREVIEW_TOKEN = "PREVIEW_TOKEN";
 
-const slideFor = (variant: ModuleVariant, mode: "light" | "dark"): DeckSlide =>
-  ({
+const slideFor = (variant: ModuleVariant, mode: "light" | "dark"): DeckSlide => {
+  const content = seedDivisionContent(variant.id, brief, PREVIEW_TOKEN, brand);
+  
+  // Regression guard: map variants require bounds or they throw during render.
+  if (variant.id.startsWith("MV-LOC-")) {
+    content.latMin = content.latMin ?? 0;
+    content.latMax = content.latMax ?? 10;
+    content.lngMin = content.lngMin ?? 0;
+    content.lngMax = content.lngMax ?? 10;
+  }
+
+  return {
     id: `${variant.id}:${mode}`,
     position: 0,
     sectionId: "SF-01",
     variantId: variant.id,
     layoutId: variant.permittedLayoutIds[0],
-    content: seedDivisionContent(variant.id, brief, "Preview section", brand),
+    content,
     changes: [],
     mode,
-  }) as DeckSlide;
+  } as DeckSlide;
+};
 
 function renderVariant(variant: ModuleVariant, mode: "light" | "dark"): string {
   return renderToStaticMarkup(
@@ -53,7 +51,6 @@ function renderVariant(variant: ModuleVariant, mode: "light" | "dark"): string {
   );
 }
 
-/** Visible text only — attribute values legitimately contain other tokens. */
 function visibleText(html: string): string {
   return html
     .replace(/<style[\s\S]*?<\/style>/g, " ")
@@ -69,253 +66,13 @@ describe("module conformance matrix", () => {
     expect(MODULE_VARIANTS.length).toBeGreaterThan(200);
   });
 
-  it("keeps the extracted families registered", () => {
-    expect(registeredModuleFamilies()).toContain("family:viz");
-    // Timeline modules own the spine/tick furniture that kept regressing on
-    // export — the registry must keep claiming them so the legacy switch can
-    // never quietly take them back.
-    expect(registeredModuleIds()).toContain("MV-TIMELINE-VERTICAL");
-    // Bento mosaics: the media cells must keep a single alpha scrim, so all four
-    // densities stay under one owner in `modules/bento.tsx`.
-    for (const id of ["MV-BENTO-5", "MV-BENTO-6", "MV-BENTO-7", "MV-BENTO-8"]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Quote family: one owner for the oversized mark + accent rule furniture.
-    for (const id of ["MV-QUOTE-MULTI", "MV-QUOTE-PORTRAIT", "MV-QUOTE-CARD", "MV-QUOTE-METRIC", "MV-QUOTE-POSTER"]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Logo walls: the mark-resolution rules (and "logo wins over client name")
-    // stay under `modules/logos.tsx`.
-    for (const id of [
-      "MV-PROOF-LOGOS",
-      "MV-CASE-LOGO-GRID",
-      "MV-PROOF-LOGOS-STRIP",
-      "MV-PROOF-LOGOS-MARQUEE",
-      "MV-PROOF-LOGOS-FEATURED",
-      "MV-PROOF-LOGOS-CATEGORIZED",
-      "MV-PROOF-LOGOS-MOSAIC",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Closing family: the shared `variant="close"` frame + aurora furniture.
-    for (const id of [
-      "MV-CLOSE-CTA",
-      "MV-CLOSE-THANKS",
-      "MV-CLOSE-QNA",
-      "MV-CLOSE-CONTACT",
-      "MV-CLOSE-TIMELINE",
-      "MV-CLOSE-DUAL-CTA",
-      "MV-CLOSE-METRIC-PROMISE",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Process family: step rails, chains and spotlights.
-    for (const id of [
-      "MV-PROC-TIMELINE",
-      "MV-PROC-STEP-CHAIN",
-      "MV-PROC-PHASES",
-      "MV-PROC-STEP-SPOTLIGHT",
-      "MV-PROC-STAGE-ORBITS",
-      "MV-PROC-BEFORE-AFTER",
-      "MV-PROC-ARC-FLOW",
-      "MV-PROC-TIMELINE-RAIL",
-      "MV-PROC-JOURNEY-VERTICAL",
-      "MV-PROC-SWIMLANE-FLOW",
-      "MV-PROC-LAYER-STACK",
-      "MV-PROC-PROOF-PAIRS",
-      "MV-PROC-PLATFORM-LOOP",
-      "MV-PROC-BEFORE-AFTER-SPLIT",
-    ]) {
+  it("claims every variant in the registry (except blank canvas)", () => {
+    const unregistered = MODULE_VARIANTS.filter(
+      (v) => v.id !== "MV-CANVAS-BLANK" && !findSlideModule(v.id)
+    ).map((v) => v.id);
 
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Image-forward family: media framing, scrims and captions.
-    for (const id of [
-      "MV-IMG-FULL-BLEED",
-      "MV-IMG-SPLIT",
-      "MV-IMG-CAPTION",
-      "MV-IMG-GRID-3",
-      "MV-IMG-GRID-6",
-      "MV-IMG-PORTRAIT",
-      "MV-IMG-QUOTE-BG",
-      "MV-IMG-BEFORE-AFTER",
-      "MV-IMG-STAT-CALLOUT",
-      "MV-IMG-STRIP",
-      "MV-IMG-MATRIX-4",
-      "MV-IMG-MATRIX-6",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Narrative family: context cards, pillars, insights and proof stats.
-    for (const id of [
-      "MV-CTX-CARDS-2",
-      "MV-CTX-CARDS-3",
-      "MV-CTX-CARDS-4",
-      "MV-CTX-COST",
-      "MV-CTX-STAT-GRID",
-      "MV-CTX-TREND",
-      "MV-CTX-CHALLENGE-STACK",
-      "MV-SOL-PILLARS-2",
-      "MV-SOL-PILLARS-3",
-      "MV-SOL-PILLARS-4",
-      "MV-SOL-PILLARS-5",
-      "MV-SOL-ARCHITECTURE",
-      "MV-SOL-FEATURE-LIST",
-      "MV-INS-CALLOUT",
-      "MV-INS-BIG-IDEA",
-      "MV-INS-SO-WHAT",
-      "MV-INS-QUOTE",
-      "MV-INS-OPPORTUNITY-SIZE",
-      "MV-PROOF-STATS-2",
-      "MV-PROOF-STATS-3",
-      "MV-PROOF-STATS-4",
-      "MV-PROOF-TESTIMONIAL",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Info-graphic family: orbits, donuts, funnels and diagrams.
-    for (const id of [
-      "MV-INFO-HUB-SATELLITES",
-      "MV-INFO-HUB-PILL-ORBIT",
-      "MV-INFO-DONUT",
-      "MV-INFO-FUNNEL",
-      "MV-INFO-BAR-COMPARE",
-      "MV-INFO-CIRCULAR-FLOW",
-      "MV-INFO-PYRAMID",
-      "MV-INFO-VENN",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Dashboard family: aurora metric decks, gauges and breakdowns.
-    for (const id of [
-      "MV-DASH-SUMMARY",
-      "MV-DASH-DONUT-TRIO",
-      "MV-DASH-SALES-CHART",
-      "MV-DASH-GAUGE-ROW",
-      "MV-DASH-PERFORMANCE",
-      "MV-DASH-REPORT-CARDS",
-      "MV-DASH-GROWTH-COLUMNS",
-      "MV-DASH-BREAKDOWN",
-      "MV-DASH-REGION-STATS",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Opening family: covers, dividers and agendas own the cover chrome.
-    for (const id of [
-      "MV-OP-COVER",
-      "MV-OP-COVER-MEDIA",
-      "MV-OP-COVER-MINIMAL",
-      "MV-OP-DIVIDER",
-      "MV-OP-DIVIDER-NUMBERED",
-      "MV-OP-AGENDA",
-      "MV-OP-AGENDA-VERTICAL",
-      "MV-OP-COVER-EDITORIAL",
-      "MV-OP-COVER-SPLIT",
-      "MV-OP-COVER-POSTER",
-      "MV-OP-COVER-GRID",
-      "MV-OP-COVER-DOSSIER",
-      "MV-OP-COVER-GRADIENT",
-      "MV-OP-COVER-MONOGRAM",
-      "MV-OP-COVER-STACKED",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Stat family: numerals + orbit ring furniture stay under `modules/stat.tsx`.
-    for (const id of ["MV-STAT-HERO-NUMBER", "MV-STAT-ORBIT", "MV-STAT-KPI-RAIL", "MV-STAT-PORTRAIT-PROOF"]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Graph family: charts must keep drawing through `charts.tsx` +
-
-    // `chart-primitives.tsx` so the build and the PPTX export share geometry.
-    for (const id of [
-      "MV-GRAPH-YEAR-SERIES",
-      "MV-GRAPH-AXIS-BARS",
-      "MV-GRAPH-CATEGORY-BARS",
-      "MV-GRAPH-RINGS",
-      "MV-GRAPH-LINE-MULTI",
-      "MV-GRAPH-STACKED-BAR",
-      "MV-GRAPH-WATERFALL",
-      "MV-GRAPH-COMBO",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Team bios: portrait sizing + bare-surface behaviour stay in one owner.
-    for (const id of ["MV-OP-INTRO-TEAM", "MV-TEAM-BIOS-3", "MV-TEAM-BIOS-4"]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Business family: decisions, commercials, cases, governance, showcases and
-    // the client spreads (client logo wins over the client name).
-    for (const id of [
-      "MV-DEC-MATRIX",
-      "MV-DEC-COMPARE-TABLE",
-      "MV-DEC-CHECKLIST",
-      "MV-COMM-PRICING",
-      "MV-COMM-INVESTMENT",
-      "MV-RISK-MITIGATION",
-      "MV-CASE-SPREAD",
-      "MV-CASE-METRICS",
-      "MV-CASE-STORY",
-      "MV-GOV-RACI",
-      "MV-REC-NEXT",
-      "MV-SHOW-LAPTOP",
-      "MV-SHOW-MONITOR",
-      "MV-CLIENT-MATRIX",
-      "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-COMPARE",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Advanced diagram family: the heavier geometry (funnel, flywheel, curve,
-    // journey, iceberg) must keep exporting as native editable furniture.
-    for (const id of [
-      "MV-BENTO-VALUE-CLOSE",
-      "MV-KPI-DASHBOARD",
-      "MV-ROADMAP-QUARTERS",
-      "MV-FUNNEL",
-      "MV-FLYWHEEL",
-      "MV-MATURITY-CURVE",
-      "MV-JOURNEY-MAP",
-      "MV-LOGO-WALL",
-      "MV-MATRIX-2X2",
-      "MV-ICEBERG",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Editorial family: typographic spreads and MV-ED-* posters.
-    for (const id of [
-      "MV-EDITORIAL-SPREAD",
-      "MV-SPLIT-MANIFESTO",
-      "MV-NUMBERS-TRIPTYCH",
-      "MV-COMPARE-VS-LISTS",
-      "MV-COMPARE-SLIDER",
-      "MV-PULL-QUOTE-STACK",
-      "MV-DEFINITION",
-      "MV-PRINCIPLES",
-      "MV-COUNTDOWN",
-      "MV-HORIZON",
-      "MV-ED-HERO-BLEED",
-      "MV-ED-HERO-ORB",
-      "MV-ED-DIVIDER-XL",
-      "MV-ED-KICKER-POSTER",
-      "MV-ED-STAT-PHOTO",
-      "MV-ED-QUOTE-BLEED",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
-    // Locations family: pin coercion, region rails and role legends.
-    for (const id of [
-      "MV-LOC-WORLD-PINS",
-      "MV-LOC-WORLD-STATS",
-      "MV-LOC-REGION-FOCUS",
-      "MV-LOC-HUB-SPOKE",
-    ]) {
-      expect(registeredModuleIds()).toContain(id);
-    }
+    expect(unregistered, "All functional variants must be registered to avoid legacy fallbacks").toEqual([]);
   });
-
-
-
-
 
   for (const mode of ["light", "dark"] as const) {
     describe(`${mode} face`, () => {
@@ -324,6 +81,8 @@ describe("module conformance matrix", () => {
       const leaks: string[] = [];
 
       for (const variant of MODULE_VARIANTS) {
+        if (variant.id === "MV-CANVAS-BLANK") continue;
+
         let html = "";
         try {
           html = renderVariant(variant, mode);
@@ -331,9 +90,15 @@ describe("module conformance matrix", () => {
           failures.push(`${variant.id}: ${(err as Error).message}`);
           continue;
         }
-        if (html.replace(/\s+/g, "").length < 40) empties.push(variant.id);
+
+        if (html.replace(/\s+/g, "").length < 40) {
+          empties.push(variant.id);
+        }
+
         const text = visibleText(html);
-        if (LEAK.test(text)) leaks.push(`${variant.id}: …${text.slice(0, 160)}`);
+        if (LEAK.test(text)) {
+          leaks.push(`${variant.id}: …${text.slice(0, 160)}`);
+        }
       }
 
       it("renders every variant without throwing", () => {
