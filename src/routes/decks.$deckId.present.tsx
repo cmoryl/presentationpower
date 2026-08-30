@@ -319,7 +319,8 @@ function PresenterView() {
                     {notesText || <span className="text-white/40">No notes</span>}
                   </div>
                 </div>
-                <div>
+                <div className="hidden sm:block">
+
                   <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
                     Up next
                   </div>
