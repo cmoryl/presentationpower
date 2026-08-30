@@ -132,6 +132,7 @@ import { HeroResizeHandle } from "@/components/print/HeroResizeHandle";
 import { HeroPreviewPanel } from "@/components/print/HeroPreviewPanel";
 import { HeroCropStudio } from "@/components/print/HeroCropStudio";
 import { PrintVariantPicker } from "@/components/print/PrintVariantPicker";
+import { PrintLogoUploadField } from "@/components/print/PrintLogoUploadField";
 import { withAutoHeroVariants } from "@/lib/hero-variants";
 import { HeroCostDebugPanel } from "@/components/print/HeroCostDebugPanel";
 import { HeroDiffTile } from "@/components/print/HeroDiffTile";
@@ -4571,6 +4572,19 @@ function HeroInlineEditor({
         value={section.summary ?? ""}
         onChange={(e) => onPatch({ summary: e.target.value })}
       />
+      <PrintLogoUploadField
+        label="Our logo"
+        value={section.orgLogoUrl}
+        onChange={(orgLogoUrl) => onPatch({ orgLogoUrl })}
+        showOrgDefaults
+        inputClassName={inspectorInput}
+      />
+      <PrintLogoUploadField
+        label="Partner / client logo"
+        value={section.partnerLogoUrl}
+        onChange={(partnerLogoUrl) => onPatch({ partnerLogoUrl })}
+        inputClassName={inspectorInput}
+      />
       {showPhoto && (
         <>
           <input
@@ -4807,6 +4821,13 @@ function LogoGridInlineEditor({
         value={section.title ?? ""}
         onChange={(e) => onPatch({ title: e.target.value })}
       />
+      <PrintLogoUploadField
+        label="Our logo"
+        value={section.orgLogoUrl}
+        onChange={(orgLogoUrl) => onPatch({ orgLogoUrl })}
+        showOrgDefaults
+        inputClassName={inspectorInput}
+      />
       <ArrayEditor
         items={section.items}
         onChange={(items) => onPatch({ items })}
@@ -4859,6 +4880,12 @@ function LogoGridItemRow({
         />
         <ClientLogoHubTrigger onClick={() => setPicking((v) => !v)} />
       </div>
+      <PrintLogoUploadField
+        label="Upload this mark"
+        value={item.url}
+        onChange={(url) => onChange({ url, path: undefined })}
+        inputClassName={inspectorInput}
+      />
       <ClientLogoHubPicker
         open={picking}
         onClose={() => setPicking(false)}
