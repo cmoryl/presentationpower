@@ -196,27 +196,29 @@ export function Breadcrumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="mb-2.5 flex items-center gap-1.5 overflow-x-auto text-[12px] font-medium text-black/55 dark:text-white/55"
+      className="mb-2.5 flex items-center gap-1.5 overflow-x-auto whitespace-nowrap text-[12px] font-medium text-black/55 dark:text-white/55"
     >
       <Link
         to="/"
-        className="rounded-full px-2 py-1 transition hover:bg-white/50 hover:text-black dark:hover:bg-white/[0.06] dark:hover:text-white"
+        className="shrink-0 rounded-full px-2 py-1 transition hover:bg-white/50 hover:text-black dark:hover:bg-white/[0.06] dark:hover:text-white"
       >
         Home
       </Link>
       {crumbs.map((c) => (
-        <span key={c.to} className="flex items-center gap-1.5">
-          <span aria-hidden className="text-black/25 dark:text-white/25">
+        <span key={c.to} className="flex min-w-0 items-center gap-1.5">
+          <span aria-hidden className="shrink-0 text-black/25 dark:text-white/25">
             /
           </span>
           {c.last ? (
             <span
               aria-current="page"
-              className="rounded-full bg-white/60 px-2 py-1 text-[#03002C] ring-1 ring-black/[0.04] dark:bg-white/[0.06] dark:text-white dark:ring-white/10"
+              title={c.label}
+              className="max-w-[60vw] truncate rounded-full bg-white/60 px-2 py-1 text-[#03002C] ring-1 ring-black/[0.04] sm:max-w-none dark:bg-white/[0.06] dark:text-white dark:ring-white/10"
             >
               {c.label}
             </span>
           ) : (
+
             // TanStack Router requires typed path params for statically-typed
             // routes. Since breadcrumbs walk arbitrary URLs, cast the string
             // through the loose overload — this is safe because every href is
