@@ -65,7 +65,6 @@ export function MobileDeckExport({
   deck,
   brand,
   blocked,
-  onBlocked,
   className,
 }: MobileDeckExportProps) {
   const [busy, setBusy] = useState<null | "pdf" | "pptx">(null);
