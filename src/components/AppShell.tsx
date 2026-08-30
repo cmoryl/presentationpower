@@ -167,15 +167,17 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
   ];
 
   // Authoring surfaces are removed from the Elements menu for create-only
-  // accounts — they build from approved templates, not the system itself.
-  const visibleElementGroups = createOnly
-    ? elementGroups.map((g) => ({
-        ...g,
-        items: g.items.filter(
-          (i) => !i.to.startsWith("/admin") && i.to !== "/library/print/modules",
-        ),
-      }))
-    : elementGroups;
+  // accounts — they build from approved templates, not the system itself — and
+  // admin studios are removed for everyone who is not a confirmed admin.
+  const visibleElementGroups = elementGroups.map((g) => ({
+    ...g,
+    items: g.items.filter(
+      (i) =>
+        (canSeeAdmin || !i.to.startsWith("/admin")) &&
+        !(createOnly && i.to === "/library/print/modules"),
+    ),
+  }));
+
 
   const adminGroups: ReadonlyArray<{
     label: string;
