@@ -48,6 +48,7 @@ import { IconPicker } from "@/components/IconPicker";
 import {
   SaveToCloudButton,
   SaveDeckButton,
+  SaveDeckToMyFilesButton,
   AutosaveIndicator,
 } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
