@@ -4316,6 +4316,27 @@ function SectionInlineEditor({
   section: PrintSection;
   onPatch: (p: Partial<PrintSection>) => void;
 }) {
+  return (
+    <div className="space-y-3">
+      <PrintSectionLayoutControls
+        kind={section.kind}
+        layoutId={printSectionLayoutId(section)}
+        onChange={(sectionLayoutId) =>
+          onPatch({ sectionLayoutId } as unknown as Partial<PrintSection>)
+        }
+      />
+      <SectionKindEditor section={section} onPatch={onPatch} />
+    </div>
+  );
+}
+
+function SectionKindEditor({
+  section,
+  onPatch,
+}: {
+  section: PrintSection;
+  onPatch: (p: Partial<PrintSection>) => void;
+}) {
   switch (section.kind) {
     case "hero":
       return (
