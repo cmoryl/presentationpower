@@ -2,25 +2,29 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { VariantRenderer } from "../VariantRenderer";
-import { findSlideModule, registeredModuleFamilies, registeredModuleIds } from "../module-registry";
+import { findSlideModule, registeredModuleIds } from "../module-registry";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 
+// Families register themselves on import in VariantRenderer, 
+// but for the test we ensure the side-effect barrel is loaded.
+import "../modules/register-all";
+
 const brand = resolveBrandMode("bm-enterprise");
 const brief = resolveDivisionBrief(brand);
-const PREVIEW_TITLE = "PREVIEW_TOKEN_CHECK";
+const PREVIEW_TOKEN = "PREVIEW_TOKEN";
 
 const slideFor = (variant: ModuleVariant, mode: "light" | "dark"): DeckSlide => {
-  const content = seedDivisionContent(variant.id, brief, PREVIEW_TITLE, brand);
+  const content = seedDivisionContent(variant.id, brief, PREVIEW_TOKEN, brand);
   
-  // Fix for MV-LOC-REGION-FOCUS which requires specific map bounds
-  if (variant.id === "MV-LOC-REGION-FOCUS") {
-    content.latMin = 0;
-    content.latMax = 10;
-    content.lngMin = 0;
-    content.lngMax = 10;
+  // Regression guard: map variants require bounds or they throw during render.
+  if (variant.id.startsWith("MV-LOC-")) {
+    content.latMin = content.latMin ?? 0;
+    content.latMax = content.latMax ?? 10;
+    content.lngMin = content.lngMin ?? 0;
+    content.lngMax = content.lngMax ?? 10;
   }
 
   return {
@@ -62,13 +66,12 @@ describe("module conformance matrix", () => {
     expect(MODULE_VARIANTS.length).toBeGreaterThan(200);
   });
 
-  it("keeps the extracted families registered", () => {
-    // Audit: every variant (except blank canvas) must be in the registry.
+  it("claims every variant in the registry (except blank canvas)", () => {
     const unregistered = MODULE_VARIANTS.filter(
       (v) => v.id !== "MV-CANVAS-BLANK" && !findSlideModule(v.id)
     ).map((v) => v.id);
 
-    expect(unregistered, `Unregistered variants found: ${unregistered.join(", ")}`).toEqual([]);
+    expect(unregistered, "All functional variants must be registered to avoid legacy fallbacks").toEqual([]);
   });
 
   for (const mode of ["light", "dark"] as const) {
@@ -76,7 +79,6 @@ describe("module conformance matrix", () => {
       const failures: string[] = [];
       const empties: string[] = [];
       const leaks: string[] = [];
-      const missingContent: string[] = [];
 
       for (const variant of MODULE_VARIANTS) {
         if (variant.id === "MV-CANVAS-BLANK") continue;
@@ -89,26 +91,13 @@ describe("module conformance matrix", () => {
           continue;
         }
 
-        const rawHtml = html.replace(/\s+/g, "");
-        if (rawHtml.length < 40) {
+        if (html.replace(/\s+/g, "").length < 40) {
           empties.push(variant.id);
         }
 
         const text = visibleText(html);
         if (LEAK.test(text)) {
           leaks.push(`${variant.id}: …${text.slice(0, 160)}`);
-        }
-
-        // Check for the seeded token. Note: Some variants might transform the text 
-        // (uppercase, split into chars), so we check if the rendered output 
-        // contains parts of the token or if it's completely missing content.
-        // We use a simplified check: if the variant is supposed to have content 
-        // but renders no text at all from the content bag, it's a regression.
-        if (!html.includes(PREVIEW_TITLE) && !text.includes("PREVIEW")) {
-           // We only flag if it looks like the content didn't make it to the DOM at all
-           // Some specialized variants might truly not render the title string
-           // but most should.
-           // missingContent.push(variant.id); 
         }
       }
 

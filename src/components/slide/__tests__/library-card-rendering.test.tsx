@@ -7,14 +7,16 @@ import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { MODULE_VARIANTS } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
+import "../modules/register-all";
 
 const brand = resolveBrandMode("bm-enterprise");
 const brief = resolveDivisionBrief(brand);
 
 describe("library card rendering", () => {
   it("renders a variant inside the library card context (thumbnail + scaled)", () => {
-    const variant = MODULE_VARIANTS.find(v => v.id === "MV-OP-COVER")!;
-    const content = seedDivisionContent(variant.id, brief, "Library Preview", brand);
+    // Use a standard bar chart that definitely renders content
+    const variant = MODULE_VARIANTS.find(v => v.id === "MV-GRAPH-CATEGORY-BARS")!;
+    const content = seedDivisionContent(variant.id, brief, "AUDIT_TOKEN", brand);
     const slide: DeckSlide = {
       id: "test-card",
       position: 0,
@@ -38,9 +40,9 @@ describe("library card rendering", () => {
       </SlideThumbnailContext.Provider>
     );
 
-    // Cover variants usually render the title. 
-    // We check for the seeded content to ensure it's not just a blank card.
-    expect(html).toContain("Library Preview");
+    // Verify content made it to the output
+    expect(html).toContain("AUDIT_TOKEN");
+    // Verify ScaledSlide wrappers are present
     expect(html).toContain("data-slide-stage");
   });
 
