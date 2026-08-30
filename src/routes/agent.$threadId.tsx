@@ -464,6 +464,12 @@ function AgentThreadPage() {
   const [seedBrief, setSeedBrief] = useState("");
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [progressEl, setProgressEl] = useState<HTMLDivElement | null>(null);
+  // Below xl the live deck preview pane has no room beside the chat, so it used
+  // to be display:none — which also hid "Open in deck editor", the skin picker
+  // and the slide list, leaving phone users at a dead end after a build. The
+  // pane is now a switchable view instead of a hidden one.
+  const [mobilePane, setMobilePane] = useState<"chat" | "deck">("chat");
+
 
   // The workspace should always run from wherever it starts on the page down to
   // the bottom of the viewport, so the rails never get cut off. Measuring beats
