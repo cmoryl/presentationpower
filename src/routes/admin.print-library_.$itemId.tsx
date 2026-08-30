@@ -14,6 +14,7 @@
 // non-admins; "Reset" restores the shipped definition.
 
 import { HeroCropStudio } from "@/components/print/HeroCropStudio";
+import { HeroBackgroundSwitcher } from "@/components/print/HeroBackgroundSwitcher";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
