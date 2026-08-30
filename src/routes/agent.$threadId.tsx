@@ -34,6 +34,7 @@ import {
   type AgentThread,
 } from "@/lib/agent/threads";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const AGENT_ACCENT = "#003FC7";
 const AGENT_GLOW = "#A1FBF9";
@@ -451,7 +452,15 @@ function AgentThreadPage() {
   const [liveCount, setLiveCount] = useState(0);
   const [refreshKey, setRefreshKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [showLeftRail, setShowLeftRail] = useState(true);
+  const isMobile = useIsMobile();
+  const [showLeftRail, setShowLeftRail] = useState(
+    () => typeof window === "undefined" || window.innerWidth >= 768,
+  );
+  // Collapse the conversations rail whenever we drop into a mobile viewport so
+  // the chat column keeps the full width instead of being squeezed to slivers.
+  useEffect(() => {
+    if (isMobile) setShowLeftRail(false);
+  }, [isMobile]);
   const [seedBrief, setSeedBrief] = useState("");
   const [heroExpanded, setHeroExpanded] = useState(false);
   const [progressEl, setProgressEl] = useState<HTMLDivElement | null>(null);
@@ -652,17 +661,21 @@ function AgentThreadPage() {
 
         <div
           ref={workspaceRef}
-          className="flex gap-3"
+          className="relative flex gap-3"
           style={{
             // Run to the bottom of the viewport, but never collapse smaller than
             // a comfortable working height when a tall hero sits above.
             height: `max(60vh, calc(100dvh - ${Math.round(workspaceTop)}px - 0.75rem))`,
           }}
         >
-          {/* Conversations — collapsible rail */}
+          {/* Conversations — collapsible rail (overlays the chat on mobile) */}
           <aside
-            className={`flex shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 bg-background/60 transition-all duration-300 ease-in-out ${
-              showLeftRail ? "w-60" : "w-12"
+            className={`flex shrink-0 flex-col overflow-hidden rounded-2xl border border-border/60 transition-all duration-300 ease-in-out ${
+              showLeftRail
+                ? isMobile
+                  ? "absolute inset-y-0 left-0 z-20 w-[min(17rem,85vw)] border-border bg-background shadow-2xl"
+                  : "w-60 bg-background/60"
+                : "w-12 bg-background/60"
             }`}
           >
             <div
@@ -712,6 +725,9 @@ function AgentThreadPage() {
                     <Link
                       to="/agent/$threadId"
                       params={{ threadId: t.id }}
+                      onClick={() => {
+                        if (isMobile) setShowLeftRail(false);
+                      }}
                       className="min-w-0 flex-1 truncate text-left"
                     >
                       {t.title}
