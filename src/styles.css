@@ -24,7 +24,26 @@
   html,
   body {
     overflow-x: hidden;
+    /* Stop iOS auto-inflating type in landscape and rubber-banding the page
+       behind fixed app chrome. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overscroll-behavior-y: none;
   }
+
+  /* Touch devices: no grey flash on tap, and honour the notch/home-indicator
+     insets declared by viewport-fit=cover. */
+  @media (hover: none) {
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+  }
+
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+
 
   body {
     background-color: var(--color-background);
