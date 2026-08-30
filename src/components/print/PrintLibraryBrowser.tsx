@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { safeList } from "@/components/print/sections/shared";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -834,7 +835,7 @@ function PrintItemCard({
 
         {item.stats?.length ? (
           <div className="mt-3 flex flex-wrap gap-1.5">
-            {item.stats.map((s, i) => (
+            {safeList(item.stats).map((s, i) => (
               <span
                 key={`${s.label}-${i}`}
                 className="inline-flex items-baseline gap-1 rounded-full border border-black/10 bg-black/[0.02] px-2 py-0.5 text-[10px] text-black/60"

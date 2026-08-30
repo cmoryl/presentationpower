@@ -1,4 +1,5 @@
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
+import { safeList } from "@/components/print/sections/shared";
 import { hiddenSectionSet } from "@/lib/print-hidden-sections";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
@@ -281,7 +282,7 @@ export function EBrochureLayout({
                             {s.body}
                           </p>
                         )}
-                        {s.bullets.length > 0 && (
+                        {safeList(s.bullets).length > 0 && (
                           <ul
                             style={{
                               margin: `${cq(8)} 0 0`,
@@ -291,7 +292,7 @@ export function EBrochureLayout({
                               color: inkFaint,
                             }}
                           >
-                            {s.bullets.slice(0, 4).map((b, k) => (
+                            {safeList(s.bullets).slice(0, 4).map((b, k) => (
                               <li key={k} style={clampLines(2)}>
                                 {b}
                               </li>
@@ -420,7 +421,7 @@ export function EBrochureLayout({
                       >
                         {content.discover.body}
                       </p>
-                      {content.discover.bullets.slice(0, 4).map((b, k) => (
+                      {safeList(content.discover.bullets).slice(0, 4).map((b, k) => (
                         <div
                           key={k}
                           className="flex items-center"

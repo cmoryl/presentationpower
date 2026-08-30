@@ -16,6 +16,7 @@
 // visible strings come from `content.pages[i]`, which keeps them live-editable.
 
 import { statUnitParts } from "@/lib/print-stat-unit";
+import { safeList } from "@/components/print/sections/shared";
 import { PrintSurfaceProvider } from "@/components/print/print-doc-mode";
 import { Fragment, useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
@@ -1686,7 +1687,7 @@ function LocationsPage({
             <T x={spec.headX} y={spec.headY} w={2} size={13.8} weight={700} tracking="-0.01em">
               {region.region}
             </T>
-            {region.columns.map((col, ci) => (
+            {safeList(region.columns).map((col, ci) => (
               <T
                 key={ci}
                 x={spec.cols[ci] ?? spec.cols[spec.cols.length - 1]!}

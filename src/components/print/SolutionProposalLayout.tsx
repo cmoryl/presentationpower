@@ -1,4 +1,5 @@
 import { statUnitParts } from "@/lib/print-stat-unit";
+import { safeList } from "@/components/print/sections/shared";
 import { useRef, type CSSProperties } from "react";
 import type { BrandMode } from "@/lib/taxonomy";
 import type {
@@ -410,7 +411,7 @@ export function SolutionProposalLayout({
                       {col.title}
                     </div>
                     <ul style={{ margin: `${cq(8)} 0 0`, padding: 0, listStyle: "none" }}>
-                      {col.items.map((v, j) => (
+                      {safeList(col.items).map((v, j) => (
                         <li
                           key={j}
                           style={{
