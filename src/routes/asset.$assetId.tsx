@@ -4948,7 +4948,48 @@ function ExpertiseInlineEditor({
         value={section.title ?? ""}
         onChange={(e) => onPatch({ title: e.target.value })}
       />
+      <div className="flex flex-wrap gap-1">
+        <button
+          type="button"
+          onClick={() =>
+            onPatch({
+              eyebrow: `${ORG_NAME} credentials`,
+              title: "Certifications",
+              items: ORG_CREDENTIALS.map((label) => ({ label })),
+            })
+          }
+          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+        >
+          Use our credentials
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            onPatch({
+              eyebrow: "How we deliver",
+              title: "What's included",
+              items: ORG_INCLUDED.map((label) => ({ label })),
+            })
+          }
+          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+        >
+          Use what's included
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            onPatch({
+              title: `How ${ORG_NAME} delivers`,
+              items: ORG_EXPERTISE.map((e) => ({ ...e })),
+            })
+          }
+          className="rounded-full border border-black/10 px-2 py-0.5 text-[10px] font-medium text-black/65 transition hover:bg-black/5 dark:border-white/15 dark:text-white/65 dark:hover:bg-white/10"
+        >
+          Use our expertise
+        </button>
+      </div>
       <ArrayEditor
+
         items={section.items}
         onChange={(items) => onPatch({ items })}
         add={() => ({ label: "", icon: "" })}
