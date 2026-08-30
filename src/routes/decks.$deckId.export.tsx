@@ -42,6 +42,8 @@ import type { VisualValidationReport } from "@/lib/pptx-visual-validate";
 
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
+import { MobileDeckExport } from "@/components/export/MobileDeckExport";
+
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 
 import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
@@ -614,6 +616,21 @@ function ExportView() {
                 </div>
               </div>
 
+              {/* Phones: build the real file here and hand it to the OS share sheet. */}
+              <MobileDeckExport
+                deck={deck}
+                brand={brand}
+                blocked={blocked}
+                onBlocked={(what) =>
+                  explainBlocked(what, () => {
+                    /* override re-runs the desktop pptx path */
+                    void runPptxExport();
+                  })
+                }
+                className="mt-5"
+              />
+
+
               {/* Image compatibility options — apply to the next export. */}
               <div className="mt-5 border-t border-black/[0.06] pt-4">
                 <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-black/45">
@@ -803,7 +820,9 @@ function ExportView() {
                     className="aspect-[16/9] w-full"
                     data-arrow-check-slide={slide.id}
                     data-arrow-check-index={i + 1}
+                    data-mobile-export-slide={slide.id}
                   >
+
                     <ScaledSlide>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
