@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CloudOff, CloudUpload, Loader2 } from "lucide-react";
+import { CloudOff, CloudUpload, FolderUp, Loader2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -498,5 +498,82 @@ export function SaveDeckButton({ deckId }: { deckId: string }) {
       savedLabel="Saved"
       title={dirty ? "Unsaved changes — save now (⌘S)" : "All changes saved"}
     />
+  );
+}
+
+/**
+ * Explicit "Save deck to My Files" control.
+ *
+ * A locally-authored deck (agent run, open canvas, imported draft) is addressed
+ * by a short local id, so its URL only resolves in the browser that made it —
+ * even after autosave has pushed the content to the workspace. This button
+ * saves on demand and then moves the user onto the portable `cloud-<uuid>`
+ * route, which opens from any signed-in device and matches the link listed in
+ * My files. Decks already on a portable id don't need it.
+ */
+export function SaveDeckToMyFilesButton({ deckId }: { deckId: string }) {
+  const deck = useDeckStore((s) => s.decks[deckId]);
+  const brief = useDeckStore((s) => (deck ? s.briefs[deck.briefId] : undefined));
+  const markCloudLinked = useDeckStore((s) => s.markCloudLinked);
+  const save = useServerFn(saveDeckToCloud);
+  const snapshot = useServerFn(snapshotDeckVersion);
+  const signedIn = useSignedIn();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+
+  // Portable already: cloud ids and uuid-addressed decks resolve anywhere.
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(deckId);
+  if (!deck || !brief || deckId.startsWith("cloud-") || isUuid) return null;
+
+  if (signedIn === null) return null;
+  if (!signedIn) {
+    return (
+      <button
+        type="button"
+        onClick={() => navigate({ to: "/auth" })}
+        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 text-[12px] font-semibold text-foreground/70 transition hover:bg-muted hover:text-foreground"
+      >
+        <CloudOff size={13} />
+        Sign in to keep this deck
+      </button>
+    );
+  }
+
+  async function onSave() {
+    if (!deck || !brief) return;
+    setBusy(true);
+    try {
+      const res = (await save({ data: { deck: deck as Deck, brief: brief as Brief } })) as {
+        deckUuid: string;
+      };
+      markDeckSaved(deckId, deckSignature(deck, brief));
+      markCloudLinked(deckId, true);
+      try {
+        await snapshot({ data: { deckId, changeSummary: "Saved to My Files" } });
+      } catch {
+        // versioning is best-effort — never break saves
+      }
+      toast.success("Saved to My Files — this deck now opens on any of your devices");
+      if (res?.deckUuid) {
+        void navigate({ to: "/decks/$deckId", params: { deckId: `cloud-${res.deckUuid}` } });
+      }
+    } catch (e) {
+      toast.error(`Save failed: ${e instanceof Error ? e.message : "unknown"}`);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onSave}
+      disabled={busy}
+      title="Store this deck in your workspace so it opens on your other devices"
+      className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[#003FC7] px-3.5 text-[12px] font-semibold text-white shadow-sm transition hover:brightness-110 disabled:opacity-60"
+    >
+      {busy ? <Loader2 size={13} className="animate-spin" /> : <FolderUp size={13} />}
+      <span>{busy ? "Saving…" : "Save deck to My Files"}</span>
+    </button>
   );
 }

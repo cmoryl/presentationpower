@@ -48,6 +48,7 @@ import { IconPicker } from "@/components/IconPicker";
 import {
   SaveToCloudButton,
   SaveDeckButton,
+  SaveDeckToMyFilesButton,
   AutosaveIndicator,
 } from "@/components/CloudDeckControls";
 import { ShareMenu } from "@/components/ShareMenu";
@@ -560,7 +561,8 @@ function DeckEditor() {
                 </>
               }
               status={
-                <div className="flex items-center gap-3 text-[11px] text-black/50">
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-black/50">
+                  <SaveDeckToMyFilesButton deckId={deckId} />
                   <SaveDeckButton deckId={deckId} />
                   <AutosaveIndicator deckId={deckId} />
                   <ReviewStatusControl localDeckId={deckId} />
