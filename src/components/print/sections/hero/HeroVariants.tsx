@@ -9,6 +9,7 @@ import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print
 import { heroImageStyle } from "@/lib/print-hero-transform";
 import { printCardSurface } from "@/lib/print-card-surface";
 import type { PrintHeroSection } from "@/lib/print-assets.types";
+import { ORG_LOGO, ORG_NAME } from "@/lib/print-library/org-facts";
 import { cq, sectionInk, pageBleed, pageGutter } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { AutoFitText } from "./HeroAutoFit";
