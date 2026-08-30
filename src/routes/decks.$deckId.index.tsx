@@ -894,7 +894,7 @@ function DeckEditor() {
                 onClick={() => setSlidesRailOpen((v) => !v)}
                 aria-expanded={slidesRailOpen}
                 title={slidesRailOpen ? "Collapse the slide list" : "Show the slide list"}
-                className={`flex w-9 flex-col items-center gap-1.5 rounded-lg py-3 transition ${
+                className={`flex w-11 flex-col items-center gap-1.5 rounded-lg py-3 transition sm:w-9 ${
                   slidesRailOpen ? "bg-[#003FC7] text-white" : "text-black/60 hover:bg-black/5"
                 }`}
               >
@@ -908,7 +908,7 @@ function DeckEditor() {
               </button>
             </div>
             <div
-              className={`shrink-0 space-y-3 ${slidesRailOpen ? "w-[260px]" : "hidden"}`}
+              className={`min-w-0 shrink-0 space-y-3 ${slidesRailOpen ? "w-full lg:w-[260px]" : "hidden"}`}
               role="group"
               aria-label="Slide list and selection"
               aria-describedby="slide-rail-help"
@@ -940,7 +940,7 @@ function DeckEditor() {
               <div
                 role="group"
                 aria-label={`Slides (${deck.slides.length})`}
-                className="space-y-3"
+                className="grid grid-cols-2 gap-3 lg:grid-cols-1"
                 onKeyDown={(e) => {
                   const last = deck.slides.length - 1;
                   const next =
