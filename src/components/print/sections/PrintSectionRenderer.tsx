@@ -45,6 +45,8 @@ import {
   DeviceMonitorShowcase,
   DeviceDuoShowcase,
 } from "./device/DeviceVariants";
+import { PrintSectionLayoutFrame } from "./PrintSectionLayoutFrame";
+import { printSectionLayoutId } from "@/lib/print-section-layouts";
 
 export const PRINT_HERO_VARIANTS: Array<{
   id: PrintHeroModuleVariant;
