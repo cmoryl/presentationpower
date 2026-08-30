@@ -412,6 +412,44 @@ export function PrintSectionRenderer({
   }
 }
 
+/** True when a module has nothing renderable — a stripped or half-authored
+ *  draft. Such a block used to render an empty wrapper that still ate a
+ *  rowGap, so pages showed ghost holes; the stack now drops it entirely and
+ *  the remaining modules reflow into the reclaimed area. */
+export function printSectionIsEmpty(section: PrintSection): boolean {
+  const text = (v?: string) => typeof v === "string" && v.trim().length > 0;
+  switch (section.kind) {
+    case "stats":
+    case "logo-grid":
+    case "expertise":
+    case "feature-list":
+    case "narrative":
+      return safeList((section as { items?: unknown[] }).items).length === 0;
+    case "table":
+      return safeList((section as { rows?: unknown[] }).rows).length === 0;
+    case "quote":
+      return !text(section.text);
+    case "contact":
+      return (
+        !text(section.title) &&
+        !text(section.body) &&
+        !text(section.email) &&
+        !text(section.phone) &&
+        !text(section.name) &&
+        safeList(section.rows).length === 0
+      );
+    case "device":
+      return (
+        !text(section.imageUrl) &&
+        !text(section.title) &&
+        !text(section.body) &&
+        safeList(section.items).length === 0
+      );
+    default:
+      return false;
+  }
+}
+
 export function PrintSectionsStack({
   sections,
   mode,
@@ -424,7 +462,8 @@ export function PrintSectionsStack({
   /** Page density — scales the rhythm between modules with the document. */
   density?: "compact" | "standard" | "airy";
 }) {
-  if (!sections?.length) return null;
+  const live = safeList(sections).filter((s) => s && !printSectionIsEmpty(s));
+  if (live.length === 0) return null;
   // The STACK owns the vertical rhythm — modules themselves carry no margin, so
   // any mix of template blocks and newer modules spaces identically, and a
   // masthead hero that bleeds to the trim still sits flush at the top.
@@ -437,7 +476,7 @@ export function PrintSectionsStack({
         data-print-module-stack
         style={{ display: "flex", flexDirection: "column", rowGap: cq(rhythm) }}
       >
-        {sections.map((s) => (
+        {live.map((s) => (
           <div
             key={s.id}
             data-section={`module:${s.id}`}
@@ -451,6 +490,7 @@ export function PrintSectionsStack({
     </PrintSurfaceProvider>
   );
 }
+
 
 /** Human label for the canvas selection chip. */
 function sectionLabel(s: PrintSection): string {
