@@ -42,6 +42,8 @@ import type { VisualValidationReport } from "@/lib/pptx-visual-validate";
 
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
+import { MobileDeckExport } from "@/components/export/MobileDeckExport";
+
 import { ApprovalGate } from "@/components/approvals/ApprovalGate";
 
 import { useCloudDeckGate } from "@/hooks/use-cloud-deck-gate";
