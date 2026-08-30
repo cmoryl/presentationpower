@@ -8,6 +8,7 @@
 
 import type { CSSProperties } from "react";
 import { printIconInk } from "@/lib/print-icon-contrast";
+import { printCardSurface, type PrintCardSurfaceOptions } from "@/lib/print-card-surface";
 import { usePrintSurface } from "./print-doc-mode";
 import type { PrintDensity, PrintPageSize } from "@/lib/print-assets.types";
 import {
