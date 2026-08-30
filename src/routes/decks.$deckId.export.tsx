@@ -614,6 +614,21 @@ function ExportView() {
                 </div>
               </div>
 
+              {/* Phones: build the real file here and hand it to the OS share sheet. */}
+              <MobileDeckExport
+                deck={deck}
+                brand={brand}
+                blocked={blocked}
+                onBlocked={(what) =>
+                  explainBlocked(what, () => {
+                    /* override re-runs the desktop pptx path */
+                    void runPptxExport();
+                  })
+                }
+                className="mt-5"
+              />
+
+
               {/* Image compatibility options — apply to the next export. */}
               <div className="mt-5 border-t border-black/[0.06] pt-4">
                 <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-black/45">
