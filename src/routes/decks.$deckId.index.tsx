@@ -894,7 +894,7 @@ function DeckEditor() {
                 onClick={() => setSlidesRailOpen((v) => !v)}
                 aria-expanded={slidesRailOpen}
                 title={slidesRailOpen ? "Collapse the slide list" : "Show the slide list"}
-                className={`flex w-9 flex-col items-center gap-1.5 rounded-lg py-3 transition ${
+                className={`flex w-11 flex-col items-center gap-1.5 rounded-lg py-3 transition sm:w-9 ${
                   slidesRailOpen ? "bg-[#003FC7] text-white" : "text-black/60 hover:bg-black/5"
                 }`}
               >
