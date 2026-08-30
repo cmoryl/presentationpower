@@ -83,6 +83,12 @@ export type HeroCopyFocusProps = {
   objectPosition?: string;
   zone?: HeroCopyFocusZone;
   strength?: HeroCopyFocusStrength;
+  /**
+   * Per-hero fine tune of the soft-focus amount, as a percentage of the chosen
+   * strength preset. 100 = the preset as designed; 0 disables the field.
+   * Clamped to 0..200 so authors cannot push the plate past opaque.
+   */
+  amount?: number;
   mode?: "light" | "dark";
   /** px → container-query unit converter from the host layout. */
   cq?: (v: number) => string;
@@ -101,17 +107,29 @@ export function HeroCopyFocus({
   objectPosition = "50% 50%",
   zone = "lower-left",
   strength = "medium",
+  amount,
   mode = "dark",
   cq,
   className,
   style,
 }: HeroCopyFocusProps) {
-  if (!imageUrl || strength === "off") return null;
+  const scale = Math.max(0, Math.min(200, amount ?? 100)) / 100;
+  if (!imageUrl || strength === "off" || scale === 0) return null;
 
-  const preset = PRESETS[strength];
+  const base = PRESETS[strength];
+  // Scale the defocus as a photographer would: blur and plate alpha ride the
+  // dial together, the tonal lift trails slightly, and the ellipse grows only
+  // a little so the feather never becomes a visible pool.
+  const preset: Preset = {
+    blurPx: base.blurPx * scale,
+    alpha: Math.min(1, base.alpha * scale),
+    liftAlpha: Math.min(0.85, base.liftAlpha * (0.35 + 0.65 * scale)),
+    spread: base.spread * (0.9 + 0.1 * scale),
+  };
   const z = ZONES[zone];
   const mask = feather(z.w * preset.spread, z.h * preset.spread);
-  const blur = cq ? cq(preset.blurPx) : `${preset.blurPx}px`;
+  const blurPx = Math.max(0.5, preset.blurPx);
+  const blur = cq ? cq(blurPx) : `${blurPx}px`;
   const lift = mode === "dark" ? "3, 0, 44" : "255, 255, 255";
 
   const shell: CSSProperties = {

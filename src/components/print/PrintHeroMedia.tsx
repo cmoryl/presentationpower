@@ -25,6 +25,8 @@ export type PrintHeroMedia = {
   // thirds. Defocuses the photograph under the words rather than plating a box
   // over it. Default "medium"; "off" keeps the flat scrim behaviour only.
   copyFocus?: "off" | "soft" | "medium" | "strong";
+  /** Fine tune of the soft-focus amount, 0..200 % of the strength preset. */
+  copyFocusAmount?: number;
   autoScrim?: boolean; // when true, sample image luminance and boost scrim on bright photos
   autoScrimThreshold?: number; // 0..1 luminance above which the boost kicks in (default 0.6)
   blendMode?: CSSProperties["mixBlendMode"]; // default "multiply"
@@ -408,6 +410,7 @@ export function PrintHeroMediaLayer({ media: rawMedia, accent, mode, cq }: Props
             (media.copyOffsetPct ?? 0) > 12 ? "lower" : (media.copyOffsetPct ?? 0) < -12 ? "upper" : "center",
           )}
           strength={focusStrength}
+          amount={media.copyFocusAmount}
           mode={mode}
           cq={cq}
         />

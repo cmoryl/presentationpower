@@ -2593,6 +2593,12 @@ function AssetEditor() {
                       ? patchContent({ heroMedia: { ...content.heroMedia, copyFocus } })
                       : undefined
                   }
+                  copyFocusAmount={content.heroMedia?.copyFocusAmount}
+                  onCopyFocusAmount={(copyFocusAmount) =>
+                    content.heroMedia
+                      ? patchContent({ heroMedia: { ...content.heroMedia, copyFocusAmount } })
+                      : undefined
+                  }
                   onChange={(next) =>
                     patchContent({
                       ...("rule" in next ? { heroRule: next.rule } : null),
@@ -4475,6 +4481,8 @@ function HeroInlineEditor({
         rule={section.rule}
         copyFocus={section.copyFocus}
         onCopyFocus={(copyFocus) => onPatch({ copyFocus })}
+        copyFocusAmount={section.copyFocusAmount}
+        onCopyFocusAmount={(copyFocusAmount) => onPatch({ copyFocusAmount })}
         surfaceLabel="Hero surface"
         onChange={(next) => onPatch(next)}
       />

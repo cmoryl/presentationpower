@@ -43,6 +43,9 @@ type Props = {
   /** Soft-focus field behind hero copy. Omit to hide the row. */
   copyFocus?: PrintHeroCopyFocus;
   onCopyFocus?: (next: PrintHeroCopyFocus) => void;
+  /** Fine tune of the soft-focus amount, 0..200 % of the strength preset. */
+  copyFocusAmount?: number;
+  onCopyFocusAmount?: (next: number) => void;
 };
 
 /** Feathered soft-focus strengths, in the order they read as a ramp. */
@@ -121,6 +124,8 @@ export function PrintVariantPicker({
   accent = "#003FC7",
   copyFocus,
   onCopyFocus,
+  copyFocusAmount,
+  onCopyFocusAmount,
 }: Props) {
   const titleId = matchTitleStylePreset(titleType);
   const bodyId = matchBodyStylePreset(titleType);
@@ -192,6 +197,31 @@ export function PrintVariantPicker({
               onClick={() => onCopyFocus(o.id)}
             />
           ))}
+        </Row>
+      ) : null}
+
+      {onCopyFocusAmount && (copyFocus ?? "medium") !== "off" ? (
+        <Row label="Focus amount" hint={`${Math.round(copyFocusAmount ?? 100)}%`}>
+          <div className="flex w-full items-center gap-2">
+            <input
+              type="range"
+              min={0}
+              max={200}
+              step={5}
+              value={Math.round(copyFocusAmount ?? 100)}
+              onChange={(e) => onCopyFocusAmount(Number(e.target.value))}
+              aria-label="Soft-focus amount behind hero copy"
+              className="h-1.5 w-full flex-1 cursor-pointer appearance-none rounded-full bg-black/15 accent-current dark:bg-white/20"
+              style={{ accentColor: accent }}
+            />
+            <button
+              type="button"
+              onClick={() => onCopyFocusAmount(100)}
+              className="rounded-full border border-black/15 px-2 py-0.5 text-[10px] font-medium text-black/60 transition hover:border-black/35 dark:border-white/15 dark:text-white/60"
+            >
+              Reset
+            </button>
+          </div>
         </Row>
       ) : null}
 

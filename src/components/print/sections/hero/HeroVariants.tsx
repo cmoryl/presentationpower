@@ -161,6 +161,7 @@ export function HeroPhotoBand({ section, mode, accent }: Props) {
           objectPosition={`${section.focalX ?? 50}% ${section.focalY ?? 50}%`}
           zone={heroFocusZone(section.align)}
           strength={section.copyFocus ?? "medium"}
+          amount={section.copyFocusAmount}
           mode="dark"
           cq={cq}
         />
@@ -657,6 +658,7 @@ export function HeroPhotoFade({ section, mode, accent }: Props) {
             objectPosition={`${section.focalX ?? 50}% ${section.focalY ?? 50}%`}
             zone={heroFocusZone(section.align, "lower")}
             strength={section.copyFocus ?? "soft"}
+            amount={section.copyFocusAmount}
             mode={mode}
             cq={cq}
           />
