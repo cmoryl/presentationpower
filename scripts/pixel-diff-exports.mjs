@@ -87,6 +87,9 @@ const ONLY = values("variant");
 const UPDATE = flag("update");
 const CI = flag("ci");
 const TOLERANCE = Number(value("tolerance", 0.02));
+// Export fidelity under test. "editable" is what the app ships, so it is the
+// default here; "layered" reproduces the historical baselines.
+const FIDELITY = value("fidelity", "editable");
 const OUT_DIR = path.resolve(value("out", "artifacts/pixel-diff"));
 const BASELINE = path.resolve(value("baseline", "tests/snapshots/export-pixel-diff.baseline.json"));
 
@@ -335,7 +338,7 @@ async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
   const browser = await launchChromium();
-  const page = await boot(browser);
+  let page = await boot(browser);
   const matrix = await page.evaluate(() => ({
     v: window.__tpExportVerify.variants,
     p: window.__tpExportVerify.packs.filter(Boolean),
@@ -353,7 +356,7 @@ async function main() {
 
   const jobs = [];
   for (const look of looks)
-    for (const mode of MODES) for (const v of variants) jobs.push([v, look, mode]);
+    for (const mode of MODES) for (const v of variants) jobs.push([v, look, mode, FIDELITY]);
 
   console.log(
     `pixel-diff (ADVISORY regression gate — LibreOffice is not a PowerPoint renderer):\n` +
@@ -366,17 +369,33 @@ async function main() {
     const job = jobs[i];
     const label = `${job[0]}@${job[1] ?? "base"}@${job[2]}`;
     let cap;
+    // A single heavy cell can tear down the page context (navigation or an OOM
+    // in the raster pass). Without a reboot every later cell then fails with
+    // "Cannot read properties of undefined (reading 'pixel')" and the sweep
+    // silently reports on a handful of modules instead of the whole library.
     try {
       [cap] = await page.evaluate((j) => window.__tpExportVerify.pixel([j]), job);
-    } catch (err) {
-      rows.push({
-        variantId: job[0],
-        packId: job[1],
-        mode: job[2],
-        score: null,
-        error: `capture threw: ${String(err).slice(0, 160)}`,
-      });
-      continue;
+    } catch (firstErr) {
+      try {
+        await page.context().browser()?.contexts?.();
+        await page.close({ runBeforeUnload: false }).catch(() => {});
+      } catch {
+        /* page already gone */
+      }
+      try {
+        page = await boot(browser);
+        [cap] = await page.evaluate((j) => window.__tpExportVerify.pixel([j]), job);
+      } catch (err) {
+        rows.push({
+          variantId: job[0],
+          packId: job[1],
+          mode: job[2],
+          score: null,
+          error: `capture threw (after reboot): ${String(err).slice(0, 160)}`,
+        });
+        console.log(`  ${i + 1}/${jobs.length} ${label} · UNSCORED (${String(firstErr).slice(0, 80)})`);
+        continue;
+      }
     }
     if (!cap?.pptx || !cap?.build) {
       rows.push({
@@ -416,6 +435,12 @@ async function main() {
 
       const diffPath = path.join(OUT_DIR, `${label.replace(/[^a-z0-9@.-]/gi, "_")}.diff.png`);
       await writeFile(diffPath, PNG.sync.write(diff));
+      // Keep both sides on disk: a diff mask alone can't tell you WHICH side is
+      // wrong, and every fidelity investigation starts by looking at the pair.
+      const stem = path.join(OUT_DIR, label.replace(/[^a-z0-9@.-]/gi, "_"));
+      await writeFile(`${stem}.build.png`, PNG.sync.write(build));
+      await writeFile(`${stem}.export.png`, PNG.sync.write(lo));
+
       if (surf.diffPng) {
         await writeFile(
           path.join(OUT_DIR, `${label.replace(/[^a-z0-9@.-]/gi, "_")}.surface.diff.png`),
