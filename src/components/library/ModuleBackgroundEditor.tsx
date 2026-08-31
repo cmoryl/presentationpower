@@ -52,7 +52,9 @@ async function readBase64(file: File): Promise<string> {
 export function skinCodeForPackId(packId: string | null | undefined): string | null {
   if (!packId) return null;
   const id = String(packId).split("+")[0]!.trim();
-  return backgroundCodeForPackId(id);
+  // Stored records are upper-cased, and every lookup here compares
+  // `skinCode.toUpperCase()` — so normalise once at the source.
+  return backgroundCodeForPackId(id)?.toUpperCase() ?? null;
 }
 
 /** Human label for a stored backdrop: authored scene name, or the module it belongs to. */
