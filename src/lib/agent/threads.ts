@@ -22,15 +22,22 @@ export function isPersistableDeckId(deckId: string): boolean {
 }
 
 export async function listAgentThreads(): Promise<AgentThread[]> {
+  // Admins can read every thread by policy (support/moderation), so the owner
+  // filter is explicit here — the conversations rail is always the caller's own.
+  const { data: session } = await supabase.auth.getSession();
+  const ownerId = session.session?.user.id;
+  if (!ownerId) return [];
   const { data, error } = await supabase
     .from("agent_threads")
     .select("id, title, deck_id, updated_at")
+    .eq("owner_id", ownerId)
     .or(PRESENTATION_KIND_FILTER)
     .order("updated_at", { ascending: false })
     .limit(100);
   if (error) throw new Error(error.message);
   return (data ?? []) as AgentThread[];
 }
+
 
 export async function createAgentThread(title = "New presentation"): Promise<AgentThread> {
   const { data: session } = await supabase.auth.getSession();

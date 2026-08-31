@@ -15,15 +15,21 @@ export type PrintAgentThread = {
 const SELECT = "id, title, print_asset_id, updated_at";
 
 export async function listPrintThreads(): Promise<PrintAgentThread[]> {
+  // Admins can read every thread by policy, so scope the rail to the caller.
+  const { data: session } = await supabase.auth.getSession();
+  const ownerId = session.session?.user.id;
+  if (!ownerId) return [];
   const { data, error } = await supabase
     .from("agent_threads")
     .select(SELECT)
+    .eq("owner_id", ownerId)
     .eq("kind", "print")
     .order("updated_at", { ascending: false })
     .limit(100);
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as PrintAgentThread[];
 }
+
 
 export async function createPrintThread(title = "New print piece"): Promise<PrintAgentThread> {
   const { data: session } = await supabase.auth.getSession();
