@@ -472,7 +472,7 @@ function DeckTile({
           </div>
           <div className="mt-3 line-clamp-2 text-lg font-semibold">{d.title}</div>
           <div className="mt-1 text-sm text-black/60 dark:text-white/60">
-            {d.slides.length} slides · {client || industry || "—"}
+            {d.slides.length} slide{d.slides.length === 1 ? "" : "s"} · {client || industry || "—"}
           </div>
           <div className="mt-4 flex items-center justify-between text-[11px] uppercase tracking-widest text-black/40 dark:text-white/40">
             <span>{relative(d.createdAt)}</span>

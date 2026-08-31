@@ -8,10 +8,16 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s: {
     next?: string;
     expired?: string;
-  }): { next?: string; expired?: string } => ({
+    mode?: string;
+  }): { next?: string; expired?: string; mode?: Mode } => ({
     next: typeof s.next === "string" ? s.next : undefined,
     expired: s.expired === "1" ? "1" : undefined,
+    mode:
+      s.mode === "signup" || s.mode === "forgot" || s.mode === "team"
+        ? (s.mode as Mode)
+        : undefined,
   }),
+
   head: () => ({ meta: [{ title: "Sign in · TransPerfect Element" }] }),
   component: AuthPage,
 });
@@ -25,16 +31,50 @@ function safeNext(next: string | undefined): string | null {
 
 type Mode = "signin" | "signup" | "forgot" | "team";
 
+/** Supabase auth errors are terse; say what the person should do next. */
+function friendlyAuthError(err: unknown): string {
+  const raw = err instanceof Error ? err.message : "";
+  const low = raw.toLowerCase();
+  if (low.includes("invalid login credentials"))
+    return "That email and password don't match an account. Check the password, or create an account below.";
+  if (low.includes("email not confirmed"))
+    return "This account still needs email confirmation. Open the link we emailed you, then sign in.";
+  if (low.includes("already registered") || low.includes("already been registered"))
+    return "An account already exists for that email. Sign in instead, or reset the password.";
+  if (low.includes("password should be"))
+    return "Pick a password with at least 8 characters.";
+  if (low.includes("rate limit") || low.includes("too many"))
+    return "Too many attempts just now. Wait a minute and try again.";
+  if (low.includes("failed to fetch") || low.includes("network"))
+    return "We couldn't reach the server. Check your connection and try again.";
+  return raw || "Something went wrong. Try again.";
+}
+
+
 function AuthPage() {
   const navigate = useNavigate();
-  const { next, expired } = Route.useSearch();
+  const { next, expired, mode: modeParam } = Route.useSearch();
   const returnTo = safeNext(next);
   const goAfterAuth = () => {
     if (returnTo) window.location.href = returnTo;
     else navigate({ to: "/", replace: true });
   };
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [mode, setMode] = useState<Mode>("signin");
+  // The mode lives in the URL so it survives hydration, reloads and the back
+  // button — a tab switched before hydration used to snap back to sign-in and
+  // silently submit the wrong form.
+  const mode: Mode = modeParam ?? "signin";
+  const setMode = (nextMode: Mode) => {
+    void navigate({
+      to: "/auth",
+      search: (prev) => ({
+        ...prev,
+        mode: nextMode === "signin" ? undefined : nextMode,
+      }),
+      replace: true,
+    });
+  };
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -122,8 +162,9 @@ function AuthPage() {
         goAfterAuth();
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Try again.");
+      setError(friendlyAuthError(err));
     } finally {
+
       setBusy(false);
     }
   }

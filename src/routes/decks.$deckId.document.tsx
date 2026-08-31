@@ -159,7 +159,7 @@ function DocumentView() {
             </label>
             <span className="text-xs text-black/50">
               {pages.length} page{pages.length === 1 ? "" : "s"} · {slides.length} of{" "}
-              {deck.slides.length} slides
+              {deck.slides.length} slide{deck.slides.length === 1 ? "" : "s"}
             </span>
           </div>
         </div>
