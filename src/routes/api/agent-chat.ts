@@ -16,7 +16,11 @@ import { buildSectionTemplateToolSet } from "@/lib/agent/section-templates-tool"
 import { buildLayoutArbiterToolSet } from "@/lib/agent/layout-arbiter-tool";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
-import { dropUnknownToolParts, repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
+import {
+  bridgeToolResultTurns,
+  dropUnknownToolParts,
+  repairDanglingToolParts,
+} from "@/lib/agent/repair-tool-parts";
 import { tool } from "ai";
 import { z } from "zod";
 
@@ -128,8 +132,8 @@ export const Route = createFileRoute("/api/agent-chat")({
           ]
             .filter(Boolean)
             .join("\n"),
-          messages: await convertToModelMessages(
-            dropUnknownToolParts(messages, Object.keys(toolSet)),
+          messages: bridgeToolResultTurns(
+            await convertToModelMessages(dropUnknownToolParts(messages, Object.keys(toolSet))),
           ),
           tools: toolSet,
           stopWhen: stepCountIs(50),
