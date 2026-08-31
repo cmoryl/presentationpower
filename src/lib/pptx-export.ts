@@ -1507,6 +1507,12 @@ export async function exportDeckToPptx(
             // light-mode decks get dark-mode axis/label colors.
             const slideMode: "light" | "dark" =
               forceMode ?? ((sl as { mode?: string }).mode === "dark" ? "dark" : "light");
+            // Same theme resolver the on-screen chart uses. Hand-rolling four
+            // tokens here left `palette` undefined, so exported charts fell back
+            // to ECharts' default category colors — the loudest "the graph
+            // doesn't match the build" defect in the VIZ family.
+            const { vizTheme } = await import("@/lib/infographics/viz-theme");
+            const baseTheme = vizTheme({ brand: renderBrand, mode: slideMode, pack: activePack });
             const spec = ensureA11y({
               id: `${sl.id}-viz`,
               kind: kind as never,
@@ -1516,19 +1522,19 @@ export async function exportDeckToPptx(
                 source: typeof content.source === "string" ? content.source : undefined,
               },
               encoding: encoding as never,
-              theme: {
-                divisionId: brand.id,
-                mode: slideMode,
-                accent: resolveSlideAccent(sl, renderBrand),
-                primary: `#${palette.primary}`,
-                ink: slideMode === "dark" ? "#FFFFFF" : `#${palette.ink}`,
-                surface: slideMode === "dark" ? `#${palette.primary}` : "#FFFFFF",
-              },
+              theme: { ...baseTheme, accent: resolveSlideAccent(sl, renderBrand) },
               accessibility: { shortAlt: "", longDesc: "" },
               export: { preferredFormat: "svg", rasterFallback: true },
             });
-            const svg = await renderSpecToSvg(spec, { width: 1600, height: 900 });
+            // Render at the aspect of the slot the SVG actually lands in, so
+            // area-packed kinds (treemap, sankey, calendar) squarify to the same
+            // proportions as the build instead of being letterboxed.
+            const svg = await renderSpecToSvg(spec, {
+              width: 1600,
+              height: Math.round((1600 * VIZ_BOX.h) / VIZ_BOX.w),
+            });
             if (svg) slideVizSvg[sl.id] = svgToDataUrl(svg);
+
           } catch {
             /* per-slide failure — falls back to title-only */
           }
