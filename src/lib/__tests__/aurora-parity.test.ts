@@ -103,9 +103,17 @@ describe("aurora parity: on-screen renderer ↔ PPTX export", () => {
     // content sits directly on the accent blooms (matches reference decks).
     expect(dark).not.toContain('id="vignette"');
     expect(light).not.toContain('id="vignette"');
-    // Only one full-bleed rect (the base tint) — no wash rect on top.
+    // Dark: one full-bleed rect (the base tint) only — no wash on top.
     expect(dark.match(/<rect width="1280" height="720"/g)?.length ?? 0).toBe(1);
-    expect(light.match(/<rect width="1280" height="720"/g)?.length ?? 0).toBe(1);
+    // Light: base tint + the same two overlays AuroraLayer paints on light
+    // slides (white veil top→bottom, faint accent bleed from the right).
+    // Without them the exported light slide reads far more saturated than the
+    // build.
+    expect(light.match(/<rect width="1280" height="720"/g)?.length ?? 0).toBe(3);
+    expect(light).toContain('id="aurora-white-veil"');
+    expect(light).toContain('id="aurora-accent-bleed"');
+    expect(dark).not.toContain('id="aurora-white-veil"');
+
   });
 
   it("is deterministic: identical (seed, brand, mode) → identical SVG payload", () => {

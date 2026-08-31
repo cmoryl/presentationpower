@@ -47,31 +47,11 @@ export async function renderSpecToSvg(
     throw new Error("renderSpecToSvg is browser-only");
   }
   // Dynamic import so echarts doesn't enter the SSR module graph via this file.
-  const echarts = await import("echarts/core");
-  const [{ SVGRenderer }, chartsMod, componentsMod] = await Promise.all([
-    import("echarts/renderers"),
-    import("echarts/charts"),
-    import("echarts/components"),
-  ]);
-  echarts.use([
-    SVGRenderer,
-    chartsMod.BarChart,
-    chartsMod.LineChart,
-    chartsMod.ScatterChart,
-    chartsMod.PieChart,
-    chartsMod.HeatmapChart,
-    chartsMod.TreemapChart,
-    chartsMod.SankeyChart,
-    chartsMod.GraphChart,
-    componentsMod.GridComponent,
-    componentsMod.TooltipComponent,
-    componentsMod.LegendComponent,
-    componentsMod.TitleComponent,
-    componentsMod.VisualMapComponent,
-    componentsMod.CalendarComponent,
-    componentsMod.MarkLineComponent,
-    componentsMod.MarkAreaComponent,
-  ]);
+  // Registration is shared with the on-screen renderer so export can never
+  // support a narrower set of chart kinds than the build.
+  const { echarts, registerEchartsModules } = await import("./echarts-register");
+  registerEchartsModules();
+
 
   const host = document.createElement("div");
   host.style.cssText = `position:fixed;left:-99999px;top:-99999px;width:${size.width}px;height:${size.height}px;pointer-events:none;`;

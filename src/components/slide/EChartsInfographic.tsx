@@ -3,54 +3,13 @@
 // lazy-loaded behind <ClientOnly>. See tanstack-execution-model.
 
 import * as React from "react";
-import * as echarts from "echarts/core";
-import { CanvasRenderer, SVGRenderer } from "echarts/renderers";
-import {
-  BarChart,
-  LineChart,
-  ScatterChart,
-  PieChart,
-  HeatmapChart,
-  TreemapChart,
-  SankeyChart,
-  GraphChart,
-} from "echarts/charts";
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  TitleComponent,
-  DataZoomComponent,
-  MarkLineComponent,
-  MarkAreaComponent,
-  VisualMapComponent,
-  CalendarComponent,
-} from "echarts/components";
 import type { InfographicSpec, RenderContext } from "@/lib/infographics/spec";
 import { buildEchartsBase } from "@/lib/infographics/echarts-theme";
 import { buildEchartsOption } from "@/lib/infographics/echarts-options";
+import { echarts, registerEchartsModules } from "@/lib/infographics/echarts-register";
 
-echarts.use([
-  CanvasRenderer,
-  SVGRenderer,
-  BarChart,
-  LineChart,
-  ScatterChart,
-  PieChart,
-  HeatmapChart,
-  TreemapChart,
-  SankeyChart,
-  GraphChart,
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  TitleComponent,
-  DataZoomComponent,
-  MarkLineComponent,
-  MarkAreaComponent,
-  VisualMapComponent,
-  CalendarComponent,
-]);
+registerEchartsModules();
+
 
 type Props = {
   spec: InfographicSpec;

@@ -1507,6 +1507,12 @@ export async function exportDeckToPptx(
             // light-mode decks get dark-mode axis/label colors.
             const slideMode: "light" | "dark" =
               forceMode ?? ((sl as { mode?: string }).mode === "dark" ? "dark" : "light");
+            // Same theme resolver the on-screen chart uses. Hand-rolling four
+            // tokens here left `palette` undefined, so exported charts fell back
+            // to ECharts' default category colors — the loudest "the graph
+            // doesn't match the build" defect in the VIZ family.
+            const { vizTheme } = await import("@/lib/infographics/viz-theme");
+            const baseTheme = vizTheme({ brand: renderBrand, mode: slideMode, pack: activePack });
             const spec = ensureA11y({
               id: `${sl.id}-viz`,
               kind: kind as never,
@@ -1516,19 +1522,19 @@ export async function exportDeckToPptx(
                 source: typeof content.source === "string" ? content.source : undefined,
               },
               encoding: encoding as never,
-              theme: {
-                divisionId: brand.id,
-                mode: slideMode,
-                accent: resolveSlideAccent(sl, renderBrand),
-                primary: `#${palette.primary}`,
-                ink: slideMode === "dark" ? "#FFFFFF" : `#${palette.ink}`,
-                surface: slideMode === "dark" ? `#${palette.primary}` : "#FFFFFF",
-              },
+              theme: { ...baseTheme, accent: resolveSlideAccent(sl, renderBrand) },
               accessibility: { shortAlt: "", longDesc: "" },
               export: { preferredFormat: "svg", rasterFallback: true },
             });
-            const svg = await renderSpecToSvg(spec, { width: 1600, height: 900 });
+            // Render at the aspect of the slot the SVG actually lands in, so
+            // area-packed kinds (treemap, sankey, calendar) squarify to the same
+            // proportions as the build instead of being letterboxed.
+            const svg = await renderSpecToSvg(spec, {
+              width: 1600,
+              height: Math.round((1600 * VIZ_BOX.h) / VIZ_BOX.w),
+            });
             if (svg) slideVizSvg[sl.id] = svgToDataUrl(svg);
+
           } catch {
             /* per-slide failure — falls back to title-only */
           }
@@ -3521,6 +3527,13 @@ function initials(name: string): string {
 }
 
 // MV-VIZ-* — render a pre-rasterized/vector SVG under the shared title zone.
+//
+// Geometry mirrors the on-screen module (`InfographicSlideModule`): a 0.667"
+// gutter (Tailwind px-16 at 1280×720) and a chart plate that ends above the
+// source line. The pre-render uses the same box aspect, so the SVG lands
+// edge-to-edge with no letterbox band.
+export const VIZ_BOX = { x: 0.667, y: 1.6, w: 12.0, h: 4.42 } as const;
+
 function renderVizSpec(
   s: PptxGenJS.Slide,
   c: Record<string, unknown>,
@@ -3528,18 +3541,25 @@ function renderVizSpec(
   vizSvg?: string,
 ) {
   const y0 = drawTitle(s, c, p);
-  const y = Math.max(y0, 1.6);
-  const h = 6.0 - y;
+  const y = Math.max(y0, VIZ_BOX.y);
+  const h = Math.max(1.5, VIZ_BOX.y + VIZ_BOX.h - y);
   if (vizSvg) {
-    s.addImage({ data: vizSvg, x: 0.6, y, w: 12.13, h, sizing: { type: "contain", w: 12.13, h } });
+    s.addImage({
+      data: vizSvg,
+      x: VIZ_BOX.x,
+      y,
+      w: VIZ_BOX.w,
+      h,
+      sizing: { type: "contain", w: VIZ_BOX.w, h },
+    });
   } else {
     // Fallback: subtitle so the slide isn't blank when SVG capture fails.
     const subtitle =
       typeof c.subtitle === "string" ? c.subtitle : "Chart preview unavailable in this export.";
     s.addText(subtitle, {
-      x: 0.6,
+      x: VIZ_BOX.x,
       y: y + 0.3,
-      w: 12.13,
+      w: VIZ_BOX.w,
       h: 0.6,
       fontFace: "Geist",
       fontSize: 14,
@@ -3549,16 +3569,17 @@ function renderVizSpec(
   const source = typeof c.source === "string" ? c.source : "";
   if (source) {
     s.addText(`Source · ${source}`, {
-      x: 0.6,
-      y: 6.4,
-      w: 12.13,
-      h: 0.35,
+      x: VIZ_BOX.x,
+      y: VIZ_BOX.y + VIZ_BOX.h + 0.16,
+      w: VIZ_BOX.w,
+      h: 0.32,
       fontFace: "Geist",
       fontSize: 10,
       color: p.ink,
     });
   }
 }
+
 
 // 1. MV-BENTO-5 / 6 / 7 / 8 — asymmetric bento mosaics
 // The area matrices mirror the on-screen renderer exactly, so an exported deck
