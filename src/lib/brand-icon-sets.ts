@@ -129,6 +129,7 @@ const CORE_PROCESS: IconSubArea = {
     { name: "Cog", label: "Configure", keywords: ["set up", "implement"] },
     { name: "FileCheck2", label: "Review", keywords: ["qa", "validate", "approve"] },
     { name: "Send", label: "Deliver", keywords: ["publish", "launch", "ship"] },
+    { name: "Clock", label: "Time", keywords: ["clock", "hours", "schedule", "duration"] },
     { name: "Timer", label: "Turnaround", keywords: ["speed", "sla", "time"] },
     { name: "GitBranch", label: "Integrate", keywords: ["connector", "api", "branch"] },
   ],
