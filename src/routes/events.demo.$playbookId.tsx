@@ -49,6 +49,7 @@ import {
 } from "@/lib/event-looks";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
+  validateSearch: validateBriefCampaignSearch,
   loader: ({ params }) => {
     const playbook = getPlaybook(params.playbookId);
     if (!playbook) throw notFound();
