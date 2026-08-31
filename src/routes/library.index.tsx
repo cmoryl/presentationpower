@@ -1475,7 +1475,11 @@ function Library() {
                   onImportExample={isVideo ? () => importVideoExample(entry.example) : undefined}
                   importBusy={isVideo && videoBusy === entry.example.key}
                   preset={preset}
-                  selectable={selectMode && !isVideo && !preset}
+                  // Curated preset cards still stand for a real variant, so they
+                  // stay selectable; only video examples can't join a deck.
+                  selectable={selectMode && !isVideo}
+                  selectDisabled={selectMode && isVideo}
+
                   selected={selectedSet.has(v.id)}
                   onToggleSelect={() => toggleSelected(v.id)}
                 />
@@ -1603,6 +1607,8 @@ const VariantCard = memo(function VariantCard({
   logoHubPool,
   compact = false,
   selectable = false,
+  selectDisabled = false,
+
   selected = false,
   onToggleSelect,
   preset,
@@ -1637,8 +1643,12 @@ const VariantCard = memo(function VariantCard({
   /** When true, clicking the card toggles selection instead of opening the
    *  detail modal — used by the library's multi-select → build deck flow. */
   selectable?: boolean;
+  /** Select mode is on but this card can't be added (video examples). Dimmed
+   *  with an explanatory title so the click isn't a silent surprise. */
+  selectDisabled?: boolean;
   selected?: boolean;
   onToggleSelect?: () => void;
+
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const pack = useLibraryPack();
@@ -1769,6 +1779,7 @@ const VariantCard = memo(function VariantCard({
       <button
         type="button"
         onClick={selectable ? onToggleSelect : onOpen}
+        title={selectDisabled ? "Video examples can't be added to a deck" : undefined}
         data-variant-card=""
         data-variant-id={variant.id}
         data-variant-family={variant.familyId}
@@ -1777,8 +1788,9 @@ const VariantCard = memo(function VariantCard({
         data-variant-pinned={pinned ? "1" : "0"}
         data-variant-selected={selected ? "1" : "0"}
         data-variant-usage={usageCount}
-        className={`group/card block w-full overflow-hidden rounded-[24px] border bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)] ${selectable && selected ? "border-[#003FC7]" : "border-slate-200 hover:border-[#003FC7]/20"}`}
+        className={`group/card block w-full overflow-hidden rounded-[24px] border bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)] ${selectable && selected ? "border-[#003FC7]" : "border-slate-200 hover:border-[#003FC7]/20"} ${selectDisabled ? "opacity-45" : ""}`}
       >
+
         {isAB ? (
           <div className="m-2 grid grid-cols-2 gap-2">
             {(["light", "dark"] as const).map((m) => (
@@ -3490,7 +3502,7 @@ function VariantDetailModal({
                 </>
               )}
 
-              <AddToDeckPanel variant={variant} onDone={onClose} />
+              <AddToDeckPanel variant={variant} brand={brand} onDone={onClose} />
 
               <Spec label="Module family">
                 <div className="font-mono text-xs text-black/50">{variant.familyId}</div>
@@ -4272,12 +4284,66 @@ function FieldChips({ fields, tone }: { fields: string[]; tone: "emerald" | "red
   );
 }
 
-function AddToDeckPanel({ variant, onDone }: { variant: ModuleVariant; onDone: () => void }) {
+function AddToDeckPanel({
+  variant,
+  brand,
+  onDone,
+}: {
+  variant: ModuleVariant;
+  brand: ReturnType<typeof useTaxonomy>["brandModes"][number];
+  onDone: () => void;
+}) {
   const decks = useDeckStore((s) => s.decks);
   const insertVariantSlide = useDeckStore((s) => s.insertVariantSlide);
+  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const pack = useLibraryPack();
+  const { sectionFrameworks } = useTaxonomy();
+
   const navigate = useNavigate();
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+
+  /** Dead end escape hatch: with no decks yet, spin one up around this module
+   *  instead of sending the user off to the brief flow and losing their place. */
+  function startDeckHere() {
+    const brief = resolveDivisionBrief(brand);
+    const content = seedDivisionContent(variant.id, brief, "Selected module", brand) as Record<
+      string,
+      unknown
+    >;
+    const payload: TemplatePayload = {
+      title: `Custom deck · 1 module`,
+      brandModeId: brand.id,
+      archetypeId: "arch-product-pitch",
+      subCompany: null,
+      context: { stylePackId: pack?.id ?? null, designRecipeId: null },
+
+      brief: {
+        prospect: brief.prospect,
+        industry: brief.industry,
+        audience: brief.audience,
+        meetingObjective: `Custom deck built from ${variant.id}`,
+        lengthTarget: 1,
+        clientFacts: brief.clientFacts,
+      },
+      slides: [
+        {
+          sectionId:
+            sectionFrameworks.find((s) => s.permittedFamilyIds.includes(variant.familyId))?.id ??
+            "SF-01",
+
+          layoutId: variant.permittedLayoutIds[0] ?? "",
+          variantId: variant.id,
+          content: content as unknown as TemplatePayload["slides"][number]["content"],
+        },
+      ],
+    };
+    const { deckId } = createDeckFromTemplate(payload);
+    toast.success("Deck created from this module");
+    onDone();
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
 
   const list = useMemo(
     () =>
@@ -4320,13 +4386,22 @@ function AddToDeckPanel({ variant, onDone }: { variant: ModuleVariant; onDone: (
       </div>
       {list.length === 0 ? (
         <div className="mt-3 rounded-lg border border-dashed border-black/15 bg-white/60 p-3 text-xs text-black/60">
-          No decks yet.{" "}
-          <Link to="/brief/new" className="font-medium text-[#003FC7] hover:underline">
-            Start a brief
-          </Link>{" "}
-          to create one.
+          No decks yet — start one straight from this module.
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={startDeckHere}
+              className="rounded-full bg-[#003FC7] px-3 py-1 text-[11px] font-medium text-white hover:bg-[#0053ff]"
+            >
+              New deck with this module →
+            </button>
+            <Link to="/brief/new" className="font-medium text-[#003FC7] hover:underline">
+              or start a brief
+            </Link>
+          </div>
         </div>
       ) : (
+
         <ul className="mt-3 space-y-1.5">
           {list.map((d) => (
             <li

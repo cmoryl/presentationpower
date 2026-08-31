@@ -790,7 +790,7 @@ function ExportView() {
               subjectId={deckId}
               title={deck.title || "Untitled deck"}
               subjectPath={`/decks/${deckId}`}
-              summary={`${deck.slides.length} slides · ${brand.name}`}
+              summary={`${deck.slides.length} slide${deck.slides.length === 1 ? "" : "s"} · ${brand.name}`}
               checks={[
                 ...blocks.map((issue, i) => ({
                   id: `block-${i}`,

@@ -546,7 +546,7 @@ function DeckEditor() {
               title={deck.title}
               meta={
                 <>
-                  <span>{deck.slides.length} slides</span>
+                  <span>{deck.slides.length} slide{deck.slides.length === 1 ? "" : "s"}</span>
                   <MetaDot />
                   <span>{brand.name}</span>
                   {qa.length > 0 && (

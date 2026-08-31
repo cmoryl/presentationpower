@@ -252,7 +252,7 @@ function BriefOutputHub() {
                     <div className="truncate text-[14px] font-medium text-[#03002C]">
                       {deck.title}
                     </div>
-                    <div className="text-[12px] text-black/50">{deck.slides.length} slides</div>
+                    <div className="text-[12px] text-black/50">{deck.slides.length} slide{deck.slides.length === 1 ? "" : "s"}</div>
                   </div>
                   <ArrowRight
                     size={16}
