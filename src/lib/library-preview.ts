@@ -21,8 +21,16 @@ import type { Brief, SlideContent } from "@/lib/deck-store";
 import { seedContent } from "@/lib/deck-store";
 import { BRAND_PROFILES } from "@/lib/brand-profiles";
 import { pickCaseStudy, pickProofLogos, CASE_STUDIES } from "@/lib/case-studies";
-import { BRAND_MODES, MODULE_VARIANTS, byId, type BrandMode } from "@/lib/taxonomy";
+import {
+  BRAND_MODES,
+  MODULE_VARIANTS,
+  byId,
+  type BrandMode,
+  type ModuleVariant,
+} from "@/lib/taxonomy";
+import { fieldSpecFor, leafOf } from "@/lib/taxonomy-field-kinds";
 import { expandPath, readPath } from "@/lib/qa";
+
 
 export function resolveDivisionBrief(brand: BrandMode): Brief {
   const profile = BRAND_PROFILES[brand.id];
@@ -440,7 +448,12 @@ interface DivisionCtx {
   quote: string;
   attribution: string;
   role: string;
+  /** Division service lines — the copy pool for generated repeated items. */
+  serviceLines: string[];
+  /** Case-study figures — the number pool for generated repeated items. */
+  stats: Array<{ value: string; unit?: string; label: string; source?: string }>;
 }
+
 
 const QUOTE_KEYS = new Set(["quote", "testimonial"]);
 const SOURCE_KEYS = new Set(["source", "footnote", "sourceNote", "prepared", "presenter", "owner"]);
@@ -500,7 +513,15 @@ export function seedDivisionContent(
     quote: cs.quote,
     attribution: cs.attribution,
     role: cs.role,
+    serviceLines: profile?.contentScope?.serviceLines ?? [],
+    stats: (cs.stats ?? []).map((s) => ({
+      value: String(s.value ?? ""),
+      unit: s.unit,
+      label: s.label,
+      source: s.source,
+    })),
   };
+
   const out: Obj = {};
   for (const k of Object.keys(seeded)) out[k] = divisionizeValue(seeded[k], k, ctx);
   return completeSeededContent(variantId, out, ctx) as SlideContent;
@@ -529,11 +550,70 @@ function writeSeedPath(root: Obj, path: string, value: string): void {
   node[parts[parts.length - 1]!] = value;
 }
 
+/**
+ * Repeated-item slots the base seed never wrote at all.
+ *
+ * Data-heavy families (graphs, maps, dashboards, flows) declare a minimum item
+ * count but have no generic seed, so a library-built deck arrived with an empty
+ * `items` array and every export was blocked by the under-capacity gate. Fill
+ * the collection to its declared minimum from the division's own service lines
+ * and case-study figures — no invented claims — and trim anything over the max.
+ */
+function fillItemCapacity(variant: ModuleVariant | undefined, out: Obj, ctx: DivisionCtx): void {
+  const cap = variant?.capacity.items;
+  if (!cap) return;
+  const path = cap.path ?? "items";
+  const current = readPath(out, path);
+  const list: unknown[] = Array.isArray(current) ? [...current] : [];
+  const specs = Object.entries(cap.fields ?? {});
+  // No declared item shape (charts/maps carry a bespoke row shape) → the
+  // variant's own seed owns this collection; never push shapeless rows at it.
+  if (specs.length === 0) return;
+
+  for (let i = list.length; i < cap.min; i += 1) {
+    const stat = ctx.stats[i % Math.max(ctx.stats.length, 1)];
+    const subject =
+      ctx.serviceLines[i % Math.max(ctx.serviceLines.length, 1)] ||
+      stat?.label ||
+      `${ctx.industry} program ${i + 1}`;
+    const item: Obj = {};
+    for (const [sub, spec] of specs) {
+      const leaf = leafOf(sub);
+      if (spec.kind === "list") {
+        item[sub] = [];
+        continue;
+      }
+      // Asset slots stay empty: a placeholder string here becomes a 404 image.
+      if (spec.kind === "logo" || spec.kind === "image" || spec.kind === "icon") continue;
+      if (spec.kind === "number") {
+        const n = Number(String(stat?.value ?? "").replace(/[^\d.-]/g, ""));
+        item[sub] = Number.isFinite(n) && n !== 0 ? n : 20 + i * 10;
+        continue;
+      }
+      if (/^(source|footnote)$/i.test(leaf)) {
+        item[sub] = stat?.source ?? `${ctx.divisionName} program data, 2025`;
+      } else if (/^unit$/i.test(leaf)) {
+        item[sub] = stat?.unit ?? "%";
+      } else if (/^(body|description|copy|detail|summary|narrative|outcome|challenge)$/i.test(leaf)) {
+        item[sub] =
+          `How ${ctx.divisionName} runs ${subject.toLowerCase()} for ${ctx.industry.toLowerCase()} programs.`;
+      } else {
+        item[sub] = subject;
+      }
+    }
+    list.push(item);
+  }
+  if (list.length > cap.max) list.length = cap.max;
+  if (list.length > 0 || Array.isArray(current)) writeSeedPath(out, path, list as unknown as string);
+}
+
 function completeSeededContent(variantId: string, content: Obj, ctx: DivisionCtx): Obj {
   const variant = byId(MODULE_VARIANTS, variantId);
   const out: Obj = { ...content };
+  fillItemCapacity(variant, out, ctx);
 
   if (Array.isArray(out.items)) {
+
     out.items = (out.items as unknown[]).map((raw) => {
       if (!raw || typeof raw !== "object") return raw;
       const item = { ...(raw as Obj) };
@@ -561,6 +641,14 @@ function completeSeededContent(variantId: string, content: Obj, ctx: DivisionCtx
     for (const path of expandPath(pattern, out)) {
       if (String(readPath(out, path) ?? "").trim() !== "") continue;
       const leaf = path.split(".").pop() ?? "";
+      // Never fabricate an asset reference: a logo/image/icon slot filled with
+      // prose renders as a broken image (404) instead of reading as empty.
+      const kind = fieldSpecFor(path, {
+        titleChars: variant?.capacity.titleChars,
+        bodyChars: variant?.capacity.bodyChars,
+      }).kind;
+      if (kind === "logo" || kind === "image" || kind === "icon" || kind === "list") continue;
+
       const parentPath = path.slice(0, path.length - leaf.length - 1);
       const parent = parentPath ? readPath(out, parentPath) : out;
       const label =
