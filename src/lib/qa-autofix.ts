@@ -324,14 +324,42 @@ function bestVariantForCount(
   return (same[0] ?? pool[0]) as ModuleVariant;
 }
 
-function swapKeepingContent(slide: DeckSlide, next: ModuleVariant): DeckSlide {
+/**
+ * Move a slide onto another variant AND translate its copy into the target's
+ * field vocabulary.
+ *
+ * Carrying `content` across verbatim used to strand the slide: a close-CTA
+ * (`message` / `nextSteps`) swapped onto a split close (`title` / `body` /
+ * `ctaLabel`) kept keys the new module never reads, so the slide rendered blank
+ * and every export was blocked by four empty-field gates. Each required text
+ * field of the target is therefore filled from the copy already on the slide —
+ * donors only, nothing invented.
+ */
+function swapKeepingContent(slide: DeckSlide, next: ModuleVariant): DeckSlide | null {
+  const content = clone(slide.content) as Record<string, unknown>;
+  const donorSource: DeckSlide = { ...slide, content: slide.content };
+  let stranded = false;
+  for (const pattern of next.editableFields) {
+    for (const cp of expandPath(pattern, content)) {
+      const rel = contentRelative(cp);
+      if (isFilled(readPath(content, rel))) continue;
+      const donor = findDonor(donorSource, rel);
+      if (donor) writePath(content, rel, donor.value);
+      else stranded = true;
+    }
+  }
+  // Never trade a rendering slide for a blank one: if the target asks for copy
+  // this slide cannot supply, stay on the current variant.
+  if (stranded) return null;
   return {
     ...slide,
     variantId: next.id,
     layoutId: next.permittedLayoutIds[0] ?? slide.layoutId,
-    content: slide.content,
+    content: content as SlideContent,
   };
 }
+
+
 
 /* ---------------------------------------------------------------- the engine */
 
@@ -431,7 +459,9 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
             : 0;
           const target = bestVariantForCount(variant, n);
           if (!target) break;
-          work = work.map((s, i) => (i === idx ? swapKeepingContent(slide, target) : s));
+          const swapped = swapKeepingContent(slide, target);
+          if (!swapped) break;
+          work = work.map((s, i) => (i === idx ? swapped : s));
           fixes.push({
             code: issue.code,
             kind: "swap-capacity-variant",
@@ -484,7 +514,9 @@ export function autoFixQa(slides: DeckSlide[], opts: QaFixOptions = {}): QaFixRe
             pool.find((v) => v.familyId === variant.familyId) ??
             (issue.code === "brand-restricted-family" ? pool[0] : undefined);
           if (!target) break;
-          work = work.map((s, i) => (i === idx ? swapKeepingContent(slide, target) : s));
+          const swappedBrand = swapKeepingContent(slide, target);
+          if (!swappedBrand) break;
+          work = work.map((s, i) => (i === idx ? swappedBrand : s));
           fixes.push({
             code: issue.code,
             kind: "swap-brand-variant",

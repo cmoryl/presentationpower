@@ -6,6 +6,7 @@ import type { DeckSlide } from "./deck-store";
 import { MODULE_VARIANTS, byId, type ModuleVariant } from "./taxonomy";
 import { BRAND_PROFILES, resolveBrandMode } from "./brand-profiles";
 import { hexContrast, resolveSlideAccent, slideBackgroundForMode } from "./slide-accent";
+import { fieldSpecFor } from "./taxonomy-field-kinds";
 
 export type QaSeverity = "block" | "warn";
 export type QaIssue = {
@@ -42,15 +43,23 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
       for (const cp of expandPath(path, slide.content)) {
         const v = readPath(slide.content, cp);
         if (v == null || (typeof v === "string" && v.trim() === "")) {
+          // Asset slots (logo/image/icon) are optional decoration: modules fall
+          // back to type-only treatments, so an empty one is a note, not a stop.
+          const kind = fieldSpecFor(cp, {
+            titleChars: variant.capacity.titleChars,
+            bodyChars: variant.capacity.bodyChars,
+          }).kind;
+          const optionalAsset = kind === "logo" || kind === "image" || kind === "icon";
           issues.push({
             slideId: slide.id,
-            severity: "block",
-            code: "empty-field",
+            severity: optionalAsset ? "warn" : "block",
+            code: optionalAsset ? "empty-asset" : "empty-field",
             message: `Empty field: ${cp}`,
           });
         }
       }
     }
+
 
     // Capacity: items array bounds → block
     checkCapacity(slide, variant, issues);
@@ -193,8 +202,12 @@ export const warningIssues = (issues: QaIssue[]) => issues.filter((i) => i.sever
 function checkCapacity(slide: DeckSlide, variant: ModuleVariant, issues: QaIssue[]) {
   const cap = variant.capacity.items;
   if (!cap) return;
-  const items = slide.content.items;
+  // The repeating collection is not always called `items`: charts and maps put
+  // it on `rows`, `series`, `points`… Counting `items` there reported zero on a
+  // fully seeded slide and blocked every export of those modules.
+  const items = readPath(slide.content, cap.path ?? "items");
   const n = Array.isArray(items) ? items.length : 0;
+
   if (n < cap.min) {
     issues.push({
       slideId: slide.id,

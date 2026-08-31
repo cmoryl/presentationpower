@@ -353,7 +353,32 @@ const STRUCTURAL_TAGS: StructuralTag[] = [
   { id: "cover", label: "Cover & close", test: (v) => /^MV-(OP|CLOSE|REC|CTA)/.test(v.id) },
 ];
 
+/** Multi-select state survives a catalog remount for the tab session. */
+const SELECT_KEY = "element.library.select";
+function readSelectState(): { mode: boolean; ids: string[] } {
+  try {
+    const raw = sessionStorage.getItem(SELECT_KEY);
+    if (!raw) return { mode: false, ids: [] };
+    const parsed = JSON.parse(raw) as { mode?: boolean; ids?: unknown };
+    return {
+      mode: Boolean(parsed.mode),
+      ids: Array.isArray(parsed.ids) ? parsed.ids.filter((x): x is string => typeof x === "string") : [],
+    };
+  } catch {
+    return { mode: false, ids: [] };
+  }
+}
+function writeSelectState(mode: boolean, ids: string[]) {
+  try {
+    if (!mode && ids.length === 0) sessionStorage.removeItem(SELECT_KEY);
+    else sessionStorage.setItem(SELECT_KEY, JSON.stringify({ mode, ids }));
+  } catch {
+    /* private mode / quota — selection just won't survive a remount */
+  }
+}
+
 function Library() {
+
   const { brandModes, moduleFamilies, moduleVariants, layoutFrameworks, sectionFrameworks } =
     useTaxonomy();
   // URL is the source of truth for the shareable slice of view state, so
@@ -383,13 +408,27 @@ function Library() {
   const [pinnedOnly, setPinnedOnly] = useState(false);
   const [sort, setSort] = useState<"default" | "most-used" | "pinned-first">("default");
   // Multi-select mode → build a deck from N chosen variants in one shot.
+  // Persisted for the tab session: the catalog loads in chunks, and a data
+  // remount used to silently drop an in-progress selection mid-click.
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const selectHydrated = useRef(false);
+  useEffect(() => {
+    const saved = readSelectState();
+    selectHydrated.current = true;
+    if (saved.mode) setSelectMode(true);
+    if (saved.ids.length) setSelected(saved.ids);
+  }, []);
+  useEffect(() => {
+    if (selectHydrated.current) writeSelectState(selectMode, selected);
+  }, [selectMode, selected]);
   const selectedSet = useMemo(() => new Set(selected), [selected]);
   const toggleSelected = useCallback((id: string) => {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }, []);
   const clearSelection = useCallback(() => setSelected([]), []);
+
+
 
   const [showImagery, setShowImagery] = useState(false);
   const [density, setDensity] = useState<"comfortable" | "thumb">("comfortable");
@@ -935,10 +974,12 @@ function Library() {
             <button
               type="button"
               onClick={() => {
-                setSelectMode((v) => {
-                  if (v) setSelected([]);
-                  return !v;
-                });
+                // Never call another setter *inside* the updater: React invokes
+                // updaters twice in development, which cancelled the toggle.
+                const next = !selectMode;
+                
+                setSelectMode(next);
+                if (!next) setSelected([]);
               }}
               aria-pressed={selectMode}
               title="Pick multiple modules, then build a deck from the selection"
