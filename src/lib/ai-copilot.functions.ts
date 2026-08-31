@@ -19,6 +19,8 @@ import { ICON_LIBRARY } from "@/lib/icon-library";
 import {
   applyContentPatch,
   applyIcon,
+  capacityClampNotice,
+  clampContentToCapacity,
   collectNumericLeaves,
   deepEqual,
   resolveVariantSwap,
@@ -288,8 +290,15 @@ export const copilotTurn = createServerFn({ method: "POST" })
             baselineNumerics: s.originalNumerics,
           });
           if (!merged.ok) return { error: merged.error };
-          s.content = merged.value;
-          return { ok: true, index: idx };
+          const fitted = clampContentToCapacity(s.variantId, merged.value);
+          s.content = fitted.content;
+          return {
+            ok: true,
+            index: idx,
+            ...(fitted.clamp
+              ? { capacity_clamped: capacityClampNotice(fitted.clamp, s.variantId) }
+              : {}),
+          };
         }
         case "set_slide_icon": {
           const idx = Number(call.input.index);
