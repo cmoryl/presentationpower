@@ -2,7 +2,7 @@ import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { loadSlide, touchDeck } from "../deck-access";
-import { applyContentPatch } from "@/lib/slide-ops";
+import { applyContentPatch, capacityClampNotice, clampContentToCapacity } from "@/lib/slide-ops";
 import { visualDataGap } from "@/lib/agent/visual-data-gaps";
 
 export default defineTool({
@@ -31,18 +31,29 @@ export default defineTool({
       allowNumericEdits: allow_numeric_edits === true,
     });
     if (!merged.ok) return errorResult(merged.error);
+    // The layout's stage area is a hard boundary: rows beyond the module's
+    // declared maximum render off the slide, so they never get written.
+    const fitted = clampContentToCapacity(found.slide.variant_id, merged.value);
     const { error } = await supabase
       .from("deck_slides")
-      .update({ content: merged.value, updated_at: new Date().toISOString() } as never)
+      .update({ content: fitted.content, updated_at: new Date().toISOString() } as never)
       .eq("id", found.slide.id);
     if (error) return errorResult(error.message);
     await touchDeck(supabase, deck_id);
-    const gap = visualDataGap(found.slide.variant_id, merged.value as Record<string, unknown>);
+    const gap = visualDataGap(found.slide.variant_id, fitted.content as Record<string, unknown>);
     return textResult({
       ok: true,
       deck_id,
       position,
-      content: merged.value,
+      content: fitted.content,
+      ...(fitted.clamp
+        ? {
+            capacity_clamped: {
+              ...fitted.clamp,
+              guidance: capacityClampNotice(fitted.clamp, found.slide.variant_id),
+            },
+          }
+        : {}),
       ...(gap ? { visual_data_required: gap } : {}),
     });
   },

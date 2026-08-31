@@ -322,7 +322,8 @@ registerSlideModule({
                     >
                       {s(it.label)}
                     </div>
-                    {s(it.note) && (
+                    {s(it.note) &&
+                      s(it.note).trim().toLowerCase() !== s(it.label).trim().toLowerCase() && (
                       <div
                         className="mt-2"
                         style={{

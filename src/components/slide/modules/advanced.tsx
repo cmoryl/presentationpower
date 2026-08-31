@@ -39,6 +39,36 @@ import type { CSSProperties } from "react";
 
 type IconType = typeof Sparkles;
 
+/**
+ * Break a caption into <=`maxLines` lines of at most `perLine` characters.
+ * SVG <text> never wraps on its own, so any long caption inside a chart has to
+ * be split before it is drawn or it runs straight through its neighbours.
+ */
+function wrapSvgText(text: string, perLine: number, maxLines: number): string[] {
+  const clean = String(text ?? "").trim();
+  if (!clean) return [];
+  const lines: string[] = [];
+  let line = "";
+  for (const word of clean.split(/\s+/)) {
+    const next = line ? `${line} ${word}` : word;
+    if (next.length <= perLine) {
+      line = next;
+      continue;
+    }
+    if (line) lines.push(line);
+    line = word;
+    if (lines.length === maxLines) break;
+  }
+  if (line && lines.length < maxLines) lines.push(line);
+  if (lines.length === maxLines) {
+    const consumed = lines.join(" ").length;
+    if (consumed < clean.length) {
+      lines[maxLines - 1] = `${lines[maxLines - 1].replace(/[\s,.;:]+$/, "")}…`;
+    }
+  }
+  return lines;
+}
+
 // The kit's icon resolver is typed against the shared kit icon shape; this
 // family renders lucide components directly, so narrow the return type once.
 const pickIcon = pickKitIcon as unknown as (
@@ -1343,6 +1373,9 @@ registerSlideModule({
           .join(" ");
         const areaPath = `${path} L ${points[points.length - 1]?.x ?? W - PAD_X} ${H - PAD_BOT} L ${points[0]?.x ?? PAD_X} ${H - PAD_BOT} Z`;
         const currentIdx = items.findIndex((it) => Boolean(it.current));
+        // Characters that fit on one note line inside one column band, at 16px.
+        const noteColWidth = (W - PAD_X * 2) / Math.max(1, n - 1);
+        const noteColChars = Math.max(14, Math.floor((noteColWidth * 0.92) / 8));
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
             <SlideTitle brand={brand} title={s(c.title, variant.name)} />
@@ -1426,7 +1459,9 @@ registerSlideModule({
                 />
                 {/* Nodes */}
                 {items.map((it, i) => {
-                  const current = Boolean(it.current) || i === currentIdx;
+                  // Exactly ONE node is "here": seeded content often flags every
+                  // level, which printed "YOU ARE HERE" five times.
+                  const current = currentIdx >= 0 ? i === currentIdx : false;
                   const p = points[i];
                   const isFirst = i === 0;
                   const isLast = i === n - 1;
@@ -1439,6 +1474,10 @@ registerSlideModule({
                   const noteX = labelX;
                   const label = s(it.label);
                   const note = s(it.note);
+                  // SVG text does not wrap, so an un-wrapped note ran the full
+                  // width of the plot and every level's note printed on top of
+                  // the next. Each note now wraps inside its own column band.
+                  const noteLines = wrapSvgText(note, noteColChars, 3);
                   return (
                     <g key={i}>
                       {current && <circle cx={p.x} cy={p.y} r={26} fill={accent} opacity={0.18} />}
@@ -1462,17 +1501,19 @@ registerSlideModule({
                       >
                         {label}
                       </text>
-                      {note && (
-                        <text
-                          x={noteX}
-                          y={H - PAD_BOT + 40}
-                          textAnchor={anchor}
-                          fontSize={18}
-                          fill={ink.muted}
-                        >
-                          {note}
-                        </text>
-                      )}
+                      {noteLines.length > 0 &&
+                        noteLines.map((line, li) => (
+                          <text
+                            key={li}
+                            x={noteX}
+                            y={H - PAD_BOT + 40 + li * 22}
+                            textAnchor={anchor}
+                            fontSize={16}
+                            fill={ink.muted}
+                          >
+                            {line}
+                          </text>
+                        ))}
                       {current && (
                         <text
                           x={p.x}

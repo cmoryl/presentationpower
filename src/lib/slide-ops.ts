@@ -165,3 +165,79 @@ export function resolveVariantSwap(
     : next.permittedLayoutIds[0];
   return { ok: true, value: { variantId: next.id, layoutId, variantName: next.name } };
 }
+
+// ---------------------------------------------------------------------------
+// CAPACITY CLAMP — the stage area is a hard boundary, not a suggestion.
+//
+// Every module declares how many repeating rows its layout was designed for
+// (`capacity.items.max`: 5 timeline stages, 3 stat cards, 6 bento tiles…).
+// Nothing used to enforce that at write time, so an agent or a seeded build
+// that wrote 8 stages into a 5-stage rail rendered the extra rows straight off
+// the bottom of the slide — visible on screen and baked into the export.
+//
+// Clamping here, in the one helper every write path shares, means the overflow
+// can never reach the canvas. The dropped rows are returned so the caller can
+// tell the agent to continue them on a second slide instead of silently losing
+// content.
+// ---------------------------------------------------------------------------
+
+export type CapacityClamp = {
+  /** Repeating collection that overflowed, e.g. "items" or "steps". */
+  path: string;
+  max: number;
+  written: number;
+  /** Rows removed because the layout has nowhere to draw them. */
+  dropped: unknown[];
+};
+
+function readCollection(content: SlideContent, path: string): unknown[] | null {
+  const value = path.split(".").reduce<unknown>((acc, key) => {
+    if (acc && typeof acc === "object" && !Array.isArray(acc)) {
+      return (acc as Record<string, unknown>)[key];
+    }
+    return undefined;
+  }, content);
+  return Array.isArray(value) ? value : null;
+}
+
+function writeCollection(content: SlideContent, path: string, rows: unknown[]): SlideContent {
+  const keys = path.split(".");
+  const out: SlideContent = { ...content };
+  let cursor: Record<string, unknown> = out;
+  for (const key of keys.slice(0, -1)) {
+    const child = cursor[key];
+    const next =
+      child && typeof child === "object" && !Array.isArray(child)
+        ? { ...(child as Record<string, unknown>) }
+        : {};
+    cursor[key] = next;
+    cursor = next;
+  }
+  cursor[keys[keys.length - 1]!] = rows;
+  return out;
+}
+
+/**
+ * Trim a slide's repeating collection to the variant's declared maximum.
+ * Returns the content unchanged (and `clamp: null`) when it already fits.
+ */
+export function clampContentToCapacity(
+  variantId: string | null | undefined,
+  content: SlideContent,
+): { content: SlideContent; clamp: CapacityClamp | null } {
+  const variant = variantId ? byId(MODULE_VARIANTS, variantId) : undefined;
+  const cap = variant?.capacity.items;
+  if (!cap) return { content, clamp: null };
+  const path = cap.path ?? "items";
+  const rows = readCollection(content, path);
+  if (!rows || rows.length <= cap.max) return { content, clamp: null };
+  return {
+    content: writeCollection(content, path, rows.slice(0, cap.max)),
+    clamp: { path, max: cap.max, written: rows.length, dropped: rows.slice(cap.max) },
+  };
+}
+
+/** Agent-facing explanation of a clamp, so the extra rows aren't just lost. */
+export function capacityClampNotice(clamp: CapacityClamp, variantId?: string | null): string {
+  return `This module draws at most ${clamp.max} ${clamp.path} inside the slide's stage area; you sent ${clamp.written}, so the last ${clamp.dropped.length} were not written (they would have rendered off the bottom of the slide). Continue them on another slide${variantId ? ` with the same module (${variantId})` : ""}, or switch to a module sized for ${clamp.written} rows.`;
+}

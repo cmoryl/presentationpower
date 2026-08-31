@@ -2,7 +2,7 @@ import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
 import { errorResult, supabaseForUser, textResult } from "../supabase";
 import { loadSlides, touchDeck } from "../deck-access";
-import { resolveVariantSwap } from "@/lib/slide-ops";
+import { capacityClampNotice, clampContentToCapacity, resolveVariantSwap } from "@/lib/slide-ops";
 import { visualDataGap } from "@/lib/agent/visual-data-gaps";
 import { variantsForSection } from "@/lib/taxonomy";
 
@@ -47,6 +47,12 @@ export default defineTool({
     const resolved = resolveVariantSwap(section_id, "", variant_id);
     if (!resolved.ok) return errorResult(resolved.error);
 
+    // Trim any over-long repeating collection before it ever reaches a canvas.
+    const fitted = clampContentToCapacity(
+      resolved.value.variantId,
+      (content ?? {}) as Record<string, unknown>,
+    );
+
     const at = Math.min(position ?? existing.slides.length, existing.slides.length);
 
     // Shift later slides down, from the back so positions never collide.
@@ -67,7 +73,7 @@ export default defineTool({
         section_id,
         variant_id: resolved.value.variantId,
         layout_id: resolved.value.layoutId,
-        content: (content ?? {}) as never,
+        content: fitted.content as never,
         notes: notes ?? null,
       } as never)
       .select("id, position, section_id, variant_id, layout_id")
@@ -76,7 +82,10 @@ export default defineTool({
     await touchDeck(supabase, deck_id);
     // A chart/diagram module inserted without its plotted values renders as an
     // empty frame on screen and in PowerPoint, so say so loudly right here.
-    const gap = visualDataGap(resolved.value.variantId, (content ?? {}) as Record<string, unknown>);
+    const gap = visualDataGap(
+      resolved.value.variantId,
+      fitted.content as Record<string, unknown>,
+    );
     // In-loop variety nudge: the agent inserts one slide at a time and cannot
     // see that it has already spent this layout twice. Tell it now, with the
     // permitted layouts still on the table, rather than at audit time.

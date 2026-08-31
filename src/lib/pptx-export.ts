@@ -10881,49 +10881,82 @@ function renderDecCompareTable(s: PptxGenJS.Slide, c: Record<string, unknown>, p
 function renderDecChecklist(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
   const items = arr(c.items);
-  const rowH = Math.min(1.0, (5.9 - y0) / Math.max(items.length, 1));
+  if (!items.length) return;
+  // Match the on-canvas module exactly: a two-column list, each row a square
+  // outlined check + label (+ note), closed by a hairline. The old export drew
+  // one full-width column of filled circles, which is why the deck looked
+  // nothing like the build after export.
+  const cols = 2;
+  const rows = Math.ceil(items.length / cols);
+  const gapX = 0.5;
+  const colW = (SLIDE_W - 1.4 - gapX) / cols;
+  const rowH = Math.min(1.05, (5.9 - y0) / Math.max(rows, 1));
   items.forEach((it, k) => {
-    const y = y0 + k * rowH;
-    // check mark badge
-    s.addShape("ellipse", {
-      x: 0.7,
-      y: y + rowH / 2 - 0.28,
-      w: 0.56,
-      h: 0.56,
-      fill: { color: p.accent },
-      line: { color: p.accent },
+    const r = Math.floor(k / cols);
+    const col = k % cols;
+    const x = 0.7 + col * (colW + gapX);
+    const y = y0 + r * rowH;
+    const label = str(it.label);
+    // Seeded content often repeats the label in the note; drawing both printed
+    // the same line twice at two sizes.
+    const noteRaw = str(it.note);
+    const note = noteRaw.trim().toLowerCase() === label.trim().toLowerCase() ? "" : noteRaw;
+    const boxSize = 0.28;
+    s.addShape("rect", {
+      x,
+      y: y + 0.12,
+      w: boxSize,
+      h: boxSize,
+      fill: { color: "FFFFFF", transparency: 100 },
+      line: { color: p.accent, width: 1.5 },
     });
     s.addText("\u2713", {
-      x: 0.7,
-      y: y + rowH / 2 - 0.32,
-      w: 0.56,
-      h: 0.6,
-      fontSize: 26,
+      x,
+      y: y + 0.08,
+      w: boxSize,
+      h: boxSize + 0.08,
+      fontSize: 12,
       bold: true,
-      color: "FFFFFF",
+      color: p.accent,
       fontFace: "Geist",
       align: "center",
       valign: "middle",
+      margin: 0,
     });
-    s.addText(str(it.label), {
-      x: 1.5,
+    const textX = x + boxSize + 0.22;
+    const textW = colW - boxSize - 0.22;
+    s.addText(label, {
+      x: textX,
       y: y + 0.05,
-      w: SLIDE_W - 2.1,
-      h: 0.5,
-      fontSize: 15,
+      w: textW,
+      h: 0.4,
+      fontSize: 14,
       bold: true,
       color: p.primary,
       fontFace: "Geist",
-    });
-    s.addText(str(it.note), {
-      x: 1.5,
-      y: y + 0.55,
-      w: SLIDE_W - 2.1,
-      h: rowH - 0.55,
-      fontSize: 11,
-      color: p.ink,
-      fontFace: "Geist",
       valign: "top",
+      margin: 0,
+    });
+    if (note) {
+      s.addText(note, {
+        x: textX,
+        y: y + 0.42,
+        w: textW,
+        h: Math.max(0.28, rowH - 0.5),
+        fontSize: 10.5,
+        color: p.ink,
+        fontFace: "Geist",
+        valign: "top",
+        margin: 0,
+      });
+    }
+    // Hairline under the row, mirroring the canvas separators.
+    s.addShape("line", {
+      x,
+      y: y + rowH - 0.08,
+      w: colW,
+      h: 0,
+      line: { color: LIGHT_GRAY, width: 0.75 },
     });
   });
 }
