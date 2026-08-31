@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { FileText, Layers, Megaphone, CalendarDays, LayoutGrid } from "lucide-react";
+import type { BriefCampaignSearch } from "@/lib/brief-campaign-context";
 
 export type BriefOutputsMasterSet = {
   /** False when the brief never asked for a deck (the deck is just the spine). */
@@ -16,6 +17,11 @@ type Props = {
   deckId?: string | null;
   deckTitle?: string | null;
   masterSet?: BriefOutputsMasterSet | null;
+  /**
+   * Brief facts relayed to the event / social kits so they render for this
+   * prospect instead of the authored demo campaign.
+   */
+  campaign?: BriefCampaignSearch;
   /** Which artifact the user is currently editing — rendered as "You're here". */
   active: { kind: "deck" | "print" | "event" | "social"; id?: string };
 };
@@ -34,7 +40,9 @@ function kindLabel(kind: string) {
  * Cross-links every artifact a single brief produced (deck + print + event +
  * social) so finishing one never dead-ends the user.
  */
-export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props) {
+export function BriefOutputsBar({ deckId, deckTitle, masterSet, campaign, active }: Props) {
+  const kitSearch: BriefCampaignSearch = { ...(campaign ?? {}) };
+  if (deckId && !kitSearch.briefId) kitSearch.briefId = deckId;
   // A brief that only produced print/social/event still owns a deck record as
   // its spine; never advertise it as a presentation the user can open.
   const deckIsArtifact = masterSet?.presentation !== false || active.kind === "deck";
@@ -122,6 +130,7 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
         <Link
           to="/events/demo/$playbookId"
           params={{ playbookId: masterSet.eventPlaybookId }}
+          search={kitSearch}
           className={`${chip} ${idle}`}
         >
           <CalendarDays size={14} strokeWidth={1.75} />
@@ -133,6 +142,7 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, active }: Props)
         <Link
           to="/social/demo/$playbookId"
           params={{ playbookId: masterSet.socialPlaybookId }}
+          search={kitSearch}
           className={`${chip} ${idle}`}
         >
           <Megaphone size={14} strokeWidth={1.75} />

@@ -1511,6 +1511,10 @@ function AssetEditor() {
               deckId={siblingDeckId}
               deckTitle={siblingDeck?.title ?? "Presentation"}
               masterSet={siblingDeck?.context?.masterSet}
+              campaign={{
+                prospect: siblingDeck?.title,
+                brandModeId: siblingDeck?.brandModeId ?? undefined,
+              }}
               active={{ kind: "print", id: row.id }}
             />
           </div>

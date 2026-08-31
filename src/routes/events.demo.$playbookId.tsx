@@ -21,6 +21,11 @@ import {
   Users,
   BadgeCheck,
 } from "lucide-react";
+import { BriefContextBanner } from "@/components/campaigns/BriefContextBanner";
+import {
+  applyBriefToEventPlaybook,
+  validateBriefCampaignSearch,
+} from "@/lib/brief-campaign-context";
 import {
   getPlaybook,
   EVENT_PLAYBOOKS,
@@ -49,6 +54,7 @@ import {
 } from "@/lib/event-looks";
 
 export const Route = createFileRoute("/events/demo/$playbookId")({
+  validateSearch: validateBriefCampaignSearch,
   loader: ({ params }) => {
     const playbook = getPlaybook(params.playbookId);
     if (!playbook) throw notFound();
@@ -76,7 +82,14 @@ export const Route = createFileRoute("/events/demo/$playbookId")({
 });
 
 function PlaybookDemoView() {
-  const { playbook } = Route.useLoaderData() as { playbook: EventPlaybook };
+  const { playbook: authored } = Route.useLoaderData() as { playbook: EventPlaybook };
+  // A kit opened from a master brief wears that brief's prospect, objective and
+  // brand mode; opened from /events it stays exactly as authored.
+  const briefSearch = Route.useSearch();
+  const playbook = useMemo(
+    () => applyBriefToEventPlaybook(authored, briefSearch),
+    [authored, briefSearch],
+  );
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === playbook.subBrand) ?? BRAND_MODES[0],
     [playbook.subBrand],
@@ -200,8 +213,10 @@ function PlaybookDemoView() {
           <ArrowLeft size={12} /> All playbooks
         </Link>
         <span aria-hidden>·</span>
-        <span>{playbook.chip}</span>
+        <span>{authored.chip}</span>
       </div>
+
+      <BriefContextBanner search={briefSearch} />
 
       {/* Hero */}
       <header

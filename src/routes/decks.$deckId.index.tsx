@@ -576,6 +576,7 @@ function DeckEditor() {
                 deckId={deckId}
                 deckTitle={deck.title}
                 masterSet={deck.context?.masterSet}
+                campaign={{ prospect: deck.title, brandModeId: deck.brandModeId ?? undefined }}
                 active={{ kind: "deck" }}
               />
             </div>
