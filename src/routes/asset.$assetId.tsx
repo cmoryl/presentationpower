@@ -1946,7 +1946,7 @@ function AssetEditor() {
                         onClick={() => setHeroModalOpen(true)}
                         title="Edit hero image"
                         aria-label="Edit hero image"
-                        className="absolute right-3 top-3 z-20 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
+                        className="absolute right-3 top-3 z-40 rounded-full border border-white/40 bg-black/45 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur transition hover:bg-black/70"
                       >
                         ✎ Hero
                       </button>
