@@ -12,6 +12,10 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
+import {
+  briefCampaignSearch,
+  type BriefCampaignSearch,
+} from "@/lib/brief-campaign-context";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -81,6 +85,18 @@ function BriefOutputHub() {
     ? getSocialPlaybook(masterSet.socialPlaybookId)
     : undefined;
   const eventCollateral = eventPb ? getExpandedCollateral(eventPb) : [];
+  // Facts relayed into the event / social kits so those pages read as part of
+  // THIS brief rather than the authored demo campaign.
+  const campaign = useMemo(
+    () =>
+      briefCampaignSearch({
+        prospect: brief?.prospect || deck?.title,
+        objective: brief?.meetingObjective,
+        brandModeId: deck?.brandModeId,
+        briefId: deckId,
+      }),
+    [brief?.prospect, brief?.meetingObjective, deck?.title, deck?.brandModeId, deckId],
+  );
   const cover = deck?.slides[0];
   const coverVariant = cover ? byId(MODULE_VARIANTS, cover.variantId) : undefined;
 
@@ -365,6 +381,7 @@ function BriefOutputHub() {
               <KitSideCard
                 to="/events/demo/$playbookId"
                 playbookId={eventPb.id}
+                search={campaign}
                 accent={eventPb.accent}
                 stat={`${eventCollateral.length}`}
                 statLabel="pieces"
@@ -406,6 +423,7 @@ function BriefOutputHub() {
               <KitSideCard
                 to="/social/demo/$playbookId"
                 playbookId={socialPb.id}
+                search={campaign}
                 accent={socialPb.accent}
                 stat={`${socialPb.deliverables.length}`}
                 statLabel="assets"
@@ -509,6 +527,7 @@ function ActionRow({
 function KitSideCard({
   to,
   playbookId,
+  search,
   accent,
   stat,
   statLabel,
@@ -517,6 +536,7 @@ function KitSideCard({
 }: {
   to: "/events/demo/$playbookId" | "/social/demo/$playbookId";
   playbookId: string;
+  search: BriefCampaignSearch;
   accent: string;
   stat: string;
   statLabel: string;
@@ -527,6 +547,7 @@ function KitSideCard({
     <Link
       to={to}
       params={{ playbookId }}
+      search={search}
       className="group flex flex-col justify-between rounded-2xl border border-black/[0.08] p-5 transition hover:shadow-[0_12px_32px_rgba(3,0,44,0.10)]"
       style={{ background: `linear-gradient(150deg, ${accent}26 0%, ${accent}0A 100%)` }}
     >

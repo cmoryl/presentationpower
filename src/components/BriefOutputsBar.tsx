@@ -130,6 +130,7 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, campaign, active
         <Link
           to="/events/demo/$playbookId"
           params={{ playbookId: masterSet.eventPlaybookId }}
+          search={kitSearch}
           className={`${chip} ${idle}`}
         >
           <CalendarDays size={14} strokeWidth={1.75} />
@@ -141,6 +142,7 @@ export function BriefOutputsBar({ deckId, deckTitle, masterSet, campaign, active
         <Link
           to="/social/demo/$playbookId"
           params={{ playbookId: masterSet.socialPlaybookId }}
+          search={kitSearch}
           className={`${chip} ${idle}`}
         >
           <Megaphone size={14} strokeWidth={1.75} />
