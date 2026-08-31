@@ -109,6 +109,7 @@ import { IconAccentContrastWarning } from "@/components/print/IconAccentContrast
 import { iconPageBackground } from "@/lib/print-icon-contrast";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
 import type { IconName } from "@/components/print/print-primitives";
+import { HeroBackgroundSwitcher } from "@/components/print/HeroBackgroundSwitcher";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
@@ -2702,7 +2703,7 @@ function AssetEditor() {
                 value={content.heroMedia}
                 onChange={(next) => patchContent({ heroMedia: next })}
                 divisionId={row?.brand_mode_id ?? null}
-                mode={editorMode}
+                mode={editorMode === "dark" ? "dark" : "light"}
                 seed={row?.id ?? "hero"}
               />
               <HeroMediaPanel
