@@ -16,7 +16,7 @@ import { buildSectionTemplateToolSet } from "@/lib/agent/section-templates-tool"
 import { buildLayoutArbiterToolSet } from "@/lib/agent/layout-arbiter-tool";
 import { coerceDesignDna, designDnaPromptBlock } from "@/lib/agent/design-dna";
 import { coerceDesignOverrides, designOverridesPromptBlock } from "@/lib/agent/design-overrides";
-import { repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
+import { dropUnknownToolParts, repairDanglingToolParts } from "@/lib/agent/repair-tool-parts";
 import { tool } from "ai";
 import { z } from "zod";
 
@@ -107,6 +107,17 @@ export const Route = createFileRoute("/api/agent-chat")({
 
         const scope = await fetchAgentScope(supabase as never);
 
+        const toolSet: ToolSet = {
+          ...buildAgentToolSet(toolContextForToken(token, userId)),
+          ...buildOutlineToolSet(),
+          ...buildDesignKnowledgeToolSet(),
+          ...buildDataVisualToolSet(),
+          ...buildStatsMappingToolSet(),
+          ...buildSectionTemplateToolSet(),
+          ...buildLayoutArbiterToolSet(),
+          ...dnaTools,
+        };
+
         const result = streamText({
           model: gateway(MODEL),
           system: [
@@ -117,17 +128,10 @@ export const Route = createFileRoute("/api/agent-chat")({
           ]
             .filter(Boolean)
             .join("\n"),
-          messages: await convertToModelMessages(messages),
-          tools: {
-            ...buildAgentToolSet(toolContextForToken(token, userId)),
-            ...buildOutlineToolSet(),
-            ...buildDesignKnowledgeToolSet(),
-            ...buildDataVisualToolSet(),
-            ...buildStatsMappingToolSet(),
-            ...buildSectionTemplateToolSet(),
-            ...buildLayoutArbiterToolSet(),
-            ...dnaTools,
-          },
+          messages: await convertToModelMessages(
+            dropUnknownToolParts(messages, Object.keys(toolSet)),
+          ),
+          tools: toolSet,
           stopWhen: stepCountIs(50),
           abortSignal: request.signal,
           onError: ({ error }) => console.error("agent stream error:", error),
