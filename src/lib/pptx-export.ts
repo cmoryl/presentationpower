@@ -4657,71 +4657,135 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   const n = items.length;
   if (!n) return;
   const marginX = 1.0;
-  const bottomY = 6.2;
-  const topY = y0 + 0.5;
+  const bottomY = 5.85;
+  const topY = y0 + 0.6;
   const step = (SLIDE_W - marginX * 2) / Math.max(n - 1, 1);
+  // Same sinusoidal ease as the canvas module, so the exported ramp has the
+  // build's S-curve shape rather than a parabola.
   const points = items.map((_, k) => {
     const t = n > 1 ? k / (n - 1) : 0;
-    const eased = t * t;
+    const eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
     return { x: marginX + k * step, y: bottomY - eased * (bottomY - topY) };
   });
-  for (let k = 0; k < points.length - 1; k++) {
-    const a = points[k];
-    const b = points[k + 1];
+  // Dashed guide rules + LOW/HIGH frame labels, matching the canvas.
+  for (let i = 0; i < 4; i++) {
+    const gy = topY + ((bottomY - topY) / 3) * i;
     s.addShape("line", {
-      x: a.x,
-      y: a.y,
-      w: b.x - a.x,
-      h: b.y - a.y,
-      line: { color: p.accent, width: 2 },
+      x: marginX,
+      y: gy,
+      w: SLIDE_W - marginX * 2,
+      h: 0,
+      line: { color: LIGHT_GRAY, width: 0.75, dashType: i === 3 ? "solid" : "dash" },
     });
   }
+  for (const frame of [
+    { text: "HIGH", y: topY - 0.12 },
+    { text: "LOW", y: bottomY - 0.12 },
+  ]) {
+    s.addText(frame.text, {
+      x: 0.25,
+      y: frame.y,
+      w: marginX - 0.35,
+      h: 0.24,
+      fontSize: 8,
+      bold: true,
+      color: p.ink,
+      fontFace: "Geist",
+      align: "right",
+      charSpacing: 3,
+      margin: 0,
+    });
+  }
+  for (let k = 0; k < points.length - 1; k++) {
+    const a2 = points[k];
+    const b2 = points[k + 1];
+    s.addShape("line", {
+      x: a2.x,
+      y: a2.y,
+      w: b2.x - a2.x,
+      h: b2.y - a2.y,
+      line: { color: p.accent, width: 2.25 },
+    });
+  }
+  // Only one milestone can be "here" — seeded decks often flag them all.
+  const currentIdx = items.findIndex((it) => Boolean(it.current));
   items.forEach((it, k) => {
     const pt = points[k];
-    const isCurrent = Boolean(it.current);
+    const isCurrent = k === currentIdx;
+    // Every text box lives inside its own column band so labels and notes can
+    // never print through their neighbours (the old boxes were 2.6" wide on a
+    // ~1.8" step, which is why captions collided).
+    const bandW = Math.min(step * 0.96, 2.4);
+    let bandX = pt.x - bandW / 2;
+    if (k === 0) bandX = Math.max(0.35, pt.x - bandW * 0.15);
+    if (k === n - 1) bandX = Math.min(SLIDE_W - 0.35 - bandW, pt.x - bandW * 0.85);
+    const align: "left" | "center" | "right" = k === 0 ? "left" : k === n - 1 ? "right" : "center";
     s.addShape("ellipse", {
-      x: pt.x - 0.15,
-      y: pt.y - 0.15,
-      w: 0.3,
-      h: 0.3,
-      fill: { color: isCurrent ? p.accent : p.primary },
-      line: { color: p.primary },
+      x: pt.x - (isCurrent ? 0.11 : 0.08),
+      y: pt.y - (isCurrent ? 0.11 : 0.08),
+      w: isCurrent ? 0.22 : 0.16,
+      h: isCurrent ? 0.22 : 0.16,
+      fill: { color: isCurrent ? p.accent : "FFFFFF" },
+      line: { color: isCurrent ? p.accent : p.primary, width: 1.5 },
     });
     s.addText(str(it.label), {
-      x: pt.x - 1.3,
-      y: pt.y - 0.85,
-      w: 2.6,
-      h: 0.4,
+      x: bandX,
+      y: pt.y - 0.52,
+      w: bandW,
+      h: 0.38,
       fontSize: 12,
       bold: true,
       color: p.primary,
       fontFace: "Geist",
-      align: "center",
+      align,
+      valign: "bottom",
+      margin: 0,
     });
-    s.addText(str(it.note), {
-      x: pt.x - 1.3,
-      y: pt.y - 0.5,
-      w: 2.6,
-      h: 0.4,
-      fontSize: 9,
-      color: p.ink,
-      fontFace: "Geist",
-      align: "center",
-    });
+    const note = str(it.note);
+    if (note && note.trim().toLowerCase() !== str(it.label).trim().toLowerCase()) {
+      // Notes sit on one shared baseline under the plot, inside the band, and
+      // wrap instead of running across the whole slide.
+      s.addText(note, {
+        x: bandX,
+        y: bottomY + (isCurrent ? 0.44 : 0.2),
+        w: bandW,
+        h: 0.62,
+        fontSize: 9,
+        color: p.ink,
+        fontFace: "Geist",
+        align,
+        valign: "top",
+        margin: 0,
+      });
+    }
     if (isCurrent) {
       s.addText("YOU ARE HERE", {
-        x: pt.x - 1.3,
-        y: pt.y + 0.2,
-        w: 2.6,
-        h: 0.3,
-        fontSize: 9,
+        x: bandX,
+        y: bottomY + 0.16,
+        w: bandW,
+        h: 0.24,
+        fontSize: 8,
         bold: true,
         color: p.accent,
         fontFace: "Geist",
-        align: "center",
-        charSpacing: 4,
+        align,
+        charSpacing: 3,
+        margin: 0,
       });
     }
+  });
+  const axis = str(c.axisLabel) || "PROGRAM MATURITY";
+  s.addText(axis.toUpperCase(), {
+    x: marginX,
+    y: 6.7,
+    w: SLIDE_W - marginX * 2,
+    h: 0.24,
+    fontSize: 8,
+    bold: true,
+    color: p.ink,
+    fontFace: "Geist",
+    charSpacing: 3,
+    margin: 0,
   });
 }
 
