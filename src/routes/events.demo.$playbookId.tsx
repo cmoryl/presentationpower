@@ -77,7 +77,14 @@ export const Route = createFileRoute("/events/demo/$playbookId")({
 });
 
 function PlaybookDemoView() {
-  const { playbook } = Route.useLoaderData() as { playbook: EventPlaybook };
+  const { playbook: authored } = Route.useLoaderData() as { playbook: EventPlaybook };
+  // A kit opened from a master brief wears that brief's prospect, objective and
+  // brand mode; opened from /events it stays exactly as authored.
+  const briefSearch = Route.useSearch();
+  const playbook = useMemo(
+    () => applyBriefToEventPlaybook(authored, briefSearch),
+    [authored, briefSearch],
+  );
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === playbook.subBrand) ?? BRAND_MODES[0],
     [playbook.subBrand],
