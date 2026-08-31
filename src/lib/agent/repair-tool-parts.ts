@@ -83,3 +83,26 @@ export function dropUnknownToolParts<T extends UIMessage>(messages: T[], knownTo
   });
   return changed ? next : messages;
 }
+
+// Gemini rejects a transcript in which a tool-result turn is followed straight
+// by a user turn ("Requests ending with a model turn are not supported"), which
+// happens whenever the assistant's summary text was recorded before its tool
+// calls. Re-seat that trailing model turn: keep the tool results, then emit an
+// assistant text turn before the next user message.
+export function bridgeToolResultTurns<T extends { role: string; content?: unknown }>(
+  messages: T[],
+): T[] {
+  const out: T[] = [];
+  for (let i = 0; i < messages.length; i += 1) {
+    const message = messages[i]!;
+    out.push(message);
+    if (message.role !== "tool") continue;
+    const next = messages[i + 1];
+    if (!next || next.role !== "user") continue;
+    out.push({
+      role: "assistant",
+      content: [{ type: "text", text: "(previous step completed)" }],
+    } as unknown as T);
+  }
+  return out;
+}
