@@ -12,8 +12,10 @@ import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
 import {
   BRAND_ICON_SETS,
   iconColorOptions,
+  iconSetGroups,
   totalApprovedIcons,
 } from "@/lib/brand-icon-sets";
+
 import { getBrandGuide } from "@/lib/brand-guides";
 import { iconByName } from "@/lib/icon-library";
 
