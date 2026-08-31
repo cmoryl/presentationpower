@@ -2695,6 +2695,16 @@ function AssetEditor() {
                   Close
                 </button>
               </div>
+              {/* Fast path first: swap the picture in one click (works even on
+                  masters that ship with no hero photo), tuning below. */}
+              <HeroBackgroundSwitcher
+                className="mb-4 border-b border-black/10 pb-4 dark:border-white/10"
+                value={content.heroMedia}
+                onChange={(next) => patchContent({ heroMedia: next })}
+                divisionId={row?.brand_mode_id ?? null}
+                mode={editorMode}
+                seed={row?.id ?? "hero"}
+              />
               <HeroMediaPanel
                 value={content.heroMedia}
                 onChange={(next) => patchContent({ heroMedia: next })}
