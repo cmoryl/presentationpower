@@ -137,6 +137,7 @@ function PublicIconLibrary() {
                 {set?.title ?? "Brand guide"}
               </span>
               <span className="mt-0.5 block text-[11px] font-medium uppercase tracking-[0.14em] text-black/55">
+                {activeGroup ? `${activeGroup.label} · ` : ""}
                 {activeCount} icons · {set?.subAreas.length ?? 0} sub-areas
               </span>
             </span>
@@ -146,8 +147,9 @@ function PublicIconLibrary() {
               aria-expanded={pickerOpen}
               className="ml-auto rounded-full border border-black/20 px-4 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/50"
             >
-              {pickerOpen ? "Hide divisions" : `Change division (${BRAND_ICON_SETS.length})`}
+              {pickerOpen ? "Hide icon sets" : `Browse all sets (${BRAND_ICON_SETS.length})`}
             </button>
+
           </div>
 
           {pickerOpen && (
