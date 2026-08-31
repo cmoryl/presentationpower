@@ -584,9 +584,18 @@ function installForegroundGuard(s: PptxGenJS.Slide, opts: { ink: string; light: 
   target.addText = (text: unknown, opts2?: unknown) => {
     if (opts2 && typeof opts2 === "object") {
       const o = opts2 as Record<string, unknown>;
+      // `decorative: true` = oversized graphic lettering (monogram watermarks,
+      // poster numerals). It carries no reading content, so the legibility lift
+      // must not repaint it — that swap is what turned the accent monogram white
+      // and broke cover parity with the build.
+      if (o.decorative === true) {
+        delete o.decorative;
+        return orig(text as string, o as PptxGenJS.TextPropsOptions);
+      }
       const patch = patchUnder(o);
       const next = resolveSlot(o.color, patch);
       if (next) o.color = next;
+
       // Multi-run paragraphs carry their colour per run.
       if (Array.isArray(text)) {
         for (const part of text as Array<{ options?: Record<string, unknown> }>) {
@@ -1868,6 +1877,15 @@ export async function exportDeckToPptx(
           !insetFrames &&
           measuredTiles.length === 0),
       );
+      // A full-bleed photograph reads as a dark ground even on a light slide, so
+      // the lockup switches to the white colourway there — the colour mark went
+      // near-invisible over cover mosaics.
+      const whiteLogo =
+        useWhiteLogo ||
+        overDarkPhoto ||
+        // Full-bleed photo mosaics tile the whole stage, so `overDarkPhoto`
+        // (which only sees single-photo grounds) misses them.
+        slide.variantId === "MV-OP-COVER-GRID";
 
       // Installed on EVERY slide: the light-ink remap is gated on the slide
       // being light, but surface→foreground pairing and the audit recorders
@@ -1995,23 +2013,27 @@ export async function exportDeckToPptx(
       // mark failed to fetch.
       const logoData =
         (sourceOrient === "stacked"
-          ? useWhiteLogo
+          ? whiteLogo
             ? (logoStackedWhite ?? logoWhite)
             : (logoStackedColor ?? logoColor)
-          : useWhiteLogo
+          : whiteLogo
             ? logoWhite
             : logoColor) ??
-        (useWhiteLogo
+        (whiteLogo
           ? (logoWhite ?? logoStackedWhite ?? logoColor ?? logoStackedColor)
           : (logoColor ?? logoStackedColor ?? logoWhite ?? logoStackedWhite));
       noteExportLogo(Boolean(logoData));
 
       if (placement.position !== "hidden") {
+        // Cover chrome renders the lockup at full display scale in the app, so
+        // the left/centre half-size rule must not apply there — that shrink is
+        // what left cover exports with a tiny, clipped wordmark.
         const isHalf =
-          placement.position === "top-center" ||
-          placement.position === "bottom-center" ||
-          placement.position === "top-left" ||
-          placement.position === "bottom-left";
+          chrome !== "cover" &&
+          (placement.position === "top-center" ||
+            placement.position === "bottom-center" ||
+            placement.position === "top-left" ||
+            placement.position === "bottom-left");
         const base: "sm" | "md" | "xl" =
           chrome === "content" ? "sm" : chrome === "cover" ? "xl" : "md";
         const wTable: Record<string, number> = { sm: 1.4, md: 1.9, xl: 2.8 };
@@ -2041,7 +2063,7 @@ export async function exportDeckToPptx(
                 return { x: inset, y: inset };
             }
           })();
-          const strokeColor = useWhiteLogo ? "FFFFFF" : palette.primary;
+          const strokeColor = whiteLogo ? "FFFFFF" : palette.primary;
           s.addShape("roundRect", {
             x: pos.x,
             y: pos.y,
@@ -11754,62 +11776,98 @@ function renderCoverGradient(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     });
 }
 
-// MV-OP-COVER-GRID — grid overlay with title in cell
+// MV-OP-COVER-GRID — 2x2 media mosaic + full-bleed navy scrim + bottom-left copy.
+// Mirrors the build renderer (opening.tsx, MV-OP-COVER-GRID): the four tiles are
+// emitted by the media pass upstream, so this only paints the legibility scrim
+// (the build's 180deg primary 15%->90% gradient) and the copy stack. The old
+// emitter drew a 6x4 white grid and a mid-slide accent cell that exist nowhere
+// on screen, which is what made this the worst-parity cover in the library.
 function renderCoverGrid(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
-  const cols = 6,
-    rows = 4;
-  const cw = SLIDE_W / cols,
-    rh = SLIDE_H / rows;
-  for (let i = 1; i < cols; i++)
-    s.addShape("rect", {
-      x: i * cw - 0.005,
-      y: 0,
-      w: 0.01,
-      h: SLIDE_H,
-      fill: { color: "FFFFFF", transparency: 82 },
-      line: { color: "FFFFFF", transparency: 100 },
-    });
-  for (let i = 1; i < rows; i++)
-    s.addShape("rect", {
-      x: 0,
-      y: i * rh - 0.005,
-      w: SLIDE_W,
-      h: 0.01,
-      fill: { color: "FFFFFF", transparency: 82 },
-      line: { color: "FFFFFF", transparency: 100 },
-    });
-  // highlighted cell
+  const date = str(c.date) || "Briefing";
+
+  // Paint the 2x2 mosaic HERE (gap 2px / pad 2px at 1920 == ~0.013in) so the
+  // deferred-tile pass has nothing left to stack on top of the scrim and copy.
+  const pad = 0.013;
+  const cw = (SLIDE_W - pad * 3) / 2;
+  const ch = (SLIDE_H - pad * 3) / 2;
+  for (let i = 0; i < 4; i++) {
+    const data = nextMediaPhoto();
+    if (!data) break;
+    addInsetPhoto(
+      s,
+      data,
+      pad + (i % 2) * (cw + pad),
+      pad + Math.floor(i / 2) * (ch + pad),
+      cw,
+      ch,
+    );
+  }
+
   s.addShape("rect", {
-    x: cw,
-    y: rh,
-    w: cw * 4,
-    h: rh * 2,
-    fill: { color: p.accent, transparency: 55 },
-    line: { color: p.accent, transparency: 100 },
-  });
-  s.addText(title, {
-    x: cw + 0.2,
-    y: rh + 0.2,
-    w: cw * 4 - 0.4,
-    h: rh * 2 - 0.4,
-    fontSize: 48,
-    bold: true,
+    x: 0,
+    y: 0,
+    w: SLIDE_W,
+    h: SLIDE_H,
+    flat: true,
+    fill: { color: p.primary, transparency: 60 },
+    line: { type: "none" },
+    objectName: `${gradientTag({
+      angleDeg: 180,
+      stops: [
+        { color: p.primary, pos: 0, alpha: 0.15 },
+        { color: p.primary, pos: 55, alpha: 0.55 },
+        { color: p.primary, pos: 100, alpha: 0.9 },
+      ],
+    })} TP Cover scrim`,
+  } as unknown as PptxGenJS.ShapeProps);
+
+  const x = 0.45;
+  const w = SLIDE_W - x * 2;
+  s.addText(date, {
+    x,
+    y: SLIDE_H - 3.05,
+    w,
+    h: 0.3,
+    fontSize: 11,
     color: "FFFFFF",
     fontFace: "Geist",
-    valign: "middle",
+    charSpacing: 3,
+    decorative: true,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  s.addShape("rect", {
+    x,
+    y: SLIDE_H - 2.6,
+    w: 0.67,
+    h: 0.028,
+    fill: { color: p.accent },
+    line: { type: "none" },
   });
+  s.addText(title, {
+    x,
+    y: SLIDE_H - 2.35,
+    w,
+    h: 1.3,
+    fontSize: 54,
+    color: "FFFFFF",
+    fontFace: "Geist",
+    valign: "bottom",
+    lineSpacingMultiple: 1.02,
+    charSpacing: -0.8,
+    decorative: true,
+  } as unknown as PptxGenJS.TextPropsOptions);
   if (subtitle)
     s.addText(subtitle, {
-      x: cw,
-      y: rh * 3.2,
-      w: cw * 4,
+      x,
+      y: SLIDE_H - 0.98,
+      w,
       h: 0.5,
       fontSize: 16,
       color: "FFFFFF",
       fontFace: "Geist",
-    });
+      decorative: true,
+    } as unknown as PptxGenJS.TextPropsOptions);
 }
 
 // MV-OP-COVER-MEDIA — full-bleed photograph with a legibility scrim and white
@@ -11896,47 +11954,96 @@ function renderCoverMinimal(s: PptxGenJS.Slide, c: Record<string, unknown>, p: P
     });
 }
 
-// MV-OP-COVER-MONOGRAM — huge single letter watermark + title
+// MV-OP-COVER-MONOGRAM — dark monogram plate (left) + editorial title column (right).
+// Geometry mirrors the build render: grid-cols-[1.15fr_1fr] inside the cover frame.
 function renderCoverMonogram(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const title = str(c.title) || "Untitled";
   const subtitle = str(c.subtitle || c.kicker);
-  const mono =
-    str(c.monogram || title)
-      .trim()
-      .charAt(0)
-      .toUpperCase() || "T";
+  const date = str(c.date);
+  const mono = (str(c.monogram) || str(c.title) || "TP").trim().slice(0, 2).toUpperCase() || "TP";
+
+  // Plate — measured off the build render (48,111 → 493,491 of 960x540).
+  // ONE flat gradient rect: `flat: true` opts out of the heuristic glass/surface
+  // pass, which otherwise turns this designed plate into a rounded glass card
+  // with a blur picture stacked on it (that is what erased the plate on export).
+  const plate = { x: 0.667, y: 1.542, w: 6.18, h: 5.278 };
+  s.addShape("rect", {
+    ...plate,
+    flat: true,
+    fill: { color: p.primary },
+    line: { type: "none" },
+    objectName: `${gradientTag({
+      angleDeg: 180,
+      stops: [
+        { color: p.primary, pos: 0, alpha: 1 },
+        { color: p.primary, pos: 62, alpha: 0.92 },
+        { color: p.surface, pos: 100, alpha: 0.62 },
+      ],
+    })} TP Monogram plate`,
+  } as unknown as PptxGenJS.ShapeProps);
+
   s.addText(mono, {
-    x: -0.5,
-    y: -0.8,
-    w: 10,
-    h: 9,
-    fontSize: 560,
+    x: plate.x,
+    y: plate.y,
+    w: plate.w,
+    h: plate.h,
+    fontSize: 200,
     bold: true,
     color: p.accent,
     fontFace: "Geist",
+    align: "center",
     valign: "middle",
+    charSpacing: -6,
+    decorative: true,
+  } as unknown as PptxGenJS.TextPropsOptions);
+
+  // Title column.
+  const colX = 7.29;
+  const colW = SLIDE_W - colX - 0.8;
+  s.addShape("rect", {
+    x: colX,
+    y: 2.18,
+    w: 0.5,
+    h: 0.03,
+    fill: { color: p.accent },
+    line: { type: "none" },
   });
   s.addText(title, {
-    x: 0.8,
-    y: 4.6,
-    w: SLIDE_W - 1.6,
-    h: 1.6,
-    fontSize: 46,
-    bold: true,
-    color: "FFFFFF",
+    x: colX,
+    y: 2.4,
+    w: colW,
+    h: 2.1,
+    fontSize: 34,
+    color: p.ink,
     fontFace: "Geist",
+    valign: "top",
+    lineSpacingMultiple: 1.05,
+    charSpacing: -0.5,
   });
   if (subtitle)
     s.addText(subtitle, {
-      x: 0.8,
-      y: 6.1,
-      w: SLIDE_W - 1.6,
-      h: 0.6,
+      x: colX,
+      y: 4.85,
+      w: colW,
+      h: 0.9,
       fontSize: 16,
-      color: "FFFFFF",
+      color: mixHex(p.ink, p.surface, 0.25),
       fontFace: "Geist",
+      valign: "top",
+    });
+  if (date)
+    s.addText(date, {
+      x: colX,
+      y: 5.85,
+      w: colW,
+      h: 0.4,
+      fontSize: 11,
+      color: mixHex(p.ink, p.surface, 0.45),
+      fontFace: "Geist",
+      charSpacing: 2,
     });
 }
+
 
 // MV-OP-COVER-POSTER — theatrical, giant caps
 function renderCoverPoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -11988,48 +12095,97 @@ function renderCoverPoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Pa
     });
 }
 
-// MV-OP-COVER-SPLIT — 50/50 accent block + title
+// MV-OP-COVER-SPLIT — photo on the left half, solid primary panel on the right
+// carrying the full copy stack (kicker rule, title, subtitle, date). Mirrors the
+// build renderer in opening.tsx; the old emitter painted an accent block on the
+// LEFT (where the photograph belongs) and printed only the subtitle.
 function renderCoverSplit(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const title = str(c.title) || "Untitled";
-  const subtitle = str(c.subtitle || c.kicker);
+  const subtitle = str(c.subtitle);
+  const client = str(c.clientName);
+  const date = str(c.date);
+  const half = SLIDE_W / 2;
+
+  const photo = nextMediaPhoto();
+  if (photo) addInsetPhoto(s, photo, 0, 0, half, SLIDE_H, "TP Cover photo");
+
   s.addShape("rect", {
-    x: 0,
+    x: half,
     y: 0,
-    w: SLIDE_W / 2,
+    w: half,
     h: SLIDE_H,
-    fill: { color: p.accent },
-    line: { color: p.accent },
-  });
-  s.addText(title, {
-    x: 0.6,
-    y: 2.8,
-    w: SLIDE_W / 2 - 1.0,
-    h: 2.4,
-    fontSize: 48,
-    bold: true,
-    color: p.primary,
-    fontFace: "Geist",
-    valign: "middle",
-  });
-  s.addShape("rect", {
-    x: SLIDE_W / 2 + 0.6,
-    y: 3.2,
-    w: 0.12,
-    h: 1.4,
-    fill: { color: p.accent },
-    line: { color: p.accent },
-  });
-  if (subtitle)
-    s.addText(subtitle, {
-      x: SLIDE_W / 2 + 0.9,
-      y: 3.2,
-      w: SLIDE_W / 2 - 1.5,
-      h: 1.4,
-      fontSize: 20,
+    flat: true,
+    fill: { color: p.primary },
+    line: { type: "none" },
+    objectName: "TP Cover panel",
+  } as unknown as PptxGenJS.ShapeProps);
+
+  const x = half + 0.73;
+  const w = half - 1.46;
+  let y = 2.4;
+  if (client) {
+    s.addText(`PREPARED FOR ${client.toUpperCase()}`, {
+      x,
+      y,
+      w,
+      h: 0.3,
+      fontSize: 11,
       color: "FFFFFF",
       fontFace: "Geist",
-      valign: "middle",
-    });
+      charSpacing: 3,
+      decorative: true,
+    } as unknown as PptxGenJS.TextPropsOptions);
+    y += 0.42;
+  }
+  s.addShape("rect", {
+    x,
+    y,
+    w: 0.5,
+    h: 0.028,
+    fill: { color: "FFFFFF", transparency: 45 },
+    line: { type: "none" },
+  });
+  y += 0.34;
+  s.addText(title, {
+    x,
+    y,
+    w,
+    h: 1.35,
+    fontSize: 34,
+    color: "FFFFFF",
+    fontFace: "Geist",
+    valign: "top",
+    lineSpacingMultiple: 1.05,
+    charSpacing: -0.4,
+    decorative: true,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  y += 1.45;
+  if (subtitle) {
+    s.addText(subtitle, {
+      x,
+      y,
+      w,
+      h: 0.75,
+      fontSize: 16,
+      color: "FFFFFF",
+      fontFace: "Geist",
+      lineSpacingMultiple: 1.15,
+      decorative: true,
+    } as unknown as PptxGenJS.TextPropsOptions);
+    y += 0.85;
+  }
+  if (date)
+    s.addText(date, {
+      x,
+      y: y + 0.25,
+      w,
+      h: 0.3,
+      fontSize: 10,
+      color: "FFFFFF",
+      fontFace: "Geist",
+      charSpacing: 2.5,
+      decorative: true,
+    } as unknown as PptxGenJS.TextPropsOptions);
 }
 
 // MV-OP-COVER-STACKED — kicker/title/subtitle stacked

@@ -80,6 +80,9 @@ export const LOGO_POSITION_BY_VARIANT: Record<string, LogoPosition> = {
   // Editorial full-bleed hero: same lower-left type stack, so the LF-05
   // bottom-left default would print the wordmark under the title.
   "MV-ED-HERO-BLEED": "top-right",
+  // 2x2 mosaic cover signs top-left in the app (opening.tsx passes
+  // logoPosition="top-left"); the chrome default would centre it.
+  "MV-OP-COVER-GRID": "top-left",
 };
 
 export type LogoPlacementSpec = {
