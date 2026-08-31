@@ -25,6 +25,7 @@ import {
   type SkinBackdropRow,
 } from "@/lib/skin-backdrop.functions";
 import { moduleScene } from "@/lib/skin-backdrop-overrides";
+import { backgroundCodeForPackId } from "@/lib/style-packs";
 import { announceSkinBackdropChange } from "@/components/slide/SkinBackdropContext";
 import { SKIN_BG_TAKES, TAKE_LABEL } from "@/lib/skin-backgrounds";
 
@@ -38,11 +39,20 @@ async function readBase64(file: File): Promise<string> {
   return btoa(bin);
 }
 
-/** Skin code (`S01`) for an approved style pack id (`skin-s01`), else null. */
+/**
+ * Background code behind a look id — the SAME resolver the ground engine uses
+ * (`skin-s01` → `S01`, `tpl-c01` → `C01`, legacy/brand packs → their own id).
+ *
+ * It used to be a strict `^skin-[sr]\d\d$` regex, so a composed look
+ * (`skin-s01` + a recipe), a published custom look or a brand-mode look
+ * silently returned null and the editor rendered nothing — the module simply
+ * had no way to replace its background. Delegating keeps screen, export and
+ * this editor on one key space.
+ */
 export function skinCodeForPackId(packId: string | null | undefined): string | null {
   if (!packId) return null;
-  const m = /^skin-([sr]\d{2})$/i.exec(String(packId));
-  return m ? m[1]!.toUpperCase() : null;
+  const id = String(packId).split("+")[0]!.trim();
+  return backgroundCodeForPackId(id);
 }
 
 /** Human label for a stored backdrop: authored scene name, or the module it belongs to. */
