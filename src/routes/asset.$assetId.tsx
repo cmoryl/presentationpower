@@ -338,6 +338,17 @@ function AssetEditor() {
   const [iconSlot, setIconSlot] = useState<{ slot: string; current: IconName | null } | null>(null);
   // Hero editor modal — opened from the canvas hero affordance.
   const [heroModalOpen, setHeroModalOpen] = useState(false);
+  // Esc always gets out of the hero editor — without this the dialog could only
+  // be dismissed by hitting the backdrop, which reads as a hang once a nested
+  // picker or confirm is up.
+  useEffect(() => {
+    if (!heroModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setHeroModalOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [heroModalOpen]);
 
   const [pendingSwap, setPendingSwap] = useState<{
     moduleIndex: number;
