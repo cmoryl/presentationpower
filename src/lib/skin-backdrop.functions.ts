@@ -41,7 +41,7 @@ function promptSceneFor(scene: string, basis?: string | null): SkinScene {
 }
 
 const GenerateInput = z.object({
-  skinCode: z.string().min(2).max(8),
+  skinCode: z.string().min(2).max(48),
   scene: z.string().min(2).max(72),
   /** 0–3: alternate takes of the same skin × scene. */
   take: z.number().int().min(0).max(3).default(0),
@@ -123,7 +123,7 @@ export const generateSkinBackdrop = createServerFn({ method: "POST" })
     if (!b64) throw new Error(json.error?.message ?? "Backdrop generation returned no image.");
 
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    const path = `${data.skinCode}/${scenePathSegment(scene)}-${data.take}-${Date.now()}.png`;
+    const path = `${scenePathSegment(data.skinCode)}/${scenePathSegment(scene)}-${data.take}-${Date.now()}.png`;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const up = await supabaseAdmin.storage
@@ -178,7 +178,7 @@ export const listSkinBackdrops = createServerFn({ method: "GET" }).handler(
 /* --------------------------------------------------------------- upload path */
 
 const UploadInput = z.object({
-  skinCode: z.string().min(2).max(8),
+  skinCode: z.string().min(2).max(48),
   scene: z.string().min(2).max(72),
   take: z.number().int().min(0).max(3).default(0),
   /** Base64 payload WITHOUT the data: prefix. */
@@ -209,7 +209,7 @@ export const uploadSkinBackdrop = createServerFn({ method: "POST" })
 
     const code = data.skinCode.toUpperCase();
     const ext = EXT[data.contentType] ?? "png";
-    const path = `${code}/${scenePathSegment(scene)}-${data.take}-upload-${Date.now()}.${ext}`;
+    const path = `${scenePathSegment(code)}/${scenePathSegment(scene)}-${data.take}-upload-${Date.now()}.${ext}`;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const up = await supabaseAdmin.storage
@@ -263,11 +263,11 @@ export const deleteSkinBackdrop = createServerFn({ method: "POST" })
 
 const AdoptInput = z.object({
   /** Destination (usually a module scene `mod:<VARIANT-ID>`). */
-  skinCode: z.string().min(2).max(8),
+  skinCode: z.string().min(2).max(48),
   scene: z.string().min(2).max(72),
   take: z.number().int().min(0).max(3).default(0),
   /** Source backdrop already in the library. */
-  fromSkinCode: z.string().min(2).max(8),
+  fromSkinCode: z.string().min(2).max(48),
   fromScene: z.string().min(2).max(72),
   fromTake: z.number().int().min(0).max(3).default(0),
 });
@@ -303,7 +303,7 @@ export const adoptSkinBackdrop = createServerFn({ method: "POST" })
     const bytes = new Uint8Array(await dl.data.arrayBuffer());
     const contentType = dl.data.type || "image/png";
     const ext = EXT[contentType] ?? src.data.storage_path.split(".").pop() ?? "png";
-    const path = `${code}/${scenePathSegment(scene)}-${data.take}-reuse-${Date.now()}.${ext}`;
+    const path = `${scenePathSegment(code)}/${scenePathSegment(scene)}-${data.take}-reuse-${Date.now()}.${ext}`;
 
     const up = await supabaseAdmin.storage
       .from("skin-backdrops")

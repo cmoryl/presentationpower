@@ -78,6 +78,17 @@ function exportVerifyGate(): Plugin {
 export default defineConfig({
   vite: {
     plugins: [mcpPlugin(), packContrastGate(), exportVerifyGate()],
+    resolve: {
+      alias: {
+        // tslib's "import" entry (tslib/modules/index.js) destructures the
+        // default export of the CJS build. In the bundled Worker SSR output
+        // that interop default is undefined, so every route whose chunk pulls
+        // a tslib-compiled dependency (pdf-lib, echarts) died at render with
+        // "Cannot destructure property '__extends'". The ESM build has real
+        // named exports, so point tslib straight at it.
+        tslib: "tslib/tslib.es6.js",
+      },
+    },
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
