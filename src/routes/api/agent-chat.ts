@@ -128,8 +128,8 @@ export const Route = createFileRoute("/api/agent-chat")({
           ]
             .filter(Boolean)
             .join("\n"),
-          messages: await convertToModelMessages(
-            dropUnknownToolParts(messages, Object.keys(toolSet)),
+          messages: bridgeToolResultTurns(
+            await convertToModelMessages(dropUnknownToolParts(messages, Object.keys(toolSet))),
           ),
           tools: toolSet,
           stopWhen: stepCountIs(50),
