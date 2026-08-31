@@ -99,8 +99,9 @@ function PublicIconLibrary() {
     return accentInk(guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
   }, [slug, guide]);
 
-
+  const GROUPS = useMemo(() => iconSetGroups(), []);
   const set = BRAND_ICON_SETS.find((s) => s.slug === slug);
+  const activeGroup = GROUPS.find((g) => g.sets.some((s) => s.slug === slug));
   const activeInk = accentInk(setAccent(slug));
   const activeCount = set ? set.subAreas.reduce((n, a) => n + a.icons.length, 0) : 0;
 
@@ -117,10 +118,12 @@ function PublicIconLibrary() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-black/70">
             {totalApprovedIcons()} approved glyphs across {BRAND_ICON_SETS.length} brand guides,
-            organised by sub-area. These are the same marks the deck builder draws, so a download
-            can never drift from what ships on a slide. Choose a division, a size and an approved
-            colour, then download a single icon, a sub-area, or the full set.
+            organised into {GROUPS.map((g) => g.label.toLowerCase()).join(", ")} — then by sub-area.
+            These are the same marks the deck builder draws, so a download can never drift from what
+            ships on a slide. Choose a set, a size and an approved colour, then download a single
+            icon, a sub-area, or the full set.
           </p>
+
 
           {/* Collapsed state: one summary row so the listings sit right under the fold. */}
           <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-black/12 bg-white p-3 pl-4">
