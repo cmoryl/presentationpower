@@ -40,6 +40,30 @@ export function auroraSvgDataUrl(
       outW = Math.round((longer * vw) / vh);
     }
   }
+  // LIGHT-MODE SCRIM — parity with the on-screen AuroraLayer, which paints two
+  // overlay gradients over the orbs on light slides (a faint accent bleed from
+  // the right plus a white veil top→bottom). Omitting them here was why an
+  // exported light slide came out visibly more saturated than the build.
+  const accent = brand.tokens.accent ?? "#003FC7";
+  const lightScrim =
+    mode === "light"
+      ? `
+    <linearGradient id="aurora-accent-bleed" x1="${vw}" y1="0" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="${accent}" stop-opacity="0.025" />
+      <stop offset="35%" stop-color="${accent}" stop-opacity="0.01" />
+      <stop offset="70%" stop-color="${accent}" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="aurora-white-veil" x1="0" y1="0" x2="0" y2="${vh}" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.58" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.38" />
+    </linearGradient>`
+      : "";
+  const lightScrimRects =
+    mode === "light"
+      ? `
+  <rect width="${vw}" height="${vh}" fill="url(#aurora-white-veil)" />
+  <rect width="${vw}" height="${vh}" fill="url(#aurora-accent-bleed)" />`
+      : "";
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${outW}" height="${outH}" viewBox="0 0 ${vw} ${vh}" preserveAspectRatio="xMidYMid slice">
   <defs>
@@ -53,7 +77,7 @@ export function auroraSvgDataUrl(
       <stop offset="100%" stop-color="${o.color}" stop-opacity="0" />
     </radialGradient>`,
       )
-      .join("")}
+      .join("")}${lightScrim}
     <filter id="aurora-blur" x="-50%" y="-50%" width="200%" height="200%" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse">
       <feGaussianBlur stdDeviation="${blurStd}" edgeMode="duplicate" />
     </filter>
@@ -66,8 +90,9 @@ export function auroraSvgDataUrl(
           `<ellipse cx="${o.x}" cy="${o.y}" rx="${o.rx}" ry="${o.ry}" fill="url(#orb-${i})" />`,
       )
       .join("")}
-  </g>
+  </g>${lightScrimRects}
 </svg>`;
+
 
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
