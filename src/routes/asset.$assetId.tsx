@@ -109,6 +109,7 @@ import { IconAccentContrastWarning } from "@/components/print/IconAccentContrast
 import { iconPageBackground } from "@/lib/print-icon-contrast";
 import { PrintIconSwapModal } from "@/components/print/PrintIconSwapModal";
 import type { IconName } from "@/components/print/print-primitives";
+import { HeroBackgroundSwitcher } from "@/components/print/HeroBackgroundSwitcher";
 import { DivisionImageryPicker } from "@/components/print/DivisionImageryPicker";
 import { listDivisionImagery, type DivisionImageryEntry } from "@/lib/division-imagery.functions";
 import { getDivisionImagery } from "@/assets/backdrops/divisions";
@@ -338,6 +339,17 @@ function AssetEditor() {
   const [iconSlot, setIconSlot] = useState<{ slot: string; current: IconName | null } | null>(null);
   // Hero editor modal — opened from the canvas hero affordance.
   const [heroModalOpen, setHeroModalOpen] = useState(false);
+  // Esc always gets out of the hero editor — without this the dialog could only
+  // be dismissed by hitting the backdrop, which reads as a hang once a nested
+  // picker or confirm is up.
+  useEffect(() => {
+    if (!heroModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setHeroModalOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [heroModalOpen]);
 
   const [pendingSwap, setPendingSwap] = useState<{
     moduleIndex: number;
@@ -2684,6 +2696,16 @@ function AssetEditor() {
                   Close
                 </button>
               </div>
+              {/* Fast path first: swap the picture in one click (works even on
+                  masters that ship with no hero photo), tuning below. */}
+              <HeroBackgroundSwitcher
+                className="mb-4 border-b border-black/10 pb-4 dark:border-white/10"
+                value={content.heroMedia}
+                onChange={(next) => patchContent({ heroMedia: next })}
+                divisionId={row?.brand_mode_id ?? null}
+                mode={editorMode === "dark" ? "dark" : "light"}
+                seed={row?.id ?? "hero"}
+              />
               <HeroMediaPanel
                 value={content.heroMedia}
                 onChange={(next) => patchContent({ heroMedia: next })}
