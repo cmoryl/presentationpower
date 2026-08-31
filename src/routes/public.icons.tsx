@@ -146,11 +146,28 @@ function PublicIconLibrary() {
           </div>
 
           {pickerOpen && (
-            <nav
-              aria-label="Choose a brand guide"
-              className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-            >
-              {BRAND_ICON_SETS.map((s) => {
+            <div className="mt-4 space-y-6">
+              {GROUPS.map((group) => (
+                <section key={group.id} aria-labelledby={`icon-group-${group.id}`}>
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <h2
+                      id={`icon-group-${group.id}`}
+                      className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#03002C]"
+                    >
+                      {group.label}
+                    </h2>
+                    <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-black/45">
+                      {group.sets.length} {group.sets.length === 1 ? "set" : "sets"}
+                    </span>
+                  </div>
+                  <p className="mt-1 max-w-2xl text-xs leading-relaxed text-black/60">
+                    {group.note}
+                  </p>
+                  <nav
+                    aria-label={`${group.label} icon sets`}
+                    className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                  >
+                    {group.sets.map((s) => {
                 const active = s.slug === slug;
                 const accent = setAccent(s.slug);
                 // Every structural use of the accent (rail, glyph strokes, badge,
@@ -224,9 +241,13 @@ function PublicIconLibrary() {
                     </span>
                   </button>
                 );
-              })}
-            </nav>
+                    })}
+                  </nav>
+                </section>
+              ))}
+            </div>
           )}
+
         </div>
       </header>
 
