@@ -52,3 +52,34 @@ export function repairDanglingToolParts<T extends UIMessage>(messages: T[]): T[]
   });
   return changed ? next : messages;
 }
+
+const KNOWN_NON_TOOL_PREFIX = new Set(["tool-invocation"]);
+
+/**
+ * A persisted transcript can hold tool calls whose names are not in the
+ * currently declared tool set (renamed tools, or a staged/simulated build).
+ * Providers reject the whole request when a history function call names a tool
+ * they were not given, so those parts are rewritten as plain text notes: the
+ * turn still reads correctly and the request stays valid.
+ */
+export function dropUnknownToolParts<T extends UIMessage>(messages: T[], knownTools: string[]): T[] {
+  const known = new Set(knownTools);
+  let changed = false;
+  const next = messages.map((message) => {
+    const parts = Array.isArray(message.parts) ? message.parts : [];
+    let touched = false;
+    const rewritten = parts.flatMap((part): unknown[] => {
+      if (!isToolPart(part)) return [part];
+      const type = (part as LooseToolPart).type;
+      if (type === "dynamic-tool" || KNOWN_NON_TOOL_PREFIX.has(type)) return [part];
+      const name = type.replace(/^tool-/, "");
+      if (known.has(name)) return [part];
+      touched = true;
+      return [{ type: "text", text: `(step: ${name})` }];
+    });
+    if (!touched) return message;
+    changed = true;
+    return { ...message, parts: rewritten } as unknown as T;
+  });
+  return changed ? next : messages;
+}
