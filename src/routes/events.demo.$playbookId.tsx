@@ -21,6 +21,11 @@ import {
   Users,
   BadgeCheck,
 } from "lucide-react";
+import { BriefContextBanner } from "@/components/campaigns/BriefContextBanner";
+import {
+  applyBriefToEventPlaybook,
+  validateBriefCampaignSearch,
+} from "@/lib/brief-campaign-context";
 import {
   getPlaybook,
   EVENT_PLAYBOOKS,
@@ -208,8 +213,10 @@ function PlaybookDemoView() {
           <ArrowLeft size={12} /> All playbooks
         </Link>
         <span aria-hidden>·</span>
-        <span>{playbook.chip}</span>
+        <span>{authored.chip}</span>
       </div>
+
+      <BriefContextBanner search={briefSearch} />
 
       {/* Hero */}
       <header

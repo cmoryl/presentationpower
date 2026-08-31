@@ -34,6 +34,11 @@ import {
   EVENT_LOOKS_BY_ID,
 } from "@/lib/event-looks";
 
+import { BriefContextBanner } from "@/components/campaigns/BriefContextBanner";
+import {
+  applyBriefToSocialPlaybook,
+  validateBriefCampaignSearch,
+} from "@/lib/brief-campaign-context";
 import {
   getSocialPlaybook,
   SOCIAL_PLAYBOOKS,
@@ -55,6 +60,7 @@ import { ForkPresetButton } from "@/components/campaigns/ForkPresetButton";
 import { CustomizeCampaignButton } from "@/components/campaigns/CustomizeCampaignButton";
 
 export const Route = createFileRoute("/social/demo/$playbookId")({
+  validateSearch: validateBriefCampaignSearch,
   loader: ({ params }) => {
     const playbook = getSocialPlaybook(params.playbookId);
     if (!playbook) throw notFound();
@@ -82,7 +88,14 @@ export const Route = createFileRoute("/social/demo/$playbookId")({
 });
 
 function SocialDemoView() {
-  const { playbook } = Route.useLoaderData() as { playbook: SocialPlaybook };
+  const { playbook: authored } = Route.useLoaderData() as { playbook: SocialPlaybook };
+  // Opened from a master brief the kit takes that brief's prospect, objective
+  // and brand mode; opened from /social it renders exactly as authored.
+  const briefSearch = Route.useSearch();
+  const playbook = useMemo(
+    () => applyBriefToSocialPlaybook(authored, briefSearch),
+    [authored, briefSearch],
+  );
   const brand = useMemo(
     () => BRAND_MODES.find((b) => b.id === playbook.subBrand) ?? BRAND_MODES[0],
     [playbook.subBrand],
@@ -197,6 +210,8 @@ function SocialDemoView() {
         <span aria-hidden>·</span>
         <span>{playbook.divisionLabel}</span>
       </div>
+
+      <BriefContextBanner search={briefSearch} />
 
       {/* Hero */}
       <header
