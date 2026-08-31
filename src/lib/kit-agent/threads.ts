@@ -24,15 +24,21 @@ function kindOf(surface: KitSurface): string {
 }
 
 export async function listKitThreads(surface: KitSurface): Promise<KitAgentThread[]> {
+  // Admins can read every thread by policy, so scope the rail to the caller.
+  const { data: session } = await supabase.auth.getSession();
+  const ownerId = session.session?.user.id;
+  if (!ownerId) return [];
   const { data, error } = await supabase
     .from("agent_threads")
     .select(SELECT)
+    .eq("owner_id", ownerId)
     .eq("kind", kindOf(surface))
     .order("updated_at", { ascending: false })
     .limit(100);
   if (error) throw new Error(error.message);
   return (data ?? []) as unknown as KitAgentThread[];
 }
+
 
 export async function createKitThread(
   surface: KitSurface,
