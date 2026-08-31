@@ -55,8 +55,6 @@ export function ConfirmModal({
 
   return createPortal(
     <div
-      {/* Above every editor overlay (hero modal z-120, imagery picker z-999):
-          a confirm rendering behind its opener reads as a hang. */}
       className="fixed inset-0 z-[1200] flex items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm"
       onClick={onCancel}
     >
