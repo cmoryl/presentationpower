@@ -8,11 +8,12 @@ import { useEffect, useState } from "react";
 import { useDeckStore } from "@/lib/deck-store";
 
 export function useDeckHydrated(): boolean {
-  const [hydrated, setHydrated] = useState<boolean>(() => {
-    // On the server, persist middleware has nothing to rehydrate.
-    if (typeof window === "undefined") return false;
-    return useDeckStore.persist.hasHydrated();
-  });
+  // Always false for the first render on BOTH server and client: reading the
+  // persisted store in the initializer makes the client's first paint disagree
+  // with the SSR HTML and React throws a hydration mismatch. The effect below
+  // flips it immediately after mount, so there is no visible delay.
+  const [hydrated, setHydrated] = useState(false);
+
 
   useEffect(() => {
     if (useDeckStore.persist.hasHydrated()) {
