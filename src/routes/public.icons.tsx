@@ -12,8 +12,10 @@ import { BrandIconLibrary } from "@/components/brand/BrandIconLibrary";
 import {
   BRAND_ICON_SETS,
   iconColorOptions,
+  iconSetGroups,
   totalApprovedIcons,
 } from "@/lib/brand-icon-sets";
+
 import { getBrandGuide } from "@/lib/brand-guides";
 import { iconByName } from "@/lib/icon-library";
 
@@ -97,8 +99,9 @@ function PublicIconLibrary() {
     return accentInk(guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
   }, [slug, guide]);
 
-
+  const GROUPS = useMemo(() => iconSetGroups(), []);
   const set = BRAND_ICON_SETS.find((s) => s.slug === slug);
+  const activeGroup = GROUPS.find((g) => g.sets.some((s) => s.slug === slug));
   const activeInk = accentInk(setAccent(slug));
   const activeCount = set ? set.subAreas.reduce((n, a) => n + a.icons.length, 0) : 0;
 
@@ -115,10 +118,12 @@ function PublicIconLibrary() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-black/70">
             {totalApprovedIcons()} approved glyphs across {BRAND_ICON_SETS.length} brand guides,
-            organised by sub-area. These are the same marks the deck builder draws, so a download
-            can never drift from what ships on a slide. Choose a division, a size and an approved
-            colour, then download a single icon, a sub-area, or the full set.
+            organised into {GROUPS.map((g) => g.label.toLowerCase()).join(", ")} — then by sub-area.
+            These are the same marks the deck builder draws, so a download can never drift from what
+            ships on a slide. Choose a set, a size and an approved colour, then download a single
+            icon, a sub-area, or the full set.
           </p>
+
 
           {/* Collapsed state: one summary row so the listings sit right under the fold. */}
           <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-black/12 bg-white p-3 pl-4">
@@ -132,6 +137,7 @@ function PublicIconLibrary() {
                 {set?.title ?? "Brand guide"}
               </span>
               <span className="mt-0.5 block text-[11px] font-medium uppercase tracking-[0.14em] text-black/55">
+                {activeGroup ? `${activeGroup.label} · ` : ""}
                 {activeCount} icons · {set?.subAreas.length ?? 0} sub-areas
               </span>
             </span>
@@ -141,16 +147,34 @@ function PublicIconLibrary() {
               aria-expanded={pickerOpen}
               className="ml-auto rounded-full border border-black/20 px-4 py-2 text-[12px] font-semibold tracking-[-0.01em] text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/50"
             >
-              {pickerOpen ? "Hide divisions" : `Change division (${BRAND_ICON_SETS.length})`}
+              {pickerOpen ? "Hide icon sets" : `Browse all sets (${BRAND_ICON_SETS.length})`}
             </button>
+
           </div>
 
           {pickerOpen && (
-            <nav
-              aria-label="Choose a brand guide"
-              className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-            >
-              {BRAND_ICON_SETS.map((s) => {
+            <div className="mt-4 space-y-6">
+              {GROUPS.map((group) => (
+                <section key={group.id} aria-labelledby={`icon-group-${group.id}`}>
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    <h2
+                      id={`icon-group-${group.id}`}
+                      className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#03002C]"
+                    >
+                      {group.label}
+                    </h2>
+                    <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-black/45">
+                      {group.sets.length} {group.sets.length === 1 ? "set" : "sets"}
+                    </span>
+                  </div>
+                  <p className="mt-1 max-w-2xl text-xs leading-relaxed text-black/60">
+                    {group.note}
+                  </p>
+                  <nav
+                    aria-label={`${group.label} icon sets`}
+                    className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                  >
+                    {group.sets.map((s) => {
                 const active = s.slug === slug;
                 const accent = setAccent(s.slug);
                 // Every structural use of the accent (rail, glyph strokes, badge,
@@ -224,9 +248,13 @@ function PublicIconLibrary() {
                     </span>
                   </button>
                 );
-              })}
-            </nav>
+                    })}
+                  </nav>
+                </section>
+              ))}
+            </div>
           )}
+
         </div>
       </header>
 

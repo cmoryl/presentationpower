@@ -1069,3 +1069,60 @@ export function approvedIconForLabel(
 export function totalApprovedIcons(): number {
   return SANITIZED.reduce((n, s) => n + flatIcons(s).length, 0);
 }
+
+// ── Public library organisation ──────────────────────────────────────────
+// The public icon page lists every approved set. Flat, that is 20+ cards with
+// no shape; grouped by what the set actually *is* (master brand, division,
+// product, event system) it reads as a directory.
+
+export type IconSetGroupId = "brand" | "divisions" | "products" | "events";
+
+export interface IconSetGroup {
+  id: IconSetGroupId;
+  label: string;
+  note: string;
+  sets: BrandIconSet[];
+}
+
+const PRODUCT_SLUGS = new Set(["globallink", "dataforce", "trial-interactive", "element"]);
+const BRAND_SLUGS = new Set(["transperfect-master", "transperfect-cobrand"]);
+
+/** Which public section a set belongs to. */
+export function iconSetGroupId(slug: string): IconSetGroupId {
+  if (slug.startsWith("next-2026")) return "events";
+  if (BRAND_SLUGS.has(slug)) return "brand";
+  if (PRODUCT_SLUGS.has(slug)) return "products";
+  return "divisions";
+}
+
+const GROUP_META: Record<IconSetGroupId, { label: string; note: string }> = {
+  brand: {
+    label: "Master brand",
+    note: "The TransPerfect system and co-branded work — the base vocabulary every other set inherits.",
+  },
+  divisions: {
+    label: "Divisions",
+    note: "Practice-specific vocabulary for each TransPerfect division.",
+  },
+  products: {
+    label: "Products & platforms",
+    note: "Technology sets: platform features, workflow stages and integrations.",
+  },
+  events: {
+    label: "Events",
+    note: "NEXT 2026 event system — program, venue, show floor and per-track glyphs.",
+  },
+};
+
+/** Approved sets grouped into the public library's sections, in display order. */
+export function iconSetGroups(): IconSetGroup[] {
+  const order: IconSetGroupId[] = ["brand", "divisions", "products", "events"];
+  return order
+    .map((id) => ({
+      id,
+      label: GROUP_META[id].label,
+      note: GROUP_META[id].note,
+      sets: BRAND_ICON_SETS.filter((s) => iconSetGroupId(s.slug) === id),
+    }))
+    .filter((g) => g.sets.length > 0);
+}
