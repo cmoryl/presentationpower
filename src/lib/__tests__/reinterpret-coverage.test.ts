@@ -19,7 +19,21 @@ function source(bullets: string[], index = 1, title = "Four proof stats"): Parse
 
 describe("completeCoverage", () => {
   it("designs continuation pages until every imported line lands on a canvas", () => {
-    const bullets = Array.from({ length: 13 }, (_, i) => `Proof point ${i + 1} — measurable outcome number ${i + 1}`);
+    const bullets = [
+      "Regulatory filings translated in 42 markets",
+      "Clinical trial masters localised overnight",
+      "98.7% on-time delivery across the retainer",
+      "Six thousand linguists vetted annually",
+      "Machine translation post-edit saves 31% cost",
+      "Single connector into the content stack",
+      "Legal review cycles cut from nine days to two",
+      "Audio dubbing studios in eleven cities",
+      "Terminology governance owned by one steward",
+      "Voice of customer surveys in nineteen languages",
+      "Annual audit passed with zero findings",
+      "Dedicated programme manager per region",
+      "Sustainability reporting handled end to end",
+    ];
     const mapped: MappedSlide[] = [
       mapParsedSlide(source(["Global content partner"], 0, "Cover"), 2),
       mapParsedSlide(source(bullets), 2),
