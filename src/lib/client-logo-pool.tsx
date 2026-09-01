@@ -12,12 +12,19 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { useClientLogos, normalizeClientName } from "@/hooks/use-client-logos";
 import { toLogoFillers, type LogoFiller } from "@/lib/logohub-fillers";
+import { primeClientWallPool } from "@/lib/client-wall-pool";
 
 const ClientLogoPoolContext = createContext<LogoFiller[]>([]);
 
 export function ClientLogoPoolProvider({ children }: { children: ReactNode }) {
   const { data } = useClientLogos();
-  const pool = useMemo(() => toLogoFillers(data, { requireBoth: false }), [data]);
+  const pool = useMemo(() => {
+    const p = toLogoFillers(data, { requireBoth: false });
+    // Prime the module-level cache so synchronous builders (import
+    // reinterpretation, deck seeds, logo-wall fillers) use REAL client marks.
+    primeClientWallPool(p);
+    return p;
+  }, [data]);
   return <ClientLogoPoolContext.Provider value={pool}>{children}</ClientLogoPoolContext.Provider>;
 }
 

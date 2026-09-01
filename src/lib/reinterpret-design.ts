@@ -24,7 +24,8 @@ import {
   variantItemImageCapacity,
   normalizeSlideMedia,
 } from "./variant-media";
-import { getApprovedLogoItems } from "./approved-logos";
+import { getClientWallItems, findClientWallLogo } from "./client-wall-pool";
+import { clientPlaceholderItems } from "./logohub-fillers";
 
 
 // ── signals ──────────────────────────────────────────────────────────────
@@ -156,23 +157,28 @@ const kw = (g: SlideSignals, re: RegExp) =>
 const LOGO_INTENT =
   /logo|client|customer|brand|trusted|partner|who we work|works? with|runs on|portfolio/;
 
-function logoWallItems(g: SlideSignals, count: number) {
+function logoWallItems(g: SlideSignals, count: number, seed = "wall") {
   const named = g.bullets
     .map((b) => b.replace(/^[•\-\s]+/, "").trim())
     .filter((b) => b.length >= 2 && b.length <= 28 && !/[.!?]$/.test(b));
-  const approved = getApprovedLogoItems("light", count);
+  // REAL approved client marks only. Division lockups (APPROVED_LOGOS) are
+  // never valid filler in a client wall, so when the pool isn't primed we emit
+  // name-only items and the renderer draws a wordmark plate instead.
+  const pool = getClientWallItems(count, seed);
   const out: Array<{ name: string; logoUrl?: string; logoUrlDark?: string }> = [];
   for (let i = 0; i < count; i++) {
-    const a = approved[i];
-    const byName = named[i]
-      ? approved.find((x) => x.name.toLowerCase() === named[i].toLowerCase())
-      : undefined;
-    const pick = byName ?? a;
+    const byName = named[i] ? findClientWallLogo(named[i]) : undefined;
+    const pick = byName ?? pool[i];
     if (pick) out.push({ ...pick });
     else if (named[i]) out.push({ name: named[i] });
+    else {
+      const ph = clientPlaceholderItems(count)[i];
+      if (ph) out.push({ name: ph.name });
+    }
   }
   return out;
 }
+
 
 const logoWallDesign = (
   id: string,
@@ -189,7 +195,7 @@ const logoWallDesign = (
   build: (g) => {
     const wantsLogos = kw(g, LOGO_INTENT) || g.images.length >= minImages;
     if (!wantsLogos) return null;
-    const items = logoWallItems(g, count);
+    const items = logoWallItems(g, count, `${variantId}:${g.title ?? ""}`);
     if (items.length < 4) return null;
     return { title: g.title || "Trusted by the world's leading brands", items };
   },

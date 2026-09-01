@@ -10,6 +10,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { listPublicWallLogos, type PublicWallLogo } from "@/lib/public-wall.functions";
 import { BRAND_PROFILES } from "@/lib/brand-profiles";
 import type { LogoFiller } from "@/lib/logohub-fillers";
+import { primeClientWallPool } from "@/lib/client-wall-pool";
 
 /** Partner/tech-stack marks are not clients — keep them out of client walls. */
 const NON_CLIENT_INDUSTRIES = new Set(["PartnerLink Logos"]);
@@ -61,6 +62,10 @@ export function useClientWallPool(brandModeId: string | undefined): LogoFiller[]
         rest.push(filler);
       }
     }
-    return [...primary, ...rest];
+    const pool = [...primary, ...rest];
+    // Prime the module-level cache so synchronous builders (import
+    // reinterpretation, deck seeds) can use REAL client marks too.
+    primeClientWallPool(pool);
+    return pool;
   }, [data, brandModeId]);
 }

@@ -7,6 +7,7 @@
 // through `seedContent()`.
 
 import type { ClientLogoRow } from "@/lib/client-logos.functions";
+import { getClientWallItems } from "@/lib/client-wall-pool";
 
 export type LogoFiller = {
   name: string;
@@ -172,7 +173,21 @@ const CLIENT_PLACEHOLDER_NAMES = [
   "Industrial Manufacturer",
 ];
 
-export function clientPlaceholderItems(count = 8): Array<{ client: string; name: string }> {
+export function clientPlaceholderItems(
+  count = 8,
+  seed = "wall",
+): Array<{ client: string; name: string; logoUrl?: string; logoUrlDark?: string }> {
+  // Prefer the REAL approved client marks when the wall pool has been primed;
+  // the generic names below are only a last resort.
+  const real = getClientWallItems(count, seed);
+  if (real.length >= count) {
+    return real.map((r) => ({
+      client: r.name,
+      name: r.name,
+      logoUrl: r.logoUrl,
+      logoUrlDark: r.logoUrlDark,
+    }));
+  }
   const out: Array<{ client: string; name: string }> = [];
   for (let i = 0; i < count; i++) {
     const n = CLIENT_PLACEHOLDER_NAMES[i % CLIENT_PLACEHOLDER_NAMES.length];
@@ -180,3 +195,4 @@ export function clientPlaceholderItems(count = 8): Array<{ client: string; name:
   }
   return out;
 }
+
