@@ -103,6 +103,66 @@ export function ReinterpretApprovalDialog({
   // Slides where the reviewer chose "use it anyway" — the picked layout wins
   // even on the cover page or when its builder would reject the copy as-is.
   const [forcedLayouts, setForcedLayouts] = useState<Set<number>>(new Set());
+  // Slides where no native module fits and the AI authored a NEW custom module,
+  // keyed by source index. Applied to the preview and the built deck; saving it
+  // into the shared module library is a separate, admin-only action.
+  const [authored, setAuthored] = useState<Record<number, CustomModuleProposal>>({});
+  const [savedKeys, setSavedKeys] = useState<Record<number, string>>({});
+  const isAdmin = useIsAdmin();
+  const createModuleFn = useServerFn(createCustomModule);
+  const saveModule = useMutation({
+    mutationFn: async (index: number) => {
+      const p = authored[index];
+      if (!p) throw new Error("Nothing authored for this slide.");
+      const issues = validateCustomModule({
+        name: p.name,
+        description: p.description,
+        baseVariantId: p.baseVariantId,
+        blocks: p.canvasBlocks,
+        content: p.content as Record<string, unknown>,
+      });
+      if (!canPublish(issues)) throw new Error(issues.find((i) => i.level === "error")!.message);
+      const row = await createModuleFn({
+        data: {
+          moduleKey: p.moduleKey,
+          name: p.name,
+          description: p.description,
+          baseVariantId: p.baseVariantId,
+          familyId: p.familyId,
+          sectionId: p.sectionId,
+          brandMode: divisionId,
+          tags: p.tags,
+          content: p.content as Record<string, unknown>,
+          canvasBlocks: p.canvasBlocks as unknown as Array<Record<string, unknown>>,
+          notes: p.notes,
+          status: "draft",
+        },
+      });
+      return { index, key: (row as { module_key?: string })?.module_key ?? p.moduleKey };
+    },
+    onSuccess: ({ index, key }) => {
+      setSavedKeys((prev) => ({ ...prev, [index]: key }));
+      toast.success(`Saved “${key}” to the module library as a draft`);
+    },
+    onError: (e: Error) => toast.error(e.message || "Couldn't save the module"),
+  });
+
+  function authorModule(index: number) {
+    const src = rawMapped.find((m) => m.source.index === index);
+    if (!src) return;
+    setAuthored((prev) => ({ ...prev, [index]: proposeCustomModule(src, { divisionId }) }));
+    setApproved((prev) => new Set(prev).add(index));
+    setCompare((prev) => new Set(prev).add(index));
+  }
+
+  function discardAuthored(index: number) {
+    setAuthored((prev) => {
+      const copy = { ...prev };
+      delete copy[index];
+      return copy;
+    });
+  }
+
 
   function toggleForced(index: number) {
     setForcedLayouts((prev) => {
