@@ -78,7 +78,7 @@ describe("exported package ordering (PowerPoint open gate)", () => {
     expect(tail.trim(), `unexpected siblings after embeddedFontLst: ${tail.trim()}`).toBe("");
   });
 
-  it("emits notesMasterIdLst for a deck with speaker notes, before sldIdLst", async () => {
+  it("emits notesMasterIdLst for a deck with speaker notes, after sldIdLst", async () => {
     const xml = await presentationXml(false);
     const slides = xml.indexOf("<p:sldIdLst");
     expect(slides, "no sldIdLst in presentation.xml").toBeGreaterThan(-1);
@@ -91,6 +91,8 @@ describe("exported package ordering (PowerPoint open gate)", () => {
       notes,
       "deck has speaker notes but presentation.xml declares no notesMasterIdLst",
     ).toBeGreaterThan(-1);
-    expect(notes).toBeLessThan(slides);
+    // Office refuses the reverse order with PPTCannotOpenFileMetroFileCorruption.
+    expect(notes).toBeGreaterThan(slides);
   });
+
 });

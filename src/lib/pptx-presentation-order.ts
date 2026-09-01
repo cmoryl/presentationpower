@@ -1,25 +1,28 @@
 /**
- * Enforce the ECMA-376 child ordering of `<p:presentation>`.
+ * Enforce the child ordering of `<p:presentation>` that Office itself accepts.
  *
- * pptxgenjs emits `notesMasterIdLst` AFTER `sldIdLst` and font embedding used to
- * append `embeddedFontLst` last. Desktop PowerPoint validates this part
- * strictly: either deviation makes it refuse the deck with "PowerPoint found a
- * problem with content… can attempt to repair". The schema sequence below is
- * what real PowerPoint files carry, so we re-assert it after every pass that
- * rewrites presentation.xml. Re-sequencing is content-preserving: each element
- * is position-independent in meaning.
+ * pptxgenjs emits `sldMasterIdLst → sldIdLst → notesMasterIdLst`, and font
+ * embedding used to append `embeddedFontLst` last. Both PowerPoint desktop and
+ * the Office conversion service refuse a deck whose `presentation.xml` strays
+ * from the sequence below — proven by bisecting a refused export down to this
+ * single part: moving `notesMasterIdLst` ahead of `sldIdLst` (the literal
+ * ECMA-376 sequence) makes Office answer
+ * `PPTCannotOpenFileMetroFileCorruption`, and moving it back makes the very
+ * same package open. So we normalise to the accepted, real-world order and
+ * re-assert it after every pass that rewrites presentation.xml. Re-sequencing is
+ * content-preserving: each element is position-independent in meaning.
  */
 
 import type JSZip from "jszip";
 
 const PRES_PATH = "ppt/presentation.xml";
 
-/** ECMA-376 CT_Presentation child sequence. */
+/** Child sequence Office accepts (verified against the Office renderer). */
 const PRES_ORDER = [
   "p:sldMasterIdLst",
+  "p:sldIdLst",
   "p:notesMasterIdLst",
   "p:handoutMasterIdLst",
-  "p:sldIdLst",
   "p:sldSz",
   "p:notesSz",
   "p:smartTags",
@@ -32,6 +35,7 @@ const PRES_ORDER = [
   "p:modifyVerifier",
   "p:extLst",
 ];
+
 
 function block(xml: string, tag: string): { start: number; end: number; text: string } | null {
   const open = new RegExp(`<${tag}\\b[^>]*?(/?)>`);
