@@ -23,6 +23,7 @@
 // -----------------------------------------------------------------------------
 
 import { PX_PER_IN } from "@/lib/export-radius";
+import { BASE_FADE } from "@/lib/surface-tokens";
 
 /** PPTX widescreen stage, inches (mirrors export-radius). */
 export const SLIDE_W_IN = 13.333;
