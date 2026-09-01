@@ -3,7 +3,9 @@ import { scoreDeckAccuracy, scoreSlideAccuracy } from "../reinterpret-accuracy";
 import type { MappedSlide } from "../pptx-mapping";
 import type { ParsedSlide } from "../pptx-import";
 
-function slide(partial: Partial<MappedSlide> & { source: Partial<ParsedSlide> }): MappedSlide {
+function slide(
+  partial: Omit<Partial<MappedSlide>, "source"> & { source: Partial<ParsedSlide> },
+): MappedSlide {
   return {
     sectionId: "SF-05",
     variantId: "MV-INS-CALLOUT",
