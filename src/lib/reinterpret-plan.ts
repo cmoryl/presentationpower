@@ -108,7 +108,7 @@ export function validateAiPlans(mapped: MappedSlide[], raw: AiSlidePlan[]): Vali
       variantId: p.variantId,
       title: title || undefined,
       bullets,
-      rationale: (p.rationale ?? "").toString().slice(0, 240),
+      rationale: (p.rationale ?? "").toString().slice(0, 420),
       confidence: Math.max(0, Math.min(1, Number(p.confidence) || 0)),
       sourceRefs: Array.isArray(p.sourceRefs) ? p.sourceRefs.slice(0, 8) : [],
       designName: entry?.name,
