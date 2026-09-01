@@ -43,6 +43,7 @@ export default defineMcp({
     "Rules that mirror the in-app copilot: prefer the smallest edit; update_slide_content deep-merges, so send only changed fields; numeric stats, dates and currency stay locked unless the user explicitly asks for numeric edits (allow_numeric_edits); a variant must be permitted for the slide's section — call list_section_variants first; ground every factual claim with search_knowledge before writing it into a slide.",
     "Verify: audit_deck_completeness is the finishing gate — it lists every slide with empty content fields, grids holding fewer cards than the layout is built for, copy far under the space a block reserves, unplotted visuals or missing speaker notes, with the exact writable paths and their character budgets. audit_deck_visuals lists every chart, KPI board or process diagram in a deck whose plotted data is missing, with the exact keys to fill — run it after any build or batch of content writes and fix what it lists before reporting the deck as done.",
     "Deliver: export_deck builds a layered, editable .pptx from a saved deck and returns a private download link valid for one hour; it also lists any slides whose artwork needs the in-app export for pixel-exact plates.",
+    "Gap filling: when the user asks for a slide whose shape no permitted native module can hold, author_custom_module builds a NEW module for it in the approved look (blank base variant plus editable canvas objects) and inserts it, optionally filing it in the module library as a draft. Try list_section_variants and insert_slide first; only reach for it when the closest layout would drop content.",
     "Share: create_share_link enables a read-only link for a deck.",
   ].join("\n"),
 
@@ -66,6 +67,7 @@ export default defineMcp({
     searchIcons,
     searchKnowledge,
     insertSlide,
+    authorCustomModule,
     deleteSlide,
     reorderSlides,
     updateSlideContent,
