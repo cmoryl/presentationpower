@@ -139,7 +139,60 @@ type Design = {
 const kw = (g: SlideSignals, re: RegExp) =>
   g.forcedIntent === true || re.test(g.lowTitle) || re.test(g.bullets.join(" ").toLowerCase());
 
+/**
+ * Client / partner logo walls. The imported slide that motivates this layout is
+ * usually a *title-only* page whose evidence lives entirely in pictures ("The
+ * World Runs on TransPerfect" + 19 logo images), so no copy-shaped builder can
+ * ever accept it. Items are drawn from the approved client-logo set (real,
+ * cleared marks), topped up with short bullet lines when the source names its
+ * clients — nothing invented.
+ */
+const LOGO_INTENT =
+  /logo|client|customer|brand|trusted|partner|who we work|works? with|runs on|portfolio/;
+
+function logoWallItems(g: SlideSignals, count: number) {
+  const named = g.bullets
+    .map((b) => b.replace(/^[•\-\s]+/, "").trim())
+    .filter((b) => b.length >= 2 && b.length <= 28 && !/[.!?]$/.test(b));
+  const approved = getApprovedLogoItems("light", count);
+  const out: Array<{ name: string; logoUrl?: string; logoUrlDark?: string }> = [];
+  for (let i = 0; i < count; i++) {
+    const a = approved[i];
+    const byName = named[i]
+      ? approved.find((x) => x.name.toLowerCase() === named[i].toLowerCase())
+      : undefined;
+    const pick = byName ?? a;
+    if (pick) out.push({ ...pick });
+    else if (named[i]) out.push({ name: named[i] });
+  }
+  return out;
+}
+
+const logoWallDesign = (
+  id: string,
+  variantId: string,
+  count: number,
+  minImages: number,
+): Design => ({
+  id,
+  sectionId: "SF-08",
+  variantId,
+  // Below the auto-apply threshold on purpose: a logo wall only ever appears
+  // when the AI plan or the reviewer explicitly picks it.
+  score: 5,
+  build: (g) => {
+    const wantsLogos = kw(g, LOGO_INTENT) || g.images.length >= minImages;
+    if (!wantsLogos) return null;
+    const items = logoWallItems(g, count);
+    if (items.length < 4) return null;
+    return { title: g.title || "Trusted by the world's leading brands", items };
+  },
+});
+
 const DESIGNS: Design[] = [
+  logoWallDesign("logowall", "MV-PROOF-LOGOS", 12, 6),
+  logoWallDesign("logostrip", "MV-PROOF-LOGOS-STRIP", 6, 4),
+
   // ── numeric ───────────────────────────────────────────────────────────
   {
     id: "kpi",
