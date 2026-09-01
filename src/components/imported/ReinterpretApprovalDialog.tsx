@@ -532,22 +532,80 @@ export function ReinterpretApprovalDialog({
                               onChange={(v) => setVariant(p.index, v)}
                             />
 
-                            {designedSlide && designedSlide.variantId !== p.variantId && (
-                              <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                                <p className="text-[11px] text-[#FF9B70]">
-                                  {forcedLayouts.has(p.index)
-                                    ? `Even forced, this layout needs copy this slide doesn't have — showing ${designedSlide.variantId}.`
-                                    : `This layout can't be built from this slide's copy — the preview shows ${designedSlide.variantId} instead.`}
-                                </p>
-                                {!forcedLayouts.has(p.index) && (
+                            {!authored[p.index] &&
+                              designedSlide &&
+                              designedSlide.variantId !== p.variantId && (
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                                  <p className="text-[11px] text-[#FF9B70]">
+                                    {forcedLayouts.has(p.index)
+                                      ? `Even forced, this layout needs copy this slide doesn't have — showing ${designedSlide.variantId}.`
+                                      : `This layout can't be built from this slide's copy — the preview shows ${designedSlide.variantId} instead.`}
+                                  </p>
+                                  {!forcedLayouts.has(p.index) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleForced(p.index)}
+                                      className="rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                                    >
+                                      Use it anyway — adapt copy
+                                    </button>
+                                  )}
                                   <button
                                     type="button"
-                                    onClick={() => toggleForced(p.index)}
-                                    className="rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                                    onClick={() => authorModule(p.index)}
+                                    title="No native module fits — author a new custom module from this slide"
+                                    className="inline-flex items-center gap-1 rounded-full border border-[#003FC7] bg-[#003FC7] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90"
                                   >
-                                    Use it anyway — adapt copy
+                                    <Sparkles size={10} /> Author a new module
                                   </button>
-                                )}
+                                </div>
+                              )}
+                            {authored[p.index] && (
+                              <div className="mt-1.5 rounded-lg border border-[#003FC7]/30 bg-[#003FC7]/[0.04] p-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="rounded-full bg-[#003FC7] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                                    New module
+                                  </span>
+                                  <span className="text-[11px] font-medium text-[#03002C]">
+                                    {authored[p.index].name}
+                                  </span>
+                                  <span className="text-[11px] text-black/50">
+                                    {authored[p.index].canvasBlocks.length} editable objects
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-[11px] text-black/55">
+                                  {authored[p.index].description}
+                                </p>
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                                  {isAdmin &&
+                                    (savedKeys[p.index] ? (
+                                      <span className="text-[11px] text-[#0B7A3B]">
+                                        Saved as draft · {savedKeys[p.index]} — publish it in Module
+                                        Studio to share it.
+                                      </span>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => saveModule.mutate(p.index)}
+                                        disabled={saveModule.isPending}
+                                        className="inline-flex items-center gap-1 rounded-full border border-[#003FC7] bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5 disabled:opacity-60"
+                                      >
+                                        {saveModule.isPending ? (
+                                          <Loader2 size={10} className="animate-spin" />
+                                        ) : (
+                                          <Check size={10} />
+                                        )}
+                                        Save to module library (draft)
+                                      </button>
+                                    ))}
+                                  <button
+                                    type="button"
+                                    onClick={() => discardAuthored(p.index)}
+                                    className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60 hover:bg-black/5"
+                                  >
+                                    Discard new module
+                                  </button>
+                                </div>
                               </div>
                             )}
                             {designedSlide &&
