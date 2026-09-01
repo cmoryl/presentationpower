@@ -40,7 +40,7 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
-import { openBottomMaskStyle, SEAM_HEIGHT_PX } from "@/lib/surface-tokens";
+import { openBottomMaskStyle, SEAM_HEIGHT_PX, cardWashGradient } from "@/lib/surface-tokens";
 
 import { accentTokens, accentInk, hexA as accentHexA } from "@/lib/accent-tokens";
 
