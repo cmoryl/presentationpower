@@ -25,7 +25,8 @@ for (const id of NATIVE_VIZ_VARIANT_IDS) {
     s.addChart(ch.type as never, ch.data as never, {
       x: box.x + ch.box.x * box.w, y: box.y + ch.box.y * box.h,
       w: ch.box.w * box.w, h: ch.box.h * box.h,
-      chartColors: ch.colors.map((c) => (c === "primary" ? "003FC7" : c === "accent" ? "A1FBF9" : "CCCCCC")),
+      chartColors: ch.colors.map((c) => (c === "primary" ? "003FC7" : c === "accent" ? "A1FBF9" : c === "series2" ? "7F9FE3" : c === "series3" ? "6B79A8" : c === "surface" ? "FFFFFF" : "9AA6CF")),
+      valAxisOrientation: ch.invertValueAxis ? "maxMin" : "minMax",
       barDir: ch.barDir ?? "col", barGrouping: ch.stacked ? "stacked" : "clustered",
       holeSize: ch.holeSize, showLegend: plan.legend.length > 1, legendPos: "b", showTitle: false,
     } as never);
