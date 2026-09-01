@@ -29,7 +29,37 @@ const IMAGE_VARIANT_IDS = new Set<string>([
   "MV-QUOTE-PORTRAIT",
   // CTA close card renders a supporting photo
   "MV-CLOSE-CTA",
+  // Editorial heroes / photo statements — all read `content.mediaUrl`
+  "MV-ED-HERO-BLEED",
+  "MV-ED-STAT-PHOTO",
+  "MV-ED-QUOTE-BLEED",
 ]);
+
+/**
+ * Variants whose imagery lives on repeating items (`items[].mediaUrl`) rather
+ * than a single slide-level photo, with the number of tiles the layout renders.
+ * Importers use this to spread every imported picture into real slots instead
+ * of dropping all but the first.
+ */
+const ITEM_IMAGE_CAPACITY: Record<string, number> = {
+  "MV-IMG-GRID-3": 3,
+  "MV-IMG-GRID-6": 6,
+  "MV-IMG-STRIP": 5,
+  "MV-IMG-MATRIX-4": 4,
+  "MV-IMG-MATRIX-6": 6,
+};
+
+/** Number of `items[].mediaUrl` tiles the variant renders (0 when none). */
+export function variantItemImageCapacity(variantId: string | undefined | null): number {
+  if (!variantId) return 0;
+  return ITEM_IMAGE_CAPACITY[variantId] ?? 0;
+}
+
+/** True when the variant renders imagery in any slot (slide-level or per item). */
+export function variantRendersAnyImagery(variantId: string | undefined | null): boolean {
+  return variantSupportsImagery(variantId) || variantItemImageCapacity(variantId) > 0;
+}
+
 
 /** Variants that render a full-bleed / media-forward slot large enough to
  *  make a background video meaningful. Subset of imagery-supporting
