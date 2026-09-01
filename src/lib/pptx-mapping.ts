@@ -36,6 +36,12 @@ export type MappedSlide = {
    * no native module could hold (see reinterpret-custom-module.ts).
    */
   canvasBlocks?: import("./deck-store").CanvasBlock[];
+  /**
+   * Continuation pages authored for the lines the primary layout could not
+   * hold, so an imported slide's full content stays on the canvas instead of
+   * being parked in speaker notes (see completeCoverage in reinterpret-design).
+   */
+  continuations?: MappedSlide[];
 };
 
 export type MapOptions = {
