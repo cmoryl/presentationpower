@@ -23,3 +23,9 @@ for (const s of designed) {
 }
 console.log("slides still dropping lines:", drops.length);
 console.log(JSON.stringify(drops, null, 1));
+
+const low = designed.map((s) => ({ s, a: scoreSlideAccuracy(s) })).filter((x) => x.a.band !== "high");
+console.log("\n--- non-high slides:", low.length);
+for (const { s, a } of low) {
+  console.log(`#${s.source.index + 1} ${a.score} ${s.variantId} :: ` + a.facets.map((f) => `${f.id}=${Math.round(f.score * 100)}`).join(" ") + (a.missing.length ? ` | missing ${a.missing.length}` : ""));
+}
