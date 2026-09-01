@@ -16,4 +16,4 @@
 
 ## Scrolling
 - [x] Fix pages that snap back to top / stop scrolling (router scroll restoration reset on auth SIGNED_IN re-emit)
-- [ ] Audit agent + presentation pages for locked (non-scrolling) full-height layouts
+- [x] Audit agent + presentation pages for locked (non-scrolling) full-height layouts (no locked containers found)
