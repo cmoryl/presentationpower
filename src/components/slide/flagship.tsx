@@ -772,113 +772,51 @@ export function GlassTile({
   const ctxAccent = useSlideAccent();
   const a = accent ?? ctxAccent ?? undefined;
   const enterprise = isEnterpriseWhite(useSlideSkin());
-  // Enterprise White cards (master PowerPoint grammar): NO outline. The panel
-  // is a soft vertical gradient that starts as a faint accent-tinted white at
-  // the top and fades out to nothing at the bottom, plus a short accent tick
-  // along the top edge.
-  const gradientCard = (accentHex: string, radiusPx: number) => ({
-    background: `var(--pack-card-bg, ${accentTokens(accentHex, "light").panelGradient})`,
-    border: "var(--pack-card-border, none)",
-    borderRadius: `var(--pack-card-radius, ${radiusPx}px)`,
-    boxShadow: "var(--pack-card-shadow, none)",
-    backdropFilter: "var(--pack-card-blur, blur(6px))",
-    clipPath: "var(--pack-card-clip, none)" as const,
-  });
-
-  // Enterprise dark pages fall through to the dark card treatment below — the
-  // light gradient panel is invisible on the navy floor.
-  if (enterprise && mode !== "dark") {
-    const ea = a ?? ENTERPRISE_WHITE.accent;
-    return (
-      <div
-        className={`relative ${padding} ${className}`}
-        style={{ ...gradientCard(ea, Math.min(radius, 20)), ...style }}
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0"
-          style={{
-            height: SEAM_HEIGHT_PX,
-            borderTopLeftRadius: Math.min(radius, 20),
-            borderTopRightRadius: Math.min(radius, 20),
-            background: accentTokens(ea, "light").seam,
-          }}
-        />
-
-        {children}
-      </div>
-    );
-  }
-  // Universal light template: same outline-free gradient fade as Enterprise
-  // White, including the short accent tick along the top edge. The tick uses
-  // the active division accent so the light look re-colours per division.
-  if (mode !== "dark") {
-    const la = a ?? ENTERPRISE_WHITE.accent;
-    return (
-      <div
-        className={`relative ${padding} ${className}`}
-        style={{ ...gradientCard(la, radius), ...style }}
-      >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0"
-          style={{
-            height: SEAM_HEIGHT_PX,
-            borderTopLeftRadius: radius,
-            borderTopRightRadius: radius,
-            background: accentTokens(la, "light").seam,
-          }}
-        />
-
-        {children}
-      </div>
-    );
-  }
-  // Clearer glass: lower fill alpha, thinner hairline ring, plus an inner
-  // top highlight and a soft accent-tinted underglow so the division colour
-  // reads through the tile edge without tinting the whole surface.
-  const fillAlpha = Math.min(0.7, 0.22 * intensity);
-  const ringAlpha = Math.min(0.4, 0.16 * intensity);
-  const bg = `rgba(10, 8, 48, ${fillAlpha})`;
-  const ring = a
-    ? accentTokens(a, "dark", { emphasis: 1.07 }).ring
-    : `rgba(255, 255, 255, ${ringAlpha})`;
-  const highlight = "inset 0 1px 0 0 rgba(255,255,255,0.08)";
-  const accentGlow = a ? `, ${accentTokens(a, "dark").glow}` : "";
+  const isDark = mode === "dark";
+  const tileAccent = a ?? ENTERPRISE_WHITE.accent;
+  // Enterprise White pages tighten the corner slightly; everything else about
+  // the surface is the shared house recipe.
+  const r = enterprise && !isDark ? Math.min(radius, 20) : radius;
+  // ONE surface for every tile, light and dark: the canonical top-lit wash that
+  // fades to 0 opacity before the bottom edge (see `moduleCardSurface`). The
+  // frame is drawn as its own masked layer so the hairline dissolves along the
+  // bottom without masking the tile's content.
+  const surface = moduleCardSurface(tileAccent, mode, { radius: r, emphasis: intensity });
   return (
     <div
       className={`relative ${padding} ${className}`}
-      style={{
-        // Pack-aware: an alternate look (e.g. Spatial Clarity) redresses every
-        // glass tile through the same `--pack-card-*` vars the hand-rolled
-        // module cards use, so one look never mixes two card treatments.
-        background: `var(--pack-card-bg, ${bg})`,
-        backgroundImage: "var(--pack-card-bg-image, none)",
-        borderRadius: `var(--pack-card-radius, ${radius}px)`,
-        backdropFilter: "var(--pack-card-blur, blur(20px) saturate(150%))",
-        boxShadow: `var(--pack-card-shadow, ${highlight}${accentGlow})`,
-        clipPath: "var(--pack-card-clip, none)",
-        ...style,
-      }}
+      style={{ ...surface, border: undefined, borderBottomColor: undefined, ...style }}
     >
-      {/* Hairline ring drawn as its own layer so the shared open-bottom mask
-          fades the frame out along the bottom without masking the content.
-          Edgeless packs set `--pack-card-border: none`, which removes it. */}
+      {/* Hairline ring — edgeless packs set `--pack-card-border: none`, which
+          removes it everywhere at once. */}
       <div
         aria-hidden
         data-decorative
         className="pointer-events-none absolute inset-0"
         style={{
-          borderRadius: `var(--pack-card-radius, ${radius}px)`,
-          border: `var(--pack-card-border, 1px solid ${ring})`,
+          borderRadius: `var(--pack-card-radius, ${r}px)`,
+          border: surface.border as string,
           borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
           ...openBottomMaskStyle(),
+        }}
+      />
+      {/* Accent seam along the top edge — the signature of a module box. */}
+      <div
+        aria-hidden
+        data-accent-glow
+        className="pointer-events-none absolute inset-x-0 top-0"
+        style={{
+          height: SEAM_HEIGHT_PX,
+          borderTopLeftRadius: r,
+          borderTopRightRadius: r,
+          background: accentTokens(tileAccent, isDark ? "dark" : "light").seam,
         }}
       />
       {children}
     </div>
   );
 }
+
 
 // ── moduleCardTint / AccentTick ───────────────────────────────────────────
 // Shared surface recipe for the plain "module box" cards that are hand-rolled
