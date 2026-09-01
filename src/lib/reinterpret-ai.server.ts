@@ -18,6 +18,18 @@ export type PlannerSlide = {
   imageCount: number;
   /** Variant the deterministic mapper chose — the planner's starting point. */
   currentVariantId: string;
+  /** Deep-read evidence from the importer (see reinterpret-evidence.ts). */
+  layoutName?: string;
+  layoutSignature?: string;
+  hidden?: boolean;
+  hasAnimation?: boolean;
+  textBlocks?: unknown[];
+  charts?: unknown[];
+  tables?: unknown[];
+  diagrams?: unknown[];
+  media?: unknown[];
+  links?: string[];
+  figures?: string[];
 };
 
 export type PlannerResult = {
@@ -28,6 +40,10 @@ export type PlannerResult = {
 };
 
 const MODEL = "google/gemini-2.5-flash";
+
+/** Slides per request — small batches keep every slide's evidence in focus. */
+const BATCH = 5;
+
 
 const schema = {
   type: "object",
