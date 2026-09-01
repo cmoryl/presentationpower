@@ -899,10 +899,13 @@ export function moduleCardTint(
 }
 
 /**
- * Canonical module-card surface — the same look GlassTile produces, exposed as
- * a plain style object for the hand-rolled cards inside VariantRenderer.
- * Light: outline-free accent→white vertical gradient. Dark: frosted glass with
- * accent ring + underglow. Pair with <AccentTick /> for the top seam.
+ * Canonical module-card surface — ONE recipe for every module box in the deck.
+ *
+ * House rule (see `@/lib/surface-tokens`): a module box is a top-lit accent
+ * wash that fades to 0 opacity before its bottom edge, framed by a hairline on
+ * the top and sides only. Light and dark differ in alpha, never in structure —
+ * that is what keeps a bento mosaic, a KPI tile and a matrix cell reading as
+ * one family. Do not hand-roll a card background anywhere else.
  */
 export function moduleCardSurface(
   accentHex: string | null | undefined,
@@ -910,37 +913,30 @@ export function moduleCardSurface(
   opts: { radius?: number; emphasis?: number } = {},
 ): CSSProperties {
   const radius = opts.radius ?? 22;
+  const isDark = mode === "dark";
   const t = accentTokens(accentHex, mode, { emphasis: opts.emphasis ?? 1 });
+  const line = accentHex || t.ring;
   // `--pack-card-*` lets an alternate style pack redress every module card
   // without touching the modules themselves; with no pack active the fallback
-  // is the exact brand value, so nothing shifts.
-  if (mode === "dark") {
-    return {
-      background: "var(--pack-card-bg, rgba(10, 8, 48, 0.22))",
-      backgroundImage: `var(--pack-card-bg-image, ${t.wash})`,
-      border: `var(--pack-card-border, 1px solid ${t.ring})`,
-      // No frame along the bottom edge — the card gradient fades into the
-      // ground rather than closing into a box.
-      borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
-      borderRadius: `var(--pack-card-radius, ${radius}px)`,
-      backdropFilter: "var(--pack-card-blur, blur(20px) saturate(150%))",
-      boxShadow: `var(--pack-card-shadow, inset 0 1px 0 0 rgba(255,255,255,0.08), ${t.glow})`,
-      clipPath: "var(--pack-card-clip, none)",
-      position: "relative",
-      overflow: "hidden",
-    };
-  }
+  // is the canonical house surface.
   return {
-    background: `var(--pack-card-bg, ${t.panelGradient})`,
-    border: "var(--pack-card-border, none)",
+    // Base tint is a whisper — the wash carries the colour, so the box never
+    // reads as a filled rectangle sitting on the ground.
+    background: `var(--pack-card-bg, ${isDark ? "rgba(10, 8, 48, 0.18)" : "rgba(255,255,255,0.10)"})`,
+    backgroundImage: `var(--pack-card-bg-image, ${cardWashGradient(line)})`,
+    border: `var(--pack-card-border, 1px solid ${t.ring})`,
+    // No frame along the bottom edge — the card gradient fades into the ground
+    // rather than closing into a box.
+    borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
     borderRadius: `var(--pack-card-radius, ${radius}px)`,
+    backdropFilter: `var(--pack-card-blur, ${isDark ? "blur(20px) saturate(150%)" : "blur(6px)"})`,
     boxShadow: "var(--pack-card-shadow, none)",
-    backdropFilter: "var(--pack-card-blur, blur(6px))",
     clipPath: "var(--pack-card-clip, none)",
     position: "relative",
     overflow: "hidden",
   };
 }
+
 
 /** Full-width accent seam along the top edge of a module card. */
 export function AccentTick({
