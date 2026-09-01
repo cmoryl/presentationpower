@@ -34,6 +34,7 @@ import {
 } from "@/components/imported/VisualConversionPanel";
 import { ReinterpretApprovalDialog } from "@/components/imported/ReinterpretApprovalDialog";
 import type { MappedSlide } from "@/lib/pptx-mapping";
+import { flattenContinuations } from "@/lib/reinterpret-design";
 import {
   applyVisualOverrides,
   mapStoredImportedDeck,
