@@ -40,7 +40,12 @@ export type SlideRegister = "corporate" | "product" | "editorial";
 import { useSlideSkin } from "@/components/slide/SlideSkinContext";
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { ENTERPRISE_WHITE, isEnterpriseWhite } from "@/lib/slide-skin";
-import { openBottomMaskStyle, SEAM_HEIGHT_PX, cardWashGradient } from "@/lib/surface-tokens";
+import {
+  openBottomMaskStyle,
+  SEAM_HEIGHT_PX,
+  cardWashGradient,
+  cardBaseGradient,
+} from "@/lib/surface-tokens";
 
 import { accentTokens, accentInk, hexA as accentHexA } from "@/lib/accent-tokens";
 
@@ -787,6 +792,18 @@ export function GlassTile({
       className={`relative ${padding} ${className}`}
       style={{ ...surface, border: undefined, borderBottomColor: undefined, ...style }}
     >
+      {/* Frosting, as its own masked layer so the blur fades out with the wash
+          instead of re-drawing a hard rectangle at the bottom edge. */}
+      <div
+        aria-hidden
+        data-decorative
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: `var(--pack-card-radius, ${r}px)`,
+          backdropFilter: isDark ? "blur(20px) saturate(150%)" : "blur(6px)",
+          ...openBottomMaskStyle(),
+        }}
+      />
       {/* Hairline ring — edgeless packs set `--pack-card-border: none`, which
           removes it everywhere at once. */}
       <div
@@ -857,17 +874,23 @@ export function moduleCardSurface(
   // `--pack-card-*` lets an alternate style pack redress every module card
   // without touching the modules themselves; with no pack active the fallback
   // is the canonical house surface.
+  // The neutral base tint fades on the SAME curve as the accent wash, so the
+  // whole surface — not just the colour — reaches 0 opacity before the bottom
+  // edge. A flat base fill was what kept module boxes reading as closed
+  // rectangles even though the wash faded.
+  const baseFill = isDark ? cardBaseGradient("10,8,48", 0.18) : cardBaseGradient("255,255,255", 0.1);
   return {
-    // Base tint is a whisper — the wash carries the colour, so the box never
-    // reads as a filled rectangle sitting on the ground.
-    background: `var(--pack-card-bg, ${isDark ? "rgba(10, 8, 48, 0.18)" : "rgba(255,255,255,0.10)"})`,
-    backgroundImage: `var(--pack-card-bg-image, ${cardWashGradient(line)})`,
+    background: "var(--pack-card-bg, transparent)",
+    backgroundImage: `var(--pack-card-bg-image, ${cardWashGradient(line)}, ${baseFill})`,
     border: `var(--pack-card-border, 1px solid ${t.ring})`,
     // No frame along the bottom edge — the card gradient fades into the ground
     // rather than closing into a box.
     borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
     borderRadius: `var(--pack-card-radius, ${radius}px)`,
-    backdropFilter: `var(--pack-card-blur, ${isDark ? "blur(20px) saturate(150%)" : "blur(6px)"})`,
+    // No blanket backdrop blur: a backdrop filter cannot fade, so it re-draws
+    // the rectangle the wash just dissolved. Frosting is applied as its own
+    // masked layer where a module wants it (see `GlassTile`).
+    backdropFilter: "var(--pack-card-blur, none)",
     boxShadow: "var(--pack-card-shadow, none)",
     clipPath: "var(--pack-card-clip, none)",
     position: "relative",

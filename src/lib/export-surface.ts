@@ -23,6 +23,7 @@
 // -----------------------------------------------------------------------------
 
 import { PX_PER_IN } from "@/lib/export-radius";
+import { BASE_FADE } from "@/lib/surface-tokens";
 
 /** PPTX widescreen stage, inches (mirrors export-radius). */
 export const SLIDE_W_IN = 13.333;
@@ -197,12 +198,26 @@ export function getGlassTreatment(opts: {
 
   // ONE structure for both modes: base tint + the shared accent wash that
   // fades to 0 by 88%, so the tile melts into the ground exactly as on screen.
+  // The base tint fades on the same curve as the wash (mirror of `BASE_FADE`
+  // in `surface-tokens.ts`), so the exported card melts into the ground exactly
+  // like the on-screen one instead of closing as a flat rectangle.
+  const baseFactor = (at: number) =>
+    at <= BASE_FADE.fullTo
+      ? 1
+      : at >= BASE_FADE.endAt
+        ? 0
+        : at <= BASE_FADE.midAt
+          ? 1 - (1 - BASE_FADE.midFactor) * ((at - BASE_FADE.fullTo) / (BASE_FADE.midAt - BASE_FADE.fullTo))
+          : BASE_FADE.midFactor * (1 - (at - BASE_FADE.midAt) / (BASE_FADE.endAt - BASE_FADE.midAt));
   const gradient: SurfaceGradient = {
     angleDeg: 180,
     stops: GLASS_CARD_TOKENS.wash.map((s) => ({
       color: s.alpha > 0 ? mixHex(T.base, accent, Math.min(0.85, s.alpha * 5)) : T.base,
       pos: s.at,
-      alpha: Math.min(0.85, (T.baseAlpha + s.alpha * e) * (s.at >= 88 ? 0.35 : 1)),
+      alpha:
+        Math.round(
+          Math.min(0.85, T.baseAlpha * baseFactor(s.at) + s.alpha * e) * 1000,
+        ) / 1000,
     })),
   };
 
