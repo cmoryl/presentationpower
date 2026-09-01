@@ -86,6 +86,13 @@ import { ExportTelemetry, type ExportTelemetryReport } from "./export-telemetry"
 import { bytesToBase64, resolveAssetUrl } from "./asset-base-url";
 import { fetchPptxVideo, placeSlideVideo, type PptxVideoAsset } from "./pptx-video";
 import { effectivePack } from "./effective-pack";
+import { isInfographicSpec, type InfographicSpec } from "./infographics/spec";
+import { vizKindForVariant } from "./infographics/variant-kinds";
+import {
+  NATIVE_VIZ_VARIANT_IDS,
+  vizNativeChartPlan,
+  type VizColorRole,
+} from "./infographics/native-chart";
 import { packField, packToneBrand, stylePackById, type StylePack } from "./style-packs";
 
 // Cursor for the slide currently being emitted. The exporter draws through many
@@ -951,7 +958,6 @@ export async function exportDeckToPptx(
       });
     }),
   );
-
 
 
   // Rasterize each slide's Backgrounds & Imagery selection in parallel. This
@@ -3146,7 +3152,7 @@ function renderAdvancedVariant(
   const c = (slide.content ?? {}) as Record<string, unknown>;
   // MV-VIZ-* spec-driven infographics — embed pre-rendered vector SVG.
   if (typeof slide.variantId === "string" && slide.variantId.startsWith("MV-VIZ-")) {
-    renderVizSpec(s, c, p, vizSvg);
+    renderVizSpec(s, c, p, vizSvg, slide.variantId);
     return true;
   }
   switch (slide.variantId) {
@@ -3407,9 +3413,6 @@ function renderAdvancedVariant(
     case "MV-PROOF-LOGOS-MOSAIC":
       renderProofLogos(s, c, p, itemLogos);
       return true;
-    case "MV-PROOF-TESTIMONIAL":
-      renderProofTestimonial(s, c, p);
-      return true;
     case "MV-RISK-MITIGATION":
       renderRiskMitigation(s, c, p);
       return true;
@@ -3495,18 +3498,6 @@ function renderAdvancedVariant(
     case "MV-CLOSE-TIMELINE":
       renderCloseTimeline(s, c, p);
       return true;
-    case "MV-QUOTE-PORTRAIT":
-      renderQuotePortrait(s, c, p);
-      return true;
-    case "MV-QUOTE-POSTER":
-      renderQuotePoster(s, c, p);
-      return true;
-    case "MV-QUOTE-METRIC":
-      renderQuoteMetric(s, c, p);
-      return true;
-    case "MV-QUOTE-MULTI":
-      renderQuoteMulti(s, c, p);
-      return true;
     default:
       return false;
   }
@@ -3526,7 +3517,136 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-// MV-VIZ-* — render a pre-rasterized/vector SVG under the shared title zone.
+// MV-VIZ-* — real PowerPoint charts where a native equivalent exists, otherwise
+// a design-exact vector plate under the shared title zone.
+
+/**
+ * Emit the VIZ slide as a native `addChart` object (editable series + embedded
+ * worksheet). Returns false when the kind has no faithful PowerPoint chart type
+ * so the caller falls back to the vector plate.
+ */
+function renderVizNativeChart(
+  s: PptxGenJS.Slide,
+  c: Record<string, unknown>,
+  p: Palette,
+  box: { x: number; y: number; w: number; h: number },
+  variantId?: string,
+): boolean {
+  const raw = (c as { spec?: unknown }).spec;
+  let spec: InfographicSpec | null = isInfographicSpec(raw) ? raw : null;
+  if (!spec) {
+    const rows = Array.isArray(c.rows) ? (c.rows as InfographicSpec["data"]["rows"]) : [];
+    const enc = obj(c.encoding) as InfographicSpec["encoding"];
+    if (rows.length === 0 || !variantId) return false;
+    spec = {
+      id: variantId,
+      kind: vizKindForVariant(variantId),
+      data: { rows, columns: obj(c.columns) as Record<string, string> },
+      encoding: enc,
+      theme: { mode: "light", accent: p.accent, primary: p.primary, ink: p.ink, surface: p.surface },
+      accessibility: { shortAlt: "", longDesc: "" },
+      export: { preferredFormat: "svg" },
+    };
+  }
+  if (variantId && !NATIVE_VIZ_VARIANT_IDS.includes(variantId)) return false;
+  const plan = vizNativeChartPlan(spec);
+  if (!plan || plan.charts.length === 0) return false;
+
+  const hex = (role: VizColorRole): string => {
+    switch (role) {
+      case "primary":
+        return p.primary.replace("#", "");
+      case "accent":
+        return p.accent.replace("#", "");
+      case "series2":
+        return mixHex(p.primary, p.surface, 0.42).replace("#", "");
+      case "series3":
+        return mixHex(p.accent, p.ink, 0.38).replace("#", "");
+      case "track":
+        return trackC(p).replace("#", "");
+      case "surface":
+        return p.surface.replace("#", "");
+      default:
+        return mutedC(p).replace("#", "");
+    }
+  };
+
+  try {
+    plan.charts.forEach((chart) => {
+      const cx = box.x + chart.box.x * box.w;
+      const cy = box.y + chart.box.y * box.h;
+      const cw = chart.box.w * box.w;
+      const chH = chart.box.h * box.h;
+      s.addChart(
+        chart.type as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+        chart.data,
+        {
+          x: cx,
+          y: cy,
+          w: cw,
+          h: chH,
+          chartColors: chart.colors.map(hex),
+          barDir: chart.barDir ?? "col",
+          barGrouping: chart.stacked ? "stacked" : "clustered",
+          holeSize: chart.holeSize,
+          showLegend: plan.legend.length > 1,
+          legendPos: "b",
+          legendFontFace: "Geist",
+          legendFontSize: 10,
+          showTitle: false,
+          showValue: !!chart.showValue,
+          dataLabelFontFace: "Geist",
+          dataLabelFontSize: 10,
+          dataLabelColor: bodyC(p),
+          catAxisLabelFontFace: "Geist",
+          catAxisLabelFontSize: 10,
+          catAxisLabelColor: bodyC(p),
+          valAxisLabelFontFace: "Geist",
+          valAxisLabelFontSize: 10,
+          valAxisLabelColor: bodyC(p),
+          valAxisHidden: !!chart.hideValAxis,
+          valAxisOrientation: chart.invertValueAxis ? "maxMin" : "minMax",
+          catGridLine: { style: "none" },
+          valGridLine: { color: trackC(p), style: "solid", size: 1 },
+          lineDataSymbol: chart.type === "line" ? "circle" : "none",
+          lineDataSymbolSize: 6,
+          lineSize: 3,
+        } as Parameters<PptxGenJS.Slide["addChart"]>[2],
+      );
+      if (chart.centerValue) {
+        s.addText(chart.centerValue, {
+          x: cx,
+          y: cy + chH / 2 - 0.3,
+          w: cw,
+          h: 0.6,
+          fontFace: "Geist",
+          fontSize: 22,
+          bold: true,
+          color: p.primary,
+          align: "center",
+        });
+      }
+      if (chart.caption) {
+        s.addText(chart.caption.toUpperCase(), {
+          x: cx,
+          y: cy + chH + 0.04,
+          w: cw,
+          h: 0.34,
+          fontFace: "Geist",
+          fontSize: 10,
+          bold: true,
+          charSpacing: 2,
+          color: bodyC(p),
+          align: "center",
+        });
+      }
+    });
+  } catch {
+    return false;
+  }
+  return true;
+}
+
 //
 // Geometry mirrors the on-screen module (`InfographicSlideModule`): a 0.667"
 // gutter (Tailwind px-16 at 1280×720) and a chart plate that ends above the
@@ -3539,11 +3659,18 @@ function renderVizSpec(
   c: Record<string, unknown>,
   p: Palette,
   vizSvg?: string,
+  variantId?: string,
 ) {
   const y0 = drawTitle(s, c, p);
   const y = Math.max(y0, VIZ_BOX.y);
   const h = Math.max(1.5, VIZ_BOX.y + VIZ_BOX.h - y);
-  if (vizSvg) {
+  // Real, editable PowerPoint charts for the kinds PowerPoint can actually
+  // draw (waterfall, stacked area, radar, slope/bump, gauge grid). Everything
+  // else keeps the design-exact vector plate below.
+  if (renderVizNativeChart(s, c, p, { x: VIZ_BOX.x, y, w: VIZ_BOX.w, h }, variantId)) {
+    // native chart emitted
+  } else if (vizSvg) {
+
     s.addImage({
       data: vizSvg,
       x: VIZ_BOX.x,
@@ -11131,81 +11258,6 @@ function renderProofLogos(
   });
 }
 
-// ── MV-PROOF-TESTIMONIAL ── quote + metric pull card
-function renderProofTestimonial(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  const quote = str(c.quote || c.body);
-  const attribution = str(c.attribution || c.author);
-  const role = str(c.role);
-  const metric = str(c.metric);
-  // Left: quote
-  s.addText("\u201C", {
-    x: 0.6,
-    y: 0.7,
-    w: 1.5,
-    h: 1.5,
-    fontSize: 140,
-    bold: true,
-    color: p.accent,
-    fontFace: "Geist",
-  });
-  s.addText(quote, {
-    x: 0.9,
-    y: 2.1,
-    w: 8.2,
-    h: 3.4,
-    fontSize: 26,
-    italic: true,
-    color: p.primary,
-    fontFace: "Geist",
-    valign: "top",
-  });
-  if (attribution)
-    s.addText(`${attribution}${role ? ` · ${role}` : ""}`, {
-      x: 0.9,
-      y: 5.8,
-      w: 8.2,
-      h: 0.5,
-      fontSize: 13,
-      color: p.ink,
-      fontFace: "Geist",
-      charSpacing: 2,
-    });
-  // Right: metric card
-  if (metric) {
-    const rx = 9.6;
-    const rw = SLIDE_W - rx - 0.6;
-    s.addShape("rect", {
-      x: rx,
-      y: 1.2,
-      w: rw,
-      h: 5.0,
-      fill: { color: p.primary },
-      line: { color: p.primary },
-    });
-    s.addText("RESULT", {
-      x: rx + 0.3,
-      y: 1.5,
-      w: rw - 0.6,
-      h: 0.4,
-      fontSize: 11,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
-      charSpacing: 4,
-    });
-    s.addText(metric, {
-      x: rx + 0.3,
-      y: 2.4,
-      w: rw - 0.6,
-      h: 3.0,
-      fontSize: 46,
-      bold: true,
-      color: "FFFFFF",
-      fontFace: "Geist",
-      valign: "middle",
-    });
-  }
-}
 
 // ── MV-RISK-MITIGATION ── risk → mitigation paired rows
 function renderRiskMitigation(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -13160,297 +13212,4 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
 
 // ── Quote family ───────────────────────────────────────────────────────
 
-// MV-QUOTE-PORTRAIT — quote left + portrait placeholder right
-function renderQuotePortrait(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  const quote = str(c.quote || c.body);
-  const author = str(c.attribution || c.author);
-  const role = str(c.role);
-  const org = str(c.organization || c.org || c.company);
-  // portrait right
-  const px = SLIDE_W - 3.6,
-    py = 1.2,
-    pw = 3.0,
-    ph = 5.1;
-  s.addShape("rect", {
-    x: px,
-    y: py,
-    w: pw,
-    h: ph,
-    fill: { color: p.primary },
-    line: { color: p.primary },
-  });
-  s.addShape("ellipse", {
-    x: px + pw / 2 - 0.9,
-    y: py + 1.0,
-    w: 1.8,
-    h: 1.8,
-    fill: { color: p.accent },
-    line: { color: p.accent },
-  });
-  s.addText(initials(author || "A"), {
-    x: px + pw / 2 - 0.9,
-    y: py + 1.0,
-    w: 1.8,
-    h: 1.8,
-    fontSize: 44,
-    bold: true,
-    color: p.primary,
-    fontFace: "Geist",
-    align: "center",
-    valign: "middle",
-  });
-  s.addText(author || "", {
-    x: px + 0.2,
-    y: py + 3.1,
-    w: pw - 0.4,
-    h: 0.5,
-    fontSize: 16,
-    bold: true,
-    color: "FFFFFF",
-    fontFace: "Geist",
-    align: "center",
-  });
-  if (role)
-    s.addText(role, {
-      x: px + 0.2,
-      y: py + 3.6,
-      w: pw - 0.4,
-      h: 0.4,
-      fontSize: 12,
-      color: p.accent,
-      fontFace: "Geist",
-      align: "center",
-    });
-  if (org)
-    s.addText(org.toUpperCase(), {
-      x: px + 0.2,
-      y: py + 4.1,
-      w: pw - 0.4,
-      h: 0.4,
-      fontSize: 10,
-      color: "FFFFFF",
-      fontFace: "Geist",
-      align: "center",
-      charSpacing: 4,
-    });
-  // quote left
-  s.addText("\u201C", {
-    x: 0.6,
-    y: 0.8,
-    w: 1.5,
-    h: 1.6,
-    fontSize: 140,
-    bold: true,
-    color: p.accent,
-    fontFace: "Geist",
-  });
-  s.addText(quote, {
-    x: 0.9,
-    y: 2.2,
-    w: SLIDE_W - 5.0,
-    h: 4.4,
-    fontSize: 24,
-    italic: true,
-    color: p.primary,
-    fontFace: "Geist",
-    valign: "top",
-  });
-}
 
-// MV-QUOTE-POSTER — poster-style caps quote
-function renderQuotePoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  const quote = (str(c.quote || c.body) || "").toUpperCase();
-  const author = str(c.attribution || c.author);
-  const role = str(c.role);
-  s.addShape("rect", {
-    x: 0.6,
-    y: 0.6,
-    w: SLIDE_W - 1.2,
-    h: SLIDE_H - 1.2,
-    fill: { color: p.primary, transparency: 100 },
-    line: { color: p.accent, width: 3 },
-  });
-  s.addText(quote, {
-    x: 1.0,
-    y: 1.2,
-    w: SLIDE_W - 2.0,
-    h: 4.8,
-    fontSize: 60,
-    bold: true,
-    color: p.primary,
-    fontFace: "Geist",
-    align: "center",
-    valign: "middle",
-    charSpacing: -1,
-  });
-  s.addShape("rect", {
-    x: (SLIDE_W - 1.0) / 2,
-    y: 6.0,
-    w: 1.0,
-    h: 0.04,
-    fill: { color: p.accent },
-    line: { color: p.accent },
-  });
-  if (author)
-    s.addText(`${author}${role ? "  ·  " + role : ""}`.toUpperCase(), {
-      x: 1.0,
-      y: 6.15,
-      w: SLIDE_W - 2.0,
-      h: 0.4,
-      fontSize: 12,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
-      align: "center",
-      charSpacing: 6,
-    });
-}
-
-// MV-QUOTE-METRIC — quote + accompanying metric card
-function renderQuoteMetric(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  const quote = str(c.quote || c.body);
-  const author = str(c.attribution || c.author);
-  const role = str(c.role);
-  const metric = str(c.stat || c.metric || c.value);
-  const unit = str(c.unit);
-  const label = str(c.label);
-  // quote left
-  s.addText("\u201C", {
-    x: 0.6,
-    y: 0.9,
-    w: 1.2,
-    h: 1.4,
-    fontSize: 120,
-    bold: true,
-    color: p.accent,
-    fontFace: "Geist",
-  });
-  s.addText(quote, {
-    x: 0.9,
-    y: 2.1,
-    w: 7.5,
-    h: 3.6,
-    fontSize: 24,
-    italic: true,
-    color: p.primary,
-    fontFace: "Geist",
-    valign: "top",
-  });
-  if (author)
-    s.addText(`${author}${role ? " · " + role : ""}`, {
-      x: 0.9,
-      y: 5.9,
-      w: 7.5,
-      h: 0.5,
-      fontSize: 13,
-      color: p.ink,
-      fontFace: "Geist",
-      charSpacing: 2,
-    });
-  // metric right card
-  const rx = 8.9,
-    rw = SLIDE_W - rx - 0.6;
-  s.addShape("rect", {
-    x: rx,
-    y: 1.4,
-    w: rw,
-    h: 4.8,
-    fill: { color: p.accent },
-    line: { color: p.accent },
-  });
-  s.addText(`${metric}${unit}`, {
-    x: rx,
-    y: 1.6,
-    w: rw,
-    h: 3.2,
-    fontSize: 88,
-    bold: true,
-    color: p.primary,
-    fontFace: "Geist",
-    align: "center",
-    valign: "middle",
-  });
-  s.addShape("rect", {
-    x: rx + 0.6,
-    y: 4.7,
-    w: rw - 1.2,
-    h: 0.03,
-    fill: { color: p.primary },
-    line: { color: p.primary },
-  });
-  if (label)
-    s.addText(label, {
-      x: rx + 0.3,
-      y: 4.9,
-      w: rw - 0.6,
-      h: 1.2,
-      fontSize: 13,
-      color: p.primary,
-      fontFace: "Geist",
-      align: "center",
-      valign: "top",
-    });
-}
-
-// MV-QUOTE-MULTI — 2 stacked quote cards
-function renderQuoteMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
-  const y0 = drawTitle(s, c, p);
-  const items = arr(c.items).slice(0, 2);
-  const n = items.length || 1;
-  const gap = 0.3;
-  const availH = 5.9 - y0 - (n - 1) * gap;
-  const rowH = availH / n;
-  items.forEach((it, k) => {
-    const y = y0 + k * (rowH + gap);
-    const isPrimary = k === 0;
-    s.addShape("rect", {
-      x: 0.6,
-      y,
-      w: SLIDE_W - 1.2,
-      h: rowH,
-      fill: { color: isPrimary ? p.primary : p.surface },
-      line: { color: isPrimary ? p.primary : LIGHT_GRAY },
-    });
-    s.addText("\u201C", {
-      x: 0.8,
-      y: y + 0.1,
-      w: 1.0,
-      h: 1.0,
-      fontSize: 72,
-      bold: true,
-      color: p.accent,
-      fontFace: "Geist",
-    });
-    s.addText(str(it.quote || it.body), {
-      x: 1.9,
-      y: y + 0.25,
-      w: SLIDE_W - 4.0,
-      h: rowH - 0.9,
-      fontSize: 18,
-      italic: true,
-      color: isPrimary ? "FFFFFF" : p.primary,
-      fontFace: "Geist",
-      valign: "middle",
-    });
-    const attribution = `${str(it.attribution || it.author)}${it.role ? " · " + str(it.role) : ""}`;
-    s.addText(attribution, {
-      x: 1.9,
-      y: y + rowH - 0.55,
-      w: SLIDE_W - 4.0,
-      h: 0.4,
-      fontSize: 11,
-      color: isPrimary ? p.accent : p.ink,
-      fontFace: "Geist",
-      charSpacing: 3,
-    });
-    // right rail
-    s.addShape("rect", {
-      x: SLIDE_W - 1.9,
-      y: y + 0.5,
-      w: 1.3,
-      h: rowH - 1.0,
-      fill: { color: isPrimary ? p.accent : p.primary, transparency: 80 },
-      line: { color: isPrimary ? p.accent : p.primary, transparency: 100 },
-    });
-  });
-}

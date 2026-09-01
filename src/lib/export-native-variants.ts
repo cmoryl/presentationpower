@@ -1,3 +1,4 @@
+import { NATIVE_VIZ_VARIANT_IDS } from "./infographics/native-chart";
 // -----------------------------------------------------------------------------
 // Which module variants have a hand-written NATIVE PowerPoint renderer
 //
@@ -104,7 +105,6 @@ export const NATIVE_EMITTER_VARIANT_IDS: readonly string[] = [
   "MV-PROOF-LOGOS-FEATURED",
   "MV-PROOF-LOGOS-CATEGORIZED",
   "MV-PROOF-LOGOS-MOSAIC",
-  "MV-PROOF-TESTIMONIAL",
   "MV-RISK-MITIGATION",
   "MV-TEAM-BIOS-3",
   "MV-TEAM-BIOS-4",
@@ -133,10 +133,6 @@ export const NATIVE_EMITTER_VARIANT_IDS: readonly string[] = [
   "MV-CLOSE-CALENDAR",
   "MV-CLOSE-SPLIT",
   "MV-CLOSE-TIMELINE",
-  "MV-QUOTE-PORTRAIT",
-  "MV-QUOTE-POSTER",
-  "MV-QUOTE-METRIC",
-  "MV-QUOTE-MULTI",
 ];
 
 const NATIVE_SET = new Set<string>(NATIVE_EMITTER_VARIANT_IDS);
@@ -179,20 +175,109 @@ export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
   "MV-CLOSE-CALENDAR",
   "MV-CLOSE-SPLIT",
   "MV-CLOSE-TIMELINE",
+  // Sept 2026 full-library PowerPoint parity sweep (real Office renderer):
+  // every variant below scored under the graphic-parity floor against its own
+  // on-screen build, so its hand-written OOXML no longer describes the current
+  // design. They take the layered route (design-exact plate + measured native
+  // text + decomposed native paint), which re-scored at ~0.99 parity while
+  // staying editable in PowerPoint.
+  "MV-BENTO-5",
+  "MV-BENTO-6",
+  "MV-BENTO-7",
+  "MV-BENTO-8",
+  "MV-BENTO-VALUE-CLOSE",
+  "MV-CASE-LOGO-GRID",
+  "MV-CASE-METRICS",
+  "MV-CASE-SPREAD",
+  "MV-CLIENT-DETAIL-3",
+  "MV-CLIENT-MATRIX",
+  "MV-COMM-INVESTMENT",
+  "MV-COMM-PRICING",
+  "MV-COMPARE-SLIDER",
+  "MV-COMPARE-VS-LISTS",
+  "MV-DASH-BREAKDOWN",
+  "MV-DASH-DONUT-TRIO",
+  "MV-DASH-GAUGE-ROW",
+  "MV-DASH-GROWTH-COLUMNS",
+  "MV-DASH-REGION-STATS",
+  "MV-DASH-REPORT-CARDS",
+  "MV-DASH-SALES-CHART",
+  "MV-DASH-SUMMARY",
+  "MV-DEC-COMPARE-TABLE",
+  "MV-DEC-MATRIX",
+  "MV-FUNNEL",
+  "MV-GOV-RACI",
+  "MV-GRAPH-AREA-STACK",
+  "MV-GRAPH-AXIS-BARS",
+  "MV-GRAPH-BUBBLE",
+  "MV-GRAPH-DUAL-DONUT",
+  "MV-GRAPH-HEATMAP",
+  "MV-GRAPH-PERCENT-COMPARE",
+  "MV-GRAPH-RINGS",
+  "MV-GRAPH-STACKED-BAR",
+  "MV-GRAPH-TASK-CARDS",
+  "MV-GRAPH-TREEMAP",
+  "MV-GRAPH-WATERFALL",
+  "MV-HORIZON",
+  "MV-ICEBERG",
+  "MV-IMG-BEFORE-AFTER",
+  "MV-IMG-MATRIX-4",
+  "MV-IMG-MATRIX-6",
+  "MV-IMG-STRIP",
+  "MV-INFO-BAR-COMPARE",
+  "MV-INFO-CIRCULAR-FLOW",
+  "MV-INFO-DONUT",
+  "MV-INFO-FUNNEL",
+  "MV-INFO-HUB-PILL-ORBIT",
+  "MV-INFO-VENN",
+  "MV-JOURNEY-MAP",
+  "MV-LOGO-WALL",
+  "MV-MATRIX-2X2",
+  "MV-MATURITY-CURVE",
+  "MV-NUMBERS-TRIPTYCH",
+  "MV-OP-COVER-EDITORIAL",
+  "MV-OP-COVER-GRADIENT",
+  "MV-OP-COVER-GRID",
+  "MV-OP-COVER-MONOGRAM",
+  "MV-OP-COVER-SPLIT",
+  "MV-OP-COVER-STACKED",
+  "MV-OP-DIVIDER-NUMBERED",
+  "MV-PRINCIPLES",
+  "MV-PROC-BEFORE-AFTER",
+  "MV-PROC-LAYER-STACK",
+  "MV-PROC-PLATFORM-LOOP",
+  "MV-PROC-PROOF-PAIRS",
+  "MV-RISK-MITIGATION",
+  "MV-SOL-ARCHITECTURE",
+  "MV-SPLIT-MANIFESTO",
+  "MV-TIMELINE-VERTICAL",
 ];
 
 const DRIFTED_SET = new Set<string>(DRIFTED_NATIVE_RENDERER_IDS);
 
+const NATIVE_VIZ_CHART_SET = new Set<string>(NATIVE_VIZ_VARIANT_IDS);
+
 /**
- * True when the exporter can rebuild this variant natively (or already embeds a
- * vector for it, as with the spec-driven MV-VIZ-* infographics).
+ * True when the exporter can rebuild this variant natively.
+ *
+ * MV-VIZ-* used to short-circuit to `true` on the assumption that the embedded
+ * spec vector already matched the build. The Sept 2026 Office sweep disproved
+ * that (0.55–0.87 graphic parity in light, large ink deltas in dark), so the
+ * spec charts now take the layered route like any other drifted renderer.
  */
 export function hasNativeVariantEmitter(variantId: string | undefined | null): boolean {
   if (!variantId) return false;
-  if (variantId.startsWith("MV-VIZ-")) return true;
   if (DRIFTED_SET.has(variantId)) return false;
+  // MV-VIZ-* kinds PowerPoint can draw as a real chart (waterfall, stacked
+  // area, radar, slope/bump, gauge grid) export as native `addChart` objects
+  // with an embedded worksheet, so they must not be fused into a plate. The
+  // remaining viz kinds (sankey, treemap, sunburst, chord, calendar heatmap,
+  // market map, beeswarm, dumbbell, gantt, boxplot, radial bar) have no native
+  // PowerPoint chart type and keep the design-exact vector plate.
+  if (NATIVE_VIZ_CHART_SET.has(variantId)) return true;
   return NATIVE_SET.has(variantId);
 }
+
 
 /**
  * True when the variant can only look right as a design-exact graphic plate
