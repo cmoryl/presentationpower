@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { ImportedFaithfulSlide } from "@/components/slide/ImportedFaithfulSlide";
+import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { MappedSlide } from "@/lib/pptx-mapping";
