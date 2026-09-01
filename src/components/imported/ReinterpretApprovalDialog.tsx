@@ -378,7 +378,10 @@ export function ReinterpretApprovalDialog({
       applyApprovedPlans(rawMapped, plans, approved, styleVariantIds, styleByIndex, forcedLayouts),
       controls.lock,
       overrides,
-    );
+    ).map((m) => {
+      const p = authored[m.source.index];
+      return p ? ({ ...m, ...applyCustomModuleProposal(m, p) } as LockedSlide) : m;
+    });
 
     onApprove(designed, {
       approved: approved.size,
