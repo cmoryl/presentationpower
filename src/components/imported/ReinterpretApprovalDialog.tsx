@@ -29,6 +29,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { GroundingCitations } from "@/components/GroundingCitations";
+import { SlideAccuracyScore } from "@/components/imported/SlideAccuracyScore";
 import { ReinterpretComparePreview } from "@/components/imported/ReinterpretComparePreview";
 import { ReinterpretCopyDiff } from "@/components/imported/ReinterpretCopyDiff";
 import { ORIGIN_LABEL, explainDesign } from "@/lib/reinterpret-explain";
@@ -719,6 +720,9 @@ export function ReinterpretApprovalDialog({
                         )}
 
                         <div className="mt-3 text-xs italic text-black/45">{p.rationale}</div>
+                        {designedSlide && (
+                          <SlideAccuracyScore slide={designedSlide} className="mt-2" />
+                        )}
                         {designedSlide?.coverage && designedSlide.coverage.total > 0 && (
                           <details className="mt-2 rounded-lg border border-black/10 bg-white/70 px-3 py-2">
                             <summary className="cursor-pointer list-none text-[11px] uppercase tracking-wider text-black/50">
