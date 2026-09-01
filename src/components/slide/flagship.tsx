@@ -792,6 +792,18 @@ export function GlassTile({
       className={`relative ${padding} ${className}`}
       style={{ ...surface, border: undefined, borderBottomColor: undefined, ...style }}
     >
+      {/* Frosting, as its own masked layer so the blur fades out with the wash
+          instead of re-drawing a hard rectangle at the bottom edge. */}
+      <div
+        aria-hidden
+        data-decorative
+        className="pointer-events-none absolute inset-0"
+        style={{
+          borderRadius: `var(--pack-card-radius, ${r}px)`,
+          backdropFilter: isDark ? "blur(20px) saturate(150%)" : "blur(6px)",
+          ...openBottomMaskStyle(),
+        }}
+      />
       {/* Hairline ring — edgeless packs set `--pack-card-border: none`, which
           removes it everywhere at once. */}
       <div
