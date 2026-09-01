@@ -1343,7 +1343,10 @@ registerSlideModule({
         // never get clipped, and vertical padding for stage-label + note lines.
         const PAD_X = 200;
         const PAD_TOP = 90;
-        const PAD_BOT = 110;
+        // Bottom padding carries the axis baseline, the wrapped note band and
+        // the axis kicker. 110 put the first note straight through the "Low"
+        // frame label and the "You are here" badge.
+        const PAD_BOT = 152;
         const W = 1760;
         const H = 520;
         const curveId = `mc-fill-${variant.id}`;
@@ -1506,7 +1509,7 @@ registerSlideModule({
                           <text
                             key={li}
                             x={noteX}
-                            y={H - PAD_BOT + 40 + li * 22}
+                            y={H - PAD_BOT + 58 + li * 22}
                             textAnchor={anchor}
                             fontSize={16}
                             fill={ink.muted}
@@ -1515,10 +1518,12 @@ registerSlideModule({
                           </text>
                         ))}
                       {current && (
+                        // Low-sitting nodes are close to the baseline and the
+                        // note band, so the badge flips above its stage label.
                         <text
                           x={p.x}
-                          y={p.y + 44}
-                          textAnchor="middle"
+                          y={p.y > PAD_TOP + (H - PAD_TOP - PAD_BOT) * 0.55 ? p.y - 70 : p.y + 44}
+                          textAnchor={anchor}
                           fontSize={13}
                           fontWeight={700}
                           fill={accent}
@@ -1527,6 +1532,7 @@ registerSlideModule({
                           You are here
                         </text>
                       )}
+
                     </g>
                   );
                 })}
