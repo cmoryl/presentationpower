@@ -62,6 +62,10 @@ export function useClientWallPool(brandModeId: string | undefined): LogoFiller[]
         rest.push(filler);
       }
     }
-    return [...primary, ...rest];
+    const pool = [...primary, ...rest];
+    // Prime the module-level cache so synchronous builders (import
+    // reinterpretation, deck seeds) can use REAL client marks too.
+    primeClientWallPool(pool);
+    return pool;
   }, [data, brandModeId]);
 }
