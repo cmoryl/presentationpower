@@ -20,6 +20,8 @@ import { bentoSiblingFor, toBentoValueClose } from "./style-variant-swaps";
 import type { SlideContent } from "./deck-store";
 import type { MappedSlide } from "./pptx-mapping";
 import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
+import { getApprovedLogoItems } from "./approved-logos";
+
 
 // ── signals ──────────────────────────────────────────────────────────────
 
