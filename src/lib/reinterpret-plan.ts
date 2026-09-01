@@ -11,7 +11,11 @@
 //  3. every slide the reviewer rejects reverts to the source copy + heuristic
 //     layout, so an unapproved plan can never reach a deck.
 
-import { DESIGN_CATALOG, designReinterpretedDeck } from "./reinterpret-design";
+import {
+  DESIGN_CATALOG,
+  completeCoverage,
+  designReinterpretedDeck,
+} from "./reinterpret-design";
 import type { MappedSlide } from "./pptx-mapping";
 
 export type AiSlidePlan = {
@@ -164,9 +168,13 @@ export function applyApprovedPlans(
     styleVariantIdsByIndex,
   });
 
+  // Author continuation pages for anything the chosen layouts could not hold,
+  // so every imported line lands on a designed canvas.
+  const covered = completeCoverage(designed, { styleVariantIds, styleVariantIdsByIndex });
+
   // Carry the reviewer-visible rationale onto the slide so the deck records
   // why each page looks the way it does.
-  return designed.map((m) => {
+  return covered.map((m) => {
     const p = byIndex.get(m.source.index);
     if (!p) return m;
     return { ...m, rationale: `${m.rationale} · ${p.rationale}` };
@@ -179,5 +187,8 @@ export function baselineReinterpretation(
   styleVariantIds?: string[],
   styleVariantIdsByIndex?: Record<number, string[]>,
 ): MappedSlide[] {
-  return designReinterpretedDeck(mapped, { styleVariantIds, styleVariantIdsByIndex });
+  return completeCoverage(
+    designReinterpretedDeck(mapped, { styleVariantIds, styleVariantIdsByIndex }),
+    { styleVariantIds, styleVariantIdsByIndex },
+  );
 }

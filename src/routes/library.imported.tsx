@@ -517,9 +517,10 @@ function DeckSlides({
     try {
       // Accepted visual conversions apply to every build path, including the
       // AI-reinterpretation plan the approval dialog hands back pre-mapped.
-      const mapped = preMapped
+      const mappedPrimary = preMapped
         ? applyVisualOverrides(preMapped, visualOverrides)
         : mapStoredImportedDeck(deck, { reinterpret, visualOverrides });
+      const mapped = flattenContinuations(mappedPrimary);
       if (mapped.length === 0) {
         toast.error("This deck has no parsed slides to convert.");
         return;
