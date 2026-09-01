@@ -857,17 +857,23 @@ export function moduleCardSurface(
   // `--pack-card-*` lets an alternate style pack redress every module card
   // without touching the modules themselves; with no pack active the fallback
   // is the canonical house surface.
+  // The neutral base tint fades on the SAME curve as the accent wash, so the
+  // whole surface — not just the colour — reaches 0 opacity before the bottom
+  // edge. A flat base fill was what kept module boxes reading as closed
+  // rectangles even though the wash faded.
+  const baseFill = isDark ? cardBaseGradient("10,8,48", 0.18) : cardBaseGradient("255,255,255", 0.1);
   return {
-    // Base tint is a whisper — the wash carries the colour, so the box never
-    // reads as a filled rectangle sitting on the ground.
-    background: `var(--pack-card-bg, ${isDark ? "rgba(10, 8, 48, 0.18)" : "rgba(255,255,255,0.10)"})`,
-    backgroundImage: `var(--pack-card-bg-image, ${cardWashGradient(line)})`,
+    background: "var(--pack-card-bg, transparent)",
+    backgroundImage: `var(--pack-card-bg-image, ${cardWashGradient(line)}, ${baseFill})`,
     border: `var(--pack-card-border, 1px solid ${t.ring})`,
     // No frame along the bottom edge — the card gradient fades into the ground
     // rather than closing into a box.
     borderBottomColor: "var(--pack-card-border-bottom-color, transparent)",
     borderRadius: `var(--pack-card-radius, ${radius}px)`,
-    backdropFilter: `var(--pack-card-blur, ${isDark ? "blur(20px) saturate(150%)" : "blur(6px)"})`,
+    // No blanket backdrop blur: a backdrop filter cannot fade, so it re-draws
+    // the rectangle the wash just dissolved. Frosting is applied as its own
+    // masked layer where a module wants it (see `GlassTile`).
+    backdropFilter: "var(--pack-card-blur, none)",
     boxShadow: "var(--pack-card-shadow, none)",
     clipPath: "var(--pack-card-clip, none)",
     position: "relative",
