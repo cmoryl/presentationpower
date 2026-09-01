@@ -125,50 +125,50 @@ export const AMBIENT_ALPHA = 0.18;
 
 // -----------------------------------------------------------------------------
 // The CANONICAL module-card glass — byte-locked mirror of `moduleCardSurface`
-// in `flagship.tsx` (which is itself built from `accent-tokens.ts`).
+// in `flagship.tsx` (which is itself built from `surface-tokens.ts`).
 // -----------------------------------------------------------------------------
 // `getSurfaceTreatment` above approximates a card by darkening whatever flat
 // fill a module renderer happened to pick. That is a guess, and it is why the
 // exported pyramid bars / stat tiles / graph frames read as plain boxes next to
 // the build: on screen every one of those is the SAME accent glass panel.
 //
-// The stops below are the same numbers the renderer paints:
+// One recipe, both modes (light and dark differ in alpha, never structure):
 //
-//   light  `accentTokens().panelGradient`
-//          linear-gradient(180deg, accent@26% 0%, accent@12% 34%,
-//                          white@60% 74%, white@0% 100%)
-//   dark   background      rgba(10, 8, 48, 0.22)
-//          backgroundImage `accentTokens().wash` (accent@14% top-left → clear)
-//          border          1px solid accent@30%
+//   background      light rgba(255,255,255,0.10) · dark rgba(10,8,48,0.18)
+//   backgroundImage `cardWashGradient(accent)` — accent@13% 0% → accent@4% 46%
+//                   → transparent 88% (FADE_STOPS in `surface-tokens.ts`)
+//   border          1px solid accent ring, bottom edge transparent
 //
 // Emitted as native gradient stops with per-stop alpha, a native hairline and a
 // native ambient shadow, so the card stays fully editable in PowerPoint.
 export const GLASS_CARD_TOKENS = {
+  /** Shared wash stops — mirror of `FADE_STOPS` in `surface-tokens.ts`. */
+  wash: [
+    { at: 0, alpha: 0.13 },
+    { at: 46, alpha: 0.04 },
+    { at: 88, alpha: 0 },
+    { at: 100, alpha: 0 },
+  ],
   light: {
-    /** `panelGradient` stops: [alpha, position, colour]. */
-    stops: [
-      { at: 0, alpha: 0.26, white: false },
-      { at: 34, alpha: 0.12, white: false },
-      { at: 74, alpha: 0.6, white: true },
-      { at: 100, alpha: 0, white: true },
-    ],
+    /** `rgba(255,255,255,0.10)` base fill. */
+    base: "FFFFFF",
+    baseAlpha: 0.1,
     /** `ACCENT_ALPHA.light.ring`. */
     ringAlpha: 0.32,
     /** `backdrop-filter: blur(6px)`. */
     backdropBlurPx: 6,
   },
   dark: {
-    /** `rgba(10, 8, 48, 0.22)` base fill. */
+    /** `rgba(10, 8, 48, 0.18)` base fill. */
     base: "0A0830",
-    baseAlpha: 0.22,
-    /** `ACCENT_ALPHA.dark.wash` — the accent bloom at the top of the tile. */
-    washAlpha: 0.14,
+    baseAlpha: 0.18,
     /** `ACCENT_ALPHA.dark.ring`. */
     ringAlpha: 0.3,
     /** `backdrop-filter: blur(20px) saturate(150%)`. */
     backdropBlurPx: 20,
   },
 } as const;
+
 
 /** White, for the light panel's lower stops. */
 const GLASS_LIGHT_STOP = "FFFFFF";
@@ -195,40 +195,16 @@ export function getGlassTreatment(opts: {
   const dark = !!opts.dark;
   const T = dark ? GLASS_CARD_TOKENS.dark : GLASS_CARD_TOKENS.light;
 
-  const gradient: SurfaceGradient = dark
-    ? {
-        angleDeg: 180,
-        stops: [
-          // The accent bloom sits at the top of the tile and clears by ~64%,
-          // matching the renderer's radial wash over the navy base.
-          {
-            color: mixHex(GLASS_CARD_TOKENS.dark.base, accent, 0.75),
-            pos: 0,
-            alpha: Math.min(
-              0.85,
-              (GLASS_CARD_TOKENS.dark.baseAlpha + GLASS_CARD_TOKENS.dark.washAlpha) * e,
-            ),
-          },
-          {
-            color: GLASS_CARD_TOKENS.dark.base,
-            pos: 64,
-            alpha: Math.min(0.85, GLASS_CARD_TOKENS.dark.baseAlpha * e),
-          },
-          {
-            color: GLASS_CARD_TOKENS.dark.base,
-            pos: 100,
-            alpha: Math.min(0.85, GLASS_CARD_TOKENS.dark.baseAlpha * e * 0.85),
-          },
-        ],
-      }
-    : {
-        angleDeg: 180,
-        stops: GLASS_CARD_TOKENS.light.stops.map((s) => ({
-          color: s.white ? GLASS_LIGHT_STOP : accent,
-          pos: s.at,
-          alpha: Math.min(1, s.alpha * (s.white ? 1 : e)),
-        })),
-      };
+  // ONE structure for both modes: base tint + the shared accent wash that
+  // fades to 0 by 88%, so the tile melts into the ground exactly as on screen.
+  const gradient: SurfaceGradient = {
+    angleDeg: 180,
+    stops: GLASS_CARD_TOKENS.wash.map((s) => ({
+      color: s.alpha > 0 ? mixHex(T.base, accent, Math.min(0.85, s.alpha * 5)) : T.base,
+      pos: s.at,
+      alpha: Math.min(0.85, (T.baseAlpha + s.alpha * e) * (s.at >= 88 ? 0.35 : 1)),
+    })),
+  };
 
   const ringAlpha = Math.min(0.85, (dark ? T.ringAlpha : GLASS_CARD_TOKENS.light.ringAlpha) * e);
   const dropTokens = dark ? SURFACE_CSS_TOKENS.dark : SURFACE_CSS_TOKENS.light;
@@ -240,6 +216,7 @@ export function getGlassTreatment(opts: {
     fill: dark
       ? mixHex(SURFACE_CSS_TOKENS.dark.gradientBottom, accent, 0.16)
       : mixHex(GLASS_LIGHT_STOP, accent, 0.12 * e),
+
     gradient,
     line: {
       color: accent,

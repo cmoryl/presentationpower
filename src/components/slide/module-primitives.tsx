@@ -1662,38 +1662,28 @@ export function Card({
   // Bare-surface skins (e.g. Organic Systems S21) render copy directly on the
   // ground — no translucent fill, ring, glow, or seam around the content.
   const bare = useStylePack()?.card.bg === "transparent";
-  const cardBg = bare ? "transparent" : isDark ? "rgba(255,255,255,0.03)" : "rgba(10,15,28,0.02)";
-  const cardRing = isDark ? "rgba(255,255,255,0.10)" : "rgba(10,15,28,0.08)";
   const bodyColor = isDark ? "rgba(255,255,255,0.72)" : "rgba(10,15,28,0.68)";
   const titleColor = ink.strong;
+  // One surface for every module box: the canonical top-lit wash that fades to
+  // 0 opacity before the bottom edge. No hand-rolled fills here.
+  const surface = moduleCardSurface(brand.tokens.accent, mode, { radius: 24 });
   return (
     <div
-      className="relative flex flex-col overflow-hidden rounded-3xl p-10"
-      style={
-        bare
-          ? { background: "transparent" }
-          : {
-              background: cardBg,
-              // Open-bottom frame: the hairline wraps the top and sides only, so the
-              // card's gradient fades out into the ground instead of being boxed in.
-              borderTop: `1px solid ${cardRing}`,
-              borderLeft: `1px solid ${cardRing}`,
-              borderRight: `1px solid ${cardRing}`,
-              borderBottom: "1px solid transparent",
-              backgroundImage: `radial-gradient(120% 90% at 0% 0%, ${brand.tokens.accent}${isDark ? "18" : "0C"} 0%, transparent 62%)`,
-            }
-      }
+      className="relative flex flex-col overflow-hidden p-10"
+      style={bare ? { background: "transparent" } : surface}
     >
       {/* Top accent bar — the signature seam of a keynote card. */}
       {!bare && (
         <div
           aria-hidden
-          className="absolute inset-x-0 top-0 h-[3px]"
+          className="absolute inset-x-0 top-0"
           style={{
+            height: SEAM_HEIGHT_PX,
             background: `linear-gradient(90deg, ${accentInk(brand.tokens.accent, mode, 3)} 0%, ${hexA(accentInk(brand.tokens.accent, mode, 3), 0.0)} 80%)`,
           }}
         />
       )}
+
       <div className="flex items-start justify-between">
         <SlideNumeral value={index} sizePx={44} color={accentInk(brand.tokens.accent, mode, 4.5)} />
         <IconBadge
