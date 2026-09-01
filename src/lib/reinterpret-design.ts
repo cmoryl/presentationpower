@@ -1276,11 +1276,14 @@ export function designReinterpretedDeck(
       if (style && style.size > 0) score += style.has(d.variantId) ? 7 : -3;
       // Imported photography must land somewhere: when the source page carries
       // pictures, favour a look with real image slots over a text-only one.
-      if (g.images.length > 0) {
+      // Copy coverage still outranks it, so a bullet-dense page is never pushed
+      // onto a picture layout that would strand its lines in the notes.
+      if (g.images.length > 0 && g.bullets.length <= 4) {
         const slots =
           (variantSupportsImagery(d.variantId) ? 1 : 0) + variantItemImageCapacity(d.variantId);
         score += slots > 0 ? Math.min(6, 3 + Math.min(3, Math.min(slots, g.images.length) - 1)) : -4;
       }
+
 
       // Capacity pressure: among otherwise comparable looks, prefer the one
       // that actually holds more of the source copy on the canvas.
