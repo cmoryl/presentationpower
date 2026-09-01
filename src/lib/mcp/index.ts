@@ -24,6 +24,8 @@ import buildDeck from "./tools/build-deck";
 import auditDeckVisuals from "./tools/audit-deck-visuals";
 import auditDeckCompleteness from "./tools/audit-deck-completeness";
 import exportDeck from "./tools/export-deck";
+import authorCustomModule from "./tools/author-custom-module";
+
 
 // The OAuth issuer must be the direct Supabase host; the project ref is the one
 // value that survives publish unchanged.
