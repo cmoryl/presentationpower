@@ -19,7 +19,11 @@ import { MODULE_FAMILIES, MODULE_VARIANTS, byId } from "./taxonomy";
 import { bentoSiblingFor, toBentoValueClose } from "./style-variant-swaps";
 import type { SlideContent } from "./deck-store";
 import type { MappedSlide } from "./pptx-mapping";
-import { variantSupportsImagery, normalizeSlideMedia } from "./variant-media";
+import {
+  variantSupportsImagery,
+  variantItemImageCapacity,
+  normalizeSlideMedia,
+} from "./variant-media";
 import { getApprovedLogoItems } from "./approved-logos";
 
 
@@ -1001,8 +1005,38 @@ function finalize(
     if (variantSupportsImagery(variant.id) && !merged.mediaUrl) merged.mediaUrl = images[0];
     if (typeof prev.mediaPath === "string" && merged.mediaUrl === images[0])
       merged.mediaPath = prev.mediaPath;
-    merged.extraImages = images.slice(merged.mediaUrl ? 1 : 0);
+    let pool = images.slice(merged.mediaUrl ? 1 : 0);
+
+    // Tile layouts (grids, strips, matrices) draw imagery from `items[].mediaUrl`.
+    // Fill those slots with the imported pictures so an image-forward page shows
+    // the deck's own photography instead of generated placeholders.
+    const tiles = variantItemImageCapacity(variant.id);
+    if (tiles > 0 && pool.length) {
+      const existing = Array.isArray(merged.items) ? (merged.items as Record<string, unknown>[]) : [];
+      const count = Math.min(tiles, Math.max(existing.length, pool.length));
+      const items: Record<string, unknown>[] = [];
+      for (let i = 0; i < count; i++) {
+        const it = { ...(existing[i] ?? {}) };
+        if (!it.mediaUrl && pool[i]) it.mediaUrl = pool[i];
+        items.push(it);
+      }
+      // Keep any extra authored items beyond the media slots untouched.
+      merged.items = [...items, ...existing.slice(count)];
+      pool = pool.slice(count);
+    }
+
+    // Before/after panels carry their own picture each.
+    if (Array.isArray(merged.panels) && pool.length) {
+      merged.panels = (merged.panels as Record<string, unknown>[]).map((p) => {
+        const panel = { ...((p.panel as Record<string, unknown>) ?? {}) };
+        if (!panel.mediaUrl && pool.length) panel.mediaUrl = pool.shift();
+        return { ...p, panel };
+      });
+    }
+
+    merged.extraImages = pool;
   }
+
 
   const sourceBullets = (base.source.bullets ?? []).map((b) => (b ?? "").trim()).filter(Boolean);
   const haystack = norm(collectStrings(merged).join(" ⋄ "));
@@ -1240,6 +1274,17 @@ export function designReinterpretedDeck(
       if (fam && fam === FAMILY_OF[last ?? ""]) score -= 3;
       score -= Math.min(4, usedCount.get(d.variantId) ?? 0);
       if (style && style.size > 0) score += style.has(d.variantId) ? 7 : -3;
+      // Imported photography must land somewhere: when the source page carries
+      // pictures, favour a look with real image slots over a text-only one.
+      // Copy coverage still outranks it, so a bullet-dense page is never pushed
+      // onto a picture layout that would strand its lines in the notes.
+      if (g.images.length > 0 && g.bullets.length <= 4) {
+        const slots =
+          (variantSupportsImagery(d.variantId) ? 1 : 0) + variantItemImageCapacity(d.variantId);
+        score += slots > 0 ? Math.min(6, 3 + Math.min(3, Math.min(slots, g.images.length) - 1)) : -4;
+      }
+
+
       // Capacity pressure: among otherwise comparable looks, prefer the one
       // that actually holds more of the source copy on the canvas.
       const cells = Array.isArray((content as { items?: unknown[] }).items)
