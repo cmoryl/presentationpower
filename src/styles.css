@@ -21,15 +21,22 @@
     border-color: var(--color-border);
   }
 
-  html,
-  body {
+  /* Only the root element gets overflow/overscroll rules. Setting them on
+     <body> too turns the body into its own scroll container, and with
+     `overscroll-behavior-y: none` on it the wheel could no longer chain out to
+     the document — pages looked frozen to the mouse while JS scrolling worked. */
+  html {
     overflow-x: hidden;
-    /* Stop iOS auto-inflating type in landscape and rubber-banding the page
-       behind fixed app chrome. */
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
     overscroll-behavior-y: none;
   }
+
+  html,
+  body {
+    /* Stop iOS auto-inflating type in landscape. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
 
   /* Touch devices: no grey flash on tap, and honour the notch/home-indicator
      insets declared by viewport-fit=cover. */
