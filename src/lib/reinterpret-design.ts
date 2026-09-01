@@ -1313,3 +1313,96 @@ export function designReinterpretedDeck(
     );
   });
 }
+
+// ── Full content coverage ──────────────────────────────────────────────────
+// Native layouts hold a fixed number of cells, so a 13-line source slide never
+// fits one page. Instead of parking the remainder in speaker notes, we design
+// continuation pages in our own look until every imported line sits on a
+// canvas. Continuations hang off the parent so the review UI keeps its 1:1
+// keying by source index; `flattenContinuations` expands them at build time.
+
+const MAX_CONTINUATIONS = 3;
+
+function continuationTitle(title: string | undefined, round: number): string {
+  const base = (title || "Continued").trim();
+  return round === 0 ? `${base} (cont.)` : `${base} (cont. ${round + 1})`;
+}
+
+export function completeCoverage(
+  designed: MappedSlide[],
+  opts: DesignOptions = {},
+  maxContinuations = MAX_CONTINUATIONS,
+): MappedSlide[] {
+  return designed.map((m) => {
+    const dropped0 = (m.coverage?.dropped ?? []).filter(Boolean);
+    if (dropped0.length === 0 || m.canvasBlocks?.length) return m;
+
+    const continuations: MappedSlide[] = [];
+    let remaining = dropped0;
+
+    for (let round = 0; round < maxContinuations && remaining.length > 0; round++) {
+      const synth: MappedSlide = {
+        ...m,
+        coverage: undefined,
+        continuations: undefined,
+        source: {
+          ...m.source,
+          title: continuationTitle(m.source.title, round),
+          bullets: remaining,
+          images: [],
+          charts: [],
+          tables: [],
+          diagrams: [],
+          notes: "",
+        },
+      };
+      // designReinterpretedDeck leaves the first entry of a deck as mapped, so
+      // pass the parent as a sacrificial lead-in and read the second result —
+      // this also gives the continuation variety pressure against the parent.
+      const out = designReinterpretedDeck([m, synth], {
+        styleVariantIds: opts.styleVariantIds,
+        styleVariantIdsByIndex: opts.styleVariantIdsByIndex,
+      });
+      const next = out[1];
+      // No coverage means no builder took the copy (the slide was kept as
+      // mapped, i.e. a duplicate of the parent) — stop rather than repeat.
+      if (!next || !next.coverage) break;
+      continuations.push(next);
+      const nextDropped = (next.coverage.dropped ?? []).filter(Boolean);
+      if (nextDropped.length >= remaining.length) break; // no progress
+      remaining = nextDropped;
+    }
+
+    if (continuations.length === 0) return m;
+
+    const haystack = norm(
+      collectStrings([m.content, ...continuations.map((c) => c.content)]).join(" ⋄ "),
+    );
+    const total = m.coverage?.total ?? dropped0.length;
+    const stillDropped = dropped0.filter((b) => !isCovered(b, haystack));
+    const priorNotes = (m.source.notes ?? "").split(OVERFLOW_HEADER)[0].trimEnd();
+    const notes = stillDropped.length
+      ? [priorNotes, `${OVERFLOW_HEADER}\n${stillDropped.map((d) => `• ${d}`).join("\n")}`]
+          .filter(Boolean)
+          .join("\n\n")
+      : priorNotes;
+
+    return {
+      ...m,
+      source: { ...m.source, notes },
+      coverage: { used: total - stillDropped.length, total, dropped: stillDropped },
+      continuations,
+    };
+  });
+}
+
+/** Expand designed slides + their continuation pages into a flat deck order. */
+export function flattenContinuations(slides: MappedSlide[]): MappedSlide[] {
+  const out: MappedSlide[] = [];
+  for (const m of slides) {
+    const { continuations, ...rest } = m;
+    out.push(rest as MappedSlide);
+    for (const c of continuations ?? []) out.push({ ...c, continuations: undefined });
+  }
+  return out;
+}
