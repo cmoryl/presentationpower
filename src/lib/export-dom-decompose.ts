@@ -410,15 +410,29 @@ function panelFadeShape(
   const opacity = parseFloat(cs.opacity);
   const mul = Number.isFinite(opacity) ? opacity : 1;
   const frosted = hasUnexpressibleSurface(cs);
+  // An OPAQUE wash is artwork, not a glass card: the monogram cover tile is a
+  // full-strength radial plate, and running it through the fade recipe replaced
+  // a solid tile with a pale rounded panel on export. Opaque, non-frosted washes
+  // therefore stay on the design-exact plate; only translucent panels (real
+  // glass cards, tinted stat boxes) are rebuilt as editable rounded rectangles.
+  if (!frosted && tint.alpha * mul >= 0.9) return null;
   // Glass surfaces read as a translucent veil on screen; opaque solids keep
   // their weight. Either way the panel fades OUT toward the bottom edge, the
   // same recipe the on-screen card uses.
-  const top = Math.max(0.06, Math.min(1, (frosted ? Math.min(tint.alpha, 0.32) : tint.alpha) * mul));
+  //
+  // Brand-tint ceiling: PowerPoint composites a flat alpha over the plate with
+  // none of the browser's blur/blend softening, so a card authored at 0.26 blue
+  // exported as a distinctly blue box while the build reads almost white. Cards
+  // therefore ship at a capped tint and truly fade to zero.
+  const raw = frosted ? Math.min(tint.alpha, 0.32) : tint.alpha;
+  const top = Math.max(0.05, Math.min(0.16, raw * mul));
+
   const stops = [
     { pos: 0, color: { hex: tint.hex, alpha: top } },
-    { pos: 0.55, color: { hex: tint.hex, alpha: top * 0.42 } },
+    { pos: 0.55, color: { hex: tint.hex, alpha: top * 0.3 } },
     { pos: 1, color: { hex: tint.hex, alpha: 0 } },
   ];
+
 
   return {
     // 180deg in this module's convention = paint runs top → bottom.
@@ -649,6 +663,19 @@ function effectShapeFor(
   const h = r.height * sy;
   if (w < MIN_SIDE_PX || h < MIN_SIDE_PX) return null;
   if (w > spaceW * 1.5 || h > spaceH * 1.5) return null;
+  // Aurora orbs and glow planes: an SVG stand-in cannot reproduce the browser's
+  // blur + blend, and it exported as a hard alpha circle floating over the
+  // artwork. Large diffuse decor stays on the pixel-exact plate instead.
+  if (isDiffuseDecor(el, cs, w, h)) return null;
+  if (
+    (el.textContent ?? "").trim().length === 0 &&
+    w * h > spaceW * spaceH * 0.16 &&
+    (parseFloat(cs.filter?.match(/blur\(([\d.]+)px\)/)?.[1] ?? "0") > 8 ||
+      (cs.mixBlendMode && cs.mixBlendMode !== "normal"))
+  ) {
+    return null;
+  }
+
 
   const { fill, gradient } = paintOf(cs);
   const radiusPx = radiusOf(cs, w, h);
@@ -956,8 +983,27 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         cs.borderRadius.includes("50%") ||
         (radiusPx >= Math.min(w, h) / 2 - 0.5 && Math.abs(w - h) < Math.max(2, w * 0.06));
 
+      // Brand-tint ceiling for translucent CARD paint. On screen a tinted card
+      // sits behind a blurred glass surface and reads almost white; PowerPoint
+      // composites the same alpha flat over the artwork plate, which turned
+      // module boxes into visibly blue panels. Bounded translucent panels are
+      // therefore scaled to a capped tint (opaque artwork is untouched).
+      const CARD_TINT_CEILING = 0.16;
+      const panelLike = w >= 48 && h >= 32 && !(w > spaceW * 0.94 && h > spaceH * 0.94);
+      const peakAlpha = Math.max(
+        fill ? fill.alpha : 0,
+        ...(gradient ? gradient.stops.map((s) => s.color.alpha) : [0]),
+      );
+      const tintScale =
+        panelLike && peakAlpha > CARD_TINT_CEILING && peakAlpha < 0.9
+          ? CARD_TINT_CEILING / peakAlpha
+          : 1;
+
       const withAlpha = (c: DomColor | null): DomColor | null =>
-        c ? { hex: c.hex, alpha: Math.max(0, Math.min(1, c.alpha * alphaMul)) } : null;
+        c
+          ? { hex: c.hex, alpha: Math.max(0, Math.min(1, c.alpha * alphaMul * tintScale)) }
+          : null;
+
 
       shapes.push({
         kind: isEllipse ? "ellipse" : radiusPx >= 1 ? "roundRect" : "rect",

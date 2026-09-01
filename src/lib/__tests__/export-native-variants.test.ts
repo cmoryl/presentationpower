@@ -29,16 +29,20 @@ describe("native variant coverage", () => {
   });
 
   it("plates only variants without a native emitter (editable-first)", () => {
-    expect(hasNativeVariantEmitter("MV-VIZ-SANKEY")).toBe(true);
+    expect(hasNativeVariantEmitter("MV-VIZ-SANKEY")).toBe(false);
     expect(hasNativeVariantEmitter("MV-FLYWHEEL")).toBe(true);
     expect(needsGraphicPlate("MV-INFO-HUB-SATELLITES")).toBe(true);
     expect(needsGraphicPlate("MV-LOC-WORLD-PINS")).toBe(true);
     // Anything with a native emitter must stay fully editable — no fused plate.
     expect(needsGraphicPlate("MV-FLYWHEEL")).toBe(false);
-    expect(needsGraphicPlate("MV-OP-COVER-SPLIT")).toBe(false);
-    expect(needsGraphicPlate("MV-BENTO-5")).toBe(false);
-    expect(needsGraphicPlate("MV-VIZ-SANKEY")).toBe(false);
+    expect(needsGraphicPlate("MV-CASE-STORY")).toBe(false);
+    expect(needsGraphicPlate("MV-VIZ-SANKEY")).toBe(true);
     expect(needsGraphicPlate(null)).toBe(false);
+    // …while variants whose hand-written OOXML drifted from the build take the
+    // design-exact layered route instead.
+    expect(needsGraphicPlate("MV-OP-COVER-SPLIT")).toBe(true);
+    expect(needsGraphicPlate("MV-BENTO-5")).toBe(true);
+
   });
 
   it("routes drifted close-family renderers to the layered plate", () => {
