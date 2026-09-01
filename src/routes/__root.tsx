@@ -10,7 +10,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -194,10 +194,17 @@ function RootComponent() {
 
   // Single global auth listener: keeps router/cache in sync and makes any
   // sign-out (including one triggered in another tab) land on the login page.
+  //
+  // Supabase re-emits SIGNED_IN on every silent token refresh and on tab focus.
+  // Invalidating the router on those emits fires a router render event, which
+  // makes scroll restoration snap the page back to the top mid-read. So we only
+  // invalidate when the signed-in identity actually changes.
+  const lastIdentity = useRef<string | null>(null);
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       if (event === "SIGNED_OUT") {
+        lastIdentity.current = null;
         queryClient.clear();
         if (
           typeof window !== "undefined" &&
@@ -208,11 +215,15 @@ function RootComponent() {
         }
         return;
       }
+      const identity = session?.user?.id ?? null;
+      if (event === "SIGNED_IN" && identity && identity === lastIdentity.current) return;
+      lastIdentity.current = identity;
       router.invalidate();
       queryClient.invalidateQueries();
     });
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
+
 
   useEffect(() => {
     installToastA11y();

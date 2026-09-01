@@ -13,3 +13,7 @@
 - [ ] PPTX export: drop brand-tint washes and legacy alpha-circle/vector decor objects from module exports (reported Sep 1 on downloaded live pptx)
 - [ ] Quote family parity: raise MV-QUOTE-METRIC / MV-QUOTE-PORTRAIT (and siblings) to the pass floor, re-sweep, re-issue master module PPTX.
 - [x] VIZ family: MV-VIZ-WATERFALL / STACKED-AREA / RADAR / SLOPE / BUMP / GAUGE-GRID now export as real native PowerPoint charts (editable series + embedded worksheet). The remaining viz kinds (sankey, chord, treemap, sunburst, calendar heatmap, market map, beeswarm, dumbbell, gantt, boxplot, radial bar) have no native PowerPoint chart type and keep the design-exact vector plate.
+
+## Scrolling
+- [x] Fix pages that snap back to top / stop scrolling (router scroll restoration reset on auth SIGNED_IN re-emit)
+- [x] Audit agent + presentation pages for locked (non-scrolling) full-height layouts (no locked containers found)
