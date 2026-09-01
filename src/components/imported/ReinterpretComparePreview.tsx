@@ -23,6 +23,8 @@ function toDeckSlide(m: MappedSlide, position: number): DeckSlide {
     content: m.content,
     changes: [],
     notes: m.source.notes || undefined,
+    // AI-authored custom modules carry their objects on the mapped slide.
+    ...(m.canvasBlocks?.length ? { canvasBlocks: m.canvasBlocks } : {}),
   };
 }
 
