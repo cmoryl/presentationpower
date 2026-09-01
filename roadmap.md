@@ -17,3 +17,4 @@
 ## Scrolling
 - [x] Fix pages that snap back to top / stop scrolling (router scroll restoration reset on auth SIGNED_IN re-emit)
 - [x] Audit agent + presentation pages for locked (non-scrolling) full-height layouts (no locked containers found)
+- [x] Restore native mouse-wheel scrolling in the deck editor by removing the root overflow/overscroll trap

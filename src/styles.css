@@ -21,13 +21,13 @@
     border-color: var(--color-border);
   }
 
-  /* Only the root element gets overflow/overscroll rules. Setting them on
-     <body> too turns the body into its own scroll container, and with
-     `overscroll-behavior-y: none` on it the wheel could no longer chain out to
-     the document — pages looked frozen to the mouse while JS scrolling worked. */
-  html {
-    overflow-x: hidden;
-    overscroll-behavior-y: none;
+  /* `overflow-x: hidden` implicitly computes the other axis to `auto`, turning
+     the root into a scroll container. That trapped wheel input over editor
+     descendants even though programmatic document scrolling still worked.
+     `clip` prevents horizontal bleed without creating a scroll container. */
+  html,
+  body {
+    overflow-x: clip;
   }
 
   html,
