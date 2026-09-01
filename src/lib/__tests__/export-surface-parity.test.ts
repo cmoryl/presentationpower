@@ -262,9 +262,13 @@ describe("surface tiering (card vs chip)", () => {
     expect(o.shadow).toBeTruthy();
     const name = String(o.objectName ?? "");
     const grad = parseGradientTag(name)!;
-    // Dark glass: accent bloom → navy base → navy base, all translucent.
-    expect(grad.stops).toHaveLength(3);
+    // Unified glass: accent wash at the top fading to the base tint by the
+    // bottom edge — the same 4-stop structure in light and dark.
+    expect(grad.stops).toHaveLength(4);
     expect(grad.stops.every((s) => (s.alpha ?? 1) < 1)).toBe(true);
+    // Alphas must descend so the box dissolves into the ground.
+    const alphas = grad.stops.map((s) => s.alpha ?? 1);
+    expect(alphas[0]).toBeGreaterThan(alphas[alphas.length - 1]);
     expect(parseAmbientTag(name)!.offset).toBe(0);
   });
 
