@@ -228,6 +228,37 @@ function fixValAx(xml: string): string {
 }
 
 /**
+ * pptxgenjs writes the plot-area / chart-area fill from an unset color, which
+ * resolves to pure black (`000000`) — every native chart shipped with an opaque
+ * black plate behind the bars. The design paints its own ground, so any pure
+ * black solid fill in a chart part becomes `noFill`; the brand palette never
+ * uses 000000 (dark ink is 03002C), so this can only hit the phantom plate.
+ */
+function clearBlackPlates(xml: string): string {
+  return xml.replace(
+    /<a:solidFill><a:srgbClr val="000000"\s*\/><\/a:solidFill>/g,
+    "<a:noFill/>",
+  );
+}
+
+/**
+ * Waterfall bridges are stacked bars where the lower "Base" series only lifts
+ * the delta into place — on screen it is invisible. pptxgenjs cannot express a
+ * transparent series, so the riser exported as a solid surface-coloured bar.
+ * Strip its fill so the exported bridge floats exactly like the build.
+ */
+function hideWaterfallRisers(xml: string): string {
+  return xml.replace(/<c:ser>[\s\S]*?<\/c:ser>/g, (ser) => {
+    if (!/<c:tx>[\s\S]*?<c:v>Base<\/c:v>/.test(ser)) return ser;
+    return ser.replace(
+      /<c:spPr>[\s\S]*?<\/c:spPr>/,
+      "<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>",
+    );
+  });
+}
+
+
+/**
  * Make one `ppt/charts/chartN.xml` schema-valid. Safe to run on already-valid
  * XML: every fix is conditional and idempotent.
  */
@@ -248,5 +279,8 @@ export function repairChartXml(xml: string): string {
   out = fixLineWidths(out);
   out = fixMarkerSizes(out);
   out = stripRedundantLeaderLineExtension(out);
+  out = clearBlackPlates(out);
+  out = hideWaterfallRisers(out);
   return out;
 }
+

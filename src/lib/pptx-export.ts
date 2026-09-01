@@ -4915,11 +4915,13 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     });
     const note = str(it.note);
     if (note && note.trim().toLowerCase() !== str(it.label).trim().toLowerCase()) {
-      // Notes sit on one shared baseline under the plot, inside the band, and
-      // wrap instead of running across the whole slide.
+      // Every note shares ONE baseline under the plot (same as the canvas
+      // module), inside its own column band so it wraps instead of running
+      // across the slide. The current milestone no longer drops its note into
+      // the axis kicker band.
       s.addText(note, {
         x: bandX,
-        y: bottomY + (isCurrent ? 0.44 : 0.2),
+        y: bottomY + 0.2,
         w: bandW,
         h: 0.62,
         fontSize: 9,
@@ -4931,9 +4933,12 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       });
     }
     if (isCurrent) {
+      // Badge sits next to its node, exactly like the build: above the stage
+      // label when the node rides low, below the marker when it rides high.
+      const low = pt.y > topY + (bottomY - topY) * 0.45;
       s.addText("YOU ARE HERE", {
         x: bandX,
-        y: bottomY + 0.16,
+        y: low ? pt.y - 0.86 : pt.y + 0.24,
         w: bandW,
         h: 0.24,
         fontSize: 8,
@@ -4945,6 +4950,7 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
         margin: 0,
       });
     }
+
   });
   const axis = str(c.axisLabel) || "PROGRAM MATURITY";
   s.addText(axis.toUpperCase(), {

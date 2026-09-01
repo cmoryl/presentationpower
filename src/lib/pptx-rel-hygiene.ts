@@ -42,10 +42,18 @@ export function relsPathFor(part: string): string {
   return `${part.slice(0, slash)}/_rels/${part.slice(slash + 1)}.rels`;
 }
 
-/** Resolve a relationship Target (relative to the part's folder) to a zip path. */
+/**
+ * Resolve a relationship Target to a zip path. Targets are normally relative to
+ * the part's own folder, but a leading `/` means package-root absolute (which is
+ * exactly how pptxgenjs writes chart parts: `/ppt/charts/chart1.xml`). Treating
+ * those as relative resolved to `ppt/slides/ppt/charts/…`, so the chart looked
+ * missing and the whole `p:graphicFrame` got scrubbed — native charts silently
+ * vanished from the exported slide.
+ */
 export function resolveTarget(part: string, target: string): string {
   if (/^[a-z]+:\/\//i.test(target)) return target;
-  const base = part.slice(0, part.lastIndexOf("/")).split("/");
+  const absolute = target.startsWith("/");
+  const base = absolute ? [] : part.slice(0, part.lastIndexOf("/")).split("/");
   const segments = target.replace(/^\//, "").split("/");
   for (const seg of segments) {
     if (seg === "." || seg === "") continue;
@@ -54,6 +62,7 @@ export function resolveTarget(part: string, target: string): string {
   }
   return base.join("/");
 }
+
 
 export interface RelEntry {
   id: string;

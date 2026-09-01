@@ -189,6 +189,25 @@ function blendOverBackdrop(
 }
 
 /**
+ * CSS `opacity` on an ancestor fades the glyphs but never shows up in the
+ * element's own computed colour, so a decorative mark drawn at, say,
+ * `opacity: .28` inside a wrapper used to export as fully saturated ink.
+ * Multiply the whole ancestor chain (self included) so the composite below
+ * blends the glyph at the alpha it is actually painted with on screen.
+ */
+function cumulativeOpacity(el: Element): number {
+  let o = 1;
+  let node: Element | null = el;
+  while (node) {
+    const v = parseFloat(getComputedStyle(node).opacity || "1");
+    if (Number.isFinite(v)) o *= Math.max(0, Math.min(1, v));
+    if (o <= 0.001) return 0;
+    node = node.parentElement;
+  }
+  return o;
+}
+
+/**
  * PowerPoint resolves a single family name, and it will never have the web
  * font's internal name ("Geist Variable"), so map the whole CSS stack onto a
  * canonical brand family with defined fallbacks (see `pptx-font-map.ts`).
@@ -280,15 +299,19 @@ export function extractTextRuns(
 
     const cs = getComputedStyle(el);
     if (cs.visibility === "hidden" || cs.display === "none") continue;
-    if (parseFloat(cs.opacity || "1") < 0.08) continue;
+    const chainAlpha = cumulativeOpacity(el);
+    if (chainAlpha < 0.08) continue;
     // Painted / clipped glyph tricks and rotated copy stay in the raster so
     // the plate keeps the exact look; they just are not editable.
     if (isPaintedText(cs) || isRotatedOrSkewed(cs)) continue;
 
     const paint = resolveColor(cs.color);
     if (!paint || paint.alpha < 0.06) continue;
-    const flat = blendOverBackdrop(el, paint);
+    const effective = { hex: paint.hex, alpha: paint.alpha * chainAlpha };
+    if (effective.alpha < 0.06) continue;
+    const flat = blendOverBackdrop(el, effective);
     const color = flat.hex;
+
 
     const rect = el.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) continue;
