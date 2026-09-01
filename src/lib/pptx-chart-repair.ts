@@ -248,14 +248,27 @@ function clearBlackPlates(xml: string): string {
  * Strip its fill so the exported bridge floats exactly like the build.
  */
 function hideWaterfallRisers(xml: string): string {
-  return xml.replace(/<c:ser>[\s\S]*?<\/c:ser>/g, (ser) => {
+  let riserIdx: number | null = null;
+  let out = xml.replace(/<c:ser>[\s\S]*?<\/c:ser>/g, (ser) => {
     if (!/<c:tx>[\s\S]*?<c:v>Base<\/c:v>/.test(ser)) return ser;
+    const idx = ser.match(/<c:idx val="(\d+)"\s*\/>/)?.[1];
+    if (idx != null) riserIdx = Number(idx);
     return ser.replace(
       /<c:spPr>[\s\S]*?<\/c:spPr>/,
       "<c:spPr><a:noFill/><a:ln><a:noFill/></a:ln></c:spPr>",
     );
   });
+  // …and drop its legend key, otherwise PowerPoint prints a "Base" entry with a
+  // blank swatch next to the real Increase/Decrease keys.
+  if (riserIdx !== null && /<c:legend>/.test(out) && !/<c:legendEntry>/.test(out)) {
+    out = out.replace(
+      /(<c:legend>\s*(?:<c:legendPos[^>]*\/>)?)/,
+      `$1<c:legendEntry><c:idx val="${riserIdx}"/><c:delete val="1"/></c:legendEntry>`,
+    );
+  }
+  return out;
 }
+
 
 
 /**
