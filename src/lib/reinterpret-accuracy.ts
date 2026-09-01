@@ -43,17 +43,31 @@ function slideHaystack(slide: MappedSlide): string {
   return norm(collectStrings(parts).join(" ⋄ "));
 }
 
+/**
+ * Imported pictures actually placed on the designed page(s): the slide-level
+ * hero plus any per-item tile (grids, strips, matrices) or panel photo.
+ */
 function mediaCount(slide: MappedSlide): number {
   const pages = [slide, ...(slide.continuations ?? [])];
   let n = 0;
-  for (const page of pages) {
-    const c = page.content as Record<string, unknown>;
-    if (typeof c.mediaUrl === "string" && c.mediaUrl) n += 1;
-    const media = c.media;
-    if (Array.isArray(media)) n += media.filter(Boolean).length;
-  }
+  const walk = (v: unknown, depth = 0): void => {
+    if (depth > 4 || !v) return;
+    if (Array.isArray(v)) {
+      for (const item of v) walk(item, depth + 1);
+      return;
+    }
+    if (typeof v !== "object") return;
+    for (const [key, val] of Object.entries(v as Record<string, unknown>)) {
+      if (key === "extraImages") continue;
+      if (key === "mediaUrl" && typeof val === "string" && val) n += 1;
+      else if (key === "media" && Array.isArray(val)) n += val.filter(Boolean).length;
+      else walk(val, depth + 1);
+    }
+  };
+  for (const page of pages) walk(page.content);
   return n;
 }
+
 
 function dataCount(slide: MappedSlide): number {
   const pages = [slide, ...(slide.continuations ?? [])];
