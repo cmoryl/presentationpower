@@ -1005,8 +1005,38 @@ function finalize(
     if (variantSupportsImagery(variant.id) && !merged.mediaUrl) merged.mediaUrl = images[0];
     if (typeof prev.mediaPath === "string" && merged.mediaUrl === images[0])
       merged.mediaPath = prev.mediaPath;
-    merged.extraImages = images.slice(merged.mediaUrl ? 1 : 0);
+    let pool = images.slice(merged.mediaUrl ? 1 : 0);
+
+    // Tile layouts (grids, strips, matrices) draw imagery from `items[].mediaUrl`.
+    // Fill those slots with the imported pictures so an image-forward page shows
+    // the deck's own photography instead of generated placeholders.
+    const tiles = variantItemImageCapacity(variant.id);
+    if (tiles > 0 && pool.length) {
+      const existing = Array.isArray(merged.items) ? (merged.items as Record<string, unknown>[]) : [];
+      const count = Math.min(tiles, Math.max(existing.length, pool.length));
+      const items: Record<string, unknown>[] = [];
+      for (let i = 0; i < count; i++) {
+        const it = { ...(existing[i] ?? {}) };
+        if (!it.mediaUrl && pool[i]) it.mediaUrl = pool[i];
+        items.push(it);
+      }
+      // Keep any extra authored items beyond the media slots untouched.
+      merged.items = [...items, ...existing.slice(count)];
+      pool = pool.slice(count);
+    }
+
+    // Before/after panels carry their own picture each.
+    if (Array.isArray(merged.panels) && pool.length) {
+      merged.panels = (merged.panels as Record<string, unknown>[]).map((p) => {
+        const panel = { ...((p.panel as Record<string, unknown>) ?? {}) };
+        if (!panel.mediaUrl && pool.length) panel.mediaUrl = pool.shift();
+        return { ...p, panel };
+      });
+    }
+
+    merged.extraImages = pool;
   }
+
 
   const sourceBullets = (base.source.bullets ?? []).map((b) => (b ?? "").trim()).filter(Boolean);
   const haystack = norm(collectStrings(merged).join(" ⋄ "));
