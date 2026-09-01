@@ -3281,6 +3281,7 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         ],
       };
     case "MV-GRAPH-TASK-CARDS":
+    case "MV-GRAPH-TASK-DIALS":
       return {
         title: `${clientName} program — quarterly status`,
         items: [
