@@ -82,6 +82,8 @@ export function ReinterpretComparePreview({
                   pageNumber={slideIndex + 1}
                   mode={mode}
                 />
+                {/* AI-authored custom modules live entirely on the canvas layer. */}
+                <CanvasBlockLayer blocks={deckSlide.canvasBlocks} brand={brand} />
               </ScaledSlide>
             </div>
           ) : (
