@@ -733,6 +733,11 @@ export function ReinterpretApprovalDialog({
                                 {designedSlide.coverage.used} of {designedSlide.coverage.total}{" "}
                                 source lines on the slide
                               </span>
+                              {designedSlide.continuations?.length
+                                ? ` · ${designedSlide.continuations.length} continuation page${
+                                    designedSlide.continuations.length === 1 ? "" : "s"
+                                  } designed for the rest`
+                                : ""}
                               {designedSlide.coverage.dropped.length > 0 &&
                                 ` · ${designedSlide.coverage.dropped.length} moved to speaker notes`}
                             </summary>
@@ -747,7 +752,9 @@ export function ReinterpretApprovalDialog({
                               </ul>
                             ) : (
                               <p className="mt-2 text-xs text-black/55">
-                                Every imported line is represented on this layout.
+                                {designedSlide.continuations?.length
+                                  ? `Every imported line is represented — across this layout and ${designedSlide.continuations.length} continuation page${designedSlide.continuations.length === 1 ? "" : "s"} in our look.`
+                                  : "Every imported line is represented on this layout."}
                               </p>
                             )}
                           </details>
