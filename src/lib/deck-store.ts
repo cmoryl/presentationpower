@@ -516,6 +516,8 @@ type DeckState = {
       notes?: string;
       /** Optional per-slide light/dark override (deck-wide colour locks). */
       mode?: "light" | "dark";
+      /** Free-canvas objects (AI-authored custom modules). */
+      canvasBlocks?: CanvasBlock[];
     }>;
     context?: Partial<DeckContext>;
   }) => { briefId: string; deckId: string };
