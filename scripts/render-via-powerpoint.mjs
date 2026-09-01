@@ -153,9 +153,27 @@ export async function renderPptxWithPowerPoint(bytes, remoteName, { keepFonts = 
 
   // Office does this conversion — a failure here means PowerPoint itself
   // could not open or draw the package.
-  const conv = await graph("GET", `/me/drive/items/${itemId}/content?format=pdf`);
+  //
+  // Graph answers 406 NotAcceptable while a freshly uploaded item is still
+  // being indexed, so a transient 406/429/5xx is retried with backoff before we
+  // are allowed to call the package "refused".
+  let conv;
+  let lastErr;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      conv = await graph("GET", `/me/drive/items/${itemId}/content?format=pdf`);
+      break;
+    } catch (err) {
+      lastErr = err;
+      const transient = /\[(406|408|423|429|5\d\d)\]/.test(String(err?.message ?? ""));
+      if (!transient || attempt === 5) throw err;
+      await new Promise((r) => setTimeout(r, 1500 * 2 ** attempt));
+    }
+  }
+  if (!conv) throw lastErr;
   const pdf = new Uint8Array(await conv.arrayBuffer());
   return { pdf, itemId, name };
+
 }
 
 export async function deleteDriveItem(itemId) {

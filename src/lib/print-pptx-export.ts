@@ -227,9 +227,10 @@ export async function exportPrintPagesAsPptx(
     });
   }
 
-  // pptxgenjs emits <p:notesMasterIdLst> after <p:sldIdLst>, which violates the
-  // PresentationML sequence (masters -> notes master -> slides -> sizes) and
-  // makes PowerPoint offer to "repair" the deck. Fixed before writing.
+  // presentation.xml child order is normalised centrally (see
+  // pptx-presentation-order): Office refuses any deck whose notes master is
+  // declared before <p:sldIdLst>. Fixed before writing.
+
   opts.onProgress?.({
     stage: "encode",
     progress: 0.88,
