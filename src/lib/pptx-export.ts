@@ -3650,13 +3650,6 @@ function renderVizNativeChart(
           valAxisMinVal: chart.valueMin,
           valAxisMaxVal: chart.valueMax,
           valAxisMajorUnit: chart.majorUnit,
-          // The build's plot has no frame or axis rules: only faint value
-          // gridlines. pptxgenjs draws a chart-area border and axis lines by
-          // default, which read as an extra box around every exported chart.
-          border: { pt: 0, color: p.surface.replace("#", "") },
-          fill: "FFFFFF00",
-          catAxisLineShow: false,
-          valAxisLineShow: false,
           catGridLine: { style: "none" },
           valGridLine: { color: trackC(p), style: "solid", size: 1 },
           lineSmooth: !!chart.lineSmooth,
