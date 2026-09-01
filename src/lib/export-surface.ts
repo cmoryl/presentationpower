@@ -195,40 +195,16 @@ export function getGlassTreatment(opts: {
   const dark = !!opts.dark;
   const T = dark ? GLASS_CARD_TOKENS.dark : GLASS_CARD_TOKENS.light;
 
-  const gradient: SurfaceGradient = dark
-    ? {
-        angleDeg: 180,
-        stops: [
-          // The accent bloom sits at the top of the tile and clears by ~64%,
-          // matching the renderer's radial wash over the navy base.
-          {
-            color: mixHex(GLASS_CARD_TOKENS.dark.base, accent, 0.75),
-            pos: 0,
-            alpha: Math.min(
-              0.85,
-              (GLASS_CARD_TOKENS.dark.baseAlpha + GLASS_CARD_TOKENS.dark.washAlpha) * e,
-            ),
-          },
-          {
-            color: GLASS_CARD_TOKENS.dark.base,
-            pos: 64,
-            alpha: Math.min(0.85, GLASS_CARD_TOKENS.dark.baseAlpha * e),
-          },
-          {
-            color: GLASS_CARD_TOKENS.dark.base,
-            pos: 100,
-            alpha: Math.min(0.85, GLASS_CARD_TOKENS.dark.baseAlpha * e * 0.85),
-          },
-        ],
-      }
-    : {
-        angleDeg: 180,
-        stops: GLASS_CARD_TOKENS.light.stops.map((s) => ({
-          color: s.white ? GLASS_LIGHT_STOP : accent,
-          pos: s.at,
-          alpha: Math.min(1, s.alpha * (s.white ? 1 : e)),
-        })),
-      };
+  // ONE structure for both modes: base tint + the shared accent wash that
+  // fades to 0 by 88%, so the tile melts into the ground exactly as on screen.
+  const gradient: SurfaceGradient = {
+    angleDeg: 180,
+    stops: GLASS_CARD_TOKENS.wash.map((s) => ({
+      color: s.alpha > 0 ? mixHex(T.base, accent, Math.min(0.85, s.alpha * 5)) : T.base,
+      pos: s.at,
+      alpha: Math.min(0.85, (T.baseAlpha + s.alpha * e) * (s.at >= 88 ? 0.35 : 1)),
+    })),
+  };
 
   const ringAlpha = Math.min(0.85, (dark ? T.ringAlpha : GLASS_CARD_TOKENS.light.ringAlpha) * e);
   const dropTokens = dark ? SURFACE_CSS_TOKENS.dark : SURFACE_CSS_TOKENS.light;
@@ -240,6 +216,7 @@ export function getGlassTreatment(opts: {
     fill: dark
       ? mixHex(SURFACE_CSS_TOKENS.dark.gradientBottom, accent, 0.16)
       : mixHex(GLASS_LIGHT_STOP, accent, 0.12 * e),
+
     gradient,
     line: {
       color: accent,
