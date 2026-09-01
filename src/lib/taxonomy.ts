@@ -4839,6 +4839,29 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     lockedFields: ["footer", "logo"],
   },
   {
+    id: "MV-GRAPH-TASK-DIALS",
+    familyId: "MF-05",
+    name: "Graph — task dials",
+    description: "Three progress panels with a percentage dial, done/total pair, bar, and body",
+    permittedLayoutIds: ["LF-11"],
+    capacity: {
+      fields: { title: { kind: "text", chars: 80 } },
+      items: {
+        min: 3,
+        max: 3,
+        fields: {
+          label: { kind: "text", chars: 80 },
+          done: { kind: "number" },
+          total: { kind: "number" },
+          body: { kind: "text", chars: 200 },
+        },
+      },
+      titleChars: 80,
+    },
+    editableFields: ["title", "items[].label", "items[].done", "items[].total", "items[].body"],
+    lockedFields: ["footer", "logo"],
+  },
+  {
     id: "MV-GRAPH-DECADE-AREA",
     familyId: "MF-05",
     name: "Graph — decade area",

@@ -3308,6 +3308,9 @@ function renderAdvancedVariant(
     case "MV-GRAPH-TASK-CARDS":
       renderGraphTaskCards(s, c, p);
       return true;
+    case "MV-GRAPH-TASK-DIALS":
+      renderGraphTaskDials(s, c, p);
+      return true;
     case "MV-GRAPH-DECADE-AREA":
       renderGraphDecadeArea(s, c, p);
       return true;
@@ -8433,6 +8436,116 @@ function renderGraphTaskCards(s: PptxGenJS.Slide, c: Record<string, unknown>, p:
       h: 1.4,
       fontSize: 13,
       color: bodyC(p),
+      fontFace: "Geist",
+    });
+  });
+}
+
+// ── MV-GRAPH-TASK-DIALS ── task cards with a native doughnut dial per panel
+function renderGraphTaskDials(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 3);
+  const cardW = (SLIDE_W - 1.2 - 0.6) / 3;
+  items.forEach((it, i) => {
+    const cx = 0.6 + i * (cardW + 0.3);
+    const done = num(it.done);
+    const total = Math.max(1, num(it.total, 100));
+    const pct = Math.min(100, Math.round((done / total) * 100));
+    s.addShape("rect", {
+      x: cx,
+      y: y0,
+      w: 2.0,
+      h: 0.04,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(str(it.label).toUpperCase(), {
+      x: cx,
+      y: y0 + 0.15,
+      w: cardW,
+      h: 0.3,
+      fontSize: 11,
+      bold: true,
+      color: bodyC(p),
+      charSpacing: 3,
+      align: "center",
+      fontFace: "Geist",
+    });
+    const dialW = Math.min(2.4, cardW - 0.4);
+    const dialX = cx + (cardW - dialW) / 2;
+    const dialY = y0 + 0.6;
+    try {
+      s.addChart(
+        "doughnut" as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
+        [
+          {
+            name: str(it.label),
+            labels: ["Complete", "Remaining"],
+            values: [pct, Math.max(0, 100 - pct)],
+          },
+        ],
+        {
+          x: dialX,
+          y: dialY,
+          w: dialW,
+          h: dialW,
+          chartColors: [p.accent, trackC(p)],
+          showLegend: false,
+          showValue: false,
+          holeSize: 68,
+        } as unknown as Parameters<PptxGenJS.Slide["addChart"]>[2],
+      );
+    } catch {
+      /* no-op */
+    }
+    s.addText(`${pct}%`, {
+      x: dialX,
+      y: dialY + dialW / 2 - 0.35,
+      w: dialW,
+      h: 0.7,
+      fontSize: 34,
+      bold: true,
+      color: p.primary,
+      align: "center",
+      valign: "middle",
+      fontFace: "Geist",
+    });
+    s.addText(`${done.toLocaleString()} / ${total.toLocaleString()}`, {
+      x: cx,
+      y: dialY + dialW + 0.15,
+      w: cardW,
+      h: 0.35,
+      fontSize: 11,
+      color: mutedC(p),
+      align: "center",
+      fontFace: "Geist",
+    });
+    const barW = cardW - 0.1;
+    const barY = dialY + dialW + 0.6;
+    s.addShape("rect", {
+      x: cx,
+      y: barY,
+      w: barW,
+      h: 0.1,
+      fill: { color: trackC(p) },
+      line: { color: trackC(p) },
+    });
+    s.addShape("rect", {
+      x: cx,
+      y: barY,
+      w: (barW * pct) / 100,
+      h: 0.1,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(str(it.body), {
+      x: cx,
+      y: barY + 0.3,
+      w: cardW,
+      h: 1.0,
+      fontSize: 13,
+      color: bodyC(p),
+      align: "center",
       fontFace: "Geist",
     });
   });

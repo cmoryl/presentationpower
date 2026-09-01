@@ -22,6 +22,7 @@ import {
   Treemap,
   WaterfallChart,
 } from "../charts";
+import { Donut } from "../chart-primitives";
 
 registerSlideModule({
   id: "family:graph",
@@ -32,6 +33,8 @@ registerSlideModule({
     "MV-GRAPH-DUAL-DONUT",
     "MV-GRAPH-RINGS",
     "MV-GRAPH-TASK-CARDS",
+    "MV-GRAPH-TASK-DIALS",
+
     "MV-GRAPH-DECADE-AREA",
     "MV-GRAPH-PERCENT-COMPARE",
     "MV-GRAPH-LINE-MULTI",
@@ -407,6 +410,66 @@ registerSlideModule({
           </SlideFrame>
         );
       }
+
+      // Same content contract as MV-GRAPH-TASK-CARDS, but each panel carries a
+      // dial so the share reads visually before the number is parsed.
+      case "MV-GRAPH-TASK-DIALS": {
+        const items = arr(c.items).slice(0, 3);
+        return (
+          <SlideFrame brand={brand} pageNumber={pageNumber}>
+            <SlideTitle brand={brand} title={s(c.title, variant.name)} />
+            <div
+              className="slide-fill-stretch mt-10 grid gap-10"
+              style={{ gridTemplateColumns: "repeat(3, 1fr)" }}
+            >
+              {items.map((it, i) => {
+                const done = Number(it.done) || 0;
+                const total = Math.max(1, Number(it.total) || 100);
+                const pct = Math.min(100, Math.round((done / total) * 100));
+                return (
+                  <div
+                    key={i}
+                    className="flex flex-col items-center pt-8 text-center"
+                    style={{ borderTop: `2px solid ${brand.tokens.accent}` }}
+                  >
+                    <div
+                      className="uppercase"
+                      style={{
+                        fontSize: fillPx(16, "body"),
+                        letterSpacing: "0.28em",
+                        color: "color-mix(in oklab, currentColor 60%, transparent)",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {s(it.label)}
+                    </div>
+                    <div className="mt-8">
+                      <Donut brand={brand} percent={pct} size={300} />
+                    </div>
+                    <div
+                      className="mt-6 tabular-nums"
+                      style={{ fontSize: fillPx(18, "body"), color: ink.faint }}
+                    >
+                      {done.toLocaleString()} / {total.toLocaleString()}
+                    </div>
+                    <div className="mt-4 flex w-full items-center">
+                      <ProgressBar brand={brand} percent={pct} />
+                    </div>
+                    <div
+                      className="mt-6"
+                      style={{ fontSize: fillPx(18, "body"), color: ink.muted, lineHeight: 1.45 }}
+                    >
+                      {s(it.body)}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </SlideFrame>
+        );
+      }
+
+
 
       case "MV-GRAPH-DECADE-AREA": {
         const series = arr(c.series).map((p) => ({
