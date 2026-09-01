@@ -65,7 +65,14 @@ export type VizNativeChart = {
   centerValue?: string;
   /** Hide the value axis (waterfall/gauge read from labels). */
   hideValAxis?: boolean;
+  /** Value-axis tick step (rank charts step by whole ranks, not 0.5). */
+  majorUnit?: number;
+  /** Curve the line (bump/slope read as smoothed ribbons on screen). */
+  lineSmooth?: boolean;
+  /** Legend placement — the build puts rank legends above the plot. */
+  legendPos?: "t" | "b";
 };
+
 
 export type VizNativeChartPlan = {
   kind: InfographicKind;
@@ -180,45 +187,53 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
 
   switch (spec.kind) {
     case "waterfall": {
-      // Two stacked series: an invisible riser that lifts each delta bar to its
-      // running total, then the delta itself. Editing either column in the
-      // embedded sheet re-draws the bridge, exactly like a hand-built one.
+      // Three stacked series: an invisible riser that lifts each delta into
+      // place, then the delta split by direction so increases and decreases
+      // carry the two colours the build uses (and a real legend, like the
+      // on-screen chart). Editing any column in the embedded sheet re-draws
+      // the bridge, exactly like a hand-built one.
       const { labels, series } = seriesFromRows(spec);
       const deltas = series[0]?.values ?? [];
       const base: number[] = [];
-      const span: number[] = [];
+      const up: number[] = [];
+      const down: number[] = [];
       let run = 0;
       deltas.forEach((d, i) => {
         const isTotal = i === 0 || i === deltas.length - 1;
         if (isTotal) {
+          const total = Math.abs(d) || run;
           base.push(0);
-          span.push(Math.abs(d) || run);
-          run = Math.abs(d) || run;
+          up.push(total);
+          down.push(0);
+          run = total;
         } else {
           const next = run + d;
           base.push(Math.min(run, next));
-          span.push(Math.abs(d));
+          up.push(d >= 0 ? Math.abs(d) : 0);
+          down.push(d < 0 ? Math.abs(d) : 0);
           run = next;
         }
       });
       return {
         kind: spec.kind,
-        legend: [],
+        legend: ["Increase", "Decrease"],
         charts: [
           {
             type: "bar",
             barDir: "col",
             stacked: true,
             box: FULL,
-            colors: ["surface", "primary"],
+            colors: ["surface", "primary", "accent"],
             data: [
               { name: "Base", labels, values: base },
-              { name: spec.data.columns?.["value"] ?? "Change", labels, values: span },
+              { name: "Increase", labels, values: up },
+              { name: "Decrease", labels, values: down },
             ],
           },
         ],
       };
     }
+
 
     case "stacked-area": {
       const { labels, series } = seriesFromRows(spec);
@@ -238,7 +253,13 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
     }
 
     case "radar": {
+      // ECharts lays spokes out counter-clockwise from the top; PowerPoint's
+      // radar walks clockwise. Reversing the category order (keeping the first
+      // spoke at 12 o'clock) makes the exported web read like the build instead
+      // of its mirror image. The build draws no numeric ring labels either.
       const { labels, series } = seriesFromRows(spec);
+      const spokes = labels.length > 2 ? [labels[0]!, ...labels.slice(1).reverse()] : labels;
+      const order = spokes.map((l) => labels.indexOf(l));
       return {
         kind: spec.kind,
         legend: series.length > 1 ? series.map((s) => s.name) : [],
@@ -246,12 +267,18 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
           {
             type: "radar",
             box: FULL,
+            hideValAxis: true,
             colors: series.map((_, i) => seriesColor(i)),
-            data: series.map((s) => ({ ...s, labels })),
+            data: series.map((s) => ({
+              name: s.name,
+              labels: spokes,
+              values: order.map((i) => s.values[i] ?? 0),
+            })),
           },
         ],
       };
     }
+
 
     case "slope":
     case "bump": {
@@ -280,6 +307,8 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
               type: "line",
               box: FULL,
               invertValueAxis: spec.kind === "bump",
+              lineSmooth: true,
+              legendPos: "t",
               colors: lines.map((_, i) => seriesColor(i)),
               data: lines,
             },
@@ -287,6 +316,9 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
         };
       }
       const { labels, series } = seriesFromRows(spec);
+      // Ranks are whole numbers: the build's axis steps 0,1,2…n, so the export
+      // must not invent half-rank ticks (1.5, 2.5) between them.
+      const maxRank = Math.max(...series.flatMap((sr) => sr.values), 1);
       return {
         kind: spec.kind,
         legend: series.map((s) => s.name),
@@ -295,18 +327,18 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
             type: "line",
             box: FULL,
             invertValueAxis: spec.kind === "bump",
-            valueMin: spec.kind === "bump" ? 1 : undefined,
-            valueMax:
-              spec.kind === "bump"
-                ? Math.max(...series.flatMap((sr) => sr.values), 1)
-                : undefined,
-
+            lineSmooth: true,
+            legendPos: spec.kind === "bump" ? "t" : "b",
+            valueMin: spec.kind === "bump" ? 0 : undefined,
+            valueMax: spec.kind === "bump" ? maxRank : undefined,
+            majorUnit: spec.kind === "bump" ? 1 : undefined,
             colors: series.map((_, i) => seriesColor(i)),
             data: series.map((s) => ({ ...s, labels })),
           },
         ],
       };
     }
+
 
     case "gauge-grid": {
       // One real doughnut per gauge, laid out on the same grid the build uses:

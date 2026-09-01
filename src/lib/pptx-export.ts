@@ -1481,6 +1481,9 @@ export async function exportDeckToPptx(
   // via ECharts). Ships as an image on the slide — pptxgenjs accepts SVG
   // data URLs and PowerPoint preserves them as vectors.
   const slideVizSvg: Record<string, string> = {};
+  // Chart series palette resolved exactly as the on-screen chart resolves it,
+  // so native PowerPoint charts get the build's colours (see hex() below).
+  const slideVizPalette: Record<string, string[]> = {};
   const vizSlides = deck.slides.filter(
     (sl) => typeof sl.variantId === "string" && sl.variantId.startsWith("MV-VIZ-"),
   );
@@ -1539,6 +1542,9 @@ export async function exportDeckToPptx(
               width: 1600,
               height: Math.round((1600 * VIZ_BOX.h) / VIZ_BOX.w),
             });
+            if (Array.isArray(spec.theme?.palette)) {
+              slideVizPalette[sl.id] = spec.theme.palette as string[];
+            }
             if (svg) slideVizSvg[sl.id] = svgToDataUrl(svg);
 
           } catch {
@@ -1744,7 +1750,9 @@ export async function exportDeckToPptx(
       const slideAccent = resolveSlideAccent(slide, renderBrand).replace("#", "");
       const slidePalette = adaptPaletteForMode({ ...palette, accent: slideAccent }, isDark);
       const useWhiteLogo = isDark || slide.variantId === "MV-SPLIT-MANIFESTO";
-      const hideFooter = useWhiteLogo;
+      // The renderer draws the footer band on every slide face, dark included;
+      // only the full-bleed manifesto split suppresses it.
+      const hideFooter = slide.variantId === "MV-SPLIT-MANIFESTO";
 
       // 1. Native PPTX background fill — always set so exported slides never
       //    default to opaque white when the editor showed a dark scene.
@@ -1925,7 +1933,7 @@ export async function exportDeckToPptx(
       });
       try {
         if (
-          !renderAdvancedVariant(sd, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id])
+          !renderAdvancedVariant(sd, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id], slideVizPalette[slide.id])
         ) {
           switch (kind) {
             case "cover":
@@ -2128,26 +2136,36 @@ export async function exportDeckToPptx(
       }
 
       if (!hideFooter) {
-        s.addText("TransPerfect", {
-          x: 0.5,
-          y: 7.05,
-          w: 4,
+        // Locked footer band, same copy/geometry as `SlideChrome`: tracked
+        // uppercase confidentiality note left, zero-padded page number right.
+        // It used to be dropped on every dark slide (and read "TransPerfect"
+        // on light ones), so exports lost chrome the build always shows.
+        const footerInk = mutedC(slidePalette).replace("#", "");
+        s.addText("CONFIDENTIAL · INTERNAL REVIEW", {
+          x: 0.75,
+          y: 6.88,
+          w: 6.5,
           h: 0.3,
-          fontSize: 9,
-          color: "666666",
+          fontSize: 10,
+          charSpacing: 2,
+          bold: true,
+          color: footerInk,
           fontFace: "Geist",
         });
         s.addText(String(i + 1).padStart(2, "0"), {
-          x: SLIDE_W - 1.0,
-          y: 7.05,
-          w: 0.5,
+          x: SLIDE_W - 1.35,
+          y: 6.88,
+          w: 0.6,
           h: 0.3,
-          fontSize: 9,
-          color: "666666",
+          fontSize: 10,
+          charSpacing: 1.6,
+          bold: true,
+          color: footerInk,
           align: "right",
           fontFace: "Geist",
         });
       }
+
 
       // Free-canvas edits paint over the module in the editor (z-40 layer), so
       // they are emitted last here as native objects at the same coordinates.
@@ -3148,11 +3166,12 @@ function renderAdvancedVariant(
   p: Palette,
   itemLogos: Array<string | null> = [],
   vizSvg?: string,
+  vizPalette?: string[],
 ): boolean {
   const c = (slide.content ?? {}) as Record<string, unknown>;
   // MV-VIZ-* spec-driven infographics — embed pre-rendered vector SVG.
   if (typeof slide.variantId === "string" && slide.variantId.startsWith("MV-VIZ-")) {
-    renderVizSpec(s, c, p, vizSvg, slide.variantId);
+    renderVizSpec(s, c, p, vizSvg, slide.variantId, vizPalette);
     return true;
   }
   switch (slide.variantId) {
@@ -3531,7 +3550,9 @@ function renderVizNativeChart(
   p: Palette,
   box: { x: number; y: number; w: number; h: number },
   variantId?: string,
+  vizPalette?: string[],
 ): boolean {
+
   const raw = (c as { spec?: unknown }).spec;
   let spec: InfographicSpec | null = isInfographicSpec(raw) ? raw : null;
   if (!spec) {
@@ -3552,16 +3573,29 @@ function renderVizNativeChart(
   const plan = vizNativeChartPlan(spec);
   if (!plan || plan.charts.length === 0) return false;
 
+  // Series colour MUST come from the same chart palette the build draws with.
+  // The slide Palette is mode-adapted for text (dark mode maps `primary` to
+  // white), so resolving series off it exported white bars and grey rank lines
+  // where the build shows brand blue, pink and green.
+  const ramp = (vizPalette ?? spec.theme?.palette ?? []).filter(
+    (h) => typeof h === "string" && /^#?[0-9a-f]{6}$/i.test(h),
+  );
+  const rampAt = (i: number): string | null => {
+    const v = ramp[i];
+    return v ? v.replace("#", "") : null;
+  };
   const hex = (role: VizColorRole): string => {
     switch (role) {
       case "primary":
-        return p.primary.replace("#", "");
+        return rampAt(0) ?? p.primary.replace("#", "");
       case "accent":
-        return p.accent.replace("#", "");
+        return rampAt(1) ?? p.accent.replace("#", "");
+      case "series":
+        return rampAt(2) ?? mutedC(p).replace("#", "");
       case "series2":
-        return mixHex(p.primary, p.surface, 0.42).replace("#", "");
+        return rampAt(3) ?? mixHex(p.primary, p.surface, 0.42).replace("#", "");
       case "series3":
-        return mixHex(p.accent, p.ink, 0.38).replace("#", "");
+        return rampAt(4) ?? mixHex(p.accent, p.ink, 0.38).replace("#", "");
       case "track":
         return trackC(p).replace("#", "");
       case "surface":
@@ -3570,6 +3604,7 @@ function renderVizNativeChart(
         return mutedC(p).replace("#", "");
     }
   };
+
 
   try {
     plan.charts.forEach((chart) => {
@@ -3587,12 +3622,18 @@ function renderVizNativeChart(
           h: chH,
           chartColors: chart.colors.map(hex),
           barDir: chart.barDir ?? "col",
+          // The build's radar web is a translucent fill behind a strong
+          // outline. PowerPoint's filled radar has no per-series alpha, so a
+          // "filled" style exports as opaque slabs that hide the inner series —
+          // the outline style is the closer match.
+          radarStyle: chart.type === "radar" ? "marker" : undefined,
           barGrouping: chart.stacked ? "stacked" : "clustered",
           holeSize: chart.holeSize,
           showLegend: plan.legend.length > 1,
-          legendPos: "b",
+          legendPos: chart.legendPos ?? "b",
           legendFontFace: "Geist",
           legendFontSize: 10,
+          legendColor: bodyC(p),
           showTitle: false,
           showValue: !!chart.showValue,
           dataLabelFontFace: "Geist",
@@ -3608,11 +3649,14 @@ function renderVizNativeChart(
           valAxisOrientation: chart.invertValueAxis ? "maxMin" : "minMax",
           valAxisMinVal: chart.valueMin,
           valAxisMaxVal: chart.valueMax,
+          valAxisMajorUnit: chart.majorUnit,
           catGridLine: { style: "none" },
           valGridLine: { color: trackC(p), style: "solid", size: 1 },
+          lineSmooth: !!chart.lineSmooth,
           lineDataSymbol: chart.type === "line" ? "circle" : "none",
           lineDataSymbolSize: 6,
           lineSize: 3,
+
         } as Parameters<PptxGenJS.Slide["addChart"]>[2],
       );
       if (chart.centerValue) {
@@ -3662,6 +3706,7 @@ function renderVizSpec(
   p: Palette,
   vizSvg?: string,
   variantId?: string,
+  vizPalette?: string[],
 ) {
   const y0 = drawTitle(s, c, p);
   const y = Math.max(y0, VIZ_BOX.y);
@@ -3669,7 +3714,9 @@ function renderVizSpec(
   // Real, editable PowerPoint charts for the kinds PowerPoint can actually
   // draw (waterfall, stacked area, radar, slope/bump, gauge grid). Everything
   // else keeps the design-exact vector plate below.
-  if (renderVizNativeChart(s, c, p, { x: VIZ_BOX.x, y, w: VIZ_BOX.w, h }, variantId)) {
+  if (
+    renderVizNativeChart(s, c, p, { x: VIZ_BOX.x, y, w: VIZ_BOX.w, h }, variantId, vizPalette)
+  ) {
     // native chart emitted
   } else if (vizSvg) {
 
