@@ -3606,6 +3606,8 @@ function renderVizNativeChart(
           valAxisLabelColor: bodyC(p),
           valAxisHidden: !!chart.hideValAxis,
           valAxisOrientation: chart.invertValueAxis ? "maxMin" : "minMax",
+          valAxisMinVal: chart.valueMin,
+          valAxisMaxVal: chart.valueMax,
           catGridLine: { style: "none" },
           valGridLine: { color: trackC(p), style: "solid", size: 1 },
           lineDataSymbol: chart.type === "line" ? "circle" : "none",

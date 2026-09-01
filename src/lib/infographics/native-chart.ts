@@ -56,6 +56,9 @@ export type VizNativeChart = {
   showValue?: boolean;
   /** Draw the value axis high-to-low (rank charts read 1 at the top). */
   invertValueAxis?: boolean;
+  /** Explicit value-axis bounds (rank charts clamp to 1..n, not 0..n+1). */
+  valueMin?: number;
+  valueMax?: number;
   /** Caption drawn under the chart (used by the gauge grid). */
   caption?: string;
   /** Big value drawn in the ring centre (gauge grid). */
@@ -292,6 +295,11 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
             type: "line",
             box: FULL,
             invertValueAxis: spec.kind === "bump",
+            valueMin: spec.kind === "bump" ? 1 : undefined,
+            valueMax:
+              spec.kind === "bump"
+                ? Math.max(...series.flatMap((sr) => sr.values), 1)
+                : undefined,
 
             colors: series.map((_, i) => seriesColor(i)),
             data: series.map((s) => ({ ...s, labels })),
