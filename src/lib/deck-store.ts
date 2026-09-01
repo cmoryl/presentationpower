@@ -4040,6 +4040,7 @@ export const useDeckStore = create<DeckState>()(
               notes: s.notes,
               mode: s.mode,
               changes: [],
+              ...(s.canvasBlocks?.length ? { canvasBlocks: s.canvasBlocks } : {}),
             })),
             context: input.context ? { ...input.context } : undefined,
           };
