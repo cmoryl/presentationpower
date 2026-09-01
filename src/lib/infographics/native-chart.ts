@@ -291,6 +291,8 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
           {
             type: "line",
             box: FULL,
+            invertValueAxis: spec.kind === "bump",
+
             colors: series.map((_, i) => seriesColor(i)),
             data: series.map((s) => ({ ...s, labels })),
           },
