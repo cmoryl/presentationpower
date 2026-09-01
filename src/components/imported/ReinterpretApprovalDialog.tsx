@@ -150,8 +150,27 @@ export function ReinterpretApprovalDialog({
       controls.lock,
       overrides,
     );
-    return new Map(designed.map((m) => [m.source.index, m]));
-  }, [plans, rawMapped, styleVariantIds, styleByIndex, controls.lock, overrides, forcedLayouts]);
+    return new Map(
+      designed.map((m) => {
+        const authoredProposal = authored[m.source.index];
+        return [
+          m.source.index,
+          authoredProposal
+            ? ({ ...m, ...applyCustomModuleProposal(m, authoredProposal) } as LockedSlide)
+            : m,
+        ];
+      }),
+    );
+  }, [
+    plans,
+    rawMapped,
+    styleVariantIds,
+    styleByIndex,
+    controls.lock,
+    overrides,
+    forcedLayouts,
+    authored,
+  ]);
 
   function setOverride(index: number, next: SlideStyleOverride | undefined) {
     setOverrides((prev) => {
