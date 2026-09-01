@@ -53,6 +53,7 @@ import {
 } from "@/lib/reinterpret-style";
 
 import { planDeckReinterpretation } from "@/lib/reinterpret-ai.functions";
+import { buildSlideEvidence } from "@/lib/reinterpret-evidence";
 import { mapStoredImportedDeck, type StoredImportedDeck } from "@/lib/imported-to-deck";
 import { DESIGN_CATALOG } from "@/lib/reinterpret-design";
 import { DesignPicker } from "./DesignPicker";
@@ -274,14 +275,11 @@ export function ReinterpretApprovalDialog({
         data: {
           deckTitle: deck.original_filename.replace(/\.pptx$/i, ""),
           divisionId,
-          slides: rawMapped.slice(0, 60).map((m) => ({
-            index: m.source.index,
-            title: m.source.title ?? "",
-            bullets: (m.source.bullets ?? []).filter(Boolean).slice(0, 30),
-            notes: (m.source.notes ?? "").slice(0, 2000),
-            imageCount: (m.source.images ?? []).filter(Boolean).length,
-            currentVariantId: m.variantId,
-          })),
+          // Deep read: every text frame, chart series, table row, diagram node
+          // and the full speaker notes go to the planner, not just the bullets.
+          slides: rawMapped
+            .slice(0, 60)
+            .map((m) => buildSlideEvidence(m.source, m.variantId)),
         },
       });
       if (res.error) throw new Error(res.error);
