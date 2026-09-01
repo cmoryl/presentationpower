@@ -58,6 +58,14 @@ import { DesignPicker } from "./DesignPicker";
 import { useDesignGroupPresets } from "@/lib/design-group-presets";
 
 import { applyApprovedPlans, validateAiPlans, type ValidatedPlan } from "@/lib/reinterpret-plan";
+import {
+  applyCustomModuleProposal,
+  proposeCustomModule,
+  type CustomModuleProposal,
+} from "@/lib/reinterpret-custom-module";
+import { canPublish, validateCustomModule } from "@/lib/custom-modules";
+import { createCustomModule } from "@/lib/custom-modules.functions";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 import type { GroundingCitation } from "@/lib/grounding-citations";
 
