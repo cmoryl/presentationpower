@@ -560,6 +560,7 @@ function DeckSlides({
           content: m.content,
           notes: m.source.notes || undefined,
           mode: (m as { mode?: "light" | "dark" }).mode,
+          canvasBlocks: m.canvasBlocks,
         })),
         context: abPaletteOverride ? { abPaletteOverride } : undefined,
       });

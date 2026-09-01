@@ -9,6 +9,7 @@ import { useMemo } from "react";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { ImportedFaithfulSlide } from "@/components/slide/ImportedFaithfulSlide";
+import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 import type { MappedSlide } from "@/lib/pptx-mapping";
@@ -23,6 +24,8 @@ function toDeckSlide(m: MappedSlide, position: number): DeckSlide {
     content: m.content,
     changes: [],
     notes: m.source.notes || undefined,
+    // AI-authored custom modules carry their objects on the mapped slide.
+    ...(m.canvasBlocks?.length ? { canvasBlocks: m.canvasBlocks } : {}),
   };
 }
 
@@ -80,6 +83,8 @@ export function ReinterpretComparePreview({
                   pageNumber={slideIndex + 1}
                   mode={mode}
                 />
+                {/* AI-authored custom modules live entirely on the canvas layer. */}
+                <CanvasBlockLayer blocks={deckSlide.canvasBlocks} brand={brand} />
               </ScaledSlide>
             </div>
           ) : (

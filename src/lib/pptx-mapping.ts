@@ -31,6 +31,11 @@ export type MappedSlide = {
     total: number;
     dropped: string[];
   };
+  /**
+   * Free-canvas objects. Set when an AI-authored custom module replaces a slide
+   * no native module could hold (see reinterpret-custom-module.ts).
+   */
+  canvasBlocks?: import("./deck-store").CanvasBlock[];
 };
 
 export type MapOptions = {

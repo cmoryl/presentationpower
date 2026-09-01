@@ -58,6 +58,14 @@ import { DesignPicker } from "./DesignPicker";
 import { useDesignGroupPresets } from "@/lib/design-group-presets";
 
 import { applyApprovedPlans, validateAiPlans, type ValidatedPlan } from "@/lib/reinterpret-plan";
+import {
+  applyCustomModuleProposal,
+  proposeCustomModule,
+  type CustomModuleProposal,
+} from "@/lib/reinterpret-custom-module";
+import { canPublish, validateCustomModule } from "@/lib/custom-modules";
+import { createCustomModule } from "@/lib/custom-modules.functions";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 import type { GroundingCitation } from "@/lib/grounding-citations";
 
@@ -103,6 +111,66 @@ export function ReinterpretApprovalDialog({
   // Slides where the reviewer chose "use it anyway" — the picked layout wins
   // even on the cover page or when its builder would reject the copy as-is.
   const [forcedLayouts, setForcedLayouts] = useState<Set<number>>(new Set());
+  // Slides where no native module fits and the AI authored a NEW custom module,
+  // keyed by source index. Applied to the preview and the built deck; saving it
+  // into the shared module library is a separate, admin-only action.
+  const [authored, setAuthored] = useState<Record<number, CustomModuleProposal>>({});
+  const [savedKeys, setSavedKeys] = useState<Record<number, string>>({});
+  const isAdmin = useIsAdmin();
+  const createModuleFn = useServerFn(createCustomModule);
+  const saveModule = useMutation({
+    mutationFn: async (index: number) => {
+      const p = authored[index];
+      if (!p) throw new Error("Nothing authored for this slide.");
+      const issues = validateCustomModule({
+        name: p.name,
+        description: p.description,
+        baseVariantId: p.baseVariantId,
+        blocks: p.canvasBlocks,
+        content: p.content as Record<string, unknown>,
+      });
+      if (!canPublish(issues)) throw new Error(issues.find((i) => i.level === "error")!.message);
+      const row = await createModuleFn({
+        data: {
+          moduleKey: p.moduleKey,
+          name: p.name,
+          description: p.description,
+          baseVariantId: p.baseVariantId,
+          familyId: p.familyId,
+          sectionId: p.sectionId,
+          brandMode: divisionId,
+          tags: p.tags,
+          content: p.content as Record<string, unknown>,
+          canvasBlocks: p.canvasBlocks as unknown as Array<Record<string, unknown>>,
+          notes: p.notes,
+          status: "draft",
+        },
+      });
+      return { index, key: (row as { module_key?: string })?.module_key ?? p.moduleKey };
+    },
+    onSuccess: ({ index, key }) => {
+      setSavedKeys((prev) => ({ ...prev, [index]: key }));
+      toast.success(`Saved “${key}” to the module library as a draft`);
+    },
+    onError: (e: Error) => toast.error(e.message || "Couldn't save the module"),
+  });
+
+  function authorModule(index: number) {
+    const src = rawMapped.find((m) => m.source.index === index);
+    if (!src) return;
+    setAuthored((prev) => ({ ...prev, [index]: proposeCustomModule(src, { divisionId }) }));
+    setApproved((prev) => new Set(prev).add(index));
+    setCompare((prev) => new Set(prev).add(index));
+  }
+
+  function discardAuthored(index: number) {
+    setAuthored((prev) => {
+      const copy = { ...prev };
+      delete copy[index];
+      return copy;
+    });
+  }
+
 
   function toggleForced(index: number) {
     setForcedLayouts((prev) => {
@@ -150,8 +218,27 @@ export function ReinterpretApprovalDialog({
       controls.lock,
       overrides,
     );
-    return new Map(designed.map((m) => [m.source.index, m]));
-  }, [plans, rawMapped, styleVariantIds, styleByIndex, controls.lock, overrides, forcedLayouts]);
+    return new Map(
+      designed.map((m) => {
+        const authoredProposal = authored[m.source.index];
+        return [
+          m.source.index,
+          authoredProposal
+            ? ({ ...m, ...applyCustomModuleProposal(m, authoredProposal) } as LockedSlide)
+            : m,
+        ];
+      }),
+    );
+  }, [
+    plans,
+    rawMapped,
+    styleVariantIds,
+    styleByIndex,
+    controls.lock,
+    overrides,
+    forcedLayouts,
+    authored,
+  ]);
 
   function setOverride(index: number, next: SlideStyleOverride | undefined) {
     setOverrides((prev) => {
@@ -291,7 +378,10 @@ export function ReinterpretApprovalDialog({
       applyApprovedPlans(rawMapped, plans, approved, styleVariantIds, styleByIndex, forcedLayouts),
       controls.lock,
       overrides,
-    );
+    ).map((m) => {
+      const p = authored[m.source.index];
+      return p ? ({ ...m, ...applyCustomModuleProposal(m, p) } as LockedSlide) : m;
+    });
 
     onApprove(designed, {
       approved: approved.size,
@@ -442,22 +532,80 @@ export function ReinterpretApprovalDialog({
                               onChange={(v) => setVariant(p.index, v)}
                             />
 
-                            {designedSlide && designedSlide.variantId !== p.variantId && (
-                              <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                                <p className="text-[11px] text-[#FF9B70]">
-                                  {forcedLayouts.has(p.index)
-                                    ? `Even forced, this layout needs copy this slide doesn't have — showing ${designedSlide.variantId}.`
-                                    : `This layout can't be built from this slide's copy — the preview shows ${designedSlide.variantId} instead.`}
-                                </p>
-                                {!forcedLayouts.has(p.index) && (
+                            {!authored[p.index] &&
+                              designedSlide &&
+                              designedSlide.variantId !== p.variantId && (
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                                  <p className="text-[11px] text-[#FF9B70]">
+                                    {forcedLayouts.has(p.index)
+                                      ? `Even forced, this layout needs copy this slide doesn't have — showing ${designedSlide.variantId}.`
+                                      : `This layout can't be built from this slide's copy — the preview shows ${designedSlide.variantId} instead.`}
+                                  </p>
+                                  {!forcedLayouts.has(p.index) && (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleForced(p.index)}
+                                      className="rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                                    >
+                                      Use it anyway — adapt copy
+                                    </button>
+                                  )}
                                   <button
                                     type="button"
-                                    onClick={() => toggleForced(p.index)}
-                                    className="rounded-full border border-[#003FC7]/30 px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5"
+                                    onClick={() => authorModule(p.index)}
+                                    title="No native module fits — author a new custom module from this slide"
+                                    className="inline-flex items-center gap-1 rounded-full border border-[#003FC7] bg-[#003FC7] px-2.5 py-1 text-[11px] font-medium text-white hover:opacity-90"
                                   >
-                                    Use it anyway — adapt copy
+                                    <Sparkles size={10} /> Author a new module
                                   </button>
-                                )}
+                                </div>
+                              )}
+                            {authored[p.index] && (
+                              <div className="mt-1.5 rounded-lg border border-[#003FC7]/30 bg-[#003FC7]/[0.04] p-2">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="rounded-full bg-[#003FC7] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+                                    New module
+                                  </span>
+                                  <span className="text-[11px] font-medium text-[#03002C]">
+                                    {authored[p.index].name}
+                                  </span>
+                                  <span className="text-[11px] text-black/50">
+                                    {authored[p.index].canvasBlocks.length} editable objects
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-[11px] text-black/55">
+                                  {authored[p.index].description}
+                                </p>
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2">
+                                  {isAdmin &&
+                                    (savedKeys[p.index] ? (
+                                      <span className="text-[11px] text-[#0B7A3B]">
+                                        Saved as draft · {savedKeys[p.index]} — publish it in Module
+                                        Studio to share it.
+                                      </span>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => saveModule.mutate(p.index)}
+                                        disabled={saveModule.isPending}
+                                        className="inline-flex items-center gap-1 rounded-full border border-[#003FC7] bg-white px-2.5 py-1 text-[11px] font-medium text-[#003FC7] hover:bg-[#003FC7]/5 disabled:opacity-60"
+                                      >
+                                        {saveModule.isPending ? (
+                                          <Loader2 size={10} className="animate-spin" />
+                                        ) : (
+                                          <Check size={10} />
+                                        )}
+                                        Save to module library (draft)
+                                      </button>
+                                    ))}
+                                  <button
+                                    type="button"
+                                    onClick={() => discardAuthored(p.index)}
+                                    className="rounded-full border border-black/15 px-2.5 py-1 text-[11px] text-black/60 hover:bg-black/5"
+                                  >
+                                    Discard new module
+                                  </button>
+                                </div>
                               </div>
                             )}
                             {designedSlide &&
