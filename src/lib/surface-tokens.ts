@@ -73,6 +73,32 @@ export function cardWashGradient(line: string): string {
 }
 
 /**
+ * Base-tint fade stops. The neutral glass fill under the accent wash must fade
+ * out on the SAME curve as the wash, otherwise the card still closes as a flat
+ * rectangle at the bottom edge (the wash goes to 0 but the base tint does not),
+ * which is exactly the "box that doesn't fade to 0" artefact.
+ */
+export const BASE_FADE = {
+  /** Full base alpha down to this % of the box height. */
+  fullTo: 34,
+  /** Half alpha at this % … */
+  midAt: 66,
+  midFactor: 0.45,
+  /** … and 0 by this %. */
+  endAt: 92,
+} as const;
+
+/**
+ * The canonical neutral base fill for a module card, already fading to 0.
+ * `alpha` is the top-of-card alpha; `rgb` is the fill triplet, e.g. "255,255,255".
+ */
+export function cardBaseGradient(rgb: string, alpha: number): string {
+  const { fullTo, midAt, midFactor, endAt } = BASE_FADE;
+  const a = (m: number) => Math.round(alpha * m * 1000) / 1000;
+  return `linear-gradient(180deg, rgba(${rgb},${a(1)}) 0%, rgba(${rgb},${a(1)}) ${fullTo}%, rgba(${rgb},${a(midFactor)}) ${midAt}%, rgba(${rgb},0) ${endAt}%)`;
+}
+
+/**
  * Corner radius, px, for any inset photographic plate (portrait proofs, photo
  * trios, photo bands). Deliberately the SAME value the bento cells use, so a
  * photo tile and a content tile read as the same family of surface. Full-bleed
