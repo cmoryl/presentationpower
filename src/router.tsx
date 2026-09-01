@@ -28,10 +28,12 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: ({ location }) => {
       const key = scrollKey(location);
+      console.log("SCROLLGATE", key, lastKey);
       if (key === lastKey) return false;
       lastKey = key;
       return true;
     },
+
     getScrollRestorationKey: scrollKey,
     defaultPreloadStaleTime: 0,
   });
