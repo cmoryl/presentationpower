@@ -642,7 +642,7 @@ function LondonSignagePage() {
                   )}
                 </p>
                 <p className="mt-1 font-mono text-[11px] text-[#03002C]/55">
-                  {LONDON_SIGNAGE_FONT.pdfName} · official EPS outlines, live vector paths in .ai and
+                  {LONDON_SIGNAGE_FONT.pdfBaseFont} · official EPS outlines, live vector paths in .ai and
                   .svg
                 </p>
               </div>
