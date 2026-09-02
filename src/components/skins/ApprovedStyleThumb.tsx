@@ -17,7 +17,8 @@
  */
 
 import * as React from "react";
-import { packGroundPaint, type StylePack } from "@/lib/style-packs";
+import type { StylePack } from "@/lib/style-packs";
+import { packSheetPlanes } from "@/lib/pack-sheet";
 import { useSkinBackdropVersion, useSkinBackdropsReady } from "@/lib/skin-backdrop-overrides";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 
@@ -25,19 +26,33 @@ const SLIDE_W = 1280;
 const SLIDE_H = 720;
 
 /**
- * Paints `pack.ground(seed)` at true 1280×720 and scales the plane to fill its
+ * Paints the look's PAGE at true 1280×720 and scales the plane to fill its
  * parent. Drop into any position:relative box that is already 16:9. Shared by
  * the library cards, the preview tiles and the lookbook so a background never
  * appears cropped at preview size.
+ *
+ * The plane stack comes from `packSheetPlanes` — the same description the slide
+ * chrome and the export rasterizer use — so a preview can never show the raw
+ * undamped ground while the real slide shows the damped, masked page.
  */
-export function GroundPlane({ pack, seed }: { pack: StylePack; seed: string }) {
+export function GroundPlane({
+  pack,
+  seed,
+  layers,
+}: {
+  pack: StylePack;
+  seed: string;
+  /** Ground layers to paint instead of the pack's own (live tuner edits). */
+  layers?: string[];
+}) {
   // Repaint when an admin replaces this look's background artwork.
   const bdVersion = useSkinBackdropVersion();
   // Hold the plane until replacements have loaded (no stale-artwork flash).
   const groundReady = useSkinBackdropsReady();
-  const background = React.useMemo(
-    () => packGroundPaint(pack, seed).join(", "),
-    [pack, seed, bdVersion],
+  const planes = React.useMemo(
+    () => packSheetPlanes(pack, seed, layers ? { layers } : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [pack, seed, layers, bdVersion],
   );
   const hostRef = React.useRef<HTMLDivElement | null>(null);
   const [scale, setScale] = React.useState(0);
@@ -72,17 +87,21 @@ export function GroundPlane({ pack, seed }: { pack: StylePack; seed: string }) {
           left: 0,
           width: SLIDE_W,
           height: SLIDE_H,
-          background,
           transform: `scale(${scale || 0.0001})`,
           transformOrigin: "top left",
           opacity: scale && groundReady ? 1 : 0,
           transition: "opacity 120ms linear",
           willChange: "transform",
         }}
-      />
+      >
+        {planes.map((p) => (
+          <div key={p.key} style={{ position: "absolute", inset: 0, ...p.style }} />
+        ))}
+      </div>
     </div>
   );
 }
+
 
 export function ApprovedStyleThumb({
   pack,

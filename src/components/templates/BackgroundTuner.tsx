@@ -24,6 +24,8 @@ import {
 import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import type { StylePack } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
+import { GroundPlane } from "@/components/skins/ApprovedStyleThumb";
+
 import { BackdropSourcePicker, divisionImageUrl } from "./BackdropSourcePicker";
 import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { SceneSlideStage } from "./SceneSlideStage";
@@ -562,10 +564,10 @@ export function BackgroundTuner({
                     aria-pressed={on}
                     className="block w-full text-left"
                   >
-                    <span
-                      className="block aspect-[16/9] w-full rounded-lg border border-black/10 dark:border-white/15"
-                      style={{ background: live.join(", ") }}
-                    />
+                    <span className="relative block aspect-[16/9] w-full overflow-hidden rounded-lg border border-black/10 dark:border-white/15">
+                      <GroundPlane pack={pack} seed={s} layers={live} />
+                    </span>
+
                   </button>
                   <span className="flex min-w-0 items-center justify-between gap-1.5">
                     <span
@@ -644,13 +646,15 @@ export function BackgroundTuner({
                   className="text-left"
                 >
                   <span
-                    className={`block aspect-[16/9] w-full rounded-lg border ${
+                    className={`relative block aspect-[16/9] w-full overflow-hidden rounded-lg border ${
                       on
                         ? "border-[#003FC7] ring-2 ring-[#003FC7]/30"
                         : "border-black/10 hover:border-[#003FC7]/50 dark:border-white/15"
                     }`}
-                    style={{ background: preview.join(", ") }}
-                  />
+                  >
+                    <GroundPlane pack={pack} seed={scene} layers={preview} />
+                  </span>
+
                   <span className="mt-1 block text-[11px] font-medium">{p.label}</span>
                   <span className="block text-[10px] leading-tight opacity-55">{p.hint}</span>
                 </button>
