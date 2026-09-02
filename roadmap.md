@@ -21,4 +21,4 @@
 
 ## Templates / looks (Sep 2)
 - [ ] 28-look restyle matrix: sweep every look and report drift vs the house look
-- [ ] Modules page: kill old-template artifacting (stale ground paints before the override registry is ready)
+- [x] Modules page: old-template artifacting fixed (shorthand/longhand background patching left prior layers painted; ground surfaces now wait on the template registry too)
