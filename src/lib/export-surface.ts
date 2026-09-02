@@ -160,9 +160,10 @@ export const GLASS_CARD_TOKENS = {
     backdropBlurPx: 6,
   },
   dark: {
-    /** `rgba(10, 8, 48, 0.18)` base fill. */
-    base: "0A0830",
-    baseAlpha: 0.18,
+    /** `rgba(255,255,255,0.07)` base fill — a light veil, same as light mode. */
+    base: "FFFFFF",
+    baseAlpha: 0.07,
+
     /** `ACCENT_ALPHA.dark.ring`. */
     ringAlpha: 0.3,
     /** `backdrop-filter: blur(20px) saturate(150%)`. */
