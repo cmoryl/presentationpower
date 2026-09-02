@@ -24,6 +24,8 @@ import {
 import { SKIN_SCENES, type SkinScene } from "@/lib/skin-backgrounds";
 import type { StylePack } from "@/lib/style-packs";
 import { LookPreviewTile } from "@/components/skins/SkinPreviewTile";
+import { GroundPlane } from "@/components/skins/ApprovedStyleThumb";
+
 import { BackdropSourcePicker, divisionImageUrl } from "./BackdropSourcePicker";
 import { uploadDivisionImagery } from "@/lib/division-imagery.functions";
 import { SceneSlideStage } from "./SceneSlideStage";
