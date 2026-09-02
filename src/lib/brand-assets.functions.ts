@@ -94,7 +94,7 @@ const createInput = z.object({
 });
 export const createBrandAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => createInput.parse(input))
+  .validator((input) => createInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -121,7 +121,7 @@ export const createBrandAsset = createServerFn({ method: "POST" })
 const delInput = z.object({ id: z.string().uuid() });
 export const deleteBrandAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => delInput.parse(input))
+  .validator((input) => delInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -146,7 +146,7 @@ export const deleteBrandAsset = createServerFn({ method: "POST" })
 const signInput = z.object({ id: z.string().uuid() });
 export const getBrandAssetSignedUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => signInput.parse(input))
+  .validator((input) => signInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s
@@ -254,7 +254,7 @@ const ingestInput = z.object({
 });
 export const ingestBrandAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => ingestInput.parse(input))
+  .validator((input) => ingestInput.parse(input))
   .handler(
     async ({ data, context }): Promise<{ ok: boolean; chunkCount: number; error?: string }> => {
       await assertAdmin(context);
@@ -351,7 +351,7 @@ const searchInput = z.object({
 });
 export const searchBrandChunks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => searchInput.parse(input))
+  .validator((input) => searchInput.parse(input))
   .handler(
     async ({
       data,
@@ -415,7 +415,7 @@ const seedInput = z.object({
 });
 export const importBrandhubSeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => seedInput.parse(input))
+  .validator((input) => seedInput.parse(input))
   .handler(
     async ({
       data,
@@ -539,7 +539,7 @@ const fetchImportInput = z.object({
 });
 export const fetchAndImportBrandhubSeed = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => fetchImportInput.parse(input))
+  .validator((input) => fetchImportInput.parse(input))
   .handler(
     async ({
       data,

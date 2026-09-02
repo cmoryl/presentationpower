@@ -55,7 +55,7 @@ function resolveDivisionId(brandModeId: string): string | null {
 
 export const suggestAssetsForSlide = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(
     async ({
       data,

@@ -120,7 +120,7 @@ export const getGlobalLinkConfig = createServerFn({ method: "GET" })
 
 export const upsertGlobalLinkConfig = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => configSchema.parse(input))
+  .validator((input) => configSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", {
       _user_id: context.userId,

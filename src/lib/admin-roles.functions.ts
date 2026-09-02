@@ -37,7 +37,7 @@ export const ROLE_DESCRIPTIONS: Record<AppRole, string> = {
 
 export const setUserRoles = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { userId: string; roles: string[] }) => {
+  .validator((input: { userId: string; roles: string[] }) => {
     if (!input || typeof input.userId !== "string" || !Array.isArray(input.roles)) {
       throw new Error("userId and roles[] are required");
     }

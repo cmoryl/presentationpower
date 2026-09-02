@@ -82,7 +82,7 @@ function formatBytes(b: number) {
 
 export const analyzeReferenceAssets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => Input.parse(input))
+  .validator((input: unknown) => Input.parse(input))
   .handler(async ({ data }): Promise<ReferenceAnalysis> => {
     if (!data.files.length) return { ok: false, error: "No reference assets attached." };
 

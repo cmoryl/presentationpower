@@ -88,7 +88,7 @@ export const listAssignableReviewers = createServerFn({ method: "GET" })
 /** All assignment rows for a set of requests (queue badges + detail panel). */
 export const listApprovalAssignees = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ requestIds: z.array(z.string().uuid()).max(200) }).parse(raw ?? { requestIds: [] }),
   )
   .handler(async ({ data, context }) => {
@@ -121,7 +121,7 @@ export const listApprovalAssignees = createServerFn({ method: "POST" })
 /** Assign a reviewer to a request. Reviewer-only. */
 export const assignApprovalReviewer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         requestId: z.string().uuid(),
@@ -176,7 +176,7 @@ export const assignApprovalReviewer = createServerFn({ method: "POST" })
 /** Remove an assignment. Reviewer-only. */
 export const unassignApprovalReviewer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: roleRows } = await supabase
@@ -194,7 +194,7 @@ export const unassignApprovalReviewer = createServerFn({ method: "POST" })
 /** The assigned reviewer records their own decision. */
 export const recordAssigneeDecision = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         id: z.string().uuid(),

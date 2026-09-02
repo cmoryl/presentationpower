@@ -73,7 +73,7 @@ export const listAgendaFiles = createServerFn({ method: "GET" })
 
 export const saveAgendaFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => versionInput.parse(data))
+  .validator((data: unknown) => versionInput.parse(data))
   .handler(async ({ data, context }) => {
     const allowed = await canEditNextDivision(context.userId, data.divisionId, context.supabase as never);
     if (!allowed) throw new Error("You are not authorized to edit agendas for this division");
@@ -95,7 +95,7 @@ export const saveAgendaFile = createServerFn({ method: "POST" })
 
 export const updateAgendaFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     versionInput.partial().extend({ id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -128,7 +128,7 @@ export const updateAgendaFile = createServerFn({ method: "POST" })
 
 export const deleteAgendaFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { data: existing, error: findError } = await context.supabase
       .from("next_agenda_versions")

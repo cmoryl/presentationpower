@@ -35,7 +35,7 @@ const signalInput = z.object({
 
 export const recordStyleSignal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => signalInput.parse(data))
+  .validator((data: unknown) => signalInput.parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("style_reco_events").insert({
       user_id: context.userId,
@@ -55,7 +55,7 @@ export const recordStyleSignal = createServerFn({ method: "POST" })
 
 export const getStyleLearning = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ profileKey: z.string().default("") }).parse(data))
+  .validator((data: unknown) => z.object({ profileKey: z.string().default("") }).parse(data))
   .handler(async ({ data, context }): Promise<LearnedStyleWeights> => {
     const prefs = await context.supabase
       .from("style_learning_prefs")
@@ -133,7 +133,7 @@ export const getStyleLearning = createServerFn({ method: "GET" })
 /** Reset / ignore learned preference. Keeps the audit trail, stops the learning. */
 export const setStyleLearningPrefs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         learningEnabled: z.boolean().optional(),
@@ -186,7 +186,7 @@ export const listExpansionCandidates = createServerFn({ method: "GET" })
  */
 export const scanExpansionCandidates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z.object({ minObservations: z.number().int().min(2).max(200).optional() }).parse(data ?? {}),
   )
   .handler(async ({ data, context }) => {
@@ -240,7 +240,7 @@ export const scanExpansionCandidates = createServerFn({ method: "POST" })
 
 export const reviewExpansionCandidate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         id: z.string().uuid(),

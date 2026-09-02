@@ -87,7 +87,7 @@ const ALLOWED_ROLES = ["admin", "brand_lead", "brand_reviewer"] as const;
  */
 export const publishLondonRevision = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => PublishSchema.parse(input))
+  .validator((input: unknown) => PublishSchema.parse(input))
   .handler(async ({ data, context }) => {
     let allowed = false;
     for (const role of ALLOWED_ROLES) {

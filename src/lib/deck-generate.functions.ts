@@ -5,7 +5,7 @@ import { generateDeckFromBrief, generateDeckInput } from "@/lib/deck-generate";
 
 export const generateDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => generateDeckInput.parse(raw))
+  .validator((raw: unknown) => generateDeckInput.parse(raw))
   .handler(async ({ data, context }) =>
     generateDeckFromBrief(context.supabase, context.userId, data),
   );

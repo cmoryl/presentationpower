@@ -21,7 +21,7 @@ export type ProspectRelevance = {
 
 export const lookupProspectContext = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(async ({ data, context }): Promise<ProspectRelevance> => {
     const { supabase, userId } = context;
     const name = data.prospect.trim();

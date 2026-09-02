@@ -32,7 +32,7 @@ function decodeBase64(b64: string): Uint8Array {
 /** Upload a generated .pptx and attach it to a saved module / slide record. */
 export const attachSlideFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         moduleId: z.string().uuid(),
@@ -72,7 +72,7 @@ export const attachSlideFile = createServerFn({ method: "POST" })
 /** Short-lived signed URL so the owner can download their saved slide file. */
 export const getSlideFileUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ moduleId: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ moduleId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: row, error } = await supabase

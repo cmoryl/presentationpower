@@ -54,7 +54,7 @@ export type PopulateSlideResult = {
 
 export const populateSlideWithDivisionInfo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => InputSchema.parse(raw))
+  .validator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data, context: authContext }): Promise<PopulateSlideResult> => {
     if (!hasAnthropicKey())
       return {

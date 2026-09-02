@@ -18,7 +18,7 @@ function toJsonRecord(rec: Record<string, unknown>): Record<string, Json> {
 
 export const personalizeSlides = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => PersonalizeInputSchema.parse(raw))
+  .validator((raw: unknown) => PersonalizeInputSchema.parse(raw))
   .handler(async ({ data }): Promise<{ slides: PersonalizedSlideJson[]; error?: string }> => {
     const result = await personalizeSlidesCore(data);
     return {

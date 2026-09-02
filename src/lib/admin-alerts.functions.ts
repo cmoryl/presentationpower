@@ -100,7 +100,7 @@ const sendSchema = z.object({
 
 export const sendAdminAlert = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => sendSchema.parse(raw))
+  .validator((raw: unknown) => sendSchema.parse(raw))
   .handler(async ({ data, context }): Promise<{ delivered: number }> => {
     await assertAdmin(context as never);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

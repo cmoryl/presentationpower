@@ -101,7 +101,7 @@ type Row = {
 
 export const getApprovalAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ windowDays: z.number().int().min(7).max(365).optional() }).parse(raw ?? {}),
   )
   .handler(async ({ data, context }): Promise<ApprovalAnalytics> => {

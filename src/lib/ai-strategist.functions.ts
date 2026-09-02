@@ -13,5 +13,5 @@ export type { DeckStrategy, StrategySection, StrategyCoreResult } from "@/lib/ai
 
 export const planDeckStrategy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => StrategyInput.parse(raw))
+  .validator((raw: unknown) => StrategyInput.parse(raw))
   .handler(async ({ data, context }) => planStrategyCore(context.supabase, data));

@@ -107,7 +107,7 @@ export type ArtDirectorInput = z.infer<typeof Input>;
 
 export const critiqueDeckRhythm = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(
     async ({
       data,

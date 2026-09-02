@@ -16,7 +16,7 @@ import { createServerFn } from "@tanstack/react-start";
 export const TEAM_ACCOUNT_EMAIL = "team@presentationpower.app";
 
 export const teamSignIn = createServerFn({ method: "POST" })
-  .inputValidator((data: { password: string }) => {
+  .validator((data: { password: string }) => {
     const password = typeof data?.password === "string" ? data.password : "";
     if (!password) throw new Error("Password is required");
     return { password };

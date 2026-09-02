@@ -45,7 +45,7 @@ const CreateInput = z.object({
 
 export const createPrintAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => CreateInput.parse(raw))
+  .validator((raw) => CreateInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const content: CaseStudyContent = {
@@ -90,7 +90,7 @@ export const listMyPrintAssets = createServerFn({ method: "GET" })
 // Reuse an existing editable copy of a library item instead of starting over.
 export const findMyPrintAssetForLibraryItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ libraryItemId: z.string().min(1) }).parse(raw))
+  .validator((raw) => z.object({ libraryItemId: z.string().min(1) }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: rows, error } = await supabase
@@ -111,7 +111,7 @@ export const findMyPrintAssetForLibraryItem = createServerFn({ method: "POST" })
 
 export const loadPrintAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ assetId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ assetId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: row, error } = await supabase
@@ -137,7 +137,7 @@ const UpdateInput = z.object({
 
 export const updatePrintAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => UpdateInput.parse(raw))
+  .validator((raw) => UpdateInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const patch: Record<string, unknown> = {};
@@ -200,7 +200,7 @@ function isHeroCustomized(hero: unknown): boolean {
 
 export const applyHeroToAllPrintAssets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => ApplyHeroInput.parse(raw))
+  .validator((raw) => ApplyHeroInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const query = supabase
@@ -267,7 +267,7 @@ const UndoApplyInput = z.object({
 
 export const undoApplyHeroToAllPrintAssets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => UndoApplyInput.parse(raw))
+  .validator((raw) => UndoApplyInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const ids = data.snapshots.map((s) => s.id);
@@ -323,7 +323,7 @@ const PreviewApplyHeroInput = z.object({
 
 export const previewApplyHeroToAllPrintAssets = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => PreviewApplyHeroInput.parse(raw))
+  .validator((raw) => PreviewApplyHeroInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: rows, error } = await supabase
@@ -360,7 +360,7 @@ export const previewApplyHeroToAllPrintAssets = createServerFn({ method: "POST" 
 
 export const deletePrintAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ assetId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ assetId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { error } = await supabase
@@ -393,7 +393,7 @@ const SeedFromBriefInput = z.object({
 
 export const createPrintAssetWithBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => SeedFromBriefInput.parse(raw))
+  .validator((raw) => SeedFromBriefInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
@@ -523,7 +523,7 @@ const SynthInput = z.object({
 
 export const synthesizeCaseStudy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => SynthInput.parse(raw))
+  .validator((raw) => SynthInput.parse(raw))
   .handler(async ({ data, context: authContext }) => {
     const { draftGroundedCaseStudy } = await import("@/lib/print-synth.server");
     return draftGroundedCaseStudy({

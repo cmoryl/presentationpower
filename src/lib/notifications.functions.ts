@@ -19,7 +19,7 @@ export type NotificationRow = {
 
 export const listNotifications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({ unreadOnly: z.boolean().optional(), limit: z.number().min(1).max(100).optional() })
       .parse(raw ?? {}),
@@ -50,7 +50,7 @@ export const listNotifications = createServerFn({ method: "POST" })
 
 export const markNotificationsRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({ ids: z.array(z.string().uuid()).max(100).optional(), all: z.boolean().optional() })
       .parse(raw ?? {}),
@@ -90,7 +90,7 @@ export const getNotificationPrefs = createServerFn({ method: "POST" })
 
 export const updateNotificationPrefs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ inappEnabled: z.boolean(), emailEnabled: z.boolean() }).parse(raw),
   )
   .handler(async ({ data, context }) => {

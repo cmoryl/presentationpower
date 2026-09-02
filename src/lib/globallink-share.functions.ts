@@ -226,7 +226,7 @@ const settingsSchema = z.object({
 
 export const upsertGlobalLinkShareSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => settingsSchema.parse(input))
+  .validator((input) => settingsSchema.parse(input))
   .handler(async ({ data, context }): Promise<GlobalLinkShareSettings> => {
     const payload = {
       id: true,
@@ -295,7 +295,7 @@ async function recordActivity(
 
 export const uploadToGlobalLinkShare = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => uploadSchema.parse(input))
+  .validator((input) => uploadSchema.parse(input))
   .handler(async ({ data, context }): Promise<GlobalLinkShareUploadResult> => {
     // Approx decoded byte size from base64 length.
     const approxBytes = Math.floor((data.contentBase64.length * 3) / 4);

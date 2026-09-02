@@ -51,7 +51,7 @@ async function resolveDivisionFilter(
 
 export const oracleChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(
     async ({
       data,

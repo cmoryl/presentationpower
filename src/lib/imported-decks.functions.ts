@@ -45,7 +45,7 @@ const UploadInput = z.object({
 
 export const uploadImportedDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => UploadInput.parse(v))
+  .validator((v) => UploadInput.parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const buf = Buffer.from(data.data, "base64");
@@ -165,7 +165,7 @@ export const uploadImportedDeck = createServerFn({ method: "POST" })
 
 export const reparseImportedDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
     const { reparseDeckRow } = await import("./imported-deck-ingest.server");
     const out = await reparseDeckRow({
@@ -184,7 +184,7 @@ export const reparseImportedDeck = createServerFn({ method: "POST" })
 
 export const listImportedDecksForDivision = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
+  .validator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: rows } = await s
@@ -212,7 +212,7 @@ export const listImportedDecksForDivision = createServerFn({ method: "GET" })
 
 export const getImportedDeckSlides = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s
@@ -354,7 +354,7 @@ export const getImportedDeckSlides = createServerFn({ method: "GET" })
 
 export const deleteImportedDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s
@@ -405,7 +405,7 @@ type BrokenRef = {
 
 export const listBrokenDeckImages = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(
     async ({
       data,
@@ -504,7 +504,7 @@ const RelinkInput = z
 
 export const relinkDeckImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => RelinkInput.parse(v))
+  .validator((v) => RelinkInput.parse(v))
   .handler(async ({ data, context }): Promise<{ ok: true; path: string }> => {
     const s = context.supabase as unknown as SbClient;
     // Fetch the deck we intend to mutate. Only the uploader (or an admin)
@@ -659,7 +659,7 @@ const embedInput = z.object({
 
 export const embedImportedDecks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => embedInput.parse(v))
+  .validator((v) => embedInput.parse(v))
   .handler(
     async ({
       data,
@@ -881,7 +881,7 @@ const SendToLibraryInput = z.object({
 
 export const sendImportedSlideToLibrary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => SendToLibraryInput.parse(v))
+  .validator((v) => SendToLibraryInput.parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s
@@ -942,7 +942,7 @@ export type LibrarySlideExample = {
 
 export const listLibrarySlideExamples = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
+  .validator((v) => z.object({ divisionId: z.string().min(1).max(120) }).parse(v))
   .handler(async ({ data, context }): Promise<LibrarySlideExample[]> => {
     const s = context.supabase as unknown as SbClient;
     const divisionId = normalizeImportedDeckDivision(data.divisionId);
@@ -974,7 +974,7 @@ export const listLibrarySlideExamples = createServerFn({ method: "GET" })
 
 export const deleteLibrarySlideExample = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { error } = await s.from("library_slide_examples").delete().eq("id", data.id);

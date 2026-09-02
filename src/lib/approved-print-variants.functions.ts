@@ -29,7 +29,7 @@ const ListInput = z.object({
 
 export const listApprovedPrintVariants = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => ListInput.parse(raw ?? {}))
+  .validator((raw) => ListInput.parse(raw ?? {}))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     let q = supabase
@@ -60,7 +60,7 @@ const CreateInput = z.object({
 
 export const createApprovedPrintVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => CreateInput.parse(raw))
+  .validator((raw) => CreateInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
@@ -101,7 +101,7 @@ const PublishFromAssetInput = z.object({
 
 export const publishAssetToLibrary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => PublishFromAssetInput.parse(raw))
+  .validator((raw) => PublishFromAssetInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
@@ -151,7 +151,7 @@ const UpdateInput = z.object({
 
 export const updateApprovedPrintVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => UpdateInput.parse(raw))
+  .validator((raw) => UpdateInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
@@ -181,7 +181,7 @@ export const updateApprovedPrintVariant = createServerFn({ method: "POST" })
 const DeleteInput = z.object({ id: z.string().uuid() });
 export const deleteApprovedPrintVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => DeleteInput.parse(raw))
+  .validator((raw) => DeleteInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
@@ -200,7 +200,7 @@ const DuplicateInput = z.object({
 });
 export const duplicateApprovedPrintVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => DuplicateInput.parse(raw))
+  .validator((raw) => DuplicateInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: v, error: vErr } = await supabase
@@ -237,7 +237,7 @@ export const duplicateApprovedPrintVariant = createServerFn({ method: "POST" })
 const RecordDownloadInput = z.object({ id: z.string().uuid() });
 export const recordApprovedVariantDownload = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => RecordDownloadInput.parse(raw))
+  .validator((raw) => RecordDownloadInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: v } = await supabase
@@ -272,7 +272,7 @@ const SuggestInput = z.object({
 });
 export const suggestPrintVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => SuggestInput.parse(raw))
+  .validator((raw) => SuggestInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
@@ -286,7 +286,7 @@ export const suggestPrintVariant = createServerFn({ method: "POST" })
 
 export const listPrintVariantSuggestions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z.object({ status: z.enum(["pending", "approved", "rejected"]).optional() }).parse(raw ?? {}),
   )
   .handler(async ({ data, context }) => {
@@ -304,7 +304,7 @@ export const listPrintVariantSuggestions = createServerFn({ method: "POST" })
 const ReviewInput = z.object({ id: z.string().uuid(), status: z.enum(["approved", "rejected"]) });
 export const reviewPrintVariantSuggestion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => ReviewInput.parse(raw))
+  .validator((raw) => ReviewInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });

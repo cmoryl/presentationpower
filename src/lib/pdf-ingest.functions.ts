@@ -198,7 +198,7 @@ const ingestInput = z.object({
 
 export const ingestPdfBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => ingestInput.parse(input))
+  .validator((input) => ingestInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -527,7 +527,7 @@ const embedInput = z.object({
 
 export const embedPdfExtractions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => embedInput.parse(input))
+  .validator((input) => embedInput.parse(input))
   .handler(
     async ({
       data,
@@ -739,7 +739,7 @@ export const embedPdfExtractions = createServerFn({ method: "POST" })
 const listByDivInput = z.object({ divisionOrSlug: z.string() });
 export const listPdfExtractionsForDivision = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => listByDivInput.parse(input))
+  .validator((input) => listByDivInput.parse(input))
   .handler(async ({ data, context }): Promise<PdfExtractionRow[]> => {
     const entity = pdfEntityForDivision(data.divisionOrSlug);
     if (!entity) return [];
@@ -768,7 +768,7 @@ export type PdfExtractionText = {
 
 export const getPdfExtractionText = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<PdfExtractionText | null> => {
     const s = context.supabase as unknown as SbClient;
     const { data: row } = await s

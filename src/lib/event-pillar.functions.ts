@@ -61,7 +61,7 @@ export const listPillarFiles = createServerFn({ method: "GET" })
 
 export const savePillarFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => versionInput.parse(data))
+  .validator((data: unknown) => versionInput.parse(data))
   .handler(async ({ data, context }) => {
     const divisionId = data.config.divisionId;
     const allowed = await canEditNextDivision(context.userId, divisionId, context.supabase as never);
@@ -85,7 +85,7 @@ export const savePillarFile = createServerFn({ method: "POST" })
 
 export const updatePillarFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     versionInput.partial().extend({ id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -122,7 +122,7 @@ export const updatePillarFile = createServerFn({ method: "POST" })
 
 export const deletePillarFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { data: existing, error: findError } = await context.supabase
       .from("event_pillar_versions")

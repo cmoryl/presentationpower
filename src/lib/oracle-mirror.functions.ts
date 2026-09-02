@@ -24,7 +24,7 @@ type Sb = {
 
 export const backfillOracleMirror = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) =>
+  .validator((d: unknown) =>
     z.object({ limit: z.number().min(1).max(500).default(400) }).parse(d ?? {}),
   )
   .handler(

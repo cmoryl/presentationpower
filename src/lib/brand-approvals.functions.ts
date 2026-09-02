@@ -44,7 +44,7 @@ function flagsFromRoles(rows: RoleRow[] | null) {
 /** Submit (or re-submit) an item for brand/compliance review. */
 export const requestApproval = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         subjectType: SubjectType,
@@ -137,7 +137,7 @@ export const requestApproval = createServerFn({ method: "POST" })
 /** The reviewer queue. Reviewers see everything; others see their own submissions. */
 export const listApprovalRequests = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ status: Status.optional(), subjectType: SubjectType.optional() }).parse(raw ?? {}),
   )
   .handler(async ({ data, context }) => {
@@ -217,7 +217,7 @@ export type ApprovalRequestRow = {
 /** Latest approval state for one item — used to gate/annotate export surfaces. */
 export const getApprovalState = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ subjectType: SubjectType, subjectId: z.string().min(1).max(200) }).parse(raw),
   )
   .handler(async ({ data, context }) => {
@@ -237,7 +237,7 @@ export const getApprovalState = createServerFn({ method: "POST" })
 /** Approve or request changes. Reviewer-only. */
 export const decideApproval = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -316,7 +316,7 @@ export const decideApproval = createServerFn({ method: "POST" })
 
 export const bulkDecideApprovals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         ids: z.array(z.string().uuid()).min(1).max(50),
@@ -373,7 +373,7 @@ export const bulkDecideApprovals = createServerFn({ method: "POST" })
 
 export const listApprovalComments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ requestId: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ requestId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: rows, error } = await supabase
@@ -396,7 +396,7 @@ export const listApprovalComments = createServerFn({ method: "POST" })
 
 export const postApprovalComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ requestId: z.string().uuid(), body: z.string().min(1).max(4000) }).parse(raw),
   )
   .handler(async ({ data, context }) => {
@@ -424,7 +424,7 @@ export const postApprovalComment = createServerFn({ method: "POST" })
 
 export const resolveApprovalComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ id: z.string().uuid(), resolved: z.boolean() }).parse(raw),
   )
   .handler(async ({ data, context }) => {
@@ -457,7 +457,7 @@ export type ApprovalTimelineEvent = {
  */
 export const listApprovalTimeline = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z.object({ subjectType: SubjectType, subjectId: z.string().min(1).max(200) }).parse(raw),
   )
   .handler(async ({ data, context }) => {

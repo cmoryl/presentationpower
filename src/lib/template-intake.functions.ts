@@ -64,7 +64,7 @@ export const listIntakes = createServerFn({ method: "GET" })
 
 export const createIntake = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => CreateInput.parse(input))
+  .validator((input: unknown) => CreateInput.parse(input))
   .handler(async ({ data, context }): Promise<TemplateIntake> => {
     const s = context.supabase as unknown as SbClient;
     await assertAdmin(s, context.userId);
@@ -94,7 +94,7 @@ export const createIntake = createServerFn({ method: "POST" })
 
 export const updateIntake = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => UpdateInput.parse(input))
+  .validator((input: unknown) => UpdateInput.parse(input))
   .handler(async ({ data, context }): Promise<TemplateIntake> => {
     const s = context.supabase as unknown as SbClient;
     await assertAdmin(s, context.userId);
@@ -120,7 +120,7 @@ export const updateIntake = createServerFn({ method: "POST" })
  */
 export const uploadIntakeAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => UploadInput.parse(input))
+  .validator((input: unknown) => UploadInput.parse(input))
   .handler(async ({ data, context }): Promise<TemplateIntake> => {
     const s = context.supabase as unknown as SbClient;
     await assertAdmin(s, context.userId);
@@ -180,7 +180,7 @@ export const uploadIntakeAsset = createServerFn({ method: "POST" })
 
 export const deleteIntakeAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), slot: z.enum(SLOT_IDS) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<TemplateIntake> => {
@@ -198,7 +198,7 @@ export const deleteIntakeAsset = createServerFn({ method: "POST" })
 /** Signed URL for one stored asset — used by previews and the derive step. */
 export const signIntakeAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ path: z.string().trim().min(3).max(400) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ url: string }> => {
@@ -217,7 +217,7 @@ export const signIntakeAsset = createServerFn({ method: "POST" })
  */
 export const approveIntakeStage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -307,7 +307,7 @@ export const approveIntakeStage = createServerFn({ method: "POST" })
 /** Send an intake back a stage with a reason — the reject half of the gate. */
 export const requestIntakeChanges = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), reason: z.string().trim().min(3).max(600) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<TemplateIntake> => {
@@ -319,7 +319,7 @@ export const requestIntakeChanges = createServerFn({ method: "POST" })
 
 export const deleteIntake = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const s = context.supabase as unknown as SbClient;
     await assertAdmin(s, context.userId);
@@ -334,7 +334,7 @@ export const deleteIntake = createServerFn({ method: "POST" })
 /** Server-side gate read, so a reviewer sees the same blockers the server holds. */
 export const intakeGate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ id: z.string().uuid(), testsPassing: z.boolean().optional() }).parse(input),
   )
   .handler(
