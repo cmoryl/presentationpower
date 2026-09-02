@@ -33,6 +33,13 @@ import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
 import { renderDitheredPng } from "@/lib/london-panel-raster";
 import {
+  LONDON_SIGNAGE_FONT,
+  brandingSummary,
+  londonBrandingPlan,
+} from "@/lib/next-london-branding";
+import { nextLogoFamily } from "@/lib/next-logo-vectors";
+import logoSetAsset from "@/assets/next-2026-logo-set.zip.asset.json";
+import {
   auditAi,
   auditSvg,
   auditPng,
@@ -353,6 +360,13 @@ function LondonSignagePage() {
               >
                 <BookOpen className="h-4 w-4" /> Master directory (PDF)
               </button>
+              <a
+                href={logoSetAsset.url}
+                download="TP-NEXT-2026-Logo-Set.zip"
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+              >
+                <Download className="h-4 w-4" /> Logo set (EPS + SVG)
+              </a>
               {userId ? (
                 <>
                   <Link
@@ -616,6 +630,22 @@ function LondonSignagePage() {
                   </p>
                 </div>
               ) : null}
+
+              <div className="rounded-lg border border-[#A1FBF9]/70 bg-[#A1FBF9]/15 p-3">
+                <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                  Branding applied
+                </p>
+                <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-[#03002C]">
+                  {brandingSummary(
+                    londonBrandingPlan(openPanel),
+                    nextLogoFamily(londonBrandingPlan(openPanel).familyId)?.label ?? "TransPerfect",
+                  )}
+                </p>
+                <p className="mt-1 font-mono text-[11px] text-[#03002C]/55">
+                  {LONDON_SIGNAGE_FONT.pdfName} · official EPS outlines, live vector paths in .ai and
+                  .svg
+                </p>
+              </div>
 
               <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {[
