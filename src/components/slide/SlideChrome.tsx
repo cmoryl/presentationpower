@@ -1111,10 +1111,15 @@ export function SlideFrame({
             aria-hidden
             data-decorative="true"
             className="pointer-events-none absolute inset-0"
+            // ARTIFACT GUARD — longhand only. Mixing the `background` shorthand
+            // with backgroundSize/Position makes React patch the layer list in
+            // place, which left the *previous* template's layers painted under
+            // the new ones (the ghost columns admins saw on the modules page).
             style={{
-              background: brandSystemLightGround(groundSeed, brand.tokens.accent),
+              backgroundImage: brandSystemLightGround(groundSeed, brand.tokens.accent),
               backgroundSize: "cover",
               backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
           {/* Grain — barely-there tactile finish, matches media tiles. Skipped
