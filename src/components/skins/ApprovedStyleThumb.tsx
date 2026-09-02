@@ -18,7 +18,7 @@
 
 import * as React from "react";
 import { packGroundPaint, type StylePack } from "@/lib/style-packs";
-import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
+import { useSkinBackdropVersion, useSkinBackdropsReady } from "@/lib/skin-backdrop-overrides";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 
 const SLIDE_W = 1280;
@@ -33,6 +33,8 @@ const SLIDE_H = 720;
 export function GroundPlane({ pack, seed }: { pack: StylePack; seed: string }) {
   // Repaint when an admin replaces this look's background artwork.
   const bdVersion = useSkinBackdropVersion();
+  // Hold the plane until replacements have loaded (no stale-artwork flash).
+  const groundReady = useSkinBackdropsReady();
   const background = React.useMemo(
     () => packGroundPaint(pack, seed).join(", "),
     [pack, seed, bdVersion],
@@ -73,7 +75,8 @@ export function GroundPlane({ pack, seed }: { pack: StylePack; seed: string }) {
           background,
           transform: `scale(${scale || 0.0001})`,
           transformOrigin: "top left",
-          opacity: scale ? 1 : 0,
+          opacity: scale && groundReady ? 1 : 0,
+          transition: "opacity 120ms linear",
           willChange: "transform",
         }}
       />

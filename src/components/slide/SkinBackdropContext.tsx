@@ -67,17 +67,21 @@ export function toBackdropMap(rows: SkinBackdropRow[]): SkinBackdropMap {
 
 export function SkinBackdropProvider({
   value,
+  ready = true,
   children,
 }: {
   value: SkinBackdropMap;
+  /** False while the library is still loading — holds grounds so no surface
+   * paints a superseded background before the replacements arrive. */
+  ready?: boolean;
   children: ReactNode;
 }) {
   // Publish into the module-global registry too, so the ground engine itself
   // (thumbnails, library cards, exporters — anything outside this tree) paints
   // the replaced artwork instead of the procedural scene.
   useEffect(() => {
-    setSkinBackdropOverrides(value);
-  }, [value]);
+    setSkinBackdropOverrides(value, ready);
+  }, [value, ready]);
   return <SkinBackdropContext.Provider value={value}>{children}</SkinBackdropContext.Provider>;
 }
 
@@ -91,6 +95,7 @@ export function announceSkinBackdropChange() {
 /** Self-loading provider for surfaces that don't already have the library. */
 export function SkinBackdropLibrary({ children }: { children: ReactNode }) {
   const [map, setMap] = useState<SkinBackdropMap>({});
+  const [ready, setReady] = useState(false);
   const [nonce, setNonce] = useState(0);
   useEffect(() => {
     const bump = () => setNonce((n) => n + 1);
@@ -105,12 +110,20 @@ export function SkinBackdropLibrary({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         /* backdrops are additive — never block a surface */
+      })
+      .finally(() => {
+        // Ready either way: a failed load must not hold every ground forever.
+        if (live) setReady(true);
       });
     return () => {
       live = false;
     };
   }, [nonce]);
-  return <SkinBackdropProvider value={map}>{children}</SkinBackdropProvider>;
+  return (
+    <SkinBackdropProvider value={map} ready={ready}>
+      {children}
+    </SkinBackdropProvider>
+  );
 }
 
 export { SkinBackdropContext };
