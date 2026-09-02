@@ -1,6 +1,6 @@
 {
   "fingerprint": "bf7392da",
-  "updatedAt": "2026-09-02T18:18:56.681Z",
+  "updatedAt": "2026-09-02T19:55:00.480Z",
   "cells": {
     "base@light": [
       "MV-BENTO-5",
@@ -429,7 +429,20 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT",
+      "MV-COMM-PRICING",
+      "MV-COMPARE-SLIDER"
     ],
     "atlas-plate@dark": [
       "MV-BENTO-5",
@@ -445,7 +458,19 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT"
     ],
     "atelier-orange@light": [
       "MV-BENTO-5",
@@ -462,7 +487,20 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT",
+      "MV-COMM-PRICING",
+      "MV-COMPARE-SLIDER"
     ],
     "azulejo-tile@light": [
       "MV-BENTO-5",
@@ -480,7 +518,20 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT",
+      "MV-COMM-PRICING",
+      "MV-COMPARE-SLIDER",
+      "MV-COMPARE-VS-LISTS"
     ],
     "bauhaus-primary@light": [
       "MV-BENTO-5",
@@ -497,7 +548,19 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT",
+      "MV-COMM-PRICING"
     ],
     "cobalt-proposal@light": [
       "MV-BENTO-5",
@@ -515,7 +578,19 @@
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
       "MV-CLOSE-CHECKLIST",
-      "MV-CLOSE-CONTACT"
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT",
+      "MV-COMM-PRICING",
+      "MV-COMPARE-SLIDER"
     ],
     "crimson-editorial@light": [
       "MV-BENTO-5",
@@ -531,7 +606,19 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT"
     ],
     "deco-marquee@dark": [
       "MV-BENTO-5",
@@ -548,7 +635,19 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT",
+      "MV-COMM-PRICING"
     ],
     "editorial-serif@light": [
       "MV-BENTO-5",
@@ -563,7 +662,19 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE"
     ],
     "herbarium-press@light": [
       "MV-BENTO-5",
@@ -580,7 +691,19 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT",
+      "MV-COMM-PRICING"
     ],
     "midnight-neon@dark": [
       "MV-BENTO-5",
@@ -595,7 +718,19 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE"
     ],
     "onyx-couture@dark": [
       "MV-BENTO-5",
@@ -611,7 +746,19 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT"
     ],
     "basalt-mono@dark": [
       "MV-BENTO-5",
@@ -628,7 +775,18 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT"
     ],
     "blueprint-cyan@dark": [
       "MV-BENTO-5",
@@ -644,7 +802,19 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT"
     ],
     "comic-panel@light": [
       "MV-BENTO-5",
@@ -660,7 +830,17 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS"
     ],
     "cyber-terminal@dark": [
       "MV-BENTO-5",
@@ -674,7 +854,18 @@
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
-      "MV-CLIENT-DETAIL-3"
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT"
     ],
     "desert-clay@light": [
       "MV-BENTO-5",
@@ -689,7 +880,18 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-TIMELINE"
     ],
     "graphite-chrome@dark": [
       "MV-BENTO-5",
@@ -703,7 +905,17 @@
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
-      "MV-CLIENT-DETAIL-3"
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT"
     ],
     "marble-aureate@light": [
       "MV-BENTO-5",
@@ -718,7 +930,18 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS"
     ],
     "neo-brutal@light": [
       "MV-BENTO-5",
@@ -732,7 +955,18 @@
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
-      "MV-CLIENT-DETAIL-3"
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-THANKS"
     ],
     "optic-moire@light": [
       "MV-BENTO-5",
@@ -747,7 +981,17 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT"
     ],
     "retro-arcade@dark": [
       "MV-BENTO-5",
@@ -761,7 +1005,18 @@
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
-      "MV-CLIENT-DETAIL-3"
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT"
     ],
     "sage-linen@light": [
       "MV-BENTO-5",
@@ -776,7 +1031,18 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-TIMELINE"
     ],
     "vapor-chrome@light": [
       "MV-BENTO-5",
@@ -790,7 +1056,17 @@
       "MV-CASE-SPREAD",
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
-      "MV-CLIENT-DETAIL-3"
+      "MV-CLIENT-DETAIL-3",
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT"
     ],
     "quant-grid@dark": [
       "MV-BENTO-5",
@@ -805,7 +1081,19 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE"
     ],
     "riso-woodcut@light": [
       "MV-BENTO-5",
@@ -821,7 +1109,19 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT"
     ],
     "swiss-noir@light": [
       "MV-BENTO-5",
@@ -836,7 +1136,19 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE"
     ],
     "verdant-corporate@dark": [
       "MV-BENTO-5",
@@ -852,7 +1164,19 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT",
+      "MV-CLOSE-CTA",
+      "MV-CLOSE-DECISION",
+      "MV-CLOSE-DUAL-CTA",
+      "MV-CLOSE-METRIC-PROMISE",
+      "MV-CLOSE-QNA",
+      "MV-CLOSE-SPLIT",
+      "MV-CLOSE-STATEMENT",
+      "MV-CLOSE-THANKS",
+      "MV-CLOSE-TIMELINE",
+      "MV-COMM-INVESTMENT"
     ]
   }
 }

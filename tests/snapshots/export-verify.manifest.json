@@ -237,9 +237,9 @@
     "verdant-corporate"
   ],
   "jobs": 6120,
-  "verifiedAt": "2026-09-02T18:18:56.684Z",
+  "verifiedAt": "2026-09-02T19:55:00.488Z",
   "coverage": "sampled",
-  "verifiedCells": 792,
+  "verifiedCells": 1116,
   "sampledVariants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
