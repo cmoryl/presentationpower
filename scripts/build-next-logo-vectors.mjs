@@ -92,9 +92,11 @@ function parseSvg(file) {
     if (!d) continue;
     const cls = /\bclass="([^"]+)"/.exec(attrs)?.[1];
     const explicit = /\bfill="([^"]+)"/.exec(attrs)?.[1];
-    const fill = explicit ?? (cls ? fills.get(cls.trim().split(/\s+/)[0]) : undefined) ?? "#000";
+    const fill = explicit ?? (cls ? fills.get(cls.trim().split(/\s+/)[0]) : undefined) ?? "#fff";
     if (fill === "none") continue;
-    paths.push({ d, fill: fill === "#fff" || fill === "#ffffff" ? "#fff" : fill });
+    // These are the white-only masters: every drawn shape is the white mark, so
+    // any inherited/default fill resolves to white rather than Illustrator black.
+    paths.push({ d, fill: "#fff" });
   }
   if (paths.length === 0) return null;
   return { w: wRaw, h: hRaw, paths };
