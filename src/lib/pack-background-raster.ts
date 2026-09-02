@@ -145,64 +145,19 @@ export async function rasterizePackBackground(
   // the bleed exists only to keep the capture viewport off the slide edge.
   host.style.overflow = "hidden";
 
-  // A REPLACED background is the whole plate: no scaffold, motif, grain, mask
-  // or damping, exactly as SlideChrome now paints it on screen. Otherwise the
-  // export carried the look's old procedural template under the new artwork.
-  const replaced = groundIsReplaced(backgroundCodeForPackId(String(pack.id)), seed);
-
-  // 1 — field
-  host.appendChild(plane({ backgroundColor: surface }));
-  // 2 — ground (damped + centre-cleared, exactly as SlideChrome paints it)
-  const mask = replaced ? undefined : packGroundMask(comp);
-  host.appendChild(
-    plane({
-      background: packGroundPaint(pack, seed).join(", "),
-      opacity: String(replaced ? 1 : packGroundDamp(pack, seed)),
-      maskImage: mask,
-      webkitMaskImage: mask,
-    } as Partial<CSSStyleDeclaration>),
-  );
-  // 3 — scaffold
-  if (!replaced) {
-    host.appendChild(
-      plane({ background: minimalPackLayers(packLayoutLayers(pack, comp, seed)).join(", ") }),
-    );
-  }
-  // 4 — signature motif (non-tiling only, matching the on-screen rule)
-  const sig = replaced ? null : packSignature(pack);
-  if (sig) {
-    const tiled =
-      /repeating-(linear|radial)-gradient/.test(sig.background) ||
-      (/\brepeat\b/.test(sig.background) && !/no-repeat/.test(sig.background));
-    if (!tiled) {
-      host.appendChild(
-        plane({
-          background: sig.background,
-          opacity: String(sig.opacity),
-          mixBlendMode: sig.blend,
-          clipPath: sig.clip,
-          maskImage: sig.mask,
-          webkitMaskImage: sig.mask,
-        } as Partial<CSSStyleDeclaration>),
-      );
+  // The plate is composed from the SHARED sheet description (pack-sheet.ts), the
+  // same one the slide chrome and the Template Studio previews render, so the
+  // export can never drift from the screen. A REPLACED background short-circuits
+  // that stack inside packSheetPlanes: the artwork is the whole page.
+  for (const p of packSheetPlanes(pack, seed, { comp })) {
+    const style: Record<string, string> = {};
+    for (const [k, v] of Object.entries(p.style)) {
+      if (v === undefined || v === null) continue;
+      style[k === "WebkitMaskImage" ? "webkitMaskImage" : k] = String(v);
     }
+    host.appendChild(plane(style as Partial<CSSStyleDeclaration>));
   }
-  // grain
-  if (!replaced && pack.grain > 0) {
-    host.appendChild(
-      plane({
-        backgroundImage: GRAIN_PLATE,
-        backgroundSize: "160px 160px",
-        opacity: String(pack.grain),
-        mixBlendMode: pack.mode === "dark" ? "overlay" : "multiply",
-      }),
-    );
-  }
-  // 5 — readability scrim
-  const { scrimAlpha } = packReadability(pack);
-  if (scrimAlpha > 0) {
-    host.appendChild(plane({ backgroundColor: surface, opacity: String(scrimAlpha) }));
-  }
+
 
   frame.appendChild(host);
   shell.appendChild(frame);
