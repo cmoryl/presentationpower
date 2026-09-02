@@ -19,7 +19,8 @@
 import * as React from "react";
 import type { StylePack } from "@/lib/style-packs";
 import { packSheetPlanes } from "@/lib/pack-sheet";
-import { useSkinBackdropVersion, useSkinBackdropsReady } from "@/lib/skin-backdrop-overrides";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
+import { useGroundReady } from "@/hooks/use-ground-ready";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 
 const SLIDE_W = 1280;
@@ -48,7 +49,7 @@ export function GroundPlane({
   // Repaint when an admin replaces this look's background artwork.
   const bdVersion = useSkinBackdropVersion();
   // Hold the plane until replacements have loaded (no stale-artwork flash).
-  const groundReady = useSkinBackdropsReady();
+  const groundReady = useGroundReady();
   const planes = React.useMemo(
     () => packSheetPlanes(pack, seed, layers ? { layers } : undefined),
     // eslint-disable-next-line react-hooks/exhaustive-deps

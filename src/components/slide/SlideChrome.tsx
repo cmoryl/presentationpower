@@ -49,8 +49,8 @@ import {
   moduleIdFromSeed,
   sceneTakeFromSeed,
   useSkinBackdropVersion,
-  useSkinBackdropsReady,
 } from "@/lib/skin-backdrop-overrides";
+import { useGroundReady } from "@/hooks/use-ground-ready";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { moduleSpacing, spacingVars } from "@/lib/module-spacing";
 
@@ -448,7 +448,7 @@ export function SlideFrame({
   // ARTIFACT GUARD — while the replacement library is still loading, the ground
   // would resolve to this skin's pre-replacement artwork. Hold the ground (field
   // only) for those few frames so an admin never sees a superseded background.
-  const groundReady = useSkinBackdropsReady();
+  const groundReady = useGroundReady();
   // AI-generated backdrop for the active skin, if the studio has rendered one
   // for this scene. Painted between the pack's flat field and its ground planes
   // so the skin's own scaffold and motif still read on top.
