@@ -1149,10 +1149,12 @@ export function SlideFrame({
           aria-hidden
           data-decorative="true"
           className="pointer-events-none absolute inset-0"
+          // Longhand only — see the artifact guard on the light ground above.
           style={{
-            background: brandSystemDarkGround(groundSeed, brand.tokens.accent),
+            backgroundImage: brandSystemDarkGround(groundSeed, brand.tokens.accent),
             backgroundSize: "cover",
             backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
         />
       )}
