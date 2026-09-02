@@ -32,6 +32,8 @@ import {
   radialShadingDict,
   stopsFromColors,
 } from "@/lib/pdf-gradient-shading";
+import { LONDON_SIGNAGE_FONT, londonBrandingPlan } from "@/lib/next-london-branding";
+import { svgPathToPdfOps } from "@/lib/vector-path-pdf";
 
 /** Fields the location team is allowed to re-issue. */
 export const LONDON_EDITABLE_FIELDS = [
@@ -434,17 +436,41 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
   const marginX = ((panel.bleedW - panel.trimW) / 2).toFixed(2);
   const marginY = ((panel.bleedH - panel.trimH) / 2).toFixed(2);
 
+  const brand = londonBrandingPlan(panel);
+  const logoScale = brand.logo.w / brand.art.w;
+  const logoGroup = [
+    `<g data-layer="lockup" data-lockup="${brand.orientation}" data-family="${brand.familyId}"`,
+    ` data-source="${escapeXml(brand.art.source)}"`,
+    ` transform="translate(${brand.logo.x.toFixed(2)} ${brand.logo.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">`,
+    brand.art.paths.map((p) => `<path d="${p.d}" fill="${p.fill}"/>`).join(""),
+    `</g>`,
+  ].join("");
+
+  const copyLayer = brand.copy
+    ? `<text data-layer="copy" x="${(marginXNum(panel) + panel.trimW / 2).toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
+      ` text-anchor="middle" fill="#FFFFFF" font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
+      ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
+      ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
+    : "";
+
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
     ` viewBox="0 0 ${panel.bleedW} ${panel.bleedH}" data-panel="${panel.id}"`,
     ` data-trim="${panel.trimW}x${panel.trimH}mm" data-bleed="${panel.bleedEdge}mm"`,
-    ` data-trim-origin="${marginX},${marginY}" data-style="${panel.style}">`,
+    ` data-trim-origin="${marginX},${marginY}" data-style="${panel.style}"`,
+    ` data-font="${LONDON_SIGNAGE_FONT.pdfBaseFont}">`,
     `<title>${escapeXml(panel.name)}</title>`,
-    `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style}</desc>`,
+    `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style} · ${escapeXml(brand.art.source)}</desc>`,
     `<defs>${paint}</defs>`,
     `<rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/>`,
+    logoGroup,
+    copyLayer,
     `</svg>`,
   ].join("");
+}
+
+function marginXNum(panel: LondonPanel): number {
+  return (panel.bleedW - panel.trimW) / 2;
 }
 
 function escapeXml(s: string): string {
@@ -494,18 +520,53 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
         stops,
       );
 
-  const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
+  // Brand layer: EPS-derived lockup outlines as live PDF paths, headline copy
+  // as live Geist Bold text — both editable when the .ai is opened.
+  const brand = londonBrandingPlan(panel);
+  const logoScale = (brand.logo.w * MM_TO_PT) / brand.art.w;
+  const logoOps = brand.art.paths
+    .map((p) => {
+      const [r, g, b] = parseColor(p.fill);
+      const ops = svgPathToPdfOps(p.d, {
+        scale: logoScale,
+        x: brand.logo.x * MM_TO_PT,
+        y: h - (brand.logo.y + brand.logo.h) * MM_TO_PT,
+        artHeight: brand.art.h,
+      });
+      if (!ops) return "";
+      return `q ${f3(r)} ${f3(g)} ${f3(b)} rg ${ops} f Q\n`;
+    })
+    .join("");
+
+  const copyOps = brand.copy
+    ? (() => {
+        const size = brand.copySizeMm * MM_TO_PT;
+        const tracking = size * LONDON_SIGNAGE_FONT.tracking;
+        const advance = brand.copy.length * (size * 0.62 + tracking);
+        const x = trimX + (panel.trimW * MM_TO_PT) / 2 - advance / 2;
+        const y = h - brand.copyBaselineMm * MM_TO_PT;
+        return (
+          `q 1 1 1 rg BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
+          `1 0 0 1 ${f3(x)} ${f3(y)} Tm (${pdfText(brand.copy)}) Tj ET Q\n`
+        );
+      })()
+    : "";
+
+  const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n${logoOps}${copyOps}`;
 
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
       `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
-      `/TPGradientKind /LiveShading /Resources << /Shading << /Sh0 6 0 R >> >> /Contents 4 0 R >>`,
+      `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
+      `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
-      `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)}) >>`,
+      `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(brand.orientation === "side" ? "side-by-side white lockup" : "stacked white lockup")}) >>`,
     shadingDict,
+    `<< /Type /Font /Subtype /TrueType /BaseFont /${LONDON_SIGNAGE_FONT.pdfBaseFont} ` +
+      `/Encoding /WinAnsiEncoding /FirstChar 32 /LastChar 255 >>`,
   ];
 
 
