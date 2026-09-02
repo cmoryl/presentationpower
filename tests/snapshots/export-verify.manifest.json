@@ -236,10 +236,10 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 11832,
-  "verifiedAt": "2026-09-02T18:02:34.736Z",
+  "jobs": 6120,
+  "verifiedAt": "2026-09-02T18:18:56.684Z",
   "coverage": "sampled",
-  "verifiedCells": 464,
+  "verifiedCells": 792,
   "sampledVariants": [
     "MV-BENTO-5",
     "MV-BENTO-6",

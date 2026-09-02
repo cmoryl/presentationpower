@@ -1,6 +1,6 @@
 {
   "fingerprint": "bf7392da",
-  "updatedAt": "2026-09-02T18:16:04.549Z",
+  "updatedAt": "2026-09-02T18:18:56.681Z",
   "cells": {
     "base@light": [
       "MV-BENTO-5",
@@ -428,7 +428,8 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST"
     ],
     "atlas-plate@dark": [
       "MV-BENTO-5",
@@ -443,7 +444,8 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR"
     ],
     "atelier-orange@light": [
       "MV-BENTO-5",
@@ -459,7 +461,8 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST"
     ],
     "azulejo-tile@light": [
       "MV-BENTO-5",
@@ -476,7 +479,8 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "bauhaus-primary@light": [
       "MV-BENTO-5",
@@ -492,7 +496,8 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST"
     ],
     "cobalt-proposal@light": [
       "MV-BENTO-5",
@@ -509,7 +514,8 @@
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
       "MV-CLOSE-CALENDAR",
-      "MV-CLOSE-CHECKLIST"
+      "MV-CLOSE-CHECKLIST",
+      "MV-CLOSE-CONTACT"
     ],
     "crimson-editorial@light": [
       "MV-BENTO-5",
@@ -621,7 +627,8 @@
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
       "MV-CLIENT-MATRIX",
-      "MV-CLOSE-CALENDAR"
+      "MV-CLOSE-CALENDAR",
+      "MV-CLOSE-CHECKLIST"
     ],
     "blueprint-cyan@dark": [
       "MV-BENTO-5",
@@ -636,7 +643,8 @@
       "MV-CASE-STORY",
       "MV-CLIENT-COMPARE",
       "MV-CLIENT-DETAIL-3",
-      "MV-CLIENT-MATRIX"
+      "MV-CLIENT-MATRIX",
+      "MV-CLOSE-CALENDAR"
     ],
     "comic-panel@light": [
       "MV-BENTO-5",
