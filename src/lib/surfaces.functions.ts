@@ -22,7 +22,7 @@ const upsertSurfaceInput = z.object({
 
 export const upsertSurface = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => upsertSurfaceInput.parse(data))
+  .validator((data: unknown) => upsertSurfaceInput.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const payload = {
@@ -74,7 +74,7 @@ export const listSurfaces = createServerFn({ method: "GET" })
 
 export const getSurface = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("surfaces")
@@ -87,7 +87,7 @@ export const getSurface = createServerFn({ method: "GET" })
 
 export const deleteSurface = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("surfaces").delete().eq("id", data.id);
     if (error) throw error;
@@ -96,7 +96,7 @@ export const deleteSurface = createServerFn({ method: "POST" })
 
 export const snapshotSurface = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         surfaceId: z.string().uuid(),

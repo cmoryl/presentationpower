@@ -53,7 +53,7 @@ function withSidecars(
 
 export const saveModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => savedModuleInput.parse(data))
+  .validator((data: unknown) => savedModuleInput.parse(data))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
@@ -100,7 +100,7 @@ export const listMyModules = createServerFn({ method: "GET" })
 
 export const deleteSavedModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("saved_modules").delete().eq("id", data.id);
     if (error) throw error;
@@ -109,7 +109,7 @@ export const deleteSavedModule = createServerFn({ method: "POST" })
 
 export const updateSavedModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z
       .object({
         id: z.string().uuid(),

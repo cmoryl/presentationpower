@@ -46,7 +46,7 @@ export async function canEditNextDivision(
 
 export const checkNextDivisionEdit = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ divisionId: z.string() }).parse(data))
+  .validator((data: unknown) => z.object({ divisionId: z.string() }).parse(data))
   .handler(async ({ data, context }) => {
     return canEditNextDivision(context.userId, data.divisionId, context.supabase);
   });
@@ -74,7 +74,7 @@ export const listNextDivisionEditors = createServerFn({ method: "GET" })
 const grantInput = z.object({ userId: z.string().uuid(), divisionId: z.string() });
 export const grantNextDivisionEditor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => grantInput.parse(data))
+  .validator((data: unknown) => grantInput.parse(data))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     const { data: isReviewer } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_reviewer" });
@@ -91,7 +91,7 @@ export const grantNextDivisionEditor = createServerFn({ method: "POST" })
 const revokeInput = z.object({ id: z.string().uuid() });
 export const revokeNextDivisionEditor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => revokeInput.parse(data))
+  .validator((data: unknown) => revokeInput.parse(data))
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     const { data: isReviewer } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_reviewer" });

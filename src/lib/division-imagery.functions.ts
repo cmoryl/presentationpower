@@ -77,7 +77,7 @@ function decodeBase64Payload(payload: string): Buffer {
 
 export const uploadDivisionImagery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => UploadInput.parse(v))
+  .validator((v) => UploadInput.parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const buf = decodeBase64Payload(data.data);
@@ -226,7 +226,7 @@ async function signVariantUrls(
 
 export const listDivisionImagery = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
+  .validator((v) =>
     z
       .object({
         divisionId: z.string().min(1).max(120),
@@ -262,7 +262,7 @@ export const listDivisionImagery = createServerFn({ method: "GET" })
 
 export const updateDivisionImagery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
+  .validator((v) =>
     z
       .object({
         id: z.string().uuid(),
@@ -298,7 +298,7 @@ export const updateDivisionImagery = createServerFn({ method: "POST" })
 
 export const deleteDivisionImagery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: row, error: qErr } = await s
@@ -328,7 +328,7 @@ export const deleteDivisionImagery = createServerFn({ method: "POST" })
 // division library shelf and print template picker by default.
 export const approveDivisionImagery = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(v))
+  .validator((v) => z.object({ id: z.string().uuid(), approved: z.boolean() }).parse(v))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: isAdmin } = await (
@@ -357,7 +357,7 @@ export const approveDivisionImagery = createServerFn({ method: "POST" })
 // Returns null when nothing qualifies — callers fall back to the division aura.
 export const pickHeroForTemplate = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
+  .validator((v) =>
     z
       .object({
         divisionId: z.string().min(1).max(120),
@@ -411,7 +411,7 @@ export const pickHeroForTemplate = createServerFn({ method: "GET" })
 // are overwritten (upsert) so this is safe to re-run.
 export const attachDivisionImageryVariants = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) =>
+  .validator((v) =>
     z
       .object({
         id: z.string().uuid(),

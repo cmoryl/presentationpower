@@ -25,7 +25,7 @@ const Input = z.object({
 });
 
 export const translateDemoContent = createServerFn({ method: "POST" })
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(async ({ data }) => {
     const { extractStrings, protectStrings, unprotectStrings, applyGlossaryOverrides } =
       await import("@/lib/translation-glossary");

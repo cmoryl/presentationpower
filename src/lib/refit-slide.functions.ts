@@ -18,7 +18,7 @@ const Input = z.object({
 
 export const refitSlideToVariant = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(async ({ data, context }): Promise<RefitResult> => {
     const { refitSlideContent } = await import("@/lib/refit-slide.server");
     return refitSlideContent({

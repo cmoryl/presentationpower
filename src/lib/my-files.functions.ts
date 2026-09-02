@@ -159,7 +159,7 @@ const TABLE_FOR_KIND: Record<MyFileKind, "decks" | "print_assets" | "saved_modul
 
 export const deleteMyFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => deleteInput.parse(data))
+  .validator((data: unknown) => deleteInput.parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from(TABLE_FOR_KIND[data.kind])

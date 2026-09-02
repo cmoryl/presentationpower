@@ -13,7 +13,7 @@ const PostInput = z.object({
 
 export const postDeckComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => PostInput.parse(raw))
+  .validator((raw: unknown) => PostInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
@@ -33,7 +33,7 @@ export const postDeckComment = createServerFn({ method: "POST" })
 
 export const listDeckComments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: rows, error } = await supabase
@@ -58,7 +58,7 @@ export const listDeckComments = createServerFn({ method: "POST" })
 
 export const updateDeckComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         id: z.string().uuid(),
@@ -80,7 +80,7 @@ export const updateDeckComment = createServerFn({ method: "POST" })
 
 export const deleteDeckComment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase.from("deck_comments").delete().eq("id", data.id);
@@ -94,7 +94,7 @@ const ReviewStatus = z.enum(["draft", "in_review", "approved", "changes_requeste
 
 export const getDeckReviewStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: deck, error } = await supabase
@@ -120,7 +120,7 @@ export const getDeckReviewStatus = createServerFn({ method: "POST" })
 
 export const setDeckReviewStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
+  .validator((raw: unknown) =>
     z
       .object({
         deckId: z.string().uuid(),

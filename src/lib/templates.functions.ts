@@ -141,7 +141,7 @@ export const listAllTemplates = createServerFn({ method: "GET" })
 
 export const saveTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => {
+  .validator((input: unknown) => {
     const parsed = TemplateInput.safeParse(input);
     if (parsed.success) return parsed.data;
     const msg = parsed.error.issues
@@ -190,7 +190,7 @@ export const saveTemplate = createServerFn({ method: "POST" })
 
 export const deleteTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await assertAdmin(context.supabase as never, context.userId);
     const { error } = await context.supabase.from("custom_templates").delete().eq("id", data.id);
@@ -200,7 +200,7 @@ export const deleteTemplate = createServerFn({ method: "POST" })
 
 export const saveBackgroundOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => OverrideInput.parse(input))
+  .validator((input: unknown) => OverrideInput.parse(input))
   .handler(async ({ data, context }): Promise<TemplateBackgroundOverride> => {
     await assertAdmin(context.supabase as never, context.userId);
     const { data: row, error } = await context.supabase
@@ -233,7 +233,7 @@ export const saveBackgroundOverride = createServerFn({ method: "POST" })
 
 export const deleteBackgroundOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ skinCode: z.string().min(2), scene: z.string().min(1) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ ok: true }> => {

@@ -47,7 +47,7 @@ export const listLanguages = createServerFn({ method: "GET" })
 
 export const listGlossary = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         scope: z.enum(["global", "division", "deck"]).optional(),
@@ -70,7 +70,7 @@ export const listGlossary = createServerFn({ method: "POST" })
 
 export const upsertGlossaryTerm = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         id: z.string().uuid().optional(),
@@ -99,7 +99,7 @@ export const upsertGlossaryTerm = createServerFn({ method: "POST" })
 
 export const deleteGlossaryTerm = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { error } = await supabase.from("glossary_terms").delete().eq("id", data.id);
@@ -157,7 +157,7 @@ async function translateContent(
 
 export const translateSlide = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         slideId: z.string().uuid(),
@@ -315,7 +315,7 @@ async function translateAllSlides(
 
 export const translateDeckInPlace = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         deckId: z.string().uuid(),
@@ -421,7 +421,7 @@ export const translateDeckInPlace = createServerFn({ method: "POST" })
 
 export const translateDeckToCopy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         deckId: z.string().uuid(),
@@ -544,7 +544,7 @@ export const translateDeckToCopy = createServerFn({ method: "POST" })
 
 export const translateDeckBatch = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         deckId: z.string().uuid(),
@@ -636,7 +636,7 @@ export const translateDeckBatch = createServerFn({ method: "POST" })
 
 export const listDeckTranslations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { data: rows, error } = await supabase
@@ -658,7 +658,7 @@ export const listDeckTranslations = createServerFn({ method: "POST" })
 
 export const cacheDeckTranslation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         deckId: z.string().uuid(),
@@ -755,7 +755,7 @@ export const cacheDeckTranslation = createServerFn({ method: "POST" })
 // Which locales are cached for this deck, and how complete each is.
 export const listCachedLocales = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { data: slides } = await supabase
@@ -798,7 +798,7 @@ export const listCachedLocales = createServerFn({ method: "POST" })
 // Per-slide-per-locale status matrix for the editor badges.
 export const listSlideTranslationStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { data: slides } = await supabase
@@ -848,7 +848,7 @@ export const listSlideTranslationStatus = createServerFn({ method: "POST" })
 // Fetch translated content keyed by slide position for the editor overlay.
 export const getDeckSlideTranslations = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z.object({ deckId: z.string().uuid(), targetLang: z.string().min(2).max(10) }).parse(raw),
   )
   .handler(async ({ data, context }) => {
@@ -875,7 +875,7 @@ export const getDeckSlideTranslations = createServerFn({ method: "POST" })
 
 // Public: fetch translated content for a share token. Uses SECURITY DEFINER RPC.
 export const getSharedDeckTranslations = createServerFn({ method: "POST" })
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z.object({ token: z.string().min(16), targetLang: z.string().min(2).max(10) }).parse(raw),
   )
   .handler(async ({ data }) => {
@@ -904,7 +904,7 @@ export const getSharedDeckTranslations = createServerFn({ method: "POST" })
 
 // Public: list cached locales for a shared deck (token-gated).
 export const listSharedLocales = createServerFn({ method: "POST" })
-  .inputValidator((raw) => z.object({ token: z.string().min(16) }).parse(raw))
+  .validator((raw) => z.object({ token: z.string().min(16) }).parse(raw))
   .handler(async ({ data }) => {
     const { createClient } = await import("@supabase/supabase-js");
     const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
@@ -937,7 +937,7 @@ export const listSharedLocales = createServerFn({ method: "POST" })
 // per-slide errors, and unfinished slides are all visible.
 export const getDeckTranslationJobDetail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { data: job, error: jErr } = await supabase
@@ -992,7 +992,7 @@ export const getDeckTranslationJobDetail = createServerFn({ method: "POST" })
 // status between slides and throws TranslationCancelledError to stop.
 export const cancelDeckTranslation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { data: job } = await supabase
@@ -1018,7 +1018,7 @@ export const cancelDeckTranslation = createServerFn({ method: "POST" })
 // translated_deck_id at the same position. Batch jobs are treated like copy.
 export const retryDeckTranslation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ jobId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const supabase = context.supabase as AnySupabase;
     const { data: job, error: jErr } = await supabase

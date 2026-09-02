@@ -63,7 +63,7 @@ function pathsBySlide(slides: unknown): Map<string, number[]> {
 
 export const listExtractedDeckImages = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => z.object({ deckId: z.string().uuid() }).parse(v))
+  .validator((v) => z.object({ deckId: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }): Promise<ExtractedDeckImage[]> => {
     const s = context.supabase as unknown as SbClient;
     const { data: deck, error } = await s
@@ -121,7 +121,7 @@ const SaveInput = z.object({
 
 export const saveExtractedImagesToDivision = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => SaveInput.parse(v))
+  .validator((v) => SaveInput.parse(v))
   .handler(
     async ({
       data,

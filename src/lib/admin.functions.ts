@@ -292,7 +292,7 @@ const activateInput = z.object({
 });
 export const activateAdminUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => activateInput.parse(input))
+  .validator((input) => activateInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -322,7 +322,7 @@ export const activateAdminUser = createServerFn({ method: "POST" })
 const resendInput = z.object({ userId: z.string().uuid(), email: z.string().email() });
 export const resendAdminInvite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => resendInput.parse(input))
+  .validator((input) => resendInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -353,7 +353,7 @@ const inviteInput = z.object({
 });
 export const inviteAdminUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => inviteInput.parse(input))
+  .validator((input) => inviteInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -378,7 +378,7 @@ const roleInput = z.object({
 });
 export const setUserRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => roleInput.parse(input))
+  .validator((input) => roleInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -410,7 +410,7 @@ export const setUserRole = createServerFn({ method: "POST" })
 const delUserInput = z.object({ userId: z.string().uuid() });
 export const deleteAdminUser = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => delUserInput.parse(input))
+  .validator((input) => delUserInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     if (data.userId === context.userId) throw new Error("You cannot delete yourself");
@@ -432,7 +432,7 @@ const aiFilter = z.object({
 });
 export const getAiAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => aiFilter.parse(input))
+  .validator((input) => aiFilter.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -522,7 +522,7 @@ const logAiInput = z.object({
 });
 export const logAiEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => logAiInput.parse(input))
+  .validator((input) => logAiInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     await s.from("ai_events").insert({
@@ -548,7 +548,7 @@ export const logAiEvent = createServerFn({ method: "POST" })
 
 export const getImageryAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => aiFilter.parse(input))
+  .validator((input) => aiFilter.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -624,7 +624,7 @@ const logImgInput = z.object({
 });
 export const logImageryEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => logImgInput.parse(input))
+  .validator((input) => logImgInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     await s.from("imagery_events").insert({
@@ -643,7 +643,7 @@ export const logImageryEvent = createServerFn({ method: "POST" })
 // signal so curators can spot which assets are actually earning use.
 export const getDivisionImageryStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
+  .validator((input) =>
     z
       .object({
         divisionId: z.string().min(1).max(120),
@@ -730,7 +730,7 @@ const expInput = z.object({
 });
 export const createAbExperiment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => expInput.parse(input))
+  .validator((input) => expInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -816,7 +816,7 @@ const expActionInput = z.object({
 });
 export const setAbExperimentStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => expActionInput.parse(input))
+  .validator((input) => expActionInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -831,7 +831,7 @@ export const setAbExperimentStatus = createServerFn({ method: "POST" })
 const delExpInput = z.object({ id: z.string().uuid() });
 export const deleteAbExperiment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => delExpInput.parse(input))
+  .validator((input) => delExpInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -844,7 +844,7 @@ export const deleteAbExperiment = createServerFn({ method: "POST" })
 const assignInput = z.object({ experimentId: z.string().uuid(), sessionId: z.string().min(4) });
 export const abAssign = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => assignInput.parse(input))
+  .validator((input) => assignInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: existing } = await s
@@ -888,7 +888,7 @@ const abEventInput = z.object({
 });
 export const abLogEvent = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => abEventInput.parse(input))
+  .validator((input) => abEventInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     await s.from("ab_events").insert({
@@ -981,7 +981,7 @@ const oracleUpdateInput = z.object({
 });
 export const updateOracleKnowledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => oracleUpdateInput.parse(input))
+  .validator((input) => oracleUpdateInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -1008,7 +1008,7 @@ export const updateOracleKnowledge = createServerFn({ method: "POST" })
 const oracleDeleteInput = z.object({ id: z.string().uuid() });
 export const deleteOracleKnowledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => oracleDeleteInput.parse(input))
+  .validator((input) => oracleDeleteInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -1034,7 +1034,7 @@ export const deleteOracleKnowledge = createServerFn({ method: "POST" })
 const oracleSyncInput = z.object({ id: z.string().uuid() });
 export const syncOracleToKnowledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => oracleSyncInput.parse(input))
+  .validator((input) => oracleSyncInput.parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;
@@ -1089,7 +1089,7 @@ export const syncOracleToKnowledge = createServerFn({ method: "POST" })
 const activeExpInput = z.object({ brandId: z.string().nullable().optional() }).default({});
 export const listActiveExperiments = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => activeExpInput.parse(input ?? {}))
+  .validator((input) => activeExpInput.parse(input ?? {}))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: exps } = await s
@@ -1185,7 +1185,7 @@ async function resolveDivisionFilter(
 }
 export const retrieveKnowledgeForBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => kbInput.parse(input))
+  .validator((input) => kbInput.parse(input))
   .handler(
     async ({
       data,
@@ -1431,7 +1431,7 @@ const proposePalettesInput = z.object({
 });
 export const proposeAbPalettes = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => proposePalettesInput.parse(input))
+  .validator((input) => proposePalettesInput.parse(input))
   .handler(
     async ({
       data,

@@ -46,7 +46,7 @@ export const listPublishedCustomModules = createServerFn({ method: "GET" })
 
 export const createCustomModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => moduleInput.parse(data))
+  .validator((data: unknown) => moduleInput.parse(data))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("custom_modules")
@@ -74,7 +74,7 @@ export const createCustomModule = createServerFn({ method: "POST" })
 
 export const updateCustomModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z.object({ id: z.string().uuid(), patch: moduleInput.partial() }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -105,7 +105,7 @@ export const updateCustomModule = createServerFn({ method: "POST" })
 
 export const deleteCustomModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("custom_modules").delete().eq("id", data.id);
     if (error) throw error;

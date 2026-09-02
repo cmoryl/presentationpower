@@ -1,5 +1,5 @@
 {
-  "fingerprint": "30d7c080",
+  "fingerprint": "bf7392da",
   "variants": [
     "MV-BENTO-5",
     "MV-BENTO-6",
@@ -74,6 +74,7 @@
     "MV-GRAPH-RINGS",
     "MV-GRAPH-STACKED-BAR",
     "MV-GRAPH-TASK-CARDS",
+    "MV-GRAPH-TASK-DIALS",
     "MV-GRAPH-TREEMAP",
     "MV-GRAPH-WATERFALL",
     "MV-GRAPH-YEAR-SERIES",
@@ -235,8 +236,8 @@
     "vapor-chrome",
     "verdant-corporate"
   ],
-  "jobs": 11774,
-  "verifiedAt": "2026-08-25T12:49:41.123Z",
+  "jobs": 11832,
+  "verifiedAt": "2026-09-02T11:37:30.323Z",
   "coverage": "sampled",
   "sampledVariants": [
     "MV-CLOSE-DUAL-CTA",

@@ -69,7 +69,7 @@ const LogInput = z.object({
 
 export const logUsageEvents = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => LogInput.parse(raw))
+  .validator((raw) => LogInput.parse(raw))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const rows = data.events.map((e) => ({
@@ -192,7 +192,7 @@ function makeDayBuckets(days: number): string[] {
 
 export const getMasterAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => Filter.parse(raw ?? {}))
+  .validator((raw) => Filter.parse(raw ?? {}))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const s = context.supabase as unknown as SbClient;

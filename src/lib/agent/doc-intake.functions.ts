@@ -57,7 +57,7 @@ async function extractViaAi(
 /** Extracts plain text from an uploaded Word/PDF/Office document. */
 export const extractAgentDocument = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => Input.parse(data))
+  .validator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
     const ext = extOf(data.filename);
     const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));

@@ -12,5 +12,5 @@ export type { KnowledgeSource, SynthesizedSnippet, SynthesisCoreResult } from "@
 
 export const synthesizeKnowledgeForBrief = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => SynthesisInput.parse(raw))
+  .validator((raw: unknown) => SynthesisInput.parse(raw))
   .handler(async ({ data, context }) => synthesizeKnowledgeForBriefCore(context.supabase, data));

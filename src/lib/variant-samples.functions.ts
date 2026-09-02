@@ -98,7 +98,7 @@ export const amIModuleAdmin = createServerFn({ method: "GET" })
 
 export const saveVariantSample = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (input: {
       variantId: string;
       brandModeId?: string;
@@ -163,7 +163,7 @@ export const saveVariantSample = createServerFn({ method: "POST" })
 
 export const deleteVariantSample = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { variantId: string; brandModeId?: string }) => {
+  .validator((input: { variantId: string; brandModeId?: string }) => {
     if (!input?.variantId) throw new Error("variantId is required");
     return input;
   })
@@ -194,7 +194,7 @@ export type SampleVersion = {
 /** Restore points for one variant scope, newest first. Admin only. */
 export const listVariantSampleVersions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { variantId: string; brandModeId?: string }) => {
+  .validator((input: { variantId: string; brandModeId?: string }) => {
     if (!input?.variantId) throw new Error("variantId is required");
     return input;
   })
@@ -231,7 +231,7 @@ export const listVariantSampleVersions = createServerFn({ method: "GET" })
 /** Drop a single restore point. Admin only. */
 export const deleteVariantSampleVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string }) => {
+  .validator((input: { id: string }) => {
     if (!input?.id) throw new Error("id is required");
     return input;
   })
@@ -305,7 +305,7 @@ function mergeStyle(
 
 export const bulkApplySampleStyle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (input: {
       style: SampleStylePayload;
       targets: BulkStyleTarget[];

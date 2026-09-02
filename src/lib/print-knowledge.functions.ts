@@ -78,7 +78,7 @@ const syncInput = z.object({ force: z.boolean().default(false) });
 
 export const syncPrintLibraryKnowledge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => syncInput.parse(input))
+  .validator((input) => syncInput.parse(input))
   .handler(
     async ({
       data,

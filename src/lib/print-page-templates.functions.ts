@@ -28,7 +28,7 @@ const SaveInput = z.object({
 
 export const savePrintPageTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => SaveInput.parse(raw))
+  .validator((raw: unknown) => SaveInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     if (data.scope === "shared") {
@@ -89,7 +89,7 @@ const UpdateInput = z.object({
 
 export const updatePrintPageTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => UpdateInput.parse(raw))
+  .validator((raw: unknown) => UpdateInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const p = data.patch;
@@ -123,7 +123,7 @@ export const updatePrintPageTemplate = createServerFn({ method: "POST" })
 
 export const deletePrintPageTemplate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("print_page_templates")

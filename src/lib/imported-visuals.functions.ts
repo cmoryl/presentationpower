@@ -27,7 +27,7 @@ const Input = z.object({
 
 export const readImportedDeckVisuals = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(async ({ data }): Promise<VisualReadResult> => {
     const { readImportedVisuals } = await import("@/lib/imported-visual-ai.server");
     return readImportedVisuals({

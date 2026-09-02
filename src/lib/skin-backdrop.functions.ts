@@ -82,7 +82,7 @@ function versionedUrl(url: string, createdAt?: string | null): string {
 
 export const generateSkinBackdrop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => GenerateInput.parse(input))
+  .validator((input: unknown) => GenerateInput.parse(input))
   .handler(async ({ data, context }): Promise<SkinBackdropRow> => {
     const key = process.env.LOVABLE_API_KEY;
     if (!key) throw new Error("Missing LOVABLE_API_KEY on the server.");
@@ -201,7 +201,7 @@ const EXT: Record<string, string> = {
  */
 export const uploadSkinBackdrop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => UploadInput.parse(input))
+  .validator((input: unknown) => UploadInput.parse(input))
   .handler(async ({ data, context }): Promise<SkinBackdropRow> => {
     const scene = normalizeScene(data.scene);
     const bytes = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
@@ -248,7 +248,7 @@ const DeleteInput = z.object({ skinCode: z.string(), scene: z.string(), take: z.
 
 export const deleteSkinBackdrop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => DeleteInput.parse(input))
+  .validator((input: unknown) => DeleteInput.parse(input))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     await context.supabase
       .from("skin_backdrops")
@@ -280,7 +280,7 @@ const AdoptInput = z.object({
  */
 export const adoptSkinBackdrop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => AdoptInput.parse(input))
+  .validator((input: unknown) => AdoptInput.parse(input))
   .handler(async ({ data, context }): Promise<SkinBackdropRow> => {
     const scene = normalizeScene(data.scene);
     const fromScene = normalizeScene(data.fromScene);

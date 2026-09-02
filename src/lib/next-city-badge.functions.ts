@@ -40,7 +40,7 @@ export const listCityBadgeVersions = createServerFn({ method: "GET" })
 
 export const saveCityBadgeVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => versionInput.parse(data))
+  .validator((data: unknown) => versionInput.parse(data))
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("next_city_badge_versions")
@@ -64,7 +64,7 @@ export const saveCityBadgeVersion = createServerFn({ method: "POST" })
 
 export const updateCityBadgeVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     versionInput.partial().extend({ id: z.string().uuid() }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -92,7 +92,7 @@ export const updateCityBadgeVersion = createServerFn({ method: "POST" })
 
 export const deleteCityBadgeVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
+  .validator((data: unknown) => z.object({ id: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("next_city_badge_versions")

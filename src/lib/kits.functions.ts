@@ -68,7 +68,7 @@ const ListInput = z.object({
 
 export const listMyKits = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => ListInput.parse(raw ?? {}))
+  .validator((raw) => ListInput.parse(raw ?? {}))
   .handler(async ({ data, context }): Promise<SavedKit[]> => {
     let q = context.supabase
       .from("campaign_kits")
@@ -89,7 +89,7 @@ export const listMyKits = createServerFn({ method: "GET" })
 
 export const getKit = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }): Promise<SavedKit | null> => {
     const { data: row, error } = await context.supabase
       .from("campaign_kits")
@@ -125,7 +125,7 @@ const SaveInput = z.object({
 
 export const saveKit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => SaveInput.parse(raw))
+  .validator((raw) => SaveInput.parse(raw))
   .handler(async ({ data, context }): Promise<SavedKit> => {
     const payload: TablesInsert<"campaign_kits"> = {
       user_id: context.userId,
@@ -164,7 +164,7 @@ export const saveKit = createServerFn({ method: "POST" })
 
 export const deleteKit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("campaign_kits").delete().eq("id", data.id);
     if (error) throw new Error(error.message ?? "Failed to delete kit");

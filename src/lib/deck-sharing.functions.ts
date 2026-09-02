@@ -8,7 +8,7 @@ import { enableDeckSharingCore, shareEnableInput } from "@/lib/deck-sharing.core
 
 export const enableDeckSharing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => shareEnableInput.parse(raw))
+  .validator((raw) => shareEnableInput.parse(raw))
   .handler(async ({ data, context }) => {
     const { token } = await enableDeckSharingCore(context.supabase, context.userId, data);
     return { token };
@@ -16,7 +16,7 @@ export const enableDeckSharing = createServerFn({ method: "POST" })
 
 export const setDeckShareExpiry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         deckId: z.string().uuid(),
@@ -36,7 +36,7 @@ export const setDeckShareExpiry = createServerFn({ method: "POST" })
 
 export const disableDeckSharing = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { error } = await supabase
@@ -49,7 +49,7 @@ export const disableDeckSharing = createServerFn({ method: "POST" })
 
 export const getDeckShareStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: row, error } = await supabase
@@ -72,7 +72,7 @@ export const getDeckShareStatus = createServerFn({ method: "POST" })
 // Public — no auth middleware. Calls SECURITY DEFINER RPC that only returns
 // data when the token matches.
 export const getSharedDeck = createServerFn({ method: "POST" })
-  .inputValidator((raw) => z.object({ token: z.string().min(16).max(128) }).parse(raw))
+  .validator((raw) => z.object({ token: z.string().min(16).max(128) }).parse(raw))
   .handler(async ({ data }) => {
     const url = process.env.SUPABASE_URL!;
     const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
@@ -185,7 +185,7 @@ export const getSharedDeck = createServerFn({ method: "POST" })
 
 // Public — records/updates a share view. Never throws to the caller.
 export const recordShareView = createServerFn({ method: "POST" })
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         token: z.string().min(16).max(128),
@@ -226,7 +226,7 @@ export const recordShareView = createServerFn({ method: "POST" })
 
 export const getShareAnalytics = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     // Ownership check via RLS: this will return no rows if not owner.

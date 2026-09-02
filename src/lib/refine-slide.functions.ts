@@ -56,7 +56,7 @@ export type RefineSlideResult = {
 
 export const refineSlideWithInstruction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => InputSchema.parse(raw))
+  .validator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data, context: authContext }): Promise<RefineSlideResult> => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey)

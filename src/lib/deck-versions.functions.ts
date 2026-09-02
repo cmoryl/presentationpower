@@ -60,7 +60,7 @@ async function pruneVersions(
 
 export const snapshotDeckVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z
       .object({
         deckId: z.string(),
@@ -132,7 +132,7 @@ export const snapshotDeckVersion = createServerFn({ method: "POST" })
 
 export const listDeckVersions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const deckUuid = await resolveDeckUuid(supabase, userId, data.deckId);
@@ -156,7 +156,7 @@ export const listDeckVersions = createServerFn({ method: "POST" })
 
 export const getDeckVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ versionId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ versionId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: row, error } = await supabase
@@ -171,7 +171,7 @@ export const getDeckVersion = createServerFn({ method: "POST" })
 
 export const restoreDeckVersion = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ versionId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ versionId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: version, error } = await supabase

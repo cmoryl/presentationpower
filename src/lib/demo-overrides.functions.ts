@@ -48,7 +48,7 @@ function publicClient() {
 
 /** Public read: every saved override for one demo (all divisions). */
 export const listDemoOverrides = createServerFn({ method: "GET" })
-  .inputValidator((input: { demoKind: DemoKind; demoId: string }) =>
+  .validator((input: { demoKind: DemoKind; demoId: string }) =>
     z
       .object({ demoKind: z.enum(["deck", "print"]), demoId: z.string().min(1).max(200) })
       .parse(input),
@@ -92,7 +92,7 @@ async function assertAdmin(context: { supabase: unknown; userId: string }) {
 /** Admin write: publish the current editor state as the live demo. */
 export const saveDemoOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
+  .validator(
     (input: {
       demoKind: DemoKind;
       demoId: string;
@@ -134,7 +134,7 @@ export const saveDemoOverride = createServerFn({ method: "POST" })
 /** Admin write: drop the override so the demo falls back to the authored build. */
 export const clearDemoOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { demoKind: DemoKind; demoId: string; divisionKey?: string }) =>
+  .validator((input: { demoKind: DemoKind; demoId: string; divisionKey?: string }) =>
     Key.parse(input),
   )
   .handler(async ({ data, context }) => {

@@ -40,7 +40,7 @@ const Input = z.object({
 
 export const planDeckReinterpretation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => Input.parse(raw))
+  .validator((raw: unknown) => Input.parse(raw))
   .handler(async ({ data, context }): Promise<PlannerResult> => {
     const { planReinterpretation } = await import("@/lib/reinterpret-ai.server");
     return planReinterpretation({

@@ -115,7 +115,7 @@ export const listRecentReviewed = createServerFn({ method: "GET" })
 // ── Submit / approve / reject ─────────────────────────────────────────────
 export const submitForReview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleId: string }) => data)
+  .validator((data: { moduleId: string }) => data)
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("slide_modules")
@@ -128,7 +128,7 @@ export const submitForReview = createServerFn({ method: "POST" })
 
 export const approveModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleId: string; notes?: string; expiresAt?: string | null }) => data)
+  .validator((data: { moduleId: string; notes?: string; expiresAt?: string | null }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
     const { error } = await context.supabase
@@ -151,7 +151,7 @@ export const approveModule = createServerFn({ method: "POST" })
 
 export const rejectModule = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleId: string; notes: string }) => data)
+  .validator((data: { moduleId: string; notes: string }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
     const { error } = await context.supabase
@@ -169,7 +169,7 @@ export const rejectModule = createServerFn({ method: "POST" })
 
 export const requestChanges = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleId: string; notes: string }) => data)
+  .validator((data: { moduleId: string; notes: string }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
     const { error } = await context.supabase
@@ -190,7 +190,7 @@ export const requestChanges = createServerFn({ method: "POST" })
 // ── Bulk approve ──────────────────────────────────────────────────────────
 export const bulkApproveModules = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleIds: string[]; expiresAt?: string | null }) => data)
+  .validator((data: { moduleIds: string[]; expiresAt?: string | null }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
     if (data.moduleIds.length === 0) return { ok: true, count: 0 };
@@ -238,7 +238,7 @@ export const listExpiringSoon = createServerFn({ method: "GET" })
 // ── Per-module audit trail ────────────────────────────────────────────────
 export const listModuleAudit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleId: string }) => data)
+  .validator((data: { moduleId: string }) => data)
   .handler(async ({ data, context }) => {
     await assertReviewer(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -286,7 +286,7 @@ export const listModuleAudit = createServerFn({ method: "POST" })
 // modules that share it (excluding self).
 export const findDuplicates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleId: string }) => data)
+  .validator((data: { moduleId: string }) => data)
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("slide_modules")
@@ -314,7 +314,7 @@ export const findDuplicates = createServerFn({ method: "POST" })
 // every source_module_id passed in. Used by the deck editor to badge slides.
 export const getModuleFlags = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { moduleIds: string[] }) => data)
+  .validator((data: { moduleIds: string[] }) => data)
   .handler(async ({ data, context }) => {
     if (data.moduleIds.length === 0)
       return [] as Array<{

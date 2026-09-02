@@ -43,7 +43,7 @@ export type CampaignCopyDraft = {
 
 export const draftCampaignCopy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) => InputSchema.parse(raw))
+  .validator((raw: unknown) => InputSchema.parse(raw))
   .handler(async ({ data, context: authContext }): Promise<CampaignCopyDraft> => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { title: "", error: "AI is not configured" };

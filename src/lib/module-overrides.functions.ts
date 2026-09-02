@@ -41,7 +41,7 @@ export const listModuleOverrides = createServerFn({ method: "GET" })
 
 export const saveModuleOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) =>
+  .validator((data: unknown) =>
     z.object({ scope, moduleId: z.string().min(2), patch: patchSchema }).parse(data),
   )
   .handler(async ({ data, context }) => {
@@ -75,7 +75,7 @@ export const saveModuleOverride = createServerFn({ method: "POST" })
 
 export const deleteModuleOverride = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: unknown) => z.object({ scope, moduleId: z.string().min(2) }).parse(data))
+  .validator((data: unknown) => z.object({ scope, moduleId: z.string().min(2) }).parse(data))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("module_overrides")

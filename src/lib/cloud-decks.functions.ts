@@ -7,7 +7,7 @@ export { toUuid } from "@/lib/cloud-decks.core";
 
 export const saveDeckToCloud = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => SaveInput.parse(raw))
+  .validator((raw) => SaveInput.parse(raw))
   .handler(async ({ data, context }) =>
     saveDeckToCloudCore(context.supabase, context.userId, data),
   );
@@ -29,7 +29,7 @@ export const listMyCloudDecks = createServerFn({ method: "GET" })
 
 export const setDeckTemplateFlag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z.object({ deckId: z.string().uuid(), isTemplate: z.boolean() }).parse(raw),
   )
   .handler(async ({ data, context }) => {
@@ -77,7 +77,7 @@ export const listTeamTemplates = createServerFn({ method: "GET" })
 
 export const getTemplateDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: payload, error } = await supabase.rpc("get_template_deck", {
@@ -89,7 +89,7 @@ export const getTemplateDeck = createServerFn({ method: "POST" })
 
 export const loadCloudDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: deck, error: dErr } = await supabase
@@ -114,7 +114,7 @@ export const loadCloudDeck = createServerFn({ method: "POST" })
 
 export const deleteCloudDeck = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => z.object({ deckId: z.string() }).parse(raw))
+  .validator((raw) => z.object({ deckId: z.string() }).parse(raw))
   .handler(async ({ data, context }) => {
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!UUID_RE.test(data.deckId)) {

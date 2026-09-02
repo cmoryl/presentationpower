@@ -217,7 +217,7 @@ const createInput = z.object({
 
 export const createClientLogo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => createInput.parse(input))
+  .validator((input) => createInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: row, error } = await s
@@ -260,7 +260,7 @@ const updateInput = z.object({
 
 export const updateClientLogo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => updateInput.parse(input))
+  .validator((input) => updateInput.parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const patch: Record<string, unknown> = {};
@@ -279,7 +279,7 @@ export const updateClientLogo = createServerFn({ method: "POST" })
 // ── DELETE ──────────────────────────────────────────────────────────────
 export const deleteClientLogo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     if (!(await assertCanManage(context))) throw new Error("Forbidden: admin or reviewer required");
     const s = context.supabase as unknown as SbClient;
@@ -310,7 +310,7 @@ export const deleteClientLogo = createServerFn({ method: "POST" })
 // ── SIGNED URL (single) ─────────────────────────────────────────────────
 export const getClientLogoSignedUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ path: z.string().min(1) }).parse(input))
+  .validator((input) => z.object({ path: z.string().min(1) }).parse(input))
   .handler(async ({ data, context }) => {
     const s = context.supabase as unknown as SbClient;
     const { data: signed, error } = await s.storage.from(BUCKET).createSignedUrl(data.path, 3600);
@@ -324,7 +324,7 @@ export const getClientLogoSignedUrl = createServerFn({ method: "POST" })
 // each requested path that resolved to a signed URL.
 export const signClientLogoPaths = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
+  .validator((input) =>
     z.object({ paths: z.array(z.string().min(1)).min(1).max(500) }).parse(input),
   )
   .handler(async ({ data, context }): Promise<{ urls: Record<string, string> }> => {
@@ -349,7 +349,7 @@ const SHARE_TTL_SECONDS = 60 * 60 * 24 * 365;
 
 export const signClientLogoForShare = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
+  .validator((input) =>
     z
       .object({
         logoId: z.string().uuid(),
@@ -424,7 +424,7 @@ function pickFiles(files: BrandhubFile[]): {
 
 export const importBrandhubLogos = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
+  .validator((input) =>
     z
       .object({
         offset: z.number().int().nonnegative().default(0),

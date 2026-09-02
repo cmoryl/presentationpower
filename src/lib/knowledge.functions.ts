@@ -77,7 +77,7 @@ type ListInput = {
 
 export const listKnowledgeEntries = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: ListInput | undefined) => data ?? {})
+  .validator((data: ListInput | undefined) => data ?? {})
   .handler(async ({ data, context }) => {
     let query = context.supabase
       .from("knowledge_entries")
@@ -120,7 +120,7 @@ export const listKnowledgeEntries = createServerFn({ method: "GET" })
 
 export const getKnowledgeEntry = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string }) => data)
+  .validator((data: { id: string }) => data)
   .handler(async ({ data, context }) => {
     const { data: row, error } = await context.supabase
       .from("knowledge_entries")
@@ -146,7 +146,7 @@ type UpsertInput = {
 
 export const upsertKnowledgeEntry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: UpsertInput) => data)
+  .validator((data: UpsertInput) => data)
   .handler(async ({ data, context }) => {
     const payload = {
       owner_division_id: data.owner_division_id,
@@ -182,7 +182,7 @@ export const upsertKnowledgeEntry = createServerFn({ method: "POST" })
 
 export const deleteKnowledgeEntry = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { id: string }) => data)
+  .validator((data: { id: string }) => data)
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("knowledge_entries").delete().eq("id", data.id);
     if (error) throw new Error(error.message);

@@ -93,7 +93,7 @@ const Input = z.object({
 
 export const getDivisionContext = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) => Input.parse(raw))
+  .validator((raw) => Input.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const divisionId = data.divisionId;
@@ -166,7 +166,7 @@ export const getDivisionContext = createServerFn({ method: "POST" })
 // context for several divisions in a single round-trip.
 export const getDivisionContexts = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw) =>
+  .validator((raw) =>
     z.object({ divisionIds: z.array(z.string().min(1)).min(1).max(20) }).parse(raw),
   )
   .handler(async ({ data, context }) => {

@@ -10,7 +10,7 @@ const InputSchema = z.object({
 
 export const importPowerpoint = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v) => InputSchema.parse(v))
+  .validator((v) => InputSchema.parse(v))
   .handler(async ({ data }): Promise<ParsedDeck> => {
     const { parsePptxBuffer } = await import("./pptx-import");
     try {
