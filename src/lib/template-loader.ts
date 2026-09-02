@@ -43,9 +43,14 @@ export async function loadTemplateRegistry(force = false): Promise<void> {
     // Authored scene art is memoised per code/scene/palette — drop it so the
     // next render composes the refreshed templates instead of the old stack.
     clearSceneArtCache();
-  })().catch(() => {
-    // A registry miss must never break rendering — the built-in catalog stands.
-    loaded = null;
-  });
+  })()
+    .catch(() => {
+      // A registry miss must never break rendering — the built-in catalog stands.
+      loaded = null;
+    })
+    .finally(() => {
+      // Ready either way: a failed load must not hold every ground forever.
+      markTemplateRegistryLoaded();
+    });
   return loaded;
 }
