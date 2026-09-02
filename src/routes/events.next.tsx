@@ -39,6 +39,9 @@ import {
   LONDON_STYLES,
   LONDON_VENUE,
   londonPanelsByFloor,
+  isVenueTemplatePanel,
+  londonPanelCount,
+  londonVenueItemMeta,
 } from "@/lib/next-london-signage";
 import { CityBadge } from "@/components/next/CityBadge";
 import { PillarSign } from "@/components/next/PillarSign";
@@ -156,8 +159,6 @@ function NextHub() {
         }}
       />
 
-
-
       {/* Registry controls */}
       <div id="registry" className="mt-8 flex scroll-mt-24 flex-wrap items-center gap-2">
         <FilterChip active={group === "all"} onClick={() => setGroup("all")}>
@@ -206,9 +207,7 @@ function NextHub() {
                   <span className="text-xs text-muted-foreground">{list.length} designs</span>
                 </div>
 
-                {gid === "pillar-signage" && (
-                  <LivePillars division={division} />
-                )}
+                {gid === "pillar-signage" && <LivePillars division={division} />}
 
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {list.map((r) => (
@@ -464,7 +463,6 @@ function Hero({
             </Link>
             <Link
               to="/events/next/pillars"
-
               className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
             >
               <span>
@@ -479,8 +477,8 @@ function Hero({
               className="group flex items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-[13px] text-white/80 backdrop-blur transition hover:bg-white/[0.08] hover:text-white"
             >
               <span>
-                <span className="font-medium">Division agendas</span> · editable agenda boards, A4 to
-                A1, every division
+                <span className="font-medium">Division agendas</span> · editable agenda boards, A4
+                to A1, every division
               </span>
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </Link>
@@ -495,8 +493,6 @@ function Hero({
               <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
             </Link>
           </div>
-
-
         </div>
       </div>
 
@@ -821,8 +817,8 @@ function Pathways({ accent, onPick }: { accent: string; onPick: (g: NextFormatGr
           </p>
           <h3 className="mt-1 text-sm font-semibold tracking-tight">Agendas &amp; schedules</h3>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-            Multi-day, multi-page agenda sheets on the approved grounds — editable
-            Word, layered PDF and press-ready art.
+            Multi-day, multi-page agenda sheets on the approved grounds — editable Word, layered PDF
+            and press-ready art.
           </p>
           <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary">
             Open agenda set
@@ -890,7 +886,6 @@ function DivisionDetail({ division, count }: { division: NextDivision; count: nu
             at 4.58″ × 6.55″ bleed. The agenda board is fully editable per division and exports as
             layered vector art.
           </span>
-
         </div>
       </div>
     </section>
@@ -1138,14 +1133,9 @@ function LivePillars({ division }: { division: NextDivision }) {
   // Every division gets an agenda preview card: the saved live file when there
   // is one, otherwise the editable division default on the selected face.
   const agendaCard = useMemo(() => {
-    const config = savedAgenda
-      ? savedAgenda.config
-      : { ...agendaDefault(division.id), face };
+    const config = savedAgenda ? savedAgenda.config : { ...agendaDefault(division.id), face };
     return { config };
   }, [savedAgenda, division.id, face]);
-
-
-
 
   return (
     <section className="mt-4 scroll-mt-24" aria-labelledby="next-live-pillars">
@@ -1208,9 +1198,7 @@ function LivePillars({ division }: { division: NextDivision }) {
             {card.fileId && (
               <p className="mt-0.5 truncate text-[11px] text-primary/80">
                 {card.fileName}
-                {card.updatedAt
-                  ? ` · updated ${new Date(card.updatedAt).toLocaleString()}`
-                  : ""}
+                {card.updatedAt ? ` · updated ${new Date(card.updatedAt).toLocaleString()}` : ""}
               </p>
             )}
             <Link
@@ -1241,7 +1229,8 @@ function LivePillars({ division }: { division: NextDivision }) {
               : `${agendaCard.config.trimW}×${agendaCard.config.trimH} mm · ${agendaCard.config.face} face · editable default`}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Multi-day, multi-page programmes · layered PDF/X-4, Illustrator and editable Word export.
+            Multi-day, multi-page programmes · layered PDF/X-4, Illustrator and editable Word
+            export.
           </p>
           <Link
             to="/events/next/agendas"
@@ -1253,11 +1242,9 @@ function LivePillars({ division }: { division: NextDivision }) {
           </Link>
         </div>
       </article>
-
     </section>
   );
 }
-
 
 /** London location signage — the QEII Centre scenic panel kit, part of the program. */
 function LondonKit() {
@@ -1272,7 +1259,9 @@ function LondonKit() {
             <span
               key={id}
               className="flex-1"
-              style={{ background: `linear-gradient(120deg, ${LONDON_STYLES[id].stops.join(", ")})` }}
+              style={{
+                background: `linear-gradient(120deg, ${LONDON_STYLES[id].stops.join(", ")})`,
+              }}
             />
           ))}
         </div>
@@ -1285,7 +1274,7 @@ function LondonKit() {
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
             {LONDON_VENUE.venue}, {LONDON_VENUE.city} · {LONDON_VENUE.datesLabel}. All{" "}
-            {LONDON_VENUE.panelCount} scenic panels the location team specified — trim and bleed
+            {londonPanelCount()} scenic panels the location team specified — trim and bleed
             geometry, gradient treatments and measured banding — with vector-first .ai/.svg and
             dithered PNG downloads for the RIP. The kit is public: the venue team can pull artwork
             straight from the link, no sign-in needed.
@@ -1293,7 +1282,7 @@ function LondonKit() {
 
           <dl className="mt-6 flex flex-wrap gap-x-9 gap-y-4">
             {[
-              { k: "Panels", v: String(LONDON_VENUE.panelCount) },
+              { k: "Panels", v: String(londonPanelCount()) },
               { k: "Floors", v: String(floors.length) },
               { k: "Gradient grounds", v: String(styleIds.length) },
               { k: "Colour space", v: LONDON_VENUE.colourSpace },

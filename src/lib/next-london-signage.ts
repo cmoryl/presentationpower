@@ -7,8 +7,9 @@
 // and are loaded lazily by the London signage route.
 
 import artworkAsset from "@/assets/next-london-signage-artwork.json.asset.json";
+import { LONDON_VENUE_ITEMS, type LondonVenueItemSpec } from "@/lib/next-london-venue-items";
 
-export type LondonFloorId = "GF" | "2F" | "3F" | "4F" | "5F";
+export type LondonFloorId = "EXT" | "GF" | "2F" | "3F" | "4F" | "5F" | "6F";
 
 export type LondonPanel = {
   id: string;
@@ -51,11 +52,13 @@ export const LONDON_VENUE = {
 } as const;
 
 export const LONDON_FLOORS: { id: LondonFloorId; label: string }[] = [
+  { id: "EXT", label: "Exterior" },
   { id: "GF", label: "Ground floor" },
   { id: "2F", label: "Second floor" },
   { id: "3F", label: "Third floor" },
   { id: "4F", label: "Fourth floor" },
   { id: "5F", label: "Fifth floor" },
+  { id: "6F", label: "Sixth floor" },
 ];
 
 /** Gradient treatments used across the London panel set. */
@@ -1276,4 +1279,79 @@ export function loadLondonArtwork(): Promise<LondonArtwork> {
 /** Total packaged raster weight, in MB. */
 export function londonRasterWeightMb(): number {
   return LONDON_PANELS.reduce((sum, p) => sum + p.rasterMb, 0);
+}
+
+// ---------------------------------------------------------------------------
+// VENUE TEMPLATE ITEMS — second issue (List Signage QEII + per-floor templates)
+//
+// Derived here rather than transcribed so every item's bleed box, raster size,
+// ppi tier, dither band and weight follow exactly the same rules as the issued
+// 54, and each one gets its own generated gradient ground plus vector-first
+// downloads. Appended into LONDON_PANELS so every existing surface — schedule,
+// QA, directory PDF, revision editor, downloads — picks them up automatically.
+// ---------------------------------------------------------------------------
+
+/** Extra, template-pack-specific metadata for a derived venue item. */
+export type LondonVenueItemMeta = LondonVenueItemSpec & { id: string };
+
+function venueItemPanel(spec: LondonVenueItemSpec, index: number): LondonPanel {
+  const id = `ldn-v${String(index + 1).padStart(2, "0")}`;
+  const seed: LondonPanel = {
+    id,
+    floor: spec.floor,
+    room: spec.room,
+    proof: spec.template,
+    page: 1,
+    name: spec.name,
+    ground: spec.ground,
+    style: LONDON_STYLES[spec.style] ? spec.style : "01-beam-violet-aqua",
+    trimW: spec.trimW,
+    trimH: spec.trimH,
+    bleedW: spec.trimW + spec.bleedEdge * 2,
+    bleedH: spec.trimH + spec.bleedEdge * 2,
+    bleedEdge: spec.bleedEdge,
+    rasterPx: "0x0",
+    rasterPpi: 0,
+    bandMm: 0,
+    rasterMb: 0,
+  };
+  const ppi = recommendedPpi(seed);
+  const size = rasterSizeFor(seed, ppi);
+  const round1 = (n: number) => Math.round(n * 10) / 10;
+  return {
+    ...seed,
+    rasterPpi: ppi,
+    rasterPx: `${size.w}x${size.h}`,
+    // Smooth gradients + triangular dither compress to ~0.28 B/px in the
+    // packaged masters, and the worst flat-tone run is ~3 device pixels.
+    rasterMb: round1(Math.max(0.1, (size.w * size.h * 0.28) / (1024 * 1024))),
+    bandMm: Math.round((25.4 / ppi) * 3 * 100) / 100,
+  };
+}
+
+/** Panel records for the venue template pack, in list order. */
+export const LONDON_VENUE_ITEM_PANELS: LondonPanel[] = LONDON_VENUE_ITEMS.map(venueItemPanel);
+
+/** Template / branding-note metadata, keyed by panel id. */
+export const LONDON_VENUE_ITEM_META: Record<string, LondonVenueItemMeta> = Object.fromEntries(
+  LONDON_VENUE_ITEM_PANELS.map((panel, i) => [
+    panel.id,
+    { ...LONDON_VENUE_ITEMS[i]!, id: panel.id },
+  ]),
+);
+
+/** True for the venue-template issue rather than the original 54. */
+export function isVenueTemplatePanel(panel: LondonPanel): boolean {
+  return panel.id.startsWith("ldn-v");
+}
+
+export function londonVenueItemMeta(panel: LondonPanel): LondonVenueItemMeta | null {
+  return LONDON_VENUE_ITEM_META[panel.id] ?? null;
+}
+
+LONDON_PANELS.push(...LONDON_VENUE_ITEM_PANELS);
+
+/** Live panel total (issued kit + venue template items). */
+export function londonPanelCount(): number {
+  return LONDON_PANELS.length;
 }
