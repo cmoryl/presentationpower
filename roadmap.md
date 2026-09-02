@@ -20,5 +20,7 @@
 - [x] Restore native mouse-wheel scrolling in the deck editor by removing the root overflow/overscroll trap
 
 ## Templates / looks (Sep 2)
-- [ ] 28-look restyle matrix: sweep every look and report drift vs the house look
+- [x] 28-look restyle gates: resumable coverage ledger (`tests/snapshots/export-verify.coverage.json`), `npm run verify:restyle` (+ `--shard k/n`, `--max`, `--workers`), sharded CI workflow, merge script, vitest coverage gate
+- [ ] 28-look restyle matrix: finish the remaining cells (`npm run verify:restyle` until the ledger reports complete) and report drift vs the house look
+
 - [x] Modules page: old-template artifacting fixed (shorthand/longhand background patching left prior layers painted; ground surfaces now wait on the template registry too)

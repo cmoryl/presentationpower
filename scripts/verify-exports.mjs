@@ -95,6 +95,83 @@ const TREE_SNAPSHOT = path.resolve(
 const TREE_UPDATE = flag("update-tree");
 const TREE_ENABLED = !flag("no-tree");
 
+/* ── restyle matrix mode ───────────────────────────────────────────────────
+ * `--restyle` sweeps the cells the coverage ledger is still missing, so the
+ * full (28 looks + house) × every module × 2 modes matrix can be finished
+ * across as many runs, shards or machines as it takes. `--shard k/n` takes a
+ * deterministic slice, `--max N` caps one run's job count.
+ * ───────────────────────────────────────────────────────────────────────── */
+const RESTYLE = flag("restyle");
+const COVERAGE = path.resolve(value("coverage", "tests/snapshots/export-verify.coverage.json"));
+const MAX_JOBS = value("max", null) == null ? null : Number(value("max", 0));
+const WORKERS = Math.max(1, Number(value("workers", RESTYLE ? 4 : 1)));
+const [SHARD, SHARDS] = (() => {
+  const raw = value("shard", null);
+  if (!raw) return [1, 1];
+  const [k, n] = raw.split("/").map((x) => Number(x));
+  return [Number.isFinite(k) ? k : 1, Number.isFinite(n) && n > 0 ? n : 1];
+})();
+
+async function loadJson(file, fallback) {
+  if (!existsSync(file)) return fallback;
+  try {
+    return JSON.parse(await readFile(file, "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
+const cellKey = (packId, mode) => `${packId ?? "base"}@${mode}`;
+
+/** Mirror of mergeCoverage() in src/lib/export-matrix.ts. */
+function mergeCoverage(ledger, rows, shape) {
+  const cells =
+    ledger && ledger.fingerprint === shape.fingerprint ? { ...(ledger.cells ?? {}) } : {};
+  for (const row of rows) {
+    const key = cellKey(row.packId, row.mode);
+    cells[key] = [...new Set([...(cells[key] ?? []), row.variantId])].sort();
+  }
+  const valid = new Set([
+    cellKey(null, "light"),
+    cellKey(null, "dark"),
+    ...shape.packs.map((p) => cellKey(p, shape.packModes?.[p] ?? "light")),
+  ]);
+  const variants = new Set(shape.variants);
+  for (const key of Object.keys(cells)) {
+    if (!valid.has(key)) delete cells[key];
+    else cells[key] = cells[key].filter((v) => variants.has(v));
+  }
+  return { fingerprint: shape.fingerprint, updatedAt: new Date().toISOString(), cells };
+}
+
+/**
+ * Mirror of remainingCoverageJobs() in src/lib/export-matrix.ts.
+ *
+ * Ordering matters for a matrix that takes hours: the house look goes first
+ * (it is the parity baseline and covers every module), then the alternate looks
+ * are drained round-robin by module index, so every look × mode cell has real
+ * coverage within the first minutes instead of look 1 finishing before look 2
+ * has been touched at all.
+ */
+function remainingJobs(ledger, shape) {
+  const cells = ledger && ledger.fingerprint === shape.fingerprint ? (ledger.cells ?? {}) : {};
+  const missing = (pack, mode) => {
+    const swept = new Set(cells[cellKey(pack, mode)] ?? []);
+    return shape.variants.filter((v) => !swept.has(v)).map((v) => [v, pack, mode]);
+  };
+  const house = [...missing(null, "light"), ...missing(null, "dark")];
+  const lanes = [];
+  for (const pack of shape.packs) lanes.push(missing(pack, shape.packModes?.[pack] ?? "light"));
+  const looks = [];
+  for (let i = 0; i < Math.max(0, ...lanes.map((l) => l.length)); i += 1) {
+    for (const lane of lanes) if (lane[i]) looks.push(lane[i]);
+  }
+  return [...house, ...looks];
+}
+
+
+
+
 async function loadManifest() {
   if (!existsSync(MANIFEST)) return null;
   try {
@@ -132,64 +209,111 @@ async function main() {
   const manifest = await loadManifest();
   const allowed = manifest?.allowedProblems ?? {};
   const browser = await launchChromium();
-  let page = await boot(browser);
+  const page0 = await boot(browser);
 
-  const matrix = await page.evaluate(() => ({
+  const matrix = await page0.evaluate(() => ({
     v: window.__tpExportVerify.variants,
     p: window.__tpExportVerify.packs,
+    m: window.__tpExportVerify.packModes ?? {},
   }));
   const variants = matrix.v;
   const allPacks = matrix.p.filter(Boolean);
   const packs = LOOKS == null ? allPacks : allPacks.slice(0, Math.max(0, LOOKS));
 
-  const swept = sampleVariants(variants, SAMPLE);
+  const shape = fingerprintFrom(variants, allPacks, matrix.m);
+  const ledgerBefore = await loadJson(COVERAGE, null);
 
-  const jobs = [];
-  for (const pack of [...packs, null]) {
-    for (const mode of ["light", "dark"]) {
-      for (const v of swept) jobs.push([v, pack, mode]);
-    }
-  }
-  console.log(
-    `export-verify: ${packs.length} looks × ${swept.length}/${variants.length} modules × 2 modes = ${jobs.length} exports (${FULL ? "full" : "sampled"})`,
-  );
-
-  const rows = [];
-  for (let i = 0; i < jobs.length; i += BATCH) {
-    const batch = jobs.slice(i, i + BATCH);
-    try {
-      rows.push(...(await page.evaluate((j) => window.__tpExportVerify.run(j), batch)));
-    } catch (err) {
-      // A harness page crash must not be reported as an export regression:
-      // reboot and retry the batch one job at a time.
-      console.warn(`  harness restart after batch ${i}: ${String(err).slice(0, 120)}`);
-      page = await boot(browser);
-      for (const job of batch) {
-        try {
-          rows.push(...(await page.evaluate((j) => window.__tpExportVerify.run(j), [job])));
-        } catch (err2) {
-          rows.push({
-            variantId: job[0],
-            packId: job[1],
-            mode: job[2],
-            ok: false,
-            bg: "none",
-            shapes: 0,
-            pics: 0,
-            runs: 0,
-            bytes: 0,
-            problems: ["harness crashed while exporting this combination"],
-            error: String(err2).slice(0, 300),
-          });
-          page = await boot(browser);
-        }
+  let jobs;
+  let label;
+  if (RESTYLE) {
+    let pending = remainingJobs(ledgerBefore, shape);
+    const pendingTotal = pending.length;
+    pending = pending.filter((_, i) => SHARDS <= 1 || i % SHARDS === Math.min(Math.max(SHARD, 1), SHARDS) - 1);
+    jobs = MAX_JOBS == null ? pending : pending.slice(0, MAX_JOBS);
+    label = `restyle matrix · ${shape.packs.length} looks (native mode) + house light/dark × ${variants.length} modules = ${shape.jobs} cells · ${pendingTotal} still unverified · this run ${jobs.length}${SHARDS > 1 ? ` (shard ${SHARD}/${SHARDS})` : ""}`;
+  } else {
+    const swept = sampleVariants(variants, SAMPLE);
+    jobs = [];
+    for (const pack of [...packs, null]) {
+      for (const mode of ["light", "dark"]) {
+        for (const v of swept) jobs.push([v, pack, mode]);
       }
     }
-    process.stdout.write(
-      `  ${Math.min(i + BATCH, jobs.length)}/${jobs.length} · failures ${rows.filter((r) => !r.ok).length}\r`,
-    );
+    label = `${packs.length} looks × ${swept.length}/${variants.length} modules × 2 modes = ${jobs.length} exports (${FULL ? "full" : "sampled"})`;
   }
+  console.log(`export-verify: ${label}`);
+
+  if (jobs.length === 0) {
+    console.log("Nothing to sweep — the coverage ledger already has every cell of this matrix.");
+  }
+
+  const rows = [];
+  let done = 0;
+
+  let writing = null;
+  /** Merge everything swept so far into the on-disk ledger (crash-safe resume). */
+  async function checkpoint() {
+    if (writing) return writing;
+    writing = (async () => {
+      const onDisk = await loadJson(COVERAGE, null);
+      const merged = mergeCoverage(onDisk, rows.filter((r) => r.ok), shape);
+      await mkdir(path.dirname(COVERAGE), { recursive: true });
+      await writeFile(COVERAGE, `${JSON.stringify(merged, null, 2)}\n`);
+    })().finally(() => {
+      writing = null;
+    });
+    return writing;
+  }
+
+  /** One worker owns a page and drains batches from the shared queue. */
+  async function worker(slice) {
+    let page = slice.length && WORKERS > 1 ? await boot(browser) : page0;
+    for (let i = 0; i < slice.length; i += BATCH) {
+      const batch = slice.slice(i, i + BATCH);
+      try {
+        rows.push(...(await page.evaluate((j) => window.__tpExportVerify.run(j), batch)));
+      } catch (err) {
+        // A harness page crash must not be reported as an export regression:
+        // reboot and retry the batch one job at a time.
+        console.warn(`  harness restart: ${String(err).slice(0, 120)}`);
+        page = await boot(browser);
+        for (const job of batch) {
+          try {
+            rows.push(...(await page.evaluate((j) => window.__tpExportVerify.run(j), [job])));
+          } catch (err2) {
+            rows.push({
+              variantId: job[0],
+              packId: job[1],
+              mode: job[2],
+              ok: false,
+              bg: "none",
+              shapes: 0,
+              pics: 0,
+              runs: 0,
+              bytes: 0,
+              problems: ["harness crashed while exporting this combination"],
+              error: String(err2).slice(0, 300),
+            });
+            page = await boot(browser);
+          }
+        }
+      }
+      done += batch.length;
+      // Checkpoint the ledger as we go: a multi-hour matrix must never lose the
+      // cells it already verified because the run was interrupted.
+      if (UPDATE && RESTYLE && done % (BATCH * 8) < BATCH) await checkpoint();
+      process.stdout.write(
+        `  ${Math.min(done, jobs.length)}/${jobs.length} · failures ${rows.filter((r) => !r.ok).length}\r`,
+      );
+    }
+  }
+
+  const slices = Array.from({ length: WORKERS }, (_, w) =>
+    jobs.filter((_, i) => i % WORKERS === w),
+  );
+  await Promise.all(slices.map((s) => worker(s)));
   console.log("");
+
 
   // ---------------------------------------------------------------------------
   // Object-tree diff: element-level comparison against the stored baseline.
@@ -289,21 +413,24 @@ async function main() {
   console.log(`\nAll ${rows.length} exports passed (backgrounds + layers intact).`);
 
   if (!UPDATE) return;
-  // A sampled run must never replace a full-coverage record for the same
-  // matrix: the fingerprint would look current while coverage silently dropped
-  // from 10,904 exports to a few hundred.
-  if (!FULL && manifest?.coverage === "full") {
-    const shapeNow = fingerprintFrom(variants, packs);
-    if (manifest.fingerprint === shapeNow.fingerprint) {
-      console.log(
-        "Manifest left untouched: existing record has full coverage for this matrix; a sampled run may not downgrade it.",
-      );
-      return;
-    }
-  }
-  // src/lib/export-matrix.ts is TS; recompute the same digest here so this
-  // script needs no TS loader. Keep both algorithms in sync.
-  const shape = fingerprintFrom(variants, packs);
+
+  // ---------------------------------------------------------------------------
+  // Coverage ledger: accumulate the cells this run verified so the restyle
+  // matrix can be finished across many runs and the gate can tell, cell by
+  // cell, whether it is actually complete.
+  // ---------------------------------------------------------------------------
+  const ledger = mergeCoverage(await loadJson(COVERAGE, ledgerBefore), rows.filter((r) => r.ok), shape);
+  await mkdir(path.dirname(COVERAGE), { recursive: true });
+  await writeFile(COVERAGE, `${JSON.stringify(ledger, null, 2)}\n`);
+  const stillMissing = remainingJobs(ledger, shape).length;
+  const complete = stillMissing === 0;
+  console.log(
+    `Coverage ledger: ${shape.jobs - stillMissing}/${shape.jobs} restyle cells verified${complete ? " — matrix complete" : ` · ${stillMissing} remaining (npm run verify:restyle)`} → ${path.relative(process.cwd(), COVERAGE)}`,
+  );
+
+  // Coverage is now derived from the ledger, so a sampled run can never claim
+  // (or silently downgrade) full coverage.
+  const sweptVariants = complete ? [] : [...new Set(ledger ? Object.values(ledger.cells).flat() : [])].sort();
   await mkdir(path.dirname(MANIFEST), { recursive: true });
   await writeFile(
     MANIFEST,
@@ -314,8 +441,9 @@ async function main() {
         packs: shape.packs,
         jobs: shape.jobs,
         verifiedAt: new Date().toISOString(),
-        coverage: FULL ? "full" : "sampled",
-        sampledVariants: FULL ? [] : swept.slice().sort(),
+        coverage: complete ? "full" : "sampled",
+        verifiedCells: shape.jobs - stillMissing,
+        sampledVariants: sweptVariants,
         allowedProblems: allowed,
       },
       null,
@@ -327,8 +455,9 @@ async function main() {
   );
 }
 
+
 /** Mirror of the FNV-1a digest in src/lib/export-matrix.ts. */
-function fingerprintFrom(variantIds, packIds) {
+function fingerprintFrom(variantIds, packIds, packModes = {}) {
   const variants = [...variantIds].sort();
   const packs = [...packIds].sort();
   let h = 0x811c9dc5;
@@ -339,7 +468,9 @@ function fingerprintFrom(variantIds, packIds) {
   return {
     variants,
     packs,
-    jobs: (packs.length + 1) * variants.length * 2,
+    // Packs are single-mode by design, so only the house look has two cells.
+    packModes,
+    jobs: (packs.length + 2) * variants.length,
     fingerprint: (h >>> 0).toString(16).padStart(8, "0"),
   };
 }
