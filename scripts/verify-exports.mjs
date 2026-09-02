@@ -103,6 +103,15 @@ const TREE_ENABLED = !flag("no-tree");
  * ───────────────────────────────────────────────────────────────────────── */
 const RESTYLE = flag("restyle");
 const COVERAGE = path.resolve(value("coverage", "tests/snapshots/export-verify.coverage.json"));
+/**
+ * Mid-run checkpoints go here, NOT to COVERAGE. The committed ledger lives
+ * under tests/, which the dev server watches: writing it every batch triggers a
+ * full page reload, which destroys the harness contexts and eventually kills
+ * the sweep ("Execution context was destroyed"). node_modules/.cache is outside
+ * the watcher, so progress can be checkpointed as often as we like and only the
+ * final result is written into the repo.
+ */
+const PROGRESS = path.resolve("node_modules/.cache/export-verify.coverage.json");
 const MAX_JOBS = value("max", null) == null ? null : Number(value("max", 0));
 const WORKERS = Math.max(1, Number(value("workers", RESTYLE ? 4 : 1)));
 const [SHARD, SHARDS] = (() => {
@@ -221,7 +230,26 @@ async function main() {
   const packs = LOOKS == null ? allPacks : allPacks.slice(0, Math.max(0, LOOKS));
 
   const shape = fingerprintFrom(variants, allPacks, matrix.m);
-  const ledgerBefore = await loadJson(COVERAGE, null);
+  // Resume from the committed ledger unioned with any unfinished run's progress.
+  // Resume from the committed ledger unioned with any unfinished run's progress.
+  const ledgerRows = (l) =>
+    !l || l.fingerprint !== shape.fingerprint
+      ? []
+      : Object.entries(l.cells ?? {}).flatMap(([key, ids]) => {
+          const at = key.lastIndexOf("@");
+          const packId = key.slice(0, at);
+          const mode = key.slice(at + 1);
+          return ids.map((variantId) => ({
+            variantId,
+            packId: packId === "base" ? null : packId,
+            mode,
+          }));
+        });
+  const ledgerBefore = mergeCoverage(
+    await loadJson(COVERAGE, null),
+    ledgerRows(await loadJson(PROGRESS, null)),
+    shape,
+  );
 
   let jobs;
   let label;
@@ -255,10 +283,9 @@ async function main() {
   async function checkpoint() {
     if (writing) return writing;
     writing = (async () => {
-      const onDisk = await loadJson(COVERAGE, null);
-      const merged = mergeCoverage(onDisk, rows.filter((r) => r.ok), shape);
-      await mkdir(path.dirname(COVERAGE), { recursive: true });
-      await writeFile(COVERAGE, `${JSON.stringify(merged, null, 2)}\n`);
+      const merged = mergeCoverage(ledgerBefore, rows.filter((r) => r.ok), shape);
+      await mkdir(path.dirname(PROGRESS), { recursive: true });
+      await writeFile(PROGRESS, `${JSON.stringify(merged, null, 2)}\n`);
     })().finally(() => {
       writing = null;
     });
@@ -419,9 +446,11 @@ async function main() {
   // matrix can be finished across many runs and the gate can tell, cell by
   // cell, whether it is actually complete.
   // ---------------------------------------------------------------------------
-  const ledger = mergeCoverage(await loadJson(COVERAGE, ledgerBefore), rows.filter((r) => r.ok), shape);
+  const ledger = mergeCoverage(ledgerBefore, rows.filter((r) => r.ok), shape);
   await mkdir(path.dirname(COVERAGE), { recursive: true });
   await writeFile(COVERAGE, `${JSON.stringify(ledger, null, 2)}\n`);
+  await mkdir(path.dirname(PROGRESS), { recursive: true });
+  await writeFile(PROGRESS, `${JSON.stringify(ledger, null, 2)}\n`);
   const stillMissing = remainingJobs(ledger, shape).length;
   const complete = stillMissing === 0;
   console.log(
