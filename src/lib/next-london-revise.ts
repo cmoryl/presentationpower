@@ -534,7 +534,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
         artHeight: brand.art.h,
       });
       if (!ops) return "";
-      return `q ${f3(r / 255)} ${f3(g / 255)} ${f3(b / 255)} rg ${ops} f Q\n`;
+      return `q ${f3(r)} ${f3(g)} ${f3(b)} rg ${ops} f Q\n`;
     })
     .join("");
 
