@@ -644,13 +644,15 @@ export function BackgroundTuner({
                   className="text-left"
                 >
                   <span
-                    className={`block aspect-[16/9] w-full rounded-lg border ${
+                    className={`relative block aspect-[16/9] w-full overflow-hidden rounded-lg border ${
                       on
                         ? "border-[#003FC7] ring-2 ring-[#003FC7]/30"
                         : "border-black/10 hover:border-[#003FC7]/50 dark:border-white/15"
                     }`}
-                    style={{ background: preview.join(", ") }}
-                  />
+                  >
+                    <GroundPlane pack={pack} seed={scene} layers={preview} />
+                  </span>
+
                   <span className="mt-1 block text-[11px] font-medium">{p.label}</span>
                   <span className="block text-[10px] leading-tight opacity-55">{p.hint}</span>
                 </button>
