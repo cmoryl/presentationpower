@@ -10,8 +10,8 @@ describe("London signage branding", () => {
     for (const panel of LONDON_PANELS) {
       const plan = londonBrandingPlan(panel);
       expect(nextLogoFamily(plan.familyId)).toBeTruthy();
-      expect(plan.paths.length).toBeGreaterThan(0);
-      for (const p of plan.paths) expect(p.fill.toLowerCase()).toMatch(/^#(fff|ffffff)$/);
+      expect(plan.art.paths.length).toBeGreaterThan(0);
+      for (const p of plan.art.paths) expect(p.fill.toLowerCase()).toMatch(/^#(fff|ffffff)$/);
     }
   });
 
