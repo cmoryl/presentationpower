@@ -49,6 +49,7 @@ import {
   moduleIdFromSeed,
   sceneTakeFromSeed,
   useSkinBackdropVersion,
+  useSkinBackdropsReady,
 } from "@/lib/skin-backdrop-overrides";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { moduleSpacing, spacingVars } from "@/lib/module-spacing";
@@ -444,6 +445,10 @@ export function SlideFrame({
   const ownsMedia = useContext(SlideOwnsMediaContext);
   // Repaint the ground the moment an admin saves a replacement background.
   useSkinBackdropVersion();
+  // ARTIFACT GUARD — while the replacement library is still loading, the ground
+  // would resolve to this skin's pre-replacement artwork. Hold the ground (field
+  // only) for those few frames so an admin never sees a superseded background.
+  const groundReady = useSkinBackdropsReady();
   // AI-generated backdrop for the active skin, if the studio has rendered one
   // for this scene. Painted between the pack's flat field and its ground planes
   // so the skin's own scaffold and motif still read on top.
@@ -902,7 +907,7 @@ export function SlideFrame({
                   skin and scene. Dimmed and tinted toward the pack field so
                   copy keeps its contrast, then over-painted by the pack's own
                   ground / scaffold / motif planes. */}
-              {aiBackdrop && (
+              {groundReady && aiBackdrop && (
                 <>
                   <img
                     aria-hidden
@@ -943,7 +948,10 @@ export function SlideFrame({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background: packGroundPaint(pack, groundSeed).join(", "),
-                  opacity: replacedGround || authoredPlateGround
+                  transition: "opacity 120ms linear",
+                  opacity: !groundReady
+                    ? 0
+                    : replacedGround || authoredPlateGround
                     ? 1
                     : packGroundDamp(pack, groundSeed),
                   maskImage: replacedGround ? undefined : groundMask,

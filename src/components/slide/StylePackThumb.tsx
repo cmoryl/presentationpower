@@ -21,7 +21,7 @@ import {
   type PackComposition,
   type StylePack,
 } from "@/lib/style-packs";
-import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
+import { useSkinBackdropVersion, useSkinBackdropsReady } from "@/lib/skin-backdrop-overrides";
 
 /** Seed keeps each pack's ground deterministic and comparable across thumbs. */
 const THUMB_SEED = "thumb-cover";
@@ -72,6 +72,8 @@ export function StylePackThumb({
   const t = pack.tokens;
   // Repaint when an admin replaces one of this skin's backgrounds.
   useSkinBackdropVersion();
+  // Hold the ground until replacements have loaded (no stale-artwork flash).
+  const groundReady = useSkinBackdropsReady();
   return (
     <div
       aria-hidden
@@ -84,7 +86,8 @@ export function StylePackThumb({
         className="absolute inset-0"
         style={{
           background: packGroundPaint(pack, THUMB_SEED).join(", "),
-          opacity: packGroundOpacity(pack),
+          opacity: groundReady ? packGroundOpacity(pack) : 0,
+          transition: "opacity 120ms linear",
           maskImage: isCuratedGroundPack(pack) ? undefined : packGroundMask(composition),
           WebkitMaskImage: isCuratedGroundPack(pack) ? undefined : packGroundMask(composition),
         }}

@@ -16,6 +16,16 @@ import { useSyncExternalStore } from "react";
 
 let OVERRIDES: Record<string, string> = {};
 let VERSION = 0;
+/**
+ * ARTIFACT GUARD — has the replacement library settled yet?
+ *
+ * Until the loader has answered, `skinBackdropOverride()` can only return null,
+ * so every ground would paint the skin's *pre-replacement* artwork for the
+ * first few hundred milliseconds. That is exactly the "old background" flash
+ * admins saw when Template Studio opened. Surfaces read `useSkinBackdropsReady`
+ * and hold the ground plane (field only) until the truth is known.
+ */
+let READY = typeof window === "undefined"; // SSR/export paths publish synchronously
 
 const listeners = new Set<() => void>();
 
@@ -24,8 +34,21 @@ function key(code: string, scene: string, take: number) {
 }
 
 /** Publish the loaded replacement library. */
-export function setSkinBackdropOverrides(map: Record<string, string>): void {
+export function setSkinBackdropOverrides(map: Record<string, string>, ready = true): void {
   OVERRIDES = map;
+  if (ready) READY = true;
+  VERSION += 1;
+  for (const fn of listeners) fn();
+}
+
+/** True once the replacement library has loaded (or failed) at least once. */
+export function skinBackdropsReady(): boolean {
+  return READY;
+}
+
+export function markSkinBackdropsLoaded(): void {
+  if (READY) return;
+  READY = true;
   VERSION += 1;
   for (const fn of listeners) fn();
 }
@@ -130,4 +153,12 @@ export function sceneTakeFromSeed(seed: string): { take: number } {
  */
 export function useSkinBackdropVersion(): number {
   return useSyncExternalStore(onSkinBackdropOverrides, skinBackdropOverrideVersion, () => 0);
+}
+
+/**
+ * Ground gate. False only while the replacement library is still in flight, so
+ * a preview never paints a superseded background before the truth arrives.
+ */
+export function useSkinBackdropsReady(): boolean {
+  return useSyncExternalStore(onSkinBackdropOverrides, skinBackdropsReady, () => true);
 }
