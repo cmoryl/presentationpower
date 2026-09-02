@@ -55,6 +55,9 @@ import {
   recommendedPpi,
   type LondonArtwork,
   type LondonPanel,
+  isVenueTemplatePanel,
+  londonPanelCount,
+  londonVenueItemMeta,
 } from "@/lib/next-london-signage";
 import {
   effectiveLondonPanels,
@@ -221,20 +224,12 @@ function LondonSignagePage() {
         const art = resolveLondonArtwork(panel, pack);
         gateOnQa(fmt === "svg" ? auditSvg(panel, art.svg) : auditAi(panel, art.ai));
         if (fmt === "svg") {
-          download(
-            new Blob([art.svg], { type: "image/svg+xml" }),
-            `${panelSlug(panel)}.svg`,
-          );
+          download(new Blob([art.svg], { type: "image/svg+xml" }), `${panelSlug(panel)}.svg`);
           return;
         }
         // .ai is PDF-compatible binary — never let Blob UTF-8 the bytes.
         const bytes = londonAiBytes(art.ai);
-        download(
-          new Blob([bytes], { type: "application/illustrator" }),
-          `${panelSlug(panel)}.ai`,
-        );
-
-
+        download(new Blob([bytes], { type: "application/illustrator" }), `${panelSlug(panel)}.ai`);
       },
     );
 
@@ -329,7 +324,7 @@ function LondonSignagePage() {
             </p>
             <dl className="mt-8 flex flex-wrap gap-x-9 gap-y-4">
               {[
-                { k: "Panels", v: String(LONDON_VENUE.panelCount) },
+                { k: "Panels", v: String(londonPanelCount()) },
                 { k: "Rooms", v: String(roomCount) },
                 { k: "Gradient grounds", v: String(styleCount) },
                 { k: "Worst measured band", v: `${worstBand.toFixed(2)} mm` },
@@ -555,7 +550,17 @@ function LondonSignagePage() {
                               Added
                             </span>
                           ) : null}
+                          {isVenueTemplatePanel(panel) ? (
+                            <span className="rounded bg-[#C2A3FF]/45 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                              Venue template
+                            </span>
+                          ) : null}
                         </p>
+                        {londonVenueItemMeta(panel) ? (
+                          <p className="mt-1 text-[12px] font-medium leading-snug text-[#03002C]/75">
+                            {londonVenueItemMeta(panel)!.note}
+                          </p>
+                        ) : null}
                         <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
                           {panel.trimW} × {panel.trimH} mm · {panel.ground}
                         </p>
@@ -587,6 +592,30 @@ function LondonSignagePage() {
               <div className="mx-auto w-full max-w-[240px]">
                 <PanelThumb panel={openPanel} svg={londonPanelSvgFor(openPanel, artwork)} />
               </div>
+
+              {londonVenueItemMeta(openPanel) ? (
+                <div className="rounded-lg border border-[#C2A3FF]/60 bg-[#C2A3FF]/12 p-3">
+                  <p className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/60">
+                    Venue template item
+                    {londonVenueItemMeta(openPanel)!.qty
+                      ? ` · ${londonVenueItemMeta(openPanel)!.qty}\u00d7 on site`
+                      : ""}
+                  </p>
+                  <p className="mt-1.5 text-[13px] font-medium leading-relaxed text-[#03002C]">
+                    {londonVenueItemMeta(openPanel)!.note}
+                  </p>
+                  <p className="mt-2 break-all font-mono text-[11px] text-[#03002C]/60">
+                    Template: {londonVenueItemMeta(openPanel)!.template}
+                  </p>
+                  <p className="mt-1 font-mono text-[11px] text-[#03002C]/50">
+                    {londonVenueItemMeta(openPanel)!.dimsSource === "list"
+                      ? "Trim size as stated on the venue signage list."
+                      : londonVenueItemMeta(openPanel)!.dimsSource === "template-1:10"
+                        ? "Trim size read from the 1:10 venue template (scaled \u00d710) — confirm on site."
+                        : "Trim size read from the venue template artboard \u2014 confirm on site."}
+                  </p>
+                </div>
+              ) : null}
 
               <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {[
