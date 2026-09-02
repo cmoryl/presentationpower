@@ -562,10 +562,10 @@ export function BackgroundTuner({
                     aria-pressed={on}
                     className="block w-full text-left"
                   >
-                    <span
-                      className="block aspect-[16/9] w-full rounded-lg border border-black/10 dark:border-white/15"
-                      style={{ background: live.join(", ") }}
-                    />
+                    <span className="relative block aspect-[16/9] w-full overflow-hidden rounded-lg border border-black/10 dark:border-white/15">
+                      <GroundPlane pack={pack} seed={s} layers={live} />
+                    </span>
+
                   </button>
                   <span className="flex min-w-0 items-center justify-between gap-1.5">
                     <span
