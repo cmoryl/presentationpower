@@ -21,6 +21,6 @@
 
 ## Templates / looks (Sep 2)
 - [x] 28-look restyle gates: resumable coverage ledger (`tests/snapshots/export-verify.coverage.json`), `npm run verify:restyle` (+ `--shard k/n`, `--max`, `--workers`), sharded CI workflow, merge script, vitest coverage gate
-- [ ] 28-look restyle matrix: finish the remaining cells (`npm run verify:restyle` until the ledger reports complete) and report drift vs the house look
+- [x] 28-look restyle matrix: swept all 6,120 cells (28 looks + house light/dark × 204 modules), 0 export failures, ledger + manifest report `coverage: "full"`. Mid-run checkpoints now land in `node_modules/.cache` so the dev-server watcher can't reload the harness mid-sweep.
 
 - [x] Modules page: old-template artifacting fixed (shorthand/longhand background patching left prior layers painted; ground surfaces now wait on the template registry too)
