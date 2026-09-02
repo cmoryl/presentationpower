@@ -434,17 +434,41 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
   const marginX = ((panel.bleedW - panel.trimW) / 2).toFixed(2);
   const marginY = ((panel.bleedH - panel.trimH) / 2).toFixed(2);
 
+  const brand = londonBrandingPlan(panel);
+  const logoScale = brand.logo.w / brand.art.w;
+  const logoGroup = [
+    `<g data-layer="lockup" data-lockup="${brand.orientation}" data-family="${brand.familyId}"`,
+    ` data-source="${escapeXml(brand.art.source)}"`,
+    ` transform="translate(${brand.logo.x.toFixed(2)} ${brand.logo.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">`,
+    brand.art.paths.map((p) => `<path d="${p.d}" fill="${p.fill}"/>`).join(""),
+    `</g>`,
+  ].join("");
+
+  const copyLayer = brand.copy
+    ? `<text data-layer="copy" x="${(marginXNum(panel) + panel.trimW / 2).toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
+      ` text-anchor="middle" fill="#FFFFFF" font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
+      ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
+      ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
+    : "";
+
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
     ` viewBox="0 0 ${panel.bleedW} ${panel.bleedH}" data-panel="${panel.id}"`,
     ` data-trim="${panel.trimW}x${panel.trimH}mm" data-bleed="${panel.bleedEdge}mm"`,
-    ` data-trim-origin="${marginX},${marginY}" data-style="${panel.style}">`,
+    ` data-trim-origin="${marginX},${marginY}" data-style="${panel.style}"`,
+    ` data-font="${LONDON_SIGNAGE_FONT.pdfBaseFont}">`,
     `<title>${escapeXml(panel.name)}</title>`,
-    `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style}</desc>`,
+    `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style} · ${escapeXml(brand.art.source)}</desc>`,
     `<defs>${paint}</defs>`,
     `<rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/>`,
+    logoGroup,
+    copyLayer,
     `</svg>`,
   ].join("");
+}
+
+function marginXNum(panel: LondonPanel): number {
+  return (panel.bleedW - panel.trimW) / 2;
 }
 
 function escapeXml(s: string): string {
