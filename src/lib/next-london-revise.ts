@@ -32,6 +32,8 @@ import {
   radialShadingDict,
   stopsFromColors,
 } from "@/lib/pdf-gradient-shading";
+import { LONDON_SIGNAGE_FONT, londonBrandingPlan } from "@/lib/next-london-branding";
+import { svgPathToPdfOps } from "@/lib/vector-path-pdf";
 
 /** Fields the location team is allowed to re-issue. */
 export const LONDON_EDITABLE_FIELDS = [
