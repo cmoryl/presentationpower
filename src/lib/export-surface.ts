@@ -135,7 +135,7 @@ export const AMBIENT_ALPHA = 0.18;
 //
 // One recipe, both modes (light and dark differ in alpha, never structure):
 //
-//   background      light rgba(255,255,255,0.10) · dark rgba(10,8,48,0.18)
+//   background      light rgba(255,255,255,0.10) · dark rgba(255,255,255,0.07)
 //   backgroundImage `cardWashGradient(accent)` — accent@13% 0% → accent@4% 46%
 //                   → transparent 88% (FADE_STOPS in `surface-tokens.ts`)
 //   border          1px solid accent ring, bottom edge transparent
