@@ -49,8 +49,8 @@ import {
   moduleIdFromSeed,
   sceneTakeFromSeed,
   useSkinBackdropVersion,
-  useSkinBackdropsReady,
 } from "@/lib/skin-backdrop-overrides";
+import { useGroundReady } from "@/hooks/use-ground-ready";
 import { packCompose, composeVars, composePlateCss } from "@/lib/pack-compose";
 import { moduleSpacing, spacingVars } from "@/lib/module-spacing";
 
@@ -448,7 +448,7 @@ export function SlideFrame({
   // ARTIFACT GUARD — while the replacement library is still loading, the ground
   // would resolve to this skin's pre-replacement artwork. Hold the ground (field
   // only) for those few frames so an admin never sees a superseded background.
-  const groundReady = useSkinBackdropsReady();
+  const groundReady = useGroundReady();
   // AI-generated backdrop for the active skin, if the studio has rendered one
   // for this scene. Painted between the pack's flat field and its ground planes
   // so the skin's own scaffold and motif still read on top.
@@ -1111,10 +1111,15 @@ export function SlideFrame({
             aria-hidden
             data-decorative="true"
             className="pointer-events-none absolute inset-0"
+            // ARTIFACT GUARD — longhand only. Mixing the `background` shorthand
+            // with backgroundSize/Position makes React patch the layer list in
+            // place, which left the *previous* template's layers painted under
+            // the new ones (the ghost columns admins saw on the modules page).
             style={{
-              background: brandSystemLightGround(groundSeed, brand.tokens.accent),
+              backgroundImage: brandSystemLightGround(groundSeed, brand.tokens.accent),
               backgroundSize: "cover",
               backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
           {/* Grain — barely-there tactile finish, matches media tiles. Skipped
@@ -1144,10 +1149,12 @@ export function SlideFrame({
           aria-hidden
           data-decorative="true"
           className="pointer-events-none absolute inset-0"
+          // Longhand only — see the artifact guard on the light ground above.
           style={{
-            background: brandSystemDarkGround(groundSeed, brand.tokens.accent),
+            backgroundImage: brandSystemDarkGround(groundSeed, brand.tokens.accent),
             backgroundSize: "cover",
             backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
         />
       )}

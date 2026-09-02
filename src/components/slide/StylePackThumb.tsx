@@ -21,7 +21,8 @@ import {
   type PackComposition,
   type StylePack,
 } from "@/lib/style-packs";
-import { useSkinBackdropVersion, useSkinBackdropsReady } from "@/lib/skin-backdrop-overrides";
+import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
+import { useGroundReady } from "@/hooks/use-ground-ready";
 
 /** Seed keeps each pack's ground deterministic and comparable across thumbs. */
 const THUMB_SEED = "thumb-cover";
@@ -73,7 +74,7 @@ export function StylePackThumb({
   // Repaint when an admin replaces one of this skin's backgrounds.
   useSkinBackdropVersion();
   // Hold the ground until replacements have loaded (no stale-artwork flash).
-  const groundReady = useSkinBackdropsReady();
+  const groundReady = useGroundReady();
   return (
     <div
       aria-hidden

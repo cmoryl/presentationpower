@@ -63,6 +63,29 @@ export function templateRegistryVersion(): number {
   return version;
 }
 
+/**
+ * ARTIFACT GUARD — has the published template/override catalog landed yet?
+ *
+ * Until it has, `stylePackById` can only resolve the built-in catalog, so any
+ * ground painted in those first frames shows the template's *pre-update*
+ * artwork. That is the "old template" flash on the modules page. Ground
+ * surfaces hold their plane until this is true. SSR/export paths publish
+ * synchronously and are ready by definition.
+ */
+let ready = typeof window === "undefined";
+
+export function templateRegistryReady(): boolean {
+  return ready;
+}
+
+/** Called once the loader has answered (success or failure). */
+export function markTemplateRegistryLoaded(): void {
+  if (ready) return;
+  ready = true;
+  version += 1;
+  emit();
+}
+
 export function setCustomPacks(packs: StylePack[]): void {
   customPacks = packs;
   version += 1;

@@ -18,3 +18,7 @@
 - [x] Fix pages that snap back to top / stop scrolling (router scroll restoration reset on auth SIGNED_IN re-emit)
 - [x] Audit agent + presentation pages for locked (non-scrolling) full-height layouts (no locked containers found)
 - [x] Restore native mouse-wheel scrolling in the deck editor by removing the root overflow/overscroll trap
+
+## Templates / looks (Sep 2)
+- [ ] 28-look restyle matrix: sweep every look and report drift vs the house look
+- [x] Modules page: old-template artifacting fixed (shorthand/longhand background patching left prior layers painted; ground surfaces now wait on the template registry too)
