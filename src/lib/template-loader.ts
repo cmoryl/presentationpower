@@ -11,6 +11,7 @@ import { clearSceneArtCache } from "./industry-scene-art";
 import { parseOverrideRow, parseTemplateRow } from "./templates.functions";
 import { templateToPack, type CustomTemplate } from "./custom-templates";
 import {
+  markTemplateRegistryLoaded,
   setBackgroundOverrides,
   setCustomPacks,
   setCustomTemplateMappings,
