@@ -878,7 +878,14 @@ export function moduleCardSurface(
   // whole surface — not just the colour — reaches 0 opacity before the bottom
   // edge. A flat base fill was what kept module boxes reading as closed
   // rectangles even though the wash faded.
-  const baseFill = isDark ? cardBaseGradient("10,8,48", 0.18) : cardBaseGradient("255,255,255", 0.1);
+  // Dark cards lift with a LIGHT veil, not a darker one. A near-black base tint
+  // over a dark ground is invisible, so dark slides read as bare hairlines while
+  // the light versions read as boxes — same structure, different result. Both
+  // modes now tint with white and differ only in alpha.
+  const baseFill = isDark
+    ? cardBaseGradient("255,255,255", 0.07)
+    : cardBaseGradient("255,255,255", 0.1);
+
   return {
     background: "var(--pack-card-bg, transparent)",
     backgroundImage: `var(--pack-card-bg-image, ${cardWashGradient(line)}, ${baseFill})`,
