@@ -1,0 +1,61 @@
+name: restyle-matrix
+
+# Drives the (28 alternate looks + house) × every module × light/dark export
+# matrix to completion. One run cannot finish ~11.8k exports, so the sweep is
+# sharded and resumable: each shard exports only the cells the coverage ledger
+# is still missing, and the ledger is merged back so the next run continues
+# where this one stopped. The vitest gate
+# (src/lib/__tests__/export-matrix-coverage.test.ts) reads that ledger.
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: Number of shards to split the remaining cells across
+        default: "8"
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Start dev server
+        run: |
+          npm run dev &
+          for i in $(seq 1 60); do curl -sf -o /dev/null http://localhost:8080/ && break; sleep 2; done
+      - name: Sweep restyle shard ${{ matrix.shard }}
+        run: node scripts/verify-exports.mjs --restyle --workers 4 --no-tree --shard ${{ matrix.shard }}/${{ github.event.inputs.shards || 8 }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: restyle-coverage-shard-${{ matrix.shard }}
+          path: tests/snapshots/export-verify.coverage.json
+
+  merge:
+    needs: sweep
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/download-artifact@v4
+        with:
+          path: shards
+      - run: node scripts/merge-restyle-coverage.mjs shards
+      - uses: actions/upload-artifact@v4
+        with:
+          name: restyle-coverage
+          path: tests/snapshots/export-verify.coverage.json

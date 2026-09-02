@@ -902,6 +902,8 @@ declare global {
       /** Subset of `variants` that render a data graphic (chart-parity scope). */
       chartVariants: string[];
       packs: (string | null)[];
+      /** Native mode of each pack — packs are single-mode by design. */
+      packModes: Record<string, "light" | "dark">;
       run: (jobs: Array<[string, string | null, "light" | "dark"]>) => Promise<Audit[]>;
       /** Compact object tree of one audit, for storing as a baseline. */
       snapshot: (audit: Audit) => LayerTreeSnapshot;
@@ -1116,6 +1118,7 @@ function ExportVerifyHarness() {
       variants: MODULE_VARIANTS.map((v) => v.id),
       chartVariants: chartParityVariantIds(),
       packs: [null, ...STYLE_PACKS.map((p) => p.id)],
+      packModes: Object.fromEntries(STYLE_PACKS.map((p) => [p.id, p.mode])),
       run: async (jobs) => {
         const out: Audit[] = [];
         for (const [v, p, m] of jobs) out.push(await verifyOne(v, p, m));

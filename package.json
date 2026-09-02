@@ -22,6 +22,8 @@
     "verify:exports": "node scripts/verify-exports.mjs",
     "verify:exports:full": "node scripts/verify-exports.mjs --full",
     "verify:exports:ci": "node scripts/verify-exports.mjs --no-update",
+    "verify:restyle": "node scripts/verify-exports.mjs --restyle --workers 6 --no-tree",
+    "verify:restyle:shard": "node scripts/verify-exports.mjs --restyle --workers 4 --no-tree",
     "verify:exports:ci:full": "node scripts/verify-exports.mjs --full --no-update",
     "verify:placement": "node scripts/verify-placement.mjs",
     "verify:placement:full": "node scripts/verify-placement.mjs --full",
