@@ -1204,7 +1204,22 @@ export function pruneOccludingPaint(
     // Anything painted BEHIND plated content (ancestors, earlier siblings and
     // their subtrees) is already baked into the pixel-exact plate. Re-emitting
     // it natively lands it on TOP of the plate and veils/erases the photo.
+    // A DECORATIVE DESCENDANT does not disqualify its own card.
+    //
+    // `GlassTile` paints its frosting and hairline as masked child layers
+    // (`[data-decorative]`), and a mask is unexpressible in OOXML, so those
+    // children stay on the plate. Treating them as "plated content this box
+    // would occlude" pruned the card itself — which is why module boxes came
+    // back from PowerPoint flattened into the background instead of shipping as
+    // editable rounded rectangles. The card keeps its native gradient; the tiny
+    // frost/hairline pixels remain on the plate underneath it.
+    const decorativeChild = (p: Element) =>
+      el.contains(p) &&
+      p !== el &&
+      (p as HTMLElement).hasAttribute?.("data-decorative") &&
+      (p.textContent ?? "").trim().length === 0;
     const behind = (p: Element) => {
+      if (decorativeChild(p)) return false;
       if (p === el || el.contains(p)) return true;
       const rel = el.compareDocumentPosition(p);
       // p FOLLOWS el in document order → el paints first → el is behind p.
@@ -1275,7 +1290,7 @@ export function keepBackgroundPaintOnPlate(
       area >= space.w * space.h * 0.35 &&
       s.w >= space.w * 0.6 &&
       s.h >= space.h * 0.5;
-    if (decorativeWash) return false;
+    if (decorativeWash && !isCardFade(s)) return false;
     // Tall translucent strips that do NOT reach both stage edges (gradient
     // column scrims, fade panels beside media) still arrive in PowerPoint as
     // selectable "invisible bars" a user drags by accident. Anything that is
@@ -1286,7 +1301,7 @@ export function keepBackgroundPaintOnPlate(
       s.w <= space.w * 0.1 &&
       s.h >= space.h * 0.5 &&
       !isModuleFurniture(s);
-    if (ghostBar) return false;
+    if (ghostBar && !isCardFade(s)) return false;
     return true;
   });
 }
@@ -1358,6 +1373,29 @@ export function isModuleFurniture(s: DomShape): boolean {
   return min <= 14 && max / Math.max(1, min) >= 8;
 }
 
+/**
+ * A DESIGNED module card, expressed the only way the house recipe allows: a
+ * top-lit tint on a rounded box that ramps to 0 alpha before the bottom edge.
+ *
+ * These records are why the culling passes below exist in a softer form now.
+ * `GlassTile` moved its hairline and frosting into masked child layers, so the
+ * card box itself arrives with no stroke and no shadow, and its capped tint
+ * (<= 0.16, see CARD_TINT_CEILING) is exactly the band `isGhostPaint` treats as
+ * background wash — so every large module box was being dropped and left to the
+ * flat plate. That is the "flat box backgrounds / boxes not editable any more"
+ * report. A fade ramp on a rounded box is never ground paint; it is a card.
+ */
+export function isCardFade(s: DomShape): boolean {
+  if (s.kind === "image") return false;
+  if (/panel|card|tile/i.test(s.name ?? "")) return true;
+  if (!s.gradient || s.gradient.stops.length < 2) return false;
+  const stops = [...s.gradient.stops].sort((a, b) => a.pos - b.pos);
+  const top = stops[0].color.alpha;
+  const bottom = stops[stops.length - 1].color.alpha;
+  if (!(top >= 0.04 && bottom <= 0.02 && top > bottom)) return false;
+  return (s.radiusPx ?? 0) >= 4;
+}
+
 /** Strongest alpha the record paints with (gradient stops or flat fill). */
 export function paintAlpha(s: DomShape): number {
   if (s.gradient && s.gradient.stops.length > 0) {
@@ -1393,6 +1431,8 @@ export function isGhostPaint(
 ): boolean {
   if (s.kind === "image") return false;
   if (isModuleFurniture(s)) return false;
+  // Designed module boxes: keep them native and editable, gradient intact.
+  if (isCardFade(s)) return false;
   const stroked = !!s.line && s.line.alpha >= 0.06 && s.line.widthPx >= 0.5;
   if (stroked) return false;
   if (s.shadow && s.shadow.color.alpha >= 0.06) return false;
