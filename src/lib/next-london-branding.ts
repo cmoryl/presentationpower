@@ -13,7 +13,7 @@
 // follows what the London location team asked for on each item.
 
 import { pickNextLogo, type NextLogoArt } from "@/lib/next-logo-vectors";
-import type { LondonPanel } from "@/lib/next-london-signage";
+import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
 
 /** The signage face for NEXT 2026. Bold only — no other weight is approved. */
 export const LONDON_SIGNAGE_FONT = {
@@ -42,12 +42,18 @@ const FAMILY_KEYWORDS: [RegExp, string][] = [
 
 /** Which lockup family an item belongs to, from its note/room/name. */
 export function londonPanelFamily(panel: LondonPanel): string {
-  const haystack = `${panel.room} ${panel.name} ${panel.ground}`;
+  const haystack = brandingHaystack(panel);
   for (const [re, id] of FAMILY_KEYWORDS) if (re.test(haystack)) return id;
   return "transperfect";
 }
 
 /** Headline copy the note calls out, normalised to the signage set. */
+/** Everything that can carry a branding instruction for an item. */
+function brandingHaystack(panel: LondonPanel): string {
+  const note = londonVenueItemMeta(panel)?.note ?? "";
+  return `${panel.room} ${panel.name} ${panel.ground} ${note}`;
+}
+
 const COPY_KEYWORDS: [RegExp, string][] = [
   [/beyond intelligence/i, "BEYOND INTELLIGENCE"],
   [/welcome/i, "WELCOME"],
@@ -135,7 +141,7 @@ export function londonBrandingPlan(panel: LondonPanel): LondonBrandingPlan {
 }
 
 function pickCopy(panel: LondonPanel): string | null {
-  const haystack = `${panel.room} ${panel.name} ${panel.ground}`;
+  const haystack = brandingHaystack(panel);
   for (const [re, copy] of COPY_KEYWORDS) if (re.test(haystack)) return copy;
   return null;
 }
