@@ -1,56 +1,37 @@
 // TransPerfect NEXT 2026 — London (QEII Centre) VENDOR BOOTH KIOSKS.
 //
-// Third issue from the London team: the per-vendor booth kiosk templates. Every
-// booth is one Illustrator template with three artboards — the main wall
-// (1830 × 2440 mm) and the two return panels (660 × 2440 mm each) — measured
-// off the supplied artboards (5187.4 × 6916.54 pt and 1870.87 × 6916.54 pt).
+// Current issue from the London team (supersedes the earlier three-artboard
+// kiosk templates): one Illustrator front-wall master per booth, trimming at
+// 1830 × 2440 mm with 100 mm bleed per edge (artboard 5754.33 × 7483.46 pt).
 //
 // Booths whose artwork has been supplied carry the vendor's own live file as
-// the print master (`aiUrl`) plus a CDN proof of each artboard (`previewUrl`),
+// the print master (`aiUrl`) plus a CDN proof of the artboard (`previewUrl`),
 // which is what the panel preview, thumbnails and live editor paint as the
 // ground so the app matches the real file. Booths still waiting on artwork
 // carry `previewUrl: null` and fall back to a spec-built brand ground.
 
-import tiKiosktemplateAi from "@/assets/london-booths/ti-kiosktemplate.ai.asset.json";
-import tiKiosktemplateP1 from "@/assets/london-booths/ti-kiosktemplate-p1.jpg.asset.json";
-import tiKiosktemplateP2 from "@/assets/london-booths/ti-kiosktemplate-p2.jpg.asset.json";
-import tiKiosktemplateP3 from "@/assets/london-booths/ti-kiosktemplate-p3.jpg.asset.json";
-import aiTvkiosktemplateV2Ai from "@/assets/london-booths/ai-tvkiosktemplate-v2.ai.asset.json";
-import aiTvkiosktemplateV2P1 from "@/assets/london-booths/ai-tvkiosktemplate-v2-p1.jpg.asset.json";
-import aiTvkiosktemplateV2P2 from "@/assets/london-booths/ai-tvkiosktemplate-v2-p2.jpg.asset.json";
-import aiTvkiosktemplateV2P3 from "@/assets/london-booths/ai-tvkiosktemplate-v2-p3.jpg.asset.json";
-import digitalTvkiosktemplateV2Ai from "@/assets/london-booths/digital-tvkiosktemplate-v2.ai.asset.json";
-import digitalTvkiosktemplateV2P1 from "@/assets/london-booths/digital-tvkiosktemplate-v2-p1.jpg.asset.json";
-import digitalTvkiosktemplateV2P2 from "@/assets/london-booths/digital-tvkiosktemplate-v2-p2.jpg.asset.json";
-import digitalTvkiosktemplateV2P3 from "@/assets/london-booths/digital-tvkiosktemplate-v2-p3.jpg.asset.json";
-import mediaTvkiosktemplateV2Ai from "@/assets/london-booths/media-tvkiosktemplate-v2.ai.asset.json";
-import mediaTvkiosktemplateV2P1 from "@/assets/london-booths/media-tvkiosktemplate-v2-p1.jpg.asset.json";
-import mediaTvkiosktemplateV2P2 from "@/assets/london-booths/media-tvkiosktemplate-v2-p2.jpg.asset.json";
-import mediaTvkiosktemplateV2P3 from "@/assets/london-booths/media-tvkiosktemplate-v2-p3.jpg.asset.json";
-import glCreativeTvkiosktemplateV2Ai from "@/assets/london-booths/gl-creative-tvkiosktemplate-v2.ai.asset.json";
-import glCreativeTvkiosktemplateV2P1 from "@/assets/london-booths/gl-creative-tvkiosktemplate-v2-p1.jpg.asset.json";
-import glCreativeTvkiosktemplateV2P2 from "@/assets/london-booths/gl-creative-tvkiosktemplate-v2-p2.jpg.asset.json";
-import glCreativeTvkiosktemplateV2P3 from "@/assets/london-booths/gl-creative-tvkiosktemplate-v2-p3.jpg.asset.json";
-import glLiveTvkiosktemplatev2Ai from "@/assets/london-booths/gl-live-tvkiosktemplatev-2.ai.asset.json";
-import glLiveTvkiosktemplatev2P1 from "@/assets/london-booths/gl-live-tvkiosktemplatev-2-p1.jpg.asset.json";
-import glLiveTvkiosktemplatev2P2 from "@/assets/london-booths/gl-live-tvkiosktemplatev-2-p2.jpg.asset.json";
-import glLiveTvkiosktemplatev2P3 from "@/assets/london-booths/gl-live-tvkiosktemplatev-2-p3.jpg.asset.json";
-import glWebTvkiosktemplateV2Ai from "@/assets/london-booths/gl-web-tvkiosktemplate-v2.ai.asset.json";
-import glWebTvkiosktemplateV2P1 from "@/assets/london-booths/gl-web-tvkiosktemplate-v2-p1.jpg.asset.json";
-import glWebTvkiosktemplateV2P2 from "@/assets/london-booths/gl-web-tvkiosktemplate-v2-p2.jpg.asset.json";
-import glWebTvkiosktemplateV2P3 from "@/assets/london-booths/gl-web-tvkiosktemplate-v2-p3.jpg.asset.json";
-import glStringskiosktemplateAi from "@/assets/london-booths/gl-stringskiosktemplate.ai.asset.json";
-import glStringskiosktemplateP1 from "@/assets/london-booths/gl-stringskiosktemplate-p1.jpg.asset.json";
-import glStringskiosktemplateP2 from "@/assets/london-booths/gl-stringskiosktemplate-p2.jpg.asset.json";
-import glStringskiosktemplateP3 from "@/assets/london-booths/gl-stringskiosktemplate-p3.jpg.asset.json";
-import reefKiosktemplateAi from "@/assets/london-booths/reef-kiosktemplate.ai.asset.json";
-import reefKiosktemplateP1 from "@/assets/london-booths/reef-kiosktemplate-p1.jpg.asset.json";
-import reefKiosktemplateP2 from "@/assets/london-booths/reef-kiosktemplate-p2.jpg.asset.json";
-import reefKiosktemplateP3 from "@/assets/london-booths/reef-kiosktemplate-p3.jpg.asset.json";
-import sterlingkiosktemplateAi from "@/assets/london-booths/sterlingkiosktemplate.ai.asset.json";
-import sterlingkiosktemplateP1 from "@/assets/london-booths/sterlingkiosktemplate-p1.jpg.asset.json";
-import sterlingkiosktemplateP2 from "@/assets/london-booths/sterlingkiosktemplate-p2.jpg.asset.json";
-import sterlingkiosktemplateP3 from "@/assets/london-booths/sterlingkiosktemplate-p3.jpg.asset.json";
+import glLiveAi from "@/assets/london-booths/gl-live-tradebooth-a.ai.asset.json";
+import glLiveP1 from "@/assets/london-booths/gl-live-tradebooth-a.jpg.asset.json";
+import gdxAi from "@/assets/london-booths/global-digital-experience-live-tradebooth-a.ai.asset.json";
+import gdxP1 from "@/assets/london-booths/global-digital-experience-live-tradebooth-a.jpg.asset.json";
+import learningAi from "@/assets/london-booths/learning-tradebooth-a.ai.asset.json";
+import learningP1 from "@/assets/london-booths/learning-tradebooth-a.jpg.asset.json";
+import legalAi from "@/assets/london-booths/legal-support-tradebooth-b.ai.asset.json";
+import legalP1 from "@/assets/london-booths/legal-support-tradebooth-b.jpg.asset.json";
+import legal2Ai from "@/assets/london-booths/legal-support2-tradebooth-b.ai.asset.json";
+import legal2P1 from "@/assets/london-booths/legal-support2-tradebooth-b.jpg.asset.json";
+import liveCustomerAi from "@/assets/london-booths/live-customer-tradebooth-a.ai.asset.json";
+import liveCustomerP1 from "@/assets/london-booths/live-customer-tradebooth-a.jpg.asset.json";
+import mediaAi from "@/assets/london-booths/media-tradebooth-a.ai.asset.json";
+import mediaP1 from "@/assets/london-booths/media-tradebooth-a.jpg.asset.json";
+import sterlingAi from "@/assets/london-booths/sterling-tradebooth-a.ai.asset.json";
+import sterlingP1 from "@/assets/london-booths/sterling-tradebooth-a.jpg.asset.json";
+import sterling2Ai from "@/assets/london-booths/sterling2-tradebooth-a.ai.asset.json";
+import sterling2P1 from "@/assets/london-booths/sterling2-tradebooth-a.jpg.asset.json";
+import tiAi from "@/assets/london-booths/ti-tradebooth-a.ai.asset.json";
+import tiP1 from "@/assets/london-booths/ti-tradebooth-a.jpg.asset.json";
+import veevaAi from "@/assets/london-booths/veeva-tradebooth-a.ai.asset.json";
+import veevaP1 from "@/assets/london-booths/veeva-tradebooth-a.jpg.asset.json";
 
 export type LondonBoothArtboardKind = "main" | "return-l" | "return-r";
 
@@ -61,6 +42,8 @@ export type LondonBoothArtboard = {
   page: number;
   trimW: number;
   trimH: number;
+  /** Bleed per edge in mm; falls back to LONDON_BOOTH_BLEED_MM. */
+  bleedMm?: number;
   /** CDN proof of the supplied artwork, or null while artwork is pending. */
   previewUrl: string | null;
 };
@@ -77,129 +60,116 @@ export type LondonBoothSpec = {
   artboards: LondonBoothArtboard[];
 };
 
-/** Bleed held per edge on every booth panel, in mm. */
+/** Bleed held per edge on a booth panel when the artboard does not state one. */
 export const LONDON_BOOTH_BLEED_MM = 10;
+
+/** Bleed per edge on the supplied trade-booth front walls, in mm. */
+export const LONDON_TRADE_BOOTH_BLEED_MM = 100;
+
+/** Every supplied front wall is the same size. */
+function frontWall(previewUrl: string | null): LondonBoothArtboard[] {
+  return [
+    {
+      kind: "main",
+      label: "Front wall",
+      page: 1,
+      trimW: 1830,
+      trimH: 2440,
+      bleedMm: LONDON_TRADE_BOOTH_BLEED_MM,
+      previewUrl,
+    },
+  ];
+}
 
 export const LONDON_BOOTHS: LondonBoothSpec[] = [
   {
-    id: "ti-kiosktemplate",
+    id: "ti-tradebooth-a",
     vendor: "Trial Interactive",
-    sourceFile: "TI_KioskTemplate.ai",
-    aiUrl: tiKiosktemplateAi.url,
+    sourceFile: "TITradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: tiAi.url,
     style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: tiKiosktemplateP1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: tiKiosktemplateP2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: tiKiosktemplateP3.url },
-    ],
+    artboards: frontWall(tiP1.url),
   },
   {
-    id: "ai-tvkiosktemplate-v2",
-    vendor: "AI Solutions",
-    sourceFile: "AI_TVKioskTemplate_v2.ai",
-    aiUrl: aiTvkiosktemplateV2Ai.url,
-    style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: aiTvkiosktemplateV2P1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: aiTvkiosktemplateV2P2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: aiTvkiosktemplateV2P3.url },
-    ],
-  },
-  {
-    id: "digital-tvkiosktemplate-v2",
-    vendor: "Digital Solutions",
-    sourceFile: "Digital_TVKioskTemplate_v2.ai",
-    aiUrl: digitalTvkiosktemplateV2Ai.url,
-    style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: digitalTvkiosktemplateV2P1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: digitalTvkiosktemplateV2P2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: digitalTvkiosktemplateV2P3.url },
-    ],
-  },
-  {
-    id: "media-tvkiosktemplate-v2",
-    vendor: "Media Solutions",
-    sourceFile: "Media_TVKioskTemplate_v2.ai",
-    aiUrl: mediaTvkiosktemplateV2Ai.url,
-    style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: mediaTvkiosktemplateV2P1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: mediaTvkiosktemplateV2P2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: mediaTvkiosktemplateV2P3.url },
-    ],
-  },
-  {
-    id: "gl-creative-tvkiosktemplate-v2",
-    vendor: "GlobalLink Creative",
-    sourceFile: "GL Creative_TVKioskTemplate_v2.ai",
-    aiUrl: glCreativeTvkiosktemplateV2Ai.url,
-    style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: glCreativeTvkiosktemplateV2P1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: glCreativeTvkiosktemplateV2P2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: glCreativeTvkiosktemplateV2P3.url },
-    ],
-  },
-  {
-    id: "gl-live-tvkiosktemplatev-2",
+    id: "gl-live-tradebooth-a",
     vendor: "GlobalLink Live",
-    sourceFile: "GL_Live_TVKioskTemplatev_2.ai",
-    aiUrl: glLiveTvkiosktemplatev2Ai.url,
+    sourceFile: "GL_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: glLiveAi.url,
     style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: glLiveTvkiosktemplatev2P1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: glLiveTvkiosktemplatev2P2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: glLiveTvkiosktemplatev2P3.url },
-    ],
+    artboards: frontWall(glLiveP1.url),
   },
   {
-    id: "gl-web-tvkiosktemplate-v2",
-    vendor: "GlobalLink Web",
-    sourceFile: "GL_Web_TVKioskTemplate_v2.ai",
-    aiUrl: glWebTvkiosktemplateV2Ai.url,
+    id: "global-digital-experience-tradebooth-a",
+    vendor: "Global Digital Experience",
+    sourceFile:
+      "GlobalDigitalExperience_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: gdxAi.url,
     style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: glWebTvkiosktemplateV2P1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: glWebTvkiosktemplateV2P2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: glWebTvkiosktemplateV2P3.url },
-    ],
+    artboards: frontWall(gdxP1.url),
   },
   {
-    id: "gl-stringskiosktemplate",
-    vendor: "GlobalLink Strings",
-    sourceFile: "GL_StringsKioskTemplate.ai",
-    aiUrl: glStringskiosktemplateAi.url,
+    id: "learning-tradebooth-a",
+    vendor: "Learning Solutions",
+    sourceFile: "LearningTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: learningAi.url,
     style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: glStringskiosktemplateP1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: glStringskiosktemplateP2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: glStringskiosktemplateP3.url },
-    ],
+    artboards: frontWall(learningP1.url),
   },
   {
-    id: "reef-kiosktemplate",
-    vendor: "Reef",
-    sourceFile: "Reef_KioskTemplate.ai",
-    aiUrl: reefKiosktemplateAi.url,
+    id: "live-customer-tradebooth-a",
+    vendor: "Live Customer Experience",
+    sourceFile: "LiveCustomerTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: liveCustomerAi.url,
     style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: reefKiosktemplateP1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: reefKiosktemplateP2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: reefKiosktemplateP3.url },
-    ],
+    artboards: frontWall(liveCustomerP1.url),
   },
   {
-    id: "sterlingkiosktemplate",
+    id: "media-tradebooth-a",
+    vendor: "Media Solutions",
+    sourceFile: "MediaTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: mediaAi.url,
+    style: "01-beam-violet-aqua",
+    artboards: frontWall(mediaP1.url),
+  },
+  {
+    id: "legal-support-tradebooth-b",
+    vendor: "Legal Support · Booth B",
+    sourceFile: "LegalSupportTradeBoothB_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: legalAi.url,
+    style: "01-beam-violet-aqua",
+    artboards: frontWall(legalP1.url),
+  },
+  {
+    id: "legal-support-2-tradebooth-b",
+    vendor: "Legal Support 2 · Booth B",
+    sourceFile: "LegalSupport2TradeBoothB_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: legal2Ai.url,
+    style: "01-beam-violet-aqua",
+    artboards: frontWall(legal2P1.url),
+  },
+  {
+    id: "sterling-tradebooth-a",
     vendor: "Sterling",
-    sourceFile: "SterlingKioskTemplate.ai",
-    aiUrl: sterlingkiosktemplateAi.url,
+    sourceFile: "SterlingTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: sterlingAi.url,
     style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: sterlingkiosktemplateP1.url },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: sterlingkiosktemplateP2.url },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: sterlingkiosktemplateP3.url },
-    ],
+    artboards: frontWall(sterlingP1.url),
+  },
+  {
+    id: "sterling-2-tradebooth-a",
+    vendor: "Sterling 2",
+    sourceFile: "Sterling2TradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: sterling2Ai.url,
+    style: "01-beam-violet-aqua",
+    artboards: frontWall(sterling2P1.url),
+  },
+  {
+    id: "veeva-tradebooth-a",
+    vendor: "Veeva",
+    sourceFile: "VeevaTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    aiUrl: veevaAi.url,
+    style: "01-beam-violet-aqua",
+    artboards: frontWall(veevaP1.url),
   },
   {
     id: "contact-center",
@@ -207,11 +177,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     sourceFile: null,
     aiUrl: null,
     style: "04-horizon",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: null },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: null },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: null },
-    ],
+    artboards: frontWall(null),
   },
   {
     id: "coa",
@@ -219,11 +185,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     sourceFile: null,
     aiUrl: null,
     style: "01-beam-violet-aqua",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: null },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: null },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: null },
-    ],
+    artboards: frontWall(null),
   },
   {
     id: "medical-writing",
@@ -231,11 +193,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     sourceFile: null,
     aiUrl: null,
     style: "09-dawn",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: null },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: null },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: null },
-    ],
+    artboards: frontWall(null),
   },
   {
     id: "live-conference-events",
@@ -243,11 +201,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     sourceFile: null,
     aiUrl: null,
     style: "03-wash-diagonal",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: null },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: null },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: null },
-    ],
+    artboards: frontWall(null),
   },
   {
     id: "veeva-tms",
@@ -255,11 +209,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     sourceFile: null,
     aiUrl: null,
     style: "07-prism-sweep",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: null },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: null },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: null },
-    ],
+    artboards: frontWall(null),
   },
   {
     id: "commercial-life-sciences",
@@ -267,11 +217,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     sourceFile: null,
     aiUrl: null,
     style: "08-chevron-sweep",
-    artboards: [
-      { kind: "main", label: "Main wall", page: 1, trimW: 1830, trimH: 2440, previewUrl: null },
-      { kind: "return-l", label: "Return panel · left", page: 2, trimW: 660, trimH: 2440, previewUrl: null },
-      { kind: "return-r", label: "Return panel · right", page: 3, trimW: 660, trimH: 2440, previewUrl: null },
-    ],
+    artboards: frontWall(null),
   },
 ];
 
