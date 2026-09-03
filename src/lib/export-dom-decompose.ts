@@ -991,10 +991,14 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
       );
       const translucent = surfaceAlpha > 0 && surfaceAlpha < 0.9;
       if (textless && !line && edges.length === 0 && translucent) {
-        const coversStage = w * h >= spaceW * spaceH * 0.5;
-        const bigCircle = isEllipse && Math.min(w, h) >= spaceW * 0.3;
+        // Narrow on purpose: only a near-full-bleed wash, or a very large
+        // textless alpha circle, is dropped. Mid-size translucent decor is real
+        // design furniture on several packs and must keep shipping natively.
+        const coversStage = w * h >= spaceW * spaceH * 0.85;
+        const bigCircle = isEllipse && Math.min(w, h) >= spaceW * 0.55;
         if (coversStage || bigCircle) continue;
       }
+
 
 
       // Brand-tint ceiling for translucent CARD paint. On screen a tinted card
