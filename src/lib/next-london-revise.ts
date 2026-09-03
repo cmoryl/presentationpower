@@ -550,7 +550,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
         const size = brand.copySizeMm * MM_TO_PT;
         const tracking = size * LONDON_SIGNAGE_FONT.tracking;
         const advance = brand.copy.length * (size * 0.62 + tracking);
-        const x = trimX + (panel.trimW * MM_TO_PT) / 2 - advance / 2;
+        const x = brand.copyCentreMm * MM_TO_PT - advance / 2;
         const y = h - brand.copyBaselineMm * MM_TO_PT;
         const [cr, cg, cb] = parseColor(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
         return (
