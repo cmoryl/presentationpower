@@ -100,16 +100,18 @@ export function londonBrandingPlan(panel: LondonPanel): LondonBrandingPlan {
   const liveW = panel.trimW - safe * 2;
   const liveH = panel.trimH - safe * 2;
 
-  // Lockup width target: horizontal lockups run wider, stacked marks stay
-  // compact so tall panels do not turn into a wall of logo.
-  const widthShare = orientation === "side" ? (aspect >= 4 ? 0.34 : 0.46) : aspect >= 1.6 ? 0.24 : 0.4;
+  // Lockup width target: the mark is the hero on scenic panels, so it fills
+  // most of the live area — horizontal lockups run widest, stacked marks stay
+  // a little tighter on very wide trims.
+  const widthShare = orientation === "side" ? (aspect >= 4 ? 0.62 : 0.78) : aspect >= 1.6 ? 0.48 : 0.72;
   let logoW = liveW * widthShare;
   let logoH = (art.h / art.w) * logoW;
-  const maxH = liveH * (orientation === "side" ? 0.24 : 0.34);
+  const maxH = liveH * (orientation === "side" ? 0.44 : 0.58);
   if (logoH > maxH) {
     logoH = maxH;
     logoW = (art.w / art.h) * logoH;
   }
+
 
   const copy = pickCopy(panel);
   const centreX = marginX + panel.trimW / 2 - logoW / 2;
