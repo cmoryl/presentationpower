@@ -16,6 +16,9 @@ import {
   buildLondonPanelAi,
   buildLondonPanelSvg,
   londonAiBytes,
+  londonPanelStops,
+  type LondonColorSpace,
+
   londonPanelFileBase,
 } from "@/lib/next-london-revise";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
