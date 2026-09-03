@@ -111,7 +111,7 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     room: "CLOAKROOM",
     name: "CLOAKROOM VINYL - 3390x1900mm",
     ground: "Halo panel",
-    style: "08-halo",
+    style: "08-chevron-sweep",
     trimW: 3390,
     trimH: 1900,
     bleedEdge: 25,
