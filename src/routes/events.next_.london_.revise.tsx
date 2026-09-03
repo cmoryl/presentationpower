@@ -333,6 +333,7 @@ function LondonRevisePage() {
   const [floor, setFloor] = useState<string>("all");
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [qa, setQa] = useState<LondonQaReport[] | null>(null);
+  const [artId, setArtId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -373,6 +374,8 @@ function LondonRevisePage() {
     () => draft.find((p) => p.id === previewId) ?? null,
     [draft, previewId],
   );
+
+  const artPanel = useMemo(() => draft.find((p) => p.id === artId) ?? null, [draft, artId]);
 
   const floors = useMemo(() => [...new Set(draft.map((p) => p.floor))], [draft]);
   const visible = floor === "all" ? draft : draft.filter((p) => p.floor === floor);
@@ -837,7 +840,7 @@ function LondonRevisePage() {
                       >
                         <td className="px-3 py-2.5">
                           <div className="flex items-start gap-2.5">
-                            <LondonPanelThumb panel={panel} size={64} />
+                            <LondonPanelThumb panel={panel} size={64} onOpen={(p) => setArtId(p.id)} />
                             <div>
                               <p className="font-semibold text-[#03002C]">{panel.name}</p>
                               <p className="text-xs text-[#666]">
@@ -1020,6 +1023,51 @@ function LondonRevisePage() {
                 per edge).
               </p>
               <LondonPpiPreview panel={previewPanel} />
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Click-to-enlarge artwork preview, always at the panel's true aspect. */}
+      <Dialog open={!!artPanel} onOpenChange={(o) => !o && setArtId(null)}>
+        <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto">
+          {artPanel ? (
+            <>
+              <DialogTitle className="text-base font-semibold text-[#03002C]">
+                {artPanel.name}
+              </DialogTitle>
+              <p className="text-xs text-[#666]">
+                {artPanel.floor} · {artPanel.room} · {artPanel.trimW}×{artPanel.trimH}mm trim ·{" "}
+                {artPanel.bleedW}×{artPanel.bleedH}mm bleed · {artPanel.rasterPx}px at{" "}
+                {artPanel.rasterPpi}ppi
+              </p>
+              <div className="flex justify-center rounded-xl bg-[#F2F2F2] p-4">
+                <LondonPanelThumb
+                  panel={artPanel}
+                  size={Math.min(680, typeof window === "undefined" ? 680 : window.innerHeight * 0.62)}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => regenPanel(artPanel)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-semibold text-white"
+                >
+                  <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                  Rebuild this panel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setArtId(null);
+                    setPreviewId(artPanel.id);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-3 py-2 text-sm font-semibold text-[#03002C]"
+                >
+                  <ScanEye className="h-4 w-4" aria-hidden="true" />
+                  Preview ppi tiers
+                </button>
+              </div>
             </>
           ) : null}
         </DialogContent>
