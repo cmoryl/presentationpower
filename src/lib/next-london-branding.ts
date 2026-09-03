@@ -12,7 +12,12 @@
 // Family and copy are read from the item's own branding note, so the artwork
 // follows what the London location team asked for on each item.
 
-import { pickNextLogo, type NextLogoArt } from "@/lib/next-logo-vectors";
+import {
+  NEXT_LOGO_COLOURWAY_LABELS,
+  pickNextLogo,
+  type NextLogoArt,
+  type NextLogoColourway,
+} from "@/lib/next-logo-vectors";
 import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
 import {
   londonLogoPlacement,
@@ -71,6 +76,8 @@ const COPY_KEYWORDS: [RegExp, string][] = [
 export type LondonBrandingPlan = {
   familyId: string;
   orientation: "stacked" | "side";
+  /** The colourway actually placed (falls back to white when unavailable). */
+  colourway: NextLogoColourway;
   art: NextLogoArt;
   /** Logo box, in mm, in the panel's bleed coordinate space. */
   logo: { x: number; y: number; w: number; h: number };
@@ -99,7 +106,8 @@ export function londonBrandingPlan(
 ): LondonBrandingPlan {
   const familyId = londonPanelFamily(panel);
   const aspect = panel.trimW / Math.max(1, panel.trimH);
-  const { art, orientation } = pickNextLogo(familyId, aspect);
+  const nudgeEarly = placement ?? londonLogoPlacement(panel.id);
+  const { art, orientation, colourway } = pickNextLogo(familyId, aspect, nudgeEarly.colourway);
 
   const marginX = (panel.bleedW - panel.trimW) / 2;
   const marginY = (panel.bleedH - panel.trimH) / 2;
@@ -113,7 +121,7 @@ export function londonBrandingPlan(
   // most of the live area — horizontal lockups run widest, stacked marks stay
   // a little tighter on very wide trims.
   const widthShare = orientation === "side" ? (aspect >= 4 ? 0.62 : 0.78) : aspect >= 1.6 ? 0.48 : 0.72;
-  const nudge = placement ?? londonLogoPlacement(panel.id);
+  const nudge = nudgeEarly;
   let logoW = liveW * widthShare * nudge.scale;
   let logoH = (art.h / art.w) * logoW;
   const maxH = liveH * (orientation === "side" ? 0.44 : 0.58) * nudge.scale;
@@ -146,6 +154,7 @@ export function londonBrandingPlan(
   return {
     familyId,
     orientation,
+    colourway,
     art,
     logo: { x: logoX, y: logoY, w: logoW, h: logoH },
     copy,
@@ -169,7 +178,8 @@ function pickCopy(panel: LondonPanel): string | null {
 
 /** Short human line for the UI: which lockup and copy a panel carries. */
 export function brandingSummary(plan: LondonBrandingPlan, familyLabel: string): string {
-  const lockup = plan.orientation === "side" ? "side-by-side white" : "stacked white";
+  const colour = NEXT_LOGO_COLOURWAY_LABELS[plan.colourway].toLowerCase();
+  const lockup = `${plan.orientation === "side" ? "side-by-side" : "stacked"} ${colour}`;
   return plan.copy
     ? `${familyLabel} · ${lockup} · “${plan.copy}” in Geist Bold`
     : `${familyLabel} · ${lockup}`;
