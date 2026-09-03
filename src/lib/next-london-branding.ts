@@ -94,11 +94,27 @@ export type LondonBrandingPlan = {
   copyCentreMm: number;
   /** Text anchor for the headline. */
   copyAlign: "middle" | "start";
+  /** True when the headline runs DOWN the panel (pillars and tall fascias). */
+  copyVertical: boolean;
   /** Clear space held around the lockup, in mm (1.5× the mark height rule). */
   clearMm: number;
+  /** Scannable QR block, in mm, when the panel carries a code. */
+  qr: {
+    data: string;
+    x: number;
+    y: number;
+    size: number;
+    /** Module count per side, including the quiet zone. */
+    modules: number;
+    /** Module geometry, in module units. */
+    path: string;
+    caption: string | null;
+    captionSizeMm: number;
+  } | null;
   /** The nudge/scale override applied to the planned lockup box. */
   placement: LondonLogoPlacement;
 };
+
 
 
 /**
