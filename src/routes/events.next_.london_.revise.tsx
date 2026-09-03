@@ -543,6 +543,8 @@ function LondonRevisePage() {
       setRemoved([]);
       setNote("");
       setRestoredFrom(undefined);
+      // Push the new spec to any already-open London kit page.
+      announceLondonRevision(res.revision.rev);
       toast.success(`Revision ${res.revision.rev} published`, {
         description: regenerationSummary(plan),
       });
