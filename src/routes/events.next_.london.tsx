@@ -360,6 +360,12 @@ function LondonSignagePage() {
               >
                 <BookOpen className="h-4 w-4" /> Master directory (PDF)
               </button>
+              <Link
+                to="/events/next/london/template"
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+              >
+                <Layers className="h-4 w-4" /> Event template & pack
+              </Link>
               <a
                 href={logoSetAsset.url}
                 download="TP-NEXT-2026-Logo-Set.zip"
@@ -367,6 +373,7 @@ function LondonSignagePage() {
               >
                 <Download className="h-4 w-4" /> Logo set (EPS + SVG)
               </a>
+
               {userId ? (
                 <>
                   <Link

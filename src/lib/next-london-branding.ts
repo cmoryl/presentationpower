@@ -14,6 +14,10 @@
 
 import { pickNextLogo, type NextLogoArt } from "@/lib/next-logo-vectors";
 import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
+import {
+  londonLogoPlacement,
+  type LondonLogoPlacement,
+} from "@/lib/next-london-logo-placement";
 
 /** The signage face for NEXT 2026. Bold only — no other weight is approved. */
 export const LONDON_SIGNAGE_FONT = {
@@ -80,6 +84,8 @@ export type LondonBrandingPlan = {
   copyAlign: "middle" | "start";
   /** Clear space held around the lockup, in mm (1.5× the mark height rule). */
   clearMm: number;
+  /** The nudge/scale override applied to the planned lockup box. */
+  placement: LondonLogoPlacement;
 };
 
 /**
@@ -87,7 +93,10 @@ export type LondonBrandingPlan = {
  * TRIM box (never the bleed) and kept inside the venue safe area, so nothing
  * lands in a cut or a wrap.
  */
-export function londonBrandingPlan(panel: LondonPanel): LondonBrandingPlan {
+export function londonBrandingPlan(
+  panel: LondonPanel,
+  placement?: LondonLogoPlacement,
+): LondonBrandingPlan {
   const familyId = londonPanelFamily(panel);
   const aspect = panel.trimW / Math.max(1, panel.trimH);
   const { art, orientation } = pickNextLogo(familyId, aspect);
@@ -104,9 +113,10 @@ export function londonBrandingPlan(panel: LondonPanel): LondonBrandingPlan {
   // most of the live area — horizontal lockups run widest, stacked marks stay
   // a little tighter on very wide trims.
   const widthShare = orientation === "side" ? (aspect >= 4 ? 0.62 : 0.78) : aspect >= 1.6 ? 0.48 : 0.72;
-  let logoW = liveW * widthShare;
+  const nudge = placement ?? londonLogoPlacement(panel.id);
+  let logoW = liveW * widthShare * nudge.scale;
   let logoH = (art.h / art.w) * logoW;
-  const maxH = liveH * (orientation === "side" ? 0.44 : 0.58);
+  const maxH = liveH * (orientation === "side" ? 0.44 : 0.58) * nudge.scale;
   if (logoH > maxH) {
     logoH = maxH;
     logoW = (art.w / art.h) * logoH;
@@ -118,10 +128,14 @@ export function londonBrandingPlan(panel: LondonPanel): LondonBrandingPlan {
 
   // Stacked lockups sit on the upper third; horizontal lockups ride the lower
   // band so the middle of a wide panel stays open for copy.
-  const logoY =
+  const baseY =
     orientation === "side"
       ? marginY + panel.trimH - safe - logoH
       : marginY + safe + liveH * (copy ? 0.06 : 0.28);
+
+  // Designer nudge, in trim fractions, clamped so the lockup stays on the sheet.
+  const logoX = clamp(centreX + nudge.dx * panel.trimW, 0, panel.bleedW - logoW);
+  const logoY = clamp(baseY + nudge.dy * panel.trimH, 0, panel.bleedH - logoH);
 
   const copySizeMm = Math.min(liveH * 0.16, Math.max(24, liveW * 0.052));
   const copyBaselineMm =
@@ -133,13 +147,18 @@ export function londonBrandingPlan(panel: LondonPanel): LondonBrandingPlan {
     familyId,
     orientation,
     art,
-    logo: { x: centreX, y: logoY, w: logoW, h: logoH },
+    logo: { x: logoX, y: logoY, w: logoW, h: logoH },
     copy,
     copySizeMm,
     copyBaselineMm,
     copyAlign: "middle",
     clearMm: logoH * 0.25,
+    placement: nudge,
   };
+}
+
+function clamp(value: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(Math.max(lo, hi), value));
 }
 
 function pickCopy(panel: LondonPanel): string | null {
