@@ -371,6 +371,30 @@ function coverPage(doc: jsPDF, panels: LondonPanel[]) {
     y += 40;
   }
 
+  // Ground ramp strip — the ten approved treatments, in issue order.
+  const styles = Object.values(LONDON_STYLES);
+  const stripY = PH - 156;
+  const stripH = 54;
+  const cellW = CW / styles.length;
+  styles.forEach((style, i) => {
+    const x = M + i * cellW;
+    style.stops.forEach((stop, k) => {
+      const [r, g, b] = hexRgb(stop);
+      const bandH = stripH / style.stops.length;
+      doc.setFillColor(r, g, b);
+      doc.rect(x, stripY + k * bandH, cellW - 4, bandH + 0.4, "F");
+    });
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(6.5);
+    doc.setTextColor(150, 165, 205);
+    doc.text(wrap(doc, style.label, cellW - 8, 1)[0]!, x, stripY + stripH + 11);
+  });
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(255, 255, 255);
+  doc.text("TEN APPROVED GROUNDS", M, stripY - 10, { charSpace: 1.4 });
+
+  doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(150, 162, 200);
   doc.text(
@@ -497,6 +521,80 @@ function specPage(ctx: Ctx) {
     }
     ctx.y += 12;
   }
+
+  // Resolution tiers — the table the fabricator asks for most.
+  ensure(ctx, 120);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...BLUE);
+  doc.text("Resolution tiers", M, ctx.y);
+  ctx.y += 12;
+  const tierCols = [150, 220, 200, CW - 570] as const;
+  const tierHead = ["Tier", "Applies to", "Viewing distance", "Use"] as const;
+  doc.setFillColor(...NAVY);
+  doc.rect(M, ctx.y, CW, 17, "F");
+  doc.setFontSize(7.5);
+  doc.setTextColor(255, 255, 255);
+  let tx = M;
+  tierHead.forEach((h, i) => {
+    doc.text(h, tx + 6, ctx.y + 11.5);
+    tx += tierCols[i]!;
+  });
+  ctx.y += 17;
+  const tiers: string[][] = [
+    ["36 ppi", "Longest edge over 2000 mm", "3 m and beyond", "Flags, banners, stage sets, wraps"],
+    ["72 ppi", "Longest edge 800–2000 mm", "1.5–3 m", "Desk fronts, plinths, door vinyl"],
+    ["120 ppi", "Longest edge under 800 mm", "Arm's length", "Slivers, fascia strips, close-up squares"],
+  ];
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8.5);
+  tiers.forEach((row, i) => {
+    if (i % 2 === 1) {
+      doc.setFillColor(...BAND);
+      doc.rect(M, ctx.y, CW, 20, "F");
+    }
+    tx = M;
+    row.forEach((cell, k) => {
+      doc.setTextColor(k === 0 ? NAVY[0] : INK[0], k === 0 ? NAVY[1] : INK[1], k === 0 ? NAVY[2] : INK[2]);
+      doc.setFont("helvetica", k === 0 ? "bold" : "normal");
+      doc.text(wrap(doc, cell, tierCols[k]! - 12, 1)[0]!, tx + 6, ctx.y + 13);
+      tx += tierCols[k]!;
+    });
+    ctx.y += 20;
+    doc.setDrawColor(...LINE);
+    doc.line(M, ctx.y, PW - M, ctx.y);
+  });
+  ctx.y += 26;
+
+  // Live download links, repeated here so the spec page stands alone.
+  ensure(ctx, 96);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.setTextColor(...BLUE);
+  doc.text("Live downloads", M, ctx.y);
+  ctx.y += 16;
+  const live: [string, string, string][] = [
+    ["Panel kit hub", "Per-panel specs, QA reports, RGB and CMYK vector downloads", HUB],
+    ["Signage template editor", "Lockup, headline, QR and ground placement per panel", TEMPLATE_URL],
+    ["Revise specifications", "Board sizes, gradients and rebuilds; publish a revision", REVISE_URL],
+  ];
+  doc.setFontSize(9);
+  for (const [label, note, url] of live) {
+    ensure(ctx, 20);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(...BLUE);
+    doc.textWithLink(safe(label), M, ctx.y, { url });
+    doc.setDrawColor(...BLUE);
+    doc.line(M, ctx.y + 2, M + doc.getTextWidth(safe(label)), ctx.y + 2);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(...GRAY);
+    doc.text(safe(note), M + 170, ctx.y);
+    doc.setFontSize(7.5);
+    doc.setTextColor(150, 158, 180);
+    doc.text(safe(url), PW - M, ctx.y, { align: "right" });
+    doc.setFontSize(9);
+    ctx.y += 20;
+  }
 }
 
 function schedulePages(ctx: Ctx, floors: FloorPlan[], record?: (label: string, page: number) => void) {
@@ -510,7 +608,9 @@ function schedulePages(ctx: Ctx, floors: FloorPlan[], record?: (label: string, p
     ctx.doc.setFontSize(8.5);
     ctx.doc.setTextColor(...GRAY);
     ctx.doc.text(
-      safe(`${floor.rooms.length} rooms · ${total} panels · identical repeats are grouped into one quantity row`),
+      safe(
+        `${floor.rooms.length} room${floor.rooms.length === 1 ? "" : "s"} · ${total} panel${total === 1 ? "" : "s"} · identical repeats are grouped into one quantity row`,
+      ),
       M,
       ctx.y,
     );
@@ -563,7 +663,7 @@ function contentsPage(doc: jsPDF, floors: FloorPlan[], pages: Map<string, number
       (f) =>
         [
           `Panel schedule — ${f.label}`,
-          `${f.rooms.length} rooms · ${f.rooms.reduce((n, r) => n + r.panels, 0)} panels`,
+          `${f.rooms.length} room${f.rooms.length === 1 ? "" : "s"} · ${f.rooms.reduce((n, r) => n + r.panels, 0)} panels`,
           pages.get(f.label) ?? null,
           null,
         ] as [string, string, number | null, string | null],
