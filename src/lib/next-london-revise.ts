@@ -571,20 +571,27 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
   const qrLayer = brand.qr
     ? (() => {
         const q = brand.qr;
-        const pad = q.size * 0.03;
-        const plate = paintFor("#FFFFFF");
-        const ink = paintFor("#03002C");
+        const pad = q.padMm;
+        const plate = paintFor(q.plateInk);
+        const ink = paintFor(q.moduleInk);
         const scale = q.size / q.modules;
         const caption = q.caption
-          ? `<text x="${(q.x + q.size / 2).toFixed(2)}" y="${(q.y + q.size + pad + q.captionSizeMm * 1.15).toFixed(2)}"` +
-            ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta}` +
-            ` font-family="${LONDON_SIGNAGE_FONT.cssStack}" font-weight="${LONDON_SIGNAGE_FONT.weight}"` +
+          ? `<text x="${q.captionX.toFixed(2)}" y="${(q.y + q.size + pad + q.captionPadMm + q.captionSizeMm).toFixed(2)}"` +
+            ` text-anchor="${q.captionAnchor}" fill="${copyPaint.paint}"${copyPaint.meta}` +
+            ` font-family="${LONDON_SIGNAGE_FONT.cssStack}" font-weight="${q.captionWeight}"` +
+            ` letter-spacing="${(q.captionSizeMm * q.captionTracking).toFixed(3)}"` +
             ` font-size="${q.captionSizeMm.toFixed(2)}">${escapeXml(q.caption)}</text>`
           : "";
+        // A transparent code drops the plate so the modules print straight onto
+        // the ground — only safe on flat, high-contrast art, and the designer's
+        // call, exactly as in the pillar QR editors.
+        const plateRect = q.plate
+          ? `<rect x="${(q.x - pad).toFixed(2)}" y="${(q.y - pad).toFixed(2)}" width="${(q.size + pad * 2).toFixed(2)}"` +
+            ` height="${(q.size + pad * 2).toFixed(2)}" rx="${q.radiusMm.toFixed(2)}" fill="${plate.paint}"${plate.meta}/>`
+          : "";
         return (
-          `<g id="qr" data-layer="qr" data-layer-order="2" data-qr="${escapeXml(q.data)}">` +
-          `<rect x="${(q.x - pad).toFixed(2)}" y="${(q.y - pad).toFixed(2)}" width="${(q.size + pad * 2).toFixed(2)}"` +
-          ` height="${(q.size + pad * 2).toFixed(2)}" rx="${(q.size * 0.04).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>` +
+          `<g id="qr" data-layer="qr" data-layer-order="2" data-qr="${escapeXml(q.data)}"` +
+          ` data-qr-plate="${q.plate ? "on" : "off"}">${plateRect}` +
           `<g transform="translate(${q.x.toFixed(2)} ${q.y.toFixed(2)}) scale(${scale.toFixed(5)})">` +
           `<path d="${q.path}" fill="${ink.paint}"${ink.meta}/></g></g>${caption}`
         );
@@ -763,25 +770,33 @@ export function buildLondonPanelAi(
   const qrOps = brand.qr
     ? (() => {
         const q = brand.qr;
-        const pad = q.size * 0.03;
+        const pad = q.padMm;
         const size = q.size * MM_TO_PT;
         const padPt = pad * MM_TO_PT;
         const x = q.x * MM_TO_PT;
         const yTop = q.y * MM_TO_PT;
-        const plate = `q ${fillOp("#FFFFFF")} ${f3(x - padPt)} ${f3(h - yTop - size - padPt)} ${f3(size + padPt * 2)} ${f3(size + padPt * 2)} re f Q\n`;
+        const plate = q.plate
+          ? `q ${fillOp(q.plateInk)} ${f3(x - padPt)} ${f3(h - yTop - size - padPt)} ${f3(size + padPt * 2)} ${f3(size + padPt * 2)} re f Q\n`
+          : "";
         const modules = svgPathToPdfOps(q.path, {
           scale: size / q.modules,
           x,
           y: h - yTop - size,
           artHeight: q.modules,
         });
-        const code = modules ? `q ${fillOp("#03002C")} ${modules} f Q\n` : "";
+        const code = modules ? `q ${fillOp(q.moduleInk)} ${modules} f Q\n` : "";
         const caption = q.caption
           ? (() => {
               const cs = q.captionSizeMm * MM_TO_PT;
               const advance = q.caption.length * cs * 0.62;
-              const cx = (q.x + q.size / 2) * MM_TO_PT - advance / 2;
-              const cy = h - (q.y + q.size + pad + q.captionSizeMm * 1.15) * MM_TO_PT;
+              const anchorX = q.captionX * MM_TO_PT;
+              const cx =
+                q.captionAnchor === "start"
+                  ? anchorX
+                  : q.captionAnchor === "end"
+                    ? anchorX - advance
+                    : anchorX - advance / 2;
+              const cy = h - (q.y + q.size + pad + q.captionPadMm + q.captionSizeMm) * MM_TO_PT;
               return (
                 `q ${copyInk} BT /F1 ${f3(cs)} Tf 1 0 0 1 ${f3(cx)} ${f3(cy)} Tm ` +
                 `(${pdfText(q.caption)}) Tj ET Q\n`

@@ -9,6 +9,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Crosshair, Download, Move, QrCode, RotateCcw, Ruler, Type } from "lucide-react";
 import { toast } from "sonner";
+import { CenterTools } from "@/components/common/CenterTools";
+import { centeredOffset, type CenterAxis } from "@/lib/center-tools";
+import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
 import {
   artworkPpi,
   artworkPpiVerdict,
@@ -52,6 +55,10 @@ import {
   LONDON_QR_MAX_CHARS,
   LONDON_QR_SCALE,
   LONDON_GROUND_SCALE,
+  LONDON_QR_CAPTION_PAD,
+  LONDON_QR_CAPTION_SIZE,
+  LONDON_QR_QUIET,
+  LONDON_QR_RADIUS,
   LONDON_TEXT_MAX_CHARS,
   LONDON_TEXT_SCALE,
   resetLondonLogoPlacement,
@@ -165,7 +172,7 @@ export function LondonPanelLiveEditor({
   const boothMeta = londonBoothPanelMeta(panel);
 
   const startDrag = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text" | "ground") => {
+    (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text" | "qr" | "ground") => {
       event.preventDefault();
       event.stopPropagation();
       const stage = stageRef.current;
@@ -180,13 +187,17 @@ export function LondonPanelLiveEditor({
             ? placement.dx
             : target === "ground"
               ? placement.groundDx
-              : placement.textDx,
+              : target === "qr"
+                ? placement.qrDx
+                : placement.textDx,
         dy:
           target === "logo"
             ? placement.dy
             : target === "ground"
               ? placement.groundDy
-              : placement.textDy,
+              : target === "qr"
+                ? placement.qrDy
+                : placement.textDy,
       };
       const move = (moveEvent: PointerEvent) => {
         const dx =
@@ -199,7 +210,9 @@ export function LondonPanelLiveEditor({
             ? { dx, dy }
             : target === "ground"
               ? { groundDx: dx, groundDy: dy }
-              : { textDx: dx, textDy: dy },
+              : target === "qr"
+                ? { qrDx: dx, qrDy: dy }
+                : { textDx: dx, textDy: dy },
         );
       };
       const up = () => {
@@ -219,6 +232,8 @@ export function LondonPanelLiveEditor({
       placement.textDy,
       placement.groundDx,
       placement.groundDy,
+      placement.qrDx,
+      placement.qrDy,
     ],
   );
 
@@ -296,6 +311,61 @@ export function LondonPanelLiveEditor({
         }
     : null;
 
+  // Centring tools. Every object is placed by a fraction-of-trim nudge, so we
+  // ask the shared helper for the nudge that lands the object's live box on the
+  // artboard centre — no editor-local arithmetic.
+  const qrBoxMm = plan.qr
+    ? { x: plan.qr.x, y: plan.qr.y, w: plan.qr.size, h: plan.qr.size }
+    : null;
+  const textBoxMm = plan.copy
+    ? plan.copyVertical
+      ? {
+          x: plan.copyCentreMm - plan.copySizeMm * 0.35,
+          y: plan.copyBaselineMm - runMm / 2,
+          w: plan.copySizeMm * 1.25,
+          h: runMm,
+        }
+      : {
+          x: plan.copyCentreMm - runMm / 2,
+          y: plan.copyBaselineMm - plan.copySizeMm,
+          w: runMm,
+          h: plan.copySizeMm * 1.25,
+        }
+    : null;
+  const frameMm = { w: panel.bleedW, h: panel.bleedH };
+  const span = { x: panel.trimW, y: panel.trimH };
+
+  const centerObject = (kind: "logo" | "text" | "qr" | "ground", axis: CenterAxis) => {
+    const box =
+      kind === "logo"
+        ? plan.logo
+        : kind === "text"
+          ? textBoxMm
+          : kind === "qr"
+            ? qrBoxMm
+            : groundBox;
+    if (!box) return;
+    const current =
+      kind === "logo"
+        ? { dx: placement.dx, dy: placement.dy }
+        : kind === "text"
+          ? { dx: placement.textDx, dy: placement.textDy }
+          : kind === "qr"
+            ? { dx: placement.qrDx, dy: placement.qrDy }
+            : { dx: placement.groundDx, dy: placement.groundDy };
+    const next = centeredOffset(current, box, frameMm, axis, span);
+    setLondonLogoPlacement(
+      panel.id,
+      kind === "logo"
+        ? { dx: next.dx, dy: next.dy }
+        : kind === "text"
+          ? { textDx: next.dx, textDy: next.dy }
+          : kind === "qr"
+            ? { qrDx: next.dx, qrDy: next.dy }
+            : { groundDx: next.dx, groundDy: next.dy },
+    );
+  };
+
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
       {/* Live stage */}
@@ -309,7 +379,7 @@ export function LondonPanelLiveEditor({
               ? boothArt
                 ? `${boothMeta?.artboard.label ?? "Booth"} · supplied vendor artwork`
                 : "Booth artwork pending — brand ground shown"
-              : "drag the lockup or the headline"}
+              : "drag the lockup, headline or code"}
           </span>
           <Button
             variant={printPreview ? "default" : "outline"}
@@ -403,6 +473,35 @@ export function LondonPanelLiveEditor({
               style={textBox}
             />
           ) : null}
+          {plan.qr && !isWall ? (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Move QR code"
+              onPointerDown={(event) => startDrag(event, "qr")}
+              onKeyDown={(event) => {
+                const step = event.shiftKey ? 0.02 : 0.005;
+                const move = (dx: number, dy: number) =>
+                  setLondonLogoPlacement(panel.id, {
+                    qrDx: placement.qrDx + dx,
+                    qrDy: placement.qrDy + dy,
+                  });
+                if (event.key === "ArrowLeft") move(-step, 0);
+                else if (event.key === "ArrowRight") move(step, 0);
+                else if (event.key === "ArrowUp") move(0, -step);
+                else if (event.key === "ArrowDown") move(0, step);
+                else return;
+                event.preventDefault();
+              }}
+              className="absolute cursor-move rounded-sm border border-dashed border-cyan-300/80 bg-cyan-200/10 outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+              style={{
+                left: `${(plan.qr.x / panel.bleedW) * 100}%`,
+                top: `${(plan.qr.y / panel.bleedH) * 100}%`,
+                width: `${(plan.qr.size / panel.bleedW) * 100}%`,
+                height: `${(plan.qr.size / panel.bleedH) * 100}%`,
+              }}
+            />
+          ) : null}
         </div>
         {printPreview ? (
           <div className="mt-3">
@@ -486,6 +585,10 @@ export function LondonPanelLiveEditor({
               >
                 Reset artwork
               </Button>
+              <CenterTools
+                label="Centre artwork"
+                onCenter={(axis) => centerObject("ground", axis)}
+              />
               <span className="text-[11px] text-muted-foreground">
                 drag the wall to reposition · arrows nudge
               </span>
@@ -582,6 +685,11 @@ export function LondonPanelLiveEditor({
             >
               <RotateCcw className="h-3.5 w-3.5" /> Reset text
             </Button>
+            <CenterTools
+              label="Centre text"
+              disabled={!textBoxMm}
+              onCenter={(axis) => centerObject("text", axis)}
+            />
           </div>
         </div>
 
@@ -625,6 +733,12 @@ export function LondonPanelLiveEditor({
               x {plan.logo.x.toFixed(0)}mm · y {plan.logo.y.toFixed(0)}mm · w{" "}
               {plan.logo.w.toFixed(0)}mm
             </span>
+            <CenterTools
+              className="ml-auto"
+              label="Centre logo"
+              disabled={!plan.lockupOn}
+              onCenter={(axis) => centerObject("logo", axis)}
+            />
           </div>
         </div>
 
@@ -709,6 +823,11 @@ export function LondonPanelLiveEditor({
             >
               <QrCode className="h-3.5 w-3.5" /> Agenda code
             </Button>
+            <CenterTools
+              label="Centre code"
+              disabled={!plan.qr}
+              onCenter={(axis) => centerObject("qr", axis)}
+            />
             <Button
               variant="outline"
               size="sm"
@@ -719,6 +838,131 @@ export function LondonPanelLiveEditor({
             >
               <RotateCcw className="h-3.5 w-3.5" /> Remove
             </Button>
+          </div>
+          {/* Code styling — the same controls the pillar QR editors expose. */}
+          <div className="mt-3 grid gap-3 border-t border-border/60 pt-3 sm:grid-cols-2">
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Caption font
+              <select
+                value={placement.qrCaptionFont}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, {
+                    qrCaptionFont: event.target.value as typeof placement.qrCaptionFont,
+                  })
+                }
+                className="h-9 flex-1 rounded-md border border-border bg-background px-2 text-sm"
+              >
+                {PILLAR_CAPTION_FONTS.map((font) => (
+                  <option key={font.id} value={font.id}>
+                    {font.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Caption align</span>
+              {(["left", "center", "right"] as const).map((align) => (
+                <button
+                  key={align}
+                  type="button"
+                  aria-pressed={placement.qrCaptionAlign === align}
+                  onClick={() => setLondonLogoPlacement(panel.id, { qrCaptionAlign: align })}
+                  className={`rounded-full border px-3 py-1 text-xs capitalize transition ${
+                    placement.qrCaptionAlign === align
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {align}
+                </button>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Caption size
+              <input
+                type="range"
+                min={LONDON_QR_CAPTION_SIZE.min}
+                max={LONDON_QR_CAPTION_SIZE.max}
+                step={LONDON_QR_CAPTION_SIZE.step}
+                value={placement.qrCaptionSize}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, { qrCaptionSize: Number(event.target.value) })
+                }
+                className="w-28"
+              />
+              <span className="tabular-nums">
+                {placement.qrCaptionSize > 0
+                  ? `${placement.qrCaptionSize.toFixed(0)}mm`
+                  : "auto"}
+              </span>
+            </label>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Caption gap
+              <input
+                type="range"
+                min={LONDON_QR_CAPTION_PAD.min}
+                max={LONDON_QR_CAPTION_PAD.max}
+                step={LONDON_QR_CAPTION_PAD.step}
+                value={placement.qrCaptionPad}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, { qrCaptionPad: Number(event.target.value) })
+                }
+                className="w-28"
+              />
+              <span className="tabular-nums">
+                {placement.qrCaptionPad > 0 ? `${placement.qrCaptionPad.toFixed(0)}mm` : "auto"}
+              </span>
+            </label>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Quiet zone
+              <input
+                type="range"
+                min={LONDON_QR_QUIET.min}
+                max={LONDON_QR_QUIET.max}
+                step={LONDON_QR_QUIET.step}
+                value={placement.qrQuiet}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, { qrQuiet: Number(event.target.value) })
+                }
+                className="w-28"
+              />
+              <span className="tabular-nums">{Math.round(placement.qrQuiet * 100)}%</span>
+            </label>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Plate radius
+              <input
+                type="range"
+                min={LONDON_QR_RADIUS.min}
+                max={LONDON_QR_RADIUS.max}
+                step={LONDON_QR_RADIUS.step}
+                value={placement.qrRadius}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, { qrRadius: Number(event.target.value) })
+                }
+                className="w-28"
+              />
+              <span className="tabular-nums">{Math.round(placement.qrRadius * 100)}%</span>
+            </label>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={placement.qrTransparent}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, { qrTransparent: event.target.checked })
+                }
+              />
+              Transparent plate (flat grounds only)
+            </label>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={placement.qrInvert}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, { qrInvert: event.target.checked })
+                }
+              />
+              Knock code out of a navy plate
+            </label>
           </div>
         </div>
 

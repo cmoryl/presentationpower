@@ -8,6 +8,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, Layers, QrCode, Redo2, Ruler, Save, Trash2, Undo2 } from "lucide-react";
 import { toast } from "sonner";
+import { CenterTools } from "@/components/common/CenterTools";
+import { centeredPosition, type CenterAxis } from "@/lib/center-tools";
 
 import { NEXT_MART_ARTWORK } from "@/lib/next-mart";
 import { martArtRatio, martArtwork } from "@/lib/next-mart-placement";
@@ -500,6 +502,29 @@ export function PillarStudio({
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
+  };
+
+  /**
+   * Centring tools. The QR block is placed in mm from the trim origin, so the
+   * shared helper hands back the offsets that land it on the pillar's axes.
+   */
+  const centerQr = (axis: CenterAxis) => {
+    pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
+    const next = centeredPosition(
+      { x: qrPlace.x, y: qrPlace.y, w: qrPlace.edge, h: qrPlace.blockH },
+      {
+        x: qrPlace.minX,
+        y: qrPlace.minY,
+        w: qrPlace.maxX - qrPlace.minX + qrPlace.edge,
+        h: qrPlace.maxY - qrPlace.minY + qrPlace.blockH,
+      },
+      axis,
+    );
+    setConfig((c) => ({
+      ...c,
+      qrOffsetX: Math.min(Math.max(next.x, qrPlace.minX), qrPlace.maxX),
+      qrOffsetY: Math.min(Math.max(next.y, qrPlace.minY), qrPlace.maxY),
+    }));
   };
 
   /** Arrow-key nudging: 1 mm, or 10 mm with shift. */
@@ -1346,6 +1371,11 @@ export function PillarStudio({
                     >
                       Reset to default position
                     </button>
+                    <CenterTools
+                      label="Centre code"
+                      disabled={!hasQr}
+                      onCenter={centerQr}
+                    />
                   </div>
 
                 </div>

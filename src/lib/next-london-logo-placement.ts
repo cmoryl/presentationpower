@@ -13,6 +13,11 @@ import {
   NEXT_LOGO_COLOURWAYS,
   type NextLogoColourway,
 } from "@/lib/next-logo-vectors";
+import {
+  PILLAR_CAPTION_FONTS,
+  type PillarCaptionAlign,
+  type PillarCaptionFontId,
+} from "@/lib/next-pillar-masters";
 
 export type LondonLogoPlacement = {
   /** Horizontal nudge, as a fraction of the trim width. */
@@ -49,6 +54,22 @@ export type LondonLogoPlacement = {
   qrDy: number;
   /** Caption printed under the code; `""` prints no caption. */
   qrCaption: string;
+  /** Caption typeface treatment, matching the pillar QR editors. */
+  qrCaptionFont: PillarCaptionFontId;
+  /** Caption cap height in mm; 0 follows the code size. */
+  qrCaptionSize: number;
+  /** Caption alignment against the code block. */
+  qrCaptionAlign: PillarCaptionAlign;
+  /** Gap between the code plate and the caption, in mm. */
+  qrCaptionPad: number;
+  /** Drop the white plate so only the code modules print. */
+  qrTransparent: boolean;
+  /** Code ink: dark modules on light plate, or knocked out white on dark. */
+  qrInvert: boolean;
+  /** Quiet-zone plate padding as a fraction of the code size. */
+  qrQuiet: number;
+  /** Plate corner radius as a fraction of the code size. */
+  qrRadius: number;
   /**
    * Whether the generated NEXT lockup is placed on this panel. `null` follows
    * the panel: on everywhere except vendor booths, whose supplied artwork is
@@ -79,6 +100,14 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   qrDx: 0,
   qrDy: 0,
   qrCaption: "SCAN FOR THE AGENDA",
+  qrCaptionFont: "bold-caps",
+  qrCaptionSize: 0,
+  qrCaptionAlign: "center",
+  qrCaptionPad: 0,
+  qrTransparent: false,
+  qrInvert: false,
+  qrQuiet: 0.03,
+  qrRadius: 0.04,
   lockup: null,
   groundScale: 1,
   groundDx: 0,
@@ -109,6 +138,18 @@ export const LONDON_QR_SCALE = { min: 0.4, max: 2.5, step: 0.01 } as const;
 /** Longest QR payload the signage set accepts (URL or plain text). */
 export const LONDON_QR_MAX_CHARS = 300;
 
+/** QR caption cap-height bounds in mm (0 = follow the code size). */
+export const LONDON_QR_CAPTION_SIZE = { min: 0, max: 120, step: 0.5 } as const;
+
+/** QR caption gap bounds in mm. */
+export const LONDON_QR_CAPTION_PAD = { min: 0, max: 120, step: 0.5 } as const;
+
+/** Quiet-zone plate padding bounds, as a fraction of the code size. */
+export const LONDON_QR_QUIET = { min: 0, max: 0.25, step: 0.005 } as const;
+
+/** Plate corner radius bounds, as a fraction of the code size. */
+export const LONDON_QR_RADIUS = { min: 0, max: 0.5, step: 0.005 } as const;
+
 /** Supplied-artwork zoom bounds (vendor booth grounds), shared with the editor. */
 export const LONDON_GROUND_SCALE = { min: 0.5, max: 2.5, step: 0.01 } as const;
 
@@ -138,6 +179,24 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
       typeof p.qrCaption === "string"
         ? p.qrCaption.slice(0, LONDON_TEXT_MAX_CHARS)
         : DEFAULT_LOGO_PLACEMENT.qrCaption,
+    qrCaptionFont: PILLAR_CAPTION_FONTS.some((f) => f.id === p.qrCaptionFont)
+      ? (p.qrCaptionFont as PillarCaptionFontId)
+      : "bold-caps",
+    qrCaptionSize: clamp(
+      p.qrCaptionSize,
+      LONDON_QR_CAPTION_SIZE.min,
+      LONDON_QR_CAPTION_SIZE.max,
+      0,
+    ),
+    qrCaptionAlign:
+      p.qrCaptionAlign === "left" || p.qrCaptionAlign === "right"
+        ? p.qrCaptionAlign
+        : "center",
+    qrCaptionPad: clamp(p.qrCaptionPad, LONDON_QR_CAPTION_PAD.min, LONDON_QR_CAPTION_PAD.max, 0),
+    qrTransparent: p.qrTransparent === true,
+    qrInvert: p.qrInvert === true,
+    qrQuiet: clamp(p.qrQuiet, LONDON_QR_QUIET.min, LONDON_QR_QUIET.max, 0.03),
+    qrRadius: clamp(p.qrRadius, LONDON_QR_RADIUS.min, LONDON_QR_RADIUS.max, 0.04),
     lockup: typeof p.lockup === "boolean" ? p.lockup : null,
     groundScale: clamp(p.groundScale, LONDON_GROUND_SCALE.min, LONDON_GROUND_SCALE.max, 1),
     groundDx: clamp(p.groundDx, -0.5, 0.5, 0),

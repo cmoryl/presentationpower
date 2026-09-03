@@ -26,6 +26,7 @@ import {
 } from "@/lib/next-london-signage";
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
+import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
 import {
   londonLogoPlacement,
   type LondonLogoPlacement,
@@ -118,6 +119,23 @@ export type LondonBrandingPlan = {
     path: string;
     caption: string | null;
     captionSizeMm: number;
+    /** Gap between the plate and the caption baseline block, in mm. */
+    captionPadMm: number;
+    /** Caption anchor, resolved from the designer's alignment choice. */
+    captionAnchor: "start" | "middle" | "end";
+    /** Caption x in mm, already resolved for the anchor. */
+    captionX: number;
+    /** Caption weight/tracking treatment. */
+    captionWeight: number;
+    captionTracking: number;
+    /** Quiet-zone plate padding, in mm. `plate: false` prints code only. */
+    padMm: number;
+    plate: boolean;
+    /** Plate corner radius, in mm. */
+    radiusMm: number;
+    /** Plate and module inks, so a code can knock out of a dark plate. */
+    plateInk: string;
+    moduleInk: string;
   } | null;
   /** The nudge/scale override applied to the planned lockup box. */
   placement: LondonLogoPlacement;
@@ -229,26 +247,62 @@ export function londonBrandingPlan(
   // the lower band of the live area, centred, with the caption beneath it.
   const code = nudge.qr ? buildPillarQr(nudge.qr) : null;
   const qrSize = Math.min(liveW * 0.55, Math.min(liveW, liveH) * 0.24) * nudge.qrScale;
-  const captionSizeMm = Math.max(6, qrSize * 0.11);
+  // Caption size follows the code unless the designer authored a cap height,
+  // matching how the pillar QR editors treat their sub-line.
+  const captionSizeMm =
+    nudge.qrCaptionSize > 0 ? nudge.qrCaptionSize : Math.max(6, qrSize * 0.11);
+  const captionFont =
+    PILLAR_CAPTION_FONTS.find((f) => f.id === nudge.qrCaptionFont) ?? PILLAR_CAPTION_FONTS[0]!;
+  const padMm = qrSize * nudge.qrQuiet;
+  const captionPadMm = nudge.qrCaptionPad > 0 ? nudge.qrCaptionPad : padMm;
   const qr = code
-    ? {
-        data: nudge.qr!,
-        size: qrSize,
-        x: clamp(
+    ? (() => {
+        const x = clamp(
           marginX + panel.trimW / 2 - qrSize / 2 + nudge.qrDx * panel.trimW,
           0,
           panel.bleedW - qrSize,
-        ),
-        y: clamp(
+        );
+        const y = clamp(
           marginY + panel.trimH - safe - qrSize - captionSizeMm * 2 + nudge.qrDy * panel.trimH,
           0,
           panel.bleedH - qrSize,
-        ),
-        modules: code.size,
-        path: code.path,
-        caption: nudge.qrCaption.trim() ? nudge.qrCaption.trim().toUpperCase() : null,
-        captionSizeMm,
-      }
+        );
+        const rawCaption = nudge.qrCaption.trim();
+        const caption = rawCaption
+          ? captionFont.uppercase
+            ? rawCaption.toUpperCase()
+            : rawCaption
+          : null;
+        const anchor =
+          nudge.qrCaptionAlign === "left"
+            ? "start"
+            : nudge.qrCaptionAlign === "right"
+              ? "end"
+              : "middle";
+        return {
+          data: nudge.qr!,
+          size: qrSize,
+          x,
+          y,
+          modules: code.size,
+          path: code.path,
+          caption,
+          captionSizeMm,
+          captionPadMm,
+          captionAnchor: anchor as "start" | "middle" | "end",
+          captionX:
+            anchor === "start" ? x - padMm : anchor === "end" ? x + qrSize + padMm : x + qrSize / 2,
+          captionWeight: captionFont.weight,
+          captionTracking: captionFont.tracking,
+          padMm,
+          plate: !nudge.qrTransparent,
+          radiusMm: qrSize * nudge.qrRadius,
+          // Inverted codes knock the modules out of a deep-navy plate; scanners
+          // read both polarities, and the dark plate sits better on light art.
+          plateInk: nudge.qrInvert ? "#03002C" : "#FFFFFF",
+          moduleInk: nudge.qrInvert ? "#FFFFFF" : "#03002C",
+        };
+      })()
     : null;
 
   return {
