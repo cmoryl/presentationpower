@@ -18,6 +18,7 @@ import {
   History,
   Loader2,
   Plus,
+  RefreshCw,
   RotateCcw,
   Save,
   Trash2,
@@ -30,6 +31,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
+import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
