@@ -19,7 +19,11 @@ import {
   type LondonPrintGeometry,
 } from "@/lib/next-london-print-geometry";
 
-const mm = (n: number) => `${Math.round(n)}mm`;
+/** Millimetres with the inch equivalent — every spec reads in both units. */
+const mm = (n: number) => `${Math.round(n)}mm / ${inches(n)}″`;
+/** Compact mm for the on-stage guide chips. */
+const mmShort = (n: number) => `${Math.round(n)}mm`;
+const inches = (n: number) => (n / 25.4).toFixed(n < 100 ? 2 : 1);
 
 export type LondonPrintGuidesProps = {
   panel: LondonPanel;
@@ -63,13 +67,13 @@ export function LondonPrintGuides({ panel, showCrop = true }: LondonPrintGuidesP
         : null}
 
       <div className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-rose-200">
-        bleed {mm(geo.bleedW)} × {mm(geo.bleedH)}
+        bleed {mmShort(geo.bleedW)} × {mmShort(geo.bleedH)} · {inches(geo.bleedW)} × {inches(geo.bleedH)}″
       </div>
       <div
         className="absolute rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-emerald-200"
         style={{ left: safe.left, top: safe.top }}
       >
-        safe {mm(geo.safeMm)}
+        safe {mmShort(geo.safeMm)} / {inches(geo.safeMm)}″
       </div>
     </div>
   );
@@ -145,10 +149,12 @@ export function LondonPrintReadout({ panel, plan }: LondonPrintReadoutProps) {
         <div>
           <Row
             label="Finished signboard (trim)"
-            value={`${mm(geo.trimW)} × ${mm(geo.trimH)}`}
+            value={`${mmShort(geo.trimW)} × ${mmShort(geo.trimH)}`}
             note={`${geo.trimWin.toFixed(2)} × ${geo.trimHin.toFixed(2)} in`}
           />
-          <Row label="File size (bleed)" value={`${mm(geo.bleedW)} × ${mm(geo.bleedH)}`} />
+          <Row label="File size (bleed)" value={`${mmShort(geo.bleedW)} × ${mmShort(geo.bleedH)}`}
+            note={`${inches(geo.bleedW)} × ${inches(geo.bleedH)} in`}
+          />
           <Row
             label="Bleed per edge"
             value={
@@ -160,13 +166,21 @@ export function LondonPrintReadout({ panel, plan }: LondonPrintReadoutProps) {
         </div>
         <div>
           <Row label="Safe inset from trim" value={mm(geo.safeMm)} />
-          <Row label="Live (safe) area" value={`${mm(geo.liveW)} × ${mm(geo.liveH)}`} />
+          <Row
+            label="Live (safe) area"
+            value={`${mmShort(geo.liveW)} × ${mmShort(geo.liveH)}`}
+            note={`${inches(geo.liveW)} × ${inches(geo.liveH)} in`}
+          />
           <Row
             label="Issued raster tier"
             value={`${geo.ppi} ppi · ${geo.rasterW}×${geo.rasterH}px`}
             note={geo.rasterCapped ? "capped — print the vector" : undefined}
           />
-          <Row label="Area" value={`${geo.areaM2.toFixed(2)} m²`} />
+          <Row
+            label="Area"
+            value={`${geo.areaM2.toFixed(2)} m²`}
+            note={`${(geo.areaM2 * 10.7639).toFixed(2)} ft²`}
+          />
         </div>
       </div>
 

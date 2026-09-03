@@ -45,6 +45,14 @@ import {
   londonCmykBuild,
 } from "@/lib/next-london-cmyk";
 import { svgPathToPdfOps } from "@/lib/vector-path-pdf";
+import {
+  isStepRepeatPanel,
+  stepRepeatConfig,
+  stepRepeatPlan,
+  stepRepeatSvgLayer,
+  type StepRepeatConfig,
+  type StepRepeatPlan,
+} from "@/lib/next-london-step-repeat";
 
 /** Fields the location team is allowed to re-issue. */
 export const LONDON_EDITABLE_FIELDS = [
@@ -439,7 +447,13 @@ export type LondonArtOptions = {
   colorSpace?: LondonColorSpace;
   /** Vibrance pre-compensation strength for converted colours (0–1.5). */
   vibrance?: number;
+  /**
+   * Step-and-repeat wall recipe. Only used on photo-wall panels; when omitted
+   * the stored recipe for the panel (or the house default) is used.
+   */
+  stepRepeat?: StepRepeatConfig;
 };
+
 
 /**
  * Rebuild a panel's SVG from its own specification: full-bleed artboard in mm,
@@ -481,6 +495,13 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
   // Supplied vendor booth artwork, when the vendor has delivered their file:
   // it becomes the ground so previews and masters match the real booth.
   const boothArt = londonBoothArtworkUrl(panel.id);
+
+  // Step-and-repeat walls are a repeating tile field, not a single lockup: the
+  // wall layer replaces the hero lockup and the headline entirely.
+  const wall =
+    !boothArt && isStepRepeatPanel(panel)
+      ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
+      : null;
 
   const brand = londonBrandingPlan(panel);
   const logoScale = brand.logo.w / brand.art.w;
@@ -560,11 +581,19 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
         `<image href="${escapeXml(boothArt)}" xlink:href="${escapeXml(boothArt)}" x="0" y="0"` +
         ` width="${panel.bleedW}" height="${panel.bleedH}" preserveAspectRatio="none"/></g>`
       : `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
-    copyLayer,
-    qrLayer,
+    wall
+      ? stepRepeatSvgLayer(panel, wall, {
+          paintFor,
+          fontStack: LONDON_SIGNAGE_FONT.cssStack,
+          fontWeight: LONDON_SIGNAGE_FONT.weight,
+          tracking: LONDON_SIGNAGE_FONT.tracking,
+        })
+      : "",
+    wall ? "" : copyLayer,
+    wall ? "" : qrLayer,
     // Booths that ship the vendor's own branded artwork never get a second,
     // generated lockup painted over it.
-    boothArt ? "" : logoGroup,
+    boothArt || wall ? "" : logoGroup,
     `</svg>`,
   ].join("");
 
@@ -641,6 +670,11 @@ export function buildLondonPanelAi(
           ? radialShadingDict(centre, radius, stops)
           : axialShadingDict(from, to, stops);
       })();
+
+  const wall =
+    isStepRepeatPanel(panel)
+      ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
+      : null;
 
   // Brand layer: EPS-derived lockup outlines as live PDF paths, headline copy
   // as live Geist Bold text — both editable when the .ai is opened.
@@ -723,10 +757,16 @@ export function buildLondonPanelAi(
   // Three real Illustrator layers via optional content groups. Paint order is
   // ground → copy (with the QR block) → hero lockup, and /OCProperties /Order
   // lists the hero lockup FIRST, so it is the top layer when the .ai is opened.
-  const content =
-    `/OC /oc3 BDC\nq 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\nEMC\n` +
-    (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
-    `/OC /oc1 BDC\n${logoOps}EMC\n`;
+  // A photo wall's top layer is the repeat field itself: every mark, text tile
+  // and QR is a live PDF object, so the wall stays fully editable in Illustrator.
+  const wallOps = wall ? stepRepeatPdfOps(wall, h, fillOp, copyInk) : "";
+
+  const content = wall
+    ? `/OC /oc3 BDC\nq 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\nEMC\n` +
+      `/OC /oc1 BDC\n${wallOps}EMC\n`
+    : `/OC /oc3 BDC\nq 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\nEMC\n` +
+      (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
+      `/OC /oc1 BDC\n${logoOps}EMC\n`;
 
 
   const objects: string[] = [
@@ -739,6 +779,7 @@ export function buildLondonPanelAi(
       `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
       `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
+      `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> >> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
@@ -746,7 +787,7 @@ export function buildLondonPanelAi(
     shadingDict,
     `<< /Type /Font /Subtype /TrueType /BaseFont /${LONDON_SIGNAGE_FONT.pdfBaseFont} ` +
       `/Encoding /WinAnsiEncoding /FirstChar 32 /LastChar 255 >>`,
-    `<< /Type /OCG /Name (Hero lockup) >>`,
+    `<< /Type /OCG /Name (${wall ? "Step & repeat" : "Hero lockup"}) >>`,
     `<< /Type /OCG /Name (Copy) >>`,
     `<< /Type /OCG /Name (Ground) >>`,
   ];
@@ -768,6 +809,77 @@ export function buildLondonPanelAi(
   const bytes = new Uint8Array(pdf.length);
   for (let i = 0; i < pdf.length; i += 1) bytes[i] = pdf.charCodeAt(i) & 0xff;
   return bytes;
+}
+
+/**
+ * Step-and-repeat wall as live PDF content: repeated lockup outlines, live text
+ * objects and vector QR modules, each rotated about its own centre.
+ */
+function stepRepeatPdfOps(
+  plan: StepRepeatPlan,
+  h: number,
+  fillOp: (hex: string) => string,
+  copyInk: string,
+): string {
+  const rad = (plan.config.rotationDeg * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  const logoScale = (plan.config.tileWidthMm * MM_TO_PT) / Math.max(1, plan.art.w);
+  const alpha = plan.config.opacity < 1 ? `/GsWall gs ` : "";
+
+  const spin = (cxMm: number, cyMm: number): string => {
+    if (!plan.config.rotationDeg) return "";
+    const cx = cxMm * MM_TO_PT;
+    const cy = h - cyMm * MM_TO_PT;
+    // Rotate about the tile centre: translate → rotate → translate back.
+    const tx = cx - (cos * cx - sin * cy);
+    const ty = cy - (sin * cx + cos * cy);
+    return `${f3(cos)} ${f3(sin)} ${f3(-sin)} ${f3(cos)} ${f3(tx)} ${f3(ty)} cm `;
+  };
+
+  return plan.tiles
+    .map((tile) => {
+      const matrix = spin(tile.x + tile.w / 2, tile.y + tile.h / 2);
+      if (tile.kind === "logo") {
+        const paths = plan.art.paths
+          .map((p) => {
+            const ops = svgPathToPdfOps(p.d, {
+              scale: logoScale,
+              x: tile.x * MM_TO_PT,
+              y: h - (tile.y + tile.h) * MM_TO_PT,
+              artHeight: plan.art.h,
+            });
+            if (!ops) return "";
+            return `${fillOp(p.fill)} ${ops} ${p.fillRule === "evenodd" ? "f*" : "f"} `;
+          })
+          .join("");
+        return paths ? `q ${alpha}${matrix}${paths}Q\n` : "";
+      }
+      if (tile.kind === "text") {
+        const size = tile.sizeMm * MM_TO_PT;
+        const tracking = size * LONDON_SIGNAGE_FONT.tracking;
+        const advance = plan.config.text.length * (size * 0.62 + tracking);
+        const x = (tile.x + tile.w / 2) * MM_TO_PT - advance / 2;
+        const y = h - (tile.y + tile.sizeMm) * MM_TO_PT;
+        return (
+          `q ${alpha}${matrix}${copyInk} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
+          `1 0 0 1 ${f3(x)} ${f3(y)} Tm (${pdfText(plan.config.text)}) Tj ET Q\n`
+        );
+      }
+      if (!plan.qr) return "";
+      const size = tile.w * MM_TO_PT;
+      const x = tile.x * MM_TO_PT;
+      const yBottom = h - (tile.y + tile.h) * MM_TO_PT;
+      const plate = `${fillOp("#FFFFFF")} ${f3(x)} ${f3(yBottom)} ${f3(size)} ${f3(size)} re f `;
+      const modules = svgPathToPdfOps(plan.qr.path, {
+        scale: size / plan.qr.modules,
+        x,
+        y: yBottom,
+        artHeight: plan.qr.modules,
+      });
+      return `q ${alpha}${matrix}${plate}${modules ? `${fillOp("#03002C")} ${modules} f ` : ""}Q\n`;
+    })
+    .join("");
 }
 
 function f3(n: number): string {

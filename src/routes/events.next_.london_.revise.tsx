@@ -74,6 +74,9 @@ import {
 import { listLondonRevisions, publishLondonRevision } from "@/lib/next-london-revise.functions";
 import { announceLondonRevision } from "@/lib/next-london-revision-live";
 
+/** Millimetres as inches — signage specs read in both units. */
+const inch = (mm: number) => (mm / 25.4).toFixed(mm < 100 ? 2 : 1);
+
 export const Route = createFileRoute("/events/next_/london_/revise")({
   head: () => ({
     meta: [
@@ -888,7 +891,8 @@ function LondonRevisePage() {
                         ))}
                         <td className="px-3 py-2.5 text-xs text-[#666]">
                           <p>
-                            {panel.bleedW}×{panel.bleedH}mm bleed
+                            {panel.bleedW}×{panel.bleedH}mm bleed · {inch(panel.trimW)}×
+                            {inch(panel.trimH)} in trim
                           </p>
                           <p>
                             {panel.rasterPx}px · {panel.rasterMb}MB · band {panel.bandMm}mm
@@ -1023,7 +1027,8 @@ function LondonRevisePage() {
               <p className="text-xs text-[#666]">
                 {previewPanel.floor} · {previewPanel.room} · previewing the{" "}
                 {plan.touched.includes(previewPanel.id) ? "revised" : "current"} specification (
-                {previewPanel.trimW}×{previewPanel.trimH}mm trim, {previewPanel.bleedEdge}mm bleed
+                {previewPanel.trimW}×{previewPanel.trimH}mm ({inch(previewPanel.trimW)}×
+                {inch(previewPanel.trimH)} in) trim, {previewPanel.bleedEdge}mm bleed
                 per edge).
               </p>
               <LondonPpiPreview panel={previewPanel} />
@@ -1041,7 +1046,8 @@ function LondonRevisePage() {
                 Edit {artPanel.name}
               </DialogTitle>
               <p className="text-xs text-[#666]">
-                {artPanel.floor} · {artPanel.room} · {artPanel.trimW}×{artPanel.trimH}mm trim ·{" "}
+                {artPanel.floor} · {artPanel.room} · {artPanel.trimW}×{artPanel.trimH}mm (
+                {inch(artPanel.trimW)}×{inch(artPanel.trimH)} in) trim ·{" "}
                 {artPanel.bleedW}×{artPanel.bleedH}mm bleed · {artPanel.rasterPx}px at{" "}
                 {artPanel.rasterPpi}ppi
               </p>

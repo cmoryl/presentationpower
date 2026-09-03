@@ -79,6 +79,9 @@ import {
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 import { onLondonRevisionPublished } from "@/lib/next-london-revision-live";
 
+/** Millimetres as inches — every signage spec reads in both units. */
+const inch = (mm: number) => (mm / 25.4).toFixed(mm < 100 ? 2 : 1);
+
 export const Route = createFileRoute("/events/next_/london")({
   head: () => ({
     meta: [
@@ -606,7 +609,8 @@ function LondonSignagePage() {
                           </p>
                         ) : null}
                         <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
-                          {panel.trimW} × {panel.trimH} mm · {panel.ground}
+                          {panel.trimW} × {panel.trimH} mm ({inch(panel.trimW)} ×{" "}
+                          {inch(panel.trimH)} in) · {panel.ground}
                         </p>
                         <p className="mt-0.5 font-mono text-[11px] text-[#03002C]/45">
                           bleed {panel.bleedEdge} mm/edge · band {panel.bandMm.toFixed(2)} mm
@@ -684,10 +688,13 @@ function LondonSignagePage() {
 
               <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 {[
-                  { k: "Trim", v: `${openPanel.trimW} × ${openPanel.trimH} mm` },
+                  {
+                    k: "Trim",
+                    v: `${openPanel.trimW} × ${openPanel.trimH} mm (${inch(openPanel.trimW)} × ${inch(openPanel.trimH)} in)`,
+                  },
                   {
                     k: "Bleed",
-                    v: `${openPanel.bleedW} × ${openPanel.bleedH} mm (${openPanel.bleedEdge}/edge)`,
+                    v: `${openPanel.bleedW} × ${openPanel.bleedH} mm (${inch(openPanel.bleedW)} × ${inch(openPanel.bleedH)} in · ${openPanel.bleedEdge}/edge)`,
                   },
                   { k: "Ground", v: `${openPanel.ground} · ${openPanel.style}` },
                   {
