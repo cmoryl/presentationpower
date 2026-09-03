@@ -834,16 +834,22 @@ function LondonRevisePage() {
                         className={`border-b border-black/5 align-top ${touched ? "bg-[#E0E8F5]/60" : ""}`}
                       >
                         <td className="px-3 py-2.5">
-                          <p className="font-semibold text-[#03002C]">{panel.name}</p>
-                          <p className="text-xs text-[#666]">
-                            {panel.floor} · {panel.room}
-                          </p>
-                          {isAddedPanel(panel) ? (
-                            <span className="mt-1 inline-block rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]">
-                              Added
-                            </span>
-                          ) : null}
+                          <div className="flex items-start gap-2.5">
+                            <LondonPanelThumb panel={panel} size={64} />
+                            <div>
+                              <p className="font-semibold text-[#03002C]">{panel.name}</p>
+                              <p className="text-xs text-[#666]">
+                                {panel.floor} · {panel.room}
+                              </p>
+                              {isAddedPanel(panel) ? (
+                                <span className="mt-1 inline-block rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]">
+                                  Added
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
                         </td>
+
                         <td className="px-3 py-2.5">
                           <select
                             aria-label={`Gradient style for ${panel.name}`}
