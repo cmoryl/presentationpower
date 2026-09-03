@@ -24,3 +24,8 @@
 - [x] 28-look restyle matrix: swept all 6,120 cells (28 looks + house light/dark × 204 modules), 0 export failures, ledger + manifest report `coverage: "full"`. Mid-run checkpoints now land in `node_modules/.cache` so the dev-server watcher can't reload the harness mid-sweep.
 
 - [x] Modules page: old-template artifacting fixed (shorthand/longhand background patching left prior layers painted; ground surfaces now wait on the template registry too)
+
+## NEXT London signage (Sep 3)
+- [x] EPS-derived logo geometry, vertical pillar copy, scannable QR block on .svg/.ai masters + editor controls
+- [x] Replace the spherical "halo" ground with a low-angle chevron sweep (cloakroom / help desk / square panels)
+- [ ] Verify the QR "Generate agenda code" control persists in the live editor
