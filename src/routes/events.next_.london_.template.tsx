@@ -6,7 +6,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy } from "lucide-react";
+import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy, Type } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -31,6 +31,8 @@ import {
   resetLondonLogoPlacement,
   setLondonLogoPlacement,
   useLondonLogoPlacements,
+  LONDON_TEXT_MAX_CHARS,
+  LONDON_TEXT_SCALE,
 } from "@/lib/next-london-logo-placement";
 import { buildLondonSignagePack } from "@/lib/next-london-pack";
 
