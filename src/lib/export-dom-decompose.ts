@@ -978,6 +978,25 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         cs.borderRadius.includes("50%") ||
         (radiusPx >= Math.min(w, h) / 2 - 0.5 && Math.abs(w - h) < Math.max(2, w * 0.06));
 
+      // Already-plated ground paint: a textless, borderless TRANSLUCENT plane
+      // that covers most of the stage is a brand-tint wash, and a big textless
+      // translucent circle is legacy accent decor. Both are painted into the
+      // design-exact plate underneath, so re-emitting them as native objects
+      // composited the tint twice — the blue-washed slides and hard alpha
+      // circles reported on downloaded decks. They are dropped here.
+      const textless = (el.textContent ?? "").trim().length === 0;
+      const surfaceAlpha = Math.max(
+        fill ? fill.alpha : 0,
+        ...(gradient ? gradient.stops.map((s) => s.color.alpha) : [0]),
+      );
+      const translucent = surfaceAlpha > 0 && surfaceAlpha < 0.9;
+      if (textless && !line && edges.length === 0 && translucent) {
+        const coversStage = w * h >= spaceW * spaceH * 0.5;
+        const bigCircle = isEllipse && Math.min(w, h) >= spaceW * 0.3;
+        if (coversStage || bigCircle) continue;
+      }
+
+
       // Brand-tint ceiling for translucent CARD paint. On screen a tinted card
       // sits behind a blurred glass surface and reads almost white; PowerPoint
       // composites the same alpha flat over the artwork plate, which turned
