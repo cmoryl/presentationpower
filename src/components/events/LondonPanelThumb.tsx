@@ -1,0 +1,83 @@
+// Tiny visual reference for a London signage panel.
+//
+// Renders the real panel artwork (same builder the .svg/.ai masters use) as a
+// small inline image so the schedule reads visually. Generation is deferred
+// until the row scrolls into view — the full kit is 105 panels and each master
+// embeds the EPS lockup geometry.
+
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { buildLondonPanelSvg } from "@/lib/next-london-revise";
+import type { LondonPanel } from "@/lib/next-london-signage";
+
+export interface LondonPanelThumbProps {
+  panel: LondonPanel;
+  /** Longest edge of the thumbnail in px. */
+  size?: number;
+  className?: string;
+}
+
+function toDataUrl(svg: string): string {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+export function LondonPanelThumb({ panel, size = 72, className }: LondonPanelThumbProps) {
+  const holder = useRef<HTMLDivElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = holder.current;
+    if (!el || visible) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setVisible(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "240px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [visible]);
+
+  const landscape = panel.bleedW >= panel.bleedH;
+  const w = landscape ? size : Math.max(18, Math.round((size * panel.bleedW) / panel.bleedH));
+  const h = landscape ? Math.max(18, Math.round((size * panel.bleedH) / panel.bleedW)) : size;
+
+  // Keyed on everything that changes the artwork, so an edit repaints the tile.
+  const key = `${panel.style}|${panel.trimW}|${panel.trimH}|${panel.bleedEdge}|${panel.name}|${panel.ground}`;
+  const src = useMemo(() => {
+    if (!visible) return null;
+    try {
+      return toDataUrl(buildLondonPanelSvg(panel));
+    } catch {
+      return null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, key]);
+
+  return (
+    <div
+      ref={holder}
+      className={`overflow-hidden rounded-md border border-black/10 bg-[#03002C] ${className ?? ""}`}
+      style={{ width: w, height: h }}
+    >
+      {src ? (
+        <img
+          src={src}
+          alt={`Artwork preview for ${panel.name}`}
+          width={w}
+          height={h}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
+      ) : null}
+    </div>
+  );
+}
