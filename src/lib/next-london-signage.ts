@@ -89,10 +89,11 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
     stops: ["#7C4EF4", "#135CFB", "#7FE3E8"],
   },
   "08-chevron-sweep": {
-    label: "Halo",
-    note: "Centred halo for small square and semicircular panels seen close-up.",
-    stops: ["#8FA6FF", "#CFF6F7", "#7FE3E8"],
+    label: "Chevron sweep",
+    note: "Low-angle brand sweep for cloakroom, help-desk and close-up square panels. Replaces the old centred halo: no soft centre sphere to read as a smudge, and the white lockup keeps full contrast at arm's length.",
+    stops: ["#03002C", "#135CFB", "#7FE3E8"],
   },
+
   "09-dawn": {
     label: "Dawn",
     note: "Lightest ground in the pack. Default for plinths, tall surrounds and the Whittle centre panels.",
