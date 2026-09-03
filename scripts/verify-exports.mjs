@@ -361,18 +361,18 @@ async function main() {
       const baseline = trees[key];
       if (!baseline) {
         tree.missing += 1;
-        trees[key] = await page.evaluate((r) => window.__tpExportVerify.snapshot(r), row);
+        trees[key] = await page0.evaluate((r) => window.__tpExportVerify.snapshot(r), row);
         tree.updated += 1;
         continue;
       }
-      const diff = await page.evaluate(
+      const diff = await page0.evaluate(
         ([b, r]) => window.__tpExportVerify.diff(b, r),
         [baseline, row],
       );
       tree.compared += 1;
       if (!diff.ok) tree.regressions.push({ key, lines: diff.regressions });
       if (TREE_UPDATE) {
-        trees[key] = await page.evaluate((r) => window.__tpExportVerify.snapshot(r), row);
+        trees[key] = await page0.evaluate((r) => window.__tpExportVerify.snapshot(r), row);
         tree.updated += 1;
       }
     }
