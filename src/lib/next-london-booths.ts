@@ -16,16 +16,12 @@ import gdxAi from "@/assets/london-booths/global-digital-experience-live-tradebo
 import gdxP1 from "@/assets/london-booths/global-digital-experience-live-tradebooth-a.jpg.asset.json";
 import learningAi from "@/assets/london-booths/learning-tradebooth-a.ai.asset.json";
 import learningP1 from "@/assets/london-booths/learning-tradebooth-a.jpg.asset.json";
-import legalAi from "@/assets/london-booths/legal-support-tradebooth-b.ai.asset.json";
-import legalP1 from "@/assets/london-booths/legal-support-tradebooth-b.jpg.asset.json";
 import legal2Ai from "@/assets/london-booths/legal-support2-tradebooth-b.ai.asset.json";
 import legal2P1 from "@/assets/london-booths/legal-support2-tradebooth-b.jpg.asset.json";
 import liveCustomerAi from "@/assets/london-booths/live-customer-tradebooth-a.ai.asset.json";
 import liveCustomerP1 from "@/assets/london-booths/live-customer-tradebooth-a.jpg.asset.json";
 import mediaAi from "@/assets/london-booths/media-tradebooth-a.ai.asset.json";
 import mediaP1 from "@/assets/london-booths/media-tradebooth-a.jpg.asset.json";
-import sterlingAi from "@/assets/london-booths/sterling-tradebooth-a.ai.asset.json";
-import sterlingP1 from "@/assets/london-booths/sterling-tradebooth-a.jpg.asset.json";
 import sterling2Ai from "@/assets/london-booths/sterling2-tradebooth-a.ai.asset.json";
 import sterling2P1 from "@/assets/london-booths/sterling2-tradebooth-a.jpg.asset.json";
 import tiAi from "@/assets/london-booths/ti-tradebooth-a.ai.asset.json";
@@ -131,38 +127,25 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     style: "01-beam-violet-aqua",
     artboards: frontWall(mediaP1.url),
   },
-  {
-    id: "legal-support-tradebooth-b",
-    vendor: "Legal Support · Booth B",
-    sourceFile: "LegalSupportTradeBoothB_Front_1830x2440mm_Plus100mmBleed.ai",
-    aiUrl: legalAi.url,
-    style: "01-beam-violet-aqua",
-    artboards: frontWall(legalP1.url),
-  },
+  // Only the latest supplied file per vendor ships; earlier rounds
+  // (LegalSupportTradeBoothB, SterlingTradeBoothA) are superseded.
   {
     id: "legal-support-2-tradebooth-b",
-    vendor: "Legal Support 2 · Booth B",
+    vendor: "Legal Support · Booth B",
     sourceFile: "LegalSupport2TradeBoothB_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: legal2Ai.url,
     style: "01-beam-violet-aqua",
     artboards: frontWall(legal2P1.url),
   },
   {
-    id: "sterling-tradebooth-a",
-    vendor: "Sterling",
-    sourceFile: "SterlingTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
-    aiUrl: sterlingAi.url,
-    style: "01-beam-violet-aqua",
-    artboards: frontWall(sterlingP1.url),
-  },
-  {
     id: "sterling-2-tradebooth-a",
-    vendor: "Sterling 2",
+    vendor: "Sterling",
     sourceFile: "Sterling2TradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: sterling2Ai.url,
     style: "01-beam-violet-aqua",
     artboards: frontWall(sterling2P1.url),
   },
+
   {
     id: "veeva-tradebooth-a",
     vendor: "Veeva",
@@ -201,14 +184,6 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     sourceFile: null,
     aiUrl: null,
     style: "03-wash-diagonal",
-    artboards: frontWall(null),
-  },
-  {
-    id: "veeva-tms",
-    vendor: "Veeva TMS | LifeSciNEXT",
-    sourceFile: null,
-    aiUrl: null,
-    style: "07-prism-sweep",
     artboards: frontWall(null),
   },
   {
