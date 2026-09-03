@@ -80,6 +80,58 @@ function svgDataUrl(svg: string): string {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+/**
+ * Millimetre field for the measured signboard. Keystrokes edit a local draft so
+ * a half-typed number is never clamped ("2500" used to collapse to the 12000mm
+ * ceiling); the value only commits on blur or Enter.
+ */
+function BoardSizeInput({
+  panelId,
+  value,
+  min,
+  max,
+  onCommit,
+}: {
+  panelId: string;
+  value: number;
+  min: number;
+  max: number;
+  onCommit: (next: number) => void;
+}) {
+  const [draft, setDraft] = useState<string | null>(null);
+  // A different panel (or a reset) must reset the draft.
+  const shown = draft ?? String(value);
+  const commit = () => {
+    if (draft === null) return;
+    const next = Number(draft);
+    setDraft(null);
+    if (!Number.isFinite(next) || draft.trim() === "") return;
+    if (next !== value) onCommit(Math.max(min, Math.min(max, next)));
+  };
+  return (
+    <input
+      key={panelId}
+      type="number"
+      inputMode="decimal"
+      min={min}
+      max={max}
+      step={1}
+      value={shown}
+      onChange={(event) => setDraft(event.target.value)}
+      onBlur={commit}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          event.currentTarget.blur();
+        }
+        if (event.key === "Escape") setDraft(null);
+      }}
+      className="h-9 w-28 rounded-md border border-border bg-background px-2 text-sm tabular-nums text-foreground"
+    />
+  );
+}
+
+
 function LondonTemplatePage() {
   const placements = useLondonLogoPlacements();
   const [floor, setFloor] = useState<string>("all");
@@ -660,21 +712,16 @@ function LondonTemplatePage() {
                 ).map((field) => (
                   <label key={field.key} className="flex flex-col gap-1 text-xs text-muted-foreground">
                     {field.label}
-                    <input
-                      type="number"
+                    <BoardSizeInput
+                      panelId={panel.id}
                       min={field.min}
                       max={field.max}
-                      step={1}
                       value={field.value}
-                      onChange={(event) => {
-                        const next = Number(event.target.value);
-                        if (!Number.isFinite(next)) return;
-                        setLondonBoardSize(panel, { [field.key]: next });
-                      }}
-                      className="h-9 w-28 rounded-md border border-border bg-background px-2 text-sm tabular-nums text-foreground"
+                      onCommit={(next) => setLondonBoardSize(panel, { [field.key]: next })}
                     />
                   </label>
                 ))}
+
                 <Button
                   variant="outline"
                   size="sm"
