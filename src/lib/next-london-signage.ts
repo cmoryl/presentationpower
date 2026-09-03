@@ -103,7 +103,18 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
     note: "Near-flat veil for slivers and thin fascia strips where a gradient would band.",
     stops: ["#8FA6FF", "#B9A6FF"],
   },
+  "11-brew-diagonal": {
+    label: "Brew · diagonal",
+    note: "NEXTbrew ground: a saturated diagonal run of brand blue into aqua. Replaces the centred halo on table tops — no soft centre blob to read as a smudge under café lighting, and the white lockup holds full contrast at arm's length.",
+    stops: ["#135CFB", "#5AC8F0", "#7FE3E8"],
+  },
+  "12-repeat-wash": {
+    label: "Repeat wash",
+    note: "Deep vertical wash sized for step-and-repeat walls, so the tiled lockup rows stay legible in on-camera flash.",
+    stops: ["#03002C", "#135CFB", "#7C4EF4"],
+  },
 };
+
 
 /**
  * Print specification, as issued with the pack. These are hard rules for the
