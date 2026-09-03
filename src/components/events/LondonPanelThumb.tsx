@@ -15,13 +15,15 @@ export interface LondonPanelThumbProps {
   /** Longest edge of the thumbnail in px. */
   size?: number;
   className?: string;
+  /** When provided the tile becomes a button that opens a larger preview. */
+  onOpen?: (panel: LondonPanel) => void;
 }
 
 function toDataUrl(svg: string): string {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
 
-export function LondonPanelThumb({ panel, size = 72, className }: LondonPanelThumbProps) {
+export function LondonPanelThumb({ panel, size = 72, className, onOpen }: LondonPanelThumbProps) {
   const holder = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -61,23 +63,39 @@ export function LondonPanelThumb({ panel, size = 72, className }: LondonPanelThu
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, key]);
 
+  const art = src ? (
+    <img
+      src={src}
+      alt={`Artwork preview for ${panel.name}`}
+      width={w}
+      height={h}
+      loading="lazy"
+      decoding="async"
+      className="h-full w-full object-contain"
+    />
+  ) : null;
+
+  const box = `overflow-hidden rounded-md border border-black/10 bg-[#03002C] ${className ?? ""}`;
+
+  if (onOpen) {
+    return (
+      <div ref={holder} style={{ width: w, height: h }}>
+        <button
+          type="button"
+          onClick={() => onOpen(panel)}
+          title={`View ${panel.name} larger`}
+          aria-label={`View a larger preview of ${panel.name}`}
+          className={`${box} block h-full w-full cursor-zoom-in transition hover:border-[#003FC7]/60 hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]`}
+        >
+          {art}
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div
-      ref={holder}
-      className={`overflow-hidden rounded-md border border-black/10 bg-[#03002C] ${className ?? ""}`}
-      style={{ width: w, height: h }}
-    >
-      {src ? (
-        <img
-          src={src}
-          alt={`Artwork preview for ${panel.name}`}
-          width={w}
-          height={h}
-          loading="lazy"
-          decoding="async"
-          className="h-full w-full object-cover"
-        />
-      ) : null}
+    <div ref={holder} className={box} style={{ width: w, height: h }}>
+      {art}
     </div>
   );
 }
