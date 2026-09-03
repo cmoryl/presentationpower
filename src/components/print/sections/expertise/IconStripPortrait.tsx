@@ -75,9 +75,7 @@ export function IconStripPortrait({
 
   if (items.length === 0) return null;
 
-  const hairline = `1px solid ${
-    mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)"
-  }`;
+  const hairline = `1px solid ${mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)"}`;
 
   const iconCircle = (name: IconName, slot: string) => (
     <div

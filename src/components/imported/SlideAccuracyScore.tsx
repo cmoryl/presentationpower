@@ -4,11 +4,12 @@
 import { scoreSlideAccuracy } from "@/lib/reinterpret-accuracy";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 
-const BAND_STYLE: Record<"high" | "medium" | "low", { chip: string; bar: string; label: string }> = {
-  high: { chip: "bg-[#A6FA87]/40 text-[#0B5A24]", bar: "bg-[#0B7A3B]", label: "Close match" },
-  medium: { chip: "bg-[#FFEB66]/50 text-[#6B4A00]", bar: "bg-[#B25C00]", label: "Partial match" },
-  low: { chip: "bg-[#FF9B70]/40 text-[#7A2410]", bar: "bg-[#E53D2E]", label: "Coverage drop" },
-};
+const BAND_STYLE: Record<"high" | "medium" | "low", { chip: string; bar: string; label: string }> =
+  {
+    high: { chip: "bg-[#A6FA87]/40 text-[#0B5A24]", bar: "bg-[#0B7A3B]", label: "Close match" },
+    medium: { chip: "bg-[#FFEB66]/50 text-[#6B4A00]", bar: "bg-[#B25C00]", label: "Partial match" },
+    low: { chip: "bg-[#FF9B70]/40 text-[#7A2410]", bar: "bg-[#E53D2E]", label: "Coverage drop" },
+  };
 
 export function SlideAccuracyScore({
   slide,
@@ -24,7 +25,9 @@ export function SlideAccuracyScore({
     <details className={`rounded-lg border border-black/10 bg-white/70 px-3 py-2 ${className}`}>
       <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-[11px] uppercase tracking-wider text-black/50">
         Accuracy vs original
-        <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold normal-case ${style.chip}`}>
+        <span
+          className={`rounded-full px-2 py-0.5 text-[11px] font-semibold normal-case ${style.chip}`}
+        >
           {a.score}% · {style.label}
         </span>
         {a.missing.length > 0 && (
@@ -53,7 +56,11 @@ export function SlideAccuracyScore({
               >
                 <div
                   className={`h-full rounded-full ${
-                    f.score >= 0.9 ? BAND_STYLE.high.bar : f.score >= 0.7 ? BAND_STYLE.medium.bar : BAND_STYLE.low.bar
+                    f.score >= 0.9
+                      ? BAND_STYLE.high.bar
+                      : f.score >= 0.7
+                        ? BAND_STYLE.medium.bar
+                        : BAND_STYLE.low.bar
                   }`}
                   style={{ width: `${Math.max(2, Math.round(f.score * 100))}%` }}
                 />
@@ -66,7 +73,9 @@ export function SlideAccuracyScore({
 
       {a.missing.length > 0 && (
         <div className="mt-2 border-t border-black/10 pt-2">
-          <p className="text-[11px] uppercase tracking-wider text-black/45">Not represented anywhere</p>
+          <p className="text-[11px] uppercase tracking-wider text-black/45">
+            Not represented anywhere
+          </p>
           <ul className="mt-1 space-y-1 text-xs text-black/60">
             {a.missing.map((m, i) => (
               <li key={i} className="flex gap-1.5">

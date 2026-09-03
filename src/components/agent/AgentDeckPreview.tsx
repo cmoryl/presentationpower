@@ -258,7 +258,9 @@ export function AgentDeckPreview({
     <div className="flex h-full min-h-0 flex-col">
       <header className="flex flex-wrap items-center gap-3 border-b border-border/60 px-4 py-3">
         <div className="min-w-0">
-          <h2 className="truncate text-sm font-semibold text-foreground">{displayTitle || "Deck"}</h2>
+          <h2 className="truncate text-sm font-semibold text-foreground">
+            {displayTitle || "Deck"}
+          </h2>
           <p className="text-[11px] text-foreground/45">
             {slides.length} slide{slides.length === 1 ? "" : "s"}
             {pack ? ` · ${pack.label}` : ""}
@@ -297,7 +299,6 @@ export function AgentDeckPreview({
         >
           Open in deck editor
         </Link>
-
       </header>
 
       {error && <p className="px-4 py-2 text-xs text-red-600">{error}</p>}

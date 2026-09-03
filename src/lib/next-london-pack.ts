@@ -74,7 +74,6 @@ export async function buildLondonSignagePack(
     files.push({ path: svgPath, panelId: panel.id, kind: "svg" });
     files.push({ path: aiPath, panelId: panel.id, kind: "ai" });
 
-
     rows.push(
       [
         panel.id,
@@ -105,7 +104,6 @@ export async function buildLondonSignagePack(
         }"`,
       ].join(","),
     );
-
 
     options.onProgress?.(index + 1, panels.length);
     // Yield to the browser so a 95-panel pack never blocks the UI thread.

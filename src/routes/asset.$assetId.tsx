@@ -816,8 +816,7 @@ function AssetEditor() {
       }
     } else {
       next = [...mods];
-      const at =
-        dropIndex == null ? mods.length : Math.max(0, Math.min(dropIndex, mods.length));
+      const at = dropIndex == null ? mods.length : Math.max(0, Math.min(dropIndex, mods.length));
       next.splice(at, 0, fit.section);
       if (replaceTarget) {
         // Built-in section (e.g. "features") being replaced by a module:
@@ -825,8 +824,7 @@ function AssetEditor() {
         if (SECTION_CLEARABLE_FIELDS[replaceTarget]) {
           patch.hiddenSections = withSectionHidden(content, replaceTarget);
           replacedLabel =
-            SECTION_DELETE_LABELS[replaceTarget] ??
-            replaceTarget.replace(/([A-Z])/g, " $1");
+            SECTION_DELETE_LABELS[replaceTarget] ?? replaceTarget.replace(/([A-Z])/g, " $1");
         }
       }
     }
@@ -841,10 +839,9 @@ function AssetEditor() {
       });
     }
     if (wasReplace) {
-      toast.success(
-        `${replacedLabel} replaced with ${sectionKindLabel(fit.section.kind)}`,
-        { description: fit.note ?? undefined },
-      );
+      toast.success(`${replacedLabel} replaced with ${sectionKindLabel(fit.section.kind)}`, {
+        description: fit.note ?? undefined,
+      });
     } else if (fit.note) {
       toast.success(`Module added — ${fit.note}`, {
         description: "Fitted to this template's page budget.",
@@ -876,9 +873,7 @@ function AssetEditor() {
     const mods = (rawContent as { modules?: PrintSection[] }).modules ?? [];
     if (!canvas) return { idx: mods.length, top: 0 };
     const cRect = canvas.getBoundingClientRect();
-    const nodes = Array.from(
-      canvas.querySelectorAll<HTMLElement>('[data-section^="module:"]'),
-    );
+    const nodes = Array.from(canvas.querySelectorAll<HTMLElement>('[data-section^="module:"]'));
     if (nodes.length === 0) {
       return { idx: 0, top: Math.max(8, clientY - cRect.top) };
     }
@@ -893,7 +888,6 @@ function AssetEditor() {
     }
     return { idx: Math.min(idx, mods.length), top };
   }
-
 
   // Collect all non-empty string paths in the content object so LiveEditOverlay
   // can bind DOM text nodes back to structured content.
@@ -1062,7 +1056,10 @@ function AssetEditor() {
       toast.success("PDF saved to your downloads", { id: exportToast });
       setExportOpen(false);
     } catch (e) {
-      toast.error(`PDF export failed: ${(e as Error).message}`, { id: exportToast, duration: 10000 });
+      toast.error(`PDF export failed: ${(e as Error).message}`, {
+        id: exportToast,
+        duration: 10000,
+      });
     } finally {
       setExportBusy(false);
       setExportProgress(null);
@@ -1890,9 +1887,7 @@ function AssetEditor() {
                             setHeroModalOpen(true);
                             return;
                           }
-                          const id = key.startsWith("module:")
-                            ? key.slice("module:".length)
-                            : null;
+                          const id = key.startsWith("module:") ? key.slice("module:".length) : null;
                           if (id) {
                             setModuleFocus((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }));
                             window.setTimeout(() => setModuleFocus(null), 4000);
@@ -1938,8 +1933,6 @@ function AssetEditor() {
                           ))}
                         </div>
                       )}
-
-
 
                       {/* Hero affordance — click straight into the hero editor from
                   the canvas instead of hunting for the sidebar panel. */}
@@ -2039,11 +2032,7 @@ function AssetEditor() {
                 )}
               </Panel>
 
-              <Panel
-                title="Shared modules"
-                defaultOpen={false}
-                openNonce={moduleFocus?.nonce ?? 0}
-              >
+              <Panel title="Shared modules" defaultOpen={false} openNonce={moduleFocus?.nonce ?? 0}>
                 {overflow.clipped && !approvedDemo && (
                   <div
                     data-testid="overflow-inspector-note"
@@ -4538,7 +4527,6 @@ function StatsInlineEditor({
           )}
         />
       </div>
-
     </>
   );
 }
@@ -4963,9 +4951,7 @@ function ExpertiseInlineEditor({
             aria-label="Layout"
             className={inspectorInput}
             value={section.layout ?? "horizontal"}
-            onChange={(e) =>
-              onPatch({ layout: e.target.value as PrintExpertiseLayout })
-            }
+            onChange={(e) => onPatch({ layout: e.target.value as PrintExpertiseLayout })}
           >
             {EXPERTISE_LAYOUTS.map((v) => (
               <option key={v.id} value={v.id}>
@@ -4977,9 +4963,7 @@ function ExpertiseInlineEditor({
             aria-label="Icon size"
             className={inspectorInput}
             value={section.iconSize ?? "md"}
-            onChange={(e) =>
-              onPatch({ iconSize: e.target.value as PrintExpertiseIconSize })
-            }
+            onChange={(e) => onPatch({ iconSize: e.target.value as PrintExpertiseIconSize })}
           >
             {ICON_SIZES.map((v) => (
               <option key={v.id} value={v.id}>
@@ -5042,7 +5026,6 @@ function ExpertiseInlineEditor({
         </button>
       </div>
       <ArrayEditor
-
         items={section.items}
         onChange={(items) => onPatch({ items })}
         add={() => ({ label: "", icon: "" })}

@@ -27,9 +27,7 @@ export function announceLondonRevision(rev: number): void {
 }
 
 /** Subscribe to revision publishes. Returns an unsubscribe function. */
-export function onLondonRevisionPublished(
-  handler: (ping: LondonRevisionPing) => void,
-): () => void {
+export function onLondonRevisionPublished(handler: (ping: LondonRevisionPing) => void): () => void {
   if (typeof window === "undefined") return () => {};
   let channel: BroadcastChannel | null = null;
   try {

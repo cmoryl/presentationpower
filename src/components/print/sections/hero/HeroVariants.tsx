@@ -514,9 +514,7 @@ export function HeroStatLockup({ section, mode, accent }: Props) {
             <div key={i}>
               <div
                 style={{
-                  fontSize: cq(
-                    24 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 6),
-                  ),
+                  fontSize: cq(24 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 6)),
                   fontWeight: 700,
                   letterSpacing: "-0.03em",
                   color: accent,

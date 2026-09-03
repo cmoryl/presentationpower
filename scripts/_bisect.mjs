@@ -1,6 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 import JSZip from "jszip";
-import { renderPptxWithPowerPoint, deleteDriveItem } from "/dev-server/scripts/render-via-powerpoint.mjs";
+import {
+  renderPptxWithPowerPoint,
+  deleteDriveItem,
+} from "/dev-server/scripts/render-via-powerpoint.mjs";
 const src = process.argv[2];
 const base = await readFile(src);
 

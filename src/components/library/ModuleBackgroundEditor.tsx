@@ -35,7 +35,8 @@ const TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/avif"]);
 async function readBase64(file: File): Promise<string> {
   const buf = new Uint8Array(await file.arrayBuffer());
   let bin = "";
-  for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+  for (let i = 0; i < buf.length; i += 0x8000)
+    bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
   return btoa(bin);
 }
 
@@ -127,7 +128,10 @@ export function ModuleBackgroundEditor({
   // right, so it lives behind the "Every look" scope.
   const choices = React.useMemo(() => {
     const mine = library.filter((r) => r.skinCode.toUpperCase() === code);
-    const rows = scope === "look" ? mine : [...mine, ...library.filter((r) => r.skinCode.toUpperCase() !== code)];
+    const rows =
+      scope === "look"
+        ? mine
+        : [...mine, ...library.filter((r) => r.skinCode.toUpperCase() !== code)];
     return rows.slice(0, 60);
   }, [library, scope, code]);
 
@@ -378,7 +382,9 @@ export function ModuleBackgroundEditor({
                           />
                           <span className="flex items-center justify-between gap-1 px-1.5 py-1 text-[10px] text-black/60 dark:text-white/60">
                             <span className="truncate">{sceneLabel(c)}</span>
-                            {active && <Check className="h-3 w-3 shrink-0 text-[#003FC7]" aria-hidden />}
+                            {active && (
+                              <Check className="h-3 w-3 shrink-0 text-[#003FC7]" aria-hidden />
+                            )}
                           </span>
                         </button>
                       </li>

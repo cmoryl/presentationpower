@@ -152,10 +152,7 @@ export function AgentChat({
       const render = (text: string, tools: DemoToolPart[]): UIMessage => ({
         id: asstId,
         role: "assistant",
-        parts: [
-          { type: "text", text },
-          ...(tools as unknown as UIMessage["parts"]),
-        ],
+        parts: [{ type: "text", text }, ...(tools as unknown as UIMessage["parts"])],
       });
       const push = (msg: UIMessage) =>
         setMessages((prev) => {
@@ -249,7 +246,6 @@ export function AgentChat({
         if (deckId) setDeckBuildState(deckId, null);
         if (alive()) setDemoBusy(false);
       }
-
     },
     [onActivity, onDeckDetected, onFirstUserMessage, setMessages, threadId],
   );
@@ -298,7 +294,9 @@ export function AgentChat({
         ...(dna ? { designDna: dna } : {}),
         ...(designOverrides ? { designOverrides } : {}),
       };
-      const agentText = isFirstCreationTurn ? `${value}\n\n${creationAppearanceLine(appearance)}` : value;
+      const agentText = isFirstCreationTurn
+        ? `${value}\n\n${creationAppearanceLine(appearance)}`
+        : value;
       const withDocs = withDocumentContext(agentText, docs);
       void sendMessage({ text: withDocs }, Object.keys(body).length ? { body } : undefined);
     },

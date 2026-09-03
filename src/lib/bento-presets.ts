@@ -300,10 +300,14 @@ const BRAND_VOICE: Record<string, { wordmark: string; swaps: [RegExp, string][] 
       [/Languages in scope/gi, "Languages collected"],
       [/adaptive MT/gi, "model-assisted labeling"],
       [/translation, review and publish/gi, "collection, annotation and evaluation"],
-      [/terminology, brand voice and regulatory guardrails/gi,
-        "consent, provenance and bias guardrails"],
-      [/Terminology, brand voice and regulatory guardrails/g,
-        "Consent, provenance and bias guardrails"],
+      [
+        /terminology, brand voice and regulatory guardrails/gi,
+        "consent, provenance and bias guardrails",
+      ],
+      [
+        /Terminology, brand voice and regulatory guardrails/g,
+        "Consent, provenance and bias guardrails",
+      ],
       [/localization/gi, "training data"],
       [/content type, and channel/gi, "modality, and task type"],
       [/content type and channel/gi, "modality and task type"],

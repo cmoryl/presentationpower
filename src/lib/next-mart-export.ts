@@ -32,8 +32,6 @@ import {
   NEXT_MART,
   NEXT_MART_ARTWORK,
   NEXT_MART_LOGOS,
-
-
   NEXT_MART_FLAT_SIGNS,
   NEXT_MART_PILLARS,
   martPillarConfig,
@@ -218,7 +216,6 @@ export async function exportMartBundle(opts?: {
   /** City/stop template to build. Defaults to the London reference kit. */
   stop?: MartStop;
 }): Promise<MartExportResult> {
-
   const stop = opts?.stop ?? LONDON_STOP;
   const allPillars = martStopPillars(stop);
   const pillars = opts?.pillarIds?.length

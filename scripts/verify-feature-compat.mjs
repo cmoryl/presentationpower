@@ -135,9 +135,7 @@ const FEATURES = [
     id: "group-child-transform",
     detect: (p) => groupAudit(p).groups,
     support: (p) =>
-      groupAudit(p).missingChild === 0
-        ? ok()
-        : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"])),
+      groupAudit(p).missingChild === 0 ? ok() : Object.fromEntries(TARGETS.map((t) => [t, "FAIL"])),
     note: "Every p:grpSp needs chOff/chExt; without them 2007-2016 collapse the group to zero size and the parts vanish.",
   },
   {
@@ -742,7 +740,9 @@ async function main() {
   else if (match) picked = variants.filter((v) => new RegExp(match, "i").test(v));
   else {
     const step = variants.length / COUNT;
-    picked = Array.from({ length: COUNT }, (_, i) => variants[Math.floor(i * step)]).filter(Boolean);
+    picked = Array.from({ length: COUNT }, (_, i) => variants[Math.floor(i * step)]).filter(
+      Boolean,
+    );
   }
 
   const results = [];
@@ -789,8 +789,7 @@ async function main() {
         console.log(
           `${worst.padEnd(4)} ${variantId} ${mode}/${fidelity} features=${rows.filter((r) => r.uses).length} groups=${grp.groups} depth=${grp.maxDepth} singleton=${grp.singletons} oob=${grp.outOfBounds} dupIds=${grp.dupIds} tagLeak=${grp.leakedTags} media=${pkg.media.length} ${(buf.length / 1024).toFixed(0)}KB`,
         );
-        for (const d of [...new Set(grp.details)].slice(0, 6))
-          console.log(`     group· ${d}`);
+        for (const d of [...new Set(grp.details)].slice(0, 6)) console.log(`     group· ${d}`);
         for (const r of rows.filter((r) => r.status === "FAIL"))
           console.log(`     FAIL ${r.id} (x${r.uses}) ${r.note}`);
         for (const o of offenders)

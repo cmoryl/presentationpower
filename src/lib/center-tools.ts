@@ -71,10 +71,7 @@ export function isCentered(
  * Distribute boxes evenly between the first and last edge on an axis — the
  * companion tool designers expect next to "centre" in a layout app.
  */
-export function distributed(
-  boxes: CenterBox[],
-  axis: "h" | "v",
-): { x: number; y: number }[] {
+export function distributed(boxes: CenterBox[], axis: "h" | "v"): { x: number; y: number }[] {
   if (boxes.length < 3) return boxes.map((b) => ({ x: b.x, y: b.y }));
   const sorted = boxes
     .map((b, index) => ({ b, index }))

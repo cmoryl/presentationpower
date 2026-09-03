@@ -139,8 +139,8 @@ async function settleStageImages(stage: HTMLElement, timeoutMs = 8000): Promise<
     extractCssUrls((cs as unknown as { maskImage?: string }).maskImage).forEach((url) =>
       cssUrls.add(url),
     );
-    extractCssUrls((cs as unknown as { webkitMaskImage?: string }).webkitMaskImage).forEach(
-      (url) => cssUrls.add(url),
+    extractCssUrls((cs as unknown as { webkitMaskImage?: string }).webkitMaskImage).forEach((url) =>
+      cssUrls.add(url),
     );
   }
   if (imgs.length === 0 && cssUrls.size === 0) return;
@@ -229,7 +229,6 @@ export async function withExactStage<T>(
     } catch {
       /* font wait is opportunistic — measurement still proceeds */
     }
-
 
     // Photographs must be decoded BEFORE the plate is rasterized. A tile that
     // is still in flight (or that lost its fetch to resource pressure during a
@@ -497,7 +496,11 @@ export async function rasterizeObjectPlate(args: ExactPlateArgs): Promise<{
       readyTimeoutMs: 9000,
     });
     if (!data) return null;
-    return { plate: data, runs, shapes: shapes.map(({ node: _node, nodes: _nodes, ...rest }) => rest) };
+    return {
+      plate: data,
+      runs,
+      shapes: shapes.map(({ node: _node, nodes: _nodes, ...rest }) => rest),
+    };
   });
 }
 

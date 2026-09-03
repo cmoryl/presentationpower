@@ -17,7 +17,12 @@ import jsPDF from "jspdf";
 import { fetchIccProfile, wrapPdfAsX4 } from "./pdf-x4";
 
 import { captureAssetCanvas } from "./asset-export";
-import { BADGE_SPEC, badgeVersionSlug, cityBadgeDivision, type CityBadgeConfig } from "./next-city-badge";
+import {
+  BADGE_SPEC,
+  badgeVersionSlug,
+  cityBadgeDivision,
+  type CityBadgeConfig,
+} from "./next-city-badge";
 
 const SLUG_IN = 0.25;
 const PROOF_DPI = 150;
@@ -130,11 +135,29 @@ export async function exportCityBadge(opts: {
   });
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
-  pdf.addImage(plateJpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
+  pdf.addImage(
+    plateJpeg,
+    "JPEG",
+    (pageW - artW) / 2,
+    (pageH - artH) / 2,
+    artW,
+    artH,
+    undefined,
+    "FAST",
+  );
   drawCropMarks(pdf, pageW, pageH, SLUG_IN + BADGE_SPEC.bleed);
   if (backJpeg) {
     pdf.addPage([pageW, pageH], "portrait");
-    pdf.addImage(backJpeg, "JPEG", (pageW - artW) / 2, (pageH - artH) / 2, artW, artH, undefined, "FAST");
+    pdf.addImage(
+      backJpeg,
+      "JPEG",
+      (pageW - artW) / 2,
+      (pageH - artH) / 2,
+      artW,
+      artH,
+      undefined,
+      "FAST",
+    );
     drawCropMarks(pdf, pageW, pageH, SLUG_IN + BADGE_SPEC.bleed);
   }
 
@@ -161,7 +184,10 @@ export async function exportCityBadge(opts: {
   opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
   const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_DPI);
   const proofBlob: Blob = await new Promise((resolve, reject) => {
-    proofCanvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");
+    proofCanvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("proof render failed"))),
+      "image/png",
+    );
   });
   const proofBuffer = await proofBlob.arrayBuffer();
 

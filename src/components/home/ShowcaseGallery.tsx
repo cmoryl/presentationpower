@@ -133,11 +133,11 @@ function buildShowcasePreview(entry: ShowcaseEntry): ShowcasePreview | null {
     const pb = getSocialPlaybook(entry.playbookId);
     if (!pb) return null;
     const kit = KIT_PROFILES_BY_ID[pb.kitProfileId];
-    const assets = buildCampaignAssets(
-      sourceFromSocialPlaybook(pb),
-      factsFromSocialPlaybook(pb),
-      { formatIds: kit?.formatIds ?? [], mode: "dark", brandId: pb.subBrand },
-    );
+    const assets = buildCampaignAssets(sourceFromSocialPlaybook(pb), factsFromSocialPlaybook(pb), {
+      formatIds: kit?.formatIds ?? [],
+      mode: "dark",
+      brandId: pb.subBrand,
+    });
     return {
       name: pb.name,
       accent: pb.accent,

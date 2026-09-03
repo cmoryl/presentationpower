@@ -1,7 +1,7 @@
 // Spec rows — label → value table with a shaded header strip. Used for scope,
 // SLA, language coverage and deliverable specs across curated collateral.
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, safeList} from "../shared";
+import { cq, sectionInk, MODULE, safeList } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 

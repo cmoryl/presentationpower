@@ -49,7 +49,12 @@ describe("auditVizSpec — correctness rules", () => {
       spec({
         kind: "donut",
         encoding: { label: "label", value: "value" },
-        data: { rows: [{ label: "A", value: 60 }, { label: "B", value: -10 }] },
+        data: {
+          rows: [
+            { label: "A", value: 60 },
+            { label: "B", value: -10 },
+          ],
+        },
       }),
     );
     expect(a.findings.map((f) => f.code)).toContain("VIZ-NEGATIVE-SHARE");
@@ -194,7 +199,9 @@ describe("platform sweep", () => {
   it("leaves no blocking defect after the deterministic repair pass", () => {
     const offenders = report.rows
       .filter((r) => r.after.blockers > 0)
-      .map((r) => `${r.kind}/${r.surface}/${r.mode}: ${r.after.findings.map((f) => f.code).join(",")}`);
+      .map(
+        (r) => `${r.kind}/${r.surface}/${r.mode}: ${r.after.findings.map((f) => f.code).join(",")}`,
+      );
     expect(offenders).toEqual([]);
   });
 

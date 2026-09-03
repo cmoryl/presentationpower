@@ -439,7 +439,6 @@ function styleAxis(styleId: string): Vec {
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
 
-
 function stopsFor(panel: LondonPanel): string[] {
   return londonPanelStops(panel);
 }
@@ -455,7 +454,6 @@ export function londonPanelStops(panel: LondonPanel): string[] {
   // end of the ramp; master-brand items are returned unchanged.
   return londonDivisionStops(londonPanelFamily(panel), base);
 }
-
 
 /**
  * Output colour space for a regenerated master. `rgb` is the default and the
@@ -500,7 +498,6 @@ export function londonGroundBox(
   };
 }
 
-
 /**
  * Rebuild a panel's SVG from its own specification: full-bleed artboard in mm,
  * live linear gradient, trim box marked as metadata only (never a drawn line).
@@ -533,7 +530,6 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
   const paint = isHalo
     ? `<radialGradient id="${id}" cx="50%" cy="45%" r="72%">${ramp}</radialGradient>`
     : `<linearGradient id="${id}" x1="${axis.x1 * 100}%" y1="${axis.y1 * 100}%" x2="${axis.x2 * 100}%" y2="${axis.y2 * 100}%">${ramp}</linearGradient>`;
-
 
   const marginX = ((panel.bleedW - panel.trimW) / 2).toFixed(2);
   const marginY = ((panel.bleedH - panel.trimH) / 2).toFixed(2);
@@ -617,7 +613,6 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
       })()
     : "";
 
-
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
     ` viewBox="0 0 ${panel.bleedW} ${panel.bleedH}" data-panel="${panel.id}"`,
@@ -643,9 +638,7 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
       : `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
     // NEXTbrew café motif: live vector marks on top of the ground, never baked
     // into the gradient. Suppressed on supplied vendor artwork.
-    !boothArt && isBrewPanel(panel)
-      ? brewMotifSvgLayer(brewMotifPlan(panel), paintFor)
-      : "",
+    !boothArt && isBrewPanel(panel) ? brewMotifSvgLayer(brewMotifPlan(panel), paintFor) : "",
 
     wall
       ? stepRepeatSvgLayer(panel, wall, {
@@ -662,11 +655,7 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
     wall || !brand.lockupOn ? "" : logoGroup,
     `</svg>`,
   ].join("");
-
 }
-
-
-
 
 function escapeXml(s: string): string {
   return s.replace(/[<>&"]/g, (c) =>
@@ -697,10 +686,7 @@ function gradientRgb(stops: string[], t: number): [number, number, number] {
  * raster is embedded. Gouraud meshes were rejected here: RIPs read them fine
  * but Illustrator re-interprets them and the colours come in wrong.
  */
-export function buildLondonPanelAi(
-  panel: LondonPanel,
-  options: LondonArtOptions = {},
-): Uint8Array {
+export function buildLondonPanelAi(panel: LondonPanel, options: LondonArtOptions = {}): Uint8Array {
   const cmyk = options.colorSpace === "cmyk";
   const vibrance = options.vibrance ?? 1;
   const w = panel.bleedW * MM_TO_PT;
@@ -737,10 +723,9 @@ export function buildLondonPanelAi(
           : axialShadingDict(from, to, stops);
       })();
 
-  const wall =
-    isStepRepeatPanel(panel)
-      ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
-      : null;
+  const wall = isStepRepeatPanel(panel)
+    ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
+    : null;
 
   // Supplied vendor artwork: embedded as a real image XObject so the `.ai`
   // opens on the vendor's own wall (placed, movable, its own layer) instead of
@@ -767,7 +752,9 @@ export function buildLondonPanelAi(
     .join("");
 
   const copyInk = cmyk
-    ? cmykFillOp(brand.colourway === "dblue" ? { c: 0, m: 0, y: 0, k: 1 } : { c: 0, m: 0, y: 0, k: 0 })
+    ? cmykFillOp(
+        brand.colourway === "dblue" ? { c: 0, m: 0, y: 0, k: 1 } : { c: 0, m: 0, y: 0, k: 0 },
+      )
     : fillOp(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
 
   const copyOps = brand.copy
@@ -832,7 +819,6 @@ export function buildLondonPanelAi(
       })()
     : "";
 
-
   // Three real Illustrator layers via optional content groups. Paint order is
   // ground → copy (with the QR block) → hero lockup, and /OCProperties /Order
   // lists the hero lockup FIRST, so it is the top layer when the .ai is opened.
@@ -885,7 +871,6 @@ export function buildLondonPanelAi(
       (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
       (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
 
-
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [8 0 R 9 0 R 10 0 R] ` +
       `/D << /Order [8 0 R 9 0 R 10 0 R] /ON [8 0 R 9 0 R 10 0 R] >> >> >>`,
@@ -897,9 +882,7 @@ export function buildLondonPanelAi(
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
       `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
       `${groundImage ? "/XObject << /ImGround 11 0 R >> " : ""}` +
-
       `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ${brewGs}>> ` +
-
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
@@ -927,7 +910,6 @@ export function buildLondonPanelAi(
         `/Length ${groundImage.bytes.length} >>\nstream\n${latin1(groundImage.bytes)}\nendstream`,
     );
   }
-
 
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
   const offsets: number[] = [];
@@ -1034,8 +1016,7 @@ export async function buildLondonPanelAiAsync(
   options: LondonArtOptions = {},
 ): Promise<Uint8Array> {
   const art = londonBoothArtworkUrl(panel.id);
-  const groundImage =
-    options.groundImage ?? (art ? await loadLondonGroundImage(art) : null);
+  const groundImage = options.groundImage ?? (art ? await loadLondonGroundImage(art) : null);
   return buildLondonPanelAi(panel, { ...options, groundImage });
 }
 
@@ -1059,7 +1040,6 @@ export function londonAiBytes(ai: string | Uint8Array): Uint8Array<ArrayBuffer> 
   return bytes;
 }
 
-
 function pdfText(s: string): string {
   return s.replace(/[\\()]/g, (c) => `\\${c}`);
 }
@@ -1073,7 +1053,6 @@ export function londonPanelFileBase(
   const space = colorSpace === "cmyk" ? "-cmyk" : "";
   return `r${String(rev).padStart(3, "0")}-${panelSlug(panel)}${space}`;
 }
-
 
 /**
  * Cheap content fingerprint (FNV-1a) recorded per regenerated file, so a
@@ -1130,7 +1109,6 @@ export function effectiveLondonPanels(revisions: LondonRevision[]): LondonPanel[
   const known = new Set(latest.panels.map((p) => p.id));
   return [...latest.panels, ...LONDON_PANELS.filter((p) => !known.has(p.id))];
 }
-
 
 /** Panels present in `to` but not in `from` — used when restoring a revision. */
 export function addedBetween(from: LondonPanel[], to: LondonPanel[]): LondonPanel[] {

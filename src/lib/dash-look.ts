@@ -138,7 +138,6 @@ export function dashLook(pack: StylePack | null | undefined, variantId: string):
     return { ...CANONICAL, chart, metric };
   }
 
-
   const geo = packGeometry(pack);
   const compose = packCompose(pack);
   const seed = hash(`${pack.id}:${geo.scaffold}:${geo.device}`);

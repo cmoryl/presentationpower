@@ -6,7 +6,12 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { callAnthropic, extractJsonObject, hasAnthropicKey, ANTHROPIC_SETUP_MESSAGE } from "./ai-core";
+import {
+  callAnthropic,
+  extractJsonObject,
+  hasAnthropicKey,
+  ANTHROPIC_SETUP_MESSAGE,
+} from "./ai-core";
 
 const RewriteItem = z.object({
   slideId: z.string(),
@@ -37,28 +42,25 @@ export const rewriteForCharCaps = createServerFn({ method: "POST" })
       "Rules: preserve the meaning, tone, numbers, and proper nouns exactly.",
       "Never add claims, never invent facts, never use lorem ipsum.",
       "Each rewritten text MUST be at most its maxChars character limit — count carefully.",
-      "Return ONLY JSON: {\"items\":[{\"slideId\":\"...\",\"field\":\"...\",\"text\":\"...\"}]} with one entry per input item, in order.",
+      'Return ONLY JSON: {"items":[{"slideId":"...","field":"...","text":"..."}]} with one entry per input item, in order.',
     ].join(" ");
 
     const user = JSON.stringify({ items: data.items });
     const res = await callAnthropic([system], user, { maxTokens: 4096, temperature: 0.2 });
     if (!res.ok) throw new Error(`AI rewrite failed (${res.status}): ${res.body.slice(0, 200)}`);
 
-    const parsed = extractJsonObject(res.text) as
-      | { items?: Array<{ slideId?: unknown; field?: unknown; text?: unknown }> }
-      | null;
+    const parsed = extractJsonObject(res.text) as {
+      items?: Array<{ slideId?: unknown; field?: unknown; text?: unknown }>;
+    } | null;
     const out = Array.isArray(parsed?.items) ? parsed!.items! : [];
 
     // Join model output back onto the requested items; anything the model
     // missed or over-ran is clamped deterministically so a gate never stays
     // red because of model drift.
     const fixes = data.items.map((req, i) => {
-      const match =
-        out.find((o) => o.slideId === req.slideId && o.field === req.field) ?? out[i];
+      const match = out.find((o) => o.slideId === req.slideId && o.field === req.field) ?? out[i];
       const text =
-        typeof match?.text === "string" && match.text.trim() !== ""
-          ? match.text
-          : req.text;
+        typeof match?.text === "string" && match.text.trim() !== "" ? match.text : req.text;
       return {
         slideId: req.slideId,
         field: req.field,

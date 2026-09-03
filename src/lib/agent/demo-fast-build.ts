@@ -5,7 +5,6 @@
 // AI generation path untouched.
 import type { DeckSnapshot } from "@/lib/deck-store";
 
-
 export const DEMO_FAST_BUILD_TRIGGER =
   "Create a 6-slide GlobalLink Q3 business review with stats and a case study";
 
@@ -64,7 +63,8 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
         authorizedAccentOverride: true,
         reference: "GLOBALLINK · Q3 FY26",
         title: "GlobalLink Q3 business review",
-        clientName: "GlobalLink enterprise programs · AI-assisted delivery, proof and Q4 scale plan",
+        clientName:
+          "GlobalLink enterprise programs · AI-assisted delivery, proof and Q4 scale plan",
         prepared: "TransPerfect Digital",
         date: "Q3 FY26",
       },
@@ -141,7 +141,8 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
           },
         ],
       },
-      notes: "Use the bento to show proof, workflow, adoption and the case-study bridge in one modular page.",
+      notes:
+        "Use the bento to show proof, workflow, adoption and the case-study bridge in one modular page.",
     },
     {
       sectionId: "SF-04",
@@ -253,7 +254,8 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
           },
         ],
       },
-      notes: "Every KPI is sourced so export QA stays clean while judges see a real dashboard module.",
+      notes:
+        "Every KPI is sourced so export QA stays clean while judges see a real dashboard module.",
     },
     {
       sectionId: "SF-04",
@@ -263,14 +265,14 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
       content: {
         eyebrow: "Live platform view",
         title: "The QBR dashboard becomes the workbench",
-        body:
-          "Program owners can move from KPI variance to the exact market, workflow and reviewer queue that needs attention.",
+        body: "Program owners can move from KPI variance to the exact market, workflow and reviewer queue that needs attention.",
         caption: "GlobalLink Now · program command center",
         mediaSeed: "GlobalLink dashboard laptop screen enterprise localization",
         deviceKind: "laptop",
         deviceTone: "graphite",
       },
-      notes: "Show that this is not static reporting — the live product view links metrics to action.",
+      notes:
+        "Show that this is not static reporting — the live product view links metrics to action.",
     },
     {
       sectionId: "SF-16",
@@ -282,14 +284,14 @@ export const GLOBALLINK_Q3_QBR_DECK: DeckSnapshot = {
         accentOverride: "#A1FBF9",
         authorizedAccentOverride: true,
         title: "Approve the Q4 scale plan",
-        body:
-          "Repeat the retail case-study result — three weeks to four days across 14 markets — by expanding AI-assisted workflows to the next wave of priority accounts.",
+        body: "Repeat the retail case-study result — three weeks to four days across 14 markets — by expanding AI-assisted workflows to the next wave of priority accounts.",
         ctaLabel: "Greenlight Q4 rollout",
         ctaDetail: "Pilot scope ready this week.",
         owner: "GlobalLink account team",
         mediaSeed: "executive kickoff workshop localization roadmap",
       },
-      notes: "Close with a dark split image and CTA that turns the case-study proof into the next decision.",
+      notes:
+        "Close with a dark split image and CTA that turns the case-study proof into the next decision.",
     },
   ],
 };

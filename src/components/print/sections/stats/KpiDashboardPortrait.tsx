@@ -2,7 +2,7 @@
 // hairlines, big value + label + optional delta. Sized for an 816px canvas.
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, safeList} from "../shared";
+import { cq, sectionInk, MODULE, safeList } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 

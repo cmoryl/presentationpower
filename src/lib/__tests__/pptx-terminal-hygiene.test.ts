@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import JSZip from "jszip";
-import {
-  applyTerminalPptxHygiene,
-  preserveDrawingTextWhitespace,
-} from "../pptx-terminal-hygiene";
+import { applyTerminalPptxHygiene, preserveDrawingTextWhitespace } from "../pptx-terminal-hygiene";
 
 describe("terminal PowerPoint hygiene", () => {
   it("marks DrawingML runs whose intentional edge whitespace must be preserved", () => {

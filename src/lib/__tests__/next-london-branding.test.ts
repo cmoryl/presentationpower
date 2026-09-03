@@ -51,4 +51,3 @@ describe("London signage branding", () => {
     }
   });
 });
-

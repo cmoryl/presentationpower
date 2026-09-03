@@ -100,7 +100,10 @@ export function BackgroundSetEditor({
   function apply(row: SkinBackdropRow) {
     setRows((prev) => {
       const k = keyOf(row.skinCode.toUpperCase(), row.scene, row.take);
-      const next = [row, ...prev.filter((r) => keyOf(r.skinCode.toUpperCase(), r.scene, r.take) !== k)];
+      const next = [
+        row,
+        ...prev.filter((r) => keyOf(r.skinCode.toUpperCase(), r.scene, r.take) !== k),
+      ];
       return next;
     });
   }
@@ -196,7 +199,12 @@ export function BackgroundSetEditor({
               byKey.has(keyOf(code, s, t)),
             );
             return (
-              <button key={s} type="button" className={chip(s === scene)} onClick={() => setScene(s)}>
+              <button
+                key={s}
+                type="button"
+                className={chip(s === scene)}
+                onClick={() => setScene(s)}
+              >
                 {s}
                 {has && <span className="ml-1 text-[#A6FA87]">•</span>}
               </button>
@@ -306,8 +314,8 @@ export function BackgroundSetEditor({
 
         {!canEdit && (
           <p className="rounded-xl border border-black/10 p-3 text-[12px] text-black/55 dark:border-white/10 dark:text-white/55">
-            Sign in with an admin or brand role to replace approved backgrounds. You can still review
-            every composition here.
+            Sign in with an admin or brand role to replace approved backgrounds. You can still
+            review every composition here.
           </p>
         )}
 

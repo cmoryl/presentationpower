@@ -106,7 +106,12 @@ import {
   useSafeAreaGuides,
 } from "@/components/slide/SafeAreaGuides";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
+import {
+  DeckPackScope,
+  deckPack,
+  deckPackResolver,
+  packBrand,
+} from "@/components/slide/DeckPackScope";
 import type { StylePack } from "@/lib/style-packs";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
@@ -325,8 +330,7 @@ function DeckEditor() {
     const onKey = (e: KeyboardEvent) => {
       if (!(e.metaKey || e.ctrlKey) || e.altKey) return;
       const t = e.target as HTMLElement | null;
-      if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA"))
-        return;
+      if (t && (t.isContentEditable || t.tagName === "INPUT" || t.tagName === "TEXTAREA")) return;
       const key = e.key.toLowerCase();
       if (key === "z" && !e.shiftKey) {
         e.preventDefault();
@@ -546,7 +550,9 @@ function DeckEditor() {
               title={deck.title}
               meta={
                 <>
-                  <span>{deck.slides.length} slide{deck.slides.length === 1 ? "" : "s"}</span>
+                  <span>
+                    {deck.slides.length} slide{deck.slides.length === 1 ? "" : "s"}
+                  </span>
                   <MetaDot />
                   <span>{brand.name}</span>
                   {qa.length > 0 && (
@@ -1963,8 +1969,8 @@ function DeckEditor() {
                                 </details>
                                 <SlideRefitButton deckId={deck.id} slide={active} />
                                 <p className="text-[11px] leading-snug text-black/45">
-                                  Re-authors this slide&rsquo;s existing copy and speaker notes
-                                  into the current layout&rsquo;s fields. Never invents new facts.
+                                  Re-authors this slide&rsquo;s existing copy and speaker notes into
+                                  the current layout&rsquo;s fields. Never invents new facts.
                                 </p>
                               </div>
                             </Panel>
@@ -2089,8 +2095,9 @@ function DeckEditor() {
                               <div className="mt-1 font-medium">{mv.name}</div>
                               <div className="mt-2 text-sm text-black/60">{mv.description}</div>
                               <p className="mt-2 text-[11px] leading-snug text-black/45">
-                                Swaps live in the dedicated <span className="font-semibold">Swap</span>{" "}
-                                tab at the top of this panel.
+                                Swaps live in the dedicated{" "}
+                                <span className="font-semibold">Swap</span> tab at the top of this
+                                panel.
                               </p>
                             </Panel>
                           )}

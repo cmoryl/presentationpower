@@ -142,7 +142,6 @@ export function sceneTakeFromSeed(seed: string): { take: number } {
   return { take: m ? parseInt(m[1]!, 10) : 0 };
 }
 
-
 /**
  * Re-render on replacement.
  *

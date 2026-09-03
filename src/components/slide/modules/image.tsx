@@ -386,9 +386,7 @@ registerSlideModule({
                     className="mt-8 pt-6"
                     style={{
                       borderTop: `${i === 1 ? 2 : 1}px solid ${
-                        i === 1
-                          ? (itemTone(p.panel) ?? brand.tokens.accent)
-                          : `${ink.hairline}`
+                        i === 1 ? (itemTone(p.panel) ?? brand.tokens.accent) : `${ink.hairline}`
                       }`,
                     }}
                   >
@@ -508,57 +506,57 @@ registerSlideModule({
                     ? cellAccent(it, brand.tokens.accent, mode)
                     : "var(--slide-accent-text)";
                   return (
-                  <div key={i} data-intro-item="" data-intro-step={i} className="min-w-0">
-                    <GlassTile radius={26} padding="p-6" className="flex h-full min-w-0 gap-7">
-                      <MediaTile
-                        overrideUrl={s(it.mediaUrl)}
-                        mediaPath={s(it.mediaPath)}
-                        brand={brand}
-                        seed={s(it.seed, `mx-${i}`)}
-                        className="h-full w-[236px] shrink-0 rounded-[18px]"
-                      />
-                      <div className="flex min-w-0 flex-1 flex-col justify-center pr-1">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="grid place-items-center tabular-nums"
-                            style={{
-                              width: 40,
-                              height: 40,
-                              borderRadius: 12,
-                              background: `color-mix(in oklab, ${cellInk} 14%, transparent)`,
-                              color: cellInk,
-                              fontSize: fillPx(18, "body"),
-                              fontWeight: 700,
-                            }}
-                          >
-                            {String(i + 1).padStart(2, "0")}
+                    <div key={i} data-intro-item="" data-intro-step={i} className="min-w-0">
+                      <GlassTile radius={26} padding="p-6" className="flex h-full min-w-0 gap-7">
+                        <MediaTile
+                          overrideUrl={s(it.mediaUrl)}
+                          mediaPath={s(it.mediaPath)}
+                          brand={brand}
+                          seed={s(it.seed, `mx-${i}`)}
+                          className="h-full w-[236px] shrink-0 rounded-[18px]"
+                        />
+                        <div className="flex min-w-0 flex-1 flex-col justify-center pr-1">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="grid place-items-center tabular-nums"
+                              style={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 12,
+                                background: `color-mix(in oklab, ${cellInk} 14%, transparent)`,
+                                color: cellInk,
+                                fontSize: fillPx(18, "body"),
+                                fontWeight: 700,
+                              }}
+                            >
+                              {String(i + 1).padStart(2, "0")}
+                            </div>
+                            <div
+                              aria-hidden
+                              style={{
+                                height: 2,
+                                flex: 1,
+                                background: `linear-gradient(90deg, color-mix(in oklab, ${cellInk} 34%, transparent), transparent)`,
+                              }}
+                            />
                           </div>
                           <div
-                            aria-hidden
+                            className="mt-4"
                             style={{
-                              height: 2,
-                              flex: 1,
-                              background: `linear-gradient(90deg, color-mix(in oklab, ${cellInk} 34%, transparent), transparent)`,
+                              fontSize: fillPx(30, "figure"),
+                              fontWeight: 600,
+                              letterSpacing: "-0.015em",
+                              color: ink.strong,
                             }}
-                          />
+                          >
+                            {s(it.label)}
+                          </div>
+                          <SupportingText size="md" opacity={0.75} className="mt-3">
+                            {s(it.body)}
+                          </SupportingText>
                         </div>
-                        <div
-                          className="mt-4"
-                          style={{
-                            fontSize: fillPx(30, "figure"),
-                            fontWeight: 600,
-                            letterSpacing: "-0.015em",
-                            color: ink.strong,
-                          }}
-                        >
-                          {s(it.label)}
-                        </div>
-                        <SupportingText size="md" opacity={0.75} className="mt-3">
-                          {s(it.body)}
-                        </SupportingText>
-                      </div>
-                    </GlassTile>
-                  </div>
+                      </GlassTile>
+                    </div>
                   );
                 })}
             </div>

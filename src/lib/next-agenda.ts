@@ -48,13 +48,7 @@ export type AgendaSizeId =
 /** Screen presets are authored in px and converted at 96 ppi CSS reference. */
 export const PX_TO_MM = 25.4 / 96;
 
-const screen = (
-  id: AgendaSizeId,
-  name: string,
-  note: string,
-  pxW: number,
-  pxH: number,
-) => ({
+const screen = (id: AgendaSizeId, name: string, note: string, pxW: number, pxH: number) => ({
   id,
   name,
   note,
@@ -75,18 +69,76 @@ export const AGENDA_SIZES: {
   pxW?: number;
   pxH?: number;
 }[] = [
-  { id: "a4", name: "A4 handout", note: "Desk / delegate-bag programme, digital print.", trimW: 210, trimH: 297, medium: "print" },
-  { id: "a3", name: "A3 room card", note: "Breakout-room door and stage-wing card.", trimW: 297, trimH: 420, medium: "print" },
-  { id: "a2", name: "A2 board", note: "Registration and concourse agenda board.", trimW: 420, trimH: 594, medium: "print" },
-  { id: "a1", name: "A1 board", note: "Main entrance agenda board, reads at distance.", trimW: 594, trimH: 841, medium: "print" },
-  screen("screen-16x9", "Screen · 16:9 HD", "Holding screens, stage LED and room displays.", 1920, 1080),
-  screen("screen-9x16", "Screen · 9:16 vertical", "Lobby verticals, totems and story frames.", 1080, 1920),
-  screen("screen-1x1", "Screen · 1:1 square", "Social agenda tile and lift-lobby panels.", 1080, 1080),
+  {
+    id: "a4",
+    name: "A4 handout",
+    note: "Desk / delegate-bag programme, digital print.",
+    trimW: 210,
+    trimH: 297,
+    medium: "print",
+  },
+  {
+    id: "a3",
+    name: "A3 room card",
+    note: "Breakout-room door and stage-wing card.",
+    trimW: 297,
+    trimH: 420,
+    medium: "print",
+  },
+  {
+    id: "a2",
+    name: "A2 board",
+    note: "Registration and concourse agenda board.",
+    trimW: 420,
+    trimH: 594,
+    medium: "print",
+  },
+  {
+    id: "a1",
+    name: "A1 board",
+    note: "Main entrance agenda board, reads at distance.",
+    trimW: 594,
+    trimH: 841,
+    medium: "print",
+  },
+  screen(
+    "screen-16x9",
+    "Screen · 16:9 HD",
+    "Holding screens, stage LED and room displays.",
+    1920,
+    1080,
+  ),
+  screen(
+    "screen-9x16",
+    "Screen · 9:16 vertical",
+    "Lobby verticals, totems and story frames.",
+    1080,
+    1920,
+  ),
+  screen(
+    "screen-1x1",
+    "Screen · 1:1 square",
+    "Social agenda tile and lift-lobby panels.",
+    1080,
+    1080,
+  ),
   screen("screen-4x5", "Screen · 4:5 portrait", "In-feed social programme post.", 1080, 1350),
-  screen("screen-ultrawide", "Screen · 21:9 ultrawide", "Concourse ribbon and wide LED band.", 2560, 1080),
-  { id: "custom", name: "Custom size", note: "Type the measured trim of the board.", trimW: 500, trimH: 700, medium: "print" },
+  screen(
+    "screen-ultrawide",
+    "Screen · 21:9 ultrawide",
+    "Concourse ribbon and wide LED band.",
+    2560,
+    1080,
+  ),
+  {
+    id: "custom",
+    name: "Custom size",
+    note: "Type the measured trim of the board.",
+    trimW: 500,
+    trimH: 700,
+    medium: "print",
+  },
 ];
-
 
 export const AGENDA_CUSTOM_SIZE = {
   w: { min: 120, max: 1600, step: 5 },
@@ -126,12 +178,21 @@ const LIGHT_BASE = [247, 249, 252] as const;
 function tint(hex: string, amount: number): string {
   const h = hex.replace("#", "");
   const n = parseInt(
-    h.length === 3 ? h.split("").map((c) => c + c).join("") : h,
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h,
     16,
   );
   const rgb = [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   return `#${rgb
-    .map((c, i) => Math.round(c + (LIGHT_BASE[i]! - c) * amount).toString(16).padStart(2, "0"))
+    .map((c, i) =>
+      Math.round(c + (LIGHT_BASE[i]! - c) * amount)
+        .toString(16)
+        .padStart(2, "0"),
+    )
     .join("")}`.toUpperCase();
 }
 
@@ -230,165 +291,569 @@ export type AgendaConfig = {
   pageLabel?: string;
 };
 
-
 /**
  * Division-specific default programmes. Every NEXT area opens on its own
  * agenda copy, so an operator starts from a real programme for that track
  * rather than a blank grid.
  */
-const DIVISION_PROGRAMMES: Record<string, { title: string; meta: string; sessions: AgendaSession[] }> = {
+const DIVISION_PROGRAMMES: Record<
+  string,
+  { title: string; meta: string; sessions: AgendaSession[] }
+> = {
   "city-series": {
     title: "DAY ONE",
     meta: "City Series · 2026 season",
     sessions: [
-      { time: "08:30", title: "Registration & welcome coffee", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Opening keynote — the local-language decade", detail: "Sofia Alvarez, Chief Executive", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "City panel: content velocity in market", detail: "Regional leads roundtable", track: "MAIN STAGE", muted: false },
-      { time: "11:30", title: "Break & expo floor", detail: "Partner stands open", track: "", muted: true },
-      { time: "12:00", title: "Workshops — AI-assisted localization", detail: "Rooms 1–4, choose your track", track: "WORKSHOP", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & welcome coffee",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Opening keynote — the local-language decade",
+        detail: "Sofia Alvarez, Chief Executive",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "City panel: content velocity in market",
+        detail: "Regional leads roundtable",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "11:30",
+        title: "Break & expo floor",
+        detail: "Partner stands open",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "12:00",
+        title: "Workshops — AI-assisted localization",
+        detail: "Rooms 1–4, choose your track",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Client stories from the City Series", detail: "Three markets, three programmes", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing remarks & drinks reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Client stories from the City Series",
+        detail: "Three markets, three programmes",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing remarks & drinks reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   globallink: {
     title: "DAY ONE",
     meta: "GlobalLink NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & platform lab open", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — one platform, every channel", detail: "GlobalLink product leadership", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "Connector clinic: CMS, PIM & commerce", detail: "Live integrations, bring a stack", track: "LAB", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & platform lab open",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — one platform, every channel",
+        detail: "GlobalLink product leadership",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "Connector clinic: CMS, PIM & commerce",
+        detail: "Live integrations, bring a stack",
+        track: "LAB",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Automation blueprints for global teams", detail: "Workflow patterns that scale", track: "WORKSHOP", muted: false },
+      {
+        time: "12:00",
+        title: "Automation blueprints for global teams",
+        detail: "Workflow patterns that scale",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & partner expo", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Roadmap deep dive", detail: "What ships next, and why", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Ask the engineers", detail: "Open floor Q&A", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Roadmap deep dive",
+        detail: "What ships next, and why",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Ask the engineers",
+        detail: "Open floor Q&A",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   finance: {
     title: "DAY ONE",
     meta: "Finance NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & breakfast briefing", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — regulated content at speed", detail: "Global banking & markets panel", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "Disclosure, KID & prospectus workflows", detail: "Compliance-first localization", track: "WORKSHOP", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & breakfast briefing",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — regulated content at speed",
+        detail: "Global banking & markets panel",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "Disclosure, KID & prospectus workflows",
+        detail: "Compliance-first localization",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Model governance & audit trails", detail: "Where AI is allowed, and where it is not", track: "LAB", muted: false },
+      {
+        time: "12:00",
+        title: "Model governance & audit trails",
+        detail: "Where AI is allowed, and where it is not",
+        track: "LAB",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Client story: 27 markets, one review cycle", detail: "Tier-1 asset manager", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing panel & reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Client story: 27 markets, one review cycle",
+        detail: "Tier-1 asset manager",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing panel & reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   games: {
     title: "DAY ONE",
     meta: "Games NEXT · agenda",
     sessions: [
-      { time: "09:00", title: "Doors & arcade open", detail: "Play the localized builds", track: "", muted: true },
-      { time: "10:00", title: "Keynote — shipping worldwide day one", detail: "Studio leadership panel", track: "MAIN STAGE", muted: false },
-      { time: "11:00", title: "Voice, VO & lip-sync pipelines", detail: "From script lock to gold master", track: "STUDIO", muted: false },
+      {
+        time: "09:00",
+        title: "Doors & arcade open",
+        detail: "Play the localized builds",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "10:00",
+        title: "Keynote — shipping worldwide day one",
+        detail: "Studio leadership panel",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "11:00",
+        title: "Voice, VO & lip-sync pipelines",
+        detail: "From script lock to gold master",
+        track: "STUDIO",
+        muted: false,
+      },
       { time: "12:00", title: "Break & arcade", detail: "", track: "", muted: true },
-      { time: "12:30", title: "LQA at scale", detail: "Test plans, device farms, live ops", track: "LAB", muted: false },
+      {
+        time: "12:30",
+        title: "LQA at scale",
+        detail: "Test plans, device farms, live ops",
+        track: "LAB",
+        muted: false,
+      },
       { time: "13:30", title: "Lunch", detail: "Atrium", track: "", muted: true },
-      { time: "14:30", title: "Live-ops content sprints", detail: "Weekly drops in 14 languages", track: "WORKSHOP", muted: false },
-      { time: "17:00", title: "Player-community showcase & drinks", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:30",
+        title: "Live-ops content sprints",
+        detail: "Weekly drops in 14 languages",
+        track: "WORKSHOP",
+        muted: false,
+      },
+      {
+        time: "17:00",
+        title: "Player-community showcase & drinks",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   legal: {
     title: "DAY ONE",
     meta: "Legal NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & CLE check-in", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — eDiscovery without borders", detail: "Litigation technology panel", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "Multilingual review workflows", detail: "Trial Interactive walkthrough", track: "LAB", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & CLE check-in",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — eDiscovery without borders",
+        detail: "Litigation technology panel",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "Multilingual review workflows",
+        detail: "Trial Interactive walkthrough",
+        track: "LAB",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Privilege, redaction & data residency", detail: "Cross-border practicalities", track: "WORKSHOP", muted: false },
+      {
+        time: "12:00",
+        title: "Privilege, redaction & data residency",
+        detail: "Cross-border practicalities",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Case study: arbitration in three languages", detail: "Counsel and project leads", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing panel & reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Case study: arbitration in three languages",
+        detail: "Counsel and project leads",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing panel & reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   "life-sci": {
     title: "DAY ONE",
     meta: "Life Sci NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & coffee", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — trials that read in every market", detail: "Clinical operations leadership", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "eCOA, ICF & patient-facing content", detail: "Linguistic validation in practice", track: "WORKSHOP", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & coffee",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — trials that read in every market",
+        detail: "Clinical operations leadership",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "eCOA, ICF & patient-facing content",
+        detail: "Linguistic validation in practice",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Regulatory submissions at pace", detail: "EMA, FDA and beyond", track: "LAB", muted: false },
+      {
+        time: "12:00",
+        title: "Regulatory submissions at pace",
+        detail: "EMA, FDA and beyond",
+        track: "LAB",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Case study: 42-country study start-up", detail: "Sponsor and CRO view", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing panel & reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Case study: 42-country study start-up",
+        detail: "Sponsor and CRO view",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing panel & reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   experience: {
     title: "DAY ONE",
     meta: "Experience NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & experience walk-through", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — one brand, every market", detail: "Global CX leadership", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "Journey localization clinic", detail: "Web, app and support in-market", track: "LAB", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & experience walk-through",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — one brand, every market",
+        detail: "Global CX leadership",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "Journey localization clinic",
+        detail: "Web, app and support in-market",
+        track: "LAB",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Personalisation without fragmentation", detail: "Governance for CX teams", track: "WORKSHOP", muted: false },
+      {
+        time: "12:00",
+        title: "Personalisation without fragmentation",
+        detail: "Governance for CX teams",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Client story: retail rollout in 19 markets", detail: "CX and content leads", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing panel & reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Client story: retail rollout in 19 markets",
+        detail: "CX and content leads",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing panel & reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   learn: {
     title: "DAY ONE",
     meta: "Learn NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & course lab open", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — training the global workforce", detail: "Learning leadership panel", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "eLearning localization clinic", detail: "SCORM, video and assessment", track: "LAB", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & course lab open",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — training the global workforce",
+        detail: "Learning leadership panel",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "eLearning localization clinic",
+        detail: "SCORM, video and assessment",
+        track: "LAB",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Voice, captions & accessibility", detail: "WCAG in every language", track: "WORKSHOP", muted: false },
+      {
+        time: "12:00",
+        title: "Voice, captions & accessibility",
+        detail: "WCAG in every language",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Case study: onboarding in 23 languages", detail: "Global enablement team", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing panel & reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Case study: onboarding in 23 languages",
+        detail: "Global enablement team",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing panel & reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   media: {
     title: "DAY ONE",
     meta: "Media NEXT · agenda",
     sessions: [
-      { time: "09:00", title: "Doors & screening room open", detail: "Localized reels on rotation", track: "", muted: true },
-      { time: "10:00", title: "Keynote — global release, one calendar", detail: "Studio distribution panel", track: "MAIN STAGE", muted: false },
-      { time: "11:00", title: "Dubbing, subtitling & audio description", detail: "Pipelines end to end", track: "STUDIO", muted: false },
+      {
+        time: "09:00",
+        title: "Doors & screening room open",
+        detail: "Localized reels on rotation",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "10:00",
+        title: "Keynote — global release, one calendar",
+        detail: "Studio distribution panel",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "11:00",
+        title: "Dubbing, subtitling & audio description",
+        detail: "Pipelines end to end",
+        track: "STUDIO",
+        muted: false,
+      },
       { time: "12:00", title: "Break & screening", detail: "", track: "", muted: true },
-      { time: "12:30", title: "Synthetic voice, human oversight", detail: "Where the line sits", track: "LAB", muted: false },
+      {
+        time: "12:30",
+        title: "Synthetic voice, human oversight",
+        detail: "Where the line sits",
+        track: "LAB",
+        muted: false,
+      },
       { time: "13:30", title: "Lunch", detail: "Atrium", track: "", muted: true },
-      { time: "14:30", title: "Metadata & discoverability", detail: "Getting found in every store", track: "WORKSHOP", muted: false },
-      { time: "17:00", title: "Premiere showcase & drinks", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:30",
+        title: "Metadata & discoverability",
+        detail: "Getting found in every store",
+        track: "WORKSHOP",
+        muted: false,
+      },
+      {
+        time: "17:00",
+        title: "Premiere showcase & drinks",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   digital: {
     title: "DAY ONE",
     meta: "Digital NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & coffee", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — search, social and AI answers", detail: "Digital marketing leadership", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "Multilingual SEO & LLM visibility clinic", detail: "Bring a domain, leave with a plan", track: "LAB", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & coffee",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — search, social and AI answers",
+        detail: "Digital marketing leadership",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "Multilingual SEO & LLM visibility clinic",
+        detail: "Bring a domain, leave with a plan",
+        track: "LAB",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Paid media in 30 markets", detail: "Creative, copy and compliance", track: "WORKSHOP", muted: false },
+      {
+        time: "12:00",
+        title: "Paid media in 30 markets",
+        detail: "Creative, copy and compliance",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Case study: organic growth across EMEA", detail: "Brand and agency leads", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing panel & reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Case study: organic growth across EMEA",
+        detail: "Brand and agency leads",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing panel & reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
   dataforce: {
     title: "DAY ONE",
     meta: "Dataforce NEXT · agenda",
     sessions: [
-      { time: "08:30", title: "Registration & data lab open", detail: "Concourse, Level 2", track: "", muted: true },
-      { time: "09:30", title: "Keynote — training data people can trust", detail: "AI data leadership panel", track: "MAIN STAGE", muted: false },
-      { time: "10:30", title: "Collection design for 100+ locales", detail: "Speech, text and image", track: "LAB", muted: false },
+      {
+        time: "08:30",
+        title: "Registration & data lab open",
+        detail: "Concourse, Level 2",
+        track: "",
+        muted: true,
+      },
+      {
+        time: "09:30",
+        title: "Keynote — training data people can trust",
+        detail: "AI data leadership panel",
+        track: "MAIN STAGE",
+        muted: false,
+      },
+      {
+        time: "10:30",
+        title: "Collection design for 100+ locales",
+        detail: "Speech, text and image",
+        track: "LAB",
+        muted: false,
+      },
       { time: "11:30", title: "Break", detail: "", track: "", muted: true },
-      { time: "12:00", title: "Annotation quality & human review", detail: "Guidelines that hold up", track: "WORKSHOP", muted: false },
+      {
+        time: "12:00",
+        title: "Annotation quality & human review",
+        detail: "Guidelines that hold up",
+        track: "WORKSHOP",
+        muted: false,
+      },
       { time: "13:00", title: "Lunch & networking", detail: "Atrium", track: "", muted: true },
-      { time: "14:00", title: "Case study: evaluation at model scale", detail: "Frontier-lab programme", track: "STUDIO", muted: false },
-      { time: "16:00", title: "Closing panel & reception", detail: "Terrace", track: "MAIN STAGE", muted: false },
+      {
+        time: "14:00",
+        title: "Case study: evaluation at model scale",
+        detail: "Frontier-lab programme",
+        track: "STUDIO",
+        muted: false,
+      },
+      {
+        time: "16:00",
+        title: "Closing panel & reception",
+        detail: "Terrace",
+        track: "MAIN STAGE",
+        muted: false,
+      },
     ],
   },
 };
@@ -429,7 +894,8 @@ export function agendaDefault(divisionId = "city-series"): AgendaConfig {
 export function withAgendaDivision(config: AgendaConfig, divisionId: string): AgendaConfig {
   const div = agendaDivision(divisionId);
   const fresh = agendaDefault(div.id);
-  const untouched = JSON.stringify(config.sessions) === JSON.stringify(agendaProgramme(config.divisionId).sessions);
+  const untouched =
+    JSON.stringify(config.sessions) === JSON.stringify(agendaProgramme(config.divisionId).sessions);
   const metaUntouched = config.meta === agendaProgramme(config.divisionId).meta;
   return {
     ...config,
@@ -474,7 +940,6 @@ export function agendaGeometry(config: { sizeId?: string; trimW?: number; trimH?
   };
 }
 
-
 export function agendaQrSize(config: AgendaConfig): number {
   const raw = Number(config.qrSize);
   const value = Number.isFinite(raw) && raw > 0 ? raw : 48;
@@ -510,8 +975,7 @@ export function agendaLayout(config: AgendaConfig) {
   const ratio = agendaDivision(config.divisionId).ratio || 1.7;
   // Cap the lockup against the sheet height so wide formats keep room for the
   // programme; portrait boards stay on the established 44% content width.
-  const lockupW =
-    Math.min(contentW * 0.44, geo.trimH * 0.2 * ratio) * agendaLockupScale(config);
+  const lockupW = Math.min(contentW * 0.44, geo.trimH * 0.2 * ratio) * agendaLockupScale(config);
   const lockupH = lockupW / ratio;
 
   const eyebrowSize = 5.4 * k;
@@ -519,7 +983,11 @@ export function agendaLayout(config: AgendaConfig) {
   const metaSize = 6.4 * k;
   const footSize = 4.4 * k;
   const qrEdge = Math.min(agendaQrSize(config), contentW * 0.35);
-  const headBlock = (config.showLockup ? lockupH + 9 * k : 0) + eyebrowSize * 2.4 + titleSize * 1.16 + metaSize * 2.1;
+  const headBlock =
+    (config.showLockup ? lockupH + 9 * k : 0) +
+    eyebrowSize * 2.4 +
+    titleSize * 1.16 +
+    metaSize * 2.1;
   const footBlock = (config.qrData.trim() ? qrEdge + footSize * 2.6 : 0) + footSize * 2.4;
   const listTop = geo.safeInset + headBlock;
   const listBottom = geo.trimH - geo.safeInset - footBlock;
@@ -590,7 +1058,9 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     divisionId: base.divisionId,
     face: raw.face === "light" ? "light" : "dark",
     styleId: AGENDA_STYLE_IDS.includes(String(raw.styleId)) ? String(raw.styleId) : base.styleId,
-    sizeId: AGENDA_SIZES.some((s) => s.id === raw.sizeId) ? (raw.sizeId as AgendaSizeId) : base.sizeId,
+    sizeId: AGENDA_SIZES.some((s) => s.id === raw.sizeId)
+      ? (raw.sizeId as AgendaSizeId)
+      : base.sizeId,
     trimW: num(raw.trimW, base.trimW),
     trimH: num(raw.trimH, base.trimH),
     showLockup: raw.showLockup !== false,
@@ -605,30 +1075,29 @@ export function normalizeAgendaConfig(input: unknown): AgendaConfig {
     qrSize: num(raw.qrSize, base.qrSize),
     qrCaption: str(raw.qrCaption, base.qrCaption),
     eventLabel: str(raw.eventLabel, ""),
-    days: Array.isArray(raw.days) && raw.days.length
-      ? raw.days.slice(0, 14).map((d, i) => {
-          const day = (d ?? {}) as Partial<AgendaDay>;
-          const rows = Array.isArray(day.sessions)
-            ? day.sessions.slice(0, 60).map((s) => ({
-                time: str((s as AgendaSession)?.time, ""),
-                title: str((s as AgendaSession)?.title, ""),
-                detail: str((s as AgendaSession)?.detail, ""),
-                track: str((s as AgendaSession)?.track, ""),
-                muted: Boolean((s as AgendaSession)?.muted),
-              }))
-            : [];
-          return {
-            label: str(day.label, `DAY ${i + 1}`),
-            meta: str(day.meta, ""),
-            sessions: rows,
-          };
-        })
-      : undefined,
+    days:
+      Array.isArray(raw.days) && raw.days.length
+        ? raw.days.slice(0, 14).map((d, i) => {
+            const day = (d ?? {}) as Partial<AgendaDay>;
+            const rows = Array.isArray(day.sessions)
+              ? day.sessions.slice(0, 60).map((s) => ({
+                  time: str((s as AgendaSession)?.time, ""),
+                  title: str((s as AgendaSession)?.title, ""),
+                  detail: str((s as AgendaSession)?.detail, ""),
+                  track: str((s as AgendaSession)?.track, ""),
+                  muted: Boolean((s as AgendaSession)?.muted),
+                }))
+              : [];
+            return {
+              label: str(day.label, `DAY ${i + 1}`),
+              meta: str(day.meta, ""),
+              sessions: rows,
+            };
+          })
+        : undefined,
     rowsPerPage: Math.max(0, Math.min(40, Math.round(num(raw.rowsPerPage, 0)))),
   };
 }
-
-
 
 /** Saved live agenda file row as the UI consumes it. */
 export type AgendaVersion = {
@@ -762,8 +1231,13 @@ export function agendaPages(config: AgendaConfig): AgendaPage[] {
   const perPage = agendaRowsPerPage(config);
   const multiDay = days.length > 1;
 
-  const chunks: { dayIndex: number; day: AgendaDay; rows: AgendaSession[]; pageInDay: number; pagesInDay: number }[] =
-    [];
+  const chunks: {
+    dayIndex: number;
+    day: AgendaDay;
+    rows: AgendaSession[];
+    pageInDay: number;
+    pagesInDay: number;
+  }[] = [];
   days.forEach((day, dayIndex) => {
     const rows = day.sessions ?? [];
     const pagesInDay = Math.max(1, Math.ceil(rows.length / perPage));
@@ -834,8 +1308,6 @@ export function writeAgendaDay(
   };
 }
 
-
-
 /** Add a programme day, seeded from the day it follows. */
 export function addAgendaDay(config: AgendaConfig): AgendaConfig {
   const days = agendaDays(config);
@@ -846,7 +1318,13 @@ export function addAgendaDay(config: AgendaConfig): AgendaConfig {
     sessions: [{ time: "09:00", title: "New session", detail: "", track: "", muted: false }],
   };
   const all = [...days, next];
-  return { ...config, days: all, title: all[0]!.label, meta: all[0]!.meta, sessions: all[0]!.sessions };
+  return {
+    ...config,
+    days: all,
+    title: all[0]!.label,
+    meta: all[0]!.meta,
+    sessions: all[0]!.sessions,
+  };
 }
 
 /** Remove a programme day. The file always keeps at least one. */

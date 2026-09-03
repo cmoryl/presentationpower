@@ -16,7 +16,12 @@ import { ensureA11y } from "@/lib/infographics/a11y";
 import { vizTheme } from "@/lib/infographics/viz-theme";
 import { SUPPORTED_VIZ_KINDS } from "@/lib/infographics/variant-kinds";
 import { variantsForKind } from "@/lib/infographics/audit-sweep";
-import { isInfographicSpec, type InfographicKind, type InfographicRow, type InfographicSpec } from "@/lib/infographics/spec";
+import {
+  isInfographicSpec,
+  type InfographicKind,
+  type InfographicRow,
+  type InfographicSpec,
+} from "@/lib/infographics/spec";
 import { BRAND_MODES } from "@/lib/taxonomy";
 import type {
   CritiqueVizInput,
@@ -178,9 +183,9 @@ export async function interpretVizDataOnServer(
   }
 
   const kindRaw = forced ?? str(parsed.kind, "bar");
-  const kind = ((SUPPORTED_VIZ_KINDS as string[]).includes(kindRaw)
-    ? kindRaw
-    : "bar") as InfographicKind;
+  const kind = (
+    (SUPPORTED_VIZ_KINDS as string[]).includes(kindRaw) ? kindRaw : "bar"
+  ) as InfographicKind;
   const encoding = coerceEncoding(parsed.encoding);
   const valueKeys = [encoding.value, encoding.y, encoding.y2].filter((k): k is string => !!k);
   const rows = coerceRows(parsed.rows, valueKeys);
@@ -238,7 +243,10 @@ export async function interpretVizDataOnServer(
     : [];
 
   const caveats = Array.isArray(parsed.caveats)
-    ? (parsed.caveats as unknown[]).map((c) => str(c)).filter(Boolean).slice(0, 5)
+    ? (parsed.caveats as unknown[])
+        .map((c) => str(c))
+        .filter(Boolean)
+        .slice(0, 5)
     : [];
 
   return {

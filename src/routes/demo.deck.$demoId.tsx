@@ -265,14 +265,14 @@ function ShowcaseDeckDemoPage() {
             <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
               Division
             </div>
-             <p className="mt-1 text-[12px] text-black/55 dark:text-white/55">
-               Same narrative, re-branded: accent color, wordmark, copy and generated imagery
-               follow the division you pick — the layout stays on the default look.
-             </p>
-           </div>
-           <div className="text-[11px] text-black/45 dark:text-white/45">
-             {division.name} · Default look
-           </div>
+            <p className="mt-1 text-[12px] text-black/55 dark:text-white/55">
+              Same narrative, re-branded: accent color, wordmark, copy and generated imagery follow
+              the division you pick — the layout stays on the default look.
+            </p>
+          </div>
+          <div className="text-[11px] text-black/45 dark:text-white/45">
+            {division.name} · Default look
+          </div>
         </div>
         <div role="group" aria-label="Choose division" className="mt-3 flex flex-wrap gap-2">
           {DEMO_DIVISIONS.map((d) => {

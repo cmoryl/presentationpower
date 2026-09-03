@@ -66,7 +66,8 @@ async function launch() {
       for (const dir of readdirSync(root).filter((d) => d.startsWith("chromium"))) {
         for (const rel of ["chrome-linux/chrome", "chrome-linux/headless_shell"]) {
           const exe = path.join(root, dir, rel);
-          if (existsSync(exe)) return await chromium.launch({ headless: true, executablePath: exe });
+          if (existsSync(exe))
+            return await chromium.launch({ headless: true, executablePath: exe });
         }
       }
     }
@@ -78,7 +79,10 @@ const browser = await launch();
 try {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 1800 } });
   const page = await ctx.newPage();
-  page.on("console", (m) => m.type() === "error" && console.error("  [page]", m.text().slice(0, 160)));
+  page.on(
+    "console",
+    (m) => m.type() === "error" && console.error("  [page]", m.text().slice(0, 160)),
+  );
 
   await page.goto(`${BASE}/dev/export-verify`, { waitUntil: "domcontentloaded" });
   await page.waitForFunction("!!window.__tpExportVerify && !!window.__tpBackdropOverrides", null, {
@@ -165,7 +169,12 @@ try {
     const mod = await import("/src/lib/slide-image-export.ts");
     const el = document.createElement("div");
     el.setAttribute("data-slide-stage", "");
-    Object.assign(el.style, { position: "fixed", left: "-9999px", width: "1600px", height: "900px" });
+    Object.assign(el.style, {
+      position: "fixed",
+      left: "-9999px",
+      width: "1600px",
+      height: "900px",
+    });
     document.body.appendChild(el);
     try {
       return mod.pdfPageSizeForNode(el);

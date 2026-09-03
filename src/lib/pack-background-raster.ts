@@ -146,7 +146,6 @@ export async function rasterizePackBackground(
     host.appendChild(plane(style as Partial<CSSStyleDeclaration>));
   }
 
-
   frame.appendChild(host);
   shell.appendChild(frame);
   document.body.appendChild(shell);

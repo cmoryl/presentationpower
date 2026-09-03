@@ -73,7 +73,6 @@ export type VizNativeChart = {
   legendPos?: "t" | "b";
 };
 
-
 export type VizNativeChartPlan = {
   kind: InfographicKind;
   charts: VizNativeChart[];
@@ -127,11 +126,7 @@ function columns(spec: InfographicSpec) {
   const rows = spec.data.rows ?? [];
   const enc = spec.encoding ?? {};
   const x =
-    enc.x ??
-    enc.label ??
-    enc.category ??
-    firstKey(rows, (v) => typeof v === "string") ??
-    "label";
+    enc.x ?? enc.label ?? enc.category ?? firstKey(rows, (v) => typeof v === "string") ?? "label";
   const y = enc.y ?? enc.value ?? firstKey(rows, (v) => typeof v === "number") ?? "value";
   const series = enc.series;
   return { rows, x, y, series };
@@ -234,7 +229,6 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
       };
     }
 
-
     case "stacked-area": {
       const { labels, series } = seriesFromRows(spec);
       return {
@@ -278,7 +272,6 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
         ],
       };
     }
-
 
     case "slope":
     case "bump": {
@@ -338,7 +331,6 @@ export function vizNativeChartPlan(spec: InfographicSpec): VizNativeChartPlan | 
         ],
       };
     }
-
 
     case "gauge-grid": {
       // One real doughnut per gauge, laid out on the same grid the build uses:

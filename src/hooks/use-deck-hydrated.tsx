@@ -14,7 +14,6 @@ export function useDeckHydrated(): boolean {
   // flips it immediately after mount, so there is no visible delay.
   const [hydrated, setHydrated] = useState(false);
 
-
   useEffect(() => {
     if (useDeckStore.persist.hasHydrated()) {
       setHydrated(true);

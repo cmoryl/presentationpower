@@ -33,7 +33,15 @@ describe("isModuleFurniture", () => {
 });
 
 describe("collapseMediaOverlays keeps furniture editable", () => {
-  const media = shape({ kind: "image", x: 0, y: 0, w: 900, h: 500, src: "data:,x", name: "TP Image" });
+  const media = shape({
+    kind: "image",
+    x: 0,
+    y: 0,
+    w: 900,
+    h: 500,
+    src: "data:,x",
+    name: "TP Image",
+  });
 
   it("merges scrims but never the connector crossing the picture", () => {
     const scrimA = shape({ x: 0, y: 0, w: 900, h: 500, fill: { hex: "000000", alpha: 0.3 } });

@@ -82,16 +82,12 @@ export async function applyAiCopyFit(deckId: string, deck: Deck): Promise<number
   }
 
   for (const [slideId, edits] of bodyEdits) {
-    const slide = useDeckStore
-      .getState()
-      .decks[deckId]?.slides.find((s) => s.id === slideId);
+    const slide = useDeckStore.getState().decks[deckId]?.slides.find((s) => s.id === slideId);
     if (!slide || !Array.isArray(slide.content.items)) continue;
-    const nextItems = (slide.content.items as Array<Record<string, unknown>>).map(
-      (it, i) => {
-        const edit = edits.get(i);
-        return edit ? { ...it, [edit.key]: edit.text } : it;
-      },
-    );
+    const nextItems = (slide.content.items as Array<Record<string, unknown>>).map((it, i) => {
+      const edit = edits.get(i);
+      return edit ? { ...it, [edit.key]: edit.text } : it;
+    });
     store.updateSlideField(deckId, slideId, "items", nextItems);
     applied += edits.size;
   }

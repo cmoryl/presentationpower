@@ -4,7 +4,6 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { canEditNextDivision } from "./next-permissions.functions";
 
-
 // Saved event pillar sign files. Each row is a live, re-editable pillar setup
 // that can be re-opened and re-exported for print at any time. RLS scopes
 // every row to its owner.
@@ -64,7 +63,11 @@ export const savePillarFile = createServerFn({ method: "POST" })
   .validator((data: unknown) => versionInput.parse(data))
   .handler(async ({ data, context }) => {
     const divisionId = data.config.divisionId;
-    const allowed = await canEditNextDivision(context.userId, divisionId, context.supabase as never);
+    const allowed = await canEditNextDivision(
+      context.userId,
+      divisionId,
+      context.supabase as never,
+    );
     if (!allowed) throw new Error("You are not authorized to edit pillars for this division");
     const { data: row, error } = await context.supabase
       .from("event_pillar_versions")
@@ -97,7 +100,8 @@ export const updatePillarFile = createServerFn({ method: "POST" })
     if (findError) throw findError;
     const isOwner = existing.user_id === context.userId;
     const existingConfig = (existing.config ?? {}) as { divisionId?: string };
-    const divisionId = data.config?.divisionId ?? existingConfig.divisionId ?? existing.division_id ?? "";
+    const divisionId =
+      data.config?.divisionId ?? existingConfig.divisionId ?? existing.division_id ?? "";
     const allowed =
       isOwner || (await canEditNextDivision(context.userId, divisionId, context.supabase as never));
     if (!allowed) throw new Error("You are not authorized to edit pillars for this division");
@@ -132,7 +136,12 @@ export const deletePillarFile = createServerFn({ method: "POST" })
     if (findError) throw findError;
     const isOwner = existing.user_id === context.userId;
     const allowed =
-      isOwner || (await canEditNextDivision(context.userId, existing.division_id ?? "", context.supabase as never));
+      isOwner ||
+      (await canEditNextDivision(
+        context.userId,
+        existing.division_id ?? "",
+        context.supabase as never,
+      ));
     if (!allowed) throw new Error("You are not authorized to delete this pillar file");
     const { error } = await context.supabase
       .from("event_pillar_versions")

@@ -35,7 +35,13 @@ function rgbOf(raw: string | undefined): [number, number, number] | null {
   if (value === "none" || value.startsWith("url(")) return null;
   const m = HEX.exec(value);
   if (!m) return null;
-  const hex = m[1]!.length === 3 ? m[1]!.split("").map((c) => c + c).join("") : m[1]!;
+  const hex =
+    m[1]!.length === 3
+      ? m[1]!
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : m[1]!;
   const n = parseInt(hex, 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
@@ -96,7 +102,8 @@ function resolve(tag: string, classes: Record<string, Decls>): Decls {
 function shapeFrom(tag: string, d: string, classes: Record<string, Decls>): MartArtShape | null {
   if (!d) return null;
   const decls = resolve(tag, classes);
-  const fill = decls.fill === undefined ? ([0, 0, 0] as [number, number, number]) : rgbOf(decls.fill);
+  const fill =
+    decls.fill === undefined ? ([0, 0, 0] as [number, number, number]) : rgbOf(decls.fill);
   const stroke = rgbOf(decls.stroke);
   if (!fill && !stroke) return null;
   const sw = Number(String(decls["stroke-width"] ?? "").replace(/px$/i, ""));
@@ -112,7 +119,10 @@ function shapeFrom(tag: string, d: string, classes: Record<string, Decls>): Mart
 /** Every drawable shape in the supplied artwork, in paint order. */
 export function parseMartArtSvg(svg: string): MartArtVector | null {
   const box = /viewBox\s*=\s*["']([^"']+)["']/i.exec(svg)?.[1] ?? "";
-  const nums = box.split(/[\s,]+/).map(Number).filter((n) => Number.isFinite(n));
+  const nums = box
+    .split(/[\s,]+/)
+    .map(Number)
+    .filter((n) => Number.isFinite(n));
   if (nums.length !== 4) return null;
   const classes = parseStyleBlock(svg);
   const shapes: MartArtShape[] = [];
@@ -125,10 +135,15 @@ export function parseMartArtSvg(svg: string): MartArtVector | null {
     if (kind === "path") {
       d = attr(tag, "d") ?? "";
     } else if (kind === "polygon" || kind === "polyline") {
-      const pts = (attr(tag, "points") ?? "").trim().split(/[\s,]+/).map(Number).filter((n) => Number.isFinite(n));
+      const pts = (attr(tag, "points") ?? "")
+        .trim()
+        .split(/[\s,]+/)
+        .map(Number)
+        .filter((n) => Number.isFinite(n));
       if (pts.length < 4) continue;
       const parts: string[] = [];
-      for (let i = 0; i + 1 < pts.length; i += 2) parts.push(`${i === 0 ? "M" : "L"}${pts[i]} ${pts[i + 1]}`);
+      for (let i = 0; i + 1 < pts.length; i += 2)
+        parts.push(`${i === 0 ? "M" : "L"}${pts[i]} ${pts[i + 1]}`);
       d = kind === "polygon" ? `${parts.join(" ")} Z` : parts.join(" ");
     } else if (kind === "rect") {
       const x = num(tag, "x") ?? 0;

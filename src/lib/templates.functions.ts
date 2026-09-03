@@ -219,7 +219,6 @@ export const saveBackgroundOverride = createServerFn({ method: "POST" })
           video_poster_url: data.videoPosterUrl || null,
           video_variant: data.videoVariant || null,
 
-
           note: data.note,
           created_by: context.userId,
         },

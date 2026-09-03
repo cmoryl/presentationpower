@@ -44,8 +44,18 @@ function clampSize(value: Partial<LondonBoardSize>, fallback: LondonBoardSize): 
       ? Math.round(Math.max(lo, Math.min(hi, n)) * 10) / 10
       : alt;
   return {
-    trimW: num(value.trimW, LONDON_BOARD_LIMITS.trim.min, LONDON_BOARD_LIMITS.trim.max, fallback.trimW),
-    trimH: num(value.trimH, LONDON_BOARD_LIMITS.trim.min, LONDON_BOARD_LIMITS.trim.max, fallback.trimH),
+    trimW: num(
+      value.trimW,
+      LONDON_BOARD_LIMITS.trim.min,
+      LONDON_BOARD_LIMITS.trim.max,
+      fallback.trimW,
+    ),
+    trimH: num(
+      value.trimH,
+      LONDON_BOARD_LIMITS.trim.min,
+      LONDON_BOARD_LIMITS.trim.max,
+      fallback.trimH,
+    ),
     bleedEdge: num(
       value.bleedEdge,
       LONDON_BOARD_LIMITS.bleed.min,
@@ -188,5 +198,9 @@ function subscribe(listener: () => void): () => void {
 
 /** React binding: re-renders whenever any measured board size changes. */
 export function useLondonBoardSizes(): LondonBoardSizeMap {
-  return useSyncExternalStore(subscribe, () => londonBoardSizes(), () => EMPTY_SIZES);
+  return useSyncExternalStore(
+    subscribe,
+    () => londonBoardSizes(),
+    () => EMPTY_SIZES,
+  );
 }

@@ -22,7 +22,15 @@
 // for CMYK-native files, so confirm with the printer.
 // -----------------------------------------------------------------------------
 
-import { PDFArray, PDFDict, PDFDocument, PDFHeader, PDFName, PDFRawStream, type PDFRef } from "pdf-lib";
+import {
+  PDFArray,
+  PDFDict,
+  PDFDocument,
+  PDFHeader,
+  PDFName,
+  PDFRawStream,
+  type PDFRef,
+} from "pdf-lib";
 import { sRgbIccBytes } from "./icc-srgb";
 import { fetchIccProfile, type IccProfileKey } from "./pdf-x4";
 
@@ -55,10 +63,7 @@ function spaceOf(icc: Uint8Array): { space: string; n: number; alt: string } {
   return { space: space || "RGB", n: 3, alt: "DeviceRGB" };
 }
 
-export async function applyPdfX4(
-  doc: PDFDocument,
-  opts: ApplyPdfX4Options,
-): Promise<PdfX4Applied> {
+export async function applyPdfX4(doc: PDFDocument, opts: ApplyPdfX4Options): Promise<PdfX4Applied> {
   const wanted = opts.iccProfileName ?? DEFAULT_PROFILE;
 
   // ── destination profile ────────────────────────────────────────────────────

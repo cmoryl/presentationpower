@@ -67,7 +67,8 @@ export function LondonPrintGuides({ panel, showCrop = true }: LondonPrintGuidesP
         : null}
 
       <div className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-rose-200">
-        bleed {mmShort(geo.bleedW)} × {mmShort(geo.bleedH)} · {inches(geo.bleedW)} × {inches(geo.bleedH)}″
+        bleed {mmShort(geo.bleedW)} × {mmShort(geo.bleedH)} · {inches(geo.bleedW)} ×{" "}
+        {inches(geo.bleedH)}″
       </div>
       <div
         className="absolute rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-medium text-emerald-200"
@@ -152,7 +153,9 @@ export function LondonPrintReadout({ panel, plan }: LondonPrintReadoutProps) {
             value={`${mmShort(geo.trimW)} × ${mmShort(geo.trimH)}`}
             note={`${geo.trimWin.toFixed(2)} × ${geo.trimHin.toFixed(2)} in`}
           />
-          <Row label="File size (bleed)" value={`${mmShort(geo.bleedW)} × ${mmShort(geo.bleedH)}`}
+          <Row
+            label="File size (bleed)"
+            value={`${mmShort(geo.bleedW)} × ${mmShort(geo.bleedH)}`}
             note={`${inches(geo.bleedW)} × ${inches(geo.bleedH)} in`}
           />
           <Row
@@ -186,7 +189,9 @@ export function LondonPrintReadout({ panel, plan }: LondonPrintReadoutProps) {
 
       <div
         className={`mt-2 flex items-start gap-2 rounded-md px-2 py-1.5 text-xs ${
-          clean ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
+          clean
+            ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+            : "bg-amber-500/10 text-amber-700 dark:text-amber-300"
         }`}
       >
         {clean ? (

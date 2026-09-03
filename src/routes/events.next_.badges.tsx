@@ -106,11 +106,7 @@ function BadgesPage() {
             </select>
           </label>
           <label className="inline-flex items-center gap-2 text-muted-foreground">
-            <input
-              type="checkbox"
-              checked={guides}
-              onChange={(e) => setGuides(e.target.checked)}
-            />
+            <input type="checkbox" checked={guides} onChange={(e) => setGuides(e.target.checked)} />
             Bleed / trim / safe-area guides
           </label>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-muted-foreground">

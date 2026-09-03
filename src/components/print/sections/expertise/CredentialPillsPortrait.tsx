@@ -17,9 +17,7 @@ export function CredentialPillsPortrait({
   const icons = usePrintIcons();
   const items = safeList(section.items).slice(0, 8);
   if (items.length === 0) return null;
-  const hairline = `1px solid ${
-    mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)"
-  }`;
+  const hairline = `1px solid ${mode === "dark" ? "rgba(255,255,255,0.14)" : "rgba(3,0,44,0.12)"}`;
   return (
     <section aria-label={section.title ?? "Credentials"} style={{ margin: 0 }}>
       {(section.eyebrow || section.title) && (

@@ -59,7 +59,9 @@ describe("layout arbiter — combination coverage", () => {
               content: shape.content,
             });
             if (!d.best) {
-              misses.push(`${section.id}/${level}/${canvas.width}x${canvas.height}/${shape.name}: no candidate`);
+              misses.push(
+                `${section.id}/${level}/${canvas.width}x${canvas.height}/${shape.name}: no candidate`,
+              );
               continue;
             }
             if (!d.candidates.some((c) => c.feasible)) {
@@ -94,11 +96,16 @@ describe("layout arbiter — combination coverage", () => {
       level: "kpi",
       content: { title: "Trend", hasChart: true, items: [1, 2, 3] },
     });
-    expect(withChart.best?.fillFamily === "chart" || withChart.best?.fillFamily === "stats").toBe(true);
+    expect(withChart.best?.fillFamily === "chart" || withChart.best?.fillFamily === "stats").toBe(
+      true,
+    );
   });
 
   it("penalises a neighbour variant so consecutive slides do not repeat", () => {
-    const base = arbitrateLayout({ sectionId: "SF-07", content: { title: "Detail", items: [1, 2, 3] } });
+    const base = arbitrateLayout({
+      sectionId: "SF-07",
+      content: { title: "Detail", items: [1, 2, 3] },
+    });
     const first = base.best!.variantId;
     const next = arbitrateLayout({
       sectionId: "SF-07",

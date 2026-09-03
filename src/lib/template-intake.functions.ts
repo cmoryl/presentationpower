@@ -198,9 +198,7 @@ export const deleteIntakeAsset = createServerFn({ method: "POST" })
 /** Signed URL for one stored asset — used by previews and the derive step. */
 export const signIntakeAsset = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: unknown) =>
-    z.object({ path: z.string().trim().min(3).max(400) }).parse(input),
-  )
+  .validator((input: unknown) => z.object({ path: z.string().trim().min(3).max(400) }).parse(input))
   .handler(async ({ data, context }): Promise<{ url: string }> => {
     const s = context.supabase as unknown as SbClient;
     await assertAdmin(s, context.userId);

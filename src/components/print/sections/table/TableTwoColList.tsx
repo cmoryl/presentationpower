@@ -1,6 +1,6 @@
 // Two-column list table — the MSA "Departments supported" pattern.
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, safeList} from "../shared";
+import { cq, sectionInk, MODULE, safeList } from "../shared";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 

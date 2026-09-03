@@ -342,7 +342,9 @@ async function auditPptx(
   // layout's `<p:bg>` so it cannot be selected. When the slide shape tree has no
   // background picture, follow the layout relationship and read it from there.
   if (!bgPart) {
-    const layoutPart = [...relTarget.values()].find((t) => /slideLayouts\/slideLayout\d+\.xml$/.test(t));
+    const layoutPart = [...relTarget.values()].find((t) =>
+      /slideLayouts\/slideLayout\d+\.xml$/.test(t),
+    );
     if (layoutPart && zip.file(layoutPart)) {
       const layoutXml = await zip.file(layoutPart)!.async("string");
       const bgRid = /<p:bg>[\s\S]*?r:embed="([^"]+)"[\s\S]*?<\/p:bg>/.exec(layoutXml)?.[1];
@@ -360,7 +362,6 @@ async function auditPptx(
               ? `ppt/${m[2].replace(/^(\.\.\/)+/, "")}`
               : `ppt/slideLayouts/${m[2]}`;
           }
-
         }
       }
     }

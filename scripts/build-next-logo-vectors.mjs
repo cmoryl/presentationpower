@@ -82,16 +82,23 @@ function parseSvg(file, colourway) {
   for (const m of src.matchAll(/<(polygon|polyline)\b([^>]*?)\/?>/g)) {
     const pts = /\bpoints="([^"]+)"/.exec(m[2])?.[1];
     if (!pts) continue;
-    const nums = pts.trim().split(/[\s,]+/).map(Number);
+    const nums = pts
+      .trim()
+      .split(/[\s,]+/)
+      .map(Number);
     let d = "";
-    for (let k = 0; k + 1 < nums.length; k += 2) d += `${k === 0 ? "M" : "L"}${nums[k]},${nums[k + 1]}`;
+    for (let k = 0; k + 1 < nums.length; k += 2)
+      d += `${k === 0 ? "M" : "L"}${nums[k]},${nums[k + 1]}`;
     if (m[1] === "polygon") d += "Z";
     shapes.push({ attrs: m[2], d });
   }
   for (const m of src.matchAll(/<rect\b([^>]*?)\/?>/g)) {
     const a = m[1];
     const g = (k) => Number(new RegExp(`\\b${k}="([^"]+)"`).exec(a)?.[1] ?? 0);
-    const x = g("x"), y = g("y"), rw = g("width"), rh = g("height");
+    const x = g("x"),
+      y = g("y"),
+      rw = g("width"),
+      rh = g("height");
     if (!rw || !rh) continue;
     shapes.push({ attrs: a, d: `M${x},${y}L${x + rw},${y}L${x + rw},${y + rh}L${x},${y + rh}Z` });
   }

@@ -1534,10 +1534,7 @@ export function FreeCanvasEditor({
 
       {/* static layout guides: safe-area margins, thirds and centre crosshair */}
       {guidesOn && (
-        <div
-          {...{ [CANVAS_UI_ATTR]: "" }}
-          className="pointer-events-none absolute inset-0 z-30"
-        >
+        <div {...{ [CANVAS_UI_ATTR]: "" }} className="pointer-events-none absolute inset-0 z-30">
           <div
             className="absolute border border-dashed"
             style={{
@@ -1578,17 +1575,11 @@ export function FreeCanvasEditor({
             target={cropBlock}
             accent={accent}
             onChange={(next) =>
-              patchMany(
-                new Map([[cropBlock.id, next]]),
-                "Crop image",
-                `crop:${cropBlock.id}`,
-              )
+              patchMany(new Map([[cropBlock.id, next]]), "Crop image", `crop:${cropBlock.id}`)
             }
           />
         </div>
       )}
-
-
 
       {/* alignment guides + marquee — persistent nodes, painted imperatively */}
       <div
@@ -1639,7 +1630,6 @@ export function FreeCanvasEditor({
                 }`
               : "pointer-events-auto absolute left-3 top-3 z-50 flex max-w-[calc(100%-1.5rem)] flex-col overflow-hidden rounded-2xl bg-card/95 text-[14px] font-medium normal-case leading-none tracking-normal text-foreground ring-1 ring-border shadow-lg backdrop-blur-md"
           }
-
           style={{
             // Scaling the shell (not just the font) grows labels, glyphs, padding
             // and hit areas together. Origin keeps it pinned to its corner.
@@ -1860,7 +1850,6 @@ export function FreeCanvasEditor({
               role="group"
               aria-label="Canvas object controls"
             >
-
               <span
                 className="flex min-h-7 items-center rounded-lg px-2.5 text-[13px] font-semibold text-[#03002C]"
                 style={{ background: accent }}
@@ -1901,9 +1890,7 @@ export function FreeCanvasEditor({
                     title="Reset the crop framing and zoom"
                     onClick={() =>
                       patchMany(
-                        new Map([
-                          [cropCandidate.id, { mediaFocus: "50% 50%", mediaZoom: 1 }],
-                        ]),
+                        new Map([[cropCandidate.id, { mediaFocus: "50% 50%", mediaZoom: 1 }]]),
                         "Reset crop",
                       )
                     }
@@ -2117,4 +2104,3 @@ function TBtn({
     </button>
   );
 }
-

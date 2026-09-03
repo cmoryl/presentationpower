@@ -43,14 +43,10 @@ import {
 } from "@/hooks/use-variant-samples";
 import { backgroundOverrides } from "@/lib/template-registry";
 import { useTemplateRegistryVersion } from "@/hooks/use-template-registry";
-import {
-  conformanceSpecIssues,
-  divisionConformancePresets,
-} from "@/lib/division-conformance";
+import { conformanceSpecIssues, divisionConformancePresets } from "@/lib/division-conformance";
 
 /** Derived once — presets are pure data from the registry + brand taxonomy. */
 const CONFORMANCE_PRESETS = divisionConformancePresets();
-
 
 export const Route = createFileRoute("/library/overrides")({
   head: () => ({
@@ -187,7 +183,12 @@ function OverrideInspector() {
           };
         })
         .filter((s) =>
-          match(s.variantId, VARIANT_NAME.get(s.variantId), s.brandModeId, BRAND_NAME.get(s.brandModeId)),
+          match(
+            s.variantId,
+            VARIANT_NAME.get(s.variantId),
+            s.brandModeId,
+            BRAND_NAME.get(s.brandModeId),
+          ),
         )
         .sort((a, b) => a.variantId.localeCompare(b.variantId)),
     [samples.data, match],
@@ -244,7 +245,9 @@ function OverrideInspector() {
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-[#03002C] dark:text-white">{scopeLabel}</p>
+        <p className="truncate text-sm font-semibold text-[#03002C] dark:text-white">
+          {scopeLabel}
+        </p>
         <p className="mt-0.5 text-xs text-[#03002C]/60 dark:text-white/60">
           {skinLabel(row.skinCode)} · {TAKE_LABEL[row.take] ?? `Take ${row.take + 1}`}
         </p>
@@ -288,7 +291,9 @@ function OverrideInspector() {
         <Link to="/library" className={btn}>
           <ExternalLink className="h-3 w-3" /> Module library
         </Link>
-        {!isAdmin ? <span className={chip}>Read-only — admin sign-in required to reset</span> : null}
+        {!isAdmin ? (
+          <span className={chip}>Read-only — admin sign-in required to reset</span>
+        ) : null}
       </div>
 
       {loading ? (
@@ -420,7 +425,9 @@ function OverrideInspector() {
                     ) : null}
                     {o.sceneSwap ? <span className={chip}>swap → {o.sceneSwap}</span> : null}
                     {o.imageUrl ? <span className={chip}>image {o.imagePriority}</span> : null}
-                    {o.videoUrl ? <span className={chip}>motion {o.videoVariant ?? "on"}</span> : null}
+                    {o.videoUrl ? (
+                      <span className={chip}>motion {o.videoVariant ?? "on"}</span>
+                    ) : null}
                   </div>
                   {o.note ? (
                     <p className="mt-1 line-clamp-2 text-[11px] text-[#03002C]/50 dark:text-white/50">
@@ -499,4 +506,3 @@ function OverrideInspector() {
     </main>
   );
 }
-

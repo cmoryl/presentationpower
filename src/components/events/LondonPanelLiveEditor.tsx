@@ -22,11 +22,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
 import { StepRepeatWallPanel } from "@/components/events/StepRepeatWallPanel";
-import {
-  isStepRepeatPanel,
-  mmToIn,
-  useStepRepeatConfigs,
-} from "@/lib/next-london-step-repeat";
+import { isStepRepeatPanel, mmToIn, useStepRepeatConfigs } from "@/lib/next-london-step-repeat";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import {
   buildLondonPanelAiAsync,
@@ -44,10 +40,7 @@ import {
   londonBoothPanelMeta,
   type LondonPanel,
 } from "@/lib/next-london-signage";
-import {
-  LONDON_DIVISION_COLOURWAYS,
-  londonDivisionAccent,
-} from "@/lib/next-london-division";
+import { LONDON_DIVISION_COLOURWAYS, londonDivisionAccent } from "@/lib/next-london-division";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -160,10 +153,7 @@ export function LondonPanelLiveEditor({
 
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const art = useMemo(() => ({ colorSpace, vibrance: 1 }), [colorSpace]);
-  const svg = useMemo(
-    () => buildLondonPanelSvg(panel, art),
-    [panel, placement, art, wallConfigs],
-  );
+  const svg = useMemo(() => buildLondonPanelSvg(panel, art), [panel, placement, art, wallConfigs]);
   // Division items are restricted to the approved white lockups.
   const divisionAccent = londonDivisionAccent(plan.familyId);
   const colourways = useMemo(() => {
@@ -323,9 +313,7 @@ export function LondonPanelLiveEditor({
   // Centring tools. Every object is placed by a fraction-of-trim nudge, so we
   // ask the shared helper for the nudge that lands the object's live box on the
   // artboard centre — no editor-local arithmetic.
-  const qrBoxMm = plan.qr
-    ? { x: plan.qr.x, y: plan.qr.y, w: plan.qr.size, h: plan.qr.size }
-    : null;
+  const qrBoxMm = plan.qr ? { x: plan.qr.x, y: plan.qr.y, w: plan.qr.size, h: plan.qr.size } : null;
   const textBoxMm = plan.copy
     ? plan.copyVertical
       ? {
@@ -385,10 +373,10 @@ export function LondonPanelLiveEditor({
             {isWall
               ? "step & repeat pattern — set the recipe on the right"
               : booth
-              ? boothArt
-                ? `${boothMeta?.artboard.label ?? "Booth"} · supplied vendor artwork`
-                : "Booth artwork pending — brand ground shown"
-              : "drag the lockup, headline or code"}
+                ? boothArt
+                  ? `${boothMeta?.artboard.label ?? "Booth"} · supplied vendor artwork`
+                  : "Booth artwork pending — brand ground shown"
+                : "drag the lockup, headline or code"}
           </span>
           <Button
             variant={printPreview ? "default" : "outline"}
@@ -445,23 +433,23 @@ export function LondonPanelLiveEditor({
             />
           ) : null}
           {isWall || !plan.lockupOn ? null : (
-          <div
-            role="button"
-            tabIndex={0}
-            aria-label="Move lockup"
-            onPointerDown={(event) => startDrag(event, "logo")}
-            onKeyDown={(event) => {
-              const step = event.shiftKey ? 0.02 : 0.005;
-              if (event.key === "ArrowLeft") nudge(-step, 0);
-              else if (event.key === "ArrowRight") nudge(step, 0);
-              else if (event.key === "ArrowUp") nudge(0, -step);
-              else if (event.key === "ArrowDown") nudge(0, step);
-              else return;
-              event.preventDefault();
-            }}
-            className="absolute cursor-move rounded-sm border border-dashed border-white/70 bg-white/5 outline-none focus-visible:ring-2 focus-visible:ring-white"
-            style={logoBox}
-          />
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Move lockup"
+              onPointerDown={(event) => startDrag(event, "logo")}
+              onKeyDown={(event) => {
+                const step = event.shiftKey ? 0.02 : 0.005;
+                if (event.key === "ArrowLeft") nudge(-step, 0);
+                else if (event.key === "ArrowRight") nudge(step, 0);
+                else if (event.key === "ArrowUp") nudge(0, -step);
+                else if (event.key === "ArrowDown") nudge(0, step);
+                else return;
+                event.preventDefault();
+              }}
+              className="absolute cursor-move rounded-sm border border-dashed border-white/70 bg-white/5 outline-none focus-visible:ring-2 focus-visible:ring-white"
+              style={logoBox}
+            />
           )}
           {textBox && !isWall ? (
             <div
@@ -523,8 +511,8 @@ export function LondonPanelLiveEditor({
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground">
           {panel.room} · {familyLabel} · {plan.orientation === "side" ? "side-by-side" : "stacked"}{" "}
-          {NEXT_LOGO_COLOURWAY_LABELS[plan.colourway].toLowerCase()} · every edit here is live across
-          the kit.
+          {NEXT_LOGO_COLOURWAY_LABELS[plan.colourway].toLowerCase()} · every edit here is live
+          across the kit.
         </p>
         {divisionAccent ? (
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -537,7 +525,6 @@ export function LondonPanelLiveEditor({
             white lockups only on division signage.
           </p>
         ) : null}
-
 
         {isWall ? <StepRepeatWallPanel panel={panel} /> : null}
 
@@ -587,9 +574,7 @@ export function LondonPanelLiveEditor({
                 variant={plan.lockupOn ? "default" : "outline"}
                 size="sm"
                 aria-pressed={plan.lockupOn}
-                onClick={() =>
-                  setLondonLogoPlacement(panel.id, { lockup: !plan.lockupOn })
-                }
+                onClick={() => setLondonLogoPlacement(panel.id, { lockup: !plan.lockupOn })}
               >
                 {plan.lockupOn ? "NEXT lockup on" : "Add NEXT lockup"}
               </Button>
@@ -637,7 +622,9 @@ export function LondonPanelLiveEditor({
         </div>
 
         {/* Copy — a wall repeats its own text, so the single headline is hidden */}
-        <div className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}>
+        <div
+          className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}
+        >
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex min-w-[220px] flex-1 items-center gap-2 text-xs text-muted-foreground">
               <Type className="h-3.5 w-3.5" /> Panel text
@@ -715,7 +702,9 @@ export function LondonPanelLiveEditor({
         </div>
 
         {/* Lockup */}
-        <div className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}>
+        <div
+          className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}
+        >
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-muted-foreground">Logo colourway</span>
             {colourways.map((key) => (
@@ -764,7 +753,9 @@ export function LondonPanelLiveEditor({
         </div>
 
         {/* QR */}
-        <div className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}>
+        <div
+          className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}
+        >
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex min-w-[220px] flex-1 items-center gap-2 text-xs text-muted-foreground">
               <QrCode className="h-3.5 w-3.5" /> QR link
@@ -912,9 +903,7 @@ export function LondonPanelLiveEditor({
                 className="w-28"
               />
               <span className="tabular-nums">
-                {placement.qrCaptionSize > 0
-                  ? `${placement.qrCaptionSize.toFixed(0)}mm`
-                  : "auto"}
+                {placement.qrCaptionSize > 0 ? `${placement.qrCaptionSize.toFixed(0)}mm` : "auto"}
               </span>
             </label>
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -1000,28 +989,26 @@ export function LondonPanelLiveEditor({
             </span>
           </div>
           <div className="mt-3 flex flex-wrap items-end gap-3">
-            {(
-              [
-                {
-                  key: "trimW" as const,
-                  label: "Width (mm)",
-                  value: panel.trimW,
-                  ...LONDON_BOARD_LIMITS.trim,
-                },
-                {
-                  key: "trimH" as const,
-                  label: "Height (mm)",
-                  value: panel.trimH,
-                  ...LONDON_BOARD_LIMITS.trim,
-                },
-                {
-                  key: "bleedEdge" as const,
-                  label: "Bleed / edge (mm)",
-                  value: panel.bleedEdge,
-                  ...LONDON_BOARD_LIMITS.bleed,
-                },
-              ]
-            ).map((field) => (
+            {[
+              {
+                key: "trimW" as const,
+                label: "Width (mm)",
+                value: panel.trimW,
+                ...LONDON_BOARD_LIMITS.trim,
+              },
+              {
+                key: "trimH" as const,
+                label: "Height (mm)",
+                value: panel.trimH,
+                ...LONDON_BOARD_LIMITS.trim,
+              },
+              {
+                key: "bleedEdge" as const,
+                label: "Bleed / edge (mm)",
+                value: panel.bleedEdge,
+                ...LONDON_BOARD_LIMITS.bleed,
+              },
+            ].map((field) => (
               <label key={field.key} className="flex flex-col gap-1 text-xs text-muted-foreground">
                 <span className="flex items-baseline gap-1">
                   {field.label}
@@ -1070,7 +1057,12 @@ export function LondonPanelLiveEditor({
               {space === "rgb" ? "RGB · RIP separates" : "CMYK · print master"}
             </button>
           ))}
-          <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("svg")}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => downloadPanel("svg")}
+          >
             <Download className="h-3.5 w-3.5" /> SVG
           </Button>
           <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("ai")}>

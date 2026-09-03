@@ -148,7 +148,6 @@ export function loadPack(id: string): Promise<IconPack> {
   return p;
 }
 
-
 export function getLoadedPack(id: string): IconPack | undefined {
   return packMem.get(id);
 }

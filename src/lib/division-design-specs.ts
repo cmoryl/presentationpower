@@ -86,7 +86,8 @@ export const DIVISION_DESIGN_SPECS: Record<string, DivisionDesignSpec> = {
     packId: "skin-s12",
     darkPackId: "skin-s20",
     recipe: "R08",
-    rationale: "Trial Interactive is an eClinical product: operational structure, healthcare ground.",
+    rationale:
+      "Trial Interactive is an eClinical product: operational structure, healthcare ground.",
   },
   "bm-product": {
     packId: packIdForBrandMode("bm-product") ?? "skin-r03",
@@ -117,7 +118,10 @@ export function divisionDesignSpec(brandModeId: string | null | undefined): Divi
 }
 
 /** Pack id a scope's slides wear on one face. */
-export function divisionPackId(brandModeId: string | null | undefined, face: "light" | "dark" = "light"): string {
+export function divisionPackId(
+  brandModeId: string | null | undefined,
+  face: "light" | "dark" = "light",
+): string {
   const spec = divisionDesignSpec(brandModeId);
   return face === "dark" ? spec.darkPackId : spec.packId;
 }

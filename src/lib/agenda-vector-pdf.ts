@@ -78,7 +78,13 @@ export type AgendaVectorResult = {
 
 function hexRgb(hex: string): [number, number, number] {
   const h = (hex || "#000000").replace("#", "");
-  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const n = parseInt(full, 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
@@ -164,7 +170,10 @@ async function loadLockup(url: string): Promise<LockupArt> {
     if (head.startsWith("<svg") || head.startsWith("<?xml") || /\.svg(\?|$)/i.test(url)) {
       const svg = new TextDecoder().decode(buf);
       const box = /viewBox\s*=\s*["']([^"']+)["']/i.exec(svg)?.[1] ?? "";
-      const nums = box.split(/[\s,]+/).map(Number).filter((n) => Number.isFinite(n));
+      const nums = box
+        .split(/[\s,]+/)
+        .map(Number)
+        .filter((n) => Number.isFinite(n));
       const paths = extractSvgPaths(svg);
       if (paths.length && nums.length === 4) {
         return { kind: "svg", paths, viewBox: nums as [number, number, number, number] };
@@ -193,7 +202,15 @@ async function ttf(doc: PDFDocument, path: string): Promise<PDFFont | null> {
 function drawTracked(
   page: PDFPage,
   text: string,
-  opts: { x: number; y: number; size: number; font: PDFFont; color: [number, number, number]; opacity?: number; spacing: number },
+  opts: {
+    x: number;
+    y: number;
+    size: number;
+    font: PDFFont;
+    color: [number, number, number];
+    opacity?: number;
+    spacing: number;
+  },
 ): number {
   let x = opts.x;
   for (const ch of text) {
@@ -220,7 +237,8 @@ function fit(font: PDFFont, text: string, size: number, maxWidth: number): strin
   if (!text) return "";
   if (font.widthOfTextAtSize(text, size) <= maxWidth) return text;
   let out = text;
-  while (out.length > 1 && font.widthOfTextAtSize(`${out}…`, size) > maxWidth) out = out.slice(0, -1);
+  while (out.length > 1 && font.widthOfTextAtSize(`${out}…`, size) > maxWidth)
+    out = out.slice(0, -1);
   return `${out}…`;
 }
 
@@ -246,8 +264,10 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   doc.setProducer("TransPerfect Element");
   doc.setCreator("TransPerfect Element — NEXT agenda studio");
 
-  const bold = (await ttf(doc, "/fonts/Geist-Bold.ttf")) ?? doc.embedStandardFont(StandardFonts.HelveticaBold);
-  const regular = (await ttf(doc, "/fonts/Geist-Regular.ttf")) ?? doc.embedStandardFont(StandardFonts.Helvetica);
+  const bold =
+    (await ttf(doc, "/fonts/Geist-Bold.ttf")) ?? doc.embedStandardFont(StandardFonts.HelveticaBold);
+  const regular =
+    (await ttf(doc, "/fonts/Geist-Regular.ttf")) ?? doc.embedStandardFont(StandardFonts.Helvetica);
 
   const names: AgendaLayerName[] = [
     "01 Ground",
@@ -264,7 +284,10 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
       Type: "OCG",
       Name: PDFString.of(name),
       Usage: doc.context.obj({
-        Print: doc.context.obj({ PrintState: PDFName.of(nonPrinting ? "OFF" : "ON"), Subtype: "Print" }),
+        Print: doc.context.obj({
+          PrintState: PDFName.of(nonPrinting ? "OFF" : "ON"),
+          Subtype: "Print",
+        }),
       }),
     });
     return { name, ref: doc.context.register(dict), tag: `OC${i + 1}` };
@@ -286,7 +309,11 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
   // Approved division lockup is fetched once and reused on every page.
   const division = agendaDivision(config.divisionId);
   const art = config.showLockup
-    ? await loadLockup(face === "light" ? division.colorUrl || division.whiteUrl : division.whiteUrl || division.colorUrl)
+    ? await loadLockup(
+        face === "light"
+          ? division.colorUrl || division.whiteUrl
+          : division.whiteUrl || division.colorUrl,
+      )
     : null;
   let lockupVector = false;
 
@@ -540,7 +567,16 @@ export async function buildAgendaVectorPdf(config: AgendaConfig): Promise<Agenda
           if (!qr.modules[r * qr.size + c]) continue;
           const x = left + c * unit;
           const y = bottom + edge - (r + 1) * unit;
-          polygon(page, [[x, y], [x + unit, y], [x + unit, y + unit], [x, y + unit]], dark);
+          polygon(
+            page,
+            [
+              [x, y],
+              [x + unit, y],
+              [x + unit, y + unit],
+              [x, y + unit],
+            ],
+            dark,
+          );
         }
       }
       if ((cfg.qrCaption ?? "").trim()) {

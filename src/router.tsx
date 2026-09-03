@@ -22,13 +22,12 @@ export const getRouter = () => {
       ? null
       : `${window.location.pathname}${window.location.search}${window.location.hash}`;
 
-
   const router = createRouter({
     routeTree,
     context: { queryClient },
     scrollRestoration: ({ location }) => {
       const key = scrollKey(location);
-      
+
       if (key === lastKey) return false;
       lastKey = key;
       return true;
@@ -40,4 +39,3 @@ export const getRouter = () => {
 
   return router;
 };
-

@@ -66,7 +66,11 @@ function pctToHex(value) {
   const m = /rgb\(\s*([\d.]+)%\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%\s*\)/.exec(value);
   if (!m) return null;
   const hex = [1, 2, 3]
-    .map((i) => Math.round((Number(m[i]) / 100) * 255).toString(16).padStart(2, "0"))
+    .map((i) =>
+      Math.round((Number(m[i]) / 100) * 255)
+        .toString(16)
+        .padStart(2, "0"),
+    )
     .join("");
   return `#${hex}`;
 }
@@ -127,7 +131,8 @@ function normalise(hex, colourway) {
   const value = (hex ?? "").trim().toLowerCase();
   if (!value) return colourway === "dblue" ? "#03002c" : "#fff";
   if (value === "#ffffff") return "#fff";
-  if (value === "#000000") return colourway === "dblue" || colourway === "color" ? "#03002c" : "#fff";
+  if (value === "#000000")
+    return colourway === "dblue" || colourway === "color" ? "#03002c" : "#fff";
   return value;
 }
 

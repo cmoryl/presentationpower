@@ -234,7 +234,9 @@ export function qaFitPrintContent(
 ): QaFitResult {
   const content: Bag = { ...((rawContent as Bag | null | undefined) ?? {}) };
   const notes: string[] = [];
-  const rawModules = Array.isArray(content["modules"]) ? (content["modules"] as PrintSection[]) : [];
+  const rawModules = Array.isArray(content["modules"])
+    ? (content["modules"] as PrintSection[])
+    : [];
 
   // Fit modules one at a time against the RUNNING page state so each insert
   // sees the budget left by the modules already placed. Fresh content fits

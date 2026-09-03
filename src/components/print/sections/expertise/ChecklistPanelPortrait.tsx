@@ -1,6 +1,6 @@
 // Glass checklist panel — up to 6 rows with accent check chips.
 import type { PrintExpertiseSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, modulePanel, safeList} from "../shared";
+import { cq, sectionInk, MODULE, modulePanel, safeList } from "../shared";
 import { Icon, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";

@@ -34,7 +34,6 @@ import { backdropForVariant } from "@/components/slide/variantBackdrop";
 import { ModuleBackgroundEditor } from "@/components/library/ModuleBackgroundEditor";
 import { useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 
-
 import {
   ALL_BRANDS,
   INK_KEY,
@@ -936,7 +935,6 @@ export function VariantSampleStudio({
               {pack ? ` · ${pack.label ?? pack.id}` : ""}
             </span>
           </div>
-
         </div>
 
         <div className="flex overflow-hidden rounded-full border border-white/25">
@@ -1221,7 +1219,6 @@ export function VariantSampleStudio({
                       mode={mode}
                     />
                   </PackShell>
-
                 </SlideBackdropContext.Provider>
               </ScaledSlide>
             </LiveEditOverlay>
@@ -1281,7 +1278,6 @@ export function VariantSampleStudio({
             ))}
           </div>
 
-
           <div className="mt-3 rounded-lg border border-white/10 bg-[#03002C]/40 p-3 text-[11px] text-white/60">
             <div className="font-semibold uppercase tracking-widest text-white/45">Save scope</div>
             <label className="mt-2 flex items-center gap-2 text-white/70">
@@ -1335,7 +1331,6 @@ export function VariantSampleStudio({
               )}
             </div>
           ) : tab === "bulk" ? (
-
             <BulkStylePanel
               variant={variant}
               brand={brand}
@@ -1691,20 +1686,20 @@ export function VariantSampleStudio({
                               on families that do not read it, so a control never
                               looks broken. */}
                           {cellControls.tone ? (
-                          <div className="mt-2">
-                            <ItemToneRow
-                              dark
-                              label="Gradient start"
-                              tone={itemTone(it)}
-                              onChange={(hex) => setItemField(i, "tone", hex ?? undefined)}
-                            />
-                            <ItemToneRow
-                              dark
-                              label="Gradient end"
-                              tone={itemToneEnd(it)}
-                              onChange={(hex) => setItemField(i, "toneEnd", hex ?? undefined)}
-                            />
-                          </div>
+                            <div className="mt-2">
+                              <ItemToneRow
+                                dark
+                                label="Gradient start"
+                                tone={itemTone(it)}
+                                onChange={(hex) => setItemField(i, "tone", hex ?? undefined)}
+                              />
+                              <ItemToneRow
+                                dark
+                                label="Gradient end"
+                                tone={itemToneEnd(it)}
+                                onChange={(hex) => setItemField(i, "toneEnd", hex ?? undefined)}
+                              />
+                            </div>
                           ) : null}
 
                           {isMedia ? (
@@ -1967,78 +1962,78 @@ export function VariantSampleStudio({
                               </div>
 
                               {cellControls.iconSize ? (
-                              <div className="mt-2 flex flex-wrap items-center gap-1">
-                                <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
-                                  Size
-                                </span>
-                                {ICON_SIZE_CHOICES.map((size) => {
-                                  const active = String(it.iconSize ?? "md") === size;
-                                  return (
-                                    <button
-                                      key={size}
-                                      type="button"
-                                      onClick={() => setItemField(i, "iconSize", size)}
-                                      className={`rounded border px-1.5 py-0.5 text-[10px] ${
-                                        active
-                                          ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/15 text-[#A1FBF9]"
-                                          : "border-white/15 text-white/60 hover:text-white"
-                                      }`}
-                                    >
-                                      {size}
-                                    </button>
-                                  );
-                                })}
-                              </div>
+                                <div className="mt-2 flex flex-wrap items-center gap-1">
+                                  <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
+                                    Size
+                                  </span>
+                                  {ICON_SIZE_CHOICES.map((size) => {
+                                    const active = String(it.iconSize ?? "md") === size;
+                                    return (
+                                      <button
+                                        key={size}
+                                        type="button"
+                                        onClick={() => setItemField(i, "iconSize", size)}
+                                        className={`rounded border px-1.5 py-0.5 text-[10px] ${
+                                          active
+                                            ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                                            : "border-white/15 text-white/60 hover:text-white"
+                                        }`}
+                                      >
+                                        {size}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               ) : null}
 
                               {/* Alignment + fine offset inside the tile's glyph
                                   well. Tile styling is untouched. Only shown for
                                   families that honour the nudge. */}
                               {cellControls.iconNudge ? (
-                              <>
-                              <div className="mt-2 flex flex-wrap items-center gap-1">
-                                <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
-                                  Align
-                                </span>
-                                {(["top", "center", "bottom"] as const).map((pos) => {
-                                  const active = String(it.iconAlign ?? "center") === pos;
-                                  return (
-                                    <button
-                                      key={pos}
-                                      type="button"
-                                      onClick={() => setItemField(i, "iconAlign", pos)}
-                                      className={`rounded border px-1.5 py-0.5 text-[10px] ${
-                                        active
-                                          ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/15 text-[#A1FBF9]"
-                                          : "border-white/15 text-white/60 hover:text-white"
-                                      }`}
-                                    >
-                                      {pos}
-                                    </button>
-                                  );
-                                })}
-                              </div>
+                                <>
+                                  <div className="mt-2 flex flex-wrap items-center gap-1">
+                                    <span className="mr-1 text-[10px] uppercase tracking-widest text-white/40">
+                                      Align
+                                    </span>
+                                    {(["top", "center", "bottom"] as const).map((pos) => {
+                                      const active = String(it.iconAlign ?? "center") === pos;
+                                      return (
+                                        <button
+                                          key={pos}
+                                          type="button"
+                                          onClick={() => setItemField(i, "iconAlign", pos)}
+                                          className={`rounded border px-1.5 py-0.5 text-[10px] ${
+                                            active
+                                              ? "border-[#A1FBF9]/70 bg-[#A1FBF9]/15 text-[#A1FBF9]"
+                                              : "border-white/15 text-white/60 hover:text-white"
+                                          }`}
+                                        >
+                                          {pos}
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
 
-                              <label className="mt-2 flex items-center gap-2">
-                                <span className="text-[10px] uppercase tracking-widest text-white/40">
-                                  Offset
-                                </span>
-                                <input
-                                  type="range"
-                                  min={-40}
-                                  max={40}
-                                  step={1}
-                                  value={Number(it.iconOffsetPct ?? 0) || 0}
-                                  onChange={(e) =>
-                                    setItemField(i, "iconOffsetPct", Number(e.target.value))
-                                  }
-                                  className="h-1 flex-1 accent-[#A1FBF9]"
-                                />
-                                <span className="w-9 text-right text-[10px] tabular-nums text-white/60">
-                                  {Number(it.iconOffsetPct ?? 0) || 0}%
-                                </span>
-                              </label>
-                              </>
+                                  <label className="mt-2 flex items-center gap-2">
+                                    <span className="text-[10px] uppercase tracking-widest text-white/40">
+                                      Offset
+                                    </span>
+                                    <input
+                                      type="range"
+                                      min={-40}
+                                      max={40}
+                                      step={1}
+                                      value={Number(it.iconOffsetPct ?? 0) || 0}
+                                      onChange={(e) =>
+                                        setItemField(i, "iconOffsetPct", Number(e.target.value))
+                                      }
+                                      className="h-1 flex-1 accent-[#A1FBF9]"
+                                    />
+                                    <span className="w-9 text-right text-[10px] tabular-nums text-white/60">
+                                      {Number(it.iconOffsetPct ?? 0) || 0}%
+                                    </span>
+                                  </label>
+                                </>
                               ) : null}
                             </div>
                           ) : null}
@@ -2056,9 +2051,7 @@ export function VariantSampleStudio({
       {layerImageFor !== null && (
         <SlideMediaPicker
           title="Image for freeform layer"
-          currentUrl={
-            layout.layers?.find((l) => l.id === layerImageFor)?.mediaUrl || undefined
-          }
+          currentUrl={layout.layers?.find((l) => l.id === layerImageFor)?.mediaUrl || undefined}
           onClose={() => setLayerImageFor(null)}
           onPick={(picked) =>
             writeLayout(

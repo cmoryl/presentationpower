@@ -45,9 +45,7 @@ export async function captureModeReferences(
 ): Promise<VisualReferenceSet> {
   const { rasterizeExactSlide } = await import("./slide-exact-raster");
   const brand =
-    resolveBrandMode(deck.brandModeId) ??
-    byId(BRAND_MODES, deck.brandModeId) ??
-    BRAND_MODES[0];
+    resolveBrandMode(deck.brandModeId) ?? byId(BRAND_MODES, deck.brandModeId) ?? BRAND_MODES[0];
   const pack = deck.context?.stylePackId ? stylePackById(deck.context.stylePackId) : null;
 
   const slides: VisualReferenceSet["slides"] = [];

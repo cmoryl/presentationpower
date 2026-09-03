@@ -79,7 +79,6 @@ function versionedUrl(url: string, createdAt?: string | null): string {
   return `${url}${url.includes("?") ? "&" : "?"}v=${stamp}`;
 }
 
-
 export const generateSkinBackdrop = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input: unknown) => GenerateInput.parse(input))

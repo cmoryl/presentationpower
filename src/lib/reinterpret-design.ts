@@ -27,7 +27,6 @@ import {
 import { getClientWallItems, findClientWallLogo } from "./client-wall-pool";
 import { clientPlaceholderItems } from "./logohub-fillers";
 
-
 // ── signals ──────────────────────────────────────────────────────────────
 
 export type SlideSignals = {
@@ -178,7 +177,6 @@ function logoWallItems(g: SlideSignals, count: number, seed = "wall") {
   }
   return out;
 }
-
 
 const logoWallDesign = (
   id: string,
@@ -1018,7 +1016,9 @@ function finalize(
     // the deck's own photography instead of generated placeholders.
     const tiles = variantItemImageCapacity(variant.id);
     if (tiles > 0 && pool.length) {
-      const existing = Array.isArray(merged.items) ? (merged.items as Record<string, unknown>[]) : [];
+      const existing = Array.isArray(merged.items)
+        ? (merged.items as Record<string, unknown>[])
+        : [];
       const count = Math.min(tiles, Math.max(existing.length, pool.length));
       const items: Record<string, unknown>[] = [];
       for (let i = 0; i < count; i++) {
@@ -1042,7 +1042,6 @@ function finalize(
 
     merged.extraImages = pool;
   }
-
 
   const sourceBullets = (base.source.bullets ?? []).map((b) => (b ?? "").trim()).filter(Boolean);
   const haystack = norm(collectStrings(merged).join(" ⋄ "));
@@ -1287,9 +1286,9 @@ export function designReinterpretedDeck(
       if (g.images.length > 0 && g.bullets.length <= 4) {
         const slots =
           (variantSupportsImagery(d.variantId) ? 1 : 0) + variantItemImageCapacity(d.variantId);
-        score += slots > 0 ? Math.min(6, 3 + Math.min(3, Math.min(slots, g.images.length) - 1)) : -4;
+        score +=
+          slots > 0 ? Math.min(6, 3 + Math.min(3, Math.min(slots, g.images.length) - 1)) : -4;
       }
-
 
       // Capacity pressure: among otherwise comparable looks, prefer the one
       // that actually holds more of the source copy on the canvas.

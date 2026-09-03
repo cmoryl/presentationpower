@@ -34,9 +34,9 @@ describe("clear-box guard", () => {
   });
 
   it("drops an effectively unpainted box at any size", () => {
-    expect(isGhostPaint(shape({ w: 300, h: 200, fill: { hex: "FFFFFF", alpha: 0.02 } }), SPACE)).toBe(
-      true,
-    );
+    expect(
+      isGhostPaint(shape({ w: 300, h: 200, fill: { hex: "FFFFFF", alpha: 0.02 } }), SPACE),
+    ).toBe(true);
   });
 
   it("keeps a glass card: translucent but stroked", () => {
@@ -73,7 +73,13 @@ describe("clear-box guard", () => {
   });
 
   it("keeps pictures", () => {
-    const pic = shape({ kind: "image", src: "data:image/png;base64,x", w: 1920, h: 1080, fill: null });
+    const pic = shape({
+      kind: "image",
+      src: "data:image/png;base64,x",
+      w: 1920,
+      h: 1080,
+      fill: null,
+    });
     expect(isGhostPaint(pic, SPACE)).toBe(false);
   });
 

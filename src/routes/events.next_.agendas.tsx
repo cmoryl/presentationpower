@@ -71,4 +71,3 @@ function AgendaPage() {
     </AppShell>
   );
 }
-

@@ -46,7 +46,6 @@ export function PrintSectionLayoutFrame({
     padding: tokens.pad > 0 ? cq(tokens.pad) : undefined,
   };
 
-
   return (
     <div
       data-ps-frame

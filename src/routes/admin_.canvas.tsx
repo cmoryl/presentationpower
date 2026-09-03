@@ -18,12 +18,7 @@ import {
 } from "@/components/editor/EditorChrome";
 import { EditorHistoryControls } from "@/components/editor/EditorHistoryControls";
 import { nanoid } from "nanoid";
-import {
-  BRAND_MODES,
-  MODULE_VARIANTS,
-  SECTION_FRAMEWORKS,
-  byId,
-} from "@/lib/taxonomy";
+import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveDivisionBrief, seedDivisionContent } from "@/lib/library-preview";
 import { retintItemsForMode } from "@/lib/canvas-mode-ink";
 import { useImageDrop } from "@/hooks/use-image-drop";
@@ -282,8 +277,7 @@ function CanvasStudioPage() {
     let backdrop: CanvasItem | null = null;
     try {
       const variant = MODULE_VARIANTS.find((v) => v.id === item.variantId);
-      const brand =
-        BRAND_MODES.find((b) => b.id === comp.brandId) ?? BRAND_MODES[0] ?? null;
+      const brand = BRAND_MODES.find((b) => b.id === comp.brandId) ?? BRAND_MODES[0] ?? null;
       if (variant && brand) {
         const brief = resolveDivisionBrief(brand);
         const sectionId =
@@ -791,8 +785,8 @@ function CanvasStudioPage() {
                 <p className="mt-2 text-[11px] text-black/45 dark:text-white/45">
                   Drag to move · corner handle to resize · drag across empty canvas to lasso-select
                   · shift-click to add · click a selected item to select just it · Esc clears the
-                  selection · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z
-                  steps through history. Double-click a placed module to make it fully editable.
+                  selection · ⌘A selects all · arrows nudge · Delete removes · ⌘Z / ⇧⌘Z steps
+                  through history. Double-click a placed module to make it fully editable.
                   Compositions save automatically in this browser.
                 </p>
               </div>

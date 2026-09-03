@@ -48,9 +48,7 @@ export default defineTool({
       .array(
         z.object({
           section_id: z.string().describe("Section framework id, e.g. 'SF-06'."),
-          variant_id: z
-            .string()
-            .describe("Module variant id permitted for that section."),
+          variant_id: z.string().describe("Module variant id permitted for that section."),
           content: z
             .record(z.string(), z.unknown())
             .describe(

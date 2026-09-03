@@ -17,7 +17,6 @@ const DATAFORCE_HERO_URL =
   "/__l5e/assets-v1/33d2ac38-f172-4289-80da-9eaab3504d71/dataforce-hero-2025.mp4";
 const DATAFORCE_HERO_POSTER = "/brand-motion/dataforce-hero-2025-poster.jpg";
 
-
 export type BrandVideo = {
   id: string;
   /** Brand-mode id that owns the clip, e.g. "bm-product" (DataForce). */

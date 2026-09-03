@@ -63,7 +63,6 @@ export function resolveTarget(part: string, target: string): string {
   return base.join("/");
 }
 
-
 export interface RelEntry {
   id: string;
   target: string;
@@ -124,22 +123,28 @@ export function dedupeDrawingIds(xml: string): { xml: string; renumbered: number
     max = Math.max(max, Number(m[1]));
   }
   let renumbered = 0;
-  const next = xml.replace(/(<p:cNvPr\b[^>]*\sid=")(\d+)(")/g, (all, pre: string, raw: string, post: string) => {
-    const id = Number(raw);
-    if (!used.has(id) && id > 0) {
-      used.add(id);
-      return all;
-    }
-    max += 1;
-    used.add(max);
-    renumbered += 1;
-    return `${pre}${max}${post}`;
-  });
+  const next = xml.replace(
+    /(<p:cNvPr\b[^>]*\sid=")(\d+)(")/g,
+    (all, pre: string, raw: string, post: string) => {
+      const id = Number(raw);
+      if (!used.has(id) && id > 0) {
+        used.add(id);
+        return all;
+      }
+      max += 1;
+      used.add(max);
+      renumbered += 1;
+      return `${pre}${max}${post}`;
+    },
+  );
   return { xml: next, renumbered };
 }
 
 /** Delete relationships whose target part is not in the package. */
-export function pruneOrphanRels(xml: string, missing: Set<string>): { xml: string; removed: number } {
+export function pruneOrphanRels(
+  xml: string,
+  missing: Set<string>,
+): { xml: string; removed: number } {
   if (missing.size === 0) return { xml, removed: 0 };
   let removed = 0;
   const next = xml.replace(/<Relationship\b[^>]*\/>/g, (tag) => {

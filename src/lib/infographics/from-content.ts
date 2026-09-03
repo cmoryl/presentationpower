@@ -52,7 +52,9 @@ export function buildVizSpecFromContent({
   const demo = authoredRows.length === 0 && allowSampleData ? sampleDatasetFor(kind) : null;
   const rows = demo ? demo.rows : authoredRows;
   const encoding =
-    Object.keys(declaredEncoding).length > 0 ? declaredEncoding : (demo?.encoding ?? declaredEncoding);
+    Object.keys(declaredEncoding).length > 0
+      ? declaredEncoding
+      : (demo?.encoding ?? declaredEncoding);
   const source = declared?.data?.source ?? (str(content.source) || demo?.source || undefined);
   const columns =
     declared?.data?.columns ??

@@ -557,7 +557,6 @@ export function buildDataVisualToolSet(): ToolSet {
   };
 }
 
-
 /* ------------------------------------------------------- correctness audit */
 
 /**
@@ -571,8 +570,7 @@ export function auditDataVisual(args: {
   surface: VizSurface;
   mode: "light" | "dark";
 }) {
-  const brand =
-    brandById(BRAND_MODES, "bm-enterprise") ?? BRAND_MODES[0];
+  const brand = brandById(BRAND_MODES, "bm-enterprise") ?? BRAND_MODES[0];
   const theme = vizTheme({ brand, mode: args.mode });
   const spec = buildVizSpecFromContent({
     content: args.content,

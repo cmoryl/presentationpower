@@ -92,7 +92,6 @@ export function brandSystemDarkGroundIsReplaced(seed: string): boolean {
 /** Page field of the master's dark face. */
 export const BRAND_SYSTEM_DARK_SURFACE = "#03002C";
 
-
 /**
  * CSS background for the default system's light page.
  *
@@ -104,20 +103,14 @@ export function brandSystemLightGround(seed: string, accentHex?: string): string
   const base = stylePackById(BRAND_SYSTEM_BASE_PACK_ID);
   if (!base) return enterpriseGroundFor(seed, accentHex);
   const code = brandSystemHasEdit(seed) ? BRAND_SYSTEM_CODE : BRAND_SYSTEM_BASE_CODE;
-  const layers = resolveGroundLayers(
-    authoredGround(base),
-    code,
-    seed,
-    ENTERPRISE_WHITE.surface,
-  );
+  const layers = resolveGroundLayers(authoredGround(base), code, seed, ENTERPRISE_WHITE.surface);
   return layers.length ? layers.join(", ") : enterpriseGroundFor(seed, accentHex);
 }
 
 /** True when the default system's ground for this seed is replaced artwork. */
 export function brandSystemGroundIsReplaced(seed: string): boolean {
   return (
-    groundIsReplaced(BRAND_SYSTEM_CODE, seed) ||
-    groundIsReplaced(BRAND_SYSTEM_BASE_CODE, seed)
+    groundIsReplaced(BRAND_SYSTEM_CODE, seed) || groundIsReplaced(BRAND_SYSTEM_BASE_CODE, seed)
   );
 }
 
@@ -184,4 +177,3 @@ export function brandSystemPack(mode: "light" | "dark" = "light"): StylePack | n
       ),
   };
 }
-

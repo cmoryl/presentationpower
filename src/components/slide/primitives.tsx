@@ -49,7 +49,7 @@ export function Kicker({
   const ink = useSlideInk();
   const kickerMode = useSlideMode();
   const enterprise = isEnterpriseWhite(useSlideSkin());
-  
+
   // Enterprise dark pages need the light ink, not the navy page ink.
   const enterpriseInk = kickerMode === "dark" ? "#FFFFFF" : ENTERPRISE_WHITE.ink;
   return (
@@ -146,7 +146,6 @@ export function copyFitScale(
   const eased = 1 - (1 - raw) * (t * t * (3 - 2 * t));
   return Number(Math.max(floor, Math.min(1, eased)).toFixed(3));
 }
-
 
 export function DisplayTitle({
   children,

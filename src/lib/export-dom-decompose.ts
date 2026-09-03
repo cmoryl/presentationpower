@@ -433,7 +433,6 @@ function panelFadeShape(
     { pos: 1, color: { hex: tint.hex, alpha: 0 } },
   ];
 
-
   return {
     // 180deg in this module's convention = paint runs top → bottom.
     kind: "roundRect",
@@ -451,7 +450,6 @@ function panelFadeShape(
     node: el,
   };
 }
-
 
 /** The paint of an element's own background box, if any. */
 function paintOf(cs: CSSStyleDeclaration): { fill: DomColor | null; gradient: DomGradient | null } {
@@ -676,7 +674,6 @@ function effectShapeFor(
     return null;
   }
 
-
   const { fill, gradient } = paintOf(cs);
   const radiusPx = radiusOf(cs, w, h);
   const ellipse =
@@ -864,7 +861,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         continue;
       }
 
-
       const r = el.getBoundingClientRect();
       const w = r.width * sx;
       const h = r.height * sy;
@@ -946,7 +942,6 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
         }
         surfaceRoots.push(el);
         continue;
-
       }
 
       // ---- painted boxes -------------------------------------------------
@@ -1000,10 +995,7 @@ export function decomposeStage(stage: HTMLElement, opts: DecomposeOptions = {}):
           : 1;
 
       const withAlpha = (c: DomColor | null): DomColor | null =>
-        c
-          ? { hex: c.hex, alpha: Math.max(0, Math.min(1, c.alpha * alphaMul * tintScale)) }
-          : null;
-
+        c ? { hex: c.hex, alpha: Math.max(0, Math.min(1, c.alpha * alphaMul * tintScale)) } : null;
 
       shapes.push({
         kind: isEllipse ? "ellipse" : radiusPx >= 1 ? "roundRect" : "rect",
@@ -1297,10 +1289,7 @@ export function keepBackgroundPaintOnPlate(
     // narrow, tall and see-through — and is not module furniture (timeline
     // spines, rails, connectors, ticks) — belongs on the flat plate.
     const ghostBar =
-      alpha <= 0.5 &&
-      s.w <= space.w * 0.1 &&
-      s.h >= space.h * 0.5 &&
-      !isModuleFurniture(s);
+      alpha <= 0.5 && s.w <= space.w * 0.1 && s.h >= space.h * 0.5 && !isModuleFurniture(s);
     if (ghostBar && !isCardFade(s)) return false;
     return true;
   });
@@ -1562,8 +1551,6 @@ export function collapseMediaOverlays(
 
   return out.filter((s) => !drop.has(s));
 }
-
-
 
 /**
  * Resolve every picture record to an inline data URL, and DROP the records that

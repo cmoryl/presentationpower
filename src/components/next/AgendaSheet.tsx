@@ -51,7 +51,11 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
   // Trim origin inside the bleed sheet.
   const tx = mm(geo.bleedEdge);
   const ty = mm(geo.bleedEdge);
-  const at = (x: number, y: number) => ({ position: "absolute" as const, left: tx + mm(x), top: ty + mm(y) });
+  const at = (x: number, y: number) => ({
+    position: "absolute" as const,
+    left: tx + mm(x),
+    top: ty + mm(y),
+  });
   const rule = face === "light" ? "rgba(3,0,44,0.22)" : "rgba(255,255,255,0.28)";
 
   return (
@@ -71,7 +75,11 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
     >
       {blocks.lockup && (division.whiteUrl || division.colorUrl) ? (
         <img
-          src={face === "light" ? division.colorUrl || division.whiteUrl : division.whiteUrl || division.colorUrl}
+          src={
+            face === "light"
+              ? division.colorUrl || division.whiteUrl
+              : division.whiteUrl || division.colorUrl
+          }
           alt={`${division.name} lockup`}
           style={{
             ...at(blocks.lockup.x, blocks.lockup.y),
@@ -164,7 +172,13 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
               {row.session.title}
             </div>
             {row.session.detail.trim() ? (
-              <div style={{ fontSize: mm(L.detailSize), opacity: 0.78, marginTop: mm(L.detailSize * 0.35) }}>
+              <div
+                style={{
+                  fontSize: mm(L.detailSize),
+                  opacity: 0.78,
+                  marginTop: mm(L.detailSize * 0.35),
+                }}
+              >
                 {row.session.detail}
               </div>
             ) : null}
@@ -199,7 +213,12 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
 
       {qr && blocks.qr ? (
         <div style={{ ...at(blocks.qr.x, blocks.qr.y) }}>
-          <svg width={mm(blocks.qr.edge)} height={mm(blocks.qr.edge)} viewBox={`0 0 ${qr.size} ${qr.size}`} aria-hidden>
+          <svg
+            width={mm(blocks.qr.edge)}
+            height={mm(blocks.qr.edge)}
+            viewBox={`0 0 ${qr.size} ${qr.size}`}
+            aria-hidden
+          >
             <rect x={0} y={0} width={qr.size} height={qr.size} fill="#FFFFFF" />
             <path d={qr.path} fill="#03002C" />
           </svg>
@@ -250,7 +269,6 @@ export function AgendaSheet({ config, pxPerMm = 0.8, guides = false, className, 
           {config.pageLabel}
         </div>
       ) : null}
-
 
       {guides ? (
         <>

@@ -24,7 +24,6 @@ import corp08 from "@/assets/backdrops/corporate-dark/bg-08.webp";
 import corp09 from "@/assets/backdrops/corporate-dark/bg-09.webp";
 import corp10 from "@/assets/backdrops/corporate-dark/bg-10.webp";
 
-
 export const CORPORATE_DARK_BACKDROPS: string[] = [
   corp01,
   corp02,

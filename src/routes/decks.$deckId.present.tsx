@@ -8,14 +8,18 @@ import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { SlideSkinProvider } from "@/components/slide/SlideSkinContext";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
+import {
+  DeckPackScope,
+  deckPack,
+  deckPackResolver,
+  packBrand,
+} from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider, SlideThumbnailContext } from "@/lib/slide-media-refresh";
 import { cn } from "@/lib/utils";
 import { MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useResolvedClientLogo } from "@/hooks/use-client-logos";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 
 const focusThumb = (el: HTMLButtonElement | null) => {
   el?.focus({ preventScroll: true });
@@ -80,7 +84,6 @@ function PresenterView() {
     else setI((n) => Math.max(n - 1, 0));
   };
   const visibleSlidesCount = useRef(0);
-
 
   // Fresh, mode-aware client logo (stored signed URLs expire after an hour).
   const currentMode =
@@ -275,7 +278,6 @@ function PresenterView() {
                           width: 1920,
                           height: 1080,
                         }}
-
                       >
                         {v && (
                           <DeckPackScope pack={packFor(s)}>
@@ -350,7 +352,6 @@ function PresenterView() {
               </Link>
             </div>
 
-
             {/* Presenter notes drawer */}
             <div
               className={cn(
@@ -371,7 +372,6 @@ function PresenterView() {
                   </div>
                 </div>
                 <div className="hidden sm:block">
-
                   <div className="text-[10px] font-medium uppercase tracking-widest text-white/50">
                     Up next
                   </div>

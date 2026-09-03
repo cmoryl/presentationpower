@@ -208,115 +208,115 @@ export function SocialModuleFrame({
 
   return (
     <VizSurfaceProvider surface="social">
-    <div
-      style={{ width: format.width * displayScale, height: format.height * displayScale }}
-      className="relative overflow-hidden"
-    >
       <div
-        style={{
-          width: format.width,
-          height: format.height,
-          transform: `scale(${displayScale})`,
-          transformOrigin: "top left",
-          background: paper,
-          color: ink,
-          position: "relative",
-          overflow: "hidden",
-        }}
+        style={{ width: format.width * displayScale, height: format.height * displayScale }}
+        className="relative overflow-hidden"
       >
-        {/* Division aura ground — keeps social frames on-brand without fighting
-            the module's own surfaces. */}
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              mode === "dark"
-                ? `radial-gradient(120% 90% at 12% 0%, ${accent}55 0%, transparent 62%), radial-gradient(90% 70% at 100% 100%, ${accent}33 0%, transparent 60%)`
-                : `radial-gradient(120% 90% at 10% 0%, ${accent}1f 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, ${accent}14 0%, transparent 58%)`,
-          }}
-        />
-
-        {/* Live module, scaled into the safe rect. */}
         <div
           style={{
-            position: "absolute",
-            left: safe.left,
-            top,
-            width: safe.width,
-            height: Math.min(fit.renderedHeight, safe.height),
+            width: format.width,
+            height: format.height,
+            transform: `scale(${displayScale})`,
+            transformOrigin: "top left",
+            background: paper,
+            color: ink,
+            position: "relative",
             overflow: "hidden",
           }}
         >
-          <div
-            ref={measureRef}
-            className="[container-type:inline-size]"
+          {/* Division aura ground — keeps social frames on-brand without fighting
+            the module's own surfaces. */}
+          <span
+            aria-hidden
             style={{
-              width: fit.pageWidth,
-              transform: `scale(${fit.scale})`,
-              transformOrigin: "top left",
-              ["--print-page-pad" as string]: "0px",
-              ["--print-page-pad-top" as string]: "0px",
-              // Air ladder: multiplies only the module's internal padding so
-              // its own plates and surfaces reach the safe rect.
-              ["--print-fit-pad" as string]: String(fit.air),
+              position: "absolute",
+              inset: 0,
+              background:
+                mode === "dark"
+                  ? `radial-gradient(120% 90% at 12% 0%, ${accent}55 0%, transparent 62%), radial-gradient(90% 70% at 100% 100%, ${accent}33 0%, transparent 60%)`
+                  : `radial-gradient(120% 90% at 10% 0%, ${accent}1f 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, ${accent}14 0%, transparent 58%)`,
+            }}
+          />
+
+          {/* Live module, scaled into the safe rect. */}
+          <div
+            style={{
+              position: "absolute",
+              left: safe.left,
+              top,
+              width: safe.width,
+              height: Math.min(fit.renderedHeight, safe.height),
+              overflow: "hidden",
             }}
           >
-            {/* The virtual sheet takes the FRAME's aspect, not Letter's. Band
+            <div
+              ref={measureRef}
+              className="[container-type:inline-size]"
+              style={{
+                width: fit.pageWidth,
+                transform: `scale(${fit.scale})`,
+                transformOrigin: "top left",
+                ["--print-page-pad" as string]: "0px",
+                ["--print-page-pad-top" as string]: "0px",
+                // Air ladder: multiplies only the module's internal padding so
+                // its own plates and surfaces reach the safe rect.
+                ["--print-fit-pad" as string]: String(fit.air),
+              }}
+            >
+              {/* The virtual sheet takes the FRAME's aspect, not Letter's. Band
                 and masthead heights are a share of page height, so this is what
                 makes a photo band fill a square post instead of sitting in a
                 letterbox. */}
-            <PrintPageProvider
-              size="Letter"
-              margin="standard"
-              heightPx={framePageHeight}
-              heroBandPct={frameBandPct}
-            >
-              <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
-                <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
-              </PrintDocModeProvider>
-            </PrintPageProvider>
+              <PrintPageProvider
+                size="Letter"
+                margin="standard"
+                heightPx={framePageHeight}
+                heroBandPct={frameBandPct}
+              >
+                <PrintDocModeProvider icons={relief.icons} iconStyle={PRINT_ICON_STYLE_DEFAULT}>
+                  <PrintSectionRenderer section={rendered} mode={mode} accent={accent} />
+                </PrintDocModeProvider>
+              </PrintPageProvider>
+            </div>
           </div>
-        </div>
 
-        {!hideLockup && brand ? (
-          <div style={{ position: "absolute", left: safe.left, bottom: lockupPad }}>
-            <BrandLockup brand={brand} color={ink} size={short >= 1400 ? "sm" : "xs"} />
-          </div>
-        ) : null}
+          {!hideLockup && brand ? (
+            <div style={{ position: "absolute", left: safe.left, bottom: lockupPad }}>
+              <BrandLockup brand={brand} color={ink} size={short >= 1400 ? "sm" : "xs"} />
+            </div>
+          ) : null}
 
-        {showSafeArea ? (
-          <>
-            <span
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: safe.left,
-                top: safe.top,
-                width: safe.width,
-                height: safe.height,
-                outline: `2px dashed ${fit.ok ? "#2563EB" : "#E53D2E"}`,
-                outlineOffset: -1,
-              }}
-            />
-            {!fit.ok ? (
+          {showSafeArea ? (
+            <>
               <span
                 aria-hidden
                 style={{
                   position: "absolute",
                   left: safe.left,
-                  top: safe.top + safe.height,
+                  top: safe.top,
                   width: safe.width,
-                  height: Math.min(fit.overflowPx, format.height - safe.top - safe.height),
-                  background: "rgba(229,61,46,0.22)",
+                  height: safe.height,
+                  outline: `2px dashed ${fit.ok ? "#2563EB" : "#E53D2E"}`,
+                  outlineOffset: -1,
                 }}
               />
-            ) : null}
-          </>
-        ) : null}
+              {!fit.ok ? (
+                <span
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: safe.left,
+                    top: safe.top + safe.height,
+                    width: safe.width,
+                    height: Math.min(fit.overflowPx, format.height - safe.top - safe.height),
+                    background: "rgba(229,61,46,0.22)",
+                  }}
+                />
+              ) : null}
+            </>
+          ) : null}
+        </div>
       </div>
-    </div>
     </VizSurfaceProvider>
   );
 }

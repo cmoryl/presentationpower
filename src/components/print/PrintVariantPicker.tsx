@@ -71,9 +71,7 @@ function Row({
         <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/50 dark:text-white/50">
           {label}
         </p>
-        {hint ? (
-          <span className="text-[10px] text-black/40 dark:text-white/40">{hint}</span>
-        ) : null}
+        {hint ? <span className="text-[10px] text-black/40 dark:text-white/40">{hint}</span> : null}
       </div>
       <div className="mt-1 flex flex-wrap gap-1">{children}</div>
     </div>

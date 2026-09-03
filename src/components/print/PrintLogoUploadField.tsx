@@ -44,13 +44,7 @@ export function PrintLogoUploadField({
     <div className="grid gap-1">
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-medium opacity-70">{label}</span>
-        {value && (
-          <img
-            src={value}
-            alt=""
-            className="h-4 w-auto max-w-[90px] object-contain"
-          />
-        )}
+        {value && <img src={value} alt="" className="h-4 w-auto max-w-[90px] object-contain" />}
       </div>
       <div className="grid grid-cols-[1fr_auto] gap-1">
         <input

@@ -74,10 +74,7 @@ export function agendaFit(config: AgendaConfig): AgendaFitReport {
   // A row is legible when its title and detail type clear the floor. The row
   // heights come straight off the shared layout, so this floor tracks format.
   const tooTight = L.titleRowSize < MIN_ROW_TITLE_MM || L.detailSize < MIN_DETAIL_MM;
-  const perRowFloor = Math.max(
-    MIN_ROW_TITLE_MM / 0.34,
-    MIN_DETAIL_MM / 0.24,
-  );
+  const perRowFloor = Math.max(MIN_ROW_TITLE_MM / 0.34, MIN_DETAIL_MM / 0.24);
   const maxRows = Math.max(1, Math.floor(bandH / perRowFloor));
 
   const titleColW = L.contentW - L.timeColW - L.trackColW - 6;

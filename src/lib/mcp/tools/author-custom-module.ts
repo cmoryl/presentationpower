@@ -20,7 +20,12 @@ export default defineTool({
     image_urls: z.array(z.string()).describe("Absolute image URLs to place.").optional(),
     notes: z.string().describe("Speaker notes.").optional(),
     section_id: z.string().describe("Section framework id this slide belongs to.").optional(),
-    position: z.number().int().min(0).describe("0-based insert position; defaults to the end.").optional(),
+    position: z
+      .number()
+      .int()
+      .min(0)
+      .describe("0-based insert position; defaults to the end.")
+      .optional(),
     why_no_native_module: z
       .string()
       .min(10)

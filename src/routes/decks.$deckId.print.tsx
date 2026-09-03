@@ -9,7 +9,12 @@ import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrate
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
 import { VizSurfaceProvider } from "@/components/slide/VizSurfaceContext";
-import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
+import {
+  DeckPackScope,
+  deckPack,
+  deckPackResolver,
+  packBrand,
+} from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -174,20 +179,19 @@ function PrintView() {
                   <ScaledSlide>
                     <DeckPackScope pack={packFor(slide)}>
                       <VizSurfaceProvider surface="print">
-                      <VariantRenderer
-                        slide={slide}
-                        variant={variant}
-                        brand={brand}
-                        pageNumber={i + 1}
-                        clientName={brief?.prospect}
-                        clientLogoUrl={clientLogoUrl}
-                        subCompany={deck.subCompany}
-                        logoOrientation={deck.context?.logoOrientation}
-                        mode={slide.mode ?? "light"}
-                      />
+                        <VariantRenderer
+                          slide={slide}
+                          variant={variant}
+                          brand={brand}
+                          pageNumber={i + 1}
+                          clientName={brief?.prospect}
+                          clientLogoUrl={clientLogoUrl}
+                          subCompany={deck.subCompany}
+                          logoOrientation={deck.context?.logoOrientation}
+                          mode={slide.mode ?? "light"}
+                        />
                       </VizSurfaceProvider>
                     </DeckPackScope>
-
                   </ScaledSlide>
                 </div>
               );

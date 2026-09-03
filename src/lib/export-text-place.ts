@@ -137,17 +137,21 @@ export function placeTextRuns(
     // word, a coloured span) are emitted as sibling runs INSIDE that line's
     // paragraph, so they keep their own style yet can never float as a separate
     // box and collide with the baked line when PowerPoint's font metrics drift.
-    if (
-      (lead.lines?.length ?? 0) > 1 &&
-      block.runs.every((r, ri) => ri === 0 || r.singleLine)
-    ) {
+    if ((lead.lines?.length ?? 0) > 1 && block.runs.every((r, ri) => ri === 0 || r.singleLine)) {
       const lines = lead.lines!;
       const frags = block.runs.slice(1);
       const fragParts = frags.map((f) => runProps(f));
       if (fragParts.every(Boolean)) {
         type BakedPart = { text: string; options: Record<string, unknown> };
         const lineParts: BakedPart[] = [];
-        const extras: { x: number; y: number; w: number; h: number; chars: number; lineIdx: number }[] = [];
+        const extras: {
+          x: number;
+          y: number;
+          w: number;
+          h: number;
+          chars: number;
+          lineIdx: number;
+        }[] = [];
         const fragUsed = new Set<number>();
         lines.forEach((line, li) => {
           const leadOpts = { ...parts[0]!.options } as Record<string, unknown>;
@@ -159,12 +163,20 @@ export function placeTextRuns(
             const p = fragParts[fi]!;
             const em = Math.max(lead.fontSizePx, f.fontSizePx);
             const gap = f.x - (line.x + line.w);
-            const spacer = /\s$/.test(line.text) || /^\s/.test(f.text) ? "" : gap > em * 0.06 ? " " : "";
+            const spacer =
+              /\s$/.test(line.text) || /^\s/.test(f.text) ? "" : gap > em * 0.06 ? " " : "";
             lineParts.push({
               text: `${spacer}${p.text.trim()}`,
               options: { ...p.options } as Record<string, unknown>,
             });
-            extras.push({ x: f.x, y: f.y, w: f.w, h: f.h, chars: p.text.trim().length + (spacer ? 1 : 0), lineIdx: li });
+            extras.push({
+              x: f.x,
+              y: f.y,
+              w: f.w,
+              h: f.h,
+              chars: p.text.trim().length + (spacer ? 1 : 0),
+              lineIdx: li,
+            });
             fragUsed.add(fi);
           });
           lineParts[lineParts.length - 1]!.options.breakLine = li < lines.length - 1;
@@ -188,7 +200,14 @@ export function placeTextRuns(
             text: ` ${p.text.trim()}`,
             options: { ...p.options } as Record<string, unknown>,
           });
-          extras.push({ x: f.x, y: f.y, w: f.w, h: f.h, chars: p.text.trim().length + 1, lineIdx: best });
+          extras.push({
+            x: f.x,
+            y: f.y,
+            w: f.w,
+            h: f.h,
+            chars: p.text.trim().length + 1,
+            lineIdx: best,
+          });
         });
 
         slide.addText(lineParts, {

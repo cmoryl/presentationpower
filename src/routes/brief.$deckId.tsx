@@ -12,10 +12,7 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
-import {
-  briefCampaignSearch,
-  type BriefCampaignSearch,
-} from "@/lib/brief-campaign-context";
+import { briefCampaignSearch, type BriefCampaignSearch } from "@/lib/brief-campaign-context";
 import { AppShell } from "@/components/AppShell";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
@@ -268,7 +265,9 @@ function BriefOutputHub() {
                     <div className="truncate text-[14px] font-medium text-[#03002C]">
                       {deck.title}
                     </div>
-                    <div className="text-[12px] text-black/50">{deck.slides.length} slide{deck.slides.length === 1 ? "" : "s"}</div>
+                    <div className="text-[12px] text-black/50">
+                      {deck.slides.length} slide{deck.slides.length === 1 ? "" : "s"}
+                    </div>
                   </div>
                   <ArrowRight
                     size={16}

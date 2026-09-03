@@ -173,7 +173,6 @@ export async function renderPptxWithPowerPoint(bytes, remoteName, { keepFonts = 
   if (!conv) throw lastErr;
   const pdf = new Uint8Array(await conv.arrayBuffer());
   return { pdf, itemId, name };
-
 }
 
 export async function deleteDriveItem(itemId) {

@@ -134,7 +134,9 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
     familyId,
     colourway: available.includes(wanted) ? wanted : (available[0] ?? "white"),
     orientation:
-      patch.orientation === "stacked" || patch.orientation === "side" || patch.orientation === "auto"
+      patch.orientation === "stacked" ||
+      patch.orientation === "side" ||
+      patch.orientation === "auto"
         ? patch.orientation
         : base.orientation,
     tileWidthMm: clampNum(
@@ -348,7 +350,10 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
   const textSize = Math.max(8, logoH * (picked.orientation === "side" ? 0.6 : 0.32));
   const qrSize = Math.min(logoW, logoH * 1.6);
 
-  const tileW = Math.max(logoW, usesText ? Math.min(logoW * 1.6, textRunMm(config.text, textSize)) : 0);
+  const tileW = Math.max(
+    logoW,
+    usesText ? Math.min(logoW * 1.6, textRunMm(config.text, textSize)) : 0,
+  );
   const tileH = Math.max(logoH, usesText ? textSize * 1.25 : 0, code ? qrSize : 0);
 
   const pitchX = tileW * (1 + config.gapX);
@@ -454,8 +459,10 @@ export function stepRepeatSummary(panel: LondonPanel, plan: StepRepeatPlan): str
 export function stepRepeatWarnings(panel: LondonPanel, plan: StepRepeatPlan): string[] {
   const out: string[] = [];
   const inW = mmToIn(plan.config.tileWidthMm);
-  if (inW < 6) out.push(`Mark is ${inW.toFixed(1)} in wide — under 6 in it stops reading in a press crop.`);
-  if (inW > 16) out.push(`Mark is ${inW.toFixed(1)} in wide — over 16 in a portrait crop can cut it in half.`);
+  if (inW < 6)
+    out.push(`Mark is ${inW.toFixed(1)} in wide — under 6 in it stops reading in a press crop.`);
+  if (inW > 16)
+    out.push(`Mark is ${inW.toFixed(1)} in wide — over 16 in a portrait crop can cut it in half.`);
   if (plan.config.gapX < 0.25 || plan.config.gapY < 0.25)
     out.push("Gaps under 25% of the mark fuse the wall into a texture on camera.");
   if (plan.config.drop < 0.2)

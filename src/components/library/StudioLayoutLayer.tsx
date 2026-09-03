@@ -212,7 +212,11 @@ export function StudioLayoutLayer({
       : { ...start, x: start.x + dx, y: start.y + dy };
     const snapped = snapRect(drag.state.resize ? moved : clampRect(moved), tx, ty);
     const out = drag.state.resize
-      ? { ...snapped.rect, w: Math.min(snapped.rect.w, SLIDE_W - start.x), h: Math.min(snapped.rect.h, SLIDE_H - start.y) }
+      ? {
+          ...snapped.rect,
+          w: Math.min(snapped.rect.w, SLIDE_W - start.x),
+          h: Math.min(snapped.rect.h, SLIDE_H - start.y),
+        }
       : clampRect(snapped.rect);
     dragRef.current = { ...drag, lastRect: out } as never;
     setGuides({ x: snapped.guideX, y: snapped.guideY });
@@ -244,7 +248,10 @@ export function StudioLayoutLayer({
       el.style.transform = "";
       const off = drag.lastOffset;
       if (off && (Math.abs(off.dx) > 0.5 || Math.abs(off.dy) > 0.5)) {
-        const nextOffsets = { ...offsets, [path]: { dx: Math.round(off.dx), dy: Math.round(off.dy) } };
+        const nextOffsets = {
+          ...offsets,
+          [path]: { dx: Math.round(off.dx), dy: Math.round(off.dy) },
+        };
         onCommit({ offsets: nextOffsets, layers }, `Move · ${path}`);
       }
       return;
@@ -258,10 +265,7 @@ export function StudioLayoutLayer({
           ? { ...l, x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.w), h: Math.round(r.h) }
           : l,
       );
-      onCommit(
-        { offsets, layers: fixed },
-        drag.state.resize ? "Resize layer" : "Move layer",
-      );
+      onCommit({ offsets, layers: fixed }, drag.state.resize ? "Resize layer" : "Move layer");
     }
   };
 
@@ -273,10 +277,7 @@ export function StudioLayoutLayer({
       const el = document.activeElement as HTMLElement | null;
       if (el?.isContentEditable) return;
       e.preventDefault();
-      onCommit(
-        { offsets, layers: layers.filter((l) => l.id !== selectedLayerId) },
-        "Delete layer",
-      );
+      onCommit({ offsets, layers: layers.filter((l) => l.id !== selectedLayerId) }, "Delete layer");
       onSelectLayer(null);
     };
     window.addEventListener("keydown", onKey);
@@ -315,7 +316,12 @@ export function StudioLayoutLayer({
             if (!enabled) return;
             onSelectLayer(layer.id);
             if (editingId === layer.id) return;
-            beginDrag({ kind: "layer", id: layer.id, start: { x: layer.x, y: layer.y, w: layer.w, h: layer.h }, resize: false })(e);
+            beginDrag({
+              kind: "layer",
+              id: layer.id,
+              start: { x: layer.x, y: layer.y, w: layer.w, h: layer.h },
+              resize: false,
+            })(e);
           }}
           onPointerMove={onDragMove}
           onPointerUp={endDrag}
@@ -383,7 +389,12 @@ export function StudioLayoutLayer({
                 data-resize-handle=""
                 onPointerDown={(e) => {
                   e.stopPropagation();
-                  beginDrag({ kind: "layer", id: layer.id, start: { x: layer.x, y: layer.y, w: layer.w, h: layer.h }, resize: true })(e);
+                  beginDrag({
+                    kind: "layer",
+                    id: layer.id,
+                    start: { x: layer.x, y: layer.y, w: layer.w, h: layer.h },
+                    resize: true,
+                  })(e);
                 }}
                 onPointerMove={onDragMove}
                 onPointerUp={endDrag}

@@ -54,7 +54,10 @@ function proposalName(title: string, imageCount: number, bulletCount: number): s
   return "Imported Slide — Custom";
 }
 
-function block(b: Partial<CanvasBlock> & Pick<CanvasBlock, "kind" | "x" | "y" | "w" | "h">, i: number): CanvasBlock {
+function block(
+  b: Partial<CanvasBlock> & Pick<CanvasBlock, "kind" | "x" | "y" | "w" | "h">,
+  i: number,
+): CanvasBlock {
   return {
     id: `cm-${i}`,
     text: "",
@@ -88,7 +91,19 @@ export function proposeCustomModule(
 
   if (title) {
     blocks.push(
-      block({ kind: "heading", x: M, y, w: STAGE_W - M * 2, h: 150, text: title, size: 84, weight: 600 }, i++),
+      block(
+        {
+          kind: "heading",
+          x: M,
+          y,
+          w: STAGE_W - M * 2,
+          h: 150,
+          text: title,
+          size: 84,
+          weight: 600,
+        },
+        i++,
+      ),
     );
     y += 190;
   }

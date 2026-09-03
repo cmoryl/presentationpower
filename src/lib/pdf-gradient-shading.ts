@@ -70,7 +70,10 @@ export function parseColor(input: string): [number, number, number] {
 
   const fn = /^rgba?\(([^)]+)\)$/.exec(raw);
   if (fn) {
-    const parts = fn[1]!.split(/[\s,/]+/).filter(Boolean).slice(0, 3);
+    const parts = fn[1]!
+      .split(/[\s,/]+/)
+      .filter(Boolean)
+      .slice(0, 3);
     const ch = parts.map((p) =>
       p.endsWith("%") ? clampChannel(parseFloat(p) / 100) : clampChannel(parseFloat(p)),
     );
@@ -101,11 +104,11 @@ export function normalizeStops(stops: GradientStop[]): GradientStop[] {
     .filter((s) => s && Number.isFinite(s.offset))
     .map((s) => ({
       offset: Math.max(0, Math.min(1, s.offset)),
-      rgb: [clampChannel(s.rgb?.[0] ?? 0), clampChannel(s.rgb?.[1] ?? 0), clampChannel(s.rgb?.[2] ?? 0)] as [
-        number,
-        number,
-        number,
-      ],
+      rgb: [
+        clampChannel(s.rgb?.[0] ?? 0),
+        clampChannel(s.rgb?.[1] ?? 0),
+        clampChannel(s.rgb?.[2] ?? 0),
+      ] as [number, number, number],
     }))
     .sort((a, b) => a.offset - b.offset);
 

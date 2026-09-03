@@ -39,7 +39,6 @@ export async function listKitThreads(surface: KitSurface): Promise<KitAgentThrea
   return (data ?? []) as unknown as KitAgentThread[];
 }
 
-
 export async function createKitThread(
   surface: KitSurface,
   title = surface === "social" ? "New social kit" : "New event kit",

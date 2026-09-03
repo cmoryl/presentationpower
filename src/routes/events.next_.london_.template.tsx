@@ -6,7 +6,17 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy, Type, QrCode, Ruler } from "lucide-react";
+import {
+  ArrowLeft,
+  Crosshair,
+  Download,
+  Move,
+  RotateCcw,
+  Copy,
+  Type,
+  QrCode,
+  Ruler,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -23,10 +33,7 @@ import {
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
-import {
-  LONDON_DIVISION_COLOURWAYS,
-  londonDivisionAccent,
-} from "@/lib/next-london-division";
+import { LONDON_DIVISION_COLOURWAYS, londonDivisionAccent } from "@/lib/next-london-division";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -56,7 +63,6 @@ import {
 
 /** Default QR target: the live London agenda board. */
 const LONDON_QR_DEFAULT_LINK = "https://transperfectelement.lovable.app/events/next/london/agenda";
-
 
 export const Route = createFileRoute("/events/next_/london_/template")({
   head: () => ({
@@ -135,7 +141,6 @@ function BoardSizeInput({
   );
 }
 
-
 function LondonTemplatePage() {
   const placements = useLondonLogoPlacements();
   const [floor, setFloor] = useState<string>("all");
@@ -160,7 +165,10 @@ function LondonTemplatePage() {
     [floor, boardSizes],
   );
   const panel = useMemo(
-    () => panels.find((p) => p.id === selectedId) ?? panels[0] ?? applyLondonBoardSize(LONDON_PANELS[0]!, boardSizes),
+    () =>
+      panels.find((p) => p.id === selectedId) ??
+      panels[0] ??
+      applyLondonBoardSize(LONDON_PANELS[0]!, boardSizes),
     [panels, selectedId, boardSizes],
   );
   const boardOverridden = !!boardSizes[panel.id];
@@ -205,7 +213,6 @@ function LondonTemplatePage() {
     [panel, art, colorSpace],
   );
 
-
   // Drag with window-level listeners so the pointer can leave the box.
   // `target` picks which object moves: the hero lockup or the headline copy.
   const startDrag = useCallback(
@@ -224,8 +231,10 @@ function LondonTemplatePage() {
       };
       const move = (moveEvent: PointerEvent) => {
         // Screen delta → trim fraction, using the panel's own bleed/trim ratio.
-        const dx = start.dx + ((moveEvent.clientX - start.x) / rect.width) * (panel.bleedW / panel.trimW);
-        const dy = start.dy + ((moveEvent.clientY - start.y) / rect.height) * (panel.bleedH / panel.trimH);
+        const dx =
+          start.dx + ((moveEvent.clientX - start.x) / rect.width) * (panel.bleedW / panel.trimW);
+        const dy =
+          start.dy + ((moveEvent.clientY - start.y) / rect.height) * (panel.bleedH / panel.trimH);
         setLondonLogoPlacement(
           panel.id,
           target === "logo" ? { dx, dy } : { textDx: dx, textDy: dy },
@@ -251,7 +260,6 @@ function LondonTemplatePage() {
       textDx: placement.textDx + dx,
       textDy: placement.textDy + dy,
     });
-
 
   async function generatePack() {
     const id = toast.loading(`Building ${panels.length} panels…`);
@@ -304,8 +312,6 @@ function LondonTemplatePage() {
         }
     : null;
 
-
-
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-[1400px] px-5 py-8">
@@ -340,7 +346,9 @@ function LondonTemplatePage() {
             </select>
             <Button onClick={generatePack} className="gap-2">
               <Download className="h-4 w-4" />
-              {progress ? `Packing ${progress.done}/${progress.total}` : `Generate pack (${panels.length})`}
+              {progress
+                ? `Packing ${progress.done}/${progress.total}`
+                : `Generate pack (${panels.length})`}
             </Button>
           </div>
         </header>
@@ -375,7 +383,11 @@ function LondonTemplatePage() {
               className="relative mx-auto mt-4 w-full max-w-[720px] select-none overflow-hidden rounded-lg border border-border"
               style={{ aspectRatio: `${panel.bleedW} / ${panel.bleedH}` }}
             >
-              <img src={svgDataUrl(svg)} alt={`${panel.name} artwork preview`} className="h-full w-full" />
+              <img
+                src={svgDataUrl(svg)}
+                alt={`${panel.name} artwork preview`}
+                className="h-full w-full"
+              />
               {printPreview ? <LondonPrintGuides panel={panel} /> : null}
               <div
                 role="button"
@@ -421,9 +433,6 @@ function LondonTemplatePage() {
               </div>
             ) : null}
 
-
-
-
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">Logo colourway</span>
               {colourways.map((key) => (
@@ -442,10 +451,20 @@ function LondonTemplatePage() {
                 </button>
               ))}
               <span className="ml-auto flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("svg")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => downloadPanel("svg")}
+                >
                   <Download className="h-3.5 w-3.5" /> SVG
                 </Button>
-                <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("ai")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() => downloadPanel("ai")}
+                >
                   <Download className="h-3.5 w-3.5" /> AI
                 </Button>
               </span>
@@ -502,7 +521,9 @@ function LondonTemplatePage() {
                         style={{ background: cmykToHex(build) }}
                       />
                       <span className="font-mono text-muted-foreground">{hex}</span>
-                      <span className={build.approved ? "text-foreground" : "text-muted-foreground"}>
+                      <span
+                        className={build.approved ? "text-foreground" : "text-muted-foreground"}
+                      >
                         {cmykLabel(build)}
                       </span>
                     </li>
@@ -510,7 +531,6 @@ function LondonTemplatePage() {
                 </ul>
               ) : null}
             </div>
-
 
             <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
               <div className="flex flex-wrap items-center gap-3">
@@ -606,7 +626,9 @@ function LondonTemplatePage() {
                     value={placement.qr ?? ""}
                     maxLength={LONDON_QR_MAX_CHARS}
                     placeholder="No code on this panel"
-                    onChange={(event) => setLondonLogoPlacement(panel.id, { qr: event.target.value })}
+                    onChange={(event) =>
+                      setLondonLogoPlacement(panel.id, { qr: event.target.value })
+                    }
                     className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
                   />
                 </label>
@@ -617,7 +639,9 @@ function LondonTemplatePage() {
                     value={placement.qrCaption}
                     maxLength={LONDON_TEXT_MAX_CHARS}
                     onChange={(event) =>
-                      setLondonLogoPlacement(panel.id, { qrCaption: event.target.value.toUpperCase() })
+                      setLondonLogoPlacement(panel.id, {
+                        qrCaption: event.target.value.toUpperCase(),
+                      })
                     }
                     className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
                   />
@@ -635,7 +659,9 @@ function LondonTemplatePage() {
                     }
                     className="w-32"
                   />
-                  <span className="tabular-nums">{plan.qr ? `${plan.qr.size.toFixed(0)}mm` : "—"}</span>
+                  <span className="tabular-nums">
+                    {plan.qr ? `${plan.qr.size.toFixed(0)}mm` : "—"}
+                  </span>
                 </label>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -706,19 +732,30 @@ function LondonTemplatePage() {
                 </span>
               </div>
               <div className="mt-3 flex flex-wrap items-end gap-3">
-                {(
-                  [
-                    { key: "trimW" as const, label: "Width (mm)", value: panel.trimW, ...LONDON_BOARD_LIMITS.trim },
-                    { key: "trimH" as const, label: "Height (mm)", value: panel.trimH, ...LONDON_BOARD_LIMITS.trim },
-                    {
-                      key: "bleedEdge" as const,
-                      label: "Bleed / edge (mm)",
-                      value: panel.bleedEdge,
-                      ...LONDON_BOARD_LIMITS.bleed,
-                    },
-                  ]
-                ).map((field) => (
-                  <label key={field.key} className="flex flex-col gap-1 text-xs text-muted-foreground">
+                {[
+                  {
+                    key: "trimW" as const,
+                    label: "Width (mm)",
+                    value: panel.trimW,
+                    ...LONDON_BOARD_LIMITS.trim,
+                  },
+                  {
+                    key: "trimH" as const,
+                    label: "Height (mm)",
+                    value: panel.trimH,
+                    ...LONDON_BOARD_LIMITS.trim,
+                  },
+                  {
+                    key: "bleedEdge" as const,
+                    label: "Bleed / edge (mm)",
+                    value: panel.bleedEdge,
+                    ...LONDON_BOARD_LIMITS.bleed,
+                  },
+                ].map((field) => (
+                  <label
+                    key={field.key}
+                    className="flex flex-col gap-1 text-xs text-muted-foreground"
+                  >
                     {field.label}
                     <BoardSizeInput
                       panelId={panel.id}
@@ -750,9 +787,6 @@ function LondonTemplatePage() {
               </p>
             </div>
 
-
-
-
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-xs text-muted-foreground">
                 Scale
@@ -760,7 +794,6 @@ function LondonTemplatePage() {
                   type="range"
                   min={0.3}
                   max={2}
-
                   step={0.01}
                   value={placement.scale}
                   onChange={(event) =>
@@ -770,7 +803,12 @@ function LondonTemplatePage() {
                 />
                 <span className="tabular-nums">{Math.round(placement.scale * 100)}%</span>
               </label>
-              <Button variant="outline" size="sm" className="gap-2" onClick={() => resetLondonLogoPlacement(panel.id)}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => resetLondonLogoPlacement(panel.id)}
+              >
                 <RotateCcw className="h-3.5 w-3.5" /> Reset panel
               </Button>
               <Button
@@ -799,7 +837,8 @@ function LondonTemplatePage() {
                 <Crosshair className="h-3.5 w-3.5" /> Reset all
               </Button>
               <span className="text-xs tabular-nums text-muted-foreground">
-                x {plan.logo.x.toFixed(0)}mm · y {plan.logo.y.toFixed(0)}mm · w {plan.logo.w.toFixed(0)}mm
+                x {plan.logo.x.toFixed(0)}mm · y {plan.logo.y.toFixed(0)}mm · w{" "}
+                {plan.logo.w.toFixed(0)}mm
               </span>
             </div>
           </section>

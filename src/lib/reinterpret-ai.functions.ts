@@ -37,7 +37,6 @@ const Input = z.object({
     .max(60),
 });
 
-
 export const planDeckReinterpretation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((raw: unknown) => Input.parse(raw))

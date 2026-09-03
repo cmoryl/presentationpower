@@ -96,7 +96,13 @@ export type PillarVectorResult = {
 
 function hexRgb(hex: string): [number, number, number] {
   const h = (hex || "#000000").replace("#", "");
-  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const full =
+    h.length === 3
+      ? h
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : h;
   const n = parseInt(full, 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
 }
@@ -205,7 +211,11 @@ export function extractSvgPaths(svg: string): string[] {
   const out: string[] = [];
   for (const m of svg.matchAll(/<path[^>]*\sd\s*=\s*["']([^"']+)["']/gi)) out.push(m[1]!);
   for (const m of svg.matchAll(/<(polygon|polyline)[^>]*\spoints\s*=\s*["']([^"']+)["']/gi)) {
-    const nums = m[2]!.trim().split(/[\s,]+/).map(Number).filter((n) => Number.isFinite(n));
+    const nums = m[2]!
+      .trim()
+      .split(/[\s,]+/)
+      .map(Number)
+      .filter((n) => Number.isFinite(n));
     if (nums.length < 6) continue;
     const parts: string[] = [];
     for (let i = 0; i + 1 < nums.length; i += 2) {
@@ -214,7 +224,8 @@ export function extractSvgPaths(svg: string): string[] {
     out.push(`${parts.join(" ")} Z`);
   }
   for (const m of svg.matchAll(/<rect\b[^>]*>/gi)) {
-    const attr = (name: string) => Number(new RegExp(`\\s${name}\\s*=\\s*["']([-0-9.]+)`, "i").exec(m[0]!)?.[1]);
+    const attr = (name: string) =>
+      Number(new RegExp(`\\s${name}\\s*=\\s*["']([-0-9.]+)`, "i").exec(m[0]!)?.[1]);
     const x = attr("x") || 0;
     const y = attr("y") || 0;
     const w = attr("width");
@@ -223,7 +234,8 @@ export function extractSvgPaths(svg: string): string[] {
     out.push(`M${x} ${y} H${x + w} V${y + h} H${x} Z`);
   }
   for (const m of svg.matchAll(/<(circle|ellipse)\b[^>]*>/gi)) {
-    const attr = (name: string) => Number(new RegExp(`\\s${name}\\s*=\\s*["']([-0-9.]+)`, "i").exec(m[0]!)?.[1]);
+    const attr = (name: string) =>
+      Number(new RegExp(`\\s${name}\\s*=\\s*["']([-0-9.]+)`, "i").exec(m[0]!)?.[1]);
     const cx = attr("cx") || 0;
     const cy = attr("cy") || 0;
     const rx = Number.isFinite(attr("r")) ? attr("r") : attr("rx");
@@ -246,7 +258,10 @@ async function loadLockup(url: string): Promise<LockupArt> {
     if (head.startsWith("<svg") || head.startsWith("<?xml") || /\.svg(\?|$)/i.test(url)) {
       const svg = new TextDecoder().decode(buf);
       const box = /viewBox\s*=\s*["']([^"']+)["']/i.exec(svg)?.[1] ?? "";
-      const nums = box.split(/[\s,]+/).map(Number).filter((n) => Number.isFinite(n));
+      const nums = box
+        .split(/[\s,]+/)
+        .map(Number)
+        .filter((n) => Number.isFinite(n));
       const paths = extractSvgPaths(svg);
       if (paths.length && nums.length === 4) {
         return { kind: "svg", paths, viewBox: nums as [number, number, number, number] };
@@ -296,8 +311,10 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   doc.setProducer("TransPerfect Element");
   doc.setCreator("TransPerfect Element — NEXT pillar studio");
 
-  const bold = (await ttf(doc, "/fonts/Geist-Bold.ttf")) ?? doc.embedStandardFont(StandardFonts.HelveticaBold);
-  const regular = (await ttf(doc, "/fonts/Geist-Regular.ttf")) ?? doc.embedStandardFont(StandardFonts.Helvetica);
+  const bold =
+    (await ttf(doc, "/fonts/Geist-Bold.ttf")) ?? doc.embedStandardFont(StandardFonts.HelveticaBold);
+  const regular =
+    (await ttf(doc, "/fonts/Geist-Regular.ttf")) ?? doc.embedStandardFont(StandardFonts.Helvetica);
 
   const page = doc.addPage([pageW, pageH]);
 
@@ -318,7 +335,10 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       Type: "OCG",
       Name: PDFString.of(name),
       Usage: doc.context.obj({
-        Print: doc.context.obj({ PrintState: PDFName.of(nonPrinting ? "OFF" : "ON"), Subtype: "Print" }),
+        Print: doc.context.obj({
+          PrintState: PDFName.of(nonPrinting ? "OFF" : "ON"),
+          Subtype: "Print",
+        }),
       }),
     });
     return { name, ref: doc.context.register(dict), tag: `OC${i + 1}` };
@@ -349,7 +369,10 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
     PDFName.of("TrimBox"),
     doc.context.obj([round(trimX), round(trimY), round(trimX + trimW), round(trimY + trimH)]),
   );
-  page.node.set(PDFName.of("BleedBox"), doc.context.obj([round(ox), round(oy), round(ox + bleedW), round(oy + bleedH)]));
+  page.node.set(
+    PDFName.of("BleedBox"),
+    doc.context.obj([round(ox), round(oy), round(ox + bleedW), round(oy + bleedH)]),
+  );
 
   const safe = mm(geo.safeInset);
   const safeX = trimX + safe;
@@ -390,8 +413,7 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
       const boxH = mm(placed.h);
       const scale = Math.min(boxW / (vw || 1), boxH / (vh || 1));
       const left = ox + mm(geo.bleedEdge + placed.x) + (boxW - (vw || 1) * scale) / 2;
-      const top =
-        oy + bleedH - mm(geo.bleedEdge + placed.y) - (boxH - (vh || 1) * scale) / 2;
+      const top = oy + bleedH - mm(geo.bleedEdge + placed.y) - (boxH - (vh || 1) * scale) / 2;
       beginLayer(page, layer("08 Placed artwork"));
       for (const shape of art.shapes) {
         page.drawSvgPath(shape.d, {
@@ -509,7 +531,9 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
   }
 
   if (isLogoOnly) {
-    const lines = [subline, (config.logoUrl || "").trim(), (config.logoSocial || "").trim()].filter(Boolean);
+    const lines = [subline, (config.logoUrl || "").trim(), (config.logoSocial || "").trim()].filter(
+      Boolean,
+    );
     if (lines.length) {
       beginLayer(page, layer("04 Sub-line"));
       let y = lockupTop - lockupH - Math.max(mm(30), subSize * 1.2) - subSize;
@@ -615,7 +639,16 @@ export async function buildPillarVectorPdf(config: PillarConfig): Promise<Pillar
         } else if (qrStyle === "rounded") {
           polygon(page, rounded(x + unit * 0.06, y + unit * 0.06, unit * 0.88, unit * 0.24), dark);
         } else {
-          polygon(page, [[x, y], [x + unit, y], [x + unit, y + unit], [x, y + unit]], dark);
+          polygon(
+            page,
+            [
+              [x, y],
+              [x + unit, y],
+              [x + unit, y + unit],
+              [x, y + unit],
+            ],
+            dark,
+          );
         }
       }
     }

@@ -416,7 +416,6 @@ function ApprovedSetsTab() {
         </a>{" "}
         — governance edits here stay in sync everywhere icons are drawn.
       </p>
-
     </section>
   );
 }

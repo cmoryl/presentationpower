@@ -44,7 +44,6 @@ const PAIRINGS: Pairing[] = [
   { kind: "ink", onSlide: AA_NORMAL, onSurface: AA_NORMAL },
 ];
 
-
 // Some brands (DataForce) intentionally use a single pop color for BOTH
 // `primary` and `accent`: it paints structural furniture — card top rules,
 // edges, emphasis bands — while headings and body both render in `ink`. For

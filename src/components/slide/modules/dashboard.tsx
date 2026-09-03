@@ -24,7 +24,7 @@ import { fillPx } from "@/lib/open-space-fill";
  * NaN, which used to collapse gauges to an empty track.
  */
 function pct(raw: unknown): number {
-  const n = typeof raw === "number" ? raw : parseFloat(String(raw ?? "").replace(/[^0-9.\-]/g, ""));
+  const n = typeof raw === "number" ? raw : parseFloat(String(raw ?? "").replace(/[^0-9.-]/g, ""));
   if (!Number.isFinite(n)) return 0;
   return Math.max(0, Math.min(100, n));
 }

@@ -312,7 +312,6 @@ export function extractTextRuns(
     const flat = blendOverBackdrop(el, effective);
     const color = flat.hex;
 
-
     const rect = el.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) continue;
 

@@ -731,4 +731,3 @@ export const LONDON_VENUE_ITEMS: LondonVenueItemSpec[] = [
     note: "Master NEXT directional pillar — MAIN STAGE.",
   },
 ];
-

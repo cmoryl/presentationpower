@@ -12,7 +12,20 @@ import { DEFAULT_LOGO_PLACEMENT } from "@/lib/next-london-logo-placement";
 
 /** Minimal 8×4 baseline JPEG header the PDF writer can embed verbatim. */
 function fakeJpeg(w: number, h: number): Uint8Array {
-  const bytes = [0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, h >> 8, h & 0xff, w >> 8, w & 0xff, 0x03];
+  const bytes = [
+    0xff,
+    0xd8,
+    0xff,
+    0xc0,
+    0x00,
+    0x11,
+    0x08,
+    h >> 8,
+    h & 0xff,
+    w >> 8,
+    w & 0xff,
+    0x03,
+  ];
   for (let i = 0; i < 40; i += 1) bytes.push(0x20);
   bytes.push(0xff, 0xd9);
   return new Uint8Array(bytes);
@@ -73,7 +86,7 @@ describe("london booth masters", () => {
     expect(zoomed.x).toBeGreaterThan((panel.bleedW - zoomed.w) / 2);
     expect(zoomed.y).toBeLessThan((panel.bleedH - zoomed.h) / 2);
     const svg = buildLondonPanelSvg(panel);
-    expect(svg).toContain('data-supplied-artwork');
+    expect(svg).toContain("data-supplied-artwork");
     expect(svg).toContain("clip-path=");
   });
 });

@@ -148,18 +148,20 @@ export function LegalCaseStudyShelf({ brandModes }: { brandModes: BrandMode[] })
               <p className="line-clamp-3 text-xs leading-relaxed text-black/60">{seed.teaser}</p>
 
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {safeList(seed.content.stats).slice(0, 3).map((s, i) => (
-                  <span
-                    key={`${s.label}-${i}`}
-                    className="inline-flex items-baseline gap-1 rounded-full border border-black/10 bg-black/[0.02] px-2 py-0.5 text-[10px] text-black/60"
-                  >
-                    <strong className="text-[11px] font-semibold text-[#03002C]">
-                      {s.value}
-                      {s.unit ?? ""}
-                    </strong>
-                    {s.label}
-                  </span>
-                ))}
+                {safeList(seed.content.stats)
+                  .slice(0, 3)
+                  .map((s, i) => (
+                    <span
+                      key={`${s.label}-${i}`}
+                      className="inline-flex items-baseline gap-1 rounded-full border border-black/10 bg-black/[0.02] px-2 py-0.5 text-[10px] text-black/60"
+                    >
+                      <strong className="text-[11px] font-semibold text-[#03002C]">
+                        {s.value}
+                        {s.unit ?? ""}
+                      </strong>
+                      {s.label}
+                    </span>
+                  ))}
               </div>
 
               <div className="mt-auto flex items-center justify-between gap-2 pt-4">

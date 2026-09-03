@@ -156,7 +156,11 @@ export function HeroCropStudio({
         aria-label="Hero crop — drag to pan, scroll to zoom, arrow keys nudge the focal point"
         tabIndex={0}
         className="relative select-none overflow-hidden rounded-lg border border-black/10 bg-[#03002C] outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7] dark:border-white/12"
-        style={{ aspectRatio: String(aspectRatio), cursor: dragRef.current ? "grabbing" : "grab", touchAction: "none" }}
+        style={{
+          aspectRatio: String(aspectRatio),
+          cursor: dragRef.current ? "grabbing" : "grab",
+          touchAction: "none",
+        }}
         onPointerDown={(e) => {
           const rect = e.currentTarget.getBoundingClientRect();
           e.currentTarget.setPointerCapture(e.pointerId);

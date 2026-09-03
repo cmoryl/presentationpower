@@ -40,7 +40,6 @@ function operators(bytes: Uint8Array): string {
 
 const count = (hay: string, re: RegExp) => (hay.match(re) ?? []).length;
 
-
 /** Bucketed so tiny sampling changes do not churn the snapshot, while a real
  *  structural change (a lost layer, a vanished mesh) still moves the numbers. */
 const bucket = (n: number) => (n === 0 ? 0 : Math.max(1, Math.round(n / 10) * 10));
@@ -88,7 +87,6 @@ function fingerprint(result: PillarVectorResult): Fingerprint {
     },
   };
 }
-
 
 const samples: { name: string; config: PillarConfig }[] = [
   {

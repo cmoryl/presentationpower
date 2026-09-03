@@ -239,133 +239,133 @@ function ImageryPage() {
         </div>
       )}
       {canCurate && (
-      <div className="mt-6 grid gap-4 md:grid-cols-[1.5fr_1fr]">
-        <div className="rounded-2xl border border-black/10 bg-white p-5">
-          <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold text-[#03002C]">Generate with brand memory</div>
-            <div className="flex rounded-full border border-black/10 p-0.5 text-xs">
-              {(["photo", "abstract"] as const).map((k) => (
-                <button
-                  key={k}
-                  onClick={() => setKind(k)}
-                  className={`rounded-full px-3 py-1 capitalize transition ${
-                    kind === k ? "bg-[#05041A] text-white" : "text-black/60"
-                  }`}
-                >
-                  {k}
-                </button>
-              ))}
-            </div>
-          </div>
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder={`Describe the ${kind} you want for ${ctx.name}… (e.g. "translator working alongside a surgical team")`}
-            rows={2}
-            className="mt-3 w-full resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-[#003FC7]"
-          />
-
-          {sources.length > 0 && (
-            <GroundingCitations
-              citations={sources}
-              tone="light"
-              label="Art direction sourced from"
-              className="mt-3"
-            />
-          )}
-
-          {/* Existing-imagery recommendations */}
-          {recommendations.length > 0 && (
-            <div className="mt-3 rounded-lg border border-black/5 bg-[#F7F5F0] p-3">
-              <div className="flex items-baseline justify-between">
-                <div className="text-[11px] uppercase tracking-wider" style={{ color: primary }}>
-                  {strongMatch
-                    ? "Strong matches already in your library"
-                    : "Possibly relevant existing imagery"}
-                </div>
-                <div className="text-[10px] text-black/40">
-                  ranked by tags · notes · prior prompts · brand fit
-                </div>
-              </div>
-              <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
-                {recommendations.map((m) => (
+        <div className="mt-6 grid gap-4 md:grid-cols-[1.5fr_1fr]">
+          <div className="rounded-2xl border border-black/10 bg-white p-5">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-semibold text-[#03002C]">Generate with brand memory</div>
+              <div className="flex rounded-full border border-black/10 p-0.5 text-xs">
+                {(["photo", "abstract"] as const).map((k) => (
                   <button
-                    key={m.entry.id}
-                    onClick={() => {
-                      setSelected(m.entry.id);
-                      lib.recordUsage(m.entry.id);
-                    }}
-                    className="group overflow-hidden rounded-md border border-black/5 bg-white text-left hover:border-black/25"
-                    title={m.reasons.join(" · ")}
+                    key={k}
+                    onClick={() => setKind(k)}
+                    className={`rounded-full px-3 py-1 capitalize transition ${
+                      kind === k ? "bg-[#05041A] text-white" : "text-black/60"
+                    }`}
                   >
-                    <div className="relative">
-                      <img
-                        src={m.entry.url}
-                        alt=""
-                        className="aspect-[16/10] w-full object-cover"
-                      />
-                      <span
-                        className="absolute right-1 top-1 rounded-full px-1.5 py-0.5 text-[9px] font-medium text-white"
-                        style={{ background: primary }}
-                      >
-                        {m.score.toFixed(1)}
-                      </span>
-                    </div>
-                    <div className="p-1.5">
-                      <div className="text-[10px] font-medium text-[#03002C]">
-                        {m.entry.source === "ai"
-                          ? "AI"
-                          : m.entry.source === "upload"
-                            ? "Upload"
-                            : m.entry.kind}
-                      </div>
-                      <div className="line-clamp-1 text-[10px] text-black/50">
-                        {m.reasons[0] ?? "brand fit"}
-                      </div>
-                    </div>
+                    {k}
                   </button>
                 ))}
               </div>
-              {strongMatch && (
-                <p className="mt-2 text-[11px] text-black/60">
-                  Use one of these to stay cohesive, or generate a new variant if none quite fit.
-                </p>
-              )}
             </div>
-          )}
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder={`Describe the ${kind} you want for ${ctx.name}… (e.g. "translator working alongside a surgical team")`}
+              rows={2}
+              className="mt-3 w-full resize-none rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none focus:border-[#003FC7]"
+            />
 
-          <div className="mt-3 flex items-center justify-between gap-3">
-            <div className="text-xs text-black/50">
-              Uses this brand's palette, tagline, photography guideline, and active library memory
-              tags.
+            {sources.length > 0 && (
+              <GroundingCitations
+                citations={sources}
+                tone="light"
+                label="Art direction sourced from"
+                className="mt-3"
+              />
+            )}
+
+            {/* Existing-imagery recommendations */}
+            {recommendations.length > 0 && (
+              <div className="mt-3 rounded-lg border border-black/5 bg-[#F7F5F0] p-3">
+                <div className="flex items-baseline justify-between">
+                  <div className="text-[11px] uppercase tracking-wider" style={{ color: primary }}>
+                    {strongMatch
+                      ? "Strong matches already in your library"
+                      : "Possibly relevant existing imagery"}
+                  </div>
+                  <div className="text-[10px] text-black/40">
+                    ranked by tags · notes · prior prompts · brand fit
+                  </div>
+                </div>
+                <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
+                  {recommendations.map((m) => (
+                    <button
+                      key={m.entry.id}
+                      onClick={() => {
+                        setSelected(m.entry.id);
+                        lib.recordUsage(m.entry.id);
+                      }}
+                      className="group overflow-hidden rounded-md border border-black/5 bg-white text-left hover:border-black/25"
+                      title={m.reasons.join(" · ")}
+                    >
+                      <div className="relative">
+                        <img
+                          src={m.entry.url}
+                          alt=""
+                          className="aspect-[16/10] w-full object-cover"
+                        />
+                        <span
+                          className="absolute right-1 top-1 rounded-full px-1.5 py-0.5 text-[9px] font-medium text-white"
+                          style={{ background: primary }}
+                        >
+                          {m.score.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="p-1.5">
+                        <div className="text-[10px] font-medium text-[#03002C]">
+                          {m.entry.source === "ai"
+                            ? "AI"
+                            : m.entry.source === "upload"
+                              ? "Upload"
+                              : m.entry.kind}
+                        </div>
+                        <div className="line-clamp-1 text-[10px] text-black/50">
+                          {m.reasons[0] ?? "brand fit"}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                {strongMatch && (
+                  <p className="mt-2 text-[11px] text-black/60">
+                    Use one of these to stay cohesive, or generate a new variant if none quite fit.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="mt-3 flex items-center justify-between gap-3">
+              <div className="text-xs text-black/50">
+                Uses this brand's palette, tagline, photography guideline, and active library memory
+                tags.
+              </div>
+              <button
+                onClick={handleGenerate}
+                disabled={busy || !prompt.trim()}
+                className="rounded-full px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50"
+                style={{ background: strongMatch ? "#03002C" : primary }}
+              >
+                {busy ? "Generating…" : strongMatch ? "Generate anyway" : "Generate image"}
+              </button>
             </div>
-            <button
-              onClick={handleGenerate}
-              disabled={busy || !prompt.trim()}
-              className="rounded-full px-4 py-2 text-sm font-medium text-white transition disabled:opacity-50"
-              style={{ background: strongMatch ? "#03002C" : primary }}
-            >
-              {busy ? "Generating…" : strongMatch ? "Generate anyway" : "Generate image"}
-            </button>
+            {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
           </div>
-          {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
-        </div>
 
-        <div className="rounded-2xl border border-dashed border-black/20 bg-white p-5">
-          <div className="text-sm font-semibold text-[#03002C]">Upload imagery</div>
-          <p className="mt-1 text-xs text-black/50">
-            Drop or select images to add to the {ctx.name} pool. Kept local to your workspace.
-          </p>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => handleUpload(e.target.files)}
-            className="mt-3 block w-full text-xs file:mr-3 file:rounded-full file:border-0 file:bg-[#03002C] file:px-3 file:py-1.5 file:text-white"
-          />
+          <div className="rounded-2xl border border-dashed border-black/20 bg-white p-5">
+            <div className="text-sm font-semibold text-[#03002C]">Upload imagery</div>
+            <p className="mt-1 text-xs text-black/50">
+              Drop or select images to add to the {ctx.name} pool. Kept local to your workspace.
+            </p>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => handleUpload(e.target.files)}
+              className="mt-3 block w-full text-xs file:mr-3 file:rounded-full file:border-0 file:bg-[#03002C] file:px-3 file:py-1.5 file:text-white"
+            />
+          </div>
         </div>
-      </div>
       )}
 
       {/* Analytics */}
@@ -415,29 +415,31 @@ function ImageryPage() {
                     {e.source === "ai" ? "AI" : e.source === "upload" ? "Upload" : e.kind}
                   </div>
                   {canCurate && (
-                  <div className="absolute right-2 top-2 flex gap-1">
-                    <button
-                      onClick={() => lib.toggle(e.id)}
-                      className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#03002C] hover:bg-white"
-                    >
-                      {disabled ? "Include" : "Exclude"}
-                    </button>
-                    <button
-                      onClick={() => {
-                        const label =
-                          e.source === "builtin"
-                            ? "Remove this built-in image from the library? You can restore it later."
-                            : "Delete this image permanently?";
-                        if (!confirm(label)) return;
-                        lib.remove(e.id);
-                        if (selected === e.id) setSelected(null);
-                      }}
-                      className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-red-600 hover:bg-white"
-                      title={e.source === "builtin" ? "Remove (restorable)" : "Delete permanently"}
-                    >
-                      Delete
-                    </button>
-                  </div>
+                    <div className="absolute right-2 top-2 flex gap-1">
+                      <button
+                        onClick={() => lib.toggle(e.id)}
+                        className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-[#03002C] hover:bg-white"
+                      >
+                        {disabled ? "Include" : "Exclude"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          const label =
+                            e.source === "builtin"
+                              ? "Remove this built-in image from the library? You can restore it later."
+                              : "Delete this image permanently?";
+                          if (!confirm(label)) return;
+                          lib.remove(e.id);
+                          if (selected === e.id) setSelected(null);
+                        }}
+                        className="rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-medium text-red-600 hover:bg-white"
+                        title={
+                          e.source === "builtin" ? "Remove (restorable)" : "Delete permanently"
+                        }
+                      >
+                        Delete
+                      </button>
+                    </div>
                   )}
                 </div>
               );

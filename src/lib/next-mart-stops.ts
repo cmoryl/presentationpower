@@ -182,7 +182,9 @@ export function martStopById(id: string): MartStop | null {
 }
 
 /** Create or update a stop. Returns the stored record. */
-export function saveMartStop(input: Omit<MartStop, "id" | "createdAt"> & { id?: string }): MartStop {
+export function saveMartStop(
+  input: Omit<MartStop, "id" | "createdAt"> & { id?: string },
+): MartStop {
   const id = input.id?.trim() || martStopSlug(input as MartStop) || `stop-${Date.now()}`;
   if (id === LONDON_STOP.id) throw new Error("London is the reference kit and cannot be replaced.");
   const stop: MartStop = {

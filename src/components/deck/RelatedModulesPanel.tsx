@@ -42,31 +42,31 @@ export function RelatedModulesPanel({
 
   const results = useMemo((): ModuleVariant[] => {
     const applySort = (list: ModuleVariant[], sectionPool: Set<string> | null) =>
-      [...list]
-        .sort((a, b) => {
-          if (sort === "name") return a.name.localeCompare(b.name);
-          if (sort === "family") {
-            const fam = a.familyId.localeCompare(b.familyId);
-            if (fam !== 0) return fam;
-            return a.name.localeCompare(b.name);
-          }
-          // "fit": section-fit first, then same family, then name.
-          const secA = sectionPool?.has(a.id) ? 1 : 0;
-          const secB = sectionPool?.has(b.id) ? 1 : 0;
-          if (secA !== secB) return secB - secA;
-          const famA = a.familyId === variant.familyId ? 1 : 0;
-          const famB = b.familyId === variant.familyId ? 1 : 0;
-          if (famA !== famB) return famB - famA;
+      [...list].sort((a, b) => {
+        if (sort === "name") return a.name.localeCompare(b.name);
+        if (sort === "family") {
+          const fam = a.familyId.localeCompare(b.familyId);
+          if (fam !== 0) return fam;
           return a.name.localeCompare(b.name);
-        });
+        }
+        // "fit": section-fit first, then same family, then name.
+        const secA = sectionPool?.has(a.id) ? 1 : 0;
+        const secB = sectionPool?.has(b.id) ? 1 : 0;
+        if (secA !== secB) return secB - secA;
+        const famA = a.familyId === variant.familyId ? 1 : 0;
+        const famB = b.familyId === variant.familyId ? 1 : 0;
+        if (famA !== famB) return famB - famA;
+        return a.name.localeCompare(b.name);
+      });
 
-    const sectionPool = sectionId
-      ? new Set(variantsForSection(sectionId).map((v) => v.id))
-      : null;
+    const sectionPool = sectionId ? new Set(variantsForSection(sectionId).map((v) => v.id)) : null;
 
     if (!filtering) {
       const ranked = relatedVariants(variant.id, sectionId, 25);
-      return (sort === "fit" ? ranked : applySort(ranked, sectionPool)).slice(0, sort === "fit" ? 5 : 25);
+      return (sort === "fit" ? ranked : applySort(ranked, sectionPool)).slice(
+        0,
+        sort === "fit" ? 5 : 25,
+      );
     }
 
     const q = query.trim().toLowerCase();

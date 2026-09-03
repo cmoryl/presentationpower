@@ -239,10 +239,7 @@ export function subscribePrintLayoutOverrides(fn: () => void): () => void {
   return () => listeners.delete(fn);
 }
 
-export function printLayoutIsCustomised(
-  kind: PrintSectionKind,
-  id: PrintSectionLayoutId,
-): boolean {
+export function printLayoutIsCustomised(kind: PrintSectionKind, id: PrintSectionLayoutId): boolean {
   const patch = loadPrintLayoutOverrides()[overrideKey(kind, id)];
   return !!patch && Object.keys(patch).length > 0;
 }
@@ -271,9 +268,7 @@ const cqu = (px: number) =>
   `calc(${((px * 100) / PAGE_W).toFixed(3)}cqw * var(--print-fit-scale, 1))`;
 
 /** CSS custom properties the frame publishes for the stylesheet to consume. */
-export function printSectionLayoutVars(
-  tokens: PrintSectionLayoutTokens,
-): Record<string, string> {
+export function printSectionLayoutVars(tokens: PrintSectionLayoutTokens): Record<string, string> {
   return {
     "--ps-cols": String(Math.max(1, Math.round(tokens.cols))),
     "--ps-gap": cqu(tokens.gap),

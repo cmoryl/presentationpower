@@ -351,11 +351,7 @@ function RoleDashboard() {
                   type="button"
                   onClick={() => choose(p.id)}
                   aria-pressed={active}
-                  title={
-                    active
-                      ? undefined
-                      : `Switch to the ${p.label}`
-                  }
+                  title={active ? undefined : `Switch to the ${p.label}`}
                   style={active ? { background: t.base, color: t.onHero } : undefined}
                   className={
                     active

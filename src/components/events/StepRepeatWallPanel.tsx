@@ -240,7 +240,12 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
             className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
           />
         </label>
-        <Button variant="outline" size="sm" className="gap-2" onClick={() => set({ qrData: AGENDA_LINK })}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={() => set({ qrData: AGENDA_LINK })}
+        >
           <QrCode className="h-3.5 w-3.5" /> Agenda code
         </Button>
       </div>
@@ -253,9 +258,15 @@ export function StepRepeatWallPanel({ panel }: StepRepeatWallPanelProps) {
           ["Grid", `${plan.cols} across × ${plan.rows} down · ${plan.tiles.length} marks`],
           ["Density", `${plan.marksPerM2} marks/m²`],
           ["Safe inset", dimText(plan.safeMm, 1)],
-          ["Lockup", `${plan.orientation === "side" ? "side by side" : "stacked"} · ${plan.colourway}`],
+          [
+            "Lockup",
+            `${plan.orientation === "side" ? "side by side" : "stacked"} · ${plan.colourway}`,
+          ],
         ].map(([label, value]) => (
-          <div key={label} className="flex items-baseline justify-between gap-3 border-b border-border/50 py-1">
+          <div
+            key={label}
+            className="flex items-baseline justify-between gap-3 border-b border-border/50 py-1"
+          >
             <dt className="text-xs text-muted-foreground">{label}</dt>
             <dd className="text-right text-xs tabular-nums">{value}</dd>
           </div>

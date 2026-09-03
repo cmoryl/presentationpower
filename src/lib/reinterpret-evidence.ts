@@ -46,7 +46,11 @@ export type SlideEvidence = {
     series: Array<{ label: string; values: number[] }>;
   }>;
   tables: Array<{ header: string[]; rows: string[][] }>;
-  diagrams: Array<{ kind: string; layoutHint?: string; nodes: Array<{ text: string; level: number }> }>;
+  diagrams: Array<{
+    kind: string;
+    layoutHint?: string;
+    nodes: Array<{ text: string; level: number }>;
+  }>;
   media: Array<{ kind: string; mime: string }>;
   links: string[];
   /** Numbers found anywhere in slide copy — the strongest stat-layout signal. */
@@ -97,7 +101,8 @@ function roleFor(args: {
   return args.isPlaceholder ? "body" : "free";
 }
 
-const FIGURE_RE = /(?:[$€£]\s?)?\d[\d,.]*\s?(?:%|k|K|M|B|bn|m|x|×|hrs?|days?|weeks?|months?|years?|languages?)?/g;
+const FIGURE_RE =
+  /(?:[$€£]\s?)?\d[\d,.]*\s?(?:%|k|K|M|B|bn|m|x|×|hrs?|days?|weeks?|months?|years?|languages?)?/g;
 
 function figuresFrom(strings: string[]): string[] {
   const seen = new Set<string>();
@@ -113,10 +118,7 @@ function figuresFrom(strings: string[]): string[] {
 const clampText = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)}…` : s);
 
 /** Build the compact deep-read record the planner consumes for one slide. */
-export function buildSlideEvidence(
-  source: ParsedSlide,
-  currentVariantId: string,
-): SlideEvidence {
+export function buildSlideEvidence(source: ParsedSlide, currentVariantId: string): SlideEvidence {
   const size = source.layout?.size;
   const sw = size?.w && size.w > 0 ? size.w : 13.333;
   const sh = size?.h && size.h > 0 ? size.h : 7.5;
@@ -164,7 +166,9 @@ export function buildSlideEvidence(
 
   const tables = (source.tables ?? []).slice(0, 3).map((t) => ({
     header: (t.header ?? []).slice(0, 8).map((c) => clampText(String(c ?? ""), 60)),
-    rows: (t.rows ?? []).slice(0, 10).map((r) => r.slice(0, 8).map((c) => clampText(String(c ?? ""), 80))),
+    rows: (t.rows ?? [])
+      .slice(0, 10)
+      .map((r) => r.slice(0, 8).map((c) => clampText(String(c ?? ""), 80))),
   }));
 
   const diagrams = (source.diagrams ?? []).slice(0, 3).map((d) => ({
@@ -186,7 +190,10 @@ export function buildSlideEvidence(
   return {
     index: source.index,
     title: source.title ?? "",
-    bullets: (source.bullets ?? []).filter(Boolean).slice(0, 30).map((b) => clampText(b, 800)),
+    bullets: (source.bullets ?? [])
+      .filter(Boolean)
+      .slice(0, 30)
+      .map((b) => clampText(b, 800)),
     notes: clampText(source.notes ?? "", 3000),
     imageCount: (source.images ?? []).filter(Boolean).length,
     currentVariantId,

@@ -50,7 +50,10 @@ describe("slide accent resolution", () => {
       brand.tokens.accent,
     );
     expect(
-      resolveSlideAccent(slide({ accentOverride: "#EC388A", authorizedAccentOverride: true }), brand),
+      resolveSlideAccent(
+        slide({ accentOverride: "#EC388A", authorizedAccentOverride: true }),
+        brand,
+      ),
     ).toBe("#EC388A");
   });
 });

@@ -115,7 +115,6 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
     (n) => !(n.to === "/" && pathname === "/") && !(n.to === "/admin" && !canSeeAdmin),
   );
 
-
   // Elements mega-menu: the four output channels and their sub-options.
   const elementGroups: ReadonlyArray<{
     label: string;
@@ -127,7 +126,7 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
       to: "/library",
       items: [
         { to: "/agent", label: "Deck agent" },
-        
+
         { to: "/library", label: "Slide modules" },
         { to: "/library/my", label: "My decks" },
         { to: "/decks", label: "All decks" },
@@ -177,7 +176,6 @@ export function AppShell({ children, bare = false }: { children: ReactNode; bare
         !(createOnly && i.to === "/library/print/modules"),
     ),
   }));
-
 
   const adminGroups: ReadonlyArray<{
     label: string;

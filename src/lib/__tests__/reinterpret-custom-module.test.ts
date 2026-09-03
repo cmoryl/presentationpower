@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  applyCustomModuleProposal,
-  proposeCustomModule,
-} from "@/lib/reinterpret-custom-module";
+import { applyCustomModuleProposal, proposeCustomModule } from "@/lib/reinterpret-custom-module";
 import { BLANK_VARIANT_ID, canPublish, validateCustomModule } from "@/lib/custom-modules";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 

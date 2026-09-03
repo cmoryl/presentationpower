@@ -12,8 +12,12 @@ const budget = (id: string, path: string) =>
   resolveCapacity(variant(id)).fields.find((f) => f.path === path);
 
 describe("capacity is addressable by field", () => {
-  it("holds for all 203 variants", () => {
-    expect(MODULE_VARIANTS.length).toBe(203);
+  it("holds for every registered variant", () => {
+    // Intentionally not pinned to a literal count: the catalog grows, and a
+    // stale number turned every addition into a false failure here. What must
+    // hold is that the catalog is non-empty, unique, and fully addressable.
+    expect(MODULE_VARIANTS.length).toBeGreaterThan(200);
+    expect(new Set(MODULE_VARIANTS.map((v) => v.id)).size).toBe(MODULE_VARIANTS.length);
     expect(() => assertCapacityIntegrity()).not.toThrow();
   });
 

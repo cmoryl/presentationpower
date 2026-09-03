@@ -42,7 +42,6 @@ describe("native variant coverage", () => {
     // design-exact layered route instead.
     expect(needsGraphicPlate("MV-OP-COVER-SPLIT")).toBe(true);
     expect(needsGraphicPlate("MV-BENTO-5")).toBe(true);
-
   });
 
   it("routes drifted close-family renderers to the layered plate", () => {

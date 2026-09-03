@@ -222,7 +222,8 @@ function PanelCard({
           </p>
         ) : null}
         <p className="mt-auto pt-1.5 font-mono text-[11px] text-[#03002C]/60">
-          {panel.trimW} × {panel.trimH} mm ({inch(panel.trimW)} × {inch(panel.trimH)} in) · {panel.ground}
+          {panel.trimW} × {panel.trimH} mm ({inch(panel.trimW)} × {inch(panel.trimH)} in) ·{" "}
+          {panel.ground}
         </p>
         <p className="mt-0.5 font-mono text-[11px] text-[#03002C]/45">
           bleed {panel.bleedEdge} mm/edge · band {panel.bandMm.toFixed(2)} mm
@@ -271,10 +272,7 @@ function LondonSignagePage() {
 
   // A revision published in the revise studio pushes here, so an open kit page
   // swaps to the new spec without a reload.
-  useEffect(
-    () => onLondonRevisionPublished(() => setRevisionTick((n) => n + 1)),
-    [],
-  );
+  useEffect(() => onLondonRevisionPublished(() => setRevisionTick((n) => n + 1)), []);
 
   useEffect(() => {
     if (!userId) return;
@@ -691,12 +689,15 @@ function LondonSignagePage() {
         </section>
       </div>
 
-      <Dialog open={!!openPanel} onOpenChange={(o) => {
+      <Dialog
+        open={!!openPanel}
+        onOpenChange={(o) => {
           if (!o) {
             setOpenPanel(null);
             setEditing(false);
           }
-        }}>
+        }}
+      >
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           {openPanel ? (
             <>
@@ -747,8 +748,8 @@ function LondonSignagePage() {
                   )}
                 </p>
                 <p className="mt-1 font-mono text-[11px] text-[#03002C]/55">
-                  {LONDON_SIGNAGE_FONT.pdfBaseFont} · official EPS outlines, live vector paths in .ai and
-                  .svg
+                  {LONDON_SIGNAGE_FONT.pdfBaseFont} · official EPS outlines, live vector paths in
+                  .ai and .svg
                 </p>
               </div>
 
@@ -800,20 +801,17 @@ function LondonSignagePage() {
                     <LondonPanelLiveEditor
                       panel={openPanel}
                       siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
-                      onStyleChange={(styleId) =>
-                        {
-                          const style = styleId as LondonPanel["style"];
-                          setPanels((prev) =>
-                            prev.map((p) => (p.id === openPanel.id ? { ...p, style } : p)),
-                          );
-                          setOpenPanel((prev) => (prev ? { ...prev, style } : prev));
-                        }
-                      }
+                      onStyleChange={(styleId) => {
+                        const style = styleId as LondonPanel["style"];
+                        setPanels((prev) =>
+                          prev.map((p) => (p.id === openPanel.id ? { ...p, style } : p)),
+                        );
+                        setOpenPanel((prev) => (prev ? { ...prev, style } : prev));
+                      }}
                     />
                   </div>
                 ) : null}
               </div>
-
 
               <div className="rounded-xl border border-black/10 p-4">
                 <div className="flex flex-wrap items-center gap-2">

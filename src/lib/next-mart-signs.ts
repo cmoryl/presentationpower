@@ -90,7 +90,10 @@ export function saveMartPillarMeta(id: string, meta: MartPillarMeta) {
   const store = read();
   const prev = store.edits[id] ?? {};
   write({
-    edits: { ...store.edits, [id]: { ...prev, pillarMeta: { ...(prev.pillarMeta ?? {}), ...meta } } },
+    edits: {
+      ...store.edits,
+      [id]: { ...prev, pillarMeta: { ...(prev.pillarMeta ?? {}), ...meta } },
+    },
   });
 }
 

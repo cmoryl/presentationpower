@@ -17,10 +17,24 @@ export async function canEditNextDivision(
 ): Promise<boolean> {
   if (!divisionId) return false;
   const sb = supabase as {
-    rpc: (name: string, args: { _user_id: string; _role: string }) => Promise<{ data?: boolean | null; error?: Error }>;
+    rpc: (
+      name: string,
+      args: { _user_id: string; _role: string },
+    ) => Promise<{ data?: boolean | null; error?: Error }>;
     from: (table: string) => {
-      select: (cols: string, opts?: { head?: boolean; count?: "exact" }) => {
-        eq: (col: string, value: string) => { eq: (col: string, value: string) => Promise<{ count?: number | null; data?: unknown[]; error?: Error }> };
+      select: (
+        cols: string,
+        opts?: { head?: boolean; count?: "exact" },
+      ) => {
+        eq: (
+          col: string,
+          value: string,
+        ) => {
+          eq: (
+            col: string,
+            value: string,
+          ) => Promise<{ count?: number | null; data?: unknown[]; error?: Error }>;
+        };
         single: () => Promise<{ data?: unknown; error?: Error }>;
       };
     };
@@ -54,9 +68,18 @@ export const checkNextDivisionEdit = createServerFn({ method: "GET" })
 export const listNextDivisionEditors = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    const { data: isReviewer } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_reviewer" });
-    const { data: isLead } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_lead" });
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    const { data: isReviewer } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "brand_reviewer",
+    });
+    const { data: isLead } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "brand_lead",
+    });
     if (!isAdmin && !isReviewer && !isLead) throw new Error("Forbidden");
     const { data, error } = await context.supabase
       .from("next_division_editors")
@@ -76,9 +99,18 @@ export const grantNextDivisionEditor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => grantInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    const { data: isReviewer } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_reviewer" });
-    const { data: isLead } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_lead" });
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    const { data: isReviewer } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "brand_reviewer",
+    });
+    const { data: isLead } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "brand_lead",
+    });
     if (!isAdmin && !isReviewer && !isLead) throw new Error("Forbidden");
     const { error } = await context.supabase.from("next_division_editors").insert({
       user_id: data.userId,
@@ -93,11 +125,23 @@ export const revokeNextDivisionEditor = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => revokeInput.parse(data))
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
-    const { data: isReviewer } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_reviewer" });
-    const { data: isLead } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "brand_lead" });
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    const { data: isReviewer } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "brand_reviewer",
+    });
+    const { data: isLead } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "brand_lead",
+    });
     if (!isAdmin && !isReviewer && !isLead) throw new Error("Forbidden");
-    const { error } = await context.supabase.from("next_division_editors").delete().eq("id", data.id);
+    const { error } = await context.supabase
+      .from("next_division_editors")
+      .delete()
+      .eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });

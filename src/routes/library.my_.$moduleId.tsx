@@ -311,12 +311,10 @@ function Editor({
         <div className="relative self-start overflow-hidden rounded-2xl border border-black/10 bg-[#0a0a1a] lg:sticky lg:top-4">
           {mode === "mixed" ? (
             <div className="space-y-4 p-4">
-              {(
-                [
-                  { m: "dark" as const, label: "Dark — cover & closing slides" },
-                  { m: "light" as const, label: "Light — body slides" },
-                ]
-              ).map(({ m, label }, i) => (
+              {[
+                { m: "dark" as const, label: "Dark — cover & closing slides" },
+                { m: "light" as const, label: "Light — body slides" },
+              ].map(({ m, label }, i) => (
                 <div key={m}>
                   <div className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-white/55">
                     {label}

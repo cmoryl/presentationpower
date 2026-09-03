@@ -41,8 +41,20 @@ export const PILLAR_SIZES: {
   trimW: number;
   trimH: number;
 }[] = [
-  { id: "thin", name: "Thin column", note: "Narrow structural column or lamp post wrap.", trimW: 300, trimH: 2000 },
-  { id: "slim", name: "Slim pillar", note: "Concourse column, single-face graphic.", trimW: 450, trimH: 2000 },
+  {
+    id: "thin",
+    name: "Thin column",
+    note: "Narrow structural column or lamp post wrap.",
+    trimW: 300,
+    trimH: 2000,
+  },
+  {
+    id: "slim",
+    name: "Slim pillar",
+    note: "Concourse column, single-face graphic.",
+    trimW: 450,
+    trimH: 2000,
+  },
   {
     id: "standard",
     name: "Standard pillar",
@@ -50,9 +62,27 @@ export const PILLAR_SIZES: {
     trimW: PILLAR_SPEC.trimW,
     trimH: PILLAR_SPEC.trimH,
   },
-  { id: "wide", name: "Wide pillar", note: "Broad column or double-width entrance face.", trimW: 900, trimH: 2200 },
-  { id: "wrap", name: "Wrap face", note: "Full column wrap panel, floor to ceiling.", trimW: 1200, trimH: 2600 },
-  { id: "custom", name: "Custom size", note: "Type the measured trim of the pillar face.", trimW: 600, trimH: 2000 },
+  {
+    id: "wide",
+    name: "Wide pillar",
+    note: "Broad column or double-width entrance face.",
+    trimW: 900,
+    trimH: 2200,
+  },
+  {
+    id: "wrap",
+    name: "Wrap face",
+    note: "Full column wrap panel, floor to ceiling.",
+    trimW: 1200,
+    trimH: 2600,
+  },
+  {
+    id: "custom",
+    name: "Custom size",
+    note: "Type the measured trim of the pillar face.",
+    trimW: 600,
+    trimH: 2000,
+  },
 ];
 
 export const PILLAR_CUSTOM_SIZE = {
@@ -75,7 +105,13 @@ export const PILLAR_CAPTION_PAD = { min: 0, max: 80, step: 2 };
 /** Caption type treatments available on the QR block. */
 export type PillarCaptionFontId = "bold-caps" | "bold" | "regular";
 
-export const PILLAR_CAPTION_FONTS: { id: PillarCaptionFontId; name: string; uppercase: boolean; weight: number; tracking: number }[] = [
+export const PILLAR_CAPTION_FONTS: {
+  id: PillarCaptionFontId;
+  name: string;
+  uppercase: boolean;
+  weight: number;
+  tracking: number;
+}[] = [
   { id: "bold-caps", name: "Geist Bold · caps", uppercase: true, weight: 600, tracking: 0.06 },
   { id: "bold", name: "Geist Bold", uppercase: false, weight: 600, tracking: 0.01 },
   { id: "regular", name: "Geist Regular", uppercase: false, weight: 400, tracking: 0.01 },
@@ -128,7 +164,6 @@ export function pillarGeometry(config: { sizeId?: string; trimW?: number; trimH?
 
 export const PILLAR_DIVISIONS = CITY_BADGE_DIVISIONS;
 export const pillarDivision = cityBadgeDivision;
-
 
 import type { PillarArrowStyleId } from "./pillar-arrows";
 
@@ -189,7 +224,6 @@ export const PILLAR_LOCKUP_SCALE = { min: 0.5, max: 1.6, step: 0.05 };
  * copy can drop lower down the column but can never ride up into the lockup. */
 export const PILLAR_HEADLINE_OFFSET = { min: 0, max: 900, step: 10 };
 
-
 /** Approved ink options for pillar copy. */
 export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = [
   { id: "white", label: "White", hex: "#FFFFFF" },
@@ -200,7 +234,6 @@ export const PILLAR_TEXT_COLORS: { id: string; label: string; hex: string }[] = 
   { id: "lavender", label: "Lavender", hex: "#C2A3FF" },
   { id: "yellow", label: "Yellow", hex: "#FFEB66" },
 ];
-
 
 export function pillarKind(id: string | undefined): PillarKind {
   return PILLAR_KINDS.find((k) => k.id === id) ?? PILLAR_KINDS[0]!;
@@ -349,7 +382,10 @@ export type PillarConfig = {
 /** Approved range for placed artwork width, as a fraction of the trim width. */
 export const PILLAR_ART_WIDTH = { min: 0.3, max: 1, step: 0.02 };
 
-export function pillarDefault(kindId: PillarKindId = "welcome", divisionId = "city-series"): PillarConfig {
+export function pillarDefault(
+  kindId: PillarKindId = "welcome",
+  divisionId = "city-series",
+): PillarConfig {
   const kind = pillarKind(kindId);
   return {
     kind: kind.id,
@@ -401,7 +437,10 @@ export function pillarArtworkBox(
   const geo = pillarGeometry(config);
   const safeW = geo.trimW - geo.safeInset * 2;
   const raw = Number(config.artworkWidth);
-  const frac = Number.isFinite(raw) && raw > 0 ? Math.min(PILLAR_ART_WIDTH.max, Math.max(PILLAR_ART_WIDTH.min, raw)) : 0.78;
+  const frac =
+    Number.isFinite(raw) && raw > 0
+      ? Math.min(PILLAR_ART_WIDTH.max, Math.max(PILLAR_ART_WIDTH.min, raw))
+      : 0.78;
   const w = Math.min(safeW, geo.trimW * frac);
   const h = w / (ratio || 1.667);
   const x = (geo.trimW - w) / 2;
@@ -565,9 +604,11 @@ export function pillarQrPlateColor(config: PillarConfig): string {
 
 /** True when the QR pairing is contrasty enough to scan reliably. */
 export function pillarQrScanSafe(config: PillarConfig): boolean {
-  return pillarContrastRatio(pillarQrForeground(config), pillarQrPlateColor(config)) >= PILLAR_QR_MIN_CONTRAST;
+  return (
+    pillarContrastRatio(pillarQrForeground(config), pillarQrPlateColor(config)) >=
+    PILLAR_QR_MIN_CONTRAST
+  );
 }
-
 
 /** Clamp a headline size into the approved range. */
 export function pillarHeadlineSize(config: PillarConfig): number {
@@ -583,7 +624,6 @@ export function pillarLockupScale(config: PillarConfig): number {
   const value = Number.isFinite(raw) && raw > 0 ? raw : 1;
   return Math.min(PILLAR_LOCKUP_SCALE.max, Math.max(PILLAR_LOCKUP_SCALE.min, value));
 }
-
 
 /** Clamp the headline downward offset into the approved range. */
 export function pillarHeadlineOffset(config: PillarConfig): number {
@@ -612,7 +652,6 @@ export function withPillarKind(config: PillarConfig, kindId: PillarKindId): Pill
     headlineSize: config.headlineSize === from.headlineSize ? to.headlineSize : config.headlineSize,
   };
 }
-
 
 export function pillarName(config: PillarConfig): string {
   const g = pillarGeometry(config);
@@ -649,5 +688,4 @@ export function pillarPanelSpec(config: PillarConfig) {
     bandMm: 2.12,
     rasterMb: 4.2,
   };
-
 }

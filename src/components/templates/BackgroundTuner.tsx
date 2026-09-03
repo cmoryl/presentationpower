@@ -567,7 +567,6 @@ export function BackgroundTuner({
                     <span className="relative block aspect-[16/9] w-full overflow-hidden rounded-lg border border-black/10 dark:border-white/15">
                       <GroundPlane pack={pack} seed={s} layers={live} />
                     </span>
-
                   </button>
                   <span className="flex min-w-0 items-center justify-between gap-1.5">
                     <span

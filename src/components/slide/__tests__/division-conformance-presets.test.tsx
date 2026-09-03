@@ -50,13 +50,7 @@ function render(variant: ModuleVariant, brandModeId: string, mode: "light" | "da
     mode,
   } as DeckSlide;
   return renderToStaticMarkup(
-    <VariantRenderer
-      slide={slide}
-      variant={variant}
-      brand={brand}
-      pageNumber={1}
-      mode={mode}
-    />,
+    <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={1} mode={mode} />,
   );
 }
 

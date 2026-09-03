@@ -61,11 +61,12 @@ export function MartBundleExport({ stop }: { stop?: MartStop }) {
             <PackageCheck size={17} /> Production bundle · PDF/X-4 + Illustrator
           </h2>
           <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-black/60">
-            One zip for the whole mart. Every pillar set is built from the layered vector pipeline at
-            its own measured footprint — entrance tower, till, wayfinding and logo column — as a
+            One zip for the whole mart. Every pillar set is built from the layered vector pipeline
+            at its own measured footprint — entrance tower, till, wayfinding and logo column — as a
             PDF/X-4 press file with an Illustrator-openable <code>.ai</code> twin and an editable
             vector gradient ground. The supplied die-cut artwork ships as its layered Illustrator
-            master, flat signage as measured print specs, plus the approved logo pack, a production manifest and a read-me.
+            master, flat signage as measured print specs, plus the approved logo pack, a production
+            manifest and a read-me.
           </p>
         </div>
         <Button size="lg" onClick={run} disabled={busy}>

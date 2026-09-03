@@ -224,7 +224,6 @@ export function LookFieldsEditor({
                   set("palette", next);
                 }}
               />
-
             </label>
           ))}
         </div>

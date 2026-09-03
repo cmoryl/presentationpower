@@ -158,7 +158,8 @@ function compressRoom(panels: LondonPanel[]): Row[] {
   };
   for (const panel of panels) {
     const prev = run[run.length - 1];
-    const same = prev && specKey(prev) === specKey(panel) && nameStem(prev.name) === nameStem(panel.name);
+    const same =
+      prev && specKey(prev) === specKey(panel) && nameStem(prev.name) === nameStem(panel.name);
     if (same) run.push(panel);
     else {
       flush();
@@ -237,7 +238,12 @@ function tableHead(ctx: Ctx, cont = false) {
   HEADERS.forEach((h, i) => {
     const label = i === 0 && cont ? `${h} (continued)` : h;
     const w = COLS[i]!;
-    doc.text(safe(label), i === 5 ? x + w - 4 : x + 6, ctx.y + 11.5, i === 5 ? { align: "right" } : undefined);
+    doc.text(
+      safe(label),
+      i === 5 ? x + w - 4 : x + 6,
+      ctx.y + 11.5,
+      i === 5 ? { align: "right" } : undefined,
+    );
     x += w;
   });
   ctx.y += 17;
@@ -292,7 +298,11 @@ function drawRow(ctx: Ctx, row: Row, index: number) {
 
   // Qty column
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(row.qty > 1 ? BLUE[0] : INK[0], row.qty > 1 ? BLUE[1] : INK[1], row.qty > 1 ? BLUE[2] : INK[2]);
+  doc.setTextColor(
+    row.qty > 1 ? BLUE[0] : INK[0],
+    row.qty > 1 ? BLUE[1] : INK[1],
+    row.qty > 1 ? BLUE[2] : INK[2],
+  );
   doc.text(row.qty > 1 ? `×${row.qty}` : "1", M + CW - 4, ctx.y + 13, { align: "right" });
   doc.setFont("helvetica", "normal");
 
@@ -544,7 +554,12 @@ function specPage(ctx: Ctx) {
   const tiers: string[][] = [
     ["36 ppi", "Longest edge over 2000 mm", "3 m and beyond", "Flags, banners, stage sets, wraps"],
     ["72 ppi", "Longest edge 800–2000 mm", "1.5–3 m", "Desk fronts, plinths, door vinyl"],
-    ["120 ppi", "Longest edge under 800 mm", "Arm's length", "Slivers, fascia strips, close-up squares"],
+    [
+      "120 ppi",
+      "Longest edge under 800 mm",
+      "Arm's length",
+      "Slivers, fascia strips, close-up squares",
+    ],
   ];
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8.5);
@@ -555,7 +570,11 @@ function specPage(ctx: Ctx) {
     }
     tx = M;
     row.forEach((cell, k) => {
-      doc.setTextColor(k === 0 ? NAVY[0] : INK[0], k === 0 ? NAVY[1] : INK[1], k === 0 ? NAVY[2] : INK[2]);
+      doc.setTextColor(
+        k === 0 ? NAVY[0] : INK[0],
+        k === 0 ? NAVY[1] : INK[1],
+        k === 0 ? NAVY[2] : INK[2],
+      );
       doc.setFont("helvetica", k === 0 ? "bold" : "normal");
       doc.text(wrap(doc, cell, tierCols[k]! - 12, 1)[0]!, tx + 6, ctx.y + 13);
       tx += tierCols[k]!;
@@ -575,8 +594,16 @@ function specPage(ctx: Ctx) {
   ctx.y += 16;
   const live: [string, string, string][] = [
     ["Panel kit hub", "Per-panel specs, QA reports, RGB and CMYK vector downloads", HUB],
-    ["Signage template editor", "Lockup, headline, QR and ground placement per panel", TEMPLATE_URL],
-    ["Revise specifications", "Board sizes, gradients and rebuilds; publish a revision", REVISE_URL],
+    [
+      "Signage template editor",
+      "Lockup, headline, QR and ground placement per panel",
+      TEMPLATE_URL,
+    ],
+    [
+      "Revise specifications",
+      "Board sizes, gradients and rebuilds; publish a revision",
+      REVISE_URL,
+    ],
   ];
   doc.setFontSize(9);
   for (const [label, note, url] of live) {
@@ -597,7 +624,11 @@ function specPage(ctx: Ctx) {
   }
 }
 
-function schedulePages(ctx: Ctx, floors: FloorPlan[], record?: (label: string, page: number) => void) {
+function schedulePages(
+  ctx: Ctx,
+  floors: FloorPlan[],
+  record?: (label: string, page: number) => void,
+) {
   for (const floor of floors) {
     ctx.section = `Panel schedule — ${floor.label}`;
     newBodyPage(ctx);
@@ -628,7 +659,9 @@ function schedulePages(ctx: Ctx, floors: FloorPlan[], record?: (label: string, p
       ctx.doc.setFontSize(8.5);
       ctx.doc.setTextColor(...GRAY);
       ctx.doc.text(
-        safe(`${room.panels} panel${room.panels === 1 ? "" : "s"} · ${room.rows.length} line${room.rows.length === 1 ? "" : "s"}`),
+        safe(
+          `${room.panels} panel${room.panels === 1 ? "" : "s"} · ${room.rows.length} line${room.rows.length === 1 ? "" : "s"}`,
+        ),
         PW - M,
         ctx.y + 2,
         { align: "right" },
@@ -643,17 +676,18 @@ function schedulePages(ctx: Ctx, floors: FloorPlan[], record?: (label: string, p
   }
 }
 
-function contentsPage(doc: jsPDF, floors: FloorPlan[], pages: Map<string, number>, totalPages: number) {
+function contentsPage(
+  doc: jsPDF,
+  floors: FloorPlan[],
+  pages: Map<string, number>,
+  totalPages: number,
+) {
   runningHeader(doc, "Contents");
   let y = BODY_TOP;
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
   doc.setTextColor(...GRAY);
-  doc.text(
-    safe(`${totalPages} pages · every entry below is a live link into the kit`),
-    M,
-    y,
-  );
+  doc.text(safe(`${totalPages} pages · every entry below is a live link into the kit`), M, y);
   y += 24;
 
   const rows: [string, string, number | null, string | null][] = [
@@ -699,7 +733,12 @@ function contentsPage(doc: jsPDF, floors: FloorPlan[], pages: Map<string, number
 // Document assembly
 // ---------------------------------------------------------------------------
 
-function renderBody(doc: jsPDF, floors: FloorPlan[], record?: (label: string, page: number) => void, startPage = 1) {
+function renderBody(
+  doc: jsPDF,
+  floors: FloorPlan[],
+  record?: (label: string, page: number) => void,
+  startPage = 1,
+) {
   const ctx: Ctx = { doc, y: BODY_TOP, page: startPage, section: "" };
   gradientPage(ctx);
   specPage(ctx);
@@ -719,7 +758,11 @@ function stampFooters(doc: jsPDF, total: number, sections: string[]) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7.5);
     doc.setTextColor(...GRAY);
-    doc.text(safe(`Job ${LONDON_VENUE.job} · ${LONDON_VENUE.venue} · ${sections[p - 1] ?? ""}`), M, FOOT_Y);
+    doc.text(
+      safe(`Job ${LONDON_VENUE.job} · ${LONDON_VENUE.venue} · ${sections[p - 1] ?? ""}`),
+      M,
+      FOOT_Y,
+    );
     doc.text(`page ${p} of ${total}`, PW - M, FOOT_Y, { align: "right" });
     doc.setTextColor(...BLUE);
     doc.textWithLink("Open the live kit", PW / 2 - 30, FOOT_Y, { url: HUB });
@@ -747,7 +790,8 @@ export function buildLondonDirectoryPdf(panels: LondonPanel[] = LONDON_PANELS): 
   const sections: string[] = ["Cover", "Contents"];
   const sectionOf = (p: number) => {
     let label = "Panel schedule";
-    for (const [floorLabel, page] of measured) if (page <= p) label = `Panel schedule — ${floorLabel}`;
+    for (const [floorLabel, page] of measured)
+      if (page <= p) label = `Panel schedule — ${floorLabel}`;
     if (p === 3) label = "Gradient treatments";
     else if (p === 4) label = "Print specification";
     return label;

@@ -61,12 +61,7 @@ function PillarPage() {
   const savedRow = useMemo(() => {
     if (file) return saved.data?.find((row) => row.id === file);
     if (!division && !kind && !face) return undefined;
-    return pickPillarFile(
-      saved.data,
-      division ?? "city-series",
-      kind ?? "welcome",
-      face ?? "dark",
-    );
+    return pickPillarFile(saved.data, division ?? "city-series", kind ?? "welcome", face ?? "dark");
   }, [file, saved.data, division, kind, face]);
 
   const seeded = useMemo<PillarConfig | undefined>(() => {
@@ -160,8 +155,8 @@ function DemoCards({
             Demo card examples · {pillarDivision(divisionId).name}
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-black/55">
-            These are the live example cards used across the hub. Pick one to load it into the editor
-            below, change anything, then save the live file — the card updates everywhere.
+            These are the live example cards used across the hub. Pick one to load it into the
+            editor below, change anything, then save the live file — the card updates everywhere.
           </p>
         </div>
         <div
@@ -174,7 +169,9 @@ function DemoCards({
               key={f}
               type="button"
               aria-pressed={face === f}
-              onClick={() => navigate({ search: (prev) => ({ ...prev, face: f, file: undefined }) })}
+              onClick={() =>
+                navigate({ search: (prev) => ({ ...prev, face: f, file: undefined }) })
+              }
               className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
                 face === f ? "bg-[#003FC7] text-white" : "text-black/55"
               }`}
@@ -231,4 +228,3 @@ function DemoCards({
     </section>
   );
 }
-

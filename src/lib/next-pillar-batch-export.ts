@@ -152,7 +152,10 @@ export async function exportPillarBatch(opts: {
       );
     }
     try {
-      zip.file(`${folder}/ai/${slug}-ground.ai`, buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel));
+      zip.file(
+        `${folder}/ai/${slug}-ground.ai`,
+        buildLondonPanelAi(pillarPanelSpec(config) as LondonPanel),
+      );
     } catch {
       // Ground art is a convenience layer; skip it rather than failing the batch.
     }

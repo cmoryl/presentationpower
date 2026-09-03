@@ -119,67 +119,65 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
               : "center",
       }}
     >
-              <div
-                style={{
-                  width: qrEdge,
-                  height: qrEdge,
-                  background: qrBack,
-                  borderRadius: qrClear ? 0 : mm(4),
-                  padding: 0,
-                }}
-              >
-                <svg
-                  width={qrEdge}
-                  height={qrEdge}
-                  viewBox={`0 0 ${qr.size} ${qr.size}`}
-                  shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
-                  aria-hidden
-                >
-                  {qrClear ? null : (
-                    <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrBack} />
-                  )}
-                  {qrStyle === "block" ? (
-                    <path d={qr.path} fill={qrFore} />
-                  ) : (
-                    qr.modules.map((on, i) => {
-                      if (!on) return null;
-                      const cx = i % qr.size;
-                      const cy = Math.floor(i / qr.size);
-                      return qrStyle === "dot" ? (
-                        <circle key={i} cx={cx + 0.5} cy={cy + 0.5} r={0.5} fill={qrFore} />
-                      ) : (
-                        <rect
-                          key={i}
-                          x={cx + 0.06}
-                          y={cy + 0.06}
-                          width={0.88}
-                          height={0.88}
-                          rx={0.24}
-                          fill={qrFore}
-                        />
-                      );
-                    })
-                  )}
-                </svg>
-              </div>
-              {qrPlace.caption ? (
-                <div
-                  style={{
-                    marginTop: mm(qrPlace.captionPad),
-                    maxWidth: qrEdge,
-                    fontSize: mm(qrPlace.captionSize),
-                    fontWeight: qrPlace.captionFont.weight,
-                    letterSpacing: `${qrPlace.captionFont.tracking}em`,
-                    textTransform: qrPlace.captionFont.uppercase ? "uppercase" : "none",
-                    textAlign: qrPlace.captionAlign,
-                    lineHeight: 1.15,
-                    color: headlineInk,
-                  }}
-                >
-                  {config.qrCaption}
-                </div>
-              ) : null}
-  </div>
+      <div
+        style={{
+          width: qrEdge,
+          height: qrEdge,
+          background: qrBack,
+          borderRadius: qrClear ? 0 : mm(4),
+          padding: 0,
+        }}
+      >
+        <svg
+          width={qrEdge}
+          height={qrEdge}
+          viewBox={`0 0 ${qr.size} ${qr.size}`}
+          shapeRendering={qrStyle === "block" ? "crispEdges" : undefined}
+          aria-hidden
+        >
+          {qrClear ? null : <rect x={0} y={0} width={qr.size} height={qr.size} fill={qrBack} />}
+          {qrStyle === "block" ? (
+            <path d={qr.path} fill={qrFore} />
+          ) : (
+            qr.modules.map((on, i) => {
+              if (!on) return null;
+              const cx = i % qr.size;
+              const cy = Math.floor(i / qr.size);
+              return qrStyle === "dot" ? (
+                <circle key={i} cx={cx + 0.5} cy={cy + 0.5} r={0.5} fill={qrFore} />
+              ) : (
+                <rect
+                  key={i}
+                  x={cx + 0.06}
+                  y={cy + 0.06}
+                  width={0.88}
+                  height={0.88}
+                  rx={0.24}
+                  fill={qrFore}
+                />
+              );
+            })
+          )}
+        </svg>
+      </div>
+      {qrPlace.caption ? (
+        <div
+          style={{
+            marginTop: mm(qrPlace.captionPad),
+            maxWidth: qrEdge,
+            fontSize: mm(qrPlace.captionSize),
+            fontWeight: qrPlace.captionFont.weight,
+            letterSpacing: `${qrPlace.captionFont.tracking}em`,
+            textTransform: qrPlace.captionFont.uppercase ? "uppercase" : "none",
+            textAlign: qrPlace.captionAlign,
+            lineHeight: 1.15,
+            color: headlineInk,
+          }}
+        >
+          {config.qrCaption}
+        </div>
+      ) : null}
+    </div>
   ) : null;
 
   return (
@@ -265,7 +263,11 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
       >
         {config.showLockup && (division.whiteUrl || division.colorUrl) ? (
           <img
-            src={face === "light" ? division.colorUrl || division.whiteUrl : division.whiteUrl || division.colorUrl}
+            src={
+              face === "light"
+                ? division.colorUrl || division.whiteUrl
+                : division.whiteUrl || division.colorUrl
+            }
             alt=""
             aria-hidden
             style={{
@@ -334,7 +336,12 @@ export function PillarSign({ config, pxPerMm = 0.72, guides = false, className, 
             {subLine}
           </div>
         ) : (
-          <div style={{ marginTop: mm(Math.min(140, geo.trimH * 0.07) + headlineOffset), width: "100%" }}>
+          <div
+            style={{
+              marginTop: mm(Math.min(140, geo.trimH * 0.07) + headlineOffset),
+              width: "100%",
+            }}
+          >
             {config.headline.trim() ? (
               <div
                 style={{

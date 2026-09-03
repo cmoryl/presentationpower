@@ -8,13 +8,7 @@
 // mesh, it scales losslessly, and it needs no clipping hacks.
 // -----------------------------------------------------------------------------
 
-import {
-  PDFDocument,
-  PDFDict,
-  PDFName,
-  type PDFPage,
-  type PDFRef,
-} from "pdf-lib";
+import { PDFDocument, PDFDict, PDFName, type PDFPage, type PDFRef } from "pdf-lib";
 
 export type MeshRgb = [number, number, number];
 
@@ -109,13 +103,11 @@ export function registerMeshShading(
   });
   const ref = doc.context.register(stream);
 
-  const resources =
-    page.node.lookupMaybe(PDFName.of("Resources"), PDFDict) ?? doc.context.obj({});
+  const resources = page.node.lookupMaybe(PDFName.of("Resources"), PDFDict) ?? doc.context.obj({});
   if (!page.node.has(PDFName.of("Resources"))) {
     page.node.set(PDFName.of("Resources"), resources);
   }
-  const shading =
-    resources.lookupMaybe(PDFName.of("Shading"), PDFDict) ?? doc.context.obj({});
+  const shading = resources.lookupMaybe(PDFName.of("Shading"), PDFDict) ?? doc.context.obj({});
   if (!resources.has(PDFName.of("Shading"))) {
     resources.set(PDFName.of("Shading"), shading);
   }

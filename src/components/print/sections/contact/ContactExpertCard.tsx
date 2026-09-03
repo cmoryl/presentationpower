@@ -6,7 +6,6 @@ import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
 import { ORG_CONTACT } from "@/lib/print-library/org-facts";
 
-
 export function ContactExpertCard({
   section,
   mode,

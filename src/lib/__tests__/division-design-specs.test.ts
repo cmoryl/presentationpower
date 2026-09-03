@@ -20,7 +20,13 @@ describe("per-division design specs", () => {
     const nonEnterprise = BRAND_MODES.filter((b) => b.id !== "bm-enterprise");
     const distinct = new Set(nonEnterprise.map((b) => divisionDesignSpec(b.id).packId));
     expect(distinct.size).toBeGreaterThan(3);
-    for (const id of ["bm-tp-legal", "bm-tp-media", "bm-tp-games", "bm-tp-digital", "bm-tp-lifesci"]) {
+    for (const id of [
+      "bm-tp-legal",
+      "bm-tp-media",
+      "bm-tp-games",
+      "bm-tp-digital",
+      "bm-tp-lifesci",
+    ]) {
       expect(divisionDesignSpec(id).packId).not.toBe(divisionDesignSpec("bm-enterprise").packId);
     }
   });

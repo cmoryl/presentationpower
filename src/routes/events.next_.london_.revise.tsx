@@ -581,8 +581,8 @@ function LondonRevisePage() {
             Sign in to revise the London kit
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-[#03002C]/70">
-            The scenic panel kit is public — anyone can view and download the artwork — but
-            changing venue specifications and publishing revisions requires an account.
+            The scenic panel kit is public — anyone can view and download the artwork — but changing
+            venue specifications and publishing revisions requires an account.
           </p>
           <div className="mt-7 flex justify-center gap-3">
             <Link
@@ -847,7 +847,11 @@ function LondonRevisePage() {
                       >
                         <td className="px-3 py-2.5">
                           <div className="flex items-start gap-2.5">
-                            <LondonPanelThumb panel={panel} size={64} onOpen={(p) => setArtId(p.id)} />
+                            <LondonPanelThumb
+                              panel={panel}
+                              size={64}
+                              onOpen={(p) => setArtId(p.id)}
+                            />
                             <div>
                               <p className="font-semibold text-[#03002C]">{panel.name}</p>
                               <p className="text-xs text-[#666]">
@@ -1028,8 +1032,7 @@ function LondonRevisePage() {
                 {previewPanel.floor} · {previewPanel.room} · previewing the{" "}
                 {plan.touched.includes(previewPanel.id) ? "revised" : "current"} specification (
                 {previewPanel.trimW}×{previewPanel.trimH}mm ({inch(previewPanel.trimW)}×
-                {inch(previewPanel.trimH)} in) trim, {previewPanel.bleedEdge}mm bleed
-                per edge).
+                {inch(previewPanel.trimH)} in) trim, {previewPanel.bleedEdge}mm bleed per edge).
               </p>
               <LondonPpiPreview panel={previewPanel} />
             </>
@@ -1047,9 +1050,8 @@ function LondonRevisePage() {
               </DialogTitle>
               <p className="text-xs text-[#666]">
                 {artPanel.floor} · {artPanel.room} · {artPanel.trimW}×{artPanel.trimH}mm (
-                {inch(artPanel.trimW)}×{inch(artPanel.trimH)} in) trim ·{" "}
-                {artPanel.bleedW}×{artPanel.bleedH}mm bleed · {artPanel.rasterPx}px at{" "}
-                {artPanel.rasterPpi}ppi
+                {inch(artPanel.trimW)}×{inch(artPanel.trimH)} in) trim · {artPanel.bleedW}×
+                {artPanel.bleedH}mm bleed · {artPanel.rasterPx}px at {artPanel.rasterPpi}ppi
               </p>
               <LondonPanelLiveEditor
                 panel={artPanel}
@@ -1081,7 +1083,6 @@ function LondonRevisePage() {
           ) : null}
         </DialogContent>
       </Dialog>
-
     </AppShell>
   );
 }

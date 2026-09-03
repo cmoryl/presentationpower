@@ -88,18 +88,42 @@ export function vizContrast(a: string, b: string): number {
  */
 type Channel = keyof InfographicSpec["encoding"];
 const REQUIRED_ENCODING: Partial<Record<InfographicKind, Channel[][]>> = {
-  bar: [["x", "label"], ["y", "value"]],
-  column: [["x", "label"], ["y", "value"]],
-  line: [["x", "label"], ["y", "value"]],
-  area: [["x", "label"], ["y", "value"]],
+  bar: [
+    ["x", "label"],
+    ["y", "value"],
+  ],
+  column: [
+    ["x", "label"],
+    ["y", "value"],
+  ],
+  line: [
+    ["x", "label"],
+    ["y", "value"],
+  ],
+  area: [
+    ["x", "label"],
+    ["y", "value"],
+  ],
   "stacked-area": [["x"], ["value", "y"], ["series"]],
   bump: [["x"], ["value", "y"], ["series"]],
-  radar: [["x", "label"], ["value", "y"]],
-  donut: [["label", "x"], ["value", "y"]],
+  radar: [
+    ["x", "label"],
+    ["value", "y"],
+  ],
+  donut: [
+    ["label", "x"],
+    ["value", "y"],
+  ],
   treemap: [["label"], ["value"]],
   sunburst: [["label"], ["value"]],
-  funnel: [["label", "x"], ["value", "y"]],
-  waterfall: [["x", "label"], ["value", "y"]],
+  funnel: [
+    ["label", "x"],
+    ["value", "y"],
+  ],
+  waterfall: [
+    ["x", "label"],
+    ["value", "y"],
+  ],
   "radial-bar": [["label"], ["value"]],
   gauge: [["value", "y"]],
   "gauge-grid": [["label"], ["value"]],
@@ -152,7 +176,6 @@ const DENSE_KINDS = new Set<InfographicKind>([
   "area",
 ]);
 
-
 /** Chart kinds where every value must be a non-negative share of a whole. */
 const PART_TO_WHOLE = new Set<InfographicKind>([
   "donut",
@@ -174,24 +197,13 @@ const SURFACE_LIMITS: Record<
   social: { categories: 5, labelChars: 14, titleChars: 60, requireSource: false },
 };
 
-const MONTHS = [
-  "jan",
-  "feb",
-  "mar",
-  "apr",
-  "may",
-  "jun",
-  "jul",
-  "aug",
-  "sep",
-  "oct",
-  "nov",
-  "dec",
-];
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 /** Best-effort ordinal for a period label so we can check chronology. */
 function periodOrdinal(raw: unknown): number | null {
-  const v = String(raw ?? "").trim().toLowerCase();
+  const v = String(raw ?? "")
+    .trim()
+    .toLowerCase();
   if (!v) return null;
   const iso = /^(\d{4})-(\d{2})(?:-(\d{2}))?/.exec(v);
   if (iso) return Number(iso[1]) * 372 + Number(iso[2]) * 31 + Number(iso[3] ?? 1);
@@ -281,7 +293,6 @@ export function auditVizSpec(spec: InfographicSpec, opts: AuditOptions = {}): Vi
       fix: `Set encoding.${unsatisfied[0][0]} to the matching column name in data.rows.`,
     });
   }
-
 
   const presentKeys = new Set(rows.flatMap((r) => Object.keys(r)));
   for (const [channel, key] of Object.entries(spec.encoding)) {

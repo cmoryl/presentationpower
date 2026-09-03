@@ -393,7 +393,9 @@ async function main() {
           score: null,
           error: `capture threw (after reboot): ${String(err).slice(0, 160)}`,
         });
-        console.log(`  ${i + 1}/${jobs.length} ${label} · UNSCORED (${String(firstErr).slice(0, 80)})`);
+        console.log(
+          `  ${i + 1}/${jobs.length} ${label} · UNSCORED (${String(firstErr).slice(0, 80)})`,
+        );
         continue;
       }
     }

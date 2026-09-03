@@ -224,7 +224,8 @@ export const JUDGING_DEMO_DECK: DeckSnapshot = {
     prospect: "Markathon judges",
     industry: "Sales enablement",
     audience: "Judging panel",
-    meetingObjective: "Prove Element can sell more, automate manual production, and scale across teams.",
+    meetingObjective:
+      "Prove Element can sell more, automate manual production, and scale across teams.",
     lengthTarget: 5,
     clientFacts:
       "Use live product actions only. Replace bracketed placeholders with measured business numbers after the demo.",
@@ -280,7 +281,10 @@ export const JUDGING_DEMO_DECK: DeckSnapshot = {
           { label: "0:00-0:25", body: "Frame Element as a revenue engine, not a design tool." },
           { label: "0:25-1:15", body: "Use the Presentation Agent to create a deck from a brief." },
           { label: "1:15-1:55", body: "Swap a module, run QA, and export to PPTX or PDF." },
-          { label: "1:55-3:00", body: "Show reuse across channels and close with the rollout plan." },
+          {
+            label: "1:55-3:00",
+            body: "Show reuse across channels and close with the rollout plan.",
+          },
         ],
       },
       notes: "Keep the demo moving; do not stop to explain every control.",
@@ -298,7 +302,8 @@ export const JUDGING_DEMO_DECK: DeckSnapshot = {
           { value: 180, unit: "pts", label: "Maximum weighted score target" },
         ],
       },
-      notes: "Only use numbers from the judging sheet and live demo timing unless real metrics are supplied.",
+      notes:
+        "Only use numbers from the judging sheet and live demo timing unless real metrics are supplied.",
     },
     {
       sectionId: "SF-16",
@@ -311,7 +316,10 @@ export const JUDGING_DEMO_DECK: DeckSnapshot = {
         items: [
           { label: "Pilot", body: "Run one sales team through briefs, decks, QA, and export." },
           { label: "Package", body: "Lock approved modules, prompts, and role-based workflows." },
-          { label: "Train", body: "Give Sales create-from-approved paths and Marketing admin control." },
+          {
+            label: "Train",
+            body: "Give Sales create-from-approved paths and Marketing admin control.",
+          },
           { label: "Scale", body: "Extend the same engine to print, social, and event kits." },
         ],
       },

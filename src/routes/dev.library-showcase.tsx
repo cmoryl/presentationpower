@@ -53,28 +53,95 @@ export const Route = createFileRoute("/dev/library-showcase")({
  * global scaffold, and the toggle can flip them without touching the root.
  */
 
-
 const SEMANTIC_TOKENS: Array<{ token: string; role: string; bg: string; fg: string }> = [
-  { token: "bg-background / text-foreground", role: "Page ground and body ink", bg: "bg-background", fg: "text-foreground" },
-  { token: "bg-card / text-card-foreground", role: "Raised surface", bg: "bg-card", fg: "text-card-foreground" },
-  { token: "bg-primary / text-primary-foreground", role: "Primary action", bg: "bg-primary", fg: "text-primary-foreground" },
-  { token: "bg-secondary / text-secondary-foreground", role: "Quiet action, chips", bg: "bg-secondary", fg: "text-secondary-foreground" },
-  { token: "bg-muted / text-muted-foreground", role: "Muted surface and captions", bg: "bg-muted", fg: "text-muted-foreground" },
-  { token: "bg-accent / text-accent-foreground", role: "Accent — 10% of a layout", bg: "bg-accent", fg: "text-accent-foreground" },
-  { token: "bg-destructive / text-destructive-foreground", role: "Destructive action", bg: "bg-destructive", fg: "text-destructive-foreground" },
-  { token: "bg-sidebar / text-sidebar-foreground", role: "Navigation ground", bg: "bg-sidebar", fg: "text-sidebar-foreground" },
+  {
+    token: "bg-background / text-foreground",
+    role: "Page ground and body ink",
+    bg: "bg-background",
+    fg: "text-foreground",
+  },
+  {
+    token: "bg-card / text-card-foreground",
+    role: "Raised surface",
+    bg: "bg-card",
+    fg: "text-card-foreground",
+  },
+  {
+    token: "bg-primary / text-primary-foreground",
+    role: "Primary action",
+    bg: "bg-primary",
+    fg: "text-primary-foreground",
+  },
+  {
+    token: "bg-secondary / text-secondary-foreground",
+    role: "Quiet action, chips",
+    bg: "bg-secondary",
+    fg: "text-secondary-foreground",
+  },
+  {
+    token: "bg-muted / text-muted-foreground",
+    role: "Muted surface and captions",
+    bg: "bg-muted",
+    fg: "text-muted-foreground",
+  },
+  {
+    token: "bg-accent / text-accent-foreground",
+    role: "Accent — 10% of a layout",
+    bg: "bg-accent",
+    fg: "text-accent-foreground",
+  },
+  {
+    token: "bg-destructive / text-destructive-foreground",
+    role: "Destructive action",
+    bg: "bg-destructive",
+    fg: "text-destructive-foreground",
+  },
+  {
+    token: "bg-sidebar / text-sidebar-foreground",
+    role: "Navigation ground",
+    bg: "bg-sidebar",
+    fg: "text-sidebar-foreground",
+  },
 ];
 
 const CHART_TOKENS = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5"];
 
 const TYPE_SCALE: Array<{ label: string; cls: string; sample: string }> = [
-  { label: "text-5xl font-semibold tracking-[-0.03em]", cls: "text-5xl font-semibold tracking-[-0.03em]", sample: "Global content, engineered" },
-  { label: "text-3xl font-semibold tracking-[-0.02em]", cls: "text-3xl font-semibold tracking-[-0.02em]", sample: "Localization at enterprise scale" },
-  { label: "text-xl font-semibold", cls: "text-xl font-semibold", sample: "GlobalLink connects your stack" },
-  { label: "text-base", cls: "text-base leading-[1.4]", sample: "Body copy sits at 140% leading so long passages stay readable on a slide or a page." },
-  { label: "text-sm text-muted-foreground", cls: "text-sm text-muted-foreground leading-[1.4]", sample: "Supporting caption for a metric, a table row, or a form hint." },
-  { label: "text-xs uppercase tracking-[0.2em]", cls: "text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground", sample: "Eyebrow label" },
-  { label: "font-mono text-sm", cls: "font-mono text-sm", sample: "npm i @transperfect/element — Geist Mono Variable" },
+  {
+    label: "text-5xl font-semibold tracking-[-0.03em]",
+    cls: "text-5xl font-semibold tracking-[-0.03em]",
+    sample: "Global content, engineered",
+  },
+  {
+    label: "text-3xl font-semibold tracking-[-0.02em]",
+    cls: "text-3xl font-semibold tracking-[-0.02em]",
+    sample: "Localization at enterprise scale",
+  },
+  {
+    label: "text-xl font-semibold",
+    cls: "text-xl font-semibold",
+    sample: "GlobalLink connects your stack",
+  },
+  {
+    label: "text-base",
+    cls: "text-base leading-[1.4]",
+    sample: "Body copy sits at 140% leading so long passages stay readable on a slide or a page.",
+  },
+  {
+    label: "text-sm text-muted-foreground",
+    cls: "text-sm text-muted-foreground leading-[1.4]",
+    sample: "Supporting caption for a metric, a table row, or a form hint.",
+  },
+  {
+    label: "text-xs uppercase tracking-[0.2em]",
+    cls: "text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground",
+    sample: "Eyebrow label",
+  },
+  {
+    label: "font-mono text-sm",
+    cls: "font-mono text-sm",
+    sample: "npm i @transperfect/element — Geist Mono Variable",
+  },
 ];
 
 const SECTIONS = [
@@ -123,7 +190,10 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 space-y-6 border-t border-border pt-10 first:border-0 first:pt-0">
+    <section
+      id={id}
+      className="scroll-mt-24 space-y-6 border-t border-border pt-10 first:border-0 first:pt-0"
+    >
       <header className="space-y-1">
         <h2 className="text-2xl font-semibold tracking-[-0.02em]">{title}</h2>
         <p className="max-w-2xl text-sm text-muted-foreground">{note}</p>
@@ -146,16 +216,20 @@ function LibraryShowcase() {
   }, [query]);
 
   return (
-    <div className={cn(dark && "dark")} style={(dark ? ELEMENT_DARK : ELEMENT_LIGHT) as React.CSSProperties}>
+    <div
+      className={cn(dark && "dark")}
+      style={(dark ? ELEMENT_DARK : ELEMENT_LIGHT) as React.CSSProperties}
+    >
       <div className="min-h-screen bg-background font-sans text-foreground">
-
         <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
           <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-4 px-6 py-4">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Design system · Preview only
               </div>
-              <div className="text-lg font-semibold tracking-[-0.02em]">Element library showcase</div>
+              <div className="text-lg font-semibold tracking-[-0.02em]">
+                Element library showcase
+              </div>
             </div>
             <div className="ml-auto flex items-center gap-3">
               <Badge variant="secondary">6 exports</Badge>
@@ -213,19 +287,25 @@ function LibraryShowcase() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Tokens first</CardTitle>
-                    <CardDescription>Colour, radius and type are variables — never literals.</CardDescription>
+                    <CardDescription>
+                      Colour, radius and type are variables — never literals.
+                    </CardDescription>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader>
                     <CardTitle>Variant APIs</CardTitle>
-                    <CardDescription>Visual change happens through variant and size props.</CardDescription>
+                    <CardDescription>
+                      Visual change happens through variant and size props.
+                    </CardDescription>
                   </CardHeader>
                 </Card>
                 <Card>
                   <CardHeader>
                     <CardTitle>Both themes</CardTitle>
-                    <CardDescription>Every specimen is verified on light and dark ground.</CardDescription>
+                    <CardDescription>
+                      Every specimen is verified on light and dark ground.
+                    </CardDescription>
                   </CardHeader>
                 </Card>
               </div>
@@ -275,7 +355,11 @@ function LibraryShowcase() {
               </div>
             </Section>
 
-            <Section id="button" title="Button" note="Six variants, four sizes, plus the states that matter.">
+            <Section
+              id="button"
+              title="Button"
+              note="Six variants, four sizes, plus the states that matter."
+            >
               <Spec label="variant">
                 <Button>Build deck</Button>
                 <Button variant="secondary">Duplicate</Button>
@@ -305,7 +389,11 @@ function LibraryShowcase() {
               <Snippet code={`<Button variant="secondary" size="lg">Duplicate</Button>`} />
             </Section>
 
-            <Section id="badge" title="Badge" note="Status marks for deck state, roles and approvals.">
+            <Section
+              id="badge"
+              title="Badge"
+              note="Status marks for deck state, roles and approvals."
+            >
               <Spec label="variant">
                 <Badge>Approved</Badge>
                 <Badge variant="secondary">In review</Badge>
@@ -315,12 +403,18 @@ function LibraryShowcase() {
               <Snippet code={`<Badge variant="outline">Draft</Badge>`} />
             </Section>
 
-            <Section id="card" title="Card" note="Header, content and footer slots on the card surface token.">
+            <Section
+              id="card"
+              title="Card"
+              note="Header, content and footer slots on the card surface token."
+            >
               <div className="grid gap-4 md:grid-cols-2">
                 <Card>
                   <CardHeader>
                     <CardTitle>GlobalLink Q3 review</CardTitle>
-                    <CardDescription>Six slides · Enterprise look · updated 2 hours ago</CardDescription>
+                    <CardDescription>
+                      Six slides · Enterprise look · updated 2 hours ago
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="text-sm text-muted-foreground">
                     Translation throughput rose 18% quarter over quarter across 42 locales.
@@ -355,7 +449,11 @@ function LibraryShowcase() {
               />
             </Section>
 
-            <Section id="input" title="Input" note="Single-line field with the shared focus ring and disabled treatment.">
+            <Section
+              id="input"
+              title="Input"
+              note="Single-line field with the shared focus ring and disabled treatment."
+            >
               <div className="grid max-w-xl gap-4">
                 <Spec label="default">
                   <Input
@@ -369,7 +467,10 @@ function LibraryShowcase() {
                   <Input placeholder="Deck name — e.g. Legal Tech EMEA" className="max-w-sm" />
                 </Spec>
                 <Spec label="focus-visible">
-                  <Input defaultValue="Focused field" className="max-w-sm ring-2 ring-ring ring-offset-2" />
+                  <Input
+                    defaultValue="Focused field"
+                    className="max-w-sm ring-2 ring-ring ring-offset-2"
+                  />
                 </Spec>
                 <Spec label="error">
                   <Input
@@ -385,7 +486,11 @@ function LibraryShowcase() {
               <Snippet code={`<Input placeholder="Deck name" aria-label="Deck name" />`} />
             </Section>
 
-            <Section id="textarea" title="Textarea" note="Multi-line brief field, same border and focus contract as Input.">
+            <Section
+              id="textarea"
+              title="Textarea"
+              note="Multi-line brief field, same border and focus contract as Input."
+            >
               <div className="grid max-w-xl gap-4">
                 <Spec label="default">
                   <Textarea
@@ -396,7 +501,11 @@ function LibraryShowcase() {
                   />
                 </Spec>
                 <Spec label="disabled">
-                  <Textarea disabled defaultValue="Brief locked after approval." className="min-h-24 w-full" />
+                  <Textarea
+                    disabled
+                    defaultValue="Brief locked after approval."
+                    className="min-h-24 w-full"
+                  />
                 </Spec>
               </div>
               <Snippet code={`<Textarea aria-label="Deck brief" className="min-h-24" />`} />
@@ -423,7 +532,11 @@ function LibraryShowcase() {
                     <label htmlFor="sc-notes" className="text-sm font-medium">
                       What should we look at?
                     </label>
-                    <Textarea id="sc-notes" className="min-h-24" defaultValue="Cover slide and the stats page." />
+                    <Textarea
+                      id="sc-notes"
+                      className="min-h-24"
+                      defaultValue="Cover slide and the stats page."
+                    />
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="secondary">GlobalLink</Badge>

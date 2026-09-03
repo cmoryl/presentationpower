@@ -31,7 +31,6 @@ import {
 import { fieldSpecFor, leafOf } from "@/lib/taxonomy-field-kinds";
 import { expandPath, readPath } from "@/lib/qa";
 
-
 export function resolveDivisionBrief(brand: BrandMode): Brief {
   const profile = BRAND_PROFILES[brand.id];
   const industry = profile?.contentScope?.industries?.[0] ?? "Life sciences";
@@ -454,7 +453,6 @@ interface DivisionCtx {
   stats: Array<{ value: string; unit?: string; label: string; source?: string }>;
 }
 
-
 const QUOTE_KEYS = new Set(["quote", "testimonial"]);
 const SOURCE_KEYS = new Set(["source", "footnote", "sourceNote", "prepared", "presenter", "owner"]);
 
@@ -540,12 +538,15 @@ export function seedDivisionContent(
  */
 /** Write a dotted/indexed path into a seeded content object. */
 function writeSeedPath(root: Obj, path: string, value: string): void {
-  const parts = path.replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
-  let node: any = root;
+  const parts = path
+    .replace(/\[(\d+)\]/g, ".$1")
+    .split(".")
+    .filter(Boolean);
+  let node: Record<string, unknown> = root as Record<string, unknown>;
   for (let i = 0; i < parts.length - 1; i += 1) {
     const key = parts[i]!;
     if (node[key] == null || typeof node[key] !== "object") node[key] = {};
-    node = node[key];
+    node = node[key] as Record<string, unknown>;
   }
   node[parts[parts.length - 1]!] = value;
 }
@@ -594,7 +595,9 @@ function fillItemCapacity(variant: ModuleVariant | undefined, out: Obj, ctx: Div
         item[sub] = stat?.source ?? `${ctx.divisionName} program data, 2025`;
       } else if (/^unit$/i.test(leaf)) {
         item[sub] = stat?.unit ?? "%";
-      } else if (/^(body|description|copy|detail|summary|narrative|outcome|challenge)$/i.test(leaf)) {
+      } else if (
+        /^(body|description|copy|detail|summary|narrative|outcome|challenge)$/i.test(leaf)
+      ) {
         item[sub] =
           `How ${ctx.divisionName} runs ${subject.toLowerCase()} for ${ctx.industry.toLowerCase()} programs.`;
       } else {
@@ -604,7 +607,8 @@ function fillItemCapacity(variant: ModuleVariant | undefined, out: Obj, ctx: Div
     list.push(item);
   }
   if (list.length > cap.max) list.length = cap.max;
-  if (list.length > 0 || Array.isArray(current)) writeSeedPath(out, path, list as unknown as string);
+  if (list.length > 0 || Array.isArray(current))
+    writeSeedPath(out, path, list as unknown as string);
 }
 
 function completeSeededContent(variantId: string, content: Obj, ctx: DivisionCtx): Obj {
@@ -613,7 +617,6 @@ function completeSeededContent(variantId: string, content: Obj, ctx: DivisionCtx
   fillItemCapacity(variant, out, ctx);
 
   if (Array.isArray(out.items)) {
-
     out.items = (out.items as unknown[]).map((raw) => {
       if (!raw || typeof raw !== "object") return raw;
       const item = { ...(raw as Obj) };

@@ -123,7 +123,6 @@ export function AdaptorBriefLayout({
     ? []
     : (Array.isArray(content.knowHow) ? content.knowHow : []).slice(0, 5);
 
-
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
