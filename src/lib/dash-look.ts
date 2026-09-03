@@ -96,7 +96,7 @@ const CHART_POOL: Record<string, DashChart[]> = {
   "MV-DASH-SUMMARY": ["area", "spark", "column", "line"],
   "MV-DASH-DONUT-TRIO": ["ring", "dial", "column", "plate"],
   "MV-DASH-SALES-CHART": ["area", "column", "line", "bar"],
-  "MV-DASH-GAUGE-ROW": ["dial", "ring", "bar", "plate"],
+  "MV-DASH-GAUGE-ROW": ["dial", "ring", "bar", "column"],
   "MV-DASH-PERFORMANCE": ["line", "area", "column", "spark"],
   "MV-DASH-REPORT-CARDS": ["spark", "bar", "ring", "plate"],
   "MV-DASH-GROWTH-COLUMNS": ["column", "bar", "area", "line"],
@@ -125,7 +125,19 @@ export function isDashModule(variantId: string): boolean {
  * `pack === null` (approved brand system) returns the canonical arrangement.
  */
 export function dashLook(pack: StylePack | null | undefined, variantId: string): DashLook {
-  if (!pack || !isDashModule(variantId)) return CANONICAL;
+  // Approved brand system (no pack) renders the module's canonical arrangement,
+  // but the chart family must still be the one the module was authored around:
+  // the first entry of its pool. Falling back to CANONICAL.chart ("area") made
+  // gauge/donut modules render DashMetricViz's numeral-only "plate" fallback,
+  // so gauges disappeared and every metric read as 0%.
+  if (!pack || !isDashModule(variantId)) {
+    const pool = CHART_POOL[variantId];
+    if (!pool) return CANONICAL;
+    const chart = pool[0]!;
+    const metric = METRIC_POOL.find((m) => m !== chart) ?? CANONICAL.metric;
+    return { ...CANONICAL, chart, metric };
+  }
+
 
   const geo = packGeometry(pack);
   const compose = packCompose(pack);

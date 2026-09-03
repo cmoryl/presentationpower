@@ -18,6 +18,17 @@ import { ProgressBar } from "../charts";
 import { useSlideInk } from "../SlideChrome";
 import { fillPx } from "@/lib/open-space-fill";
 
+/**
+ * Percent from an authored field. Accepts numbers and strings the inspector
+ * writes ("62", "62%", "62.5 %"); anything unparseable stays 0 rather than
+ * NaN, which used to collapse gauges to an empty track.
+ */
+function pct(raw: unknown): number {
+  const n = typeof raw === "number" ? raw : parseFloat(String(raw ?? "").replace(/[^0-9.\-]/g, ""));
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(100, n));
+}
+
 // Free-form breakdown row. Feathered left-to-right accent gradient with no
 // track plate; the highlight row adds a radial halo and an accent stroke tip
 // at the value edge.
@@ -369,7 +380,7 @@ registerSlideModule({
                   <DashMetricViz
                     brand={brand}
                     kind={dash.chart}
-                    percent={Number(it.value) || 0}
+                    percent={pct(it.value)}
                     size={280}
                     bloom={i === 0}
                     value={s(it.value)}
