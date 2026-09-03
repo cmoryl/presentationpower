@@ -87,6 +87,8 @@ export type LondonBrandingPlan = {
   copySizeMm: number;
   /** Headline baseline, in mm from the top of the bleed box. */
   copyBaselineMm: number;
+  /** Headline centre, in mm from the left of the bleed box. */
+  copyCentreMm: number;
   /** Text anchor for the headline. */
   copyAlign: "middle" | "start";
   /** Clear space held around the lockup, in mm (1.5× the mark height rule). */
@@ -94,6 +96,7 @@ export type LondonBrandingPlan = {
   /** The nudge/scale override applied to the planned lockup box. */
   placement: LondonLogoPlacement;
 };
+
 
 /**
  * Deterministic branding placement for a panel. The lockup is sized against the
