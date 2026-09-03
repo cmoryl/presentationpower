@@ -20,7 +20,14 @@ import {
   londonPanelFileBase,
   type LondonColorSpace,
 } from "@/lib/next-london-revise";
-import { LONDON_STYLES, type LondonPanel } from "@/lib/next-london-signage";
+import {
+  LONDON_STYLES,
+  isBoothPanel,
+  londonBoothArtworkUrl,
+  londonBoothMasterUrl,
+  londonBoothPanelMeta,
+  type LondonPanel,
+} from "@/lib/next-london-signage";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -128,6 +135,13 @@ export function LondonPanelLiveEditor({
   const familyLabel = nextLogoFamily(plan.familyId)?.label ?? "TransPerfect";
   const boardOverridden = !!boardSizes[panel.id];
 
+  // Vendor booth kiosks: the vendor's supplied artwork is the ground and their
+  // Illustrator template is the print deliverable.
+  const booth = isBoothPanel(panel);
+  const boothArt = londonBoothArtworkUrl(panel.id);
+  const boothMaster = londonBoothMasterUrl(panel.id);
+  const boothMeta = londonBoothPanelMeta(panel);
+
   const startDrag = useCallback(
     (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text") => {
       event.preventDefault();
@@ -216,7 +230,12 @@ export function LondonPanelLiveEditor({
       <div>
         <div className="flex items-center justify-between gap-2 pb-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
-            <Move className="h-3.5 w-3.5" /> drag the lockup or the headline
+            <Move className="h-3.5 w-3.5" />{" "}
+            {booth
+              ? boothArt
+                ? `${boothMeta?.artboard.label ?? "Booth"} · supplied vendor artwork`
+                : "Booth artwork pending — brand ground shown"
+              : "drag the lockup or the headline"}
           </span>
           <Button
             variant={printPreview ? "default" : "outline"}
@@ -233,7 +252,20 @@ export function LondonPanelLiveEditor({
           className="relative mx-auto w-full max-w-[420px] select-none overflow-hidden rounded-lg border border-border"
           style={{ aspectRatio: `${panel.bleedW} / ${panel.bleedH}` }}
         >
-          <img src={svgDataUrl(svg)} alt={`${panel.name} live artwork`} className="h-full w-full" />
+          <>
+            {boothArt ? (
+              <img
+                src={boothArt}
+                alt={`${panel.name} supplied booth artwork`}
+                className="absolute inset-0 h-full w-full"
+              />
+            ) : null}
+            <img
+              src={svgDataUrl(svg)}
+              alt={`${panel.name} live artwork`}
+              className="relative h-full w-full"
+            />
+          </>
           {printPreview ? <LondonPrintGuides panel={panel} /> : null}
           <div
             role="button"
@@ -599,6 +631,13 @@ export function LondonPanelLiveEditor({
           <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("ai")}>
             <Download className="h-3.5 w-3.5" /> AI
           </Button>
+          {boothMaster ? (
+            <Button variant="default" size="sm" className="gap-2" asChild>
+              <a href={boothMaster} download={boothMeta?.booth.sourceFile ?? undefined}>
+                <Download className="h-3.5 w-3.5" /> Supplied booth master (.ai)
+              </a>
+            </Button>
+          ) : null}
           <Button
             variant="outline"
             size="sm"

@@ -21,6 +21,8 @@
 import {
   LONDON_PANELS,
   LONDON_STYLES,
+  isBoothPanel,
+  londonBoothArtworkUrl,
   panelSlug,
   rasterSizeFor,
   recommendedPpi,
@@ -476,6 +478,10 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
   const marginX = ((panel.bleedW - panel.trimW) / 2).toFixed(2);
   const marginY = ((panel.bleedH - panel.trimH) / 2).toFixed(2);
 
+  // Supplied vendor booth artwork, when the vendor has delivered their file:
+  // it becomes the ground so previews and masters match the real booth.
+  const boothArt = londonBoothArtworkUrl(panel.id);
+
   const brand = londonBrandingPlan(panel);
   const logoScale = brand.logo.w / brand.art.w;
   // HERO LOCKUP is layer 1: it is written last in paint order, so it sits on
@@ -539,7 +545,7 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
 
 
   return [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
+    `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
     ` viewBox="0 0 ${panel.bleedW} ${panel.bleedH}" data-panel="${panel.id}"`,
     ` data-trim="${panel.trimW}x${panel.trimH}mm" data-bleed="${panel.bleedEdge}mm"`,
     ` data-trim-origin="${marginX},${marginY}" data-style="${panel.style}"`,
@@ -549,10 +555,16 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
     `<title>${escapeXml(panel.name)}</title>`,
     `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style} · ${escapeXml(brand.art.source)}</desc>`,
     `<defs>${paint}</defs>`,
-    `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
+    boothArt
+      ? `<g id="ground" data-layer="ground" data-layer-order="3" data-supplied-artwork="${escapeXml(boothArt)}">` +
+        `<image href="${escapeXml(boothArt)}" xlink:href="${escapeXml(boothArt)}" x="0" y="0"` +
+        ` width="${panel.bleedW}" height="${panel.bleedH}" preserveAspectRatio="none"/></g>`
+      : `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
     copyLayer,
     qrLayer,
-    logoGroup,
+    // Booths that ship the vendor's own branded artwork never get a second,
+    // generated lockup painted over it.
+    boothArt ? "" : logoGroup,
     `</svg>`,
   ].join("");
 
@@ -843,8 +855,13 @@ export function baseRevision(): LondonRevision {
 /** The panel set in force: latest revision, or the issued pack. */
 export function effectiveLondonPanels(revisions: LondonRevision[]): LondonPanel[] {
   const latest = [...revisions].sort((a, b) => b.rev - a.rev)[0];
-  return latest?.panels?.length ? latest.panels : LONDON_PANELS;
+  if (!latest?.panels?.length) return LONDON_PANELS;
+  // Items issued to the catalog AFTER a revision was cut (vendor booth kiosks,
+  // for example) are appended so a published revision can never hide them.
+  const known = new Set(latest.panels.map((p) => p.id));
+  return [...latest.panels, ...LONDON_PANELS.filter((p) => !known.has(p.id))];
 }
+
 
 /** Panels present in `to` but not in `from` — used when restoring a revision. */
 export function addedBetween(from: LondonPanel[], to: LondonPanel[]): LondonPanel[] {
