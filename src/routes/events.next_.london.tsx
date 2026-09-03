@@ -51,6 +51,7 @@ import {
 } from "@/lib/london-signage-qa";
 import {
   LONDON_PANELS,
+  londonBoothArtworkUrl,
   LONDON_PRINT_SPEC,
   LONDON_STYLES,
   LONDON_VENUE,
@@ -123,12 +124,22 @@ function gateOnQa(report: LondonQaReport) {
 function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   const style = LONDON_STYLES[panel.style];
   const ratio = panel.bleedW / panel.bleedH;
+  // Vendor booths show the supplied artwork proof directly: a data-URL SVG in an
+  // <img> cannot load the linked artwork.
+  const boothArt = londonBoothArtworkUrl(panel.id);
   return (
     <div
       className="relative w-full overflow-hidden rounded-lg border border-black/10 bg-[#E0E8F5]"
       style={{ aspectRatio: `${Math.max(ratio, 0.08)}` }}
     >
-      {svg ? (
+      {boothArt ? (
+        <img
+          src={boothArt}
+          alt={`${panel.room} — ${panel.name}, supplied vendor booth artwork`}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+        />
+      ) : svg ? (
         <img
           src={`data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`}
           alt={`${panel.room} panel ${panel.name} — ${style?.label ?? panel.style} gradient ground`}
