@@ -19,6 +19,7 @@ import {
   type NextLogoColourway,
 } from "@/lib/next-logo-vectors";
 import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
+import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import {
   londonLogoPlacement,
