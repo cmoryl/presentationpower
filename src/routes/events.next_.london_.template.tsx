@@ -456,10 +456,140 @@ function LondonTemplatePage() {
                   <RotateCcw className="h-3.5 w-3.5" /> Reset text
                 </Button>
               </div>
+              {/* Direction: pillars and tall fascias run their copy DOWN the
+                  panel. "Auto" follows the panel shape; either direction can be
+                  forced per panel. */}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">Text direction</span>
+                {(
+                  [
+                    { key: null, label: "Auto" },
+                    { key: false, label: "Across" },
+                    { key: true, label: "Down the panel" },
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={String(option.key)}
+                    type="button"
+                    aria-pressed={placement.textVertical === option.key}
+                    onClick={() => setLondonLogoPlacement(panel.id, { textVertical: option.key })}
+                    className={`rounded-full border px-3 py-1 text-xs transition ${
+                      placement.textVertical === option.key
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+                <span className="text-[11px] text-muted-foreground">
+                  now running {plan.copyVertical ? "down the panel" : "across"}
+                </span>
+              </div>
               <p className="mt-2 text-xs text-muted-foreground">
                 Live Geist Bold on the .svg and .ai masters. Drag the amber box on the panel — or
                 nudge it with the arrow keys — to place the line. Clear the field to drop the
                 headline from this panel.
+              </p>
+            </div>
+
+            {/* QR: a real encoded, scannable code generated as vector modules,
+                sized and placed per panel. */}
+            <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex min-w-[260px] flex-1 items-center gap-2 text-xs text-muted-foreground">
+                  <QrCode className="h-3.5 w-3.5" /> QR link
+                  <input
+                    type="text"
+                    value={placement.qr ?? ""}
+                    maxLength={LONDON_QR_MAX_CHARS}
+                    placeholder="No code on this panel"
+                    onChange={(event) => setLondonLogoPlacement(panel.id, { qr: event.target.value })}
+                    className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
+                  />
+                </label>
+                <label className="flex min-w-[200px] items-center gap-2 text-xs text-muted-foreground">
+                  Caption
+                  <input
+                    type="text"
+                    value={placement.qrCaption}
+                    maxLength={LONDON_TEXT_MAX_CHARS}
+                    onChange={(event) =>
+                      setLondonLogoPlacement(panel.id, { qrCaption: event.target.value.toUpperCase() })
+                    }
+                    className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  Code size
+                  <input
+                    type="range"
+                    min={LONDON_QR_SCALE.min}
+                    max={LONDON_QR_SCALE.max}
+                    step={LONDON_QR_SCALE.step}
+                    value={placement.qrScale}
+                    onChange={(event) =>
+                      setLondonLogoPlacement(panel.id, { qrScale: Number(event.target.value) })
+                    }
+                    className="w-32"
+                  />
+                  <span className="tabular-nums">{plan.qr ? `${plan.qr.size.toFixed(0)}mm` : "—"}</span>
+                </label>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-muted-foreground">Position</span>
+                {(
+                  [
+                    { label: "←", dx: -0.02, dy: 0 },
+                    { label: "→", dx: 0.02, dy: 0 },
+                    { label: "↑", dx: 0, dy: -0.02 },
+                    { label: "↓", dx: 0, dy: 0.02 },
+                  ] as const
+                ).map((step) => (
+                  <button
+                    key={step.label}
+                    type="button"
+                    onClick={() =>
+                      setLondonLogoPlacement(panel.id, {
+                        qrDx: placement.qrDx + step.dx,
+                        qrDy: placement.qrDy + step.dy,
+                      })
+                    }
+                    className="h-7 w-7 rounded-md border border-border text-xs text-muted-foreground hover:bg-muted"
+                    aria-label={`Move QR ${step.label}`}
+                  >
+                    {step.label}
+                  </button>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() =>
+                    setLondonLogoPlacement(panel.id, {
+                      qr: `${LONDON_QR_DEFAULT_LINK}`,
+                      qrScale: 1,
+                      qrDx: 0,
+                      qrDy: 0,
+                    })
+                  }
+                >
+                  <QrCode className="h-3.5 w-3.5" /> Generate agenda code
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() =>
+                    setLondonLogoPlacement(panel.id, { qr: null, qrScale: 1, qrDx: 0, qrDy: 0 })
+                  }
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Remove code
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Encoded at error-correction level H and drawn as vector modules on a white plate, so
+                it stays scannable at any signage size in both the .svg and .ai masters.
               </p>
             </div>
 
@@ -471,6 +601,7 @@ function LondonTemplatePage() {
                   type="range"
                   min={0.3}
                   max={2}
+
                   step={0.01}
                   value={placement.scale}
                   onChange={(event) =>
