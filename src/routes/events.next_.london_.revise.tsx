@@ -18,6 +18,7 @@ import {
   History,
   Loader2,
   Plus,
+  RefreshCw,
   RotateCcw,
   Save,
   Trash2,
@@ -30,6 +31,7 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
+import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
@@ -331,6 +333,7 @@ function LondonRevisePage() {
   const [floor, setFloor] = useState<string>("all");
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [qa, setQa] = useState<LondonQaReport[] | null>(null);
+  const [artId, setArtId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -371,6 +374,8 @@ function LondonRevisePage() {
     () => draft.find((p) => p.id === previewId) ?? null,
     [draft, previewId],
   );
+
+  const artPanel = useMemo(() => draft.find((p) => p.id === artId) ?? null, [draft, artId]);
 
   const floors = useMemo(() => [...new Set(draft.map((p) => p.floor))], [draft]);
   const visible = floor === "all" ? draft : draft.filter((p) => p.floor === floor);
@@ -420,7 +425,12 @@ function LondonRevisePage() {
     });
   };
 
-  const regenerate = async (panels: LondonPanel[], rev: number, kind: "vector" | "raster") => {
+  const regenerate = async (
+    panels: LondonPanel[],
+    rev: number,
+    kind: "vector" | "raster",
+    zipName?: string,
+  ) => {
     const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
     const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint,qa"];
@@ -453,7 +463,7 @@ function LondonRevisePage() {
     zip.file("manifest.csv", manifest.join("\n"));
     zip.file("qa-report.csv", qaReportCsv(reports));
     const blob = await zip.generateAsync({ type: "blob" });
-    download(blob, `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
+    download(blob, zipName ?? `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
 
     const r = rollup(reports);
     setQa(reports);
@@ -470,6 +480,27 @@ function LondonRevisePage() {
         description: "Trim, bleed, ppi and banding verified against the revised spec.",
       });
     }
+  };
+
+  // One panel at a time: rebuild just this board's .svg, .ai and dithered PNG,
+  // audited against its current (possibly edited) spec.
+  const regenPanel = (panel: LondonPanel) => {
+    void runWithExportFeedback(
+      {
+        pending: `Rebuilding ${panel.name}…`,
+        success: `${panel.name} artwork downloaded`,
+        failure: `Could not rebuild ${panel.name}`,
+      },
+      async () => {
+        const rev = head.rev + (dirty ? 1 : 0);
+        await regenerate(
+          [panel],
+          rev,
+          "vector",
+          `NEXT-London-r${String(rev).padStart(3, "0")}-${panelSlug(panel)}.zip`,
+        );
+      },
+    );
   };
 
   const regenAffected = () => {
@@ -808,16 +839,22 @@ function LondonRevisePage() {
                         className={`border-b border-black/5 align-top ${touched ? "bg-[#E0E8F5]/60" : ""}`}
                       >
                         <td className="px-3 py-2.5">
-                          <p className="font-semibold text-[#03002C]">{panel.name}</p>
-                          <p className="text-xs text-[#666]">
-                            {panel.floor} · {panel.room}
-                          </p>
-                          {isAddedPanel(panel) ? (
-                            <span className="mt-1 inline-block rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]">
-                              Added
-                            </span>
-                          ) : null}
+                          <div className="flex items-start gap-2.5">
+                            <LondonPanelThumb panel={panel} size={64} onOpen={(p) => setArtId(p.id)} />
+                            <div>
+                              <p className="font-semibold text-[#03002C]">{panel.name}</p>
+                              <p className="text-xs text-[#666]">
+                                {panel.floor} · {panel.room}
+                              </p>
+                              {isAddedPanel(panel) ? (
+                                <span className="mt-1 inline-block rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#03002C]">
+                                  Added
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
                         </td>
+
                         <td className="px-3 py-2.5">
                           <select
                             aria-label={`Gradient style for ${panel.name}`}
@@ -860,6 +897,15 @@ function LondonRevisePage() {
                             <ScanEye className="h-3.5 w-3.5" aria-hidden="true" />
                             Preview ppi tiers
                           </button>
+                          <button
+                            type="button"
+                            onClick={() => regenPanel(panel)}
+                            className="ml-1.5 mt-1 inline-flex items-center gap-1.5 rounded-md border border-[#003FC7]/30 px-2 py-1 text-[11px] font-semibold text-[#003FC7]"
+                          >
+                            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                            Rebuild this panel
+                          </button>
+
                           <button
                             type="button"
                             onClick={() => dropPanel(panel)}
@@ -977,6 +1023,51 @@ function LondonRevisePage() {
                 per edge).
               </p>
               <LondonPpiPreview panel={previewPanel} />
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
+
+      {/* Click-to-enlarge artwork preview, always at the panel's true aspect. */}
+      <Dialog open={!!artPanel} onOpenChange={(o) => !o && setArtId(null)}>
+        <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto">
+          {artPanel ? (
+            <>
+              <DialogTitle className="text-base font-semibold text-[#03002C]">
+                {artPanel.name}
+              </DialogTitle>
+              <p className="text-xs text-[#666]">
+                {artPanel.floor} · {artPanel.room} · {artPanel.trimW}×{artPanel.trimH}mm trim ·{" "}
+                {artPanel.bleedW}×{artPanel.bleedH}mm bleed · {artPanel.rasterPx}px at{" "}
+                {artPanel.rasterPpi}ppi
+              </p>
+              <div className="flex justify-center rounded-xl bg-[#F2F2F2] p-4">
+                <LondonPanelThumb
+                  panel={artPanel}
+                  size={Math.min(680, typeof window === "undefined" ? 680 : window.innerHeight * 0.62)}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => regenPanel(artPanel)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#003FC7] px-3 py-2 text-sm font-semibold text-white"
+                >
+                  <RefreshCw className="h-4 w-4" aria-hidden="true" />
+                  Rebuild this panel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setArtId(null);
+                    setPreviewId(artPanel.id);
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-black/15 px-3 py-2 text-sm font-semibold text-[#03002C]"
+                >
+                  <ScanEye className="h-4 w-4" aria-hidden="true" />
+                  Preview ppi tiers
+                </button>
+              </div>
             </>
           ) : null}
         </DialogContent>

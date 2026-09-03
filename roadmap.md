@@ -31,3 +31,5 @@
 - [x] Verified QR + placement overrides persist in the live editor (tp-next-london-logo-placement-v1)
 - [x] Real signboard sizes: per-panel measured trim W/H + bleed per edge (tp-next-london-board-size-v1) drive print preview, safe area, raster tier and both masters
 - [x] Verified the .ai masters carry real EPS-derived NEXT lockup geometry (19 compound paths / 126 curve ops per panel) — no placeholder mark
+
+- London revise: mini panel thumbnails + click-to-enlarge aspect-correct preview; per-panel rebuild (.svg/.ai/PNG).
