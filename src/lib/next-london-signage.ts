@@ -1401,7 +1401,7 @@ function boothPanel(
     room: `${booth.vendor.toUpperCase()} BOOTH`,
     proof: booth.sourceFile ?? "Artwork pending",
     page: artboard.page,
-    name: `${booth.vendor} — ${artboard.label} - ${artboard.trimW}x${artboard.trimH}mm`,
+    name: booth.vendor, // Keep short — dimensions are already in the spec metadata line below the card.
     ground: (artboard.previewUrl ? "Supplied booth artwork" : "Brand ground (artwork pending)"),
     style: LONDON_STYLES[booth.style] ? booth.style : "01-beam-violet-aqua",
     trimW: artboard.trimW,
