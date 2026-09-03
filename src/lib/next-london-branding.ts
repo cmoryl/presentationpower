@@ -135,8 +135,9 @@ export function londonBrandingPlan(
 
   const marginX = (panel.bleedW - panel.trimW) / 2;
   const marginY = (panel.bleedH - panel.trimH) / 2;
-  // Safe area: bleed plus 4% of the short trim edge, floored at 20 mm.
-  const safe = Math.max(20, Math.min(panel.trimW, panel.trimH) * 0.04);
+  // Safe area: bleed plus 4% of the short trim edge, floored at 20 mm. Shared
+  // with the print preview so the on-screen guides are the real geometry.
+  const safe = londonSafeMm(panel);
 
   const liveW = panel.trimW - safe * 2;
   const liveH = panel.trimH - safe * 2;
