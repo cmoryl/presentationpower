@@ -632,6 +632,12 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
           );
         })()
       : `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
+    // NEXTbrew café motif: live vector marks on top of the ground, never baked
+    // into the gradient. Suppressed on supplied vendor artwork.
+    !boothArt && isBrewPanel(panel)
+      ? brewMotifSvgLayer(brewMotifPlan(panel), paintFor)
+      : "",
+
     wall
       ? stepRepeatSvgLayer(panel, wall, {
           paintFor,
