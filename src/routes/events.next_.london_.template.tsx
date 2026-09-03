@@ -202,14 +202,24 @@ function LondonTemplatePage() {
 
   // Headline hit box: the cap band around the copy baseline, centred on the
   // planned copy centre — the same numbers the .svg and .ai masters use.
+  // Vertical copy (pillars) runs DOWN the panel, so the band is transposed.
+  const runMm = plan.copy ? plan.copySizeMm * plan.copy.length * 0.62 : 0;
   const textBox = plan.copy
-    ? {
-        left: `${((plan.copyCentreMm - plan.copySizeMm * plan.copy.length * 0.31) / panel.bleedW) * 100}%`,
-        top: `${((plan.copyBaselineMm - plan.copySizeMm) / panel.bleedH) * 100}%`,
-        width: `${((plan.copySizeMm * plan.copy.length * 0.62) / panel.bleedW) * 100}%`,
-        height: `${((plan.copySizeMm * 1.25) / panel.bleedH) * 100}%`,
-      }
+    ? plan.copyVertical
+      ? {
+          left: `${((plan.copyCentreMm - plan.copySizeMm * 0.35) / panel.bleedW) * 100}%`,
+          top: `${((plan.copyBaselineMm - runMm / 2) / panel.bleedH) * 100}%`,
+          width: `${((plan.copySizeMm * 1.25) / panel.bleedW) * 100}%`,
+          height: `${(runMm / panel.bleedH) * 100}%`,
+        }
+      : {
+          left: `${((plan.copyCentreMm - runMm / 2) / panel.bleedW) * 100}%`,
+          top: `${((plan.copyBaselineMm - plan.copySizeMm) / panel.bleedH) * 100}%`,
+          width: `${(runMm / panel.bleedW) * 100}%`,
+          height: `${((plan.copySizeMm * 1.25) / panel.bleedH) * 100}%`,
+        }
     : null;
+
 
 
   return (
