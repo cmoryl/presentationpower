@@ -1406,9 +1406,10 @@ function boothPanel(
     style: LONDON_STYLES[booth.style] ? booth.style : "01-beam-violet-aqua",
     trimW: artboard.trimW,
     trimH: artboard.trimH,
-    bleedW: artboard.trimW + LONDON_BOOTH_BLEED_MM * 2,
-    bleedH: artboard.trimH + LONDON_BOOTH_BLEED_MM * 2,
-    bleedEdge: LONDON_BOOTH_BLEED_MM,
+    bleedW: artboard.trimW + (artboard.bleedMm ?? LONDON_BOOTH_BLEED_MM) * 2,
+    bleedH: artboard.trimH + (artboard.bleedMm ?? LONDON_BOOTH_BLEED_MM) * 2,
+    bleedEdge: artboard.bleedMm ?? LONDON_BOOTH_BLEED_MM,
+
     rasterPx: "0x0",
     rasterPpi: 0,
     bandMm: 0,
