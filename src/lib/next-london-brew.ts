@@ -132,3 +132,77 @@ export function brewMotifSvgLayer(
     .join("");
   return `<g id="brew-motif" data-layer="brew-motif" data-layer-order="3">${body}</g>`;
 }
+
+const MM_TO_PT = 72 / 25.4;
+
+/** Unique alpha levels in a plan, so the writer can mint one ExtGState each. */
+export function brewMotifAlphas(plan: BrewMotifPlan): number[] {
+  return [...new Set(plan.marks.map((m) => Number(m.alpha.toFixed(3))))];
+}
+
+export function brewGsName(alpha: number): string {
+  return `GsBrew${Math.round(Number(alpha.toFixed(3)) * 1000)}`;
+}
+
+/** Circle as four beziers, in PDF user space (y up). */
+function circleOps(cx: number, cy: number, r: number): string {
+  const k = 0.5523 * r;
+  return [
+    `${f(cx - r)} ${f(cy)} m`,
+    `${f(cx - r)} ${f(cy + k)} ${f(cx - k)} ${f(cy + r)} ${f(cx)} ${f(cy + r)} c`,
+    `${f(cx + k)} ${f(cy + r)} ${f(cx + r)} ${f(cy + k)} ${f(cx + r)} ${f(cy)} c`,
+    `${f(cx + r)} ${f(cy - k)} ${f(cx + k)} ${f(cy - r)} ${f(cx)} ${f(cy - r)} c`,
+    `${f(cx - k)} ${f(cy - r)} ${f(cx - r)} ${f(cy - k)} ${f(cx - r)} ${f(cy)} c`,
+  ].join(" ");
+}
+
+/**
+ * Motif as live PDF path objects. `pageH` is the page height in points;
+ * `fillOp`/`strokeOp` paint the ink in the master's colour space.
+ */
+export function brewMotifPdfOps(
+  plan: BrewMotifPlan,
+  pageH: number,
+  fillOp: (hex: string) => string,
+  strokeOp: (hex: string) => string,
+): string {
+  const fill = fillOp(plan.ink);
+  const stroke = strokeOp(plan.ink);
+  const yUp = (mm: number) => pageH - mm * MM_TO_PT;
+  return plan.marks
+    .map((m) => {
+      const gs = `/${brewGsName(m.alpha)} gs`;
+      if (m.kind === "ring") {
+        return (
+          `q ${gs} ${stroke} ${f(m.width * MM_TO_PT)} w ` +
+          `${circleOps(m.cx * MM_TO_PT, yUp(m.cy), m.r * MM_TO_PT)} S Q\n`
+        );
+      }
+      if (m.kind === "bean") {
+        return (
+          `q ${gs} ${fill} ${circleOps(m.cx * MM_TO_PT, yUp(m.cy), m.r * MM_TO_PT)} f Q\n`
+        );
+      }
+      return "";
+    })
+    .join("");
+}
+
+/** Steam ribbons, emitted from the SVG path data the plan already carries. */
+export function brewMotifSteamPdfOps(
+  plan: BrewMotifPlan,
+  pageH: number,
+  strokeOp: (hex: string) => string,
+  toOps: (d: string) => string,
+): string {
+  void pageH;
+  const stroke = strokeOp(plan.ink);
+  return plan.marks
+    .filter((m): m is Extract<BrewMark, { kind: "path" }> => m.kind === "path")
+    .map((m) => {
+      const ops = toOps(m.d);
+      if (!ops) return "";
+      return `q /${brewGsName(m.alpha)} gs ${stroke} ${f(m.width * MM_TO_PT)} w ${ops} S Q\n`;
+    })
+    .join("");
+}
