@@ -71,6 +71,7 @@ import {
   type LondonRevision,
 } from "@/lib/next-london-revise";
 import { listLondonRevisions, publishLondonRevision } from "@/lib/next-london-revise.functions";
+import { announceLondonRevision } from "@/lib/next-london-revision-live";
 
 export const Route = createFileRoute("/events/next_/london_/revise")({
   head: () => ({
