@@ -27,8 +27,12 @@ describe("step & repeat wall", () => {
     expect(Math.min(...plan.tiles.map((t) => t.x))).toBeLessThan(0);
     expect(Math.min(...plan.tiles.map((t) => t.y))).toBeLessThan(0);
     // Odd rows are dropped by half a pitch.
-    const row0 = plan.tiles.filter((t) => t.row === 0).map((t) => t.x)[0]!;
-    const row1 = plan.tiles.filter((t) => t.row === 1).map((t) => t.x)[0]!;
+    const centre = (row: number) => {
+      const t = plan.tiles.find((tile) => tile.row === row)!;
+      return t.x + t.w / 2;
+    };
+    const row0 = centre(0);
+    const row1 = centre(1);
     expect(Math.abs(row1 - row0 - plan.pitchX * DEFAULT_STEP_REPEAT.drop)).toBeLessThan(1);
   });
 
