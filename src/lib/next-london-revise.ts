@@ -485,7 +485,8 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
     brand.art.paths
       .map((p) => {
         const { paint: fill, meta } = paintFor(p.fill);
-        return `<path d="${p.d}" fill="${fill}"${meta}/>`;
+        const rule = p.fillRule === "evenodd" ? ` fill-rule="evenodd"` : "";
+        return `<path d="${p.d}" fill="${fill}"${rule}${meta}/>`;
       })
       .join(""),
     `</g>`,
@@ -494,11 +495,42 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
   const inkOnLight = brand.colourway === "dblue";
   const copyHex = inkOnLight ? "#03002C" : "#FFFFFF";
   const copyPaint = paintFor(copyHex);
+  // Vertical copy runs DOWN the panel — a 90° rotation about the anchor, so the
+  // text object stays live and re-typeable in Illustrator.
+  const copyRotate = brand.copyVertical
+    ? ` transform="rotate(90 ${brand.copyCentreMm.toFixed(2)} ${brand.copyBaselineMm.toFixed(2)})"`
+    : "";
   const copyLayer = brand.copy
     ? `<text data-layer="copy" data-layer-order="2" x="${brand.copyCentreMm.toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
+      `${copyRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
       ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta} font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
       ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
       ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
+    : "";
+
+  // QR: real encoded modules as vector geometry on a white plate, so the code
+  // stays crisp at any signage size and scans off a scenic ground.
+  const qrLayer = brand.qr
+    ? (() => {
+        const q = brand.qr;
+        const pad = q.size * 0.03;
+        const plate = paintFor("#FFFFFF");
+        const ink = paintFor("#03002C");
+        const scale = q.size / q.modules;
+        const caption = q.caption
+          ? `<text x="${(q.x + q.size / 2).toFixed(2)}" y="${(q.y + q.size + pad + q.captionSizeMm * 1.15).toFixed(2)}"` +
+            ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta}` +
+            ` font-family="${LONDON_SIGNAGE_FONT.cssStack}" font-weight="${LONDON_SIGNAGE_FONT.weight}"` +
+            ` font-size="${q.captionSizeMm.toFixed(2)}">${escapeXml(q.caption)}</text>`
+          : "";
+        return (
+          `<g id="qr" data-layer="qr" data-layer-order="2" data-qr="${escapeXml(q.data)}">` +
+          `<rect x="${(q.x - pad).toFixed(2)}" y="${(q.y - pad).toFixed(2)}" width="${(q.size + pad * 2).toFixed(2)}"` +
+          ` height="${(q.size + pad * 2).toFixed(2)}" rx="${(q.size * 0.04).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>` +
+          `<g transform="translate(${q.x.toFixed(2)} ${q.y.toFixed(2)}) scale(${scale.toFixed(5)})">` +
+          `<path d="${q.path}" fill="${ink.paint}"${ink.meta}/></g></g>${caption}`
+        );
+      })()
     : "";
 
 
@@ -515,9 +547,11 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
     `<defs>${paint}</defs>`,
     `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
     copyLayer,
+    qrLayer,
     logoGroup,
     `</svg>`,
   ].join("");
+
 }
 
 
