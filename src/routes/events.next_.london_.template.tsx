@@ -660,21 +660,16 @@ function LondonTemplatePage() {
                 ).map((field) => (
                   <label key={field.key} className="flex flex-col gap-1 text-xs text-muted-foreground">
                     {field.label}
-                    <input
-                      type="number"
+                    <BoardSizeInput
+                      panelId={panel.id}
                       min={field.min}
                       max={field.max}
-                      step={1}
                       value={field.value}
-                      onChange={(event) => {
-                        const next = Number(event.target.value);
-                        if (!Number.isFinite(next)) return;
-                        setLondonBoardSize(panel, { [field.key]: next });
-                      }}
-                      className="h-9 w-28 rounded-md border border-border bg-background px-2 text-sm tabular-nums text-foreground"
+                      onCommit={(next) => setLondonBoardSize(panel, { [field.key]: next })}
                     />
                   </label>
                 ))}
+
                 <Button
                   variant="outline"
                   size="sm"
