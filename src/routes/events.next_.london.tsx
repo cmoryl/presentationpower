@@ -691,6 +691,35 @@ function LondonSignagePage() {
               {/* Check every resolution tier on screen before downloading. */}
               <LondonPpiPreview panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
 
+              {/* Live panel editing, same editor as the revise screen. Placement,
+                  copy and board size write to the shared stores, so thumbnails
+                  and downloads here update without a reload. */}
+              <div className="rounded-xl border border-black/10 p-4">
+                <button
+                  type="button"
+                  onClick={() => setEditing((v) => !v)}
+                  aria-expanded={editing}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                >
+                  <Ruler className="h-3.5 w-3.5" />
+                  {editing ? "Hide panel editor" : "Edit this panel"}
+                </button>
+                {editing ? (
+                  <div className="mt-4">
+                    <LondonPanelLiveEditor
+                      panel={openPanel}
+                      siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
+                      onStyleChange={(styleId) =>
+                        setPanels((prev) =>
+                          prev.map((p) => (p.id === openPanel.id ? { ...p, style: styleId } : p)),
+                        )
+                      }
+                    />
+                  </div>
+                ) : null}
+              </div>
+
+
               <div className="rounded-xl border border-black/10 p-4">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#03002C]/55">
