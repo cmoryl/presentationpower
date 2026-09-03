@@ -1943,6 +1943,12 @@ export function FreeCanvasEditor({
                   title="Center on slide vertically"
                   onClick={() => centerOnStage("y")}
                 />
+                <TBtn
+                  label="⊕"
+                  title="Auto-center on both axes"
+                  disabled={!selectionBounds}
+                  onClick={() => centerOnStage("both")}
+                />
               </ToolGroup>
 
               <ToolGroup label="Distribute">
