@@ -55,7 +55,7 @@ import {
   addedBetween,
   applyLondonEdits,
   baseRevision,
-  buildLondonPanelAi,
+  buildLondonPanelAiAsync,
   buildLondonPanelSvg,
   diffLondonPanels,
   editsBetween,
@@ -446,7 +446,7 @@ function LondonRevisePage() {
       const base = londonPanelFileBase(panel, rev);
       const svg = buildLondonPanelSvg(panel);
       if (kind === "vector") {
-        const ai = buildLondonPanelAi(panel);
+        const ai = await buildLondonPanelAiAsync(panel);
         const svgQa = auditSvg(panel, svg);
         const aiQa = auditAi(panel, ai);
         reports.push(svgQa, aiQa);

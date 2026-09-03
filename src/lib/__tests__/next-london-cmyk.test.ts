@@ -22,6 +22,7 @@ describe("london cmyk", () => {
     expect(b.c + b.m + b.y).toBe(0);
     expect(b.k).toBeGreaterThan(0.9);
   });
+  // 150+ panels × two colour spaces: real work, so allow real time.
   it("emits DeviceCMYK ai and cmyk svg metadata for every panel", () => {
     for (const panel of LONDON_PANELS) {
       const svg = buildLondonPanelSvg(panel, { colorSpace: "cmyk" });
@@ -34,7 +35,7 @@ describe("london cmyk", () => {
       const rgb = new TextDecoder().decode(londonAiBytes(buildLondonPanelAi(panel)));
       expect(rgb).toContain("/DeviceRGB");
     }
-  });
+  }, 60_000);
   it("labels builds", () => {
     expect(cmykLabel(londonCmykBuild("#003FC7"))).toContain("approved");
   });

@@ -18,7 +18,12 @@ import {
   type NextLogoArt,
   type NextLogoColourway,
 } from "@/lib/next-logo-vectors";
-import { isBoothPanel, londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
+import {
+  isBoothPanel,
+  londonBoothArtworkUrl,
+  londonVenueItemMeta,
+  type LondonPanel,
+} from "@/lib/next-london-signage";
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import {
@@ -116,6 +121,12 @@ export type LondonBrandingPlan = {
   } | null;
   /** The nudge/scale override applied to the planned lockup box. */
   placement: LondonLogoPlacement;
+  /**
+   * Whether the generated NEXT lockup prints on this panel. Vendor booths with
+   * supplied artwork default to OFF (their file is already branded); the
+   * location designer can switch it on per booth.
+   */
+  lockupOn: boolean;
 };
 
 
@@ -255,6 +266,9 @@ export function londonBrandingPlan(
     clearMm: logoH * 0.25,
     qr,
     placement: nudge,
+    // Booths that supplied branded artwork start clean; pending booths still get
+    // the house lockup on their brand ground.
+    lockupOn: nudge.lockup ?? !(isBoothPanel(panel) && !!londonBoothArtworkUrl(panel.id)),
   };
 }
 

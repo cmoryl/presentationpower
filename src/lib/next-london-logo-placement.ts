@@ -49,6 +49,18 @@ export type LondonLogoPlacement = {
   qrDy: number;
   /** Caption printed under the code; `""` prints no caption. */
   qrCaption: string;
+  /**
+   * Whether the generated NEXT lockup is placed on this panel. `null` follows
+   * the panel: on everywhere except vendor booths, whose supplied artwork is
+   * already typeset. Set `true` to add the lockup over supplied booth artwork.
+   */
+  lockup: boolean | null;
+  /** Zoom on supplied artwork (vendor booth grounds). 1 = fills the bleed box. */
+  groundScale: number;
+  /** Supplied-artwork pan, as a fraction of the trim width. */
+  groundDx: number;
+  /** Supplied-artwork pan, as a fraction of the trim height. */
+  groundDy: number;
 };
 
 export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
@@ -67,6 +79,10 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   qrDx: 0,
   qrDy: 0,
   qrCaption: "SCAN FOR THE AGENDA",
+  lockup: null,
+  groundScale: 1,
+  groundDx: 0,
+  groundDy: 0,
 };
 
 
@@ -92,6 +108,9 @@ export const LONDON_QR_SCALE = { min: 0.4, max: 2.5, step: 0.01 } as const;
 
 /** Longest QR payload the signage set accepts (URL or plain text). */
 export const LONDON_QR_MAX_CHARS = 300;
+
+/** Supplied-artwork zoom bounds (vendor booth grounds), shared with the editor. */
+export const LONDON_GROUND_SCALE = { min: 0.5, max: 2.5, step: 0.01 } as const;
 
 function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
   const clamp = (n: unknown, lo: number, hi: number, fallback: number) =>
@@ -119,6 +138,10 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
       typeof p.qrCaption === "string"
         ? p.qrCaption.slice(0, LONDON_TEXT_MAX_CHARS)
         : DEFAULT_LOGO_PLACEMENT.qrCaption,
+    lockup: typeof p.lockup === "boolean" ? p.lockup : null,
+    groundScale: clamp(p.groundScale, LONDON_GROUND_SCALE.min, LONDON_GROUND_SCALE.max, 1),
+    groundDx: clamp(p.groundDx, -0.5, 0.5, 0),
+    groundDy: clamp(p.groundDy, -0.5, 0.5, 0),
   };
 }
 

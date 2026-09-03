@@ -13,7 +13,7 @@ import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { LONDON_FLOORS, LONDON_PANELS, LONDON_VENUE } from "@/lib/next-london-signage";
 import {
-  buildLondonPanelAi,
+  buildLondonPanelAiAsync,
   buildLondonPanelSvg,
   londonAiBytes,
   londonPanelFileBase,
@@ -178,12 +178,12 @@ function LondonTemplatePage() {
 
   // Single-panel handoff: the exact masters the printer opens, hero lockup first.
   const downloadPanel = useCallback(
-    (kind: "svg" | "ai") => {
+    async (kind: "svg" | "ai") => {
       const base = londonPanelFileBase(panel, 1, colorSpace);
       const blob =
         kind === "svg"
           ? new Blob([buildLondonPanelSvg(panel, art)], { type: "image/svg+xml" })
-          : new Blob([londonAiBytes(buildLondonPanelAi(panel, art))], {
+          : new Blob([londonAiBytes(await buildLondonPanelAiAsync(panel, art))], {
               type: "application/postscript",
             });
       const url = URL.createObjectURL(blob);

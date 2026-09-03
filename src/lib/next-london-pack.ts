@@ -9,7 +9,7 @@ import { LONDON_FLOORS, type LondonPanel } from "@/lib/next-london-signage";
 import { brandingSummary, londonBrandingPlan } from "@/lib/next-london-branding";
 import { nextLogoFamily } from "@/lib/next-logo-vectors";
 import {
-  buildLondonPanelAi,
+  buildLondonPanelAiAsync,
   buildLondonPanelSvg,
   londonAiBytes,
   londonPanelFileBase,
@@ -69,7 +69,8 @@ export async function buildLondonSignagePack(
     const aiPath = `${dir}/${base}.ai`;
 
     zip.file(svgPath, buildLondonPanelSvg(panel, art));
-    zip.file(aiPath, londonAiBytes(buildLondonPanelAi(panel, art)));
+    // Vendor booths embed their supplied wall, so await the artwork resolve.
+    zip.file(aiPath, londonAiBytes(await buildLondonPanelAiAsync(panel, art)));
     files.push({ path: svgPath, panelId: panel.id, kind: "svg" });
     files.push({ path: aiPath, panelId: panel.id, kind: "ai" });
 

@@ -35,6 +35,8 @@ import {
   stopsFromColors,
 } from "@/lib/pdf-gradient-shading";
 import { LONDON_SIGNAGE_FONT, londonBrandingPlan } from "@/lib/next-london-branding";
+import { loadLondonGroundImage, type LondonGroundImage } from "@/lib/next-london-artwork";
+
 import {
   cmykAxialShadingDict,
   cmykCss,
@@ -452,7 +454,32 @@ export type LondonArtOptions = {
    * the stored recipe for the panel (or the house default) is used.
    */
   stepRepeat?: StepRepeatConfig;
+  /**
+   * Supplied vendor artwork, already fetched, so the `.ai` master embeds the
+   * real booth wall instead of rebuilding a house gradient under it.
+   * Resolve it with `loadLondonGroundImage` (see next-london-artwork.ts).
+   */
+  groundImage?: LondonGroundImage | null;
 };
+
+/**
+ * Placement box for a supplied-artwork ground, in mm on the bleed sheet. The
+ * designer can zoom and pan the vendor wall; both masters and the on-screen
+ * stage read this same geometry.
+ */
+export function londonGroundBox(
+  panel: LondonPanel,
+  placement: { groundScale: number; groundDx: number; groundDy: number },
+): { x: number; y: number; w: number; h: number } {
+  const w = panel.bleedW * placement.groundScale;
+  const h = panel.bleedH * placement.groundScale;
+  return {
+    w,
+    h,
+    x: (panel.bleedW - w) / 2 + placement.groundDx * panel.trimW,
+    y: (panel.bleedH - h) / 2 + placement.groundDy * panel.trimH,
+  };
+}
 
 
 /**
@@ -575,11 +602,18 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
 
     `<title>${escapeXml(panel.name)}</title>`,
     `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style} · ${escapeXml(brand.art.source)}</desc>`,
-    `<defs>${paint}</defs>`,
+    `<defs>${paint}<clipPath id="clip-${id}"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}"/></clipPath></defs>`,
     boothArt
-      ? `<g id="ground" data-layer="ground" data-layer-order="3" data-supplied-artwork="${escapeXml(boothArt)}">` +
-        `<image href="${escapeXml(boothArt)}" xlink:href="${escapeXml(boothArt)}" x="0" y="0"` +
-        ` width="${panel.bleedW}" height="${panel.bleedH}" preserveAspectRatio="none"/></g>`
+      ? (() => {
+          const box = londonGroundBox(panel, brand.placement);
+          return (
+            `<g id="ground" data-layer="ground" data-layer-order="3" data-supplied-artwork="${escapeXml(boothArt)}"` +
+            ` data-ground-scale="${brand.placement.groundScale}" clip-path="url(#clip-${id})">` +
+            `<image href="${escapeXml(boothArt)}" xlink:href="${escapeXml(boothArt)}"` +
+            ` x="${box.x.toFixed(2)}" y="${box.y.toFixed(2)}" width="${box.w.toFixed(2)}"` +
+            ` height="${box.h.toFixed(2)}" preserveAspectRatio="none"/></g>`
+          );
+        })()
       : `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
     wall
       ? stepRepeatSvgLayer(panel, wall, {
@@ -591,9 +625,9 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
       : "",
     wall ? "" : copyLayer,
     wall ? "" : qrLayer,
-    // Booths that ship the vendor's own branded artwork never get a second,
-    // generated lockup painted over it.
-    boothArt || wall ? "" : logoGroup,
+    // Booths that ship the vendor's own branded artwork start without a second,
+    // generated lockup — the designer can switch it on per booth.
+    wall || !brand.lockupOn ? "" : logoGroup,
     `</svg>`,
   ].join("");
 
@@ -675,6 +709,11 @@ export function buildLondonPanelAi(
     isStepRepeatPanel(panel)
       ? stepRepeatPlan(panel, options.stepRepeat ?? stepRepeatConfig(panel.id))
       : null;
+
+  // Supplied vendor artwork: embedded as a real image XObject so the `.ai`
+  // opens on the vendor's own wall (placed, movable, its own layer) instead of
+  // a rebuilt house gradient. JPEG bytes ride through as /DCTDecode.
+  const groundImage = options.groundImage ?? null;
 
   // Brand layer: EPS-derived lockup outlines as live PDF paths, headline copy
   // as live Geist Bold text — both editable when the .ai is opened.
@@ -761,12 +800,27 @@ export function buildLondonPanelAi(
   // and QR is a live PDF object, so the wall stays fully editable in Illustrator.
   const wallOps = wall ? stepRepeatPdfOps(wall, h, fillOp, copyInk) : "";
 
+  // Ground: the vendor's placed artwork when supplied (zoom/pan honoured),
+  // otherwise the live gradient shading.
+  const groundOps = groundImage
+    ? (() => {
+        const box = londonGroundBox(panel, brand.placement);
+        const bw = box.w * MM_TO_PT;
+        const bh = box.h * MM_TO_PT;
+        const bx = box.x * MM_TO_PT;
+        const by = h - (box.y + box.h) * MM_TO_PT;
+        return (
+          `q 0 0 ${f3(w)} ${f3(h)} re W n ` +
+          `${f3(bw)} 0 0 ${f3(bh)} ${f3(bx)} ${f3(by)} cm /ImGround Do Q\n`
+        );
+      })()
+    : `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
+
   const content = wall
-    ? `/OC /oc3 BDC\nq 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\nEMC\n` +
-      `/OC /oc1 BDC\n${wallOps}EMC\n`
-    : `/OC /oc3 BDC\nq 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\nEMC\n` +
+    ? `/OC /oc3 BDC\n${groundOps}EMC\n` + `/OC /oc1 BDC\n${wallOps}EMC\n`
+    : `/OC /oc3 BDC\n${groundOps}EMC\n` +
       (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
-      `/OC /oc1 BDC\n${logoOps}EMC\n`;
+      (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
 
 
   const objects: string[] = [
@@ -779,6 +833,8 @@ export function buildLondonPanelAi(
       `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
       `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
+      `${groundImage ? "/XObject << /ImGround 11 0 R >> " : ""}` +
+
       `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> >> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
@@ -791,6 +847,22 @@ export function buildLondonPanelAi(
     `<< /Type /OCG /Name (Copy) >>`,
     `<< /Type /OCG /Name (Ground) >>`,
   ];
+
+  // Object 11: the supplied artwork image. JPEG data is embedded verbatim, so
+  // Illustrator opens the vendor's wall at full supplied resolution.
+  if (groundImage) {
+    objects.push(
+      `<< /Type /XObject /Subtype /Image /Width ${groundImage.width} /Height ${groundImage.height} ` +
+        `/ColorSpace ${
+          groundImage.components === 1
+            ? "/DeviceGray"
+            : groundImage.components === 4
+              ? "/DeviceCMYK"
+              : "/DeviceRGB"
+        } /BitsPerComponent 8 /Filter /${groundImage.filter} ` +
+        `/Length ${groundImage.bytes.length} >>\nstream\n${latin1(groundImage.bytes)}\nendstream`,
+    );
+  }
 
 
   let pdf = "%PDF-1.5\n%\u00e2\u00e3\u00cf\u00d3\n";
@@ -880,6 +952,27 @@ function stepRepeatPdfOps(
       return `q ${alpha}${matrix}${plate}${modules ? `${fillOp("#03002C")} ${modules} f ` : ""}Q\n`;
     })
     .join("");
+}
+
+/** Raw bytes as a binary-safe latin-1 string, for PDF stream assembly. */
+function latin1(bytes: Uint8Array): string {
+  let out = "";
+  for (let i = 0; i < bytes.length; i += 1) out += String.fromCharCode(bytes[i]!);
+  return out;
+}
+
+/**
+ * `.ai` master with any supplied vendor artwork resolved first — the builder a
+ * download or pack should call, so booth masters ship the real wall.
+ */
+export async function buildLondonPanelAiAsync(
+  panel: LondonPanel,
+  options: LondonArtOptions = {},
+): Promise<Uint8Array> {
+  const art = londonBoothArtworkUrl(panel.id);
+  const groundImage =
+    options.groundImage ?? (art ? await loadLondonGroundImage(art) : null);
+  return buildLondonPanelAi(panel, { ...options, groundImage });
 }
 
 function f3(n: number): string {

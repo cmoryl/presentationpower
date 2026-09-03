@@ -6,9 +6,15 @@
 // step. The editor is intentionally self-contained so it can be mounted in a
 // dialog from any panel listing.
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Copy, Crosshair, Download, Move, QrCode, RotateCcw, Ruler, Type } from "lucide-react";
 import { toast } from "sonner";
+import {
+  artworkPpi,
+  artworkPpiVerdict,
+  loadLondonGroundImage,
+  type LondonGroundImage,
+} from "@/lib/next-london-artwork";
 
 import { Button } from "@/components/ui/button";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
@@ -20,7 +26,8 @@ import {
 } from "@/lib/next-london-step-repeat";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import {
-  buildLondonPanelAi,
+  buildLondonPanelAiAsync,
+  londonGroundBox,
   buildLondonPanelSvg,
   londonAiBytes,
   londonPanelFileBase,
@@ -44,6 +51,7 @@ import {
   DEFAULT_LOGO_PLACEMENT,
   LONDON_QR_MAX_CHARS,
   LONDON_QR_SCALE,
+  LONDON_GROUND_SCALE,
   LONDON_TEXT_MAX_CHARS,
   LONDON_TEXT_SCALE,
   resetLondonLogoPlacement,
@@ -157,7 +165,7 @@ export function LondonPanelLiveEditor({
   const boothMeta = londonBoothPanelMeta(panel);
 
   const startDrag = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text") => {
+    (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text" | "ground") => {
       event.preventDefault();
       event.stopPropagation();
       const stage = stageRef.current;
@@ -167,15 +175,32 @@ export function LondonPanelLiveEditor({
       const start = {
         x: event.clientX,
         y: event.clientY,
-        dx: target === "logo" ? placement.dx : placement.textDx,
-        dy: target === "logo" ? placement.dy : placement.textDy,
+        dx:
+          target === "logo"
+            ? placement.dx
+            : target === "ground"
+              ? placement.groundDx
+              : placement.textDx,
+        dy:
+          target === "logo"
+            ? placement.dy
+            : target === "ground"
+              ? placement.groundDy
+              : placement.textDy,
       };
       const move = (moveEvent: PointerEvent) => {
         const dx =
           start.dx + ((moveEvent.clientX - start.x) / rect.width) * (panel.bleedW / panel.trimW);
         const dy =
           start.dy + ((moveEvent.clientY - start.y) / rect.height) * (panel.bleedH / panel.trimH);
-        setLondonLogoPlacement(panel.id, target === "logo" ? { dx, dy } : { textDx: dx, textDy: dy });
+        setLondonLogoPlacement(
+          panel.id,
+          target === "logo"
+            ? { dx, dy }
+            : target === "ground"
+              ? { groundDx: dx, groundDy: dy }
+              : { textDx: dx, textDy: dy },
+        );
       };
       const up = () => {
         window.removeEventListener("pointermove", move);
@@ -186,7 +211,15 @@ export function LondonPanelLiveEditor({
       window.addEventListener("pointerup", up);
       window.addEventListener("pointercancel", up);
     },
-    [panel, placement.dx, placement.dy, placement.textDx, placement.textDy],
+    [
+      panel,
+      placement.dx,
+      placement.dy,
+      placement.textDx,
+      placement.textDy,
+      placement.groundDx,
+      placement.groundDy,
+    ],
   );
 
   const nudge = (dx: number, dy: number) =>
@@ -197,12 +230,12 @@ export function LondonPanelLiveEditor({
       textDy: placement.textDy + dy,
     });
 
-  const downloadPanel = (kind: "svg" | "ai") => {
+  const downloadPanel = async (kind: "svg" | "ai") => {
     const base = londonPanelFileBase(panel, 1, colorSpace);
     const blob =
       kind === "svg"
         ? new Blob([buildLondonPanelSvg(panel, art)], { type: "image/svg+xml" })
-        : new Blob([londonAiBytes(buildLondonPanelAi(panel, art))], {
+        : new Blob([londonAiBytes(await buildLondonPanelAiAsync(panel, art))], {
             type: "application/postscript",
           });
     const url = URL.createObjectURL(blob);
@@ -213,6 +246,31 @@ export function LondonPanelLiveEditor({
     setTimeout(() => URL.revokeObjectURL(url), 4000);
     toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
   };
+
+  // Supplied artwork: read the real pixel size so the designer sees the true
+  // print resolution at this board size, and so zooming warns before it softens.
+  const [groundImage, setGroundImage] = useState<LondonGroundImage | null>(null);
+  useEffect(() => {
+    let live = true;
+    setGroundImage(null);
+    if (!boothArt) return;
+    void loadLondonGroundImage(boothArt).then((image) => {
+      if (live) setGroundImage(image);
+    });
+    return () => {
+      live = false;
+    };
+  }, [boothArt]);
+
+  const groundBox = londonGroundBox(panel, placement);
+  const groundStyle = {
+    left: `${(groundBox.x / panel.bleedW) * 100}%`,
+    top: `${(groundBox.y / panel.bleedH) * 100}%`,
+    width: `${(groundBox.w / panel.bleedW) * 100}%`,
+    height: `${(groundBox.h / panel.bleedH) * 100}%`,
+  };
+  const groundPpi = groundImage ? artworkPpi(groundImage.width, groundBox.w) : 0;
+  const groundVerdict = artworkPpiVerdict(groundPpi);
 
   const logoBox = {
     left: `${(plan.logo.x / panel.bleedW) * 100}%`,
@@ -273,7 +331,8 @@ export function LondonPanelLiveEditor({
               <img
                 src={boothArt}
                 alt={`${panel.name} supplied booth artwork`}
-                className="absolute inset-0 h-full w-full"
+                className="absolute"
+                style={groundStyle}
               />
             ) : null}
             <img
@@ -283,7 +342,30 @@ export function LondonPanelLiveEditor({
             />
           </>
           {printPreview ? <LondonPrintGuides panel={panel} /> : null}
-          {isWall ? null : (
+          {boothArt ? (
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Move supplied artwork"
+              onPointerDown={(event) => startDrag(event, "ground")}
+              onKeyDown={(event) => {
+                const step = event.shiftKey ? 0.02 : 0.005;
+                const move = (dx: number, dy: number) =>
+                  setLondonLogoPlacement(panel.id, {
+                    groundDx: placement.groundDx + dx,
+                    groundDy: placement.groundDy + dy,
+                  });
+                if (event.key === "ArrowLeft") move(-step, 0);
+                else if (event.key === "ArrowRight") move(step, 0);
+                else if (event.key === "ArrowUp") move(0, -step);
+                else if (event.key === "ArrowDown") move(0, step);
+                else return;
+                event.preventDefault();
+              }}
+              className="absolute inset-0 cursor-move outline-none focus-visible:ring-2 focus-visible:ring-sky-300"
+            />
+          ) : null}
+          {isWall || !plan.lockupOn ? null : (
           <div
             role="button"
             tabIndex={0}
@@ -338,6 +420,78 @@ export function LondonPanelLiveEditor({
         </p>
 
         {isWall ? <StepRepeatWallPanel panel={panel} /> : null}
+
+        {/* Supplied vendor artwork: place it, zoom it, and decide whether the
+            house lockup prints over it. Everything here rides into the .ai. */}
+        {boothArt ? (
+          <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <span className="font-medium">Supplied artwork</span>
+              {groundImage ? (
+                <span
+                  className={
+                    groundVerdict.tone === "ok"
+                      ? "text-emerald-500"
+                      : groundVerdict.tone === "warn"
+                        ? "text-amber-500"
+                        : "text-destructive"
+                  }
+                >
+                  {groundImage.width}×{groundImage.height}px · {groundPpi} PPI at{" "}
+                  {Math.round(groundBox.w)}mm ({(groundBox.w / 25.4).toFixed(1)}in) ·{" "}
+                  {groundVerdict.label}
+                </span>
+              ) : (
+                <span className="text-muted-foreground">reading artwork…</span>
+              )}
+            </div>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Zoom
+              <input
+                type="range"
+                min={LONDON_GROUND_SCALE.min}
+                max={LONDON_GROUND_SCALE.max}
+                step={LONDON_GROUND_SCALE.step}
+                value={placement.groundScale}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, {
+                    groundScale: Number(event.target.value),
+                  })
+                }
+                className="flex-1"
+              />
+              <span className="tabular-nums">{Math.round(placement.groundScale * 100)}%</span>
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant={plan.lockupOn ? "default" : "outline"}
+                size="sm"
+                aria-pressed={plan.lockupOn}
+                onClick={() =>
+                  setLondonLogoPlacement(panel.id, { lockup: !plan.lockupOn })
+                }
+              >
+                {plan.lockupOn ? "NEXT lockup on" : "Add NEXT lockup"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setLondonLogoPlacement(panel.id, {
+                    groundScale: 1,
+                    groundDx: 0,
+                    groundDy: 0,
+                  })
+                }
+              >
+                Reset artwork
+              </Button>
+              <span className="text-[11px] text-muted-foreground">
+                drag the wall to reposition · arrows nudge
+              </span>
+            </div>
+          </div>
+        ) : null}
 
         {/* Gradient */}
         <div className="rounded-lg border border-border bg-muted/30 p-3">
