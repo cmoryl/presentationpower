@@ -16,11 +16,11 @@ import {
   buildLondonPanelAi,
   buildLondonPanelSvg,
   londonAiBytes,
+  londonPanelFileBase,
   londonPanelStops,
   type LondonColorSpace,
-
-  londonPanelFileBase,
 } from "@/lib/next-london-revise";
+import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
