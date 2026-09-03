@@ -131,38 +131,25 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
     style: "01-beam-violet-aqua",
     artboards: frontWall(mediaP1.url),
   },
-  {
-    id: "legal-support-tradebooth-b",
-    vendor: "Legal Support · Booth B",
-    sourceFile: "LegalSupportTradeBoothB_Front_1830x2440mm_Plus100mmBleed.ai",
-    aiUrl: legalAi.url,
-    style: "01-beam-violet-aqua",
-    artboards: frontWall(legalP1.url),
-  },
+  // Only the latest supplied file per vendor ships; earlier rounds
+  // (LegalSupportTradeBoothB, SterlingTradeBoothA) are superseded.
   {
     id: "legal-support-2-tradebooth-b",
-    vendor: "Legal Support 2 · Booth B",
+    vendor: "Legal Support · Booth B",
     sourceFile: "LegalSupport2TradeBoothB_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: legal2Ai.url,
     style: "01-beam-violet-aqua",
     artboards: frontWall(legal2P1.url),
   },
   {
-    id: "sterling-tradebooth-a",
-    vendor: "Sterling",
-    sourceFile: "SterlingTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
-    aiUrl: sterlingAi.url,
-    style: "01-beam-violet-aqua",
-    artboards: frontWall(sterlingP1.url),
-  },
-  {
     id: "sterling-2-tradebooth-a",
-    vendor: "Sterling 2",
+    vendor: "Sterling",
     sourceFile: "Sterling2TradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: sterling2Ai.url,
     style: "01-beam-violet-aqua",
     artboards: frontWall(sterling2P1.url),
   },
+
   {
     id: "veeva-tradebooth-a",
     vendor: "Veeva",
