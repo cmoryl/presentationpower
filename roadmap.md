@@ -28,4 +28,4 @@
 ## NEXT London signage (Sep 3)
 - [x] EPS-derived logo geometry, vertical pillar copy, scannable QR block on .svg/.ai masters + editor controls
 - [x] Replace the spherical "halo" ground with a low-angle chevron sweep (cloakroom / help desk / square panels)
-- [ ] Verify the QR "Generate agenda code" control persists in the live editor
+- [x] Verified QR + placement overrides persist in the live editor (tp-next-london-logo-placement-v1)
