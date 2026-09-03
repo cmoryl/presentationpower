@@ -633,8 +633,8 @@ export function buildLondonDirectoryPdf(panels: LondonPanel[] = LONDON_PANELS): 
   const probe = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
   const measured = new Map<string, number>();
   // cover (1) + contents (2) => body starts on page 3
-  renderBody(probe, floors, (label, page) => measured.set(label, page + 2), 2);
-  const totalPages = probe.getNumberOfPages() + 2;
+  renderBody(probe, floors, (label, page) => measured.set(label, page), 2);
+  const totalPages = probe.getNumberOfPages() + 1;
 
   // Pass 2 — real document.
   const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
