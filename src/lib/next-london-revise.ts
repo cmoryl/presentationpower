@@ -406,8 +406,12 @@ function styleAxis(styleId: string): Vec {
   if (styleId.includes("bloom")) return { x1: 0, y1: 0, x2: 0.85, y2: 0.85 };
   if (styleId.includes("prism")) return { x1: 0, y1: 1, x2: 1, y2: 0 };
   if (styleId.includes("veil")) return { x1: 0, y1: 0, x2: 0.25, y2: 1 };
+  // Chevron sweep: a low-angle run from the bottom-left, echoing the NEXT
+  // chevron rather than a centred sphere.
+  if (styleId.includes("chevron")) return { x1: 0, y1: 1, x2: 1, y2: 0.18 };
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
+
 
 function stopsFor(panel: LondonPanel): string[] {
   return londonPanelStops(panel);
