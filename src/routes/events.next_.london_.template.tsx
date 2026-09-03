@@ -6,7 +6,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy, Type, QrCode } from "lucide-react";
+import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy, Type, QrCode, Ruler } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -22,6 +22,7 @@ import {
 } from "@/lib/next-london-revise";
 import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
+import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
 import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
@@ -80,6 +81,8 @@ function LondonTemplatePage() {
   // default (the RIP separates); CMYK is the explicit vibrant-corrected master.
   const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
   const [vibrance, setVibrance] = useState(1);
+  // Print preview: draws the real bleed / trim / safe boxes over the stage.
+  const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   const panels = useMemo(
@@ -278,8 +281,17 @@ function LondonTemplatePage() {
                   {NEXT_LOGO_COLOURWAY_LABELS[plan.colourway].toLowerCase()}
                 </p>
               </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Move className="h-3.5 w-3.5" /> drag the lockup or the headline
+                <Button
+                  variant={printPreview ? "default" : "outline"}
+                  size="sm"
+                  className="gap-2"
+                  aria-pressed={printPreview}
+                  onClick={() => setPrintPreview((v) => !v)}
+                >
+                  <Ruler className="h-3.5 w-3.5" /> Print preview
+                </Button>
               </div>
             </div>
 
@@ -289,6 +301,7 @@ function LondonTemplatePage() {
               style={{ aspectRatio: `${panel.bleedW} / ${panel.bleedH}` }}
             >
               <img src={svgDataUrl(svg)} alt={`${panel.name} artwork preview`} className="h-full w-full" />
+              {printPreview ? <LondonPrintGuides panel={panel} /> : null}
               <div
                 role="button"
                 tabIndex={0}
@@ -326,6 +339,14 @@ function LondonTemplatePage() {
                 />
               ) : null}
             </div>
+
+            {printPreview ? (
+              <div className="mt-4">
+                <LondonPrintReadout panel={panel} plan={plan} />
+              </div>
+            ) : null}
+
+
 
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
