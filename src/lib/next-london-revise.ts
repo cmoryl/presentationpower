@@ -847,9 +847,32 @@ export function buildLondonPanelAi(
       })()
     : `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n`;
 
+  // NEXTbrew café motif: live stroked/filled paths sitting in the ground layer,
+  // each with its own ExtGState alpha so nothing is flattened.
+  const brewPlan = !groundImage && !wall && isBrewPanel(panel) ? brewMotifPlan(panel) : null;
+  const strokeOpFor = (hex: string): string => {
+    const op = fillOp(hex);
+    return op.endsWith(" rg")
+      ? `${op.slice(0, -3)} RG`
+      : op.endsWith(" k")
+        ? `${op.slice(0, -2)} K`
+        : op;
+  };
+  const brewOps = brewPlan
+    ? brewMotifPdfOps(brewPlan, h, fillOp, strokeOpFor) +
+      brewMotifSteamPdfOps(brewPlan, h, strokeOpFor, (d) =>
+        svgPathToPdfOps(d, { scale: MM_TO_PT, x: 0, y: 0, artHeight: panel.bleedH }),
+      )
+    : "";
+  const brewGs = brewPlan
+    ? brewMotifAlphas(brewPlan)
+        .map((a) => `/${brewGsName(a)} << /Type /ExtGState /ca ${f3(a)} /CA ${f3(a)} >> `)
+        .join("")
+    : "";
+
   const content = wall
     ? `/OC /oc3 BDC\n${groundOps}EMC\n` + `/OC /oc1 BDC\n${wallOps}EMC\n`
-    : `/OC /oc3 BDC\n${groundOps}EMC\n` +
+    : `/OC /oc3 BDC\n${groundOps}${brewOps}EMC\n` +
       (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
       (brand.lockupOn && logoOps ? `/OC /oc1 BDC\n${logoOps}EMC\n` : "");
 
@@ -866,7 +889,8 @@ export function buildLondonPanelAi(
       `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
       `${groundImage ? "/XObject << /ImGround 11 0 R >> " : ""}` +
 
-      `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> >> ` +
+      `/ExtGState << /GsWall << /Type /ExtGState /ca ${f3(wall ? wall.config.opacity : 1)} >> ${brewGs}>> ` +
+
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
