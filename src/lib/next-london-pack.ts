@@ -47,7 +47,7 @@ export async function buildLondonSignagePack(
   const zip = new JSZip();
   const files: LondonPackFile[] = [];
   const rows: string[] = [
-    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale",
+    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,colourway,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale",
   ];
 
   for (const [index, panel] of panels.entries()) {
@@ -73,6 +73,7 @@ export async function buildLondonSignagePack(
         `${panel.bleedW}x${panel.bleedH}`,
         panel.bleedEdge,
         plan.orientation,
+        plan.colourway,
         plan.familyId,
         `"${plan.copy ?? ""}"`,
         plan.logo.x.toFixed(2),
@@ -101,9 +102,12 @@ export async function buildLondonSignagePack(
       "  .svg — master geometry, live gradient ground, editable lockup outlines",
       "  .ai  — Illustrator-native (PDF compatible): live gradient, editable lockup paths, live Geist Bold copy",
       "",
+      "Layers, top to bottom: Hero lockup · Copy · Ground. The hero lockup is the",
+      "first layer in both formats. Colourway per panel is recorded in manifest.csv.",
+      "",
       "Artboards are full bleed. Trim origin and bleed per edge are recorded in the",
-      "SVG metadata and in manifest.csv. Body copy prints 100K; do not recolour the",
-      "white lockups or place them on complex artwork.",
+      "SVG metadata and in manifest.csv. Body copy prints 100K; use only the approved",
+      "lockup colourways shipped here and never place them on complex artwork.",
     ].join("\n"),
   );
 

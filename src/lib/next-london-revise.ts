@@ -438,17 +438,23 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
 
   const brand = londonBrandingPlan(panel);
   const logoScale = brand.logo.w / brand.art.w;
+  // HERO LOCKUP is layer 1: it is written last in paint order, so it sits on
+  // top of the ground and the copy, and Illustrator lists it first in Layers.
   const logoGroup = [
-    `<g data-layer="lockup" data-lockup="${brand.orientation}" data-family="${brand.familyId}"`,
+    `<g id="hero-lockup" data-layer="hero-lockup" data-layer-order="1"`,
+    ` data-lockup="${brand.orientation}" data-family="${brand.familyId}"`,
+    ` data-colourway="${brand.colourway}"`,
     ` data-source="${escapeXml(brand.art.source)}"`,
     ` transform="translate(${brand.logo.x.toFixed(2)} ${brand.logo.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">`,
     brand.art.paths.map((p) => `<path d="${p.d}" fill="${p.fill}"/>`).join(""),
     `</g>`,
   ].join("");
 
+  const inkOnLight = brand.colourway === "dblue";
+  const copyInk = inkOnLight ? "#03002C" : "#FFFFFF";
   const copyLayer = brand.copy
-    ? `<text data-layer="copy" x="${(marginXNum(panel) + panel.trimW / 2).toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
-      ` text-anchor="middle" fill="#FFFFFF" font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
+    ? `<text data-layer="copy" data-layer-order="2" x="${(marginXNum(panel) + panel.trimW / 2).toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
+      ` text-anchor="middle" fill="${copyInk}" font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
       ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
       ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
     : "";
@@ -462,9 +468,9 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
     `<title>${escapeXml(panel.name)}</title>`,
     `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style} · ${escapeXml(brand.art.source)}</desc>`,
     `<defs>${paint}</defs>`,
-    `<rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/>`,
-    logoGroup,
+    `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
     copyLayer,
+    logoGroup,
     `</svg>`,
   ].join("");
 }
@@ -545,28 +551,41 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
         const advance = brand.copy.length * (size * 0.62 + tracking);
         const x = trimX + (panel.trimW * MM_TO_PT) / 2 - advance / 2;
         const y = h - brand.copyBaselineMm * MM_TO_PT;
+        const [cr, cg, cb] = parseColor(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
         return (
-          `q 1 1 1 rg BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
+          `q ${f3(cr)} ${f3(cg)} ${f3(cb)} rg BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
           `1 0 0 1 ${f3(x)} ${f3(y)} Tm (${pdfText(brand.copy)}) Tj ET Q\n`
         );
       })()
     : "";
 
-  const content = `q 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\n${logoOps}${copyOps}`;
+  // Three real Illustrator layers via optional content groups. Paint order is
+  // ground → copy → hero lockup, and /OCProperties /Order lists the hero lockup
+  // FIRST, so the lockup is the top layer when the .ai is opened.
+  const content =
+    `/OC /oc3 BDC\nq 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\nEMC\n` +
+    (copyOps ? `/OC /oc2 BDC\n${copyOps}EMC\n` : "") +
+    `/OC /oc1 BDC\n${logoOps}EMC\n`;
 
   const objects: string[] = [
-    `<< /Type /Catalog /Pages 2 0 R >>`,
+    `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [8 0 R 9 0 R 10 0 R] ` +
+      `/D << /Order [8 0 R 9 0 R 10 0 R] /ON [8 0 R 9 0 R 10 0 R] >> >> >>`,
     `<< /Type /Pages /Kids [3 0 R] /Count 1 >>`,
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
       `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
       `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
-      `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> >> /Contents 4 0 R >>`,
+      `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
+      `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
+      `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
     `<< /Length ${content.length} >>\nstream\n${content}endstream`,
     `<< /Title (${pdfText(panel.name)}) /Creator (TransPerfect Element) ` +
-      `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(brand.orientation === "side" ? "side-by-side white lockup" : "stacked white lockup")}) >>`,
+      `/Subject (NEXT 2026 London signage · ${pdfText(panel.room)} · ${pdfText(panel.style)} · ${pdfText(`${brand.orientation === "side" ? "side-by-side" : "stacked"} ${brand.colourway} lockup`)}) >>`,
     shadingDict,
     `<< /Type /Font /Subtype /TrueType /BaseFont /${LONDON_SIGNAGE_FONT.pdfBaseFont} ` +
       `/Encoding /WinAnsiEncoding /FirstChar 32 /LastChar 255 >>`,
+    `<< /Type /OCG /Name (Hero lockup) >>`,
+    `<< /Type /OCG /Name (Copy) >>`,
+    `<< /Type /OCG /Name (Ground) >>`,
   ];
 
 

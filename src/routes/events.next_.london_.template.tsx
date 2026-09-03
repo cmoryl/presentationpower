@@ -12,11 +12,21 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { LONDON_FLOORS, LONDON_PANELS, LONDON_VENUE } from "@/lib/next-london-signage";
-import { buildLondonPanelSvg } from "@/lib/next-london-revise";
+import {
+  buildLondonPanelAi,
+  buildLondonPanelSvg,
+  londonAiBytes,
+  londonPanelFileBase,
+} from "@/lib/next-london-revise";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
-import { nextLogoFamily } from "@/lib/next-logo-vectors";
+import {
+  NEXT_LOGO_COLOURWAY_LABELS,
+  nextLogoColourways,
+  nextLogoFamily,
+} from "@/lib/next-logo-vectors";
 import {
   copyLondonLogoPlacement,
+  DEFAULT_LOGO_PLACEMENT,
   resetAllLondonLogoPlacements,
   resetLondonLogoPlacement,
   setLondonLogoPlacement,
@@ -65,10 +75,32 @@ function LondonTemplatePage() {
     () => panels.find((p) => p.id === selectedId) ?? panels[0] ?? LONDON_PANELS[0]!,
     [panels, selectedId],
   );
-  const placement = placements[panel.id] ?? { dx: 0, dy: 0, scale: 1 };
+  const placement = placements[panel.id] ?? DEFAULT_LOGO_PLACEMENT;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const svg = useMemo(() => buildLondonPanelSvg(panel), [panel, placement]);
   const familyLabel = nextLogoFamily(plan.familyId)?.label ?? "TransPerfect";
+  const colourways = useMemo(() => nextLogoColourways(plan.familyId), [plan.familyId]);
+
+  // Single-panel handoff: the exact masters the printer opens, hero lockup first.
+  const downloadPanel = useCallback(
+    (kind: "svg" | "ai") => {
+      const base = londonPanelFileBase(panel, 1);
+      const blob =
+        kind === "svg"
+          ? new Blob([buildLondonPanelSvg(panel)], { type: "image/svg+xml" })
+          : new Blob([londonAiBytes(buildLondonPanelAi(panel))], {
+              type: "application/postscript",
+            });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${base}.${kind}`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success(`${base}.${kind} downloaded`);
+    },
+    [panel],
+  );
 
   // Drag with window-level listeners so the pointer can leave the lockup box.
   const onPointerDown = useCallback(
@@ -173,7 +205,8 @@ function LondonTemplatePage() {
                 <h2 className="text-base font-semibold">{panel.name}</h2>
                 <p className="text-xs text-muted-foreground">
                   {panel.room} · trim {panel.trimW}×{panel.trimH}mm · {familyLabel} ·{" "}
-                  {plan.orientation === "side" ? "side-by-side" : "stacked"} white
+                  {plan.orientation === "side" ? "side-by-side" : "stacked"}{" "}
+                  {NEXT_LOGO_COLOURWAY_LABELS[plan.colourway].toLowerCase()}
                 </p>
               </div>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -204,6 +237,33 @@ function LondonTemplatePage() {
                 className="absolute cursor-move rounded-sm border border-dashed border-white/70 bg-white/5 outline-none ring-offset-0 focus-visible:ring-2 focus-visible:ring-white"
                 style={logoBox}
               />
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs text-muted-foreground">Logo colourway</span>
+              {colourways.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  aria-pressed={plan.colourway === key}
+                  onClick={() => setLondonLogoPlacement(panel.id, { colourway: key })}
+                  className={`rounded-full border px-3 py-1 text-xs transition ${
+                    plan.colourway === key
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {NEXT_LOGO_COLOURWAY_LABELS[key]}
+                </button>
+              ))}
+              <span className="ml-auto flex items-center gap-2">
+                <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("svg")}>
+                  <Download className="h-3.5 w-3.5" /> SVG
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2" onClick={() => downloadPanel("ai")}>
+                  <Download className="h-3.5 w-3.5" /> AI
+                </Button>
+              </span>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-3">

@@ -9,6 +9,11 @@
 
 import { useSyncExternalStore } from "react";
 
+import {
+  NEXT_LOGO_COLOURWAYS,
+  type NextLogoColourway,
+} from "@/lib/next-logo-vectors";
+
 export type LondonLogoPlacement = {
   /** Horizontal nudge, as a fraction of the trim width. */
   dx: number;
@@ -16,9 +21,17 @@ export type LondonLogoPlacement = {
   dy: number;
   /** Size multiplier on the planned lockup width. */
   scale: number;
+  /** Which approved colourway of the lockup to place on this panel. */
+  colourway: NextLogoColourway;
 };
 
-export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = { dx: 0, dy: 0, scale: 1 };
+export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
+  dx: 0,
+  dy: 0,
+  scale: 1,
+  // All-white knockout is the approved default for scenic signage.
+  colourway: "white",
+};
 
 export type LondonLogoPlacementMap = Record<string, LondonLogoPlacement>;
 
@@ -38,6 +51,9 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     dx: clamp(p.dx, -0.5, 0.5, 0),
     dy: clamp(p.dy, -0.5, 0.5, 0),
     scale: clamp(p.scale, 0.2, 2.5, 1),
+    colourway: NEXT_LOGO_COLOURWAYS.includes(p.colourway as NextLogoColourway)
+      ? (p.colourway as NextLogoColourway)
+      : "white",
   };
 }
 
