@@ -453,11 +453,12 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
   const inkOnLight = brand.colourway === "dblue";
   const copyInk = inkOnLight ? "#03002C" : "#FFFFFF";
   const copyLayer = brand.copy
-    ? `<text data-layer="copy" data-layer-order="2" x="${(marginXNum(panel) + panel.trimW / 2).toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
+    ? `<text data-layer="copy" data-layer-order="2" x="${brand.copyCentreMm.toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
       ` text-anchor="middle" fill="${copyInk}" font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
       ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
       ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
     : "";
+
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
@@ -475,9 +476,8 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
   ].join("");
 }
 
-function marginXNum(panel: LondonPanel): number {
-  return (panel.bleedW - panel.trimW) / 2;
-}
+
+
 
 function escapeXml(s: string): string {
   return s.replace(/[<>&"]/g, (c) =>
@@ -549,7 +549,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
         const size = brand.copySizeMm * MM_TO_PT;
         const tracking = size * LONDON_SIGNAGE_FONT.tracking;
         const advance = brand.copy.length * (size * 0.62 + tracking);
-        const x = trimX + (panel.trimW * MM_TO_PT) / 2 - advance / 2;
+        const x = brand.copyCentreMm * MM_TO_PT - advance / 2;
         const y = h - brand.copyBaselineMm * MM_TO_PT;
         const [cr, cg, cb] = parseColor(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
         return (

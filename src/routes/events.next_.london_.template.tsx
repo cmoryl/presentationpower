@@ -6,7 +6,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy } from "lucide-react";
+import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy, Type } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -31,6 +31,8 @@ import {
   resetLondonLogoPlacement,
   setLondonLogoPlacement,
   useLondonLogoPlacements,
+  LONDON_TEXT_MAX_CHARS,
+  LONDON_TEXT_SCALE,
 } from "@/lib/next-london-logo-placement";
 import { buildLondonSignagePack } from "@/lib/next-london-pack";
 
@@ -102,20 +104,30 @@ function LondonTemplatePage() {
     [panel],
   );
 
-  // Drag with window-level listeners so the pointer can leave the lockup box.
-  const onPointerDown = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
+  // Drag with window-level listeners so the pointer can leave the box.
+  // `target` picks which object moves: the hero lockup or the headline copy.
+  const startDrag = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text") => {
       event.preventDefault();
+      event.stopPropagation();
       const stage = stageRef.current;
       if (!stage) return;
       const rect = stage.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
-      const start = { x: event.clientX, y: event.clientY, dx: placement.dx, dy: placement.dy };
+      const start = {
+        x: event.clientX,
+        y: event.clientY,
+        dx: target === "logo" ? placement.dx : placement.textDx,
+        dy: target === "logo" ? placement.dy : placement.textDy,
+      };
       const move = (moveEvent: PointerEvent) => {
         // Screen delta → trim fraction, using the panel's own bleed/trim ratio.
         const dx = start.dx + ((moveEvent.clientX - start.x) / rect.width) * (panel.bleedW / panel.trimW);
         const dy = start.dy + ((moveEvent.clientY - start.y) / rect.height) * (panel.bleedH / panel.trimH);
-        setLondonLogoPlacement(panel.id, { dx, dy });
+        setLondonLogoPlacement(
+          panel.id,
+          target === "logo" ? { dx, dy } : { textDx: dx, textDy: dy },
+        );
       };
       const up = () => {
         window.removeEventListener("pointermove", move);
@@ -126,11 +138,18 @@ function LondonTemplatePage() {
       window.addEventListener("pointerup", up);
       window.addEventListener("pointercancel", up);
     },
-    [panel, placement.dx, placement.dy],
+    [panel, placement.dx, placement.dy, placement.textDx, placement.textDy],
   );
 
   const nudge = (dx: number, dy: number) =>
     setLondonLogoPlacement(panel.id, { dx: placement.dx + dx, dy: placement.dy + dy });
+
+  const nudgeText = (dx: number, dy: number) =>
+    setLondonLogoPlacement(panel.id, {
+      textDx: placement.textDx + dx,
+      textDy: placement.textDy + dy,
+    });
+
 
   async function generatePack() {
     const id = toast.loading(`Building ${panels.length} panels…`);
@@ -158,6 +177,18 @@ function LondonTemplatePage() {
     width: `${(plan.logo.w / panel.bleedW) * 100}%`,
     height: `${(plan.logo.h / panel.bleedH) * 100}%`,
   };
+
+  // Headline hit box: the cap band around the copy baseline, centred on the
+  // planned copy centre — the same numbers the .svg and .ai masters use.
+  const textBox = plan.copy
+    ? {
+        left: `${((plan.copyCentreMm - plan.copySizeMm * plan.copy.length * 0.31) / panel.bleedW) * 100}%`,
+        top: `${((plan.copyBaselineMm - plan.copySizeMm) / panel.bleedH) * 100}%`,
+        width: `${((plan.copySizeMm * plan.copy.length * 0.62) / panel.bleedW) * 100}%`,
+        height: `${((plan.copySizeMm * 1.25) / panel.bleedH) * 100}%`,
+      }
+    : null;
+
 
   return (
     <AppShell>
@@ -210,7 +241,7 @@ function LondonTemplatePage() {
                 </p>
               </div>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Move className="h-3.5 w-3.5" /> drag the lockup
+                <Move className="h-3.5 w-3.5" /> drag the lockup or the headline
               </div>
             </div>
 
@@ -224,7 +255,7 @@ function LondonTemplatePage() {
                 role="button"
                 tabIndex={0}
                 aria-label="Move lockup"
-                onPointerDown={onPointerDown}
+                onPointerDown={(event) => startDrag(event, "logo")}
                 onKeyDown={(event) => {
                   const step = event.shiftKey ? 0.02 : 0.005;
                   if (event.key === "ArrowLeft") nudge(-step, 0);
@@ -237,7 +268,27 @@ function LondonTemplatePage() {
                 className="absolute cursor-move rounded-sm border border-dashed border-white/70 bg-white/5 outline-none ring-offset-0 focus-visible:ring-2 focus-visible:ring-white"
                 style={logoBox}
               />
+              {textBox ? (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Move headline"
+                  onPointerDown={(event) => startDrag(event, "text")}
+                  onKeyDown={(event) => {
+                    const step = event.shiftKey ? 0.02 : 0.005;
+                    if (event.key === "ArrowLeft") nudgeText(-step, 0);
+                    else if (event.key === "ArrowRight") nudgeText(step, 0);
+                    else if (event.key === "ArrowUp") nudgeText(0, -step);
+                    else if (event.key === "ArrowDown") nudgeText(0, step);
+                    else return;
+                    event.preventDefault();
+                  }}
+                  className="absolute cursor-move rounded-sm border border-dashed border-amber-300/80 bg-amber-200/10 outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                  style={textBox}
+                />
+              ) : null}
             </div>
+
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">Logo colourway</span>
@@ -265,6 +316,60 @@ function LondonTemplatePage() {
                 </Button>
               </span>
             </div>
+
+            <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex min-w-[240px] flex-1 items-center gap-2 text-xs text-muted-foreground">
+                  <Type className="h-3.5 w-3.5" /> Panel text
+                  <input
+                    type="text"
+                    value={placement.text ?? plan.copy ?? ""}
+                    maxLength={LONDON_TEXT_MAX_CHARS}
+                    placeholder="No headline on this panel"
+                    onChange={(event) =>
+                      setLondonLogoPlacement(panel.id, { text: event.target.value.toUpperCase() })
+                    }
+                    className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  Text size
+                  <input
+                    type="range"
+                    min={LONDON_TEXT_SCALE.min}
+                    max={LONDON_TEXT_SCALE.max}
+                    step={LONDON_TEXT_SCALE.step}
+                    value={placement.textScale}
+                    onChange={(event) =>
+                      setLondonLogoPlacement(panel.id, { textScale: Number(event.target.value) })
+                    }
+                    className="w-36"
+                  />
+                  <span className="tabular-nums">{plan.copySizeMm.toFixed(0)}mm</span>
+                </label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() =>
+                    setLondonLogoPlacement(panel.id, {
+                      text: null,
+                      textScale: 1,
+                      textDx: 0,
+                      textDy: 0,
+                    })
+                  }
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Reset text
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Live Geist Bold on the .svg and .ai masters. Drag the amber box on the panel — or
+                nudge it with the arrow keys — to place the line. Clear the field to drop the
+                headline from this panel.
+              </p>
+            </div>
+
 
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-xs text-muted-foreground">

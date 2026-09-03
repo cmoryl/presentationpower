@@ -23,6 +23,17 @@ export type LondonLogoPlacement = {
   scale: number;
   /** Which approved colourway of the lockup to place on this panel. */
   colourway: NextLogoColourway;
+  /**
+   * Headline copy override. `null` keeps the copy the branding note implies,
+   * `""` removes the headline from the panel entirely.
+   */
+  text: string | null;
+  /** Size multiplier on the planned headline cap height. */
+  textScale: number;
+  /** Headline horizontal nudge, as a fraction of the trim width. */
+  textDx: number;
+  /** Headline vertical nudge, as a fraction of the trim height. */
+  textDy: number;
 };
 
 export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
@@ -31,6 +42,10 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   scale: 1,
   // All-white knockout is the approved default for scenic signage.
   colourway: "white",
+  text: null,
+  textScale: 1,
+  textDx: 0,
+  textDy: 0,
 };
 
 export type LondonLogoPlacementMap = Record<string, LondonLogoPlacement>;
@@ -44,6 +59,12 @@ let placements: LondonLogoPlacementMap = {};
 let hydrated = false;
 const listeners = new Set<() => void>();
 
+/** Headline cap-height multiplier bounds, shared with the editor UI. */
+export const LONDON_TEXT_SCALE = { min: 0.3, max: 3, step: 0.01 } as const;
+
+/** Longest headline the signage set accepts on one line. */
+export const LONDON_TEXT_MAX_CHARS = 64;
+
 function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
   const clamp = (n: unknown, lo: number, hi: number, fallback: number) =>
     typeof n === "number" && Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : fallback;
@@ -54,8 +75,13 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     colourway: NEXT_LOGO_COLOURWAYS.includes(p.colourway as NextLogoColourway)
       ? (p.colourway as NextLogoColourway)
       : "white",
+    text: typeof p.text === "string" ? p.text.slice(0, LONDON_TEXT_MAX_CHARS) : null,
+    textScale: clamp(p.textScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
+    textDx: clamp(p.textDx, -0.5, 0.5, 0),
+    textDy: clamp(p.textDy, -0.5, 0.5, 0),
   };
 }
+
 
 function hydrate(): void {
   if (hydrated || typeof window === "undefined") return;

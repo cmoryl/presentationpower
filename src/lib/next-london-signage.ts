@@ -103,7 +103,18 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
     note: "Near-flat veil for slivers and thin fascia strips where a gradient would band.",
     stops: ["#8FA6FF", "#B9A6FF"],
   },
+  "11-brew-diagonal": {
+    label: "Brew · diagonal",
+    note: "NEXTbrew ground: a saturated diagonal run of brand blue into aqua. Replaces the centred halo on table tops — no soft centre blob to read as a smudge under café lighting, and the white lockup holds full contrast at arm's length.",
+    stops: ["#135CFB", "#5AC8F0", "#7FE3E8"],
+  },
+  "12-repeat-wash": {
+    label: "Repeat wash",
+    note: "Deep vertical wash sized for step-and-repeat walls, so the tiled lockup rows stay legible in on-camera flash.",
+    stops: ["#03002C", "#135CFB", "#7C4EF4"],
+  },
 };
+
 
 /**
  * Print specification, as issued with the pack. These are hard rules for the
@@ -607,7 +618,7 @@ export const LONDON_PANELS: LondonPanel[] = [
     page: 3,
     name: "BRITTEN COFFEE BAR - p03 - 732x1300mm",
     ground: "Dawn column",
-    style: "09-dawn",
+    style: "11-brew-diagonal",
     trimW: 732.0,
     trimH: 1300.0,
     bleedW: 782.0,
@@ -626,7 +637,7 @@ export const LONDON_PANELS: LondonPanel[] = [
     page: 4,
     name: "BRITTEN COFFEE BAR - p04 - 1587x1300mm",
     ground: "Banner wash",
-    style: "09-dawn",
+    style: "11-brew-diagonal",
     trimW: 1587.0,
     trimH: 1300.0,
     bleedW: 1637.0,
@@ -645,7 +656,7 @@ export const LONDON_PANELS: LondonPanel[] = [
     page: 5,
     name: "BRITTEN COFFEE BAR - p05 - 732x1300mm",
     ground: "Dawn column",
-    style: "09-dawn",
+    style: "11-brew-diagonal",
     trimW: 732.0,
     trimH: 1300.0,
     bleedW: 782.0,
