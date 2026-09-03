@@ -163,7 +163,12 @@ export function svgPathToPdfOps(d: string, t: PdfPathTransform): string {
 }
 
 /** Bounding box of a path in its own units — used for sanity checks and QA. */
-export function svgPathBounds(d: string): { minX: number; minY: number; maxX: number; maxY: number } {
+export function svgPathBounds(d: string): {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+} {
   const tokens = tokenize(d).filter((t) => typeof t === "number") as number[];
   let minX = Infinity;
   let minY = Infinity;

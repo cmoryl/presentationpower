@@ -60,7 +60,6 @@ export function runQa(slides: DeckSlide[], brandModeId?: string): QaIssue[] {
       }
     }
 
-
     // Capacity: items array bounds → block
     checkCapacity(slide, variant, issues);
 

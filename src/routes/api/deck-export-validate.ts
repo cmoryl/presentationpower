@@ -40,7 +40,10 @@ export const Route = createFileRoute("/api/deck-export-validate")({
           return Response.json({ error: "Missing file or manifest." }, { status: 400 });
         }
         if (file.size === 0 || file.size > MAX_VALIDATE_BYTES) {
-          return Response.json({ error: "File is empty or too large to validate." }, { status: 413 });
+          return Response.json(
+            { error: "File is empty or too large to validate." },
+            { status: 413 },
+          );
         }
 
         let manifest: z.infer<typeof manifestSchema>;

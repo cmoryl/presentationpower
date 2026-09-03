@@ -46,7 +46,6 @@ class StageBoundary extends Component<
   }
 }
 
-
 export type PrintExportRequest = {
   assetId: string;
   title?: string;
@@ -162,8 +161,6 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
     [busy, mode, pageIndex, pageSize, row],
   );
 
-
-
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-start gap-2">
@@ -244,7 +241,6 @@ export function PrintExportCard({ request }: { request: PrintExportRequest }) {
               />
             </StageBoundary>
           </div>
-
         </div>
       ) : null}
     </div>

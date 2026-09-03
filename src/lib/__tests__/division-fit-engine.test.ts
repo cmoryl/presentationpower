@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  demoSlideBriefs,
-  planDivisionFit,
-  sectionSequence,
-} from "../division-fit-engine";
+import { demoSlideBriefs, planDivisionFit, sectionSequence } from "../division-fit-engine";
 import { DIVISION_DESIGN_SPECS, divisionDesignSpec } from "../division-design-specs";
 import { NARRATIVE_ARCHETYPES } from "../taxonomy";
 

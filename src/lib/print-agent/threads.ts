@@ -30,7 +30,6 @@ export async function listPrintThreads(): Promise<PrintAgentThread[]> {
   return (data ?? []) as unknown as PrintAgentThread[];
 }
 
-
 export async function createPrintThread(title = "New print piece"): Promise<PrintAgentThread> {
   const { data: session } = await supabase.auth.getSession();
   const ownerId = session.session?.user.id;

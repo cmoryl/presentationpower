@@ -49,8 +49,7 @@ export function PrintSectionLayoutControls({
   const { tokens } = resolvePrintSectionLayout(kind, active);
   const customised = printLayoutIsCustomised(kind, active);
 
-  const patch = (p: Partial<PrintSectionLayoutTokens>) =>
-    savePrintLayoutOverride(kind, active, p);
+  const patch = (p: Partial<PrintSectionLayoutTokens>) => savePrintLayoutOverride(kind, active, p);
 
   return (
     <div className="space-y-1.5">

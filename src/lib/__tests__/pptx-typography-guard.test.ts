@@ -43,7 +43,10 @@ const MAX_CHAR_SPACING = 8;
 describe("PPTX typography parity guard", () => {
   it("preview --font-sans is the Geist family", () => {
     const match = STYLES_SRC.match(/--font-sans:\s*"([^"]+)"/);
-    expect(match, "expected a --font-sans declaration in the app or library stylesheet").toBeTruthy();
+    expect(
+      match,
+      "expected a --font-sans declaration in the app or library stylesheet",
+    ).toBeTruthy();
     expect(match![1]).toMatch(/^Geist/);
   });
 

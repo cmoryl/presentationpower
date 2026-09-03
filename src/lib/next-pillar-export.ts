@@ -34,7 +34,10 @@ const MM_TO_IN = 1 / 25.4;
 const SLUG_IN = 0.4;
 const PROOF_PPI = 24;
 
-export type PillarExportProgress = { stage: "render" | "pdf" | "vector" | "proof" | "package"; label: string };
+export type PillarExportProgress = {
+  stage: "render" | "pdf" | "vector" | "proof" | "package";
+  label: string;
+};
 
 export type PillarExportResult = {
   blob: Blob;
@@ -76,7 +79,8 @@ async function plate(
     { node, width: nativeW, height: nativeH, label: "NEXT master pillar" },
     { scale, background: bg },
   );
-  if (!(canvas.width > 0 && canvas.height > 0)) throw new Error("pillar capture produced no pixels");
+  if (!(canvas.width > 0 && canvas.height > 0))
+    throw new Error("pillar capture produced no pixels");
   return canvas;
 }
 
@@ -106,7 +110,9 @@ function readme(
     `Safe area:       ${Math.round(geo.safeInset)} mm inside trim`,
     `Sub-line:        ${(config.subheadline ?? "").trim() || "none"}`,
     `QR payload:      ${qr || "none"}`,
-    qr ? `QR block:        ${Math.round(Number(config.qrSize) || 180)} mm square, quiet zone included, ECC level H` : `QR block:        n/a`,
+    qr
+      ? `QR block:        ${Math.round(Number(config.qrSize) || 180)} mm square, quiet zone included, ECC level H`
+      : `QR block:        n/a`,
     `Plate:           ${ppi} ppi (large-format issued tier ${PILLAR_SPEC.rasterPpi} ppi)`,
     `Colour:          convert to ${PILLAR_SPEC.colorMode} at output; body text 100K`,
     `Export preset:   ${PILLAR_SPEC.exportPreset}`,
@@ -125,7 +131,9 @@ function readme(
     vector
       ? `Lockup:          ${vector.lockupVector ? "vector paths (editable, single-colour)" : "high-resolution placed bitmap"}`
       : `Lockup:          placed bitmap`,
-    vector ? `Type:            live Geist text, font embedded and subset — editable in Illustrator` : ``,
+    vector
+      ? `Type:            live Geist text, font embedded and subset — editable in Illustrator`
+      : ``,
     vector ? `QR code:         vector modules, ECC level H — no raster upscaling` : ``,
     vector ? `Guides layer:    trim + safe guides sit on a non-printing layer` : ``,
     ``,
@@ -214,7 +222,10 @@ export async function exportPillarSign(opts: {
   opts.onProgress?.({ stage: "proof", label: "Rendering the proof PNG" });
   const proofCanvas = await plate(node, nativeWidth, nativeHeight, PROOF_PPI, groundBg, geo.bleedW);
   const proofBlob: Blob = await new Promise((resolve, reject) => {
-    proofCanvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");
+    proofCanvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("proof render failed"))),
+      "image/png",
+    );
   });
   const proofBuffer = await proofBlob.arrayBuffer();
 

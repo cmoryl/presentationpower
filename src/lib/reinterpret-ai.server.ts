@@ -44,7 +44,6 @@ const MODEL = "google/gemini-2.5-flash";
 /** Slides per request — small batches keep every slide's evidence in focus. */
 const BATCH = 5;
 
-
 const schema = {
   type: "object",
   properties: {
@@ -203,7 +202,8 @@ export async function planReinterpretation(args: {
 
   try {
     const batches: PlannerSlide[][] = [];
-    for (let i = 0; i < args.slides.length; i += BATCH) batches.push(args.slides.slice(i, i + BATCH));
+    for (let i = 0; i < args.slides.length; i += BATCH)
+      batches.push(args.slides.slice(i, i + BATCH));
 
     const all: RawPlan[] = [];
     let lastStatus = 200;
@@ -229,8 +229,7 @@ export async function planReinterpretation(args: {
         plans: [],
         sources,
         model: MODEL,
-        error:
-          lastStatus === 200 ? "AI returned no plan." : `AI planner failed (${lastStatus}).`,
+        error: lastStatus === 200 ? "AI returned no plan." : `AI planner failed (${lastStatus}).`,
       };
 
     // Fold the slide reading into the reviewer-visible rationale so the depth of
@@ -245,4 +244,3 @@ export async function planReinterpretation(args: {
     return { plans: [], sources, model: MODEL, error: (e as Error).message };
   }
 }
-

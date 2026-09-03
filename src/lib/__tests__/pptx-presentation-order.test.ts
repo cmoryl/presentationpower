@@ -47,5 +47,3 @@ describe("orderPresentationLists", () => {
     expect(out.indexOf("notesMasterIdLst")).toBeGreaterThan(out.indexOf("sldIdLst"));
   });
 });
-
-

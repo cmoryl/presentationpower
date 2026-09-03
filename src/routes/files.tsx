@@ -155,7 +155,6 @@ function MyFilesPage() {
 
   const rows = (data ?? []) as MyFile[];
 
-
   const [q, setQ] = useState("");
   const [kind, setKind] = useState<"all" | MyFileKind>("all");
   const [sort, setSort] = useState<SortKey>("recent");

@@ -117,12 +117,17 @@ export async function exportAgendaSheet(opts: {
   const screen = geo.isScreen;
   opts.onProgress?.({
     stage: "proof",
-    label: screen ? `Rendering ${geo.pxW} × ${geo.pxH} px screen artwork` : "Rendering the proof PNG",
+    label: screen
+      ? `Rendering ${geo.pxW} × ${geo.pxH} px screen artwork`
+      : "Rendering the proof PNG",
   });
   const wantPx = screen ? geo.pxW : geo.bleedW * MM_TO_IN * PROOF_PPI;
   const canvas = await captureAssetCanvas(
     { node, width: nativeWidth, height: nativeHeight, label: "NEXT division agenda" },
-    { scale: Math.max(0.4, wantPx / nativeWidth), background: agendaStops(config.styleId, config.face, config.divisionId)[0]! },
+    {
+      scale: Math.max(0.4, wantPx / nativeWidth),
+      background: agendaStops(config.styleId, config.face, config.divisionId)[0]!,
+    },
   );
   const proofBlob: Blob = await new Promise((resolve, reject) => {
     canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("proof render failed"))), "image/png");
@@ -144,7 +149,6 @@ export async function exportAgendaSheet(opts: {
     zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
   }
   zip.file("READ-ME.txt", readme(config, vector, word?.notes ?? []));
-
 
   const blob = await zip.generateAsync({ type: "blob" });
 

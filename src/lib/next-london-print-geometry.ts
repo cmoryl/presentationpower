@@ -7,11 +7,7 @@
 // same rectangles the .svg / .ai masters are built from. If a guide shows copy
 // crossing the safe line here, it crosses it on the signboard.
 
-import {
-  rasterSizeFor,
-  recommendedPpi,
-  type LondonPanel,
-} from "@/lib/next-london-signage";
+import { rasterSizeFor, recommendedPpi, type LondonPanel } from "@/lib/next-london-signage";
 
 /** Safe inset from the TRIM edge, in mm: 4% of the short trim edge, min 20mm. */
 export function londonSafeMm(panel: { trimW: number; trimH: number }): number {
@@ -125,5 +121,10 @@ export function insideSafe(
   const r = l + geo.liveW;
   const b = t + geo.liveH;
   const eps = 0.5; // half a millimetre of tolerance — rounding, not a bust
-  return rect.x >= l - eps && rect.y >= t - eps && rect.x + rect.w <= r + eps && rect.y + rect.h <= b + eps;
+  return (
+    rect.x >= l - eps &&
+    rect.y >= t - eps &&
+    rect.x + rect.w <= r + eps &&
+    rect.y + rect.h <= b + eps
+  );
 }

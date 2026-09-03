@@ -29,7 +29,10 @@ import {
 export const Route = createFileRoute("/events/next_/city-badges")({
   validateSearch: (search: Record<string, unknown>) => ({
     division: typeof search.division === "string" ? search.division : undefined,
-    face: search.face === "light" || search.face === "dark" ? (search.face as CityBadgeFaceId) : undefined,
+    face:
+      search.face === "light" || search.face === "dark"
+        ? (search.face as CityBadgeFaceId)
+        : undefined,
   }),
   head: () => ({
     meta: [
@@ -75,7 +78,6 @@ function CityBadgePage() {
   const [busy, setBusy] = useState(false);
   const plateRef = useRef<HTMLDivElement | null>(null);
   const backRef = useRef<HTMLDivElement | null>(null);
-
 
   const versions = useQuery({
     queryKey: ["city-badge-versions"],
@@ -160,7 +162,6 @@ function CityBadgePage() {
           attendee tier, then export PDF, an Illustrator twin and a proof PNG.
         </p>
 
-
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
           {/* Live plate */}
           <div>
@@ -212,8 +213,8 @@ function CityBadgePage() {
                   cutout {BADGE_SPEC.klik.w}″ × {BADGE_SPEC.klik.h}″
                 </li>
                 <li>
-                  {BADGE_SPEC.colorMode} at output, {BADGE_SPEC.minImageDpi} ppi minimum, exported as{" "}
-                  {BADGE_SPEC.exportPreset}
+                  {BADGE_SPEC.colorMode} at output, {BADGE_SPEC.minImageDpi} ppi minimum, exported
+                  as {BADGE_SPEC.exportPreset}
                 </li>
               </ul>
               <div className="mt-3 flex flex-wrap gap-3">

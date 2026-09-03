@@ -144,13 +144,7 @@ export const CITY_BADGE_SOURCE = {
 } as const;
 
 /** Attendee tiers printed on the role band of the general NEXT badge. */
-export const CITY_BADGE_ROLES = [
-  "ATTENDEE",
-  "EMPLOYEE",
-  "CLIENT",
-  "SPECIAL GUEST",
-  "VIP",
-] as const;
+export const CITY_BADGE_ROLES = ["ATTENDEE", "EMPLOYEE", "CLIENT", "SPECIAL GUEST", "VIP"] as const;
 
 /**
  * Where the supplied artwork carries its baked NEXT lockup. Swapping a division
@@ -166,7 +160,6 @@ export const BADGE_LOCKUP_WINDOW = {
   /** Replacement lockup width on the plate. */
   markW: 2.62,
 } as const;
-
 
 /**
  * A saved, print-ready configuration of the City Series badge. Persisted in the
@@ -212,7 +205,8 @@ export function normalizeCityBadgeConfig(input: unknown): CityBadgeConfig {
   const str = (v: unknown, fallback: string) => (typeof v === "string" ? v : fallback);
   return {
     face: raw.face === "light" ? "light" : "dark",
-    divisionId: cityBadgeDivision(typeof raw.divisionId === "string" ? raw.divisionId : undefined).id,
+    divisionId: cityBadgeDivision(typeof raw.divisionId === "string" ? raw.divisionId : undefined)
+      .id,
     showLockup: raw.showLockup !== false,
     cityLabel: str(raw.cityLabel, CITY_BADGE_DEFAULT.cityLabel),
     datesLabel: str(raw.datesLabel, CITY_BADGE_DEFAULT.datesLabel),

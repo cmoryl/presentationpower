@@ -82,10 +82,7 @@ export default defineTool({
     await touchDeck(supabase, deck_id);
     // A chart/diagram module inserted without its plotted values renders as an
     // empty frame on screen and in PowerPoint, so say so loudly right here.
-    const gap = visualDataGap(
-      resolved.value.variantId,
-      fitted.content as Record<string, unknown>,
-    );
+    const gap = visualDataGap(resolved.value.variantId, fitted.content as Record<string, unknown>);
     // In-loop variety nudge: the agent inserts one slide at a time and cannot
     // see that it has already spent this layout twice. Tell it now, with the
     // permitted layouts still on the table, rather than at audit time.

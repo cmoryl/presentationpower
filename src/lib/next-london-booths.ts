@@ -97,8 +97,7 @@ export const LONDON_BOOTHS: LondonBoothSpec[] = [
   {
     id: "global-digital-experience-tradebooth-a",
     vendor: "Global Digital Experience",
-    sourceFile:
-      "GlobalDigitalExperience_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
+    sourceFile: "GlobalDigitalExperience_LiveTradeBoothA_Front_1830x2440mm_Plus100mmBleed.ai",
     aiUrl: gdxAi.url,
     style: "01-beam-violet-aqua",
     artboards: frontWall(gdxP1.url),

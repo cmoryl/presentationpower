@@ -317,7 +317,6 @@ export function EditorialTitle({
         paddingBottom: `var(--mod-descender, 0.16em)`,
         marginBottom: `calc(-1 * var(--mod-descender, 0.16em) + 0.02em)`,
       }}
-
     >
       {parts.map((p, i) =>
         p.italic ? (
@@ -834,7 +833,6 @@ export function GlassTile({
   );
 }
 
-
 // ── moduleCardTint / AccentTick ───────────────────────────────────────────
 // Shared surface recipe for the plain "module box" cards that are hand-rolled
 // inside VariantRenderer (matrix cells, breakdown boxes, etc). Every card gets
@@ -904,7 +902,6 @@ export function moduleCardSurface(
     overflow: "hidden",
   };
 }
-
 
 /** Full-width accent seam along the top edge of a module card. */
 export function AccentTick({

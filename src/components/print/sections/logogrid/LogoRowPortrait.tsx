@@ -1,6 +1,6 @@
 // Single-row logo strip — 4-6 logos with dividers, no card.
 import type { PrintLogoGridSection, PrintLogoItem } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, safeList} from "../shared";
+import { cq, sectionInk, MODULE, safeList } from "../shared";
 import { useResolvedLogoUrl } from "@/lib/slide-media-refresh";
 
 function Cell({ item, mode }: { item: PrintLogoItem; mode: "light" | "dark" }) {

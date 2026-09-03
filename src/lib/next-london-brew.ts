@@ -83,9 +83,24 @@ export function brewMotifPlan(panel: LondonPanel, light = false): BrewMotifPlan 
   const gap = short * 0.075;
   const steamWidth = Math.max(1.6, short * 0.0065);
   marks.push(
-    { kind: "path", d: steamPath(sx - gap, steamBase, steamH * 0.78, gap * 0.5), width: steamWidth, alpha: 0.16 },
-    { kind: "path", d: steamPath(sx, steamBase, steamH, gap * 0.6), width: steamWidth, alpha: 0.22 },
-    { kind: "path", d: steamPath(sx + gap, steamBase, steamH * 0.7, gap * 0.45), width: steamWidth, alpha: 0.14 },
+    {
+      kind: "path",
+      d: steamPath(sx - gap, steamBase, steamH * 0.78, gap * 0.5),
+      width: steamWidth,
+      alpha: 0.16,
+    },
+    {
+      kind: "path",
+      d: steamPath(sx, steamBase, steamH, gap * 0.6),
+      width: steamWidth,
+      alpha: 0.22,
+    },
+    {
+      kind: "path",
+      d: steamPath(sx + gap, steamBase, steamH * 0.7, gap * 0.45),
+      width: steamWidth,
+      alpha: 0.14,
+    },
   );
 
   // Bean tick row: a quiet rhythm along the leading edge, sized off the long
@@ -179,9 +194,7 @@ export function brewMotifPdfOps(
         );
       }
       if (m.kind === "bean") {
-        return (
-          `q ${gs} ${fill} ${circleOps(m.cx * MM_TO_PT, yUp(m.cy), m.r * MM_TO_PT)} f Q\n`
-        );
+        return `q ${gs} ${fill} ${circleOps(m.cx * MM_TO_PT, yUp(m.cy), m.r * MM_TO_PT)} f Q\n`;
       }
       return "";
     })

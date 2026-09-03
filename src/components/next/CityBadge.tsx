@@ -118,102 +118,107 @@ export function CityBadge({
 
       {/* Safe-area copy — front only; the back is artwork and mark alone. */}
       {side === "front" ? (
-      <div
-
-        style={{
-          position: "absolute",
-          left: safeX,
-          right: safeX,
-          top: safeY,
-          bottom: h - klikTop + px(0.06),
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-end",
-          gap: 10 * scale,
-        }}
-      >
-        {eventLine ? (
-          <div
-            style={{
-              fontSize: 11 * scale,
-              letterSpacing: 1.6 * scale,
-              textTransform: "uppercase",
-              fontWeight: 600,
-              color: face.ink,
-              textShadow: "0 1px 6px rgba(3,0,44,0.35)",
-            }}
-          >
-            {eventLine}
-          </div>
-        ) : null}
-
-        {config.showAttendee ? (
-          <div
-            style={{
-              background: face.panel,
-              color: face.panelInk,
-              borderRadius: 10 * scale,
-              padding: `${13 * scale}px ${15 * scale}px ${15 * scale}px`,
-            }}
-          >
+        <div
+          style={{
+            position: "absolute",
+            left: safeX,
+            right: safeX,
+            top: safeY,
+            bottom: h - klikTop + px(0.06),
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-end",
+            gap: 10 * scale,
+          }}
+        >
+          {eventLine ? (
             <div
               style={{
-                display: "inline-block",
-                background: face.band,
-                color: face.bandInk,
-                fontSize: 9.5 * scale,
-                fontWeight: 700,
-                letterSpacing: 1.5 * scale,
-                padding: `${4 * scale}px ${9 * scale}px`,
-                borderRadius: 999,
-              }}
-            >
-              {config.roleLabel || "ATTENDEE"}
-            </div>
-            <div
-              style={{
-                marginTop: 9 * scale,
-                fontSize: 25 * scale,
-                lineHeight: 1.03,
+                fontSize: 11 * scale,
+                letterSpacing: 1.6 * scale,
+                textTransform: "uppercase",
                 fontWeight: 600,
-                letterSpacing: -0.7 * scale,
+                color: face.ink,
+                textShadow: "0 1px 6px rgba(3,0,44,0.35)",
               }}
             >
-              {config.firstName}
-              {config.lastName ? (
-                <>
-                  <br />
-                  {config.lastName}
-                </>
-              ) : null}
+              {eventLine}
             </div>
-            {config.jobTitle ? (
-              <div style={{ marginTop: 7 * scale, fontSize: 11 * scale, lineHeight: 1.35, opacity: 0.85 }}>
-                {config.jobTitle}
+          ) : null}
+
+          {config.showAttendee ? (
+            <div
+              style={{
+                background: face.panel,
+                color: face.panelInk,
+                borderRadius: 10 * scale,
+                padding: `${13 * scale}px ${15 * scale}px ${15 * scale}px`,
+              }}
+            >
+              <div
+                style={{
+                  display: "inline-block",
+                  background: face.band,
+                  color: face.bandInk,
+                  fontSize: 9.5 * scale,
+                  fontWeight: 700,
+                  letterSpacing: 1.5 * scale,
+                  padding: `${4 * scale}px ${9 * scale}px`,
+                  borderRadius: 999,
+                }}
+              >
+                {config.roleLabel || "ATTENDEE"}
               </div>
-            ) : null}
-            {config.company ? (
-              <div style={{ marginTop: 2 * scale, fontSize: 12 * scale, fontWeight: 600 }}>
-                {config.company}
-              </div>
-            ) : null}
-            {config.reference ? (
               <div
                 style={{
                   marginTop: 9 * scale,
-                  fontSize: 8.5 * scale,
-                  letterSpacing: 1.1 * scale,
-                  opacity: 0.6,
+                  fontSize: 25 * scale,
+                  lineHeight: 1.03,
+                  fontWeight: 600,
+                  letterSpacing: -0.7 * scale,
                 }}
               >
-                {config.reference}
+                {config.firstName}
+                {config.lastName ? (
+                  <>
+                    <br />
+                    {config.lastName}
+                  </>
+                ) : null}
               </div>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
+              {config.jobTitle ? (
+                <div
+                  style={{
+                    marginTop: 7 * scale,
+                    fontSize: 11 * scale,
+                    lineHeight: 1.35,
+                    opacity: 0.85,
+                  }}
+                >
+                  {config.jobTitle}
+                </div>
+              ) : null}
+              {config.company ? (
+                <div style={{ marginTop: 2 * scale, fontSize: 12 * scale, fontWeight: 600 }}>
+                  {config.company}
+                </div>
+              ) : null}
+              {config.reference ? (
+                <div
+                  style={{
+                    marginTop: 9 * scale,
+                    fontSize: 8.5 * scale,
+                    letterSpacing: 1.1 * scale,
+                    opacity: 0.6,
+                  }}
+                >
+                  {config.reference}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
       ) : null}
-
 
       {guides ? <BadgeGuides ppi={ppi} /> : null}
     </div>
@@ -236,8 +241,23 @@ function BadgeGuides({ ppi }: { ppi: number }) {
       style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
       aria-hidden
     >
-      <rect x={0.5} y={0.5} width={w - 1} height={h - 1} fill="none" stroke="#EC388A" strokeDasharray="4 3" />
-      <rect x={trimX} y={trimY} width={w - trimX * 2} height={h - trimY * 2} fill="none" stroke="#FFEB66" />
+      <rect
+        x={0.5}
+        y={0.5}
+        width={w - 1}
+        height={h - 1}
+        fill="none"
+        stroke="#EC388A"
+        strokeDasharray="4 3"
+      />
+      <rect
+        x={trimX}
+        y={trimY}
+        width={w - trimX * 2}
+        height={h - trimY * 2}
+        fill="none"
+        stroke="#FFEB66"
+      />
       <rect
         x={px(SAFE_INSET_X)}
         y={px(SAFE_INSET_Y)}

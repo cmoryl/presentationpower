@@ -26,7 +26,11 @@ function safeName(title: string): string {
 }
 
 /** Share a generated file through the OS sheet, or download it if that fails. */
-async function deliverFile(blob: Blob, fileName: string, mime: string): Promise<"shared" | "saved"> {
+async function deliverFile(
+  blob: Blob,
+  fileName: string,
+  mime: string,
+): Promise<"shared" | "saved"> {
   const file = new File([blob], fileName, { type: mime });
   const nav = navigator as Navigator & {
     canShare?: (data: { files?: File[] }) => boolean;
@@ -61,12 +65,7 @@ export type MobileDeckExportProps = {
   className?: string;
 };
 
-export function MobileDeckExport({
-  deck,
-  brand,
-  blocked,
-  className,
-}: MobileDeckExportProps) {
+export function MobileDeckExport({ deck, brand, blocked, className }: MobileDeckExportProps) {
   const [busy, setBusy] = useState<null | "pdf" | "pptx">(null);
 
   async function run(kind: "pdf" | "pptx", force = false) {
@@ -100,10 +99,14 @@ export function MobileDeckExport({
         const nodes = Array.from(
           document.querySelectorAll<HTMLElement>(`[${MOBILE_EXPORT_SLIDE_ATTR}]`),
         );
-        if (nodes.length === 0) throw new Error("Slides are still rendering — try again in a moment");
+        if (nodes.length === 0)
+          throw new Error("Slides are still rendering — try again in a moment");
         const { exportSlidesAsImagePdf } = await import("@/lib/slide-image-export");
         const out = await exportSlidesAsImagePdf(
-          nodes.map((node, i) => ({ node, mode: (deck.slides[i]?.mode ?? "light") as "light" | "dark" })),
+          nodes.map((node, i) => ({
+            node,
+            mode: (deck.slides[i]?.mode ?? "light") as "light" | "dark",
+          })),
           {
             returnBlob: true,
             onProgress: (p) =>
@@ -167,7 +170,11 @@ export function MobileDeckExport({
           disabled={busy !== null}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-black/15 bg-white px-4 text-[13px] font-semibold text-[#03002C] transition hover:border-[#003FC7] hover:text-[#003FC7] disabled:opacity-60"
         >
-          {busy === "pptx" ? <Loader2 size={14} className="animate-spin" /> : <FileDown size={14} />}
+          {busy === "pptx" ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <FileDown size={14} />
+          )}
           {busy === "pptx" ? "Building…" : "Share .pptx"}
         </button>
       </div>

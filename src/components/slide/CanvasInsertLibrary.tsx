@@ -44,7 +44,8 @@ import {
   Hexagon,
   Home,
   Image,
-  Infinity,
+  // Aliased: importing it bare shadowed the global `Infinity` for this module.
+  Infinity as InfinityIcon,
   Info,
   Key,
   Landmark,
@@ -193,7 +194,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Hexagon,
   Home,
   Image,
-  Infinity,
+  Infinity: InfinityIcon,
   Info,
   Key,
   Landmark,

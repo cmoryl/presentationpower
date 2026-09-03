@@ -125,7 +125,6 @@ export function createDeckFromBuiltStages(
   return { deckId, briefId, deck: useDeckStore.getState().decks[deckId] };
 }
 
-
 /** Materialise the run in the deck store and return the saved deck. */
 export function createDeckFromDivisionRun(
   plan: DivisionFitPlan,
@@ -171,7 +170,9 @@ export async function walkDeckAgainstSpec(
     const planned = plan.slides[i];
     const plannedVariantId = planned?.best?.variantId ?? null;
     const samePosition = plannedVariantId === slide.variantId;
-    const variant: ModuleVariant | undefined = MODULE_VARIANTS.find((v) => v.id === slide.variantId);
+    const variant: ModuleVariant | undefined = MODULE_VARIANTS.find(
+      (v) => v.id === slide.variantId,
+    );
     const mode = slide.mode === "dark" ? "dark" : "light";
     const pack = (packFor(slide) ?? null) as StylePack | null;
     const base: DeckWalkSlide = {

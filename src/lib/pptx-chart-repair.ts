@@ -235,10 +235,7 @@ function fixValAx(xml: string): string {
  * uses 000000 (dark ink is 03002C), so this can only hit the phantom plate.
  */
 function clearBlackPlates(xml: string): string {
-  return xml.replace(
-    /<a:solidFill><a:srgbClr val="000000"\s*\/><\/a:solidFill>/g,
-    "<a:noFill/>",
-  );
+  return xml.replace(/<a:solidFill><a:srgbClr val="000000"\s*\/><\/a:solidFill>/g, "<a:noFill/>");
 }
 
 /**
@@ -269,8 +266,6 @@ function hideWaterfallRisers(xml: string): string {
   return out;
 }
 
-
-
 /**
  * Make one `ppt/charts/chartN.xml` schema-valid. Safe to run on already-valid
  * XML: every fix is conditional and idempotent.
@@ -296,4 +291,3 @@ export function repairChartXml(xml: string): string {
   out = hideWaterfallRisers(out);
   return out;
 }
-

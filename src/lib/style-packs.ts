@@ -2667,7 +2667,10 @@ export function stylePackCssVars(pack: StylePack): Record<string, string> {
  * the sheet stays coherent.
  */
 export function packToneBrand<
-  T extends { id?: string; tokens: { primary: string; accent: string; surface: string; ink: string } },
+  T extends {
+    id?: string;
+    tokens: { primary: string; accent: string; surface: string; ink: string };
+  },
 >(brand: T, pack: StylePack | null | undefined): T {
   if (!pack) return brand;
   const ownsLook = Boolean(brand.id) && lookBrandModeId(pack.id) === brand.id;

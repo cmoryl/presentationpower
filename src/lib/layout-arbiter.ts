@@ -336,7 +336,11 @@ function scoreSpec(
   if (ownedIds.has(variant.id)) {
     return {
       score: 1,
-      reasons: [specPackNote ? `owned by this division's spec (${specPackNote})` : "in the division conformance set"],
+      reasons: [
+        specPackNote
+          ? `owned by this division's spec (${specPackNote})`
+          : "in the division conformance set",
+      ],
     };
   }
   return { score: 0.35, reasons: ["outside this division's conformance set"] };
@@ -360,9 +364,10 @@ export function arbitrateLayout(brief: LayoutBrief): LayoutDecision {
   const avoid = new Set(brief.avoid ?? []);
   const items = brief.content.items?.length ?? brief.content.bullets?.length ?? 0;
 
-  const curated = brief.industryId && sectionId
-    ? sectionTemplate({ industryId: brief.industryId, sectionId, level })
-    : null;
+  const curated =
+    brief.industryId && sectionId
+      ? sectionTemplate({ industryId: brief.industryId, sectionId, level })
+      : null;
   const curatedVariantId = curated?.variantId ?? null;
   const curatedAlternates = new Set(curated?.alternates ?? []);
 
@@ -499,14 +504,20 @@ export function recommendCanvas(
   const role = LEVEL_ROLE[level];
   const blocks = brief.content.items?.length ?? brief.content.bullets?.length ?? 0;
   const overBlocks = blocks > role.density.blocks;
-  const suggested = Math.max(1, Math.ceil(load.load / 1.15), overBlocks ? Math.ceil(blocks / role.density.blocks) : 1);
+  const suggested = Math.max(
+    1,
+    Math.ceil(load.load / 1.15),
+    overBlocks ? Math.ceil(blocks / role.density.blocks) : 1,
+  );
 
   const aspect: CanvasRecommendation["aspect"] =
     load.load > 1.15 || overBlocks ? (ratio > 1.6 ? "16:10" : "4:3") : aspectName(ratio);
 
   return {
     aspect,
-    fillBias: Math.round(Math.min(1.2, Math.max(0.7, role.fillBias * (1 + (1 - load.load) * 0.12))) * 100) / 100,
+    fillBias:
+      Math.round(Math.min(1.2, Math.max(0.7, role.fillBias * (1 + (1 - load.load) * 0.12))) * 100) /
+      100,
     splitRecommended: suggested > 1,
     suggestedSlides: suggested,
     note:
@@ -539,7 +550,10 @@ export function bestLayoutVariant(brief: LayoutBrief): string | null {
 }
 
 /** Feasibility probe — does this exact variant hold this content? */
-export function layoutFits(variantId: string, brief: LayoutBrief): { fits: boolean; violations: string[] } {
+export function layoutFits(
+  variantId: string,
+  brief: LayoutBrief,
+): { fits: boolean; violations: string[] } {
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
   if (!variant) return { fits: false, violations: [`unknown variant ${variantId}`] };
   const cap = scoreCapacity(variant, brief.content);

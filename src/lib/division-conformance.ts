@@ -21,7 +21,11 @@
 
 import "@/components/slide/modules/register-all";
 import { findSlideModule } from "@/components/slide/module-registry";
-import { ENTERPRISE_BRAND_TOKENS, isTransPerfectBrandScope, resolveBrandMode } from "./brand-profiles";
+import {
+  ENTERPRISE_BRAND_TOKENS,
+  isTransPerfectBrandScope,
+  resolveBrandMode,
+} from "./brand-profiles";
 import { backdropSetFor } from "./division-backdrop-manifest";
 import { divisionDesignSpec, isKnownPackId } from "./division-design-specs";
 import { LIBRARY_PRESETS, type LibraryPreset } from "./library-presets";
@@ -138,7 +142,9 @@ export function conformanceSpecIssues(preset: DivisionConformancePreset): string
     ["darkPackId", preset.darkPackId],
   ] as const) {
     if (!id) {
-      issues.push(`${preset.brandModeId}: ${key} is unset — the scope would fall back to the generic look`);
+      issues.push(
+        `${preset.brandModeId}: ${key} is unset — the scope would fall back to the generic look`,
+      );
     } else if (!isKnownPackId(id)) {
       issues.push(`${preset.brandModeId}: ${key} "${id}" is not an approved style pack`);
     }

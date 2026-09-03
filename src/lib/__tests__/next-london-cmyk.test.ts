@@ -28,7 +28,9 @@ describe("london cmyk", () => {
       const svg = buildLondonPanelSvg(panel, { colorSpace: "cmyk" });
       expect(svg).toContain('data-colorspace="cmyk"');
       expect(svg).toContain("device-cmyk(");
-      const ai = new TextDecoder().decode(londonAiBytes(buildLondonPanelAi(panel, { colorSpace: "cmyk" })));
+      const ai = new TextDecoder().decode(
+        londonAiBytes(buildLondonPanelAi(panel, { colorSpace: "cmyk" })),
+      );
       expect(ai).toContain("/DeviceCMYK");
       expect(ai).not.toContain(" rg ");
       expect(ai).toContain("/TPColorSpace (DeviceCMYK");

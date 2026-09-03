@@ -60,7 +60,6 @@ export function variantRendersAnyImagery(variantId: string | undefined | null): 
   return variantSupportsImagery(variantId) || variantItemImageCapacity(variantId) > 0;
 }
 
-
 /** Variants that render a full-bleed / media-forward slot large enough to
  *  make a background video meaningful. Subset of imagery-supporting
  *  variants — a stat callout or split caption is fine for a still, but a

@@ -62,7 +62,10 @@ const KNOWN_NON_TOOL_PREFIX = new Set(["tool-invocation"]);
  * they were not given, so those parts are rewritten as plain text notes: the
  * turn still reads correctly and the request stays valid.
  */
-export function dropUnknownToolParts<T extends UIMessage>(messages: T[], knownTools: string[]): T[] {
+export function dropUnknownToolParts<T extends UIMessage>(
+  messages: T[],
+  knownTools: string[],
+): T[] {
   const known = new Set(knownTools);
   let changed = false;
   const next = messages.map((message) => {

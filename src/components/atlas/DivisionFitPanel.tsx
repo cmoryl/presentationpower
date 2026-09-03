@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  planDivisionFit,
-  demoSlideBriefs,
-  sectionSequence,
-} from "@/lib/division-fit-engine";
+import { planDivisionFit, demoSlideBriefs, sectionSequence } from "@/lib/division-fit-engine";
 import { NARRATIVE_ARCHETYPES } from "@/lib/taxonomy";
 import { DIVISION_DESIGN_SPECS } from "@/lib/division-design-specs";
 import { buildDivisionRun, runDivisionStages, type DivisionRunReport } from "@/lib/division-run";
@@ -19,7 +15,6 @@ import { useDeckStore } from "@/lib/deck-store";
 import { Link } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
-
 // The stage graph (VariantRenderer + every module family) is large and only
 // needed once the reviewer asks to see the built slides, so it is code-split
 // away from the Atlas page shell.
@@ -34,10 +29,7 @@ declare global {
   interface Window {
     __tpDivisionRun?: {
       run: (opts?: { brandModeId?: string; archetypeId?: string }) => Promise<DivisionRunReport>;
-      buildDeck: (opts?: {
-        brandModeId?: string;
-        archetypeId?: string;
-      }) => Promise<DeckWalkReport>;
+      buildDeck: (opts?: { brandModeId?: string; archetypeId?: string }) => Promise<DeckWalkReport>;
     };
   }
 }
@@ -123,7 +115,6 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
     }
   }
 
-
   async function build() {
     setBusy({ done: 0, total: plan.slides.length });
     try {
@@ -157,7 +148,9 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
           rhythmWindow,
           slides: demoSlideBriefs(sections, { blocks, copy, media }),
         });
-        const { deck } = createDeckFromDivisionRun(p, { archetypeId: opts?.archetypeId ?? archetypeId });
+        const { deck } = createDeckFromDivisionRun(p, {
+          archetypeId: opts?.archetypeId ?? archetypeId,
+        });
         const out = await walkDeckAgainstSpec(deck, p);
         setWalk(out);
         return out;
@@ -177,8 +170,8 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
   return (
     <div className="space-y-5">
       <p className="max-w-3xl text-sm text-black/60">
-        A deck is not a bag of slides. This engine plans a whole run for one brand scope: every slide
-        is arbitrated with the division's own spec (approved light/dark packs, ground recipe,
+        A deck is not a bag of slides. This engine plans a whole run for one brand scope: every
+        slide is arbitrated with the division's own spec (approved light/dark packs, ground recipe,
         conformance set) plus the winners of the previous slides as neighbour context, so rhythm is
         earned across the sequence instead of inside a single card.
       </p>
@@ -408,7 +401,9 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
                         <Chip tone="ok">planned</Chip>
                       ) : (
                         <Chip tone="warn">
-                          {s.plannedVariantId ? `swapped from ${s.plannedVariantId}` : "added by QA"}
+                          {s.plannedVariantId
+                            ? `swapped from ${s.plannedVariantId}`
+                            : "added by QA"}
                         </Chip>
                       )}
                     </td>
@@ -427,12 +422,9 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
         </div>
       )}
 
-      {(staged || walk) && <QaFitPanel deckId={(staged?.deckId ?? walk!.deckId)} ink={ink} />}
+      {(staged || walk) && <QaFitPanel deckId={staged?.deckId ?? walk!.deckId} ink={ink} />}
 
       {walk && <DeckApprovalPanel walk={walk} ink={ink} />}
-
-
-
 
       {previews && built.length > 0 && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -443,15 +435,15 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
             >
               <Suspense fallback={<div className="aspect-[16/9] w-full bg-black/5" />}>
                 <ScaledSlide>
-                <ExactSlideStage
-                  slide={item.slide}
-                  variant={item.variant}
-                  brand={item.brand}
-                  mode={item.mode}
-                  pack={item.pack}
-                  industryId={item.plan.recipe}
-                  pageNumber={item.plan.index + 1}
-                />
+                  <ExactSlideStage
+                    slide={item.slide}
+                    variant={item.variant}
+                    brand={item.brand}
+                    mode={item.mode}
+                    pack={item.pack}
+                    industryId={item.plan.recipe}
+                    pageNumber={item.plan.index + 1}
+                  />
                 </ScaledSlide>
               </Suspense>
               <div className="flex items-baseline justify-between px-4 py-2 font-mono text-[11px] text-black/50">
@@ -545,7 +537,8 @@ export function DivisionFitPanel({ ink }: { ink: string }) {
                       <ul className="mt-2 space-y-1 text-xs text-black/55">
                         {audit.checks.map((c) => (
                           <li key={c.id}>
-                            {c.ok ? "✓" : "✕"} {c.label} · <span className="font-mono">{c.detail}</span>
+                            {c.ok ? "✓" : "✕"} {c.label} ·{" "}
+                            <span className="font-mono">{c.detail}</span>
                           </li>
                         ))}
                       </ul>

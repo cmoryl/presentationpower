@@ -470,7 +470,6 @@ function AgentThreadPage() {
   // pane is now a switchable view instead of a hidden one.
   const [mobilePane, setMobilePane] = useState<"chat" | "deck">("chat");
 
-
   // The workspace should always run from wherever it starts on the page down to
   // the bottom of the viewport, so the rails never get cut off. Measuring beats
   // a hardcoded header offset because the hero band collapses and expands.
@@ -698,7 +697,6 @@ function AgentThreadPage() {
         )}
 
         <div
-
           ref={workspaceRef}
           className="relative flex gap-3"
           style={{
@@ -829,7 +827,6 @@ function AgentThreadPage() {
           >
             <AgentDeckPreview deckId={deckId} refreshKey={refreshKey} />
           </aside>
-
         </div>
       </div>
     </AppShell>

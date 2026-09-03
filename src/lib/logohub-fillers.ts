@@ -195,4 +195,3 @@ export function clientPlaceholderItems(
   }
   return out;
 }
-

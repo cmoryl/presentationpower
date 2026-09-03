@@ -61,7 +61,10 @@ function hex(color: string, fallback = "000000"): string {
  * carries the real mark instead of a text substitute. Word gets a picture, but
  * it is the same gradient, the same stops and the same lockup as the press file.
  */
-async function flattenedGroundPng(config: AgendaConfig, px: { w: number; h: number }): Promise<Blob> {
+async function flattenedGroundPng(
+  config: AgendaConfig,
+  px: { w: number; h: number },
+): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(64, Math.round(px.w));
   canvas.height = Math.max(64, Math.round(px.h));
@@ -131,7 +134,6 @@ async function drawLockup(
   }
 }
 
-
 function agendaFaceGround(config: AgendaConfig): string {
   return (config.face ?? "dark") === "light" ? "#EEF1F7" : "#03002C";
 }
@@ -179,7 +181,9 @@ function cell(widthTwips: number, content: string): string {
  * Build the .docx. Text stays editable and keeps the printed fonts, sizes and
  * inks; the approved gradient ground is a flattened full-page picture behind it.
  */
-export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blob; notes: string[] }> {
+export async function buildAgendaDocx(
+  config: AgendaConfig,
+): Promise<{ blob: Blob; notes: string[] }> {
   const pages = agendaPages(config);
   const geo = agendaGeometry(config);
   const L = agendaLayout(pages[0]!.config);
@@ -200,23 +204,24 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
   const ground = await flattenedGroundPng(config, groundPx);
   const groundBytes = await ground.arrayBuffer();
 
-  const backgroundDrawing = (rel: string) => [
-    "<w:r><w:drawing>",
-    `<wp:anchor behindDoc="1" distT="0" distB="0" distL="0" distR="0" simplePos="0" locked="0" layoutInCell="1" allowOverlap="1" relativeHeight="0">`,
-    '<wp:simplePos x="0" y="0"/>',
-    '<wp:positionH relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionH>',
-    '<wp:positionV relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionV>',
-    `<wp:extent cx="${Math.round(geo.trimW * EMU_PER_MM)}" cy="${Math.round(geo.trimH * EMU_PER_MM)}"/>`,
-    '<wp:effectExtent l="0" t="0" r="0" b="0"/>',
-    '<wp:wrapNone/>',
-    '<wp:docPr id="1" name="Approved NEXT ground" descr="Flattened approved NEXT gradient ground"/>',
-    "<a:graphic xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\"><a:graphicData uri=\"http://schemas.openxmlformats.org/drawingml/2006/picture\">",
-    '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
-    '<pic:nvPicPr><pic:cNvPr id="1" name="ground.png"/><pic:cNvPicPr/></pic:nvPicPr>',
-    `<pic:blipFill><a:blip r:embed="${rel}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>`,
-    `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${Math.round(geo.trimW * EMU_PER_MM)}" cy="${Math.round(geo.trimH * EMU_PER_MM)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>`,
-    "</pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>",
-  ].join("");
+  const backgroundDrawing = (rel: string) =>
+    [
+      "<w:r><w:drawing>",
+      `<wp:anchor behindDoc="1" distT="0" distB="0" distL="0" distR="0" simplePos="0" locked="0" layoutInCell="1" allowOverlap="1" relativeHeight="0">`,
+      '<wp:simplePos x="0" y="0"/>',
+      '<wp:positionH relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionH>',
+      '<wp:positionV relativeFrom="page"><wp:posOffset>0</wp:posOffset></wp:positionV>',
+      `<wp:extent cx="${Math.round(geo.trimW * EMU_PER_MM)}" cy="${Math.round(geo.trimH * EMU_PER_MM)}"/>`,
+      '<wp:effectExtent l="0" t="0" r="0" b="0"/>',
+      "<wp:wrapNone/>",
+      '<wp:docPr id="1" name="Approved NEXT ground" descr="Flattened approved NEXT gradient ground"/>',
+      '<a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">',
+      '<pic:nvPicPr><pic:cNvPr id="1" name="ground.png"/><pic:cNvPicPr/></pic:nvPicPr>',
+      `<pic:blipFill><a:blip r:embed="${rel}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>`,
+      `<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${Math.round(geo.trimW * EMU_PER_MM)}" cy="${Math.round(geo.trimH * EMU_PER_MM)}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>`,
+      "</pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing></w:r>",
+    ].join("");
 
   const timeW = contentTwips * 0.17;
   const trackW = contentTwips * 0.2;
@@ -241,16 +246,21 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
             { afterTwips: 20 },
           ),
           (session.detail ?? "").trim()
-            ? para(run(session.detail, { size: halfPt(PL.detailSize), color: rowInk }), { afterTwips: 0 })
+            ? para(run(session.detail, { size: halfPt(PL.detailSize), color: rowInk }), {
+                afterTwips: 0,
+              })
             : "",
         ].join("");
         return [
           "<w:tr>",
           cell(
             timeW,
-            para(run(session.time ?? "", { size: halfPt(PL.timeSize), color: rowInk, bold: true }), {
-              afterTwips: 0,
-            }),
+            para(
+              run(session.time ?? "", { size: halfPt(PL.timeSize), color: rowInk, bold: true }),
+              {
+                afterTwips: 0,
+              },
+            ),
           ),
           cell(bodyW, body),
           cell(
@@ -274,7 +284,7 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
       "<w:tbl><w:tblPr>",
       `<w:tblW w:w="${Math.round(contentTwips)}" w:type="dxa"/>`,
       '<w:tblBorders><w:insideH w:val="single" w:sz="2" w:color="7F8798"/></w:tblBorders>',
-      "<w:tblLayout w:type=\"fixed\"/></w:tblPr>",
+      '<w:tblLayout w:type="fixed"/></w:tblPr>',
       "<w:tblGrid>",
       `<w:gridCol w:w="${Math.round(timeW)}"/><w:gridCol w:w="${Math.round(bodyW)}"/><w:gridCol w:w="${Math.round(trackW)}"/>`,
       "</w:tblGrid>",
@@ -296,7 +306,12 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
           )
         : "",
       para(
-        run(cfg.title ?? "", { size: halfPt(PL.titleSize), color: pageTitleHex, bold: true, spacing: -20 }),
+        run(cfg.title ?? "", {
+          size: halfPt(PL.titleSize),
+          color: pageTitleHex,
+          bold: true,
+          spacing: -20,
+        }),
         { afterTwips: 80 },
       ),
       (cfg.meta ?? "").trim()
@@ -319,7 +334,13 @@ export async function buildAgendaDocx(config: AgendaConfig): Promise<{ blob: Blo
         : "",
       (cfg.pageLabel ?? "").trim()
         ? para(
-            run(cfg.pageLabel ?? "", { size: halfPt(PL.footSize), color: inkHex, caps: true, bold: true, spacing: 30 }),
+            run(cfg.pageLabel ?? "", {
+              size: halfPt(PL.footSize),
+              color: inkHex,
+              caps: true,
+              bold: true,
+              spacing: 30,
+            }),
             { afterTwips: 0, align: "right" },
           )
         : "",

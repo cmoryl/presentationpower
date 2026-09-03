@@ -1,7 +1,7 @@
 // Scale rail — the MSA right-hand rail: big values over small labels, stacked
 // with hairlines. Reads as "languages / linguists / cities / studies".
 import type { PrintTableSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass, MODULE, safeList} from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE, safeList } from "../shared";
 
 export function TableScaleRail({
   section,

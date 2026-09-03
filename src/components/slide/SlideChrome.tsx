@@ -20,7 +20,6 @@ import {
   brandSystemLightGround,
 } from "@/lib/brand-system-template";
 
-
 import { useStylePack } from "@/components/slide/StylePackContext";
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { skinCodeFromPackId } from "@/lib/design-skin-pack";
@@ -515,7 +514,12 @@ export function SlideFrame({
   const reducedMotion = useReducedMotion();
   const sectionMotion = (() => {
     if (!pack || !/^skin-[sr]\d{2}$/i.test(String(pack.id))) return null;
-    const o = overrideFor(String(pack.id).replace(/^skin-/i, "").toUpperCase(), packScene);
+    const o = overrideFor(
+      String(pack.id)
+        .replace(/^skin-/i, "")
+        .toUpperCase(),
+      packScene,
+    );
     if (!o || !hasMotionGround(o)) return null;
     const treatment = motionTreatment(o.videoVariant);
     if (!treatment) return null;
@@ -526,7 +530,6 @@ export function SlideFrame({
       scrim: treatment.scrim,
     };
   })();
-
 
   // A style pack is a complete master design, so it owns the page ground
   // outright: brand mesh/aurora backdrops are suppressed while one is active.
@@ -952,8 +955,8 @@ export function SlideFrame({
                   opacity: !groundReady
                     ? 0
                     : replacedGround || authoredPlateGround
-                    ? 1
-                    : packGroundDamp(pack, groundSeed),
+                      ? 1
+                      : packGroundDamp(pack, groundSeed),
                   maskImage: replacedGround ? undefined : groundMask,
                   WebkitMaskImage: replacedGround ? undefined : groundMask,
                   ...(!replacedGround && authoredPlateGround && calm.filter
@@ -1017,16 +1020,16 @@ export function SlideFrame({
               {/* 3 — scaffold: page structure for this composition. Suppressed
                   under a replaced background so no old template lines survive. */}
               {!replacedGround && (
-              <div
-                aria-hidden
-                data-decorative="true"
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background: minimalPackLayers(packLayoutLayers(pack, comp, groundSeed)).join(
-                    ", ",
-                  ),
-                }}
-              />
+                <div
+                  aria-hidden
+                  data-decorative="true"
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background: minimalPackLayers(packLayoutLayers(pack, comp, groundSeed)).join(
+                      ", ",
+                    ),
+                  }}
+                />
               )}
             </>
           );
@@ -1140,7 +1143,6 @@ export function SlideFrame({
         </>
       )}
 
-
       {/* Enterprise DARK ground — same quiet master grammar as the white page,
           rendered on the brand navy floor with two soft accent washes placed in
           the corners so copy zones stay clean. */}
@@ -1158,7 +1160,6 @@ export function SlideFrame({
           }}
         />
       )}
-
 
       {/* Brand bar (locked) — hairline accent rule, editorial not decorative.
           Enterprise White replaces the full-bleed bar with nothing at the top

@@ -140,7 +140,8 @@ export function applyPillarQrPreset(config: PillarConfig, preset: PillarQrPreset
       : sameSheet
         ? preset.qrOffsetY
         : Math.round((preset.fracY ?? 0) * trim.h);
-  const qrSize = Number.isFinite(preset.qrSize) && preset.qrSize > 0 ? preset.qrSize : config.qrSize;
+  const qrSize =
+    Number.isFinite(preset.qrSize) && preset.qrSize > 0 ? preset.qrSize : config.qrSize;
   // Older presets predate caption formatting — fall back to the live config.
   return {
     ...config,

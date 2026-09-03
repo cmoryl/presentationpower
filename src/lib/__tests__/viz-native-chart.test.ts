@@ -1,10 +1,7 @@
 // Native PowerPoint chart plans for the MV-VIZ-* kinds PowerPoint can draw for
 // real (editable series + embedded worksheet) rather than as a flat plate.
 import { describe, expect, it } from "vitest";
-import {
-  NATIVE_VIZ_VARIANT_IDS,
-  vizNativeChartPlan,
-} from "@/lib/infographics/native-chart";
+import { NATIVE_VIZ_VARIANT_IDS, vizNativeChartPlan } from "@/lib/infographics/native-chart";
 import { sampleDatasetFor } from "@/lib/infographics/sample-data";
 import { vizKindForVariant } from "@/lib/infographics/variant-kinds";
 import type { InfographicSpec } from "@/lib/infographics/spec";

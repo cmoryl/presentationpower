@@ -182,11 +182,14 @@ export function coverageCellKey(packId: string | null, mode: string): string {
  */
 export function coverageCellKeys(shape: ExportMatrixShape = exportMatrixShape()): string[] {
   const keys = EXPORT_MODES.map((m) => coverageCellKey(null, m));
-  for (const pack of shape.packs) keys.push(coverageCellKey(pack, shape.packModes[pack] ?? "light"));
+  for (const pack of shape.packs)
+    keys.push(coverageCellKey(pack, shape.packModes[pack] ?? "light"));
   return keys;
 }
 
-export function emptyCoverageLedger(shape: ExportMatrixShape = exportMatrixShape()): CoverageLedger {
+export function emptyCoverageLedger(
+  shape: ExportMatrixShape = exportMatrixShape(),
+): CoverageLedger {
   return { fingerprint: shape.fingerprint, updatedAt: new Date(0).toISOString(), cells: {} };
 }
 
@@ -307,7 +310,9 @@ export function formatCoverageGaps(report: CoverageReport): string {
     lines.push("  coverage ledger was accumulated against a different module × look matrix");
   }
   for (const gap of report.gaps.slice(0, 12)) {
-    lines.push(`  ${gap.cell}: ${gap.missing.length} module(s) never swept — e.g. ${gap.missing.slice(0, 4).join(", ")}`);
+    lines.push(
+      `  ${gap.cell}: ${gap.missing.length} module(s) never swept — e.g. ${gap.missing.slice(0, 4).join(", ")}`,
+    );
   }
   if (report.gaps.length > 12) lines.push(`  …and ${report.gaps.length - 12} more cells`);
   lines.push("");

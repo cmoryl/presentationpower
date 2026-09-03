@@ -63,7 +63,6 @@ export function clampShapeExtents(xml: string): { xml: string; fixed: number } {
   return { xml: next, fixed };
 }
 
-
 /** Re-assert invariants on the exact final package that will be downloaded. */
 export async function applyTerminalPptxHygiene(
   blob: Blob,
@@ -100,7 +99,6 @@ export async function applyTerminalPptxHygiene(
           continue;
         }
 
-
         if (/^ppt\/charts\/chart\d+\.xml$/.test(name)) {
           const file = zip.file(name);
           if (!file) continue;
@@ -136,7 +134,6 @@ export async function applyTerminalPptxHygiene(
       report.relationshipsRepaired > 0 ||
       report.invalidExtentsFixed > 0
     ) {
-
       console.info("[pptx-terminal-hygiene]", report);
     }
     return out;

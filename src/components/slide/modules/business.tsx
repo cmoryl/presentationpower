@@ -324,17 +324,17 @@ registerSlideModule({
                     </div>
                     {s(it.note) &&
                       s(it.note).trim().toLowerCase() !== s(it.label).trim().toLowerCase() && (
-                      <div
-                        className="mt-2"
-                        style={{
-                          fontSize: fillPx(20, "body"),
-                          lineHeight: 1.4,
-                          color: "color-mix(in oklab, currentColor 65%, transparent)",
-                        }}
-                      >
-                        {s(it.note)}
-                      </div>
-                    )}
+                        <div
+                          className="mt-2"
+                          style={{
+                            fontSize: fillPx(20, "body"),
+                            lineHeight: 1.4,
+                            color: "color-mix(in oklab, currentColor 65%, transparent)",
+                          }}
+                        >
+                          {s(it.note)}
+                        </div>
+                      )}
                   </div>
                 </div>
               ))}

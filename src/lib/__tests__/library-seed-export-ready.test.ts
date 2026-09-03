@@ -20,16 +20,13 @@ describe("library seeding is export-ready", () => {
     const failures: string[] = [];
     for (const brand of BRAND_MODES) {
       const brief = resolveDivisionBrief(brand);
-      const restricted = new Set(
-        BRAND_PROFILES[brand.id]?.contentScope.restrictedFamilyIds ?? [],
-      );
+      const restricted = new Set(BRAND_PROFILES[brand.id]?.contentScope.restrictedFamilyIds ?? []);
       for (const v of MODULE_VARIANTS) {
         if (restricted.has(v.familyId)) continue;
         const content = seedDivisionContent(v.id, brief, "Selected module", brand);
-        const blocking = runQa(
-          [{ id: "s", variantId: v.id, content } as never],
-          brand.id,
-        ).filter((i) => i.severity === "block");
+        const blocking = runQa([{ id: "s", variantId: v.id, content } as never], brand.id).filter(
+          (i) => i.severity === "block",
+        );
         if (blocking.length) {
           failures.push(`${brand.id}/${v.id} :: ${blocking.map((i) => i.message).join(" | ")}`);
         }

@@ -11,11 +11,7 @@
 //  3. every slide the reviewer rejects reverts to the source copy + heuristic
 //     layout, so an unapproved plan can never reach a deck.
 
-import {
-  DESIGN_CATALOG,
-  completeCoverage,
-  designReinterpretedDeck,
-} from "./reinterpret-design";
+import { DESIGN_CATALOG, completeCoverage, designReinterpretedDeck } from "./reinterpret-design";
 import type { MappedSlide } from "./pptx-mapping";
 
 export type AiSlidePlan = {

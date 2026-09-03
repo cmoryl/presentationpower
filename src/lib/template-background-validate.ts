@@ -122,7 +122,9 @@ export function validateBackgroundRefs(set: IndustryBackgroundSet): BackgroundRe
 
 /** Validate one look by code (`R03`, `skin-r03`, `S12`). */
 export function validateLookBackgroundRefs(code: string): BackgroundRefReport | null {
-  const wanted = /^skin-/i.test(code.trim()) ? code.trim().slice(-3).toUpperCase() : code.trim().toUpperCase();
+  const wanted = /^skin-/i.test(code.trim())
+    ? code.trim().slice(-3).toUpperCase()
+    : code.trim().toUpperCase();
   const set = allBackgroundSets().find((s) => s.recipeId.toUpperCase() === wanted);
   return set ? validateBackgroundRefs(set) : null;
 }

@@ -1,7 +1,7 @@
 // Feature verb cards — port of AdaptorBrief 6-card pattern. Supports 2- or
 // 3-column layouts via the `cols` prop.
 import type { PrintFeatureListSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, modulePanel, safeList} from "../shared";
+import { cq, sectionInk, MODULE, modulePanel, safeList } from "../shared";
 import { Icon, ICON_PATHS, type IconName, clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";

@@ -61,8 +61,7 @@ export function packSheetPlanes(
   const comp = opts.comp ?? packCompositionFor(seed, seed);
   const surface = packField(pack);
   const replaced =
-    opts.replaced ??
-    groundIsReplaced(backgroundCodeForPackId(String(pack.id ?? "")), seed);
+    opts.replaced ?? groundIsReplaced(backgroundCodeForPackId(String(pack.id ?? "")), seed);
   const ground = opts.layers ?? packGroundPaint(pack, seed);
   const planes: SheetPlane[] = [];
 

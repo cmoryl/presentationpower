@@ -258,13 +258,9 @@ export function PptxCertifiedCanvas({
           ) ??
           block.runs
             .slice(1)
-            .reduce<Span[]>(
-              (acc, f) => [
-                ...acc,
-                { text: ` ${f.text.trim()}`, italic: f.italic, bold: f.bold, color: `#${f.color}` },
-              ],
-              [{ text: r.text }],
-            );
+            .reduce<
+              Span[]
+            >((acc, f) => [...acc, { text: ` ${f.text.trim()}`, italic: f.italic, bold: f.bold, color: `#${f.color}` }], [{ text: r.text }]);
         return (
           <div
             key={`tx-${i}`}

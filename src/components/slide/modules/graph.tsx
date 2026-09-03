@@ -469,8 +469,6 @@ registerSlideModule({
         );
       }
 
-
-
       case "MV-GRAPH-DECADE-AREA": {
         const series = arr(c.series).map((p) => ({
           label: s(p.label),

@@ -63,7 +63,10 @@ describe("scoreSlideAccuracy", () => {
       ...base,
       continuations: [
         slide({
-          content: { title: "Proof (cont.)", items: [{ label: "Audio dubbing studios in eleven cities" }] } as never,
+          content: {
+            title: "Proof (cont.)",
+            items: [{ label: "Audio dubbing studios in eleven cities" }],
+          } as never,
           source: { bullets: [] },
         }),
       ],
@@ -90,7 +93,11 @@ describe("scoreSlideAccuracy", () => {
     });
     const bad = slide({
       content: { title: "Empty" } as never,
-      source: { index: 1, title: "Very different heading words", bullets: ["Nothing here landed at all"] },
+      source: {
+        index: 1,
+        title: "Very different heading words",
+        bullets: ["Nothing here landed at all"],
+      },
     });
     const roll = scoreDeckAccuracy([good, bad]);
     expect(roll.worst!.index).toBe(1);

@@ -224,7 +224,6 @@ function RootComponent() {
     return () => sub.subscription.unsubscribe();
   }, [queryClient, router]);
 
-
   useEffect(() => {
     installToastA11y();
     // Admin-authored templates + background overrides join the pack catalog.

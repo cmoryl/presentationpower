@@ -10,7 +10,6 @@ import { echarts, registerEchartsModules } from "@/lib/infographics/echarts-regi
 
 registerEchartsModules();
 
-
 type Props = {
   spec: InfographicSpec;
   ctx: RenderContext;

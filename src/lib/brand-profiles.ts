@@ -256,14 +256,7 @@ export const BRAND_PROFILES: Record<string, BrandProfile> = {
         "Multilingual data across 250+ languages",
         "Contributor community of 1M+ specialists",
       ],
-      caseStudyTags: [
-        "ai-training",
-        "annotation",
-        "llm",
-        "computer-vision",
-        "speech",
-        "platform",
-      ],
+      caseStudyTags: ["ai-training", "annotation", "llm", "computer-vision", "speech", "platform"],
       preferredArchetypes: ["arch-market-fit", "arch-transformation"],
       restrictedFamilyIds: ["MF-06"],
       preferredVariantIds: [

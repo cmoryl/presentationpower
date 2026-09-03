@@ -123,7 +123,6 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
   },
 };
 
-
 /**
  * Print specification, as issued with the pack. These are hard rules for the
  * London run — the app surfaces them next to every download.
@@ -1403,7 +1402,7 @@ function boothPanel(
     proof: booth.sourceFile ?? "Artwork pending",
     page: artboard.page,
     name: booth.vendor, // Keep short — dimensions are already in the spec metadata line below the card.
-    ground: (artboard.previewUrl ? "Supplied booth artwork" : "Brand ground (artwork pending)"),
+    ground: artboard.previewUrl ? "Supplied booth artwork" : "Brand ground (artwork pending)",
     style: LONDON_STYLES[booth.style] ? booth.style : "01-beam-violet-aqua",
     trimW: artboard.trimW,
     trimH: artboard.trimH,
@@ -1427,9 +1426,8 @@ function boothPanel(
   };
 }
 
-const BOOTH_ROWS: { booth: LondonBoothSpec; artboard: LondonBoothArtboard }[] = LONDON_BOOTHS.flatMap(
-  (booth) => booth.artboards.map((artboard) => ({ booth, artboard })),
-);
+const BOOTH_ROWS: { booth: LondonBoothSpec; artboard: LondonBoothArtboard }[] =
+  LONDON_BOOTHS.flatMap((booth) => booth.artboards.map((artboard) => ({ booth, artboard })));
 
 /** Panel records for every booth artboard, in booth order. */
 export const LONDON_BOOTH_PANELS: LondonPanel[] = BOOTH_ROWS.map((row, i) =>

@@ -165,10 +165,7 @@ export function authoredGround(pack: StylePack): (seed: string) => string[] {
 }
 
 /** Replacement artwork registered for this code × seed, if any. */
-export function replacedGroundUrl(
-  code: string | null | undefined,
-  seed: string,
-): string | null {
+export function replacedGroundUrl(code: string | null | undefined, seed: string): string | null {
   if (!code) return null;
   return skinBackdropOverride(
     code.toUpperCase(),

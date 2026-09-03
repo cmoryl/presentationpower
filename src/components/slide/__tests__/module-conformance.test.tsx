@@ -8,7 +8,7 @@ import { resolveBrandMode } from "@/lib/brand-profiles";
 import { MODULE_VARIANTS, type ModuleVariant } from "@/lib/taxonomy";
 import type { DeckSlide } from "@/lib/deck-store";
 
-// Families register themselves on import in VariantRenderer, 
+// Families register themselves on import in VariantRenderer,
 // but for the test we ensure the side-effect barrel is loaded.
 import "../modules/register-all";
 
@@ -18,7 +18,7 @@ const PREVIEW_TOKEN = "PREVIEW_TOKEN";
 
 const slideFor = (variant: ModuleVariant, mode: "light" | "dark"): DeckSlide => {
   const content = seedDivisionContent(variant.id, brief, PREVIEW_TOKEN, brand);
-  
+
   // Regression guard: map variants require bounds or they throw during render.
   if (variant.id.startsWith("MV-LOC-")) {
     content.latMin = content.latMin ?? 0;
@@ -68,10 +68,13 @@ describe("module conformance matrix", () => {
 
   it("claims every variant in the registry (except blank canvas)", () => {
     const unregistered = MODULE_VARIANTS.filter(
-      (v) => v.id !== "MV-CANVAS-BLANK" && !findSlideModule(v.id)
+      (v) => v.id !== "MV-CANVAS-BLANK" && !findSlideModule(v.id),
     ).map((v) => v.id);
 
-    expect(unregistered, "All functional variants must be registered to avoid legacy fallbacks").toEqual([]);
+    expect(
+      unregistered,
+      "All functional variants must be registered to avoid legacy fallbacks",
+    ).toEqual([]);
   });
 
   for (const mode of ["light", "dark"] as const) {

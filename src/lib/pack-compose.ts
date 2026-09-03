@@ -165,7 +165,6 @@ export function packCompose(pack: StylePack, moduleId?: string | null): PackComp
     ...override,
     ...modOverride,
   };
-
 }
 
 /** CSS custom properties + layout style for the module content plane. */

@@ -60,7 +60,11 @@ function RoleEditor({
 }) {
   const save = useServerFn(setUserRoles);
   const [selected, setSelected] = useState<Set<AppRole>>(
-    new Set((member.roles ?? []).filter((r): r is AppRole => (APP_ROLES as readonly string[]).includes(r))),
+    new Set(
+      (member.roles ?? []).filter((r): r is AppRole =>
+        (APP_ROLES as readonly string[]).includes(r),
+      ),
+    ),
   );
   const [saving, setSaving] = useState(false);
 

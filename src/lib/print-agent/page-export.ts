@@ -85,13 +85,10 @@ export function assertPrintPageReady(node: HTMLElement | null | undefined): HTML
  * decoded (bounded), then two frames of layout. Replaces a fixed short delay,
  * which truncated heavy pages with hero imagery.
  */
-export async function waitForPrintPageReady(
-  node: HTMLElement,
-  timeoutMs = 6000,
-): Promise<void> {
+export async function waitForPrintPageReady(node: HTMLElement, timeoutMs = 6000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   const remaining = () => Math.max(0, deadline - Date.now());
-  const cap = <T,>(p: Promise<T>) =>
+  const cap = <T>(p: Promise<T>) =>
     Promise.race([p, new Promise<void>((r) => setTimeout(r, remaining()))]);
 
   if (typeof document !== "undefined" && document.fonts) await cap(document.fonts.ready);
@@ -141,8 +138,6 @@ export async function stagePrintPageForExport(
   await waitForPrintPageReady(ready, Math.max(1000, deadline - Date.now()));
   return assertPrintPageReady(ready);
 }
-
-
 
 /** Rasterize the page at print resolution and return a PNG data URL. */
 async function rasterizePage(

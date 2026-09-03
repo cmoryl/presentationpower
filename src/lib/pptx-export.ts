@@ -803,7 +803,8 @@ export async function exportDeckToPptx(
       effectivePack({
         stylePackId: deck.context?.stylePackId ?? null,
         designRecipeId: deck.context?.designRecipeId ?? null,
-      })) || null;
+      })) ||
+    null;
   const renderBrand = activePack ? packToneBrand(brand, activePack) : brand;
 
   // Chart grammar for this run: every exported fill, stroke, gradient and track
@@ -959,7 +960,6 @@ export async function exportDeckToPptx(
     }),
   );
 
-
   // Rasterize each slide's Backgrounds & Imagery selection in parallel. This
   // covers library presets, solid/gradient/pattern, and image (upload/ai)
   // choices — everything set through the Background & Imagery panel.
@@ -1097,7 +1097,8 @@ export async function exportDeckToPptx(
   } else if (activePack && typeof document === "undefined") {
     const surface = packField(activePack).replace("#", "");
     for (let i = 0; i < backgroundPlans.length; i += 1) {
-      if (backgroundPlans[i].kind === "none") backgroundPlans[i] = { kind: "solid", color: surface };
+      if (backgroundPlans[i].kind === "none")
+        backgroundPlans[i] = { kind: "solid", color: surface };
     }
   }
 
@@ -1546,7 +1547,6 @@ export async function exportDeckToPptx(
               slideVizPalette[sl.id] = spec.theme.palette as string[];
             }
             if (svg) slideVizSvg[sl.id] = svgToDataUrl(svg);
-
           } catch {
             /* per-slide failure — falls back to title-only */
           }
@@ -1933,7 +1933,14 @@ export async function exportDeckToPptx(
       });
       try {
         if (
-          !renderAdvancedVariant(sd, slide, slidePalette, slideItemLogos[i], slideVizSvg[slide.id], slideVizPalette[slide.id])
+          !renderAdvancedVariant(
+            sd,
+            slide,
+            slidePalette,
+            slideItemLogos[i],
+            slideVizSvg[slide.id],
+            slideVizPalette[slide.id],
+          )
         ) {
           switch (kind) {
             case "cover":
@@ -2165,7 +2172,6 @@ export async function exportDeckToPptx(
           fontFace: "Geist",
         });
       }
-
 
       // Free-canvas edits paint over the module in the editor (z-40 layer), so
       // they are emitted last here as native objects at the same coordinates.
@@ -3555,7 +3561,6 @@ function renderVizNativeChart(
   variantId?: string,
   vizPalette?: string[],
 ): boolean {
-
   const raw = (c as { spec?: unknown }).spec;
   let spec: InfographicSpec | null = isInfographicSpec(raw) ? raw : null;
   if (!spec) {
@@ -3567,7 +3572,13 @@ function renderVizNativeChart(
       kind: vizKindForVariant(variantId),
       data: { rows, columns: obj(c.columns) as Record<string, string> },
       encoding: enc,
-      theme: { mode: "light", accent: p.accent, primary: p.primary, ink: p.ink, surface: p.surface },
+      theme: {
+        mode: "light",
+        accent: p.accent,
+        primary: p.primary,
+        ink: p.ink,
+        surface: p.surface,
+      },
       accessibility: { shortAlt: "", longDesc: "" },
       export: { preferredFormat: "svg" },
     };
@@ -3608,60 +3619,54 @@ function renderVizNativeChart(
     }
   };
 
-
   try {
     plan.charts.forEach((chart) => {
       const cx = box.x + chart.box.x * box.w;
       const cy = box.y + chart.box.y * box.h;
       const cw = chart.box.w * box.w;
       const chH = chart.box.h * box.h;
-      s.addChart(
-        chart.type as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0],
-        chart.data,
-        {
-          x: cx,
-          y: cy,
-          w: cw,
-          h: chH,
-          chartColors: chart.colors.map(hex),
-          barDir: chart.barDir ?? "col",
-          // The build's radar web is a translucent fill behind a strong
-          // outline. PowerPoint's filled radar has no per-series alpha, so a
-          // "filled" style exports as opaque slabs that hide the inner series —
-          // the outline style is the closer match.
-          radarStyle: chart.type === "radar" ? "marker" : undefined,
-          barGrouping: chart.stacked ? "stacked" : "clustered",
-          holeSize: chart.holeSize,
-          showLegend: plan.legend.length > 1,
-          legendPos: chart.legendPos ?? "b",
-          legendFontFace: "Geist",
-          legendFontSize: 10,
-          legendColor: bodyC(p),
-          showTitle: false,
-          showValue: !!chart.showValue,
-          dataLabelFontFace: "Geist",
-          dataLabelFontSize: 10,
-          dataLabelColor: bodyC(p),
-          catAxisLabelFontFace: "Geist",
-          catAxisLabelFontSize: 10,
-          catAxisLabelColor: bodyC(p),
-          valAxisLabelFontFace: "Geist",
-          valAxisLabelFontSize: 10,
-          valAxisLabelColor: bodyC(p),
-          valAxisHidden: !!chart.hideValAxis,
-          valAxisOrientation: chart.invertValueAxis ? "maxMin" : "minMax",
-          valAxisMinVal: chart.valueMin,
-          valAxisMaxVal: chart.valueMax,
-          valAxisMajorUnit: chart.majorUnit,
-          catGridLine: { style: "none" },
-          valGridLine: { color: trackC(p), style: "solid", size: 1 },
-          lineSmooth: !!chart.lineSmooth,
-          lineDataSymbol: chart.type === "line" ? "circle" : "none",
-          lineDataSymbolSize: 6,
-          lineSize: 3,
-
-        } as Parameters<PptxGenJS.Slide["addChart"]>[2],
-      );
+      s.addChart(chart.type as unknown as Parameters<PptxGenJS.Slide["addChart"]>[0], chart.data, {
+        x: cx,
+        y: cy,
+        w: cw,
+        h: chH,
+        chartColors: chart.colors.map(hex),
+        barDir: chart.barDir ?? "col",
+        // The build's radar web is a translucent fill behind a strong
+        // outline. PowerPoint's filled radar has no per-series alpha, so a
+        // "filled" style exports as opaque slabs that hide the inner series —
+        // the outline style is the closer match.
+        radarStyle: chart.type === "radar" ? "marker" : undefined,
+        barGrouping: chart.stacked ? "stacked" : "clustered",
+        holeSize: chart.holeSize,
+        showLegend: plan.legend.length > 1,
+        legendPos: chart.legendPos ?? "b",
+        legendFontFace: "Geist",
+        legendFontSize: 10,
+        legendColor: bodyC(p),
+        showTitle: false,
+        showValue: !!chart.showValue,
+        dataLabelFontFace: "Geist",
+        dataLabelFontSize: 10,
+        dataLabelColor: bodyC(p),
+        catAxisLabelFontFace: "Geist",
+        catAxisLabelFontSize: 10,
+        catAxisLabelColor: bodyC(p),
+        valAxisLabelFontFace: "Geist",
+        valAxisLabelFontSize: 10,
+        valAxisLabelColor: bodyC(p),
+        valAxisHidden: !!chart.hideValAxis,
+        valAxisOrientation: chart.invertValueAxis ? "maxMin" : "minMax",
+        valAxisMinVal: chart.valueMin,
+        valAxisMaxVal: chart.valueMax,
+        valAxisMajorUnit: chart.majorUnit,
+        catGridLine: { style: "none" },
+        valGridLine: { color: trackC(p), style: "solid", size: 1 },
+        lineSmooth: !!chart.lineSmooth,
+        lineDataSymbol: chart.type === "line" ? "circle" : "none",
+        lineDataSymbolSize: 6,
+        lineSize: 3,
+      } as Parameters<PptxGenJS.Slide["addChart"]>[2]);
       if (chart.centerValue) {
         s.addText(chart.centerValue, {
           x: cx,
@@ -3717,12 +3722,9 @@ function renderVizSpec(
   // Real, editable PowerPoint charts for the kinds PowerPoint can actually
   // draw (waterfall, stacked area, radar, slope/bump, gauge grid). Everything
   // else keeps the design-exact vector plate below.
-  if (
-    renderVizNativeChart(s, c, p, { x: VIZ_BOX.x, y, w: VIZ_BOX.w, h }, variantId, vizPalette)
-  ) {
+  if (renderVizNativeChart(s, c, p, { x: VIZ_BOX.x, y, w: VIZ_BOX.w, h }, variantId, vizPalette)) {
     // native chart emitted
   } else if (vizSvg) {
-
     s.addImage({
       data: vizSvg,
       x: VIZ_BOX.x,
@@ -3758,7 +3760,6 @@ function renderVizSpec(
     });
   }
 }
-
 
 // 1. MV-BENTO-5 / 6 / 7 / 8 — asymmetric bento mosaics
 // The area matrices mirror the on-screen renderer exactly, so an exported deck
@@ -4050,7 +4051,6 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
         );
       }
 
-
       g.addText(str(it.label).toUpperCase(), {
         x: cell.x + pad,
         y: cell.y + cell.h - pad - 0.34,
@@ -4120,7 +4120,6 @@ function renderBento5(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette
       });
     }
   });
-
 }
 
 // 1b. MV-BENTO-VALUE-CLOSE — promise band, value grid, close band.
@@ -5000,7 +4999,6 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
         margin: 0,
       });
     }
-
   });
   const axis = str(c.axisLabel) || "PROGRAM MATURITY";
   s.addText(axis.toUpperCase(), {
@@ -5610,15 +5608,22 @@ function renderNumbersTriptych(s: PptxGenJS.Slide, c: Record<string, unknown>, p
       fontFace: "Geist",
       charSpacing: 2,
     });
-    s.addText(statRuns(str(it.value) || "—", str(it.unit), { size: PT(108), unitSize: PT(52), color: p.ink }), {
-      x: tx,
-      y: cellY + 0.38,
-      w: tw,
-      h: 1.3,
-      fontFace: "Geist",
-      valign: "top",
-      fit: "shrink",
-    });
+    s.addText(
+      statRuns(str(it.value) || "—", str(it.unit), {
+        size: PT(108),
+        unitSize: PT(52),
+        color: p.ink,
+      }),
+      {
+        x: tx,
+        y: cellY + 0.38,
+        w: tw,
+        h: 1.3,
+        fontFace: "Geist",
+        valign: "top",
+        fit: "shrink",
+      },
+    );
     const note = str(it.note);
     if (note) {
       s.addText(note, {
@@ -11426,7 +11431,6 @@ function renderProofLogos(
   });
 }
 
-
 // ── MV-RISK-MITIGATION ── risk → mitigation paired rows
 function renderRiskMitigation(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const y0 = drawTitle(s, c, p);
@@ -12284,7 +12288,6 @@ function renderCoverMonogram(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       charSpacing: 2,
     });
 }
-
 
 // MV-OP-COVER-POSTER — theatrical, giant caps
 function renderCoverPoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
@@ -13379,5 +13382,3 @@ function renderCloseTimeline(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
 }
 
 // ── Quote family ───────────────────────────────────────────────────────
-
-

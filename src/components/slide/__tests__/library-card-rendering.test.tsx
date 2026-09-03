@@ -15,8 +15,8 @@ const brief = resolveDivisionBrief(brand);
 describe("library card rendering", () => {
   it("renders a variant inside the library card context (thumbnail + scaled)", () => {
     // Use a standard bar chart that definitely renders content
-    const variant = MODULE_VARIANTS.find(v => v.id === "MV-GRAPH-CATEGORY-BARS")!;
-    const content = seedDivisionContent(variant.id, brief, "AUDIT_TOKEN", brand);
+    const variant = MODULE_VARIANTS.find((v) => v.id === "MV-GRAPH-CATEGORY-BARS")!;
+    const content = seedDivisionContent(variant.id, brief, "Audit", brand);
     const slide: DeckSlide = {
       id: "test-card",
       position: 0,
@@ -30,36 +30,34 @@ describe("library card rendering", () => {
     const html = renderToStaticMarkup(
       <SlideThumbnailContext.Provider value={true}>
         <ScaledSlide>
-          <VariantRenderer
-            slide={slide}
-            variant={variant}
-            brand={brand}
-            pageNumber={1}
-          />
+          <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={1} />
         </ScaledSlide>
-      </SlideThumbnailContext.Provider>
+      </SlideThumbnailContext.Provider>,
     );
 
-    // Verify content made it to the output
-    expect(html).toContain("AUDIT_TOKEN");
+    // Verify seeded content made it to the output. The third argument to
+    // seedDivisionContent is a section name, not a marker injected into copy,
+    // so assert against real seeded strings instead of a sentinel token.
+    const seededText = [content.title, content.headline, content.kicker].filter(
+      (v): v is string => typeof v === "string" && v.trim().length > 3,
+    );
+    expect(seededText.length).toBeGreaterThan(0);
+    for (const text of seededText) expect(html).toContain(text);
     // Verify ScaledSlide wrappers are present
     expect(html).toContain("data-slide-stage");
   });
 
   it("survives missing optional props in library view", () => {
     const variant = MODULE_VARIANTS[0]!;
-    const slide: any = {
+    const slide = {
       variantId: variant.id,
       content: {},
-    };
+    } as unknown as DeckSlide;
 
-    expect(() => renderToStaticMarkup(
-      <VariantRenderer
-        slide={slide}
-        variant={variant}
-        brand={brand}
-        pageNumber={1}
-      />
-    )).not.toThrow();
+    expect(() =>
+      renderToStaticMarkup(
+        <VariantRenderer slide={slide} variant={variant} brand={brand} pageNumber={1} />,
+      ),
+    ).not.toThrow();
   });
 });

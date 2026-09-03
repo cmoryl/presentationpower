@@ -11,11 +11,7 @@
 import { describe, expect, it } from "vitest";
 
 import "../modules/register-all";
-import {
-  findSlideModule,
-  registeredModuleFamilies,
-  registeredModuleIds,
-} from "../module-registry";
+import { findSlideModule, registeredModuleFamilies, registeredModuleIds } from "../module-registry";
 
 const REGISTRY_KEY = Symbol.for("transperfect-element.slide-module-registry");
 

@@ -76,7 +76,9 @@ export async function fetchPptxVideo(
     const headerType = (res.headers.get("content-type") ?? "").split(";")[0].trim().toLowerCase();
     const extn = NATIVE_VIDEO_MIME[headerType] ?? extnFromUrl(url);
     if (!extn) {
-      console.warn(`[pptx-video] ${label} is not a PowerPoint-native container (${headerType || "unknown"}): ${url}`);
+      console.warn(
+        `[pptx-video] ${label} is not a PowerPoint-native container (${headerType || "unknown"}): ${url}`,
+      );
       return null;
     }
     const mime = extn === "mov" ? "video/quicktime" : extn === "m4v" ? "video/x-m4v" : "video/mp4";
@@ -111,7 +113,6 @@ type MediaSlide = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   addMedia: (opts: any) => unknown;
 };
-
 
 /**
  * Place an embedded clip edge-to-edge behind the slide's copy. Called right

@@ -68,7 +68,6 @@ function mediaCount(slide: MappedSlide): number {
   return n;
 }
 
-
 function dataCount(slide: MappedSlide): number {
   const pages = [slide, ...(slide.continuations ?? [])];
   let n = 0;
@@ -110,7 +109,8 @@ export function scoreSlideAccuracy(slide: MappedSlide): SlideAccuracy {
       .split(" ")
       .filter((w) => w.length >= 4);
     const hits = words.filter((w) => haystack.includes(w)).length;
-    const score = words.length === 0 ? (isCovered(sourceTitle, haystack) ? 1 : 0) : hits / words.length;
+    const score =
+      words.length === 0 ? (isCovered(sourceTitle, haystack) ? 1 : 0) : hits / words.length;
     facets.push({
       id: "title",
       label: "Headline",

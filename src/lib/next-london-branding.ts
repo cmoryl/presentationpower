@@ -28,11 +28,7 @@ import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
 import { londonDivisionColourway } from "@/lib/next-london-division";
-import {
-  londonLogoPlacement,
-  type LondonLogoPlacement,
-} from "@/lib/next-london-logo-placement";
-
+import { londonLogoPlacement, type LondonLogoPlacement } from "@/lib/next-london-logo-placement";
 
 /** The signage face for NEXT 2026. Bold only — no other weight is approved. */
 export const LONDON_SIGNAGE_FONT = {
@@ -148,8 +144,6 @@ export type LondonBrandingPlan = {
   lockupOn: boolean;
 };
 
-
-
 /**
  * Deterministic branding placement for a panel. The lockup is sized against the
  * TRIM box (never the bleed) and kept inside the venue safe area, so nothing
@@ -179,7 +173,8 @@ export function londonBrandingPlan(
   // Lockup width target: the mark is the hero on scenic panels, so it fills
   // most of the live area — horizontal lockups run widest, stacked marks stay
   // a little tighter on very wide trims.
-  const widthShare = orientation === "side" ? (aspect >= 4 ? 0.62 : 0.78) : aspect >= 1.6 ? 0.48 : 0.72;
+  const widthShare =
+    orientation === "side" ? (aspect >= 4 ? 0.62 : 0.78) : aspect >= 1.6 ? 0.48 : 0.72;
   const nudge = nudgeEarly;
   let logoW = liveW * widthShare * nudge.scale;
   let logoH = (art.h / art.w) * logoW;
@@ -188,7 +183,6 @@ export function londonBrandingPlan(
     logoH = maxH;
     logoW = (art.w / art.h) * logoH;
   }
-
 
   // Copy: the note-derived headline unless the location team typed their own.
   // An empty string is a deliberate "no headline on this panel".
@@ -240,11 +234,7 @@ export function londonBrandingPlan(
       copySizeMm,
       panel.bleedH - copySizeMm * 0.3,
     );
-    copyCentreMm = clamp(
-      marginX + panel.trimW / 2 + nudge.textDx * panel.trimW,
-      0,
-      panel.bleedW,
-    );
+    copyCentreMm = clamp(marginX + panel.trimW / 2 + nudge.textDx * panel.trimW, 0, panel.bleedW);
   }
 
   // QR block: a real, scannable code in vector modules. Default placement is
@@ -253,8 +243,7 @@ export function londonBrandingPlan(
   const qrSize = Math.min(liveW * 0.55, Math.min(liveW, liveH) * 0.24) * nudge.qrScale;
   // Caption size follows the code unless the designer authored a cap height,
   // matching how the pillar QR editors treat their sub-line.
-  const captionSizeMm =
-    nudge.qrCaptionSize > 0 ? nudge.qrCaptionSize : Math.max(6, qrSize * 0.11);
+  const captionSizeMm = nudge.qrCaptionSize > 0 ? nudge.qrCaptionSize : Math.max(6, qrSize * 0.11);
   const captionFont =
     PILLAR_CAPTION_FONTS.find((f) => f.id === nudge.qrCaptionFont) ?? PILLAR_CAPTION_FONTS[0]!;
   const padMm = qrSize * nudge.qrQuiet;
@@ -329,8 +318,6 @@ export function londonBrandingPlan(
     lockupOn: nudge.lockup ?? !(isBoothPanel(panel) && !!londonBoothArtworkUrl(panel.id)),
   };
 }
-
-
 
 function clamp(value: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(Math.max(lo, hi), value));

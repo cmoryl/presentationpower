@@ -41,15 +41,13 @@ function friendlyAuthError(err: unknown): string {
     return "This account still needs email confirmation. Open the link we emailed you, then sign in.";
   if (low.includes("already registered") || low.includes("already been registered"))
     return "An account already exists for that email. Sign in instead, or reset the password.";
-  if (low.includes("password should be"))
-    return "Pick a password with at least 8 characters.";
+  if (low.includes("password should be")) return "Pick a password with at least 8 characters.";
   if (low.includes("rate limit") || low.includes("too many"))
     return "Too many attempts just now. Wait a minute and try again.";
   if (low.includes("failed to fetch") || low.includes("network"))
     return "We couldn't reach the server. Check your connection and try again.";
   return raw || "Something went wrong. Try again.";
 }
-
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -164,7 +162,6 @@ function AuthPage() {
     } catch (err: unknown) {
       setError(friendlyAuthError(err));
     } finally {
-
       setBusy(false);
     }
   }

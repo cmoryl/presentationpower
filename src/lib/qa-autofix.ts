@@ -277,8 +277,7 @@ function approvedLegibleAccent(accent: string, bg: string, target = 4.5): string
   return pool
     .map((hex) => {
       const c = hexToRgb(hex) ?? [0, 0, 0];
-      const d =
-        (c[0] - from[0]) ** 2 + (c[1] - from[1]) ** 2 + (c[2] - from[2]) ** 2;
+      const d = (c[0] - from[0]) ** 2 + (c[1] - from[1]) ** 2 + (c[2] - from[2]) ** 2;
       return { hex, d };
     })
     .sort((a, b) => a.d - b.d)[0]!.hex;
@@ -358,8 +357,6 @@ function swapKeepingContent(slide: DeckSlide, next: ModuleVariant): DeckSlide | 
     content: content as SlideContent,
   };
 }
-
-
 
 /* ---------------------------------------------------------------- the engine */
 

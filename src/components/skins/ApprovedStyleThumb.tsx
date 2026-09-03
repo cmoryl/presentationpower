@@ -103,7 +103,6 @@ export function GroundPlane({
   );
 }
 
-
 export function ApprovedStyleThumb({
   pack,
   scene = "cover",
@@ -142,7 +141,13 @@ export function ApprovedStyleThumb({
         <img
           src={overrideUrl}
           alt=""
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
           loading="lazy"
         />
       ) : (

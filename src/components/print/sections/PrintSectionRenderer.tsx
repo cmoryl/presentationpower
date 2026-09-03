@@ -518,7 +518,6 @@ export function PrintSectionsStack({
   );
 }
 
-
 /** Human label for the canvas selection chip. */
 function sectionLabel(s: PrintSection): string {
   const kindLabel =

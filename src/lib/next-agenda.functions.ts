@@ -4,7 +4,6 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { canEditNextDivision } from "./next-permissions.functions";
 
-
 // Saved NEXT division agenda files. Each row is a live, re-editable agenda that
 // can be re-opened and re-exported for print at any time. RLS scopes every row
 // to its owner.
@@ -75,7 +74,11 @@ export const saveAgendaFile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((data: unknown) => versionInput.parse(data))
   .handler(async ({ data, context }) => {
-    const allowed = await canEditNextDivision(context.userId, data.divisionId, context.supabase as never);
+    const allowed = await canEditNextDivision(
+      context.userId,
+      data.divisionId,
+      context.supabase as never,
+    );
     if (!allowed) throw new Error("You are not authorized to edit agendas for this division");
     const { data: row, error } = await context.supabase
       .from("next_agenda_versions")
@@ -138,9 +141,13 @@ export const deleteAgendaFile = createServerFn({ method: "POST" })
     if (findError) throw findError;
     const isOwner = existing.user_id === context.userId;
     const allowed =
-      isOwner || (await canEditNextDivision(context.userId, existing.division_id, context.supabase as never));
+      isOwner ||
+      (await canEditNextDivision(context.userId, existing.division_id, context.supabase as never));
     if (!allowed) throw new Error("You are not authorized to delete this agenda file");
-    const { error } = await context.supabase.from("next_agenda_versions").delete().eq("id", data.id);
+    const { error } = await context.supabase
+      .from("next_agenda_versions")
+      .delete()
+      .eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });

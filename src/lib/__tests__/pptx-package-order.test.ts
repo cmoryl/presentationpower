@@ -94,5 +94,4 @@ describe("exported package ordering (PowerPoint open gate)", () => {
     // Office refuses the reverse order with PPTCannotOpenFileMetroFileCorruption.
     expect(notes).toBeGreaterThan(slides);
   });
-
 });

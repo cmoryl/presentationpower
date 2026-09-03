@@ -49,6 +49,8 @@ export function iconWellStyle(it: Record<string, unknown>) {
 /** Per-cell icon scale multiplier matching the Studio icon size stepper. */
 export function cellIconScale(it: Record<string, unknown>): number {
   return (
-    ({ xs: 0.6, sm: 0.8, md: 1, lg: 1.25, xl: 1.6, display: 2.2 }) as Record<string, number>
-  )[String(it.iconSize ?? "md")] ?? 1;
+    ({ xs: 0.6, sm: 0.8, md: 1, lg: 1.25, xl: 1.6, display: 2.2 } as Record<string, number>)[
+      String(it.iconSize ?? "md")
+    ] ?? 1
+  );
 }

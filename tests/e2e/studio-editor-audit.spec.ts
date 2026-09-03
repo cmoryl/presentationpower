@@ -25,7 +25,6 @@ type Surface = {
   commits?: boolean;
   /** set when the path is a legacy alias that must land somewhere else. */
   redirectsTo?: string;
-
 };
 
 const SURFACES: Surface[] = [

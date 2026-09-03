@@ -178,9 +178,6 @@ function remainingJobs(ledger, shape) {
   return [...house, ...looks];
 }
 
-
-
-
 async function loadManifest() {
   if (!existsSync(MANIFEST)) return null;
   try {
@@ -256,7 +253,9 @@ async function main() {
   if (RESTYLE) {
     let pending = remainingJobs(ledgerBefore, shape);
     const pendingTotal = pending.length;
-    pending = pending.filter((_, i) => SHARDS <= 1 || i % SHARDS === Math.min(Math.max(SHARD, 1), SHARDS) - 1);
+    pending = pending.filter(
+      (_, i) => SHARDS <= 1 || i % SHARDS === Math.min(Math.max(SHARD, 1), SHARDS) - 1,
+    );
     jobs = MAX_JOBS == null ? pending : pending.slice(0, MAX_JOBS);
     label = `restyle matrix · ${shape.packs.length} looks (native mode) + house light/dark × ${variants.length} modules = ${shape.jobs} cells · ${pendingTotal} still unverified · this run ${jobs.length}${SHARDS > 1 ? ` (shard ${SHARD}/${SHARDS})` : ""}`;
   } else {
@@ -283,7 +282,11 @@ async function main() {
   async function checkpoint() {
     if (writing) return writing;
     writing = (async () => {
-      const merged = mergeCoverage(ledgerBefore, rows.filter((r) => r.ok), shape);
+      const merged = mergeCoverage(
+        ledgerBefore,
+        rows.filter((r) => r.ok),
+        shape,
+      );
       await mkdir(path.dirname(PROGRESS), { recursive: true });
       await writeFile(PROGRESS, `${JSON.stringify(merged, null, 2)}\n`);
     })().finally(() => {
@@ -340,7 +343,6 @@ async function main() {
   );
   await Promise.all(slices.map((s) => worker(s)));
   console.log("");
-
 
   // ---------------------------------------------------------------------------
   // Object-tree diff: element-level comparison against the stored baseline.
@@ -446,7 +448,11 @@ async function main() {
   // matrix can be finished across many runs and the gate can tell, cell by
   // cell, whether it is actually complete.
   // ---------------------------------------------------------------------------
-  const ledger = mergeCoverage(ledgerBefore, rows.filter((r) => r.ok), shape);
+  const ledger = mergeCoverage(
+    ledgerBefore,
+    rows.filter((r) => r.ok),
+    shape,
+  );
   await mkdir(path.dirname(COVERAGE), { recursive: true });
   await writeFile(COVERAGE, `${JSON.stringify(ledger, null, 2)}\n`);
   await mkdir(path.dirname(PROGRESS), { recursive: true });
@@ -459,7 +465,9 @@ async function main() {
 
   // Coverage is now derived from the ledger, so a sampled run can never claim
   // (or silently downgrade) full coverage.
-  const sweptVariants = complete ? [] : [...new Set(ledger ? Object.values(ledger.cells).flat() : [])].sort();
+  const sweptVariants = complete
+    ? []
+    : [...new Set(ledger ? Object.values(ledger.cells).flat() : [])].sort();
   await mkdir(path.dirname(MANIFEST), { recursive: true });
   await writeFile(
     MANIFEST,
@@ -483,7 +491,6 @@ async function main() {
     `Manifest refreshed: ${path.relative(process.cwd(), MANIFEST)} (${shape.fingerprint})`,
   );
 }
-
 
 /** Mirror of the FNV-1a digest in src/lib/export-matrix.ts. */
 function fingerprintFrom(variantIds, packIds, packModes = {}) {

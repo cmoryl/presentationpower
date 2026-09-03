@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { londonBrandingPlan } from "@/lib/next-london-branding";
-import {
-  DEFAULT_LOGO_PLACEMENT,
-  setLondonLogoPlacement,
-} from "@/lib/next-london-logo-placement";
+import { DEFAULT_LOGO_PLACEMENT, setLondonLogoPlacement } from "@/lib/next-london-logo-placement";
 import { buildLondonPanelSvg } from "@/lib/next-london-revise";
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 

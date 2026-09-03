@@ -29,9 +29,7 @@ export const listMyCloudDecks = createServerFn({ method: "GET" })
 
 export const setDeckTemplateFlag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((raw) =>
-    z.object({ deckId: z.string().uuid(), isTemplate: z.boolean() }).parse(raw),
-  )
+  .validator((raw) => z.object({ deckId: z.string().uuid(), isTemplate: z.boolean() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { error } = await supabase

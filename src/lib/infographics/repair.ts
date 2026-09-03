@@ -17,7 +17,9 @@ export type RepairResult = { spec: InfographicSpec; notes: RepairNote[] };
 const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
 
 function periodOrdinal(raw: unknown): number | null {
-  const v = String(raw ?? "").trim().toLowerCase();
+  const v = String(raw ?? "")
+    .trim()
+    .toLowerCase();
   if (!v) return null;
   const iso = /^(\d{4})-(\d{2})(?:-(\d{2}))?/.exec(v);
   if (iso) return Number(iso[1]) * 372 + Number(iso[2]) * 31 + Number(iso[3] ?? 1);
@@ -112,8 +114,7 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
     const ords = rows.map((r) => periodOrdinal(r[e.x as string]));
     if (ords.every((o) => o !== null)) {
       const sorted = [...rows].sort(
-        (a, b) =>
-          (periodOrdinal(a[e.x as string]) ?? 0) - (periodOrdinal(b[e.x as string]) ?? 0),
+        (a, b) => (periodOrdinal(a[e.x as string]) ?? 0) - (periodOrdinal(b[e.x as string]) ?? 0),
       );
       if (sorted.some((r, i) => r !== rows[i])) {
         rows = sorted;
@@ -169,7 +170,8 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
     if (fixed.toLowerCase() !== c.toLowerCase()) recolored += 1;
     return fixed;
   });
-  if (nextPalette.length) theme.palette = separatePalette(Array.from(new Set(nextPalette)), surfaceHex);
+  if (nextPalette.length)
+    theme.palette = separatePalette(Array.from(new Set(nextPalette)), surfaceHex);
   const accent = guard(theme.accent ?? "#003FC7", 3);
   const primary = guard(theme.primary ?? "#003FC7", 3);
   const ink = guard(theme.ink ?? "#03002C", 4.5);
@@ -210,7 +212,7 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
         detail: `Shortened long category labels to ${shortened} characters for social.`,
       });
     }
-    if (!annotations.headline?.trim() && (!labelKey || !valueKey) ) {
+    if (!annotations.headline?.trim() && (!labelKey || !valueKey)) {
       const alt = spec.accessibility?.shortAlt?.trim();
       const fallback = (alt || spec.title || "").split(/(?<=[.!?])\s/)[0]?.trim();
       if (fallback) {
@@ -222,10 +224,14 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
       }
     }
     if (!annotations.headline?.trim() && labelKey && valueKey && rows.length > 0) {
-      const ranked = [...rows].sort((a, b) => (coerceNumber(b[valueKey]) ?? 0) - (coerceNumber(a[valueKey]) ?? 0));
+      const ranked = [...rows].sort(
+        (a, b) => (coerceNumber(b[valueKey]) ?? 0) - (coerceNumber(a[valueKey]) ?? 0),
+      );
       const top = ranked[0];
       if (top) {
-        const unit = /%|percent|share|rate/i.test(String(spec.data?.columns?.[valueKey] ?? valueKey))
+        const unit = /%|percent|share|rate/i.test(
+          String(spec.data?.columns?.[valueKey] ?? valueKey),
+        )
           ? "%"
           : "";
         annotations.headline = `${String(top[labelKey])} leads at ${coerceNumber(top[valueKey]) ?? 0}${unit}`;
@@ -255,4 +261,3 @@ export function repairVizSpec(spec: InfographicSpec, opts: RepairOptions = {}): 
 
   return { spec: repaired, notes };
 }
-

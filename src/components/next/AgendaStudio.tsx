@@ -21,7 +21,6 @@ import { exportAgendaSheet } from "@/lib/next-agenda-export";
 import { agendaFit } from "@/lib/next-agenda-fit";
 import { buildAgendaDocx } from "@/lib/next-agenda-docx";
 
-
 import {
   deleteAgendaFile,
   listAgendaFiles,
@@ -52,7 +51,6 @@ import {
   agendaProgramme,
   agendaSlug,
   agendaStyleLabel,
-
   normalizeAgendaConfig,
   withAgendaDivision,
   type AgendaConfig,
@@ -63,7 +61,10 @@ import { NEXT_CITY_SERIES, NEXT_EVENT } from "@/lib/next-event";
 const NATIVE_PX_PER_MM = 1.2;
 
 const EVENT_OPTIONS: { label: string; value: string }[] = [
-  { label: `${NEXT_EVENT.name} — ${NEXT_EVENT.city} (flagship)`, value: `${NEXT_EVENT.name} — ${NEXT_EVENT.city}` },
+  {
+    label: `${NEXT_EVENT.name} — ${NEXT_EVENT.city} (flagship)`,
+    value: `${NEXT_EVENT.name} — ${NEXT_EVENT.city}`,
+  },
   ...NEXT_CITY_SERIES.stops
     .filter((s) => s.id !== "london")
     .map((s) => ({
@@ -128,9 +129,10 @@ export function AgendaStudio({
     setConfig(initialConfig);
   }, [initialConfig]);
 
-
   const signedIn = useSignedIn();
-  const { canEdit: canEditDivision, isLoading: canEditLoading } = useCanEditNextDivision(config.divisionId);
+  const { canEdit: canEditDivision, isLoading: canEditLoading } = useCanEditNextDivision(
+    config.divisionId,
+  );
   const qc = useQueryClient();
   const list = useServerFn(listAgendaFiles);
   const create = useServerFn(saveAgendaFile);
@@ -285,7 +287,8 @@ export function AgendaStudio({
   const programmeIsStock = useMemo(
     () =>
       !config.days &&
-      JSON.stringify(config.sessions) === JSON.stringify(agendaProgramme(config.divisionId).sessions),
+      JSON.stringify(config.sessions) ===
+        JSON.stringify(agendaProgramme(config.divisionId).sessions),
     [config.days, config.sessions, config.divisionId],
   );
 
@@ -297,7 +300,10 @@ export function AgendaStudio({
       </header>
 
       {/* programme days + printed pages */}
-      <section aria-labelledby="agenda-days" className="rounded-xl border border-border bg-muted/30 p-4">
+      <section
+        aria-labelledby="agenda-days"
+        className="rounded-xl border border-border bg-muted/30 p-4"
+      >
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="min-w-0 space-y-2">
             <h2 id="agenda-days" className="text-sm font-semibold tracking-tight">
@@ -308,7 +314,9 @@ export function AgendaStudio({
                 <div
                   key={i}
                   className={`flex items-center gap-1 rounded-full border px-1 py-0.5 text-xs ${
-                    i === dayIndex ? "border-[#003FC7] bg-background font-medium" : "border-border bg-background/60"
+                    i === dayIndex
+                      ? "border-[#003FC7] bg-background font-medium"
+                      : "border-border bg-background/60"
                   }`}
                 >
                   <button
@@ -394,7 +402,9 @@ export function AgendaStudio({
                   type="button"
                   aria-pressed={i === pageIndex}
                   className={`rounded-md border px-2 py-1 text-xs ${
-                    i === pageIndex ? "border-[#003FC7] bg-background font-medium" : "border-border bg-background/60"
+                    i === pageIndex
+                      ? "border-[#003FC7] bg-background font-medium"
+                      : "border-border bg-background/60"
                   }`}
                   onClick={() => {
                     setActivePage(i);
@@ -421,7 +431,11 @@ export function AgendaStudio({
             </span>
             <span className="flex items-center gap-3">
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={guides} onChange={(e) => setGuides(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={guides}
+                  onChange={(e) => setGuides(e.target.checked)}
+                />
                 Guides
               </label>
               <label className="flex items-center gap-2">
@@ -449,14 +463,12 @@ export function AgendaStudio({
                 height: geo.bleedH * NATIVE_PX_PER_MM * previewScale,
               }}
             >
-
               <div style={{ transform: `scale(${previewScale})`, transformOrigin: "top left" }}>
                 <AgendaSheet config={pageConfig} pxPerMm={NATIVE_PX_PER_MM} guides={guides} />
               </div>
             </div>
           </div>
         </div>
-
 
         {/* controls */}
         <div className="space-y-5">
@@ -575,17 +587,29 @@ export function AgendaStudio({
 
           <div className="space-y-2">
             <Label htmlFor="agenda-eyebrow">Eyebrow</Label>
-            <Input id="agenda-eyebrow" value={config.eyebrow} onChange={(e) => set("eyebrow", e.target.value)} />
+            <Input
+              id="agenda-eyebrow"
+              value={config.eyebrow}
+              onChange={(e) => set("eyebrow", e.target.value)}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="agenda-title">Day title</Label>
-            <Input id="agenda-title" value={day.label} onChange={(e) => patchDay({ label: e.target.value })} />
+            <Input
+              id="agenda-title"
+              value={day.label}
+              onChange={(e) => patchDay({ label: e.target.value })}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="agenda-meta">Date · venue line</Label>
-            <Input id="agenda-meta" value={day.meta} onChange={(e) => patchDay({ meta: e.target.value })} />
+            <Input
+              id="agenda-meta"
+              value={day.meta}
+              onChange={(e) => patchDay({ meta: e.target.value })}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -617,7 +641,9 @@ export function AgendaStudio({
                 value={config.lockupScale}
                 onChange={(e) => set("lockupScale", Number(e.target.value))}
               />
-              <p className="text-xs text-muted-foreground">{Math.round(config.lockupScale * 100)}%</p>
+              <p className="text-xs text-muted-foreground">
+                {Math.round(config.lockupScale * 100)}%
+              </p>
             </div>
           </div>
 
@@ -679,7 +705,13 @@ export function AgendaStudio({
             <select
               id="agenda-event"
               className={selectClass}
-              value={EVENT_OPTIONS.some((o) => o.value === config.eventLabel) ? config.eventLabel : config.eventLabel ? "__other" : ""}
+              value={
+                EVENT_OPTIONS.some((o) => o.value === config.eventLabel)
+                  ? config.eventLabel
+                  : config.eventLabel
+                    ? "__other"
+                    : ""
+              }
               onChange={(e) => {
                 if (e.target.value === "__other") {
                   set("eventLabel", customEvent || "");
@@ -720,7 +752,9 @@ export function AgendaStudio({
 
             <Button
               variant="secondary"
-              disabled={signedIn !== true || saveMutation.isPending || !canEditDivision || canEditLoading}
+              disabled={
+                signedIn !== true || saveMutation.isPending || !canEditDivision || canEditLoading
+              }
               onClick={() => saveMutation.mutate()}
             >
               <Save className="mr-2 h-4 w-4" />
@@ -733,7 +767,8 @@ export function AgendaStudio({
             <p className="text-xs text-muted-foreground">Checking division editing permissions…</p>
           ) : !canEditDivision ? (
             <p className="text-xs text-muted-foreground">
-              You are not assigned as an editor for this division. Ask an admin or brand reviewer to add you.
+              You are not assigned as an editor for this division. Ask an admin or brand reviewer to
+              add you.
             </p>
           ) : null}
         </div>
@@ -792,7 +827,8 @@ export function AgendaStudio({
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">
-            {days.length > 1 ? `${day.label || `Day ${dayIndex + 1}`} programme` : "Programme"} — {day.sessions.length} rows
+            {days.length > 1 ? `${day.label || `Day ${dayIndex + 1}`} programme` : "Programme"} —{" "}
+            {day.sessions.length} rows
             <span className="ml-2 text-xs font-normal text-muted-foreground">
               of {fit.maxRows} that fit {geo.sizeName}
             </span>
@@ -802,7 +838,10 @@ export function AgendaStudio({
             size="sm"
             onClick={() =>
               patchDay({
-                sessions: [...day.sessions, { time: "", title: "New session", detail: "", track: "", muted: false }],
+                sessions: [
+                  ...day.sessions,
+                  { time: "", title: "New session", detail: "", track: "", muted: false },
+                ],
               })
             }
           >
@@ -817,7 +856,6 @@ export function AgendaStudio({
                 overRows.has(i) ? "border-destructive/60 bg-destructive/5" : "border-border"
               } ${i >= fit.maxRows ? "opacity-70" : ""}`}
             >
-
               <Input
                 aria-label={`Row ${i + 1} time`}
                 value={session.time}
@@ -852,10 +890,20 @@ export function AgendaStudio({
                   />
                   Break
                 </label>
-                <Button variant="ghost" size="icon" aria-label={`Move row ${i + 1} up`} onClick={() => moveSession(i, -1)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Move row ${i + 1} up`}
+                  onClick={() => moveSession(i, -1)}
+                >
                   <ArrowUp className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" aria-label={`Move row ${i + 1} down`} onClick={() => moveSession(i, 1)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Move row ${i + 1} down`}
+                  onClick={() => moveSession(i, 1)}
+                >
                   <ArrowDown className="h-4 w-4" />
                 </Button>
                 <Button
@@ -900,7 +948,6 @@ export function AgendaStudio({
                           the host locale/timezone, so SSR and the browser
                           produced different text and hydration failed. */}
                       {new Date(row.updated_at).toISOString().slice(0, 10)}
-
                     </p>
                   </div>
                   <div className="flex gap-2">

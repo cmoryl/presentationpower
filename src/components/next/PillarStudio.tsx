@@ -102,7 +102,10 @@ const NATIVE_PX_PER_MM = 0.72;
 
 /** Events a pillar file can be filed against. Anything else is free text. */
 const EVENT_OPTIONS: { label: string; value: string }[] = [
-  { label: `${NEXT_EVENT.name} — ${NEXT_EVENT.city} (flagship)`, value: `${NEXT_EVENT.name} — ${NEXT_EVENT.city}` },
+  {
+    label: `${NEXT_EVENT.name} — ${NEXT_EVENT.city} (flagship)`,
+    value: `${NEXT_EVENT.name} — ${NEXT_EVENT.city}`,
+  },
   ...NEXT_CITY_SERIES.stops
     .filter((s) => s.id !== "london")
     .map((s) => ({
@@ -110,7 +113,6 @@ const EVENT_OPTIONS: { label: string; value: string }[] = [
       value: `${NEXT_CITY_SERIES.name} — ${s.city}`,
     })),
 ];
-
 
 /** Output tiers. Large-format grounds are viewed at distance, so the issued
  * 36 ppi tier stays the default; the higher tiers are for close-read pillars. */
@@ -165,7 +167,6 @@ export function PillarStudio({
   /** Surface every plate change so a host can save it back onto a sign. */
   onConfigChange?: (config: PillarConfig) => void;
 }) {
-
   const [config, setConfig] = useState<PillarConfig>(() => initialConfig ?? pillarDefault());
 
   // Re-seed when the host switches which prepared sign is being edited.
@@ -179,7 +180,6 @@ export function PillarStudio({
   useEffect(() => {
     onConfigChange?.(config);
   }, [config, onConfigChange]);
-
 
   const [guides, setGuides] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -287,11 +287,6 @@ export function PillarStudio({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   });
-
-
-
-
-
 
   const signedIn = useSignedIn();
   /** Light and dark are two faces of ONE master; edits travel to both by default. */
@@ -401,7 +396,6 @@ export function PillarStudio({
   const fitScale = Math.min(0.95, 820 / (geo.bleedH * NATIVE_PX_PER_MM));
   const previewScale = fitScale * zoom;
 
-
   const runExport = async () => {
     const node = plateRef.current?.querySelector<HTMLElement>('[data-kit-asset-frame="true"]');
     if (!node) return;
@@ -442,7 +436,6 @@ export function PillarStudio({
         ? { trimW: Number(config.trimW) || geo.trimW, trimH: Number(config.trimH) || geo.trimH }
         : {}),
     }));
-
 
   // ── QR drag placement ──────────────────────────────────────────────────────
   const qrPlace = pillarQrPlacement(config);
@@ -547,7 +540,6 @@ export function PillarStudio({
     }));
   };
 
-
   const runBatchExport = async () => {
     if (batchItems.length === 0) return;
     setBatchBusy(true);
@@ -580,7 +572,6 @@ export function PillarStudio({
     }
   };
 
-
   const field =
     "w-full rounded-lg border border-black/15 bg-white px-3 py-2 text-sm text-[#03002C] outline-none focus:border-[#003FC7]";
   const label = "text-xs font-medium text-black/60";
@@ -611,7 +602,9 @@ export function PillarStudio({
                   onChange={(e) => setZoom(Number(e.target.value))}
                   aria-label="Preview zoom"
                 />
-                <span className="w-10 shrink-0 tabular-nums text-black/50">{Math.round(zoom * 100)}%</span>
+                <span className="w-10 shrink-0 tabular-nums text-black/50">
+                  {Math.round(zoom * 100)}%
+                </span>
                 <button
                   type="button"
                   onClick={() => setZoom(1)}
@@ -631,10 +624,7 @@ export function PillarStudio({
             </div>
           </div>
 
-          <div
-            className="mt-6 flex max-h-[860px] justify-center overflow-auto"
-            ref={plateRef}
-          >
+          <div className="mt-6 flex max-h-[860px] justify-center overflow-auto" ref={plateRef}>
             <div
               style={{
                 position: "relative",
@@ -817,8 +807,8 @@ export function PillarStudio({
                 onChange={(e) => setMirrorFaces(e.target.checked)}
               />
               <span>
-                Keep both faces in step — saving writes the same copy, size, QR and
-                geometry onto the {config.face === "dark" ? "light" : "dark"} face master too.
+                Keep both faces in step — saving writes the same copy, size, QR and geometry onto
+                the {config.face === "dark" ? "light" : "dark"} face master too.
               </span>
             </label>
 
@@ -1032,7 +1022,9 @@ export function PillarStudio({
                         <svg viewBox="0 0 100 100" className="mx-auto h-7 w-7" aria-hidden>
                           <path d={pillarArrowPath(a.id)} fill="#03002C" />
                         </svg>
-                        <div className="mt-1 text-[10px] leading-tight text-black/65">{a.label}</div>
+                        <div className="mt-1 text-[10px] leading-tight text-black/65">
+                          {a.label}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -1063,151 +1055,150 @@ export function PillarStudio({
             </div>
           ) : null}
 
-              {/* Placed NEXT MART artwork — modular: the supplied die-cut master
+          {/* Placed NEXT MART artwork — modular: the supplied die-cut master
                   drops onto this live sheet, everything else stays editable. */}
-              <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
-                <div className="flex items-center justify-between">
-                  <div className={label}>Placed MART artwork</div>
-                  <div className="text-[11px] text-black/50">
-                    {config.artworkId ? "vector placed" : "none"}
-                  </div>
-                </div>
-                <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
-                  Place a supplied category master on this sheet. It exports as vector shapes on
-                  its own <code>08 Placed artwork</code> layer, so the ground, lockup, headline and
-                  QR all stay live and separable in Illustrator.
-                </p>
-                <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
-                  <button
-                    type="button"
-                    onClick={() => set("artworkId", "")}
-                    className={`rounded-md border px-2 py-1.5 text-[11px] ${
-                      config.artworkId
-                        ? "border-black/10 hover:border-[#003FC7]/50"
-                        : "border-[#003FC7] bg-[#003FC7]/5 font-medium"
-                    }`}
-                  >
-                    No artwork
-                  </button>
-                  {NEXT_MART_ARTWORK.map((a) => (
-                    <button
-                      key={a.id}
-                      type="button"
-                      onClick={() => set("artworkId", a.id)}
-                      className={`rounded-md border px-2 py-1.5 text-left text-[11px] ${
-                        config.artworkId === a.id
-                          ? "border-[#003FC7] bg-[#003FC7]/5 font-medium"
-                          : "border-black/10 hover:border-[#003FC7]/50"
-                      }`}
-                    >
-                      <span className="block truncate text-[#03002C]">{a.headline}</span>
-                      <span className="block truncate text-[10px] text-black/45">{a.category}</span>
-                    </button>
-                  ))}
-                </div>
-                {config.artworkId ? (
-                  <div className="mt-2.5 space-y-2">
-                    <label className="block">
-                      <span className={label}>
-                        Artwork width · {Math.round((config.artworkWidth ?? 0.78) * 100)}% of trim
-                      </span>
-                      <input
-                        type="range"
-                        className="mt-1 w-full"
-                        min={PILLAR_ART_WIDTH.min}
-                        max={PILLAR_ART_WIDTH.max}
-                        step={PILLAR_ART_WIDTH.step}
-                        value={config.artworkWidth ?? 0.78}
-                        onChange={(e) => set("artworkWidth", Number(e.target.value))}
-                      />
-                    </label>
-                    <label className="block">
-                      <span className={label}>
-                        Artwork top ·{' '}
-                        {Math.round(pillarArtworkBox(config, martArtRatio(martArtwork(config.artworkId))).y)}{' '}
-                        mm from trim top
-                      </span>
-                      <input
-                        type="range"
-                        className="mt-1 w-full"
-                        min={0}
-                        max={Math.round(pillarGeometry(config).trimH)}
-                        step={10}
-                        value={Math.round(
-                          pillarArtworkBox(config, martArtRatio(martArtwork(config.artworkId))).y,
-                        )}
-                        onChange={(e) => set("artworkOffsetY", Number(e.target.value))}
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className="text-[11px] font-medium text-[#003FC7] underline"
-                      onClick={() => set("artworkOffsetY", null)}
-                    >
-                      Reset to default flow
-                    </button>
-                  </div>
-                ) : null}
+          <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
+            <div className="flex items-center justify-between">
+              <div className={label}>Placed MART artwork</div>
+              <div className="text-[11px] text-black/50">
+                {config.artworkId ? "vector placed" : "none"}
               </div>
+            </div>
+            <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
+              Place a supplied category master on this sheet. It exports as vector shapes on its own{" "}
+              <code>08 Placed artwork</code> layer, so the ground, lockup, headline and QR all stay
+              live and separable in Illustrator.
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+              <button
+                type="button"
+                onClick={() => set("artworkId", "")}
+                className={`rounded-md border px-2 py-1.5 text-[11px] ${
+                  config.artworkId
+                    ? "border-black/10 hover:border-[#003FC7]/50"
+                    : "border-[#003FC7] bg-[#003FC7]/5 font-medium"
+                }`}
+              >
+                No artwork
+              </button>
+              {NEXT_MART_ARTWORK.map((a) => (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => set("artworkId", a.id)}
+                  className={`rounded-md border px-2 py-1.5 text-left text-[11px] ${
+                    config.artworkId === a.id
+                      ? "border-[#003FC7] bg-[#003FC7]/5 font-medium"
+                      : "border-black/10 hover:border-[#003FC7]/50"
+                  }`}
+                >
+                  <span className="block truncate text-[#03002C]">{a.headline}</span>
+                  <span className="block truncate text-[10px] text-black/45">{a.category}</span>
+                </button>
+              ))}
+            </div>
+            {config.artworkId ? (
+              <div className="mt-2.5 space-y-2">
+                <label className="block">
+                  <span className={label}>
+                    Artwork width · {Math.round((config.artworkWidth ?? 0.78) * 100)}% of trim
+                  </span>
+                  <input
+                    type="range"
+                    className="mt-1 w-full"
+                    min={PILLAR_ART_WIDTH.min}
+                    max={PILLAR_ART_WIDTH.max}
+                    step={PILLAR_ART_WIDTH.step}
+                    value={config.artworkWidth ?? 0.78}
+                    onChange={(e) => set("artworkWidth", Number(e.target.value))}
+                  />
+                </label>
+                <label className="block">
+                  <span className={label}>
+                    Artwork top ·{" "}
+                    {Math.round(
+                      pillarArtworkBox(config, martArtRatio(martArtwork(config.artworkId))).y,
+                    )}{" "}
+                    mm from trim top
+                  </span>
+                  <input
+                    type="range"
+                    className="mt-1 w-full"
+                    min={0}
+                    max={Math.round(pillarGeometry(config).trimH)}
+                    step={10}
+                    value={Math.round(
+                      pillarArtworkBox(config, martArtRatio(martArtwork(config.artworkId))).y,
+                    )}
+                    onChange={(e) => set("artworkOffsetY", Number(e.target.value))}
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="text-[11px] font-medium text-[#003FC7] underline"
+                  onClick={() => set("artworkOffsetY", null)}
+                >
+                  Reset to default flow
+                </button>
+              </div>
+            ) : null}
+          </div>
 
-              {showMartLayouts && martLayouts.exact.length + martLayouts.other.length > 0 ? (
-                <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
-                  <div className="flex items-center justify-between">
-                    <div className={label}>NEXT MART layouts</div>
-                    <div className="text-[11px] text-black/50">{pillarQrScopeLabel(config)}</div>
-                  </div>
-                  <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
-                    Issued mart layouts for this template. Each one sets the QR block placement
-                    and caption formatting together with the wayfinding geometry — headline size,
-                    vertical run, downward offset, lockup scale and arrow — as fractions of the
-                    sheet, so switching pillar size re-lays the sign instead of needing a re-drag.
-                  </p>
-                  <ul className="mt-2 space-y-1.5">
-                    {[...martLayouts.exact, ...martLayouts.other].map((p: MartLayoutPreset) => {
-                      const tuned =
-                        p.sizes.length === 0 || p.sizes.includes(config.sizeId);
-                      const active = appliedMartLayout === p.id;
-                      return (
-                        <li key={p.id}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
-                              setConfig((c) => applyMartLayout(c, p));
-                              setAppliedMartLayout(p.id);
-                              toast.success(`Applied “${p.name}”`, {
-                                description: martLayoutSummary(p, config),
-                              });
-                            }}
-                            className={`w-full rounded-md border px-2.5 py-2 text-left ${
-                              active
-                                ? "border-[#003FC7] bg-[#003FC7]/5"
-                                : "border-black/10 hover:border-[#003FC7]/50"
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="truncate text-[11px] font-medium text-[#03002C]">
-                                {p.name}
-                              </span>
-                              {!tuned ? (
-                                <span className="shrink-0 text-[10px] text-black/45">
-                                  rescaled
-                                </span>
-                              ) : null}
-                            </div>
-                            <div className="mt-0.5 text-[11px] leading-snug text-black/55">
-                              {p.note}
-                            </div>
-                            <div className="mt-1 text-[10px] tabular-nums text-black/45">
-                              {martLayoutSummary(p, config)}
-                            </div>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              ) : null}
+          {showMartLayouts && martLayouts.exact.length + martLayouts.other.length > 0 ? (
+            <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
+              <div className="flex items-center justify-between">
+                <div className={label}>NEXT MART layouts</div>
+                <div className="text-[11px] text-black/50">{pillarQrScopeLabel(config)}</div>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-black/55">
+                Issued mart layouts for this template. Each one sets the QR block placement and
+                caption formatting together with the wayfinding geometry — headline size, vertical
+                run, downward offset, lockup scale and arrow — as fractions of the sheet, so
+                switching pillar size re-lays the sign instead of needing a re-drag.
+              </p>
+              <ul className="mt-2 space-y-1.5">
+                {[...martLayouts.exact, ...martLayouts.other].map((p: MartLayoutPreset) => {
+                  const tuned = p.sizes.length === 0 || p.sizes.includes(config.sizeId);
+                  const active = appliedMartLayout === p.id;
+                  return (
+                    <li key={p.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          pushQrHistory({ x: config.qrOffsetX, y: config.qrOffsetY });
+                          setConfig((c) => applyMartLayout(c, p));
+                          setAppliedMartLayout(p.id);
+                          toast.success(`Applied “${p.name}”`, {
+                            description: martLayoutSummary(p, config),
+                          });
+                        }}
+                        className={`w-full rounded-md border px-2.5 py-2 text-left ${
+                          active
+                            ? "border-[#003FC7] bg-[#003FC7]/5"
+                            : "border-black/10 hover:border-[#003FC7]/50"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="truncate text-[11px] font-medium text-[#03002C]">
+                            {p.name}
+                          </span>
+                          {!tuned ? (
+                            <span className="shrink-0 text-[10px] text-black/45">rescaled</span>
+                          ) : null}
+                        </div>
+                        <div className="mt-0.5 text-[11px] leading-snug text-black/55">
+                          {p.note}
+                        </div>
+                        <div className="mt-1 text-[10px] tabular-nums text-black/45">
+                          {martLayoutSummary(p, config)}
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
 
           {/* QR stylizer */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">
@@ -1371,13 +1362,8 @@ export function PillarStudio({
                     >
                       Reset to default position
                     </button>
-                    <CenterTools
-                      label="Centre code"
-                      disabled={!hasQr}
-                      onCenter={centerQr}
-                    />
+                    <CenterTools label="Centre code" disabled={!hasQr} onCenter={centerQr} />
                   </div>
-
                 </div>
 
                 <div className="rounded-lg border border-black/10 bg-white px-3 py-2.5">
@@ -1460,9 +1446,6 @@ export function PillarStudio({
                   )}
                 </div>
 
-
-
-
                 <div>
                   <div className={label}>Module style</div>
                   <div className="mt-2 grid grid-cols-3 gap-2">
@@ -1538,7 +1521,10 @@ export function PillarStudio({
                 {pillarQrScanSafe(config) ? (
                   <p className="rounded-lg bg-[#A6FA87]/30 px-3 py-2 text-[11px] font-medium text-[#03002C]">
                     Scan-safe · contrast{" "}
-                    {pillarContrastRatio(pillarQrForeground(config), pillarQrPlateColor(config)).toFixed(1)}
+                    {pillarContrastRatio(
+                      pillarQrForeground(config),
+                      pillarQrPlateColor(config),
+                    ).toFixed(1)}
                     :1 · error-correction H · quiet zone included. Encoded live from the payload and
                     drawn as vector modules, so the printed code is 100% scannable.
                   </p>
@@ -1546,9 +1532,11 @@ export function PillarStudio({
                   <div className="rounded-lg bg-[#FFEB66]/40 px-3 py-2 text-[11px] text-[#03002C]">
                     <p>
                       Low contrast (
-                      {pillarContrastRatio(pillarQrForeground(config), pillarQrPlateColor(config)).toFixed(1)}
-                      :1 — needs {PILLAR_QR_MIN_CONTRAST}:1). This pairing may not scan in the
-                      hall.
+                      {pillarContrastRatio(
+                        pillarQrForeground(config),
+                        pillarQrPlateColor(config),
+                      ).toFixed(1)}
+                      :1 — needs {PILLAR_QR_MIN_CONTRAST}:1). This pairing may not scan in the hall.
                     </p>
                     <button
                       type="button"
@@ -1587,9 +1575,8 @@ export function PillarStudio({
               ))}
             </select>
             <p className="mt-2 text-xs text-muted-foreground">
-              The press PDF/.ai is 100% vector, so it prints sharp at any size. This
-              setting only sizes the raster proof plate — up to {ppiCeiling} ppi for{" "}
-              {geo.sizeName}
+              The press PDF/.ai is 100% vector, so it prints sharp at any size. This setting only
+              sizes the raster proof plate — up to {ppiCeiling} ppi for {geo.sizeName}
               {ppiCeiling < 300 ? "; 300 ppi needs a shorter panel footprint." : "."}
             </p>
             <button
@@ -1713,8 +1700,6 @@ export function PillarStudio({
               {batchBusy ? batchStage || "Building batch…" : "Export batch package"}
             </button>
           </div>
-
-
 
           {/* Live files */}
           <div className="rounded-2xl border border-black/10 bg-white p-5 space-y-3">

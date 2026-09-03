@@ -215,4 +215,3 @@ export function separatePalette(colors: string[], surface: string): string[] {
 function vizContrastLocal(a: string, b: string): number {
   return contrast(a, b);
 }
-

@@ -105,5 +105,4 @@ describe("industry background sets", () => {
     expect(layers.slice(1)).toEqual(hostTonal);
     expect(layers.length).toBe(hostTonal.length + 1);
   });
-
 });

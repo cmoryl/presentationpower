@@ -52,7 +52,6 @@ export async function renderSpecToSvg(
   const { echarts, registerEchartsModules } = await import("./echarts-register");
   registerEchartsModules();
 
-
   const host = document.createElement("div");
   host.style.cssText = `position:fixed;left:-99999px;top:-99999px;width:${size.width}px;height:${size.height}px;pointer-events:none;`;
   document.body.appendChild(host);

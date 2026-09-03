@@ -36,9 +36,6 @@ function luminance(hex: string): number {
   return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
 }
 
-
-
-
 function mix(hex: string, target: string, amount: number): string {
   const parse = (v: string) =>
     [0, 2, 4].map((i) => parseInt(v.replace("#", "").slice(i, i + 2), 16));
@@ -59,9 +56,6 @@ function accentInk(hex: string): string {
   for (let i = 0; i < 8 && luminance(out) > 0.22; i++) out = mix(out, "#03002C", 0.22);
   return out;
 }
-
-
-
 
 export const Route = createFileRoute("/public/icons")({
   head: () => ({
@@ -94,8 +88,7 @@ function PublicIconLibrary() {
   const hero = useMemo(() => {
     // Readable ink, not the raw guide accent: pale division colours (aqua,
     // lavender, yellow) are unreadable on the white listing surface below.
-    if (slug.startsWith("next-2026"))
-      return accentInk(iconColorOptions(slug)[1]?.hex ?? "#1B3E6F");
+    if (slug.startsWith("next-2026")) return accentInk(iconColorOptions(slug)[1]?.hex ?? "#1B3E6F");
     return accentInk(guide?.secondaryColors?.[0]?.hex ?? "#003FC7");
   }, [slug, guide]);
 
@@ -124,7 +117,6 @@ function PublicIconLibrary() {
             icon, a sub-area, or the full set.
           </p>
 
-
           {/* Collapsed state: one summary row so the listings sit right under the fold. */}
           <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-black/12 bg-white p-3 pl-4">
             <span
@@ -149,7 +141,6 @@ function PublicIconLibrary() {
             >
               {pickerOpen ? "Hide icon sets" : `Browse all sets (${BRAND_ICON_SETS.length})`}
             </button>
-
           </div>
 
           {pickerOpen && (
@@ -175,93 +166,90 @@ function PublicIconLibrary() {
                     className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
                   >
                     {group.sets.map((s) => {
-                const active = s.slug === slug;
-                const accent = setAccent(s.slug);
-                // Every structural use of the accent (rail, glyph strokes, badge,
-                // ring) runs through the readable ink so pale division colours
-                // stop dissolving into the white card.
-                const ink = accentInk(accent);
-                const count = s.subAreas.reduce((n, a) => n + a.icons.length, 0);
-                const preview = s.subAreas.flatMap((a) => a.icons.slice(0, 2)).slice(0, 5);
-                return (
-                  <button
-                    key={s.slug}
-                    type="button"
-                    onClick={() => {
-                      setSlug(s.slug);
-                      setPickerOpen(false);
-                    }}
-                    aria-pressed={active}
-                    className={`group relative overflow-hidden rounded-2xl border bg-white p-4 pl-5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/50 ${
-                      active
-                        ? "border-transparent shadow-[0_12px_30px_-18px_rgba(3,0,44,0.55)]"
-                        : "border-black/12 hover:-translate-y-0.5 hover:border-black/30 hover:shadow-[0_10px_24px_-20px_rgba(3,0,44,0.6)]"
-                    }`}
-                    style={active ? { boxShadow: `0 0 0 2px ${ink} inset` } : undefined}
-                  >
-                    <span
-                      aria-hidden
-                      className="absolute inset-y-0 left-0 w-1.5"
-                      style={{ background: ink }}
-                    />
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute -right-10 -top-12 h-28 w-28 rounded-full opacity-[0.10] transition group-hover:opacity-[0.16]"
-                      style={{ background: ink }}
-                    />
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="min-w-0">
-                        <span className="block truncate text-[15px] font-semibold tracking-[-0.01em]">
-                          {s.title}
-                        </span>
-                        <span className="mt-1 block text-[11px] font-medium uppercase tracking-[0.14em] text-black/55">
-                          {count} icons · {s.subAreas.length} sub-areas
-                        </span>
-                      </span>
-                      {active && (
-                        <span
-                          className="mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
-                          style={{ background: ink, color: "#FFFFFF" }}
+                      const active = s.slug === slug;
+                      const accent = setAccent(s.slug);
+                      // Every structural use of the accent (rail, glyph strokes, badge,
+                      // ring) runs through the readable ink so pale division colours
+                      // stop dissolving into the white card.
+                      const ink = accentInk(accent);
+                      const count = s.subAreas.reduce((n, a) => n + a.icons.length, 0);
+                      const preview = s.subAreas.flatMap((a) => a.icons.slice(0, 2)).slice(0, 5);
+                      return (
+                        <button
+                          key={s.slug}
+                          type="button"
+                          onClick={() => {
+                            setSlug(s.slug);
+                            setPickerOpen(false);
+                          }}
+                          aria-pressed={active}
+                          className={`group relative overflow-hidden rounded-2xl border bg-white p-4 pl-5 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#003FC7]/50 ${
+                            active
+                              ? "border-transparent shadow-[0_12px_30px_-18px_rgba(3,0,44,0.55)]"
+                              : "border-black/12 hover:-translate-y-0.5 hover:border-black/30 hover:shadow-[0_10px_24px_-20px_rgba(3,0,44,0.6)]"
+                          }`}
+                          style={active ? { boxShadow: `0 0 0 2px ${ink} inset` } : undefined}
                         >
-                          Viewing
-                        </span>
-                      )}
-                    </span>
-                    <span className="mt-3 flex items-center gap-2">
-                      {preview.map((icon) => {
-                        const Glyph = iconByName(icon.name);
-                        if (!Glyph) return null;
-                        return (
                           <span
-                            key={icon.name}
-                            className="flex h-8 w-8 items-center justify-center rounded-lg border"
-                            style={{
-                              background: `${ink}14`,
-                              borderColor: `${ink}33`,
-                              color: ink,
-                            }}
-                          >
-                            <Glyph className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                            aria-hidden
+                            className="absolute inset-y-0 left-0 w-1.5"
+                            style={{ background: ink }}
+                          />
+                          <span
+                            aria-hidden
+                            className="pointer-events-none absolute -right-10 -top-12 h-28 w-28 rounded-full opacity-[0.10] transition group-hover:opacity-[0.16]"
+                            style={{ background: ink }}
+                          />
+                          <span className="flex items-start justify-between gap-3">
+                            <span className="min-w-0">
+                              <span className="block truncate text-[15px] font-semibold tracking-[-0.01em]">
+                                {s.title}
+                              </span>
+                              <span className="mt-1 block text-[11px] font-medium uppercase tracking-[0.14em] text-black/55">
+                                {count} icons · {s.subAreas.length} sub-areas
+                              </span>
+                            </span>
+                            {active && (
+                              <span
+                                className="mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em]"
+                                style={{ background: ink, color: "#FFFFFF" }}
+                              >
+                                Viewing
+                              </span>
+                            )}
                           </span>
-                        );
-                      })}
-                    </span>
-                  </button>
-                );
+                          <span className="mt-3 flex items-center gap-2">
+                            {preview.map((icon) => {
+                              const Glyph = iconByName(icon.name);
+                              if (!Glyph) return null;
+                              return (
+                                <span
+                                  key={icon.name}
+                                  className="flex h-8 w-8 items-center justify-center rounded-lg border"
+                                  style={{
+                                    background: `${ink}14`,
+                                    borderColor: `${ink}33`,
+                                    color: ink,
+                                  }}
+                                >
+                                  <Glyph className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                                </span>
+                              );
+                            })}
+                          </span>
+                        </button>
+                      );
                     })}
                   </nav>
                 </section>
               ))}
             </div>
           )}
-
         </div>
       </header>
 
       <div className="mx-auto max-w-6xl px-6 py-10">
-        {set && (
-          <p className="mb-6 max-w-3xl text-sm leading-relaxed text-black/70">{set.body}</p>
-        )}
+        {set && <p className="mb-6 max-w-3xl text-sm leading-relaxed text-black/70">{set.body}</p>}
         <BrandIconLibrary slug={slug} hero={hero} />
         <p className="mt-10 text-xs text-black/60">
           Approved sets only. Usage follows the TransPerfect brand guidelines — never recolour a
@@ -271,4 +259,3 @@ function PublicIconLibrary() {
     </main>
   );
 }
-

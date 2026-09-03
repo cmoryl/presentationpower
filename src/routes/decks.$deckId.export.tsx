@@ -8,7 +8,12 @@ import { useDeckStore } from "@/lib/deck-store";
 import { useDeckHydrated, DeckHydratingFallback } from "@/hooks/use-deck-hydrated";
 import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
+import {
+  DeckPackScope,
+  deckPack,
+  deckPackResolver,
+  packBrand,
+} from "@/components/slide/DeckPackScope";
 import { SlideMediaRefreshProvider } from "@/lib/slide-media-refresh";
 import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
 import { resolveBrandMode } from "@/lib/brand-profiles";
@@ -38,7 +43,6 @@ import type { ExportTelemetryReport } from "@/lib/export-telemetry";
 import type { ImageCompatReport } from "@/lib/export-image-report";
 import type { PptxValidationReport } from "@/lib/pptx-validate";
 import type { VisualValidationReport } from "@/lib/pptx-visual-validate";
-
 
 import { writeExportFidelity, type ExportFidelityId } from "@/lib/export-quality";
 import { ArrowOverlapCheck } from "@/components/export/ArrowOverlapCheck";
@@ -98,7 +102,6 @@ function ExportView() {
   const [imageReport, setImageReport] = useState<ImageCompatReport | null>(null);
   const [validationReport, setValidationReport] = useState<PptxValidationReport | null>(null);
   const [visualReport, setVisualReport] = useState<VisualValidationReport | null>(null);
-
 
   const [perf, setPerf] = useState<ExportTelemetryReport | null>(null);
   const [legacyImages, setLegacyImages] = useExportLegacyImages();
@@ -268,9 +271,8 @@ function ExportView() {
         id: progressId,
         description: "Checking slides and embedded assets.",
       });
-      const { buildExportManifest, validateExportedPptx } = await import(
-        "@/lib/pptx-validate-client"
-      );
+      const { buildExportManifest, validateExportedPptx } =
+        await import("@/lib/pptx-validate-client");
       let validation: Awaited<ReturnType<typeof validateExportedPptx>> | null = null;
       try {
         validation = await validateExportedPptx(blob, buildExportManifest(deck));
@@ -311,9 +313,8 @@ function ExportView() {
       });
       let visual: VisualValidationReport | null = null;
       try {
-        const { captureModeReferences, validateExportedPptxVisuals } = await import(
-          "@/lib/pptx-visual-validate-client"
-        );
+        const { captureModeReferences, validateExportedPptxVisuals } =
+          await import("@/lib/pptx-visual-validate-client");
         const refs = await captureModeReferences(deck, {
           onProgress: (done, total) => {
             toast.loading("Comparing exported slides with the editor…", {
@@ -543,8 +544,8 @@ function ExportView() {
                     Export <span className="text-black/40">·</span> {deck.title}
                   </h1>
                   <p className="mt-1 max-w-md text-sm text-black/60">
-                    Download a native PowerPoint file, or use your browser's print dialog to save
-                    as PDF.
+                    Download a native PowerPoint file, or use your browser's print dialog to save as
+                    PDF.
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
@@ -584,7 +585,10 @@ function ExportView() {
                     <button
                       onClick={() => {
                         if (blocked) {
-                          explainBlocked("GlobalLink upload", () => void handleShareViaGlobalLink());
+                          explainBlocked(
+                            "GlobalLink upload",
+                            () => void handleShareViaGlobalLink(),
+                          );
                           return;
                         }
                         void handleShareViaGlobalLink();
@@ -629,7 +633,6 @@ function ExportView() {
                 }
                 className="mt-5"
               />
-
 
               {/* Image compatibility options — apply to the next export. */}
               <div className="mt-5 border-t border-black/[0.06] pt-4">
@@ -822,7 +825,6 @@ function ExportView() {
                     data-arrow-check-index={i + 1}
                     data-mobile-export-slide={slide.id}
                   >
-
                     <ScaledSlide>
                       <DeckPackScope pack={packFor(slide)}>
                         <VariantRenderer
@@ -862,7 +864,10 @@ function ExportView() {
               <p className="mt-2 text-xs text-[#03002C]/70">
                 Opened the generated file on the server: {validationReport.slideCount} of{" "}
                 {validationReport.expectedSlideCount} slides,{" "}
-                {validationReport.slides.filter((s) => s.probesTotal === 0 || s.probesFound > 0).length}{" "}
+                {
+                  validationReport.slides.filter((s) => s.probesTotal === 0 || s.probesFound > 0)
+                    .length
+                }{" "}
                 slide IDs confirmed, {validationReport.mediaCount} embedded media asset
                 {validationReport.mediaCount === 1 ? "" : "s"}.
               </p>
@@ -904,8 +909,8 @@ function ExportView() {
               <p className="mt-2 text-xs text-[#03002C]/70">
                 Rendered every slide in both appearances and compared them with the artwork in the
                 file: {visualReport.checked} slide{visualReport.checked === 1 ? "" : "s"} checked,{" "}
-                {visualReport.skipped} skipped, {Math.round(visualReport.threshold * 100)}% similarity
-                required.
+                {visualReport.skipped} skipped, {Math.round(visualReport.threshold * 100)}%
+                similarity required.
               </p>
               <ul className="mt-3 space-y-1.5">
                 {visualReport.slides
@@ -937,7 +942,6 @@ function ExportView() {
           )}
 
           {coverageReport && coverageReport.total > 0 && (
-
             <section className="mt-8 rounded-2xl border border-black/10 bg-white/80 p-5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="text-sm font-semibold tracking-tight text-[#03002C]">

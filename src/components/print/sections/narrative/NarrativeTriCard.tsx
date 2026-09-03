@@ -1,7 +1,7 @@
 // Challenge / Approach / Impact triptych — the spine of every curated
 // e-brochure in the print library. Three glass cards, optional bullet rails.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, moduleCard, safeList} from "../shared";
+import { cq, sectionInk, MODULE, moduleCard, safeList } from "../shared";
 import { clampLines, type IconName } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";
@@ -121,39 +121,41 @@ export function NarrativeTriCard({
             )}
             {safeList(it.bullets).length > 0 && (
               <ul style={{ margin: `${cq(8)} 0 0`, padding: 0, listStyle: "none" }}>
-                {safeList(it.bullets).slice(0, 4).map((b, bi) => (
-                  <li
-                    key={bi}
-                    className="flex items-start"
-                    style={{ gap: cq(6), marginTop: cq(5) }}
-                  >
-                    {icons ? (
-                      <span style={{ marginTop: cq(2), flexShrink: 0 }}>
-                        <EditableIcon
-                          slot={`sec.${section.id}.bullet`}
-                          name="check"
-                          size={cq(9)}
-                          color={accent}
-                          strokeWidth={2.25}
+                {safeList(it.bullets)
+                  .slice(0, 4)
+                  .map((b, bi) => (
+                    <li
+                      key={bi}
+                      className="flex items-start"
+                      style={{ gap: cq(6), marginTop: cq(5) }}
+                    >
+                      {icons ? (
+                        <span style={{ marginTop: cq(2), flexShrink: 0 }}>
+                          <EditableIcon
+                            slot={`sec.${section.id}.bullet`}
+                            name="check"
+                            size={cq(9)}
+                            color={accent}
+                            strokeWidth={2.25}
+                          />
+                        </span>
+                      ) : (
+                        <span
+                          style={{
+                            width: cq(5),
+                            height: cq(5),
+                            borderRadius: "50%",
+                            background: accent,
+                            marginTop: cq(4),
+                            flexShrink: 0,
+                          }}
                         />
+                      )}
+                      <span style={{ fontSize: cq(9.2), lineHeight: 1.45, color: ink.faint }}>
+                        {b}
                       </span>
-                    ) : (
-                      <span
-                        style={{
-                          width: cq(5),
-                          height: cq(5),
-                          borderRadius: "50%",
-                          background: accent,
-                          marginTop: cq(4),
-                          flexShrink: 0,
-                        }}
-                      />
-                    )}
-                    <span style={{ fontSize: cq(9.2), lineHeight: 1.45, color: ink.faint }}>
-                      {b}
-                    </span>
-                  </li>
-                ))}
+                    </li>
+                  ))}
               </ul>
             )}
           </div>

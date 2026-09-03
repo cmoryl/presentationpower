@@ -22,7 +22,9 @@ import { pillarArtworkBox, pillarDefault, type PillarConfig } from "@/lib/next-p
 export function martArtwork(id: string): MartArtwork | null {
   // Locally edited or imported slots win over the shipped record, so placed
   // artwork and the vector exports always use the current production file.
-  return listMartArtwork().find((a) => a.id === id) ?? NEXT_MART_ARTWORK.find((a) => a.id === id) ?? null;
+  return (
+    listMartArtwork().find((a) => a.id === id) ?? NEXT_MART_ARTWORK.find((a) => a.id === id) ?? null
+  );
 }
 
 /** Artwork aspect ratio (width / height) on the supplied board. */

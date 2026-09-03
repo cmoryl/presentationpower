@@ -79,7 +79,9 @@ export function printCardSurface(
     backgroundSize: sizes.join(", "),
     backgroundPosition: positions.join(", "),
     backgroundRepeat: "no-repeat",
-    ...(blur ? { backdropFilter: mode === "dark" ? "blur(14px) saturate(140%)" : "blur(6px)" } : {}),
+    ...(blur
+      ? { backdropFilter: mode === "dark" ? "blur(14px) saturate(140%)" : "blur(6px)" }
+      : {}),
   };
 
   if (mode === "dark") {

@@ -50,9 +50,7 @@ export function CenterTools({
         >
           <Icon className="h-3.5 w-3.5" />
           {size === "icon" ? null : (
-            <span className="text-[11px]">
-              {key === "h" ? "H" : key === "v" ? "V" : "Auto"}
-            </span>
+            <span className="text-[11px]">{key === "h" ? "H" : key === "v" ? "V" : "Auto"}</span>
           )}
         </Button>
       ))}

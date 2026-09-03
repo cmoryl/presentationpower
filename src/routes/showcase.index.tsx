@@ -65,9 +65,9 @@ function ShowcaseIndex() {
           </p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">Preset module-set links</h1>
           <p className="mt-3 max-w-2xl text-sm text-black/65 dark:text-white/65">
-            Each link opens the module library already scoped to one brand with its template
-            applied — nothing to configure before a demo. Filters you set afterwards stay in the
-            URL, so any view you build by hand is shareable too.
+            Each link opens the module library already scoped to one brand with its template applied
+            — nothing to configure before a demo. Filters you set afterwards stay in the URL, so any
+            view you build by hand is shareable too.
           </p>
         </header>
 

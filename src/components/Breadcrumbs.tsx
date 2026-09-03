@@ -218,7 +218,6 @@ export function Breadcrumbs() {
               {c.label}
             </span>
           ) : (
-
             // TanStack Router requires typed path params for statically-typed
             // routes. Since breadcrumbs walk arbitrary URLs, cast the string
             // through the loose overload — this is safe because every href is

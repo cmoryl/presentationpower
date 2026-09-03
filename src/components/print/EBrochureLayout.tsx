@@ -114,7 +114,6 @@ export function EBrochureLayout({
     ? []
     : (Array.isArray(content.stats) ? content.stats : []).slice(0, 5);
 
-
   return (
     <SlideModeContext.Provider value={mode}>
       <SlideAccentContext.Provider value={accent}>
@@ -292,11 +291,13 @@ export function EBrochureLayout({
                               color: inkFaint,
                             }}
                           >
-                            {safeList(s.bullets).slice(0, 4).map((b, k) => (
-                              <li key={k} style={clampLines(2)}>
-                                {b}
-                              </li>
-                            ))}
+                            {safeList(s.bullets)
+                              .slice(0, 4)
+                              .map((b, k) => (
+                                <li key={k} style={clampLines(2)}>
+                                  {b}
+                                </li>
+                              ))}
                           </ul>
                         )}
                       </div>
@@ -421,24 +422,26 @@ export function EBrochureLayout({
                       >
                         {content.discover.body}
                       </p>
-                      {safeList(content.discover.bullets).slice(0, 4).map((b, k) => (
-                        <div
-                          key={k}
-                          className="flex items-center"
-                          style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}
-                        >
-                          <EditableIcon
-                            slot="eb.check"
-                            d={ICONS.check}
-                            size={cq(11)}
-                            color={accentInk}
-                            strokeWidth={2.5}
-                          />
-                          <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
-                            {b}
+                      {safeList(content.discover.bullets)
+                        .slice(0, 4)
+                        .map((b, k) => (
+                          <div
+                            key={k}
+                            className="flex items-center"
+                            style={{ gap: cq(8), marginTop: k === 0 ? cq(12) : cq(8) }}
+                          >
+                            <EditableIcon
+                              slot="eb.check"
+                              d={ICONS.check}
+                              size={cq(11)}
+                              color={accentInk}
+                              strokeWidth={2.5}
+                            />
+                            <div style={{ fontSize: cq(10), color: inkSoft, ...clampLines(2) }}>
+                              {b}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   )}
                 </div>

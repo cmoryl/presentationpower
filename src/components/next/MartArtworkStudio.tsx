@@ -32,18 +32,16 @@ function inputCls() {
 
 type Draft = MartArtwork;
 
-function ArtFields({
-  draft,
-  set,
-}: {
-  draft: Draft;
-  set: (patch: Partial<Draft>) => void;
-}) {
+function ArtFields({ draft, set }: { draft: Draft; set: (patch: Partial<Draft>) => void }) {
   return (
     <div className="grid gap-2.5 sm:grid-cols-2">
       <label className="block">
         <span className={labelCls()}>Code</span>
-        <input className={inputCls()} value={draft.code} onChange={(e) => set({ code: e.target.value })} />
+        <input
+          className={inputCls()}
+          value={draft.code}
+          onChange={(e) => set({ code: e.target.value })}
+        />
       </label>
       <label className="block">
         <span className={labelCls()}>Category</span>
@@ -116,7 +114,11 @@ function ArtFields({
       </label>
       <label className="block">
         <span className={labelCls()}>Die shape</span>
-        <input className={inputCls()} value={draft.die} onChange={(e) => set({ die: e.target.value })} />
+        <input
+          className={inputCls()}
+          value={draft.die}
+          onChange={(e) => set({ die: e.target.value })}
+        />
       </label>
       <label className="block">
         <span className={labelCls()}>Substrate</span>
@@ -210,8 +212,8 @@ function ImportRow({
         </button>
       </div>
       <p className="mt-2 text-[11px] text-black/50">
-        Drag a file or link straight onto this panel, or use the buttons. SVG or PDF/AI keeps the vector
-        layers the cutter reads. {filename ? `Current file: ${filename}` : null}
+        Drag a file or link straight onto this panel, or use the buttons. SVG or PDF/AI keeps the
+        vector layers the cutter reads. {filename ? `Current file: ${filename}` : null}
       </p>
     </div>
   );
@@ -360,8 +362,8 @@ export function MartArtworkStudio() {
             Die-cut merch boards for the London mart, straight from the Illustrator masters. Layers
             stay intact: bleed, board, icon, type and the magenta CutContour path the cutter reads.
             Every slot is editable — drop a new file in by upload or link and it maps onto the same
-            master slot, so placed artwork and the layered vector exports pick it up.{" "}
-            {list.length} designs · {panels} panels.
+            master slot, so placed artwork and the layered vector exports pick it up. {list.length}{" "}
+            designs · {panels} panels.
           </p>
         </div>
         <button

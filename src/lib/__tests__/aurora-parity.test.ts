@@ -113,7 +113,6 @@ describe("aurora parity: on-screen renderer ↔ PPTX export", () => {
     expect(light).toContain('id="aurora-white-veil"');
     expect(light).toContain('id="aurora-accent-bleed"');
     expect(dark).not.toContain('id="aurora-white-veil"');
-
   });
 
   it("is deterministic: identical (seed, brand, mode) → identical SVG payload", () => {

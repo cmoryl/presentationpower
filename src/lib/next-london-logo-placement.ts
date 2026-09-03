@@ -9,10 +9,7 @@
 
 import { useSyncExternalStore } from "react";
 
-import {
-  NEXT_LOGO_COLOURWAYS,
-  type NextLogoColourway,
-} from "@/lib/next-logo-vectors";
+import { NEXT_LOGO_COLOURWAYS, type NextLogoColourway } from "@/lib/next-logo-vectors";
 import {
   PILLAR_CAPTION_FONTS,
   type PillarCaptionAlign,
@@ -114,7 +111,6 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   groundDy: 0,
 };
 
-
 export type LondonLogoPlacementMap = Record<string, LondonLogoPlacement>;
 
 const EMPTY_PLACEMENTS: LondonLogoPlacementMap = {};
@@ -189,9 +185,7 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
       0,
     ),
     qrCaptionAlign:
-      p.qrCaptionAlign === "left" || p.qrCaptionAlign === "right"
-        ? p.qrCaptionAlign
-        : "center",
+      p.qrCaptionAlign === "left" || p.qrCaptionAlign === "right" ? p.qrCaptionAlign : "center",
     qrCaptionPad: clamp(p.qrCaptionPad, LONDON_QR_CAPTION_PAD.min, LONDON_QR_CAPTION_PAD.max, 0),
     qrTransparent: p.qrTransparent === true,
     qrInvert: p.qrInvert === true,
@@ -203,8 +197,6 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     groundDy: clamp(p.groundDy, -0.5, 0.5, 0),
   };
 }
-
-
 
 function hydrate(): void {
   if (hydrated || typeof window === "undefined") return;

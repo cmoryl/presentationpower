@@ -207,15 +207,13 @@ export const VIDEO_SLIDE_EXAMPLES: VideoSlideExample[] = [
     blurb:
       "Client proof layered over the DataForce loop — keep the scrim on so the quote stays legible.",
     content: {
-      quote:
-        "DataForce gave us evaluation data we could defend to our own model-risk committee.",
+      quote: "DataForce gave us evaluation data we could defend to our own model-risk committee.",
       attribution: "Head of Applied AI",
       role: "Global Technology Platform",
       videoUrl: DATAFORCE_HERO_VIDEO_URL,
       videoPosterUrl: DATAFORCE_HERO_POSTER_URL,
     },
   },
-
 ];
 
 export const VIDEO_EXAMPLE_VARIANT_IDS: ReadonlySet<string> = new Set(

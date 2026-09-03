@@ -362,7 +362,9 @@ function readSelectState(): { mode: boolean; ids: string[] } {
     const parsed = JSON.parse(raw) as { mode?: boolean; ids?: unknown };
     return {
       mode: Boolean(parsed.mode),
-      ids: Array.isArray(parsed.ids) ? parsed.ids.filter((x): x is string => typeof x === "string") : [],
+      ids: Array.isArray(parsed.ids)
+        ? parsed.ids.filter((x): x is string => typeof x === "string")
+        : [],
     };
   } catch {
     return { mode: false, ids: [] };
@@ -378,7 +380,6 @@ function writeSelectState(mode: boolean, ids: string[]) {
 }
 
 function Library() {
-
   const { brandModes, moduleFamilies, moduleVariants, layoutFrameworks, sectionFrameworks } =
     useTaxonomy();
   // URL is the source of truth for the shareable slice of view state, so
@@ -427,8 +428,6 @@ function Library() {
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }, []);
   const clearSelection = useCallback(() => setSelected([]), []);
-
-
 
   const [showImagery, setShowImagery] = useState(false);
   const [density, setDensity] = useState<"comfortable" | "thumb">("comfortable");
@@ -782,7 +781,6 @@ function Library() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scopeBrandId, packId, recipeId, tagIds, q, mode, search.preset]);
 
-
   function sectionForVariant(variantId: string): string {
     const v = byId(MODULE_VARIANTS, variantId);
     if (!v) return "SF-01";
@@ -911,7 +909,6 @@ function Library() {
           </div>
         </header>
 
-
         <div className="sticky top-0 z-20 -mx-2 rounded-2xl border border-black/10 bg-white/85 px-3 py-3 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#05041A]/80">
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative min-w-[220px] flex-1">
@@ -977,7 +974,7 @@ function Library() {
                 // Never call another setter *inside* the updater: React invokes
                 // updaters twice in development, which cancelled the toggle.
                 const next = !selectMode;
-                
+
                 setSelectMode(next);
                 if (!next) setSelected([]);
               }}
@@ -1299,7 +1296,6 @@ function Library() {
                   Open background directory
                 </Link>
               </div>
-
             </div>
             <StyleLookPicker
               value={packId}
@@ -1520,7 +1516,6 @@ function Library() {
                   // stay selectable; only video examples can't join a deck.
                   selectable={selectMode && !isVideo}
                   selectDisabled={selectMode && isVideo}
-
                   selected={selectedSet.has(v.id)}
                   onToggleSelect={() => toggleSelected(v.id)}
                 />
@@ -1689,7 +1684,6 @@ const VariantCard = memo(function VariantCard({
   selectDisabled?: boolean;
   selected?: boolean;
   onToggleSelect?: () => void;
-
 }) {
   const brief = useMemo(() => resolveDivisionBrief(brand), [brand]);
   const pack = useLibraryPack();
@@ -1831,7 +1825,6 @@ const VariantCard = memo(function VariantCard({
         data-variant-usage={usageCount}
         className={`group/card block w-full overflow-hidden rounded-[24px] border bg-white text-left shadow-[0_4px_6px_-1px_rgba(0,0,0,0.02),0_2px_4px_-2px_rgba(0,0,0,0.02)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_50px_-12px_rgba(3,0,44,0.15)] ${selectable && selected ? "border-[#003FC7]" : "border-slate-200 hover:border-[#003FC7]/20"} ${selectDisabled ? "opacity-45" : ""}`}
       >
-
         {isAB ? (
           <div className="m-2 grid grid-cols-2 gap-2">
             {(["light", "dark"] as const).map((m) => (
@@ -3654,7 +3647,6 @@ function VariantDetailModal({
                 canEdit={isModuleAdmin}
               />
             </div>
-
           </div>
         </div>
       </div>
@@ -4385,7 +4377,6 @@ function AddToDeckPanel({
     navigate({ to: "/decks/$deckId", params: { deckId } });
   }
 
-
   const list = useMemo(
     () =>
       Object.values(decks)
@@ -4442,7 +4433,6 @@ function AddToDeckPanel({
           </div>
         </div>
       ) : (
-
         <ul className="mt-3 space-y-1.5">
           {list.map((d) => (
             <li

@@ -50,7 +50,6 @@ import {
 } from "@/lib/print-library/org-facts";
 import { clientPlaceholderItems } from "@/lib/logohub-fillers";
 
-
 export const PRINT_SECTION_DND_MIME = "application/x-print-section";
 
 const rid = () => `sec-${Math.random().toString(36).slice(2, 10)}`;
@@ -144,7 +143,6 @@ export function makePrintStatsSection(variantId: PrintStatsVariant): PrintSectio
   return { ...base, items: ORG_STATS.slice(0, 4).map((s) => ({ ...s })) };
 }
 
-
 export function makePrintQuoteSection(variantId: PrintQuoteVariant): PrintSection {
   return {
     id: rid(),
@@ -201,7 +199,6 @@ export function makePrintExpertiseSection(variantId: PrintExpertiseVariant): Pri
     items: ORG_EXPERTISE.map((e) => ({ ...e })),
   };
 }
-
 
 export function makePrintFeatureSection(variantId: PrintFeatureVariant): PrintSection {
   const items = [
@@ -403,7 +400,6 @@ export function makePrintContactSection(variantId: PrintContactVariant): PrintSe
     phone: ORG_CONTACT.phone,
   };
 }
-
 
 export function makePrintDeviceSection(variantId: PrintDeviceVariant): PrintSection {
   const base = {

@@ -1532,7 +1532,6 @@ registerSlideModule({
                           You are here
                         </text>
                       )}
-
                     </g>
                   );
                 })}

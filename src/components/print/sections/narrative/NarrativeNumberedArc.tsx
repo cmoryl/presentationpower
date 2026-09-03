@@ -1,7 +1,7 @@
 // Numbered Challenge → Solution → Result arc. Mirrors the case-study spine:
 // large 01/02/03 markers, connective hairline, roomy body copy.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, safeList} from "../shared";
+import { cq, sectionInk, safeList } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 
 export function NarrativeNumberedArc({
@@ -92,21 +92,23 @@ export function NarrativeNumberedArc({
               )}
               {safeList(it.bullets).length > 0 && (
                 <div className="flex flex-wrap" style={{ gap: cq(6), marginTop: cq(7) }}>
-                  {safeList(it.bullets).slice(0, 4).map((b, bi) => (
-                    <span
-                      key={bi}
-                      style={{
-                        fontSize: cq(8.8),
-                        padding: `${cq(3)} ${cq(8)}`,
-                        borderRadius: cq(999),
-                        color: ink.strong,
-                        border: `1px solid color-mix(in srgb, ${accent} 30%, transparent)`,
-                        background: `color-mix(in srgb, ${accent} 12%, transparent)`,
-                      }}
-                    >
-                      {b}
-                    </span>
-                  ))}
+                  {safeList(it.bullets)
+                    .slice(0, 4)
+                    .map((b, bi) => (
+                      <span
+                        key={bi}
+                        style={{
+                          fontSize: cq(8.8),
+                          padding: `${cq(3)} ${cq(8)}`,
+                          borderRadius: cq(999),
+                          color: ink.strong,
+                          border: `1px solid color-mix(in srgb, ${accent} 30%, transparent)`,
+                          background: `color-mix(in srgb, ${accent} 12%, transparent)`,
+                        }}
+                      >
+                        {b}
+                      </span>
+                    ))}
                 </div>
               )}
             </div>

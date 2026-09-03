@@ -151,7 +151,8 @@ function SpotlightPreview() {
     const node = (mode === "light" ? lightRef : darkRef).current;
     if (!node) return;
     const exportToast = toast.loading(`Preparing ${mode} PDF export…`, {
-      description: "Rendering the spotlight at 300 DPI — you'll get a confirmation when it's saved.",
+      description:
+        "Rendering the spotlight at 300 DPI — you'll get a confirmation when it's saved.",
     });
     setBusy(mode);
     try {

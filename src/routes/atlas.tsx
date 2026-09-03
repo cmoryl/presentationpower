@@ -1348,15 +1348,13 @@ const FIT_ENGINES: Array<{ name: string; module: string; does: string }> = [
 function SystemsSegment({ ink }: { ink: string }) {
   const specs = Object.entries(DIVISION_DESIGN_SPECS);
 
-
-
   return (
     <>
       <Section title="Per-division design specs" count={specs.length}>
         <p className="mb-4 max-w-3xl text-sm text-black/60">
           Every brand scope carries its own approved light and dark packs plus an industry ground
-          recipe. Palette is deliberately not part of the spec — TransPerfect divisions all render in
-          the enterprise palette and differ by lockup, look, recipe and copy.
+          recipe. Palette is deliberately not part of the spec — TransPerfect divisions all render
+          in the enterprise palette and differ by lockup, look, recipe and copy.
         </p>
         <div className="overflow-x-auto rounded-2xl border border-black/10 bg-white">
           <table className="w-full text-left text-sm">
@@ -1421,7 +1419,6 @@ function SystemsSegment({ ink }: { ink: string }) {
       <Section title="Layout arbiter" count={SECTION_FRAMEWORKS_COUNT}>
         <ArbiterLab ink={ink} />
       </Section>
-
 
       <Section title="Division fit engine" count={specs.length}>
         <DivisionFitPanel ink={ink} />

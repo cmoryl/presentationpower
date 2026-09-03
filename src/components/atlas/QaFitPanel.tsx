@@ -195,9 +195,7 @@ export function QaFitPanel({ deckId, ink }: { deckId: string; ink: string }) {
         </ul>
       )}
       {total === 0 && (
-        <p className="mt-4 text-sm text-[#1B6B3A]">
-          Every slide in this deck passes its QA gates.
-        </p>
+        <p className="mt-4 text-sm text-[#1B6B3A]">Every slide in this deck passes its QA gates.</p>
       )}
     </div>
   );

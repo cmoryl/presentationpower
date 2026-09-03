@@ -1,7 +1,7 @@
 // "Discover" panel — short body paragraph on the left, bullet rail on the
 // right. Ported from the e-brochure / engagement-snapshot pattern.
 import type { PrintNarrativeSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, MODULE, modulePanel, safeList} from "../shared";
+import { cq, sectionInk, MODULE, modulePanel, safeList } from "../shared";
 import { clampLines } from "@/components/print/print-primitives";
 import { EditableIcon } from "@/components/print/PrintIconEdit";
 import { usePrintIcons } from "@/components/print/print-doc-mode";

@@ -3,10 +3,7 @@
 // current slide. Selection commits as a standard `library` background, so the
 // pick renders on screen and exports natively to PowerPoint.
 import { useMemo, useState } from "react";
-import {
-  skinBackdropOverride,
-  useSkinBackdropVersion,
-} from "@/lib/skin-backdrop-overrides";
+import { skinBackdropOverride, useSkinBackdropVersion } from "@/lib/skin-backdrop-overrides";
 import { Check, Columns2, Search, X } from "lucide-react";
 import type { SkinScene } from "@/lib/skin-backgrounds";
 import type { MotifFamily } from "@/lib/skin-backgrounds";

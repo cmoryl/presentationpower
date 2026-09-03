@@ -866,7 +866,6 @@ registerSlideModule({
                         {icon}
                       </>
                     )}
-
                   </div>
                 );
               })}

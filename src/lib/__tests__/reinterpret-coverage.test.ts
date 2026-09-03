@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { completeCoverage, designReinterpretedDeck, flattenContinuations } from "../reinterpret-design";
+import {
+  completeCoverage,
+  designReinterpretedDeck,
+  flattenContinuations,
+} from "../reinterpret-design";
 import type { MappedSlide } from "../pptx-mapping";
 import { mapParsedSlide } from "../pptx-mapping";
 import type { ParsedSlide } from "../pptx-import";

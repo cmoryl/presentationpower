@@ -161,7 +161,6 @@ function isMediaPic(s: Shape): boolean {
   return s.tag === "pic" && /<a:videoFile|p14:media|ppaction:\/\/media/.test(s.xml);
 }
 
-
 /** Remove planned shapes from the slide XML (right-to-left, offsets stay valid). */
 export function stripShapes(slideXml: string, drop: Shape[]): string {
   let out = slideXml;

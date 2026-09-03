@@ -20,7 +20,8 @@ const COPY = {
     body: "Measured against the FY baseline across four markets, with localisation throughput and review cycles held constant.",
   },
   long: {
-    title: "Proof the programme paid back inside two quarters across every regulated market we entered",
+    title:
+      "Proof the programme paid back inside two quarters across every regulated market we entered",
     body: "Measured against the FY baseline across four markets, with localisation throughput, review cycles and downstream rework all held constant so the delta is attributable to the programme itself rather than to seasonal demand or headcount changes in the regional teams.",
   },
 } as const;
@@ -70,8 +71,8 @@ export function ArbiterLab({ ink }: { ink: string }) {
       <p className="max-w-3xl text-sm text-black/60">
         The assembler no longer takes the first permitted layout. Change the brief below and every
         section card re-arbitrates live: each one enumerates its legal module × layout × reading
-        level combinations, prunes what the authored content cannot hold, and reports the winner with
-        its sizing guidance.
+        level combinations, prunes what the authored content cannot hold, and reports the winner
+        with its sizing guidance.
       </p>
 
       <div className="grid grid-cols-1 gap-4 rounded-2xl border border-black/10 bg-white p-5 md:grid-cols-3">
@@ -175,8 +176,8 @@ export function ArbiterLab({ ink }: { ink: string }) {
       </div>
 
       <div className="text-xs uppercase tracking-widest text-black/45">
-        {considered.toLocaleString()} legal combinations scored across{" "}
-        {SECTION_FRAMEWORKS.length} section frameworks
+        {considered.toLocaleString()} legal combinations scored across {SECTION_FRAMEWORKS.length}{" "}
+        section frameworks
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -225,7 +226,9 @@ export function ArbiterLab({ ink }: { ink: string }) {
                       <Chip tone="warn">split across {decision.canvas.suggestedSlides}</Chip>
                     )}
                     {!best.feasible && <Chip tone="warn">no exact fit</Chip>}
-                    {curatedDiffers && <Chip tone="ink">beats curated {decision.curatedVariantId}</Chip>}
+                    {curatedDiffers && (
+                      <Chip tone="ink">beats curated {decision.curatedVariantId}</Chip>
+                    )}
                   </div>
 
                   <p className="mt-3 text-xs leading-relaxed text-black/50">

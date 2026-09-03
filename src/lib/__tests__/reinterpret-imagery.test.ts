@@ -4,8 +4,7 @@ import { baselineReinterpretation } from "../reinterpret-plan";
 import { scoreSlideAccuracy } from "../reinterpret-accuracy";
 import { variantItemImageCapacity, variantSupportsImagery } from "../variant-media";
 
-const IMG = (n: number) =>
-  Array.from({ length: n }, (_, i) => `data:image/png;base64,AAAA${i}`);
+const IMG = (n: number) => Array.from({ length: n }, (_, i) => `data:image/png;base64,AAAA${i}`);
 
 function parsed(images: string[], bullets: string[] = []) {
   return {
@@ -23,7 +22,7 @@ function parsed(images: string[], bullets: string[] = []) {
 describe("imported imagery placement", () => {
   it("routes a picture-led slide onto a layout with real image slots", () => {
     const mapped = [
-      mapParsedSlide(parsed([]) , 2),
+      mapParsedSlide(parsed([]), 2),
       mapParsedSlide(parsed(IMG(3), ["Regional teams", "Local knowledge"]), 2),
     ];
     const designed = baselineReinterpretation(mapped);
@@ -31,7 +30,9 @@ describe("imported imagery placement", () => {
     const slots =
       (variantSupportsImagery(slide.variantId) ? 1 : 0) + variantItemImageCapacity(slide.variantId);
     expect(slots).toBeGreaterThan(0);
-    expect(scoreSlideAccuracy(slide).facets.find((f) => f.id === "media")!.score).toBeGreaterThan(0);
+    expect(scoreSlideAccuracy(slide).facets.find((f) => f.id === "media")!.score).toBeGreaterThan(
+      0,
+    );
   });
 
   it("counts item-level tile imagery toward the media facet", () => {

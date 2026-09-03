@@ -49,12 +49,7 @@ describe("ground resolver cohesion", () => {
 
   it("never applies the tuning twice", () => {
     const pack = stylePackById("skin-s01")!;
-    const once = resolveGroundLayers(
-      pack.ground,
-      null,
-      "scene:cover cover",
-      pack.tokens.surface,
-    );
+    const once = resolveGroundLayers(pack.ground, null, "scene:cover cover", pack.tokens.surface);
     expect(packGroundPaint(pack, "scene:cover cover")).toEqual(once);
   });
 

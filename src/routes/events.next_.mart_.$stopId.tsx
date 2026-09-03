@@ -80,8 +80,8 @@ function MartStopPage() {
             {martStopEventLabel(stop)}
             {stop.venue ? ` · ${stop.venue}` : ""}
             {stop.dates ? ` · ${stop.dates}` : ""}. Cloned from the London kit: identical pillar
-            footprints, flat trims, quantities and substrates, with this stop's shop URL, hashtag and
-            local currency swapped through the copy, QR codes and print specs.
+            footprints, flat trims, quantities and substrates, with this stop's shop URL, hashtag
+            and local currency swapped through the copy, QR codes and print specs.
           </p>
           <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[12px] tabular-nums text-black/55">
             <li>{martStopPanels(stop)} panels</li>
@@ -118,7 +118,9 @@ function MartStopPage() {
                   <div className="text-sm font-medium text-[#03002C]">{p.name}</div>
                   <div className="mt-0.5 text-[12px] text-black/55">{p.role}</div>
                   <ul className="mt-2 space-y-0.5 text-[11px] tabular-nums text-black/55">
-                    <li>Qty {p.quantity} · {p.substrate}</li>
+                    <li>
+                      Qty {p.quantity} · {p.substrate}
+                    </li>
                     <li>{p.placement}</li>
                   </ul>
                 </div>
@@ -167,8 +169,8 @@ function MartStopPage() {
             })}
           </div>
           <p className="mt-3 inline-flex items-center gap-1.5 text-[12px] text-black/50">
-            <Ruler size={13} /> Trims, substrates and finishing match the London build exactly — only
-            the stop facts change.
+            <Ruler size={13} /> Trims, substrates and finishing match the London build exactly —
+            only the stop facts change.
           </p>
         </section>
       </div>

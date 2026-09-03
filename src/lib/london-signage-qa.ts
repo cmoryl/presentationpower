@@ -34,9 +34,15 @@ function expectedRamp(panel: LondonPanel): string[] {
   return londonDivisionStops(londonPanelFamily(panel), base);
 }
 
-
 function hex(c: [number, number, number]): string {
-  return `#${c.map((v) => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+  return `#${c
+    .map((v) =>
+      Math.round(Math.max(0, Math.min(1, v)) * 255)
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")
+    .toUpperCase()}`;
 }
 
 /** Worst measured flat-tone run in the issued pack — the pass tolerance. */
@@ -302,7 +308,7 @@ export function auditAi(panel: LondonPanel, ai: string | Uint8Array): LondonQaRe
       "live shading or Illustrator-safe vector mesh",
       /\/TPGradientKind\s*\/VectorMesh/.test(text)
         ? "Illustrator-safe vector mesh"
-        : /\/ShadingType\s*[23]/.exec(text)?.[0] ?? "vector paths, no gradient marker",
+        : (/\/ShadingType\s*[23]/.exec(text)?.[0] ?? "vector paths, no gradient marker"),
       {
         warnOnly: true,
         note: "Vector-path blends print correctly but are less editable than a live shading.",
@@ -335,9 +341,9 @@ export function auditAiGradient(panel: LondonPanel, text: string): QaCheck[] {
   const ramp = expectedRamp(panel);
   const shadings = text.match(/\/Type\s*\/Shading[\s\S]*?>>\s*(?=endobj|\n\d+ 0 obj|$)/g) ?? [];
   const dict = shadings[0] ?? "";
-  const spaces = Array.from(text.matchAll(/\/ShadingType\s*\d[\s\S]{0,120}?\/ColorSpace\s*\/(\w+)/g)).map(
-    (m) => m[1]!,
-  );
+  const spaces = Array.from(
+    text.matchAll(/\/ShadingType\s*\d[\s\S]{0,120}?\/ColorSpace\s*\/(\w+)/g),
+  ).map((m) => m[1]!);
   const meshTypes = Array.from(text.matchAll(/\/ShadingType\s*([4-7])/g)).map((m) => m[1]!);
 
   const found = readShadingStops(dict);
@@ -386,8 +392,6 @@ export function auditAiGradient(panel: LondonPanel, text: string): QaCheck[] {
     ),
   ];
 }
-
-
 
 // ---------------------------------------------------------------------------
 // Raster: PNG

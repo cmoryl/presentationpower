@@ -23,8 +23,6 @@ import {
 } from "@/lib/chart-styles";
 import { useChartStyle } from "./ChartStyleContext";
 
-
-
 // Shared feathered accent gradient — drawn as a page-integrated free-form
 // fill. No panels, no boxes. Every chart references `url(#<id>-airy)`.
 export function AiryDefs({ id }: { id: string }) {
@@ -298,7 +296,6 @@ export function SeriesArea({
     </>
   );
 }
-
 
 /** Series markers in the pack's marker language. */
 export function SeriesMarkers({

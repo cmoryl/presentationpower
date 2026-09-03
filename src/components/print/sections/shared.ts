@@ -4,10 +4,7 @@
 
 import type { CSSProperties } from "react";
 
-import {
-  printCardSurface,
-  type PrintCardSurfaceOptions,
-} from "@/lib/print-card-surface";
+import { printCardSurface, type PrintCardSurfaceOptions } from "@/lib/print-card-surface";
 
 export const PRINT_PAGE_W = 816;
 

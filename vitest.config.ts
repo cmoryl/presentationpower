@@ -12,5 +12,12 @@ export default defineConfig({
   test: {
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["**/node_modules/**", "tests/e2e/**", "**/dist/**", "**/.nitro/**"],
+    // Several suites sweep whole catalogs (150+ signage panels, 200+ module
+    // variants, the full layout-arbiter combination space). They do real work,
+    // so vitest's 5s default failed purely because the catalogs grew — a
+    // timeout that looked identical to a product regression. Give them room;
+    // genuinely hung tests still fail well inside CI limits.
+    testTimeout: 120_000,
+    hookTimeout: 60_000,
   },
 });

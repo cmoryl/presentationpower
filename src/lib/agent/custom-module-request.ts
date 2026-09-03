@@ -9,10 +9,7 @@
 //
 // Pure + deterministic: every string comes from the request. Nothing invented.
 
-import {
-  proposeCustomModule,
-  type CustomModuleProposal,
-} from "@/lib/reinterpret-custom-module";
+import { proposeCustomModule, type CustomModuleProposal } from "@/lib/reinterpret-custom-module";
 import type { MappedSlide } from "@/lib/pptx-mapping";
 
 export type CustomModuleRequest = {
@@ -30,7 +27,10 @@ export type CustomModuleRequest = {
 export function authorCustomModuleFromRequest(req: CustomModuleRequest): CustomModuleProposal {
   const lines = [
     ...(req.stats ?? []).map((s) =>
-      [s.value, s.label].filter((p) => (p ?? "").trim()).join(" — ").trim(),
+      [s.value, s.label]
+        .filter((p) => (p ?? "").trim())
+        .join(" — ")
+        .trim(),
     ),
     ...(req.lines ?? []),
   ]
@@ -60,7 +60,8 @@ export function authorCustomModuleFromRequest(req: CustomModuleRequest): CustomM
   });
   return {
     ...proposal,
-    description: `Authored for a requested slide no native module could hold. ${proposal.description.split("— ").slice(1).join("— ")}`.trim(),
+    description:
+      `Authored for a requested slide no native module could hold. ${proposal.description.split("— ").slice(1).join("— ")}`.trim(),
     tags: proposal.tags.map((t) => (t === "import-gap" ? "agent-authored" : t)),
     rationale: proposal.rationale.replace("AI-authored custom module", "Authored a new module"),
   };

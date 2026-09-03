@@ -60,7 +60,10 @@ export type DivisionRunReport = {
 };
 
 /** Resolve one planned slide into a mountable, content-seeded slide record. */
-export function buildDivisionSlide(plan: DivisionSlidePlan, brandModeId: string): BuiltDivisionSlide | null {
+export function buildDivisionSlide(
+  plan: DivisionSlidePlan,
+  brandModeId: string,
+): BuiltDivisionSlide | null {
   const variantId = plan.best?.variantId;
   if (!variantId) return null;
   const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
@@ -105,7 +108,11 @@ function norm(color: string): string {
   const parts = m[1].split(",").map((p) => Number(p.trim()));
   const hex = parts
     .slice(0, 3)
-    .map((n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, "0"))
+    .map((n) =>
+      Math.max(0, Math.min(255, Math.round(n)))
+        .toString(16)
+        .padStart(2, "0"),
+    )
     .join("");
   return `#${hex}`;
 }

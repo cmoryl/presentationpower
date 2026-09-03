@@ -5,8 +5,14 @@ const slide = {
   sectionId: "SF-08",
   content: { title: "The World Runs on TransPerfect" },
   rationale: "x",
-  source: { index: 3, title: "The World Runs on TransPerfect", bullets: [], notes: "", images: Array.from({length:19},(_,i)=>`img${i}`) },
-} as any;
+  source: {
+    index: 3,
+    title: "The World Runs on TransPerfect",
+    bullets: [],
+    notes: "",
+    images: Array.from({ length: 19 }, (_, i) => `img${i}`),
+  },
+} as unknown as Parameters<typeof designReinterpretedDeck>[0][number];
 describe("logo wall force", () => {
   it("applies MV-PROOF-LOGOS when forced", () => {
     const out = designReinterpretedDeck([slide, slide], {
@@ -14,6 +20,6 @@ describe("logo wall force", () => {
       forced: { 3: true },
     });
     expect(out[1].variantId).toBe("MV-PROOF-LOGOS");
-    expect((out[1].content as any).items.length).toBeGreaterThanOrEqual(6);
+    expect((out[1].content as { items: unknown[] }).items.length).toBeGreaterThanOrEqual(6);
   });
 });

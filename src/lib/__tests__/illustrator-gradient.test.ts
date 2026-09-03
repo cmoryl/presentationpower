@@ -121,8 +121,10 @@ describe("Illustrator gradient edge cases", () => {
     expect(readShadingStops(two)).toHaveLength(2);
 
     for (const n of [3, 4, 5, 8, 12, 24]) {
-      const colors = Array.from({ length: n }, (_, i) =>
-        `#${i.toString(16).padStart(2, "0")}${(255 - i * 3).toString(16).padStart(2, "0")}C7`,
+      const colors = Array.from(
+        { length: n },
+        (_, i) =>
+          `#${i.toString(16).padStart(2, "0")}${(255 - i * 3).toString(16).padStart(2, "0")}C7`,
       );
       const dict = axialShadingDict({ x: 0, y: 0 }, { x: 10, y: 0 }, stopsFromColors(colors));
       expect(dict, `${n} stops`).toContain("/FunctionType 3");

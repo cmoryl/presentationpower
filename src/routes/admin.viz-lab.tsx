@@ -66,10 +66,9 @@ function VizLabPage() {
     setExporting(true);
     const toastId = toast.loading("Building the PowerPoint slide from this spec…");
     try {
-      await exportSpecsToPptx(
-        [{ spec: result.spec, insight: result.insight, mode }],
-        { title: result.spec.title || "Campaign data view" },
-      );
+      await exportSpecsToPptx([{ spec: result.spec, insight: result.insight, mode }], {
+        title: result.spec.title || "Campaign data view",
+      });
       toast.success("PPTX exported from the same chart spec.", { id: toastId });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "PPTX export failed.", { id: toastId });
@@ -186,7 +185,9 @@ function VizLabPage() {
                     <span className="text-black/50 dark:text-white/50">{r.before.score}</span> →{" "}
                     <span
                       className={
-                        r.after.score >= 90 ? "text-emerald-600" : "text-amber-600 dark:text-amber-400"
+                        r.after.score >= 90
+                          ? "text-emerald-600"
+                          : "text-amber-600 dark:text-amber-400"
                       }
                     >
                       {r.after.score}

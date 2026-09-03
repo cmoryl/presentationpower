@@ -19,7 +19,13 @@ const ContentSchema = z.object({
   subtitle: z.string().optional(),
   body: z.string().optional(),
   bullets: z.array(z.string()).optional(),
-  item_count: z.number().int().min(0).max(60).optional().describe("Repeated blocks: cards, stats, stages, bars, logos"),
+  item_count: z
+    .number()
+    .int()
+    .min(0)
+    .max(60)
+    .optional()
+    .describe("Repeated blocks: cards, stats, stages, bars, logos"),
   has_image: z.boolean().optional(),
   has_chart: z.boolean().optional(),
 });

@@ -58,10 +58,7 @@ export function SectionSelectOverlay({
       return {
         key,
         label: el.dataset.sectionLabel ?? el.dataset.section ?? "Section",
-        hasMedia:
-          el.dataset.sectionMedia === "true" ||
-          key === "hero" ||
-          !!el.querySelector("img"),
+        hasMedia: el.dataset.sectionMedia === "true" || key === "hero" || !!el.querySelector("img"),
         rect: {
           top: r.top - canvasRect.top,
           left: r.left - canvasRect.left,

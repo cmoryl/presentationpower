@@ -33,10 +33,7 @@ const GLASS_TOKENS = {
 
 // The glass utilities now live in the Element library theme that
 // `src/styles.css` @imports — parse both so parity follows the tokens.
-const CSS = [
-  "src/styles.css",
-  "src/design-system/element/styles/theme.css",
-]
+const CSS = ["src/styles.css", "src/design-system/element/styles/theme.css"]
   .map((f) => fs.readFileSync(path.join(process.cwd(), f), "utf8"))
   .join("\n");
 

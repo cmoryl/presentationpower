@@ -29,7 +29,10 @@ const TITLE_KEYS = [
 ] as const satisfies readonly (keyof PrintHeroTitleType)[];
 
 /** Keys owned by the body axis. */
-const BODY_KEYS = ["summaryPx", "summaryLeading"] as const satisfies readonly (keyof PrintHeroTitleType)[];
+const BODY_KEYS = [
+  "summaryPx",
+  "summaryLeading",
+] as const satisfies readonly (keyof PrintHeroTitleType)[];
 
 export type PrintTitleStylePreset = {
   id: string;
@@ -202,7 +205,8 @@ export function matchTitleStylePreset(type: PrintHeroTitleType | undefined): str
 export function matchBodyStylePreset(type: PrintHeroTitleType | undefined): string | undefined {
   if (!type) return undefined;
   return PRINT_BODY_STYLE_PRESETS.find(
-    (p) => near(type.summaryPx, p.type.summaryPx) && near(type.summaryLeading, p.type.summaryLeading),
+    (p) =>
+      near(type.summaryPx, p.type.summaryPx) && near(type.summaryLeading, p.type.summaryLeading),
   )?.id;
 }
 

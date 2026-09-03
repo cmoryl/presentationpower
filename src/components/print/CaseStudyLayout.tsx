@@ -117,7 +117,8 @@ export function CaseStudyLayout({
   // reads to the user as "the export button did nothing".
   const hidden = hiddenSectionSet(content);
   const emptyBlock = { heading: "", body: "" } as typeof content.challenge;
-  const stats = hidden.has("stats") || !Array.isArray(content.stats) ? [] : content.stats.slice(0, 3);
+  const stats =
+    hidden.has("stats") || !Array.isArray(content.stats) ? [] : content.stats.slice(0, 3);
   const blocks: Array<{ label: string; block: typeof content.challenge; icon: string }> = [
     {
       label: content.challenge?.heading || "The Challenge",
@@ -147,7 +148,6 @@ export function CaseStudyLayout({
           ? [content.expert.name, ...(content.expert.role ? [content.expert.role] : [])]
           : [],
   };
-
 
   return (
     <SlideModeContext.Provider value={mode}>
@@ -506,8 +506,7 @@ export function CaseStudyLayout({
                             style={{
                               gap: cq(8),
                               minWidth: 0,
-                              marginTop:
-                                k === 0 || (!content.quote && k === 1) ? cq(12) : cq(9),
+                              marginTop: k === 0 || (!content.quote && k === 1) ? cq(12) : cq(9),
                             }}
                           >
                             <div
@@ -563,13 +562,13 @@ export function CaseStudyLayout({
 
               {/* FOOTER LOCKUP */}
               {!hidden.has("footer") && (
-              <PrintFooterLockup
-                brand={brand}
-                mode={mode}
-                cq={cq}
-                links={content.footer?.links ?? ["transperfect.com"]}
-                email={hidden.has("expert") ? undefined : content.expert?.email}
-              />
+                <PrintFooterLockup
+                  brand={brand}
+                  mode={mode}
+                  cq={cq}
+                  links={content.footer?.links ?? ["transperfect.com"]}
+                  email={hidden.has("expert") ? undefined : content.expert?.email}
+                />
               )}
             </div>
           </div>

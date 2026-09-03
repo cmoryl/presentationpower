@@ -22,7 +22,10 @@ function countMediaHints(deck: Deck): number {
   let n = 0;
   const walk = (value: unknown) => {
     if (typeof value === "string") {
-      if (/^(https?:|data:image\/|\/)/.test(value) && /\.(png|jpe?g|webp|svg)|data:image\//i.test(value)) {
+      if (
+        /^(https?:|data:image\/|\/)/.test(value) &&
+        /\.(png|jpe?g|webp|svg)|data:image\//i.test(value)
+      ) {
         n += 1;
       }
       return;

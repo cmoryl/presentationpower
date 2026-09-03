@@ -173,7 +173,6 @@ export function ReinterpretApprovalDialog({
     });
   }
 
-
   function toggleForced(index: number) {
     setForcedLayouts((prev) => {
       const next = new Set(prev);
@@ -277,9 +276,7 @@ export function ReinterpretApprovalDialog({
           divisionId,
           // Deep read: every text frame, chart series, table row, diagram node
           // and the full speaker notes go to the planner, not just the bullets.
-          slides: rawMapped
-            .slice(0, 60)
-            .map((m) => buildSlideEvidence(m.source, m.variantId)),
+          slides: rawMapped.slice(0, 60).map((m) => buildSlideEvidence(m.source, m.variantId)),
         },
       });
       if (res.error) throw new Error(res.error);

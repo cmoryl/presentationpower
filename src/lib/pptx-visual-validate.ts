@@ -107,7 +107,12 @@ export async function decodePng(bytes: Uint8Array): Promise<Rgba | null> {
 
   while (at + 8 <= bytes.length) {
     const len = readU32(bytes, at);
-    const type = String.fromCharCode(bytes[at + 4]!, bytes[at + 5]!, bytes[at + 6]!, bytes[at + 7]!);
+    const type = String.fromCharCode(
+      bytes[at + 4]!,
+      bytes[at + 5]!,
+      bytes[at + 6]!,
+      bytes[at + 7]!,
+    );
     const body = bytes.subarray(at + 8, at + 8 + len);
     if (type === "IHDR") {
       width = readU32(body, 0);

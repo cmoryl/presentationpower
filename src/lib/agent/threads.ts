@@ -38,7 +38,6 @@ export async function listAgentThreads(): Promise<AgentThread[]> {
   return (data ?? []) as AgentThread[];
 }
 
-
 export async function createAgentThread(title = "New presentation"): Promise<AgentThread> {
   const { data: session } = await supabase.auth.getSession();
   const ownerId = session.session?.user.id;

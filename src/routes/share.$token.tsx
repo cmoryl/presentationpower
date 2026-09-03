@@ -11,7 +11,12 @@ import { ScaledSlide } from "@/components/slide/ScaledSlide";
 import { SlideStage, type Direction } from "@/components/slide/SlideStage";
 import { SectionCue } from "@/components/slide/SectionCue";
 import { VariantRenderer } from "@/components/slide/VariantRenderer";
-import { DeckPackScope, deckPack, deckPackResolver, packBrand } from "@/components/slide/DeckPackScope";
+import {
+  DeckPackScope,
+  deckPack,
+  deckPackResolver,
+  packBrand,
+} from "@/components/slide/DeckPackScope";
 import { SlideTemplateIndustryProvider } from "@/components/slide/SlideTemplateContext";
 import { applySlideExtras, splitSlideContent } from "@/lib/cloud-slide-extras";
 import { BRAND_MODES, MODULE_VARIANTS, SECTION_FRAMEWORKS, byId } from "@/lib/taxonomy";

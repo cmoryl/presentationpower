@@ -393,7 +393,8 @@ export function SpotlightLayout({
                               style={{
                                 fontWeight: 700,
                                 fontSize: cq(
-                                  18 * statValueFitScale(s.value, statUnitParts(s.unit).inline, 6.5),
+                                  18 *
+                                    statValueFitScale(s.value, statUnitParts(s.unit).inline, 6.5),
                                 ),
                                 color: accentInk,
                                 marginTop: cq(8),
@@ -643,13 +644,13 @@ export function SpotlightLayout({
               {/* FOOTER — TP + division lockup + contact strip                 */}
               {/* ============================================================ */}
               {!hidden.has("footer") && (
-              <PrintFooterLockup
-                brand={brand}
-                mode={mode}
-                cq={cq}
-                links={["transperfect.com"]}
-                email={content.expert?.email}
-              />
+                <PrintFooterLockup
+                  brand={brand}
+                  mode={mode}
+                  cq={cq}
+                  links={["transperfect.com"]}
+                  email={content.expert?.email}
+                />
               )}
 
               {showSafeArea && (

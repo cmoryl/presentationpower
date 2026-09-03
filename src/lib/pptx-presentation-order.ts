@@ -36,7 +36,6 @@ const PRES_ORDER = [
   "p:extLst",
 ];
 
-
 function block(xml: string, tag: string): { start: number; end: number; text: string } | null {
   const open = new RegExp(`<${tag}\\b[^>]*?(/?)>`);
   const m = open.exec(xml);

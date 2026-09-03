@@ -103,7 +103,8 @@ registerSlideModule({
             style={{
               ...cellStyle,
               gridArea: "a",
-              backgroundImage: cellTone(anchor, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
+              backgroundImage:
+                cellTone(anchor, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
             }}
           >
             <AccentTick
@@ -119,10 +120,7 @@ registerSlideModule({
                 background: `radial-gradient(60% 60% at 30% 20%, color-mix(in oklab, ${cellTone(anchor, brand.tokens.accent).accent} 22%, transparent), transparent 70%)`,
               }}
             />
-            <div
-              className="relative flex items-center gap-4"
-              style={iconWellStyle(anchor)}
-            >
+            <div className="relative flex items-center gap-4" style={iconWellStyle(anchor)}>
               <IconBadge
                 brand={brand}
                 label={s(anchor.title)}
@@ -239,7 +237,8 @@ registerSlideModule({
                 style={{
                   ...cellStyle,
                   gridArea: area,
-                  backgroundImage: cellTone(it, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
+                  backgroundImage:
+                    cellTone(it, brand.tokens.accent).wash ?? cellStyle.backgroundImage,
                 }}
               >
                 <AccentTick

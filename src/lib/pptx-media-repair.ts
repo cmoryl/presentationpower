@@ -95,9 +95,7 @@ export async function repairPptxMedia(
   try {
     const report: MediaRepairReport = { slidesWithMedia: 0, timingAdded: 0, idsRenumbered: 0 };
     const out = await repackPptxBlob(blob, async (zip) => {
-      const slides = Object.keys(zip.files).filter((n) =>
-        /^ppt\/slides\/slide\d+\.xml$/.test(n),
-      );
+      const slides = Object.keys(zip.files).filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n));
       for (const path of slides) {
         const xml = await zip.file(path)!.async("string");
         const ids = mediaShapeIds(xml);

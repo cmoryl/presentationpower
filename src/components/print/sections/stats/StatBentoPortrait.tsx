@@ -3,7 +3,7 @@
 // wide.
 import { statUnitParts, statValueFitScale, STAT_VALUE_NOWRAP } from "@/lib/print-stat-unit";
 import type { PrintStatsSection } from "@/lib/print-assets.types";
-import { cq, sectionInk, sectionGlass, MODULE, safeList} from "../shared";
+import { cq, sectionInk, sectionGlass, MODULE, safeList } from "../shared";
 
 export function StatBentoPortrait({
   section,

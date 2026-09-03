@@ -16,11 +16,7 @@ import {
 import { MART_LAYOUT_PRESETS } from "@/lib/next-mart-layouts";
 import { martArtwork, martFlatArtworkId } from "@/lib/next-mart-placement";
 import { PILLAR_SIZES, pillarKind } from "@/lib/next-pillar-masters";
-import {
-  NEXT_MART,
-  NEXT_MART_LOGOS,
-  martTotalPanels,
-} from "@/lib/next-mart";
+import { NEXT_MART, NEXT_MART_LOGOS, martTotalPanels } from "@/lib/next-mart";
 
 export const Route = createFileRoute("/events/next_/mart")({
   head: () => ({
@@ -109,7 +105,9 @@ function MartPage() {
                   <div className="text-sm font-medium text-[#03002C]">{p.name}</div>
                   <p className="mt-1 text-[12px] leading-relaxed text-black/60">{p.role}</p>
                   <ul className="mt-2.5 space-y-1 text-[11px] text-black/55">
-                    <li>Qty {p.quantity} · {p.config.face === "dark" ? "Dark face" : "Light face"}</li>
+                    <li>
+                      Qty {p.quantity} · {p.config.face === "dark" ? "Dark face" : "Light face"}
+                    </li>
                     <li>{p.placement}</li>
                     <li>{p.substrate}</li>
                   </ul>
@@ -154,9 +152,7 @@ function MartPage() {
                 <div className="text-sm font-medium text-[#03002C]">{p.name}</div>
                 <p className="mt-1 text-[12px] leading-relaxed text-black/60">{p.note}</p>
                 <ul className="mt-2.5 space-y-1 text-[11px] tabular-nums text-black/55">
-                  <li>
-                    Templates: {p.kinds.map((k) => pillarKind(k).name).join(", ")}
-                  </li>
+                  <li>Templates: {p.kinds.map((k) => pillarKind(k).name).join(", ")}</li>
                   <li>
                     Footprints:{" "}
                     {p.sizes.length === 0
@@ -236,7 +232,6 @@ function MartPage() {
             ))}
           </div>
         </section>
-
 
         {/* Flat signage specs */}
         <section className="mt-12">
@@ -323,8 +318,7 @@ function MartPage() {
                     <div className="mt-0.5 text-[12px] text-black/55">{sign.role}</div>
                     <ul className="mt-2 space-y-0.5 text-[11px] tabular-nums text-black/55">
                       <li>
-                        {sign.trimW} × {sign.trimH} mm · {sign.bleed} mm bleed · qty{" "}
-                        {sign.quantity}
+                        {sign.trimW} × {sign.trimH} mm · {sign.bleed} mm bleed · qty {sign.quantity}
                       </li>
                       <li>{art ? `Placed art: ${art.headline}` : "No placed artwork"}</li>
                     </ul>
