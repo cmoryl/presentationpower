@@ -64,7 +64,9 @@ import {
   recommendedPpi,
   type LondonArtwork,
   type LondonPanel,
+  isBoothPanel,
   isVenueTemplatePanel,
+  londonBoothPanelMeta,
   londonPanelCount,
   londonVenueItemMeta,
 } from "@/lib/next-london-signage";
@@ -161,6 +163,75 @@ function PanelThumb({ panel, svg }: { panel: LondonPanel; svg?: string }) {
   );
 }
 
+function PanelCard({
+  panel,
+  svg,
+  onClick,
+}: {
+  panel: LondonPanel;
+  svg?: string;
+  onClick?: (panel: LondonPanel) => void;
+}) {
+  const booth = londonBoothPanelMeta(panel);
+  return (
+    <button
+      type="button"
+      onClick={() => onClick?.(panel)}
+      className="group flex h-full flex-col rounded-xl border border-black/10 bg-white p-3 text-left transition-shadow hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
+    >
+      <div className="shrink-0">
+        <PanelThumb panel={panel} svg={svg} />
+      </div>
+      <div className="mt-3 flex min-w-0 flex-1 flex-col">
+        <p
+          className="text-[13px] font-semibold leading-snug text-[#03002C]"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            wordBreak: "break-word",
+          }}
+          title={panel.name}
+        >
+          {panel.name}
+          {isAddedPanel(panel) ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Added
+            </span>
+          ) : null}
+          {isVenueTemplatePanel(panel) ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#C2A3FF]/45 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Venue
+            </span>
+          ) : null}
+          {booth ? (
+            <span className="ml-1.5 inline-flex align-middle rounded bg-[#A1FBF9]/55 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+              Booth
+            </span>
+          ) : null}
+        </p>
+        {londonVenueItemMeta(panel) ? (
+          <p className="mt-1 text-[12px] font-medium leading-snug text-[#03002C]/75">
+            {londonVenueItemMeta(panel)!.note}
+          </p>
+        ) : null}
+        {booth ? (
+          <p className="mt-1 text-[12px] font-medium leading-snug text-[#03002C]/75">
+            {booth.artboard.label} · {booth.artboard.trimW} × {booth.artboard.trimH} mm
+          </p>
+        ) : null}
+        <p className="mt-auto pt-1.5 font-mono text-[11px] text-[#03002C]/60">
+          {panel.trimW} × {panel.trimH} mm ({inch(panel.trimW)} × {inch(panel.trimH)} in) · {panel.ground}
+        </p>
+        <p className="mt-0.5 font-mono text-[11px] text-[#03002C]/45">
+          bleed {panel.bleedEdge} mm/edge · band {panel.bandMm.toFixed(2)} mm
+        </p>
+      </div>
+    </button>
+  );
+}
+
 function LondonSignagePage() {
   const fetchRevisions = useServerFn(listLondonRevisions);
   // `undefined` while the session resolves, `null` when signed out. The kit is
@@ -171,7 +242,9 @@ function LondonSignagePage() {
   // The kit shows the panel set IN FORCE: the newest published revision, or the
   // issued venue pack when there is none (or when the viewer is not signed in).
   const [panels, setPanels] = useState<LondonPanel[]>(LONDON_PANELS);
-  const floors = useMemo(() => londonPanelsByFloor(panels), [panels]);
+  const boothPanels = useMemo(() => panels.filter(isBoothPanel), [panels]);
+  const nonBoothPanels = useMemo(() => panels.filter((p) => !isBoothPanel(p)), [panels]);
+  const floors = useMemo(() => londonPanelsByFloor(nonBoothPanels), [nonBoothPanels]);
   const [floorId, setFloorId] = useState<string>("all");
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
@@ -533,7 +606,7 @@ function LondonSignagePage() {
                   : "border-black/15 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
               }`}
             >
-              All floors · {panels.length}
+              All floors · {nonBoothPanels.length}
             </button>
             {floors.map((floor) => (
               <button
@@ -558,6 +631,29 @@ function LondonSignagePage() {
             </p>
           ) : null}
 
+          {boothPanels.length > 0 ? (
+            <div className="mt-10">
+              <div className="flex flex-wrap items-baseline gap-3 border-b border-black/10 pb-2">
+                <h3 className="text-xl font-semibold tracking-tight text-[#03002C]">
+                  Partner booths
+                </h3>
+                <span className="ml-auto font-mono text-[11px] text-[#03002C]/55">
+                  {boothPanels.length} panels
+                </span>
+              </div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                {boothPanels.map((panel) => (
+                  <PanelCard
+                    key={panel.id}
+                    panel={panel}
+                    svg={londonPanelSvgFor(panel, artwork)}
+                    onClick={setOpenPanel}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           {shown.map((floor) => (
             <div key={floor.id} className="mt-8">
               <div className="flex flex-wrap items-baseline gap-3 border-b border-black/10 pb-2">
@@ -580,42 +676,12 @@ function LondonSignagePage() {
                   </h4>
                   <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {room.panels.map((panel) => (
-                      <button
+                      <PanelCard
                         key={panel.id}
-                        type="button"
-                        onClick={() => setOpenPanel(panel)}
-                        className="group rounded-xl border border-black/10 bg-white p-3 text-left transition-shadow hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#003FC7]"
-                      >
-                        <PanelThumb panel={panel} svg={londonPanelSvgFor(panel, artwork)} />
-                        <p className="mt-3 flex flex-wrap items-center gap-1.5 text-[13px] font-semibold leading-snug text-[#03002C]">
-                          <span>
-                            {panel.proof.replace(/\.pdf$/i, "")} · p
-                            {String(panel.page).padStart(2, "0")}
-                          </span>
-                          {isAddedPanel(panel) ? (
-                            <span className="rounded bg-[#A6FA87]/50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                              Added
-                            </span>
-                          ) : null}
-                          {isVenueTemplatePanel(panel) ? (
-                            <span className="rounded bg-[#C2A3FF]/45 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                              Venue template
-                            </span>
-                          ) : null}
-                        </p>
-                        {londonVenueItemMeta(panel) ? (
-                          <p className="mt-1 text-[12px] font-medium leading-snug text-[#03002C]/75">
-                            {londonVenueItemMeta(panel)!.note}
-                          </p>
-                        ) : null}
-                        <p className="mt-1 font-mono text-[11px] text-[#03002C]/60">
-                          {panel.trimW} × {panel.trimH} mm ({inch(panel.trimW)} ×{" "}
-                          {inch(panel.trimH)} in) · {panel.ground}
-                        </p>
-                        <p className="mt-0.5 font-mono text-[11px] text-[#03002C]/45">
-                          bleed {panel.bleedEdge} mm/edge · band {panel.bandMm.toFixed(2)} mm
-                        </p>
-                      </button>
+                        panel={panel}
+                        svg={londonPanelSvgFor(panel, artwork)}
+                        onClick={setOpenPanel}
+                      />
                     ))}
                   </div>
                 </div>
