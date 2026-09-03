@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 import { buildLondonPanelAi, buildLondonPanelSvg } from "@/lib/next-london-revise";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
-import { nextLogoFamily } from "@/lib/next-logo-vectors";
+import { nextLogoColourways, nextLogoFamily } from "@/lib/next-logo-vectors";
+import { DEFAULT_LOGO_PLACEMENT } from "@/lib/next-london-logo-placement";
 
 describe("London signage branding", () => {
   it("plans a white lockup for every panel", () => {
