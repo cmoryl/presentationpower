@@ -24,6 +24,10 @@ import { cmykLabel, cmykToHex, londonCmykBuild } from "@/lib/next-london-cmyk";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
 import {
+  LONDON_DIVISION_COLOURWAYS,
+  londonDivisionAccent,
+} from "@/lib/next-london-division";
+import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
   nextLogoFamily,
@@ -166,7 +170,11 @@ function LondonTemplatePage() {
   // Preview paints the chosen space, so a CMYK master is soft-proofed on screen.
   const svg = useMemo(() => buildLondonPanelSvg(panel, art), [panel, placement, art]);
   const familyLabel = nextLogoFamily(plan.familyId)?.label ?? "TransPerfect";
-  const colourways = useMemo(() => nextLogoColourways(plan.familyId), [plan.familyId]);
+  const divisionAccent = londonDivisionAccent(plan.familyId);
+  const colourways = useMemo(() => {
+    const all = nextLogoColourways(plan.familyId);
+    return divisionAccent ? all.filter((c) => LONDON_DIVISION_COLOURWAYS.includes(c)) : all;
+  }, [plan.familyId, divisionAccent]);
   const groundBuilds = useMemo(
     () =>
       londonPanelStops(panel).map((hex) => ({

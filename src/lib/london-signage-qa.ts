@@ -18,13 +18,22 @@ import {
 } from "@/lib/next-london-signage";
 import { parseColor, readShadingStops } from "@/lib/pdf-gradient-shading";
 
+import { londonDivisionStops } from "@/lib/next-london-division";
+import { londonPanelFamily } from "@/lib/next-london-branding";
+
 const MM_TO_PT = 72 / 25.4;
 
-/** Approved ramp for a panel — the colours an exported `.ai` must still carry. */
+/**
+ * Approved ramp for a panel — the colours an exported `.ai` must still carry.
+ * Division items carry their NEXT 2026 accent tint at the light end, so the
+ * approved ramp is the tinted one.
+ */
 function expectedRamp(panel: LondonPanel): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
-  return stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+  const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+  return londonDivisionStops(londonPanelFamily(panel), base);
 }
+
 
 function hex(c: [number, number, number]): string {
   return `#${c.map((v) => Math.round(Math.max(0, Math.min(1, v)) * 255).toString(16).padStart(2, "0")).join("").toUpperCase()}`;

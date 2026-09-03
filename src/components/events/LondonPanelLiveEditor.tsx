@@ -45,6 +45,10 @@ import {
   type LondonPanel,
 } from "@/lib/next-london-signage";
 import {
+  LONDON_DIVISION_COLOURWAYS,
+  londonDivisionAccent,
+} from "@/lib/next-london-division";
+import {
   NEXT_LOGO_COLOURWAY_LABELS,
   nextLogoColourways,
   nextLogoFamily,
@@ -160,7 +164,12 @@ export function LondonPanelLiveEditor({
     () => buildLondonPanelSvg(panel, art),
     [panel, placement, art, wallConfigs],
   );
-  const colourways = useMemo(() => nextLogoColourways(plan.familyId), [plan.familyId]);
+  // Division items are restricted to the approved white lockups.
+  const divisionAccent = londonDivisionAccent(plan.familyId);
+  const colourways = useMemo(() => {
+    const all = nextLogoColourways(plan.familyId);
+    return divisionAccent ? all.filter((c) => LONDON_DIVISION_COLOURWAYS.includes(c)) : all;
+  }, [plan.familyId, divisionAccent]);
   const familyLabel = nextLogoFamily(plan.familyId)?.label ?? "TransPerfect";
   const boardOverridden = !!boardSizes[panel.id];
 
@@ -517,6 +526,18 @@ export function LondonPanelLiveEditor({
           {NEXT_LOGO_COLOURWAY_LABELS[plan.colourway].toLowerCase()} · every edit here is live across
           the kit.
         </p>
+        {divisionAccent ? (
+          <p className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span
+              aria-hidden
+              className="inline-block size-3 rounded-sm border border-border"
+              style={{ background: divisionAccent.hex }}
+            />
+            {divisionAccent.label} accent {divisionAccent.hex} tints the light end of the ground;
+            white lockups only on division signage.
+          </p>
+        ) : null}
+
 
         {isWall ? <StepRepeatWallPanel panel={panel} /> : null}
 
