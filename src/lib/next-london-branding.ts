@@ -170,22 +170,71 @@ export function londonBrandingPlan(
   const logoX = clamp(centreX + nudge.dx * panel.trimW, 0, panel.bleedW - logoW);
   const logoY = clamp(baseY + nudge.dy * panel.trimH, 0, panel.bleedH - logoH);
 
-  const copySizeMm = Math.min(liveH * 0.16, Math.max(24, liveW * 0.052)) * nudge.textScale;
-  const baseBaseline =
-    orientation === "side"
-      ? marginY + safe + copySizeMm
-      : logoY + logoH + Math.max(logoH * 0.5, copySizeMm * 1.2);
-  // Headline nudge, clamped so the cap band stays inside the sheet.
-  const copyBaselineMm = clamp(
-    baseBaseline + nudge.textDy * panel.trimH,
-    copySizeMm,
-    panel.bleedH - copySizeMm * 0.3,
-  );
-  const copyCentreMm = clamp(
-    marginX + panel.trimW / 2 + nudge.textDx * panel.trimW,
-    0,
-    panel.bleedW,
-  );
+  // Pillars and other tall, narrow sheets set their copy running DOWN the
+  // panel by default — the same treatment as the master NEXT pillar set. The
+  // location designer can force either direction per panel.
+  const vertical = nudge.textVertical ?? aspect <= 0.5;
+
+  const copySizeMm = vertical
+    ? Math.min(liveW * 0.42, Math.max(24, liveH * 0.036)) * nudge.textScale
+    : Math.min(liveH * 0.16, Math.max(24, liveW * 0.052)) * nudge.textScale;
+
+  let copyBaselineMm: number;
+  let copyCentreMm: number;
+  if (vertical) {
+    // Rotated 90°: the anchor x carries the baseline, cap heights run to its
+    // right, so the band is centred by pulling the baseline back a third of a
+    // cap height. The anchor y is the middle of the vertical run.
+    const baseX = marginX + panel.trimW / 2 - copySizeMm * 0.35;
+    copyCentreMm = clamp(baseX + nudge.textDx * panel.trimW, 0, panel.bleedW);
+    copyBaselineMm = clamp(
+      marginY + safe + liveH * 0.55 + nudge.textDy * panel.trimH,
+      0,
+      panel.bleedH,
+    );
+  } else {
+    const baseBaseline =
+      orientation === "side"
+        ? marginY + safe + copySizeMm
+        : logoY + logoH + Math.max(logoH * 0.5, copySizeMm * 1.2);
+    // Headline nudge, clamped so the cap band stays inside the sheet.
+    copyBaselineMm = clamp(
+      baseBaseline + nudge.textDy * panel.trimH,
+      copySizeMm,
+      panel.bleedH - copySizeMm * 0.3,
+    );
+    copyCentreMm = clamp(
+      marginX + panel.trimW / 2 + nudge.textDx * panel.trimW,
+      0,
+      panel.bleedW,
+    );
+  }
+
+  // QR block: a real, scannable code in vector modules. Default placement is
+  // the lower band of the live area, centred, with the caption beneath it.
+  const code = nudge.qr ? buildPillarQr(nudge.qr) : null;
+  const qrSize = Math.min(liveW * 0.55, Math.min(liveW, liveH) * 0.24) * nudge.qrScale;
+  const captionSizeMm = Math.max(6, qrSize * 0.11);
+  const qr = code
+    ? {
+        data: nudge.qr!,
+        size: qrSize,
+        x: clamp(
+          marginX + panel.trimW / 2 - qrSize / 2 + nudge.qrDx * panel.trimW,
+          0,
+          panel.bleedW - qrSize,
+        ),
+        y: clamp(
+          marginY + panel.trimH - safe - qrSize - captionSizeMm * 2 + nudge.qrDy * panel.trimH,
+          0,
+          panel.bleedH - qrSize,
+        ),
+        modules: code.size,
+        path: code.path,
+        caption: nudge.qrCaption.trim() ? nudge.qrCaption.trim().toUpperCase() : null,
+        captionSizeMm,
+      }
+    : null;
 
   return {
     familyId,
@@ -198,10 +247,13 @@ export function londonBrandingPlan(
     copyBaselineMm,
     copyCentreMm,
     copyAlign: "middle",
+    copyVertical: vertical,
     clearMm: logoH * 0.25,
+    qr,
     placement: nudge,
   };
 }
+
 
 
 function clamp(value: number, lo: number, hi: number): number {
