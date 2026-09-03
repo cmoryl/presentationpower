@@ -36,8 +36,14 @@ import {
   useLondonLogoPlacements,
   LONDON_TEXT_MAX_CHARS,
   LONDON_TEXT_SCALE,
+  LONDON_QR_MAX_CHARS,
+  LONDON_QR_SCALE,
 } from "@/lib/next-london-logo-placement";
 import { buildLondonSignagePack } from "@/lib/next-london-pack";
+
+/** Default QR target: the live London agenda board. */
+const LONDON_QR_DEFAULT_LINK = "https://transperfectelement.lovable.app/events/next/london/agenda";
+
 
 export const Route = createFileRoute("/events/next_/london_/template")({
   head: () => ({
