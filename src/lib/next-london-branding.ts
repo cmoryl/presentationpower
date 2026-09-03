@@ -70,6 +70,9 @@ const COPY_KEYWORDS: [RegExp, string][] = [
   [/cloakroom/i, "CLOAKROOM"],
   [/nextbrew/i, "NEXTBREW"],
   [/merch/i, "MERCH MART"],
+  [/main stage|directional/i, "MAIN STAGE"],
+  [/help desk/i, "HELP DESK"],
+  [/step\s*&?\s*repeat|photo wall/i, "TRANSPERFECT NEXT"],
   [/lunch|catering|coffee/i, "REFUEL"],
 ];
 
