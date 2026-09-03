@@ -112,9 +112,10 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
   },
   "11-brew-diagonal": {
     label: "Brew · diagonal",
-    note: "NEXTbrew ground: a saturated diagonal run of brand blue into aqua. Replaces the centred halo on table tops — no soft centre blob to read as a smudge under café lighting, and the white lockup holds full contrast at arm's length.",
-    stops: ["#135CFB", "#5AC8F0", "#7FE3E8"],
+    note: "NEXTbrew ground: a deep diagonal run out of brand navy through brand blue into aqua, themed with a live café motif — cup rings, steam ribbons and a bean tick row, all editable vector marks in the masters. The darker head end keeps the white lockup at full contrast under warm café lighting.",
+    stops: ["#03002C", "#135CFB", "#5AC8F0", "#A1FBF9"],
   },
+
   "12-repeat-wash": {
     label: "Repeat wash",
     note: "Deep vertical wash sized for step-and-repeat walls, so the tiled lockup rows stay legible in on-camera flash.",
