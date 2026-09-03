@@ -41,6 +41,14 @@ import {
   LONDON_QR_SCALE,
 } from "@/lib/next-london-logo-placement";
 import { buildLondonSignagePack } from "@/lib/next-london-pack";
+import {
+  applyLondonBoardSize,
+  applyLondonBoardSizes,
+  LONDON_BOARD_LIMITS,
+  resetLondonBoardSize,
+  setLondonBoardSize,
+  useLondonBoardSizes,
+} from "@/lib/next-london-board-size";
 
 /** Default QR target: the live London agenda board. */
 const LONDON_QR_DEFAULT_LINK = "https://transperfectelement.lovable.app/events/next/london/agenda";
@@ -85,14 +93,21 @@ function LondonTemplatePage() {
   const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
+  // Measured signboard sizes win over the shipped spec everywhere on this page.
+  const boardSizes = useLondonBoardSizes();
   const panels = useMemo(
-    () => (floor === "all" ? LONDON_PANELS : LONDON_PANELS.filter((p) => p.floor === floor)),
-    [floor],
+    () =>
+      applyLondonBoardSizes(
+        floor === "all" ? LONDON_PANELS : LONDON_PANELS.filter((p) => p.floor === floor),
+        boardSizes,
+      ),
+    [floor, boardSizes],
   );
   const panel = useMemo(
-    () => panels.find((p) => p.id === selectedId) ?? panels[0] ?? LONDON_PANELS[0]!,
-    [panels, selectedId],
+    () => panels.find((p) => p.id === selectedId) ?? panels[0] ?? applyLondonBoardSize(LONDON_PANELS[0]!, boardSizes),
+    [panels, selectedId, boardSizes],
   );
+  const boardOverridden = !!boardSizes[panel.id];
   const placement = placements[panel.id] ?? DEFAULT_LOGO_PLACEMENT;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const art = useMemo(() => ({ colorSpace, vibrance }), [colorSpace, vibrance]);
@@ -619,6 +634,68 @@ function LondonTemplatePage() {
                 it stays scannable at any signage size in both the .svg and .ai masters.
               </p>
             </div>
+
+            <div className="mt-4 rounded-lg border border-border/70 bg-muted/20 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="flex items-center gap-2 text-sm font-semibold">
+                  <Ruler className="h-3.5 w-3.5" /> Real signboard size
+                </h3>
+                <span className="text-xs text-muted-foreground">
+                  {boardOverridden ? "Measured on site" : "Shipped spec"} · file {panel.bleedW}×
+                  {panel.bleedH}mm
+                </span>
+              </div>
+              <div className="mt-3 flex flex-wrap items-end gap-3">
+                {(
+                  [
+                    { key: "trimW" as const, label: "Width (mm)", value: panel.trimW, ...LONDON_BOARD_LIMITS.trim },
+                    { key: "trimH" as const, label: "Height (mm)", value: panel.trimH, ...LONDON_BOARD_LIMITS.trim },
+                    {
+                      key: "bleedEdge" as const,
+                      label: "Bleed / edge (mm)",
+                      value: panel.bleedEdge,
+                      ...LONDON_BOARD_LIMITS.bleed,
+                    },
+                  ]
+                ).map((field) => (
+                  <label key={field.key} className="flex flex-col gap-1 text-xs text-muted-foreground">
+                    {field.label}
+                    <input
+                      type="number"
+                      min={field.min}
+                      max={field.max}
+                      step={1}
+                      value={field.value}
+                      onChange={(event) => {
+                        const next = Number(event.target.value);
+                        if (!Number.isFinite(next)) return;
+                        setLondonBoardSize(panel, { [field.key]: next });
+                      }}
+                      className="h-9 w-28 rounded-md border border-border bg-background px-2 text-sm tabular-nums text-foreground"
+                    />
+                  </label>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  disabled={!boardOverridden}
+                  onClick={() => {
+                    resetLondonBoardSize(panel.id);
+                    toast.success("Board size back to the shipped spec");
+                  }}
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Reset size
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Type the board as it is actually being built. Bleed box, safe area, raster tier and
+                both masters recompute from these numbers; lockup, headline and QR keep their
+                relative placement.
+              </p>
+            </div>
+
+
 
 
             <div className="mt-4 flex flex-wrap items-center gap-3">

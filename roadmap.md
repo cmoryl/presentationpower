@@ -29,3 +29,5 @@
 - [x] EPS-derived logo geometry, vertical pillar copy, scannable QR block on .svg/.ai masters + editor controls
 - [x] Replace the spherical "halo" ground with a low-angle chevron sweep (cloakroom / help desk / square panels)
 - [x] Verified QR + placement overrides persist in the live editor (tp-next-london-logo-placement-v1)
+- [x] Real signboard sizes: per-panel measured trim W/H + bleed per edge (tp-next-london-board-size-v1) drive print preview, safe area, raster tier and both masters
+- [x] Verified the .ai masters carry real EPS-derived NEXT lockup geometry (19 compound paths / 126 curve ops per panel) — no placeholder mark
