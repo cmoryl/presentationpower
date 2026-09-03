@@ -87,6 +87,12 @@ export const LONDON_TEXT_SCALE = { min: 0.3, max: 3, step: 0.01 } as const;
 /** Longest headline the signage set accepts on one line. */
 export const LONDON_TEXT_MAX_CHARS = 64;
 
+/** QR block size multiplier bounds, shared with the editor UI. */
+export const LONDON_QR_SCALE = { min: 0.4, max: 2.5, step: 0.01 } as const;
+
+/** Longest QR payload the signage set accepts (URL or plain text). */
+export const LONDON_QR_MAX_CHARS = 300;
+
 function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
   const clamp = (n: unknown, lo: number, hi: number, fallback: number) =>
     typeof n === "number" && Number.isFinite(n) ? Math.max(lo, Math.min(hi, n)) : fallback;
@@ -101,8 +107,21 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
     textScale: clamp(p.textScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
     textDx: clamp(p.textDx, -0.5, 0.5, 0),
     textDy: clamp(p.textDy, -0.5, 0.5, 0),
+    textVertical: typeof p.textVertical === "boolean" ? p.textVertical : null,
+    qr:
+      typeof p.qr === "string" && p.qr.trim().length > 0
+        ? p.qr.trim().slice(0, LONDON_QR_MAX_CHARS)
+        : null,
+    qrScale: clamp(p.qrScale, LONDON_QR_SCALE.min, LONDON_QR_SCALE.max, 1),
+    qrDx: clamp(p.qrDx, -0.5, 0.5, 0),
+    qrDy: clamp(p.qrDy, -0.5, 0.5, 0),
+    qrCaption:
+      typeof p.qrCaption === "string"
+        ? p.qrCaption.slice(0, LONDON_TEXT_MAX_CHARS)
+        : DEFAULT_LOGO_PLACEMENT.qrCaption,
   };
 }
+
 
 
 function hydrate(): void {
