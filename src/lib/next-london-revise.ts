@@ -476,9 +476,8 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
   ].join("");
 }
 
-function marginXNum(panel: LondonPanel): number {
-  return (panel.bleedW - panel.trimW) / 2;
-}
+
+
 
 function escapeXml(s: string): string {
   return s.replace(/[<>&"]/g, (c) =>
