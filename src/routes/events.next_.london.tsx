@@ -28,6 +28,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
+import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
@@ -161,6 +162,7 @@ function LondonSignagePage() {
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [openPanel, setOpenPanel] = useState<LondonPanel | null>(null);
+  const [editing, setEditing] = useState(false);
   const [ppi, setPpi] = useState<number>(72);
   const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
@@ -608,7 +610,12 @@ function LondonSignagePage() {
         </section>
       </div>
 
-      <Dialog open={!!openPanel} onOpenChange={(o) => !o && setOpenPanel(null)}>
+      <Dialog open={!!openPanel} onOpenChange={(o) => {
+          if (!o) {
+            setOpenPanel(null);
+            setEditing(false);
+          }
+        }}>
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           {openPanel ? (
             <>
@@ -690,6 +697,39 @@ function LondonSignagePage() {
 
               {/* Check every resolution tier on screen before downloading. */}
               <LondonPpiPreview panel={openPanel} svg={artwork?.[openPanel.id]?.svg} />
+
+              {/* Live panel editing, same editor as the revise screen. Placement,
+                  copy and board size write to the shared stores, so thumbnails
+                  and downloads here update without a reload. */}
+              <div className="rounded-xl border border-black/10 p-4">
+                <button
+                  type="button"
+                  onClick={() => setEditing((v) => !v)}
+                  aria-expanded={editing}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-xs font-semibold text-white hover:opacity-90"
+                >
+                  <Ruler className="h-3.5 w-3.5" />
+                  {editing ? "Hide panel editor" : "Edit this panel"}
+                </button>
+                {editing ? (
+                  <div className="mt-4">
+                    <LondonPanelLiveEditor
+                      panel={openPanel}
+                      siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
+                      onStyleChange={(styleId) =>
+                        {
+                          const style = styleId as LondonPanel["style"];
+                          setPanels((prev) =>
+                            prev.map((p) => (p.id === openPanel.id ? { ...p, style } : p)),
+                          );
+                          setOpenPanel((prev) => (prev ? { ...prev, style } : prev));
+                        }
+                      }
+                    />
+                  </div>
+                ) : null}
+              </div>
+
 
               <div className="rounded-xl border border-black/10 p-4">
                 <div className="flex flex-wrap items-center gap-2">
