@@ -75,6 +75,7 @@ import {
 } from "@/lib/next-london-revise";
 
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
+import { onLondonRevisionPublished } from "@/lib/next-london-revision-live";
 
 export const Route = createFileRoute("/events/next_/london")({
   head: () => ({
@@ -177,6 +178,15 @@ function LondonSignagePage() {
     };
   }, []);
 
+  const [revisionTick, setRevisionTick] = useState(0);
+
+  // A revision published in the revise studio pushes here, so an open kit page
+  // swaps to the new spec without a reload.
+  useEffect(
+    () => onLondonRevisionPublished(() => setRevisionTick((n) => n + 1)),
+    [],
+  );
+
   useEffect(() => {
     if (!userId) return;
     let live = true;
@@ -192,7 +202,7 @@ function LondonSignagePage() {
     return () => {
       live = false;
     };
-  }, [fetchRevisions, userId]);
+  }, [fetchRevisions, userId, revisionTick]);
 
   useEffect(() => {
     if (openPanel) setPpi(recommendedPpi(openPanel));
