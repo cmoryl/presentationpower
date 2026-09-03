@@ -13,7 +13,10 @@ import {
   buildLondonPanelSvg,
   londonAiBytes,
   londonPanelFileBase,
+  londonPanelStops,
+  type LondonColorSpace,
 } from "@/lib/next-london-revise";
+import { cmykLabel, londonCmykBuild } from "@/lib/next-london-cmyk";
 
 export type LondonPackFile = {
   path: string;
@@ -41,26 +44,35 @@ function slug(value: string): string {
 /** Build the full signage pack for the given panels as a downloadable zip. */
 export async function buildLondonSignagePack(
   panels: LondonPanel[],
-  options: { revision?: number; onProgress?: (done: number, total: number) => void } = {},
+  options: {
+    revision?: number;
+    /** "rgb" (default, RIP separates) or "cmyk" print masters with vibrant correction. */
+    colorSpace?: LondonColorSpace;
+    vibrance?: number;
+    onProgress?: (done: number, total: number) => void;
+  } = {},
 ): Promise<LondonPackResult> {
   const rev = options.revision ?? 1;
+  const colorSpace: LondonColorSpace = options.colorSpace ?? "rgb";
+  const art = { colorSpace, vibrance: options.vibrance ?? 1 };
   const zip = new JSZip();
   const files: LondonPackFile[] = [];
   const rows: string[] = [
-    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,colourway,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale",
+    "panel_id,name,floor,room,style,trim_mm,bleed_mm,bleed_edge_mm,lockup,colourway,family,copy,logo_x_mm,logo_y_mm,logo_w_mm,nudge_dx,nudge_dy,scale,colour_space,ground_builds",
   ];
 
   for (const [index, panel] of panels.entries()) {
     const plan = londonBrandingPlan(panel);
     const dir = `${slug(floorLabel(panel.floor))}`;
-    const base = londonPanelFileBase(panel, rev);
+    const base = londonPanelFileBase(panel, rev, colorSpace);
     const svgPath = `${dir}/${base}.svg`;
     const aiPath = `${dir}/${base}.ai`;
 
-    zip.file(svgPath, buildLondonPanelSvg(panel));
-    zip.file(aiPath, londonAiBytes(buildLondonPanelAi(panel)));
+    zip.file(svgPath, buildLondonPanelSvg(panel, art));
+    zip.file(aiPath, londonAiBytes(buildLondonPanelAi(panel, art)));
     files.push({ path: svgPath, panelId: panel.id, kind: "svg" });
     files.push({ path: aiPath, panelId: panel.id, kind: "ai" });
+
 
     rows.push(
       [
@@ -82,8 +94,17 @@ export async function buildLondonSignagePack(
         plan.placement.dx.toFixed(4),
         plan.placement.dy.toFixed(4),
         plan.placement.scale.toFixed(3),
+        colorSpace,
+        `"${
+          colorSpace === "cmyk"
+            ? londonPanelStops(panel)
+                .map((hex) => cmykLabel(londonCmykBuild(hex, art.vibrance)))
+                .join(" | ")
+            : londonPanelStops(panel).join(" ")
+        }"`,
       ].join(","),
     );
+
 
     options.onProgress?.(index + 1, panels.length);
     // Yield to the browser so a 95-panel pack never blocks the UI thread.
@@ -97,7 +118,17 @@ export async function buildLondonSignagePack(
     [
       "TransPerfect NEXT 2026 — London signage pack",
       `Panels: ${panels.length} · files: ${files.length} · revision r${rev}`,
+      `Colour space: ${
+        colorSpace === "cmyk"
+          ? `DeviceCMYK — vibrant-corrected print masters (vibrance ${art.vibrance}). ` +
+            "Brand colours with a signed-off CMYK build use it verbatim; everything else is " +
+            "converted with skeletal black (no black under saturated colour) and a 300% TAC " +
+            "ceiling. Copy prints 100K / 0-0-0-0 knockout. Per-stop builds are in manifest.csv."
+          : "DeviceRGB — brand RGB is shipped untouched so the RIP performs the separation. " +
+            "Request the -cmyk pack if you need press-ready separations from us."
+      }`,
       "",
+
       "Each panel ships twice:",
       "  .svg — master geometry, live gradient ground, editable lockup outlines",
       "  .ai  — Illustrator-native (PDF compatible): live gradient, editable lockup paths, live Geist Bold copy",

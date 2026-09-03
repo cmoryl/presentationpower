@@ -33,6 +33,15 @@ import {
   stopsFromColors,
 } from "@/lib/pdf-gradient-shading";
 import { LONDON_SIGNAGE_FONT, londonBrandingPlan } from "@/lib/next-london-branding";
+import {
+  cmykAxialShadingDict,
+  cmykCss,
+  cmykFillOp,
+  cmykRadialShadingDict,
+  cmykStopsFromColors,
+  cmykToHex,
+  londonCmykBuild,
+} from "@/lib/next-london-cmyk";
 import { svgPathToPdfOps } from "@/lib/vector-path-pdf";
 
 /** Fields the location team is allowed to re-issue. */
@@ -414,24 +423,51 @@ export function londonPanelStops(panel: LondonPanel): string[] {
 }
 
 /**
+ * Output colour space for a regenerated master. `rgb` is the default and the
+ * house rule (the RIP separates); `cmyk` is the explicit, operator-chosen print
+ * master with vibrant correction and approved brand builds.
+ */
+export type LondonColorSpace = "rgb" | "cmyk";
+
+export type LondonArtOptions = {
+  colorSpace?: LondonColorSpace;
+  /** Vibrance pre-compensation strength for converted colours (0–1.5). */
+  vibrance?: number;
+};
+
+/**
  * Rebuild a panel's SVG from its own specification: full-bleed artboard in mm,
  * live linear gradient, trim box marked as metadata only (never a drawn line).
  */
-export function buildLondonPanelSvg(panel: LondonPanel): string {
+export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOptions = {}): string {
+  const cmyk = options.colorSpace === "cmyk";
+  const vibrance = options.vibrance ?? 1;
   const stops = stopsFor(panel);
   const axis = styleAxis(panel.style);
   const id = `g-${panel.id}`;
   const isHalo = panel.style.includes("halo");
+  // In a CMYK master every stop carries its press build: the paint is
+  // device-cmyk(), with the screen proxy as the fallback so browsers and
+  // Illustrator's preview still show the corrected colour.
+  const paintFor = (hex: string): { paint: string; meta: string } => {
+    if (!cmyk) return { paint: hex, meta: "" };
+    const build = londonCmykBuild(hex, vibrance);
+    return {
+      paint: `${cmykToHex(build)}`,
+      meta: ` data-cmyk="${cmykCss(build)}" data-cmyk-approved="${build.approved}" data-source-rgb="${hex}"`,
+    };
+  };
   const ramp = stops
-    .map(
-      (hex, i) =>
-        `<stop offset="${((i / (stops.length - 1)) * 100).toFixed(2)}%" stop-color="${hex}"/>`,
-    )
+    .map((hex, i) => {
+      const { paint, meta } = paintFor(hex);
+      return `<stop offset="${((i / (stops.length - 1)) * 100).toFixed(2)}%" stop-color="${paint}"${meta}/>`;
+    })
     .join("");
 
   const paint = isHalo
     ? `<radialGradient id="${id}" cx="50%" cy="45%" r="72%">${ramp}</radialGradient>`
     : `<linearGradient id="${id}" x1="${axis.x1 * 100}%" y1="${axis.y1 * 100}%" x2="${axis.x2 * 100}%" y2="${axis.y2 * 100}%">${ramp}</linearGradient>`;
+
 
   const marginX = ((panel.bleedW - panel.trimW) / 2).toFixed(2);
   const marginY = ((panel.bleedH - panel.trimH) / 2).toFixed(2);
@@ -446,15 +482,21 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
     ` data-colourway="${brand.colourway}"`,
     ` data-source="${escapeXml(brand.art.source)}"`,
     ` transform="translate(${brand.logo.x.toFixed(2)} ${brand.logo.y.toFixed(2)}) scale(${logoScale.toFixed(5)})">`,
-    brand.art.paths.map((p) => `<path d="${p.d}" fill="${p.fill}"/>`).join(""),
+    brand.art.paths
+      .map((p) => {
+        const { paint: fill, meta } = paintFor(p.fill);
+        return `<path d="${p.d}" fill="${fill}"${meta}/>`;
+      })
+      .join(""),
     `</g>`,
   ].join("");
 
   const inkOnLight = brand.colourway === "dblue";
-  const copyInk = inkOnLight ? "#03002C" : "#FFFFFF";
+  const copyHex = inkOnLight ? "#03002C" : "#FFFFFF";
+  const copyPaint = paintFor(copyHex);
   const copyLayer = brand.copy
     ? `<text data-layer="copy" data-layer-order="2" x="${brand.copyCentreMm.toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
-      ` text-anchor="middle" fill="${copyInk}" font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
+      ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta} font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
       ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
       ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
     : "";
@@ -465,7 +507,9 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
     ` viewBox="0 0 ${panel.bleedW} ${panel.bleedH}" data-panel="${panel.id}"`,
     ` data-trim="${panel.trimW}x${panel.trimH}mm" data-bleed="${panel.bleedEdge}mm"`,
     ` data-trim-origin="${marginX},${marginY}" data-style="${panel.style}"`,
+    ` data-colorspace="${cmyk ? "cmyk" : "rgb"}"${cmyk ? ` data-vibrance="${vibrance}"` : ""}`,
     ` data-font="${LONDON_SIGNAGE_FONT.pdfBaseFont}">`,
+
     `<title>${escapeXml(panel.name)}</title>`,
     `<desc>TransPerfect NEXT 2026 London · ${escapeXml(panel.room)} · trim ${panel.trimW}×${panel.trimH}mm, bleed ${panel.bleedEdge}mm/edge, ${panel.style} · ${escapeXml(brand.art.source)}</desc>`,
     `<defs>${paint}</defs>`,
@@ -508,23 +552,45 @@ function gradientRgb(stops: string[], t: number): [number, number, number] {
  * raster is embedded. Gouraud meshes were rejected here: RIPs read them fine
  * but Illustrator re-interprets them and the colours come in wrong.
  */
-export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
+export function buildLondonPanelAi(
+  panel: LondonPanel,
+  options: LondonArtOptions = {},
+): Uint8Array {
+  const cmyk = options.colorSpace === "cmyk";
+  const vibrance = options.vibrance ?? 1;
   const w = panel.bleedW * MM_TO_PT;
   const h = panel.bleedH * MM_TO_PT;
   const trimX = ((panel.bleedW - panel.trimW) / 2) * MM_TO_PT;
   const trimY = ((panel.bleedH - panel.trimH) / 2) * MM_TO_PT;
-  const stops = stopsFromColors(stopsFor(panel));
   const axis = styleAxis(panel.style);
   const isHalo = panel.style.includes("halo");
+  /** Fill operator for one brand colour, in the chosen output space. */
+  const fillOp = (hex: string): string =>
+    cmyk
+      ? cmykFillOp(londonCmykBuild(hex, vibrance))
+      : (() => {
+          const [r, g, b] = parseColor(hex);
+          return `${f3(r)} ${f3(g)} ${f3(b)} rg`;
+        })();
 
   // Unit-space axis/centre mirror the SVG master (y down); PDF space is y up.
-  const shadingDict = isHalo
-    ? radialShadingDict({ x: 0.5 * w, y: h - 0.45 * h }, 0.72 * Math.max(w, h), stops)
-    : axialShadingDict(
-        { x: axis.x1 * w, y: h - axis.y1 * h },
-        { x: axis.x2 * w, y: h - axis.y2 * h },
-        stops,
-      );
+  const from = { x: axis.x1 * w, y: h - axis.y1 * h };
+  const to = { x: axis.x2 * w, y: h - axis.y2 * h };
+  const centre = { x: 0.5 * w, y: h - 0.45 * h };
+  const radius = 0.72 * Math.max(w, h);
+  const shadingDict = cmyk
+    ? (() => {
+        const stops = cmykStopsFromColors(stopsFor(panel), vibrance);
+        return isHalo
+          ? cmykRadialShadingDict(centre, radius, stops)
+          : cmykAxialShadingDict(from, to, stops);
+      })()
+    : (() => {
+        const stops = stopsFromColors(stopsFor(panel));
+        return isHalo
+          ? radialShadingDict(centre, radius, stops)
+          : axialShadingDict(from, to, stops);
+      })();
 
   // Brand layer: EPS-derived lockup outlines as live PDF paths, headline copy
   // as live Geist Bold text — both editable when the .ai is opened.
@@ -532,7 +598,6 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
   const logoScale = (brand.logo.w * MM_TO_PT) / brand.art.w;
   const logoOps = brand.art.paths
     .map((p) => {
-      const [r, g, b] = parseColor(p.fill);
       const ops = svgPathToPdfOps(p.d, {
         scale: logoScale,
         x: brand.logo.x * MM_TO_PT,
@@ -540,7 +605,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
         artHeight: brand.art.h,
       });
       if (!ops) return "";
-      return `q ${f3(r)} ${f3(g)} ${f3(b)} rg ${ops} f Q\n`;
+      return `q ${fillOp(p.fill)} ${ops} f Q\n`;
     })
     .join("");
 
@@ -551,13 +616,22 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
         const advance = brand.copy.length * (size * 0.62 + tracking);
         const x = brand.copyCentreMm * MM_TO_PT - advance / 2;
         const y = h - brand.copyBaselineMm * MM_TO_PT;
-        const [cr, cg, cb] = parseColor(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
+        // Copy on a CMYK master follows the print contract: dark copy is 100K,
+        // knockout copy is 0/0/0/0 — never a four-colour build.
+        const ink = cmyk
+          ? cmykFillOp(
+              brand.colourway === "dblue"
+                ? { c: 0, m: 0, y: 0, k: 1 }
+                : { c: 0, m: 0, y: 0, k: 0 },
+            )
+          : fillOp(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
         return (
-          `q ${f3(cr)} ${f3(cg)} ${f3(cb)} rg BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
+          `q ${ink} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
           `1 0 0 1 ${f3(x)} ${f3(y)} Tm (${pdfText(brand.copy)}) Tj ET Q\n`
         );
       })()
     : "";
+
 
   // Three real Illustrator layers via optional content groups. Paint order is
   // ground → copy → hero lockup, and /OCProperties /Order lists the hero lockup
@@ -574,6 +648,7 @@ export function buildLondonPanelAi(panel: LondonPanel): Uint8Array {
     `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f3(w)} ${f3(h)}] /BleedBox [0 0 ${f3(w)} ${f3(h)}] ` +
       `/TrimBox [${f3(trimX)} ${f3(trimY)} ${f3(trimX + panel.trimW * MM_TO_PT)} ${f3(trimY + panel.trimH * MM_TO_PT)}] ` +
       `/TPGradientKind /LiveShading /TPLockup (${pdfText(brand.art.source)}) ` +
+      `/TPColorSpace (${cmyk ? `DeviceCMYK vibrant${vibrance}` : "DeviceRGB"}) ` +
       `/TPLockupColourway (${pdfText(brand.colourway)}) ` +
       `/Resources << /Shading << /Sh0 6 0 R >> /Font << /F1 7 0 R >> ` +
       `/Properties << /oc1 8 0 R /oc2 9 0 R /oc3 10 0 R >> >> /Contents 4 0 R >>`,
@@ -633,9 +708,15 @@ function pdfText(s: string): string {
 }
 
 /** Stable file base for a regenerated panel, versioned by revision number. */
-export function londonPanelFileBase(panel: LondonPanel, rev: number): string {
-  return `r${String(rev).padStart(3, "0")}-${panelSlug(panel)}`;
+export function londonPanelFileBase(
+  panel: LondonPanel,
+  rev: number,
+  colorSpace: LondonColorSpace = "rgb",
+): string {
+  const space = colorSpace === "cmyk" ? "-cmyk" : "";
+  return `r${String(rev).padStart(3, "0")}-${panelSlug(panel)}${space}`;
 }
+
 
 /**
  * Cheap content fingerprint (FNV-1a) recorded per regenerated file, so a

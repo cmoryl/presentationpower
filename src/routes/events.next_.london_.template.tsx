@@ -67,6 +67,10 @@ function LondonTemplatePage() {
   const [floor, setFloor] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string>(LONDON_PANELS[0]?.id ?? "");
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  // Output colour space for every download on this page. RGB stays the house
+  // default (the RIP separates); CMYK is the explicit vibrant-corrected master.
+  const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
+  const [vibrance, setVibrance] = useState(1);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   const panels = useMemo(
@@ -79,18 +83,28 @@ function LondonTemplatePage() {
   );
   const placement = placements[panel.id] ?? DEFAULT_LOGO_PLACEMENT;
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
-  const svg = useMemo(() => buildLondonPanelSvg(panel), [panel, placement]);
+  const art = useMemo(() => ({ colorSpace, vibrance }), [colorSpace, vibrance]);
+  // Preview paints the chosen space, so a CMYK master is soft-proofed on screen.
+  const svg = useMemo(() => buildLondonPanelSvg(panel, art), [panel, placement, art]);
   const familyLabel = nextLogoFamily(plan.familyId)?.label ?? "TransPerfect";
   const colourways = useMemo(() => nextLogoColourways(plan.familyId), [plan.familyId]);
+  const groundBuilds = useMemo(
+    () =>
+      londonPanelStops(panel).map((hex) => ({
+        hex,
+        build: londonCmykBuild(hex, vibrance),
+      })),
+    [panel, vibrance],
+  );
 
   // Single-panel handoff: the exact masters the printer opens, hero lockup first.
   const downloadPanel = useCallback(
     (kind: "svg" | "ai") => {
-      const base = londonPanelFileBase(panel, 1);
+      const base = londonPanelFileBase(panel, 1, colorSpace);
       const blob =
         kind === "svg"
-          ? new Blob([buildLondonPanelSvg(panel)], { type: "image/svg+xml" })
-          : new Blob([londonAiBytes(buildLondonPanelAi(panel))], {
+          ? new Blob([buildLondonPanelSvg(panel, art)], { type: "image/svg+xml" })
+          : new Blob([londonAiBytes(buildLondonPanelAi(panel, art))], {
               type: "application/postscript",
             });
       const url = URL.createObjectURL(blob);
@@ -99,10 +113,11 @@ function LondonTemplatePage() {
       link.download = `${base}.${kind}`;
       link.click();
       URL.revokeObjectURL(url);
-      toast.success(`${base}.${kind} downloaded`);
+      toast.success(`${base}.${kind} downloaded · ${colorSpace.toUpperCase()}`);
     },
-    [panel],
+    [panel, art, colorSpace],
   );
+
 
   // Drag with window-level listeners so the pointer can leave the box.
   // `target` picks which object moves: the hero lockup or the headline copy.
@@ -155,15 +170,19 @@ function LondonTemplatePage() {
     const id = toast.loading(`Building ${panels.length} panels…`);
     try {
       const pack = await buildLondonSignagePack(panels, {
+        colorSpace,
+        vibrance,
         onProgress: (done, total) => setProgress({ done, total }),
       });
       const url = URL.createObjectURL(pack.blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `TP-NEXT-2026-London-${floor === "all" ? "full" : floor}-signage-pack.zip`;
+      link.download = `TP-NEXT-2026-London-${floor === "all" ? "full" : floor}-signage-pack${
+        colorSpace === "cmyk" ? "-cmyk" : ""
+      }.zip`;
       link.click();
       URL.revokeObjectURL(url);
-      toast.success(`${pack.files.length} files packed`, { id });
+      toast.success(`${pack.files.length} files packed · ${colorSpace.toUpperCase()}`, { id });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Pack failed", { id });
     } finally {
@@ -316,6 +335,67 @@ function LondonTemplatePage() {
                 </Button>
               </span>
             </div>
+
+            {/* Output colour space — applies to the preview above and to every
+                download on this page, single panel or full pack. */}
+            <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-medium">Output colour space</span>
+                {(["rgb", "cmyk"] as const).map((space) => (
+                  <button
+                    key={space}
+                    type="button"
+                    aria-pressed={colorSpace === space}
+                    onClick={() => setColorSpace(space)}
+                    className={`rounded-full border px-3 py-1 text-xs transition ${
+                      colorSpace === space
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {space === "rgb" ? "RGB · RIP separates" : "CMYK · print master"}
+                  </button>
+                ))}
+                {colorSpace === "cmyk" ? (
+                  <label className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+                    Vibrance
+                    <input
+                      type="range"
+                      min={0}
+                      max={1.5}
+                      step={0.1}
+                      value={vibrance}
+                      onChange={(event) => setVibrance(Number(event.target.value))}
+                      className="w-28"
+                      aria-label="CMYK vibrance correction"
+                    />
+                    <span className="tabular-nums">{vibrance.toFixed(1)}×</span>
+                  </label>
+                ) : null}
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">
+                {colorSpace === "cmyk"
+                  ? "DeviceCMYK masters: signed-off brand builds are used verbatim, everything else converts with skeletal black (no black under saturated colour) and a 300% ink ceiling. Copy prints 100K or 0-0-0-0 knockout. Files are suffixed -cmyk."
+                  : "Brand RGB ships untouched and the printer's RIP performs the separation — the house default. Switch to CMYK only when the printer asks for separated masters."}
+              </p>
+              {colorSpace === "cmyk" ? (
+                <ul className="mt-2 grid gap-1 sm:grid-cols-2">
+                  {groundBuilds.map(({ hex, build }) => (
+                    <li key={hex} className="flex items-center gap-2 text-[11px]">
+                      <span
+                        className="h-3.5 w-3.5 shrink-0 rounded-sm border border-black/20"
+                        style={{ background: cmykToHex(build) }}
+                      />
+                      <span className="font-mono text-muted-foreground">{hex}</span>
+                      <span className={build.approved ? "text-foreground" : "text-muted-foreground"}>
+                        {cmykLabel(build)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+
 
             <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
               <div className="flex flex-wrap items-center gap-3">
