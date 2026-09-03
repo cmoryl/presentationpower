@@ -134,7 +134,10 @@ export function londonBrandingPlan(
   }
 
 
-  const copy = pickCopy(panel);
+  // Copy: the note-derived headline unless the location team typed their own.
+  // An empty string is a deliberate "no headline on this panel".
+  const authored = nudge.text === null ? pickCopy(panel) : nudge.text.trim() || null;
+  const copy = authored;
   const centreX = marginX + panel.trimW / 2 - logoW / 2;
 
   // Stacked lockups sit on the upper third; horizontal lockups ride the lower
@@ -148,11 +151,22 @@ export function londonBrandingPlan(
   const logoX = clamp(centreX + nudge.dx * panel.trimW, 0, panel.bleedW - logoW);
   const logoY = clamp(baseY + nudge.dy * panel.trimH, 0, panel.bleedH - logoH);
 
-  const copySizeMm = Math.min(liveH * 0.16, Math.max(24, liveW * 0.052));
-  const copyBaselineMm =
+  const copySizeMm = Math.min(liveH * 0.16, Math.max(24, liveW * 0.052)) * nudge.textScale;
+  const baseBaseline =
     orientation === "side"
       ? marginY + safe + copySizeMm
       : logoY + logoH + Math.max(logoH * 0.5, copySizeMm * 1.2);
+  // Headline nudge, clamped so the cap band stays inside the sheet.
+  const copyBaselineMm = clamp(
+    baseBaseline + nudge.textDy * panel.trimH,
+    copySizeMm,
+    panel.bleedH - copySizeMm * 0.3,
+  );
+  const copyCentreMm = clamp(
+    marginX + panel.trimW / 2 + nudge.textDx * panel.trimW,
+    0,
+    panel.bleedW,
+  );
 
   return {
     familyId,
@@ -163,11 +177,13 @@ export function londonBrandingPlan(
     copy,
     copySizeMm,
     copyBaselineMm,
+    copyCentreMm,
     copyAlign: "middle",
     clearMm: logoH * 0.25,
     placement: nudge,
   };
 }
+
 
 function clamp(value: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(Math.max(lo, hi), value));
