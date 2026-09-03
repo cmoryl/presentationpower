@@ -12,6 +12,12 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { LondonPrintGuides, LondonPrintReadout } from "@/components/london/LondonPrintPreview";
+import { StepRepeatWallPanel } from "@/components/events/StepRepeatWallPanel";
+import {
+  isStepRepeatPanel,
+  mmToIn,
+  useStepRepeatConfigs,
+} from "@/lib/next-london-step-repeat";
 import { londonBrandingPlan } from "@/lib/next-london-branding";
 import {
   buildLondonPanelAi,
@@ -128,9 +134,17 @@ export function LondonPanelLiveEditor({
   const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
+  // Photo walls are a repeating pattern, so their artwork is driven by the wall
+  // recipe rather than by a single lockup / headline placement.
+  const wallConfigs = useStepRepeatConfigs();
+  const isWall = isStepRepeatPanel(panel);
+
   const plan = useMemo(() => londonBrandingPlan(panel, placement), [panel, placement]);
   const art = useMemo(() => ({ colorSpace, vibrance: 1 }), [colorSpace]);
-  const svg = useMemo(() => buildLondonPanelSvg(panel, art), [panel, placement, art]);
+  const svg = useMemo(
+    () => buildLondonPanelSvg(panel, art),
+    [panel, placement, art, wallConfigs],
+  );
   const colourways = useMemo(() => nextLogoColourways(plan.familyId), [plan.familyId]);
   const familyLabel = nextLogoFamily(plan.familyId)?.label ?? "TransPerfect";
   const boardOverridden = !!boardSizes[panel.id];
@@ -231,7 +245,9 @@ export function LondonPanelLiveEditor({
         <div className="flex items-center justify-between gap-2 pb-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
             <Move className="h-3.5 w-3.5" />{" "}
-            {booth
+            {isWall
+              ? "step & repeat pattern — set the recipe on the right"
+              : booth
               ? boothArt
                 ? `${boothMeta?.artboard.label ?? "Booth"} · supplied vendor artwork`
                 : "Booth artwork pending — brand ground shown"
@@ -267,6 +283,7 @@ export function LondonPanelLiveEditor({
             />
           </>
           {printPreview ? <LondonPrintGuides panel={panel} /> : null}
+          {isWall ? null : (
           <div
             role="button"
             tabIndex={0}
@@ -284,7 +301,8 @@ export function LondonPanelLiveEditor({
             className="absolute cursor-move rounded-sm border border-dashed border-white/70 bg-white/5 outline-none focus-visible:ring-2 focus-visible:ring-white"
             style={logoBox}
           />
-          {textBox ? (
+          )}
+          {textBox && !isWall ? (
             <div
               role="button"
               tabIndex={0}
@@ -319,6 +337,8 @@ export function LondonPanelLiveEditor({
           the kit.
         </p>
 
+        {isWall ? <StepRepeatWallPanel panel={panel} /> : null}
+
         {/* Gradient */}
         <div className="rounded-lg border border-border bg-muted/30 p-3">
           <label className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -338,8 +358,8 @@ export function LondonPanelLiveEditor({
           </label>
         </div>
 
-        {/* Copy */}
-        <div className="rounded-lg border border-border bg-muted/30 p-3">
+        {/* Copy — a wall repeats its own text, so the single headline is hidden */}
+        <div className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}>
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex min-w-[220px] flex-1 items-center gap-2 text-xs text-muted-foreground">
               <Type className="h-3.5 w-3.5" /> Panel text
@@ -412,7 +432,7 @@ export function LondonPanelLiveEditor({
         </div>
 
         {/* Lockup */}
-        <div className="rounded-lg border border-border bg-muted/30 p-3">
+        <div className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}>
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-muted-foreground">Logo colourway</span>
             {colourways.map((key) => (
@@ -455,7 +475,7 @@ export function LondonPanelLiveEditor({
         </div>
 
         {/* QR */}
-        <div className="rounded-lg border border-border bg-muted/30 p-3">
+        <div className={`rounded-lg border border-border bg-muted/30 p-3 ${isWall ? "hidden" : ""}`}>
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex min-w-[220px] flex-1 items-center gap-2 text-xs text-muted-foreground">
               <QrCode className="h-3.5 w-3.5" /> QR link
@@ -556,7 +576,8 @@ export function LondonPanelLiveEditor({
             </h4>
             <span className="text-xs text-muted-foreground">
               {boardOverridden ? "Measured on site" : "Shipped spec"} · file {panel.bleedW}×
-              {panel.bleedH}mm
+              {panel.bleedH}mm ({mmToIn(panel.bleedW).toFixed(1)}×{mmToIn(panel.bleedH).toFixed(1)}
+              in)
             </span>
           </div>
           <div className="mt-3 flex flex-wrap items-end gap-3">
@@ -583,7 +604,12 @@ export function LondonPanelLiveEditor({
               ]
             ).map((field) => (
               <label key={field.key} className="flex flex-col gap-1 text-xs text-muted-foreground">
-                {field.label}
+                <span className="flex items-baseline gap-1">
+                  {field.label}
+                  <span className="tabular-nums text-[10px] opacity-70">
+                    {mmToIn(field.value).toFixed(2)}″
+                  </span>
+                </span>
                 <MmInput
                   label={`${panel.name} ${field.label}`}
                   value={field.value}
