@@ -420,7 +420,12 @@ function LondonRevisePage() {
     });
   };
 
-  const regenerate = async (panels: LondonPanel[], rev: number, kind: "vector" | "raster") => {
+  const regenerate = async (
+    panels: LondonPanel[],
+    rev: number,
+    kind: "vector" | "raster",
+    zipName?: string,
+  ) => {
     const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
     const manifest: string[] = ["file,panel,room,trim_mm,bleed_mm,ppi,fingerprint,qa"];
