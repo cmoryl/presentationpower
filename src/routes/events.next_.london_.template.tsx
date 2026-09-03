@@ -176,6 +176,18 @@ function LondonTemplatePage() {
     height: `${(plan.logo.h / panel.bleedH) * 100}%`,
   };
 
+  // Headline hit box: the cap band around the copy baseline, centred on the
+  // planned copy centre — the same numbers the .svg and .ai masters use.
+  const textBox = plan.copy
+    ? {
+        left: `${((plan.copyCentreMm - plan.copySizeMm * plan.copy.length * 0.31) / panel.bleedW) * 100}%`,
+        top: `${((plan.copyBaselineMm - plan.copySizeMm) / panel.bleedH) * 100}%`,
+        width: `${((plan.copySizeMm * plan.copy.length * 0.62) / panel.bleedW) * 100}%`,
+        height: `${((plan.copySizeMm * 1.25) / panel.bleedH) * 100}%`,
+      }
+    : null;
+
+
   return (
     <AppShell>
       <div className="mx-auto w-full max-w-[1400px] px-5 py-8">
