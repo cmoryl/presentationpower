@@ -315,6 +315,60 @@ function LondonTemplatePage() {
               </span>
             </div>
 
+            <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <label className="flex min-w-[240px] flex-1 items-center gap-2 text-xs text-muted-foreground">
+                  <Type className="h-3.5 w-3.5" /> Panel text
+                  <input
+                    type="text"
+                    value={placement.text ?? plan.copy ?? ""}
+                    maxLength={LONDON_TEXT_MAX_CHARS}
+                    placeholder="No headline on this panel"
+                    onChange={(event) =>
+                      setLondonLogoPlacement(panel.id, { text: event.target.value.toUpperCase() })
+                    }
+                    className="h-9 w-full rounded-md border border-border bg-background px-2 text-sm"
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  Text size
+                  <input
+                    type="range"
+                    min={LONDON_TEXT_SCALE.min}
+                    max={LONDON_TEXT_SCALE.max}
+                    step={LONDON_TEXT_SCALE.step}
+                    value={placement.textScale}
+                    onChange={(event) =>
+                      setLondonLogoPlacement(panel.id, { textScale: Number(event.target.value) })
+                    }
+                    className="w-36"
+                  />
+                  <span className="tabular-nums">{plan.copySizeMm.toFixed(0)}mm</span>
+                </label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                  onClick={() =>
+                    setLondonLogoPlacement(panel.id, {
+                      text: null,
+                      textScale: 1,
+                      textDx: 0,
+                      textDy: 0,
+                    })
+                  }
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Reset text
+                </Button>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Live Geist Bold on the .svg and .ai masters. Drag the amber box on the panel — or
+                nudge it with the arrow keys — to place the line. Clear the field to drop the
+                headline from this panel.
+              </p>
+            </div>
+
+
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <label className="flex items-center gap-2 text-xs text-muted-foreground">
                 Scale
