@@ -477,6 +477,27 @@ function LondonRevisePage() {
     }
   };
 
+  // One panel at a time: rebuild just this board's .svg, .ai and dithered PNG,
+  // audited against its current (possibly edited) spec.
+  const regenPanel = (panel: LondonPanel) => {
+    void runWithExportFeedback(
+      {
+        pending: `Rebuilding ${panel.name}…`,
+        success: `${panel.name} artwork downloaded`,
+        failure: `Could not rebuild ${panel.name}`,
+      },
+      async () => {
+        const rev = head.rev + (dirty ? 1 : 0);
+        await regenerate(
+          [panel],
+          rev,
+          "vector",
+          `NEXT-London-r${String(rev).padStart(3, "0")}-${panelSlug(panel)}.zip`,
+        );
+      },
+    );
+  };
+
   const regenAffected = () => {
     const vectorPanels = draft.filter((p) => plan.vector.includes(p.id));
     const rasterPanels = draft.filter((p) => plan.raster.includes(p.id));
