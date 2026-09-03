@@ -453,11 +453,12 @@ export function buildLondonPanelSvg(panel: LondonPanel): string {
   const inkOnLight = brand.colourway === "dblue";
   const copyInk = inkOnLight ? "#03002C" : "#FFFFFF";
   const copyLayer = brand.copy
-    ? `<text data-layer="copy" data-layer-order="2" x="${(marginXNum(panel) + panel.trimW / 2).toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
+    ? `<text data-layer="copy" data-layer-order="2" x="${brand.copyCentreMm.toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
       ` text-anchor="middle" fill="${copyInk}" font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
       ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
       ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
     : "";
+
 
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" width="${panel.bleedW}mm" height="${panel.bleedH}mm"`,
