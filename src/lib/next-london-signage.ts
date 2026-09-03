@@ -88,11 +88,12 @@ export const LONDON_STYLES: Record<string, { label: string; note: string; stops:
     note: "Widest hue travel in the set — reserved for the merch mart and the Westminster/Cambridge screens.",
     stops: ["#7C4EF4", "#135CFB", "#7FE3E8"],
   },
-  "08-halo": {
-    label: "Halo",
-    note: "Centred halo for small square and semicircular panels seen close-up.",
-    stops: ["#8FA6FF", "#CFF6F7", "#7FE3E8"],
+  "08-chevron-sweep": {
+    label: "Chevron sweep",
+    note: "Low-angle brand sweep for cloakroom, help-desk and close-up square panels. Replaces the old centred halo: no soft centre sphere to read as a smudge, and the white lockup keeps full contrast at arm's length.",
+    stops: ["#03002C", "#135CFB", "#7FE3E8"],
   },
+
   "09-dawn": {
     label: "Dawn",
     note: "Lightest ground in the pack. Default for plinths, tall surrounds and the Whittle centre panels.",
@@ -485,7 +486,7 @@ export const LONDON_PANELS: LondonPanel[] = [
     page: 3,
     name: "CHURCHILL STAGE SET - p03 - 488x244mm",
     ground: "Banner wash",
-    style: "08-halo",
+    style: "08-chevron-sweep",
     trimW: 488.0,
     trimH: 244.0,
     bleedW: 508.0,
@@ -770,7 +771,7 @@ export const LONDON_PANELS: LondonPanel[] = [
     page: 5,
     name: "FLEMMING PLENARY STAGE - p05 - 596x428mm",
     ground: "Banner wash",
-    style: "08-halo",
+    style: "08-chevron-sweep",
     trimW: 595.8,
     trimH: 428.2,
     bleedW: 615.8,
@@ -884,7 +885,7 @@ export const LONDON_PANELS: LondonPanel[] = [
     page: 11,
     name: "FLEMMING PLENARY STAGE - p11 - 596x428mm",
     ground: "Banner wash",
-    style: "08-halo",
+    style: "08-chevron-sweep",
     trimW: 595.8,
     trimH: 428.2,
     bleedW: 615.8,

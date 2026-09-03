@@ -406,8 +406,12 @@ function styleAxis(styleId: string): Vec {
   if (styleId.includes("bloom")) return { x1: 0, y1: 0, x2: 0.85, y2: 0.85 };
   if (styleId.includes("prism")) return { x1: 0, y1: 1, x2: 1, y2: 0 };
   if (styleId.includes("veil")) return { x1: 0, y1: 0, x2: 0.25, y2: 1 };
+  // Chevron sweep: a low-angle run from the bottom-left, echoing the NEXT
+  // chevron rather than a centred sphere.
+  if (styleId.includes("chevron")) return { x1: 0, y1: 1, x2: 1, y2: 0.18 };
   return { x1: 0.5, y1: 0, x2: 0.5, y2: 1 };
 }
+
 
 function stopsFor(panel: LondonPanel): string[] {
   return londonPanelStops(panel);
@@ -485,7 +489,8 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
     brand.art.paths
       .map((p) => {
         const { paint: fill, meta } = paintFor(p.fill);
-        return `<path d="${p.d}" fill="${fill}"${meta}/>`;
+        const rule = p.fillRule === "evenodd" ? ` fill-rule="evenodd"` : "";
+        return `<path d="${p.d}" fill="${fill}"${rule}${meta}/>`;
       })
       .join(""),
     `</g>`,
@@ -494,11 +499,42 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
   const inkOnLight = brand.colourway === "dblue";
   const copyHex = inkOnLight ? "#03002C" : "#FFFFFF";
   const copyPaint = paintFor(copyHex);
+  // Vertical copy runs DOWN the panel — a 90° rotation about the anchor, so the
+  // text object stays live and re-typeable in Illustrator.
+  const copyRotate = brand.copyVertical
+    ? ` transform="rotate(90 ${brand.copyCentreMm.toFixed(2)} ${brand.copyBaselineMm.toFixed(2)})"`
+    : "";
   const copyLayer = brand.copy
     ? `<text data-layer="copy" data-layer-order="2" x="${brand.copyCentreMm.toFixed(2)}" y="${brand.copyBaselineMm.toFixed(2)}"` +
+      `${copyRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
       ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta} font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
       ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
       ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
+    : "";
+
+  // QR: real encoded modules as vector geometry on a white plate, so the code
+  // stays crisp at any signage size and scans off a scenic ground.
+  const qrLayer = brand.qr
+    ? (() => {
+        const q = brand.qr;
+        const pad = q.size * 0.03;
+        const plate = paintFor("#FFFFFF");
+        const ink = paintFor("#03002C");
+        const scale = q.size / q.modules;
+        const caption = q.caption
+          ? `<text x="${(q.x + q.size / 2).toFixed(2)}" y="${(q.y + q.size + pad + q.captionSizeMm * 1.15).toFixed(2)}"` +
+            ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta}` +
+            ` font-family="${LONDON_SIGNAGE_FONT.cssStack}" font-weight="${LONDON_SIGNAGE_FONT.weight}"` +
+            ` font-size="${q.captionSizeMm.toFixed(2)}">${escapeXml(q.caption)}</text>`
+          : "";
+        return (
+          `<g id="qr" data-layer="qr" data-layer-order="2" data-qr="${escapeXml(q.data)}">` +
+          `<rect x="${(q.x - pad).toFixed(2)}" y="${(q.y - pad).toFixed(2)}" width="${(q.size + pad * 2).toFixed(2)}"` +
+          ` height="${(q.size + pad * 2).toFixed(2)}" rx="${(q.size * 0.04).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>` +
+          `<g transform="translate(${q.x.toFixed(2)} ${q.y.toFixed(2)}) scale(${scale.toFixed(5)})">` +
+          `<path d="${q.path}" fill="${ink.paint}"${ink.meta}/></g></g>${caption}`
+        );
+      })()
     : "";
 
 
@@ -515,9 +551,11 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
     `<defs>${paint}</defs>`,
     `<g id="ground" data-layer="ground" data-layer-order="3"><rect x="0" y="0" width="${panel.bleedW}" height="${panel.bleedH}" fill="url(#${id})"/></g>`,
     copyLayer,
+    qrLayer,
     logoGroup,
     `</svg>`,
   ].join("");
+
 }
 
 
@@ -605,41 +643,79 @@ export function buildLondonPanelAi(
         artHeight: brand.art.h,
       });
       if (!ops) return "";
-      return `q ${fillOp(p.fill)} ${ops} f Q\n`;
+      // Compound outlines keep the master's fill rule, so glyph counters and
+      // knockouts stay open exactly as the .eps draws them.
+      return `q ${fillOp(p.fill)} ${ops} ${p.fillRule === "evenodd" ? "f*" : "f"} Q\n`;
     })
     .join("");
+
+  const copyInk = cmyk
+    ? cmykFillOp(brand.colourway === "dblue" ? { c: 0, m: 0, y: 0, k: 1 } : { c: 0, m: 0, y: 0, k: 0 })
+    : fillOp(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
 
   const copyOps = brand.copy
     ? (() => {
         const size = brand.copySizeMm * MM_TO_PT;
         const tracking = size * LONDON_SIGNAGE_FONT.tracking;
         const advance = brand.copy.length * (size * 0.62 + tracking);
-        const x = brand.copyCentreMm * MM_TO_PT - advance / 2;
-        const y = h - brand.copyBaselineMm * MM_TO_PT;
+        const ax = brand.copyCentreMm * MM_TO_PT;
+        const ay = h - brand.copyBaselineMm * MM_TO_PT;
         // Copy on a CMYK master follows the print contract: dark copy is 100K,
         // knockout copy is 0/0/0/0 — never a four-colour build.
-        const ink = cmyk
-          ? cmykFillOp(
-              brand.colourway === "dblue"
-                ? { c: 0, m: 0, y: 0, k: 1 }
-                : { c: 0, m: 0, y: 0, k: 0 },
-            )
-          : fillOp(brand.colourway === "dblue" ? "#03002C" : "#FFFFFF");
+        // Vertical copy is a live text object rotated -90°, so it runs down the
+        // pillar and still re-types in Illustrator.
+        const tm = brand.copyVertical
+          ? `0 -1 1 0 ${f3(ax)} ${f3(ay + advance / 2)} Tm`
+          : `1 0 0 1 ${f3(ax - advance / 2)} ${f3(ay)} Tm`;
         return (
-          `q ${ink} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
-          `1 0 0 1 ${f3(x)} ${f3(y)} Tm (${pdfText(brand.copy)}) Tj ET Q\n`
+          `q ${copyInk} BT /F1 ${f3(size)} Tf ${f3(tracking)} Tc ` +
+          `${tm} (${pdfText(brand.copy)}) Tj ET Q\n`
         );
+      })()
+    : "";
+
+  // QR: vector modules on a white plate, plus its caption — all live objects.
+  const qrOps = brand.qr
+    ? (() => {
+        const q = brand.qr;
+        const pad = q.size * 0.03;
+        const size = q.size * MM_TO_PT;
+        const padPt = pad * MM_TO_PT;
+        const x = q.x * MM_TO_PT;
+        const yTop = q.y * MM_TO_PT;
+        const plate = `q ${fillOp("#FFFFFF")} ${f3(x - padPt)} ${f3(h - yTop - size - padPt)} ${f3(size + padPt * 2)} ${f3(size + padPt * 2)} re f Q\n`;
+        const modules = svgPathToPdfOps(q.path, {
+          scale: size / q.modules,
+          x,
+          y: h - yTop - size,
+          artHeight: q.modules,
+        });
+        const code = modules ? `q ${fillOp("#03002C")} ${modules} f Q\n` : "";
+        const caption = q.caption
+          ? (() => {
+              const cs = q.captionSizeMm * MM_TO_PT;
+              const advance = q.caption.length * cs * 0.62;
+              const cx = (q.x + q.size / 2) * MM_TO_PT - advance / 2;
+              const cy = h - (q.y + q.size + pad + q.captionSizeMm * 1.15) * MM_TO_PT;
+              return (
+                `q ${copyInk} BT /F1 ${f3(cs)} Tf 1 0 0 1 ${f3(cx)} ${f3(cy)} Tm ` +
+                `(${pdfText(q.caption)}) Tj ET Q\n`
+              );
+            })()
+          : "";
+        return plate + code + caption;
       })()
     : "";
 
 
   // Three real Illustrator layers via optional content groups. Paint order is
-  // ground → copy → hero lockup, and /OCProperties /Order lists the hero lockup
-  // FIRST, so the lockup is the top layer when the .ai is opened.
+  // ground → copy (with the QR block) → hero lockup, and /OCProperties /Order
+  // lists the hero lockup FIRST, so it is the top layer when the .ai is opened.
   const content =
     `/OC /oc3 BDC\nq 0 0 ${f3(w)} ${f3(h)} re W n /Sh0 sh Q\nEMC\n` +
-    (copyOps ? `/OC /oc2 BDC\n${copyOps}EMC\n` : "") +
+    (copyOps || qrOps ? `/OC /oc2 BDC\n${copyOps}${qrOps}EMC\n` : "") +
     `/OC /oc1 BDC\n${logoOps}EMC\n`;
+
 
   const objects: string[] = [
     `<< /Type /Catalog /Pages 2 0 R /OCProperties << /OCGs [8 0 R 9 0 R 10 0 R] ` +
