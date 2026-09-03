@@ -102,20 +102,30 @@ function LondonTemplatePage() {
     [panel],
   );
 
-  // Drag with window-level listeners so the pointer can leave the lockup box.
-  const onPointerDown = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
+  // Drag with window-level listeners so the pointer can leave the box.
+  // `target` picks which object moves: the hero lockup or the headline copy.
+  const startDrag = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>, target: "logo" | "text") => {
       event.preventDefault();
+      event.stopPropagation();
       const stage = stageRef.current;
       if (!stage) return;
       const rect = stage.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
-      const start = { x: event.clientX, y: event.clientY, dx: placement.dx, dy: placement.dy };
+      const start = {
+        x: event.clientX,
+        y: event.clientY,
+        dx: target === "logo" ? placement.dx : placement.textDx,
+        dy: target === "logo" ? placement.dy : placement.textDy,
+      };
       const move = (moveEvent: PointerEvent) => {
         // Screen delta → trim fraction, using the panel's own bleed/trim ratio.
         const dx = start.dx + ((moveEvent.clientX - start.x) / rect.width) * (panel.bleedW / panel.trimW);
         const dy = start.dy + ((moveEvent.clientY - start.y) / rect.height) * (panel.bleedH / panel.trimH);
-        setLondonLogoPlacement(panel.id, { dx, dy });
+        setLondonLogoPlacement(
+          panel.id,
+          target === "logo" ? { dx, dy } : { textDx: dx, textDy: dy },
+        );
       };
       const up = () => {
         window.removeEventListener("pointermove", move);
@@ -126,11 +136,18 @@ function LondonTemplatePage() {
       window.addEventListener("pointerup", up);
       window.addEventListener("pointercancel", up);
     },
-    [panel, placement.dx, placement.dy],
+    [panel, placement.dx, placement.dy, placement.textDx, placement.textDy],
   );
 
   const nudge = (dx: number, dy: number) =>
     setLondonLogoPlacement(panel.id, { dx: placement.dx + dx, dy: placement.dy + dy });
+
+  const nudgeText = (dx: number, dy: number) =>
+    setLondonLogoPlacement(panel.id, {
+      textDx: placement.textDx + dx,
+      textDy: placement.textDy + dy,
+    });
+
 
   async function generatePack() {
     const id = toast.loading(`Building ${panels.length} panels…`);
