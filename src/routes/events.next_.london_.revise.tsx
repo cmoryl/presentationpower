@@ -894,6 +894,15 @@ function LondonRevisePage() {
                           </button>
                           <button
                             type="button"
+                            onClick={() => regenPanel(panel)}
+                            className="ml-1.5 mt-1 inline-flex items-center gap-1.5 rounded-md border border-[#003FC7]/30 px-2 py-1 text-[11px] font-semibold text-[#003FC7]"
+                          >
+                            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                            Rebuild this panel
+                          </button>
+
+                          <button
+                            type="button"
                             onClick={() => dropPanel(panel)}
                             className="ml-1.5 mt-1 inline-flex items-center gap-1.5 rounded-md border border-[#E53D2E]/30 px-2 py-1 text-[11px] font-semibold text-[#E53D2E]"
                           >
