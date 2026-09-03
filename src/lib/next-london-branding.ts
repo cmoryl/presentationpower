@@ -27,6 +27,7 @@ import {
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
+import { londonDivisionColourway } from "@/lib/next-london-division";
 import {
   londonLogoPlacement,
   type LondonLogoPlacement,
@@ -161,7 +162,10 @@ export function londonBrandingPlan(
   const familyId = londonPanelFamily(panel);
   const aspect = panel.trimW / Math.max(1, panel.trimH);
   const nudgeEarly = placement ?? londonLogoPlacement(panel.id);
-  const { art, orientation, colourway } = pickNextLogo(familyId, aspect, nudgeEarly.colourway);
+  // Division items print the white lockup: full-colour and dark-blue marks are
+  // not approved on division signage, so a stored override is clamped here.
+  const wantedColourway = londonDivisionColourway(familyId, nudgeEarly.colourway);
+  const { art, orientation, colourway } = pickNextLogo(familyId, aspect, wantedColourway);
 
   const marginX = (panel.bleedW - panel.trimW) / 2;
   const marginY = (panel.bleedH - panel.trimH) / 2;

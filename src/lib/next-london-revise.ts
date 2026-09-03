@@ -34,7 +34,12 @@ import {
   radialShadingDict,
   stopsFromColors,
 } from "@/lib/pdf-gradient-shading";
-import { LONDON_SIGNAGE_FONT, londonBrandingPlan } from "@/lib/next-london-branding";
+import {
+  LONDON_SIGNAGE_FONT,
+  londonBrandingPlan,
+  londonPanelFamily,
+} from "@/lib/next-london-branding";
+import { londonDivisionStops } from "@/lib/next-london-division";
 import { loadLondonGroundImage, type LondonGroundImage } from "@/lib/next-london-artwork";
 
 import {
@@ -445,8 +450,12 @@ function stopsFor(panel: LondonPanel): string[] {
  */
 export function londonPanelStops(panel: LondonPanel): string[] {
   const stops = LONDON_STYLES[panel.style]?.stops;
-  return stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+  const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
+  // Division items carry their NEXT 2026 accent as a slight tint at the light
+  // end of the ramp; master-brand items are returned unchanged.
+  return londonDivisionStops(londonPanelFamily(panel), base);
 }
+
 
 /**
  * Output colour space for a regenerated master. `rgb` is the default and the
