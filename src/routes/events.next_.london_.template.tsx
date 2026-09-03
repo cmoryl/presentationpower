@@ -239,7 +239,7 @@ function LondonTemplatePage() {
                 </p>
               </div>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Move className="h-3.5 w-3.5" /> drag the lockup
+                <Move className="h-3.5 w-3.5" /> drag the lockup or the headline
               </div>
             </div>
 
@@ -253,7 +253,7 @@ function LondonTemplatePage() {
                 role="button"
                 tabIndex={0}
                 aria-label="Move lockup"
-                onPointerDown={onPointerDown}
+                onPointerDown={(event) => startDrag(event, "logo")}
                 onKeyDown={(event) => {
                   const step = event.shiftKey ? 0.02 : 0.005;
                   if (event.key === "ArrowLeft") nudge(-step, 0);
@@ -266,7 +266,27 @@ function LondonTemplatePage() {
                 className="absolute cursor-move rounded-sm border border-dashed border-white/70 bg-white/5 outline-none ring-offset-0 focus-visible:ring-2 focus-visible:ring-white"
                 style={logoBox}
               />
+              {textBox ? (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Move headline"
+                  onPointerDown={(event) => startDrag(event, "text")}
+                  onKeyDown={(event) => {
+                    const step = event.shiftKey ? 0.02 : 0.005;
+                    if (event.key === "ArrowLeft") nudgeText(-step, 0);
+                    else if (event.key === "ArrowRight") nudgeText(step, 0);
+                    else if (event.key === "ArrowUp") nudgeText(0, -step);
+                    else if (event.key === "ArrowDown") nudgeText(0, step);
+                    else return;
+                    event.preventDefault();
+                  }}
+                  className="absolute cursor-move rounded-sm border border-dashed border-amber-300/80 bg-amber-200/10 outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                  style={textBox}
+                />
+              ) : null}
             </div>
+
 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground">Logo colourway</span>
