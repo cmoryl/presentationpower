@@ -281,8 +281,17 @@ function LondonTemplatePage() {
                   {NEXT_LOGO_COLOURWAY_LABELS[plan.colourway].toLowerCase()}
                 </p>
               </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Move className="h-3.5 w-3.5" /> drag the lockup or the headline
+                <Button
+                  variant={printPreview ? "default" : "outline"}
+                  size="sm"
+                  className="gap-2"
+                  aria-pressed={printPreview}
+                  onClick={() => setPrintPreview((v) => !v)}
+                >
+                  <Ruler className="h-3.5 w-3.5" /> Print preview
+                </Button>
               </div>
             </div>
 
@@ -292,6 +301,7 @@ function LondonTemplatePage() {
               style={{ aspectRatio: `${panel.bleedW} / ${panel.bleedH}` }}
             >
               <img src={svgDataUrl(svg)} alt={`${panel.name} artwork preview`} className="h-full w-full" />
+              {printPreview ? <LondonPrintGuides panel={panel} /> : null}
               <div
                 role="button"
                 tabIndex={0}
