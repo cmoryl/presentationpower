@@ -32,6 +32,7 @@ import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
 import { LondonPanelThumb } from "@/components/events/LondonPanelThumb";
+import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
@@ -1031,25 +1032,24 @@ function LondonRevisePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Click-to-enlarge artwork preview, always at the panel's true aspect. */}
+      {/* Click-through live editor: full panel editing at the panel's true aspect. */}
       <Dialog open={!!artPanel} onOpenChange={(o) => !o && setArtId(null)}>
-        <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto">
+        <DialogContent className="max-h-[92vh] max-w-6xl overflow-y-auto">
           {artPanel ? (
             <>
               <DialogTitle className="text-base font-semibold text-[#03002C]">
-                {artPanel.name}
+                Edit {artPanel.name}
               </DialogTitle>
               <p className="text-xs text-[#666]">
                 {artPanel.floor} · {artPanel.room} · {artPanel.trimW}×{artPanel.trimH}mm trim ·{" "}
                 {artPanel.bleedW}×{artPanel.bleedH}mm bleed · {artPanel.rasterPx}px at{" "}
                 {artPanel.rasterPpi}ppi
               </p>
-              <div className="flex justify-center rounded-xl bg-[#F2F2F2] p-4">
-                <LondonPanelThumb
-                  panel={artPanel}
-                  size={Math.min(680, typeof window === "undefined" ? 680 : window.innerHeight * 0.62)}
-                />
-              </div>
+              <LondonPanelLiveEditor
+                panel={artPanel}
+                siblingIds={visible.filter((p) => p.id !== artPanel.id).map((p) => p.id)}
+                onStyleChange={(styleId) => setField(artPanel.id, "style", styleId)}
+              />
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
@@ -1075,6 +1075,7 @@ function LondonRevisePage() {
           ) : null}
         </DialogContent>
       </Dialog>
+
     </AppShell>
   );
 }
