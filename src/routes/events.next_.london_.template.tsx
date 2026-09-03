@@ -81,6 +81,8 @@ function LondonTemplatePage() {
   // default (the RIP separates); CMYK is the explicit vibrant-corrected master.
   const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
   const [vibrance, setVibrance] = useState(1);
+  // Print preview: draws the real bleed / trim / safe boxes over the stage.
+  const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   const panels = useMemo(
