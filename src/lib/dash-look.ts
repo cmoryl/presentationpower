@@ -96,7 +96,7 @@ const CHART_POOL: Record<string, DashChart[]> = {
   "MV-DASH-SUMMARY": ["area", "spark", "column", "line"],
   "MV-DASH-DONUT-TRIO": ["ring", "dial", "column", "plate"],
   "MV-DASH-SALES-CHART": ["area", "column", "line", "bar"],
-  "MV-DASH-GAUGE-ROW": ["dial", "ring", "bar", "plate"],
+  "MV-DASH-GAUGE-ROW": ["dial", "ring", "bar", "column"],
   "MV-DASH-PERFORMANCE": ["line", "area", "column", "spark"],
   "MV-DASH-REPORT-CARDS": ["spark", "bar", "ring", "plate"],
   "MV-DASH-GROWTH-COLUMNS": ["column", "bar", "area", "line"],

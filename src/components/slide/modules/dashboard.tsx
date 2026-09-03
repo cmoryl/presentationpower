@@ -369,7 +369,7 @@ registerSlideModule({
                   <DashMetricViz
                     brand={brand}
                     kind={dash.chart}
-                    percent={Number(it.value) || 0}
+                    percent={pct(it.value)}
                     size={280}
                     bloom={i === 0}
                     value={s(it.value)}
