@@ -8,7 +8,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { buildLondonPanelSvg } from "@/lib/next-london-revise";
-import type { LondonPanel } from "@/lib/next-london-signage";
+import { londonBoothArtworkUrl, type LondonPanel } from "@/lib/next-london-signage";
 
 export interface LondonPanelThumbProps {
   panel: LondonPanel;
@@ -53,15 +53,21 @@ export function LondonPanelThumb({ panel, size = 72, className, onOpen }: London
 
   // Keyed on everything that changes the artwork, so an edit repaints the tile.
   const key = `${panel.style}|${panel.trimW}|${panel.trimH}|${panel.bleedEdge}|${panel.name}|${panel.ground}`;
+  // Vendor booth panels show the supplied artwork proof itself: an <img> with a
+  // data-URL SVG cannot load external references, so the CDN proof is painted
+  // directly rather than through the generated master.
+  const boothArt = londonBoothArtworkUrl(panel.id);
+
   const src = useMemo(() => {
     if (!visible) return null;
+    if (boothArt) return boothArt;
     try {
       return toDataUrl(buildLondonPanelSvg(panel));
     } catch {
       return null;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible, key]);
+  }, [visible, key, boothArt]);
 
   const art = src ? (
     <img

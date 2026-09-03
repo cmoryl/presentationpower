@@ -7,6 +7,12 @@
 // and are loaded lazily by the London signage route.
 
 import artworkAsset from "@/assets/next-london-signage-artwork.json.asset.json";
+import {
+  LONDON_BOOTHS,
+  LONDON_BOOTH_BLEED_MM,
+  type LondonBoothArtboard,
+  type LondonBoothSpec,
+} from "@/lib/next-london-booths";
 import { LONDON_VENUE_ITEMS, type LondonVenueItemSpec } from "@/lib/next-london-venue-items";
 
 export type LondonFloorId = "EXT" | "GF" | "2F" | "3F" | "4F" | "5F" | "6F";
@@ -1367,3 +1373,97 @@ LONDON_PANELS.push(...LONDON_VENUE_ITEM_PANELS);
 export function londonPanelCount(): number {
   return LONDON_PANELS.length;
 }
+
+// ---------------------------------------------------------------------------
+// VENDOR BOOTH KIOSKS — third issue (per-vendor booth templates)
+//
+// One panel record per artboard (main wall + two return panels) so booths get
+// the same schedule row, thumbnail, print preview, live editor, revision and
+// download flow as every other item. Where the vendor supplied artwork, the
+// proof of their own file is painted as the ground and their Illustrator master
+// is the print deliverable; pending booths fall back to a brand ground.
+// ---------------------------------------------------------------------------
+
+export type LondonBoothPanelMeta = {
+  panelId: string;
+  booth: LondonBoothSpec;
+  artboard: LondonBoothArtboard;
+};
+
+function boothPanel(
+  booth: LondonBoothSpec,
+  artboard: LondonBoothArtboard,
+  index: number,
+): LondonPanel {
+  const seed: LondonPanel = {
+    id: `ldn-b${String(index + 1).padStart(2, "0")}`,
+    floor: "GF",
+    room: `${booth.vendor.toUpperCase()} BOOTH`,
+    proof: booth.sourceFile ?? "Artwork pending",
+    page: artboard.page,
+    name: `${booth.vendor} — ${artboard.label} - ${artboard.trimW}x${artboard.trimH}mm`,
+    ground: (artboard.previewUrl ? "Supplied booth artwork" : "Brand ground (artwork pending)"),
+    style: LONDON_STYLES[booth.style] ? booth.style : "01-beam-violet-aqua",
+    trimW: artboard.trimW,
+    trimH: artboard.trimH,
+    bleedW: artboard.trimW + LONDON_BOOTH_BLEED_MM * 2,
+    bleedH: artboard.trimH + LONDON_BOOTH_BLEED_MM * 2,
+    bleedEdge: LONDON_BOOTH_BLEED_MM,
+    rasterPx: "0x0",
+    rasterPpi: 0,
+    bandMm: 0,
+    rasterMb: 0,
+  };
+  const ppi = recommendedPpi(seed);
+  const size = rasterSizeFor(seed, ppi);
+  return {
+    ...seed,
+    rasterPpi: ppi,
+    rasterPx: `${size.w}x${size.h}`,
+    rasterMb: Math.round(Math.max(0.1, (size.w * size.h * 0.28) / (1024 * 1024)) * 10) / 10,
+    bandMm: Math.round((25.4 / ppi) * 3 * 100) / 100,
+  };
+}
+
+const BOOTH_ROWS: { booth: LondonBoothSpec; artboard: LondonBoothArtboard }[] = LONDON_BOOTHS.flatMap(
+  (booth) => booth.artboards.map((artboard) => ({ booth, artboard })),
+);
+
+/** Panel records for every booth artboard, in booth order. */
+export const LONDON_BOOTH_PANELS: LondonPanel[] = BOOTH_ROWS.map((row, i) =>
+  boothPanel(row.booth, row.artboard, i),
+);
+
+/** Booth / artboard metadata, keyed by panel id. */
+export const LONDON_BOOTH_PANEL_META: Record<string, LondonBoothPanelMeta> = Object.fromEntries(
+  LONDON_BOOTH_PANELS.map((panel, i) => [
+    panel.id,
+    { panelId: panel.id, booth: BOOTH_ROWS[i]!.booth, artboard: BOOTH_ROWS[i]!.artboard },
+  ]),
+);
+
+/** True for a vendor booth kiosk panel. */
+export function isBoothPanel(panel: LondonPanel | { id: string }): boolean {
+  return panel.id.startsWith("ldn-b");
+}
+
+export function londonBoothPanelMeta(
+  panel: LondonPanel | { id: string },
+): LondonBoothPanelMeta | null {
+  return LONDON_BOOTH_PANEL_META[panel.id] ?? null;
+}
+
+/**
+ * The supplied artwork proof for a panel, when the vendor has delivered their
+ * file. Painted as the ground so previews match the real booth artwork.
+ */
+export function londonBoothArtworkUrl(panelId: string): string | null {
+  return LONDON_BOOTH_PANEL_META[panelId]?.artboard.previewUrl ?? null;
+}
+
+/** The vendor's Illustrator master — the print deliverable for a booth panel. */
+export function londonBoothMasterUrl(panelId: string): string | null {
+  return LONDON_BOOTH_PANEL_META[panelId]?.booth.aiUrl ?? null;
+}
+
+LONDON_PANELS.push(...LONDON_BOOTH_PANELS);

@@ -33,3 +33,7 @@
 - [x] Verified the .ai masters carry real EPS-derived NEXT lockup geometry (19 compound paths / 126 curve ops per panel) — no placeholder mark
 
 - London revise: mini panel thumbnails + click-to-enlarge aspect-correct preview; per-panel rebuild (.svg/.ai/PNG).
+
+## NEXT London vendor booths (Sep 3)
+- [x] Import the 10 supplied vendor booth kiosk templates (main wall 1830×2440mm + 2 return panels 660×2440mm) as London booth panels with their real artwork as the ground
+- [x] Add the 6 missing LifeSciNEXT booths (Contact Center, COA, Medical Writing, Live Conference/Events, Veeva TMS, Commercial for Life Sciences) — artwork pending, spec-built grounds

@@ -18,7 +18,7 @@ import {
   type NextLogoArt,
   type NextLogoColourway,
 } from "@/lib/next-logo-vectors";
-import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
+import { isBoothPanel, londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import {
@@ -265,6 +265,8 @@ function clamp(value: number, lo: number, hi: number): number {
 }
 
 function pickCopy(panel: LondonPanel): string | null {
+  // Vendor booth artwork is already typeset by the vendor — no auto headline.
+  if (isBoothPanel(panel)) return null;
   const haystack = brandingHaystack(panel);
   for (const [re, copy] of COPY_KEYWORDS) if (re.test(haystack)) return copy;
   return null;

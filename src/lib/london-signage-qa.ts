@@ -9,6 +9,7 @@
 
 import { LONDON_MAX_PX } from "@/lib/london-panel-raster";
 import {
+  isBoothPanel,
   LONDON_STYLES,
   panelSlug,
   rasterSizeFor,
@@ -182,13 +183,23 @@ export function auditSvg(panel: LondonPanel, svg: string): LondonQaReport {
         ? {}
         : { warnOnly: true, note: "Bleed is implied by the artboard size on this master." },
     ),
-    check(
-      "svg-live-gradient",
-      "Ground is a live gradient, not a raster",
-      /(linear|radial)Gradient/.test(svg) && !/<image/i.test(svg),
-      "vector gradient only",
-      /<image/i.test(svg) ? "embedded raster found" : "vector gradient",
-    ),
+    // Vendor booth kiosks intentionally place the vendor's own supplied artwork
+    // as the ground; their print deliverable is the vendor's Illustrator master.
+    isBoothPanel(panel)
+      ? check(
+          "svg-live-gradient",
+          "Ground is the supplied vendor artwork",
+          /<image/i.test(svg) || /(linear|radial)Gradient/.test(svg),
+          "supplied booth artwork or vector gradient",
+          /<image/i.test(svg) ? "supplied booth artwork" : "vector gradient",
+        )
+      : check(
+          "svg-live-gradient",
+          "Ground is a live gradient, not a raster",
+          /(linear|radial)Gradient/.test(svg) && !/<image/i.test(svg),
+          "vector gradient only",
+          /<image/i.test(svg) ? "embedded raster found" : "vector gradient",
+        ),
   ];
 
   return {
