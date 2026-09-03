@@ -28,6 +28,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { LondonPpiPreview } from "@/components/events/LondonPpiPreview";
+import { LondonPanelLiveEditor } from "@/components/events/LondonPanelLiveEditor";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import { handleLondonDirectoryDownload } from "@/lib/london-directory-pdf";
@@ -161,6 +162,7 @@ function LondonSignagePage() {
   const [artwork, setArtwork] = useState<LondonArtwork | null>(null);
   const [artworkError, setArtworkError] = useState<string | null>(null);
   const [openPanel, setOpenPanel] = useState<LondonPanel | null>(null);
+  const [editing, setEditing] = useState(false);
   const [ppi, setPpi] = useState<number>(72);
   const [qa, setQa] = useState<LondonQaReport[] | null>(null);
 
@@ -608,7 +610,12 @@ function LondonSignagePage() {
         </section>
       </div>
 
-      <Dialog open={!!openPanel} onOpenChange={(o) => !o && setOpenPanel(null)}>
+      <Dialog open={!!openPanel} onOpenChange={(o) => {
+          if (!o) {
+            setOpenPanel(null);
+            setEditing(false);
+          }
+        }}>
         <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
           {openPanel ? (
             <>
@@ -710,9 +717,13 @@ function LondonSignagePage() {
                       panel={openPanel}
                       siblingIds={panels.filter((p) => p.id !== openPanel.id).map((p) => p.id)}
                       onStyleChange={(styleId) =>
-                        setPanels((prev) =>
-                          prev.map((p) => (p.id === openPanel.id ? { ...p, style: styleId } : p)),
-                        )
+                        {
+                          const style = styleId as LondonPanel["style"];
+                          setPanels((prev) =>
+                            prev.map((p) => (p.id === openPanel.id ? { ...p, style } : p)),
+                          );
+                          setOpenPanel((prev) => (prev ? { ...prev, style } : prev));
+                        }
                       }
                     />
                   </div>
