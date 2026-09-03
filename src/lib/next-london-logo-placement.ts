@@ -34,6 +34,21 @@ export type LondonLogoPlacement = {
   textDx: number;
   /** Headline vertical nudge, as a fraction of the trim height. */
   textDy: number;
+  /**
+   * Headline direction. `null` follows the panel shape — pillars and other
+   * tall, narrow sheets set their copy running DOWN the panel.
+   */
+  textVertical: boolean | null;
+  /** QR payload. `null`/empty means the panel carries no code. */
+  qr: string | null;
+  /** Size multiplier on the planned QR block. */
+  qrScale: number;
+  /** QR horizontal nudge, as a fraction of the trim width. */
+  qrDx: number;
+  /** QR vertical nudge, as a fraction of the trim height. */
+  qrDy: number;
+  /** Caption printed under the code; `""` prints no caption. */
+  qrCaption: string;
 };
 
 export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
@@ -46,7 +61,14 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   textScale: 1,
   textDx: 0,
   textDy: 0,
+  textVertical: null,
+  qr: null,
+  qrScale: 1,
+  qrDx: 0,
+  qrDy: 0,
+  qrCaption: "SCAN FOR THE AGENDA",
 };
+
 
 export type LondonLogoPlacementMap = Record<string, LondonLogoPlacement>;
 
