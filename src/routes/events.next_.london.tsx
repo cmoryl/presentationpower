@@ -79,6 +79,9 @@ import {
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 import { onLondonRevisionPublished } from "@/lib/next-london-revision-live";
 
+/** Millimetres as inches — every signage spec reads in both units. */
+const inch = (mm: number) => (mm / 25.4).toFixed(mm < 100 ? 2 : 1);
+
 export const Route = createFileRoute("/events/next_/london")({
   head: () => ({
     meta: [
