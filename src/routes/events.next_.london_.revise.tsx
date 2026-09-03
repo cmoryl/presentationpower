@@ -458,7 +458,7 @@ function LondonRevisePage() {
     zip.file("manifest.csv", manifest.join("\n"));
     zip.file("qa-report.csv", qaReportCsv(reports));
     const blob = await zip.generateAsync({ type: "blob" });
-    download(blob, `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
+    download(blob, zipName ?? `NEXT-London-r${String(rev).padStart(3, "0")}-${kind}.zip`);
 
     const r = rollup(reports);
     setQa(reports);
