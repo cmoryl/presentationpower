@@ -6,7 +6,7 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy, Type } from "lucide-react";
+import { ArrowLeft, Crosshair, Download, Move, RotateCcw, Copy, Type, QrCode } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
