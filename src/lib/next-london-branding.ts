@@ -19,10 +19,12 @@ import {
   type NextLogoColourway,
 } from "@/lib/next-logo-vectors";
 import { londonVenueItemMeta, type LondonPanel } from "@/lib/next-london-signage";
+import { buildPillarQr } from "@/lib/pillar-qr";
 import {
   londonLogoPlacement,
   type LondonLogoPlacement,
 } from "@/lib/next-london-logo-placement";
+
 
 /** The signage face for NEXT 2026. Bold only — no other weight is approved. */
 export const LONDON_SIGNAGE_FONT = {
