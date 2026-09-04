@@ -55,6 +55,15 @@ const FAMILY_KEYWORDS: [RegExp, string][] = [
   [/city series/i, "cityseries"],
 ];
 
+/**
+ * Run length of a single line of signage copy, in mm. Geist Bold caps average
+ * ~0.62 em of advance, and each glyph also carries the tracking, so opening the
+ * tracking widens the measured box the editor and print preview draw.
+ */
+export function londonCopyRunMm(text: string, sizeMm: number, trackingEm: number): number {
+  return Math.max(0, text.length * sizeMm * (0.62 + trackingEm));
+}
+
 /** Which lockup family an item belongs to, from its note/room/name. */
 export function londonPanelFamily(panel: LondonPanel): string {
   const haystack = brandingHaystack(panel);
@@ -94,6 +103,13 @@ export type LondonBrandingPlan = {
   copy: string | null;
   /** Cap height of the headline, in mm. */
   copySizeMm: number;
+  /**
+   * Headline tracking, in em: the brand's tight signage tracking plus whatever
+   * extra spacing the location designer dialled in for this board.
+   */
+  copyTrackingEm: number;
+  /** Headline run length, in mm, at the current cap height and tracking. */
+  copyRunMm: number;
   /** Headline baseline, in mm from the top of the bleed box. */
   copyBaselineMm: number;
   /** Headline centre, in mm from the left of the bleed box. */
@@ -298,6 +314,9 @@ export function londonBrandingPlan(
       })()
     : null;
 
+  const copyTrackingEm = LONDON_SIGNAGE_FONT.tracking + nudge.textTracking;
+  const copyRunMm = copy ? londonCopyRunMm(copy, copySizeMm, copyTrackingEm) : 0;
+
   return {
     familyId,
     orientation,
@@ -306,6 +325,8 @@ export function londonBrandingPlan(
     logo: { x: logoX, y: logoY, w: logoW, h: logoH },
     copy,
     copySizeMm,
+    copyTrackingEm,
+    copyRunMm,
     copyBaselineMm,
     copyCentreMm,
     copyAlign: "middle",

@@ -58,6 +58,7 @@ import {
   LONDON_QR_RADIUS,
   LONDON_TEXT_MAX_CHARS,
   LONDON_TEXT_SCALE,
+  LONDON_TEXT_TRACKING,
   resetLondonLogoPlacement,
   setLondonLogoPlacement,
   useLondonLogoPlacements,
@@ -145,6 +146,12 @@ export function LondonPanelLiveEditor({
   const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
   const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  // Stage size. A 12-metre signboard shown at 420px is unusable for fine
+  // tuning, so the live print area can be widened — and at the two larger
+  // sizes the controls drop underneath so the artwork gets the full dialog.
+  const [stageSize, setStageSize] = useState<"fit" | "large" | "full">("large");
+  const stageMaxWidth =
+    stageSize === "fit" ? "420px" : stageSize === "large" ? "860px" : "100%";
 
   // Photo walls are a repeating pattern, so their artwork is driven by the wall
   // recipe rather than by a single lockup / headline placement.
@@ -293,7 +300,7 @@ export function LondonPanelLiveEditor({
     height: `${(plan.logo.h / panel.bleedH) * 100}%`,
   };
 
-  const runMm = plan.copy ? plan.copySizeMm * plan.copy.length * 0.62 : 0;
+  const runMm = plan.copyRunMm;
   const textBox = plan.copy
     ? plan.copyVertical
       ? {
@@ -364,7 +371,13 @@ export function LondonPanelLiveEditor({
   };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
+    <div
+      className={
+        stageSize === "fit"
+          ? "grid gap-4 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]"
+          : "grid gap-4"
+      }
+    >
       {/* Live stage */}
       <div>
         <div className="flex items-center justify-between gap-2 pb-2 text-xs text-muted-foreground">
@@ -378,20 +391,40 @@ export function LondonPanelLiveEditor({
                   : "Booth artwork pending — brand ground shown"
                 : "drag the lockup, headline or code"}
           </span>
-          <Button
-            variant={printPreview ? "default" : "outline"}
-            size="sm"
-            className="gap-2"
-            aria-pressed={printPreview}
-            onClick={() => setPrintPreview((v) => !v)}
-          >
-            <Ruler className="h-3.5 w-3.5" /> Guides
-          </Button>
+          <span className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] uppercase tracking-wide">Stage</span>
+            {(
+              [
+                { key: "fit", label: "Fit" },
+                { key: "large", label: "Large" },
+                { key: "full", label: "Full width" },
+              ] as const
+            ).map((option) => (
+              <Button
+                key={option.key}
+                variant={stageSize === option.key ? "default" : "outline"}
+                size="sm"
+                aria-pressed={stageSize === option.key}
+                onClick={() => setStageSize(option.key)}
+              >
+                {option.label}
+              </Button>
+            ))}
+            <Button
+              variant={printPreview ? "default" : "outline"}
+              size="sm"
+              className="gap-2"
+              aria-pressed={printPreview}
+              onClick={() => setPrintPreview((v) => !v)}
+            >
+              <Ruler className="h-3.5 w-3.5" /> Guides
+            </Button>
+          </span>
         </div>
         <div
           ref={stageRef}
-          className="relative mx-auto w-full max-w-[420px] select-none overflow-hidden rounded-lg border border-border"
-          style={{ aspectRatio: `${panel.bleedW} / ${panel.bleedH}` }}
+          className="relative mx-auto w-full select-none overflow-hidden rounded-lg border border-border"
+          style={{ aspectRatio: `${panel.bleedW} / ${panel.bleedH}`, maxWidth: stageMaxWidth }}
         >
           <>
             {boothArt ? (
@@ -653,6 +686,32 @@ export function LondonPanelLiveEditor({
                 className="w-32"
               />
               <span className="tabular-nums">{plan.copySizeMm.toFixed(0)}mm</span>
+            </label>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              Letter spacing
+              <input
+                type="range"
+                min={LONDON_TEXT_TRACKING.min}
+                max={LONDON_TEXT_TRACKING.max}
+                step={LONDON_TEXT_TRACKING.step}
+                value={placement.textTracking}
+                onChange={(event) =>
+                  setLondonLogoPlacement(panel.id, { textTracking: Number(event.target.value) })
+                }
+                className="w-32"
+              />
+              <span className="tabular-nums">
+                {(plan.copySizeMm * plan.copyTrackingEm).toFixed(0)}mm ·{" "}
+                {plan.copyTrackingEm >= 0 ? "+" : ""}
+                {(plan.copyTrackingEm * 1000).toFixed(0)}/1000 em
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLondonLogoPlacement(panel.id, { textTracking: 0 })}
+              >
+                Reset spacing
+              </Button>
             </label>
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-2">

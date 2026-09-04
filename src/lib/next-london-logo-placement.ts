@@ -32,6 +32,12 @@ export type LondonLogoPlacement = {
   text: string | null;
   /** Size multiplier on the planned headline cap height. */
   textScale: number;
+  /**
+   * Extra letter-spacing on the headline, in em, ADDED to the brand's tight
+   * signage tracking. Large-format copy often needs to be opened up so it reads
+   * across a 12m board, which the cap-height slider alone cannot do.
+   */
+  textTracking: number;
   /** Headline horizontal nudge, as a fraction of the trim width. */
   textDx: number;
   /** Headline vertical nudge, as a fraction of the trim height. */
@@ -89,6 +95,7 @@ export const DEFAULT_LOGO_PLACEMENT: LondonLogoPlacement = {
   colourway: "white",
   text: null,
   textScale: 1,
+  textTracking: 0,
   textDx: 0,
   textDy: 0,
   textVertical: null,
@@ -128,6 +135,12 @@ export const LONDON_TEXT_SCALE = { min: 0.3, max: 3, step: 0.01 } as const;
 /** Longest headline the signage set accepts on one line. */
 export const LONDON_TEXT_MAX_CHARS = 64;
 
+/**
+ * Extra headline tracking bounds, in em, on top of the brand's -0.02 signage
+ * tracking. Negative tightens, positive spaces the letters out across the board.
+ */
+export const LONDON_TEXT_TRACKING = { min: -0.05, max: 0.6, step: 0.005 } as const;
+
 /** QR block size multiplier bounds, shared with the editor UI. */
 export const LONDON_QR_SCALE = { min: 0.4, max: 2.5, step: 0.01 } as const;
 
@@ -161,6 +174,12 @@ function clampPlacement(p: Partial<LondonLogoPlacement>): LondonLogoPlacement {
       : "white",
     text: typeof p.text === "string" ? p.text.slice(0, LONDON_TEXT_MAX_CHARS) : null,
     textScale: clamp(p.textScale, LONDON_TEXT_SCALE.min, LONDON_TEXT_SCALE.max, 1),
+    textTracking: clamp(
+      p.textTracking,
+      LONDON_TEXT_TRACKING.min,
+      LONDON_TEXT_TRACKING.max,
+      0,
+    ),
     textDx: clamp(p.textDx, -0.5, 0.5, 0),
     textDy: clamp(p.textDy, -0.5, 0.5, 0),
     textVertical: typeof p.textVertical === "boolean" ? p.textVertical : null,

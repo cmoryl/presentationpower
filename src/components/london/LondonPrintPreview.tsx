@@ -107,7 +107,7 @@ export function LondonPrintReadout({ panel, plan }: LondonPrintReadoutProps) {
     w: plan.logo.w,
     h: plan.logo.h,
   });
-  const runMm = plan.copy ? plan.copySizeMm * plan.copy.length * 0.62 : 0;
+  const runMm = plan.copyRunMm;
   const copySafe = !plan.copy
     ? true
     : insideSafe(
