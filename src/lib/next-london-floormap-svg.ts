@@ -497,12 +497,15 @@ export type FloorMapOptions = {
   roomsOnly?: boolean;
   /** Look, sheet setup, pin treatment and wording. */
   design?: MapDesign;
+  /** Areas the team sectioned off themselves, merged on top of the venue rooms. */
+  areas?: readonly LondonCustomArea[];
 };
 
 /** Everything inside the <svg> wrapper, so the asset card can reuse it. */
 function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: FloorMapSize): string {
-  const plan = londonFloorPlan(floor);
-  if (!plan) return "";
+  const base = londonFloorPlan(floor);
+  if (!base) return "";
+  const plan = planWithAreas(base, opts.areas);
   const ox = PAD;
   const oy = PAD + HEAD;
   const roomsOnly = opts.roomsOnly === true;
@@ -595,8 +598,9 @@ ${
 export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = {}): FloorMapSize {
   const restore = applyDesign(opts.design);
   try {
-    const plan = londonFloorPlan(floor);
-    if (!plan) return { w: 0, h: 0 };
+    const base = londonFloorPlan(floor);
+    if (!base) return { w: 0, h: 0 };
+    const plan = planWithAreas(base, opts.areas);
     const size = floorMapSize(plan);
     if (opts.roomsOnly === true) {
       return { w: size.w, h: size.h + roomKeyExtraHeight(plan, size.w - PAD * 2) };
