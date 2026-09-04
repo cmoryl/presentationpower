@@ -36,6 +36,8 @@ const PPM = 18;
 const PAD = 34;
 const HEAD = 84;
 const LEGEND = 62;
+/** Directory footer strip: venue credit line, drawn in the same face as the map. */
+const FOOT = 40;
 
 export type LondonZoneStyle = { fill: string; accent: string };
 
@@ -97,8 +99,17 @@ export type FloorMapSize = { w: number; h: number };
 export function floorMapSize(plan: LondonFloorPlan): FloorMapSize {
   return {
     w: Math.round(plan.w * PPM + PAD * 2),
-    h: Math.round(plan.h * PPM + PAD * 2 + HEAD + LEGEND),
+    h: Math.round(plan.h * PPM + PAD * 2 + HEAD + LEGEND + FOOT),
   };
+}
+
+/** Directory credit strip — same face and palette as the map, so print stays cohesive. */
+function footerStrip(w: number, y: number, right: string): string {
+  const left = `${LONDON_VENUE.venue} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
+  return `<g><path d="M ${PAD - 6} ${y} H ${w - PAD + 6}" stroke="${LINE}" stroke-width="1" />
+<text x="${PAD - 2}" y="${y + 17}" font-family="${FONT}" font-size="9.5" letter-spacing="0.6" fill="${NAVY}" opacity="0.62">${esc(left)}</text>
+<text x="${w - PAD + 2}" y="${y + 17}" text-anchor="end" font-family="${FONT}" font-size="9.5" letter-spacing="0.6" fill="${BLUE}" opacity="0.85">${esc(right)}</text>
+<text x="${PAD - 2}" y="${y + 30}" font-family="${FONT}" font-size="8.5" fill="${NAVY}" opacity="0.42">Schematic install plan — confirm exact positions on site with the venue production partner.</text></g>`;
 }
 
 function defs(): string {
@@ -117,14 +128,22 @@ function defs(): string {
 }
 
 /** Marker glyph — a dropped map pin, shaped by asset kind inside the head. */
-function markerGlyph(m: LondonMarker, cx: number, cy: number, active: boolean): string {
+function markerGlyph(
+  m: LondonMarker,
+  cx: number,
+  cy: number,
+  active: boolean,
+  /** Numbered print pins carry an index number instead of the kind glyph. */
+  numbered = false,
+): string {
   const ink = active ? "#EC388A" : (LONDON_KIND_INK[m.kind] ?? BLUE);
-  const r = active ? 9.5 : 7.5;
+  const r = active ? 9.5 : numbered ? 8.5 : 7.5;
   const tail = r * 1.65;
   const body =
     `<path d="M ${cx} ${cy + tail} C ${cx - r * 0.75} ${cy + r * 0.7}, ${cx - r} ${cy + r * 0.35}, ${cx - r} ${cy} ` +
     `A ${r} ${r} 0 1 1 ${cx + r} ${cy} C ${cx + r} ${cy + r * 0.35}, ${cx + r * 0.75} ${cy + r * 0.7}, ${cx} ${cy + tail} Z" ` +
     `fill="${ink}" stroke="${PAPER}" stroke-width="${active ? 2 : 1.5}" filter="url(#ldn-pin)" />`;
+  if (numbered) return body;
   const ir = r * 0.42;
   let core: string;
   if (m.kind === "pillar" || m.kind === "table" || m.kind === "booth") {
@@ -137,6 +156,38 @@ function markerGlyph(m: LondonMarker, cx: number, cy: number, active: boolean): 
     core = `<polygon points="${cx},${cy - ir * 1.2} ${cx + ir * 1.1},${cy + ir * 0.85} ${cx - ir * 1.1},${cy + ir * 0.85}" fill="${PAPER}" />`;
   }
   return `${body}${core}`;
+}
+
+/** Directory index geometry — three columns of numbered entries. */
+const INDEX_COLS = 3;
+const INDEX_ROW = 14;
+
+function indexHeight(count: number): number {
+  if (!count) return 0;
+  return 30 + Math.ceil(count / INDEX_COLS) * INDEX_ROW + 10;
+}
+
+function indexBlock(markers: LondonMarker[], x: number, y: number, w: number): string {
+  if (!markers.length) return "";
+  const rows = Math.ceil(markers.length / INDEX_COLS);
+  const colW = w / INDEX_COLS;
+  const head = `<text x="${x - 2}" y="${y}" font-family="${FONT}" font-size="9.5" letter-spacing="1.4" font-weight="700" fill="${BLUE}">ASSET INDEX</text>`;
+  const entries = markers
+    .map((m, i) => {
+      const col = Math.floor(i / rows);
+      const row = i % rows;
+      const cx = x - 2 + col * colW;
+      const cy = y + 20 + row * INDEX_ROW;
+      const max = Math.floor(colW / 5.3) - 6;
+      const name = m.name.length > max ? `${m.name.slice(0, max - 1)}…` : m.name;
+      return `<text x="${cx}" y="${cy}" font-family="${FONT}" font-size="9" font-weight="700" fill="${
+        LONDON_KIND_INK[m.kind] ?? BLUE
+      }">${i + 1}</text><text x="${cx + 18}" y="${cy}" font-family="${FONT}" font-size="9" fill="${NAVY}" opacity="0.78">${esc(
+        name,
+      )}</text>`;
+    })
+    .join("");
+  return `<g>${head}${entries}</g>`;
 }
 
 function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): string {
@@ -229,6 +280,8 @@ export type FloorMapOptions = {
   activePanelId?: string;
   /** Print labels next to every marker. */
   labels?: boolean;
+  /** Right-hand credit in the footer strip; pass null to suppress the strip. */
+  footerNote?: string | null;
 };
 
 /** Everything inside the <svg> wrapper, so the asset card can reuse it. */
@@ -240,22 +293,25 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
   const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
 
+  // Print sheets number the pins and list them in a directory index instead of
+  // printing names on the plan, where a dense pillar run would overlap itself.
+  const numbered = opts.labels === true;
+  const indexH = numbered ? indexHeight(markers.length) : 0;
+
   const pins = markers
-    .map((m) => {
+    .map((m, i) => {
       const cx = ox + m.x * PPM;
       const cy = oy + m.y * PPM;
       const active = m.panelId === opts.activePanelId;
-      const name = m.name.length > 34 ? `${m.name.slice(0, 33)}…` : m.name;
-      const label = opts.labels
-        ? `<text x="${cx + 12}" y="${cy + 3.5}" font-family="${FONT}" font-size="9.5" font-weight="600" fill="${NAVY}" opacity="0.82" stroke="${PAPER}" stroke-width="2.6" paint-order="stroke">${esc(
-            name,
-          )}</text>`
+      const badge = numbered
+        ? `<text x="${cx}" y="${cy + 3}" text-anchor="middle" font-family="${FONT}" font-size="8.5" font-weight="700" fill="${PAPER}">${i + 1}</text>`
         : "";
-      return `<g data-panel="${esc(m.panelId)}">${markerGlyph(m, cx, cy, active)}${label}</g>`;
+      return `<g data-panel="${esc(m.panelId)}">${markerGlyph(m, cx, cy, active, numbered)}${badge}</g>`;
     })
     .join("");
 
   const kinds = KIND_ORDER.filter((k) => markers.some((m) => m.kind === k));
+  const legendY = size.h - FOOT - indexH - LEGEND;
 
   return `${defs()}
 <g>
@@ -269,15 +325,35 @@ ${northArrow(size.w - PAD - 8, PAD + 22)}
 </g>
 ${planBody(plan, ox, oy)}
 ${pins}
-${scaleBar(PAD, size.h - LEGEND + 6)}
-${legendRow(kinds, PAD, size.h - LEGEND + 34, size.w - PAD * 2)}`;
+${scaleBar(PAD, legendY + 6)}
+${legendRow(kinds, PAD, legendY + 34, size.w - PAD * 2)}
+${numbered ? indexBlock(markers, PAD, size.h - FOOT - indexH + 14, size.w - PAD * 2) : ""}
+${
+  opts.footerNote === null
+    ? ""
+    : footerStrip(size.w, size.h - FOOT + 2, opts.footerNote ?? `${plan.label} · install plan`)
+}`;
+}
+
+/**
+ * Sheet size for a floor. Print sheets (`labels: true`) grow by the numbered
+ * asset index, so exports must size the raster from here, not from the plan.
+ */
+export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = {}): FloorMapSize {
+  const plan = londonFloorPlan(floor);
+  if (!plan) return { w: 0, h: 0 };
+  const size = floorMapSize(plan);
+  if (opts.labels !== true) return size;
+  const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
+  const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
+  return { w: size.w, h: size.h + indexHeight(markers.length) };
 }
 
 /** The whole floor with every asset marked. */
 export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): string {
   const plan = londonFloorPlan(floor);
   if (!plan) return "";
-  const size = floorMapSize(plan);
+  const size = floorMapSheetSize(floor, opts);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size.w}" height="${size.h}" viewBox="0 0 ${size.w} ${size.h}" role="img" aria-label="${esc(
     `${plan.label} install map — ${LONDON_VENUE.name}`,
   )}">
@@ -300,10 +376,16 @@ export function assetMapSvg(
   const size = floorMapSize(plan);
   const specH = 106;
   const w = size.w;
-  const h = size.h + specH;
+  /** Map block ends where the (suppressed) floor footer would have started. */
+  const base = size.h - FOOT;
+  const h = base + specH + FOOT;
   const zone = marker ? plan.zones.find((z) => z.id === marker.zoneId) : null;
 
-  const body = floorMapContent(panel.floor, { ...opts, activePanelId: panel.id }, size);
+  const body = floorMapContent(
+    panel.floor,
+    { ...opts, activePanelId: panel.id, footerNote: null },
+    size,
+  );
 
   const specs: [string, string][] = [
     ["Asset", panel.name],
@@ -319,7 +401,7 @@ export function assetMapSvg(
       const col = i % 3;
       const row = Math.floor(i / 3);
       const x = PAD + 10 + col * ((w - PAD * 2 - 20) / 3);
-      const y = size.h + 30 + row * 34;
+      const y = base + 30 + row * 34;
       return `<text x="${x}" y="${y}" font-family="${FONT}" font-size="9.5" letter-spacing="1.2" fill="${NAVY}" opacity="0.55">${esc(
         k.toUpperCase(),
       )}</text><text x="${x}" y="${y + 15}" font-family="${FONT}" font-size="12.5" font-weight="600" fill="${NAVY}">${esc(
@@ -333,7 +415,8 @@ export function assetMapSvg(
   )}">
 <rect width="${w}" height="${h}" fill="${PAPER}" />
 ${body}
-<rect x="${PAD - 6}" y="${size.h + 6}" width="${w - (PAD - 6) * 2}" height="${specH - 16}" rx="12" fill="#F5F8FD" stroke="${LINE}" stroke-width="1" />
+<rect x="${PAD - 6}" y="${base + 6}" width="${w - (PAD - 6) * 2}" height="${specH - 16}" rx="12" fill="#F5F8FD" stroke="${LINE}" stroke-width="1" />
 ${specBlock}
+${footerStrip(w, base + specH, `Install card · ${panel.name}`)}
 </svg>`;
 }

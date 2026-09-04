@@ -11,7 +11,7 @@ import {
   type LondonAssetKind,
   type LondonMarkerOverrides,
 } from "@/lib/next-london-floorplan";
-import { assetMapSvg, floorMapSize, floorMapSvg } from "@/lib/next-london-floormap-svg";
+import { assetMapSvg, floorMapSheetSize, floorMapSvg } from "@/lib/next-london-floormap-svg";
 import {
   LONDON_VENUE,
   panelSlug,
@@ -69,7 +69,7 @@ export function downloadFloorMapSvg(floor: LondonFloorId, opts: MapExportOptions
 export async function downloadFloorMapPng(floor: LondonFloorId, opts: MapExportOptions) {
   const plan = LONDON_FLOOR_PLANS.find((p) => p.floor === floor);
   if (!plan) return;
-  const { w, h } = floorMapSize(plan);
+  const { w, h } = floorMapSheetSize(floor, opts);
   const blob = await mapPngBlob(floorMapSvg(floor, opts), w, h, 2.5);
   save(blob, `next-london-map-${floor.toLowerCase()}.png`);
 }
@@ -95,22 +95,32 @@ export async function downloadFloorMapPdf(opts: MapExportOptions) {
   const M = 28;
   let first = true;
 
-  for (const plan of LONDON_FLOOR_PLANS) {
-    const count = opts.panels.filter((p) => p.floor === plan.floor).length;
-    if (!count) continue;
+  const sheets = LONDON_FLOOR_PLANS.filter((plan) =>
+    opts.panels.some((p) => p.floor === plan.floor),
+  );
+
+  for (let i = 0; i < sheets.length; i += 1) {
+    const plan = sheets[i]!;
     if (!first) doc.addPage();
     first = false;
-    const { w, h } = floorMapSize(plan);
-    const data = await pngDataUrl(floorMapSvg(plan.floor, { ...opts, labels: true }), w, h, 2);
-    const k = Math.min((PW - M * 2) / w, (PH - M * 2 - 18) / h);
-    doc.addImage(data, "PNG", M, M, w * k, h * k, undefined, "FAST");
-    doc.setFontSize(8);
-    doc.setTextColor(102);
-    doc.text(
-      `${LONDON_VENUE.venue} · Job ${LONDON_VENUE.job} · schematic install plan — confirm positions on site`,
-      M,
-      PH - 14,
+    const sheetOpts = {
+      ...opts,
+      labels: true,
+      footerNote: `${plan.label} · sheet ${i + 1} of ${sheets.length}`,
+    };
+    const { w, h } = floorMapSheetSize(plan.floor, sheetOpts);
+    const data = await pngDataUrl(
+      floorMapSvg(plan.floor, sheetOpts),
+      w,
+      h,
+      2,
     );
+    // The sheet carries its own directory header, legend and credit strip, so the
+    // page is just the artwork centred with an even margin — no second typeface.
+    const k = Math.min((PW - M * 2) / w, (PH - M * 2) / h);
+    const dw = w * k;
+    const dh = h * k;
+    doc.addImage(data, "PNG", (PW - dw) / 2, (PH - dh) / 2, dw, dh, undefined, "FAST");
   }
   doc.save("next-london-install-maps.pdf");
 }
@@ -125,16 +135,34 @@ export async function downloadAssetMapPack(opts: MapExportOptions) {
       .folder(panel.floor.toLowerCase())!
       .file(`${panelSlug(panel)}-location.svg`, assetMapSvg(panel, opts));
   }
+  // Directory sheets for the whole floor sit alongside the per-asset cards, in the
+  // same visual language, so a crew can print either from one pack.
+  const sheets = zip.folder("floor-directory")!;
+  for (const plan of LONDON_FLOOR_PLANS) {
+    if (!opts.panels.some((p) => p.floor === plan.floor)) continue;
+    sheets.file(
+      `next-london-directory-${plan.floor.toLowerCase()}.svg`,
+      floorMapSvg(plan.floor, { ...opts, labels: true, footerNote: `${plan.label} · install plan` }),
+    );
+  }
+
   zip.file("install-positions.csv", londonMapCsv(opts.panels, opts.overrides));
   zip.file(
     "README.txt",
     [
-      "TransPerfect NEXT 2026 — London (QEII Centre) location maps",
-      "Job 2281 · one top-down install card per asset.",
+      `${LONDON_VENUE.name} — location maps`,
+      `${LONDON_VENUE.venue}, ${LONDON_VENUE.address}`,
+      `Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`,
+      "",
+      "Contents",
+      "  <floor>/                 one directory-style install card per asset",
+      "  floor-directory/         full-floor directory sheet per mapped floor",
+      "  install-positions.csv    confirmed positions in plan metres",
       "",
       "Positions are schematic: each asset is placed in its scheduled floor and zone,",
       "on the face it is installed against. Corrections made on the maps page are",
-      "included here as confirmed positions (see install-positions.csv).",
+      "included here as confirmed positions. Confirm exact positions on site with the",
+      `venue production partner (${LONDON_VENUE.producer}).`,
     ].join("\n"),
   );
   save(await zip.generateAsync({ type: "blob" }), "next-london-location-maps.zip");
