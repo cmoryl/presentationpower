@@ -37,6 +37,7 @@ export function LogoWallPanel({
   const list = rows(items);
   const w = resolveLogoWall(wall);
   const set = (patch: Partial<LogoWall>) => onChangeWall(patchLogoWall(wall, patch));
+  const reorder = useReorder(list, onChangeItems);
 
   const addLogo = () => {
     if (list.length >= MAX_WALL_LOGOS) return;
