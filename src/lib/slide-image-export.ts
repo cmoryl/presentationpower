@@ -796,8 +796,10 @@ export async function captureSlideAsDataUrl(
     }
     throw new Error(describeCaptureFailure(lastErr));
   } finally {
+    restorePins();
     releaseChrome();
     restoreBackdrop();
+
     restoreImages();
   }
 }
