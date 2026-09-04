@@ -542,34 +542,52 @@ function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): ()
  * baked height, and prints straight through the element below (observed on
  * MV-DEC-CHECKLIST: the label's second line landed on top of its note).
  *
- * Before capture, every text leaf gets a hair of tracking relief (~0.4% of its
- * font size) so a marginally wider face still fits the line it fits on screen,
- * and leaves that render on ONE line are pinned to one line (`nowrap`). Nothing
- * is height-clamped: clipping a word off a wrapped paragraph would be a worse
- * defect than the wrap it prevents. All inline styles are restored afterwards.
+ * Before capture every text leaf is pinned to the exact line breaks it has on
+ * screen: single-line leaves get `white-space: nowrap`, and multi-line leaves
+ * are re-emitted as one nowrap block per live line (measured with a Range over
+ * the text node). A marginally wider embedded face then overhangs its line by a
+ * hair instead of adding a line and printing through the element below. Every
+ * leaf also gets ~0.4% of tracking relief to absorb that overhang. The original
+ * markup and inline styles are restored after capture.
  */
 function pinTextLineCounts(root: HTMLElement): () => void {
   const affected: Array<{
     el: HTMLElement;
     whiteSpace: string;
     letterSpacing: string;
+    html: string | null;
   }> = [];
   root.querySelectorAll<HTMLElement>("*").forEach((el) => {
     if (el.children.length > 0) return;
-    const text = (el.textContent ?? "").trim();
-    if (!text) return;
+    const text = el.textContent ?? "";
+    if (!text.trim()) return;
     const cs = window.getComputedStyle(el);
     if (cs.position === "absolute" && !cs.width.endsWith("px")) return;
     const lineHeight = parseFloat(cs.lineHeight);
     const height = el.getBoundingClientRect().height;
     if (!Number.isFinite(lineHeight) || lineHeight <= 0 || height <= 0) return;
     const lines = Math.max(1, Math.round(height / lineHeight));
-    affected.push({
+    const record = {
       el,
       whiteSpace: el.style.whiteSpace,
       letterSpacing: el.style.letterSpacing,
-    });
-    if (lines === 1) el.style.whiteSpace = "nowrap";
+      html: null as string | null,
+    };
+    if (lines === 1) {
+      el.style.whiteSpace = "nowrap";
+    } else {
+      const segments = liveLineSegments(el);
+      if (segments.length > 1) {
+        record.html = el.innerHTML;
+        el.innerHTML = segments
+          .map(
+            (line) =>
+              `<span style="display:block;white-space:nowrap">${escapeHtmlText(line)}</span>`,
+          )
+          .join("");
+      }
+    }
+    affected.push(record);
     const tracking = parseFloat(cs.letterSpacing);
     const fontSize = parseFloat(cs.fontSize);
     if (Number.isFinite(tracking) && Number.isFinite(fontSize)) {
@@ -578,11 +596,46 @@ function pinTextLineCounts(root: HTMLElement): () => void {
   });
   return () => {
     for (const a of affected) {
+      if (a.html !== null) a.el.innerHTML = a.html;
       a.el.style.whiteSpace = a.whiteSpace;
       a.el.style.letterSpacing = a.letterSpacing;
     }
   };
 }
+
+function escapeHtmlText(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/**
+ * The text of a leaf split at the line breaks the browser actually chose, found
+ * by walking a Range one character at a time and grouping by rendered top.
+ */
+function liveLineSegments(el: HTMLElement): string[] {
+  const node = el.firstChild;
+  if (!node || node.nodeType !== Node.TEXT_NODE) return [];
+  const text = node.textContent ?? "";
+  if (!text.trim() || text.length > 800) return [];
+  const range = document.createRange();
+  const lines: string[] = [];
+  let current = "";
+  let lastTop: number | null = null;
+  for (let i = 0; i < text.length; i += 1) {
+    range.setStart(node, i);
+    range.setEnd(node, i + 1);
+    const rect = range.getBoundingClientRect();
+    const top = rect.height > 0 ? Math.round(rect.top) : lastTop;
+    if (lastTop !== null && top !== null && Math.abs(top - lastTop) > 1) {
+      lines.push(current.trim());
+      current = "";
+    }
+    if (top !== null) lastTop = top;
+    current += text[i];
+  }
+  if (current.trim()) lines.push(current.trim());
+  return lines.filter((line) => line.length > 0);
+}
+
 
 
 /**
