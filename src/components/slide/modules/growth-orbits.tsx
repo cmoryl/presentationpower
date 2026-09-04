@@ -9,6 +9,7 @@ import { ClientLogoImg, pickLogoForMode } from "../client-logo";
 import { Kicker } from "../primitives";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
+import { formatStatValue } from "@/lib/stat-format";
 import { orbitBaseSize, resolveOrbitLayout } from "@/lib/orbit-layout";
 import {
   orbitDotColor,
@@ -235,7 +236,7 @@ registerSlideModule({
                           color: ink.strong,
                         }}
                       >
-                        {s(g.value)}
+                        {formatStatValue(g.value, g)}
                       </div>
                       <div className="min-w-0">
                         <div
@@ -340,7 +341,7 @@ registerSlideModule({
                         color: ink.strong,
                       }}
                     >
-                      {s(o.value)}
+                      {formatStatValue(o.value, o)}
                     </div>
                     {s(o.body) && (
                       <div

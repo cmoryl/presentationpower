@@ -119,6 +119,7 @@ import { StagePhasesPanel } from "@/components/slide/StagePhasesPanel";
 import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
 import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
 import { OrbitStylePanel } from "@/components/slide/OrbitStylePanel";
+import { OrbitContentPanel } from "@/components/slide/OrbitContentPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
@@ -1531,6 +1532,12 @@ function DeckEditor() {
               {/* Orbit stat placement — drag the figures on the growth-proof split */}
               {active && mv && mv.id === "MV-PROOF-GROWTH-ORBITS" && (
                 <div className="mt-6 space-y-6">
+                  <OrbitContentPanel
+                    content={active.content as Record<string, unknown>}
+                    onChangeField={(field, value) =>
+                      updateField(deck.id, active.id, field, value)
+                    }
+                  />
                   <LogoWallPanel
                     items={(active.content as Record<string, unknown>).items}
                     wall={(active.content as Record<string, unknown>).logoWall}
