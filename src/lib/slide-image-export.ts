@@ -624,7 +624,7 @@ function liveLineSegments(el: HTMLElement): string[] {
     range.setStart(node, i);
     range.setEnd(node, i + 1);
     const rect = range.getBoundingClientRect();
-    const top = rect.height > 0 ? Math.round(rect.top) : lastTop;
+    const top: number | null = rect.height > 0 ? Math.round(rect.top) : lastTop;
     if (lastTop !== null && top !== null && Math.abs(top - lastTop) > 1) {
       lines.push(current.trim());
       current = "";
