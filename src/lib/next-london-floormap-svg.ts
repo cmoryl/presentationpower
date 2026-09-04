@@ -171,10 +171,11 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number): string {
         `<path d="M ${x} ${y + 7} a 7 7 0 0 1 7 -7 h ${bar} v ${h} h -${bar} a 7 7 0 0 1 -7 -7 Z" fill="${style.accent}" opacity="0.9" />`;
       const label =
         h > 22
-          ? `<text x="${x + bar + 7}" y="${y + 15}" font-family="${FONT}" font-size="11" font-weight="700" letter-spacing="0.6" fill="${NAVY}" opacity="0.82">${esc(
-              z.label,
+          ? `<text x="${x + bar + 14}" y="${y + 17}" font-family="${FONT}" font-size="10.5" font-weight="700" letter-spacing="1" fill="${NAVY}" opacity="0.85">${esc(
+              z.label.toUpperCase(),
             )}</text>`
           : "";
+
       const dims =
         h > 40 && w > 96
           ? `<text x="${x + w - 7}" y="${y + h - 7}" text-anchor="end" font-family="${FONT}" font-size="9" fill="${NAVY}" opacity="0.4">${z.w.toFixed(
