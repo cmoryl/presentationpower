@@ -181,8 +181,11 @@ export function LondonFloorMap({
         style={{
           aspectRatio: `${plan.w} / ${plan.h}`,
           backgroundColor: palette.walkway,
-          backgroundImage:
-            "repeating-linear-gradient(135deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 9px)",
+          // The paper hatch only reads on a light ground; on a dark theme it
+          // turns to noise, so the dark palettes get a flat walkway.
+          backgroundImage: palette.dark
+            ? undefined
+            : "repeating-linear-gradient(135deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 9px)",
         }}
         role="group"
         aria-label={`${plan.label} top-down install map`}
