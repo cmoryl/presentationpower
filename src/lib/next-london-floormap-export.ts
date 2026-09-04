@@ -100,16 +100,17 @@ export async function downloadAssetMapPng(panel: LondonPanel, opts: MapExportOpt
   save(await mapPngBlob(svg, w, h, 2.5), `next-london-location-${panelSlug(panel)}.png`);
 }
 
-/** One PDF page per floor — the install plan set the crew works from. */
-export async function downloadFloorMapPdf(opts: MapExportOptions) {
+/** Shared page-per-floor PDF builder for both the install set and the guide. */
+async function buildFloorPdf(opts: MapExportOptions, filename: string) {
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a3" });
   const PW = doc.internal.pageSize.getWidth();
   const PH = doc.internal.pageSize.getHeight();
   const M = 28;
   let first = true;
 
-  const sheets = LONDON_FLOOR_PLANS.filter((plan) =>
-    opts.panels.some((p) => p.floor === plan.floor),
+  const rooms = opts.roomsOnly === true;
+  const sheets = LONDON_FLOOR_PLANS.filter(
+    (plan) => rooms || opts.panels.some((p) => p.floor === plan.floor),
   );
 
   for (let i = 0; i < sheets.length; i += 1) {
@@ -118,16 +119,11 @@ export async function downloadFloorMapPdf(opts: MapExportOptions) {
     first = false;
     const sheetOpts = {
       ...opts,
-      labels: true,
+      labels: rooms ? false : true,
       footerNote: `${plan.label} · sheet ${i + 1} of ${sheets.length}`,
     };
     const { w, h } = floorMapSheetSize(plan.floor, sheetOpts);
-    const data = await pngDataUrl(
-      floorMapSvg(plan.floor, sheetOpts),
-      w,
-      h,
-      2,
-    );
+    const data = await pngDataUrl(floorMapSvg(plan.floor, sheetOpts), w, h, 2);
     // The sheet carries its own directory header, legend and credit strip, so the
     // page is just the artwork centred with an even margin — no second typeface.
     const k = Math.min((PW - M * 2) / w, (PH - M * 2) / h);
@@ -135,8 +131,14 @@ export async function downloadFloorMapPdf(opts: MapExportOptions) {
     const dh = h * k;
     doc.addImage(data, "PNG", (PW - dw) / 2, (PH - dh) / 2, dw, dh, undefined, "FAST");
   }
-  doc.save("next-london-install-maps.pdf");
+  doc.save(filename);
 }
+
+/** One PDF page per floor — the install plan set the crew works from. */
+export async function downloadFloorMapPdf(opts: MapExportOptions) {
+  await buildFloorPdf({ ...opts, roomsOnly: false }, "next-london-install-maps.pdf");
+}
+
 
 /** A zip with one location map per asset, plus the install schedule. */
 export async function downloadAssetMapPack(opts: MapExportOptions) {
