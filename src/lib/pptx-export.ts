@@ -603,6 +603,19 @@ function installForegroundGuard(s: PptxGenJS.Slide, opts: { ink: string; light: 
       const next = resolveSlot(o.color, patch);
       if (next) o.color = next;
 
+      // Text-level `transparency` is unreliable across renderers: at reading
+      // sizes some converters drop the tail of a letter-spaced run entirely
+      // (observed as clipped eyebrows/captions). Bake the alpha into the colour
+      // instead and keep it only for oversized decorative lettering.
+      const alpha = typeof o.transparency === "number" ? o.transparency : 0;
+      const size = typeof o.fontSize === "number" ? o.fontSize : 0;
+      if (alpha > 0 && size > 0 && size <= 28 && typeof o.color === "string") {
+        const base = patch?.hex ?? (opts.light ? "FFFFFF" : "03002C");
+        o.color = mixHex(canonicalizeInk(o.color), base, Math.min(0.85, alpha / 100));
+        delete o.transparency;
+      }
+
+
       // Multi-run paragraphs carry their colour per run.
       if (Array.isArray(text)) {
         for (const part of text as Array<{ options?: Record<string, unknown> }>) {
@@ -6674,89 +6687,138 @@ function renderCompareSlider(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
 function renderPullQuoteStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const hero = (c.hero ?? {}) as Record<string, unknown>;
   const items = arr(c.items).slice(0, 2);
-  // Decorative quote mark
+  const L = 0.667;
+  const R = SLIDE_W - 0.667;
+  // Decorative quote mark (soft, behind the kicker like the build)
   s.addText("\u201C", {
-    x: 0.4,
-    y: 0.2,
-    w: 2.5,
-    h: 2.5,
-    fontSize: 240,
+    x: L - 0.05,
+    y: -0.35,
+    w: 2.2,
+    h: 2.2,
+    fontSize: 200,
     bold: true,
     color: p.accent,
     fontFace: "Geist",
-    transparency: 70,
+    transparency: 78,
   } as unknown as PptxGenJS.TextPropsOptions);
-  s.addText(str(hero.quote), {
-    x: 0.8,
-    y: 1.0,
-    w: SLIDE_W - 1.6,
-    h: 3.4,
-    fontSize: 32,
-    italic: true,
+  // Kicker
+  s.addText("VOICES", {
+    x: L,
+    y: 0.78,
+    w: 4,
+    h: 0.5,
+    fontSize: 10,
+    bold: true,
+    color: mutedC(p),
+    fontFace: "Geist",
+    charSpacing: 3,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  // Hero quote — semibold roman with typographic quotes, matching the build
+  s.addText(`\u201C${str(hero.quote)}\u201D`, {
+    x: L,
+    y: 1.15,
+    w: R - L - 3.0,
+    h: 1.25,
+    fontSize: 30,
+    bold: true,
     color: p.primary,
     fontFace: "Geist",
-    valign: "middle",
+    valign: "top",
+    lineSpacingMultiple: 1.1,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  // Attribution rule + name + meta (stacked, as on canvas)
+  s.addShape("rect", {
+    x: L,
+    y: 2.52,
+    w: 0.28,
+    h: 0.02,
+    fill: { color: p.ink },
+    line: { color: p.ink },
   });
-  const attrParts = [str(hero.name), str(hero.role), str(hero.org)].filter(Boolean);
-  s.addText(attrParts.join(" · ").toUpperCase(), {
-    x: 0.8,
-    y: 4.4,
-    w: SLIDE_W - 1.6,
-    h: 0.4,
-    fontSize: 11,
-    bold: true,
+  s.addText(str(hero.name), {
+    x: L,
+    y: 2.68,
+    w: R - L - 3.0,
+    h: 0.3,
+    fontSize: 13,
     color: p.ink,
     fontFace: "Geist",
-    charSpacing: 4,
+    valign: "top",
   });
-  // Divider
-  s.addShape("rect", {
-    x: 0.8,
-    y: 5.0,
-    w: SLIDE_W - 1.6,
-    h: 0.01,
-    fill: { color: LIGHT_GRAY },
-    line: { color: LIGHT_GRAY },
-  });
-  // Two smaller quotes
-  const smallW = (SLIDE_W - 1.6 - 0.4) / 2;
+  const heroMeta = [str(hero.role), str(hero.org)].filter(Boolean).join(" \u00B7 ").toUpperCase();
+  if (heroMeta) {
+    s.addText(heroMeta, {
+      x: L,
+      y: 3.0,
+      w: R - L - 2.0,
+      h: 0.5,
+      fontSize: 9,
+      bold: true,
+      color: mutedC(p),
+      fontFace: "Geist",
+      charSpacing: 3,
+      valign: "top",
+    } as unknown as PptxGenJS.TextPropsOptions);
+  }
+  // Two smaller quotes, each with its own accent top rule
+  const gap = 0.7;
+  const smallW = (R - L - gap) / 2;
   items.forEach((it, k) => {
-    const x = 0.8 + k * (smallW + 0.4);
-    s.addText(`"${str(it.quote)}"`, {
+    const x = L + k * (smallW + gap);
+    s.addShape("rect", {
       x,
-      y: 5.2,
+      y: 4.66,
       w: smallW,
-      h: 1.2,
-      fontSize: 14,
-      italic: true,
+      h: 0.028,
+      fill: { color: p.accent },
+      line: { color: p.accent },
+    });
+    s.addText(`\u201C${str(it.quote)}\u201D`, {
+      x,
+      y: 4.9,
+      w: smallW,
+      h: 0.6,
+      fontSize: 12,
       color: p.primary,
       fontFace: "Geist",
       valign: "top",
     });
-    const parts = [str(it.name), str(it.role), str(it.org)].filter(Boolean);
-    s.addText(parts.join(" · ").toUpperCase(), {
+    s.addShape("rect", {
       x,
-      y: 6.5,
+      y: 5.44,
+      w: 0.22,
+      h: 0.02,
+      fill: { color: p.ink },
+      line: { color: p.ink },
+    });
+    s.addText(str(it.name), {
+      x,
+      y: 5.56,
       w: smallW,
-      h: 0.3,
-      fontSize: 9,
-      bold: true,
+      h: 0.28,
+      fontSize: 11,
       color: p.ink,
       fontFace: "Geist",
-      charSpacing: 3,
+      valign: "top",
     });
-    if (k === 0 && items.length > 1) {
-      s.addShape("rect", {
-        x: x + smallW + 0.19,
-        y: 5.2,
-        w: 0.01,
-        h: 1.5,
-        fill: { color: LIGHT_GRAY },
-        line: { color: LIGHT_GRAY },
-      });
+    const meta = [str(it.role), str(it.org)].filter(Boolean).join(" \u00B7 ").toUpperCase();
+    if (meta) {
+      s.addText(meta, {
+        x,
+        y: 5.85,
+        w: smallW,
+        h: 0.5,
+        fontSize: 8,
+        bold: true,
+        color: mutedC(p),
+        fontFace: "Geist",
+        charSpacing: 2,
+          valign: "top",
+      } as unknown as PptxGenJS.TextPropsOptions);
     }
   });
 }
+
 
 // 17. MV-DEFINITION
 function renderDefinition(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
