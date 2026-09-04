@@ -15,10 +15,13 @@ import {
   resolveLogoWall,
   type LogoWall,
 } from "@/lib/logo-wall";
+import { canMoveDown, canMoveUp } from "@/lib/reorder";
+import { ReorderHandle, ReorderNudge, useReorder } from "./ReorderRow";
 
 type Row = Record<string, unknown>;
 
 const rows = (v: unknown): Row[] => (Array.isArray(v) ? (v as Row[]) : []);
+const str = (v: unknown) => (typeof v === "string" ? v : "");
 
 export function LogoWallPanel({
   items,
