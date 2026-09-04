@@ -10,10 +10,16 @@ import { Kicker } from "../primitives";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { orbitBaseSize, resolveOrbitLayout } from "@/lib/orbit-layout";
+import {
+  MAX_WALL_LOGOS,
+  resolveLogoWall,
+  wallLogoMaxHeight,
+  wallLogoMaxWidth,
+} from "@/lib/logo-wall";
 
 const MAX_ORBITS = 3;
 const MAX_GROWTH = 4;
-const MAX_LOGOS = 12;
+const MAX_LOGOS = MAX_WALL_LOGOS;
 
 /** Hairline orbit ring: one full circle plus an offset arc with end nodes. */
 function OrbitRing({ accent, size }: { accent: string; size: number }) {
@@ -82,6 +88,8 @@ registerSlideModule({
     const logos = arr(c.items).slice(0, MAX_LOGOS);
     const growth = arr(c.growth).slice(0, MAX_GROWTH);
     const orbits = arr(c.orbits).slice(0, MAX_ORBITS);
+    const wall = resolveLogoWall(c.logoWall);
+
 
     const tileBg = bareSurfaces ? "transparent" : isDark ? "#FFFFFF" : "rgba(10,15,28,0.02)";
     const tileRing = bareSurfaces
@@ -131,7 +139,13 @@ registerSlideModule({
             {logos.length > 0 && (
               <div className="mt-10" data-intro-item="" data-intro-step={1}>
                 {s(c.logosLabel) && <Kicker brand={brand}>{s(c.logosLabel)}</Kicker>}
-                <div className="mt-4 grid grid-cols-4" style={{ gap: 12 }}>
+                <div
+                  className="mt-4 grid"
+                  style={{
+                    gap: wall.gap,
+                    gridTemplateColumns: `repeat(${wall.columns}, minmax(0, 1fr))`,
+                  }}
+                >
                   {logos.map((it: Item, i) => {
                     const url = pickLogoForMode(it, mode);
                     const path = s(it.logoPath);
@@ -151,7 +165,11 @@ registerSlideModule({
                             url={url}
                             path={path}
                             alt={`${name} logo`}
-                            className="max-h-[68%] max-w-[86%] object-contain"
+                            className="object-contain"
+                            style={{
+                              maxHeight: wallLogoMaxHeight(wall.scale),
+                              maxWidth: wallLogoMaxWidth(wall.scale),
+                            }}
                           />
                         ) : (
                           <div

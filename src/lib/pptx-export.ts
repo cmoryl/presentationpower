@@ -7,6 +7,7 @@
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
 import { resolveOrbitLayout } from "./orbit-layout";
+import { MAX_WALL_LOGOS, resolveLogoWall } from "./logo-wall";
 import { fitTrackedBox } from "./export-tracked-fit";
 import {
   setExportChartStyle,
@@ -11980,11 +11981,13 @@ function renderGrowthOrbits(
     });
     y += 0.34;
   }
-  const logos = arr(c.items).slice(0, 12);
-  const cols = 4;
-  const gap = 0.12;
+  const wall = resolveLogoWall(c.logoWall);
+  const logos = arr(c.items).slice(0, MAX_WALL_LOGOS);
+  const cols = wall.columns;
+  const gap = wall.gap / 100;
   const tileW = (LW - (cols - 1) * gap) / cols;
-  const tileH = 0.62;
+  const tileH = Math.max(0.34, tileW * (7 / 16));
+
   logos.forEach((it, k) => {
     const col = k % cols;
     const row = Math.floor(k / cols);
@@ -12000,11 +12003,20 @@ function renderGrowthOrbits(
     });
     const logoData = itemLogos[k];
     if (logoData) {
+      const markW = tileW * Math.min(0.96, 0.86 * wall.scale);
+      const markH = tileH * Math.min(0.94, 0.68 * wall.scale);
       s.addImage({
         data: logoData,
-        ...containFrame(logoData, x + 0.1, ty + 0.08, tileW - 0.2, tileH - 0.16),
+        ...containFrame(
+          logoData,
+          x + (tileW - markW) / 2,
+          ty + (tileH - markH) / 2,
+          markW,
+          markH,
+        ),
       });
     } else {
+
       s.addText(str(it.name || it.client), {
         x,
         y: ty,
