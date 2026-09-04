@@ -17,6 +17,7 @@ import {
   Package,
   Palette,
   RotateCcw,
+  SquareDashed,
   Table2,
 } from "lucide-react";
 
@@ -59,6 +60,7 @@ import {
   planWithAreas,
   type LondonCustomArea,
 } from "@/lib/next-london-floormap-areas";
+import { areaKindLabel } from "@/lib/next-london-floormap-icons";
 import { effectiveLondonPanels } from "@/lib/next-london-revise";
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 import {
@@ -67,6 +69,13 @@ import {
   type LondonFloorId,
   type LondonPanel,
 } from "@/lib/next-london-signage";
+
+/** Next free name for a kind on this floor: "Stage", "Stage 2", "Stage 3"… */
+function areaLabelFor(kind: MapAreaKind, existing: readonly LondonCustomArea[]): string {
+  const base = areaKindLabel(kind);
+  const used = existing.filter((a) => a.kind === kind).length;
+  return used ? `${base} ${used + 1}` : base;
+}
 
 const STORE_KEY = "next-london-map-positions-v1";
 const DESIGN_KEY = "next-london-map-design-v1";
@@ -111,6 +120,7 @@ function LondonMapsPage() {
   /** Areas the team sectioned off themselves, across every floor. */
   const [areas, setAreas] = useState<LondonCustomArea[]>([]);
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null);
+  const [areasOpen, setAreasOpen] = useState(false);
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -489,6 +499,17 @@ function LondonMapsPage() {
                 >
                   <Palette className="h-4 w-4" /> {designOpen ? "Hide design" : "Design the map"}
                 </button>
+                <button
+                  type="button"
+                  className={btn}
+                  aria-expanded={areasOpen}
+                  onClick={() => setAreasOpen((v) => !v)}
+                >
+                  <SquareDashed className="h-4 w-4" />{" "}
+                  {areasOpen
+                    ? "Hide areas"
+                    : `Section off areas${floorAreas.length ? ` · ${floorAreas.length}` : ""}`}
+                </button>
               </div>
 
               {designOpen ? (
@@ -501,13 +522,40 @@ function LondonMapsPage() {
                 </div>
               ) : null}
 
+              {areasOpen && planWithMine ? (
+                <div className="mt-3">
+                  <LondonMapAreasPanel
+                    plan={planWithMine}
+                    areas={floorAreas}
+                    selectedId={selectedAreaId}
+                    onSelect={setSelectedAreaId}
+                    onAdd={addArea}
+                    onChange={changeArea}
+                    onDuplicate={(a) => {
+                      const copy = {
+                        ...clampArea({ ...a, x: a.x + 1, y: a.y + 1 }, plan),
+                        id: newLondonArea(floor).id,
+                        label: `${a.label} copy`,
+                      };
+                      persistAreas([...areas, copy]);
+                      setSelectedAreaId(copy.id);
+                    }}
+                    onRemove={(id) => {
+                      persistAreas(areas.filter((a) => a.id !== id));
+                      if (selectedAreaId === id) setSelectedAreaId(null);
+                    }}
+                    design={design}
+                  />
+                </div>
+              ) : null}
+
               {attendee ? (
                 <>
                   <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
                     Rooms and breakouts on this floor
                   </h3>
                   <ul className="mt-2 max-h-[30rem] divide-y divide-black/5 overflow-y-auto rounded-xl border border-black/10 bg-white">
-                    {(plan?.zones ?? [])
+                    {(planWithMine?.zones ?? [])
                       .filter((z) => z.kind !== "circulation" && z.kind !== "core")
                       .map((z) => (
                         <li
