@@ -7,6 +7,22 @@
 
 import type { LondonAssetKind, LondonZone } from "@/lib/next-london-floorplan";
 
+/**
+ * Kinds of space a sheet can mark. The venue plans use the LondonZone kinds; the
+ * extras exist for areas a team sections off themselves (a stage, a catering
+ * run, a demo bay), each with its own colour and icon.
+ */
+export type MapAreaKind =
+  | LondonZone["kind"]
+  | "stage"
+  | "catering"
+  | "meeting"
+  | "demo"
+  | "media"
+  | "vip"
+  | "storage"
+  | "support";
+
 export type MapThemeId = "directory" | "blueprint" | "night" | "mono" | "brand";
 export type MapPinShape = "pin" | "dot" | "square";
 export type MapLabelMode = "numbered" | "named" | "none";
@@ -180,7 +196,7 @@ export function mapPalette(design: MapDesign): MapPalette {
   return { ...base, accent };
 }
 
-const ZONE_ACCENT: Record<LondonZone["kind"], string> = {
+const ZONE_ACCENT: Record<MapAreaKind, string> = {
   auditorium: "#003FC7",
   room: "#2C6FD1",
   foyer: "#0E7C8C",
@@ -190,6 +206,14 @@ const ZONE_ACCENT: Record<LondonZone["kind"], string> = {
   exhibition: "#6A54C9",
   terrace: "#2E8B57",
   exterior: "#8593A8",
+  stage: "#EC388A",
+  catering: "#D2733F",
+  meeting: "#2C6FD1",
+  demo: "#0E7C8C",
+  media: "#5A3FC0",
+  vip: "#B27000",
+  storage: "#6C7B92",
+  support: "#2E8B57",
 };
 
 const KIND_INK: Record<LondonAssetKind, string> = {
@@ -208,7 +232,7 @@ const KIND_INK: Record<LondonAssetKind, string> = {
 
 /** Room tile fill + category bar for a zone, under the current design. */
 export function zoneStyleFor(
-  kind: LondonZone["kind"],
+  kind: MapAreaKind,
   design: MapDesign,
   pal: MapPalette = mapPalette(design),
 ): { fill: string; accent: string } {
