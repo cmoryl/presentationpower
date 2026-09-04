@@ -647,7 +647,7 @@ registerSlideModule({
                           className="flex shrink-0 items-center justify-center"
                           style={{ color: accent, paddingTop: Math.round(m.medallion * 0.44) }}
                         >
-                          <ChevronsRight size={m.chev} strokeWidth={3} />
+                          <ChevronsRight size={m.chev} strokeWidth={slim ? 2 : 3} />
                         </div>
                       )}
                       <div className="flex min-w-0 flex-1 flex-col items-center">
@@ -664,19 +664,21 @@ registerSlideModule({
                             data-decorative
                             className="absolute inset-0 rounded-full"
                             style={{
-                              border: `2px solid color-mix(in oklab, ${accent} 38%, transparent)`,
+                              border: `${slim ? 1 : 2}px solid color-mix(in oklab, ${accent} ${slim ? 30 : 38}%, transparent)`,
                             }}
                           />
-                          {/* Inner containment ring. */}
-                          <div
-                            aria-hidden
-                            data-decorative
-                            className="absolute rounded-full"
-                            style={{
-                              inset: "5.5%",
-                              border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
-                            }}
-                          />
+                          {/* Inner containment ring — dropped in the slim tier. */}
+                          {!slim && (
+                            <div
+                              aria-hidden
+                              data-decorative
+                              className="absolute rounded-full"
+                              style={{
+                                inset: "5.5%",
+                                border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
+                              }}
+                            />
+                          )}
                           {/* Orbit nodes centred exactly on the outer ring. */}
                           {orbitNodePositions(4, 26).map((pos, i) => (
                             <div
@@ -686,8 +688,8 @@ registerSlideModule({
                               className="absolute rounded-full"
                               style={{
                                 ...pos,
-                                width: wide ? 13 : 10,
-                                height: wide ? 13 : 10,
+                                width: wide ? 13 : slim ? 7 : 10,
+                                height: wide ? 13 : slim ? 7 : 10,
                                 transform: "translate(-50%, -50%)",
                                 backgroundColor: accent,
                               }}
@@ -696,8 +698,9 @@ registerSlideModule({
                           {/* Photo medallion with duotone wash so type clears. */}
                           <div
                             className="absolute overflow-hidden rounded-full"
-                            style={{ inset: "11%" }}
+                            style={{ inset: slim ? "8%" : "11%" }}
                           >
+
                             <MediaTile
                               brand={brand}
                               seed={s(st.mediaSeed, s(st.label, `stage-${si + 1}`))}
