@@ -12,14 +12,19 @@ describe("NEXTbrew theming", () => {
     expect(LONDON_STYLES["11-brew-diagonal"]!.stops[0]).toBe("#03002C");
   });
 
-  it("plans cup rings, steam and bean ticks for every brew panel", () => {
+  it("plans a seamless line field — no floating vector doodles", () => {
     for (const panel of brewPanels) {
       const plan = brewMotifPlan(panel);
       const kinds = new Set(plan.marks.map((m) => m.kind));
-      expect(kinds.has("ring")).toBe(true);
-      expect(kinds.has("path")).toBe(true);
-      expect(kinds.has("bean")).toBe(true);
+      // The cup ring / bean clip art is gone: strokes only.
+      expect([...kinds]).toEqual(["path"]);
+      expect(plan.marks.length).toBeGreaterThan(6);
       for (const m of plan.marks) expect(m.alpha).toBeGreaterThan(0);
+
+      // Lattice rules must touch the sheet edges so the pattern is continuous
+      // across the trim rather than floating inside the panel.
+      const lattice = plan.marks.filter((m) => m.kind === "path" && m.d.includes(" L "));
+      expect(lattice.length).toBeGreaterThan(4);
     }
   });
 
