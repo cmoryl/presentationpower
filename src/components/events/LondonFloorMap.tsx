@@ -42,6 +42,8 @@ export type LondonFloorMapProps = {
   onSelect: (panelId: string | null) => void;
   /** Read-only for signed-out viewers. */
   editable: boolean;
+  /** Attendee view: rooms and breakouts only, no signage pins. */
+  roomsOnly?: boolean;
 };
 
 export function LondonFloorMap({
@@ -54,6 +56,7 @@ export function LondonFloorMap({
   selectedId,
   onSelect,
   editable,
+  roomsOnly = false,
 }: LondonFloorMapProps) {
   const plan = londonFloorPlan(floor);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -63,9 +66,11 @@ export function LondonFloorMap({
   const panRef = useRef<{ px: number; py: number; ox: number; oy: number } | null>(null);
 
   const markers = useMemo(() => {
+    if (roomsOnly) return [];
     const all = londonFloorMarkers(floor, panels, overrides);
     return kinds.length ? all.filter((m) => kinds.includes(m.kind)) : all;
-  }, [floor, panels, overrides, kinds]);
+  }, [floor, panels, overrides, kinds, roomsOnly]);
+
 
   // Reset the view whenever the floor changes so a new plan opens fully framed.
   useEffect(() => setView({ z: 1, x: 0, y: 0 }), [floor]);
