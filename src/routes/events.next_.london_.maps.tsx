@@ -141,7 +141,10 @@ function LondonMapsPage() {
   }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
-  const exportOpts = { panels, overrides, kinds, labels: true };
+  const exportOpts = attendee
+    ? { panels, overrides, roomsOnly: true, labels: false }
+    : { panels, overrides, kinds, labels: true };
+
   const correctedCount = Object.keys(overrides).length;
 
   useEffect(() => {
