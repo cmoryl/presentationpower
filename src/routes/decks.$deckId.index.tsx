@@ -1529,12 +1529,19 @@ function DeckEditor() {
 
               {/* Orbit stat placement — drag the figures on the growth-proof split */}
               {active && mv && mv.id === "MV-PROOF-GROWTH-ORBITS" && (
-                <div className="mt-6">
+                <div className="mt-6 space-y-6">
+                  <LogoWallPanel
+                    items={(active.content as Record<string, unknown>).items}
+                    wall={(active.content as Record<string, unknown>).logoWall}
+                    onChangeItems={(items) => updateField(deck.id, active.id, "items", items)}
+                    onChangeWall={(wall) => updateField(deck.id, active.id, "logoWall", wall)}
+                  />
                   <OrbitLayoutPanel
                     orbits={(active.content as Record<string, unknown>).orbits}
                     onChange={(orbits) => updateField(deck.id, active.id, "orbits", orbits)}
                   />
                 </div>
+
               )}
 
               {/* Locations pin editor — only for MV-LOC-* variants */}
