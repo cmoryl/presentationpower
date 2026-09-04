@@ -477,6 +477,9 @@ export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = 
   const plan = londonFloorPlan(floor);
   if (!plan) return { w: 0, h: 0 };
   const size = floorMapSize(plan);
+  if (opts.roomsOnly === true) {
+    return { w: size.w, h: size.h + roomKeyExtraHeight(plan, size.w - PAD * 2) };
+  }
   if (opts.labels !== true) return size;
   const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
   const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
@@ -489,7 +492,10 @@ export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): s
   if (!plan) return "";
   const size = floorMapSheetSize(floor, opts);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size.w}" height="${size.h}" viewBox="0 0 ${size.w} ${size.h}" role="img" aria-label="${esc(
-    `${plan.label} install map — ${LONDON_VENUE.name}`,
+    opts.roomsOnly === true
+      ? `${plan.label} attendee floor guide — ${LONDON_VENUE.name}`
+      : `${plan.label} install map — ${LONDON_VENUE.name}`,
+
   )}">
 <rect width="${size.w}" height="${size.h}" fill="${PAPER}" />
 ${floorMapContent(floor, opts, size)}
