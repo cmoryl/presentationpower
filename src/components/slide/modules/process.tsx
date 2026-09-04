@@ -615,10 +615,15 @@ registerSlideModule({
         const hasTaskBody = stages.some((st) => arr(st.items).some((t) => s(obj(t).body)));
         const m = stageMetrics(stageCount, maxTasks + (hasTaskBody ? 2 : 0));
         const wide = m.tier === "wide";
+        // Five and six stages drop to lighter chrome — hairline rings, no inner
+        // ring, smaller orbit nodes and thinner chevrons — so the row reads as a
+        // fine-line diagram instead of six heavy badges.
+        const slim = m.slim;
         const iconBox = m.iconBox;
         const taskSize = m.taskSize;
         const numeralSize = m.numeral;
         const stageNameSize = m.stageName;
+
 
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
