@@ -12,6 +12,7 @@ import JSZip from "jszip";
 import { captureAssetCanvas } from "./asset-export";
 import { buildAgendaVectorPdf } from "./agenda-vector-pdf";
 import { buildAgendaDocx } from "./next-agenda-docx";
+import { buildAgendaPptx } from "./next-agenda-pptx";
 
 import {
   AGENDA_SPEC,
@@ -38,12 +39,15 @@ export type AgendaExportResult = {
   layers: string[];
   /** Pages in the press file — one per programme day / overflow page. */
   pageCount: number;
+  /** Slides in the editable PowerPoint deck, 0 when the deck could not build. */
+  deckSlides: number;
 };
 
 function readme(
   config: AgendaConfig,
   vector: Awaited<ReturnType<typeof buildAgendaVectorPdf>>,
   wordNotes: string[] = [],
+  deck: { slideCount: number; notes: string[] } | null = null,
 ): string {
   const geo = agendaGeometry(config);
   const qr = (config.qrData ?? "").trim();
@@ -85,11 +89,15 @@ function readme(
     wordNotes.length
       ? `word/   editable Microsoft Word version — flattened approved ground behind live text.`
       : `word/   not included (Word build unavailable in this browser).`,
+    deck
+      ? `pptx/   editable PowerPoint deck — one slide per programme page, live text.`
+      : `pptx/   not included (PowerPoint build unavailable in this browser).`,
     geo.isScreen
       ? `screen/ ${geo.pxW} x ${geo.pxH} px sRGB PNG, ready to load on the display.`
       : `proof/  ${PROOF_PPI} ppi RGB proof for sign-off only. Never output from the proof.`,
     ``,
     ...(wordNotes.length ? ["Word file:", ...wordNotes.map((n) => `  - ${n}`), ``] : []),
+    ...(deck ? ["PowerPoint file:", ...deck.notes.map((n) => `  - ${n}`), ``] : []),
 
     `Palette and geometry are fixed across every NEXT division area — only the`,
     `approved division lockup and the programme copy change.`,
@@ -136,6 +144,9 @@ export async function exportAgendaSheet(opts: {
   opts.onProgress?.({ stage: "package", label: "Building the editable Word file" });
   const word = await buildAgendaDocx(config).catch(() => null);
 
+  opts.onProgress?.({ stage: "package", label: "Building the editable PowerPoint deck" });
+  const deck = await buildAgendaPptx(config).catch(() => null);
+
   opts.onProgress?.({ stage: "package", label: "Packaging the zip" });
   const zip = new JSZip();
   zip.file(`pdf/${slug}.pdf`, pdfBuffer);
@@ -143,12 +154,15 @@ export async function exportAgendaSheet(opts: {
   if (word) {
     zip.file(`word/${slug}.docx`, await word.blob.arrayBuffer());
   }
+  if (deck) {
+    zip.file(`powerpoint/${slug}.pptx`, await deck.blob.arrayBuffer());
+  }
   if (screen) {
     zip.file(`screen/${slug}-${geo.pxW}x${geo.pxH}.png`, await proofBlob.arrayBuffer());
   } else {
     zip.file(`proof/${slug}-proof.png`, await proofBlob.arrayBuffer());
   }
-  zip.file("READ-ME.txt", readme(config, vector, word?.notes ?? []));
+  zip.file("READ-ME.txt", readme(config, vector, word?.notes ?? [], deck));
 
   const blob = await zip.generateAsync({ type: "blob" });
 
@@ -158,5 +172,6 @@ export async function exportAgendaSheet(opts: {
     pdfBytes: pdfBuffer.byteLength,
     layers: vector.layers,
     pageCount: vector.pageCount,
+    deckSlides: deck?.slideCount ?? 0,
   };
 }

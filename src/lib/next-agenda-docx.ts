@@ -61,7 +61,7 @@ function hex(color: string, fallback = "000000"): string {
  * carries the real mark instead of a text substitute. Word gets a picture, but
  * it is the same gradient, the same stops and the same lockup as the press file.
  */
-async function flattenedGroundPng(
+export async function flattenedGroundPng(
   config: AgendaConfig,
   px: { w: number; h: number },
 ): Promise<Blob> {
