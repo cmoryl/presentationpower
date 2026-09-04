@@ -28,6 +28,14 @@ import {
   zoneStyleFor,
   type MapDesign,
 } from "@/lib/next-london-floormap-design";
+import { AREA_ICONS, areaKindLabel } from "@/lib/next-london-floormap-icons";
+import {
+  MIN_AREA_M,
+  clampArea,
+  isCustomAreaId,
+  planWithAreas,
+  type LondonCustomArea,
+} from "@/lib/next-london-floormap-areas";
 import type { LondonFloorId, LondonPanel } from "@/lib/next-london-signage";
 
 const MIN_Z = 1;
@@ -48,6 +56,12 @@ export type LondonFloorMapProps = {
   roomsOnly?: boolean;
   /** Live design — the editor previews exactly what will export. */
   design?: MapDesign;
+  /** Areas the team sectioned off themselves on this floor. */
+  areas?: readonly LondonCustomArea[];
+  /** Called while an area is dragged or resized on the plan. */
+  onAreaChange?: (area: LondonCustomArea) => void;
+  selectedAreaId?: string | null;
+  onSelectArea?: (id: string | null) => void;
 };
 
 export function LondonFloorMap({
@@ -62,10 +76,23 @@ export function LondonFloorMap({
   editable,
   roomsOnly = false,
   design = DEFAULT_MAP_DESIGN,
+  areas,
+  onAreaChange,
+  selectedAreaId = null,
+  onSelectArea,
 }: LondonFloorMapProps) {
   const palette = mapPalette(design);
   const KIND_INK = (k: LondonAssetKind) => kindInkFor(k, design);
-  const plan = londonFloorPlan(floor);
+  const base = londonFloorPlan(floor);
+  // The sectioned areas draw exactly as the export does: merged on top of the
+  // venue rooms, so the screen is a true preview of the sheet.
+  const plan = useMemo(() => (base ? planWithAreas(base, areas) : null), [base, areas]);
+  const areaDrag = useRef<{
+    area: LondonCustomArea;
+    mode: "move" | "resize";
+    px: number;
+    py: number;
+  } | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -139,6 +166,39 @@ export function LondonFloorMap({
       window.removeEventListener("pointerup", up);
     };
   }, [dragId, onMove, toPlan]);
+
+  // Dragging an area body moves it; dragging its corner handle resizes it.
+  useEffect(() => {
+    if (!onAreaChange) return;
+    const move = (e: PointerEvent) => {
+      const s = areaDrag.current;
+      const p = s ? toPlan(e.clientX, e.clientY) : null;
+      if (!s || !p) return;
+      if (s.mode === "move") {
+        onAreaChange(
+          clampArea({ ...s.area, x: p.x - (s.px - s.area.x), y: p.y - (s.py - s.area.y) }, plan),
+        );
+      } else {
+        onAreaChange(
+          clampArea(
+            {
+              ...s.area,
+              w: Math.max(MIN_AREA_M, p.x - s.area.x),
+              h: Math.max(MIN_AREA_M, p.y - s.area.y),
+            },
+            plan,
+          ),
+        );
+      }
+    };
+    const up = () => (areaDrag.current = null);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+  }, [onAreaChange, plan, toPlan]);
 
   useEffect(() => {
     const move = (e: PointerEvent) => {
