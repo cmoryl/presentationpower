@@ -6,8 +6,10 @@
 //  2. `assetMapSvg`  — one asset called out on the same plan with its spec
 //     block, so a single pillar wrap can be packed with its own location map.
 //
-// Everything is plain SVG built from the plan metres, so the same string is used
-// for the on-screen map, the PNG raster and the PDF page.
+// Visual language is a mall directory: a walkway ground with white tenant tiles
+// floating on it, each tile carrying a coloured category bar and a label chip,
+// and assets marked with dropped map pins. Everything is plain SVG built from the
+// plan metres, so the same string drives screen, PNG and PDF.
 
 import {
   LONDON_ASSET_KIND_LABEL,
@@ -24,27 +26,48 @@ import { LONDON_VENUE, type LondonFloorId, type LondonPanel } from "@/lib/next-l
 
 const NAVY = "#03002C";
 const BLUE = "#003FC7";
-const AQUA = "#A1FBF9";
 const LINE = "#C9D5EA";
 const PAPER = "#FFFFFF";
+const WALKWAY = "#DCE4F0";
 const FONT = "Geist, 'Geist Variable', Inter, Helvetica, Arial, sans-serif";
 
 /** Screen pixels per plan metre. */
 const PPM = 18;
 const PAD = 34;
-const HEAD = 74;
-const LEGEND = 58;
+const HEAD = 84;
+const LEGEND = 62;
 
-const ZONE_FILL: Record<LondonZone["kind"], string> = {
-  auditorium: "#E0E8F5",
-  room: "#EEF1F7",
-  foyer: "#F5F8FD",
-  circulation: "#F7F9FC",
-  core: "#DCE4F2",
-  hospitality: "#F1F6F6",
-  exhibition: "#EAF0FB",
-  terrace: "#F2F2F2",
-  exterior: "#F4F7FB",
+export type LondonZoneStyle = { fill: string; accent: string };
+
+/**
+ * Directory categories. Tenant-style tiles sit white on the walkway; circulation
+ * and structure stay flat so the routes read as negative space.
+ */
+export const LONDON_ZONE_STYLE: Record<LondonZone["kind"], LondonZoneStyle> = {
+  auditorium: { fill: "#FFFFFF", accent: "#003FC7" },
+  room: { fill: "#FFFFFF", accent: "#1F7AE0" },
+  foyer: { fill: "#FFFFFF", accent: "#0B7285" },
+  circulation: { fill: "#E7EDF6", accent: "#9AA7BC" },
+  core: { fill: "#E2E8F2", accent: "#5A6B85" },
+  hospitality: { fill: "#FFFFFF", accent: "#FF9B70" },
+  exhibition: { fill: "#FFFFFF", accent: "#7C5CFF" },
+  terrace: { fill: "#EFF5F1", accent: "#0F9D58" },
+  exterior: { fill: "#EFF3F9", accent: "#7A8699" },
+};
+
+/** One ink per asset kind so a crowded floor reads at a glance. */
+export const LONDON_KIND_INK: Record<LondonAssetKind, string> = {
+  wall: "#003FC7",
+  banner: "#0B7285",
+  set: "#5A3FC0",
+  floor: "#C77C00",
+  door: "#EC388A",
+  lift: "#8A6BFF",
+  table: "#0F9D58",
+  pillar: "#03002C",
+  "step-repeat": "#7C5CFF",
+  stair: "#7A8699",
+  booth: "#1F7AE0",
 };
 
 const KIND_ORDER: LondonAssetKind[] = [
@@ -62,7 +85,11 @@ const KIND_ORDER: LondonAssetKind[] = [
 ];
 
 function esc(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 export type FloorMapSize = { w: number; h: number };
@@ -74,23 +101,42 @@ export function floorMapSize(plan: LondonFloorPlan): FloorMapSize {
   };
 }
 
-/** Marker glyph — shape carries the asset kind so the map reads without colour. */
+function defs(): string {
+  return `<defs>
+<filter id="ldn-tile" x="-20%" y="-20%" width="140%" height="140%">
+  <feDropShadow dx="0" dy="1.4" stdDeviation="1.8" flood-color="${NAVY}" flood-opacity="0.16" />
+</filter>
+<filter id="ldn-pin" x="-60%" y="-60%" width="220%" height="220%">
+  <feDropShadow dx="0" dy="1.6" stdDeviation="1.4" flood-color="${NAVY}" flood-opacity="0.34" />
+</filter>
+<pattern id="ldn-walk" width="9" height="9" patternUnits="userSpaceOnUse">
+  <rect width="9" height="9" fill="${WALKWAY}" />
+  <path d="M0 9 L9 0" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="1" />
+</pattern>
+</defs>`;
+}
+
+/** Marker glyph — a dropped map pin, shaped by asset kind inside the head. */
 function markerGlyph(m: LondonMarker, cx: number, cy: number, active: boolean): string {
-  const r = active ? 9 : 6.5;
-  const fill = active ? "#EC388A" : BLUE;
-  const stroke = active ? "#8f0f47" : NAVY;
-  const common = `fill="${fill}" stroke="${stroke}" stroke-width="${active ? 2 : 1}"`;
+  const ink = active ? "#EC388A" : (LONDON_KIND_INK[m.kind] ?? BLUE);
+  const r = active ? 9.5 : 7.5;
+  const tail = r * 1.65;
+  const body =
+    `<path d="M ${cx} ${cy + tail} C ${cx - r * 0.75} ${cy + r * 0.7}, ${cx - r} ${cy + r * 0.35}, ${cx - r} ${cy} ` +
+    `A ${r} ${r} 0 1 1 ${cx + r} ${cy} C ${cx + r} ${cy + r * 0.35}, ${cx + r * 0.75} ${cy + r * 0.7}, ${cx} ${cy + tail} Z" ` +
+    `fill="${ink}" stroke="${PAPER}" stroke-width="${active ? 2 : 1.5}" filter="url(#ldn-pin)" />`;
+  const ir = r * 0.42;
+  let core: string;
   if (m.kind === "pillar" || m.kind === "table" || m.kind === "booth") {
-    return `<circle cx="${cx}" cy="${cy}" r="${r}" ${common} />`;
+    core = `<circle cx="${cx}" cy="${cy}" r="${ir}" fill="${PAPER}" />`;
+  } else if (m.kind === "door" || m.kind === "lift") {
+    core = `<rect x="${cx - ir * 1.4}" y="${cy - ir * 0.6}" width="${ir * 2.8}" height="${ir * 1.2}" rx="0.6" fill="${PAPER}" />`;
+  } else if (m.kind === "floor" || m.kind === "step-repeat") {
+    core = `<rect x="${cx - ir}" y="${cy - ir}" width="${ir * 2}" height="${ir * 2}" transform="rotate(45 ${cx} ${cy})" fill="${PAPER}" />`;
+  } else {
+    core = `<polygon points="${cx},${cy - ir * 1.2} ${cx + ir * 1.1},${cy + ir * 0.85} ${cx - ir * 1.1},${cy + ir * 0.85}" fill="${PAPER}" />`;
   }
-  if (m.kind === "door" || m.kind === "lift") {
-    return `<rect x="${cx - r}" y="${cy - r * 0.55}" width="${r * 2}" height="${r * 1.1}" rx="1.5" ${common} />`;
-  }
-  if (m.kind === "floor") {
-    return `<rect x="${cx - r}" y="${cy - r}" width="${r * 2}" height="${r * 2}" rx="2" transform="rotate(45 ${cx} ${cy})" ${common} />`;
-  }
-  const p = `${cx},${cy - r} ${cx + r},${cy + r * 0.8} ${cx - r},${cy + r * 0.8}`;
-  return `<polygon points="${p}" ${common} />`;
+  return `${body}${core}`;
 }
 
 function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): string {
@@ -98,13 +144,8 @@ function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): s
   return kinds
     .map((k, i) => {
       const cx = x + per * i + 8;
-      const glyph = markerGlyph(
-        { kind: k } as LondonMarker,
-        cx,
-        y,
-        false,
-      );
-      return `${glyph}<text x="${cx + 12}" y="${y + 4}" font-family="${FONT}" font-size="11" fill="${NAVY}" opacity="0.72">${esc(
+      const glyph = markerGlyph({ kind: k } as LondonMarker, cx, y - 2, false);
+      return `${glyph}<text x="${cx + 13}" y="${y + 4}" font-family="${FONT}" font-size="11" fill="${NAVY}" opacity="0.72">${esc(
         LONDON_ASSET_KIND_LABEL[k],
       )}</text>`;
     })
@@ -112,17 +153,36 @@ function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): s
 }
 
 function planBody(plan: LondonFloorPlan, ox: number, oy: number): string {
+  const ground = `<rect x="${ox - 6}" y="${oy - 6}" width="${plan.w * PPM + 12}" height="${
+    plan.h * PPM + 12
+  }" rx="12" fill="url(#ldn-walk)" stroke="${LINE}" stroke-width="1.25" />`;
+
   const zones = plan.zones
     .map((z) => {
-      const x = ox + z.x * PPM;
-      const y = oy + z.y * PPM;
-      const w = z.w * PPM;
-      const h = z.h * PPM;
-      return `<g><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${
-        ZONE_FILL[z.kind]
-      }" stroke="${LINE}" stroke-width="1.25" /><text x="${x + 8}" y="${y + 16}" font-family="${FONT}" font-size="11.5" font-weight="600" fill="${NAVY}" opacity="0.78">${esc(
-        z.label,
-      )}</text></g>`;
+      const style = LONDON_ZONE_STYLE[z.kind];
+      const inset = 1.6;
+      const x = ox + z.x * PPM + inset;
+      const y = oy + z.y * PPM + inset;
+      const w = Math.max(6, z.w * PPM - inset * 2);
+      const h = Math.max(6, z.h * PPM - inset * 2);
+      const bar = Math.min(5, w * 0.12);
+      const tile =
+        `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="${style.fill}" stroke="${LINE}" stroke-width="1" filter="url(#ldn-tile)" />` +
+        `<path d="M ${x} ${y + 7} a 7 7 0 0 1 7 -7 h ${bar} v ${h} h -${bar} a 7 7 0 0 1 -7 -7 Z" fill="${style.accent}" opacity="0.9" />`;
+      const label =
+        h > 22
+          ? `<text x="${x + bar + 14}" y="${y + 17}" font-family="${FONT}" font-size="10.5" font-weight="700" letter-spacing="1" fill="${NAVY}" opacity="0.85">${esc(
+              z.label.toUpperCase(),
+            )}</text>`
+          : "";
+
+      const dims =
+        h > 40 && w > 96
+          ? `<text x="${x + w - 7}" y="${y + h - 7}" text-anchor="end" font-family="${FONT}" font-size="9" fill="${NAVY}" opacity="0.4">${z.w.toFixed(
+              1,
+            )} × ${z.h.toFixed(1)} m</text>`
+          : "";
+      return `<g>${tile}${label}${dims}</g>`;
     })
     .join("");
 
@@ -130,30 +190,34 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number): string {
     .map((e) => {
       const x = ox + e.x * PPM;
       const y = oy + e.y * PPM;
-      return `<g><polygon points="${x},${y - 9} ${x + 7},${y + 3} ${x - 7},${y + 3}" fill="${AQUA}" stroke="${NAVY}" stroke-width="1" /><text x="${x}" y="${
-        y + 16
-      }" text-anchor="middle" font-family="${FONT}" font-size="10" fill="${NAVY}" opacity="0.7">${esc(e.label)}</text></g>`;
+      const tw = Math.max(46, esc(e.label).length * 6 + 16);
+      return `<g><rect x="${x - tw / 2}" y="${y - 9}" width="${tw}" height="18" rx="9" fill="${NAVY}" /><text x="${x}" y="${
+        y + 4
+      }" text-anchor="middle" font-family="${FONT}" font-size="9.5" font-weight="700" letter-spacing="0.8" fill="${PAPER}">${esc(
+        e.label.toUpperCase(),
+      )}</text></g>`;
     })
     .join("");
 
-  return `${zones}${entries}`;
+  return `${ground}${zones}${entries}`;
 }
 
 function scaleBar(x: number, y: number): string {
   const len = 5 * PPM;
-  return `<g><line x1="${x}" y1="${y}" x2="${x + len}" y2="${y}" stroke="${NAVY}" stroke-width="1.5" /><line x1="${x}" y1="${
-    y - 4
-  }" x2="${x}" y2="${y + 4}" stroke="${NAVY}" stroke-width="1.5" /><line x1="${x + len}" y1="${y - 4}" x2="${
-    x + len
-  }" y2="${y + 4}" stroke="${NAVY}" stroke-width="1.5" /><text x="${x + len + 8}" y="${
-    y + 4
-  }" font-family="${FONT}" font-size="10.5" fill="${NAVY}" opacity="0.7">5 m (schematic)</text></g>`;
+  const half = len / 2;
+  return `<g><rect x="${x}" y="${y - 4}" width="${half}" height="7" fill="${NAVY}" /><rect x="${
+    x + half
+  }" y="${y - 4}" width="${half}" height="7" fill="${PAPER}" stroke="${NAVY}" stroke-width="1" /><text x="${
+    x + len + 8
+  }" y="${y + 4}" font-family="${FONT}" font-size="10.5" fill="${NAVY}" opacity="0.7">5 m (schematic)</text></g>`;
 }
 
 function northArrow(x: number, y: number): string {
-  return `<g><polygon points="${x},${y - 14} ${x + 6},${y + 4} ${x - 6},${y + 4}" fill="${NAVY}" /><text x="${x}" y="${
-    y + 17
-  }" text-anchor="middle" font-family="${FONT}" font-size="10" font-weight="600" fill="${NAVY}">N</text></g>`;
+  return `<g><circle cx="${x}" cy="${y}" r="16" fill="${PAPER}" stroke="${LINE}" stroke-width="1.25" /><polygon points="${x},${
+    y - 11
+  } ${x + 5.5},${y + 4} ${x},${y + 1} ${x - 5.5},${y + 4}" fill="${NAVY}" /><text x="${x}" y="${
+    y + 13
+  }" text-anchor="middle" font-family="${FONT}" font-size="8" font-weight="700" letter-spacing="0.6" fill="${NAVY}">N</text></g>`;
 }
 
 export type FloorMapOptions = {
@@ -167,11 +231,10 @@ export type FloorMapOptions = {
   labels?: boolean;
 };
 
-/** The whole floor with every asset marked. */
-export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): string {
+/** Everything inside the <svg> wrapper, so the asset card can reuse it. */
+function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: FloorMapSize): string {
   const plan = londonFloorPlan(floor);
   if (!plan) return "";
-  const size = floorMapSize(plan);
   const ox = PAD;
   const oy = PAD + HEAD;
   const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
@@ -182,9 +245,10 @@ export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): s
       const cx = ox + m.x * PPM;
       const cy = oy + m.y * PPM;
       const active = m.panelId === opts.activePanelId;
+      const name = m.name.length > 34 ? `${m.name.slice(0, 33)}…` : m.name;
       const label = opts.labels
-        ? `<text x="${cx + 11}" y="${cy + 3.5}" font-family="${FONT}" font-size="9.5" fill="${NAVY}" opacity="0.8">${esc(
-            m.name.length > 34 ? `${m.name.slice(0, 33)}…` : m.name,
+        ? `<text x="${cx + 12}" y="${cy + 3.5}" font-family="${FONT}" font-size="9.5" font-weight="600" fill="${NAVY}" opacity="0.82" stroke="${PAPER}" stroke-width="2.6" paint-order="stroke">${esc(
+            name,
           )}</text>`
         : "";
       return `<g data-panel="${esc(m.panelId)}">${markerGlyph(m, cx, cy, active)}${label}</g>`;
@@ -193,20 +257,32 @@ export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): s
 
   const kinds = KIND_ORDER.filter((k) => markers.some((m) => m.kind === k));
 
+  return `${defs()}
+<g>
+<rect x="${PAD - 6}" y="${PAD - 18}" width="${size.w - (PAD - 6) * 2}" height="${HEAD - 4}" rx="12" fill="#F5F8FD" stroke="${LINE}" stroke-width="1" />
+<text x="${PAD + 8}" y="${PAD + 2}" font-family="${FONT}" font-size="10" letter-spacing="1.8" font-weight="700" fill="${BLUE}">TRANSPERFECT NEXT 2026 · DIRECTORY</text>
+<text x="${PAD + 8}" y="${PAD + 30}" font-family="${FONT}" font-size="23" font-weight="700" fill="${NAVY}">${esc(plan.label)}</text>
+<text x="${PAD + 8}" y="${PAD + 50}" font-family="${FONT}" font-size="11.5" fill="${NAVY}" opacity="0.7">${esc(
+    `${LONDON_VENUE.name} · ${markers.length} asset${markers.length === 1 ? "" : "s"} · ${plan.orientation}`,
+  )}</text>
+${northArrow(size.w - PAD - 8, PAD + 22)}
+</g>
+${planBody(plan, ox, oy)}
+${pins}
+${scaleBar(PAD, size.h - LEGEND + 6)}
+${legendRow(kinds, PAD, size.h - LEGEND + 34, size.w - PAD * 2)}`;
+}
+
+/** The whole floor with every asset marked. */
+export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): string {
+  const plan = londonFloorPlan(floor);
+  if (!plan) return "";
+  const size = floorMapSize(plan);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size.w}" height="${size.h}" viewBox="0 0 ${size.w} ${size.h}" role="img" aria-label="${esc(
     `${plan.label} install map — ${LONDON_VENUE.name}`,
   )}">
 <rect width="${size.w}" height="${size.h}" fill="${PAPER}" />
-<text x="${PAD}" y="${PAD + 4}" font-family="${FONT}" font-size="10.5" letter-spacing="1.6" fill="${BLUE}">TRANSPERFECT NEXT 2026 · LOCATION MAP</text>
-<text x="${PAD}" y="${PAD + 30}" font-family="${FONT}" font-size="22" font-weight="700" fill="${NAVY}">${esc(plan.label)}</text>
-<text x="${PAD}" y="${PAD + 50}" font-family="${FONT}" font-size="11.5" fill="${NAVY}" opacity="0.7">${esc(
-    `${LONDON_VENUE.name} · ${markers.length} asset${markers.length === 1 ? "" : "s"} · ${plan.orientation}`,
-  )}</text>
-${northArrow(size.w - PAD - 14, PAD + 24)}
-${planBody(plan, ox, oy)}
-${pins}
-${scaleBar(PAD, size.h - LEGEND + 4)}
-${legendRow(kinds, PAD, size.h - LEGEND + 32, size.w - PAD * 2)}
+${floorMapContent(floor, opts, size)}
 </svg>`;
 }
 
@@ -218,21 +294,16 @@ export function assetMapSvg(
   const plan = londonFloorPlan(panel.floor);
   if (!plan) return "";
   const marker =
-    londonFloorMarkers(panel.floor, opts.panels, opts.overrides).find((m) => m.panelId === panel.id) ??
-    null;
+    londonFloorMarkers(panel.floor, opts.panels, opts.overrides).find(
+      (m) => m.panelId === panel.id,
+    ) ?? null;
   const size = floorMapSize(plan);
-  const specH = 96;
+  const specH = 106;
   const w = size.w;
   const h = size.h + specH;
   const zone = marker ? plan.zones.find((z) => z.id === marker.zoneId) : null;
 
-  const body = floorMapSvg(panel.floor, {
-    ...opts,
-    activePanelId: panel.id,
-  })
-    .replace(/^<svg[^>]*>/, "")
-    .replace(/<\/svg>$/, "")
-    .replace(/<rect width="\d+" height="\d+" fill="#FFFFFF" \/>/, "");
+  const body = floorMapContent(panel.floor, { ...opts, activePanelId: panel.id }, size);
 
   const specs: [string, string][] = [
     ["Asset", panel.name],
@@ -247,8 +318,8 @@ export function assetMapSvg(
     .map(([k, v], i) => {
       const col = i % 3;
       const row = Math.floor(i / 3);
-      const x = PAD + col * ((w - PAD * 2) / 3);
-      const y = size.h + 26 + row * 34;
+      const x = PAD + 10 + col * ((w - PAD * 2 - 20) / 3);
+      const y = size.h + 30 + row * 34;
       return `<text x="${x}" y="${y}" font-family="${FONT}" font-size="9.5" letter-spacing="1.2" fill="${NAVY}" opacity="0.55">${esc(
         k.toUpperCase(),
       )}</text><text x="${x}" y="${y + 15}" font-family="${FONT}" font-size="12.5" font-weight="600" fill="${NAVY}">${esc(
@@ -262,7 +333,7 @@ export function assetMapSvg(
   )}">
 <rect width="${w}" height="${h}" fill="${PAPER}" />
 ${body}
-<line x1="${PAD}" y1="${size.h + 2}" x2="${w - PAD}" y2="${size.h + 2}" stroke="${LINE}" stroke-width="1" />
+<rect x="${PAD - 6}" y="${size.h + 6}" width="${w - (PAD - 6) * 2}" height="${specH - 16}" rx="12" fill="#F5F8FD" stroke="${LINE}" stroke-width="1" />
 ${specBlock}
 </svg>`;
 }
