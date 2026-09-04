@@ -36,6 +36,7 @@ function StatRows({
 }) {
   const patch = (i: number, p: Row) =>
     onChange(items.map((row, k) => (k === i ? { ...row, ...p } : row)));
+  const reorder = useReorder(items, onChange);
 
   if (items.length === 0) {
     return (
