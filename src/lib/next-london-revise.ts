@@ -39,7 +39,11 @@ import {
   londonBrandingPlan,
   londonPanelFamily,
 } from "@/lib/next-london-branding";
-import { londonDivisionStops } from "@/lib/next-london-division";
+import {
+  isLondonDoorItem,
+  LONDON_DOOR_ACCENT_WEIGHT,
+  londonDivisionStops,
+} from "@/lib/next-london-division";
 import { loadLondonGroundImage, type LondonGroundImage } from "@/lib/next-london-artwork";
 
 import {
@@ -452,7 +456,13 @@ export function londonPanelStops(panel: LondonPanel): string[] {
   const base = stops && stops.length > 0 ? stops : ["#7C4EF4", "#7FE3E8"];
   // Division items carry their NEXT 2026 accent as a slight tint at the light
   // end of the ramp; master-brand items are returned unchanged.
-  return londonDivisionStops(londonPanelFamily(panel), base);
+  // Doors take the stronger soft-focus accent weight; scenic panels keep the
+  // restrained tint so the venue still reads as one pack.
+  return londonDivisionStops(
+    londonPanelFamily(panel),
+    base,
+    isLondonDoorItem(panel.room, panel.name) ? LONDON_DOOR_ACCENT_WEIGHT : undefined,
+  );
 }
 
 /**

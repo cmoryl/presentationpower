@@ -29,6 +29,7 @@ import { buildPillarQr } from "@/lib/pillar-qr";
 import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
 import {
   isLondonDoorItem,
+  londonDivisionColourway,
   londonDoorColourway,
   londonDoorDivision,
 } from "@/lib/next-london-division";
