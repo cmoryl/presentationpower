@@ -1540,6 +1540,10 @@ function DeckEditor() {
                     orbits={(active.content as Record<string, unknown>).orbits}
                     onChange={(orbits) => updateField(deck.id, active.id, "orbits", orbits)}
                   />
+                  <OrbitStylePanel
+                    style={(active.content as Record<string, unknown>).orbitStyle}
+                    onChange={(next) => updateField(deck.id, active.id, "orbitStyle", next)}
+                  />
                 </div>
 
               )}
