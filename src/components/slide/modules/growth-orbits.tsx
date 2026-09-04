@@ -10,10 +10,16 @@ import { Kicker } from "../primitives";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { orbitBaseSize, resolveOrbitLayout } from "@/lib/orbit-layout";
+import {
+  MAX_WALL_LOGOS,
+  resolveLogoWall,
+  wallLogoMaxHeight,
+  wallLogoMaxWidth,
+} from "@/lib/logo-wall";
 
 const MAX_ORBITS = 3;
 const MAX_GROWTH = 4;
-const MAX_LOGOS = 12;
+const MAX_LOGOS = MAX_WALL_LOGOS;
 
 /** Hairline orbit ring: one full circle plus an offset arc with end nodes. */
 function OrbitRing({ accent, size }: { accent: string; size: number }) {
