@@ -11,7 +11,12 @@ import {
   londonMarkerFor,
   londonZoneFor,
 } from "@/lib/next-london-floorplan";
-import { assetMapSvg, floorMapSize, floorMapSvg } from "@/lib/next-london-floormap-svg";
+import {
+  assetMapSvg,
+  floorMapSheetSize,
+  floorMapSize,
+  floorMapSvg,
+} from "@/lib/next-london-floormap-svg";
 import { LONDON_PANELS } from "@/lib/next-london-signage";
 
 const mappedFloors = new Set(LONDON_FLOOR_PLANS.map((p) => p.floor));
@@ -151,5 +156,32 @@ describe("london map artwork", () => {
     expect(rows.length).toBe(pinned + 1);
     expect(rows[0]).toContain("Plan X m");
     expect(csv).toContain("Schematic (rule)");
+  });
+});
+
+describe("attendee floor guide", () => {
+  it("draws rooms only — no pins, no asset key", () => {
+    const svg = floorMapSvg("GF", { roomsOnly: true });
+    expect(svg).not.toContain("data-panel=");
+    expect(svg).not.toContain("ASSET KEY");
+    expect(svg).toContain("ROOMS ON THIS FLOOR");
+    expect(svg).toContain("attendee floor guide");
+    expect(svg.match(/<svg/g)!.length).toBe(1);
+  });
+
+  it("names every listed room on the sheet", () => {
+    const plan = londonFloorPlan("GF")!;
+    const svg = floorMapSvg("GF", { roomsOnly: true });
+    for (const z of plan.zones) {
+      if (z.kind === "circulation" || z.kind === "core") continue;
+      expect(svg).toContain(z.label.toUpperCase().replace(/&/g, "&amp;"));
+    }
+  });
+
+  it("sizes the sheet tall enough for the room key", () => {
+    for (const plan of LONDON_FLOOR_PLANS) {
+      const rooms = floorMapSheetSize(plan.floor, { roomsOnly: true });
+      expect(rooms.h).toBeGreaterThanOrEqual(floorMapSize(plan).h);
+    }
   });
 });
