@@ -70,7 +70,46 @@ export type StepRepeatConfig = {
   text: string;
   /** QR payload used by the QR rows; empty disables the QR rows. */
   qrData: string;
+  /** Dark-module colour of the repeated QR. */
+  qrInkHex: string;
+  /** Plate (quiet-zone) colour behind the code; `none` prints the code bare. */
+  qrPlateHex: string;
+  /** Module geometry: hard squares scan best, dots/rounded read softer. */
+  qrModuleShape: StepRepeatQrModuleShape;
+  /** Plate silhouette behind the code. */
+  qrPlateShape: StepRepeatQrPlateShape;
 };
+
+export const STEP_REPEAT_QR_MODULE_SHAPES = ["square", "rounded", "dot"] as const;
+export type StepRepeatQrModuleShape = (typeof STEP_REPEAT_QR_MODULE_SHAPES)[number];
+export const STEP_REPEAT_QR_MODULE_LABELS: Record<StepRepeatQrModuleShape, string> = {
+  square: "Square",
+  rounded: "Rounded",
+  dot: "Dot",
+};
+
+export const STEP_REPEAT_QR_PLATE_SHAPES = ["square", "rounded", "circle", "none"] as const;
+export type StepRepeatQrPlateShape = (typeof STEP_REPEAT_QR_PLATE_SHAPES)[number];
+export const STEP_REPEAT_QR_PLATE_LABELS: Record<StepRepeatQrPlateShape, string> = {
+  square: "Square plate",
+  rounded: "Rounded plate",
+  circle: "Circle plate",
+  none: "No plate",
+};
+
+/** Approved brand inks a repeated code may print in. */
+export const STEP_REPEAT_QR_SWATCHES: { hex: string; label: string }[] = [
+  { hex: "#03002C", label: "Blue 800" },
+  { hex: "#003FC7", label: "Blue 500" },
+  { hex: "#FFFFFF", label: "White" },
+  { hex: "#E0E8F5", label: "Blue white" },
+  { hex: "#A1FBF9", label: "Aqua" },
+  { hex: "#C2A3FF", label: "Lavender" },
+];
+
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const normHex = (v: unknown, alt: string): string =>
+  typeof v === "string" && HEX_RE.test(v.trim()) ? v.trim().toUpperCase() : alt;
 
 export const STEP_REPEAT_LIMITS = {
   tileWidthMm: { min: 60, max: 900, step: 5 },
@@ -96,7 +135,12 @@ export const DEFAULT_STEP_REPEAT: StepRepeatConfig = {
   opacity: 1,
   text: "TRANSPERFECT NEXT",
   qrData: "",
+  qrInkHex: "#03002C",
+  qrPlateHex: "#FFFFFF",
+  qrModuleShape: "square",
+  qrPlateShape: "rounded",
 };
+
 
 /** Is this panel a step-and-repeat / photo wall? */
 export function isStepRepeatPanel(panel: LondonPanel): boolean {
