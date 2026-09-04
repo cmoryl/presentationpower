@@ -7,6 +7,7 @@
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
 import { resolveOrbitLayout } from "./orbit-layout";
+import { orbitRingColor, resolveOrbitFace } from "./orbit-style";
 import { MAX_WALL_LOGOS, resolveLogoWall } from "./logo-wall";
 import { fitTrackedBox } from "./export-tracked-fit";
 import {
@@ -12106,6 +12107,9 @@ function renderGrowthOrbits(
   // Each figure keeps the placement authored on the slide (percentages of the
   // right-hand area), so the exported deck matches what the editor shows.
   const layout = resolveOrbitLayout(orbits);
+  // Ring colour + weight follow the face the slide is exported on.
+  const ringFace = resolveOrbitFace(c.orbitStyle, isDarkPalette(p) ? "dark" : "light");
+  const ringHex = orbitRingColor(ringFace, p.accent).replace("#", "");
   const baseH = Math.min(1.95, avail / Math.max(orbits.length, 1) - 0.1);
   orbits.forEach((o, k) => {
     const pos = layout[k]!;
@@ -12120,7 +12124,11 @@ function renderGrowthOrbits(
       w: ringH,
       h: ringH,
       fill: { color: "FFFFFF", transparency: 100 },
-      line: { color: p.accent, width: 1 },
+      line: {
+        color: ringHex,
+        width: ringFace.ringWidth,
+        transparency: 100 - ringFace.ringOpacity,
+      },
     });
     s.addText(
       [
