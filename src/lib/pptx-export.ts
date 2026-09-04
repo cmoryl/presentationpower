@@ -7,6 +7,7 @@
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
 import { resolveOrbitLayout } from "./orbit-layout";
+import { MAX_WALL_LOGOS, resolveLogoWall } from "./logo-wall";
 import { fitTrackedBox } from "./export-tracked-fit";
 import {
   setExportChartStyle,
