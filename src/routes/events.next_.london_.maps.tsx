@@ -84,6 +84,9 @@ function LondonMapsPage() {
   const [kinds, setKinds] = useState<LondonAssetKind[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  /** Attendee mode draws rooms and breakouts only — no signage pins. */
+  const [attendee, setAttendee] = useState(false);
+
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
