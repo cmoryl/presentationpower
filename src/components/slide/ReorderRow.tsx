@@ -58,17 +58,17 @@ export function useReorder<T>(
       onKeyDown: (e: React.KeyboardEvent) => {
         if (e.key === "ArrowUp" && canMoveUp(index)) {
           e.preventDefault();
-          onChange(moveUp(items, index));
+          move(index, index - 1);
         } else if (e.key === "ArrowDown" && canMoveDown(index, items.length)) {
           e.preventDefault();
-          onChange(moveDown(items, index));
+          move(index, index + 1);
         }
       },
       "aria-label": `${label} — drag to reorder, or use the arrow keys`,
       title: "Drag to reorder",
     }),
-    moveUpRow: (index: number) => onChange(moveUp(items, index)),
-    moveDownRow: (index: number) => onChange(moveDown(items, index)),
+    moveUpRow: (index: number) => move(index, index - 1),
+    moveDownRow: (index: number) => move(index, index + 1),
   };
 }
 
