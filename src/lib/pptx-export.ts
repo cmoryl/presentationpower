@@ -8,6 +8,7 @@ import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
 import { resolveOrbitLayout } from "./orbit-layout";
 import { orbitDotColor, orbitRingColor, resolveOrbitFace } from "./orbit-style";
+import { formatStatValue } from "./stat-format";
 import { MAX_WALL_LOGOS, resolveLogoWall } from "./logo-wall";
 import { fitTrackedBox } from "./export-tracked-fit";
 import {
@@ -12053,7 +12054,7 @@ function renderGrowthOrbits(
   const gH = Math.min(0.72, Math.max(0.5, (6.9 - y) / Math.max(growth.length, 1)));
   growth.forEach((g, k) => {
     const gy = y + k * gH;
-    s.addText(str(g.value), {
+    s.addText(formatStatValue(g.value, g), {
       x: LX,
       y: gy,
       w: 1.0,
@@ -12168,7 +12169,10 @@ function renderGrowthOrbits(
               },
             ]
           : []),
-        { text: str(o.value), options: { fontSize: 34, bold: true, color: p.primary } },
+        {
+          text: formatStatValue(o.value, o),
+          options: { fontSize: 34, bold: true, color: p.primary },
+        },
         ...(str(o.body)
           ? [{ text: `\n${str(o.body)}`, options: { fontSize: 10, color: p.ink } }]
           : []),
