@@ -22,11 +22,13 @@ import {
   type LondonMarkerOverrides,
 } from "@/lib/next-london-floorplan";
 import {
-  LONDON_KIND_INK as KIND_INK,
-  LONDON_ZONE_STYLE,
-} from "@/lib/next-london-floormap-svg";
+  DEFAULT_MAP_DESIGN,
+  kindInkFor,
+  mapPalette,
+  zoneStyleFor,
+  type MapDesign,
+} from "@/lib/next-london-floormap-design";
 import type { LondonFloorId, LondonPanel } from "@/lib/next-london-signage";
-
 
 const MIN_Z = 1;
 const MAX_Z = 6;
@@ -44,6 +46,8 @@ export type LondonFloorMapProps = {
   editable: boolean;
   /** Attendee view: rooms and breakouts only, no signage pins. */
   roomsOnly?: boolean;
+  /** Live design — the editor previews exactly what will export. */
+  design?: MapDesign;
 };
 
 export function LondonFloorMap({
@@ -57,7 +61,10 @@ export function LondonFloorMap({
   onSelect,
   editable,
   roomsOnly = false,
+  design = DEFAULT_MAP_DESIGN,
 }: LondonFloorMapProps) {
+  const palette = mapPalette(design);
+  const KIND_INK = (k: LondonAssetKind) => kindInkFor(k, design);
   const plan = londonFloorPlan(floor);
   const frameRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -70,7 +77,6 @@ export function LondonFloorMap({
     const all = londonFloorMarkers(floor, panels, overrides);
     return kinds.length ? all.filter((m) => kinds.includes(m.kind)) : all;
   }, [floor, panels, overrides, kinds, roomsOnly]);
-
 
   // Reset the view whenever the floor changes so a new plan opens fully framed.
   useEffect(() => setView({ z: 1, x: 0, y: 0 }), [floor]);
@@ -171,11 +177,15 @@ export function LondonFloorMap({
     <div className="min-w-0">
       <div
         ref={frameRef}
-        className="relative w-full touch-none overflow-hidden rounded-2xl border border-[#03002C]/12 bg-[#DCE4F0] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]"
+        className="relative w-full touch-none overflow-hidden rounded-2xl border border-[#03002C]/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]"
         style={{
           aspectRatio: `${plan.w} / ${plan.h}`,
-          backgroundImage:
-            "repeating-linear-gradient(135deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 9px)",
+          backgroundColor: palette.walkway,
+          // The paper hatch only reads on a light ground; on a dark theme it
+          // turns to noise, so the dark palettes get a flat walkway.
+          backgroundImage: palette.dark
+            ? undefined
+            : "repeating-linear-gradient(135deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 9px)",
         }}
         role="group"
         aria-label={`${plan.label} top-down install map`}
@@ -207,8 +217,8 @@ export function LondonFloorMap({
                 y1={0}
                 x2={i}
                 y2={plan.h}
-                stroke="#FFFFFF"
-                strokeOpacity={i % 5 === 0 ? 0.55 : 0.22}
+                stroke={palette.grid}
+                strokeOpacity={design.grid === false ? 0 : i % 5 === 0 ? 0.55 : 0.22}
                 strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
               />
             ))}
@@ -219,22 +229,24 @@ export function LondonFloorMap({
                 y1={i}
                 x2={plan.w}
                 y2={i}
-                stroke="#FFFFFF"
-                strokeOpacity={i % 5 === 0 ? 0.55 : 0.22}
+                stroke={palette.grid}
+                strokeOpacity={design.grid === false ? 0 : i % 5 === 0 ? 0.55 : 0.22}
                 strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
               />
             ))}
           </svg>
 
           {plan.zones.map((z) => {
-            const style = LONDON_ZONE_STYLE[z.kind];
+            const style = zoneStyleFor(z.kind, design);
             const quiet = z.kind === "circulation" || z.kind === "core" || z.kind === "exterior";
             return (
               <div
                 key={z.id}
                 data-plan-surface="1"
                 className={`absolute overflow-hidden rounded-[3px] border border-[#D3DCEA] ${
-                  quiet ? "" : "shadow-[0_1px_2px_rgba(3,0,44,0.10),0_6px_14px_-6px_rgba(3,0,44,0.25)]"
+                  quiet
+                    ? ""
+                    : "shadow-[0_1px_2px_rgba(3,0,44,0.10),0_6px_14px_-6px_rgba(3,0,44,0.25)]"
                 }`}
                 style={{
                   left: `${(z.x / plan.w) * 100}%`,
@@ -272,7 +284,7 @@ export function LondonFloorMap({
 
           {markers.map((m) => {
             const active = m.panelId === selectedId;
-            const ink = active ? "#C4306E" : m.corrected ? "#0F9D58" : KIND_INK[m.kind];
+            const ink = active ? "#C4306E" : m.corrected ? "#0F9D58" : KIND_INK(m.kind);
             return (
               <button
                 key={m.panelId}
@@ -308,7 +320,6 @@ export function LondonFloorMap({
                   // from their tip like a directory drop pin.
                   // Pins near the top edge flip so the head stays inside the plan.
                   transform: `translate(-50%, ${m.y < 1.4 ? "0%" : "-100%"}) rotate(${m.y < 1.4 ? 180 : 0}deg) scale(${(active ? 1.18 : 1) / view.z})`,
-
                 }}
               >
                 <span
@@ -333,7 +344,6 @@ export function LondonFloorMap({
             );
           })}
         </div>
-
 
         {/* North arrow + scale bar: fixed to the frame, unaffected by zoom. */}
         <div className="pointer-events-none absolute right-2 top-2 z-30 flex flex-col items-center rounded-md border border-[#03002C]/12 bg-white/90 px-1.5 py-1 text-[#03002C]">
@@ -388,8 +398,8 @@ export function LondonFloorMap({
                     <div>
                       <p className="text-[13px] font-semibold text-[#03002C]">{m.name}</p>
                       <p className="mt-0.5 text-[11.5px] text-[#03002C]/70">
-                        {LONDON_ASSET_KIND_LABEL[m.kind]} · {m.room} · {LONDON_FACE_LABEL[m.face]} · x{" "}
-                        {m.x.toFixed(1)} m / y {m.y.toFixed(1)} m
+                        {LONDON_ASSET_KIND_LABEL[m.kind]} · {m.room} · {LONDON_FACE_LABEL[m.face]} ·
+                        x {m.x.toFixed(1)} m / y {m.y.toFixed(1)} m
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -427,12 +437,12 @@ export function LondonFloorMap({
             <span className="relative block h-4 w-3">
               <span
                 className="absolute left-0 top-0 block h-3 w-3 rounded-full border border-white"
-                style={{ background: KIND_INK[k] }}
+                style={{ background: KIND_INK(k) }}
               />
               <span
                 aria-hidden="true"
                 className="absolute left-1/2 top-[8px] block h-2 w-2 -translate-x-1/2 rotate-45 rounded-[1px]"
-                style={{ background: KIND_INK[k] }}
+                style={{ background: KIND_INK(k) }}
               />
             </span>
             {LONDON_ASSET_KIND_LABEL[k]}
@@ -460,9 +470,11 @@ function glyphClass(kind: LondonAssetKind): string {
   return "h-1.5 w-1.5 [clip-path:polygon(50%_0,100%_100%,0_100%)]";
 }
 
-
 /** Kind chips used above the map. */
-export function londonKindsPresent(panels: LondonPanel[], floor?: LondonFloorId): LondonAssetKind[] {
+export function londonKindsPresent(
+  panels: LondonPanel[],
+  floor?: LondonFloorId,
+): LondonAssetKind[] {
   const set = new Set<LondonAssetKind>();
   for (const p of panels) {
     if (floor && p.floor !== floor) continue;
