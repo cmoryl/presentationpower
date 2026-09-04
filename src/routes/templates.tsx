@@ -67,6 +67,26 @@ function TemplatesGallery() {
         </div>
       </div>
 
+      <div className="mt-12">
+        <div className="text-xs uppercase tracking-widest text-black/50 dark:text-white/50">
+          Division starters
+        </div>
+        <h2 className="mt-1 text-xl font-semibold">
+          One approved deck per division, already written
+        </h2>
+        <p className="mt-2 max-w-2xl text-sm text-black/60 dark:text-white/60">
+          Each starter is composed from that division&apos;s preferred narrative, its permitted
+          module families and real division content — stats, case proof, workflow and close. Clone
+          one and edit the copy rather than starting from an empty stage.
+        </p>
+        <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {DIVISION_STARTERS.map((s) => (
+            <DivisionStarterCard key={s.brandModeId} starter={s} />
+          ))}
+        </div>
+      </div>
+
+
       <div className="mt-10">
         {userId === null ? (
           <div className="rounded-2xl border border-black/10 bg-black/[0.02] p-6 text-sm text-black/60 dark:border-white/10 dark:bg-white/[0.03] dark:text-white/60">
