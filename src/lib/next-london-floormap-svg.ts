@@ -232,8 +232,28 @@ function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): s
 }
 
 /** Attendee room key: one chip per named room, inked by its category. */
+function roomKeyRooms(plan: LondonFloorPlan): LondonZone[] {
+  return plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core");
+}
+
+/** Extra sheet height the room key needs beyond the single legend row. */
+function roomKeyExtraHeight(plan: LondonFloorPlan, w: number): number {
+  let rows = 1;
+  let cx = 0;
+  for (const z of roomKeyRooms(plan)) {
+    const cw = z.label.length * 5.5 + 26;
+    if (cx + cw > w) {
+      rows += 1;
+      cx = 0;
+    }
+    cx += cw + 7;
+  }
+  return Math.max(0, rows - 1) * 19;
+}
+
 function roomKeyRow(plan: LondonFloorPlan, x: number, y: number, w: number): string {
-  const rooms = plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core");
+  const rooms = roomKeyRooms(plan);
+
   const out: string[] = [];
   let cx = x;
   let cy = y;
