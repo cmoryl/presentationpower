@@ -11,7 +11,7 @@ import {
   type LondonAssetKind,
   type LondonMarkerOverrides,
 } from "@/lib/next-london-floorplan";
-import { assetMapSvg, floorMapSize, floorMapSvg } from "@/lib/next-london-floormap-svg";
+import { assetMapSvg, floorMapSheetSize, floorMapSvg } from "@/lib/next-london-floormap-svg";
 import {
   LONDON_VENUE,
   panelSlug,
@@ -69,7 +69,7 @@ export function downloadFloorMapSvg(floor: LondonFloorId, opts: MapExportOptions
 export async function downloadFloorMapPng(floor: LondonFloorId, opts: MapExportOptions) {
   const plan = LONDON_FLOOR_PLANS.find((p) => p.floor === floor);
   if (!plan) return;
-  const { w, h } = floorMapSize(plan);
+  const { w, h } = floorMapSheetSize(floor, opts);
   const blob = await mapPngBlob(floorMapSvg(floor, opts), w, h, 2.5);
   save(blob, `next-london-map-${floor.toLowerCase()}.png`);
 }
@@ -103,13 +103,14 @@ export async function downloadFloorMapPdf(opts: MapExportOptions) {
     const plan = sheets[i]!;
     if (!first) doc.addPage();
     first = false;
-    const { w, h } = floorMapSize(plan);
+    const sheetOpts = {
+      ...opts,
+      labels: true,
+      footerNote: `${plan.label} · sheet ${i + 1} of ${sheets.length}`,
+    };
+    const { w, h } = floorMapSheetSize(plan.floor, sheetOpts);
     const data = await pngDataUrl(
-      floorMapSvg(plan.floor, {
-        ...opts,
-        labels: true,
-        footerNote: `${plan.label} · sheet ${i + 1} of ${sheets.length}`,
-      }),
+      floorMapSvg(plan.floor, sheetOpts),
       w,
       h,
       2,
