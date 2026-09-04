@@ -26,11 +26,14 @@ import {
 import {
   DEFAULT_MAP_DESIGN,
   kindInkFor,
+  MAP_BRAND_BAR,
   mapPalette,
   zoneStyleFor,
   type MapDesign,
 } from "@/lib/next-london-floormap-design";
+import { mapLogoRatio, mapLogoSvg } from "@/lib/next-london-floormap-logos";
 import { areaIconSvg } from "@/lib/next-london-floormap-icons";
+
 import {
   isCustomAreaId,
   planWithAreas,
@@ -163,14 +166,34 @@ function eyebrow(x: number, y: number, text: string, fill = BLUE, size = 9): str
   )}</text>`;
 }
 
+/** Venue / event wording — the design may override the registry defaults. */
+function venueName(): string {
+  return DESIGN.venueName.trim() || LONDON_VENUE.venue;
+}
+function eventName(): string {
+  return DESIGN.eventName.trim() || "TransPerfect NEXT 2026";
+}
+
+/** Approved palette strip — brand signature on every sheet. */
+function brandBar(x: number, y: number, w: number): string {
+  if (DESIGN.brandBar === false) return "";
+  const cells = MAP_BRAND_BAR.length;
+  const cw = Math.min(26, w / (cells * 4));
+  return `<g>${MAP_BRAND_BAR.map(
+    (c, i) =>
+      `<rect x="${n(x + i * (cw + 3))}" y="${n(y)}" width="${n(cw)}" height="4" rx="1" fill="${c}" />`,
+  ).join("")}</g>`;
+}
+
 /** Directory credit strip — same face and palette as the map, so print stays cohesive. */
 function footerStrip(w: number, y: number, right: string, note?: string): string {
-  const left = `${LONDON_VENUE.venue} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
+  const left = `${venueName()} · ${eventName()} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
   return `<g><path d="M ${PAD} ${n(y)} H ${n(w - PAD)}" stroke="${LINE}" stroke-width="1" />
 <text x="${PAD}" y="${n(y + 18)}" font-family="${FONT}" font-size="9" letter-spacing="0.5" fill="${NAVY}" opacity="0.6">${esc(left)}</text>
 <text x="${n(w - PAD)}" y="${n(y + 18)}" text-anchor="end" font-family="${FONT}" font-size="9" font-weight="600" letter-spacing="0.5" fill="${BLUE}" opacity="0.9">${esc(right)}</text>
 <text x="${PAD}" y="${n(y + 31)}" font-family="${FONT}" font-size="8" letter-spacing="0.2" fill="${NAVY}" opacity="0.38">${esc(note ?? "Schematic install plan — confirm exact positions on site with the venue production partner.")}</text></g>`;
 }
+
 
 function defs(): string {
   return `<defs>
@@ -547,28 +570,46 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const eyebrowText =
     DESIGN.eyebrow.trim() ||
     (roomsOnly
-      ? "TransPerfect NEXT 2026 · you are here"
-      : "TransPerfect NEXT 2026 · venue directory");
+      ? `${eventName()} · you are here`
+      : `${eventName()} · venue directory`);
   const titleText = DESIGN.title.trim() || plan.label;
   const subtitleText =
     DESIGN.subtitle.trim() ||
     (roomsOnly
-      ? `${LONDON_VENUE.venue} · ${roomCount} room${roomCount === 1 ? "" : "s"} and breakout space${roomCount === 1 ? "" : "s"}`
-      : `${LONDON_VENUE.venue} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`);
+      ? `${venueName()} · ${roomCount} room${roomCount === 1 ? "" : "s"} and breakout space${roomCount === 1 ? "" : "s"}`
+      : `${venueName()} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`);
   const legendTitle =
     DESIGN.legendTitle.trim() || (roomsOnly ? "Rooms on this floor" : "Asset key");
 
+  const logoH = Math.max(12, Math.min(46, DESIGN.logoScale || 26));
+  const logoW = mapLogoRatio(DESIGN.logo) * logoH;
+  const logo =
+    DESIGN.logo === "none"
+      ? ""
+      : mapLogoSvg(
+          DESIGN.logo,
+          size.w - PAD - logoW,
+          PAD - 6,
+          logoH,
+          DESIGN.logoMono ? NAVY : undefined,
+        );
+  // The compass cluster drops below the lockup so the two never collide.
+  const compassY = DESIGN.logo === "none" ? PAD + 22 : PAD - 6 + logoH + 22;
+
   return `${defs()}
 <g>
+${logo}
 ${eyebrow(PAD, PAD + 8, eyebrowText)}
 <text x="${PAD}" y="${n(PAD + 38)}" font-family="${FONT}" font-size="24" font-weight="600" letter-spacing="-0.4" fill="${NAVY}">${esc(titleText)}</text>
 <text x="${PAD}" y="${n(PAD + 58)}" font-family="${FONT}" font-size="10.5" letter-spacing="0.3" fill="${NAVY}" opacity="0.62">${esc(
     subtitleText,
   )}</text>
-${DESIGN.compass === false ? "" : northArrow(size.w - PAD - 15, PAD + 22)}
-${DESIGN.compass === false ? "" : scaleBar(size.w - PAD - 30 - 4 * 2.5 * PPM - 92, PAD + 50)}
+${DESIGN.compass === false ? "" : northArrow(size.w - PAD - 15, compassY)}
+${DESIGN.compass === false ? "" : scaleBar(size.w - PAD - 30 - 4 * 2.5 * PPM - 92, compassY + 28)}
 <path d="M ${PAD} ${n(headRule)} H ${n(size.w - PAD)}" stroke="${LINE}" stroke-width="1" />
+${brandBar(PAD, headRule + 5, size.w - PAD * 2)}
 </g>
+
 ${planBody(plan, ox, oy, roomsOnly)}
 ${pins}
 ${legendOn ? eyebrow(PAD, legendY + 16, legendTitle) : ""}
@@ -589,7 +630,7 @@ ${
         opts.footerNote ?? `${titleText} · ${roomsOnly ? "attendee floor guide" : "install plan"}`,
         DESIGN.footerNote.trim() ||
           (roomsOnly
-            ? `${LONDON_VENUE.name} · schematic layout for orientation — follow on-site wayfinding and venue staff.`
+            ? `${venueName()} · schematic layout for orientation — follow on-site wayfinding and venue staff.`
             : undefined),
       )
 }`;

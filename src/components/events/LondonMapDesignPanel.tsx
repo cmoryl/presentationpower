@@ -7,6 +7,7 @@ import { RotateCcw } from "lucide-react";
 
 import {
   DEFAULT_MAP_DESIGN,
+  MAP_ACCENT_SWATCHES,
   MAP_THEME_LABEL,
   mapPalette,
   type MapDesign,
@@ -17,6 +18,8 @@ import {
   type MapPinShape,
   type MapThemeId,
 } from "@/lib/next-london-floormap-design";
+import { MAP_LOGO_LABEL, type MapLogoId } from "@/lib/next-london-floormap-logos";
+import { LONDON_VENUE } from "@/lib/next-london-signage";
 
 export type LondonMapDesignPanelProps = {
   design: MapDesign;
@@ -127,7 +130,69 @@ export function LondonMapDesignPanel({ design, onChange, roomsOnly }: LondonMapD
       </div>
 
       <div className="mt-3.5 space-y-3.5">
+        <Group title="Brand">
+          <div className="flex flex-wrap gap-2">
+            {(Object.keys(MAP_LOGO_LABEL) as MapLogoId[]).map((id) => (
+              <Toggle
+                key={id}
+                title={MAP_LOGO_LABEL[id]}
+                active={design.logo === id}
+                onClick={() => set("logo", id)}
+              />
+            ))}
+          </div>
+          {design.logo !== "none" ? (
+            <>
+              <Slider
+                id="map-logo-scale"
+                title="Logo height"
+                value={design.logoScale}
+                min={12}
+                max={46}
+                step={1}
+                suffix=" px"
+                onChange={(v) => set("logoScale", v)}
+              />
+              <Toggle
+                title="Single-ink logo"
+                active={design.logoMono}
+                onClick={() => set("logoMono", !design.logoMono)}
+              />
+            </>
+          ) : null}
+          <div>
+            <label htmlFor="map-venue" className={label}>
+              Venue name
+            </label>
+            <input
+              id="map-venue"
+              value={design.venueName}
+              onChange={(e) => set("venueName", e.target.value)}
+              placeholder={LONDON_VENUE.venue}
+              className={field}
+            />
+          </div>
+          <div>
+            <label htmlFor="map-event" className={label}>
+              Event name
+            </label>
+            <input
+              id="map-event"
+              value={design.eventName}
+              onChange={(e) => set("eventName", e.target.value)}
+              placeholder="TransPerfect NEXT 2026"
+              className={field}
+            />
+          </div>
+          <Toggle
+            title="Brand colour strip"
+            active={design.brandBar}
+            onClick={() => set("brandBar", !design.brandBar)}
+          />
+        </Group>
+
         <Group title="Look and colour">
+
           <div className="flex flex-wrap gap-2">
             {(Object.keys(MAP_THEME_LABEL) as MapThemeId[]).map((t) => (
               <Toggle
@@ -158,6 +223,25 @@ export function LondonMapDesignPanel({ design, onChange, roomsOnly }: LondonMapD
               style={{ background: palette.accent }}
             />
           </div>
+          <div className="flex flex-wrap gap-1.5">
+            {MAP_ACCENT_SWATCHES.map((s) => (
+              <button
+                key={s.hex}
+                type="button"
+                title={`${s.name} ${s.hex}`}
+                aria-label={`${s.name} accent`}
+                aria-pressed={design.accent.toUpperCase() === s.hex}
+                onClick={() => set("accent", design.accent.toUpperCase() === s.hex ? "" : s.hex)}
+                className={`h-6 w-6 rounded-md border ${
+                  design.accent.toUpperCase() === s.hex
+                    ? "border-[#03002C] ring-2 ring-[#003FC7]/35"
+                    : "border-[#03002C]/20"
+                }`}
+                style={{ background: s.hex }}
+              />
+            ))}
+          </div>
+
           <div className="flex flex-wrap gap-2">
             <Toggle
               title="Room colour bars"

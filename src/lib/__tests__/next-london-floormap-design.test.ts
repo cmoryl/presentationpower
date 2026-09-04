@@ -36,11 +36,34 @@ describe("map design", () => {
   });
 
   it("paints the sheet in the chosen theme", () => {
-    expect(svg()).toContain("#EDF1F7");
+    // Brand blue is the house default; directory stays available.
+    expect(svg()).toContain("#E0E8F5");
+    expect(svg({ theme: "directory" })).toContain("#EDF1F7");
     const night = svg({ theme: "night" });
     expect(night).toContain("#03002C");
     expect(night).toContain("#0B1043");
   });
+
+  it("brands every sheet with the lockup, palette strip and venue credit", () => {
+    const sheet = svg();
+    // The NEXT lockup is inlined, so PNG/PDF need no external artwork.
+    expect(sheet).toContain("#1590EF");
+    expect(sheet).toContain("#A1FBF9");
+    expect(sheet).toContain("Queen Elizabeth II Centre");
+    expect(sheet).toContain("TransPerfect NEXT 2026");
+
+    const plain = svg({ logo: "none", brandBar: false });
+    expect(plain).not.toContain("#1590EF");
+
+    const mono = svg({ logoMono: true });
+    expect(mono).not.toContain("#1590EF");
+
+    const ours = svg({ venueName: "Riverside Hall", eventName: "TransPerfect Summit" });
+    expect(ours).toContain("Riverside Hall");
+    expect(ours).toContain("TransPerfect Summit");
+    expect(ours).not.toContain("Queen Elizabeth II Centre");
+  });
+
 
   it("honours scale and margin in the sheet size", () => {
     const base = floorMapSheetSize("GF", { panels: LONDON_PANELS, labels: true });

@@ -5,6 +5,7 @@
 // setup, pin treatment, wording) is described here so screen, SVG, PNG and PDF
 // all read from the same object and print identically.
 
+import type { MapLogoId } from "@/lib/next-london-floormap-logos";
 import type { LondonAssetKind, LondonZone } from "@/lib/next-london-floorplan";
 
 /**
@@ -89,10 +90,21 @@ export type MapDesign = {
   subtitle: string;
   legendTitle: string;
   footerNote: string;
+  /** Brand lockup printed in the sheet header. */
+  logo: MapLogoId;
+  /** Lockup height in px. */
+  logoScale: number;
+  /** Force the lockup to a single ink (reverse / mono usage). */
+  logoMono: boolean;
+  /** Venue + event wording used by the built-in header and footer. */
+  venueName: string;
+  eventName: string;
+  /** Brand palette strip under the header rule. */
+  brandBar: boolean;
 };
 
 export const DEFAULT_MAP_DESIGN: MapDesign = {
-  theme: "directory",
+  theme: "brand",
   accent: "",
   roomTint: true,
   grid: true,
@@ -114,7 +126,29 @@ export const DEFAULT_MAP_DESIGN: MapDesign = {
   subtitle: "",
   legendTitle: "",
   footerNote: "",
+  logo: "next",
+  logoScale: 26,
+  logoMono: false,
+  venueName: "",
+  eventName: "",
+  brandBar: true,
 };
+
+/** The approved TransPerfect strip printed under the header rule. */
+export const MAP_BRAND_BAR = ["#003FC7", "#A1FBF9", "#C2A3FF", "#FFEB66", "#A6FA87"] as const;
+
+/** Brand accent swatches offered in the design panel. */
+export const MAP_ACCENT_SWATCHES: { name: string; hex: string }[] = [
+  { name: "Blue 500", hex: "#003FC7" },
+  { name: "Blue 800", hex: "#03002C" },
+  { name: "Aqua", hex: "#A1FBF9" },
+  { name: "Lavender", hex: "#C2A3FF" },
+  { name: "Yellow", hex: "#FFEB66" },
+  { name: "Green", hex: "#A6FA87" },
+  { name: "Peach", hex: "#FF9B70" },
+  { name: "Pink", hex: "#EC388A" },
+];
+
 
 const THEMES: Record<MapThemeId, MapPalette> = {
   directory: {
