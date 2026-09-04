@@ -511,7 +511,7 @@ export function StatFigure({
   //     font-size ceiling so very wide values step down automatically before
   //     they touch the next column;
   //   • tighten letter-spacing on the value so long strings stay compact.
-  const rawUnitText = unit?.trim() ?? "";
+  const rawUnitText = sameWords(unit ?? "", label ?? "") ? "" : (unit?.trim() ?? "");
   // A unit only reads as a unit when the value ends in a numeral. Seeded and
   // imported content often carries a leftover "%" alongside a value that
   // already states its own units ("6 wks → 9 days"), which printed as
