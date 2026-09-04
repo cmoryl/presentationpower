@@ -376,6 +376,11 @@ export type FloorMapOptions = {
   labels?: boolean;
   /** Right-hand credit in the footer strip; pass null to suppress the strip. */
   footerNote?: string | null;
+  /**
+   * Attendee wayfinding sheet: rooms and entrances only — no signage pins, no
+   * asset key, no numbered index.
+   */
+  roomsOnly?: boolean;
 };
 
 /** Everything inside the <svg> wrapper, so the asset card can reuse it. */
@@ -384,12 +389,13 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   if (!plan) return "";
   const ox = PAD;
   const oy = PAD + HEAD;
-  const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
+  const roomsOnly = opts.roomsOnly === true;
+  const all = roomsOnly ? [] : londonFloorMarkers(floor, opts.panels, opts.overrides);
   const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
 
   // Print sheets number the pins and list them in a directory index instead of
   // printing names on the plan, where a dense pillar run would overlap itself.
-  const numbered = opts.labels === true;
+  const numbered = !roomsOnly && opts.labels === true;
   const indexH = numbered ? indexHeight(markers.length) : 0;
 
   const pins = markers
@@ -407,29 +413,41 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const kinds = KIND_ORDER.filter((k) => markers.some((m) => m.kind === k));
   const legendY = size.h - FOOT - indexH - LEGEND;
   const headRule = PAD + HEAD - 18;
+  const roomCount = plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core").length;
 
   return `${defs()}
 <g>
-${eyebrow(PAD, PAD + 8, "TransPerfect NEXT 2026 · venue directory")}
+${eyebrow(PAD, PAD + 8, roomsOnly ? "TransPerfect NEXT 2026 · you are here" : "TransPerfect NEXT 2026 · venue directory")}
 <text x="${PAD}" y="${n(PAD + 38)}" font-family="${FONT}" font-size="24" font-weight="600" letter-spacing="-0.4" fill="${NAVY}">${esc(plan.label)}</text>
 <text x="${PAD}" y="${n(PAD + 58)}" font-family="${FONT}" font-size="10.5" letter-spacing="0.3" fill="${NAVY}" opacity="0.62">${esc(
-    `${LONDON_VENUE.venue} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`,
+    roomsOnly
+      ? `${LONDON_VENUE.venue} · ${roomCount} room${roomCount === 1 ? "" : "s"} and breakout space${roomCount === 1 ? "" : "s"}`
+      : `${LONDON_VENUE.venue} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`,
   )}</text>
 ${northArrow(size.w - PAD - 15, PAD + 22)}
 ${scaleBar(size.w - PAD - 30 - 4 * 2.5 * PPM - 92, PAD + 50)}
 <path d="M ${PAD} ${n(headRule)} H ${n(size.w - PAD)}" stroke="${LINE}" stroke-width="1" />
 </g>
-${planBody(plan, ox, oy)}
+${planBody(plan, ox, oy, roomsOnly)}
 ${pins}
-${eyebrow(PAD, legendY + 16, "Asset key")}
-${legendRow(kinds, PAD, legendY + 38, size.w - PAD * 2)}
+${eyebrow(PAD, legendY + 16, roomsOnly ? "Rooms on this floor" : "Asset key")}
+${
+  roomsOnly
+    ? roomKeyRow(plan, PAD, legendY + 38, size.w - PAD * 2)
+    : legendRow(kinds, PAD, legendY + 38, size.w - PAD * 2)
+}
 ${numbered ? indexBlock(markers, PAD, size.h - FOOT - indexH + 18, size.w - PAD * 2) : ""}
 ${
   opts.footerNote === null
     ? ""
-    : footerStrip(size.w, size.h - FOOT + 4, opts.footerNote ?? `${plan.label} · install plan`)
+    : footerStrip(
+        size.w,
+        size.h - FOOT + 4,
+        opts.footerNote ?? `${plan.label} · ${roomsOnly ? "attendee floor guide" : "install plan"}`,
+      )
 }`;
 }
+
 
 /**
  * Sheet size for a floor. Print sheets (`labels: true`) grow by the numbered
