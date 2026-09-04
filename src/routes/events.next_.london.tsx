@@ -458,6 +458,12 @@ function LondonSignagePage() {
                 <BookOpen className="h-4 w-4" /> Master directory (PDF)
               </button>
               <Link
+                to="/events/next/london/maps"
+                className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
+              >
+                <MapPin className="h-4 w-4" /> Install location maps
+              </Link>
+              <Link
                 to="/events/next/london/template"
                 className="inline-flex items-center gap-2 rounded-full border border-[#03002C]/25 bg-white/70 px-5 py-2.5 text-sm font-semibold text-[#03002C] transition-colors hover:bg-white"
               >
