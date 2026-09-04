@@ -88,6 +88,8 @@ registerSlideModule({
     const logos = arr(c.items).slice(0, MAX_LOGOS);
     const growth = arr(c.growth).slice(0, MAX_GROWTH);
     const orbits = arr(c.orbits).slice(0, MAX_ORBITS);
+    const wall = resolveLogoWall(c.logoWall);
+
 
     const tileBg = bareSurfaces ? "transparent" : isDark ? "#FFFFFF" : "rgba(10,15,28,0.02)";
     const tileRing = bareSurfaces
