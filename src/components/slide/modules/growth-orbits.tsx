@@ -252,15 +252,25 @@ registerSlideModule({
                 )}
               </div>
             )}
-            <div className="mt-8 flex w-full flex-col" style={{ gap: stackGap }}>
-              {orbits.map((o: Item, i) => (
+            <div className="relative mt-8 w-full flex-1" style={{ minHeight: ringSize + 40 }}>
+              {orbits.map((o: Item, i) => {
+                const pos = positions[i]!;
+                const size = Math.round(ringSize * pos.size);
+                return (
                 <div
                   key={i}
                   data-intro-item=""
                   data-intro-step={4 + i}
-                  className={`relative ${align[i] ?? "self-start"}`}
-                  style={{ width: ringSize, height: ringSize }}
+                  className="absolute"
+                  style={{
+                    width: size,
+                    height: size,
+                    left: `${pos.x}%`,
+                    top: `${pos.y}%`,
+                    transform: "translate(-50%, -50%)",
+                  }}
                 >
+
                   <OrbitRing accent={accent} size={ringSize} />
                   <div className="absolute inset-[9%] flex flex-col items-center justify-center text-center">
                     {s(o.label) && (
