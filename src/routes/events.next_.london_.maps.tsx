@@ -23,6 +23,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap, londonKindsPresent } from "@/components/events/LondonFloorMap";
 import { LondonMapDesignPanel } from "@/components/events/LondonMapDesignPanel";
+import { LondonMapAreasPanel } from "@/components/events/LondonMapAreasPanel";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
@@ -45,7 +46,19 @@ import {
   downloadFloorMapSvg,
   downloadMapCsv,
 } from "@/lib/next-london-floormap-export";
-import { DEFAULT_MAP_DESIGN, type MapDesign } from "@/lib/next-london-floormap-design";
+import {
+  DEFAULT_MAP_DESIGN,
+  type MapAreaKind,
+  type MapDesign,
+} from "@/lib/next-london-floormap-design";
+import {
+  areasOnFloor,
+  clampArea,
+  newLondonArea,
+  parseStoredAreas,
+  planWithAreas,
+  type LondonCustomArea,
+} from "@/lib/next-london-floormap-areas";
 import { effectiveLondonPanels } from "@/lib/next-london-revise";
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 import {
@@ -57,6 +70,7 @@ import {
 
 const STORE_KEY = "next-london-map-positions-v1";
 const DESIGN_KEY = "next-london-map-design-v1";
+const AREAS_KEY = "next-london-map-areas-v1";
 
 export const Route = createFileRoute("/events/next_/london_/maps")({
   head: () => ({
@@ -94,6 +108,9 @@ function LondonMapsPage() {
   /** Live map design — previewed on screen and read by every download. */
   const [design, setDesign] = useState<MapDesign>(DEFAULT_MAP_DESIGN);
   const [designOpen, setDesignOpen] = useState(false);
+  /** Areas the team sectioned off themselves, across every floor. */
+  const [areas, setAreas] = useState<LondonCustomArea[]>([]);
+  const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null);
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -105,6 +122,8 @@ function LondonMapsPage() {
       // Merge over the defaults so a design saved before a new control existed
       // still opens with every field populated.
       if (rawDesign) setDesign({ ...DEFAULT_MAP_DESIGN, ...(JSON.parse(rawDesign) as MapDesign) });
+      const rawAreas = localStorage.getItem(AREAS_KEY);
+      if (rawAreas) setAreas(parseStoredAreas(rawAreas));
     } catch {
       /* Corrupt or unavailable storage — schematic positions stand. */
     }
@@ -153,10 +172,29 @@ function LondonMapsPage() {
   }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
-  const installOpts = { panels, overrides, kinds, labels: true, design };
+  const installOpts = { panels, overrides, kinds, labels: true, design, areas };
   const exportOpts = attendee
-    ? { panels, overrides, roomsOnly: true, labels: false, design }
+    ? { panels, overrides, roomsOnly: true, labels: false, design, areas }
     : installOpts;
+  const floorAreas = areasOnFloor(areas, floor);
+  const planWithMine = plan ? planWithAreas(plan, areas) : null;
+
+  const changeArea = (next: LondonCustomArea) =>
+    persistAreas(areas.map((a) => (a.id === next.id ? clampArea(next, plan) : a)));
+  const addArea = (kind: MapAreaKind) => {
+    const area = newLondonArea(floor, kind, areaLabelFor(kind, floorAreas));
+    persistAreas([...areas, area]);
+    setSelectedAreaId(area.id);
+  };
+
+  const persistAreas = useCallback((next: LondonCustomArea[]) => {
+    setAreas(next);
+    try {
+      localStorage.setItem(AREAS_KEY, JSON.stringify(next));
+    } catch {
+      /* Private mode — the session still draws the areas. */
+    }
+  }, []);
 
   const applyDesign = useCallback((next: MapDesign) => {
     setDesign(next);
@@ -410,6 +448,10 @@ function LondonMapsPage() {
               editable={!attendee}
               roomsOnly={attendee}
               design={design}
+              areas={floorAreas}
+              onAreaChange={attendee ? undefined : changeArea}
+              selectedAreaId={selectedAreaId}
+              onSelectArea={setSelectedAreaId}
             />
 
             <div className="min-w-0">
