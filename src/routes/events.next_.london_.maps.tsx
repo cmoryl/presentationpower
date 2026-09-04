@@ -37,6 +37,7 @@ import {
   downloadAssetMapPack,
   downloadAssetMapPng,
   downloadAssetMapSvg,
+  downloadAttendeeMapPdf,
   downloadFloorMapPdf,
   downloadFloorMapPng,
   downloadFloorMapSvg,
@@ -144,9 +145,10 @@ function LondonMapsPage() {
   }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
+  const installOpts = { panels, overrides, kinds, labels: true };
   const exportOpts = attendee
     ? { panels, overrides, roomsOnly: true, labels: false }
-    : { panels, overrides, kinds, labels: true };
+    : installOpts;
 
   const correctedCount = Object.keys(overrides).length;
 
@@ -232,11 +234,27 @@ function LondonMapsPage() {
                       success: "next-london-install-maps.pdf downloaded",
                       failure: "Install plan set failed",
                     },
-                    () => downloadFloorMapPdf(exportOpts),
+                    () => downloadFloorMapPdf(installOpts),
                   )
                 }
               >
                 <FileDown className="h-4 w-4" /> Install plan set (PDF)
+              </button>
+              <button
+                type="button"
+                className={btn}
+                onClick={() =>
+                  runWithExportFeedback(
+                    {
+                      pending: "Building the attendee floor guide…",
+                      success: "next-london-floor-guide.pdf downloaded",
+                      failure: "Attendee floor guide failed",
+                    },
+                    () => downloadAttendeeMapPdf({ panels, overrides }),
+                  )
+                }
+              >
+                <FileDown className="h-4 w-4" /> Attendee floor guide (PDF)
               </button>
               <button
                 type="button"
@@ -247,13 +265,13 @@ function LondonMapsPage() {
                       success: "next-london-location-maps.zip downloaded",
                       failure: "Location card pack failed",
                     }, () =>
-                    downloadAssetMapPack(exportOpts),
+                    downloadAssetMapPack(installOpts),
                   )
                 }
               >
                 <Package className="h-4 w-4" /> Per-asset cards (ZIP)
               </button>
-              <button type="button" className={btn} onClick={() => downloadMapCsv(exportOpts)}>
+              <button type="button" className={btn} onClick={() => downloadMapCsv(installOpts)}>
                 <Table2 className="h-4 w-4" /> Install positions (CSV)
               </button>
               {correctedCount ? (
@@ -380,7 +398,7 @@ function LondonMapsPage() {
                   className={btn}
                   onClick={() => downloadFloorMapSvg(floor, exportOpts)}
                 >
-                  <Download className="h-4 w-4" /> Floor map (SVG)
+                  <Download className="h-4 w-4" /> {attendee ? "Floor guide (SVG)" : "Floor map (SVG)"}
                 </button>
                 <button
                   type="button"
@@ -395,7 +413,7 @@ function LondonMapsPage() {
                     )
                   }
                 >
-                  <ImageIcon className="h-4 w-4" /> Floor map (PNG)
+                  <ImageIcon className="h-4 w-4" /> {attendee ? "Floor guide (PNG)" : "Floor map (PNG)"}
                 </button>
               </div>
 
