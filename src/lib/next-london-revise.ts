@@ -988,14 +988,17 @@ function stepRepeatPdfOps(
       const size = tile.w * MM_TO_PT;
       const x = tile.x * MM_TO_PT;
       const yBottom = h - (tile.y + tile.h) * MM_TO_PT;
-      const plate = `${fillOp("#FFFFFF")} ${f3(x)} ${f3(yBottom)} ${f3(size)} ${f3(size)} re f `;
+      const plate = plan.qr.plateHex
+        ? `${fillOp(plan.qr.plateHex)} ${f3(x)} ${f3(yBottom)} ${f3(size)} ${f3(size)} re f `
+        : "";
       const modules = svgPathToPdfOps(plan.qr.path, {
         scale: size / plan.qr.modules,
         x,
         y: yBottom,
         artHeight: plan.qr.modules,
       });
-      return `q ${alpha}${matrix}${plate}${modules ? `${fillOp("#03002C")} ${modules} f ` : ""}Q\n`;
+      return `q ${alpha}${matrix}${plate}${modules ? `${fillOp(plan.qr.inkHex)} ${modules} f ` : ""}Q\n`;
+
     })
     .join("");
 }

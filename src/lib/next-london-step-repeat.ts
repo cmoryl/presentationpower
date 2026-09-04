@@ -70,7 +70,46 @@ export type StepRepeatConfig = {
   text: string;
   /** QR payload used by the QR rows; empty disables the QR rows. */
   qrData: string;
+  /** Dark-module colour of the repeated QR. */
+  qrInkHex: string;
+  /** Plate (quiet-zone) colour behind the code; `none` prints the code bare. */
+  qrPlateHex: string;
+  /** Module geometry: hard squares scan best, dots/rounded read softer. */
+  qrModuleShape: StepRepeatQrModuleShape;
+  /** Plate silhouette behind the code. */
+  qrPlateShape: StepRepeatQrPlateShape;
 };
+
+export const STEP_REPEAT_QR_MODULE_SHAPES = ["square", "rounded", "dot"] as const;
+export type StepRepeatQrModuleShape = (typeof STEP_REPEAT_QR_MODULE_SHAPES)[number];
+export const STEP_REPEAT_QR_MODULE_LABELS: Record<StepRepeatQrModuleShape, string> = {
+  square: "Square",
+  rounded: "Rounded",
+  dot: "Dot",
+};
+
+export const STEP_REPEAT_QR_PLATE_SHAPES = ["square", "rounded", "circle", "none"] as const;
+export type StepRepeatQrPlateShape = (typeof STEP_REPEAT_QR_PLATE_SHAPES)[number];
+export const STEP_REPEAT_QR_PLATE_LABELS: Record<StepRepeatQrPlateShape, string> = {
+  square: "Square plate",
+  rounded: "Rounded plate",
+  circle: "Circle plate",
+  none: "No plate",
+};
+
+/** Approved brand inks a repeated code may print in. */
+export const STEP_REPEAT_QR_SWATCHES: { hex: string; label: string }[] = [
+  { hex: "#03002C", label: "Blue 800" },
+  { hex: "#003FC7", label: "Blue 500" },
+  { hex: "#FFFFFF", label: "White" },
+  { hex: "#E0E8F5", label: "Blue white" },
+  { hex: "#A1FBF9", label: "Aqua" },
+  { hex: "#C2A3FF", label: "Lavender" },
+];
+
+const HEX_RE = /^#[0-9a-fA-F]{6}$/;
+const normHex = (v: unknown, alt: string): string =>
+  typeof v === "string" && HEX_RE.test(v.trim()) ? v.trim().toUpperCase() : alt;
 
 export const STEP_REPEAT_LIMITS = {
   tileWidthMm: { min: 60, max: 900, step: 5 },
@@ -96,7 +135,12 @@ export const DEFAULT_STEP_REPEAT: StepRepeatConfig = {
   opacity: 1,
   text: "TRANSPERFECT NEXT",
   qrData: "",
+  qrInkHex: "#03002C",
+  qrPlateHex: "#FFFFFF",
+  qrModuleShape: "square",
+  qrPlateShape: "rounded",
 };
+
 
 /** Is this panel a step-and-repeat / photo wall? */
 export function isStepRepeatPanel(panel: LondonPanel): boolean {
@@ -159,6 +203,20 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
       .slice(0, L.textMaxChars)
       .toUpperCase(),
     qrData: (typeof patch.qrData === "string" ? patch.qrData : base.qrData).slice(0, L.qrMaxChars),
+    qrInkHex: normHex(patch.qrInkHex, base.qrInkHex ?? DEFAULT_STEP_REPEAT.qrInkHex),
+    qrPlateHex:
+      patch.qrPlateHex === "none"
+        ? "none"
+        : normHex(patch.qrPlateHex, base.qrPlateHex ?? DEFAULT_STEP_REPEAT.qrPlateHex),
+    qrModuleShape: STEP_REPEAT_QR_MODULE_SHAPES.includes(
+      patch.qrModuleShape as StepRepeatQrModuleShape,
+    )
+      ? (patch.qrModuleShape as StepRepeatQrModuleShape)
+      : (base.qrModuleShape ?? DEFAULT_STEP_REPEAT.qrModuleShape),
+    qrPlateShape: STEP_REPEAT_QR_PLATE_SHAPES.includes(patch.qrPlateShape as StepRepeatQrPlateShape)
+      ? (patch.qrPlateShape as StepRepeatQrPlateShape)
+      : (base.qrPlateShape ?? DEFAULT_STEP_REPEAT.qrPlateShape),
+
   };
 }
 
@@ -284,7 +342,15 @@ export type StepRepeatPlan = {
   orientation: "stacked" | "side";
   colourway: NextLogoColourway;
   /** QR module geometry, when the recipe carries a code. */
-  qr: { modules: number; path: string } | null;
+  qr: {
+    modules: number;
+    path: string;
+    inkHex: string;
+    /** `null` when the recipe prints the code with no plate behind it. */
+    plateHex: string | null;
+    plateShape: StepRepeatQrPlateShape;
+  } | null;
+
   /** Ink colour for text tiles. */
   inkHex: string;
   tiles: StepRepeatTile[];
@@ -323,6 +389,41 @@ export function sizeText(wMm: number, hMm: number, digits = 2): string {
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
 const textRunMm = (text: string, sizeMm: number) => Math.max(1, text.length * sizeMm * 0.62);
+
+/**
+ * Dark-module geometry in module units, in the requested shape. Squares are the
+ * scanner-safe default; rounded and dot styles shrink each module slightly, which
+ * every reader tolerates because the sampling point is the module centre.
+ */
+export function stepRepeatQrPath(
+  qr: { size: number; modules: boolean[]; path: string },
+  shape: StepRepeatQrModuleShape,
+): string {
+  if (shape === "square") return qr.path;
+  const parts: string[] = [];
+  const r = shape === "dot" ? 0.46 : 0.22;
+  for (let y = 0; y < qr.size; y += 1) {
+    for (let x = 0; x < qr.size; x += 1) {
+      if (!qr.modules[y * qr.size + x]) continue;
+      if (shape === "dot") {
+        // Circle as two arcs, so the geometry survives the PDF path converter.
+        const cx = x + 0.5;
+        const cy = y + 0.5;
+        parts.push(
+          `M${cx - r} ${cy}A${r} ${r} 0 0 1 ${cx + r} ${cy}A${r} ${r} 0 0 1 ${cx - r} ${cy}z`,
+        );
+      } else {
+        parts.push(
+          `M${x + r} ${y}h${1 - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${1 - 2 * r}` +
+            `a${r} ${r} 0 0 1 ${-r} ${r}h${-(1 - 2 * r)}a${r} ${r} 0 0 1 ${-r} ${-r}` +
+            `v${-(1 - 2 * r)}a${r} ${r} 0 0 1 ${r} ${-r}z`,
+        );
+      }
+    }
+  }
+  return parts.join("");
+}
+
 
 /**
  * Lay the wall out. Tiles are generated with one row/column of overscan on every
@@ -430,7 +531,18 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
     art,
     orientation: picked.orientation,
     colourway: picked.colourway,
-    qr: code ? { modules: code.size, path: code.path } : null,
+    qr: code
+      ? {
+          modules: code.size,
+          path: stepRepeatQrPath(code, config.qrModuleShape),
+          inkHex: config.qrInkHex,
+          plateHex: config.qrPlateShape === "none" || config.qrPlateHex === "none"
+            ? null
+            : config.qrPlateHex,
+          plateShape: config.qrPlateShape,
+        }
+      : null,
+
     inkHex: picked.colourway === "dblue" ? "#03002C" : "#FFFFFF",
     tiles,
     pitchX,
@@ -471,6 +583,20 @@ export function stepRepeatWarnings(panel: LondonPanel, plan: StepRepeatPlan): st
     out.push("Fewer than ~3 marks across the wall: a tight crop may contain no whole mark.");
   if (plan.config.opacity < 0.4)
     out.push("Below 40% opacity the marks disappear under on-camera flash.");
+  if (plan.qr) {
+    // A reader needs a clear light/dark split between modules and their ground.
+    const lum = (hex: string) => {
+      const v = hex.replace("#", "");
+      const c = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255);
+      return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
+    };
+    const ground = plan.qr.plateHex ?? (plan.inkHex === "#03002C" ? "#FFFFFF" : "#03002C");
+    if (Math.abs(lum(plan.qr.inkHex) - lum(ground)) < 0.4)
+      out.push("QR colour and its plate are too close in value — phones will fail to scan it.");
+    if (plan.config.qrModuleShape === "dot" && mmToIn(plan.config.tileWidthMm) < 8)
+      out.push("Dot modules on a mark under 8 in wide lose scan reliability — use square modules.");
+  }
+
   return out;
 }
 
@@ -532,16 +658,33 @@ export function stepRepeatSvgLayer(
         );
       }
       if (!plan.qr) return "";
-      const plate = paintFor("#FFFFFF");
-      const dark = paintFor("#03002C");
+      const dark = paintFor(plan.qr.inkHex);
       const scale = tile.w / plan.qr.modules;
+      let plateEl = "";
+      if (plan.qr.plateHex) {
+        const plate = paintFor(plan.qr.plateHex);
+        if (plan.qr.plateShape === "circle") {
+          // The circle must fully contain the code, so it takes the diagonal.
+          plateEl =
+            `<circle cx="${(tile.x + tile.w / 2).toFixed(2)}" cy="${(tile.y + tile.h / 2).toFixed(2)}"` +
+            ` r="${((tile.w * Math.SQRT2) / 2).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>`;
+        } else {
+          const rx = plan.qr.plateShape === "rounded" ? tile.w * 0.08 : 0;
+          plateEl =
+            `<rect x="${tile.x.toFixed(2)}" y="${tile.y.toFixed(2)}" width="${tile.w.toFixed(2)}" height="${tile.h.toFixed(2)}"` +
+            (rx ? ` rx="${rx.toFixed(2)}"` : "") +
+            ` fill="${plate.paint}"${plate.meta}/>`;
+        }
+      }
       return (
-        `<g data-tile="qr" data-row="${tile.row}" data-col="${tile.col}"${spin}>` +
-        `<rect x="${tile.x.toFixed(2)}" y="${tile.y.toFixed(2)}" width="${tile.w.toFixed(2)}" height="${tile.h.toFixed(2)}"` +
-        ` rx="${(tile.w * 0.04).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>` +
+        `<g data-tile="qr" data-row="${tile.row}" data-col="${tile.col}"` +
+        ` data-qr-ink="${plan.qr.inkHex}" data-qr-plate="${plan.qr.plateHex ?? "none"}"` +
+        ` data-qr-module="${plan.config.qrModuleShape}"${spin}>` +
+        plateEl +
         `<g transform="translate(${tile.x.toFixed(2)} ${tile.y.toFixed(2)}) scale(${scale.toFixed(5)})">` +
         `<path d="${plan.qr.path}" fill="${dark.paint}"${dark.meta}/></g></g>`
       );
+
     })
     .join("");
 
