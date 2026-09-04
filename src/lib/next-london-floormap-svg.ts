@@ -143,6 +143,7 @@ function markerGlyph(
     `<path d="M ${cx} ${cy + tail} C ${cx - r * 0.75} ${cy + r * 0.7}, ${cx - r} ${cy + r * 0.35}, ${cx - r} ${cy} ` +
     `A ${r} ${r} 0 1 1 ${cx + r} ${cy} C ${cx + r} ${cy + r * 0.35}, ${cx + r * 0.75} ${cy + r * 0.7}, ${cx} ${cy + tail} Z" ` +
     `fill="${ink}" stroke="${PAPER}" stroke-width="${active ? 2 : 1.5}" filter="url(#ldn-pin)" />`;
+  if (numbered) return body;
   const ir = r * 0.42;
   let core: string;
   if (m.kind === "pillar" || m.kind === "table" || m.kind === "booth") {
