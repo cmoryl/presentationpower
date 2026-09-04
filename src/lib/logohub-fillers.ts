@@ -80,6 +80,7 @@ export function overlayLogoHubFillers(
   const items = Array.isArray(content.items) ? (content.items as unknown[]) : [];
 
   switch (variantId) {
+    case "MV-PROOF-GROWTH-ORBITS":
     case "MV-PROOF-LOGOS":
     case "MV-CASE-LOGO-GRID":
     case "MV-LOGO-WALL":

@@ -1388,6 +1388,7 @@ export async function exportDeckToPptx(
     "MV-PROOF-LOGOS-FEATURED",
     "MV-PROOF-LOGOS-CATEGORIZED",
     "MV-PROOF-LOGOS-MOSAIC",
+    "MV-PROOF-GROWTH-ORBITS",
     "MV-CASE-LOGO-GRID",
     "MV-LOGO-WALL",
     "MV-CLIENT-MATRIX",
@@ -3473,6 +3474,9 @@ function renderAdvancedVariant(
       return true;
     case "MV-PROOF-LOGOS-MOSAIC":
       renderProofLogos(s, c, p, itemLogos);
+      return true;
+    case "MV-PROOF-GROWTH-ORBITS":
+      renderGrowthOrbits(s, c, p, itemLogos);
       return true;
     case "MV-RISK-MITIGATION":
       renderRiskMitigation(s, c, p);
@@ -11923,6 +11927,206 @@ function renderProofLogos(
       align: "center",
       charSpacing: 3,
     });
+  });
+}
+
+// ── MV-PROOF-GROWTH-ORBITS ── logo wall + growth stats | orbit percentages
+function renderGrowthOrbits(
+  s: PptxGenJS.Slide,
+  c: Record<string, unknown>,
+  p: Palette,
+  itemLogos: Array<string | null> = [],
+) {
+  const LX = 0.6;
+  const LW = 5.9;
+  const RX = 7.1;
+  const RW = 5.6;
+
+  s.addText(str(c.title), {
+    x: LX,
+    y: 0.45,
+    w: LW,
+    h: 0.8,
+    fontSize: 34,
+    bold: true,
+    color: p.primary,
+    fontFace: "Geist",
+  });
+  if (str(c.subtitle)) {
+    s.addText(str(c.subtitle), {
+      x: LX,
+      y: 1.25,
+      w: LW,
+      h: 0.6,
+      fontSize: 14,
+      color: p.ink,
+      fontFace: "Geist",
+    });
+  }
+
+  let y = 2.0;
+  if (str(c.logosLabel)) {
+    s.addText(str(c.logosLabel).toUpperCase(), {
+      x: LX,
+      y,
+      w: LW,
+      h: 0.28,
+      fontSize: 11,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+      charSpacing: 3,
+    });
+    y += 0.34;
+  }
+  const logos = arr(c.items).slice(0, 12);
+  const cols = 4;
+  const gap = 0.12;
+  const tileW = (LW - (cols - 1) * gap) / cols;
+  const tileH = 0.62;
+  logos.forEach((it, k) => {
+    const col = k % cols;
+    const row = Math.floor(k / cols);
+    const x = LX + col * (tileW + gap);
+    const ty = y + row * (tileH + gap);
+    s.addShape("rect", {
+      x,
+      y: ty,
+      w: tileW,
+      h: tileH,
+      fill: { color: "FFFFFF" },
+      line: { color: LIGHT_GRAY },
+    });
+    const logoData = itemLogos[k];
+    if (logoData) {
+      s.addImage({
+        data: logoData,
+        ...containFrame(logoData, x + 0.1, ty + 0.08, tileW - 0.2, tileH - 0.16),
+      });
+    } else {
+      s.addText(str(it.name || it.client), {
+        x,
+        y: ty,
+        w: tileW,
+        h: tileH,
+        fontSize: 10,
+        bold: true,
+        color: p.primary,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      });
+    }
+  });
+  const logoRows = Math.ceil(logos.length / cols);
+  y += logoRows * (tileH + gap) + 0.25;
+
+  if (str(c.growthLabel)) {
+    s.addText(str(c.growthLabel).toUpperCase(), {
+      x: LX,
+      y,
+      w: LW,
+      h: 0.28,
+      fontSize: 11,
+      bold: true,
+      color: p.accent,
+      fontFace: "Geist",
+      charSpacing: 3,
+    });
+    y += 0.34;
+  }
+  const growth = arr(c.growth).slice(0, 4);
+  const gH = Math.min(0.72, Math.max(0.5, (6.9 - y) / Math.max(growth.length, 1)));
+  growth.forEach((g, k) => {
+    const gy = y + k * gH;
+    s.addText(str(g.value), {
+      x: LX,
+      y: gy,
+      w: 1.0,
+      h: gH - 0.05,
+      fontSize: 26,
+      bold: true,
+      color: p.primary,
+      fontFace: "Geist",
+      align: "right",
+      valign: "middle",
+    });
+    s.addText(
+      [
+        { text: str(g.label), options: { bold: true, fontSize: 13, color: p.primary } },
+        ...(str(g.body)
+          ? [{ text: `\n${str(g.body)}`, options: { fontSize: 12, color: p.ink } }]
+          : []),
+      ],
+      {
+        x: LX + 1.15,
+        y: gy,
+        w: LW - 1.15,
+        h: gH - 0.05,
+        fontFace: "Geist",
+        valign: "middle",
+      },
+    );
+  });
+
+  // Right panel — headline + orbit rings
+  const headline = str(c.statsTitle);
+  if (headline) {
+    s.addText(
+      [
+        { text: headline, options: { bold: true, fontSize: 30, color: p.primary } },
+        ...(str(c.statsEmphasis)
+          ? [
+              {
+                text: ` ${str(c.statsEmphasis)}`,
+                options: { bold: true, italic: true, fontSize: 30, color: p.accent },
+              },
+            ]
+          : []),
+      ],
+      { x: RX, y: 0.45, w: RW, h: 0.95, fontFace: "Geist" },
+    );
+  }
+  const orbits = arr(c.orbits).slice(0, 3);
+  const top = headline ? 1.5 : 0.6;
+  const avail = 6.8 - top;
+  const ringH = Math.min(1.95, avail / Math.max(orbits.length, 1) - 0.1);
+  orbits.forEach((o, k) => {
+    const oy = top + k * (ringH + 0.1);
+    const ox = RX + (k % 2 === 1 ? RW - ringH : 0);
+    s.addShape("ellipse", {
+      x: ox,
+      y: oy,
+      w: ringH,
+      h: ringH,
+      fill: { color: "FFFFFF", transparency: 100 },
+      line: { color: p.accent, width: 1 },
+    });
+    s.addText(
+      [
+        ...(str(o.label)
+          ? [
+              {
+                text: `${str(o.label).toUpperCase()}\n`,
+                options: { fontSize: 10, bold: true, color: p.accent, charSpacing: 2 },
+              },
+            ]
+          : []),
+        { text: str(o.value), options: { fontSize: 34, bold: true, color: p.primary } },
+        ...(str(o.body)
+          ? [{ text: `\n${str(o.body)}`, options: { fontSize: 10, color: p.ink } }]
+          : []),
+      ],
+      {
+        x: ox + 0.12,
+        y: oy + 0.12,
+        w: ringH - 0.24,
+        h: ringH - 0.24,
+        fontFace: "Geist",
+        align: "center",
+        valign: "middle",
+      },
+    );
   });
 }
 
