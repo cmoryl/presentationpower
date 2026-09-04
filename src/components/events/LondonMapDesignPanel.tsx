@@ -175,6 +175,11 @@ export function LondonMapDesignPanel({ design, onChange, roomsOnly }: LondonMapD
               onClick={() => set("compass", !design.compass)}
             />
             <Toggle
+              title="Area icons"
+              active={design.icons}
+              onClick={() => set("icons", !design.icons)}
+            />
+            <Toggle
               title="Room sizes"
               active={design.roomDims}
               onClick={() => set("roomDims", !design.roomDims)}

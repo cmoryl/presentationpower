@@ -17,6 +17,7 @@ import {
   pdfFormatFor,
   type MapDesign,
 } from "@/lib/next-london-floormap-design";
+import { londonAreaCsv, type LondonCustomArea } from "@/lib/next-london-floormap-areas";
 import {
   LONDON_VENUE,
   panelSlug,
@@ -33,6 +34,8 @@ export type MapExportOptions = {
   roomsOnly?: boolean;
   /** Look, sheet setup, pin treatment and wording. */
   design?: MapDesign;
+  /** Areas the team sectioned off themselves. */
+  areas?: readonly LondonCustomArea[];
 };
 
 /** Raster multiplier the design asks for, clamped to what a canvas can hold. */
@@ -192,6 +195,9 @@ export async function downloadAssetMapPack(opts: MapExportOptions) {
   }
 
   zip.file("install-positions.csv", londonMapCsv(opts.panels, opts.overrides));
+  // Sectioned areas travel with the pack so the production partner can set out
+  // the stage, catering run and demo bays without opening the app.
+  if (opts.areas?.length) zip.file("sectioned-areas.csv", londonAreaCsv(opts.areas));
   zip.file(
     "README.txt",
     [
@@ -203,6 +209,7 @@ export async function downloadAssetMapPack(opts: MapExportOptions) {
       "  <floor>/                 one directory-style install card per asset",
       "  floor-directory/         full-floor directory sheet per mapped floor",
       "  install-positions.csv    confirmed positions in plan metres",
+      "  sectioned-areas.csv      areas sectioned off on the plans (when used)",
       "",
       "Positions are schematic: each asset is placed in its scheduled floor and zone,",
       "on the face it is installed against. Corrections made on the maps page are",
