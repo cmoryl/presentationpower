@@ -581,17 +581,35 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const legendTitle =
     DESIGN.legendTitle.trim() || (roomsOnly ? "Rooms on this floor" : "Asset key");
 
+  const logoH = Math.max(12, Math.min(46, DESIGN.logoScale || 26));
+  const logoW = mapLogoRatio(DESIGN.logo) * logoH;
+  const logo =
+    DESIGN.logo === "none"
+      ? ""
+      : mapLogoSvg(
+          DESIGN.logo,
+          size.w - PAD - logoW,
+          PAD - 6,
+          logoH,
+          DESIGN.logoMono ? NAVY : undefined,
+        );
+  // The compass cluster drops below the lockup so the two never collide.
+  const compassY = DESIGN.logo === "none" ? PAD + 22 : PAD - 6 + logoH + 22;
+
   return `${defs()}
 <g>
+${logo}
 ${eyebrow(PAD, PAD + 8, eyebrowText)}
 <text x="${PAD}" y="${n(PAD + 38)}" font-family="${FONT}" font-size="24" font-weight="600" letter-spacing="-0.4" fill="${NAVY}">${esc(titleText)}</text>
 <text x="${PAD}" y="${n(PAD + 58)}" font-family="${FONT}" font-size="10.5" letter-spacing="0.3" fill="${NAVY}" opacity="0.62">${esc(
     subtitleText,
   )}</text>
-${DESIGN.compass === false ? "" : northArrow(size.w - PAD - 15, PAD + 22)}
-${DESIGN.compass === false ? "" : scaleBar(size.w - PAD - 30 - 4 * 2.5 * PPM - 92, PAD + 50)}
+${DESIGN.compass === false ? "" : northArrow(size.w - PAD - 15, compassY)}
+${DESIGN.compass === false ? "" : scaleBar(size.w - PAD - 30 - 4 * 2.5 * PPM - 92, compassY + 28)}
 <path d="M ${PAD} ${n(headRule)} H ${n(size.w - PAD)}" stroke="${LINE}" stroke-width="1" />
+${brandBar(PAD, headRule + 5, size.w - PAD * 2)}
 </g>
+
 ${planBody(plan, ox, oy, roomsOnly)}
 ${pins}
 ${legendOn ? eyebrow(PAD, legendY + 16, legendTitle) : ""}
