@@ -117,6 +117,7 @@ import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
 import { StagePhasesPanel } from "@/components/slide/StagePhasesPanel";
 import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
+import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
