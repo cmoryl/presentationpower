@@ -203,6 +203,20 @@ function clampConfig(patch: Partial<StepRepeatConfig>, base: StepRepeatConfig): 
       .slice(0, L.textMaxChars)
       .toUpperCase(),
     qrData: (typeof patch.qrData === "string" ? patch.qrData : base.qrData).slice(0, L.qrMaxChars),
+    qrInkHex: normHex(patch.qrInkHex, base.qrInkHex ?? DEFAULT_STEP_REPEAT.qrInkHex),
+    qrPlateHex:
+      patch.qrPlateHex === "none"
+        ? "none"
+        : normHex(patch.qrPlateHex, base.qrPlateHex ?? DEFAULT_STEP_REPEAT.qrPlateHex),
+    qrModuleShape: STEP_REPEAT_QR_MODULE_SHAPES.includes(
+      patch.qrModuleShape as StepRepeatQrModuleShape,
+    )
+      ? (patch.qrModuleShape as StepRepeatQrModuleShape)
+      : (base.qrModuleShape ?? DEFAULT_STEP_REPEAT.qrModuleShape),
+    qrPlateShape: STEP_REPEAT_QR_PLATE_SHAPES.includes(patch.qrPlateShape as StepRepeatQrPlateShape)
+      ? (patch.qrPlateShape as StepRepeatQrPlateShape)
+      : (base.qrPlateShape ?? DEFAULT_STEP_REPEAT.qrPlateShape),
+
   };
 }
 
