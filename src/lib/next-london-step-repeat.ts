@@ -583,6 +583,20 @@ export function stepRepeatWarnings(panel: LondonPanel, plan: StepRepeatPlan): st
     out.push("Fewer than ~3 marks across the wall: a tight crop may contain no whole mark.");
   if (plan.config.opacity < 0.4)
     out.push("Below 40% opacity the marks disappear under on-camera flash.");
+  if (plan.qr) {
+    // A reader needs a clear light/dark split between modules and their ground.
+    const lum = (hex: string) => {
+      const v = hex.replace("#", "");
+      const c = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255);
+      return 0.2126 * c[0]! + 0.7152 * c[1]! + 0.0722 * c[2]!;
+    };
+    const ground = plan.qr.plateHex ?? (plan.inkHex === "#03002C" ? "#FFFFFF" : "#03002C");
+    if (Math.abs(lum(plan.qr.inkHex) - lum(ground)) < 0.4)
+      out.push("QR colour and its plate are too close in value — phones will fail to scan it.");
+    if (plan.config.qrModuleShape === "dot" && mmToIn(plan.config.tileWidthMm) < 8)
+      out.push("Dot modules on a mark under 8 in wide lose scan reliability — use square modules.");
+  }
+
   return out;
 }
 
