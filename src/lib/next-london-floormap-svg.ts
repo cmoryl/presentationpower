@@ -153,7 +153,11 @@ function markerGlyph(
     `<path d="M ${n(cx)} ${n(cy + tail)} C ${n(cx - r * 0.75)} ${n(cy + r * 0.7)}, ${n(cx - r)} ${n(cy + r * 0.35)}, ${n(cx - r)} ${n(cy)} ` +
     `A ${n(r)} ${n(r)} 0 1 1 ${n(cx + r)} ${n(cy)} C ${n(cx + r)} ${n(cy + r * 0.35)}, ${n(cx + r * 0.75)} ${n(cy + r * 0.7)}, ${n(cx)} ${n(cy + tail)} Z" ` +
     `fill="${ink}" stroke="${PAPER}" stroke-width="${active ? 1.9 : 1.4}" filter="url(#ldn-pin)" />`;
-  if (numbered) return body;
+  // The called-out asset gets a locator ring so a single card reads instantly.
+  const ring = active
+    ? `<circle cx="${n(cx)}" cy="${n(cy)}" r="17" fill="none" stroke="#C4306E" stroke-width="1.25" stroke-dasharray="3 3" opacity="0.85" /><circle cx="${n(cx)}" cy="${n(cy)}" r="24" fill="none" stroke="#C4306E" stroke-width="1" opacity="0.3" />`
+    : "";
+  if (numbered) return `${ring}${body}`;
   const ir = r * 0.4;
   let core: string;
   if (m.kind === "pillar" || m.kind === "table" || m.kind === "booth") {
@@ -165,7 +169,7 @@ function markerGlyph(
   } else {
     core = `<polygon points="${n(cx)},${n(cy - ir * 1.2)} ${n(cx + ir * 1.1)},${n(cy + ir * 0.85)} ${n(cx - ir * 1.1)},${n(cy + ir * 0.85)}" fill="${PAPER}" />`;
   }
-  return `${body}${core}`;
+  return `${ring}${body}${core}`;
 }
 
 /** Directory index geometry — three columns of numbered entries. */
