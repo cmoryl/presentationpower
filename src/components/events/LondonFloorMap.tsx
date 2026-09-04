@@ -299,14 +299,22 @@ export function LondonFloorMap({
           {plan.zones.map((z) => {
             const style = zoneStyleFor(z.kind, design);
             const quiet = z.kind === "circulation" || z.kind === "core" || z.kind === "exterior";
+            const own = isCustomAreaId(z.id);
+            const mine = own ? areas?.find((a) => a.id === z.id) : undefined;
+            const chosen = own && z.id === selectedAreaId;
+            const canEdit = editable && !!mine && !!onAreaChange;
             return (
               <div
                 key={z.id}
-                data-plan-surface="1"
-                className={`absolute overflow-hidden rounded-[3px] border border-[#D3DCEA] ${
+                data-plan-surface={own ? undefined : "1"}
+                className={`absolute rounded-[3px] border ${
+                  own ? "border-dashed" : "overflow-hidden border-[#D3DCEA]"
+                } ${
                   quiet
                     ? ""
                     : "shadow-[0_1px_2px_rgba(3,0,44,0.10),0_6px_14px_-6px_rgba(3,0,44,0.25)]"
+                } ${chosen ? "z-[6] ring-2 ring-[#003FC7]/60" : own ? "z-[5]" : ""} ${
+                  canEdit ? "cursor-grab" : ""
                 }`}
                 style={{
                   left: `${(z.x / plan.w) * 100}%`,
@@ -314,7 +322,22 @@ export function LondonFloorMap({
                   width: `${(z.w / plan.w) * 100}%`,
                   height: `${(z.h / plan.h) * 100}%`,
                   background: style.fill,
+                  borderColor: own ? style.accent : undefined,
                 }}
+                onPointerDown={
+                  own
+                    ? (ev) => {
+                        ev.stopPropagation();
+                        onSelectArea?.(z.id);
+                        if (!canEdit || !mine) return;
+                        const p = toPlan(ev.clientX, ev.clientY);
+                        if (!p) return;
+                        ev.preventDefault();
+                        areaDrag.current = { area: mine, mode: "move", px: p.x, py: p.y };
+                      }
+                    : undefined
+                }
+                title={own ? `${z.label} — ${areaKindLabel(z.kind)}` : undefined}
               >
                 {/* Category bar — the mall-directory colour key for this space. */}
                 <span
@@ -325,12 +348,30 @@ export function LondonFloorMap({
                 <span className="absolute left-2.5 top-1 text-[9.5px] font-bold uppercase tracking-[0.08em] text-[#03002C]/80">
                   {z.label}
                 </span>
+                {design.icons !== false && z.w > 3.2 && z.h > 2.4 && !quiet ? (
+                  <AreaGlyph kind={z.kind} ink={style.accent} />
+                ) : null}
                 <span className="absolute bottom-0.5 right-1.5 font-mono text-[8.5px] tabular-nums text-[#03002C]/35">
                   {z.w.toFixed(1)} × {z.h.toFixed(1)} m
                 </span>
+                {canEdit && mine ? (
+                  <span
+                    role="presentation"
+                    onPointerDown={(ev) => {
+                      ev.stopPropagation();
+                      ev.preventDefault();
+                      onSelectArea?.(z.id);
+                      areaDrag.current = { area: mine, mode: "resize", px: 0, py: 0 };
+                    }}
+                    className="absolute -bottom-1 -right-1 block h-3 w-3 cursor-nwse-resize rounded-sm border border-white"
+                    style={{ background: style.accent }}
+                    title="Drag to resize this area"
+                  />
+                ) : null}
               </div>
             );
           })}
+
 
           {plan.entries.map((e) => (
             <span
