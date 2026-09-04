@@ -3270,6 +3270,22 @@ function renderAdvancedVariant(
     case "MV-PULL-QUOTE-STACK":
       renderPullQuoteStack(s, c, p);
       return true;
+    case "MV-QUOTE-CARD":
+      renderQuoteCard(s, c, p);
+      return true;
+    case "MV-QUOTE-PORTRAIT":
+      renderQuotePortrait(s, c, p);
+      return true;
+    case "MV-QUOTE-METRIC":
+      renderQuoteMetric(s, c, p);
+      return true;
+    case "MV-QUOTE-MULTI":
+      renderQuoteMulti(s, c, p);
+      return true;
+    case "MV-QUOTE-POSTER":
+      renderQuotePoster(s, c, p);
+      return true;
+
     case "MV-DEFINITION":
       renderDefinition(s, c, p);
       return true;
@@ -4892,8 +4908,28 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   if (!n) return;
   const marginX = 1.0;
   const bottomY = 5.85;
-  const topY = y0 + 0.6;
+  // The canvas module carries an optional subtitle band under the title; the
+  // export used to drop it, which is one of the reasons this renderer was
+  // treated as drifted. Emit it and push the plot down by the space it takes.
+  const subtitle = str(c.subtitle);
+  let plotTop = y0 + 0.6;
+  if (subtitle) {
+    s.addText(subtitle, {
+      x: marginX - 0.4,
+      y: y0 + 0.12,
+      w: SLIDE_W - (marginX - 0.4) * 2,
+      h: 0.5,
+      fontSize: 11,
+      color: mutedC(p),
+      fontFace: "Geist",
+      valign: "top",
+      margin: 0,
+    });
+    plotTop = y0 + 0.78;
+  }
+  const topY = plotTop;
   const step = (SLIDE_W - marginX * 2) / Math.max(n - 1, 1);
+
   // Same sinusoidal ease as the canvas module, so the exported ramp has the
   // build's S-curve shape rather than a parabola.
   const points = items.map((_, k) => {
@@ -4930,6 +4966,31 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       margin: 0,
     });
   }
+  // Area wash under the ramp — the canvas paints a vertical accent gradient
+  // from the curve down to the baseline. PowerPoint has no free-form area fill,
+  // so it is approximated by narrow trapezoid columns whose transparency
+  // deepens toward the baseline, giving the same soft under-glow.
+  const bands = 48;
+  for (let k = 0; k < bands; k++) {
+    const t0 = k / bands;
+    const t1 = (k + 1) / bands;
+    const yAt = (t: number) => {
+      const eased = 0.5 - 0.5 * Math.cos(Math.PI * t);
+      return bottomY - eased * (bottomY - topY);
+    };
+    const x0 = marginX + t0 * (SLIDE_W - marginX * 2);
+    const x1 = marginX + t1 * (SLIDE_W - marginX * 2);
+    const yTop = Math.min(yAt(t0), yAt(t1));
+    if (bottomY - yTop <= 0.01) continue;
+    s.addShape("rect", {
+      x: x0,
+      y: yTop,
+      w: Math.max(0.01, x1 - x0 + 0.004),
+      h: bottomY - yTop,
+      fill: { color: p.accent, transparency: 88 },
+      line: { color: p.accent, transparency: 100 },
+    });
+  }
   for (let k = 0; k < points.length - 1; k++) {
     const a2 = points[k];
     const b2 = points[k + 1];
@@ -4941,6 +5002,7 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       line: { color: p.accent, width: 2.25 },
     });
   }
+
   // Only one milestone can be "here" — seeded decks often flag them all.
   const currentIdx = items.findIndex((it) => Boolean(it.current));
   items.forEach((it, k) => {
@@ -4954,6 +5016,17 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
     if (k === 0) bandX = Math.max(0.35, pt.x - bandW * 0.15);
     if (k === n - 1) bandX = Math.min(SLIDE_W - 0.35 - bandW, pt.x - bandW * 0.85);
     const align: "left" | "center" | "right" = k === 0 ? "left" : k === n - 1 ? "right" : "center";
+    if (isCurrent) {
+      // Soft accent halo behind the live milestone, exactly as on canvas.
+      s.addShape("ellipse", {
+        x: pt.x - 0.2,
+        y: pt.y - 0.2,
+        w: 0.4,
+        h: 0.4,
+        fill: { color: p.accent, transparency: 82 },
+        line: { color: p.accent, transparency: 100 },
+      });
+    }
     s.addShape("ellipse", {
       x: pt.x - (isCurrent ? 0.11 : 0.08),
       y: pt.y - (isCurrent ? 0.11 : 0.08),
@@ -4962,6 +5035,18 @@ function renderMaturityCurve(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
       fill: { color: isCurrent ? p.accent : "FFFFFF" },
       line: { color: isCurrent ? p.accent : p.primary, width: 1.5 },
     });
+    if (isCurrent) {
+      // Inner ring dot — the canvas marker is a filled node with a light core.
+      s.addShape("ellipse", {
+        x: pt.x - 0.04,
+        y: pt.y - 0.04,
+        w: 0.08,
+        h: 0.08,
+        fill: { color: "FFFFFF" },
+        line: { color: "FFFFFF" },
+      });
+    }
+
     s.addText(str(it.label), {
       x: bandX,
       y: pt.y - 0.52,
@@ -6683,7 +6768,351 @@ function renderCompareSlider(s: PptxGenJS.Slide, c: Record<string, unknown>, p: 
   });
 }
 
+// ─── Quote / testimonial family (native) ────────────────────────────────────
+// The five MV-QUOTE-* treatments used to fall through to the generic
+// `renderQuote`, which threw the design away: an italic 28pt block with a bare
+// quote glyph, no kicker, no accent rule, no attribution block and no metric
+// column. These emitters rebuild each treatment shape-by-shape from the same
+// geometry the on-screen module uses (src/components/slide/modules/quote.tsx),
+// so the exported slide is the designed slide AND every object stays editable.
+//
+// Stage → slide conversion: the module is authored on the 1920×1080 stage, so a
+// stage pixel is SLIDE_W/1920 inches and a CSS px of type is half a point.
+const Q_PX = SLIDE_W / 1920;
+const qpt = (px: number) => Math.max(7, Math.round(px * 0.5 * 10) / 10);
+const Q_L = 0.667;
+const Q_R = SLIDE_W - 0.667;
+
+/** Oversized decorative quote mark, matching `QuoteMark` on canvas. */
+function addQuoteGlyph(
+  s: PptxGenJS.Slide,
+  p: Palette,
+  o: { x: number; y: number; sizePx: number; opacity?: number },
+) {
+  s.addText("\u201C", {
+    x: o.x,
+    y: o.y,
+    w: o.sizePx * Q_PX * 1.1,
+    h: o.sizePx * Q_PX * 1.1,
+    fontSize: qpt(o.sizePx * 1.35),
+    bold: true,
+    color: p.accent,
+    fontFace: "Geist",
+    margin: 0,
+    valign: "top",
+    transparency: Math.round((1 - (o.opacity ?? 0.9)) * 100),
+  } as unknown as PptxGenJS.TextPropsOptions);
+}
+
+/** Kicker + accent hairline pair used by every quote treatment. */
+function addQuoteKicker(
+  s: PptxGenJS.Slide,
+  p: Palette,
+  o: { x: number; y: number; w: number; text: string; rulePx?: number; onDark?: boolean },
+) {
+  s.addText(o.text.toUpperCase(), {
+    x: o.x,
+    y: o.y,
+    w: o.w,
+    h: 0.26,
+    fontSize: 10,
+    bold: true,
+    charSpacing: 3,
+    color: o.onDark ? p.accent : mutedC(p),
+    fontFace: "Geist",
+    margin: 0,
+    valign: "top",
+  } as unknown as PptxGenJS.TextPropsOptions);
+  const ruleW = (o.rulePx ?? 72) * Q_PX;
+  s.addShape("rect", {
+    x: o.x,
+    y: o.y + 0.34,
+    w: ruleW,
+    h: 2 * Q_PX,
+    fill: { color: p.accent },
+    line: { color: p.accent },
+  });
+}
+
+/** Name + role/org attribution block (name over uppercase meta line). */
+function addQuoteAttribution(
+  s: PptxGenJS.Slide,
+  p: Palette,
+  o: {
+    x: number;
+    y: number;
+    w: number;
+    name: string;
+    role?: string;
+    org?: string;
+    align?: "left" | "right";
+    ink?: string;
+  },
+) {
+  const align = o.align ?? "left";
+  const ink = o.ink ?? p.ink;
+  if (!o.name && !o.role && !o.org) return;
+  s.addShape("rect", {
+    x: align === "right" ? o.x + o.w - 0.28 : o.x,
+    y: o.y,
+    w: 0.28,
+    h: 2 * Q_PX,
+    fill: { color: p.accent },
+    line: { color: p.accent },
+  });
+  if (o.name) {
+    s.addText(o.name, {
+      x: o.x,
+      y: o.y + 0.14,
+      w: o.w,
+      h: 0.3,
+      fontSize: 14,
+      bold: true,
+      color: ink,
+      fontFace: "Geist",
+      align,
+      margin: 0,
+      valign: "top",
+    });
+  }
+  const meta = [o.role, o.org].filter((v) => (v ?? "").trim()).join(" \u00B7 ");
+  if (meta) {
+    s.addText(meta.toUpperCase(), {
+      x: o.x,
+      y: o.y + 0.46,
+      w: o.w,
+      h: 0.3,
+      fontSize: 9,
+      bold: true,
+      charSpacing: 3,
+      color: mutedC(p),
+      fontFace: "Geist",
+      align,
+      margin: 0,
+      valign: "top",
+    } as unknown as PptxGenJS.TextPropsOptions);
+  }
+}
+
+/** MV-QUOTE-CARD — centred testimonial card. */
+function renderQuoteCard(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const g = groupScope(s, "quote-card", "TP Testimonial");
+  addQuoteGlyph(g, p, { x: Q_L - 0.05, y: 1.0, sizePx: 560, opacity: 0.9 });
+  addQuoteKicker(g, p, { x: Q_L, y: 1.95, w: 4, text: "Testimonial" });
+  g.addText(`\u201C${str(c.quote)}\u201D`, {
+    x: Q_L,
+    y: 2.5,
+    w: Q_R - Q_L - 0.6,
+    h: 2.5,
+    fontSize: qpt(56),
+    bold: false,
+    color: p.primary,
+    fontFace: "Geist",
+    valign: "top",
+    lineSpacingMultiple: 1.22,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  addQuoteAttribution(g, p, {
+    x: Q_L,
+    y: 5.35,
+    w: 4.6,
+    name: str(c.attribution),
+    role: str(c.role),
+  });
+  if (str(c.org)) {
+    g.addText(str(c.org).toUpperCase(), {
+      x: Q_R - 4.0,
+      y: 5.49,
+      w: 4.0,
+      h: 0.3,
+      fontSize: 9,
+      bold: true,
+      charSpacing: 3,
+      color: mutedC(p),
+      fontFace: "Geist",
+      align: "right",
+      margin: 0,
+    } as unknown as PptxGenJS.TextPropsOptions);
+  }
+}
+
+/** MV-QUOTE-PORTRAIT — portrait photo left, quote right. The photo itself is
+ *  emitted separately from the measured media tile, so this owns only type. */
+function renderQuotePortrait(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const textX = Q_L + 420 * Q_PX + 64 * Q_PX;
+  const w = Q_R - textX;
+  addQuoteGlyph(s, p, { x: textX - 0.05, y: 0.9, sizePx: 520, opacity: 0.9 });
+  addQuoteKicker(s, p, { x: textX, y: 1.85, w, text: "In their words" });
+  s.addText(`\u201C${str(c.quote)}\u201D`, {
+    x: textX,
+    y: 2.4,
+    w,
+    h: 2.5,
+    fontSize: qpt(60),
+    color: p.primary,
+    fontFace: "Geist",
+    valign: "top",
+    lineSpacingMultiple: 1.2,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  addQuoteAttribution(s, p, {
+    x: textX,
+    y: 5.3,
+    w,
+    name: str(c.attribution),
+    role: str(c.role),
+    org: str(c.org),
+  });
+}
+
+/** MV-QUOTE-METRIC — quote left, outcome figure right. */
+function renderQuoteMetric(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const gap = 1.0;
+  const total = Q_R - Q_L - gap;
+  const leftW = total * (1.3 / 2.3);
+  const rightX = Q_L + leftW + gap;
+  const rightW = Q_R - rightX;
+  addQuoteGlyph(s, p, { x: Q_L - 0.05, y: 1.0, sizePx: 520, opacity: 0.9 });
+  addQuoteKicker(s, p, { x: Q_L, y: 1.9, w: leftW, text: "In their words" });
+  s.addText(`\u201C${str(c.quote)}\u201D`, {
+    x: Q_L,
+    y: 2.45,
+    w: leftW,
+    h: 2.4,
+    fontSize: qpt(58),
+    color: p.primary,
+    fontFace: "Geist",
+    valign: "top",
+    lineSpacingMultiple: 1.2,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  addQuoteAttribution(s, p, {
+    x: Q_L,
+    y: 5.2,
+    w: leftW,
+    name: str(c.attribution),
+    role: str(c.role),
+  });
+  // Outcome column: accent rule, label, oversized figure + unit.
+  const g = groupScope(s, "quote-metric", "TP Outcome");
+  g.addShape("rect", {
+    x: rightX,
+    y: 2.05,
+    w: 56 * Q_PX,
+    h: 2 * Q_PX,
+    fill: { color: p.accent },
+    line: { color: p.accent },
+  });
+  g.addText((str(c.metricLabel) || "Outcome").toUpperCase(), {
+    x: rightX,
+    y: 2.24,
+    w: rightW,
+    h: 0.3,
+    fontSize: 10,
+    bold: true,
+    charSpacing: 3,
+    color: mutedC(p),
+    fontFace: "Geist",
+    margin: 0,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  g.addText(
+    [
+      { text: str(c.metric), options: { fontSize: qpt(150), bold: true, color: p.primary } },
+      ...(str(c.unit)
+        ? [{ text: str(c.unit), options: { fontSize: qpt(64), bold: true, color: p.accent } }]
+        : []),
+    ],
+    {
+      x: rightX,
+      y: 2.7,
+      w: rightW,
+      h: 1.7,
+      fontFace: "Geist",
+      valign: "top",
+      margin: 0,
+    },
+  );
+}
+
+/** MV-QUOTE-MULTI — three stacked quotes with attribution on the right. */
+function renderQuoteMulti(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  const y0 = drawTitle(s, c, p);
+  const items = arr(c.items).slice(0, 3);
+  if (!items.length) return;
+  const top = y0 + 0.35;
+  const bandH = Math.min(1.5, (6.6 - top) / Math.max(items.length, 1));
+  const attrW = 2.6;
+  const quoteX = Q_L + 0.85;
+  const quoteW = Q_R - attrW - 0.5 - quoteX;
+  items.forEach((it, k) => {
+    const y = top + k * bandH;
+    const g = groupScope(s, `quote-multi-${k}`, `TP Quote ${k + 1}`);
+    if (k > 0) {
+      g.addShape("rect", {
+        x: Q_L,
+        y,
+        w: Q_R - Q_L,
+        h: 1 * Q_PX,
+        fill: { color: LIGHT_GRAY },
+        line: { color: LIGHT_GRAY },
+      });
+    }
+    addQuoteGlyph(g, p, { x: Q_L - 0.02, y: y + 0.1, sizePx: 110, opacity: 0.9 });
+    g.addText(`\u201C${str(it.quote)}\u201D`, {
+      x: quoteX,
+      y: y + 0.24,
+      w: quoteW,
+      h: bandH - 0.4,
+      fontSize: qpt(30),
+      color: p.primary,
+      fontFace: "Geist",
+      valign: "top",
+      lineSpacingMultiple: 1.3,
+    } as unknown as PptxGenJS.TextPropsOptions);
+    addQuoteAttribution(g, p, {
+      x: Q_R - attrW,
+      y: y + 0.3,
+      w: attrW,
+      name: str(it.attribution),
+      role: str(it.role),
+      org: str(it.org),
+      align: "right",
+    });
+  });
+}
+
+/** MV-QUOTE-POSTER — full-bleed cover treatment, white copy on the ground. */
+function renderQuotePoster(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
+  addQuoteGlyph(s, p, { x: Q_L - 0.05, y: 0.5, sizePx: 780, opacity: 0.16 });
+  addQuoteKicker(s, p, {
+    x: Q_L,
+    y: 1.55,
+    w: 5,
+    text: "Testimonial",
+    rulePx: 120,
+    onDark: true,
+  });
+  s.addText(str(c.quote), {
+    x: Q_L,
+    y: 2.25,
+    w: Q_R - Q_L - 0.4,
+    h: 3.0,
+    fontSize: qpt(96),
+    bold: true,
+    color: "FFFFFF",
+    fontFace: "Geist",
+    valign: "top",
+    lineSpacingMultiple: 1.06,
+  } as unknown as PptxGenJS.TextPropsOptions);
+  addQuoteAttribution(s, p, {
+    x: Q_L,
+    y: 5.75,
+    w: 5.5,
+    name: str(c.attribution),
+    role: str(c.role),
+    ink: "FFFFFF",
+  });
+}
+
 // 16. MV-PULL-QUOTE-STACK
+
 function renderPullQuoteStack(s: PptxGenJS.Slide, c: Record<string, unknown>, p: Palette) {
   const hero = (c.hero ?? {}) as Record<string, unknown>;
   const items = arr(c.items).slice(0, 2);

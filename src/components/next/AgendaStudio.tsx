@@ -284,6 +284,26 @@ export function AgendaStudio({
     }
   };
 
+  const runDeckExport = async () => {
+    setBusy(true);
+    const id = toast.loading("Building the editable PowerPoint deck…");
+    try {
+      const { buildAgendaPptx } = await import("@/lib/next-agenda-pptx");
+      const { blob, filename, notes } = await buildAgendaPptx(config);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("PowerPoint deck downloaded", { id, description: notes[notes.length - 1] });
+    } catch (e) {
+      toast.error("PowerPoint export failed", { id, description: (e as Error).message });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const programmeIsStock = useMemo(
     () =>
       !config.days &&
@@ -748,6 +768,10 @@ export function AgendaStudio({
             <Button variant="outline" onClick={runWordExport} disabled={busy}>
               <FileText className="mr-2 h-4 w-4" />
               Export editable Word
+            </Button>
+            <Button variant="outline" onClick={runDeckExport} disabled={busy}>
+              <FileText className="mr-2 h-4 w-4" />
+              Export editable PowerPoint
             </Button>
 
             <Button

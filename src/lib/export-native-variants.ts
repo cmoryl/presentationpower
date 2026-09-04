@@ -45,6 +45,14 @@ export const NATIVE_EMITTER_VARIANT_IDS: readonly string[] = [
   "MV-PROC-PLATFORM-LOOP",
   "MV-COMPARE-SLIDER",
   "MV-PULL-QUOTE-STACK",
+  // Quote / testimonial family — rebuilt natively (Oct 2026) against
+  // src/components/slide/modules/quote.tsx: oversized mark, kicker + accent
+  // hairline, designed type scale, attribution block and outcome figure.
+  "MV-QUOTE-CARD",
+  "MV-QUOTE-PORTRAIT",
+  "MV-QUOTE-METRIC",
+  "MV-QUOTE-MULTI",
+  "MV-QUOTE-POSTER",
   "MV-DEFINITION",
   "MV-PRINCIPLES",
   "MV-COUNTDOWN",
@@ -235,7 +243,9 @@ export const DRIFTED_NATIVE_RENDERER_IDS: readonly string[] = [
   "MV-JOURNEY-MAP",
   "MV-LOGO-WALL",
   "MV-MATRIX-2X2",
-  "MV-MATURITY-CURVE",
+  // MV-MATURITY-CURVE was un-drifted (Oct 2026): its native renderer now
+  // carries the subtitle band, the accent area wash under the ramp and the
+  // haloed live milestone, so it exports as real editable PowerPoint objects.
   "MV-NUMBERS-TRIPTYCH",
   "MV-OP-COVER-EDITORIAL",
   "MV-OP-COVER-GRADIENT",
