@@ -11980,11 +11980,13 @@ function renderGrowthOrbits(
     });
     y += 0.34;
   }
-  const logos = arr(c.items).slice(0, 12);
-  const cols = 4;
-  const gap = 0.12;
+  const wall = resolveLogoWall(c.logoWall);
+  const logos = arr(c.items).slice(0, MAX_WALL_LOGOS);
+  const cols = wall.columns;
+  const gap = wall.gap / 100;
   const tileW = (LW - (cols - 1) * gap) / cols;
-  const tileH = 0.62;
+  const tileH = Math.max(0.34, tileW * (7 / 16));
+
   logos.forEach((it, k) => {
     const col = k % cols;
     const row = Math.floor(k / cols);
