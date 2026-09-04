@@ -26,11 +26,14 @@ import {
 import {
   DEFAULT_MAP_DESIGN,
   kindInkFor,
+  MAP_BRAND_BAR,
   mapPalette,
   zoneStyleFor,
   type MapDesign,
 } from "@/lib/next-london-floormap-design";
+import { mapLogoRatio, mapLogoSvg } from "@/lib/next-london-floormap-logos";
 import { areaIconSvg } from "@/lib/next-london-floormap-icons";
+
 import {
   isCustomAreaId,
   planWithAreas,
