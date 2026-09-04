@@ -23,8 +23,10 @@ describe("London division signage", () => {
         const plan = londonBrandingPlan(panel, { ...DEFAULT_LOGO_PLACEMENT, colourway });
         expect(["white", "white-accent"]).toContain(plan.colourway);
       }
-      // Default placement is the all-white cut.
-      expect(londonBrandingPlan(panel).colourway).toBe("white");
+      // Default placement is the all-white cut — except on doors, which
+      // default to the white mark with the division accent in its chevrons.
+      const isDoor = /\bdoors?\b/i.test(`${panel.room} ${panel.name}`);
+      expect(londonBrandingPlan(panel).colourway).toBe(isDoor ? "white-accent" : "white");
     }
   });
 
@@ -50,6 +52,29 @@ describe("London division signage", () => {
     expect(stops).not.toEqual(base);
     const svg = buildLondonPanelSvg(panel);
     expect(svg).toContain(stops[stops.length - 1]!);
+  });
+
+  it("gives every door its room's accent and the accent-chevron white mark", () => {
+    // Door branding boards only — the lift doors are shared circulation and
+    // stay on the master mark.
+    const doors = LONDON_PANELS.filter((p) => /door (branding|vinyl|artwork)/i.test(p.name));
+    expect(doors.length).toBeGreaterThan(8);
+    const accents = new Set<string>();
+    for (const panel of doors) {
+      const plan = londonBrandingPlan(panel);
+      const accent = londonDivisionAccent(plan.familyId);
+      expect(accent, panel.name).toBeTruthy();
+      accents.add(accent!.hex);
+      expect(plan.colourway, panel.name).toBe("white-accent");
+      // Dark head untouched: the mark keeps full contrast on every door.
+      const stops = londonPanelStops(panel);
+      expect(stops[0]).toBe(LONDON_STYLES[panel.style]!.stops[0]);
+      expect(stops[stops.length - 1]).not.toBe(
+        LONDON_STYLES[panel.style]!.stops[LONDON_STYLES[panel.style]!.stops.length - 1],
+      );
+    }
+    // Variety across the door family, cohesion from the shared dark head.
+    expect(accents.size).toBeGreaterThan(4);
   });
 
   it("leaves master-brand panels on the approved ramp", () => {

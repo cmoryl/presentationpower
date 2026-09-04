@@ -56,6 +56,51 @@ export function londonDivisionColourway(
   return LONDON_DIVISION_COLOURWAYS.includes(wanted) ? wanted : "white";
 }
 
+/**
+ * Door branding is the one place in the kit where every board belongs to a
+ * room, and every room belongs to a division. Rooms whose note already names a
+ * division are resolved from the note; this map covers the doors whose note
+ * does not (entrance leaves, lounges, the Fleming/Whittle pair), so the whole
+ * door family reads as a deliberate accent set rather than a mixed bag.
+ */
+export const LONDON_DOOR_DIVISIONS: Record<string, string> = {
+  "MAIN DOORS": "globallink",
+  CHURCHILL: "legal",
+  FLEMING: "lifesci",
+  WHITTLE: "games",
+  PICKWICK: "experience",
+  BURTON: "media",
+};
+
+/** True when a panel is a door leaf / door branding board. */
+export function isLondonDoorItem(room: string, name: string): boolean {
+  return /\bdoors?\b/i.test(`${room} ${name}`);
+}
+
+/** The division a door's room belongs to, when its note does not name one. */
+export function londonDoorDivision(room: string): string | null {
+  const key = room.trim().toUpperCase();
+  if (LONDON_DOOR_DIVISIONS[key]) return LONDON_DOOR_DIVISIONS[key];
+  const hit = Object.keys(LONDON_DOOR_DIVISIONS).find((k) => key.includes(k));
+  return hit ? LONDON_DOOR_DIVISIONS[hit] : null;
+}
+
+/**
+ * Doors default to the white lockup that carries its division's accent inside
+ * the mark (the white + colour-chevron cut). The door itself is small, seen
+ * close up and lit from the room, so the accent inside the mark is legible —
+ * and it ties the mark to the accent soft focus behind it. Plain white stays
+ * available; unapproved colourways still clamp to white.
+ */
+export function londonDoorColourway(
+  familyId: string,
+  wanted: NextLogoColourway,
+): NextLogoColourway {
+  if (!londonDivisionAccent(familyId)) return londonDivisionColourway(familyId, wanted);
+  return wanted === "white" ? "white-accent" : londonDivisionColourway(familyId, wanted);
+}
+
+
 function hex(n: number): string {
   return Math.max(0, Math.min(255, Math.round(n)))
     .toString(16)
@@ -88,16 +133,29 @@ function mix(a: string, b: string, t: number): string {
 export const LONDON_DIVISION_ACCENT_WEIGHT = 0.34;
 
 /**
- * Tint a panel ramp with its division accent. The first stop (the dark head
- * that carries the lockup) is untouched; weight ramps up to
- * `LONDON_DIVISION_ACCENT_WEIGHT` at the last stop.
+ * Doors carry a stronger soft-focus accent than scenic panels: a door is a
+ * single small board read at arm's length, so the room's division has to be
+ * obvious on it. The dark head stays untouched, which is what keeps every door
+ * in the venue cohesive no matter which accent is blooming behind the mark.
  */
-export function londonDivisionStops(familyId: string, stops: string[]): string[] {
+export const LONDON_DOOR_ACCENT_WEIGHT = 0.56;
+
+/**
+ * Tint a panel ramp with its division accent. The first stop (the dark head
+ * that carries the lockup) is untouched; weight ramps up to `weight` (default
+ * `LONDON_DIVISION_ACCENT_WEIGHT`) at the last stop.
+ */
+export function londonDivisionStops(
+  familyId: string,
+  stops: string[],
+  weight: number = LONDON_DIVISION_ACCENT_WEIGHT,
+): string[] {
   const accent = londonDivisionAccent(familyId);
   if (!accent || stops.length < 2) return stops;
   const last = stops.length - 1;
   return stops.map((stop, i) => {
-    const t = (i / last) ** 1.4 * LONDON_DIVISION_ACCENT_WEIGHT;
+    const t = (i / last) ** 1.4 * weight;
     return i === 0 ? stop : mix(stop, accent.hex, t);
+
   });
 }

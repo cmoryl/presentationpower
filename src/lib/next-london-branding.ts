@@ -27,7 +27,13 @@ import {
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
-import { londonDivisionColourway } from "@/lib/next-london-division";
+import {
+  isLondonDoorItem,
+  londonDivisionColourway,
+  londonDoorColourway,
+  londonDoorDivision,
+} from "@/lib/next-london-division";
+
 import { londonLogoPlacement, type LondonLogoPlacement } from "@/lib/next-london-logo-placement";
 
 /** The signage face for NEXT 2026. Bold only — no other weight is approved. */
@@ -41,16 +47,19 @@ export const LONDON_SIGNAGE_FONT = {
   tracking: -0.02,
 } as const;
 
+// The venue notes write divisions as one word ("MediaNEXT", "GamesNEXT"), so
+// each keyword also accepts the NEXT suffix — otherwise a word-boundary match
+// silently fell through to the master brand and the board lost its accent.
 const FAMILY_KEYWORDS: [RegExp, string][] = [
   [/globallink/i, "globallink"],
   [/dataforce/i, "dataforce"],
   [/life\s*sci/i, "lifesci"],
   [/legal/i, "legal"],
-  [/\bmedia\b/i, "media"],
-  [/\bgames?\b/i, "games"],
+  [/\bmedia(next)?\b/i, "media"],
+  [/\bgames?(next)?\b/i, "games"],
   [/finance|financial/i, "finance"],
-  [/\bdigital\b/i, "digital"],
-  [/\blearn(ing)?\b/i, "learn"],
+  [/\bdigital(next)?\b/i, "digital"],
+  [/\blearn(ing|next)?\b/i, "learn"],
   [/experience/i, "experience"],
   [/city series/i, "cityseries"],
 ];
@@ -68,8 +77,16 @@ export function londonCopyRunMm(text: string, sizeMm: number, trackingEm: number
 export function londonPanelFamily(panel: LondonPanel): string {
   const haystack = brandingHaystack(panel);
   for (const [re, id] of FAMILY_KEYWORDS) if (re.test(haystack)) return id;
+  // Door branding always belongs to a room, and every room belongs to a
+  // division: fall back to the door register so entrance leaves and lounge
+  // doors carry an accent rather than the neutral master ramp.
+  if (isLondonDoorItem(panel.room, panel.name)) {
+    const door = londonDoorDivision(panel.room);
+    if (door) return door;
+  }
   return "transperfect";
 }
+
 
 /** Headline copy the note calls out, normalised to the signage set. */
 /** Everything that can carry a branding instruction for an item. */
@@ -174,7 +191,10 @@ export function londonBrandingPlan(
   const nudgeEarly = placement ?? londonLogoPlacement(panel.id);
   // Division items print the white lockup: full-colour and dark-blue marks are
   // not approved on division signage, so a stored override is clamped here.
-  const wantedColourway = londonDivisionColourway(familyId, nudgeEarly.colourway);
+  const wantedColourway = isLondonDoorItem(panel.room, panel.name)
+    ? londonDoorColourway(familyId, nudgeEarly.colourway)
+    : londonDivisionColourway(familyId, nudgeEarly.colourway);
+
   const { art, orientation, colourway } = pickNextLogo(familyId, aspect, wantedColourway);
 
   const marginX = (panel.bleedW - panel.trimW) / 2;
