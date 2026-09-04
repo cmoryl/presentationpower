@@ -516,7 +516,12 @@ registerSlideModule({
                 const cfg = layout[i] ?? { col: 4, row: 1, kind: "bar" as TileKind };
                 const label = s(it.label);
                 const value = s(it.value);
-                const unit = s(it.unit);
+                // Imported/seeded tiles often repeat the label in the unit
+                // slot ("Markets live" / "Cost / word"), which printed the same
+                // words twice on one tile. A unit that just restates the label
+                // carries no information, so drop it.
+                const rawTileUnit = s(it.unit);
+                const unit = sameWords(rawTileUnit, label) ? "" : rawTileUnit;
                 const delta = s(it.delta);
                 const trend = s(it.trend) || (delta.startsWith("-") ? "down" : "up");
                 const Icon = pickTileIcon(label, s(it.icon), i);
