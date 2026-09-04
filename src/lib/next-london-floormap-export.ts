@@ -24,7 +24,10 @@ export type MapExportOptions = {
   overrides?: LondonMarkerOverrides;
   kinds?: LondonAssetKind[];
   labels?: boolean;
+  /** Attendee sheets: rooms and breakouts only, no signage pins. */
+  roomsOnly?: boolean;
 };
+
 
 function save(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
