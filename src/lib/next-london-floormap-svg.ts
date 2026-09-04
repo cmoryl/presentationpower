@@ -335,11 +335,25 @@ ${
 }`;
 }
 
+/**
+ * Sheet size for a floor. Print sheets (`labels: true`) grow by the numbered
+ * asset index, so exports must size the raster from here, not from the plan.
+ */
+export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = {}): FloorMapSize {
+  const plan = londonFloorPlan(floor);
+  if (!plan) return { w: 0, h: 0 };
+  const size = floorMapSize(plan);
+  if (opts.labels !== true) return size;
+  const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
+  const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
+  return { w: size.w, h: size.h + indexHeight(markers.length) };
+}
+
 /** The whole floor with every asset marked. */
 export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): string {
   const plan = londonFloorPlan(floor);
   if (!plan) return "";
-  const size = floorMapSize(plan);
+  const size = floorMapSheetSize(floor, opts);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size.w}" height="${size.h}" viewBox="0 0 ${size.w} ${size.h}" role="img" aria-label="${esc(
     `${plan.label} install map — ${LONDON_VENUE.name}`,
   )}">
