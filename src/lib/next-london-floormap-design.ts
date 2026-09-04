@@ -5,6 +5,7 @@
 // setup, pin treatment, wording) is described here so screen, SVG, PNG and PDF
 // all read from the same object and print identically.
 
+import type { MapLogoId } from "@/lib/next-london-floormap-logos";
 import type { LondonAssetKind, LondonZone } from "@/lib/next-london-floorplan";
 
 /**
