@@ -29,11 +29,13 @@ import {
   londonAssetKind,
   londonFloorPlan,
   londonMappedFloors,
+  londonMarkerFor,
   type LondonAssetKind,
   type LondonMarkerOverrides,
 } from "@/lib/next-london-floorplan";
 import {
   downloadAssetMapPack,
+  downloadAssetMapPng,
   downloadAssetMapSvg,
   downloadFloorMapPdf,
   downloadFloorMapPng,
@@ -81,6 +83,7 @@ function LondonMapsPage() {
   const [floor, setFloor] = useState<LondonFloorId>("GF");
   const [kinds, setKinds] = useState<LondonAssetKind[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -123,7 +126,21 @@ function LondonMapsPage() {
   const plan = londonFloorPlan(floor);
   const kindsOnFloor = useMemo(() => londonKindsPresent(panels, floor), [panels, floor]);
   const floorPanels = useMemo(() => panels.filter((p) => p.floor === floor), [panels, floor]);
+  const listed = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return floorPanels.filter(
+      (p) =>
+        (!kinds.length || kinds.includes(londonAssetKind(p))) &&
+        (!q ||
+          `${p.name} ${p.room} ${p.trimW}x${p.trimH} ${
+            LONDON_ASSET_KIND_LABEL[londonAssetKind(p)]
+          }`
+            .toLowerCase()
+            .includes(q)),
+    );
+  }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
+  const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
   const exportOpts = { panels, overrides, kinds, labels: true };
   const correctedCount = Object.keys(overrides).length;
 
@@ -346,12 +363,20 @@ function LondonMapsPage() {
               </div>
 
               <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
-                Assets on this floor ({floorPanels.length})
+                Assets on this floor ({listed.length}
+                {listed.length === floorPanels.length ? "" : ` of ${floorPanels.length}`})
               </h3>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Find an asset, room or size…"
+                aria-label="Search assets on this floor"
+                className="mt-2 w-full rounded-full border border-black/10 bg-white px-4 py-2 text-[13px] text-[#03002C] outline-none placeholder:text-[#03002C]/40 focus:border-[#003FC7]"
+              />
               <ul className="mt-2 max-h-[30rem] divide-y divide-black/5 overflow-y-auto rounded-xl border border-black/10 bg-white">
-                {floorPanels
-                  .filter((p) => !kinds.length || kinds.includes(londonAssetKind(p)))
-                  .map((p) => {
+                {listed.length ? (
+                  listed.map((p) => {
                     const active = p.id === selectedId;
                     return (
                       <li key={p.id}>
@@ -377,8 +402,14 @@ function LondonMapsPage() {
                         </button>
                       </li>
                     );
-                  })}
+                  })
+                ) : (
+                  <li className="px-3 py-4 text-[12.5px] text-[#03002C]/60">
+                    No asset on this floor matches the current filters.
+                  </li>
+                )}
               </ul>
+
 
               {selected ? (
                 <div className="mt-4 rounded-xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4">
@@ -389,17 +420,39 @@ function LondonMapsPage() {
                     edge.
                   </p>
                   <p className="mt-1 text-[12px] text-[#03002C]/65">
-                    {LONDON_FACE_LABEL[
-                      (overrides[selected.id]?.face ?? "free") as keyof typeof LONDON_FACE_LABEL
-                    ]}
+                    {selectedMarker
+                      ? `${LONDON_FACE_LABEL[selectedMarker.face]} · x ${selectedMarker.x.toFixed(
+                          1,
+                        )} m / y ${selectedMarker.y.toFixed(1)} m · ${
+                          selectedMarker.corrected ? "position confirmed" : "schematic position"
+                        }`
+                      : "Not pinned on this plan."}
                   </p>
-                  <button
-                    type="button"
-                    className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
-                    onClick={() => downloadAssetMapSvg(selected, exportOpts)}
-                  >
-                    <Download className="h-4 w-4" /> Location card for this asset
-                  </button>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 rounded-full bg-[#03002C] px-4 py-2 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                      onClick={() => downloadAssetMapSvg(selected, exportOpts)}
+                    >
+                      <Download className="h-4 w-4" /> Location card (SVG)
+                    </button>
+                    <button
+                      type="button"
+                      className={btn}
+                      onClick={() =>
+                        runWithExportFeedback(
+                          {
+                            pending: "Rasterising the location card…",
+                            success: "Location card PNG downloaded",
+                            failure: "Location card PNG failed",
+                          },
+                          () => downloadAssetMapPng(selected, exportOpts),
+                        )
+                      }
+                    >
+                      <ImageIcon className="h-4 w-4" /> Location card (PNG)
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <p className="mt-4 rounded-xl border border-black/10 bg-white p-4 text-[12.5px] leading-relaxed text-[#03002C]/70">

@@ -79,6 +79,14 @@ export function downloadAssetMapSvg(panel: LondonPanel, opts: MapExportOptions) 
   save(new Blob([svg], { type: "image/svg+xml" }), `next-london-location-${panelSlug(panel)}.svg`);
 }
 
+/** Same install card as a print-ready raster, for crews working off a phone. */
+export async function downloadAssetMapPng(panel: LondonPanel, opts: MapExportOptions) {
+  const svg = assetMapSvg(panel, opts);
+  const w = Number(/width="(\d+)"/.exec(svg)?.[1] ?? 720);
+  const h = Number(/height="(\d+)"/.exec(svg)?.[1] ?? 520);
+  save(await mapPngBlob(svg, w, h, 2.5), `next-london-location-${panelSlug(panel)}.png`);
+}
+
 /** One PDF page per floor — the install plan set the crew works from. */
 export async function downloadFloorMapPdf(opts: MapExportOptions) {
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a3" });
