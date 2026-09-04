@@ -163,14 +163,34 @@ function eyebrow(x: number, y: number, text: string, fill = BLUE, size = 9): str
   )}</text>`;
 }
 
+/** Venue / event wording — the design may override the registry defaults. */
+function venueName(): string {
+  return DESIGN.venueName.trim() || LONDON_VENUE.venue;
+}
+function eventName(): string {
+  return DESIGN.eventName.trim() || "TransPerfect NEXT 2026";
+}
+
+/** Approved palette strip — brand signature on every sheet. */
+function brandBar(x: number, y: number, w: number): string {
+  if (DESIGN.brandBar === false) return "";
+  const cells = MAP_BRAND_BAR.length;
+  const cw = Math.min(26, w / (cells * 4));
+  return `<g>${MAP_BRAND_BAR.map(
+    (c, i) =>
+      `<rect x="${n(x + i * (cw + 3))}" y="${n(y)}" width="${n(cw)}" height="4" rx="1" fill="${c}" />`,
+  ).join("")}</g>`;
+}
+
 /** Directory credit strip — same face and palette as the map, so print stays cohesive. */
 function footerStrip(w: number, y: number, right: string, note?: string): string {
-  const left = `${LONDON_VENUE.venue} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
+  const left = `${venueName()} · ${eventName()} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
   return `<g><path d="M ${PAD} ${n(y)} H ${n(w - PAD)}" stroke="${LINE}" stroke-width="1" />
 <text x="${PAD}" y="${n(y + 18)}" font-family="${FONT}" font-size="9" letter-spacing="0.5" fill="${NAVY}" opacity="0.6">${esc(left)}</text>
 <text x="${n(w - PAD)}" y="${n(y + 18)}" text-anchor="end" font-family="${FONT}" font-size="9" font-weight="600" letter-spacing="0.5" fill="${BLUE}" opacity="0.9">${esc(right)}</text>
 <text x="${PAD}" y="${n(y + 31)}" font-family="${FONT}" font-size="8" letter-spacing="0.2" fill="${NAVY}" opacity="0.38">${esc(note ?? "Schematic install plan — confirm exact positions on site with the venue production partner.")}</text></g>`;
 }
+
 
 function defs(): string {
   return `<defs>
