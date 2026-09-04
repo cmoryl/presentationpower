@@ -30,6 +30,12 @@ import {
   zoneStyleFor,
   type MapDesign,
 } from "@/lib/next-london-floormap-design";
+import { areaIconSvg } from "@/lib/next-london-floormap-icons";
+import {
+  isCustomAreaId,
+  planWithAreas,
+  type LondonCustomArea,
+} from "@/lib/next-london-floormap-areas";
 import { LONDON_VENUE, type LondonFloorId, type LondonPanel } from "@/lib/next-london-signage";
 
 // Live drawing palette. Rendering one sheet is synchronous and single threaded,
@@ -304,7 +310,7 @@ function roomKeyExtraHeight(plan: LondonFloorPlan, w: number): number {
   let rows = 1;
   let cx = 0;
   for (const z of roomKeyRooms(plan)) {
-    const cw = z.label.length * 5.5 + 26;
+    const cw = z.label.length * 5.5 + (DESIGN.icons === false ? 26 : 34);
     if (cx + cw > w) {
       rows += 1;
       cx = 0;
@@ -322,15 +328,17 @@ function roomKeyRow(plan: LondonFloorPlan, x: number, y: number, w: number): str
   let cy = y;
   for (const z of rooms) {
     const label = z.label.toUpperCase();
-    const cw = label.length * 5.5 + 26;
+    const cw = label.length * 5.5 + (DESIGN.icons === false ? 26 : 34);
     if (cx + cw > x + w) {
       cx = x;
       cy += 19;
     }
     out.push(
       `<g><rect x="${n(cx)}" y="${n(cy - 10)}" width="${n(cw)}" height="16" rx="8" fill="${PAPER}" stroke="${LINE}" stroke-width="1" />` +
-        `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${zoneStyleFor(z.kind, DESIGN).accent}" />` +
-        `<text x="${n(cx + 18)}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
+        (DESIGN.icons === false
+          ? `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${zoneStyleFor(z.kind, DESIGN).accent}" />`
+          : areaIconSvg(z.kind, cx + 12, cy - 2, 13, zoneStyleFor(z.kind, DESIGN).accent, 0.95)) +
+        `<text x="${n(cx + (DESIGN.icons === false ? 18 : 22))}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
           label,
         )}</text></g>`,
     );
