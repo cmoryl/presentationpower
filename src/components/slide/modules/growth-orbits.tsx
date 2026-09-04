@@ -139,7 +139,13 @@ registerSlideModule({
             {logos.length > 0 && (
               <div className="mt-10" data-intro-item="" data-intro-step={1}>
                 {s(c.logosLabel) && <Kicker brand={brand}>{s(c.logosLabel)}</Kicker>}
-                <div className="mt-4 grid grid-cols-4" style={{ gap: 12 }}>
+                <div
+                  className="mt-4 grid"
+                  style={{
+                    gap: wall.gap,
+                    gridTemplateColumns: `repeat(${wall.columns}, minmax(0, 1fr))`,
+                  }}
+                >
                   {logos.map((it: Item, i) => {
                     const url = pickLogoForMode(it, mode);
                     const path = s(it.logoPath);
@@ -159,7 +165,11 @@ registerSlideModule({
                             url={url}
                             path={path}
                             alt={`${name} logo`}
-                            className="max-h-[68%] max-w-[86%] object-contain"
+                            className="object-contain"
+                            style={{
+                              maxHeight: wallLogoMaxHeight(wall.scale),
+                              maxWidth: wallLogoMaxWidth(wall.scale),
+                            }}
                           />
                         ) : (
                           <div
