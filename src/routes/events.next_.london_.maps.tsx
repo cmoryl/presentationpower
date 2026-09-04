@@ -297,36 +297,65 @@ function LondonMapsPage() {
             ))}
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            {kindsOnFloor.map((k) => (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {(
+              [
+                { id: false, label: "Install plan · signage pinned" },
+                { id: true, label: "Attendee guide · rooms only" },
+              ] as const
+            ).map((m) => (
               <button
-                key={k}
+                key={String(m.id)}
                 type="button"
-                onClick={() => toggleKind(k)}
-                aria-pressed={kinds.includes(k)}
+                onClick={() => {
+                  setAttendee(m.id);
+                  setSelectedId(null);
+                }}
+                aria-pressed={attendee === m.id}
                 className={`${chip} ${
-                  kinds.includes(k)
-                    ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
-                    : "border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]"
+                  attendee === m.id
+                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
                 }`}
               >
-                {LONDON_ASSET_KIND_LABEL[k]}
+                {m.label}
               </button>
             ))}
-            {kinds.length ? (
-              <button
-                type="button"
-                onClick={() => setKinds([])}
-                className={`${chip} border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]`}
-              >
-                Show all kinds
-              </button>
-            ) : null}
           </div>
 
+          {attendee ? null : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {kindsOnFloor.map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => toggleKind(k)}
+                  aria-pressed={kinds.includes(k)}
+                  className={`${chip} ${
+                    kinds.includes(k)
+                      ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                      : "border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  {LONDON_ASSET_KIND_LABEL[k]}
+                </button>
+              ))}
+              {kinds.length ? (
+                <button
+                  type="button"
+                  onClick={() => setKinds([])}
+                  className={`${chip} border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]`}
+                >
+                  Show all kinds
+                </button>
+              ) : null}
+            </div>
+          )}
+
           <p className="mt-3 text-[12.5px] leading-relaxed text-[#03002C]/65">
-            {plan ? plan.orientation : ""} Schematic layout drawn from the venue room list — sizes
-            are for orientation, not measurement.
+            {attendee
+              ? "Attendee floor guide: rooms and breakout spaces named, signage hidden. Print or share these sheets with delegates."
+              : "Schematic layout drawn from the venue room list — sizes are for orientation, not measurement."}
           </p>
 
           <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
@@ -339,11 +368,13 @@ function LondonMapsPage() {
               kinds={kinds}
               selectedId={selectedId}
               onSelect={setSelectedId}
-              editable
+              editable={!attendee}
+              roomsOnly={attendee}
             />
 
             <div className="min-w-0">
               <div className="flex flex-wrap gap-2">
+
                 <button
                   type="button"
                   className={btn}
