@@ -130,7 +130,7 @@ describe("london map artwork", () => {
     const svg = assetMapSvg(panel);
     expect(svg).toContain(`${panel.trimW} × ${panel.trimH} mm`);
     expect(svg).toContain("BLEED");
-    expect(svg).toContain("#EC388A"); // active pin fill
+    expect(svg).toContain("#C4306E"); // active pin fill
     expect(londonMarkerFor(panel)).not.toBeNull();
     // Escaped, single-root SVG.
     expect(svg.match(/<svg/g)!.length).toBe(1);
