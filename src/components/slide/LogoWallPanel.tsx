@@ -15,10 +15,13 @@ import {
   resolveLogoWall,
   type LogoWall,
 } from "@/lib/logo-wall";
+import { canMoveDown, canMoveUp } from "@/lib/reorder";
+import { ReorderHandle, ReorderNudge, useReorder } from "./ReorderRow";
 
 type Row = Record<string, unknown>;
 
 const rows = (v: unknown): Row[] => (Array.isArray(v) ? (v as Row[]) : []);
+const str = (v: unknown) => (typeof v === "string" ? v : "");
 
 export function LogoWallPanel({
   items,
@@ -34,6 +37,7 @@ export function LogoWallPanel({
   const list = rows(items);
   const w = resolveLogoWall(wall);
   const set = (patch: Partial<LogoWall>) => onChangeWall(patchLogoWall(wall, patch));
+  const reorder = useReorder(list, onChangeItems);
 
   const addLogo = () => {
     if (list.length >= MAX_WALL_LOGOS) return;
@@ -97,6 +101,35 @@ export function LogoWallPanel({
           </button>
         </div>
       </div>
+
+      {list.length > 1 && (
+        <div className="mt-3 space-y-1.5">
+          <p className="text-[11px] text-black/55">
+            Drag a logo by its handle to change where it sits in the wall.
+          </p>
+          {list.map((row, i) => (
+            <div
+              key={i}
+              {...reorder.rowProps(i)}
+              className="flex items-center justify-between gap-2 rounded-lg border border-black/10 px-2 py-1.5 data-[drop-target]:border-[#003FC7] data-[dragging]:opacity-60"
+            >
+              <span className="flex min-w-0 items-center gap-1.5">
+                <ReorderHandle draggable {...reorder.handleProps(i, str(row.name) || `Logo ${i + 1}`)} />
+                <span className="truncate text-[12px] text-[#03002C]">
+                  {str(row.name) || `Logo ${i + 1}`}
+                </span>
+              </span>
+              <ReorderNudge
+                onUp={() => reorder.moveUpRow(i)}
+                onDown={() => reorder.moveDownRow(i)}
+                upDisabled={!canMoveUp(i)}
+                downDisabled={!canMoveDown(i, list.length)}
+                label={str(row.name) || `logo ${i + 1}`}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
       <label className="mt-4 flex flex-col gap-1">
         <span className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.14em] text-black/45">

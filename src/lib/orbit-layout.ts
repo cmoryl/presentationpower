@@ -77,6 +77,43 @@ export function patchOrbitPos(
   });
 }
 
+/**
+ * Reorder the figures while the placements stay with their slot, so the content
+ * reflows through the existing arrangement instead of the rings jumping around.
+ */
+export function reorderOrbits(
+  items: unknown[],
+  from: number,
+  to: number,
+): Record<string, unknown>[] {
+  if (from === to || from < 0 || from >= items.length) {
+    return items.map((it) => ({ ...((it ?? {}) as Record<string, unknown>) }));
+  }
+  const slots = items.map((it, i) => resolveOrbitPos(it, i, items.length));
+  const explicit = items.map((it) => {
+    const o = (it ?? {}) as Record<string, unknown>;
+    return num(o.x) !== null || num(o.y) !== null || num(o.size) !== null;
+  });
+  const target = clamp(to, 0, items.length - 1);
+  const order = items.map((_, i) => i);
+  const [moved] = order.splice(from, 1);
+  order.splice(target, 0, moved!);
+
+  return order.map((src, slot) => {
+    const row = { ...((items[src] ?? {}) as Record<string, unknown>) };
+    if (explicit[slot]) {
+      row.x = slots[slot]!.x;
+      row.y = slots[slot]!.y;
+      row.size = slots[slot]!.size;
+    } else {
+      delete row.x;
+      delete row.y;
+      delete row.size;
+    }
+    return row;
+  });
+}
+
 /** Drop stored placement so a figure returns to its staggered default. */
 export function resetOrbitPos(items: unknown[], index: number): Record<string, unknown>[] {
   return items.map((it, i) => {
