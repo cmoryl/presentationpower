@@ -2876,7 +2876,11 @@ function renderTimeline(s: PptxGenJS.Slide, slide: DeckSlide, p: Palette) {
     : arr(c.stages).map((st) => ({
         label: st.label ?? st.title,
         body: arr(st.items)
-          .map((t) => str(t.label ?? t.title))
+          .map((t) =>
+            [str(t.label ?? t.title), str(t.body)]
+              .filter(Boolean)
+              .join(" — "),
+          )
           .filter(Boolean)
           .join("\n"),
       }));

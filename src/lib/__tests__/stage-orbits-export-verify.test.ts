@@ -114,11 +114,36 @@ describe("MV-PROC-STAGE-ORBITS export verification", () => {
         ...content.stages,
         { stepNumber: "4", label: "Extra", items: [] },
         { stepNumber: "5", label: "Extra 2", items: [] },
+        { stepNumber: "6", label: "Extra 3", items: [] },
+        { stepNumber: "7", label: "Extra 4", items: [] },
       ],
     };
     const exp = expectationFor(VARIANT, tooMany);
-    expect(exp.capacityProblems.join(" ")).toMatch(/maximum is 4/);
+    expect(exp.capacityProblems.join(" ")).toMatch(/maximum is 6/);
   });
+
+
+  it("exports a six-phase chain with task descriptions as native text", async () => {
+    const wide = {
+      title: "Six stage program",
+      subtitle: "Full lifecycle",
+      stages: Array.from({ length: 6 }, (_, i) => ({
+        stepNumber: String(i + 1),
+        label: `Stage ${i + 1}`,
+        mediaSeed: `stage-${i + 1}`,
+        items: [{ label: `Task ${i + 1}A`, body: `Detail ${i + 1}`, icon: "Check" }],
+      })),
+    };
+    const exp = expectationFor(VARIANT, wide);
+    expect(exp.capacityProblems).toEqual([]);
+    const deck = deckOf();
+    (deck.slides[0] as unknown as { content: unknown }).content = wide;
+    const res = await exportDeckToPptx(deck, brand, { output: "blob", forceMode: "light" });
+    expect(res.failedSlides).toEqual([]);
+    const zip = await JSZip.loadAsync(await res.blob!.arrayBuffer());
+    const xml = await zip.files["ppt/slides/slide1.xml"].async("string");
+    for (const t of ["Stage 6", "Task 6A", "Detail 6"]) expect(xml).toContain(t);
+  }, 120_000);
 
   for (const mode of ["light", "dark"] as const) {
     it(`exports every stage, task and medallion as its own object (${mode})`, async () => {

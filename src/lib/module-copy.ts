@@ -72,7 +72,7 @@ const AUTHORED: Record<string, ModuleCopy> = {
   "MV-PROC-STAGE-ORBITS": {
     caption: "Numbered stages as photo medallions with task chains",
     description:
-      "Two to four medallions in orbit rings, each with an icon task chain beneath. Use it when the process is worth dressing up — a kickoff or executive summary — and you have clean imagery.",
+      "Two to six medallions in orbit rings, each with an icon task chain beneath. Use it when the process is worth dressing up — a kickoff or executive summary — and you have clean imagery.",
   },
   "MV-PROC-BEFORE-AFTER": {
     caption: "The workflow before, and after the change",

@@ -1196,18 +1196,19 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
     familyId: "MF-04",
     name: "Stage orbits (numbered medallions)",
     description:
-      "Two to four numbered photo medallions in orbit rings, each with an icon task chain beneath",
+      "Two to six numbered photo medallions in orbit rings, each with an icon task chain beneath",
     permittedLayoutIds: ["LF-14"],
     capacity: {
       fields: { title: { kind: "text", chars: 44 }, subtitle: { kind: "text", chars: 44 } },
       items: {
         path: "stages",
         min: 2,
-        max: 4,
+        max: 6,
         fields: {
           label: { kind: "text", chars: 44 },
           stepNumber: { kind: "number" },
           "items[].label": { kind: "text", chars: 44 },
+          "items[].body": { kind: "text", chars: 70 },
           "items[].icon": { kind: "icon" },
         },
       },
@@ -1220,6 +1221,7 @@ export const MODULE_VARIANTS: ModuleVariant[] = [
       "stages[].label",
       "stages[].stepNumber",
       "stages[].items[].label",
+      "stages[].items[].body",
       "stages[].items[].icon",
     ],
     lockedFields: ["footer", "logo", "connector"],
