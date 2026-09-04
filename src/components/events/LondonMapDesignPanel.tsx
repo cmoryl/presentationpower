@@ -220,6 +220,25 @@ export function LondonMapDesignPanel({ design, onChange, roomsOnly }: LondonMapD
               style={{ background: palette.accent }}
             />
           </div>
+          <div className="flex flex-wrap gap-1.5">
+            {MAP_ACCENT_SWATCHES.map((s) => (
+              <button
+                key={s.hex}
+                type="button"
+                title={`${s.name} ${s.hex}`}
+                aria-label={`${s.name} accent`}
+                aria-pressed={design.accent.toUpperCase() === s.hex}
+                onClick={() => set("accent", design.accent.toUpperCase() === s.hex ? "" : s.hex)}
+                className={`h-6 w-6 rounded-md border ${
+                  design.accent.toUpperCase() === s.hex
+                    ? "border-[#03002C] ring-2 ring-[#003FC7]/35"
+                    : "border-[#03002C]/20"
+                }`}
+                style={{ background: s.hex }}
+              />
+            ))}
+          </div>
+
           <div className="flex flex-wrap gap-2">
             <Toggle
               title="Room colour bars"
