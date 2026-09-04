@@ -533,6 +533,70 @@ function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): ()
 }
 
 /**
+ * LINE-COUNT PIN
+ * --------------
+ * html-to-image bakes each element's *computed* height into the clone but the
+ * text inside re-measures against whatever font the <foreignObject> actually
+ * resolves. When the embedded face differs from the live one by even a fraction
+ * of a percent, a line that fits on screen wraps in the raster, overflows the
+ * baked height, and prints straight through the element below (observed on
+ * MV-DEC-CHECKLIST: the label's second line landed on top of its note).
+ *
+ * Before capture, every text leaf that renders on ONE line in the live DOM is
+ * pinned to one line (`white-space: nowrap`, and a hair of tracking relief so
+ * a marginally wider face still fits rather than clipping). Multi-line leaves
+ * keep their wrapping but get their live height and `overflow: hidden`, so an
+ * extra raster line can never bleed into a sibling. All inline styles are
+ * restored afterwards.
+ */
+function pinTextLineCounts(root: HTMLElement): () => void {
+  const affected: Array<{
+    el: HTMLElement;
+    whiteSpace: string;
+    letterSpacing: string;
+    height: string;
+    overflow: string;
+  }> = [];
+  root.querySelectorAll<HTMLElement>("*").forEach((el) => {
+    if (el.children.length > 0) return;
+    const text = (el.textContent ?? "").trim();
+    if (!text) return;
+    const cs = window.getComputedStyle(el);
+    if (cs.position === "absolute" && !cs.width.endsWith("px")) return;
+    const lineHeight = parseFloat(cs.lineHeight);
+    const height = el.getBoundingClientRect().height;
+    if (!Number.isFinite(lineHeight) || lineHeight <= 0 || height <= 0) return;
+    const lines = Math.max(1, Math.round(height / lineHeight));
+    affected.push({
+      el,
+      whiteSpace: el.style.whiteSpace,
+      letterSpacing: el.style.letterSpacing,
+      height: el.style.height,
+      overflow: el.style.overflow,
+    });
+    if (lines === 1) {
+      el.style.whiteSpace = "nowrap";
+      const tracking = parseFloat(cs.letterSpacing);
+      if (Number.isFinite(tracking)) {
+        el.style.letterSpacing = `${tracking - Math.max(0.01, parseFloat(cs.fontSize) * 0.004)}px`;
+      }
+    } else {
+      el.style.height = `${Math.round(height)}px`;
+      el.style.overflow = "hidden";
+    }
+  });
+  return () => {
+    for (const a of affected) {
+      a.el.style.whiteSpace = a.whiteSpace;
+      a.el.style.letterSpacing = a.letterSpacing;
+      a.el.style.height = a.height;
+      a.el.style.overflow = a.overflow;
+    }
+  };
+}
+
+/**
+
  * Wait for all <img> descendants to finish loading (or error). Runs after
  * inlining so we're really waiting on decode of the swapped data URLs.
  */
@@ -672,8 +736,11 @@ export async function captureSlideAsDataUrl(
   // outlines, icon-swap hints, resize rails. Never belongs in an export.
   const releaseChrome = beginExportChrome();
 
+  const restorePins = pinTextLineCounts(node);
+
   // Give the browser one paint cycle so the neutralized styles settle.
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
 
   try {
     report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
@@ -729,8 +796,10 @@ export async function captureSlideAsDataUrl(
     }
     throw new Error(describeCaptureFailure(lastErr));
   } finally {
+    restorePins();
     releaseChrome();
     restoreBackdrop();
+
     restoreImages();
   }
 }

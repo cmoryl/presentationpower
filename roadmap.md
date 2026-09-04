@@ -7,8 +7,8 @@
 
 ## Slide fit (Aug 31)
 - [x] Clamp repeating collections to module capacity on every slide write (agent, MCP, copilot) so rows never render off the stage.
-- [ ] Fix maturity-curve module caption layout: per-level captions all render on one baseline and overlap.
-- [ ] PPTX parity audit: every module must export matching the build (checklist label/note pairing off-by-one, maturity-curve caption collisions).
+- [x] Fix maturity-curve module caption layout: captions now wrap inside their per-level column band, one baseline each, no overlap.
+- [x] PPTX parity audit: checklist label/note pairing and maturity-curve captions match the build. The checklist "overlap" was a rasterizer artifact (html-to-image bakes computed heights but re-measures text in the foreignObject); capture now pins live line counts (`pinTextLineCounts` in slide-image-export.ts).
 
 - [x] PPTX export: drop brand-tint washes and legacy alpha-circle/vector decor objects from module exports (reported Sep 1 on downloaded live pptx)
 - [ ] Quote family parity: raise MV-QUOTE-METRIC / MV-QUOTE-PORTRAIT (and siblings) to the pass floor, re-sweep, re-issue master module PPTX.

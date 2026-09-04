@@ -1114,7 +1114,70 @@ function ExportVerifyHarness() {
     // backdrop exactly as an admin upload would publish it, then export.
     (window as unknown as { __tpBackdropOverrides?: unknown }).__tpBackdropOverrides =
       setSkinBackdropOverrides;
+    // Layout probe: mounts the SAME offscreen export stage and returns the
+    // painted rect of every leaf text node, so a headless run can prove
+    // whether copy collides in the real DOM or only in the rasterizer.
+    (
+      window as unknown as {
+        __tpProbeStage?: (v: string, m: "light" | "dark") => Promise<unknown>;
+      }
+    ).__tpProbeStage = async (variantId, mode) => {
+      const variant = MODULE_VARIANTS.find((v) => v.id === variantId);
+      if (!variant) return { error: "unknown variant" };
+      const brand = BRAND_MODES[0];
+      const brief = resolveDivisionBrief(brand);
+      const content = seedDivisionContent(
+        variant.id,
+        brief,
+        "Verification section",
+        brand,
+      ) as Record<string, unknown>;
+      const slide = {
+        id: `probe-${variant.id}`,
+        position: 0,
+        sectionId: sectionFor(variant.familyId),
+        variantId: variant.id,
+        layoutId: variant.permittedLayoutIds[0],
+        content,
+        changes: [],
+      };
+      const { withExactStage } = await import("@/lib/slide-exact-raster");
+      return withExactStage(
+        {
+          slide,
+          variant,
+          brand,
+          mode,
+          pack: null,
+          pageNumber: 1,
+        } as Parameters<
+          Awaited<typeof import("@/lib/slide-exact-raster")>["withExactStage"]
+        >[0],
+        (stage) => {
+          const base = stage.getBoundingClientRect();
+          const out: Array<Record<string, number | string>> = [];
+          stage.querySelectorAll<HTMLElement>("*").forEach((el) => {
+            if (el.children.length) return;
+            const text = (el.textContent ?? "").trim();
+            if (!text) return;
+            const r = el.getBoundingClientRect();
+            const cs = getComputedStyle(el);
+            out.push({
+              text: text.slice(0, 44),
+              x: Math.round(r.left - base.left),
+              y: Math.round(r.top - base.top),
+              w: Math.round(r.width),
+              h: Math.round(r.height),
+              fontSize: cs.fontSize,
+              lineHeight: cs.lineHeight,
+            });
+          });
+          return { stage: { w: Math.round(base.width), h: Math.round(base.height) }, out };
+        },
+      );
+    };
     window.__tpExportVerify = {
+
       variants: MODULE_VARIANTS.map((v) => v.id),
       chartVariants: chartParityVariantIds(),
       packs: [null, ...STYLE_PACKS.map((p) => p.id)],

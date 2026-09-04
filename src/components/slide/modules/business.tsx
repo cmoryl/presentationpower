@@ -296,7 +296,7 @@ registerSlideModule({
               {arr(c.items).map((it, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-6 py-6"
+                  className="flex items-start gap-6 py-6"
                   style={{ borderBottom: `1px solid ${ink.hairline}` }}
                 >
                   <div
@@ -310,7 +310,13 @@ registerSlideModule({
                   >
                     ✓
                   </div>
-                  <div>
+                  {/* The copy column takes the whole remaining track (min-w-0 +
+                      flex-1). A shrink-to-fit column sized itself to the exact
+                      one-line label width, so any metric drift in the still
+                      rasterizer re-wrapped the label past its captured height
+                      and the note printed through the second line. */}
+                  <div className="min-w-0 flex-1">
+
                     <div
                       style={{
                         fontSize: fillPx(26, "body"),
