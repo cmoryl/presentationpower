@@ -760,7 +760,7 @@ registerSlideModule({
                           {tasks.map((t, ti) => {
                             const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
                             const taskGap = wide ? 4 : slim ? 2 : 3;
-                            const wellRadius = slim ? 12 : 18;
+                            const iconDisc = Math.round(iconBox * 0.78);
                             return (
                               <React.Fragment key={ti}>
                                 {ti > 0 && (
