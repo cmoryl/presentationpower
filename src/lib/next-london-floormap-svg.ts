@@ -570,14 +570,14 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const eyebrowText =
     DESIGN.eyebrow.trim() ||
     (roomsOnly
-      ? "TransPerfect NEXT 2026 · you are here"
-      : "TransPerfect NEXT 2026 · venue directory");
+      ? `${eventName()} · you are here`
+      : `${eventName()} · venue directory`);
   const titleText = DESIGN.title.trim() || plan.label;
   const subtitleText =
     DESIGN.subtitle.trim() ||
     (roomsOnly
-      ? `${LONDON_VENUE.venue} · ${roomCount} room${roomCount === 1 ? "" : "s"} and breakout space${roomCount === 1 ? "" : "s"}`
-      : `${LONDON_VENUE.venue} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`);
+      ? `${venueName()} · ${roomCount} room${roomCount === 1 ? "" : "s"} and breakout space${roomCount === 1 ? "" : "s"}`
+      : `${venueName()} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`);
   const legendTitle =
     DESIGN.legendTitle.trim() || (roomsOnly ? "Rooms on this floor" : "Asset key");
 
@@ -630,7 +630,7 @@ ${
         opts.footerNote ?? `${titleText} · ${roomsOnly ? "attendee floor guide" : "install plan"}`,
         DESIGN.footerNote.trim() ||
           (roomsOnly
-            ? `${LONDON_VENUE.name} · schematic layout for orientation — follow on-site wayfinding and venue staff.`
+            ? `${venueName()} · schematic layout for orientation — follow on-site wayfinding and venue staff.`
             : undefined),
       )
 }`;
