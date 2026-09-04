@@ -11,7 +11,11 @@
 - [x] PPTX parity audit: checklist label/note pairing and maturity-curve captions match the build. The checklist "overlap" was a rasterizer artifact (html-to-image bakes computed heights but re-measures text in the foreignObject); capture now pins live line counts (`pinTextLineCounts` in slide-image-export.ts).
 
 - [x] PPTX export: drop brand-tint washes and legacy alpha-circle/vector decor objects from module exports (reported Sep 1 on downloaded live pptx)
-- [ ] Quote family parity: raise MV-QUOTE-METRIC / MV-QUOTE-PORTRAIT (and siblings) to the pass floor, re-sweep, re-issue master module PPTX.
+- [x] Quote family parity: StatFigure now drops a unit suffix when the value doesn't end in a numeral
+      (killed the "6 wks → 9 days%" artifact); captures pin the live line breaks per text leaf
+      (`liveLineSegments` in slide-image-export.ts) so rasters can't re-wrap and print through a
+      neighbour. MV-QUOTE-METRIC back to 0.9967 with the full quote intact; no drift across the sweep.
+
 - [x] VIZ family: MV-VIZ-WATERFALL / STACKED-AREA / RADAR / SLOPE / BUMP / GAUGE-GRID now export as real native PowerPoint charts (editable series + embedded worksheet). The remaining viz kinds (sankey, chord, treemap, sunburst, calendar heatmap, market map, beeswarm, dumbbell, gantt, boxplot, radial bar) have no native PowerPoint chart type and keep the design-exact vector plate.
 
 ## Scrolling
