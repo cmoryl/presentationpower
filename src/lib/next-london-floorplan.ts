@@ -701,12 +701,14 @@ function rulePlacement(
   const runRow = Math.floor(index / perRow);
   const runIdx = index % perRow;
   const runCount = Math.min(perRow, total - runRow * perRow);
+  // Alternate rows shift half a step so wrapped pins never sit under each other.
+  const runShift = runRow % 2 === 1 ? Math.min(0.8, (right - left) / (perRow * 2)) : 0;
 
   if (kind === "door" || kind === "lift") {
     // Doors face the circulation side, i.e. the bottom edge of the zone block.
     return {
-      x: span(runCount, runIdx, left, right),
-      y: zone.y + zone.h + runRow * 1.3,
+      x: span(runCount, runIdx, left, right) + runShift,
+      y: zone.y + zone.h + runRow * 1.5,
       face: "north",
     };
   }
@@ -718,8 +720,8 @@ function rulePlacement(
   }
   if (kind === "wall" || kind === "banner" || kind === "set") {
     return {
-      x: span(runCount, runIdx, left, right),
-      y: zone.y + 0.9 + runRow * 1.3,
+      x: span(runCount, runIdx, left, right) + runShift,
+      y: zone.y + 0.9 + runRow * 1.5,
       face: "south",
     };
   }

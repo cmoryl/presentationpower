@@ -272,7 +272,7 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number): string {
           : "";
 
       const dims =
-        h > 30 && w > 108
+        h > 30 && w > z.label.length * 6.2 + 108
           ? `<text x="${n(x + w - 6)}" y="${n(y + h - 7)}" text-anchor="end" font-family="${FONT}" font-size="8.5" letter-spacing="0.2" fill="${NAVY}" opacity="0.34">${z.w.toFixed(
               1,
             )} × ${z.h.toFixed(1)} m</text>`
