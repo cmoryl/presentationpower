@@ -11,6 +11,8 @@ import {
   patchStatFormat,
   resolveStatFormat,
 } from "@/lib/stat-format";
+import { ReorderHandle, ReorderNudge, useReorder } from "./ReorderRow";
+import { canMoveDown, canMoveUp } from "@/lib/reorder";
 
 type Row = Record<string, unknown>;
 
