@@ -695,9 +695,20 @@ function rulePlacement(
   const top = zone.y + inset;
   const bottom = zone.y + zone.h - inset;
 
+  // A long run of assets on one edge would stack pin on pin, so runs wrap into
+  // staggered rows stepping into the room — legible on print at any density.
+  const perRow = Math.max(1, Math.floor((right - left) / 1.6) + 1);
+  const runRow = Math.floor(index / perRow);
+  const runIdx = index % perRow;
+  const runCount = Math.min(perRow, total - runRow * perRow);
+
   if (kind === "door" || kind === "lift") {
     // Doors face the circulation side, i.e. the bottom edge of the zone block.
-    return { x: span(total, index, left, right), y: zone.y + zone.h, face: "north" };
+    return {
+      x: span(runCount, runIdx, left, right),
+      y: zone.y + zone.h + runRow * 1.3,
+      face: "north",
+    };
   }
   if (kind === "stair") {
     return { x: zone.x + zone.w, y: span(total, index, top, bottom), face: "west" };
@@ -706,7 +717,11 @@ function rulePlacement(
     return { x: (zone.x + zone.w / 2), y: bottom, face: "up" };
   }
   if (kind === "wall" || kind === "banner" || kind === "set") {
-    return { x: span(total, index, left, right), y: zone.y, face: "south" };
+    return {
+      x: span(runCount, runIdx, left, right),
+      y: zone.y + 0.9 + runRow * 1.3,
+      face: "south",
+    };
   }
 
   // Free-standing: interior grid, filled in rows across the zone.
