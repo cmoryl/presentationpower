@@ -531,7 +531,18 @@ export function stepRepeatPlan(panel: LondonPanel, config: StepRepeatConfig): St
     art,
     orientation: picked.orientation,
     colourway: picked.colourway,
-    qr: code ? { modules: code.size, path: code.path } : null,
+    qr: code
+      ? {
+          modules: code.size,
+          path: stepRepeatQrPath(code, config.qrModuleShape),
+          inkHex: config.qrInkHex,
+          plateHex: config.qrPlateShape === "none" || config.qrPlateHex === "none"
+            ? null
+            : config.qrPlateHex,
+          plateShape: config.qrPlateShape,
+        }
+      : null,
+
     inkHex: picked.colourway === "dblue" ? "#03002C" : "#FFFFFF",
     tiles,
     pitchX,
