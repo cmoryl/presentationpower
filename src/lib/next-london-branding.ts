@@ -190,7 +190,10 @@ export function londonBrandingPlan(
   const nudgeEarly = placement ?? londonLogoPlacement(panel.id);
   // Division items print the white lockup: full-colour and dark-blue marks are
   // not approved on division signage, so a stored override is clamped here.
-  const wantedColourway = londonDivisionColourway(familyId, nudgeEarly.colourway);
+  const wantedColourway = isLondonDoorItem(panel.room, panel.name)
+    ? londonDoorColourway(familyId, nudgeEarly.colourway)
+    : londonDivisionColourway(familyId, nudgeEarly.colourway);
+
   const { art, orientation, colourway } = pickNextLogo(familyId, aspect, wantedColourway);
 
   const marginX = (panel.bleedW - panel.trimW) / 2;
