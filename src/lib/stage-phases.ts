@@ -154,23 +154,29 @@ export function stageTier(count: number): StageTier {
 
 export function stageMetrics(count: number, taskMax = 3) {
   const tier = stageTier(count);
+  // Five and six stages read as "bulky" with the four-stage weights: the rings,
+  // chevrons and icon wells all stay heavy while the columns narrow. `slim`
+  // lets the renderer lighten that chrome, not just shrink it.
+  const slim = count >= 5;
   const dense = taskMax > 4;
   const base =
     tier === "wide"
       ? { medallion: 380, iconBox: 78, taskSize: 27, numeral: 96, stageName: 40, gap: 28, chev: 58 }
       : tier === "mid"
         ? { medallion: 310, iconBox: 64, taskSize: 22, numeral: 74, stageName: 32, gap: 18, chev: 44 }
-        : { medallion: 236, iconBox: 52, taskSize: 19, numeral: 58, stageName: 25, gap: 12, chev: 34 };
-  if (!dense) return { tier, ...base };
+        : { medallion: 214, iconBox: 46, taskSize: 18, numeral: 52, stageName: 22, gap: 16, chev: 26 };
+  if (!dense) return { tier, slim, ...base };
   // More than four tasks in a chain: shave the medallion and rows to keep the
   // whole stack inside the stage height.
   return {
     tier,
+    slim,
     ...base,
     medallion: Math.round(base.medallion * 0.82),
     iconBox: Math.round(base.iconBox * 0.84),
     taskSize: Math.max(16, Math.round(base.taskSize * 0.86)),
     numeral: Math.round(base.numeral * 0.84),
-    stageName: Math.max(20, Math.round(base.stageName * 0.86)),
+    stageName: Math.max(18, Math.round(base.stageName * 0.86)),
   };
 }
+

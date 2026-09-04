@@ -615,10 +615,15 @@ registerSlideModule({
         const hasTaskBody = stages.some((st) => arr(st.items).some((t) => s(obj(t).body)));
         const m = stageMetrics(stageCount, maxTasks + (hasTaskBody ? 2 : 0));
         const wide = m.tier === "wide";
+        // Five and six stages drop to lighter chrome — hairline rings, no inner
+        // ring, smaller orbit nodes and thinner chevrons — so the row reads as a
+        // fine-line diagram instead of six heavy badges.
+        const slim = m.slim;
         const iconBox = m.iconBox;
         const taskSize = m.taskSize;
         const numeralSize = m.numeral;
         const stageNameSize = m.stageName;
+
 
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -642,7 +647,7 @@ registerSlideModule({
                           className="flex shrink-0 items-center justify-center"
                           style={{ color: accent, paddingTop: Math.round(m.medallion * 0.44) }}
                         >
-                          <ChevronsRight size={m.chev} strokeWidth={3} />
+                          <ChevronsRight size={m.chev} strokeWidth={slim ? 2 : 3} />
                         </div>
                       )}
                       <div className="flex min-w-0 flex-1 flex-col items-center">
@@ -659,19 +664,21 @@ registerSlideModule({
                             data-decorative
                             className="absolute inset-0 rounded-full"
                             style={{
-                              border: `2px solid color-mix(in oklab, ${accent} 38%, transparent)`,
+                              border: `${slim ? 1 : 2}px solid color-mix(in oklab, ${accent} ${slim ? 30 : 38}%, transparent)`,
                             }}
                           />
-                          {/* Inner containment ring. */}
-                          <div
-                            aria-hidden
-                            data-decorative
-                            className="absolute rounded-full"
-                            style={{
-                              inset: "5.5%",
-                              border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
-                            }}
-                          />
+                          {/* Inner containment ring — dropped in the slim tier. */}
+                          {!slim && (
+                            <div
+                              aria-hidden
+                              data-decorative
+                              className="absolute rounded-full"
+                              style={{
+                                inset: "5.5%",
+                                border: `1px solid color-mix(in oklab, ${accent} 26%, transparent)`,
+                              }}
+                            />
+                          )}
                           {/* Orbit nodes centred exactly on the outer ring. */}
                           {orbitNodePositions(4, 26).map((pos, i) => (
                             <div
@@ -681,8 +688,8 @@ registerSlideModule({
                               className="absolute rounded-full"
                               style={{
                                 ...pos,
-                                width: wide ? 13 : 10,
-                                height: wide ? 13 : 10,
+                                width: wide ? 13 : slim ? 7 : 10,
+                                height: wide ? 13 : slim ? 7 : 10,
                                 transform: "translate(-50%, -50%)",
                                 backgroundColor: accent,
                               }}
@@ -691,8 +698,9 @@ registerSlideModule({
                           {/* Photo medallion with duotone wash so type clears. */}
                           <div
                             className="absolute overflow-hidden rounded-full"
-                            style={{ inset: "11%" }}
+                            style={{ inset: slim ? "8%" : "11%" }}
                           >
+
                             <MediaTile
                               brand={brand}
                               seed={s(st.mediaSeed, s(st.label, `stage-${si + 1}`))}
@@ -746,12 +754,13 @@ registerSlideModule({
                         <div
                           data-intro-item=""
                           data-intro-step={si * 2 + 2}
-                          className="mt-8 flex w-full flex-col"
+                          className={slim ? "mt-5 flex w-full flex-col" : "mt-8 flex w-full flex-col"}
                           style={{ gap: 0 }}
                         >
                           {tasks.map((t, ti) => {
                             const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
-                            const taskGap = wide ? 4 : 3;
+                            const taskGap = wide ? 4 : slim ? 2 : 3;
+                            const wellRadius = slim ? 12 : 18;
                             return (
                               <React.Fragment key={ti}>
                                 {ti > 0 && (
@@ -761,17 +770,23 @@ registerSlideModule({
                                     className="flex items-center justify-center"
                                     style={{
                                       width: iconBox,
-                                      height: wide ? 26 : 20,
+                                      height: wide ? 26 : slim ? 14 : 20,
                                       marginTop: taskGap,
                                       marginBottom: taskGap,
                                       color: accent,
                                     }}
                                   >
-                                    <ChevronsDown size={wide ? 24 : 18} strokeWidth={2.5} />
+                                    <ChevronsDown
+                                      size={wide ? 24 : slim ? 14 : 18}
+                                      strokeWidth={slim ? 2 : 2.5}
+                                    />
                                   </div>
                                 )}
 
-                                <div className="flex items-center" style={{ gap: wide ? 24 : 18 }}>
+                                <div
+                                  className="flex items-center"
+                                  style={{ gap: wide ? 24 : slim ? 14 : 18 }}
+                                >
                                   <div
                                     className="relative flex shrink-0 items-center justify-center"
                                     style={{ width: iconBox, height: iconBox, ...iconWellStyle(t) }}
@@ -781,7 +796,7 @@ registerSlideModule({
                                       data-decorative
                                       className="absolute inset-0"
                                       style={{
-                                        borderRadius: 18,
+                                        borderRadius: wellRadius,
                                         backgroundImage: cellWash(t, cellAccent(t, accent, mode)),
                                       }}
                                     />
@@ -789,8 +804,9 @@ registerSlideModule({
                                       aria-hidden
                                       data-decorative
                                       className="absolute inset-0"
-                                      style={openBottomFrame(cellAccent(t, accent, mode), 18)}
+                                      style={openBottomFrame(cellAccent(t, accent, mode), wellRadius)}
                                     />
+
                                     <span
                                       className="relative"
                                       style={{ color: cellAccent(t, accent, mode) }}
