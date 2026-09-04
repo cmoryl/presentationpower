@@ -270,9 +270,9 @@ registerSlideModule({
                     transform: "translate(-50%, -50%)",
                   }}
                 >
-
-                  <OrbitRing accent={accent} size={ringSize} />
+                  <OrbitRing accent={accent} size={size} />
                   <div className="absolute inset-[9%] flex flex-col items-center justify-center text-center">
+
                     {s(o.label) && (
                       <div
                         style={{
