@@ -578,7 +578,7 @@ export function buildLondonPanelSvg(panel: LondonPanel, options: LondonArtOption
       `${copyRotate} data-direction="${brand.copyVertical ? "vertical" : "horizontal"}"` +
       ` text-anchor="middle" fill="${copyPaint.paint}"${copyPaint.meta} font-family="${LONDON_SIGNAGE_FONT.cssStack}"` +
       ` font-weight="${LONDON_SIGNAGE_FONT.weight}" font-size="${brand.copySizeMm.toFixed(2)}"` +
-      ` letter-spacing="${(brand.copySizeMm * LONDON_SIGNAGE_FONT.tracking).toFixed(3)}">${escapeXml(brand.copy)}</text>`
+      ` letter-spacing="${(brand.copySizeMm * brand.copyTrackingEm).toFixed(3)}">${escapeXml(brand.copy)}</text>`
     : "";
 
   // QR: real encoded modules as vector geometry on a white plate, so the code
@@ -760,7 +760,7 @@ export function buildLondonPanelAi(panel: LondonPanel, options: LondonArtOptions
   const copyOps = brand.copy
     ? (() => {
         const size = brand.copySizeMm * MM_TO_PT;
-        const tracking = size * LONDON_SIGNAGE_FONT.tracking;
+        const tracking = size * brand.copyTrackingEm;
         const advance = brand.copy.length * (size * 0.62 + tracking);
         const ax = brand.copyCentreMm * MM_TO_PT;
         const ay = h - brand.copyBaselineMm * MM_TO_PT;

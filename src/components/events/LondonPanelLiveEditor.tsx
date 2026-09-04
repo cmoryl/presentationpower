@@ -145,6 +145,12 @@ export function LondonPanelLiveEditor({
   const [colorSpace, setColorSpace] = useState<LondonColorSpace>("rgb");
   const [printPreview, setPrintPreview] = useState(true);
   const stageRef = useRef<HTMLDivElement | null>(null);
+  // Stage size. A 12-metre signboard shown at 420px is unusable for fine
+  // tuning, so the live print area can be widened — and at the two larger
+  // sizes the controls drop underneath so the artwork gets the full dialog.
+  const [stageSize, setStageSize] = useState<"fit" | "large" | "full">("large");
+  const stageMaxWidth =
+    stageSize === "fit" ? "420px" : stageSize === "large" ? "860px" : "100%";
 
   // Photo walls are a repeating pattern, so their artwork is driven by the wall
   // recipe rather than by a single lockup / headline placement.
@@ -293,7 +299,7 @@ export function LondonPanelLiveEditor({
     height: `${(plan.logo.h / panel.bleedH) * 100}%`,
   };
 
-  const runMm = plan.copy ? plan.copySizeMm * plan.copy.length * 0.62 : 0;
+  const runMm = plan.copyRunMm;
   const textBox = plan.copy
     ? plan.copyVertical
       ? {
