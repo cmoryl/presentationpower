@@ -769,7 +769,8 @@ registerSlideModule({
                                     data-decorative
                                     className="flex items-center justify-center"
                                     style={{
-                                      width: iconBox,
+                                      width: iconDisc,
+
                                       height: wide ? 26 : slim ? 14 : 20,
                                       marginTop: taskGap,
                                       marginBottom: taskGap,
