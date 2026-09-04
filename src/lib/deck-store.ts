@@ -1619,6 +1619,42 @@ export function seedContent(variantId: string, brief: Brief, sectionName: string
         title: "Trusted by",
         items: clientPlaceholderItems(8),
       };
+    case "MV-PROOF-GROWTH-ORBITS":
+      return {
+        title: "Global updates",
+        subtitle: "Growing our presence to build a better future for our clients.",
+        logosLabel: "Recent acquisitions",
+        items: clientPlaceholderItems(8),
+        growthLabel: "Global growth",
+        growth: [
+          { value: "32", label: "Years of strategic growth" },
+          { value: "21", label: "Key acquisitions", body: "since 2020" },
+          {
+            value: "32",
+            label: "New regional offices",
+            body: "Local knowledge powering global delivery",
+          },
+        ],
+        statsTitle: "Specializing in areas that",
+        statsEmphasis: "matter",
+        orbits: [
+          {
+            label: "Digital marketing",
+            value: "97%",
+            body: "Of users are influenced by a business's online presence.",
+          },
+          {
+            label: "Media",
+            value: "90%",
+            body: "Of our clients cite video as key to growing their global strategy.",
+          },
+          {
+            label: "Events",
+            value: "70%",
+            body: "Awareness boost delivered by event marketing.",
+          },
+        ],
+      };
     case "MV-PROOF-LOGOS-STRIP":
       return {
         kicker: "Trusted by",

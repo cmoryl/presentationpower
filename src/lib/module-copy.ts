@@ -74,6 +74,11 @@ const AUTHORED: Record<string, ModuleCopy> = {
     description:
       "Two to six medallions in orbit rings, each with an icon task chain beneath. Use it when the process is worth dressing up — a kickoff or executive summary — and you have clean imagery.",
   },
+  "MV-PROOF-GROWTH-ORBITS": {
+    caption: "Acquisition logos and growth stats beside orbit percentages",
+    description:
+      "A split proof slide: a logo wall plus numbered growth figures on the left, up to three headline percentages in hairline orbit rings on the right. Use it for a corporate update where both scale and behavioural data need to land together.",
+  },
   "MV-PROC-BEFORE-AFTER": {
     caption: "The workflow before, and after the change",
     description:
