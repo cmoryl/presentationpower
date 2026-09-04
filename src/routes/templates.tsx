@@ -293,3 +293,86 @@ function EmptyState() {
     </div>
   );
 }
+
+function DivisionStarterCard({ starter }: { starter: DivisionStarter }) {
+  const brand = resolveBrandMode(starter.brandModeId);
+  const createDeckFromTemplate = useDeckStore((s) => s.createDeckFromTemplate);
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+
+  function onUse() {
+    setBusy(true);
+    const { deckId } = createDeckFromTemplate(starter.build());
+    navigate({ to: "/decks/$deckId", params: { deckId } });
+  }
+
+  return (
+    <div className="group flex flex-col overflow-hidden rounded-2xl border border-black/10 bg-white transition hover:-translate-y-0.5 hover:border-black/30 hover:shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
+      <div
+        className="relative aspect-[16/9] overflow-hidden"
+        style={{
+          background: `linear-gradient(135deg, ${brand.tokens.primary} 0%, ${brand.tokens.accent} 100%)`,
+        }}
+      >
+        <div
+          className="absolute inset-0 opacity-25"
+          style={{
+            background:
+              "radial-gradient(120% 100% at 12% 0%, rgba(255,255,255,0.45) 0%, transparent 55%)",
+          }}
+        />
+        <div className="absolute inset-0 flex flex-col justify-between p-5 text-white">
+          <div className="flex items-center justify-between gap-3">
+            <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-widest">
+              <Layers size={12} /> Division starter
+            </span>
+            <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] uppercase tracking-widest">
+              {starter.tag}
+            </span>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-widest opacity-80">
+              {starter.brandName}
+            </div>
+            <div className="mt-1 line-clamp-2 text-lg font-semibold leading-tight">
+              {starter.title}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-1 flex-col border-t border-black/10 p-4 dark:border-white/10">
+        <div className="text-sm font-medium leading-snug">{starter.caption}</div>
+        <p className="mt-1.5 text-xs leading-relaxed text-black/60 dark:text-white/60">
+          {starter.description}
+        </p>
+        <ul className="mt-3 space-y-1.5">
+          {starter.contains.map((line) => (
+            <li
+              key={line}
+              className="flex gap-2 text-[11px] leading-snug text-black/70 dark:text-white/70"
+            >
+              <span
+                aria-hidden
+                className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#003FC7] dark:bg-[#A1FBF9]"
+              />
+              {line}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 flex items-center justify-between text-[11px] text-black/50 dark:text-white/50">
+          <span>{starter.slideCount} slides</span>
+          <span>{starter.archetypeName}</span>
+        </div>
+        <button
+          type="button"
+          onClick={onUse}
+          disabled={busy}
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#003FC7] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+        >
+          {busy ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+          {busy ? "Building…" : "Use starter"}
+        </button>
+      </div>
+    </div>
+  );
+}
