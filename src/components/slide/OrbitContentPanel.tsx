@@ -28,15 +28,24 @@ function StatRows({
   hint,
   items,
   onChange,
+  keepPlacement,
 }: {
   title: string;
   hint: string;
   items: Row[];
   onChange: (items: Row[]) => void;
+  /** Keep ring placements with their slot so the content reflows in place. */
+  keepPlacement?: boolean;
 }) {
   const patch = (i: number, p: Row) =>
     onChange(items.map((row, k) => (k === i ? { ...row, ...p } : row)));
-  const reorder = useReorder(items, onChange);
+  const reorder = useReorder(
+    items,
+    onChange,
+    keepPlacement
+      ? (list, from, to) => reorderOrbits(list as Row[], from, to) as Row[]
+      : undefined,
+  );
 
   if (items.length === 0) {
     return (
