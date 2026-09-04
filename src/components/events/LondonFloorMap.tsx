@@ -228,7 +228,7 @@ export function LondonFloorMap({
               <div
                 key={z.id}
                 data-plan-surface="1"
-                className={`absolute overflow-hidden rounded-lg border border-[#C9D5EA] ${
+                className={`absolute overflow-hidden rounded-[3px] border border-[#D3DCEA] ${
                   quiet ? "" : "shadow-[0_1px_2px_rgba(3,0,44,0.10),0_6px_14px_-6px_rgba(3,0,44,0.25)]"
                 }`}
                 style={{
@@ -267,7 +267,7 @@ export function LondonFloorMap({
 
           {markers.map((m) => {
             const active = m.panelId === selectedId;
-            const ink = active ? "#EC388A" : m.corrected ? "#0F9D58" : KIND_INK[m.kind];
+            const ink = active ? "#C4306E" : m.corrected ? "#0F9D58" : KIND_INK[m.kind];
             return (
               <button
                 key={m.panelId}
