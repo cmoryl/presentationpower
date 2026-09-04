@@ -299,7 +299,12 @@ export async function buildAgendaPptx(config: AgendaConfig): Promise<AgendaPptxR
     }
   }
 
-  const blob = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  const raw = (await pptx.write({ outputType: "blob" })) as unknown as Blob;
+  // pptxgenjs emits presentation.xml with notesMasterIdLst after sldIdLst, which
+  // the ECMA-376 sequence forbids and Office refuses to open. Reuse the same
+  // terminal hygiene pass every other deck export in the app runs through.
+  const { applyTerminalPptxHygiene } = await import("./pptx-terminal-hygiene");
+  const blob = await applyTerminalPptxHygiene(raw);
   notes.push(
     `${pages.length} slide${pages.length === 1 ? "" : "s"} at ${geo.trimW} × ${geo.trimH} mm — every programme row is an editable PowerPoint table cell.`,
   );
