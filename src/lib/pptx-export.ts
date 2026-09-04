@@ -6,6 +6,7 @@
 
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
+import { resolveOrbitLayout } from "./orbit-layout";
 import { fitTrackedBox } from "./export-tracked-fit";
 import {
   setExportChartStyle,

@@ -116,6 +116,7 @@ import type { StylePack } from "@/lib/style-packs";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
 import { StagePhasesPanel } from "@/components/slide/StagePhasesPanel";
+import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
@@ -1521,6 +1522,16 @@ function DeckEditor() {
                     stages={(active.content as Record<string, unknown>).stages}
                     brandModeId={brand.id}
                     onChange={(stages) => updateField(deck.id, active.id, "stages", stages)}
+                  />
+                </div>
+              )}
+
+              {/* Orbit stat placement — drag the figures on the growth-proof split */}
+              {active && mv && mv.id === "MV-PROOF-GROWTH-ORBITS" && (
+                <div className="mt-6">
+                  <OrbitLayoutPanel
+                    orbits={(active.content as Record<string, unknown>).orbits}
+                    onChange={(orbits) => updateField(deck.id, active.id, "orbits", orbits)}
                   />
                 </div>
               )}
