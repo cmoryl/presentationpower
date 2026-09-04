@@ -542,58 +542,101 @@ function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): ()
  * baked height, and prints straight through the element below (observed on
  * MV-DEC-CHECKLIST: the label's second line landed on top of its note).
  *
- * Before capture, every text leaf that renders on ONE line in the live DOM is
- * pinned to one line (`white-space: nowrap`, and a hair of tracking relief so
- * a marginally wider face still fits rather than clipping). Multi-line leaves
- * keep their wrapping but get their live height and `overflow: hidden`, so an
- * extra raster line can never bleed into a sibling. All inline styles are
- * restored afterwards.
+ * Before capture every text leaf is pinned to the exact line breaks it has on
+ * screen: single-line leaves get `white-space: nowrap`, and multi-line leaves
+ * are re-emitted as one nowrap block per live line (measured with a Range over
+ * the text node). A marginally wider embedded face then overhangs its line by a
+ * hair instead of adding a line and printing through the element below. Every
+ * leaf also gets ~0.4% of tracking relief to absorb that overhang. The original
+ * markup and inline styles are restored after capture.
  */
 function pinTextLineCounts(root: HTMLElement): () => void {
   const affected: Array<{
     el: HTMLElement;
     whiteSpace: string;
     letterSpacing: string;
-    height: string;
-    overflow: string;
+    html: string | null;
   }> = [];
   root.querySelectorAll<HTMLElement>("*").forEach((el) => {
     if (el.children.length > 0) return;
-    const text = (el.textContent ?? "").trim();
-    if (!text) return;
+    const text = el.textContent ?? "";
+    if (!text.trim()) return;
     const cs = window.getComputedStyle(el);
     if (cs.position === "absolute" && !cs.width.endsWith("px")) return;
     const lineHeight = parseFloat(cs.lineHeight);
     const height = el.getBoundingClientRect().height;
     if (!Number.isFinite(lineHeight) || lineHeight <= 0 || height <= 0) return;
     const lines = Math.max(1, Math.round(height / lineHeight));
-    affected.push({
+    const record = {
       el,
       whiteSpace: el.style.whiteSpace,
       letterSpacing: el.style.letterSpacing,
-      height: el.style.height,
-      overflow: el.style.overflow,
-    });
+      html: null as string | null,
+    };
     if (lines === 1) {
       el.style.whiteSpace = "nowrap";
-      const tracking = parseFloat(cs.letterSpacing);
-      if (Number.isFinite(tracking)) {
-        el.style.letterSpacing = `${tracking - Math.max(0.01, parseFloat(cs.fontSize) * 0.004)}px`;
-      }
     } else {
-      el.style.height = `${Math.round(height)}px`;
-      el.style.overflow = "hidden";
+      const segments = liveLineSegments(el);
+      if (segments.length > 1) {
+        record.html = el.innerHTML;
+        el.innerHTML = segments
+          .map(
+            (line) =>
+              `<span style="display:block;white-space:nowrap">${escapeHtmlText(line)}</span>`,
+          )
+          .join("");
+      }
+    }
+    affected.push(record);
+    const tracking = parseFloat(cs.letterSpacing);
+    const fontSize = parseFloat(cs.fontSize);
+    if (Number.isFinite(tracking) && Number.isFinite(fontSize)) {
+      el.style.letterSpacing = `${tracking - Math.max(0.01, fontSize * 0.004)}px`;
     }
   });
   return () => {
     for (const a of affected) {
+      if (a.html !== null) a.el.innerHTML = a.html;
       a.el.style.whiteSpace = a.whiteSpace;
       a.el.style.letterSpacing = a.letterSpacing;
-      a.el.style.height = a.height;
-      a.el.style.overflow = a.overflow;
     }
   };
 }
+
+function escapeHtmlText(value: string): string {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/**
+ * The text of a leaf split at the line breaks the browser actually chose, found
+ * by walking a Range one character at a time and grouping by rendered top.
+ */
+function liveLineSegments(el: HTMLElement): string[] {
+  const node = el.firstChild;
+  if (!node || node.nodeType !== Node.TEXT_NODE) return [];
+  const text = node.textContent ?? "";
+  if (!text.trim() || text.length > 800) return [];
+  const range = document.createRange();
+  const lines: string[] = [];
+  let current = "";
+  let lastTop: number | null = null;
+  for (let i = 0; i < text.length; i += 1) {
+    range.setStart(node, i);
+    range.setEnd(node, i + 1);
+    const rect = range.getBoundingClientRect();
+    const top: number | null = rect.height > 0 ? Math.round(rect.top) : lastTop;
+    if (lastTop !== null && top !== null && Math.abs(top - lastTop) > 1) {
+      lines.push(current.trim());
+      current = "";
+    }
+    if (top !== null) lastTop = top;
+    current += text[i];
+  }
+  if (current.trim()) lines.push(current.trim());
+  return lines.filter((line) => line.length > 0);
+}
+
+
 
 /**
 

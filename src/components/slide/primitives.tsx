@@ -511,8 +511,14 @@ export function StatFigure({
   //     font-size ceiling so very wide values step down automatically before
   //     they touch the next column;
   //   • tighten letter-spacing on the value so long strings stay compact.
-  const unitText = unit?.trim() ?? "";
+  const rawUnitText = unit?.trim() ?? "";
+  // A unit only reads as a unit when the value ends in a numeral. Seeded and
+  // imported content often carries a leftover "%" alongside a value that
+  // already states its own units ("6 wks → 9 days"), which printed as
+  // "6 wks → 9 days%". Drop the suffix instead of rendering nonsense.
+  const unitText = /[0-9]$/.test((value ?? "").trim()) ? rawUnitText : "";
   const unitIsLong = /\s|·|\/|–|-/.test(unitText) || unitText.length > 6;
+
   // A "phrase value" is a value that isn't just a number+suffix but a full
   // clause like "38% ↓ time to market". These previously overflowed their
   // grid track because `white-space:nowrap` refused to wrap. Detect the case
