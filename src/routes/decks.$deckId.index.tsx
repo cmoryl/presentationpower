@@ -115,6 +115,7 @@ import {
 import type { StylePack } from "@/lib/style-packs";
 import { LiveEditOverlay } from "@/components/slide/LiveEditOverlay";
 import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
+import { StagePhasesPanel } from "@/components/slide/StagePhasesPanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
@@ -1509,6 +1510,17 @@ function DeckEditor() {
                     onChange={(pillars) => updateField(deck.id, active.id, "pillars", pillars)}
                     title="Pillar gradient colours"
                     rowLabel="Pillar"
+                  />
+                </div>
+              )}
+
+              {/* Phases & tasks structure editor — numbered stage module */}
+              {active && mv && mv.id === "MV-PROC-STAGE-ORBITS" && (
+                <div className="mt-6">
+                  <StagePhasesPanel
+                    stages={(active.content as Record<string, unknown>).stages}
+                    brandModeId={brand.id}
+                    onChange={(stages) => updateField(deck.id, active.id, "stages", stages)}
                   />
                 </div>
               )}

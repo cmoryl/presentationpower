@@ -27,6 +27,7 @@ import {
   SUMMARY_BAND,
 } from "@/lib/surface-tokens";
 import { cellAccent, cellWash, iconWellStyle, cellIconScale } from "./cell-controls";
+import { MAX_TASKS, clampPhases, readPhases, stageMetrics } from "@/lib/stage-phases";
 
 registerSlideModule({
   id: "family:process",
@@ -598,21 +599,26 @@ registerSlideModule({
         );
       }
       case "MV-PROC-STAGE-ORBITS": {
-        // Two-to-four numbered stages across the slide. Each stage is a circular
+        // Two-to-six numbered stages across the slide. Each stage is a circular
         // photo medallion in an orbit ring carrying its numeral and stage name,
         // with a vertical icon-led task chain beneath it. Chevron pairs carry the
         // eye between stages. House treatment: accentInk tones, hairline rings
         // with faded tails, cardWashGradient + openBottomFrame task tiles.
+        // Sizing comes from stageMetrics() so 5–6 stages (or 5–6 tasks in a
+        // chain) compress instead of colliding.
         const accent = accentInk(brand.tokens.accent, mode, 4.5);
-        const stages = arr(c.stages)
-          .slice(0, 4)
-          .map((raw) => obj(raw));
+        const stages = clampPhases(readPhases(c.stages)).map((raw) => obj(raw));
         const stageCount = Math.max(stages.length, 1);
-        const wide = stageCount <= 3;
-        const iconBox = wide ? 78 : 64;
-        const taskSize = wide ? 27 : 22;
-        const numeralSize = wide ? 96 : 74;
-        const stageNameSize = wide ? 40 : 32;
+        const maxTasks = stages.reduce((m, st) => Math.max(m, arr(st.items).length), 0);
+        // A task chain that also carries descriptions occupies roughly two extra
+        // rows of height, so it takes the dense sizing tier.
+        const hasTaskBody = stages.some((st) => arr(st.items).some((t) => s(obj(t).body)));
+        const m = stageMetrics(stageCount, maxTasks + (hasTaskBody ? 2 : 0));
+        const wide = m.tier === "wide";
+        const iconBox = m.iconBox;
+        const taskSize = m.taskSize;
+        const numeralSize = m.numeral;
+        const stageNameSize = m.stageName;
 
         return (
           <SlideFrame brand={brand} pageNumber={pageNumber}>
@@ -622,13 +628,10 @@ registerSlideModule({
                   <SlideTitle brand={brand} title={s(c.title)} kicker={s(c.subtitle)} />
                 </div>
               )}
-              <div
-                className="mt-10 flex items-start justify-center"
-                style={{ gap: wide ? 28 : 18 }}
-              >
+              <div className="mt-10 flex items-start justify-center" style={{ gap: m.gap }}>
                 {stages.map((st, si) => {
                   const tasks = arr(st.items)
-                    .slice(0, 4)
+                    .slice(0, MAX_TASKS)
                     .map((t) => obj(t));
                   return (
                     <React.Fragment key={si}>
@@ -637,9 +640,9 @@ registerSlideModule({
                           aria-hidden
                           data-decorative
                           className="flex shrink-0 items-center justify-center"
-                          style={{ color: accent, paddingTop: wide ? 168 : 140 }}
+                          style={{ color: accent, paddingTop: Math.round(m.medallion * 0.44) }}
                         >
-                          <ChevronsRight size={wide ? 58 : 44} strokeWidth={3} />
+                          <ChevronsRight size={m.chev} strokeWidth={3} />
                         </div>
                       )}
                       <div className="flex min-w-0 flex-1 flex-col items-center">
@@ -648,7 +651,7 @@ registerSlideModule({
                           data-intro-item=""
                           data-intro-step={si * 2 + 1}
                           className="relative aspect-square w-full"
-                          style={{ maxWidth: wide ? 380 : 310 }}
+                          style={{ maxWidth: m.medallion }}
                         >
                           {/* Outer orbit ring — one continuous hairline. */}
                           <div
@@ -817,6 +820,20 @@ registerSlideModule({
                                     }}
                                   >
                                     {s(t.label)}
+                                    {s(t.body) && (
+                                      <div
+                                        style={{
+                                          fontSize: Math.max(15, Math.round(taskSize * 0.72)),
+                                          fontWeight: 500,
+                                          lineHeight: 1.28,
+                                          marginTop: 4,
+                                          color: ink.body,
+                                          ...clampLines(2),
+                                        }}
+                                      >
+                                        {s(t.body)}
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
                               </React.Fragment>
