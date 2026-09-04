@@ -253,22 +253,25 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
   const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
 
+  // Print sheets number the pins and list them in a directory index instead of
+  // printing names on the plan, where a dense pillar run would overlap itself.
+  const numbered = opts.labels === true;
+  const indexH = numbered ? indexHeight(markers.length) : 0;
+
   const pins = markers
-    .map((m) => {
+    .map((m, i) => {
       const cx = ox + m.x * PPM;
       const cy = oy + m.y * PPM;
       const active = m.panelId === opts.activePanelId;
-      const name = m.name.length > 34 ? `${m.name.slice(0, 33)}…` : m.name;
-      const label = opts.labels
-        ? `<text x="${cx + 12}" y="${cy + 3.5}" font-family="${FONT}" font-size="9.5" font-weight="600" fill="${NAVY}" opacity="0.82" stroke="${PAPER}" stroke-width="2.6" paint-order="stroke">${esc(
-            name,
-          )}</text>`
+      const badge = numbered
+        ? `<text x="${cx}" y="${cy + 3}" text-anchor="middle" font-family="${FONT}" font-size="8.5" font-weight="700" fill="${PAPER}">${i + 1}</text>`
         : "";
-      return `<g data-panel="${esc(m.panelId)}">${markerGlyph(m, cx, cy, active)}${label}</g>`;
+      return `<g data-panel="${esc(m.panelId)}">${markerGlyph(m, cx, cy, active, numbered)}${badge}</g>`;
     })
     .join("");
 
   const kinds = KIND_ORDER.filter((k) => markers.some((m) => m.kind === k));
+  const legendY = size.h - FOOT - indexH - LEGEND;
 
   return `${defs()}
 <g>
