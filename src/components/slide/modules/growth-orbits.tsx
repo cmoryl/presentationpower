@@ -11,6 +11,12 @@ import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { orbitBaseSize, resolveOrbitLayout } from "@/lib/orbit-layout";
 import {
+  orbitDotColor,
+  orbitRingColor,
+  resolveOrbitFace,
+  type OrbitFaceStyle,
+} from "@/lib/orbit-style";
+import {
   MAX_WALL_LOGOS,
   resolveLogoWall,
   wallLogoMaxHeight,
@@ -22,7 +28,15 @@ const MAX_GROWTH = 4;
 const MAX_LOGOS = MAX_WALL_LOGOS;
 
 /** Hairline orbit ring: one full circle plus an offset arc with end nodes. */
-function OrbitRing({ accent, size }: { accent: string; size: number }) {
+function OrbitRing({
+  accent,
+  size,
+  face,
+}: {
+  accent: string;
+  size: number;
+  face: OrbitFaceStyle;
+}) {
   const nodes = [
     { top: "10%", left: "8%" },
     { top: "50%", left: "-1%" },
@@ -30,13 +44,21 @@ function OrbitRing({ accent, size }: { accent: string; size: number }) {
     { top: "22%", left: "94%" },
     { top: "74%", left: "92%" },
   ];
+  const ring = orbitRingColor(face, accent);
+  const dot = orbitDotColor(face, accent);
+  const alpha = face.ringOpacity / 100;
+  // The SVG arcs live in a 100-unit box, so translate the px weight to units.
+  const arcWidth = Math.max(0.4, (face.ringWidth / Math.max(size, 1)) * 100);
+  const dotPx = Math.max(0, Math.round(face.dotSize * 0.75 + size * 0.008));
   return (
     <>
       <div
         aria-hidden
         data-decorative
         className="absolute inset-0 rounded-full"
-        style={{ border: `1px solid color-mix(in oklab, ${accent} 55%, transparent)` }}
+        style={{
+          border: `${face.ringWidth}px solid color-mix(in oklab, ${ring} ${face.ringOpacity}%, transparent)`,
+        }}
       />
       <svg
         aria-hidden
@@ -48,37 +70,41 @@ function OrbitRing({ accent, size }: { accent: string; size: number }) {
       >
         <path
           d="M 92 28 A 46 46 0 0 1 66 93"
-          stroke={accent}
-          strokeOpacity="0.85"
-          strokeWidth="0.7"
+          stroke={ring}
+          strokeOpacity={Math.min(1, alpha * 1.5)}
+          strokeWidth={arcWidth}
           strokeLinecap="round"
         />
         <path
           d="M 10 72 A 46 46 0 0 1 26 12"
-          stroke={accent}
-          strokeOpacity="0.55"
-          strokeWidth="0.7"
+          stroke={ring}
+          strokeOpacity={alpha}
+          strokeWidth={arcWidth}
           strokeLinecap="round"
         />
       </svg>
-      {nodes.map((pos, i) => (
-        <div
-          key={i}
-          aria-hidden
-          data-decorative
-          className="absolute rounded-full"
-          style={{
-            ...pos,
-            width: Math.max(5, Math.round(size * 0.024)),
-            height: Math.max(5, Math.round(size * 0.024)),
-            transform: "translate(-50%, -50%)",
-            backgroundColor: accent,
-          }}
-        />
-      ))}
+      {face.dotStyle !== "none" &&
+        dotPx > 0 &&
+        nodes.map((pos, i) => (
+          <div
+            key={i}
+            aria-hidden
+            data-decorative
+            className={face.dotStyle === "square" ? "absolute" : "absolute rounded-full"}
+            style={{
+              ...pos,
+              width: dotPx,
+              height: dotPx,
+              transform: "translate(-50%, -50%)",
+              backgroundColor: face.dotStyle === "hollow" ? "transparent" : dot,
+              border: face.dotStyle === "hollow" ? `${face.ringWidth}px solid ${dot}` : undefined,
+            }}
+          />
+        ))}
     </>
   );
 }
+
 
 registerSlideModule({
   id: "family:growth-orbits",
@@ -89,6 +115,8 @@ registerSlideModule({
     const growth = arr(c.growth).slice(0, MAX_GROWTH);
     const orbits = arr(c.orbits).slice(0, MAX_ORBITS);
     const wall = resolveLogoWall(c.logoWall);
+    // Ring colour, weight and dot treatment are authored per face.
+    const ringFace = resolveOrbitFace(c.orbitStyle, mode === "dark" ? "dark" : "light");
 
 
     const tileBg = bareSurfaces ? "transparent" : isDark ? "#FFFFFF" : "rgba(10,15,28,0.02)";
@@ -286,7 +314,7 @@ registerSlideModule({
                     transform: "translate(-50%, -50%)",
                   }}
                 >
-                  <OrbitRing accent={accent} size={size} />
+                  <OrbitRing accent={accent} size={size} face={ringFace} />
                   <div className="absolute inset-[9%] flex flex-col items-center justify-center text-center">
 
                     {s(o.label) && (

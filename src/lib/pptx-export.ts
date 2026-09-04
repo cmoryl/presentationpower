@@ -7,6 +7,7 @@
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
 import { resolveOrbitLayout } from "./orbit-layout";
+import { orbitDotColor, orbitRingColor, resolveOrbitFace } from "./orbit-style";
 import { MAX_WALL_LOGOS, resolveLogoWall } from "./logo-wall";
 import { fitTrackedBox } from "./export-tracked-fit";
 import {
@@ -12106,6 +12107,9 @@ function renderGrowthOrbits(
   // Each figure keeps the placement authored on the slide (percentages of the
   // right-hand area), so the exported deck matches what the editor shows.
   const layout = resolveOrbitLayout(orbits);
+  // Ring colour + weight follow the face the slide is exported on.
+  const ringFace = resolveOrbitFace(c.orbitStyle, isDarkPalette(p) ? "dark" : "light");
+  const ringHex = orbitRingColor(ringFace, p.accent).replace("#", "");
   const baseH = Math.min(1.95, avail / Math.max(orbits.length, 1) - 0.1);
   orbits.forEach((o, k) => {
     const pos = layout[k]!;
@@ -12120,8 +12124,40 @@ function renderGrowthOrbits(
       w: ringH,
       h: ringH,
       fill: { color: "FFFFFF", transparency: 100 },
-      line: { color: p.accent, width: 1 },
+      line: {
+        color: ringHex,
+        width: ringFace.ringWidth,
+        transparency: 100 - ringFace.ringOpacity,
+      },
     });
+    // Orbit dots, honouring the authored treatment for this face.
+    if (ringFace.dotStyle !== "none" && ringFace.dotSize > 0) {
+      const dotHex = orbitDotColor(ringFace, p.accent).replace("#", "");
+      const d = Math.max(0.04, (ringFace.dotSize / 96) * Math.max(0.7, ringH));
+      const nodes = [
+        [0.08, 0.1],
+        [-0.01, 0.5],
+        [0.22, 0.88],
+        [0.94, 0.22],
+        [0.92, 0.74],
+      ] as const;
+      nodes.forEach(([fx, fy]) => {
+        s.addShape(ringFace.dotStyle === "square" ? "rect" : "ellipse", {
+          x: ox + fx * ringH - d / 2,
+          y: oy + fy * ringH - d / 2,
+          w: d,
+          h: d,
+          fill:
+            ringFace.dotStyle === "hollow"
+              ? { color: "FFFFFF", transparency: 100 }
+              : { color: dotHex },
+          line:
+            ringFace.dotStyle === "hollow"
+              ? { color: dotHex, width: ringFace.ringWidth }
+              : { color: dotHex, width: 0 },
+        });
+      });
+    }
     s.addText(
       [
         ...(str(o.label)

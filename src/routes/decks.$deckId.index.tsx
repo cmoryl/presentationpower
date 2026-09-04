@@ -118,6 +118,7 @@ import { PinEditorPanel } from "@/components/slide/PinEditorPanel";
 import { StagePhasesPanel } from "@/components/slide/StagePhasesPanel";
 import { OrbitLayoutPanel } from "@/components/slide/OrbitLayoutPanel";
 import { LogoWallPanel } from "@/components/slide/LogoWallPanel";
+import { OrbitStylePanel } from "@/components/slide/OrbitStylePanel";
 import { WorldStatsMetricsPanel } from "@/components/slide/WorldStatsMetricsPanel";
 
 import { CanvasBlockLayer } from "@/components/slide/CanvasBlockLayer";
@@ -1539,6 +1540,10 @@ function DeckEditor() {
                   <OrbitLayoutPanel
                     orbits={(active.content as Record<string, unknown>).orbits}
                     onChange={(orbits) => updateField(deck.id, active.id, "orbits", orbits)}
+                  />
+                  <OrbitStylePanel
+                    style={(active.content as Record<string, unknown>).orbitStyle}
+                    onChange={(next) => updateField(deck.id, active.id, "orbitStyle", next)}
                   />
                 </div>
 
