@@ -1,5 +1,6 @@
 // Public, no-login module variant library.
 import { BackToTop } from "@/components/BackToTop";
+import { moduleCopy } from "@/lib/module-copy";
 // Read-only gallery of every approved module variant, rendered live in both
 // light and dark modes so external reviewers can browse and download stills
 // without a Lovable/app account. No server functions, no session reads.
@@ -871,8 +872,11 @@ function Lightbox({
         </button>
       </div>
 
-      <p className="mt-4 text-center text-xs text-white/55">
-        {preset ? preset.description : variant.description}
+      <p className="mt-4 text-center text-sm text-white/80">
+        {preset ? preset.label : moduleCopy(variant).caption}
+      </p>
+      <p className="mx-auto mt-1 max-w-3xl text-center text-xs leading-relaxed text-white/55">
+        {preset ? preset.description : moduleCopy(variant).description}
       </p>
     </div>
   );
