@@ -3,14 +3,24 @@
 // nudge the row so the control stays reachable without a pointer.
 
 import { useState, type ReactNode } from "react";
-import { canMoveDown, canMoveUp, moveDown, moveItem, moveUp } from "@/lib/reorder";
+import { canMoveDown, canMoveUp, moveItem } from "@/lib/reorder";
 
-export function useReorder<T>(items: readonly T[], onChange: (next: T[]) => void) {
+export function useReorder<T>(
+  items: readonly T[],
+  onChange: (next: T[]) => void,
+  /** Optional custom move, e.g. keeping ring placements bound to their slot. */
+  reorderFn: (items: readonly T[], from: number, to: number) => T[] = moveItem,
+) {
   const [dragging, setDragging] = useState<number | null>(null);
   const [over, setOver] = useState<number | null>(null);
 
+  const move = (from: number, to: number) => {
+    if (to < 0 || to > items.length - 1 || from === to) return;
+    onChange(reorderFn(items, from, to));
+  };
+
   const drop = (to: number) => {
-    if (dragging !== null && dragging !== to) onChange(moveItem(items, dragging, to));
+    if (dragging !== null) move(dragging, to);
     setDragging(null);
     setOver(null);
   };
