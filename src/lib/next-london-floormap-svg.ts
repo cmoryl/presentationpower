@@ -30,6 +30,12 @@ import {
   zoneStyleFor,
   type MapDesign,
 } from "@/lib/next-london-floormap-design";
+import { areaIconSvg } from "@/lib/next-london-floormap-icons";
+import {
+  isCustomAreaId,
+  planWithAreas,
+  type LondonCustomArea,
+} from "@/lib/next-london-floormap-areas";
 import { LONDON_VENUE, type LondonFloorId, type LondonPanel } from "@/lib/next-london-signage";
 
 // Live drawing palette. Rendering one sheet is synchronous and single threaded,
@@ -304,7 +310,7 @@ function roomKeyExtraHeight(plan: LondonFloorPlan, w: number): number {
   let rows = 1;
   let cx = 0;
   for (const z of roomKeyRooms(plan)) {
-    const cw = z.label.length * 5.5 + 26;
+    const cw = z.label.length * 5.5 + (DESIGN.icons === false ? 26 : 34);
     if (cx + cw > w) {
       rows += 1;
       cx = 0;
@@ -322,15 +328,17 @@ function roomKeyRow(plan: LondonFloorPlan, x: number, y: number, w: number): str
   let cy = y;
   for (const z of rooms) {
     const label = z.label.toUpperCase();
-    const cw = label.length * 5.5 + 26;
+    const cw = label.length * 5.5 + (DESIGN.icons === false ? 26 : 34);
     if (cx + cw > x + w) {
       cx = x;
       cy += 19;
     }
     out.push(
       `<g><rect x="${n(cx)}" y="${n(cy - 10)}" width="${n(cw)}" height="16" rx="8" fill="${PAPER}" stroke="${LINE}" stroke-width="1" />` +
-        `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${zoneStyleFor(z.kind, DESIGN).accent}" />` +
-        `<text x="${n(cx + 18)}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
+        (DESIGN.icons === false
+          ? `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${zoneStyleFor(z.kind, DESIGN).accent}" />`
+          : areaIconSvg(z.kind, cx + 12, cy - 2, 13, zoneStyleFor(z.kind, DESIGN).accent, 0.95)) +
+        `<text x="${n(cx + (DESIGN.icons === false ? 18 : 22))}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
           label,
         )}</text></g>`,
     );
@@ -371,10 +379,15 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
       const w = Math.max(6, z.w * PPM - inset * 2);
       const h = Math.max(6, z.h * PPM - inset * 2);
       const bar = Math.min(4, w * 0.1);
+      const own = isCustomAreaId(z.id);
+      // A sectioned area is a translucent wash, not an opaque tile: whatever the
+      // venue drew underneath — and any pin inside it — must still read.
       const tile =
-        `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.fill}" stroke="${LINE}" stroke-width="1"${
-          quiet ? "" : ' filter="url(#ldn-tile)"'
-        } />` +
+        (own
+          ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.accent}" fill-opacity="0.12" />`
+          : `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.fill}" stroke="${LINE}" stroke-width="1"${
+              quiet ? "" : ' filter="url(#ldn-tile)"'
+            } />`) +
         `<path d="M ${n(x)} ${n(y + 3)} a 3 3 0 0 1 3 -3 h ${n(bar)} v ${n(h)} h ${n(-bar)} a 3 3 0 0 1 -3 -3 Z" fill="${style.accent}" opacity="${
           quiet ? 0.6 : 0.95
         }" />`;
@@ -403,7 +416,28 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
             )} × ${z.h.toFixed(1)} m</text>`
           : "";
 
-      return `<g>${tile}${label}${dims}</g>`;
+      // Category icon, top-right of the tile: the directory symbol for this kind
+      // of space. It sits away from both the label baseline and the pin field.
+      const iconSize = Math.min(22, Math.max(12, Math.min(w, h) * 0.3));
+      const icon =
+        DESIGN.icons !== false && w > iconSize * 2.6 && h > iconSize * 1.7 && !quiet
+          ? areaIconSvg(
+              z.kind,
+              x + w - iconSize / 2 - 7,
+              y + iconSize / 2 + 6,
+              iconSize,
+              style.accent,
+              0.8,
+            )
+          : "";
+
+      // An area the team sectioned off themselves is drawn as a dashed overlay so
+      // it never reads as a wall the venue built.
+      const custom = own
+        ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="none" stroke="${style.accent}" stroke-width="1.4" stroke-dasharray="5 3" opacity="0.9" />`
+        : "";
+
+      return `<g>${tile}${custom}${icon}${label}${dims}</g>`;
     })
     .join("");
 
@@ -467,12 +501,15 @@ export type FloorMapOptions = {
   roomsOnly?: boolean;
   /** Look, sheet setup, pin treatment and wording. */
   design?: MapDesign;
+  /** Areas the team sectioned off themselves, merged on top of the venue rooms. */
+  areas?: readonly LondonCustomArea[];
 };
 
 /** Everything inside the <svg> wrapper, so the asset card can reuse it. */
 function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: FloorMapSize): string {
-  const plan = londonFloorPlan(floor);
-  if (!plan) return "";
+  const base = londonFloorPlan(floor);
+  if (!base) return "";
+  const plan = planWithAreas(base, opts.areas);
   const ox = PAD;
   const oy = PAD + HEAD;
   const roomsOnly = opts.roomsOnly === true;
@@ -565,8 +602,9 @@ ${
 export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = {}): FloorMapSize {
   const restore = applyDesign(opts.design);
   try {
-    const plan = londonFloorPlan(floor);
-    if (!plan) return { w: 0, h: 0 };
+    const base = londonFloorPlan(floor);
+    if (!base) return { w: 0, h: 0 };
+    const plan = planWithAreas(base, opts.areas);
     const size = floorMapSize(plan);
     if (opts.roomsOnly === true) {
       return { w: size.w, h: size.h + roomKeyExtraHeight(plan, size.w - PAD * 2) };
