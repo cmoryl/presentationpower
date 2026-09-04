@@ -36,6 +36,8 @@ const PPM = 18;
 const PAD = 34;
 const HEAD = 84;
 const LEGEND = 62;
+/** Directory footer strip: venue credit line, drawn in the same face as the map. */
+const FOOT = 40;
 
 export type LondonZoneStyle = { fill: string; accent: string };
 
@@ -97,8 +99,17 @@ export type FloorMapSize = { w: number; h: number };
 export function floorMapSize(plan: LondonFloorPlan): FloorMapSize {
   return {
     w: Math.round(plan.w * PPM + PAD * 2),
-    h: Math.round(plan.h * PPM + PAD * 2 + HEAD + LEGEND),
+    h: Math.round(plan.h * PPM + PAD * 2 + HEAD + LEGEND + FOOT),
   };
+}
+
+/** Directory credit strip — same face and palette as the map, so print stays cohesive. */
+function footerStrip(w: number, y: number, right: string): string {
+  const left = `${LONDON_VENUE.venue} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
+  return `<g><path d="M ${PAD - 6} ${y} H ${w - PAD + 6}" stroke="${LINE}" stroke-width="1" />
+<text x="${PAD - 2}" y="${y + 17}" font-family="${FONT}" font-size="9.5" letter-spacing="0.6" fill="${NAVY}" opacity="0.62">${esc(left)}</text>
+<text x="${w - PAD + 2}" y="${y + 17}" text-anchor="end" font-family="${FONT}" font-size="9.5" letter-spacing="0.6" fill="${BLUE}" opacity="0.85">${esc(right)}</text>
+<text x="${PAD - 2}" y="${y + 30}" font-family="${FONT}" font-size="8.5" fill="${NAVY}" opacity="0.42">Schematic install plan — confirm exact positions on site with the venue production partner.</text></g>`;
 }
 
 function defs(): string {
@@ -229,6 +240,8 @@ export type FloorMapOptions = {
   activePanelId?: string;
   /** Print labels next to every marker. */
   labels?: boolean;
+  /** Right-hand credit in the footer strip; pass null to suppress the strip. */
+  footerNote?: string | null;
 };
 
 /** Everything inside the <svg> wrapper, so the asset card can reuse it. */
@@ -269,8 +282,13 @@ ${northArrow(size.w - PAD - 8, PAD + 22)}
 </g>
 ${planBody(plan, ox, oy)}
 ${pins}
-${scaleBar(PAD, size.h - LEGEND + 6)}
-${legendRow(kinds, PAD, size.h - LEGEND + 34, size.w - PAD * 2)}`;
+${scaleBar(PAD, size.h - FOOT - LEGEND + 6)}
+${legendRow(kinds, PAD, size.h - FOOT - LEGEND + 34, size.w - PAD * 2)}
+${
+  opts.footerNote === null
+    ? ""
+    : footerStrip(size.w, size.h - FOOT + 2, opts.footerNote ?? `${plan.label} · install plan`)
+}`;
 }
 
 /** The whole floor with every asset marked. */
@@ -300,10 +318,16 @@ export function assetMapSvg(
   const size = floorMapSize(plan);
   const specH = 106;
   const w = size.w;
-  const h = size.h + specH;
+  /** Map block ends where the (suppressed) floor footer would have started. */
+  const base = size.h - FOOT;
+  const h = base + specH + FOOT;
   const zone = marker ? plan.zones.find((z) => z.id === marker.zoneId) : null;
 
-  const body = floorMapContent(panel.floor, { ...opts, activePanelId: panel.id }, size);
+  const body = floorMapContent(
+    panel.floor,
+    { ...opts, activePanelId: panel.id, footerNote: null },
+    size,
+  );
 
   const specs: [string, string][] = [
     ["Asset", panel.name],
@@ -319,7 +343,7 @@ export function assetMapSvg(
       const col = i % 3;
       const row = Math.floor(i / 3);
       const x = PAD + 10 + col * ((w - PAD * 2 - 20) / 3);
-      const y = size.h + 30 + row * 34;
+      const y = base + 30 + row * 34;
       return `<text x="${x}" y="${y}" font-family="${FONT}" font-size="9.5" letter-spacing="1.2" fill="${NAVY}" opacity="0.55">${esc(
         k.toUpperCase(),
       )}</text><text x="${x}" y="${y + 15}" font-family="${FONT}" font-size="12.5" font-weight="600" fill="${NAVY}">${esc(
@@ -333,7 +357,8 @@ export function assetMapSvg(
   )}">
 <rect width="${w}" height="${h}" fill="${PAPER}" />
 ${body}
-<rect x="${PAD - 6}" y="${size.h + 6}" width="${w - (PAD - 6) * 2}" height="${specH - 16}" rx="12" fill="#F5F8FD" stroke="${LINE}" stroke-width="1" />
+<rect x="${PAD - 6}" y="${base + 6}" width="${w - (PAD - 6) * 2}" height="${specH - 16}" rx="12" fill="#F5F8FD" stroke="${LINE}" stroke-width="1" />
 ${specBlock}
+${footerStrip(w, base + specH, `Install card · ${panel.name}`)}
 </svg>`;
 }
