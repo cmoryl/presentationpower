@@ -118,12 +118,12 @@ function eyebrow(x: number, y: number, text: string, fill = BLUE, size = 9): str
 }
 
 /** Directory credit strip — same face and palette as the map, so print stays cohesive. */
-function footerStrip(w: number, y: number, right: string): string {
+function footerStrip(w: number, y: number, right: string, note?: string): string {
   const left = `${LONDON_VENUE.venue} · Job ${LONDON_VENUE.job} · ${LONDON_VENUE.datesLabel}`;
   return `<g><path d="M ${PAD} ${n(y)} H ${n(w - PAD)}" stroke="${LINE}" stroke-width="1" />
 <text x="${PAD}" y="${n(y + 18)}" font-family="${FONT}" font-size="9" letter-spacing="0.5" fill="${NAVY}" opacity="0.6">${esc(left)}</text>
 <text x="${n(w - PAD)}" y="${n(y + 18)}" text-anchor="end" font-family="${FONT}" font-size="9" font-weight="600" letter-spacing="0.5" fill="${BLUE}" opacity="0.9">${esc(right)}</text>
-<text x="${PAD}" y="${n(y + 31)}" font-family="${FONT}" font-size="8" letter-spacing="0.2" fill="${NAVY}" opacity="0.38">Schematic install plan — confirm exact positions on site with the venue production partner.</text></g>`;
+<text x="${PAD}" y="${n(y + 31)}" font-family="${FONT}" font-size="8" letter-spacing="0.2" fill="${NAVY}" opacity="0.38">${esc(note ?? "Schematic install plan — confirm exact positions on site with the venue production partner.")}</text></g>`;
 }
 
 function defs(): string {
@@ -231,7 +231,53 @@ function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): s
   return `<g>${out.join("")}</g>`;
 }
 
-function planBody(plan: LondonFloorPlan, ox: number, oy: number): string {
+/** Attendee room key: one chip per named room, inked by its category. */
+function roomKeyRooms(plan: LondonFloorPlan): LondonZone[] {
+  return plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core");
+}
+
+/** Extra sheet height the room key needs beyond the single legend row. */
+function roomKeyExtraHeight(plan: LondonFloorPlan, w: number): number {
+  let rows = 1;
+  let cx = 0;
+  for (const z of roomKeyRooms(plan)) {
+    const cw = z.label.length * 5.5 + 26;
+    if (cx + cw > w) {
+      rows += 1;
+      cx = 0;
+    }
+    cx += cw + 7;
+  }
+  return Math.max(0, rows - 1) * 19;
+}
+
+function roomKeyRow(plan: LondonFloorPlan, x: number, y: number, w: number): string {
+  const rooms = roomKeyRooms(plan);
+
+  const out: string[] = [];
+  let cx = x;
+  let cy = y;
+  for (const z of rooms) {
+    const label = z.label.toUpperCase();
+    const cw = label.length * 5.5 + 26;
+    if (cx + cw > x + w) {
+      cx = x;
+      cy += 19;
+    }
+    out.push(
+      `<g><rect x="${n(cx)}" y="${n(cy - 10)}" width="${n(cw)}" height="16" rx="8" fill="${PAPER}" stroke="${LINE}" stroke-width="1" />` +
+        `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${LONDON_ZONE_STYLE[z.kind].accent}" />` +
+        `<text x="${n(cx + 18)}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
+          label,
+        )}</text></g>`,
+    );
+    cx += cw + 7;
+  }
+  return `<g>${out.join("")}</g>`;
+}
+
+function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = false): string {
+
   const pw = plan.w * PPM;
   const ph = plan.h * PPM;
   const ground = `<rect x="${n(ox)}" y="${n(oy)}" width="${n(pw)}" height="${n(ph)}" rx="3" fill="${WALKWAY}" stroke="${LINE}" stroke-width="1" />`;
@@ -268,19 +314,31 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number): string {
         `<path d="M ${n(x)} ${n(y + 3)} a 3 3 0 0 1 3 -3 h ${n(bar)} v ${n(h)} h ${n(-bar)} a 3 3 0 0 1 -3 -3 Z" fill="${style.accent}" opacity="${
           quiet ? 0.6 : 0.95
         }" />`;
-      const label =
-        h > 20
+      // Attendee sheets centre a larger room name in the tile — there are no pins
+      // to avoid, so the name can own the space and read from a phone.
+      const label = roomsOnly
+        ? h > 14 && !quiet
+          ? `<text x="${n(x + bar + (w - bar) / 2)}" y="${n(y + h / 2 + 4)}" text-anchor="middle" font-family="${FONT}" font-size="${
+              w > 150 ? 12 : w > 96 ? 10.5 : 9
+            }" font-weight="600" letter-spacing="0.8" fill="${NAVY}">${esc(z.label.toUpperCase())}</text>`
+          : h > 12
+            ? `<text x="${n(x + bar + 8)}" y="${n(y + h / 2 + 3)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.55">${esc(
+                z.label.toUpperCase(),
+              )}</text>`
+            : ""
+        : h > 20
           ? `<text x="${n(x + bar + 9)}" y="${n(y + h - 7)}" font-family="${FONT}" font-size="9.5" font-weight="600" letter-spacing="0.9" fill="${NAVY}" opacity="0.8">${esc(
               z.label.toUpperCase(),
             )}</text>`
           : "";
 
       const dims =
-        h > 30 && w > z.label.length * 6.2 + 108
+        !roomsOnly && h > 30 && w > z.label.length * 6.2 + 108
           ? `<text x="${n(x + w - 6)}" y="${n(y + h - 7)}" text-anchor="end" font-family="${FONT}" font-size="8.5" letter-spacing="0.2" fill="${NAVY}" opacity="0.34">${z.w.toFixed(
               1,
             )} × ${z.h.toFixed(1)} m</text>`
           : "";
+
       return `<g>${tile}${label}${dims}</g>`;
     })
     .join("");
@@ -338,6 +396,11 @@ export type FloorMapOptions = {
   labels?: boolean;
   /** Right-hand credit in the footer strip; pass null to suppress the strip. */
   footerNote?: string | null;
+  /**
+   * Attendee wayfinding sheet: rooms and entrances only — no signage pins, no
+   * asset key, no numbered index.
+   */
+  roomsOnly?: boolean;
 };
 
 /** Everything inside the <svg> wrapper, so the asset card can reuse it. */
@@ -346,12 +409,13 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   if (!plan) return "";
   const ox = PAD;
   const oy = PAD + HEAD;
-  const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
+  const roomsOnly = opts.roomsOnly === true;
+  const all = roomsOnly ? [] : londonFloorMarkers(floor, opts.panels, opts.overrides);
   const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
 
   // Print sheets number the pins and list them in a directory index instead of
   // printing names on the plan, where a dense pillar run would overlap itself.
-  const numbered = opts.labels === true;
+  const numbered = !roomsOnly && opts.labels === true;
   const indexH = numbered ? indexHeight(markers.length) : 0;
 
   const pins = markers
@@ -369,29 +433,45 @@ function floorMapContent(floor: LondonFloorId, opts: FloorMapOptions, size: Floo
   const kinds = KIND_ORDER.filter((k) => markers.some((m) => m.kind === k));
   const legendY = size.h - FOOT - indexH - LEGEND;
   const headRule = PAD + HEAD - 18;
+  const roomCount = plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core").length;
 
   return `${defs()}
 <g>
-${eyebrow(PAD, PAD + 8, "TransPerfect NEXT 2026 · venue directory")}
+${eyebrow(PAD, PAD + 8, roomsOnly ? "TransPerfect NEXT 2026 · you are here" : "TransPerfect NEXT 2026 · venue directory")}
 <text x="${PAD}" y="${n(PAD + 38)}" font-family="${FONT}" font-size="24" font-weight="600" letter-spacing="-0.4" fill="${NAVY}">${esc(plan.label)}</text>
 <text x="${PAD}" y="${n(PAD + 58)}" font-family="${FONT}" font-size="10.5" letter-spacing="0.3" fill="${NAVY}" opacity="0.62">${esc(
-    `${LONDON_VENUE.venue} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`,
+    roomsOnly
+      ? `${LONDON_VENUE.venue} · ${roomCount} room${roomCount === 1 ? "" : "s"} and breakout space${roomCount === 1 ? "" : "s"}`
+      : `${LONDON_VENUE.venue} · ${plan.w} × ${plan.h} m · ${markers.length} asset${markers.length === 1 ? "" : "s"} scheduled`,
   )}</text>
 ${northArrow(size.w - PAD - 15, PAD + 22)}
 ${scaleBar(size.w - PAD - 30 - 4 * 2.5 * PPM - 92, PAD + 50)}
 <path d="M ${PAD} ${n(headRule)} H ${n(size.w - PAD)}" stroke="${LINE}" stroke-width="1" />
 </g>
-${planBody(plan, ox, oy)}
+${planBody(plan, ox, oy, roomsOnly)}
 ${pins}
-${eyebrow(PAD, legendY + 16, "Asset key")}
-${legendRow(kinds, PAD, legendY + 38, size.w - PAD * 2)}
+${eyebrow(PAD, legendY + 16, roomsOnly ? "Rooms on this floor" : "Asset key")}
+${
+  roomsOnly
+    ? roomKeyRow(plan, PAD, legendY + 38, size.w - PAD * 2)
+    : legendRow(kinds, PAD, legendY + 38, size.w - PAD * 2)
+}
 ${numbered ? indexBlock(markers, PAD, size.h - FOOT - indexH + 18, size.w - PAD * 2) : ""}
 ${
   opts.footerNote === null
     ? ""
-    : footerStrip(size.w, size.h - FOOT + 4, opts.footerNote ?? `${plan.label} · install plan`)
+    : footerStrip(
+        size.w,
+        size.h - FOOT + 4,
+        opts.footerNote ?? `${plan.label} · ${roomsOnly ? "attendee floor guide" : "install plan"}`,
+        roomsOnly
+          ? `${LONDON_VENUE.name} · schematic layout for orientation — follow on-site wayfinding and venue staff.`
+          : undefined,
+
+      )
 }`;
 }
+
 
 /**
  * Sheet size for a floor. Print sheets (`labels: true`) grow by the numbered
@@ -401,6 +481,9 @@ export function floorMapSheetSize(floor: LondonFloorId, opts: FloorMapOptions = 
   const plan = londonFloorPlan(floor);
   if (!plan) return { w: 0, h: 0 };
   const size = floorMapSize(plan);
+  if (opts.roomsOnly === true) {
+    return { w: size.w, h: size.h + roomKeyExtraHeight(plan, size.w - PAD * 2) };
+  }
   if (opts.labels !== true) return size;
   const all = londonFloorMarkers(floor, opts.panels, opts.overrides);
   const markers = opts.kinds?.length ? all.filter((m) => opts.kinds!.includes(m.kind)) : all;
@@ -413,7 +496,10 @@ export function floorMapSvg(floor: LondonFloorId, opts: FloorMapOptions = {}): s
   if (!plan) return "";
   const size = floorMapSheetSize(floor, opts);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size.w}" height="${size.h}" viewBox="0 0 ${size.w} ${size.h}" role="img" aria-label="${esc(
-    `${plan.label} install map — ${LONDON_VENUE.name}`,
+    opts.roomsOnly === true
+      ? `${plan.label} attendee floor guide — ${LONDON_VENUE.name}`
+      : `${plan.label} install map — ${LONDON_VENUE.name}`,
+
   )}">
 <rect width="${size.w}" height="${size.h}" fill="${PAPER}" />
 ${floorMapContent(floor, opts, size)}

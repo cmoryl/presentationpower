@@ -37,6 +37,7 @@ import {
   downloadAssetMapPack,
   downloadAssetMapPng,
   downloadAssetMapSvg,
+  downloadAttendeeMapPdf,
   downloadFloorMapPdf,
   downloadFloorMapPng,
   downloadFloorMapSvg,
@@ -84,6 +85,9 @@ function LondonMapsPage() {
   const [kinds, setKinds] = useState<LondonAssetKind[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  /** Attendee mode draws rooms and breakouts only — no signage pins. */
+  const [attendee, setAttendee] = useState(false);
+
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -141,7 +145,11 @@ function LondonMapsPage() {
   }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
-  const exportOpts = { panels, overrides, kinds, labels: true };
+  const installOpts = { panels, overrides, kinds, labels: true };
+  const exportOpts = attendee
+    ? { panels, overrides, roomsOnly: true, labels: false }
+    : installOpts;
+
   const correctedCount = Object.keys(overrides).length;
 
   useEffect(() => {
@@ -226,11 +234,27 @@ function LondonMapsPage() {
                       success: "next-london-install-maps.pdf downloaded",
                       failure: "Install plan set failed",
                     },
-                    () => downloadFloorMapPdf(exportOpts),
+                    () => downloadFloorMapPdf(installOpts),
                   )
                 }
               >
                 <FileDown className="h-4 w-4" /> Install plan set (PDF)
+              </button>
+              <button
+                type="button"
+                className={btn}
+                onClick={() =>
+                  runWithExportFeedback(
+                    {
+                      pending: "Building the attendee floor guide…",
+                      success: "next-london-floor-guide.pdf downloaded",
+                      failure: "Attendee floor guide failed",
+                    },
+                    () => downloadAttendeeMapPdf({ panels, overrides }),
+                  )
+                }
+              >
+                <FileDown className="h-4 w-4" /> Attendee floor guide (PDF)
               </button>
               <button
                 type="button"
@@ -241,13 +265,13 @@ function LondonMapsPage() {
                       success: "next-london-location-maps.zip downloaded",
                       failure: "Location card pack failed",
                     }, () =>
-                    downloadAssetMapPack(exportOpts),
+                    downloadAssetMapPack(installOpts),
                   )
                 }
               >
                 <Package className="h-4 w-4" /> Per-asset cards (ZIP)
               </button>
-              <button type="button" className={btn} onClick={() => downloadMapCsv(exportOpts)}>
+              <button type="button" className={btn} onClick={() => downloadMapCsv(installOpts)}>
                 <Table2 className="h-4 w-4" /> Install positions (CSV)
               </button>
               {correctedCount ? (
@@ -291,36 +315,65 @@ function LondonMapsPage() {
             ))}
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            {kindsOnFloor.map((k) => (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            {(
+              [
+                { id: false, label: "Install plan · signage pinned" },
+                { id: true, label: "Attendee guide · rooms only" },
+              ] as const
+            ).map((m) => (
               <button
-                key={k}
+                key={String(m.id)}
                 type="button"
-                onClick={() => toggleKind(k)}
-                aria-pressed={kinds.includes(k)}
+                onClick={() => {
+                  setAttendee(m.id);
+                  setSelectedId(null);
+                }}
+                aria-pressed={attendee === m.id}
                 className={`${chip} ${
-                  kinds.includes(k)
-                    ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
-                    : "border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]"
+                  attendee === m.id
+                    ? "border-[#003FC7] bg-[#003FC7] text-white"
+                    : "border-[#03002C]/20 bg-white text-[#03002C] hover:bg-[#F2F2F2]"
                 }`}
               >
-                {LONDON_ASSET_KIND_LABEL[k]}
+                {m.label}
               </button>
             ))}
-            {kinds.length ? (
-              <button
-                type="button"
-                onClick={() => setKinds([])}
-                className={`${chip} border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]`}
-              >
-                Show all kinds
-              </button>
-            ) : null}
           </div>
 
+          {attendee ? null : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {kindsOnFloor.map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => toggleKind(k)}
+                  aria-pressed={kinds.includes(k)}
+                  className={`${chip} ${
+                    kinds.includes(k)
+                      ? "border-[#003FC7] bg-[#E0E8F5] text-[#03002C]"
+                      : "border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]"
+                  }`}
+                >
+                  {LONDON_ASSET_KIND_LABEL[k]}
+                </button>
+              ))}
+              {kinds.length ? (
+                <button
+                  type="button"
+                  onClick={() => setKinds([])}
+                  className={`${chip} border-[#03002C]/15 bg-white text-[#03002C]/70 hover:bg-[#F2F2F2]`}
+                >
+                  Show all kinds
+                </button>
+              ) : null}
+            </div>
+          )}
+
           <p className="mt-3 text-[12.5px] leading-relaxed text-[#03002C]/65">
-            {plan ? plan.orientation : ""} Schematic layout drawn from the venue room list — sizes
-            are for orientation, not measurement.
+            {attendee
+              ? "Attendee floor guide: rooms and breakout spaces named, signage hidden. Print or share these sheets with delegates."
+              : "Schematic layout drawn from the venue room list — sizes are for orientation, not measurement."}
           </p>
 
           <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
@@ -333,17 +386,19 @@ function LondonMapsPage() {
               kinds={kinds}
               selectedId={selectedId}
               onSelect={setSelectedId}
-              editable
+              editable={!attendee}
+              roomsOnly={attendee}
             />
 
             <div className="min-w-0">
               <div className="flex flex-wrap gap-2">
+
                 <button
                   type="button"
                   className={btn}
                   onClick={() => downloadFloorMapSvg(floor, exportOpts)}
                 >
-                  <Download className="h-4 w-4" /> Floor map (SVG)
+                  <Download className="h-4 w-4" /> {attendee ? "Floor guide (SVG)" : "Floor map (SVG)"}
                 </button>
                 <button
                   type="button"
@@ -358,10 +413,33 @@ function LondonMapsPage() {
                     )
                   }
                 >
-                  <ImageIcon className="h-4 w-4" /> Floor map (PNG)
+                  <ImageIcon className="h-4 w-4" /> {attendee ? "Floor guide (PNG)" : "Floor map (PNG)"}
                 </button>
               </div>
 
+              {attendee ? (
+                <>
+                  <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
+                    Rooms and breakouts on this floor
+                  </h3>
+                  <ul className="mt-2 max-h-[30rem] divide-y divide-black/5 overflow-y-auto rounded-xl border border-black/10 bg-white">
+                    {(plan?.zones ?? [])
+                      .filter((z) => z.kind !== "circulation" && z.kind !== "core")
+                      .map((z) => (
+                        <li
+                          key={z.id}
+                          className="flex items-center justify-between gap-3 px-3 py-2 text-[13px] text-[#03002C]"
+                        >
+                          <span className="truncate font-medium">{z.label}</span>
+                          <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+                            {z.kind}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                </>
+              ) : (
+                <>
               <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
                 Assets on this floor ({listed.length}
                 {listed.length === floorPanels.length ? "" : ` of ${floorPanels.length}`})
@@ -409,9 +487,10 @@ function LondonMapsPage() {
                   </li>
                 )}
               </ul>
+                </>
+              )}
 
-
-              {selected ? (
+              {selected && !attendee ? (
                 <div className="mt-4 rounded-xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4">
                   <p className="text-[13px] font-semibold text-[#03002C]">{selected.name}</p>
                   <p className="mt-1 text-[12.5px] leading-relaxed text-[#03002C]/75">
