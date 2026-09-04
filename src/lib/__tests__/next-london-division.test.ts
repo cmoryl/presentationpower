@@ -23,8 +23,10 @@ describe("London division signage", () => {
         const plan = londonBrandingPlan(panel, { ...DEFAULT_LOGO_PLACEMENT, colourway });
         expect(["white", "white-accent"]).toContain(plan.colourway);
       }
-      // Default placement is the all-white cut.
-      expect(londonBrandingPlan(panel).colourway).toBe("white");
+      // Default placement is the all-white cut — except on doors, which
+      // default to the white mark with the division accent in its chevrons.
+      const isDoor = /\bdoors?\b/i.test(`${panel.room} ${panel.name}`);
+      expect(londonBrandingPlan(panel).colourway).toBe(isDoor ? "white-accent" : "white");
     }
   });
 

@@ -12,6 +12,9 @@ describe("London signage branding", () => {
       const plan = londonBrandingPlan(panel);
       expect(nextLogoFamily(plan.familyId)).toBeTruthy();
       expect(plan.art.paths.length).toBeGreaterThan(0);
+      // Division doors print the white lockup whose chevrons carry the room's
+      // accent, so their mark is white plus that one accent ink.
+      if (plan.colourway === "white-accent") continue;
       for (const p of plan.art.paths) expect(p.fill.toLowerCase()).toMatch(/^#(fff|ffffff)$/);
     }
   });
