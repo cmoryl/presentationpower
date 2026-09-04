@@ -128,9 +128,16 @@ function defs(): string {
 }
 
 /** Marker glyph — a dropped map pin, shaped by asset kind inside the head. */
-function markerGlyph(m: LondonMarker, cx: number, cy: number, active: boolean): string {
+function markerGlyph(
+  m: LondonMarker,
+  cx: number,
+  cy: number,
+  active: boolean,
+  /** Numbered print pins carry an index number instead of the kind glyph. */
+  numbered = false,
+): string {
   const ink = active ? "#EC388A" : (LONDON_KIND_INK[m.kind] ?? BLUE);
-  const r = active ? 9.5 : 7.5;
+  const r = active ? 9.5 : numbered ? 8.5 : 7.5;
   const tail = r * 1.65;
   const body =
     `<path d="M ${cx} ${cy + tail} C ${cx - r * 0.75} ${cy + r * 0.7}, ${cx - r} ${cy + r * 0.35}, ${cx - r} ${cy} ` +
