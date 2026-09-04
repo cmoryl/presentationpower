@@ -27,7 +27,12 @@ import {
 import { londonSafeMm } from "@/lib/next-london-print-geometry";
 import { buildPillarQr } from "@/lib/pillar-qr";
 import { PILLAR_CAPTION_FONTS } from "@/lib/next-pillar-masters";
-import { londonDivisionColourway } from "@/lib/next-london-division";
+import {
+  isLondonDoorItem,
+  londonDoorColourway,
+  londonDoorDivision,
+} from "@/lib/next-london-division";
+
 import { londonLogoPlacement, type LondonLogoPlacement } from "@/lib/next-london-logo-placement";
 
 /** The signage face for NEXT 2026. Bold only — no other weight is approved. */
