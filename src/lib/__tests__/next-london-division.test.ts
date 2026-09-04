@@ -55,7 +55,9 @@ describe("London division signage", () => {
   });
 
   it("gives every door its room's accent and the accent-chevron white mark", () => {
-    const doors = LONDON_PANELS.filter((p) => /\bdoors?\b/i.test(`${p.room} ${p.name}`));
+    // Door branding boards only — the lift doors are shared circulation and
+    // stay on the master mark.
+    const doors = LONDON_PANELS.filter((p) => /door (branding|vinyl|artwork)/i.test(p.name));
     expect(doors.length).toBeGreaterThan(8);
     const accents = new Set<string>();
     for (const panel of doors) {
