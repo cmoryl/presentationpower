@@ -736,8 +736,11 @@ export async function captureSlideAsDataUrl(
   // outlines, icon-swap hints, resize rails. Never belongs in an export.
   const releaseChrome = beginExportChrome();
 
+  const restorePins = pinTextLineCounts(node);
+
   // Give the browser one paint cycle so the neutralized styles settle.
   await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
 
   try {
     report(onProgress, { stage: "render", progress: 0.1, message: "Rasterizing…" });
