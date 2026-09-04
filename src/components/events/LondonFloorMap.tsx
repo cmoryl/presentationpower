@@ -3,9 +3,12 @@
 // The plan is drawn as real DOM so markers stay keyboard reachable, and any
 // marker can be dragged to its true position; corrections persist per browser
 // and flow straight into the SVG / PNG / PDF / zip downloads.
+//
+// Survey furniture (metre grid, scale bar, north arrow, kind legend) matches the
+// exported plans so what the crew reads on screen is what prints.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Crosshair, RotateCcw } from "lucide-react";
+import { Compass, Crosshair, Minus, Plus, RotateCcw, Scan } from "lucide-react";
 
 import {
   LONDON_ASSET_KIND_LABEL,
@@ -32,6 +35,24 @@ const ZONE_FILL: Record<string, string> = {
   exterior: "#F4F7FB",
 };
 
+/** One ink per asset kind so a crowded floor reads at a glance. */
+const KIND_INK: Record<LondonAssetKind, string> = {
+  wall: "#003FC7",
+  banner: "#0B7285",
+  set: "#5A3FC0",
+  floor: "#C77C00",
+  door: "#EC388A",
+  lift: "#8A6BFF",
+  table: "#0F9D58",
+  pillar: "#03002C",
+  "step-repeat": "#C2A3FF",
+  stair: "#7A8699",
+  booth: "#1F7AE0",
+};
+
+const MIN_Z = 1;
+const MAX_Z = 6;
+
 export type LondonFloorMapProps = {
   floor: LondonFloorId;
   panels: LondonPanel[];
@@ -57,17 +78,24 @@ export function LondonFloorMap({
   editable,
 }: LondonFloorMapProps) {
   const plan = londonFloorPlan(floor);
-  const wrapRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const [dragId, setDragId] = useState<string | null>(null);
+  const [view, setView] = useState({ z: 1, x: 0, y: 0 });
+  const panRef = useRef<{ px: number; py: number; ox: number; oy: number } | null>(null);
 
   const markers = useMemo(() => {
     const all = londonFloorMarkers(floor, panels, overrides);
     return kinds.length ? all.filter((m) => kinds.includes(m.kind)) : all;
   }, [floor, panels, overrides, kinds]);
 
+  // Reset the view whenever the floor changes so a new plan opens fully framed.
+  useEffect(() => setView({ z: 1, x: 0, y: 0 }), [floor]);
+
+  /** Client point → plan metres, read off the transformed stage so zoom/pan are already applied. */
   const toPlan = useCallback(
     (clientX: number, clientY: number) => {
-      const el = wrapRef.current;
+      const el = stageRef.current;
       if (!el || !plan) return null;
       const r = el.getBoundingClientRect();
       return {
@@ -77,6 +105,36 @@ export function LondonFloorMap({
     },
     [plan],
   );
+
+  const zoomAt = useCallback((next: number, px: number, py: number) => {
+    setView((v) => {
+      const z = clamp(next, MIN_Z, MAX_Z);
+      const k = z / v.z;
+      return { z, x: px - (px - v.x) * k, y: py - (py - v.y) * k };
+    });
+  }, []);
+
+  // Wheel zoom needs a non-passive listener; React's onWheel cannot preventDefault.
+  const zoomRef = useRef(zoomAt);
+  zoomRef.current = zoomAt;
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 100 : 1);
+      const r = el.getBoundingClientRect();
+      setView((v) => {
+        const z = clamp(v.z * Math.exp(-dy * 0.0018), MIN_Z, MAX_Z);
+        const k = z / v.z;
+        const px = e.clientX - r.left;
+        const py = e.clientY - r.top;
+        return { z, x: px - (px - v.x) * k, y: py - (py - v.y) * k };
+      });
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, []);
 
   useEffect(() => {
     if (!dragId) return;
@@ -93,6 +151,21 @@ export function LondonFloorMap({
     };
   }, [dragId, onMove, toPlan]);
 
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      const s = panRef.current;
+      if (!s) return;
+      setView((v) => ({ ...v, x: s.ox + (e.clientX - s.px), y: s.oy + (e.clientY - s.py) }));
+    };
+    const up = () => (panRef.current = null);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    return () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+  }, []);
+
   if (!plan) {
     return (
       <p className="rounded-xl border border-black/10 bg-white p-5 text-[13px] text-[#03002C]/70">
@@ -104,126 +177,253 @@ export function LondonFloorMap({
   const nudge = (m: LondonMarker, dx: number, dy: number) =>
     onMove(m.panelId, clamp(m.x + dx, 0, plan.w), clamp(m.y + dy, 0, plan.h));
 
+  const kindsPresent = [...new Set(markers.map((m) => m.kind))];
+  const zoomed = view.z > 1.001 || view.x !== 0 || view.y !== 0;
+  const centerZoom = (dir: 1 | -1) => {
+    const r = frameRef.current?.getBoundingClientRect();
+    zoomAt(view.z * (dir === 1 ? 1.4 : 1 / 1.4), (r?.width ?? 0) / 2, (r?.height ?? 0) / 2);
+  };
+
   return (
-    <div
-      ref={wrapRef}
-      className="relative w-full overflow-hidden rounded-xl border border-black/10 bg-white"
-      style={{ aspectRatio: `${plan.w} / ${plan.h}` }}
-      role="group"
-      aria-label={`${plan.label} top-down install map`}
-    >
-      {plan.zones.map((z) => (
+    <div className="min-w-0">
+      <div
+        ref={frameRef}
+        className="relative w-full touch-none overflow-hidden rounded-xl border border-black/10 bg-white"
+        style={{ aspectRatio: `${plan.w} / ${plan.h}` }}
+        role="group"
+        aria-label={`${plan.label} top-down install map`}
+        onPointerDown={(ev) => {
+          if (ev.target !== ev.currentTarget && !(ev.target as HTMLElement).dataset.planSurface)
+            return;
+          onSelect(null);
+          panRef.current = { px: ev.clientX, py: ev.clientY, ox: view.x, oy: view.y };
+        }}
+      >
         <div
-          key={z.id}
-          className="absolute rounded-[5px] border border-[#C9D5EA]"
-          style={{
-            left: `${(z.x / plan.w) * 100}%`,
-            top: `${(z.y / plan.h) * 100}%`,
-            width: `${(z.w / plan.w) * 100}%`,
-            height: `${(z.h / plan.h) * 100}%`,
-            background: ZONE_FILL[z.kind] ?? "#F5F8FD",
-          }}
+          ref={stageRef}
+          data-plan-surface="1"
+          className="absolute inset-0 origin-top-left"
+          style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.z})` }}
         >
-          <span className="absolute left-1.5 top-1 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-[#03002C]/60">
-            {z.label}
+          {/* Metre grid: 1 m hairlines with a heavier 5 m line, so distances are readable. */}
+          <svg
+            data-plan-surface="1"
+            className="absolute inset-0 h-full w-full"
+            viewBox={`0 0 ${plan.w} ${plan.h}`}
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            {Array.from({ length: Math.floor(plan.w) + 1 }, (_, i) => (
+              <line
+                key={`v${i}`}
+                x1={i}
+                y1={0}
+                x2={i}
+                y2={plan.h}
+                stroke="#03002C"
+                strokeOpacity={i % 5 === 0 ? 0.12 : 0.05}
+                strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
+              />
+            ))}
+            {Array.from({ length: Math.floor(plan.h) + 1 }, (_, i) => (
+              <line
+                key={`h${i}`}
+                x1={0}
+                y1={i}
+                x2={plan.w}
+                y2={i}
+                stroke="#03002C"
+                strokeOpacity={i % 5 === 0 ? 0.12 : 0.05}
+                strokeWidth={i % 5 === 0 ? 0.06 : 0.03}
+              />
+            ))}
+          </svg>
+
+          {plan.zones.map((z) => (
+            <div
+              key={z.id}
+              data-plan-surface="1"
+              className="absolute rounded-[5px] border border-[#C9D5EA]"
+              style={{
+                left: `${(z.x / plan.w) * 100}%`,
+                top: `${(z.y / plan.h) * 100}%`,
+                width: `${(z.w / plan.w) * 100}%`,
+                height: `${(z.h / plan.h) * 100}%`,
+                background: ZONE_FILL[z.kind] ?? "#F5F8FD",
+              }}
+            >
+              <span className="absolute left-1.5 top-1 font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-[#03002C]/60">
+                {z.label}
+              </span>
+              <span className="absolute bottom-0.5 right-1.5 font-mono text-[8.5px] tabular-nums text-[#03002C]/40">
+                {z.w.toFixed(1)} × {z.h.toFixed(1)} m
+              </span>
+            </div>
+          ))}
+
+          {plan.entries.map((e) => (
+            <span
+              key={e.label}
+              className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#A1FBF9] px-2 py-0.5 text-[9.5px] font-semibold text-[#03002C]"
+              style={{ left: `${(e.x / plan.w) * 100}%`, top: `${(e.y / plan.h) * 100}%` }}
+            >
+              {e.label}
+            </span>
+          ))}
+
+          {markers.map((m) => {
+            const active = m.panelId === selectedId;
+            const ink = active ? "#EC388A" : m.corrected ? "#0F9D58" : KIND_INK[m.kind];
+            return (
+              <button
+                key={m.panelId}
+                type="button"
+                onPointerDown={(ev) => {
+                  ev.stopPropagation();
+                  onSelect(m.panelId);
+                  if (!editable) return;
+                  ev.preventDefault();
+                  setDragId(m.panelId);
+                }}
+                onKeyDown={(ev) => {
+                  if (!editable) return;
+                  const step = ev.shiftKey ? 1 : 0.25;
+                  if (ev.key === "ArrowLeft") nudge(m, -step, 0);
+                  else if (ev.key === "ArrowRight") nudge(m, step, 0);
+                  else if (ev.key === "ArrowUp") nudge(m, 0, -step);
+                  else if (ev.key === "ArrowDown") nudge(m, 0, step);
+                  else return;
+                  ev.preventDefault();
+                }}
+                title={`${m.name} — ${LONDON_ASSET_KIND_LABEL[m.kind]} · ${LONDON_FACE_LABEL[m.face]} · x ${m.x.toFixed(1)} m / y ${m.y.toFixed(1)} m`}
+                aria-label={`${m.name}, ${LONDON_ASSET_KIND_LABEL[m.kind]}, ${LONDON_FACE_LABEL[m.face]}${
+                  m.corrected ? ", position confirmed" : ""
+                }`}
+                className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full outline-offset-2 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7] ${
+                  active ? "z-20 scale-125" : "z-10 hover:scale-110"
+                } ${editable ? "cursor-grab" : "cursor-pointer"}`}
+                style={{
+                  left: `${(m.x / plan.w) * 100}%`,
+                  top: `${(m.y / plan.h) * 100}%`,
+                  // Pins keep their on-screen size as the plan scales up.
+                  transform: `translate(-50%, -50%) scale(${1 / view.z})`,
+                }}
+              >
+                <span
+                  className={`block h-3.5 w-3.5 border border-[#03002C] shadow-[0_1px_2px_rgba(3,0,44,0.25)] ${shapeClass(m.kind)}`}
+                  style={{ background: ink }}
+                />
+              </button>
+            );
+          })}
+        </div>
+
+        {/* North arrow + scale bar: fixed to the frame, unaffected by zoom. */}
+        <div className="pointer-events-none absolute right-2 top-2 z-30 flex flex-col items-center rounded-md border border-[#03002C]/12 bg-white/90 px-1.5 py-1 text-[#03002C]">
+          <Compass className="h-3.5 w-3.5" />
+          <span className="font-mono text-[9px] font-semibold tracking-[0.1em]">N</span>
+        </div>
+        <div className="pointer-events-none absolute bottom-2 right-2 z-30 rounded-md border border-[#03002C]/12 bg-white/90 px-2 py-1">
+          <div
+            className="h-1.5 border border-[#03002C]/70 bg-[linear-gradient(90deg,#03002C_0_50%,transparent_50%_100%)]"
+            style={{ width: `${(5 / plan.w) * 100 * view.z}%`, minWidth: 26 }}
+          />
+          <span className="mt-0.5 block font-mono text-[9px] tabular-nums text-[#03002C]/70">
+            5 m
           </span>
         </div>
-      ))}
 
-      {plan.entries.map((e) => (
-        <span
-          key={e.label}
-          className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#A1FBF9] px-2 py-0.5 text-[9.5px] font-semibold text-[#03002C]"
-          style={{ left: `${(e.x / plan.w) * 100}%`, top: `${(e.y / plan.h) * 100}%` }}
-        >
-          {e.label}
-        </span>
-      ))}
+        {/* Zoom controls */}
+        <div className="pointer-events-none absolute left-2 top-2 z-30 flex items-center gap-1">
+          {[
+            { k: "in", icon: Plus, label: "Zoom in", act: () => centerZoom(1) },
+            { k: "out", icon: Minus, label: "Zoom out", act: () => centerZoom(-1) },
+            {
+              k: "fit",
+              icon: Scan,
+              label: "Fit plan to frame",
+              act: () => setView({ z: 1, x: 0, y: 0 }),
+            },
+          ].map((c) => (
+            <button
+              key={c.k}
+              type="button"
+              onClick={c.act}
+              aria-label={c.label}
+              title={c.label}
+              className="pointer-events-auto rounded-md border border-[#03002C]/15 bg-white/90 p-1 text-[#03002C] hover:bg-white"
+            >
+              <c.icon className="h-3.5 w-3.5" />
+            </button>
+          ))}
+          <span className="rounded-md border border-[#03002C]/12 bg-white/90 px-1.5 py-0.5 font-mono text-[9.5px] tabular-nums text-[#03002C]/70">
+            {view.z.toFixed(1)}×
+          </span>
+        </div>
 
-      {markers.map((m) => {
-        const active = m.panelId === selectedId;
-        return (
-          <button
-            key={m.panelId}
-            type="button"
-            onPointerDown={(ev) => {
-              if (!editable) return;
-              ev.preventDefault();
-              onSelect(m.panelId);
-              setDragId(m.panelId);
-            }}
-            onClick={() => onSelect(active ? null : m.panelId)}
-            onKeyDown={(ev) => {
-              if (!editable) return;
-              const step = ev.shiftKey ? 1 : 0.25;
-              if (ev.key === "ArrowLeft") nudge(m, -step, 0);
-              else if (ev.key === "ArrowRight") nudge(m, step, 0);
-              else if (ev.key === "ArrowUp") nudge(m, 0, -step);
-              else if (ev.key === "ArrowDown") nudge(m, 0, step);
-              else return;
-              ev.preventDefault();
-            }}
-            title={`${m.name} — ${LONDON_ASSET_KIND_LABEL[m.kind]}`}
-            aria-label={`${m.name}, ${LONDON_ASSET_KIND_LABEL[m.kind]}, ${LONDON_FACE_LABEL[m.face]}${
-              m.corrected ? ", position confirmed" : ""
-            }`}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full outline-offset-2 transition-transform focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#003FC7] ${
-              active ? "z-20 scale-125" : "z-10 hover:scale-110"
-            } ${editable ? "cursor-grab" : "cursor-pointer"}`}
-            style={{ left: `${(m.x / plan.w) * 100}%`, top: `${(m.y / plan.h) * 100}%` }}
-          >
-            <span
-              className={`block h-3.5 w-3.5 border ${shapeClass(m.kind)} ${
-                active
-                  ? "border-[#8f0f47] bg-[#EC388A]"
-                  : m.corrected
-                    ? "border-[#03002C] bg-[#A6FA87]"
-                    : "border-[#03002C] bg-[#003FC7]"
-              }`}
-            />
-          </button>
-        );
-      })}
-
-      {selectedId
-        ? (() => {
-            const m = markers.find((x) => x.panelId === selectedId);
-            if (!m) return null;
-            return (
-              <div className="absolute bottom-2 left-2 right-2 z-30 rounded-lg border border-[#03002C]/15 bg-white/95 p-3 shadow-sm backdrop-blur">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <p className="text-[13px] font-semibold text-[#03002C]">{m.name}</p>
-                    <p className="mt-0.5 text-[11.5px] text-[#03002C]/70">
-                      {LONDON_ASSET_KIND_LABEL[m.kind]} · {m.room} ·{" "}
-                      {LONDON_FACE_LABEL[m.face]} · x {m.x.toFixed(1)} m / y {m.y.toFixed(1)} m
+        {selectedId
+          ? (() => {
+              const m = markers.find((x) => x.panelId === selectedId);
+              if (!m) return null;
+              return (
+                <div className="absolute bottom-2 left-2 right-2 z-30 rounded-lg border border-[#03002C]/15 bg-white/95 p-3 shadow-sm backdrop-blur">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <p className="text-[13px] font-semibold text-[#03002C]">{m.name}</p>
+                      <p className="mt-0.5 text-[11.5px] text-[#03002C]/70">
+                        {LONDON_ASSET_KIND_LABEL[m.kind]} · {m.room} · {LONDON_FACE_LABEL[m.face]} · x{" "}
+                        {m.x.toFixed(1)} m / y {m.y.toFixed(1)} m
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-[#E0E8F5] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#03002C]/70">
+                        <Crosshair className="h-3 w-3" />
+                        {m.corrected ? "confirmed" : "schematic"}
+                      </span>
+                      {editable && m.corrected ? (
+                        <button
+                          type="button"
+                          onClick={() => onResetOne(m.panelId)}
+                          className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/20 px-2 py-0.5 text-[11px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
+                        >
+                          <RotateCcw className="h-3 w-3" /> Reset
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
+                  {editable ? (
+                    <p className="mt-1.5 text-[11px] text-[#03002C]/55">
+                      Drag the pin, or use the arrow keys (hold Shift for a 1 m step). Scroll to
+                      zoom, drag the plan to pan.
                     </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-[#E0E8F5] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.1em] text-[#03002C]/70">
-                      <Crosshair className="h-3 w-3" />
-                      {m.corrected ? "confirmed" : "schematic"}
-                    </span>
-                    {editable && m.corrected ? (
-                      <button
-                        type="button"
-                        onClick={() => onResetOne(m.panelId)}
-                        className="inline-flex items-center gap-1 rounded-full border border-[#03002C]/20 px-2 py-0.5 text-[11px] font-semibold text-[#03002C] hover:bg-[#F2F2F2]"
-                      >
-                        <RotateCcw className="h-3 w-3" /> Reset
-                      </button>
-                    ) : null}
-                  </div>
+                  ) : null}
                 </div>
-                {editable ? (
-                  <p className="mt-1.5 text-[11px] text-[#03002C]/55">
-                    Drag the pin, or use the arrow keys (hold Shift for a 1 m step).
-                  </p>
-                ) : null}
-              </div>
-            );
-          })()
-        : null}
+              );
+            })()
+          : null}
+      </div>
+
+      {/* Legend — same glyph vocabulary as the printed plans. */}
+      <ul className="mt-2 flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
+        {kindsPresent.map((k) => (
+          <li key={k} className="flex items-center gap-1.5 text-[11px] text-[#03002C]/70">
+            <span
+              className={`block h-2.5 w-2.5 border border-[#03002C] ${shapeClass(k)}`}
+              style={{ background: KIND_INK[k] }}
+            />
+            {LONDON_ASSET_KIND_LABEL[k]}
+          </li>
+        ))}
+        <li className="flex items-center gap-1.5 text-[11px] text-[#03002C]/70">
+          <span className="block h-2.5 w-2.5 rounded-full border border-[#03002C] bg-[#0F9D58]" />
+          Position confirmed
+        </li>
+        {zoomed ? (
+          <li className="ml-auto font-mono text-[10px] uppercase tracking-[0.1em] text-[#03002C]/50">
+            View {view.z.toFixed(1)}× — press fit to reframe
+          </li>
+        ) : null}
+      </ul>
     </div>
   );
 }
