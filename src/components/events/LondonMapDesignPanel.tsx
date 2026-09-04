@@ -7,6 +7,7 @@ import { RotateCcw } from "lucide-react";
 
 import {
   DEFAULT_MAP_DESIGN,
+  MAP_ACCENT_SWATCHES,
   MAP_THEME_LABEL,
   mapPalette,
   type MapDesign,
@@ -17,6 +18,8 @@ import {
   type MapPinShape,
   type MapThemeId,
 } from "@/lib/next-london-floormap-design";
+import { MAP_LOGO_LABEL, type MapLogoId } from "@/lib/next-london-floormap-logos";
+import { LONDON_VENUE } from "@/lib/next-london-signage";
 
 export type LondonMapDesignPanelProps = {
   design: MapDesign;
