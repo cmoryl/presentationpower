@@ -11,7 +11,7 @@ import { AppShell } from "@/components/AppShell";
 import { useSessionUser } from "@/hooks/use-session-user";
 
 import { listTeamTemplates, getTemplateDeck } from "@/lib/cloud-decks.functions";
-import { BRAND_MODES, MODULE_VARIANTS, byId } from "@/lib/taxonomy";
+
 import { resolveBrandMode } from "@/lib/brand-profiles";
 import { useDeckStore, type TemplatePayload } from "@/lib/deck-store";
 
