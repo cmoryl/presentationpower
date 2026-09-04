@@ -54,6 +54,27 @@ describe("London division signage", () => {
     expect(svg).toContain(stops[stops.length - 1]!);
   });
 
+  it("gives every door its room's accent and the accent-chevron white mark", () => {
+    const doors = LONDON_PANELS.filter((p) => /\bdoors?\b/i.test(`${p.room} ${p.name}`));
+    expect(doors.length).toBeGreaterThan(8);
+    const accents = new Set<string>();
+    for (const panel of doors) {
+      const plan = londonBrandingPlan(panel);
+      const accent = londonDivisionAccent(plan.familyId);
+      expect(accent, panel.name).toBeTruthy();
+      accents.add(accent!.hex);
+      expect(plan.colourway, panel.name).toBe("white-accent");
+      // Dark head untouched: the mark keeps full contrast on every door.
+      const stops = londonPanelStops(panel);
+      expect(stops[0]).toBe(LONDON_STYLES[panel.style]!.stops[0]);
+      expect(stops[stops.length - 1]).not.toBe(
+        LONDON_STYLES[panel.style]!.stops[LONDON_STYLES[panel.style]!.stops.length - 1],
+      );
+    }
+    // Variety across the door family, cohesion from the shared dark head.
+    expect(accents.size).toBeGreaterThan(4);
+  });
+
   it("leaves master-brand panels on the approved ramp", () => {
     const master = LONDON_PANELS.find((p) => londonPanelFamily(p) === "transperfect")!;
     expect(londonPanelStops(master)).toEqual(LONDON_STYLES[master.style]!.stops);
