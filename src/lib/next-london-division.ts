@@ -133,16 +133,29 @@ function mix(a: string, b: string, t: number): string {
 export const LONDON_DIVISION_ACCENT_WEIGHT = 0.34;
 
 /**
- * Tint a panel ramp with its division accent. The first stop (the dark head
- * that carries the lockup) is untouched; weight ramps up to
- * `LONDON_DIVISION_ACCENT_WEIGHT` at the last stop.
+ * Doors carry a stronger soft-focus accent than scenic panels: a door is a
+ * single small board read at arm's length, so the room's division has to be
+ * obvious on it. The dark head stays untouched, which is what keeps every door
+ * in the venue cohesive no matter which accent is blooming behind the mark.
  */
-export function londonDivisionStops(familyId: string, stops: string[]): string[] {
+export const LONDON_DOOR_ACCENT_WEIGHT = 0.56;
+
+/**
+ * Tint a panel ramp with its division accent. The first stop (the dark head
+ * that carries the lockup) is untouched; weight ramps up to `weight` (default
+ * `LONDON_DIVISION_ACCENT_WEIGHT`) at the last stop.
+ */
+export function londonDivisionStops(
+  familyId: string,
+  stops: string[],
+  weight: number = LONDON_DIVISION_ACCENT_WEIGHT,
+): string[] {
   const accent = londonDivisionAccent(familyId);
   if (!accent || stops.length < 2) return stops;
   const last = stops.length - 1;
   return stops.map((stop, i) => {
-    const t = (i / last) ** 1.4 * LONDON_DIVISION_ACCENT_WEIGHT;
+    const t = (i / last) ** 1.4 * weight;
     return i === 0 ? stop : mix(stop, accent.hex, t);
+
   });
 }
