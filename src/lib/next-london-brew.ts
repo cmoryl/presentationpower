@@ -1,21 +1,24 @@
 /**
  * NEXTbrew signage theming.
  *
- * The brew ground (`11-brew-diagonal`) used to be a bare gradient, which read
- * as "generic panel with a lockup on it" next to the rest of the London pack.
- * This adds an editable café motif on top of the ground: concentric cup rings
- * (the ring a cup leaves on a table top), a set of steam curves, and a bean
- * tick row. Every mark is a live vector object in both masters — nothing is
- * rasterised and nothing is baked into the gradient.
+ * The café panels used to carry floating vector doodles (a cup ring, three
+ * steam curls, a bean row), which read as clip art sitting on top of a
+ * gradient. They are gone. In their place the brew ground gets a *seamless*
+ * geometric line field that runs edge to edge, over and through the gradient:
+ * a fine diagonal rule lattice plus repeating scallop arcs — the rhythm of a
+ * cup sleeve, a tiled counter front and an awning, which is the register the
+ * high-street coffee brands work in.
  *
- * Geometry is expressed in mm on the bleed sheet so the SVG and the `.ai`
- * agree, and it is scaled from the panel's short edge so a 488mm table top and
- * a 2394mm fascia both read at arm's length.
+ * Every line is a live vector object in both masters (nothing rasterised,
+ * nothing baked into the gradient), the pitch is derived from the panel's
+ * short edge so a 700mm table top and a 2394mm fascia read the same at arm's
+ * length, and each band uses whole periods clipped to the bleed sheet so the
+ * pattern is continuous across the trim on every side.
  */
 
 import type { LondonPanel } from "@/lib/next-london-signage";
 
-/** One motif mark. Filled shapes use `fill`; ring/steam strokes use `stroke`. */
+/** One motif mark. Filled shapes use `fill`; line/arc strokes use `stroke`. */
 export type BrewMark =
   | { kind: "ring"; cx: number; cy: number; r: number; width: number; alpha: number }
   | { kind: "path"; d: string; width: number; alpha: number }
@@ -37,85 +40,111 @@ function f(n: number): string {
 }
 
 /**
- * Steam curve: a vertical ribbon of two mirrored bows, drawn upward from
- * (x, y) over `height` with `sway` lateral travel.
+ * Clip a long segment to the bleed rectangle (Liang–Barsky). Lattice lines are
+ * generated well past the sheet so the pattern has no visible start or end;
+ * this trims them to the artboard without changing their phase.
  */
-function steamPath(x: number, y: number, height: number, sway: number): string {
-  const h1 = height * 0.5;
-  return [
-    `M ${f(x)} ${f(y)}`,
-    `C ${f(x + sway)} ${f(y - h1 * 0.45)} ${f(x - sway)} ${f(y - h1 * 0.6)} ${f(x)} ${f(y - h1)}`,
-    `C ${f(x + sway)} ${f(y - h1 - h1 * 0.4)} ${f(x - sway)} ${f(y - h1 - h1 * 0.55)} ${f(x)} ${f(y - height)}`,
-  ].join(" ");
+function clipSegment(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  w: number,
+  h: number,
+): [number, number, number, number] | null {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  let t0 = 0;
+  let t1 = 1;
+  const edges: Array<[number, number]> = [
+    [-dx, x1],
+    [dx, w - x1],
+    [-dy, y1],
+    [dy, h - y1],
+  ];
+  for (const [p, q] of edges) {
+    if (p === 0) {
+      if (q < 0) return null;
+      continue;
+    }
+    const r = q / p;
+    if (p < 0) {
+      if (r > t1) return null;
+      if (r > t0) t0 = r;
+    } else {
+      if (r < t0) return null;
+      if (r < t1) t1 = r;
+    }
+  }
+  return [x1 + t0 * dx, y1 + t0 * dy, x1 + t1 * dx, y1 + t1 * dy];
+}
+
+/** A run of parallel 45° rules at `pitch`, covering the whole sheet. */
+function latticePaths(w: number, h: number, pitch: number, slope: 1 | -1): string[] {
+  const span = w + h;
+  const out: string[] = [];
+  for (let c = -span; c <= span; c += pitch) {
+    // y = slope * x + c, sampled far outside the sheet then clipped.
+    const seg = clipSegment(-span, slope * -span + c, span, slope * span + c, w, h);
+    if (!seg) continue;
+    out.push(`M ${f(seg[0])} ${f(seg[1])} L ${f(seg[2])} ${f(seg[3])}`);
+  }
+  return out;
+}
+
+/**
+ * A scallop band: half-circle arcs repeated across the full width, written as
+ * cubic segments (the `.ai` writer takes M/L/C). `up` flips the bulge. The run
+ * starts a whole period before the left edge so the rhythm continues off both
+ * sides of the sheet.
+ */
+function scallopPath(w: number, y: number, r: number, up: boolean): string {
+  const k = 0.5523 * r;
+  const dir = up ? -1 : 1;
+  const parts: string[] = [`M ${f(-2 * r)} ${f(y)}`];
+  for (let x = -2 * r; x < w + 2 * r; x += 2 * r) {
+    parts.push(
+      `C ${f(x + k)} ${f(y + dir * k)} ${f(x + 2 * r - k)} ${f(y + dir * k)} ${f(x + 2 * r)} ${f(y)}`,
+    );
+  }
+  return parts.join(" ");
 }
 
 /**
  * Motif for a brew panel. `light` flips the ink for the pale grounds so the
- * marks stay visible without shouting over the lockup.
+ * line field stays visible without shouting over the lockup.
  */
 export function brewMotifPlan(panel: LondonPanel, light = false): BrewMotifPlan {
   const w = panel.bleedW;
   const h = panel.bleedH;
   const short = Math.min(w, h);
-  const long = Math.max(w, h);
-  const wide = w / h >= 1.6;
 
   const marks: BrewMark[] = [];
 
-  // Cup rings, anchored off the trailing edge so the hero lockup (which sits in
-  // the live band) never fights them.
-  const ringR = short * (wide ? 0.34 : 0.3);
-  const rx = wide ? w * 0.86 : w * 0.78;
-  const ry = wide ? h * 0.68 : h * 0.82;
-  const ringWidth = Math.max(2, short * 0.008);
-  for (const [scale, alpha] of [
-    [1, 0.2],
-    [0.76, 0.13],
-    [0.52, 0.09],
-  ] as const) {
-    marks.push({ kind: "ring", cx: rx, cy: ry, r: ringR * scale, width: ringWidth, alpha });
+  // Diagonal rule lattice. The dominant direction is tight and quiet; the
+  // counter direction is half as dense and fainter, so the field reads as a
+  // woven sleeve texture rather than a grid.
+  const pitch = Math.max(18, short * 0.075);
+  const hair = Math.max(0.8, short * 0.0032);
+  for (const d of latticePaths(w, h, pitch, 1)) {
+    marks.push({ kind: "path", d, width: hair, alpha: 0.14 });
+  }
+  for (const d of latticePaths(w, h, pitch * 2, -1)) {
+    marks.push({ kind: "path", d, width: hair, alpha: 0.07 });
   }
 
-  // Steam ribbons rising from the opposite corner.
-  const steamBase = wide ? h * 0.9 : h * 0.94;
-  const steamH = short * (wide ? 0.42 : 0.3);
-  const sx = wide ? w * 0.1 : w * 0.22;
-  const gap = short * 0.075;
-  const steamWidth = Math.max(1.6, short * 0.0065);
-  marks.push(
-    {
-      kind: "path",
-      d: steamPath(sx - gap, steamBase, steamH * 0.78, gap * 0.5),
-      width: steamWidth,
-      alpha: 0.16,
-    },
-    {
-      kind: "path",
-      d: steamPath(sx, steamBase, steamH, gap * 0.6),
-      width: steamWidth,
-      alpha: 0.22,
-    },
-    {
-      kind: "path",
-      d: steamPath(sx + gap, steamBase, steamH * 0.7, gap * 0.45),
-      width: steamWidth,
-      alpha: 0.14,
-    },
-  );
-
-  // Bean tick row: a quiet rhythm along the leading edge, sized off the long
-  // edge so short panels get fewer ticks instead of a cramped row.
-  const beanR = Math.max(1.4, short * 0.009);
-  const beanGap = beanR * 5;
-  const count = Math.max(3, Math.min(9, Math.floor((long * 0.28) / beanGap)));
-  const beanY = h * 0.06;
-  for (let i = 0; i < count; i++) {
+  // Scallop bands — awning / cup-sleeve arcs, whole periods, full width.
+  const scallopR = Math.max(14, short * 0.11);
+  for (const [ratio, alpha, up] of [
+    [0.28, 0.1, true],
+    [0.72, 0.16, false],
+    [0.9, 0.09, false],
+  ] as const) {
     marks.push({
-      kind: "bean",
-      cx: w * 0.06 + i * beanGap,
-      cy: beanY,
-      r: beanR,
-      alpha: 0.26 - i * 0.02,
+      kind: "path",
+      d: scallopPath(w, h * ratio, scallopR, up),
+      width: Math.max(1.1, short * 0.0045),
+      alpha,
     });
   }
 
