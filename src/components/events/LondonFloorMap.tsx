@@ -180,7 +180,7 @@ export function LondonFloorMap({
         className="relative w-full touch-none overflow-hidden rounded-2xl border border-[#03002C]/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]"
         style={{
           aspectRatio: `${plan.w} / ${plan.h}`,
-          background: palette.walkway,
+          backgroundColor: palette.walkway,
           backgroundImage:
             "repeating-linear-gradient(135deg, rgba(255,255,255,0.55) 0 1px, transparent 1px 9px)",
         }}
