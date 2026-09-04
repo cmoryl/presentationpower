@@ -754,12 +754,13 @@ registerSlideModule({
                         <div
                           data-intro-item=""
                           data-intro-step={si * 2 + 2}
-                          className="mt-8 flex w-full flex-col"
+                          className={slim ? "mt-5 flex w-full flex-col" : "mt-8 flex w-full flex-col"}
                           style={{ gap: 0 }}
                         >
                           {tasks.map((t, ti) => {
                             const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
-                            const taskGap = wide ? 4 : 3;
+                            const taskGap = wide ? 4 : slim ? 2 : 3;
+                            const wellRadius = slim ? 12 : 18;
                             return (
                               <React.Fragment key={ti}>
                                 {ti > 0 && (
@@ -769,17 +770,23 @@ registerSlideModule({
                                     className="flex items-center justify-center"
                                     style={{
                                       width: iconBox,
-                                      height: wide ? 26 : 20,
+                                      height: wide ? 26 : slim ? 14 : 20,
                                       marginTop: taskGap,
                                       marginBottom: taskGap,
                                       color: accent,
                                     }}
                                   >
-                                    <ChevronsDown size={wide ? 24 : 18} strokeWidth={2.5} />
+                                    <ChevronsDown
+                                      size={wide ? 24 : slim ? 14 : 18}
+                                      strokeWidth={slim ? 2 : 2.5}
+                                    />
                                   </div>
                                 )}
 
-                                <div className="flex items-center" style={{ gap: wide ? 24 : 18 }}>
+                                <div
+                                  className="flex items-center"
+                                  style={{ gap: wide ? 24 : slim ? 14 : 18 }}
+                                >
                                   <div
                                     className="relative flex shrink-0 items-center justify-center"
                                     style={{ width: iconBox, height: iconBox, ...iconWellStyle(t) }}
@@ -789,7 +796,7 @@ registerSlideModule({
                                       data-decorative
                                       className="absolute inset-0"
                                       style={{
-                                        borderRadius: 18,
+                                        borderRadius: wellRadius,
                                         backgroundImage: cellWash(t, cellAccent(t, accent, mode)),
                                       }}
                                     />
@@ -797,8 +804,9 @@ registerSlideModule({
                                       aria-hidden
                                       data-decorative
                                       className="absolute inset-0"
-                                      style={openBottomFrame(cellAccent(t, accent, mode), 18)}
+                                      style={openBottomFrame(cellAccent(t, accent, mode), wellRadius)}
                                     />
+
                                     <span
                                       className="relative"
                                       style={{ color: cellAccent(t, accent, mode) }}
