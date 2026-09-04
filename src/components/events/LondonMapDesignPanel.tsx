@@ -127,7 +127,69 @@ export function LondonMapDesignPanel({ design, onChange, roomsOnly }: LondonMapD
       </div>
 
       <div className="mt-3.5 space-y-3.5">
+        <Group title="Brand">
+          <div className="flex flex-wrap gap-2">
+            {(Object.keys(MAP_LOGO_LABEL) as MapLogoId[]).map((id) => (
+              <Toggle
+                key={id}
+                title={MAP_LOGO_LABEL[id]}
+                active={design.logo === id}
+                onClick={() => set("logo", id)}
+              />
+            ))}
+          </div>
+          {design.logo !== "none" ? (
+            <>
+              <Slider
+                id="map-logo-scale"
+                title="Logo height"
+                value={design.logoScale}
+                min={12}
+                max={46}
+                step={1}
+                suffix=" px"
+                onChange={(v) => set("logoScale", v)}
+              />
+              <Toggle
+                title="Single-ink logo"
+                active={design.logoMono}
+                onClick={() => set("logoMono", !design.logoMono)}
+              />
+            </>
+          ) : null}
+          <div>
+            <label htmlFor="map-venue" className={label}>
+              Venue name
+            </label>
+            <input
+              id="map-venue"
+              value={design.venueName}
+              onChange={(e) => set("venueName", e.target.value)}
+              placeholder={LONDON_VENUE.venue}
+              className={field}
+            />
+          </div>
+          <div>
+            <label htmlFor="map-event" className={label}>
+              Event name
+            </label>
+            <input
+              id="map-event"
+              value={design.eventName}
+              onChange={(e) => set("eventName", e.target.value)}
+              placeholder="TransPerfect NEXT 2026"
+              className={field}
+            />
+          </div>
+          <Toggle
+            title="Brand colour strip"
+            active={design.brandBar}
+            onClick={() => set("brandBar", !design.brandBar)}
+          />
+        </Group>
+
         <Group title="Look and colour">
+
           <div className="flex flex-wrap gap-2">
             {(Object.keys(MAP_THEME_LABEL) as MapThemeId[]).map((t) => (
               <Toggle
