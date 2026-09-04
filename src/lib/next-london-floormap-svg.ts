@@ -411,7 +411,29 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
             )} × ${z.h.toFixed(1)} m</text>`
           : "";
 
-      return `<g>${tile}${label}${dims}</g>`;
+      // Category icon, top-right of the tile: the directory symbol for this kind
+      // of space. It sits away from both the label baseline and the pin field.
+      const iconSize = Math.min(22, Math.max(12, Math.min(w, h) * 0.3));
+      const icon =
+        DESIGN.icons !== false && w > iconSize * 2.6 && h > iconSize * 1.7 && !quiet
+          ? areaIconSvg(
+              z.kind,
+              x + w - iconSize / 2 - 7,
+              y + iconSize / 2 + 6,
+              iconSize,
+              style.accent,
+              0.8,
+            )
+          : "";
+
+      // An area the team sectioned off themselves is drawn as a dashed overlay so
+      // it never reads as a wall the venue built.
+      const custom = isCustomAreaId(z.id)
+        ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="none" stroke="${style.accent}" stroke-width="1.4" stroke-dasharray="5 3" opacity="0.9" />`
+        : "";
+
+      return `<g>${tile}${custom}${icon}${label}${dims}</g>`;
+
     })
     .join("");
 
