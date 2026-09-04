@@ -322,7 +322,11 @@ export function LondonFloorMap({
                   top: `${(z.y / plan.h) * 100}%`,
                   width: `${(z.w / plan.w) * 100}%`,
                   height: `${(z.h / plan.h) * 100}%`,
-                  background: style.fill,
+                  // Sectioned areas wash over the plan so the room and pins below
+                  // still read; venue rooms are solid tiles.
+                  background: own
+                    ? `color-mix(in srgb, ${style.accent} 14%, transparent)`
+                    : style.fill,
                   borderColor: own ? style.accent : undefined,
                 }}
                 onPointerDown={

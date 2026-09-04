@@ -379,10 +379,15 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
       const w = Math.max(6, z.w * PPM - inset * 2);
       const h = Math.max(6, z.h * PPM - inset * 2);
       const bar = Math.min(4, w * 0.1);
+      const own = isCustomAreaId(z.id);
+      // A sectioned area is a translucent wash, not an opaque tile: whatever the
+      // venue drew underneath — and any pin inside it — must still read.
       const tile =
-        `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.fill}" stroke="${LINE}" stroke-width="1"${
-          quiet ? "" : ' filter="url(#ldn-tile)"'
-        } />` +
+        (own
+          ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.accent}" fill-opacity="0.12" />`
+          : `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="${style.fill}" stroke="${LINE}" stroke-width="1"${
+              quiet ? "" : ' filter="url(#ldn-tile)"'
+            } />`) +
         `<path d="M ${n(x)} ${n(y + 3)} a 3 3 0 0 1 3 -3 h ${n(bar)} v ${n(h)} h ${n(-bar)} a 3 3 0 0 1 -3 -3 Z" fill="${style.accent}" opacity="${
           quiet ? 0.6 : 0.95
         }" />`;
@@ -428,12 +433,11 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
 
       // An area the team sectioned off themselves is drawn as a dashed overlay so
       // it never reads as a wall the venue built.
-      const custom = isCustomAreaId(z.id)
+      const custom = own
         ? `<rect x="${n(x)}" y="${n(y)}" width="${n(w)}" height="${n(h)}" rx="3" fill="none" stroke="${style.accent}" stroke-width="1.4" stroke-dasharray="5 3" opacity="0.9" />`
         : "";
 
       return `<g>${tile}${custom}${icon}${label}${dims}</g>`;
-
     })
     .join("");
 
