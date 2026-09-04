@@ -13,6 +13,7 @@ import {
 } from "@/lib/stat-format";
 import { ReorderHandle, ReorderNudge, useReorder } from "./ReorderRow";
 import { canMoveDown, canMoveUp } from "@/lib/reorder";
+import { reorderOrbits } from "@/lib/orbit-layout";
 
 type Row = Record<string, unknown>;
 
@@ -224,6 +225,7 @@ export function OrbitContentPanel({
         hint="Prefix and suffix override whatever sits around the number; decimals round it."
         items={rows(content.orbits)}
         onChange={(next) => onChangeField("orbits", next)}
+        keepPlacement
       />
 
       <StatRows
