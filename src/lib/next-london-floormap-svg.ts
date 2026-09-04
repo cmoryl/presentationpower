@@ -231,7 +231,33 @@ function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): s
   return `<g>${out.join("")}</g>`;
 }
 
-function planBody(plan: LondonFloorPlan, ox: number, oy: number): string {
+/** Attendee room key: one chip per named room, inked by its category. */
+function roomKeyRow(plan: LondonFloorPlan, x: number, y: number, w: number): string {
+  const rooms = plan.zones.filter((z) => z.kind !== "circulation" && z.kind !== "core");
+  const out: string[] = [];
+  let cx = x;
+  let cy = y;
+  for (const z of rooms) {
+    const label = z.label.toUpperCase();
+    const cw = label.length * 5.5 + 26;
+    if (cx + cw > x + w) {
+      cx = x;
+      cy += 19;
+    }
+    out.push(
+      `<g><rect x="${n(cx)}" y="${n(cy - 10)}" width="${n(cw)}" height="16" rx="8" fill="${PAPER}" stroke="${LINE}" stroke-width="1" />` +
+        `<circle cx="${n(cx + 10)}" cy="${n(cy - 2)}" r="3.4" fill="${LONDON_ZONE_STYLE[z.kind].accent}" />` +
+        `<text x="${n(cx + 18)}" y="${n(cy + 1.5)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.8">${esc(
+          label,
+        )}</text></g>`,
+    );
+    cx += cw + 7;
+  }
+  return `<g>${out.join("")}</g>`;
+}
+
+function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = false): string {
+
   const pw = plan.w * PPM;
   const ph = plan.h * PPM;
   const ground = `<rect x="${n(ox)}" y="${n(oy)}" width="${n(pw)}" height="${n(ph)}" rx="3" fill="${WALKWAY}" stroke="${LINE}" stroke-width="1" />`;
