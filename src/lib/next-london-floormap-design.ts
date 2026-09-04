@@ -76,6 +76,8 @@ export type MapDesign = {
   roomDims: boolean;
   /** Show scale bar + north point in the header. */
   compass: boolean;
+  /** Category icons on room tiles and in the sheet key. */
+  icons: boolean;
   /** PDF page setup. */
   paper: MapPaper;
   orientation: MapOrientation;
@@ -103,6 +105,7 @@ export const DEFAULT_MAP_DESIGN: MapDesign = {
   roomLabelScale: 1,
   roomDims: true,
   compass: true,
+  icons: true,
   paper: "A3",
   orientation: "landscape",
   exportScale: 2.5,
