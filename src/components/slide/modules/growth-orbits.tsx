@@ -11,6 +11,12 @@ import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { orbitBaseSize, resolveOrbitLayout } from "@/lib/orbit-layout";
 import {
+  orbitDotColor,
+  orbitRingColor,
+  resolveOrbitFace,
+  type OrbitFaceStyle,
+} from "@/lib/orbit-style";
+import {
   MAX_WALL_LOGOS,
   resolveLogoWall,
   wallLogoMaxHeight,
@@ -109,6 +115,8 @@ registerSlideModule({
     const growth = arr(c.growth).slice(0, MAX_GROWTH);
     const orbits = arr(c.orbits).slice(0, MAX_ORBITS);
     const wall = resolveLogoWall(c.logoWall);
+    // Ring colour, weight and dot treatment are authored per face.
+    const ringFace = resolveOrbitFace(c.orbitStyle, mode === "dark" ? "dark" : "light");
 
 
     const tileBg = bareSurfaces ? "transparent" : isDark ? "#FFFFFF" : "rgba(10,15,28,0.02)";
@@ -306,7 +314,7 @@ registerSlideModule({
                     transform: "translate(-50%, -50%)",
                   }}
                 >
-                  <OrbitRing accent={accent} size={size} />
+                  <OrbitRing accent={accent} size={size} face={ringFace} />
                   <div className="absolute inset-[9%] flex flex-col items-center justify-center text-center">
 
                     {s(o.label) && (
