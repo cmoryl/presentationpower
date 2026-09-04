@@ -6,6 +6,7 @@
 
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
+import { resolveOrbitLayout } from "./orbit-layout";
 import { fitTrackedBox } from "./export-tracked-fit";
 import {
   setExportChartStyle,
@@ -12090,10 +12091,17 @@ function renderGrowthOrbits(
   const orbits = arr(c.orbits).slice(0, 3);
   const top = headline ? 1.5 : 0.6;
   const avail = 6.8 - top;
-  const ringH = Math.min(1.95, avail / Math.max(orbits.length, 1) - 0.1);
+  // Each figure keeps the placement authored on the slide (percentages of the
+  // right-hand area), so the exported deck matches what the editor shows.
+  const layout = resolveOrbitLayout(orbits);
+  const baseH = Math.min(1.95, avail / Math.max(orbits.length, 1) - 0.1);
   orbits.forEach((o, k) => {
-    const oy = top + k * (ringH + 0.1);
-    const ox = RX + (k % 2 === 1 ? RW - ringH : 0);
+    const pos = layout[k]!;
+    const ringH = baseH * pos.size;
+    const cx = RX + (pos.x / 100) * RW;
+    const cy = top + (pos.y / 100) * avail;
+    const ox = Math.min(RX + RW - ringH, Math.max(RX, cx - ringH / 2));
+    const oy = Math.min(top + avail - ringH, Math.max(top, cy - ringH / 2));
     s.addShape("ellipse", {
       x: ox,
       y: oy,
