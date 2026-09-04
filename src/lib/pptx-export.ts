@@ -12002,11 +12002,20 @@ function renderGrowthOrbits(
     });
     const logoData = itemLogos[k];
     if (logoData) {
+      const markW = tileW * Math.min(0.96, 0.86 * wall.scale);
+      const markH = tileH * Math.min(0.94, 0.68 * wall.scale);
       s.addImage({
         data: logoData,
-        ...containFrame(logoData, x + 0.1, ty + 0.08, tileW - 0.2, tileH - 0.16),
+        ...containFrame(
+          logoData,
+          x + (tileW - markW) / 2,
+          ty + (tileH - markH) / 2,
+          markW,
+          markH,
+        ),
       });
     } else {
+
       s.addText(str(it.name || it.client), {
         x,
         y: ty,
