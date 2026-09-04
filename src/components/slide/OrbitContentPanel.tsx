@@ -50,16 +50,37 @@ function StatRows({
   return (
     <div className="mt-5">
       <span className={LABEL}>{title}</span>
-      <p className="mt-1 text-[11px] text-black/55">{hint}</p>
+      <p className="mt-1 text-[11px] text-black/55">
+        {hint} Drag a row by its handle to change the order.
+      </p>
       <div className="mt-2 space-y-3">
         {items.map((row, i) => {
           const fmt = resolveStatFormat(row);
           return (
-            <div key={i} className="rounded-xl border border-black/10 p-3">
+            <div
+              key={i}
+              {...reorder.rowProps(i)}
+              className="rounded-xl border border-black/10 p-3 data-[drop-target]:border-[#003FC7] data-[dragging]:opacity-60"
+            >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[11px] font-semibold text-black/55">Figure {i + 1}</span>
-                <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#03002C]">
-                  {formatStatValue(row.value, row) || "—"}
+                <span className="flex items-center gap-1.5">
+                  <ReorderHandle
+                    draggable
+                    {...reorder.handleProps(i, `Figure ${i + 1}`)}
+                  />
+                  <span className="text-[11px] font-semibold text-black/55">Figure {i + 1}</span>
+                </span>
+                <span className="flex items-center gap-2">
+                  <ReorderNudge
+                    onUp={() => reorder.moveUpRow(i)}
+                    onDown={() => reorder.moveDownRow(i)}
+                    upDisabled={!canMoveUp(i)}
+                    downDisabled={!canMoveDown(i, items.length)}
+                    label={`figure ${i + 1}`}
+                  />
+                  <span className="rounded-full bg-[#E0E8F5] px-2 py-0.5 text-[11px] font-semibold tabular-nums text-[#03002C]">
+                    {formatStatValue(row.value, row) || "—"}
+                  </span>
                 </span>
               </div>
 
