@@ -66,7 +66,11 @@ async function pngDataUrl(svg: string, w: number, h: number, scale = 2): Promise
 
 export function downloadFloorMapSvg(floor: LondonFloorId, opts: MapExportOptions) {
   const svg = floorMapSvg(floor, opts);
-  save(new Blob([svg], { type: "image/svg+xml" }), `next-london-map-${floor.toLowerCase()}.svg`);
+  const kind = opts.roomsOnly ? "rooms" : "map";
+  save(
+    new Blob([svg], { type: "image/svg+xml" }),
+    `next-london-${kind}-${floor.toLowerCase()}.svg`,
+  );
 }
 
 export async function downloadFloorMapPng(floor: LondonFloorId, opts: MapExportOptions) {
@@ -74,10 +78,16 @@ export async function downloadFloorMapPng(floor: LondonFloorId, opts: MapExportO
   if (!plan) return;
   const { w, h } = floorMapSheetSize(floor, opts);
   const blob = await mapPngBlob(floorMapSvg(floor, opts), w, h, 2.5);
-  save(blob, `next-london-map-${floor.toLowerCase()}.png`);
+  save(blob, `next-london-${opts.roomsOnly ? "rooms" : "map"}-${floor.toLowerCase()}.png`);
+}
+
+/** Attendee floor guide: one page per floor, rooms and breakouts only. */
+export async function downloadAttendeeMapPdf(opts: MapExportOptions) {
+  await buildFloorPdf({ ...opts, roomsOnly: true, labels: false }, "next-london-floor-guide.pdf");
 }
 
 export function downloadAssetMapSvg(panel: LondonPanel, opts: MapExportOptions) {
+
   const svg = assetMapSvg(panel, opts);
   save(new Blob([svg], { type: "image/svg+xml" }), `next-london-location-${panelSlug(panel)}.svg`);
 }
