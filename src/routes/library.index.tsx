@@ -2,6 +2,7 @@ import { HeroVideoLayer } from "@/components/hero/HeroVideoLayer";
 import heroPresentationVideo from "@/assets/hero-presentation.mp4.asset.json";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { BackToTop } from "@/components/BackToTop";
+import { moduleCopy } from "@/lib/module-copy";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { toast } from "sonner";
@@ -2019,6 +2020,13 @@ const VariantCard = memo(function VariantCard({
             >
               {variant.id}
             </div>
+            <p className="line-clamp-2 text-[11px] leading-snug text-slate-500">
+              {videoExample
+                ? videoExample.blurb
+                : preset
+                  ? preset.description
+                  : moduleCopy(variant).caption}
+            </p>
           </div>
         ) : (
           <div className="space-y-4 p-6 pt-4">
@@ -2040,13 +2048,22 @@ const VariantCard = memo(function VariantCard({
               </span>
             </div>
 
-            <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">
-              {videoExample
-                ? videoExample.blurb
-                : preset
-                  ? preset.description
-                  : variant.description}
-            </p>
+            <div className="space-y-1.5">
+              <p className="text-sm font-medium leading-snug text-[#03002C]/80">
+                {videoExample
+                  ? videoExample.title
+                  : preset
+                    ? preset.label
+                    : moduleCopy(variant).caption}
+              </p>
+              <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">
+                {videoExample
+                  ? videoExample.blurb
+                  : preset
+                    ? preset.description
+                    : moduleCopy(variant).description}
+              </p>
+            </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
               <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
@@ -3510,7 +3527,15 @@ function VariantDetailModal({
                 modes={splitSampleContent(detailContent).modes}
               />
 
-              <p className="mt-4 text-sm text-black/60">{variant.description}</p>
+              <p className="mt-4 text-sm font-medium text-[#03002C]">
+                {moduleCopy(variant).caption}
+              </p>
+              <p className="mt-1.5 text-sm leading-relaxed text-black/60">
+                {moduleCopy(variant).description}
+              </p>
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.1em] text-black/35">
+                {variant.description}
+              </p>
             </div>
 
             {/* Specifics */}
