@@ -397,6 +397,17 @@ export function TitleBlock({
 // primary, unit/suffix in accent, small-caps label beneath. Sizes are named
 // so a stat row baseline-aligns and a single-stat slide can go monumental.
 type StatSize = "sm" | "md" | "lg" | "xl" | "monumental";
+/**
+ * True when two strings say the same thing once punctuation, spacing and case
+ * are ignored. Imported content routinely repeats a stat's label in its unit
+ * slot ("Markets live" / "Cost / word"), which printed the same words twice.
+ */
+export function sameWords(a: string, b: string): boolean {
+  const norm = (v: string) => v.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const na = norm(a);
+  return na.length > 0 && na === norm(b);
+}
+
 const STAT_SPECS: Record<StatSize, { valuePx: number; unitPx: number; labelPx: number }> = {
   sm: { valuePx: 84, unitPx: 32, labelPx: 20 },
   md: { valuePx: 116, unitPx: 42, labelPx: 22 },
@@ -511,7 +522,7 @@ export function StatFigure({
   //     font-size ceiling so very wide values step down automatically before
   //     they touch the next column;
   //   • tighten letter-spacing on the value so long strings stay compact.
-  const rawUnitText = unit?.trim() ?? "";
+  const rawUnitText = sameWords(unit ?? "", label ?? "") ? "" : (unit?.trim() ?? "");
   // A unit only reads as a unit when the value ends in a numeral. Seeded and
   // imported content often carries a leftover "%" alongside a value that
   // already states its own units ("6 wks → 9 days"), which printed as
