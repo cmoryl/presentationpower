@@ -285,8 +285,9 @@ ${northArrow(size.w - PAD - 8, PAD + 22)}
 </g>
 ${planBody(plan, ox, oy)}
 ${pins}
-${scaleBar(PAD, size.h - FOOT - LEGEND + 6)}
-${legendRow(kinds, PAD, size.h - FOOT - LEGEND + 34, size.w - PAD * 2)}
+${scaleBar(PAD, legendY + 6)}
+${legendRow(kinds, PAD, legendY + 34, size.w - PAD * 2)}
+${numbered ? indexBlock(markers, PAD, size.h - FOOT - indexH + 14, size.w - PAD * 2) : ""}
 ${
   opts.footerNote === null
     ? ""
