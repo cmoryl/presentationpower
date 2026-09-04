@@ -542,20 +542,17 @@ function neutralizeBackdropFilters(root: HTMLElement, mode: SlideExportMode): ()
  * baked height, and prints straight through the element below (observed on
  * MV-DEC-CHECKLIST: the label's second line landed on top of its note).
  *
- * Before capture, every text leaf that renders on ONE line in the live DOM is
- * pinned to one line (`white-space: nowrap`, and a hair of tracking relief so
- * a marginally wider face still fits rather than clipping). Multi-line leaves
- * keep their wrapping but get their live height and `overflow: hidden`, so an
- * extra raster line can never bleed into a sibling. All inline styles are
- * restored afterwards.
+ * Before capture, every text leaf gets a hair of tracking relief (~0.4% of its
+ * font size) so a marginally wider face still fits the line it fits on screen,
+ * and leaves that render on ONE line are pinned to one line (`nowrap`). Nothing
+ * is height-clamped: clipping a word off a wrapped paragraph would be a worse
+ * defect than the wrap it prevents. All inline styles are restored afterwards.
  */
 function pinTextLineCounts(root: HTMLElement): () => void {
   const affected: Array<{
     el: HTMLElement;
     whiteSpace: string;
     letterSpacing: string;
-    height: string;
-    overflow: string;
   }> = [];
   root.querySelectorAll<HTMLElement>("*").forEach((el) => {
     if (el.children.length > 0) return;
@@ -571,29 +568,22 @@ function pinTextLineCounts(root: HTMLElement): () => void {
       el,
       whiteSpace: el.style.whiteSpace,
       letterSpacing: el.style.letterSpacing,
-      height: el.style.height,
-      overflow: el.style.overflow,
     });
-    if (lines === 1) {
-      el.style.whiteSpace = "nowrap";
-      const tracking = parseFloat(cs.letterSpacing);
-      if (Number.isFinite(tracking)) {
-        el.style.letterSpacing = `${tracking - Math.max(0.01, parseFloat(cs.fontSize) * 0.004)}px`;
-      }
-    } else {
-      el.style.height = `${Math.round(height)}px`;
-      el.style.overflow = "hidden";
+    if (lines === 1) el.style.whiteSpace = "nowrap";
+    const tracking = parseFloat(cs.letterSpacing);
+    const fontSize = parseFloat(cs.fontSize);
+    if (Number.isFinite(tracking) && Number.isFinite(fontSize)) {
+      el.style.letterSpacing = `${tracking - Math.max(0.01, fontSize * 0.004)}px`;
     }
   });
   return () => {
     for (const a of affected) {
       a.el.style.whiteSpace = a.whiteSpace;
       a.el.style.letterSpacing = a.letterSpacing;
-      a.el.style.height = a.height;
-      a.el.style.overflow = a.overflow;
     }
   };
 }
+
 
 /**
 
