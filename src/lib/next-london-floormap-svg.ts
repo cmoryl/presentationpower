@@ -158,6 +158,38 @@ function markerGlyph(
   return `${body}${core}`;
 }
 
+/** Directory index geometry — three columns of numbered entries. */
+const INDEX_COLS = 3;
+const INDEX_ROW = 14;
+
+function indexHeight(count: number): number {
+  if (!count) return 0;
+  return 30 + Math.ceil(count / INDEX_COLS) * INDEX_ROW + 10;
+}
+
+function indexBlock(markers: LondonMarker[], x: number, y: number, w: number): string {
+  if (!markers.length) return "";
+  const rows = Math.ceil(markers.length / INDEX_COLS);
+  const colW = w / INDEX_COLS;
+  const head = `<text x="${x - 2}" y="${y}" font-family="${FONT}" font-size="9.5" letter-spacing="1.4" font-weight="700" fill="${BLUE}">ASSET INDEX</text>`;
+  const entries = markers
+    .map((m, i) => {
+      const col = Math.floor(i / rows);
+      const row = i % rows;
+      const cx = x - 2 + col * colW;
+      const cy = y + 20 + row * INDEX_ROW;
+      const max = Math.floor(colW / 5.3) - 6;
+      const name = m.name.length > max ? `${m.name.slice(0, max - 1)}…` : m.name;
+      return `<text x="${cx}" y="${cy}" font-family="${FONT}" font-size="9" font-weight="700" fill="${
+        LONDON_KIND_INK[m.kind] ?? BLUE
+      }">${i + 1}</text><text x="${cx + 18}" y="${cy}" font-family="${FONT}" font-size="9" fill="${NAVY}" opacity="0.78">${esc(
+        name,
+      )}</text>`;
+    })
+    .join("");
+  return `<g>${head}${entries}</g>`;
+}
+
 function legendRow(kinds: LondonAssetKind[], x: number, y: number, w: number): string {
   const per = Math.max(120, w / Math.max(1, kinds.length));
   return kinds
