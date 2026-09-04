@@ -20,6 +20,7 @@ import {
   type LondonAssetKind,
   type LondonMarker,
   type LondonMarkerOverrides,
+  type LondonZoneKind,
 } from "@/lib/next-london-floorplan";
 import {
   DEFAULT_MAP_DESIGN,
@@ -372,7 +373,6 @@ export function LondonFloorMap({
             );
           })}
 
-
           {plan.entries.map((e) => (
             <span
               key={e.label}
@@ -560,6 +560,26 @@ export function LondonFloorMap({
         ) : null}
       </ul>
     </div>
+  );
+}
+
+/** Category symbol drawn in the top-right of a space, matching the print sheet. */
+function AreaGlyph({ kind, ink }: { kind: LondonZoneKind; ink: string }) {
+  const icon = AREA_ICONS[kind] ?? AREA_ICONS.room;
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="absolute right-1.5 top-1.5 h-[14%] max-h-6 min-h-3 w-auto"
+      style={{ aspectRatio: "1 / 1", color: ink, opacity: 0.8 }}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.7}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={icon.path} />
+    </svg>
   );
 }
 
