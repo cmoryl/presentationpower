@@ -342,7 +342,15 @@ export type StepRepeatPlan = {
   orientation: "stacked" | "side";
   colourway: NextLogoColourway;
   /** QR module geometry, when the recipe carries a code. */
-  qr: { modules: number; path: string } | null;
+  qr: {
+    modules: number;
+    path: string;
+    inkHex: string;
+    /** `null` when the recipe prints the code with no plate behind it. */
+    plateHex: string | null;
+    plateShape: StepRepeatQrPlateShape;
+  } | null;
+
   /** Ink colour for text tiles. */
   inkHex: string;
   tiles: StepRepeatTile[];
