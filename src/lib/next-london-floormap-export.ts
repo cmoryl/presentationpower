@@ -13,6 +13,11 @@ import {
 } from "@/lib/next-london-floorplan";
 import { assetMapSvg, floorMapSheetSize, floorMapSvg } from "@/lib/next-london-floormap-svg";
 import {
+  DEFAULT_MAP_DESIGN,
+  pdfFormatFor,
+  type MapDesign,
+} from "@/lib/next-london-floormap-design";
+import {
   LONDON_VENUE,
   panelSlug,
   type LondonFloorId,
@@ -26,8 +31,14 @@ export type MapExportOptions = {
   labels?: boolean;
   /** Attendee sheets: rooms and breakouts only, no signage pins. */
   roomsOnly?: boolean;
+  /** Look, sheet setup, pin treatment and wording. */
+  design?: MapDesign;
 };
 
+/** Raster multiplier the design asks for, clamped to what a canvas can hold. */
+function scaleOf(opts: MapExportOptions): number {
+  return Math.max(1, Math.min(4, opts.design?.exportScale ?? 2.5));
+}
 
 function save(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -77,7 +88,7 @@ export async function downloadFloorMapPng(floor: LondonFloorId, opts: MapExportO
   const plan = LONDON_FLOOR_PLANS.find((p) => p.floor === floor);
   if (!plan) return;
   const { w, h } = floorMapSheetSize(floor, opts);
-  const blob = await mapPngBlob(floorMapSvg(floor, opts), w, h, 2.5);
+  const blob = await mapPngBlob(floorMapSvg(floor, opts), w, h, scaleOf(opts));
   save(blob, `next-london-${opts.roomsOnly ? "rooms" : "map"}-${floor.toLowerCase()}.png`);
 }
 
@@ -87,7 +98,6 @@ export async function downloadAttendeeMapPdf(opts: MapExportOptions) {
 }
 
 export function downloadAssetMapSvg(panel: LondonPanel, opts: MapExportOptions) {
-
   const svg = assetMapSvg(panel, opts);
   save(new Blob([svg], { type: "image/svg+xml" }), `next-london-location-${panelSlug(panel)}.svg`);
 }
@@ -97,12 +107,24 @@ export async function downloadAssetMapPng(panel: LondonPanel, opts: MapExportOpt
   const svg = assetMapSvg(panel, opts);
   const w = Number(/width="(\d+)"/.exec(svg)?.[1] ?? 720);
   const h = Number(/height="(\d+)"/.exec(svg)?.[1] ?? 520);
-  save(await mapPngBlob(svg, w, h, 2.5), `next-london-location-${panelSlug(panel)}.png`);
+  save(await mapPngBlob(svg, w, h, scaleOf(opts)), `next-london-location-${panelSlug(panel)}.png`);
 }
 
 /** Shared page-per-floor PDF builder for both the install set and the guide. */
 async function buildFloorPdf(opts: MapExportOptions, filename: string) {
-  const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a3" });
+  const design = opts.design ?? DEFAULT_MAP_DESIGN;
+  const first0 = LONDON_FLOOR_PLANS[0]!;
+  const fallback = floorMapSheetSize(first0.floor, opts);
+  // "Sheet" paper sizes the page to the artwork itself, so nothing is letterboxed.
+  const format = pdfFormatFor(design) ?? [
+    Math.round(fallback.w * 0.75),
+    Math.round(fallback.h * 0.75),
+  ];
+  const doc = new jsPDF({
+    orientation: design.orientation === "portrait" ? "portrait" : "landscape",
+    unit: "pt",
+    format,
+  });
   const PW = doc.internal.pageSize.getWidth();
   const PH = doc.internal.pageSize.getHeight();
   const M = 28;
@@ -123,7 +145,12 @@ async function buildFloorPdf(opts: MapExportOptions, filename: string) {
       footerNote: `${plan.label} · sheet ${i + 1} of ${sheets.length}`,
     };
     const { w, h } = floorMapSheetSize(plan.floor, sheetOpts);
-    const data = await pngDataUrl(floorMapSvg(plan.floor, sheetOpts), w, h, 2);
+    const data = await pngDataUrl(
+      floorMapSvg(plan.floor, sheetOpts),
+      w,
+      h,
+      Math.min(3, scaleOf(opts)),
+    );
     // The sheet carries its own directory header, legend and credit strip, so the
     // page is just the artwork centred with an even margin — no second typeface.
     const k = Math.min((PW - M * 2) / w, (PH - M * 2) / h);
@@ -138,7 +165,6 @@ async function buildFloorPdf(opts: MapExportOptions, filename: string) {
 export async function downloadFloorMapPdf(opts: MapExportOptions) {
   await buildFloorPdf({ ...opts, roomsOnly: false }, "next-london-install-maps.pdf");
 }
-
 
 /** A zip with one location map per asset, plus the install schedule. */
 export async function downloadAssetMapPack(opts: MapExportOptions) {
@@ -157,7 +183,11 @@ export async function downloadAssetMapPack(opts: MapExportOptions) {
     if (!opts.panels.some((p) => p.floor === plan.floor)) continue;
     sheets.file(
       `next-london-directory-${plan.floor.toLowerCase()}.svg`,
-      floorMapSvg(plan.floor, { ...opts, labels: true, footerNote: `${plan.label} · install plan` }),
+      floorMapSvg(plan.floor, {
+        ...opts,
+        labels: true,
+        footerNote: `${plan.label} · install plan`,
+      }),
     );
   }
 

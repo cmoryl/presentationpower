@@ -15,12 +15,14 @@ import {
   Image as ImageIcon,
   Map as MapIcon,
   Package,
+  Palette,
   RotateCcw,
   Table2,
 } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
 import { LondonFloorMap, londonKindsPresent } from "@/components/events/LondonFloorMap";
+import { LondonMapDesignPanel } from "@/components/events/LondonMapDesignPanel";
 import { useSessionUser } from "@/hooks/use-session-user";
 import { runWithExportFeedback } from "@/lib/export-feedback";
 import {
@@ -43,6 +45,7 @@ import {
   downloadFloorMapSvg,
   downloadMapCsv,
 } from "@/lib/next-london-floormap-export";
+import { DEFAULT_MAP_DESIGN, type MapDesign } from "@/lib/next-london-floormap-design";
 import { effectiveLondonPanels } from "@/lib/next-london-revise";
 import { listLondonRevisions } from "@/lib/next-london-revise.functions";
 import {
@@ -53,6 +56,7 @@ import {
 } from "@/lib/next-london-signage";
 
 const STORE_KEY = "next-london-map-positions-v1";
+const DESIGN_KEY = "next-london-map-design-v1";
 
 export const Route = createFileRoute("/events/next_/london_/maps")({
   head: () => ({
@@ -87,7 +91,9 @@ function LondonMapsPage() {
   const [query, setQuery] = useState("");
   /** Attendee mode draws rooms and breakouts only — no signage pins. */
   const [attendee, setAttendee] = useState(false);
-
+  /** Live map design — previewed on screen and read by every download. */
+  const [design, setDesign] = useState<MapDesign>(DEFAULT_MAP_DESIGN);
+  const [designOpen, setDesignOpen] = useState(false);
 
   // Corrections live per browser: the location team marks up positions on site
   // and the same browser keeps producing corrected maps.
@@ -95,6 +101,10 @@ function LondonMapsPage() {
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) setOverrides(JSON.parse(raw) as LondonMarkerOverrides);
+      const rawDesign = localStorage.getItem(DESIGN_KEY);
+      // Merge over the defaults so a design saved before a new control existed
+      // still opens with every field populated.
+      if (rawDesign) setDesign({ ...DEFAULT_MAP_DESIGN, ...(JSON.parse(rawDesign) as MapDesign) });
     } catch {
       /* Corrupt or unavailable storage — schematic positions stand. */
     }
@@ -136,19 +146,26 @@ function LondonMapsPage() {
       (p) =>
         (!kinds.length || kinds.includes(londonAssetKind(p))) &&
         (!q ||
-          `${p.name} ${p.room} ${p.trimW}x${p.trimH} ${
-            LONDON_ASSET_KIND_LABEL[londonAssetKind(p)]
-          }`
+          `${p.name} ${p.room} ${p.trimW}x${p.trimH} ${LONDON_ASSET_KIND_LABEL[londonAssetKind(p)]}`
             .toLowerCase()
             .includes(q)),
     );
   }, [floorPanels, kinds, query]);
   const selected = floorPanels.find((p) => p.id === selectedId) ?? null;
   const selectedMarker = selected ? londonMarkerFor(selected, panels, overrides) : null;
-  const installOpts = { panels, overrides, kinds, labels: true };
+  const installOpts = { panels, overrides, kinds, labels: true, design };
   const exportOpts = attendee
-    ? { panels, overrides, roomsOnly: true, labels: false }
+    ? { panels, overrides, roomsOnly: true, labels: false, design }
     : installOpts;
+
+  const applyDesign = useCallback((next: MapDesign) => {
+    setDesign(next);
+    try {
+      localStorage.setItem(DESIGN_KEY, JSON.stringify(next));
+    } catch {
+      /* Private mode — the session still renders the chosen design. */
+    }
+  }, []);
 
   const correctedCount = Object.keys(overrides).length;
 
@@ -212,7 +229,10 @@ function LondonMapsPage() {
             <dl className="mt-7 flex flex-wrap gap-x-9 gap-y-4">
               {[
                 { k: "Floors mapped", v: String(floors.length) },
-                { k: "Assets pinned", v: String(panels.filter((p) => londonFloorPlan(p.floor)).length) },
+                {
+                  k: "Assets pinned",
+                  v: String(panels.filter((p) => londonFloorPlan(p.floor)).length),
+                },
                 { k: "Positions confirmed", v: String(correctedCount) },
               ].map((s) => (
                 <div key={s.k}>
@@ -260,12 +280,13 @@ function LondonMapsPage() {
                 type="button"
                 className={btn}
                 onClick={() =>
-                  runWithExportFeedback({
+                  runWithExportFeedback(
+                    {
                       pending: "Building one location card per asset…",
                       success: "next-london-location-maps.zip downloaded",
                       failure: "Location card pack failed",
-                    }, () =>
-                    downloadAssetMapPack(installOpts),
+                    },
+                    () => downloadAssetMapPack(installOpts),
                   )
                 }
               >
@@ -388,34 +409,55 @@ function LondonMapsPage() {
               onSelect={setSelectedId}
               editable={!attendee}
               roomsOnly={attendee}
+              design={design}
             />
 
             <div className="min-w-0">
               <div className="flex flex-wrap gap-2">
-
                 <button
                   type="button"
                   className={btn}
                   onClick={() => downloadFloorMapSvg(floor, exportOpts)}
                 >
-                  <Download className="h-4 w-4" /> {attendee ? "Floor guide (SVG)" : "Floor map (SVG)"}
+                  <Download className="h-4 w-4" />{" "}
+                  {attendee ? "Floor guide (SVG)" : "Floor map (SVG)"}
                 </button>
                 <button
                   type="button"
                   className={btn}
                   onClick={() =>
-                    runWithExportFeedback({
-                      pending: "Rasterising the floor map…",
-                      success: "Floor map PNG downloaded",
-                      failure: "Floor map PNG failed",
-                    }, () =>
-                      downloadFloorMapPng(floor, exportOpts),
+                    runWithExportFeedback(
+                      {
+                        pending: "Rasterising the floor map…",
+                        success: "Floor map PNG downloaded",
+                        failure: "Floor map PNG failed",
+                      },
+                      () => downloadFloorMapPng(floor, exportOpts),
                     )
                   }
                 >
-                  <ImageIcon className="h-4 w-4" /> {attendee ? "Floor guide (PNG)" : "Floor map (PNG)"}
+                  <ImageIcon className="h-4 w-4" />{" "}
+                  {attendee ? "Floor guide (PNG)" : "Floor map (PNG)"}
+                </button>
+                <button
+                  type="button"
+                  className={btn}
+                  aria-expanded={designOpen}
+                  onClick={() => setDesignOpen((v) => !v)}
+                >
+                  <Palette className="h-4 w-4" /> {designOpen ? "Hide design" : "Design the map"}
                 </button>
               </div>
+
+              {designOpen ? (
+                <div className="mt-3">
+                  <LondonMapDesignPanel
+                    design={design}
+                    onChange={applyDesign}
+                    roomsOnly={attendee}
+                  />
+                </div>
+              ) : null}
 
               {attendee ? (
                 <>
@@ -440,53 +482,53 @@ function LondonMapsPage() {
                 </>
               ) : (
                 <>
-              <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
-                Assets on this floor ({listed.length}
-                {listed.length === floorPanels.length ? "" : ` of ${floorPanels.length}`})
-              </h3>
-              <input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Find an asset, room or size…"
-                aria-label="Search assets on this floor"
-                className="mt-2 w-full rounded-full border border-black/10 bg-white px-4 py-2 text-[13px] text-[#03002C] outline-none placeholder:text-[#03002C]/40 focus:border-[#003FC7]"
-              />
-              <ul className="mt-2 max-h-[30rem] divide-y divide-black/5 overflow-y-auto rounded-xl border border-black/10 bg-white">
-                {listed.length ? (
-                  listed.map((p) => {
-                    const active = p.id === selectedId;
-                    return (
-                      <li key={p.id}>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedId(active ? null : p.id)}
-                          className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors ${
-                            active ? "bg-[#E0E8F5]" : "hover:bg-[#F7F9FC]"
-                          }`}
-                        >
-                          <span className="min-w-0">
-                            <span className="block truncate text-[13px] font-medium text-[#03002C]">
-                              {p.name}
-                            </span>
-                            <span className="block truncate font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
-                              {LONDON_ASSET_KIND_LABEL[londonAssetKind(p)]} · {p.room}
-                              {overrides[p.id] ? " · confirmed" : ""}
-                            </span>
-                          </span>
-                          <span className="shrink-0 font-mono text-[10.5px] text-[#03002C]/50">
-                            {p.trimW}×{p.trimH}
-                          </span>
-                        </button>
+                  <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
+                    Assets on this floor ({listed.length}
+                    {listed.length === floorPanels.length ? "" : ` of ${floorPanels.length}`})
+                  </h3>
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Find an asset, room or size…"
+                    aria-label="Search assets on this floor"
+                    className="mt-2 w-full rounded-full border border-black/10 bg-white px-4 py-2 text-[13px] text-[#03002C] outline-none placeholder:text-[#03002C]/40 focus:border-[#003FC7]"
+                  />
+                  <ul className="mt-2 max-h-[30rem] divide-y divide-black/5 overflow-y-auto rounded-xl border border-black/10 bg-white">
+                    {listed.length ? (
+                      listed.map((p) => {
+                        const active = p.id === selectedId;
+                        return (
+                          <li key={p.id}>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedId(active ? null : p.id)}
+                              className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors ${
+                                active ? "bg-[#E0E8F5]" : "hover:bg-[#F7F9FC]"
+                              }`}
+                            >
+                              <span className="min-w-0">
+                                <span className="block truncate text-[13px] font-medium text-[#03002C]">
+                                  {p.name}
+                                </span>
+                                <span className="block truncate font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+                                  {LONDON_ASSET_KIND_LABEL[londonAssetKind(p)]} · {p.room}
+                                  {overrides[p.id] ? " · confirmed" : ""}
+                                </span>
+                              </span>
+                              <span className="shrink-0 font-mono text-[10.5px] text-[#03002C]/50">
+                                {p.trimW}×{p.trimH}
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })
+                    ) : (
+                      <li className="px-3 py-4 text-[12.5px] text-[#03002C]/60">
+                        No asset on this floor matches the current filters.
                       </li>
-                    );
-                  })
-                ) : (
-                  <li className="px-3 py-4 text-[12.5px] text-[#03002C]/60">
-                    No asset on this floor matches the current filters.
-                  </li>
-                )}
-              </ul>
+                    )}
+                  </ul>
                 </>
               )}
 
@@ -535,8 +577,8 @@ function LondonMapsPage() {
                 </div>
               ) : (
                 <p className="mt-4 rounded-xl border border-black/10 bg-white p-4 text-[12.5px] leading-relaxed text-[#03002C]/70">
-                  Pick an asset to see its spec and download a location card. Pins can be dragged, or
-                  nudged with the arrow keys once focused.
+                  Pick an asset to see its spec and download a location card. Pins can be dragged,
+                  or nudged with the arrow keys once focused.
                 </p>
               )}
             </div>
