@@ -9,6 +9,7 @@ import { ClientLogoImg, pickLogoForMode } from "../client-logo";
 import { Kicker } from "../primitives";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
+import { orbitBaseSize, resolveOrbitLayout } from "@/lib/orbit-layout";
 
 const MAX_ORBITS = 3;
 const MAX_GROWTH = 4;
@@ -91,11 +92,8 @@ registerSlideModule({
 
     // Ring size shrinks as the count grows so three still clear each other and
     // the whole stack stays inside the 1080px frame under the headline.
-    const ringSize = orbits.length >= 3 ? 258 : orbits.length === 2 ? 320 : 380;
-    // Slight vertical overlap + alternating alignment gives the staggered,
-    // diagonal run of figures rather than a rigid column.
-    const stackGap = orbits.length >= 3 ? -18 : 12;
-    const align = ["self-start", "self-end", "self-center"];
+    const ringSize = orbitBaseSize(orbits.length);
+    const positions = resolveOrbitLayout(orbits);
 
 
     return (
@@ -289,7 +287,7 @@ registerSlideModule({
                     )}
                     <div
                       style={{
-                        fontSize: Math.round(ringSize * 0.33),
+                        fontSize: Math.round(size * 0.33),
                         fontWeight: 800,
                         lineHeight: 1,
                         letterSpacing: "-0.05em",
@@ -313,7 +311,8 @@ registerSlideModule({
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
