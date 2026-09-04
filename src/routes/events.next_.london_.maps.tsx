@@ -417,6 +417,29 @@ function LondonMapsPage() {
                 </button>
               </div>
 
+              {attendee ? (
+                <>
+                  <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
+                    Rooms and breakouts on this floor
+                  </h3>
+                  <ul className="mt-2 max-h-[30rem] divide-y divide-black/5 overflow-y-auto rounded-xl border border-black/10 bg-white">
+                    {(plan?.zones ?? [])
+                      .filter((z) => z.kind !== "circulation" && z.kind !== "core")
+                      .map((z) => (
+                        <li
+                          key={z.id}
+                          className="flex items-center justify-between gap-3 px-3 py-2 text-[13px] text-[#03002C]"
+                        >
+                          <span className="truncate font-medium">{z.label}</span>
+                          <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.1em] text-[#03002C]/55">
+                            {z.kind}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                </>
+              ) : (
+                <>
               <h3 className="mt-5 text-sm font-semibold text-[#03002C]">
                 Assets on this floor ({listed.length}
                 {listed.length === floorPanels.length ? "" : ` of ${floorPanels.length}`})
@@ -464,9 +487,10 @@ function LondonMapsPage() {
                   </li>
                 )}
               </ul>
+                </>
+              )}
 
-
-              {selected ? (
+              {selected && !attendee ? (
                 <div className="mt-4 rounded-xl border border-[#003FC7]/25 bg-[#E0E8F5] p-4">
                   <p className="text-[13px] font-semibold text-[#03002C]">{selected.name}</p>
                   <p className="mt-1 text-[12.5px] leading-relaxed text-[#03002C]/75">
