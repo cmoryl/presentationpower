@@ -464,6 +464,10 @@ ${
         size.w,
         size.h - FOOT + 4,
         opts.footerNote ?? `${plan.label} · ${roomsOnly ? "attendee floor guide" : "install plan"}`,
+        roomsOnly
+          ? `${LONDON_VENUE.name} · schematic layout for orientation — follow on-site wayfinding and venue staff.`
+          : undefined,
+
       )
 }`;
 }
