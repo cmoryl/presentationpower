@@ -760,7 +760,7 @@ registerSlideModule({
                           {tasks.map((t, ti) => {
                             const TaskIcon = t.icon ? iconByName(s(t.icon)) : null;
                             const taskGap = wide ? 4 : slim ? 2 : 3;
-                            const wellRadius = slim ? 12 : 18;
+                            const iconDisc = Math.round(iconBox * 0.78);
                             return (
                               <React.Fragment key={ti}>
                                 {ti > 0 && (
@@ -769,7 +769,8 @@ registerSlideModule({
                                     data-decorative
                                     className="flex items-center justify-center"
                                     style={{
-                                      width: iconBox,
+                                      width: iconDisc,
+
                                       height: wide ? 26 : slim ? 14 : 20,
                                       marginTop: taskGap,
                                       marginBottom: taskGap,
@@ -785,46 +786,38 @@ registerSlideModule({
 
                                 <div
                                   className="flex items-center"
-                                  style={{ gap: wide ? 24 : slim ? 14 : 18 }}
+                                  style={{ gap: wide ? 20 : slim ? 12 : 16 }}
                                 >
                                   <div
-                                    className="relative flex shrink-0 items-center justify-center"
-                                    style={{ width: iconBox, height: iconBox, ...iconWellStyle(t) }}
+                                    className="relative flex shrink-0 items-center justify-center rounded-full"
+                                    style={{
+                                      width: Math.round(iconBox * 0.78),
+                                      height: Math.round(iconBox * 0.78),
+                                      backgroundColor: `color-mix(in oklab, ${cellAccent(t, accent, mode)} 12%, transparent)`,
+                                    }}
                                   >
-                                    <div
-                                      aria-hidden
-                                      data-decorative
-                                      className="absolute inset-0"
-                                      style={{
-                                        borderRadius: wellRadius,
-                                        backgroundImage: cellWash(t, cellAccent(t, accent, mode)),
-                                      }}
-                                    />
-                                    <div
-                                      aria-hidden
-                                      data-decorative
-                                      className="absolute inset-0"
-                                      style={openBottomFrame(cellAccent(t, accent, mode), wellRadius)}
-                                    />
-
                                     <span
                                       className="relative"
                                       style={{ color: cellAccent(t, accent, mode) }}
                                     >
                                       {TaskIcon ? (
                                         <TaskIcon
-                                          size={Math.round(iconBox * 0.46 * cellIconScale(t))}
-                                          strokeWidth={1.7}
+                                          size={Math.round(iconBox * 0.42 * cellIconScale(t))}
+                                          strokeWidth={1.6}
                                         />
                                       ) : (
                                         <span
-                                          style={{ fontSize: fillPx(24, "body"), fontWeight: 700 }}
+                                          style={{
+                                            fontSize: Math.round(iconBox * 0.34),
+                                            fontWeight: 700,
+                                          }}
                                         >
                                           {ti + 1}
                                         </span>
                                       )}
                                     </span>
                                   </div>
+
                                   <div
                                     className="min-w-0"
                                     style={{
