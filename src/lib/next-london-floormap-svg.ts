@@ -294,19 +294,31 @@ function planBody(plan: LondonFloorPlan, ox: number, oy: number, roomsOnly = fal
         `<path d="M ${n(x)} ${n(y + 3)} a 3 3 0 0 1 3 -3 h ${n(bar)} v ${n(h)} h ${n(-bar)} a 3 3 0 0 1 -3 -3 Z" fill="${style.accent}" opacity="${
           quiet ? 0.6 : 0.95
         }" />`;
-      const label =
-        h > 20
+      // Attendee sheets centre a larger room name in the tile — there are no pins
+      // to avoid, so the name can own the space and read from a phone.
+      const label = roomsOnly
+        ? h > 14 && !quiet
+          ? `<text x="${n(x + bar + (w - bar) / 2)}" y="${n(y + h / 2 + 4)}" text-anchor="middle" font-family="${FONT}" font-size="${
+              w > 150 ? 12 : w > 96 ? 10.5 : 9
+            }" font-weight="600" letter-spacing="0.8" fill="${NAVY}">${esc(z.label.toUpperCase())}</text>`
+          : h > 12
+            ? `<text x="${n(x + bar + 8)}" y="${n(y + h / 2 + 3)}" font-family="${FONT}" font-size="8.5" font-weight="600" letter-spacing="0.7" fill="${NAVY}" opacity="0.55">${esc(
+                z.label.toUpperCase(),
+              )}</text>`
+            : ""
+        : h > 20
           ? `<text x="${n(x + bar + 9)}" y="${n(y + h - 7)}" font-family="${FONT}" font-size="9.5" font-weight="600" letter-spacing="0.9" fill="${NAVY}" opacity="0.8">${esc(
               z.label.toUpperCase(),
             )}</text>`
           : "";
 
       const dims =
-        h > 30 && w > z.label.length * 6.2 + 108
+        !roomsOnly && h > 30 && w > z.label.length * 6.2 + 108
           ? `<text x="${n(x + w - 6)}" y="${n(y + h - 7)}" text-anchor="end" font-family="${FONT}" font-size="8.5" letter-spacing="0.2" fill="${NAVY}" opacity="0.34">${z.w.toFixed(
               1,
             )} × ${z.h.toFixed(1)} m</text>`
           : "";
+
       return `<g>${tile}${label}${dims}</g>`;
     })
     .join("");
