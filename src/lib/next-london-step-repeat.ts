@@ -644,16 +644,33 @@ export function stepRepeatSvgLayer(
         );
       }
       if (!plan.qr) return "";
-      const plate = paintFor("#FFFFFF");
-      const dark = paintFor("#03002C");
+      const dark = paintFor(plan.qr.inkHex);
       const scale = tile.w / plan.qr.modules;
+      let plateEl = "";
+      if (plan.qr.plateHex) {
+        const plate = paintFor(plan.qr.plateHex);
+        if (plan.qr.plateShape === "circle") {
+          // The circle must fully contain the code, so it takes the diagonal.
+          plateEl =
+            `<circle cx="${(tile.x + tile.w / 2).toFixed(2)}" cy="${(tile.y + tile.h / 2).toFixed(2)}"` +
+            ` r="${((tile.w * Math.SQRT2) / 2).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>`;
+        } else {
+          const rx = plan.qr.plateShape === "rounded" ? tile.w * 0.08 : 0;
+          plateEl =
+            `<rect x="${tile.x.toFixed(2)}" y="${tile.y.toFixed(2)}" width="${tile.w.toFixed(2)}" height="${tile.h.toFixed(2)}"` +
+            (rx ? ` rx="${rx.toFixed(2)}"` : "") +
+            ` fill="${plate.paint}"${plate.meta}/>`;
+        }
+      }
       return (
-        `<g data-tile="qr" data-row="${tile.row}" data-col="${tile.col}"${spin}>` +
-        `<rect x="${tile.x.toFixed(2)}" y="${tile.y.toFixed(2)}" width="${tile.w.toFixed(2)}" height="${tile.h.toFixed(2)}"` +
-        ` rx="${(tile.w * 0.04).toFixed(2)}" fill="${plate.paint}"${plate.meta}/>` +
+        `<g data-tile="qr" data-row="${tile.row}" data-col="${tile.col}"` +
+        ` data-qr-ink="${plan.qr.inkHex}" data-qr-plate="${plan.qr.plateHex ?? "none"}"` +
+        ` data-qr-module="${plan.config.qrModuleShape}"${spin}>` +
+        plateEl +
         `<g transform="translate(${tile.x.toFixed(2)} ${tile.y.toFixed(2)}) scale(${scale.toFixed(5)})">` +
         `<path d="${plan.qr.path}" fill="${dark.paint}"${dark.meta}/></g></g>`
       );
+
     })
     .join("");
 
