@@ -391,6 +391,41 @@ const round1 = (n: number) => Math.round(n * 10) / 10;
 const textRunMm = (text: string, sizeMm: number) => Math.max(1, text.length * sizeMm * 0.62);
 
 /**
+ * Dark-module geometry in module units, in the requested shape. Squares are the
+ * scanner-safe default; rounded and dot styles shrink each module slightly, which
+ * every reader tolerates because the sampling point is the module centre.
+ */
+export function stepRepeatQrPath(
+  qr: { size: number; modules: boolean[]; path: string },
+  shape: StepRepeatQrModuleShape,
+): string {
+  if (shape === "square") return qr.path;
+  const parts: string[] = [];
+  const r = shape === "dot" ? 0.46 : 0.22;
+  for (let y = 0; y < qr.size; y += 1) {
+    for (let x = 0; x < qr.size; x += 1) {
+      if (!qr.modules[y * qr.size + x]) continue;
+      if (shape === "dot") {
+        // Circle as two arcs, so the geometry survives the PDF path converter.
+        const cx = x + 0.5;
+        const cy = y + 0.5;
+        parts.push(
+          `M${cx - r} ${cy}A${r} ${r} 0 0 1 ${cx + r} ${cy}A${r} ${r} 0 0 1 ${cx - r} ${cy}z`,
+        );
+      } else {
+        parts.push(
+          `M${x + r} ${y}h${1 - 2 * r}a${r} ${r} 0 0 1 ${r} ${r}v${1 - 2 * r}` +
+            `a${r} ${r} 0 0 1 ${-r} ${r}h${-(1 - 2 * r)}a${r} ${r} 0 0 1 ${-r} ${-r}` +
+            `v${-(1 - 2 * r)}a${r} ${r} 0 0 1 ${r} ${-r}z`,
+        );
+      }
+    }
+  }
+  return parts.join("");
+}
+
+
+/**
  * Lay the wall out. Tiles are generated with one row/column of overscan on every
  * side, so the pattern truly bleeds off all four edges instead of stopping at
  * the artboard.
