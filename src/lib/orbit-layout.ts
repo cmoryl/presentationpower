@@ -126,3 +126,157 @@ export function resetOrbitPos(items: unknown[], index: number): Record<string, u
     return row;
   });
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Collision detection
+ *
+ * The rings are placed by percentage inside the right-hand stage, so two
+ * figures (or a figure and the stage edge) can end up overlapping — the labels
+ * and percentages then print on top of each other. `fitOrbitLayout` runs a
+ * short relaxation pass over the resolved placements: any pair of rings closer
+ * than their combined radii plus a breathing gap is pushed apart along the line
+ * between their centres, and every centre is finally clamped so the whole ring
+ * stays inside the stage. Earlier figures carry more weight, so the reading
+ * order is preserved and the first figure barely moves.
+ *
+ * Units are arbitrary (px on the slide, inches in the PPTX export) as long as
+ * the stage size and the base diameter share them.
+ * ────────────────────────────────────────────────────────────────────────── */
+
+export type OrbitStage = { w: number; h: number };
+
+/** Nominal stage the slide renderer gives the rings (1920×1080 canvas). */
+export function orbitStageSize(count: number): OrbitStage {
+  return { w: 860, h: Math.max(620, orbitBaseSize(count) + 40) };
+}
+
+export type FittedOrbit = OrbitPos & {
+  /** True when collision resolution had to move this figure. */
+  nudged: boolean;
+};
+
+/** Do two placements overlap (rings, plus the breathing gap)? */
+export function orbitsCollide(
+  a: OrbitPos,
+  b: OrbitPos,
+  stage: OrbitStage,
+  base: number,
+  gap = base * 0.06,
+): boolean {
+  const dx = ((a.x - b.x) / 100) * stage.w;
+  const dy = ((a.y - b.y) / 100) * stage.h;
+  const need = ((a.size + b.size) * base) / 2 + gap;
+  return Math.hypot(dx, dy) < need;
+}
+
+/**
+ * Resolve overlaps between placements and keep every ring inside the stage.
+ * Returns placements in the same percentage space as the input.
+ */
+export function fitOrbitLayout(
+  positions: OrbitPos[],
+  opts: { stage: OrbitStage; base: number; gap?: number; iterations?: number } ,
+): FittedOrbit[] {
+  const { stage, base } = opts;
+  const gap = opts.gap ?? base * 0.06;
+  const iterations = opts.iterations ?? 60;
+  if (positions.length === 0 || stage.w <= 0 || stage.h <= 0) {
+    return positions.map((p) => ({ ...p, nudged: false }));
+  }
+
+  // Work in stage units so the push is geometrically correct on a non-square
+  // stage (a 5% step sideways is not the same distance as 5% down).
+  const pts = positions.map((p) => ({
+    x: (p.x / 100) * stage.w,
+    y: (p.y / 100) * stage.h,
+    r: (p.size * base) / 2,
+  }));
+  const start = pts.map((p) => ({ x: p.x, y: p.y }));
+  // Earlier figures resist movement: weight 1, 1.6, 2.2, ...
+  const give = pts.map((_, i) => 1 + i * 0.6);
+
+  const clampIn = (i: number) => {
+    const p = pts[i]!;
+    const m = Math.min(p.r, stage.w / 2);
+    const mh = Math.min(p.r, stage.h / 2);
+    p.x = clamp(p.x, m, stage.w - m);
+    p.y = clamp(p.y, mh, stage.h - mh);
+  };
+
+  for (let it = 0; it < iterations; it += 1) {
+    let moved = false;
+    for (let i = 0; i < pts.length; i += 1) {
+      for (let j = i + 1; j < pts.length; j += 1) {
+        const a = pts[i]!;
+        const b = pts[j]!;
+        let dx = b.x - a.x;
+        let dy = b.y - a.y;
+        let d = Math.hypot(dx, dy);
+        const need = a.r + b.r + gap;
+        if (d >= need * 1.01) continue;
+        if (d < 0.0001) {
+          // Perfectly stacked — separate along a stable diagonal.
+          dx = 0.7071;
+          dy = 0.7071;
+          d = 1;
+        }
+        // 1% slack absorbs the rounding back into percentages, so a pair that
+        // has just been separated never reads as touching again.
+        const push = (need * 1.01 - d) / d;
+        const total = give[i]! + give[j]!;
+        a.x -= dx * push * (give[i]! / total);
+        a.y -= dy * push * (give[i]! / total);
+        b.x += dx * push * (give[j]! / total);
+        b.y += dy * push * (give[j]! / total);
+        clampIn(i);
+        clampIn(j);
+        moved = true;
+      }
+    }
+    for (let i = 0; i < pts.length; i += 1) clampIn(i);
+    if (!moved) break;
+  }
+
+  // Safety net: if the stage is simply too tight for the authored sizes, the
+  // relaxation can stay wedged against the edges. Fall back to an even grid in
+  // reading order so figures still never sit on top of each other.
+  const stillColliding = () => {
+    for (let i = 0; i < pts.length; i += 1) {
+      for (let j = i + 1; j < pts.length; j += 1) {
+        const a = pts[i]!;
+        const b = pts[j]!;
+        if (Math.hypot(b.x - a.x, b.y - a.y) < a.r + b.r + gap * 0.5) return true;
+      }
+    }
+    return false;
+  };
+  if (stillColliding()) {
+    const cols = Math.min(pts.length, Math.max(1, Math.floor(stage.w / (base + gap))));
+    const rows = Math.ceil(pts.length / cols);
+    pts.forEach((p, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      p.x = ((col + 0.5) / cols) * stage.w;
+      p.y = ((row + 0.5) / rows) * stage.h;
+    });
+    for (let i = 0; i < pts.length; i += 1) clampIn(i);
+  }
+
+  return pts.map((p, i) => ({
+    x: Math.round(clamp((p.x / stage.w) * 100, 0, 100) * 10) / 10,
+    y: Math.round(clamp((p.y / stage.h) * 100, 0, 100) * 10) / 10,
+    size: positions[i]!.size,
+    nudged:
+      Math.abs(p.x - start[i]!.x) > 0.5 || Math.abs(p.y - start[i]!.y) > 0.5,
+  }));
+}
+
+/** Resolve stored placements and immediately clear any collisions. */
+export function resolveFittedOrbitLayout(
+  items: unknown[],
+  opts?: { stage?: OrbitStage; base?: number; gap?: number },
+): FittedOrbit[] {
+  const base = opts?.base ?? orbitBaseSize(items.length);
+  const stage = opts?.stage ?? orbitStageSize(items.length);
+  return fitOrbitLayout(resolveOrbitLayout(items), { stage, base, gap: opts?.gap });
+}

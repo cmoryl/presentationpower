@@ -10,7 +10,7 @@ import { Kicker } from "../primitives";
 import { accentInk } from "@/lib/accent-tokens";
 import { fillPx } from "@/lib/open-space-fill";
 import { formatStatValue } from "@/lib/stat-format";
-import { orbitBaseSize, resolveOrbitLayout } from "@/lib/orbit-layout";
+import { orbitBaseSize, orbitStageSize, resolveFittedOrbitLayout } from "@/lib/orbit-layout";
 import {
   orbitDotColor,
   orbitRingColor,
@@ -130,7 +130,13 @@ registerSlideModule({
     // Ring size shrinks as the count grows so three still clear each other and
     // the whole stack stays inside the 1080px frame under the headline.
     const ringSize = orbitBaseSize(orbits.length);
-    const positions = resolveOrbitLayout(orbits);
+    // Collision pass: rings that would overlap each other (or run off the
+    // stage) are pushed apart so no percentage or label ever prints on top of
+    // another figure.
+    const positions = resolveFittedOrbitLayout(orbits, {
+      base: ringSize,
+      stage: orbitStageSize(orbits.length),
+    });
 
 
     return (
@@ -297,7 +303,7 @@ registerSlideModule({
                 )}
               </div>
             )}
-            <div className="relative mt-8 w-full flex-1" style={{ minHeight: ringSize + 40 }}>
+            <div className="relative mt-8 w-full flex-1" style={{ minHeight: orbitStageSize(orbits.length).h }}>
               {orbits.map((o: Item, i) => {
                 const pos = positions[i]!;
                 const size = Math.round(ringSize * pos.size);

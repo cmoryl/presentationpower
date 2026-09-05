@@ -6,7 +6,7 @@
 
 import PptxGenJS from "pptxgenjs";
 import { resetImageEmbedLedger } from "./export-image-report";
-import { resolveOrbitLayout } from "./orbit-layout";
+import { fitOrbitLayout, resolveOrbitLayout } from "./orbit-layout";
 import { orbitDotColor, orbitRingColor, resolveOrbitFace } from "./orbit-style";
 import { formatStatValue } from "./stat-format";
 import { MAX_WALL_LOGOS, resolveLogoWall } from "./logo-wall";
@@ -12112,11 +12112,17 @@ function renderGrowthOrbits(
   const avail = 6.8 - top;
   // Each figure keeps the placement authored on the slide (percentages of the
   // right-hand area), so the exported deck matches what the editor shows.
-  const layout = resolveOrbitLayout(orbits);
+  const rawLayout = resolveOrbitLayout(orbits);
   // Ring colour + weight follow the face the slide is exported on.
   const ringFace = resolveOrbitFace(c.orbitStyle, isDarkPalette(p) ? "dark" : "light");
   const ringHex = orbitRingColor(ringFace, p.accent).replace("#", "");
   const baseH = Math.min(1.95, avail / Math.max(orbits.length, 1) - 0.1);
+  // Same collision pass as the on-screen slide, in inches, so the exported
+  // rings never overlap each other or the edge of the stage.
+  const layout = fitOrbitLayout(rawLayout, {
+    stage: { w: RW, h: avail },
+    base: baseH,
+  });
   orbits.forEach((o, k) => {
     const pos = layout[k]!;
     const ringH = baseH * pos.size;
